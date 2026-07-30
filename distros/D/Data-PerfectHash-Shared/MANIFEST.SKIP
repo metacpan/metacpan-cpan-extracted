@@ -1,0 +1,21 @@
+^\.git/
+^\.github/
+^\.superpowers/
+\bblib/
+\bpm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^MANIFEST\.bak$
+(^|/)\.gitignore$
+^Shared\.c$
+\.o$
+\.bs$
+^ppport\.h$
+^[^/]+\.tar\.gz$
+^Data-PerfectHash-Shared-[\d._]+/
+~$
+
+# local tool artifacts / built dists (not shipped)
+(^|/)\.pcg($|/)
+(^|/)\.claude($|/)

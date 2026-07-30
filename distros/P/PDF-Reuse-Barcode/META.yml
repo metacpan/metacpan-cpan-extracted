@@ -24,7 +24,7 @@ no_index:
 provides:
   PDF::Reuse::Barcode:
     file: Barcode.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Barcode::Code128: '0'
   Carp: '0'
@@ -44,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/cnighswonger/PDF-Reuse-Barcode/issues
   repository: https://github.com/cnighswonger/PDF-Reuse-Barcode.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

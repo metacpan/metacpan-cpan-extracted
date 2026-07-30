@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my ($str, $xsize, $ysize, $height, $sPtn, @sizes, $length, $value, %default);
 my $qrcode = 0;
@@ -15,6 +15,25 @@ my $qrcode = 0;
 # keys off this so pre-0.10 output stays byte-identical; the two must not
 # drift apart.
 our $DEFAULT_TEXTSIZE = 10;
+
+# Tallest glyph, in em above the baseline, that a barcode value can put on
+# the page: 750/1000, the AFM bbox ury of Courier's bar glyph. Code128
+# accepts the whole printable ASCII range, so the ceiling has to cover it
+# rather than just the digits at 622 -- Code39 alone reaches 662 with a
+# dollar sign, which overprinted above 32 point. Deliberately the maximum
+# and not a per-value measurement: over-lifting costs a little whitespace
+# above the text, under-lifting puts glyphs through the bars and breaks
+# scanning.
+#
+# The font itself goes higher -- accented capitals reach 805 -- but every
+# symbology here rejects high-byte characters at validation, so those
+# glyphs cannot reach the page through this module.
+my $GLYPH_HEIGHT_EM = 0.75;
+
+# How far general2() lifts the bars to keep them clear of taller text. Set by
+# standardEnd() before it calls general2(); left at 0 by the EAN and UPC
+# paths, which render their text at a fixed 10 point and must not move.
+my $textLift = 0;
 
 sub init
 {  %default   = ( value           => '0000000',
@@ -43,6 +62,8 @@ sub init
    $sPtn   = '';
    @sizes  = ();
    $length = 0;
+   $textLift = 0;
+   $qrcode = 0;
    $value  = ''
 }
 
@@ -86,12 +107,12 @@ sub general2
    }
    else
    {  $length     = 20 + (length($sPtn) * 0.9);
-   my $height  = 38;
-   my $step    = 9;
+   $height     = 38 + $textLift;
+   my $step    = 9 + $textLift;
    my $prolong = 0;
    if ($default{'prolong'} > 1)
    {  $prolong  = $default{'prolong'};
-      $height  = 26 + ($prolong * 12);
+      $height  = 26 + ($prolong * 12) + $textLift;
    }
    if ($default{'drawbackground'})
    {   $str .= "$default{'background'} rg\n";
@@ -136,21 +157,38 @@ sub general3
    prFontSize($sizes[1]);
 }
 
+# textsize reaches a PDF text operator directly, so a non-numeric or
+# non-positive value would emit an invalid or invisible Tf rather than
+# failing anywhere useful.
+sub text_size
+{  my $textsize = $default{'textsize'};
+   return $textsize
+       if defined $textsize && $textsize =~ /^\d*\.?\d+$/ && $textsize > 0;
+   carp "Ignoring invalid textsize '"
+        . (defined $textsize ? $textsize : 'undef')
+        . "', using $DEFAULT_TEXTSIZE";
+   return $DEFAULT_TEXTSIZE;
+}
+
 sub standardEnd
-{  general2();
+{  my $textsize = text_size();
+
+   # The text baseline is fixed at 1.5 while the bars start at 9, so the
+   # 7.5 units of clearance were sized for the old hard-coded 10 point.
+   # Anything taller than that would print digits into the bar region --
+   # a scannability failure, not a cosmetic one. Lift the bars by the
+   # extra digit height instead, which preserves the clearance and leaves
+   # output at the default size untouched. Must be set before general2()
+   # draws anything.
+   $textLift = ($default{'text'} && $textsize > $DEFAULT_TEXTSIZE)
+             ? ($textsize * $GLYPH_HEIGHT_EM)
+               - ($DEFAULT_TEXTSIZE * $GLYPH_HEIGHT_EM)
+             : 0;
+
+   general2();
 
    if ($default{'text'})
    {   my @vec = prFont('C');
-       # textsize reaches a PDF text operator directly, so a non-numeric
-       # or non-positive value would emit an invalid or invisible Tf
-       # rather than failing anywhere useful.
-       my $textsize = $default{'textsize'};
-       unless (defined $textsize && $textsize =~ /^\d*\.?\d+$/ && $textsize > 0)
-       {   carp "Ignoring invalid textsize '"
-                . (defined $textsize ? $textsize : 'undef')
-                . "', using $DEFAULT_TEXTSIZE";
-           $textsize = $DEFAULT_TEXTSIZE;
-       }
        prFontSize($textsize);
        # Courier is monospaced at 600/1000 em, so this is the exact
        # rendered width, not an estimate. At the default size of 10 it
@@ -691,8 +729,10 @@ sub UPCE
 
 sub QRcode
 {  eval 'require GD::Barcode::QRcode';
-   $qrcode = 1;
+   # init() resets per-call state, so the flag has to be set after it,
+   # not before -- setting it first meant init() wiped it.
    init();
+   $qrcode = 1;
    my %param = @_;
    for (keys %param)
     {   my $lc = lc($_);
@@ -962,6 +1002,10 @@ no other parameter needs adjusting when this changes.
                                 y         => 600,
                                 value     => '1234567890',
                                 textsize  => 14);
+
+The bars are raised to keep clear of the text as it grows, so a large
+C<textsize> does not print digits over the bottom of the barcode.  The
+background box grows to match.  Output at the default size is unchanged.
 
 If the text comes out wider than the barcode itself -- a short value at a
 large size -- the background is extended on both sides to hold it, rather

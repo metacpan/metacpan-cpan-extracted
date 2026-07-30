@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Symbols 0.54;
+package Devel::MAT::Tool::Symbols 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant CMD => "symbols";
 use constant CMD_DESC => "Display a list of the symbol table";
@@ -23,6 +26,8 @@ This C<Devel::MAT> tool displays a list names from the symbol table.
 =cut
 
 =head1 COMMANDS
+
+=for highlighter
 
 =head2 symbols
 
@@ -49,10 +54,8 @@ Recursively show the inner symbols inside stashes.
 
 =cut
 
-sub extract_symbols
+sub extract_symbols ( $stash, $prefix )
 {
-   my ( $stash, $prefix ) = @_;
-
    my @ret;
    foreach my $key ( sort $stash->keys ) {
       my $gv = $stash->value( $key );
@@ -71,10 +74,8 @@ sub extract_symbols
    return @ret;
 }
 
-sub _show_symbol
+sub _show_symbol ( $name, $sv )
 {
-   my ( $name, $sv ) = @_;
-
    Devel::MAT::Cmd->printf( "%s at %s\n",
       Devel::MAT::Cmd->format_symbol( $name, $sv ),
       Devel::MAT::Cmd->format_sv( $sv ),
@@ -90,18 +91,16 @@ use constant CMD_ARGS => (
    { name => "start", help => "show symbols within this symbol, rather than %main::" },
 );
 
-sub run
+sub run ( $self, $optsref, $start = undef )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
+   my %opts = $optsref->%*;
 
    my $df = $self->df;
 
    my @queue;
 
-   if( @_ ) {
-      my $name = shift @_;
-      @queue = extract_symbols( $self->pmat->find_stash( $name ), $name . "::" );
+   if( defined $start ) {
+      @queue = extract_symbols( $self->pmat->find_stash( $start ), $start . "::" );
    }
    else {
       # Don't recurse into self-referential 'main::' symbol
@@ -112,8 +111,7 @@ sub run
       @queue = grep { $_->[1] !~ m/^_</ } @queue;
    }
 
-   Devel::MAT::Tool::more->paginate( sub {
-      my ( $count ) = @_;
+   Devel::MAT::Tool::more->paginate( sub ( $count ) {
       while( $count and @queue ) {
          $_ = shift @queue;
          if( $_->[0]->isa( "Devel::MAT::SV::GLOB" ) ) {
@@ -169,10 +167,8 @@ use constant CMD_OPTS => (
                  alias => "V" },
 );
 
-sub _versionof
+sub _versionof ( $stash )
 {
-   my ( $stash ) = @_;
-
    # TODO: might be nice to have $stash->find_symbol
    my $versiongv = $stash->value( 'VERSION' ) or return "";
    my $versionsv = $versiongv->scalar or return "";
@@ -193,17 +189,15 @@ sub _versionof
    return " " . Devel::MAT::Cmd->format_value( $version );
 }
 
-sub run
+sub run ( $self, $optsref )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
+   my %opts = $optsref->%*;
 
    my @queue = grep {
       $_->[0]->isa( "Devel::MAT::SV::GLOB" ) and $_->[1] ne "main::"
    } Devel::MAT::Tool::Symbols::extract_symbols( $self->df->defstash, "" );
 
-   Devel::MAT::Tool::more->paginate( sub {
-      my ( $count ) = @_;
+   Devel::MAT::Tool::more->paginate( sub ( $count ) {
       while( $count and @queue ) {
          $_ = shift @queue;
          my ( $gv, $name ) = @$_;

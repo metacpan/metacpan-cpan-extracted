@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Outrefs 0.54;
+package Devel::MAT::Tool::Outrefs 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use List::UtilsBy qw( sort_by );
 
@@ -21,6 +24,8 @@ This C<Devel::MAT> tool provides a command to list the other SVs that a given
 SV retains a reference to.
 
 =head1 COMANDS
+
+=for highlighter
 
 =cut
 
@@ -66,11 +71,9 @@ my %NOTES_BY_STRENGTH = (
    inferred => Devel::MAT::Cmd->format_note( "~", 2 ),
 );
 
-sub run
+sub run ( $self, $optsref, $sv )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
-   my ( $sv ) = @_;
+   my %opts = $optsref->%*;
 
    my $method = $opts{all}  ? "outrefs" :
                 $opts{weak} ? "outrefs_direct" :
@@ -79,16 +82,11 @@ sub run
    $self->show_refs_by_method( $method, $sv );
 }
 
-sub show_refs_by_method
+sub show_refs_by_method ( $self, $method, $sv )
 {
-   my $self = shift;
-   my ( $method, $sv ) = @_;
-
    my @refs = grep { $_->sv } sort_by { $_->name } $sv->$method;
 
-   Devel::MAT::Tool::more->paginate( sub {
-      my ( $count ) = @_;
-
+   Devel::MAT::Tool::more->paginate( sub ( $count ) {
       my @table;
 
       my $ref;

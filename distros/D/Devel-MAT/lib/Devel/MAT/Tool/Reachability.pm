@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Reachability 0.54;
+package Devel::MAT::Tool::Reachability 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant FOR_UI => 1;
 
@@ -59,13 +62,9 @@ use constant {
    REACH_INTERNAL => 5,
 };
 
-sub new
+sub new ( $class, $pmat, %args )
 {
-   my $class = shift;
-   my ( $pmat, %args ) = @_;
-
-   *Devel::MAT::SV::reachable = sub {
-      my $sv = shift;
+   *Devel::MAT::SV::reachable = sub ( $sv ) {
       return $sv->{tool_reachable};
    };
 
@@ -77,20 +76,16 @@ sub new
 my @ICONS = (
    "none", "symtab", "user", "padlist", "lexical", "internal"
 );
-sub _reach2icon
+sub _reach2icon ( $sv )
 {
-   my ( $sv ) = @_;
    my $reach = $sv->{tool_reachable} // 0;
 
    my $icon = $ICONS[$reach] // die "Unknown reachability value $reach";
    return "reachable-$icon";
 }
 
-sub init_ui
+sub init_ui ( $self, $ui )
 {
-   my $self = shift;
-   my ( $ui ) = @_;
-
    foreach ( @ICONS ) {
       $ui->register_icon(
          name => "reachable-$_",
@@ -115,11 +110,8 @@ sub init_ui
    );
 }
 
-sub mark_reachable
+sub mark_reachable ( $self, $df, %args )
 {
-   my $self = shift;
-   my ( $df, %args ) = @_;
-
    my $progress = $args{progress};
 
    my @user;
@@ -301,6 +293,8 @@ sub mark_reachable
 }
 
 =head1 SV METHODS
+
+=for highlighter language=perl
 
 This tool adds the following SV methods.
 

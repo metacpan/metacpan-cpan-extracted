@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Context 0.54;
+package Devel::MAT::Context 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -23,20 +26,17 @@ These contexts represent function calls between perl functions.
 =cut
 
 my %types;
-sub register_type
+sub register_type ( $pkg, $id )
 {
-   $types{$_[1]} = $_[0];
+   $types{$id} = $pkg;
    # generate the ->type constant method
-   ( my $typename = $_[0] ) =~ s/^Devel::MAT::Context:://;
+   ( my $typename = $pkg ) =~ s/^Devel::MAT::Context:://;
    no strict 'refs';
-   *{"$_[0]::type"} = sub () { $typename };
+   *{"${pkg}::type"} = sub (@) { $typename };
 }
 
-sub new
+sub new ( $class, $type, $df, $bytes, $, $strs )
 {
-   shift;
-   my ( $type, $df, $bytes, undef, $strs ) = @_;
-
    $types{$type} or croak "Cannot load unknown CTX type $type";
 
    my $self = bless {}, $types{$type};
@@ -48,11 +48,8 @@ sub new
    return $self;
 }
 
-sub load_v0_1
+sub load_v0_1 ( $class, $type, $df )
 {
-   my $class = shift;
-   my ( $type, $df ) = @_;
-
    $types{$type} or croak "Cannot load unknown CTX type $type";
 
    my $self = bless {}, $types{$type};
@@ -70,6 +67,8 @@ sub load_v0_1
 
 =head1 COMMON METHODS
 
+=for highlighter language=perl
+
 =cut
 
 =head2 gimme
@@ -81,9 +80,8 @@ Returns the gimme value of the call context.
 =cut
 
 my @GIMMES = ( undef, qw( void scalar array ) );
-sub gimme
+sub gimme ( $self )
 {
-   my $self = shift;
    return $GIMMES[ $self->{gimme} ];
 }
 
@@ -103,16 +101,15 @@ Returns the file, line or location as (C<FILE line LINE>).
 
 =cut
 
-sub file  { my $self = shift; return $self->{file} }
-sub line  { my $self = shift; return $self->{line} }
+sub file ( $self ) { return $self->{file} }
+sub line ( $self ) { return $self->{line} }
 
-sub location
+sub location ( $self )
 {
-   my $self = shift;
    return "$self->{file} line $self->{line}";
 }
 
-package Devel::MAT::Context::SUB 0.54;
+package Devel::MAT::Context::SUB 0.55;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 1 );
 
@@ -122,11 +119,8 @@ Represents a context which is a subroutine call.
 
 =cut
 
-sub load
+sub load ( $self, $bytes, $ptrs, $ )
 {
-   my $self = shift;
-   my ( $bytes, $ptrs, undef ) = @_;
-
    my $df = $self->{df};
 
    ( $self->{olddepth} ) = unpack "$df->{u32_fmt}", $bytes;
@@ -136,11 +130,8 @@ sub load
    undef $self->{args_at} if $df->perlversion ge "5.23.8";
 }
 
-sub _load_v0_1
+sub _load_v0_1 ( $self, $df )
 {
-   my $self = shift;
-   my ( $df ) = @_;
-
    $self->{olddepth} = -1;
 
    $self->{cv_at}   = $df->_read_ptr;
@@ -178,11 +169,10 @@ from the actual C<depth> of the CV is no other call exists.
 
 =cut
 
-sub cv   { my $self = shift; return $self->{df}->sv_at( $self->{cv_at} ) }
+sub cv ( $self )  { return $self->{df}->sv_at( $self->{cv_at} ) }
 
-sub args
+sub args ( $self )
 {
-   my $self = shift;
    # Perl 5.23.8 removed blk_sub.argarray so we have to go the long way round
    $self->{args_at} //= do {
       my $cv = $self->cv;
@@ -193,12 +183,12 @@ sub args
    return $self->{df}->sv_at( $self->{args_at} );
 }
 
-sub olddepth { return $_[0]->{olddepth} }
+sub olddepth ( $self ) { return $self->{olddepth} }
 
-sub _set_depth { $_[0]->{depth} = $_[1] }
-sub depth      { return $_[0]->{depth} }
+sub _set_depth ( $self, $depth ) { $self->{depth} = $depth }
+sub depth      ( $self )         { return $self->{depth} }
 
-package Devel::MAT::Context::TRY 0.54;
+package Devel::MAT::Context::TRY 0.55;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 2 );
 
@@ -208,11 +198,11 @@ Represents a context which is a block C<eval {}> call.
 
 =cut
 
-sub load {}
+sub load ( $self, $, $, $ ) {}
 
-sub _load_v0_1 {}
+sub _load_v0_1 ( $self, $ ) {}
 
-package Devel::MAT::Context::EVAL 0.54;
+package Devel::MAT::Context::EVAL 0.55;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 3 );
 
@@ -222,19 +212,13 @@ Represents a context which is a string C<eval EXPR> call.
 
 =cut
 
-sub load
+sub load ( $self, $, $ptrs, $ )
 {
-   my $self = shift;
-   my ( undef, $ptrs, undef ) = @_;
-
    ( $self->{code_at} ) = @$ptrs;
 }
 
-sub _load_v0_1
+sub _load_v0_1 ( $self, $df )
 {
-   my $self = shift;
-   my ( $df ) = @_;
-
    $self->{code_at} = $df->_read_ptr;
 }
 
@@ -246,7 +230,7 @@ Returns the SV containing the text string being evaluated.
 
 =cut
 
-sub code { my $self = shift; return $self->{df}->sv_at( $self->{code_at} ) }
+sub code ( $self ) { return $self->{df}->sv_at( $self->{code_at} ) }
 
 =head1 AUTHOR
 

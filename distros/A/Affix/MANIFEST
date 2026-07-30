@@ -100,7 +100,6 @@ t/032_recursive_liveness.t
 t/033_unified_access.t
 t/035_magic_struct.t
 t/040_error.t
-t/050_affix_build.t
 t/060_platform_unix_security.t
 t/070_security_fixes.t
 t/075_error_negative.t

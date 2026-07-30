@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2024-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Strtab 0.54;
+package Devel::MAT::Tool::Strtab 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Syntax::Keyword::Match;
 
@@ -26,6 +29,8 @@ string table, and identifying places where those strings are used.
 =cut
 
 =head1 COMMANDS
+
+=for highlighter
 
 =cut
 
@@ -87,10 +92,8 @@ use constant CMD_ARGS => (
    { name => "filter", help => "optional pattern to filter keys by" },
 );
 
-sub _init_hek_users
+sub _init_hek_users ( $self )
 {
-   my $self = shift;
-
    my %hek_users;
 
    foreach my $sv ( $self->df->heap ) {
@@ -102,17 +105,17 @@ sub _init_hek_users
 
             foreach my $key ( $sv->keys ) {
                $hek = $sv->hek_at( $key ) and
-                  push @{ $hek_users{$hek} }, $sv;
+                  push $hek_users{$hek}->@*, $sv;
             }
          }
          case( "GLOB" ),
          case( "CODE" ) {
             $hek = $sv->name_hek and
-               push @{ $hek_users{$hek} }, $sv;
+               push $hek_users{$hek}->@*, $sv;
          }
          case( "SCALAR" ) {
             $hek = $sv->shared_hek and
-               push @{ $hek_users{$hek} }, $sv;
+               push $hek_users{$hek}->@*, $sv;
          }
       }
    }
@@ -120,11 +123,9 @@ sub _init_hek_users
    return \%hek_users;
 }
 
-sub run
+sub run ( $self, $optsref, $filter = undef )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
-   my ( $filter ) = @_;
+   my %opts = $optsref->%*;
 
    my $strtab = $self->df->strtab;
 
@@ -141,8 +142,7 @@ sub run
 
    my $hek_users = $self->{hek_users} //= $self->_init_hek_users;
 
-   Devel::MAT::Tool::more->paginate( { pagesize => $opts{count} }, sub {
-      my ( $count ) = @_;
+   Devel::MAT::Tool::more->paginate( { pagesize => $opts{count} }, sub ( $count ) {
       my @rows;
       foreach my $key ( splice @keys, 0, $count ) {
          my $hek = $strtab->hek_at( $key );

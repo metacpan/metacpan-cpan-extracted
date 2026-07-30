@@ -1,5 +1,15 @@
 Revision history for XML-PugiXML
 
+0.08  2026-07-29
+    - Fix use-after-free in $doc->select_nodes (results past the first got a
+      bogus document handle; ->root segfaulted)
+    - Fix use-after-free after remove_child/remove_attr (handles into the
+      removed subtree now go stale instead of dangling)
+    - Reject embedded NULs in lookup and removal args, not just mutation args
+    - path() requires a single-character delimiter
+    - CLONE_SKIP on all classes (ithreads double-free)
+    - Keep perl's $Config{ccflags} instead of replacing them
+
 0.07  2026-06-25
     - Add ensure_child / ensure_attr (get-or-create)
     - Expose FORMAT_NO_EMPTY_ELEMENT_TAGS and PUGIXML_VERSION constants

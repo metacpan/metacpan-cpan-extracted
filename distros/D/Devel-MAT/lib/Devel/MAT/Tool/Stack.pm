@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Stack 0.54;
+package Devel::MAT::Tool::Stack 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant CMD => "stack";
 use constant CMD_DESC => "Display the value stack";
@@ -25,6 +28,8 @@ showing the SVs in place there.
 
 =head1 COMMANDS
 
+=for highlighter
+
 =head2 stack
 
    pmat> stack
@@ -35,10 +40,8 @@ Prints SVs on the value stack.
 
 =cut
 
-sub run
+sub run ( $self )
 {
-   my $self = shift;
-
    my @stacksvs = $self->df->stack;
    foreach my $idx ( reverse 0 .. $#stacksvs ) {
       my $sv = $stacksvs[$idx];

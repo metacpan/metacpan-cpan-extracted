@@ -2,7 +2,7 @@ package Zuzu::Value::Task;
 
 use utf8;
 
-our $VERSION = '0.007001';
+our $VERSION = '0.007002';
 
 use Moo;
 use Scalar::Util qw( blessed refaddr );

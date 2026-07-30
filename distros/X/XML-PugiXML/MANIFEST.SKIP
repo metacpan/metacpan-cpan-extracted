@@ -17,6 +17,7 @@
 \.swp$
 ~$
 \.claude/
+^\.pcg/
 
 # Ad-hoc scripts
 ^repro_

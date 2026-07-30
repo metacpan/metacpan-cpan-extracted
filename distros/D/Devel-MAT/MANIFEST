@@ -84,9 +84,9 @@ t/01self.t
 t/02contexts.t
 t/03local.t
 t/04objects.t
-t/10tool-identify.t
-t/10tool-inrefs.t
-t/10tool-reachability.t
-t/10tool-sizes.t
+t/40tool-identify.t
+t/40tool-inrefs.t
+t/40tool-reachability.t
+t/40tool-sizes.t
 t/50cmd-print-table.t
 t/99pod.t

@@ -1,4 +1,5 @@
-use v5.14;
+use v5;
+use strict;
 use warnings;
 
 use Module::Build;
@@ -6,7 +7,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Devel::MAT',
    requires => {
-      'perl' => '5.014',      # s///r
+      'perl' => '5.020',
       'Syntax::Keyword::Match' => 0,
 
       'Commandable::Invocation' => '0.04', # ->peek_remaining

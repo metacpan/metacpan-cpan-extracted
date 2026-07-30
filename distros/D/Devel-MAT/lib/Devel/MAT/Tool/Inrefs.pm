@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Inrefs 0.54;
+package Devel::MAT::Tool::Inrefs 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use List::Util qw( any pairs );
 
@@ -36,10 +39,8 @@ refer to them.
 
 =cut
 
-sub init_tool
+sub init_tool ( $self )
 {
-   my $self = shift;
-
    my $df = $self->df;
 
    my $heap_total = scalar $df->heap;
@@ -48,7 +49,7 @@ sub init_tool
       foreach ( pairs $sv->outrefs( "NO_DESC" ) ) {
          my ( $strength, $refsv ) = @$_;
 
-         push @{ $refsv->{tool_inrefs}[ $STRENGTH_TO_IDX{ $strength } ] }, $sv->addr if !$refsv->immortal;
+         push $refsv->{tool_inrefs}[ $STRENGTH_TO_IDX{ $strength } ]->@*, $sv->addr if !$refsv->immortal;
       }
 
       $count++;
@@ -79,6 +80,8 @@ sub init_tool
 }
 
 =head1 SV METHODS
+
+=for highlighter language=perl
 
 This tool adds the following SV methods.
 
@@ -114,11 +117,8 @@ C<outrefs_*> methods.
 
 =cut
 
-sub Devel::MAT::SV::_inrefs
+sub Devel::MAT::SV::_inrefs ( $self, @strengths )
 {
-   my $self = shift;
-   my ( @strengths ) = @_;
-
    # In scalar context we don't need to return SVs or Reference instances,
    #   just count them. This allows a lot of optimisations.
    my $just_count = !wantarray;
@@ -129,7 +129,7 @@ sub Devel::MAT::SV::_inrefs
    my @inrefs;
    foreach my $strength ( @strengths ) {
       my %seen;
-      foreach my $addr ( @{ $self->{tool_inrefs}[ $STRENGTH_TO_IDX{$strength} ] // [] } ) {
+      foreach my $addr ( ( $self->{tool_inrefs}[ $STRENGTH_TO_IDX{$strength} ] // [] )->@* ) {
          if( $just_count ) {
             push @inrefs, 1;
          }
@@ -187,14 +187,16 @@ sub Devel::MAT::SV::_inrefs
 }
 
 # If 'strong' is included in these lists it must be first
-sub Devel::MAT::SV::inrefs          { shift->_inrefs( qw( strong weak indirect inferred )) }
-sub Devel::MAT::SV::inrefs_strong   { shift->_inrefs( qw( strong      )) }
-sub Devel::MAT::SV::inrefs_weak     { shift->_inrefs( qw( weak        )) }
-sub Devel::MAT::SV::inrefs_direct   { shift->_inrefs( qw( strong weak )) }
-sub Devel::MAT::SV::inrefs_indirect { shift->_inrefs( qw( indirect    )) }
-sub Devel::MAT::SV::inrefs_inferred { shift->_inrefs( qw( inferred    )) }
+sub Devel::MAT::SV::inrefs          ( $self ) { $self->_inrefs( qw( strong weak indirect inferred )) }
+sub Devel::MAT::SV::inrefs_strong   ( $self ) { $self->_inrefs( qw( strong      )) }
+sub Devel::MAT::SV::inrefs_weak     ( $self ) { $self->_inrefs( qw( weak        )) }
+sub Devel::MAT::SV::inrefs_direct   ( $self ) { $self->_inrefs( qw( strong weak )) }
+sub Devel::MAT::SV::inrefs_indirect ( $self ) { $self->_inrefs( qw( indirect    )) }
+sub Devel::MAT::SV::inrefs_inferred ( $self ) { $self->_inrefs( qw( inferred    )) }
 
 =head1 COMANDS
+
+=for highlighter
 
 =cut
 
@@ -233,11 +235,9 @@ use constant CMD_OPTS => (
 
 use constant CMD_ARGS_SV => 1;
 
-sub run
+sub run ( $self, $optsref, $sv )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
-   my ( $sv ) = @_;
+   my %opts = $optsref->%*;
 
    my $method = $opts{all}  ? "inrefs" :
                 $opts{weak} ? "inrefs_direct" :

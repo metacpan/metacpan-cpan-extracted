@@ -630,3 +630,6 @@ Version 0.24 Sep 24 2023
 Version 0.25 Sep 29 2024
 	The Syntax method now gives proper warning when attempting to set an invalid syntax.
 	Applied patch from git user PommesSchranke removing warnings for already defined variables.
+
+Version 0.26 Jul 29 2026
+	Fixed latest version of Template::Toolkit spoiling tests.

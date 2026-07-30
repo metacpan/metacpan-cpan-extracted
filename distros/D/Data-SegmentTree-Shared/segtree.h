@@ -48,9 +48,8 @@
 #ifndef ST_READER_SLOTS
 #define ST_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
-/* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
- * cleared on clean release.  A writer scans these ST_OCC_WORDS words to visit
- * only OCCUPIED slots (O(words + live readers)) instead of all ST_READER_SLOTS. */
+/* Occupancy bitmap: one bit per reader slot; lets a writer scan only claimed
+ * slots (O(words + live readers)) instead of all ST_READER_SLOTS. */
 #define ST_OCC_WORDS    (((ST_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
 #define ST_OCC_BYTES    ((uint64_t)ST_OCC_WORDS * 8)      /* 128 bytes */
 #define ST_MIN_N        1
@@ -58,7 +57,7 @@
 #define ST_IDENTITY_MIN INT64_MAX        /* min identity (padding leaves / empty range) */
 #define ST_IDENTITY_MAX INT64_MIN        /* max identity */
 
-/* StNode.flags bits (weighted with the assign lazy + product-overflow marker) */
+/* StNode.flags bits */
 #define ST_F_HAS_ASSIGN 0x1U             /* node has a pending range-assign (lazy) */
 #define ST_F_PROD_OVF   0x2U             /* node's product overflowed int64 (unusable) */
 
@@ -68,14 +67,11 @@
  * Structs
  * ================================================================ */
 
-/* Per-process slot for dead-process recovery.  In the reader-slots-only rwlock a
- * reader's ENTIRE contribution to the shared lock is `rdepth` in its OWN slot --
- * there is no separate shared reader counter to fall out of sync with it -- so a
- * dead reader's contribution is exactly this one word, which a draining writer
- * neutralises by clearing the slot's pid (the scan then ignores the slot).  No
- * orphaned counter can exist, so there is no quiescent force-reset and sustained
- * readers cannot starve a writer.  _rsv1/_rsv2 are kept only to preserve the
- * 16-byte slot size across the already-released builds. */
+/* Per-process slot for dead-process recovery.  A reader's ENTIRE lock
+ * contribution is `rdepth` in its OWN slot -- with no separate shared counter,
+ * a draining writer neutralises a dead reader by clearing its slot's pid, so
+ * no orphaned counter can strand and sustained readers cannot starve a writer.
+ * _rsv1/_rsv2 kept only for the 16-byte slot size across released builds. */
 typedef struct {
     uint32_t pid;      /* 0 = unclaimed */
     uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
@@ -179,18 +175,15 @@ static inline void st_rwlock_spin_pause(void) {
 #define ST_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define ST_RWLOCK_WR(pid)    (ST_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & ST_RWLOCK_PID_MASK))
 
-/* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
-/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse -- if a dead
- * lock-holder's PID is recycled to an unrelated live process before recovery
- * runs, this reports "alive" and that slot's rdepth is not reclaimed until the
- * recycled process exits. Robust detection would require a per-slot
- * process-start-time epoch (a header-layout/version change).
- * Documented under "Crash Safety" in the POD. */
-/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
- * process that crashed while holding the lock and lingers unreaped would never
- * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
- * this module); if /proc is unreadable we fall back to "alive" (safe: we never
- * force-recover a possibly-live holder). */
+/* Liveness via kill(pid,0).  Cannot detect PID reuse: if a dead lock-holder's
+ * PID is recycled to a live process before recovery runs, this reports
+ * "alive" and that slot's rdepth is not reclaimed until the recycled process
+ * exits (robust detection needs a per-slot start-time epoch, a header-layout
+ * change).  Documented under "Crash Safety" in the POD. */
+/* A zombie (dead, unreaped) still answers kill(pid,0) as alive, so a crashed
+ * lock-holder that lingers unreaped would never be recovered.  Treat
+ * /proc/<pid>/stat state 'Z' as dead.  Linux-only; if /proc is unreadable,
+ * fall back to "alive" (never force-recover a possibly-live holder). */
 static inline int st_pid_is_zombie(uint32_t pid) {
     char path[32], buf[256];
     snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
@@ -286,11 +279,11 @@ static inline void st_claim_reader_slot(StHandle *h) {
             return;
         }
     }
-    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
-     * if its rdepth>0: clearing pid drops the dead reader's entire contribution
-     * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
-     * old design) we need not skip dead slots that still show a read count. */
+    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe even if its
+     * rdepth>0: clearing pid drops the dead reader's entire contribution (a
+     * writer scan ignores rdepth when pid==0), and we reset rdepth to 0 as we
+     * claim it.  No orphaned shared counter exists, so dead slots need not be
+     * skipped even if they still show a read count. */
     for (uint32_t i = 0; i < ST_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || st_pid_alive(dpid)) continue;
@@ -332,12 +325,12 @@ static inline void st_unpark(StHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
 
-/* Publish (inc) / retract (dec) this reader's presence -- its ENTIRE
- * contribution to the lock.  A slotted reader uses its slot's rdepth; a reader
- * that could not claim a slot uses the global slotless_rdepth.  inc() is SEQ_CST
- * so the wlock re-check that follows it in rdlock forms a Dekker handshake with
- * the writer's SEQ_CST wlock-store + rdepth-scan.  leave() peels slotless first
- * so a slot claimed mid-hold cannot misattribute the decrement. */
+/* Publish (inc) / retract (dec) this reader's ENTIRE lock contribution.  A
+ * slotted reader uses its slot's rdepth; one that could not claim a slot uses
+ * the global slotless_rdepth.  inc() is SEQ_CST so the wlock re-check that
+ * follows it in rdlock forms a Dekker handshake with the writer's SEQ_CST
+ * wlock-store + rdepth-scan.  dec() peels slotless first so a slot claimed
+ * mid-hold cannot misattribute the decrement. */
 static inline void st_rdepth_inc(StHandle *h) {
     if (h->my_slot_idx != UINT32_MAX) {
         __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
@@ -372,10 +365,10 @@ static inline void st_rwlock_rdlock(StHandle *h) {
         uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_ACQUIRE);
         if (cur == 0) {
             /* Optimistically take the read: publish rdepth, then re-check wlock.
-             * SEQ_CST inc + SEQ_CST load vs the writer's SEQ_CST wlock CAS +
-             * SEQ_CST rdepth scan: by the single total order of SEQ_CST ops the
-             * two sides cannot both miss each other, so we never hold
-             * concurrently with a writer. */
+             * SEQ_CST inc + SEQ_CST load vs. the writer's SEQ_CST wlock CAS +
+             * rdepth scan: by the single total order of SEQ_CST ops, the two
+             * sides cannot both miss each other, so we never hold concurrently
+             * with a writer. */
             st_rdepth_inc(h);
             if (__atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST) == 0)
                 return;                       /* no writer after our publish -> we hold the read lock */
@@ -509,12 +502,10 @@ static inline void st_rwlock_wrunlock(StHandle *h) {
 
 /* ================================================================
  * Layout math + create / open / destroy
- *
- * Layout: Header -> reader_slots[1024] -> occ bitmap -> nodes[2*next_pow2(n)]
  * ================================================================ */
 
-/* Single source of truth for the mmap region layout offsets.
- * Layout: Header -> reader_slots[1024] -> occ bitmap -> nodes[2*size] (1-indexed, node 0 unused) */
+/* Single source of truth for the mmap region layout offsets:
+ * Header -> reader_slots[1024] -> occ bitmap -> nodes[2*size] (1-indexed, node 0 unused). */
 typedef struct { uint64_t reader_slots, occ, nodes, total; } StLayout;
 
 /* round v up to the next power of two (64-bit), with a floor of 1 */
@@ -541,9 +532,8 @@ static inline void st_init_header(void *base, uint64_t n, uint64_t size, uint64_
     StLayout L = st_layout_for(size);
     StHeader *hdr = (StHeader *)base;
     /* Zero the whole region: every node's sum/min/max/lazy = 0, so all n
-       positions read as 0.  Padding leaves (n..size-1) stay 0 too -- no query
-       ever covers a padding-containing node (queries clamp to [0, n-1]), so
-       their aggregates never surface. */
+       positions read as 0.  Padding leaves (n..size-1) stay 0 too and are
+       never queried (queries clamp to [0, n-1]), so they never surface. */
     memset(base, 0, (size_t)L.total);
     hdr->magic            = ST_MAGIC;
     hdr->version          = ST_VERSION;
@@ -570,12 +560,13 @@ static inline uint64_t st_nodes_max(StHandle *h) {
 }
 
 static inline StHandle *st_setup(void *base, size_t map_size,
-                                 const char *path, int backing_fd) {
+                                 const char *path, int backing_fd, char *errbuf) {
     StHeader *hdr = (StHeader *)base;
     StHandle *h = (StHandle *)calloc(1, sizeof(StHandle));
     if (!h) {
         munmap(base, map_size);
         if (backing_fd >= 0) close(backing_fd);
+        ST_ERR("out of memory");   /* else callers croak with an empty message */
         return NULL;
     }
     h->hdr          = hdr;
@@ -588,10 +579,20 @@ static inline StHandle *st_setup(void *base, size_t map_size,
     h->size         = hdr->size;
     h->mmap_size    = map_size;
     /* Layer B: if the mapping cannot hold 2*size nodes the header lied about its
-       size; clamp the cached tree size to what actually fits. */
+       size; clamp the cached tree size to what actually fits.  The clamped size
+       MUST stay a power of two: the mid-split recursion over [0, size-1] indexes up
+       to ~4*size nodes for a NON-pow2 size but only 2*size-1 for a pow2 size, so a
+       bare `size = fit` (fit possibly non-pow2) would let a node index run past
+       2*size and out of the mapping.  Clamp down to the largest power of two <= fit
+       (keeps size pow2 AND 2*size <= nodes_max, so every node index < 2*size stays
+       inside the mapping).  A resulting size==0 is handled safely everywhere (ops
+       become no-ops via st_clamp_range). */
     {
         uint64_t fit = st_nodes_max(h) / 2;
-        if (h->size > fit) { h->size = fit; if (h->n > h->size) h->n = h->size; }
+        if (h->size > fit) {
+            uint64_t p = 0; for (uint64_t q = 1; q && q <= fit; q <<= 1) p = q;   /* largest pow2 <= fit, or 0 */
+            h->size = p; if (h->n > h->size) h->n = h->size;
+        }
     }
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -684,12 +685,12 @@ static StHandle *st_create(const char *path, uint64_t n, mode_t mode, char *errb
                 ST_ERR("invalid segment-tree file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            return st_setup(base, map_size, path, -1);
+            return st_setup(base, map_size, path, -1, errbuf);
         }
     }
     st_init_header(base, n, size, total);
     if (fd >= 0) { flock(fd, LOCK_UN); close(fd); }
-    return st_setup(base, map_size, path, -1);
+    return st_setup(base, map_size, path, -1, errbuf);
 }
 
 static StHandle *st_create_memfd(const char *name, uint64_t n, char *errbuf) {
@@ -706,7 +707,7 @@ static StHandle *st_create_memfd(const char *name, uint64_t n, char *errbuf) {
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { ST_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     st_init_header(base, n, size, total);
-    return st_setup(base, (size_t)total, NULL, fd);
+    return st_setup(base, (size_t)total, NULL, fd, errbuf);
 }
 
 static StHandle *st_open_fd(int fd, char *errbuf) {
@@ -714,6 +715,18 @@ static StHandle *st_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { ST_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(StHeader)) { ST_ERR("too small"); return NULL; }
+    /* A donor fd we do not own can be truncated after we fstat/mmap it, faulting
+     * the reader with SIGBUS on a later access.  For a SEALABLE fd (memfd) require
+     * resize seals so its size cannot change under us.  A non-sealable fd (regular
+     * file, pipe, etc.) returns EINVAL from F_GET_SEALS -- skip the check there and
+     * leave the trust to the caller (documented in the POD SECURITY note).  The
+     * family's own new_memfd seals GROW|SHRINK, so its fds pass. */
+    int seals = fcntl(fd, F_GET_SEALS);
+    if (seals >= 0 &&
+        (seals & (F_SEAL_SHRINK | F_SEAL_GROW)) != (F_SEAL_SHRINK | F_SEAL_GROW)) {
+        ST_ERR("fd is not sealed against resize (need F_SEAL_SHRINK|F_SEAL_GROW)");
+        return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { ST_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -722,7 +735,7 @@ static StHandle *st_open_fd(int fd, char *errbuf) {
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { ST_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
-    return st_setup(base, ms, NULL, myfd);
+    return st_setup(base, ms, NULL, myfd, errbuf);
 }
 
 static void st_destroy(StHandle *h) {
@@ -757,14 +770,13 @@ static inline int st_msync(StHandle *h) {
  *
  * A perfect binary tree over `size` = next_pow2(n) leaves; node 1 is the root
  * covering [0, size-1], node v has children 2v and 2v+1.  Positions n..size-1
- * are padding leaves that no query ever covers (queries are clamped to
- * [0, n-1]).  Each node keeps its subtree's sum/min/max plus a pending "range
- * add" delta (lazy) already reflected in its own aggregate but not yet in its
- * children's.  Range-add pushes lazy down on the way to recompute; queries never
- * mutate -- they carry the ancestors' un-pushed lazy as `pending` and shift each
- * covered node's aggregate by it.  All node indices come from the recursion
- * (never from shared memory), so the st_setup size-clamp alone keeps every access
- * inside the mapping.
+ * are padding leaves no query ever covers (queries clamp to [0, n-1]).  Each
+ * node's sum/min/max already reflects its own pending "range add" lazy; only
+ * its children are stale.  Range-add pushes lazy down as it recomputes;
+ * queries never mutate -- they carry ancestors' un-pushed lazy as `pending`
+ * and shift each covered node's aggregate by it.  Node indices all come from
+ * the recursion (never from shared memory), so the st_setup size-clamp alone
+ * keeps every access inside the mapping.
  * ================================================================ */
 
 /* gcd of |a|,|b| (INT64_MIN-safe); 0 is the identity, so gcd(0,x) == |x| */
@@ -873,12 +885,11 @@ static void st_range_assign_rec(StNode *nodes, uint64_t v, uint64_t lo, uint64_t
     st_pull(nodes, v);
 }
 
-/* Read-only query carry.  Applying a covered node's stored aggregate under the
- * ancestors' un-pushed lazies gives value = (asg ? av : stored) + ad.  A node's
- * un-pushed lazy applies to its children, so SHALLOWER lazies are applied LATER
- * (outermost): the SHALLOWEST assign on the path wins (av), adds ABOVE it still
- * apply on top (ad), and everything DEEPER than that assign is wiped by it.
- * Hence: adopt an assign / accumulate an add only while no assign has been seen. */
+/* Read-only query carry.  A covered node's value is (asg ? av : stored) + ad.
+ * A node's un-pushed lazy applies to its children, so SHALLOWER lazies apply
+ * LATER (outermost): the SHALLOWEST assign on the path wins (av), adds ABOVE
+ * it still apply on top (ad), and everything deeper than that assign is
+ * wiped.  Hence: adopt an assign / accumulate an add only while none seen. */
 typedef struct { int asg; int64_t av; int64_t ad; } StCarry;
 
 static inline StCarry st_carry_descend(StCarry c, const StNode *nd) {
@@ -965,7 +976,7 @@ static inline int st_clamp_range(StHandle *h, uint64_t *l, uint64_t *r) {
  * permanently gates off the gcd/product monoids (add_used = 1). */
 static void st_range_add_locked(StHandle *h, uint64_t l, uint64_t r, int64_t delta) {
     if (!st_clamp_range(h, &l, &r)) return;
-    h->hdr->add_used = 1;
+    __atomic_store_n(&h->hdr->add_used, 1, __ATOMIC_RELAXED);   /* atomic: monoids_valid reads add_used unlocked (RELAXED) -- plain store would be a C11 data race */
     st_range_add_rec(st_nodes(h), 1, 0, h->size - 1, l, r, delta);
 }
 
@@ -1027,7 +1038,7 @@ static inline void st_clear_locked(StHandle *h) {
     uint64_t nmax = st_nodes_max(h);    /* Layer B: clamp to the mapping */
     if (node_count > nmax) node_count = nmax;
     memset(nodes, 0, (size_t)(node_count * sizeof(StNode)));   /* every aggregate + lazy = 0 */
-    h->hdr->add_used = 0;               /* a cleared tree is gcd/product-capable again */
+    __atomic_store_n(&h->hdr->add_used, 0, __ATOMIC_RELAXED);   /* atomic: monoids_valid reads add_used unlocked -- a cleared tree is gcd/product-capable again */
 }
 
 #endif /* ST_H */

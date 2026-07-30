@@ -17,6 +17,10 @@ t/03-load-validation.t
 t/04-default-indent.t
 t/05-empty-element-tags.t
 t/06-ensure.t
+t/07-handle-invalidation.t
+t/08-arg-validation.t
+t/09-registry.t
+t/10-threads.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

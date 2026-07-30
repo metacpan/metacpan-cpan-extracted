@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="kwsens" version="0.1" casesensitive="1" section="Test" extensions="*.kwsens;">
+<language name="kwsens" version="0.1" kateversion="23.08.5" casesensitive="1" section="Other" license="MIT" extensions="*.kwsens;">
 <highlighting>
 <list name="colours">
 	<item> black </item>

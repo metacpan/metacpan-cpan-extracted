@@ -1,14 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Identify 0.54;
+package Devel::MAT::Tool::Identify 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::ToolBase::GraphWalker );
 use utf8;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant CMD => "identify";
 use constant CMD_DESC => "Identify an SV by its referrers";
@@ -28,6 +31,8 @@ by how it can be reached from well-known program roots.
 =cut
 
 =head1 COMMANDS
+
+=for highlighter
 
 =cut
 
@@ -90,11 +95,9 @@ use constant CMD_OPTS => (
 
 use constant CMD_ARGS_SV => 1;
 
-sub run
+sub run ( $self, $optsref, $sv )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
-   my ( $sv ) = @_;
+   my %opts = $optsref->%*;
 
    $self->reset;
 
@@ -119,32 +122,24 @@ sub run
    ), "" );
 }
 
-sub _strength_label
+sub _strength_label ( $strength )
 {
-   my ( $strength ) = @_;
    $strength eq "strong" ? "" :
       Devel::MAT::Cmd->format_note( "[$strength]", 1 ) . " ",
 }
 
-sub on_walk_nothing
+sub on_walk_nothing ( $, $node, $indent )
 {
-   shift;
-   my ( $node, $indent ) = @_;
    Devel::MAT::Cmd->printf( "$indent└─not found\n" );
 }
 
-sub on_walk_EDEPTH
+sub on_walk_EDEPTH ( $, $node, $indent )
 {
-   shift;
-   my ( $node, $indent ) = @_;
    Devel::MAT::Cmd->printf( "$indent└─not found at this depth\n" );
 }
 
-sub on_walk_again
+sub on_walk_again ( $, $node, $cyclic, $id, $indent )
 {
-   shift;
-   my ( $node, $cyclic, $id, $indent ) = @_;
-
    Devel::MAT::Cmd->printf( "$indent└─already found " );
 
    Devel::MAT::Cmd->printf( "%s ",
@@ -163,21 +158,15 @@ sub on_walk_again
    }
 }
 
-sub on_walk_root
+sub on_walk_root ( $, $node, $root, $is_final, $indent )
 {
-   shift;
-   my ( $node, $root, $isfinal, $indent ) = @_;
-
-   Devel::MAT::Cmd->printf( $indent . ( $isfinal ? "└─%s%s\n" : "├─%s%s\n" ),
+   Devel::MAT::Cmd->printf( $indent . ( $is_final ? "└─%s%s\n" : "├─%s%s\n" ),
       _strength_label( $root->strength ), $root->name,
    );
 }
 
-sub on_walk_ref
+sub on_walk_ref ( $, $node, $ref, $sv, $ref_id, $is_final, $indent )
 {
-   shift;
-   my ( $node, $ref, $sv, $ref_id, $is_final, $indent ) = @_;
-
    Devel::MAT::Cmd->printf(
       $indent . ( $is_final ? "└─" : "├─" ) );
 
@@ -199,10 +188,8 @@ sub on_walk_ref
    return ( $indent . ( $is_final ? "  " : "│ " ) );
 }
 
-sub on_walk_itself
+sub on_walk_itself ( $, $node, $indent )
 {
-   shift;
-   my ( $node, $indent ) = @_;
    Devel::MAT::Cmd->printf( "${indent}itself\n" );
 }
 

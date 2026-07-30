@@ -1,5 +1,15 @@
 Revision history for Devel-MAT
 
+0.55    2026-07-29
+        [CHANGES]
+         * Updated to Perl 5.20:
+            + use subroutine signatures
+            + use postfix deref
+         * Fix some minor Pod issuses
+
+        [BUGFIXES]
+         * Add the missing `show_UNDEF` method for `show` command
+
 0.54    2025-12-26
         [BUGFIXES]
          * Fix to `show` command on GLOBs with name_heks

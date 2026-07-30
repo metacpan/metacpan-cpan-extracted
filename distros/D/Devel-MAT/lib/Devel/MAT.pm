@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT 0.54;
+package Devel::MAT 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 use List::Util qw( first pairs );
@@ -64,6 +67,8 @@ be made more stable.
 
 =head1 CONSTRUCTOR
 
+=for highlighter language=perl
+
 =cut
 
 =head2 load
@@ -75,11 +80,9 @@ instance wrapping it.
 
 =cut
 
-sub load
+sub load ( $class, $path, %opts )
 {
-   my $class = shift;
-
-   my $df = Devel::MAT::Dumpfile->load( @_ );
+   my $df = Devel::MAT::Dumpfile->load( $path, %opts );
 
    return bless {
       df => $df,
@@ -99,9 +102,8 @@ object.
 
 =cut
 
-sub dumpfile
+sub dumpfile ( $self )
 {
-   my $self = shift;
    return $self->{df};
 }
 
@@ -117,10 +119,8 @@ Lists the L<Devel::MAT::Tool> classes that are installed and available.
    my @TOOLS;
    my $TOOLS_LOADED;
 
-   sub available_tools
+   sub available_tools ( $self )
    {
-      my $self = shift;
-
       return @TOOLS if $TOOLS_LOADED;
 
       $TOOLS_LOADED++;
@@ -145,11 +145,8 @@ Loads the named L<Devel::MAT::Tool> class.
 
 =cut
 
-sub load_tool
+sub load_tool ( $self, $name, %args )
 {
-   my $self = shift;
-   my ( $name, %args ) = @_;
-
    # Ensure tools are 'require'd
    $self->available_tools;
 
@@ -157,11 +154,8 @@ sub load_tool
    return $self->{tools}{$name} ||= $tool_class->new( $self, %args );
 }
 
-sub load_tool_for_command
+sub load_tool_for_command ( $self, $cmd, %args )
 {
-   my $self = shift;
-   my ( $cmd, %args ) = @_;
-
    return $self->{tools_by_command}{$cmd} ||= do {
       my $name = first {
          my $class = "Devel::MAT::Tool::$_";
@@ -180,11 +174,8 @@ Returns true if the named tool is already loaded.
 
 =cut
 
-sub has_tool
+sub has_tool ( $self, $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
-
    return defined $self->{tools}{$name};
 }
 
@@ -196,11 +187,8 @@ Runs a tool command given by the L<Commandable::Invocation> instance.
 
 =cut
 
-sub run_command
+sub run_command ( $self, $inv, %args )
 {
-   my $self = shift;
-   my ( $inv, %args ) = @_;
-
    my $cmd = $inv->pull_token;
 
    $self->load_tool_for_command( $cmd,
@@ -253,11 +241,8 @@ shorter output for lexical variables.
 
 =cut
 
-sub inref_graph
+sub inref_graph ( $self, $sv, %opts )
 {
-   my $self = shift;
-   my ( $sv, %opts ) = @_;
-
    my $graph = $opts{graph} //= Devel::MAT::Graph->new( $self->dumpfile );
 
    # TODO: allow separate values for these
@@ -308,7 +293,7 @@ sub inref_graph
    }
 
    if( $elide_rv ) {
-      @inrefs = map { sub {
+      @inrefs = map { sub () {
          return $_ unless $_->sv and
                           $_->sv->type eq "REF" and
                           $_->name eq "the referrant";
@@ -329,7 +314,7 @@ sub inref_graph
    }
 
    if( $elide_pad ) {
-      @inrefs = map { sub {
+      @inrefs = map { sub () {
          return $_ unless $_->sv and
                           $_->sv->type eq "PAD";
          my $pad = $_->sv;
@@ -381,18 +366,19 @@ sub inref_graph
 Attempts to walk the symbol table looking for a symbol of the given name,
 which must include the sigil.
 
+=for highlighter
+
    $Package::Name::symbol_name => to return a SCALAR SV
    @Package::Name::symbol_name => to return an ARRAY SV
    %Package::Name::symbol_name => to return a HASH SV
    &Package::Name::symbol_name => to return a CODE SV
 
+=for highlighter language=perl
+
 =cut
 
-sub find_symbol
+sub find_symbol ( $self, $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
-
    my ( $sigil, $globname ) = $name =~ m/^([\$\@%&])(.*)$/ or
       croak "Could not parse sigil from $name";
 
@@ -432,11 +418,8 @@ Attempts to walk the symbol table looking for a stash of the given name.
 
 =cut
 
-sub find_stashvalue
+sub find_stashvalue ( $self, $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
-
    my ( $parent, $shortname ) = $name =~ m/^(?:(.*)::)?(.+?)$/;
 
    my $stash;
@@ -452,11 +435,8 @@ sub find_stashvalue
    return $sv;
 }
 
-sub find_glob
+sub find_glob ( $self, $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
-
    my $sv = $self->find_stashvalue( $name ) or return;
    $sv->type eq "GLOB" or
       croak "$name is not a GLOB";
@@ -464,11 +444,8 @@ sub find_glob
    return $sv;
 }
 
-sub find_stash
+sub find_stash ( $self, $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
-
    my $gv = $self->find_glob( $name . "::" );
    return $gv->hash ||
       croak "$name has no hash";
@@ -484,13 +461,10 @@ package
 use B qw( perlstring );
 use List::Util qw( max );
 
-sub print_table
+sub print_table ( $self, $rows, %opts )
 {
-   my $self = shift;
-   my ( $rows, %opts ) = @_;
-
    if( $opts{headings} ) {
-      my @headings = map { $self->format_heading( $_ ) } @{ $opts{headings} };
+      my @headings = map { $self->format_heading( $_ ) } $opts{headings}->@*;
       $rows = [ \@headings, @$rows ];
    }
 
@@ -533,34 +507,23 @@ sub print_table
    }
 }
 
-sub format_note
+sub format_note ( $, $str, $idx = 1 )
 {
-   shift;
-   my ( $str, $idx ) = @_;
-
    return $str;
 }
 
-sub _format_sv
+sub _format_sv ( $, $ret, $sv )
 {
-   shift;
-   my ( $ret ) = @_;
-
    return $ret;
 }
 
-sub _format_addr
+sub _format_addr ( $, $addr )
 {
-   shift;
-   my ( $addr ) = @_;
    return sprintf "%#x", $addr;
 }
 
-sub format_sv
+sub format_sv ( $, $sv )
 {
-   shift;
-   my ( $sv ) = @_;
-
    my $ret = $sv->desc;
 
    if( my $blessed = $sv->blessed ) {
@@ -576,19 +539,13 @@ sub format_sv
    return Devel::MAT::Cmd->_format_sv( $ret, $sv );
 }
 
-sub _format_value
+sub _format_value ( $, $val )
 {
-   shift;
-   my ( $val ) = @_;
-
    return $val;
 }
 
-sub format_value
+sub format_value ( $, $val, %opts )
 {
-   shift;
-   my ( $val, %opts ) = @_;
-
    my $text;
    if( $opts{key} ) {
       my $strval = $val;
@@ -623,19 +580,13 @@ sub format_value
    }
 }
 
-sub format_symbol
+sub format_symbol ( $, $name, $sv )
 {
-   shift;
-   my ( $name ) = @_;
-
    return $name;
 }
 
-sub format_bytes
+sub format_bytes ( $, $bytes )
 {
-   shift;
-   my ( $bytes ) = @_;
-
    if( $bytes < 1024 ) {
       return sprintf "%d bytes", $bytes;
    }
@@ -651,11 +602,8 @@ sub format_bytes
    return sprintf "%.1f TiB", $bytes / 1024**4;
 }
 
-sub format_sv_with_value
+sub format_sv_with_value ( $self, $sv )
 {
-   my $self = shift;
-   my ( $sv ) = @_;
-
    my $repr = $self->format_sv( $sv );
 
    match( $sv->type : eq ) {

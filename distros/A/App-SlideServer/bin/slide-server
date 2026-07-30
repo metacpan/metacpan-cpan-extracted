@@ -8,14 +8,14 @@ use Log::Any::Adapter 'Daemontools',
 	-init => { argv => 1, env => 1, signals => ['USR1','USR2'] };
 BEGIN {
 	# Allow running from project dir
-	push @INC, "$FindBin::RealBin/../lib"
+	unshift @INC, "$FindBin::RealBin/../lib"
 		if -f "$FindBin::RealBin/../lib/App/SlideServer.pm";
 }
 use App::SlideServer 'mojo2logany';
 
 #PODNAME: slide-server
 #ABSTRACT: Run a HTTP server that serves the slides and websocket
-our $VERSION = '0.002'; #VERSION
+our $VERSION = '0.003'; #VERSION
 
 # in case running in Docker, need signal handlers installed
 $SIG{INT}= $SIG{TERM}= sub { exit 0; };
@@ -33,8 +33,9 @@ my $app= App::SlideServer->new(\%opts);
 eval {
 	$app->monitor_source_changes(1);
 	$log->info("Monitoring ".$app->slides_source_file." for changes");
-}
-or $log->warn("Can't monitor for changes, install Linux::Inotify2: $@");
+} or do {
+	Mojo::IOLoop->recurring(1 => sub { $app->build_slides; });
+};
 push @ARGV, qw( daemon -l http://*:2000 ) unless @ARGV;
 $app->start(@ARGV);
 
@@ -50,7 +51,7 @@ slide-server - Run a HTTP server that serves the slides and websocket
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 
@@ -58,7 +59,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -39,7 +39,7 @@ WriteMakefile(
         provides => {
             'PDF::Reuse::Barcode' => {
                 file    => 'Barcode.pm',
-                version => '0.10',
+                version => '0.11',
             },
         },
     },

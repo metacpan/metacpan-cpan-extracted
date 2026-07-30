@@ -4,6 +4,7 @@ use Affix qw[wrap Int32];
 use Affix::Build;
 use Test2::Tools::Affix qw[:all];
 use Test2::V0 -no_srand => 1;
+use Test2::Require::AuthorTesting;
 use Path::Tiny qw[path tempfile tempdir];
 use DynaLoader;
 use Config;

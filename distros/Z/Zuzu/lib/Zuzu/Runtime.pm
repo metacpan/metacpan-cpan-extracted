@@ -2,7 +2,7 @@ package Zuzu::Runtime;
 
 use utf8;
 
-our $VERSION = '0.007001';
+our $VERSION = '0.007002';
 our $DEBUG_LEVEL = 0;
 
 use Digest::MD5 qw( md5_hex );
@@ -4991,6 +4991,13 @@ sub eval_new {
 			$node->file,
 			$node->line,
 		);
+		$self->_apply_declared_fields_to_native_object(
+			$object,
+			$class_val,
+			$named,
+			$node->file,
+			$node->line,
+		);
 
 		return $self->_apply_object_lifecycle_hooks(
 			$object,
@@ -5129,6 +5136,39 @@ sub _make_instance_without_build {
 		$line,
 		0,
 	);
+}
+
+sub _apply_declared_fields_to_native_object {
+	my ( $self, $object, $class_val, $named, $file, $line ) = @_;
+
+	return $object
+		if !blessed($object) or !$object->isa('Zuzu::Value::Object');
+
+	my ( $slots, $const, $types, $weak ) = $self->_instantiate_slots($class_val);
+	return $object if !keys %{$slots};
+
+	for my $key ( keys %{$slots} ) {
+		next if exists $object->slots->{$key};
+		$object->slots->{$key} = $slots->{$key};
+		$object->const->{$key} = $const->{$key};
+		$object->types->{$key} = $types->{$key};
+		$object->weak->{$key} = $weak->{$key};
+	}
+
+	for my $key ( keys %{ $named // {} } ) {
+		next if !exists $slots->{$key};
+		my $declared_type = exists $types->{$key} ? $types->{$key} : 'Any';
+		$self->_assert_declared_type(
+			$declared_type,
+			$named->{$key},
+			$file,
+			$line,
+			$key,
+		);
+		store_value( \$object->slots->{$key}, $named->{$key}, $object->weak->{$key} );
+	}
+
+	return $object;
 }
 
 sub _install_object_demolish_hook {

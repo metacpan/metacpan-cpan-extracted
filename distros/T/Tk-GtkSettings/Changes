@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::GtkSettings.
 
+0.12  Jul 30 2026
+	- Added option guideColor for Tk::ListBrowser.
+
 0.11  May 08 2025
 	- Fixed missing tkgtk executable.
 	- Added FilterEntry to the group of content widgets.

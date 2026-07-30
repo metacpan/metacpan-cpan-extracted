@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project roughly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 but using Perlish version numbers like `x.yyyzzz` instead of `x.y.z`.
 
+## 0.007002 - 2026-07-30
+
+### Fixed
+
+- Subclasses of native classes, including `Exception`, now keep their declared
+  fields and can initialize them with named constructor arguments.
+- CI ztest runs now give nested ZuzuScript subprocesses the full stdlib module
+  path and deterministic `zuzuprove --verbose` markers, while skipping a
+  shared `sprintf` rounding check on old Perls with incompatible float
+  formatting.
+
 ## 0.007001 - 2026-06-29
 
 *stdlib tag 20260629, languagetests tag 20260625.*

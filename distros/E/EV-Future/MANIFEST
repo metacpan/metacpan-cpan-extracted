@@ -1,9 +1,14 @@
 bench/benchmark.pl
 bench/comparison.pl
+bench/map_vs_task.pl
 Changes
+eg/cancel_progress.pl
 eg/curl_parallel.pl
 eg/etcd_series.pl
+eg/map_limit.pl
+eg/race_timeout.pl
 eg/redis_parallel.pl
+eg/series_map_pipeline.pl
 Future.xs
 lib/EV/Future.pm
 LICENSE
@@ -13,10 +18,14 @@ README.md
 t/01-basic.t
 t/02-nested.t
 t/03-race.t
+t/04-map.t
+t/05-handle.t
 t/repro_async_uaf.t
 t/repro_dangling_cv.t
 t/repro_parallel_uaf.t
+t/repro_reentrant_cancel.t
 t/repro_series_double_call.t
+t/repro_unsafe_abandon.t
 t/repro_unsafe_exception_uaf.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

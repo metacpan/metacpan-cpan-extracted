@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Count 0.54;
+package Devel::MAT::Tool::Count 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";
@@ -27,6 +30,8 @@ This C<Devel::MAT> tool counts the different kinds of SV in the heap.
 =cut
 
 =head1 COMMANDS
+
+=for highlighter
 
 =head2 count
 
@@ -72,18 +77,13 @@ use constant CMD_OPTS => (
 
 struct Counts => [qw( svs bytes blessed_svs blessed_bytes )];
 
-sub run
+sub run ( $self, $optsref )
 {
-   my $self = shift;
-
-   $self->count_svs( %{ +shift } );
+   $self->count_svs( $optsref->%* );
 }
 
-sub count_svs
+sub count_svs ( $self, %opts )
 {
-   my $self = shift;
-   my %opts = @_;
-
    # TODO: consider options for
    #   sorting
    #   filtering
@@ -94,9 +94,13 @@ sub count_svs
 
    # Options for bin/pmat-counts
    my $emit_count = $opts{emit_count} //
-      sub { ( !$_[1] || $_[2] ) ? $_[2] : "" };
+      sub ( $kind, $is_blessed, $count ) {
+         ( !$is_blessed || $count ) ? $count : ""
+      };
    my $emit_bytes = $opts{emit_bytes} //
-      sub { ( !$_[1] || $_[2] ) ? Devel::MAT::Cmd->format_bytes( $_[2] ) : "" };
+      sub ( $kind, $is_blessed, $bytes ) {
+         ( !$is_blessed || $bytes ) ? Devel::MAT::Cmd->format_bytes( $bytes ) : ""
+      };
 
    my %counts;
    my %counts_SCALAR;
@@ -182,14 +186,12 @@ sub count_svs
       headings => [ "Kind", "Count", "(blessed)", "Bytes", "(blessed)" ],
       sep      => [ "    ", " ", "    ", " " ],
       align    => [ undef, "right", "right", "right", "right" ],
-      %{ $opts{table_args} || {} },
+      ( $opts{table_args} || {} )->%*,
    );
 }
 
-sub _gen_package_breakdown
+sub _gen_package_breakdown ( $counts, $emit_count, $emit_bytes )
 {
-   my ( $counts, $emit_count, $emit_bytes ) = @_;
-
    my @packages = rev_nsort_by { $counts->{$_}->blessed_svs } sort keys %$counts;
 
    my @ret;

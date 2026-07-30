@@ -15,11 +15,11 @@ WriteMakefile(
    PREREQ_PM         => {
       'Data::Dumper' => 0,
       'Module::Load::Conditional' => 0,
-      'Template' => 2.27,
-      'Term::ANSIColor' => 4.00,
-      'Test::More' => 1,
-      'XML::TokeParser' => 0.05,
-      'Time::HiRes' => 0,
+      'Template' => '3.106',
+      'Term::ANSIColor' => '4.00',
+      'Test::More' => '1',
+      'XML::TokeParser' => '0.05',
+      'Time::HiRes' => '0',
    },
    ABSTRACT_FROM     => 'lib/Syntax/Kamelon.pod', # retrieve abstract from module
    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {

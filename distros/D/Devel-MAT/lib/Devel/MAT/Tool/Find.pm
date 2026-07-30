@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Find 0.54;
+package Devel::MAT::Tool::Find 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Scalar::Util qw( blessed );
 
@@ -37,6 +40,8 @@ criteria.
 
 =head1 COMMANDS
 
+=for highlighter
+
 =cut
 
 =head2 find
@@ -61,14 +66,11 @@ Just count the matching SVs and print the total
 
 # TODO(leonerd): This is ugly; taking over ->run_cmd directly. See if we can
 # integrate it better
-sub run_cmd
+sub run_cmd ( $self, $inv )
 {
-   my $self = shift;
-   my ( $inv ) = @_;
-
-   my %opts = %{ $self->get_opts_from_inv( $inv, { $self->CMD_OPTS },
+   my %opts = $self->get_opts_from_inv( $inv, { $self->CMD_OPTS },
       permute => 0,
-   ) };
+   )->%*;
 
    my @filters;
    while( length $inv->peek_remaining ) {
@@ -94,8 +96,7 @@ sub run_cmd
 
    my @svs = $self->df->heap;
    my ( $sv, @output );
-   Devel::MAT::Tool::more->paginate( sub {
-      my ( $count ) = @_;
+   Devel::MAT::Tool::more->paginate( sub ( $count ) {
       SV: while( $sv = shift @svs ) {
          @output = ();
 
@@ -126,7 +127,7 @@ sub run_cmd
    } );
 }
 
-sub help_cmd
+sub help_cmd ( $self )
 {
    Devel::MAT::Cmd->printf( "\nSYNOPSIS:\n" );
    Devel::MAT::Cmd->printf( "  find [FILTER...]\n" );
@@ -145,13 +146,10 @@ sub help_cmd
 }
 
 # to make help work
-sub find_subcommand { return "Devel::MAT::Tool::Find::filter::$_[1]" }
+sub find_subcommand ( $self, $name ) { return "Devel::MAT::Tool::Find::filter::$name" }
 
-sub build_filter
+sub build_filter ( $self, $inv )
 {
-   my $self = shift;
-   my ( $inv ) = @_;
-
    my $name = $inv->pull_token;
    my $filterpkg = "Devel::MAT::Tool::Find::filter::$name";
    $filterpkg->can( "build" ) or
@@ -177,15 +175,15 @@ sub build_filter
 package # hide
    Devel::MAT::Tool::Find::filter;
 
-sub CMD_DESC { return "find " . shift->FILTER_DESC }
+sub CMD_DESC ( $self ) { return "find " . $self->FILTER_DESC }
 
 use constant FILTER_OPTS => ();
-sub CMD_OPTS { shift->FILTER_OPTS }
+sub CMD_OPTS ( $self ) { $self->FILTER_OPTS }
 
 use constant CMD_ARGS_SV => 0;
 
 use constant FILTER_ARGS => ();
-sub CMD_ARGS { shift->FILTER_ARGS }
+sub CMD_ARGS ( $self ) { $self->FILTER_ARGS }
 
 package # hide
    Devel::MAT::Tool::Find::filter::num;
@@ -226,18 +224,14 @@ numerical SV will be found.
 
 =cut
 
-sub build
+sub build ( $self, $inv, $optsref, $value = undef )
 {
-   my $self = shift;
-   shift; # inv
-   my %opts = %{ +shift };
-   my ( $value ) = @_;
+   my %opts = $optsref->%*;
 
    $opts{iv} or $opts{uv} or $opts{nv} or
       $opts{iv} = $opts{uv} = $opts{nv} = 1;
 
-   return sub {
-      my ( $sv ) = @_;
+   return sub ( $sv ) {
       return unless $sv->type eq "SCALAR";
 
       if( $opts{nv} and defined( my $nv = $sv->nv ) ) {
@@ -306,12 +300,9 @@ Match case-insensitively, for any of substring, equality or regexp match.
 
 =cut
 
-sub build
+sub build ( $self, $inv, $optsref, $pattern )
 {
-   my $self = shift;
-   shift; # inv
-   my %opts = %{ +shift };
-   my ( $pattern ) = @_;
+   my %opts = $optsref->%*;
 
    my $flags = $opts{ignorecase} ? "i" : "";
 
@@ -326,8 +317,7 @@ sub build
       $pattern = qr/(?$flags)\Q$pattern\E/;
    }
 
-   return sub {
-      my ( $sv ) = @_;
+   return sub ( $sv ) {
       return unless $sv->type eq "SCALAR";
       return unless defined( my $pv = $sv->pv );
       return unless $pv =~ $pattern;
@@ -352,14 +342,11 @@ use constant FILTER_OPTS => (
                 alias => "f" },
 );
 
-sub build
+sub build ( $self, $inv, $optsref )
 {
-   my $self = shift;
-   my $inv = shift;
-   my %opts = %{ +shift };
+   my %opts = $optsref->%*;
 
-   return sub {
-      my ( $sv ) = @_;
+   return sub ( $sv ) {
       return unless $sv->type eq "CODE";
       if( $opts{xsub} ) {
          return if !$sv->is_xsub;
@@ -417,11 +404,9 @@ Match only IO handles associated with the given filenumber.
 
 =cut
 
-sub build
+sub build ( $self, $inv, $optsref )
 {
-   my $self = shift;
-   my $inv = shift;
-   my %opts = %{ +shift };
+   my %opts = $optsref->%*;
 
    # Back-compat
    if( !defined $opts{fileno} and ( $inv->peek_token // "" ) =~ m/^\d+$/ ) {
@@ -429,8 +414,7 @@ sub build
    }
 
    if( defined( my $fileno = $opts{fileno} ) ) {
-      return sub {
-         my ( $sv ) = @_;
+      return sub ( $sv ) {
          return unless $sv->type eq "IO";
 
          my $imatch = $sv->ifileno == $fileno;
@@ -444,8 +428,7 @@ sub build
       }
    }
    else {
-      return sub {
-         my ( $sv ) = @_;
+      return sub ( $sv ) {
          return unless $sv->type eq "IO";
          return String::Tagged->from_sprintf( "ifileno=%s ofileno=%s",
             $sv->ifileno,
@@ -474,16 +457,12 @@ use constant FILTER_ARGS => (
    { name => "package", help => "the blessed package", required => 1 },
 );
 
-sub build
+sub build ( $self, $inv, $package = undef )
 {
-   my $self = shift;
-   my ( $inv, $package ) = @_;
-
    defined $package or
       die "Expected package name for 'blessed' filter";
 
-   return sub {
-      my ( $sv ) = @_;
+   return sub ( $sv ) {
       return unless my $stash = $sv->blessed;
       return unless $stash->stashname eq $package;
       return Devel::MAT::Cmd->format_value( $stash->stashname );
@@ -515,20 +494,16 @@ use constant FILTER_OPTS => (
                  alias => "I" },
 );
 
-sub build
+sub build ( $self, $inv, $optsref, $name = undef )
 {
-   my $self = shift;
-   my $inv = shift;
-   my %opts = %{ +shift };
-   my ( $name ) = @_;
+   my %opts = $optsref->%*;
 
    defined $name or
       die "Expected variable name for 'lexical' filter";
 
    # We'll actually match pad which contains such a lexical. then redirect the
    # search onto the SV itself
-   return sub {
-      my ( $pad ) = @_;
+   return sub ( $pad ) {
       return unless $pad->type eq "PAD";
       return unless my $sv = $pad->maybe_lexvar( $name );
 
@@ -574,17 +549,12 @@ use constant FILTER_ARGS => (
    { name => "name", help => "the structure type name", required => 1 },
 );
 
-sub build
+sub build ( $self, $inv, $name = undef )
 {
-   my $self = shift;
-   my $inv = shift;
-   my ( $name ) = @_;
-
    defined $name or
       die "Expected structure type name for 'struct' filter";
 
-   return sub {
-      my ( $struct ) = @_;
+   return sub ( $struct ) {
       return unless $struct->type eq "C_STRUCT";
       my $type = $struct->structtype;
       return unless $type->name eq $name;
@@ -609,15 +579,12 @@ use constant FILTER_OPTS => (
              alias => "v" },
 );
 
-sub build
+sub build ( $self, $inv, $optsref )
 {
-   my $self = shift;
-   my $inv = shift;
-   my %opts = %{ +shift };
+   my %opts = $optsref->%*;
 
    if( my $vtbl = $opts{vtbl} ) {
-      return sub {
-         my ( $sv ) = @_;
+      return sub ( $sv ) {
          my @magics = $sv->magic or return;
          foreach my $magic ( @magics ) {
             next unless defined $magic->vtbl and $magic->vtbl == $vtbl;

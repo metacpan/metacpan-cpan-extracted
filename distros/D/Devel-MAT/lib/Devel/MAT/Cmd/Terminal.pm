@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Cmd::Terminal 0.54;
+package Devel::MAT::Cmd::Terminal 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use String::Tagged 0.15;  # sprintf
 use String::Tagged::Terminal 0.03;  # ->print_to_terminal
@@ -31,11 +34,8 @@ my @FG = (
    5, # magenta
 );
 
-sub Devel::MAT::Cmd::printf
+sub Devel::MAT::Cmd::printf ( $, $fmt, @args )
 {
-   shift;
-   my ( $fmt, @args ) = @_;
-
    my $str = String::Tagged::Terminal->from_sprintf( $fmt, @args );
 
    CAN_COLOUR ? $str->print_to_terminal : print "$str";
@@ -43,10 +43,8 @@ sub Devel::MAT::Cmd::printf
    return length $str;
 }
 
-sub Devel::MAT::Cmd::format_note
+sub Devel::MAT::Cmd::format_note ( $, $str, $idx )
 {
-   shift;
-   my ( $str, $idx ) = @_;
    $idx //= 0;
 
    return String::Tagged->new_tagged( $str,
@@ -55,43 +53,30 @@ sub Devel::MAT::Cmd::format_note
    );
 }
 
-sub Devel::MAT::Cmd::_format_addr
+sub Devel::MAT::Cmd::_format_addr ( $, $addr )
 {
-   shift;
-   my ( $addr ) = @_;
-
    return String::Tagged->new_tagged( sprintf( "%#x", $addr ), italic => 1 );
 }
 
-sub Devel::MAT::Cmd::_format_sv
+sub Devel::MAT::Cmd::_format_sv ( $, $ret, $sv )
 {
-   shift;
-   my ( $ret, $sv ) = @_;
-
    return String::Tagged->new_tagged( $ret, bold => 1, italic => 1 );
 }
 
-sub Devel::MAT::Cmd::_format_value
+sub Devel::MAT::Cmd::_format_value ( $, $value )
 {
-   shift;
-   return String::Tagged->new_tagged( $_[0], fgindex => 5+8 );
+   return String::Tagged->new_tagged( $value, fgindex => 5+8 );
 }
 
-sub Devel::MAT::Cmd::format_symbol
+sub Devel::MAT::Cmd::format_symbol ( $, $name )
 {
-   shift;
-   my ( $name ) = @_;
-
    return String::Tagged->new_tagged( $name,
       fgindex => 2,
    );
 }
 
-sub Devel::MAT::Cmd::format_heading
+sub Devel::MAT::Cmd::format_heading ( $, $text, $level = undef )
 {
-   shift;
-   my ( $text, $level ) = @_;
-
    $level //= 1;
    $level %= 3;
 

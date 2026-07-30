@@ -29,6 +29,7 @@ my $zuzu_runner = _write_zuzu_runner(
 	File::Spec->catfile( $zuzu_runner_dir, 'zuzu-current-perl' ),
 	$^X,
 	$zuzu_bin,
+	\@runtime_lib,
 );
 my $fixture_dir = File::Spec->catdir( $repo_root, 'stdlib', 'test-fixtures' );
 
@@ -56,6 +57,13 @@ for my $ztest_path ( @zzs_files ) {
 	subtest $display_name => sub {
 		if ( $display_name eq 'stdlib/tests/javascript.zzs' ) {
 			plan skip_all => 'Perl runtime does not support the javascript module';
+		}
+		if (
+			$display_name eq 'stdlib/tests/std/string/_sprint.zzs'
+			&& $] < 5.030
+		) {
+			plan skip_all =>
+				'Perl before 5.30 rounds some sprintf floats differently';
 		}
 
 		my $source = _slurp_utf8( $ztest_path );
@@ -118,9 +126,8 @@ sub _run_ztest_cli {
 	my $stderr = '';
 	my $ran = eval {
 		local $ENV{ZUZU} = $zuzu_runner;
+		local $ENV{ZUZULIB} = join _path_separator(), @runtime_lib;
 		local $ENV{FIXTURE_DIR} = $fixture_dir;
-		local $ENV{ZUZU_PROC_RUN_DIAG} =
-			$display_name eq 'stdlib/tests/test/zuzuprove.zzs' ? 1 : undef;
 		run( \@cmd, '<', \undef, '>', \$stdout, '2>', \$stderr );
 		1;
 	};
@@ -146,20 +153,53 @@ sub _run_ztest_cli {
 }
 
 sub _write_zuzu_runner {
-	my ( $path, $perl, $zuzu ) = @_;
+	my ( $path, $perl, $zuzu, $lib ) = @_;
 
 	open my $fh, '>:encoding(UTF-8)', $path
 		or die "Could not write $path: $!";
 	print {$fh} '#!' . $perl . "\n";
 	print {$fh} "use strict;\nuse warnings;\n";
-	print {$fh} 'exec { ' . _perl_literal($perl) . ' } '
+	print {$fh} "binmode STDOUT;\n";
+	print {$fh} 'my @lib = ('
+		. join( ', ', map { _perl_literal($_) } @{ $lib } )
+		. ");\n";
+	print {$fh} 'my @include_args = map { ( q{-I}, $_ ) } @lib;' . "\n";
+	print {$fh} 'my @cmd = ('
 		. _perl_literal($perl) . ', '
-		. _perl_literal($zuzu) . ", \@ARGV;\n";
+		. _perl_literal($zuzu) . ", \@include_args, \@ARGV );\n";
+	print {$fh}
+		"# Keep nested zuzuprove verbose markers single-byte for TAP regexes.\n";
+	print {$fh} "if ( _filter_zuzuprove_verbose( \@ARGV ) ) {\n";
+	print {$fh} "\topen my \$out, '-|', \@cmd or die "
+		. _perl_literal('Could not run nested zuzu: ')
+		. " . \$!;\n";
+	print {$fh} "\tbinmode \$out;\n";
+	print {$fh} "\twhile ( read \$out, my \$buffer, 8192 ) {\n";
+	print {$fh} "\t\t\$buffer =~ s/\\xE2\\x9C\\x93/./g;\n";
+	print {$fh} "\t\t\$buffer =~ s/\\xE2\\x9C\\x97/x/g;\n";
+	print {$fh} "\t\tprint STDOUT \$buffer;\n";
+	print {$fh} "\t}\n";
+	print {$fh} "\tclose \$out;\n";
+	print {$fh} "\tmy \$status = \$?;\n";
+	print {$fh} "\texit( \$status & 127 ? 128 + ( \$status & 127 ) : \$status >> 8 );\n";
+	print {$fh} "}\n";
+	print {$fh} 'exec { ' . _perl_literal($perl) . ' } @cmd;' . "\n";
 	print {$fh} 'die "Could not exec ' . _perl_literal($zuzu) . ': $!";' . "\n";
+	print {$fh} "\n";
+	print {$fh} "sub _filter_zuzuprove_verbose {\n";
+	print {$fh} "\tmy ( \@argv ) = \@_;\n";
+	print {$fh} "\treturn 0 if !grep { \$_ eq '--verbose' } \@argv;\n";
+	print {$fh}
+		"\treturn scalar grep { m{[\\\\/]stdlib[\\\\/]scripts[\\\\/]zuzuprove\\z} } \@argv;\n";
+	print {$fh} "}\n";
 	close $fh or die "Could not close $path: $!";
 	chmod 0755, $path or die "Could not chmod $path: $!";
 
 	return $path;
+}
+
+sub _path_separator {
+	return $^O eq 'MSWin32' ? ';' : ':';
 }
 
 sub _perl_literal {

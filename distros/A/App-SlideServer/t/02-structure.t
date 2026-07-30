@@ -6,6 +6,9 @@ use Test::Mojo;
 use Mojo::DOM;
 use Log::Any::Adapter 'TAP';
 use App::SlideServer 'mojo2logany';
+my $has_markdown= eval { defined App::SlideServer::_build_markdown_processor() };
+plan skip_all => "No markdown processor available"
+	unless $has_markdown;
 
 my $md= <<~MD;
 	<title>Test</title>

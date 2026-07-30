@@ -55,6 +55,7 @@ Tk-GtkSettings*NoteBook.borderWidth: 1
 *errorColor: #d7c0c0
 *font: {Noto Sans} 10 
 *foreground: #000000
+*guideColor: #B9B59C
 *headerBackground: #bca880
 *highlightBackground: #dec9a9
 *highlightColor: #8f6b32

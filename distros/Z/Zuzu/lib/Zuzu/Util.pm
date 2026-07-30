@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '0.007001';
+our $VERSION = '0.007002';
 
 use Unicode::Normalize qw(NFC);
 use Zuzu::Value::Equality qw(equality_type);

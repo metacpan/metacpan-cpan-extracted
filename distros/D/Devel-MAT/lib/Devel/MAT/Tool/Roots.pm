@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Roots 0.54;
+package Devel::MAT::Tool::Roots 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use List::Util qw( pairs );
 
@@ -26,6 +29,8 @@ This C<Devel::MAT> tool displays a list of all the root SVs.
 
 =head1 COMMANDS
 
+=for highlighter
+
 =head2 roots
 
    pmat> roots
@@ -37,10 +42,8 @@ Prints a list of every root SV in the heap.
 
 =cut
 
-sub run
+sub run ( $self )
 {
-   my $self = shift;
-
    my $df = $self->df;
 
    Devel::MAT::Cmd->print_table(

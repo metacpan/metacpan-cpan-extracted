@@ -2,7 +2,7 @@ package Zuzu::Module::Math;
 
 use utf8;
 
-our $VERSION = '0.007001';
+our $VERSION = '0.007002';
 
 use List::Util qw(
 	max

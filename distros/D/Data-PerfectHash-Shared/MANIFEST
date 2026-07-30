@@ -1,0 +1,37 @@
+bench/baseline.pl
+bench/single.pl
+Changes
+chd.h
+eg/allowlist.pl
+eg/cross_process.pl
+eg/dictionary.pl
+lib/Data/PerfectHash/Shared.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+phash.h
+README
+Shared.xs
+t/00_use.t
+t/01_basic.t
+t/02_corrupt.t
+t/02_str.t
+t/03_exact.t
+t/04_load_validate.t
+t/05_edge.t
+t/06_cross_bless.t
+t/07_atomic_rebuild.t
+t/08_builder_errors.t
+xt/asan.t
+xt/concurrent_readers.t
+xt/destroy_during_call.t
+xt/eg_runs.t
+xt/kwalitee.t
+xt/large_500k.t
+xt/pod.t
+xt/tsan.t
+xt/ubsan.t
+xt/valgrind.t
+xxhash.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

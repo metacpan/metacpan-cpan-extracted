@@ -57,7 +57,7 @@
          "web" : "https://github.com/davorg-cpan/moox-role-seotags"
       }
    },
-   "version" : "v1.1.1",
+   "version" : "v1.2.1",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

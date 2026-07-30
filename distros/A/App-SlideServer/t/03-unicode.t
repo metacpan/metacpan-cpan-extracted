@@ -6,13 +6,14 @@ use Test::Mojo;
 use File::Temp;
 use Log::Any::Adapter 'TAP';
 use App::SlideServer 'mojo2logany';
+my $has_markdown= eval { defined App::SlideServer::_build_markdown_processor() };
 
 my $nanika= chr(0x4F55).chr(0x304B);
 
 sub tempfile_containing($content, @opts) {
 	my $f= File::Temp->new(@opts);
 	binmode($f, ':encoding(UTF-8)');
-	$f->print(@_);
+	$f->print($content);
 	$f->seek(0,0);
 	$f;
 }
@@ -48,9 +49,11 @@ for (
 	[ html_scalar => App::SlideServer->new(slides_source_file => \$html,    log => mojo2logany(), presenter_key => 'x') ],
 	[ html_fname  => App::SlideServer->new(slides_source_file => "$html_f", log => mojo2logany(), presenter_key => 'x') ],
 	[ html_handle => App::SlideServer->new(slides_source_file => $html_f,   log => mojo2logany(), presenter_key => 'x') ],
+        ($has_markdown? (
 	[ md_scalar   => App::SlideServer->new(slides_source_file => \$md,      log => mojo2logany(), presenter_key => 'x') ],
 	[ md_fname    => App::SlideServer->new(slides_source_file => "$md_f",   log => mojo2logany(), presenter_key => 'x') ],
 	[ md_handle   => App::SlideServer->new(slides_source_file => $md_f,     log => mojo2logany(), presenter_key => 'x') ],
+        ):()),
 ) {
 	my ($name, $ss)= @$_;
 	subtest $name => sub {

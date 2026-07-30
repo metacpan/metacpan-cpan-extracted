@@ -2,7 +2,7 @@ package Zuzu::Module::Net::SMTP;
 
 use utf8;
 
-our $VERSION = '0.007001';
+our $VERSION = '0.007002';
 
 use B ();
 use IO::Socket::INET ();

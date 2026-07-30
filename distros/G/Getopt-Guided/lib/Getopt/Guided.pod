@@ -196,7 +196,8 @@ indicator) as its third argument. If the option (or flag) has no indicator,
 the third argument is an empty string. The callback function is invoked in
 scalar context. If the callback function returns the end of options delimiter
 (C<-->), the C<processopts()> function stops prematurely. EOOD is a constant
-that returns the end of options delimiter.
+that returns the end of options delimiter. If the callback function dies the
+C<processopts()> function catches the error, warns and returns false.
 
 The C<processopts()> function returns true (C<!!1>) on success; otherwise the
 function returns false (C<!!0>). If the function stops prematurely, its return

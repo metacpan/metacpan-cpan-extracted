@@ -42,6 +42,12 @@
          }
       }
    },
+   "provides" : {
+      "XML::PugiXML" : {
+         "file" : "lib/XML/PugiXML.pm",
+         "version" : "0.08"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -53,6 +59,6 @@
          "web" : "https://github.com/vividsnow/perl5-xml-pugixml"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

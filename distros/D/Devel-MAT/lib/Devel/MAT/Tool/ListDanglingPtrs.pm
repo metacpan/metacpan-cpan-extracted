@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::ListDanglingPtrs 0.54;
+package Devel::MAT::Tool::ListDanglingPtrs 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use List::Util qw( pairs );
 
@@ -28,6 +31,8 @@ non-NULL addresses, but which do not point to other known SVs. These are so-call
 
 =head1 COMMANDS
 
+=for highlighter
+
 =head2 list-dangling-ptrs
 
    pmat> list-dangling-ptrs
@@ -39,9 +44,8 @@ Prints a list of fields in SVs which do not point at other valid SVs.
 =cut
 
 my %methodcache;
-sub methods_of
+sub methods_of ( $pkg )
 {
-   my ( $pkg ) = @_;
    my $methods = $methodcache{$pkg} //= do {
       no strict 'refs';
       my @syms = keys %{"${pkg}::"};
@@ -53,10 +57,8 @@ sub methods_of
    return @$methods;
 }
 
-sub run
+sub run ( $self )
 {
-   my $self = shift;
-
    my $df = $self->df;
 
    my %roots_at;
@@ -66,10 +68,7 @@ sub run
          $roots_at{ $sv->addr } = $name;
    }
 
-   my $test_ptr = sub {
-      my $self = shift;
-      my ( $sv, $name, $addr ) = @_;
-
+   my $test_ptr = sub ( $self, $sv, $name, $addr = undef ) {
       $addr or return;
       $roots_at{$addr} and return;
       $df->{heap}{$addr} and return;

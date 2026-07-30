@@ -1,5 +1,12 @@
 Revision history for Data-SegmentTree-Shared
 
+0.03      2026-07-29
+          - On-disk format change: files written by 0.01/0.02 are rejected on
+            attach by 0.03; rebuild them.
+          - Reader-slots read-write lock with dead-process recovery.
+          - Security hardening: re-entrancy identity guards, an attach-path
+            bounds fix, and a monoid-gate data-race fix.
+
 0.02      2026-07-21
           - Add range_assign and gcd/product range monoids.
           - On-disk format change: 0.01 files cannot be opened by 0.02.

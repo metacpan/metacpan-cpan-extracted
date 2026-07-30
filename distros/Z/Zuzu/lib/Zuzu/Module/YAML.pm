@@ -2,7 +2,7 @@ package Zuzu::Module::YAML;
 
 use utf8;
 
-our $VERSION = '0.007001';
+our $VERSION = '0.007002';
 
 use JSON::PP ();
 use Scalar::Util qw( blessed );

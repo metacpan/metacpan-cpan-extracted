@@ -10,7 +10,21 @@
         croak("Expected a Data::SegmentTree::Shared object"); \
     StHandle *h = INT2PTR(StHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::SegmentTree::Shared object"); \
+    StHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code. EXTRACT's
+ * sv_2mortal(SvREFCNT_inc(...)) pin only blocks REFCOUNT-driven destruction;
+ * an explicit $obj->DESTROY frees the handle regardless and zeroes the IV.
+ * A position/value argument's SvUV/SvIV runs tie/overload magic; that same Perl
+ * can destroy the invocant, or REPLACE it ($obj = <other> mutates ST(0) in place,
+ * because Perl passes aliases), hence the SvROK re-check and the h0 identity
+ * compare.  Re-validate before any dereference of h that follows a conversion. */
+#define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::SegmentTree::Shared object was replaced during the call"); \
+    h = INT2PTR(StHandle*, SvIV(SvRV(sv))); \
+    if (h != h0) croak("Data::SegmentTree::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -18,10 +32,15 @@
     sv_bless(ref, gv_stashpv(class, GV_ADD)); \
     RETVAL = ref
 
-/* validate + fetch a 0-based position, croaking on out-of-range (h->n is the
- * process-local, attach-validated position count -- not the peer-writable header) */
+/* Validate + fetch a 0-based position, croaking on out-of-range (h->n is the
+ * process-local, attach-validated count -- not the peer-writable header).
+ * REEXTRACT(self) must run BEFORE the h->n dereference below (SvUV(sv) can run
+ * Perl that destroys/replaces the invocant -- see REEXTRACT above) -- the
+ * guard lives inside this macro because POS itself dereferences h.  Every
+ * method that uses POS names its invocant `self`. */
 #define POS(nm, sv) \
     UV nm = SvUV(sv); \
+    REEXTRACT(self); \
     if (nm >= h->n) croak("Data::SegmentTree::Shared: position %" UVuf " out of range (n=%" UVuf ")", nm, (UV)h->n)
 
 MODULE = Data::SegmentTree::Shared  PACKAGE = Data::SegmentTree::Shared
@@ -42,7 +61,7 @@ new(class, path = &PL_sv_undef, n = 0, ...)
      * (default 0600, owner-only). Pass e.g. 0660 for cross-user sharing.
      * Resolve it before capturing the path PV: SvGETMAGIC on ST(3) may
      * realloc/free the PV that SvPV_nolen(path) would return. */
-    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? ((mode_t)SvUV(ST(3)) & 0777) : 0600;   /* mask off setuid/setgid/sticky bits on a data file */
     /* capture the path PV last, after all get-magic on other args has run */
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     StHandle *h = st_create(p, (uint64_t)n, mode, errbuf);
@@ -332,7 +351,7 @@ size(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = (UV)h->hdr->n;
+    RETVAL = (UV)h->n;   /* attach-validated cache, not the peer-writable header */
   OUTPUT:
     RETVAL
 
@@ -344,8 +363,8 @@ stats(self)
   CODE:
     {
         uint64_t n, sz, ops;
-        n   = h->hdr->n;
-        sz  = h->hdr->size;
+        n   = h->n;      /* attach-validated caches, not the peer-writable header */
+        sz  = h->size;
         ops = __atomic_load_n(&h->hdr->stat_ops, __ATOMIC_RELAXED);
         HV *hv = newHV();
         hv_stores(hv, "n",         newSVuv((UV)n));

@@ -28,19 +28,29 @@
       "configure" : {
          "requires" : {
             "EV" : "4.37",
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
             "EV" : "4.37",
-            "perl" : "5.010000"
+            "perl" : "5.014000"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test::More" : "0.96"
          }
+      }
+   },
+   "provides" : {
+      "EV::Future" : {
+         "file" : "lib/EV/Future.pm",
+         "version" : "0.06"
+      },
+      "EV::Future::Handle" : {
+         "file" : "lib/EV/Future.pm",
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -51,6 +61,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-future"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

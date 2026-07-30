@@ -160,7 +160,7 @@ font.Warning {
 <body>
 
 <div class="content">
-<div id="1" class="line"><font class="Normal">--&nbsp;test&nbsp;file&nbsp;for&nbsp;Haskell&nbsp;syntax&nbsp;highlighting&nbsp;in&nbsp;KDE's&nbsp;Kate</font></br></div>
+<div id="1" class="line"><font class="Normal">--&nbsp;test&nbsp;file&nbsp;for&nbsp;Haskell&nbsp;syntax&nbsp;highlighting&nbsp;in&nbsp;KDE&#39;s&nbsp;Kate</font></br></div>
 <div id="2" class="line"></br></div>
 <div id="3" class="line"><font class="Normal">--&nbsp;The&nbsp;test&nbsp;file&nbsp;for&nbsp;literate&nbsp;Haskell&nbsp;can&nbsp;be&nbsp;easily&nbsp;created&nbsp;like&nbsp;this:</font></br></div>
 <div id="4" class="line"><font class="Normal">--&nbsp;&nbsp;cat&nbsp;highlight.hs&nbsp;|&nbsp;sed&nbsp;-e&nbsp;&quot;s|^|&gt;&nbsp;|&quot;&nbsp;-e&nbsp;&quot;s|&gt;&nbsp;--&nbsp;||&quot;&nbsp;-e&nbsp;&quot;s|^&gt;&nbsp;$||&quot;&nbsp;&gt;&nbsp;highlight.lhs</font></br></div>
@@ -170,7 +170,7 @@ font.Warning {
 <div id="8" class="line"></br></div>
 <div id="9" class="line"><font class="Normal">{-&nbsp;this&nbsp;is&nbsp;a&nbsp;multi-line&nbsp;comment</font></br></div>
 <div id="10" class="line"></br></div>
-<div id="11" class="line"><font class="Normal">Things&nbsp;like&nbsp;&quot;a&nbsp;string&quot;&nbsp;or&nbsp;a&nbsp;'c'&nbsp;character&nbsp;shouldn't&nbsp;be&nbsp;highlighted&nbsp;in&nbsp;here.</font></br></div>
+<div id="11" class="line"><font class="Normal">Things&nbsp;like&nbsp;&quot;a&nbsp;string&quot;&nbsp;or&nbsp;a&nbsp;&#39;c&#39;&nbsp;character&nbsp;shouldn&#39;t&nbsp;be&nbsp;highlighted&nbsp;in&nbsp;here.</font></br></div>
 <div id="12" class="line"></br></div>
 <div id="13" class="line"><font class="Normal">--&nbsp;I&nbsp;could&nbsp;even&nbsp;start&nbsp;a&nbsp;new</font></br></div>
 <div id="14" class="line"><font class="Normal">--&nbsp;one-line&nbsp;comment.</font></br></div>
@@ -192,26 +192,26 @@ font.Warning {
 <div id="30" class="line"></br></div>
 <div id="31" class="line"><font class="Normal">strangefunction::Int-&gt;String</font></br></div>
 <div id="32" class="line"><font class="Normal">strangefunction&nbsp;1&nbsp;=&nbsp;&quot;hello&quot;</font></br></div>
-<div id="33" class="line"><font class="Normal">strangefunction&nbsp;2&nbsp;=&nbsp;&quot;what's&nbsp;up&quot;</font></br></div>
+<div id="33" class="line"><font class="Normal">strangefunction&nbsp;2&nbsp;=&nbsp;&quot;what&#39;s&nbsp;up&quot;</font></br></div>
 <div id="34" class="line"><font class="Normal">strangefunction&nbsp;3&nbsp;=&nbsp;(strangefunction&nbsp;1)&nbsp;++&nbsp;&quot;,&nbsp;&quot;&nbsp;++&nbsp;(strangefunction&nbsp;2)</font></br></div>
-<div id="35" class="line"><font class="Normal">strangefunction&nbsp;4&nbsp;=&nbsp;'a':'b':'c':'&quot;':[]&nbsp;--&nbsp;will&nbsp;return&nbsp;&quot;abc&quot;</font></br></div>
-<div id="36" class="line"><font class="Normal">strangefunction&nbsp;5&nbsp;=&nbsp;'\n':[]</font></br></div>
-<div id="37" class="line"><font class="Normal">strangefunction&nbsp;6&nbsp;=&nbsp;'\invalidhaskell':[]</font></br></div>
+<div id="35" class="line"><font class="Normal">strangefunction&nbsp;4&nbsp;=&nbsp;&#39;a&#39;:&#39;b&#39;:&#39;c&#39;:&#39;&quot;&#39;:[]&nbsp;--&nbsp;will&nbsp;return&nbsp;&quot;abc&quot;</font></br></div>
+<div id="36" class="line"><font class="Normal">strangefunction&nbsp;5&nbsp;=&nbsp;&#39;\n&#39;:[]</font></br></div>
+<div id="37" class="line"><font class="Normal">strangefunction&nbsp;6&nbsp;=&nbsp;&#39;\invalidhaskell&#39;:[]</font></br></div>
 <div id="38" class="line"></br></div>
 <div id="39" class="line"><font class="Normal">--&nbsp;function&nbsp;name&nbsp;including&nbsp;the&nbsp;single&nbsp;quote&nbsp;character</font></br></div>
 <div id="40" class="line"><font class="Normal">--&nbsp;and&nbsp;infix&nbsp;operator&nbsp;(`div`)</font></br></div>
 <div id="41" class="line"></br></div>
-<div id="42" class="line"><font class="Normal">justtesting'::Int-&gt;Int</font></br></div>
-<div id="43" class="line"><font class="Normal">justtesting'&nbsp;2&nbsp;=&nbsp;2+1</font></br></div>
-<div id="44" class="line"><font class="Normal">justtesting'&nbsp;9&nbsp;=&nbsp;7&nbsp;`div`&nbsp;2</font></br></div>
+<div id="42" class="line"><font class="Normal">justtesting&#39;::Int-&gt;Int</font></br></div>
+<div id="43" class="line"><font class="Normal">justtesting&#39;&nbsp;2&nbsp;=&nbsp;2+1</font></br></div>
+<div id="44" class="line"><font class="Normal">justtesting&#39;&nbsp;9&nbsp;=&nbsp;7&nbsp;`div`&nbsp;2</font></br></div>
 <div id="45" class="line"></br></div>
 <div id="46" class="line"><font class="Normal">--&nbsp;same&nbsp;definition&nbsp;as&nbsp;above,&nbsp;slightly&nbsp;different&nbsp;function&nbsp;name&nbsp;and&nbsp;a&nbsp;couple&nbsp;more&nbsp;whitespaces</font></br></div>
 <div id="47" class="line"></br></div>
-<div id="48" class="line"><font class="Normal">justtesting''&nbsp;&nbsp;&nbsp;::&nbsp;&nbsp;&nbsp;Int&nbsp;-&gt;&nbsp;Int</font></br></div>
-<div id="49" class="line"><font class="Normal">justtesting''&nbsp;&nbsp;&nbsp;2&nbsp;=&nbsp;3</font></br></div>
-<div id="50" class="line"><font class="Normal">justtesting''&nbsp;&nbsp;&nbsp;9&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;3&nbsp;+&nbsp;9&nbsp;-&nbsp;9</font></br></div>
+<div id="48" class="line"><font class="Normal">justtesting&#39;&#39;&nbsp;&nbsp;&nbsp;::&nbsp;&nbsp;&nbsp;Int&nbsp;-&gt;&nbsp;Int</font></br></div>
+<div id="49" class="line"><font class="Normal">justtesting&#39;&#39;&nbsp;&nbsp;&nbsp;2&nbsp;=&nbsp;3</font></br></div>
+<div id="50" class="line"><font class="Normal">justtesting&#39;&#39;&nbsp;&nbsp;&nbsp;9&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;3&nbsp;+&nbsp;9&nbsp;-&nbsp;9</font></br></div>
 <div id="51" class="line"></br></div>
-<div id="52" class="line"><font class="Normal">--&nbsp;the&nbsp;following&nbsp;lines&nbsp;are&nbsp;copied&nbsp;out&nbsp;of&nbsp;Haskell's&nbsp;&quot;Prelude.hs&quot;</font></br></div>
+<div id="52" class="line"><font class="Normal">--&nbsp;the&nbsp;following&nbsp;lines&nbsp;are&nbsp;copied&nbsp;out&nbsp;of&nbsp;Haskell&#39;s&nbsp;&quot;Prelude.hs&quot;</font></br></div>
 <div id="53" class="line"></br></div>
 <div id="54" class="line"><font class="Normal">infixl&nbsp;7&nbsp;&nbsp;*,&nbsp;/,&nbsp;`quot`,&nbsp;`rem`,&nbsp;`div`,&nbsp;`mod`,&nbsp;:%,&nbsp;%</font></br></div>
 <div id="55" class="line"></br></div>

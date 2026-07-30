@@ -1,5 +1,19 @@
 Revision history for Perl extension PDF::Reuse::Barcode.
 
+0.11 Wed Jul 29 2026
+     Bug fixes to the 0.10 "textsize" work and one older defect:
+     - The bars are now raised as the text grows, so a large textsize no
+       longer prints the human readable text over the bottom of the
+       barcode. Previously anything above about 12 point overprinted,
+       which is a scanning failure rather than a cosmetic one. GitHub #8.
+     - The background extension strips are drawn at the height the
+       background box was actually drawn at, rather than one unit short.
+       GitHub #8.
+     - $qrcode is reset between barcodes, so a barcode drawn after a
+       QRcode in the same process no longer renders down the QRcode path.
+       GitHub #6.
+     Output at the default textsize is unchanged.
+
 0.10 Wed Jul 29 2026
      Added "textsize" parameter to set the point size of the human readable
      text below the barcode. Defaults to 10, so existing output is unchanged.

@@ -1,5 +1,21 @@
 Revision history for EV-Future
 
+0.06    Wed Jul 29 2026
+        - Minimum perl is now 5.14: the XS uses croak_sv, unavailable earlier
+        - Fix a stack-use-after-return in parallel_limit when an unsafe-mode
+          task croaked from an event-loop callback; an escaping unsafe-mode
+          exception now abandons the operation instead of wedging it
+        - Fix parallel_limit running sequentially for any limit above 2**31
+        - Add parallel_map, parallel_map_limit and series_map: one worker
+          called as ($item, $done) per element, instead of a closure per item
+        - Every primitive returns an EV::Future::Handle in non-void context,
+          with cancel([$fire]), pending and active; assigning from a primitive
+          now yields a handle where it used to yield undef
+        - Tasks are dispatched in void context, so wantarray inside a task
+          reports undef rather than false-but-defined
+        - Document four silent traps; add runnable eg/ examples and a
+          task-versus-map benchmark
+
 0.05    Sat May  2 2026
         - Add race(); first done wins, args forwarded to final_cb
 

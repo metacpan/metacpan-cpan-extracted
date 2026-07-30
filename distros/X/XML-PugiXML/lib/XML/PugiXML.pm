@@ -2,10 +2,20 @@ package XML::PugiXML;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('XML::PugiXML', $VERSION);
+
+# Under ithreads, the objects in these packages are blessed pointers to C++
+# structures, not per-interpreter data. Cloning one into a new thread would
+# copy the raw pointer and leave two interpreters each holding a DESTROY for
+# it, double-deleting the underlying object. CLONE_SKIP tells perl not to
+# clone them: a new thread simply does not inherit these objects.
+sub CLONE_SKIP { 1 }
+sub XML::PugiXML::Node::CLONE_SKIP  { 1 }
+sub XML::PugiXML::Attr::CLONE_SKIP  { 1 }
+sub XML::PugiXML::XPath::CLONE_SKIP { 1 }
 
 1;
 
@@ -52,10 +62,24 @@ XML::PugiXML - Perl binding for pugixml C++ XML parser
 XML::PugiXML provides a Perl interface to the pugixml C++ XML parsing library.
 It offers fast parsing, XPath support, and a clean API.
 
+=head2 Encoding
+
 String inputs must be UTF-8: either Perl Unicode strings (the internal
-representation is passed through), or raw UTF-8 bytes. Latin-1 byte
-strings are not auto-converted; call C<utf8::upgrade> on them first if
-needed. All string outputs are UTF-8 flagged.
+representation is passed through), or raw UTF-8 bytes. All string outputs are
+UTF-8 flagged.
+
+Latin-1 byte strings are B<not> auto-converted, because a byte string cannot
+be told apart from the raw UTF-8 the module also accepts. Call
+C<utf8::upgrade> on them at the boundary: passing one through stores invalid
+UTF-8 in the document, and what you read back is a UTF-8 flagged but malformed
+string that makes C<length> warn and C<to_string> emit invalid XML. There is
+no diagnostic to rely on here.
+
+=head2 NUL bytes
+
+Names, values, paths and XPath expressions must not contain an embedded NUL:
+it is invalid in XML 1.0, and truncating there would silently operate on a
+different string than the caller passed. Such arguments croak.
 
 =head1 METHODS
 
@@ -261,7 +285,9 @@ constants listed under L</"Node Type Constants">.
 
 =item path($delimiter?)
 
-Return the absolute XPath path to this node. Default delimiter is '/'.
+Return the absolute XPath path to this node. The delimiter defaults to '/'
+and must be a single character; anything longer or shorter croaks rather
+than being silently truncated.
 
 =item hash()
 
@@ -275,10 +301,9 @@ Return the source offset of this node (for debugging).
 
 =item valid()
 
-Return true if this is a valid node handle. This detects a null handle and a
-handle left stale by a document C<reset>/reload, but B<not> a node that was
-removed from the tree: an orphaned node still reports as valid until the
-document is destroyed.
+Return true if this is a valid node handle. This detects a null handle, a
+handle left stale by a document C<reset>/reload, and a handle to a node that
+has been removed from the tree by C<remove_child> (see L</"MEMORY MODEL">).
 
 =item root()
 
@@ -349,7 +374,9 @@ native pugixml 1.16 C<ensure_attribute>; emulated on older libraries.)
 
 =item remove_attr($name)
 
-Remove an attribute by name. Returns true on success.
+Remove an attribute by name. Returns true on success. Any existing
+C<XML::PugiXML::Attr> handle to that attribute becomes stale; see
+L</"MEMORY MODEL">.
 
 =back
 
@@ -394,7 +421,10 @@ Add a processing instruction (e.g., C<< <?target data?> >>).
 
 =item remove_child($node)
 
-Remove a child node. Returns true on success.
+Remove a child node. Returns true on success. Handles to the removed node and
+to everything beneath it (descendants and their attributes) become stale; see
+L</"MEMORY MODEL">. Handles to the rest of the document are unaffected, so
+C<$parent> stays usable across the call.
 
 =item set_name($name), set_value($value), set_text($text)
 
@@ -456,9 +486,9 @@ Set attribute name. Returns true on success.
 
 =item valid()
 
-Return true if this is a valid attribute handle. This detects a null handle and
-a handle left stale by a document C<reset>/reload, but B<not> an attribute that
-was removed from its node.
+Return true if this is a valid attribute handle. This detects a null handle, a
+handle left stale by a document C<reset>/reload, and a handle to an attribute
+that has been removed by C<remove_attr> (see L</"MEMORY MODEL">).
 
 =back
 
@@ -519,6 +549,34 @@ variable goes out of scope:
     }
     # $node is still valid here
 
+Handles do B<not> keep individual nodes alive: pugixml offers no way to do
+that, and destroying a node really does free its storage. A handle is instead
+marked stale as soon as what it points at is destroyed, so using it croaks
+rather than reading freed memory. Two things destroy nodes:
+
+=over 4
+
+=item *
+
+C<reset()>, C<load_file()> and C<load_string()> replace the whole tree, so
+every outstanding Node and Attr handle for that document goes stale.
+
+=item *
+
+C<remove_child()> and C<remove_attr()> destroy one subtree or one attribute.
+Exactly the handles pointing into it go stale, descendants and their
+attributes included; the rest of the document is unaffected, so the parent
+you called the method on stays usable.
+
+=back
+
+C<valid()> tests a handle without croaking:
+
+    my $victim = $root->child('doomed');
+    $root->remove_child($victim);
+    $victim->valid;    # false
+    $victim->name;     # croaks "Stale node handle: node has been removed ..."
+
 =head1 PERFORMANCE
 
 Benchmarked against XML::LibXML (100-5000 element documents):
@@ -543,6 +601,12 @@ unexpanded in the parsed text rather than being recursively expanded.
 
 Different document instances may be used concurrently from different
 threads. Concurrent access to the same document is not safe.
+
+Under ithreads, all four classes set C<CLONE_SKIP>, so documents, nodes,
+attributes and compiled XPath objects are B<not> cloned into a new thread:
+they wrap raw C++ pointers, and cloning would give two interpreters a
+destructor each for the same object. Create the document inside the thread
+that uses it, or pass the XML as a string and re-parse.
 
 =head1 SEE ALSO
 

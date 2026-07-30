@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.54;
+package Devel::MAT::Dumpfile 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 use IO::Handle;   # ->read
@@ -30,6 +33,8 @@ use constant {
 C<Devel::MAT::Dumpfile> - load and analyse a heap dump file
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Devel::MAT::Dumpfile;
 
@@ -107,15 +112,14 @@ foreach (
    $ROOTDESC{$name} = $desc;
 
    # Autogenerate the accessors
-   my $code = sub {
-      my $self = shift;
+   my $code = sub ( $self ) {
       $self->{roots}{$name} ? $self->sv_at( $self->{roots}{$name}[0] ) : undef;
    };
    no strict 'refs';
    *$name = $code;
 }
 
-*ROOTS = sub { @ROOTS };
+*ROOTS = sub ( $self ) { @ROOTS };
 
 =head1 CONSTRUCTOR
 
@@ -142,11 +146,8 @@ user.
 
 =cut
 
-sub load
+sub load ( $class, $path, %args )
 {
-   my $class = shift;
-   my ( $path, %args ) = @_;
-
    my $progress = $args{progress};
 
    $progress->( "Loading file $path..." ) if $progress;
@@ -283,20 +284,14 @@ sub load
    return $self;
 }
 
-sub structtype
+sub structtype ( $self, $id )
 {
-   my $self = shift;
-   my ( $id ) = @_;
-
    return $self->{structtypes_by_id}{$id} //
       croak "Dumpfile does not define a struct type of ID=$id\n";
 }
 
-sub _fixup
+sub _fixup ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $progress = $args{progress};
 
    my $heap = $self->{heap};
@@ -304,7 +299,7 @@ sub _fixup
    my $heap_total = scalar keys %$heap;
 
    # Annotate each root SV
-   foreach my $name ( keys %{ $self->{roots} } ) {
+   foreach my $name ( keys $self->{roots}->%* ) {
       my $sv = $self->root( $name ) or next;
       $sv->{rootname} = $name;
    }
@@ -326,7 +321,7 @@ sub _fixup
    if( $self->{format_minor} >= 2 ) {
       my %prev_depth_by_cvaddr;
 
-      foreach my $ctx ( @{ $self->{contexts} } ) {
+      foreach my $ctx ( $self->{contexts}->@* ) {
          next unless $ctx->type eq "SUB";
 
          my $cvaddr = $ctx->{cv_at};
@@ -340,88 +335,72 @@ sub _fixup
 }
 
 # Nicer interface to IO::Handle
-sub _read
+sub _read ( $self, $len )
 {
-   my $self = shift;
-   my ( $len ) = @_;
    return "" if $len == 0;
    defined( $self->{fh}->read( my $buf, $len ) ) or croak "Cannot read - $!";
    return $buf;
 }
 
-sub _read_u8
+sub _read_u8 ( $self )
 {
-   my $self = shift;
    defined( $self->{fh}->read( my $buf, 1 ) ) or croak "Cannot read - $!";
    return unpack "C", $buf;
 }
 
-sub _read_u32
+sub _read_u32 ( $self )
 {
-   my $self = shift;
    defined( $self->{fh}->read( my $buf, 4 ) ) or croak "Cannot read - $!";
    return unpack $self->{u32_fmt}, $buf;
 }
 
-sub _read_u64
+sub _read_u64 ( $self )
 {
-   my $self = shift;
    defined( $self->{fh}->read( my $buf, 8 ) ) or croak "Cannot read - $!";
    return unpack $self->{u64_fmt}, $buf;
 }
 
-sub _read_uint
+sub _read_uint ( $self )
 {
-   my $self = shift;
    defined( $self->{fh}->read( my $buf, $self->{uint_len} ) ) or croak "Cannot read - $!";
    return unpack $self->{uint_fmt}, $buf;
 }
 
-sub _read_ptr
+sub _read_ptr ( $self )
 {
-   my $self = shift;
    defined( $self->{fh}->read( my $buf, $self->{ptr_len} ) ) or croak "Cannot read - $!";
    return unpack $self->{ptr_fmt}, $buf;
 }
 
-sub _read_ptrs
+sub _read_ptrs ( $self, $n )
 {
-   my $self = shift;
-   my ( $n ) = @_;
    defined( $self->{fh}->read( my $buf, $self->{ptr_len} * $n ) ) or croak "Cannot read - $!";
    return unpack "$self->{ptr_fmt}$n", $buf;
 }
 
-sub _read_nv
+sub _read_nv ( $self )
 {
-   my $self = shift;
    defined( $self->{fh}->read( my $buf, $self->{nv_len} ) ) or croak "Cannot read - $!";
    return unpack $self->{nv_fmt}, $buf;
 }
 
-sub _read_str
+sub _read_str ( $self )
 {
-   my $self = shift;
    my $len = $self->_read_uint;
    return undef if $len == $self->{minus_1};
    return $self->_read($len);
 }
 
-sub _read_bytesptrsstrs
+sub _read_bytesptrsstrs ( $self, $nbytes, $nptrs, $nstrs )
 {
-   my $self = shift;
-   my ( $nbytes, $nptrs, $nstrs ) = @_;
-
    return
       ( $nbytes ? $self->_read( $nbytes ) : "" ),
       ( $nptrs  ? [ $self->_read_ptrs( $nptrs ) ] : undef ),
       ( $nstrs  ? [ map { $self->_read_str } 1 .. $nstrs ] : undef );
 }
 
-sub _read_sv
+sub _read_sv ( $self )
 {
-   my $self = shift;
-
    while(1) {
       my $type = $self->_read_u8;
       return if !$type;
@@ -483,7 +462,7 @@ sub _read_sv
 
       # First read the "common" header
       my $sv = Devel::MAT::SV->new( $type, $self,
-         $self->_read_bytesptrsstrs( @{ $self->{sv_sizes}[0] } )
+         $self->_read_bytesptrsstrs( $self->{sv_sizes}[0]->@* )
       );
 
       if( $type == 0x7F ) {
@@ -498,7 +477,7 @@ sub _read_sv
          $type >= 16 and !$self->{warned_experimental_class}++ and
             warnings::warnif experimental => "Support for class features in PMAT file is experimental";
 
-         my ( $bytes, $nptrs, $nstrs ) = @{ $self->{sv_sizes}[$type] };
+         my ( $bytes, $nptrs, $nstrs ) = $self->{sv_sizes}[$type]->@*;
          $sv->load(
             $self->_read_bytesptrsstrs( $bytes, $nptrs, $nstrs )
          );
@@ -508,92 +487,62 @@ sub _read_sv
    }
 }
 
-sub _read_svx_80
+sub _read_svx_80 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $sv, $bytes, $ptrs, $strs ) = @_;
-
    my ( $type, $flags ) = unpack "A1 C", $bytes;
 
    $sv->more_magic( $type => $flags, @$ptrs );
 }
 
-sub _read_svx_81
+sub _read_svx_81 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $sv, $bytes, $ptrs, $strs ) = @_;
-
    $sv->_more_saved( SCALAR => $ptrs->[0] );
 }
 
-sub _read_svx_82
+sub _read_svx_82 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $sv, $bytes, $ptrs, $strs ) = @_;
-
    $sv->_more_saved( ARRAY => $ptrs->[0] );
 }
 
-sub _read_svx_83
+sub _read_svx_83 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $sv, $bytes, $ptrs, $strs ) = @_;
-
    $sv->_more_saved( HASH => $ptrs->[0] );
 }
 
-sub _read_svx_84
+sub _read_svx_84 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $av, $bytes, $ptrs, $strs ) = @_;
-
    my $index = unpack $self->{uint_fmt}, $bytes;
 
-   $av->isa( "Devel::MAT::SV::ARRAY" ) and
-      $av->_more_saved( $index, $ptrs->[0] );
+   $sv->isa( "Devel::MAT::SV::ARRAY" ) and
+      $sv->_more_saved( $index, $ptrs->[0] );
 }
 
-sub _read_svx_85
+sub _read_svx_85 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $hv, $bytes, $ptrs, $strs ) = @_;
-
-   $hv->isa( "Devel::MAT::SV::HASH" ) and
-      $hv->_more_saved( $ptrs->[0], $ptrs->[1] );
+   $sv->isa( "Devel::MAT::SV::HASH" ) and
+      $sv->_more_saved( $ptrs->[0], $ptrs->[1] );
 }
 
-sub _read_svx_86
+sub _read_svx_86 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $sv, $bytes, $ptrs, $strs ) = @_;
-
    $sv->_more_saved( CODE => $ptrs->[0] );
 }
 
-sub _read_svx_87
+sub _read_svx_87 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $sv, $bytes, $ptrs, $strs ) = @_;
-
    $sv->_more_annotations( $ptrs->[0], $strs->[0] );
 }
 
-sub _read_svx_88
+sub _read_svx_88 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $sv, $bytes, $ptrs, $strs ) = @_;
-
    my ( $serial, $line ) = unpack "($self->{uint_fmt})2", $bytes;
    my $file = $strs->[0];
 
    $sv->_debugdata( $serial, $line, $file );
 }
 
-sub _read_svx_89
+sub _read_svx_89 ( $self, $sv, $bytes, $ptrs, $strs )
 {
-   my $self = shift;
-   my ( $sv, $bytes, $ptrs, $strs ) = @_;
-
    my ( $shared_hek ) = unpack "$self->{ptr_fmt}", $bytes;
 
    if( $sv->type eq "SCALAR" ) {
@@ -604,20 +553,18 @@ sub _read_svx_89
    }
 }
 
-sub _read_ctx
+sub _read_ctx ( $self )
 {
-   my $self = shift;
-
    my $type = $self->_read_u8;
    return if !$type;
 
    if( $self->{format_minor} >= 2 ) {
       my $ctx = Devel::MAT::Context->new( $type, $self,
-         $self->_read_bytesptrsstrs( @{ $self->{ctx_sizes}[0] } )
+         $self->_read_bytesptrsstrs( $self->{ctx_sizes}[0]->@* )
       );
 
       $ctx->load(
-         $self->_read_bytesptrsstrs( @{ $self->{ctx_sizes}[$type] } )
+         $self->_read_bytesptrsstrs( $self->{ctx_sizes}[$type]->@* )
       );
 
       return $ctx;
@@ -640,9 +587,8 @@ string in the form C<5.14.2>.
 
 =cut
 
-sub perlversion
+sub perlversion ( $self )
 {
-   my $self = shift;
    my $v = $self->{perlver};
    return join ".", $v>>24, ($v>>16) & 0xff, $v&0xffff;
 }
@@ -656,9 +602,8 @@ either C<big> or C<little>.
 
 =cut
 
-sub endian
+sub endian ( $self )
 {
-   my $self = shift;
    return $self->{big_endian} ? "big" : "little";
 }
 
@@ -671,9 +616,8 @@ created by.
 
 =cut
 
-sub uint_len
+sub uint_len ( $self )
 {
-   my $self = shift;
    return $self->{uint_len};
 }
 
@@ -686,9 +630,8 @@ was created by.
 
 =cut
 
-sub ptr_len
+sub ptr_len ( $self )
 {
-   my $self = shift;
    return $self->{ptr_len};
 }
 
@@ -701,9 +644,8 @@ was created by.
 
 =cut
 
-sub nv_len
+sub nv_len ( $self )
 {
-   my $self = shift;
    return $self->{nv_len};
 }
 
@@ -716,9 +658,8 @@ that the heap dump was created by.
 
 =cut
 
-sub ithreads
+sub ithreads ( $self )
 {
-   my $self = shift;
    return $self->{ithreads};
 }
 
@@ -744,30 +685,26 @@ that count as strong references.
 
 =cut
 
-sub _roots
+sub _roots ( $self )
 {
-   my $self = shift;
    return map {
       my ( $root_at, $desc ) = @$_;
       $desc => $self->sv_at( $root_at )
-   } values %{ $self->{roots} };
+   } values $self->{roots}->%*;
 }
 
-sub roots
+sub roots ( $self )
 {
-   my $self = shift;
    return pairmap { substr( $a, 1 ) => $b } $self->_roots;
 }
 
-sub roots_strong
+sub roots_strong ( $self )
 {
-   my $self = shift;
    return pairmap { $a =~ m/^\+(.*)/ ? ( $1 => $b ) : () } $self->_roots;
 }
 
-sub roots_weak
+sub roots_weak ( $self )
 {
-   my $self = shift;
    return pairmap { $a =~ m/^\-(.*)/ ? ( $1 => $b ) : () } $self->_roots;
 }
 
@@ -777,6 +714,8 @@ sub roots_weak
 
 For each of the root names given below, a method exists with that name which
 returns the SV at that root:
+
+=for highlighter
 
    main_cv
    defstash
@@ -808,6 +747,8 @@ returns the SV at that root:
    isarev
    registered_mros
 
+=for highlighter language=perl
+
 =cut
 
 =head2 root_descriptions
@@ -819,9 +760,8 @@ each of the possible roots.
 
 =cut
 
-sub root_descriptions
+sub root_descriptions ( $self )
 {
-   my $self = shift;
    my $roots = $self->{roots};
    return map {
       $_ => substr $roots->{$_}[1], 1
@@ -836,11 +776,8 @@ Returns the SV address of the given named root.
 
 =cut
 
-sub root_at
+sub root_at ( $self, $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
-
    return $self->{roots}{$name} ? $self->{roots}{$name}[0] : undef;
 }
 
@@ -852,10 +789,9 @@ Returns the given root SV.
 
 =cut
 
-sub root
+sub root ( $self, $name )
 {
-   my $self = shift;
-   my $root_at = $self->root_at( @_ ) or return;
+   my $root_at = $self->root_at( $name ) or return;
    return $self->sv_at( $root_at );
 }
 
@@ -867,10 +803,9 @@ Returns all of the heap-allocated SVs, in no particular order
 
 =cut
 
-sub heap
+sub heap ( $self )
 {
-   my $self = shift;
-   return values %{ $self->{heap} };
+   return values $self->{heap}->%*;
 }
 
 =head2 stack
@@ -881,11 +816,9 @@ Returns all the SVs on the stack
 
 =cut
 
-sub stack
+sub stack ( $self )
 {
-   my $self = shift;
-
-   return map { $self->sv_at( $_ ) } @{ $self->{stack_at} };
+   return map { $self->sv_at( $_ ) } $self->{stack_at}->@*;
 }
 
 =head2 contexts
@@ -897,10 +830,9 @@ stack in the dumpfile.
 
 =cut
 
-sub contexts
+sub contexts ( $self )
 {
-   my $self = shift;
-   return @{ $self->{contexts} };
+   return $self->{contexts}->@*;
 }
 
 =head2 sv_at
@@ -914,10 +846,8 @@ immortal C<Devel::MAT::SV::UNDEF> SV).
 
 =cut
 
-sub sv_at
+sub sv_at ( $self, $addr )
 {
-   my $self = shift;
-   my ( $addr ) = @_;
    return undef if !$addr;
 
    return $self->{UNDEF} if $addr == $self->{undef_at};

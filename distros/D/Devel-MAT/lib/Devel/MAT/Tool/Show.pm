@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.54;
+package Devel::MAT::Tool::Show 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use List::Util qw( max );
 
@@ -35,6 +38,8 @@ applied to.
 
 =head1 COMMANDS
 
+=for highlighter
+
 =cut
 
 =head2 show
@@ -52,18 +57,14 @@ Prints information about the given SV.
 use constant CMD_ARGS_SV => 1;
 
 my @SHOW_EXTRA;
-sub register_extra
+sub register_extra ( $pkg, $code )
 {
-   shift;
-   my ( $code ) = @_;
    push @SHOW_EXTRA, $code;
 }
 
-sub run
+sub run ( $self, $optsref, $sv )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
-   my ( $sv ) = @_;
+   my %opts = $optsref->%*;
 
    Devel::MAT::Cmd->printf( "%s with refcount %d%s\n",
       Devel::MAT::Cmd->format_sv( $sv ),
@@ -134,9 +135,8 @@ sub run
    $self->$method( $sv, \%opts );
 }
 
-sub say_with_sv
+sub say_with_sv ( $str, @args )
 {
-   my ( $str, @args ) = @_;
    my $sv = pop @args;
 
    Devel::MAT::Cmd->printf( $str . "%s\n",
@@ -145,11 +145,10 @@ sub say_with_sv
    );
 }
 
-sub show_GLOB
-{
-   my $self = shift;
-   my ( $gv ) = @_;
+sub show_UNDEF ( $self, $, $ ) { }
 
+sub show_GLOB ( $self, $gv, $ )
+{
    if( $gv->name ) {
       Devel::MAT::Cmd->printf( "  name=%s\n", $gv->name );
       Devel::MAT::Cmd->printf( "  name_hek=%s\n", Devel::MAT::Cmd->format_value( $gv->name_hek, addr => 1 ) ) if $gv->name_hek;
@@ -166,11 +165,8 @@ sub show_GLOB
    say_with_sv '  FORM=',   $gv->form   if $gv->form;
 }
 
-sub show_SCALAR
+sub show_SCALAR ( $self, $sv, $opts )
 {
-   my $self = shift;
-   my ( $sv, $opts ) = @_;
-
    Devel::MAT::Cmd->printf( "  UV=%s\n",
       Devel::MAT::Cmd->format_value( $sv->uv, nv => 1 ),
    ) if defined $sv->uv;
@@ -195,58 +191,40 @@ sub show_SCALAR
    }
 }
 
-sub show_BOOL
+sub show_BOOL ( $self, $sv, $ )
 {
-   my $self = shift;
-   my ( $sv, $opts ) = @_;
-
    Devel::MAT::Cmd->printf( "  BOOL=%s\n",
       Devel::MAT::Cmd->format_value( $sv->uv ? "true" : "false" )
    );
 }
 
-sub show_REF
+sub show_REF ( $self, $sv, $ )
 {
-   my $self = shift;
-   my ( $sv ) = @_;
-
    say_with_sv '  RV=', $sv->rv if $sv->rv;
 }
 
-sub show_ARRAY
+sub show_ARRAY ( $self, $av, $ )
 {
-   my $self = shift;
-   my ( $av ) = @_;
-
    Devel::MAT::Cmd->printf( "  %d elements (use 'elems' command to show)\n",
       $av->n_elems,
    );
 }
 
-sub show_STASH
+sub show_STASH ( $self, $hv, $ = undef )
 {
-   my $self = shift;
-   my ( $hv ) = @_;
-
    Devel::MAT::Cmd->printf( "  stashname=%s\n", $hv->stashname );
    $self->show_HASH( $hv );
 }
 
-sub show_HASH
+sub show_HASH ( $self, $hv, $ = undef )
 {
-   my $self = shift;
-   my ( $hv ) = @_;
-
    Devel::MAT::Cmd->printf( "  %d values (use 'values' command to show)\n",
       $hv->n_values,
    );
 }
 
-sub show_CODE
+sub show_CODE ( $self, $cv, $opts )
 {
-   my $self = shift;
-   my ( $cv, $opts ) = @_;
-
    $cv->name_hek ? Devel::MAT::Cmd->printf( "  name_hek=%s\n", Devel::MAT::Cmd->format_value( $cv->name_hek, addr => 1 ) )
                  : ();
 
@@ -282,7 +260,7 @@ sub show_CODE
 
    if( $opts->{pad} and my $pad0 = ( $cv->pads )[0] ) {
       Devel::MAT::Cmd->printf( "PAD[0]:\n" );
-      $self->show_PAD_contents( $pad0 );
+      $self->show_PAD_contents( $pad0, $opts );
    }
 
    if( my @globs = $cv->globrefs ) {
@@ -292,11 +270,8 @@ sub show_CODE
    }
 }
 
-sub show_PAD
+sub show_PAD ( $self, $pad, $ )
 {
-   my $self = shift;
-   my ( $pad ) = @_;
-
    my $padcv = $pad->padcv;
    $padcv ? say_with_sv( "  padcv=", $padcv )
           : Devel::MAT::Cmd->printf( "  no padcv\n" );
@@ -304,20 +279,15 @@ sub show_PAD
    $self->show_PAD_contents( $pad );
 }
 
-sub _join
+sub _join ( $sep, $ret, @elems )
 {
    # Like CORE::join but respects string concat operator
-   my ( $sep, @elems ) = @_;
-   my $ret = shift @elems;
    $ret = $ret . $sep . $_ for @elems;
    return $ret;
 }
 
-sub show_PAD_contents
+sub show_PAD_contents ( $self, $pad, $ = undef )
 {
-   my $self = shift;
-   my ( $pad ) = @_;
-
    my $padcv = $pad->padcv;
 
    my @elems = $pad->elems;
@@ -373,11 +343,8 @@ sub show_PAD_contents
 
 # TODO: PADLIST
 
-sub show_PADNAMES
+sub show_PADNAMES ( $self, $padnames, $ )
 {
-   my $self = shift;
-   my ( $padnames ) = @_;
-
    $padnames->padcv ? say_with_sv( "  padcv=", $padnames->padcv )
                     : Devel::MAT::Cmd->printf( "  no padcv\n" );
 
@@ -392,20 +359,14 @@ sub show_PADNAMES
    }
 }
 
-sub show_IO
+sub show_IO ( $self, $io, $ )
 {
-   my $self = shift;
-   my ( $io ) = @_;
-
    Devel::MAT::Cmd->printf( "  ifileno=%d\n", $io->ifileno ) if defined $io->ifileno;
    Devel::MAT::Cmd->printf( "  ofileno=%d\n", $io->ofileno ) if defined $io->ofileno;
 }
 
-sub show_OBJECT
+sub show_OBJECT ( $self, $obj, $ )
 {
-   my $self = shift;
-   my ( $obj ) = @_;
-
    my @fields = $obj->fields;
 
    foreach my $field ( $obj->blessed->fields ) {
@@ -418,11 +379,8 @@ sub show_OBJECT
    }
 }
 
-sub show_CLASS
+sub show_CLASS ( $self, $cls, $ )
 {
-   my $self = shift;
-   my ( $cls ) = @_;
-
    Devel::MAT::Cmd->printf( "  is CLASS\n" );
 
    $cls->adjust_blocks ? say_with_sv( "  adjust_blocks=", $cls->adjust_blocks )
@@ -431,11 +389,8 @@ sub show_CLASS
    $self->show_STASH( $cls );
 }
 
-sub show_C_STRUCT
+sub show_C_STRUCT ( $self, $struct, $ )
 {
-   my $self = shift;
-   my ( $struct ) = @_;
-
    my @fields = $struct->fields;
 
    while( @fields ) {
@@ -511,11 +466,9 @@ use constant CMD_ARGS_SV => 1;
 use constant CMD_ARGS => (
 );
 
-sub run
+sub run ( $self, $optsref, $av )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
-   my ( $av ) = @_;
+   my %opts = $optsref->%*;
 
    my $type = $av->type;
    if( $type eq "HASH" or $type eq "STASH" ) {
@@ -612,11 +565,9 @@ use constant CMD_ARGS => (
    { name => "filter", help => "optional pattern to filter keys by" },
 );
 
-sub run
+sub run ( $self, $optsref, $hv, $filter = undef )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
-   my ( $hv, $filter ) = @_;
+   my %opts = $optsref->%*;
 
    my $type = $hv->type;
    if( $type eq "ARRAY" ) {
@@ -640,8 +591,7 @@ sub run
    @keys = sort @keys unless $opts{no_sort};
    splice @keys, 0, $skipcount if $skipcount;
 
-   Devel::MAT::Tool::more->paginate( { pagesize => $opts{count} }, sub {
-      my ( $count ) = @_;
+   Devel::MAT::Tool::more->paginate( { pagesize => $opts{count} }, sub ( $count ) {
       my @rows;
       foreach my $key ( splice @keys, 0, $count ) {
          my $sv = $hv->value( $key );

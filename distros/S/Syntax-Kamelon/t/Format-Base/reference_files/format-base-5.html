@@ -38,9 +38,9 @@
 </br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{CALLBACK}&nbsp;=&nbsp;</font><font class="Keyword">sub&nbsp;</font><font class="Normal">{};</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{COMMANDS}&nbsp;=&nbsp;{</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">doremove</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoRemove,</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">doreplace</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoReplace,</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">dowrite</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoWrite,</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">&#39;</font><font class="String">doremove</font><font class="Operator">&#39;</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoRemove,</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">&#39;</font><font class="String">doreplace</font><font class="Operator">&#39;</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoReplace,</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">&#39;</font><font class="String">dowrite</font><font class="Operator">&#39;</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoWrite,</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;};</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{LISTENING}&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font></br>
@@ -55,7 +55,7 @@
 </br>
 <font class="Keyword">sub&nbsp;</font><font class="Function">AppendText</font><font class="Normal">&nbsp;{</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">append</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">&#39;</font><font class="String">append</font><font class="Operator">&#39;</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Append</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br>
 <font class="Normal">}</font></br>

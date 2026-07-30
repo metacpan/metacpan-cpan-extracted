@@ -1,7 +1,7 @@
 package Data::SegmentTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::SegmentTree::Shared', $VERSION);
 
@@ -41,7 +41,7 @@ Data::SegmentTree::Shared - shared-memory segment tree (range add/assign, range 
 
 A B<segment tree> in shared memory: a fixed array of C<n> signed 64-bit integer
 positions that supports B<range updates and range queries> in O(log n) each --
-add a delta to every element of a range, and ask for the sum, minimum, or maximum
+add a delta to every element of a range, and query the sum, minimum, or maximum
 of any range. It complements L<Data::Fenwick::Shared> (which does prefix sums and
 point updates): a segment tree adds B<range minimum and maximum> queries and
 B<range add> (via lazy propagation), neither of which a Fenwick tree can do.
@@ -59,30 +59,30 @@ write-preferring futex rwlock with dead-process recovery guards mutation; querie
 never mutate the tree, so they take only the read lock and many can run at once.
 B<Linux-only>. Requires 64-bit Perl.
 
-Values and range sums are signed 64-bit integers; feeding values large enough
-that a range sum exceeds the 64-bit range overflows (wraps), as with any native
-integer accumulator.
+Values and range sums are signed 64-bit integers; a range sum that exceeds the
+64-bit range overflows (wraps), as with any native integer accumulator.
 
 =head2 Range assign and the gcd/product monoids
 
-Alongside C<range_add>, the tree supports B<range_assign> -- set every position of
+Alongside C<range_add>, the tree supports B<range_assign> -- set every position in
 a range to a constant in O(log n) (a second lazy tag, composed correctly with
 C<range_add>). It also offers two extra range monoids, B<gcd> and B<product>.
 
-These monoids come with a hard rule dictated by the math: B<gcd and product cannot
+These monoids come with a hard mathematical restriction: B<gcd and product cannot
 be maintained under C<range_add>> (there is no way to recover the gcd or product
 of C<{a+d, b+d, ...}> from the gcd/product of C<{a, b, ...}>). So C<gcd> and
-C<product> are exact only while the tree has been built with B<assign/set updates
-only>; the first C<range_add> or C<add> B<permanently gates them off> (C<gcd>/
+C<product> are exact only while the tree has seen B<assign/set updates only>; the
+first C<range_add> or C<add> B<permanently gates them off> (C<gcd>/
 C<product> then croak until C<clear>). Use C<< $st->monoids_valid >> to check.
 Point updates via C<set> use assign internally, so they keep the monoids valid.
 C<product> additionally croaks if the product of the queried range overflows a
 signed 64-bit integer.
 
-B<On-disk format>: version 0.02 widened the node to carry the assign tag and the
-gcd/product aggregates, so a segment-tree B<file written by 0.01 cannot be opened
-by 0.02> (it is rejected on attach); rebuild it. These trees are normally
-ephemeral compute structures, so this only matters if you persisted one.
+B<On-disk format>: the on-disk layout changes between releases (0.02 widened the
+node to carry the assign tag and the gcd/product aggregates; 0.03 added the
+reader-slots lock's occupancy bitmap), so a B<file written by an older release is
+rejected on attach> -- rebuild it. These trees are normally ephemeral compute
+structures, so this only matters if you persisted one.
 
 =head1 METHODS
 
@@ -111,8 +111,8 @@ C<set> assigns a single position; C<add> adds a delta to a single position and
 returns its new value; C<range_add> adds a delta to every position in the
 inclusive range C<[$l, $r]>, and C<range_assign> sets every position in the range
 to a constant -- each in O(log n) via lazy propagation. All indices are 0-based
-and croak if out of range; the range forms croak if C<$l > $r>. Note that
-C<range_add>/C<add> gate off the gcd/product monoids (see below), while C<set>/
+and croak if out of range; the range forms croak if C<$l > $r>.
+C<range_add>/C<add> gate off the gcd/product monoids (see below); C<set>/
 C<range_assign> do not.
 
 =head2 Queries
@@ -130,8 +130,8 @@ aggregate over the inclusive range C<[$l, $r]>. C<query> returns all of them at
 once as a hash reference C<< { sum, min, max, count } >> (C<count> is
 C<$r - $l + 1>), computed under a single read lock so the four values are
 mutually consistent. C<gcd> returns the greatest common divisor of C<|values|>
-over the range (0 for an all-zero range), and C<product> their product; both
-require an B<assign/set-only> tree and croak once any C<range_add>/C<add> has run
+over the range (0 for an all-zero range), and C<product> returns their product;
+both require an B<assign/set-only> tree and croak once any C<range_add>/C<add> has run
 (see L</"Range assign and the gcd/product monoids">), and C<product> also croaks
 on 64-bit overflow. Ranges croak if an index is out of range or C<$l > $r>.
 
@@ -149,11 +149,13 @@ re-enables the monoids. C<sync> flushes the mapping to its backing
 store (a no-op for anonymous and memfd trees); C<unlink> removes the backing file
 (also callable as C<< Class->unlink($path) >>); C<path> returns the backing path
 (C<undef> for anonymous, memfd, or fd-reopened trees) and C<memfd> the backing
-descriptor.
+descriptor. The descriptor C<memfd> returns is B<owned by the object> and closed
+when the object is destroyed; do not close it yourself. Pass it to another process
+(or C<new_from_fd>) while the object is still alive.
 
 =head1 SHARING ACROSS PROCESSES
 
-The tree lives in a shared mapping, shared the same three ways as the rest of the
+The tree lives in a shared mapping, exposed the same three ways as the rest of the
 family: a B<backing file>, an B<anonymous mapping inherited across C<fork>>, or a
 B<memfd> passed to an unrelated process and reopened with C<< new_from_fd($fd) >>.
 Every process's updates land in the one shared array, and queries take only the
@@ -163,9 +165,16 @@ read lock so many readers proceed concurrently.
 
 Backing files are created with mode C<0600> (owner-only) by default; pass an
 explicit octal mode (e.g. C<0660>) as the last argument to C<new> for cross-user
-sharing. The file is opened with C<O_NOFOLLOW> and C<O_EXCL>, and the header is
-validated on attach. Any process granted write access is trusted not to corrupt
-the mapping.
+sharing (the mode is masked to the permission bits C<0777>). The file is opened
+with C<O_NOFOLLOW> and C<O_EXCL>, and the header is validated on attach. Any
+process granted write access is trusted not to corrupt the mapping.
+
+A descriptor passed to C<new_from_fd> must be B<resize-sealed> (a C<memfd> sealed
+against C<F_SEAL_SHRINK>|C<F_SEAL_GROW>, as C<new_memfd> produces) or come from a
+trusted owner: a hostile donor that truncates the fd after it is mapped can fault
+the reader with C<SIGBUS> on a later access. C<new_from_fd> rejects a sealable fd
+that lacks both resize seals; a non-sealable fd (e.g. a regular file) cannot carry
+seals and is accepted on the caller's trust.
 
 =head1 CRASH SAFETY
 

@@ -4,7 +4,7 @@ use Test2::V1
   qw( dies fail is imported_ok like ok plan subtest warning );
 BEGIN { MODULE->import( qw( EOOD print_version_info processopts ) ) }
 
-plan 15;
+plan 16;
 
 imported_ok qw( EOOD print_version_info processopts );
 
@@ -196,4 +196,13 @@ subtest 'Edge case options 0 and 1' => sub {
     is $rv,   "-$_", 'Check return value';
     is @argv, 0,     '@argv is empty'
   }
-}
+};
+
+subtest 'Callback destination call raises an exception' => sub {
+  plan 3;
+
+  my @argv = qw( -e );
+  like warning { ok !processopts( @argv, 'e' => sub { die "callback dies\n" } ), 'Failed' }, qr/\A ${ \( basename( __FILE__ ) ) }: \ .* \ --\ e/x,
+    'Check warning';
+  is \@argv, [ qw( -e ) ], '@argv not changed'
+};

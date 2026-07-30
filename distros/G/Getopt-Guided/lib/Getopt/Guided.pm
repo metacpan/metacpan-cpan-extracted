@@ -4,8 +4,7 @@ use strict;
 use warnings;
 
 package Getopt::Guided;
-
-$Getopt::Guided::VERSION = 'v3.2.0';
+BEGIN { our $VERSION = 'v3.2.1' }
 
 # Options Delimiter constant
 sub OD () { '-' }
@@ -171,7 +170,7 @@ sub print_version_info {
   #               the caller's package name is Getopt::Guided
   # call frame 1: a run() function/method (the caller) usually calls processopts()
   #               the caller's package name is whatever it is (could be "main")
-  printf STDOUT "%s %s\nperl v%vd\n", program_name(), ( caller( 1 ) // 'main' )->VERSION, $^V;
+  printf STDOUT "%s %s\nperl v%vd\n", program_name(), ( caller( 2 ) // 'main' )->VERSION, $^V;
   EOOD
 }
 
@@ -183,10 +182,12 @@ sub processopts ( \@@ ) {
   my $spec_as_hash;
   parse_spec $_, %$spec_as_hash, 1 for @$spec_as_array;
 
+  my @argv_backup = @$argv;
   return FALSE unless getopts $spec_as_hash, my %opts, @$argv;
 
+  my @error;
   # This ordered processing is a feature!
-  for ( my $i = 0 ; $i < @_ ; $i += 2 ) {
+  for ( my $i = 0 ; $i < @_ and not @error ; $i += 2 ) {
     # If $_[ $i ] refers to a flag with no indicator, the split still returns
     # the empty string (not undef!) as the value for the indicator
     my ( $name, $indicator ) = split //, $_[ $i ];
@@ -200,19 +201,32 @@ sub processopts ( \@@ ) {
         $dest_ref_type eq 'ARRAY'  and $indicator eq ',' and @{ $dest } = @$value, last;
         $dest_ref_type eq 'HASH'   and $indicator eq '=' and %{ $dest } = %$value, last;
         if ( $dest_ref_type eq 'CODE' ) {
+          local $@; ## no critic ( RequireInitializationForLocalVars )
+          my $rv = eval { $dest->( $value, $name, $indicator ) // '' };
+          @error = ( 'option callback destination throws an exception', $name, $@ ), last
+            unless defined $rv;
           # Callbacks are called in scalar context
           # If EOOD is the return value of the callback,
           # processopts() will terminate early. The return value will be
           # a special TRUE value. Using $name is not sufficient because 0 and 1
           # are posible values for $name.
-          ( $dest->( $value, $name, $indicator ) // '' ) eq EOOD ? return ( OD . $name ) : last
+          $rv eq EOOD ? return ( OD . $name ) : last
         }
         croakf "'%s' is an unsupported destination reference type for the '%s' indicator", $dest_ref_type, $indicator
       }
     }
   }
 
-  TRUE
+  if ( @error ) {
+    chomp @error;
+    # Restore to avoid side effects
+    @$argv = @argv_backup; ## no critic ( RequireLocalizedPunctuationVars )
+    # Prepare and print warning message:
+    # Program name, eval error, and option character
+    warn sprintf( "%s: %s -- %s\n%s\n", program_name(), @error ) ## no critic ( RequireCarping )
+  }
+
+  @error == 0
 }
 
 sub readopts ( \@ ) {

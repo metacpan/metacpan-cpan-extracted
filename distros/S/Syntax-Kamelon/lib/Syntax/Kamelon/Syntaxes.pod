@@ -4,7 +4,7 @@ Syntax::Kamelon::Syntaxes - List of available syntaxes
 
 =head1 LIST
 
-This is a list of all included syntax definition files in this release 0.23 of B<Syntax::Kamelon>.
+This is a list of all included syntax definition files in this release 0.26 of B<Syntax::Kamelon>.
 Please note that the names may contain spaces.
 
 =over 4
@@ -296,7 +296,7 @@ Please note that the names may contain spaces.
  Java                                    3
  Julia                                   3
  KBasic                                  2
- KDev-PG[-Qt                             2
+ KDev-PG[-Qt] Grammar                    2
  Kotlin                                  2
  LPC                                     1
  Lex/Flex                                2

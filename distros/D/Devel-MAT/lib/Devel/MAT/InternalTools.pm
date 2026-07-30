@@ -3,10 +3,13 @@
 #
 #  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::InternalTools 0.54;
+package Devel::MAT::InternalTools 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 package Devel::MAT::Tool::help;
 
@@ -20,11 +23,8 @@ use constant CMD_ARGS => (
      slurpy => 1 },
 );
 
-sub run
+sub run ( $self, $cmdname = undef, @subnames )
 {
-   my $self = shift;
-   my ( $cmdname, @subnames ) = @_;
-
    if( defined $cmdname ) {
       $self->help_cmd( $cmdname, @subnames );
    }
@@ -33,10 +33,8 @@ sub run
    }
 }
 
-sub help_summary
+sub help_summary ( $self )
 {
-   my $self = shift;
-
    my $pmat = $self->{pmat};
 
    my @commands = sort map {
@@ -56,19 +54,14 @@ sub help_summary
 }
 
 # A join() that respects stringify overloading
-sub _join
+sub _join ( $sep, $ret = "", @s )
 {
-   my $sep = shift;
-   my $ret = shift;
-   $ret .= "$sep$_" for @_;
+   $ret .= "$sep$_" for @s;
    return $ret;
 }
 
-sub help_cmd
+sub help_cmd ( $self, $cmdname, @subnames )
 {
-   my $self = shift;
-   my ( $cmdname, @subnames ) = @_;
-
    my $fullname = join " ", $cmdname, @subnames;
 
    my $tool = $self->{pmat}->load_tool_for_command( $cmdname );
@@ -148,7 +141,7 @@ use constant CMD_DESC => "Continue the previous listing";
 
 my $more;
 
-sub run
+sub run ( $self )
 {
    if( $more ) {
       $more->() or undef $more;
@@ -158,24 +151,22 @@ sub run
    }
 }
 
-sub paginate
+sub paginate ( $self, @args )
 {
-   shift;
-   my $opts = ( ref $_[0] eq "HASH" ) ? shift : {};
-   my ( $func ) = @_;
+   my $opts = ( ref $args[0] eq "HASH" ) ? shift @args : {};
+   my ( $func ) = @args;
 
-   $more = sub { $func->( $opts->{pagesize} // 30 ) };
+   $more = sub () { $func->( $opts->{pagesize} // 30 ) };
 
    $more->() or undef $more;
 }
 
-sub stop
+sub stop ( $self )
 {
-   shift;
    undef $more;
 }
 
-sub can_more
+sub can_more ( $self )
 {
    return defined $more;
 }
@@ -187,9 +178,8 @@ use base qw( Devel::MAT::Tool );
 use constant CMD => "stop";
 use constant CMD_DESC => "Stops pagination";
 
-sub run
+sub run ( $self )
 {
-   shift;
    Devel::MAT::Tool::more->stop;
 }
 
@@ -202,11 +192,8 @@ use constant CMD_DESC => "Measure the runtime of a command";
 
 use Time::HiRes qw( gettimeofday tv_interval );
 
-sub run_cmd
+sub run_cmd ( $self, $inv )
 {
-   my $self = shift;
-   my ( $inv ) = @_;
-
    my $cmd = $inv->pull_token;
 
    my $starttime = [gettimeofday];

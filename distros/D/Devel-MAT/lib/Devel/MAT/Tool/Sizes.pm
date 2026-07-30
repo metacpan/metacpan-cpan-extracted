@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Sizes 0.54;
+package Devel::MAT::Tool::Sizes 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant FOR_UI => 1;
 
@@ -52,11 +55,8 @@ original directly owns.
 
 =cut
 
-sub init_ui
+sub init_ui ( $self, $ui )
 {
-   my $self = shift;
-   my ( $ui ) = @_;
-
    my %size_tooltip = (
       SV        => "Display the size of each SV individually",
       Structure => "Display the size of SVs including its internal structure",
@@ -76,10 +76,10 @@ sub init_ui
             text    => $_,
             icon    => "size-$_",
             tooltip => $size_tooltip{$_},
-            code    => sub {
+            code    => sub ( @ ) {
                $ui->set_svlist_column_values(
                   column => Devel::MAT::UI->COLUMN_SIZE,
-                  from   => sub { shift->$size },
+                  from   => sub ( $sv ) { $sv->$size },
                );
             },
          }
@@ -88,6 +88,8 @@ sub init_ui
 }
 
 =head1 SV METHODS
+
+=for highlighter language=perl
 
 This tool adds the following SV methods.
 
@@ -106,37 +108,34 @@ Returns the size, in bytes, of the structure that the SV contains.
 =cut
 
 # Most SVs' structual set is just themself
-sub Devel::MAT::SV::structure_set { shift }
+sub Devel::MAT::SV::structure_set ( $sv ) { $sv }
 
 # ARRAY structure includes the element SVs
-sub Devel::MAT::SV::ARRAY::structure_set
+sub Devel::MAT::SV::ARRAY::structure_set ( $av )
 {
-   my $av = shift;
    my @svs = ( $av, grep { $_ && !$_->immortal } $av->elems );
    return @svs;
 }
 
 # HASH structure includes the value SVs
-sub Devel::MAT::SV::HASH::structure_set
+sub Devel::MAT::SV::HASH::structure_set ( $hv )
 {
-   my $hv = shift;
    my @svs = ( $hv, grep { $_ && !$_->immortal } $hv->values );
    return @svs;
 }
 
 # CODE structure includes PADLIST, PADNAMES, PADs, and all pad name and pad SVs
-sub Devel::MAT::SV::CODE::structure_set
+sub Devel::MAT::SV::CODE::structure_set ( $cv )
 {
-   my $cv = shift;
    my @svs = ( $cv, grep { $_ && !$_->immortal }
       $cv->padlist, $cv->padnames_av, $cv->pads,
       $cv->constval, $cv->constants, $cv->globrefs );
    return @svs;
 }
 
-sub Devel::MAT::SV::structure_size
+sub Devel::MAT::SV::structure_size ( $sv )
 {
-   return sum0 map { $_->size } shift->structure_set
+   return sum0 map { $_->size } $sv->structure_set
 }
 
 =head2 owned_set
@@ -153,9 +152,9 @@ Returns the total size, in bytes, of the SVs owned by the given one.
 
 =cut
 
-sub Devel::MAT::SV::owned_set
+sub Devel::MAT::SV::owned_set ( $sv )
 {
-   my @more = ( shift );
+   my @more = ( $sv );
 
    my %seen;
    my @owned;
@@ -172,13 +171,14 @@ sub Devel::MAT::SV::owned_set
    return @owned;
 }
 
-sub Devel::MAT::SV::owned_size
+sub Devel::MAT::SV::owned_size ( $sv )
 {
-   my $sv = shift;
    return $sv->{tool_sizes_owned} //= sum0 map { $_->size } $sv->owned_set;
 }
 
 =head1 COMMANDS
+
+=for highlighter
 
 =cut
 
@@ -199,11 +199,8 @@ use constant CMD_DESC => "Show the size of a given SV";
 
 use constant CMD_ARGS_SV => 1;
 
-sub run
+sub run ( $self, $sv )
 {
-   my $self = shift;
-   my ( $sv ) = @_;
-
    Devel::MAT::Cmd->printf( "%s consumes:\n",
       Devel::MAT::Cmd->format_sv( $sv )
    );
@@ -267,10 +264,8 @@ use List::UtilsBy qw( max_by );
 
 my %seen;
 
-sub list_largest_svs
+sub list_largest_svs ( $svlist, $metric, $indent, @counts )
 {
-   my ( $svlist, $metric, $indent, @counts ) = @_;
-
    my $method = $metric ? "${metric}_size" : "size";
 
    my $heap = Heap::Fibonacci->new;
@@ -320,12 +315,12 @@ sub list_largest_svs
 }
 
 package Devel::MAT::Tool::Sizes::_Elem {
-   sub new { my ( $class, $val, $sv ) = @_; bless [ $val, $sv ], $class }
+   sub new ( $class, $val, $sv ) { bless [ $val, $sv ], $class }
 
-   sub sv { my $self = shift; return $self->[1]; }
-   sub heap { my $self = shift; $self->[2] = shift if @_; return $self->[2] }
+   sub sv   ( $self ) { return $self->[1]; }
+   sub heap ( $self, @args ) { $self->[2] = shift @args if @args; return $self->[2] }
 
-   sub cmp { my ( $self, $other ) = @_; return $other->[0] <=> $self->[0] }
+   sub cmp ( $self, $other ) { return $other->[0] <=> $self->[0] }
 }
 
 use constant CMD_OPTS => (
@@ -338,13 +333,13 @@ use constant CMD_ARGS => (
      repeated => 1 },
 );
 
-sub run
+sub run ( $self, $optsref, @counts )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
+   my %opts = $optsref->%*;
 
-   my @counts = ( 5, 3, 2 );
-   $counts[$_] = $_[$_] for 0 .. $#_;
+   $counts[0] //= 5;
+   $counts[1] //= 3;
+   $counts[2] //= 2;
 
    my $df = $self->df;
 

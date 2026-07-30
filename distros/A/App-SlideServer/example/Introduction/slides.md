@@ -68,23 +68,24 @@ CPAN: NERDVANA
 
 ## HTML Structure
 
-```
-<body>
-  <div class="slides">
-    <div class="slide">
-      <ul class="auto-step">
-        <li>...
-        <li>...
-      </ul>
-      <pre class="notes"> ... </pre>
-    </div>
-  </div>
-</body>
-```
+<div style="padding: 0 15%; font-size: 150%">
+  <pre><code>
+&lt;body>
+  &lt;div class="slides">
+    &lt;div class="slide">
+      &lt;ul class="auto-step">
+        &lt;li>...
+        &lt;li>...
+      &lt;/ul>
+      &lt;pre class="notes"> ... &lt;/pre>
+    &lt;/div>
+  &lt;/div>
+&lt;/body>
+</code></pre></div>
 
 ## Markdown Structure
 
-<div style="padding: 0 20%; font-size: 150%">
+<div style="padding: 0 15%; font-size: 150%">
   <pre><code>
     ## Heading 2
     
@@ -185,13 +186,22 @@ $ docker create --name=slideserver --restart=always\
   app-slideserver:latest
 ```
 
+<!--
+## Ready For Experimentation
+
+<iframe style="width: 700px; height: 600px; background-color: white;"
+  src="https://metacpan.org/pod/App::SlideServer">
+</iframe>
+-->
+
 ## Future Work
 
-  * More options for static page rendering
+  * Better width/height automatic layout
+  * Better mix of Markdown and HTML
   * Color scheme controls in UI
   * GNU Screen integration
   * More robust auto-update
-  * Better width/height automatic layout
+  * More options for static page rendering
 
 <pre class=notes>
   static pages - inline images and js for local

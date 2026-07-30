@@ -1,0 +1,232 @@
+NAME
+    Data::PerfectHash::Shared - immutable shared-memory exact set via CHD
+    minimal perfect hashing
+
+SYNOPSIS
+        use Data::PerfectHash::Shared;
+
+        # --- integer keys, via the incremental builder ---
+        my $b = Data::PerfectHash::Shared->new_builder(type => 'int');   # 'int' is the default
+        $b->add($_) for 1, 2, 3, 5, 8, 13;
+        $b->add_many([21, 34, 55]);
+        $b->count;                            # 9 -- keys given to add/add_many so far
+        $b->build('/tmp/fib.phs');            # computes the perfect hash, writes the image (mode 0600)
+
+        my $set = Data::PerfectHash::Shared->load('/tmp/fib.phs');   # mmap, read-only
+        $set->has(13);                        # true
+        $set->has(14);                        # false
+        $set->count;                          # 9 -- distinct keys actually stored
+        $set->each_key(sub { my ($key) = @_; ... });   # visit every stored key
+        $set->type;                           # 'int'
+        $set->unlink;                         # remove the backing file
+
+        # --- string keys, via the one-shot class methods ---
+        Data::PerfectHash::Shared->build_str('/tmp/words.phs', ['apple', 'banana', 'cherry']);
+        my $words = Data::PerfectHash::Shared->load('/tmp/words.phs');
+        $words->has('banana');                # true
+        $words->has('durian');                # false
+
+        # same one-shot form for integers:
+        Data::PerfectHash::Shared->build_int('/tmp/ids.phs', \@user_ids);
+
+DESCRIPTION
+    Data::PerfectHash::Shared is an immutable exact static set: build it once
+    from a fixed collection of keys (integers or byte strings), then test
+    membership from any number of processes with lock-free, O(1)-worst-case
+    reads over a shared read-only mapping.
+
+    Membership is computed with a CHD (compress, hash, displace) minimal
+    perfect hash over XXH3: for the N distinct keys given to a builder,
+    "build" finds a displacement value per bucket such that every key lands on
+    its own slot, with no collisions and no wasted slots. There are about a
+    sixth as many buckets as keys, and each bucket's displacement is stored
+    byte-packed at the minimal width (1 to 4 bytes), so the whole index costs
+    on the order of four bits per key. A minimal perfect hash alone would map
+    any key -- even one never added -- to some occupied slot, so a bare "is
+    this slot occupied" test would false-positive on non-members. To rule that
+    out, every key is also stored in full (its int64 value, or its bytes in an
+    append-only arena for strings), so "has" always finishes with an exact
+    comparison against the stored key: zero false positives, and (by
+    construction, and covered by t/03_exact.t) zero false negatives.
+
+    The image is immutable once built: there is no incremental add, remove, or
+    update on a loaded set. That means "load"'s reads need none of the
+    locking, atomics, or crash/dead-process recovery that the rest of the
+    "Data::*::Shared" family carries for its mutable structures -- "load" just
+    "mmap"s the file "PROT_READ|MAP_SHARED", and any number of processes may
+    "load" and query the same path concurrently. To change membership, build a
+    new file (optionally at the same path) and have readers "load" it again.
+
+    The builder is a private, in-process object (plain heap memory, not a
+    shared mapping) used only to collect keys before "build" computes the hash
+    and writes the image; the built ".phs" file -- opened with "load" -- is
+    the shared artifact.
+
+    The on-disk image is validated at "load" time: a magic number, a format
+    version, an explicit endianness marker, and the recorded file size are all
+    checked, along with the bounds of every region (the displacement array,
+    the slot array, and, for string sets, the byte arena). A file that fails
+    any check -- including one built on a different byte order -- is refused
+    with a descriptive error instead of being misread. Every persisted field
+    is a fixed-width little-endian integer ("uint32_t"/"uint64_t" in the
+    header, and a 1- to 4-byte packed integer per displacement entry), so an
+    image builds and loads consistently across hosts of differing word size,
+    as long as they share the same byte order (see "SECURITY" for what is, and
+    is not, re-validated on every lookup).
+
+METHODS
+  Builder
+        my $b = Data::PerfectHash::Shared->new_builder(%opts);
+        my $b = Data::PerfectHash::Shared->new_builder;             # type => 'int', the default
+        my $b = Data::PerfectHash::Shared->new_builder(type => 'str');
+
+        $b->add($key);
+        $b->add_many(\@keys);
+        $b->count;
+        $b->build($path, mode => 0600);
+
+    "new_builder" is a class method that returns a blessed
+    "Data::PerfectHash::Shared::Builder" handle. %opts takes one key, "type",
+    which is 'int' or 'str' (default 'int'); every key later given to this
+    builder must match.
+
+    "add" appends one key: an integer builder takes any Perl integer-ish
+    scalar (coerced with Perl's normal numeric conversion and stored as a
+    signed 64-bit integer); a string builder takes any byte string, including
+    one with embedded NUL bytes (encode wide-character strings to bytes
+    yourself first). "add_many" appends every element of an arrayref the same
+    way, in order; a nonexistent element (a hole in a sparse array) is
+    silently skipped.
+
+    "count" returns the number of keys given to "add"/"add_many" so far --
+    before deduplication, so adding the same key three times counts three
+    towards it. (This is a running tally on the builder; it does not change
+    when "build" is called. The final, deduplicated key count is "$set->count"
+    after "build"/"load" -- see below.)
+
+    "build" deduplicates the keys added so far, computes the CHD perfect hash
+    over the survivors, and writes the immutable image to $path, creating it
+    securely with mode 0600 (owner-only) by default; pass "mode => $mode" for
+    a different octal mode (e.g. 0644, to share the file with other users).
+    "build" croaks on failure, including the (exceedingly unlikely for real
+    key sets, and only theoretically reachable for a pathological or
+    adversarially crafted one) case where CHD cannot find a placement within
+    its attempt budget.
+
+  Class one-shots
+        Data::PerfectHash::Shared->build_int($path, \@integers);
+        Data::PerfectHash::Shared->build_str($path, \@strings);
+
+    Convenience wrappers that create a builder of the matching type,
+    "add_many" every element, "build" to $path with the default mode 0600, and
+    free the builder -- equivalent to, but cheaper than, doing all of that by
+    hand. Both croak on failure and otherwise return a true value.
+
+  Set (querying a built image)
+        my $set = Data::PerfectHash::Shared->load($path);
+
+        $set->has($key);           # bool, O(1) worst case, exact (no false positives)
+        $set->count;                # number of distinct keys stored
+        $set->each_key(sub { my ($key) = @_; ... });
+        $set->type;                 # 'int' or 'str'
+        $set->path;                 # the path given to load()
+        $set->unlink;                # remove the backing file
+
+    "load" is a class method: it "mmap"s $path read-only
+    ("PROT_READ|MAP_SHARED") and validates its header, croaking with a
+    description of what failed (missing file, truncated file, bad magic,
+    unsupported version, wrong byte order, or a size/region mismatch) rather
+    than returning a set that is not safe to query.
+
+    "has" reports whether $key is a member, coercing $key the same way "add"
+    does (an integer set takes integers, a string set takes byte strings); it
+    never returns true for a key that was never added, and never false for one
+    that was.
+
+    "count" is the number of distinct keys stored -- after the deduplication
+    that "build" performed -- unlike the builder's "count" described above.
+
+    "each_key" calls $cb->($key) once per stored key, in internal (CHD slot)
+    order -- not insertion order, and not sorted. For a string set, a key
+    whose on-disk slot fails a bounds check (only reachable via a corrupted or
+    adversarially crafted image) is silently skipped rather than read out of
+    bounds; see "SECURITY".
+
+    "type" returns 'int' or 'str'. "path" returns the path "load" was given.
+    "unlink" removes the backing file (a missing file is not an error); the
+    already-mapped set remains valid and queryable until it goes out of scope,
+    since unlinking only removes the directory entry.
+
+SECURITY
+    "build", "build_int", and "build_str" create the image file with mode 0600
+    (owner-only) by default; pass "mode => $mode" to "build" for a different
+    mode if the file needs to be shared with other users or processes.
+
+    "load" treats its input as untrusted -- a ".phs" path can come from
+    anywhere -- so the header (magic, version, endianness, size, and every
+    region's bounds) is fully validated before any of it is used, and "load"
+    croaks instead of mmap-ing something unsafe. Within a file that otherwise
+    passes header validation, an individual string slot's "(offset, length)"
+    pair is still attacker-controllable; validating every slot at "load" time
+    would cost an O(n) pass on every load just to guard a file that is already
+    known to be untrusted, so instead "has" and "each_key" each bounds-check a
+    slot immediately before reading through it. A slot that fails the check is
+    reported as not present (or skipped, for "each_key") rather than read out
+    of bounds.
+
+LIMITS
+    *   Immutable. A built image cannot be added to, removed from, or updated
+        in place; there is no such API. To change membership, build a new file
+        (the builder is cheap and disposable) and have readers "load" it
+        again.
+
+    *   Exact set, not a map. Keys have no associated value -- "has" is a
+        membership test, not a lookup. Store values elsewhere (keyed by the
+        same integer or string) if you need them.
+
+    *   Same byte order to load what you built. "load" checks an explicit
+        endianness marker in the header; an image built on a big-endian host
+        refuses to load on a little-endian one (or vice versa) with a clear
+        error rather than misreading it.
+
+PERFORMANCE
+    Built once, queried many times -- so the read path is what matters. "has"
+    is one hash of the key, a single indexed probe into the displacement
+    table, and one comparison against the stored key: lock-free, O(1) worst
+    case, with no shared mutable state, so lookups scale linearly across
+    processes.
+
+    A snapshot for one million keys, in a single process on one core of an
+    Intel i5-1135G7 (perl 5.40) -- your numbers will vary:
+
+      1,000,000 keys        int           str ("key-NNN")
+      --------------------  ------------  ---------------
+      build (one-shot)      ~10 s         ~11 s
+      has() lookups         ~4.4 M/s      ~2.1 M/s
+      each_key iteration    ~14 M/s       ~6.5 M/s
+      index                 4.0 bits/key  4.0 bits/key
+      image on disk         8.5 MB        26 MB
+
+    The perfect-hash index costs about four bits per key; the file itself is
+    dominated by the full keys it stores (eight bytes for each integer; the
+    key bytes plus a 16-byte slot for each string), which is what makes
+    membership exact -- zero false positives -- and lets "each_key" hand the
+    keys back. For contrast, on the same machine "has" on an integer set runs
+    at about 4.4 M lookups/s against 1.9 M/s for "exists" on an ordinary Perl
+    hash, while also being shared between processes and persistent on disk.
+
+    Building is the one expensive step -- the CHD search does more work as the
+    table fills toward a perfect fit -- and it is a whole-image rebuild, after
+    which readers simply "load" the new file. The scripts in bench/ reproduce
+    these figures.
+
+SEE ALSO
+    The rest of the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+

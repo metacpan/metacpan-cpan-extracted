@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Graph 0.54;
+package Devel::MAT::Graph 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Struct::Dumb 0.07 'readonly_struct';
 
@@ -25,6 +28,8 @@ tasks.
 
 =head1 CONSTRUCTOR
 
+=for highlighter language=perl
+
 =cut
 
 =head2 new
@@ -36,11 +41,8 @@ Constructs a new C<Devel::MAT::Graph> instance backed by the given dumpfile
 
 =cut
 
-sub new
+sub new ( $class, $df )
 {
-   my $class = shift;
-   my ( $df ) = @_;
-
    bless {
       df  => $df,
 
@@ -66,11 +68,8 @@ recursion control.
 
 =cut
 
-sub add_sv
+sub add_sv ( $self, $sv )
 {
-   my $self = shift;
-   my ( $sv ) = @_;
-
    $self->{edges_from}{$sv->addr} ||= [];
 
    return $self;
@@ -85,16 +84,13 @@ description.
 
 =cut
 
-sub add_ref
+sub add_ref ( $self, $from_sv, $to_sv, $desc )
 {
-   my $self = shift;
-   my ( $from_sv, $to_sv, $desc ) = @_;
-
    my $from_addr = $from_sv->addr;
    my $to_addr   = $to_sv->addr;
 
-   push @{ $self->{edges_from}{$from_addr} }, [ $to_addr,   $desc ];
-   push @{ $self->{edges_to}  {$to_addr}   }, [ $from_addr, $desc ];
+   push $self->{edges_from}{$from_addr}->@*, [ $to_addr,   $desc ];
+   push $self->{edges_to}  {$to_addr}  ->@*, [ $from_addr, $desc ];
 
    return $self;
 }
@@ -107,12 +103,9 @@ Adds a root edge to the graph, at the given SV with the given description.
 
 =cut
 
-sub add_root
+sub add_root ( $self, $from_sv, $desc )
 {
-   my $self = shift;
-   my ( $from_sv, $desc ) = @_;
-
-   push @{ $self->{roots_from}{$from_sv->addr} }, $desc;
+   push $self->{roots_from}{$from_sv->addr}->@*, $desc;
 
    return $self;
 }
@@ -130,11 +123,8 @@ least been given to C<add_sv>.
 
 =cut
 
-sub has_sv
+sub has_sv ( $self, $sv )
 {
-   my $self = shift;
-   my ( $sv ) = @_;
-
    my $addr = $sv->addr;
 
    return !!( $self->{edges_from}{$addr} ||
@@ -150,11 +140,8 @@ Returns a C<Node> object for the given SV.
 
 =cut
 
-sub get_sv_node
+sub get_sv_node ( $self, $sv )
 {
-   my $self = shift;
-   my ( $sv ) = @_;
-
    my $addr = ref $sv ? $sv->addr : $sv;
 
    return Devel::MAT::Graph::Node->new(
@@ -172,16 +159,15 @@ nodes having those roots, in no particular order.
 
 =cut
 
-sub get_root_nodes
+sub get_root_nodes ( $self )
 {
-   my $self = shift;
    return map {
       my $node = $self->get_sv_node( $_ );
-      map { $_, $node } @{ $self->{roots_from}{$_} }
-   } keys %{ $self->{roots_from} };
+      map { $_, $node } $self->{roots_from}{$_}->@*
+   } keys $self->{roots_from}->%*;
 }
 
-package Devel::MAT::Graph::Node 0.54;
+package Devel::MAT::Graph::Node 0.55;
 
 =head1 NODE OBJECTS
 
@@ -189,7 +175,7 @@ The values returned by C<get_sv_node> respond to the following methods:
 
 =cut
 
-sub new { my $class = shift; bless { @_ }, $class }
+sub new ( $class, %args ) { bless { %args }, $class }
 
 =head2 graph
 
@@ -205,8 +191,8 @@ Returns the address of the SV represented by this node.
 
 =cut
 
-sub graph { $_[0]->{graph} }
-sub addr  { $_[0]->{addr}  }
+sub graph ( $self ) { $self->{graph} }
+sub addr  ( $self ) { $self->{addr}  }
 
 =head2 sv
 
@@ -216,7 +202,7 @@ Returns the SV object itself, as taken from the dumpfile instance.
 
 =cut
 
-sub sv { $_[0]->graph->{df}->sv_at( $_[0]->addr ) }
+sub sv ( $self ) { $self->graph->{df}->sv_at( $self->addr ) }
 
 =head2 roots
 
@@ -231,10 +217,9 @@ the SV at this node.
 
 =cut
 
-sub roots
+sub roots ( $self )
 {
-   my $self = shift;
-   return @{ $self->graph->{roots_from}{$self->addr} // [] };
+   return ( $self->graph->{roots_from}{$self->addr} // [] )->@*;
 }
 
 =head2 edges_out
@@ -258,10 +243,8 @@ size of the pairlist that would be returned in list context.
 
 =cut
 
-sub edges_out
+sub edges_out ( $self )
 {
-   my $self = shift;
-
    return unless my $edges = $self->graph->{edges_from}{$self->addr};
    return scalar @$edges unless wantarray;
    return map {
@@ -289,10 +272,8 @@ size of the pairlist that would be returned in list context.
 
 =cut
 
-sub edges_in
+sub edges_in ( $self )
 {
-   my $self = shift;
-
    return unless my $edges = $self->graph->{edges_to}{$self->addr};
    return scalar @$edges unless wantarray;
    return map {

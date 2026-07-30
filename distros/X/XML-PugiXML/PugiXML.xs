@@ -12,6 +12,7 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
 #include <cerrno>
 #include <cstring>
 
@@ -46,26 +47,76 @@ struct PugiXPath {
     xpath_query* query;
 };
 
-/* Wrapper structures */
+/* Wrapper structures.
+
+   A handle is invalidated by either of two independent mechanisms:
+
+   * generation -- bumped by reset()/load_file()/load_string(), which replace
+     the whole tree at once. Each wrapper snapshots it at creation.
+   * the `dead` flag -- set by remove_child()/remove_attr() on exactly those
+     wrappers that point into the removed subtree. pugixml's remove_* really
+     do free the storage (destroy_tree -> deallocate_memory; a fully-freed
+     non-top page is handed back to the system with free()), so a surviving
+     Perl handle into a removed subtree is a dangling pointer rather than a
+     harmless orphan. Finding those wrappers needs a registry.
+
+   The registry is a per-document hash index keyed by the pugixml pointer each
+   wrapper holds, with the chain links stored inside the wrapper (no per-entry
+   allocation). Keying it that way is what keeps removal cheap: invalidation
+   walks the subtree being destroyed and probes the index for each node and
+   attribute in it, so it costs O(removed subtree) -- the same order pugixml
+   already pays in destroy_tree -- rather than O(live handles). A flat list
+   would instead make the ordinary idiom
+
+       $root->remove_child($_) for $root->children;
+
+   quadratic, because every removal would rescan every retained handle.
+
+   Note the index is probed by pointer VALUE and never dereferences a stored
+   pugixml pointer, so entries left behind by a reset/reload (whose pointers
+   dangle) are safe to walk past; the gen_snap guard skips them anyway.
+
+   `owner` is NULL once the document wrapper itself has been destroyed. That
+   happens during global destruction, where perl calls DESTROY in arbitrary
+   order and may free the document before its nodes; the document's DESTROY
+   detaches every live wrapper so their DESTROY never dereferences it. */
+
+struct PugiNode;
+struct PugiAttr;
 
 struct PugiDoc {
     xml_document* doc;
     unsigned int generation;  /* Incremented on reset/load to detect stale handles */
+    PugiNode** node_buckets;  /* Hash index of live node wrappers */
+    size_t node_nbuckets;     /* Always a power of two, never 0 after new() */
+    size_t node_count;
+    PugiAttr** attr_buckets;  /* Hash index of live attribute wrappers */
+    size_t attr_nbuckets;
+    size_t attr_count;
 };
 
+/* hnext/hprev are the intrusive hash chain. hprev is the address of the link
+   pointing AT this wrapper (a bucket slot, or the previous entry's hnext),
+   which makes unlinking O(1) without a back-pointer to the entry itself. */
 struct PugiNode {
     xml_node node;
     SV* doc_sv;              /* Reference to document to keep it alive */
-    unsigned int* gen_ptr;   /* Points to doc->generation */
-    unsigned int gen_snap;   /* Generation at creation time */
+    PugiDoc* owner;          /* NULL once the document has been destroyed */
+    unsigned int gen_snap;   /* owner->generation at creation time */
+    bool dead;               /* Removed from the tree: storage is gone */
+    PugiNode*  hnext;
+    PugiNode** hprev;
 };
 
 struct PugiAttr {
     xml_attribute attr;
     xml_node parent_node;    /* Element owning this attribute */
     SV* doc_sv;              /* Reference to document to keep it alive */
-    unsigned int* gen_ptr;   /* Points to doc->generation */
-    unsigned int gen_snap;   /* Generation at creation time */
+    PugiDoc* owner;          /* NULL once the document has been destroyed */
+    unsigned int gen_snap;   /* owner->generation at creation time */
+    bool dead;               /* Removed from its element: storage is gone */
+    PugiAttr*  hnext;
+    PugiAttr** hprev;
 };
 
 typedef PugiDoc*   XML__PugiXML;
@@ -74,20 +125,30 @@ typedef PugiAttr*  XML__PugiXML__Attr;
 typedef PugiXPath* XML__PugiXML__XPath;
 
 
-#define CHECK_NODE_ALIVE(self) \
-    if (self->gen_snap != *self->gen_ptr) \
-        croak("Stale node handle: document has been reset or reloaded")
+/* True once the whole tree the handle was taken from has been replaced. */
+#define HANDLE_STALE(self) \
+    (!(self)->owner || (self)->gen_snap != (self)->owner->generation)
 
-#define CHECK_ATTR_ALIVE(self) \
-    if (self->gen_snap != *self->gen_ptr) \
-        croak("Stale attribute handle: document has been reset or reloaded")
+#define CHECK_NODE_ALIVE(self) STMT_START { \
+    if (HANDLE_STALE(self)) \
+        croak("Stale node handle: document has been reset or reloaded"); \
+    if ((self)->dead) \
+        croak("Stale node handle: node has been removed from the document"); \
+} STMT_END
 
-/* Two node handles share a document iff their gen_ptr (which points at that
-   document's generation counter) is identical. insert_child_* / remove_child
-   require the ref/child argument to live in the same document as self;
-   pugixml otherwise silently returns a null node. */
+#define CHECK_ATTR_ALIVE(self) STMT_START { \
+    if (HANDLE_STALE(self)) \
+        croak("Stale attribute handle: document has been reset or reloaded"); \
+    if ((self)->dead) \
+        croak("Stale attribute handle: attribute has been removed from its element"); \
+} STMT_END
+
+/* Two handles share a document iff they name the same PugiDoc. insert_child_*
+   / remove_child require the ref/child argument to live in the same document
+   as self; pugixml otherwise silently returns a null node. Only used after
+   CHECK_*_ALIVE, so neither owner is NULL. */
 #define CHECK_SAME_DOC(a, b) \
-    if ((a)->gen_ptr != (b)->gen_ptr) \
+    if ((a)->owner != (b)->owner) \
         croak("Node belongs to a different document")
 
 /* croak() longjmps out of a catch block, skipping __cxa_end_catch and leaking
@@ -103,6 +164,159 @@ typedef PugiXPath* XML__PugiXML__XPath;
 
 /* Helper functions */
 
+/* --- Hash index of live wrappers -------------------------------------- */
+
+#define PUGI_HIDX_MIN 16   /* initial bucket count, power of two */
+
+static size_t ptr_hash(const void* p) {
+    size_t x = (size_t)p;
+    x >>= 4;                 /* pugixml structs are at least 16-byte aligned */
+    x ^= x >> 16;
+    return x;
+}
+
+/* Both wrapper types expose the same hnext/hprev members, so one set of
+   templates serves both indexes. */
+
+static const void* wrapper_key(PugiNode* n) { return n->node.internal_object(); }
+static const void* wrapper_key(PugiAttr* a) { return a->attr.internal_object(); }
+
+template <typename W>
+static void hidx_insert(W** buckets, size_t nbuckets, W* w, const void* key) {
+    W** head = &buckets[ptr_hash(key) & (nbuckets - 1)];
+    w->hnext = *head;
+    if (*head) (*head)->hprev = &w->hnext;
+    w->hprev = head;
+    *head = w;
+}
+
+template <typename W>
+static void hidx_erase(W* w) {
+    if (!w->hprev) return;
+    *(w->hprev) = w->hnext;
+    if (w->hnext) w->hnext->hprev = w->hprev;
+    w->hnext = NULL;
+    w->hprev = NULL;
+}
+
+/* Double the table. Best-effort: on allocation failure the old table stays
+   valid and simply carries longer chains, so this never has to fail loudly. */
+template <typename W>
+static void hidx_grow(W*** pbuckets, size_t* pnbuckets) {
+    size_t newn = *pnbuckets * 2;
+    W** nb = (W**)calloc(newn, sizeof(W*));
+    if (!nb) return;
+    for (size_t i = 0; i < *pnbuckets; i++)
+        for (W* w = (*pbuckets)[i]; w; ) {
+            W* next = w->hnext;
+            hidx_insert(nb, newn, w, wrapper_key(w));
+            w = next;
+        }
+    free(*pbuckets);
+    *pbuckets = nb;
+    *pnbuckets = newn;
+}
+
+static void doc_register_node(PugiDoc* doc, PugiNode* n) {
+    if (doc->node_count + 1 > doc->node_nbuckets)
+        hidx_grow(&doc->node_buckets, &doc->node_nbuckets);
+    n->owner = doc;
+    hidx_insert(doc->node_buckets, doc->node_nbuckets, n, n->node.internal_object());
+    doc->node_count++;
+}
+
+static void doc_unregister_node(PugiNode* n) {
+    if (!n->owner) return;   /* document already destroyed, index is gone */
+    hidx_erase(n);
+    n->owner->node_count--;
+    n->owner = NULL;
+}
+
+static void doc_register_attr(PugiDoc* doc, PugiAttr* a) {
+    if (doc->attr_count + 1 > doc->attr_nbuckets)
+        hidx_grow(&doc->attr_buckets, &doc->attr_nbuckets);
+    a->owner = doc;
+    hidx_insert(doc->attr_buckets, doc->attr_nbuckets, a, a->attr.internal_object());
+    doc->attr_count++;
+}
+
+static void doc_unregister_attr(PugiAttr* a) {
+    if (!a->owner) return;
+    hidx_erase(a);
+    a->owner->attr_count--;
+    a->owner = NULL;
+}
+
+/* --- Invalidation ------------------------------------------------------ */
+
+/* Kill every live handle to `n` itself and to its attributes, recording what
+   was killed so a removal that pugixml then refuses can be undone exactly.
+   Only wrappers this call marks are recorded, so undoing can never resurrect
+   a handle that was already dead. */
+static void kill_handles_for(PugiDoc* doc, xml_node n,
+                             std::vector<PugiNode*>& killed_nodes,
+                             std::vector<PugiAttr*>& killed_attrs) {
+    const void* nkey = n.internal_object();
+    for (PugiNode* p = doc->node_buckets[ptr_hash(nkey) & (doc->node_nbuckets - 1)];
+         p; p = p->hnext)
+        if (!p->dead && p->gen_snap == doc->generation && p->node == n) {
+            p->dead = true;
+            killed_nodes.push_back(p);
+        }
+
+    for (xml_attribute a = n.first_attribute(); a; a = a.next_attribute()) {
+        const void* akey = a.internal_object();
+        for (PugiAttr* q = doc->attr_buckets[ptr_hash(akey) & (doc->attr_nbuckets - 1)];
+             q; q = q->hnext)
+            if (!q->dead && q->gen_snap == doc->generation && q->attr == a) {
+                q->dead = true;
+                killed_attrs.push_back(q);
+            }
+    }
+}
+
+struct KillWalker : public xml_tree_walker {
+    PugiDoc* doc;
+    std::vector<PugiNode*>* killed_nodes;
+    std::vector<PugiAttr*>* killed_attrs;
+    virtual bool for_each(xml_node& n) {
+        kill_handles_for(doc, n, *killed_nodes, *killed_attrs);
+        return true;
+    }
+};
+
+/* Mark every live handle pointing into the subtree rooted at `victim` dead.
+   MUST run before pugixml frees that subtree, while it is still walkable. */
+static void invalidate_subtree(PugiDoc* doc, xml_node victim,
+                               std::vector<PugiNode*>& killed_nodes,
+                               std::vector<PugiAttr*>& killed_attrs) {
+    kill_handles_for(doc, victim, killed_nodes, killed_attrs);  /* traverse() starts below victim */
+    KillWalker w;
+    w.doc = doc;
+    w.killed_nodes = &killed_nodes;
+    w.killed_attrs = &killed_attrs;
+    victim.traverse(w);
+}
+
+static void invalidate_attribute(PugiDoc* doc, xml_attribute victim,
+                                 std::vector<PugiAttr*>& killed_attrs) {
+    const void* key = victim.internal_object();
+    for (PugiAttr* q = doc->attr_buckets[ptr_hash(key) & (doc->attr_nbuckets - 1)];
+         q; q = q->hnext)
+        if (!q->dead && q->gen_snap == doc->generation && q->attr == victim) {
+            q->dead = true;
+            killed_attrs.push_back(q);
+        }
+}
+
+/* pugixml's remove_child/remove_attribute re-check an allocator reserve AFTER
+   the ownership check and can still return false, leaving the subtree alive.
+   Undo the invalidation in that case so the handles are not falsely stale. */
+static void revive_handles(std::vector<PugiNode*>& nodes, std::vector<PugiAttr*>& attrs) {
+    for (size_t i = 0; i < nodes.size(); i++) nodes[i]->dead = false;
+    for (size_t i = 0; i < attrs.size(); i++) attrs[i]->dead = false;
+}
+
 static SV* wrap_node(pTHX_ xml_node node, SV* doc_sv) {
     if (!node) {
         return &PL_sv_undef;
@@ -115,8 +329,9 @@ static SV* wrap_node(pTHX_ xml_node node, SV* doc_sv) {
     }
     wrapper->node = node;
     wrapper->doc_sv = SvREFCNT_inc(doc_sv);
-    wrapper->gen_ptr = &doc->generation;
     wrapper->gen_snap = doc->generation;
+    wrapper->dead = false;
+    doc_register_node(doc, wrapper);
 
     SV* sv = newSV(0);
     sv_setref_pv(sv, "XML::PugiXML::Node", (void*)wrapper);
@@ -136,8 +351,9 @@ static SV* wrap_attr(pTHX_ xml_attribute attr, xml_node parent, SV* doc_sv) {
     wrapper->attr = attr;
     wrapper->parent_node = parent;
     wrapper->doc_sv = SvREFCNT_inc(doc_sv);
-    wrapper->gen_ptr = &doc->generation;
     wrapper->gen_snap = doc->generation;
+    wrapper->dead = false;
+    doc_register_attr(doc, wrapper);
 
     SV* sv = newSV(0);
     sv_setref_pv(sv, "XML::PugiXML::Attr", (void*)wrapper);
@@ -193,6 +409,21 @@ CODE:
         croak("Out of memory allocating xml_document");
     }
     doc->generation = 0;
+    /* Allocate both indexes up front so registration can never fail and leave
+       an unindexed (hence never-invalidated) wrapper behind. */
+    doc->node_buckets = (PugiNode**)calloc(PUGI_HIDX_MIN, sizeof(PugiNode*));
+    doc->attr_buckets = (PugiAttr**)calloc(PUGI_HIDX_MIN, sizeof(PugiAttr*));
+    if (!doc->node_buckets || !doc->attr_buckets) {
+        free(doc->node_buckets);
+        free(doc->attr_buckets);
+        delete doc->doc;
+        delete doc;
+        croak("Out of memory allocating document handle index");
+    }
+    doc->node_nbuckets = PUGI_HIDX_MIN;
+    doc->attr_nbuckets = PUGI_HIDX_MIN;
+    doc->node_count = 0;
+    doc->attr_count = 0;
     RETVAL = doc;
 }
 OUTPUT:
@@ -202,12 +433,29 @@ void
 DESTROY(XML::PugiXML self)
 CODE:
 {
+    /* Global destruction calls DESTROY in arbitrary order and may free the
+       document before the nodes that reference it. Detach every live handle
+       so their own DESTROY does not dereference this struct. */
+    for (size_t i = 0; i < self->node_nbuckets; i++)
+        for (PugiNode* p = self->node_buckets[i]; p; ) {
+            PugiNode* next = p->hnext;
+            p->owner = NULL; p->hnext = NULL; p->hprev = NULL; p->dead = true;
+            p = next;
+        }
+    for (size_t i = 0; i < self->attr_nbuckets; i++)
+        for (PugiAttr* a = self->attr_buckets[i]; a; ) {
+            PugiAttr* next = a->hnext;
+            a->owner = NULL; a->hnext = NULL; a->hprev = NULL; a->dead = true;
+            a = next;
+        }
+    free(self->node_buckets);
+    free(self->attr_buckets);
     delete self->doc;
     delete self;
 }
 
 bool
-load_file(XML::PugiXML self, const char* path, unsigned int parse_options = parse_default)
+load_file(XML::PugiXML self, nul_safe_pv path, unsigned int parse_options = parse_default)
 CODE:
 {
     self->generation++;
@@ -247,7 +495,7 @@ CODE:
 }
 
 bool
-save_file(XML::PugiXML self, const char* path, const char* indent = NULL, unsigned int flags = format_default)
+save_file(XML::PugiXML self, nul_safe_pv path, nul_safe_pv indent = NULL, unsigned int flags = format_default)
 CODE:
 {
     if (!indent) indent = "\t";   /* default: avoid ParseXS mangling "\t" in the signature */
@@ -265,7 +513,7 @@ OUTPUT:
     RETVAL
 
 SV*
-to_string(XML::PugiXML self, const char* indent = NULL, unsigned int flags = format_default)
+to_string(XML::PugiXML self, nul_safe_pv indent = NULL, unsigned int flags = format_default)
 CODE:
 {
     if (!indent) indent = "\t";   /* default: avoid ParseXS mangling "\t" in the signature */
@@ -294,7 +542,7 @@ OUTPUT:
     RETVAL
 
 SV*
-child(XML::PugiXML self, const char* name)
+child(XML::PugiXML self, nul_safe_pv name)
 CODE:
 {
     xml_node child = self->doc->child(name);
@@ -304,7 +552,7 @@ OUTPUT:
     RETVAL
 
 SV*
-select_node(XML::PugiXML self, const char* xpath)
+select_node(XML::PugiXML self, nul_safe_pv xpath)
 CODE:
 {
     RETVAL = 0;
@@ -317,21 +565,26 @@ OUTPUT:
     RETVAL
 
 void
-select_nodes(XML::PugiXML self, const char* xpath)
+select_nodes(XML::PugiXML self, nul_safe_pv xpath)
 PPCODE:
 {
+    /* xsubpp emits "SP -= items" before this body, so the first PUSHs below
+       overwrites the ST(0) slot. Cache the invocant before pushing anything:
+       reading ST(0) inside the loop would hand every result after the first
+       the preceding result's RV in place of the document. */
+    SV* doc_sv = ST(0);
     XPATH_GUARDED {
         xpath_node_set nodes = self->doc->select_nodes(xpath);
         EXTEND(SP, (SSize_t)nodes.size());
         for (xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
-            SV* sv = wrap_xpath_result(aTHX_ *it, ST(0));
+            SV* sv = wrap_xpath_result(aTHX_ *it, doc_sv);
             PUSHs(sv_2mortal(sv));
         }
     } END_XPATH_GUARDED;
 }
 
 SV*
-compile_xpath(XML::PugiXML self, const char* xpath)
+compile_xpath(XML::PugiXML self, nul_safe_pv xpath)
 CODE:
 {
     PERL_UNUSED_VAR(self);
@@ -405,6 +658,7 @@ void
 DESTROY(XML::PugiXML::Node self)
 CODE:
 {
+    doc_unregister_node(self);
     SvREFCNT_dec(self->doc_sv);
     delete self;
 }
@@ -450,7 +704,7 @@ OUTPUT:
     RETVAL
 
 SV*
-child(XML::PugiXML::Node self, const char* name)
+child(XML::PugiXML::Node self, nul_safe_pv name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -470,7 +724,7 @@ OUTPUT:
     RETVAL
 
 SV*
-next_sibling(XML::PugiXML::Node self, const char* name = NULL)
+next_sibling(XML::PugiXML::Node self, nul_safe_pv name = NULL)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -484,7 +738,7 @@ OUTPUT:
     RETVAL
 
 SV*
-previous_sibling(XML::PugiXML::Node self, const char* name = NULL)
+previous_sibling(XML::PugiXML::Node self, nul_safe_pv name = NULL)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -508,7 +762,7 @@ OUTPUT:
     RETVAL
 
 void
-children(XML::PugiXML::Node self, const char* name = NULL)
+children(XML::PugiXML::Node self, nul_safe_pv name = NULL)
 PPCODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -531,7 +785,7 @@ PPCODE:
 }
 
 SV*
-attr(XML::PugiXML::Node self, const char* name)
+attr(XML::PugiXML::Node self, nul_safe_pv name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -646,13 +900,22 @@ OUTPUT:
     RETVAL
 
 SV*
-path(XML::PugiXML::Node self, char delimiter = '/')
+path(XML::PugiXML::Node self, nul_safe_pv delimiter = NULL)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
+    /* pugixml's path() takes a single char. Taking this as a string and
+       checking the length beats the T_CHAR typemap, which quietly turned
+       path('::') into ':' and path('') into a NUL delimiter. */
+    char delim = '/';
+    if (delimiter) {
+        if (strlen(delimiter) != 1)
+            croak("path: delimiter must be a single character");
+        delim = delimiter[0];
+    }
     RETVAL = 0;
     XPATH_GUARDED {
-        std::string p = self->node.path(delimiter);
+        std::string p = self->node.path(delim);
         RETVAL = new_utf8_svpvn(aTHX_ p.c_str(), p.length());
     } catch (const std::exception& e) {
         snprintf(xpath_err, sizeof(xpath_err), "path error: %s", e.what());
@@ -663,7 +926,7 @@ OUTPUT:
     RETVAL
 
 SV*
-find_child_by_attribute(XML::PugiXML::Node self, const char* name, const char* attr_name, const char* attr_value)
+find_child_by_attribute(XML::PugiXML::Node self, nul_safe_pv name, nul_safe_pv attr_name, nul_safe_pv attr_value)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -678,9 +941,9 @@ root(XML::PugiXML::Node self)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
-    /* Document element (consistent with $doc->root) */
-    PugiDoc* doc = INT2PTR(PugiDoc*, SvIV(SvRV(self->doc_sv)));
-    RETVAL = wrap_node(aTHX_ doc->doc->document_element(), self->doc_sv);
+    /* Document element (consistent with $doc->root). CHECK_NODE_ALIVE has
+       already established that owner is non-NULL. */
+    RETVAL = wrap_node(aTHX_ self->owner->doc->document_element(), self->doc_sv);
 }
 OUTPUT:
     RETVAL
@@ -716,7 +979,7 @@ OUTPUT:
     RETVAL
 
 SV*
-select_node(XML::PugiXML::Node self, const char* xpath)
+select_node(XML::PugiXML::Node self, nul_safe_pv xpath)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -730,7 +993,7 @@ OUTPUT:
     RETVAL
 
 void
-select_nodes(XML::PugiXML::Node self, const char* xpath)
+select_nodes(XML::PugiXML::Node self, nul_safe_pv xpath)
 PPCODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -749,7 +1012,7 @@ valid(XML::PugiXML::Node self)
 CODE:
 {
     /* valid() deliberately skips CHECK_NODE_ALIVE -- returns false for stale handles */
-    RETVAL = (self->gen_snap == *self->gen_ptr) && (bool)self->node;
+    RETVAL = !HANDLE_STALE(self) && !self->dead && (bool)self->node;
 }
 OUTPUT:
     RETVAL
@@ -802,17 +1065,38 @@ CODE:
     CHECK_NODE_ALIVE(self);
     CHECK_NODE_ALIVE(child);
     CHECK_SAME_DOC(self, child);
+    /* pugixml frees the subtree's storage here, so every handle into it must
+       be killed first, while the subtree is still walkable. The condition
+       mirrors pugixml's own precondition, so a removal that is going to fail
+       for the usual reason invalidates nothing; pugixml can still refuse on
+       an allocator reserve after that check, which revive_handles undoes. */
+    std::vector<PugiNode*> killed_nodes;
+    std::vector<PugiAttr*> killed_attrs;
+    if (child->node && child->node.parent() == self->node)
+        invalidate_subtree(self->owner, child->node, killed_nodes, killed_attrs);
     RETVAL = self->node.remove_child(child->node);
+    if (!RETVAL) revive_handles(killed_nodes, killed_attrs);
 }
 OUTPUT:
     RETVAL
 
 bool
-remove_attr(XML::PugiXML::Node self, const char* name)
+remove_attr(XML::PugiXML::Node self, nul_safe_pv name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
-    RETVAL = self->node.remove_attribute(name);
+    /* Same reasoning as remove_child: the attribute's storage is freed, so
+       handles to it must be killed while it is still readable. */
+    xml_attribute victim = self->node.attribute(name);
+    if (victim) {
+        std::vector<PugiNode*> killed_nodes;
+        std::vector<PugiAttr*> killed_attrs;
+        invalidate_attribute(self->owner, victim, killed_attrs);
+        RETVAL = self->node.remove_attribute(victim);
+        if (!RETVAL) revive_handles(killed_nodes, killed_attrs);
+    } else {
+        RETVAL = false;
+    }
 }
 OUTPUT:
     RETVAL
@@ -930,6 +1214,7 @@ void
 DESTROY(XML::PugiXML::Attr self)
 CODE:
 {
+    doc_unregister_attr(self);
     SvREFCNT_dec(self->doc_sv);
     delete self;
 }
@@ -1063,7 +1348,7 @@ valid(XML::PugiXML::Attr self)
 CODE:
 {
     /* valid() deliberately skips CHECK_ATTR_ALIVE -- returns false for stale handles */
-    RETVAL = (self->gen_snap == *self->gen_ptr) && (bool)self->attr;
+    RETVAL = !HANDLE_STALE(self) && !self->dead && (bool)self->attr;
 }
 OUTPUT:
     RETVAL

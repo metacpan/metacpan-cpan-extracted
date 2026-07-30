@@ -2,7 +2,7 @@ package Zuzu::Module::HTTP;
 
 use utf8;
 
-our $VERSION = '0.007001';
+our $VERSION = '0.007002';
 
 use HTTP::Tiny ();
 use JSON::PP ();

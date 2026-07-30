@@ -25,7 +25,7 @@ name: Dancer2-Plugin-OIDC
 provides:
   Dancer2::Plugin::OIDC:
     file: lib/Dancer2/Plugin/OIDC.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Carp: '0'
   Clone: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/sebmourlhou/dancer2-plugin-oidc/issues
   homepage: https://github.com/sebmourlhou/dancer2-plugin-oidc
   repository: https://github.com/sebmourlhou/dancer2-plugin-oidc.git
-version: '1.02'
+version: '1.03'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

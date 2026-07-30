@@ -1,0 +1,7 @@
+Revision history for Data::PerfectHash::Shared
+
+0.01  2026-07-28
+    - Initial release.
+    - Compact CHD index: the per-bucket displacement array is stored
+      byte-packed at the minimal fixed width (1..4 bytes/entry) over
+      ceil(n/6) buckets, for roughly 4 bits/key (on-disk format v2).

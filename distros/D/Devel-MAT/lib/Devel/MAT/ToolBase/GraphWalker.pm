@@ -1,14 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::ToolBase::GraphWalker 0.54;
+package Devel::MAT::ToolBase::GraphWalker 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
 use utf8;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use List::Util qw( any pairs );
 use List::UtilsBy qw( nsort_by );
@@ -24,18 +27,15 @@ my $next_id;
 my %id_for;
 my %seen;
 
-sub reset
+sub reset ( $self )
 {
    $next_id = "A";
    undef %id_for;
    undef %seen;
 }
 
-sub walk_graph
+sub walk_graph ( $self, $node, @args )
 {
-   my $self = shift;
-   my ( $node, @args ) = @_;
-
    my $addr  = $node->addr;
    my @roots = $node->roots;
    my @edges = $node->edges_in;
@@ -72,7 +72,7 @@ sub walk_graph
 
    my @refs = nsort_by { $STRENGTH_ORDER{$_->[0]->strength} } pairs @edges;
    foreach my $idx ( 0 .. $#refs ) {
-      my ( $ref, $refnode ) = @{ $refs[$idx] };
+      my ( $ref, $refnode ) = $refs[$idx]->@*;
       my $is_final = $idx == $#refs;
 
       my $ref_id;

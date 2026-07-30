@@ -15,6 +15,10 @@ WriteMakefile(
     MIN_PERL_VERSION   => '5.022',
     LIBS               => [''],
     DEFINE             => '-D_GNU_SOURCE',
+    # -fwrapv: sum/min/max do intentional two's-complement wraparound on signed
+    # int64 (documented in the POD); make it defined behaviour, not UB.  Preserve
+    # the perl default ccflags (do not drop them) and just append.
+    CCFLAGS            => "$Config{ccflags} -fwrapv",
     INC                => '-I.',
     XS                 => { 'Shared.xs' => 'Shared.c' },
     OBJECT             => 'Shared$(OBJ_EXT)',

@@ -1,21 +1,52 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Tools 0.54;
+package Devel::MAT::Tool::Tools 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant CMD => "tools";
 use constant CMD_DESC => "List the available tools";
 
-sub run
-{
-   my $self = shift;
+=head1 NAME
 
+C<Devel::MAT::Tool::Tools> - display a list of the available tools
+
+=head1 DESCRIPTION
+
+This C<Devel::MAT> tool displays a list of the names and descriptions of
+additional tools that may be available, and allows loading them.
+
+=cut
+
+=head1 COMMANDS
+
+=for highlighter
+
+=head2 tools
+
+   pmat> tools
+     Reachability - <no desc>
+     Sizes        - <no desc>
+
+Prints a list of the names of every additional tool that is available to load
+into the F<pmat> analysis shell. Each is prefixed with a C<*> if it is already
+loaded.
+
+Currently, only the tools marked C<FOR_UI> are actually listed, which isn't
+helpful in the shell as many tools are useful without UI additions.
+
+=cut
+
+sub run ( $self )
+{
    my @table;
 
    foreach my $tool ( sort Devel::MAT->available_tools ) {
@@ -50,13 +81,24 @@ use constant CMD_ARGS => (
    { name => "tool", help => "the name of the tool to load" },
 );
 
-sub run
-{
-   my $self = shift;
-   my ( $toolname ) = @_;
+=head2 tool
 
+Loads an additional analysis tool.
+
+   pmat> tool Sizes
+
+=cut
+
+sub run ( $self, $toolname )
+{
    my $tool = $self->pmat->load_tool( $toolname, progress => $self->{progress} );
    $self->report_progress();
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

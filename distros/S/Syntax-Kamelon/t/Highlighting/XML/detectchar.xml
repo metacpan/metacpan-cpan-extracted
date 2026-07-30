@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="detectchar" version="0.1" section="Test" extensions="*.detectchar;">
+<language name="detectchar" version="0.1" kateversion="23.08.5" section="Other" license="MIT" extensions="*.detectchar;">
 <highlighting>
 
 <contexts>

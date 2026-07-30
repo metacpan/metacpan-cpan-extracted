@@ -1,7 +1,28 @@
 use strict;
 use warnings;
+use Config;
 use ExtUtils::MakeMaker;
 use Alien::pugixml;
+
+# CCFLAGS *replaces* $Config{ccflags} in the generated Makefile rather than
+# adding to it, and perl's own flags are not optional here: -fno-strict-aliasing
+# (perl's headers type-pun SV/AV/HV deliberately, which -O2 would otherwise be
+# entitled to miscompile), -D_LARGEFILE_SOURCE/-D_FILE_OFFSET_BITS=64 (they fix
+# the ABI of structs this XS shares with libperl), -fwrapv, and the hardening
+# defines. Carry them across, dropping the C-only dialect/warning flags that a
+# C++ compiler rejects.
+my $c_only = qr{^-(?:
+      std=(?:gnu|c)[0-9]+
+    | W(?:error=)?(?: declaration-after-statement | nested-externs
+                    | old-style-definition   | strict-prototypes
+                    | missing-prototypes     | implicit-function-declaration
+                    | pointer-sign           | bad-function-cast
+                    | c\+\+-compat )
+)$}x;
+
+my $ccflags = join ' ',
+    ( grep { !/$c_only/ } split ' ', $Config{ccflags} ),
+    '-std=c++11', '-Wall', Alien::pugixml->cflags;
 
 WriteMakefile(
     NAME             => 'XML::PugiXML',
@@ -15,7 +36,7 @@ WriteMakefile(
     LD               => 'c++',
     XSOPT            => '-C++',
 
-    CCFLAGS          => '-std=c++11 -Wall ' . Alien::pugixml->cflags,
+    CCFLAGS          => $ccflags,
     OPTIMIZE         => '-O2',
 
     INC              => '-I.',
@@ -37,6 +58,12 @@ WriteMakefile(
 
     META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'XML::PugiXML' => {
+                file    => 'lib/XML/PugiXML.pm',
+                version => MM->parse_version('lib/XML/PugiXML.pm'),
+            },
+        },
         resources   => {
             repository => {
                 type => 'git',

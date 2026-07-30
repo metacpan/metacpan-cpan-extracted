@@ -28,6 +28,34 @@ catch ( Exception e ) {
 }
 SRC
 
+is eval_src(<<'SRC'), 'boom|42|exception #42: boom', 'Exception subclass fields and build hooks work';
+class CodedException extends Exception {
+	let code with get := null;
+
+	method __build__ () {
+		self{message} := "boom";
+	}
+
+	method to_String () {
+		return "exception #" _ code _ ": " _ self{message};
+	}
+}
+try {
+	throw new CodedException( message: "prefix: boom", code: 42 );
+}
+catch ( CodedException e ) {
+	e{message} _ "|" _ e.get_code() _ "|" _ e.to_String();
+}
+SRC
+
+is eval_src(<<'SRC'), 'line 3', 'Exception subclass declared fields can override native-looking names';
+class LocatedException extends Exception {
+	let line with get := 0;
+}
+let e := new LocatedException( message: "boom", line: 3 );
+"line " _ e.get_line();
+SRC
+
 is eval_src(<<'SRC'), 'boom|Exception: boom|yes', 'Exception exposes raw message method';
 try {
 	throw new Exception( message: "boom" );

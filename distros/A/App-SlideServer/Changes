@@ -1,3 +1,12 @@
+Version 0.003 - 2026-07-29
+
+  - Add support for Markdown::Perl as the markdown preprocessor.
+    Text::Markdown::Hoedown is still supported
+  - Improved automatic DOM restructuring for <head> and tags that belong there
+  - Improve styling and CSS support
+  - Can now supply presenter key via URL parameter
+  - __END__ marker can be used to truncate input markdown file
+
 Version 0.002 - 2023-07-11
 
   - Fix bug in hiding steps which use a step range

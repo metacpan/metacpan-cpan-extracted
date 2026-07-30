@@ -35,13 +35,18 @@ function Slide(el, num) {
 		var start_step= e.dataset.step;
 		if (start_step && start_step.match(/^[0-9]+$/))
 			step_num= parseInt(start_step);
-		$(e).children().each(function(){ this.dataset.step= [[step_num++]] });
+		$(e).children().each(function(){
+			if (this.dataset.step != null && this.dataset.step.match(/^[0-9]+$/))
+				step_num= parseInt(this.dataset.step) + 1;
+			else
+				this.dataset.step= step_num++;
+		});
 	});
 	// do a deep search to find any element with 'data-step' and give it the class of
 	// 'slide-step' for easier selecting later.
 	slide_jq.find('*').each(function(){
 		if (this.dataset.step)
-			$(this).addClass('slide-step');
+			this.classList.add('slide-step');
 	});
 	// Parse each "data-step" specification and replace with an array of ranges
 	// Also calculate the step count
@@ -55,7 +60,7 @@ function Slide(el, num) {
 					max_step= show_list[i][0];
 				// If a step  has both a start frame and an end frame, then it is "temporary".
 				if (show_list[i].length > 1) {
-					$(this).addClass('temporary-step');
+					this.classList.add('temporary-step');
 					if (show_list[i][1] > max_step) max_step= show_list[i][1];
 				}
 			}
@@ -85,7 +90,8 @@ Slide.prototype.scaleTo= function(viewport_w, viewport_h) {
 	// Example:
 	// 50x10 inside 100x60, xscale=2, yscale=6, pad h with 40, 20 top 20 bottom 
 	var scale= (xscale < yscale)? xscale : yscale;
-	$(this.el).css('margin', ypad+' 0').css('transform', 'scale('+scale+','+scale+')');
+	this.el.style.margin= ypad+' 0';
+	this.el.style.transform= 'scale('+scale+','+scale+')';
 }
 Slide.prototype.top= function() { return $(this.el).offset().top }
 Slide.prototype.show= function(show) { show? $(this.el).show() : $(this.el).hide(); return this }
@@ -102,22 +108,36 @@ Slide.prototype.showStep= function(step_num, view_mode) {
 	var self= this;
 	if (step_num < 0) step_num= this.max_step + 1 + step_num;
 	if (step_num < 0) step_num= 0;
+	for (var i= 0; i < step_num; i++) {
+		this.el.classList.remove('step'+i);
+		this.el.classList.add('step'+i+'-');
+	}
+	this.el.classList.add('step'+step_num);
+	this.el.classList.add('step'+step_num+'-');
+	for (var i= step_num+1; i <= this.max_step; i++) {
+		this.el.classList.remove('step'+i);
+		this.el.classList.remove('step'+i+'-');
+	}
 	this.steps.each(function() {
-		var step= $(this);
 		// If a step is not visible, behavior depends on whether we are the presenter
 		// and whether the element is temporary.  Non-temporary elements need to remain
 		// in the document flow so that the layout of the rest doesn't jump around.
 		// But temporary have to be removed from the layout so that they don't occupy
 		// space.  Meanwhile the presenter gets to see all hidden elements.
-		if (_num_is_in_ranges(step_num, self.parseSteps(this.dataset.step)))
-			step.css('visibility','visible').css('position','relative').css('opacity',1);
+		if (_num_is_in_ranges(step_num, self.parseSteps(this.dataset.step))) {
+			this.style.visibility= 'visible';
+			this.style.position= 'relative';
+			this.style.opacity= 1;
+		}
 		else {
-			if (view_mode == 'presenter')
-				step.css('visibility','visible').css('opacity', .3);
+			if (view_mode == 'presenter') {
+				this.style.visibility= 'visible';
+				this.style.opacity= .3;
+			}
 			else
-				step.css('visibility','hidden');
-			if (step.hasClass('temporary-step'))
-				step.css('position','absolute');
+				this.style.visibility= 'hidden';
+			if (this.classList.contains('temporary-step'))
+				this.style.position= 'absolute';
 		}
 	});
 	this.cur_step= step_num;
@@ -260,7 +280,7 @@ window.slides= {
 	// Remove leading whitespace, and convert tabs to spaces, and remove
 	// the largest common indent of all lines.
 	_fixup_code_block: function(code_el) {
-		var text= $(code_el).text();
+		var text= code_el.innerHTML;
 		text= text.replace(/\t/g, '   '); // tabs to spaces
 		text= text.replace(/^\s*\n/g, ''); // remove leading blank line
 		text= text.replace(/\n\s*$/g, ''); // remove blank trailing line
@@ -274,7 +294,7 @@ window.slides= {
 			}
 		if (indent > 0)
 			text= text.replace(new RegExp('^'+(' '.repeat(indent)), 'mg'), '');
-		$(code_el).text(text);
+		code_el.innerHTML = text;
 		// Apply syntax highlighting if available
 		if (this.config.code_highlight)
 			this.config.code_highlight(code_el);

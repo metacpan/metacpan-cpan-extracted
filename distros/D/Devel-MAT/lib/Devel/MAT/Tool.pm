@@ -3,10 +3,13 @@
 #
 #  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool 0.54;
+package Devel::MAT::Tool 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Syntax::Keyword::Match;
 
@@ -14,11 +17,8 @@ use List::Util qw( any );
 use Commandable::Invocation;
 Commandable::Invocation->VERSION( '0.04' ); # ->peek_remaining
 
-sub new
+sub new ( $class, $pmat, %args )
 {
-   my $class = shift;
-   my ( $pmat, %args ) = @_;
-
    my $self = bless {
       pmat     => $pmat,
       df       => $pmat->dumpfile,
@@ -30,29 +30,23 @@ sub new
    return $self;
 }
 
-sub pmat
+sub pmat ( $self )
 {
-   my $self = shift;
    return $self->{pmat};
 }
 
-sub df
+sub df ( $self )
 {
-   my $self = shift;
    return $self->{df};
 }
 
-sub report_progress
+sub report_progress ( $self, @args )
 {
-   my $self = shift;
-   $self->{progress}->( @_ ) if $self->{progress};
+   $self->{progress}->( @args ) if $self->{progress};
 }
 
-sub get_sv_from_inv
+sub get_sv_from_inv ( $self, $inv )
 {
-   my $self = shift;
-   my ( $inv ) = @_;
-
    my $sv = Devel::MAT::UI->can( "current_sv" ) && Devel::MAT::UI->current_sv;
 
    if( defined( my $addr = $inv->pull_token ) ) {
@@ -88,11 +82,8 @@ use constant CMD_OPTS => ();
 use constant CMD_ARGS_SV => 0;
 use constant CMD_ARGS => ();
 
-sub find_subcommand
+sub find_subcommand ( $self, $subname )
 {
-   my $self = shift;
-   my ( $subname ) = @_;
-
    # TODO: sanity check
 
    return ( ref($self) . "::" . $subname )->new( $self->pmat,
@@ -100,11 +91,8 @@ sub find_subcommand
    );
 }
 
-sub parse_cmd
+sub parse_cmd ( $self, $inv )
 {
-   my $self = shift;
-   my ( $inv ) = @_;
-
    my @args;
 
    if( my %optspec = $self->CMD_OPTS ) {
@@ -122,19 +110,13 @@ sub parse_cmd
    return @args;
 }
 
-sub run_cmd
+sub run_cmd ( $self, $inv )
 {
-   my $self = shift;
-   my ( $inv ) = @_;
-
    $self->run( $self->parse_cmd( $inv ) );
 }
 
-sub get_opts_from_inv
+sub get_opts_from_inv ( $self, $inv, $optspec, %args )
 {
-   my $self = shift;
-   my ( $inv, $optspec, %args ) = @_;
-
    my $permute = $args{permute} // 1;
 
    my %opts;
@@ -204,11 +186,8 @@ sub get_opts_from_inv
    return \%opts;
 }
 
-sub get_args_from_inv
+sub get_args_from_inv ( $self, $inv, @argspec )
 {
-   my $self = shift;
-   my ( $inv, @argspec ) = @_;
-
    my @args;
 
    foreach my $argspec ( @argspec ) {

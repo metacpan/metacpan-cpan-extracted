@@ -46,10 +46,11 @@ Call native code from Perl without XS, compilers, or runtime overhead.
 
 Affix is a high-performance Foreign Function Interface (FFI) for Perl. It bridges Perl to C, Rust, Zig, C++, Go,
 Fortran, and more via JIT-compiled trampolines that handle argument marshalling at runtime—no generic dispatch loops.
-The result is near-native call speed with a rich type system covering primitives, structs, unions, enums, SIMD vectors, and pointers.
+The result is near-native call speed with a rich type system covering primitives, structs, unions, enums, SIMD vectors,
+and pointers.
 
-Powered by [infix](https://github.com/sanko/infix/), which has been tested on Linux, Windows, macOS, Solaris, BSD, and across
-`x86_64` and `AArch64` (ARM64).
+Powered by [infix](https://github.com/sanko/infix/), which has been tested on Linux, Windows, macOS, Solaris, BSD, and
+across `x86_64` and `AArch64` (ARM64).
 
 # EXPORTS
 
@@ -675,7 +676,7 @@ The `readonly()` function allows you to inspect or toggle the const status of a 
 as an _FFI Escape Hatch_ (similar to `const_cast` in C++).
 
 ```perl
-my $point = cast($addr, 'struct { x: int, y: int }');
+my $point = cast($addr, Struct[ x => Int, y => Int ]);
 
 readonly($point, 1); # Lock the entire struct
 $point->{x} = 10;    # FATAL ERROR
@@ -687,7 +688,7 @@ When an aggregate (Struct or Array) is marked as read-only, Affix automatically 
 its members.
 
 ```perl
-my $rect = cast($addr, '+struct { top: {x:int, y:int}, bottom: {x:int, y:int} }');
+my $rect = cast($addr, Const[Struct[top => Struct[ x => Int, y => Int ], bottom => Struct[ x => Int, y => Int ] ]]);
 
 # Even though 'x' wasn't explicitly marked Const, it inherited protection
 # from the parent struct.
@@ -700,14 +701,14 @@ When using `cast( ... )`, you can prepend a `+` to the type signature to create 
 address.
 
 ```perl
-my $view = cast($raw_addr, "+MyStruct");
+my $view = cast($raw_addr, Const[MyStruct]);
 # $view is now a read-only HashRef mapping to C memory.
 ```
 
 # Zero-copy Aggregates
 
-Structs, unions, and arrays map directly to C memory—no deep copies required. When C returns a pointer to an aggregate,
-Affix wraps it in a magical Perl reference that reads and writes C memory in real time.
+Structs, unions, and arrays map directly to C memory—no deep copies required. When C returns a pointer to an
+aggregate, Affix wraps it in a magical Perl reference that reads and writes C memory in real time.
 
 ### Native Array Indexing
 
@@ -1035,9 +1036,8 @@ to attach a temporary Perl context to that thread. This should be sufficient but
 
 # RECIPES & EXAMPLES
 
-Real-world patterns including linked lists and C++ vtable calls. See
-[The Affix Cookbook](https://github.com/sanko/Affix.pm/discussions/categories/recipes) for comprehensive guides to
-using Affix.
+Real-world patterns including linked lists and C++ vtable calls. See [The Affix
+Cookbook](https://github.com/sanko/Affix.pm/discussions/categories/recipes) for comprehensive guides to using Affix.
 
 ## Linked List Implementation
 
@@ -1098,6 +1098,6 @@ Sanko Robinson - [https://github.com/sanko](https://github.com/sanko)
 
 # COPYRIGHT
 
-Copyright (C) 2023-2026 by Sanko Robinson.
+Copyright (C) 2022-2026 by Sanko Robinson.
 
 This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.

@@ -1,6 +1,6 @@
 NAME
-    Data::SegmentTree::Shared - shared-memory segment tree (range
-    add/assign, range sum/min/max/gcd/product)
+    Data::SegmentTree::Shared - shared-memory segment tree (range add/assign,
+    range sum/min/max/gcd/product)
 
 SYNOPSIS
         use Data::SegmentTree::Shared;
@@ -26,51 +26,51 @@ SYNOPSIS
 DESCRIPTION
     A segment tree in shared memory: a fixed array of "n" signed 64-bit
     integer positions that supports range updates and range queries in O(log
-    n) each -- add a delta to every element of a range, and ask for the sum,
+    n) each -- add a delta to every element of a range, and query the sum,
     minimum, or maximum of any range. It complements Data::Fenwick::Shared
     (which does prefix sums and point updates): a segment tree adds range
-    minimum and maximum queries and range add (via lazy propagation),
-    neither of which a Fenwick tree can do.
+    minimum and maximum queries and range add (via lazy propagation), neither
+    of which a Fenwick tree can do.
 
     The tree is a perfect binary tree over next_pow2(n) leaves; each node
     caches its subtree's sum, min, and max, plus a pending "range add" delta
-    that is pushed down lazily. Range updates and queries therefore touch
-    only O(log n) nodes. Positions start at 0 and are addressed by a 0-based
-    index; out-of-range indices croak.
+    that is pushed down lazily. Range updates and queries therefore touch only
+    O(log n) nodes. Positions start at 0 and are addressed by a 0-based index;
+    out-of-range indices croak.
 
     Because the tree lives in a shared mapping, several processes update and
     query one array: any process that opens the same backing file, inherits
     the anonymous mapping across "fork", or reopens a passed memfd sees the
     same array. A write-preferring futex rwlock with dead-process recovery
-    guards mutation; queries never mutate the tree, so they take only the
-    read lock and many can run at once. Linux-only. Requires 64-bit Perl.
+    guards mutation; queries never mutate the tree, so they take only the read
+    lock and many can run at once. Linux-only. Requires 64-bit Perl.
 
-    Values and range sums are signed 64-bit integers; feeding values large
-    enough that a range sum exceeds the 64-bit range overflows (wraps), as
-    with any native integer accumulator.
+    Values and range sums are signed 64-bit integers; a range sum that exceeds
+    the 64-bit range overflows (wraps), as with any native integer
+    accumulator.
 
   Range assign and the gcd/product monoids
     Alongside "range_add", the tree supports range_assign -- set every
-    position of a range to a constant in O(log n) (a second lazy tag,
-    composed correctly with "range_add"). It also offers two extra range
-    monoids, gcd and product.
+    position in a range to a constant in O(log n) (a second lazy tag, composed
+    correctly with "range_add"). It also offers two extra range monoids, gcd
+    and product.
 
-    These monoids come with a hard rule dictated by the math: gcd and
-    product cannot be maintained under "range_add" (there is no way to
-    recover the gcd or product of "{a+d, b+d, ...}" from the gcd/product of
-    "{a, b, ...}"). So "gcd" and "product" are exact only while the tree has
-    been built with assign/set updates only; the first "range_add" or "add"
-    permanently gates them off ("gcd"/ "product" then croak until "clear").
-    Use "$st->monoids_valid" to check. Point updates via "set" use assign
-    internally, so they keep the monoids valid. "product" additionally
-    croaks if the product of the queried range overflows a signed 64-bit
-    integer.
+    These monoids come with a hard mathematical restriction: gcd and product
+    cannot be maintained under "range_add" (there is no way to recover the gcd
+    or product of "{a+d, b+d, ...}" from the gcd/product of "{a, b, ...}"). So
+    "gcd" and "product" are exact only while the tree has seen assign/set
+    updates only; the first "range_add" or "add" permanently gates them off
+    ("gcd"/ "product" then croak until "clear"). Use "$st->monoids_valid" to
+    check. Point updates via "set" use assign internally, so they keep the
+    monoids valid. "product" additionally croaks if the product of the queried
+    range overflows a signed 64-bit integer.
 
-    On-disk format: version 0.02 widened the node to carry the assign tag
-    and the gcd/product aggregates, so a segment-tree file written by 0.01
-    cannot be opened by 0.02 (it is rejected on attach); rebuild it. These
-    trees are normally ephemeral compute structures, so this only matters if
-    you persisted one.
+    On-disk format: the on-disk layout changes between releases (0.02 widened
+    the node to carry the assign tag and the gcd/product aggregates; 0.03
+    added the reader-slots lock's occupancy bitmap), so a file written by an
+    older release is rejected on attach -- rebuild it. These trees are
+    normally ephemeral compute structures, so this only matters if you
+    persisted one.
 
 METHODS
   Constructors
@@ -80,12 +80,11 @@ METHODS
         my $st = Data::SegmentTree::Shared->new_from_fd($fd);
 
     $n is the number of positions (at least 1, up to 2^24); every position
-    starts at 0. Memory is "2 * next_pow2(n) * 64" bytes plus a fixed
-    header. "new" and "new_memfd" croak on a $n below 1 or above 2^24. When
-    reopening an existing file or memfd the stored $n wins and the caller's
-    argument is ignored. An optional file mode may be passed as the last
-    argument to "new" (e.g. 0660) for cross-user sharing; it defaults to
-    0600 (owner-only).
+    starts at 0. Memory is "2 * next_pow2(n) * 64" bytes plus a fixed header.
+    "new" and "new_memfd" croak on a $n below 1 or above 2^24. When reopening
+    an existing file or memfd the stored $n wins and the caller's argument is
+    ignored. An optional file mode may be passed as the last argument to "new"
+    (e.g. 0660) for cross-user sharing; it defaults to 0600 (owner-only).
 
   Updates
         $st->set($i, $value);              # position $i := $value
@@ -95,11 +94,11 @@ METHODS
 
     "set" assigns a single position; "add" adds a delta to a single position
     and returns its new value; "range_add" adds a delta to every position in
-    the inclusive range "[$l, $r]", and "range_assign" sets every position
-    in the range to a constant -- each in O(log n) via lazy propagation. All
-    indices are 0-based and croak if out of range; the range forms croak if
-    $l $r>. Note that "range_add"/"add" gate off the gcd/product monoids
-    (see below), while "set"/ "range_assign" do not.
+    the inclusive range "[$l, $r]", and "range_assign" sets every position in
+    the range to a constant -- each in O(log n) via lazy propagation. All
+    indices are 0-based and croak if out of range; the range forms croak if $l
+    $r>. "range_add"/"add" gate off the gcd/product monoids (see below);
+    "set"/ "range_assign" do not.
 
   Queries
         my $v = $st->get($i);          # value at position $i
@@ -111,12 +110,12 @@ METHODS
         my $p = $st->product($l, $r);  # product over [$l, $r] (assign/set-only trees)
 
     "get" returns a single position's value. "sum", "min", and "max" return
-    one aggregate over the inclusive range "[$l, $r]". "query" returns all
-    of them at once as a hash reference "{ sum, min, max, count }" ("count"
-    is "$r - $l + 1"), computed under a single read lock so the four values
-    are mutually consistent. "gcd" returns the greatest common divisor of
-    "|values|" over the range (0 for an all-zero range), and "product" their
-    product; both require an assign/set-only tree and croak once any
+    one aggregate over the inclusive range "[$l, $r]". "query" returns all of
+    them at once as a hash reference "{ sum, min, max, count }" ("count" is
+    "$r - $l + 1"), computed under a single read lock so the four values are
+    mutually consistent. "gcd" returns the greatest common divisor of
+    "|values|" over the range (0 for an all-zero range), and "product" returns
+    their product; both require an assign/set-only tree and croak once any
     "range_add"/"add" has run (see "Range assign and the gcd/product
     monoids"), and "product" also croaks on 64-bit overflow. Ranges croak if
     an index is out of range or $l $r>.
@@ -129,28 +128,38 @@ METHODS
         $st->path; $st->memfd; $st->sync; $st->unlink;
 
     "monoids_valid" reports whether "gcd"/"product" are currently usable
-    (false once a "range_add"/"add" has gated them off). "clear" resets
-    every position to 0 and re-enables the monoids. "sync" flushes the
-    mapping to its backing store (a no-op for anonymous and memfd trees);
-    "unlink" removes the backing file (also callable as
-    "Class->unlink($path)"); "path" returns the backing path ("undef" for
-    anonymous, memfd, or fd-reopened trees) and "memfd" the backing
-    descriptor.
+    (false once a "range_add"/"add" has gated them off). "clear" resets every
+    position to 0 and re-enables the monoids. "sync" flushes the mapping to
+    its backing store (a no-op for anonymous and memfd trees); "unlink"
+    removes the backing file (also callable as "Class->unlink($path)"); "path"
+    returns the backing path ("undef" for anonymous, memfd, or fd-reopened
+    trees) and "memfd" the backing descriptor. The descriptor "memfd" returns
+    is owned by the object and closed when the object is destroyed; do not
+    close it yourself. Pass it to another process (or "new_from_fd") while the
+    object is still alive.
 
 SHARING ACROSS PROCESSES
-    The tree lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file, an anonymous mapping inherited
-    across "fork", or a memfd passed to an unrelated process and reopened
-    with new_from_fd($fd). Every process's updates land in the one shared
-    array, and queries take only the read lock so many readers proceed
-    concurrently.
+    The tree lives in a shared mapping, exposed the same three ways as the
+    rest of the family: a backing file, an anonymous mapping inherited across
+    "fork", or a memfd passed to an unrelated process and reopened with
+    new_from_fd($fd). Every process's updates land in the one shared array,
+    and queries take only the read lock so many readers proceed concurrently.
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default; pass
-    an explicit octal mode (e.g. 0660) as the last argument to "new" for
-    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
-    and the header is validated on attach. Any process granted write access
-    is trusted not to corrupt the mapping.
+    Backing files are created with mode 0600 (owner-only) by default; pass an
+    explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing (the mode is masked to the permission bits 0777). The
+    file is opened with "O_NOFOLLOW" and "O_EXCL", and the header is validated
+    on attach. Any process granted write access is trusted not to corrupt the
+    mapping.
+
+    A descriptor passed to "new_from_fd" must be resize-sealed (a "memfd"
+    sealed against "F_SEAL_SHRINK"|"F_SEAL_GROW", as "new_memfd" produces) or
+    come from a trusted owner: a hostile donor that truncates the fd after it
+    is mapped can fault the reader with "SIGBUS" on a later access.
+    "new_from_fd" rejects a sealable fd that lacks both resize seals; a
+    non-sealable fd (e.g. a regular file) cannot carry seals and is accepted
+    on the caller's trust.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
@@ -159,24 +168,23 @@ CRASH SAFETY
     tree walk with no commit protocol, so a writer killed mid-update leaves
     that update partially applied: the tree can be left internally
     inconsistent (a later "query" may disagree with the individual "get"
-    values), and recovery neither detects nor repairs the torn update. Treat
-    a crash during a mutation as leaving the tree in an undefined state, and
+    values), and recovery neither detects nor repairs the torn update. Treat a
+    crash during a mutation as leaving the tree in an undefined state, and
     rebuild from a trusted source if you need consistency across crashes.
     Limitation: PID reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
 
 SEE ALSO
     Data::Fenwick::Shared (prefix sums / point updates), and the rest of the
@@ -186,6 +194,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

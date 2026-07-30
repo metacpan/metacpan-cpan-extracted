@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Callers 0.54;
+package Devel::MAT::Tool::Callers 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant CMD => "callers";
 use constant CMD_DESC => "Display the caller stack";
@@ -29,6 +32,8 @@ showing which functions have been called, and what their arguments were.
 =cut
 
 =head1 COMMANDS
+
+=for highlighter
 
 =head2 callers
 
@@ -53,10 +58,9 @@ Additionally show the contents of the active PAD at this depth.
 
 =cut
 
-sub run
+sub run ( $self, $optref )
 {
-   my $self = shift;
-   my %opts = %{ +shift };
+   my %opts = $optref->%*;
 
    my @contexts = $self->df->contexts;
    foreach my $idx ( 0 .. $#contexts ) {

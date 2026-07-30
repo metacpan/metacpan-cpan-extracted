@@ -2,7 +2,7 @@ package Zuzu::AST::Expr::Ternary;
 
 use utf8;
 
-our $VERSION = '0.007001';
+our $VERSION = '0.007002';
 
 use Moo;
 

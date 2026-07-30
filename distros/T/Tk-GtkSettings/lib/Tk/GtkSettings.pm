@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use File::Basename;
 use Config;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -776,8 +776,15 @@ sub initDefaults {
 	for (keys %mainoptions) {
 		groupOption('main', $_, $mainoptions{$_})
 	}
+
+	#adding the icontheme option
 	my $iconlib = gtkKey('gtk-icon-theme-name');
 	groupOption('main', 'iconTheme', $iconlib) if defined $iconlib;
+
+	#adding the guidecolor option
+	my $bg = gtkKey('content_view_bg');
+	my $gc = alterColor($bg, 70);
+	groupOption('main', 'guideColor', $gc);
 
 	my @cw = @contentwidgets;
 	my %co = %contentoptions;

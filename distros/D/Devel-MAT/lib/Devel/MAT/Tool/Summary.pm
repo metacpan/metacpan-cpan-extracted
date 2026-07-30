@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Summary 0.54;
+package Devel::MAT::Tool::Summary 0.55;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Devel::MAT::Tool );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use constant CMD => "summary";
 use constant CMD_DESC => "Print basic information about the loaded dumpfile";
@@ -23,6 +26,8 @@ dumpfile.
 
 =head1 COMANDS
 
+=for highlighter
+
 =cut
 
 =head2 summary
@@ -36,10 +41,8 @@ it, and the number of SVs it contains.
 
 =cut
 
-sub run
+sub run ( $self )
 {
-   my $self = shift;
-
    my $df = $self->df;
 
    Devel::MAT::Cmd->printf( "Perl memory dumpfile from perl %s %s\n",
