@@ -45,7 +45,7 @@ for my $doc (@doc_files) {
         my $raw = do { local $/; <FHS1> }; close FHS1;
         my $non_ascii = 0;
         for my $i (0 .. length($raw)-1) {
-            $non_ascii++ if ord(substr($raw,$i,1)) > 127;
+            $non_ascii++ if ord(substr($raw, $i, 1)) > 127;
         }
         ok($non_ascii > 0,
            "S1 - doc/ native script present [$lang]: $doc");

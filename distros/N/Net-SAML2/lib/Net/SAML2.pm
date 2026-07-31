@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2;
-our $VERSION = '0.85';
+our $VERSION = '0.88';
 
 require 5.012;
 
@@ -40,7 +40,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,24 @@ version 0.85
 
   # handle the POST back from the IdP, via the browser:
 
-        my $post = Net::SAML2::Binding::POST->new;
+        # Get the Assertion Consumer Service
+        # $acs->{Location} can then be used to specify the
+        # expected destination (you may choose other methods)
+
+        my $acs = first { $_->{Binding} eq 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST' }
+            @{ $sp->assertion_consumer_service };
+
+        # At least one of C<cacert> or C<cert_text> must be supplied at
+        # construction, unless C<insecure_trust_embedded_cert> is set.
+        # Without a C<cacert> or C<cert_text> the handle_response accepts
+        # whatever signing certificate the response embeds in its KeyInfo
+        # block, which is equivalent to no signature checking at all.
+        # Has no effect on the binding's signing path (C<sign_xml>).
+
+        my $post = Net::SAML2::Binding::POST->new(
+            cacert                      => "IdP-cacert.pem", # Optional for sign_xml()
+            insecure_trust_embedded_cert    => 0, Default - false require trust anchor
+        );
         my $ret = $post->handle_response(
                 $saml_response
         );
@@ -102,7 +119,9 @@ version 0.85
                 my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
                         xml         => decode_base64($saml_response),
                         key_file    => "SP-Private-Key.pem",    # Required for EncryptedAssertions
-                        cacert      => "IdP-cacert.pem",        # Required for EncryptedAssertions
+                        cacert      => "IdP-cacert.pem",        # Required unless insecure_trust_embedded_cert is true
+                        issuer      => $idp->{entity_id},       # Maybe required in the future
+                        destination => $acs->{Location},        # Maybe required in the future
                 );
 
                 # ...

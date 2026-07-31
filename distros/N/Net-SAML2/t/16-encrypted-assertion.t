@@ -29,6 +29,46 @@ lives_ok(
     '$sp->handle_response works'
 );
 
+# Trust-anchor enforcement on the encrypted-assertion path.
+#
+# Without a cacert configured on new_from_xml,
+# _verify_encrypted_assertion previously short-circuited and accepted
+# the KeyInfo-embedded signing certificate. new_from_xml now refuses
+# unless the caller explicitly opts out via insecure_trust_embedded_cert.
+
+throws_ok(sub {
+    Net::SAML2::Protocol::Assertion->new_from_xml(
+        xml      => decode_base64($response),
+        key_file => 't/encrypted-sign-private.pem',
+        # no cacert
+    );
+}, qr/'cacert' or 'cert_text' is required to verify/, 'encrypted assertion without cacert croaks');
+
+lives_ok(sub {
+    Net::SAML2::Protocol::Assertion->new_from_xml(
+        xml                      => decode_base64($response),
+        key_file                 => 't/encrypted-sign-private.pem',
+        insecure_trust_embedded_cert => 1,
+    );
+}, 'explicit insecure_trust_embedded_cert opt-out lets encrypted assertion through');
+
+# require_signed_assertion: when set, the decrypted assertion must
+# carry a <dsig:Signature>. The existing fixture is a signed encrypted
+# assertion, so this is the positive case (does not regress).
+lives_ok(sub {
+    Net::SAML2::Protocol::Assertion->new_from_xml(
+        xml                      => decode_base64($response),
+        key_file                 => 't/encrypted-sign-private.pem',
+        cacert                   => 't/keycloak-cacert.pem',
+        require_signed_assertion => 1,
+    );
+}, 'require_signed_assertion accepts a properly signed encrypted assertion');
+
+# Negative case (unsigned encrypted assertion + require_signed_assertion
+# => 1 should croak) would need an unsigned-encrypted-assertion fixture
+# that is not present in this test data. To be added when such a
+# fixture lands; the code path is the one above with the new croak.
+
 my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
                         xml => decode_base64($response),
                         key_file => 't/encrypted-sign-private.pem',

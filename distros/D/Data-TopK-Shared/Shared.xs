@@ -10,6 +10,7 @@
         croak("Expected a Data::TopK::Shared object"); \
     TkHandle *h = INT2PTR(TkHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::TopK::Shared object"); \
+    TkHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -19,8 +20,10 @@
  * explicit DESTROY, so the local `h` would dangle.  Used only where magic
  * can actually intervene between EXTRACT and the first use of h. */
 #define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::TopK::Shared object was replaced during the call"); \
     h = INT2PTR(TkHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::TopK::Shared object destroyed during the call")
+    if (h != h0) croak("Data::TopK::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -201,6 +204,7 @@ add_many(self, items)
     if (!SvROK(items) || SvTYPE(SvRV(items)) != SVt_PVAV)
         croak("Data::TopK::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(items);
+    sv_2mortal(SvREFCNT_inc((SV *)av));   /* pin the arrayref: element magic below cannot free it mid-loop */
     top = av_len(av);                     /* last index, -1 if empty */
     {
         STRLEN cnt = (top >= 0) ? (STRLEN)(top + 1) : 0, i;

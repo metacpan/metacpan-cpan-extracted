@@ -18,7 +18,8 @@ my %WriteMakefile=(
     MIN_PERL_VERSION => '5.006',
     PREREQ_PM        => {
         'WebDyne' => 0,
-        'PAGI'   => 0
+        'PAGI::Server'   => 0,
+        'PAGI::Tools'    => 0
     },
     TEST_REQUIRES    => {
         'Test::More' => 0,

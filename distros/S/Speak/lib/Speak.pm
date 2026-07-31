@@ -15,7 +15,7 @@ Andrew DeFaria <Andrew@DeFaria.com>
 
 =item Revision
 
-$Revision: 1.02 $
+$Revision: 1.03 $
 
 =item Created
 
@@ -50,7 +50,7 @@ use base 'Exporter';
 
 use Clipboard;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 {
 
@@ -161,6 +161,8 @@ sub _split_text ($text) {
   my @sentences;
   while (length $text) {
     if ($text =~ s/^(.{1,100}?(?:[.!?;]|$))//) {
+      push @sentences, $1;
+    } elsif ($text =~ s/^(.{1,100})\s//) {
       push @sentences, $1;
     } else {
       # Fallback: force-slice the first 100 characters if no punctuation is found within 100 chars
@@ -342,6 +344,7 @@ Returns:
 
   my @sentences = _split_text ($msg);
   my @mp3_files;
+  my @valid_sentences;
 
   foreach my $sentence (@sentences) {
     next unless $sentence =~ /\S/;
@@ -355,6 +358,7 @@ Returns:
     close $fh;
 
     push @mp3_files, $filename;
+    push @valid_sentences, $sentence;
   } ## end foreach my $sentence (@sentences)
 
   if (@mp3_files) {
@@ -366,6 +370,22 @@ Returns:
     # Concatenate using sox if multiple files
     my $final_file;
     if (@mp3_files > 1) {
+      # Trim boundary silences for artificial (non-punctuation) splits
+      for (my $i = 0; $i < $#mp3_files; $i++) {
+        my $sentence = $valid_sentences[$i];
+        if ($sentence !~ /[.!?;]$/) {
+          # Trim trailing silence of $mp3_files[$i]
+          my ($fh_t, $trimmed_t) = tempfile (SUFFIX => '.mp3', UNLINK => 0);
+          close $fh_t;
+          if (system ("sox \"$mp3_files[$i]\" \"$trimmed_t\" reverse silence 1 0.01 1% reverse") == 0) {
+            unlink $mp3_files[$i];
+            $mp3_files[$i] = $trimmed_t;
+          } else {
+            unlink $trimmed_t;
+          }
+        }
+      }
+
       my ($fh, $joined) = tempfile (SUFFIX => '.mp3', UNLINK => 0);
       close $fh;
       $final_file = $joined;

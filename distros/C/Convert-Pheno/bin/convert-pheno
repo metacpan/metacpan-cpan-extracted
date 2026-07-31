@@ -34,8 +34,7 @@ use Convert::Pheno::IO::Atomic qw(
   discard_staged_path
   write_atomically
 );
-use Convert::Pheno::IO::CSVHandler;
-use Convert::Pheno::OMOP::Definitions;
+use Convert::Pheno::Sink::FileSet qw(resolve_entity_output_file);
 
 $Data::Dumper::Sortkeys = 1;
 
@@ -57,7 +56,8 @@ Usage:
   convert-pheno -ipxf <infile> -obff --entities <list> --out-dir <dir> [options]
 
 Common input flags:
-  -i <type> <file>    Generic input form (pxf|bff|omop|redcap|cdisc|csv|openehr)
+  -i <type> <file>    Generic input form
+                      (pxf|bff|omop|redcap|cdisc-odm|dataset-json|fhir|csv|openehr)
   -ibff <file>      Beacon v2 Models ('individuals' JSON|YAML)
   -ipxf <file>      Phenopackets v2 (JSON|YAML)
   -iomop <files...> OMOP-CDM CSV files or PostgreSQL dump
@@ -65,7 +65,13 @@ Common input flags:
                     Experimental openEHR canonical JSON/YAML compositions
                     (currently EHRbase-oriented; input-only; BFF/PXF output)
   -iredcap <file>   REDCap export CSV
-  -icdisc <file>    CDISC-ODM XML
+  -icdisc-odm <file>
+                    CDISC-ODM XML
+  -idataset-json <files...>
+                    Experimental CDISC Dataset-JSON v1.1 SDTM datasets
+                    (input-only; loaded in memory; BFF, PXF, or OMOP output)
+  -ifhir <files...>  Experimental FHIR R4 JSON Bundles
+                    (input-only; loaded in memory; BFF, PXF, or OMOP output)
   -icsv <file>      Raw CSV
 
 Common output flags:
@@ -83,8 +89,8 @@ Output behavior:
   --out-dir <dir>       Output directory (required for entity-aware BFF mode)
   --entities <list>     Beacon entities for BFF output [individuals]
                         Supported: individuals, biosamples, datasets, cohorts
-                        biosamples are emitted from -ipxf when present, or
-                        from -iomop when the SPECIMEN table is provided
+                        biosamples are emitted from -ipxf, FHIR Specimen,
+                        OMOP SPECIMEN, or beacon.biosamples mapping rules
                         datasets and cohorts are synthesized from individuals
                         Use with -obff and --out-dir
   --out-name k=file     Override one multi-file output name; repeat as needed
@@ -92,7 +98,8 @@ Output behavior:
   -O                    Overwrite output file(s)
 
 Mapping and search:
-  --mapping-file <file>           Fields mapping YAML or JSON file
+  --mapping-file <file>           Mapping V2 YAML or JSON file targeting
+                                  Beacon schema 2.0.0
   --redcap-dictionary|-rcd <file> REDCap data dictionary CSV file
   --schema-file <file>            Alternative JSON Schema for mapping files
   --self-validate-schema|-svs     Self-validate the mapping JSON Schema
@@ -150,6 +157,13 @@ Examples:
   convert-pheno -ipxf pxf.json -obff --entities individuals biosamples --out-dir out/ --out-name biosamples=samples.json
   convert-pheno -ipxf pxf.json -obff --entities individuals datasets cohorts --out-dir out/
   convert-pheno -icsv data.csv --mapping-file mapping.yaml -obff --entities individuals datasets cohorts --out-dir out/
+  convert-pheno -iredcap data.csv -rcd dictionary.csv --mapping-file mapping.yaml -obff --entities individuals biosamples --out-dir out/
+  convert-pheno -idataset-json dm.json mh.json lb.json -obff individuals.json
+  convert-pheno -i dataset-json dm.json mh.json lb.json -o pxf phenopackets.json
+  convert-pheno -idataset-json dm.json mh.json lb.json -oomop --out-dir omop_out/ --ohdsi-db
+  convert-pheno -ifhir bundle.json -obff individuals.json
+  convert-pheno -ifhir bundle.json -obff --entities individuals biosamples --out-dir out/
+  convert-pheno -i fhir bundle.json -o pxf phenopacket.json
   convert-pheno -iomop PERSON.csv CONCEPT.csv SPECIMEN.csv -obff --entities biosamples --out-dir out/
   convert-pheno -ibff individuals.json -oomop --out-dir omop_out/
   convert-pheno -ibff individuals.json -oomop --out-dir omop_out/ --out-name PERSON=patients.csv
@@ -168,6 +182,8 @@ BFF output modes:
   PXF output still defaults subject.vitalStatus to ALIVE unless a preserved
   source vitalStatus or --default-vital-status is available.
   openEHR input support is currently experimental and limited to BFF or PXF output.
+  Dataset-JSON input support is experimental, SDTM-oriented, and processed in memory.
+  FHIR input support is experimental, targets R4 JSON Bundles, and is processed in memory.
 
 Docs:
   Site:  https://cnag-biomedical-informatics.github.io/convert-pheno
@@ -266,7 +282,7 @@ sub convert {
         || ( $l_data->{entities}[0] || 'individuals' ) ne 'individuals'
       );
 
-    maybe_warn_legacy_pxf_biosamples( $l_data, $entity_mode );
+    maybe_warn_single_file_pxf_biosamples( $l_data, $entity_mode );
     prepare_output_targets( $l_data, $o_file, $entity_mode );
 
     # Start verbose
@@ -281,7 +297,7 @@ sub convert {
     print BOLD GREEN program_footer(), RESET if $verbose;
 }
 
-sub maybe_warn_legacy_pxf_biosamples {
+sub maybe_warn_single_file_pxf_biosamples {
     my ( $l_data, $entity_mode ) = @_;
 
     return if $entity_mode;
@@ -402,95 +418,23 @@ sub run_conversion_to_atomic_output {
 
 sub write_conversion_result {
     my ( $l_data, $o_file, $data, $bundle ) = @_;
-    my $method = $l_data->{method};
-
-    if ($bundle) {
-        for my $entity ( @{ $l_data->{entities} } ) {
-            my $entity_file = resolve_entity_output_file( $l_data, $entity );
-            say BOLD GREEN "Writing <$entity_file> file\n", RESET if $verbose;
-            write_atomically(
-                $entity_file,
-                sub {
-                    my ($staged) = @_;
-                    io_yaml_or_json(
-                        {
-                            filepath => $staged,
-                            mode     => 'write',
-                            data     => $bundle->entities($entity),
-                        }
-                    );
-                }
-            );
-        }
-        return;
-    }
-
-    return unless $data;
-
-    say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
-
-    if ( $method eq 'bff2csv' || $method eq 'pxf2csv' ) {
-        write_atomically(
-            $o_file,
-            sub {
-                my ($staged) = @_;
-                write_csv(
-                    {
-                        sep      => $l_data->{sep} // ';',
-                        filepath => $staged,
-                        headers  => get_headers($data),
-                        data     => $data,
-                    }
-                );
-            }
-        );
-        return;
-    }
-
-    if ( $method =~ /2omop$/ ) {
-        for my $table ( sort keys %$data ) {
-            my $filepath = resolve_omop_table_output_file( $l_data, $table );
-            ask_overwrite($filepath) unless $overwrite;
-            my @headers  = @{ $omop_headers->{$table} };
-            write_atomically(
-                $filepath,
-                sub {
-                    my ($staged) = @_;
-                    write_csv(
-                        {
-                            sep      => ";",
-                            filepath => $staged,
-                            headers  => \@headers,
-                            data     => $data->{$table},
-                        }
-                    );
-                }
-            );
-        }
-        return;
-    }
-
-    write_atomically(
-        $o_file,
-        sub {
-            my ($staged) = @_;
-            io_yaml_or_json(
-                {
-                    filepath => $staged,
-                    mode     => 'write',
-                    data     => $data,
-                }
-            );
+    my $sink = Convert::Pheno::Sink::FileSet->new(
+        {
+            request  => $l_data,
+            out_file => $o_file,
+            before_write => sub {
+                my ($path) = @_;
+                ask_overwrite($path) unless $overwrite;
+                return 1;
+            },
+            on_write => sub {
+                my ($path) = @_;
+                say BOLD GREEN "Writing <$path> file\n", RESET if $verbose;
+                return 1;
+            },
         }
     );
-}
-
-sub resolve_omop_table_output_file {
-    my ( $l_data, $table ) = @_;
-    return $l_data->{output_name_overrides}{$table}
-      if exists $l_data->{output_name_overrides}
-      && exists $l_data->{output_name_overrides}{$table};
-    return catfile( $l_data->{out_dir}, $table . '.csv' );
+    return $sink->write_result( data => $data, bundle => $bundle );
 }
 
 sub program_header {
@@ -518,7 +462,7 @@ EOF
 sub program_body {
     my $l_data = shift;
     my $file =
-      $l_data->{method} =~ m/^omop/
+      @{ $l_data->{in_files} || [] }
       ? join ',', @{ $l_data->{in_files} }
       : $l_data->{in_file};
     my $msg = <<EOF;
@@ -605,12 +549,4 @@ sub ask_overwrite {
         }
         die "Too many invalid attempts. Operation aborted.\n";
     }
-}
-
-sub resolve_entity_output_file {
-    my ( $l_data, $entity ) = @_;
-    return $l_data->{output_name_overrides}{$entity}
-      if exists $l_data->{output_name_overrides}
-      && exists $l_data->{output_name_overrides}{$entity};
-    return catfile( $l_data->{out_dir}, $entity . '.json' );
 }

@@ -1,28 +1,21 @@
 use strict;
 use warnings;
+use lib qw(./lib ../lib t/lib);
 use FindBin qw($Bin);
 use File::Spec::Functions qw(catfile);
-use IPC::Open3;
 use JSON::XS;
-use Symbol qw(gensym);
 use Test::More;
+use Test::ConvertPheno qw(load_json_file run_command_capture);
 
 my $script = catfile( $Bin, '..', 'api', 'perl', 'json_bridge.pl' );
 my $json   = JSON::XS->new->canonical;
 
 sub run_bridge {
     my ($payload) = @_;
-    my $stderr = gensym;
-    my $pid = open3( my $in, my $out, $stderr, $^X, $script );
-    print {$in} $payload if defined $payload;
-    close $in;
-
-    local $/;
-    my $stdout = <$out>;
-    my $err    = <$stderr>;
-
-    waitpid( $pid, 0 );
-    return ( $? >> 8, $stdout // q{}, $err // q{} );
+    return run_command_capture(
+        command => [ $^X, $script ],
+        stdin   => $payload,
+    );
 }
 
 my ( $exit_ok, $stdout_ok, $stderr_ok ) = run_bridge(
@@ -49,6 +42,24 @@ is( $stderr_ok, q{}, 'bridge keeps stderr empty on success' );
 my $decoded = eval { $json->decode($stdout_ok) };
 ok( !$@, 'bridge returns valid JSON on success' );
 is( $decoded->{id}, 'P0007500', 'bridge returns converted BFF payload' );
+
+my ( $exit_fhir, $stdout_fhir, $stderr_fhir ) = run_bridge(
+    $json->encode(
+        {
+            method => 'fhir2bff',
+            data   => load_json_file('t/fhir2bff/in/patient-bundle.json'),
+            test   => 1,
+        }
+    )
+);
+is( $exit_fhir, 0, 'bridge accepts an in-memory FHIR Bundle' );
+is( $stderr_fhir, q{}, 'FHIR bridge conversion keeps stderr empty' );
+my $fhir = eval { $json->decode($stdout_fhir) };
+is(
+    $fhir->[0]{id},
+    '5b24c87b-6223-f5b4-51e9-82051159bd1d',
+    'Python bridge exposes fhir2bff'
+);
 
 my ( $exit_missing_method, undef, $stderr_missing_method ) =
   run_bridge( $json->encode( { data => {} } ) );

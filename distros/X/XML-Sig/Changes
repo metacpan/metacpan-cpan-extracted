@@ -1,5 +1,27 @@
 Revision history for XML-Sig
 
+0.71 -- Thu Jul 30 22:50:01 ADT 2026
+
+  [Notable Changes]
+  Security Fixes CVE-2026-9487 and CVE-2026-9390
+  CVE-2026-9390 enforces a subset of the characters allowed in an ID
+  CVE-2026-9487 rejects signature checking if the ID references multiple nodes
+
+  [Change Log]
+  - 7ac376f Update the release to use sigstore for signing
+  - 7385a2a Update contact email address (replace cpan.org)
+  - c0dd9f5 Update the build items dependencies and version
+  - e59c13b Document the allowed characters in an ID
+  - 4976bde Reject Duplicate IDs in XML document (CVE-2026-9487)
+  - ef7a52b Fix some invalid characters in the array
+  - f92a5b5 UTF8 in XML needs to be encoded to avoid Wide character errors
+  - 9f54cb8 Add a mailmap file
+  - a85aad2 improve the regex
+  - 69ad2b4 Enforce the ID format as per the specification Reject any XML ids with invalid characters (CVE-2026-9390)
+  - abd726a use  instead of ->{parser} when called multiple times
+  - 92970ff _load_key should not return anything
+  - 1532383 v0.70
+
 0.70 -- Sun Apr 12 16:03:32 ADT 2026
 
   [Notable Changes since 0.69]

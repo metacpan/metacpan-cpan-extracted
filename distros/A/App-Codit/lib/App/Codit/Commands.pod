@@ -1,4 +1,4 @@
-=head1 NAME 
+=head1 NAME
 
 App::Codit::Commands - Overview of available commands
 
@@ -14,7 +14,7 @@ A command can be executed as follows:
  my $result = $app->cmdExecute('command_name', @options)
  my @result = $app->cmdExecute('command_name', @options)
 
-Generated: Sat Mar 29 08:32:06 2025
+Generated: Wed Jul 29 21:10:40 2026
 
 =head1 COMMANDS
 
@@ -134,6 +134,10 @@ Returns a boolean for succes or failure.
 Takes a filename as parameter and opens it in deferred state.
 If no parameter is specified a file dialog is issued.
 Returns a boolean for succes or failure.
+
+=item B<doc_patch> in L<App::Codit::Ext::CoditMDI>
+
+Invokes a dialog where you can select a diff file to patch the current document.
 
 =item B<doc_remove_trailing> in L<App::Codit::Ext::CoditMDI>
 

@@ -1,5 +1,9 @@
 Release history for Getopt-Guided
 
+v3.2.2    2026-07-31T07:02:33Z
+          - Change $VERSION assignment to overcome deficits of
+            some static "our $VERSION" line parsers
+
 v3.2.1    2026-07-30T05:24:49Z
           - Cleanup cpanfile setup
           - Catch exception raised by callback destination call

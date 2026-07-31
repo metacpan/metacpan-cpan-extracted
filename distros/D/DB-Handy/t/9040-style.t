@@ -21,7 +21,8 @@ plan_tests(count_E($ROOT) + count_K($ROOT));
 
 check_E($ROOT);
 
-# DB-Handy specific K3 exempt variables: %sch %outer_row %opts %attr
-check_K($ROOT, k3_exempt => 'sch\b|outer_row\b|opts\b|attr\b');
+# The default K3 exemption (env, opts, args) is sufficient: lib/DB/Handy.pm
+# no longer takes a reference to a named hash anywhere in its code.
+check_K($ROOT);
 
 END { end_testing() }

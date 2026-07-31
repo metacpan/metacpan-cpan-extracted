@@ -43,6 +43,6 @@
          "url" : "https://github.com/rhuss/schedule-cron"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

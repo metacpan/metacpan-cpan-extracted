@@ -68,8 +68,12 @@ my @cases = (
 );
 
 for my $case (@cases) {
+    my $suffix = $case->{writer} eq 'csv'
+      ? '.csv'
+      : $case->{out_file} =~ /\.ya?ml$/ ? '.yaml'
+      : '.json';
     my $tmp_file = temp_output_file(
-        suffix => $case->{writer} eq 'csv' ? '.csv' : '.json'
+        suffix => $suffix,
     );
 
     my $convert = build_convert(
@@ -84,8 +88,6 @@ for my $case (@cases) {
         write_csv_rows( $tmp_file, $headers, $data );
     }
     else {
-        my $suffix = $case->{out_file} =~ /\.ya?ml$/ ? '.yaml' : '.json';
-        $tmp_file =~ s/\.[^.]+$/$suffix/;
         write_json_file( $tmp_file, $convert->${ \$case->{method} } );
     }
 
@@ -252,6 +254,13 @@ for my $case (@cases) {
                     },
                 },
             },
+            {
+                assayCode => { id => 'LOINC:94531-1', label => 'Result' },
+                measurementValue => {
+                    id    => 'NCIT:C38757',
+                    label => 'Negative',
+                },
+            },
         ],
     };
 
@@ -283,6 +292,7 @@ for my $case (@cases) {
     is( $got->{measurements}[0]{timeObserved}{age}{iso8601duration}, 'P2Y', 'bff2pxf wraps observationMoment back into timeObserved' );
     is( $got->{measurements}[0]{complexValue}{typedQuantities}[0]{type}{id}, 'NCIT:C25208', 'bff2pxf restores quantityType to type inside complexValue' );
     is( $got->{measurements}[1]{timeObserved}{timestamp}, '2021-09-24T00:00:00Z', 'bff2pxf derives timeObserved from Beacon measure date when needed' );
+    is( $got->{measurements}[2]{value}{ontologyClass}{id}, 'NCIT:C38757', 'bff2pxf wraps categorical measurement values as Phenopackets ontologyClass values' );
 
     is( $bff->{phenotypicFeatures}[0]{featureType}{id}, 'HP:0000118', 'bff2pxf does not mutate the input BFF record' );
 }

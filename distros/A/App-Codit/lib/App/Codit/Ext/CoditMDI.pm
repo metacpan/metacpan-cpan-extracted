@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.19';
+$VERSION = '0.23';
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -154,6 +154,10 @@ Returns the begin and end index of the current selection.
 
 Returns the text in the current selected document from index $begin to index $end.
 
+=item B<doc_patch>
+
+Invokes a dialog where you can select a diff file to patch the current document.
+
 =item B<doc_remove_trailing>
 
 Removes spaces at the end of each line.
@@ -236,6 +240,7 @@ sub new {
 		doc_fix_indent => ['docFixIndent', $self],
 		doc_get_sel => ['docGetSel', $self],
 		doc_get_text => ['docGetText', $self],
+		doc_patch => ['docPatch', $self],
 		doc_remove_trailing => ['docRemoveTrailing', $self],
 		doc_replace => ['docPopFindReplace', $self, 0],
 		doc_wrap => ['docWrap', $self],
@@ -502,6 +507,69 @@ sub docGetText {
 	my $doc = $self->docSelected;
 	return unless defined $doc;
 	return $self->docGet($doc)->get(@_);
+}
+
+sub docPatch {
+	my $self = shift;
+	my $dialog = $self->YADialog(
+		-title => 'Patch',
+		-buttons => ['Ok', 'Cancel'],
+	);
+
+	my @padding = (-padx => 2, -pady => 2);
+	my $f = $dialog->Frame->pack(-fill => 'x');
+	$f->Label(
+		-text => 'File:',
+		-width => 6,
+		-anchor => 'e',
+	)->pack(-side => 'left');
+	my $e = $f->Entry(
+		-width => 40,
+	)->pack(@padding, -side => 'left');
+	$f->Button(
+		-relief => 'flat',
+		-image => $self->getArt('document-open', 22),
+		-text => 'Select',
+		-command => sub {
+			my ($file) = $self->pickFileOpen;
+			if (defined $file) {
+				$e->delete('0', 'end');
+				$e->insert('end', $file)
+			}
+		},
+	)->pack(@padding, -side => 'left');
+
+	my $m = $dialog->Frame->pack(-fill => 'x');
+	$m->Label(
+		-text => 'Style:',
+		-width => 6,
+		-anchor => 'e',
+	)->pack(-side => 'left');
+	my $style = 'Unified';
+	my $mb = $m->Menubutton(
+		-anchor => 'w',
+		-textvariable => \$style,
+	)->pack(@padding, -side => 'left', -fill => 'x');
+	my @menu = ();
+	for ('Unified', 'Context', 'OldStyle') {
+		my $operation = $_;
+		push @menu, [command => $operation,
+			-command => sub { $style = $operation },
+		];
+	}
+	$mb->configure(-menu => $mb->Menu(
+		-menuitems => \@menu,
+	));
+	
+	my $result = $dialog->show(
+		-popover => $self->toplevel,
+	);
+	if ($result eq 'Ok') {
+		my $file = $e->get;
+		my $txt = $self->docWidget;
+		$txt->patchdiff($file, $style) if -e $file;
+	}
+	$dialog->destroy
 }
 
 sub docOption {
@@ -793,6 +861,7 @@ sub MenuItems {
 		[ 'menu_check',     'Tools::',          'A~uto complete',        undef,   '-doc_autocomplete', undef, 0, 1],
 		[ 'menu_radio_s',   'Tools::',          '~Wrap',  [qw/char word none/],  undef, '-doc_wrap'],
 		[ 'menu_separator', 'Tools::',          't1' ],
+		[ 'menu_normal',    'Tools::',          '~Patch',                    'doc_patch',],
 		[ 'menu_normal',    'Tools::',          'R~emove trailing spaces',   'doc_remove_trailing',],
 		[ 'menu_normal',    'Tools::',          'F~ix indentation',   'doc_fix_indent',],
 	);

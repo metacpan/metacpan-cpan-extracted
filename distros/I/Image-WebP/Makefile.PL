@@ -1,92 +1,44 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
-use ExtUtils::MakeMaker;
 use Config;
+use ExtUtils::MakeMaker;
+use File::Spec;
 
-my @linux_objs = (
-'webp-src/src/dsp/libwebpdsp_la-cpu.o',
-'webp-src/src/dsp/libwebpdsp_la-dec.o',
-'webp-src/src/dsp/libwebpdsp_la-lossless.o',
-'webp-src/src/dsp/libwebpdsp_la-upsampling_neon.o',
-'webp-src/src/dsp/libwebpdsp_la-upsampling.o',
-'webp-src/src/dsp/libwebpdsp_la-upsampling_sse2.o',
-'webp-src/src/dsp/libwebpdsp_la-dec_neon.o',
-'webp-src/src/dsp/libwebpdsp_la-dec_sse2.o',
-'webp-src/src/dsp/libwebpdsp_la-enc.o',
-'webp-src/src/dsp/libwebpdsp_la-yuv.o',
-'webp-src/src/dsp/libwebpdsp_la-enc_neon.o',
-'webp-src/src/dsp/libwebpdsp_la-enc_sse2.o',
-'webp-src/src/enc/libwebpencode_la-alpha.o',
-'webp-src/src/enc/libwebpencode_la-iterator.o',
-'webp-src/src/enc/libwebpencode_la-webpenc.o',
-'webp-src/src/enc/libwebpencode_la-analysis.o',
-'webp-src/src/enc/libwebpencode_la-picture.o',
-'webp-src/src/enc/libwebpencode_la-token.o',
-'webp-src/src/enc/libwebpencode_la-vp8l.o',
-'webp-src/src/enc/libwebpencode_la-histogram.o',
-'webp-src/src/enc/libwebpencode_la-frame.o',
-'webp-src/src/enc/libwebpencode_la-tree.o',
-'webp-src/src/enc/libwebpencode_la-config.o',
-'webp-src/src/enc/libwebpencode_la-cost.o',
-'webp-src/src/enc/libwebpencode_la-filter.o',
-'webp-src/src/enc/libwebpencode_la-layer.o',
-'webp-src/src/enc/libwebpencode_la-backward_references.o',
-'webp-src/src/enc/libwebpencode_la-quant.o',
-'webp-src/src/enc/libwebpencode_la-syntax.o',
-'webp-src/src/dec/libwebpdecode_la-idec.o',
-'webp-src/src/dec/libwebpdecode_la-layer.o',
-'webp-src/src/dec/libwebpdecode_la-quant.o',
-'webp-src/src/dec/libwebpdecode_la-frame.o',
-'webp-src/src/dec/libwebpdecode_la-io.o',
-'webp-src/src/dec/libwebpdecode_la-webp.o',
-'webp-src/src/dec/libwebpdecode_la-alpha.o',
-'webp-src/src/dec/libwebpdecode_la-buffer.o',
-'webp-src/src/dec/libwebpdecode_la-vp8l.o',
-'webp-src/src/dec/libwebpdecode_la-tree.o',
-'webp-src/src/dec/libwebpdecode_la-vp8.o',
-'webp-src/src/utils/rescaler.o',
-'webp-src/src/utils/bit_reader.o',
-'webp-src/src/utils/color_cache.o',
-'webp-src/src/utils/filters.o',
-'webp-src/src/utils/huffman.o',
-'webp-src/src/utils/bit_writer.o',
-'webp-src/src/utils/huffman_encode.o',
-'webp-src/src/utils/quant_levels.o',
-'webp-src/src/utils/utils.o',
-'webp-src/src/utils/quant_levels_dec.o',
-'webp-src/src/utils/thread.o'
-);
-
-my $ldd_flags;
-if (! ($Config{osname} =~ /Win/)) {
-	chdir("webp-src");
-	system("./configure --disable-shared");
-	system("make");
-	chdir("..");
-
-	$ldd_flags = " -lpthread " . join(" ", @linux_objs);
-}
-else {
-	my @objs = <precompiled\\win32\\*.o>;
-	$ldd_flags = " " . join(" ", @objs) . " ";
+sub pkg_config {
+    my (@args) = @_;
+    open my $pipe, '-|', 'pkg-config', @args
+        or die "pkg-config is required to locate system libwebp: $!\n";
+    local $/;
+    my $output = <$pipe>;
+    close $pipe
+        or die "pkg-config could not locate system libwebp\n";
+    $output =~ s/\s+\z//;
+    return $output;
 }
 
+my $webp_cflags = pkg_config('--cflags', 'libwebp');
+my $webp_libs = pkg_config('--libs', 'libwebp');
 
+if ($^O eq 'MSWin32' && $Config{'cc'} =~ /gcc/i) {
+    my $libdir = pkg_config('--variable=libdir', 'libwebp');
+    my $import_library = File::Spec->catfile($libdir, 'libwebp.a');
+    $webp_libs = $import_library if -f $import_library;
+}
 
 WriteMakefile(
     NAME             => 'Image::WebP',
     AUTHOR           => q{Zargener <zargener@gmail.com>},
     VERSION_FROM     => 'lib/Image/WebP.pm',
     ABSTRACT_FROM    => 'lib/Image/WebP.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'artistic_2',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-        'Test::More' => 0,
+        'Test::More' => 0.88,
     },
     PREREQ_PM => {
         #'ABC'              => 1.6,
@@ -94,5 +46,6 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Image-WebP-*' },
-    LDDLFLAGS => $Config{lddlflags} . $ldd_flags
+    INC   => $webp_cflags,
+    LIBS  => [$webp_libs],
 );

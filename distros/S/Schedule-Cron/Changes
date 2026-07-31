@@ -1,3 +1,8 @@
+1.07        2026-07-30
+
+- Fixed a race condition and incorrect failure message in the process name
+  tests (#13)
+
 1.06        2026-07-20
 
 - Updated the DST fallback test to use America/Los_Angeles instead of the

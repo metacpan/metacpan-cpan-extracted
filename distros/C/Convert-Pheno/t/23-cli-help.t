@@ -136,6 +136,86 @@ is(
     'CLI parser accepts generic -o omop without an output prefix'
 );
 
+my @datasetjson_files = sort glob 't/datasetjson2bff/in/*.json';
+$request = build_cli_request(
+    argv => [
+        '-i', 'dataset-json',
+        @datasetjson_files,
+        '-o', 'pxf',
+        'phenopackets.json',
+    ],
+    usage_error => sub { die @_ },
+    schema_file => 'share/schema/mapping.json',
+    out_dir     => $tmpdir,
+    color       => 1,
+);
+
+is( $request->{data}{method}, 'datasetjson2pxf', 'CLI parser accepts Dataset-JSON input' );
+is_deeply(
+    $request->{data}{in_files},
+    \@datasetjson_files,
+    'CLI parser retains every Dataset-JSON domain file'
+);
+
+$request = build_cli_request(
+    argv => [
+        '-idataset-json', @datasetjson_files,
+        '-oomop',
+        '--out-dir', $tmpdir,
+        '--ohdsi-db',
+    ],
+    usage_error => sub { die @_ },
+    schema_file => 'share/schema/mapping.json',
+    out_dir     => '.',
+    color       => 1,
+);
+
+is(
+    $request->{data}{method},
+    'datasetjson2omop',
+    'CLI parser accepts Dataset-JSON to OMOP output'
+);
+
+$request = build_cli_request(
+    argv => [
+        '-i', 'fhir',
+        't/fhir2bff/in/patient-bundle.json',
+        '-o', 'pxf',
+        'phenopacket.json',
+    ],
+    usage_error => sub { die @_ },
+    schema_file => 'share/schema/mapping.json',
+    out_dir     => $tmpdir,
+    color       => 1,
+);
+
+is( $request->{data}{method}, 'fhir2pxf', 'CLI parser accepts generic FHIR input' );
+is_deeply(
+    $request->{data}{in_files},
+    ['t/fhir2bff/in/patient-bundle.json'],
+    'CLI parser retains FHIR Bundle files'
+);
+
+$request = build_cli_request(
+    argv => [
+        '-ifhir', 't/fhir2bff/in/patient-bundle.json',
+        '-obff',
+        '--entities', 'biosamples',
+        '--out-dir', $tmpdir,
+    ],
+    usage_error => sub { die @_ },
+    schema_file => 'share/schema/mapping.json',
+    out_dir     => '.',
+    color       => 1,
+);
+
+is( $request->{data}{method}, 'fhir2bff', 'CLI parser accepts compact FHIR input' );
+is_deeply(
+    $request->{data}{entities},
+    ['biosamples'],
+    'CLI parser accepts FHIR biosample output'
+);
+
 my $usage_error;
 eval {
     build_cli_request(
@@ -179,6 +259,27 @@ like(
     $usage_error,
     qr/no longer accepts a prefix/,
     'CLI parser prints a focused error for the removed -oomop PREFIX form'
+);
+
+$usage_error = undef;
+eval {
+    build_cli_request(
+        argv => [
+            '-ibff', 't/bff2pxf/in/individuals.json',
+            '-obff', 'individuals.json',
+        ],
+        usage_error => sub { die @_ },
+        schema_file => 'share/schema/mapping.json',
+        out_dir     => $tmpdir,
+        color       => 1,
+    );
+    1;
+} or $usage_error = $@;
+
+like(
+    $usage_error,
+    qr/Unsupported conversion <bff2bff>/,
+    'CLI parser rejects unsupported same-format routes'
 );
 
 my $cli = cli_script_path();
@@ -232,6 +333,10 @@ like(
     qr/--color\|--no-color/,
     'CLI help documents --no-color'
 );
+like( $help, qr/-icdisc-odm <file>/, 'CLI help names CDISC-ODM explicitly' );
+unlike( $help, qr/-icdisc(?:\s|\x20)<file>/, 'CLI help does not advertise the removed -icdisc flag' );
+like( $help, qr/-idataset-json <files\.\.\.>/, 'CLI help documents Dataset-JSON input' );
+like( $help, qr/-ifhir <files\.\.\.>/, 'CLI help documents FHIR Bundle input' );
 like(
     $help,
     qr/\[ALIVE\|DECEASED\|UNKNOWN_STATUS\]/,
@@ -244,8 +349,13 @@ like(
 );
 like(
     $help,
-    qr/biosamples are emitted from -ipxf when present/s,
-    'CLI help documents first-class biosample output from PXF'
+    qr/biosamples are emitted from -ipxf, FHIR Specimen,\s+OMOP SPECIMEN, or beacon\.biosamples mapping rules/s,
+    'CLI help documents all first-class biosample sources'
+);
+like(
+    $help,
+    qr/Mapping V2 YAML or JSON file targeting\s+Beacon schema 2\.0\.0/s,
+    'CLI help documents the mapping and Beacon schema contract'
 );
 like(
     $help,

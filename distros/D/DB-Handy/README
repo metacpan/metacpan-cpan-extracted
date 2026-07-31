@@ -116,7 +116,64 @@ LIMITATIONS
   - VARCHAR is always stored as 255 bytes on disk; declared size is enforced
     on INSERT/UPDATE (values longer than declared size are rejected)
   - Single-column indexes only
+  - A JOIN takes a single-equality ON clause between two table-qualified
+    columns; either operand order is fine.  A second condition, any other
+    comparison operator, an unqualified name, USING, NATURAL and FULL OUTER
+    JOIN are rejected with an error.  Put extra restrictions in the WHERE
+    clause; build a full outer join from LEFT JOIN and RIGHT JOIN with UNION
+  - The WHERE clause of a JOIN query takes AND-separated comparisons plus
+    IN, NOT IN, LIKE, BETWEEN and IS [NOT] NULL; OR, NOT and parentheses are
+    rejected with an error.  A single-table WHERE has no such restriction
+  - The select list of a non-aggregate JOIN query takes column names, * and
+    table.* only; an expression or an AS alias is rejected.  An aggregate
+    JOIN query does accept AS
+  - Up to 1.08 all of the JOIN restrictions above were silent: the query
+    returned a Cartesian product or an unfiltered result instead of an
+    error.  1.09 answers correctly where it can and reports an error where
+    it cannot, so code written against 1.08 may now raise an error
+  - UNION, UNION ALL, INTERSECT and EXCEPT match their branches by column
+    position and take the result column names from the first branch.  Up to
+    1.08 they matched by column name, so a branch whose names differed from
+    the first branch's contributed rows of NULL
+  - connect() with AutoCommit => 0 is refused; there are no transactions to
+    turn AutoCommit off for.  $dbh->{AutoCommit} is a plain hash key that
+    can be assigned to, but only the AutoCommit method is authoritative
+  - fetchall_arrayref accepts DBI's $max_rows argument and ignores it; use
+    LIMIT in the SQL instead
+  - Database, table and index names must be word characters ([A-Za-z0-9_]);
+    they become path components, so a name holding / \ : or .. is rejected
+    with "Invalid <kind> name" rather than being turned into a path
+  - $DB::Handy::errstr keeps the last error from any handle and is not
+    cleared by a later success; test $dbh->errstr, or the return value of
+    the method, instead
+  - PRIMARY KEY and UNIQUE are enforced through an index built by CREATE
+    TABLE, so a table created by 1.08 or earlier still accepts duplicates
+    until CREATE UNIQUE INDEX is run on it
+  - ORDER BY by select-list position is not available with SELECT * across
+    a JOIN; name the column instead
+  - Whitespace between SQL tokens is collapsed, but whitespace inside a
+    quoted value is kept, so multi-line text can be stored as-is
+  - INT is a 4-byte signed integer; a numeric value outside
+    -2147483648..2147483647 is rejected on INSERT/UPDATE, a fractional value
+    is truncated, and a non-numeric value is stored as 0
+  - DATE must be a valid YYYY-MM-DD calendar date; anything else is rejected
+    on INSERT/UPDATE.  No date arithmetic is provided
   - NOT IN with NULL in the value list returns no rows (SQL UNKNOWN semantics)
+  - NULL is stored as the empty string; in an INT or FLOAT column it is
+    stored as 0 and cannot be told apart from a real 0
+  - SUM/AVG/MIN/MAX return 0 rather than NULL over an empty set
+  - LIKE is case-insensitive
+  - An unknown column name in a SELECT list yields NULL, not an error
+  - Declared column sizes count bytes, not characters; a VARCHAR(10) holds
+    three UTF-8 Japanese characters, not ten
+  - A trailing NUL byte in a value is stripped when the record is read back
+  - An unterminated /* comments out the rest of the statement rather than
+    raising a syntax error
+  - fetchall_arrayref ignores a column-index slice such as [0, 2] and
+    always returns every column
+  - FLOAT values in the .dat file use the machine's native double, so a data
+    file holding FLOAT columns is not portable between machines with a
+    different byte order (INT, CHAR, VARCHAR and DATE are portable)
   - WINDOW functions (OVER clause) return type='error'
   - FOREIGN KEY syntax accepted but not enforced; CREATE VIEW returns error
   - No BLOB/CLOB
@@ -124,7 +181,7 @@ LIMITATIONS
 
 AUTHOR
 
-  INABA Hitoshi <ina@cpan.org>
+  INABA Hitoshi <ina.cpan@gmail.com>
 
 COPYRIGHT AND LICENSE
 

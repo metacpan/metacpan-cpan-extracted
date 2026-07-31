@@ -25,11 +25,197 @@ DESCRIPTION
     "--enable-blumenthal-aes"
     "--with-defaults"
 
+  macOS
+    Build this with a Homebrew or perlbrew perl. Apple's /usr/bin/perl is
+    not a supported target: it is frozen at whatever version macOS shipped,
+    its directories need root, and Apple has deprecated the runtime.
+    Continuous integration covers Homebrew perl on both Intel and Apple
+    Silicon.
+
+    If a bare "perl" on your "PATH" still resolves to /usr/bin/perl,
+    "Makefile.PL" aborts with "Can't locate Alien/Build/MM.pm". Run it with
+    the full path to the perl you mean.
+
+BACKGROUND
+    Net-SNMP's Perl modules live in the Net-SNMP source tree; they are not a
+    separately maintained CPAN distribution. The standalone "SNMP" release
+    on CPAN is 5.0404, whose version number encodes the Net-SNMP 5.4.4
+    release it was taken from. This distribution instead installs the "SNMP"
+    module out of the Net-SNMP tarball it builds and pins, so the Perl
+    module and the C library beneath it always come from the same upstream
+    release. That coupling matters, because the XS is compiled against one
+    specific libnetsnmp, and it is what keeps the Perl side level with the
+    library rather than years behind it.
+
+    Three kinds of user need that.
+
+    Anyone installing outside the system perl
+        The Perl modules in a distribution's "net-snmp" package are built
+        for the system perl and installed into system directories, so under
+        perlbrew, local::lib, or any "INSTALL_BASE" prefix they are simply
+        not on @INC. This distribution builds them with the perl that is
+        running the build and installs them wherever that perl's install
+        target points. See "BUNDLED PERL MODULES".
+
+    Anyone parsing large MIB collections
+        Older Net-SNMP had fixed ceilings in the MIB parser: a maximum
+        number of Textual Conventions, and a maximum number of imports per
+        module. Large vendor MIB collections reached them, which is why
+        patched Net-SNMP builds were once needed for MIB development. Both
+        limits are gone as of Net-SNMP 5.9, where the Textual Convention
+        list grows on demand and "MAX_IMPORTS" is 512. A stock build from
+        this distribution needs no patching for that work.
+
+    Anyone shelling out to the Net-SNMP tools
+        The command line utilities are built here too, from the same source,
+        and can be put ahead of the system ones on "PATH". See "COMMAND LINE
+        UTILITIES".
+
+BUNDLED PERL MODULES
+    The Net-SNMP source ships the "SNMP" and "NetSNMP::*" XS modules. They
+    are built against the library built here, by the same perl that is
+    building this distribution, and are installed along with it. A bare "use
+    SNMP;" therefore works, and they follow whatever installation target you
+    give Alien::SNMP itself ("INSTALL_BASE", "PREFIX", "DESTDIR",
+    local::lib).
+
+    They resolve "libnetsnmp" from this Alien's share dir, so they coexist
+    with an operating system "net-snmp" package: system tools keep using the
+    system library, while these modules use ours. That is arranged two ways:
+    Net-SNMP bakes the share dir into the XS modules' run-path, and this
+    module additionally preloads the share copy at use-time. Note that the
+    run-path is emitted as "DT_RUNPATH", which "LD_LIBRARY_PATH" takes
+    precedence over; the preload is what makes the choice robust in that
+    case.
+
+    On macOS the mechanism differs but the outcome does not: the XS modules
+    record "libnetsnmp" by its absolute path in the installed share dir, so
+    that is the copy they load.
+
+  Shadowing an operating system packaged SNMP.pm
+    Some operating systems ship Net-SNMP's Perl modules as a package of
+    their own, installed into the system perl's vendor directories.
+    Installing Alien::SNMP into that same perl, which is what happens when
+    it is installed as root outside perlbrew or local::lib, puts our copy in
+    the site directories. Those precede the vendor ones in @INC, so ours
+    answers "use SNMP;" for every script that perl runs.
+
+    Nothing is overwritten. The two copies live in different directories,
+    and removing Alien::SNMP brings the operating system packaged one back.
+    But the substitution is silent, and our copy looks in different places
+    than the operating system packaged one did:
+
+    MIB files
+        The operating system packaged module searches the system MIB
+        directory, usually /usr/share/snmp/mibs. Ours does not. See "MIBS".
+
+    snmp.conf
+        The operating system packaged module reads /etc/snmp/snmp.conf,
+        where a site keeps defaults such as "defVersion", "defCommunity",
+        "mibdirs" and "mibs". Ours reads snmp.conf from its own share
+        directory and from ~/.snmp, never from /etc/snmp, so those defaults
+        stop applying. Set "SNMPCONFPATH" to the directories you want
+        searched to get them back.
+
+    Neither change reports anything: symbolic names quietly stop resolving
+    and site defaults quietly stop being read. Installing into a perlbrew or
+    local::lib perl raises neither question, because nothing is shadowed.
+
+MIBS
+    No MIB files are shipped, because Net-SNMP is configured here with
+    "--disable-mibs" and "--with-mibs=""". Out of the box both the Perl
+    modules and the command line tools work in numeric OIDs, and
+    "snmptranslate" reports "Cannot find module".
+
+    The system MIB directory is not consulted either. The default search
+    path is ~/.snmp/mibs plus a directory inside this distribution's share,
+    and nothing else, whatever the operating system may have installed
+    elsewhere.
+
+    That is a matter of supplying MIBs, not a missing capability. Symbolic
+    names resolve normally, in both directions, once a collection is on the
+    search path. Put one there with the "-M" option or the "MIBDIRS"
+    environment variable, or place files in ~/.snmp/mibs, which is on the
+    default path:
+
+     $ MIBDIRS=/path/to/mibs snmptranslate .1.3.6.1.2.1.1.3.0
+     SNMPv2-MIB::sysUpTime.0
+
+    From Perl, "SNMP::addMibDirs" and "SNMP::loadModules" do the same job.
+    Either way that covers the modules Net-SNMP loads by default; anything
+    outside that list also needs naming, with "-m" or the "MIBS" environment
+    variable.
+
+  The MIB index files are gone
+    Net-SNMP 5.9 removed the on-disk MIB index cache. It no longer writes or
+    reads the ".index" files older versions left inside MIB directories, nor
+    the numbered files under "SNMP_PERSISTENT_DIR", and that variable now
+    has no bearing on MIB indexing at all. Parsing is unaffected:
+    "snmptranslate", "SNMP::addMibDirs" and "SNMP::loadModules" behave as
+    they always did, and directories are simply rescanned each run instead
+    of being read from a cache.
+
+    What is gone is any way to ask Net-SNMP which file defines a given
+    module. It still tracks that internally but exposes no accessor, so code
+    that located a module's file by reading an index directory will find
+    nothing there. Derive the mapping from the files instead, following
+    Net-SNMP's own rule from add_mibfile() in snmplib/parse.c: a file
+    defines a module when its first token is a label and its second is
+    "DEFINITIONS", and that first token is the module name. Reading the head
+    of each candidate file until "DEFINITIONS" appears is enough to build
+    the map.
+
+    Two things trip up a hand-rolled version. Strip "--" comments before
+    looking for "DEFINITIONS", or a mention of it in a file's comment header
+    ends the read early; note too that an ASN.1 comment ends at a second
+    "--" as well as at end of line. And do not derive the module from the
+    file name: SNMPv2-MIB.txt does contain "SNMPv2-MIB", so that shortcut
+    passes on the common case and then fails on vendor MIBs, where
+    CISCO-90-MIB.my defines "Cisco90Series-MIB".
+
+    Building the map opens every file in the collection, so cache it if you
+    need it often.
+
+COMMAND LINE UTILITIES
+    The build also produces the Net-SNMP client tools, "snmpget",
+    "snmpwalk", "snmpbulkwalk", "snmptranslate", "snmptable" and the rest,
+    from the same pinned source as the library and the Perl modules.
+    "--disable-agent" means there is no "snmpd"; these are the client side.
+    "bin_dir" returns the directory holding them, so a program that shells
+    out can use them in preference to whatever the operating system ships,
+    or on a host that ships none:
+
+     use Alien::SNMP;
+     use Env qw( @PATH );
+     unshift @PATH, Alien::SNMP->bin_dir;
+
+     my $uptime = `snmpget -v2c -c public $host 1.3.6.1.2.1.1.3.0`;
+
+    They read MIBs and snmp.conf from this distribution's own directories
+    rather than from /usr/share/snmp/mibs and /etc/snmp, so putting
+    "bin_dir" first on "PATH" changes both for anything that runs from
+    there. See "Shadowing an operating system packaged SNMP.pm".
+
+    Their options and output formats are Net-SNMP's own and are documented
+    at <http://www.net-snmp.org/docs/man/>. This distribution builds with
+    "--disable-manuals", so it installs no man pages of its own for them.
+
+  Which libnetsnmp the utilities load
+    Each utility records this distribution's share directory as its
+    run-path, so it finds our "libnetsnmp" without any help from you, and
+    coexists with a system Net-SNMP package. The one thing that overrides a
+    run-path is "LD_LIBRARY_PATH", an environment variable that is unset on
+    most systems and that "echo $LD_LIBRARY_PATH" will show you. If it is
+    set, and names a directory holding another "libnetsnmp" of the same
+    major version, that copy is loaded instead of ours. "delete local
+    $ENV{LD_LIBRARY_PATH};" around the call rules that out.
+
 METHODS
   bin_dir
      my $bin_dir = Alien::SNMP->bin_dir;
 
-    Returns the location of the net-snmp apps (snmptranslate, etc).
+    Returns the location of the net-snmp apps (snmptranslate, etc). See
+    "COMMAND LINE UTILITIES".
 
   cflags
      my $cflags = Alien::SNMP->cflags;

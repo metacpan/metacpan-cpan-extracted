@@ -20,7 +20,7 @@ foreach my $alg (@hash_alg) {
     );
     isa_ok($sig, "XML::Sig", "XML::Sig Digest: $alg");
 
-    my $signed = $sig->sign('<foo ID="123"></foo>');
+    my $signed = $sig->sign('<foo ID="_123"></foo>');
     ok($signed, "XML Signed Sucessfully using dsa key");
 
     $sig = XML::Sig->new();
@@ -48,7 +48,7 @@ foreach my $alg (@hash_alg) {
     );
     isa_ok($sig, "XML::Sig", "XML::Sig Digest: $alg");
 
-    my $signed = $sig->sign('<foo ID="123"></foo>');
+    my $signed = $sig->sign('<foo ID="_123"></foo>');
     ok($signed, "XML Signed Sucessfully using rsa key - no X509");
 
     $sig = XML::Sig->new();
@@ -82,7 +82,7 @@ foreach my $alg (@hash_alg) {
     );
     isa_ok($sig, "XML::Sig", "XML::Sig Digest: $alg");
 
-    my $signed = $sig->sign('<foo ID="123"></foo>');
+    my $signed = $sig->sign('<foo ID="_123"></foo>');
     ok($signed, "XML Signed Sucessfully using rsa key");
 
     $sig = XML::Sig->new();
@@ -118,7 +118,7 @@ foreach my $alg (@hash_alg) {
     );
     isa_ok($sig, "XML::Sig", "XML::Sig Digest: $alg");
 
-    my $signed = $sig->sign('<foo ID="123"></foo>');
+    my $signed = $sig->sign('<foo ID="_123"></foo>');
     ok($signed, "XML Signed Sucessfully using ecdsa key");
 
     $sig = XML::Sig->new();
@@ -139,7 +139,7 @@ foreach my $alg (@hash_alg) {
     $sig = XML::Sig->new({ key => 't/ecdsa.private.pem' });
     isa_ok($sig, "XML::Sig", "XML::Sig Digest: $alg");
 
-    $signed = $sig->sign('<foo ID="123"></foo>');
+    $signed = $sig->sign('<foo ID="_123"></foo>');
     ok($signed, "XML Signed Sucessfully using ecdsa key");
 
     $sig = XML::Sig->new();

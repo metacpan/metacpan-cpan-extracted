@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
-use Encode;
+use Encode qw(encode_utf8);
 use Try::Tiny;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
@@ -31,6 +31,52 @@ use constant TRANSFORM_C14N_V1_1         => 'http://www.w3.org/TR/2008/REC-xml-c
 use constant TRANSFORM_C14N_V1_1_COMMENTS => 'http://www.w3.org/TR/2008/REC-xml-c14n11-20080502#WithComments';
 use constant TRANSFORM_EXC_C14N          => 'http://www.w3.org/2001/10/xml-exc-c14n#';
 use constant TRANSFORM_EXC_C14N_COMMENTS => 'http://www.w3.org/2001/10/xml-exc-c14n#WithComments';
+
+# Character class for NCNameStartChar (XML 1.0 Fifth Edition):
+#   A-Z_a-z          ASCII letters and underscore
+#   \xC0-\xD6        Latin-1 supplement: À to Ö
+#   \xD8-\xF6        Latin-1 supplement: Ø to ö
+#   \xF8-\x{2FF}     Latin Extended A/B, IPA, spacing modifiers
+#   \x{370}-\x{37D}  Greek and Coptic
+#   \x{37F}-\x{1FFF} Greek through Greek Extended
+#   \x{2070}-\x{218F} Superscripts, currency, letterlike symbols
+#   \x{2C00}-\x{2FEF} Glagolitic, Coptic, Georgian, Tifinagh
+#   \x{3001}-\x{D7FF} CJK punctuation through Hangul syllables
+#   \x{F900}-\x{FDCF} CJK compatibility, Arabic presentation A
+#   \x{FDF0}-\x{FFFD} Arabic presentation B, halfwidth/fullwidth
+#
+
+my $NCNameStartChar = qr{
+    [A-Z_a-z
+     \xC0-\xD6
+     \xD8-\xF6
+     \xF8-\x{2FF}
+     \x{370}-\x{37D}
+     \x{37F}-\x{1FFF}
+     \x{2070}-\x{218F}
+     \x{2C00}-\x{2FEF}
+     \x{3001}-\x{D7FF}
+     \x{F900}-\x{FDCF}
+     \x{FDF0}-\x{FFFD}]
+}x;
+
+# Extras (NameChar-only):
+#   -                  hyphen
+#   .                  period
+#   0-9                ASCII digits
+#   \xB7               middle dot (·)
+#   \x{0300}-\x{036F}  combining diacritical marks
+#   \x{203F}-\x{2040}  undertie (‿) and character tie (⁀)
+#
+my $NCNameChar = qr{
+    (?: $NCNameStartChar
+      | [-.0-9\xB7
+         \x{0300}-\x{036F}
+         \x{203F}-\x{2040}]
+    )
+}x;
+
+my $NCName = qr{\A ${NCNameStartChar} ${NCNameChar}* \z}x;
 
 sub DESTROY { }
 
@@ -122,12 +168,13 @@ sub sign {
     my $dom = $self->_load_xml($xml);
 
     $self->{ parser } = XML::LibXML::XPathContext->new($dom);
-    $self->{ parser }->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
-    $self->{ parser }->registerNs('ec', 'http://www.w3.org/2001/10/xml-exc-c14n#');
-    $self->{ parser }->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
+    my $parser = $self->{ parser };
+    $parser->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
+    $parser->registerNs('ec', 'http://www.w3.org/2001/10/xml-exc-c14n#');
+    $parser->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
     if ($self->{ns}) {
         foreach (keys %{$self->{ns}}) {
-            $self->{ parser }->registerNs($_, $self->{ns}{$_});
+            $parser->registerNs($_, $self->{ns}{$_});
         }
     }
 
@@ -254,18 +301,19 @@ sub verify {
     my $dom = $self->_load_xml($xml);
 
     $self->{ parser } = XML::LibXML::XPathContext->new($dom);
-    $self->{ parser }->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
-    $self->{ parser }->registerNs('ec', 'http://www.w3.org/2001/10/xml-exc-c14n#');
-    $self->{ parser }->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
-    $self->{ parser }->registerNs('ecdsa', 'http://www.w3.org/2001/04/xmldsig-more#');
+    my $parser = $self->{ parser };
+    $parser->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
+    $parser->registerNs('ec', 'http://www.w3.org/2001/10/xml-exc-c14n#');
+    $parser->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
+    $parser->registerNs('ecdsa', 'http://www.w3.org/2001/04/xmldsig-more#');
 
-    my $signature_nodeset = $self->{ parser }->findnodes('//dsig:Signature');
+    my $signature_nodeset = $parser->findnodes('//dsig:Signature');
 
     my $key_to_verify;
     if ($self->{id_attr}) {
         if ($self->{ns}) {
             foreach (keys %{$self->{ns}}) {
-                $self->{ parser }->registerNs($_, $self->{ns}{$_});
+                $parser->registerNs($_, $self->{ns}{$_});
             }
         }
         $key_to_verify = $self->_get_ids_to_sign();
@@ -282,9 +330,13 @@ sub verify {
         print ("\nSignature $i\n") if $DEBUG;
 
         # Get SignedInfo Reference ID
-        my $reference = $self->{ parser }->findvalue(
+        my $reference = $parser->findvalue(
             'dsig:SignedInfo/dsig:Reference/@URI', $signature_node);
         $reference =~ s/#//g;
+
+        if ($reference !~ $NCName) {
+            croak ("SignedInfo Reference URI is invalid");
+        }
 
         print("   Reference URI: $reference\n") if $DEBUG;
 
@@ -293,12 +345,20 @@ sub verify {
             next;
         }
 
-        # The reference ID must point to something in the document
-        # if not disregard it and look for another signature
-        # TODO check to ensure that if there is only a single reference
-        # like this it won't accidentally validate
-        if (! $self->{ parser }->findvalue('//*[@ID=\''. $reference . '\']')) {
-            print ("   Signature reference $reference is not signing anything in this xml\n") if $DEBUG;
+
+        # The reference ID must point to exactly ONE element in the document.
+        # If zero, the signature signs nothing.  If more than one, the
+        # document is ambiguous and vulnerable to XML Signature Wrapping
+        # (XSW) attacks - the signature could validate against one element
+        # while a caller extracts a different element with the same ID.
+        # See USENIX Security 2012 "On Breaking SAML" (Somorovsky et al)
+        # and CVE-2025-29774 (xml-crypto).
+        my $ref_nodes = $self->{ parser }->findnodes(
+            '//*[@ID=\''. $reference . '\']');
+        my $ref_count = $ref_nodes->size();
+        if ($ref_count == 0) {
+            print "   Signature reference $reference is not signing anything in this xml\n"
+                if $DEBUG;
             if ($numsigs <= 1) {
                 return 0;
             }
@@ -307,8 +367,14 @@ sub verify {
             }
         }
 
+        if ($ref_count > 1) {
+            print "   Signature reference $reference matches $ref_count elements - rejecting (XSW mitigation)\n"
+                if $DEBUG;
+            return 0;
+        }
+
         # Get SignedInfo DigestMethod Algorithim
-        my $digest_method = $self->{ parser }->findvalue(
+        my $digest_method = $parser->findvalue(
                 'dsig:SignedInfo/dsig:Reference/dsig:DigestMethod/@Algorithm', $signature_node);
         $digest_method =~ s/^.*[#]//;
         print ("   Digest Method: $digest_method\n") if $DEBUG;
@@ -316,16 +382,16 @@ sub verify {
         # Get the DigestValue used to verify Canonical XML
         # Note that the digest may have embedded newlines in the XML
         # Decode the base64 and encode it with no newlines
-        my $refdigest = encode_base64(decode_base64(_trim($self->{ parser }->findvalue(
+        my $refdigest = encode_base64(decode_base64(_trim($parser->findvalue(
                 'dsig:SignedInfo/dsig:Reference/dsig:DigestValue', $signature_node))), "");
         print ("   Digest Value: $refdigest\n") if $DEBUG;
 
         # Get the SignatureValue used to verify the SignedInfo
-        my $signature = _trim($self->{ parser }->findvalue('dsig:SignatureValue', $signature_node));
+        my $signature = _trim($parser->findvalue('dsig:SignatureValue', $signature_node));
         print ("   Signature: $signature\n") if $DEBUG;
 
         # Get SignatureMethod Algorithim
-        my $signature_method = $self->{ parser }->findvalue(
+        my $signature_method = $parser->findvalue(
                 'dsig:SignedInfo/dsig:SignatureMethod/@Algorithm', $signature_node);
         $signature_method =~ s/^.*[#]//;
         $signature_method =~ s/^rsa-//;
@@ -337,7 +403,7 @@ sub verify {
         print ("   SignatureMethod: $signature_method\n") if $DEBUG;
 
         # Get the SignedInfo and obtain its Canonical form
-        my ($signed_info) = $self->{ parser }->findnodes('dsig:SignedInfo', $signature_node);
+        my ($signed_info) = $parser->findnodes('dsig:SignedInfo', $signature_node);
         my $signed_info_canon = $self->_canonicalize_xml($signed_info, $signature_node);
 
         print "$signed_info_canon\n" if $DEBUG;
@@ -391,11 +457,11 @@ sub verify {
             my $keyinfo_nodeset;
             foreach my $key_info_sig_type ( qw/X509Data RSAKeyValue DSAKeyValue ECDSAKeyValue/ ) {
                 if ( $key_info_sig_type eq 'X509Data' ) {
-                    $keyinfo_nodeset = $self->{ parser }->find(
+                    $keyinfo_nodeset = $parser->find(
                             "dsig:KeyInfo/dsig:$key_info_sig_type", $signature_node);
                     #print ("   keyinfo_nodeset X509Data: $keyinfo_nodeset\n") if $DEBUG;
                 } else {
-                    $keyinfo_nodeset = $self->{ parser }->find(
+                    $keyinfo_nodeset = $parser->find(
                             "dsig:KeyInfo/dsig:KeyValue/dsig:$key_info_sig_type", $signature_node);
                     #print ("   keyinfo_nodeset [DR]SAKeyValue: $keyinfo_nodeset\n") if $DEBUG;
                 }
@@ -469,21 +535,28 @@ sub signer_cert {
 ##
 sub _get_ids_to_sign {
     my $self = shift;
-
+    my $parser = $self->{parser};
     if ($self->{id_attr}) {
-        my $nodes = $self->{parser}->findnodes($self->{id_attr});
+        my $nodes = $parser->findnodes($self->{id_attr});
         if ($nodes->size == 0) {
             die "Unable to find an attribute node with $self->{id_attr}";
         }
         my $node = $nodes->get_node(1);
+        my $id = $node->getAttribute('ID');
+        if ($id !~ $NCName) {
+            croak ("XML ID format is invalid (should match '$NCName'");
+        }
         return $node->getAttribute('ID');
 
     }
 
-    my $nodes = $self->{parser}->findnodes('//@ID');
+    my $nodes = $parser->findnodes('//@ID');
     return $nodes->reverse->map(
         sub {
             my $val = $_->getValue;
+            if ($val !~ $NCName) {
+                croak ("XML ID format is invalid (should match '$NCName'");
+            }
             defined($val) && length($val) && $val;
         }
     );
@@ -527,6 +600,10 @@ sub _get_signed_xml {
 
     my $id = $self->{parser}->findvalue('./dsig:SignedInfo/dsig:Reference/@URI', $context);
     $id =~ s/^#//;
+    if ($id !~ $NCName) {
+        croak ("SignedInfo Reference URI is invalid");
+    }
+
     print ("    Signed XML id: $id\n") if $DEBUG;
 
     $self->{'sign_id'} = $id;
@@ -637,10 +714,11 @@ sub _verify_rsa {
     };
     confess "Crypt::PK::RSA needs to be installed so
                 that we can handle X509 certificates" if $@;
+    my $parser = $self->{parser};
     # Generate Public Key from XML
-    my $mod = _trim($self->{parser}->findvalue('dsig:Modulus', $context));
+    my $mod = _trim($parser->findvalue('dsig:Modulus', $context));
     my $modBin = decode_base64( $mod );
-    my $exp = _trim($self->{parser}->findvalue('dsig:Exponent', $context));
+    my $exp = _trim($parser->findvalue('dsig:Exponent', $context));
     my $expBin = decode_base64( $exp );
     my $n = unpack("H*", $modBin);
     my $e = unpack("H*", $expBin);
@@ -907,11 +985,12 @@ sub _verify_dsa {
     confess "Crypt::OpenSSL::DSA >= 0.20 needs to be installed so
                     that we can handle DSA signatures" if ! $self->check_dsa_version();
 
+    my $parser = $self->{parser};
     # Generate Public Key from XML
-    my $p = decode_base64(_trim($self->{parser}->findvalue('dsig:P', $context)));
-    my $q = decode_base64(_trim($self->{parser}->findvalue('dsig:Q', $context)));
-    my $g = decode_base64(_trim($self->{parser}->findvalue('dsig:G', $context)));
-    my $y = decode_base64(_trim($self->{parser}->findvalue('dsig:Y', $context)));
+    my $p = decode_base64(_trim($parser->findvalue('dsig:P', $context)));
+    my $q = decode_base64(_trim($parser->findvalue('dsig:Q', $context)));
+    my $g = decode_base64(_trim($parser->findvalue('dsig:G', $context)));
+    my $y = decode_base64(_trim($parser->findvalue('dsig:Y', $context)));
     my $dsa_pub = Crypt::OpenSSL::DSA->new();
     $dsa_pub->set_p($p);
     $dsa_pub->set_q($q);
@@ -956,11 +1035,12 @@ sub _verify_ecdsa {
     my $self = shift;
     my ($context,$canonical,$sig) = @_;
 
+    my $parser = $self->{parser};
     eval {require Crypt::PK::ECC; CryptX->VERSION('0.036'); 1}
     or confess "Crypt::PK::ECC 0.036+ needs to be installed so
              that we can handle ECDSA signatures";
     # Generate Public Key from XML
-    my $oid = _trim($self->{parser}->findvalue('.//dsig:NamedCurve/@URN', $context));
+    my $oid = _trim($parser->findvalue('.//dsig:NamedCurve/@URN', $context));
 
     use URI ();
     my $u1 = URI->new($oid);
@@ -981,8 +1061,8 @@ sub _verify_ecdsa {
         '1.3.36.3.3.2.8.1.1.13' => 'brainpoolP512r1',
     );
 
-    my $x = $self->{parser}->findvalue('.//dsig:PublicKey/dsig:X/@Value', $context);
-    my $y = $self->{parser}->findvalue('.//dsig:PublicKey/dsig:Y/@Value', $context);
+    my $x = $parser->findvalue('.//dsig:PublicKey/dsig:X/@Value', $context);
+    my $y = $parser->findvalue('.//dsig:PublicKey/dsig:Y/@Value', $context);
 
     my $ecdsa_pub = Crypt::PK::ECC->new();
 
@@ -1064,11 +1144,12 @@ sub _verify_hmac {
 sub _get_node {
     my $self = shift;
     my ($xpath, $context) = @_;
+    my $parser = $self->{parser};
     my $nodeset;
     if ($context) {
-         $nodeset = $self->{parser}->find($xpath, $context);
+         $nodeset = $parser->find($xpath, $context);
     } else {
-         $nodeset = $self->{parser}->find($xpath);
+         $nodeset = $parser->find($xpath);
     }
     foreach my $node ($nodeset->get_nodelist) {
         return $node;
@@ -1403,8 +1484,6 @@ sub _load_key {
             else {
                 $self->_load_dsa_key( $text );
             }
-
-            return 1;
         } elsif ( $text =~ m/BEGIN EC PRIVATE KEY/ ) {
             $self->_load_ecdsa_key( $text );
         } elsif ( $text =~ m/BEGIN PRIVATE KEY/ ) {
@@ -1611,7 +1690,8 @@ sub _calc_dsa_signature {
 
     # DSA 1024-bit only permits the signing of 20 bytes or less, hence the sha1
     # DSA 2048-bit only permits the signing sha256
-    my $bin_signature = $self->{key_obj}->do_sign( $self->{ sig_method }($signed_info_canon) );
+    my $bin_signature = $self->{key_obj}->do_sign(
+        $self->{ sig_method }(encode_utf8($signed_info_canon)) );
 
     # https://www.w3.org/TR/2002/REC-xmldsig-core-20020212/#sec-SignatureAlg
     # The output of the DSA algorithm consists of a pair of integers
@@ -1645,7 +1725,7 @@ sub _calc_ecdsa_signature {
     print ("    Signing SignedInfo using ECDSA key type\n") if $DEBUG;
 
     my $bin_signature = $self->{key_obj}->sign_message_rfc7518(
-        $signed_info_canon, uc($self->{sig_hash})
+        encode_utf8($signed_info_canon), uc($self->{sig_hash})
     );
     # The output of the ECDSA algorithm consists of a pair of integers
     # The signature value consists of the base64 encoding of the
@@ -1669,7 +1749,8 @@ sub _calc_rsa_signature {
     my $signed_info_canon   = shift;
 
     print ("    Signing SignedInfo using RSA key type\n") if $DEBUG;
-    my $bin_signature = $self->{key_obj}->sign_message( $signed_info_canon, $self->{sig_hash}, 'v1.5' );
+    my $bin_signature = $self->{key_obj}->sign_message(
+        encode_utf8($signed_info_canon), $self->{sig_hash}, 'v1.5' );
 
     return $bin_signature;
 }
@@ -1694,7 +1775,7 @@ sub _calc_hmac_signature {
     if (my $ref = Digest::SHA->can('hmac_' . $self->{ sig_hash })) {
         $self->{sig_method} = $ref;
         $bin_signature = $self->{sig_method} (
-                            $signed_info_canon,
+                            encode_utf8($signed_info_canon),
                             decode_base64( $self->{ hmac_key } )
                         );
     }
@@ -1745,7 +1826,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 
@@ -1988,6 +2069,51 @@ Arguments: none
 Returns: integer (1 True, 0 False) if a valid version of
 Crypt::OpenSSL::DSA is installed
 
+=head1 ID VALIDATION
+
+The ID in a document must match the criteria set out below.  It is a subset of
+the allowed format in the specification: L<https://www.w3.org/TR/REC-xml/#NT-Name>
+
+=head2 Permitted Starting character
+
+An ID can start with characters in this range only:
+
+Character class for NCNameStartChar (XML 1.0 Fifth Edition):
+
+=over
+
+    A-Z_a-z          ASCII letters and underscore
+    \xC0-\xD6        Latin-1 supplement: À to Ö
+    \xD8-\xF6        Latin-1 supplement: Ø to ö
+    \xF8-\x{2FF}     Latin Extended A/B, IPA, spacing modifiers
+    \x{370}-\x{37D}  Greek and Coptic
+    \x{37F}-\x{1FFF} Greek through Greek Extended
+    \x{2070}-\x{218F} Superscripts, currency, letterlike symbols
+    \x{2C00}-\x{2FEF} Glagolitic, Coptic, Georgian, Tifinagh
+    \x{3001}-\x{D7FF} CJK punctuation through Hangul syllables
+    \x{F900}-\x{FDCF} CJK compatibility, Arabic presentation A
+    \x{FDF0}-\x{FFFD} Arabic presentation B, halfwidth/fullwidth
+
+=back
+
+=head2 Permitted Remaining characters
+
+The rest of the ID can include all of the charaters that match the
+NCNameStartChar and any character that matches the following:
+
+Extras (NameChar-only):
+
+=over
+
+    -                  hyphen
+    .                  period
+    0-9                ASCII digits
+    \xB7               middle dot (·)
+    \x{0300}-\x{036F}  combining diacritical marks
+    \x{203F}-\x{2040}  undertie (‿) and character tie (⁀)
+
+=back
+
 =head1 ABOUT DIGITAL SIGNATURES
 
 Just as one might want to send an email message that is cryptographically signed
@@ -2094,7 +2220,7 @@ signatures.
 
 Net::SAML2 embedded version amended by Chris Andrews <chris@nodnol.org>.
 
-Maintainer: Timothy Legge <timlegge@cpan.org>
+Maintainer: Timothy Legge <timlegge@gmail.com>
 
 =head1 AUTHOR
 

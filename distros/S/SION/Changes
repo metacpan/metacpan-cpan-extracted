@@ -1,0 +1,9 @@
+Revision history for SION
+
+0.01    2026-07-30
+        First version, released on an unsuspecting world.
+        - encode_sion()/decode_sion() and a JSON::PP-like OO interface
+        - booleans are JSON::PP::Boolean (native booleans supported on 5.36+)
+        - Int/Double distinction preserved; Double emitted as C99 hexfloat
+        - Strings are utf-8 strings, Data are byte strings
+        - .Date/.Ext via SION::Date/SION::Ext; SION::Data to force Data

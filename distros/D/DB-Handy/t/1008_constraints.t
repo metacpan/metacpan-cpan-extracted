@@ -5,8 +5,9 @@
 #
 # NOT NULL   -- rejected on INSERT and UPDATE
 # DEFAULT    -- applied when column is omitted or empty
-# CHECK      -- evaluated on INSERT only (not UPDATE)
-# PRIMARY KEY -- implies NOT NULL; does NOT auto-create UNIQUE index
+# CHECK      -- evaluated on INSERT and UPDATE
+# PRIMARY KEY -- implies NOT NULL and a UNIQUE index named <col>_pk
+# UNIQUE      -- column or table constraint; index named <col>_unique
 # UNIQUE via CREATE UNIQUE INDEX -- enforced on INSERT and UPDATE
 #
 ######################################################################
@@ -22,13 +23,20 @@ use DB::Handy;
 # Embedded test harness (no Test::More dependency)
 ###############################################################################
 my ($PASS, $FAIL, $T) = (0, 0, 0);
-sub ok  { my($c,$n)=@_; $T++; $c ? ($PASS++, print "ok $T - $n\n") : ($FAIL++, print "not ok $T - $n\n") }
-sub is  { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, print "ok $T - $n\n") : ($FAIL++, print "not ok $T - $n  (got='${\ (defined $g?$g:'undef')}', exp='$e')\n") }
+my @OUT;          # buffered ok() lines
+my $DONE = 0;     # set once the plan has been emitted
+sub ok  { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is  { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\ (defined $g?$g:'undef')}', exp='$e')\n") }
 
-print "1..47\n";
 use File::Path ();
-my $BASE = "/tmp/test_constraints_$$";
+use File::Spec ();
+my $BASE = File::Spec->catdir(File::Spec->tmpdir, "test_constraints_$$");
 File::Path::rmtree($BASE) if -d $BASE;
+
+# Remove the scratch directory however the script leaves: a normal exit,
+# a die in mid-file, or an interrupt.  Without this an aborted run left a
+# stale tree behind in the system temp directory.
+END { File::Path::rmtree($BASE) if defined($BASE) && -d $BASE }
 
 my $db = DB::Handy->new(base_dir => $BASE);
 $db->create_database('ctest');
@@ -128,7 +136,7 @@ ok($res->{type} eq 'error', "CHECK: UPDATE with negative salary fails");
 ok($res->{message} =~ /CHECK/, "CHECK: UPDATE error message mentions CHECK");
 
 ###############################################################################
-# PRIMARY KEY: implies NOT NULL; does NOT auto-create UNIQUE index
+# PRIMARY KEY: implies NOT NULL and an auto-created UNIQUE index <col>_pk
 ###############################################################################
 $db->execute("CREATE TABLE pk (id INT PRIMARY KEY, name VARCHAR(20))");
 
@@ -141,18 +149,18 @@ $res = $db->execute("INSERT INTO pk (name) VALUES ('Bob')");
 # ok 20
 ok($res->{type} eq 'error', "PRIMARY KEY: omitting PK column fails (NOT NULL)");
 
-# PRIMARY KEY alone does NOT enforce uniqueness (no auto-index)
+# PRIMARY KEY enforces uniqueness through the auto-created index
 $res = $db->execute("INSERT INTO pk (id,name) VALUES (1,'Dup')");
 # ok 21
-ok($res->{type} eq 'ok', "PRIMARY KEY: duplicate allowed without explicit UNIQUE INDEX");
+ok($res->{type} eq 'error', "PRIMARY KEY: duplicate rejected without explicit UNIQUE INDEX");
 
-# After adding explicit UNIQUE INDEX, duplicate is rejected
-$db->execute("CREATE UNIQUE INDEX pk_idx ON pk (id)");
-$res = $db->execute("INSERT INTO pk (id,name) VALUES (1,'Dup2')");
+# The auto-created index is named after the column
+my $pk_idx = $db->list_indexes('pk');
 # ok 22
-ok($res->{type} eq 'error', "PRIMARY KEY + UNIQUE INDEX: duplicate now rejected");
+ok((grep { $_->{name} eq 'id_pk' && $_->{unique} && $_->{col} eq 'id' } @$pk_idx),
+   "PRIMARY KEY: auto-created UNIQUE index is named id_pk");
 # ok 23
-ok($res->{message} =~ /UNIQUE/, "PRIMARY KEY + UNIQUE INDEX: error mentions UNIQUE");
+ok($res->{message} =~ /UNIQUE/, "PRIMARY KEY: error mentions UNIQUE");
 
 ###############################################################################
 # PRIMARY KEY: schema records PK column name
@@ -292,5 +300,24 @@ is($res->{data}[0]{name}, 'id', "DESCRIBE nn: first col is id");
 ###############################################################################
 # Cleanup
 ###############################################################################
-File::Path::rmtree($BASE) if -d $BASE;
+###############################################################################
+# Emit the plan.  The count is taken from the assertions that actually ran,
+# so it can never drift out of step with the body the way the former
+# hard-coded "1..N" line could.  The ok() lines are buffered in @OUT purely
+# so that the plan can still be printed first: a leading plan is what every
+# Test::Harness understands, including the one shipped with Perl 5.005_03.
+###############################################################################
+$DONE = 1;
+print "1..$T\n", @OUT;
+
 exit($FAIL ? 1 : 0);
+
+# If the body dies before the plan is emitted, flush whatever did run and
+# append one failing assertion, so the harness is handed a complete and
+# definitely-failing stream instead of no plan at all.
+END {
+    unless ($DONE) {
+        print '1..' . ($T + 1) . "\n", @OUT;
+        print 'not ok ' . ($T + 1) . " - test script aborted before completion\n";
+    }
+}

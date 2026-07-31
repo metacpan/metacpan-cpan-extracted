@@ -1,202 +1,867 @@
 Revision history for DB::Handy
 
+1.09  2026-07-31 JST (Japan Standard Time)
+
+  SQL engine -- JOIN.  Every item below returned a wrong answer in
+  silence up to 1.08; the parser matched only "ON col = col" as an
+  optional group, so any ON it could not read simply did not
+  participate and join_select fell through to its Cartesian-product
+  branch.  Nothing was reported, and the caller got a plausible-looking
+  result set that answered a different question.
+  - Fixed: ON with the operands the other way round ("ON right.col =
+    left.col") is now the same join as "ON left.col = right.col".  It
+    used to produce a Cartesian product.
+  - Fixed: an ON clause the engine cannot execute -- a second
+    condition, a comparison other than =, an unqualified column name,
+    an unknown alias, or one that never names the table being joined --
+    is now an error naming the offending text.
+  - Fixed: JOIN ... USING, NATURAL JOIN and FULL OUTER JOIN are now
+    errors.  They used to give a Cartesian product, a result with the
+    right-hand columns missing, and a result with the columns shifted.
+  - Fixed: an INNER, LEFT or RIGHT JOIN written without an ON clause is
+    now an error.  CROSS JOIN still needs none.
+  - Fixed: text left over in the FROM clause after the JOIN chain is
+    now an error instead of being discarded.
+  - Fixed: a WHERE condition the JOIN path cannot execute (OR, NOT,
+    parentheses) is now an error.  It used to be dropped, so the query
+    returned the whole join unfiltered.
+  - Added: IS NULL and IS NOT NULL in the WHERE clause of a JOIN query,
+    which makes the LEFT JOIN anti-join idiom work.
+  - Added: BETWEEN in the WHERE clause of a JOIN query.  Its AND is no
+    longer mistaken for a conjunction when the conditions are split.
+  - Fixed: SELECT DISTINCT over a JOIN now deduplicates.  DISTINCT used
+    to stay glued to the first select item, which made the item
+    unresolvable and returned rows with no values in them.  DISTINCT is
+    applied before OFFSET and LIMIT, as SQL requires.
+  - Added: a multi-key ORDER BY over a JOIN, in both the plain and the
+    aggregate branch.  Only a single key was matched before, so
+    "ORDER BY a, b DESC" was swallowed by the WHERE strip and dropped.
+  - Fixed: an ORDER BY key that resolves to nothing is now an error.  A
+    bare column name is resolved against the joined tables first.
+  - Fixed: a select item that is not a column, '*' or 'table.*' is now
+    an error in a non-aggregate JOIN query.  An expression or an AS
+    alias used to return rows with no values in them.  An aggregate
+    JOIN query still accepts AS.
+  - Fixed: an aggregate query over a JOIN now keeps the select-list
+    column order.  Its rows are keyed by the bare column name, so a
+    qualified select item failed the name check and the whole list fell
+    back to alphabetical order: "SELECT a.y, COUNT(*)" reported NAME as
+    ['COUNT(*)', 'y'].
+
+  SQL engine -- set operations.
+  - Fixed: UNION, UNION ALL, INTERSECT and EXCEPT now line their
+    branches up by column position and take the result column names
+    from the first branch, as SQL requires.  They used to be matched by
+    column name, so "SELECT a FROM t1 UNION SELECT b FROM t2" returned
+    NULL for every row contributed by the second branch.
+  - Added: branches that disagree on the number of columns are now an
+    error.
+
+  DBI layer.
+  - Fixed: connect() with AutoCommit => 0 is now refused with an
+    explanatory errstr.  It used to be accepted, leaving DBI code that
+    opens a transaction that way believing its writes were batched.
+
+  Documentation.
+  - Fixed: the AutoCommit attribute was documented as read-only.  The
+    handle is an ordinary hash reference, so assigning to the key
+    stores the value and it reads back; only the AutoCommit method is
+    authoritative.  The POD now says so.
+  - Fixed: four entries under DIFFERENCES FROM DBI ended with
+    "Compatible with DBI.", which contradicted the section title.  The
+    last_insert_id entry was one of them and is not compatible: it
+    returns a row count, not a generated key.
+  - Added: =head2 entries for ping, AutoCommit, begin_work, commit,
+    rollback, table_info and column_info, which had no reference entry
+    at all.  column_info takes the table name as its only argument, not
+    DBI's four; that is now stated.
+  - Added: DIAGNOSTICS entries for the value-too-long, integer-range,
+    invalid-DATE and CHECK-constraint messages, for every new JOIN and
+    set-operation message, and for the AutoCommit refusal.
+  - Added: a statement of what a JOIN accepts, under EXAMPLES, and an
+    anti-join example; the JOIN restrictions and the set-operation
+    change under BUGS AND LIMITATIONS; and a note that the $max_rows
+    argument of fetchall_arrayref is accepted and ignored.
+  - Fixed: the SELECT grammar now shows the ON clause as a single
+    column equality, and CROSS JOIN as taking no ON.
+
+  Tests.
+  - Added: t/1023_join_negative.t (59 tests).  Every construct listed
+    above is pinned to one of two outcomes, the right answer or an
+    error, so none of them can go back to returning something.
+    t/1003_join.t only ever exercised a single "ON left.col =
+    right.col" in that operand order, which is why this class of defect
+    survived 1877 assertions.
+
+  Shared infrastructure:
+  - t/lib/INA_CPAN_Check.pm: replaced with the shared ina@CPAN test
+    library (0.41) used by the other distributions.  It is now an
+    Exporter-based module, adds category L (Changes file format),
+    renames the file helper _find_pm to _find_pm_t, and adds the
+    _code_only, _text_files, _primary_pm and _lib_pm_files helpers.
+  - t/lib/INA_CPAN_Check.pm: the TAP harness now guards against a
+    duplicate plan line and against a plan count that does not match
+    the number of ok() calls, and sets the exit status from its own
+    END block instead of calling exit().
+  - pmake.bat: replaced with the shared build tool (0.43), which adds
+    the selfcheck target and records its version in generated_by.
+  - pmake.bat: ExtUtils::MakeMaker is no longer emitted as a runtime
+    prerequisite.  It used to be pushed into the same %requires hash
+    that feeds PREREQ_PM, the META.yml requires block and all four
+    prereq phases of META.json, so every distribution declared the
+    build toolchain as something its users had to have installed at
+    run time, which CPANTS marks down.  It now lives in its own
+    %configure_requires hash, which produces a configure_requires
+    block in META.yml, a prereqs/configure/requires block in
+    META.json, and a CONFIGURE_REQUIRES argument in Makefile.PL
+    (guarded by ExtUtils::MakeMaker 6.52, which introduced it).
+  - pmake.bat: the repository and bugtracker resources are no longer
+    emitted into Makefile.PL, META.yml or META.json.  The generated
+    per-distribution https://github.com/ina-cpan/<Dist> URL was never
+    verified and returned 404 for this distribution, and no CPANTS core
+    Kwalitee indicator looks at either resource: the only indicator
+    that mentions one is meta_yml_has_repository_resource, which is
+    experimental and excluded from the score and the ranking.  Removing
+    them keeps the score at 100% for every distribution whether or not
+    a public repository exists.  The license resource is unchanged, and
+    bug reports are directed to the author's address by the POD.
+  - pmake.bat: a CR is stripped from every element of @ARGV.  This file
+    is a cmd.exe / sh / Perl polyglot whose preamble must use CRLF for
+    cmd.exe, and sh passes the CR of its last line through to the last
+    argument, so on Unix "./pmake.bat ptar" arrived as "ptar\r" and was
+    reported as an unknown target -- which is exactly what the untar
+    test at the end of "dist" hit.  Option flags were broken the same
+    way.  "pmake dist" now completes its untar test on Unix as well.
+  - pmake.bat: an argument beginning with "--" is no longer dispatched
+    as a target.  The flags are read by the targets that understand
+    them, so the documented "pmake dist --no-check1" also printed
+    "unknown target: --no-check1." after doing the right thing.
+  - pmake.bat: MANIFEST is read line by line with trailing whitespace
+    trimmed and blank and comment lines skipped, as ExtUtils::Manifest
+    does.  A MANIFEST saved with CRLF and read on Unix used to leave a
+    CR on every entry, so every file appeared to be missing and "pmake
+    test" silently ran nothing.  Trailing whitespace is trimmed rather
+    than split off, so a file name containing a space survives.  The
+    same reading is used where "dist" takes the primary module name
+    from the first MANIFEST line.
+  - pmake.bat: _runtests() quotes the interpreter path before building
+    the qx{} command, as INA_CPAN_Check::selfcheck_suite already does,
+    so a perl installed under a directory with a space in its name
+    works.
+  - pmake.bat: _runtests() reports a test file that produced no TAP
+    plan (a compile error, say) and one that is listed in MANIFEST but
+    missing from the working directory.  Both used to be counted as
+    neither ok nor not ok, so the run was reported as a failure with
+    nothing named in the summary, and a missing file also failed to
+    advance the script index, which misaligned every later entry of
+    the failed-test list against its file name.  The plan line is now
+    located anywhere in the output rather than on the first line only,
+    and the "Failed m/n subtests" denominator is the planned count, as
+    prove reports it.
+  - pmake.bat: the install target derives the interpreter directory
+    with dirname($^X) instead of a backslash-only pattern, which left
+    it undefined on anything but Windows, and a top-level executable is
+    now copied to that directory rather than into the library tree --
+    the message already named the bin directory, only the copy did not.
+  - t/9030-distribution.t: adjusted to the new check_J() signature
+    (the distribution-specific j2_stale option no longer exists; J2 is
+    now the prerequisite-version clash check).  Category H dropped
+    because t/9060-readme.t covers README in more depth; category L
+    added for the Changes file format.
+  - t/9050-pod.t: new G13 takes over what the removed check_J j2_stale
+    option used to do -- it fails if =head1 BUGS AND LIMITATIONS still
+    lists INTERSECT/EXCEPT, index range scans, or INSERT-only CHECK as
+    missing.  Plan is now 13 tests per .pm file.
+  - t/9001-load.t: extended to verify check_L and count_L.
+  - t/9040-style.t: the k3_exempt override is gone; the shared default
+    (env, opts, args) is now sufficient.
+
+  Bug fixes:
+  - lib/DB/Handy.pm: _load_schema() no longer clobbers the caller's $_.
+    Its "while (<FH>)" loop assigned to the global $_, so calling any
+    method that loads a schema from inside a for/map/grep block either
+    corrupted the caller's list ("for (@ids) { $dbh->do(...) }" wiped
+    out the first element) or died outright with "Modification of a
+    read-only value attempted" when the list held constants.  The loop
+    now runs under "local $_".
+  - lib/DB/Handy.pm: LIMIT and OFFSET are no longer ignored on a SELECT
+    that has no WHERE, ORDER BY or GROUP BY clause.  parse_select()
+    strips leading whitespace from the clause tail before matching
+    "\s+LIMIT", so a query whose tail started with LIMIT never matched.
+    Both patterns now allow the start of the string.
+  - lib/DB/Handy.pm: a CHECK constraint no longer rejects a NULL value.
+    SQL-92 requires a constraint that evaluates to UNKNOWN to be
+    treated as satisfied, but eval_bool() returns false for an
+    undefined operand, so "INSERT INTO t (id) VALUES (1)" was refused
+    whenever any other column carried a CHECK.  Both the INSERT and the
+    UPDATE path now skip the check when the column is NULL.  A value
+    that really violates the constraint is still rejected.
+  - lib/DB/Handy.pm: LIKE patterns now escape regular-expression
+    metacharacters.  The three separate implementations each did no
+    more than "s/%/.*/g; s/_/./g", so "LIKE 'a.c'" also matched 'abc'
+    and "LIKE 'C++'" matched nothing.  All three now call the new
+    _like_to_re() helper, which passes % and _ through as wildcards and
+    quotemeta()s everything else.
+  - lib/DB/Handy.pm: a doubled single quote inside a LIKE pattern is
+    un-escaped, so "LIKE 'O''B%'" matches "O'Brien" as it already did
+    for the = operator.
+  - lib/DB/Handy.pm: COUNT(col) and COUNT(DISTINCT col) skip NULL
+    values, as SQL-92 requires.  COUNT(*) is unchanged.
+  - lib/DB/Handy.pm: _col_order_from_sql() keeps the SELECT list order
+    when the list holds three or more expressions with no AS alias.  It
+    used to give up and fall back to alphabetical order, so
+    "SELECT COUNT(*), SUM(n), MIN(n)" reported NAME and
+    fetchrow_arrayref in the order COUNT(*), MIN(n), SUM(n).  The
+    expression text is now used as the column name, which is the same
+    key project() stores the value under; the existing verification
+    step still falls back if the two disagree.
+  - lib/DB/Handy.pm: storing NULL in a FLOAT column no longer produces
+    an "Argument \"\" isn't numeric in addition (+)" warning under -w.
+    _pack_record() and _encode_key() now coerce an empty value to 0
+    before pack('d'), the way the INT branch already did.
+  - lib/DB/Handy.pm: fixed a typo in four whitespace-trimming
+    substitutions: s/^\s+|\s+\$//g matched a literal '$' rather than
+    the end of the string, so trailing whitespace was never removed
+    from INSERT column lists, SELECT column lists, derived-table column
+    lists and GROUP BY items.
+
+  Bug fixes (second round):
+  - lib/DB/Handy.pm: SQL comments are removed before parsing.  Neither
+    "--" nor "/* ... */" was recognised anywhere, so a comment placed
+    in or after the WHERE clause became part of the condition and the
+    statement silently returned no rows instead of raising an error.
+    The new _strip_sql_comments() runs at the head of execute() and
+    leaves a comment marker inside a string literal alone; an
+    unterminated "/*" comments out the rest of the statement.
+  - lib/DB/Handy.pm: _idx_write_all() no longer truncates the index
+    file before it holds the lock.  It opened with '>', which empties
+    the file at open() time, so a second writer destroyed the first
+    writer's data while waiting for the exclusive lock.  The file is
+    now opened with '+<' and truncated after the lock is taken.
+  - lib/DB/Handy.pm: _idx_read_all() takes a shared lock, and
+    _rebuild_index() takes one on the .dat file.  Both used to read
+    without any lock, so either could read a half-written file.
+  - lib/DB/Handy.pm: insert() keeps the .dat lock until every index
+    has been updated.  It used to unlock and close first, leaving a
+    window in which another process could see the new record with no
+    index entry for it.  delete_rows() already did this correctly; the
+    two paths now agree, and both take the .dat lock before the index
+    lock, so the ordering cannot deadlock.
+  - lib/DB/Handy.pm: a '?' inside a string literal is no longer treated
+    as a bind placeholder.  "UPDATE t SET s='x?y' WHERE id=?" consumed
+    the bind value for the literal's '?' and matched no rows.  The
+    substitution now skips string literals, and comments are stripped
+    before it runs.
+  - lib/DB/Handy.pm: the write paths check what they write.  print(),
+    close() and rename() return values were discarded throughout, so a
+    full disk or a read-only file produced a silent success.  insert(),
+    delete_rows(), update(), vacuum(), create_table(), create_index(),
+    _idx_write_all() and _rewrite_schema() now return undef with
+    errstr set.  The read paths are unchanged.
+  - lib/DB/Handy.pm: the VARCHAR length error said "chars" while
+    counting bytes.  It now says "bytes" on both the INSERT and the
+    UPDATE path.
+
+  Bug fixes (third round):
+  - lib/DB/Handy.pm: an INT value outside the range of the 4-byte field
+    is rejected instead of being silently clamped.  Storing 3000000000
+    used to succeed and leave 2147483647 in the column.  A value with a
+    fractional part is still truncated towards zero and a value that is
+    not numeric at all is still stored as 0; neither of those loses
+    information the caller did not already give away, so they remain
+    accepted.  Checked on both INSERT and UPDATE.
+  - lib/DB/Handy.pm: a DATE value that is not a well-formed calendar
+    date is rejected.  '2020-13-99' and '2021-02-29' used to be stored
+    verbatim.  The format must be YYYY-MM-DD with the month in 01-12
+    and the day valid for that month and year; the four-hundred-year
+    leap rule is applied, so 2000-02-29 is accepted and 1900-02-29 is
+    not.  NULL and the empty string are always accepted.  Checked on
+    both INSERT and UPDATE.
+  - lib/DB/Handy.pm: create_table() calls binmode on the .dat file it
+    creates.  This was the only file handle in the module that reached
+    a binary file without it.  The handle is closed without writing
+    anything, so no data file was ever affected.
+  - lib/DB/Handy.pm: storing a non-numeric value in an INT column no
+    longer produces an "Argument isn't numeric in int" warning under
+    -w.  _pack_record() and _encode_key() now test the value before
+    calling int(), matching the guard added to the FLOAT branch
+    earlier in this release.  The stored value is unchanged (0).
+
+  Bug fixes (fourth round):
+  - lib/DB/Handy.pm: whitespace inside a string literal is preserved.
+    execute() normalised the statement with a blanket s/\s+/ /g, which
+    also collapsed the contents of quoted values, so a newline, tab or
+    carriage return stored through SQL silently became a single space.
+    Multi-line text could not be stored at all.  Normalisation now runs
+    only outside literals, and the two INSERT dispatch patterns plus
+    parse_set_exprs() gained /s so that a value spanning lines still
+    parses.  The low-level insert() API was never affected.
+  - lib/DB/Handy.pm: an aggregate over a derived table is evaluated.
+    "SELECT COUNT(*) FROM (SELECT ...) AS sub" returned one empty row
+    per row of the derived table instead of a count, because the outer
+    projection step only copied columns.  The grouping and aggregation
+    code has been factored out of the table-backed SELECT path into
+    group_and_aggregate(), and the derived-table path now calls it.
+    GROUP BY and HAVING on the outer query are supported at the same
+    time, and ORDER BY / LIMIT / OFFSET are applied to the aggregated
+    result rather than to its input.
+  - lib/DB/Handy.pm: $dbh->{AutoCommit} reads as 1.  The AutoCommit
+    method already returned 1 but the attribute was undef, so DBI-style
+    code testing $dbh->{AutoCommit} saw the wrong answer.  DB::Handy
+    still has no transactions; assigning to the attribute changes
+    nothing.
+
+  Bug fixes (fifth round):
+  - lib/DB/Handy.pm: a JOIN whose tables carry no alias no longer loses
+    its join type and its ON condition.  The optional alias slot in the
+    FROM clause matched any word, so in "FROM a LEFT JOIN b ON ..." the
+    keyword LEFT was taken as the alias of a -- the LEFT JOIN then
+    parsed as a plain JOIN and every "a.col" reference became
+    unresolvable -- and in "JOIN b ON ..." the keyword ON was taken as
+    the alias of b, which dropped the join condition and produced a
+    silent cross join.  Both alias positions now reject the SQL
+    keywords that can legally follow a table name.  Queries that
+    already aliased every table are unaffected.
+  - lib/DB/Handy.pm: PRIMARY KEY is enforced.  CREATE TABLE now builds
+    a unique index named <column>_pk for it, so a duplicate key is
+    rejected on INSERT and on UPDATE.  Previously the column name was
+    recorded in the schema and NOT NULL was applied, but nothing ever
+    checked uniqueness, contrary to what the POD stated.
+  - lib/DB/Handy.pm: the UNIQUE column modifier and the table-level
+    UNIQUE (col) constraint are enforced.  Both were parsed away and
+    silently ignored; CREATE TABLE now builds a unique index named
+    <column>_unique for them.  A column that is both PRIMARY KEY and
+    UNIQUE gets one index, not two.
+  - lib/DB/Handy.pm: a UNIQUE column accepts any number of NULLs, as
+    SQL-92 requires and as the POD already promised.  The check now
+    skips an empty value instead of treating the empty string as an
+    ordinary duplicate.
+  - lib/DB/Handy.pm: the UNIQUE check runs after DEFAULT has been
+    applied, so the value compared is the value actually stored.
+  - lib/DB/Handy.pm: $sth->execute() rejects a bind list whose length
+    does not match $sth->{NUM_OF_PARAMS}.  A missing value used to
+    leave a bare "?" in the statement, which then matched nothing, and
+    a surplus value was dropped, so either mistake returned a silently
+    wrong result set instead of an error.
+  - lib/DB/Handy.pm: err and errstr are cleared when a statement is
+    prepared or executed, as DBI does.  A message left over from an
+    earlier failure could otherwise be read back after a call that had
+    just succeeded.
+  - lib/DB/Handy.pm: ORDER BY by select-list position works.  A sort
+    key written as a plain number was compared as a constant, so the
+    rows came back unsorted with no error at all.  Positions now
+    resolve against the select list on a single table, on SELECT *
+    (using CREATE TABLE order), with GROUP BY, in a JOIN and on a
+    derived table; a position outside the select list is reported as
+    an error.  The one case that cannot be resolved, SELECT * across a
+    JOIN, is reported rather than ignored.
+  - lib/DB/Handy.pm: ORDER BY on a derived table no longer warns about
+    an undefined value under -w when the sort key has no alias prefix.
+
+  Bug fixes (sixth round):
+  - lib/DB/Handy.pm: insert(), delete_rows(), update() and
+    _idx_write_all() get their data onto disk before the exclusive lock
+    is released.  print() buffers, and the buffer was written out by
+    close(), which runs after flock(LOCK_UN), so a second process could
+    take the lock and read the file while the writer's record was still
+    sitting in the buffer.  The handle is now put into autoflush mode
+    right after open() by the new _autoflush() helper, which uses the
+    select() idiom rather than IO::Handle so that it works on 5.005_03.
+    No corruption was observed in practice, because close() follows
+    immediately; the change removes the window rather than a known
+    failure.
+  - lib/DB/Handy.pm: vacuum() closes the replacement file before it
+    unlocks the source file, so .dat.tmp is complete on disk while the
+    exclusive lock is still held.  Both the normal and the write-error
+    path were reordered.
+  - lib/DB/Handy.pm: _idx_write_all() assembles the whole index image
+    in memory and writes it with one print() instead of one print() per
+    entry, so autoflush costs a single write() per index rebuild.
+
+  Bug fixes (seventh round):
+  - lib/DB/Handy.pm: database, table and index names given to the
+    low-level API are now checked against \w+ before they are used as
+    path components.  Without the check a name coming from outside the
+    program could walk out of base_dir: drop_database('../victim')
+    handed '../victim' straight to File::Path::rmtree() and deleted a
+    directory tree that had nothing to do with the database, and
+    create_database('../x') or create_database('a/b') created
+    directories outside it.  The guards are in new(), create_database(),
+    use_database(), drop_database(), create_table(), drop_table(),
+    create_index(), drop_index() and _load_schema(), the last of which
+    covers describe_table(), list_indexes(), insert(), delete_rows()
+    and vacuum() as well.  A rejected name sets errstr to "Invalid
+    database name '<name>'", "Invalid table name '<name>'" or "Invalid
+    index name '<name>'".  The SQL layer has always matched identifiers
+    with \w+ and is unaffected, so no SQL statement that worked before
+    is rejected now.
+  - eg/db_dump.pl: the schema is scanned for /^recsize=(\d+)$/, but the
+    engine writes the key in upper case (RECSIZE=264), so the script
+    always died with "Could not find recsize" and had never produced a
+    dump.  The match is now case-insensitive.
+  - lib/DB/Handy.pm: DB::Handy::Connection::$VERSION and
+    DB::Handy::Statement::$VERSION were assigned from
+    $DB::Handy::VERSION.  That is invisible to a static parser, so
+    Module::Metadata -- and therefore PAUSE, when it cannot fall back on
+    the provides field -- read both as 0.  Both are now literals.
+
+  New features:
+  - lib/DB/Handy.pm: $sth->{NAME_lc} and $sth->{NAME_uc} carry the
+    NAME list case-folded.
+  - lib/DB/Handy.pm: $sth->{NUM_OF_PARAMS} reports the number of ?
+    placeholders and $sth->{Statement} the SQL as prepared.  Both are
+    available as soon as prepare() returns.  A '?' inside a string
+    literal or a comment is not counted, matching what execute() does.
+
+  Incompatible changes:
+  - An INSERT or UPDATE that supplies an out-of-range INT, or a DATE
+    that is not a valid calendar date, now fails with errstr set where
+    it used to succeed with a silently altered value.  Existing rows
+    are not re-validated on read, so a data file written by 1.08 or
+    earlier keeps whatever it already holds.
+  - COUNT(col) and COUNT(DISTINCT col) return a smaller number than
+    before when the column holds NULL values.  This is the SQL-92
+    result; code that relied on the old count must switch to COUNT(*).
+  - fetchrow_arrayref(), fetchrow_array(), fetchall_arrayref(),
+    selectall_arrayref(), selectrow_arrayref() and $sth->{NAME} report
+    a different column order for a SELECT list of three or more
+    unaliased expressions.  The new order is the order written in the
+    SQL.  Code that depended on the old alphabetical order should use
+    fetchrow_hashref() or add explicit AS aliases.
+  - A LIKE pattern containing a regular-expression metacharacter now
+    matches that character literally.  Code that (knowingly or not)
+    relied on '.' or '+' behaving as a regular expression must be
+    rewritten to use the SQL wildcards % and _.
+  - CREATE TABLE with a PRIMARY KEY or a UNIQUE column now creates a
+    unique index for it, so an INSERT or UPDATE that duplicates such a
+    value fails where it used to succeed.  The index is part of the
+    table, so a table created by 1.08 or earlier keeps the old
+    behaviour until CREATE UNIQUE INDEX is run on it; the .sch and
+    .dat formats are otherwise unchanged and remain readable.
+  - $sth->execute() with the wrong number of bind values now returns
+    undef with errstr set instead of running a statement with an
+    unsubstituted placeholder or a dropped value.
+  - ORDER BY <number> is now a select-list position rather than a
+    constant.  A query that passed a literal number expecting it to be
+    ignored will now sort, or fail if the position does not exist.
+
+  Tests:
+  - t/1022_names.t: new, 33 assertions covering the identifier check.
+    The central case builds a victim directory next to base_dir, puts a
+    file in it, and asserts that drop_database('../victim') is refused
+    and the file survives.  The rest covers every guarded method, the
+    three errstr messages, that ordinary names with digits, underscores
+    and mixed case still work end to end, and that the SQL layer is
+    unchanged.
+  - t/1001_dbms.t .. t/1016_unsupported.t: the scratch directory was
+    hard-coded as /tmp/<name>_$$.  On Windows that resolves to the root
+    of the current drive (C:\tmp), which a standard user account may not
+    be able to write to, and everywhere it ignored TMPDIR/TEMP and so
+    wrote outside a smoker's working area.  All sixteen now build the
+    path with File::Spec->catdir(File::Spec->tmpdir, ...), matching
+    t/1017 onwards.
+  - t/1001_dbms.t .. t/1016_unsupported.t: the plan line was a
+    hard-coded "1..N" that had to be recounted by hand whenever an
+    assertion was added or removed.  ok()/is() now buffer their output
+    and the plan is printed from the number of assertions that actually
+    ran, so it cannot drift.  The plan still comes first in the stream,
+    which is what the Test::Harness shipped with 5.005_03 expects.  If
+    the body dies before the plan is emitted, an END block flushes what
+    did run and appends one failing assertion, so the harness gets a
+    complete and definitely-failing stream instead of no plan at all.
+  - t/1001_dbms.t .. t/1021_integrity.t: the scratch directory was
+    removed by a statement at the end of the file, which never ran if
+    the script died part way through.  All twenty-one now remove it from
+    an END block instead.
+  - t/1021_integrity.t: new, 46 assertions covering PRIMARY KEY and
+    UNIQUE enforcement and their index names, NULL exemption from
+    UNIQUE, JOIN parsing without table aliases (INNER, LEFT, LEFT
+    OUTER), the execute() bind-count check, err/errstr clearing, and
+    ORDER BY by position across the single-table, SELECT *, GROUP BY,
+    JOIN and derived-table paths.
+  - t/1008_constraints.t: the PRIMARY KEY block asserted the old
+    behaviour (a duplicate key being accepted) and now asserts that it
+    is rejected and that the index id_pk was created.
+  - t/1020_sql_layer.t: new, 31 assertions covering whitespace
+    preservation inside literals across INSERT/SELECT/WHERE/LIKE/
+    UPDATE/DELETE and index lookups, statement layout normalisation
+    outside literals, aggregates over derived tables, GROUP BY /
+    HAVING / ORDER BY / LIMIT on a derived table, and the AutoCommit
+    attribute.
+  - t/1019_types.t: new, 37 assertions covering the INT range check,
+    the values that stay accepted, DATE validity including the leap
+    year rules, NULL handling, the same checks on UPDATE, and byte
+    transparency of the .dat file.
+  - t/1018_hardening.t: new, 33 assertions covering the second-round
+    fixes: comment stripping and literal protection, index integrity
+    across INSERT/UPDATE/DELETE/vacuum, the new statement attributes,
+    placeholder handling, the documented fetchall_arrayref slice
+    behaviour, and I/O failure reporting on the write paths.  The
+    last group is skipped when chmod does not stop the test process
+    from writing (running as root, or a file system without it).
+  - t/1017_regression.t: new, 29 assertions covering each of the eight
+    fixes above.  Its plan count is derived from the list of test
+    closures rather than hard-coded, and the runner turns a die inside
+    a closure into a single "not ok" so that one crashing case does not
+    truncate the report.
+
+  Code:
+  - lib/DB/Handy.pm: _load_schema() builds the schema as a hash
+    reference from the start instead of taking \%sch of a named hash.
+    Behaviour is unchanged -- the cached entry in $self->{_tables} and
+    the returned value are still the same reference -- but the house
+    style rule "use { %hash } instead of \%hash" now holds with no
+    per-distribution exemption, which 'pmake dist' requires.
+  - t/9080-cheatsheets.t: substr($raw,$i,1) respaced to
+    substr($raw, $i, 1) (K1: a comma is followed by whitespace).
+  - lib/DB/Handy.pm: the Fcntl import is now qw(:flock).  The :DEFAULT
+    tag brought in the O_* constants, none of which is used -- every
+    open() in the module is the two-argument mode-string form.
+
+  Documentation:
+  - lib/DB/Handy.pm: DIAGNOSTICS gains the three "Invalid ... name"
+    messages, and METHODS - Low-level API opens with the identifier
+    rule and the reason it is there.
+  - lib/DB/Handy.pm, README: DIAGNOSTICS said that the error variables
+    are "set on every failed operation and cleared on success".  That
+    holds for $dbh->errstr and $sth->errstr but not for the
+    package-level $DB::Handy::errstr, which is only ever overwritten by
+    the next error and so still holds a stale message after a success.
+    Both now say so and point at the handle accessor instead.
+  - eg/crud_sample.pl: the script leaves ./sample_db behind on purpose,
+    so that eg/db_dump.pl has something to read, but said nothing about
+    it.  The header comment now explains this and the closing message
+    gives the db_dump.pl command line and the one-liner that removes the
+    directory.
+  - Contact address changed from ina@cpan.org to ina.cpan@gmail.com
+    throughout lib/DB/Handy.pm, README, Makefile.PL, META.yml,
+    META.json and SECURITY.md.
+  - lib/DB/Handy.pm: POD =head1 VERSION corrected from "Version 1.07"
+    to "Version 1.09" (was not updated at the 1.08 release).
+  - lib/DB/Handy.pm: the Subqueries section documents what the outer
+    query of a derived table accepts, including aggregates and the
+    order in which LIMIT is applied.  The feature list notes that
+    whitespace inside a quoted value is preserved.  =head1 ATTRIBUTES
+    documents AutoCommit, which is no longer listed as unimplemented.
+  - lib/DB/Handy.pm: =head1 DATA TYPES describes the INT range check
+    and the DATE validity rules, and no longer claims that no date
+    validation is performed.  The FLOAT entry now distinguishes the
+    order-preserving encoding used for index keys from the native
+    double written to the .dat file.
+  - lib/DB/Handy.pm: corrected seven POD passages that described the
+    array-ref column order as alphabetical.  It is the SELECT list
+    order for a named column list and the CREATE TABLE declaration
+    order for SELECT * (qualified, table by table, for a JOIN); the
+    =head2 NAME entry already said so, so the POD contradicted itself.
+  - lib/DB/Handy.pm: fetchall_arrayref documents that a column-index
+    slice such as [0, 2] is ignored and every column is returned.
+  - lib/DB/Handy.pm: DBI COMPATIBILITY and =head1 ATTRIBUTES list the
+    new NAME_lc / NAME_uc / NUM_OF_PARAMS / Statement attributes, and
+    Statement is no longer listed as unimplemented.
+  - lib/DB/Handy.pm: =head1 BUGS AND LIMITATIONS gains three entries:
+    declared column sizes count bytes rather than characters (a
+    VARCHAR(10) holds three UTF-8 Japanese characters, not ten); a
+    trailing NUL byte in a value is stripped when the record is read
+    back; and an unterminated /* comments out the rest of the
+    statement instead of raising a syntax error.
+  - lib/DB/Handy.pm: =head1 BUGS AND LIMITATIONS documents five
+    behaviours that were previously undocumented: NULL is stored as the
+    empty string and is indistinguishable from 0 in an INT or FLOAT
+    column; SUM/AVG/MIN/MAX return 0 rather than NULL over an empty
+    set; LIKE is case-insensitive; an unknown column name yields NULL
+    instead of an error; and FLOAT values in the .dat file use the
+    machine's native double, so a data file holding FLOAT columns is
+    not portable between machines with different byte order.  The
+    FLOAT-on-disk format is deliberately left unchanged so that data
+    files written by 1.08 and earlier stay readable.
+  - lib/DB/Handy.pm: the File locking bullet in =head1 DESCRIPTION no
+    longer calls concurrent access "safe".  It now says that a lock is
+    held for the duration of every read and write, that this serialises
+    access on a local file system, and that the return value of flock()
+    is not checked, with a link to =head1 BUGS AND LIMITATIONS.
+  - lib/DB/Handy.pm: =head1 BUGS AND LIMITATIONS gains an entry for the
+    unchecked flock() return value: where locking is unavailable (NFS
+    with no lock daemon, some network shares) the call fails silently
+    and the access proceeds unlocked, so a single writer should be
+    assumed there.  The failure is ignored deliberately, since raising
+    an error would make the module unusable on those file systems.
+  - lib/DB/Handy.pm: the "Value too long" error now reads "declared
+    VARCHAR(5), got 10 bytes" instead of "declared VARCHAR(5) bytes,
+    got 10 bytes", which stated the unit twice, and it names the type
+    the column was actually declared with.  The check covers CHAR as
+    well as VARCHAR, but the message said VARCHAR for both, so a CHAR(3)
+    violation was reported as "declared VARCHAR(3)".
+  - lib/DB/Handy.pm: FLOAT now applies the same non-numeric test that
+    INT has applied since earlier in this release, and applies it on
+    both the record path (_pack_record) and the index key path
+    (_encode_key).  Up to 1.08 the FLOAT branches handed the raw value
+    to pack(), so storing a value that was not a number leaked an
+    "isn't numeric" warning out of the module -- twice per row when the
+    column was indexed, and once more when such a column was compared
+    in a WHERE clause.  The module sets $^W itself, so the warning
+    appeared whatever the caller's own warning settings were.  The two
+    types also disagreed about what a value like '12abc' meant: INT
+    failed the test and stored 0, while FLOAT let Perl stop at the
+    first non-digit and stored 12.  Both store 0 now.  Values that
+    really are numbers are unaffected: '1e3', ' 42 ' and -2.5 still
+    round trip, and an index lookup on a FLOAT column still works.
+  - lib/DB/Handy.pm: the numeric test itself was written out three
+    times (index key encoding, type validation, record packing) and is
+    now the single function _looks_numeric().  Three copies of one
+    regular expression is how the FLOAT paths came to have no copy at
+    all, and it is the same trap that produced three copies of the LIKE
+    implementation.
+  - lib/DB/Handy.pm: =head1 DATA TYPES documents the FLOAT rule.  The
+    INT entry said what happens to a value that is not numeric; the
+    FLOAT entry said nothing.
+  - t/1019_types.t: new group T7 covers the FLOAT rule -- no warning on
+    insert, on an indexed insert, on update or on comparison; the value
+    stored is 0; INT and FLOAT agree about '12abc'; genuine numbers
+    still round trip; and both index lookups still find their rows.
+    Seven of the fourteen new assertions fail against 1.09 as first
+    built.
+
+  Documentation:
+  - lib/DB/Handy.pm: =head1 BUGS AND LIMITATIONS records that a
+    single-table WHERE clause is not syntax-checked.  The JOIN parser
+    added in this release rejects a condition it cannot read, but the
+    single-table parser still treats one as matching nothing, so
+    "WHERE x = 1 GARBAGE", "WHERE x ==== 1", "WHERE x = 1 AND" and
+    "WHERE (x = 1" all return zero rows rather than reporting a syntax
+    error.  DELETE and UPDATE fail safe -- an unreadable condition
+    changes and removes nothing -- but a SELECT gives a plausible empty
+    answer to a question it never asked.  This is the same class of
+    fault the JOIN work removed, left in place here because rejecting
+    an unreadable single-table condition would change the result of
+    existing queries; it is documented rather than silently carried.
+
+  Build tool:
+  - pmake.bat 0.44: files in the generated archive are 0644, and .pl,
+    .bat, .exe, .com and bin/* are 0755.  0664 and 0775 marked every
+    file group-writable, which is not the CPAN convention.
+  - pmake.bat 0.44: 'perl' is no longer written into PREREQ_PM in the
+    generated Makefile.PL.  MIN_PERL_VERSION already carries it, and
+    older ExtUtils::MakeMaker reports a missing prerequisite named
+    "perl" when it appears in both.  The META files still list it
+    under requires.
+  - pmake.bat 0.44: the generated CONTRIBUTING is rewritten.  The old
+    text was a GitHub template with "pull request" replaced by
+    "e-mail", which left it asking for "some small e-mail", praising
+    "Good e-mail, patches", and warning about "unrelated commits" and
+    work that would not be "merged" in a distribution that has no
+    repository.  The new text says how to report a bug and how to send
+    a diff.
+  - pmake.bat 0.44: the generated SECURITY.md no longer tells the
+    reader not to open a GitHub issue, since no GitHub URL appears in
+    the distribution's resources.  It says instead that there is no
+    public issue tracker and that private e-mail is the channel.
+  - created by INABA Hitoshi
+
 1.08  2026-04-04 JST (Japan Standard Time)
 
-    Fixes:
-    - t/9050-pod.t: replace G11 implementation with Pod::Checker OO
-      interface (Pod::Checker->new / num_errors / num_warnings) and
-      split into G11 (errors) + G12 (warnings); plan updated from
-      11 to 12 tests per .pm file.
-    - t/9050-pod.t: skip G11 Pod::Checker errors check when
-      Pod::Checker < 1.51 to avoid false FAILs caused by mis-reported
-      errors for valid L</section>, L</"section">, and L<URL> syntax
-      on older Perl installations (CPAN Testers FAIL fix).
-    - t/9050-pod.t: skip G12 Pod::Checker warnings check when
-      Pod::Checker < 1.60 to avoid false FAILs caused by mis-reported
-      warnings for valid L<> link syntax on older Perl installations.
-    - t/9050-pod.t: fix warnings stub guard to use
-      !defined(&warnings::import) form (consistent with other 9xxx
-      tests).
+  Fixes:
+  - t/9050-pod.t: replace G11 implementation with Pod::Checker OO
+    interface (Pod::Checker->new / num_errors / num_warnings) and
+    split into G11 (errors) + G12 (warnings); plan updated from
+    11 to 12 tests per .pm file.
+  - t/9050-pod.t: skip G11 Pod::Checker errors check when
+    Pod::Checker < 1.51 to avoid false FAILs caused by mis-reported
+    errors for valid L</section>, L</"section">, and L<URL> syntax
+    on older Perl installations (CPAN Testers FAIL fix).
+  - t/9050-pod.t: skip G12 Pod::Checker warnings check when
+    Pod::Checker < 1.60 to avoid false FAILs caused by mis-reported
+    warnings for valid L<> link syntax on older Perl installations.
+  - t/9050-pod.t: fix warnings stub guard to use
+    !defined(&warnings::import) form (consistent with other 9xxx
+    tests).
+  - created by INABA Hitoshi
 
 1.07  2026-03-24 JST (Japan Standard Time)
 
-    Code:
-    - lib/DB/Handy.pm: added "use 5.00503" declaration before use strict
-      (aligned with HTTP-Handy 1.02 and LTSV-LINQ 1.06 style).
+  Code:
+  - lib/DB/Handy.pm: added "use 5.00503" declaration before use strict
+    (aligned with HTTP-Handy 1.02 and LTSV-LINQ 1.06 style).
 
-    Documentation:
-    - lib/DB/Handy.pm: POD =head1 VERSION corrected from "Version 1.00"
-      to "Version 1.07" (was never updated from initial release).
-    - lib/DB/Handy.pm: TABLE OF CONTENTS fixed: added missing
-      INCLUDED DOCUMENTATION entry; removed phantom AUTHOR and
-      COPYRIGHT AND LICENSE entries; corrected section order so
-      ATTRIBUTES appears before METHODS - Low-level API; changed
-      " - " separator to " -- " (aligned with HTTP-Handy style).
-    - lib/DB/Handy.pm: DIAGNOSTICS expanded with ten new =item C<>
-      entries: "Database already exists/does not exist",
-      "Cannot open/create/drop base_dir/database/dat/schema",
-      "DB::Handy connect failed", "DB::Handy: <message>".
-    - eg/crud_sample.pl: removed shebang (#!/usr/bin/perl); corrected
-      header comment filename from "01_crud_sample.pl" to
-      "crud_sample.pl"; added CVE-2016-1238 mitigation
-      (BEGIN { pop @INC }).
-    - eg/db_dump.pl: removed shebang; added CVE-2016-1238 mitigation;
-      added FindBin / use lib boilerplate (aligned with crud_sample.pl
-      and LTSV-LINQ eg/ style).
-    - t/0005-cpan_precheck.t: extended file scan to include eg/*.pl
-      in addition to .pm and .t files (D/E/C checks now cover example
-      scripts, aligned with HTTP-Handy 1.02 and LTSV-LINQ 1.06).
-    - t/0005-cpan_precheck.t: added L check group (L1-L10): use 5.00503
-      presence (L1), header pragma order (L2), TABLE OF CONTENTS
-      completeness/phantom/order (L3), DIAGNOSTICS coverage of all
-      die/croak/$errstr messages (L4), eg/ no shebang (L5), eg/
-      CVE-2016-1238 mitigation (L6), eg/ FindBin (L7), eg/ header
-      comment filename (L8), doc/ native script per language (L9),
-      doc/ consecutive section numbers (L10).
-    - t/0004-perl5compat.t: added P13: prohibit @- / @+ / $-[N] /
-      $+[N] special variables (Perl 5.6+); applied to all .pm, .t,
-      and eg/*.pl files.  These variables caused failures when the test
-      suite was run under Perl 5.005_03 (pmake test).
-    - t/9001-load.t through t/9080-cheatsheets.t (new): second-generation
-      test suite using t/lib/INA_CPAN_Check.pm shared library.
-      9001: library load/export; 9010: encoding; 9020: Perl 5.005_03
-      compat (P1-P14, all .pm/.t/eg); 9030: distribution integrity
-      (MANIFEST/version/META/Changes/Makefile.PL/test consistency);
-      9040: coding style (E/K); 9050: POD structure and content (G1-G10
-      incl. VERSION format, TOC position/completeness, DIAGNOSTICS);
-      9060: README sections; 9070: eg/ quality (E1-E6 incl. Demonstrates
-      vs actual methods); 9080: doc/ cheat sheets (native script, section
-      order, header tag).
-    - MANIFEST: added t/lib/INA_CPAN_Check.pm and t/9001-t/9080.
+  Documentation:
+  - lib/DB/Handy.pm: POD =head1 VERSION corrected from "Version 1.00"
+    to "Version 1.07" (was never updated from initial release).
+  - lib/DB/Handy.pm: TABLE OF CONTENTS fixed: added missing
+    INCLUDED DOCUMENTATION entry; removed phantom AUTHOR and
+    COPYRIGHT AND LICENSE entries; corrected section order so
+    ATTRIBUTES appears before METHODS - Low-level API; changed
+    " - " separator to " -- " (aligned with HTTP-Handy style).
+  - lib/DB/Handy.pm: DIAGNOSTICS expanded with ten new =item C<>
+    entries: "Database already exists/does not exist",
+    "Cannot open/create/drop base_dir/database/dat/schema",
+    "DB::Handy connect failed", "DB::Handy: <message>".
+  - eg/crud_sample.pl: removed shebang (#!/usr/bin/perl); corrected
+    header comment filename from "01_crud_sample.pl" to
+    "crud_sample.pl"; added CVE-2016-1238 mitigation
+    (BEGIN { pop @INC }).
+  - eg/db_dump.pl: removed shebang; added CVE-2016-1238 mitigation;
+    added FindBin / use lib boilerplate (aligned with crud_sample.pl
+    and LTSV-LINQ eg/ style).
+  - t/0005-cpan_precheck.t: extended file scan to include eg/*.pl
+    in addition to .pm and .t files (D/E/C checks now cover example
+    scripts, aligned with HTTP-Handy 1.02 and LTSV-LINQ 1.06).
+  - t/0005-cpan_precheck.t: added L check group (L1-L10): use 5.00503
+    presence (L1), header pragma order (L2), TABLE OF CONTENTS
+    completeness/phantom/order (L3), DIAGNOSTICS coverage of all
+    die/croak/$errstr messages (L4), eg/ no shebang (L5), eg/
+    CVE-2016-1238 mitigation (L6), eg/ FindBin (L7), eg/ header
+    comment filename (L8), doc/ native script per language (L9),
+    doc/ consecutive section numbers (L10).
+  - t/0004-perl5compat.t: added P13: prohibit @- / @+ / $-[N] /
+    $+[N] special variables (Perl 5.6+); applied to all .pm, .t,
+    and eg/*.pl files.  These variables caused failures when the test
+    suite was run under Perl 5.005_03 (pmake test).
+  - t/9001-load.t through t/9080-cheatsheets.t (new): second-generation
+    test suite using t/lib/INA_CPAN_Check.pm shared library.
+    9001: library load/export; 9010: encoding; 9020: Perl 5.005_03
+    compat (P1-P14, all .pm/.t/eg); 9030: distribution integrity
+    (MANIFEST/version/META/Changes/Makefile.PL/test consistency);
+    9040: coding style (E/K); 9050: POD structure and content (G1-G10
+    incl. VERSION format, TOC position/completeness, DIAGNOSTICS);
+    9060: README sections; 9070: eg/ quality (E1-E6 incl. Demonstrates
+    vs actual methods); 9080: doc/ cheat sheets (native script, section
+    order, header tag).
+  - MANIFEST: added t/lib/INA_CPAN_Check.pm and t/9001-t/9080.
+  - created by INABA Hitoshi
 
 1.06  2026-03-22 JST (Japan Standard Time)
 
-    - Added: doc/ directory with SQL cheat sheets in 21 languages
-      (BM/BN/EN/FR/HI/ID/JA/KM/KO/MN/MY/NE/SI/TH/TL/TR/TW/UR/UZ/VI/ZH)
-      for use as learning materials for international students.
-    - Fix: col NOT IN (v1, NULL, v2) now returns 0 rows, conforming to
-      SQL standard NULL semantics (result is UNKNOWN for every row when
-      the list contains NULL and the value is not found among non-NULL
-      elements).  Previously, NULL values in the list were silently
-      ignored and rows were returned as if NULL were absent.  Fixed in
-      all four evaluation paths: compile_tree, eval_expr (where_sub
-      closure), join_select, and compile_where_from_conds (subquery).
-    - Fix: col NOT IN (SELECT ... FROM empty_table) now correctly
-      returns all rows.  Previously the empty subquery was substituted
-      as (NULL), which after the NULL-semantics fix would have produced
-      0 rows instead of all rows.
-    - Updated: BUGS AND LIMITATIONS and README revised to document the
-      corrected NOT IN NULL behaviour.
-    - Updated: t/1015_new_features.t ok9 now asserts 0 rows for
-      NOT IN with NULL in the value list.
-    - Added: t/0004-perl5compat.t -- dedicated Perl 5.005_03 compatibility
-      checker with 12 tests per .pm file: no 'our', no say/given/state,
-      no my(undef), no defined-or // (with split// exempt), no //=,
-      no yada-yada, no 'when', no \o{}, no wide \x{}, $VERSION
-      self-assignment, warnings stub, CVE-2016-1238 mitigation.
-    - Changed: test file execution order revised so that source-level
-      checks run before functional tests:
-        0001-load.t        (was 0000)
-        0002-pod.t         (was 0005)
-        0003-usascii.t     (was 0006)
-        0004-perl5compat.t (new: detailed 5.005_03 compat, including //)
-        0005-cpan_precheck.t (was 0007)
-        1001-1016          (unchanged)
-    - Fix: corrected three occurrences of the defined-or // operator
-      (Perl 5.10+) introduced in 1.06 that caused compilation failures
-      on Perl 5.005_03 (Windows pmake reported 'Global symbol requires
-      explicit package name' errors).  Replaced with ternary equivalents.
-    - Fix: WINDOW functions (OVER clause) now return type='error' with a
-      clear message instead of silently returning undef column values.
-    - Fix: FOREIGN KEY table-level constraint syntax (FOREIGN KEY (...)
-      REFERENCES ...) is now recognised and silently skipped in CREATE TABLE
-      rather than causing a parse error.
-    - Fix: begin_work, commit, and rollback now return undef with errstr
-      set rather than crashing with 'method not found'.
-    - Fix: AutoCommit attribute now returns 1 (previously undef).
-    - Fix: VARCHAR and CHAR declared sizes are now enforced on INSERT and
-      UPDATE; values longer than the declared size return type='error'.
-      Backward compatible: old schema files without stored declared sizes
-      default to no restriction (treated as VARCHAR(255)).
-    - Added: t/1016_unsupported.t (56 tests) verifying all of the above.
-    - Updated: POD, README, and DIFFERENCES FROM DBI revised to document
-      the exact behaviour of each unsupported feature.
-    - New: col NOT IN (v1, v2, ...) on an indexed column now uses an
-      index complement lookup instead of a full table scan.  The engine
-      resolves the exclusion set via the index and returns all other
-      records.  NOT IN with NULL in the list falls back to a full scan
-      (SQL semantics: the result is UNKNOWN for every row).
-    - New: last_insert_id() now accepts the four DBI positional arguments
-      ($catalog, $schema, $table, $field) and ignores them, making the
-      call signature compatible with DBI.
-    - New: connect() now accepts a dbi:Handy:key=val;... DSN prefix in
-      addition to a plain directory path or bare key=val string.
-    - New: INSERT INTO dst (...) SELECT ... FROM src now maps columns by
-      name when every destination column name exists in the SELECT result
-      row; falls back to positional order when column names differ.
-    - Added: t/1015_new_features.t (68 tests) covering all four features.
-    - Updated: POD, README, and BUGS AND LIMITATIONS revised to reflect
-      the new behaviour; stale limitations removed.
+  - Added: doc/ directory with SQL cheat sheets in 21 languages
+    (BM/BN/EN/FR/HI/ID/JA/KM/KO/MN/MY/NE/SI/TH/TL/TR/TW/UR/UZ/VI/ZH)
+    for use as learning materials for international students.
+  - Fix: col NOT IN (v1, NULL, v2) now returns 0 rows, conforming to
+    SQL standard NULL semantics (result is UNKNOWN for every row when
+    the list contains NULL and the value is not found among non-NULL
+    elements).  Previously, NULL values in the list were silently
+    ignored and rows were returned as if NULL were absent.  Fixed in
+    all four evaluation paths: compile_tree, eval_expr (where_sub
+    closure), join_select, and compile_where_from_conds (subquery).
+  - Fix: col NOT IN (SELECT ... FROM empty_table) now correctly
+    returns all rows.  Previously the empty subquery was substituted
+    as (NULL), which after the NULL-semantics fix would have produced
+    0 rows instead of all rows.
+  - Updated: BUGS AND LIMITATIONS and README revised to document the
+    corrected NOT IN NULL behaviour.
+  - Updated: t/1015_new_features.t ok9 now asserts 0 rows for
+    NOT IN with NULL in the value list.
+  - Added: t/0004-perl5compat.t -- dedicated Perl 5.005_03 compatibility
+    checker with 12 tests per .pm file: no 'our', no say/given/state,
+    no my(undef), no defined-or // (with split// exempt), no //=,
+    no yada-yada, no 'when', no \o{}, no wide \x{}, $VERSION
+    self-assignment, warnings stub, CVE-2016-1238 mitigation.
+  - Changed: test file execution order revised so that source-level
+    checks run before functional tests:
+      0001-load.t        (was 0000)
+      0002-pod.t         (was 0005)
+      0003-usascii.t     (was 0006)
+      0004-perl5compat.t (new: detailed 5.005_03 compat, including //)
+      0005-cpan_precheck.t (was 0007)
+      1001-1016          (unchanged)
+  - Fix: corrected three occurrences of the defined-or // operator
+    (Perl 5.10+) introduced in 1.06 that caused compilation failures
+    on Perl 5.005_03 (Windows pmake reported 'Global symbol requires
+    explicit package name' errors).  Replaced with ternary equivalents.
+  - Fix: WINDOW functions (OVER clause) now return type='error' with a
+    clear message instead of silently returning undef column values.
+  - Fix: FOREIGN KEY table-level constraint syntax (FOREIGN KEY (...)
+    REFERENCES ...) is now recognised and silently skipped in CREATE TABLE
+    rather than causing a parse error.
+  - Fix: begin_work, commit, and rollback now return undef with errstr
+    set rather than crashing with 'method not found'.
+  - Fix: AutoCommit attribute now returns 1 (previously undef).
+  - Fix: VARCHAR and CHAR declared sizes are now enforced on INSERT and
+    UPDATE; values longer than the declared size return type='error'.
+    Backward compatible: old schema files without stored declared sizes
+    default to no restriction (treated as VARCHAR(255)).
+  - Added: t/1016_unsupported.t (56 tests) verifying all of the above.
+  - Updated: POD, README, and DIFFERENCES FROM DBI revised to document
+    the exact behaviour of each unsupported feature.
+  - New: col NOT IN (v1, v2, ...) on an indexed column now uses an
+    index complement lookup instead of a full table scan.  The engine
+    resolves the exclusion set via the index and returns all other
+    records.  NOT IN with NULL in the list falls back to a full scan
+    (SQL semantics: the result is UNKNOWN for every row).
+  - New: last_insert_id() now accepts the four DBI positional arguments
+    ($catalog, $schema, $table, $field) and ignores them, making the
+    call signature compatible with DBI.
+  - New: connect() now accepts a dbi:Handy:key=val;... DSN prefix in
+    addition to a plain directory path or bare key=val string.
+  - New: INSERT INTO dst (...) SELECT ... FROM src now maps columns by
+    name when every destination column name exists in the SELECT result
+    row; falls back to positional order when column names differ.
+  - Added: t/1015_new_features.t (68 tests) covering all four features.
+  - Updated: POD, README, and BUGS AND LIMITATIONS revised to reflect
+    the new behaviour; stale limitations removed.
+  - created by INABA Hitoshi
 
 1.05  2026-03-21 JST (Japan Standard Time)
 
-    - New: SELECT * now presents columns in CREATE TABLE declaration order
-      (previously alphabetical).  For SELECT * with JOIN, columns follow
-      table appearance order (FROM first, then each JOIN), each table's
-      columns in declaration order, as 'alias.col' qualified names.
-      Named SELECT lists (SELECT a, b) continue to follow the SELECT order.
-    - New: INSERT INTO table VALUES (...) without a column list is now
-      supported; values are assigned to columns in CREATE TABLE order.
-      Mismatched value count returns an error.
-    - Added: t/1014_colorder_insert.t (72 tests) covering both features.
-    - Updated: POD and README revised; column-order limitation removed.
+  - New: SELECT * now presents columns in CREATE TABLE declaration order
+    (previously alphabetical).  For SELECT * with JOIN, columns follow
+    table appearance order (FROM first, then each JOIN), each table's
+    columns in declaration order, as 'alias.col' qualified names.
+    Named SELECT lists (SELECT a, b) continue to follow the SELECT order.
+  - New: INSERT INTO table VALUES (...) without a column list is now
+    supported; values are assigned to columns in CREATE TABLE order.
+    Mismatched value count returns an error.
+  - Added: t/1014_colorder_insert.t (72 tests) covering both features.
+  - Updated: POD and README revised; column-order limitation removed.
+  - created by INABA Hitoshi
 
 1.04  2026-03-21 JST (Japan Standard Time)
 
-    - New: pure OR expressions where every atom has an index now use
-      index lookups and return the union of matching records, rather
-      than a full table scan.  Mixed OR/AND and OR with any unindexed
-      column still fall back to a full table scan.
-    - Added: t/1013_or_index.t (62 tests) covering OR index acceleration.
-    - Updated: POD and README revised to document the new behaviour.
+  - New: pure OR expressions where every atom has an index now use
+    index lookups and return the union of matching records, rather
+    than a full table scan.  Mixed OR/AND and OR with any unindexed
+    column still fall back to a full table scan.
+  - Added: t/1013_or_index.t (62 tests) covering OR index acceleration.
+  - Updated: POD and README revised to document the new behaviour.
+  - created by INABA Hitoshi
 
 1.03  2026-03-21 JST (Japan Standard Time)
 
-    - New: col IN (v1, v2, ...) predicates on indexed columns now use
-      index lookups (one equality lookup per value, results unioned)
-      instead of a full table scan.  NOT IN is not optimised.
-    - Added: t/1012_in_index.t (56 tests) covering IN index acceleration.
-    - Updated: POD and README revised to document the new behaviour.
-    - Style: commas in function/method calls are now consistently followed
-      by a space (commas inside regex patterns and string literals exempt).
-    - Style: \@array references rewritten as [ @array ]; \%hash references
-      rewritten as { %hash } where semantically equivalent.
-    - Checks: t/0007-cpan_precheck.t gains Category K (3 tests) that
-      enforce the above coding-style rules on all .pm files.
+  - New: col IN (v1, v2, ...) predicates on indexed columns now use
+    index lookups (one equality lookup per value, results unioned)
+    instead of a full table scan.  NOT IN is not optimised.
+  - Added: t/1012_in_index.t (56 tests) covering IN index acceleration.
+  - Updated: POD and README revised to document the new behaviour.
+  - Style: commas in function/method calls are now consistently followed
+    by a space (commas inside regex patterns and string literals exempt).
+  - Style: \@array references rewritten as [ @array ]; \%hash references
+    rewritten as { %hash } where semantically equivalent.
+  - Checks: t/0007-cpan_precheck.t gains Category K (3 tests) that
+    enforce the above coding-style rules on all .pm files.
+  - created by INABA Hitoshi
 
 1.02  2026-03-21 JST (Japan Standard Time)
 
-    - New: Multi-column AND queries now exploit an available index on
-      one of the columns (partial AND index pushdown). Example:
-      WHERE dept = 'Eng' AND salary > 70000 uses the dept or salary
-      index rather than performing a full table scan.
-    - New: INTERSECT, INTERSECT ALL, EXCEPT, and EXCEPT ALL set
-      operations are now supported alongside UNION / UNION ALL.
-    - Added: t/1011_index_and_setop.t (69 tests) covering both features.
-    - Updated: POD and README revised to document the new behaviour.
+  - New: Multi-column AND queries now exploit an available index on
+    one of the columns (partial AND index pushdown). Example:
+    WHERE dept = 'Eng' AND salary > 70000 uses the dept or salary
+    index rather than performing a full table scan.
+  - New: INTERSECT, INTERSECT ALL, EXCEPT, and EXCEPT ALL set
+    operations are now supported alongside UNION / UNION ALL.
+  - Added: t/1011_index_and_setop.t (69 tests) covering both features.
+  - Updated: POD and README revised to document the new behaviour.
+  - created by INABA Hitoshi
 
 1.01  2026-03-20 JST (Japan Standard Time)
 
-    - Fixed: CHECK constraints are now enforced on UPDATE as well as INSERT.
-    - Fixed: WHERE col BETWEEN lo AND hi and
-      WHERE col OP lo AND col OP hi (two-sided AND range on one column)
-      now exploit an index when available.
-    - Fixed: fetchrow_arrayref, fetchrow_array, and sth->{NAME} now
-      reflect the SELECT list column order for named column lists.
-      SELECT * and JOIN results still fall back to alphabetical order.
-    - Added: t/1010_fixes.t (60 tests) covering the three fixes above.
-    - Updated: POD and README revised to document the corrected behaviour.
+  - Fixed: CHECK constraints are now enforced on UPDATE as well as INSERT.
+  - Fixed: WHERE col BETWEEN lo AND hi and
+    WHERE col OP lo AND col OP hi (two-sided AND range on one column)
+    now exploit an index when available.
+  - Fixed: fetchrow_arrayref, fetchrow_array, and sth->{NAME} now
+    reflect the SELECT list column order for named column lists.
+    SELECT * and JOIN results still fall back to alphabetical order.
+  - Added: t/1010_fixes.t (60 tests) covering the three fixes above.
+  - Updated: POD and README revised to document the corrected behaviour.
+  - created by INABA Hitoshi
 
 1.00  2026-03-19 JST (Japan Standard Time)
 
-    - First release on CPAN.
+  - First release on CPAN.

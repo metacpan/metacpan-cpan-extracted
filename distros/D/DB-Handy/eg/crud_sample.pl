@@ -1,5 +1,11 @@
 ######################################################################
 # crud_sample.pl - Basic CRUD operations using DB::Handy
+#
+# The sample database is created in ./sample_db under the current
+# working directory and is deliberately left in place when the script
+# finishes, so that db_dump.pl can be pointed at the files it wrote.
+# Re-running the script wipes and recreates the directory, and the
+# closing message says how to remove it by hand.
 ######################################################################
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
@@ -61,4 +67,13 @@ while (my $row = $sth_sel->fetchrow_hashref) {
 $sth_sel->finish;
 
 $dbh->disconnect;
+
+# The sample database is kept on purpose so that it can be inspected with
+# eg/db_dump.pl.  Say where it is and how to get rid of it, rather than
+# leaving an unexplained directory behind in the user's working directory.
+my $sch = "$base_dir/school/student.sch";
+my $dat = "$base_dir/school/student.dat";
 print "\n--- End of Sample ---\n";
+print "\nThe sample database was left in $base_dir so you can inspect it:\n";
+print "    perl db_dump.pl $sch $dat\n";
+print "Remove it with: perl -MFile::Path -e \"File::Path::rmtree('$base_dir')\"\n";

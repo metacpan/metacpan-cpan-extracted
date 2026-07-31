@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.21';
+$VERSION = '0.23';
 use Tk;
 use App::Codit::CodeTextManager;
 use Config;
@@ -19,7 +19,8 @@ App::Codit - IDE for and in Perl
 
 =head1 DESCRIPTION
 
-Codit is a versatile text editor / integrated development environment aimed at the Perl programming language.
+Codit is a versatile text editor / integrated development environment aimed at the
+Perl programming language.
 
 It is written in Perl/Tk and based on the L<Tk::AppWindow> application framework.
 
@@ -209,6 +210,10 @@ Codit comes with these plugins:
 
 =item B<Console> see L<App::Codit::Plugins::Console>
 
+=item B<Critic> see L<App::Codit::Plugins::Critic>
+
+=item B<Diff> see L<App::Codit::Plugins::Diff>
+
 =item B<Exporter> see L<App::Codit::Plugins::Exporter>
 
 =item B<FileBrowser> see L<App::Codit::Plugins::FileBrowser>
@@ -233,9 +238,119 @@ Codit comes with these plugins:
 
 =head1 CONFIG VARIABLES
 
-Codit defines one config variable.
+Codit defines the following config variables. The I<-content...> variables all
+have an undefined default value. Most of them can be set through the Settings panel.
+As long as you do not set them, the factory value of the L<Tk::CodeText> widget is used.
 
 =over 4
+
+=item Switch B<-contentacpopsize>
+
+Specifies how many characters you type before an auto complete suggestion list pops up.
+
+=item Switch B<-contentacscansize>
+
+Specifies the minimum word length for an addition to the database.
+
+=item Switch B<-contentactivedelay>
+
+Specifies the delay in ms between the moment the user stops typing and the moment an
+auto complete suggestion list pops up.
+
+=item Switch B<-contentautobrackets>
+
+Boolean. If set, Every time you type a (, {, {, ' or " it's counterpart will be placed
+right after it and the insert cursor in between.
+
+=item Switch B<-contentautocomplete>
+
+Boolean. If set, auto complete is on.
+
+=item Switch B<-contentautoindent>
+
+Boolean. If set, auto indent is on.
+
+=item Switch B<-contentbackground>
+
+Background color of the Tk::CodeText widget.
+
+=item Switch B<-contentbgdspace>
+
+Background color of leading and trailing spaces when showspaces is on.
+
+=item Switch B<-contentbgdtab>
+
+Background color of leading and trailing tabs when showspaces is on.
+
+=item Switch B<-contentbookmarkcolor>
+
+Background color of line number indicator of bookmarked lines.
+
+=item Switch B<-contentfindbg>
+
+Background color search hits.
+
+=item Switch B<-contentfontfamily>
+
+Font family to be used for editing.
+
+=item Switch B<-contentfontsize>
+
+Font size to be used for editing.
+
+=item Switch B<-contentforeground>
+
+Background color of the Tk::CodeText widget.
+
+=item Switch B<-contentindent>
+
+Set the preferred indent style. You can set it to 'tab'
+if you use tabs for indenting. Or you set it to the number
+of spaces you want to use for indenting.
+
+=item Switch B<-contentmatchbg>
+
+Background color used when matching {}, (), and [].
+
+=item Switch B<-contentmatchfg>
+
+Foreground color used when matching {}, (), and [].
+
+=item Switch B<-contentshowspaces>
+
+Boolean. If set, Leading and trailing spaces and tabs are shown
+with a special background..
+
+=item Switch B<-contentsyntax>
+
+Default syntax setting for a new text document.
+
+=item Switch B<-contenttabs>
+
+Specify your tab size. See also L<Tk::Text>.
+
+=item Switch B<-contentwrap>
+
+Specify your wrap style. See also L<Tk::Text>.
+
+=item Switch B<-highlight_themefile>
+
+Specify the theme file used for syntax highlighting.
+
+=item Switch B<-showfolds>
+
+Boolean. If you clear it the fold indicators in the L<Tk::CodeText> widget
+will be hidden.
+
+=item Switch B<-shownumbers>
+
+Boolean. If you clear it the line number indicators in the L<Tk::CodeText> widget
+will be hidden.
+
+=item Switch B<-showstatus>
+
+Boolean. If you clear it the status bar in the L<Tk::CodeText> widget
+will be hidden.
 
 =item Switch B<-uniqueinstance>
 
@@ -368,7 +483,7 @@ sub Populate {
 			],
 			http => 'https://www.perlgui.org/appcodit/',
 		},
-		-helpfile => 'http://www.perlgui.org/wp-content/uploads/2025/03/manual-0.19.pdf',
+		-helpfile => 'https://www.perlgui.org/wp-content/uploads/2026/07/manual-0.22.pdf',
 
 		#configure content manager
 		-contentmanagerclass => 'CodeTextManager',
@@ -384,8 +499,6 @@ sub Populate {
 			'-contentbgdtab',
 			'-contentbookmarkcolor',
 			'-contentfindbg',
-			'-contentfindfg',
-#			'-contentfont',
 			'-contentfontfamily',
 			'-contentfontsize',
 			'-contentforeground',

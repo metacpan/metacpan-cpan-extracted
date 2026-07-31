@@ -3,10 +3,11 @@
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability in this distribution, please report
-it by e-mail to the author at ina@cpan.org.
+it by e-mail to the author at ina.cpan@gmail.com.
 
-Do NOT open a public GitHub issue for security vulnerabilities.  Please use
-private e-mail so that a fix can be prepared before public disclosure.
+Please do not disclose the problem publicly before a fix is available.
+This distribution has no public issue tracker; private e-mail to the author
+is the reporting channel.
 
 You can expect an acknowledgement within a few days.  If you do not receive
 a response within one week, please follow up.

@@ -81,13 +81,14 @@ my $override = Sub::Override->override(
 # Assertion from ArtifactResponse #
 ###################################
 my $assertion_artifact = Net::SAML2::Protocol::Artifact->new_from_xml(
-    xml => $artifact_assertion_response,
+    xml     => $artifact_assertion_response,
 );
 
 isa_ok($assertion_artifact, "Net::SAML2::Protocol::Artifact");
 
 my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-    xml => $assertion_artifact->response,
+    xml     => $assertion_artifact->response,
+    insecure_trust_embedded_cert => 1,
 );
 
 isa_ok($assertion, "Net::SAML2::Protocol::Assertion");
@@ -99,7 +100,8 @@ is($assertion->in_response_to, 'NETSAML2_2b2bcaa750d745ed5ffec2e3cc3a905ab855de0
 is($assertion->id, 'ID_ef9c4328-63de-4d55-ae05-e5342e67f36c', "Assertion ID - ok");
 
 $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-    xml => $assertion_artifact->get_response(),
+    xml     => $assertion_artifact->get_response(),
+    insecure_trust_embedded_cert => 1,
 );
 
 isa_ok($assertion, "Net::SAML2::Protocol::Assertion", "from get_response");
@@ -114,7 +116,7 @@ is($assertion->id, 'ID_ef9c4328-63de-4d55-ae05-e5342e67f36c', "Assertion ID - ok
 # LogoutResponse from ArtifactResponse #
 ########################################
 my $logout_artifact = Net::SAML2::Protocol::Artifact->new_from_xml(
-    xml => $artifact_logout_response,
+    xml     => $artifact_logout_response,
 );
 
 isa_ok($logout_artifact, "Net::SAML2::Protocol::Artifact");

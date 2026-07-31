@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "PAGI" : "0",
+            "PAGI::Server" : "0",
+            "PAGI::Tools" : "0",
             "WebDyne" : "0",
             "perl" : "5.006"
          }
@@ -46,15 +47,12 @@
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://github.com/aspeer/pm-Task-WebDyne-PAGI",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/aspeer/pm-Task-WebDyne-PAGI.git",
          "web" : "https://github.com/aspeer/pm-Task-WebDyne-PAGI"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

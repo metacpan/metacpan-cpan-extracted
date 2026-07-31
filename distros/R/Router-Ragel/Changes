@@ -1,5 +1,10 @@
 Revision history for Router-Ragel
 
+0.05    2026-07-30
+    - Security and correctness fixes in pattern validation, captures and
+      serialization
+    - Clearer diagnostics and documented limitations
+
 0.04    2026-06-05
     - Croak instead of crashing on match() without a router object
     - Documentation and test coverage improvements

@@ -1,119 +1,127 @@
-#######################
-# Project identifiers #
-#######################
+mappingVersion: 2
+
+source:
+  profile: csv
+
+target:
+  model: beacon
+  schemaVersion: '2.0.0'
 
 project:
   id: CSV_src_test
-  source: csv
-  ontology: ncit
   version: test-0.1
   description: Mapping file for a CSV with generic clinical data
-  baselineFieldsToPropagate: [Sex,Ethnicity,TobaccoUse,AgeAtTobaccoExposure,AlcoholUse,AgeAtAlcoholExposure,Disease_1,Disease_2,Disease_3,PhenotypicFeature_1,PhenotypicFeature_2]
 
-#################################
-# Beacon v2 Models: individuals #
-#################################
+defaults:
+  ontology: ncit
+
+records:
+  visitId:
+    sourceField: VisitOccurrenceId
+  baseline:
+    strategy: firstNonNull
+    sourceFields: [Sex, Ethnicity, TobaccoUse, AgeAtTobaccoExposure, AlcoholUse, AgeAtAlcoholExposure, Disease_1, Disease_2, Disease_3, PhenotypicFeature_1, PhenotypicFeature_2]
 
 beacon:
   individuals:
-    # Term: diseases
-    diseases:
-      fields: [Disease_1,Disease_2,Disease_3]
-      visitId: VisitOccurrenceId
-      valueTermLabels:
-        Ashtma: Ashtma
-        Diabetes: Diabetes Mellitus
-  
-    # Term: ethnicity
-    ethnicity:
-      fields: Ethnicity
-      valueTermLabels:
-        Caucasian: White
-        Hispanic: Hispanic or Latino
-  
-    # Term: exposures
-    exposures: 
-      fields: [AlcoholUse,TobaccoUse]
-      useHeaderAsTermLabel: [AlcoholUse,TobaccoUse]
-      visitId: VisitOccurrenceId
-      fieldTermLabels:
-        AlcoholUse: Alcohol
-        TobaccoUse: Tobacco
-      fieldRules:
-        AlcoholUse:
-          ageAtExposure: AgeAtAlcoholExposure
-        TobaccoUse:
-          ageAtExposure: AgeAtTobaccoExposure
-  
-    # Term: geographicOrigin
-    # geographicOrigin: null
-  
-    # Term: id
     id:
-      fields: [PatientId,EventName]
-      targetFields:
-        primaryKey: PatientId 
-  
-    # Term: info
+      sourceFields: [PatientId, EventName]
+      primaryKey: PatientId
+      separator: ':'
+      missingValue: NA
+
+    sex:
+      sourceField: Sex
+      query: { from: value }
+
+    ethnicity:
+      sourceField: Ethnicity
+      query:
+        from: value
+        aliases:
+          Caucasian: White
+          Hispanic: Hispanic or Latino
+
+    diseases:
+      defaults:
+        diseaseCode:
+          query:
+            from: value
+            aliases: { Ashtma: Ashtma, Diabetes: Diabetes Mellitus }
+      rules:
+        - { sourceField: Disease_1, when: { nonEmpty: true } }
+        - { sourceField: Disease_2, when: { nonEmpty: true } }
+        - { sourceField: Disease_3, when: { nonEmpty: true } }
+
+    exposures:
+      defaults:
+        unit: { query: { from: value } }
+      rules:
+        - sourceField: AlcoholUse
+          when: { notValues: ['No', 'False'] }
+          exposureCode: { query: Alcohol }
+          ageAtExposure: { sourceField: AgeAtAlcoholExposure }
+        - sourceField: TobaccoUse
+          when: { notValues: ['No', 'False'] }
+          exposureCode: { query: Tobacco }
+          ageAtExposure:
+            sourceField: AgeAtTobaccoExposure
+
     info:
-     fields: []
-  
-    # Term: measures
+      sourceFields: []
+
     measures:
-      ontology: ncit
-      fields: [Hemoglobin (g/dL), WBC (10^9/L), Platelets (10^9/L), BMI (kg/m^2)]
-      useHeaderAsTermLabel: [Hemoglobin (g/dL), WBC (10^9/L), Platelets (10^9/L), BMI (kg/m^2)]
-      visitId: VisitOccurrenceId 
-      fieldTermLabels:
-        'Hemoglobin (g/dL)': Hemoglobin Measurement
-        'WBC (10^9/L)': Leukocyte
-        'Platelets (10^9/L)': Platelet Count
-        'BMI (kg/m^2)': Body Mass Index
-      unit:
-        'Hemoglobin (g/dL)':
-          label: Gram per Deciliter
-          referenceRange:
-            low: 12.1
-            high: 17.2
-        'WBC (10^9/L)':
-          label: Cells per Microliter
-          referenceRange:
-            low: 4.0
-            high: 11.0
-        'Platelets (10^9/L)':
-          label: Cells per Microliter
-          referenceRange:
-            low: 150
-            high: 450
-        'BMI (kg/m^2)':
-          label: Kilogram per Square Meter
-          referenceRange:
-            low: 18.5
-            high: 24.9
-          procedureCodeLabel: Physical Examination Category
-  
-    # Term: phenotypicFeatures
-    phenotypicFeatures: 
-      ontology: hpo
-      fields: [PhenotypicFeature_1,PhenotypicFeature_2]
-      visitId: VisitOccurrenceId
-  
-    # Term: sex
-    sex: 
-      fields: Sex
-  
-    # Term: treatments
+      defaults:
+        procedure:
+          procedureCode: { query: Blood Test Result }
+      rules:
+        - sourceField: 'Hemoglobin (g/dL)'
+          assayCode: { query: Hemoglobin Measurement }
+          measurementValue:
+            quantity:
+              unit: { query: Gram per Deciliter }
+              referenceRange: { low: 12.1, high: 17.2 }
+        - sourceField: 'WBC (10^9/L)'
+          assayCode: { query: Leukocyte }
+          measurementValue:
+            quantity:
+              unit: { query: Cells per Microliter }
+              referenceRange: { low: 4.0, high: 11.0 }
+        - sourceField: 'Platelets (10^9/L)'
+          assayCode: { query: Platelet Count }
+          measurementValue:
+            quantity:
+              unit: { query: Cells per Microliter }
+              referenceRange: { low: 150, high: 450 }
+        - sourceField: 'BMI (kg/m^2)'
+          assayCode: { query: Body Mass Index }
+          measurementValue:
+            quantity:
+              unit: { query: Kilogram per Square Meter }
+              referenceRange: { low: 18.5, high: 24.9 }
+          procedure:
+            procedureCode: { query: Physical Examination Category }
+
+    phenotypicFeatures:
+      defaults:
+        featureType:
+          ontology: hpo
+          query: { from: value }
+      rules:
+        - { sourceField: PhenotypicFeature_1, when: { nonEmpty: true } }
+        - { sourceField: PhenotypicFeature_2, when: { nonEmpty: true } }
+
     treatments:
-      fields: [DrugName]
-      visitId: VisitOccurrenceId
-      drugDose:
-        DrugName: DrugDose (mg)
-      drugUnit:
-        DrugName: Milligram
-      duration:
-        DrugName: TreatmentDuration (weeks)
-      durationUnit:
-        DrugName: Week
-      routeOfAdministration: 
-        Albuterol: oral
-        Lisinopril: oral
+      rules:
+        - sourceField: DrugName
+          when: { nonEmpty: true }
+          treatmentCode:
+            query: { from: value }
+          routeOfAdministration: { query: Oral Route of Administration }
+          cumulativeDose:
+            value: { sourceField: 'TreatmentDuration (weeks)' }
+            unit: { query: Week }
+          doseIntervals:
+            quantity:
+              value: { sourceField: 'DrugDose (mg)' }
+              unit: { query: Milligram }

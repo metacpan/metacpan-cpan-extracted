@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::SAML2::Db;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 
 use v5.24;
 use Moo;

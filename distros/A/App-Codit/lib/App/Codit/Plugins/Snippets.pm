@@ -9,7 +9,7 @@ App::Codit::Plugins::Snippets - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 use Carp;
 
@@ -93,12 +93,7 @@ sub new {
 	)->pack(@padding, -fill => 'x');
 	my @to = ();
 
-	my $fam = $self->configGet('-contentfontfamily');
-	$fam = 'Courier' unless defined $fam;
-	my $siz = $self->configGet('-contentfontsize');
-	$siz = 10 unless defined $siz;
 	my $text = $sf->Scrolled('XText', @to,
-		-font => "{$fam} $siz",
 		-scrollbars => 'osoe',
 		-tabs => '8m',
 		-wrap => 'none',
@@ -107,6 +102,7 @@ sub new {
 	)->pack(@padding, -expand => 1, -fill => 'both');
 	$self->{TEXT} = $text;
 
+	$self->ReConfigure;
 	$self->listRefresh;
 	return $self;
 }
@@ -169,6 +165,16 @@ sub listRefresh {
 sub Quit {
 	my $self = shift;
 	$self->snippetSave;
+}
+
+sub ReConfigure {
+	my $self = shift;
+	my $txt = $self->{TEXT};
+	my $fam = $self->configGet('-contentfontfamily');
+	$fam = 'Courier' unless defined $fam;
+	my $siz = $self->configGet('-contentfontsize');
+	$siz = 10 unless defined $siz;
+	$txt->configure(-font => "{$fam} $siz");
 }
 
 sub snippetAdd {

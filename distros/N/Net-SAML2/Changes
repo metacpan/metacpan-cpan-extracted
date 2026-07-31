@@ -1,5 +1,180 @@
 Revision history for Perl extension Net::SAML2.
 
+0.88 -- Thu Jul 30 23:49:54 ADT 2026
+
+    - Re-issue 0.86 as the version number was incorrect in lib/Net/SAML2.pm
+
+    [Security Release]
+    This release hardens Response and Assertion verification.  Upgrading is
+    strongly recommended. Fixes:
+    - CVE-2026-18089
+    - CVE-2026-18092
+
+    [Significant Changes]
+    BREAKING CHANGE: a trust anchor (cacert or cert_text) is now required to
+    verify a Response or Assertion.  See the Compatibility section below.
+
+    - Implement cacert as a required trust anchor; only trust Assertions that validate
+    - Net::SAML2::SP::post_binding now forwards its arguments to
+      Net::SAML2::Binding::POST instead of discarding them
+    - Defend against XML Signature Wrapping: anchor all extractions at the
+      validated subtree and croak on duplicate-ID wrapping
+    - Verify decrypted EncryptedAssertions against the trust anchor
+    - New require_signed_assertion and require_signed_response options, both
+      opt-in and off by default.  require_signed_response does not apply to
+      samlp:ArtifactResponse
+    - Added support for validating the Issuer and Destination
+    - xsd:ID values may no longer be empty
+
+    [Compatibility Deprecation Warning]
+
+    BREAKING CHANGE: As of Release 0.86, one of cacert, cert_text or
+    insecure_trust_embedded_cert must be provided when instantiating:
+
+    - Net::SAML2::SP                     (forwards cacert to sp_post_binding)
+    - Net::SAML2::Binding::POST
+    - Net::SAML2::Object::Response
+    - Net::SAML2::Protocol::Assertion
+
+    insecure_trust_embedded_cert trusts the certificate embedded in the
+    message itself, which provides no protection against a forged Assertion.
+    It exists for test and development use only.
+
+    As of Release 0.79 the following have been changed and the old version may be
+    removed in an upcoming release.
+
+    - Net::SAML2::Protocol::Artifact
+        - response_to changed to in_response_to
+    - Net::SAML2::Protocol::LogoutResponse
+        - response_to changed to in_response_to
+
+    [Detailed Change Log]
+    - 9b5d70b Update version for a release
+    - 743f410 (tag: 0.87) Incorrect version in release
+    - 803a4a2 Increment version for a release
+    - c3a2967 v0.86
+    - b679659 Increment version for a release
+    - d5fefe4 Updates for a release
+    - 55ff856 Update the release to use sigstore for signing
+    - 4c65b2c Fix pod issues, update readme and make assert_saml_value private
+    - ec4550f testapp: encryption_key is a public key certificate
+    - 58381ab Revert the update to XML::Sig until it is released
+    - 15dfbdb Skip network testing as LWP::Protocol::https fails a test
+    - e49b10d Add subroutines to simplify object instantiation
+    - ee3d959 Require XML::Sig 0.71
+    - 7af036b use Try::Tiny and add length test to XsdID->check
+    - c53eaa4 Fix regressions - we want the context to be considered
+    - 5155fa1 Simplify for readability
+    - 8442513 Break out get_trusted_assertion into its own function
+    - f3ab873 Fix the Abstract
+    - 5f1186e Add regression tests for XSW defenses and require_signed_assertion
+    - e6d2922 Move get_pem_from_keynode to Net::SAML2::Role::XMLCertificate
+    - d916468 Anchor at the assertion only when there is exactly one
+    - 201fead Assertion: anchor extractions at the validated subtree
+    - 360e3aa Fix some issues in the Issuer and Destination checks
+    - 0a8e748 Simplify the checks by using assertion
+    - 41c162f Refactor new_from_xml
+    - 7dfcd4e Improve the error message format somewhat
+    - a202864 Assertion: verify decrypted EncryptedAssertion against cacert/cert_text
+    - 778cdbe Exclude the samlp:ArtifactResponse from require_signed_response check
+    - 57d4a08 Add missing trust propogation in to_assertion()
+    - 1db83bd Fix treatment of require_signed_response
+    - 8da1e0d Add the trust anchor requirement to Response
+    - 170e1d2 Use BUILDARGS for trust_anchors
+    - 39703b2 Fix test issues due to insecure anchor
+    - b0b8bdb Implement insecure_no_trust_anchor and require cacert or cert_text
+    - 4ddfc45 Require no_comments instead of calling XML::LibXML->load_xml()
+    - d52a40d Update testapp to check issuer and destination
+    - f4c33eb Add additional checks on the Assertion/Response for the Issuer and Destination
+    - a7635ed Increment repo version
+    - 9733ba4 v0.85
+
+0.87 -- Unreleased
+    - Version 0.86 had the the incorrect version in lin/Net/SAML2.pm
+
+0.86 -- Thu Jul 30 23:14:40 ADT 2026
+
+    [Security Release]
+    This release hardens Response and Assertion verification.  Upgrading is
+    strongly recommended. Fixes:
+    - CVE-2026-18089
+    - CVE-2026-18092
+
+    [Significant Changes]
+    BREAKING CHANGE: a trust anchor (cacert or cert_text) is now required to
+    verify a Response or Assertion.  See the Compatibility section below.
+
+    - Implement cacert as a required trust anchor; only trust Assertions that validate
+    - Net::SAML2::SP::post_binding now forwards its arguments to
+      Net::SAML2::Binding::POST instead of discarding them
+    - Defend against XML Signature Wrapping: anchor all extractions at the
+      validated subtree and croak on duplicate-ID wrapping
+    - Verify decrypted EncryptedAssertions against the trust anchor
+    - New require_signed_assertion and require_signed_response options, both
+      opt-in and off by default.  require_signed_response does not apply to
+      samlp:ArtifactResponse
+    - Added support for validating the Issuer and Destination
+    - xsd:ID values may no longer be empty
+
+    [Compatibility Deprecation Warning]
+
+    BREAKING CHANGE: As of Release 0.86, one of cacert, cert_text or
+    insecure_trust_embedded_cert must be provided when instantiating:
+
+    - Net::SAML2::SP                     (forwards cacert to sp_post_binding)
+    - Net::SAML2::Binding::POST
+    - Net::SAML2::Object::Response
+    - Net::SAML2::Protocol::Assertion
+
+    insecure_trust_embedded_cert trusts the certificate embedded in the
+    message itself, which provides no protection against a forged Assertion.
+    It exists for test and development use only.
+
+    As of Release 0.79 the following have been changed and the old version may be
+    removed in an upcoming release.
+
+    - Net::SAML2::Protocol::Artifact
+        - response_to changed to in_response_to
+    - Net::SAML2::Protocol::LogoutResponse
+        - response_to changed to in_response_to
+
+    [Detailed Change Log]
+    - b679659 Increment version for a release
+    - d5fefe4 Updates for a release
+    - 55ff856 Update the release to use sigstore for signing
+    - 4c65b2c Fix pod issues, update readme and make assert_saml_value private
+    - ec4550f testapp: encryption_key is a public key certificate
+    - 58381ab Revert the update to XML::Sig until it is released
+    - 15dfbdb Skip network testing as LWP::Protocol::https fails a test
+    - e49b10d Add subroutines to simplify object instantiation
+    - ee3d959 Require XML::Sig 0.71
+    - 7af036b use Try::Tiny and add length test to XsdID->check
+    - c53eaa4 Fix regressions - we want the context to be considered
+    - 5155fa1 Simplify for readability
+    - 8442513 Break out get_trusted_assertion into its own function
+    - f3ab873 Fix the Abstract
+    - 5f1186e Add regression tests for XSW defenses and require_signed_assertion
+    - e6d2922 Move get_pem_from_keynode to Net::SAML2::Role::XMLCertificate
+    - d916468 Anchor at the assertion only when there is exactly one
+    - 201fead Assertion: anchor extractions at the validated subtree
+    - 360e3aa Fix some issues in the Issuer and Destination checks
+    - 0a8e748 Simplify the checks by using assertion
+    - 41c162f Refactor new_from_xml
+    - 7dfcd4e Improve the error message format somewhat
+    - a202864 Assertion: verify decrypted EncryptedAssertion against cacert/cert_text
+    - 778cdbe Exclude the samlp:ArtifactResponse from require_signed_response check
+    - 57d4a08 Add missing trust propogation in to_assertion()
+    - 1db83bd Fix treatment of require_signed_response
+    - 8da1e0d Add the trust anchor requirement to Response
+    - 170e1d2 Use BUILDARGS for trust_anchors
+    - 39703b2 Fix test issues due to insecure anchor
+    - b0b8bdb Implement insecure_no_trust_anchor and require cacert or cert_text
+    - 4ddfc45 Require no_comments instead of calling XML::LibXML->load_xml()
+    - d52a40d Update testapp to check issuer and destination
+    - f4c33eb Add additional checks on the Assertion/Response for the Issuer and Destination
+    - a7635ed Increment repo version
+    - 9733ba4 v0.85
+
 0.85 -- Mon Feb 09 19:43:26 AST 2026
 
     [Significant Changes]

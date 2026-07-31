@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::Redirect;
 use Moose;
 
-our $VERSION = '0.85'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
 use Carp qw(croak);
 use Crypt::PK::RSA;
@@ -212,7 +212,7 @@ Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =head1 SYNOPSIS
 

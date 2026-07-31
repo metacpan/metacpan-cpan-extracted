@@ -309,6 +309,7 @@ subtest 'IP fallback: dont_use_ip suppresses country-based language detection' =
 	delete local $ENV{LANG};
 
 	my $l = _obj([$LANG{EN}], dont_use_ip => 1);
+	$l->{_have_ipcountry} = 0;    # GEO_ABSENT — force "no IP::Country" path
 	$l->{_have_geoip}     = 0;    # GEO_ABSENT — force "no Geo::IP" path
 	$l->{_have_geoipfree} = 0;    # GEO_ABSENT — force "no Geo::IPfree" path
 	is($l->language(), 'Unknown', 'dont_use_ip: language() returns Unknown with no header');

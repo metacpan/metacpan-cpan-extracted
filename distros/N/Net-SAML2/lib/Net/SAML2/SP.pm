@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.85'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
 use Moose;
 
@@ -73,6 +73,12 @@ has 'sign_metadata' => (isa => 'Bool', is => 'ro', required => 0, default => 1);
 
 has assertion_consumer_service => (is => 'ro', isa => 'ArrayRef', required => 1);
 has single_logout_service => (is => 'ro', isa => 'ArrayRef', required => 1);
+
+has 'insecure_trust_embedded_cert' => (
+    isa       => 'Bool',
+    is        => 'ro',
+    default   => 0,
+);
 
 around BUILDARGS => sub {
     my $orig = shift;
@@ -282,6 +288,10 @@ sub sp_post_binding {
         ) : (
             insecure => 1,
         ),
+        $self->cacert ? (cacert => $self->cacert) : (),
+        $self->insecure_trust_embedded_cert ? (
+            insecure_trust_embedded_cert => $self->insecure_trust_embedded_cert
+        ) : (),
         param => $param,
     );
 
@@ -529,7 +539,7 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =head1 SYNOPSIS
 
@@ -537,6 +547,7 @@ my $sp = Net::SAML2::SP->new(
     issuer => 'http://localhost:3000',
     url    => 'http://localhost:3000',
     cert   => 'sign-nopw-cert.pem',
+    cacert => 'IdP-cacert.pem',
     key    => 'sign-nopw-key.pem',
 );
 

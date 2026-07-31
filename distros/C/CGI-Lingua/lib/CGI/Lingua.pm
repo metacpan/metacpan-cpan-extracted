@@ -18,7 +18,7 @@ use Class::Autouse qw{
 	I18N::LangTags::Detect
 };
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 # ── Module-level constants ───────────────────────────────────────────────────
 # Gathering magic strings here makes behavioural changes one-edit operations.
@@ -44,7 +44,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.83
+Version 0.84
 
 =cut
 
@@ -211,7 +211,7 @@ sub new
 			# JSON cannot execute code regardless of its content.
 			# If the blob is not valid JSON (e.g. a legacy Storable entry), the
 			# eval catches the error and we fall through to fresh construction.
-			my $rc = eval { JSON::PP::decode_json($frozen) };
+			my $rc = eval { local $SIG{__DIE__}; JSON::PP::decode_json($frozen) };
 			unless(defined $rc && ref($rc) eq 'HASH') {
 				$rc = undef;    # stale or corrupt entry — rebuild below
 			}
@@ -627,7 +627,6 @@ sub _accept_language_match
 #               descending quality value so fallback scans honour q= priority.
 # Entry:        $header — validated Accept-Language string.
 # Exit:         Arrayref of [$language_tag, $quality] pairs, highest q first.
-# Side Effects: None.
 sub _sorted_tokens
 {
 	my ($self, $header) = @_;
@@ -1199,6 +1198,13 @@ sub country {
 			$ip = '127.0.0.1';    # normalise loopback
 		} elsif($ip =~ /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/i) {
 			$ip = $1;             # normalise IPv4-mapped IPv6 (::ffff:a.b.c.d) to plain IPv4
+			# \d{1,3} matches 0-999; validate range before geo lookups because
+			# some inet_aton implementations wrap out-of-range octets modulo 256,
+			# turning 999.999.999.999 into a real routable address.
+			unless(is_ipv4($ip)) {
+				$self->_warn({ warning => "$ip isn't a valid IP address" });
+				return;
+			}
 		} elsif(!is_ipv6($ip)) {
 			$self->_warn({ warning => "$ip isn't a valid IP address" });
 			return;
@@ -1416,7 +1422,6 @@ sub _resolve_country_via_whois
 #               (e.g. "US\r", "GB # United Kingdom").
 # Entry:        $raw — raw country string from a Whois response.
 # Exit:         Cleaned 2-char country code string.
-# Side Effects: None.
 sub _clean_country_code
 {
 	my ($raw) = @_;

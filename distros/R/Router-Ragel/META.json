@@ -36,6 +36,7 @@
             "JSON::PP" : "0",
             "Mojolicious" : "0",
             "Plack::Request" : "0",
+            "Pod::Markdown" : "0",
             "Router::R3" : "0",
             "Router::XS" : "0",
             "Test::CPAN::Changes" : "0",
@@ -52,6 +53,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Digest::MD5" : "0",
             "Inline" : "0",
             "Inline::C" : "0",
             "Inline::Filters::Ragel" : "0",
@@ -62,8 +65,10 @@
          "requires" : {
             "Devel::Size" : "0",
             "Encode" : "0",
+            "File::Temp" : "0",
+            "Storable" : "0",
             "Test::LeakTrace" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.94",
             "URI::Escape::XS" : "0"
          }
       }
@@ -71,7 +76,7 @@
    "provides" : {
       "Router::Ragel" : {
          "file" : "lib/Router/Ragel.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -85,6 +90,6 @@
          "web" : "https://github.com/vividsnow/Router-Ragel"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

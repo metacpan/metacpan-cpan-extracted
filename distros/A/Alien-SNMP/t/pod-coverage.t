@@ -21,8 +21,10 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-# Alien::SNMP::Install::Files is a machine-generated back-compat shim emitted by
-# Alien::Build::MM into blib; it has no POD by design, so exclude it.
-my @modules = grep { !/::Install::Files$/ } all_modules();
+# Scoped to lib/: the default is blib, which also holds Alien::Build::MM's
+# machine-generated Alien::SNMP::Install::Files shim and the bundled Net-SNMP perl
+# modules (SNMP.pm, NetSNMP::*) staged there by the alienfile.  Neither is ours to
+# document.
+my @modules = all_modules('lib');
 plan tests => scalar @modules;
 pod_coverage_ok($_, "Pod coverage on $_") for @modules;

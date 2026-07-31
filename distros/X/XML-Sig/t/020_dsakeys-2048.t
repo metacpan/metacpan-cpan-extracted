@@ -10,7 +10,7 @@ my $sig = XML::Sig->new({ key => 't/dsa.private-2048.key', });
 isa_ok($sig, 'XML::Sig');
 isa_ok($sig->{key_obj}, 'Crypt::OpenSSL::DSA', 'Key object is valid');
 
-my $signed = $sig->sign('<foo ID="123"></foo>');
+my $signed = $sig->sign('<foo ID="_123"></foo>');
 ok($signed, "XML Signed Sucessfully using DSA key");
 
 SKIP: {

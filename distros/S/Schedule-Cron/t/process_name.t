@@ -11,7 +11,7 @@ my $orig_proc_name = $0;
 
 my $dispatch_1 = sub {
     my $test_msg = 'process name suffixed with debug status by default';
-    my $process_name_rx = '^Schedule::Cron MainLoop - next: '.scalar(localtime).'$';
+    my $process_name_rx = '^Schedule::Cron MainLoop - next: .+$';
     if ($0 =~ /$process_name_rx/) {
         die "1-$test_msg\n";
     }
@@ -85,12 +85,12 @@ $0 = $orig_proc_name;
 
 my $dispatch_4 = sub {
     my $test_msg = 'process name prefixed with string when using processprefix';
-    my $rx = '^foo MainLoop - next: '.scalar(localtime).'$';
+    my $rx = '^foo MainLoop - next: .+$';
     if ($0 =~ /$rx/) {
         die "1-$test_msg\n";
     }
     else {
-        die "0-test_msg\n";
+        die "0-$test_msg\n";
     }
 };
 $cron = Schedule::Cron->new(

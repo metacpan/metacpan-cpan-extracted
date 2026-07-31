@@ -1,6 +1,6 @@
 package Net::SAML2::Protocol::Artifact;
 use Moose;
-our $VERSION = '0.85'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
 use MooseX::Types::DateTime qw/ DateTime /;
 use DateTime::Format::XSD;
@@ -102,7 +102,7 @@ Net::SAML2::Protocol::Artifact - SAML2 artifact object
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =head1 SYNOPSIS
 

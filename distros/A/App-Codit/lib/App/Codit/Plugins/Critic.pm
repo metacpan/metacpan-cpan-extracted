@@ -9,7 +9,7 @@ App::Codit::Plugins::Critic - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -78,14 +78,9 @@ sub new {
 		-command => ['Clear', $self],
 	)->pack(@padding, -fill => 'x');
 
-	my $fam = $self->configGet('-contentfontfamily');
-	$fam = 'Courier' unless defined $fam;
-	my $siz = $self->configGet('-contentfontsize');
-	$siz = 10 unless defined $siz;
 	my $txt = $sa->Scrolled('ROText',
-		-font => "{$fam} $siz",
 		-scrollbars => 'oe',
-		-width => 40,
+		-width => 80,
 		-wrap => 'word',
 	)->pack(@padding, -expand => 1, -fill => 'both');
 	$self->{TXT} = $txt;
@@ -95,6 +90,7 @@ sub new {
 	$txt->tagBind('link', '<Leave>', sub { $txt->configure('-cursor', 'xterm')});
 	$txt->tagBind('link', '<ButtonRelease-1>', [$self, 'linkClick', Ev('x'), Ev('y')]);
 
+	$self->ReConfigure;
 	return $self;
 }
 
@@ -154,6 +150,16 @@ sub linkClick {
 		$widg->focus;
 	}
 
+}
+
+sub ReConfigure {
+	my $self = shift;
+	my $txt = $self->{TXT};
+	my $fam = $self->configGet('-contentfontfamily');
+	$fam = 'Courier' unless defined $fam;
+	my $siz = $self->configGet('-contentfontsize');
+	$siz = 10 unless defined $siz;
+	$txt->configure(-font => "{$fam} $siz");
 }
 
 sub Unload {

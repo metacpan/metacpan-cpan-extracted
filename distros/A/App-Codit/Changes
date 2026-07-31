@@ -1,5 +1,16 @@
 Revision history for Perl extension App::Codit.
 
+0.23 Thu Jul 30 2026
+	- Version 0.22 could not be index by cpan. Fixed that.
+
+0.22 Thu Jul 30 2026
+	- Removed an image file from the manifest that should not have been there.
+	- Plugins Critic, Diff, FileBrowser and Snippets have their ReConfigure method in place.
+	- Added documentation about the -content... options.
+	- Facilitated the use of Tk::CodeText version 0.69.
+	- Updated documentation.
+	- Updated manual.
+
 0.21 Mon Jul 20 2026
 	- Corrected documntation.
 	- Git plugin ignores non existing files in the git file list.

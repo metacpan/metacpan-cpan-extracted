@@ -6,11 +6,9 @@ use autodie;
 use feature               qw(say);
 use File::Spec::Functions qw(catdir catfile);
 use Data::Dumper;
-use Path::Tiny;
 use File::Basename;
 use File::ShareDir::ProjectDistDir;
 use List::Util qw(any uniq);
-use XML::Fast;
 use Moo;
 use Types::Standard                qw(Str Int Num Enum ArrayRef Undef);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
@@ -18,7 +16,10 @@ use File::ShareDir::ProjectDistDir qw(dist_dir);
 use Convert::Pheno::IO::CSVHandler;
 use Convert::Pheno::IO::FileIO;
 use Convert::Pheno::Context;
+use Convert::Pheno::Pipeline qw(run_conversion_pipeline);
 use Convert::Pheno::Runner qw(run_operation);
+use Convert::Pheno::Source qw(source_adapter);
+use Convert::Pheno::Operations qw(conversion_spec);
 use Convert::Pheno::Emit::OMOP qw(
   dispatcher_open_stream_out
   transform_item
@@ -28,7 +29,6 @@ use Convert::Pheno::Emit::OMOP qw(
   omop_stream_targets_finalize
   omop_streams_multiple_entities
 );
-use Convert::Pheno::OMOP::Source qw(collect_omop_input);
 use Convert::Pheno::OMOP::ParticipantStream qw(
   omop_require_concept
   omop_init_caches_and_metadata
@@ -44,7 +44,9 @@ use Convert::Pheno::PXF::ToBFF;
 use Convert::Pheno::OpenEHR::ToBFF;
 use Convert::Pheno::BFF::ToPXF;
 use Convert::Pheno::BFF::ToOMOP;
-use Convert::Pheno::CDISC;
+use Convert::Pheno::CDISC::ODM;
+use Convert::Pheno::CDISC::SDTM::ToBFF;
+use Convert::Pheno::FHIR::ToBFF;
 use Convert::Pheno::REDCap;
 
 use Exporter 'import';
@@ -56,7 +58,7 @@ our @EXPORT =
 use constant DEVEL_MODE => 0;
 
 # Global variables:
-our $VERSION   = '0.32';
+our $VERSION   = '0.33';
 our $share_dir = dist_dir('Convert-Pheno');
 
 # SQLite database
@@ -174,6 +176,7 @@ has [
 has [qw /data method/] => ( is => 'rw' );
 has entities => ( is => 'ro', default => sub { ['individuals'] } );
 has derived_entity_overrides => ( is => 'ro', default => sub { {} } );
+has output_name_overrides => ( is => 'ro', default => sub { {} } );
 
 ##########################################
 # End declaring attributes for the class #
@@ -260,11 +263,7 @@ sub redcap2bff {
 
 sub redcap2pxf {
     my $self = shift;
-    return _convert_via_bff(
-        $self,
-        via_method => 'redcap2bff',
-        to_method  => 'bff2pxf',
-    );
+    return run_conversion_pipeline($self);
 }
 
 #################
@@ -275,12 +274,7 @@ sub redcap2pxf {
 
 sub redcap2omop {
     my $self = shift;
-    return _convert_via_bff(
-        $self,
-        via_method => 'redcap2bff',
-        to_method  => 'bff2omop',
-        merge_omop => 1,
-    );
+    return run_conversion_pipeline($self);
 }
 
 ##########################################################
@@ -294,7 +288,7 @@ sub _with_temp_self_field {
 
 sub _omop_collect_input {
     my ($self) = @_;
-    return collect_omop_input($self);
+    return source_adapter( $self, 'omop' )->load;
 }
 
 sub _omop_require_concept {
@@ -328,11 +322,16 @@ sub omop2bff {
     );
 
     if ( $self->{stream} ) {
-        return omop_stream_dispatcher(
-            {
-                self      => $self,
-                filepath  => $self->{filepath_sql},
-                filepaths => $self->{filepaths_csv},
+        return _with_prepared_data_cleanup(
+            $self,
+            sub {
+                return omop_stream_dispatcher(
+                    {
+                        self      => $self,
+                        filepath  => $self->{filepath_sql},
+                        filepaths => $self->{filepaths_csv},
+                    }
+                );
             }
         );
     }
@@ -348,64 +347,127 @@ sub omop2bff {
 
 sub omop2pxf {
     my $self = shift;
-
-    if ( exists $self->{data} ) {
-        $self->{omop_cli} = 0;
-        return _convert_via_bff(
-            $self,
-            via_method => 'omop2bff',
-            to_method  => 'bff2pxf',
-        );
-    }
-
-    $self->{method_ori} = 'omop2pxf';
-    $self->{method}     = 'omop2bff';
-    $self->{omop_cli}   = 1;
-
-    return omop2bff($self);
+    return run_conversion_pipeline($self);
 }
 
 ###############
 ###############
-#  CDISC2BFF  #
+# CDISCODM2BFF #
 ###############
 ###############
 
-sub cdisc2bff {
+sub cdiscodm2bff {
     my $self = shift;
-    _prepare_cdisc2bff_input($self);
+    _prepare_cdiscodm2bff_input($self);
     return _run_primary_view($self);
 }
 
 ###############
 ###############
-#  CDISC2PXF  #
+# CDISCODM2PXF #
 ###############
 ###############
 
-sub cdisc2pxf {
+sub cdiscodm2pxf {
     my $self = shift;
-    return _convert_via_bff(
-        $self,
-        via_method => 'cdisc2bff',
-        to_method  => 'bff2pxf',
-    );
+    return run_conversion_pipeline($self);
 }
 
 ################
 ################
-#  CDISC2OMOP  #
+# CDISCODM2OMOP #
 ################
 ################
 
-sub cdisc2omop {
+sub cdiscodm2omop {
     my $self = shift;
-    return _convert_via_bff(
+    return run_conversion_pipeline($self);
+}
+
+####################
+####################
+# DATASETJSON2BFF   #
+####################
+####################
+
+sub datasetjson2bff {
+    my $self = shift;
+    _prepare_datasetjson2bff_input($self);
+    $self->{convertPheno} ||= get_info($self);
+    $self->{conversion_context} = Convert::Pheno::Context->from_self(
         $self,
-        via_method => 'cdisc2bff',
-        to_method  => 'bff2omop',
-        merge_omop => 1,
+        {
+            source_format => 'dataset-json',
+            target_format => 'beacon',
+            entities      => $self->{entities} || ['individuals'],
+        }
     );
+    return _run_primary_view($self);
+}
+
+####################
+####################
+# DATASETJSON2PXF   #
+####################
+####################
+
+sub datasetjson2pxf {
+    my $self = shift;
+    return run_conversion_pipeline($self);
+}
+
+####################
+####################
+# DATASETJSON2OMOP  #
+####################
+####################
+
+sub datasetjson2omop {
+    my $self = shift;
+    return run_conversion_pipeline($self);
+}
+
+##############
+##############
+#  FHIR2BFF  #
+##############
+##############
+
+sub fhir2bff {
+    my $self = shift;
+    _prepare_fhir2bff_input($self);
+    $self->{convertPheno} ||= get_info($self);
+    $self->{conversion_context} = Convert::Pheno::Context->from_self(
+        $self,
+        {
+            source_format => 'fhir',
+            target_format => 'beacon',
+            entities      => $self->{entities} || ['individuals'],
+        }
+    );
+    return _run_primary_view($self);
+}
+
+##############
+##############
+#  FHIR2PXF  #
+##############
+##############
+
+sub fhir2pxf {
+    my $self = shift;
+    return run_conversion_pipeline($self);
+}
+
+##############
+##############
+# FHIR2OMOP  #
+##############
+##############
+
+sub fhir2omop {
+    my $self = shift;
+    return run_conversion_pipeline($self);
 }
 
 #############
@@ -436,12 +498,7 @@ sub pxf2bff {
 
 sub pxf2omop {
     my $self = shift;
-    return _convert_via_bff(
-        $self,
-        via_method => 'pxf2bff',
-        to_method  => 'bff2omop',
-        merge_omop => 1,
-    );
+    return run_conversion_pipeline($self);
 }
 
 #################
@@ -473,11 +530,7 @@ sub openehr2bff {
 
 sub openehr2pxf {
     my $self = shift;
-    return _convert_via_bff(
-        $self,
-        via_method => 'openehr2bff',
-        to_method  => 'bff2pxf',
-    );
+    return run_conversion_pipeline($self);
 }
 
 #############
@@ -500,11 +553,7 @@ sub csv2bff {
 
 sub csv2pxf {
     my $self = shift;
-    return _convert_via_bff(
-        $self,
-        via_method => 'csv2bff',
-        to_method  => 'bff2pxf',
-    );
+    return run_conversion_pipeline($self);
 }
 
 ##############
@@ -515,12 +564,7 @@ sub csv2pxf {
 
 sub csv2omop {
     my $self = shift;
-    return _convert_via_bff(
-        $self,
-        via_method => 'csv2bff',
-        to_method  => 'bff2omop',
-        merge_omop => 1,
-    );
+    return run_conversion_pipeline($self);
 }
 
 #############
@@ -565,9 +609,13 @@ sub pxf2jsonld {
 sub _dispatcher_input_data {
     my ($self) = @_;
     return $self->{data} if exists $self->{data};
-    return ( $self->{in_textfile} && $self->{method} !~ m/^(redcap2|omop2|cdisc2|csv)/ )
-      ? io_yaml_or_json( { filepath => $self->{in_file}, mode => 'read' } )
-      : $self->{data};
+    return $self->{data}
+      unless $self->{in_textfile}
+      && $self->{method} !~ m/^(redcap2|omop2|cdiscodm2|csv)/;
+
+    my $spec = conversion_spec( $self->{method} )
+      or die "Unsupported conversion <$self->{method}>\n";
+    return source_adapter( $self, $spec->{source} )->load->data;
 }
 
 sub _dispatcher_open_stream_out {
@@ -576,28 +624,60 @@ sub _dispatcher_open_stream_out {
 
 sub _run_primary_view {
     my ($self) = @_;
-    return run_operation(
-        $self,
-        _dispatcher_input_data($self),
-        view => 'primary',
-    );
+    return _run_view( $self, 'primary' );
 }
 
 sub _run_bundle_view {
     my ($self) = @_;
     _prepare_bundle_input($self);
-    return run_operation(
+    return _run_view( $self, 'bundle' );
+}
+
+sub _run_view {
+    my ( $self, $view ) = @_;
+    my $input = _dispatcher_input_data($self);
+
+    return _with_prepared_data_cleanup(
         $self,
-        _dispatcher_input_data($self),
-        view => 'bundle',
+        sub {
+            return run_operation(
+                $self,
+                $input,
+                view => $view,
+            );
+        }
     );
+}
+
+sub _with_prepared_data_cleanup {
+    my ( $self, $code ) = @_;
+    my $owns_prepared_data = delete $self->{_owns_prepared_data};
+
+    my ( $ok, $error, $result );
+    $ok = eval {
+        $result = $code->();
+        1;
+    };
+    $error = $@ unless $ok;
+
+    # Module callers own their references. Only release buffers loaded or
+    # derived internally; clearing a caller's array corrupts reusable input.
+    delete $self->{data} if $owns_prepared_data;
+
+    die $error unless $ok;
+    return $result;
 }
 
 sub _prepare_bundle_input {
     my ($self) = @_;
 
     return _prepare_redcap2bff_input($self) if $self->{method} eq 'redcap2bff';
-    return _prepare_cdisc2bff_input($self)  if $self->{method} eq 'cdisc2bff';
+    return _prepare_cdiscodm2bff_input($self)
+      if $self->{method} eq 'cdiscodm2bff';
+    return _prepare_datasetjson2bff_input($self)
+      if $self->{method} eq 'datasetjson2bff';
+    return _prepare_fhir2bff_input($self)
+      if $self->{method} eq 'fhir2bff';
     return _prepare_csv2bff_input($self)    if $self->{method} eq 'csv2bff';
     return _prepare_openehr2bff_input($self)
       if $self->{method} eq 'openehr2bff' || $self->{method} eq 'openehr2pxf';
@@ -620,62 +700,64 @@ sub _prepare_bundle_input {
 sub _prepare_redcap2bff_input {
     my ($self) = @_;
     return 1 if exists $self->{data} && exists $self->{data_mapping_file};
+    return _prepare_tabular_input( $self, 'redcap' );
+}
 
-    $self->{data} = read_csv(
-        {
-            in             => $self->{in_file},
-            sep            => $self->{sep},
-            coerce_numbers => 0,
-        }
-    );
-    $self->{data_redcap_dict} = read_redcap_dict_file(
-        {
-            redcap_dictionary => $self->{redcap_dictionary},
-        }
-    );
-    my $loaded_mapping_file = read_mapping_file(
-        {
-            mapping_file         => $self->{mapping_file},
-            self_validate_schema => $self->{self_validate_schema},
-            schema_file          => $self->{schema_file}
-        }
-    );
-    $self->{data_mapping_file} =
-      select_mapping_entity( $loaded_mapping_file, 'individuals' );
-    $self->{metaData}     = get_metaData($self);
-    $self->{convertPheno} = get_info($self);
-    $self->{mapping_file_derived_entity_overrides} =
-      _mapping_file_derived_entity_overrides($loaded_mapping_file);
+sub _prepare_cdiscodm2bff_input {
+    my ($self) = @_;
+    return 1 if exists $self->{data} && exists $self->{data_mapping_file};
+    return _prepare_tabular_input( $self, 'cdisc-odm' );
+}
+
+sub _prepare_datasetjson2bff_input {
+    my ($self) = @_;
+    return 1
+      if $self->{dataset_json_input_prepared} && exists $self->{data};
+
+    # Keep the caller's Dataset-JSON documents separate from the normalized
+    # participant buffer. The latter is released after each conversion, while
+    # the former allows a module caller to reuse the same converter safely.
+    $self->{_dataset_json_source_data} = $self->{data}
+      if exists $self->{data} && !exists $self->{_dataset_json_source_data};
+    $self->{data} = $self->{_dataset_json_source_data}
+      if !exists $self->{data} && exists $self->{_dataset_json_source_data};
+
+    my $source = source_adapter( $self, 'dataset-json' )->load;
+    $self->{data} = $source->data;
+    $self->{_owns_prepared_data} = 1 if $source->owned;
+    $self->{dataset_json_metadata} = $source->artifact('dataset_metadata');
+    $self->{dataset_json_subject_independent_domains} =
+      $source->artifact('subject_independent_domains');
+    $self->{source_derived_entity_overrides} =
+      $source->artifact('derived_entity_overrides') || {};
+    $self->{convertPheno} ||= get_info($self);
+    $self->{dataset_json_input_prepared} = 1;
 
     return 1;
 }
 
-sub _prepare_cdisc2bff_input {
+sub _prepare_fhir2bff_input {
     my ($self) = @_;
-    return 1 if exists $self->{data} && exists $self->{data_mapping_file};
+    return 1 if $self->{fhir_input_prepared} && exists $self->{data};
 
-    my $str  = path( $self->{in_file} )->slurp_utf8;
-    my $hash = xml2hash $str, attr => '-', text => '~';
+    # Keep caller-owned Bundles reusable while releasing the normalized,
+    # patient-scoped buffer after conversion.
+    $self->{_fhir_source_data} = $self->{data}
+      if exists $self->{data} && !exists $self->{_fhir_source_data};
+    $self->{data} = $self->{_fhir_source_data}
+      if !exists $self->{data} && exists $self->{_fhir_source_data};
 
-    $self->{data} = cdisc2redcap($hash);
-    $self->{data_redcap_dict} = read_redcap_dict_file(
-        {
-            redcap_dictionary => $self->{redcap_dictionary},
-        }
-    );
-    my $loaded_mapping_file = read_mapping_file(
-        {
-            mapping_file         => $self->{mapping_file},
-            self_validate_schema => $self->{self_validate_schema},
-            schema_file          => $self->{schema_file}
-        }
-    );
-    $self->{data_mapping_file} =
-      select_mapping_entity( $loaded_mapping_file, 'individuals' );
-    $self->{metaData}     = get_metaData($self);
-    $self->{convertPheno} = get_info($self);
-    $self->{mapping_file_derived_entity_overrides} =
-      _mapping_file_derived_entity_overrides($loaded_mapping_file);
+    my $source = source_adapter( $self, 'fhir' )->load;
+    my $patients = $source->data;
+    $self->{data} = $patients;
+    $self->{_owns_prepared_data} = 1 if $source->owned;
+    $self->{fhir_bundle_metadata} = $source->artifact('bundle_metadata');
+    $self->{fhir_unassigned_resources} =
+      $source->artifact('unassigned_resources');
+    $self->{source_derived_entity_overrides} =
+      $source->artifact('derived_entity_overrides') || {};
+    $self->{convertPheno} ||= get_info($self);
+    $self->{fhir_input_prepared} = 1;
 
     return 1;
 }
@@ -683,23 +765,20 @@ sub _prepare_cdisc2bff_input {
 sub _prepare_csv2bff_input {
     my ($self) = @_;
     return 1 if exists $self->{data} && exists $self->{data_mapping_file};
+    return _prepare_tabular_input( $self, 'csv' );
+}
 
-    $self->{data} = read_csv(
-        {
-            in             => $self->{in_file},
-            sep            => $self->{sep},
-            coerce_numbers => 0,
-        }
-    );
-    my $loaded_mapping_file = read_mapping_file(
-        {
-            mapping_file         => $self->{mapping_file},
-            self_validate_schema => $self->{self_validate_schema},
-            schema_file          => $self->{schema_file}
-        }
-    );
-    $self->{data_mapping_file} =
-      select_mapping_entity( $loaded_mapping_file, 'individuals' );
+sub _prepare_tabular_input {
+    my ( $self, $format ) = @_;
+    my $source = source_adapter( $self, $format )->load;
+
+    $self->{data} = $source->data;
+    $self->{_owns_prepared_data} = 1 if $source->owned;
+    $self->{data_redcap_dict} = $source->artifact('redcap_dictionary')
+      if defined $source->artifact('redcap_dictionary');
+    $self->{data_mapping_file} = $source->artifact('entity_mapping');
+
+    my $loaded_mapping_file = $source->artifact('mapping');
     $self->{metaData}     = get_metaData($self);
     $self->{convertPheno} = get_info($self);
     $self->{mapping_file_derived_entity_overrides} =
@@ -717,16 +796,25 @@ sub _prepare_omop2bff_input {
     _ensure_omop_specimen_table_for_biosamples($self);
     $self->{prev_omop_tables} = [ @{ $self->{omop_tables} } ];
 
-    my $ctx  = _omop_collect_input($self);
-    my $data = $ctx->{data};
+    my $source = _omop_collect_input($self);
+    my $data   = $source->data;
 
     _omop_require_concept( $self, $data );
-    _require_omop_specimen_for_biosamples( $self, $data, $ctx );
+    _require_omop_specimen_for_biosamples(
+        $self,
+        $data,
+        {
+            filepath_sql  => $source->artifact('filepath_sql'),
+            filepaths_csv => $source->artifact('filepaths_csv'),
+        }
+    );
     _omop_init_caches_and_metadata( $self, $data );
     _omop_prepare_data_shape( $self, $data );
+    $self->{_owns_prepared_data} = 1 if $source->owned;
 
-    $self->{filepath_sql}  = $ctx->{filepath_sql}  if exists $ctx->{filepath_sql};
-    $self->{filepaths_csv} = $ctx->{filepaths_csv} if exists $ctx->{filepaths_csv};
+    $self->{filepath_sql} = $source->artifact('filepath_sql')
+      if defined $source->artifact('filepath_sql');
+    $self->{filepaths_csv} = $source->artifact('filepaths_csv') || [];
 
     return 1;
 }
@@ -735,68 +823,16 @@ sub _prepare_openehr2bff_input {
     my ($self) = @_;
     return 1 if $self->{openehr_input_prepared};
 
-    my @documents = _collect_openehr_documents($self);
+    my $source = source_adapter( $self, 'openehr' )->load;
+    my @documents = @{ $source->data };
     my $grouped   = _group_openehr_documents_by_patient( $self, \@documents );
 
     $self->{data} = @{$grouped} == 1 ? $grouped->[0] : $grouped;
+    $self->{_owns_prepared_data} = 1 if $source->owned;
     $self->{convertPheno} ||= get_info($self);
     $self->{openehr_input_prepared} = 1;
 
     return 1;
-}
-
-sub _collect_openehr_documents {
-    my ($self) = @_;
-
-    return _normalize_openehr_documents( $self->{data} ) if exists $self->{data};
-
-    my @files = @{ $self->{in_files} || [] };
-    push @files, $self->{in_file} if !@files && defined $self->{in_file};
-
-    my @documents;
-    for my $file (@files) {
-        my $loaded = io_yaml_or_json(
-            {
-                filepath => $file,
-                mode     => 'read',
-            }
-        );
-        push @documents, _normalize_openehr_documents($loaded);
-    }
-
-    return @documents;
-}
-
-sub _normalize_openehr_documents {
-    my ($data) = @_;
-    return () unless defined $data;
-
-    if ( ref($data) eq 'ARRAY' ) {
-        my $all_envelopes = 1;
-        for my $item ( @{$data} ) {
-            if ( ref($item) ne 'HASH' || !exists $item->{compositions} ) {
-                $all_envelopes = 0;
-                last;
-            }
-        }
-
-        return map { _normalize_openehr_document($_) } @{$data}
-          if @{$data} && $all_envelopes;
-
-        return ( _normalize_openehr_document($data) );
-    }
-
-    return ( _normalize_openehr_document($data) );
-}
-
-sub _normalize_openehr_document {
-    my ($doc) = @_;
-
-    return $doc
-      if ref($doc) eq 'HASH' && exists $doc->{compositions};
-
-    return { compositions => $doc } if ref($doc) eq 'ARRAY';
-    return { compositions => [$doc] };
 }
 
 sub _group_openehr_documents_by_patient {
@@ -957,15 +993,20 @@ sub _mapping_file_derived_entity_overrides {
       if defined $project->{version};
 
     if ( exists $mapping->{beacon} && ref( $mapping->{beacon} ) eq 'HASH' ) {
-        _merge_hash_into( $overrides{datasets}, $mapping->{beacon}{datasets} )
+        _merge_hash_into(
+            $overrides{datasets},
+            $mapping->{beacon}{datasets}{defaults}
+          )
           if exists $mapping->{beacon}{datasets}
-          && ref( $mapping->{beacon}{datasets} ) eq 'HASH';
-        _merge_hash_into( $overrides{cohorts}, $mapping->{beacon}{cohorts} )
+          && ref( $mapping->{beacon}{datasets} ) eq 'HASH'
+          && ref( $mapping->{beacon}{datasets}{defaults} ) eq 'HASH';
+        _merge_hash_into(
+            $overrides{cohorts},
+            $mapping->{beacon}{cohorts}{defaults}
+          )
           if exists $mapping->{beacon}{cohorts}
-          && ref( $mapping->{beacon}{cohorts} ) eq 'HASH';
-        _merge_hash_into( $overrides{biosamples}, $mapping->{beacon}{biosamples} )
-          if exists $mapping->{beacon}{biosamples}
-          && ref( $mapping->{beacon}{biosamples} ) eq 'HASH';
+          && ref( $mapping->{beacon}{cohorts} ) eq 'HASH'
+          && ref( $mapping->{beacon}{cohorts}{defaults} ) eq 'HASH';
     }
 
     return \%overrides;
@@ -1039,34 +1080,6 @@ sub _with_temp_self_fields {
     return $wantarray ? @ret : $ret[0];
 }
 
-sub _convert_via_bff {
-    my ( $self, %arg ) = @_;
-    my $via_method = $arg{via_method};
-
-    my $bff = _with_temp_self_fields(
-        $self,
-        { method => $via_method },
-        sub {
-            return $self->$via_method();
-        }
-    );
-
-    # Compound CLI commands stay stable, but internally they are a
-    # simple two-step pipeline through the BFF intermediate.
-    return _with_temp_self_fields(
-        $self,
-        {
-            method      => $arg{to_method},
-            data        => $bff,
-            in_textfile => 0,
-        },
-        sub {
-            my $out = _run_primary_view($self);
-            return $arg{merge_omop} ? merge_omop_tables($out) : $out;
-        }
-    );
-}
-
 sub _transform_item {
     return transform_item(@_);
 }
@@ -1130,53 +1143,91 @@ sub Dumper_concise {
 
 =head1 NAME
 
-Convert::Pheno - A module to interconvert common data models for phenotypic data
+Convert::Pheno - Convert clinical and phenotypic data between supported models
 
 =head1 SYNOPSIS
 
  use Convert::Pheno;
 
- my $my_pxf_json_data = {
+ my $pxf = {
      "phenopacket" => {
          "id"      => "P0007500",
          "subject" => {
              "id"          => "P0007500",
-             "dateOfBirth" => "unknown-01-01T00:00:00Z",
+             "dateOfBirth" => "2000-01-01T00:00:00Z",
              "sex"         => "FEMALE"
          }
      }
  };
 
- # Create object
- my $convert = Convert::Pheno->new(
+ my $converter = Convert::Pheno->new(
      {
-         data   => $my_pxf_json_data,
+         data   => $pxf,
          method => 'pxf2bff'
      }
  );
 
- # Apply a method
- my $data = $convert->pxf2bff;
+ my $individual = $converter->pxf2bff;
 
 =head1 DESCRIPTION
 
-For a better description, please read the following documentation:
+C<Convert::Pheno> is the conversion engine used by the C<convert-pheno>
+command-line program. It converts supported in-memory data structures and
+route-specific file inputs between Beacon v2 Models Format (BFF),
+Phenopackets v2 (PXF), OMOP-CDM, REDCap, CDISC-ODM, CDISC Dataset-JSON,
+FHIR R4, openEHR, and tabular representations.
+
+Conversion availability and required arguments depend on the selected route.
+Mapping-file conversions use the Mapping V2 contract and require
+C<mappingVersion: 2>; pre-V2 mapping files are rejected.
+
+=head1 METHODS
+
+=head2 new
+
+ my $converter = Convert::Pheno->new(\%arguments);
+
+Creates a converter. C<method> identifies the public conversion method.
+In-memory routes receive decoded input under C<data>; file-based routes use
+the arguments documented for that conversion.
+
+=head2 Conversion methods
+
+ my $result = $converter->$method;
+
+In-memory conversions return Perl data structures. Streaming and file-output
+routes write to their configured destinations and may instead return a
+completion status. See the module guide for supported methods, arguments,
+multi-entity results, and Python interoperability.
+
+=head1 DOCUMENTATION
 
 =over
 
-=item General:
+=item Project documentation
 
 L<https://cnag-biomedical-informatics.github.io/convert-pheno>
 
-=item Command-Line Interface:
+=item Module usage
 
-L<https://github.com/CNAG-Biomedical-Informatics/convert-pheno#readme>
+L<https://cnag-biomedical-informatics.github.io/convert-pheno/use-as-a-module>
+
+=item Command-line interface
+
+L<https://cnag-biomedical-informatics.github.io/convert-pheno/use-as-a-command-line-interface>
 
 =back
 
+=head1 ERRORS
+
+Invalid input, unsupported routes, and conversion failures raise exceptions.
+Callers that need recovery should invoke conversion methods inside C<eval> or
+another exception-handling mechanism.
+
 =head1 CITATION
 
-The author requests that any published work that utilizes C<Convert-Pheno> includes a cite to the the following reference:
+Please cite the following reference in published work that uses
+C<Convert-Pheno>:
 
 Rueda, M et al., (2024). Convert-Pheno: A software toolkit for the interconversion of standard data models for phenotypic data. Journal of Biomedical Informatics. L<DOI|https://doi.org/10.1016/j.jbi.2023.104558>
 
@@ -1184,12 +1235,11 @@ Rueda, M et al., (2024). Convert-Pheno: A software toolkit for the interconversi
 
 Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag.eu>.
 
-=head1 METHODS
+=head1 COPYRIGHT AND LICENSE
 
-See L<https://cnag-biomedical-informatics.github.io/convert-pheno/use-as-a-module>.
+Copyright 2022-2026 Manuel Rueda and CNAG.
 
-=head1 COPYRIGHT
-
-This PERL file is copyrighted. See the LICENSE file included in this distribution.
+This software is distributed under the Artistic License 2.0. See the LICENSE
+file included in this distribution.
 
 =cut

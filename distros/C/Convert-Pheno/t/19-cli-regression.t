@@ -5,8 +5,8 @@ use warnings;
 use lib qw(./lib ../lib t/lib);
 use Config;
 use File::Spec;
+use File::Temp qw(tempdir);
 use Test::More;
-use File::Temp qw(tempfile);
 use Test::ConvertPheno qw(
   cli_script_path
   temp_output_file
@@ -18,6 +18,7 @@ use Test::ConvertPheno qw(
   write_json_file
   has_ohdsi_db
   test_tmpdir
+  run_command_capture
 );
 
 my $cli = cli_script_path();
@@ -25,8 +26,8 @@ plan skip_all => "convert-pheno CLI not found at $cli" unless -f $cli;
 plan skip_all => 'Skipping CLI regression tests on ld architectures due to known issues'
   if $Config{archname} =~ /-ld\b/;
 
-use constant IS_WINDOWS => ( $^O eq 'MSWin32' || $^O eq 'cygwin' ) ? 1 : 0;
 my $tmpdir = test_tmpdir();
+my @datasetjson_files = sort glob 't/datasetjson2bff/in/*.json';
 
 my @cases = (
     {
@@ -129,26 +130,71 @@ my @cases = (
         compare  => 'structured',
     },
     {
-        name     => 'cdisc2bff',
+        name     => 'cdiscodm2bff',
         cmd      => [
-            '-icdisc',             't/cdisc2bff/in/cdisc_odm_data.xml',
+            '-icdisc-odm',         't/cdiscodm2bff/in/cdisc_odm_data.xml',
             '--redcap-dictionary', 't/redcap2bff/in/redcap_dictionary.csv',
             '--mapping-file',      't/redcap2bff/in/redcap_mapping.yaml',
             '-obff',               '__OUT__',
         ],
-        expected => 't/cdisc2bff/out/individuals.json',
+        expected => 't/cdiscodm2bff/out/individuals.json',
         suffix   => '.json',
         compare  => 'structured',
     },
     {
-        name     => 'cdisc2pxf',
+        name     => 'cdiscodm2pxf',
         cmd      => [
-            '-icdisc',             't/cdisc2bff/in/cdisc_odm_data.xml',
+            '-icdisc-odm',         't/cdiscodm2bff/in/cdisc_odm_data.xml',
             '--redcap-dictionary', 't/redcap2bff/in/redcap_dictionary.csv',
             '--mapping-file',      't/redcap2bff/in/redcap_mapping.yaml',
             '-opxf',               '__OUT__',
         ],
-        expected => 't/cdisc2pxf/out/pxf.json',
+        expected => 't/cdiscodm2pxf/out/pxf.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
+        name     => 'datasetjson2bff',
+        cmd      => [ '-idataset-json', @datasetjson_files, '-obff', '__OUT__' ],
+        expected => 't/datasetjson2bff/out/individuals.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
+        name     => 'datasetjson2bff_generic_io',
+        cmd      => [ '-i', 'dataset-json', @datasetjson_files, '-o', 'bff', '__OUT__' ],
+        expected => 't/datasetjson2bff/out/individuals.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
+        name     => 'datasetjson2pxf',
+        cmd      => [ '-idataset-json', @datasetjson_files, '-opxf', '__OUT__' ],
+        expected => 't/datasetjson2pxf/out/pxf.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
+        name     => 'fhir2bff',
+        cmd      => [ '-ifhir', 't/fhir2bff/in/patient-bundle.json', '-obff', '__OUT__' ],
+        expected => 't/fhir2bff/out/individuals.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
+        name     => 'fhir2bff_generic_io',
+        cmd      => [
+            '-i', 'fhir', 't/fhir2bff/in/patient-bundle.json',
+            '-o', 'bff', '__OUT__',
+        ],
+        expected => 't/fhir2bff/out/individuals.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
+        name     => 'fhir2pxf',
+        cmd      => [ '-ifhir', 't/fhir2bff/in/patient-bundle.json', '-opxf', '__OUT__' ],
+        expected => 't/fhir2pxf/out/pxf.json',
         suffix   => '.json',
         compare  => 'structured',
     },
@@ -235,28 +281,13 @@ sub compare_case_output {
 
 sub run_cli {
     my (@cmd) = @_;
-    my ( $fh, $log_file ) = tempfile( DIR => $tmpdir, SUFFIX => '.cli.log', UNLINK => 1 );
-    my $pid = fork();
-    die 'fork failed' unless defined $pid;
-
-    if ( $pid == 0 ) {
-        open STDOUT, '>&', $fh or die "dup STDOUT failed: $!";
-        open STDERR, '>&', $fh or die "dup STDERR failed: $!";
-        exec @cmd or die "exec failed: $!";
-    }
-
-    waitpid( $pid, 0 );
-    seek $fh, 0, 0;
-    local $/;
-    my $output = <$fh>;
-    close $fh;
-
-    return ( $? >> 8, $output );
+    my ( $status, $stdout, $stderr ) =
+      run_command_capture( command => \@cmd );
+    return ( $status, $stdout . $stderr );
 }
 
 for my $case (@cases) {
   SKIP: {
-        skip 'CLI file comparisons are unreliable on Windows', 2 if IS_WINDOWS;
         skip q{share/db/ohdsi.db is required for this CLI OMOP test}, 2
           if $case->{requires_db} && !has_ohdsi_db();
 
@@ -280,8 +311,42 @@ for my $case (@cases) {
 }
 
 SKIP: {
-    skip 'CLI file comparisons are unreliable on Windows', 2 if IS_WINDOWS;
+    skip q{share/db/ohdsi.db is required for the CLI fhir2omop test}, 7
+      unless has_ohdsi_db();
 
+    my $omop_dir = tempdir( CLEANUP => 1 );
+    my @cmd = (
+        $^X, $cli,
+        '-ifhir', 't/fhir2bff/in/patient-bundle.json',
+        '-oomop',
+        '--out-dir', $omop_dir,
+        '--ohdsi-db',
+        '-O',
+        '--test',
+    );
+    my ( $status, $output ) = run_cli(@cmd);
+    diag($output) if $status != 0 && defined $output && length $output;
+    is( $status, 0, 'CLI fhir2omop exits successfully' );
+
+    for my $table (qw(
+      CONDITION_OCCURRENCE
+      DRUG_EXPOSURE
+      MEASUREMENT
+      OBSERVATION
+      PERSON
+      PROCEDURE_OCCURRENCE
+    )) {
+        ok(
+            csv_files_match(
+                "t/fhir2omop/out/$table.csv",
+                File::Spec->catfile( $omop_dir, "$table.csv" ),
+            ),
+            "CLI fhir2omop $table matches reference output",
+        );
+    }
+}
+
+{
     my $tmp_file  = temp_output_file( suffix => '.json', dir => $tmpdir );
     my $input_file = temp_output_file( suffix => '.json', dir => $tmpdir );
 
@@ -307,9 +372,7 @@ SKIP: {
     );
 }
 
-SKIP: {
-    skip 'CLI file comparisons are unreliable on Windows', 2 if IS_WINDOWS;
-
+{
     my $tmp_file = temp_output_file( suffix => '.json', dir => $tmpdir );
     my @cmd = (
         $^X, $cli,

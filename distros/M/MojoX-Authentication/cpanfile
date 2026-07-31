@@ -1,12 +1,12 @@
 requires 'perl', '5.024000';
-requires 'Crypt::Passphrase';
-requires 'Crypt::Passphrase::Argon2';
+requires 'Crypt::Passphrase', '0.023';
+requires 'Crypt::Passphrase::Argon2', '0.010';
 requires 'Module::Runtime', '0.018';
 requires 'Moo', '2.005005';
 requires 'namespace::clean', '0.27';
-requires 'Net::SAML2';
+requires 'Net::SAML2', '0.88';
 requires 'Ouch', '0.0501';
-requires 'Try::Catch';
+requires 'Try::Catch', '1.1.0';
 
 on test => sub {
    requires 'Path::Tiny',      '0.084';

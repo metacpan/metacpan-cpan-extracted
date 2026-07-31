@@ -9,7 +9,7 @@ App::Codit::Plugins::Diff - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -115,25 +115,26 @@ sub new {
 		-relief => 'groove',
 		-borderwidth => 2,
 	)->pack(@padding, -expand => 1, -fill => 'both');
-	$sa->Button(
+	my $bf1 = $sa->Frame->pack(-expand => 1, -fill =>'x');
+	$bf1->Button(
 		-text => 'Diff',
 		-command => ['Diff', $self],
-	)->pack(@padding, -fill => 'x');
-	$sa->Button(
+	)->pack(@padding, -expand => 1, -side => 'left', -fill => 'x');
+	$bf1->Button(
 		-text => 'Clear',
 		-command => ['Clear', $self],
-	)->pack(@padding, -fill => 'x');
-	$sa->Button(
+	)->pack(@padding, -expand => 1, -side => 'left', -fill => 'x');
+	my $bf2 = $sa->Frame->pack(-expand => 1, -fill =>'x');
+	$bf2->Button(
+		-text => 'Patch',
+		-command => ['Patch', $self],
+	)->pack(@padding, -expand => 1, -side => 'left', -fill => 'x');
+	$bf2->Button(
 		-text => 'Export',
 		-command => ['Export', $self],
-	)->pack(@padding, -fill => 'x');
+	)->pack(@padding, -expand => 1, -side => 'left', -fill => 'x');
 
-	my $fam = $self->configGet('-contentfontfamily');
-	$fam = 'Courier' unless defined $fam;
-	my $siz = $self->configGet('-contentfontsize');
-	$siz = 10 unless defined $siz;
 	my $txt = $sa->CodeText(
-		-font => "{$fam} $siz",
 		-readonly => 1,
 		-showfolds => 0,
 		-shownumbers => 0,
@@ -144,6 +145,7 @@ sub new {
 	)->pack(@padding, -fill => 'both', -expand => 1);
 	$self->{TXT} = $txt;
 
+	$self->ReConfigure;
 	return $self;
 }
 
@@ -169,6 +171,7 @@ sub Diff {
 		$diff = diff(\$source, $file, { STYLE => $style });
 	}
 	$txt->insert('end', $diff);
+	$self->after(10, sub { $txt->highlightPurge });
 }
 
 sub Export {
@@ -194,6 +197,24 @@ sub GetStyle {
 	my $self = shift;
 	my $m = $self->{STYLE};
 	return $$m;
+}
+
+sub Patch {
+	my $self = shift;
+	my $patch = $self->{TXT}->get('0.0', 'end - 1c');
+	my $widg = $self->mdi->docWidget;
+	$widg->patchdiff(\$patch);
+}
+
+sub ReConfigure {
+	my $self = shift;
+	my $txt = $self->{TXT};
+	my $fam = $self->configGet('-contentfontfamily');
+	$fam = 'Courier' unless defined $fam;
+	my $siz = $self->configGet('-contentfontsize');
+	$siz = 10 unless defined $siz;
+	$txt->configure(-font => "{$fam} $siz");
+	$txt->configure(-themefile => $self->GetThemeFile);
 }
 
 sub Unload {

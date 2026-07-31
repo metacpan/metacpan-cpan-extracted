@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use 5.010001;
 use ExtUtils::MakeMaker;
+use File::Spec;
 use Alien::Build::MM;
 
 # Windows is not supported (Net-SNMP source build); bail early, matching the old
@@ -52,6 +53,34 @@ WriteMakefile($abmm->mm_args(
     },
   },
 ));
+
+# Point the dynamic loader at the staged libnetsnmp for the test phase, and only
+# the test phase.  Alien::SNMP preloads that library at use-time so the bundled XS
+# resolves it before `make install` has populated the final share dir, which is
+# where the run-path baked into the XS points.  That works on glibc, which matches
+# an already-loaded object by its DT_SONAME, and on darwin, which matches by
+# install name.  It cannot work on musl: opening a library by an explicit path
+# records no name for it at all (ldso/dynlink.c, "Add a shortname only if name arg
+# was not an explicit pathname"), and the already-loaded lookup matches on that
+# name alone, so on Alpine every load of the bundled modules fails with "Error
+# loading shared library libnetsnmp.so.45".
+# Nothing installed is affected: this alters one make recipe, and the installed
+# copy resolves through the run-path as before.
+# Written as a package block, not `sub MY::test_via_harness`: SUPER:: resolves
+# against the package a sub is compiled in, which for the latter is main.
+{
+  package MY;
+
+  sub test_via_harness {
+    my ($self, $perl, $tests) = @_;
+    # Absolute: a relative entry in LD_LIBRARY_PATH resolves against the current
+    # directory, and Test::Alien compiles and loads its XS somewhere else.
+    my $staged_libs = File::Spec->rel2abs(File::Spec->catdir(
+      $self->{INST_LIB}, qw(auto share dist), $self->{DISTNAME}, 'lib'));
+    return $self->SUPER::test_via_harness(
+      qq{LD_LIBRARY_PATH="$staged_libs:\$\$LD_LIBRARY_PATH" $perl}, $tests);
+  }
+}
 
 # Wire Alien::Build::MM into the standard MakeMaker targets, and add author-only
 # LICENSE/README regeneration (replacing Module::Build's create_license/create_readme).

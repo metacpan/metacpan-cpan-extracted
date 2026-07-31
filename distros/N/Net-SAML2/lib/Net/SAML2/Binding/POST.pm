@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::POST;
-our $VERSION = '0.85'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
 use Moose;
 use Carp qw(croak);
@@ -22,10 +22,22 @@ has 'cacert' => (isa => 'Maybe[Str]', is => 'ro');
 has 'cert' => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_cert');
 has 'cert_text' => (isa => 'Str', is => 'ro');
 has 'key'  => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_key');
+has 'insecure_trust_embedded_cert' => (isa => 'Bool', is => 'ro', default => 0);
 
 
 sub handle_response {
     my ($self, $response) = @_;
+
+    unless ($self->cacert
+         || $self->cert_text
+         || $self->insecure_trust_embedded_cert) {
+        croak(
+            "Net::SAML2::Binding::POST::handle_response requires 'cacert' "
+          . "or 'cert_text' on the binding to verify SAML response "
+          . "signatures. To explicitly disable signature verification "
+          . "(test/dev only), pass insecure_trust_embedded_cert => 1 to new()."
+        );
+    }
 
     # unpack and check the signature
     my $xml = decode_base64($response);
@@ -99,7 +111,7 @@ Net::SAML2::Binding::POST - HTTP POST binding for SAML
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =head1 SYNOPSIS
 
@@ -124,19 +136,12 @@ Arguments:
 
 path to the CA certificate for verification
 
-=item B<cert>
-
-path to a certificate that is added to the signed XML.  It needs to be the
-certificate that includes the public key related to the B<key>
-
-=item B<cert_text>
-
-text form of the certificate in FORMAT_ASN1 or FORMAT_PEM that is used to
-verify the signed XML.
-
-=item B<key>
-
-path to a key used to sign the XML.
+B<Notice>: when C<handle_response> is called, at least one of
+C<cacert> or C<cert_text> must have been supplied at construction,
+unless C<insecure_trust_embedded_cert> is set. Without a trust anchor
+the binding accepts whatever signing certificate the response embeds
+in its KeyInfo block, which is equivalent to no signature checking
+at all.
 
 =item B<cert>
 
@@ -148,9 +153,20 @@ certificate that includes the public key related to the B<key>
 text form of the certificate in FORMAT_ASN1 or FORMAT_PEM that is used to
 verify the signed XML.
 
+See B<insecure_trust_embedded_cert>
+
 =item B<key>
 
 path to a key used to sign the XML.
+
+=item B<insecure_trust_embedded_cert>
+
+Boolean, default false. When true, C<handle_response> proceeds with
+no pre-configured trust anchor (every embedded signing certificate
+is accepted). B<This disables effective signature verification and
+is intended only for local testing.> Production deployments must
+leave this false and supply C<cacert> or C<cert_text>. Has no effect
+on the binding's signing path (C<sign_xml>).
 
 =back
 

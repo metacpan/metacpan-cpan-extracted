@@ -14,6 +14,12 @@
 #   G10 DIAGNOSTICS covers all die/croak/$errstr messages
 #   G11 Pod::Checker: no errors
 #   G12 Pod::Checker: no warnings
+#   G13 BUGS AND LIMITATIONS has no stale removed-feature entries
+#
+# G13 was formerly the j2_stale option of INA_CPAN_Check::check_J.  The
+# shared library dropped that option at 0.41 (J2 is now the prerequisite
+# version clash check), so the list of phrases lives here, next to the
+# other POD content checks, where it is a distribution concern anyway.
 ######################################################################
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
@@ -33,7 +39,16 @@ my @manifest = _manifest_files($ROOT);
 my @pm_files = sort grep { /^lib\/.*\.pm$/ && -f "$ROOT/$_" } @manifest;
 
 plan_skip('no .pm files found') unless @pm_files;
-plan_tests(scalar(@pm_files) * 12);
+plan_tests(scalar(@pm_files) * 13);
+
+# Statements that were true once but describe features DB::Handy now has.
+# If any of them reappears under =head1 BUGS AND LIMITATIONS the POD is
+# describing a limitation that no longer exists.
+my @stale_limitations = (
+    'No INTERSECT or EXCEPT set operations',
+    'Range scans do not use indexes',
+    'CHECK.*evaluated on INSERT only',
+);
 
 for my $pm (@pm_files) {
     my $text = _slurp("$ROOT/$pm");
@@ -189,6 +204,19 @@ for my $pm (@pm_files) {
         ok(!$errors,   "G11 - Pod::Checker: no errors: $pm$checker_msg11");
         ok(!$warnings, "G12 - Pod::Checker: no warnings: $pm$checker_msg12");
     }
+
+    # G13: BUGS AND LIMITATIONS has no stale removed-feature entries
+    my $bugs_text = '';
+    if ($text =~ /=head1 BUGS AND LIMITATIONS(.*?)^=head1/ms) {
+        $bugs_text = $1;
+    }
+    my @stale_found;
+    for my $entry (@stale_limitations) {
+        push @stale_found, $entry if $bugs_text =~ /$entry/;
+    }
+    ok(!@stale_found,
+       "G13 - BUGS AND LIMITATIONS has no stale entries: $pm"
+       . (@stale_found ? " (stale: @stale_found)" : ''));
 }
 
 END { end_testing() }

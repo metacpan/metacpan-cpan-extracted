@@ -229,6 +229,7 @@ sub _map_measurements {
 
 sub _map_diseases {
     my ( $self, $bff, $pxf ) = @_;
+    my $diseases = $bff->{diseases} || [];
 
     # ========
     # diseases
@@ -256,7 +257,7 @@ sub _map_diseases {
               if exists $disease->{laterality};
 
             \%mapped;
-        } @{ $bff->{diseases} }
+        } @{$diseases}
     ];
 }
 
@@ -516,6 +517,15 @@ sub _map_measurement_value_to_pxf {
               if exists $typedQuantity->{quantityType};
         }
     }
+
+    # Phenopackets Value is a oneof wrapper. Beacon represents categorical
+    # values directly as ontology terms, so restore the ontologyClass arm
+    # rather than emitting id/label beside quantity.
+    return { ontologyClass => $mapped }
+      if exists $mapped->{id}
+      && !exists $mapped->{quantity}
+      && !exists $mapped->{ontologyClass}
+      && !exists $mapped->{typedQuantities};
 
     return $mapped;
 }

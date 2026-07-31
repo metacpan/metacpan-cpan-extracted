@@ -6,8 +6,10 @@ build_requires:
   Devel::Size: '0'
   Encode: '0'
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Storable: '0'
   Test::LeakTrace: '0'
-  Test::More: '0'
+  Test::More: '0.94'
   URI::Escape::XS: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -25,8 +27,10 @@ no_index:
 provides:
   Router::Ragel:
     file: lib/Router/Ragel.pm
-    version: '0.04'
+    version: '0.05'
 requires:
+  Carp: '0'
+  Digest::MD5: '0'
   Inline: '0'
   Inline::C: '0'
   Inline::Filters::Ragel: '0'
@@ -34,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/Router-Ragel/issues
   repository: https://github.com/vividsnow/Router-Ragel.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -3,7 +3,7 @@ NAME
     Signatures
 
 VERSION
-    version 0.70
+    version 0.71
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';
@@ -204,6 +204,41 @@ USAGE
     Returns: integer (1 True, 0 False) if a valid version of
     Crypt::OpenSSL::DSA is installed
 
+ID VALIDATION
+    The ID in a document must match the criteria set out below. It is a
+    subset of the allowed format in the specification:
+    <https://www.w3.org/TR/REC-xml/#NT-Name>
+
+  Permitted Starting character
+    An ID can start with characters in this range only:
+
+    Character class for NCNameStartChar (XML 1.0 Fifth Edition):
+
+            A-Z_a-z          ASCII letters and underscore
+            \xC0-\xD6        Latin-1 supplement: Ã to Ã
+            \xD8-\xF6        Latin-1 supplement: Ã to Ã¶
+            \xF8-\x{2FF}     Latin Extended A/B, IPA, spacing modifiers
+            \x{370}-\x{37D}  Greek and Coptic
+            \x{37F}-\x{1FFF} Greek through Greek Extended
+            \x{2070}-\x{218F} Superscripts, currency, letterlike symbols
+            \x{2C00}-\x{2FEF} Glagolitic, Coptic, Georgian, Tifinagh
+            \x{3001}-\x{D7FF} CJK punctuation through Hangul syllables
+            \x{F900}-\x{FDCF} CJK compatibility, Arabic presentation A
+            \x{FDF0}-\x{FFFD} Arabic presentation B, halfwidth/fullwidth
+
+  Permitted Remaining characters
+    The rest of the ID can include all of the charaters that match the
+    NCNameStartChar and any character that matches the following:
+
+    Extras (NameChar-only):
+
+            -                  hyphen
+            .                  period
+            0-9                ASCII digits
+            \xB7               middle dot (Â·)
+            \x{0300}-\x{036F}  combining diacritical marks
+            \x{203F}-\x{2040}  undertie (â¿) and character tie (â)
+
 ABOUT DIGITAL SIGNATURES
     Just as one might want to send an email message that is
     cryptographically signed in order to give the recipient the means to
@@ -306,7 +341,7 @@ AUTHORS and CREDITS
 
     Net::SAML2 embedded version amended by Chris Andrews <chris@nodnol.org>.
 
-    Maintainer: Timothy Legge <timlegge@cpan.org>
+    Maintainer: Timothy Legge <timlegge@gmail.com>
 
 AUTHOR
     Timothy Legge <timlegge@gmail.com>

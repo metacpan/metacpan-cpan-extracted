@@ -3,12 +3,14 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: DB-Handy
-version: 1.08
+version: 1.09
 abstract: Pure-Perl flat-file relational database with DBI-like interface
 author:
-  - ina <ina@cpan.org>
+  - ina <ina.cpan@gmail.com>
 license: perl
-generated_by: pmake.bat
+generated_by: pmake.bat version 0.44
+configure_requires:
+  ExtUtils::MakeMaker: 5.4302
 requires:
   Fcntl: 1.03
   File::Path: 1.0401
@@ -16,23 +18,16 @@ requires:
   POSIX: 0
   constant: 0
   perl: 5.00503
-  strict: 1.01
-  vars: 0
-  warnings: 0
-build_requires:
-  Test: 1.122
 minimum_perl_version: 5.00503
 provides:
   DB::Handy:
     file: lib/DB/Handy.pm
-    version: 1.08
+    version: 1.09
   DB::Handy::Connection:
     file: lib/DB/Handy.pm
-    version: 1.08
+    version: 1.09
   DB::Handy::Statement:
     file: lib/DB/Handy.pm
-    version: 1.08
+    version: 1.09
 resources:
   license: http://dev.perl.org/licenses/
-  bugtracker: https://github.com/ina-cpan/DB-Handy/issues
-  repository: https://github.com/ina-cpan/DB-Handy

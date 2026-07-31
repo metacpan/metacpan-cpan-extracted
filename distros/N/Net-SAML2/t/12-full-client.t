@@ -96,7 +96,8 @@ my $ret = $post->handle_response(
 # Get the Assertion from the SAMLResponse XML
 ##############################################
 my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-        xml => decode_base64($saml_response)
+        xml     => decode_base64($saml_response),
+        cacert  => $cacert,  # Filename of the Identity Providers CACert
 );
 
 if (defined $assertion->{response_status}) {

@@ -46,13 +46,24 @@ The router supports:
 
 =back
 
+=head1 REQUIREMENTS
+
+C<compile> generates Ragel source and builds it through L<Inline::C>, so the
+external B<C<ragel>> binary, a B<C compiler> and B<C<make>> must be present at
+B<run time>, not just at install time. C<Makefile.PL> reports the distribution
+as unavailable when C<ragel> is not on C<PATH>.
+
+Loading the module compiles a small C stub as well, so even C<use
+Router::Ragel> invokes the compiler against a cold L<Inline> cache. See
+L</DEPLOYMENT> for keeping that off the request path.
+
 =head1 METHODS
 
 =head2 new
 
     my $router = Router::Ragel->new;
 
-Constructs a new router. Takes no arguments.
+Constructs a new router. Takes no arguments, and C<croak>s if given any.
 
 =head2 add
 
@@ -60,7 +71,9 @@ Constructs a new router. Takes no arguments.
 
 Registers a route. C<$pattern> is a path string (see L</"ROUTE PATTERNS">);
 C<$data> is the value returned by C<match> on a hit and may be any scalar.
-Returns the router, so calls can be chained.
+Returns the router, so calls can be chained. C<$data> may be omitted, in which
+case the route returns C<undef>; passing more than the two arguments is a
+mistake and C<croak>s rather than silently dropping the rest.
 
 Adding a route after C<compile> invalidates the compiled state; the next
 C<match> will C<croak> until C<compile> is called again.
@@ -139,31 +152,91 @@ Built-in aliases:
 
 =back
 
-Anything else inside C<< <...> >> is passed verbatim to Ragel, so arbitrary
-character classes and quantifiers work:
+Anything else inside C<< <...> >> is a B<Ragel expression>, passed through to
+the generated state machine, so arbitrary character classes and quantifiers
+work:
 
     /code/:c<[0-9]{4}> # exactly four digits
     /file/:name<[a-z0-9\-]+> # slug-like (escape '-' inside a class)
 
 The dialect is B<Ragel's>, not Perl/PCRE. Available: character classes,
-quantifiers (C<*>, C<+>, C<?>, C<{n}>, C<{n,m}>), alternation, grouping, and
-Ragel keywords (C<digit>, C<alpha>, C<alnum>, C<xdigit>, C<lower>, C<upper>,
-C<space>, C<punct>, C<print>, C<ascii>, C<any>). B<Not> available: Perl
-shortcuts (C<\d>, C<\w>, C<\s>), anchors, lookaround, and backreferences.
-Anchors are unnecessary anyway: segment boundaries are implicit.
+quantifiers (C<*>, C<+>, C<?>, C<{n}>, C<{n,m}>), alternation, grouping,
+quoted literals (C<< <('ab'|'cd')+> >> -- an unquoted word is a I<machine
+name>, not a literal), and Ragel keywords (C<digit>, C<alpha>, C<alnum>,
+C<xdigit>, C<lower>, C<upper>, C<space>, C<punct>, C<print>, C<ascii>,
+C<any>). B<Not> available: Perl shortcuts (C<\d>, C<\w>, C<\s>), anchors,
+lookaround, and backreferences. Anchors are unnecessary anyway: segment
+boundaries are implicit. C<^> is Ragel's negation operator rather than an
+anchor, so C<< <^'a'> >> matches any one byte except C<a>; inside a character
+class it keeps its usual sense (C<< <[^0-9]+> >>).
+
+Ragel grammar can also embed C code and start new grammar statements, so
+C<compile> holds the type expression to the constructs listed above: strings,
+character classes and parentheses must balance, C<< { >> may only introduce a
+repetition quantifier, and C<< % >>, C<< $ >>, C<< @ >>, C<< # >>, C<< ; >>,
+C<< = >>, C<< } >> and control characters (newlines included) are rejected --
+but only where they would be grammar. To match one of them, put it in a
+character class or a quoted literal, where it is ordinary data
+(C<< <[a-z0-9%]+> >>, C<< <'100%'> >>). This catches mistakes; it is B<not> a
+security boundary, see L</SECURITY>.
 
 A literal C<< > >> cannot appear inside a C<< <type> >> expression (the
-parser closes the type at the first C<< > >>); a literal C<< < >> is
-rejected at compile time. A literal C<< - >> inside a character class must
-be escaped as C<< \- >> (Ragel parses an unescaped C<< - >> as a range
-operator and errors out, even at the start or end of the class). For any of
-these, match a permissive class and post-process in user code.
+parser closes the type at the first C<< > >>, and everything after it is
+literal segment text); a literal C<< < >> is rejected at compile time. A
+literal C</> cannot appear either, not even inside a character class: the
+pattern is cut into segments on C</> before placeholders are parsed, so
+C<< <[^/]+> >> reads as a type that never closes. That expression is what the
+C<string> alias means, so write C<< <string> >> instead. A
+literal C<< - >> inside a character class must be escaped as C<< \- >>
+(Ragel parses an unescaped C<< - >> as a range operator and errors out, even
+at the start or end of the class). For any of these, match a permissive class
+and post-process in user code.
+
+If Ragel or the C compiler rejects the generated machine, C<compile> C<croak>s
+naming every pattern that carries a C<< <type> >>: literal segments are quoted
+and escaped, so those are the only possible culprits. The C<ragel>/compiler
+diagnostics themselves go to C<STDERR>.
 
 =head2 Captures
 
 Captures are returned positionally by C<match>, in the order their
 placeholders appear in the pattern. Placeholder names are not used at match
 time.
+
+Where a segment puts a placeholder next to something else, the boundary
+between them must be decidable as the bytes arrive. The generated machine is
+a DFA and cannot backtrack, so a boundary it cannot settle on the spot is
+settled greedily and the captures can come back wrong. Two shapes are
+affected, both confined to a single segment:
+
+=over 4
+
+=item *
+
+A placeholder followed by literal text its own type would also accept, where
+the literal's first byte occurs again later in the literal. One placeholder is
+enough: C<< /:a<string>ff >> on C</xff> reports C<a> as C<'xf'>, and
+C<< /:a<string>.tar.gz >> on C</x.tar.gz> reports C<'x.tar'>. Neither is a
+reading of the pattern. A literal whose first byte does not recur (C<_extra>,
+C<.json>, C<-v2>) splits correctly.
+
+=item *
+
+Placeholders with nothing between them, where the second one's type sets a
+minimum length. The greedy split can leave that capture shorter than its own
+type allows: C<< /:a<[0-9]*>:b<[0-9]{2,3}> >> on C</90> reports C<b> as
+C<'0'>. A valid reading existed (C<a> empty, C<b> C<'90'>); the machine just
+did not take it.
+
+=back
+
+Denser versions of these can leave a capture closed before it opened; C<match>
+C<croak>s naming the pattern rather than returning nonsense. Separate the
+placeholders with a literal the preceding type cannot begin with and the split
+is exact: C<< /:a<int>-:b<int> >> on C</12-34> gives C<12> and C<34>,
+C<< /:name<[a-z]+>.:ext<[a-z]+> >> on C</img.png> gives C<img> and C<png>.
+A placeholder that occupies its whole segment, the usual case, has no boundary
+to get wrong and is never affected.
 
 =head2 Examples
 
@@ -180,6 +253,25 @@ time.
 Any C<:> inside a segment introduces a placeholder; there is no escaping
 mechanism. Avoid literal colons in path segments.
 
+=head1 SECURITY
+
+B<Route patterns are code.> C<compile> turns them into C source and runs a C
+compiler over it, so a pattern is closer to C<eval> than to a configuration
+value. Treat the pattern list with the same trust you give the program text:
+never build it from a request parameter, an uploaded file, an untrusted
+database row, or a plugin you would not let run arbitrary code.
+
+C<compile> rejects the type-expression constructs that most obviously reach the
+C compiler (see L</"Type constraints">), which turns a typo into a clear error.
+Ragel is a full grammar language, though, and that check is not a sandbox. If
+patterns must come from somewhere less trusted than your codebase, validate
+them against your own allowlist, or build the routing table in code and let the
+untrusted input only select from it.
+
+Paths passed to C<match> are B<data>, not code, and need no such care: the
+compiled machine only walks bytes. An embedded NUL does not truncate a path and
+cannot be used to slip past a route.
+
 =head1 DEPLOYMENT
 
 The compiled Ragel machine lives in a shared library that L<Inline::C>
@@ -193,10 +285,12 @@ once in the parent process before forking>:
     # inherit the loaded .so via copy-on-write
 
 If the cache is cold and several workers reach C<compile> concurrently,
-L<Inline::C> serializes them on a directory lock and only one process runs
-the C compiler -- the rest C<dlopen> the resulting C<.so>. That avoids the
-C<cc>/C<ragel> stampede but every worker still pays the wait. Compiling in
-the parent before fork eliminates the wait too.
+L<Inline::C> serializes them on an exclusive lock over the L<Inline>
+directory, so the builds run one after another instead of trampling a shared
+build directory. Taking turns is not sharing, though: every worker still runs
+C<ragel> and the C compiler for itself, so N workers cost N builds and the
+last one waits out all the others. Compiling in the parent before the fork
+avoids the queue entirely.
 
 For deterministic startup, populate the L<Inline::C> cache at build/deploy
 time and ship the warmed directory with the artifact (e.g., bake C<_Inline/>
@@ -204,6 +298,15 @@ into your Docker image). Pin the cache location for reproducibility:
 
     use Inline Config => DIRECTORY => '/opt/myapp/inline';
     use Router::Ragel;
+
+The directory must already exist: L<Inline> checks it and will not create it,
+and the resulting error names C<Router::Ragel> rather than the C<Config> line.
+
+The generated machine is named after the route patterns, so a warmed cache
+hits regardless of how many routers the process built first, and two routers
+sharing a pattern list share one compiled library (their route I<data> still
+differs -- that lives on the Perl object). Recompiling a router whose patterns
+have not changed costs nothing.
 
 The C<use Inline Config> line must be evaluated before C<Router::Ragel> is
 loaded (place it in the same file above C<use Router::Ragel>, or in a
@@ -237,15 +340,44 @@ skipped.
 
 =item *
 
-Patterns and paths are byte strings. Wide-character (utf8-flagged) strings
-are matched against their UTF-8 byte representation.
+Matching runs over the bytes Perl currently holds for the SV, so patterns and
+paths must be B<byte strings>. C<compile> C<croak>s on a pattern containing
+characters above C<255>. For paths the difference is invisible at the Perl
+level and does matter: C<"/caf\x{e9}"> stored as Latin-1 and the same string
+after C<utf8::upgrade> are C<eq> to each other but match differently, and
+captures always come back as byte strings with the UTF-8 flag off. Encode
+before matching and decode the captures:
+
+    my ($h, @cap) = $router->match(Encode::encode_utf8($path));
+
+Paths taken straight from a web server (PSGI's C<REQUEST_URI>, and
+C<PATH_INFO> on most servers) are already byte strings.
+
+=item *
+
+A router holds the address of its compiled matcher, which is meaningful only
+inside the process that built it. L<Storable> C<freeze>/C<dclone> therefore
+serialize the routes alone; a thawed router C<croak>s C<"compile() not
+called"> until you call C<compile> on it again. Do not pass routers between
+processes by any other serializer without doing the same.
+
+Routers frozen by 0.04 or earlier predate those hooks: their blobs carry the
+raw address, and nothing on the reading side can tell it from a live one.
+Rebuild those from their patterns instead of thawing them.
 
 =item *
 
 Patterns must start with C</> and must not be empty, contain a NUL byte,
 contain consecutive slashes, use a bare C<:> placeholder name, or contain a
-C<< <type> >> that is empty, unterminated, or itself contains a C<< < >>.
-C<compile> C<croak>s on any of these.
+C<< <type> >> that is empty, unterminated, contains a C<< < >> or a C</>, or
+uses constructs outside the accepted Ragel subset (see
+L</"Type constraints">). C<compile> C<croak>s on any of these.
+
+=item *
+
+A segment that packs a placeholder against a literal or another placeholder
+can have its captures split wrongly, and the densest of those shapes make
+C<match> C<croak>; see L</Captures>.
 
 =item *
 
@@ -256,9 +388,12 @@ Normalize input ahead of C<match> to fold repeated or trailing slashes.
 =item *
 
 Adding a route after C<compile> invalidates the compiled matcher; C<match>
-C<croak>s until you re-run C<compile>. Each C<compile> C<dlopen>s a new
-shared library; the previous one stays loaded for the lifetime of the
-process. See L</DEPLOYMENT> for the implications under pre-forking servers.
+C<croak>s until you re-run C<compile>. Every distinct route set C<dlopen>s a
+shared library that stays loaded for the lifetime of the process, so a program
+that keeps building routers with new patterns keeps accumulating libraries.
+Recompiling an unchanged route set, or compiling a second router with the same
+patterns, reuses the library already loaded. See L</DEPLOYMENT> for the
+implications under pre-forking servers.
 
 =item *
 

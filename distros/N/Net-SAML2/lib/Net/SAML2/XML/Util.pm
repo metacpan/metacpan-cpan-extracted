@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::XML::Util;
-our $VERSION = '0.85'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
 use XML::LibXML;
 
@@ -52,7 +52,7 @@ Net::SAML2::XML::Util - XML Util class
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =head1 SYNOPSIS
 

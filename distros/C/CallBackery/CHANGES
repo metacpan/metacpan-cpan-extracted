@@ -1,3 +1,18 @@
+0.58.3 2026-07-30 16:11:29 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Config: restoring a configuration blob replaced the configuration
+   database file, giving it a new inode. Every connection open at the
+   time stayed attached to the old, now unlinked file: it went on
+   reading the pre-restore configuration and failed on its first write
+   with SQLITE_READONLY_DBMOVED, which SQLite reports as "attempt to
+   write a readonly database". With a prefork server and background
+   helpers that is most of the processes on the machine. The
+   replacement database is now built beside the live one and copied in
+   with SQLite's online backup API, so the inode is preserved and open
+   connections simply see the restored data. If the write lock cannot
+   be had within 30 seconds the restore now gives up with an error and
+   leaves the database untouched, rather than restoring it half way.
+
 0.58.2 2026-07-20 12:54:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - Frontend ui.plugin.Form: make sure trigger load does not overwrite

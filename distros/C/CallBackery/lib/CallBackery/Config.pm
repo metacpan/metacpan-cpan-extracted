@@ -24,6 +24,7 @@ use CallBackery::Translate qw(trm);
 use Config::Grammar::Dynamic;
 use Carp;
 use autodie;
+use DBI;
 use File::Spec;
 use Locale::PO;
 use Mojo::Promise;
@@ -31,6 +32,7 @@ use Mojo::Loader qw(load_class);
 use Mojo::JSON qw(true false);
 use Mojo::Exception;
 use Scalar::Util qw(blessed);
+use Time::HiRes;
 # use Devel::Cycle;
 
 =head2 file
@@ -554,6 +556,72 @@ sub getConfigBlob {
     return $crypt->encrypt($self->pack16($zipData));
 }
 
+# how long to keep trying when someone else holds a lock on the config
+# database; package scoped so that tests can shorten it
+our $RESTORE_BUSY_TIMEOUT_MS = 30_000;
+
+# Build a replacement config database with $builder and then copy it over the
+# live one with SQLite's online backup API, so that the database keeps its
+# inode.
+#
+# Replacing the file instead (the way this used to work) leaves every long
+# lived handle in the system attached to the old, now unlinked inode: the
+# config daemon and its workers, the application server, and any helper that
+# happens to be running at the time. Those handles go on reading stale
+# configuration and fail on their first write with SQLITE_READONLY_DBMOVED,
+# which SQLite reports as "attempt to write a readonly database".
+#
+# The staging database lives next to the config database rather than in a
+# world readable temp directory, since it holds the same secrets, and on the
+# same filesystem, so it does not compete for space with anything else.
+sub _stageAndRestoreDb ($self,$builder) {
+    my $cfgDb = $self->cfgHash->{BACKEND}{cfg_db};
+    my $staging = $cfgDb.'.restore.'.$$;
+    my $err;
+    eval {
+        # unlink glob, not plain unlink: a leftover journal of our own would
+        # otherwise be rolled back into the staging database
+        no autodie;
+        unlink glob $staging.'*';
+        use autodie;
+        $builder->($staging);
+        chmod 0600, $staging;
+        my $dbh = DBI->connect("dbi:SQLite:dbname=$cfgDb",'','',{
+            RaiseError => 1,
+            PrintError => 0,
+            AutoCommit => 1,
+        });
+        # the backup runs the destination's busy handler while it waits for
+        # the write lock; on top of that we retry, because a backup that
+        # starts while another connection sits in a read transaction gives up
+        # rather than waiting
+        $dbh->sqlite_busy_timeout($RESTORE_BUSY_TIMEOUT_MS);
+        my $deadline = Time::HiRes::time() + $RESTORE_BUSY_TIMEOUT_MS / 1000;
+        my ($busy,$tries) = (undef,0);
+        while (1) {
+            $busy = undef;
+            last if eval { $dbh->sqlite_backup_from_file($staging) };
+            $busy = $@ || $dbh->errstr || 'unknown error';
+            last if Time::HiRes::time() >= $deadline;
+            # first attempt and then roughly every five seconds, so that a
+            # long wait is visible without a log line per retry
+            $self->log->warn("Config database busy, retrying restore: $busy")
+                if $tries++ % 50 == 0;
+            Time::HiRes::sleep(0.1);
+        }
+        $dbh->disconnect;
+        # giving up here is safe: the live database has not been touched, so
+        # this degrades to a clean error rather than a half restored config
+        die mkerror(3845,trm("Could not restore the configuration database: %1",$busy))
+            if $busy;
+        1;
+    } or $err = $@;
+    no autodie;
+    unlink glob $staging.'*';
+    die $err if $err;
+    return;
+}
+
 =head2 $cfg->restoreConfigBlob(configBlob)
 
 retore the confguration state
@@ -568,7 +636,6 @@ sub restoreConfigBlob {
     my $crypt = $self->getCrypt($password);
     $config = $self->unpack16($crypt->decrypt($config));
 
-    my $cfg = $self->cfgHash;
     my $user = $self->app->userObject->new(app=>$self->app,userId=>'__CONFIG', log=>$self->log);
     open my $fh ,'<', \$config;
     my $zip = Archive::Zip->new();
@@ -578,20 +645,22 @@ sub restoreConfigBlob {
         for ($member->fileName){
             /^\{DATABASE\}$/ && do {
                 $self->log->warn("Restoring Database!");
-                $self->app->database->mojoSqlDb->disconnect;
-                unlink glob $cfg->{BACKEND}{cfg_db}.'*';
-                $member->extractToFileNamed($cfg->{BACKEND}{cfg_db});
+                $self->_stageAndRestoreDb(sub ($staging) {
+                    $member->extractToFileNamed($staging);
+                });
                 last;
             };
             /^\{DATABASEDUMP\}$/ && do {
                 $self->log->warn("Restoring Database Dump!");
-                $self->app->database->mojoSqlDb->disconnect;
-                unlink glob $cfg->{BACKEND}{cfg_db}.'*';
-                open my $sqlite, '|-', '/usr/bin/sqlite3',$cfg->{BACKEND}{cfg_db};
-                my $sql = $member->contents();
-                $sql =~ s/0$//; # for some reason the dump ends in 0
-                print $sqlite $sql;
-                close $sqlite;
+                $self->_stageAndRestoreDb(sub ($staging) {
+                    open my $sqlite, '|-', '/usr/bin/sqlite3',$staging;
+                    my $sql = $member->contents();
+                    $sql =~ s/0$//; # for some reason the dump ends in 0
+                    print $sqlite $sql;
+                    # autodie turns a non zero exit of sqlite3 into a die, so a
+                    # dump that does not replay never reaches the live database
+                    close $sqlite;
+                });
                 last;
             };
             m/^\{PLUGINSTATE\.([^.]+)\}(.+)/ && do {

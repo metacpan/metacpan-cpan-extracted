@@ -1,4 +1,5 @@
-requires 'PAGI';
+requires 'PAGI::Server';
+requires 'PAGI::Tools';
 requires 'WebDyne';
 
 on configure => sub {

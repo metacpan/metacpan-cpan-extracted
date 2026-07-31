@@ -40,13 +40,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::Passphrase" : "0",
-            "Crypt::Passphrase::Argon2" : "0",
+            "Crypt::Passphrase" : "0.023",
+            "Crypt::Passphrase::Argon2" : "0.010",
             "Module::Runtime" : "0.018",
             "Moo" : "2.005005",
-            "Net::SAML2" : "0",
+            "Net::SAML2" : "0.88",
             "Ouch" : "0.0501",
-            "Try::Catch" : "0",
+            "Try::Catch" : "v1.1.0",
             "namespace::clean" : "0.27",
             "perl" : "5.024000"
          }
@@ -59,7 +59,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.004",
+   "version" : "0.006",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

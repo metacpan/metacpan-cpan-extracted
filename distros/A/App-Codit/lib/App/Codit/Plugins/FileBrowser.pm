@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -65,23 +65,7 @@ sub new {
 
 
 	my $page = $self->ToolLeftPageAdd('FileBrowser', 'folder', undef, 'Browse your file system', 400);
-	my @images = (
-		['-compactimage', 'view-list-details', 16],
-		['-detailsimage', 'view-list-tree', 16],
-		['-iconviewimage', 'view-list-icons', 16],
-		['-msgimage', 'dialog-information', 32],
-		['-newfolderimage', 'folder-new', 16],
-		['-reloadimage', 'appointment-recurring', 16],
-		['-warnimage', 'dialog-warning', 32],
-	);
-	my @op = ();
-	for (@images) {
-		my ($opt, $icon, $size) = @$_;
-		my $img = $self->getArt($icon, $size);
-		push @op, $opt, $img if defined $img;
-	}
-
-	my $b = $page->FileManager(@op,
+	my $b = $page->FileManager(
 		-invokefile => ['fbInvoke', $self],
 		-listmenu => $self->extGet('MenuBar')->menuStack(@contextmenu),
 		-diriconcall => ['getDirIcon', $self],
@@ -100,6 +84,7 @@ sub new {
 	$self->after(1000, ['load', $b]);
 	$self->{BROWSER} = $b;
 	
+	$self->ReConfigure;
 	return $self;
 }
 
@@ -129,6 +114,26 @@ sub fbOpen {
 	}
 	$mdi->silentMode(0);
 	$mdi->docSelectFirst;
+}
+
+sub ReConfigure {
+	my $self = shift;
+	my $b = $self->{BROWSER};
+	my $size = $self->configGet('-tooliconsize');
+	my @images = (
+		['-compactimage', 'view-list-details', $size],
+		['-detailsimage', 'view-list-tree', $size],
+		['-iconviewimage', 'view-list-icons', $size],
+		['-msgimage', 'dialog-information', 32],
+		['-newfolderimage', 'folder-new', $size],
+		['-reloadimage', 'appointment-recurring', $size],
+		['-warnimage', 'dialog-warning', 32],
+	);
+	for (@images) {
+		my ($opt, $icon, $size) = @$_;
+		my $img = $self->getArt($icon, $size);
+		$b->configure($opt, $img) if defined $img;
+	}
 }
 
 sub Unload {

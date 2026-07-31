@@ -147,7 +147,10 @@ lives_ok(
 
 is($response_xml, $xml, "We have the response XML as XML");
 
-my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $response_xml);
+my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $response_xml,
+                    cacert => 't/net-saml2-cacert.pem',
+                );
 isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
 
 done_testing;

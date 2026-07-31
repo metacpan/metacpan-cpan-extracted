@@ -1,10 +1,11 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{DB::Handy},
-    'VERSION'   => q{1.08},
+    'VERSION'   => q{1.09},
     'ABSTRACT'  => q{Pure-Perl flat-file relational database with DBI-like interface},
     'PREREQ_PM' => {
         'Fcntl' => '1.03',
@@ -12,19 +13,36 @@ my %args = (
         'File::Spec' => '0',
         'POSIX' => '0',
         'constant' => '0',
-        'perl' => '5.00503',
-        'strict' => '1.01',
-        'vars' => '0',
-        'warnings' => '0',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
+
+# Install bin/*.pl as executables (EUMM creates .bat wrappers on Win32).
+# A dist without a bin/ directory is unaffected.
+if (-d 'bin') {
+    local *BINDIR;
+    if (opendir(BINDIR, 'bin')) {
+        $args{EXE_FILES} =
+            [map { "bin/$_" } sort grep { /\.pl\z/ && -f "bin/$_" } readdir(BINDIR)];
+        closedir(BINDIR);
+    }
+}
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
 # Passing it to older versions produces an "is not a known parameter" warning
 # without failing, but we suppress the noise by checking the version.
 if ($ExtUtils::MakeMaker::VERSION >= 6.31) {
     $args{LICENSE} = q{perl};
+}
+
+# CONFIGURE_REQUIRES was introduced in ExtUtils::MakeMaker 6.52.  Older
+# versions ignore an unknown parameter with a warning, so it is passed
+# only when it is understood; the generated META files carry the same
+# information for every toolchain.
+if ($ExtUtils::MakeMaker::VERSION >= 6.52) {
+    $args{CONFIGURE_REQUIRES} = {
+        'ExtUtils::MakeMaker' => '5.4302',
+    };
 }
 
 # MIN_PERL_VERSION (6.48) and META_MERGE (6.46) arrived together in the
@@ -36,27 +54,19 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'meta-spec' => { version => 2 },
         'resources' => {
             'license'    => [ 'http://dev.perl.org/licenses/' ],
-            'bugtracker' => {
-                'web' => 'https://github.com/ina-cpan/DB-Handy/issues',
-            },
-            'repository' => {
-                'url'  => 'https://github.com/ina-cpan/DB-Handy',
-                'web'  => 'https://github.com/ina-cpan/DB-Handy',
-                'type' => 'git',
-            },
         },
         'provides' => {
             'DB::Handy' => {
                 'file'    => 'lib/DB/Handy.pm',
-                'version' => '1.08',
+                'version' => '1.09',
             },
             'DB::Handy::Connection' => {
                 'file'    => 'lib/DB/Handy.pm',
-                'version' => '1.08',
+                'version' => '1.09',
             },
             'DB::Handy::Statement' => {
                 'file'    => 'lib/DB/Handy.pm',
-                'version' => '1.08',
+                'version' => '1.09',
             }
         },
     };

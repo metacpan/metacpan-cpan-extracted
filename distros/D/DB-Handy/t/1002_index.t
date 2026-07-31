@@ -16,14 +16,21 @@ use DB::Handy;
 # Embedded test harness (no Test::More dependency)
 ###############################################################################
 my ($PASS, $FAIL, $T) = (0, 0, 0);
-sub ok      { my($c,$n)=@_; $T++; $c ? ($PASS++, print "ok $T - $n\n") : ($FAIL++, print "not ok $T - $n\n") }
-sub is      { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, print "ok $T - $n\n") : ($FAIL++, print "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
+my @OUT;          # buffered ok() lines
+my $DONE = 0;     # set once the plan has been emitted
+sub ok      { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is      { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
 
-print "1..52\n";
 use File::Path ();
+use File::Spec ();
 
-my $BASE = '/tmp/test_idx_' . $$;
+my $BASE = File::Spec->catdir(File::Spec->tmpdir, "test_idx_$$");
 File::Path::rmtree($BASE) if -d $BASE;
+
+# Remove the scratch directory however the script leaves: a normal exit,
+# a die in mid-file, or an interrupt.  Without this an aborted run left a
+# stale tree behind in the system temp directory.
+END { File::Path::rmtree($BASE) if defined($BASE) && -d $BASE }
 
 my $db = DB::Handy->new(base_dir => $BASE);
 
@@ -364,6 +371,25 @@ ok(!-f "$BASE/testdb/ftest.idx_f.idx", "DROP TABLE removes idx file");
 ###############################################################################
 # Cleanup
 ###############################################################################
-File::Path::rmtree($BASE);
+
+###############################################################################
+# Emit the plan.  The count is taken from the assertions that actually ran,
+# so it can never drift out of step with the body the way the former
+# hard-coded "1..N" line could.  The ok() lines are buffered in @OUT purely
+# so that the plan can still be printed first: a leading plan is what every
+# Test::Harness understands, including the one shipped with Perl 5.005_03.
+###############################################################################
+$DONE = 1;
+print "1..$T\n", @OUT;
 
 exit($FAIL ? 1 : 0);
+
+# If the body dies before the plan is emitted, flush whatever did run and
+# append one failing assertion, so the harness is handed a complete and
+# definitely-failing stream instead of no plan at all.
+END {
+    unless ($DONE) {
+        print '1..' . ($T + 1) . "\n", @OUT;
+        print 'not ok ' . ($T + 1) . " - test script aborted before completion\n";
+    }
+}

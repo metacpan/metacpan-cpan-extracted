@@ -1,9 +1,8 @@
 package Image::WebP;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
-use Data::Dumper;
 
 require DynaLoader;
 
@@ -13,7 +12,7 @@ Image::WebP - binding to Google's libwebp.
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -89,9 +88,9 @@ sub WebPGetFeatures {
 
 =head3 WebPDecodeSimple (data, format)
 
-Decode Webp image <data> into specified rgb <format>. Format can be:
+Decode WebP image C<data> into the specified RGB C<format>. The format can be:
 "RGBA", "ARGB", "BGRA", "RGB", "BGR". Returns raw string. If you
-pass wrong webp data, you can catch segfault!
+pass invalid WebP data, the method throws an exception.
 
 Returns hash like:
 
@@ -107,8 +106,12 @@ sub WebPDecodeSimple {
     my ($self, $img_data, $format ) = @_;
 
     my %formats = ( "RGBA" => 1, "ARGB" => 2, "BGRA" => 3, "RGB" => 4, "BGR" => 5 );
+    die "WebP decode format is required\n"
+        if !defined($format);
+    die "Unsupported WebP decode format '$format'\n"
+        if !exists($formats{$format});
 
-    my @res = xs_WebPDecodeSimple($img_data, length($img_data), $formats{$format} || 1);
+    my @res = xs_WebPDecodeSimple($img_data, length($img_data), $formats{$format});
 
     return {
         'data'   => shift @res,
@@ -120,15 +123,19 @@ sub WebPDecodeSimple {
 
 =head3 WebPEncodeSimple(data, width, height, format, opts)
 
-Encode raw RGB <data> with specified <width> and <height> into webp image and return it as string. Parameter <format> stands for raw data format, you pass to function, it can be one of "RGBA", "BGRA", "RGB", "BGR". The <format> must be exactly same as your data, or you will encounter segfault!
+Encode raw RGB or RGBA C<data> with the specified C<width> and C<height>
+into WebP data. C<format> must describe the raw data and can be one of
+"RGBA", "BGRA", "RGB", "BGR".
 
 The <opts> parameter stands for encoding options. For understanding them see L<https://developers.google.com/speed/webp/docs/api>. Supported options are:
 
  {
     stride  => integer, # not specify it unless you really know what you want
     quality => float,   # 0.0 - 100.0, needed if you compress to lossy format
-    loseless=> 0 || 1,  #  0 for lossy encoding and 1 for loseless
+    lossless => 0 || 1, # 0 for lossy encoding and 1 for lossless
  }
+
+The historical misspelling C<loseless> remains accepted for compatibility.
 
 =cut
 
@@ -136,16 +143,24 @@ sub WebPEncodeSimple {
     my ($self, $data, $w, $h, $fmt, $opts) = @_;
 
     my %formats = ( "RGBA" => 3, "BGRA" => 4, "RGB" => 1, "BGR" => 2 );
+    my %channels = ( "RGBA" => 4, "BGRA" => 4, "RGB" => 3, "BGR" => 3 );
+    die "WebP encode format is required\n"
+        if !defined($fmt);
+    die "Unsupported WebP encode format '$fmt'\n"
+        if !exists($formats{$fmt});
 
-    $opts->{'quality'} = 95.0 if !defined($opts->{'quality'});
-    $opts->{'stride'}  = $w*3;
+    my %options = %{ $opts || {} };
+    $options{'quality'} = 95.0 if !defined($options{'quality'});
+    $options{'stride'} = $w * $channels{$fmt}
+        if !defined($options{'stride'});
+    my $lossless = $options{'lossless'} || $options{'loseless'};
 
     my @res = xs_WebPEncode(
         $data, $w, $h,
-        $opts->{'stride'},
+        $options{'stride'},
         $formats{$fmt},
-        $opts->{'loseless'} ? 2 : 1,
-        $opts->{'quality'}
+        $lossless ? 2 : 1,
+        $options{'quality'}
        );
 
     return {
@@ -161,12 +176,13 @@ XSLoader::load('Image::WebP', $VERSION);
 
 =head1 AUTHOR
 
-Zargener, C<< <zargener at gmail.com> >>
+Yalexwander, C<< <yalexvandr at gmail.com> >>
+Zen Dodd, C<< <mail at steadytao.com> >>
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Zargener.
+Copyright 2013-2026 Yalexwander.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

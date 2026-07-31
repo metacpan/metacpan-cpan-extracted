@@ -7,9 +7,15 @@ This directory contains the Python REST wrapper around `Convert::Pheno`.
 * The API is built with FastAPI.
 * The public REST contract uses a single `POST /api` endpoint.
 * `/api` receives a JSON object with explicit `conversion`, `input`, `output`, and `options` sections.
-* Incoming request bodies are validated at the payload-shape level before conversion.
+* Incoming request bodies are validated against a public field allowlist before conversion.
 * The Python layer calls the Perl conversion code through `api/perl/json_bridge.pl`.
 * The conversion logic still runs in Perl; this wrapper only exposes the same REST contract through FastAPI.
+
+The HTTP API accepts in-memory data under `input.data`. It deliberately rejects
+host filesystem options such as `in_file`, `out_file`, `mapping_file`, and
+`path_to_ohdsi_db`. BFF, PXF, FHIR R4 Bundles, openEHR, and already-transposed OMOP payloads can
+be sent over HTTP; file-based CSV, REDCap, CDISC-ODM, and Dataset-JSON routes
+should use the CLI or module interface.
 
 ## Installation
 
@@ -58,7 +64,7 @@ If you need HTTPS, add TLS in the ASGI server configuration or terminate TLS in 
 
 With `uvicorn` for development:
 
-    $ docker container run -p 8000:8000 --name convert-pheno-uvicorn cnag/convert-pheno:latest uvicorn share.api.python.main:app --host 0.0.0.0
+    $ docker container run -p 8000:8000 --name convert-pheno-uvicorn manuelrueda/convert-pheno:latest uvicorn api.python.main:app --host 0.0.0.0
 
 ## Examples
 

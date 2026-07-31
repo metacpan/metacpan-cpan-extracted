@@ -18,5 +18,6 @@ t/02-memory.t
 t/03-edge-cases.t
 t/04-precedence.t
 t/05-overlap-captures.t
+t/06-hardening.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

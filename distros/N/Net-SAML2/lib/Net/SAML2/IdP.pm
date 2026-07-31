@@ -1,7 +1,8 @@
 package Net::SAML2::IdP;
 use Moose;
+with 'Net::SAML2::Role::XMLCertificate';
 
-our $VERSION = '0.85'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
 # ABSTRACT: SAML Identity Provider object
 
@@ -111,7 +112,7 @@ sub new_from_xml {
     my %certs = ();
     for my $key ($xpath->findnodes("$basepath/md:KeyDescriptor")) {
         my $use = $key->getAttribute('use');
-        my $pem = $class->_get_pem_from_keynode($key);
+        my $pem = $class->get_pem_from_keynode($key);
         if (!$use) {
             push(@{$certs{signing}}, $pem);
             push(@{$certs{encryption}}, $pem);
@@ -138,32 +139,6 @@ sub new_from_xml {
     );
 
 }
-
-sub _get_pem_from_keynode {
-    my $self = shift;
-    my $node = shift;
-
-    $node->setNamespace('http://www.w3.org/2000/09/xmldsig#', 'ds');
-
-    my ($text)
-        = $node->findvalue("ds:KeyInfo/ds:X509Data/ds:X509Certificate", $node)
-        =~ /^\s*(.+?)\s*$/s;
-
-    # rewrap the base64 data from the metadata; it may not
-    # be wrapped at 64 characters as PEM requires
-    $text =~ s/\n//g;
-
-    my @lines;
-    while(length $text > 64) {
-        push @lines, substr $text, 0, 64, '';
-    }
-    push @lines, $text;
-
-    $text = join "\n", @lines;
-
-    return "-----BEGIN CERTIFICATE-----\n$text\n-----END CERTIFICATE-----\n";
-}
-
 
 # BUILDARGS ( hashref of the parameters passed to the constructor )
 #
@@ -272,7 +247,7 @@ Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =head1 SYNOPSIS
 

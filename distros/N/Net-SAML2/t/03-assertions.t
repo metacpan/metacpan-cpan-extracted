@@ -65,7 +65,45 @@ my $xml = <<XML;
 </samlp:Response>
 XML
 
-my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+throws_ok(sub { Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    issuer => 'INCORRECT_ISSUER',
+                    insecure_trust_embedded_cert => 1,
+                );},
+                qr/assert_saml_value: \(INCORRECT_ISSUER\) does not match \(http:\/\/sso\.dev\.venda\.com\/opensso\) in \(saml:Issuer\)/,
+                'Incorrect Issuer will croak'
+        );
+
+lives_ok(sub { Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    issuer => 'http://sso.dev.venda.com/opensso',
+                    insecure_trust_embedded_cert => 1,
+                );},
+                'Correct Issuer will not croak'
+        );
+
+lives_ok(sub { Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    destination => 'http://ct.local/saml/consumer-post',
+                    insecure_trust_embedded_cert => 1,
+                );},
+                'Correct Destination will not croak'
+        );
+
+throws_ok(sub { Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    destination => 'INCORRECT_DESTINATION',
+                    insecure_trust_embedded_cert => 1,
+                );},
+                qr/assert_saml_value: \(INCORRECT_DESTINATION\) does not match \(http:\/\/ct.local\/saml\/consumer-post\)/,
+                'Incorrect Destination will croak'
+        );
+
+my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    insecure_trust_embedded_cert => 1,
+                );
+
 isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
 
 is($assertion->{id},
@@ -110,6 +148,33 @@ is($assertion->valid('http://ct.local'), 1, "ct.local is valid now - InResponseT
 is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXynLPhB'), 1, "ct.local is valid now - InResponseTo Checked");
 is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXyn'), 0, "Invalid InResponseTo Checked and failed");
 
+# Check the Issuer
+is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXynLPhB' , 'http://sso.dev.venda.com/opensso'), 1, "Audience, InResponseTo and Issuer are valid");
+is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXynLPhBWRONG' , 'http://sso.dev.venda.com/opensso'), 0, "InResponseTo is incorrect");
+is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXynLPhB' , 'Wrong Issuer'), 0, "Issuer is invalid");
+
+# Check the Destination
+is($assertion->valid('http://ct.local',         # Audience
+        'N3k95Hg41WCHdwc9mqXynLPhB',            # InResponseTo
+        'http://sso.dev.venda.com/opensso',     # Issuer
+        'http://ct.local/saml/consumer-post',   # Destination
+        ),
+        1, "Audience, InResponseTo, Issuer and Destination are valid");
+
+is($assertion->valid('http://ct.local',         # Audience
+        'N3k95Hg41WCHdwc9mqXynLPhB',            # InResponseTo
+        'Wrong Issuer',                         # Issuer
+        'http://ct.local/saml/consumer-post',   # Destination
+        ),
+        0, "Issuer is invalid");
+
+is($assertion->valid('http://ct.local',         # Audience
+        'N3k95Hg41WCHdwc9mqXynLPhB',            # InResponseTo
+        'http://sso.dev.venda.com/opensso',     # Issuer
+        'Wrong Destination',                    # Destination
+        ),
+        0, "Response Destination is invalid");
+
 $assertion->{not_before} = DateTime->now->add(minutes => 5);
 is($assertion->valid('http://ct.local'), 0, "and invalid again - InResponseTo not Checked");
 is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXynLPhB'), 0, "and invalid again - InResponseTo Checked");
@@ -135,7 +200,10 @@ PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c2FtbDJwOlJlc3BvbnNlIHhtbG5z
 BASE64
 
 $xml = decode_base64($assertion_b64);
-$assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+$assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    insecure_trust_embedded_cert => 1,
+                );
 isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
 
 is($assertion->nameid_name_qualifier,
@@ -171,7 +239,10 @@ is($assertion->id,
 lives_ok(
     sub {
        my  $xml = path('t/data/eherkenning-assertion.xml')->slurp;
-       $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+       $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    insecure_trust_embedded_cert => 1,
+                );
     },
     "Correct parsing of dates"
 );
@@ -186,7 +257,10 @@ is($assertion->not_after, "2020-06-02T11:53:07", "... and the correct not_after"
 lives_ok(
     sub {
        my  $xml = path('t/data/saml-adfs-plain.xml')->slurp;
-       $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+       $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    insecure_trust_embedded_cert => 1,
+                );
     },
     "Correct parsing of plain ADFS"
 );
@@ -194,7 +268,10 @@ lives_ok(
 lives_ok(
     sub {
        my  $xml = path('t/data/failed-assertion.xml')->slurp;
-       $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+       $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    insecure_trust_embedded_cert => 1,
+                );
     },
     "Correct parsing of failed assertion"
 );
@@ -214,7 +291,10 @@ is(
 
 {
     my $xml = path('t/data/digid-live.xml')->slurp;
-    my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+    my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $xml,
+                    insecure_trust_embedded_cert => 1,
+                );
     isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
 }
 

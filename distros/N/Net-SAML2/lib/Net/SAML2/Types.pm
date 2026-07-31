@@ -2,7 +2,7 @@ package Net::SAML2::Types;
 use warnings;
 use strict;
 
-our $VERSION = '0.85'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
 # ABSTRACT: Custom Moose types for Net::SAML2
 
@@ -20,6 +20,7 @@ use MooseX::Types::Moose qw(Str Int Num Bool ArrayRef HashRef Item);
 
 subtype XsdID, as Str,
     where {
+        return 0 unless length($_ // '');
         return 0 unless $_ =~ /^[a-zA-Z_]/;
         return 0 if $_ =~ /[^a-zA-Z0-9_\.\-]/;
         return 1;
@@ -57,7 +58,7 @@ Net::SAML2::Types - Custom Moose types for Net::SAML2
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =head2 XsdID
 

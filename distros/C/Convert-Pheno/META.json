@@ -1,5 +1,5 @@
 {
-   "abstract" : "A module to interconvert common data models for phenotypic data",
+   "abstract" : "Convert clinical and phenotypic data between supported models",
    "author" : [
       "Manuel Rueda <mrueda@cpan.org>"
    ],
@@ -55,6 +55,7 @@
             "Text::Similarity" : "0.13",
             "Types::Standard" : "2.004000",
             "XML::Fast" : "0.17",
+            "YAML::PP" : "v0.38.0",
             "YAML::XS" : "0.88",
             "perl" : "5.026000"
          }
@@ -83,7 +84,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

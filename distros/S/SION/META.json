@@ -1,0 +1,62 @@
+{
+   "abstract" : "a serialization format a little more expressive than JSON",
+   "author" : [
+      "Dan Kogai <dankogai@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SION",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "JSON::PP" : "2.27300",
+            "MIME::Base64" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dankogai/p5-sion.git",
+         "web" : "https://github.com/dankogai/p5-sion"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::SAML2;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 
 use v5.24;
 use Moo;
@@ -184,13 +184,16 @@ sub parse_assertion ($self, $id, $response) {
    time() <= $reqts->{ts} + 30
       or ouch 400, 'Not expecting anything SAML-related', 'expired id';
 
-   my $xml_response =
-      Net::SAML2::Binding::POST->new->handle_response($response);
-
-   # the module insists on a file-based CA certificate...
+   # the module for Assertion insists on a file-based CA certificate so we
+   # save it in a temporary file. It is also useful for the POST module
+   # since Net::SAML 0.88
    my ($fh, $cacert_path) = tempfile();
    print {$fh} join "\n\n", $self->idp->cert('signing')->@*;
    close $fh;
+
+   my $xml_response = Net::SAML2::Binding::POST
+      ->new(cacert => $cacert_path)
+      ->handle_response($response);
 
    my $sp_conf = $self->sp_configuration;
    my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(

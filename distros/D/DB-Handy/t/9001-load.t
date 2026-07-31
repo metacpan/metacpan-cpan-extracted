@@ -18,7 +18,7 @@
 #
 #   2. INA_CPAN_Check library load and export
 #      - t/lib/INA_CPAN_Check.pm loads without error
-#      - check_A through check_K and helpers are exported
+#      - check_A through check_L and helpers are exported
 #
 # COMPATIBILITY
 #   Perl 5.005_03 and later.  No non-core dependencies.
@@ -131,20 +131,22 @@ ok( defined &INA_CPAN_Check::ok
  && defined &INA_CPAN_Check::_scan_code,
    'INA_CPAN_Check: key helpers defined');
 
-# check_A through check_K defined
+# check_A through check_L defined
 ok( defined &INA_CPAN_Check::check_A && defined &INA_CPAN_Check::check_B
  && defined &INA_CPAN_Check::check_C && defined &INA_CPAN_Check::check_D
  && defined &INA_CPAN_Check::check_E && defined &INA_CPAN_Check::check_F
  && defined &INA_CPAN_Check::check_G && defined &INA_CPAN_Check::check_H
  && defined &INA_CPAN_Check::check_I && defined &INA_CPAN_Check::check_J
- && defined &INA_CPAN_Check::check_K,
-   'INA_CPAN_Check: check_A through check_K defined');
+ && defined &INA_CPAN_Check::check_K
+ && defined &INA_CPAN_Check::check_L,
+   'INA_CPAN_Check: check_A through check_L defined');
 
-# count_A through count_K defined
+# count_A through count_L defined
 ok( defined &INA_CPAN_Check::count_A && defined &INA_CPAN_Check::count_B
  && defined &INA_CPAN_Check::count_C && defined &INA_CPAN_Check::count_D
  && defined &INA_CPAN_Check::count_E && defined &INA_CPAN_Check::count_F
  && defined &INA_CPAN_Check::count_G && defined &INA_CPAN_Check::count_H
  && defined &INA_CPAN_Check::count_I && defined &INA_CPAN_Check::count_J
- && defined &INA_CPAN_Check::count_K,
-   'INA_CPAN_Check: count_A through count_K defined');
+ && defined &INA_CPAN_Check::count_K
+ && defined &INA_CPAN_Check::count_L,
+   'INA_CPAN_Check: count_A through count_L defined');

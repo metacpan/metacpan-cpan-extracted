@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Config::Grammar" : "1.13",
+            "DBI" : "0",
             "Excel::Writer::XLSX" : "0",
             "Future::AsyncAwait" : "0.65",
             "JSON::Validator" : "5.14",
@@ -63,6 +64,6 @@
          "url" : "https://github.com/oetiker/callbackery"
       }
    },
-   "version" : "v0.58.2",
+   "version" : "v0.58.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

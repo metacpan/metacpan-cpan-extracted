@@ -42,6 +42,8 @@ my @files = (
     't/026_do-not-move-namespace-to-parent.t',
     't/027_no_signatures_should_fail.t',
     't/028_croak_with_no_xml.t',
+    't/029_verify_id_formats.t',
+    't/030-reject-duplicate-id.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

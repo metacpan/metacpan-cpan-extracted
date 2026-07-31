@@ -151,7 +151,10 @@ ujwb1+y1SYnlalLUt7PzEW85RNqVewGsHE8SD/1s70eYNYp7YJwLGPKJfyr3LvSl
         </dsig:Signature></samlp:Response>
 XML_FILE
 
-my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml     => $xml,
+                    cacert  => 't/data/openssl-verify-cacert.pem',
+                );
 isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
 
 is($assertion->in_response_to, 'NETSAML2_1d8748c413abe58635d3c8b53b79633a', 'In response to is correct');

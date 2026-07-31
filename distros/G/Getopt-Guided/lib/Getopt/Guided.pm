@@ -3,8 +3,12 @@ BEGIN { require 5.010000 }; ## no critic ( RequireUseStrict, RequireUseWarnings 
 use strict;
 use warnings;
 
+#<<<
 package Getopt::Guided;
-BEGIN { our $VERSION = 'v3.2.1' }
+BEGIN {
+our $VERSION = 'v3.2.2';
+}
+#>>>
 
 # Options Delimiter constant
 sub OD () { '-' }

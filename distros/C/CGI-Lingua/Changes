@@ -1,5 +1,35 @@
 Revision history for CGI-Lingua
 
+0.84	Thu Jul 30 03:07:22 PM EDT 2026
+	[ Security ]
+	- country(): after extracting the IPv4 portion of an ::ffff: mapped address,
+	  validate it with is_ipv4() before proceeding to geo lookups; the untainting
+	  regex uses \d{1,3} which matches 0-999, so ::ffff:999.999.999.999 previously
+	  reached IP::Country with a nominally out-of-range address; on systems where
+	  inet_aton wraps octets modulo 256, this silently became 231.231.231.231 (a
+	  real routable IP) and returned a spurious country code
+
+	[ Bug Fixes ]
+	- new(): add local $SIG{__DIE__} inside the eval { JSON::PP::decode_json(...) }
+	  guard so that applications using the Error module (or any other framework that
+	  installs a $SIG{__DIE__} handler) do not see spurious "malformed JSON string"
+	  log messages when the cache holds a legacy Storable blob; the eval already
+	  discards the stale entry and falls through to fresh construction, but without
+	  the local the handler intercepts the JSON parse exception before eval can
+	  swallow it
+	- t/cgi_security.t: pre-require LWP::Simple::WithCache and JSON::Parse before
+	  installing any Test::Mockingbird mocks; without this, the lazy
+	  eval { require LWP::Simple::WithCache } inside country() loads the real
+	  module on first call and clobbers the mock, causing the bogus-IP subtest
+	  (::ffff:999.999.999.999) to make a real network call and receive a country
+	  code instead of undef — matches the pre-require pattern already used in
+	  t/integration.t and t/edge_cases.t
+	- t/integration.t: add missing _have_ipcountry = 0 sentinel in the
+	  'dont_use_ip suppresses country-based language detection' subtest; the
+	  comment stated all geo-module sentinels were set to GEO_ABSENT but
+	  _have_ipcountry was omitted, so on machines with IP::Country installed the
+	  lookup ran against 8.8.8.8 and returned a real country code
+
 0.83	Tue Jul 28 20:30:23 EDT 2026
 	[ Security ]
 	- Replace Storable::nfreeze/thaw with JSON::PP encode/decode for cache

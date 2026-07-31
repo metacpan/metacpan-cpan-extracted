@@ -26,6 +26,13 @@ t/1013_or_index.t
 t/1014_colorder_insert.t
 t/1015_new_features.t
 t/1016_unsupported.t
+t/1017_regression.t
+t/1018_hardening.t
+t/1019_types.t
+t/1020_sql_layer.t
+t/1021_integrity.t
+t/1022_names.t
+t/1023_join_negative.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t

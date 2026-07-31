@@ -1,5 +1,10 @@
 Revision history for Data-TopK-Shared
 
+0.03      2026-07-30
+          - Reject a non-ref invocant replacement in the re-entrancy guard: a
+            hostile tied or overloaded argument could crash the process mid-call;
+            it now croaks cleanly.
+
 0.02      2026-07-21
           - Add time-decayed mode (new_decayed/new_decayed_memfd, half_life,
             is_decayed) for recency-weighted top-k.

@@ -24,7 +24,10 @@ open(SCH, "< $sch_file") or die("Cannot open schema $sch_file: $!\n");
 my $recsize = 0;
 while (my $line = <SCH>) {
     $line =~ s/\r?\n$//;
-    if ($line =~ /^recsize=(\d+)$/) {
+    # The engine writes the key in upper case (RECSIZE=264); matching it in
+    # lower case here meant this script always died with "Could not find
+    # recsize".  Match case-insensitively so either spelling is accepted.
+    if ($line =~ /^recsize=(\d+)$/i) {
         $recsize = $1;
         last;
     }

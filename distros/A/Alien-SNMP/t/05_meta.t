@@ -24,6 +24,29 @@ is_deeply \%pod_flags, \%alienfile_flags,
   or diag "POD:       @{[ sort keys %pod_flags ]}\n"
         . "alienfile: @{[ sort keys %alienfile_flags ]}";
 
+# --- Tracked META.* must match the module $VERSION ---
+# MakeMaker regenerates these only inside the dist directory, so a stale copy in
+# the repository never shows up in `git status`.  It is not harmless: MYMETA is
+# built from META when META is present, so the old version reaches anything
+# installing straight from the repository rather than from a release tarball.
+SKIP: {
+    eval { require CPAN::Meta; 1 }
+      or skip 'CPAN::Meta required to read the tracked META files', 2;
+
+    my $distdir = "Alien-SNMP-$Alien::SNMP::VERSION";
+
+    for my $meta_file (qw( META.json META.yml )) {
+        # Assigned first: a bare `is CPAN::Meta->...` parses as an indirect
+        # object call, CPAN::Meta->is(...).
+        my $meta_version = CPAN::Meta->load_file($meta_file)->version;
+
+        is $meta_version, $Alien::SNMP::VERSION,
+          "meta__tracked_${meta_file}__matches_module_version"
+          or diag "refresh with: make distdir && cp $distdir/META.* . "
+                . "&& rm -rf $distdir";
+    }
+}
+
 done_testing;
 
 sub _pod_configure_flags {

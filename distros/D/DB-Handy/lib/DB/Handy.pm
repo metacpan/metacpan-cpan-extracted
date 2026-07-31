@@ -5,7 +5,7 @@ package DB::Handy;
 #
 # https://metacpan.org/dist/DB-Handy
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ######################################################################
 #
 # Compatible : Perl 5.005_03 and later
@@ -39,13 +39,13 @@ use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
-use Fcntl qw(:DEFAULT :flock);
+use Fcntl qw(:flock);
 use File::Path ();
 use File::Spec;
 use POSIX ();
 
 use vars qw($VERSION $errstr);
-$VERSION = '1.08';
+$VERSION = '1.09';
 $VERSION = $VERSION;
 $errstr  = '';
 
@@ -55,6 +55,8 @@ $errstr  = '';
 use constant RECORD_ACTIVE  => "\x01";
 use constant RECORD_DELETED => "\x00";
 use constant MAX_VARCHAR    => 255;
+use constant INT_MAX        =>  2147483647;
+use constant INT_MIN        => -2147483648;
 use constant IDX_MAGIC      => "SDBIDX1\n";
 use constant IDX_MAGIC_LEN  => 8;
 use constant REC_NO_SIZE    => 4;
@@ -79,6 +81,11 @@ sub new {
         _locks   => {},
     };
     bless $self, $class;
+    if (($self->{db_name} ne '') && !_valid_name($self->{db_name})) {
+        my $bad = _shown_name($self->{db_name});
+        $errstr = "Invalid database name '$bad'";
+        return undef;
+    }
     unless (-d $self->{base_dir}) {
         eval {
             File::Path::mkpath($self->{base_dir});
@@ -96,6 +103,11 @@ sub new {
 ###############################################################################
 sub create_database {
     my($self, $db_name) = @_;
+    unless (_valid_name($db_name)) {
+        my $bad = _shown_name($db_name);
+        $errstr = "Invalid database name '$bad'";
+        return 0;
+    }
     my $path = $self->_db_path($db_name);
     if (-d $path) {
         $errstr = "Database '$db_name' already exists";
@@ -113,6 +125,11 @@ sub create_database {
 
 sub use_database {
     my($self, $db_name) = @_;
+    unless (_valid_name($db_name)) {
+        my $bad = _shown_name($db_name);
+        $errstr = "Invalid database name '$bad'";
+        return 0;
+    }
     my $path = $self->_db_path($db_name);
     unless (-d $path) {
         $errstr = "Database '$db_name' does not exist";
@@ -125,6 +142,11 @@ sub use_database {
 
 sub drop_database {
     my($self, $db_name) = @_;
+    unless (_valid_name($db_name)) {
+        my $bad = _shown_name($db_name);
+        $errstr = "Invalid database name '$bad'";
+        return 0;
+    }
     my $path = $self->_db_path($db_name);
     unless (-d $path) {
         $errstr = "Database '$db_name' does not exist";
@@ -157,6 +179,8 @@ sub list_databases {
 sub create_table {
     my($self, $table, $columns) = @_;
     return $self->_err("No database selected") unless $self->{db_name};
+    return $self->_err("Invalid table name '" . _shown_name($table) . "'")
+        unless _valid_name($table);
     my $sch_file = $self->_file($table, 'sch');
     return $self->_err("Table '$table' already exists") if -f $sch_file;
 
@@ -186,22 +210,36 @@ sub create_table {
 
     local *FH;
     open(FH, "> $sch_file") or return $self->_err("Cannot write schema: $!");
-    print FH "VERSION=1\n";
-    print FH "RECSIZE=$rec_size\n";
+    my $ok = print FH "VERSION=1\n";
+    $ok &&= print FH "RECSIZE=$rec_size\n";
     for my $c (@cols) {
-        print FH "COL=$c->{name}:$c->{type}:$c->{size}:$c->{decl}\n";
+        $ok &&= print FH "COL=$c->{name}:$c->{type}:$c->{size}:$c->{decl}\n";
     }
-    close FH;
+    my $err = $!;
+    unless ($ok && close(FH)) {
+        $err = $! if $ok;
+        close FH if $ok;
+        unlink $sch_file;
+        return $self->_err("Cannot write schema: $err");
+    }
 
     local *FH;
-    open(FH, "> ".$self->_file($table, 'dat')) or return $self->_err("Cannot create dat: $!");
-    close FH;
+    my $dat_file = $self->_file($table, 'dat');
+    open(FH, "> $dat_file") or return $self->_err("Cannot create dat: $!");
+    binmode FH;
+    unless (close FH) {
+        my $e = $!;
+        unlink $sch_file;
+        return $self->_err("Cannot create dat: $e");
+    }
     return 1;
 }
 
 sub drop_table {
     my($self, $table) = @_;
     return $self->_err("No database selected") unless $self->{db_name};
+    return $self->_err("Invalid table name '" . _shown_name($table) . "'")
+        unless _valid_name($table);
     my $sch = $self->_load_schema($table);
     if ($sch && $sch->{indexes}) {
         for my $ix (values %{$sch->{indexes}}) {
@@ -248,6 +286,8 @@ sub describe_table {
 sub create_index {
     my($self, $idxname, $table, $colname, $unique) = @_;
     return $self->_err("No database selected") unless $self->{db_name};
+    return $self->_err("Invalid index name '" . _shown_name($idxname) . "'")
+        unless _valid_name($idxname);
     my $sch = $self->_load_schema($table) or return undef;
 
     my($col_def) = grep { $_->{name} eq $colname } @{$sch->{cols}};
@@ -259,8 +299,13 @@ sub create_index {
     my $sch_file = $self->_file($table, 'sch');
     local *FH;
     open(FH, ">> $sch_file") or return $self->_err("Cannot update schema: $!");
-    print FH "IDX=$idxname:$colname:$unique\n";
-    close FH;
+    my $ok = print FH "IDX=$idxname:$colname:$unique\n";
+    my $err = $!;
+    unless ($ok && close(FH)) {
+        $err = $! if $ok;
+        close FH if $ok;
+        return $self->_err("Cannot update schema: $err");
+    }
 
     $sch->{indexes}{$idxname} = {
         name    => $idxname,
@@ -276,6 +321,8 @@ sub create_index {
 sub drop_index {
     my($self, $idxname, $table) = @_;
     return $self->_err("No database selected") unless $self->{db_name};
+    return $self->_err("Invalid index name '" . _shown_name($idxname) . "'")
+        unless _valid_name($idxname);
     my $sch = $self->_load_schema($table) or return undef;
     return $self->_err("Index '$idxname' does not exist on '$table'") unless $sch->{indexes}{$idxname};
 
@@ -299,25 +346,31 @@ sub insert {
     return $self->_err("No database selected") unless $self->{db_name};
     my $sch = $self->_load_schema($table) or return undef;
 
-    # UNIQUE check
-    for my $ix (values %{$sch->{indexes}}) {
-        next unless $ix->{unique};
-        my $val = $row->{$ix->{col}};
-        if ($self->_idx_lookup_exact($table, $ix, $val) >= 0) {
-            return $self->_err("UNIQUE constraint violated on '$ix->{name}' (col '$ix->{col}', value '$val')");
-        }
-    }
-
     for my $col (@{$sch->{cols}}) {
         my $cn = $col->{name};
         if ((!defined($row->{$cn}) || ($row->{$cn} eq '')) && defined $sch->{defaults}{$cn}) {
             $row->{$cn} = $sch->{defaults}{$cn};
         }
     }
+
+    # UNIQUE check.  It runs after DEFAULT has been applied, so that the
+    # value actually stored is the one compared.  NULL is the empty string
+    # here and SQL-92 lets a UNIQUE column hold any number of NULLs, so an
+    # absent value is not compared at all.
+    for my $ix (values %{$sch->{indexes}}) {
+        next unless $ix->{unique};
+        my $val = $row->{$ix->{col}};
+        next unless defined($val) && ($val ne '');
+        if ($self->_idx_lookup_exact($table, $ix, $val) >= 0) {
+            return $self->_err("UNIQUE constraint violated on '$ix->{name}' (col '$ix->{col}', value '$val')");
+        }
+    }
+
     for my $cn (keys %{$sch->{notnull} || {}}) {
         return $self->_err("NOT NULL constraint violated on column '$cn'") unless defined($row->{$cn}) && ($row->{$cn} ne '');
     }
     for my $cn (keys %{$sch->{checks} || {}}) {
+        next unless defined($row->{$cn}) && ($row->{$cn} ne '');
         return $self->_err("CHECK constraint failed on column '$cn'") unless eval_bool($sch->{checks}{$cn}, $row);
     }
     # VARCHAR / CHAR length check: reject values longer than the declared size.
@@ -330,24 +383,40 @@ sub insert {
         if (length($row->{$cn}) > $decl) {
             return $self->_err(
                 "Value too long for column '$cn': "
-                . "declared VARCHAR($decl), got " . length($row->{$cn}) . " chars"
+                . "declared $col->{type}($decl), got "
+                . length($row->{$cn}) . " bytes"
             );
         }
+    }
+    # Type check: INT range and DATE validity.
+    for my $col (@{$sch->{cols}}) {
+        my $msg = _type_error($col, $row->{$col->{name}});
+        return $self->_err($msg) if defined $msg;
     }
     my $packed = $self->_pack_record($sch, $row) or return undef;
     my $dat = $self->_file($table, 'dat');
     local *FH;
     open(FH, ">> $dat") or return $self->_err("Cannot open dat for append: $!");
     binmode FH;
+    _autoflush(\*FH);
     _lock_ex(\*FH);
     my $file_size = (stat FH)[7];
     my $rec_no    = int($file_size / $sch->{recsize});
-    print FH $packed;
-    _unlock(\*FH);
-    close FH;
+    unless (print FH $packed) {
+        my $e = $!;
+        _unlock(\*FH);
+        close FH;
+        return $self->_err("Cannot write record: $e");
+    }
 
+    # The .dat lock is held until every index is updated, so that another
+    # process never sees the new record without its index entries.
     for my $ix (values %{$sch->{indexes}}) {
         $self->_idx_insert($table, $ix, $row->{$ix->{col}}, $rec_no);
+    }
+    _unlock(\*FH);
+    unless (close FH) {
+        return $self->_err("Cannot flush record: $!");
     }
     return 1;
 }
@@ -364,6 +433,7 @@ sub delete_rows {
     local *FH;
     open(FH, "+< $dat") or return $self->_err("Cannot open dat for delete: $!");
     binmode FH;
+    _autoflush(\*FH);
     _lock_ex(\*FH);
 
     seek(FH, 0, 0);
@@ -377,7 +447,12 @@ sub delete_rows {
             my $row = $self->_unpack_record($sch, $raw);
             if (!$where_sub || $where_sub->($row)) {
                 seek(FH, $pos, 0);
-                print FH RECORD_DELETED;
+                unless (print FH RECORD_DELETED) {
+                    my $e = $!;
+                    _unlock(\*FH);
+                    close FH;
+                    return $self->_err("Cannot mark record deleted: $e");
+                }
                 $count++;
                 for my $ix (values %{$sch->{indexes}}) {
                     $self->_idx_delete($table, $ix, $row->{$ix->{col}}, $rec_no);
@@ -388,7 +463,9 @@ sub delete_rows {
         $rec_no++;
     }
     _unlock(\*FH);
-    close FH;
+    unless (close FH) {
+        return $self->_err("Cannot flush dat: $!");
+    }
     return $count;
 }
 
@@ -417,14 +494,32 @@ sub vacuum {
         my $n = read(IN_FH, $raw, $recsize);
         last unless defined($n) && ($n == $recsize);
         if (substr($raw, 0, 1) ne RECORD_DELETED) {
-            print OUT_FH $raw;
+            unless (print OUT_FH $raw) {
+                my $e = $!;
+                close OUT_FH;
+                _unlock(\*IN_FH);
+                close IN_FH;
+                unlink $tmp;
+                return $self->_err("Cannot write tmp: $e");
+            }
             $kept++;
         }
     }
+    # close() flushes, so the replacement file is complete on disk before
+    # the exclusive lock on the original is released.
+    my $out_ok  = close(OUT_FH);
+    my $out_err = $!;
     _unlock(\*IN_FH);
     close IN_FH;
-    close OUT_FH;
-    rename($tmp, $dat) or return $self->_err("Cannot replace dat: $!");
+    unless ($out_ok) {
+        unlink $tmp;
+        return $self->_err("Cannot flush tmp: $out_err");
+    }
+    rename($tmp, $dat) or do {
+        my $e = $!;
+        unlink $tmp;
+        return $self->_err("Cannot replace dat: $e");
+    };
 
     for my $ix (values %{$sch->{indexes}}) {
         $self->_rebuild_index($table, $ix->{name}) or return undef;
@@ -437,8 +532,9 @@ sub vacuum {
 ###############################################################################
 sub execute {
     my($self, $sql) = @_;
+    $sql = _strip_sql_comments($sql);
     $sql =~ s/^\s+|\s+$//g;
-    $sql =~ s/\s+/ /g;
+    $sql = _normalize_sql_space($sql);
 
     # Detect subqueries: any SELECT that contains a nested (SELECT ...)
     # Route through the subquery engine, but guard against infinite recursion
@@ -489,11 +585,17 @@ sub execute {
     if ($sql =~ /^CREATE\s+TABLE\s+(\w+)\s*\((.+)\)$/si) {
         my($tbl, $col_str) = ($1, $2);
         my @col_defs = _split_col_defs($col_str);
-        my(@cols, %nn, %defs, %chks, $pk);
+        my(@cols, %nn, %defs, %chks, %uniq, $pk);
         for my $cd (@col_defs) {
             $cd =~ s/^\s+|\s+$//g;
             if ($cd =~ /^PRIMARY\s+KEY\s*\(\s*(\w+)\s*\)$/si) {
                 $pk = $1;
+                next;
+            }
+            # Table-level UNIQUE (col): enforced through a unique index,
+            # exactly like the column-level UNIQUE modifier below.
+            if ($cd =~ /^UNIQUE\s*\(\s*(\w+)\s*\)$/si) {
+                $uniq{$1} = 1;
                 next;
             }
             # FOREIGN KEY (...) REFERENCES ...: table-level constraint.
@@ -518,6 +620,12 @@ sub execute {
             $nn{$cn}   = 1 if $rest =~ /\b(?:NOT\s+NULL|PRIMARY\s+KEY)\b/si;
             $defs{$cn} = (defined($1) ? $1 : $2) if $rest =~ /\bDEFAULT\s+(?:'([^']*)'|(-?\d+\.?\d*))/si;
             $chks{$cn} = $1 if $rest =~ /\bCHECK\s*\((.+)\)/si;
+            # UNIQUE is looked for with the CHECK expression removed, so
+            # that a CHECK body that happens to mention the word cannot
+            # produce a false hit.
+            my $ukw = $rest;
+            $ukw =~ s/\bCHECK\s*\(.+\)//si;
+            $uniq{$cn} = 1 if $ukw =~ /\bUNIQUE\b/si;
         }
         $nn{$pk} = 1 if defined $pk;
         $self->create_table($tbl, [ @cols ]) or return { type=>'error', message=>$errstr };
@@ -529,6 +637,29 @@ sub execute {
             $sch->{pk}       = $pk if defined $pk;
             $self->_rewrite_schema($tbl, $sch);
         }
+
+        # PRIMARY KEY and UNIQUE are enforced by insert() and update()
+        # through a unique index, so one has to be created here.  Without
+        # it both constraints were silently accepted and never checked.
+        # A column that is both PRIMARY KEY and UNIQUE gets a single index.
+        my(@auto_idx, %seen_idx);
+        if (defined $pk) {
+            push @auto_idx, [ $pk, $pk . '_pk' ];
+            $seen_idx{$pk} = 1;
+        }
+        for my $c (@cols) {
+            my $cn = $c->[0];
+            next unless $uniq{$cn};
+            next if $seen_idx{$cn}++;
+            push @auto_idx, [ $cn, $cn . '_unique' ];
+        }
+        for my $ai (@auto_idx) {
+            next if $self->create_index($ai->[1], $tbl, $ai->[0], 1);
+            my $msg = $errstr;
+            $self->drop_table($tbl);
+            return { type=>'error', message=>$msg };
+        }
+
         my $fk_note = ($col_str =~ /\bREFERENCES\b/si
                        || $col_str =~ /\bFOREIGN\s+KEY\b/si)
             ? " (NOTE: FOREIGN KEY constraints are not enforced)"
@@ -558,7 +689,7 @@ sub execute {
             : { type=>'error', message=>$errstr };
     }
     # INSERT INTO table VALUES (...)  -- no column list: use schema order
-    if ($sql =~ /^INSERT\s+INTO\s+(\w+)\s+VALUES\s*\((.+)\)$/i) {
+    if ($sql =~ /^INSERT\s+INTO\s+(\w+)\s+VALUES\s*\((.+)\)$/si) {
         my($tbl, $val_str) = ($1, $2);
         my $sch = $self->_load_schema($tbl)
             or return { type=>'error', message=>"Table '$tbl' does not exist" };
@@ -575,9 +706,9 @@ sub execute {
             ? { type=>'ok',    message=>"1 row inserted" }
             : { type=>'error', message=>$errstr };
     }
-    if ($sql =~ /^INSERT\s+INTO\s+(\w+)\s*\(([^)]+)\)\s*VALUES\s*\((.+)\)$/i) {
+    if ($sql =~ /^INSERT\s+INTO\s+(\w+)\s*\(([^)]+)\)\s*VALUES\s*\((.+)\)$/si) {
         my($tbl, $col_str, $val_str) = ($1, $2, $3);
-        my @c = map { my $x = $_; $x =~ s/^\s+|\s+\$//g; $x } split /,/, $col_str;
+        my @c = map { my $x = $_; $x =~ s/^\s+|\s+$//g; $x } split /,/, $col_str;
         my @v = _parse_values($val_str);
         my %row;
         @row{@c} = @v;
@@ -728,7 +859,7 @@ sub _exec_correlated_select {
     # Parse col list
     my @sel_cols;
     unless ($col_str =~ /^\*$/) {
-        @sel_cols = map { my $x = $_; $x =~ s/^\s+|\s+\$//g; $x } split /,/, $col_str;
+        @sel_cols = map { my $x = $_; $x =~ s/^\s+|\s+$//g; $x } split /,/, $col_str;
     }
 
     # Strip ORDER BY / LIMIT / OFFSET
@@ -742,6 +873,12 @@ sub _exec_correlated_select {
     if ($rest =~ s/\bORDER\s+BY\s+(\w+)(?:\s+(ASC|DESC))?//i) {
         $opts{order_by}  = $1;
         $opts{order_dir} = defined($2) ? $2 : 'ASC';
+        my @onames = @sel_cols
+            ? map { _order_name_of($_) } @sel_cols
+            : map { $_->{name} } @{$sch->{cols}};
+        my($obe, $obk) = _resolve_order_ordinal_scalar($opts{order_by}, [ @onames ]);
+        return { type=>'error', message=>$obe } if $obe ne '';
+        $opts{order_by} = $obk;
     }
 
     # Extract WHERE expression
@@ -1340,10 +1477,26 @@ sub _exec_derived_table {
     if ($after =~ s/\bORDER\s+BY\s+([\w.]+)(?:\s+(ASC|DESC))?//i) {
         $outer_opts{order_by}  = $1;
         $outer_opts{order_dir} = ($2 || 'ASC');
+        my @onames;
+        unless ($outer_cols_str =~ /^\s*(?:\w+\.)?\*\s*$/) {
+            @onames = map { _order_name_of($_) } split(/\s*,\s*/, $outer_cols_str);
+        }
+        my($obe, $obk) = _resolve_order_ordinal_scalar($outer_opts{order_by}, [ @onames ]);
+        return { type=>'error', message=>$obe } if $obe ne '';
+        $outer_opts{order_by} = $obk;
+    }
+    my $outer_having = '';
+    if ($after =~ s/\bHAVING\s+(.+?)(?=\s*$)//si) {
+        $outer_having = $1;
+        $outer_having =~ s/^\s+|\s+$//g;
+    }
+    my @outer_gb;
+    if ($after =~ s/\bGROUP\s+BY\s+([\w.,\s]+?)(?=\s*$)//si) {
+        @outer_gb = map { my $x = $_; $x =~ s/^\s+|\s+$//g; $x } split /\s*,\s*/, $1;
     }
 
     my $outer_where_str = '';
-    if ($after =~ /\bWHERE\s+(.+)/i) {
+    if ($after =~ /\bWHERE\s+(.+)/si) {
         $outer_where_str = $1;
         $outer_where_str =~ s/^\s+|\s+$//g;
     }
@@ -1378,16 +1531,23 @@ sub _exec_derived_table {
         @qualified_rows = grep { $filter->($_) } @qualified_rows;
     }
 
+    # An aggregate or a GROUP BY in the outer SELECT list consumes the
+    # materialised rows, so ORDER BY / LIMIT / OFFSET have to be applied to
+    # the aggregated result instead of to the input.
+    my $outer_agg = (@outer_gb || ($outer_having ne '')
+                     || ($outer_cols_str =~ /\b(?:COUNT|SUM|AVG|MIN|MAX)\s*\(/i)) ? 1 : 0;
+
     # Step 8: ORDER BY
-    if (my $ob = $outer_opts{order_by}) {
+    if ((my $ob = $outer_opts{order_by}) && !$outer_agg) {
         my $dir = lc($outer_opts{order_dir} || 'asc');
+        # Rows are keyed "alias.col"; fall back to the bare column name so
+        # that an unqualified sort key still resolves.  The fallback key is
+        # computed once here: deriving it inside the comparator produced an
+        # undefined hash subscript whenever the key had no alias prefix.
+        my $obb = ($ob =~ /\.(\w+)$/) ? $1 : $ob;
         @qualified_rows = sort {
-            my $va = defined($a->{$ob})
-                ? $a->{$ob}
-                : $a->{ ($ob =~ /\.(\w+)$/)[0] };
-            my $vb = defined($b->{$ob})
-                ? $b->{$ob}
-                : $b->{ ($ob =~ /\.(\w+)$/)[0] };
+            my $va = defined($a->{$ob}) ? $a->{$ob} : $a->{$obb};
+            my $vb = defined($b->{$ob}) ? $b->{$ob} : $b->{$obb};
             my $cmp = (defined($va) && ($va =~ /^-?\d+\.?\d*$/) &&
                        defined($vb) && ($vb =~ /^-?\d+\.?\d*$/))
                 ? ($va <=> $vb)
@@ -1397,21 +1557,45 @@ sub _exec_derived_table {
     }
 
     # Step 9: OFFSET / LIMIT
-    my $off = ($outer_opts{offset} || 0);
-    @qualified_rows = splice(@qualified_rows, $off) if $off;
-    if (defined $outer_opts{limit}) {
-        my $last = $outer_opts{limit} - 1;
-        $last = $#qualified_rows if $last > $#qualified_rows;
-        @qualified_rows = @qualified_rows[0..$last];
+    unless ($outer_agg) {
+        my $off = ($outer_opts{offset} || 0);
+        @qualified_rows = splice(@qualified_rows, $off) if $off;
+        if (defined $outer_opts{limit}) {
+            my $last = $outer_opts{limit} - 1;
+            $last = $#qualified_rows if $last > $#qualified_rows;
+            @qualified_rows = @qualified_rows[0..$last];
+        }
     }
 
     # Step 10: outer column projection
     my @proj_rows;
-    if ($outer_cols_str =~ /^\s*\*\s*$/) {
+    if ($outer_agg) {
+        my @specs = parse_col_list($outer_cols_str);
+        @proj_rows = group_and_aggregate([ @qualified_rows ], [ @specs ],
+                                         [ @outer_gb ], $outer_having);
+        if (my $ob = $outer_opts{order_by}) {
+            my $dir = lc($outer_opts{order_dir} || 'asc');
+            @proj_rows = sort {
+                my $va = defined($a->{$ob}) ? $a->{$ob} : '';
+                my $vb = defined($b->{$ob}) ? $b->{$ob} : '';
+                my $cmp = (($va =~ /^-?\d+\.?\d*$/) && ($vb =~ /^-?\d+\.?\d*$/))
+                    ? ($va <=> $vb) : ($va cmp $vb);
+                ($dir eq 'desc') ? -$cmp : $cmp;
+            } @proj_rows;
+        }
+        my $off = ($outer_opts{offset} || 0);
+        @proj_rows = splice(@proj_rows, $off) if $off;
+        if (defined $outer_opts{limit}) {
+            my $last = $outer_opts{limit} - 1;
+            $last = $#proj_rows if $last > $#proj_rows;
+            @proj_rows = @proj_rows[0..$last];
+        }
+    }
+    elsif ($outer_cols_str =~ /^\s*\*\s*$/) {
         @proj_rows = @qualified_rows;
     }
     else {
-        my @want = map { my $x = $_; $x =~ s/^\s+|\s+\$//g; $x } split /,/, $outer_cols_str;
+        my @want = map { my $x = $_; $x =~ s/^\s+|\s+$//g; $x } split /,/, $outer_cols_str;
         for my $r (@qualified_rows) {
             my %p;
             for my $w (@want) {
@@ -1501,15 +1685,19 @@ sub _encode_key {
     my($type, $keysize, $val) = @_;
     $val = '' unless defined $val;
     if ($type eq 'INT') {
-        my $iv = int($val || 0);
-        $iv =  2147483647 if $iv >  2147483647;
-        $iv = -2147483648 if $iv < -2147483648;
+        my $iv = _looks_numeric($val) ? int($val) : 0;
+        $iv = INT_MAX if $iv > INT_MAX;
+        $iv = INT_MIN if $iv < INT_MIN;
         return pack('N', ($iv & 0xFFFFFFFF) ^ 0x80000000);
     }
     elsif ($type eq 'FLOAT') {
 
+        # A value that is not numeric encodes as 0, exactly as it is
+        # stored by _pack_record.  The test is made here rather than left
+        # to pack() so that -w stays quiet: an index on a FLOAT column
+        # used to make a single INSERT emit two "isn't numeric" warnings.
         # my $packed = pack('d>', $val+0);
-        my $packed = pack('d', $val+0);
+        my $packed = pack('d', _looks_numeric($val) ? $val+0 : 0);
         $packed = reverse($packed) if unpack("C", pack("S", 1));
 
         my @b = unpack('C8', $packed);
@@ -1542,9 +1730,11 @@ sub _idx_read_all {
     local *FH;
     open(FH, "< $idx_file") or return [ @entries ];
     binmode FH;
+    _lock_sh(\*FH);
     my $magic = '';
     read(FH, $magic, IDX_MAGIC_LEN);
     unless ($magic eq IDX_MAGIC) {
+        _unlock(\*FH);
         close FH;
         return [ @entries ];
     }
@@ -1554,6 +1744,7 @@ sub _idx_read_all {
         last unless defined($n) && ($n == $entry_size);
         push @entries, [ substr($entry, 0, $ix->{keysize}), unpack('N', substr($entry, $ix->{keysize}, REC_NO_SIZE)) ];
     }
+    _unlock(\*FH);
     close FH;
     return [ @entries ];
 }
@@ -1562,15 +1753,36 @@ sub _idx_write_all {
     my($self, $table, $ix, $entries) = @_;
     my $idx_file = $self->_idx_file($table, $ix->{name});
     local *FH;
-    open(FH, "> $idx_file") or return $self->_err("Cannot write index: $!");
+    unless (-f $idx_file) {
+        open(FH, "> $idx_file") or return $self->_err("Cannot create index: $!");
+        close FH;
+    }
+    # Open without truncating, so that the file is emptied only after the
+    # exclusive lock is held.  Opening with '>' truncates at open() time,
+    # which destroys a concurrent writer's data while we wait for the lock.
+    open(FH, "+< $idx_file") or return $self->_err("Cannot write index: $!");
     binmode FH;
+    _autoflush(\*FH);
     _lock_ex(\*FH);
-    print FH IDX_MAGIC;
+    truncate(FH, 0);
+    seek(FH, 0, 0);
+    # The whole image is assembled first and written with a single print,
+    # so autoflush costs one write() per rebuild rather than one per entry.
+    my $image = IDX_MAGIC;
     for my $e (@$entries) {
-        print FH $e->[0] . pack('N', $e->[1]);
+        $image .= $e->[0] . pack('N', $e->[1]);
+    }
+    my $ok = print FH $image;
+    unless ($ok) {
+        my $e = $!;
+        _unlock(\*FH);
+        close FH;
+        return $self->_err("Cannot write index: $e");
     }
     _unlock(\*FH);
-    close FH;
+    unless (close FH) {
+        return $self->_err("Cannot flush index: $!");
+    }
     return 1;
 }
 
@@ -1660,6 +1872,7 @@ sub _rebuild_index {
         local *FH;
         open(FH, "< $dat") or return $self->_err("Cannot read dat: $!");
         binmode FH;
+        _lock_sh(\*FH);
         my $rec_no = 0;
         while (1) {
             my $raw = '';
@@ -1671,6 +1884,7 @@ sub _rebuild_index {
             }
             $rec_no++;
         }
+        _unlock(\*FH);
         close FH;
     }
     @entries = sort { $a->[0] cmp $b->[0] } @entries;
@@ -2116,10 +2330,49 @@ sub join_select {
         my $join_type = uc($js->{type} || 'INNER');
 
         # Parse ON  alias1.col1 = alias2.col2
+        # A CROSS JOIN is unconditional, so an ON written on one is accepted
+        # and ignored rather than checked.
         my($on_l_alias, $on_l_col, $on_r_alias, $on_r_col);
-        if ($js->{on_left} && $js->{on_right}) {
+        if (($join_type ne 'CROSS') && $js->{on_left} && $js->{on_right}) {
             ($on_l_alias, $on_l_col) = _split_qualified($js->{on_left});
             ($on_r_alias, $on_r_col) = _split_qualified($js->{on_right});
+
+            # An equality is symmetric, but the code below is not: the left
+            # operand has to name the accumulated left-hand side and the right
+            # operand the table being joined in.  "ON b.k = a.x" is as valid
+            # as "ON a.x = b.k", and before 1.09 it produced a silent cross
+            # join, so the operands are swapped here when they are the other
+            # way round.
+            if (defined($on_l_alias) && defined($on_r_alias)
+                && ($on_l_alias eq $js->{alias}) && ($on_r_alias ne $js->{alias})) {
+                ($on_l_alias, $on_l_col, $on_r_alias, $on_r_col) =
+                    ($on_r_alias, $on_r_col, $on_l_alias, $on_l_col);
+            }
+
+            # Both operands have to be table-qualified.  An unqualified name
+            # cannot be looked up in a result row, whose keys are all
+            # "alias.col", so before 1.09 "ON x = k" fell through to the
+            # Cartesian-product branch without a word.
+            unless (defined($on_l_alias) && defined($on_r_alias)) {
+                return $self->_err(
+                    "Unqualified column in the ON clause of JOIN "
+                    . "$js->{table}; write ON <table>.<col> = <table>.<col>");
+            }
+
+            # A qualified operand has to name a table in this query.
+            for my $qa ($on_l_alias, $on_r_alias) {
+                next if $alias_info{$qa};
+                return $self->_err(
+                    "Unknown table or alias '$qa' in the ON clause of "
+                    . "JOIN $js->{table}");
+            }
+            if ($on_r_alias ne $js->{alias}) {
+                return $self->_err(
+                    "The ON clause of JOIN $js->{table} does not reference "
+                    . "'$js->{alias}'; a join condition has to compare a "
+                    . "column of '$js->{alias}' with a column of a table "
+                    . "already joined");
+            }
         }
 
         # Load the right-side table
@@ -2226,39 +2479,66 @@ sub join_select {
     # ------------------------------------------------------------------
     # Step 5: ORDER BY
     # ------------------------------------------------------------------
-    if (my $ob = $opts->{order_by}) {
-        my $dir = lc($opts->{order_dir} || 'asc');
+    # order_keys holds every ORDER BY key as [ name, ASC|DESC ]; order_by and
+    # order_dir carry the first key so that older callers keep working.
+    my @ob_keys;
+    if ($opts->{order_keys} && @{$opts->{order_keys}}) {
+        @ob_keys = @{$opts->{order_keys}};
+    }
+    elsif ($opts->{order_by}) {
+        @ob_keys = ([ $opts->{order_by}, ($opts->{order_dir} || 'ASC') ]);
+    }
+    if (@ob_keys) {
 
-        # ob may be 'alias.col' or bare 'col'; normalise
+        # A result row is keyed "alias.col", so a bare ORDER BY name has to be
+        # resolved to the alias that owns it.  An unresolvable key used to
+        # leave the rows in scan order without a word.
+        my(%qual, %bare);
+        for my $js (@$join_specs) {
+            my $a = $js->{alias};
+            for my $c (@{$alias_info{$a}{sch}{cols}}) {
+                $qual{"$a.$c->{name}"} = 1;
+                $bare{$c->{name}}      = "$a.$c->{name}"
+                    unless exists $bare{$c->{name}};
+            }
+        }
+        for my $k (@ob_keys) {
+            next if $qual{$k->[0]};
+            if ($bare{$k->[0]}) {
+                $k->[0] = $bare{$k->[0]};
+                next;
+            }
+            return $self->_err(
+                "Unknown ORDER BY column '$k->[0]' in a JOIN query");
+        }
+
         @cur_rows = sort {
-            my $va = $a->{$ob};
-            my $vb = $b->{$ob};
-            my $cmp = (defined($va) && ($va =~ /^-?\d+\.?\d*$/) &&
-                       defined($vb) && ($vb =~ /^-?\d+\.?\d*$/))
-                    ? ($va <=> $vb)
-                    : (($va || '') cmp ($vb || ''));
-            ($dir eq 'desc') ? -$cmp : $cmp;
+            my $cmp = 0;
+            for my $k (@ob_keys) {
+                my($key, $dir) = @$k;
+                my $va = $a->{$key};
+                my $vb = $b->{$key};
+                my $c  = (defined($va) && ($va =~ /^-?\d+\.?\d*$/) &&
+                          defined($vb) && ($vb =~ /^-?\d+\.?\d*$/))
+                       ? ($va <=> $vb)
+                       : ((defined($va) ? $va : '') cmp (defined($vb) ? $vb : ''));
+                $c = -$c if lc($dir) eq 'desc';
+                if ($c != 0) {
+                    $cmp = $c;
+                    last;
+                }
+            }
+            $cmp;
         } @cur_rows;
     }
 
     # ------------------------------------------------------------------
-    # Step 6: OFFSET / LIMIT
+    # Step 6: expand the select list and check every item
     # ------------------------------------------------------------------
-    my $offset = ($opts->{offset} || 0);
-    @cur_rows  = splice(@cur_rows, $offset) if $offset;
-    if (defined $opts->{limit}) {
-        my $last  = $opts->{limit} - 1;
-        $last     = $#cur_rows if $last > $#cur_rows;
-        @cur_rows = @cur_rows[0..$last];
-    }
-
-    # ------------------------------------------------------------------
-    # Step 7: column projection
-    # ------------------------------------------------------------------
+    my @expanded;
     if ($col_specs && @$col_specs) {
 
         # Expand wildcards: 'alias.*' or '*'
-        my @expanded;
         for my $cs (@$col_specs) {
             if ($cs eq '*') {
 
@@ -2274,16 +2554,71 @@ sub join_select {
             elsif ($cs =~ /^(\w+)\.\*$/) {
                 my $a   = $1;
                 my $sch = $alias_info{$a} ? $alias_info{$a}{sch} : undef;
-                if ($sch) {
-                    for my $c (@{$sch->{cols}}) {
-                        push @expanded, "$a.$c->{name}";
-                    }
+                unless ($sch) {
+                    return $self->_err("Unknown table or alias '$a' in '$cs'");
+                }
+                for my $c (@{$sch->{cols}}) {
+                    push @expanded, "$a.$c->{name}";
                 }
             }
             else {
                 push @expanded, $cs;
             }
         }
+
+        # Every item has to name a column of one of the joined tables.  A
+        # JOIN select list cannot evaluate an expression or an AS alias, and
+        # until 1.09 such an item silently produced a row with no values in
+        # it at all: "SELECT a.y AS nm ... JOIN", "SELECT a.x + 1 ... JOIN"
+        # and "SELECT DISTINCT a.x ... JOIN" all returned empty rows.
+        my %valid_col;
+        for my $js (@$join_specs) {
+            my $a = $js->{alias};
+            for my $c (@{$alias_info{$a}{sch}{cols}}) {
+                $valid_col{"$a.$c->{name}"} = 1;
+                $valid_col{$c->{name}}      = 1;
+            }
+        }
+        for my $ck (@expanded) {
+            next if $valid_col{$ck};
+            return $self->_err(
+                "Unsupported select item '$ck' in a JOIN query; a JOIN "
+                . "select list accepts column names, '*' and '<table>.*' "
+                . "only (no expressions and no AS aliases)");
+        }
+    }
+
+    # ------------------------------------------------------------------
+    # Step 7: DISTINCT.  Applied before OFFSET/LIMIT, as SQL requires, and
+    # keyed on the select-list values only.
+    # ------------------------------------------------------------------
+    if ($opts->{distinct}) {
+        my @dkeys = @expanded ? @expanded : sort keys %{ $cur_rows[0] || {} };
+        my(%seen, @uniq);
+        for my $r (@cur_rows) {
+            my $k = join("\x00", map {
+                defined($r->{$_}) ? $r->{$_} : "\x01"
+            } @dkeys);
+            push @uniq, $r unless $seen{$k}++;
+        }
+        @cur_rows = @uniq;
+    }
+
+    # ------------------------------------------------------------------
+    # Step 8: OFFSET / LIMIT
+    # ------------------------------------------------------------------
+    my $offset = ($opts->{offset} || 0);
+    @cur_rows  = splice(@cur_rows, $offset) if $offset;
+    if (defined $opts->{limit}) {
+        my $last  = $opts->{limit} - 1;
+        $last     = $#cur_rows if $last > $#cur_rows;
+        @cur_rows = @cur_rows[0..$last];
+    }
+
+    # ------------------------------------------------------------------
+    # Step 9: column projection
+    # ------------------------------------------------------------------
+    if (@expanded) {
         my @proj_rows;
         for my $r (@cur_rows) {
             my %p;
@@ -2408,6 +2743,19 @@ sub _compile_join_where {
                     }
                 }
             }
+            # IS [NOT] NULL is decided before the coercion below, and uses
+            # the same rule as the single-table engine: a NULL is either an
+            # undefined value (a NULL-filled outer-join row) or the empty
+            # string (the on-disk representation).
+            if ($c->{op} eq 'IS_NULL') {
+                return 0 if defined($lv) && ($lv ne '');
+                next;
+            }
+            if ($c->{op} eq 'IS_NOT_NULL') {
+                return 0 unless defined($lv) && ($lv ne '');
+                next;
+            }
+
             $lv = '' unless defined $lv;
 
             # Resolve right-hand value (literal or column)
@@ -2474,8 +2822,7 @@ sub _compile_join_where {
                 return 0 unless $num ? ($lv >= $rv) : ($lv ge $rv);
             }
             elsif ($op eq 'LIKE') {
-                (my $p = $rv) =~ s/%/.*/g;
-                $p =~ s/_/./g;
+                my $p = _like_to_re($rv);
                 return 0 unless $lv =~ /^$p$/i;
             }
         }
@@ -2494,6 +2841,18 @@ sub _compile_join_where {
 #   [ORDER BY alias.col [ASC|DESC]]
 #   [LIMIT n] [OFFSET m]
 ###############################################################################
+# A table alias in a FROM clause is optional, so the token that follows a
+# table name has to be checked before it is accepted as one.  Without this
+# guard "FROM a LEFT JOIN b ON a.id = b.bid" read LEFT as the alias of a,
+# which turned the LEFT JOIN into a plain JOIN and left every "a.col"
+# reference unresolvable, and "JOIN b ON ..." read ON as the alias of b,
+# which dropped the join condition and produced a silent cross join.
+sub _is_join_keyword {
+    my($word) = @_;
+    return 0 unless defined $word;
+    return $word =~ /^(?:INNER|LEFT|RIGHT|FULL|OUTER|CROSS|NATURAL|JOIN|ON|USING|WHERE|GROUP|ORDER|HAVING|LIMIT|OFFSET|UNION)$/i ? 1 : 0;
+}
+
 sub _parse_join_sql {
     my($sql) = @_;
     # sql has been normalised: single spaces, trimmed
@@ -2518,9 +2877,24 @@ sub _parse_join_sql {
     if ($from_rest =~ s/\s+LIMIT\s+(\d+)\s*$//i) {
         $opts{limit} = $1;
     }
-    if ($from_rest =~ s/\s+ORDER\s+BY\s+([\w.]+)(?:\s+(ASC|DESC))?\s*$//i) {
-        $opts{order_by}  = $1;
-        $opts{order_dir} = ($2 || 'ASC');
+    # ORDER BY accepts a comma-separated key list.  Before 1.09 only a single
+    # key was matched here, so "ORDER BY a.y, a.x DESC" failed to match, was
+    # swallowed by the WHERE strip below and then dropped by the condition
+    # parser -- the rows came back in scan order with no error.
+    if ($from_rest =~ s/\s+ORDER\s+BY\s+([\w.]+(?:\s+(?:ASC|DESC))?(?:\s*,\s*[\w.]+(?:\s+(?:ASC|DESC))?)*)\s*$//i) {
+        my $ob_str = $1;
+        my @ob_keys;
+        for my $k (split(/\s*,\s*/, $ob_str)) {
+            $k =~ s/^\s+|\s+$//g;
+            my $dir = 'ASC';
+            $dir = uc($1) if $k =~ s/\s+(ASC|DESC)\s*$//i;
+            push @ob_keys, [ $k, $dir ];
+        }
+        if (@ob_keys) {
+            $opts{order_keys} = [ @ob_keys ];
+            $opts{order_by}   = $ob_keys[0][0];
+            $opts{order_dir}  = $ob_keys[0][1];
+        }
     }
 
     # ---------------------------------------------------------------
@@ -2537,33 +2911,97 @@ sub _parse_join_sql {
 
     # ---------------------------------------------------------------
     # 4. Parse the FROM clause using iterative regex matching
-    #    Grammar: table [AS alias] { join_type JOIN table [AS alias] ON col=col }*
+    #    Grammar: table [AS alias]
+    #             { join_type JOIN table [AS alias] ON qcol = qcol }*
     # ---------------------------------------------------------------
     my @join_specs;
 
     # Parse the driving (first) table
     my $fr = $from_rest;
     $fr =~ s/^\s+//;
-    unless ($fr =~ s/^(\w+)(?:\s+(?:AS\s+)?(\w+))?//) {
+    unless ($fr =~ s/^(\w+)//) {
         return undef;
     }
-    my($first_tbl, $first_alias) = ($1, defined($2) ? $2 : $1);
+    my $first_tbl   = $1;
+    my $first_alias = $first_tbl;
+    if ($fr =~ /^\s+(?:AS\s+)?(\w+)/i) {
+        my $cand = $1;
+        unless (_is_join_keyword($cand)) {
+            $fr =~ s/^\s+(?:AS\s+)?\w+//i;
+            $first_alias = $cand;
+        }
+    }
     push @join_specs, { table => $first_tbl, alias => $first_alias, type => 'FIRST' };
 
-    # Iteratively match JOIN clauses
-    while ($fr =~ s/^\s+(?:(INNER|LEFT(?:\s+OUTER)?|RIGHT(?:\s+OUTER)?|CROSS)\s+)?JOIN\s+(\w+)(?:\s+(?:AS\s+)?(\w+))?(?:\s+ON\s+([\w.]+)\s*=\s*([\w.]+))?//i) {
-        my($type_kw, $tbl, $alias, $on_left, $on_right) = ($1, $2, $3, $4, $5);
+    # Iteratively match JOIN clauses.
+    #
+    # The join-type words, the table and its alias are matched first; the ON
+    # expression is then taken as everything up to the start of the next JOIN
+    # clause (or the end of the FROM text) and checked separately.  Until 1.09
+    # the ON clause was part of this pattern as an *optional* group matching
+    # only "col = col", so every ON the pattern could not read simply failed
+    # to participate: on_left and on_right stayed undef and join_select fell
+    # through to its Cartesian-product branch.  "ON a.x = b.k AND a.id < b.id",
+    # "ON a.x < b.k", "ON b.k = a.x" (operands the other way round), USING,
+    # NATURAL and FULL OUTER all returned a silent cross join instead of an
+    # error.  Anything not executable is now collected in $err.
+    my $err = '';
+    while ($fr =~ s/^\s+((?:(?:INNER|LEFT|RIGHT|FULL|CROSS|NATURAL|OUTER)\s+)*)JOIN\s+(\w+)(?:\s+(?:AS\s+)?((?!(?:INNER|LEFT|RIGHT|FULL|OUTER|CROSS|NATURAL|JOIN|ON|USING|WHERE|GROUP|ORDER|HAVING|LIMIT|OFFSET|UNION)\b)\w+))?//i) {
+        my($type_kw, $tbl, $alias) = ($1, $2, $3);
+        $type_kw = '' unless defined $type_kw;
+        $type_kw =~ s/\s+$//;
         my $type = 'INNER';
-        if (defined($type_kw) && ($type_kw =~ /LEFT/i)) {
-            $type = 'LEFT';
+        if ($type_kw =~ /NATURAL/i) {
+            $err = "NATURAL JOIN is not supported; name the join columns "
+                 . "with ON <left>.<col> = <right>.<col>"
+                unless $err ne '';
         }
-        elsif (defined($type_kw) && ($type_kw =~ /RIGHT/i)) {
-            $type = 'RIGHT';
+        elsif ($type_kw =~ /FULL/i) {
+            $err = "FULL OUTER JOIN is not supported; use LEFT JOIN or "
+                 . "RIGHT JOIN, or combine the two with UNION"
+                unless $err ne '';
         }
-        elsif (defined($type_kw) && ($type_kw =~ /CROSS/i)) {
+        elsif ($type_kw =~ /CROSS/i) {
             $type = 'CROSS';
         }
+        elsif ($type_kw =~ /LEFT/i) {
+            $type = 'LEFT';
+        }
+        elsif ($type_kw =~ /RIGHT/i) {
+            $type = 'RIGHT';
+        }
         $alias = $tbl unless defined $alias;
+
+        # USING (col, ...) -- recognised only so that it can be rejected.
+        if ($fr =~ s/^\s+USING\s*\(([^)]*)\)//i) {
+            $err = "JOIN ... USING is not supported; use "
+                 . "ON <left>.<col> = <right>.<col>"
+                unless $err ne '';
+        }
+
+        # ON <expr>, up to the next JOIN clause or the end of the FROM text.
+        my($on_left, $on_right);
+        if ($fr =~ s/^\s+ON\s+(.*?)(?=\s+(?:(?:INNER|LEFT|RIGHT|FULL|CROSS|NATURAL|OUTER)\s+)*JOIN\b|$)//is) {
+            my $on_expr = $1;
+            $on_expr =~ s/^\s+|\s+$//g;
+            if ($on_expr =~ /^([\w.]+)\s*=\s*([\w.]+)$/) {
+                ($on_left, $on_right) = ($1, $2);
+            }
+            else {
+                $err = "Unsupported JOIN condition 'ON $on_expr'; a JOIN "
+                     . "accepts a single equality between two columns, as in "
+                     . "ON <left>.<col> = <right>.<col>.  Move any further "
+                     . "restriction into the WHERE clause"
+                    unless $err ne '';
+            }
+        }
+        elsif ($type ne 'CROSS') {
+            $err = "JOIN $tbl has no ON clause; add "
+                 . "ON <left>.<col> = <right>.<col>, or write CROSS JOIN for "
+                 . "a deliberate Cartesian product"
+                unless $err ne '';
+        }
+
         push @join_specs, {
             table    => $tbl,
             alias    => $alias,
@@ -2573,13 +3011,30 @@ sub _parse_join_sql {
         };
     }
 
-    # Must have at least 2 tables to be a JOIN
+    # Must have at least 2 tables to be a JOIN.  A JOIN that appears only
+    # inside a subquery lands here too, so this returns undef without an
+    # error and lets the ordinary SELECT parser take over.
     return undef if @join_specs < 2;
+
+    # Text left over in the FROM chain used to be discarded without a word.
+    if (($err eq '') && ($fr =~ /\S/)) {
+        my $left = $fr;
+        $left =~ s/^\s+|\s+$//g;
+        $err = "Unsupported text in FROM clause: '$left'";
+    }
+
+    return [ undef, undef, undef, undef, $err ] if $err ne '';
 
     # ---------------------------------------------------------------
     # 5. Parse SELECT column list
     # ---------------------------------------------------------------
     my @col_specs;
+
+    # DISTINCT used to be left glued to the first select item, which made the
+    # item unresolvable: every row came back empty and nothing was deduplicated.
+    if ($sel_str =~ s/^\s*DISTINCT\s+//i) {
+        $opts{distinct} = 1;
+    }
     if ($sel_str =~ /^\s*\*\s*$/) {
         @col_specs = (); # empty = all columns (expanded later)
     }
@@ -2594,19 +3049,63 @@ sub _parse_join_sql {
     # 6. Parse WHERE conditions
     # ---------------------------------------------------------------
     my @where_conds;
-    @where_conds = _parse_join_conditions($where_str) if $where_str =~ /\S/;
+    if ($where_str =~ /\S/) {
+        my($wc, $werr) = _parse_join_conditions($where_str);
+        return [ undef, undef, undef, undef, $werr ] if $werr ne '';
+        @where_conds = @$wc;
+    }
 
-    return [ [ @join_specs ], [ @col_specs ], [ @where_conds ], { %opts } ];
+    return [ [ @join_specs ], [ @col_specs ], [ @where_conds ], { %opts }, '' ];
 }
 
 # Parse WHERE expression containing possibly qualified column names
 # Returns arrayref of condition hashrefs
 sub _parse_join_conditions {
     my($expr) = @_;
-    return () unless defined($expr) && ($expr =~ /\S/);
+    return ([], '') unless defined($expr) && ($expr =~ /\S/);
     my @conds;
-    for my $part (split /\s+AND\s+/i, $expr) {
+
+    # Split on AND.  BETWEEN carries an AND of its own that is not a
+    # conjunction, so a part that opened a BETWEEN is glued back together
+    # with the part that follows it.
+    my @raw = split(/\s+AND\s+/i, $expr);
+    my @parts;
+    while (@raw) {
+        my $p = shift @raw;
+        if (($p =~ /\bBETWEEN\b/i) && ($p !~ /\bBETWEEN\b.*\bAND\b/i) && @raw) {
+            $p .= ' AND ' . shift(@raw);
+        }
+        push @parts, $p;
+    }
+
+    for my $part (@parts) {
         $part =~ s/^\s+|\s+$//g;
+        next unless $part =~ /\S/;
+
+        # col IS [NOT] NULL.  Without this a LEFT JOIN anti-join
+        # ("WHERE right.col IS NULL") matched no pattern at all and was
+        # dropped, so every joined row came back unfiltered.
+        if ($part =~ /^((?:\w+\.)?\w+)\s+IS\s+(NOT\s+)?NULL$/i) {
+            my($lhs, $neg) = ($1, $2);
+            my($la, $lc)   = _split_qualified($lhs);
+            push @conds, {
+                lhs_alias => $la,
+                lhs_col   => $lc,
+                op        => ($neg ? 'IS_NOT_NULL' : 'IS_NULL'),
+            };
+            next;
+        }
+
+        # col BETWEEN lo AND hi  ->  col >= lo, col <= hi
+        if ($part =~ /^((?:\w+\.)?\w+)\s+BETWEEN\s+(?:'([^']*)'|(-?\d+\.?\d*))\s+AND\s+(?:'([^']*)'|(-?\d+\.?\d*))$/i) {
+            my($lhs, $lo_s, $lo_n, $hi_s, $hi_n) = ($1, $2, $3, $4, $5);
+            my($la, $lc) = _split_qualified($lhs);
+            my $lo = defined($lo_s) ? $lo_s : $lo_n;
+            my $hi = defined($hi_s) ? $hi_s : $hi_n;
+            push @conds, { lhs_alias=>$la, lhs_col=>$lc, op=>'>=', val=>$lo };
+            push @conds, { lhs_alias=>$la, lhs_col=>$lc, op=>'<=', val=>$hi };
+            next;
+        }
 
         # col-vs-col:   alias1.col1 OP alias2.col2
         if (($part =~ /^((?:\w+\.)?\w+)\s*(=|!=|<>|<=|>=|<|>)\s*((?:\w+\.)?\w+)$/i) && ($part !~ /'/)) {
@@ -2646,8 +3145,20 @@ sub _parse_join_conditions {
             my($la, $lc) = _split_qualified($lhs);
             push @conds, { lhs_alias=>$la, lhs_col=>$lc, op=>$op, val=>defined($sv) ? $sv : $nv };
         }
+        else {
+
+            # Until 1.09 a part that matched none of the patterns above was
+            # dropped in silence, so "WHERE a.x = 1 OR a.x = 2", "WHERE NOT
+            # a.x = 1" and "WHERE (a.x = 1)" returned the whole join result
+            # as though no WHERE had been written at all.
+            return ([], "Unsupported WHERE condition in a JOIN query: "
+                      . "'$part'.  A JOIN accepts AND-separated comparisons "
+                      . "between a column and a column or literal, IN, "
+                      . "NOT IN, LIKE, BETWEEN and IS [NOT] NULL; OR, NOT "
+                      . "and parentheses are not supported here");
+        }
     }
-    return @conds;
+    return ([ @conds ], '');
 }
 
 ###############################################################################
@@ -2657,6 +3168,28 @@ sub _err {
     my($self, $msg) = @_;
     $errstr = $msg;
     return undef;
+}
+
+# Identifier validation.
+#
+# Database, table and index names are used directly as path components by
+# _db_path(), _file() and _idx_file().  Without a check, a caller of the
+# low-level API could escape base_dir entirely -- drop_database('../x')
+# would hand '../x' to File::Path::rmtree() and delete a directory tree
+# outside the database.  The SQL layer already restricts every identifier
+# to \w+, so this only holds the documented Perl-level methods to the
+# same rule; no name that SQL can produce is rejected here.
+sub _valid_name {
+    my($name) = @_;
+    return 0 unless defined $name;
+    return 0 unless $name =~ /^\w+\z/;
+    return 1;
+}
+
+# Render a name for an error message without interpolating undef.
+sub _shown_name {
+    my($name) = @_;
+    return defined($name) ? $name : '';
 }
 
 sub _db_path {
@@ -2671,6 +3204,11 @@ sub _file {
 
 sub _load_schema {
     my($self, $table) = @_;
+    unless (_valid_name($table)) {
+        my $bad = _shown_name($table);
+        $errstr = "Invalid table name '$bad'";
+        return undef;
+    }
     return $self->{_tables}{$table} if $self->{_tables}{$table};
     my $sch_file = $self->_file($table, 'sch');
     unless (-f $sch_file) {
@@ -2679,15 +3217,17 @@ sub _load_schema {
     }
     local *FH;
     open(FH, "< $sch_file") or do { $errstr = "Cannot read schema: $!"; return undef; };
-    my(%sch, @cols, %indexes);
-    $sch{notnull}  = {};
-    $sch{defaults} = {};
-    $sch{checks}   = {};
-    $sch{pk}       = undef;
+    my($sch, @cols, %indexes);
+    $sch = {};
+    $sch->{notnull}  = {};
+    $sch->{defaults} = {};
+    $sch->{checks}   = {};
+    $sch->{pk}       = undef;
+    local $_;
     while (<FH>) {
         chomp;
         if (/^RECSIZE=(\d+)/) {
-            $sch{recsize} = $1;
+            $sch->{recsize} = $1;
         }
         elsif (/^COL=(\w+):(\w+):(\d+)(?::(\d+))?/) {
             # 4th field is decl (declared size); absent in old schema files
@@ -2695,17 +3235,17 @@ sub _load_schema {
                           decl=>(defined($4) ? $4+0 : $3+0) };
         }
         elsif (/^NOTNULL=(\w+)/) {
-            $sch{notnull}{$1} = 1;
+            $sch->{notnull}{$1} = 1;
         }
         elsif (/^DEFAULT=(\w+):(.+)/) {
-            $sch{defaults}{$1} = $2;
+            $sch->{defaults}{$1} = $2;
         }
         elsif (/^CHECK=(\w+):(.+)/) {
-            $sch{checks}{$1} = $2;
+            $sch->{checks}{$1} = $2;
         }
         elsif (/^PK=(\w+)/) {
-            $sch{pk}          = $1;
-            $sch{notnull}{$1} = 1;
+            $sch->{pk}          = $1;
+            $sch->{notnull}{$1} = 1;
         }
         elsif (/^IDX=(\w+):(\w+):([01])/) {
             my($iname, $icol, $iuniq) = ($1, $2, $3);
@@ -2720,10 +3260,10 @@ sub _load_schema {
         }
     }
     close FH;
-    $sch{cols}               = [ @cols ];
-    $sch{indexes}            = { %indexes };
-    $self->{_tables}{$table} = \%sch; # don't write { %sch }
-    return \%sch;                     # don't write { %sch }
+    $sch->{cols}               = [ @cols ];
+    $sch->{indexes}            = { %indexes };
+    $self->{_tables}{$table} = $sch;
+    return $sch;
 }
 
 sub _rewrite_schema {
@@ -2731,27 +3271,86 @@ sub _rewrite_schema {
     my $sch_file = $self->_file($table, 'sch');
     local *FH;
     open(FH, "> $sch_file") or return $self->_err("Cannot rewrite schema: $!");
-    print FH "VERSION=1\n";
-    print FH "RECSIZE=$sch->{recsize}\n";
+    my $ok = print FH "VERSION=1\n";
+    $ok &&= print FH "RECSIZE=$sch->{recsize}\n";
     for my $c (@{$sch->{cols}}) {
-        print FH "COL=$c->{name}:$c->{type}:$c->{size}:"
+        $ok &&= print FH "COL=$c->{name}:$c->{type}:$c->{size}:"
             . (defined($c->{decl}) ? $c->{decl} : $c->{size}) . "\n";
     }
     for my $ix (values %{$sch->{indexes}}) {
-        print FH "IDX=$ix->{name}:$ix->{col}:$ix->{unique}\n";
+        $ok &&= print FH "IDX=$ix->{name}:$ix->{col}:$ix->{unique}\n";
     }
     for my $c (sort keys %{$sch->{notnull} || {}}) {
-        print FH "NOTNULL=$c\n";
+        $ok &&= print FH "NOTNULL=$c\n";
     }
     for my $c (sort keys %{$sch->{defaults} || {}}) {
-        print FH "DEFAULT=$c:$sch->{defaults}{$c}\n";
+        $ok &&= print FH "DEFAULT=$c:$sch->{defaults}{$c}\n";
     }
     for my $c (sort keys %{$sch->{checks} || {}}) {
-        print FH "CHECK=$c:$sch->{checks}{$c}\n";
+        $ok &&= print FH "CHECK=$c:$sch->{checks}{$c}\n";
     }
-    print FH "PK=$sch->{pk}\n" if $sch->{pk};
-    close FH;
+    $ok &&= print FH "PK=$sch->{pk}\n" if $sch->{pk};
+    my $err = $!;
+    unless ($ok && close(FH)) {
+        $err = $! if $ok;
+        close FH if $ok;
+        return $self->_err("Cannot rewrite schema: $err");
+    }
     return 1;
+}
+
+# Does $v look like a number that Perl can use in arithmetic without
+# complaining under -w?  Leading and trailing whitespace is allowed, an
+# optional sign, a decimal part and an exponent; everything else -- the
+# empty string, 'abc', '12abc', '0x10', 'Inf', 'NaN' -- is not numeric.
+#
+# The same test used to be written out three times (index key encoding,
+# type validation and record packing) and the FLOAT paths had no test at
+# all, which is how "isn't numeric" warnings escaped from inside this
+# module.  Keep it in one place so the three callers cannot drift apart.
+sub _looks_numeric {
+    my($v) = @_;
+    return 0 unless defined $v;
+    return $v =~ /^\s*[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?\s*$/ ? 1 : 0;
+}
+
+# Is $v a well-formed calendar date in YYYY-MM-DD form?
+sub _valid_date {
+    my($v) = @_;
+    return 0 unless $v =~ /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
+    my($y, $m, $d) = ($1, $2, $3);
+    return 0 if ($m < 1) || ($m > 12);
+    return 0 if $d < 1;
+    my @mdays = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+    my $max = $mdays[$m-1];
+    if ($m == 2) {
+        $max = 29 if ((($y % 4) == 0) && (($y % 100) != 0)) || (($y % 400) == 0);
+    }
+    return 0 if $d > $max;
+    return 1;
+}
+
+# Return an error message when $v cannot be stored in column $col, or undef
+# when it can.  NULL (undef or the empty string) is always storable.
+sub _type_error {
+    my($col, $v) = @_;
+    return undef unless defined($v) && ($v ne '');
+    my $cn = $col->{name};
+    if ($col->{type} eq 'INT') {
+        # A value that is not numeric at all keeps its historical
+        # behaviour and is stored as 0.  Only a numeric value too large
+        # for the 4-byte field is rejected, because that used to be
+        # silently clamped to the nearest limit.
+        return undef unless _looks_numeric($v);
+        return undef if ($v >= INT_MIN) && ($v <= INT_MAX);
+        return "Integer out of range for column '$cn': '$v' "
+             . '(INT holds ' . INT_MIN . ' .. ' . INT_MAX . ')';
+    }
+    if ($col->{type} eq 'DATE') {
+        return undef if _valid_date($v);
+        return "Invalid DATE for column '$cn': '$v' (expected YYYY-MM-DD)";
+    }
+    return undef;
 }
 
 sub _pack_record {
@@ -2762,13 +3361,20 @@ sub _pack_record {
         my $t = $col->{type};
         my $s = $col->{size};
         if ($t eq 'INT') {
-            my $iv = int($v || 0);
-            $iv =  2147483647 if $iv >  2147483647;
-            $iv = -2147483648 if $iv < -2147483648;
+            # A value that is not numeric is stored as 0.  It is tested
+            # here rather than left to int() so that -w stays quiet.
+            my $iv = _looks_numeric($v) ? int($v) : 0;
+            $iv = INT_MAX if $iv > INT_MAX;
+            $iv = INT_MIN if $iv < INT_MIN;
             $data .= pack('N', $iv&0xFFFFFFFF);
         }
         elsif ($t eq 'FLOAT') {
-            $data .= pack('d', $v+0);
+            # Same rule as INT, and for the same reason: a value that is
+            # not numeric is stored as 0 without a warning.  Up to 1.08
+            # this branch handed the raw value to pack() and any string
+            # that was not a number leaked an "isn't numeric" warning out
+            # of the module, whatever the caller's warning settings were.
+            $data .= pack('d', _looks_numeric($v) ? $v+0 : 0);
         }
         else {
             my $sv = substr($v, 0, $s);
@@ -2807,6 +3413,20 @@ sub _unpack_record {
 sub _lock_ex { flock($_[0], LOCK_EX) }
 sub _lock_sh { flock($_[0], LOCK_SH) }
 sub _unlock  { flock($_[0], LOCK_UN) }
+
+# Put a write handle into autoflush mode.
+#
+# print() buffers, and the buffer is written out by close(), which runs
+# after _unlock().  Without this the data would reach the file only after
+# the exclusive lock had already been handed to another process.  With
+# autoflush on, every print() reaches the file while the lock is still
+# held.  IO::Handle->autoflush is avoided on purpose: the select() idiom
+# needs no module and works on every Perl from 5.005_03 onwards.
+sub _autoflush {
+    my $old = select($_[0]);
+    $| = 1;
+    select($old);
+}
 
 sub _to_where_sub {
     my($wi) = @_;
@@ -2996,8 +3616,7 @@ sub _compile_where_from_conds {
                     return 0 unless $num ? ($rv >= $cv) : ($rv ge $cv);
                 }
                 elsif ($op eq 'LIKE') {
-                    (my $p = $cv) =~ s/%/.*/g;
-                    $p =~ s/_/./g;
+                    my $p = _like_to_re($cv);
                     return 0 unless $rv =~ /^$p$/i;
                 }
             }
@@ -3356,6 +3975,102 @@ sub bool_split {
     return @parts > 1 ? @parts : ($expr);
 }
 
+# Split $sql into alternating chunks of [ is_literal, text ] so that a
+# placeholder inside a quoted string is never mistaken for a bind marker.
+sub _split_sql_literals {
+    my($sql) = @_;
+    my @parts;
+    my $len = length $sql;
+    my $i   = 0;
+    my $cur = '';
+    while ($i < $len) {
+        if (substr($sql, $i, 1) eq "'") {
+            push @parts, [ 0, $cur ] if length $cur;
+            $cur  = '';
+            my $j = $i + 1;
+            while ($j < $len) {
+                if (substr($sql, $j, 1) ne "'") { $j++; next }
+                last unless substr($sql, $j+1, 1) eq "'";
+                $j += 2;
+            }
+            $j = $len if $j > $len;
+            push @parts, [ 1, substr($sql, $i, $j-$i+1) ];
+            $i = $j + 1;
+            next;
+        }
+        $cur .= substr($sql, $i, 1);
+        $i++;
+    }
+    push @parts, [ 0, $cur ] if length $cur;
+    return @parts;
+}
+
+# Collapse each run of whitespace to a single space, but leave string
+# literals byte for byte alone: a newline or a tab inside a literal is
+# part of the value, not statement layout.
+sub _normalize_sql_space {
+    my($sql) = @_;
+    my $out = '';
+    for my $part (_split_sql_literals($sql)) {
+        if ($part->[0]) { $out .= $part->[1]; next }
+        my $chunk = $part->[1];
+        $chunk =~ s/\s+/ /g;
+        $out .= $chunk;
+    }
+    return $out;
+}
+
+sub _strip_sql_comments {
+    my($sql) = @_;
+    my $out  = '';
+    my $len  = length($sql);
+    my $i    = 0;
+    while ($i < $len) {
+        my $ch = substr($sql, $i, 1);
+        if ($ch eq "'") {
+            my $j = $i + 1;
+            while ($j < $len) {
+                if (substr($sql, $j, 1) ne "'") { $j++; next }
+                last unless substr($sql, $j+1, 1) eq "'";
+                $j += 2;
+            }
+            $j = $len if $j > $len;
+            $out .= substr($sql, $i, $j-$i+1);
+            $i = $j + 1;
+            next;
+        }
+        if (substr($sql, $i, 2) eq '--') {
+            $i += 2;
+            $i++ while ($i < $len) && (substr($sql, $i, 1) ne "\n");
+            $out .= ' ';
+            next;
+        }
+        if (substr($sql, $i, 2) eq '/*') {
+            $i += 2;
+            $i++ while ($i < $len) && (substr($sql, $i, 2) ne '*/');
+            $i += 2;
+            $out .= ' ';
+            next;
+        }
+        $out .= $ch;
+        $i++;
+    }
+    $out =~ s/^\s+|\s+$//g;
+    return $out;
+}
+
+sub _like_to_re {
+    my($pat) = @_;
+    my $re   = '';
+    for my $i (0 .. length($pat)-1) {
+        my $ch = substr($pat, $i, 1);
+        if    ($ch eq '%') { $re .= '.*' }
+        elsif ($ch eq '_') { $re .= '.'  }
+        else               { $re .= quotemeta($ch) }
+    }
+    return $re;
+}
+
 sub parse_leaf {
     my($part) = @_;
     $part =~ s/^\s+|\s+$//g;
@@ -3396,8 +4111,8 @@ sub parse_leaf {
     if ($part =~ /^(.+?)\s+(NOT\s+)?LIKE\s+('(?:[^']|'')*'|\S+)$/si) {
         my($lhs, $neg, $pat) = ($1, $2, $3);
         $pat =~ s/^'(.*)'$/$1/s;
-        (my $re = $pat) =~ s/%/.*/g;
-        $re =~ s/_/./g;
+        $pat =~ s/''/'/g;
+        my $re = _like_to_re($pat);
         return { op=>($neg ? 'NOT_LIKE' : 'LIKE'), lhs=>$lhs, re=>$re };
     }
     if ($part =~ /^(.+?)\s*(=|!=|<>|<=|>=|<|>)\s*(.+)$/s) {
@@ -3539,8 +4254,32 @@ sub select {
         my $needs_groupby = (@gb_join || ($having_join ne '') || $has_agg);
 
         my $parsed = _parse_join_sql($join_sql);
-        if ($parsed) {
+
+        # A JOIN construct the parser cannot execute is reported here rather
+        # than left to fall through to the single-table parser, which used to
+        # accept it and return rows that answered a different question.
+        if ($parsed && ($parsed->[4] ne '')) {
+            return { type=>'error', message=>$parsed->[4] };
+        }
+        if ($parsed && $parsed->[0]) {
             my($js, $cs, $wc, $opts) = @$parsed;
+
+            # ORDER BY <position>: resolve against the select list.  In the
+            # aggregate branch the sort runs on projected rows keyed by
+            # alias, in the plain branch on raw rows keyed by expression.
+            my @sel_names =
+                map { $needs_groupby ? _order_alias_of($_) : _order_name_of($_) } @$cs;
+            my @ob_keys = $opts->{order_keys} ? @{$opts->{order_keys}} : ();
+            for my $k (@ob_keys) {
+                my($obe, $obk) = _resolve_order_ordinal_scalar($k->[0], [ @sel_names ]);
+                return { type=>'error', message=>$obe } if $obe ne '';
+                $k->[0] = $obk if defined $obk;
+            }
+            if (@ob_keys) {
+                $opts->{order_keys} = [ @ob_keys ];
+                $opts->{order_by}   = $ob_keys[0][0];
+                $opts->{order_dir}  = $ob_keys[0][1];
+            }
 
             # If GROUP BY / HAVING / aggregate: fetch raw rows with SELECT *
             my $rows;
@@ -3550,8 +4289,10 @@ sub select {
                 my $raw_opts = {%$opts};
                 delete $raw_opts->{order_by};
                 delete $raw_opts->{order_dir};
+                delete $raw_opts->{order_keys};
                 delete $raw_opts->{limit};
                 delete $raw_opts->{offset};
+                delete $raw_opts->{distinct};
                 $rows = $self->join_select($js, [], $wc, $raw_opts);
             }
             else {
@@ -3620,17 +4361,45 @@ sub select {
                     push @results, { %out };
                 }
 
-                # ORDER BY from opts
-                if (defined $opts->{order_by}) {
-                    my $ob   = $opts->{order_by};
-                    my $dir  = lc($opts->{order_dir} || 'asc');
+                # ORDER BY from opts (every key, in order)
+                my @gob = $opts->{order_keys} ? @{$opts->{order_keys}}
+                        : (defined($opts->{order_by})
+                            ? ([ $opts->{order_by}, ($opts->{order_dir} || 'ASC') ])
+                            : ());
+                if (@gob && @results) {
+
+                    # An aggregate result row is keyed by the select-list
+                    # alias, so "ORDER BY a.y" over "SELECT a.y, COUNT(*)"
+                    # has to resolve to the key 'y'.  Before 1.09 it resolved
+                    # to nothing and the sort quietly did not happen.
+                    for my $k (@gob) {
+                        next if exists $results[0]{$k->[0]};
+                        if (($k->[0] =~ /^\w+\.(\w+)$/) && exists($results[0]{$1})) {
+                            $k->[0] = $1;
+                            next;
+                        }
+                        return { type=>'error', message=>
+                            "ORDER BY column '$k->[0]' is not in the select "
+                            . "list of this aggregate query" };
+                    }
+                }
+                if (@gob) {
                     @results = sort {
-                        my $va = defined($a->{$ob}) ? $a->{$ob} : '';
-                        my $vb = defined($b->{$ob}) ? $b->{$ob} : '';
-                        my $c = (($va =~ /^-?\d+\.?\d*$/) && ($vb =~ /^-?\d+\.?\d*$/))
-                            ? ($va <=> $vb)
-                            : ($va cmp $vb);
-                        ($dir eq 'desc') ? -$c : $c;
+                        my $cmp = 0;
+                        for my $k (@gob) {
+                            my($key, $dir) = @$k;
+                            my $va = defined($a->{$key}) ? $a->{$key} : '';
+                            my $vb = defined($b->{$key}) ? $b->{$key} : '';
+                            my $c = (($va =~ /^-?\d+\.?\d*$/) && ($vb =~ /^-?\d+\.?\d*$/))
+                                  ? ($va <=> $vb)
+                                  : ($va cmp $vb);
+                            $c = -$c if lc($dir) eq 'desc';
+                            if ($c != 0) {
+                                $cmp = $c;
+                                last;
+                            }
+                        }
+                        $cmp;
                     } @results;
                 }
                 if (defined($opts->{offset}) && ($opts->{offset} > 0)) {
@@ -3651,6 +4420,8 @@ sub select {
     my $needs_agg = (@$gb || ($having ne '') || grep { $_->[0] =~ /\b(?:COUNT|SUM|AVG|MIN|MAX)\s*\(/si } @$col_specs);
     return $self->exec_groupby($tbl, $col_specs, $where_expr, $gb, $having, $ob, $limit, $offset) if $needs_agg;
     my $sch = $self->_load_schema($tbl) or return { type=>'error', message=>$errstr };
+    my $obe = _resolve_order_ordinals($ob, $col_specs, $sch);
+    return { type=>'error', message=>$obe } if $obe ne '';
     my $dat = $self->_file($tbl, 'dat');
     my $ws;
     if ($where_expr ne '') {
@@ -3844,8 +4615,8 @@ sub parse_select {
     $rest =~ s/^\s+//;
     return undef unless $tbl;
     my($limit, $offset) = (undef, undef);
-    $rest =~ s/\s+OFFSET\s+(\d+)\s*$//si and $offset = $1;
-    $rest =~ s/\s+LIMIT\s+(\d+)\s*$//si and $limit = $1;
+    $rest =~ s/(?:^|\s+)OFFSET\s+(\d+)\s*$//si and $offset = $1;
+    $rest =~ s/(?:^|\s+)LIMIT\s+(\d+)\s*$//si and $limit = $1;
     my @ob;
     if ($rest =~ s/(?:^|\s+)ORDER\s+BY\s+(.+?)(?=\s*(?:LIMIT|OFFSET|$))//si) {
         my $s = $1;
@@ -3862,7 +4633,7 @@ sub parse_select {
     $having =~ s/^\s+|\s+$//g;
     my @gb;
     if ($rest =~ s/(?:^|\s+)GROUP\s+BY\s+(.+?)(?=\s*(?:HAVING|ORDER|LIMIT|OFFSET|$))//si) {
-        @gb = map { my $x = $_; $x =~ s/^\s+|\s+\$//g; $x } split /\s*,\s*/, $1;
+        @gb = map { my $x = $_; $x =~ s/^\s+|\s+$//g; $x } split /\s*,\s*/, $1;
     }
     my $where = '';
     $rest =~ /(?:^|\s*)WHERE\s+(.+)/si and ($where = $1) =~ s/^\s+|\s+$//g;
@@ -3922,9 +4693,86 @@ sub parse_col_list {
     return @specs;
 }
 
+# SQL-92 lets an ORDER BY key be written as a select-list position instead
+# of a column name ("ORDER BY 2 DESC").  Rewrite every such item into the
+# name of the column it refers to, so that the comparators further down see
+# a name.  Left alone, a bare number was compared as a constant and the
+# result came back unsorted with no error at all.
+# @$col_specs is the parsed select list; $sch is the table schema, needed
+# to resolve a position when the select list is "*".
+# Returns '' on success, or an error message for an out-of-range position.
+sub _resolve_order_ordinals {
+    my($ob, $col_specs, $sch) = @_;
+    return '' unless (ref($ob) eq 'ARRAY') && @$ob;
+    my $wanted = 0;
+    for my $o (@$ob) {
+        $wanted = 1 if (ref($o) eq 'ARRAY') && defined($o->[0]) && ($o->[0] =~ /^\d+$/);
+    }
+    return '' unless $wanted;
+
+    my @names;
+    if (ref($col_specs) eq 'ARRAY') {
+        if ((@$col_specs == 1) && (ref($col_specs->[0]) eq 'ARRAY')
+            && ($col_specs->[0][0] eq '*')) {
+            @names = map { $_->{name} } @{$sch->{cols}} if ref($sch) eq 'HASH';
+        }
+        else {
+            @names = map { ref($_) eq 'ARRAY' ? $_->[1] : $_ } @$col_specs;
+        }
+    }
+    for my $o (@$ob) {
+        next unless (ref($o) eq 'ARRAY') && defined($o->[0]);
+        next unless $o->[0] =~ /^\d+$/;
+        my $n = $o->[0] + 0;
+        unless (@names && ($n >= 1) && ($n <= scalar @names)) {
+            return "ORDER BY position $o->[0] is not in the select list";
+        }
+        $o->[0] = $names[$n - 1];
+    }
+    return '';
+}
+
+# Scalar counterpart of _resolve_order_ordinals, for the JOIN, derived
+# table and correlated subquery paths.  Those carry a single ORDER BY key
+# rather than a list of them.  @$names is the output column list in SELECT
+# order; when it is empty the position cannot be resolved (a "*" select
+# list whose expansion is not known at this point) and the position is
+# reported rather than quietly ignored.
+# Returns (error_message, key); error_message is '' on success, and key is
+# the original one when it was not a position.
+sub _resolve_order_ordinal_scalar {
+    my($ob, $names) = @_;
+    return ('', $ob) unless defined($ob) && ($ob =~ /^\d+$/);
+    my $n = $ob + 0;
+    unless ((ref($names) eq 'ARRAY') && @$names && ($n >= 1) && ($n <= scalar @$names)) {
+        return ("ORDER BY position $ob is not in the select list", $ob);
+    }
+    return ('', $names->[$n - 1]);
+}
+
+# Select-list item as the sort comparators see it before projection: the
+# expression with any trailing "AS alias" removed.
+sub _order_name_of {
+    my($item) = @_;
+    return '' unless defined $item;
+    $item =~ s/^\s+|\s+$//g;
+    $item =~ s/\s+AS\s+\w+\s*$//si;
+    return $item;
+}
+
+# Select-list item as it is keyed after projection: the explicit alias,
+# the bare column of a qualified name, or the expression itself.
+sub _order_alias_of {
+    my($item) = @_;
+    return '' unless defined $item;
+    $item =~ s/^\s+|\s+$//g;
+    return $1 if $item =~ /\s+AS\s+(\w+)\s*$/si;
+    return $2 if $item =~ /^(\w+)\.(\w+)$/;
+    return $item;
+}
+
 sub project {
-    my($self, $rows, $col_specs, $distinct, $ob, $limit, $offset) = @_;
-    my $star = ((@$col_specs == 1) && ($col_specs->[0][0] eq '*'));
+    my($self, $rows, $col_specs, $distinct, $ob, $limit, $offset) = @_;    my $star = ((@$col_specs == 1) && ($col_specs->[0][0] eq '*'));
 
     # ORDER BY must be evaluated against the original (unprojected) rows so that
     # columns not listed in SELECT (e.g. "SELECT name ... ORDER BY score") are
@@ -3986,6 +4834,8 @@ sub project {
 sub exec_groupby {
     my($self, $tbl, $col_specs, $where_expr, $gb, $having, $ob, $limit, $offset) = @_;
     my $sch = $self->_load_schema($tbl) or return{ type=>'error', message=>$errstr };
+    my $obe = _resolve_order_ordinals($ob, $col_specs, $sch);
+    return { type=>'error', message=>$obe } if $obe ne '';
     my $dat = $self->_file($tbl, 'dat');
     my $ws = ($where_expr ne '') ? where_sub($where_expr) : undef;
     my @raw;
@@ -4004,34 +4854,7 @@ sub exec_groupby {
     }
     _unlock(\*FH);
     close FH;
-    my %gr;
-    my @go;
-    if (@$gb) {
-        for my $row (@raw) {
-            my $k = join("\x00", map { my $v = eval_expr($_, $row); defined($v) ? $v : '' } @$gb);
-            push @go, $k unless exists $gr{$k};
-            push @{$gr{$k}}, $row;
-        }
-    }
-    else {
-        @go          = ('__all__');
-        $gr{__all__} = [ @raw ];
-    }
-    my @results;
-    for my $gk (@go) {
-        my $grp = $gr{$gk};
-        my $rep = defined($grp->[0]) ? $grp->[0] : {};
-        my %out;
-        $out{$_->[1]} = eval_agg($_->[0], $grp, $rep) for @$col_specs;
-        if ($having ne '') {
-            my $h   = $having;
-            my $cnt = scalar @$grp;
-            $h =~ s/COUNT\s*\(\s*\*\s*\)/$cnt/gsi;
-            $h =~ s/\b(SUM|AVG|MIN|MAX|COUNT)\s*\(([^)]+)\)/eval_agg("$1($2)", $grp, $rep)/geis;
-            next unless where_sub($h)->({ %out });
-        }
-        push @results, { %out };
-    }
+    my @results = group_and_aggregate([ @raw ], $col_specs, $gb, $having);
     if (@$ob) {
         @results = sort {
             my($ra, $rb) = ($a, $b);
@@ -4056,19 +4879,63 @@ sub exec_groupby {
     return{ type=>'rows', data=>[ @results ] };
 }
 
+# Group @$rows by the expressions in @$gb (an empty list means one group
+# holding every row), evaluate @$col_specs for each group and drop the
+# groups rejected by $having.  Returns the result rows.  The table-backed
+# SELECT path and the derived-table path share this, which is why it takes
+# rows rather than reading them itself.
+sub group_and_aggregate {
+    my($rows, $col_specs, $gb, $having) = @_;
+    $gb     = []  unless defined $gb;
+    $having = ''  unless defined $having;
+    my %gr;
+    my @go;
+    if (@$gb) {
+        for my $row (@$rows) {
+            my $k = join("\x00", map { my $v = eval_expr($_, $row); defined($v) ? $v : '' } @$gb);
+            push @go, $k unless exists $gr{$k};
+            push @{$gr{$k}}, $row;
+        }
+    }
+    else {
+        @go          = ('__all__');
+        $gr{__all__} = [ @$rows ];
+    }
+    my @results;
+    for my $gk (@go) {
+        my $grp = $gr{$gk};
+        my $rep = defined($grp->[0]) ? $grp->[0] : {};
+        my %out;
+        $out{$_->[1]} = eval_agg($_->[0], $grp, $rep) for @$col_specs;
+        if ($having ne '') {
+            my $h   = $having;
+            my $cnt = scalar @$grp;
+            $h =~ s/COUNT\s*\(\s*\*\s*\)/$cnt/gsi;
+            $h =~ s/\b(SUM|AVG|MIN|MAX|COUNT)\s*\(([^)]+)\)/eval_agg("$1($2)", $grp, $rep)/geis;
+            next unless where_sub($h)->({ %out });
+        }
+        push @results, { %out };
+    }
+    return @results;
+}
+
 sub eval_agg {
     my($expr, $grp, $rep) = @_;
     return scalar @$grp if $expr =~ /^COUNT\s*\(\s*\*\s*\)$/si;
     if ($expr =~ /^COUNT\s*\(\s*DISTINCT\s+(.+)\s*\)$/si) {
         my $e = $1;
         my %s;
-        $s{ do { my $vv = eval_expr($e, $_); defined($vv) ? $vv : '' } }++ for @$grp;
+        for my $r (@$grp) {
+            my $vv = eval_expr($e, $r);
+            next unless defined($vv) && ($vv ne '');
+            $s{$vv}++;
+        }
         return scalar keys %s;
     }
     if ($expr =~ /^(COUNT|SUM|AVG|MIN|MAX)\s*\((.+)\)$/si) {
         my($fn, $inner) = (uc($1), $2);
         $inner =~ s/^\s+|\s+$//g;
-        my @vals = grep { defined $_ } map { eval_expr($inner, $_) } @$grp;
+        my @vals = grep { defined($_) && ($_ ne '') } map { eval_expr($inner, $_) } @$grp;
         return 0 unless @vals;
         return scalar @vals if $fn eq 'COUNT';
         if ($fn eq 'SUM') {
@@ -4185,6 +5052,13 @@ sub split_union {
     return @parts;
 }
 
+# Column order of one branch of a set operation, as a list of result-row
+# hash keys in select-list order.
+sub _branch_col_order {
+    my($self, $sql, $data) = @_;
+    return [ DB::Handy::Statement::_col_order_from_sql(undef, $sql, $data, $self) ];
+}
+
 sub exec_union {
     my($self, $parts) = @_;
     my @p     = @$parts;
@@ -4192,12 +5066,42 @@ sub exec_union {
     my $r0    = $self->execute($first);
     return $r0 if $r0->{type} eq 'error';
     my @rows  = @{$r0->{data}};
+
+    # A result row is a hash keyed by column name, and SQL lines the branches
+    # of a set operation up by *position*, taking the result column names from
+    # the first branch.  Until 1.09 the branches were merged as they came, so
+    # "SELECT x FROM a UNION ALL SELECT p FROM b" produced rows keyed 'p' for
+    # the second branch; every value read under the name 'x' was then NULL.
+    # The column order of each later branch is therefore mapped onto the
+    # first branch's names before the rows are combined.
+    my $base = $self->_branch_col_order($first, \@rows);
+
     while (@p >= 2) {
         my $sep = shift @p;
         my $q   = shift @p;
         my $r   = $self->execute($q);
         return $r if $r->{type} eq 'error';
         my @rhs = @{$r->{data}};
+        my $rord = $self->_branch_col_order($q, \@rhs);
+        if (@$base && @$rord) {
+            if (@$base != @$rord) {
+                return { type=>'error', message=>
+                    "Each SELECT of a set operation must return the same "
+                    . "number of columns (" . scalar(@$base) . " and "
+                    . scalar(@$rord) . ")" };
+            }
+            if (join("\x00", @$base) ne join("\x00", @$rord)) {
+                my @mapped;
+                for my $row (@rhs) {
+                    my %n;
+                    for my $i (0 .. $#$base) {
+                        $n{ $base->[$i] } = $row->{ $rord->[$i] };
+                    }
+                    push @mapped, { %n };
+                }
+                @rhs = @mapped;
+            }
+        }
         # Build a key string for each row for set operations
         my $_key = sub {
             my($row) = @_;
@@ -4280,7 +5184,7 @@ sub parse_set_exprs {
     my %set;
     for my $part (args($str)) {
         $part =~ s/^\s+|\s+$//g;
-        $set{$1} = $2 if $part =~ /^(\w+)\s*=\s*(.+)$/;
+        $set{$1} = $2 if $part =~ /^(\w+)\s*=\s*(.+)$/s;
     }
     return %set;
 }
@@ -4295,6 +5199,7 @@ sub update {
     local *FH;
     open(FH, "+< $dat") or return $self->_err("Cannot open dat: $!");
     binmode FH;
+    _autoflush(\*FH);
     _lock_ex(\*FH);
     seek(FH, 0, 0);
     my $pos = 0;
@@ -4316,6 +5221,7 @@ sub update {
                 for my $ix (values %{$sch->{indexes}}) {
                     next unless $ix->{unique} && exists $set_exprs->{$ix->{col}};
                     my $nv = $row->{$ix->{col}};
+                    next unless defined($nv) && ($nv ne '');
                     my $ep = $self->_idx_lookup_exact($table, $ix, $nv);
                     if ($ep >= 0) {
                         my $ef = $self->_idx_file($table, $ix->{name});
@@ -4347,6 +5253,7 @@ sub update {
                 # CHECK constraint check on UPDATE
                 for my $cn (keys %{$sch->{checks} || {}}) {
                     next unless exists $set_exprs->{$cn};
+                    next unless defined($row->{$cn}) && ($row->{$cn} ne '');
                     unless (eval_bool($sch->{checks}{$cn}, $row)) {
                         _unlock(\*FH);
                         close FH;
@@ -4366,14 +5273,28 @@ sub update {
                         close FH;
                         return $self->_err(
                             "Value too long for column '$cn': "
-                            . "declared VARCHAR($decl), got "
-                            . length($row->{$cn}) . " chars"
+                            . "declared $col->{type}($decl), got "
+                            . length($row->{$cn}) . " bytes"
                         );
                     }
                 }
+                # Type check on UPDATE: INT range and DATE validity.
+                for my $col (@{$sch->{cols}}) {
+                    next unless exists $set_exprs->{$col->{name}};
+                    my $msg = _type_error($col, $row->{$col->{name}});
+                    next unless defined $msg;
+                    _unlock(\*FH);
+                    close FH;
+                    return $self->_err($msg);
+                }
                 my $p = $self->_pack_record($sch, $row);
                 seek(FH, $pos, 0);
-                print FH $p;
+                unless (print FH $p) {
+                    my $e = $!;
+                    _unlock(\*FH);
+                    close FH;
+                    return $self->_err("Cannot write record: $e");
+                }
                 $n++;
                 for my $ix (values %{$sch->{indexes}}) {
                     next unless exists $set_exprs->{$ix->{col}};
@@ -4386,7 +5307,9 @@ sub update {
         $rno++;
     }
     _unlock(\*FH);
-    close FH;
+    unless (close FH) {
+        return $self->_err("Cannot flush dat: $!");
+    }
     return $n;
 }
 
@@ -4409,8 +5332,8 @@ sub update {
 ###############################################################################
 package DB::Handy::Connection;
 use vars qw($VERSION);
-$VERSION = $DB::Handy::VERSION;
-$VERSION = $VERSION;
+$VERSION = '1.09';   # keep in step with $DB::Handy::VERSION (literal so
+$VERSION = $VERSION; # that PAUSE and Module::Metadata can parse it)
 
 use vars qw($errstr);
 $errstr = '';
@@ -4419,6 +5342,18 @@ $errstr = '';
 sub new {
     my($class, $base_dir, $database, $opts) = @_;
     $opts = {} unless ref($opts) eq 'HASH';
+
+    # DBI code often opens a transaction by connecting with AutoCommit => 0.
+    # There are no transactions here, so accepting that silently would leave
+    # the caller believing its writes were being batched.
+    if (exists($opts->{AutoCommit}) && !$opts->{AutoCommit}) {
+        $errstr = "AutoCommit cannot be turned off: DB::Handy has no transactions";
+        if ($opts->{RaiseError}) {
+            die "DB::Handy connect failed: $errstr\n";
+        }
+        warn "DB::Handy: $errstr\n" if $opts->{PrintError};
+        return undef;
+    }
     my $engine = DB::Handy->new(base_dir => $base_dir);
     unless (defined $engine) {
         $errstr = $DB::Handy::errstr;
@@ -4430,6 +5365,7 @@ sub new {
     my $self = {
         _engine    => $engine,
         _database  => $database || '',
+        AutoCommit => 1,
         RaiseError => $opts->{RaiseError} || 0,
         PrintError => (defined($opts->{PrintError}) ? $opts->{PrintError} : 0),
         errstr     => '',
@@ -4481,6 +5417,7 @@ sub do {
 # prepare($sql) -- returns a statement handle
 sub prepare {
     my($self, $sql) = @_;
+    $self->_clear_err;
     unless (defined($sql) && ($sql =~ /\S/)) {
         $self->_set_err("prepare: empty SQL");
         return undef;
@@ -4608,6 +5545,16 @@ sub rollback {
 sub errstr { return $_[0]->{errstr} }
 sub err    { return $_[0]->{err}    }
 
+# _clear_err() -- DBI resets err/errstr at the start of every method that
+# talks to the database, so that a stale message from an earlier failure
+# is never mistaken for the outcome of the call that just succeeded.
+sub _clear_err {
+    my($self) = @_;
+    $self->{errstr} = '';
+    $self->{err}    = 0;
+    return;
+}
+
 sub _set_err {
     my($self, $msg, $code) = @_;
     $code = 1 unless defined $code;
@@ -4627,8 +5574,8 @@ sub _set_err {
 ###############################################################################
 package DB::Handy::Statement;
 use vars qw($VERSION);
-$VERSION = $DB::Handy::VERSION;
-$VERSION = $VERSION;
+$VERSION = '1.09';   # keep in step with $DB::Handy::VERSION (literal so
+$VERSION = $VERSION; # that PAUSE and Module::Metadata can parse it)
 
 use vars qw($errstr);
 $errstr = '';
@@ -4646,27 +5593,69 @@ sub new {
         errstr        => '',
         err           => 0,
         NAME          => [],
+        NAME_lc       => [],
+        NAME_uc       => [],
         NUM_OF_FIELDS => 0,
+        NUM_OF_PARAMS => _count_placeholders($sql),
+        Statement     => $sql,
     };
     bless $self, $class;
     return $self;
 }
 
+# Number of ? placeholders, ignoring any that sit inside a string literal
+# or a comment.  This is the same count execute() will consume.
+sub _count_placeholders {
+    my($sql) = @_;
+    my $n = 0;
+    for my $part (DB::Handy::_split_sql_literals(DB::Handy::_strip_sql_comments($sql))) {
+        next if $part->[0];
+        $n += ($part->[1] =~ tr/?//);
+    }
+    return $n;
+}
+
 # execute(@bind_values) -- substitute ? placeholders and run the statement
 sub execute {
     my($self, @bind) = @_;
+    $self->_clear_err;
 
     # merge values pre-set via bind_param()
     if (!@bind && @{$self->{_bind_params}}) {
         @bind = @{$self->{_bind_params}};
     }
 
-    my $sql = $self->{_sql};
+    # DBI refuses a bind list whose length does not match the number of
+    # placeholders.  Without this check a missing value left a bare "?"
+    # in the statement -- which then matched nothing -- and a surplus
+    # value was dropped, so either mistake produced a silently wrong
+    # result instead of an error.
+    my $got  = scalar @bind;
+    my $need = $self->{NUM_OF_PARAMS};
+    if ($got != $need) {
+        $self->_set_err(
+            "called with $got bind variable" . (($got  == 1) ? '' : 's')
+            . " when $need "                 . (($need == 1) ? 'is' : 'are')
+            . " needed"
+        );
+        return undef;
+    }
+
+    # Comments are removed first so that a ? inside one is not mistaken
+    # for a placeholder; a ? inside a string literal is left alone too.
+    my $sql = DB::Handy::_strip_sql_comments($self->{_sql});
 
     # substitute ? placeholders with actual values
     if (@bind) {
         my @params = @bind;
-        $sql =~ s/\?/_dbi_quote(shift @params)/ge;
+        my $out    = '';
+        for my $part (DB::Handy::_split_sql_literals($sql)) {
+            if ($part->[0]) { $out .= $part->[1]; next }
+            my $chunk = $part->[1];
+            $chunk =~ s/\?/_dbi_quote(shift @params)/ge;
+            $out .= $chunk;
+        }
+        $sql = $out;
     }
 
     my $engine = $self->{_dbh}{_engine};
@@ -4690,6 +5679,8 @@ sub execute {
         # use schema declaration order; fall back to alphabetical.
         my @name_order = $self->_col_order_from_sql($sql, $data, $engine);
         $self->{NAME}          = [ @name_order ];
+        $self->{NAME_lc}       = [ map { lc $_ } @name_order ];
+        $self->{NAME_uc}       = [ map { uc $_ } @name_order ];
         $self->{NUM_OF_FIELDS} = scalar @name_order;
         return $n || '0E0';
     }
@@ -4700,8 +5691,12 @@ sub execute {
         if (defined($res->{message}) && ($res->{message} =~ /(\d+)\s+row/)) {
             $affected = $1 + 0;
         }
-        $self->{rows}  = $affected;
-        $self->{_rows} = undef;
+        $self->{rows}          = $affected;
+        $self->{_rows}         = undef;
+        $self->{NAME}          = [];
+        $self->{NAME_lc}       = [];
+        $self->{NAME_uc}       = [];
+        $self->{NUM_OF_FIELDS} = 0;
         if ($sql =~ /^\s*INSERT\b/i) {
             $self->{_dbh}{_last_insert_id} = $affected;
         }
@@ -4809,32 +5804,48 @@ sub _col_order_from_sql {
         else  { $cur .= $ch }
     }
     push @parts, $cur if length $cur;
-    my @names;
+    my(@names, @alt);
     for my $part (@parts) {
         $part =~ s/^\s+|\s+$//g;
         # explicit alias:  expr AS alias
         if ($part =~ /\bAS\s+(\w+)\s*$/si) {
             push @names, $1;
+            push @alt,   undef;
         }
         # qualified alias.col -> keep as 'alias.col' (JOIN result key format)
         elsif ($part =~ /^(\w+)\.(\w+)$/) {
             push @names, "$1.$2";
+
+            # An aggregate query over a JOIN keys its output rows by the bare
+            # column name, so 'a.y' has to be able to resolve to 'y'.  Without
+            # this the whole list was rejected below and the alphabetical
+            # fallback took over, which put the columns of
+            # "SELECT a.y, COUNT(*) ... GROUP BY a.y" in the order
+            # COUNT(*), y.
+            push @alt, $2;
         }
         # bare column name
         elsif ($part =~ /^(\w+)$/) {
             push @names, $1;
+            push @alt,   undef;
         }
-        # complex expression without alias -> fall back entirely
+        # complex expression without alias -> use the expression text as key
         else {
-            return @fallback;
+            push @names, $part;
+            push @alt,   undef;
         }
     }
     # Verify that every parsed name exists as a key in the result
     # (guards against mis-parses; also handles 0-row results)
     if (@$data) {
         my %keys = map { $_ => 1 } keys %{$data->[0]};
-        for my $nm (@names) {
-            return @fallback unless $keys{$nm};
+        for my $i (0 .. $#names) {
+            next if $keys{$names[$i]};
+            if (defined($alt[$i]) && $keys{$alt[$i]}) {
+                $names[$i] = $alt[$i];
+                next;
+            }
+            return @fallback;
         }
     }
     return @names;
@@ -4920,6 +5931,15 @@ sub rows { return $_[0]->{rows} }
 sub errstr { return $_[0]->{errstr} }
 sub err    { return $_[0]->{err}    }
 
+sub _clear_err {
+    my($self) = @_;
+    $self->{errstr} = '';
+    $self->{err}    = 0;
+    my $dbh = $self->{_dbh};
+    $dbh->_clear_err if ref($dbh);
+    return;
+}
+
 sub _set_err {
     my($self, $msg, $code) = @_;
     $code = 1 unless defined $code;
@@ -4961,7 +5981,7 @@ DB::Handy - Pure-Perl flat-file relational database with DBI-like interface
 
 =head1 VERSION
 
-Version 1.07
+Version 1.09
 
 =head1 SYNOPSIS
 
@@ -5107,10 +6127,18 @@ Perl hash data structures containing execution status and data.
 =item * B<SQL support> - SELECT with JOIN, subqueries, UNION/INTERSECT/EXCEPT,
 GROUP BY, HAVING, ORDER BY, LIMIT/OFFSET, aggregates, CASE expressions,
 and more.  C<IN (...)>, C<NOT IN (...)>, and pure C<OR> expressions on
-indexed columns use index lookups.
+indexed columns use index lookups.  C<--> and C</* ... */> comments are
+removed before parsing, and runs of whitespace between tokens are
+collapsed, but neither happens inside a string literal: a newline, tab or
+carriage return in a quoted value is stored as written, so a statement
+may be laid out across several lines without disturbing its data.
 
-=item * B<File locking> - shared/exclusive C<flock> on data files for safe
-concurrent access from multiple processes.
+=item * B<File locking> - a shared or exclusive C<flock> is taken on the
+data and index files for the duration of every read and write, which
+serialises concurrent access from multiple processes on a local file
+system.  The return value of C<flock> is not checked; see
+L</"BUGS AND LIMITATIONS"> for what that means on a file system where
+locking is unavailable.
 
 =item * B<Portable> - works on Windows and UNIX/Linux without modification.
 
@@ -5179,11 +6207,14 @@ Both the handle-level accessors (C<< $dbh->errstr >>, C<< $sth->errstr >>)
 and the package-level variable (C<$DB::Handy::errstr>) work the same way
 as C<$DBI::errstr> / C<$DBI::err>.
 
-=item * B<NAME / NUM_OF_FIELDS> -
+=item * B<NAME / NAME_lc / NAME_uc / NUM_OF_FIELDS / NUM_OF_PARAMS / Statement> -
 C<< $sth->{NAME} >> (array-ref of column names in SELECT list order
-for named columns, alphabetical for C<SELECT *> / JOIN) and
+for a named column list, C<CREATE TABLE> declaration order for
+C<SELECT *> / JOIN) and
 C<< $sth->{NUM_OF_FIELDS} >> (integer count) are set after C<execute>,
-matching DBI statement-handle attributes.
+matching DBI statement-handle attributes.  C<NAME_lc> and C<NAME_uc>
+carry the same list case-folded.  C<< $sth->{NUM_OF_PARAMS} >> and
+C<< $sth->{Statement} >> are available as soon as C<prepare> returns.
 C<NAME> is also populated from the SQL for zero-row results.
 
 =item * B<table_info / column_info> -
@@ -5225,16 +6256,19 @@ only and may not fire in every error path that DBI would cover.
 DBI provides C<type_info> and C<type_info_all> to query data-type
 capabilities.  These methods are not implemented.
 
-=item * B<No statement-level attributes beyond NAME/NUM_OF_FIELDS> -
-DBI statement handles expose many attributes (C<TYPE>, C<PRECISION>,
-C<SCALE>, C<NULLABLE>, C<CursorName>, etc.).  DB::Handy only supports
-C<NAME> and C<NUM_OF_FIELDS>.
+=item * B<Limited statement-level attributes> -
+DBI statement handles expose many attributes.  DB::Handy supports
+C<NAME>, C<NAME_lc>, C<NAME_uc>, C<NUM_OF_FIELDS>, C<NUM_OF_PARAMS> and
+C<Statement>; C<TYPE>, C<PRECISION>, C<SCALE>, C<NULLABLE>,
+C<CursorName>, C<ParamValues> and C<RowsInCache> are not implemented.
 
 =item * B<last_insert_id semantics> -
 C<last_insert_id> accepts the same four positional arguments as DBI
 (C<$catalog>, C<$schema>, C<$table>, C<$field>) but ignores them.
 It returns the row count of the most recent INSERT (always 1 for a
-single-row insert).  Compatible with DBI.
+single-row insert), B<not> a generated key value: there are no
+auto-increment columns, so there is no key to return.  Code ported from
+DBI that uses the return value as a row identifier will be wrong.
 
 =item * B<No BLOB / CLOB types> -
 DBI supports large-object binding via special type constants.  DB::Handy
@@ -5366,7 +6400,7 @@ Compatible with DBI.
       {Slice => {}},
       'Eng');
 
-  # Array of array-refs (one per row, columns alphabetical)
+  # Array of array-refs (one per row, columns in SELECT list order)
   my $rows = $dbh->selectall_arrayref(
       "SELECT id, name FROM emp ORDER BY id");
 
@@ -5383,7 +6417,9 @@ Each row is a hash-ref C<{ column_name =E<gt> value, ... }>.
 
 =item C<< {Slice => []} >> (default, or omit C<\%attr>)
 
-Each row is an array-ref with values in alphabetical column order.
+Each row is an array-ref with values in C<< $sth->{NAME} >> order: the SELECT list order for a named
+column list, and the C<CREATE TABLE> declaration order for
+C<SELECT *> (qualified as C<alias.col>, table by table, for a JOIN).
 
 =back
 
@@ -5418,7 +6454,7 @@ Compatible with DBI.
 
   my $row = $dbh->selectrow_arrayref(
       "SELECT name, salary FROM emp WHERE id = ?", {}, 1);
-  # $row = ['Alice', 75000]  (columns in alphabetical order)
+  # $row = ['Alice', 75000]  (columns in SELECT list order)
 
 Execute C<$sql>, fetch the first row as an array-ref, then call C<finish>.
 Returns C<undef> if no rows match or on error.
@@ -5475,8 +6511,12 @@ disconnected flag.  Compatible with DBI.
 Return the error message from the most recent failed operation on this
 handle, or the empty string if there was no error.
 
+Like DBI, DB::Handy resets C<errstr> and C<err> when a statement is
+prepared or executed, so a message left over from an earlier failure is
+never mistaken for the outcome of a call that has just succeeded.
+
 The package-level variable C<$DB::Handy::errstr> holds the last error
-from any handle, analogous to C<$DBI::errstr>.
+from any handle, analogous to C<$DBI::errstr>.  It is not reset.
 Compatible with DBI.
 
 =head2 err()
@@ -5484,8 +6524,62 @@ Compatible with DBI.
   my $code = $dbh->err;
 
 Return the error code from the most recent failed operation (always 1 for
-any error, 0 for no error).  Analogous to C<$DBI::err>.
+any error, 0 for no error).  Reset together with C<errstr>.
+Analogous to C<$DBI::err>.
 Compatible with DBI.
+
+=head2 ping()
+
+  my $alive = $dbh->ping;
+
+Return true while the handle is usable, false after C<disconnect>.  There
+is no server to reach, so this reports the handle's own state.
+Compatible with DBI.
+
+=head2 AutoCommit()
+
+  my $ac = $dbh->AutoCommit;   # always 1
+
+Always returns C<1>.  This method, not the C<< $dbh->{AutoCommit} >> hash
+key, is the authoritative answer; see L</ATTRIBUTES>.
+
+=head2 begin_work() / commit() / rollback()
+
+  $dbh->begin_work or die $dbh->errstr;
+
+All three always fail: they return C<undef> and set C<errstr> to explain
+that DB::Handy has no transactions.  They exist so that ported DBI code
+fails visibly instead of appearing to open a transaction.  Connecting with
+C<AutoCommit =E<gt> 0> is refused for the same reason.
+
+=head2 table_info()
+
+  my $rows = $dbh->table_info;
+  for my $t (@$rows) { print "$t->{TABLE_NAME}\n" }
+
+Return an array reference of hash references, one per table in the current
+database.  B<Not compatible with DBI>, in two ways: DBI's C<table_info>
+takes four positional arguments (C<$catalog>, C<$schema>, C<$table>,
+C<$type>) and returns a statement handle, whereas this method takes no
+arguments and returns the rows directly.  The hash keys follow DBI's
+naming (C<TABLE_CAT>, C<TABLE_SCHEM>, C<TABLE_NAME>, C<TABLE_TYPE>,
+C<REMARKS>).
+
+=head2 column_info( $table )
+
+  my $rows = $dbh->column_info('emp');
+  for my $c (@$rows) { print "$c->{COLUMN_NAME} $c->{TYPE_NAME}\n" }
+
+Return an array reference of hash references, one per column of C<$table>,
+in declaration order.  B<Not compatible with DBI>: DBI's C<column_info>
+takes C<$catalog>, C<$schema>, C<$table>, C<$column> and returns a
+statement handle; this method takes B<the table name as its only
+argument> and returns the rows directly.  Calling it with DBI's four
+arguments passes C<undef> as the table name and returns C<undef>.
+
+The hash keys follow DBI's naming (C<TABLE_CAT>, C<TABLE_SCHEM>,
+C<TABLE_NAME>, C<COLUMN_NAME>, C<DATA_TYPE>, C<TYPE_NAME>,
+C<COLUMN_SIZE>, C<ORDINAL_POSITION>, C<IS_NULLABLE>, C<COLUMN_DEF>).
 
 =head1 METHODS - Statement handle (DB::Handy::Statement)
 
@@ -5500,6 +6594,11 @@ instance of C<DB::Handy::Statement>.
 Execute the prepared statement.  C<?> placeholders are substituted
 left-to-right with the supplied values.  If no values are supplied and
 C<bind_param> was called previously, the pre-bound values are used.
+
+The number of values must equal C<< $sth->{NUM_OF_PARAMS} >>.  A
+mismatch sets C<errstr> and returns C<undef> rather than running a
+statement in which some placeholder was left unsubstituted or some value
+was silently dropped.
 
 Returns:
 
@@ -5556,7 +6655,8 @@ Compatible with DBI.
 
 Return the next row as an array-ref with values in the order defined by
 C<< $sth->{NAME} >>.  For named SELECT lists the order matches the SELECT
-list; for C<SELECT *> and JOIN results the order is alphabetical.
+list; for C<SELECT *> and JOIN results it is the C<CREATE TABLE>
+declaration order.
 Returns C<undef> at end of result.
 
 B<Note:> Column order follows the SELECT list for named columns;
@@ -5569,7 +6669,8 @@ Compatible with DBI.
   my @row = $sth->fetchrow_array;
 
 Return the next row as a plain list in C<< $sth->{NAME} >> order
-(SELECT list order for named columns, alphabetical for C<SELECT *>),
+(SELECT list order for a named column list, C<CREATE TABLE>
+declaration order for C<SELECT *>),
 or an empty list at end of result.
 
 B<Note:> Column order matches the SELECT list for named columns.
@@ -5599,13 +6700,25 @@ Each row is returned as a hash-ref C<{ col =E<gt> val, ... }>.
 
 =item Array-ref slice C<[]> or omitted
 
-Each row is returned as an array-ref with values in alphabetical column
-order.
+Each row is returned as an array-ref with values in C<< $sth->{NAME} >> order: the SELECT list order for a named
+column list, and the C<CREATE TABLE> declaration order for
+C<SELECT *> (qualified as C<alias.col>, table by table, for a JOIN).
 
 =back
 
+B<Column-index slices are not supported.>  DBI lets you pass a list of
+column positions, as in C<fetchall_arrayref([0, 2])>, to select a subset
+of the columns.  DB::Handy ignores the contents of the array-ref and
+always returns every column; name the columns you want in the SELECT
+list instead.
+
+B<The C<$max_rows> argument is not supported.>  DBI accepts a second
+argument limiting how many rows are fetched, as in
+C<fetchall_arrayref(undef, 10)>.  DB::Handy accepts the argument and
+ignores it, always returning every remaining row; use C<LIMIT> in the SQL,
+or C<fetchrow_hashref> in a loop, instead.
+
 Returns C<undef> if no statement has been executed.
-Compatible with DBI.
 
 =head2 fetchall_hashref( $key_field )
 
@@ -5678,16 +6791,33 @@ as qualified names C<alias.col>.
 The attribute is set correctly even for zero-row results.
 Compatible with DBI.
 
+=item C<$sth-E<gt>{NAME_lc}> / C<$sth-E<gt>{NAME_uc}>
+
+The same list as C<NAME>, lower-cased and upper-cased respectively.
+Useful when the SQL and the calling code disagree about identifier case.
+Compatible with DBI.
+
 =item C<$sth-E<gt>{NUM_OF_FIELDS}>
 
 The number of columns in the result set (integer).  Set to 0 for
 non-SELECT statements.  Compatible with DBI.
 
+=item C<$sth-E<gt>{NUM_OF_PARAMS}>
+
+The number of C<?> placeholders in the prepared statement.  Available
+immediately after C<prepare>, before C<execute>.  A C<?> inside a string
+literal or a comment is not counted, because C<execute> does not consume
+one for it either.  Compatible with DBI.
+
+=item C<$sth-E<gt>{Statement}>
+
+The SQL text passed to C<prepare>, unchanged.  Compatible with DBI.
+
 =back
 
 The following DBI statement-handle attributes are B<not> implemented:
 C<TYPE>, C<PRECISION>, C<SCALE>, C<NULLABLE>, C<CursorName>,
-C<ParamValues>, C<Statement>, C<RowsInCache>.
+C<ParamValues>, C<RowsInCache>.
 
 =head2 Connection-handle attributes
 
@@ -5703,16 +6833,39 @@ C<connect> time via the options hash.  Compatible with DBI.
 When true, any error causes a C<warn>.  Can be set at C<connect> time.
 Compatible with DBI.
 
+=item C<AutoCommit>
+
+Set to C<1> at connect time, so that DBI-style code which reads
+C<< $dbh->{AutoCommit} >> gets the expected answer.
+
+The handle is an ordinary hash reference, so B<assigning to this key stores
+the value and it reads back> -- it does not enable transactions, and it
+does not make C<commit> work.  Only the C<AutoCommit> method is
+authoritative: it always returns C<1>.  (Releases up to 1.08 documented
+this key as read-only, which it never was.)  Passing
+C<AutoCommit =E<gt> 0> to C<connect> is refused outright rather than
+accepted and ignored.
+
 =back
 
 The following DBI connection-handle attributes are B<not> implemented:
-C<AutoCommit>, C<LongReadLen>, C<LongTruncOk>, C<ChopBlanks>,
+C<LongReadLen>, C<LongTruncOk>, C<ChopBlanks>,
 C<FetchHashKeyName>, C<HandleError>, C<Profile>.
 
 =head1 METHODS - Low-level API
 
 These methods operate directly on the DB::Handy engine object returned by
 C<< DB::Handy->new >>.  They are independent of the DBI-like layer.
+
+B<Identifier restriction.>  Database, table and index names become path
+components on disk, so every method below restricts them to word
+characters (C<[A-Za-z0-9_]>, i.e. C<\w>).  A name containing C</>, C<\>,
+C<:> or C<..> is rejected with C<Invalid database name>, C<Invalid table
+name> or C<Invalid index name> in C<$DB::Handy::errstr> rather than being
+turned into a path.  This matters when a name comes from outside the
+program: without the check, C<< $db->drop_database($cgi_param) >> could be
+made to delete a directory tree outside C<base_dir>.  The SQL layer has
+always applied the same C<\w+> rule, so SQL statements are unaffected.
 
 =head2 new( base_dir =E<gt> $dir [, db_name =E<gt> $name] )
 
@@ -5896,12 +7049,13 @@ SELECT result row; otherwise the mapping falls back to positional order
   SELECT [DISTINCT] col_expr [AS alias], ...
          | *
   FROM   table [AS alias]
-         [INNER | LEFT [OUTER] | RIGHT [OUTER] | CROSS] JOIN table [AS alias]
-             ON condition
+         [INNER | LEFT [OUTER] | RIGHT [OUTER]] JOIN table [AS alias]
+             ON table.col = table.col
+         | CROSS JOIN table [AS alias]
   [WHERE condition]
   [GROUP BY col, ...]
   [HAVING condition]
-  [ORDER BY col [ASC|DESC], ...]
+  [ORDER BY {col | position} [ASC|DESC], ...]
   [LIMIT  n]
   [OFFSET n]
 
@@ -5917,6 +7071,18 @@ SELECT result row; otherwise the mapping falls back to positional order
 
 Correlated subqueries (referencing outer table columns) are supported.
 Nesting depth is limited to 32 levels.
+
+The outer query of a derived table accepts C<WHERE>, C<GROUP BY>,
+C<HAVING>, C<ORDER BY>, C<LIMIT> and C<OFFSET>, and its SELECT list may
+use the aggregate functions:
+
+  SELECT COUNT(*)      FROM (SELECT ...) AS sub
+  SELECT dept, SUM(n)  FROM (SELECT ...) AS sub GROUP BY dept
+  SELECT dept          FROM (SELECT ...) AS sub GROUP BY dept HAVING MAX(n) > 10
+
+C<LIMIT> and C<OFFSET> are applied to the aggregated result, not to the
+rows going into it, so C<SELECT COUNT(*) FROM (...) AS sub LIMIT 1>
+counts every row.
 
 =head2 Set operations
 
@@ -5981,6 +7147,23 @@ B<EXCEPT ALL> returns the multiset difference.
 
   SELECT salary * 1.1 AS new_salary FROM emp
 
+=head2 Ordering by select-list position
+
+  SELECT name, salary FROM emp ORDER BY 2 DESC
+  SELECT name, salary FROM emp ORDER BY 2, 1
+
+A sort key written as a plain number is the position of a column in the
+SELECT list, counting from 1, as in SQL-92.  With C<SELECT *> the
+positions follow the C<CREATE TABLE> column order.  A position outside
+that range is an error rather than a sort that quietly does nothing.
+
+An expression is never read as a position, so C<ORDER BY 1+1> still
+sorts by the value of that expression.
+
+The one place a position cannot be resolved is C<SELECT *> across a
+JOIN, because the combined column list is not known when the sort key is
+parsed; use a column name there.
+
 =head1 DATA TYPES
 
 =over 4
@@ -5991,11 +7174,28 @@ A 4-byte signed integer stored in big-endian binary form.
 Range: -2,147,483,648 to 2,147,483,647.
 Stored size on disk: 4 bytes.
 
+A numeric value outside that range is B<rejected> by C<INSERT> and
+C<UPDATE> with an "Integer out of range" error; earlier releases clamped
+it silently to the nearest limit.  A value with a fractional part is
+truncated towards zero (C<1.7> is stored as C<1>), and a value that is
+not numeric at all is stored as C<0>; neither is an error.
+
 =item B<FLOAT>
 
-An 8-byte IEEE 754 double stored using an order-preserving encoding that
-keeps the binary sort order consistent with numeric order.
-Stored size on disk: 8 bytes.
+An 8-byte IEEE 754 double.  Stored size on disk: 8 bytes.
+Index keys use an order-preserving encoding so that the binary sort
+order of the index matches numeric order.  The C<.dat> file itself holds
+the machine's native double -- see L</"BUGS AND LIMITATIONS"> for what
+that means when a data file is copied between machines.
+
+A value that is not numeric at all is stored as C<0> and is not an
+error, the same rule C<INT> follows.  C<'abc'>, C<'12abc'>, C<'0x10'>,
+C<'Inf'> and C<'NaN'> are all stored as C<0>; only a leading sign, digits,
+a decimal point and an exponent are read as a number.  Up to 1.08 this
+column type had no such test and passed the value straight to C<pack>,
+so a non-numeric value emitted an C<isn't numeric> warning from inside
+DB::Handy -- twice per row when the column was indexed -- regardless of
+the caller's warning settings.
 
 =item B<CHAR(n)>
 
@@ -6011,9 +7211,19 @@ on disk; there is no variable-length storage.
 
 =item B<DATE>
 
-A 10-byte fixed string.  No date validation or arithmetic is performed;
-C<DATE> is simply a convenient alias for C<CHAR(10)> with an implied
-C<YYYY-MM-DD> format.
+A 10-byte fixed string in C<YYYY-MM-DD> form.  C<INSERT> and C<UPDATE>
+B<reject> a value that is not a well-formed calendar date: the format
+must be exactly four digits, a hyphen, two digits, a hyphen and two
+digits, the month must be 01-12, and the day must exist in that month of
+that year (C<2020-02-29> is accepted, C<2021-02-29> is not; the
+four-hundred-year rule is applied, so C<2000-02-29> is accepted and
+C<1900-02-29> is not).  NULL and the empty string are always accepted.
+
+No date arithmetic is performed.  Comparisons are plain string
+comparisons, which give the expected result because the format sorts
+chronologically.  Values written by 1.08 or earlier are not re-validated
+on read, so an existing file may still hold something that C<INSERT>
+would now refuse.
 
 =back
 
@@ -6037,18 +7247,28 @@ both B<INSERT> and B<UPDATE>.
 
 Applied when an INSERT omits the column or supplies an empty value.
 
-=item B<UNIQUE> (via index)
+=item B<UNIQUE>
 
+  CREATE TABLE emp (id INT, email VARCHAR(60) UNIQUE)
+  CREATE TABLE emp (id INT, email VARCHAR(60), UNIQUE (email))
   CREATE UNIQUE INDEX emp_id ON emp (id)
 
-Enforced at INSERT and UPDATE time.  Multiple NULL (empty string) values
-are allowed.
+Enforced at INSERT and UPDATE time.  The column modifier and the
+table-level constraint both create a unique index called
+C<< <column>_unique >>; C<CREATE UNIQUE INDEX> names the index itself.
+Multiple NULL (empty string) values are allowed, as SQL-92 requires.
 
 =item B<PRIMARY KEY>
 
   CREATE TABLE emp (id INT PRIMARY KEY, name VARCHAR(40))
+  CREATE TABLE emp (id INT, name VARCHAR(40), PRIMARY KEY (id))
 
-Implies both C<NOT NULL> and a UNIQUE index named after the column.
+Implies C<NOT NULL> and creates a unique index called
+C<< <column>_pk >>, so duplicate keys are rejected on INSERT and on
+UPDATE.  A column that is both C<PRIMARY KEY> and C<UNIQUE> gets one
+index, not two.  The index is created with the table, so a table that
+was created by DB::Handy 1.08 or earlier does not have one; add it with
+C<CREATE UNIQUE INDEX> if the older table needs the constraint.
 
 =item B<CHECK>
 
@@ -6159,7 +7379,7 @@ B<Schema file format> (C<.sch>):
   [IDX=<idxname>:<colname>:<unique 0|1>]
   [NN=<colname>]            NOT NULL
   [DEF=<colname>:<val>]     DEFAULT value
-  [PK=<colname>]            PRIMARY KEY
+  [PK=<colname>]            PRIMARY KEY (also recorded as an IDX line)
 
 B<Data file format> (C<.dat>):
 
@@ -6253,6 +7473,66 @@ Use the C<VACUUM> SQL command to physically remove deleted records and compact t
   ORDER BY e.name
   SQL
 
+What a JOIN accepts is narrower than the rest of the SELECT support, so it
+is worth stating plainly:
+
+=over 4
+
+=item *
+
+The C<ON> clause is B<one equality between two table-qualified columns>.
+Either operand order is fine (C<ON e.department = d.code> and
+C<ON d.code = e.department> are the same join).  A second condition, a
+comparison other than C<=>, an unqualified name, C<USING> and
+C<NATURAL> are all rejected with an error.  Put any further restriction in
+the C<WHERE> clause.
+
+=item *
+
+C<CROSS JOIN> needs no C<ON>; every other join type requires one.  An
+C<ON> written on a C<CROSS JOIN> is accepted and ignored.
+
+=item *
+
+C<FULL OUTER JOIN> is not supported.  Combine a C<LEFT JOIN> and a
+C<RIGHT JOIN> with C<UNION> instead.
+
+=item *
+
+The C<WHERE> clause of a JOIN query takes AND-separated comparisons
+between a column and a column or literal, plus C<IN>, C<NOT IN>, C<LIKE>,
+C<BETWEEN> and C<IS [NOT] NULL>.  C<OR>, C<NOT> and parentheses are
+rejected with an error.
+
+=item *
+
+The select list takes column names, C<*> and C<table.*>.  An expression or
+an C<AS> alias is rejected, B<except> in an aggregate query (one with
+C<GROUP BY>, C<HAVING> or an aggregate function), where C<AS> works
+normally.
+
+=item *
+
+C<SELECT DISTINCT> and a multi-key C<ORDER BY> both work.
+
+=back
+
+Every construct listed above as rejected returns an error naming the
+offending text.  Up to 1.08 most of them were accepted and quietly turned
+into a Cartesian product or an unfiltered result; see
+L</"BUGS AND LIMITATIONS">.
+
+=head2 Anti-join with LEFT JOIN
+
+  # Employees whose department is not in the dept table
+  my $rows = $dbh->selectall_arrayref(<<'SQL', {Slice=>{}});
+  SELECT e.name
+  FROM employee AS e
+  LEFT JOIN dept AS d ON e.department = d.code
+  WHERE d.code IS NULL
+  ORDER BY e.name
+  SQL
+
 =head2 Subquery
 
   # Employees earning above the company average
@@ -6307,6 +7587,9 @@ and does B<not> require the L<DBI> module.  This section gives a detailed
 account of every known incompatibility.  See also L</"DBI COMPATIBILITY">
 for the overview table.
 
+A few entries below record the opposite: a place where DBI users often
+expect a difference and there is none.  Those entries say so explicitly.
+
 =head2 dbi:Handy DSN
 
 C<connect> accepts a C<dbi:Handy:key=val;...> prefix in addition to a
@@ -6355,7 +7638,12 @@ C<CREATE TABLE>:
   #   -> NAME = ['e.id', 'e.name', 'e.dept', 'e.salary',
   #               'd.did', 'd.dname', 'd.budget']
 
-Compatible with DBI.
+No difference here: this is what DBI drivers do.  The entry exists because
+earlier releases of DB::Handy sorted the names alphabetically instead.
+
+The one exception is an aggregate query over a JOIN, whose rows are keyed
+by the select-list alias rather than by C<alias.col>; the order still
+follows the select list.
 
 =head2 RaiseError / PrintError are standalone
 
@@ -6384,14 +7672,21 @@ Standard SQL and DBI drivers support C<INSERT INTO t VALUES (v1, v2, ...)>
 without an explicit column list.  DB::Handy also supports this form;
 values are assigned to columns in C<CREATE TABLE> declaration order.
 If the number of values does not match the number of columns, an error
-is returned.  Compatible with DBI.
+is returned.  No difference here; the entry exists only because the form
+is easy to assume unsupported in a driver this small.
 
 =head2 INTERSECT / EXCEPT
 
 C<INTERSECT>, C<INTERSECT ALL>, C<EXCEPT>, and C<EXCEPT ALL> are
 supported in addition to C<UNION> and C<UNION ALL>.
-These follow standard SQL set-operation semantics.
-Compatible with DBI.
+These follow standard SQL set-operation semantics.  DBI is not a SQL
+engine and imposes nothing here, so there is no DBI behaviour to differ
+from; the entry records the support because most small drivers lack it.
+
+The branches of a set operation are matched B<by position>, and the result
+column names come from the first branch, as SQL requires.  Up to 1.08 they
+were matched by column name, so a branch whose column names differed from
+the first branch's contributed rows of C<NULL>.
 
 =head2 VARCHAR is always 255 bytes on disk
 
@@ -6453,7 +7748,11 @@ execution will continue (methods will return C<undef>).
   $dbh->errstr               last error on this connection handle
   $sth->errstr               last error on this statement handle
 
-These variables are set on every failed operation and cleared on success.
+The two handle-level accessors are set on every failed operation and
+cleared on success.  The package-level C<$DB::Handy::errstr> is only ever
+overwritten by the next error, so it still holds the last error seen by
+I<any> handle after a subsequent success; test the handle accessor, or the
+return value of the method, rather than the package variable.
 
 =head2 Common error messages
 
@@ -6476,7 +7775,20 @@ A DML or DDL operation referenced a table for which no C<.sch> file was found.
 =item C<UNIQUE constraint violated on 'E<lt>idxnameE<gt>' ...>
 
 An INSERT or UPDATE would have created a duplicate value in a column covered
-by a UNIQUE index.
+by a UNIQUE index.  The index behind a C<PRIMARY KEY> is named
+C<< <column>_pk >> and the one behind a C<UNIQUE> column or table
+constraint is named C<< <column>_unique >>.
+
+=item C<called with E<lt>nE<gt> bind variables when E<lt>mE<gt> are needed>
+
+C<< $sth->execute >> was given a number of values that does not match the
+number of C<?> placeholders in the statement.
+
+=item C<ORDER BY position E<lt>nE<gt> is not in the select list>
+
+A numeric C<ORDER BY> key referred to a select-list position that does not
+exist.  Positions start at 1, and they cannot be used with C<SELECT *>
+across a JOIN.
 
 =item C<NOT NULL constraint violated on column 'E<lt>colE<gt>'>
 
@@ -6495,6 +7807,24 @@ The C<CREATE TABLE> parser could not interpret a column definition.
 =item C<Unsupported SQL: E<lt>sqlE<gt>>
 
 The SQL string does not match any known pattern.
+
+=item C<Invalid database name 'E<lt>nameE<gt>'>
+
+A database name was passed to C<new>, C<create_database>, C<use_database>
+or C<drop_database> that is not a plain identifier.  Names are restricted
+to word characters (C<[A-Za-z0-9_]>) because they are used directly as
+directory names; C<..>, C</> and C<\\> are therefore rejected.
+
+=item C<Invalid table name 'E<lt>nameE<gt>'>
+
+A table name that is not a plain identifier was passed to C<create_table>,
+C<drop_table>, or to any method that loads a schema.  See
+C<Invalid database name> above for the rule.
+
+=item C<Invalid index name 'E<lt>nameE<gt>'>
+
+An index name that is not a plain identifier was passed to C<create_index>
+or C<drop_index>.  See C<Invalid database name> above for the rule.
 
 =item C<Database 'E<lt>nameE<gt>' already exists>
 
@@ -6545,12 +7875,65 @@ the underlying error set by the failing operation.
 A fatal internal error was raised directly via C<die>.
 C<RaiseError> must be enabled (the default) for this message to propagate.
 
+=item C<AutoCommit cannot be turned off: DB::Handy has no transactions>
+
+C<connect> was called with C<AutoCommit =E<gt> 0>.  DB::Handy has no
+transactions, so the request cannot be honoured and the connection is
+refused rather than accepted with a promise it could not keep.
+
+=item C<Value too long for column 'E<lt>colE<gt>': declared E<lt>typeE<gt>(E<lt>nE<gt>), got E<lt>mE<gt> bytes>
+
+An C<INSERT> or C<UPDATE> supplied a value longer than the declared
+C<CHAR> or C<VARCHAR> size.  The value is rejected; it is never truncated.
+
+=item C<Integer out of range for column 'E<lt>colE<gt>': 'E<lt>valueE<gt>' ...>
+
+An C<INSERT> or C<UPDATE> supplied a value outside the range the declared
+integer type can hold.
+
+=item C<Invalid DATE for column 'E<lt>colE<gt>': 'E<lt>valueE<gt>' (expected YYYY-MM-DD)>
+
+A C<DATE> column was given a value that is not an ISO-8601 calendar date.
+
+=item C<CHECK constraint failed on column 'E<lt>colE<gt>'>
+
+An C<INSERT> or C<UPDATE> supplied a value the column's C<CHECK>
+expression rejected.
+
+=item C<FULL OUTER JOIN is not supported ...>
+
+=item C<NATURAL JOIN is not supported ...>
+
+=item C<JOIN ... USING is not supported ...>
+
+=item C<Unsupported JOIN condition 'ON E<lt>exprE<gt>' ...>
+
+=item C<Unqualified column in the ON clause of JOIN E<lt>tableE<gt> ...>
+
+=item C<Unsupported WHERE condition in a JOIN query: 'E<lt>partE<gt>' ...>
+
+=item C<Unsupported select item 'E<lt>itemE<gt>' in a JOIN query ...>
+
+=item C<Unknown ORDER BY column 'E<lt>colE<gt>' in a JOIN query>
+
+The query used a JOIN construct the engine cannot execute.  See
+L</JOIN> for what a JOIN accepts.  Each of these messages names the
+offending text and says what to write instead.  Before 1.09 these
+constructs were accepted and quietly answered a different question, so
+code that used to "work" may now report an error; see L</BUGS AND
+LIMITATIONS>.
+
+=item C<Each SELECT of a set operation must return the same number of columns (E<lt>nE<gt> and E<lt>mE<gt>)>
+
+The branches of a C<UNION>, C<INTERSECT> or C<EXCEPT> disagree on how
+many columns they return.
+
 =back
 
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests by e-mail to
-E<lt>ina@cpan.orgE<gt>.
+E<lt>ina.cpan@gmail.comE<gt>.
 
 When reporting a bug, please include:
 
@@ -6584,6 +7967,69 @@ Known limitations:
 
 =item *
 
+B<A JOIN accepts only a single-equality C<ON> clause.>  The condition has
+to be one C<=> between two table-qualified columns; either operand order
+is accepted.  A second condition, any other comparison operator, an
+unqualified name, C<USING> and C<NATURAL> are rejected with an error, as
+is C<FULL OUTER JOIN>.  Move extra restrictions into the C<WHERE> clause,
+and build a full outer join from a C<LEFT JOIN> and a C<RIGHT JOIN>
+combined with C<UNION>.
+
+=item *
+
+B<The C<WHERE> clause of a JOIN query does not accept C<OR>, C<NOT> or
+parentheses.>  It takes AND-separated comparisons between a column and a
+column or literal, plus C<IN>, C<NOT IN>, C<LIKE>, C<BETWEEN> and
+C<IS [NOT] NULL>.  Anything else is rejected with an error.  A
+single-table C<WHERE> has no such restriction.
+
+=item *
+
+B<The select list of a non-aggregate JOIN query does not accept
+expressions or C<AS> aliases.>  Column names, C<*> and C<table.*> only.
+An aggregate JOIN query (C<GROUP BY>, C<HAVING> or an aggregate function)
+does accept C<AS>.
+
+=item *
+
+B<Up to 1.08 these JOIN restrictions were silent.>  An C<ON> clause the
+parser could not read, C<USING>, C<NATURAL>, C<FULL OUTER JOIN> and an
+operand order of C<ON right.col = left.col> all produced a Cartesian
+product; an unsupported C<WHERE> condition was dropped and the rows came
+back unfiltered; C<SELECT DISTINCT> over a JOIN returned empty rows; and a
+multi-key C<ORDER BY> was ignored.  1.09 answers correctly where it can
+(reversed operand order, C<DISTINCT>, multi-key C<ORDER BY>,
+C<IS [NOT] NULL>, C<BETWEEN>) and reports an error where it cannot.  Code
+written against 1.08 that appeared to work may now raise an error -- the
+error is the bug report.
+
+=item *
+
+B<A single-table C<WHERE> clause is not syntax-checked.>  The JOIN parser
+rejects a condition it cannot read, but the single-table parser does not:
+a condition it fails to understand simply matches nothing.
+C<WHERE x = 1 GARBAGE>, C<WHERE x ==== 1>, C<WHERE x = 1 AND> and
+C<WHERE (x = 1> all return zero rows instead of reporting a syntax error,
+so a typo in a C<WHERE> clause looks like a query that legitimately found
+nothing.  C<DELETE> and C<UPDATE> are affected in the safe direction --
+an unreadable condition matches no rows, so nothing is changed or
+removed -- but a C<SELECT> gives a plausible empty answer to a question
+it never asked.  Until this is fixed, treat an unexpected empty result
+set as a possible typo and check the C<WHERE> clause before concluding
+that the table holds no matching rows.
+
+=item *
+
+B<Set-operation branches are matched by position.>  C<UNION>,
+C<UNION ALL>, C<INTERSECT> and C<EXCEPT> line the branches up by column
+position and take the result column names from the first branch, as SQL
+requires.  Up to 1.08 they were matched by column name, so
+C<SELECT a FROM t1 UNION SELECT b FROM t2> returned C<NULL> for every row
+contributed by the second branch.  A mismatch in the number of columns is
+now an error.
+
+=item *
+
 B<No transaction support.>  C<begin_work>, C<commit>, and C<rollback>
 are implemented and return C<undef> with C<errstr> set rather than
 crashing.  C<AutoCommit> always returns C<1>.  Every write is
@@ -6596,6 +8042,90 @@ save disk space; the full 255 bytes are always reserved per record.
 However, the declared size I<is> enforced on INSERT and UPDATE: a value
 longer than C<n> causes an error.  C<VARCHAR> without a size and
 C<VARCHAR(255)> accept any value up to 255 bytes.
+
+=item *
+
+B<C<NULL> is represented as the empty string.>  There is no separate NULL
+marker on disk.  For C<CHAR>, C<VARCHAR> and C<DATE> columns a NULL value
+and an empty string are the same value, and C<IS NULL> is true for both.
+For C<INT> and C<FLOAT> columns a NULL value is stored as C<0> and reads
+back as C<0>, so C<NULL> and C<0> cannot be told apart and C<IS NULL> is
+never true for a numeric column.  Use a companion C<CHAR(1)> flag column
+if a numeric column has to distinguish "unknown" from zero.
+
+=item *
+
+B<Aggregates over an empty set return C<0>, not C<NULL>.>  C<SUM>, C<AVG>,
+C<MIN> and C<MAX> return C<0> when no row qualifies; SQL-92 requires
+C<NULL> for these four and C<0> only for C<COUNT>.  C<COUNT(col)> and
+C<COUNT(DISTINCT col)> do skip NULL values, as SQL-92 requires.
+
+=item *
+
+B<C<LIKE> is case-insensitive.>  SQL-92 compares C<LIKE> patterns using
+the column collation, which is normally case-sensitive.  DB::Handy always
+matches without regard to case, so C<LIKE 'abc'> and C<LIKE 'ABC'> select
+the same rows.  Wrap the column in C<UPPER()> or C<LOWER()> on both sides
+if a deterministic comparison is needed.
+
+=item *
+
+B<A column name that does not exist yields C<NULL> instead of an error.>
+C<SELECT nosuchcol FROM t> returns one C<NULL> per row rather than
+failing, so a typo in a column name is silent.
+
+=item *
+
+B<C<FLOAT> data files are not portable between machines.>  C<INT> columns
+and every index file are written in a fixed byte order, but C<FLOAT>
+values in the C<.dat> file use the machine's native 8-byte double.  A
+C<.dat> file holding C<FLOAT> columns is therefore readable only on
+machines with the same floating-point representation and byte order.
+Copying such a file between a little-endian and a big-endian machine will
+misread those columns.  This is kept as-is so that data files written by
+earlier releases stay readable; C<INT>, C<CHAR>, C<VARCHAR> and C<DATE>
+columns are unaffected.
+
+=item *
+
+B<An unterminated C</*> comments out the rest of the statement.>
+C<--> to end of line and C</* ... */> are stripped before parsing
+(a marker inside a string literal is left alone), but a C</*> with no
+closing C<*/> silently swallows everything after it instead of raising
+a syntax error.
+
+=item *
+
+B<Declared column sizes are counted in bytes, not characters.>  DB::Handy
+stores byte strings and never decodes them, so a C<VARCHAR(10)> column
+holds ten bytes.  Three Japanese characters encoded in UTF-8 occupy nine
+bytes and fit; six characters occupy eighteen bytes and are rejected.
+The same applies to C<CHAR> and to the C<keysize> of an index.  Decode to
+characters in your own code if you need character-based limits.
+
+=item *
+
+B<A trailing NUL byte in a value is not preserved.>  C<CHAR>, C<VARCHAR>
+and C<DATE> values are padded with NUL bytes on disk, and the padding is
+stripped when the record is read back, so a value that legitimately ends
+in C<"\0"> loses those bytes.  Interior NUL bytes are preserved.
+
+=item *
+
+B<A table created before 1.09 has no PRIMARY KEY index.>  C<PRIMARY KEY>
+and C<UNIQUE> are enforced through an index that C<CREATE TABLE> builds,
+so a C<.sch> file written by DB::Handy 1.08 or earlier still accepts
+duplicate keys.  The data files are otherwise unchanged and are read and
+written normally; add C<CREATE UNIQUE INDEX> to an older table if the
+constraint is wanted there too.
+
+=item *
+
+B<C<ORDER BY> by position does not work with C<SELECT *> across a JOIN.>
+The combined column list of the joined tables is not known at the point
+the sort key is parsed, so the position is reported as an error.  Name
+the column instead.  Positions do work with C<SELECT *> on a single
+table, and with an explicit select list anywhere.
 
 =item *
 
@@ -6629,6 +8159,20 @@ cost-based optimiser.
 
 =item *
 
+B<The return value of C<flock> is not checked.>  Every read takes a
+shared lock and every write an exclusive lock on the C<.dat> file and on
+each index file, and a write is flushed before the lock is released, so
+concurrent access is serialised wherever C<flock> works.  Where it does
+not -- NFS with no lock daemon, some network shares, a platform that
+implements C<flock> as a no-op -- the call fails silently and the access
+proceeds unlocked, so two processes writing the same table at the same
+time can interleave.  The failure is ignored on purpose, because raising
+an error would make the module unusable on those file systems for the
+single-process use it is designed for; assume a single writer if the
+data directory is not on a local file system.
+
+=item *
+
 Cannot be used as a drop-in replacement via C<DBI-E<gt>connect>.
 
 =back
@@ -6648,7 +8192,7 @@ L<Jacode>, L<Jacode4e>, L<Jacode4e::RoundTrip>, L<mb::JSON>
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 This project was originated by INABA Hitoshi.
 

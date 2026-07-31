@@ -1,0 +1,49 @@
+SION
+
+This module implements an encoder/decoder for SION, a data
+serialization format a little more expressive than JSON, with an
+interface modeled after JSON::PP.
+
+    use SION;
+    my $data = decode_sion($sion_text);
+    my $sion = encode_sion($data);
+
+See https://dankogai.github.io/SION/ for the format itself.
+
+Requires perl 5.22 or later (for hexadecimal floating point support).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SION
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=SION
+
+    Search CPAN
+        https://metacpan.org/release/SION
+
+    GitHub
+        https://github.com/dankogai/p5-sion
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Dan Kogai <dankogai@cpan.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

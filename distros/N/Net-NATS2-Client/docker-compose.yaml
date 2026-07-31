@@ -1,0 +1,14 @@
+services:
+  nats:
+    image: nats:2.11-alpine
+    command: -js
+
+  test:
+    image: perl:5.44-trixie
+    working_dir: /app
+    volumes:
+      - .:/app
+    depends_on:
+      - nats
+    command: >
+      sh -ec 'cpanm --notest --installdeps . && perl Makefile.PL && make test'

@@ -26,7 +26,7 @@ use warnings;
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='0.003';
+$VERSION='0.004';
 $VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ };
 chomp($VERSION_GIT_SHA) if defined $VERSION_GIT_SHA;
 

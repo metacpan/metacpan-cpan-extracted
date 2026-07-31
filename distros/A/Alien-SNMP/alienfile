@@ -1,9 +1,157 @@
 use alienfile;
+use File::Copy ();
+use Path::Tiny ();
 
 # Net-SNMP is built deliberately minimal and from a pinned source tarball; we never
 # probe for / use a system copy. This forces a share (source) build, equivalent to
 # the legacy alien_check_installed_version returning nothing.
 probe sub { 'share' };
+
+# Inject `use Alien::SNMP;` into the bundled Perl module before it is built, so the
+# installed SNMP.pm pulls in this Alien at use-time to locate the dynamic libnetsnmp.
+# (Was inc/My/AlienPatch.pm.)  cwd is the extracted source root.
+my $inject_alien_snmp_use = sub {
+  my $file = 'perl/SNMP/SNMP.pm';
+  open my $in, '<', $file or die "can't read $file: $!";
+  my @lines = <$in>;
+  close $in;
+  for my $line (@lines) {
+    if ($line =~ /use warnings;/) {
+      $line .= "\nuse Alien::SNMP;\n";
+      last;
+    }
+  }
+  open my $out, '>', $file or die "can't write $file: $!";
+  print {$out} @lines;
+  close $out;
+};
+
+# net-snmp 5.9.5.2 lists snmpIPBaseDomain.h among the transport headers to install,
+# but ships it under snmplib/transports/ instead of the include/ tree the install
+# rule reads from (configure special-cases the IPBase transport's source path and
+# then adds the bare header name to the list anyway).  GNU make swallows the
+# resulting `install` failure -- the rule is a shell for-loop whose last command is
+# `echo` -- so on Linux the header is silently never installed.  BSD and Solaris
+# make run recipes under `sh -e`, where the same failure aborts the whole build.
+# Put the header where the install rule expects it.
+my $stage_ipbase_header = sub {
+  my $src = Path::Tiny->new('snmplib/transports/snmpIPBaseDomain.h');
+  my $dst = Path::Tiny->new('include/net-snmp/library/snmpIPBaseDomain.h');
+  return if $dst->is_file;      # upstream fixed it
+  return unless $src->is_file;  # or moved it; nothing to stage
+  File::Copy::copy("$src", "$dst") or die "can't stage $src as $dst: $!";
+};
+
+# net-snmp finds its perl with AC_PATH_PROG, i.e. the first `perl` on PATH, which on
+# a CPAN smoker is routinely not the perl being tested.  We pin it with PERLPROG (see
+# the build block), and verify the pin took: a silent mismatch builds the XS modules
+# for someone else's perl, and is invisible on a developer box where the active perl
+# happens to be first on PATH.
+my $assert_build_perl = sub {
+  my ($build) = @_;
+  my $wanted = $build->meta->interpolator->interpolate('%{perl}', $build);
+  my ($got) = Path::Tiny->new('Makefile')->slurp =~ /^PERL\s*=\s*(\S+)/m;
+  return if defined $got && $got eq $wanted;
+  die "net-snmp configured itself to build the bundled Perl modules with "
+    . (defined $got ? $got : 'an undetermined perl')
+    . ", not $wanted.  They would be compiled against, and installed for, the "
+    . "wrong perl.  The PERLPROG assignment on the configure command line is no "
+    . "longer being honored by this version of net-snmp.\n";
+};
+
+# net-snmp picks its system header from the host triple, so FreeBSD 15 gets
+# net-snmp/system/freebsd15.h.  That header is in the source tree, so net-snmp
+# itself compiles, but Makefile.in's INCLUDESUBDIRHEADERS list stops at
+# freebsd14.h, so it is never installed.  The installed net-snmp-config.h still
+# says
+#   #define NETSNMP_SYSTEM_INCLUDE_FILE "net-snmp/system/freebsd15.h"
+# and every downstream compile against our cflags then fails with "file not
+# found", t/02_compile.t included.  Add whatever the list is missing rather than
+# naming the two headers, so the next FreeBSD needs no change here and the step
+# becomes a no-op once upstream catches up.
+my $install_every_system_header = sub {
+  my ($build) = @_;
+  my $makefile = Path::Tiny->new('Makefile.in');
+  my $text     = $makefile->slurp;
+
+  my ($listed) = $text =~ /^INCLUDESUBDIRHEADERS=((?:[^\n\\]*\\\n)*[^\n]*)/m
+    or die "no INCLUDESUBDIRHEADERS assignment in Makefile.in: net-snmp no "
+         . "longer lists the system headers to install there, so this patch "
+         . "cannot tell which of them are missing.\n";
+
+  $listed =~ s/\\\n/ /g;
+  my %is_listed = map { $_ => 1 } grep { /\.h\z/ } split ' ', $listed;
+
+  my @unlisted = sort grep { !$is_listed{$_} }
+                 map  { $_->basename }
+                 Path::Tiny->new('include', 'net-snmp', 'system')->children(qr/\.h\z/);
+  return unless @unlisted;
+
+  $text =~ s/^INCLUDESUBDIRHEADERS=/INCLUDESUBDIRHEADERS= @unlisted /m;
+  $makefile->spew($text);
+  $build->log("added to the header install list: @unlisted");
+};
+
+my $copy_tree = sub {
+  my ($src_dir, $dst_dir, $skip) = @_;
+  $src_dir->visit(sub {
+    my ($src) = @_;
+    return if $src->is_dir || $src->basename eq '.exists';
+    my $rel = $src->relative($src_dir);
+    return if "$rel" =~ $skip;
+    my $dst = $dst_dir->child($rel);
+    $dst->parent->mkpath;
+    $dst->remove;   # blib .pm files are mode 0444: a rebuild could not reopen them
+    File::Copy::copy("$src", "$dst") or die "can't copy $src to $dst: $!";
+    chmod((stat "$src")[2] & 0777, "$dst");
+  }, { recurse => 1 });
+};
+
+# Bundle/MakefileSubs.pm is net-snmp's own Makefile.PL helper (it declares `package
+# MakefileSubs;` despite its path); only the source tree's Makefile.PLs use it.
+my $not_shippable = qr{(?:^|/)Bundle/};
+
+my $has_shippable_files = sub {
+  my ($dir) = @_;
+  return 0 unless $dir->is_dir;
+  my $found = 0;
+  $dir->visit(sub {
+    my ($path) = @_;
+    return if $path->is_dir || $path->basename eq '.exists';
+    return if $path->relative($dir) =~ $not_shippable;
+    $found = 1;
+    return \0;   # Path::Tiny halts iteration on a ref to a false value
+  }, { recurse => 1 });
+  return $found;
+};
+
+# The bundled Perl modules have to end up in the normal perl lib dirs -- that is how
+# downstream `use SNMP;` works -- but a build command must never write outside
+# $DESTDIR: doing so fails wherever the real target is not writable at build time
+# (CPAN smokers on system perl, root-owned site perl, packaging roots).  So hand them
+# to *this* distribution's blib and let ExtUtils::Install place them at `make
+# install`, which honors DESTDIR, INSTALL_BASE, PREFIX and local::lib, and which owns
+# the .packlist / perllocal.pod bookkeeping.  net-snmp's own `make install` already
+# staged a copy under $DESTDIR; that copy is discarded with the staging dir.
+my $install_perl_modules_into_blib = sub {
+  my ($build) = @_;
+  # install_prop->{root} is documented as absolute, and is <dist>/_alien under
+  # Alien::Build::MM.
+  my $blib = Path::Tiny->new($build->install_prop->{root})->parent->child('blib');
+
+  foreach my $section (qw( lib arch man3 )) {
+    my $src = Path::Tiny->new('perl', 'blib', $section);
+    if ($section ne 'man3' && !$has_shippable_files->($src)) {
+      die "net-snmp built no perl/blib/$section, so the bundled SNMP and NetSNMP "
+        . "modules would be missing from this distribution.  Check that "
+        . "perl module support is still in the configure flags and that net-snmp "
+        . "still builds its perl modules with ExtUtils::MakeMaker.\n";
+    }
+    next unless $src->is_dir;
+    $copy_tree->($src, $blib->child($section), $not_shippable);
+    $build->log("staged perl/blib/$section into $blib/$section");
+  }
+};
 
 share {
   # Canonical raw URL serves the tarball directly (no GitHub blob-page redirects).
@@ -24,23 +172,11 @@ share {
 
   plugin 'Extract' => 'tar.gz';
 
-  # Inject `use Alien::SNMP;` into the bundled Perl module before it is built, so the
-  # installed SNMP.pm pulls in this Alien at use-time to locate the dynamic libnetsnmp.
-  # (Was inc/My/AlienPatch.pm.)  cwd here is the extracted source root.
   patch sub {
-    my $file = 'perl/SNMP/SNMP.pm';
-    open my $in, '<', $file or die "can't read $file: $!";
-    my @lines = <$in>;
-    close $in;
-    for my $line (@lines) {
-      if ($line =~ /use warnings;/) {
-        $line .= "\nuse Alien::SNMP;\n";
-        last;
-      }
-    }
-    open my $out, '>', $file or die "can't write $file: $!";
-    print {$out} @lines;
-    close $out;
+    my ($build) = @_;
+    $inject_alien_snmp_use->();
+    $stage_ipbase_header->();
+    $install_every_system_header->($build);
   };
 
   # Provides %{configure} (adds --prefix and --with-pic) and %{make}.  We keep the
@@ -54,11 +190,15 @@ share {
     # Same configure flags as the legacy $conf_cmd, minus --with-pic and --prefix
     # which the Autoconf plugin supplies via %{configure}.  --with-perl-modules builds
     # the bundled SNMP XS module against the just-built libnetsnmp.
+    # PERLPROG pins the perl net-snmp builds those modules with: it otherwise takes
+    # the first perl on PATH, which on a CPAN smoker is not the perl under test.
     '%{configure}'
+      . ' PERLPROG=%{perl}'
       . ' --disable-agent --disable-scripts --disable-mibs'
       . ' --enable-ipv6 --with-mibs=""'
       . ' --with-perl-modules --disable-embedded-perl'
       . ' --disable-manuals --enable-blumenthal-aes --with-defaults',
+    $assert_build_perl,
     '%{make}',
     # Net-SNMP ignores the DESTDIR *environment* variable Alien::Build sets, so pass it
     # explicitly (its Makefile honors $(DESTDIR)).  This stages everything -- the C
@@ -66,50 +206,7 @@ share {
     # install paths baked in (SNMP.so's rpath points at the installed share).  Gather
     # then relocates $DESTDIR/<prefix> (the C library) into the share dir.
     '%{make} install DESTDIR=$DESTDIR',
-    # The Perl modules need to live in the real perl site_lib (that is how downstream
-    # `use SNMP;` works), but the line above staged them under $DESTDIR.  Copy the staged
-    # files into the real filesystem, skipping the Alien share itself (Gather installs
-    # that via blib, so copying it here would double-install / pollute).  We use a small
-    # File::Find copier rather than `tar -C / -x` because tar aborts trying to chmod
-    # pre-existing top-level dirs (/, /home, ...) it does not own; this creates parent
-    # dirs with make_path and never touches existing directory metadata.
-    q{%{perl} -MFile::Find -MFile::Path -MFile::Copy -e '
-        my $destdir = $ENV{DESTDIR};
-        my $share   = q[%{.install.prefix}];   # the Alien share prefix, installed separately via blib
-
-        File::Find::find({
-            no_chdir => 1,
-            wanted   => sub {
-                my $src = $File::Find::name;
-                return if $src eq $destdir;             # skip the staging root itself
-
-                # Strip $DESTDIR to recover the real (absolute) install path.
-                (my $dst = $src) =~ s/^\Q$destdir\E//;
-
-                # Do not copy the Alien share tree; Gather installs that via blib,
-                # so copying it here would double-install / pollute the share.
-                if ($dst =~ m{^\Q$share\E(?:/|$)}) {
-                    $File::Find::prune = 1;
-                    return;
-                }
-
-                return if -d $src;                     # make_path recreates dirs as needed
-
-                # Ensure the destination parent dir exists, then replace any old file.
-                (my $parent = $dst) =~ s{/[^/]+$}{};
-                File::Path::make_path($parent);
-                unlink $dst;
-
-                if (-l $src) {                         # preserve symlinks as symlinks
-                    symlink readlink($src), $dst;
-                }
-                else {
-                    File::Copy::copy($src, $dst) or die qq[copy $src: $!];
-                    chmod((stat $src)[2] & 0777, $dst);   # preserve permission bits
-                }
-            },
-        }, $destdir);
-    '},
+    $install_perl_modules_into_blib,
   ];
 
   gather sub {

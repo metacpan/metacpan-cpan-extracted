@@ -46,19 +46,26 @@ my %bench;
 $bench{'Ragel(fun)'} = sub { my @r; @r = Router::Ragel::match($ragel, $_) for @paths };
 $bench{'Ragel(method)'} = sub { my @r; @r = $ragel->match($_) for @paths };
 
+# Rewrite our ':name' placeholders into another router's syntax (avoiding
+# s///r, which needs 5.14).
+sub rewrite {
+    my ($from, $to) = @_; # $to is a coderef; $1 is visible inside it
+    map { (my $p = $_) =~ s/$from/$to->()/ge; $p } @routes;
+}
+
 if ($have{XS}) {
-    Router::XS::add_route($_ =~ s/:\w+/*/gr, +{}) for @routes;
+    Router::XS::add_route($_, +{}) for rewrite(qr/:\w+/, sub { '*' });
     $bench{'XS(fun)'} = sub { my @r; @r = Router::XS::check_route($_) for @paths };
 }
 
 if ($have{R3}) {
-    my $r3 = Router::R3->new(map +(s/:(\w+)/{$1}/gr, +{}), @routes);
+    my $r3 = Router::R3->new(map +($_, +{}), rewrite(qr/:(\w+)/, sub { "{$1}" }));
     $bench{'R3(method)'} = sub { my @r; @r = $r3->match($_) for @paths };
     $bench{'R3(fun)'} = sub { my @r; @r = Router::R3::match($r3, $_) for @paths };
 }
 
 if ($have{UR}) {
-    my $ur = URI::Router->new(map +(s/:(\w+)/*/gr, +{}), @routes);
+    my $ur = URI::Router->new(map +($_, +{}), rewrite(qr/:(\w+)/, sub { '*' }));
     $bench{'UR(method)'} = sub { my @r; @r = $ur->route($_) for @paths };
     $bench{'UR(fun)'} = sub { my @r; @r = URI::Router::route($ur, $_) for @paths };
 }

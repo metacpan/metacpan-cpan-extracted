@@ -19,10 +19,10 @@
 # CI config (not shipped in the CPAN dist)
 ^\.github/
 
-# Tooling / IDE
-^\.claude/
-^\.vscode/
-^\.idea/
+# Tooling / IDE: skip every dot-directory rather than chasing them one by one
+# (.claude, .vscode, .idea, .pcg, ...). Dot-FILES are still listed explicitly
+# above so a new one cannot slip into the dist unnoticed.
+^\.[^/]+/
 
 # Author-only test directory (not shipped in the dist)
 ^xt/

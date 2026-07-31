@@ -1,0 +1,7 @@
+\.tar\.gz$
+\.hist$
+^MYMETA\.
+^Makefile$
+^blib/
+^pm_to_blib$
+^MANIFEST\.bak$

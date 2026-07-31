@@ -1,4 +1,4 @@
-=head1 NAME 
+=head1 NAME
 
 App::Codit::ConfigVariables - Overview of available config variables
 
@@ -14,7 +14,7 @@ You can get and set variables as follows:
  my $value = $app->configGet('-variable_name')
  $app->configPut('-variable_name', $value)
 
-Generated: Sat Mar 29 08:32:49 2025
+Generated: Wed Jul 29 21:19:34 2026
 
 =head1 CONFIG VARIABLES
 
@@ -56,7 +56,7 @@ tab with a L<Tk::ROText> widget.
 
 =item B<licenselink>
 
-Works only if the I<license> key is defined. Specify the weblink to your license. By default it 
+Works only if the I<license> key is defined. Specify the weblink to your license. By default it
 is set to L<https://dev.perl.org/licenses/>.
 Set it to I<undef> if you do not want it to show.
 
@@ -116,9 +116,73 @@ Others: $ENV{HOME}/.local/share/appname
 
 You can overwrite it at launch by setting a folder yourself.
 
+=item B<-contentacpopsize> in L<App::Codit>
+
+Specifies how many characters you type before an auto complete suggestion list pops up.
+
+=item B<-contentacscansize> in L<App::Codit>
+
+Specifies the minimum word length for an addition to the database.
+
+=item B<-contentactivedelay> in L<App::Codit>
+
+Specifies the delay in ms between the moment the user stops typing and the moment an
+auto complete suggestion list pops up.
+
+=item B<-contentautobrackets> in L<App::Codit>
+
+Boolean. If set, Every time you type a (, {, {, ' or " it's counterpart will be placed
+right after it and the insert cursor in between.
+
+=item B<-contentautocomplete> in L<App::Codit>
+
+Boolean. If set, auto complete is on.
+
+=item B<-contentautoindent> in L<App::Codit>
+
+Boolean. If set, auto indent is on.
+
+=item B<-contentbackground> in L<App::Codit>
+
+Background color of the Tk::CodeText widget.
+
+=item B<-contentbgdspace> in L<App::Codit>
+
+Background color of leading and trailing spaces when showspaces is on.
+
+=item B<-contentbgdtab> in L<App::Codit>
+
+Background color of leading and trailing tabs when showspaces is on.
+
+=item B<-contentbookmarkcolor> in L<App::Codit>
+
+Background color of line number indicator of bookmarked lines.
+
+=item B<-contentfindbg> in L<App::Codit>
+
+Background color search hits.
+
+=item B<-contentfontfamily> in L<App::Codit>
+
+Font family to be used for editing.
+
+=item B<-contentfontsize> in L<App::Codit>
+
+Font size to be used for editing.
+
+=item B<-contentforeground> in L<App::Codit>
+
+Background color of the Tk::CodeText widget.
+
+=item B<-contentindent> in L<App::Codit>
+
+Set the preferred indent style. You can set it to 'tab'
+if you use tabs for indenting. Or you set it to the number
+of spaces you want to use for indenting.
+
 =item B<-contentmanagerclass> in L<Tk::AppWindow::Ext::MDI>
 
-This one should always be specified and you should always define a 
+This one should always be specified and you should always define a
 content manager class inheriting L<Tk::AppWindow::BaseClasses::ContentManager>.
 This base class is a valid Tk widget.
 
@@ -127,9 +191,34 @@ This base class is a valid Tk widget.
 The possible options to pass on to the contentmanager.
 These will also become options to the main application.
 
+=item B<-contentmatchbg> in L<App::Codit>
+
+Background color used when matching {}, (), and [].
+
+=item B<-contentmatchfg> in L<App::Codit>
+
+Foreground color used when matching {}, (), and [].
+
+=item B<-contentshowspaces> in L<App::Codit>
+
+Boolean. If set, Leading and trailing spaces and tabs are shown
+with a special background..
+
+=item B<-contentsyntax> in L<App::Codit>
+
+Default syntax setting for a new text document.
+
+=item B<-contenttabs> in L<App::Codit>
+
+Specify your tab size. See also L<Tk::Text>.
+
+=item B<-contentwrap> in L<App::Codit>
+
+Specify your wrap style. See also L<Tk::Text>.
+
 =item B<-cycleinterval> in L<Tk::AppWindow::Ext::Daemons>
 
-Default value 10 miliseconds. This is the base interval for the Deamons system. 
+Default value 10 miliseconds. This is the base interval for the Deamons system.
 
 How often a job is executed is defined by their own interval parameter. The real interval time of a job is the base interval
 multiplied by the job interval.
@@ -137,7 +226,7 @@ multiplied by the job interval.
 =item B<-diskmonitorinterval> in L<Tk::AppWindow::Ext::MDI>
 
 Default value 100. This means every 100 cycles of the B<Daemons> extension. Specifies the interval for
-monitoring the disk status of documents. 
+monitoring the disk status of documents.
 
 =item B<-doc_autobrackets> I<hookable> in L<App::Codit::Ext::CoditMDI>
 
@@ -185,8 +274,8 @@ Default value '#FF0000' (red).
 Specifies the list of extensions to be loaded.
 
  my $app = Tk::AppWindow->new(
-    -extensions => [ 
-       qw/Art ConfigFolder Daemons 
+    -extensions => [
+       qw/Art ConfigFolder Daemons
        Help Keyboard MDI MenuBar
        Panels Plugins SDI Selector
        Settings SideBars StatusBar
@@ -206,6 +295,10 @@ Default value is "All files|*"
 Point to your help file. Can be a weblink.
 If it is a I<.pod> file it will launch a dialog box with
 a I<PodText> widget.
+
+=item B<-highlight_themefile> in L<App::Codit>
+
+Specify the theme file used for syntax highlighting.
 
 =item B<-historymenupath> in L<Tk::AppWindow::Ext::MDI>
 
@@ -281,13 +374,13 @@ Default value 16
 =item B<-modifiedmonitorinterval> in L<Tk::AppWindow::Ext::MDI>
 
 Default value 25. This means every 25 cycles of the B<Daemons> extension. Specifies the interval for
-monitoring the modified status of documents. 
+monitoring the modified status of documents.
 
 =item B<-namespace> in L<Tk::AppWindow>
 
 Specifies an additional name space for extensions and plugins.
 If you set it, for example, to 'Foo::Bar', then your extensions
-may also live in 'Foo::Bar::Ext' and your plugins may live 
+may also live in 'Foo::Bar::Ext' and your plugins may live
 in 'Foo::Bar::Plugins'.
 
 Only available at create time.
@@ -304,7 +397,7 @@ values are 'pack' and 'grid'. Default value 'pack'.
 
 =item B<-panellayout> I<hookable> in L<Tk::AppWindow::Ext::Panels>
 
-Specify the structure of your layout. 
+Specify the structure of your layout.
 
 The keys used below are all home to the geometry manager used. Plus a
 few more. These are:
@@ -391,6 +484,21 @@ if the extension B<ConfigFolder> is loaded.
 
 Name of the settings file. Default is I<settingsrc>.
 
+=item B<-showfolds> in L<App::Codit>
+
+Boolean. If you clear it the fold indicators in the L<Tk::CodeText> widget
+will be hidden.
+
+=item B<-shownumbers> in L<App::Codit>
+
+Boolean. If you clear it the line number indicators in the L<Tk::CodeText> widget
+will be hidden.
+
+=item B<-showstatus> in L<App::Codit>
+
+Boolean. If you clear it the status bar in the L<Tk::CodeText> widget
+will be hidden.
+
 =item B<-sidebariconsize> I<hookable> in L<Tk::AppWindow::Ext::SideBars>
 
 Default value 32.
@@ -443,16 +551,16 @@ Configure your tool bar here. Example:
 
  [    #type             #label    #command       #icon               #help
     [	'tool_button',   'New',     'doc_new',     'document-new',     'Create a new document' ],
- 
+
     [	'tool_list',     'popcommand' ],
     [	'tool_button',   'Save',    'doc_save',    'document-save',    'Save current document' ],
     [	'tool_button',   'Save as', 'doc_save_as', 'document-save-as', 'Rename and save current document' ],
     [	'tool_separator' ],
     [	'tool_button',   'Save all','doc_save_all','document-save-as', 'Save all modified documents' ],
     [	'tool_list_end' ],
- 
+
     [	'tool_separator' ],
- 
+
       #type             #label,   #class
     [	'tool_widget',    'Widget', 'MyWidget', @options ],
     [	'tool_widget',    '*Nolabel,'MyWidget', @options ],

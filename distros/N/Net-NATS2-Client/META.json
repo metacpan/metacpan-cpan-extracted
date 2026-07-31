@@ -1,0 +1,63 @@
+{
+   "abstract" : "A Perl client for the NATS messaging system",
+   "author" : [
+      "Kostiantyn Cherednichenko <dshadowukraine@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-NATS2-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ],
+      "package" : [
+         "Net::NATS2::URI"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::INET" : "0",
+            "JSON" : "0",
+            "URI" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dshadow/perl-nats2/issues"
+      },
+      "homepage" : "https://github.com/dshadow/perl-nats2",
+      "license" : [
+         "https://opensource.org/license/mit"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/dshadow/perl-nats2"
+      }
+   },
+   "version" : "v0.3.3",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

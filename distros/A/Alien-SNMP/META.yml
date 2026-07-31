@@ -39,7 +39,7 @@ requires:
 resources:
   bugtracker: https://github.com/ollyg/Alien-SNMP/issues
   repository: https://github.com/ollyg/Alien-SNMP.git
-version: '4.0509050200'
+version: '4.0509050201'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

@@ -1,3 +1,29 @@
+4.0509050201 - 2026-07-28
+
+  * Fixes the CPAN Testers install failures reported against 4.0509050200:
+    the bundled SNMP / NetSNMP::* modules now honor INSTALL_BASE, PREFIX,
+    DESTDIR and local::lib, instead of failing with "Permission denied"
+    wherever the install target was not writable at build time
+  * Built for the perl that ran Makefile.PL, not the first perl on PATH
+  * Installs a net-snmp header that was silently dropped on Linux and aborted
+    the build outright on FreeBSD and Solaris
+  * Fixes installation on macOS, where the bundled SNMP and NetSNMP::*
+    modules could not load libnetsnmp during make test
+  * Fixes installation on Alpine and other musl systems, which failed the
+    same way
+  * Installs two more net-snmp headers that upstream ships but forgets to
+    install, without which nothing can compile against this Alien on
+    FreeBSD 15 or 16
+  * New documentation for the bundled Perl modules, MIB handling and the index
+    files net-snmp 5.9 removed, the command line utilities, and the effects of
+    installing into a system perl that already has SNMP.pm
+  * 4.0509050200 installed net-snmp's Bundle/MakefileSubs.pm and an
+    auto/Bundle/NetSNMP/.packlist beside it. This release installs neither,
+    but upgrading does not remove the old copies; they are safe to delete
+  * Known issue: On FreeBSD 9 the link of libnetsnmp fails with "undefined
+    reference to 'ceil'"; the suspected fix (LIBS=-lm) is untested and not
+    applied
+
 4.0509050200 - 2026-07-18
 
   * Migrate from legacy Alien::Base::ModuleBuild to the modern alienfile /

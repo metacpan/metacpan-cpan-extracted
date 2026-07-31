@@ -1,0 +1,34 @@
+---
+abstract: 'a serialization format a little more expressive than JSON'
+author:
+  - 'Dan Kogai <dankogai@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SION
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: '0'
+  Carp: '0'
+  Encode: '0'
+  Exporter: '0'
+  JSON::PP: '2.27300'
+  MIME::Base64: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  perl: '5.022'
+resources:
+  repository: https://github.com/dankogai/p5-sion.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

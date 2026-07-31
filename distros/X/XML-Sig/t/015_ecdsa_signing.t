@@ -9,7 +9,7 @@ my $sig = XML::Sig->new(
     { x509 => 1, key => 't/ecdsa.private.pem', cert => 't/ecdsa.public.pem' });
 isa_ok( $sig, 'XML::Sig' );
 
-my $signed = $sig->sign('<foo ID="123"></foo>');
+my $signed = $sig->sign('<foo ID="_123"></foo>');
 ok($signed, "XML Signed Sucessfully using ecdsa key");
 
 $sig = XML::Sig->new();
@@ -26,7 +26,7 @@ SKIP: {
 $sig = XML::Sig->new( { key => 't/ecdsa.private.pem' } );
 isa_ok( $sig, 'XML::Sig' );
 
-$signed = $sig->sign('<foo ID="123"></foo>');
+$signed = $sig->sign('<foo ID="_123"></foo>');
 ok($signed, "XML Signed Sucessfully using ecdsa key");
 
 $sig = XML::Sig->new( );

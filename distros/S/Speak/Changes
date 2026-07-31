@@ -1,5 +1,9 @@
 Changes file for Speak
 
+1.03    2026-07-30
+        - Adjusted the text-splitting algorithm in Speak::_split_text to respect
+          word boundaries by splitting on whitespace instead of mid-word.
+
 1.02    2026-07-27
         - Fixed speak() signature to make $log and $lang parameters optional
           (Perl feature 'signatures' enforces strict arity; previously calling

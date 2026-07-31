@@ -1,7 +1,7 @@
 #!perl
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 11;
 use FindBin;
 use File::Temp qw(tempfile tempdir);
 use File::Spec;
@@ -26,6 +26,11 @@ use_ok ('Speak');
   diag ("Sentences count: " . scalar (@sentences));
   if (@sentences) {diag ("First char: " . substr ($sentences[0], 0, 10))}
   ok (scalar (@sentences) >= 2, "Splits long text without punctuation");
+
+  my $long_with_spaces = "Now that you have breached the portal to the administration console, DeFaria, we must complete the pairing";
+  @sentences = Speak::_split_text ($long_with_spaces);
+  is ($sentences[0], "Now that you have breached the portal to the administration console, DeFaria, we must complete the", "Splits at word boundary space");
+  is ($sentences[1], "pairing", "Second chunk contains the word 'pairing'");
 }
 
 # 2. Test _get_config environment variable expansion

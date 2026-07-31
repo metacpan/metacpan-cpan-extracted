@@ -7,6 +7,8 @@ use Test::More;
 use Test::Exception;
 use File::Temp qw(tempfile);
 use Convert::Pheno;
+use Convert::Pheno::ConversionRequest;
+use Convert::Pheno::ExecutionContext;
 use Convert::Pheno::Runner qw(resolve_operation run_operation);
 
 my $orig_warn_handler = $SIG{__WARN__};
@@ -19,7 +21,9 @@ local $SIG{__WARN__} = sub {
     no warnings 'redefine';
 
     local *Convert::Pheno::redcap2bff = sub { return [ { id => 'r1' } ] };
-    local *Convert::Pheno::cdisc2bff  = sub { return [ { id => 'c1' } ] };
+    local *Convert::Pheno::cdiscodm2bff = sub { return [ { id => 'c1' } ] };
+    local *Convert::Pheno::datasetjson2bff = sub { return [ { id => 'd1' } ] };
+    local *Convert::Pheno::fhir2bff     = sub { return [ { id => 'f1' } ] };
     local *Convert::Pheno::csv2bff    = sub { return [ { id => 'csv1' } ] };
     local *Convert::Pheno::pxf2bff    = sub { return [ { id => 'p1' } ] };
     local *Convert::Pheno::omop2bff   = sub { return [ { id => 'o1' } ] };
@@ -33,19 +37,91 @@ local $SIG{__WARN__} = sub {
     };
     local *Convert::Pheno::merge_omop_tables = sub { return { merged => shift } };
 
-    my $redcap = Convert::Pheno->new( { method => 'redcap2pxf', in_textfile => 1 } )->redcap2pxf;
+    my $redcap_converter = Convert::Pheno->new(
+        { method => 'redcap2pxf', in_textfile => 1 }
+    );
+    my $redcap = $redcap_converter->redcap2pxf;
     is( $redcap->{method}, 'bff2pxf', 'redcap2pxf switches to bff2pxf' );
     is_deeply( $redcap->{data}, [ { id => 'r1' } ], 'redcap2pxf forwards redcap2bff output' );
     is( $redcap->{in_textfile}, 0, 'redcap2pxf forces in_textfile off' );
+    is(
+        $redcap_converter->{method},
+        'redcap2pxf',
+        'compound conversion does not rewrite the caller converter method'
+    );
+    ok(
+        !exists $redcap_converter->{data},
+        'compound conversion does not attach intermediate data to the caller converter'
+    );
 
-    my $cdisc = Convert::Pheno->new( { method => 'cdisc2omop', in_textfile => 1 } )->cdisc2omop;
-    is( $cdisc->{merged}{data}[0]{id}, 'c1', 'cdisc2omop merges cdisc2bff output' );
+    my $cdisc = Convert::Pheno->new( { method => 'cdiscodm2omop', in_textfile => 1 } )->cdiscodm2omop;
+    is( $cdisc->{merged}{data}[0]{id}, 'c1', 'cdiscodm2omop merges cdiscodm2bff output' );
+
+    my $datasetjson = Convert::Pheno->new( { method => 'datasetjson2pxf', in_textfile => 1 } )->datasetjson2pxf;
+    is( $datasetjson->{data}[0]{id}, 'd1', 'datasetjson2pxf forwards datasetjson2bff output' );
+
+    my $datasetjson_omop =
+      Convert::Pheno->new( { method => 'datasetjson2omop', in_textfile => 1 } )
+      ->datasetjson2omop;
+    is(
+        $datasetjson_omop->{merged}{data}[0]{id},
+        'd1',
+        'datasetjson2omop merges datasetjson2bff output'
+    );
+
+    my $fhir = Convert::Pheno->new( { method => 'fhir2pxf', in_textfile => 1 } )->fhir2pxf;
+    is( $fhir->{data}[0]{id}, 'f1', 'fhir2pxf forwards fhir2bff output' );
+
+    my $fhir_omop = Convert::Pheno->new( { method => 'fhir2omop', in_textfile => 1 } )->fhir2omop;
+    is(
+        $fhir_omop->{merged}{data}[0]{id},
+        'f1',
+        'fhir2omop merges fhir2bff output'
+    );
 
     my $csv = Convert::Pheno->new( { method => 'csv2omop', in_textfile => 1 } )->csv2omop;
     is( $csv->{merged}{data}[0]{id}, 'csv1', 'csv2omop merges csv2bff output' );
 
     my $pxf = Convert::Pheno->new( { method => 'pxf2omop', in_textfile => 1 } )->pxf2omop;
     is( $pxf->{merged}{data}[0]{id}, 'p1', 'pxf2omop merges pxf2bff output' );
+}
+
+{
+    my $input = [ { id => 'source-1' } ];
+    my $convert = Convert::Pheno->new(
+        {
+            method   => 'csv2omop',
+            data     => $input,
+            entities => ['individuals'],
+        }
+    );
+    my $request = Convert::Pheno::ConversionRequest->from_converter($convert);
+
+    is( $request->method, 'csv2omop', 'conversion request keeps the public method' );
+    is_deeply(
+        $request->pipeline,
+        [ 'csv2bff', 'bff2omop' ],
+        'conversion request exposes immutable registry stages'
+    );
+    throws_ok(
+        sub { $request->{method} = 'bff2omop' },
+        qr/read-only/,
+        'conversion request top-level state is immutable'
+    );
+
+    my $execution = Convert::Pheno::ExecutionContext->new(
+        { request => $request }
+    );
+    my ( $first_stage, $first_args ) = $execution->begin_next_stage;
+    is( $first_stage, 'csv2bff', 'execution context starts the first stage' );
+    is( $first_args->{data}, $input, 'first stage receives caller-owned input by reference' );
+
+    my $intermediate = [ { id => 'bff-1' } ];
+    $execution->complete_stage($intermediate);
+    my ( $second_stage, $second_args ) = $execution->begin_next_stage;
+    is( $second_stage, 'bff2omop', 'execution context advances to the second stage' );
+    is( $second_args->{data}, $intermediate, 'second stage receives the prior stage result' );
+    is( $second_args->{in_textfile}, 0, 'intermediate stages use in-memory input' );
 }
 
 {
@@ -84,6 +160,62 @@ local $SIG{__WARN__} = sub {
     );
     my $data = Convert::Pheno::_dispatcher_input_data($convert);
     is( ref($data), 'ARRAY', '_dispatcher_input_data reads structured file input for bff-like methods' );
+}
+
+{
+    my $data = Convert::Pheno::io_yaml_or_json(
+        {
+            filepath => 't/bff2pxf/in/individuals.json',
+            mode     => 'read',
+        }
+    );
+    my $before = JSON::XS->new->canonical->encode($data);
+    my $convert = Convert::Pheno->new(
+        {
+            method => 'bff2pxf',
+            data   => $data,
+            test   => 1,
+        }
+    );
+
+    my $result = $convert->bff2pxf;
+    is( scalar @{$result}, scalar @{$data}, 'in-memory BFF conversion returns every input record' );
+    is(
+        JSON::XS->new->canonical->encode($data),
+        $before,
+        'in-memory BFF conversion does not modify caller-owned data'
+    );
+    is( $convert->{data}, $data, 'converter retains caller-owned data for reuse' );
+}
+
+{
+    my $data = Convert::Pheno::io_yaml_or_json(
+        {
+            filepath => 't/pxf2bff/in/pxf.json',
+            mode     => 'read',
+        }
+    );
+    my $before = JSON::XS->new->canonical->encode($data);
+    my $convert = Convert::Pheno->new(
+        {
+            method => 'pxf2bff',
+            data   => $data,
+            test   => 1,
+        }
+    );
+
+    my $result = $convert->pxf2bff;
+    is(
+        scalar @{$result},
+        scalar @{$data},
+        'in-memory PXF conversion returns every input record'
+    );
+    is(
+        JSON::XS->new->canonical->encode($data),
+        $before,
+        'in-memory PXF conversion does not modify caller-owned data'
+    );
+    is( $convert->{data}, $data, 'PXF converter retains caller-owned data for reuse' );
 }
 
 {
@@ -205,6 +337,7 @@ local $SIG{__WARN__} = sub {
     my $convert = Convert::Pheno->new( { method => 'omop2bff' } );
     my $op = resolve_operation($convert);
     is( $op->{type}, 'bundle', 'runner resolves omop2bff as a bundle operation' );
+    ok( $op->{requires_sqlite}, 'runner marks omop2bff as requiring SQLite' );
     is_deeply( $op->{default_entities}, ['individuals'], 'runner resolves omop2bff default bundle entities' );
 
     local *Convert::Pheno::OMOP::ToBFF::run_omop_to_bundle = sub {
@@ -227,6 +360,13 @@ local $SIG{__WARN__} = sub {
     my $convert = Convert::Pheno->new( { method => 'bff2csv' } );
     my $op = resolve_operation($convert);
     is( $op->{type}, 'direct', 'runner resolves bff2csv as a direct operation' );
+    ok( !$op->{requires_sqlite}, 'runner does not open SQLite for bff2csv' );
+}
+
+{
+    my $convert = Convert::Pheno->new( { method => 'pxf2bff' } );
+    my $op = resolve_operation($convert);
+    ok( $op->{requires_sqlite}, 'runner keeps SQLite available for PXF ontology mapping' );
 }
 
 {
@@ -236,8 +376,9 @@ local $SIG{__WARN__} = sub {
     my $finalized = 0;
     my $convert   = Convert::Pheno->new( { method => 'csv2bff' } );
     my $operation = {
-        type => 'direct',
-        run  => sub { die "mapping failed\n" },
+        type            => 'direct',
+        requires_sqlite => 1,
+        run             => sub { die "mapping failed\n" },
     };
 
     local *Convert::Pheno::open_connections_SQLite = sub { return 1 };

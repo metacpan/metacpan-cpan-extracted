@@ -38,6 +38,14 @@ use Test::Most;
 use Test::Mockingbird;
 use Test::Returns qw(returns_ok);
 
+# Pre-require LWP::Simple::WithCache and JSON::Parse before any mocks are
+# installed.  Their BEGIN blocks run on first require and clobber any existing
+# symbol-table entry, including mocks.  Loading them here makes all subsequent
+# eval { require ... } calls inside country() and time_zone() no-ops that
+# leave Test::Mockingbird mocks intact.
+my $HAS_LWP  = eval { require LWP::Simple::WithCache; 1 } ? 1 : 0;
+my $HAS_JSON = eval { require JSON::Parse;             1 } ? 1 : 0;
+
 BEGIN { use_ok('CGI::Lingua') }
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -71,12 +79,13 @@ Readonly my @CRLF_PAYLOADS => (
 # Block all real network I/O for the entire file.  Subtests that need specific
 # whois/geoplugin behaviour override locally before restoring.
 Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois', sub { });
-Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', sub { undef });
+Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', sub { undef }) if $HAS_LWP;
 
 # Restore the global network block after restore_all() in any subtest.
 sub _block_network {
 	Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois', sub { });
-	Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', sub { undef });
+	Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', sub { undef })
+		if $HAS_LWP;
 }
 
 # Build a minimal CGI::Lingua object with the global network block active.
@@ -423,8 +432,7 @@ subtest '_clean_country_code: CRLF + injected header does not propagate' => sub 
 # in the countryCode field.
 
 subtest 'geoplugin JSON: XSS payload in countryCode is not returned as-is' => sub {
-	eval { require LWP::Simple::WithCache; require JSON::Parse };
-	if($@) {
+	unless($HAS_LWP && $HAS_JSON) {
 		pass('LWP::Simple::WithCache or JSON::Parse not installed; skipping');
 		return;
 	}
@@ -456,8 +464,7 @@ subtest 'geoplugin JSON: XSS payload in countryCode is not returned as-is' => su
 };
 
 subtest 'ip-api JSON: XSS payload in timezone field is not returned as-is' => sub {
-	eval { require LWP::Simple::WithCache; require JSON::Parse };
-	if($@) {
+	unless($HAS_LWP && $HAS_JSON) {
 		pass('LWP::Simple::WithCache or JSON::Parse not installed; skipping');
 		return;
 	}
@@ -487,8 +494,7 @@ subtest 'ip-api JSON: XSS payload in timezone field is not returned as-is' => su
 };
 
 subtest 'geoplugin JSON: malformed JSON does not croak' => sub {
-	eval { require LWP::Simple::WithCache; require JSON::Parse };
-	if($@) {
+	unless($HAS_LWP && $HAS_JSON) {
 		pass('LWP::Simple::WithCache or JSON::Parse not installed; skipping');
 		return;
 	}

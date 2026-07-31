@@ -2,6 +2,7 @@
 Changes
 examples/echo_http.pl
 examples/echo_stdio.pl
+examples/perldoc_stdio.pl
 examples/streaming_http.pl
 lib/MCP.pm
 lib/MCP/Client.pm
@@ -11,7 +12,8 @@ lib/MCP/Prompt.pm
 lib/MCP/Resource.pm
 lib/MCP/Server.pm
 lib/MCP/Server/Context.pm
-lib/MCP/Server/Session.pm
+lib/MCP/Server/Legacy.pm
+lib/MCP/Server/Subscription.pm
 lib/MCP/Server/Transport.pm
 lib/MCP/Server/Transport/HTTP.pm
 lib/MCP/Server/Transport/Stdio.pm
@@ -25,11 +27,18 @@ t/apps/lite_app.pl
 t/apps/mojolicious.png
 t/apps/stdio.pl
 t/auth_scopes_app.t
+t/cancel.t
+t/context_specific_app.t
+t/exceptions.t
+t/headers.t
+t/legacy.t
 t/lib/MCPStdioTest.pm
 t/lite_app.t
+t/mrtr.t
+t/notifications.t
 t/pod.t
 t/pod_coverage.t
-t/session_specific_app.t
+t/schema.t
 t/stdio.t
 t/streaming.t
 t/tool_validation.t
