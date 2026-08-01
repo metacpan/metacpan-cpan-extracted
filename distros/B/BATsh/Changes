@@ -1,5 +1,183 @@
 Revision history for BATsh
 
+0.10  2026-08-01 JST (Japan Standard Time)
+
+    No behaviour of the shell changes in this release: apart from the
+    version numbers themselves, lib/ is untouched.  Three CPAN Testers
+    FAILs for 0.09 were defects of the tests rather than of the shell,
+    and fixing them turned up a further group of assertions that could
+    never fail, a launcher that could shadow its own installed module,
+    and a distribution check that was enforcing something untrue.
+
+  - TEST FIX (t/0019-tempfile-security.t): TS01 and TS03 assert that a
+    temp file is created with open(O_CREAT|O_EXCL) and therefore never
+    follows a symlink that some other process planted at the candidate
+    path.  That promise is POSIX.  Win32 has no equivalent: CreateFile
+    with CREATE_NEW resolves a reparse point and creates the target
+    happily, so on a Windows smoker where symlink() happened to work
+    (Windows 10 and later with developer mode) the two cases reported a
+    difference in operating system semantics as a BATsh bug.  Both are
+    now skipped on the Windows family, with the reason printed, exactly
+    as TS02 and TS04 already skipped their 0600 mode checks there.
+    Reported for BATsh-0.09 on MSWin32 with perl 5.42.0.
+
+  - TEST FIX (t/0015-cp932.t): CP12 writes to, and tests for, a file
+    whose name contains the raw CP932 byte pair 0x83 0x5C.  Not every
+    environment can hold such a name: a Windows perl whose ANSI code
+    page is UTF-8 rejects it with ENOENT before BATsh is reached.  The
+    case now probes the file system with plain perl first and skips,
+    with the reason printed, when the name is unusable, instead of
+    reporting a platform limit as a failure.  Reported for BATsh-0.09 on
+    MSWin32 with perl 5.42.0.
+
+  - TEST FIX (t/0020-tilde-expansion.t): TE01 and TE02 compared the
+    directory reached by "cd ~" against Cwd::realpath().  On Win32 that
+    comparison is not portable -- realpath() and cwd() can disagree
+    about separator direction, drive letter case and 8.3 short names --
+    and it produced a FAIL on a Windows smoker whose tilde expansion was
+    in fact correct.  Both now compare against the value cwd() reports
+    after perl itself has chdir()ed to the same directory, which is the
+    only reference that is guaranteed to be spelled identically.
+    Reported for BATsh-0.09 on MSWin32 with perl 5.18.4.
+
+  - TEST FIX (33 cases in t/0003, t/0006, t/0007, t/0009, t/0011, t/0020
+    and t/0032): an assertion written as
+
+        _ok($out =~ /wanted/, 'name');
+
+    evaluates the match in list context.  A successful match with no
+    capture group yields (1), so the call is _ok(1, 'name') and behaves;
+    but a FAILED match yields the empty list, so the call collapses to
+    _ok('name') -- a true value -- and the case passed no matter what
+    the shell had printed.  Every such assertion is now written
+
+        _ok(($out =~ /wanted/) ? 1 : 0, 'name');
+
+    which restores scalar context.  TE03 of t/0020 was the one case that
+    had been silently passing over a real defect: it looks for a "cd:
+    ... No such file or directory" diagnostic, which the shell writes to
+    STDERR, while the helper captured STDOUT only.  The helper now
+    captures both streams and TE03 examines them together.
+
+  - TEST FIX (t/9060-readme.t): the file defined a local _pm_version(),
+    which INA_CPAN_Check has exported since 0.41, so every run of the
+    suite printed "Subroutine _pm_version redefined at t/9060-readme.t
+    line 47".  The local copy is gone and the shared implementation is
+    used.  "pmake dist" is now warning free.
+
+  - TEST FIX (t/0020, t/0026): the two cases that deliberately provoke a
+    shell diagnostic ("cd: ~user: No such file or directory", "sh:
+    ...: No such file or directory") let it through to the console, so a
+    clean run looked like a broken one in the CPAN Testers output.  Both
+    helpers now capture STDERR as well.
+
+  - CORRECTION: the 0.09 entry below states that writing "my (undef,
+    ...)" to skip an element of a list assignment is a Perl 5.10
+    spelling.  That is wrong, and this release withdraws the claim.
+    Perl 5.005_03 already accepts the form: its op.c my() carries an
+    explicit "else if (type == OP_UNDEF) return o;" branch, and perl
+    5.6.0 and 5.8.9 carry the same one, so the spelling has been legal
+    across the whole range BATsh supports.  Nothing has to change in the
+    code -- the three declarations rewritten in 0.09 were correct
+    before and are correct now -- but the rule that prompted the rewrite
+    does, see the INA_CPAN_Check note below.
+
+  - TEST FIX (t/0020-tilde-expansion.t): TE02 built its scratch
+    directory with File::Temp, which is core only from 5.6.1.  On
+    5.005_03 the "require File::Temp" inside its eval failed, the
+    failure was swallowed, and the case reported success without having
+    tested tilde expansion at all.  The directory is now made with
+    mkdir(), whose own failure is the atomicity guarantee, in the same
+    spirit as the sysopen(O_CREAT|O_EXCL) used elsewhere in BATsh, and
+    it is removed again at the end of the case.
+
+  - FIX (bin/batsh.pl): the launcher added its sibling lib/ to @INC
+    unconditionally.  That is right when the script is run out of an
+    unpacked distribution, but after installation into (say)
+    /usr/local/bin it put /usr/local/lib at the *head* of @INC on every
+    run, where a stale or unrelated BATsh.pm would shadow the copy that
+    had just been installed.  The directory is now added only when a
+    MANIFEST sits beside it, which is what identifies an unpacked
+    distribution and is never true of an installation prefix.
+
+  - QA (t/9020-perl5compat.t): new check P13 rejects any module that
+    entered core after 5.005_03, in lib/, t/, bin/ and eg/ alike.
+    Wrapping such a load in eval does not satisfy it: that is precisely
+    what let the File::Temp call above sit unnoticed, since on the
+    oldest supported perl the eval simply failed and whatever depended
+    on the module stopped being tested.  Each scanned file now
+    contributes 13 checks instead of 12.
+
+  - QA (t/lib/INA_CPAN_Check.pm 0.41 -> 0.42): D4 used to reject
+    "my (undef, ...)" as Perl 5.10 syntax.  It is not, as described
+    above, so the rule enforced a restriction that does not exist and
+    could only cause correct code to be rewritten.  The slot is reused
+    for the post-5.005_03 core-module check that P13 also runs, sharing
+    one list (@POST_5005_MODULES) so the two cannot drift apart.  The
+    number of checks per module is unchanged at six.
+
+  - QA (pmake.bat 0.44 -> 0.45): runtime prerequisites were collected
+    from lib/*.pm only, so a dependency that appeared solely in an
+    installed bin/ script never reached META -- BATsh shipped without
+    declaring FindBin, which bin/batsh.pl loads.  The scan now covers
+    bin/*.pl as well, and the "lib" pragma is dropped from the result
+    alongside strict, warnings and vars.
+
+  - QA (pmake.bat 0.45 -> 0.46): the prerequisite scan matched "use
+    Module" only, so a module reached through "require Module" was
+    invisible to META.  BATsh loads Cwd and POSIX that way and declared
+    neither.  Both spellings are now collected, and they are not treated
+    alike: "use Module" and a bare "require Module" are unconditional and
+    become runtime requires, while a require inside eval is the pure Perl
+    way of writing "use this if it is here" -- the caller has a fallback
+    -- and becomes a recommendation instead.  META.yml gains a
+    "recommends" block (spec 1.4) and META.json a
+    prereqs/runtime/recommends block (spec 2); Makefile.PL is unchanged,
+    since a recommendation must not enter PREREQ_PM.  BATsh now declares
+    Cwd and POSIX under recommends, which is what the code actually
+    means.  The scan also skips POD and full-line comments, so prose that
+    merely names a module can no longer invent a dependency.
+
+  - QA (pmake.bat 0.46): "pmake dist" runs its own copy of the K1 rule
+    over the sources listed in MANIFEST, and that copy did not say what
+    INA_CPAN_Check::check_K says.  It exempted a comma followed by $, a
+    single quote or a double quote, on the reasoning that stripping a
+    string literal leaves a quote character behind -- but f("a","b")
+    really is missing the space, and so is f($x,$y), so the exemption was
+    hiding exactly the lines the rule exists to find.  The two are now
+    spelled identically.  Nothing in BATsh changes: the strict form finds
+    no violation anywhere in the set "pmake dist" scans.
+
+  - QA (t/lib/INA_CPAN_Check.pm 0.42 -> 0.43): style group K ran over
+    lib/*.pm alone.  Unlike D, E and G -- which demand a shape only a
+    module is obliged to have -- K1, K2 and K3 ask for a space after a
+    comma and for [ @array ] and { %hash } in place of \@array and
+    \%hash, which are questions of spelling that apply to any Perl
+    source.  Restricting them to lib/ left most of a pure-Perl
+    distribution unchecked, so K now runs over lib/, bin/ and t/ as
+    listed in MANIFEST.  Five lines needed respacing, none of which
+    changes what the code does: t/0003 208, t/0005 40 and t/0009 273
+    open(STDOUT,'>&...') in the STDOUT-capture helpers, and t/9080 55 68
+    ok(0,"..."). With group K widened the suite runs 2071 tests.
+
+  - QA (t/lib/INA_CPAN_Check.pm 0.43): new check B8.  B1 to B7 tie
+    $VERSION to META.yml, META.json, Makefile.PL and Changes, but the
+    "Version 0.00" line printed under =head1 VERSION was verified by
+    nothing -- G2 asks only that the heading exists.  That line is what a
+    reader sees on metacpan and it is a hand-edited copy of a number kept
+    elsewhere, so it is precisely what goes stale unnoticed.  B8 requires
+    every shipped Perl source carrying the heading -- lib/*.pm and the
+    bin/*.pl installed as EXE_FILES -- to state the distribution version
+    under it.  It is one check for the distribution, so check_B goes from
+    six per module plus one to six per module plus two.
+
+  - bin/batsh.pl: gains the =head1 VERSION section the five modules
+    already carry, so the installed launcher documents which release it
+    belongs to.  B8 above keeps it from drifting.
+
+  - Changes: this entry is dated 2026-08-01 JST, the day of the upload.
+
+
 0.09  2026-07-27 JST (Japan Standard Time)
 
   - FIX (SH, Windows): the result of an expansion is literal data, not

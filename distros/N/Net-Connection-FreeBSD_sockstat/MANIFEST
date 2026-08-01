@@ -2,8 +2,18 @@ Changes
 lib/Net/Connection/FreeBSD_sockstat.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/00-load.t
+t/01-parse.t
+t/02-port-stringify.t
+t/03-orphaned.t
+t/04-uid.t
+t/05-args.t
+t/06-errors.t
+t/07-live-freebsd.t
+t/08-external-commands.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

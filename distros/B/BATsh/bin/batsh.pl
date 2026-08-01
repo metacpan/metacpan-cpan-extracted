@@ -21,8 +21,23 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 
 # Prefer the sibling lib/ when run from an unpacked distribution
 # (perl bin/batsh.pl ...); an installed BATsh is found via @INC as usual.
+#
+# The sibling directory is added only when the parent really is an
+# unpacked BATsh distribution, which is what MANIFEST next to it means.
+# An unconditional "use lib" would, once this script is installed into
+# (say) /usr/local/bin, put /usr/local/lib at the head of @INC on every
+# run; a stale or unrelated BATsh.pm left in that directory would then
+# shadow the copy that was just installed.  Testing only for the module
+# would not help, since that is exactly the case that goes wrong.
 use FindBin ();
-use lib "$FindBin::Bin/../lib";
+BEGIN {
+    my $root   = "$FindBin::Bin/..";
+    my $devlib = "$root/lib";
+    if (-e "$root/MANIFEST" && -e "$devlib/BATsh.pm") {
+        require lib;
+        lib->import($devlib);
+    }
+}
 
 use BATsh;
 
@@ -33,6 +48,10 @@ __END__
 =head1 NAME
 
 batsh.pl - run a bilingual cmd.exe / bash .batsh script
+
+=head1 VERSION
+
+Version 0.10
 
 =head1 SYNOPSIS
 

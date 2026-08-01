@@ -1,5 +1,24 @@
 Revision history for Net-Connection-Sort
 
+0.2.0	 2026-07-31/00:00
+		 - Invert is now actually honored.
+		 - The sort type may no longer be used to inject code.
+		 - port_fa/port_la now sort nameless ports numerically.
+		 - port_f/port_l no longer warn on wildcard ports.
+		 - Sorting anything other than a array now dies.
+		 - POD now documents sorter instead of a non-existent sort.
+		 - Fix the module named in a few of the synopsises.
+		 - Use the accessors instead of poking at the object hash.
+		 - user now uses a empty string for a missing username.
+		 - Net::Connection 0.2.0 or newer is now required.
+		 - The host sorters now call Net::IP once per connection
+		   instead of once per comparison.
+		 - The host sorters now handle IPv6 zone ids.
+		 - Fix a self assignment in the synopsises.
+		 - Note unsorted and invert in the README.
+		 - Document the sort types in the POD.
+		 - Drop the unused argument handling from the sorters.
+
 0.1.1	 2023-06-01/13:00
 		 - Add unsorted.
 

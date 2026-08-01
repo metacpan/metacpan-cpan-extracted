@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Mouse;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Carp;
 use File::Temp;
@@ -118,7 +118,7 @@ sub start {
             }
         }
 
-        sleep $elapsed += 0.1;
+        sleep($elapsed += 0.1);
     }
 
     unless ($ready) {
@@ -183,7 +183,7 @@ sub stop {
     # It is unlikely that tmpdir will disappear first, but if both the RedisServer
     # object and the tmpdir are defined globally, it may happen because the order
     # in which they are DESTLOYed is uncertain.
-    if (! -f $self->tmpdir) {
+    if (! -d $self->tmpdir) {
         $self->_redis->config_set('appendonly', 'no');
         $self->_redis->config_set('save', '');
     }

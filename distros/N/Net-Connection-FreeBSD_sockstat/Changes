@@ -1,10 +1,15 @@
 Revision history for Net-Connection-FreeBSD_sockstat
 
-0.0.2	 2021-02-08/20:00
-		 - Add missing depend of Proc::ProcessTable.
+1.0.0   2026-07-31/22:15
+        - Now requires FreeBSD 15.0 or newer for libxo support in sockstat.
+        - Parse 'sockstat --libxo json' instead of the text output.
+        - Use ps for proc info, dropping the Proc::ProcessTable depend.
+        - zombie_skip=>0 no longer dies, leaving the PID and UID undef.
+        - Add tests for parsing, args, UID handling, and the error paths.
+
+0.0.2   2021-02-08/20:00
+        - Add missing depend of Proc::ProcessTable.
 
 
-0.0.1	 2021-02-08/08:00
-		 - Initial release.
-
-
+0.0.1   2021-02-08/08:00
+        - Initial release.

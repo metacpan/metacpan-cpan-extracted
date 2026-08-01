@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Cmd::Terminal 0.55;
+package Devel::MAT::Cmd::Terminal 0.56;
 
 use v5.20;
 use warnings;
@@ -43,7 +43,7 @@ sub Devel::MAT::Cmd::printf ( $, $fmt, @args )
    return length $str;
 }
 
-sub Devel::MAT::Cmd::format_note ( $, $str, $idx )
+sub Devel::MAT::Cmd::format_note ( $, $str, $idx = undef )
 {
    $idx //= 0;
 
@@ -68,7 +68,7 @@ sub Devel::MAT::Cmd::_format_value ( $, $value )
    return String::Tagged->new_tagged( $value, fgindex => 5+8 );
 }
 
-sub Devel::MAT::Cmd::format_symbol ( $, $name )
+sub Devel::MAT::Cmd::format_symbol ( $, $name, $sv = undef )
 {
    return String::Tagged->new_tagged( $name,
       fgindex => 2,

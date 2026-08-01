@@ -1,65 +1,72 @@
 Revision history for Net-Connection-ncnetstat
 
-0.8.0	 2023-06-01/13:15
-		 - Don't try to sort by default now.
+0.9.0   2026-07-31/22:30
+        - Use Net::Connection::Linux_ss on Linux and
+          Net::Connection::FreeBSD_sockstat on FreeBSD, falling back to
+          Net::Connection::lsof elsewhere.
+        - Load the collection method at runtime and fall back to
+          Net::Connection::lsof if the native one is not installed.
 
-0.7.1	 2021-02-19/08:00
-		 - Bump the min version of Text::ANSITable required to 0.601. Thanks SREZIC / #134375.
-		 - Fix some typos in bin/ncnetstat docs. Thanks RSAVAGE / #134382.
+0.8.0   2023-06-01/13:15
+        - Don't try to sort by default now.
 
-0.7.0	 2021-02-19/06:30
-		 - Revert to lsof on FreeBSD given formatting problems with
-		   sockstat on FreeBSD with long IPv6 addresses.
+0.7.1   2021-02-19/08:00
+        - Bump the min version of Text::ANSITable required to 0.601. Thanks SREZIC / #134375.
+        - Fix some typos in bin/ncnetstat docs. Thanks RSAVAGE / #134382.
 
-0.6.4	 2021-02-17/04:00
-		 - Change use if around to play friendly with older versions of Perl.
+0.7.0   2021-02-19/06:30
+        - Revert to lsof on FreeBSD given formatting problems with
+          sockstat on FreeBSD with long IPv6 addresses.
 
-0.6.3	 2021-02-16/10:30
-		 - Fix at runtime module use to actually work now. Thanks Grinnz, Botje!
+0.6.4   2021-02-17/04:00
+        - Change use if around to play friendly with older versions of Perl.
 
-0.6.2	 2021-02-16/02:30
-		 - Remove it accidentally using Net::Conection::lsof always.
+0.6.3   2021-02-16/10:30
+        - Fix at runtime module use to actually work now. Thanks Grinnz, Botje!
 
-0.6.1	 2021-02-08/20:00
-		 - Accidentally inverted the OS check for FreeBSD in Makefile.PL.
+0.6.2   2021-02-16/02:30
+        - Remove it accidentally using Net::Conection::lsof always.
 
-0.6.0	 2021-02-08/08:00
-		 - Now uses sockstat on FreeBSD.
-		 - Make --pct, -C, --Cl, and -W XORable via $ENV
+0.6.1   2021-02-08/20:00
+        - Accidentally inverted the OS check for FreeBSD in Makefile.PL.
 
-0.5.0	 2019-09-03/03:30
-		 - Add the arg no_pid_user.
+0.6.0   2021-02-08/08:00
+        - Now uses sockstat on FreeBSD.
+        - Make --pct, -C, --Cl, and -W XORable via $ENV
 
-0.4.2	 2019-08-20/02:00
-		 - Add a missing column style option.
-		 - Depend on Data::Unixish::Apply, #130303.
-		 - Clean up column code.
+0.5.0   2019-09-03/03:30
+        - Add the arg no_pid_user.
 
-0.4.1	 2019-08-14/05:00
-		 - Actually use Net::Connection->proc now.
+0.4.2   2019-08-20/02:00
+        - Add a missing column style option.
+        - Depend on Data::Unixish::Apply, #130303.
+        - Clean up column code.
 
-0.4.0	 2019-08-14/04:30
-		 - Convert to Text::ANSITable for line wrapping with --Cl
+0.4.1   2019-08-14/05:00
+        - Actually use Net::Connection->proc now.
 
-0.3.0	 2019-08-12/06:00
-		 - Add support for wchan, pctmem, and pctcpu.
+0.4.0   2019-08-14/04:30
+        - Convert to Text::ANSITable for line wrapping with --Cl
 
-0.2.0	 2019-08-09/08:30
-		 - Add regexp command searching.
-		 - Update the POD for ncnetstat.
+0.3.0   2019-08-12/06:00
+        - Add support for wchan, pctmem, and pctcpu.
 
-0.1.1	 2019-08-06/21:30
-		 - Foreach Host -> Remote Host
+0.2.0   2019-08-09/08:30
+        - Add regexp command searching.
+        - Update the POD for ncnetstat.
 
-0.1.0	 2019-08-06/05:30
-		 - Add RegexPTR support.
-		 - Add UID support.
-		 - Add username support.
+0.1.1   2019-08-06/21:30
+        - Foreach Host -> Remote Host
 
-0.0.1	 2019-08-05/21:10
-		 - Actually install the script now.
+0.1.0   2019-08-06/05:30
+        - Add RegexPTR support.
+        - Add UID support.
+        - Add username support.
+
+0.0.1   2019-08-05/21:10
+        - Actually install the script now.
 
 
-0.0.0	 2019-08-04/23:45
-		 - Initial release.
+0.0.0   2019-08-04/23:45
+        - Initial release.
 

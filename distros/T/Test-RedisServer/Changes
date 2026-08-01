@@ -1,5 +1,11 @@
 Revision history for Perl extension Test::RedisServer
 
+0.25 2026-07-31T18:20:03Z
+    - Enhance testing and update CI stuffs
+    - Fix compile error on perl 5.43.3+ (Time::HiRes::sleep prototype change)
+    - fix the tmpdir existence check in stop to use -d instead of -f
+
+
 0.24 2026-01-29T12:09:09Z
     - Adjust test to redis 8.0.0 (issue #18) (gregoa)
 

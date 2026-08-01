@@ -79,7 +79,7 @@ sub new{
 	if ( ! defined( $args{protos} ) ){
 		die ('No protos key specified in the argument hash');
 	}
-	if ( ref( \$args{protos} ) eq 'ARRAY' ){
+	if ( ref( $args{protos} ) ne 'ARRAY' ){
 		die ('The protos key is not a array');
 	}
 	if ( ! defined $args{protos}[0] ){

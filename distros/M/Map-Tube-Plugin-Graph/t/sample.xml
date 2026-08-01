@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="test">
+  <lines>
+    <line id="1" name="Line 1" color="#550000"/>
+    <line id="2" name="Line 2" color="#005500"/>
+  </lines>
+  <stations>
+    <station id="A" name="Station A" line="1:1" link="B"/>
+    <station id="B" name="Station B" line="1:2,2:2" link="A,C,D,E"/>
+    <station id="C" name="Station C" line="1:3" link="B"/>
+    <station id="D" name="Station D" line="2:1" link="B"/>
+    <station id="E" name="Station E" line="2:3" link="B"/>
+  </stations>
+</tube>

@@ -66,7 +66,7 @@ eval{
 	$sorter=Net::Connection::Sort::pid->new;
 	$worked=1;
 };
-ok( $worked eq 1, 'sorter init') or die ('Net::Connection::Sort::pid->new resulted in... '.$@);
+ok( $worked == 1, 'sorter init') or die ('Net::Connection::Sort::pid->new resulted in... '.$@);
 
 my @sorted;
 $worked=0;
@@ -74,7 +74,7 @@ eval{
 	@sorted=$sorter->sorter( \@objects );
 	$worked=1;
 };
-ok( $worked eq 1, 'sort') or die ('Net::Connection::Sort::proto->sorter(@objects) resulted in... '.$@);
+ok( $worked == 1, 'sort') or die ('Net::Connection::Sort::pid->sorter(@objects) resulted in... '.$@);
 
 # 0 and 1 can end up in any order, make sure they are as expected
 my $is_defined=1;
@@ -95,9 +95,9 @@ if( (
 	$is_zero=1;
 }
 
-ok( $is_defined eq '0', 'sort order 0') or die ('The PID for 0/1 is not 0');
-ok( $is_zero eq '1', 'sort order 1') or die ('The PID for 0/1 is not 0');
-ok( $sorted[2]->{pid} eq '1', 'sort order 2') or die ('The PID for 2 is not 33');
-ok( $sorted[3]->{pid} eq '2', 'sort order 2') or die ('The PID for 3 is not 1000');
+ok( $is_defined == 0, 'sort order 0') or die ('The PID for 0/1 is not 0');
+ok( $is_zero == 1, 'sort order 1') or die ('The PID for 0/1 is not 0');
+ok( $sorted[2]->{pid} eq '1', 'sort order 2') or die ('The PID for 2 is not 1');
+ok( $sorted[3]->{pid} eq '2', 'sort order 3') or die ('The PID for 3 is not 2');
 
 done_testing(7);

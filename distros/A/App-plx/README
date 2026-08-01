@@ -137,7 +137,8 @@ BOOTSTRAP
     installer available, you can run:
 
       mkdir bin
-      wget https://raw.githubusercontent.com/shadowcat-mst/plx/master/bin/plx-packed -O bin/plx
+      wget https://raw.githubusercontent.com/NicholasBHubbard/plx/master/bin/plx-packed -O bin/plx
+      chmod +x bin/plx
 
     to get the current latest packed version.
 
@@ -462,12 +463,15 @@ ACTIONS
 AUTHOR
      mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
 
+MAINTAINER
+     Nicholas B. Hubbard (cpan:NHUBBARD) <nicholashubbard@posteo.net>
+
 CONTRIBUTORS
-    None yet - maybe this software is perfect! (ahahahahahahahahaha)
+     Nicholas B. Hubbard (cpan:NHUBBARD) <nicholashubbard@posteo.net>
 
 COPYRIGHT
-    Copyright (c) 2020 the App::plx "AUTHOR" and "CONTRIBUTORS" as listed
-    above.
+    Copyright (c) 2020 the App::plx "AUTHOR", "MAINTAINER", and
+    "CONTRIBUTORS" as listed above.
 
 LICENSE
     This library is free software and may be distributed under the same

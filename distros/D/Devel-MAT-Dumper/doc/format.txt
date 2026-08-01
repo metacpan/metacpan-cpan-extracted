@@ -345,6 +345,21 @@ SV extensions:
     Header(P):
       PTR   HEK
 
+  type: MAGICv2 (0x8A)
+    Header(4+2I):
+      U8    SHAPE
+      U8    FLAGS  0x01 : WEAK_AUXSV
+                   0x02 : HAS_KEYIV
+      U16   PRIV
+      UINT  PTRLEN
+      UINT  KEYIV
+    PTRs(5):
+            FUNCS
+            AUXSV
+            PTR
+            KEYSV
+            USERSTRUCT
+
   type: META_STRUCT (0xF0)
     Header(2I):
       UINT  STRUCTID

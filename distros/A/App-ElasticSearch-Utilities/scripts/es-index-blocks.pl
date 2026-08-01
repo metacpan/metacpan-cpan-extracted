@@ -88,7 +88,7 @@ es-index-blocks.pl - Report and manage index blocks
 
 =head1 VERSION
 
-version 8.9
+version 9.0
 
 =head1 SYNOPSIS
 

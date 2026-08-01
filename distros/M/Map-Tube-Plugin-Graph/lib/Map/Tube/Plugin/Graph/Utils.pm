@@ -2,7 +2,7 @@ package Map::Tube::Plugin::Graph::Utils;
 
 use version;
 
-our $VERSION   = qv('v1.1.0');
+our $VERSION   = qv('v1.1.1');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -11,7 +11,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version v1.1.0
+Version v1.1.1
 
 =cut
 
@@ -181,7 +181,6 @@ sub get_graphviz_supported {
     return unless $dot_bin;
     my $dot_out;
     run3( [ $dot_bin, $what ], \undef, \undef, \$dot_out );
-    # my($dot_out, undef) = Capture::Tiny::capture_stderr { system( $dot_bin, $what ) };
     return unless $dot_out =~ /Use one of:/s;
     $dot_out =~ s/.*Use one of:\s*//s;
     return split( /\s+/, $dot_out );

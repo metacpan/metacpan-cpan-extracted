@@ -51,7 +51,9 @@ t/port_la.t
 t/proto.t
 t/ptr_f.t
 t/ptr_l.t
+t/sort.t
 t/state.t
+t/types.t
 t/uid.t
 t/unsorted.t
 t/user.t

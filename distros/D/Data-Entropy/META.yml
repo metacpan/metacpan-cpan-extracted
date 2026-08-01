@@ -1,15 +1,15 @@
 ---
 abstract: 'entropy (randomness) management'
 author:
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -25,7 +25,7 @@ requires:
   Data::Float: '0.008'
   Errno: '1.00'
   Exporter: '0'
-  HTTP::Lite: '2.2'
+  HTTP::Tiny: '0.096'
   IO::File: '1.03'
   Module::Build: '0'
   Params::Classify: '0'
@@ -37,7 +37,8 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Data-Entropy/issues
+  license: https://dev.perl.org/licenses/
   repository: git://github.com/robrwo/Data-Entropy.git
-version: '0.008'
+version: '0.009'
 x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -64,7 +64,7 @@ eval{
 	$sorter=Net::Connection::Sort::port_fa->new;
 	$worked=1;
 };
-ok( $worked eq 1, 'sorter init') or die ('Net::Connection::Sort::port_fa->new resulted in... '.$@);
+ok( $worked == 1, 'sorter init') or die ('Net::Connection::Sort::port_fa->new resulted in... '.$@);
 
 my @sorted;
 $worked=0;
@@ -72,11 +72,31 @@ eval{
 	@sorted=$sorter->sorter( \@objects );
 	$worked=1;
 };
-ok( $worked eq 1, 'sort') or die ('Net::Connection::Sort::host_f->sorter(@objects) resulted in... '.$@);
+ok( $worked == 1, 'sort') or die ('Net::Connection::Sort::port_fa->sorter(@objects) resulted in... '.$@);
 
-ok( $sorted[0]->foreign_port =~ 'FTP', 'sort order 0') or die ('The first foreign port value was not FTP');
-ok( $sorted[1]->foreign_port =~ 'HTTP', 'sort order 1') or die ('The last foreign port value was not HTTP');
-ok( $sorted[2]->foreign_port =~ 'HTTPS', 'sort order 2') or die ('The middle foreign port value was not HTTPS');
-ok( $sorted[3]->foreign_port =~ 'SSH' , 'sort order 2') or die ('The middle foreign port value was not SSH');
+ok( $sorted[0]->foreign_port eq 'FTP', 'sort order 0') or die ('The first foreign port value was not FTP');
+ok( $sorted[1]->foreign_port eq 'HTTP', 'sort order 1') or die ('The second foreign port value was not HTTP');
+ok( $sorted[2]->foreign_port eq 'HTTPS', 'sort order 2') or die ('The third foreign port value was not HTTPS');
+ok( $sorted[3]->foreign_port eq 'SSH' , 'sort order 3') or die ('The last foreign port value was not SSH');
 
-done_testing(7);
+# ports with no service name fall back to the port itself, which must be
+# compared numerically and not as a string
+my @numeric=map {
+	Net::Connection->new({
+						  'foreign_host' => '3.3.3.3',
+						  'local_host' => '4.4.4.4',
+						  'foreign_port' => $_,
+						  'local_port' => '11132',
+						  'state' => 'ESTABLISHED',
+						  'proto' => 'tcp4',
+						  'ports' => 0,
+						  })
+} ( '100', '9', '10' );
+
+@sorted=$sorter->sorter( \@numeric );
+
+ok( $sorted[0]->foreign_port eq '9', 'numeric sort order 0') or die ('The first foreign port value was not 9');
+ok( $sorted[1]->foreign_port eq '10', 'numeric sort order 1') or die ('The second foreign port value was not 10');
+ok( $sorted[2]->foreign_port eq '100', 'numeric sort order 2') or die ('The last foreign port value was not 100');
+
+done_testing(10);

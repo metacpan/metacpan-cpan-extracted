@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app-blurfill-web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        APP_BLURFILL_VERSION: 0.1.0
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Find 0.55;
+package Devel::MAT::Tool::Find 0.56;
 
 use v5.20;
 use warnings;
@@ -564,10 +564,24 @@ sub build ( $self, $inv, $name = undef )
 }
 
 package # hide
-   Devel::MAT::Tool::Find::filter::magic;;
+   Devel::MAT::Tool::Find::filter::magic;
 use base qw( Devel::MAT::Tool::Find::filter );
 
 =head2 magic
+
+   pmat> find magic --vtbl 0x7fa73f5421c0
+   SCALAR(UV) at 0x5632acbddc50: magic type '^', with object ARRAY(1) at 0x5632acbd2f88
+   ...
+
+Searches for SVs that have magic that uses the given MGVTBL address.
+
+=over 4
+
+=item --vtbl, -v ADDR
+
+Address of the required MGVTBL
+
+=back
 
 =cut
 
@@ -587,7 +601,9 @@ sub build ( $self, $inv, $optsref )
       return sub ( $sv ) {
          my @magics = $sv->magic or return;
          foreach my $magic ( @magics ) {
-            next unless defined $magic->vtbl and $magic->vtbl == $vtbl;
+            next unless $magic->ver == 1 and
+                        defined $magic->vtbl and
+                        $magic->vtbl == $vtbl;
 
             my $ret = String::Tagged->from_sprintf( "magic type '%s'",
                $magic->type,
@@ -603,6 +619,75 @@ sub build ( $self, $inv, $optsref )
    }
 
    die "Expected --vtbl\n";
+}
+
+package # hide
+   Devel::MAT::Tool::Find::filter::magicv2;
+use base qw( Devel::MAT::Tool::Find::filter );
+
+=head2 magicv2
+
+   pmat> find magicv2 --funcs 0x562c1d39bc20
+   SCALAR(PV) at 0x562c1fce1070: MagicV2 funcs 0x562c1d39bc20
+   ...
+
+Searches for SVs that have Magic v2 attachments, optionally limited to those
+which use the given MagicFunctions structure or have the given C<MgAUXSV>.
+
+Takes the following named options:
+
+=over 4
+
+=item --funcs, -f ADDR
+
+Returns only attachments that use the given C<struct MagicFunctions> structure
+address.
+
+=item --auxsv, -A ADDR
+
+Returns only attachments that have the given SV as the C<MgAUXSV>.
+
+=back
+
+=cut
+
+use constant FILTER_DESC => "SVs with MagicV2";
+
+use constant FILTER_OPTS => (
+   funcs => { help => "the MgFUNCS pointer",
+              type => "x",
+              alias => "f" },
+   auxsv => { help => "the MgAUXSV pointer",
+              type => "x",
+              alias => "A" },
+);
+
+sub build ( $self, $inv, $optsref )
+{
+   my %opts = $optsref->%*;
+
+   my $want_funcs = $optsref->{funcs};
+   my $want_auxsv = $optsref->{auxsv};
+
+   return sub ( $sv ) {
+      my @magics = $sv->magic or return;
+      foreach my $magic ( @magics ) {
+         next unless $magic->ver == 2;
+
+         next if defined $want_funcs and
+                 $magic->funcs != $want_funcs;
+         next if defined $want_auxsv and
+                 ( !defined $magic->auxsv or $magic->auxsv != $want_auxsv );
+
+         my $ret = String::Tagged->from_sprintf( "MagicV2 funcs %s",
+            Devel::MAT::Cmd->format_value( $magic->funcs, addr => 1 ),
+         );
+
+         $ret .= ", with auxsv " . Devel::MAT::Cmd->format_sv( $magic->auxsv ) if $magic->auxsv;
+
+         return $ret;
+      }
+   };
 }
 
 =head1 AUTHOR

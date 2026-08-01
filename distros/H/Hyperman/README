@@ -1,0 +1,52 @@
+Hyperman
+
+An event-loop PSGI server: a prefork supervisor with a per-worker XS event
+loop (kqueue / epoll / poll / opt-in io_uring behind one backend interface),
+aiming to match a JIT HTTP server's throughput without a JIT. Runs any Plack
+app via `plackup -s Hyperman` and passes the full Plack::Test::Suite.
+
+Handlers may return a Hyperman::Future (or any Future-compatible object) of
+the PSGI response; the connection parks while the worker keeps serving, and
+awaiting a Future inside a handler pumps the worker's own loop re-entrantly.
+psgi.streaming, psgix.io, and psgix.loop are provided; a client disconnect
+cancels the pending response Future.
+
+Production features: worker respawn, SIGHUP zero-downtime worker recycle,
+graceful shutdown, idle/slow-request timeouts, pipelining fairness,
+SO_REUSEPORT (opt-in, Linux), access_log callback, Hyperman->stats.
+
+See BENCHMARKS.md for measured numbers and plan/ for the design documents.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Requires a C compiler. No non-core runtime dependencies; Plack is optional
+(needed only for `plackup -s Hyperman` and the conformance tests).
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Hyperman
+    perldoc Hyperman::Future
+    perldoc Hyperman::Loop
+
+You can also look for information at:
+
+    Search CPAN
+        https://metacpan.org/release/Hyperman
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

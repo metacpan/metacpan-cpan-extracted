@@ -140,7 +140,7 @@ my @tests = (
             BATsh->run_string('echo pipetest | perl -ne "print uc"');
         });
         $out =~ s/\r//g;
-        _ok($out =~ /PIPETEST/, "EE03: pipeline baseline (got [$out])");
+        _ok(($out =~ /PIPETEST/) ? 1 : 0, "EE03: pipeline baseline (got [$out])");
     },
 
     ##################################################################

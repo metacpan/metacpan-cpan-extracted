@@ -43,15 +43,9 @@ for my $b (@eg_base) {
     ok($text =~ /$q/, "R5: README mentions $b");
 }
 
-# Extract $VERSION from a .pm file (Perl 5.005_03 compatible).
-sub _pm_version {
-    my($file) = @_;
-    (-f $file) or return undef;
-    my $src = _slurp($file);
-    if ($src =~ /\$VERSION\s*=\s*["']?([0-9._]+)["']?/) {
-        return $1;
-    }
-    return undef;
-}
+# NOTE: _pm_version() is imported from INA_CPAN_Check (it has been part of
+# that module's exports since 0.41).  Defining a local copy here made perl
+# emit "Subroutine _pm_version redefined at t/9060-readme.t"; the shared
+# implementation is used instead.
 
 END { end_testing() }

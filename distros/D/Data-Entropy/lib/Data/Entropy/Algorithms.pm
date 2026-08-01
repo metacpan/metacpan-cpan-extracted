@@ -45,13 +45,13 @@ use strict;
 
 use Carp qw(croak);
 use Data::Entropy qw(entropy_source);
-use Data::Float 0.008 qw(
+use Data::Float 0.009 qw(
 	have_subnormal min_normal_exp significand_bits
 	float_is_finite float_parts float_sign mult_pow2 copysign
 );
 use Params::Classify 0.000 qw(is_ref);
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -441,11 +441,11 @@ L<Data::Entropy::Source>
 
 Andrew Main (Zefram) <zefram@fysh.org>
 
-Maintained by Robert Rothenberg <rrwo@cpan.org>
+Maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2011, 2025
+Copyright (C) 2006, 2007, 2009, 2011, 2025-2026
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

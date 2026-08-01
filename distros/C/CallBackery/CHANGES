@@ -1,3 +1,18 @@
+0.58.4 2026-07-31 16:15:51 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Frontend ui.Login: a login could be lost outright. The credentials
+   were copied into the hidden iframe form that exists only to make the
+   browser offer to save the password, and that copy ran before the
+   login call, unguarded. The iframe reloads /login every time the login
+   window appears, so whenever that fetch had not completed yet -- a
+   busy server is enough -- getElementById returned null, the handler
+   threw on it, and the login request was never sent. The form had
+   already disabled itself, so it just sat there greyed out with nothing
+   on screen to explain it, and only a reload got the user out of it.
+   The password manager hand-off now happens after a successful login
+   and is fully guarded, so it can miss the save prompt but can no
+   longer come between the user and their session.
+
 0.58.3 2026-07-30 16:11:29 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - Config: restoring a configuration blob replaced the configuration

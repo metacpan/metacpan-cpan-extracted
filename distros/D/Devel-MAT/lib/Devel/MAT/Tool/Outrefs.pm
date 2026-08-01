@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Outrefs 0.55;
+package Devel::MAT::Tool::Outrefs 0.56;
 
 use v5.20;
 use warnings;

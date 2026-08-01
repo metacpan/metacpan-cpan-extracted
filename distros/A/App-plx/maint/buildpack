@@ -1,17 +1,42 @@
 #!/bin/sh
 
-set -e
+set -eu
 
-rm -rf packbuild
+# bin/plx-packed is a committed release artifact.  Its bundled dependency
+# versions live in maint/fatpack-cpanfile; this script installs those into an
+# isolated, temporary toolchain before rebuilding the artifact.
+project_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+build_dir="${project_dir}/packbuild"
+toolchain_dir="${build_dir}/toolchain"
+toolchain_lib="${toolchain_dir}/lib/perl5"
+packed_file="${project_dir}/bin/plx-packed"
+packed_temp="${packed_file}.new"
+bootstrap_cpanm=${CPANM:-}
 
-mkdir -p packbuild/fatlib/local
-cp $(perldoc -lm local::lib) packbuild/fatlib/local/
-mkdir -p packbuild/fatlib/File
-cp $(perldoc -lm File::Which) packbuild/fatlib/File/
+if [ -z "$bootstrap_cpanm" ]; then
+  bootstrap_cpanm=$(command -v cpanm || :)
+fi
+if [ -z "$bootstrap_cpanm" ]; then
+  echo "maint/buildpack requires cpanm (or set CPANM)" >&2
+  exit 1
+fi
+
+rm -rf "$build_dir"
+trap 'rm -rf "$build_dir" "$packed_temp"' EXIT HUP INT TERM
+
+mkdir -p "$build_dir"
+PERL_CPANM_HOME="${build_dir}/cpanm-home" "$bootstrap_cpanm" \
+  --quiet --notest -L "$toolchain_dir" \
+  --cpanfile "${project_dir}/maint/fatpack-cpanfile" --installdeps "$project_dir"
+
+mkdir -p "${build_dir}/fatlib/local"
+cp "${toolchain_lib}/local/lib.pm" "${build_dir}/fatlib/local/"
+mkdir -p "${build_dir}/fatlib/File"
+cp "${toolchain_lib}/File/Which.pm" "${build_dir}/fatlib/File/"
 
 
 fragment () {
-  perl -e '
+  PATH="${toolchain_dir}/bin:${PATH}" PERL5LIB="$toolchain_lib" perl -e '
   use File::Which;
   my $cpanm = do { local (@ARGV, $/) = which("cpanm"); <> };
   $cpanm =~ s/^/  /mg;
@@ -55,8 +80,14 @@ local *App::plx::find_cpanm = sub {
 
 (
   echo '#!/usr/bin/env perl';
-  perl -E 'require "./bin/plx"; say q{$App::plx::VERSION = }.$App::plx::VERSION.";";'
-  (cd packbuild; fatpack file);
+  cd "$project_dir";
+  PERL5LIB="$toolchain_lib" perl -E \
+    'require "./bin/plx"; say q{$App::plx::VERSION = }.$App::plx::VERSION.";";'
+  (cd "$build_dir"; PATH="${toolchain_dir}/bin:${PATH}" \
+    PERL5LIB="$toolchain_lib" fatpack file);
   fragment;
-  cat bin/plx;
-) >bin/plx-packed
+  cat "${project_dir}/bin/plx";
+) >"$packed_temp"
+
+chmod --reference="$packed_file" "$packed_temp" 2>/dev/null || chmod 0644 "$packed_temp"
+mv "$packed_temp" "$packed_file"

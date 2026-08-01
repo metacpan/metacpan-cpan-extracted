@@ -126,7 +126,7 @@ sub new{
 		 ( ! defined( $args{fptrs}[0] ) )
 		 )
 		){
-		die ('No ports defined in the in any of the [fl]ptrs array');
+		die ('No PTRs defined in any of the [fl]ptrs arrays');
 	}
 
     my $self = {
@@ -190,10 +190,14 @@ sub match{
 		$l_ptr='NOTFOUND';
 		# See if we can look it up.
 		my $answer=$self->{resolver}->search( $object->local_host );
-		if ( defined( $answer->{answer}[0] ) &&
-			 ( ref( $answer->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
-			){
-			$l_ptr=lc($answer->{answer}[0]->ptrdname);
+		if ( defined( $answer ) ){
+			# search the whole answer section as the first RR may be a CNAME
+			foreach my $rr ( $answer->answer ){
+				if ( $rr->type eq 'PTR' ){
+					$l_ptr=lc( $rr->ptrdname );
+					last;
+				}
+			}
 		}
 	}
 
@@ -205,10 +209,14 @@ sub match{
 		$f_ptr='NOTFOUND';
 		# See if we can look it up.
 		my $answer=$self->{resolver}->search( $object->foreign_host );
-		if ( defined( $answer->{answer}[0] ) &&
-			 ( ref( $answer->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
-			){
-			$f_ptr=lc($answer->{answer}[0]->ptrdname);
+		if ( defined( $answer ) ){
+			# search the whole answer section as the first RR may be a CNAME
+			foreach my $rr ( $answer->answer ){
+				if ( $rr->type eq 'PTR' ){
+					$f_ptr=lc( $rr->ptrdname );
+					last;
+				}
+			}
 		}
 	}
 

@@ -1,3 +1,11 @@
+0.902004 - 2026-07-31
+  - Point distribution metadata and bootstrap documentation at the new
+    GitHub repository
+  - Rebuild plx-packed with current dependencies
+  - Document Nicholas B. Hubbard as the current maintainer
+  - Correct the minimum supported Perl version to 5.10
+  - Fix executable permissions in the standalone bootstrap instructions
+
 0.902003 - 2021-11-25
   - Restore 'plx t/foo.t' feature
 

@@ -10,16 +10,18 @@ Net::Connection::Sort::port_la - Sorts the connections via the local port alphab
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.2
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.2';
 
 
 =head1 SYNOPSIS
 
-This currently implements cmp sorting only. For numeric sorting using port_l.
+This sorts on the service name where there is one. Ports without a service
+name sort after those with one, numerically. For purely numeric sorting use
+port_l.
 
     use Net::Connection::Sort::port_la;
     use Net::Connection;
@@ -72,7 +74,7 @@ This currently implements cmp sorting only. For numeric sorting using port_l.
                                         }),
                  );
     
-    my $sorter=$sorter=Net::Connection::Sort::port_la->new;
+    my $sorter=Net::Connection::Sort::port_la->new;
     
     @objects=$sorter->sorter( \@objects );
     
@@ -86,17 +88,11 @@ This initiates the module.
 
 No arguments are taken and this will always succeed.
 
-    my $sorter=$sorter=Net::Connection::Sort::port_la->new;
+    my $sorter=Net::Connection::Sort::port_la->new;
 
 =cut
 
 sub new{
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
-
-
 	my $self = {
 				};
     bless $self;
@@ -104,7 +100,7 @@ sub new{
 	return $self;
 }
 
-=head2 sort
+=head2 sorter
 
 This sorts the array of Net::Connection objects.
 
@@ -129,7 +125,24 @@ sub sorter{
 	}
 
 	@objects=sort  {
-		&helper( $a ) cmp &helper( $b )
+		my ( $a_nameless, $a_key )=helper( $a );
+		my ( $b_nameless, $b_key )=helper( $b );
+
+		# Named ports sort alphabetically ahead of the nameless ones, which
+		# sort numerically so port 9 does not end up after port 10. Anything
+		# nameless and non-numeric, such as the '*' used for wildcard ports,
+		# falls back to a string comparison.
+		$a_nameless <=> $b_nameless
+			||
+		(
+		 (
+		  $a_nameless &&
+		  ( $a_key =~ /^[0-9]+$/ ) &&
+		  ( $b_key =~ /^[0-9]+$/ )
+		  )
+		 ? $a_key <=> $b_key
+		 : $a_key cmp $b_key
+		 )
 	} @objects;
 
 	return @objects;
@@ -139,13 +152,20 @@ sub sorter{
 
 A internal helper function.
 
+Two items are returned for the connection passed to it. The first is true if
+the port has no service name and the second is the value to sort on, either
+the service name or the port itself.
+
 =cut
 
 sub helper{
-	if ( !defined( $_[0]->local_port_name ) ){
-		return $_[0]->local_port;
+	my $port_name=$_[0]->local_port_name;
+
+	if ( !defined( $port_name ) ){
+		return ( 1, $_[0]->local_port );
 	}
-	return $_[0]->local_port_name;
+
+	return ( 0, $port_name );
 }
 
 =head1 AUTHOR

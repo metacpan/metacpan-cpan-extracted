@@ -1,10 +1,11 @@
 {
    "abstract" : "Perl Layout Executor",
    "author" : [
-      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>",
+      "Nicholas B. Hubbard (cpan:NHUBBARD) <nicholashubbard@posteo.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,11 +35,21 @@
          "requires" : {
             "File::Which" : "0",
             "local::lib" : "2",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.902003",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/NicholasBHubbard/plx/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/NicholasBHubbard/plx.git",
+         "web" : "https://github.com/NicholasBHubbard/plx"
+      }
+   },
+   "version" : "0.902004",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

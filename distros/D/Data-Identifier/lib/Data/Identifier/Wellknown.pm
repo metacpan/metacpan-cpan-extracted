@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.31;
+our $VERSION = v0.32;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -61,6 +61,7 @@ sub import {
     my $namespace;
     my %found;
     my @extra_classes;
+    my $displayname_is_tagname;
 
     return if exists $loaded{':all'}; # if we done :all we ... did all!
 
@@ -96,8 +97,11 @@ sub import {
             } elsif ($command eq '$class') {
                 $default_class = $arg;
                 @extra_classes = ();
+                $displayname_is_tagname = undef;
             } elsif ($command eq '$extra_classes') {
                 @extra_classes = split(/,/, $arg);
+            } elsif ($command eq '$displayname_is_tagname') {
+                $displayname_is_tagname = $arg eq 'true';
             } elsif ($command eq '$generator') {
                 %generator = split(/[,=]/, $arg);
                 $id_type = undef;
@@ -180,7 +184,12 @@ sub import {
                 }
             }
 
-            $identifier->{displayname} //= $displayname; # force-update, using internal API. DO NOT TRY AT HOME!
+            if ($displayname_is_tagname && defined($displayname)) {
+                my %tagnames = map {$_ => undef} $displayname, $identifier->tagname(list => 1, default => [], no_defaults => 1);
+                $identifier->{tagname} = [keys %tagnames];
+            } else {
+                $identifier->{displayname} //= $displayname; # force-update, using internal API. DO NOT TRY AT HOME!
+            }
             $identifier->register;
 
             foreach my $class (@classes) {
@@ -267,7 +276,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.31
+version v0.32
 
 =head1 SYNOPSIS
 
@@ -356,6 +365,7 @@ This is free software, licensed under:
 __DATA__
 $class abstract-colour
 $extra_classes colour
+$displayname_is_tagname true
 $type uuid
 
 .   fade296d-c34f-4ded-abd5-d9adaf37c284    black       sid=61
@@ -377,6 +387,7 @@ $type uuid
 
 $class vga-colour
 $extra_classes colour
+$displayname_is_tagname true
 $type uuid
 
 .   32f5e924-0ddb-4427-ad81-2d099b590c68    black
@@ -399,6 +410,7 @@ $type uuid
 
 $class rgb-colour
 $extra_classes colour
+$displayname_is_tagname true
 $generator style=colour,namespace=88d3944f-a13b-4e35-89eb-e3c1fbe53e76,generator=55febcc4-6655-4397-ae3d-2353b5856b34
 
 .   #000000     black
@@ -415,6 +427,7 @@ $generator style=colour,namespace=88d3944f-a13b-4e35-89eb-e3c1fbe53e76,generator
 
 
 $class namespace
+$displayname_is_tagname true
 $type uuid
 
 .   9e10aca7-4a99-43ac-9368-6cbfa43636df    Wikidata-namespace
@@ -438,6 +451,7 @@ $type uuid
 
 
 $class subject-type
+$displayname_is_tagname true
 $type uuid
 
 .   eacbf914-52cf-4192-a42c-8ecd27c85ee1    unicode-string              sid=11
@@ -547,6 +561,7 @@ $extra_classes identifier
 
 
 $class any-taxon
+$displayname_is_tagname true
 $type uuid
 
 .   838eede5-3f93-46a9-8e10-75165d10caa1    cat                         sid=80
@@ -567,6 +582,7 @@ $type uuid
 
 
 $class encoding
+$displayname_is_tagname true
 $type uuid
 
 .   ec6cd46a-aef5-495d-830b-acb3347a34ec    utf-8-string-encoding
@@ -578,6 +594,7 @@ $type uuid
 
 
 $class direction
+$displayname_is_tagname true
 $type uuid
 
 .   4e855294-4b4f-443e-b67b-8cb9d733a889    backwards                   sid=43
@@ -600,6 +617,7 @@ $type uuid
 
 
 $class tagpool
+$displayname_is_tagname true
 $type uuid
 
 .   3f066699-48df-4250-846b-20f96ac708fa    tagpool-function
@@ -685,6 +703,7 @@ $extra_classes rating-catalog-item
 
 
 $class gamebook
+$displayname_is_tagname true
 $type uuid
 
 .   10a65258-237f-45f5-9d84-7287d62dcbb5    gamebook-application-context
@@ -726,6 +745,7 @@ $extra_classes link
 
 
 $class link
+$displayname_is_tagname true
 $type uuid
 
 .   ddd60c5c-2934-404f-8f2d-fcb4da88b633    also-shares-identifier      sid=1
@@ -836,6 +856,7 @@ $type uuid
 
 
 $class gender
+$displayname_is_tagname true
 $type uuid
 
 .   3694d8ca-c969-5705-beca-01f17b1487e8    male
@@ -843,12 +864,14 @@ $type uuid
 
 
 $class sex
+$displayname_is_tagname true
 $type uuid
 
 .   ae1072ef-0865-5104-b257-0d45441fa5e5    male
 .   3c4b6cdf-f5a8-50d6-8a3a-b0c0975f7e69    female
 
 $class gender-or-sex
+$displayname_is_tagname true
 $type uuid
 
 .   d642eff3-bee6-5d09-aea9-7c47b181dd83    male                        sid=75
@@ -856,6 +879,7 @@ $type uuid
 
 
 $class flag
+$displayname_is_tagname true
 $type uuid
 
 .   e6135f02-28c1-4973-986c-ab7a6421c0a0    important
@@ -863,6 +887,7 @@ $type uuid
 
 
 $class service
+$displayname_is_tagname false
 $type uuid
 
 .   198bc92a-be09-42d2-bf96-20a177294b79    wikidata
@@ -904,6 +929,7 @@ $type uuid
 
 
 $class action
+$displayname_is_tagname true
 $type uuid
 
 % Human readable:
@@ -921,6 +947,7 @@ $type uuid
 
 
 $class boolean
+$displayname_is_tagname true
 $type uuid
 
 .   6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1    false   sid=45,sni=189
@@ -928,6 +955,7 @@ $type uuid
 
 
 $class integer
+$displayname_is_tagname true
 
 $generator style=integer-based,namespace=5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99,generator=e8aa9e01-8d37-4b4b-8899-42ca0a2a906f
 .   -1  .       sid=47
@@ -956,6 +984,7 @@ $generator style=integer-based,namespace=5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99,ge
 
 
 $class digest-algorithm
+$displayname_is_tagname false
 $type uuid=8db88212-69df-40f3-a5cf-105dcd853d44
 $namespace 34f1f1d2-51be-4754-9585-83e33c5cb7e8
 
@@ -976,6 +1005,7 @@ $namespace 34f1f1d2-51be-4754-9585-83e33c5cb7e8
 
 
 $class day-of-week
+$displayname_is_tagname true
 $generator style=integer-based,namespace=01a1ba02-c6a4-4468-a0dd-2944896c14c7,generator=7d7e0a5c-a244-43b6-90be-414059279a1e
 
 .   1   Monday
@@ -988,6 +1018,7 @@ $generator style=integer-based,namespace=01a1ba02-c6a4-4468-a0dd-2944896c14c7,ge
 
 
 $class rdf
+$displayname_is_tagname false
 $type uri
 $namespace 6ba7b811-9dad-11d1-80b4-00c04fd430c8
 
@@ -1034,6 +1065,7 @@ $extra_classes rdf-schema
 
 
 $class dublin-core
+$displayname_is_tagname false
 $type uri
 $namespace 6ba7b811-9dad-11d1-80b4-00c04fd430c8
 
@@ -1152,6 +1184,7 @@ $extra_classes dublin-core-terms
 
 
 $class foaf
+$displayname_is_tagname false
 $type uri
 $namespace 6ba7b811-9dad-11d1-80b4-00c04fd430c8
 
@@ -1236,6 +1269,7 @@ $extra_classes subject-type
 
 
 $class dot-comments
+$displayname_is_tagname true
 $type uuid
 
 $extra_classes subject-type
@@ -1252,6 +1286,7 @@ $extra_classes namespace
 .   4004c90f-fe88-4c2e-9f92-e678f54c6417    dot-comments-rating-namespace
 
 $extra_classes rating
+$displayname_is_tagname false
 .   06813a68-06f2-5d42-b230-28445e5f5dc1    0
 .   4b31eb8c-546a-578b-83bb-e5d6e6a53263    1
 .   bb986cde-9f2e-5c1d-9f56-cb3fa019077d    2
@@ -1262,6 +1297,7 @@ $extra_classes rating
 
 $class language
 $extra_classes languoid
+$displayname_is_tagname false
 $type sid=8
 $namespace 47dd950c-9089-4956-87c1-54c122533219
 
@@ -1308,6 +1344,7 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 
 $class language
 $extra_classes languoid
+$displayname_is_tagname true
 $type uuid
 
 .   8ca63437-1b1e-4a85-8512-02ba5c15a412    Lapine      sid=340
@@ -1315,6 +1352,7 @@ $type uuid
 
 
 $class mediatype
+$displayname_is_tagname false
 $generator style=name-based,namespace=38ef9f1b-1cea-4173-953e-4fdee539010d,generator=5c8c072e-f1a2-4824-9721-d57e811b6b4f
 
 .   application
@@ -1331,6 +1369,7 @@ $generator style=name-based,namespace=38ef9f1b-1cea-4173-953e-4fdee539010d,gener
 
 
 $class mediasubtype
+$displayname_is_tagname false
 $generator style=name-based,namespace=50d7c533-2d9b-4208-b560-bcbbf75ce3f9,generator=a649d48d-35b0-4454-81af-c5fd2eb40373
 
 .   application/gzip                                            .   sid=233
@@ -1383,6 +1422,7 @@ $generator style=name-based,namespace=50d7c533-2d9b-4208-b560-bcbbf75ce3f9,gener
 
 
 $class wikidata
+$displayname_is_tagname false
 $type wd
 % We only include a small selection here
 
@@ -1450,6 +1490,7 @@ $extra_classes link
 
 
 $class factgrid
+$displayname_is_tagname false
 $type uuid=d576b9d1-47d4-43ae-b7ec-bbea1fe009ba
 $namespace 6491f7a9-0b29-4ef1-992c-3681cea18182,lc
 
@@ -1470,6 +1511,7 @@ $extra_classes link
 
 
 $class _other
+$displayname_is_tagname true
 $type uuid
 
 .   54bf8af4-b1d7-44da-af48-5278d11e8f32    ValueFile
@@ -1494,6 +1536,7 @@ $extra_classes generator
 
 
 $class _leftover_sids
+$displayname_is_tagname false
 $type uuid
 
 % Handled above: 1 - 6

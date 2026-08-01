@@ -1,19 +1,25 @@
 BEGIN {
   -e 'Distar'
-    or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git")
+    or system("git clone https://github.com/p5sagit/Distar.git")
 }
 use lib 'Distar/lib';
 use Distar;
 
-author 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>';
+author [
+  'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>',
+  'Nicholas B. Hubbard (cpan:NHUBBARD) <nicholashubbard@posteo.net>',
+];
 
 manifest_include bin => qr{plx.*};
 
 system('pod2markdown', 'bin/plx', 'README.md');
-system('maint/buildpack');
 
 sub MY::postamble {
-  q{distdir: actual_module_file
+  q{fatpack: bin/plx-packed
+bin/plx-packed: bin/plx maint/buildpack maint/fatpack-cpanfile
+	maint/buildpack
+
+distdir: bin/plx-packed actual_module_file
 actual_module_file: create_distdir
 	$(MKPATH) $(DISTVNAME)/lib/App/
 	cp $(DISTVNAME)/bin/plx $(DISTVNAME)/lib/App/plx.pm

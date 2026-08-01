@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::SV 0.55;
+package Devel::MAT::SV 0.56;
 
 use v5.20;
 use warnings;
@@ -25,7 +25,6 @@ use List::Util qw( first );
 
 use Struct::Dumb 0.07 qw( readonly_struct );
 readonly_struct Reference => [qw( name strength sv )];
-readonly_struct Magic     => [qw( type obj ptr vtbl )];
 
 =head1 NAME
 
@@ -207,24 +206,34 @@ Returns the (approximate) size in bytes of the SV
    @magics = $sv->magic;
 
 Returns a list of magic applied to the SV; each giving the type and target SVs
-as struct fields:
+as struct fields. The exact structures for v1 and v2 magic differ.
 
+For (original) Magic v1:
+
+           $magic->ver == 1;
    $type = $magic->type;
-   $sv = $magic->obj;
-   $sv = $magic->ptr;
-   $ptr = $magic->vtbl;
+   $sv   = $magic->obj;
+   $sv   = $magic->ptr;
+   $ptr  = $magic->vtbl;
+
+For Magic v2:
+
+             $magic->ver == 2;
+   $u16    = $magic->priv;
+   $len    = $magic->ptrlen;
+   $iv     = $magic->keyiv;
+   $ptr    = $magic->funcs;
+   $sv     = $magic->auxsv;
+   $ptr    = $magic->ptr;
+   $sv     = $magic->keysv;
+   $struct = $magic->userstruct;
 
 =cut
 
 sub magic ( $self )
 {
    return unless my $magic = $self->{magic};
-
-   my $df = $self->df;
-   return map {
-      my ( $type, undef, $obj_at, $ptr_at, $vtbl_ptr ) = @$_;
-      Magic( $type, $df->sv_at( $obj_at ), $df->sv_at( $ptr_at ), $vtbl_ptr );
-   } @$magic;
+   return @$magic;
 }
 
 =head2 magic_svs
@@ -240,11 +249,14 @@ sub magic_svs ( $self )
 {
    return unless my $magic = $self->{magic};
 
-   my $df = $self->df;
    return map {
-      my ( undef, undef, $obj_at, $ptr_at ) = @$_;
-      ( $obj_at ? ( $df->sv_at( $obj_at ) ) : () ),
-      ( $ptr_at ? ( $df->sv_at( $ptr_at ) ) : () )
+      my $mg = $_;
+      if( $mg->ver == 1 ) {
+         grep { defined } $mg->obj, $mg->ptr;
+      }
+      elsif( $mg->ver == 2 ) {
+         grep { defined } $mg->auxsv, $mg->keysv, $mg->userstruct;
+      }
    } @$magic;
 }
 
@@ -262,9 +274,10 @@ sub backrefs ( $self )
    return undef unless my $magic = $self->{magic};
 
    foreach my $mg ( @$magic ) {
-      my ( $type, undef, $obj_at ) = @$mg;
-      # backrefs list uses "<" magic type
-      return $self->df->sv_at( $obj_at ) if $type eq "<";
+      # backrefs list uses "<" magic v1 type
+      if( $mg->ver == 1 and $mg->type eq "<" ) {
+         return $mg->obj;
+      }
    }
 
    return undef;
@@ -285,9 +298,55 @@ sub rootname ( $self )
 }
 
 # internal
+package Devel::MAT::SV::_Magic {
+   sub new ( $class, @args ) { bless [ @args[0..5], (undef)x2 ], $class }
+   sub ver             { 1 }
+   sub df    ( $self ) { $self->[0] }
+   sub type  ( $self ) { $self->[1] }
+   sub flags ( $self ) { $self->[2] }
+   # [3] == obj_at 
+   # [4] == ptr_at 
+   sub vtbl  ( $self ) { $self->[5] }
+
+   # obj and ptr have to be resolved lazily, in case the SVs they point at
+   # weren't yet loaded at construction time
+   sub obj   ( $self ) { $self->[6] //= $self->df->sv_at( $self->[3] ) }
+   sub ptr   ( $self ) { $self->[7] //= $self->df->sv_at( $self->[4] ) }
+}
 sub more_magic ( $self, $type, $flags, $obj_at, $ptr_at, $vtbl_ptr )
 {
-   push $self->{magic}->@*, [ $type => $flags, $obj_at, $ptr_at, $vtbl_ptr ];
+   my $df = $self->df;
+
+   push $self->{magic}->@*,
+      Devel::MAT::SV::_Magic->new( $df, $type, $flags, $obj_at, $ptr_at, $vtbl_ptr );
+}
+
+package Devel::MAT::SV::_Magicv2 {
+   sub new ( $class, @args ) { bless [ @args[0..9], (undef)x2 ], $class }
+   sub ver              { 2 }
+   sub df     ( $self ) { $self->[0] }
+   sub flags  ( $self ) { $self->[1] }
+   sub priv   ( $self ) { $self->[2] }
+   sub ptrlen ( $self ) { $self->[3] }
+   sub keyiv  ( $self ) { $self->[4] }
+   sub funcs  ( $self ) { $self->[5] }
+   # [6] == auxsv_at
+   sub ptr    ( $self ) { $self->[7] }
+   # [8] == keysv_at
+   # [9] == userstruct_at
+
+   # auxsv, keysv and userstruct have to be resolved lazily, in case the SVs
+   # they point at weren't yet loaded at construction time
+   sub auxsv      ( $self ) { $self->[10] //= $self->df->sv_at( $self->[6] ) }
+   sub keysv      ( $self ) { $self->[11] //= $self->df->sv_at( $self->[8] ) }
+   sub userstruct ( $self ) { $self->[12] //= $self->df->sv_at( $self->[9] ) }
+}
+sub more_magicv2 ( $self, $flags, $priv, $ptrlen, $keyiv, $mg_ptr, $funcs_ptr, $auxsv_at, $ptr, $keysv_at )
+{
+   my $df = $self->df;
+
+   push $self->{magic}->@*,
+      Devel::MAT::SV::_Magicv2->new( $df, $flags, $priv, $ptrlen, $keyiv, $mg_ptr, $funcs_ptr, $auxsv_at, $ptr, $keysv_at );
 }
 
 sub _more_annotations ( $self, $val_at, $name )
@@ -361,20 +420,44 @@ sub _outrefs_matching ( $self, $match, $no_desc )
    }
 
    foreach my $mg ( ( $self->{magic} || [] )->@* ) {
-      my ( $type, $flags, $obj_at, $ptr_at ) = @$mg;
+      my $ver = $mg->ver;
 
-      if( my $obj = $self->df->sv_at( $obj_at ) ) {
-         my $is_strong = ( $flags & 0x01 );
-         if( $match & ( $is_strong ? STRENGTH_STRONG : STRENGTH_WEAK ) ) {
-            my $strength = $is_strong ? "strong" : "weak";
-            push @outrefs, $no_desc ? ( $strength => $obj ) :
-               Reference( "'$type' magic object", $strength => $obj );
+      if( $ver == 1 ) {
+         my $type = $mg->type;
+
+         if( my $obj = $mg->obj ) {
+            my $is_strong = ( $mg->flags & 0x01 );
+            if( $match & ( $is_strong ? STRENGTH_STRONG : STRENGTH_WEAK ) ) {
+               my $strength = $is_strong ? "strong" : "weak";
+               push @outrefs, $no_desc ? ( $strength => $obj ) :
+                  Reference( "'$type' magic object", $strength => $obj );
+               }
+            }
+
+         if( $match & STRENGTH_STRONG and my $ptr = $mg->ptr ) {
+            push @outrefs, $no_desc ? ( strong => $ptr ) :
+               Reference( "'$type' magic pointer", strong => $ptr );
          }
       }
+      elsif( $ver == 2 ) {
+         if( my $auxsv = $mg->auxsv ) {
+            my $is_strong = !( $mg->flags & 0x01 ); # WEAK_AUXSV flag
+            if( $match & ( $is_strong ? STRENGTH_STRONG : STRENGTH_WEAK ) ) {
+               my $strength = $is_strong ? "strong" : "weak";
+               push @outrefs, $no_desc ? ( $strength => $auxsv ) :
+                  Reference( "MagicV2 auxsv", $strength => $auxsv );
+            }
+         }
 
-      if( $match & STRENGTH_STRONG and my $ptr = $self->df->sv_at( $ptr_at ) ) {
-         push @outrefs, $no_desc ? ( strong => $ptr ) :
-            Reference( "'$type' magic pointer", strong => $ptr );
+         if( $match & STRENGTH_STRONG and my $keysv = $mg->keysv ) {
+            push @outrefs, $no_desc ? ( strong => $keysv ) :
+               Reference( "MagicV2 keysv", strong => $keysv );
+         }
+
+         if( $match & STRENGTH_STRONG and my $userstruct = $mg->userstruct ) {
+            push @outrefs, $no_desc ? ( strong => $userstruct ) :
+               Reference( "MagicV2 userstruct", strong => $userstruct );
+         }
       }
    }
 
@@ -518,7 +601,7 @@ boolean true and false. They are
 
 =cut
 
-package Devel::MAT::SV::Immortal 0.55;
+package Devel::MAT::SV::Immortal 0.56;
 use base qw( Devel::MAT::SV );
 use constant immortal => 1;
 use constant basetype => "SV";
@@ -530,12 +613,12 @@ sub new ( $class, $df, $addr )
 }
 sub _outrefs ( @ ) { () }
 
-package Devel::MAT::SV::UNDEF 0.55;
+package Devel::MAT::SV::UNDEF 0.56;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc ( $ ) { "UNDEF" }
 sub type ( $ ) { "UNDEF" }
 
-package Devel::MAT::SV::YES 0.55;
+package Devel::MAT::SV::YES 0.56;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc ( $ ) { "YES" }
 sub type ( $ ) { "SCALAR" }
@@ -548,7 +631,7 @@ sub pv ( $ ) { "1" }
 sub rv ( $ ) { undef }
 sub is_weak ( $ ) { '' }
 
-package Devel::MAT::SV::NO 0.55;
+package Devel::MAT::SV::NO 0.56;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc ( $ ) { "NO" }
 sub type ( $ ) { "SCALAR" }
@@ -561,7 +644,7 @@ sub pv ( $ ) { "0" }
 sub rv ( $ ) { undef }
 sub is_weak ( $ ) { '' }
 
-package Devel::MAT::SV::Unknown 0.55;
+package Devel::MAT::SV::Unknown 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 0xff );
 
@@ -569,7 +652,7 @@ sub desc ( $ ) { "UNKNOWN" }
 
 sub _outrefs ( @ ) {}
 
-package Devel::MAT::SV::GLOB 0.55;
+package Devel::MAT::SV::GLOB 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 1 );
 use constant $CONSTANTS;
@@ -742,7 +825,7 @@ sub _more_saved ( $self, $slot, $addr )
    push $self->{saved}->@*, [ $slot => $addr ];
 }
 
-package Devel::MAT::SV::SCALAR 0.55;
+package Devel::MAT::SV::SCALAR 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 2 );
 use constant $CONSTANTS;
@@ -898,7 +981,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::REF 0.55;
+package Devel::MAT::SV::REF 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 3 );
 use constant $CONSTANTS;
@@ -981,7 +1064,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::BOOL 0.55;
+package Devel::MAT::SV::BOOL 0.56;
 use base qw( Devel::MAT::SV::SCALAR );
 
 sub type ( $ ) { return "BOOL" }
@@ -992,7 +1075,7 @@ sub desc ( $self )
    return "BOOL(NO)";
 }
 
-package Devel::MAT::SV::ARRAY 0.55;
+package Devel::MAT::SV::ARRAY 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 4 );
 use constant $CONSTANTS;
@@ -1133,7 +1216,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::PADLIST 0.55;
+package Devel::MAT::SV::PADLIST 0.56;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PADLIST";
@@ -1177,7 +1260,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::PADNAMES 0.55;
+package Devel::MAT::SV::PADNAMES 0.56;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PADNAMES";
@@ -1251,7 +1334,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::PAD 0.55;
+package Devel::MAT::SV::PAD 0.56;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PAD";
@@ -1360,7 +1443,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::HASH 0.55;
+package Devel::MAT::SV::HASH 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 5 );
 use constant $CONSTANTS;
@@ -1528,7 +1611,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::STASH 0.55;
+package Devel::MAT::SV::STASH 0.56;
 use base qw( Devel::MAT::SV::HASH );
 __PACKAGE__->register_type( 6 );
 use constant $CONSTANTS;
@@ -1657,7 +1740,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::CODE 0.55;
+package Devel::MAT::SV::CODE 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 7 );
 use constant $CONSTANTS;
@@ -2199,7 +2282,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::IO 0.55;
+package Devel::MAT::SV::IO 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 8 );
 use constant $CONSTANTS;
@@ -2268,7 +2351,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::LVALUE 0.55;
+package Devel::MAT::SV::LVALUE 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 9 );
 use constant $CONSTANTS;
@@ -2304,7 +2387,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::REGEXP 0.55;
+package Devel::MAT::SV::REGEXP 0.56;
 use base qw( Devel::MAT::SV );
 use constant basetype => "REGEXP";
 __PACKAGE__->register_type( 10 );
@@ -2315,7 +2398,7 @@ sub desc ( $ ) { "REGEXP()" }
 
 sub _outrefs ( @ ) { () }
 
-package Devel::MAT::SV::FORMAT 0.55;
+package Devel::MAT::SV::FORMAT 0.56;
 use base qw( Devel::MAT::SV );
 use constant basetype => "PVFM";
 __PACKAGE__->register_type( 11 );
@@ -2326,7 +2409,7 @@ sub desc ( $ ) { "FORMAT()" }
 
 sub _outrefs ( @ ) { () }
 
-package Devel::MAT::SV::INVLIST 0.55;
+package Devel::MAT::SV::INVLIST 0.56;
 use base qw( Devel::MAT::SV );
 use constant basetype => "INVLIST";
 __PACKAGE__->register_type( 12 );
@@ -2338,7 +2421,7 @@ sub desc ( $ ) { "INVLIST()" }
 sub _outrefs ( @ ) { () }
 
 # A hack to compress files
-package Devel::MAT::SV::_UNDEFSV 0.55;
+package Devel::MAT::SV::_UNDEFSV 0.56;
 use base qw( Devel::MAT::SV::SCALAR );
 __PACKAGE__->register_type( 13 );
 
@@ -2352,7 +2435,7 @@ sub load ( $self, $header, $ptrs, $strs )
    );
 }
 
-package Devel::MAT::SV::_YESSV 0.55;
+package Devel::MAT::SV::_YESSV 0.56;
 use base qw( Devel::MAT::SV::BOOL );
 __PACKAGE__->register_type( 14 );
 
@@ -2366,7 +2449,7 @@ sub load ( $self, $header, $ptrs, $strs )
    );
 }
 
-package Devel::MAT::SV::_NOSV 0.55;
+package Devel::MAT::SV::_NOSV 0.56;
 use base qw( Devel::MAT::SV::BOOL );
 __PACKAGE__->register_type( 15 );
 
@@ -2380,7 +2463,7 @@ sub load ( $self, $header, $ptrs, $strs )
    );
 }
 
-package Devel::MAT::SV::OBJECT 0.55;
+package Devel::MAT::SV::OBJECT 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 16 );
 use constant $CONSTANTS;
@@ -2472,7 +2555,7 @@ sub _outrefs ( $self, $match, $no_desc )
    return @outrefs;
 }
 
-package Devel::MAT::SV::CLASS 0.55;
+package Devel::MAT::SV::CLASS 0.56;
 use base qw( Devel::MAT::SV::STASH );
 __PACKAGE__->register_type( 17 );
 use constant $CONSTANTS;
@@ -2591,7 +2674,7 @@ sub _outrefs ( $self, $match, $no_desc )
 
 # A "SV" type that isn't really an SV, but has many of the same methods. These
 # aren't created by core perl, but are used by XS extensions
-package Devel::MAT::SV::C_STRUCT 0.55;
+package Devel::MAT::SV::C_STRUCT 0.56;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 0x7F );
 use constant $CONSTANTS;

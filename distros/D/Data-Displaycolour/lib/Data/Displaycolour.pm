@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -18,7 +18,7 @@ use Data::URIID::Colour;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Known);
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my %_abstract_names_to_ise = (
     black    => 'fade296d-c34f-4ded-abd5-d9adaf37c284',
@@ -71,11 +71,12 @@ my %_palette = (
         green       => '#8AE234',
         blue        => '#729FCF',
         cyan        => '#6BE5E5',
-        magenta     => '#AD7FA8',
+        magenta     => '#ff65c1',
         yellow      => '#FCE94F',
         grey        => '#888A85',
         orange      => '#FCAF3E',
         savannah    => '#E9B96E',
+        _other      => ['#ad7fa8'],
     },
     vga => {
         black       => '#000000',
@@ -180,8 +181,20 @@ my %_palette = (
         blue        => '#2E2C9B',
         yellow      => '#EDF171',
         orange      => '#8E5029',
-        gray        => '#B2B2B2',
+        grey        => '#B2B2B2',
         _other      => ['#C46C71', '#4A4A4A', '#7B7B7B', '#A9FF9F', '#706DEB', '#553800'],
+    },
+    cga => {
+        black       => '#000000',
+        white       => '#FFFFFF',
+        red         => '#AA0000',
+        green       => '#00AA00',
+        blue        => '#0000AA',
+        cyan        => '#00AAAA',
+        magenta     => '#AA00AA',
+        yellow      => '#FFFF55',
+        grey        => '#AAAAAA',
+        _other      => ['#AA5500', '#555555', '#5555FF', '#55FF55', '#55FFFF', '#FF5555', '#FF55FF', '#AAAA00'],
     },
 );
 
@@ -244,21 +257,31 @@ sub new {
 
     if (!defined($self->{origin}) && defined(my $for = delete $opts{for})) {
         my $id = eval {Data::Identifier->new(from => $for)};
-        if (defined $_abstract_ise_to_name{eval {$id->ise} // ''}) {
-            $opts{from} //= $for;
-        } elsif ($for->isa('Data::URIID::Result')) {
-            eval {$self->so_attach(extractor => $for->extractor)};
-            $self->{origin} //= $for->attribute('displaycolour', as => 'Data::URIID::Colour', default => undef);
-            $opts{for__ise} //= $for->ise(default => undef);
-        } else {
-            my Data::URIID $extractor = $self->extractor;
-            my Data::URIID::Result $result = $extractor->lookup($for);
 
-            $self->{origin} //= $result->attribute('displaycolour', as => 'Data::URIID::Colour', default => undef);
-            $opts{for__ise} //= $for->ise(default => undef);
+        if (eval {$for->isa('Data::Identifier::Interface::Userdata')}) {
+            foreach my $key (qw(origin abstract specific)) {
+                my $v = scalar(eval { $for->userdata(__PACKAGE__, 'mark_'.$key) }) // next;
+                $opts{from} //= $v;
+            }
         }
 
-        $opts{for_displayname} //= $id->displayname(default => undef, no_defaults => 1) if defined $id;
+        unless (defined $opts{from}) {
+            if (defined $_abstract_ise_to_name{eval {$id->ise} // ''}) {
+                $opts{from} //= $for;
+            } elsif ($for->isa('Data::URIID::Result')) {
+                eval {$self->so_attach(extractor => $for->extractor)};
+                $self->{origin} //= $for->attribute('displaycolour', as => 'Data::URIID::Colour', default => undef);
+                $opts{for__ise} //= $for->ise(default => undef);
+            } else {
+                my Data::URIID $extractor = $self->extractor;
+                my Data::URIID::Result $result = $extractor->lookup($for);
+
+                $self->{origin} //= $result->attribute('displaycolour', as => 'Data::URIID::Colour', default => undef);
+                $opts{for__ise} //= $for->ise(default => undef);
+            }
+
+            $opts{for_displayname} //= $id->displayname(default => undef, no_defaults => 1) if defined $id;
+        }
     }
 
 
@@ -451,6 +474,32 @@ sub list_colours {
     return \%res;
 }
 
+
+sub mark {
+    my ($obj, %opts) = @_;
+    croak 'Invalid object, not a Data::Identifier::Interface::Userdata' unless $obj->isa('Data::Identifier::Interface::Userdata');
+
+    $opts{origin} //= delete $opts{from};
+
+    foreach my $key (qw(origin abstract specific)) {
+        my $v = delete($opts{$key}) // next;
+
+        if (!ref $v) {
+            $v = Data::URIID::Colour->new(rgb => $v);
+        } elsif ($v->isa('Data::Identifier')) {
+            # no-op.
+        } else {
+            $v = Data::URIID::Colour->new(from => $v);
+        }
+
+        $obj->userdata(__PACKAGE__, 'mark_'.$key => $v);
+    }
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $obj;
+}
+
 # ---- Private helpers ----
 
 sub _colour_getter {
@@ -492,7 +541,52 @@ sub extractor {
     return $extractor;
 }
 
+sub import {
+    my ($pkg, $opts) = @_;
+    return unless defined $opts;
+    croak 'Bad options' unless ref($opts) eq 'HASH';
+
+    if (defined(my $register_colours = $opts->{register_colours})) {
+        $register_colours = [split /\s*,\s*/, $register_colours] unless ref $register_colours;
+        foreach my $colours (@{$register_colours}) {
+            if ($colours eq ':abstract') {
+                foreach my $name (keys %_abstract_names_to_ise) {
+                    Data::Identifier->new(ise => $_abstract_names_to_ise{$name}, displayname => $name)->register;
+                }
+            } elsif ($colours eq ':specific') {
+                foreach my $palette (keys %_palette) {
+                    $pkg->_register_colours_of_palette($palette);
+                }
+            } elsif ($colours eq ':common') {
+                foreach my $name (keys %_abstract_names_to_ise) {
+                    Data::Identifier->new(ise => $_abstract_names_to_ise{$name}, displayname => $name)->register;
+                }
+                foreach my $palette (qw(fallbacks v0 vga girlsandboys fun)) {
+                    $pkg->_register_colours_of_palette($palette);
+                }
+            } elsif (exists $_palette{$colours}) {
+                $pkg->_register_colours_of_palette($colours);
+            } else {
+                croak 'Invalid import option value for: register_colours';
+            }
+        }
+    }
+}
+
 # ---- Private loaders ----
+sub _register_colours_of_palette {
+    require Data::Identifier::Generate;
+
+    my ($pkg, $palette) = @_;
+    state $register = Data::URIID::Colour->can('register') ? sub { Data::URIID::Colour->new(rgb => $_[0])->register } : sub { Data::Identifier::Generate->colour($_[0])->register };
+    state $done = {};
+
+    foreach my $rgb (map {fc} map {ref ? @$_ : $_} values %{$_palette{$palette}}) {
+        next if exists $done->{$rgb};
+        $done->{$rgb} = undef;
+        $register->($rgb);
+    }
+}
 
 sub _match_with_quality {
     my ($haystack, $needle) = @_;
@@ -585,11 +679,13 @@ Data::Displaycolour - Work with display colours
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
     use Data::Displaycolour;
+    # or:
+    use Data::Displaycolour {register_colours => ':common'}; # or: :abstract, :specific, or :all
 
     my Data::Displaycolour $dp = Data::Displaycolour->new(...);
 
@@ -601,6 +697,9 @@ B<Note:>
 This package is still a bit experimental.
 While the API should be stable for use, the results may change over the next releases
 as palette and matching code updates will take place.
+
+Explicit import arguments are experimental.
+(since v0.06)
 
 This package inherits from L<Data::Identifier::Interface::Userdata>, and L<Data::Identifier::Interface::Subobjects>, and
 L<Data::Identifier::Interface::Known>.
@@ -654,7 +753,7 @@ Please also keep the notes in the documentation for that method in mind.
 The palette to use. If this is a scalar it is the name of the palette.
 If an array reference it must be a list of C<#rrggbb> values.
 In this case the colours are matched to the abstract colours if possible,
-with the default values used what what cannot be matched.
+with the default values used with what cannot be matched.
 Other types of values might be supported.
 Newer versions of this module might support more palette types.
 
@@ -759,6 +858,48 @@ The values are a L<Data::Identifier> of the abstract colour this value represent
 
 For discovery of known palettes see L</known>.
 
+=head2 mark
+
+    $obj->Data::Displaycolour::mark(%opts);
+
+(experimental since v0.06)
+
+Marks any object implementing L<Data::Identifier::Interface::Userdata> with a given colour.
+
+Returns the object itself.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<origin>
+
+The colour to use. This is the same as C<from> in L</new> but for the supported value types.
+
+This accepts a value RGB value as per C<rgb> of L<Data::URIID::Colour/new>,
+a L<Data::Identifier>,
+or anything L<Data::URIID::Colour/new> accepts via C<from>, including an instance of L<Data::URIID::Colour> itself.
+
+=item C<from>
+
+An alias for C<origin>.
+
+=item C<abstract>
+
+(highly experimental)
+
+The abstract colour to use.
+Takes the same values as C<origin>.
+
+=item C<specific>
+
+(highly experimental)
+
+The specific colour to use.
+Takes the same values as C<origin>.
+
+=back
+
 =head2 known
 
     my @list = Data::Displaycolour->known($class [, %opts ] );
@@ -792,7 +933,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025 - 2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

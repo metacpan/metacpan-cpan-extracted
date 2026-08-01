@@ -5,9 +5,10 @@ package App::ElasticSearch::Utilities::Connection;
 use v5.16;
 use warnings;
 
-our $VERSION = '8.9'; # VERSION
+our $VERSION = '9.0'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
+use App::ElasticSearch::Utilities::VersionHacks qw(_fix_version_request);
 use CLI::Helpers qw(:output);
 use JSON::MaybeXS;
 use LWP::UserAgent;
@@ -66,6 +67,50 @@ has 'ssl_opts' => (
 );
 
 
+has 'version' => (
+    is => 'lazy',
+    isa => Str,
+    init_arg => undef,
+);
+
+sub _build_version {
+    my $self = shift;
+
+    # Retry with TLS and/or Auth
+    my $resp = $self->request('/',{skip_version_check => 1});
+    my $err;
+    if( $resp->is_success ) {
+        my $ver;
+        eval {
+            $ver = $resp->content->{version};
+        };
+        if( $ver ) {
+            if( $ver->{distribution} and $ver->{distribution} eq 'opensearch' ) {
+                return sprintf "%0.1f", version->parse($ver->{minimum_wire_compatibility_version});
+            }
+            else {
+                return sprintf "%0.1f", version->parse($ver->{number});
+            }
+        } else {
+            $err = "Parsing version failed";
+        }
+    }
+    elsif( $resp->code == 500 && $resp->message eq "Server closed connection without sending any data back" ) {
+        $err = "Attempting promotion to HTTPS, try setting 'proto: https' in ~/.es-utils.yaml";
+    }
+    elsif( $resp->code == 401 ) {
+        $err = $self->password ? sprintf("Authorization failed for user '%s'", $self->username)
+                               : "Authorization required, try setting 'password-exec: /home/user/bin/get-password.sh` in ~/.es-utils.yaml'";
+    }
+    else {
+        $err = "Failed getting version";
+    }
+    output({color=>'red',stderr=>1}, sprintf "FAIL [%d] Unable to determine Elasticsearch version: %s", $resp->code, $err);
+    output({color=>'red',stderr=>1}, ref $resp->content ? YAML::XS::Dump($resp->content) : $resp->content) if $resp->content;
+    exit 1;
+}
+
+
 has 'ua' => (
     is  => 'lazy',
     isa => InstanceOf["LWP::UserAgent"],
@@ -91,8 +136,8 @@ sub _build_ua {
     $ua->add_handler( response_done => sub {
         my ($response,$lwp_ua,$headers) = @_;
         debug( {color=>'magenta'}, "respone_done handler, got:");
+        debug($response->as_string);
 
-        debug_var($response);
         my $ctype = $response->content_type() || 'invalid';
         # JSON Transform
         if( $ctype =~ m{^application/json\b} ) {
@@ -135,12 +180,13 @@ sub _build_ua {
 sub request {
     my ($self,$url,$options,$body) = @_;
 
+    # Skip Version Check
+    my $skip_version_check = delete $options->{skip_version_check};
+
     # Build the Path
     $options->{command} ||= $url;
     my @path = grep { defined and length } @{ $options }{qw(index command)};
-
     my $path = join('/', @path);
-
     debug(sprintf "calling %s->request(%s)", ref $self, $path);
 
     # Build a URI
@@ -170,7 +216,12 @@ sub request {
         $uri->path($options->{index});
     }
 
-    debug({color=>'magenta'}, sprintf "Issuing %s with URI of '%s'", $method, $uri->as_string);
+    # Apply VersionHacks
+    if ( !$skip_version_check ) {
+        ($url,$options,$body) = _fix_version_request($self->version,$url,$options,$body);
+    }
+
+    debug({color=>'magenta'}, sprintf "Issuing %s with URI of '%s' as '%s:%s'", $method, $uri->as_string, $self->username, length $self->password ? 'hunter2' : '');
     if( defined $body ) {
         if( is_ref($body) )  {
             debug_var({indent=>1}, $body);
@@ -242,7 +293,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 8.9
+version 9.0
 
 =head1 SYNOPSIS
 
@@ -303,6 +354,10 @@ HTTP Basic Authorization password, if set, we'll try authentication.
 =head2 ssl_opts
 
 SSL Options for L<LWP::UserAgent/ssl_opts>.
+
+=head2 version
+
+Detected ElasticSearch version
 
 =head2 ua
 

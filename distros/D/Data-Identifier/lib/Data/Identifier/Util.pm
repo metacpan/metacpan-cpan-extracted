@@ -18,7 +18,7 @@ use Carp;
 use Data::Identifier;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.31;
+our $VERSION = v0.32;
 
 use constant {
     BOOL_TRUE  => Data::Identifier->new(uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5')->register,
@@ -694,7 +694,8 @@ sub regenerate {
 
         if (defined $n) {
             foreach my $key (qw(displayname displaycolour description icontext)) {
-                $identifier->{$key} //= $n->{$key} // next;
+                next unless defined $n->{$key};
+                $identifier->{$key} //= $n->{$key};
             }
         }
     }
@@ -799,7 +800,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.31
+version v0.32
 
 =head1 SYNOPSIS
 
@@ -835,7 +836,7 @@ Creates a new instance that can be used to call the different methods.
 (experimental since v0.30)
 
 Returns a true or false as an identifier based on the passed boolean.
-The value is check for it's boolean value by perl's rules.
+The value is checked for it's boolean value by perl's rules.
 
 =head2 is_true
 

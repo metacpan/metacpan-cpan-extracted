@@ -201,15 +201,21 @@ qx.Class.define("callbackery.ui.Login", {
 
         login.addListener("execute", function(e) {
             this.setEnabled(false);
-            var doc = this.__getIframeDocument();
-            // save the username and password to our hidden iframe form
-            doc.getElementById("cbUsername").value = username.getValue();
             var passwordValue;
             if (! cfg.hide_password) {
                 passwordValue = password.getValue();
-                doc.getElementById("cbPassword").value = passwordValue;
             }
-            rpc.callAsync(qx.lang.Function.bind(this.__loginHandler, this), 'login',
+            // The credentials are handed to the hidden iframe form in the
+            // handler, once the login actually succeeded. Nothing about the
+            // iframe happens before this call: it is a convenience for the
+            // browser's password manager and must never be able to stop a
+            // login. It used to run here, and whenever the iframe had not
+            // finished loading /login the null it returned threw before this
+            // line ever ran -- leaving the form disabled forever with no
+            // request sent and nothing on screen to say why.
+            rpc.callAsync(qx.lang.Function.bind(
+                    this.__loginHandler, this, username.getValue(), passwordValue),
+                'login',
                 username.getValue(),
                 passwordValue
             );
@@ -251,8 +257,45 @@ qx.Class.define("callbackery.ui.Login", {
 
     members : {
         /**
+         * Hand the credentials to the browser's password manager by filling
+         * the hidden iframe form and submitting it.
+         *
+         * Best effort by design. The iframe reloads /login on every appear,
+         * so its document can still be blank when this runs and
+         * getElementById then returns null. That is a missed save prompt and
+         * nothing more, so every step is guarded and the caller ignores the
+         * outcome -- this must never come between the user and their session.
+         *
+         * @param username {String} the user name to offer for saving
+         * @param password {String} the password to offer, may be undefined
+         * @return {void}
+         */
+        __rememberCredentials: function(username, password) {
+            try {
+                var doc = this.__getIframeDocument();
+                var form = doc && doc.getElementById('cbLoginForm');
+                var userField = doc && doc.getElementById('cbUsername');
+                var passField = doc && doc.getElementById('cbPassword');
+                if (!form || !userField) {
+                    this.debug('login iframe not ready, skipping the password save prompt');
+                    return;
+                }
+                userField.value = username;
+                if (password !== undefined && passField) {
+                    passField.value = password;
+                }
+                form.submit();
+            }
+            catch (e) {
+                this.debug('could not offer the credentials for saving: ' + e);
+            }
+        },
+
+        /**
          * Handler for the login events
          *
+         * @param username {String} the user name that was submitted.
+         * @param password {String} the password that was submitted, may be undefined.
          * @param ret {Boolean} true if the login is ok and false if it is not ok.
          * @param exc {Exception} any error found during the login process.
          * @return {void}
@@ -277,11 +320,10 @@ qx.Class.define("callbackery.ui.Login", {
             var iframe = this.__iframe;
             return iframe.contentWindow ? iframe.contentWindow.document : iframe.contentDocument;
         },
-        __loginHandler : function(ret, exc) {
+        __loginHandler : function(username, password, ret, exc) {
             if (exc == null) {
                 if (qx.lang.Type.isObject(ret) && ret.sessionCookie) {
-                    // submit the iframe form to trigger the browser to save the password
-                    this.__getIframeDocument().getElementById('cbLoginForm').submit();
+                    this.__rememberCredentials(username, password);
                     this.fireDataEvent('login', ret);
                     this.close();
                 }

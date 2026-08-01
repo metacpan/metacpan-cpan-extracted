@@ -60,7 +60,7 @@ eval{
 	$sorter=Net::Connection::Sort::unsorted->new;
 	$worked=1;
 };
-ok( $worked eq 1, 'sorter init') or die ('Net::Connection::Sort::state->new resulted in... '.$@);
+ok( $worked == 1, 'sorter init') or die ('Net::Connection::Sort::unsorted->new resulted in... '.$@);
 
 my @sorted;
 $worked=0;
@@ -68,11 +68,11 @@ eval{
 	@sorted=$sorter->sorter( \@objects );
 	$worked=1;
 };
-ok( $worked eq 1, 'sort') or die ('Net::Connection::Sort::state->sorter(@objects) resulted in... '.$@);
+ok( $worked == 1, 'sort') or die ('Net::Connection::Sort::unsorted->sorter(@objects) resulted in... '.$@);
 
-ok( $sorted[0]->state =~ 'LISTEN', 'sort order 0') or die ('The state for 0 is not LISTEN');
-ok( $sorted[1]->state =~ 'FIN_WAIT_2', 'sort order 1') or die ('The state for 1 is not FIN_WAIT_2');
-ok( $sorted[2]->state =~ 'TIME_WAIT', 'sort order 2') or die ('The state for 2 is not TIME_WAIT');
-ok( $sorted[3]->state =~ 'ESTABLISHED', 'sort order 2') or die ('The state for 3 is not ESTABLISHED');
+ok( $sorted[0]->state eq 'LISTEN', 'sort order 0') or die ('The state for 0 is not LISTEN');
+ok( $sorted[1]->state eq 'FIN_WAIT_2', 'sort order 1') or die ('The state for 1 is not FIN_WAIT_2');
+ok( $sorted[2]->state eq 'TIME_WAIT', 'sort order 2') or die ('The state for 2 is not TIME_WAIT');
+ok( $sorted[3]->state eq 'ESTABLISHED', 'sort order 3') or die ('The state for 3 is not ESTABLISHED');
 
 done_testing(7);

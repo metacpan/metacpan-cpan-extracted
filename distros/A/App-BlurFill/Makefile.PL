@@ -7,16 +7,17 @@ WriteMakefile(
     AUTHOR       => 'dave@perlhacks.com',
     ABSTRACT     => 'Blurred background fill image processor',
     PREREQ_PM    => {
-        'Imager'         => 0,
-        'File::Basename' => 0,
-        'File::Temp'     => 0,
-        'Test::More'     => 0,
-        'Dancer2'        => 0,
-        'Plack'          => 0,
-        'Starman'        => 0,
+        'Imager'            => 0,
+        'Imager::File::PNG' => 0,
+        'File::Basename'    => 0,
+        'File::Temp'        => 0,
+        'Getopt::Long'      => 0,
+    },
+    TEST_REQUIRES => {
+        'Test::More' => 0,
     },
     MIN_PERL_VERSION => '5.040',
-    EXE_FILES        => [ 'bin/app.psgi', 'bin/blurfill' ],
+    EXE_FILES        => [ 'bin/blurfill' ],
     META_MERGE    => {
         'meta-spec' => { version => 2 },
         resources => {

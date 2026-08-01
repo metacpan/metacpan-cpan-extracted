@@ -46,24 +46,45 @@ eval { require BATsh } or die "Cannot load BATsh: $@";
 my $HOME = $ENV{'HOME'};
 $HOME = '' unless defined $HOME;
 
+# STDOUT is returned; whatever the shell wrote to STDERR is stashed in
+# $CAPTURED_STDERR.  STDERR is captured (not left on the console) because
+# some of these cases deliberately provoke a diagnostic ("cd: ~user: No
+# such file or directory"), and a test run must not spray expected
+# diagnostics over the harness output.
+use vars qw($CAPTURED_STDERR);
+$CAPTURED_STDERR = '';
+
 sub _capture {
     my ($code) = @_;
     my $out = '';
-    local *OLDOUT;
+    $CAPTURED_STDERR = '';
+    local *OLDOUT; local *OLDERR;
     open(OLDOUT, ">&STDOUT") or die "cannot dup STDOUT: $!";
-    my $tmp = "$FindBin::Bin/_te_cap_$$.tmp";
+    open(OLDERR, ">&STDERR") or die "cannot dup STDERR: $!";
+    my $tmp  = "$FindBin::Bin/_te_cap_$$.tmp";
+    my $tmpe = "$FindBin::Bin/_te_err_$$.tmp";
     close(STDOUT);
     open(STDOUT, "> $tmp")
         or do { open(STDOUT, ">&OLDOUT"); die "cannot redirect STDOUT: $!" };
+    close(STDERR);
+    open(STDERR, "> $tmpe")
+        or do { open(STDERR, ">&OLDERR"); die "cannot redirect STDERR: $!" };
     eval { $code->() };
     my $err = $@;
     close(STDOUT);
+    close(STDERR);
     open(STDOUT, ">&OLDOUT") or die "cannot restore STDOUT: $!";
+    open(STDERR, ">&OLDERR") or die "cannot restore STDERR: $!";
     close(OLDOUT);
+    close(OLDERR);
     local *RF;
-    if (open(RF, $tmp)) { local $/; $out = <RF>; close(RF) }
+    if (open(RF, $tmp))  { local $/; $out = <RF>; close(RF) }
+    local *EF;
+    if (open(EF, $tmpe)) { local $/; $CAPTURED_STDERR = <EF>; close(EF) }
     unlink($tmp);
+    unlink($tmpe);
     $out = '' unless defined $out;
+    $CAPTURED_STDERR = '' unless defined $CAPTURED_STDERR;
     warn $err if $err;
     return $out;
 }
@@ -74,14 +95,23 @@ my @tests = (
     # 1. cd expansion
     ##################################################################
 
+    # The reference value for "where should we have landed?" is obtained by
+    # letting perl itself chdir() there and asking Cwd::cwd().  Comparing
+    # against Cwd::realpath()/abs_path() instead is not portable: on Win32
+    # the two disagree about separator direction, drive-letter case and 8.3
+    # short names on some perls, which produced a spurious FAIL on a
+    # Windows/5.18.4 smoker even though the tilde expansion was correct.
     sub {
         return _ok(1, 'TE01: skipped (HOME not set)') if $HOME eq '';
         my $save = Cwd::cwd();
+        my $want = chdir($HOME) ? Cwd::cwd() : '';
+        chdir($save);
+        return _ok(1, 'TE01: skipped (HOME is not reachable)') if $want eq '';
         BATsh::Env::init();
         _capture(sub { BATsh->run_string('cd ~') });
-        my $ok = (Cwd::cwd() eq $HOME) || (Cwd::cwd() eq Cwd::realpath($HOME));
+        my $got = Cwd::cwd();
         chdir($save);
-        _ok($ok, 'TE01: cd ~ goes to $HOME');
+        _ok(($got eq $want) ? 1 : 0, 'TE01: cd ~ goes to $HOME');
     },
 
     sub {
@@ -94,17 +124,36 @@ my @tests = (
             unless $_te02_readable;
         BATsh::Env::init();
         my $save = Cwd::cwd();
-        my $ok = 1;
-        eval {
-            require File::Temp;
-            my $sub = File::Temp::tempdir(DIR => $HOME, CLEANUP => 1);
-            my ($leaf) = ($sub =~ m{([^/\\]+)\z});
-            _capture(sub { BATsh->run_string("cd ~/$leaf") });
-            $ok = (Cwd::cwd() eq Cwd::realpath($sub));
-        };
-        $ok = 1 if $@;   # environment without writable HOME: don't fail the suite
+
+        # A private subdirectory under $HOME, made without File::Temp:
+        # that module is core only from 5.6.1, and this distribution
+        # supports 5.005_03, where "require File::Temp" would fail and
+        # leave this case silently passing instead of testing anything.
+        # mkdir() is itself the atomic claim, exactly as the rest of
+        # BATsh uses sysopen(O_CREAT|O_EXCL) rather than a temp-file
+        # module.
+        my $leaf = '';
+        for my $try (0 .. 99) {
+            my $cand = "batsh_te02_${$}_$try";
+            if (mkdir(File::Spec->catdir($HOME, $cand), 0700)) {
+                $leaf = $cand;
+                last;
+            }
+        }
+        return _ok(1, 'TE02: skipped ($HOME is not writable)') if $leaf eq '';
+
+        my $dir  = File::Spec->catdir($HOME, $leaf);
+        my $want = chdir($dir) ? Cwd::cwd() : '';
         chdir($save);
-        _ok($ok, 'TE02: cd ~/subdir expands under $HOME');
+        if ($want eq '') {
+            rmdir($dir);
+            return _ok(1, 'TE02: skipped (temp dir under $HOME unreachable)');
+        }
+        _capture(sub { BATsh->run_string("cd ~/$leaf") });
+        my $got = Cwd::cwd();
+        chdir($save);
+        rmdir($dir);
+        _ok(($got eq $want) ? 1 : 0, 'TE02: cd ~/subdir expands under $HOME');
     },
 
     sub {
@@ -115,7 +164,9 @@ my @tests = (
         });
         chdir($save);
         # Unresolvable ~user is left literal, so cd fails (no such directory).
-        _ok($out =~ /No such file or directory/,
+        # The diagnostic goes to STDERR, so look at both streams.
+        my $both = $out . $CAPTURED_STDERR;
+        _ok(($both =~ /No such file or directory/) ? 1 : 0,
             'TE03: cd ~nonexistentuser fails (word left literal)');
     },
 

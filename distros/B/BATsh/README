@@ -2,7 +2,7 @@ NAME
     BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 VERSION
-    Version 0.09
+    Version 0.10
 
 SYNOPSIS
       use BATsh;

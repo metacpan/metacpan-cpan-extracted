@@ -7,13 +7,23 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
-t/01-render.t
-t/02-as_image.t
-t/03-as_png.t
-t/04-as_graph.t
-t/05-graphviz-meta.t
-t/06-unusual-station-name.t
+t/01-graphviz-meta.t
+t/02-render-gv.t
+t/03-render-vector.t
+t/04-render-bitmap.t
+t/05-as_image.t
+t/06-as_png.t
+t/07-as_graph.t
+t/08-drivers.t
+t/09-unusual-station-name.t
+t/sample.xml
 t/unusual-station-name.xml
 t/lib/Sample.pm
+xt/changes.t
+xt/manifest.t
+xt/meta-json.t
+xt/meta-yml.t
+xt/pod.t
+xt/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

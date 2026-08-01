@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.55;
+package Devel::MAT::Dumpfile 0.56;
 
 use v5.20;
 use warnings;
@@ -551,6 +551,14 @@ sub _read_svx_89 ( $self, $sv, $bytes, $ptrs, $strs )
    else {
       warn sprintf "Ignoring SVxSHARED_HEK on non-SCALAR SV addr=%#x\n", $sv->addr;
    }
+}
+
+sub _read_svx_8A ( $self, $sv, $bytes, $ptrs, $strs )
+{
+   my ( $shape, $flags, $priv, $ptrlen, $keyiv ) = unpack "C C S ($self->{uint_fmt})2", $bytes;
+   $flags & 0x02 or undef $keyiv;
+
+   $sv->more_magicv2( $flags, $priv, $ptrlen, $keyiv, @{$ptrs}[0 .. 4] );
 }
 
 sub _read_ctx ( $self )

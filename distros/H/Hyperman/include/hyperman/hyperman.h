@@ -1,0 +1,59 @@
+#ifndef HYPERMAN_H
+#define HYPERMAN_H
+
+/* Hyperman - shared types for the event loop core and its pluggable
+ * readiness backends. The backend wraps the OS
+ * mechanism (kqueue now, epoll later) behind add/modify/remove/wait; the
+ * loop core and HTTP/PSGI machinery live in Hyperman.xs. */
+
+#include <stddef.h>
+#include <stdint.h>
+#include <time.h>
+
+#define HM_MAXFD   65536
+#define HM_MAXEV   1024
+#define HM_RBUF    16384
+
+/* interest / event kinds */
+#define HM_EV_READ   0x1
+#define HM_EV_WRITE  0x2
+#define HM_EV_TIMER  0x4
+#define HM_EV_SIGNAL 0x8
+
+/* one normalized readiness event out of the backend */
+typedef struct {
+    int      kind;   /* HM_EV_* */
+    int      fd;     /* READ/WRITE: the fd; SIGNAL: signo */
+    void    *udata;  /* TIMER: the watcher registered with add_timer */
+} hm_event;
+
+/* Backend interface: add($fd,$mask) / modify / remove /
+ * wait($timeout) -> @ready. Timers and signals are watcher-style adds. */
+typedef struct hm_backend hm_backend;
+struct hm_backend {
+    const char *name;
+    void       *state;
+    int  (*add_io)    (hm_backend *, int fd, int mask, int oneshot);
+    int  (*modify_io) (hm_backend *, int fd, int mask, int oneshot);
+    int  (*remove_io) (hm_backend *, int fd, int mask);
+    int  (*add_timer) (hm_backend *, double secs, int oneshot, void *udata);
+    int  (*del_timer) (hm_backend *, void *udata);
+    int  (*add_signal)(hm_backend *, int signo);
+    /* timeout < 0 waits forever; returns count or -1 (errno) */
+    int  (*wait)      (hm_backend *, hm_event *out, int max, double timeout);
+    void (*destroy)   (hm_backend *);
+};
+
+hm_backend *hm_backend_kqueue_new(void);
+int         hm_backend_kqueue_available(void);
+hm_backend *hm_backend_epoll_new(void);
+int         hm_backend_epoll_available(void);
+hm_backend *hm_backend_poll_new(void);
+int         hm_backend_poll_available(void);
+hm_backend *hm_backend_iouring_new(void);
+int         hm_backend_iouring_available(void);
+
+/* pick by name ("kqueue"/"epoll"/"poll"), or best-available when NULL */
+hm_backend *hm_backend_create(const char *name);
+
+#endif

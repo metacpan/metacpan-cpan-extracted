@@ -11,20 +11,15 @@ use v5.14;
 use strict;
 use warnings;
 
-use parent qw(Data::Identifier::Interface::Userdata);
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects);
 
 use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.31;
+our $VERSION = v0.32;
 
-my %_valid_new_opts = (
-    db          => 'Data::TagDB',
-    extractor   => 'Data::URIID',
-    fii         => 'File::Information',
-    store       => 'File::FStore',
-);
+my @_old_subobjects = qw(db extractor fii store);
 
 
 sub new {
@@ -37,7 +32,8 @@ sub new {
         }
 
         if (eval {$from->isa(__PACKAGE__)}) {
-            $opts{$_} //= $from->{$_} foreach keys %_valid_new_opts;
+            $self->so_attach($_ => $from->so_get($_, default => undef, no_defaults => 1) // next) foreach @_old_subobjects;
+            $self->so_attach(parent => $from);
 
             $opts{root} = [$from->roots];
             $opts{entry} = [$from->entries];
@@ -50,12 +46,15 @@ sub new {
         croak 'Unknown/Unsupported from' unless defined $opts{root};
     }
 
-    foreach my $key (keys %_valid_new_opts) {
+    foreach my $key (@_old_subobjects) {
         my $v = delete($opts{$key}) // next;
 
-        croak 'Bad type for key '.$key unless $v->isa($_valid_new_opts{$key});
+        $self->so_attach($key => $v);
+    }
 
-        $self->{$key} = $v;
+    if (defined(my $so = delete $opts{so})) {
+        require Data::Identifier::Interface::Subobjects; # Is this required?
+        $self->so_attach($_ => $so->so_get($_, default => undef) // next) foreach Data::Identifier::Interface::Subobjects->KEYS;
     }
 
     foreach my $key (qw(root entry)) {
@@ -86,14 +85,14 @@ sub new {
 
 sub as {
     my ($self, $as, %opts) = @_;
-    my %extra = %opts{qw(db extractor fii store)};
+    my %extra = %opts{@_old_subobjects};
 
     $as = $opts{rawtype} if $as eq 'raw' && defined($opts{rawtype});
 
     return $self if ($as =~ /^[A-Z]/ || $as =~ /::/) && eval {$self->isa($as)};
 
     if (eval {$self->isa(__PACKAGE__)}) {
-        $extra{$_} //= $self->{$_} foreach qw(db extractor fii store);
+        $extra{so} //= $self;
     }
 
     if (!ref($self) || ref($self) eq 'ARRAY') {
@@ -110,9 +109,10 @@ sub roots {
     my ($self, %opts) = @_;
 
     if (defined $opts{as}) {
-        my %extra = map {$_ => ($opts{$_} // $self->{$_})} qw(db extractor fii store);
+        my %extra = map {$_ => ($opts{$_} // $self->so_get($_, default => undef, no_defaults => 1))} @_old_subobjects;
         return map {$_->Data::Identifier::as(
             $opts{as},
+            so => $opts{so} // $self,
             %extra,
             )} values %{$self->{root}};
     }
@@ -125,9 +125,10 @@ sub entries {
     my ($self, %opts) = @_;
 
     if (defined $opts{as}) {
-        my %extra = map {$_ => ($opts{$_} // $self->{$_})} qw(db extractor fii store);
+        my %extra = map {$_ => ($opts{$_} // $self->so_get($_, default => undef, no_defaults => 1))} @_old_subobjects;
         return map {$_->Data::Identifier::as(
             $opts{as},
+            so => $opts{so} // $self,
             %extra,
             )} values %{$self->{root}};
     }
@@ -150,36 +151,41 @@ sub is_entry {
 }
 
 
+sub add_entry {
+    my ($self, @entries) = @_;
+
+    foreach my $entry (@entries) {
+        unless (eval {$entry->can('ise')}) {
+            $entry = Data::Identifier->new(from => $entry);
+        }
+        next if exists $self->{entry}{$entry->ise};
+        $self->{entry}{$entry->ise} = $entry;
+    }
+}
+
+
 #@returns Data::TagDB
 sub db {
     my ($self, %opts) = @_;
-    return $self->{db} if defined $self->{db};
-    return $opts{default} if exists $opts{default};
-    croak 'No database known';
+    return $self->so_get('db', %opts);
 }
 
 #@returns Data::URIID
 sub extractor {
     my ($self, %opts) = @_;
-    return $self->{extractor} if defined $self->{extractor};
-    return $opts{default} if exists $opts{default};
-    croak 'No extractor known';
+    return $self->so_get('extractor', %opts);
 }
 
 #@returns File::Information
 sub fii {
     my ($self, %opts) = @_;
-    return $self->{fii} if defined $self->{fii};
-    return $opts{default} if exists $opts{default};
-    croak 'No fii known';
+    return $self->so_get('fii', %opts);
 }
 
 #@returns File::FStore
 sub store {
     my ($self, %opts) = @_;
-    return $self->{store} if defined $self->{store};
-    return $opts{default} if exists $opts{default};
-    croak 'No store known';
+    return $self->so_get('store', %opts);
 }
 
 1;
@@ -196,7 +202,7 @@ Data::Identifier::Cloudlet - format independent identifier object
 
 =head1 VERSION
 
-version v0.31
+version v0.32
 
 =head1 SYNOPSIS
 
@@ -225,7 +231,8 @@ But they could also be used for example to provide a directory listing.
 B<Note:>
 Two tags are considered equal if their ISE string equals (C<eq>), see L</new> for details.
 
-This package inherits from L<Data::Identifier::Interface::Userdata> (since v0.14).
+This package inherits from L<Data::Identifier::Interface::Userdata> (since v0.14),
+and L<Data::Identifier::Interface::Subobjects> (since v0.32).
 
 =head1 METHODS
 
@@ -277,17 +284,31 @@ The list of other (non-root) entries. Accepts the same values as C<root>.
 
 A L<Data::TagDB> instance.
 
+Deprecated since v0.32. Replace with L<Data::Identifier::Interface::Subobjects/so_attach>.
+
 =item C<extractor>
 
 A L<Data::URIID> instance.
+
+Deprecated since v0.32. Replace with L<Data::Identifier::Interface::Subobjects/so_attach>.
 
 =item C<fii>
 
 A L<File::Information> instance.
 
+Deprecated since v0.32. Replace with L<Data::Identifier::Interface::Subobjects/so_attach>.
+
 =item C<store>
 
 A L<File::FStore> instance.
+
+Deprecated since v0.32. Replace with L<Data::Identifier::Interface::Subobjects/so_attach>.
+
+=item C<so>
+
+(experimental since v0.32)
+
+A L<Data::Identifier::Interface::Subobjects> that is used to create the new objects as needed.
 
 =back
 
@@ -329,6 +350,8 @@ Defaults to false.
 
 An instance of L<Data::TagDB>. This is used to create instances of related packages.
 
+Deprecated since v0.32. Replace with C<so>.
+
 =item C<default>
 
 Same as in L</uuid>.
@@ -338,9 +361,13 @@ Same as in L</uuid>.
 An instance of L<Data::URIID>. This is used to create instances of related packages
 such as L<Data::URIID::Result>.
 
+Deprecated since v0.32. Replace with C<so>.
+
 =item C<fii>
 
 An instance of L<File::Information>. This is used to create instances of related packages.
+
+Deprecated since v0.32. Replace with C<so>.
 
 =item C<no_defaults>
 
@@ -351,10 +378,18 @@ Same as in L</uuid>.
 If C<$as> is given as C<raw> then this value is used for C<$as>.
 This can be used to ease implementation of other methods that are required to accept C<raw>.
 
+=item C<so>
+
+(experimental since v0.32)
+
+A L<Data::Identifier::Interface::Subobjects>.
+
 =item C<store>
 
 An instance of L<File::FStore>. This is used to create instances of related packages
 such as L<File::FStore::File>.
+
+Deprecated since v0.32. Replace with C<so>.
 
 =back
 
@@ -377,17 +412,29 @@ This is implemented by calling L<Data::Identifier/as>.
 
 A L<Data::TagDB> object passed to L<Data::Identifier/as>. Defaults to the value given via L</new>.
 
+Deprecated since v0.32. Will be removed in v0.33. Consider using L<Data::Identifier::Interface::Subobjects/so_attach> or C<so>.
+
 =item C<extractor>
 
 A L<Data::URIID> object passed to L<Data::Identifier/as>. Defaults to the value given via L</new>.
+
+Deprecated since v0.32. Will be removed in v0.33. Consider using L<Data::Identifier::Interface::Subobjects/so_attach> or C<so>.
 
 =item C<fii>
 
 A L<File::Information> object passed to L<Data::Identifier/as>. Defaults to the value given via L</new>.
 
+Deprecated since v0.32. Will be removed in v0.33. Consider using L<Data::Identifier::Interface::Subobjects/so_attach> or C<so>.
+
 =item C<store>
 
 A L<File::FStore> object passed to L<Data::Identifier/as>. Defaults to the value given via L</new>.
+
+Deprecated since v0.32. Will be removed in v0.33. Consider using L<Data::Identifier::Interface::Subobjects/so_attach> or C<so>.
+
+=item C<so>
+
+See C<so> in L<Data::Identifier/as>.
 
 =back
 
@@ -413,12 +460,23 @@ Accepts the same type of objects as L</new> in C<root>. See there for how the ma
 Returns whether or not a given tag is part of the cloudlet.
 Accepts the same type of objects as L</new> in C<root>. See there for how the matching is performed.
 
+=head2 add_entry
+
+    $cl->add_entry($entry [, $entry [, ...] ]);
+
+(since v0.32, experimental)
+
+Adds one or more entries (non-root) to the cloudlet.
+The same rules apply as for L</new>.
+
 =head2 db, extractor, fii, store
 
     my Data::TagDB $db        = $cl->db;
     my Data::URIID $extractor = $cl->extractor;
     my File::Information $fii = $cl->fii;
     my File::FStore $store    = $cl->store;
+
+(deprecated since v0.32, will be removed in v0.33)
 
 Gets the corresponding object as passed to L</new>.
 

@@ -80,7 +80,7 @@ sub new{
 	if ( ! defined( $args{commands} ) ){
 		die ('No commands key specified in the argument hash');
 	}
-	if ( ref( \$args{commands} ) eq 'ARRAY' ){
+	if ( ref( $args{commands} ) ne 'ARRAY' ){
 		die ('The commands key is not a array');
 	}
 	if ( ! defined $args{commands}[0] ){

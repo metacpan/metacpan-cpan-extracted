@@ -78,7 +78,7 @@ eval{
 	$sorter=Net::Connection::Sort::ptr_l->new;
 	$worked=1;
 };
-ok( $worked eq 1, 'sorter init') or die ('Net::Connection::Sort::ptr_l->new resulted in... '.$@);
+ok( $worked == 1, 'sorter init') or die ('Net::Connection::Sort::ptr_l->new resulted in... '.$@);
 
 my @sorted;
 $worked=0;
@@ -86,16 +86,62 @@ eval{
 	@sorted=$sorter->sorter( \@objects );
 	$worked=1;
 };
-ok( $worked eq 1, 'sort') or die ('Net::Connection::Sort::proto->sorter(@objects) resulted in... '.$@);
+ok( $worked == 1, 'sort') or die ('Net::Connection::Sort::ptr_l->sorter(@objects) resulted in... '.$@);
 
 my $is_defined=1;
 if ( !defined( $sorted[0]->local_ptr ) ){
 	$is_defined=0;
 }
 
-ok( $is_defined eq '0', 'sort order 0') or die ('The first ptr should be undef.');
-ok( $sorted[1]->local_ptr =~ 'a.foo', 'sort order 1') or die ('The ptr for 1 is not a.foo ');
-ok( $sorted[2]->local_ptr =~ 'b.foo', 'sort order 2') or die ('The ptr for 2 is not b.foo');
-ok( $sorted[3]->local_ptr =~ 'c.foo', 'sort order 2') or die ('The ptr for 3 is not c.foo');
+ok( $is_defined == 0, 'sort order 0') or die ('The first ptr should be undef.');
+ok( $sorted[1]->local_ptr eq 'a.foo', 'sort order 1') or die ('The ptr for 1 is not a.foo ');
+ok( $sorted[2]->local_ptr eq 'b.foo', 'sort order 2') or die ('The ptr for 2 is not b.foo');
+ok( $sorted[3]->local_ptr eq 'c.foo', 'sort order 3') or die ('The ptr for 3 is not c.foo');
 
-done_testing(7);
+
+# with no PTR the host is used instead, including the wildcard used for
+# listening sockets
+my @edge=(
+		  Net::Connection->new({
+								'foreign_host' => '1.1.1.1',
+								'local_host' => '1.1.1.1',
+								'foreign_port' => '22',
+								'local_port' => '11132',
+								'state' => 'ESTABLISHED',
+								'proto' => 'tcp4',
+								'local_ptr' => 'z.foo',
+								'ptrs' => 0,
+							   }),
+		  Net::Connection->new({
+								'foreign_host' => '*',
+								'local_host' => '*',
+								'foreign_port' => '*',
+								'local_port' => '123',
+								'state' => '',
+								'proto' => 'udp4',
+								'ptrs' => 0,
+							   }),
+		  Net::Connection->new({
+								'foreign_host' => '2.2.2.2',
+								'local_host' => '2.2.2.2',
+								'foreign_port' => '22',
+								'local_port' => '11132',
+								'state' => 'ESTABLISHED',
+								'proto' => 'tcp4',
+								'ptrs' => 0,
+							   }),
+		  );
+
+my @warnings;
+$worked=0;
+eval{
+	local $SIG{__WARN__}=sub{ push( @warnings, $_[0] ) };
+	@sorted=$sorter->sorter( \@edge );
+	$worked=1;
+};
+ok( $worked == 1, 'missing ptr sort') or die ('Sorting a missing PTR resulted in... '.$@);
+ok( ! @warnings, 'missing ptr sort is warning free') or die ('Sorting a missing PTR warned... '.join(q{}, @warnings));
+ok( $sorted[0]->local_host eq '*', 'missing ptr sort order 0') or die ('The first host was not *');
+ok( $sorted[2]->local_ptr eq 'z.foo', 'missing ptr sort order 1') or die ('The last ptr was not z.foo');
+
+done_testing(11);

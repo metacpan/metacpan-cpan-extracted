@@ -28,7 +28,7 @@ no_index:
 provides:
   Test::RedisServer:
     file: lib/Test/RedisServer.pm
-    version: '0.24'
+    version: '0.25'
 requires:
   Mouse: '0'
   Redis: '0'
@@ -36,17 +36,20 @@ resources:
   bugtracker: https://github.com/typester/Test-RedisServer/issues
   homepage: https://github.com/typester/Test-RedisServer
   repository: https://github.com/typester/Test-RedisServer.git
-version: '0.24'
+version: '0.25'
 x_authority: cpan:TYPESTER
 x_contributors:
   - 'Daisuke Murase <typester@gmail.com>'
   - 'David Cantrell <david.cantrell@broadbean.com>'
   - 'Devendranath Thadi <devendranath.thadi3@gmail.com>'
+  - 'ICHINOSE Shogo <shogo82148@gmail.com>'
   - 'Ivan Baidakou <dmol@gmx.com>'
   - 'Jeremy Zawodny <jzawodn@craigslist.org>'
+  - 'Koki Matsumoto <git@rokuosan.dev>'
   - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'Robin Smidsrød <robin@smidsrod.no>'
   - 'Sean Smith <ssmith@localhost.localdomain>'
+  - 'Yuji Hatakeyama <htkymyj0512@gmail.com>'
   - 'gregor herrmann <gregoa@debian.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

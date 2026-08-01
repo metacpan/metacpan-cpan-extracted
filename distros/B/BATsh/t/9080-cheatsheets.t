@@ -52,7 +52,7 @@ for my $doc (@doc_files) {
     }
 
     local *FHS2;
-    open(FHS2, "< $path") or do { ok(0,"S2: $doc open fail"); ok(0,"S3: $doc open fail"); next };
+    open(FHS2, "< $path") or do { ok(0, "S2: $doc open fail"); ok(0, "S3: $doc open fail"); next };
     my @nums;
     while (<FHS2>) { if (/^\s*(\d+)\.\s/) { push @nums, $1 } }
     close(FHS2);
@@ -65,7 +65,7 @@ for my $doc (@doc_files) {
     ok($consecutive || @nums == 0, "S2: $doc section numbers consecutive");
 
     local *FHS3;
-    open(FHS3, "< $path") or do { ok(0,"S3: $doc open fail"); next };
+    open(FHS3, "< $path") or do { ok(0, "S3: $doc open fail"); next };
     my $first = <FHS3>;
     close(FHS3);
     $first = '' unless defined $first;

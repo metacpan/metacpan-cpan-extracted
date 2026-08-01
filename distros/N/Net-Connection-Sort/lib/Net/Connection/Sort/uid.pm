@@ -10,11 +10,11 @@ Net::Connection::Sort::uid - Sorts the connections via the UID.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.2';
 
 
 =head1 SYNOPSIS
@@ -22,7 +22,7 @@ our $VERSION = '0.0.0';
 Please keep in mind that UID is not a requirement and if not specified is set to 0,
 meaning it will show up earlier.
 
-    use Net::Connection::Sort::host_f;
+    use Net::Connection::Sort::uid;
     use Net::Connection;
     use Data::Dumper;
     
@@ -73,7 +73,7 @@ meaning it will show up earlier.
                                         }),
                  );
     
-    my $sorter=$sorter=Net::Connection::Sort::uid->new;
+    my $sorter=Net::Connection::Sort::uid->new;
     
     @objects=$sorter->sorter( \@objects );
     
@@ -87,17 +87,11 @@ This initiates the module.
 
 No arguments are taken and this will always succeed.
 
-    my $sorter=$sorter=Net::Connection::Sort::uid->new;
+    my $sorter=Net::Connection::Sort::uid->new;
 
 =cut
 
 sub new{
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
-
-
 	my $self = {
 				};
     bless $self;
@@ -105,7 +99,7 @@ sub new{
 	return $self;
 }
 
-=head2 sort
+=head2 sorter
 
 This sorts the array of Net::Connection objects.
 
@@ -130,7 +124,7 @@ sub sorter{
 	}
 
 	@objects=sort  {
-		&helper( $a->uid ) <=>  &helper( $b->uid )
+		helper( $a->uid ) <=>  helper( $b->uid )
 	} @objects;
 
 	return @objects;

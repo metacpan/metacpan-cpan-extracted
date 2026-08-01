@@ -85,7 +85,7 @@ sub new{
 	if ( ! defined( $args{cidrs} ) ){
 		die ('No cidrs key specified in the argument hash');
 	}
-	if ( ref( \$args{cidrs} ) eq 'ARRAY' ){
+	if ( ref( $args{cidrs} ) ne 'ARRAY' ){
 		die ('The cidrs key is not a array');
 	}
 	if ( ! defined $args{cidrs}[0] ){

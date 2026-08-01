@@ -17,6 +17,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES   => {
         'Test::More' => 0,
+        'Test::Lib'  => 0,
     },
     PREREQ_PM                  => {
         'Moo::Role'            => '2.000000',
@@ -30,6 +31,7 @@ WriteMakefile(
         'Graph'                => '0.9732',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    test  => { TESTS => 't/*.t xt/*.t' },
     clean => { FILES => 'Map-Tube-Plugin-Graph-*' },
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -41,6 +43,17 @@ WriteMakefile(
             'Map::Tube::Plugin::Graph::Utils' => {
                 file    => 'lib/Map/Tube/Plugin/Graph/Utils.pm',
                 version => MM->parse_version('lib/Map/Tube/Plugin/Graph/Utils.pm')
+            },
+        },
+        prereqs => {
+            test => {
+                recommends => {
+                    'Test::CPAN::Changes'    => 0,
+                    'Test::CPAN::Meta::JSON' => 0,
+                    'Test::CPAN::Meta'       => 0,
+                    'Test::Pod'              => 1.22,
+                    'Test::Version'          => 0,
+                },
             },
         },
         resources => {

@@ -41,6 +41,15 @@
 #  define HAVE_FEATURE_CLASS
 #endif
 
+#if (PERL_REVISION == 5) && (PERL_VERSION < 38)
+/* Perl v5.38 added HvHasAUX. Before that, just use SvOOK */
+#  define HvHasAUX(hv)  SvOOK(hv)
+#endif
+
+#if defined(MgIsV2)
+#  define HAVE_MAGICv2
+#endif
+
 static int max_string;
 
 #if NVSIZE == 8
@@ -117,6 +126,7 @@ static uint8_t svx_sizes[] = {
   0,          1,     1,     /* SV->SV annotation */
   2*UVSIZE,   0,     1,     /* SV leak report */
   PTRSIZE,    0,     0,     /* PV shared HEK */
+  4+2*UVSIZE, 5,     0,     /* magic v2 */
 };
 
 static uint8_t ctx_sizes[] = {
@@ -160,6 +170,7 @@ enum PMAT_SVt {
   PMAT_SVxSVSVnote,
   PMAT_SVxDEBUGREPORT,
   PMAT_SVxPV_SHARED_HEK,
+  PMAT_SVxMAGICv2,
 
   PMAT_SVtMETA_STRUCT = 0xF0,
 };
@@ -208,6 +219,11 @@ static void write_u8(FILE *fh, uint8_t v)
 /* We just write multi-byte integers in native endian, because we've declared
  * in the file flags what the platform byte direction is anyway
  */
+static void write_u16(FILE *fh, uint16_t v)
+{
+  fwrite(&v, 2, 1, fh);
+}
+
 static void write_u32(FILE *fh, uint32_t v)
 {
   fwrite(&v, 4, 1, fh);
@@ -532,7 +548,7 @@ static void write_private_hv(FILE *fh, const HV *hv)
   write_uint(fh, nkeys);
 
   // PTRs
-  if(SvOOK(hv) && HvAUX(hv))
+  if(HvHasAUX(hv) && HvAUX(hv))
     write_svptr(fh, (SV*)HvAUX(hv)->xhv_backreferences);
   else
     write_svptr(fh, NULL);
@@ -546,7 +562,7 @@ static void write_stash_ptrs(FILE *fh, const HV *stash)
 {
   struct mro_meta *mro_meta = HvAUX(stash)->xhv_mro_meta;
 
-  if(SvOOK(stash) && HvAUX(stash))
+  if(HvHasAUX(stash) && HvAUX(stash))
     write_svptr(fh, (SV*)HvAUX(stash)->xhv_backreferences);
   else
     write_svptr(fh, NULL);
@@ -881,6 +897,99 @@ static void run_package_helpers(DMDContext *ctx, const SV *sv, SV *classname)
   }
 }
 
+static void write_magic(DMDContext *ctx, const SV *sv, MAGIC *mg)
+{
+  FILE *fh = ctx->fh;
+
+#ifdef HAVE_MAGICv2
+  if(MgIsV2(mg)) {
+    const struct MagicFunctions *funcs = MgFUNCS(mg);
+
+    write_u8(fh, PMAT_SVxMAGICv2);
+    write_svptr(fh, sv);
+
+    write_u8(fh, (U8)funcs->shape);
+    write_u8(fh, 0 |
+      (MgWEAK_AUXSV(mg) ? 0x01 : 0) |
+      (MgHasKEYIV(mg) ? 0x02 : 0));
+    write_u16(fh, MgPRIV(mg));
+    write_uint(fh, MgPTRLEN(mg));
+    if(MgHasKEYIV(mg))
+      write_uint(fh, MgKEYIV(mg));
+    else
+      write_uint(fh, 0);
+
+    write_ptr(fh, funcs);
+    write_svptr(fh, MgAUXSV(mg));
+    write_ptr(fh, MgPTR(mg));
+    if(MgHasKEYSV(mg))
+      write_svptr(fh, MgKEYSV(mg));
+    else
+      write_svptr(fh, NULL);
+    write_ptr(fh, funcs->user_size > 0 ? MgUSERSTRUCT(mg, void *) : NULL);
+
+    if(funcs->user_size > 0) {
+      SV *key = make_tmp_iv((IV)funcs);
+
+      DMD_MagicHelper *helper = NULL;
+      HE *he = hv_fetch_ent(helper_per_magic, key, 0, 0);
+      if(he)
+        helper = (DMD_MagicHelper *)SvUV(HeVAL(he));
+
+      if(helper) {
+        ENTER;
+        SAVETMPS;
+
+        int ret = (helper)(aTHX_ ctx, sv, mg);
+
+        if(ret > 0)
+          write_annotations_from_stack(fh, ret);
+
+        FREETMPS;
+        LEAVE;
+      }
+    }
+  }
+  else
+#endif
+  {
+    write_u8(fh, PMAT_SVxMAGIC);
+    write_svptr(fh, sv);
+    write_u8(fh, mg->mg_type);
+    write_u8(fh, (mg->mg_flags & MGf_REFCOUNTED ? 0x01 : 0));
+    write_svptr(fh, mg->mg_obj);
+    if(mg->mg_len == HEf_SVKEY)
+      write_svptr(fh, (SV*)mg->mg_ptr);
+    else
+      write_svptr(fh, NULL);
+    write_svptr(fh, (SV *)mg->mg_virtual); /* Not really an SV */
+
+    if(mg->mg_type == PERL_MAGIC_ext &&
+        mg->mg_ptr && mg->mg_len != HEf_SVKEY) {
+      SV *key = make_tmp_iv((IV)mg->mg_virtual);
+      HE *he;
+
+      DMD_MagicHelper *helper = NULL;
+      he = hv_fetch_ent(helper_per_magic, key, 0, 0);
+      if(he)
+        helper = (DMD_MagicHelper *)SvUV(HeVAL(he));
+
+      if(helper) {
+        ENTER;
+        SAVETMPS;
+
+        int ret = (helper)(aTHX_ ctx, sv, mg);
+
+        if(ret > 0)
+          write_annotations_from_stack(fh, ret);
+
+        FREETMPS;
+        LEAVE;
+      }
+    }
+  }
+}
+
 static void write_sv(DMDContext *ctx, const SV *sv)
 {
   FILE *fh = ctx->fh;
@@ -967,42 +1076,8 @@ static void write_sv(DMDContext *ctx, const SV *sv)
 
   if(SvMAGICAL(sv)) {
     MAGIC *mg;
-    for(mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic) {
-      write_u8(fh, PMAT_SVxMAGIC);
-      write_svptr(fh, sv);
-      write_u8(fh, mg->mg_type);
-      write_u8(fh, (mg->mg_flags & MGf_REFCOUNTED ? 0x01 : 0));
-      write_svptr(fh, mg->mg_obj);
-      if(mg->mg_len == HEf_SVKEY)
-        write_svptr(fh, (SV*)mg->mg_ptr);
-      else
-        write_svptr(fh, NULL);
-      write_svptr(fh, (SV *)mg->mg_virtual); /* Not really an SV */
-
-      if(mg->mg_type == PERL_MAGIC_ext &&
-         mg->mg_ptr && mg->mg_len != HEf_SVKEY) {
-        SV *key = make_tmp_iv((IV)mg->mg_virtual);
-        HE *he;
-
-        DMD_MagicHelper *helper = NULL;
-        he = hv_fetch_ent(helper_per_magic, key, 0, 0);
-        if(he)
-          helper = (DMD_MagicHelper *)SvUV(HeVAL(he));
-
-        if(helper) {
-          ENTER;
-          SAVETMPS;
-
-          int ret = (helper)(aTHX_ ctx, sv, mg);
-
-          if(ret > 0)
-            write_annotations_from_stack(fh, ret);
-
-          FREETMPS;
-          LEAVE;
-        }
-      }
-    }
+    for(mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic)
+      write_magic(ctx, sv, mg);
   }
 
   if(SvOBJECT(sv)) {

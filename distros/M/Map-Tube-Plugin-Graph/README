@@ -1,15 +1,11 @@
-Map::Tube::Plugin::Graph
+A Map::Tube plugin to find lines and stations by partially specified or mistyped names.
 
-The README  is  used  to  introduce the module and provide instructions on how to
-install the module, any machine dependencies it may have (for example C compilers
-and installed libraries) and any other information that should be provided before
-the module is installed.
+This is an add-on for the Perl module Map::Tube to display single tube lines or
+whole tube maps in graphical form. The module is a Moo role which gets plugged
+into the Map::Tube::* family automatically once it is installed.
 
-A  README  file  is required for CPAN modules since CPAN extracts the README file
-from a module distribution so that people browsing the archive can use it to  get
-an  idea  of  the  module's  uses.  It  is usually a good idea to provide version
-information here so that people can decide whether fixes for the module are worth
-downloading.
+Documentation for the module can be found at
+<https://metacpan.org/pod/Map::Tube::Plugin::Graph>.
 
 INSTALLATION
 

@@ -137,7 +137,7 @@ es-index-fields.pl - Show information on the fields storage usage
 
 =head1 VERSION
 
-version 8.9
+version 9.0
 
 =head1 SYNOPSIS
 

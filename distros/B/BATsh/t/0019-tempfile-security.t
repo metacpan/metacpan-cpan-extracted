@@ -35,7 +35,9 @@
 #
 #   Symlink checks are skipped (with a documented reason, not silently)
 #   on platforms where symlink() is unavailable (e.g. many Windows
-#   configurations without developer mode / admin privilege).
+#   configurations without developer mode / admin privilege) and, more
+#   generally, on the Windows family, whose CreateFile(CREATE_NEW) does
+#   not carry the POSIX O_EXCL promise of never following a symlink.
 #
 # COMPATIBILITY: Perl 5.005_03 and later
 #
@@ -58,7 +60,19 @@ my $CANARY = File::Spec->catfile($TMPDIR, "batsh_canary_$$.tmp");
 
 # Detect symlink() support without dying (Win32 without privilege, or a
 # filesystem that refuses symlinks, returns 0 or dies).
-my $HAVE_SYMLINK = eval {
+#
+# The two symlink-race cases below are POSIX assertions: they rely on
+# open(O_CREAT|O_EXCL) refusing to follow a symlink that already occupies
+# the candidate path.  Win32 has no such guarantee -- a CreateFile with
+# CREATE_NEW resolves the reparse point and happily creates the target --
+# so on the Windows family the race checks are skipped rather than run and
+# failed.  Native Win32 perls where symlink() happens to work (Windows 10+
+# with developer mode) otherwise reported a FAIL for a difference in OS
+# semantics, not in BATsh.  The 0600 mode checks below are skipped there
+# for the same kind of reason.
+my $POSIX_SEMANTICS = ($^O =~ /^(?:MSWin32|dos|os2)$/) ? 0 : 1;
+
+my $HAVE_SYMLINK = $POSIX_SEMANTICS && eval {
     my $target = File::Spec->catfile($TMPDIR, "batsh_symtest_${$}_t.tmp");
     my $link   = File::Spec->catfile($TMPDIR, "batsh_symtest_${$}_l.tmp");
     open(_TS_T, "> $target") or die; close(_TS_T);
@@ -105,7 +119,7 @@ my @tests = (
     # via O_EXCL retry and used a different file instead).
     sub {
         if (!$HAVE_SYMLINK) {
-            _ok(1, 'TS01: skipped (symlink() unsupported here)');
+            _ok(1, 'TS01: skipped (no POSIX symlink/O_EXCL semantics here)');
             return;
         }
         unlink $CANARY;
@@ -157,7 +171,7 @@ my @tests = (
     # and the canary was never created.
     sub {
         if (!$HAVE_SYMLINK) {
-            _ok(1, 'TS03: skipped (symlink() unsupported here)');
+            _ok(1, 'TS03: skipped (no POSIX symlink/O_EXCL semantics here)');
             return;
         }
         unlink $CANARY;

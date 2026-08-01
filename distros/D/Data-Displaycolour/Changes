@@ -1,3 +1,9 @@
+v0.06  2026-07-31Z
+    - Use girlsandboys magenta for v0
+    - Added CGA palette
+    - Added experimental support to register colours
+    - Added mark(), allowing to mark objects for later requests
+
 v0.05  2025-12-18Z
     - Updated list of extra colours
 

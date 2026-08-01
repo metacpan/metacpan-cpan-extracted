@@ -60,7 +60,7 @@ eval{
 	$sorter=Net::Connection::Sort::proto->new;
 	$worked=1;
 };
-ok( $worked eq 1, 'sorter init') or die ('Net::Connection::Sort::proto->new resulted in... '.$@);
+ok( $worked == 1, 'sorter init') or die ('Net::Connection::Sort::proto->new resulted in... '.$@);
 
 my @sorted;
 $worked=0;
@@ -68,11 +68,37 @@ eval{
 	@sorted=$sorter->sorter( \@objects );
 	$worked=1;
 };
-ok( $worked eq 1, 'sort') or die ('Net::Connection::Sort::proto->sorter(@objects) resulted in... '.$@);
+ok( $worked == 1, 'sort') or die ('Net::Connection::Sort::proto->sorter(@objects) resulted in... '.$@);
 
-ok( $sorted[0]->proto =~ 'tcp4', 'sort order 0') or die ('The proto for 0 is not tcp4');
-ok( $sorted[1]->proto =~ 'tcp6', 'sort order 1') or die ('The proto for 1 is not tcp6');
-ok( $sorted[2]->proto =~ 'udp4', 'sort order 2') or die ('The proto for 2 is not udp4');
-ok( $sorted[3]->proto =~ 'udp6', 'sort order 2') or die ('The proto for 3 is not udp6');
+ok( $sorted[0]->proto eq 'tcp4', 'sort order 0') or die ('The proto for 0 is not tcp4');
+ok( $sorted[1]->proto eq 'tcp6', 'sort order 1') or die ('The proto for 1 is not tcp6');
+ok( $sorted[2]->proto eq 'udp4', 'sort order 2') or die ('The proto for 2 is not udp4');
+ok( $sorted[3]->proto eq 'udp6', 'sort order 3') or die ('The proto for 3 is not udp6');
 
-done_testing(7);
+
+# dual stack sockets are reported as tcp46/udp46, which must sort between the
+# v4 and v6 forms rather than anywhere else
+my @edge=map {
+	Net::Connection->new({
+						  'foreign_host' => '1.1.1.1',
+						  'local_host' => '2.2.2.2',
+						  'foreign_port' => '22',
+						  'local_port' => '11132',
+						  'state' => 'ESTABLISHED',
+						  'proto' => $_,
+						  })
+} ( 'udp46', 'tcp4', 'tcp46', 'tcp6' );
+
+my @warnings;
+$worked=0;
+eval{
+	local $SIG{__WARN__}=sub{ push( @warnings, $_[0] ) };
+	@sorted=$sorter->sorter( \@edge );
+	$worked=1;
+};
+ok( $worked == 1, 'dual stack sort') or die ('Sorting a dual stack proto resulted in... '.$@);
+ok( ! @warnings, 'dual stack sort is warning free') or die ('Sorting a dual stack proto warned... '.join('', @warnings));
+ok( $sorted[1]->proto eq 'tcp46', 'dual stack sort order 0') or die ('The second proto was not tcp46');
+ok( $sorted[2]->proto eq 'tcp6', 'dual stack sort order 1') or die ('The third proto was not tcp6');
+
+done_testing(11);

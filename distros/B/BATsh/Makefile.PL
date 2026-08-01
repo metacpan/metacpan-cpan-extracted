@@ -5,16 +5,15 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{BATsh},
-    'VERSION'   => q{0.09},
+    'VERSION'   => q{0.10},
     'ABSTRACT'  => q{Bilingual Shell for cmd.exe and bash in one script},
     'PREREQ_PM' => {
         'Carp' => '0',
-        'ExtUtils::MakeMaker' => '5.4302',
         'Fcntl' => '1.03',
         'File::Copy' => '2.02',
         'File::Path' => '1.0401',
         'File::Spec' => '0',
-        'perl' => '5.00503',
+        'FindBin' => '1.42',
     },
     'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
@@ -37,6 +36,16 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.31) {
     $args{LICENSE} = q{perl};
 }
 
+# CONFIGURE_REQUIRES was introduced in ExtUtils::MakeMaker 6.52.  Older
+# versions ignore an unknown parameter with a warning, so it is passed
+# only when it is understood; the generated META files carry the same
+# information for every toolchain.
+if ($ExtUtils::MakeMaker::VERSION >= 6.52) {
+    $args{CONFIGURE_REQUIRES} = {
+        'ExtUtils::MakeMaker' => '5.4302',
+    };
+}
+
 # MIN_PERL_VERSION (6.48) and META_MERGE (6.46) arrived together in the
 # same EUMM release cycle; guard them under the higher threshold (6.48)
 # so both are always either present or absent.
@@ -46,35 +55,27 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'meta-spec' => { version => 2 },
         'resources' => {
             'license'    => [ 'http://dev.perl.org/licenses/' ],
-            'bugtracker' => {
-                'web' => 'https://github.com/ina-cpan/BATsh/issues',
-            },
-            'repository' => {
-                'url'  => 'https://github.com/ina-cpan/BATsh',
-                'web'  => 'https://github.com/ina-cpan/BATsh',
-                'type' => 'git',
-            },
         },
         'provides' => {
             'BATsh' => {
                 'file'    => 'lib/BATsh.pm',
-                'version' => '0.09',
+                'version' => '0.10',
             },
             'BATsh::CMD' => {
                 'file'    => 'lib/BATsh/CMD.pm',
-                'version' => '0.09',
+                'version' => '0.10',
             },
             'BATsh::Env' => {
                 'file'    => 'lib/BATsh/Env.pm',
-                'version' => '0.09',
+                'version' => '0.10',
             },
             'BATsh::MB' => {
                 'file'    => 'lib/BATsh/MB.pm',
-                'version' => '0.09',
+                'version' => '0.10',
             },
             'BATsh::SH' => {
                 'file'    => 'lib/BATsh/SH.pm',
-                'version' => '0.09',
+                'version' => '0.10',
             }
         },
     };

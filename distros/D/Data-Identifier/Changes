@@ -1,3 +1,14 @@
+v0.32  2026-07-31Z
+    - Updated documentation
+    - Marked removal versions for some functions
+    - Added global option allow_use
+    - Added Data::Identifier::Interface::Subobjects->so_new()
+    - Added $cl->add_entry()
+    - Made Data::Identifier::Cloudlet a proper Data::Identifier::Interface::Subobjects
+    - Improved support for tagnames in Data::Identifier::Wellknown
+    - Added digest algorithm generator in Data::Identifier::Generate
+    - Improved $util->regenerate()
+
 v0.31  2026-06-27Z
     - Updated documentation
     - Improved $id->displaycolour(), $id->icontext(), and $id->description() significantly

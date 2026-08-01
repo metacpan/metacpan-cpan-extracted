@@ -11,11 +11,11 @@ Net::Connection::Sort::host_fl - Sorts the connections via the foreign host and 
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.4
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.4';
 
 
 =head1 SYNOPSIS
@@ -67,7 +67,7 @@ our $VERSION = '0.0.0';
                                         }),
                  );
     
-    my $sorter=$sorter=Net::Connection::Sort::host_fl->new;
+    my $sorter=Net::Connection::Sort::host_fl->new;
     
     @objects=$sorter->sorter( \@objects );
     
@@ -81,17 +81,11 @@ This initiates the module.
 
 No arguments are taken and this will always succeed.
 
-    my $sorter=$sorter=Net::Connection::Sort::host_fl->new;
+    my $sorter=Net::Connection::Sort::host_fl->new;
 
 =cut
 
 sub new{
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
-
-
 	my $self = {
 				};
     bless $self;
@@ -99,7 +93,7 @@ sub new{
 	return $self;
 }
 
-=head2 sort
+=head2 sorter
 
 This sorts the array of Net::Connection objects.
 
@@ -123,10 +117,11 @@ sub sorter{
 		die 'The passed item is either not a array or undefined';
 	}
 
-	@objects=sort  {
-		&helper( $a->{foreign_host} ) <=>  &helper( $b->{foreign_host} ) or
-		&helper( $a->{local_host} ) <=>  &helper( $b->{local_host} )
-	} @objects;
+	# Net::IP is not cheap, so the values to sort on are worked out once per
+	# connection here instead of once per comparison in the sort block.
+	@objects=map { $_->[2] }
+		sort { $a->[0] <=> $b->[0] || $a->[1] <=> $b->[1] }
+		map { [ helper( $_->foreign_host ), helper( $_->local_host ), $_ ] } @objects;
 
 	return @objects;
 }
@@ -138,14 +133,20 @@ This is a internal function.
 =cut
 
 sub helper{
+        if ( !defined($_[0]) ){
+			return 0;
+        }
+        # Link local addresses arrive with a zone id attached, such as
+        # fe80::1%eth0. Neither the check below nor Net::IP will take one.
+        my $address=$_[0];
+        $address=~s/\%.*$//;
         if (
-			( !defined($_[0]) ) ||
-			( $_[0] eq '*' ) ||
-			( $_[0] =~ /[g-zG-Z]/ )
+			( $address eq '*' ) ||
+			( $address =~ /[g-zG-Z]/ )
 			){
 			return 0;
         }
-        my $host=eval { Net::IP->new( $_[0] )->intip} ;
+        my $host=eval { Net::IP->new( $address )->intip} ;
         if (!defined( $host )){
 			return 0;
         }

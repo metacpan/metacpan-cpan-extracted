@@ -10,11 +10,11 @@ Net::Connection::Sort::state - Sorts the connections via the connection state.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.2';
 
 
 =head1 SYNOPSIS
@@ -66,7 +66,7 @@ our $VERSION = '0.0.0';
                                         }),
                  );
     
-    my $sorter=$sorter=Net::Connection::Sort::state->new;
+    my $sorter=Net::Connection::Sort::state->new;
     
     @objects=$sorter->sorter( \@objects );
     
@@ -80,17 +80,11 @@ This initiates the module.
 
 No arguments are taken and this will always succeed.
 
-    my $sorter=$sorter=Net::Connection::Sort::state->new;
+    my $sorter=Net::Connection::Sort::state->new;
 
 =cut
 
 sub new{
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
-
-
 	my $self = {
 				};
     bless $self;
@@ -98,7 +92,7 @@ sub new{
 	return $self;
 }
 
-=head2 sort
+=head2 sorter
 
 This sorts the array of Net::Connection objects.
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool 0.55;
+package Devel::MAT::Tool 0.56;
 
 use v5.20;
 use warnings;

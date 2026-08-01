@@ -37,7 +37,7 @@ sub _capture_cmd {
     my $tmp = "${TMPBASE}_cap.tmp";
     local *VCOLD; local *VCCAP;
     open(VCOLD, '>&STDOUT') or return '';
-    open(VCCAP, "> $tmp")   or do { open(STDOUT,'>&VCOLD'); return '' };
+    open(VCCAP, "> $tmp")   or do { open(STDOUT, '>&VCOLD'); return '' };
     open(STDOUT, '>&VCCAP');
     eval {
         BATsh::CMD::exec_block('BATsh::CMD', \@lines,

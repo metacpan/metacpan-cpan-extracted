@@ -34,7 +34,7 @@ my @tests = (
     sub {
         $BATsh::Env::STORE{'CMD_T2'} = 'world';
         my $out = _capture(sub { BATsh->run_string('ECHO %CMD_T2%') });
-        _ok($out =~ /world/, 'CMD2: ECHO expands %VAR%');
+        _ok(($out =~ /world/) ? 1 : 0, 'CMD2: ECHO expands %VAR%');
     },
 
     # CMD3: IF condition true
@@ -180,7 +180,7 @@ my @tests = (
                 'ECHO visible_line',
             ));
         });
-        _ok($out =~ /visible_line/, 'CMD14: ECHO output after @ECHO OFF');
+        _ok(($out =~ /visible_line/) ? 1 : 0, 'CMD14: ECHO output after @ECHO OFF');
     },
 
     # CMD15: IF EXIST (file that exists)
@@ -205,7 +205,7 @@ sub _capture {
     local *OLD_STDOUT;
     open(OLD_STDOUT, '>&STDOUT') or return '';
     local *CAPFH;
-    open(CAPFH, "> $tmpfile") or do { open(STDOUT,'>&OLD_STDOUT'); return '' };
+    open(CAPFH, "> $tmpfile") or do { open(STDOUT, '>&OLD_STDOUT'); return '' };
     open(STDOUT, '>&CAPFH');
     eval { $code->() };
     open(STDOUT, '>&OLD_STDOUT');

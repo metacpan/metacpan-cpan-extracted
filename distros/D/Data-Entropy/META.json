@@ -1,12 +1,12 @@
 {
    "abstract" : "entropy (randomness) management",
    "author" : [
-      "Robert Rothenberg <rrwo@cpan.org>"
+      "Robert Rothenberg <perl@rhizomnic.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,7 +38,7 @@
             "Data::Float" : "0.008",
             "Errno" : "1.00",
             "Exporter" : "0",
-            "HTTP::Lite" : "2.2",
+            "HTTP::Tiny" : "0.096",
             "IO::File" : "1.03",
             "Module::Build" : "0",
             "Params::Classify" : "0",
@@ -61,12 +61,15 @@
       "bugtracker" : {
          "web" : "https://github.com/robrwo/Data-Entropy/issues"
       },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/robrwo/Data-Entropy.git"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_deprecated" : 1,
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

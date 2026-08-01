@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::ListDanglingPtrs 0.55;
+package Devel::MAT::Tool::ListDanglingPtrs 0.56;
 
 use v5.20;
 use warnings;

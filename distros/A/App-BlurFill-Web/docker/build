@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -eu
+
+cd "$(dirname "$0")/.."
+
+version=${1:-0.1.0}
+core_version=${APP_BLURFILL_VERSION:-0.1.0}
+
+docker build \
+  --build-arg "APP_BLURFILL_VERSION=$core_version" \
+  -t "davorg/app-blurfill-web:$version" \
+  -t davorg/app-blurfill-web:latest \
+  -f docker/Dockerfile .
+
+docker push "davorg/app-blurfill-web:$version"
+docker push davorg/app-blurfill-web:latest

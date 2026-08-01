@@ -1,0 +1,34 @@
+Revision history for Hyperman
+
+0.02    2026-08-01
+        - io_uring backend: assign sqe->user_data directly instead of calling
+          io_uring_sqe_set_data64(), which only exists in liburing >= 2.2 and
+          left the .so with an undefined symbol on hosts with older liburing.
+        - Supervisor: close a signal lost-wakeup race. The pool loop now keeps
+          TERM/INT/HUP/USR1/USR2/CHLD blocked, reaps with WNOHANG, and waits
+          via sigsuspend(), so a USR1 stats dump (or any signal) arriving while
+          the pool is idle is serviced immediately instead of stalling until a
+          worker happened to exit. Fixes intermittent t/15-process.t failures.
+
+0.01    2026-07-31
+        First release.
+        - Event-loop PSGI server: prefork supervisor + per-worker XS loop.
+          Passes the full Plack::Test::Suite; runs any Plack app via
+          `plackup -s Hyperman`.
+        - Pluggable readiness backends behind one C vtable: kqueue
+          (macOS/BSD), epoll (Linux), portable poll fallback, and an opt-in
+          io_uring backend (raw syscalls, poll-mode ring). Selection is
+          automatic; force with HYPERMAN_BACKEND.
+        - Hyperman::Future: native XS array-slot Future-compatible async
+          result. Handlers may return a Future (or any on_ready-compatible
+          object, e.g. CPAN Future) of the PSGI response; get/await pump the
+          worker's own loop re-entrantly.
+        - Async PSGI: psgi.streaming/delayed responder with a streaming
+          writer, psgix.io (dup'd client socket), psgix.loop, cancellation
+          of the response Future on client disconnect, timer and io_ready
+          Futures on the loop.
+        - Production: worker respawn with crash-loop throttle, SIGHUP
+          zero-downtime worker recycle, graceful TERM/INT drain, idle and
+          slow-request timeouts, pipelining fairness cap, request size
+          ceiling with 413, opt-in SO_REUSEPORT per-worker listeners
+          (Linux), access_log callback, Hyperman->stats.

@@ -11,11 +11,11 @@ Net::Connection::Match - Runs a stack of checks to match Net::Connection objects
 
 =head1 VERSION
 
-Version 0.5.0
+Version 0.5.1
 
 =cut
 
-our $VERSION = '0.5.0';
+our $VERSION = '0.5.1';
 
 
 =head1 SYNOPSIS
@@ -119,7 +119,7 @@ sub new{
 	if ( ! defined( $args{checks} )	){
 		die ('No check key specified in the argument hash');
 	}
-	if ( ref( @{ $args{checks} } ) eq 'ARRAY' ){
+	if ( ref( $args{checks} ) ne 'ARRAY' ){
 		die ('The checks key is not a array');
 	}
 	# Will never match anything.
@@ -131,7 +131,7 @@ sub new{
 		};
 
 	}
-	if ( ref( %{ $args{checks}[0] } ) eq 'HASH' ){
+	if ( ref( $args{checks}[0] ) ne 'HASH' ){
 		die ('The first item in the checks array is not a hash');
 	}
 
@@ -144,6 +144,7 @@ sub new{
 							 flags=>{
 									 1=>'failedCheckInit',
 									 2=>'notNCobj',
+									 3=>'checkErrored',
 									 }
 							 },
 				checks=>[],
@@ -181,7 +182,7 @@ sub new{
 			){
 		   $new_check{args}=$args{checks}[$check_int]{'args'};
 		}else{
-			die('No type defined for check '.$check_int.' or it is not a HASH');
+			die('No args defined for check '.$check_int.' or it is not a HASH');
 		}
 
 		# makes sure we have a args object and that it is a hash
@@ -198,9 +199,14 @@ sub new{
 		}
 
 		my $check;
-		my $eval_string='use Net::Connection::Match::'.$new_check{type}.';'.
-		'$check=Net::Connection::Match::'.$new_check{type}.'->new( $new_check{args} );';
-		eval( $eval_string );
+		my $check_module='Net::Connection::Match::'.$new_check{type};
+		eval( 'require '.$check_module.';' );
+		if ( $@ ){
+			die 'Failed to load the module "'.$check_module.'" for check '.$check_int.'... '.$@;
+		}
+		eval{
+			$check=$check_module->new( $new_check{args} );
+		};
 
 		if (!defined( $check )){
 			die 'Failed to init the check for '.$check_int.' as it returned undef... '.$@;
@@ -263,6 +269,16 @@ sub match{
 			$hit=$check->{check}->match($conn);
 		};
 
+		# surface the error instead of silently returning a non-match
+		if ( $@ ){
+			$self->{error}=3;
+			$self->{errorString}='The check "'.$check->{type}.'" died... '.$@;
+			if ( ! $self->{testing} ){
+				$self->warn;
+			}
+			return undef;
+		}
+
 		# If $hits is undef, then one of the checks errored and we skip processing the results.
 		# Should only be 0 or 1.
 		if ( defined( $hit ) ){
@@ -281,7 +297,7 @@ sub match{
 	}
 
 	# if these are the same, then we have a match
-	if ( $required eq $hits ){
+	if ( $required == $hits ){
 		return 1;
 	}
 
@@ -297,6 +313,10 @@ Error handling is provided by L<Error::Helper>.
 
 Not a Net::Connection object. Either is is not defined
 or what is being passed is not a Net::Connection object.
+
+=head2 3 / checkErrored
+
+One of the checks died while running match.
 
 =head1 AUTHOR
 

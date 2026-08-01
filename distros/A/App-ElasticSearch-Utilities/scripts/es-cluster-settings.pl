@@ -99,7 +99,7 @@ es-cluster-settings.pl - Get or apply settings to the cluster
 
 =head1 VERSION
 
-version 8.9
+version 9.0
 
 =head1 SYNOPSIS
 

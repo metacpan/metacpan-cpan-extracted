@@ -2,7 +2,7 @@ package Map::Tube::Plugin::Graph;
 
 use version;
 
-our $VERSION   = qv('v1.1.0');
+our $VERSION   = qv('v1.1.1');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -11,7 +11,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version v1.1.0
+Version v1.1.1
 
 =cut
 
@@ -243,7 +243,7 @@ given line map as a PNG bitmap. Otherwise you get the entire map.
 (In fact, this method is almost an alias for the L<render()> method. However, it always
 returns only the graph representation, never an output file name.)
 
-See "SYNOPSIS" for more details on how it can be used.
+See L</SYNOPSIS> for more details on how it can be used.
 
 =cut
 

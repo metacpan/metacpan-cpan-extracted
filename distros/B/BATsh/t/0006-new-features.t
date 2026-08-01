@@ -190,7 +190,7 @@ my @tests = (
         });
         unlink $helper;
         $out =~ s/\r//g;
-        _ok($out =~ /GOT:pipetest/, "NF07: pipeline passes left stdout to right stdin (got [$out])");
+        _ok(($out =~ /GOT:pipetest/) ? 1 : 0, "NF07: pipeline passes left stdout to right stdin (got [$out])");
     },
 
     # NF08: multiple pipes (cmd1 | cmd2 | cmd3)
@@ -319,7 +319,7 @@ my @tests = (
             );
         });
         $out =~ s/\r//g;
-        _ok($out =~ /PIPETEST/, "NF21: SH pipeline left->right (got [$out])");
+        _ok(($out =~ /PIPETEST/) ? 1 : 0, "NF21: SH pipeline left->right (got [$out])");
     },
 
     # NF22: SH pipeline does NOT leak left-side output to terminal
@@ -735,7 +735,7 @@ my @tests = (
             BATsh->run_string("read NF59_V <<EOF\nbody\nEOF\necho after=\$NF59_V");
         });
         $out =~ s/\r//g;
-        _ok($out =~ /after=body/, "NF59: command after heredoc runs (got [$out])");
+        _ok(($out =~ /after=body/) ? 1 : 0, "NF59: command after heredoc runs (got [$out])");
     },
 
     # NF60: heredoc feeds STDIN to an external command (portable perl)
@@ -758,7 +758,7 @@ my @tests = (
             BATsh->run_string("read NF61_V <<EOF\nEOF\necho done61");
         });
         $out =~ s/\r//g;
-        _ok($out =~ /done61/, "NF61: empty heredoc body ok (got [$out])");
+        _ok(($out =~ /done61/) ? 1 : 0, "NF61: empty heredoc body ok (got [$out])");
     },
 
     # NF62: unterminated here-document sets non-zero status
@@ -780,7 +780,7 @@ my @tests = (
             BATsh->run_string('echo "a << b"');
         });
         $out =~ s/\r//g;
-        _ok($out =~ /a << b/, "NF63: quoted << not a heredoc (got [$out])");
+        _ok(($out =~ /a << b/) ? 1 : 0, "NF63: quoted << not a heredoc (got [$out])");
     },
 
     ##################################################################
@@ -855,7 +855,7 @@ my @tests = (
             BATsh->run_string('echo fgbuiltin &');
         });
         $out =~ s/\r//g;
-        _ok($out =~ /fgbuiltin/,
+        _ok(($out =~ /fgbuiltin/) ? 1 : 0,
             "NF72: builtin & runs foreground (got [$out])");
     },
 
@@ -883,7 +883,7 @@ my @tests = (
         });
         $pid = $BATsh::SH::_LAST_BG_PID;
         $pid = '' unless defined $pid;
-        _ok($pid =~ /\A\d*\z/,
+        _ok(($pid =~ /\A\d*\z/) ? 1 : 0,
             "NF74: background launch records numeric/empty PID (pid=[$pid])");
     },
 

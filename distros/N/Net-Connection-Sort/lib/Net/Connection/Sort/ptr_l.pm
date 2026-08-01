@@ -10,11 +10,11 @@ Net::Connection::Sort::ptr_l - Sorts via the foriegn PTR.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.2';
 
 
 =head1 SYNOPSIS
@@ -74,7 +74,7 @@ If a local PTR could not be found or is not set, then the foreign host is used.
                                         }),
                  );
     
-    my $sorter=$sorter=Net::Connection::Sort::ptr_l->new;
+    my $sorter=Net::Connection::Sort::ptr_l->new;
     
     @objects=$sorter->sorter( \@objects );
     
@@ -88,17 +88,11 @@ This initiates the module.
 
 No arguments are taken and this will always succeed.
 
-    my $sorter=$sorter=Net::Connection::Sort::ptr_l->new;
+    my $sorter=Net::Connection::Sort::ptr_l->new;
 
 =cut
 
 sub new{
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
-
-
 	my $self = {
 				};
     bless $self;
@@ -106,7 +100,7 @@ sub new{
 	return $self;
 }
 
-=head2 sort
+=head2 sorter
 
 This sorts the array of Net::Connection objects.
 
@@ -131,7 +125,7 @@ sub sorter{
 	}
 
 	@objects=sort  {
-		&helper( $a ) cmp  &helper( $b )
+		helper( $a ) cmp  helper( $b )
 	} @objects;
 
 	return @objects;

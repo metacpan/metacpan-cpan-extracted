@@ -22,7 +22,7 @@ use File::Spec ();
 BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 $VERSION = $VERSION;
 
 require BATsh::MB;
@@ -870,7 +870,7 @@ BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -882,7 +882,8 @@ Version 0.09
   BATsh->run('myscript.batsh', args => ['arg1', 'arg2']);
   print BATsh->last_status;    # same value, queried later
 
-  # From the command line (bin/batsh.pl is installed as "batsh"):
+  # From the command line (bin/batsh.pl is installed as "batsh" on
+  # Windows, "batsh.pl" elsewhere):
   #   batsh script.batsh arg1 arg2      exit code = script status
   #   batsh -e 'echo hi'                run inline source
   #   ... | batsh - arg1                read the script from STDIN

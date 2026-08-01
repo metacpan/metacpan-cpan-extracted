@@ -9,7 +9,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 NAME
 
@@ -231,6 +231,18 @@ internal to the C<Devel::MAT::Dumper> module. Helper functions are not
 expected to interact with it, except to pass it on any C<DMD_DUMP_STRUCT>
 calls it may make.
 
+=head2 DMD_SET_MGv2_HELPER
+
+   DMD_SET_MGv2_HELPER(void *funcs, DMD_MagicHelper *helper);
+
+I<Since version 0.52.>
+
+Similar to L</DMD_SET_MAGIC_HELPER>, this macro should be called from the
+C<BOOT> section of the XS module to associate a helper function for Magic v2,
+to provide extra annotations about the SV and its magic annotation. Likely
+this will be in the form of calls to L</DMD_DUMP_STRUCT> on the C<MgPTR> area,
+or L</DMD_DUMP_MGv2_USERSTRUCT> on the C<MgUSERSTRUCT> area.
+
 =head2 DMD_ADD_ROOT
 
    DMD_ADD_ROOT(SV *sv, const char *name);
@@ -322,6 +334,19 @@ the size of the structure overall, are recorded for every call, but the typing
 information is stored only once on that first call. It is best to ensure that
 the module source contains only a single instance of this macro for a given
 structure name, thus ensuring the type information will always be consistent.
+
+=head2 DMD_DUMP_MGv2_USERSTRUCT
+
+   DMD_DUMP_MGv2_USERSTRUCT(DMDContext *ctx, const char *name, MAGIC *mg,
+      size_t nfields, const DMDNamedField fields[]);
+
+I<Since version 0.52.>
+
+When built on a Perl that contains Magic v2, this helper macro wraps a call to
+the same helper function as L</DMD_DUMP_STRUCT>, but formats its arguments a
+little better for handling the C<MgUSERSTRUCT> area of a Magic v2 annotation.
+Rather than needing to give the actual structure address and its size, this
+information can be recovered from the I<mg> pointer directly.
 
 =head1 HANDLING C-LEVEL STRUCTURES
 
@@ -485,6 +510,14 @@ static void S_DMD_DumpStruct(pTHX_ DMDContext *ctx, const char *name, void *addr
   if(func != (void *)(-1))
     (*func)(aTHX_ ctx, name, addr, size, nfields, fields);
 }
+
+#ifdef MgIsV2
+#define DMD_SET_MGv2_HELPER(funcs, helper) \
+      DMD_SET_MAGIC_HELPER((MGVTBL *)funcs, helper)
+#
+#define DMD_DUMP_MGv2_USERSTRUCT(ctx, name, mg, nfields, fields) \
+      S_DMD_DumpStruct(aTHX_ ctx, name, MgUSERSTRUCT(mg, void *), MgFUNCS(mg)->user_size, nfields, fields)
+#endif
 
 #else
 typedef int DMD_Helper(pTHX_ const SV *sv);

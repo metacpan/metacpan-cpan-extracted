@@ -63,7 +63,7 @@ eval{
 	$sorter=Net::Connection::Sort::uid->new;
 	$worked=1;
 };
-ok( $worked eq 1, 'sorter init') or die ('Net::Connection::Sort::uid->new resulted in... '.$@);
+ok( $worked == 1, 'sorter init') or die ('Net::Connection::Sort::uid->new resulted in... '.$@);
 
 my @sorted;
 $worked=0;
@@ -71,7 +71,7 @@ eval{
 	@sorted=$sorter->sorter( \@objects );
 	$worked=1;
 };
-ok( $worked eq 1, 'sort') or die ('Net::Connection::Sort::proto->sorter(@objects) resulted in... '.$@);
+ok( $worked == 1, 'sort') or die ('Net::Connection::Sort::uid->sorter(@objects) resulted in... '.$@);
 
 # 0 and 1 can end up in any order, make sure they are as expected
 my $is_defined=1;
@@ -92,9 +92,9 @@ if( (
 	$is_zero=1;
 }
 
-ok( $is_defined eq '0', 'sort order 0') or die ('The UID for 0/1 is not 0');
-ok( $is_zero eq '1', 'sort order 1') or die ('The UID for 0/1 is not 0');
+ok( $is_defined == 0, 'sort order 0') or die ('The UID for 0/1 is not 0');
+ok( $is_zero == 1, 'sort order 1') or die ('The UID for 0/1 is not 0');
 ok( $sorted[2]->uid eq '33', 'sort order 2') or die ('The UID for 2 is not 33');
-ok( $sorted[3]->uid eq '1000', 'sort order 2') or die ('The UID for 3 is not 1000');
+ok( $sorted[3]->uid eq '1000', 'sort order 3') or die ('The UID for 3 is not 1000');
 
 done_testing(7);

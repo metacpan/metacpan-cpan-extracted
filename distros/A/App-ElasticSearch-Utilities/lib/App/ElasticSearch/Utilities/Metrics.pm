@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Metrics;
 use v5.16;
 use warnings;
 
-our $VERSION = '8.9'; # VERSION
+our $VERSION = '9.0'; # VERSION
 
 use App::ElasticSearch::Utilities qw(es_connect);
 use CLI::Helpers qw(:output);
@@ -220,7 +220,6 @@ sub collect_index_metrics {
     my $shardres = $self->request('_cat/shards',
         {
             uri_param => {
-                local  => 'true',
                 format => 'json',
                 bytes  => 'b',
                 h => join(',', qw( index prirep docs store id state )),
@@ -335,7 +334,7 @@ App::ElasticSearch::Utilities::Metrics - Fetches performance metrics about the n
 
 =head1 VERSION
 
-version 8.9
+version 9.0
 
 =head1 SYNOPSIS
 

@@ -10,11 +10,11 @@ Net::Connection::Sort::pid - Sorts the connections via the PID.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.2
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.2';
 
 
 =head1 SYNOPSIS
@@ -22,7 +22,7 @@ our $VERSION = '0.0.0';
 Please keep in mind that PID is not a requirement and if not specified is set to 0,
 meaning it will show up earlier.
 
-    use Net::Connection::Sort::host_f;
+    use Net::Connection::Sort::pid;
     use Net::Connection;
     use Data::Dumper;
     
@@ -76,7 +76,7 @@ meaning it will show up earlier.
                                         }),
                  );
     
-    my $sorter=$sorter=Net::Connection::Sort::uid->new;
+    my $sorter=Net::Connection::Sort::pid->new;
     
     @objects=$sorter->sorter( \@objects );
     
@@ -90,17 +90,11 @@ This initiates the module.
 
 No arguments are taken and this will always succeed.
 
-    my $sorter=$sorter=Net::Connection::Sort::uid->new;
+    my $sorter=Net::Connection::Sort::pid->new;
 
 =cut
 
 sub new{
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
-
-
 	my $self = {
 				};
     bless $self;
@@ -108,7 +102,7 @@ sub new{
 	return $self;
 }
 
-=head2 sort
+=head2 sorter
 
 This sorts the array of Net::Connection objects.
 
@@ -132,10 +126,8 @@ sub sorter{
 		die 'The passed item is either not a array or undefined';
 	}
 
-	# whoops... just realized I forgot to create a method for this in Net::Connection... doing it this way foreign
-	# compatibility with Net::Connection 0.0.0 as of currently
 	@objects=sort  {
-		&helper( $a->{pid} ) <=>  &helper( $b->{pid} )
+		helper( $a->pid ) <=>  helper( $b->pid )
 	} @objects;
 
 	return @objects;

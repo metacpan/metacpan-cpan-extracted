@@ -150,7 +150,7 @@ my @tests = (
             'RET',
         ]);
         # Separator is normalised to "/" by the tilde expander; drive + dir.
-        _ok($o =~ /\Adp \[C:.*dir.*sub.\]\n\z/,
+        _ok(($o =~ /\Adp \[C:.*dir.*sub.\]\n\z/) ? 1 : 0,
             "CA7: %~dp1 drive+dir on passed argument (got [$o])");
     },
 

@@ -71,7 +71,7 @@ use File::Spec ();
 use Carp qw(croak);
 use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_EXCL O_TRUNC O_APPEND);
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 $VERSION = $VERSION;
 
 require BATsh::MB;
@@ -7142,7 +7142,7 @@ BATsh::SH - Pure Perl bash/sh interpreter for BATsh
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

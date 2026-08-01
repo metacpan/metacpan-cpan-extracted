@@ -6,7 +6,7 @@ use v5.16;
 use warnings;
 no warnings 'uninitialized';
 
-our $VERSION = '8.9'; # VERSION
+our $VERSION = '9.0'; # VERSION
 
 use JSON::MaybeXS;
 use Ref::Util qw(is_ref is_arrayref is_hashref);
@@ -60,7 +60,7 @@ App::ElasticSearch::Utilities::HTTPRequest - Allow for strange content elements 
 
 =head1 VERSION
 
-version 8.9
+version 9.0
 
 =head1 SYNOPSIS
 

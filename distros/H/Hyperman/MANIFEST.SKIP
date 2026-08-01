@@ -1,0 +1,23 @@
+# build artifacts
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+\.o$
+\.bs$
+^Hyperman\.c$
+^MYMETA\.
+
+# version control / editors
+^\.git/
+\.swp$
+~$
+^\.#
+^#.*#$
+\.DS_Store$
+
+# author / local work files
+^xt/
+^ignore\.txt$
+^_hypersonic_cache/
+^Hyperman-[\d.]+

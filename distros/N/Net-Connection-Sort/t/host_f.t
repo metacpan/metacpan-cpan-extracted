@@ -60,7 +60,7 @@ eval{
 	$sorter=Net::Connection::Sort::host_f->new;
 	$worked=1;
 };
-ok( $worked eq 1, 'sorter init') or die ('Net::Connection::Sort::host_f->new resulted in... '.$@);
+ok( $worked == 1, 'sorter init') or die ('Net::Connection::Sort::host_f->new resulted in... '.$@);
 
 my @sorted;
 $worked=0;
@@ -68,11 +68,31 @@ eval{
 	@sorted=$sorter->sorter( \@objects );
 	$worked=1;
 };
-ok( $worked eq 1, 'sort') or die ('Net::Connection::Sort::host_f->sorter(@objects) resulted in... '.$@);
+ok( $worked == 1, 'sort') or die ('Net::Connection::Sort::host_f->sorter(@objects) resulted in... '.$@);
 
 ok( $sorted[0]->foreign_host eq '1.1.1.1', 'sort order 0') or die ('The first foreign host value was not 1.1.1.1');
 ok( $sorted[3]->foreign_host eq '5.5.5.5', 'sort order 1') or die ('The last foreign host value was not 5.5.5.5');
 ok( $sorted[2]->foreign_host eq '3.3.3.3', 'sort order 2') or die ('The middle foreign host value was not 3.3.3.3');
-ok( $sorted[1]->foreign_host eq '3.3.3.3', 'sort order 2') or die ('The middle foreign host value was not 3.3.3.3');
+ok( $sorted[1]->foreign_host eq '3.3.3.3', 'sort order 3') or die ('The middle foreign host value was not 3.3.3.3');
 
-done_testing(7);
+
+# link local addresses arrive with a zone id attached and must still sort by
+# the address rather than all collapsing together
+my @zoned=map {
+	Net::Connection->new({
+						  'foreign_host' => $_,
+						  'local_host' => $_,
+						  'foreign_port' => '22',
+						  'local_port' => '11132',
+						  'state' => 'ESTABLISHED',
+						  'proto' => 'tcp6',
+						  })
+} ( 'fe80::3%eth0', 'fe80::1%eth0', 'fe80::2%em0' );
+
+@sorted=$sorter->sorter( \@zoned );
+
+ok( $sorted[0]->foreign_host eq 'fe80::1%eth0', 'zone id sort order 0') or die ('The first host was not fe80::1%eth0');
+ok( $sorted[1]->foreign_host eq 'fe80::2%em0', 'zone id sort order 1') or die ('The middle host was not fe80::2%em0');
+ok( $sorted[2]->foreign_host eq 'fe80::3%eth0', 'zone id sort order 2') or die ('The last host was not fe80::3%eth0');
+
+done_testing(10);

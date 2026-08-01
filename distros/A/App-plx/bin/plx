@@ -2,7 +2,7 @@
 
 package App::plx;
 
-our $VERSION = '0.902003'; # 0.902.3
+our $VERSION = '0.902004'; # 0.902.4
 
 $VERSION = eval $VERSION;
 
@@ -794,7 +794,8 @@ However, if you want a self-contained plx script without having a cpan
 installer available, you can run:
 
   mkdir bin
-  wget https://raw.githubusercontent.com/shadowcat-mst/plx/master/bin/plx-packed -O bin/plx
+  wget https://raw.githubusercontent.com/NicholasBHubbard/plx/master/bin/plx-packed -O bin/plx
+  chmod +x bin/plx
 
 to get the current latest packed version.
 
@@ -1136,14 +1137,18 @@ C<--installenv>.
 
  mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
 
+=head1 MAINTAINER
+
+ Nicholas B. Hubbard (cpan:NHUBBARD) <nicholashubbard@posteo.net>
+
 =head1 CONTRIBUTORS
 
-None yet - maybe this software is perfect! (ahahahahahahahahaha)
+ Nicholas B. Hubbard (cpan:NHUBBARD) <nicholashubbard@posteo.net>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2020 the App::plx L</AUTHOR> and L</CONTRIBUTORS>
-as listed above.
+Copyright (c) 2020 the App::plx L</AUTHOR>, L</MAINTAINER>, and
+L</CONTRIBUTORS> as listed above.
 
 =head1 LICENSE
 

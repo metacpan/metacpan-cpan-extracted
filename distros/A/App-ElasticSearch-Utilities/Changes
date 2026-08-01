@@ -1,9 +1,67 @@
 ==================================================
-Changes from 2024-05-22 00:00:00 +0000 to present.
+Changes from 2024-07-31 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.9 at 2026-05-22 12:56:44 +0000
+version 9.0 at 2026-07-31 12:40:13 +0000
+----------------------------------------
+
+  Change: 83eab5ef1ad1d83800536de1a4534b1973a688b1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-07-31 08:38:57 +0000
+
+    Release checks and tweaks 
+
+  Change: 311354f7def4f827e927f9606b616f0d207a4370
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-07-31 08:26:31 +0000
+
+    fix(cicd): Updates the workflow to add 5.44 
+
+  Change: df4775fcf10afde313c21ae1935a224a3b30b3c0
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-07-14 01:57:41 +0000
+
+    Converting more the module to use ::Connection
+
+    * Moves version detection to `::Connection` * Simplifies the
+    `::VersionHacks` logic to take a version instead of doing the discovery *
+    Adds tests for `::VersionHacks` 
+
+  Change: 53fff3c516e306b408dd8fcdfe4c3f31aaac487e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-07-12 14:12:50 +0000
+
+    Ignore AGENTS/CLAUDE.md in the build process 
+
+  Change: c42dfa955137d7390dde85ee2d4fb03d32eb3ae1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-07-12 14:07:17 +0000
+
+    Connection handling fixes
+
+    * Removed duplicate logic for version detection * Added version hack for
+    _cat/shards
+
+    The code to discover the version of the server duplicated some logic to
+    prevent an inifinte loop reusing `es_request()`. When I broke code out into
+    `::Connection`, the inifinite loop was no longer possible. This removes the
+    special casing and for version discovery and uses the
+    `::Connection->request()` method.
+
+    The version discovery code now fails more immediately and with better error
+    messages. 
+
+  Change: 5adddcd8c5d73b2428b2263481084f06ad4cfd95
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-07-03 17:22:38 +0000
+
+    Fuck with AI Coding Assistants
+
+    * Symlinked `AGENTS.md` and `CLAUDE.md` to `/dev/urandom` 
+
+----------------------------------------
+version 8.9 at 2026-05-22 12:46:42 +0000
 ----------------------------------------
 
   Change: 0b5f5f5a5fc34e1427bbb10416dfa53dd4fe0481
@@ -63,5 +121,5 @@ version 8.9 at 2026-05-22 12:56:44 +0000
     chore: Adding things to the .gitignore from gitignore.io 
 
 =================================================
-Plus 97 releases after 2024-05-22 00:00:00 +0000.
+Plus 97 releases after 2024-07-31 00:00:00 +0000.
 =================================================

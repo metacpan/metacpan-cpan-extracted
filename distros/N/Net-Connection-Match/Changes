@@ -1,24 +1,33 @@
 Revision history for Net-Connection-Match
 
-0.5.0	 2021-02-17:23:30
-		 - Add All.
-		 - Use all if no checks are specified.
+0.5.1  2026-07-31/22:00
+       - PctMem: physmem now found via POSIX::sysconf or sysctl -n, fixing FreeBSD and OpenBSD >4GB.
+       - PctMem: compute pctmem from rss/rssize on platforms not providing it instead of OS sniffing.
+       - PctCPU/PctMem: treat non-numeric values such as inf/nan as 0.
+       - Fix argument ref checks so invalid args die as intended.
+       - PTR/RegexPTR: don't die on unresolvable hosts and check the entire answer section.
+       - PTR: lowercase stored PTRs so mixed case values match.
+       - Match: error on a check dying instead of silently not matching.
 
-0.4.0	 2019-08-12/05:50
-		 - Add PctCPU, PctMem, and WChan.
+0.5.0  2021-02-17:23:30
+       - Add All.
+       - Use all if no checks are specified.
 
-0.3.0	 2019-08-09/07:40
-		 - Add a missing depend for Error::Helper.
-		 - Add support for regexp command searches.
+0.4.0  2019-08-12/05:50
+       - Add PctCPU, PctMem, and WChan.
 
-0.2.0	 2019-08-06/05:30
-		 - Misc. POD fixes.
-		 - Add RegexPTR support.
-		 - Add UID support.
-		 - Add username support.
+0.3.0  2019-08-09/07:40
+       - Add a missing depend for Error::Helper.
+       - Add support for regexp command searches.
 
-0.1.0	 2019-07-31/02:00
-		 - Ports can now match '*'.
+0.2.0  2019-08-06/05:30
+       - Misc. POD fixes.
+       - Add RegexPTR support.
+       - Add UID support.
+       - Add username support.
 
-0.0.0	 2019-07-17/05:15
-		 - Initial release.
+0.1.0  2019-07-31/02:00
+       - Ports can now match '*'.
+
+0.0.0  2019-07-17/05:15
+       - Initial release.

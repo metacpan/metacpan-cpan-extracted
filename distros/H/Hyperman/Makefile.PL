@@ -1,0 +1,222 @@
+use 5.008003;
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+use Config;
+
+# --- io_uring backend: use liburing when available (Linux only) ----------
+#
+# The io_uring backend links against liburing rather than issuing the ring
+# syscalls by hand. We detect it at configure time: pkg-config first, then a
+# bare `-luring` compile probe. When neither succeeds the backend compiles to
+# graceful "unavailable" stubs and auto-selection falls back to epoll/poll.
+my ($uring_inc, $uring_libs) = ('', '');
+if ($^O eq 'linux') {
+    my ($cflags, $libs);
+    if (system('pkg-config --exists liburing >/dev/null 2>&1') == 0) {
+        chomp($cflags = `pkg-config --cflags liburing 2>/dev/null`);
+        chomp($libs   = `pkg-config --libs liburing 2>/dev/null`);
+        $libs ||= '-luring';
+    }
+    if (!$libs && probe_liburing()) {
+        ($cflags, $libs) = ('', '-luring');
+    }
+    if ($libs) {
+        $uring_inc  = " $cflags -DHM_HAVE_LIBURING";
+        $uring_libs = $libs;
+        print "Found liburing: io_uring backend enabled.\n";
+    } else {
+        print "liburing not found: io_uring backend disabled "
+            . "(epoll/poll remain available; install liburing-dev to enable it).\n";
+    }
+}
+
+# --- TLS/HTTPS via OpenSSL (any platform with the library) ---------------
+#
+# A non-blocking TLS layer on the event loop; with nghttp2 also present, ALPN
+# negotiates h2 over TLS. Detected like the others: pkg-config, then an
+# -lssl -lcrypto compile probe. Absent, the TLS code compiles to stubs and
+# `tls_cert`/`tls_key` error at runtime.
+my ($tls_inc, $tls_libs) = ('', '');
+{
+    my ($cflags, $libs);
+    if (system('pkg-config --exists openssl >/dev/null 2>&1') == 0) {
+        chomp($cflags = `pkg-config --cflags openssl 2>/dev/null`);
+        chomp($libs   = `pkg-config --libs openssl 2>/dev/null`);
+        $libs ||= '-lssl -lcrypto';
+    }
+    if (!$libs && probe_openssl('')) {
+        ($cflags, $libs) = ('', '-lssl -lcrypto');
+    }
+    if (!$libs) {   # homebrew keg-only path (no pkg-config on macOS)
+        for my $p ('/opt/homebrew/opt/openssl', '/opt/homebrew/opt/openssl@3',
+                   '/usr/local/opt/openssl', '/usr/local/opt/openssl@3') {
+            next unless -d "$p/include";
+            if (probe_openssl("-I$p/include -L$p/lib")) {
+                ($cflags, $libs) = ("-I$p/include", "-L$p/lib -lssl -lcrypto");
+                last;
+            }
+        }
+    }
+    if ($libs) {
+        $tls_inc  = " $cflags -DHM_HAVE_OPENSSL";
+        $tls_libs = " $libs";
+        print "Found OpenSSL: TLS/HTTPS support enabled.\n";
+    } else {
+        print "OpenSSL not found: TLS/HTTPS support disabled "
+            . "(install libssl-dev to enable it).\n";
+    }
+}
+
+sub probe_openssl {
+    my $flags = shift;
+    my $dir = "hm_tls_probe_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
+    if (open my $fh, '>', $src) {
+        print $fh <<'C';
+#include <openssl/ssl.h>
+int main(void) {
+    SSL_CTX *c = SSL_CTX_new(TLS_server_method());
+    if (c) SSL_CTX_free(c);
+    return 0;
+}
+C
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $flags $src -o $bin -lssl -lcrypto >/dev/null 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
+# --- HTTP/2 via nghttp2 (any platform with the library) ------------------
+#
+# nghttp2 does the framing, HPACK, flow control, and stream state; we glue it
+# to the loop. Detected like liburing: pkg-config, then a compile probe. When
+# absent the HTTP/2 code compiles to stubs and `http2 => 1` errors at runtime.
+my ($h2_inc, $h2_libs) = ('', '');
+{
+    my ($cflags, $libs);
+    if (system('pkg-config --exists libnghttp2 >/dev/null 2>&1') == 0) {
+        chomp($cflags = `pkg-config --cflags libnghttp2 2>/dev/null`);
+        chomp($libs   = `pkg-config --libs libnghttp2 2>/dev/null`);
+        $libs ||= '-lnghttp2';
+    }
+    if (!$libs && probe_nghttp2()) {
+        ($cflags, $libs) = ('', '-lnghttp2');
+    }
+    if ($libs) {
+        $h2_inc  = " $cflags -DHM_HAVE_NGHTTP2";
+        $h2_libs = " $libs";
+        print "Found nghttp2: HTTP/2 (h2c) support enabled.\n";
+    } else {
+        print "nghttp2 not found: HTTP/2 support disabled "
+            . "(install libnghttp2-dev to enable it).\n";
+    }
+}
+
+sub probe_nghttp2 {
+    my $dir = "hm_h2_probe_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
+    if (open my $fh, '>', $src) {
+        print $fh <<'C';
+#include <nghttp2/nghttp2.h>
+int main(void) {
+    nghttp2_session_callbacks *cb;
+    if (nghttp2_session_callbacks_new(&cb) == 0)
+        nghttp2_session_callbacks_del(cb);
+    return 0;
+}
+C
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $src -o $bin -lnghttp2 >/dev/null 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
+# Compile+link a tiny liburing program to confirm header and lib are usable.
+sub probe_liburing {
+    my $dir  = "hm_uring_probe_$$";
+    mkdir $dir or return 0;
+    my $src  = "$dir/probe.c";
+    my $bin  = "$dir/probe";
+    my $ok   = 0;
+    if (open my $fh, '>', $src) {
+        print $fh <<'C';
+#include <liburing.h>
+int main(void) {
+    struct io_uring ring;
+    if (io_uring_queue_init(8, &ring, 0) == 0) io_uring_queue_exit(&ring);
+    return 0;
+}
+C
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $src -o $bin -luring >/dev/null 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
+my %WriteMakefileArgs = (
+    NAME             => 'Hyperman',
+    AUTHOR           => ['LNATION <email@lnation.org>'],
+    VERSION_FROM     => 'lib/Hyperman.pm',
+    ABSTRACT_FROM    => 'lib/Hyperman.pm',
+    LICENSE          => 'artistic_2',
+    MIN_PERL_VERSION => '5.008003',
+    OBJECT           => 'Hyperman$(OBJ_EXT)',
+    INC              => '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc,
+    LIBS             => [ join(' ', grep { length } $uring_libs, $h2_libs, $tls_libs) ],
+    depend           => {
+        'Hyperman.c' => 'xs/hyperman.xs xs/future.xs xs/loop.xs '
+                      . 'xs/writer.xs xs/event.xs',
+        'Hyperman$(OBJ_EXT)' =>
+            'include/hyperman/hyperman.h include/hyperman/hm_core.h '
+          . 'include/hyperman/hm_future.h include/hyperman/backend_kqueue.c '
+          . 'include/hyperman/backend_epoll.c include/hyperman/backend_poll.c '
+          . 'include/hyperman/backend_iouring.c include/hyperman/hm_http2.h '
+          . 'include/hyperman/hm_tls.h',
+    },
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
+    },
+    TEST_REQUIRES => {
+        'Test::More' => '0',
+    	'Plack::Test::Suite' => '0',
+    },
+    PREREQ_PM => {
+        #'ABC'              => '1.6',
+        #'Foo::Bar::Module' => '5.0401',
+    },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES => 'Hyperman-*' },
+);
+
+# Compatibility with old versions of ExtUtils::MakeMaker
+unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
+    my $test_requires = delete $WriteMakefileArgs{TEST_REQUIRES} || {};
+    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$test_requires} = values %$test_requires;
+}
+
+unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
+    my $build_requires = delete $WriteMakefileArgs{BUILD_REQUIRES} || {};
+    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
+delete $WriteMakefileArgs{MIN_PERL_VERSION}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
+delete $WriteMakefileArgs{LICENSE}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+
+WriteMakefile(%WriteMakefileArgs);

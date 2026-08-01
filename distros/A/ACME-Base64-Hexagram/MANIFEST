@@ -1,0 +1,10 @@
+MANIFEST
+Changes
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+t/01-basic.t
+lib/ACME/Base64/Hexagram.pm
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

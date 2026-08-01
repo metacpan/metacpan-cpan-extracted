@@ -64,7 +64,7 @@ eval{
 	$sorter=Net::Connection::Sort::port_f->new;
 	$worked=1;
 };
-ok( $worked eq 1, 'sorter init') or die ('Net::Connection::Sort::port_f->new resulted in... '.$@);
+ok( $worked == 1, 'sorter init') or die ('Net::Connection::Sort::port_f->new resulted in... '.$@);
 
 my @sorted;
 $worked=0;
@@ -72,11 +72,36 @@ eval{
 	@sorted=$sorter->sorter( \@objects );
 	$worked=1;
 };
-ok( $worked eq 1, 'sort') or die ('Net::Connection::Sort::host_f->sorter(@objects) resulted in... '.$@);
+ok( $worked == 1, 'sort') or die ('Net::Connection::Sort::port_f->sorter(@objects) resulted in... '.$@);
 
 ok( $sorted[0]->foreign_port eq '1', 'sort order 0') or die ('The first foreign port value was not 1');
-ok( $sorted[1]->foreign_port eq '21', 'sort order 1') or die ('The last foreign port value was not 21');
-ok( $sorted[2]->foreign_port eq '22', 'sort order 2') or die ('The middle foreign port value was not 22');
-ok( $sorted[3]->foreign_port eq '80' , 'sort order 2') or die ('The middle foreign port value was not 80');
+ok( $sorted[1]->foreign_port eq '21', 'sort order 1') or die ('The second foreign port value was not 21');
+ok( $sorted[2]->foreign_port eq '22', 'sort order 2') or die ('The third foreign port value was not 22');
+ok( $sorted[3]->foreign_port eq '80' , 'sort order 3') or die ('The last foreign port value was not 80');
 
-done_testing(7);
+# wildcard ports, as used for listening sockets, must not warn or die
+my @wildcard=map {
+	Net::Connection->new({
+						  'foreign_host' => '3.3.3.3',
+						  'local_host' => '4.4.4.4',
+						  'foreign_port' => $_,
+						  'local_port' => '11132',
+						  'state' => 'ESTABLISHED',
+						  'proto' => 'tcp4',
+						  'ports' => 0,
+						  })
+} ( '22', '*', '1' );
+
+my @warnings;
+$worked=0;
+eval{
+	local $SIG{__WARN__}=sub{ push( @warnings, $_[0] ) };
+	@sorted=$sorter->sorter( \@wildcard );
+	$worked=1;
+};
+ok( $worked == 1, 'wildcard sort') or die ('Sorting a wildcard port resulted in... '.$@);
+ok( ! @warnings, 'wildcard sort is warning free') or die ('Sorting a wildcard port warned... '.join('', @warnings));
+ok( $sorted[0]->foreign_port eq '*', 'wildcard sort order 0') or die ('The first foreign port value was not *');
+ok( $sorted[2]->foreign_port eq '22', 'wildcard sort order 1') or die ('The last foreign port value was not 22');
+
+done_testing(11);

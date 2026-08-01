@@ -1,0 +1,47 @@
+{
+   "abstract" : "Runs a stack of checks to match Net::Connection objects.",
+   "author" : [
+      "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Connection-Match",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Error::Helper" : "v1.0.0",
+            "Net::CIDR" : "0.20",
+            "Net::Connection" : "v0.2.0",
+            "Net::DNS" : "1.20",
+            "Proc::ProcessTable" : "0.59",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.5.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

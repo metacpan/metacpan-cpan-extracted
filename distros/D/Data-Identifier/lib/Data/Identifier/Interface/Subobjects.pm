@@ -16,7 +16,7 @@ use parent 'Data::Identifier::Interface::Userdata';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.31;
+our $VERSION = v0.32;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -78,6 +78,12 @@ sub _subobject_provider {
 }
 
 
+sub so_new {
+    my ($pkg) = @_;
+    return bless {};
+}
+
+
 
 sub KEYS {
     return keys %_types;
@@ -97,7 +103,7 @@ Data::Identifier::Interface::Subobjects - format independent identifier object
 
 =head1 VERSION
 
-version v0.31
+version v0.32
 
 =head1 SYNOPSIS
 
@@ -169,6 +175,17 @@ It is equivalent to:
     return $obj->{subobjects} //= {};
 
 If all other methods are overridden this method can stay unimplemented.
+
+=head2 so_new
+
+    my Data::Identifier::Interface::Subobjects $obj = Data::Identifier::Interface::Subobjects->so_new;
+
+(since v0.32, experimental)
+
+Creates a new subobjects object.
+This is only useful as a container to hold subobjects.
+It can be used with C<parent> on other objects implementing this interface to ease object setup and avoid circular references.
+See also C<weak> in L</so_attach>.
 
 =head1 CONSTANTS
 

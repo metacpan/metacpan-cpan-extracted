@@ -183,7 +183,7 @@ my @tests = (
 
     sub {
         return _ok(1, 'GP05: skipped (fixture tree unavailable)') unless $SETUP;
-        _ok(_run("echo $BASE/sub/.*") =~ /\.hidden/,
+        _ok((_run("echo $BASE/sub/.*") =~ /\.hidden/) ? 1 : 0,
             'GP05: .* does match a leading dot');
     },
 
@@ -235,7 +235,7 @@ my @tests = (
     sub {
         return _ok(1, 'GP12: skipped (fixture tree unavailable)') unless $SETUP;
         my $out = _run("FOR %%f IN ($BASE/sub/*.txt) DO ECHO [%%f]\n");
-        _ok($out =~ /\Q[$BASE\/sub\/one.txt]\E/,
+        _ok(($out =~ /\Q[$BASE\/sub\/one.txt]\E/) ? 1 : 0,
             'GP12: CMD FOR uses the same matcher');
     },
 

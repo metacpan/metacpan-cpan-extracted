@@ -126,7 +126,7 @@ sub new{
 		 ( ! defined( $args{fptrs}[0] ) )
 		 )
 		){
-		die ('No ports defined in the in any of the [fl]ptrs array');
+		die ('No PTRs defined in any of the [fl]ptrs arrays');
 	}
 
     my $self = {
@@ -141,31 +141,31 @@ sub new{
 	## These are all stored as lower case to make matching easier.
 	##
 
-	# Process the ports for matching either
+	# Process the PTRs for matching either
 	my $ptrs_int=0;
 	if ( defined( $args{ptrs} ) ){
 		while (defined( $args{ptrs}[$ptrs_int] )) {
-			$self->{ptrs}{ $args{ptrs}[$ptrs_int] }=lc( $args{ptrs}[$ptrs_int] );
+			$self->{ptrs}{ lc( $args{ptrs}[$ptrs_int] ) }=lc( $args{ptrs}[$ptrs_int] );
 
 			$ptrs_int++;
 		}
 	}
 
-	# Process the ports for matching local ports
+	# Process the PTRs for matching the local side
 	$ptrs_int=0;
 	if ( defined( $args{lptrs} ) ){
 		while (defined( $args{lptrs}[$ptrs_int] )) {
-			$self->{lptrs}{ $args{lptrs}[$ptrs_int] }=lc( $args{lptrs}[$ptrs_int] );
+			$self->{lptrs}{ lc( $args{lptrs}[$ptrs_int] ) }=lc( $args{lptrs}[$ptrs_int] );
 
 			$ptrs_int++;
 		}
 	}
 
-	# Process the ports for matching foreign ports
+	# Process the PTRs for matching the foreign side
 	$ptrs_int=0;
 	if ( defined( $args{fptrs} ) ){
 		while (defined( $args{fptrs}[$ptrs_int] )) {
-			$self->{fptrs}{ $args{fptrs}[$ptrs_int] }=lc( $args{fptrs}[$ptrs_int] );
+			$self->{fptrs}{ lc( $args{fptrs}[$ptrs_int] ) }=lc( $args{fptrs}[$ptrs_int] );
 
 			$ptrs_int++;
 		}
@@ -214,10 +214,14 @@ sub match{
 		$l_ptr='NOTFOUND';
 		# See if we can look it up.
 		my $answer=$self->{resolver}->search( $object->local_host );
-		if ( defined( $answer->{answer}[0] ) &&
-			 ( ref( $answer->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
-			){
-			$l_ptr=lc($answer->{answer}[0]->ptrdname);
+		if ( defined( $answer ) ){
+			# search the whole answer section as the first RR may be a CNAME
+			foreach my $rr ( $answer->answer ){
+				if ( $rr->type eq 'PTR' ){
+					$l_ptr=lc( $rr->ptrdname );
+					last;
+				}
+			}
 		}
 	}
 
@@ -229,10 +233,14 @@ sub match{
 		$f_ptr='NOTFOUND';
 		# See if we can look it up.
 		my $answer=$self->{resolver}->search( $object->foreign_host );
-		if ( defined( $answer->{answer}[0] ) &&
-			 ( ref( $answer->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
-			){
-			$f_ptr=lc($answer->{answer}[0]->ptrdname);
+		if ( defined( $answer ) ){
+			# search the whole answer section as the first RR may be a CNAME
+			foreach my $rr ( $answer->answer ){
+				if ( $rr->type eq 'PTR' ){
+					$f_ptr=lc( $rr->ptrdname );
+					last;
+				}
+			}
 		}
 	}
 

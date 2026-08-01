@@ -45,7 +45,8 @@ my @files = (
     't/02-index-data.t',
     't/03-hash-flattening.t',
     't/04-aggregate-expand.t',
-    't/05-aggregate-flatten.t'
+    't/05-aggregate-flatten.t',
+    't/06-version-hacks.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

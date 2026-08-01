@@ -58,7 +58,7 @@
    "provides" : {
       "Test::RedisServer" : {
          "file" : "lib/Test/RedisServer.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -73,17 +73,20 @@
          "web" : "https://github.com/typester/Test-RedisServer"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_authority" : "cpan:TYPESTER",
    "x_contributors" : [
       "Daisuke Murase <typester@gmail.com>",
       "David Cantrell <david.cantrell@broadbean.com>",
       "Devendranath Thadi <devendranath.thadi3@gmail.com>",
+      "ICHINOSE Shogo <shogo82148@gmail.com>",
       "Ivan Baidakou <dmol@gmx.com>",
       "Jeremy Zawodny <jzawodn@craigslist.org>",
+      "Koki Matsumoto <git@rokuosan.dev>",
       "Masayuki Matsuki <y.songmu@gmail.com>",
       "Robin Smidsrød <robin@smidsrod.no>",
       "Sean Smith <ssmith@localhost.localdomain>",
+      "Yuji Hatakeyama <htkymyj0512@gmail.com>",
       "gregor herrmann <gregoa@debian.org>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",

@@ -1,5 +1,13 @@
 Revision history for Devel-MAT-Dumper
 
+0.52    2026-07-31
+        [CHANGES]
+         * Updates to support Magic v2, newly added in perl 5.45.2.
+
+        [BUGFIXES]
+         * Use HvHasAUX() rather than SvOOK() as newer perls no longer have
+           the latter.
+
 0.51    2026-01-14
         [CHANGES]
          * Slight C-level updates to avoid some clang warnings about

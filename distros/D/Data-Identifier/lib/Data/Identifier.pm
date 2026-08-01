@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.31;
+our $VERSION = v0.32;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -1035,6 +1035,15 @@ sub import {
             }
         }
     }
+
+    if (defined(my $allow_use = $opts->{allow_use})) {
+        $allow_use = [split /\s*,\s*/, $allow_use] unless ref $allow_use;
+        foreach my $to_use (@{$allow_use}) {
+            if ($to_use eq 'Data::URIID::Colour') {
+                require Data::URIID::Colour;
+            }
+        }
+    }
 }
 
 sub _generate {
@@ -1102,7 +1111,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.31
+version v0.32
 
 =head1 SYNOPSIS
 
@@ -1143,6 +1152,22 @@ and L<Data::Identifier::Interface::Userdata> (since v0.14).
 =head2 OPTIONS
 
 The following options are supported. Some are marked as experimental.
+
+=head3 allow_use
+
+(since v0.32)
+
+This option lists other modules this module is allowed to use internally.
+
+This setting takes an arrayref of strings or a single string that is a comma separated list.
+
+As this option only allows this module to make use of other modules without forcing it,
+unknown modules in this list will be ignored.
+
+It is undefined what happens if a module listed here is not installed or otherwise unloadable.
+
+Currently only L<Data::URIID::Colour> is supported.
+Future versions will likely also support <Data::IconText> and L<Data::Displaycolour>.
 
 =head3 disable
 
@@ -1373,7 +1398,7 @@ This is an alias for:
 (deprecated since v0.13)
 
 See also L</known>.
-This method will be removed in a future version.
+This method will be removed in C<v0.33>.
 
 =head2 type
 

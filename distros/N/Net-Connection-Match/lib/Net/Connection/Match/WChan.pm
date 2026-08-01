@@ -81,7 +81,7 @@ sub new{
 	if ( ! defined( $args{wchans} ) ){
 		die ('No wchans key specified in the argument hash');
 	}
-	if ( ref( \$args{wchans} ) eq 'ARRAY' ){
+	if ( ref( $args{wchans} ) ne 'ARRAY' ){
 		die ('The wchans key is not a array');
 	}
 	if ( ! defined $args{wchans}[0] ){

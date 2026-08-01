@@ -1,10 +1,10 @@
 {
-   "abstract" : "This uses lsof to generate a array of Net::Connection objects.",
+   "abstract" : "This uses lsof to generate an array of Net::Connection objects.",
    "author" : [
       "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -44,6 +44,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.3.0",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/VVelox/Net-Connection-lsof.git",
+         "web" : "https://github.com/VVelox/Net-Connection-lsof"
+      }
+   },
+   "version" : "v0.4.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

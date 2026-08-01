@@ -44,7 +44,7 @@ use strict;
 
 use Params::Classify 0.000 qw(is_number is_ref is_string);
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 =head1 CONSTRUCTOR
 
@@ -351,11 +351,11 @@ L<Data::Entropy::Source>
 
 Andrew Main (Zefram) <zefram@fysh.org>
 
-Maintained by Robert Rothenberg <rrwo@cpan.org>
+Maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2011, 2025
+Copyright (C) 2006, 2007, 2009, 2011, 2025-2026
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

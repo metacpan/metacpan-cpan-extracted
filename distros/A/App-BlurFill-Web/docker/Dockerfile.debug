@@ -1,0 +1,15 @@
+ARG APP_BLURFILL_VERSION=0.1.0
+FROM davorg/app-blurfill:${APP_BLURFILL_VERSION}
+
+WORKDIR /opt/app-blurfill-web
+COPY . .
+
+RUN cpanm --notest --installdeps . ; \
+    exit_code=$? ; \
+    mkdir -p /opt/app-blurfill-web/cpanm-logs ; \
+    find /root/.cpanm/work -name build.log -exec cp {} /opt/app-blurfill-web/cpanm-logs/ \; 2>/dev/null ; \
+    exit $exit_code
+
+EXPOSE 8080
+
+CMD ["plackup", "-s", "Starman", "-a", "bin/app.psgi", "-o", "0.0.0.0", "-p", "8080"]

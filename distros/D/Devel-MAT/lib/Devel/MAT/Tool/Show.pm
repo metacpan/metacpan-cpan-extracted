@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.55;
+package Devel::MAT::Tool::Show 0.56;
 
 use v5.20;
 use warnings;
@@ -96,26 +96,9 @@ sub run ( $self, $optsref, $sv )
    }
 
    foreach my $magic ( $sv->magic ) {
-      my $type = $magic->type;
-      $type = "^" . chr( 0x40 + ord $type ) if ord $type < 0x20;
-
-      Devel::MAT::Cmd->printf( "  has %s magic",
-         Devel::MAT::Cmd->format_note( $type, 1 ),
-      );
-
-      Devel::MAT::Cmd->printf( " with object at %s",
-         Devel::MAT::Cmd->format_sv( $magic->obj )
-      ) if $magic->obj;
-
-      Devel::MAT::Cmd->printf( " with pointer at %s",
-         Devel::MAT::Cmd->format_sv( $magic->ptr )
-      ) if $magic->ptr;
-
-      Devel::MAT::Cmd->printf( "\n     with virtual table at %s",
-         Devel::MAT::Cmd->format_value( $magic->vtbl, addr => 1 )
-      ) if $magic->vtbl;
-
-      Devel::MAT::Cmd->printf( "\n" );
+      my $ver = $magic->ver;
+      my $method = "show_magicv$ver";
+      $self->$method( $magic );
    }
 
    if( defined( my $serial = $sv->debug_serial ) ) {
@@ -143,6 +126,68 @@ sub say_with_sv ( $str, @args )
       @args,
       Devel::MAT::Cmd->format_sv( $sv ),
    );
+}
+
+sub show_magicv1 ( $self, $magic )
+{
+   my $type = $magic->type;
+   $type = "^" . chr( 0x40 + ord $type ) if ord $type < 0x20;
+
+   Devel::MAT::Cmd->printf( "  has %s magic",
+      Devel::MAT::Cmd->format_note( $type, 1 ),
+   );
+
+   Devel::MAT::Cmd->printf( " with object at %s",
+      Devel::MAT::Cmd->format_sv( $magic->obj )
+   ) if $magic->obj;
+
+   Devel::MAT::Cmd->printf( " with pointer at %s",
+      Devel::MAT::Cmd->format_sv( $magic->ptr )
+   ) if $magic->ptr;
+
+   Devel::MAT::Cmd->printf( "\n     with virtual table at %s",
+      Devel::MAT::Cmd->format_value( $magic->vtbl, addr => 1 )
+   ) if $magic->vtbl;
+
+   Devel::MAT::Cmd->printf( "\n" );
+}
+
+sub show_magicv2 ( $self, $magic )
+{
+   Devel::MAT::Cmd->printf( "  has MagicV2 with funcs at %s",
+      Devel::MAT::Cmd->format_value( $magic->funcs, addr => 1 )
+   );
+
+   Devel::MAT::Cmd->printf( "\n    with auxsv at %s",
+      Devel::MAT::Cmd->format_sv( $magic->auxsv )
+   ) if $magic->auxsv;
+
+   if( $magic->ptr and $magic->ptrlen ) {
+      Devel::MAT::Cmd->printf( "\n    with ptr %s len %s",
+         Devel::MAT::Cmd->format_value( $magic->ptr, addr => 1 ),
+         Devel::MAT::Cmd->format_value( $magic->ptrlen ),
+      );
+   }
+   elsif( $magic->ptr ) {
+      Devel::MAT::Cmd->printf( "\n    with ptr %s",
+         Devel::MAT::Cmd->format_value( $magic->ptr, addr => 1 ),
+      );
+   }
+   elsif( $magic->ptrlen ) {
+      Devel::MAT::Cmd->printf( "\n    with ptrlen %s",
+         Devel::MAT::Cmd->format_value( $magic->ptrlen ),
+      );
+   }
+
+   Devel::MAT::Cmd->printf( "\n    with keyiv %s",
+      Devel::MAT::Cmd->format_value( $magic->keyiv )
+   ) if defined $magic->keyiv;
+
+   Devel::MAT::Cmd->printf( "\n    with keysv at %s",
+      Devel::MAT::Cmd->format_sv( $magic->keysv )
+   ) if $magic->keysv;
+
+   Devel::MAT::Cmd->printf( "\n" );
 }
 
 sub show_UNDEF ( $self, $, $ ) { }

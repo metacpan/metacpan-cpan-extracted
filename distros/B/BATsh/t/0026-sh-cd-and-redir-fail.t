@@ -40,16 +40,28 @@ sub _run_out {
     my ($source) = @_;
     BATsh::Env::init();
     my $cap = "$FindBin::Bin/_cf_out_$$.tmp";
-    local *OLDOUT;
+    # RF01 deliberately provokes "sh: ...: No such file or directory" on
+    # STDERR.  Capture that stream too (and throw it away) so an expected
+    # diagnostic is not printed over the harness output.
+    my $cape = "$FindBin::Bin/_cf_err_$$.tmp";
+    local *OLDOUT; local *OLDERR;
     open(OLDOUT, ">&STDOUT") or die "cannot dup STDOUT: $!";
+    open(OLDERR, ">&STDERR") or die "cannot dup STDERR: $!";
     close(STDOUT);
     open(STDOUT, "> $cap")
         or do { open(STDOUT, ">&OLDOUT"); die "cannot redirect STDOUT: $!" };
+    close(STDERR);
+    open(STDERR, "> $cape")
+        or do { open(STDERR, ">&OLDERR"); die "cannot redirect STDERR: $!" };
     eval { BATsh->run_string($source) };
     my $err = $@;
     close(STDOUT);
+    close(STDERR);
     open(STDOUT, ">&OLDOUT") or die "cannot restore STDOUT: $!";
+    open(STDERR, ">&OLDERR") or die "cannot restore STDERR: $!";
     close(OLDOUT);
+    close(OLDERR);
+    unlink($cape);
     my $out = '';
     local *RF;
     if (open(RF, $cap)) { local $/; $out = <RF>; close(RF) }

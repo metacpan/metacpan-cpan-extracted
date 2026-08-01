@@ -1,0 +1,18 @@
+.dockerignore
+bin/app.psgi
+Changes.md
+docker/DOCKER.md
+docker/Dockerfile
+docker/Dockerfile.debug
+docker/build
+docker/docker-compose.yml
+lib/App/BlurFill/Web.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-web.t
+t/pod.t
+t/pod_coverage.t
+t/test.png
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

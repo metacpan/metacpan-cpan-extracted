@@ -1,31 +1,40 @@
 Revision history for Net-Connection-lsof
 
-0.3.0	 2023-06-01/13:15
-		 - Redirect stderr to dev null to prevent pointless warning about kern diffferences from lsof.
+0.4.0   2026-07-31/22:15
+        - Fix exit code checking on non-Linux systems.
+        - Check open worked when reading wchan on Linux.
+        - Skip unparsable lines.
+        - Fetch physmem and compute pctmem like Proc::ProcessTable::Match.
+        - Fix pid_start, the process table field is start.
+        - Only scan the process table once.
+        - Split parsing out into its own sub for testability and add tests.
+        - Update repo links to Github.
 
-0.2.0	 2019-08-16/16:40
-		 - WChan support added to Linux.
+0.3.0   2023-06-01/13:15
+        - Redirect stderr to dev null to prevent pointless warning about kern diffferences from lsof.
 
-0.1.1	 2019-08-13/06:00
-		 - Only call sysctl on BSD.
+0.2.0   2019-08-16/16:40
+        - WChan support added to Linux.
 
-0.1.0	 2019-08-12/05:45
-		 - Add support for process information.
+0.1.1   2019-08-13/06:00
+        - Only call sysctl on BSD.
 
-0.0.3	 2019-08-09/07:30
-		 - Add a work around for on some Linux systems
-		   where lsof will exit 1 upon successful completion,
-		   such as Debian 9.
+0.1.0   2019-08-12/05:45
+        - Add support for process information.
 
-0.0.2	 2019-07-28/21:45
-		 - Properly set uid_resolve.
-		 - Actually remove ) from state now.
-		 - Properly set if it is 4 or 6 on the protocol.
+0.0.3   2019-08-09/07:30
+        - Add a work around for on some Linux systems
+          where lsof will exit 1 upon successful completion,
+          such as Debian 9.
 
-0.0.1	 2019-07-28/21:10
-		 - Some versions of lsof shipped with some linux
-		   distros don't support +c so don't use that option.
+0.0.2   2019-07-28/21:45
+        - Properly set uid_resolve.
+        - Actually remove ) from state now.
+        - Properly set if it is 4 or 6 on the protocol.
 
-0.0.0	 2019-07-28/06:40
-		 - Initial release.
+0.0.1   2019-07-28/21:10
+        - Some versions of lsof shipped with some linux
+          distros don't support +c so don't use that option.
 
+0.0.0   2019-07-28/06:40
+        - Initial release.

@@ -15,10 +15,12 @@ my %WriteMakefileArgs = (
 	},
 	TEST_REQUIRES => {
 		'Test::More' => '0',
+		'File::Temp' => '0',
+		'File::Spec' => '0',
 	},
 	PREREQ_PM => {
 		'Net::Connection' => '0.2.0',
-		'Proc::ProcessTable' => '0.59',
+		'JSON'            => '4.00',
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES    => 'Net-Connection-FreeBSD_sockstat-*' },

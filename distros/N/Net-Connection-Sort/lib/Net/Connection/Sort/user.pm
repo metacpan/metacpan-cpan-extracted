@@ -10,17 +10,17 @@ Net::Connection::Sort::user - Sorts the connections via the username
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.2
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.2';
 
 
 =head1 SYNOPSIS
 
-Please keep in mind that username is not a requirement and if not specified is set to 0,
-meaning it will show up earlier.
+Please keep in mind that username is not a requirement and if not specified is
+treated as a empty string, meaning it will show up earlier.
 
     use Net::Connection::Sort::user;
     use Net::Connection;
@@ -69,7 +69,7 @@ meaning it will show up earlier.
                                         'username' => 'foo',
                                         'uid_resolve' => 0,
                                         }),
-    # as no username is specified, the value of 0 will just be used instead
+    # as no username is specified, a empty string will just be used instead
                   Net::Connection->new({
                                         'foreign_host' => '3.3.3.3',
                                         'local_host' => '4.4.4.4',
@@ -82,7 +82,7 @@ meaning it will show up earlier.
                                         }),
                  );
     
-    my $sorter=$sorter=Net::Connection::Sort::user->new;
+    my $sorter=Net::Connection::Sort::user->new;
     
     @objects=$sorter->sorter( \@objects );
     
@@ -96,17 +96,11 @@ This initiates the module.
 
 No arguments are taken and this will always succeed.
 
-    my $sorter=$sorter=Net::Connection::Sort::uid->new;
+    my $sorter=Net::Connection::Sort::user->new;
 
 =cut
 
 sub new{
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
-
-
 	my $self = {
 				};
     bless $self;
@@ -114,7 +108,7 @@ sub new{
 	return $self;
 }
 
-=head2 sort
+=head2 sorter
 
 This sorts the array of Net::Connection objects.
 
@@ -139,7 +133,7 @@ sub sorter{
 	}
 
 	@objects=sort  {
-		&helper( $a->username ) cmp  &helper( $b->username )
+		helper( $a->username ) cmp  helper( $b->username )
 	} @objects;
 
 	return @objects;
@@ -149,13 +143,15 @@ sub sorter{
 
 This is a internal function.
 
-If no UID is defined, returns 0.
+If no username is defined, returns a empty string. This is compared using
+cmp, so a empty string is used instead of 0 to keep it from colliding with a
+user actually named 0.
 
 =cut
 
 sub helper{
         if ( !defined($_[0]) ){
-			return 0;
+			return '';
         }
         return $_[0];
 }

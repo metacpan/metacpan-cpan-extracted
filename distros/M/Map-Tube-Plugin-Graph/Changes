@@ -1,4 +1,13 @@
-Revision history for Map::Tube::Plugin::Graph
+Revision history for module Map::Tube::Plugin::Graph
+
+1.1.1   2026-07-31
+        This release entirely belongs to @GWS.
+        - No functional hanges
+        - Augmented tests
+        - Sped up tests
+        - Made tests more robust (hopefully)
+        - Removed test dependencies on Map::Tube::London
+        - Augmented README.
 
 1.1.0   2026-07-21
         This release entirely belongs to @GWS.

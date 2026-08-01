@@ -5,7 +5,7 @@ use File::Temp qw(tempdir);
 use File::Basename;
 use App::BlurFill::CLI;
 
-my $image = "t/test.jpg";
+my $image = "t/test.png";
 plan skip_all => "Test image $image not found" unless -e $image;
 
 # Simulate @ARGV as CLI would receive it

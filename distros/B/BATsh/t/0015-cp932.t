@@ -173,6 +173,23 @@ my @tests = (
         my $orig = eval { Cwd::cwd() };
         chdir($TMPDIR) if defined $orig;
         my $fname = $SO . "_$$.tmp";
+        # Not every environment can even hold such a name: a perl whose
+        # Win32 ANSI code page is UTF-8 rejects the raw CP932 byte pair
+        # with ENOENT before BATsh is involved.  Probe with plain perl
+        # first and skip (rather than fail) when the name is unusable,
+        # otherwise this reports a platform limitation as a BATsh bug.
+        my $usable = 0;
+        local *PROBE;
+        if (open(PROBE, "> $fname")) {
+            close(PROBE);
+            $usable = (-f $fname) ? 1 : 0;
+            unlink($fname);
+        }
+        if (!$usable) {
+            chdir($orig) if defined $orig;
+            return _ok(1,
+                'CP12: skipped (this filesystem cannot hold a CP932 file name)');
+        }
         BATsh->run_string(join("\n",
             "echo naka > $fname",
             "if [ -f $fname ]; then",

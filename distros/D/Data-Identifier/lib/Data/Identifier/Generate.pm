@@ -28,10 +28,11 @@ use constant {
     #WK_LANGUAGE_GENERATOR               => '',
     WK_MULTIPLICITY_GENERATOR           => '19659233-0a22-412c-bdf1-8ee9f8fc4086',
     WK_MINIMUM_MULTIPLICITY_GENERATOR   => '5ec197c3-1406-467c-96c7-4b1a6ec2c5c9',
+    WK_STD_DIGEST_ALGO_GENERATOR        => '65284e17-5550-42ef-9449-cdf13cb97a9e',
 };
 
 
-our $VERSION = v0.31;
+our $VERSION = v0.32;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -106,6 +107,47 @@ my %_generators = (
     WK_MINIMUM_MULTIPLICITY_GENERATOR() => {
         namespace   => NS_GTE,
     },
+    WK_STD_DIGEST_ALGO_GENERATOR() => {
+        style       => 'id-based',
+        namespace   => '34f1f1d2-51be-4754-9585-83e33c5cb7e8',
+    },
+);
+
+my %_hash_type_to_utag = (
+    '8238da08-ca93-4d67-bf40-54818aa94405' => { # rfc9530-digest-identifier
+        'md5'       => 'md-5-128',
+        'sha'       => 'sha-1-160',
+        'sha-256'   => 'sha-2-256',
+        'sha-512'   => 'sha-2-512',
+    },
+    '0d4ef6fa-0f9a-4bc8-9fc1-e4f00725397e' => { # openpgp-digest-identifier
+        1           => 'md-5-128',
+        2           => 'sha-1-160',
+        3           => 'ripemd-1-160',
+        # 4 - 7
+        8           => 'sha-2-256',
+        9           => 'sha-2-384',
+        10          => 'sha-2-512',
+        11          => 'sha-2-224',
+        12          => 'sha-3-256',
+        # 13
+        14          => 'sha-3-512',
+    },
+    '039e0bb7-5dd3-40ee-a98c-596ff6cce405' => { # sirtx-numerical-identifier
+        185         => 'sha-1-160',
+        186         => 'sha-3-512',
+    },
+);
+
+my %_hash_utag_to_type = map {
+    my $x = $_;
+    $x => {map {$_hash_type_to_utag{$x}{$_} => $_} keys %{$_hash_type_to_utag{$x}}},
+} keys %_hash_type_to_utag;
+
+my %_hash_type_aliases = (
+    rfc9530 => '8238da08-ca93-4d67-bf40-54818aa94405',
+    openpgp => '0d4ef6fa-0f9a-4bc8-9fc1-e4f00725397e',
+    sni     => '039e0bb7-5dd3-40ee-a98c-596ff6cce405',
 );
 
 
@@ -372,6 +414,56 @@ sub unit {
 
 
 #@returns Data::Identifier
+sub digest {
+    my ($pkg, $type, $request, %opts) = @_;
+    state $generator = Data::Identifier->new(uuid => WK_STD_DIGEST_ALGO_GENERATOR)->register;
+    my Data::Identifier $identifier;
+    my $utag;
+
+    croak 'Bad type or request' unless defined($type) && defined($request);
+
+    $type = $type->ise if ref $type;
+
+    if ($type eq 'utag' || $type eq '8db88212-69df-40f3-a5cf-105dcd853d44') {
+        $utag = $request;
+    } elsif (defined($_hash_type_to_utag{$type}) && defined($utag = $_hash_type_to_utag{$type}{$request})) {
+        # no-op
+    } elsif (defined($_hash_type_to_utag{$_hash_type_aliases{$type} // '_nx'}) && defined($utag = $_hash_type_to_utag{$_hash_type_aliases{$type}}{$request})) {
+        # no-op
+    } else {
+        croak 'Invalid or unsupported type: '.$type;
+    }
+
+    croak 'Bad request: '.$utag unless $utag =~ /^[a-z]{2,6}-(?:0|[1-9][0-9]*)-[1-9][0-9]*\z/;
+
+    $identifier = $pkg->generic(request => $utag, generator => $generator, %opts);
+
+    $identifier->{generator}    //= $generator;
+    $identifier->{request}      //= $utag;
+
+    {
+        my %tagnames = map {$_ => undef} $utag, $identifier->tagname(list => 1, default => [], no_defaults => 1);
+        $identifier->{tagname} = [keys %tagnames];
+    }
+
+    {
+        my $id_cache = $identifier->{id_cache} //= {};
+        $id_cache->{'8db88212-69df-40f3-a5cf-105dcd853d44'} = $utag unless $identifier->type->eq('8db88212-69df-40f3-a5cf-105dcd853d44');
+
+        foreach my $type (keys %_hash_utag_to_type) {
+            my $v = $_hash_utag_to_type{$type}{$utag} // next;
+            $id_cache->{$type} //= $v;
+        }
+    }
+
+    use Data::Dumper;
+    warn Dumper($identifier);
+
+    return $identifier;
+}
+
+
+#@returns Data::Identifier
 sub generic {
     my ($pkg, %opts) = @_;
     my $generator = $opts{generator};
@@ -580,7 +672,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.31
+version v0.32
 
 =head1 SYNOPSIS
 
@@ -918,6 +1010,66 @@ Defaults to the data from the request.
 
 B<Note:>
 This function might load L<Data::Identifier::Util> dynamically.
+
+=head2 digest
+
+    my Data::Identifier $identifier = Data::Identifier::Generate->digest($type => $request [, %opts ] );
+    # e.g.:
+    my Data::Identifier $identifier = Data::Identifier::Generate->digest(utag => 'sha-3-512');
+
+(since v0.32)
+
+Generates an identifier for a given type of digest/hash algorithm.
+
+The C<$request> defines the digest algorithm based on the given C<$type>.
+
+The following types are supported:
+
+=over
+
+=item C<utag>
+
+(since v0.32)
+
+The algorithm is given in universal tag format. E.g. C<sha-1-160> or C<sha-3-512>.
+
+This is the recommended type to use, specifically for constants.
+
+=item C<rfc9530>
+
+(experimental since v0.32)
+
+The algorithm by it's name in RFC 9530.
+
+=item C<openpgp>
+
+(experimental since v0.32)
+
+The algorithm by it's number in OpenPGP.
+
+=item C<sni>
+
+(experimental since v0.32)
+
+The algorithm by it's SIRTX numerical identifier (sni).
+
+=back
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<displayname>
+
+The displayname as to be used for the identifier.
+This is the same as defined by L<Data::Identifier/new>.
+
+Defaults to the data from the request.
+
+=back
+
+B<Note:>
+Future versions of this method might automatically register the identifier.
 
 =head2 generic
 

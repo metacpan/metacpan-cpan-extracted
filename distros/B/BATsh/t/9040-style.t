@@ -3,7 +3,7 @@
 # 9040-style.t  Code style checks
 #
 #   check_C  US-ASCII only, no trailing whitespace, ends with newline
-#   check_K  comma spacing and reference idioms in lib/*.pm
+#   check_K  comma spacing and reference idioms in lib/, bin/ and t/
 #
 # COMPATIBILITY: Perl 5.005_03 and later
 #

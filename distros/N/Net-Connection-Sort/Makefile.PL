@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
 										   'Test::More' => '0',
 										   },
 						 PREREQ_PM => {
-									   'Net::Connection'=>'0.0.0',
+									   'Net::Connection'=>'0.2.0',
 									   'Net::IP'=>'1.26',
 									   },
 						 dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2026 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Context 0.55;
+package Devel::MAT::Context 0.56;
 
 use v5.20;
 use warnings;
@@ -109,7 +109,7 @@ sub location ( $self )
    return "$self->{file} line $self->{line}";
 }
 
-package Devel::MAT::Context::SUB 0.55;
+package Devel::MAT::Context::SUB 0.56;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 1 );
 
@@ -188,7 +188,7 @@ sub olddepth ( $self ) { return $self->{olddepth} }
 sub _set_depth ( $self, $depth ) { $self->{depth} = $depth }
 sub depth      ( $self )         { return $self->{depth} }
 
-package Devel::MAT::Context::TRY 0.55;
+package Devel::MAT::Context::TRY 0.56;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 2 );
 
@@ -202,7 +202,7 @@ sub load ( $self, $, $, $ ) {}
 
 sub _load_v0_1 ( $self, $ ) {}
 
-package Devel::MAT::Context::EVAL 0.55;
+package Devel::MAT::Context::EVAL 0.56;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 3 );
 

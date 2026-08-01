@@ -46,7 +46,7 @@ for my $sub (qw(lib t bin eg)) {
 @scan_files = sort @scan_files;
 
 plan_skip('no source files found') unless @scan_files;
-plan_tests(scalar(@scan_files) * 12);
+plan_tests(scalar(@scan_files) * 13);
 
 for my $path (@scan_files) {
     my $rel   = $path;
@@ -125,6 +125,19 @@ for my $path (@scan_files) {
         }
         ok(!$p12_fail || $guarded,
            "$rel P12: // defined-or guarded or absent");
+    };
+
+    # P13: a module that entered core after 5.005_03.  Wrapping such a
+    # load in eval does NOT make it acceptable here: the module is then
+    # missing on the oldest supported perl and whatever depended on it
+    # quietly stops being tested, which is how a File::Temp call sat
+    # unnoticed in t/0020-tilde-expansion.t.  The shared list lives in
+    # INA_CPAN_Check (@POST_5005_MODULES) so that check_D and this file
+    # cannot drift apart.
+    do {
+        my @late = _post_5005_modules($code);
+        ok(!@late, "$rel P13: no post-5.005_03 core module"
+                 . (@late ? " (@late)" : ''));
     };
 
 }

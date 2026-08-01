@@ -1,0 +1,18 @@
+# Git files
+.git
+.gitignore
+
+# Build artifacts
+App-BlurFill-*.tar.gz
+MYMETA.json
+MYMETA.yml
+Makefile
+blib/
+pm_to_blib
+MANIFEST.bak
+
+# Docker files
+.dockerignore
+
+# GitHub
+.github

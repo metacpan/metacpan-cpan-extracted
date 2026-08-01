@@ -10,11 +10,11 @@ Net::Connection::Sort::port_l - Sorts the connections via the local port numeric
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.2
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.2';
 
 
 =head1 SYNOPSIS
@@ -72,7 +72,7 @@ This currently implements numeric sorting only. For non-numeric sorting using po
                                         }),
                  );
     
-    my $sorter=$sorter=Net::Connection::Sort::port_l->new;
+    my $sorter=Net::Connection::Sort::port_l->new;
     
     @objects=$sorter->sorter( \@objects );
     
@@ -86,17 +86,11 @@ This initiates the module.
 
 No arguments are taken and this will always succeed.
 
-    my $sorter=$sorter=Net::Connection::Sort::port_l->new;
+    my $sorter=Net::Connection::Sort::port_l->new;
 
 =cut
 
 sub new{
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
-
-
 	my $self = {
 				};
     bless $self;
@@ -104,7 +98,7 @@ sub new{
 	return $self;
 }
 
-=head2 sort
+=head2 sorter
 
 This sorts the array of Net::Connection objects.
 
@@ -129,10 +123,29 @@ sub sorter{
 	}
 
 	@objects=sort  {
-		$a->local_port <=> $b->local_port
+		helper( $a->local_port ) <=> helper( $b->local_port )
 	} @objects;
 
 	return @objects;
+}
+
+=head2 helper
+
+This is a internal function.
+
+Returns the value to sort the passed port on. Anything not numeric, such as
+the '*' used for a wildcard port, becomes 0.
+
+=cut
+
+sub helper{
+	if (
+		( !defined($_[0]) ) ||
+		( $_[0] !~ /^[0-9]+$/ )
+		){
+		return 0;
+	}
+	return $_[0];
 }
 
 =head1 AUTHOR

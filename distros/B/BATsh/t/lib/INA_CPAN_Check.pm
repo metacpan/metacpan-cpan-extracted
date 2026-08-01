@@ -11,7 +11,7 @@ package INA_CPAN_Check;
 # a test file can emit its plan before running anything.
 #
 #   A  MANIFEST completeness
-#   B  version consistency across .pm / META.yml / META.json /
+#   B  version consistency across .pm / POD / META.yml / META.json /
 #      Makefile.PL / Changes, including the provides blocks
 #   C  encoding hygiene: US-ASCII, trailing whitespace, final newline
 #   D  Perl 5.005_03 compatibility of lib/*.pm
@@ -46,14 +46,14 @@ use Exporter ();
 use vars qw(@ISA);
 @ISA = qw(Exporter);
 
-$VERSION = '0.41';
+$VERSION = '0.43';
 $VERSION = $VERSION;
 
 @EXPORT_OK = qw(
     ok plan_tests diag plan_skip end_testing
     _slurp _slurp_lines _scan_code _code_only
     _manifest_files _manifest_pm_and_t _text_files _find_pm_t
-    _primary_pm _lib_pm_files _pm_version
+    _primary_pm _lib_pm_files _pm_version _post_5005_modules
     _yaml_str _json_str
     check_A count_A
     check_B count_B
@@ -340,6 +340,28 @@ sub _lib_pm_files {
     return sort @pm;
 }
 
+# ----------------------------------------------------------------------
+# _style_files -- every Perl source file the distribution ships.
+#
+# The D, E and G groups are deliberately limited to lib/*.pm: they demand
+# a particular shape -- a warnings stub, a $VERSION self-assignment, a
+# fixed set of =head1 sections -- that only a module is obliged to have.
+# The K group demands nothing of the kind.  K1 asks for a space after a
+# comma; K2 and K3 ask for [ @array ] and { %hash } in place of \@array
+# and \%hash.  All three are questions of spelling that apply to any Perl
+# source, and a reader of the distribution meets bin/*.pl and t/*.t as
+# often as lib/*.pm.  Restricting the group to lib/ therefore left most of
+# a pure-Perl distribution unchecked for no reason, so K now runs over
+# lib/, bin/ and t/ alike, as listed in MANIFEST.
+# ----------------------------------------------------------------------
+sub _style_files {
+    my ($root) = @_;
+    # See the note in _lib_pm_files: grep must not follow sort directly.
+    my @src = grep { m{^(?:lib/.*\.pm|bin/.*\.pl|t/.*\.(?:t|pm))$}
+                     && -f "$root/$_" } _manifest_files($root);
+    return sort @src;
+}
+
 sub _pm_version {
     my ($path) = @_;
     my $text = _slurp($path);
@@ -485,7 +507,7 @@ sub check_A {
 sub count_B {
     my ($root) = @_;
     my @pm = _lib_pm_files($root);
-    return scalar(@pm) * 6 + 1;
+    return scalar(@pm) * 6 + 2;
 }
 
 sub check_B {
@@ -548,6 +570,35 @@ sub check_B {
        "B7 - META.json provides versions all eq \$VERSION ("
        . (defined $primary_ver ? $primary_ver : 'undef') . ")"
        . (@json_mm ? " (@json_mm)" : ''));
+
+    # B8 -- the number printed in POD.
+    #
+    # B1..B7 tie $VERSION to META.yml, META.json, Makefile.PL and Changes,
+    # but the "Version 0.00" line under =head1 VERSION was checked by
+    # nothing: G2 only asks that the heading exists.  That line is the one
+    # a reader actually sees on metacpan, and it is a hand-edited copy of
+    # a number that lives somewhere else, so it is exactly the sort of
+    # thing that goes stale unnoticed.  Every shipped Perl source that has
+    # the heading -- lib/*.pm and the bin/*.pl scripts installed as
+    # EXE_FILES -- must print the distribution version under it.
+    my @pod_mm;
+    for my $src (@pm_files, grep { m{^bin/.*\.pl$} && -f "$root/$_" }
+                            _manifest_files($root)) {
+        my $text = _slurp("$root/$src");
+        next unless $text =~ /^=head1[ \t]+VERSION\b[ \t]*\r?\n(.*?)^=/ms;
+        my $body = $1;
+        my $found = 0;
+        if (defined $primary_ver) {
+            for my $tok ($body =~ /([0-9][0-9._]*)/g) {
+                $found = 1 if $tok eq $primary_ver;
+            }
+        }
+        push @pod_mm, $src unless $found;
+    }
+    ok(!@pod_mm,
+       "B8 - =head1 VERSION body states "
+       . (defined $primary_ver ? $primary_ver : 'undef')
+       . (@pod_mm ? " (@pod_mm)" : ''));
 }
 
 ######################################################################
@@ -599,14 +650,87 @@ sub check_C {
 }
 
 ######################################################################
+# _post_5005_modules -- modules a 5.005_03 perl does not ship
+#
+# Every name below entered the core distribution after 5.005_03, so a
+# distribution that claims 5.005_03 support must not load it (not even
+# inside eval, which turns the missing module into a silently skipped
+# test rather than an honest failure).  The list is deliberately a
+# deny-list of the modules that are actually reached for in practice
+# rather than an inverted copy of the 5.005_03 manifest: a name that is
+# absent from both lists is simply not checked.
+#
+# Pragmas that already have their own rule elsewhere (warnings, base,
+# parent) are left out so that a file is not reported twice.
+######################################################################
+
+use vars qw(@POST_5005_MODULES);
+@POST_5005_MODULES = qw(
+    Archive::Tar Attribute::Handlers autodie
+    bigint bignum bigrat bytes
+    charnames Class::ISA Compress::Raw::Zlib Compress::Zlib
+    CPANPLUS Devel::PPPort Digest Digest::MD5 Digest::SHA
+    Encode Encode::Guess ExtUtils::Constant
+    feature File::Fetch File::Glob File::Temp
+    Filter::Simple Filter::Util::Call
+    Hash::Util Hash::Util::FieldHash HTTP::Tiny
+    I18N::Langinfo if IO::Compress::Gzip IO::Uncompress::Gunzip IO::Zlib
+    JSON::PP List::Util Locale::Maketext Log::Message
+    Math::BigRat Memoize MIME::Base64 Module::CoreList Module::Load
+    Module::Load::Conditional Module::Loaded Module::Metadata mro
+    NEXT Object::Accessor open Params::Check
+    PerlIO PerlIO::encoding PerlIO::scalar PerlIO::via
+    Pod::Escapes Pod::Parser Pod::Simple Pod::Usage
+    Scalar::Util sort Storable Switch
+    Term::ANSIColor Term::UI Test::Builder Test::More Test::Simple
+    Text::Balanced threads threads::shared Tie::File Time::HiRes
+    Time::Piece Unicode::Collate Unicode::Normalize
+    version Win32API::File XSLoader
+);
+
+sub _post_5005_modules {
+    my ($code) = @_;
+    return () unless defined $code;
+
+    # Drop comment-only lines so that a rule documenting a forbidden
+    # module in prose is not reported as a use of it.
+    my $stripped = join "\n", grep { !/^\s*#/ } split /\n/, $code;
+
+    my @hit;
+    for my $mod (@POST_5005_MODULES) {
+        # Require statement position: start of file, or just after a
+        # statement or block boundary.  This still catches the
+        # "eval { require Foo }" form, which is the one that turns a
+        # portability defect into a silently skipped test.
+        next unless $stripped =~ /(?:\A|[\n;{}(]|\|\||&&|\bor\b|\band\b)
+                                  \s*(?:use|require)\s+\Q$mod\E\b/x;
+        push @hit, $mod;
+    }
+    return @hit;
+}
+
+######################################################################
 # check_D -- Perl 5.005_03 compatibility, per lib/*.pm
 #
 #   D1  the warnings stub defines import()
 #   D2  no 'our'                        (5.6+)
 #   D3  no say / given / state          (5.10+)
-#   D4  no my (undef, ...)              (5.10+)
+#   D4  no module that entered core after 5.005_03
 #   D5  $VERSION self-assignment present
 #   D6  CVE-2016-1238 mitigation: pop @INC
+#
+# D4 replaces an earlier rule of the same number that rejected the
+# "my (undef, ...)" list-assignment spelling as Perl 5.10 syntax.  That
+# was simply wrong: perl 5.005_03 already accepts it.  Its op.c my()
+# carries an explicit
+#
+#     } else if (type == OP_UNDEF) {
+#         return o;
+#
+# branch, and perl 5.6.0 and 5.8.9 carry the same one, so skipping an
+# element inside "my" has been legal for the whole supported range.  The
+# slot is reused for a check that catches a real portability defect
+# instead: loading a module that a 5.005_03 perl does not ship.
 #
 # A dist whose own test suite checks these in more depth (a t/9020 style
 # perl5compat file) should not also call check_D.
@@ -633,8 +757,9 @@ sub check_D {
         my @syn = _scan_code("$root/$pm", qr/\b(?:say|given|state)\s*[\(\{]/);
         ok(!@syn, "D3 - no say/given/state: $pm");
 
-        my @und = _scan_code("$root/$pm", qr/\bmy\s*\(\s*undef/);
-        ok(!@und, "D4 - no 'my (undef, ...)': $pm");
+        my @late = _post_5005_modules($code);
+        ok(!@late, "D4 - no post-5.005_03 core module: $pm"
+                 . (@late ? " (@late)" : ''));
 
         ok($text =~ /\$VERSION\s*=\s*\$VERSION/,
            "D5 - \$VERSION self-assignment present: $pm");
@@ -860,7 +985,7 @@ sub check_J {
 
 sub count_K {
     my ($root) = @_;
-    my @pm = _lib_pm_files($root);
+    my @pm = _style_files($root);
     return scalar(@pm) * 3;
 }
 
@@ -869,7 +994,7 @@ sub check_K {
     my $k3_exempt = exists $opt{k3_exempt} ? $opt{k3_exempt}
                                            : 'env\b|opts\b|args\b';
 
-    for my $pm (_lib_pm_files($root)) {
+    for my $pm (_style_files($root)) {
         my $text  = _code_only("$root/$pm");
         my @lines = split /\n/, $text;
 

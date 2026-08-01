@@ -79,7 +79,7 @@ sub new{
 	if ( ! defined( $args{states} ) ){
 		die ('No states key specified in the argument hash');
 	}
-	if ( ref( \$args{states} ) eq 'ARRAY' ){
+	if ( ref( $args{states} ) ne 'ARRAY' ){
 		die ('The states key is not a array');
 	}
 	if ( ! defined $args{states}[0] ){

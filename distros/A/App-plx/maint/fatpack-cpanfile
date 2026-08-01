@@ -1,0 +1,4 @@
+requires 'App::FatPacker', '== 0.010008';
+requires 'App::cpanminus', '== 1.7049';
+requires 'File::Which', '== 1.27';
+requires 'local::lib', '== 2.000029';

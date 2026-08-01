@@ -90,7 +90,7 @@ sub new{
 	if ( ! defined( $args{pctcpus} ) ){
 		die ('No pctcpus key specified in the argument hash');
 	}
-	if ( ref( \$args{pctcpus} ) eq 'ARRAY' ){
+	if ( ref( $args{pctcpus} ) ne 'ARRAY' ){
 		die ('The pctcpus key is not a array');
 	}
 	if ( ! defined $args{pctcpus}[0] ){
@@ -140,7 +140,6 @@ sub match{
 	}
 
 
-	my $loop=0;
 	my $pctcpu;
 	if ( ! defined( $object->proc ) ){
 		# go through each proc and look for a matching pid
@@ -173,31 +172,36 @@ sub match{
 		return 0;
 	}
 
+	# handle non-numeric values, such as inf or nan, some platforms may return
+	if ( $pctcpu !~ /^\s*[0-9]*\.?[0-9]+\s*$/ ){
+		$pctcpu=0;
+	}
+
 	# use while as foreach will reference the value
 	my $pctcpu_int=0;
 	while (defined( $self->{pctcpus}[$pctcpu_int] )){
 		my $value=$self->{pctcpus}[$pctcpu_int];
 		if (
-			( $value =~ /^[0-9.]+$/ ) &&
-			( $value eq $pctcpu )
+			( $value =~ /^[0-9]*\.?[0-9]+$/ ) &&
+			( $value == $pctcpu )
 			){
 			return 1;
-		}elsif( $value =~ /^\<\=[0-9.]+$/ ){
+		}elsif( $value =~ /^\<\=[0-9]*\.?[0-9]+$/ ){
 			$value=~s/^\<\=//;
 			if ( $value <= $pctcpu ){
 				return 1;
 			}
-		}elsif( $value =~ /^\<[0-9.]+$/ ){
+		}elsif( $value =~ /^\<[0-9]*\.?[0-9]+$/ ){
 			$value=~s/^\<//;
 			if ( $pctcpu < $value ){
 				return 1;
 			}
-		}elsif( $value =~ /^\>\=[0-9.]+$/ ){
+		}elsif( $value =~ /^\>\=[0-9]*\.?[0-9]+$/ ){
 			$value=~s/^\>\=//;
 			if ( $pctcpu >= $value ){
 				return 1;
 			}
-		}elsif( $value =~ /^\>[0-9.]+$/ ){
+		}elsif( $value =~ /^\>[0-9]*\.?[0-9]+$/ ){
 			$value=~s/^\>//;
 			if ( $pctcpu > $value ){
 				return 1;

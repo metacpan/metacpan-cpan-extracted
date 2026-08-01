@@ -10,11 +10,11 @@ Net::Connection::Sort - Sorts array of Net::Connection objects.
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 
 =head1 SYNOPSIS
@@ -95,7 +95,11 @@ One argument is taken and that is a hash ref with two possible keys,
 the defaults will be used.
 
 'type' is the module to use. It is relative to 'Net::Connection::Sort',
-so 'host_f' becomes 'Net::Connection::Sort::host_f'.
+so 'host_f' becomes 'Net::Connection::Sort::host_f'. Only word characters
+are accepted here and anything else will result in it dying. See
+L</SORT TYPES> below for the list of what may be used.
+
+'invert' reverses the order returned by the sorter if set to true.
 
     my $sort_args={
                   type=>'host_f',
@@ -104,7 +108,7 @@ so 'host_f' becomes 'Net::Connection::Sort::host_f'.
     
     my $mcs;
     eval{
-        $ncs=Net::Connection::Sort->new( $sort_args );
+        $mcs=Net::Connection::Sort->new( $sort_args );
     };
     
     if ( ! defined( $mcs ) ){
@@ -136,14 +140,30 @@ sub new{
 		$self->{invert}=$args{invert};
 	}
 
+	# The type is used to build a module name and path below, so make sure it
+	# is nothing more than a bare module name. Anything else is a injection
+	# attempt and the type is likely to have come from something such as a
+	# command line switch. The capture is also used to untaint it.
+	if ( $self->{type} =~ /^([A-Za-z0-9_]+)$/ ){
+		$self->{type}=$1;
+	}else{
+		die( '"'.$self->{type}.'" is not a usable sort type name');
+	}
+
+	my $module='Net::Connection::Sort::'.$self->{type};
+
 	# see of we amd reel in the module
-	my $to_eval='use Net::Connection::Sort::'.$self->{type}
-	.'; $self->{sorter}=Net::Connection::Sort::'.$self->{type}.'->new;';
-	eval( $to_eval ) or die('Failed to use or invoke Net::Connection::Sort::'.$self->{type}.'->new... '.$@);
+	eval{
+		require 'Net/Connection/Sort/'.$self->{type}.'.pm';
+		$self->{sorter}=$module->new;
+	};
+	if ( $@ ){
+		die('Failed to use or invoke '.$module.'->new... '.$@);
+	}
 
 	# make sure we did get it
 	if (!defined( $self->{sorter} )){
-		die( 'Net::Connection::Sort::'.$self->{type}.'->new returned undef');
+		die( $module.'->new returned undef');
 	}
 
 	return $self;
@@ -153,10 +173,11 @@ sub new{
 
 This sorts the array of Net::Connection objects.
 
-One object is taken and that is a array of objects.
+One object is taken and that is a array of objects. Anything else will
+result in it dying.
 
     my @sorted=$mcs->sorter( \@objects );
-    
+
     print Dumper( \@sorted );
 
 =cut
@@ -164,12 +185,67 @@ One object is taken and that is a array of objects.
 sub sorter{
 	my $self=$_[0];
 	my @objects;
-	if(defined($_[1])){
-		@objects= @{$_[1]};
-	};
+	if (
+		defined( $_[1] ) &&
+		( ref($_[1]) eq 'ARRAY' )
+		){
+		@objects=@{ $_[1] };
+	}else{
+		die 'The passed item is either not a array or undefined';
+	}
 
-	return $self->{sorter}->sorter( \@objects );
+	my @sorted=$self->{sorter}->sorter( \@objects );
+
+	if ( $self->{invert} ){
+		return reverse( @sorted );
+	}
+
+	return @sorted;
 }
+
+=head1 SORT TYPES
+
+Any of the below may be used as the 'type' when calling new. Anything else
+will result in new dying.
+
+=over 4
+
+=item host_f - Host, foreign
+
+=item host_fl - Host, foreign then local
+
+=item host_l - Host, local
+
+=item host_lf - Host, local then foreign
+
+=item pid - Process ID
+
+=item port_f - Port, foreign, numeric
+
+=item port_fa - Port, foreign, alpha
+
+=item port_l - Port, local, numeric
+
+=item port_la - Port, local, alpha
+
+=item proto - Network connection protocol
+
+=item ptr_f - PTR, foreign
+
+=item ptr_l - PTR, local
+
+=item state - Connection state
+
+=item uid - User ID
+
+=item unsorted - Leaves the order as is
+
+=item user - Username
+
+=back
+
+The alpha port types sort on the service name where there is one. Ports
+without a service name sort after those with one, numerically.
 
 =head1 AUTHOR
 

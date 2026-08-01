@@ -90,7 +90,7 @@ sub new{
 	if ( ! defined( $args{uids} ) ){
 		die ('No uids key specified in the argument hash');
 	}
-	if ( ref( \$args{uids} ) eq 'ARRAY' ){
+	if ( ref( $args{uids} ) ne 'ARRAY' ){
 		die ('The uids key is not a array');
 	}
 	if ( ! defined $args{uids}[0] ){

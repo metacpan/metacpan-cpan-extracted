@@ -1,5 +1,13 @@
 Revision history for Devel-MAT
 
+0.56    2026-07-31
+        [CHANGES]
+         * Support Magic v2 annotations new in perl 5.45.2
+
+        [BUGFIXES]
+         * Fixes for Devel::MAT::Cmd method signature violations introduced in
+           previous version
+
 0.55    2026-07-29
         [CHANGES]
          * Updated to Perl 5.20:
