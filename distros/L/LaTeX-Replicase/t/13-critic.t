@@ -7,8 +7,8 @@ use utf8;
 use Test::More;
 use Test::More::UTF8;
 
-unless ( $ENV{RELEASE_TESTING} ) {
-	plan skip_all => "Author tests not required for installation. Test only run when called with RELEASE_TESTING=1";
+if( ! $ENV{RELEASE_TESTING} or $ENV{RELEASE_TESTING} < 2 ) {
+	plan skip_all => "Author tests not required for installation. Test only run when called with RELEASE_TESTING=2";
 }
 
 my $min_tcm = '1.04';

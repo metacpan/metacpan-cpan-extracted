@@ -1,6 +1,11 @@
 Revision history for Perl extension Tk::ListBrowser.
 
-0.16  Date
+0.17  Date
+	- Fixed bug in HashList.pm, slightly improved it's indexing speed
+	- Fixed deep recursion on openedparent method in Entry.pm.
+	- Added method textCrop to Item.pm. Long text lines no longer creep out after the last column.
+
+0.16  Wed Jul 29 2026
 	- Fixed silly bug in 2-Tk-ListBrowser-columns-headers.t that caused a test to fail.
 	- Added option -guidecolor.
 	- Revisited selectiondrawing. Overlapping columns now show correct.

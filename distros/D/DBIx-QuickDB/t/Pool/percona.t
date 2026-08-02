@@ -16,7 +16,9 @@ run_per_install(Percona => sub {
     no strict 'refs';
     *{"main::DRIVER"} = sub() { 'Percona' };
 
-    require "$Bin/Pool.pm";
+    my $ok = eval { require "$Bin/Pool.pm"; 1 };
+    my $err = $@;
+    die $err unless $ok || QDB::Installs::is_resource_unavailable($err);
 });
 
 done_testing;

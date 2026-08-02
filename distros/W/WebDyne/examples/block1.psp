@@ -42,7 +42,7 @@ sub check {
 
 	my $self=shift();
 
-	if ((my $ans=$_{'sum'}) == 4) {
+	if ((my $ans=$_{'sum'}+0) == 4) {
 		$self->render_block('pass')
 	}
 	elsif ($ans=~/^[0-9.]+$/) {

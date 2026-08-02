@@ -1,3 +1,62 @@
+0.000060  2026-08-02 00:07:51-07:00 America/Los_Angeles
+
+    - Windows cleanup now backs off between quarantine rename attempts so a
+      transient sharing lock cannot defeat every retry in a tight loop. A
+      terminal removal failure reports the affected directory and OS error,
+      and the Windows regression tests preserve those diagnostics.
+
+0.000059  2026-08-01 20:28:29-07:00 America/Los_Angeles
+
+    - Windows SQLite bootstrap now disconnects its private DBI handle
+      explicitly, and driver cleanup quarantines a database tree when normal
+      deletion retries cannot clear it, preventing disposable directories from
+      remaining at their canonical paths. Quarantines are retried by later
+      cleanups and at process shutdown.
+    - Pool clone timestamps now serialize with a locale-independent decimal
+      point; legacy decimal-comma timestamps are accepted, while empty or
+      damaged timestamps are reclaimed without warnings rather than pinning a
+      broken cache entry indefinitely.
+
+0.000058  2026-08-01 19:18:06-07:00 America/Los_Angeles
+
+    - MariaDB bootstrap now requires an executable installer from the selected
+      installation. Missing mariadb-install-db/mysql_install_db makes bootstrap
+      nonviable, and direct bootstrap calls fail before creating a partial data
+      directory instead of warning and continuing with incomplete system tables.
+      Diagnostics identify the selected installation and explain that helpers
+      from other installations are intentionally ignored; the matching policy
+      and MariaDB 13.1 system-catalog requirement are now documented in the
+      MariaDB driver.
+
+0.000057  2026-08-01 16:52:20-07:00 America/Los_Angeles
+
+    - MariaDB bootstrap now uses the installation-matched vendor helper, when
+      available, to create the complete system catalog; MariaDB 13.1 trigger
+      DDL and information_schema.triggers no longer fail for lack of
+      mysql.event. Server-only installations retain the legacy bare bootstrap
+      fallback, and older releases no longer receive a helper option that was
+      introduced in MariaDB 10.1.
+    - Disposable fast_destroy databases now retain their fast teardown policy
+      when the watcher detects owner death, while cleanup => 0 databases keep
+      graceful shutdown and preserve their reusable data directories, including
+      when eliminate() terminates the watcher explicitly.
+    - Graceful DESTROY now waits explicitly for the watcher before deleting the
+      data directory, preventing END-phase cleanup from stranding MySQL during
+      shutdown and producing SIGKILL escalation warnings.
+    - The default graceful-stop allowance is now 30 seconds, reducing false
+      SIGKILL escalation on loaded parallel test hosts; escalation remains
+      tunable through QDB_STOP_GRACE. The unusually high-churn Pool tests
+      request 60 seconds without changing the consumer default.
+    - PostgreSQL startup now requires a successful connection instead of only
+      a Unix socket, closing PostgreSQL 9.3's false-ready window before SysV
+      IPC allocation. Early launch logs are retained so proven ENOSPC failures
+      can skip cleanly while other startup failures remain actionable.
+    - Windows SQLite cleanup now recognizes equivalent DBI/File::Temp paths
+      across slash direction and case, disconnects every retained matching
+      handle before deleting pool caches, and quarantines a stubborn stale tree
+      rather than rebuilding on top of it and failing with "table already
+      exists".
+
 0.000056  2026-07-21 11:35:25-07:00 America/Los_Angeles
 
     - Added a no_disconnect_handles driver attribute (inheritable by clones) that skips the teardown-time DBI handle disconnect, for callers that hold their own live handles to the db being stopped (e.g. MySQL, which shuts down fine with clients connected).

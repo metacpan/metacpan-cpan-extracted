@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,6 +14,8 @@ use Carp;
 use Scalar::Util qw(looks_like_number weaken);
 use Data::Identifier v0.12;
 
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Simple Data::Identifier::Interface::Known);
+
 use constant {
     WK_UNICODE_CP               => Data::Identifier->new(uuid => '5f167223-cc9c-4b2f-9928-9fe1b253b560')->register, # unicode-code-point
     WK_ASCII_CP                 => Data::Identifier->new(uuid => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c')->register, # ascii-code-point
@@ -22,14 +24,7 @@ use constant {
 
 use overload '""' => sub {$_[0]->as_string};
 
-our $VERSION = v0.05;
-
-my %_types = (
-    db          => 'Data::TagDB',
-    extractor   => 'Data::URIID',
-    fii         => 'File::Information',
-    store       => 'File::FStore',
-);
+our $VERSION = v0.06;
 
 my %_for_version = (
     v0.01 => {
@@ -424,6 +419,20 @@ my %_for_version = (
             },
         }
     },
+    v0.06 => {
+        parent => v0.05,
+        identifier => {
+            '8be115d2-dc2f-4a98-91e1-a6e3075cbc31' => { # uuid
+                '38f33f38-0231-5533-a88b-5ab36b6bd23e' => 0x25CF,   # chat0w:248    Monday
+                'b7e54e35-47e8-5a3a-a699-2fbc732b4268' => 0x002B,   # chat0w:249    Tuesday
+                '3d0058f4-9860-521a-928a-019b75f483da' => 0x25CB,   # chat0w:250    Wednesday
+                '0adc25c7-91bb-5fb3-9b67-0a1cd1d2a697' => 0x00D7,   # chat0w:251    Thursday
+                '1f59ab66-fbb9-5f64-b7ed-82120d709af8' => 0x25A1,   # chat0w:252    Friday
+                'ff7d5c03-4c84-5f44-bc47-6428664c37d4' => 0x2733,   # chat0w:253    Saturday
+                '9ca41eca-c4bf-5b7d-bb0c-640ef5ae635e' => 0x229B,   # chat0w:254    Sunday
+            },
+        }
+    },
 );
 
 while (1) {
@@ -462,6 +471,17 @@ sub new {
     my $self = bless {for_version => (delete($opts{for_version}) // $VERSION)}, $pkg;
     my $for_version_info = $self->_find_for_version_info;
     my @mimetypes;
+
+    if (defined(my $new_for = $opts{for})) {
+        while (defined($new_for) && eval {$opts{for}->isa('Data::Identifier::Interface::Userdata')}) {
+            foreach my $key (qw(unicode from)) {
+                my $v = scalar(eval {$new_for->userdata(__PACKAGE__, 'mark_'.$key)}) // next;
+                $opts{$key} //= $v;
+            }
+            $new_for = scalar(eval {$new_for->userdata(__PACKAGE__, 'mark_for')});
+            $opts{for} = $new_for;
+        }
+    }
 
     if (defined(my $unicode = delete $opts{unicode})) {
         if (looks_like_number($unicode)) {
@@ -660,7 +680,7 @@ sub new {
     }
 
     # Attach subobjects:
-    $self->attach(map {$_ => delete $opts{$_}} keys(%_types), 'weak');
+    $self->so_attach(map {$_ => delete $opts{$_}} qw(db extractor fii store  weak));
 
     croak 'Stray options passed' if scalar keys %opts;
 
@@ -707,9 +727,7 @@ sub as {
     require Data::Identifier::Generate;
     $self->{identifier} //= Data::Identifier::Generate->unicode_character(unicode => $self->unicode);
 
-    $opts{$_} //= $self->{$_} foreach keys %_types;
-
-    return $self->{identifier}->as($as, %opts);
+    return $self->{identifier}->as($as, so => $self, %opts);
 }
 
 
@@ -722,20 +740,86 @@ sub ise {
 
 sub attach {
     my ($self, %opts) = @_;
-    my $weak = delete $opts{weak};
+    return $self->so_attach(%opts);
+}
 
-    foreach my $key (keys %_types) {
-        my $v = delete $opts{$key};
-        next unless defined $v;
-        croak 'Invalid type for key: '.$key unless eval {$v->isa($_types{$key})};
-        $self->{$key} //= $v;
-        croak 'Missmatch for key: '.$key unless $self->{$key} == $v;
-        weaken($self->{$key}) if $weak;
+
+sub mark {
+    my ($obj, %opts) = @_;
+    croak 'Invalid object, not a Data::Identifier::Interface::Userdata' unless $obj->isa('Data::Identifier::Interface::Userdata');
+
+    if (defined(my $raw = delete $opts{raw})) {
+        croak 'Raw has wrong length' unless length($raw) == 1;
+        $opts{unicode} //= ord($raw);
+    }
+
+    foreach my $key (qw(unicode from for)) {
+        my $v = delete($opts{$key}) // next;
+
+        $obj->userdata(__PACKAGE__, 'mark_'.$key => $v);
     }
 
     croak 'Stray options passed' if scalar keys %opts;
 
-    return $self;
+    return $obj;
+}
+
+# ---- Private helpers for Data::Identifier::Interface::Known ----
+
+
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+
+    if ($class eq ':all') {
+        my %media_subtypes;
+        my %ids;
+
+        require Data::Identifier::Generate;
+
+        foreach my $dataset (values %_for_version) {
+            my $identifier = $dataset->{identifier} // {};
+
+            foreach my $type (keys %{$identifier}) {
+                foreach my $id (keys %{$identifier->{$type}}) {
+                    eval {
+                        my $di = Data::Identifier->new($type => $id);
+                        my $ise = $di->ise(no_defaults => 1);
+                        $ids{$ise} = $di;
+                    };
+                }
+            }
+
+            foreach my $media_subtype (keys %{$dataset->{media_subtype}//{}}) {
+                eval {
+                    my $di = $media_subtypes{$media_subtype} //= Data::Identifier::Generate->generic(
+                        request => $media_subtype,
+                        generator => 'a649d48d-35b0-4454-81af-c5fd2eb40373',
+                        namespace => '50d7c533-2d9b-4208-b560-bcbbf75ce3f9',
+                        style => 'name-based',
+                    );
+                    my $ise = $di->ise(no_defaults => 1);
+                    $ids{$ise} = $di;
+                };
+            }
+            foreach my $media_type (keys %{$dataset->{media_type}//{}}) {
+                eval {
+                    my $di = $media_subtypes{$media_type} //= Data::Identifier::Generate->generic(
+                        request => $media_type,
+                        generator => '5c8c072e-f1a2-4824-9721-d57e811b6b4f',
+                        namespace => '38ef9f1b-1cea-4173-953e-4fdee539010d',
+                        style => 'name-based',
+                    );
+                    my $ise = $di->ise(no_defaults => 1);
+                    $ids{$ise} = $di;
+                };
+            }
+        }
+
+        return ([values %ids], rawtype => 'Data::Identifier');
+    }
+
+    croak 'Unsupported class';
 }
 
 # ---- Private helpers ----
@@ -790,13 +874,18 @@ Data::IconText - Work with icon text
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
     use Data::IconText;
 
 Allows icon text (single character text icons) to be handled in a nice way.
+
+This package inherits from L<Data::Identifier::Interface::Userdata> (since v0.06),
+L<Data::Identifier::Interface::Subobjects> (since v0.06),
+L<Data::Identifier::Interface::Known> (since v0.06),
+and L<Data::Identifier::Interface::Simple> (since v0.06).
 
 =head1 METHODS
 
@@ -953,6 +1042,8 @@ THis is a proxy for L<Data::Identifier/ise>.
     # or:
     $icontext->attach(key => $obj, ..., weak => 1);
 
+(since v0.01, deprecated since v0.06, will be removed in 0.08)
+
 Attaches objects of the given type.
 Takes the same list of objects as L</new>.
 
@@ -962,13 +1053,73 @@ If C<weak> is set to a true value the object reference becomes weak.
 
 Returns itself.
 
+B<Note:>
+This has been deprecated. Use L<Data::Identifier::Interface::Subobjects/so_attach>.
+
+=head2 mark
+
+    $obj->Data::IconText::mark(%opts);
+
+(experimental since v0.06)
+
+Marks any object implementing L<Data::Identifier::Interface::Userdata> with a given icon text.
+
+Returns the object itself.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<for>
+
+(experimental since v0.06)
+
+Proxy the request to the given object, effectively using the same data as for the object given here.
+Accepts the same values as C<for> in L</new>.
+
+=item C<from>
+
+(experimental since v0.06)
+
+The same as C<from> in L</new>.
+
+=item C<unicode>
+
+(experimental since v0.06)
+
+The same as C<unicode> in L</new>.
+
+=item C<raw>
+
+(experimental since v0.06)
+
+The same as C<raw> in L</new>.
+
+=back
+
+=head2 known
+
+    my @list = Data::IconText->known($class [, %opts ] );
+
+Returns a list of well known items. See L<Data::Identifier::Interface::Known/known> for details.
+
+The following classes are supported:
+
+=over
+
+=item C<:all>
+
+List of all known things.
+
+=back
+
 =head1 AUTHOR
 
 Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

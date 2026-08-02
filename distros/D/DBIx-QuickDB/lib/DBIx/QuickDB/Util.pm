@@ -2,8 +2,9 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000060';
 
+use Errno qw/EEXIST/;
 use File::Path qw/remove_tree/;
 use IPC::Cmd qw/can_run/;
 use Carp qw/confess/;
@@ -11,7 +12,88 @@ use Time::HiRes qw/sleep/;
 
 use Importer Importer => 'import';
 
-our @EXPORT_OK = qw/clone_dir strip_hash_defaults env_timeout remove_tree_robust/;
+our @EXPORT_OK = qw/clone_dir strip_hash_defaults env_timeout remove_tree_robust remove_tree_or_quarantine disconnect_dbi_handles/;
+
+my @DEFERRED_REMOVE;
+
+# A quarantine can outlive the immediate cleanup attempt while Windows releases
+# a delete-pending file. Retry earlier quarantines during later cleanups and once
+# more after normal END blocks have released application/test resources. This is
+# best-effort and must not alter the exit status or turn successful teardown into
+# a global-destruction exception.
+sub _retry_deferred_remove {
+    @DEFERRED_REMOVE = grep {
+        -d $_ && !remove_tree_robust($_)
+    } @DEFERRED_REMOVE;
+    return;
+}
+
+END {
+    local $?;
+    _retry_deferred_remove();
+}
+
+# Return true when a DBI handle Name contains a database directory. DBI drivers
+# preserve the spelling used in their DSN, while File::Temp/File::Spec can hand
+# the driver object a differently-spelled version of the same Windows path
+# (backslashes vs forward slashes, and different case). A raw index() therefore
+# misses the live SQLite handle precisely on the platform where that handle
+# prevents unlinking the database file.
+#
+# $win32 is private test plumbing. Production callers omit it and use $^O.
+sub _dbi_name_matches_dir {
+    my ($name, $dir, $win32) = @_;
+    return 0 unless defined($name) && length($name);
+    return 0 unless defined($dir)  && length($dir);
+
+    $win32 = $^O eq 'MSWin32' unless defined $win32;
+    if ($win32) {
+        tr{\\}{/} for $name, $dir;
+        $name = lc $name;
+        $dir  = lc $dir;
+    }
+
+    # Avoid treating a sibling such as C:\db-old as a child of C:\db. In a
+    # DBI Name the directory is either the whole value, follows a DSN separator,
+    # and is followed by a path/DSN separator or the end of the string.
+    $dir =~ s{/$}{} unless $dir =~ m{^[a-z]:/$}i;
+    my $at = -1;
+    while (($at = index($name, $dir, $at + 1)) >= 0) {
+        my $before = $at ? substr($name, $at - 1, 1) : '';
+        my $after_at = $at + length($dir);
+        my $after = $after_at < length($name) ? substr($name, $after_at, 1) : '';
+        next unless !$at || $before =~ /[=;\s]/;
+        return 1 if $after eq '' || $after =~ m{[/;?\s]};
+    }
+
+    return 0;
+}
+
+# Disconnect all DBI database handles in this process whose DSN points into the
+# supplied directory. Collect first and disconnect second: mutating DBI's child
+# handle tree from inside visit_handles() can otherwise skip a sibling handle.
+# DBI is optional and may not have been loaded, so this remains a no-op in that
+# case and during global destruction when DBI's own handle tree is going away.
+sub disconnect_dbi_handles {
+    my ($dir) = @_;
+
+    return 0 unless $INC{'DBI.pm'};
+    return 0 if defined(${^GLOBAL_PHASE}) && ${^GLOBAL_PHASE} eq 'DESTRUCT';
+
+    my @handles;
+    DBI->visit_handles(
+        sub {
+            my ($handle) = @_;
+            push @handles => $handle
+                if $handle->{Type} && $handle->{Type} eq 'db' && $handle->{Active}
+                && _dbi_name_matches_dir($handle->{Name}, $dir);
+            return 1;
+        }
+    );
+
+    $_->disconnect for @handles;
+    return scalar @handles;
+}
 
 # Best-effort recursive removal that also copes with Windows. On MSWin32 a plain
 # remove_tree can leave the directory non-empty -- the OS releases file handles
@@ -48,6 +130,56 @@ sub remove_tree_robust {
     }
 
     return 0;
+}
+
+# Keep filesystem operations and retry pauses behind private functions so the
+# transient-failure sequence can be exercised deterministically in tests.
+sub _rename_tree {
+    return rename($_[0], $_[1]);
+}
+
+sub _quarantine_retry_pause {
+    sleep 0.2 if $^O eq 'MSWin32';
+    return;
+}
+
+# Remove a disposable tree. If deletion still fails after the platform-aware
+# retries above, move it away from its canonical name so callers never rebuild
+# or continue using a partially deleted database. The quarantine remains on the
+# same volume and is retried by later cleanups and the END block above; Pool
+# sweeps may reclaim it sooner. Returns an empty string for direct removal, the
+# quarantine path after a successful rename, and undef only when neither
+# operation cleared the original path.
+sub remove_tree_or_quarantine {
+    my ($dir, $opts) = @_;
+
+    _retry_deferred_remove() if @DEFERRED_REMOVE;
+
+    return '' unless -d $dir;
+    return '' if remove_tree_robust($dir, $opts);
+
+    my $error;
+    my $max_attempts = 10;
+    for my $attempt (1 .. $max_attempts) {
+        return '' unless -d $dir; # A concurrent watcher won the cleanup race.
+
+        my $stale = join '-' => "$dir.STALE", $$, CORE::time(), $attempt;
+        next if -e $stale;
+
+        if (_rename_tree($dir, $stale)) {
+            push @DEFERRED_REMOVE => $stale;
+            return $stale;
+        }
+
+        $error = $!;
+        _quarantine_retry_pause() if $attempt < $max_attempts;
+    }
+
+    return '' unless -d $dir;
+
+    $error = EEXIST unless defined $error;
+    $! = $error;
+    return undef;
 }
 
 # Read a positive-integer timeout (in seconds) from an environment variable,

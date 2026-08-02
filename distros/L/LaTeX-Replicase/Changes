@@ -93,3 +93,14 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Fixed old tests.
 	- Added CONTRIBUTING.md file.
 	- The manual has been corrected and expanded.
+
+0.790 Sat Aug 01 16:16:16 2026
+	- Added many additional features and options to manage reliability and safety of use.
+	- Added a new subroutine REase() (i.e. REstrictase)
+	- Code refactoring and optimized algorithms.
+	- Replacing active character masking '^', '~', '\' to '\^\/', '\~\/', '\char92\/' respectively.
+	- Added _ACTIONS_ option, which allows you to precisely control the template filling process.
+	- Added new tests.
+	- Fixed old tests.
+	- The manual has been corrected and expanded.
+

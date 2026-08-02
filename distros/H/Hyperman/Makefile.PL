@@ -4,6 +4,18 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
+# Hyperman is a Unix event-loop server: it relies on fork(2), BSD sockets,
+# POSIX signals, sys/uio (readv/writev), and a kqueue/epoll/io_uring/poll
+# readiness backend. None of that exists on native Windows - MSWin32/MinGW
+# lacks even <sys/uio.h> - so bail out cleanly before writing a Makefile.
+# Exiting 0 without a Makefile has CPAN Testers record NA rather than a
+# spurious C compilation FAIL. (Cygwin has fork+sys/uio and is left alone.)
+if ($^O eq 'MSWin32') {
+    print "OS unsupported: Hyperman needs a Unix-like platform "
+        . "(fork, POSIX signals, sockets, kqueue/epoll/io_uring/poll).\n";
+    exit 0;
+}
+
 # --- io_uring backend: use liburing when available (Linux only) ----------
 #
 # The io_uring backend links against liburing rather than issuing the ring
@@ -107,6 +119,15 @@ my ($h2_inc, $h2_libs) = ('', '');
     if (!$libs && probe_nghttp2()) {
         ($cflags, $libs) = ('', '-lnghttp2');
     }
+    if (!$libs) {   # homebrew keg-only path (no pkg-config on macOS)
+        for my $p ('/opt/homebrew', '/usr/local') {
+            next unless -e "$p/include/nghttp2/nghttp2.h";
+            if (probe_nghttp2("-I$p/include -L$p/lib")) {
+                ($cflags, $libs) = ("-I$p/include", "-L$p/lib -lnghttp2");
+                last;
+            }
+        }
+    }
     if ($libs) {
         $h2_inc  = " $cflags -DHM_HAVE_NGHTTP2";
         $h2_libs = " $libs";
@@ -117,7 +138,29 @@ my ($h2_inc, $h2_libs) = ('', '');
     }
 }
 
+# True if a clock_gettime(CLOCK_MONOTONIC) program links with the given libs.
+sub probe_clock_gettime {
+    my ($extra) = @_;
+    my $dir = "hm_rt_probe_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
+    if (open my $fh, '>', $src) {
+        print $fh <<'C';
+#include <time.h>
+int main(void) { struct timespec ts; return clock_gettime(CLOCK_MONOTONIC, &ts); }
+C
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $src -o $bin $extra >/dev/null 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
 sub probe_nghttp2 {
+    my ($extra) = @_;
+    $extra = '' unless defined $extra;
     my $dir = "hm_h2_probe_$$";
     mkdir $dir or return 0;
     my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
@@ -133,7 +176,7 @@ int main(void) {
 C
         close $fh;
         my $cc = $Config{cc} || 'cc';
-        $ok = system("$cc $src -o $bin -lnghttp2 >/dev/null 2>&1") == 0;
+        $ok = system("$cc $extra $src -o $bin -lnghttp2 >/dev/null 2>&1") == 0;
     }
     unlink $src, $bin;
     rmdir $dir;
@@ -165,6 +208,19 @@ C
     return $ok;
 }
 
+# --- clock_gettime: needs -lrt on old glibc (< 2.17) ---------------------
+#
+# backend_poll.c calls clock_gettime(CLOCK_MONOTONIC). On glibc before 2.17
+# that symbol lives in librt, not libc, so the .so loads with
+# "undefined symbol: clock_gettime" unless we link -lrt. Newer glibc folds it
+# into libc, and macOS/BSD have no librt at all, so only add it when a link
+# probe genuinely needs it.
+my $rt_libs = '';
+if (!probe_clock_gettime('') && probe_clock_gettime('-lrt')) {
+    $rt_libs = '-lrt';
+    print "clock_gettime needs -lrt (old glibc): linking it.\n";
+}
+
 my %WriteMakefileArgs = (
     NAME             => 'Hyperman',
     AUTHOR           => ['LNATION <email@lnation.org>'],
@@ -174,7 +230,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.008003',
     OBJECT           => 'Hyperman$(OBJ_EXT)',
     INC              => '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc,
-    LIBS             => [ join(' ', grep { length } $uring_libs, $h2_libs, $tls_libs) ],
+    LIBS             => [ join(' ', grep { length } $uring_libs, $h2_libs, $tls_libs, $rt_libs) ],
     depend           => {
         'Hyperman.c' => 'xs/hyperman.xs xs/future.xs xs/loop.xs '
                       . 'xs/writer.xs xs/event.xs',

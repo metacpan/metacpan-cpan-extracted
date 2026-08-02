@@ -1,11 +1,51 @@
 use 5.006;
 use strict;
 use ExtUtils::MakeMaker;
+use File::Copy qw(copy);
+use File::Spec;
+use Cwd qw(abs_path);
+use Tie::File;
+
+BEGIN {
+
+    # ExtUtils::Manifest in some Perl versions walks the tree with symlink
+    # following enabled before MANIFEST.SKIP is applied. A local Python venv can
+    # therefore abort Makefile.PL when its python symlinks resolve twice.
+    require ExtUtils::Manifest;
+    require File::Find;
+
+    no warnings 'redefine';
+    *ExtUtils::Manifest::manifind = sub {
+        my $found = {};
+
+        my $wanted = sub {
+            my $name = ExtUtils::Manifest::clean_up_filename($File::Find::name);
+            return if -d $File::Find::name;
+            $found->{$name} = '';
+        };
+
+        File::Find::find(
+            {
+                wanted     => $wanted,
+                no_chdir   => 1,
+                preprocess => sub { grep { $_ ne '.venv' } @_ },
+            },
+            '.'
+        );
+
+        return $found;
+    };
+
+}
+
+
 my $mm_ver=$ExtUtils::MakeMaker::VERSION;
 if ($mm_ver=~/_/) {    # dev version
     $mm_ver=eval $mm_ver;
     die $@ if $@;
 }
+
+
 my %WriteMakefile=(
     NAME          => 'WebDyne',
     VERSION_FROM  => 'lib/WebDyne.pm',
@@ -18,7 +58,9 @@ my %WriteMakefile=(
             'bin/wdapacheinit',
             'bin/wddebug',
             'bin/wdlint',
-            'bin/webdyne.psgi'
+            'bin/webdyne.psgi',
+            'bin/webdyne.pagi',
+            'bin/webdyne.apache'
         ]
     },
     LICENSE          => 'perl',
@@ -31,6 +73,10 @@ my %WriteMakefile=(
         'IO::String'        => 0,
         'Digest::MD5'       => 0,
         'HTTP::Status'      => 0,
+        'HTTP::Negotiate'   => 0,
+        'HTTP::AcceptLanguage' => 0,
+        'HTTP::Headers::Util'  => 0,
+        'HTTP::Headers::Fast'  => 0,
         'HTML::Tagset'      => 0,
         'HTML::TreeBuilder' => 0,
         'Storable'          => 0,
@@ -38,13 +84,20 @@ my %WriteMakefile=(
         'Devel::Confess'    => 0,
         'Router::Simple'    => 0,
         'Hash::MultiValue'  => 0,
-        'Devel::Confess'    => 0,
         'Time::HiRes'       => 0,
+        'Sub::Util'         => 0,
+        'Term::ANSIColor'   => 0,
+        'Crypt::URandom'    => 0,
         
-        #  Plack recommended but not mandatory
+        #  Plack
         #
         #'Plack'             => 0,
-        #'Plack::Middleware::ForceEnv => 0,
+        
+        
+        #  PAGI
+        #
+        #'PAGI'             => 0,
+        
 
         #  Needed for installer - can be ignored if not using installer
         'Text::Template' => 0,
@@ -52,10 +105,12 @@ my %WriteMakefile=(
 
     },
     BUILD_REQUIRES  => {
+        'Algorithm::Diff'   => 0,
         'Test::Simple'      => 0.44,
         'Test::More'        => 0,
         'Capture::Tiny'     => 0,
         'Test::Deep'        => 0,
+        'Test::Differences' => 0,
         'Test::Exception'   => 0,
         'Text::Diff'        => 0
     },
@@ -76,11 +131,14 @@ my %WriteMakefile=(
                 type => 'git',
                 url  => 'https://github.com/aspeer/WebDyne.git',
                 web  => 'https://github.com/aspeer/WebDyne'
+            }, 
+            bugtracker => {
+                web => 'https://github.com/aspeer/WebDyne/issues'
             }
         },
         x_authority => 'cpan:ASPEER'
     },
-    PM_FILTER => $ENV{'PM_DEBUG'} || $ENV{'WEBDYNE_DEBUG'} || do {
+    PM_FILTER => ($ENV{'PM_DEBUG'} || $ENV{'WEBDYNE_DEBUG'}) ? '' : do {
         use IO::File;
         my $fn='.pm_filter.pf';
         my $fh=IO::File->new($fn, O_WRONLY | O_CREAT | O_TRUNC) ||
@@ -113,14 +171,10 @@ while (my ($mm_ver_test, $ar)=each %MM_Compat) {
 }
 WriteMakefile(%WriteMakefile);
 
-package MY;
-use File::Copy qw(copy);
-use File::Spec;
-use Cwd qw(abs_path);
-use Tie::File;
 
-
-sub post_initialize {
+#  Extend Makefile
+#
+sub MY::post_initialize {
 
     #  Add license file, other support files here
     #
@@ -149,16 +203,72 @@ sub post_initialize {
         tie my @lines, 'Tie::File', $mm_or->{'VERSION_FROM'} . '.sha' || die "error on Tie::File, $!";
         $lines[0]=$git_version;
     }
-    $mm_or->SUPER::post_initialize;
+    $mm_or->MY::SUPER::post_initialize;
 
 }
 
 
-sub postamble {
+#  Get ExtUtils::Git postamble if we are using it
+#
+sub MM::postamble {
     my $mm_or=shift();
     my $postamble;
     eval {ExtUtils::Git->import(); $postamble=&MY::postamble($mm_or)};
     $postamble.=<<'END';
+
+
+SRC_DIR := doc
+TMP_DIR := $(SRC_DIR)/build
+PSP_DIR := $(SRC_DIR)/example
+PSP_FILES := $(shell find $(PSP_DIR) -type f -name '*.psp')
+BIN_DOC_FILES := $(wildcard bin/*.md)
+LIB_DOC_FILES := $(shell find lib -type f -name '*.md' | sort)
+
+DOC_DIR := docs
+SCRIPTS_DIR := scripts
+
+DOCKER_DIR := mkdocs/docker
+DOCKER_IMAGE := webdyne-mkdocs:latest
+DOCKER_STAMP := $(DOCKER_DIR)/.built
+
+
+$(SRC_DIR)/webdyne.md : $(SRC_DIR)/webdyne.xml $(BIN_DOC_FILES) $(LIB_DOC_FILES)
+	mkdir -p $(TMP_DIR)
+	xmllint --xinclude --noent $< -o $(TMP_DIR)/$(notdir $<)
+	xsltproc $(SCRIPTS_DIR)/promote-title-ids.xsl $(TMP_DIR)/$(notdir $<) | sponge $(TMP_DIR)/$(notdir $<)
+	pandoc -f docbook -t markdown-smart --lua-filter=$(SCRIPTS_DIR)/admonition-advanced.lua --resource-path=$(SRC_DIR) --extract-media=$(DOC_DIR) -o $(TMP_DIR)/$(notdir $@) $(TMP_DIR)/$(notdir $<)
+	perl -pi -e 's/[\\]+</\&lt;/g; s/[\\]+>/\&gt;/g' $(TMP_DIR)/$(notdir $@)
+	# Fix image placeholders from pandoc
+	perl -pi -e 's{\Qdocs/images\E}{images}g' $(TMP_DIR)/$(notdir $@)
+	perl -0pi -e 's/\{\.manual-page-new-tab\s+role="manual-page-new-tab"\}/{target="_blank" rel="noopener"}/g' $(TMP_DIR)/$(notdir $@)
+	perl -pi -e 's/[ \t]+$$//' $(TMP_DIR)/$(notdir $@)
+	cp $(TMP_DIR)/$(notdir $@) $@
+	rm -f $(DOC_DIR)/*.md
+	perl $(SCRIPTS_DIR)/mdsplit.pl $(TMP_DIR)/$(notdir $@) $(DOC_DIR)
+	mkdir -p $(DOC_DIR)/utilities
+	rm -f $(DOC_DIR)/utilities/*.md
+	cp $(BIN_DOC_FILES) $(DOC_DIR)/utilities/
+	rm -rf $(DOC_DIR)/modules
+	mkdir -p $(DOC_DIR)/modules
+	perl -MFile::Copy=copy -e 'for my $$src (@ARGV) { (my $$dst=$$src)=~s{^lib/}{}; $$dst=~s{\.pm\.md$$}{.md}; $$dst=~s{/}{_}g; $$dst="$(DOC_DIR)/modules/$$dst"; copy($$src,$$dst) or die "$$src -> $$dst: $$!" }' $(LIB_DOC_FILES)
+
+gh-deploy : $(SRC_DIR)/webdyne.md
+	mkdocs gh-deploy -f mkdocs.gh.yml
+
+serve : $(SRC_DIR)/webdyne.md docker
+	docker rm -f webdyne-mkdocs || true
+	docker run -d --name webdyne-mkdocs -e PORT=5000 -p 5000:5000 webdyne-mkdocs
+	mkdocs serve -f mkdocs.yml
+
+
+mkdocs-docker: $(DOCKER_STAMP)
+
+$(DOCKER_STAMP) : $(PSP_FILES) $(DOCKER_DIR)/Dockerfile.alpine
+	docker build  -t $(DOCKER_IMAGE) -f ($DOCKET_DIR)/Dockerfile.alpine .
+	touch $(DOCKER_STAMP)
+
+
+
 doc_xml:
 	@echo Generating doc
 	docbook-convert --markdown -o .md *.xml
@@ -188,7 +298,8 @@ docker_update ::
 	cd docker && $(PERL) build.pl
 
 END
-    return $postamble;
+    #return $mm_or->SUPER::postamble . $postamble;
+    return $mm_or->MY::SUPER::postamble . $postamble;
 }
 
 
@@ -208,6 +319,6 @@ sub MM::init_main {
         push @fn, $fn_new;
     }
     $mm_or->{'EXE_FILES'}=\@fn;
-    $mm_or->SUPER::init_main();
+    $mm_or->MM::SUPER::init_main();
 
 }

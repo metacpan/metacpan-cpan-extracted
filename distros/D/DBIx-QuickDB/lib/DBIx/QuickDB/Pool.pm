@@ -2,7 +2,7 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000060';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
@@ -12,7 +12,7 @@ use Scalar::Util qw/refaddr/;
 use Time::HiRes qw/time/;
 
 use DBIx::QuickDB;
-use DBIx::QuickDB::Util qw/remove_tree_robust/;
+use DBIx::QuickDB::Util qw/remove_tree_robust remove_tree_or_quarantine disconnect_dbi_handles/;
 
 use DBIx::QuickDB::Util::HashBase qw{
     +cache_dir
@@ -59,6 +59,21 @@ sub init {
     $self->{+DATABASES} //= {};
 }
 
+# Remove a disposable database tree, or move it out of the canonical cache path
+# when Windows still refuses the removal after retries. Returning true means the
+# canonical path is clear and safe to rebuild; clear_old_cache() reclaims the
+# quarantine on a later pass, and it can never be mistaken for a valid entry.
+sub _remove_or_quarantine {
+    my ($self, $dir) = @_;
+
+    my $stale = remove_tree_or_quarantine($dir);
+    return 0 unless defined $stale;
+
+    $self->diag("$$ Quarantined stale database directory '$dir' as '$stale'")
+        if length $stale;
+    return 1;
+}
+
 sub clear_old_cache {
     my $self = shift;
     my ($age) = @_;
@@ -67,22 +82,55 @@ sub clear_old_cache {
 
     opendir(my $dh, $dir) or die "Could not open cache dir '$dir': $!";
     for my $name (readdir($dh)) {
+        my $full = "$dir/$name";
+
+        # Quarantines sit outside the canonical cache path (see
+        # _remove_or_quarantine). Retry their removal on every pass: the
+        # transient Windows file lock that blocked deletion may have cleared.
+        if ($name =~ m/\.STALE-/) {
+            remove_tree_robust($full) if -d $full;
+            next;
+        }
+
+        # A live cache entry is a bare directory name. Its marker files
+        # ("$name.lock", "$name.READY") do contain dots and are handled
+        # through their entry, never scanned directly.
         next if $name =~ m/\./;
 
-        my $full = "$dir/$name";
         next unless -d $full;
 
         my $file = "$full/cloned";
         next unless -f $file;
 
         open(my $fh, '<', $file) or next;
-        chomp(my $stamp = <$fh>);
+        my $stamp = <$fh>;
         close($fh);
+        $stamp = '' unless defined $stamp;
+        chomp($stamp);
+
+        # Time::HiRes values written by older releases can contain a decimal
+        # comma under the Windows process locale (for example 1785633742,27439).
+        # Cache expiry needs only whole seconds, so accept either historical
+        # fractional spelling and reduce it to a locale-independent integer. A
+        # damaged stamp is treated as infinitely old so it is reclaimed rather
+        # than pinning an unusable clone in the cache forever.
+        $stamp =~ s/[.,]\d+\z//;
+        $stamp = 0 unless $stamp =~ /^\d+\z/;
 
         next unless $age <= (time - $stamp);
 
         eval {
-            remove_tree_robust($full);
+            # An expired SQLite source may still have DBI handles retained by
+            # application/test code. On Windows those handles prevent unlinking
+            # the database file. Close every matching handle before removal.
+            disconnect_dbi_handles($full);
+
+            # If removal remains blocked, moving the tree out of its canonical
+            # path keeps a later build from seeing partially-removed SQLite
+            # schema/data. Either way, invalidate the external markers: expiry
+            # was explicitly requested, and build_db() will refuse to build on
+            # any stubborn tree that could not be quarantined.
+            $self->_remove_or_quarantine($full);
             unlink("$full.lock") if -e "$full.lock";
             unlink("$full.READY") if -e "$full.READY";
             1;
@@ -339,11 +387,21 @@ sub build_db {
     my $self = shift;
     my ($dir, $spec, %params) = @_;
 
-    # Create the dir, deleting it if it exists. On Windows a lingering handle to
-    # a prior instance's data file can otherwise leave the dir non-empty, so the
-    # stale db survives into the rebuilt instance (a later CREATE TABLE then dies
-    # with "table already exists"); remove_tree_robust retries past that.
-    remove_tree_robust($dir) if -d $dir;
+    # Create the dir, deleting it if it exists. Close retained DBI handles first
+    # (essential for SQLite on Windows). If removal still fails, quarantine the
+    # entire stale tree before rebuilding. We must never continue in the old
+    # directory: doing so feeds stale schema/data to the builder and turns the
+    # cleanup problem into misleading errors such as "table already exists".
+    if (-d $dir) {
+        disconnect_dbi_handles($dir);
+
+        unless ($self->_remove_or_quarantine($dir)) {
+            my $error = "$!";
+            $error = 'unknown operating-system error' unless length $error;
+            $self->throw("Could not remove or quarantine stale database directory '$dir': $error");
+        }
+    }
+
     make_path($dir);
     $spec->{dir} = $dir;
 
@@ -418,7 +476,11 @@ sub write_clone_stamp {
     my $self = shift;
     my ($db) = @_;
 
-    my $stamp = time();
+    # Preserve subsecond resolution (callers use it to detect rapid successive
+    # clones), but make the serialized decimal separator locale-independent.
+    # Stringifying Time::HiRes::time on Windows may otherwise produce a comma.
+    my $stamp = '' . time();
+    $stamp =~ tr/,/./;
     open(my $fh, '>', $db->dir . '/cloned') or die "$!";
     print $fh $stamp, "\n";
     close($fh);

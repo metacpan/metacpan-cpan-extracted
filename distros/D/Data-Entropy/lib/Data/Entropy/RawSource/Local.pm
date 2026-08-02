@@ -34,9 +34,7 @@ On systems where B</dev/random> does not block, the bits generated are
 necessarily correlated to some extent, but it should be cryptographically
 difficult to detect the correlation.  Such an entropy source is not
 suitable for all applications.  Some other systems lack B</dev/random>
-entirely.  If satisfactory entropy cannot be generated locally, consider
-downloading it from a server (see L<Data::Entropy::RawSource::RandomOrg>
-and L<Data::Entropy::RawSource::RandomnumbersInfo>).
+entirely.
 
 =cut
 
@@ -49,7 +47,7 @@ use strict;
 use Carp qw(croak);
 use IO::File 1.03;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 =head1 CONSTRUCTOR
 

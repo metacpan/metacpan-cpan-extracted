@@ -11,182 +11,257 @@
 #
 #  <http://dev.perl.org/licenses/>
 #
-package WebDyne::Request::PSGI::Run;
 
 
-#  Compiler Pragma
+#  Pragma
 #
-use strict qw(vars);
+use strict;
 use vars   qw($VERSION);
 use warnings;
-no warnings qw(uninitialized);
 
 
-#  External Modules
+#  External modules
 #
-use HTTP::Status qw(:constants is_success is_error);
-use IO::String;
+use Cwd qw(fastcwd);
 use Data::Dumper;
-use Cwd qw(cwd);
+use File::Basename;
+use File::Spec;
 
 
-#  WebDyne Modules
+#  Local customisation
 #
-use WebDyne;
+local $Data::Dumper::Indent=1;
+local $Data::Dumper::Sortkeys=1;
+
+
+#  PSGI modules we need
+#
+use Plack::Builder;
+use WebDyne::PSGI;
 use WebDyne::Constant;
-use WebDyne::Util;
-use WebDyne::Request::PSGI;
-use WebDyne::Request::PSGI::Constant;
+use WebDyne::PSGI::Constant;
 
 
-#  Version information
+#  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
-#  API file name cache
+#  Check for supporting modules
 #
-our (%API_fn);
+BEGIN {
+    my @missing;
+    for my $module (qw(Plack)) {
+        eval "require $module; 1" or push @missing, $module;
+    }
+    if (@missing) {
+        printf STDERR ("Please install missing CPAN modules: %s \n", join(', ', @missing));
+        exit 1;
+    }
+    
+}
 
 
-#  Test file to use if no DOCUMENT_ROOT found
-#
-(my $test_dn=$INC{'WebDyne.pm'})=~s/\.pm$//;
-my $test_fn=File::Spec->catfile($test_dn, 'time.psp');
-
-
-#  Set DOCUMENT_DEFAULT
-#
-$DOCUMENT_DEFAULT=$ENV{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
-
-
-#  All done. Start endless loop if called from command line or return
-#  handler code ref.
+#  Called from command line ?
 #
 if (!caller || exists $ENV{PAR_TEMP}) {
 
+
+    #  Yes. Get options
+    #
+    my %opt=(
+        test    => 0,
+        static  => 1,
+        index   => defined($ENV{'DOCUMENT_DEFAULT'}) ? $ENV{'DOCUMENT_DEFAULT'} : 1,
+        %{do(glob(sprintf('~/.%s.opt', basename(__FILE__)))) || {}}
+    );
+    if (delete $opt{'no_index'}) {
+        $opt{'index'}=0;
+    }
+
+
+    #  Process
+    #
+    require Getopt::Long;
+    Getopt::Long::Configure('pass_through');
+    @ARGV=grep {
+        if ($_ eq '--no-index') {
+            $opt{'index'}=0;
+            0;
+        }
+        elsif (/^--index=(.*)$/) {
+            $opt{'index'}=$1;
+            0;
+        }
+        else {
+            1;
+        }
+    } @ARGV;
+    Getopt::Long::GetOptions(
+        \%opt,
+        my @opt=(
+        'test!',
+        'static!',
+        'index!' => sub {
+            my ($name, $value)=@_;
+            $opt{'index'}=$value ? 1 : 0;
+        },
+        'no_index' => sub {
+            $opt{'index'}=0
+        },
+        'root|docroot|doc_root|doc-root|document_root|document-root:s',
+        'env|E=s',
+        'argv:s',
+        'dump_opt|dump-opt|opt'
+        )
+    );
+    map {$opt{"no_${_}"} = !($opt{$_})} map { /^([^|!:=+]+)/ } grep {!ref($_) && /\!$/} @opt;
+    
+    
+    #  Last argument is root directory
+    #
+    if (@ARGV && $ARGV[-1] !~ /^--?/) {
+        $opt{'root'} = pop @ARGV;
+    }
+    else {
+        $opt{'root'} ||=($ENV{'DOCUMENT_ROOT'} ||  fastcwd());
+    }
+
+
+    #  Dump options for debugging
+    #
+    die Dumper(\%opt) if $opt{'dump_opt'};
+    
+    
+    #  Startup
+    #
+    exit &startup(\%opt, split(/\s+/, $opt{'argv'} || ''), @ARGV);
+
+}
+else {
+
+    # No - called from psgi_server or starman. Need document root and doc default from 
+    # env or var
+    #
+    my %opt=(
+        root    => $ENV{'DOCUMENT_ROOT'} || $DOCUMENT_ROOT || fastcwd(),
+        index   => $ENV{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT
+    );
+    return &build(\%opt);
+    
+}
+
+
+
+#==================================================================================================
+
+
+sub build {
+
+
+    #  Build app code ref, options passed for builder
+    #
+    my $opt_hr=shift();
+    my $builder_or=Plack::Builder->new();
+    
+    
+    #  Adjust static service config var based on opts if
+    #  they exist
+    #
+    if (exists($opt_hr->{'static'})) {
+        $WEBDYNE_PSGI_STATIC=$opt_hr->{'static'};
+    }
+    
+    
+    #  Add in any middleware in config file
+    #
+    foreach my $middleware_ar (@{$WEBDYNE_PSGI_MIDDLEWARE}) {
+        my ($middleware, $middleware_opt_hr)=@{$middleware_ar};
+        
+        #  Skip static if not wanted
+        #
+        if ($middleware eq 'Static') {
+            next unless $WEBDYNE_PSGI_STATIC;
+        }
+        
+        
+        #  And code refs are run and given opt as first param
+        #
+        if (ref($middleware_opt_hr) eq 'CODE') {
+            $middleware_opt_hr=$middleware_opt_hr->($opt_hr);
+        }
+        
+        
+        #  Now add it
+        #
+        $builder_or->add_middleware($middleware, %{$middleware_opt_hr});
+    }
+    
+
+    #  Read in local webdyne.conf.pl
+    #
+    #&local_constant_load($opt_hr->{'root'});
+
+
+    #  Finally return as app code ref
+    #
+    return $builder_or->to_app(
+        WebDyne::PSGI->new(%{$opt_hr})->to_app())
+
+}
+
+
+sub startup {
+
+
+    #  Get WebDyne::PSGI options and Plack::Runner args
+    #
+    my ($opt_hr, @argv)=@_;
+    
+    
     #  Running from command line without being stared by plackup or starman
     #
     require Plack::Runner;
     my $plack_or=Plack::Runner->new();
     
-
-    #  User specified --test on command line ? Note and consume before 
-    #  passing to parse_options ?
+    
+    #  Environment/mode. The wrapper consumes -E/--env so that values can
+    #  also come from ~/.webdyne.psgi.opt, then passes it on to the runner.
     #
-    my $test_fg;
-    if ($test_fg=grep {/^--test$/} @ARGV) {
-        @ARGV=grep {!/^--test$/} @ARGV;
+    if (defined($opt_hr->{'env'})) {
+        die "--env must be development, production, or none\n"
+            unless $opt_hr->{'env'} =~ /^(?:development|production|none)$/;
+        $ENV{'PLACK_ENV'}=$opt_hr->{'env'};
+        push (@argv, ('--env', $opt_hr->{'env'}))
+            unless grep { $_ eq '-E' || $_ eq '--env' || /^--env=/ } @argv;
     }
     
-    
-    #  Used to do --static as option, now default, change to negate option, i.e. always
-    #  serve static files for convenience when started from the command line, same with noindex
-    #
-    my $nostatic_fg;
-    if ($nostatic_fg=grep {/^--nostatic$/} @ARGV) {
-        @ARGV=grep {!/^--nostatic/} @ARGV;
-    }
-    my $noindex_fg;
-    if ($noindex_fg=grep {/^--noindex$/} @ARGV) {
-        @ARGV=grep {!/^--noindex/} @ARGV;
-    }
-
 
     #  Mac conflicts with Plack default port of 5000 - choose 5001
     #
-    if ($^O eq 'darwin') {
-        $plack_or->parse_options('--port', '5001', @ARGV);
+    if (($^O eq 'darwin') && !(grep { /--port/ } @argv)) {
+        $plack_or->parse_options('--port', '5001', @argv)
     }
     else {
-        $plack_or->parse_options(@ARGV);
+        $plack_or->parse_options(map {split(/\s+/)} @argv);
     }
     
-    
-    #  Finalise DOCUMENT_ROOT. First try and get as last command line option or env or variable but --test
-    #  flag wins over everything else
-    #
-    $DOCUMENT_ROOT=shift(@{$plack_or->{'argv'}}) ||
-        $ENV{'DOCUMENT_ROOT'} || $DOCUMENT_ROOT;
-    #if ($test_fg || !$DOCUMENT_ROOT) {
-    #    $DOCUMENT_ROOT=$test_fn;
-    #}
-    if ($test_fg) {
-        $DOCUMENT_ROOT=$test_fn;
-    }
-    elsif(! $DOCUMENT_ROOT) {
-        $DOCUMENT_ROOT=cwd();
-    }
-    $DOCUMENT_ROOT=&normalize_dn($DOCUMENT_ROOT);
-    
-    
-    #  Indexing ? Do by default unless file specified as DOCUMENT_ROOT or --noindex spec'd etc.
-    #
-    unless (-f $DOCUMENT_ROOT || -f File::Spec->catfile($DOCUMENT_ROOT, $DOCUMENT_DEFAULT) || $noindex_fg) {
-
-        #  Final check. Only do if directory
-        #
-        if (-d $DOCUMENT_ROOT) {
-    
-            #  We can do indexing
-            #
-            $DOCUMENT_DEFAULT=File::Spec->rel2abs(File::Spec->catfile($test_dn, $WEBDYNE_PSGI_INDEX));
-            
-        }
-        
-    }
-    
-    
-    #  Read in local webdyne.conf.pl
-    #
-    &local_constant_load($DOCUMENT_ROOT);
-    
-    
-    #  Show error information by default
-    #
-    $WebDyne::WEBDYNE_ERROR_SHOW=1;
-    $WebDyne::WEBDYNE_ERROR_SHOW_EXTENDED=1;
-
-
-    #  Done - run it
-    #
-    $plack_or->run(&handler_build($nostatic_fg ? \&handler : &handler_static(\&handler)));
-    exit 0;
-
-}
-else {
-
-    #  Not running from comamnd line. Get DOCUMENT_ROOT from environment or
-    #  vars file
-    #
-    $DOCUMENT_ROOT=$ENV{'DOCUMENT_ROOT'} 
-        || $DOCUMENT_ROOT || $test_fn;
-    $DOCUMENT_ROOT=&normalize_dn($DOCUMENT_ROOT);
-
 
     #  Read in local webdyne.conf.pl
     #
-    &local_constant_load($DOCUMENT_ROOT);
-
-}
+    &local_constant_load($opt_hr->{'root'});
 
 
-#  Return handler code ref
-#
-&handler_build($WEBDYNE_PSGI_STATIC ? &handler_static(\&handler) : \&handler);
-
-
-#==================================================================================================
-
-sub normalize_dn {
-
-    #  Normal dir, normally document_root
+    #  Get app code ref from WebDyne::PAGI
     #
-    my $rel_dn=shift();
-    my $abs_dn=File::Spec->rel2abs($rel_dn);
-    $abs_dn =~ s{/$}{} unless $abs_dn eq '/';
-    return $abs_dn;
+    my $app_cr=&build($opt_hr);
+
     
+    #  Run it
+    #
+    #*PAGI::Runner::load_app=sub { return $app_cr };
+    exit $plack_or->run($app_cr);
+
 }
 
 
@@ -199,313 +274,24 @@ sub local_constant_load {
     
     
     #  If root_dn is a file get dir name
+    #
     if (-f $root_dn) {
         $root_dn=(File::Spec->splitpath($root_dn))[1];
     }
     WebDyne::Constant->import(File::Spec->catfile($root_dn, sprintf('.%s', $WEBDYNE_CONF_FN)));
 
 }
-    
-
-#  Build a Plack::Build ref if there is middleware requested
-#
-sub handler_static {
 
 
-    #  Used when starting webdyne.psgi from command line without plackup or via starman - presumably for dev
-    #  purposes so include the Plack static middleware to allow serving non-psp files such as css
-    #
-    my ($handler_cr, @param)=@_;
-    if (my $qr=$WEBDYNE_PSGI_MIDDLEWARE_STATIC) {
-        my $root_dn;
-        if (-f $DOCUMENT_ROOT) {
-            #  DOCUMENT_ROOT is actually a file. Get the directory name
-            #
-            require File::Basename;
-            $root_dn=&File::Basename::dirname($DOCUMENT_ROOT)
-        }
-        else {
-            #  DOCUMENT_ROOT is a dirname, keep but check
-            $root_dn=$DOCUMENT_ROOT;
-            (-d $root_dn) || return err("$root_dn is not a directory, aborting");
-        }
-        require Plack::Middleware::Static;
-        $handler_cr=Plack::Middleware::Static->wrap($handler_cr, path=>$qr, root=>$root_dn );
-    }
-    return $handler_cr;
-
-}
-
-
-sub handler_build {
-    
-    
-    #  Check for any additional Plack middleware handlers requested in config and wrap them if needed
-    #
-    my ($handler_cr, @param)=@_;
-    if (my $middleware_ar=$WEBDYNE_PSGI_MIDDLEWARE) {
-        #  Yes, middleware requested
-        #
-        foreach my $middleware_hr (@{$middleware_ar}) {
-            while (my ($middleware, $opt_hr)=each %{$middleware_hr}) {
-                if ($middleware !~ /^Plack::Middleware/) {
-                    $middleware = "Plack::Middleware::${middleware}";
-                }
-                (my $middleware_pm = $middleware) =~ s{::}{/}g;
-                $middleware_pm.='.pm';
-                eval { require $middleware_pm } ||
-                    return err("error loading Plack middleware: $middleware ($middleware_pm), $@");
-                if (ref($opt_hr) eq 'CODE') {
-                    #  If opt_hr is code ref means we want DOCUMENT_ROOT built in
-                    $opt_hr=$opt_hr->($DOCUMENT_ROOT);
-                }
-                $handler_cr=$middleware->wrap($handler_cr, %{$opt_hr});
-            }
-        }
-    }
-    #if ($WEBDYNE_PSGI_ENV_KEEP || $WEBDYNE_PSGI_ENV_SET) {
-    #    require Plack::Middleware::ForceEnv;
-    #    $handler_cr=Plack::Middleware::ForceEnv->wrap($handler_cr, 
-    #        %{$WEBDYNE_PSGI_ENV_SET},
-    #        map {$_=>$ENV{$_}} @{$WEBDYNE_PSGI_ENV_KEEP}
-    #    )
-    #}
-    return $handler_cr;
-    
-}
-    
-
-#  Actual Plack handler
-#
-sub handler {
-
-
-    #  Get env
-    #
-    my ($env_hr, @param)=@_;
-    local *ENV=$env_hr;
-    debug('in handler, env: %s, param:%s', Dumper(\%ENV, \@param));
-    
-    
-    #  Set any env vars we want
-    #
-    @ENV{qw(DOCUMENT_ROOT DOCUMENT_DEFAULT)}=($DOCUMENT_ROOT, $DOCUMENT_DEFAULT);
-    if (WEBDYNE_PSGI_ENV_SET) {
-        map { $ENV{$_}=$WEBDYNE_PSGI_ENV_SET->{$_} } keys %{$WEBDYNE_PSGI_ENV_SET}
-    }
-
-
-    #  Cache handler for a location
-    #
-    #my ($handler, %handler);
-
-
-    #  Create new PSGI Request object, will pull filename from
-    #  environment. 
-    #
-    my $html;
-    my $html_fh=IO::String->new($html);
-    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT, uri=>$ENV{'PATH_INFO'}, env=>$env_hr, @param) ||
-        return err('unable to create new WebDyne::Request::PSGI object: %s', 
-    			$@ || errclr() || 'unknown error');
-    debug("r: $r");
-
-
-    #  Get handler. Update - Commented out. Let WebDyne handle this as borks if
-    #  using WebDyne::Template and index.psp gets called. Keep code for reference
-    #
-    my $handler='WebDyne';
-    if (0) {
-        my %handler;
-        unless ($handler=$handler{my $location=$r->location()}) {
-            my $handler_package=
-                $r->dir_config('WebDyneHandler') || $ENV{'WebDyneHandler'};
-            if ($handler_package) {
-                local $SIG{'__DIE__'};
-                (my $handler_package_pm=$handler_package)=~s{::}{/}g;
-                $handler_package_pm.='.pm';
-                unless (eval {require $handler_package_pm}) {
-                    #  Didn't load - let Webdyne handle the error.
-                    $handler='WebDyne';
-                }
-                else {
-                    $handler=$handler{$location}=$handler_package;
-                }
-            }
-            else {
-                $handler=$handler{$location}='WebDyne';
-            }
-        }
-    }
-    debug("calling handler: $handler");
-
-
-    #  Call handler and evaluate results
-    #
-    my $status=eval {$handler->handler($r)};
-    debug("handler returned status: $status");
-
-
-	#  Can close html file handle now
-	#
-    $html_fh->close();
-    debug("html returned: $html");
-
-
-	#  Present error if non 200 (success) status returned. Yes - there are other status codes but this is most
-	#  common and quickest test, other 200 codes will fall through the if/else statements and still work
-	#
-	unless ($status == HTTP_OK) {
-	    
-	    
-	    #  OK. Most common match didn't happen. Is it an error ?
-	    #
-	    if (!defined($status) || ($status < 0) ||  is_error($status)) {
-	
-	    
-            #  Something went wrong. Let's start working through it
-            #
-            if (($status eq HTTP_NOT_FOUND) && !(-f (my $fn=$r->filename()))) {
-
-            
-                #  We couldn't find file but this might be an API request. Go back through
-                #  file paths looking for a file that matches the apu request, e.g. if URI
-                #  is /api/user/42 go back looking for /api/user.psp or /api.psp in the treet
-                #
-                debug("status: $status, fn: $fn");
-                my $document_root=$r->document_root;
-                if ($WEBDYNE_API_ENABLE) {
-                    debug("status: $status, fn:$fn (%s), looking for API match", $r->filename());
-                    #(my $api_dn=$fn)=~s/^${document_root}//;
-                    (my $api_dn=$ENV{'PATH_INFO'})=~s/^${document_root}//;
-                    my @api_dn=grep {$_} File::Spec::Unix->splitdir($api_dn);
-                    my @api_fn;
-                    while (my $dn=shift @api_dn) {
-                        push @api_fn, $dn;
-                        my $api_fn=File::Spec->catfile($document_root, @api_fn) . WEBDYNE_PSP_EXT;
-                        debug("check $api_fn");
-                        #  Check of outside docroot
-                        last if (index($api_fn, $document_root) !=0);
-                        if ($API_fn{$api_fn} || (-f $api_fn)) {
-                            debug("found api file name: $api_fn, %s, dispatching", Dumper(\%API_fn));
-                            $API_fn{$api_fn}++; # Cache so not stat()ing on file system
-                            return &handler($env_hr, filename=>$api_fn);
-                        }
-                    }
-                }
-                
-                
-                #  If get here nothing found, send 404 error
-                #
-                debug("status: $status, fn:$fn, setting HTTP_NOT_FOUND");
-                $r->status(HTTP_NOT_FOUND);
-                my $error=errdump() || "File not found, status ($status)"; errclr();
-                $html=$r->err_html($status, $error)
-            }
-            elsif (is_error($status)) {
-            
-                #  Some other error besides 404
-                #
-                debug("returning custom error: $status");
-                $html=$r->custom_response($status) ||
-                    "Error $status with no content - try server error logs ?";
-            }
-            else {
-            
-                #  Weird non HTTP status code, something has gone wrong along way
-                #
-                debug('undefined status returned, looking for error handler');
-                my $error=errdump() || $@; errclr();
-                $error ||=  "Unexpected return status ($status) from handler $handler";
-                debug("request handler status:$status, detected error: $error, calling err_html");
-                $r->status(HTTP_INTERNAL_SERVER_ERROR);
-                $html=$r->err_html($status, $error)
-
-            }
-                
-        }
-        else {
-        
-        
-            #  Not an error, but not HTTP_OK
-            #
-            debug("status: $status is not an error, proceeding");
-            
-        }
-
-    }
-    debug("final handler status: %s, content_type: %s, html:%s", $status, $r->content_type(), $html);
-
-
-	#  If html defined set header content type unless already set during handler run
-	#
-	$r->content_type($WEBDYNE_CONTENT_TYPE_HTML) 
-	    if ($html && !$r->content_type());
-
-	
-	#  Return structure
-	#
-	my @return=(
-        $r->status() || HTTP_INTERNAL_SERVER_ERROR,
-        [
-			%{$r->headers_out()}
-		],
-        [
-			$html 
-		]
-	);
-
-
-	#  Finished with response handler now
-	#
-	$r->DESTROY();
-
-
-	#  And return
-	#
-	debug('return %s', Dumper(\@return));
-	return \@return;
-
-
-}
-
-
-sub error {
-
-	#  Get and return error string as last resort. Test function not used 
-	#  in main handler.
-	#
-	my @error=@_;
-	my $error=sprintf(shift(), @error) ||
-		'Unknown error';
-
-	#  Basic error response
-	#
-    return [
-        HTTP_INTERNAL_SERVER_ERROR,
-        ['Content-Type' => 'text/plain'],
-        [join($/,
-			'Internal Server Error:',
-			undef, 
-			$error
-		)]
-    ];
-
-}
-
-#  DO NOT END WITH 1; Here - will break Apache PSGI 
-#
 __END__
-
-# Documentation in Markdown. Convert to POD using markpod from 
-#
-# https://github.com/aspeer/pl-markpod.git 
 
 =begin markdown
 
-# NAME
+# webdyne.psgi #
 
-WebDyne - PSGI application for handling web requests
+# NAME #
+
+webdyne.psgi - PSGI application runner for WebDyne
 
 # SYNOPSIS
 
@@ -513,48 +299,126 @@ WebDyne - PSGI application for handling web requests
 
 `webdyne.psgi --port 8080 /var/www/html` 
 
+`webdyne.psgi --test`
+
 # DESCRIPTION
 
-`webdyne.psgi` is a PSGI application script that handles web requests using the WebDyne framework. It initializes the environment, creates a new PSGI request object, determines the appropriate handler, and processes the request to generate a response.
+`webdyne.psgi` builds a `WebDyne::PSGI` application, applies configured Plack middleware, loads local WebDyne constants for the selected root, and runs the app through `Plack::Runner`.
 
 # OPTIONS
 
-Command line options are handled by the Plack::Runner module and are the same as described in the [plackup(1)](man:plackup(1)) man page. Refer to that page for full options but some common options are:
+`webdyne.psgi` parses a small set of wrapper options itself and passes remaining command line options through to `Plack::Runner`.
 
-**--host** Which host interface to bind to
+Wrapper defaults can be preloaded from `~/.webdyne.psgi.opt` by creating an anonymous hash of option names and values.
 
-**--port** Which port to bind to
+Wrapper options handled by `webdyne.psgi` itself:
 
-**--server** Which server to use, e.g. Starman
+* **--test**
 
-**--reload** Reload if libraries or other files change
+    Use WebDyne's internal test page as the root.
 
-**-I** Same as perl -I for library include paths
+* **--static**
 
-**-M** Same as perl -M for loading modules before the script starts
+    Enable or disable PSGI static-file middleware.
+
+* **--index**
+
+    Enable or disable directory index handling. With the default enabled setting, `--index` uses WebDyne's built-in dynamic index page.
+
+* **--index=FILE**
+
+    Use `FILE` as the default document for directory requests instead of the built-in dynamic index page. Use the equals form so the document root argument is not consumed as the index value.
+
+* **--root**
+
+    Set the document root. If omitted, the final non-option command line argument is used. If neither is supplied, `DOCUMENT_ROOT` or the current working directory is used.
+
+* **--env**
+
+    Set the PSGI/Plack environment mode to `development`, `production`, or `none`. The wrapper sets `PLACK_ENV` and forwards the mode to `Plack::Runner`.
+
+* **--argv**
+
+    Supply additional arguments that the wrapper prepends to the remaining command line arguments before invoking `Plack::Runner`.
+
+* **--dump_opt**
+
+    Dump the processed option hash and exit.
+
+Remaining command line options are handled by `Plack::Runner` and are the same as described in the [plackup(1)](man:plackup(1)) man page. Refer to that page for full options but some common options are:
+
+* **--host**
+
+    Which host interface to bind to
+
+* **--port**
+
+    Which port to bind to
+
+* **--server**
+
+    Which server to use, e.g. Starman
+
+* **--reload**
+
+    Reload if libraries or other files change
+
+* **-I**
+
+    Same as perl -I for library include paths
+
+* **-M**
+
+    Same as perl -M for loading modules before the script starts
+
+On macOS, if no `--port` option is passed through to `Plack::Runner`, the wrapper uses port `5001` to avoid conflicts with Plack's default port. Other platforms use the normal Plack default unless a port is supplied.
 
 
 # EXAMPLES
 
-To run the script, use the following command for basic functionality and serving files from the /var/www/html directory. If no specific .psp requested the file 'index.psp' will attempt to be loaded (this can be changed - see below)
+To run the script, use the following command for basic functionality and serving files from the /var/www/html directory. With default settings, index handling is enabled and the wrapper uses WebDyne's built-in dynamic index page.
 
 `webdyne.psgi /var/www/html`
 
-Specify an alternative default document to serve if none specified
+Disable wrapper-managed index handling and rely on the PSGI request layer's default document behaviour instead
 
-`DOCUMENT_DEFAULT=time.psp webdyne.psgi /var/www/html`
+`webdyne.psgi --no-index /var/www/html`
 
-Run a single page app. Only this page will be allowed
+Use `home.psp` as the default document for directory requests
 
-`webdyne.psgi /var/www/html/time.psp`
+`webdyne.psgi --index=home.psp /var/www/html`
+
+Start in production mode
+
+`webdyne.psgi --env production /var/www/html`
 
 Start with the Starman server
 
-`DOCUMENT_DEFAULT=time.psp webdyne.psgi --no-default-middleware  --server Starman /home/aspeer/public_html`
+`webdyne.psgi --no-default-middleware --server Starman /home/aspeer/public_html`
+
+Start with the internal test page
+
+`webdyne.psgi --test`
 
 # ENVIRONMENT VARIABLES
 
-This script is a frontend to the WebDyne::Request::PSGI module. All environment variables and configuration files from that module are applicable when running this script.
+This script is a frontend to the WebDyne PSGI stack. In addition to `Plack::Runner` options, it uses WebDyne configuration and environment handling.
+
+* **DOCUMENT_ROOT**
+
+    Supplies the document root when neither `--root` nor a final non-option document root argument is provided.
+
+* **DOCUMENT_DEFAULT**
+
+    Supplies the default `index` value before `~/.webdyne.psgi.opt` and command-line options are applied. This means explicit CLI index options override the environment, and `~/.webdyne.psgi.opt` also overrides the environment. When the script is loaded by `plackup` or `starman` instead of run directly, the PSGI constant layer default is `app.psp`.
+
+* **PLACK_ENV**
+
+    Supplies the PSGI/Plack environment mode when `--env` is not provided.
+
+* **WEBDYNE_***
+
+    Supplies the relevant WebDyne settings used by the PSGI modules.
 
 # AUTHOR
 
@@ -576,9 +440,12 @@ Full license text is available at:
 =end markdown
 
 
+=head1 webdyne.psgi
+
+
 =head1 NAME
 
-WebDyne - PSGI application for handling web requests
+webdyne.psgi - PSGI application runner for WebDyne
 
 
 =head1 SYNOPSIS
@@ -587,51 +454,213 @@ C<<< webdyne.psgi [--option] <document_root> >>>
 
 C<webdyne.psgi --port 8080 /var/www/html> 
 
+C<webdyne.psgi --test>
+
 
 =head1 DESCRIPTION
 
-C<webdyne.psgi> is a PSGI application script that handles web requests using the WebDyne framework. It initializes the environment, creates a new PSGI request object, determines the appropriate handler, and processes the request to generate a response.
+C<webdyne.psgi> builds a C<WebDyne::PSGI> application, applies configured Plack middleware, loads local WebDyne constants for the selected root, and runs the app through C<Plack::Runner>.
 
 
 =head1 OPTIONS
 
-Command line options are handled by the Plack::Runner module and are the same as described in the L<plackup(1)|man:plackup(1)> man page. Refer to that page for full options but some common options are:
+C<webdyne.psgi> parses a small set of wrapper options itself and passes remaining command line options through to C<Plack::Runner>.
 
-B<--host> Which host interface to bind to
+Wrapper defaults can be preloaded from C<~/.webdyne.psgi.opt> by creating an anonymous hash of option names and values.
 
-B<--port> Which port to bind to
+Wrapper options handled by C<webdyne.psgi> itself:
 
-B<--server> Which server to use, e.g. Starman
+=over
 
-B<--reload> Reload if libraries or other files change
+=item *
 
-B<-I> Same as perl -I for library include paths
+B<--test>
 
-B<-M> Same as perl -M for loading modules before the script starts
+Use WebDyne's internal test page as the root.
+
+
+
+=item *
+
+B<--static>
+
+Enable or disable PSGI static-file middleware.
+
+
+
+=item *
+
+B<--index>
+
+Enable or disable directory index handling. With the default enabled setting, C<--index> uses WebDyne's built-in dynamic index page.
+
+
+
+=item *
+
+B<--index=FILE>
+
+Use C<FILE> as the default document for directory requests instead of the built-in dynamic index page. Use the equals form so the document root argument is not consumed as the index value.
+
+
+
+=item *
+
+B<--root>
+
+Set the document root. If omitted, the final non-option command line argument is used. If neither is supplied, C<DOCUMENT_ROOT> or the current working directory is used.
+
+
+
+=item *
+
+B<--env>
+
+Set the PSGI/Plack environment mode to C<development>, C<production>, or C<none>. The wrapper sets C<PLACK_ENV> and forwards the mode to C<Plack::Runner>.
+
+
+
+=item *
+
+B<--argv>
+
+Supply additional arguments that the wrapper prepends to the remaining command line arguments before invoking C<Plack::Runner>.
+
+
+
+=item *
+
+B<--dump_opt>
+
+Dump the processed option hash and exit.
+
+
+
+=back
+
+Remaining command line options are handled by C<Plack::Runner> and are the same as described in the L<plackup(1)|man:plackup(1)> man page. Refer to that page for full options but some common options are:
+
+=over
+
+=item *
+
+B<--host>
+
+Which host interface to bind to
+
+
+
+=item *
+
+B<--port>
+
+Which port to bind to
+
+
+
+=item *
+
+B<--server>
+
+Which server to use, e.g. Starman
+
+
+
+=item *
+
+B<--reload>
+
+Reload if libraries or other files change
+
+
+
+=item *
+
+B<-I>
+
+Same as perl -I for library include paths
+
+
+
+=item *
+
+B<-M>
+
+Same as perl -M for loading modules before the script starts
+
+
+
+=back
+
+On macOS, if no C<--port> option is passed through to C<Plack::Runner>, the wrapper uses port C<5001> to avoid conflicts with Plack's default port. Other platforms use the normal Plack default unless a port is supplied.
 
 
 =head1 EXAMPLES
 
-To run the script, use the following command for basic functionality and serving files from the /var/www/html directory. If no specific .psp requested the file 'index.psp' will attempt to be loaded (this can be changed - see below)
+To run the script, use the following command for basic functionality and serving files from the /var/www/html directory. With default settings, index handling is enabled and the wrapper uses WebDyne's built-in dynamic index page.
 
 C<webdyne.psgi /var/www/html>
 
-Specify an alternative default document to serve if none specified
+Disable wrapper-managed index handling and rely on the PSGI request layer's default document behaviour instead
 
-C<DOCUMENT_DEFAULT=time.psp webdyne.psgi /var/www/html>
+C<webdyne.psgi --no-index /var/www/html>
 
-Run a single page app. Only this page will be allowed
+Use C<home.psp> as the default document for directory requests
 
-C<webdyne.psgi /var/www/html/time.psp>
+C<webdyne.psgi --index=home.psp /var/www/html>
+
+Start in production mode
+
+C<webdyne.psgi --env production /var/www/html>
 
 Start with the Starman server
 
-C<DOCUMENT_DEFAULT=time.psp webdyne.psgi --no-default-middleware  --server Starman /home/aspeer/public_html>
+C<webdyne.psgi --no-default-middleware --server Starman /home/aspeer/public_html>
+
+Start with the internal test page
+
+C<webdyne.psgi --test>
 
 
 =head1 ENVIRONMENT VARIABLES
 
-This script is a frontend to the WebDyne::Request::PSGI module. All environment variables and configuration files from that module are applicable when running this script.
+This script is a frontend to the WebDyne PSGI stack. In addition to C<Plack::Runner> options, it uses WebDyne configuration and environment handling.
+
+=over
+
+=item *
+
+B<DOCUMENT_ROOT>
+
+Supplies the document root when neither C<--root> nor a final non-option document root argument is provided.
+
+
+
+=item *
+
+B<DOCUMENT_DEFAULT>
+
+Supplies the default C<index> value before C<~/.webdyne.psgi.opt> and command-line options are applied. This means explicit CLI index options override the environment, and C<~/.webdyne.psgi.opt> also overrides the environment. When the script is loaded by C<plackup> or C<starman> instead of run directly, the PSGI constant layer default is C<app.psp>.
+
+
+
+=item *
+
+B<PLACK_ENV>
+
+Supplies the PSGI/Plack environment mode when C<--env> is not provided.
+
+
+
+=item *
+
+B<WEBDYNE_>*
+
+Supplies the relevant WebDyne settings used by the PSGI modules.
+
+
+
+=back
 
 
 =head1 AUTHOR

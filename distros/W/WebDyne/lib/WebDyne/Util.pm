@@ -10,7 +10,6 @@
 #
 #  <http://dev.perl.org/licenses/>
 #
-
 package WebDyne::Util;
 
 
@@ -18,14 +17,29 @@ package WebDyne::Util;
 #
 sub BEGIN {$^W=0}
 use strict qw(vars);
-use vars   qw($VERSION @EXPORT);
+use vars   qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use warnings;
 no warnings qw(uninitialized redefine once);
+
+
+#  Package wide vars and defaults, initialised in BEGIN
+#
+our (
+    $WEBDYNE_DEBUG,
+    $WEBDYNE_DEBUG_FILE,
+    $WEBDYNE_DEBUG_FILTER,
+    $WEBDYNE_DEBUG_MAX_LINES,
+    $WEBDYNE_DEBUG_MAX_LENGTH,
+    $WEBDYNE_DEBUG_NO_COLOUR,
+    $WEBDYNE_ERROR_TEXT_SHOW_ALL,
+    $WEBDYNE_ERROR_TEXT_CHAR_MAX
+);
 
 
 #  External modules
 #
 use Data::Dumper;
+use File::Spec;
 use IO::File;
 use POSIX qw(strftime);
 
@@ -38,22 +52,18 @@ require Exporter;
 #  Exports
 #
 @EXPORT=qw(err errstr errclr errdump errsubst errstack errnofatal debug);
+@EXPORT_OK=qw(perl_inc_dn apache_startup apache_shutdown);
+%EXPORT_TAGS=(all => [@EXPORT, @EXPORT_OK]);
 
 
 #  Version information
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
 #  Var to hold package wide hash, for data shared across package, and error stack
 #
 my (%Package, @Err);
-
-
-#  Bring the WEBDYNE_DEBUG env var into package var so available via Plack handler,
-#  which normally replaces env with its own
-#
-$Package{'WEBDYNE_DEBUG'}=$ENV{'WEBDYNE_DEBUG'};
 
 
 #  All done. Positive return
@@ -67,6 +77,19 @@ $Package{'WEBDYNE_DEBUG'}=$ENV{'WEBDYNE_DEBUG'};
 #
 BEGIN {
     eval {require Time::HiRes; Time::HiRes->import(qw(time gettimeofday))};
+    my %config=(
+        WEBDYNE_DEBUG               => '',
+        WEBDYNE_DEBUG_FILE          => '',
+        WEBDYNE_DEBUG_FILTER        => '',
+        WEBDYNE_DEBUG_MAX_LINES     => 6,
+        WEBDYNE_DEBUG_MAX_LENGTH    => 1024,
+        WEBDYNE_DEBUG_NO_COLOUR     => $ENV{'WEBDYNE_DEBUG_NO_COLOR'},
+        WEBDYNE_ERROR_TEXT_SHOW_ALL => '',
+        WEBDYNE_ERROR_TEXT_CHAR_MAX => $ENV{'WEBDYNE_ERROR_TEXT_CHAR_MAX'} || 72,
+    );
+    while (my($name, $value)=each(%config)) {
+        ${__PACKAGE__."::${name}"}=defined($ENV{$name}) ? $ENV{$name} : $value;
+    }
 }
 
 
@@ -90,7 +113,7 @@ sub import {
 
     #  Environment var overrides all
     #
-    if ($debug_fn=$ENV{'WEBDYNE_DEBUG_FILE'}) {
+    if ($debug_fn=$WEBDYNE_DEBUG_FILE) {
 
         #  fn is whatever spec'd
         #
@@ -100,7 +123,7 @@ sub import {
         };
 
     }
-    elsif ($ENV{'WEBDYNE_DEBUG'}) {
+    elsif ($WEBDYNE_DEBUG) {
 
 
         #  fh is stderr
@@ -212,20 +235,30 @@ sub debug {
 
     #  Send debug message to log file. Turn off buffering and get file handle
     #
+    my ($debug, @param)=@_;
     local $|=1;
     my $debug_fh=$Package{'debug_fh'} ||
         return undef;
 
 
-    #  Get caller
-    #
-    #  Get who is calling us
+    #  Get caller, iterate until not eval
     #
     my $caller=(caller(0))[0] ||
         return undef;
-    my $method=(caller(1))[3] || 'main';
+    my ($eval_fg, $method);
+    { my $i=1; while(1) {
+        my @caller=caller($i++);
+        last unless @caller;
+        $method=$caller[3] || 'main';
+        if ($method=~/\(eval\)/) {
+            $eval_fg++;
+            next;
+        }
+        last;
+    }}
     (my $subroutine=$method)=~s/^.*:://;
     (my $class=$method)=~s/::\Q${subroutine}\E$//;
+    $subroutine.='(eval)' if $eval_fg;
 
 
     #  Time in human readable format
@@ -236,24 +269,64 @@ sub debug {
 
     #  Get the debug message
     #
-    #local $SIG{__WARN__}=sub { require Carp; &Carp::confess @_ };  #uncomment if want to trace any missing sprintf params
-    my $debug=$#_ ? sprintf(shift(), @_) : shift();
-
-
+    #local $SIG{__WARN__}=sub { CORE::die("SPRINTF: ". Dumper([$debug, @param])) }; #uncomment if want to trace any missing sprintf params
+    #local $SIG{__WARN__}=sub { require Carp; &Carp::confess(@_) };  #uncomment if want to trace any missing sprintf params
+    $debug=@param ? sprintf($debug, map { defined($_) ? $_ : 'undef' } @param) : $debug;
+    
+    
+    #  Truncate ?
+    #
+    if ($WEBDYNE_DEBUG_MAX_LINES && (length($debug) > $WEBDYNE_DEBUG_MAX_LENGTH)) {
+        $debug=substr($debug, 0, $WEBDYNE_DEBUG_MAX_LENGTH);
+    }
+    
+    
+    #  Wrap lines ?
+    #
+    $debug =~ s/\n(?!\z)/\n    /g;
+    
+    
+    #  Truncate lines ?
+    #
+    if ($WEBDYNE_DEBUG_MAX_LINES) {
+        my @debug=split(/\n/, $debug, $WEBDYNE_DEBUG_MAX_LINES+1);
+        if (@debug > $WEBDYNE_DEBUG_MAX_LINES) {
+            splice(@debug, $WEBDYNE_DEBUG_MAX_LINES);
+            push @debug, '...';
+        }
+        $debug=join("\n", @debug);
+    }
+    chomp($debug);
+    
+    
+    #  Colourise
+    #
+    if (-t STDOUT && !($WEBDYNE_DEBUG_NO_COLOUR)) {
+        eval {
+            require Term::ANSIColor;
+            $timestamp=Term::ANSIColor::color('cyan') . $timestamp;
+            $class=Term::ANSIColor::color('magenta') . $class;
+            $subroutine=Term::ANSIColor::color('bold green') . $subroutine;
+            $debug=Term::ANSIColor::color('reset') . $debug;
+        };
+        eval {} if $@;
+    }
+    
+    
     #  Filtering ?
     #
-    if ($Package{'WEBDYNE_DEBUG'} && ($Package{'WEBDYNE_DEBUG'} ne '1')) {
+    if ($WEBDYNE_DEBUG && ($WEBDYNE_DEBUG ne '1')) {
 
 
         #  Yes - check we are getting from caller we are interested in
         #
-        my @debug_target=split(/[,;]/, $Package{'WEBDYNE_DEBUG'});
+        my @debug_target=split(/[,;]/, $WEBDYNE_DEBUG);
         foreach my $debug_target (@debug_target) {
             if (($caller eq $debug_target) || ($method=~/\Q$debug_target\E$/)) {
             
                 #  Print debug after checking for any regexp wanted
                 #
-                if (my $regexp=$ENV{'WEBDYNE_DEBUG_FILTER'}) {
+                if (my $regexp=$WEBDYNE_DEBUG_FILTER) {
                     next unless $debug=~qr/$regexp/m;
                 }
                 CORE::print $debug_fh "[$timestamp $class ($subroutine)] ", $debug, $/;
@@ -264,7 +337,7 @@ sub debug {
 
         #  No filtering. Open floodgates but still apply any regexp
         #
-        if (my $regexp=$ENV{'WEBDYNE_DEBUG_FILTER'}) {
+        if (my $regexp=$WEBDYNE_DEBUG_FILTER) {
             return unless $debug=~qr/$regexp/;
         }
         CORE::print $debug_fh "[$timestamp $class ($subroutine)] ", $debug, $/;
@@ -295,10 +368,10 @@ sub err {
     #  If no message supplied return last one seen
     #
     unless ($message) {
-        $message=@Err ? $Err[$#Err]->[0] && return undef : 'undefined error';
+        $message=@Err ? ($Err[$#Err]->[0] && return undef) : 'undefined error';
     }
     else {
-        $message=sprintf($message, @param) if @param;
+        $message=@param ? sprintf($message, map { defined($_) ? $_ : 'undef' } @param) : $message;
     }
 
 
@@ -319,6 +392,8 @@ sub err {
 
 
     }
+    debug("err: $message, caller:%s", Dumper(\@caller));
+
 
 
     #  If this message is *not* the same as the last one we saw,
@@ -365,9 +440,20 @@ sub err {
     }
 
 
+    #  If operating under eval and withing a WebDyne::<inode> block call CORE::die;
+    #
+    foreach my $caller_ar (@caller) {
+        if ($caller_ar->[0]=~/^WebDyne::[a-f0-9]{32}$/) {
+            debug("die with WebDyne::<inode> eval detected, calling CORE::die");
+            CORE::die($message);
+        }
+    }
+    debug('not under WebDyne eval, proceeding');
+
+
     #  Return undef
     #
-    return $Package{'nofatal'} ? undef : die(&errdump);
+    return $Package{'nofatal'} ? undef : die(&errdump || 'undefined webdyne error');
 
 }
 
@@ -474,12 +560,14 @@ sub errdump {
     #
     my @format=(
 
-        '+' . ('-' x 78) . "+\n",
-        "| @<<<<< | ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< |\n",
-        "|        | ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<~~ |\n"
+        #'+' . ('-' x 78) . "+\n",
+        #"| @<<<<< | ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< |\n",
+        #"|        | ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<~~ |\n"
+        '+' . ('-' x ($WEBDYNE_ERROR_TEXT_CHAR_MAX + 12)) . "+\n",
+        sprintf('| @<<<<< | ^%s |'."\n", ('<' x $WEBDYNE_ERROR_TEXT_CHAR_MAX)),
+        sprintf('|        | ^%s~~ |'."\n", ('<' x ($WEBDYNE_ERROR_TEXT_CHAR_MAX-2) ))
 
     );
-
 
     #  Go through the message stack on error at a time in reverse order
     #
@@ -534,8 +622,9 @@ sub errdump {
 
         #  Include any user supplied info
         #
-        while (my ($key, $value)=each %{$info_hr}) {
-
+        #while (my ($key, $value)=each %{$info_hr}) {
+        foreach my $key (sort keys %{$info_hr}) {
+            my $value=$info_hr->{$key};
 
             #  Print separator, info
             #
@@ -553,6 +642,11 @@ sub errdump {
         formline $format[1], 'PID', "$$";
         formline $format[0];
         formline "\n";
+        
+        
+        #  Only show first error message
+        #
+        last unless $WEBDYNE_ERROR_TEXT_SHOW_ALL;
 
 
     }
@@ -574,3 +668,364 @@ sub errstack {
 
 }
 
+
+sub perl_inc_dn {
+
+    #  Return array ref of any additional libraries specified via command line (-I)
+    #
+    my %default_inc=map { $_ => 1 } @{ perl_inc_dn_default() || [] };
+    my %seen;
+    my @lib=grep {
+        !$default_inc{$_} && !$seen{$_}++
+    } map {
+        File::Spec->rel2abs($_)
+    } grep {
+        defined($_) && !ref($_) && length($_) && -d $_
+    } @INC;
+
+    return \@lib;
+}
+
+
+sub perl_inc_dn_default {
+
+    my @default_inc;
+    #local %ENV=%ENV;
+    #delete @ENV{qw(PERL5LIB PERLLIB PERL_USE_UNSAFE_INC)};
+
+    if (open(my $perl_fh, '-|', $^X, '-e', 'print join qq(\0), grep { defined && !ref && length && -d } @INC')) {
+        local $/;
+        my $inc=<$perl_fh>;
+        close($perl_fh);
+        @default_inc=map {
+            File::Spec->rel2abs($_)
+        } split(/\0/, ($inc || ''));
+    }
+
+    return \@default_inc;
+}
+
+
+sub apache_startup {
+
+    my $opt_hr=shift() || {};
+
+    #  Use an Apache::Test server root under tmp.  By default File::Temp cleans
+    #  this at process exit; --keep_tmp flips CLEANUP off for debugging.
+    #
+    require File::Temp;
+    my $svr_root_dn=$opt_hr->{'serverroot'} || File::Temp::tempdir(
+        'webdyne_apache_XXXXXXXX',
+        TMPDIR  => 1,
+        CLEANUP => exists($opt_hr->{'keep_tmp'}) ? !$opt_hr->{'keep_tmp'} : 1,
+    );
+
+    #  Some command-line helpers run best with an isolated cache inside the
+    #  temporary server root, rather than the system/default WebDyne cache.
+    #
+    if ($opt_hr->{'cache_dn_env'}) {
+        mkdir(my $cache_dn=File::Spec->catdir($svr_root_dn, 'cache'));
+        $ENV{'WEBDYNE_CACHE_DN'}=$cache_dn;
+    }
+
+    #  Apache::Test may warn about duplicate inherited options; they are noisy
+    #  but benign for these one-process throwaway instances.
+    #
+    local $SIG{__WARN__}=sub {
+        return if $_[0] =~ /Duplicate specification/;
+        CORE::warn @_;
+    };
+
+    #  Avoid Apache::Test attempting to adjust process ulimits in environments
+    #  where that is either unnecessary or not permitted.
+    #
+    $ENV{'APACHE_TEST_ULIMIT_SET'}++;
+
+    #  Apache::Test normally writes startup.pl and index.html helpers. WebDyne
+    #  supplies the whole runtime config via the caller's postamble instead.
+    #
+    no warnings qw(once redefine);
+    require Apache::TestConfig;
+    *Apache::TestConfig::generate_index_html=sub {};
+    *Apache::TestConfig::configure_startup_pl=sub {};
+
+    #  Load Apache::Test lazily so WebDyne::Util can be used without mod_perl
+    #  development dependencies unless an Apache helper is actually invoked.
+    #
+    require Apache::TestRunPerl;
+    my $runner=Apache::TestRunPerl->new();
+    unless ($runner) {
+        my $message='unable to create Apache::TestRunPerl instance';
+        die "$message\n" if $opt_hr->{'die_on_error'};
+        return err($message);
+    }
+
+    #  The postamble is caller-owned because wdrender, webdyne.apache, and the
+    #  test harness each need subtly different Apache configuration fragments.
+    #
+    my @argv=(
+        '-port'         => defined($opt_hr->{'port'}) ? $opt_hr->{'port'} : 'select',
+        '-serverroot'   => $svr_root_dn,
+        '-documentroot' => $opt_hr->{'documentroot'},
+        '-postamble'    => $opt_hr->{'postamble'},
+        '-one-process',
+        '-start-httpd',
+    );
+
+    $runner->run(@argv);
+    return $runner;
+}
+
+
+sub apache_shutdown {
+
+    my $runner=shift();
+    return unless $runner && $runner->{'server'};
+    $runner->{'server'}->stop();
+    return;
+}
+
+1;__END__
+
+=begin markdown
+
+# WebDyne::Util #
+
+# NAME #
+
+WebDyne::Util - debugging and error-stack utility functions for WebDyne
+
+# SYNOPSIS #
+
+```perl
+use WebDyne::Util;
+
+debug('message: %s', $value);
+err('something failed');
+my $msg = errstr();
+```
+
+# DESCRIPTION #
+
+`WebDyne::Util` provides the common debugging, error-stack, and error-formatting functions used throughout the WebDyne codebase.
+
+It exports the standard utility functions by default and uses environment variables such as `WEBDYNE_DEBUG`, `WEBDYNE_DEBUG_FILE`, `WEBDYNE_DEBUG_FILTER`, and related settings to control runtime debug output.
+
+`perl_inc_dn` is exported by default and can also be requested explicitly. `apache_startup` and `apache_shutdown` are available on request, or through the `:all` export tag.
+
+# FUNCTIONS #
+
+* **debug($message, @args)**
+
+    Emit a formatted debug message if debugging is enabled for the calling package or environment.
+
+* **err($message, @args)**
+
+    Push an error message onto the WebDyne error stack.
+
+* **errstr()**
+
+    Return the current error string.
+
+* **errclr()**
+
+    Clear the current error state.
+
+* **errsubst(...)**
+
+    Apply error-text substitutions and formatting helpers.
+
+* **errdump(...)**
+
+    Produce a formatted dump of the current error stack and related diagnostics.
+
+* **errstack()**
+
+    Return the current error stack.
+
+* **errnofatal($bool)**
+
+    Control whether errors are treated as fatal by the utility layer.
+
+* **perl_inc_dn()**
+
+    Return non-default library directories from `@INC`.
+
+* **apache_startup(\%options)**
+
+    Start an Apache::Test runner instance with a caller-supplied postamble.
+
+* **apache_shutdown($runner)**
+
+    Stop an Apache::Test runner instance if it is active.
+
+# NOTES #
+
+This module is foundational to the rest of WebDyne. Most other modules import it for debug and error handling.
+
+# AUTHOR #
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 WebDyne::Util
+
+
+=head1 NAME
+
+WebDyne::Util - debugging and error-stack utility functions for WebDyne
+
+
+=head1 SYNOPSIS
+
+
+ use WebDyne::Util;
+ 
+ debug('message: %s', $value);
+ err('something failed');
+ my $msg = errstr();
+
+=head1 DESCRIPTION
+
+C<WebDyne::Util> provides the common debugging, error-stack, and error-formatting functions used throughout the WebDyne codebase.
+
+It exports the standard utility functions by default and uses environment variables such as C<WEBDYNE_DEBUG>, C<WEBDYNE_DEBUG_FILE>, C<WEBDYNE_DEBUG_FILTER>, and related settings to control runtime debug output.
+
+C<perl_inc_dn> is exported by default and can also be requested explicitly. C<apache_startup> and C<apache_shutdown> are available on request, or through the C<:all> export tag.
+
+
+=head1 FUNCTIONS
+
+=over
+
+=item *
+
+B<debug($message, @args)>
+
+Emit a formatted debug message if debugging is enabled for the calling package or environment.
+
+
+
+=item *
+
+B<err($message, @args)>
+
+Push an error message onto the WebDyne error stack.
+
+
+
+=item *
+
+B<errstr()>
+
+Return the current error string.
+
+
+
+=item *
+
+B<errclr()>
+
+Clear the current error state.
+
+
+
+=item *
+
+B<errsubst(...)>
+
+Apply error-text substitutions and formatting helpers.
+
+
+
+=item *
+
+B<errdump(...)>
+
+Produce a formatted dump of the current error stack and related diagnostics.
+
+
+
+=item *
+
+B<errstack()>
+
+Return the current error stack.
+
+
+
+=item *
+
+B<errnofatal($bool)>
+
+Control whether errors are treated as fatal by the utility layer.
+
+
+
+=item *
+
+B<perl_inc_dn()>
+
+Return non-default library directories from C<@INC>.
+
+
+
+=item *
+
+B<apache_startup(\%options)>
+
+Start an Apache::Test runner instance with a caller-supplied postamble.
+
+
+
+=item *
+
+B<apache_shutdown($runner)>
+
+Stop an Apache::Test runner instance if it is active.
+
+
+
+=back
+
+
+=head1 NOTES
+
+This module is foundational to the rest of WebDyne. Most other modules import it for debug and error handling.
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
+
+=cut

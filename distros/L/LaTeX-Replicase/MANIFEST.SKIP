@@ -6,6 +6,7 @@ ready_good.tex
 LaTeX-Replicase-*
 README.md
 Replicase.html
+sandbox
 
 # Avoid version control files.
 \B\.git\b

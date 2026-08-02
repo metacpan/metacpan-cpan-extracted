@@ -840,3 +840,12 @@ Revision history for StreamFinder
         Youtube urls, increasing the liklyhood of finding videos.
         - StreamFinder::PodcastAddict - remove depreciated-warning from the 
         module's POD docs.
+2.63    2026/08/01
+        - StreamFinder::Rumble - Fetch & return the length in milliseconds 
+        as indicated in the webpage (as $video->{'length'}), which is now 
+        needed by Fauxdacious due to some Rumble compressed HLS streams 
+        returning incorrect values to the ffmpeg library.  Also strip off some 
+        excess fields appended to certain video URLs which prevent recent 
+        ffmpeg (libavmormat) from recognizing them as valid video streams.
+        - StreamFinder::Youtube - Better handle more embedded Youtube and 
+        Rumble videos found in non-Youtube pages.

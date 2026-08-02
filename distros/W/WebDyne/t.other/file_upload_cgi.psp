@@ -1,0 +1,37 @@
+<start_html title="File Upload">
+<h2>Upload File</h2>
+<start_multipart_form>
+<filefield name="file" multiple required>
+<p>
+<submit name=Upload>
+<end_form>
+
+<pre id="output"></pre>
+
+<script>
+const form = document.querySelector("form");
+const output = document.getElementById("output");
+
+form.addEventListener("submit", () => {
+output.textContent = "Submitting form...\nWaiting for server response...";
+});
+</script>
+
+<p>
+<block name="file" display="+{Upload}">
+<pre>
+<perl handler/>
+</pre>
+</block>
+<dump force>
+
+__PERL__
+
+use Data::Dumper;
+sub handler {
+
+    my $self=shift();
+    my $cgi_or=$self->CGI();
+    return Dumper($cgi_or->uploads()->flatten);
+
+}

@@ -23,15 +23,17 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-Test::More
-Test::More::UTF8
-Test::Pod
-Test::Exception
-Test::Output
 File::Basename
 File::Path
 File::Compare
 Carp
+Test::More			for tests only
+Test::More::UTF8	for tests only
+Test::Pod			for tests only
+Test::Exception	for tests only
+Test::Output		for tests only
+Storable				for tests only
+Data::Dumper		for tests only
 
 COPYRIGHT AND LICENCE
 

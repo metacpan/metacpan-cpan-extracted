@@ -78,10 +78,14 @@ BEGIN {
 
 my $pkg = 'main::Const::Test';
 is($pkg->do_it, 'const', "worked as expected");
-{
-    local $SIG{__WARN__} = sub { };
+my $override_warnings = warnings {
     *main::Const::Test::FOO = sub { 0 };
-}
+};
+ok(@$override_warnings, 'overriding the constant emitted warnings');
+like(join('', @$override_warnings), qr/(?:Constant s|S)ubroutine .*FOO redefined/,
+    'captured the expected subroutine-redefinition warning');
+like(join('', @$override_warnings), qr/Prototype mismatch: sub .*FOO \(\) vs none/,
+    'captured the expected prototype-mismatch warning');
 ok(!$pkg->FOO, "overrode const sub");
 {
 local $TODO = "known to fail on $]" if $] le "5.006002";

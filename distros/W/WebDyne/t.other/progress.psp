@@ -1,0 +1,64 @@
+<start_html title="Progress Bar" h3 hr alpine sse>
+<progress id="bar" value="0" max="100"></progress>
+<span id="pct">0%</span>
+
+<script>
+const bar = document.getElementById('bar');
+const pct = document.getElementById('pct');
+
+const es = new EventSource("#");
+
+es.addEventListener("progress", e => {
+    const value = parseInt(e.data, 10);
+    bar.value = value;
+    pct.textContent = value + "%";
+});
+
+es.addEventListener("done", () => {
+    es.close();
+});
+</script>
+
+__PERL__
+use WebDyne::Util qw(debug);
+use HTTP::Status qw(HTTP_OK);
+use Future::AsyncAwait;
+use Sub::Util qw(set_subname);
+
+async sub sse {
+
+    #  Get self ref, PAGI::SSE object
+    #
+    my $self=shift();
+    my $sse_or=$self->r->sse();
+    
+    
+    #  Send start with some extra headers to discourage buffering
+    #
+    debug("sse: $sse_or, sending start");
+    await $sse_or->start(status => HTTP_OK, 
+        headers => [
+            ['X-Accel-Buffering' => 'no'], 
+            ['Content-Encoding' => 'identity']
+        ]);
+    
+    
+    #  Now main loop
+    #
+    my $progress = 0;
+    debug('sse: main loop');
+    await $sse_or->every(1, async sub {
+
+        $progress += 10;
+        await $sse_or->send_event(
+            event => 'progress',
+            data  => $progress,
+        );
+
+        if ($progress >= 100) {
+            await $sse_or->send_event(event => 'done');
+            $sse_or->close;  # stop stream
+        }
+    });
+
+}

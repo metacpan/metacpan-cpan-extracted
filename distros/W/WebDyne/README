@@ -1,55 +1,177 @@
+README
+
 Introduction
 
-WebDyne is a dynamic content generation engine for Apache/mod_perl and
-PSGI web servers (such as Plack and Starman). HTML documents with
-embedded Perl code are processed to produce dynamic HTML output.
+WebDyne is a dynamic content generation engine for Apache/mod_perl, PSGI
+web servers such as Plack and Starman, and PAGI runtimes. HTML documents
+with embedded Perl code are processed to produce dynamic HTML output.
 
-An installer is included in the base WebDyne module for Apache, or a
-PSGI variant is included for use with Plack. Once WebDyne is installed
-any file with a .psp extension is treated as a WebDyne source file. It
-is parsed for WebDyne tags (such as <perl> and <block>) which are
-interpreted and executed on the server as appropriate to generate a
-compliant HTML document. The resulting output is then sent to the
-browser.
+An installer is included in the base WebDyne module for Apache, and
+wrapper scripts are included for PSGI, PAGI, and temporary local
+Apache/mod_perl development. Once WebDyne is installed any file with a
+.psp extension is treated as a WebDyne source file. It is parsed for
+WebDyne tags such as <perl> and <block>, which are interpreted and
+executed on the server as appropriate to generate a compliant HTML
+document. The resulting output is then sent to the browser.
 
-Once parsed paged are are optionally stored in a partially compiled
-format, speeding up subsequent processing. The aim of WebDyne is to make
-coding web pages with Perl components a faster, easier and more
-enjoyable experience.
+Once parsed, pages are optionally stored in a partially compiled format,
+speeding up subsequent processing. The aim of WebDyne is to make coding
+web pages with Perl components a faster, easier and more enjoyable
+experience.
+
+Full documentation for WebDyne (with examples) is available at
+https://webdyne.org.
+
+Overview
+
+WebDyne is primarily intended to operate as the main rendering and
+request-handling module within the wider WebDyne framework under a web
+server or application runtime. In current codebase terms that includes
+Apache/mod_perl, PSGI, and PAGI environments.
+
+It can also be used directly from the command line or from standalone
+Perl scripts to render .psp templates to HTML, which makes it useful for
+diagnostics, testing, and simple offline generation.
+
+WebDyne pages are HTML documents with embedded Perl and optional
+WebDyne-specific tags such as <perl>, <block>, <include>, processing
+instructions such as <? ... ?>, and shortcut tags such as <start_html>.
+
+WebDyne Features
+
+- server-side HTML rendering with embedded Perl
+- a path from quick inline page logic to cleaner separation using
+  __PERL__, modules, templates, and handler chains
+- compile-time parsing and caching of .psp pages
+- runtime flexibility across Apache/mod_perl, PSGI, PAGI, and standalone
+  rendering tools
+
+Quick Example
+
+Save the following as app.psp:
+
+    <html><head><title>Server Time</title></head><body>
+    The local server time is: <? localtime() ?>
+    </body></html>
+
+You can render it directly from the command line:
+
+    wdrender app.psp
+
+WebDyne supports sytactic shortcuts which still render as compliant
+HTML. The following produces the exact same output as the first example:
+
+    <start_html title="Server Time">
+    The local server time is: <? localtime() ?>
+
+Example output:
+
+    <!DOCTYPE html><html lang="en"><head><title>Server Time</title><meta charset="UTF-8"></head>
+    <body><p>The local server time is: ...</p></body></html>
+
+If you prefer to keep Perl logic in a dedicated section:
+
+    <start_html title="Server Time">
+    The local server time is: <? print_time() ?>
+    __PERL__
+    sub print_time {
+        print scalar localtime;
+    }
 
 Getting Started
 
-Install the WebDyne module from CPAN using cpanminus (cpanm) or cpan,
-and install Plack for the PSGI version.
+Install the Core Module
 
-    #  Use cpan if you don't have cpanm
-    #
-    $ cpanm WebDyne
-    Building and testing Webdyne-2.04 ... OK
+Install WebDyne from CPAN using cpan or cpanm:
 
-    $ cpanm Plack
-    Building and testing Plack-1.0051 ... OK
+    cpanm WebDyne
 
-Run the PSGI variant in test mode and connect to the server to check
-that it is working.
+This installs the core WebDyne modules and command-line tools.
 
-    $ webdyne.psgi --test
-    HTTP::Server::PSGI: Accepting connections at http://0:5000/
+Depending on how you want to run WebDyne, you may also need additional
+runtime components:
 
-Create an app.psp file in the appropriate web server home directory.
-Don't be put off by the shortcut <start_html> tag, you can still use
-traditional tags if you like.
+- for PSGI: Plack and optionally a PSGI server such as Starman
+- for Apache: Apache HTTP Server plus mod_perl
+- for PAGI: the PAGI runtime stack
 
-    # Create file called app.psp with this content.
-    #
+Hello World
+
+The fastest way to confirm WebDyne is working is to render a .psp file
+directly:
+
+    wdrender app.psp
+
+You can also start the PSGI wrapper in test mode:
+
+    webdyne.psgi --test
+
+Or serve a document root directory with the PSGI wrapper:
+
+    webdyne.psgi /path/to/site-root
+
+The PAGI wrapper can be started in the same style:
+
+    webdyne.pagi --test
+    webdyne.pagi /path/to/site-root
+
+For Apache/mod_perl development without installing system-wide Apache
+configuration, use the temporary Apache runner:
+
+    webdyne.apache --test
+    webdyne.apache /path/to/site-root
+
+A Simple PSGI Site
+
+Create a directory with an app.psp file:
+
     <start_html>
-    The local server time is: <perl>localtime()</perl>
+    My first WebDyne page. Server time: <? localtime() ?>
 
-Run the PSGI variant against that directory
+Then run:
 
-    # 
-    $ webdyne.psgi /location/of/app.psp
-    HTTP::Server::PSGI: Accepting connections at http://0:5000/
+    webdyne.psgi /path/to/site-root/
 
-See the documentation at https://webdyne.org for more examples and
-information.
+WebDyne will serve .psp files from that directory through the PSGI
+runtime.
+
+Runtime Modes
+
+WebDyne can be used in several ways:
+
+- Apache/mod_perl, either permanently configured or started locally
+  through webdyne.apache
+- PSGI, including wrapper usage through webdyne.psgi
+- PAGI, including HTTP, server-sent event, WebSocket, and lifespan
+  handling through webdyne.pagi
+- standalone rendering through wdrender, wdcompile, or direct use of
+  WebDyne::html()
+
+Features
+
+WebDyne supports:
+
+- embedded Perl in HTML pages
+- <? ... ?>, <perl>...</perl>, and related WebDyne tag styles
+- compile-time parsing and cached intermediate representations
+- template blocks and includes
+- handler chains, session helpers, filters, and templates
+- CGI-style parameter access from page code
+- standalone rendering and debugging tools
+
+Further Reading
+
+Repository documentation includes:
+
+- doc/webdyne.xml as the definitive guide source
+- doc/webdyne.md
+- lib/WebDyne.pm.md
+- command documentation in bin/*.md
+
+Useful entry points include:
+
+- bin/wdrender.md
+- bin/wdcompile.md
+- bin/webdyne.apache.md
+- bin/webdyne.psgi.md
+- bin/webdyne.pagi.md

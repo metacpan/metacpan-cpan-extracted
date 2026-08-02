@@ -27,7 +27,7 @@ sub check_output {
 	my($out) = @_;
 	for (@out_files) {
 		ok -f $_;
-		eq_or_diff path($_)->slurp, $out;
+		eq_or_diff $out, path($_)->slurp;
 	}
 }
 
@@ -41,12 +41,7 @@ sub test {
 	
 	ok 1, "line ".(caller)[2]." - call script";
 	unlink @out_files;
-	capture_stderr { ok 0 == system $^X, 'blib/bin/pp.pl', @in_files };
-	check_output($out);
-	
-	ok 1, "line ".(caller)[2]." - call module";
-	unlink @out_files;
-	capture_stderr { ok 0 == system $^X, 'blib/lib/Preproc/Tiny.pm', @in_files };
+	capture_stderr { ok 0 == system $^X, 'blib/script/pp', @in_files };
 	check_output($out);
 	
 	ok 1, "line ".(caller)[2]." - use module old interface";
@@ -63,7 +58,7 @@ sub test {
 	
 	# test filter
 	my $result = pp_text($in);
-	eq_or_diff $result, $out;
+	eq_or_diff $out, $result;
 }
 
 test(<<'IN', <<'OUT');
@@ -189,11 +184,11 @@ write_input(<<'IN');
 IN
 
 
-my($stderr, $result) = capture_stderr { system $^X, 'blib/bin/pp.pl' };
+my($stderr, $result) = capture_stderr { system $^X, 'blib/script/pp' };
 ok $result != 0;
-like $stderr, qr/Usage: pp\.pl file\.pp\.\.\./;
+like $stderr, qr/Usage: pp file\.pp\.\.\./;
 
-($stderr, $result) = capture_stderr { system $^X, 'blib/bin/pp.pl', $in_files[0] };
+($stderr, $result) = capture_stderr { system $^X, 'blib/script/pp', $in_files[0] };
 ok $result != 0;
 like $stderr, qr/Can't modify constant item in scalar assignment/;
 like $stderr, qr/parse error:/;

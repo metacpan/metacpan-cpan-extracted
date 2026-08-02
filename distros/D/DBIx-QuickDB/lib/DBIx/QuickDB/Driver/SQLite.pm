@@ -5,7 +5,7 @@ use warnings;
 use IPC::Cmd qw/can_run/;
 use Scalar::Util qw/reftype/;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000060';
 
 use parent 'DBIx::QuickDB::Driver';
 
@@ -96,13 +96,36 @@ sub load_sql {
     my $self = shift;
     my ($db_name, $file) = @_;
 
-    my $dbh = $self->connect($db_name, sqlite_allow_multiple_statements => 1, RaiseError => 1, AutoCommit => 1);
-
     open(my $fh, '<', $file) or die "Could not open file '$file': $!";
     my $sql = join "" => <$fh>;
     close($fh);
 
-    $dbh->do($sql) or die $dbh->errstr;
+    my $dbh = $self->connect($db_name, sqlite_allow_multiple_statements => 1, RaiseError => 1, AutoCommit => 1);
+
+    my $result;
+    my $ok = eval {
+        $result = $dbh->do($sql) or die $dbh->errstr;
+        1;
+    };
+    my $error = $@;
+
+    # Do not rely on DBI handle destruction to close the native SQLite file.
+    # On Windows that close can otherwise lag long enough for Driver cleanup to
+    # exhaust its deletion retries and leave the generated database directory.
+    my $disconnect_ok = eval {
+        $dbh->disconnect or die $dbh->errstr;
+        1;
+    };
+    my $disconnect_error = $@;
+
+    unless ($ok) {
+        $error = "SQLite SQL execution failed without an error message\n"
+            unless defined($error) && length("$error");
+        die $error;
+    }
+    die $disconnect_error unless $disconnect_ok;
+
+    return $result;
 }
 
 sub shell_command {

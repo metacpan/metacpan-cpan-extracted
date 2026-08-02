@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000060';
 
 use Capture::Tiny qw/capture/;
 use Carp qw/confess croak/;
@@ -402,6 +402,7 @@ sub bootstrap {
 
     my $init_file = "$self->{+DIR}/init.sql";
     open(my $init, '>', $init_file) or die "Could not open init file: $!";
+    print $init "DROP DATABASE IF EXISTS test;\n";
     print $init "CREATE DATABASE quickdb;\n";
     close($init);
 

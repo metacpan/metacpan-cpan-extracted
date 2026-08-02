@@ -8,6 +8,7 @@ use vars   qw($VERSION);
 
 BEGIN {
     $ENV{'WEBDYNE_CONF'}='.' unless ($ENV{'WEBDYNE_TEST_FILE_PREFIX'} eq '03');
+    $ENV{'WEBDYNE_HEAD_INSERT'}=0 unless ($ENV{'WEBDYNE_TEST_FILE_PREFIX'} eq '03');
 }
 
 #  External Modules
@@ -111,10 +112,10 @@ sub main {
             my %opt=(
 
                 srce        	=> $test_cn,
-                nofilter	=> 1,
-                noperl		=> 1,
-                notimestamp	=> 1,
-                nomanifest	=> 1,
+                no_filter	=> 1,
+                no_perl		=> 1,
+                no_timestamp	=> 1,
+                no_manifest	=> 1,
                 $stage_name	=> 1
                 
             );

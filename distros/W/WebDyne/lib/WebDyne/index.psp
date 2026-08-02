@@ -2,16 +2,16 @@
 #
 <start_html 
     title="File Index" 
-    include_style="@{qw(index.css)}"
+    include_style="@{qw(webdyne.css index.css)}"
     style="@{qw(
-        https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css
+        https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/atom-one-dark.min.css
         https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css
     )}" 
     meta="%{viewport=>'width=device-width, initial-scale=1.0'}"
     script="@{qw(
         https://cdn.jsdelivr.net/npm/htmx.org@1.9.5
         https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js#defer
-        https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js
+        https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js
         https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js#defer
     )}"
     include_script="@{qw(index.js)}"
@@ -21,7 +21,7 @@
 
 
 
-<perl handler="index" run="!{! !shift()->r->header('hx-request') !}">
+<perl handler="index" run="!{! !shift()->r->headers_in('hx-request') !}">
 <header>
   <h1>Index of <span id="current-path">${path_dn}</span></h1>
   <hr>
@@ -33,7 +33,7 @@
       <tr>
         <th><a href="${sort_name_href}">Filename</a></th>
         <th><a href="${sort_mtime_href}">Last Modified</a></th>
-        <th><a href="${sort_size_href}">Size</a></th>
+        <th style="text-align: right"><a href="${sort_size_href}">Size</a></th>
         <th style="text-align: right">View</th>
       </tr>
     </thead>
@@ -42,11 +42,11 @@
       <tr>
         <td><a href="${href}">${filename}</a></td>
         <td>${date}</td>
-        <td>${size}</td>
+        <td style="text-align: right">${size}</td>
         
             <block name="file" display="!{! $_[1]->{'type'} eq 'file' !}" >
             <td style="text-align: right"  x-data="{ isOpen: false }">
-                <a href="#" @click.prevent="toggleSourceRow($el, $data)" class="cursor-pointer inline-flex items-center gap-1"  data-filename="${filename}" data-md5="${md5_hex}">
+                <a href="#" @click.prevent="toggleSourceRow($el, $data)" class="source-toggle"  data-filename="${filename}" data-md5="${md5_hex}">
                     <svg data-lucide="chevron-left" width="16" height="16" :style="isOpen ? 'transform: rotate(-90deg)' : ''" style="transition: transform .15s ease-in-out;"></svg>
                 </a>
             </td>
@@ -94,7 +94,7 @@ __PERL__
 use strict;
 use File::stat;
 use File::Spec::Unix;
-use File::Basename qw(dirname fileparse);
+use File::Basename qw(dirname basename fileparse);
 use POSIX qw(strftime);
 use WebDyne::Constant;
 use WebDyne::Util;
@@ -335,7 +335,12 @@ sub full_dn {
     #
     $path_dn ||= $self->sanitize_path($cgi_or, ($r->path_info() || $ENV{'PATH_INFO'})) ||
         return err('unable to get path');
-    debug("path_dn: $path_dn");
+        
+    #  For Apache - if aliased to index.psp get rid of it from end of path
+    #
+    #my $index_fn=basename($WEBDYNE_DEFAULT_INDEX_FN);
+    #$path_dn=~s/\Q$index_fn\E$//;
+    #debug("path_dn after check: $path_dn");
         
     
     #  Now get real dn and check not higher than document root
@@ -347,12 +352,14 @@ sub full_dn {
         $full_dn=realpath($full_dn);
         if (!defined($full_dn) || (index($full_dn,$root_dn) !=0)) {
             # Bad person, trying to escape
+            debug("root escape detected on full_dn: $full_dn, setting full_dn to root_dn: $root_dn");
             $full_dn=$root_dn;
             next;
         }
         elsif(-f $full_dn) {
             #  Clicked on a file URL which isn't recognised. Go back to index
             #
+            debug("full_dn: $full_dn detected as file, getting dirname($path_dn)");
             $path_dn=dirname($path_dn);
             next;
         }
@@ -363,6 +370,7 @@ sub full_dn {
     #  Reset if things go bad
     #
     unless ($full_dn && (-d $full_dn)) {
+        debug("full_dn: $full_dn not defined or not directory, setting to root_dn: $root_dn");
         $full_dn=$root_dn;
     }
     
@@ -395,6 +403,7 @@ sub index {
     #
     my $path_dn=$self->sanitize_path($cgi_or, ($r->path_info() || $ENV{'PATH_INFO'})) ||
         return err('unable to get path');
+    debug("path_dn: $path_dn, url:%s,  path_info:%s, PATH_INFO:%s", $r->url, $r->path_info(), $ENV{'PATH_INFO'});
         
     
     #  Now get real dn and check not higher than document root
@@ -402,6 +411,7 @@ sub index {
     my $root_dn=$r->document_root();
     my $full_dn=$self->full_dn() ||
         return err('no full_dn');
+    debug("root_dn: $root_dn, full_dn: $full_dn");
 
     
     #  Reset if things go bad
@@ -599,6 +609,8 @@ sub sanitize_path {
     $dn = File::Spec->canonpath($dn);
     $dn =~ s{[^A-Za-z0-9_\-.\s/]}{}g;
     $dn ='/' unless $dn =~ m{^/};
+    my $index_fn=basename($WEBDYNE_DEFAULT_INDEX_FN);
+    $dn=~s/\Q$index_fn\E$//;
     return $dn;
     
 }

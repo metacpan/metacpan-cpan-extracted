@@ -5,7 +5,7 @@ use warnings;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION =  0.16;
+$VERSION =  0.17;
 
 sub new {
 	my $class = shift;
@@ -19,7 +19,7 @@ sub new {
 
 sub add {
 	my ($self, $entry, $index) = @_;
-	if ($self->exist($entry)) {
+	if ($self->exist($entry->name)) {
 		croak "Entry '$entry' already exists";
 		return
 	}
@@ -29,7 +29,7 @@ sub add {
 	
 	$i->{$entry->name} = $index;
 	splice(@$l, $index, 0, $entry);
-	grep {	$i->{$l->[$_]->name} = $_ } $index .. @$l - 1;
+	$i->{$l->[$_]->name} = $_ for $index .. @$l - 1; #rebuild the index
 }
 
 sub delete {
@@ -41,7 +41,7 @@ sub delete {
 		$del->clear;
 		my $i = $self->{INDEX};
 		delete $i->{$name};
-		grep {	$i->{$l->[$_]->name} = $_ } $index .. @$l - 1;
+		$i->{$l->[$_]->name} = $_ for $index .. @$l - 1; #rebuild the index
 		return $del
 	}
 	croak "Entry '$name' not found";

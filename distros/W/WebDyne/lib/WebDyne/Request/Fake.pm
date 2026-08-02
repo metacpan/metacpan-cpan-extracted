@@ -1,3 +1,4 @@
+
 #
 #  This file is part of WebDyne.
 #
@@ -18,7 +19,7 @@ package WebDyne::Request::Fake;
 #  Compiler Pragma
 #
 use strict qw(vars);
-use vars   qw($VERSION $AUTOLOAD);
+use vars   qw($VERSION $AUTOLOAD %Package);
 use warnings;
 no warnings qw(uninitialized);
 
@@ -27,24 +28,24 @@ no warnings qw(uninitialized);
 #
 use Cwd qw(fastcwd);
 use Data::Dumper;
-use HTTP::Status (RC_OK);
+use HTTP::Status qw(status_message HTTP_OK HTTP_NOT_FOUND HTTP_FOUND);
+use HTTP::Headers::Fast;
+use HTTP::Negotiate qw(choose);
+use HTTP::AcceptLanguage;
+use HTTP::Headers::Util qw(split_header_words);
+use CGI::Simple::Cookie;
+use File::stat;
+use File::Spec;
+use File::Spec::Unix;
 use WebDyne::Util;
 use WebDyne::Constant;
-
-
-#  Var to hold package wide hash, for data shared across package
-#
-my %Package;
-
-
-#  Snapshot environment for Dir_config
-#
-#my %Dir_config_env;
+use WebDyne::Request::Common qw(handler_methods_all handler_methods_check);
+use URI;
 
 
 #  Version information
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
 #  Debug load
@@ -52,9 +53,9 @@ $VERSION='2.075';
 debug("Loading %s version $VERSION", __PACKAGE__);
 
 
-#  Run init code for utility accessors unless already done
+#  Run init code for utility accessors unless already done. Picked method() as arbitrary test
 #
-&_init unless defined(&method);
+&init() unless defined(&method);
 
 
 #  All done. Positive return
@@ -64,39 +65,232 @@ debug("Loading %s version $VERSION", __PACKAGE__);
 
 #==================================================================================================
 
-sub _init {
 
-    #  Load quick and dirty mod_perl equivalent handler accessors that get info from
-    #  environment vars if they exist
+sub init {
+
+
+    #  Do ENV filtering here
     #
-    my %handler=(
-        method          => 'REQUEST_METHOD',
-        protocol        => 'SERVER_PROTOCOL',
-        args            => 'QUERY_STRING',
-        path_info       => 'PATH_INFO',
-        content_length  => 'CONTENT_LENGTH',
-        hostname        => 'SERVER_NAME',
-        get_server_name => 'SERVER_NAME',
-        get_server_port => 'SERVER_PORT',
-        get_remote_host => 'REMOTE_ADDR',
-        user            => 'REMOTE_USER',
-        ap_auth_type    => 'AUTH_TYPE',
-        unparsed_uri    => 'REQUEST_URI',
+    local %ENV=(
+        (map { $_=>$ENV{$_}  } (
+            grep { defined($ENV{$_}) } (qw(
+                DOCUMENT_DEFAULT
+                DOCUMENT_ROOT
+                REQUEST_METHOD
+                REQUEST_URI
+                PATH_INFO
+                SCRIPT_NAME
+                QUERY_STRING
+                SERVER_PROTOCOL
+                SERVER_NAME
+                SERVER_PORT
+                REMOTE_ADDR
+                REMOTE_PORT
+                REMOTE_USER
+                AUTH_TYPE
+                HTTPS 
+                APPL_MD_PATH
+            ),
+            (grep {/^WEBDYNE/i} keys %ENV), # Note not WEBDYNE_, just /WEBDYNE/i to allow for DirConfig type entries such as WebDyneHandler
+            (grep {/^HTTP_/i} keys %ENV),
+            (grep {/^CONTENT_/i} keys %ENV)
+        )))
     );
-    while (my ($k, $v)=each %handler) {
-        *{$k}=sub { return $ENV{$v} } unless defined &{$k}
+
+
+    #  Setup pass through methods
+    #
+    my %method=(
+        accept_encoding     => sub { shift()->headers_in('accept-encoding') },
+        accept_language     => sub { shift()->headers_in('accept-language') },
+        accept              => sub { shift()->headers_in('accept') },
+        args                => sub { shift()->env->{'QUERY_STRING'} },
+        as_string           => undef,
+        authority           => sub { shift()->uri->authority },
+        authorization       => sub { shift()->headers_in('authorization') },
+        auth_type           => sub { shift()->{'env'}->{'AUTH_TYPE'} },
+        base                => 'base_url',
+        #base_url            => sub { URI->new($_[0]->host . $_[0]->script_name()) },
+        base_url            => sub { my $uri_or=shift()->uri->canonical->clone; $uri_or->path('/'), $uri_or->query(undef); $uri_or },
+        body_handle         => sub { shift->{'input'} },
+        body                => undef,
+        cache_control       => sub { shift()->headers_in('cache-control') },
+        charset             => sub { my $content_type=shift()->content_type || return; (my @split=split_header_words($content_type)) || return; my %param=@{$split[0]}; return lc($param{'charset'}) },
+        cleanup_register    => undef,
+        client_address      => sub { shift()->env->{'REMOTE_ADDR'} },
+        content             => 'body',
+        content_encoding    => sub { shift()->headers_in('content-encoding') },
+        content_length      => undef,
+        content_type        => undef,
+        cookie              => 'cookies',
+        cookies             => undef,
+        custom_response     => undef,
+        cwd                 => undef,
+        dir_config          => undef,
+        document_root       => undef,
+        env                 => sub { \%ENV },
+        etag                => sub { shift()->headers_out('etag', @_) },
+        filename            => undef,
+        finalize            => undef,
+        finfo               => undef,
+        form_parameters     => undef,
+        forwarded_for       => sub { shift()->headers_in('x-forwarded-for') },
+        fragment            => sub { shift()->uri->fragment },
+        handler             => undef,
+        header              => 'headers_in',
+        headers             => 'headers_in',
+        header_only         => undef,
+        headers_in          => undef,
+        headers_out         => undef,
+        hostname            => sub { shift()->env->{'SERVER_NAME'} }, # Prob should be local host name
+        #host                => sub { shift()->uri->host if $_[0]->uri->authority },
+        host                => sub { shift()->headers_in('host') },
+        https               => sub { shift()->env->{'HTTPS'} },
+        http_version        => 'protocol',
+        id                  => undef,
+        if_modified_since   => sub { shift()->headers_in('if-modified-since') },
+        if_none_match       => sub { shift()->headers_in('if-none-match') },
+        input               => sub { shift()->{'input'} },
+        is_ajax             => sub { (shift()->headers_in('x-requested-with') eq 'XMLHttpRequest') },
+        is_main             => undef,
+        location            => undef,
+        log_error           => undef,
+        lookup_file         => undef,
+        lookup_uri          => undef,
+        main                => undef,
+        media_type             => sub { my $content_type=shift()->content_type || return; (my @split=split_header_words($content_type)) || return; return lc($split[0][0]) },
+        method              => sub { shift->env->{'REQUEST_METHOD'} || 'GET' },
+        mtime               => undef,
+        multipart_parameters=> undef,
+        next                => undef,
+        notes               => undef,
+        origin              => sub { shift()->headers_in('origin') },
+        output_filters      => undef,
+        path_info           => sub { shift->env->{'PATH_INFO'} },
+        path_parameters     => undef,
+        path                => 'path_info',
+        pool                => undef,
+        preferred_charset   => undef,
+        preferred_encoding  => undef,
+        preferred_language  => undef,
+        preferred_media_type=> undef,
+        prev                => undef,
+        print               => undef,
+        protocol            => sub { shift()->env->{'SERVER_PROTOCOL'} || 'HTTP/1.1' },
+        query_parameters    => undef,
+        query_string        => 'args',
+        redirect            => undef,
+        referer             => sub { shift()->headers_in('referer') },
+        register_cleanup    => 'cleanup_register',
+        remote_address      => 'client_address',
+        remote_host         => 'client_address',
+        remote_port         => sub { shift()->env->{'REMOTE_PORT'} },
+        remote_user         => 'user',
+        request_time        => undef,
+        route               => undef,
+        run                 => undef,
+        scheme              => undef,
+        script_name         => sub { shift()->env->{'SCRIPT_NAME'} },
+        secure              => sub { (shift()->https eq 'on') },
+        sendfile            => undef,
+        send_http_header    => undef,
+        server_name         => sub { shift()->env->{'SERVER_NAME'} },
+        server_port         => sub { shift()->env->{'SERVER_PORT'} },
+        session_id          => undef,
+        session             => undef,
+        set_handlers        => undef,
+        status_line         => undef,
+        status              => undef,
+        unparsed_uri        => sub { shift()->filename() },
+        uploads             => undef,
+        #uri                 => sub { $_[0]->{'uri'} ||= URI->new($_[0]->filename()) },
+        uri                 => undef,
+        url                 => 'uri',
+        user_agent          => sub { shift()->headers_in('user-agent') },
+        user                => sub { shift()->env->{'REMOTE_USER'} },
+        write               => undef,
+        err_html            => undef,
+        DESTROY             => undef
+            
+    );
+
+
+    #   Not really valid here but setup anyway
+    #
+    foreach my $handler (qw(req res)) {
+        *{$handler}=sub { return shift() };
     }
 
+
+    #  Now setup abstraction methods. Slightly different than PSGI, PAGI, Apache so just do it here
+    #
+    my %method_check;
+    while (my ($method, $dispatch)=each %method) {
+        $method_check{$method}++;
+        if (defined(*{sprintf('%s::%s', __PACKAGE__, $method)}{'CODE'})) {
+            #  Do nothing, defined here
+            #
+            warn("duplicate method for $method") if $dispatch;
+            debug("skip $method, defined in this package");
+            
+        }
+        elsif (!defined($dispatch)) {
+            #  Do nothing, will fall through
+            #
+            debug("skip $method, will inherit from Fake");
+        }
+        elsif (ref($dispatch) eq 'CODE') {
+            #  Turn into method
+            #
+            debug("setting method: $method to code ref: $dispatch");
+            *{$method}=$dispatch;
+        }
+        else {
+            #  Existing method
+            #
+            debug("setting method: $method to dispatch: $dispatch");
+            *{$method}=sub { shift()->$dispatch(@_) };
+        }
+    }
+    
+    
+    #  Done, do runtime check and return, will warn if we have missed anything
+    #
+    return handler_methods_check(__PACKAGE__, \%method_check);
+    
 }
 
 
-sub dir_config0 {
+sub uri {
 
-    #  Old very simplistic dir_config
-    #
-    my ($r, $key)=@_;
-    return $ENV{$key};
+    $_[0]->{'uri'} ||= URI->new($_[0]->filename()) 
+    
+}
 
+
+sub body {
+
+    my $r=shift();
+    return $r->{'body'} ||= do {
+        if (my $fh=$r->{'input'}) {
+            seek($fh,0,0);
+            local $/;
+            <$fh>
+        }
+    };
+    
+}
+
+
+sub cookies {
+
+    my $r=shift();
+    my %cookies=CGI::Simple::Cookie->parse(
+        $r->headers_in('cookie'));
+    if (@_) {
+        $r->headers_out('set-cookie', CGI::Simple::Cookie->new(@_)->as_string());
+    }
+    return \%cookies;
 }
 
 
@@ -177,7 +371,7 @@ sub dir_config {
             #  Get location we are operating in
             #
             my $location=$r->location();
-            debug("in dir_config looking for key $key at location $location");
+            debug("in dir_config looking for key: $key at location: $location");
             
             
             #  Array of hashes we may need to look through
@@ -207,32 +401,34 @@ sub dir_config {
             #  Now iterate across array, return on first match
             #
             foreach my $hr (@constant_hr) {
+                my %location;
                 foreach my $hr_key ($location, '') {
-                    debug("looking at hr: $hr, k: $hr_key");
+                    next if ($location{$location}++);
+                    debug("looking at hr: $hr, hr_key: $hr_key");
                     #  Maybe $hr->{$location}{$key} or $hr->{''}{$key} ?
                     #
                     if (exists $constant_hr->{$hr_key}) {
-                        debug('found $hr->{%s}', $hr_key);
+                        debug("found hr: $hr, hr_key: $hr_key");
                         return $hr->{$hr_key}{$key} if exists($hr->{$hr_key}{$key});
                     }
                     else {
-                        debug('no match on hr:$hr {%s}', $hr_key);
+                        debug("no match on hr: $hr, hr_key: $hr_key");
                     }
                 }
                 #  No - $hr->{$key} is last chance
                 #
                 if (exists $hr->{$key}) {
-                    debug('found $hr->{%s}', $key);
+                    debug("found hr: $hr, key: $key");
                     return $hr->{$key}
                 }
                 else {
-                    debug("no match on $hr {%s}", $key);
+                    debug("no match on hr: $hr, key: $key");
                 }
             }
                 
             #  Nothing found
             #
-            debug("no key found for location: $location or any other match, %s");
+            debug("no key found for location: $location or any other match");
             return undef;
             
         }
@@ -246,7 +442,7 @@ sub dir_config {
         #my %dir_config=(%{$constant_hr}, %Dir_config_env);
         my %dir_config=(
             %{$constant_hr}, 
-            (map { $_=>$ENV{$_} } grep {/^WebDyne/i} keys %ENV), 
+            (map { $_=>$ENV{$_} } grep {/^WEBDYNE_/i} keys %ENV), 
             (map { $_=>$ENV{$_} } grep {exists $ENV{$_} } keys %{$constant_hr})
             #(map { $_=>$ENV{$_} } @{$WEBDYNE_PSGI_ENV_KEEP},
             #%{$WEBDYNE_PSGI_ENV_SET}
@@ -260,6 +456,7 @@ sub dir_config {
 sub filename {
 
     my $r=shift();
+    return undef unless defined $r->{'filename'};
 
     #  Store cwd as takes a fair bit of processing time.
     File::Spec->rel2abs($r->{'filename'}, ($Package{'_cwd'} ||= fastcwd()));
@@ -267,41 +464,25 @@ sub filename {
 }
 
 
-sub headers {
-
-    #  Set/get header. r=request, d=direction(in/out), k=key, v=value
-    #
-    my ($r, $d, $k, $v)=@_;
-    
-    if (@_ == 4) {
-        return $r->{$d}{$k}=$v
-    }
-    elsif (@_ == 3) {
-        return $r->{$d}{$k}
-    }
-    elsif (@_ == 2) {
-        return ($r->{$d} ||= {});
+sub headers_in {
+    my $r=shift();
+    if (@_) {
+        return ($r->{'headers_in'} ||= HTTP::Headers::Fast->new())->header(@_);
     }
     else {
-        return err("incorrect usage of %s $d object, r->$d(%s)", ref($r), join(',', @_[1..$#_]));
+        return ($r->{'headers_in'} ||= HTTP::Headers::Fast->new());
     }
-
 }
 
 
 sub headers_out {
-
     my $r=shift();
-    return $r->headers('headers_out', @_);
-    
-}
-
-
-sub headers_in {
-
-    my $r=shift();
-    return $r->headers('headers_in', @_);
-    
+    if (@_) {
+        return ($r->{'headers_out'} ||= HTTP::Headers::Fast->new())->header(@_);
+    }
+    else {
+        return ($r->{'headers_out'} ||= HTTP::Headers::Fast->new());
+    }
 }
 
 
@@ -321,27 +502,20 @@ sub log_error {
 }
 
 
-sub lookup_file0 {
-
-    #  Old, simplistic version
-    #
-    my ($r, $fn)=@_;
-    my $r_child=ref($r)->new(filename => $fn, main=>$r) || return err();
-
-}
-
 
 sub lookup_file {
 
     my ($r, $fn)=@_;
+    debug("r: $r, fn: $fn");
     my $r_child;
     if ($fn!~WEBDYNE_PSP_EXT_RE) { # fastest
 
 
         #  Static file. Should migrate to this module but OK is PSGI for moment
         #
+        debug('non psp file, passing to WebDyne::Request::PSGI::Static');
         require WebDyne::Request::PSGI::Static;
-        $r_child=WebDyne::Request::PSGI::Static->new(filename => $fn, prev => $r) ||
+        $r_child=WebDyne::Request::PSGI::Static->new(filename => $fn, prev => $r, env=>$r->env()) ||
             return err();
 
     }
@@ -350,12 +524,14 @@ sub lookup_file {
 
         #  Subrequest
         #
+        debug('psp file, creating new request');
         $r_child=ref($r)->new(filename => $fn, prev => $r) || return err();
 
     }
 
     #  Return child
     #
+    debug("returning r_child: $r_child");
     return $r_child;
 
 }
@@ -381,9 +557,40 @@ sub main {
 
 sub new {
 
+
+    #  Instantiate new fake handler
+    #
     my ($class, %r)=@_;
     debug("$class, r:%s", Dumper(\%r));
-    return bless \%r, $class;
+    my $r=bless(\%r, $class);
+
+
+    #  Now move ENV into headers
+    #
+    foreach my $env ((grep {/^HTTP_/} keys %ENV), qw(CONTENT_TYPE CONTENT_LENGTH)) {
+        my $header=$env;
+        exists $ENV{$header} || next;
+        my $value=$ENV{$header};
+        $header=~s/^HTTP_//;
+        $header=~s/_/-/g;
+        debug("setting header: $header, value: $value");
+        $r->headers_in(lc($header), $value);
+    }
+    
+    
+    #  If Headers in supplied as array or hash ref convert
+    #
+    if (ref($r{'headers_in'}) eq 'ARRAY') {
+        $r{'headers_in'}=HTTP::Headers::Fast->new(@{$r->{'headers_in'}})
+    }
+    elsif (ref($r{'headers_in'}) eq 'HASH') {
+        $r{'headers_in'}=HTTP::Headers::Fast->new(%{$r->{'headers_in'}})
+    }
+    
+        
+    #  Done
+    #
+    return $r;
 
 }
 
@@ -407,13 +614,6 @@ sub notes {
 }
 
 
-sub parsed_uri {
-
-    my $r=shift();
-    require URI;
-    URI->new($r->uri());
-
-}
 
 
 sub prev {
@@ -434,7 +634,7 @@ sub print {
 }
 
 
-sub register_cleanup {
+sub cleanup_register {
 
     #my $r=shift();
     my ($r, $cr)=@_;
@@ -446,11 +646,6 @@ sub register_cleanup {
 }
 
 
-sub cleanup_register {
-
-    &register_cleanup(@_);
-
-}
 
 
 sub pool {
@@ -476,14 +671,7 @@ sub run {
 sub status {
 
     my $r=shift();
-    @_ ? $r->{'status'}=shift() : $r->{'status'} || RC_OK;
-
-}
-
-
-sub uri {
-
-    shift()->{'filename'}
+    @_ ? $r->{'status'}=shift() : $r->{'status'} || HTTP_OK;
 
 }
 
@@ -504,16 +692,60 @@ sub output_filters {
 
 sub location {
 
-    #  Get/set location
-    my ($self, $location)=@_;
-    if ($location) {
-        return $self->{'location'}=$location;
+
+    #  Equiv to Apache::RequestUtil->location;
+    #
+    my $r=shift();
+    debug("r: $r, caller: %s", Dumper([caller(0)]));
+    my $location;
+    my $constant_hr=$WEBDYNE_DIR_CONFIG;
+    my $constant_server_hr;
+    #if (my $server=$Dir_config_env{'WebDyneServer'} || $ENV{'SERVER_NAME'}) {
+    if (my $server=$ENV{'WebDyneServer'} || $ENV{'SERVER_NAME'}) {
+        $constant_server_hr=$constant_hr->{$server} if exists($constant_hr->{$server})
+    }
+    #if ($Dir_config_env{'WebDyneLocation'} || $ENV{'APPL_MD_PATH'}) {
+    if ($location=$r->{'location'}) {
+        return $location;
+    }
+    elsif ($ENV{'WebDyneLocation'} || $ENV{'APPL_MD_PATH'}) {
+
+        #  APPL_MD_PATH is IIS virtual dir. If that or a fixed location set use it.
+        #
+        #$location=$Dir_config_env{'WebDyneLocation'} || $ENV{'APPL_MD_PATH'};
+        $location=$ENV{'WebDyneLocation'} || $ENV{'APPL_MD_PATH'};
+    }
+    elsif (my $uri_path=join('', grep {$_} @ENV{qw(SCRIPT_NAME PATH_INFO)})) {
+        
+        #  Strip file name
+        #
+        $uri_path=~s{[^/]+\Q@{[WEBDYNE_PSP_EXT]}\E$}{}x; #\
+        debug("uri_path: $uri_path");
+        my @location=('/', grep {$_} File::Spec::Unix->splitdir($uri_path));
+        
+        #  Start iterating through directories
+        #
+        while ($location=File::Spec::Unix->catdir(@location)) {
+            debug("location: $location");
+            last if exists($constant_hr->{$location}) || exists($constant_server_hr->{$location});
+            $location.='/' unless ($location eq '/');
+            last if exists($constant_hr->{$location}) || exists($constant_server_hr->{$location});
+            pop @location;
+        }
     }
     else {
-        return $self->{'location'} || $ENV{'WebDyneLocation'}
+        
+        #  Actually mod_perl spec says location blank if not positively given - don't default to '/'
+        #
+        #$location=File::Spec::Unix->rootdir();
     }
+    
+    #  
+    #
+    return $location;
 
 }
+
 
 
 sub header_only {
@@ -528,12 +760,6 @@ sub set_handlers {
 }
 
 
-sub noheader {
-
-    my $r=shift();
-    @_ ? $r->{'header'}=shift() : $r->{'header'};
-
-}
 
 
 sub send_http_header {
@@ -542,7 +768,7 @@ sub send_http_header {
     return unless $r->{'header'};
     my $fh=$r->{'select'} || \*STDOUT;
     CORE::printf $fh ("Status: %s\n", $r->status());
-    while (my ($header, $value)=each(%{$r->{'headers_out'}})) {
+    while (my ($header, $value)=each(%{$r->headers_out()})) {
         CORE::print $fh ("$header: $value\n");
     }
     CORE::print $fh "\n";
@@ -550,11 +776,21 @@ sub send_http_header {
 }
 
 
-sub content_type {
+sub content_type { # Was bi-directional but now only reads from response headers.
 
     my ($r, $content_type)=@_;
-    return ($content_type ? $r->{'headers_out'}{'Content-Type'}=$content_type : $ENV{'CONTENT_TYPE'});
-    #CORE::print("Content-Type: $content_type\n");
+    debug("r: $r, %s", Dumper(\@_));
+    #return ($content_type ? $r->headers_out('content-type', $content_type) : $r->headers_in('content-type'));
+    return ($content_type ? $r->headers_out('content-type', $content_type) : $r->headers_out('content-type'));
+
+}
+
+
+sub content_length {
+
+    my ($r, $content_length)=@_;
+    debug("r: $r, %s", Dumper(\@_));
+    return ($content_length ? $r->headers_out('content-length', $content_length) : $r->headers_in('content-length'));
 
 }
 
@@ -571,18 +807,11 @@ sub handler {
 
 sub custom_response {
 
-    my ($r, $status)=(shift, shift);
-    $r->status($status);
-    $r->send_http_header();
-    $r->print(@_);
+    my ($r, $status)=(shift(), shift());
+    while ($r->prev) {$r=$r->prev}
+    debug("in custom response, status $status");
+    @_ ? $r->{'custom_response'}{$status}=shift() : $r->{'custom_response'}{$status};
 
-}
-
-
-sub args {
-
-    return $ENV{'QUERY_STRING'};
-    
 }
 
 
@@ -612,7 +841,192 @@ sub cwd {
 }
 
 
-sub AUTOLOAD {
+# TO DO
+#
+sub status_line {
+
+    my $r=shift();
+    return sprintf('%s %s',$r->status, status_message($r->status));
+    
+}
+
+
+sub write {
+
+    #  Just print for Fake, other handlers can map to native
+    #
+    return &print(@_);
+    
+}
+
+
+sub finalize {
+
+    #  No op
+    
+}
+
+
+sub redirect {
+
+    #  No op
+
+}
+
+
+
+sub as_string {
+
+    my $r=shift();
+    my @return;
+    push @return, join(' ', map {$r->$_} qw(method unparsed_uri protocol));
+    push @return, $r->headers_in->as_string();
+    push @return, undef; #Blank line between headers and body
+    push @return, $r->body();
+    return join("\n", grep {$_} @return);
+
+}
+
+
+sub mtime {
+
+    shift()->finfo->mtime();
+
+}
+
+sub next {
+
+}
+
+
+sub preferred_charset {
+
+    return &preferred_media_type(@_);    
+    
+}
+
+sub preferred_encoding {
+
+    return &preferred_media_type(@_);    
+    
+}
+
+
+sub preferred_language {
+
+    my ($r, $lang_ar, @param)=@_;
+    unless (ref($lang_ar) eq 'ARRAY') {
+        $lang_ar=[$lang_ar, @param];
+    }
+    return HTTP::AcceptLanguage->new($r->accept_language())->match(@{$lang_ar});
+    
+
+}
+
+
+sub preferred_media_type {
+
+    my ($r, $variant_ar, @param)=@_;
+    unless (ref($variant_ar) eq 'ARRAY') {
+        $variant_ar=[map {[$_]} $variant_ar, @param];
+    }
+    return choose($variant_ar, $r->headers_in);
+
+}
+
+
+sub session {
+
+}
+
+sub session_id {
+
+}
+
+sub route {
+
+}
+
+sub path_parameters {
+
+}
+
+
+sub sendfile {
+
+}
+
+
+sub finfo {
+
+    return stat(shift->filename());
+    
+}
+
+sub form_parameters {
+
+}
+
+sub id {
+
+}
+
+sub multipart_parameters {
+
+}
+
+sub query_parameters {
+
+    use Hash::MultiValue;
+    return Hash::MultiValue->new(shift()->uri->query_form);
+
+}
+
+sub request_time {
+
+}
+
+sub scheme {
+
+    return 'http',
+    
+}
+
+
+sub uploads {
+
+}
+
+
+# Error handling, autoload
+
+
+sub err_html {
+
+    #  Very basic HTML error messages for file not found and similar
+    #
+    my ($r, $status, $error)=@_;
+    require WebDyne::HTML::Tiny;
+    my $html_or=WebDyne::HTML::Tiny->new( mode=>$WEBDYNE_HTML_TINY_MODE, r=>$r ) ||
+        return err();
+    #my $heading=sprintf("%s error - $error", ref($r) || __PACKAGE__);
+    my $heading=sprintf("%s error.", ref($r) || __PACKAGE__);
+    my @body=(
+        $html_or->start_html(title=>"WebDyne Error: $status"),
+        $html_or->h3($heading),
+        $html_or->hr(),
+        $html_or->em(status_message($status) || 'Unknown Error'), $html_or->br(), $html_or->br(),
+        $html_or->pre(
+            sprintf("The requested URI '%s' generated error:\n\n$error", $r->uri)
+        ),
+        $html_or->end_html()
+    );
+    return join('', @body);
+
+}
+
+
+sub AUTOLOAD { #no subsort
 
     my ($r, $v)=@_;
     debug("$r AUTOLOAD: $AUTOLOAD, v: $v");
@@ -624,14 +1038,254 @@ sub AUTOLOAD {
 }
 
 
-sub DESTROY {
+sub DESTROY { #no subsort
 
     my $r=shift();
     debug("$r DESTROY");
     if (my $cr_ar=delete $r->{'register_cleanup'}) {
-        foreach my $cr (@{$cr_ar}) {
+        debug('found cleanup code refs: %s', Dumper($cr_ar));
+        foreach my $cr (grep {ref($_) eq 'CODE'} @{$cr_ar}) {
+            debug("running code ref: $cr against r: $r");
             $cr->($r);
         }
     }
+    else {
+        debug('no cleanup code registered');
+    }
 
 }
+
+__END__
+
+=begin markdown
+
+# WebDyne::Request::Fake #
+
+# NAME #
+
+WebDyne::Request::Fake - synthetic request/response object used for direct WebDyne rendering
+
+# SYNOPSIS #
+
+```perl
+use WebDyne::Request::Fake;
+
+my $r = WebDyne::Request::Fake->new(
+    filename => 'page.psp',
+    method   => 'GET',
+);
+```
+
+# DESCRIPTION #
+
+`WebDyne::Request::Fake` is the baseline WebDyne request adapter. It is used when rendering pages outside a real web server environment, for example through `WebDyne::html`, `WebDyne::html_sr`, `wdrender`, and related command-line tooling.
+
+The module provides a normalized request/response API and also acts as the fallback implementation for methods not implemented by more specific request adapters.
+
+# METHODS #
+
+Notable methods implemented directly by this class include:
+
+* **new(%options)**
+
+    Construct a synthetic request object.
+
+* **filename()**
+
+    Get or derive the current source filename being requested.
+
+* **uri()**
+
+    Return a `URI` object for the current request.
+
+* **headers_in() / headers_out()**
+
+    Access request and response headers.
+
+* **status() / status_line()**
+
+    Access or update response status information.
+
+* **print() / write()**
+
+    Append response body output.
+
+* **finalize()**
+
+    Finalize the synthetic response for downstream consumers.
+
+* **redirect($url)**
+
+    Set redirect-style response headers and status.
+
+* **dir_config($name)**
+
+    Look up directory-style configuration, including values sourced from `WEBDYNE_DIR_CONFIG` and optional local `.webdyne.conf.pl` loading.
+
+* **err_html()**
+
+    Generate an error response using WebDyne’s HTML error facilities.
+
+# NOTES #
+
+`WebDyne::Request::Fake` intentionally carries both request and response responsibilities. More specialized adapters such as `WebDyne::Request::Apache`, `WebDyne::Request::PSGI`, and `WebDyne::Request::PAGI` inherit from it for missing behavior.
+
+# AUTHOR #
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 WebDyne::Request::Fake
+
+
+=head1 NAME
+
+WebDyne::Request::Fake - synthetic request/response object used for direct WebDyne rendering
+
+
+=head1 SYNOPSIS
+
+
+ use WebDyne::Request::Fake;
+ 
+ my $r = WebDyne::Request::Fake->new(
+     filename => 'page.psp',
+     method   => 'GET',
+ );
+
+=head1 DESCRIPTION
+
+C<WebDyne::Request::Fake> is the baseline WebDyne request adapter. It is used when rendering pages outside a real web server environment, for example through C<WebDyne::html>, C<WebDyne::html_sr>, C<wdrender>, and related command-line tooling.
+
+The module provides a normalized request/response API and also acts as the fallback implementation for methods not implemented by more specific request adapters.
+
+
+=head1 METHODS
+
+Notable methods implemented directly by this class include:
+
+=over
+
+=item *
+
+B<new(%options)>
+
+Construct a synthetic request object.
+
+
+
+=item *
+
+B<filename()>
+
+Get or derive the current source filename being requested.
+
+
+
+=item *
+
+B<uri()>
+
+Return a C<URI> object for the current request.
+
+
+
+=item *
+
+B<headers_in() / headers_out()>
+
+Access request and response headers.
+
+
+
+=item *
+
+B<status() / status_line()>
+
+Access or update response status information.
+
+
+
+=item *
+
+B<print() / write()>
+
+Append response body output.
+
+
+
+=item *
+
+B<finalize()>
+
+Finalize the synthetic response for downstream consumers.
+
+
+
+=item *
+
+B<redirect($url)>
+
+Set redirect-style response headers and status.
+
+
+
+=item *
+
+B<dir_config($name)>
+
+Look up directory-style configuration, including values sourced from C<WEBDYNE_DIR_CONFIG> and optional local C<.webdyne.conf.pl> loading.
+
+
+
+=item *
+
+B<err_html()>
+
+Generate an error response using WebDyne’s HTML error facilities.
+
+
+
+=back
+
+
+=head1 NOTES
+
+C<WebDyne::Request::Fake> intentionally carries both request and response responsibilities. More specialized adapters such as C<WebDyne::Request::Apache>, C<WebDyne::Request::PSGI>, and C<WebDyne::Request::PAGI> inherit from it for missing behavior.
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
+
+=cut

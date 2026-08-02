@@ -1,0 +1,50 @@
+<start_html>
+<form method=post>
+<textfield name=name value="Your Name">
+<submit>
+</form>
+R
+<pre>
+<perl handler autonewline/>
+</pre>
+CGI
+<pre>
+<? Dumper(scalar shift()->CGI->Vars()) ?>
+<? Dumper(shift()->CGI()) ?>
+__PERL__
+use WebDyne::Request::Common qw(handler_methods_all);
+use Data::Dumper;
+use WebDyne::Util;
+local $Data::Dumper::Indent=1;
+local $Data::Dumper::Sortkeys=1;
+
+sub handler {
+    my $self=shift();
+    my $r=$self->r();
+    my @method_skip=(qw(
+        lookup_file
+        lookup_uri
+        register_cleanup
+        run
+        header
+        redirect
+        set_handlers
+    ));
+    my %method_skip=map { $_=>1 } @method_skip;
+    my @ret;
+    #my $i;
+    foreach my $method (@{&handler_methods_all}) {
+        next if $method_skip{$method};
+        next if ($_{'method'} && ($method ne $_{'method'}));
+        #$i++;
+        #last if ($i > 20);
+        debug($method);
+        my $value=$r->$method();
+        #my $ret="$method: ". ref($value) ? Dumper($value) : $value;
+        push @ret, [$method => $value];
+        #$r->print($ret);
+        #print "$method: ". $r->$method, "\n";
+        #print "$method \n";
+    }
+    return Dumper(\@ret);
+}

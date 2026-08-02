@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -3227,6 +3227,7 @@ sub refreshLoop {
 				my @params = $self->refreshParams;
 				my $sel;
 				my $entry = $self->getIndex($pos);
+				my $name = $entry->name;
 				$handler->draw($entry, @params);
 				@params = $handler->nextPosition(@params);
 				$self->refreshParams(@params);

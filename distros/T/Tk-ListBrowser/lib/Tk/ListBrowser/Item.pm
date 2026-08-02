@@ -47,6 +47,7 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 	$self->drawrect(1) unless $self->configSet('-drawrect');
+	$self->croptext(1) unless $self->configSet('-croptext');
 	$self->rectX(0);
 	$self->rectY(0);
 	return $self
@@ -78,6 +79,12 @@ sub column {
 	my $self = shift;
 	$self->{COLUMN} = shift if @_;
 	return $self->{COLUMN}
+}
+
+sub croptext {
+	my $self = shift;
+	$self->{CROPTEXT} = shift if @_;
+	return $self->{CROPTEXT}
 }
 
 sub ctext {
@@ -610,6 +617,31 @@ sub textAbbreviate {
 	return $string;
 }
 
+sub textCrop {
+	my ($self, $text) = @_;
+#	print "textCrop\n";
+	return $text unless $self->listMode;
+	return $text unless $self->croptext;
+	my $c = $self->Subwidget('Canvas');
+	my $owner = $self->owner;
+
+	my @col = $self->columnList;
+	if (@col) {
+		if (($self->isentry) or ($owner->name ne $col[@col-1])) {
+			my $cellwidth = $owner->cget('-cellwidth');
+			my $pixlength = $self->fontMeasure($self->font, $text);
+			if ($pixlength > $cellwidth) {
+				my $charlength = length($text);
+				my $pixperchar = $pixlength / $charlength;
+				my $newlength = int($cellwidth/$pixperchar) + 2;
+				$text = substr($text, 0, $newlength);
+			}
+		}
+	}
+
+	return $text
+}
+
 sub textFormatted {
 	my $self = shift;
 	$self->{TEXTFORMATTED} = shift if @_;
@@ -630,7 +662,7 @@ sub textFormat {
 	my $font = $self->font;
 	my $length = $self->textlength;
 	$text = $self->textAbbreviate($text, $length) if $length > 0;
-	return $text if $wraplength eq 0;
+	return $self->textCrop($text) if $wraplength eq 0;
 	my @lines = split (/\n/, $text);
 	my @out;
 	for (@lines) {
@@ -654,7 +686,7 @@ sub textFormat {
 	}
 	my $result = '';
 	while (@out) {
-		$result = $result . shift @out;
+		$result = $result . $self->textCrop(shift @out);
 		$result = "$result\n" if @out
 	}
 	return $result

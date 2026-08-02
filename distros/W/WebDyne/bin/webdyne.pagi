@@ -1,0 +1,811 @@
+#!/usr/bin/env perl
+#
+#  This file is part of WebDyne.
+#
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
+#
+#  Full license text is available at:
+#
+#  <http://dev.perl.org/licenses/>
+#
+
+
+#  Pragma
+#
+use strict;
+use vars   qw($VERSION);
+use warnings;
+no warnings qw(redefine once);
+
+
+#  External modules
+#
+use Cwd qw(fastcwd);
+use Data::Dumper;
+use File::Basename;
+use File::Spec;
+
+
+#  Local customisation
+#
+local $Data::Dumper::Indent=1;
+local $Data::Dumper::Sortkeys=1;
+
+
+#  PAGI modules we need
+#
+use PAGI::Middleware::Builder;
+use WebDyne::PAGI;
+use WebDyne::Constant;
+use WebDyne::PAGI::Constant;
+
+
+#  Version Info, must be all one line for MakeMaker, CPAN.
+#
+$VERSION='3.006';
+
+
+#  Check for supporting modules
+#
+BEGIN {
+    my @missing;
+    for my $module (qw(PAGI::Server PAGI::Tools)) {
+        eval "require $module; 1" or push @missing, $module;
+    }
+    if (@missing) {
+        printf STDERR ("Please install missing CPAN modules: %s \n", join(', ', @missing));
+        exit 1;
+    }
+    
+}
+
+
+#  Called from command line ?
+#
+if (!caller || exists $ENV{PAR_TEMP}) {
+
+
+    #  Yes. Get options
+    #
+    my %opt=(
+        test    => 0,
+        static  => 1,
+        index   => defined($ENV{'DOCUMENT_DEFAULT'}) ? $ENV{'DOCUMENT_DEFAULT'} : 1,
+        %{do(glob(sprintf('~/.%s.opt', basename(__FILE__)))) || {}}
+    );
+    if (delete $opt{'no_index'}) {
+        $opt{'index'}=0;
+    }
+
+
+    #  Process
+    #
+    require Getopt::Long;
+    Getopt::Long::Configure('pass_through');
+    @ARGV=grep {
+        if ($_ eq '--no-index') {
+            $opt{'index'}=0;
+            0;
+        }
+        elsif (/^--index=(.*)$/) {
+            $opt{'index'}=$1;
+            0;
+        }
+        else {
+            1;
+        }
+    } @ARGV;
+    Getopt::Long::GetOptions(
+        \%opt,
+        my @opt=(
+        'test!',
+        'static!',
+        'index!' => sub {
+            my ($name, $value)=@_;
+            $opt{'index'}=$value ? 1 : 0;
+        },
+        'no_index' => sub {
+            $opt{'index'}=0
+        },
+        'root|docroot|doc_root|doc-root|document_root|document-root:s',
+        'env|E=s',
+        'argv:s',
+        'dump_opt|dump-opt|opt'
+        )
+    );
+    map {$opt{"no_${_}"} = !($opt{$_})} map { /^([^|!:=+]+)/ } grep {!ref($_) && /\!$/} @opt;
+    
+    
+    #  Last argument is root directory
+    #
+    if (@ARGV && $ARGV[-1] !~ /^--?/) {
+        $opt{'root'} = pop @ARGV;
+    }
+    else {
+        $opt{'root'} ||=($ENV{'DOCUMENT_ROOT'} ||  fastcwd());
+    }
+
+
+    #  Dump options for debugging
+    #
+    die Dumper(\%opt) if $opt{'dump_opt'};
+    
+    
+    #  Startup
+    #
+    exit &startup(\%opt, split(/\s+/, $opt{'argv'} || ''), @ARGV);
+
+}
+else {
+
+    # No - called from pagi_server. Need document root and doc default from 
+    # env or var
+    #
+    my %opt=(
+        root    => $ENV{'DOCUMENT_ROOT'} || $DOCUMENT_ROOT || fastcwd(),
+        index   => $ENV{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT
+    );
+    return &build(\%opt);
+    
+}
+
+
+
+#==================================================================================================
+
+
+sub build {
+
+
+    #  Build app code ref, options passed for builder
+    #
+    my $opt_hr=shift();
+    my $builder_or=PAGI::Middleware::Builder->new();
+    
+    
+    #  Adjust static service config var based on opts if
+    #  they exist
+    #
+    if (exists($opt_hr->{'static'})) {
+        $WEBDYNE_PAGI_STATIC=$opt_hr->{'static'};
+    }
+    
+    
+    #  Add in any middleware in config file
+    #
+    foreach my $middleware_ar (@{$WEBDYNE_PAGI_MIDDLEWARE}) {
+        my ($middleware, $middleware_opt_hr)=@{$middleware_ar};
+        
+        #  Skip static if not wanted
+        #
+        if ($middleware eq 'Static') {
+            next unless $WEBDYNE_PAGI_STATIC;
+        }
+        
+        
+        #  And code refs are run and given opt as first param
+        #
+        if (ref($middleware_opt_hr) eq 'CODE') {
+            $middleware_opt_hr=$middleware_opt_hr->($opt_hr);
+        }
+        
+        
+        #  Now add it
+        #
+        $builder_or->add_middleware($middleware, %{$middleware_opt_hr});
+    }
+    
+
+    #  Read in local webdyne.conf.pl
+    #
+    #&local_constant_load($opt_hr->{'root'});
+
+
+    #  Finally return as app code ref
+    #
+    return $builder_or->to_app(
+        WebDyne::PAGI->new(%{$opt_hr})->to_app())
+
+}
+
+
+sub startup {
+
+
+    #  Get WebDyne::PAGI options and PAGI::Server::Runner args
+    #
+    my ($opt_hr, @argv)=@_;
+    
+    
+    #  Running from command line without being stared by plackup or starman
+    #
+    require PAGI::Server::Runner;
+    my $pagi_or=PAGI::Server::Runner->new();
+    
+    
+    #  Environment/mode. The wrapper consumes -E/--env so that values can
+    #  also come from ~/.webdyne.pagi.opt, then passes it on to the runner.
+    #
+    if (defined($opt_hr->{'env'})) {
+        die "--env must be development, production, or none\n"
+            unless $opt_hr->{'env'} =~ /^(?:development|production|none)$/;
+        $ENV{'PAGI_ENV'}=$opt_hr->{'env'};
+        push (@argv, ('--env', $opt_hr->{'env'}))
+            unless grep { $_ eq '-E' || $_ eq '--env' || /^--env=/ } @argv;
+    }
+    
+    
+    #  Add host 0.0.0.0 option unless already spec'd as option
+    #
+    push (@argv, ('--host', '0.0.0.0')) unless grep { /--host/ } @argv;
+    
+
+    #  Mac conflicts with Plack default port of 5000 - choose 5001
+    #
+    if (($^O eq 'darwin') && !(grep { /--port/ } @argv)) {
+        $pagi_or->parse_options('--port', '5001', @argv);
+    }
+    else {
+        $pagi_or->parse_options(map {split(/\s+/)} @argv);
+    }
+    
+
+    #  Read in local webdyne.conf.pl
+    #
+    &local_constant_load($opt_hr->{'root'});
+
+
+    #  Get app code ref from WebDyne::PAGI
+    #
+    my $app_cr=&build($opt_hr);
+
+    
+    #  Run it
+    #
+    *PAGI::Server::Runner::load_app=sub { return $app_cr };
+    exit ($pagi_or->run() || 0);
+
+}
+
+
+sub local_constant_load {
+
+
+    #  Read in local webdyne.conf.pl
+    #
+    my $root_dn=shift();
+    
+    
+    #  If root_dn is a file get dir name
+    #
+    if (-f $root_dn) {
+        $root_dn=(File::Spec->splitpath($root_dn))[1];
+    }
+    WebDyne::Constant->import(File::Spec->catfile($root_dn, sprintf('.%s', $WEBDYNE_CONF_FN)));
+
+}
+
+
+__END__
+
+=begin markdown
+
+# webdyne.pagi #
+
+# NAME #
+
+webdyne.pagi - PAGI application runner for WebDyne
+
+# SYNOPSIS
+
+`webdyne.pagi [--option] <document_root>`
+
+`webdyne.pagi --port 8080 /var/www/html`
+
+`webdyne.pagi --test`
+
+# DESCRIPTION
+
+`webdyne.pagi` is a PAGI application script that handles web requests using the WebDyne framework. It builds a `WebDyne::PAGI` application, loads any configured PAGI middleware, and starts it through `PAGI::Server::Runner`.
+
+The underlying `WebDyne::PAGI` application can dispatch PAGI scope types for normal HTTP requests, server-sent events, WebSocket connections, and lifespan startup or shutdown events.
+
+# OPTIONS
+
+`webdyne.pagi` parses a small set of wrapper options itself and passes remaining command line options through to `PAGI::Server::Runner`.
+
+Wrapper defaults can be preloaded from `~/.webdyne.pagi.opt` by creating an anonymous hash of option names and values.
+
+Wrapper options handled by `webdyne.pagi` itself:
+
+* **--test**
+
+    Use WebDyne's internal test page as the root.
+
+* **--static**
+
+    Enable or disable PAGI static-file middleware.
+
+* **--index**
+
+    Enable or disable directory index handling. With the default enabled setting, `--index` uses WebDyne's built-in dynamic index page.
+
+* **--index=FILE**
+
+    Use `FILE` as the default document for directory requests instead of the built-in dynamic index page. Use the equals form so the document root argument is not consumed as the index value.
+
+* **--root**
+
+    Set the document root. If omitted, the final non-option command line argument is used. If neither is supplied, `DOCUMENT_ROOT` or the current working directory is used.
+
+* **--env**
+
+    Set the PAGI environment mode to `development`, `production`, or `none`. The wrapper sets `PAGI_ENV` and forwards the mode to `PAGI::Server::Runner`.
+
+* **--argv**
+
+    Supply additional arguments that the wrapper prepends to the remaining command line arguments before invoking `PAGI::Server::Runner`.
+
+* **--dump_opt**
+
+    Dump the processed option hash and exit.
+
+Remaining command line options are handled by `PAGI::Server::Runner`. Some common options are:
+
+* **--host**
+
+    Which host interface to bind to. When launched through `webdyne.pagi`, the wrapper adds `--host 0.0.0.0` unless a `--host` option is present.
+
+* **--port**
+
+    Which port to bind to.
+
+* **--server**
+
+    Which PAGI server class to use. The runner default is `PAGI::Server`.
+
+* **--loop**
+
+    Event loop backend.
+
+* **--lib**
+
+    Add a library path to `@INC`.
+
+* **-M**
+
+    Load a module before the app starts.
+
+* **--default-middleware**
+
+    Enable or disable runner default middleware.
+
+* **--daemonize**
+
+    Run as a background daemon.
+
+* **--access-log**
+
+    Configure access logging.
+
+Additional runner process and output controls are passed through to
+`PAGI::Server::Runner`; see that runner's documentation for details.
+
+On macOS, if no `--port` option is passed through to `PAGI::Server::Runner`, the wrapper uses port `5001` to avoid conflicts with the default port. Other platforms use the normal runner default unless a port is supplied.
+
+# EXAMPLES
+
+To run the script for basic functionality and serve files from `/var/www/html`, use:
+
+`webdyne.pagi /var/www/html`
+
+Disable wrapper-managed index handling and rely on the PAGI request layer's default document behaviour instead:
+
+`webdyne.pagi --no-index /var/www/html`
+
+Use `home.psp` as the default document for directory requests:
+
+`webdyne.pagi --index=home.psp /var/www/html`
+
+Start in production mode:
+
+`webdyne.pagi --env production /var/www/html`
+
+Start on another port:
+
+`webdyne.pagi --port 8080 /var/www/html`
+
+Start with a specific host:
+
+`webdyne.pagi --host 127.0.0.1 --port 8080 /var/www/html`
+
+Start with the internal test page:
+
+`webdyne.pagi --test`
+
+Start with a different event loop backend:
+
+`webdyne.pagi --loop EV /home/aspeer/public_html`
+
+# ENVIRONMENT VARIABLES
+
+This script is a frontend to the WebDyne PAGI stack. It uses WebDyne configuration and environment handling.
+
+* **DOCUMENT_ROOT**
+
+    Supplies the document root when neither `--root` nor a final non-option document root argument is provided.
+
+* **DOCUMENT_DEFAULT**
+
+    Supplies the default `index` value before `~/.webdyne.pagi.opt` and command-line options are applied. This means explicit CLI index options override the environment, and `~/.webdyne.pagi.opt` also overrides the environment. When the script is loaded by `pagi-server` instead of run directly, the PAGI constant layer default is `app.psp`.
+
+* **PAGI_ENV**
+
+    Supplies the PAGI environment mode when `--env` is not provided.
+
+* **WEBDYNE_***
+
+    Supplies the relevant WebDyne settings used by the PAGI modules.
+
+When launched from the command line, the wrapper also reads local WebDyne configuration from `DOCUMENT_ROOT/.webdyne.conf.pl` before starting the PAGI runner.
+
+Relevant PAGI-specific settings from `WebDyne::PAGI::Constant` include:
+
+* **WEBDYNE_PAGI_STATIC**
+
+    Enable or disable static-file serving middleware.
+
+* **WEBDYNE_PAGI_MIDDLEWARE_STATIC**
+
+    Regular expression used to decide which static files are served directly.
+
+* **WEBDYNE_PAGI_MIDDLEWARE**
+
+    Middleware stack applied around the WebDyne PAGI app.
+
+* **WEBDYNE_PAGI_ENV_KEEP / WEBDYNE_PAGI_ENV_SET**
+
+    Environment variables preserved or injected for request handling.
+
+# AUTHOR
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+=end markdown
+
+
+=head1 webdyne.pagi
+
+
+=head1 NAME
+
+webdyne.pagi - PAGI application runner for WebDyne
+
+
+=head1 SYNOPSIS
+
+C<<< webdyne.pagi [--option] <document_root> >>>
+
+C<webdyne.pagi --port 8080 /var/www/html>
+
+C<webdyne.pagi --test>
+
+
+=head1 DESCRIPTION
+
+C<webdyne.pagi> is a PAGI application script that handles web requests using the WebDyne framework. It builds a C<WebDyne::PAGI> application, loads any configured PAGI middleware, and starts it through C<PAGI::Server::Runner>.
+
+The underlying C<WebDyne::PAGI> application can dispatch PAGI scope types for normal HTTP requests, server-sent events, WebSocket connections, and lifespan startup or shutdown events.
+
+
+=head1 OPTIONS
+
+C<webdyne.pagi> parses a small set of wrapper options itself and passes remaining command line options through to C<PAGI::Server::Runner>.
+
+Wrapper defaults can be preloaded from C<~/.webdyne.pagi.opt> by creating an anonymous hash of option names and values.
+
+Wrapper options handled by C<webdyne.pagi> itself:
+
+=over
+
+=item *
+
+B<--test>
+
+Use WebDyne's internal test page as the root.
+
+
+
+=item *
+
+B<--static>
+
+Enable or disable PAGI static-file middleware.
+
+
+
+=item *
+
+B<--index>
+
+Enable or disable directory index handling. With the default enabled setting, C<--index> uses WebDyne's built-in dynamic index page.
+
+
+
+=item *
+
+B<--index=FILE>
+
+Use C<FILE> as the default document for directory requests instead of the built-in dynamic index page. Use the equals form so the document root argument is not consumed as the index value.
+
+
+
+=item *
+
+B<--root>
+
+Set the document root. If omitted, the final non-option command line argument is used. If neither is supplied, C<DOCUMENT_ROOT> or the current working directory is used.
+
+
+
+=item *
+
+B<--env>
+
+Set the PAGI environment mode to C<development>, C<production>, or C<none>. The wrapper sets C<PAGI_ENV> and forwards the mode to C<PAGI::Server::Runner>.
+
+
+
+=item *
+
+B<--argv>
+
+Supply additional arguments that the wrapper prepends to the remaining command line arguments before invoking C<PAGI::Server::Runner>.
+
+
+
+=item *
+
+B<--dump_opt>
+
+Dump the processed option hash and exit.
+
+
+
+=back
+
+Remaining command line options are handled by C<PAGI::Server::Runner>. Some common options are:
+
+=over
+
+=item *
+
+B<--host>
+
+Which host interface to bind to. When launched through C<webdyne.pagi>, the wrapper adds C<--host 0.0.0.0> unless a C<--host> option is present.
+
+
+
+=item *
+
+B<--port>
+
+Which port to bind to.
+
+
+
+=item *
+
+B<--server>
+
+Which PAGI server class to use. The runner default is C<PAGI::Server>.
+
+
+
+=item *
+
+B<--loop>
+
+Event loop backend.
+
+
+
+=item *
+
+B<--lib>
+
+Add a library path to C<@INC>.
+
+
+
+=item *
+
+B<-M>
+
+Load a module before the app starts.
+
+
+
+=item *
+
+B<--default-middleware>
+
+Enable or disable runner default middleware.
+
+
+
+=item *
+
+B<--daemonize>
+
+Run as a background daemon.
+
+
+
+=item *
+
+B<--access-log>
+
+Configure access logging.
+
+
+
+=back
+
+Additional runner process and output controls are passed through to
+C<PAGI::Server::Runner>; see that runner's documentation for details.
+
+On macOS, if no C<--port> option is passed through to C<PAGI::Server::Runner>, the wrapper uses port C<5001> to avoid conflicts with the default port. Other platforms use the normal runner default unless a port is supplied.
+
+
+=head1 EXAMPLES
+
+To run the script for basic functionality and serve files from C</var/www/html>, use:
+
+C<webdyne.pagi /var/www/html>
+
+Disable wrapper-managed index handling and rely on the PAGI request layer's default document behaviour instead:
+
+C<webdyne.pagi --no-index /var/www/html>
+
+Use C<home.psp> as the default document for directory requests:
+
+C<webdyne.pagi --index=home.psp /var/www/html>
+
+Start in production mode:
+
+C<webdyne.pagi --env production /var/www/html>
+
+Start on another port:
+
+C<webdyne.pagi --port 8080 /var/www/html>
+
+Start with a specific host:
+
+C<webdyne.pagi --host 127.0.0.1 --port 8080 /var/www/html>
+
+Start with the internal test page:
+
+C<webdyne.pagi --test>
+
+Start with a different event loop backend:
+
+C<webdyne.pagi --loop EV /home/aspeer/public_html>
+
+
+=head1 ENVIRONMENT VARIABLES
+
+This script is a frontend to the WebDyne PAGI stack. It uses WebDyne configuration and environment handling.
+
+=over
+
+=item *
+
+B<DOCUMENT_ROOT>
+
+Supplies the document root when neither C<--root> nor a final non-option document root argument is provided.
+
+
+
+=item *
+
+B<DOCUMENT_DEFAULT>
+
+Supplies the default C<index> value before C<~/.webdyne.pagi.opt> and command-line options are applied. This means explicit CLI index options override the environment, and C<~/.webdyne.pagi.opt> also overrides the environment. When the script is loaded by C<pagi-server> instead of run directly, the PAGI constant layer default is C<app.psp>.
+
+
+
+=item *
+
+B<PAGI_ENV>
+
+Supplies the PAGI environment mode when C<--env> is not provided.
+
+
+
+=item *
+
+B<WEBDYNE_>*
+
+Supplies the relevant WebDyne settings used by the PAGI modules.
+
+
+
+=back
+
+When launched from the command line, the wrapper also reads local WebDyne configuration from C<DOCUMENT_ROOT/.webdyne.conf.pl> before starting the PAGI runner.
+
+Relevant PAGI-specific settings from C<WebDyne::PAGI::Constant> include:
+
+=over
+
+=item *
+
+B<WEBDYNE_PAGI_STATIC>
+
+Enable or disable static-file serving middleware.
+
+
+
+=item *
+
+B<WEBDYNE_PAGI_MIDDLEWARE_STATIC>
+
+Regular expression used to decide which static files are served directly.
+
+
+
+=item *
+
+B<WEBDYNE_PAGI_MIDDLEWARE>
+
+Middleware stack applied around the WebDyne PAGI app.
+
+
+
+=item *
+
+B<WEBDYNE_PAGI_ENV_KEEP / WEBDYNE_PAGI_ENV_SET>
+
+Environment variables preserved or injected for request handling.
+
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
+
+=cut

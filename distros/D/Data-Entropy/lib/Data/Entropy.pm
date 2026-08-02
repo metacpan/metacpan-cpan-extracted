@@ -56,9 +56,10 @@ use warnings;
 use strict;
 
 use Carp qw(croak);
+use Devel::Deprecate qw(deprecate);
 use Params::Classify 0.000 qw(is_ref);
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(entropy_source with_entropy_source);
@@ -80,6 +81,7 @@ C<with_entropy_source>, if any, or otherwise the default entropy source.
 my $default_entropy_source;
 
 sub entropy_source() {
+	deprecate( reason => 'Please use an alternative module as recommended in the STATUS section' );
 	if(is_ref($entropy_source, "CODE")) {
 		my $source = $entropy_source->();
 		croak "entropy source thunk returned another thunk"

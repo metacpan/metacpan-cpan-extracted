@@ -14,6 +14,7 @@ WriteMakefile(
         'Crypt::Rijndael'  => 0,
         'Crypt::URandom'   => '0.36',
         'Data::Float'      => '0.008',
+        'Devel::Deprecate' => 0,
         'Errno'            => '1.00',
         'Exporter'         => 0,
         'HTTP::Tiny'       => '0.096',

@@ -2,11 +2,11 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000060';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults env_timeout/;
-use Time::HiRes qw/sleep/;
+use Time::HiRes qw/sleep time/;
 use Scalar::Util qw/reftype/;
 
 use parent 'DBIx::QuickDB::Driver';
@@ -223,6 +223,85 @@ sub write_config {
         print $cf "$key = $val\n";
     }
     close($cf);
+}
+
+# PostgreSQL 9.3 creates its Unix-domain listening socket before it allocates
+# shared memory and semaphores.  (Modern releases use a different order.)
+# Waiting for the socket alone therefore has a small false-ready window on the
+# affected old releases: the postmaster can create the socket, fail during the
+# remaining startup work (notably semget() on SysV-IPC platforms), and remove
+# it again after the base start() has returned.
+#
+# Confirm readiness with a real connection to the always-present postgres
+# database.  A healthy postmaster can briefly refuse even that connection, so
+# retry while its socket still exists, up to the same startup timeout.  If the
+# socket vanishes or the timeout expires, preserve the last DBI exception and
+# append both server logs.  Failures before the logging collector starts are
+# written only to the watcher's launch log; including it also lets test helpers
+# recognize an exact resource-exhaustion error without treating an ordinary
+# connection failure as an environmental skip.
+sub start {
+    my $self = shift;
+
+    $self->SUPER::start(@_);
+
+    my $timeout = env_timeout(QDB_START_TIMEOUT => 10);
+    my $start = time;
+    my ($dbh, $err);
+    while (1) {
+        my $ok;
+        {
+            local $@;
+            $ok = eval {
+                # Call the base connection method directly: this loop replaces
+                # catch_startup() here so it can also tolerate a brief generic
+                # connection-refused error before the postmaster is ready.
+                $dbh = $self->SUPER::connect(
+                    'postgres',
+                    AutoCommit => 1,
+                    RaiseError => 1,
+                    PrintError => 0,
+                );
+                1;
+            };
+            $err = $ok ? undef : $@;
+        }
+
+        last if $ok;
+        last unless -S $self->socket;
+        last if time - $start > $timeout;
+        sleep 0.01;
+    }
+
+    if ($err) {
+        my $watcher    = $self->watcher;
+        my $launch_log = $watcher ? $self->_read_file($watcher->log_file) : '';
+        my $error_log  = $self->read_error_log;
+
+        my $msg = $err;
+        $msg .= "\n=== server launch log ===\n$launch_log" if length $launch_log;
+        $msg .= "\n=== error log ===\n$error_log"          if length $error_log;
+
+        # A failed start must not leave the object permanently reporting
+        # started() merely because it still holds a watcher.  Stop and reap
+        # the owned postmaster without Driver::stop's checkpoint attempt (the
+        # server never became ready), retaining the original startup error.
+        if ($watcher) {
+            delete $self->{+DBIx::QuickDB::Driver::WATCHER()};
+            eval {
+                $watcher->stop;
+                $watcher->wait;
+                my $socket = $self->socket;
+                unlink($socket) if $socket && -S $socket;
+                1;
+            };
+        }
+
+        die $msg;
+    }
+
+    $dbh->disconnect;
+    return;
 }
 
 sub bootstrap {

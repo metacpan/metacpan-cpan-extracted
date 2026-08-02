@@ -10,12 +10,15 @@ use vars   qw($VERSION);
 #
 BEGIN {
     $ENV{'WEBDYNE_CONF'}='.' unless (($ENV{'WEBDYNE_TEST_FILE_PREFIX'} ||= '') eq '03');
+    $ENV{'WEBDYNE_HEAD_INSERT'}=0 unless (($ENV{'WEBDYNE_TEST_FILE_PREFIX'} ||= '') eq '03');
 }
 
 #  Load
 #
 use Test::More qw(no_plan);
 use FindBin qw($RealBin $Script);
+use lib $RealBin;
+use test_diff_helper qw(eq_or_diff_text_test);
 use File::Temp qw(tempfile);
 use File::Find qw(find);
 use Data::Dumper;
@@ -24,7 +27,7 @@ use IO::String;
 use Cwd qw(abs_path);
 $Data::Dumper::Indent=1;
 $Data::Dumper::Sortkeys=1;
-use Storable qw(lock_retrieve freeze);
+use Storable qw(lock_retrieve);
 $Storable::canonical=1;
 
 
@@ -84,13 +87,20 @@ sub main {
 
     #  Iterate over files
     #
-    diag('');
+    note('');
     
     
     #  Repeat as required
     #
     for (1 .. ($ENV{'WEBDYNE_TEST_REPEAT'} || 1)) {
         FILE: foreach my $test_fn (sort {$a cmp $b } @test_fn) {
+        
+        
+            #  Skip files with numer prefix, specific to a single tes
+            #
+            next if ($test_fn=~/\/\d+\-.*\.psp/);
+            next if ($test_fn=~/\/error_handler_.*\.psp$/);
+            next if ($test_fn=~/\/error_format_.*\.psp$/);
 
 
             #  Create WebDyne render of PSP file and capture to file
@@ -100,7 +110,7 @@ sub main {
                 return err("unable to determine full path of $test_fn");
             (-f $test_cn) ||
                 return err("unable to find file: $test_fn");
-            diag("processing: $test_fn");
+            note("processing: $test_fn");
             
 
             #  Create a new compile instance
@@ -142,10 +152,10 @@ sub main {
                     my %opt=(
 
                         srce        	=> $test_cn,
-                        nofilter	=> 1,
-                        noperl		=> 1,
-                        notimestamp	=> 1,
-                        nomanifest	=> 1,
+                        no_filter	=> 1,
+                        no_perl		=> 1,
+                        no_timestamp	=> 1,
+                        no_manifest	=> 1,
                         $stage_name     => 1
                         
                     );
@@ -169,36 +179,11 @@ sub main {
                         return err();
 
 
-                    #  Now compare
-                    #
-                    #my $string_live=freeze($data_live_ar);
-                    #my $string_thaw=freeze($data_thaw_ar);
-                    
                     #  New comparison - Storable format not reliable across different perl versions
                     #
                     my $string_actual=Data::Dumper->Dump([$data_live_ar],['$VAR1']);
                     my $string_expect=Data::Dumper->Dump([$data_thaw_ar],['$VAR1']);
-                    
-                    if ($string_actual eq $string_expect) {
-                        pass("$test_fn pass on stage: $stage");
-                    }
-                    else {
-                        fail(diag("$test_fn fail on stage: $stage count: $count"));
-                        diag("ACTUAL: $string_actual");
-                        diag("EXPECT: $string_expect");
-                        eval { require Text::Diff } || do {
-                            diag('unable to load Text::Diff module to show comparison');
-                            next;
-                        };
-                        my $diff=Text::Diff::diff(
-                            \(my $actual=Data::Dumper->Dump([$data_live_ar],['$ACTUAL'])),
-                            \(my $expect=Data::Dumper->Dump([$data_thaw_ar],['$EXPECT'])),
-                            { STYLE => 'Unified' }
-                        );
-                        diag("diff: $diff");
-                        #exit;
-                        #diag(sprintf('%s:%s', Dumper($data_live_ar, $data_thaw_ar)));
-                    }
+                    eq_or_diff_text_test($string_actual, $string_expect, "$test_fn pass on stage: $stage");
 
                 } #foreach stage
                 
@@ -227,23 +212,7 @@ sub main {
                 my $html_thaw=<$html_thaw_fh>;
                 $html_thaw_fh->close();
 
-                if (${$html_live_sr} eq $html_thaw) {
-                    pass("$test_fn pass on stage: HTML render");
-                }
-                else {
-                    fail(diag("$test_fn fail on stage: HTML render"));
-                    eval { require Text::Diff } || do {
-                        diag('unable to load Text::Diff module to show comparison');
-                        next;
-                    };
-                    my $diff=Text::Diff::diff(
-                        \Data::Dumper->Dump([$html_live_sr], ['$ACTUAL']),
-                        \Data::Dumper->Dump([\$html_thaw], ['$EXPECT']),
-                        { STYLE => 'Unified' }
-                    );
-                    diag("diff: $diff");
-                    #diag(sprintf('%s:%s', Dumper($html_live_sr, \$html_thaw)));
-                }
+                eq_or_diff_text_test(${$html_live_sr}, $html_thaw, "$test_fn pass on stage: HTML render");
 
             }
 
@@ -298,5 +267,3 @@ sub render {
     return \$html;
 
 }
-
-

@@ -1,10 +1,20 @@
-## WebDyne — Perl embedded HTML engine and mod_perl/PSGI web framework
+## WebDyne - Perl embedded HTML engine and mod_perl/PSGI/PAGI web framework
 
-**WebDyne** is a Perl-centric dynamic HTML engine for building server-rendered web applications with embedded Perl. It's been around for a while but I have recently re-written to support more modern practices, work with PSGI etc. Version 2 release is now available.
+**WebDyne** is a Perl-centric dynamic HTML engine for building server-rendered web applications with embedded Perl. It has been updated to support modern Perl web runtimes while preserving the original `.psp` page model.
 
-It supports multiple Perl embedding styles inside `.psp` files, partial compilation and caching for performance, and runs under **mod_perl** or **PSGI/Plack**.
+It supports multiple Perl embedding styles inside `.psp` files, partial compilation and caching for performance, and runs under **mod_perl**, **PSGI/Plack**, or **PAGI**.
 
-Introduction below, full documentation is at [webdyne.org](https://webdyne.org), with code available on [CPAN](https://metacpan.org/dist/WebDyne) and via [Github](https://github.com/aspeer/WebDyne). Docker images are also available. The latest version at writing is 2.071, metaCPAN seems to throw up older versions sometimes.
+Introduction below, full documentation is at [webdyne.org](https://webdyne.org), with code available on [CPAN](https://metacpan.org/dist/WebDyne) and via [Github](https://github.com/aspeer/WebDyne). Docker images are also available. Current branch builds are versioned in the `2.088_630` series.
+
+Branch highlights:
+
+- PAGI runtime support through `WebDyne::PAGI` and `webdyne.pagi`
+- PAGI dispatch for HTTP, server-sent events, WebSocket connections, and lifespan events
+- normalized request adapters for standalone/fake, Apache, PSGI, and PAGI execution
+- `webdyne.apache` for temporary local Apache/mod_perl development without permanent Apache configuration
+- expanded wrapper and utility documentation for `wdlint`, `wdrender`, `webdyne.psgi`, `webdyne.pagi`, and `webdyne.apache`
+- broader test coverage for request backends, command wrappers, static files, path traversal, uploads, error handling, SSE, and WebSocket flows
+- the main WebDyne documentation has been merged into this repository with `doc/webdyne.xml` as the definitive source
 
 Quick selected feature summary below to pique interest/dis-interest:
 
@@ -187,7 +197,29 @@ sub countries {
 
 ### Docker
 
-Docker images are available and can be used for base containers for self-containe applications. See simple [Perl Fortune app](https://github.com/aspeer/psp-WebDyne-Fortune) as an example.
+Docker images are available and can be used for base containers for self-contained applications. See simple [Perl Fortune app](https://github.com/aspeer/psp-WebDyne-Fortune) as an example.
+
+---
+
+### Runtime Wrappers
+
+WebDyne includes wrapper scripts for the main supported runtime modes:
+
+```bash
+# PSGI/Plack
+webdyne.psgi --test
+webdyne.psgi /path/to/site-root
+
+# PAGI
+webdyne.pagi --test
+webdyne.pagi /path/to/site-root
+
+# Temporary local Apache/mod_perl
+webdyne.apache --test
+webdyne.apache /path/to/site-root
+```
+
+The PAGI wrapper supports normal HTTP requests plus PAGI-specific server-sent event, WebSocket, and lifespan flows.
 
 ---
 
@@ -202,6 +234,8 @@ cpanm WebDyne
 #
 cpanm Task::WebDyne::Plack
 ```
+
+For PAGI, install the PAGI runtime stack needed by `webdyne.pagi`. For Apache/mod_perl, use `wdapacheinit` for permanent configuration or `webdyne.apache --test` for a temporary local server.
 
 Docs: https://webdyne.org  
 CPAN: https://metacpan.org/dist/WebDyne  

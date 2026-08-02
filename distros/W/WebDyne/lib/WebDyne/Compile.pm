@@ -39,7 +39,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
 #  Debug load
@@ -92,7 +92,7 @@ sub new {
     #  Init WebDyne module
     #
     require WebDyne::Request::Fake;
-    my $r=WebDyne::Request::Fake->new( filename=> ( $opt{'filename'} || $opt{'srce'} ) );
+    my $r=WebDyne::Request::Fake->new( filename=> ( $opt{'filename'} || $opt{'srce'} ), no_head_insert=>$opt{'no_head_insert'} );
 
 
     #  Get appropriate cgi_or
@@ -294,7 +294,7 @@ sub compile {
     #  is rentrant as the tree is descended
     #
     my %meta=(
-        manifest => $param_hr->{'nomanifest'} ? undef : [$html_cn]
+        manifest => $param_hr->{'no_manifest'} ? undef : [$html_cn]
     );
     my $data_ar=$self->parse($tree_or, \%meta) || do {
         return err($close_cr->());
@@ -376,7 +376,7 @@ sub compile {
     
     #  And look for any static or cache tags found in start_html and noted 
     #
-    foreach my $attr (qw(static cache handler)) {
+    foreach my $attr (qw(static cache handler sse ws)) {
         if (my $value=$html_tiny_or->{"_${attr}"}) {
             $meta{$attr}=$value;
         }
@@ -420,7 +420,7 @@ sub compile {
     #  runs it can access meta data via $self->meta();
     #
     $self->{'_meta_hr'}=\%meta if keys %meta;
-    if ((my $perl_ar=$meta{'perl'}) && !$param_hr->{'noperl'}) {
+    if ((my $perl_ar=$meta{'perl'}) && !$param_hr->{'no_perl'}) {
 
         #  This is inline __PERL__ perl. Must be executed before filter so any filters added by the __PERL__
         #  block are seen
@@ -445,7 +445,7 @@ sub compile {
         @filter=split(/\s+/, $filter) if $filter;
     }
     debug('filter %s', Dumper(\@filter));
-    if ((@filter) && !$param_hr->{'nofilter'}) {
+    if ((@filter) && !$param_hr->{'no_filter'}) {
         local $SIG{'__DIE__'};
         foreach my $filter (@filter) {
             $filter=~s/::filter$//;
@@ -549,9 +549,9 @@ sub compile {
     #
     my $time_compile=sprintf('%0.4f', time()-$time);
     $meta{'time_compile_elapsed'}=$time_compile unless
-        $param_hr->{'notimestamp'};
+        $param_hr->{'no_timestamp'};
     $meta{'time_compile'}=$time unless
-        $param_hr->{'notimestamp'};
+        $param_hr->{'no_timestamp'};
     debug("form $html_cn compile time $time_compile");
 
 
@@ -1324,3 +1324,212 @@ sub parse {
 }
 
 
+__END__
+
+=begin markdown
+
+# WebDyne::Compile #
+
+# NAME #
+
+WebDyne::Compile - compiler for WebDyne `.psp` source files
+
+# SYNOPSIS #
+
+```perl
+use WebDyne::Compile;
+
+my $compiler = WebDyne::Compile->new(
+    srce => 'page.psp',
+);
+
+my $container = $compiler->compile({
+    srce => 'page.psp',
+});
+```
+
+# DESCRIPTION #
+
+`WebDyne::Compile` turns WebDyne source files into the internal container structure used by the runtime. It coordinates `WebDyne::HTML::TreeBuilder`, compile-time Perl and filter stages, optimization passes, metadata extraction, and optional `Storable` output to a cache destination.
+
+The compiler is usually driven indirectly through `WebDyne`, but it can also be used directly for diagnostics and tooling such as `wdcompile`.
+
+# METHODS #
+
+* **new(%options)**
+
+    Construct a compiler-oriented WebDyne object suitable for out-of-request compilation work.
+
+* **compile(\%options)**
+
+    Compile the source file named by `srce`. Optional keys such as `dest`, stage controls, whitespace controls, and other compile flags influence the result.
+
+* **compile_init()**
+
+    Initialize compile-time parser state and shared structures.
+
+* **optimise_one()**
+
+    Run the first optimization pass over the parsed data tree.
+
+* **optimise_two()**
+
+    Run the second optimization pass over the parsed data tree.
+
+* **parse()**
+
+    Parse the source into the container form used by later compile stages.
+
+# OUTPUT #
+
+The compiler returns a two-element container:
+
+* metadata hashref
+* compiled page data structure
+
+When a `dest` filename is supplied, the container may also be written to disk in `Storable` form.
+
+# AUTHOR #
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 WebDyne::Compile
+
+
+=head1 NAME
+
+WebDyne::Compile - compiler for WebDyne C<.psp> source files
+
+
+=head1 SYNOPSIS
+
+
+ use WebDyne::Compile;
+ 
+ my $compiler = WebDyne::Compile->new(
+     srce => 'page.psp',
+ );
+ 
+ my $container = $compiler->compile({
+     srce => 'page.psp',
+ });
+
+=head1 DESCRIPTION
+
+C<WebDyne::Compile> turns WebDyne source files into the internal container structure used by the runtime. It coordinates C<WebDyne::HTML::TreeBuilder>, compile-time Perl and filter stages, optimization passes, metadata extraction, and optional C<Storable> output to a cache destination.
+
+The compiler is usually driven indirectly through C<WebDyne>, but it can also be used directly for diagnostics and tooling such as C<wdcompile>.
+
+
+=head1 METHODS
+
+=over
+
+=item *
+
+B<new(%options)>
+
+Construct a compiler-oriented WebDyne object suitable for out-of-request compilation work.
+
+
+
+=item *
+
+B<compile(\%options)>
+
+Compile the source file named by C<srce>. Optional keys such as C<dest>, stage controls, whitespace controls, and other compile flags influence the result.
+
+
+
+=item *
+
+B<compile_init()>
+
+Initialize compile-time parser state and shared structures.
+
+
+
+=item *
+
+B<optimise_one()>
+
+Run the first optimization pass over the parsed data tree.
+
+
+
+=item *
+
+B<optimise_two()>
+
+Run the second optimization pass over the parsed data tree.
+
+
+
+=item *
+
+B<parse()>
+
+Parse the source into the container form used by later compile stages.
+
+
+
+=back
+
+
+=head1 OUTPUT
+
+The compiler returns a two-element container:
+
+=over
+
+=item *
+
+metadata hashref
+
+
+=item *
+
+compiled page data structure
+
+
+=back
+
+When a C<dest> filename is supplied, the container may also be written to disk in C<Storable> form.
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
+
+=cut

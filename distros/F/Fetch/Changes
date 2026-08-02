@@ -1,0 +1,24 @@
+Revision history for Fetch
+
+0.03    2026-08-02
+        - Fetch->new(simple_response => 1): resolve to a plain unblessed hashref
+          { status, headers, content } instead of a blessed Fetch::Response, so
+          callers read fields directly and skip method dispatch. A lean option
+          for consuming very large numbers of responses.
+        - Native Windows (MSWin32) port. A new socket/IO shim (ft_win.h) maps
+          the ~dozen socket calls onto Winsock: sockets are wrapped in a CRT fd
+          via _open_osfhandle so the rest of the core keeps its dense "int fd"
+          model (per-fd callback arrays, the backend, TLS all unchanged), with
+          the real SOCKET recovered only at the Winsock boundary and WSA errors
+          mapped to errno. A select()-based readiness backend (backend_select.c)
+          replaces poll (which Windows lacks)
+        - Link -lrt when clock_gettime needs it. backend_poll.c calls
+          clock_gettime(CLOCK_MONOTONIC), which lives in librt on glibc before
+          2.17
+
+0.02    2026-08-01
+        - Fix a missing NUL terminator in the URL-scheme lowercaser
+          (ft_lc_dup)
+
+0.01    2026-08-01
+        First version

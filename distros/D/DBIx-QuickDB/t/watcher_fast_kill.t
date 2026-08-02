@@ -106,7 +106,8 @@ subtest graceful_kill_escalates_via_fast_sig => sub {
     # (which writes the marker file asserted below) before SIGKILL landed --
     # observed as a spurious CPAN Testers failure of the marker assertion.
     local $ENV{QDB_STOP_GRACE} = 4;
-    local $SIG{__WARN__} = sub { };    # silence the expected escalation warnings
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings => @_ };
 
     # Child ignores SIGTERM (the polite stop) but exits cleanly on SIGQUIT, the
     # way PostgreSQL's immediate-shutdown lets the postmaster release its
@@ -124,19 +125,31 @@ subtest graceful_kill_escalates_via_fast_sig => sub {
     ok(-e "$tmp/grace-quit", "graceful escalation sent the fast_stop_sig (SIGQUIT), not a bare SIGKILL");
     ok(!pid_alive($pid),     "child reaped");
     ok($elapsed < 10,        "escalation happened within the grace window (${elapsed}s)");
+    like(join('', @warnings),
+        qr/Server taking too long to shut down, sending SIGQUIT/,
+        'captured the expected fast-signal escalation warning');
+    unlike(join('', @warnings), qr/Server still running, sending SIGKILL/,
+        'server exited on the fast signal without final escalation');
 };
 
 # If even the fast_stop_sig is ignored, _watcher_kill must still escalate to
 # SIGKILL so teardown always completes.
 subtest graceful_kill_escalates_to_sigkill => sub {
     local $ENV{QDB_STOP_GRACE} = 1;
-    local $SIG{__WARN__} = sub { };
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings => @_ };
 
     my $pid = spawn_child(TERM => 'IGNORE', QUIT => 'IGNORE');
 
     ok(lives { DBIx::QuickDB::Watcher->_watcher_kill('TERM', $pid, 'QUIT') },
         "_watcher_kill reaped a server that ignores both stop and fast_stop signals") or diag($@);
     ok(!pid_alive($pid), "child gone after escalation to SIGKILL");
+    like(join('', @warnings),
+        qr/Server taking too long to shut down, sending SIGQUIT/,
+        'captured the expected fast-signal escalation warning');
+    like(join('', @warnings),
+        qr/Server still running, sending SIGKILL/,
+        'captured the expected final SIGKILL escalation warning');
 };
 
 done_testing;

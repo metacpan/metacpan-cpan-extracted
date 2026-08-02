@@ -1,10 +1,10 @@
 {
-   "abstract" : "Dynamic Perl web application framework with template compilation and modular design. Designed to be used via Plack/Starman/PSGI or Apache mod_perl web servers, but supports     standalone HTML output",
+   "abstract" : "Primary runtime module for the WebDyne framework, with support for standalone `.psp` to HTML rendering",
    "author" : [
       "Andrew Speer <andrew.speer@isolutions.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -22,8 +22,10 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Algorithm::Diff" : "0",
             "Capture::Tiny" : "0",
             "Test::Deep" : "0",
+            "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.44",
@@ -41,18 +43,25 @@
          },
          "requires" : {
             "CGI::Simple" : "0",
+            "Crypt::URandom" : "0",
             "Devel::Confess" : "0",
             "Digest::MD5" : "0",
             "Env::Path" : "0",
             "HTML::Tagset" : "0",
             "HTML::Tiny" : "0",
             "HTML::TreeBuilder" : "0",
+            "HTTP::AcceptLanguage" : "0",
+            "HTTP::Headers::Fast" : "0",
+            "HTTP::Headers::Util" : "0",
+            "HTTP::Negotiate" : "0",
             "HTTP::Status" : "0",
             "Hash::MultiValue" : "0",
             "IO::String" : "0",
             "JSON" : "0",
             "Router::Simple" : "0",
             "Storable" : "0",
+            "Sub::Util" : "0",
+            "Term::ANSIColor" : "0",
             "Text::Template" : "0",
             "Tie::IxHash" : "0",
             "Time::HiRes" : "0",
@@ -62,6 +71,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aspeer/WebDyne/issues"
+      },
       "homepage" : "https://github.com/aspeer/WebDyne",
       "repository" : {
          "type" : "git",
@@ -69,7 +81,7 @@
          "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "2.075",
+   "version" : "3.006",
    "x_authority" : "cpan:ASPEER",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

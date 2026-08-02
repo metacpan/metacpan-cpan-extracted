@@ -1,0 +1,170 @@
+:root {
+  font: 85%/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #373c44;
+  background: #fff;
+  --webdyne-code-background: #f5f6f7;
+  --webdyne-code-color: #646b79;
+  --webdyne-code-font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --webdyne-code-font-size: .875em;
+  --webdyne-code-padding: 0;
+  --webdyne-body-margin: .75rem;
+  --webdyne-spacing: 0.75rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: var(--webdyne-body-margin);
+  padding: 0;
+}
+
+body > header,
+body > main,
+body > footer {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--webdyne-spacing);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 .75rem;
+  line-height: 1.2;
+}
+
+p,
+ul,
+ol,
+table,
+form,
+fieldset,
+pre {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: #0172ad;
+}
+
+label {
+  display: block;
+  margin-bottom: .15rem;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+  font: inherit;
+}
+
+:where(
+  input:not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="submit"],
+    [type="button"],
+    [type="reset"]
+  ),
+  select,
+  textarea
+) {
+  padding: .25rem .45rem;
+  color: inherit;
+  background: #fff;
+  border: 1px solid #b8bec7;
+  border-radius: .15rem;
+}
+
+:where(input, select, textarea):focus {
+  outline: none;
+  border-color: #0172ad;
+  box-shadow: 0 0 0 .12rem rgb(1 114 173 / 18%);
+}
+
+textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+:where(
+  button,
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"]
+) {
+  appearance: none;
+  padding: .25rem .55rem;
+  color: #373c44;
+  background: #e4e8eb;
+  border: 1px solid #b8c0c7;
+  border-radius: .15rem;
+  cursor: pointer;
+}
+
+:where(
+  button,
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"]
+):hover {
+  background: #d7dde1;
+}
+
+:where(button, input, select, textarea):disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+fieldset {
+  width: fit-content;
+  max-width: 100%;
+  padding: .65rem;
+  border: 1px solid #d5d9df;
+}
+
+legend {
+  padding: 0 .3rem;
+  font-weight: 600;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: .5rem;
+  border-bottom: 1px solid #dfe3e7;
+  text-align: left;
+}
+
+pre {
+  max-width: 100%;
+  overflow: auto;
+  padding: var(--webdyne-code-padding);
+  background: var(--webdyne-code-background);
+  color: var(--webdyne-code-color);
+  font-family: var(--webdyne-code-font-family);
+  font-size: var(--webdyne-code-font-size);
+  font-weight: 400;
+  line-height: initial;
+}
+
+.tight-code-block,
+.tight-code-block code {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.tight-code-block code {
+  display: block;
+}

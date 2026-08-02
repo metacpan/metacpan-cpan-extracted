@@ -12,6 +12,7 @@ use warnings;
 
 use Test2::V0;
 use Test2::Tools::QuickDB;
+use File::Basename qw/basename dirname/;
 use Time::HiRes qw/sleep time/;
 
 use QDB::Installs qw/contaminate_env/;
@@ -149,7 +150,24 @@ sub driver_body {
             sleep 0.2;
         }
 
+        unless ($dir_gone) {
+            my @left;
+            if (opendir(my $dh, $dir)) {
+                @left = grep { $_ ne '.' && $_ ne '..' } readdir($dh);
+                closedir($dh);
+            }
+            diag("Cleanup left '$dir' in place"
+                . (@left ? ' containing: ' . join(', ' => sort @left) : ''));
+        }
         ok($dir_gone, "Cleaned up the dir when done");
+        if ($^O ne 'MSWin32') {
+            my $base = basename($dir);
+            opendir(my $dh, dirname($dir))
+                or die "Could not inspect cleanup parent for '$dir': $!";
+            my @stale = grep { /^\Q$base\E\.STALE-/ } readdir($dh);
+            closedir($dh);
+            is(\@stale, [], "Cleanup did not quarantine the dir on $^O");
+        }
         ok($pid_gone, "Cleaned up the process when done") if $pid;
     };
 

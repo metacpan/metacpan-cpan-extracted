@@ -1,9 +1,18 @@
+bin/pp
 Changes
 lib/Preproc/Tiny.pm
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
+Preproc-Tiny-0.09.tar
 README.md
+t/expected/test_at.pl
+t/expected/test_square.pl
+t/input/test_at.pl.pp
+t/input/test_square.pl.pp
 t/Preproc-Tiny.t
+t/test_at.t
+t/test_square.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

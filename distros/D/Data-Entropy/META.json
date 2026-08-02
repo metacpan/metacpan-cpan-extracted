@@ -36,6 +36,7 @@
             "Crypt::Rijndael" : "0",
             "Crypt::URandom" : "0.36",
             "Data::Float" : "0.008",
+            "Devel::Deprecate" : "0",
             "Errno" : "1.00",
             "Exporter" : "0",
             "HTTP::Tiny" : "0.096",
@@ -69,7 +70,7 @@
          "url" : "git://github.com/robrwo/Data-Entropy.git"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_deprecated" : 1,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

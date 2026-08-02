@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => "0.20",
     "Carp" => 0,
     "Digest::SHA" => 0,
+    "Errno" => 0,
     "Fcntl" => 0,
     "File::Copy::Recursive" => 0,
     "File::Path" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.000056",
+  "VERSION" => "0.000060",
   "test" => {
     "TESTS" => "t/*.t t/Drivers/*.t t/Pool/*.t t/QuickDB/*.t t/Tools/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => "0.20",
   "Carp" => 0,
   "Digest::SHA" => 0,
+  "Errno" => 0,
   "Fcntl" => 0,
   "File::Copy::Recursive" => 0,
   "File::Path" => 0,

@@ -56,13 +56,16 @@ use constant PATH => [qw(
 #  Local constants
 #
 our $Httpd_Bin=&httpd_bin();
+our $Apachectl_Bin=&apachectl_bin();
 our $Httpd_Config_hr=&httpd_config();
+our $Apxs_Bin=&apxs_bin();
+our $Apxs_Config_hr=&apxs_config($Apxs_Bin);
 my $ServerRoot;
 
 
 #  Version information
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
 #------------------------------------------------------------------------------
@@ -121,6 +124,8 @@ my $mp2_installed=&mp2_installed();
     #  Binary
     #
     HTTPD_BIN => $Httpd_Bin,
+    APACHECTL_BIN => $Apachectl_Bin,
+    APXS_BIN => $Apxs_Bin,
 
 
     #  Config file templates and final names, delimiter if inserted into master httpd.conf
@@ -181,6 +186,7 @@ my $mp2_installed=&mp2_installed();
 
     #  Server config
     #
+    %{$Apxs_Config_hr || {}},
     %{$Httpd_Config_hr},
 
 
@@ -304,20 +310,101 @@ sub find_bin {
 }
 
 
+sub find_first_bin {
+
+    my ($env_ar, $name_ar)=@_;
+    foreach my $env (@{$env_ar || []}) {
+        next unless $ENV{$env};
+        return File::Spec->canonpath($ENV{$env}) if -f $ENV{$env};
+    }
+    my $path=join(Env::Path->PathSeparator, $ENV{'PATH'}, @{+PATH});
+    my @dir=grep {-d $_} split(Env::Path->PathSeparator, $path);
+    my %dir=map  {$_ => 1} @dir;
+    foreach my $dir (@dir) {
+        next unless delete $dir{$dir};
+        foreach my $name (@{$name_ar || []}) {
+            my $fn=File::Spec->catfile($dir, $name);
+            return File::Spec->canonpath($fn) if -f $fn;
+        }
+    }
+    return;
+
+}
+
+
+sub command_output {
+
+    my ($bin, @arg)=@_;
+    return unless $bin && -f $bin;
+    my @out;
+    open(my $stderr_save, '>&', \*STDERR);
+    open(STDERR, '>', File::Spec->devnull());
+    if (open(my $fh, '-|', $bin, @arg)) {
+        @out=<$fh>;
+        close($fh);
+    }
+    open(STDERR, '>&', $stderr_save) if $stderr_save;
+    return @out;
+
+}
+
+
+sub apachectl_bin {
+
+    my $apachectl_bin=find_first_bin(
+        [qw(APACHECTL_BIN APACHECTL APACHE2CTL)],
+        [qw(apachectl apache2ctl)]
+    );
+    debug("apachectl_bin returning: $apachectl_bin");
+    return $apachectl_bin;
+
+}
+
+
+sub apxs_bin {
+
+    my $apxs_bin=find_first_bin(
+        [qw(APXS_BIN APXS APACHE_TEST_APXS)],
+        [qw(apxs apxs2 apxs2.4)]
+    );
+    debug("apxs_bin returning: $apxs_bin");
+    return $apxs_bin;
+
+}
+
+
+sub apxs_config {
+
+    my $apxs_bin=shift() || return {};
+    my %config;
+    foreach my $key (qw(LIBEXECDIR SYSCONFDIR HTTPD_ROOT SERVER_CONFIG_FILE)) {
+        my @out=command_output($apxs_bin, '-q', $key);
+        next unless @out;
+        chomp(my $value=$out[0]);
+        next unless defined($value) && length($value);
+        $config{"APXS_$key"}=$value;
+    }
+    debug('apxs_config: %s', Dumper(\%config));
+    return \%config;
+
+}
+
+
 sub httpd_config {
 
 
-    #  Return if no Httpd_Bin, means apache binary not found
+    #  Return if neither httpd nor apachectl was found.
     #
     debug();
-    return unless $Httpd_Bin;
+    return unless $Httpd_Bin || $Apachectl_Bin;
 
 
     #  Need to get httpd config as series of key/val pairs
     #
     my %config;
     my $devnull=File::Spec->devnull();
-    my @httpd_config=qx(\"$Httpd_Bin\" -V 2>$devnull);
+    my @httpd_config=command_output($Httpd_Bin, '-V');
+    @httpd_config=command_output($Apachectl_Bin, '-V') unless @httpd_config;
     debug('httpd_config: %s', Dumper(\@httpd_config));
 
 
@@ -379,9 +466,14 @@ sub dir_apache_conf {
     my $apache_conf_dn;
     unless ($apache_conf_dn=$ENV{'DIR_APACHE_CONF'}) {
 
-        $apache_conf_dn=$Httpd_Config_hr->{'HTTPD_SERVER_CONFIG_FILE'};
+        if (my $sysconf_dn=$Apxs_Config_hr->{'APXS_SYSCONFDIR'}) {
+            $apache_conf_dn=$sysconf_dn;
+        }
+        else {
+            $apache_conf_dn=$Httpd_Config_hr->{'HTTPD_SERVER_CONFIG_FILE'};
+        }
         my $apache_conf_fn=(File::Spec->splitpath($apache_conf_dn))[2];
-        $apache_conf_dn=~s/\Q$apache_conf_fn\E$//;
+        $apache_conf_dn=~s/\Q$apache_conf_fn\E$// if $apache_conf_fn=~/\.conf$/;
 
         #$apache_conf_dn=(File::Spec->splitpath(
         #    $Httpd_Config_hr->{'HTTPD_SERVER_CONFIG_FILE'}))[1];
@@ -399,17 +491,33 @@ sub dir_apache_conf {
         }
 
 
-        #  Check for ../conf.d path
+        #  Prefer distro include directories when available. Debian-style
+        #  systems keep the source file in conf-available and enable it through
+        #  conf-enabled; Fedora/RHEL-style systems commonly include conf.d.
         #
-        foreach my $dn ('conf.d', File::Spec->catdir(File::Spec->updir(), 'conf.d')) {
+        my @include_dn=(
+            [ 'conf.d' ],
+            [ File::Spec->catdir(File::Spec->updir(), 'conf.d') ],
+            [ 'conf-available', 'conf-enabled' ],
+            [ File::Spec->catdir(File::Spec->updir(), 'conf-available'), File::Spec->catdir(File::Spec->updir(), 'conf-enabled') ],
+        );
+        foreach my $dn_ar (@include_dn) {
+            my ($dn, $enabled_dn)=@{$dn_ar};
             debug("looking for conf.d path: $dn");
             my $test_dn=File::Spec->canonpath(
                 File::Spec->catdir($apache_conf_dn, $dn));
             debug("testing: $test_dn");
             if (-d $test_dn) {
+                if ($enabled_dn) {
+                    my $test_enabled_dn=File::Spec->canonpath(
+                        File::Spec->catdir($apache_conf_dn, $enabled_dn));
+                    $Httpd_Config_hr->{'DIR_APACHE_CONF_ENABLED'}=realpath($test_enabled_dn)
+                        if -d $test_enabled_dn;
+                }
                 $apache_conf_dn=realpath($test_dn);
                 debug("found, setting apache_conf_dn: $apache_conf_dn");
                 $Httpd_Config_hr->{'HTTPD_SERVER_CONFIG_SKIP'}=1;
+                last;
             }
             else {
                 debug('not found');
@@ -443,6 +551,7 @@ sub dir_apache_modules {
     #
     debug();
     my @dn=(
+        $Apxs_Config_hr->{'APXS_LIBEXECDIR'},
         File::Spec->catdir(
             $Httpd_Config_hr->{'HTTPD_ROOT'}, 'modules'
         ),
@@ -573,3 +682,371 @@ sub mp2_installed {
 #  Done
 #
 1;
+__END__
+
+=begin markdown
+
+# WebDyne::Install::Apache::Constant #
+
+# NAME #
+
+WebDyne::Install::Apache::Constant - Apache-install discovery and template constants for WebDyne
+
+# SYNOPSIS #
+
+```perl
+use WebDyne::Install::Apache::Constant;
+```
+
+# DESCRIPTION #
+
+`WebDyne::Install::Apache::Constant` discovers Apache-related paths and defaults used by the Apache installer. It resolves the Apache binary, configuration directories, module directories, mod_perl library path, Apache runtime user/group, SELinux helpers, and template filenames used by `WebDyne::Install::Apache`.
+
+# CONSTANTS #
+
+Commonly used constants include:
+
+* **MP2_INSTALLED**
+
+    Boolean indicating whether mod_perl 2 appears to be installed.
+
+* **HTTPD_BIN**
+
+    Resolved path to the Apache `httpd` binary.
+
+* **APACHECTL_BIN**
+
+    Resolved path to `apachectl` or `apache2ctl`, used as a fallback source for Apache `-V` configuration output.
+
+* **APXS_BIN**
+
+    Resolved path to `apxs`, `apxs2`, or `apxs2.4`, used to query Apache development installation paths when available.
+
+* **DIR_APACHE_CONF**
+
+    Resolved Apache configuration directory.
+
+* **DIR_APACHE_CONF_ENABLED**
+
+    Resolved Debian-style enabled configuration directory when `conf-available` and `conf-enabled` are detected.
+
+* **DIR_APACHE_MODULES**
+
+    Resolved Apache modules directory.
+
+* **FILE_MOD_PERL_LIB**
+
+    Resolved mod_perl shared library path.
+
+* **APACHE_UNAME / APACHE_GNAME**
+
+    Detected Apache user and group names.
+
+* **APACHE_UID / APACHE_GID**
+
+    Detected Apache user and group numeric identifiers.
+
+* **FILE_WEBDYNE_CONF_TEMPLATE / FILE_WEBDYNE_CONF**
+
+    Input template filename and rendered Apache config filename.
+
+* **FILE_WEBDYNE_CONF_PL_TEMPLATE / FILE_WEBDYNE_CONF_PL**
+
+    Input template filename and rendered WebDyne Perl config filename.
+
+* **SELINUX_CONTEXT_HTTPD / SELINUX_CONTEXT_LIB**
+
+    SELinux context names used during installation checks and setup.
+
+* **SELINUX_ENABLED_BIN / SELINUX_CHCON_BIN / SELINUX_SEMANAGE_BIN**
+
+    Discovered helper binaries used for SELinux detection and context changes.
+
+# METHODS #
+
+This module also exposes helper routines used internally by the installer:
+
+* **httpd_bin()**
+
+    Locate the Apache executable.
+
+* **apachectl_bin()**
+
+    Locate the Apache control executable.
+
+* **apxs_bin() / apxs_config()**
+
+    Locate APXS and query Apache development installation paths.
+
+* **httpd_config()**
+
+    Inspect Apache configuration and derive path details.
+
+* **dir_apache_conf()**
+
+    Resolve the Apache configuration directory.
+
+* **dir_apache_modules()**
+
+    Resolve the Apache modules directory.
+
+* **file_mod_perl_lib()**
+
+    Locate the mod_perl shared library.
+
+* **mp2_installed()**
+
+    Determine whether mod_perl 2 support is available.
+
+# AUTHOR #
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 WebDyne::Install::Apache::Constant
+
+
+=head1 NAME
+
+WebDyne::Install::Apache::Constant - Apache-install discovery and template constants for WebDyne
+
+
+=head1 SYNOPSIS
+
+
+ use WebDyne::Install::Apache::Constant;
+
+=head1 DESCRIPTION
+
+C<WebDyne::Install::Apache::Constant> discovers Apache-related paths and defaults used by the Apache installer. It resolves the Apache binary, configuration directories, module directories, mod_perl library path, Apache runtime user/group, SELinux helpers, and template filenames used by C<WebDyne::Install::Apache>.
+
+
+=head1 CONSTANTS
+
+Commonly used constants include:
+
+=over
+
+=item *
+
+B<MP2_INSTALLED>
+
+Boolean indicating whether mod_perl 2 appears to be installed.
+
+
+
+=item *
+
+B<HTTPD_BIN>
+
+Resolved path to the Apache C<httpd> binary.
+
+
+
+=item *
+
+B<APACHECTL_BIN>
+
+Resolved path to C<apachectl> or C<apache2ctl>, used as a fallback source for Apache C<-V> configuration output.
+
+
+
+=item *
+
+B<APXS_BIN>
+
+Resolved path to C<apxs>, C<apxs2>, or C<apxs2.4>, used to query Apache development installation paths when available.
+
+
+
+=item *
+
+B<DIR_APACHE_CONF>
+
+Resolved Apache configuration directory.
+
+
+
+=item *
+
+B<DIR_APACHE_CONF_ENABLED>
+
+Resolved Debian-style enabled configuration directory when C<conf-available> and C<conf-enabled> are detected.
+
+
+
+=item *
+
+B<DIR_APACHE_MODULES>
+
+Resolved Apache modules directory.
+
+
+
+=item *
+
+B<FILE_MOD_PERL_LIB>
+
+Resolved mod_perl shared library path.
+
+
+
+=item *
+
+B<APACHE_UNAME / APACHE_GNAME>
+
+Detected Apache user and group names.
+
+
+
+=item *
+
+B<APACHE_UID / APACHE_GID>
+
+Detected Apache user and group numeric identifiers.
+
+
+
+=item *
+
+B<FILE_WEBDYNE_CONF_TEMPLATE / FILE_WEBDYNE_CONF>
+
+Input template filename and rendered Apache config filename.
+
+
+
+=item *
+
+B<FILE_WEBDYNE_CONF_PL_TEMPLATE / FILE_WEBDYNE_CONF_PL>
+
+Input template filename and rendered WebDyne Perl config filename.
+
+
+
+=item *
+
+B<SELINUX_CONTEXT_HTTPD / SELINUX_CONTEXT_LIB>
+
+SELinux context names used during installation checks and setup.
+
+
+
+=item *
+
+B<SELINUX_ENABLED_BIN / SELINUX_CHCON_BIN / SELINUX_SEMANAGE_BIN>
+
+Discovered helper binaries used for SELinux detection and context changes.
+
+
+
+=back
+
+
+=head1 METHODS
+
+This module also exposes helper routines used internally by the installer:
+
+=over
+
+=item *
+
+B<httpd_bin()>
+
+Locate the Apache executable.
+
+
+
+=item *
+
+B<apachectl_bin()>
+
+Locate the Apache control executable.
+
+
+
+=item *
+
+B<apxs_bin() / apxs_config()>
+
+Locate APXS and query Apache development installation paths.
+
+
+
+=item *
+
+B<httpd_config()>
+
+Inspect Apache configuration and derive path details.
+
+
+
+=item *
+
+B<dir_apache_conf()>
+
+Resolve the Apache configuration directory.
+
+
+
+=item *
+
+B<dir_apache_modules()>
+
+Resolve the Apache modules directory.
+
+
+
+=item *
+
+B<file_mod_perl_lib()>
+
+Locate the mod_perl shared library.
+
+
+
+=item *
+
+B<mp2_installed()>
+
+Determine whether mod_perl 2 support is available.
+
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
+
+=cut

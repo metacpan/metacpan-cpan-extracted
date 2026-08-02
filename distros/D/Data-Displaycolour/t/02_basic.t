@@ -5,13 +5,16 @@ use warnings;
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More tests => 6;
+use Test::More tests => 9;
 
 use_ok('Data::Displaycolour');
 
 my $dp = Data::Displaycolour->new(for_text => 'YeLlOw');
 
 isa_ok($dp, 'Data::Displaycolour');
+isa_ok($dp, 'Data::Identifier::Interface::Userdata');
+isa_ok($dp, 'Data::Identifier::Interface::Subobjects');
+isa_ok($dp, 'Data::Identifier::Interface::Known');
 ok(defined($dp->rgb(default => undef, no_defaults => 1)), 'Has RGB');
 ok(defined($dp->abstract('Data::Identifier', default => undef, no_defaults => 1)), 'Has abstract (Data::Identifier)');
 ok(defined($dp->specific('Data::Identifier', default => undef, no_defaults => 1)), 'Has specific (Data::Identifier)');

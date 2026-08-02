@@ -30,9 +30,7 @@ It superficially appears to be much more than this, if (and to the
 extent that) the block cipher is secure.  This technique is not
 suitable for all problems, and requires a careful choice of block
 cipher and keying method.  Applications requiring true entropy
-should generate it (see L<Data::Entropy::RawSource::Local>) or
-download it (see L<Data::Entropy::RawSource::RandomnumbersInfo> and
-L<Data::Entropy::RawSource::RandomOrg>).
+should generate it (see L<Data::Entropy::RawSource::Local>).
 
 =cut
 
@@ -44,7 +42,7 @@ use strict;
 
 use Params::Classify 0.000 qw(is_number is_ref is_string);
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 =head1 CONSTRUCTOR
 
@@ -343,8 +341,6 @@ sub eof {
 
 L<Crypt::Rijndael>,
 L<Data::Entropy::RawSource::Local>,
-L<Data::Entropy::RawSource::RandomOrg>,
-L<Data::Entropy::RawSource::RandomnumbersInfo>,
 L<Data::Entropy::Source>
 
 =head1 AUTHOR

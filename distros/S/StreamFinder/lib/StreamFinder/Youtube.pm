@@ -582,7 +582,6 @@ sub new
 	if ($self->{'_isaYtPage'} && !$self->{'noiframes'} && ($url2fetch =~ m#\/(?:channel|user|c)\/#
 			|| $url2fetch =~ m#$self->{'youtube-site'}\/\@#)) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
 		print STDERR "..1a:We're a channel or user page!...\n"  if ($DEBUG);
-		my $embedded_video;
 		my $html = '';
 		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 		$ua->timeout($self->{'timeout'});
@@ -617,67 +616,72 @@ sub new
 
 	unless ($self->{'_isaYtPage'} || $self->{'noiframes'}) {
 		print STDERR "..1a:See if we have a StreamFinder-supported URL in 1st iframe?...\n"  if ($DEBUG);
-		my $embedded_video;
+		my $embedded_video = 0;;
 		my $html = '';
 		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 		$ua->timeout($self->{'timeout'});
 		$ua->max_size(1024);  #LIMIT FETCH-SIZE TO AVOID INFINITELY DOWNLOADING A STREAM!
 		$ua->cookie_jar({});
 		$ua->env_proxy;
-	 	my $response = $ua->get($url);
+	 	my $response = $ua->get($url2fetch);
 	 	$html = $response->decoded_content  if ($response->is_success);
 	 	if ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i) {  #IF WE'RE AN HTML DOC. (NOT A STREAM!), THEN FETCH THE WHOLE THING:
 			$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
 		 	my $response = $ua->get($url2fetch);
 		 	$html = $response->decoded_content  if ($response->is_success);
+		 	##FIRST, LOOK FOR FIRST YOUTUBE VIDEO EMBEDDED IN AN IFRAME:
 			while ($html && $html =~ s#\<iframe([^\>]+)\>##so) {
 				my $one = $1;
 				my $embeddedURL = ($one =~ m#\"(https?\:\/\/[^\"]+)#s) ? $1 : '';
 				if ($embeddedURL) {
+					next  unless ($embeddedURL =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/);
+
 					$embeddedURL =~ s/[\?\&](?!v\=).*$//  unless ($self->{'notrim'});
 					print STDERR "--embedded IFRAME url=$embeddedURL=\n"  if ($DEBUG);
-					my $haveStreamFinder = 0;
-					eval { require 'StreamFinder.pm'; $haveStreamFinder = 1; };
-					if ($haveStreamFinder) {
-						my %globalArgs = (-noiframes => 1, -debug => $DEBUG);
-						foreach my $arg (qw(log logfmt)) {
-							$globalArgs{$arg} = $self->{$arg}  if (defined($self->{$arg}) && $self->{$arg});
-						}
-						$embedded_video = new StreamFinder($embeddedURL, %globalArgs);
-					}
+					$url2fetch = $embeddedURL;
+					$self->{'_isaYtPage'} = 1;
+					$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+					$self->{'id'} =~ s/^watch\?v\=//;
+					$self->{'id'} =~ s/[\?\&].*$//;
+					$embedded_video = 1;
 					last;
 				}
 			}
-			return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
 			##NEXT, TRY FOR YOUTUBE URLs HIDDEN IN JSON:
-			while ($html && $html =~ s#\"url\"\:\"([^\"]+)\"\,##so) {
-				my $one = $1;
-				my $embeddedURL = ($one =~ m#(https?\:\/\/[^\"]+)#so) ? $1 : '';
-				next  unless ($embeddedURL && $embeddedURL =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/o);
-				$embeddedURL =~ s/[\?\&](?!v\=).*$//  unless ($self->{'notrim'});
-				$url2fetch = $embeddedURL;
-				print STDERR "--embedded YOUTUBE JSON url=$url2fetch=\n"  if ($DEBUG);
-				$self->{'_isaYtPage'} = 1;
-				$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
-				$self->{'id'} =~ s/^watch\?v\=//;
-				$self->{'id'} =~ s/[\?\&].*$//;
-				$self->{'id'} = $1  if (!$self->{'_isaYtPage'} && $url2fetch =~ m#id[\=\:\#]?([^\/\s\=\:\#]+)#);
-				last;
+			unless ($embedded_video) {
+				while ($html && $html =~ s#\"url\"\:\"([^\"]+)\"\,##so) {
+					my $one = $1;
+					my $embeddedURL = ($one =~ m#(https?\:\/\/[^\"]+)#so) ? $1 : '';
+					next  unless ($embeddedURL && $embeddedURL =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/o);
+					$embeddedURL =~ s/[\?\&](?!v\=).*$//  unless ($self->{'notrim'});
+					$url2fetch = $embeddedURL;
+					print STDERR "--embedded YOUTUBE JSON url=$url2fetch=\n"  if ($DEBUG);
+					$self->{'_isaYtPage'} = 1;
+					$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+					$self->{'id'} =~ s/^watch\?v\=//;
+					$self->{'id'} =~ s/[\?\&].*$//;
+					$embedded_video = 1;
+					last;
+				}
 			}
-			unless ($self->{'youtubeonly'}) {
-				if ($html =~ /\bRumble\s*\(\"play\"\,\s+\{\"video\"\:\"([a-z0-9\-\_]+)\"/si) {
-					#EXTRACT CERTAIN EMBEDDED RUMBLE VIDEOS NOT NECESSARILY IN AN IFRAME:
-					my $embeddedURL = 'https://rumble.com/embed/' . $1;
-					my $haveRumble = 0;
-					print STDERR "---FOUND AN EMBEDDED RUMBLE VIDEO ($embeddedURL), SEE IF WE CAN GO WITH THAT!\n"  if ($DEBUG);
-					eval { require 'StreamFinder/Rumble.pm'; $haveRumble = 1; };
-					if ($haveRumble) {
-						my %globalArgs = (-debug => $DEBUG);
-						foreach my $arg (qw(log logfmt)) {
-							$globalArgs{$arg} = $self->{$arg}  if (defined($self->{$arg}) && $self->{$arg});
+			##LAST, TRY FOR EMBEDDED RUMBLE VIDEO-IDS (NOT RUMBLE-URLS,
+			##    WHICH WOULD BE CAUGHT BY StreamFinder::Rumble):
+			unless ($embedded_video) {
+				unless ($self->{'youtubeonly'}) {
+					if ($html =~ /\bRumble\s*\(\"play\"\,\s+\{\"video\"\:\"([a-z0-9\-\_]+)\"/si) {
+						#EXTRACT CERTAIN EMBEDDED RUMBLE VIDEOS NOT NECESSARILY IN AN IFRAME:
+						my $embeddedURL = 'https://rumble.com/embed/' . $1;
+						my $haveRumble = 0;
+						print STDERR "---FOUND AN EMBEDDED RUMBLE VIDEO ($embeddedURL), SEE IF WE CAN GO WITH THAT!\n"  if ($DEBUG);
+						eval { require 'StreamFinder/Rumble.pm'; $haveRumble = 1; };
+						if ($haveRumble) {
+							my %globalArgs = (-debug => $DEBUG);
+							foreach my $arg (qw(log logfmt)) {
+								$globalArgs{$arg} = $self->{$arg}  if (defined($self->{$arg}) && $self->{$arg});
+							}
+							$embedded_video = new StreamFinder::Rumble($embeddedURL, %globalArgs);
+							return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
 						}
-						$embedded_video = new StreamFinder::Rumble($embeddedURL, %globalArgs);
-						return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
 					}
 				}
 			}
@@ -696,9 +700,11 @@ DO_YTDL:
 	$self->{'format-fallback'} = $DEFAULTFALLBACK
 		if  (!defined($self->{'format-fallback'}) && $self->{'formatonly'});
 	my $ytformat = (defined $self->{'format'}) ? $self->{'format'} : $DEFAULTFMT;
-	my $ua = (defined $self->{'user-agent'}) ? (' --user-agent "'.$self->{'user-agent'}.'"') : '';
+	my $ua = (defined $self->{'user-agent'})
+			? (' --user-agent "'.$self->{'user-agent'}.'"') : '';
 	my $ytdlArgs = $self->{'youtube-dl-args'};
-	$ytdlArgs .= $self->{'youtube-dl-add-args'}  if (defined $self->{'youtube-dl-add-args'});
+	$ytdlArgs .= ' ' . $self->{'youtube-dl-add-args'}
+			if (defined $self->{'youtube-dl-add-args'});
 	$ytdlArgs .= $ua;
 	$ytdlArgs .= ' -f "' . $ytformat . '" '  unless ($ytformat =~ /^a(?:ny|ll)$/i);
 	my $try = 0;

@@ -16,7 +16,9 @@ run_per_install(PostgreSQL => sub {
     no strict 'refs';
     *{"main::DRIVER"} = sub() { 'PostgreSQL' };
 
-    require "$Bin/Pool.pm";
+    my $ok = eval { require "$Bin/Pool.pm"; 1 };
+    my $err = $@;
+    die $err unless $ok || QDB::Installs::is_resource_unavailable($err);
 });
 
 done_testing;

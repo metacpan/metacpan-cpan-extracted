@@ -50,7 +50,7 @@ use WebDyne::Install::Apache::Constant;
 
 #  Version information
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
 #  Debug
@@ -91,15 +91,21 @@ sub install {
     #  Get class, other paths
     #
     my ($class, $prefix, $installbin_dn, $opt_hr)=@_;
+    my $dry_run=$opt_hr->{'dry_run'} || $ENV{'DRY_RUN'};
+    local $ENV{'DRY_RUN'}=$ENV{'DRY_RUN'};
+    $ENV{'DRY_RUN'}=1 if $dry_run;
 
 
-    #  Run the base install/uninstall routine to create the cache dir
+    #  Run the base install/uninstall routine to create the cache dir.
+    #  In --text mode this module only renders generated config to STDOUT;
+    #  cache path discovery still happens below, but no filesystem setup is
+    #  performed.
     #
-    unless ($Uninstall_fg) {
+    unless ($Uninstall_fg || $opt_hr->{'text'}) {
         WebDyne::Install->install($prefix, $installbin_dn) ||
             return err();
     }
-    else {
+    elsif ($Uninstall_fg) {
         WebDyne::Install->uninstall($prefix, $installbin_dn) ||
             return err();
     }
@@ -191,22 +197,23 @@ sub install {
 
 
 
-    #  Open, write webdyne config file unless in uninstall
+    #  Remove webdyne config file in uninstall mode. Install mode writes it
+    #  after all generated fragments are available, so --text can print the
+    #  complete Apache/WebDyne configuration.
     #
-    unless ($Uninstall_fg) {
-        message "writing Apache config file '$webdyne_conf_fn'.";
-        my $webdyne_conf_fh=$opt_hr->{'text'} ? *STDOUT : IO::File->new($webdyne_conf_fn, O_CREAT | O_WRONLY | O_TRUNC) ||
-            return err("unable to open file $webdyne_conf_fn, $!");
-        print $webdyne_conf_fh $webdyne_conf;
-        $webdyne_conf_fh->close() unless ($webdyne_conf_fh eq '*main::STDOUT');
-        return \undef if $opt_hr->{'text'};
-    }
-    else {
+    if ($Uninstall_fg) {
 
         #  In uninstall - get rid of conf file
         #
         if (-f $webdyne_conf_fn) {
-            unlink($webdyne_conf_fn) && message "remove config file $webdyne_conf_fn";
+            if ($dry_run) {
+                message "would remove config file $webdyne_conf_fn";
+            }
+            else {
+                unlink($webdyne_conf_fn) ||
+                    return err("unable to remove config file $webdyne_conf_fn, $!");
+                message "remove config file $webdyne_conf_fn";
+            }
         }
 
     }
@@ -244,15 +251,69 @@ sub install {
     ) || return err("unable to fill in template $template_webdyne_conf_pl_fn, $Text::Template::ERROR");
 
 
+    #  Print complete generated output if requested.
+    #
+    if ($opt_hr->{'text'} && !$Uninstall_fg) {
+        print "# $webdyne_conf_fn\n";
+        print $webdyne_conf;
+        print "\n# $webdyne_conf_pl_fn\n";
+        print $webdyne_conf_pl;
+        unless ($config_hr->{'HTTPD_SERVER_CONFIG_SKIP'}) {
+            my $apache_template_fn=File::Spec->catfile(
+                $template_dn, $config_hr->{'FILE_APACHE_CONF_TEMPLATE'});
+            my $apache_template_or=Text::Template->new(
+                type   => 'FILE',
+                source => $apache_template_fn,
+            ) || return err("unable to open template $apache_template_fn, $!");
+            my $apache_conf=$apache_template_or->fill_in(
+                HASH       => $config_hr,
+                DELIMITERS => ['<!--', '-->'],
+            ) || return err("unable to fill in template $apache_template_fn, $Text::Template::ERROR");
+            print "\n# $apache_template_fn\n";
+            print $apache_conf;
+        }
+        elsif (my $enabled_dn=$config_hr->{'DIR_APACHE_CONF_ENABLED'}) {
+            my $enabled_fn=File::Spec->catfile($enabled_dn, $config_hr->{'FILE_WEBDYNE_CONF'});
+            print "\n# Enable by linking $enabled_fn to $webdyne_conf_fn\n";
+        }
+        return \undef;
+    }
+
+
+    #  Open, write webdyne config file unless in uninstall
+    #
+    unless ($Uninstall_fg) {
+        message "writing Apache config file '$webdyne_conf_fn'.";
+        if ($dry_run) {
+            message "would write Apache config file '$webdyne_conf_fn'.";
+        }
+        else {
+            my $webdyne_conf_fh=IO::File->new($webdyne_conf_fn, O_CREAT | O_WRONLY | O_TRUNC) ||
+                return err("unable to open file $webdyne_conf_fn, $!");
+            print $webdyne_conf_fh $webdyne_conf ||
+                return err("unable to write file $webdyne_conf_fn, $!");
+            $webdyne_conf_fh->close() ||
+                return err("unable to close file $webdyne_conf_fn, $!");
+        }
+    }
+
+
     #  Copy constants file into conf.d
     #
     unless ($Uninstall_fg) {
 
         message "writing Webdyne config file '$webdyne_conf_pl_fn'.";
-        my $webdyne_conf_pl_fh=IO::File->new($webdyne_conf_pl_fn, O_CREAT | O_WRONLY | O_TRUNC) ||
-            return err("unable to open file $webdyne_conf_pl_fn, $!");
-        print $webdyne_conf_pl_fh $webdyne_conf_pl;
-        $webdyne_conf_pl_fh->close() unless ($webdyne_conf_pl_fh eq '*main::STDOUT');
+        if ($dry_run) {
+            message "would write Webdyne config file '$webdyne_conf_pl_fn'.";
+        }
+        else {
+            my $webdyne_conf_pl_fh=IO::File->new($webdyne_conf_pl_fn, O_CREAT | O_WRONLY | O_TRUNC) ||
+                return err("unable to open file $webdyne_conf_pl_fn, $!");
+            print $webdyne_conf_pl_fh $webdyne_conf_pl ||
+                return err("unable to write file $webdyne_conf_pl_fn, $!");
+            $webdyne_conf_pl_fh->close() ||
+                return err("unable to close file $webdyne_conf_pl_fn, $!");
+        }
 
     }
     else {
@@ -260,9 +321,64 @@ sub install {
         #  In uninstall - get rid of conf file
         #
         if (-f $webdyne_conf_pl_fn) {
-            unlink($webdyne_conf_pl_fn) && message "remove config file $webdyne_conf_pl_fn";
+            if ($dry_run) {
+                message "would remove config file $webdyne_conf_pl_fn";
+            }
+            else {
+                unlink($webdyne_conf_pl_fn) ||
+                    return err("unable to remove config file $webdyne_conf_pl_fn, $!");
+                message "remove config file $webdyne_conf_pl_fn";
+            }
         }
 
+    }
+
+
+    #  Debian-style Apache installs use conf-available/conf-enabled.
+    #
+    if (my $enabled_dn=$config_hr->{'DIR_APACHE_CONF_ENABLED'}) {
+        my $enabled_fn=File::Spec->catfile($enabled_dn, $config_hr->{'FILE_WEBDYNE_CONF'});
+        if ($Uninstall_fg) {
+            if (-l $enabled_fn) {
+                my $target=readlink($enabled_fn);
+                if ($target eq $webdyne_conf_fn) {
+                    if ($dry_run) {
+                        message "would remove enabled Apache config link $enabled_fn";
+                    }
+                    else {
+                        unlink($enabled_fn) ||
+                            return err("unable to remove enabled Apache config link $enabled_fn, $!");
+                        message "remove enabled Apache config link $enabled_fn";
+                    }
+                }
+                else {
+                    message "not removing enabled Apache config link $enabled_fn; target is $target";
+                }
+            }
+            elsif (-e $enabled_fn) {
+                message "not removing enabled Apache config path $enabled_fn; it is not a symlink";
+            }
+        }
+        else {
+            unless (-e $enabled_fn) {
+                if ($dry_run) {
+                    message "would enable Apache config link '$enabled_fn'.";
+                }
+                else {
+                    symlink($webdyne_conf_fn, $enabled_fn) ||
+                        return err("unable to enable Apache config $enabled_fn -> $webdyne_conf_fn, $!");
+                    message "enabled Apache config link '$enabled_fn'.";
+                }
+            }
+            elsif (-l $enabled_fn) {
+                my $target=readlink($enabled_fn);
+                return err("Apache config link $enabled_fn points to $target, expected $webdyne_conf_fn")
+                    unless $target eq $webdyne_conf_fn;
+            }
+            else {
+                return err("Apache config enable path $enabled_fn already exists and is not a symlink");
+            }
+        }
     }
         
 
@@ -409,11 +525,18 @@ sub install {
         #  means nothing was changed.
         #
         unless ($Uninstall_fg && ($delim[0] == $delim[1])) {
-            $apache_conf_fh=IO::File->new($apache_conf_fn, O_TRUNC | O_WRONLY) ||
-                return err("unable to open file $apache_conf_fn, $!");
-            print $apache_conf_fh join('', @apache_conf);
-            $apache_conf_fh->close();
-            message "Apache config file '$apache_conf_fn' updated.";
+            if ($dry_run) {
+                message "would update Apache config file '$apache_conf_fn'.";
+            }
+            else {
+                $apache_conf_fh=IO::File->new($apache_conf_fn, O_TRUNC | O_WRONLY) ||
+                    return err("unable to open file $apache_conf_fn, $!");
+                print $apache_conf_fh join('', @apache_conf) ||
+                    return err("unable to write file $apache_conf_fn, $!");
+                $apache_conf_fh->close() ||
+                    return err("unable to close file $apache_conf_fn, $!");
+                message "Apache config file '$apache_conf_fn' updated.";
+            }
         }
 
     }
@@ -436,13 +559,18 @@ sub install {
             unless ($cache_dn eq File::Spec->tmpdir()) {
                 message
                     "Granting Apache ($APACHE_UNAME.$APACHE_GNAME) ownership of cache directory '$cache_dn'.";
-                chown($APACHE_UID, $APACHE_GID, $cache_dn) ||
-                    return err("unable to chown $cache_dn to $APACHE_UNAME.$APACHE_GNAME");
+                if ($dry_run) {
+                    message "would chown $cache_dn to $APACHE_UNAME.$APACHE_GNAME";
+                }
+                else {
+                    chown($APACHE_UID, $APACHE_GID, $cache_dn) ||
+                        return err("unable to chown $cache_dn to $APACHE_UNAME.$APACHE_GNAME");
+                }
 
 
                 #  Selinx fixup
                 #
-                if ($SELINUX_ENABLED_BIN) {
+                if ($SELINUX_ENABLED_BIN && !$dry_run) {
 
 
                     #  Run to see if SELinux enabled
@@ -550,3 +678,133 @@ sub install {
 
 
 }
+__END__
+
+=begin markdown
+
+# WebDyne::Install::Apache #
+
+# NAME #
+
+WebDyne::Install::Apache - Apache configuration installer for WebDyne
+
+# SYNOPSIS #
+
+```perl
+use WebDyne::Install::Apache;
+
+WebDyne::Install::Apache->install($prefix, $installbin_dn, \%options);
+WebDyne::Install::Apache->uninstall($prefix, $installbin_dn, \%options);
+```
+
+# DESCRIPTION #
+
+`WebDyne::Install::Apache` installs or removes Apache-side configuration files required for serving WebDyne pages under Apache/mod_perl.
+
+The module builds rendered configuration files from bundled templates, merges values from `WebDyne::Constant`, `WebDyne::Install::Constant`, and `WebDyne::Install::Apache::Constant`, ensures the base WebDyne installation step has run, and writes or removes the generated Apache config and WebDyne Perl config files.
+
+# METHODS #
+
+* **install($prefix, $installbin_dn, \%options)**
+
+    Run the Apache installer. This writes rendered configuration files derived from the bundled templates. If `text` is true in the options hash, the complete generated Apache/WebDyne config is printed instead of written to disk. If `dry_run` is true, planned filesystem and ownership changes are reported but not applied.
+
+* **uninstall($prefix, $installbin_dn, \%options)**
+
+    Run the uninstall path, removing generated Apache-side configuration files and delegating cache-directory cleanup to the base installer layer. If `dry_run` is true, planned removals are reported but not applied.
+
+# NOTES #
+
+The module depends on the discovery logic in `WebDyne::Install::Apache::Constant` for Apache binary detection, config directory selection, mod_perl library discovery, and SELinux-related helpers.
+
+# AUTHOR #
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 WebDyne::Install::Apache
+
+
+=head1 NAME
+
+WebDyne::Install::Apache - Apache configuration installer for WebDyne
+
+
+=head1 SYNOPSIS
+
+
+ use WebDyne::Install::Apache;
+ 
+ WebDyne::Install::Apache->install($prefix, $installbin_dn, \%options);
+ WebDyne::Install::Apache->uninstall($prefix, $installbin_dn, \%options);
+
+=head1 DESCRIPTION
+
+C<WebDyne::Install::Apache> installs or removes Apache-side configuration files required for serving WebDyne pages under Apache/mod_perl.
+
+The module builds rendered configuration files from bundled templates, merges values from C<WebDyne::Constant>, C<WebDyne::Install::Constant>, and C<WebDyne::Install::Apache::Constant>, ensures the base WebDyne installation step has run, and writes or removes the generated Apache config and WebDyne Perl config files.
+
+
+=head1 METHODS
+
+=over
+
+=item *
+
+B<install($prefix, $installbin_dn, \%options)>
+
+Run the Apache installer. This writes rendered configuration files derived from the bundled templates. If C<text> is true in the options hash, the complete generated Apache/WebDyne config is printed instead of written to disk. If C<dry_run> is true, planned filesystem and ownership changes are reported but not applied.
+
+
+
+=item *
+
+B<uninstall($prefix, $installbin_dn, \%options)>
+
+Run the uninstall path, removing generated Apache-side configuration files and delegating cache-directory cleanup to the base installer layer. If C<dry_run> is true, planned removals are reported but not applied.
+
+
+
+=back
+
+
+=head1 NOTES
+
+The module depends on the discovery logic in C<WebDyne::Install::Apache::Constant> for Apache binary detection, config directory selection, mod_perl library discovery, and SELinux-related helpers.
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
+
+=cut

@@ -2,7 +2,7 @@ package Test2::Tools::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000060';
 
 use Carp qw/croak/;
 use Test2::API qw/context/;
@@ -15,21 +15,26 @@ our @EXPORT = qw/get_db_or_skipall get_db skipall_unless_can_db skipall_on_resou
 # Match the errors a host throws when it cannot give a database server the
 # System V IPC resources it needs to start -- semaphore or shared-memory table
 # exhaustion. These come through as the failed initdb/start command's captured
-# output (e.g. PostgreSQL: "could not create semaphores: No space left on
-# device", "semget(...)", SEMMNI/SEMMNS hints). Returns a human reason if the
-# error is one of these, else undef.
+# output. Accept PostgreSQL's ENOSPC text (or its ENOSPC-only SEMMNI/SEMMNS
+# hint), plus driver-neutral semget()/shmget() failures that explicitly report
+# ENOSPC. The failed syscall alone is insufficient: it can also fail for
+# actionable reasons such as EACCES. Returns a human reason if the error is
+# specifically resource exhaustion, else undef.
 sub resource_exhaustion_reason {
     my ($err) = @_;
     return undef unless defined $err;
 
     return "host is out of System V semaphores (cannot start a database server)"
-        if $err =~ /could not create semaphores/i
-        || $err =~ /\bsemget\(/
-        || $err =~ /\bSEMM(?:NI|NS)\b/;
+        if $err =~ /could not create semaphores[^\n]*No space left on device/i
+        || ($err =~ /could not create semaphores/i
+            && $err =~ /\bSEMM(?:NI|NS)\b.*\b(?:would be exceeded|need to raise)\b/is)
+        || ($err =~ /\bsemget\(/
+            && $err =~ /No space left on device|\berrno[:= ]*28\b/i);
 
     return "host is out of System V shared memory (cannot start a database server)"
-        if $err =~ /could not create shared memory/i
-        || $err =~ /\bshmget\(/;
+        if $err =~ /could not create shared memory[^\n]*No space left on device/i
+        || ($err =~ /\bshmget\(/
+            && $err =~ /No space left on device|\berrno[:= ]*28\b/i);
 
     return undef;
 }

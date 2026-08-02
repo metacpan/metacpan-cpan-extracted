@@ -1,27 +1,44 @@
 package Test::Pool;
 BEGIN { $INC{'Test/Pool.pm'} = __FILE__ }
 
+use FindBin qw/$Bin/;
+use lib "$Bin/../lib";
+
 # These pool tests build, clone, start, and stop many servers in sequence. On a
-# slow or loaded host (e.g. a CPAN smoke box) the library's default start
-# timeout is too tight and the test spuriously fails. Ask for a generous one
-# here -- this only affects the test, not normal consumers of the library.
-# Respect any value already set.
+# slow or loaded host (e.g. a CPAN smoke box) the library's default start and
+# stop timeouts can be too tight for this unusual churn. Ask for generous test
+# values here -- this does not change normal consumers, and an explicit caller
+# value still wins.
 #
 # This used to also pin QDB_STOP_GRACE to a small value, on the theory that
 # wedged shutdowns "never finish no matter how long we wait" (the historical
 # PostgreSQL shutdown wedge on the FreeBSD smokers). That wedge turned out to
 # be stop() signals lost across the watcher's exec -- fixed in the watcher by
-# blocking them -- so real shutdowns do finish, and the library default grace
-# now accommodates a normal slow shutdown. No override needed.
+# blocking them. The 60s value below is deliberately more generous than the
+# library's 30s default because a loaded parallel Pool run has exceeded 30s;
+# it is not the old small-grace workaround. This deliberately gives a genuinely
+# stuck server a 122s watcher wait budget and a 182s final leash. This release
+# accepts that test-only cost to avoid prematurely killing a slow InnoDB
+# shutdown; root-causing the rare 30s+ shutdown remains separate work.
 BEGIN {
     $ENV{QDB_START_TIMEOUT} = 120 unless defined $ENV{QDB_START_TIMEOUT};
+    $ENV{QDB_STOP_GRACE}    = 60  unless defined $ENV{QDB_STOP_GRACE};
 }
 
 use Test2::V0 -target => 'DBIx::QuickDB::Pool';
+use QDB::Installs qw/skip_remaining_on_resource_error/;
 use File::Spec;
 use File::Temp qw/tempdir/;
 use Time::HiRes qw/time/;
 use Capture::Tiny qw/capture/;
+
+our @POOL_TEMP_DIRS;
+sub pool_tempdir {
+    my $cleanup = $^O eq 'MSWin32' ? 0 : 1;
+    my $dir = tempdir(CLEANUP => $cleanup);
+    push @POOL_TEMP_DIRS => $dir unless $cleanup;
+    return $dir;
+}
 
 # This is only here for developing the test, in most cases the test will be
 # called with a driver.
@@ -157,7 +174,7 @@ sub diag_connect {
 ok($driver, "Got a driver ($driver)") or die "Cannot continue without a driver";
 
 use Test2::Tools::QuickDB qw/skipall_on_resource_error/;
-use DBIx::QuickDB::Pool cache_dir => tempdir(CLEANUP => 1), verbose => 0;
+use DBIx::QuickDB::Pool cache_dir => pool_tempdir(), verbose => 0;
 
 # db() that builds/clones a new server can fail on a host out of System V IPC at
 # any point in the run, not just the very first build. Wrap the new-server
@@ -168,6 +185,12 @@ sub db_or_skip {
     my $ok = eval { @out = db(@_); 1 };
     return wantarray ? @out : $out[0] if $ok;
     my $err = $@;
+
+    # A new server can expose an IPC allocation failure in the middle of the
+    # Pool body. A skip-all plan is invalid after prior assertions; emit one
+    # normal skip and let the per-driver wrapper catch the dedicated sentinel.
+    skip_remaining_on_resource_error($err);
+
     skipall_on_resource_error($err);
     die $err;
 }
@@ -205,11 +228,7 @@ my $start = time();
 # This is the first server built from scratch (initdb + start). On a smoke host
 # already out of System V semaphores/shared memory it fails right here; treat
 # that as a skip (environment limit), not a failure. Any other error is real.
-my $base = eval { db($driver) };
-if (my $err = $@) {
-    skipall_on_resource_error($err);
-    die $err;
-}
+my $base = db_or_skip($driver);
 my $total = time() - $start;
 note(sprintf("Initialized DB from scratch in %.6f seconds", $total));
 
@@ -431,7 +450,7 @@ subtest init => sub {
         "Need a cache_dir to be valid"
     );
 
-    my $one = $CLASS->new(cache_dir => tempdir(CLEANUP => 1));
+    my $one = $CLASS->new(cache_dir => pool_tempdir());
     isa_ok($one, [$CLASS], "Created an instance");
     like(
         $one,
@@ -447,7 +466,7 @@ subtest init => sub {
 };
 
 subtest export => sub {
-    my $one = $CLASS->new(cache_dir => tempdir(CLEANUP => 1), library => 'Fake::Export::Lib');
+    my $one = $CLASS->new(cache_dir => pool_tempdir(), library => 'Fake::Export::Lib');
     $one->export;
     {
         package Fake::Export::Lib;
@@ -460,7 +479,7 @@ subtest export => sub {
 };
 
 subtest throw => sub {
-    my $one = $CLASS->new(cache_dir => tempdir(CLEANUP => 1));
+    my $one = $CLASS->new(cache_dir => pool_tempdir());
 
     my $line;
     my $throw = sub { $one->throw('haha') };
@@ -478,7 +497,7 @@ subtest throw => sub {
 };
 
 subtest alert => sub {
-    my $one = $CLASS->new(cache_dir => tempdir(CLEANUP => 1));
+    my $one = $CLASS->new(cache_dir => pool_tempdir());
 
     my $line;
     my $alert = sub { $one->alert('haha') };
@@ -496,7 +515,7 @@ subtest alert => sub {
 };
 
 subtest diag => sub {
-    my $one = $CLASS->new(cache_dir => tempdir(CLEANUP => 1));
+    my $one = $CLASS->new(cache_dir => pool_tempdir());
 
     like(
         [capture { $one->diag("haha") }],
@@ -527,8 +546,8 @@ subtest diag => sub {
 };
 
 subtest instance_dir => sub {
-    my $instdir = tempdir(CLEANUP => 1);
-    my $one     = $CLASS->new(cache_dir => tempdir(CLEANUP => 1), instance_dir => $instdir);
+    my $instdir = pool_tempdir();
+    my $one     = $CLASS->new(cache_dir => pool_tempdir(), instance_dir => $instdir);
 
     $one->add_driver(
         $driver => (
@@ -553,8 +572,14 @@ subtest instance_dir => sub {
         )
     );
 
-    my $db = eval { $one->fetch_db('xyz') };
-    if (my $err = $@) { skipall_on_resource_error($err); die $err }
+    my $db;
+    my $ok = eval { $db = $one->fetch_db('xyz'); 1 };
+    unless ($ok) {
+        my $err = $@;
+        skip_remaining_on_resource_error($err);
+        skipall_on_resource_error($err);
+        die $err;
+    }
     opendir(my $dh, $instdir) or die "Could not open dir: $!";
 
     my $found = 0;
@@ -570,5 +595,19 @@ subtest instance_dir => sub {
 
 # If run directly
 done_testing() unless $caller;
+
+# File::Temp's global cleanup runs before file-scope Pool/DBI objects are
+# destroyed. On Windows that made it warn about nonempty SQLite cache roots.
+# Track those roots without File::Temp cleanup there, disconnect their handles
+# explicitly, and use the same robust/quarantine policy as production teardown.
+END {
+    local $?;
+    if ($^O eq 'MSWin32') {
+        for my $dir (reverse @POOL_TEMP_DIRS) {
+            DBIx::QuickDB::Util::disconnect_dbi_handles($dir);
+            DBIx::QuickDB::Util::remove_tree_or_quarantine($dir);
+        }
+    }
+}
 
 1;

@@ -7,8 +7,7 @@ in a flexible way and without having to adapt to limitations of
 the several mini-languages of other templating engines available
 in CPAN. The template language used is just perl.
 
-Being a Tiny module, it has no external dependencies and can be
-used by just copying the pp.pl file to any executable directory.
+Being a Tiny module, it has no external dependencies.
 
 # Installation
 

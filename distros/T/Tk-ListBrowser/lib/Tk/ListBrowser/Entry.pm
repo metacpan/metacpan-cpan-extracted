@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.16;
+$VERSION = 0.17;
 
 use base qw(Tk::ListBrowser::Item);
 
@@ -150,14 +150,6 @@ sub deleteSelect {
 	$self->deleteRect;
 }
 
-#sub draw {
-#	my $self = shift;
-#	my ($x, $y) = @_;
-#	$self->SUPER::draw(@_);
-#	my $sel = $self->selected and $self->ismapped;
-#	$self->drawSelect if $sel;
-#}
-
 sub drawAnchor {
 	my ($self, $force) = @_;
 	return unless $self->ismapped;
@@ -171,40 +163,7 @@ sub drawAnchor {
 		-tags => ['anchor'],
 	);
 	$self->canchor($a);
-#	$c->raise('guides', 'anchor');
 }
-
-#sub drawSelect {
-#	my ($self) = @_;
-#	my $left = 1;
-#	my $right = 1;
-#	$self->deleteSelect;
-#	
-#	my $lb = $self->listbrowser;
-#	return unless $lb->ismapped;
-#	return unless $self->selected;
-#	my $c = $lb->Subwidget('Canvas');
-#	my $si = Tk::ListBrowser::SelectXPM->new($lb);
-#
-#	my @coords = $self->elementCoords;
-#	return if $coords[0] >= $coords[2];
-#	return if $coords[1] >= $coords[3];
-#
-#	my ($x, $y) = @coords;
-#	my $pixmap = $si->selectimage(@coords, $left, $right);
-#	my $image = $c->createImage($x, $y,
-#		-image => $pixmap,
-#		-anchor => 'nw',
-#		-tags => ['sel', 'rect', $self->name],
-#	);
-#	$self->crect($image);
-#	my @guides = $c->find('withtag', 'guides');
-#	$c->raise('guides', 'sel') if @guides;
-#	$c->raise('indicator', 'sel');
-#	$c->raise('indicator', 'guides') if @guides;
-#	$c->raise($self->cimage, $image);
-#	$c->raise($self->ctext, $image);
-#}
 
 sub hasChildren {
 	my $self = shift;
@@ -253,6 +212,7 @@ sub opened {
 sub openedparent {
 	my $self = shift;
 	my $name = $self->name;
+	return 1 unless $self->hierarchy;
 	my $p = $self->infoParent($name);
 	my $r = '';
 	if (defined $p) {

@@ -18,7 +18,12 @@ my %load    = (
 
 skipall_unless_can_db(\@drivers);
 
-diag("Search order: " . join(', ' => @drivers));
+is(
+    [sort @drivers],
+    [sort keys %load],
+    'randomized search order contains every requested driver exactly once',
+);
+note('Search order: ' . join(', ' => @drivers));
 
 subtest use_it => sub {
     my $db = get_db db => {drivers => \@drivers, load_sql => \%load};

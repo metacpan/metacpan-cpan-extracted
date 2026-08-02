@@ -1,10 +1,9 @@
+.mailmap
 Changes
 lib/Data/Entropy.pm
 lib/Data/Entropy/Algorithms.pm
 lib/Data/Entropy/RawSource/CryptCounter.pm
 lib/Data/Entropy/RawSource/Local.pm
-lib/Data/Entropy/RawSource/RandomnumbersInfo.pm
-lib/Data/Entropy/RawSource/RandomOrg.pm
 lib/Data/Entropy/Source.pm
 Makefile.PL
 MANIFEST
@@ -33,8 +32,6 @@ t/rand_int.t
 t/rand_prob.t
 t/rs_cryptcounter.t
 t/rs_local.t
-t/rs_randomnumbersinfo.t
-t/rs_randomorg.t
 t/shuffle.t
 t/test0.entropy
 t/with.t

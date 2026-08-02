@@ -1,6 +1,12 @@
 Revision History for File-Sticker
 =================================
 
+v4.606 2026-08-02
+-----------------
+
+* 2026-08-02 15:06:43 +1000
+  Fixed bug with Subject keywords in image files
+
 v4.605 2026-05-22
 -----------------
 
@@ -72,14 +78,6 @@ v4.101 2025-08-23
 
 * 2025-08-23 13:01:13 +1000
   fix for options
-
-v4.1 2025-06-05
----------------
-
-* 2025-06-05 16:17:20 +1000
-  Making the new fields create_date and alt_text
-* 2025-06-05 13:27:17 +1000
-  Rolling back the FreeFields excursion
 
 ===================================
 End of changes in the last 365 days

@@ -53,6 +53,21 @@ sub get {
     return undef;
 }
 
+# Poll $code until it returns true or $secs of wall-clock elapse. Fixed
+# iteration counts are unreliable on loaded CPAN smokers - a killed worker
+# is respawned with exponential backoff (see hm_core.h), so respawn/recycle
+# can lag several seconds. Bound by wall time instead.
+sub wait_until {
+    my ($secs, $code) = @_;
+    my $deadline = Time::HiRes::time() + $secs;
+    while (1) {
+        my $r = $code->();
+        return $r if $r;
+        return $r if Time::HiRes::time() >= $deadline;
+        Time::HiRes::sleep(0.1);
+    }
+}
+
 # collect the pids currently serving
 sub worker_pids {
     my %p;
@@ -68,9 +83,17 @@ cmp_ok(scalar @orig, '>=', 1, "serving from workers: @orig");
 
 # ---- stats --------------------------------------------------------------
 {
-    my $b = get('/stats');
+    # The per-worker counter is bumped after the response is sent, and /stats
+    # may land on a freshly-accepted worker whose count is still 0. Poll until
+    # some worker reports a request it has already completed.
+    my $b;
+    my $req = 0;
+    wait_until(15, sub {
+        $b = get('/stats');
+        ($req) = ($b // '') =~ /req=(\d+)/;
+        $req && $req > 0;
+    });
     like($b, qr/^req=\d+ conn=\d+ pid=\d+$/, "stats: $b");
-    my ($req) = $b =~ /req=(\d+)/;
     cmp_ok($req, '>', 0, 'request counter advanced');
 }
 
@@ -94,17 +117,14 @@ cmp_ok(scalar @orig, '>=', 1, "serving from workers: @orig");
     my ($victim) = @orig;
     kill 'KILL', $victim;
     Time::HiRes::sleep(0.2);
-    my $ok = 0;
-    for (1 .. 20) { defined get('/') and $ok++, last }
+    my $ok = wait_until(15, sub { defined get('/') });
     ok($ok, 'service continues after a worker is killed -9');
 
-    my $newcomer = 0;
     my %orig = map { $_ => 1 } @orig;
-    for (1 .. 100) {
+    my $newcomer = wait_until(15, sub {
         my $b = get('/');
-        if (defined $b && $b =~ /^w(\d+)/ && !$orig{$1}) { $newcomer = 1; last }
-        Time::HiRes::sleep(0.1) if $_ % 10 == 0;
-    }
+        defined $b && $b =~ /^w(\d+)/ && !$orig{$1};
+    });
     ok($newcomer, 'supervisor respawned a replacement worker');
 }
 
@@ -121,12 +141,10 @@ cmp_ok(scalar @orig, '>=', 1, "serving from workers: @orig");
     }
     is($failures, 0, 'no failed requests during HUP recycle');
 
-    my $fresh = 0;
-    for (1 .. 100) {
+    my $fresh = wait_until(15, sub {
         my $b = get('/');
-        if (defined $b && $b =~ /^w(\d+)/ && !$before{$1}) { $fresh = 1; last }
-        Time::HiRes::sleep(0.1) if $_ % 10 == 0;
-    }
+        defined $b && $b =~ /^w(\d+)/ && !$before{$1};
+    });
     ok($fresh, 'HUP produced fresh workers');
 }
 

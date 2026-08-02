@@ -1,4 +1,4 @@
-# WebDyne::Chain.pm(3pm) #
+# WebDyne::Chain #
 
 # NAME #
 
@@ -8,36 +8,35 @@ WebDyne::Chain - WebDyne chaining module, allows extension of base WebDyne handl
 
 SYNOPSIS
 
-```perl
-#  Basic usage in a simple chain.psp file:
+```
+#  Basic usage. Save as file named chain.psp:
 #
 <start_html>
 Server local time is: <? localtime ?>
 __PERL__
 use WebDyne::Chain qw(WebDyne::Session)
-
-#  Render with wdrender. Note the session variable
-#
-$ wdrender --header ./chain.psp
-Status: 200
-X-Frame-Options: SAMEORIGIN
-Pragma: no-cache
-Cache-Control: no-cache, no-store, must-revalidate
-Expires: 0
-Content-Type: text/html; charset=UTF-8
-Set-cookie: session=3653dbc88d665db9a4bfabf27a01310c; path=/
-X-Content-Type-Options: nosniff
-Content-Length: 242
-
-<!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"></head>
-<body><p>Server local time is: Sun Dec  7 21:56:17 2025</p></body></html>
-
-# Or extend manually from command line for testing. Does not require use of WebDyne::Chain
-# in page.
-#
-$ WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp 
-
 ```
+
+    #  Render with wdrender. Note the session variable
+    #
+    $ wdrender --header ./chain.psp
+    Status: 200
+    X-Frame-Options: SAMEORIGIN
+    Pragma: no-cache
+    Cache-Control: no-cache, no-store, must-revalidate
+    Expires: 0
+    Content-Type: text/html; charset=UTF-8
+    Set-cookie: session=3653dbc88d665db9a4bfabf27a01310c; path=/
+    X-Content-Type-Options: nosniff
+    Content-Length: 242
+    
+    <!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"></head>
+    <body><p>Server local time is: Sun Dec  7 21:56:17 2025</p></body></html>
+
+    # Or extend manually from command line for testing. Does not require use of WebDyne::Chain
+    # in page.
+    #
+    $ WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp 
 
 # DESCRIPTION #
 
@@ -61,6 +60,8 @@ WebDyne includes two example Chain modules in the base package:
 
     Rewrite Request or Response headers, HTML content
 
+When used inside a page, `use WebDyne::Chain ...` is intended for the page `__PERL__` block. The import routine stores the nominated module list in page metadata and switches the page handler to `WebDyne::Chain`.
+
 # USAGE #
 
 WebDyne::Chain allows nomination of modules to chain in a psp page via the import method when using the module. At it&#39;s simplest you can import just the modules you want.
@@ -69,7 +70,7 @@ WebDyne::Chain allows nomination of modules to chain in a psp page via the impor
 <start_html>
 Server local time is <? localtime ?>
 __PERL__
-use WebDyne::Chain qw(WebDyne::Session WebDyne::State);
+use WebDyne::Chain qw(WebDyne::Session WebDyne::Filter);
 1;
 ```
 
@@ -97,7 +98,7 @@ use WebDyne::Session;
 
 # METHODS #
 
-WebDyne::Chain does not expose any public methods
+WebDyne::Chain does not expose any public methods intended for page code. Its `handler()` implementation is internal and is used to construct and dispatch the nominated handler chain.
 
 # OPTIONS #
 
@@ -105,7 +106,7 @@ WebDyne::Chain does not expose any options other than the names of modules to ad
 
 # AUTHOR #
 
-Andrew Speer &lt;andrew.speer@isolutions.com.au&gt; and contributors.
+Andrew Speer <andrew.speer@isolutions.com.au> and contributors.
 
 # LICENSE #
 

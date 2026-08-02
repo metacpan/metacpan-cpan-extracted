@@ -1,3 +1,6 @@
+v0.07  2026-08-02Z
+    - Added support for "for" in mark()
+
 v0.06  2026-07-31Z
     - Use girlsandboys magenta for v0
     - Added CGA palette

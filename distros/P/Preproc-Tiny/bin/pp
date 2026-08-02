@@ -1,0 +1,3 @@
+#!/usr/bin/env perl
+use Preproc::Tiny;
+exit Preproc::Tiny::main(@ARGV);

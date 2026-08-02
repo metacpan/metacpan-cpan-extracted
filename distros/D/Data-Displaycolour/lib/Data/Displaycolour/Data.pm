@@ -17,7 +17,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %_extra_data = (
     en => {
@@ -565,7 +565,7 @@ Data::Displaycolour::Data - Work with display colours (internal data)
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

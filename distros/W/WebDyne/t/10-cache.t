@@ -76,7 +76,7 @@ sub main {
                 ok('cache code pairs')
             }
             else {
-                diag('html renders not identical: %s', Dumper([$html[$i-1], $html[$i]]));
+                diag('html renders not identical:', Dumper([$html[$i-1], $html[$i]]));
                 fail('cache code pairs');
             }
         }

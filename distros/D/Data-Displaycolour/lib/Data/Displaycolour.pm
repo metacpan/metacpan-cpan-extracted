@@ -18,7 +18,7 @@ use Data::URIID::Colour;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Known);
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %_abstract_names_to_ise = (
     black    => 'fade296d-c34f-4ded-abd5-d9adaf37c284',
@@ -256,16 +256,28 @@ sub new {
     }
 
     if (!defined($self->{origin}) && defined(my $for = delete $opts{for})) {
-        my $id = eval {Data::Identifier->new(from => $for)};
+        {
+            my %found;
 
-        if (eval {$for->isa('Data::Identifier::Interface::Userdata')}) {
-            foreach my $key (qw(origin abstract specific)) {
-                my $v = scalar(eval { $for->userdata(__PACKAGE__, 'mark_'.$key) }) // next;
-                $opts{from} //= $v;
+            while (eval {$for->isa('Data::Identifier::Interface::Userdata')}) {
+                croak 'Recursion loop detected' if exists $found{$for};
+                $found{$for} = undef;
+                foreach my $key (qw(origin abstract specific)) {
+                    my $v = scalar(eval { $for->userdata(__PACKAGE__, 'mark_'.$key) }) // next;
+                    $opts{from} //= $v;
+                }
+
+                if (defined(my $new_for = eval { $for->userdata(__PACKAGE__, 'mark_for') })) {
+                    $for = $new_for;
+                } else {
+                    last;
+                }
             }
         }
 
         unless (defined $opts{from}) {
+            my $id = eval {Data::Identifier->new(from => $for)};
+
             if (defined $_abstract_ise_to_name{eval {$id->ise} // ''}) {
                 $opts{from} //= $for;
             } elsif ($for->isa('Data::URIID::Result')) {
@@ -481,12 +493,14 @@ sub mark {
 
     $opts{origin} //= delete $opts{from};
 
-    foreach my $key (qw(origin abstract specific)) {
+    foreach my $key (qw(origin abstract specific for)) {
         my $v = delete($opts{$key}) // next;
 
         if (!ref $v) {
             $v = Data::URIID::Colour->new(rgb => $v);
         } elsif ($v->isa('Data::Identifier')) {
+            # no-op.
+        } elsif ($key eq 'for' && $v->isa('Data::Identifier::Interface::Subobjects')) {
             # no-op.
         } else {
             $v = Data::URIID::Colour->new(from => $v);
@@ -679,7 +693,7 @@ Data::Displaycolour - Work with display colours
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -874,6 +888,8 @@ The following options (all optional) are supported:
 
 =item C<origin>
 
+(experimental since v0.06)
+
 The colour to use. This is the same as C<from> in L</new> but for the supported value types.
 
 This accepts a value RGB value as per C<rgb> of L<Data::URIID::Colour/new>,
@@ -882,18 +898,27 @@ or anything L<Data::URIID::Colour/new> accepts via C<from>, including an instanc
 
 =item C<from>
 
+(experimental since v0.06)
+
 An alias for C<origin>.
+
+=item C<for>
+
+(experimental since v0.07)
+
+Proxy the request to the given object, effectively using the same data as for the object given here.
+Accepts the same values as C<for> in L</new>.
 
 =item C<abstract>
 
-(highly experimental)
+(highly experimental since v0.06)
 
 The abstract colour to use.
 Takes the same values as C<origin>.
 
 =item C<specific>
 
-(highly experimental)
+(highly experimental since v0.06)
 
 The specific colour to use.
 Takes the same values as C<origin>.

@@ -12,7 +12,7 @@ ok(-e $script, 'wdrender script found');
 
 # Capture STDOUT and STDERR
 my ($stdout, $stderr, $exit) = capture {
-    system($^X, $script, '--headers_in=hx-request:true', 't/htmx_bare.psp');   # run with Perl interpreter
+    system($^X, $script, (map {"--no$_"} qw(colour tidy lineno)), '--headers_in=hx-request:true', 't/htmx_bare.psp');   # run with Perl interpreter
 };
 
 # Ensure script executed successfully

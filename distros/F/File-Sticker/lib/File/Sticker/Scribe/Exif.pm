@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Exif;
-$File::Sticker::Scribe::Exif::VERSION = '4.605';
+$File::Sticker::Scribe::Exif::VERSION = '4.606';
 =head1 NAME
 
 File::Sticker::Scribe::Exif - read, write and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 4.605
+version 4.606
 
 =head1 SYNOPSIS
 
@@ -265,7 +265,7 @@ sub read_meta {
     my @tags = ();
     foreach my $field (sort keys %{$info})
     {
-        if ($field =~ /(Keywords|Subject)/
+        if ($field =~ /^(Keywords|Subject)$/
                 and $info->{$field})
         {
             my $val = $info->{$field};

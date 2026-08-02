@@ -1,0 +1,61 @@
+<start_html ws title="WebSocket Demo" h3>
+<input id="msg" value="Hello from browser">
+<button id="send">Send</button>
+<pre id="log"></pre>
+
+<script>
+  const log = (line) => {
+    document.getElementById('log').textContent += line + "\n";
+  };
+
+  const ws = new WebSocket(
+    `${location.origin.replace(/^http/, "ws")}${location.pathname}`
+  );
+
+  ws.onopen = () => log("connected");
+  ws.onmessage = (ev) => log("server: " + ev.data);
+  ws.onclose = () => log("closed");
+  ws.onerror = (ev) => log("error");
+
+  document.getElementById('send').onclick = () => {
+    const text = document.getElementById('msg').value;
+    log("client: " + text);
+    ws.send(text);
+  };
+</script>
+__PERL__
+use Future::AsyncAwait;
+
+async sub ws {
+
+    my $self=shift();
+    my $r=$self->r();
+    #my $ws_or=$self->r->ws();
+    my ($scope, $receive, $send) = map {$r->{$_}} qw(scope receive send);
+
+    await $send->({
+        type => 'websocket.accept',
+    });
+
+    while (1) {
+        my $event = await $receive->();
+
+        last if $event->{type} eq 'websocket.disconnect';
+
+        if (defined $event->{text}) {
+            my $text=$event->{text}. ' '. scalar localtime;
+            await $send->({
+                type => 'websocket.send',
+                text => "$text",
+            });
+        }
+        elsif (defined $event->{bytes}) {
+            await $send->({
+                type  => 'websocket.send',
+                bytes => $event->{bytes},
+            });
+        }
+    }
+
+    return;
+}

@@ -35,7 +35,43 @@ use POSIX qw/WNOHANG/;
 use Time::HiRes qw/sleep/;
 
 use Importer Importer => 'import';
-our @EXPORT = qw/run_per_install qdb_installs contaminate_env/;
+our @EXPORT = qw{
+    run_per_install qdb_installs contaminate_env
+    skip_remaining_on_resource_error is_resource_unavailable
+};
+
+{
+    package QDB::Installs::ResourceUnavailable;
+
+    sub reason { shift->{reason} }
+    sub error  { shift->{error} }
+}
+
+# A skip-all plan is invalid after a test body has already emitted assertions.
+# Pool tests can exhaust host IPC resources partway through, so record one
+# ordinary skip for the unavailable remainder and throw a dedicated sentinel.
+# The per-driver wrapper catches only that sentinel; every other exception
+# still fails the buffered install subtest.  Loading the DBIx test helper is
+# deliberately deferred until this function runs in an install child (see the
+# parent-process loading warning above).
+sub skip_remaining_on_resource_error {
+    my ($err) = @_;
+
+    require Test2::Tools::QuickDB;
+    my $reason = Test2::Tools::QuickDB::resource_exhaustion_reason($err)
+        or return 0;
+
+    my $ctx = context();
+    $ctx->skip('remaining Pool checks unavailable', ucfirst($reason));
+    $ctx->release;
+
+    die bless {reason => $reason, error => $err}, 'QDB::Installs::ResourceUnavailable';
+}
+
+sub is_resource_unavailable {
+    my ($err) = @_;
+    return ref($err) eq 'QDB::Installs::ResourceUnavailable';
+}
 
 my %MYSQL_FORK = (
     MariaDB  => {servers => [qw/mariadbd mysqld/], clients => [qw/mariadb mysql/], match => qr/MariaDB/i},

@@ -1,59 +1,54 @@
-/* Layout and font selections */
-
-:root {
-  --pico-font-size: 85%;
-}
 body {
   margin: 1rem auto;
   max-width: 900px;
 }
+
+/* Let directory columns size naturally, but keep entries on one line. */
 table {
   width: 100%;
-  border-collapse: collapse;
 }
-th, td {
-  text-align: left;
-  padding: 0.5rem;
+
+th,
+td {
+  white-space: nowrap;
 }
-th {
-  font-weight: bold;
+
+tbody tr:nth-child(even) td {
+  background-color: var(--pico-table-row-stripped-background-color, rgba(111, 120, 135, .0375));
 }
-tr:nth-child(even) {
-  background-color: var(--pico-background-color-hover);
+
+tbody tr:hover td {
+  background-color: var(--pico-form-element-selected-background-color, #dfe3eb);
 }
+
 hr {
   margin: 1.5rem 0;
 }
 
-/* Keep the table from expanding when code is injected */
-table {
-  table-layout: fixed;
-  width: 100%;
-  border-collapse: collapse;
+.source-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  cursor: pointer;
 }
 
-/* Make sure the cell doesn't force wider layout */
+/* Keep the source preview from expanding beyond the table width. */
 .source-row td {
   max-width: 100%;
-  overflow: hidden; /* hides anything outside the cell */
+  overflow: hidden;
 }
 
-/* Style the code block properly */
+/* Keep source code scrollable inside its table cell. */
 .source-row pre {
   margin: 0;
-  padding: 0.5em;
-  background: #f8f8f8; /* optional */
-  border-radius: 4px;
-
-  /* The key bits: */
-  white-space: pre;      /* no wrapping */
-  overflow-x: auto;      /* horizontal scroll if needed */
-  overflow-y: hidden;    /* avoid double scrollbars */
-  max-width: 100%;       /* stay within the table cell */
-  box-sizing: border-box;
+  padding: .5em;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
 }
 
-/* Ensure code fits inside pre block */
+/* Ensure highlighted code fills the scrollable pre block. */
 .source-row code {
   display: inline-block;
   min-width: 100%;

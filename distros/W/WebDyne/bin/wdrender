@@ -11,6 +11,14 @@
 #
 #  <http://dev.perl.org/licenses/>
 #
+BEGIN {
+
+    #  Get in before module load
+    #
+    $ENV{'WEBDYNE_HTML_NEWLINE'}=0;
+    $ENV{'WEBDYNE_ERROR_TEXT'}=1;
+    
+}
 
 
 #
@@ -24,34 +32,49 @@ package main;
 use strict qw(vars);
 use vars   qw($VERSION);
 use warnings;
+no warnings qw(once);
 
 
-#  Use the base module
+#  Use the base module for err()
 #
-use WebDyne::Util;
+use WebDyne::Util qw(:all);
 
 
 #  Other external modules
 #
-use WebDyne;
-use WebDyne::Request::Fake;
+use WebDyne::Constant;
 use Getopt::Long;
 use Pod::Usage;
 use IO::File;
+use IO::String;
 use File::Spec;
-use FindBin qw($RealBin $Script);
-use URI::Escape;
+use FindBin qw($Script);
+#use URI::Escape;
+use Data::Dumper;
+use Term::ANSIColor;
+use File::Basename;
+use HTTP::Request;
+use HTTP::Response;
+use URI;
+use Cwd qw(fastcwd);
 
 
 #  Error handling and environment
 #
-use Carp;
-local $SIG{__DIE__}=\&Carp::confess;
+#use Carp;
+#local $SIG{__DIE__}=\&Carp::confess;
+#sub err { croak(@_) }
+
+
+#  Local customisation
+#
+local $Data::Dumper::Indent=1;
+local $Data::Dumper::Sortkeys=1;
 
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
 #  Run main
@@ -59,6 +82,7 @@ $VERSION='2.075';
 exit ${&main(\@ARGV) || die errdump()};
 
 #===================================================================================================
+
 
 sub main {
 
@@ -68,14 +92,25 @@ sub main {
     my $argv_ar=shift();
 
 
-    #  Defaul options
+    #  Default options
     #
     my %opt=(
 
         handler => $ENV{'WebDyneHandler'} || 'WebDyne',
         error   => 'text',
         header  => 0,
-        warn    => 0,
+        tidy    => 1,
+        colour  => 1,
+        lineno  => 1,
+        no_head_insert => 1,
+        theme   => 'light',
+        #request => ['fake'],
+        method  => 'GET',
+        root    => fastcwd(),
+        keep_tmp => 0,
+        warn    => 1,
+        apache_stdout => 0,
+        %{do(glob(sprintf('~/.%s.opt', basename(__FILE__)))) || {}}
 
     );
 
@@ -84,160 +119,358 @@ sub main {
     #
     GetOptions(
         \%opt,
-        'help|?',
-        'handler=s',
-        'status=s',
-        'header!',
-        'warn!',
-        'error=s',
-        'headers_out|header_out=s@',
-        'headers_in|header_in=s@',
-        'outfile=s',
-        'repeat|r|num|n=s',
-        'loop',
+        my @opt=(
+        'all',
+        'colour|color!',
+        'compare',
+        'conf|config=s',
+        'no_conf|no_config|no-conf|no-config' => sub { $opt{'no_conf'}=1 },
+        'delay|sleep=i',
+        # 'error=s', # Not applied
+        'fake',
         'get=s@',
-        'delay=i',
+        'handler=s',
+        'head',
+        'head_insert|head-insert!',
+        'header|headers!',
+        'header_only|header-only|headers_only|headers-only|headersonly',
+        'headers_in|header_in|headers-in|header-in=s@',
+        'htmx',
+        'lineno!',
+        'loop',
+        'method=s',
+        'mod_perl|mod-perl|apache',
+        'apache_stdout|apache-stdout!',
+        'dump_postamble|dump-postamble',
+        'dump_opt|dump-opt|opt',
+        'options=s@',
+        'outfile=s',
+        'pagi',
+        'param=s@',
+        'patch=s@',
+        'post=s@',
+        'psgi',
+        'psgi_server|psgi-server',
+        'put=s@',
+        'raw',
+        'repeat|num|n=s',
+        'request|r=s@',
+        'root|docroot|doc_root|doc-root|document_root|document-root=s',
+        'sse',
+        'silent|quiet!',
+        #'status=s', # Not applied
+        'test',
+        'theme=s',
+        'tidy|pretty!',
+        'keep_tmp|keep-tmp!',
+        'help|?',
+        'warn!',
         'man',
         'version'
+        ),
     ) || pod2usage(2);
     pod2usage(-verbose => 99, -sections => 'SYNOPSIS|OPTIONS', -exitval => 1) if $opt{'help'};
     pod2usage(-verbose => 2)                                                  if $opt{'man'};
     $opt{'version'} && do {
+        require WebDyne;
         print "$Script version: $VERSION\n";
         print "WebDyne version: $WebDyne::VERSION ($WebDyne::VERSION_GIT_SHA)\n";
         exit 0
     };
 
 
+    #  Convert negative flags
+    #
+    #map {$opt{"no_${_}"}=!($opt{$_})} qw(head_insert);
+    map {$opt{"no_${_}"}=!($opt{$_})} map { /^([^|!:=+]+)/ } grep {/\!$/} @opt;
+    
+
+    #  Special config ?
+    #
+    if (my $conf_fn=$opt{'conf'}) {
+        $ENV{'WEBDYNE_CONF'}=$opt{'conf'};
+    }
+    elsif($opt{'no_conf'} || $opt{'raw'}) {
+        $ENV{'WEBDYNE_CONF'}='.';
+    }
+
+
+    #  Dump options for debugging
+    #
+    die Dumper(\%opt) if $opt{'dump_opt'};
+
+    
     #  Is dest file set ? If so open
     #
-    my $dest_fh;
+    my ($html, $html_fh);
     if (my $dest_fn=$opt{'outfile'}) {
-        $dest_fh=IO::File->new($dest_fn, O_CREAT | O_TRUNC | O_WRONLY) ||
+        $html_fh=IO::File->new($dest_fn, O_CREAT | O_TRUNC | O_WRONLY) ||
             return err("unable to open file $dest_fn for output, $!");
-        $opt{'select'}=$dest_fh;
     }
+    #else {
+    #    $html_fh=IO::String->new($html);
+    #}
+    #$opt{'select'}=$html_fh;
 
 
     #  Get srce file, add to options
     #
-    my $srce_fn=shift(@{$argv_ar}) ||
+    my $srce_fn=$opt{'test'} ? $WEBDYNE_DEFAULT_TEST_FN : shift(@{$argv_ar});
+    $srce_fn ||
         pod2usage("$Script: no source file specified !");
     (-f $srce_fn) ||
         pod2usage("$Script: input file not found !");
 
 
-    #  Split out header in/out arrays as Request::Fake uses hash to hold them (should be array one day)
+    #  Consolidate backend request handler options into one multiplexer option
     #
-    my ($header_out_ar, $header_in_ar)=map {delete $opt{$_}} qw(
-        headers_out
-        headers_in
-    );
+    my @request_type=qw(fake psgi psgi_server pagi mod_perl);
+    my $request_ar=ref($opt{'request'}) eq 'ARRAY' ? $opt{'request'} : [ grep { defined } $opt{'request'} ];
+    #my %request_type=map { $_=>1 } @{$opt{'request'}};
+    my %request_type=map { $_=>1 } @{$request_ar};
+    map { $request_type{$_}=1 } grep { $opt{$_} } @request_type;
+    unless ($request_type{'all'} || $opt{'all'}) {
+        @request_type=grep {$request_type{$_} || $opt{$_}} @request_type;
+    }
+    @request_type=('fake') unless @request_type;
+
+
+    #  Santy check to make sure no invalid request types
+    #
+    delete @request_type{(@request_type, 'all')};
+    return err('invalid or missing request type \'%s\', must be one of fake,psgi,psgi_server,pagi,mod_perl,all', join(',', sort keys %request_type)) 
+        if keys %request_type;
+        
+    
+    #  Get request method wanted
+    #
+    my $method=lc((grep{exists $opt{$_}} qw(get post patch put options head))[0] || $opt{'method'});
+    
+
+    #  Convert any headers into a HTTP::Header object
+    #
+    my @headers_in=map { split(/[:=]/, $_, 2) } @{$opt{'headers_in'}};
+    my $headers_in_or=HTTP::Headers->new(@headers_in);
+    
+
+    #  Get any headers from environment vars
+    #
+    foreach my $env (qw(CONTENT_TYPE CONTENT_LENGTH), grep {/^HTTP_/} keys %ENV) {
+        my $value=$ENV{$env};
+        (my $header=$env)=~s/^HTTP_//;
+        $header=~s/\-/_/;
+        $headers_in_or->header(lc($header), $value);
+    }
     
     
-    #  Simulate a GET request with parameters if supplied
+    #  If htmx option add hx-request header
     #
-    if (my $query_opt_ar=delete $opt{'get'}) {
-        my @query_string;
-        my @query_opt=map { split(/[;&]/) } @{$query_opt_ar};
-        foreach my $query_opt (@query_opt) {
-            my ($key, $value)=split(/=/, $query_opt);
-            push @query_string, join('=', map { uri_escape($_) } ($key, $value));
-        }
-        my $query_string=join('&', @query_string );
-        ## no critic (Variables::RequireLocalizedPunctuationVars)
-        $ENV{'QUERY_STRING'}=$query_string;
-        $ENV{'REQUEST_METHOD'}='GET';
-        ## use critic
+    if ($opt{'htmx'}) {
+        $headers_in_or->header('hx-request', 'true');
+    }
+    if ($opt{'sse'}) {
+        $headers_in_or->header('accept', 'text/event-stream');
     }
 
 
-    #  Get new request object
+    #  Pull out query or post params
+    #
+    my @query_string;
+    if (my $query_opt_ar=$opt{$method}) {
+        my @query_opt=map { split(/[;&]/, $_) } @{$query_opt_ar};
+        foreach my $query_opt (@query_opt) {
+            my ($key, $value)=split(/[:=]/, $query_opt, 2);
+            push @query_string, $key, $value
+        }
+    };
+    $opt{'query_string'}=\@query_string;
+    
+    
+    #  And parameters we want to supply to the handler for use in perl blocks ?
+    #
+    my %param;
+    if (my $param_opt_ar=$opt{'param'}) {
+        my @param_opt=map { split(/[;&]/) } @{$param_opt_ar};
+        foreach my $param (@param_opt) {
+            my ($key, $value)=split(/[:=]/, $param, 2);
+            if (ref($param{$key}) eq 'ARRAY') {
+                #  Array already, push
+                push @{$param{$key}}, $value;
+            }
+            elsif (exists $param{$key}) {
+                #  Duplicate, create array
+                $param{$key}=[$param{$key}, $value];
+            }
+            else {
+                #  Vanilla
+                $param{$key}=$value;
+            }
+        }
+    };
+    $opt{'param'}=\%param;
+
+
+    #  Construct the HTTP::Request object
+    #
+    my $req_or;
+    my $uri_or=URI->new($srce_fn);
+    if ($method eq 'get') {
+        $uri_or->query_form(\@query_string);
+        $req_or=HTTP::Request->new('GET', $uri_or, $headers_in_or);
+    }
+    else {
+        #$req_or=HTTP::Request->new(uc($method), $uri_or, $headers_in_or, \@query_string);
+        my $method_uc=uc($method);
+        use HTTP::Request::Common;
+        $req_or=&{"HTTP::Request::Common::${method_uc}"}($uri_or, \@query_string, $headers_in_or->flatten );
+    }
+    
+    
+    #  If we're running apache backend start server now
+    #
+    my $apache_runner;
+    if ($opt{'mod_perl'} || $opt{'all'} || (grep {/^(?:mod_perl|apache)$/} @request_type)) {
+        $apache_runner=&request_mod_perl_startup(\%opt);
+    }
+
+
+    #  Run main routine to call appropriate handler
     #
     LOOP: while (1) {
-        for (1..($opt{'repeat'} || 1)) {
+    
 
-            #  Get new request handler
+        #  Request type is PSGI, PAGI, Fake etc.
+        #
+        foreach my $request_type (@request_type) {
+        
+        
+            #  If different request types (more than one) identify
             #
-            my $r=WebDyne::Request::Fake->new(
-
-                filename => $srce_fn,
-                %opt
-
-                #select          =>  $dest_fh,
-                #status          =>  $opt{'status'},
-
-            ) || return err();
-            
-
-            #  Set headers
-            #
-            foreach my $header_out (@{$header_out_ar}) {
-                my ($k, $v)=split(/\s*:\s*/, $header_out);
-                $r->headers_out($k, $v);
-            }
-            foreach my $header_in (@{$header_in_ar}) {
-                my ($k, $v)=split(/\s*:\s*/, $header_in);
-                $r->headers_in($k, $v);
+            if ((@request_type > 1) && !$opt{'silent'}) {
+                print "Request type: $request_type\n";
             }
 
-
-            #  Get handler
-            #
-            my $handler=$opt{'handler'};
-
-
-            #  Load up whichever handler we are using
-            #
-            (my $handler_pm = $handler) =~ s{::}{/}g;
-            $handler_pm.='.pm';
-            eval {require $handler_pm} ||
-                return err("$Script: unable to load handler $handler, $@");
-
-
-            #  Set text errors only
-            #
-            $WebDyne::Err::WEBDYNE_ERROR_TEXT=1 if ($opt{'error'} eq 'text');
-
-
-            #  Set header, warning output
-            #
-            #$r->notes('noheader', $opt{'header'} ? 0 : 1);
-            #$r->notes('nowarn',   $opt{'warn'} ? 0 : 1);
-
-
-            #  Run it and display results, or any error generated
-            #
-            defined($handler->handler($r)) || return err();
-            print $/;
-
             
-            #  If looking for leak
+            #  Run as many repeats as nominated
             #
-            #my $gladiator_ar=Devel::Gladiator::walk_arena();
-
-
-            #  Manual cleanup
-            #
-            $r->DESTROY();
+            for (1..($opt{'repeat'} || 1)) {
             
             
-            #  Leak detection
-            #
-            #print("SV: ",  scalar @{$gladiator_ar}, "\n") if $opt{'leak'};
-            #@{$gladiator_ar} = ();
-            
-            #  Delay (presumably to test caching code)
-            #
-            if (my $delay=$opt{'delay'}) {
-                sleep $delay
+                #  Send out to backend for render
+                #
+                my $res_or=&{sprintf('request_%s', $request_type)}($req_or, \%opt);
+                my $html=$res_or->decoded_content;
+                
+
+                #  If headers wanted strip them out
+                #
+                my $header;
+                if ($opt{'header'} || $opt{'header_only'}) {
+                    $header=$res_or->status_line(). "\n";
+                    $header.=$res_or->headers->as_string();
+                }
+                if ($opt{'header_only'}) {
+                    print $header, "\n";
+                    next;
+                }
+                
+
+                #  Don't colourise or format if --raw optoion given
+                #
+                unless ($opt{'raw'}) {
+
+
+                    #  Tidy ?
+                    #
+                    if ($opt{'tidy'} && ($res_or->content_type eq 'text/html') && !$opt{'htmx'} ) {
+                        $html=&html_tidy($html, \%opt);
+                    }
+
+
+                    #  Send to syntax higlighter ?
+                    #
+                    unless ($opt{'outfile'}) {
+                        if ($opt{'colour'} && ($res_or->content_type eq 'text/html')) {
+                            $html=&html_colour($html, $header, \%opt);
+                        }
+                    }
+                
+                }
+                
+                
+                #  Defensive revert select in case very weird/bad error
+                #
+                select STDOUT if defined(fileno(STDOUT));
+                
+                
+                #  Print it
+                #
+                $html_fh ? CORE::print $html_fh $html, $/ : CORE::print $html, $/;
+                
+                
+                if ($opt{'compare'}) {
+                    unless ($html eq ($_{'html'} ||= $html)) {
+                        eval { require Text::Diff } || do {
+                            die(sprintf("compare mismatch:\n\n$html\n\n%s",$_{'html'}));
+                        };
+                        my $diff=Text::Diff::diff(
+                            #\Data::Dumper->Dump([\$html], ['$ACTUAL']),
+                            #\Data::Dumper->Dump([\$_{'html'}], ['$EXPECT']),
+                            \$_{'html'},
+                            \$html,
+                            { STYLE => 'Unified', FILENAME_A=>'EXPECT', FILENAME_B=>'ACTUAL' }
+                        );
+                        local $SIG{'__DIE__'};
+                        CORE::die("compare mismatch:\n$diff");
+                    }
+                }
+                
+                
+                #  If looking for leak
+                #
+                #my $gladiator_ar=Devel::Gladiator::walk_arena();
+
+
+                #  Manual cleanup
+                #
+                #my $r;
+                #$r->DESTROY();
+                
+                
+                #  Leak detection
+                #
+                #print("SV: ",  scalar @{$gladiator_ar}, "\n") if $opt{'leak'};
+                #@{$gladiator_ar} = ();
+                
+
+                #  Delay (presumably to test caching code)
+                #
+                if (my $delay=$opt{'delay'}) {
+                    sleep $delay
+                }
+
             }
+            
+            #  Reinit WebDyne for next run to clear cache etc
+            #
+            WebDyne->init() if defined(&WebDyne::init);
 
         }
-
+        
+        
+        #  Run again ?
+        #
         last LOOP unless $opt{'loop'};
+
     }
 
+
+    #  Shutdown server if using Apache backend
+    #
+    if ($apache_runner) {
+        &apache_shutdown($apache_runner);
+    }
+    
 
     #  Done, return success
     #
@@ -246,127 +479,1286 @@ sub main {
 }
 
 
+
+sub request_psgi {
+
+
+    #  Use PSGI mock handler. Get filename we want to render
+    #
+    my ($req_or, $opt_hr)=@_;
+
+
+    #  Load modules we need
+    #
+    require WebDyne::PSGI;
+    require Plack::Test;
+
+    #  Create new instance of WebDyne PSGI handler
+    #
+    my $app_cr=($_{'psgi_app_cr'} ||= 
+        (my $psgi_or=WebDyne::PSGI->new(root=>$opt_hr->{'root'}))->to_app());
+
+
+    #  Now run. For some reason PSGI manipulates request object so clone first and restore
+    #
+    my $uri_or=$req_or->uri->clone();
+    my $test_or=($_{'psgi_test_or'} ||=
+        Plack::Test->create($app_cr));
+    my $res_or=$test_or->request($req_or);
+    $req_or->uri($uri_or);
+    
+    
+    #  Return results
+    #
+    return $res_or;
+    
+}
+
+
+sub request_psgi_server {
+
+    no warnings qw(once);
+    local $Plack::Test::Impl='Server';
+    return &request_psgi(@_);
+    
+}
+
+
+sub request_pagi {
+
+
+    #  Use PSGI mock handler. Get filename we want to render
+    #
+    my ($req_or, $opt_hr)=@_;
+    
+
+    #  Load modules we need
+    #
+    require WebDyne::PAGI;
+    require PAGI::Test::Client;
+    #use Future::AsyncAwait;
+    #use Sub::Util qw(set_subname);
+
+
+    #  Create new instance of WebDyne::PAGI handler
+    #
+    my $app_cr=($_{'pagi_app_cr'} ||=
+        WebDyne::PAGI->new(root=>$opt_hr->{'root'})->to_app());
+    my $test_or=($_{'pagi_test_or'} ||=
+        PAGI::Test::Client->new(app => $app_cr, headers=>{$req_or->headers->flatten}));
+
+
+    #  Extract method wanted and run
+    #
+    my $method=lc($req_or->method());
+    my $pagi_res_or=$test_or->$method($req_or->uri->path(), query=>{ @{ $opt_hr->{'query_string'}} });
+    
+
+    #  Xlate to HTTP::Response object
+    #
+    my $res_or=HTTP::Response->new(
+        $pagi_res_or->status(),
+        HTTP::Status->status_message($pagi_res_or->status()),
+        HTTP::Headers->new(%{$pagi_res_or->headers()}),
+        $pagi_res_or->content()
+    );
+    
+
+    #  Return
+    #
+    return $res_or;
+    
+}
+
+
+sub request_apache {
+
+    return goto &request_mod_perl;
+    
+}
+
+
+sub request_mod_perl {
+
+
+    #  Spin up Apache and use that
+    #
+    my ($req_or, $opt_hr)=@_;
+    
+    
+    #  Load modules we need
+    #
+    require Apache::TestRequest; 
+
+
+    #  Get response object
+    #
+    #
+    my $res_or;
+    my $method=uc($req_or->method());
+    if (grep { $method eq $_ } qw(GET PUT HEAD)) {
+        $res_or=&{"Apache::TestRequest::${method}"}($req_or->uri, $req_or->headers->flatten());
+    }
+    elsif ($method eq 'POST') {
+        #$res_or=&{"Apache::TestRequest::${method}"}($req_or->uri, content => [$req_or->content], $req_or->headers->flatten());
+        $res_or=&{"Apache::TestRequest::${method}"}($req_or->uri, $opt_hr->{'query_string'}, $req_or->headers->flatten());
+    }
+    else {
+        return err('method %s not supported for mod_perl/apache request type', $method);
+    }
+
+
+    #  Done
+    #
+    return $res_or;
+    
+}
+
+
+sub request_mod_perl_startup {
+
+
+    #  Startup Apache test instance
+    #
+    my $opt_hr=shift();
+
+    #  Get postamble with WebDyne config
+    #
+    my $postamble=&request_mod_perl_postamble($opt_hr);
+
+
+    #  Start Apache using Apache::Test.
+    #
+    return apache_startup({
+        port         => 'select',
+        documentroot => $opt_hr->{'root'},
+        postamble    => $postamble,
+        keep_tmp     => $opt_hr->{'keep_tmp'},
+    });
+
+}
+
+
+sub request_mod_perl_postamble {
+
+
+    #  Create postamble suitable for running Apache and interpreting .psp files
+    #
+    my $opt_hr=shift();
+
+
+    #  Need to work out if stderr writable. If not need to use alternate log file (prob running in container)
+    #
+    my $stderr_fn=$opt_hr->{'apache_stdout'} ? '/dev/stderr' : File::Spec->devnull();
+    my $stdout_fn=$opt_hr->{'apache_stdout'} ? '/dev/stdout' : File::Spec->devnull();
+    if (! open(my $fh, '>>', $stderr_fn)) {
+
+        #  Not writable, probably running under docker, revert to traditional
+        #
+        print STDERR "unable to write to stderr,stdout - reverting to log files\n";
+        $stderr_fn='logs/error.log';
+        $stdout_fn='logs/access.log';
+    
+    }
+
+
+    #  Get any additional library paths we want
+    #
+    my @perl_inc_dn=@{&perl_inc_dn()};
+
+
+    #  Ok - proceed to build postamble
+    #
+    my @PerlSetEnv=map { sprintf('PerlSetEnv %s %s', $_, $ENV{$_}) }
+        grep { defined($ENV{$_}) && $ENV{$_} ne '' }
+        grep { /^WEBDYNE_/ } keys %ENV;
+    push (@PerlSetEnv, "PerlSetEnv WEBDYNE_ERROR_TEXT 1") unless defined($ENV{'WEBDYNE_ERROR_TEXT'});
+    my $PerlSetEnv=join("\n", @PerlSetEnv);
+    my $PerlSwitches=join("\n", map { sprintf('PerlSwitches -I%s', $_) } @perl_inc_dn);
+    my $postamble= <<"END"
+$PerlSetEnv
+$PerlSwitches
+PerlModule WebDyne
+AddHandler modperl .psp
+PerlResponseHandler WebDyne
+
+ErrorLog $stderr_fn
+LogLevel debug
+LogFormat "%h %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\"" combined
+CustomLog $stdout_fn combined
+END
+    ;
+    exit print $postamble if $opt_hr->{'dump_postamble'};
+    return $postamble;
+
+}
+
+
+sub request_fake {
+
+
+    #  Use fake request handler
+    #
+    my ($req_or, $opt_hr)=@_;
+
+
+    #  Open file hanldle to receive HTML
+    #
+    my $html;
+    my $html_fh=IO::String->new($html);
+    
+    
+    #  Setup environment to emulate CGI param if needed
+    #
+
+    my %env=(
+        QUERY_STRING    => sub { $req_or->uri->query },
+        REQUEST_METHOD  => sub { $req_or->method },
+        CONTENT_TYPE    => sub { $req_or->content_type },
+        CONTENT_LENGTH  => sub { $req_or->content_length }
+    );
+    local %ENV = %ENV;    
+    while (my($key, $cr)=each %env) {
+        if (defined(my $value=$cr->($key))) {
+            $ENV{$key}=$value;
+        }
+    }
+    
+    
+    #  Setup stdin if there is a content length
+    #
+    my $io_fh;
+    if (defined($ENV{'CONTENT_LENGTH'}) && ($ENV{'CONTENT_LENGTH'} > 0)) {
+        $io_fh=IO::String->new($req_or->content());
+    }
+    local *STDIN=$io_fh if $io_fh;
+    
+    
+    #  Get new request handler
+    #
+    require WebDyne::Request::Fake;
+    my $r=WebDyne::Request::Fake->new(
+
+        filename        => $req_or->uri->path(),
+        select          => $html_fh,
+        input           => $io_fh,
+        no_head_insert  => $opt_hr->{'no_head_insert'},
+
+    ) || return err();
+    
+
+    #  Set headers
+    #
+    $r->headers_in($req_or->headers->flatten);
+
+
+    #  Get handler
+    #
+    my $handler=$opt_hr->{'handler'};
+
+
+    #  Load up whichever handler we are using
+    #
+    (my $handler_pm = $handler) =~ s{::}{/}g;
+    $handler_pm.='.pm';
+    eval {require $handler_pm} ||
+        return err("$Script: unable to load handler $handler, $@");
+
+
+    #  Set text errors only
+    #
+    #$WebDyne::Err::WEBDYNE_ERROR_TEXT=1 if ($opt{'error'} eq 'text');
+
+
+    #  Set header, warning output
+    #
+    #$r->notes('noheader', $opt{'header'} ? 0 : 1);
+    #$r->notes('nowarn',   $opt{'warn'} ? 0 : 1);
+
+
+    #  Run it and display results, or any error generated
+    #
+    #defined(my $status=$handler->handler(grep {$_} $r, $opt_hr)) || return err();
+    defined(my $status=$handler->handler(grep {$_} $r, $opt_hr->{'param'})) || return err();
+    
+    
+    #  Close file handle
+    #
+    $html_fh->close();
+    
+
+    #  Construct HTTP::Response and return it
+    #
+    my $res_or=HTTP::Response->new(
+        $status,
+        HTTP::Status->status_message($status),
+        HTTP::Headers->new(%{$r->headers_out()}),
+        $html
+    );
+    
+
+    #  Return response obkect
+    #
+    return $res_or;
+    
+}    
+
+
+sub html_colour {
+
+
+    #  Colouris HTML
+    #
+    my ($html, $header, $opt_hr)=@_;
+
+
+    #  Try to load colour module
+    #
+    eval { require Syntax::Highlight::Engine::Kate } ||
+        return do { warn("install Syntax::Highlight::Engine::Kate to colourise output.\n") if $opt_hr->{'warn'}; $html };
+
+    
+    #  Var to hold output
+    #    
+    my $html_colour;
+
+
+    # Parse optional theme argument
+    #
+    my $theme = $opt_hr->{'theme'};
+
+
+    # Theme definitions
+    #
+    my %themes = (
+        dark => {
+            Alert       => [ color('bold red'),       color('reset') ],
+            Error       => [ color('bold red'),       color('reset') ],
+            Warning     => [ color('red'),            color('reset') ],
+
+            Comment     => [ color('bright_black'),   color('reset') ],
+            Documentation => [ color('bright_black'), color('reset') ],
+
+            Keyword     => [ color('bold yellow'),    color('reset') ],
+            ControlFlow => [ color('bold yellow'),    color('reset') ],
+            Operator    => [ color('blue'),           color('reset') ],
+
+            DataType    => [ color('cyan'),           color('reset') ],
+            DecVal      => [ color('cyan'),           color('reset') ],
+            Float       => [ color('cyan'),           color('reset') ],
+            BaseN       => [ color('cyan'),           color('reset') ],
+            Constant    => [ color('cyan'),           color('reset') ],
+
+            String      => [ color('green'),          color('reset') ],
+            Char        => [ color('green'),          color('reset') ],
+            SpecialString => [ color('green'),        color('reset') ],
+
+            Function    => [ color('magenta'),        color('reset') ],
+            Variable    => [ color('white'),          color('reset') ],
+
+            Others      => [ color('blue'),           color('reset') ],
+            Normal      => [ '',                      '' ],
+            BString     => [ '',                      '' ],
+            Reserved    => [ '',                      '' ],
+
+            LineNum     => color('bright_black'),
+        },
+
+        light => {
+            Alert       => [ color('red'),            color('reset') ],
+            Error       => [ color('red'),            color('reset') ],
+            Warning     => [ color('magenta'),        color('reset') ],
+
+            Comment     => [ color('bright_black'),   color('reset') ],
+            Documentation => [ color('bright_black'), color('reset') ],
+
+            Keyword     => [ color('bold blue'),      color('reset') ],
+            ControlFlow => [ color('bold blue'),      color('reset') ],
+            Operator    => [ color('cyan'),           color('reset') ],
+
+            DataType    => [ color('magenta'),        color('reset') ],
+            DecVal      => [ color('magenta'),        color('reset') ],
+            Float       => [ color('magenta'),        color('reset') ],
+            BaseN       => [ color('magenta'),        color('reset') ],
+            Constant    => [ color('magenta'),        color('reset') ],
+
+            String      => [ color('bold green'),     color('reset') ],
+            Char        => [ color('bold green'),     color('reset') ],
+            SpecialString => [ color('bold green'),   color('reset') ],
+
+            Function    => [ color('bold red'),       color('reset') ],
+            Variable    => [ color('black'),          color('reset') ],
+
+            Others      => [ color('cyan'),           color('reset') ],
+            Normal      => [ '',                      '' ],
+            BString     => [ '',                      '' ],
+            Reserved    => [ '',                      '' ],
+
+            LineNum     => color('bright_black'),
+        }
+    );
+    my $colors = $themes{$theme};
+
+
+    # Set up Kate highlighter
+    #
+    my $hl = Syntax::Highlight::Engine::Kate->new(
+        language      => 'HTML',
+        substitutions => {
+            map { $_ => $colors->{$_}[0] } keys %{ $themes{$theme} }
+        },
+        format_table => {
+            map { $_ => $colors->{$_} } keys %{ $themes{$theme} }
+        },
+    );
+
+    # Highlight
+    #
+    my $html_highlighted = $hl->highlightText($html);
+
+
+    # Print with line numbers if wanted
+    #
+    if ($opt_hr->{'lineno'}) {
+        my @lines = split /\n/, (join("\n", grep {$_} $header,  $html_highlighted));
+        my $width = length(scalar @lines);
+        for my $i (0..$#lines) {
+            my $num = sprintf("%*d", $width, $i + 1);
+            $html_colour.=join('',  $colors->{LineNum}, "$num | ", color('reset'), "$lines[$i]\n");
+        }
+    }
+    else {
+    
+        #  Or just raw
+        #
+        $html_colour=$html_highlighted
+    }
+        
+        
+    #  Done
+    #
+    return $html_colour;
+
+}    
+
+
+sub html_tidy {
+
+    my ($html, $opt_hr)=@_;
+    eval { require HTML::Tidy5 } ||
+        return do { warn("install system libtidy-devel package and HTML::Tidy5 to tidy output.\n") if $opt_hr->{'warn'}; $html };
+    $html=HTML::Tidy5->new($WEBDYNE_HTML_TIDY_CONFIG_HR)->clean($html);
+    return $html;
+
+}
+
+
 __END__
 
+=begin markdown
+
+# wdrender #
+
+# NAME #
+
+wdrender - parse and render WebDyne files
+
+# SYNOPSIS #
+
+`wdrender [OPTIONS] FILE`
+
+# DESCRIPTION #
+
+`wdrender` renders a WebDyne source file and prints the resulting response body to standard output.
+
+By default it uses the internal `WebDyne` handler with the `fake` request backend. It can also exercise other backends such as `psgi`, `psgi_server`, `pagi`, and `mod_perl`, or use a different handler module via `--handler`.
+
+Defaults:
+
+* request backend: `fake`
+* method: `GET`
+* root: current working directory
+* colour: enabled
+* line numbers: enabled
+* tidy formatting: enabled
+* head insertion: disabled
+* theme: `light`
+
+Options can also be preloaded from `~/.wdrender.opt` by creating an anonymous hash of option names and values.
+
+# OPTIONS #
+
+## General ##
+
+* **--help**
+
+    Show brief help output \(synopsis and options).
+
+* **--man**
+
+    Display the full manual.
+
+* **--version**
+
+    Display the script version and WebDyne version, then exit.
+
+* **--handler=MODULE**
+
+    Use a different WebDyne handler module, for example `WebDyne::Chain`.
+
+* **--conf=FILE**
+
+    Set `WEBDYNE_CONF` to the specified configuration file before rendering.
+
+* **--no_conf**
+
+    Disable normal config loading by setting `WEBDYNE_CONF=.`.
+
+* **--raw**
+
+    Disable config loading and skip HTML tidy/colour formatting.
+
+* **--outfile=FILE**
+
+    Send output to nominated file. Colourisation is disabled but tidy will be performed if available.
+    
+* **--test**
+
+    Use WebDyne's built-in default test page as the source file.
+
+* **--warn**
+
+    Enable or disable warnings about missing Tidy or Colourise modules
+
+* **--head_insert**
+
+    Enable or disable WebDyne head insertion while rendering from the command line, including configured `WEBDYNE_HEAD_INSERT` content and related `start_html` parameters. This is disabled by default so command-line checks show the page output without head snippets normally inserted during Apache, PSGI, or PAGI request handling.
+
+## Backend Selection ##
+
+* **--request=TYPE**
+
+    Select one or more backends used to execute the request. Repeat the option to run multiple backends. Valid values are `fake`, `psgi`, `psgi_server`, `pagi`, `mod_perl`, and `all`.
+
+* **--fake**
+
+    Shortcut for `--request=fake`.
+
+* **--psgi**
+
+    Shortcut for `--request=psgi`.
+
+* **--psgi_server**
+
+    Shortcut for `--request=psgi_server`.
+
+* **--pagi**
+
+    Shortcut for `--request=pagi`.
+
+* **--mod_perl**
+
+    Shortcut for `--request=mod_perl`.
+
+* **--all**
+
+    Run all supported backends instead of just one selected backend. This is equivalent to `--request=all`.
+
+* **--root=DIR**
+
+    Set the document root passed to backend handlers. Defaults to the current working directory.
+
+* **--keep_tmp**
+
+    When using the `mod_perl` backend, do not cleanup temporary Apache server root.
+
+* **--apache_stdout**
+
+    When using the `mod_perl` backend, send Apache access/error logs to stdout/stderr where possible instead of suppressing them.
+
+* **--dump_postamble**
+
+    Print the generated Apache postamble and exit instead of starting the Apache test instance.
+
+* **--dump_opt**
+
+    Dump the parsed option hash for debugging and exit.
+
+## Request Construction ##
+
+* **--method=VERB**
+
+    Explicitly set the HTTP method, for example `GET`, `POST`, `PUT`, `PATCH`, `OPTIONS`, or `HEAD`.
+
+* **--get=KEY=VALUE**
+
+    Add request parameters and use `GET`.
+
+* **--post=KEY=VALUE**
+
+    Add request parameters and use `POST`.
+
+* **--put=KEY=VALUE**
+
+    Add request parameters and use `PUT`.
+
+* **--patch=KEY=VALUE**
+
+    Add request parameters and use `PATCH`.
+
+* **--options=KEY=VALUE**
+
+    Add request parameters and use `OPTIONS`.
+
+Request parameter options may be repeated, and each value may contain multiple `;` or `&` separated key/value pairs. Keys and values may be separated with `=` or `:`.
+
+* **--head**
+
+    Use `HEAD`.
+
+* **--param=KEY=VALUE**
+
+    Pass handler parameters to the WebDyne handler call. These are separate from request query/body parameters and are available to handler-side Perl code. Repeat the option or separate entries with `;` or `&`. Duplicate keys are preserved as array values.
+
+* **--headers_in=NAME:VALUE**
+
+    Add request headers. Multiple values may be supplied by repeating the option.
+
+* **--htmx**
+
+    Add the request header `HX-Request: true`.
+
+* **--sse**
+
+    Add the request header `Accept: text/event-stream`.
+
+## Response Display ##
+
+* **--header**
+
+    Include the response status line and headers ahead of the rendered body.
+
+* **--header_only**
+
+    Print only the response status line and headers.
+
+* **--colour**
+
+    Enable or disable HTML syntax highlighting for `text/html` responses.
+
+* **--lineno**
+
+    Enable or disable line numbers in colourised output.
+
+* **--theme=light|dark**
+
+    Select the colour theme used by syntax highlighting.
+
+* **--tidy**
+
+    Enable or disable HTML tidy formatting for `text/html` responses. Tidy is skipped automatically for HTMX output.
+
+## Repetition and Comparison ##
+
+* **--repeat=NUM**
+
+    Repeat the render `NUM` times.
+
+* **--compare**
+
+    When repeating renders, require each rendered body to match the first one. If output differs, the script aborts and shows a diff when `Text::Diff` is installed.
+
+* **--loop**
+
+    Repeat forever. Intended for leak or stability testing.
+
+* **--delay=SECONDS**
+
+    Sleep between iterations.
+
+# EXAMPLES #
+
+```sh
+# Show the rendered version of time.psp
+wdrender time.psp
+```
+
+```sh
+# Show headers as well as the body
+wdrender --header time.psp
+```
+
+```sh
+# Show only the status line and headers
+wdrender --header-only time.psp
+```
+
+```sh
+# Render using a different handler
+WebDyneChain=WebDyne::Session wdrender --handler WebDyne::Chain time.psp
+```
+
+```sh
+# Simulate a GET request with query parameters
+wdrender --get "test=1" checkbox.psp
+```
+
+```sh
+# Simulate a POST request
+wdrender --post "name=alice" form.psp
+```
+
+```sh
+# Force the PSGI backend
+wdrender --psgi app/example.psp
+```
+
+```sh
+# Compare repeated renders for stability
+wdrender --repeat 5 --compare page.psp
+```
+
+```sh
+# Simulate an HTMX request with a custom header
+wdrender --htmx --headers_in "X-Debug: 1" fragment.psp
+```
+
+# NOTES #
+
+`wdrender` aims to reproduce WebDyne output from the command line, but it cannot perfectly duplicate every web-server runtime detail. In particular, pages that depend on a specific server environment may behave differently across `fake`, `psgi`, `psgi_server`, `pagi`, and `mod_perl` backends.
+
+# AUTHOR #
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
 
 
+=end markdown
 
 
-=pod
+=head1 wdrender
 
-=head1 wdrender(1)
 
 =head1 NAME
 
 wdrender - parse and render WebDyne files
 
+
 =head1 SYNOPSIS
 
-C<<<< wdrender [OPTIONS] FILE >>>>
+C<wdrender [OPTIONS] FILE>
 
-=head1 Description
 
-The  C<<<< wdrender >>>>  command displays the HTML that would be generated from a .psp page using the WebDyne perl module.
+=head1 DESCRIPTION
 
-By default  C<<<< wdrender >>>>  will use the internal WebDyne handler when building the output, but can optionally use other WebDyne modules (such as C<<<< WebDyne::Chain >>>> ) by using the  C<<<< --handler >>>>  option.
+C<wdrender> renders a WebDyne source file and prints the resulting response body to standard output.
 
-=head1 Options
+By default it uses the internal C<WebDyne> handler with the C<fake> request backend. It can also exercise other backends such as C<psgi>, C<psgi_server>, C<pagi>, and C<mod_perl>, or use a different handler module via C<--handler>.
+
+Defaults:
 
 =over
 
-=item * B<<< -h, --help >>>
+=item *
 
-Show brief help message.
+request backend: C<fake>
 
-=item * B<<< --handler >>>
 
-Use a different WebDyne handler module. Currently the only other handler module available is  C<<<< WebDyne::Chain >>>> .
+=item *
 
-=item * B<<< --status >>>
+method: C<GET>
 
-Specify the status.
 
-=item * B<<< --header >>>
+=item *
 
-Include headers in the output.
+root: current working directory
 
-=item * B<<< --error >>>
 
-Specify the error format (default: text).
+=item *
 
-=item * B<<< --headers_out | --header_out >>>
+colour: enabled
 
-Specify headers to include in the output.
 
-=item * B<<< --headers_in | --header_in >>>
+=item *
 
-Specify headers to include in the input.
+line numbers: enabled
 
-=item * B<<< --outfile >>>
 
-Specify the output file.
+=item *
 
-=item * B<<< --repeat | --r | --num | --n >>>
+tidy formatting: enabled
 
-Specify the number of times to repeat the rendering. Used for consistency testing
 
-=item * B<<< --loop >>>
+=item *
 
-Enable looping. Used for leak testing.
+head insertion: disabled
 
-=item * B<<< --get >>>
 
-Parameters for simulating a HTTP GET request
+=item *
 
-=item * B<<< --man >>>
+theme: C<light>
 
-Display the full manual.
-
-=item * B<<< --version >>>
-
-Display the script version and exit.
 
 =back
 
-=head1 Examples
+Options can also be preloaded from C<~/.wdrender.opt> by creating an anonymous hash of option names and values.
 
-    # Reference file saved as time.psp
-    #
-    <start_html>
-    The current server time is: <? localtime() ?>
 
-    # Show the HTML rendered version of time.psp
-    #
-    wdrender time.psp
+=head1 OPTIONS
 
-    # Show the HTML rendered version of time.psp with headers
-    #
-    wdrender --header time.psp
 
-    # Show the HTML rendered version of time.psp chaining with the WebDyne::Session module
-    #
-    WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp
+=head2 General
 
-    # Simulate a GET request, i.e. adding ?test=1 to URI
-    #
-    wdrender --get="test=1" checkbox.psp
+=over
 
-=head1 Notes
+=item *
 
-The  C<<<< wdrender >>>>  command will attempt to build the HTML as faithfully as possible from the command line environment, but may not be able to exactly duplicate the HTML generated under a real Web Server. As an example if a .psp page takes advantage of the Apache request handler when generating HTML, the  C<<<< wdrender >>>>  commend will not be able to duplicate that environment.
+B<--help>
 
-=head1 Author
+Show brief help output (synopsis and options).
 
-Written by Andrew Speer,  <andrew@webdyne.org>
 
-=head1 LICENSE and COPYRIGHT
+
+=item *
+
+B<--man>
+
+Display the full manual.
+
+
+
+=item *
+
+B<--version>
+
+Display the script version and WebDyne version, then exit.
+
+
+
+=item *
+
+B<--handler=MODULE>
+
+Use a different WebDyne handler module, for example C<WebDyne::Chain>.
+
+
+
+=item *
+
+B<--conf=FILE>
+
+Set C<WEBDYNE_CONF> to the specified configuration file before rendering.
+
+
+
+=item *
+
+B<--no_conf>
+
+Disable normal config loading by setting C<WEBDYNE_CONF=.>.
+
+
+
+=item *
+
+B<--raw>
+
+Disable config loading and skip HTML tidy/colour formatting.
+
+
+
+=item *
+
+B<--outfile=FILE>
+
+Send output to nominated file. Colourisation is disabled but tidy will be performed if available.
+
+
+
+=item *
+
+B<--test>
+
+Use WebDyne's built-in default test page as the source file.
+
+
+
+=item *
+
+B<--warn>
+
+Enable or disable warnings about missing Tidy or Colourise modules
+
+
+
+=item *
+
+B<--head_insert>
+
+Enable or disable WebDyne head insertion while rendering from the command line, including configured C<WEBDYNE_HEAD_INSERT> content and related C<start_html> parameters. This is disabled by default so command-line checks show the page output without head snippets normally inserted during Apache, PSGI, or PAGI request handling.
+
+
+
+=back
+
+
+=head2 Backend Selection
+
+=over
+
+=item *
+
+B<--request=TYPE>
+
+Select one or more backends used to execute the request. Repeat the option to run multiple backends. Valid values are C<fake>, C<psgi>, C<psgi_server>, C<pagi>, C<mod_perl>, and C<all>.
+
+
+
+=item *
+
+B<--fake>
+
+Shortcut for C<--request=fake>.
+
+
+
+=item *
+
+B<--psgi>
+
+Shortcut for C<--request=psgi>.
+
+
+
+=item *
+
+B<--psgi_server>
+
+Shortcut for C<--request=psgi_server>.
+
+
+
+=item *
+
+B<--pagi>
+
+Shortcut for C<--request=pagi>.
+
+
+
+=item *
+
+B<--mod_perl>
+
+Shortcut for C<--request=mod_perl>.
+
+
+
+=item *
+
+B<--all>
+
+Run all supported backends instead of just one selected backend. This is equivalent to C<--request=all>.
+
+
+
+=item *
+
+B<--root=DIR>
+
+Set the document root passed to backend handlers. Defaults to the current working directory.
+
+
+
+=item *
+
+B<--keep_tmp>
+
+When using the C<mod_perl> backend, do not cleanup temporary Apache server root.
+
+
+
+=item *
+
+B<--apache_stdout>
+
+When using the C<mod_perl> backend, send Apache access/error logs to stdout/stderr where possible instead of suppressing them.
+
+
+
+=item *
+
+B<--dump_postamble>
+
+Print the generated Apache postamble and exit instead of starting the Apache test instance.
+
+
+
+=item *
+
+B<--dump_opt>
+
+Dump the parsed option hash for debugging and exit.
+
+
+
+=back
+
+
+=head2 Request Construction
+
+=over
+
+=item *
+
+B<--method=VERB>
+
+Explicitly set the HTTP method, for example C<GET>, C<POST>, C<PUT>, C<PATCH>, C<OPTIONS>, or C<HEAD>.
+
+
+
+=item *
+
+B<--get=KEY=VALUE>
+
+Add request parameters and use C<GET>.
+
+
+
+=item *
+
+B<--post=KEY=VALUE>
+
+Add request parameters and use C<POST>.
+
+
+
+=item *
+
+B<--put=KEY=VALUE>
+
+Add request parameters and use C<PUT>.
+
+
+
+=item *
+
+B<--patch=KEY=VALUE>
+
+Add request parameters and use C<PATCH>.
+
+
+
+=item *
+
+B<--options=KEY=VALUE>
+
+Add request parameters and use C<OPTIONS>.
+
+
+
+=back
+
+Request parameter options may be repeated, and each value may contain multiple C<;> or C<&> separated key/value pairs. Keys and values may be separated with C<=> or C<:>.
+
+=over
+
+=item *
+
+B<--head>
+
+Use C<HEAD>.
+
+
+
+=item *
+
+B<--param=KEY=VALUE>
+
+Pass handler parameters to the WebDyne handler call. These are separate from request query/body parameters and are available to handler-side Perl code. Repeat the option or separate entries with C<;> or C<&>. Duplicate keys are preserved as array values.
+
+
+
+=item *
+
+B<--headers_in=NAME:VALUE>
+
+Add request headers. Multiple values may be supplied by repeating the option.
+
+
+
+=item *
+
+B<--htmx>
+
+Add the request header C<HX-Request: true>.
+
+
+
+=item *
+
+B<--sse>
+
+Add the request header C<Accept: text/event-stream>.
+
+
+
+=back
+
+
+=head2 Response Display
+
+=over
+
+=item *
+
+B<--header>
+
+Include the response status line and headers ahead of the rendered body.
+
+
+
+=item *
+
+B<--header_only>
+
+Print only the response status line and headers.
+
+
+
+=item *
+
+B<--colour>
+
+Enable or disable HTML syntax highlighting for C<text/html> responses.
+
+
+
+=item *
+
+B<--lineno>
+
+Enable or disable line numbers in colourised output.
+
+
+
+=item *
+
+B<--theme=light|dark>
+
+Select the colour theme used by syntax highlighting.
+
+
+
+=item *
+
+B<--tidy>
+
+Enable or disable HTML tidy formatting for C<text/html> responses. Tidy is skipped automatically for HTMX output.
+
+
+
+=back
+
+
+=head2 Repetition and Comparison
+
+=over
+
+=item *
+
+B<--repeat=NUM>
+
+Repeat the render C<NUM> times.
+
+
+
+=item *
+
+B<--compare>
+
+When repeating renders, require each rendered body to match the first one. If output differs, the script aborts and shows a diff when C<Text::Diff> is installed.
+
+
+
+=item *
+
+B<--loop>
+
+Repeat forever. Intended for leak or stability testing.
+
+
+
+=item *
+
+B<--delay=SECONDS>
+
+Sleep between iterations.
+
+
+
+=back
+
+
+=head1 EXAMPLES
+
+
+ # Show the rendered version of time.psp
+ wdrender time.psp
+
+ # Show headers as well as the body
+ wdrender --header time.psp
+
+ # Show only the status line and headers
+ wdrender --header-only time.psp
+
+ # Render using a different handler
+ WebDyneChain=WebDyne::Session wdrender --handler WebDyne::Chain time.psp
+
+ # Simulate a GET request with query parameters
+ wdrender --get "test=1" checkbox.psp
+
+ # Simulate a POST request
+ wdrender --post "name=alice" form.psp
+
+ # Force the PSGI backend
+ wdrender --psgi app/example.psp
+
+ # Compare repeated renders for stability
+ wdrender --repeat 5 --compare page.psp
+
+ # Simulate an HTMX request with a custom header
+ wdrender --htmx --headers_in "X-Debug: 1" fragment.psp
+
+=head1 NOTES
+
+C<wdrender> aims to reproduce WebDyne output from the command line, but it cannot perfectly duplicate every web-server runtime detail. In particular, pages that depend on a specific server environment may behave differently across C<fake>, C<psgi>, C<psgi_server>, C<pagi>, and C<mod_perl> backends.
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE AND COPYRIGHT
 
 This file is part of WebDyne.
 
 This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
 

@@ -25,7 +25,7 @@ use overload;
 #  WebDyne constants, base modules
 #
 use WebDyne::Util;
-use WebDyne::CGI;
+use WebDyne::CGI::Simple;
 use WebDyne::Constant;
 use WebDyne::HTML::Tiny;
 
@@ -45,6 +45,7 @@ use HTML::Entities qw(decode_entities encode_entities);
 use CGI::Simple;
 use JSON;
 use Cwd qw(fastcwd);
+use Sub::Util qw(set_subname);
 
 
 #  Inherit from the Compile module, not loaded until needed though.
@@ -61,7 +62,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.075';
+$VERSION='3.006';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -95,12 +96,12 @@ require WebDyne::Err;
 
 #  Var to hold package wide hash, for data shared across package
 #
-my %Package;
+our %Package;
 
 
 #  Do some class wide initialisation
 #
-&init_class();
+&init();
 
 
 #  Eval safe not effective - die if turned on
@@ -158,7 +159,7 @@ sub html_sr {
     require WebDyne::Request::Fake;
     my $r=$opt_hr->{'r'} || WebDyne::Request::Fake->new(%{$opt_hr}) ||
         return err();
-        
+
 
     #  Get handler
     #
@@ -206,7 +207,17 @@ sub handler : method {    # no subsort
     #  Get self ref/class, request ref
     #
     my ($self, $r, $param_hr)=@_;
-    debug("handler called with self $self, r $r, MP2 $MP2");
+    debug("handler called with self: $self, r: $r, MP2: $MP2, param: %s", Dumper($param_hr));
+    
+    
+    #  Update r if needed
+    #
+    if (ref($r)=~/^Apache/) {
+        debug("converting r: $r to WebDyne::Request::Apache module");
+        require WebDyne::Request::Apache;
+        $r=WebDyne::Request::Apache->new($r);
+        debug("r now: $r");
+    }
 
 
     #  Start timer so we can optionally keep stats on how long handler takes to run
@@ -237,55 +248,14 @@ sub handler : method {    # no subsort
 
     #  Setup error handlers
     #
-    local $SIG{'__DIE__'}=sub {
-        debug('in __DIE__ sig handler, caller %s', join(',', (caller(0))[0..3]));
-        
-        #  Go back through call stack looking for eval errors
-        #
-        my $i=0;
-        my @eval_nest;
-        my $eval_nest;
-        while (my @caller=caller($i++)) {
-            if ($caller[3] eq '(eval)') {
-                push @eval_nest, \@caller;
-                $eval_nest++;
-            }
-        }
-        debug("eval_nest: $eval_nest, eval_nest_ar: %s", Dumper(\@eval_nest)); 
-        
-        
-        #  Don't error out if not a WebDyne error (i.e. if eval{} block was in module called from
-        #  user code
-        #
-        #if ($eval_nest[0][0]!~/^WebDyne::/) {
-        if ($eval_nest[0][0] !~ /^WebDyne(?:::|$)/) {
-        
-            #  Not us, clear eval stack
-            #
-            debug("eval_nest: $eval_nest[0][0] did not match WebDyne module, clearning eval error");
-            eval {};
-            return;
-            
-        }
-                
-
-        #  Updated to *NOT* throw error if in eval block (i.e. if $@ is set). Stops error handler being called
-        #  if non WebDyne module has eval code which triggers non WebDyne AUTOLOAD block. Might need to be more
-        #  sophisticated and look at traceback for Autoload::AUTOLOAD but another day
-        return err(@_) unless $@;
-    };
-    local $SIG{'__WARN__'}=sub {
-        debug('in __WARN__ sig handler, caller %s', join(',', (caller(0))[0..3]));
-        return err(@_)
-        }
-        if WEBDYNE_WARNINGS_FATAL;
-
+    local $SIG{'__DIE__'} =\&handler_die;
+    local $SIG{'__WARN__'}=\&handler_warn;
+    
 
     #  Debug
     #
     debug(
-        "in WebDyne::handler. class $class, self $self, r $r (%s), param_hr %s",
-        Dumper($r, $param_hr));
+        "in WebDyne::handler, class: $class, self: $self, r: $r (%s), param_hr: %s", Dumper($r, $param_hr));
 
 
     #  Skip all processing if header request only
@@ -296,7 +266,7 @@ sub handler : method {    # no subsort
     #  Debug
     #
     debug(
-        "enter handler, r $r, location %s file %s, param %s",
+        "enter handler, r: $r, location: %s, file: %s, param: %s",
         $r->location(), $r->filename(), Dumper($param_hr));
 
 
@@ -318,7 +288,7 @@ sub handler : method {    # no subsort
         # return &Apache::DECLINED;
 
     };
-    debug("srce_pn $srce_pn, srce_mtime (real) $srce_mtime");
+    debug("srce_pn: $srce_pn, srce_mtime (real): $srce_mtime");
 
 
     #  Used to use inode as unique identifier for file in cache, but that
@@ -332,7 +302,7 @@ sub handler : method {    # no subsort
         $self->{'_inode'} ||= md5_hex(ref($self), $r->location, $srce_pn)
             ||
             return $self->err_html("could not get md5 for file $srce_pn, $!"));
-    debug("srce_inode $srce_inode");
+    debug("srce_inode: $srce_inode");
 
 
     #  Var to hold pointer to cached metadata area, so we are not constantly
@@ -359,11 +329,11 @@ sub handler : method {    # no subsort
     #  template (eg menu) mtime. Here so can be subclassed by other handler like
     #  menu systems
     #
-    debug("about to call source_mtime, self $self");
+    debug("about to call source_mtime, self: $self");
     $srce_mtime=${
         $self->source_mtime($srce_mtime) || return $self->err_html()}
         || $srce_mtime;
-    debug("srce_pn $srce_pn, srce_mtime (computed) $srce_mtime");
+    debug("srce_pn: $srce_pn, srce_mtime (computed): $srce_mtime");
 
 
     #  Need to stat cache file mtime in case another process has updated it (ie via self->cache_compile(1)) call,
@@ -374,7 +344,7 @@ sub handler : method {    # no subsort
     #
     my ($cache_pn, $cache_mtime);
     if (WEBDYNE_CACHE_DN) {
-        debug("webdyne_cache_dn $WEBDYNE_CACHE_DN");
+        debug("webdyne_cache_dn: $WEBDYNE_CACHE_DN");
         $cache_pn=File::Spec->catfile(WEBDYNE_CACHE_DN, $srce_inode);
         $cache_mtime=((-f $cache_pn) && (stat(_))[9]);
         debug("webdyne_cache file: $cache_pn, cache_mtime: $cache_mtime");
@@ -382,6 +352,7 @@ sub handler : method {    # no subsort
     else {
         debug('no webdyne_cache_dn');
     }
+    #die if ($param_hr->{'count'}==2);
 
 
     #  Test if compile/reload needed
@@ -392,7 +363,7 @@ sub handler : method {    # no subsort
         #  Debug
         #
         debug(
-            "compile/reload needed _compile %s, cache_inode_hr mtime %s, srce_mtime $srce_mtime, WEBDYNE::RELOAD $WEBDYNE_RELOAD",
+            "compile/reload needed _compile: %s, cache_inode_hr mtime: %s, srce_mtime: $srce_mtime, WEBDYNE::RELOAD: $WEBDYNE_RELOAD",
             $self->{'_compile'}, $cache_inode_hr->{'mtime'});
 
 
@@ -439,7 +410,7 @@ sub handler : method {    # no subsort
 
         #  Debug
         #
-        debug("srce_pn $srce_pn, cache_pn $cache_pn, mtime $cache_mtime");
+        debug("srce_pn: $srce_pn, cache_pn: $cache_pn, mtime: $cache_mtime");
 
 
         my $container_ar;
@@ -448,7 +419,7 @@ sub handler : method {    # no subsort
 
             #  Debug
             #
-            debug("compiling srce: $srce_pn, dest $cache_pn");
+            debug("compiling srce: $srce_pn, dest: $cache_pn");
 
 
             #  Recompile from source
@@ -495,7 +466,7 @@ sub handler : method {    # no subsort
             #  Load from storeable file
             #
             $container_ar=Storable::lock_retrieve($cache_pn) ||
-                return $self->err_html("Storable error when retreiveing cached file '$cache_pn', $!");
+                return $self->err_html("Storable error when retreiveing cached file: '$cache_pn', $!");
 
 
             #  Update mtime flag
@@ -564,8 +535,8 @@ sub handler : method {    # no subsort
     #
     my ($meta_hr, $data_ar)=@{$cache_inode_hr}{qw(meta data)};
     debug('meta_hr %s, ', Dumper($meta_hr));
-
-
+    
+    
     #  Custom handler ?
     #
     if (my $handler_ar=$meta_hr->{'handler'} || $r->dir_config('WebDyneHandler')) {
@@ -596,6 +567,28 @@ sub handler : method {    # no subsort
             $self->{'_meta_hr'}=$meta_hr;
             return &{"${handler}::handler"}($self, $r, \%handler_param_hr);
         }
+    }
+
+
+    #  SSE ?
+    #
+    if (WEBDYNE_PAGI && ($r->{'scope'}->{'type'} eq 'sse') && (my $sse=($self->{'_sse'} || $meta_hr->{'sse'}))) {
+        my $sse_cr=&eval_cr($srce_inode, \"&${sse}");
+        $r->custom_response(HTTP_CONTINUE, sub { $sse_cr->($self) });
+        return HTTP_CONTINUE
+    }
+
+
+    #  WebSockets under PAGI ?
+    #
+    if (
+        WEBDYNE_PAGI
+        && ($r->{'scope'}->{'type'} =~ /^(?:ws|websocket)$/)
+        && (my $ws=($self->{'_ws'} || $meta_hr->{'ws'}))
+    ) {
+        my $ws_cr=&eval_cr($srce_inode, \"&${ws}");
+        $r->custom_response(HTTP_CONTINUE, sub { $ws_cr->($self) });
+        return HTTP_CONTINUE
     }
 
 
@@ -689,8 +682,8 @@ sub handler : method {    # no subsort
         debug('not running cache code');
         
     }
-
-
+    
+    
     #  Is it plain HTML which can be/is pre-rendered and stored on disk ? Note to self, leave here - should
     #  run after any cache code is run, as that may change inode.
     #
@@ -707,7 +700,7 @@ sub handler : method {    # no subsort
 
         #  We are the main request handler. So process
         #
-        debug('static flag detected, in main handler');
+        debug("static flag detected, in main handler, looking for cache_pn: $cache_pn");
         if ($cache_pn && (-f (my $fn="${cache_pn}.html")) && ((stat(_))[9] >= $srce_mtime) && !$self->{'_compile'}) {
 
             #  Cache file exists, and is not stale, and user/cache code does not want a recompile. Tell Apache or FCGI
@@ -721,15 +714,18 @@ sub handler : method {    # no subsort
                 #  Apache 2 seems to add junk characters at end of output
                 #
                 debug('using MP2 or FCGI_ROLE path');
-                my $r_child=$r->lookup_file($fn, $r->output_filters);
-                debug("r_child: $r_child");
+                my $r_child=$r->lookup_file($fn, $r->output_filters) ||
+                    return err();
+                debug("r_child: $r_child, self: $self");
                 $r_child->handler('default-handler');
                 $r_child->content_type(WEBDYNE_CONTENT_TYPE_HTML);
 
                 #  Apache bug ? Need to set content type on r also
                 $r->content_type(WEBDYNE_CONTENT_TYPE_HTML);
                 debug("set content type to: $WEBDYNE_CONTENT_TYPE_HTML, running");
-                return $r_child->run($self);
+                #return $r_child->run($self);
+                return $r_child->run();
+
 
             }
             else {
@@ -740,7 +736,7 @@ sub handler : method {    # no subsort
                 $r->filename($fn);
                 $r->handler('default-handler');
                 $r->content_type(WEBDYNE_CONTENT_TYPE_HTML);
-                return &Apache::DECLINED;
+                return $MP2 ? &Apache::DECLINED : $r->status(HTTP_NOT_FOUND);;
             }
         }
         elsif ($cache_pn) {
@@ -749,10 +745,10 @@ sub handler : method {    # no subsort
             #  after render complete
             #
             debug("storing inode: %s to disk file: ${cache_pn}.html, cache html %s", $self->{'_inode'}, \$data_ar->[0]);
-            my $cr=sub {
+            my $cr=set_subname('cache_disk_writeback_anon', sub {
                 &cache_html(
                     "${cache_pn}.html", ($meta_hr->{'static'} || $self->{'_static'}) ? $html_sr : \$data_ar->[0])
-            };
+            });
             $MP2 ? $r->pool->cleanup_register($cr) : $r->register_cleanup($cr);
         }
         else {
@@ -761,10 +757,10 @@ sub handler : method {    # no subsort
             #  at least still be only compiled once for each version.
             #
             debug('storing to memory cache html %s', \$data_ar->[0]);
-            my $cr=sub {
+            my $cr=set_subname('cache_mem_writeback_anon', sub {
                 $cache_inode_hr->{'data'}=[
                     ($meta_hr->{'static'} || $self->{'_static'}) ? ${$html_sr} : $data_ar->[0]]
-            };
+            });
             $MP2 ? $r->pool->cleanup_register($cr) : $r->register_cleanup($cr);
         }
 
@@ -779,6 +775,7 @@ sub handler : method {    # no subsort
         debug('not static code, not saving to cache or serving');
         
     }
+    #die if ($param_hr->{'count'}==2);
 
 
     #  Debug
@@ -862,9 +859,12 @@ sub handler : method {    # no subsort
     debug('r status set, %s', $r->status());
     
     
-    #  Tidy ? Run under eval in case module not installed/working, considerd non-fatal
+    #  Tidy ? Run under eval in case module not installed/working, considerd non-fatal. Note
+    #  use of folding contstant and variable - lets it be turned on in wdrender via folding
+    #  constant, then toggled off by options if not wanted
+    # 
     #
-    if (WEBDYNE_HTML_TIDY) { 
+    if (WEBDYNE_HTML_TIDY && $param_hr->{'tidy'}) {
         eval {
             require HTML::Tidy5;
             my $html=HTML::Tidy5->new($WEBDYNE_HTML_TIDY_CONFIG_HR)->clean(${$html_sr});
@@ -891,6 +891,7 @@ sub handler : method {    # no subsort
         %{$WEBDYNE_HTTP_HEADER}
 
     );
+    debug('header_out_hr: %s', Dumper($header_out_hr));
     foreach (keys %header_out) {$header_out_hr->{$_}=$header_out{$_}}
 
 
@@ -935,7 +936,7 @@ sub handler : method {    # no subsort
 
         #  Yes, we need to clean cache after finished
         #
-        my $cr=sub {&cache_clean($Package{'_cache'})};
+        my $cr=set_subname('cache_clean_anon', sub {&cache_clean($Package{'_cache'})});
         $MP2 ? $r->pool->cleanup_register($cr) : $r->register_cleanup($cr);
 
 
@@ -983,7 +984,84 @@ sub handler : method {    # no subsort
 }
 
 
-sub init_class {
+sub handler_die {
+
+
+    #  Die signal handler
+    #
+    debug('in __DIE__ sig handler, $^S: %s: message: %s, caller %s', $^S, $_[0], join(',', (caller(0))[0..3]));
+    
+    
+    #  Avoid recursion
+    #
+    local $SIG{__DIE__};
+    
+    
+    #  Go back through call stack looking for eval errors
+    #
+    my $i=0;
+    my @eval_nest;
+    my $eval_nest;
+    while (my @caller=caller($i++)) {
+        if ($caller[3] eq '(eval)') {
+            push @eval_nest, [@caller[0..3]];
+            #push @eval_nest, \@caller;
+            $eval_nest++;
+        }
+    }
+    debug("eval_nest: $eval_nest, eval_nest_ar: %s", Dumper(\@eval_nest)); 
+    
+    
+    #  Don't error out if not a WebDyne error (i.e. if eval{} block was in module called from
+    #  user code
+    #
+    #if ($eval_nest[0][0]!~/^WebDyne::/) {
+    if ($eval_nest[0][0] !~ /^WebDyne(?:::|$)/) {
+    
+        #  Not us, clear eval stack
+        #
+        debug('eval_nest: %sdid not match WebDyne module, clearning eval error',  $eval_nest[0][0] );
+        eval {};
+        return;
+        
+    }
+    
+    
+    #  If operating under eval and withing a WebDyne::<inode> block call CORE::die;
+    #
+    #foreach my $eval_nest_ar (@{$eval_nest}) {
+    #    if ($eval_nest_ar->[0]=~/^WebDyne::[a-f0-9]{32}$/) {
+    #        debug("die with WebDyne::<inode> eval detected, calling CORE::die");
+    #        CORE::die(\@_);
+    #    }
+    #}
+            
+
+    #  Updated to *NOT* throw error if in eval block (i.e. if $@ is set). Stops error handler being called
+    #  if non WebDyne module has eval code which triggers non WebDyne AUTOLOAD block. Might need to be more
+    #  sophisticated and look at traceback for Autoload::AUTOLOAD but another day
+    return err(@_) unless $@;
+
+}
+
+
+sub handler_warn {
+
+    #  Warn signal handler
+    #
+    debug('in __WARN__ sig handler, caller %s', join(',', (caller(0))[0..3]));
+    goto &handler_die if $WEBDYNE_WARNINGS_FATAL;
+    return err(@_)
+
+}
+    
+
+sub init {
+
+
+    #  Clear Package cache and start from scratch
+    #
+    undef %Package;
 
 
     #  Try to load correct modules depending on Apache ver, taking special care
@@ -1073,13 +1151,19 @@ sub init_class {
     #  code could probably easily subvert us, as all operations are
     #  allowed, including redefining our subroutines etc).
     #
-    my $eval_perl_cr=sub {
+    my $eval_perl_cr=set_subname('eval_perl_cr_anon', sub {
 
 
         #  Get self ref
         #
         my ($self, $data_ar, $eval_param_hr, $eval_text, $index, $tag_fg)=@_;
         $eval_text=decode_entities($eval_text);
+        
+        
+        #  Debug
+        #
+        debug("self: $self, data_ar: $data_ar, eval_param_hr: %s, eval_text: %s, index: $index, tag_fg: $tag_fg", Dumper($eval_param_hr, \$eval_text));
+        debug('caller: %s', Dumper([(caller(0))[0..3]]));
 
 
         #  Debug
@@ -1095,9 +1179,11 @@ sub init_class {
         my $param_hr=(
             $self->{'_eval_cgi_hr'} ||= do {
                 $cgi_or->Vars();
-
+        
             }
         );
+        #my $cgi_or;
+        #my $param_hr;
 
 
         #  Only eval subroutine if we have not done already, if need to eval store in
@@ -1173,12 +1259,13 @@ sub init_class {
         };
         if (!@eval || $@ || !$eval[0]) {
 
-            #  An error occurred - handle it and return.
+            #  An error occurred - handle it and return
             #
             if (my $err=(errstr() || $@)) {
 
                 #  Eval error or err() called during routine.
                 #
+                debug("eval error detected: $err");
                 return $self->err_eval($err, \$eval_text, $inode);
 
             }
@@ -1196,17 +1283,19 @@ sub init_class {
 
             #  $self fell through, probably means no explicit return was done, e.g perl code was sub foo {}
             #
+            debug('self ref detected, erasing eval');
             undef @eval;
 
         }
+        
 
-
-        #  Quick sanity check on return
+        #  Quick sanity check on return.
         #
         if (grep {ref($_) && (ref($_) !~ /(?:SCALAR|ARRAY|HASH|JSON)/)} @eval) {
 
             #  Whatever it is we can't render it unless SCALAR, ARRAY or HASH
             #
+            debug('incorrect ref type detected');
             return err('return from eval of ref type \'%s\' not supported', join(',', grep {$_} map {ref($_)} @eval));
 
         }
@@ -1214,14 +1303,15 @@ sub init_class {
 
         #  Done
         #
+        debug('no error detected, returning: %s', Dumper(\@eval));
         \@eval;
 
-    };
+    });
 
 
     #  The code ref for the eval statement if using Safe module. NOTE: old and unmaintained.
     #
-    my $eval_safe_cr=sub {
+    my $eval_safe_cr=set_subname('eval_safe_cr_anon', sub {
 
 
         #  Get self ref
@@ -1332,12 +1422,12 @@ sub init_class {
         return ref($html_sr) ? $html_sr : \$html_sr;
 
 
-    };
+    });
 
 
     #  Hash eval routine, works similar to the above, but returns a hash ref
     #
-    my $eval_hash_cr=sub {
+    my $eval_hash_cr=set_subname('eval_hash_cr_anon', sub {
 
 
         #  Run eval and turn into tied hash
@@ -1347,12 +1437,12 @@ sub init_class {
         return \%hr;
 
 
-    };
+    });
 
 
     #  Array eval routine, works similar to the above, but returns an array ref
     #
-    my $eval_array_cr=sub {
+    my $eval_array_cr=set_subname('eval_array_cr_anon', sub {
 
 
         #  Run eval and return default - which is an array ref
@@ -1360,12 +1450,12 @@ sub init_class {
         debug('eval_array_cr, %s', Dumper(\@_));
         return $eval_perl_cr->(@_) || err();
 
-    };
+    });
 
 
     #  Code ref eval routine
     #
-    my $eval_code_cr=sub {
+    my $eval_code_cr=set_subname('eval_code_cr_anon', sub {
 
 
         #  Need to eval some code. Dispatch to perl code ref
@@ -1374,7 +1464,8 @@ sub init_class {
         debug("eval code start $eval_text");
         my $html_ar=$eval_perl_cr->(@_) || return err();
         debug("eval code finish %s, %s", Dumper($html_ar, $eval_param_hr));
-
+        
+        
 
         #  We only accept first item of any array ref returned (which might be an array ref itself)
         #
@@ -1410,12 +1501,12 @@ sub init_class {
         #
         return ref($html_sr) ? $html_sr : \$html_sr;
 
-    };
+    });
 
 
     #  Scalar (${foo}) routine
     #
-    my $eval_scalar_cr=sub {
+    my $eval_scalar_cr=set_subname('eval_scalar_cr_anon', sub {
 
         my $value=$_[2]->{$_[3]};
         unless ($value) {
@@ -1428,7 +1519,7 @@ sub init_class {
         if (ref($value) && overload::Overloaded($value)) {$value="$value"}
         return ref($value) ? $value : \$value
 
-    };
+    });
 
 
     #  Init anon text and attr evaluation subroutines, store in class space
@@ -1440,6 +1531,7 @@ sub init_class {
         '@' => $eval_array_cr,
         '%' => $eval_hash_cr,
         '!' => $eval_code_cr,
+        '#' => $eval_perl_cr,
         '+' => sub {return \($_[0]->CGI()->param($_[3]))},
         '*' => sub {return \$ENV{$_[3]}},
         '^' => sub {
@@ -2528,7 +2620,7 @@ sub json {
     #  Run the code in perl routine specifying it is JSON, get return ref of
     #  some kind
     #
-    defined(my $json_xr=$self->perl(undef, {json => 1, %{$attr_hr}})) ||
+    defined(my $json_xr=$self->perl($data_ar, {json => 1, %{$attr_hr}})) ||
         return err();
     if (ref($json_xr) eq 'SCALAR') {
         $json_xr=${$json_xr}
@@ -2540,6 +2632,8 @@ sub json {
     #
     my $json_or=JSON->new() ||
         return err('unable to create new JSON object');
+    #$json_or->allow_blessed(1);
+    #$json_or->convert_blessed(1);
     debug("json_or: $json_or");
     $json_or->canonical(defined($attr_hr->{'canonical'}) ? ($attr_hr->{'canonical'} ? 1 : 0) : WEBDYNE_JSON_CANONICAL);
     $json_or->pretty(defined($attr_hr->{'pretty'}) ? ($attr_hr->{'pretty'} ? 1 : 0)  : WEBDYNE_JSON_PRETTY);
@@ -2715,7 +2809,8 @@ sub api {
         #  some kind
         #
         #my $json_xr=$self->perl(undef, {json => 1, %{$attr_hr}, param=>$match_hr }) ||
-        my $json_xr=$self->perl(undef, {json => 1, %attr, param=>$match_hr }) ||
+        #my $json_xr=$self->perl(undef, {json => 1, %attr, param=>$match_hr }) ||
+        my $json_xr=$self->perl($data_ar, {json => 1, %attr, param=>$match_hr }) ||
             return err();
         debug("json_xr %s", Dumper($json_xr));
 
@@ -2819,7 +2914,7 @@ sub perl {
         #  for consistancy
         #
         $html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, $perl_param_hr, $perl_code) ||
-            err();
+            return err();
         
         
 
@@ -3007,7 +3102,7 @@ sub eval_require {
 
     #  Eval cr
     #
-    my $eval_cr=sub {
+    my $eval_cr=set_subname('eval_require_cr_anon', sub {
 
         local $SIG{__DIE__};
         eval {} if $@;    #Clear $@;
@@ -3021,7 +3116,7 @@ sub eval_require {
         }
         return $ret
 
-    };
+    });
 
 
     #  File or module ? Try via syntax, allow force with 'file' attribute
@@ -3124,14 +3219,20 @@ sub perl_init_eval {
 
     #  Eval routine for perl_init code. Avoid using var names so things like $self not available
     #  in eval code;
-    #local $SIG{__DIE__};
+    #  local $SIG{__DIE__};
     my $eval=join(
         $/,
         "package WebDyne::$_[0]; $WebDyne::WEBDYNE_EVAL_USE_STRICT;",
+        grep {$_} (
+        (WEBDYNE_EVAL_PREPEND && WEBDYNE_EVAL_PREPEND),
+        (WEBDYNE_PAGI && $WebDyne::PAGI::WEBDYNE_PAGI_EVAL_PREPEND),
+        (WEBDYNE_PSGI && $WebDyne::PSGI::WEBDYNE_PSGI_EVAL_PREPEND),
+        ),
         "#line $_[2] WebDyne::$_[0]",
         "${$_[1]}",
         ';1'
     );
+    debug("perl_init_eval:\n%s", $eval);
     return eval($eval);
 
 }
@@ -3151,7 +3252,7 @@ sub perl_init {
     #
     debug("$self init perl code $perl_ar in $inode, %s", Dumper($perl_ar));
     *{"WebDyne::${inode}::err"}=\&err;
-    *{"WebDyne::${inode}::self"}=sub {$self};
+    *{"WebDyne::${inode}::self"}=set_subname('perl_init_inode_self_cr_anon', sub {$self});
     *{"WebDyne::${inode}::AUTOLOAD"}=sub {die("unknown function $AUTOLOAD")};
 
 
@@ -3181,7 +3282,7 @@ sub perl_init {
 
         #  Error handler
         #
-        my $error_cr=sub {
+        my $error_cr=set_subname('error_cr_anon', sub {
 
             #  An error has occurred. Deregister self subroutine call in package
             #
@@ -3202,7 +3303,7 @@ sub perl_init {
             #
             push @{$self->{'_data_ar_err'}}, \@data;
 
-        };
+        });
 
 
         #  Var for eval return value
@@ -3296,7 +3397,7 @@ sub subst {
     #  compile time in front of text with one of theses patterns
     #
     my $index;
-    my $cr=sub {
+    my $cr=set_subname('subst_cr_anon', sub {
 
         #  Used to be this
         #
@@ -3308,10 +3409,13 @@ sub subst {
         
         #  But doesn't have to be scalar ref, as long as represents as scalar
         #
-        return $eval_cr->{$_[0]}($self, $data_ar, $param_data_hr, $_[1], $_[2]) ||
+        debug('running subst');
+        return $eval_cr->{$_[0]}($self, $data_ar, $param_data_hr, $_[1], $_[2]) || do {
+            debug('subst_cr_anon returning error');
             return err();
-    };
-    $text=~s/([\$!+*^])\{(\1?)(.*?)\2}/${$cr->($1, $3, $index++) || return err()}/ge;
+        };
+    });
+    $text=~s/([\$!+*^])\{(\1?)(.*?)\2}/${$cr->($1, $3, $index++) || do { debug('subst returning error'); return err() } }/ge;
 
 
     #  Done
@@ -3391,13 +3495,13 @@ sub subst_attr {
             #  Substitution needed
             #
             debug("subst_attr path 2: $attr_name, $attr_value");
-            my $cr=sub {
+            my $cr=set_subname('subst_attr_cr_anon', sub {
                 my $sr=$eval_cr->{$_[0]}($self, $data_ar, $param_hr, $_[1], $_[2]) ||
                     return err();
                 (ref($sr) eq 'SCALAR') ||
                     return err("eval of '$_[1]' returned %s ref, should return SCALAR ref", ref($sr));
                 $sr;
-            };
+            });
 
             #$attr_value=~s/([\$!+*^]){1}{(\1?)(.*?)\2}/${$cr->($1,$3,$index++) || return err()}/ge;
             $attr_value=~s/([\$!+*^]){1}{(\1?)(.*?)\2}/${$cr->($1,$3,$attr_name) || return err()}/ge;
@@ -3508,8 +3612,8 @@ sub include {
             debug('head or body render');
             my %option=(
 
-                nofilter => 1,
-                noperl   => 1,
+                no_filter => 1,
+                no_perl   => 1,
                 stage0   => 1,
                 srce     => $pn,
                 
@@ -3601,8 +3705,8 @@ sub include {
             debug('block render');
             my %option=(
 
-                nofilter 	=> 1,
-                #noperl     => 1,
+                no_filter 	=> 1,
+                #no_perl     => 1,
                 stage1 	=> 1,
                 srce   	=> $pn,
                 implicit_body_p_tag => 0,
@@ -3745,7 +3849,7 @@ sub find_node {
 
     #  Create recursive anon sub
     #
-    my $find_cr=sub {
+    my $find_cr=set_subname('find_node_cr_anon', sub {
 
 
         #  Get params
@@ -3830,7 +3934,7 @@ sub find_node {
 
         }
 
-    };
+    });
 
 
     #  Start it running with our top node
@@ -3866,7 +3970,7 @@ sub delete_node {
 
     #  Create recursive anon sub
     #
-    my $find_cr=sub {
+    my $find_cr=set_subname('delete_node_cr_anon', sub {
 
 
         #  Get params
@@ -3908,7 +4012,7 @@ sub delete_node {
         #
         return \undef;
 
-    };
+    });
 
 
     #  Start
@@ -3921,7 +4025,7 @@ sub delete_node {
 sub CGI {
 
 
-    #  Return WebDyne::CGI wrapper object
+    #  Return WebDyne::CGI::Simple wrapper object
     #
     my $self=shift();
     debug("$self get WebDyne::CGI object, caller: %s", Dumper([caller(0)]));
@@ -3941,7 +4045,7 @@ sub CGI {
         #  block and we don't want to trigger an error so be careful
         #
         local $SIG{'__DIE__'}=sub {};
-        my $cgi_or=WebDyne::CGI->new($self->{'_r'}) ||
+        my $cgi_or=WebDyne::CGI::Simple->new($self->{'_r'}) ||
            return err('unable to get WebDyne::CGI object');
         $self->CGI_param_expand($cgi_or);
         debug("cgi_or: $cgi_or");
@@ -4020,7 +4124,7 @@ sub dump {
 
         #  Always do CGI vars
         #
-        push @html, Data::Dumper->Dump([scalar $cgi_or->Vars()], ['WebDyne::CGI']);
+        push @html, Data::Dumper->Dump([scalar $cgi_or->Vars()], ['WebDyne::CGI::Simple']);
         
         
         #  Others are optional. Environment
@@ -4619,134 +4723,329 @@ sub AUTOLOAD {
 
 __END__
 
-=pod
+=begin markdown
 
-=head1 WebDyne(3pm)
+# WebDyne #
 
-=head1 NAME
+# NAME #
 
-WebDyne - Dynamic Perl web application framework with template compilation and modular design. Designed to be used via Plack/Starman/PSGI or Apache mod_perl web servers, but supports
-    standalone HTML output
+WebDyne - Primary runtime module for the WebDyne framework, with support for standalone `.psp` to HTML rendering
 
-=head1 SYNOPSIS
+# SYNOPSIS #
 
-SYNOPSIS
+```perl
+# Framework usage usually happens under a WebDyne-compatible runtime
+# such as Apache/mod_perl, PSGI, or PAGI, where WebDyne->handler()
+# is called by the request layer.
+#
+use WebDyne qw(html html_sr);
 
-    #  Basic usage
-    #
-    use WebDyne qw(html html_sr);
-    
-    # Render a .psp file to HTML (returns a string)
-    #
-    my $html = html('app.psp', { param1 => 'value', param2 => 'value' });
-    
-    # Render a .psp file to HTML (returns a scalar ref)
-    #
-    my $html_ref = html_sr('app.psp', { param1 => 'value', param2 => 'value' });
-    
-    # With additional options
-    #
-    my $html = html('template.psp', { outfile => $fh });
+# Render a .psp file to HTML and return a string
+#
+my $html = html('app.psp');
 
-=head1 DESCRIPTION
+# Render a .psp file with template parameters
+#
+my $html = html('app.psp', {
+    param => {
+        user => 'alice',
+    },
+});
 
-I<<< WebDyne >>>  is a high-performance, dynamic Perl web application framework. It provides method to integrate Perl code in HTML files with dynamic compilation, caching, and a modular architecture. WebDyne is designed for flexibility and performance, supporting both CGI and persistent environments (mod_perl, PSGI). The core interface for scripts is via the html  and  html_sr  functions, which render .psp templates to HTML.
+# Render a .psp file to HTML and return a scalar ref
+#
+my $html_ref = html_sr('app.psp');
 
-WebDyne can be used directly from scripts or as a handler in persistent environments. It supports advanced features such as block rendering, custom handlers, caching, and integration with Apache via mod_perl, and PSGI servers such as Plack and Starman.
+# Write rendered output to an existing filehandle
+#
+html('template.psp', { outfile => $fh });
+```
 
-Comprehensive documentation around the construction and options within .psp files, and the general usage of WebDyne within an Apache or PSGI server are available in the doc directory of the Perl module or from the  L<Github repository|https://github.com/aspeer/WebDyne> .
+# DESCRIPTION #
 
-The simplest representation of a .psp file that can be rendered is as follows. This example uses several syntactic shortcuts for brevity that are not standard HTML, however the output generated by WebDyne is alway standards compliant HTML.
+*WebDyne* is the primary supporting module for the WebDyne framework. In normal use it operates under a web server or application runtime such as Apache/mod_perl, PSGI, or PAGI, where it acts as the main request handler and rendering engine for `.psp` pages.
 
-    <start_html>
-    The current server time is: <? localtime() ?>
+The module can also be used directly from scripts to render `.psp` templates to HTML without a web server, which is useful for tooling, diagnostics, offline generation, and simple standalone usage. In that mode the main entry points are `html()` and `html_sr()`.
 
- If this example is saved as the filename  C<<<< app.psp >>>>  it can be rendered to HTML from the command line utility  C<<<< wdrender >>>>  as follows:
+The `html()` and `html_sr()` functions are exported only on request:
+
+```perl
+use WebDyne qw(html html_sr);
+```
+
+WebDyne supports embedded Perl within HTML, compile-time parsing and caching, chained handler modules, filters, templates, CGI-style parameter access, and integration with the wider WebDyne module family.
+
+Comprehensive documentation around `.psp` page construction and framework usage is available in the module source tree and the [Github repository](https://github.com/aspeer/WebDyne).
+
+The simplest representation of a `.psp` file that can be rendered is:
+
+```
+<start_html>
+The current server time is: <? localtime() ?>
+```
+
+If this example is saved as `app.psp`, it can be rendered from the command line with `wdrender`:
 
     $ wdrender app.psp
      
     <!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"></head>
-    <body><p>The current server time is: Sat Sep 20 17:17:13 2025</p></body></html>
+    <body><p>The current server time is: ...</p></body></html>
 
-=head1 METHODS
+# METHODS #
 
-=over
+* **html($filename, \%options, ...)**
 
-=item * B<<< html($filename, \%options, ...) >>>
+    Render a `.psp` file and return the result as a string. This is the convenience wrapper around `html_sr()`.
 
-Renders a .psp file to HTML and returns the result as a string. This is a convenience wrapper around  html_sr .
+    Supported calling styles include:
 
-I<<< Arguments: >>> 
+    `html('page.psp')`
 
-=over
+    `html('page.psp', { ... })`
 
-=item * I<<< $filename >>>  - Path to the .psp template file.
+    `html('page.psp', key => value, ...)`
 
-=item * I<<< \%options >>>  - Hashref or hash of options and parameters to pass to the template.
+    `html({ filename => 'page.psp', ... })`
 
-=back
+* **html_sr($filename, \%options, ...)**
 
-I<<< Options: >>> 
+    Render a `.psp` file and return a scalar reference to the generated HTML when output is captured internally. This is the core script-facing rendering function.
 
-=over
+    If `outfile` is supplied, output is written to that filehandle and `html_sr()` returns a reference to `undef` instead of a scalar reference containing generated HTML. The `html()` wrapper dereferences this, so `html(..., outfile => $fh)` returns `undef`.
 
-=item * I<<< handler >>>  - Specify a custom handler class (defaults to WebDyne).
+    Arguments and options are the same as for `html()`.
 
-=item * I<<< outfile >>>  - Filehandle to write output to (optional).
+    In standalone rendering, `html_sr()` creates a `WebDyne::Request::Fake` request object unless an `r` option is supplied. If a custom `handler` option is supplied, that handler class is loaded before rendering.
 
-=back
+* **handler($r, \%params)**
 
-=item * B<<< html_sr($filename, \%options, ...) >>>
+    Main request lifecycle entry point for WebDyne under server environments such as Apache/mod_perl, PSGI, PAGI, and chained WebDyne handler modules. It is not typically called directly from standalone scripts.
 
-Renders a .psp file to HTML and returns a scalar reference to the result. This is the core rendering function for scripts.
+    Raw Apache request objects are wrapped in `WebDyne::Request::Apache`; other runtimes normally provide an appropriate WebDyne request object. The return value is the status or response result expected by the active runtime.
 
-I<<< Arguments and options are as for html. >>>
+# OPTIONS #
 
-=item * B<<< handler($r, \%params) >>>
+The following options are the most commonly used with `html()` and `html_sr()`:
 
-Main request handler for mod_perl and PSGI environments. Not typically used directly in scripts.
+* **filename**
 
-=back
+    `.psp` filename to render. Usually supplied as the first argument.
 
-=head1 OPTIONS
+* **handler**
 
-The following options can be passed to  html  and  html_sr :  
+    Custom handler class to use for rendering. Defaults to `WebDyne`.
 
-=over
+* **outfile**
 
-=item * B<<< filename >>>
+    Filehandle to receive rendered output. When supplied, output is written directly and `html_sr()` does not return a scalar reference.
 
-application .psp filename to render (defaults to first argument).
+* **param**
 
-=item * B<<< handler >>>
+    Hash reference of parameters passed into the handler/rendering context for use by page code.
 
-Custom handler class to use for rendering. Defaults to the inbuilt WebDyne handler
+* **r**
 
-=item * B<<< outfile >>>
+    Optional prebuilt request object. If omitted, WebDyne creates a `WebDyne::Request::Fake` object for standalone rendering.
 
-File handle to write output to (optional).
+# SEE ALSO #
 
-=back
+[Plack](https://metacpan.org/pod/Plack) [Catalyst](https://metacpan.org/pod/Catalyst) [Dancer2](https://metacpan.org/pod/Dancer2) [Mojolicious](https://metacpan.org/pod/Mojolicious)
 
-=head1 SEE ALSO
-
-L<Plack|https://metacpan.org/pod/Plack> L<Catalyst|https://metacpan.org/pod/Catalyst> L<Dancer2|https://metacpan.org/pod/Dancer2> L<Mojolicious|https://metacpan.org/pod/Mojolicious>
-
-=head1 AUTHOR
+# AUTHOR #
 
 Andrew Speer <andrew.speer@isolutions.com.au> and contributors.
 
-=head1 LICENSE and COPYRIGHT
+# LICENSE and COPYRIGHT
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
 
-L<http://dev.perl.org/licenses/>
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 WebDyne
+
+
+=head1 NAME
+
+WebDyne - Primary runtime module for the WebDyne framework, with support for standalone C<.psp> to HTML rendering
+
+
+=head1 SYNOPSIS
+
+
+ # Framework usage usually happens under a WebDyne-compatible runtime
+ # such as Apache/mod_perl, PSGI, or PAGI, where WebDyne->handler()
+ # is called by the request layer.
+ #
+ use WebDyne qw(html html_sr);
+ 
+ # Render a .psp file to HTML and return a string
+ #
+ my $html = html('app.psp');
+ 
+ # Render a .psp file with template parameters
+ #
+ my $html = html('app.psp', {
+     param => {
+         user => 'alice',
+     },
+ });
+ 
+ # Render a .psp file to HTML and return a scalar ref
+ #
+ my $html_ref = html_sr('app.psp');
+ 
+ # Write rendered output to an existing filehandle
+ #
+ html('template.psp', { outfile => $fh });
+
+=head1 DESCRIPTION
+
+I<WebDyne> is the primary supporting module for the WebDyne framework. In normal use it operates under a web server or application runtime such as Apache/mod_perl, PSGI, or PAGI, where it acts as the main request handler and rendering engine for C<.psp> pages.
+
+The module can also be used directly from scripts to render C<.psp> templates to HTML without a web server, which is useful for tooling, diagnostics, offline generation, and simple standalone usage. In that mode the main entry points are C<html()> and C<html_sr()>.
+
+The C<html()> and C<html_sr()> functions are exported only on request:
+
+
+ use WebDyne qw(html html_sr);
+WebDyne supports embedded Perl within HTML, compile-time parsing and caching, chained handler modules, filters, templates, CGI-style parameter access, and integration with the wider WebDyne module family.
+
+Comprehensive documentation around C<.psp> page construction and framework usage is available in the module source tree and the L<Github repository|https://github.com/aspeer/WebDyne>.
+
+The simplest representation of a C<.psp> file that can be rendered is:
+
+
+ <start_html>
+ The current server time is: <? localtime() ?>
+If this example is saved as C<app.psp>, it can be rendered from the command line with C<wdrender>:
+
+    $ wdrender app.psp
+     
+    <!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"></head>
+    <body><p>The current server time is: ...</p></body></html>
+
+
+=head1 METHODS
+
+=over
+
+=item *
+
+B<html($filename, \%options, ...)>
+
+Render a C<.psp> file and return the result as a string. This is the convenience wrapper around C<html_sr()>.
+
+Supported calling styles include:
+
+C<html('page.psp')>
+
+C<html('page.psp', { ... })>
+
+C<<< html('page.psp', key => value, ...) >>>
+
+C<<< html({ filename => 'page.psp', ... }) >>>
+
+
+
+=item *
+
+B<html_sr($filename, \%options, ...)>
+
+Render a C<.psp> file and return a scalar reference to the generated HTML when output is captured internally. This is the core script-facing rendering function.
+
+If C<outfile> is supplied, output is written to that filehandle and C<html_sr()> returns a reference to C<undef> instead of a scalar reference containing generated HTML. The C<html()> wrapper dereferences this, so C<<< html(..., outfile => $fh) >>> returns C<undef>.
+
+Arguments and options are the same as for C<html()>.
+
+In standalone rendering, C<html_sr()> creates a C<WebDyne::Request::Fake> request object unless an C<r> option is supplied. If a custom C<handler> option is supplied, that handler class is loaded before rendering.
+
+
+
+=item *
+
+B<handler($r, \%params)>
+
+Main request lifecycle entry point for WebDyne under server environments such as Apache/mod_perl, PSGI, PAGI, and chained WebDyne handler modules. It is not typically called directly from standalone scripts.
+
+Raw Apache request objects are wrapped in C<WebDyne::Request::Apache>; other runtimes normally provide an appropriate WebDyne request object. The return value is the status or response result expected by the active runtime.
+
+
+
+=back
+
+
+=head1 OPTIONS
+
+The following options are the most commonly used with C<html()> and C<html_sr()>:
+
+=over
+
+=item *
+
+B<filename>
+
+C<.psp> filename to render. Usually supplied as the first argument.
+
+
+
+=item *
+
+B<handler>
+
+Custom handler class to use for rendering. Defaults to C<WebDyne>.
+
+
+
+=item *
+
+B<outfile>
+
+Filehandle to receive rendered output. When supplied, output is written directly and C<html_sr()> does not return a scalar reference.
+
+
+
+=item *
+
+B<param>
+
+Hash reference of parameters passed into the handler/rendering context for use by page code.
+
+
+
+=item *
+
+B<r>
+
+Optional prebuilt request object. If omitted, WebDyne creates a C<WebDyne::Request::Fake> object for standalone rendering.
+
+
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Plack|https://metacpan.org/pod/Plack> L<Catalyst|https://metacpan.org/pod/Catalyst> L<Dancer2|https://metacpan.org/pod/Dancer2> L<Mojolicious|https://metacpan.org/pod/Mojolicious>
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au> and contributors.
+
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See  L<http://dev.perl.org/licenses/|http://dev.perl.org/licenses/> .
 
 =cut

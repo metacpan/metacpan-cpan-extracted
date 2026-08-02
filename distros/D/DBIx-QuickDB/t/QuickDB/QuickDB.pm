@@ -2,7 +2,9 @@ use Test2::V0 -target => 'DBIx::QuickDB';
 use Test2::Tools::QuickDB;
 
 my $driver = skipall_unless_can_db(drivers => $main::DRIVERS);
-diag("Using driver '$driver'");
+like($driver, qr/^DBIx::QuickDB::Driver::/,
+    "selected a fully qualified driver ($driver)");
+note("Using driver '$driver'");
 
 # DBIx::QuickDB->import builds (and starts) a server immediately. A host out of
 # System V IPC cannot start one; that is an environment limit, not a fault here,

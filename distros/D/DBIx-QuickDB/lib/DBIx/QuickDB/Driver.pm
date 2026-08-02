@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000060';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -10,7 +10,7 @@ use POSIX ":sys_wait_h";
 use Scalar::Util qw/blessed/;
 use Time::HiRes qw/sleep time/;
 
-use DBIx::QuickDB::Util qw/clone_dir env_timeout remove_tree_robust/;
+use DBIx::QuickDB::Util qw/clone_dir env_timeout remove_tree_or_quarantine disconnect_dbi_handles/;
 
 use DBIx::QuickDB::Watcher;
 
@@ -315,11 +315,21 @@ sub cleanup {
     # a second disconnect simply finds no matching handles.
     $self->_disconnect_handles;
 
-    # Best-effort, idempotent, and Windows-aware (retries while a transient lock
-    # clears). Errors are swallowed: the watcher daemon may be deleting this same
-    # directory concurrently, and either way the dir ends up gone. See
-    # DBIx::QuickDB::Util::remove_tree_robust.
-    remove_tree_robust($self->{+DIR}) if -d $self->{+DIR};
+    # Best-effort, idempotent, and Windows-aware. If retries cannot delete the
+    # tree, retry the quarantine rename with Windows-aware backoff, then retry a
+    # successful quarantine during later cleanups and at process shutdown. This
+    # is essential for SQLite on Windows: a briefly delete-pending file must not
+    # leave the database directory visible after the driver dies.
+    my $dir = $self->{+DIR};
+    if (-d $dir) {
+        my $removed = remove_tree_or_quarantine($dir);
+        unless (defined $removed) {
+            my $error_number = 0 + $!;
+            my $error = "$!";
+            warn "Could not remove or quarantine database directory '$dir' "
+                . "(OS error $error_number: $error)\n";
+        }
+    }
     return;
 }
 
@@ -417,19 +427,7 @@ sub _disconnect_handles {
 
     return if $self->{+NO_DISCONNECT_HANDLES};
 
-    return unless $INC{'DBI.pm'} && ${^GLOBAL_PHASE} ne 'DESTRUCT';
-
-    DBI->visit_handles(
-        sub {
-            my ($driver_handle) = @_;
-
-            $driver_handle->disconnect
-               if $driver_handle->{Type} && $driver_handle->{Type} eq 'db'
-               && $driver_handle->{Name} && index($driver_handle->{Name}, $self->{+DIR}) >= 0;
-
-            return 1;
-        }
-    );
+    disconnect_dbi_handles($self->{+DIR});
 
     return;
 }
@@ -524,15 +522,15 @@ sub DESTROY {
         # handle sat out the full stop grace and then got escalated.
         $self->_disconnect_handles;
 
-        # eliminate() signals the watcher to stop the server and delete the data
-        # dir; destroying the watcher then blocks (via Watcher::wait) until the
-        # watcher process has exited, and the watcher reaps the server before it
-        # exits. So once $watcher is gone the server is gone too. We deliberately
-        # do NOT fall back to signalling a stored server pid here: after the
-        # watcher exits that pid may have been recycled to an unrelated process
-        # (the pid-reuse hazard), so a stray TERM/KILL could hit the wrong one.
+        # Explicitly wait after signalling. Relying on Watcher::DESTROY to wait
+        # is unsafe during Perl's END phase: destruction of the local watcher
+        # can be deferred until after this Driver::DESTROY returns, allowing
+        # cleanup() below to delete the data dir while the server is still
+        # shutting down. That strands MySQL mid-shutdown until the watcher
+        # escalates to SIGKILL. An explicit wait also handles callers retaining
+        # another watcher reference.
         $watcher->eliminate();
-        undef $watcher;
+        $watcher->wait();
 
         $self->cleanup() if $self->should_cleanup;
     }
@@ -756,6 +754,11 @@ True if this db was created with C<< fast_destroy => 1 >>. When set B<and> the d
 is disposable (C<< cleanup => 1 >>), C<DESTROY> uses C<destroy_quietly()> instead
 of the normal graceful teardown. With C<< cleanup => 0 >> the flag is ignored and
 the graceful path is used, so a reusable data dir is never hard-killed.
+
+The same policy is passed to the independent watcher. If the owning process
+exits without running destructors, the watcher uses immediate teardown only for
+a disposable C<fast_destroy> database; reusable databases retain graceful
+owner-death shutdown and their data directories.
 
 The attribute is inherited by clones via C<clone_data()>, so a clone of a
 fast_destroy database is itself fast_destroy.

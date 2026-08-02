@@ -1,8 +1,24 @@
 Revision history for Data-Entropy:
 
+0.010
+  [Security]
+  - The RandomOrg and RandomnumbersInfo sources were not properly fixed in 0.009, and have been removed.
+    The concept of downloading random data from an external source is flawed.
+
+  - This module has been deprecated since version 0.008. Please use an alternative such as
+    Crypt::URandom, Crypt::SysRandom or Crypt::PRNG.
+
+    This now uses Devel::Deprecate to warn loudly about deprecation.
+
+  [Documentation]
+  - Adjusted the Changes file.
+
 0.009
   [Security]
   - The RandomOrg and RandomnumbersInfo sources now make requests over https. (CVE-2026-18536)
+
+  - This module has been deprecated since version 0.008. Please use an alternative such as
+    Crypt::URandom, Crypt::SysRandom or Crypt::PRNG.
 
   [Documentation]
   - Updated security policy to have consistent contact instructions.
@@ -22,7 +38,7 @@ Revision history for Data-Entropy:
 
   - Use Crypt::URandom to seed the default algorithm with
     cryptographically secure random bytes instead of the builtin
-    rand() function [CVE 2025-1860].
+    rand() function (CVE 2025-1860).
 
   - This module has been marked as deprecated.
 

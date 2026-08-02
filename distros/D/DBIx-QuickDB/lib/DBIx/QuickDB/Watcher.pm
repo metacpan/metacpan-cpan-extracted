@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000060';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
@@ -96,6 +96,10 @@ sub watch {
     my $ddir = $self->{+DB}->dir;
     my $ssig = $self->{+DB}->stop_sig // 'TERM';
     my $fsig = $self->{+DB}->fast_stop_sig // 'KILL';
+    my $delete_data = $self->{+DB}->should_cleanup ? 1 : 0;
+    my $owner_kill  = $delete_data && $self->{+DB}->fast_destroy
+        ? 'FAST_TERM'
+        : 'TERM';
 
     # Block (rather than ignore) every teardown signal across the exec. A
     # blocked signal stays *pending* instead of being discarded, so a stop(),
@@ -124,6 +128,8 @@ sub watch {
         server_pid  => $spid,
         signal      => $ssig,
         fast_signal => $fsig,
+        delete_data => $delete_data,
+        owner_kill  => $owner_kill,
         kill        => $kill,
         hup         => $hup,
     );
@@ -158,6 +164,8 @@ sub _do_watch {
     my $data_dir    = $params{data_dir}   or die "No data dir provided";
     my $signal      = $params{signal} // 'TERM';
     my $fast_signal = $params{fast_signal} // 'KILL';
+    my $delete_data = $params{delete_data} // 0;
+    my $owner_kill  = $params{owner_kill} // 'TERM';
 
     my $hupped = 0;
     while (!$kill) {
@@ -171,10 +179,10 @@ sub _do_watch {
         sleep 0.1;
 
         next if kill(0, $master_pid);
-        $kill = 'TERM';
+        $kill = $owner_kill;
     }
 
-    unless (eval { $class->_watcher_terminate(send_sig => $signal, fast_sig => $fast_signal, got_sig => $kill, pid => $server_pid, dir => $data_dir); 1 }) {
+    unless (eval { $class->_watcher_terminate(send_sig => $signal, fast_sig => $fast_signal, got_sig => $kill, pid => $server_pid, dir => $data_dir, delete_data => $delete_data); 1 }) {
         my $err = $@;
         eval { warn $@ };
         POSIX::_exit(1);
@@ -221,14 +229,15 @@ sub _watcher_terminate {
         # through the 'error' handler) if the owner process deletes this same
         # tree concurrently; deletion is idempotent best-effort.
         my $err = [];
-        eval { remove_tree($dir, {safe => 1, error => \$err}) } if -d $dir;
+        eval { remove_tree($dir, {safe => 1, error => \$err}) }
+            if $params{delete_data} && -d $dir;
 
         return;
     }
 
     $class->_watcher_kill($send_sig, $pid, $params{fast_sig});
 
-    if ($got_sig && $got_sig eq 'TERM') {
+    if ($params{delete_data} && $got_sig && $got_sig eq 'TERM') {
         # Ignore errors here (eval: see FAST_TERM above).
         my $err = [];
         eval { remove_tree($dir, {safe => 1, error => \$err}) } if -d $dir;
@@ -297,7 +306,7 @@ sub _watcher_kill_fast {
 # blocking them; real shutdowns do finish.
 sub _stop_grace {
     my $grace = $ENV{QDB_STOP_GRACE};
-    $grace = 10 unless defined($grace) && $grace =~ /^\d+$/ && $grace > 0;
+    $grace = 30 unless defined($grace) && $grace =~ /^\d+$/ && $grace > 0;
     return $grace;
 }
 

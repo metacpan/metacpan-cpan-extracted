@@ -50,7 +50,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 =head1 CONSTRUCTOR
 
@@ -304,7 +304,6 @@ L<Data::Entropy>,
 L<Data::Entropy::Algorithms>,
 L<Data::Entropy::RawSource::CryptCounter>,
 L<Data::Entropy::RawSource::Local>,
-L<Data::Entropy::RawSource::RandomOrg>,
 L<IO::Handle>
 
 =head1 AUTHOR

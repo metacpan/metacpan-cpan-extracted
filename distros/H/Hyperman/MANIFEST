@@ -42,6 +42,7 @@ t/17-tls.t
 t/18-tls-advanced.t
 bench/app.psgi
 bench/bench.sh
+bench/soak.sh
 MANIFEST.SKIP
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

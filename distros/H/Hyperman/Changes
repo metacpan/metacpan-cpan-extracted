@@ -1,5 +1,31 @@
 Revision history for Hyperman
 
+0.04    2026-08-02
+        - Link -lrt when clock_gettime needs it. backend_poll.c calls
+          clock_gettime(CLOCK_MONOTONIC), which on glibc before 2.17 lives in
+          librt, not libc.
+        - t/12-loop.t: make the persistent-watcher subtest more robust by adding a
+          watcher to prevent the test hanging like it has in some cpantesters environments.
+
+0.03    2026-08-01
+        - TLS: build against pre-1.1.0 OpenSSL. Older releases lack
+          OPENSSL_init_ssl(), the OPENSSL_INIT_LOAD_*_STRINGS constants,
+          TLS_server_method(), and SSL_CTX_set_min_proto_version(); provide
+          a compatibility shim (SSL_library_init + SSLv23_server_method +
+          SSL_OP_NO_* protocol fencing) so hm_tls.h compiles instead of
+          failing with undeclared-identifier errors on those hosts. Also map
+          SSL_get1_peer_certificate to SSL_get_peer_certificate before 3.0.
+        - Makefile.PL: bail out cleanly (NA, not FAIL) on native Windows.
+          Hyperman needs fork, POSIX signals, sockets, sys/uio, and a
+          kqueue/epoll/io_uring/poll backend, none of which MSWin32/MinGW
+          provides (the build previously died on a missing <sys/uio.h>).
+        - t/14-prod.t: bound the respawn/recycle/stats polls by wall-clock
+          time instead of fixed iteration counts. A -9'd worker is respawned
+          with exponential backoff, so on loaded smokers the replacement can
+          lag; the fixed windows produced intermittent failures on the
+          "request counter advanced" and "supervisor respawned a replacement
+          worker" assertions.
+
 0.02    2026-08-01
         - io_uring backend: assign sqe->user_data directly instead of calling
           io_uring_sqe_set_data64(), which only exists in liburing >= 2.2 and

@@ -5,11 +5,11 @@
 __PERL__
 use JSON;
 sub true {
-    return JSON::true
+    return [ \1 ]
 }
 sub false {
-    return JSON::false
+    return [ \0 ]
 }
 sub hash {
-    return { true=>&true, false=>&false }
+    return { true=>\1, false=>\0 }
 }

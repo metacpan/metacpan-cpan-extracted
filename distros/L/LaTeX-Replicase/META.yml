@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,9 +19,11 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Data::Dumper: '2.183'
   File::Basename: '2.00'
   File::Compare: '1.00'
   File::Path: '2.18'
+  Storable: '2.19'
   Test::Exception: '0.43'
   Test::More: '0.98'
   Test::More::UTF8: '0.05'
@@ -31,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/AlessandroGorohovski/LaTeX-Replicase/issues
   repository: git://github.com/AlessandroGorohovski/LaTeX-Replicase.git
-version: '0.705'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.790'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

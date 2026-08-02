@@ -1,0 +1,188 @@
+<start_html>
+<pre>
+Status: <perl handler=status/>
+Headers In: <perl handler=headers_in/>
+Test No: <?  Test::Builder->new->current_test ?>
+
+__PERL__
+
+use Test::More;
+use HTTP::Status qw(HTTP_OK);
+use Data::Dumper;
+
+my $self=&self();
+my $test_no=$self->r->headers_in('x-test-no');
+if ($test_no) {
+    Test::Builder->new->current_test($test_no);
+}
+
+ok($self, 'self');
+foreach my $method (qw(status headers_in method protocol uri)) {
+    ok(&{$method}($self), "$method (all)");
+}
+
+
+sub status {
+
+    my $self=shift();
+    #diag("status: $self, caller: %s", Dumper([caller()]));
+    my $r=$self->r();
+    is($r->status, HTTP_OK, 'status');
+    is($r->status(HTTP_OK), HTTP_OK, 'status');
+    is($r->status(), HTTP_OK, 'status');
+    return $r->status();
+
+}
+
+sub headers_in {
+
+    my $self=shift();
+    my $r=$self->r();
+    is(ref($r->headers_in), 'HTTP::Headers::Fast' );
+    is($r->headers_in('x-test-header-req-get'), 'OK');
+    is($r->headers_in('X-Test-Header-Req-Get'), 'OK');
+    $r->headers_in('X-Test-Header-Req-Set', 'OK');
+    is($r->headers_in('X-Test-Header-Req-Set'), 'OK');
+
+}
+
+sub method {
+
+    is(shift()->r->method(), 'GET', 'method');
+    
+}
+
+sub protocol {
+
+    like(shift()->r->protocol(), qr{^HTTP}, 'protocol');
+    
+}
+
+sub uri {
+
+    my $r=shift()->r();
+    like(ref($r->uri), qr(^URI), 'uri');
+    
+}
+
+sub path_info {
+
+    my $r=shift()->r();
+    diag($r->path_info);
+    like($r->path_info, qr{15-request\.psp$});
+    
+}
+
+__PERL__
+__END__
+            accept_encoding     => undef,
+            accept_language     => undef,
+            accept              => undef,
+            args                => undef,
+            as_string           => undef,
+            authority           => undef,
+            authorization       => undef,
+            auth_type           => undef,
+            base                => 'base',
+            base_url            => 'base',
+            body_handle         => 'input',
+            #body                => sub { my $r=shift(); if (my $input_or=$r->input) { unless (exists $r->{'body'}) { $input_or->read($r->{'body'}, $r->content_length()) }; return $r->{'body'} } },
+            body                => \&body,
+            cache_control       => undef,
+            charset             => undef,
+            cleanup_register    => undef,
+            client_address      => 'address',
+            content             => \&body,
+            content_encoding    => 'content_encoding',
+            #content_length      => 'content_length',
+            #content_type        => 'content_type',
+            content_length      => undef,
+            content_type        => undef,
+            cookies             => 'cookies',
+            cookie              => 'cookies',
+            custom_response     => undef,
+            cwd                 => undef,
+            dir_config          => undef,
+            document_root       => undef,
+            env                 => 'env',
+            etag                => undef,
+            filename            => undef,
+            finalize            => undef,
+            finfo               => undef,
+            form_parameters     => 'body_parameters',
+            forwarded_for       => undef,
+            fragment            => undef,
+            handler             => undef,
+            header              => sub { shift()->{'req'}->headers->header(@_) },
+            headers             => undef,
+            header_only         => undef,
+            headers_in          => \&headers_in,
+            headers_out         => undef,
+            hostname            => undef,
+            host                => undef,
+            https               => undef,
+            http_version        => 'protocol',
+            id                  => sub { shift()->{'env'}->{'psgi.request_id'} },
+            if_modified_since   => undef,
+            if_none_match       => undef,
+            input               => sub { shift()->{'env'}->{'psgi.input'} },
+            is_ajax             => undef,
+            is_main             => undef,
+            location            => undef,
+            log_error           => undef,
+            lookup_file         => undef,
+            lookup_uri          => undef,
+            main                => undef,
+            media_type          => undef,
+            method              => 'method',
+            mtime               => undef,
+            multipart_parameters=> 'body_parameters',
+            next                => undef,
+            notes               => undef,
+            origin              => undef,
+            output_filters      => undef,
+            path_info           => 'path_info',
+            path_parameters     => undef,
+            path                => 'path_info',
+            pool                => undef,
+            preferred_charset   => undef,
+            preferred_encoding  => undef,
+            preferred_language  => undef,
+            preferred_media_type=> undef,
+            prev                => undef,
+            print               => undef,
+            protocol            => 'protocol',
+            query_parameters    => 'query_parameters',
+            query_string        => 'query_string',
+            redirect            => undef,
+            referer             => 'referer',
+            register_cleanup    => undef,
+            remote_address      => 'address',
+            remote_host         => sub { my $r=shift(); $r->{'req'}->remote_host || $r->{'env'}->{'REMOTE_ADDR'} },
+            remote_port         => undef,
+            remote_user         => 'user',
+            request_time        => sub { shift()->{'env'}->{'psgi.start_time'} },
+            route               => undef,
+            run                 => undef,
+            scheme              => 'scheme',
+            script_name         => 'script_name',
+            secure              => 'secure',
+            sendfile            => undef,
+            send_http_header    => undef,
+            server_name         => undef,
+            server_port         => undef,
+            session_id          => undef,
+            session             => undef,
+            set_handlers        => undef,
+            status_line         => undef,
+            status              => undef,
+            unparsed_uri        => sub { shift()->{'env'}->{'REQUEST_URI'} },
+            uploads             => 'uploads',
+            uri                 => 'uri',
+            url                 => 'uri',
+            user_agent          => 'user_agent',
+            user                => undef,
+            write               => undef,
+
+
+1;

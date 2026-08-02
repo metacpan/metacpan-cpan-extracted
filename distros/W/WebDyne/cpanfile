@@ -10,6 +10,8 @@ requires 'HTML::Tagset';
 requires 'HTML::Tiny';
 requires 'HTML::TreeBuilder';
 requires 'HTTP::Status';
+requires 'HTTP::Negotiate';
+requires 'HTTP::AcceptLanguage';
 requires 'Hash::MultiValue';
 requires 'IO::String';
 requires 'JSON';
@@ -59,9 +61,11 @@ on build => sub {
     requires 'Test::Exception';
     requires 'Test::More';
     requires 'Test::Simple', '0.44';
+    requires 'Test::Differences';
 };
 
 on test => sub {
+    requires 'Algorithm::Diff';
     requires 'Capture::Tiny';
     requires 'File::Temp';
     requires 'IO::String';

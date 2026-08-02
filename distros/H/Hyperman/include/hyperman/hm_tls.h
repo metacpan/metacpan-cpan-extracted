@@ -21,6 +21,34 @@
 #include <string.h>
 #include <strings.h>
 
+/* Pre-1.1.0 OpenSSL compatibility. Before 1.1.0 the library-init function,
+ * the version-agnostic method constructor, and the min-proto-version setter
+ * did not exist; init was explicit and TLS was selected via SSLv23_*_method
+ * with SSL_OP_NO_* to fence off the obsolete protocols. LibreSSL reports a
+ * >= 1.1.0 version number and ships these, so it takes the modern path. */
+#if OPENSSL_VERSION_NUMBER < 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+static int OPENSSL_init_ssl(unsigned long opts, const void *settings) {
+    (void)opts; (void)settings;
+    SSL_library_init();
+    SSL_load_error_strings();
+    OpenSSL_add_all_algorithms();
+    return 1;
+}
+#define OPENSSL_INIT_LOAD_SSL_STRINGS    0
+#define OPENSSL_INIT_LOAD_CRYPTO_STRINGS 0
+#define TLS_server_method                SSLv23_server_method
+/* emulate set_min_proto_version(TLS1_2) with SSL_OP_NO_* below; the setter
+ * itself is a no-op so hm_tls_ctx_one compiles unchanged. */
+#define SSL_CTX_set_min_proto_version(ctx, v) \
+    SSL_CTX_set_options((ctx), SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 \
+                             | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1)
+#endif
+
+/* SSL_get1_peer_certificate is the 3.0 spelling of SSL_get_peer_certificate. */
+#if OPENSSL_VERSION_NUMBER < 0x30000000L || defined(LIBRESSL_VERSION_NUMBER)
+#define SSL_get1_peer_certificate SSL_get_peer_certificate
+#endif
+
 /* client-cert verification modes */
 #define HM_TLS_VERIFY_NONE     0
 #define HM_TLS_VERIFY_OPTIONAL 1

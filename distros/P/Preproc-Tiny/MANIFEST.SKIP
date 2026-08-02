@@ -1,0 +1,11 @@
+^blib/
+^Makefile$
+^Makefile.old$
+^MYMETA\.
+^pm_to_blib
+^\.git/
+^\.github/
+^\.gitignore
+^\.vscode/
+\.bak$
+^Preproc-Tiny-.*.tar.gz

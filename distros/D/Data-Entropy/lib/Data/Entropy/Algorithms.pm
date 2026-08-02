@@ -45,13 +45,13 @@ use strict;
 
 use Carp qw(croak);
 use Data::Entropy qw(entropy_source);
-use Data::Float 0.009 qw(
+use Data::Float 0.010 qw(
 	have_subnormal min_normal_exp significand_bits
 	float_is_finite float_parts float_sign mult_pow2 copysign
 );
 use Params::Classify 0.000 qw(is_ref);
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

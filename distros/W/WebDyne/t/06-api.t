@@ -17,7 +17,7 @@ $ENV{'PATH_INFO'}='/api/uppercase/bob/42';
 
 # Capture STDOUT and STDERR
 my ($stdout, $stderr, $exit) = capture {
-    system($^X, $script, 't/api_perl_inline.psp');   # run with Perl interpreter
+    system($^X, $script, (map {"--no$_"} qw(colour tidy lineno)), 't/api_perl_inline.psp');   # run with Perl interpreter
 };
 #diag("stdout: $stdout, stderr: $stderr: exit: $exit");
 

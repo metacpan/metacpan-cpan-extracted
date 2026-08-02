@@ -531,6 +531,17 @@ sub new
 				$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
 			}
 
+			#GRAB VIDEO LENGTH (RECENT ffmpeg DOESN'T SEEM TO RELIABLY ANYMORE)!
+			if (!defined($self->{'length'}) && $html =~ m#\"duration\"\:\"?([^\"\,]+)#s) {
+				my $length = $1;
+				if ($length =~ /^\d+$/) {
+					$self->{'length'} = $length * 1000;  #NEED IT IN MILLISECS!
+				} elsif ($length =~ /(\d+)H(\d+)M(\d+)S/) {
+					$self->{'length'} = ($1 * 3600) + ($2 * 60) + $3;
+					$self->{'length'} *= 1000;  #NEED IT IN MILLISECS!
+				}
+			}
+
 			#STEP 2:  FETCH THE STREAMS FROM THE "embedUrl":
 			return $url2;
 		}
@@ -554,6 +565,10 @@ sub new
 			}
 		}
 		if ($html) {
+			if ($DEBUG > 1 && open DBG, ">/tmp/rumble_embed_page.htm") {
+				print DBG $html;
+				close DBG;
+			}
 			my @streams = ();
 			my %ext = ();
 			my %quality = ();
@@ -564,6 +579,30 @@ sub new
 			$html =~ s#\\\/#\/#gs;
 			$self->{'title'} ||= ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
 			my $url2 = ($html =~ m#\<link\s+rel\=\"canonical\"\s+href\=\"([^\"]+)#s) ? $1 : undef;
+
+			if ($html =~ m#\"author\"\:\{\"name\"\:\"([^\"]+)\"\,\"url\"\:\"([^\"]+)#s) {
+				$self->{'artist'} ||= $1;
+				$self->{'albumartist'} ||= $2;
+			}
+			if ($html =~ m#\"pubDate\"\:\"([^\"]+)#s) {
+				$self->{'created'} = $1;
+				$self->{'year'} ||= $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
+			}
+			if ($html =~ m#\"i\"\:\"([^\"]+)#s) {  #GRAB EMBEDDED IMAGE URL IN CASE MAIN PAGE IS "PRIVATE"(UNFETCHABLE):
+				$self->{'iconurl'} ||= $1;
+				$self->{'imageurl'} ||= $self->{'iconurl'};
+			}
+			#GRAB VIDEO LENGTH (RECENT ffmpeg DOESN'T SEEM TO RELIABLY ANYMORE)!
+			if (!defined($self->{'length'}) && $html =~ m#\"duration\"\:\"?([^\"\,]+)#s) {
+				my $length = $1;
+				if ($length =~ /^\d+$/) {
+					$self->{'length'} = $length * 1000;  #NEED IT IN MILLISECS!
+				} elsif ($length =~ /(\d+)H(\d+)M(\d+)S/) {
+					$self->{'length'} = ($1 * 3600) + ($2 * 60) + $3;
+					$self->{'length'} *= 1000;  #NEED IT IN MILLISECS!
+				}
+			}
+
 			$html =~ s#^.+\"u\"\:\{##s;
 			#PARSE OUT ALL STREAMS (CLASS IS EITHER "mp4", "webm", "###" (RESOLUTION) OR OTHER.
 			#SINCE THE STREAMS OF EACH RESOLUTION ARE OFTEN REPEATED UNDER "mp4", "webm", or "<other>"
@@ -611,6 +650,8 @@ sub new
 									($ext =~ /any/io || $ext{$stream} =~ /$ext/));
 							unless (defined $streamHash{$stream}
 									|| ($self->{'secure'} && $stream !~ /^https/o)) {
+								#JWT:NEXT TEST NEEDED BY RECENT libavformat CHANGES:
+								$stream =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//;
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}
@@ -628,6 +669,8 @@ sub new
 									($ext =~ /any/io || $ext{$stream} =~ /$ext/));
 							unless (defined $streamHash{$stream}
 									|| ($self->{'secure'} && $stream !~ /^https/o)) {
+								#JWT:NEXT TEST NEEDED BY RECENT libavformat CHANGES:
+								$stream =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//;
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}
@@ -636,18 +679,6 @@ sub new
 				}
 			}
 
-			if ($html =~ m#\"author\"\:\{\"name\"\:\"([^\"]+)\"\,\"url\"\:\"([^\"]+)#s) {
-				$self->{'artist'} ||= $1;
-				$self->{'albumartist'} ||= $2;
-			}
-			if ($html =~ m#\"pubDate\"\:\"([^\"]+)#s) {
-				$self->{'created'} = $1;
-				$self->{'year'} ||= $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
-			}
-			if ($html =~ m#\"i\"\:\"([^\"]+)#s) {  #GRAB EMBEDDED IMAGE URL IN CASE MAIN PAGE IS "PRIVATE"(UNFETCHABLE):
-				$self->{'iconurl'} ||= $1;
-				$self->{'imageurl'} ||= $self->{'iconurl'};
-			}
 			return $url2;
 		} else {
 			$url2fetch =~ s#\/embed\/#\/#;

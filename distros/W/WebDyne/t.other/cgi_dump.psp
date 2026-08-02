@@ -1,0 +1,4 @@
+<start_html>
+<? Dumper(\%{shift()->CGI->Vars()}) ?>
+__PERL__
+use Data::Dumper;

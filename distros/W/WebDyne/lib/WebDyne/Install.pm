@@ -50,7 +50,7 @@ use Config;
 
 #  Version information
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
 #  Debug
@@ -105,6 +105,7 @@ sub uninstall {
     #  Get cache dn
     #
     my $cache_dn=&cache_dn($prefix);
+    my $dry_run=$ENV{'DRY_RUN'};
 
 
     #  Delete cache files and remove if empty
@@ -113,10 +114,26 @@ sub uninstall {
         my @file_cn=glob(File::Spec->catfile($cache_dn, '*'));
         message "removing cache files from '$cache_dn'";
         foreach my $fn (grep {/\w{32}(\.html)?$/} @file_cn) {
-            unlink $fn;    #don't error here if problems, user will never see it
+            if ($dry_run) {
+                message "would remove cache file '$fn'";
+                next;
+            }
+            unlink($fn) ||
+                return err("unable to remove cache file $fn, $!");
         }
         message "removing cache directory '$cache_dn'";
-        rmdir $cache_dn unless ($cache_dn eq File::Spec->tmpdir);
+        unless ($cache_dn eq File::Spec->tmpdir) {
+            if ($dry_run) {
+                message "would remove cache directory '$cache_dn'";
+            }
+            else {
+                my @remaining=glob(File::Spec->catfile($cache_dn, '*'));
+                unless (@remaining) {
+                    rmdir($cache_dn) ||
+                        return err("unable to remove cache directory $cache_dn, $!");
+                }
+            }
+        }
     }
 
     #if ($prefix) {
@@ -155,9 +172,14 @@ sub install {
         #  Make
         #
         message "creating cache directory '$cache_dn'.";
-        File::Path::mkpath($cache_dn, 0, 0755) || do {
-            return err("unable to create dir $cache_dn") unless (-d $cache_dn)
-        };
+        if ($ENV{'DRY_RUN'}) {
+            message "would create cache directory '$cache_dn'.";
+        }
+        else {
+            File::Path::mkpath($cache_dn, 0, 0755) || do {
+                return err("unable to create dir $cache_dn") unless (-d $cache_dn)
+            };
+        }
 
     }
     else {
@@ -230,3 +252,148 @@ sub cache_dn {
     return $cache_dn;
 
 }
+__END__
+
+=begin markdown
+
+# WebDyne::Install #
+
+# NAME #
+
+WebDyne::Install - base installation helper for WebDyne cache setup
+
+# SYNOPSIS #
+
+```perl
+use WebDyne::Install qw(message);
+
+WebDyne::Install->install($prefix);
+WebDyne::Install->uninstall($prefix);
+```
+
+# DESCRIPTION #
+
+`WebDyne::Install` provides the base installation and uninstall routines used by the WebDyne installer scripts and higher-level installer modules.
+
+Its main job is to determine the appropriate cache directory, create it during installation, and remove WebDyne-managed cache artifacts during uninstall.
+
+# METHODS #
+
+* **install($prefix)**
+
+    Create the cache directory if required and report progress through `message()`. If `DRY_RUN` is set in the environment, report the action without creating the directory.
+
+* **uninstall($prefix)**
+
+    Remove cached compile artifacts from the resolved cache directory and attempt to remove the directory if appropriate. Cache cleanup is limited to files whose names match a 32-character word name, optionally followed by `.html`.
+
+* **cache_dn($prefix)**
+
+    Resolve the cache directory path from `WEBDYNE_CACHE_DN`, an installation prefix, or `DIR_CACHE_DEFAULT`.
+
+* **message(@args)**
+
+    Print installer progress messages unless `SILENT` is set in the environment.
+
+# AUTHOR #
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 WebDyne::Install
+
+
+=head1 NAME
+
+WebDyne::Install - base installation helper for WebDyne cache setup
+
+
+=head1 SYNOPSIS
+
+
+ use WebDyne::Install qw(message);
+ 
+ WebDyne::Install->install($prefix);
+ WebDyne::Install->uninstall($prefix);
+
+=head1 DESCRIPTION
+
+C<WebDyne::Install> provides the base installation and uninstall routines used by the WebDyne installer scripts and higher-level installer modules.
+
+Its main job is to determine the appropriate cache directory, create it during installation, and remove WebDyne-managed cache artifacts during uninstall.
+
+
+=head1 METHODS
+
+=over
+
+=item *
+
+B<install($prefix)>
+
+Create the cache directory if required and report progress through C<message()>. If C<DRY_RUN> is set in the environment, report the action without creating the directory.
+
+
+
+=item *
+
+B<uninstall($prefix)>
+
+Remove cached compile artifacts from the resolved cache directory and attempt to remove the directory if appropriate. Cache cleanup is limited to files whose names match a 32-character word name, optionally followed by C<.html>.
+
+
+
+=item *
+
+B<cache_dn($prefix)>
+
+Resolve the cache directory path from C<WEBDYNE_CACHE_DN>, an installation prefix, or C<DIR_CACHE_DEFAULT>.
+
+
+
+=item *
+
+B<message(@args)>
+
+Print installer progress messages unless C<SILENT> is set in the environment.
+
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
+
+=cut

@@ -33,19 +33,24 @@ use WebDyne::Util;
 
 #  External modules
 #
+use WebDyne::Constant;
 use WebDyne::Compile;
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
 use File::Spec;
 use FindBin qw($RealBin $Script);
-$Data::Dumper::Indent=1;
-$Data::Dumper::Sortkeys=1;
+
+
+#  Local customisation
+#
+local $Data::Dumper::Indent=1;
+local $Data::Dumper::Sortkeys=1;
 
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.075';
+$VERSION='3.006';
 
 
 #  Run main
@@ -68,10 +73,11 @@ sub main {
     #
     my %opt=(
 
-        nofilter      => 1,    # don't run through any filters
-        noperl        => 1,    # don't run perl code,
-        notimestamp   => 1,
-        manifest      => 1,
+        no_filter      => 1,    # don't run through any filters
+        no_perl        => 1,    # don't run perl code,
+        no_timestamp   => 1,
+        no_head_insert => 1,
+        manifest      => 1
 
         #stage5   => 1,    # default
 
@@ -82,27 +88,31 @@ sub main {
     #  internal stage numbers so maps are 0=>stage0, 1=>stage2, 2=>stage3, 3=>stage4, confusing ..
     #
     GetOptions(
-        \%opt, qw(
-            stage0|0
-            stage1|1
-            stage2|2
-            stage3|3
-            stage4|4
-            stage5|5|final
-            meta
-            data
-            manifest!
-            outfile|dest|dest_fn:s
-            all
-            timestamp!
-            repeat|r|num|n=s
-            perl!
-            filter!
-            version
-            help|?
-            man
-            opt
-        )) || pod2usage(2);
+        \%opt, 
+        my @opt=(
+        'stage0|0',
+        'stage1|1',
+        'stage2|2',
+        'stage3|3',
+        'stage4|4',
+        'stage5|5|final',
+        'meta',
+        'data',
+        'manifest!',
+        'head_insert|head-insert!',
+        'outfile|dest|dest_fn:s',
+        'all',
+        'timestamp!',
+        'repeat|r|num|n=s',
+        'perl!',
+        'filter!',
+        'test',
+        'version',
+        'help|?',
+        'man',
+        'dump_opt|dump-opt|opt'
+        ),
+    ) || pod2usage(2);
     pod2usage(-verbose => 99, -sections => 'SYNOPSIS|OPTIONS', -exitval => 1) if $opt{'help'};
     pod2usage(-verbose => 2)                                                  if $opt{'man'};
     $opt{'version'} && do {
@@ -114,19 +124,22 @@ sub main {
 
     #  Clunky, too hard to change module logic
     #
-    map {$opt{"no${_}"}=!($opt{$_})} qw(perl filter timestamp manifest);
+    map {$opt{"no_${_}"}=!($opt{$_})} map { /^([^|!:=+]+)/ } grep {/\!$/} @opt;
+    #map {$opt{"no${_}"}=!($opt{$_})} qw(perl filter timestamp manifest head_insert);
+    #die Dumper(\%opt);
 
 
     #  Get srce file, add to options
     #
-    my $srce_fn=$argv_ar->[0] ||
+    my $srce_fn=$opt{'test'} ? $WEBDYNE_DEFAULT_TEST_FN : $argv_ar->[0];
+    $srce_fn ||
         pod2usage("$Script: no source file specified !");
     $opt{'srce'}=$srce_fn;
 
 
     #  Dump options for debugging
     #
-    die Dumper(\%opt) if $opt{'opt'};
+    die Dumper(\%opt) if $opt{'dump_opt'};
 
 
     #  Loop if required as diagnostic for consistant compiles, i.e. making
@@ -167,172 +180,503 @@ sub main {
 
 __END__
 
+=begin markdown
 
+# wdcompile #
 
-=pod
-
-=head1 wdcompile(1)
-
-=head1 NAME
+# NAME #
 
 wdcompile - parse and display internal data representation of WebDyne files
 
-=head1 SYNOPSIS
+# SYNOPSIS #
 
-C<<<< wdcompile [OPTIONS] FILE >>>>
+`wdcompile [OPTIONS] FILE`
 
-=head1 Description
+# Description #
 
-The  C<<<< wdcompile >>>>  command displays internal compiled (Storable) representation of a .psp page using the WebDyne perl module.
+The  `wdcompile`  command compiles a \.psp page with the WebDyne perl module and displays the resulting internal Perl data structure using `Data::Dumper`.
 
-WebDyne parses HTML into an intermediate format which is then stored to disk to speed up subsequent rendering of pages. It is dependent on HTML::Treebuilder and HTML::Parser modules to build the tree, and results are stored to disk in a data array format via the Storable module.
+WebDyne parses HTML into an intermediate format which can then be stored to disk to speed up subsequent rendering of pages. It is dependent on HTML::TreeBuilder and HTML::Parser modules to build the tree, and the compiler produces a container of metadata plus compiled page data.
 
 The parser may build incorrect representations on a HTML tree if the HTML is badly formed or there are errors in the WebDyne compiler itself. This utility is useful for diagnosing any such errors.
 
-The parser interprets files in 3 main stages (and some lesser intermediate stages that do not impact data structure but are used in the test suites): a full HTML::TreeBuilder representation of all tags with no optimisation, an intermediate partial optimisation stage that re-renders tags with no dynamic components (e.g. no <perl> or similar tags) back into
- static HTML and a final fully optimised file that should only contain a data structure for dynamic components of the page.
+The parser interprets files in 3 main stages \(and some lesser intermediate stages that do not impact data structure but are used in the test suites): a full HTML::TreeBuilder representation of all tags with no optimisation, an intermediate partial optimisation stage that re-renders tags with no dynamic components \(e.g. no &lt;perl&gt; or similar tags) back into static HTML and a final fully optimised file that should only contain a data structure for dynamic components of the page.
 
 The final data structure contains various artifacts used by the render engine such as a manifest section, and notation of line numbers for dynamic sections to aid in error display and source file tracebacks should an error occur in any dynamic code at render time.
 
-=head1 Options
+By default the command prints the compiled page data section only. `--meta` prints only the metadata section, and `--all` prints the full two-element container.
 
-=over
+# Options #
 
-=item * B<<< -h, --help >>>
+* **--help**
 
-Show brief help message.
+    Show brief help message.
 
-=item * B<<< --meta >>>
+* **--meta**
 
-Show just the file metadata in compile output
+    Show only the metadata section of the compiled container.
 
-=item * B<<< --data >>>
+* **--data**
 
-Show just the file data structure in compile output, no meta data. This is the default
+    Show only the compiled page data section. This is the default output mode.
 
-=item * B<<< --all >>>
+* **--all**
 
-Show both the file meta and core data in output
+    Show the full compiled container, including both metadata and compiled page data.
 
-=item * B<<< --[no]manifest >>>
+* **--test**
 
-Do/do not populate the filename into the metadata manifest section. Only used in test suite.
+    Use WebDyne's built-in default test page as the source file.
 
-=item * B<<< --[no]timestamp >>>
+* **--manifest**
 
-Do/do not populate the timestamp into the metadata manifest section. Only used in test suite.
+    Enable or disable population of the source filename in the metadata manifest section. Manifest output is enabled by default.
 
-=item * B<<< --[no]perl >>>
+* **--timestamp**
 
-Do/do not run Perl in __PERL__ section at compile time. The default is to not run any Perl sections.
+    Enable or disable compile timestamps in metadata. Timestamps are disabled by default.
 
-=item * B<<< --[no]filter >>>
+* **--perl**
 
-Do/do not run any filter stages that may be nominated in the file.
+    Enable or disable execution of Perl in \__PERL__ sections at compile time. Perl execution is disabled by default.
 
-=item * B<<< --outfile >>>
+* **--filter**
 
-Specify the output file to save the Storable representation of the data.
+    Enable or disable compile-time filter stages nominated in the file. Filters are disabled by default.
 
-=item * B<<< --repeat | --r | --num | --n >>>
+* **--head_insert**
 
-Specify the number of times to repeat the compile. Used for consistency testing
+    Enable or disable WebDyne head insertion while compiling from the command line, including configured `WEBDYNE_HEAD_INSERT` content and related `start_html` parameters. This is disabled by default so diagnostic compile output is not changed by runtime head additions normally intended for Apache, PSGI, or PAGI request handling.
 
-=item * B<<< --stage[n]|stage0|stage1|stage2|stage3|stage4|stage5|final >>>
+* **--outfile**
 
-Stop at a certain stage of the compile process. The default is to compile to final representation. The most significant intermediate stages are stage 0 for the raw tree, stage 4 for the first intermediate compile optimisation and stage 5 (final) for final optimisation.
+    Intended to specify a destination file for the compiled Storable cache. In the current `wdcompile` script this option is parsed but not wired through to the compiler's `dest` parameter, so it does not currently write an output file.
 
-=item * B<<< --man >>>
+* **--repeat=NUM**
 
-Display the full manual.
+    Specify the number of times to repeat the compile. Used for consistency testing.
 
-=item * B<<< --version >>>
+* **--stage0**
 
-Display the script version and exit.
+    Stop after parsing into the initial container representation.
 
-=back
+* **--stage1**
 
-=head1 Examples
+    Stop after compile-time Perl processing.
 
-    # Reference file saved as time.psp
-    #
-    <start_html>
-    The current server time is: <? localtime() ?>
+* **--stage2**
 
-    # Show the final compiled data structure of time.psp
-    #
-    $ wdcompile time.psp
-    
-    $VAR1 = [
-      '<!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"></head>
-    <body><p>The current server time is: ',
+    Stop after compile-time filter processing.
+
+* **--stage3**
+
+    Stop after the first optimisation pass.
+
+* **--stage4**
+
+    Stop after the second optimisation pass.
+
+* **--stage5**
+
+    Stop at the final compiled container representation. This is the default.
+
+* **--dump_opt**
+
+    Dump the parsed option hash for debugging and exit.
+
+* **--man**
+
+    Display the full manual.
+
+* **--version**
+
+    Display the script version and WebDyne version, then exit.
+
+# Examples #
+
+```sh
+# Reference file saved as time.psp
+#
+<start_html>
+The current server time is: <? localtime() ?>
+
+```
+
+```sh
+# Show the final compiled data structure of time.psp
+#
+$ wdcompile time.psp
+
+$VAR1 = [
+  '<!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"></head>
+<body><p>The current server time is: ',
+  [
+    'perl',
+    {
+      'inline' => 1,
+      'perl' => ' localtime() '
+    },
+    undef,
+    undef,
+    2,
+    2,
+    \'time.psp'
+  ],
+  '</p></body></html>'
+];
+
+```
+
+```sh
+# Show the initial compiled data structure (stage 0) of the time.psp file including metadata
+#
+$ wdcompile --all --stage0 time.psp
+
+$VAR1 = [
+  {
+    'manifest' => [
+      'time.psp'
+    ]
+  },
+  [
+    'html',
+    {
+      'lang' => 'en'
+    },
+    [
       [
-        'perl',
-        {
-          'inline' => 1,
-          'perl' => ' localtime() '
-        },
+        'head',
         undef,
-        undef,
-        2,
-        2,
-        \'time.psp'
-      ],
-      '</p></body></html>'
-    ];
-
-    # Show the initial compiled data structure (stage 0) of the time.psp file including metadata
-    #
-    $ wdcompile --all --stage0 time.psp
-    
-    $VAR1 = [
-      {
-        'manifest' => [
-          'time.psp'
-        ]
-      },
-      [
-        'html',
-        {
-          'lang' => 'en'
-        },
         [
           [
-            'head',
+            'title',
             undef,
             [
-              [
-                'title',
-                undef,
-                [
-                  'Untitled Document'
-                ],
-                undef,
-                1,
-                1,
-                \$VAR1->[0]{'manifest'}[0]
-                ...
+              'Untitled Document'
+            ],
+            undef,
+            1,
+            1,
+            \$VAR1->[0]{'manifest'}[0]
+            ...
 
-=head1 Notes
+```
 
-The  C<<<< wdcompile >>>>  command will attempt to build the HTML tree as faithfully as possible from the command line environment, but may not be able to interpret all HTML files, especially those with malformed HTML tags. It is reliant on HTML::TreeBuilder and HTML::Parser. If you are sure your HTML is compliant (all tags closed, all attributes double quoted
- etc.) and wdcompile is still producing a malformed tree you can submit a big report with the smallest possible HTML file needed to replicate the issue.
+# Notes #
 
-=head1 Author
+The  `wdcompile`  command will attempt to build the HTML tree as faithfully as possible from the command line environment, but may not be able to interpret all HTML files, especially those with malformed HTML tags. It is reliant on HTML::TreeBuilder and HTML::Parser. If you are sure your HTML is compliant \(all tags closed, all attributes double quoted
+ etc.) and wdcompile is still producing a malformed tree you can submit a bug report with the smallest possible HTML file needed to replicate the issue.
 
-Written by Andrew Speer,  <andrew@webdyne.org>
+# Author #
 
-=head1 LICENSE and COPYRIGHT
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
 
-L<http://dev.perl.org/licenses/>
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 wdcompile
+
+
+=head1 NAME
+
+wdcompile - parse and display internal data representation of WebDyne files
+
+
+=head1 SYNOPSIS
+
+C<wdcompile [OPTIONS] FILE>
+
+
+=head1 Description
+
+The  C<wdcompile>  command compiles a .psp page with the WebDyne perl module and displays the resulting internal Perl data structure using C<Data::Dumper>.
+
+WebDyne parses HTML into an intermediate format which can then be stored to disk to speed up subsequent rendering of pages. It is dependent on HTML::TreeBuilder and HTML::Parser modules to build the tree, and the compiler produces a container of metadata plus compiled page data.
+
+The parser may build incorrect representations on a HTML tree if the HTML is badly formed or there are errors in the WebDyne compiler itself. This utility is useful for diagnosing any such errors.
+
+The parser interprets files in 3 main stages (and some lesser intermediate stages that do not impact data structure but are used in the test suites): a full HTML::TreeBuilder representation of all tags with no optimisation, an intermediate partial optimisation stage that re-renders tags with no dynamic components (e.g. no E<lt>perlE<gt> or similar tags) back into static HTML and a final fully optimised file that should only contain a data structure for dynamic components of the page.
+
+The final data structure contains various artifacts used by the render engine such as a manifest section, and notation of line numbers for dynamic sections to aid in error display and source file tracebacks should an error occur in any dynamic code at render time.
+
+By default the command prints the compiled page data section only. C<--meta> prints only the metadata section, and C<--all> prints the full two-element container.
+
+
+=head1 Options
+
+=over
+
+=item *
+
+B<--help>
+
+Show brief help message.
+
+
+
+=item *
+
+B<--meta>
+
+Show only the metadata section of the compiled container.
+
+
+
+=item *
+
+B<--data>
+
+Show only the compiled page data section. This is the default output mode.
+
+
+
+=item *
+
+B<--all>
+
+Show the full compiled container, including both metadata and compiled page data.
+
+
+
+=item *
+
+B<--test>
+
+Use WebDyne's built-in default test page as the source file.
+
+
+
+=item *
+
+B<--manifest>
+
+Enable or disable population of the source filename in the metadata manifest section. Manifest output is enabled by default.
+
+
+
+=item *
+
+B<--timestamp>
+
+Enable or disable compile timestamps in metadata. Timestamps are disabled by default.
+
+
+
+=item *
+
+B<--perl>
+
+Enable or disable execution of Perl in __PERL__ sections at compile time. Perl execution is disabled by default.
+
+
+
+=item *
+
+B<--filter>
+
+Enable or disable compile-time filter stages nominated in the file. Filters are disabled by default.
+
+
+
+=item *
+
+B<--head_insert>
+
+Enable or disable WebDyne head insertion while compiling from the command line, including configured C<WEBDYNE_HEAD_INSERT> content and related C<start_html> parameters. This is disabled by default so diagnostic compile output is not changed by runtime head additions normally intended for Apache, PSGI, or PAGI request handling.
+
+
+
+=item *
+
+B<--outfile>
+
+Intended to specify a destination file for the compiled Storable cache. In the current C<wdcompile> script this option is parsed but not wired through to the compiler's C<dest> parameter, so it does not currently write an output file.
+
+
+
+=item *
+
+B<--repeat=NUM>
+
+Specify the number of times to repeat the compile. Used for consistency testing.
+
+
+
+=item *
+
+B<--stage0>
+
+Stop after parsing into the initial container representation.
+
+
+
+=item *
+
+B<--stage1>
+
+Stop after compile-time Perl processing.
+
+
+
+=item *
+
+B<--stage2>
+
+Stop after compile-time filter processing.
+
+
+
+=item *
+
+B<--stage3>
+
+Stop after the first optimisation pass.
+
+
+
+=item *
+
+B<--stage4>
+
+Stop after the second optimisation pass.
+
+
+
+=item *
+
+B<--stage5>
+
+Stop at the final compiled container representation. This is the default.
+
+
+
+=item *
+
+B<--dump_opt>
+
+Dump the parsed option hash for debugging and exit.
+
+
+
+=item *
+
+B<--man>
+
+Display the full manual.
+
+
+
+=item *
+
+B<--version>
+
+Display the script version and WebDyne version, then exit.
+
+
+
+=back
+
+
+=head1 Examples
+
+
+ # Reference file saved as time.psp
+ #
+ <start_html>
+ The current server time is: <? localtime() ?>
+
+
+ # Show the final compiled data structure of time.psp
+ #
+ $ wdcompile time.psp
+ 
+ $VAR1 = [
+   '<!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"></head>
+ <body><p>The current server time is: ',
+   [
+     'perl',
+     {
+       'inline' => 1,
+       'perl' => ' localtime() '
+     },
+     undef,
+     undef,
+     2,
+     2,
+     \'time.psp'
+   ],
+   '</p></body></html>'
+ ];
+
+
+ # Show the initial compiled data structure (stage 0) of the time.psp file including metadata
+ #
+ $ wdcompile --all --stage0 time.psp
+ 
+ $VAR1 = [
+   {
+     'manifest' => [
+       'time.psp'
+     ]
+   },
+   [
+     'html',
+     {
+       'lang' => 'en'
+     },
+     [
+       [
+         'head',
+         undef,
+         [
+           [
+             'title',
+             undef,
+             [
+               'Untitled Document'
+             ],
+             undef,
+             1,
+             1,
+             \$VAR1->[0]{'manifest'}[0]
+             ...
+
+
+=head1 Notes
+
+The  C<wdcompile>  command will attempt to build the HTML tree as faithfully as possible from the command line environment, but may not be able to interpret all HTML files, especially those with malformed HTML tags. It is reliant on HTML::TreeBuilder and HTML::Parser. If you are sure your HTML is compliant (all tags closed, all attributes double quoted
+ etc.) and wdcompile is still producing a malformed tree you can submit a bug report with the smallest possible HTML file needed to replicate the issue.
+
+
+=head1 Author
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer E<lt>andrew.speer@isolutions.com.auE<gt>.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+E<lt>L<http://dev.perl.org/licenses/>;>
 
 =cut
