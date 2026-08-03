@@ -25,13 +25,13 @@ produces output
     de Fehlerstrom-Schutzschalter
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.05/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.06/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Table::Readable version 0.05
-corresponding to git commit L<c5bf0b4cfb273eaa66a9d14c56a59527a86c3e11|https://github.com/benkasminbullock/Table-Readable/commit/c5bf0b4cfb273eaa66a9d14c56a59527a86c3e11> released on Sun Feb 7 09:47:05 2021 +0900.
+This documents Table::Readable version 0.06
+corresponding to git commit L<e3e702ffac5414333ca3dadcfab0129b1162d578|https://github.com/benkasminbullock/Table-Readable/commit/e3e702ffac5414333ca3dadcfab0129b1162d578> released on Mon Aug 3 13:43:17 2026 +0900.
 
 =head1 DESCRIPTION
 
@@ -40,6 +40,12 @@ information which a computer can read. By design, the format does not
 support any kind of nesting, and can only be text in UTF-8 encoding.
 
 =head1 FUNCTIONS
+
+=head2 append_table
+
+    append_table('file.txt', %things);
+
+Append an entry to the specified file.
 
 =head2 read_table
 
@@ -127,6 +133,12 @@ hash reference using the key specified as the second argument. If some
 entries of the table do not have the specified key, or if some entries
 have the same value for the key, warnings are printed.
 
+=head2 sort_file
+
+    sort_file ($file, $tag);
+
+Sort the entries of C<$file> using the key C<$tag>.
+
 =head2 write_table
 
     write_table (\@table, 'file.txt');
@@ -201,7 +213,7 @@ produces output
     2
 
 
-(This example is included as L<F<comment-not-row.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.05/examples/comment-not-row.pl> in the distribution.)
+(This example is included as L<F<comment-not-row.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.06/examples/comment-not-row.pl> in the distribution.)
 
 
 =head2 Encoding
@@ -283,7 +295,7 @@ produces output
     d'
 
 
-(This example is included as L<F<slash.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.05/examples/slash.pl> in the distribution.)
+(This example is included as L<F<slash.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.06/examples/slash.pl> in the distribution.)
 
 
 If you actually need a backslash at the start or end of your string,
@@ -328,7 +340,7 @@ produces output
     'a' = 'b'
 
 
-(This example is included as L<F<whitespace.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.05/examples/whitespace.pl> in the distribution.)
+(This example is included as L<F<whitespace.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.06/examples/whitespace.pl> in the distribution.)
 
 
 =head3 Empty values
@@ -463,12 +475,12 @@ request. A tag ":all" exports all the functions:
 
 =head1 AUTHOR
 
-Ben Bullock, <bkb@cpan.org>
+Ben Bullock, <benkasminbullock@gmail.com>
 
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2010-2021
+2010-2026
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

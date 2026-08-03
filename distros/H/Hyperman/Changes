@@ -1,5 +1,24 @@
 Revision history for Hyperman
 
+0.07    2026-08-03
+        - Build on OpenSSL older than 1.0.2. ALPN (SSL_CTX_set_alpn_select_cb),
+          used to offer HTTP/2 over TLS, is absent before 1.0.2, so the module
+          linked an undefined symbol and failed to load on such smokers. Guard
+          it behind a version check.
+
+0.06    2026-08-02
+        - Fast default access log. access_log now accepts a file path or an
+          open handle in addition to a coderef: Hyperman then formats an
+          Apache Combined Log Format line in C and appends it directly, with
+          no per-request Perl call on the hot path. 
+        - Populate REMOTE_ADDR in the PSGI env (HTTP/1 and HTTP/2), captured
+          from the peer at accept. Needed by the access log and expected by
+          apps.
+
+0.05    2026-08-02
+        - Various fixes to compile on perls older than 5.16.
+        - Correct MIN_PERL_VERSION from 5.008003 to 5.010000
+
 0.04    2026-08-02
         - Link -lrt when clock_gettime needs it. backend_poll.c calls
           clock_gettime(CLOCK_MONOTONIC), which on glibc before 2.17 lives in

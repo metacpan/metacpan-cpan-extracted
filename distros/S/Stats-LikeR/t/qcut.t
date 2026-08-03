@@ -88,9 +88,10 @@ sub is_approx {
 	ok(scalar @edges < 5, 'dropping merges duplicate edges');
 }
 
-# --- help: qcut('h') / qcut('?') prints the documentation and dies ----------
-# The text comes from the module's own POD now (see t/help.t), so this only
-# checks that qcut takes part in it, in either argument slot.
+# --- 'h' and '?' are ordinary bad arguments, not a help request -------------
+# qcut used to print its documentation and die for either string.  It does not
+# any more (h('qcut') is the way to ask -- see t/help.t): both slots refuse the
+# string with the type error the slot always gives, and nothing is printed.
 {
 	for my $arg ('h', '?') {
 		for my $call ( [ $arg ], [ [1 .. 9], $arg ] ) {
@@ -102,10 +103,12 @@ sub is_approx {
 			}
 			my $slot = @$call == 1 ? 'first' : 'second';
 			ok($err, "qcut('$arg') in the $slot slot dies");
-			like($@, qr/help requested/,
-				"qcut('$arg') in the $slot slot dies with the help notice");
-			like($out, qr/Equal-frequency binning/,
-				"qcut('$arg') in the $slot slot prints its documentation");
+			unlike($@, qr/help requested/,
+				"qcut('$arg') in the $slot slot is not a help request");
+			like($@, @$call == 1 ? qr/must be an ARRAY reference/
+			                     : qr/number of quantiles/,
+				"qcut('$arg') in the $slot slot dies with the type error");
+			is($out, '', "qcut('$arg') in the $slot slot prints nothing");
 		}
 	}
 }
@@ -126,13 +129,7 @@ if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 	no_leaks_ok { eval { my $x = qcut(\@data, 4, labels => [qw/a b c d/]) } } 'qcut: no leaks (labels)';
 	no_leaks_ok { eval { my @x = qcut(\@tied, 4, duplicates => 'drop') } } 'qcut: no leaks (drop dups)';
 	no_leaks_ok { eval { my @x = qcut(\@tied, 4) } } 'qcut: no leaks (croak path)';
-	# the help path prints the documentation, so keep it off the TAP stream
-	no_leaks_ok {
-		my $sink = '';
-		local *STDOUT;
-		open STDOUT, '>', \$sink or die "cannot redirect STDOUT: $!";
-		eval { qcut('h') };
-	} 'qcut: no leaks (help/die path)';
+	no_leaks_ok { eval { qcut('h') } } 'qcut: no leaks (bad first argument)';
 }
 
 done_testing();

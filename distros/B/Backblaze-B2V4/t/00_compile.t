@@ -5,6 +5,9 @@ use_ok $_ for qw(
     Backblaze::B2V4
 );
 
+# NOTE: The API key provided below is a ready-ony key locked to a B2 bucket 
+# specifically created to support the testing and distribution of this module.
+
 # let them use ENV vars to test their account
 my $application_key_id = $ENV{B2_APP_KEY_ID} || '002dcecbc999f31000000000e';
 my $application_key =  $ENV{B2_APP_KEY} || 'K002cbUnOGDiTATcLQvac+pDTVjghC8';

@@ -1,3 +1,9 @@
+0.000061  2026-08-02 19:49:26-07:00 America/Los_Angeles
+
+    - Per-install tests now use real child Perl processes on MSWin32 instead of
+      Test2's unsupported thread-based pseudo-fork. Single-install child TAP is
+      streamed directly so an XS crash retains its preceding diagnostics.
+
 0.000060  2026-08-02 00:07:51-07:00 America/Los_Angeles
 
     - Windows cleanup now backs off between quarantine rename attempts so a

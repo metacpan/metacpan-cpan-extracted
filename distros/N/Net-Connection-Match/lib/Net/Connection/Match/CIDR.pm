@@ -17,7 +17,6 @@ Version 0.0.0
 
 our $VERSION = '0.0.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::CIDR;
@@ -75,50 +74,48 @@ If the new method fails, it dies.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# run some basic checks to make sure we have the minimum stuff required to work
-	if ( ! defined( $args{cidrs} ) ){
-		die ('No cidrs key specified in the argument hash');
+	if ( !defined( $args{cidrs} ) ) {
+		die('No cidrs key specified in the argument hash');
 	}
-	if ( ref( $args{cidrs} ) ne 'ARRAY' ){
-		die ('The cidrs key is not a array');
+	if ( ref( $args{cidrs} ) ne 'ARRAY' ) {
+		die('The cidrs key is not a array');
 	}
-	if ( ! defined $args{cidrs}[0] ){
-		die ('No CIDRs defined in the cidrs array');
+	if ( !defined $args{cidrs}[0] ) {
+		die('No CIDRs defined in the cidrs array');
 	}
 
-    my $self = {
-				cidrs=>[],
-				};
-    bless $self;
+	my $self = { cidrs => [], };
+	bless $self;
 
 	# make sure each cidr is valid before returning it
-	my $cidrs_int=0;
-	while( defined( $args{cidrs}[$cidrs_int] ) ){
-		my $cidr_good=0;
-		eval{
-			if ( Net::CIDR::cidrvalidate( $args{cidrs}[$cidrs_int] ) ){
-				$cidr_good=1;
+	my $cidrs_int = 0;
+	while ( defined( $args{cidrs}[$cidrs_int] ) ) {
+		my $cidr_good = 0;
+		eval {
+			if ( Net::CIDR::cidrvalidate( $args{cidrs}[$cidrs_int] ) ) {
+				$cidr_good = 1;
 			}
 		};
 
 		# if good add it, otherwise die
-		if ( $cidr_good ){
-			$self->{cidrs}[$cidrs_int]=$args{cidrs}[$cidrs_int];
-		}else{
-			die('"'.$args{cidrs}[$cidrs_int].'" is not a CIDR according to Net::CIDR::cidrvalidate');
+		if ($cidr_good) {
+			$self->{cidrs}[$cidrs_int] = $args{cidrs}[$cidrs_int];
+		} else {
+			die( '"' . $args{cidrs}[$cidrs_int] . '" is not a CIDR according to Net::CIDR::cidrvalidate' );
 		}
 
 		$cidrs_int++;
-	}
+	} ## end while ( defined( $args{cidrs}[$cidrs_int] ) )
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -134,38 +131,37 @@ The returned value is a boolean.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $object=$_[1];
+sub match {
+	my $self   = $_[0];
+	my $object = $_[1];
 
-	if ( !defined( $object ) ){
+	if ( !defined($object) ) {
 		return 0;
 	}
 
-	if ( ref( $object ) ne 'Net::Connection' ){
+	if ( ref($object) ne 'Net::Connection' ) {
 		return 0;
 	}
 
-	my $cidrs_int=0;
-	while( defined( $self->{cidrs}[$cidrs_int] ) ){
+	my $cidrs_int = 0;
+	while ( defined( $self->{cidrs}[$cidrs_int] ) ) {
 		if (
 			(
-			 ( $object->foreign_host ne '*' ) &&
-			 ( eval{ Net::CIDR::cidrlookup( $object->foreign_host, $self->{cidrs}[$cidrs_int] ) })
-			 ) ||
-			(
-			 ( $object->local_host ne '*' ) &&
-			 ( eval{ Net::CIDR::cidrlookup( $object->local_host, $self->{cidrs}[$cidrs_int] ) })
-			 )
-			){
+				   ( $object->foreign_host ne '*' )
+				&& ( eval { Net::CIDR::cidrlookup( $object->foreign_host, $self->{cidrs}[$cidrs_int] ) } )
+			)
+			|| (   ( $object->local_host ne '*' )
+				&& ( eval { Net::CIDR::cidrlookup( $object->local_host, $self->{cidrs}[$cidrs_int] ) } ) )
+			)
+		{
 			return 1;
-		}
+		} ## end if ( ( ( $object->foreign_host ne '*' ) &&...))
 
 		$cidrs_int++;
-	}
+	} ## end while ( defined( $self->{cidrs}[$cidrs_int] ))
 
 	return 0;
-}
+} ## end sub match
 
 =head1 AUTHOR
 
@@ -256,4 +252,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

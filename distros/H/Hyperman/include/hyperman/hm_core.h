@@ -35,6 +35,7 @@ struct hm_conn {
     unsigned char tls_w_wants_r;  /* SSL_write blocked wanting read  */
     int      last_status;   /* last response status/bytes (logging) */
     size_t   last_blen;
+    char     peer[INET6_ADDRSTRLEN];  /* REMOTE_ADDR, filled at accept    */
     time_t   last_active;
     time_t   req_start;     /* first byte of an incomplete request  */
     hm_conn *lru_prev, *lru_next;
@@ -80,6 +81,11 @@ struct hm_loop {
     char       *host;               /* bind host, for SERVER_NAME */
     SV         *self_sv;            /* cached psgix.loop wrapper */
     SV         *log_cb;             /* access_log coderef, or NULL */
+    int         log_fd;             /* fast access-log fd (C writer), or -1 */
+    char       *log_buf;            /* pending Combined-format log lines    */
+    size_t      log_len, log_cap;
+    time_t      log_ts_sec;         /* second the cached stamp below is for  */
+    char        log_ts[32];         /* "dd/Mon/YYYY:HH:MM:SS +ZZZZ", 1Hz     */
     UV          requests;           /* requests dispatched (stats)  */
     UV          accepts;            /* connections accepted (stats) */
     UV          bytes_out;          /* response bytes queued (stats) */
@@ -122,6 +128,19 @@ static const char *hm_reason(int s) {
         case 500: return "Internal Server Error";
         default:  return "OK";
     }
+}
+
+/* Format a peer sockaddr into a printable REMOTE_ADDR string ("" on failure
+ * or for address families we don't serve). */
+static void hm_fmt_peer(char *out, size_t outlen, const struct sockaddr *sa) {
+    out[0] = '\0';
+    if (!sa) return;
+    if (sa->sa_family == AF_INET)
+        inet_ntop(AF_INET, &((const struct sockaddr_in *)sa)->sin_addr,
+                  out, (socklen_t)outlen);
+    else if (sa->sa_family == AF_INET6)
+        inet_ntop(AF_INET6, &((const struct sockaddr_in6 *)sa)->sin6_addr,
+                  out, (socklen_t)outlen);
 }
 
 static void hm_set_nonblock(int fd) {
@@ -454,6 +473,7 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     hv_stores(env, "SCRIPT_NAME",      newSVpvs(""));
     hv_stores(env, "SERVER_NAME",      newSVpv(c->loop->host ? c->loop->host : "0.0.0.0", 0));
     hv_stores(env, "SERVER_PORT",      newSViv(c->loop->port));
+    if (c->peer[0]) hv_stores(env, "REMOTE_ADDR", newSVpv(c->peer, 0));
     hv_stores(env, "psgi.version",     newRV_noinc((SV *)ver));
     hv_stores(env, "psgi.url_scheme",  newSVpv(c->ssl ? "https" : "http", 0));
     hv_stores(env, "psgi.multithread", newSViv(0));
@@ -572,10 +592,139 @@ static SV *hm_call_app0(pTHX_ hm_loop *loop, HV *env) {
     return resp;
 }
 
-/* Run the access_log callback: $cb->($env, $status, $bytes). Errors in the
- * logger are swallowed so they cannot take the loop down. */
+/* Is any access logging configured for this loop? Guards the (small) cost of
+ * keeping the env alive past the response purely for the logger. */
+#define hm_logging(loop) ((loop)->log_cb || (loop)->log_fd >= 0)
+
+/* ---- fast default access-log writer (Combined Log Format) ----------------
+ * When access_log is a path/handle rather than a coderef, log lines are
+ * formatted and buffered in C and flushed once per loop wakeup - no Perl
+ * call on the hot path. The fd is shared (inherited) across workers and
+ * opened O_APPEND, so whole-line writes stay atomic between them. */
+
+#define HM_LOG_FLUSH_AT (32 * 1024)   /* flush the buffer once it grows past  */
+
+static void hm_log_flush(hm_loop *loop) {
+    size_t off = 0;
+    if (loop->log_fd < 0 || loop->log_len == 0) return;
+    while (off < loop->log_len) {
+        ssize_t n = write(loop->log_fd, loop->log_buf + off, loop->log_len - off);
+        if (n > 0) { off += (size_t)n; continue; }
+        if (n < 0 && errno == EINTR) continue;
+        break;   /* EAGAIN/error: keep the unwritten tail for the next flush */
+    }
+    if (off && off < loop->log_len)
+        memmove(loop->log_buf, loop->log_buf + off, loop->log_len - off);
+    loop->log_len -= off;
+}
+
+static void hm_log_raw(hm_loop *loop, const char *p, size_t n) {
+    if (loop->log_len + n > loop->log_cap) {
+        size_t ncap = loop->log_cap ? loop->log_cap : 8192;
+        while (ncap < loop->log_len + n) ncap *= 2;
+        loop->log_buf = (char *)realloc(loop->log_buf, ncap);
+        loop->log_cap = ncap;
+    }
+    memcpy(loop->log_buf + loop->log_len, p, n);
+    loop->log_len += n;
+}
+
+/* A plain token: '-' when empty (CLF uses '-' for missing fields). */
+static void hm_log_tok(hm_loop *loop, const char *p, size_t n) {
+    if (!p || n == 0) { hm_log_raw(loop, "-", 1); return; }
+    hm_log_raw(loop, p, n);
+}
+
+/* A value going inside "quotes": escape ", \ and control bytes \xHH so a
+ * hostile URI or User-Agent cannot forge or split a log line. */
+static void hm_log_quoted(hm_loop *loop, const char *p, size_t n) {
+    static const char hex[] = "0123456789abcdef";
+    size_t i, run = 0;
+    if (!p) return;
+    for (i = 0; i < n; i++) {
+        unsigned char ch = (unsigned char)p[i];
+        if (ch == '"' || ch == '\\' || ch < 0x20 || ch == 0x7f) {
+            char e[4];
+            if (run) { hm_log_raw(loop, p + i - run, run); run = 0; }
+            if (ch == '"' || ch == '\\') {
+                e[0] = '\\'; e[1] = (char)ch; hm_log_raw(loop, e, 2);
+            } else {
+                e[0] = '\\'; e[1] = 'x'; e[2] = hex[ch >> 4]; e[3] = hex[ch & 0xf];
+                hm_log_raw(loop, e, 4);
+            }
+        } else {
+            run++;
+        }
+    }
+    if (run) hm_log_raw(loop, p + n - run, run);
+}
+
+/* Cached apache-style timestamp, recomputed at most once per second. */
+static const char *hm_log_time(hm_loop *loop) {
+    if (loop->now != loop->log_ts_sec) {
+        struct tm tm;
+        time_t t = loop->now;
+        localtime_r(&t, &tm);
+        strftime(loop->log_ts, sizeof(loop->log_ts), "%d/%b/%Y:%H:%M:%S %z", &tm);
+        loop->log_ts_sec = loop->now;
+    }
+    return loop->log_ts;
+}
+
+static const char *hm_env_str(pTHX_ HV *env, const char *key, I32 klen, STRLEN *lenp) {
+    SV **s = hv_fetch(env, key, klen, 0);
+    if (s && *s && SvOK(*s)) return SvPV(*s, *lenp);
+    *lenp = 0;
+    return NULL;
+}
+
+/* Build one Combined Log Format line into the loop's log buffer:
+ *   host - user [time] "METHOD URI PROTO" status bytes "referer" "ua" */
+static void hm_log_clf(pTHX_ hm_loop *loop, SV *env_rv, int status, ssize_t blen) {
+    HV *env;
+    const char *s; STRLEN n;
+    char num[32];
+    int ln;
+    const char *ts;
+
+    if (!(env_rv && SvROK(env_rv) && SvTYPE(SvRV(env_rv)) == SVt_PVHV)) return;
+    env = (HV *)SvRV(env_rv);
+
+    s = hm_env_str(aTHX_ env, "REMOTE_ADDR", 11, &n); hm_log_tok(loop, s, n);
+    hm_log_raw(loop, " - ", 3);                        /* %l always '-' */
+    s = hm_env_str(aTHX_ env, "REMOTE_USER", 11, &n); hm_log_tok(loop, s, n);
+    hm_log_raw(loop, " [", 2);
+    ts = hm_log_time(loop); hm_log_raw(loop, ts, strlen(ts));
+    hm_log_raw(loop, "] \"", 3);
+    s = hm_env_str(aTHX_ env, "REQUEST_METHOD", 14, &n); hm_log_quoted(loop, s, n);
+    hm_log_raw(loop, " ", 1);
+    s = hm_env_str(aTHX_ env, "REQUEST_URI", 11, &n);
+    if (s) hm_log_quoted(loop, s, n); else hm_log_raw(loop, "-", 1);
+    hm_log_raw(loop, " ", 1);
+    s = hm_env_str(aTHX_ env, "SERVER_PROTOCOL", 15, &n); hm_log_quoted(loop, s, n);
+    hm_log_raw(loop, "\" ", 2);
+    ln = (int)snprintf(num, sizeof(num), "%d", status); hm_log_raw(loop, num, (size_t)ln);
+    hm_log_raw(loop, " ", 1);
+    if (blen >= 0) { ln = (int)snprintf(num, sizeof(num), "%ld", (long)blen);
+                     hm_log_raw(loop, num, (size_t)ln); }
+    else           hm_log_raw(loop, "-", 1);
+    hm_log_raw(loop, " \"", 2);
+    s = hm_env_str(aTHX_ env, "HTTP_REFERER", 12, &n);
+    if (s) hm_log_quoted(loop, s, n); else hm_log_raw(loop, "-", 1);
+    hm_log_raw(loop, "\" \"", 3);
+    s = hm_env_str(aTHX_ env, "HTTP_USER_AGENT", 15, &n);
+    if (s) hm_log_quoted(loop, s, n); else hm_log_raw(loop, "-", 1);
+    hm_log_raw(loop, "\"\n", 2);
+
+    if (loop->log_len >= HM_LOG_FLUSH_AT) hm_log_flush(loop);
+}
+
+/* Record one response. Fast path: format in C to the access-log fd. Else, if
+ * a coderef was given, call $cb->($env, $status, $bytes); errors in the logger
+ * are swallowed so they cannot take the loop down. */
 static void hm_access_log(pTHX_ hm_loop *loop, SV *env_rv, int status, ssize_t blen) {
     dSP;
+    if (loop->log_fd >= 0) { hm_log_clf(aTHX_ loop, env_rv, status, blen); return; }
     if (!loop->log_cb) return;
     ENTER; SAVETMPS; PUSHMARK(SP);
     XPUSHs(env_rv);
@@ -1104,7 +1253,7 @@ static void hm_process(pTHX_ hm_conn *c) {
         HV *env = hm_build_env(aTHX_ c->rbuf, headlen, c->rbuf + bodystart, clen, c);
         SV *env_rv = NULL;
         SV *resp;
-        if (loop->log_cb) {                 /* env survives for access_log */
+        if (hm_logging(loop)) {             /* env survives for access_log */
             env_rv = newRV_noinc((SV *)env);
             resp = hm_call_app(aTHX_ loop, env_rv);
         } else {
@@ -1204,10 +1353,14 @@ static void hm_accept(pTHX_ hm_loop *loop) {
     int batch = 0;
     if (loop->stopping) return;
     for (;;) {
-        int fd = accept(loop->listen_fd, NULL, NULL);
+        struct sockaddr_storage ss;
+        socklen_t slen = sizeof(ss);
+        hm_conn *c;
+        int fd = accept(loop->listen_fd, (struct sockaddr *)&ss, &slen);
         if (fd < 0) break;                     /* EAGAIN: drained */
         if (fd >= HM_MAXFD) { close(fd); continue; }
-        hm_new_conn(loop, fd);
+        c = hm_new_conn(loop, fd);
+        hm_fmt_peer(c->peer, sizeof(c->peer), (struct sockaddr *)&ss);
         loop->accepts++;
         /* fairness: don't grab the whole queue in one wakeup; the listener
          * stays level-readable, so the next iteration resumes */
@@ -1451,6 +1604,7 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
         n = loop->be->wait(loop->be, evs, HM_MAXEV, timeout);
         if (n < 0) { if (errno == EINTR) continue; break; }
         for (i = 0; i < n; i++) hm_dispatch(aTHX_ loop, &evs[i]);
+        if (loop->log_fd >= 0 && loop->log_len) hm_log_flush(loop);
         if (loop->stop) break;
         if (until && hmf_state(aTHX_ until) != HMF_PENDING) break;
     }
@@ -1473,6 +1627,7 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
     loop->io_w  = (hm_iow *)calloc(HM_MAXFD, sizeof(hm_iow));
     loop->deferred = newAV();
     loop->listen_fd = -1;
+    loop->log_fd = -1;
     loop->now = time(NULL);
     loop->idle_timeout   = 60.0;
     loop->header_timeout = 30.0;
@@ -1508,6 +1663,8 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
         if (c->rbuf) free(c->rbuf);
         free(c);
     }
+    if (loop->log_fd >= 0) { hm_log_flush(loop); close(loop->log_fd); }
+    if (loop->log_buf) free(loop->log_buf);
     if (loop->host) free(loop->host);
     if (loop->self_sv) SvREFCNT_dec(loop->self_sv);
     if (loop->log_cb)  SvREFCNT_dec(loop->log_cb);
@@ -1620,7 +1777,9 @@ typedef struct {
     double      idle_t, header_t, grace;
     int         max_pipe, reuseport, affinity, nworkers, http2;
     UV          max_requests;
-    SV         *log_cb;
+    SV         *log_cb;              /* access_log coderef, or NULL          */
+    int         log_fd;             /* fast access-log fd, or -1            */
+    const char *log_path;           /* access_log file to open (parent), or NULL */
     const char *tls_cert, *tls_key, *tls_ca;
     int         tls_verify;
     SV         *tls_sni;
@@ -1637,7 +1796,9 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, int listen_fd) {
     loop->max_requests = cfg->max_requests;
     loop->http2 = cfg->http2;
     loop->tls_ctx = cfg->tls_ctx;
-    if (cfg->log_cb && SvOK(cfg->log_cb))
+    if (cfg->log_fd >= 0)
+        loop->log_fd = cfg->log_fd;               /* fast C writer wins */
+    else if (cfg->log_cb && SvOK(cfg->log_cb))
         loop->log_cb = SvREFCNT_inc(cfg->log_cb);
     hm_attach_server(aTHX_ loop, cfg->app, listen_fd, cfg->host, cfg->port);
     hm_loop_run(aTHX_ loop, NULL);
@@ -1702,6 +1863,16 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         if (!cfg->tls_ctx)
             croak("Hyperman: TLS: could not initialise from cert '%s' / key '%s'",
                   cfg->tls_cert, cfg->tls_key);
+    }
+
+    /* Open the access-log file once in the parent so all workers share (and
+     * O_APPEND to) the same fd - whole-line writes stay atomic between them. */
+    if (cfg->log_path && cfg->log_fd < 0) {
+        cfg->log_fd = open(cfg->log_path,
+                           O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0644);
+        if (cfg->log_fd < 0)
+            croak("Hyperman: open access_log '%s': %s",
+                  cfg->log_path, strerror(errno));
     }
 
     cfg->listen_fd = hm_make_listener(cfg->host, cfg->port, cfg->reuseport);

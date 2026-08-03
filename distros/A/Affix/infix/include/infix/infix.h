@@ -355,11 +355,59 @@ struct infix_function_argument_t {
  * @{
  */
 /**
+ * @typedef infix_allocator_t
+ * @brief A v-table of allocation callbacks used for all of infix's internal heap allocations.
+ * @details infix routes every internal heap allocation through these four callbacks.
+ *          By default they point to the C library's `malloc`, `calloc`, `realloc`, and
+ *          `free`. Replace them at runtime with `infix_set_allocator()` to make infix
+ *          allocate from your own memory manager (e.g. a language runtime's tracked
+ *          heap or a garbage collector).
+ *
+ *          The callbacks must honor the usual C library semantics: `malloc(0)` and
+ *          `calloc(0, n)` may return `NULL` or a unique pointer, `realloc` must accept
+ *          a `NULL` pointer (acting like `malloc`), and `free` must accept `NULL` as a
+ *          no-op. Memory returned by one callback must be released with the matching
+ *          `free` callback. Never mix allocators.
+ */
+typedef struct {
+    void * (*malloc)(size_t);          /**< Equivalent of `malloc`. */
+    void * (*calloc)(size_t, size_t);  /**< Equivalent of `calloc`. */
+    void * (*realloc)(void *, size_t); /**< Equivalent of `realloc`. */
+    void (*free)(void *);              /**< Equivalent of `free`. */
+} infix_allocator_t;
+/**
+ * @brief The allocator currently used for all of infix's internal heap allocations.
+ * @details Initialized to the C library's `malloc`/`calloc`/`realloc`/`free`. Do not
+ *          assign to it directly. Use `infix_set_allocator()` so the documentation
+ *          and any future locking stay in one place.
+ */
+extern infix_allocator_t infix_allocator;
+/**
+ * @brief Replaces the allocator infix uses for all internal heap allocations.
+ * @param[in] allocator A pointer to a valid `infix_allocator_t`, or `NULL` to restore
+ *            the default C library allocator.
+ * @details infix copies the callback pointers, so the caller may pass a temporary
+ *          struct. Call this before creating any trampolines (typically during host
+ *          initialization) and before infix is used from more than one thread, since
+ *          the table is not internally synchronized.
+ *
+ *          Every pointer infix returns must be freed through the same allocator:
+ *          callers that release infix-owned memory (such as the buffer returned by
+ *          `emit_get_binary`) must use `infix_free` or the equivalent entry point
+ *          of the allocator they installed rather than the C library's `free`.
+ */
+void infix_set_allocator(const infix_allocator_t * allocator);
+/**
  * @def infix_malloc
- * @brief A macro that can be defined to override the default `malloc` function.
- * @details If you need to integrate `infix` with a custom memory allocator (e.g., for
- *          memory tracking or garbage collection), define this macro **before**
- *          including `infix.h`. You must also define the other `infix_*` memory macros.
+ * @brief A macro that can be defined to override infix's allocator at compile time.
+ * @details infix routes every internal heap allocation through the `infix_malloc`,
+ *          `infix_calloc`, `infix_realloc`, and `infix_free` macros. By default they
+ *          dispatch to the runtime allocator installed with `infix_set_allocator()`.
+ *
+ *          If you prefer a compile-time override (no indirect call at all), define
+ *          these macros **before** including `infix.h`. You must then define all four
+ *          consistently, and anything that frees infix-owned memory must use
+ *          `infix_free`.
  * @code
  * #define infix_malloc my_custom_malloc
  * #define infix_calloc my_custom_calloc
@@ -369,19 +417,19 @@ struct infix_function_argument_t {
  * @endcode
  */
 #ifndef infix_malloc
-#define infix_malloc malloc
+#define infix_malloc(n) infix_allocator.malloc(n)
 #endif
-/** @brief A macro that can be defined to override the default `calloc` function. */
+/** @brief A macro that can be defined to override infix's allocator at compile time. */
 #ifndef infix_calloc
-#define infix_calloc calloc
+#define infix_calloc(nelem, size) infix_allocator.calloc(nelem, size)
 #endif
-/** @brief A macro that can be defined to override the default `realloc` function. */
+/** @brief A macro that can be defined to override infix's allocator at compile time. */
 #ifndef infix_realloc
-#define infix_realloc realloc
+#define infix_realloc(ptr, n) infix_allocator.realloc(ptr, n)
 #endif
-/** @brief A macro that can be defined to override the default `free` function. */
+/** @brief A macro that can be defined to override infix's allocator at compile time. */
 #ifndef infix_free
-#define infix_free free
+#define infix_free(ptr) infix_allocator.free(ptr)
 #endif
 /** @brief A macro that can be defined to override the default `memcpy` function. */
 #ifndef infix_memcpy

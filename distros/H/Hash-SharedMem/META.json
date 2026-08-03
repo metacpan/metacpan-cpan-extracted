@@ -1,10 +1,10 @@
 {
    "abstract" : "efficient shared mutable hash",
    "author" : [
-      "Andrew Main (Zefram) <zefram@fysh.org>"
+      "Kurt Starsinic <cpan@kstar.fastmail.fm>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4224",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -13,39 +13,31 @@
       "version" : 2
    },
    "name" : "Hash-SharedMem",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Data::Dumper" : "0",
-            "Errno" : "1.00",
-            "ExtUtils::CBuilder" : "0.15",
-            "ExtUtils::ParseXS" : "3.30",
-            "File::Temp" : "0.22",
-            "IO::File" : "0",
-            "Module::Build" : "0",
-            "POSIX" : "0",
-            "Scalar::String" : "0",
-            "Test::Builder" : "0.03",
-            "Test::More" : "0.40",
-            "if" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "utf8" : "0",
-            "warnings" : "0"
+            "ExtUtils::ParseXS" : "3.30"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0",
+            "ExtUtils::CBuilder" : "0.15",
+            "ExtUtils::MakeMaker" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "Devel::CallChecker" : "0.003"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Devel::CallChecker" : "0.003"
-         },
          "requires" : {
             "Exporter" : "0",
             "XSLoader" : "0",
@@ -53,17 +45,24 @@
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "Devel::CallChecker" : "0.003"
          }
-      }
-   },
-   "provides" : {
-      "Hash::SharedMem" : {
-         "file" : "lib/Hash/SharedMem.pm",
-         "version" : "0.005"
       },
-      "Hash::SharedMem::Handle" : {
-         "file" : "lib/Hash/SharedMem/Handle.pm",
-         "version" : "0.005"
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Errno" : "1.00",
+            "File::Temp" : "0.22",
+            "IO::File" : "0",
+            "POSIX" : "0",
+            "Scalar::String" : "0",
+            "Test::Builder" : "0.03",
+            "Test::More" : "0.40",
+            "if" : "0",
+            "utf8" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -71,11 +70,8 @@
       "bugtracker" : {
          "mailto" : "bug-Hash-SharedMem@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-SharedMem"
-      },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      }
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

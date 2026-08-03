@@ -1,5 +1,11 @@
 Revision history for Datafile-Array.pm
 
+1.06 2026-08-02
+    - make sure version is in all required files
+    - move github.com to codeberg.org 
+    - some minimal code changes in Array.pm
+    - Added a README file
+
 1.05 2025-01-18
     - Added pure-Perl CSV parsing with multi-line record support
     - Added prefix mode (H/R convention) for header and data lines

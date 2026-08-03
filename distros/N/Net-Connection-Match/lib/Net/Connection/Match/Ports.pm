@@ -16,7 +16,6 @@ Version 0.1.0
 
 our $VERSION = '0.1.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::Port;
@@ -87,110 +86,103 @@ If the new method fails, it dies.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# run some basic checks to make sure we have the minimum stuff required to work
-	if (
-		( ! defined( $args{ports} ) ) &&
-		( ! defined( $args{fports} ) ) &&
-		( ! defined( $args{lports} ) )
-		){
-		die ('No [fl]ports key specified in the argument hash');
+	if (   ( !defined( $args{ports} ) )
+		&& ( !defined( $args{fports} ) )
+		&& ( !defined( $args{lports} ) ) )
+	{
+		die('No [fl]ports key specified in the argument hash');
 	}
 	if (
-		(
-		 defined( $args{ports} ) &&
-		 ( ! defined( $args{ports}[0] ) )
-		 ) &&
-		(
-		 defined( $args{lports} ) &&
-		 ( ! defined( $args{lports}[0] ) )
-		 ) &&
-		(
-		 defined( $args{fports} ) &&
-		 ( ! defined( $args{fports}[0] ) )
-		 )
-		){
-		die ('No ports defined in the in any of the [fl]ports array');
-	}
+		( defined( $args{ports} ) && ( !defined( $args{ports}[0] ) ) )
+		&& ( defined( $args{lports} )
+			&& ( !defined( $args{lports}[0] ) ) )
+		&& ( defined( $args{fports} )
+			&& ( !defined( $args{fports}[0] ) ) )
+		)
+	{
+		die('No ports defined in the in any of the [fl]ports array');
+	} ## end if ( ( defined( $args{ports} ) && ( !defined...)))
 
-    my $self = {
-				ports=>{},
-				fports=>{},
-				lports=>{},
-				};
-    bless $self;
+	my $self = {
+		ports  => {},
+		fports => {},
+		lports => {},
+	};
+	bless $self;
 
 	# Process the ports for matching either
-	my $ports_int=0;
-	if ( defined( $args{ports} ) ){
-		while (defined( $args{ports}[$ports_int] )) {
-			if ( $args{ports}[$ports_int] =~ /^[0-9\*]+$/ ){
-				$self->{ports}{ $args{ports}[$ports_int] }= $args{ports}[$ports_int];
-			}else{
-				my $port_number=(getservbyname( $args{ports}[$ports_int] , '' ))[2];
+	my $ports_int = 0;
+	if ( defined( $args{ports} ) ) {
+		while ( defined( $args{ports}[$ports_int] ) ) {
+			if ( $args{ports}[$ports_int] =~ /^[0-9\*]+$/ ) {
+				$self->{ports}{ $args{ports}[$ports_int] } = $args{ports}[$ports_int];
+			} else {
+				my $port_number = ( getservbyname( $args{ports}[$ports_int], '' ) )[2];
 
-				if( !defined( $port_number ) ){
-					die("Could not resolve port '".$args{ports}[$ports_int]."' to a number");
+				if ( !defined($port_number) ) {
+					die( "Could not resolve port '" . $args{ports}[$ports_int] . "' to a number" );
 				}
 
-				$self->{ports}{$port_number}=$port_number;
+				$self->{ports}{$port_number} = $port_number;
 			}
 
 			$ports_int++;
-		}
-	}
+		} ## end while ( defined( $args{ports}[$ports_int] ) )
+	} ## end if ( defined( $args{ports} ) )
 
 	# Process the ports for matching local ports
-	$ports_int=0;
-	if ( defined( $args{lports} ) ){
-		while (defined( $args{lports}[$ports_int] )) {
-			if ( $args{lports}[$ports_int] =~ /^[0-9]+$/ ){
-				$self->{lports}{ $args{lports}[$ports_int] }= $args{lports}[$ports_int];
-			}elsif( $args{lports}[$ports_int] =~ /^\*$/  ){
-				$self->{lports}{'*'}='*';
-			}else{
-				my $port_number=(getservbyname( $args{lports}[$ports_int] , '' ))[2];
+	$ports_int = 0;
+	if ( defined( $args{lports} ) ) {
+		while ( defined( $args{lports}[$ports_int] ) ) {
+			if ( $args{lports}[$ports_int] =~ /^[0-9]+$/ ) {
+				$self->{lports}{ $args{lports}[$ports_int] } = $args{lports}[$ports_int];
+			} elsif ( $args{lports}[$ports_int] =~ /^\*$/ ) {
+				$self->{lports}{'*'} = '*';
+			} else {
+				my $port_number = ( getservbyname( $args{lports}[$ports_int], '' ) )[2];
 
-				if( !defined( $port_number ) ){
-					die("Could not resolve port '".$args{lports}[$ports_int]."' to a number");
+				if ( !defined($port_number) ) {
+					die( "Could not resolve port '" . $args{lports}[$ports_int] . "' to a number" );
 				}
 
-				$self->{lports}{$port_number}=$port_number;
+				$self->{lports}{$port_number} = $port_number;
 			}
 
 			$ports_int++;
-		}
-	}
+		} ## end while ( defined( $args{lports}[$ports_int] ) )
+	} ## end if ( defined( $args{lports} ) )
 
 	# Process the ports for matching foreign ports
-	$ports_int=0;
-	if ( defined( $args{fports} ) ){
-		while (defined( $args{fports}[$ports_int] )) {
-			if ( $args{fports}[$ports_int] =~ /^[0-9]+$/ ){
-				$self->{fports}{ $args{fports}[$ports_int] }= $args{fports}[$ports_int];
-			}elsif( $args{fports}[$ports_int] =~ /^\*$/  ){
-				$self->{fports}{'*'}='*';
-			}else{
-				my $port_number=(getservbyname( $args{fports}[$ports_int] , '' ))[2];
+	$ports_int = 0;
+	if ( defined( $args{fports} ) ) {
+		while ( defined( $args{fports}[$ports_int] ) ) {
+			if ( $args{fports}[$ports_int] =~ /^[0-9]+$/ ) {
+				$self->{fports}{ $args{fports}[$ports_int] } = $args{fports}[$ports_int];
+			} elsif ( $args{fports}[$ports_int] =~ /^\*$/ ) {
+				$self->{fports}{'*'} = '*';
+			} else {
+				my $port_number = ( getservbyname( $args{fports}[$ports_int], '' ) )[2];
 
-				if( !defined( $port_number ) ){
-					die("Could not resolve port '".$args{fports}[$ports_int]."' to a number");
+				if ( !defined($port_number) ) {
+					die( "Could not resolve port '" . $args{fports}[$ports_int] . "' to a number" );
 				}
 
-				$self->{fports}{$port_number}=$port_number;
+				$self->{fports}{$port_number} = $port_number;
 			}
 
 			$ports_int++;
-		}
-	}
+		} ## end while ( defined( $args{fports}[$ports_int] ) )
+	} ## end if ( defined( $args{fports} ) )
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -206,47 +198,46 @@ The returned value is a boolean.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $object=$_[1];
+sub match {
+	my $self   = $_[0];
+	my $object = $_[1];
 
-	if ( !defined( $object ) ){
+	if ( !defined($object) ) {
 		return 0;
 	}
 
-	if ( ref( $object ) ne 'Net::Connection' ){
+	if ( ref($object) ne 'Net::Connection' ) {
 		return 0;
 	}
 
-	my $lport=$object->local_port;
-	my $fport=$object->foreign_port;
+	my $lport = $object->local_port;
+	my $fport = $object->foreign_port;
 
 	# If either are non-numeric, resolve them if possible
-	if ( $lport !~ /^[0-9\*]+$/ ){
-		my $lport_number=(getservbyname( $lport , '' ))[2];
-		if ( defined( $lport_number ) ){
-			$lport=$lport_number;
+	if ( $lport !~ /^[0-9\*]+$/ ) {
+		my $lport_number = ( getservbyname( $lport, '' ) )[2];
+		if ( defined($lport_number) ) {
+			$lport = $lport_number;
 		}
 	}
-	if ( $fport !~ /^[0-9\*]+$/ ){
-		my $fport_number=(getservbyname( $fport , '' ))[2];
-		if ( defined( $fport_number ) ){
-			$fport=$fport_number;
+	if ( $fport !~ /^[0-9\*]+$/ ) {
+		my $fport_number = ( getservbyname( $fport, '' ) )[2];
+		if ( defined($fport_number) ) {
+			$fport = $fport_number;
 		}
 	}
 
 	# check if this is one of the ones we are looking for
-	if (
-		defined( $self->{ports}{ $lport } ) ||
-		defined( $self->{ports}{ $fport } ) ||
-		defined( $self->{lports}{ $lport } ) ||
-		defined( $self->{fports}{ $fport } )
-		){
+	if (   defined( $self->{ports}{$lport} )
+		|| defined( $self->{ports}{$fport} )
+		|| defined( $self->{lports}{$lport} )
+		|| defined( $self->{fports}{$fport} ) )
+	{
 		return 1;
 	}
 
 	return 0;
-}
+} ## end sub match
 
 =head1 AUTHOR
 
@@ -337,4 +328,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

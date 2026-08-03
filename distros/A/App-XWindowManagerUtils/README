@@ -1,9 +1,9 @@
 NAME
-    App::XWindowManagerUtils - Utilities related to X Window Manager
+    App::XWindowManagerUtils - Utilities related to "X Window Manager"
 
 VERSION
-    This document describes version 0.003 of App::XWindowManagerUtils (from
-    Perl distribution App-XWindowManagerUtils), released on 2026-04-06.
+    This document describes version 0.004 of App::XWindowManagerUtils (from
+    Perl distribution App-XWindowManagerUtils), released on 2026-04-15.
 
 SYNOPSIS
 DESCRIPTION
@@ -14,96 +14,6 @@ DESCRIPTION
 
     *   list-xwm-windows
 
-    Under the hood, it's currently a wrapper to tools like "wmctrl", etc.
-
-    "wmctrl" works on EWMH-compliant X11 window managers. This means
-    mainstream desktop environments like KWin, Xfwm, Mutter (GNOME). It
-    works partially or doesn't work with minimalist window managers like
-    dwm, suckless. It partially works with Wayland where there is an X
-    compatibility layer, e.g. GNOME Wayland, KDE Plasma Wayland.
-
-FUNCTIONS
-  get_xwm_window_kde_activity
-    Usage:
-
-     get_xwm_window_kde_activity(%args) -> [$status_code, $reason, $payload, \%result_meta]
-
-    Get the KDE activity GUID(s) of a specific window.
-
-    A window can be displayed in more than one KDE activities, so this
-    utility can return a comma-separated list of GUIDs.
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   id* => *str*
-
-        Window ID, specified in hex form with 0x prefix, e.g. 0x05a0000e.
-
-    Returns an enveloped result (an array).
-
-    First element ($status_code) is an integer containing HTTP-like status
-    code (200 means OK, 4xx caller error, 5xx function error). Second
-    element ($reason) is a string containing error message, or something
-    like "OK" if status is 200. Third element ($payload) is the actual
-    result, but usually not present when enveloped result is an error
-    response ($status_code is not 2xx). Fourth element (%result_meta) is
-    called result metadata and is optional, a hash that contains extra
-    information, much like how HTTP response headers provide additional
-    metadata.
-
-    Return value: (any)
-
-  list_xwm_windows
-    Usage:
-
-     list_xwm_windows(%args) -> [$status_code, $reason, $payload, \%result_meta]
-
-    List all Windows.
-
-    This utility is currently a wrapper for wmctrl.
-
-    This function is not exported by default, but exportable.
-
-    Arguments ('*' denotes required arguments):
-
-    *   detail => *bool*
-
-        (No description)
-
-    *   query => *array[str]*
-
-        Queries are matched against window titles, IDs, and KDE activity
-        names & GUIDs (if KDE activity names & GUIDs are requested).
-
-    *   with_kde_activity => *bool*
-
-        Show KDE activity GUID for each window (old name for
-        with_kde_activity_guid).
-
-    *   with_kde_activity_guid => *bool*
-
-        Show KDE activity GUID for each window.
-
-    *   with_kde_activity_name => *bool*
-
-        Show KDE activity name for each window.
-
-    Returns an enveloped result (an array).
-
-    First element ($status_code) is an integer containing HTTP-like status
-    code (200 means OK, 4xx caller error, 5xx function error). Second
-    element ($reason) is a string containing error message, or something
-    like "OK" if status is 200. Third element ($payload) is the actual
-    result, but usually not present when enveloped result is an error
-    response ($status_code is not 2xx). Fourth element (%result_meta) is
-    called result metadata and is optional, a hash that contains extra
-    information, much like how HTTP response headers provide additional
-    metadata.
-
-    Return value: (any)
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-XWindowManagerUtils>.
@@ -113,8 +23,13 @@ SOURCE
     <https://github.com/perlancar/perl-App-XWindowManagerUtils>.
 
 SEE ALSO
+    Desktop::XWindowManager::Util
+
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

@@ -1,7 +1,7 @@
 {
    "abstract" : "Lightweight pure-Perl data file handlers for array/tabular/csv data",
    "author" : [
-      "Hans Harder"
+      "Hans Harder <hans at atbas.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
@@ -34,24 +34,35 @@
          "requires" : {
             "perl" : "5.014"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::NoWarnings" : "1.04",
+            "Test::Pod::Coverage" : "1.04"
+         }
       }
    },
    "provides" : {
       "Datafile::Array" : {
-         "file" : "lib/Datafile/Array.pm"
+         "file" : "lib/Datafile/Array.pm",
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/HansH111/Datafile-Array.pm/issues"
+         "web" : "https://codeberg.org/HansH111/Datafile-Array.pm/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/HansH111/Datafile-Array.pm.git",
-         "web" : "https://github.com/HansH111/Datafile-Array.pm"
+         "url" : "https://codeberg.org/HansH111/Datafile-Array.pm.git",
+         "web" : "https://codeberg.org/HansH111/Datafile-Array.pm"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
+   "x_contributors" : [
+      "Hans Harder <hans at atbas.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

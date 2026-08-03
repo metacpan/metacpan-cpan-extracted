@@ -56,6 +56,7 @@ static void hm_h2_env_init(pTHX_ hm_h2_sess *s, HV *env) {
     hv_stores(env, "SERVER_PROTOCOL",   newSVpvs("HTTP/2"));
     hv_stores(env, "SERVER_NAME",       newSVpv(loop->host ? loop->host : "0.0.0.0", 0));
     hv_stores(env, "SERVER_PORT",       newSViv(loop->port));
+    if (s->conn->peer[0]) hv_stores(env, "REMOTE_ADDR", newSVpv(s->conn->peer, 0));
     hv_stores(env, "QUERY_STRING",      newSVpvs(""));
     hv_stores(env, "psgi.version",      newRV_noinc((SV *)ver));
     hv_stores(env, "psgi.url_scheme",   newSVpv(s->conn->ssl ? "https" : "http", 0));
@@ -362,7 +363,7 @@ static void hm_h2_deliver(pTHX_ int fd, UV gen, int32_t sid, SV *resp) {
     if (!st) return;
     st->awaiting = 0;
     hm_h2_respond(aTHX_ s, st, resp);
-    if (loop->log_cb && st->env_rv)
+    if (hm_logging(loop) && st->env_rv)
         hm_access_log(aTHX_ loop, st->env_rv, st->status, (ssize_t)st->blen);
     hm_h2_flush_send(aTHX_ s);
 }
@@ -450,7 +451,7 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
     }
 
     hm_h2_respond(aTHX_ s, st, resp);
-    if (loop->log_cb)
+    if (hm_logging(loop))
         hm_access_log(aTHX_ loop, env_rv, st->status, (ssize_t)st->blen);
     if (resp) SvREFCNT_dec(resp);
     SvREFCNT_dec(env_rv);

@@ -1,9 +1,18 @@
 Revision history for Proc-ProcessTable-InfoString
 
-0.0.1  2026-07-28/21:00
+0.2.0  2026-08-02/15:30
+       - add proc_infostring_describe, a exportable function for
+         printing what the info string means for the current OS
+       - support for OpenBSD, NetBSD, DragonFly, MidnightBSD, and
+         GNU/kFreeBSD
+       - do not die on OSes that do not report resident memory
+       - match the state case insensitively, as OpenBSD reports it
+         in upper case
+
+0.1.0  2026-07-28/21:00
        - various fixes
        - better linux support
        - a proper test
 
-0.1.0  2019-08-28/01:55
+0.0.1  2019-08-28/01:55
        - Initial release.

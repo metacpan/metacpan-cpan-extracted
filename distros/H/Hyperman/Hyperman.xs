@@ -15,6 +15,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "hm_compat.h"    /* perl API shims (XS_INTERNAL, mg_findext, croak_sv) */
 
 #include <sys/types.h>
 #include <sys/socket.h>

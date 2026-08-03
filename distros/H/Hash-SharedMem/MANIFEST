@@ -1,15 +1,12 @@
 .gitignore
-Build.PL
 Changes
 DESIGN
 MANIFEST
-META.json
-META.yml
+Makefile.PL
 README
-lib/Hash/SharedMem.pm
 lib/Hash/SharedMem.xs
+lib/Hash/SharedMem.pm
 lib/Hash/SharedMem/Handle.pm
-lib/Hash/features.probe
 magic
 t/arg_error.t
 t/bad_dir.t
@@ -42,4 +39,5 @@ t/threads.t
 t/tidy.t
 t/tie.t
 t/version_synch.t
-SIGNATURE    Added here by Module::Build
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,14 @@
 Revision history for Proc-ProcessTable-ncps
 
+0.2.2    2026-08-02/15:30
+         - Stop using the Proc::ProcessTable TTY cache, which is unreadable
+           for perls built with a differing double size.
+         - Require a Text::ANSI::Util/Text::WideChar::Util pair that works.
+         - Add the missing BorderStyle::ASCII::None prereq.
+         - Minimum perl is now 5.10.1, which the prereqs already required.
+         - -h now describes the info column via
+           Proc::ProcessTable::InfoString 0.2.0.
+
 0.2.1    2026-07-28/23:15
          - add a inf/nan fix that can crop up on linux for pctcpu
          - perltidy

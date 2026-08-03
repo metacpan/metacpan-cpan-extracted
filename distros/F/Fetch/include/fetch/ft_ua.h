@@ -302,7 +302,7 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
     char *authority;
     char portbuf[16];
     SV *req, *hdrs2_rv, *m_sv, *sc_sv, *au_sv, *pa_sv, *f;
-    SV *body = NULL, *on_body = NULL, *json_body = NULL;
+    SV *body = NULL, *on_body = NULL, *on_headers = NULL, *json_body = NULL;
     ft_loop *l = NULL; SV *lsv = NULL;
     ft_pool *pl;
     SSize_t n, i;
@@ -390,6 +390,7 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
         if (to && *to) timeout = SvNV(*to);
         body    = hv_fetchs(opt, "body", 0)    ? *hv_fetchs(opt, "body", 0)    : NULL;
         on_body = hv_fetchs(opt, "on_body", 0) ? *hv_fetchs(opt, "on_body", 0) : NULL;
+        on_headers = hv_fetchs(opt, "on_headers", 0) ? *hv_fetchs(opt, "on_headers", 0) : NULL;
         if (body && !SvOK(body)) body = NULL;
     }
     if (json_body) body = json_body;   /* json => wins over an explicit body */
@@ -422,10 +423,13 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
         STRLEN rl;
         const char *rb = SvPV_const(req, rl);
         ft_conn_simple_next = ua->simple_response;   /* inherited by a fresh conn */
+        ft_conn_on_headers_next =
+            (on_headers && SvROK(on_headers)) ? on_headers : NULL;
         f = ft_h1_start(aTHX_ l, lsv, pl, u.host, portbuf, rb, rl, tls, verify,
                         timeout, m_sv, sc_sv, au_sv, pa_sv, hdrs2_rv,
                         body ? body : &PL_sv_undef,
                         on_body ? on_body : &PL_sv_undef, NULL);
+        ft_conn_on_headers_next = NULL;   /* borrowed; do not keep past the call */
     }
 
     /* store any Set-Cookie before the caller/redirect-follower runs */

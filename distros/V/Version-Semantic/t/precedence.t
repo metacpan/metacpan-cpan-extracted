@@ -34,7 +34,7 @@ subtest '11.3' => sub {
 };
 
 subtest '11.4' => sub {
-  plan tests => 19;
+  plan tests => 21;
 
   my @versions = qw(
     0.9.0
@@ -63,5 +63,9 @@ subtest '11.4' => sub {
     '1.0.0-alpha == 1.0.0-alpha (same pre-release lists)';
   ok $class->parse( '1.0.0-5' ) == $class->parse( '1.0.0-5' ), '1.0.0-5 == 1.0.0-5 (same pre-release lists)';
   ok $class->parse( '1.0.8-20260216170758-TRIAL' ) < $class->parse( '1.0.8-20260223134407-TRIAL' ),
-'1.0.8-20260216170758-TRIAL < 1.0.8-20260223134407-TRIAL; lexical order matches chronological order if the date format is numeric %Y%m%d%H%M%S'
+'1.0.8-20260216170758-TRIAL < 1.0.8-20260223134407-TRIAL; lexical order matches chronological order if the date format is numeric %Y%m%d%H%M%S';
+  ok $class->parse( '5.3.0-20260307100725-TRIAL' ) < $class->parse( '5.3.0-TRIAL3' ),
+    '5.3.0-20260307100725-TRIAL < 5.3.0-TRIAL3';
+  ok $class->parse( '5.3.0-20260307100725.TRIAL' ) < $class->parse( '5.3.0-TRIAL3' ),
+'5.3.0-20260307100725.TRIAL < 5.3.0-TRIAL3; numeric identifiers (20260307100725) always have lower precedence than non-numeric identifiers (TRIAL3)'
 }

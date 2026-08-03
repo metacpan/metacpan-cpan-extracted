@@ -11,7 +11,7 @@ use IO::Select       ();
 use File::Temp 0.2310 ();    # 0.2310 for tempfile's PERMS option
 use JSON::MaybeXS ();
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 NAME
 
@@ -304,10 +304,14 @@ sub _read_line {
     my $response = $client->authenticate;
     die $response->{error} if $response->{status} ne 'ok';
 
-Perform the server's Unix-ownership challenge: call C<auth_start>, write the
-returned cookie to a fresh file in the server's C<temp_dir> (the OS stamps the
-file with this process's effective UID, which is the proof the server checks),
-then call C<auth_verify> and clean the file up.
+Authenticate to the server. If the server advertises kernel peer-credential
+authentication (C<< peercred => 1 >> in its C<auth_start> reply), this calls
+C<auth_verify> with no arguments -- no file is created, the OS proves the UID.
+Otherwise it performs the Unix-ownership challenge: call C<auth_start>, write
+the returned cookie to a fresh file in the server's C<temp_dir> (the OS stamps
+the file with this process's effective UID, which is the proof the server
+checks), then call C<auth_verify> and clean the file up. See
+L<POE::Component::Server::JSONUnix/"KERNEL PEER-CREDENTIAL AUTHENTICATION">.
 
 Accepts an optional C<timeout>, applied to each of the two requests. Returns
 the C<auth_verify> response envelope on success, or a synthesised
@@ -331,6 +335,23 @@ sub authenticate {
 			error  => 'auth_start failed: ' . ( $challenge->{error} // 'unknown error' ),
 		};
 	}
+
+	# When the server advertises kernel peer-credential auth, skip the file
+	# entirely: the uid is proven by the OS, so auth_verify needs no path.
+	if ( $challenge->{result}{peercred} ) {
+		my $verdict = $self->call(
+			command => 'auth_verify',
+			( defined $timeout ? ( timeout => $timeout ) : () ),
+		);
+		if ( ( $verdict->{status} // '' ) eq 'ok' ) {
+			$self->{auth} = {
+				uid      => $verdict->{result}{uid},
+				username => $verdict->{result}{username},
+				groups   => $verdict->{result}{groups} // [],
+			};
+		}
+		return $verdict;
+	} ## end if ( $challenge->{result}...)
 
 	my $cookie   = $challenge->{result}{cookie}   // '';
 	my $temp_dir = $challenge->{result}{temp_dir} // '';

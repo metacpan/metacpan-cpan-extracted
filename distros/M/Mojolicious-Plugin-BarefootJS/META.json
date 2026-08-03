@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "BarefootJS" : "v0.29.0",
+            "BarefootJS" : "v0.30.2",
             "Mojolicious" : "9.0",
             "perl" : "5.020"
          }
@@ -42,6 +42,20 @@
             "Test2::V0" : "0",
             "Test::Mojo" : "0"
          }
+      }
+   },
+   "provides" : {
+      "BarefootJS::Backend::Mojo" : {
+         "file" : "lib/BarefootJS/Backend/Mojo.pm",
+         "version" : "v0.30.2"
+      },
+      "Mojolicious::Plugin::BarefootJS" : {
+         "file" : "lib/Mojolicious/Plugin/BarefootJS.pm",
+         "version" : "v0.30.2"
+      },
+      "Mojolicious::Plugin::BarefootJS::DevReload" : {
+         "file" : "lib/Mojolicious/Plugin/BarefootJS/DevReload.pm",
+         "version" : "v0.30.2"
       }
    },
    "release_status" : "stable",
@@ -56,6 +70,6 @@
          "web" : "https://github.com/piconic-ai/barefootjs"
       }
    },
-   "version" : "v0.29.0",
+   "version" : "v0.30.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

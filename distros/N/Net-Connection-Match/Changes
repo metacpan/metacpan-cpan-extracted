@@ -1,5 +1,12 @@
 Revision history for Net-Connection-Match
 
+0.5.2  2026-08-02/15:15
+       - Fixed manifest.
+       - Perl tidy.
+       - PctCPU/PctMem: fix inverted <= comparison.
+       - Add tests for All, Command, PctCPU, PctMem, and WChan.
+       - Test the process table lookup via a mocked Proc::ProcessTable.
+
 0.5.1  2026-07-31/22:00
        - PctMem: physmem now found via POSIX::sysconf or sysctl -n, fixing FreeBSD and OpenBSD >4GB.
        - PctMem: compute pctmem from rss/rssize on platforms not providing it instead of OS sniffing.

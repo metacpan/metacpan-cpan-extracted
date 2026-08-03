@@ -13,4 +13,6 @@ my $min_tp = 1.22;
 eval "use Test::Pod $min_tp";
 plan skip_all => "Test::Pod $min_tp required for testing POD" if $@;
 
-all_pod_files_ok();
+# the sources are checked directly as the script is installed via
+# INST_SCRIPT, so it never shows up under blib for the default check
+all_pod_files_ok( all_pod_files( 'lib', 'src_bin' ) );

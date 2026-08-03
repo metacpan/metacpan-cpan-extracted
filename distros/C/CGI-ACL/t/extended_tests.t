@@ -423,17 +423,16 @@ subtest 'all_denied(): wildcard deny + allow_country + IP check — all three ac
 };
 
 subtest 'all_denied(): deny_cloud + allow_ip + deny_country — cloud takes precedence' => sub {
-	# Cloud IP must be denied even though it is in the allow-list.
-	# Then a non-cloud non-listed IP must reach the country check.
-	my $acl = CGI::ACL->new()
-		->deny_cloud()
-		->allow_ip($config{RFC5737_IP})
-		->deny_country($config{CC_DE});
-
+	# Each scenario uses its own ACL object so the per-object DNS cache does
+	# not carry a result from one mock into the next.
 	my $gb_lingua = MockLingua->new(country => $config{CC_GB});
 
 	{
 		# Cloud IP: denied regardless of allow_ip
+		my $acl = CGI::ACL->new()
+			->deny_cloud()
+			->allow_ip($config{RFC5737_IP})
+			->deny_country($config{CC_DE});
 		my $guard = mock_scoped 'CGI::ACL::_verified_rdns'
 			=> sub { $config{AWS_HOST} };
 		diag "cloud IP with allow_ip + deny_country" if $ENV{TEST_VERBOSE};
@@ -442,12 +441,20 @@ subtest 'all_denied(): deny_cloud + allow_ip + deny_country — cloud takes prec
 	}
 	{
 		# Non-cloud, allowed IP: allow-list match returns 0 before country check
+		my $acl = CGI::ACL->new()
+			->deny_cloud()
+			->allow_ip($config{RFC5737_IP})
+			->deny_country($config{CC_DE});
 		my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub { undef };
 		is(denied_at($acl, $config{RFC5737_IP}), 0,
 			'non-cloud, allowed IP passes without country check');
 	}
 	{
 		# Non-cloud, non-allowed IP: reaches country check
+		my $acl = CGI::ACL->new()
+			->deny_cloud()
+			->allow_ip($config{RFC5737_IP})
+			->deny_country($config{CC_DE});
 		my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub { undef };
 		is(denied_at($acl, $config{RFC5737_IP2}, lingua => $gb_lingua), 0,
 			'non-cloud non-allowed IP, non-denied country → allowed');

@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     1
 
 VERSION
-    This document describes version 1.0.0 of DesktopWorkspace (from Perl
-    distribution DesktopWorkspace), released on 2026-03-29.
+    This document describes version 1.0.1 of DesktopWorkspace (from Perl
+    distribution DesktopWorkspace), released on 2026-04-15.
 
 DESCRIPTION
     This document specifies a way to describe windows and applications to
@@ -70,7 +70,7 @@ SPECIFICATION
 
     *   kde_activity
 
-        Str. Switch to a KDE activity of the specified name.
+        Str. Put the item in specified KDE activity.
 
   Workspace item
     A DefHash structure that contain the following properties:
@@ -88,7 +88,23 @@ SPECIFICATION
         Path to a directory to be opened by an appropriate desktop
         application (usually a file manager).
 
-    *   app_path
+    *   firefox_window_num
+
+        Int. Group this item to a specific firefox window specified by an
+        arbitrary number just for grouping. Note that only "url" items
+        should be have this.
+
+    *   dolphin_window_num
+
+        Int. Group this item to a specific Dolphin window specified by an
+        arbitrary number just for grouping. Note that only "dir" and "url"
+        items should be have this.
+
+    *   prog_name
+
+        Name of a program to be run, to be searched in PATH.
+
+    *   prog_path
 
         Path to a program to be run.
 
@@ -100,7 +116,12 @@ SPECIFICATION
 
         Bool. When opening the URL, use a new browser window.
 
-    Exactly one of "url", "file", "dir", "app_path" must be specified.
+    *   new_file_manager_window
+
+        Bool. When opening the directory, use a new file manager window.
+
+    Exactly one of "url", "file", "dir", "prog_path", "prog_name" must be
+    specified.
 
 NOTES
     Currently a single desktop workspace specification can only describe
@@ -127,6 +148,9 @@ SEE ALSO
 HISTORY
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict;
 use warnings;
 
@@ -15,7 +15,7 @@ my $options  = '-output -config -incl';
 # only define options which have no default value 0 or '';
 my %opt      = ( config  => '/etc/myapp.conf' );
 
-CLI::Cmdline::parse(\%opt, $switches, $options) 
+CLI::Cmdline::parse(\%opt, $switches, $options)
 	or die "Try '$0 --help' for more information.\n";
 
 # @ARGV should now contain only positional arguments

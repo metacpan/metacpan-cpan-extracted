@@ -1,5 +1,8 @@
 Revision history for Net-Connection-ncnetstat
 
+0.9.1   2026-08-02/15:45
+        - add missing depeond of Proc::ProcessTable
+
 0.9.0   2026-07-31/22:30
         - Use Net::Connection::Linux_ss on Linux and
           Net::Connection::FreeBSD_sockstat on FreeBSD, falling back to

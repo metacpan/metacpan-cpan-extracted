@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MariaDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000060';
+our $VERSION = '0.000061';
 
 use Carp qw/croak/;
 use IPC::Cmd qw/can_run/;

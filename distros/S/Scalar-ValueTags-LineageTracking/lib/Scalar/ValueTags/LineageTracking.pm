@@ -1,4 +1,4 @@
-package Scalar::ValueTags::LineageTracking 0.002;
+package Scalar::ValueTags::LineageTracking 0.004;
 
 use v5.44;
 
@@ -27,7 +27,7 @@ class Scalar::ValueTags::LineageTracking {
 
     ADJUST {
         croak "Invalid tag_type: must be 'ref' or 'string'"
-        unless $self->&tag_type =~ m/\A(ref|string)\Z/n;
+          unless $self->&tag_type =~ m/\A(ref|string)\Z/n;
     }
 
     ADJUST {
@@ -40,15 +40,19 @@ class Scalar::ValueTags::LineageTracking {
         );
     }
 
-    method add_data_source( $var_ref, $data_source ) {
+    method add_data_sources( $var_ref, $data_sources ) {
         my $tag_type = $self->&tag_type;
 
-        croak 'invalid data_source: must be string'
-          if $tag_type eq 'string' && is_ref($data_source);
-        croak 'invalid data_source: must be unblessed ref'
-          if $tag_type eq 'ref' && !is_plain_ref($data_source);
+        for my $data_source ( $data_sources->@* ) {
+            croak 'invalid data_source: must be string'
+              if $tag_type eq 'string' && is_ref($data_source);
+            croak 'invalid data_source: must be unblessed ref'
+              if $tag_type eq 'ref' && !is_plain_ref($data_source);
 
-        add_value_tag( $self->&_vt_type, $var_ref, $data_source );
+            add_value_tag( $self->&_vt_type, $var_ref, $data_source );
+        }
+
+        return;
     }
 
     method get_data_sources($var_ref) {
@@ -58,27 +62,28 @@ class Scalar::ValueTags::LineageTracking {
         return $tags;
     }
 
-    method set_data_source( $var_ref, $data_source ) {
+    method set_data_sources( $var_ref, $data_sources ) {
         my $tag_type = $self->&tag_type;
 
-        croak 'invalid data_source: must be string'
-          if $tag_type eq 'string' && is_ref($data_source);
-        croak 'invalid data_source: must be unblessed ref'
-          if $tag_type eq 'ref' && !is_plain_ref($data_source);
+        my $prev_data_sources = $self->get_data_sources($var_ref);
 
-        my $vt_type = $self->&_vt_type;
         clear_value_tags( $vt_type, $var_ref );
-        add_value_tag( $vt_type, $var_ref, $data_source );
+        for my $data_source ( $data_sources->@* ) {
+            croak 'invalid data_source: must be string'
+              if $tag_type eq 'string' && is_ref($data_source);
+            croak 'invalid data_source: must be unblessed ref'
+              if $tag_type eq 'ref' && !is_plain_ref($data_source);
+
+            add_value_tag( $vt_type, $var_ref, $data_source );
+        }
+
+        return $prev_data_sources;
     }
 
     method clear_data_sources($var_ref) {
+        my $prev_data_sources = $self->get_data_sources($var_ref);
         clear_value_tags( $self->&_vt_type, $var_ref );
-    }
-
-    method get_and_clear_data_sources($var_ref) {
-        my $tags = $self->get_data_sources($var_ref);
-        $self->clear_data_sources($var_ref);
-        return $tags;
+        return $prev_data_sources;
     }
 }
 
@@ -92,41 +97,59 @@ Scalar::ValueTags::LineageTracking - track data lineages using ValueTags
 =head1 SYNOPIS
 
     # setup: choose type of data to store in tags
-    my $dt = Scalar::ValueTags::LineageTracking->new( tag_type => 'string' );
-    my $dt = Scalar::ValueTags::LineageTracking->new( tag_type => 'ref' );
+    my $lt = Scalar::ValueTags::LineageTracking->new( tag_type => 'string' );
+    my $lt = Scalar::ValueTags::LineageTracking->new( tag_type => 'ref' );
 
     # default tag_type: string
-    my $dt = Scalar::ValueTags::LineageTracking->new();
+    my $lt = Scalar::ValueTags::LineageTracking->new();
 
     ### append tracking data sources when data is received from external sources
     my $names = $dbh->selectcol_arrayref('select name from user where user_id = %s", undef, $id);
     my $name = $names->[0];
 
     # using 'ref' tag_type
-    $dt->add_data_source(\$name,
-        { table => 'user', column => 'name', id => $id, file => __FILE__, line => __LINE__ }
+    $lt->add_data_sources(\$name,
+        [
+            { table => 'user', column => 'name', id => $id, file => __FILE__, line => __LINE__ },
+            ...,
+        ]
     );
 
     # using 'string' tag_type
     my $json = JSON->new->utf8->canonical->pretty(0);
-    $dt->add_data_source(\$name,
-        $json->encode( { table => 'user', column => 'name', id => $id, file => __FILE__, line => __LINE__ } )
+    $lt->add_data_sources( \$name,
+        [
+            $json->encode( { table => 'user', column => 'name', id => $id, file => __FILE__, line => __LINE__ } ),
+            ...,
+        ],
     );
 
     ### clear previous data sources and set data source
-    $dt->set_data_source( \$var, { table => 'user', column => 'name' } ); # 'ref' tag_type
-    $dt->set_data_source( \$var, $json->encode( { table => 'user', column => 'name' } ) ); # 'string' tag_type
+    # 'ref' tag_type
+    $lt->set_data_sources( \$name,
+        [
+            { table => 'user', column => 'name' },
+            ...,
+        ]
+    );
+    # 'string' tag_type
+    $lt->set_data_sources( \$name,
+        [
+            $json->encode( { table => 'user', column => 'name' } ),
+            ...,
+        ]
+    );
 
     ### data sources are propagated any time data is used
-    $dt->add_data_source(\$name, 'tag-one');
-    $dt->add_data_source(\$honorif, 'tag-two');
+    $lt->add_data_source(\$name, 'tag-one');
+    $lt->add_data_source(\$honorif, 'tag-two');
     my $salutation = "Hello, $honorif $name";
 
     # returns data sources set on both $honorif and $name:
-    my $data_sources = get_data_sources(\$salutation);
+    my $sources = $lt->get_data_sources(\$salutation);
 
     ### retrieve and clear data sources, for reporting
-    my $sources = $dt->get_and_clear_data_sources(\$salutation);
+    my $sources = $lt->get_and_clear_data_sources(\$salutation);
     send_lineage( { sources => $sources, var => 'salutation', file => __FILE__, line => __LINE__ } );
 
 =head1 DESCRIPTION
@@ -144,49 +167,88 @@ The tracking data may be either an unblessed Perl reference or a serialized data
 string, depending on the C<tag_type> parameter.
 
 When the tracking items are propagated, they are de-duplicated using either the
-string or the refaddr of the data structure that was set in C<set_data_source>.
+string or the refaddr of the data structure that was set in C<set_data_sources>.
 
 The tracking data may be formatted in any way, such as OpenLineage.
 
 =head2 Implementation
 
-C<LineageTracking> uses the C<SVTAGS_UNIQUE_REF_ARRAY> behavior, which allows arbitrary
-references to data structures or serialized data strings to be added to the value magic,
-and de-duplicates the structures when propagating them to subsequent data values. If
-the data structure references are used, they are de-duplicated by C<refaddr> of the
-structure.
+For the "hash" C<tag_type>, the C<SVTAGS_UNIQUE_HASH> behavior is used, allowing
+string-serialized data to be used as tags. The tags are de-duplicated by the
+string value, so the serialization must generate canonical strings.
 
-=head1 FUNCTIONS
+For the "ref" C<tag_type>, the C<SVTAGS_UNIQUE_REF_ARRAY> behavior is used, allowing
+any arbitray Perl reference to be used as tags. The tags are de-duplicated by the
+C<refaddr> of the reference rather than the contents, so identical tags must use
+the same Perl reference.
 
-=head2 set_data_source
+=head1 PARAMETERS
 
-    # using string
-    set_data_source( \$var, JSON->encode( { this => 1, that => 2 } );
+=head2 tag_type
 
-    # using Perl reference
-    set_data_source( \$var, { this => 1, that => 2 } );
+The C<tag_type> determines the type of the tags passed to L<Scalar::ValueTags>.
 
-Set the data source for the value of the given C<$var> to be the given data structure.
+=over
 
-=head2 get_data_sources
+=item * "string"
 
-    $data_sources = get_data_sources(\$var);
-    for my $data_source (@$data_sources) { ... }
+Each value tag must be a string suitable for use as a hash key. De-duplication is
+done automatically since the string is used as a hash key.
 
-Returns arrayref of all data sources inherited by value in given C<$var>.
+=item * "ref"
+
+Each value tag must be a Perl reference. De-duplication is done by the C<refaddr>
+of the reference.
+
+=back
+
+=head1 METHODS
+
+=head2 add_data_sources
+
+    # using 'string' tag type
+    $lt->add_data_sources( \$var, [ $string1, $string2, ... ] );
+
+    # using 'ref' tag type
+    $lt->add_data_sources( \$var, [ { this => 1 }, { that => 2 } ] );
+
+Append the given data sources to the value of the given C<$var>. Each
+data source must match the L<tag_type> set upon instantiation.
+
+Does not return anything.
 
 =head2 clear_data_sources
 
-    clear_data_sources(\$var);
+    my $data_sources = $lt->clear_data_sources(\$var);
+    for my $data_source (@$data_sources) { ... }
 
-Clears all data sources on value in given C<$var>.
+Clears all data sources on the value in given C<$var>.
 
-=head2 export_and_clear_data_sources
+Returns an arrayref of all of the data sources that previously existed
+on the value in C<$var>.
 
-    export_and_clear_data_sources( \$var, { sink => 'database', table => 'user', id => $id } );
+=head2 get_data_sources
 
-Captures and sends the tracking data from C<$var>, adding the given metadata to indicate
-where the data is being exported from.
+    my $data_sources = $lt->get_data_sources(\$var);
+    for my $data_source (@$data_sources) { ... }
+
+Returns an arrayref of all data sources set for the value in the given C<$var>.
+Includes all propagated tags from all data values that were used to calculate
+the value of C<$var>.
+
+=head2 set_data_sources
+
+    # using 'string' tag type
+    my $prev_sources = $lt->set_data_sources( \$var, [ $string1, $string2, ... ] );
+
+    # using 'ref' tag type
+    my $prev_sources = $lt->set_data_sources( \$var, [ { this => 1 }, { that => 2 } ] );
+
+Set the data sources for the value of the given C<$var> to be the given data
+sources, clearing any pervious data sources. Each data source must match the
+L<tag_type> set upon instantiation.
+
+Returns an arrayref of the previous data sources that were set on the value in C<$var>.
 
 =head1 LICENSE
 

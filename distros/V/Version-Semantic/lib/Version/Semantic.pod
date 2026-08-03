@@ -30,6 +30,11 @@ The C<semver_re()> class method provides the regular expression that is used
 by the C<parse()> method. The C<parse()> method adds a C<\A> anchor at the
 beginning and a C<\z> anchor at the end of the regular expression pattern.
 
+The C<parse()> method returns C<undef>, if its string parameter (the first
+parameter) cannot be parsed. The C<parse()> method croaks, if its string
+parameter cannot be parse and if its options hash reference parameter (the
+second parameter) has a C<fatal> boolean option that is true.
+
 The class has a usual C<new()> constructor method (class method) to create
 objects from their named attributes.
 

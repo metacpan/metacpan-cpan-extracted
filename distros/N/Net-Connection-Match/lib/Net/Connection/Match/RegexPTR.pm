@@ -17,7 +17,6 @@ Version 0.0.0
 
 our $VERSION = '0.0.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::RegexPTR;
@@ -98,57 +97,50 @@ This is a array of PTRs to match in for the local side.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# run some basic checks to make sure we have the minimum stuff required to work
-	if (
-		( ! defined( $args{ptrs} ) ) &&
-		( ! defined( $args{fptrs} ) ) &&
-		( ! defined( $args{lptrs} ) )
-		){
-		die ('No [fl]ptrs key specified in the argument hash');
+	if (   ( !defined( $args{ptrs} ) )
+		&& ( !defined( $args{fptrs} ) )
+		&& ( !defined( $args{lptrs} ) ) )
+	{
+		die('No [fl]ptrs key specified in the argument hash');
 	}
 	if (
-		(
-		 defined( $args{ptrs} ) &&
-		 ( ! defined( $args{ptrs}[0] ) )
-		 ) &&
-		(
-		 defined( $args{lptrs} ) &&
-		 ( ! defined( $args{lptrs}[0] ) )
-		 ) &&
-		(
-		 defined( $args{fptrs} ) &&
-		 ( ! defined( $args{fptrs}[0] ) )
-		 )
-		){
-		die ('No PTRs defined in any of the [fl]ptrs arrays');
-	}
+		( defined( $args{ptrs} ) && ( !defined( $args{ptrs}[0] ) ) )
+		&& ( defined( $args{lptrs} )
+			&& ( !defined( $args{lptrs}[0] ) ) )
+		&& ( defined( $args{fptrs} )
+			&& ( !defined( $args{fptrs}[0] ) ) )
+		)
+	{
+		die('No PTRs defined in any of the [fl]ptrs arrays');
+	} ## end if ( ( defined( $args{ptrs} ) && ( !defined...)))
 
-    my $self = {
-				ptrs=>[],
-				lptrs=>[],
-				fptrs=>[],
-				resolver=>Net::DNS::Resolver->new,
-				};
-    bless $self;
+	my $self = {
+		ptrs     => [],
+		lptrs    => [],
+		fptrs    => [],
+		resolver => Net::DNS::Resolver->new,
+	};
+	bless $self;
 
-	if ( defined( $args{ptrs}[0] ) ){
-		$self->{ptrs}=$args{ptrs};
+	if ( defined( $args{ptrs}[0] ) ) {
+		$self->{ptrs} = $args{ptrs};
 	}
-	if ( defined( $args{lptrs}[0] ) ){
-		$self->{lptrs}=$args{lptrs};
+	if ( defined( $args{lptrs}[0] ) ) {
+		$self->{lptrs} = $args{lptrs};
 	}
-	if ( defined( $args{fptrs}[0] ) ){
-		$self->{fptrs}=$args{fptrs};
+	if ( defined( $args{fptrs}[0] ) ) {
+		$self->{fptrs} = $args{fptrs};
 	}
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -167,80 +159,80 @@ will be used for resolving the address.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $object=$_[1];
+sub match {
+	my $self   = $_[0];
+	my $object = $_[1];
 
-	if ( !defined( $object ) ){
+	if ( !defined($object) ) {
 		return 0;
 	}
 
-	if ( ref( $object ) ne 'Net::Connection' ){
+	if ( ref($object) ne 'Net::Connection' ) {
 		return 0;
 	}
 
-	my $l_ptr=$object->local_ptr;
-	my $f_ptr=$object->foreign_ptr;
+	my $l_ptr = $object->local_ptr;
+	my $f_ptr = $object->foreign_ptr;
 
-	if ( defined( $l_ptr ) ){
+	if ( defined($l_ptr) ) {
 		# If we have one, convert it to lower case for easier processing.
-		$l_ptr=lc( $l_ptr )
-	}else{
+		$l_ptr = lc($l_ptr);
+	} else {
 		# We don't have it. Uppercase default will prevent it from being matched.
-		$l_ptr='NOTFOUND';
+		$l_ptr = 'NOTFOUND';
 		# See if we can look it up.
-		my $answer=$self->{resolver}->search( $object->local_host );
-		if ( defined( $answer ) ){
+		my $answer = $self->{resolver}->search( $object->local_host );
+		if ( defined($answer) ) {
 			# search the whole answer section as the first RR may be a CNAME
-			foreach my $rr ( $answer->answer ){
-				if ( $rr->type eq 'PTR' ){
-					$l_ptr=lc( $rr->ptrdname );
+			foreach my $rr ( $answer->answer ) {
+				if ( $rr->type eq 'PTR' ) {
+					$l_ptr = lc( $rr->ptrdname );
 					last;
 				}
 			}
 		}
-	}
+	} ## end else [ if ( defined($l_ptr) ) ]
 
-	if ( defined( $f_ptr ) ){
+	if ( defined($f_ptr) ) {
 		# If we have one, convert it to lower case for easier processing.
-		$f_ptr=lc( $f_ptr )
-	}else{
+		$f_ptr = lc($f_ptr);
+	} else {
 		# We don't have it. Uppercase default will prevent it from being matched.
-		$f_ptr='NOTFOUND';
+		$f_ptr = 'NOTFOUND';
 		# See if we can look it up.
-		my $answer=$self->{resolver}->search( $object->foreign_host );
-		if ( defined( $answer ) ){
+		my $answer = $self->{resolver}->search( $object->foreign_host );
+		if ( defined($answer) ) {
 			# search the whole answer section as the first RR may be a CNAME
-			foreach my $rr ( $answer->answer ){
-				if ( $rr->type eq 'PTR' ){
-					$f_ptr=lc( $rr->ptrdname );
+			foreach my $rr ( $answer->answer ) {
+				if ( $rr->type eq 'PTR' ) {
+					$f_ptr = lc( $rr->ptrdname );
 					last;
 				}
 			}
 		}
-	}
+	} ## end else [ if ( defined($f_ptr) ) ]
 
-	foreach my $regex ( @{ $self->{ptrs} } ){
-		if ( $l_ptr =~ /$regex/ ){
+	foreach my $regex ( @{ $self->{ptrs} } ) {
+		if ( $l_ptr =~ /$regex/ ) {
 			return 1;
 		}
-		if ( $f_ptr =~ /$regex/ ){
-			return 1;
-		}
-	}
-	foreach my $regex ( @{ $self->{lptrs} } ){
-		if ( $l_ptr =~ /$regex/ ){
+		if ( $f_ptr =~ /$regex/ ) {
 			return 1;
 		}
 	}
-	foreach my $regex ( @{ $self->{fptrs} } ){
-		if ( $f_ptr =~ /$regex/ ){
+	foreach my $regex ( @{ $self->{lptrs} } ) {
+		if ( $l_ptr =~ /$regex/ ) {
+			return 1;
+		}
+	}
+	foreach my $regex ( @{ $self->{fptrs} } ) {
+		if ( $f_ptr =~ /$regex/ ) {
 			return 1;
 		}
 	}
 
 	return 0;
-}
+} ## end sub match
 
 =head1 AUTHOR
 
@@ -331,4 +323,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

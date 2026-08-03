@@ -1,0 +1,8 @@
+Revision history for Reverse-Proxy
+
+0.02    2026-08-03
+        - t/03-errors.t: make the DNS-failure test robust on CPAN Testers hosts
+          whose resolvers hijack NXDOMAIN and answer a parking page 
+
+0.01    2026-08-02
+        First version.

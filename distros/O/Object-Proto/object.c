@@ -61,6 +61,7 @@ typedef struct {
     U8 has_clearer;                 /* Generate clear_X method */
     U8 has_predicate;               /* Generate has_X method */
     U8 is_weak;                     /* Weaken references when stored */
+    U8 is_private;                  /* Accessor only callable from the owning package */
     U8 has_checks;                  /* is_readonly | is_required | has_coerce | TYPE_CUSTOM — skip block when 0 */
     SV *clearer_name;               /* Custom clearer method name */
     SV *predicate_name;             /* Custom predicate method name */
@@ -542,6 +543,8 @@ static SlotSpec* parse_slot_spec(pTHX_ const char *spec_str, STRLEN len) {
                 spec->is_lazy = 1;
             } else if (mod_len == 4 && strncmp(mod_start, "weak", 4) == 0) {
                 spec->is_weak = 1;
+            } else if (mod_len == 7 && strncmp(mod_start, "private", 7) == 0) {
+                spec->is_private = 1;
             } else if (mod_len == 7 && strncmp(mod_start, "clearer", 7) == 0) {
                 spec->has_clearer = 1;
                 /* Default clearer name: clear_<property> */
@@ -642,6 +645,7 @@ static SlotSpec* clone_slot_spec(pTHX_ const SlotSpec *src) {
     dst->is_readonly = src->is_readonly;
     dst->is_lazy     = src->is_lazy;
     dst->is_weak     = src->is_weak;
+    dst->is_private  = src->is_private;
     dst->has_default  = src->has_default;
     dst->has_trigger  = src->has_trigger;
     dst->has_coerce   = src->has_coerce;
@@ -710,6 +714,7 @@ static SlotSpec* merge_slot_spec(pTHX_ const SlotSpec *parent, const SlotSpec *o
     if (override->is_readonly) merged->is_readonly = 1;
     if (override->is_lazy)     merged->is_lazy = 1;
     if (override->is_weak)     merged->is_weak = 1;
+    if (override->is_private)  merged->is_private = 1;
     
     /* Clearer/predicate */
     if (override->has_clearer) {
@@ -2204,6 +2209,20 @@ static void install_accessor(pTHX_ const char *class_name, const char *prop_name
 }
 
 /* XS fallback accessor with type checking */
+/* Enforce a :private attribute - its accessor may only be called from code
+ * compiled in the owning package. In an XSUB (and in a custom op) PL_curcop is
+ * the caller's cop, so its stash names the calling package. */
+static void object_check_private(pTHX_ SlotSpec *spec, ClassMeta *meta) {
+    HV *stash;
+    const char *caller;
+    if (!spec->is_private) return;
+    stash  = PL_curcop ? CopSTASH(PL_curcop) : NULL;
+    caller = (stash && HvNAME(stash)) ? HvNAME(stash) : "";
+    if (strEQ(caller, meta->class_name)) return;
+    croak("cannot call private attribute %s on %s from %s",
+          spec->name, meta->class_name, caller);
+}
+
 XS_INTERNAL(xs_accessor_typed_fallback) {
     dXSARGS;
     SlotOpData *data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
@@ -2212,6 +2231,8 @@ XS_INTERNAL(xs_accessor_typed_fallback) {
     SlotSpec *spec = meta->slots[idx];
     SV *self = ST(0);
     AV *av;
+
+    object_check_private(aTHX_ spec, meta);
 
     if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVAV) {
         croak("Not an object");
@@ -2350,6 +2371,10 @@ static OP* accessor_typed_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *cko
     OP *newop;
 
     PERL_UNUSED_ARG(namegv);
+
+    /* Private slots keep the XSUB (which enforces the caller check) rather than
+     * being inlined to a custom op that would bypass it. */
+    if (data->meta->slots[idx]->is_private) return entersubop;
 
     pushop = cUNOPx(entersubop)->op_first;
     if (!OpHAS_SIBLING(pushop)) {
@@ -3425,7 +3450,7 @@ XS_INTERNAL(xs_define) {
         if (spec->is_lazy) meta->has_any_lazy = 1;
 
         /* Install accessor method - typed or plain depending on spec */
-        if (spec->has_type || spec->has_trigger || spec->has_coerce || spec->is_readonly || spec->is_lazy || spec->is_required || spec->is_weak) {
+        if (spec->has_type || spec->has_trigger || spec->has_coerce || spec->is_readonly || spec->is_lazy || spec->is_required || spec->is_weak || spec->is_private) {
             install_accessor_typed(aTHX_ class_pv, spec->name, idx, meta);
         } else {
             install_accessor(aTHX_ class_pv, spec->name, idx);

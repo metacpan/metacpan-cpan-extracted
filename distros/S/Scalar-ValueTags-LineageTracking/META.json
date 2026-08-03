@@ -36,15 +36,22 @@
    "provides" : {
       "Scalar::ValueTags::LineageTracking" : {
          "file" : "lib/Scalar/ValueTags/LineageTracking.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Zhtwn/Scalar-ValueTags-LineageTracking/issues"
+      },
       "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+         "http://dev.perl.org/licenses/",
+         "https://dev.perl.org/licences/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/Zhtwn/Scalar-ValueTags-LineageTracking.git"
+      }
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

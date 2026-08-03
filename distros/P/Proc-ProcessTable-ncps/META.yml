@@ -19,19 +19,22 @@ no_index:
     - t
     - inc
 requires:
+  BorderStyle::ASCII::None: '0.014'
   ColorTheme::NoColor: '0.003'
   Data::Unixish::Apply: '1.572'
-  Getopt::Long: v0.0.0
-  List::Util: '1.63'
+  Getopt::Long: '0'
+  List::Util: '0'
   POSIX: '0'
   Proc::ProcessTable: '0.634'
-  Proc::ProcessTable::InfoString: v0.1.0
+  Proc::ProcessTable::InfoString: v0.2.0
   Proc::ProcessTable::Match: v0.1.0
   Statistics::Basic: '1.6611'
   Term::ANSIColor: '5.01'
+  Text::ANSI::Util: '0.234'
   Text::ANSITable: '0.501'
-  perl: '5.006'
+  Text::WideChar::Util: '0.172'
+  perl: '5.010001'
 resources:
   repository: https://github.com/VVelox/Proc-ProcessTable-ncps
-version: v0.2.1
+version: v0.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

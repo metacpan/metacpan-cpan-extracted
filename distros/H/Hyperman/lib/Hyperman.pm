@@ -1,10 +1,10 @@
 package Hyperman;
 
-use 5.008003;
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -60,9 +60,12 @@ interfaces (F<xs/>).
         reuseport      => 0,           # per-worker listeners (SO_REUSEPORT;
                                        # Linux accept scaling - regressed on
                                        # macOS, keep off there)
-        access_log     => sub {        # optional; called after each response
-            my ($env, $status, $bytes) = @_;   # $bytes undef for streaming
-        },
+        access_log     => '/var/log/app.log',  # fast built-in Combined-log
+                                       # writer (a path, or an open handle
+                                       # like \*STDERR). Or pass a coderef
+                                       # for custom logging:
+                                       #   sub { my ($env,$status,$bytes)=@_ }
+                                       # ($bytes is undef for streaming)
         max_requests_per_worker => 0,  # recycle a worker after N requests
         shutdown_grace => 30,          # bound on graceful drain (secs)
         affinity       => 0,           # pin worker i to core i%ncpu (Linux)
@@ -79,6 +82,24 @@ interfaces (F<xs/>).
 
 The event backend is chosen automatically (kqueue, io_uring, epoll, then poll) and can
 be forced with C<HYPERMAN_BACKEND>.
+
+=head3 access_log
+
+When C<access_log> is a path or an open filehandle, Hyperman formats an
+Apache-style Combined Log Format line
+
+    host - user [dd/Mon/YYYY:HH:MM:SS +ZZZZ] "METHOD URI PROTO" status bytes "referer" "ua"
+
+entirely in C and appends it to the file, with no per-request Perl call on
+the hot path. The timestamp is cached and recomputed at most once a second,
+lines are buffered and flushed once per event-loop wakeup, and a file target
+is opened once in the parent and shared C<O_APPEND> across workers so their
+lines stay interleaved without tearing. Quoted fields are escaped, so a
+hostile URI or User-Agent cannot forge a log line. C<REMOTE_ADDR> is captured
+at accept and is also visible to the app in C<$env>.
+
+Pass a coderef instead (C<< sub { my ($env, $status, $bytes) = @_ } >>) for
+full control; that path calls back into Perl for every response.
 
 =head2 HTTP/2
 

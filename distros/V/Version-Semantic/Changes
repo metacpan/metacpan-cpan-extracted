@@ -1,5 +1,12 @@
 Release history for Version-Semantic
 
+v2.0.0    2026-08-03T08:43:10Z
+          - BREAKING CHANGE: parse() returns undef unless it is fatalized
+          - Use Test2::V1 in some test scripts
+          - Change VERSION assignment statement
+          - Remove pre-release logic from Makefile.PL
+          - Remove useless imports in test script
+
 v1.3.0    2026-02-27T10:52:58Z
           - Add semver_re() class method
           - Harden the parse() factory method

@@ -38,7 +38,7 @@ is( $info_string_handler->info('some string'),  '', 'non-ref returns empty strin
 # state mapping, on a OS with no flag handling so only the state shows
 #
 {
-	local $^O = 'netbsd';
+	local $^O = 'solaris';
 	my %state_to_expected = (
 							 'sleep'       => 'S ',
 							 'zombie'      => 'Z ',
@@ -114,10 +114,124 @@ is( $info_string_handler->info('some string'),  '', 'non-ref returns empty strin
 }
 
 #
+# OpenBSD, which provides no flags field and no wchan field, and which
+# reports the state in upper case
+#
+{
+	local $^O = 'openbsd';
+
+	# only the fields OpenBSD actually provides
+	my $openbsd_proc = sub {
+		return bless(
+					 {
+					  pid    => 999999999,
+					  rss    => 4096,
+					  sess   => 1000,
+					  ttynum => -1,
+					  state  => 'SLEEP',
+					  @_,
+					  },
+					 'Proc::ProcessTable::Process'
+					 );
+	};
+
+	my %openbsd_state_to_expected = (
+									 'IDLE'    => 'I ',
+									 'RUN'     => 'R ',
+									 'SLEEP'   => 'S ',
+									 'STOP'    => 'T ',
+									 'ZOMBIE'  => 'Z ',
+									 'UNKNOWN' => '? ',
+									 );
+	foreach my $state ( sort( keys(%openbsd_state_to_expected) ) ) {
+		is( $info_string_handler->info( $openbsd_proc->( state => $state ) ),
+			$openbsd_state_to_expected{$state}, "openbsd: upper case state '$state'" );
+	}
+
+	is( $info_string_handler->info( $openbsd_proc->( sess => 999999999 ) ), 'Ss ', 'openbsd: session leader' );
+	is( $info_string_handler->info( $openbsd_proc->( ttynum => 1032 ) ),    'S+ ', 'openbsd: has controlling tty' );
+	is( $info_string_handler->info( $openbsd_proc->( rss => 0 ) ),          'SO ', 'openbsd: rss 0 gets O' );
+	is( $info_string_handler->info( $openbsd_proc->() ),                    'S ',  'openbsd: missing wchan field handled' );
+
+	# NODEV may arrive as the unsigned form instead of -1
+	is( $info_string_handler->info( $openbsd_proc->( ttynum => 4294967295 ) ), 'S ', 'openbsd: unsigned NODEV is no tty' );
+}
+
+#
+# NetBSD and DragonFly, both procfs based, where the flags are a comma
+# separated word list, no rss is provided, and the state field holds the
+# wait channel
+#
+foreach my $procfs_bsd ( 'netbsd', 'dragonfly' ) {
+	local $^O = $procfs_bsd;
+
+	# only the fields the procfs based implementations provide
+	my $procfs_proc = sub {
+		return bless(
+					 {
+					  pid    => 999999999,
+					  sess   => 1000,
+					  ttynum => 34816,
+					  flags  => 'noflags',
+					  state  => 'nochan',
+					  wchan  => 'nochan',
+					  @_,
+					  },
+					 'Proc::ProcessTable::Process'
+					 );
+	};
+
+	# no rss field there, so no O, and the state is the wait channel
+	is( $info_string_handler->info( $procfs_proc->() ), '? ', "$procfs_bsd: no rss or state to work with" );
+	is( $info_string_handler->info( $procfs_proc->( state => 'select', wchan => 'select' ) ),
+		'? select', "$procfs_bsd: wait channel shown" );
+
+	# a wait channel that happens to share a name with a state must not be
+	# mistaken for one
+	is( $info_string_handler->info( $procfs_proc->( state => 'wait', wchan => 'wait' ) ),
+		'? wait', "$procfs_bsd: wait channel named like a state stays ?" );
+	is( $info_string_handler->info( $procfs_proc->( flags => 'ctty' ) ),      '?+ ',  "$procfs_bsd: ctty" );
+	is( $info_string_handler->info( $procfs_proc->( flags => 'sldr' ) ),      '?s ',  "$procfs_bsd: sldr" );
+	is( $info_string_handler->info( $procfs_proc->( flags => 'ctty,sldr' ) ), '?s+ ', "$procfs_bsd: ctty and sldr" );
+}
+
+#
+# ancient FreeBSD, where the procfs implementation was used, the flags are
+# a word list instead of hex, and the state field holds the wait channel
+#
+{
+	local $^O = 'freebsd';
+	is( $info_string_handler->info( fake_proc( flags => 'ctty,sldr', state => 'select' ) ),
+		'?s+ ', 'freebsd: word list flags' );
+	is( $info_string_handler->info( fake_proc( flags => 'noflags', state => 'nochan' ) ),
+		'? ', 'freebsd: noflags' );
+}
+
+#
+# MidnightBSD, which uses the same kvm implementation as FreeBSD
+#
+{
+	local $^O = 'midnightbsd';
+	is( $info_string_handler->info( fake_proc( flags => '0x2' ) ),  'S+ ', 'midnightbsd: has controlling tty' );
+	is( $info_string_handler->info( fake_proc( flags => '0x800' ) ), 'SX ', 'midnightbsd: traced' );
+}
+
+#
+# Debian GNU/kFreeBSD, where the Linux implementation is used, so it must
+# not be treated as FreeBSD despite the name
+#
+{
+	local $^O = 'gnukfreebsd';
+	is( $info_string_handler->info( fake_proc( flags => 0x4, ttynum => 0 ) ), 'SE ', 'gnukfreebsd: Linux style flags' );
+	is( $info_string_handler->info( fake_proc( flags => 0, sess => 999999999, ttynum => 0 ) ),
+		'Ss ', 'gnukfreebsd: session leader' );
+}
+
+#
 # colors
 #
 {
-	local $^O = 'netbsd';
+	local $^O = 'solaris';
 	require Term::ANSIColor;
 	my $colored_handler = Proc::ProcessTable::InfoString->new( { flags_color => 'red', wchan_color => 'blue' } );
 	my $expected =

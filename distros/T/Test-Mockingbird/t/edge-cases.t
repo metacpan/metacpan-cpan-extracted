@@ -332,43 +332,34 @@ subtest 'mock_scoped(): () prototype function -- no warning, correct prototype' 
 	ok !@warnings, 'no warnings during mock_scoped on () prototype function';
 };
 
-subtest 'spy(): installing on () prototype function -- behaviour documented' => sub {
-	# spy() installs its own wrapper coderef directly without going through
-	# mock(), so set_prototype is NOT applied by spy().  This test documents
-	# the current behaviour so any future fix to spy() is caught by
-	# regression: if spy() is ever fixed, the wrapper's prototype will be
-	# '' and the test description will still hold.
+subtest 'spy(): preserves prototype -- no mismatch warning, _ prototype binds $_' => sub {
+	# spy() now applies set_prototype to its wrapper, so installing a spy
+	# on a prototyped function emits no "Prototype mismatch" warning and
+	# the wrapper carries the correct prototype for call-site arg binding.
 	{
 		package Proto::Edge::Spy;
 		sub fn () { 'orig' }
 	}
 
-	# spy() does NOT call mock() internally, so set_prototype is not applied.
-	# Installing a spy on a () prototype function therefore still emits a
-	# "Prototype mismatch" warning -- this is the known limitation documented
-	# here so that a future fix to spy() will be caught by regression.
 	my @warnings;
 	local $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
 	my $spy = spy 'Proto::Edge::Spy::fn';
 
-	# Direct literal calls to a () prototype function are constant-folded
-	# at compile time.  Use ->can() for a runtime lookup that goes through
-	# the spy wrapper.
+	# () prototype functions are constant-folded at compile time.
+	# Use ->can() for a runtime call that goes through the spy wrapper.
 	Proto::Edge::Spy->can('fn')->();
 	my @calls = $spy->();
 
 	is scalar @calls, 1, 'spy captured the call';
 	is $calls[0][0], 'Proto::Edge::Spy::fn', 'method name recorded';
 
-	# Exactly one "Prototype mismatch" warning is expected because spy()
-	# installs its wrapper without applying set_prototype.
-	is scalar(grep { /Prototype mismatch/ } @warnings), 1,
-		'spy() emits exactly one prototype-mismatch warning (known limitation)';
+	# set_prototype is now applied -- no prototype-mismatch warning
+	is scalar(grep { /Prototype mismatch/ } @warnings), 0,
+		'spy() emits no prototype-mismatch warning after fix';
 
 	restore_all();
 
-	# Reinstating the original coderef also restores its () prototype
 	is prototype(\&Proto::Edge::Spy::fn), '',
 		'original () prototype restored after spy removed';
 };

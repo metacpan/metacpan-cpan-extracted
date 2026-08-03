@@ -8,7 +8,6 @@ Makefile.PL
 README
 dist.ini
 lib/App/KDEActivityUtils.pm
-script/get-current-kde-activity
 script/getkact
 script/list-kde-activities
 script/move-windows-to-kde-activity

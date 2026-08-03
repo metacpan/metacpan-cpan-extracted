@@ -34,6 +34,27 @@ results in output like...
 55631 Ss+ wait
 ```
 
+How much is shown depends on what `Proc::ProcessTable` reports for the
+OS in question.
+
+| OS                   | Flags                   |
+|----------------------|-------------------------|
+| FreeBSD, MidnightBSD | O, E, s, L, +, c, F, X  |
+| Linux, GNU/kFreeBSD  | O, E, s, +, F, X        |
+| OpenBSD              | O, s, +                 |
+| NetBSD, DragonFly    | s, +                    |
+| anything else        | O                       |
+
+For printing what the states and flags mean, tailored to the OS it is
+running on, there is `proc_infostring_describe`, which does not require
+creating a object first, making it handy for `--help` output.
+
+```
+use Proc::ProcessTable::InfoString qw(proc_infostring_describe);
+
+print proc_infostring_describe();
+```
+
 # INSTALLATION
 
 To install this module, run the following commands:

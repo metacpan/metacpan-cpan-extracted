@@ -3,14 +3,14 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 require XSLoader;
-use warnings FATAL => 'all';
 use autodie ':default';
+use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2hoa aoh2hoh aov assign auc auroc bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table);
+our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
 
 # ===========================================================================
@@ -25,11 +25,10 @@ our @EXPORT = @EXPORT_OK;
 # It prints that function's own section of the documentation -- the same text
 # as the matching heading in README.md -- to STDOUT, and returns.
 #
-# The pure Perl functions below additionally accept '?' or 'h' in place of
-# their arguments, which prints the same text and then dies (a bare 'h' where
-# an argument was expected might have been meant as data, so returning a
-# result would be a guess).  The XS functions deliberately do not do this: it
-# cannot be told apart from a column or file that really is named 'h'.
+# h() is the only way in.  No function reads its own arguments for a help flag:
+# a bare 'h' or '?' cannot be told apart from a column, file or option value
+# that really is that string, and one help route that works everywhere beats
+# two that behave differently depending on whether the callee is XS or Perl.
 #
 # The help text is not duplicated in the source.  It is rendered from this
 # file's own POD at run time (that POD is generated from README.md by
@@ -50,6 +49,7 @@ my %HELP_ALIAS = (
 	_cols_drop        => 'drop_cols',
 	_cols_rename      => 'rename_cols',
 	_drop_dups_core   => 'drop_duplicates',
+	_aoh_key_union    => 'drop_duplicates',
 	_qcut_core        => 'qcut',
 	_interp_column_xs => 'interpolate',
 	_parse_csv_file   => 'read_table',
@@ -59,25 +59,6 @@ my %HELP_ALIAS = (
 	_df_shape         => 'agg',
 	_xtab             => 'cramers_v',
 );
-
-# Set to 0 to turn the help option off for code that has to pass a bare 'h'
-# or '?' as a column name, a file name or an option value.
-our $HELP = 1;
-
-# _want_help(@args) -- true when any plain-scalar argument is exactly '?' or
-# 'h'.  References (data frames, coderefs, col() objects) and undef never
-# trigger help, so a column literally named 'h' is the only way to get a false
-# positive, and only when it is passed as a bare string.  $HELP = 0 switches
-# the whole thing off for code that has to do that; h() is unaffected either
-# way, since it takes the name rather than reading the arguments.
-sub _want_help {
-	return 0 unless $HELP;
-	for my $arg (@_) {
-		next if !defined($arg) || ref($arg);
-		return 1 if $arg eq 'h' || $arg eq '?';
-	}
-	return 0;
-}
 
 # _help_show($name) -- print $name's documentation to STDOUT.  Returns the
 # name it showed.
@@ -90,23 +71,10 @@ sub _help_show {
 	return $name;
 }
 
-# _help($name) -- print $name's documentation and die.  This is the '?' / 'h'
-# argument path, reached from the Perl subs and, through call_pv(), from every
-# XSUB.  It dies because a bare 'h' where an argument was expected might have
-# been meant as data, so returning a result would be a guess.  Never returns.
-sub _help {
-	my ($name) = @_;
-	$name = _help_show($name);
-	die "Stats::LikeR"
-	  . (length($name) ? "::$name" : '')
-	  . ": help requested ('?' or 'h'); no computation was done\n";
-}
-
-# h() -- ask for documentation by name rather than by argument.  This is the
-# unambiguous way in: the '?' / 'h' argument cannot be told apart from a column,
-# file or option value that really is the string 'h', but nothing here is open
-# to that reading.  So, unlike the argument form, h() does not die -- you asked
-# for it on purpose, and there is nothing to protect you from.
+# h() -- ask for documentation by name.  It never dies over the name it is
+# given (an undocumented one lists the documented ones instead), and it never
+# stands in the way of a call: no function here reads its arguments for a help
+# flag, so a column, file or option value really named 'h' is just data.
 #
 #     h('bedroc');      # by name
 #     h(*bedroc);       # by name, unquoted
@@ -182,7 +150,6 @@ sub _help_text {
 	my $title  = length($name) ? "Stats::LikeR::$name" : 'Stats::LikeR';
 	$title .= "   (documented under \`$topic')" if $topic ne $name && @sect;
 	my $rule   = '=' x $width;
-	my $call   = length($name) ? $name : 'any function';
 
 	return join('',
 		"\n", $rule, "\n", $title, "\n", $rule, "\n\n",
@@ -264,8 +231,8 @@ sub _help_fallback {
 	my $out = _pod_wrap("There is no documentation section for "
 	                  . (length($name) ? "`$name'" : 'that name')
 	                  . '.'
-	                  . (length($list) ? '  These functions have one, and each'
-	                                   . " takes '?' or 'h' the same way:" : ''),
+	                  . (length($list) ? '  These functions have one, and h()'
+	                                   . ' will show any of them:' : ''),
 	                    $width, 1);
 	return length($list) ? $out . "\n" . $list . "\n" : $out;
 }
@@ -290,11 +257,9 @@ sub _help_general {
 		     . "  h(*quantile);    # by name, unquoted\n"
 		     . "  h(\\&quantile);   # by reference\n"
 		     . "\n"
-		     . _pod_wrap('The pure Perl functions also take \'?\' or \'h\' in place '
-		               . 'of their arguments, which prints the same text and then '
-		               . 'dies. Set $Stats::LikeR::HELP = 0 to switch that off, for '
-		               . 'code that has to pass a column or file really named '
-		               . "'h'.", $width, 1);
+		     . _pod_wrap('h() is the only way to ask: no function reads its own '
+		               . 'arguments for a help flag, so a column, file or option '
+		               . "value really named 'h' is just data.", $width, 1);
 	}
 	my $list = _help_topic_block($width);
 	if (length $list) {
@@ -315,8 +280,7 @@ sub _pod_open {
 	$file = $INC{'Stats/LikeR.pm'} unless defined($file) && -r $file;
 	return undef unless defined($file) && -r $file;
 	my $fh;
-	# autodie is in force for this file, so ask politely
-	eval { open $fh, '<', $file or die "no\n"; 1 } or return undef;
+	open $fh, '<', $file or return undef;
 	return $fh;
 }
 
@@ -767,7 +731,6 @@ sub _html_fold {
 # that this family does not.
 
 sub colnames {
-	_help('colnames') if _want_help(@_);
 	my ($df) = @_;
 	die "colnames: undefined data in first position\n" unless defined $df;
 	my $shape = _df_shape($df, 'colnames');
@@ -794,7 +757,6 @@ sub colnames {
 }
 
 sub rownames {
-	_help('rownames') if _want_help(@_);
 	my ($df) = @_;
 	die "rownames: undefined data in first position\n" unless defined $df;
 	my $shape = _df_shape($df, 'rownames');
@@ -874,7 +836,6 @@ sub rownames {
 # select_cols (rectangular); drop_cols/rename_cols leave ragged frames ragged.
 
 sub _cols_arg {                         # normalise + validate a column list
-	_help('_cols_arg') if _want_help(@_);
 	my ($fn, @a) = @_;
 	my @cols = (@a == 1 && ref $a[0] eq 'ARRAY') ? @{ $a[0] } : @a;
 	die "$fn: at least one column is required\n" unless @cols;
@@ -887,7 +848,6 @@ sub _cols_arg {                         # normalise + validate a column list
 }
 
 sub _aoa_width { # widest row of an AoA (ragged-safe)
-	_help('_aoa_width') if _want_help(@_);
 	my $df = shift;
 	my $w = 0;
 	for my $r (@$df) { $w = scalar @$r if ref $r eq 'ARRAY' && @$r > $w }
@@ -895,7 +855,6 @@ sub _aoa_width { # widest row of an AoA (ragged-safe)
 }
 
 sub _aoa_int_cols { # validate integer positions in range
-	_help('_aoa_int_cols') if _want_help(@_);
 	my ($fn, $df, @cols) = @_;
 	my $w = _aoa_width($df);
 	for my $c (@cols) {
@@ -908,7 +867,6 @@ sub _aoa_int_cols { # validate integer positions in range
 }
 
 sub _present_keys { # union of keys over AoH/HoH rows
-	_help('_present_keys') if _want_help(@_);
 	my ($df, $shape) = @_;
 	my @rows = $shape eq 'AoH' ? @$df : values %$df;
 	my %seen;
@@ -917,7 +875,6 @@ sub _present_keys { # union of keys over AoH/HoH rows
 }
 
 sub _rename_inplace { # VOID-context rename: mutate the source
-	_help('_rename_inplace') if _want_help(@_);
 	my ($df, $shape, $map) = @_;
 	if ($shape eq 'HoA') { # rename the column keys
 		my %vals;                                   # gather-then-set = swap-safe
@@ -942,7 +899,6 @@ sub _rename_inplace { # VOID-context rename: mutate the source
 }
 
 sub select_cols {# shape code passed to the XS: 1 = AoH, 2 = HoH, 3 = AoA
-	_help('select_cols') if _want_help(@_);
 	my $df = shift;
 	die "select_cols: undefined data in first position\n" unless defined $df;
 	my @cols  = _cols_arg('select_cols', @_);
@@ -968,7 +924,6 @@ sub select_cols {# shape code passed to the XS: 1 = AoH, 2 = HoH, 3 = AoA
 }
 
 sub drop_cols {
-	_help('drop_cols') if _want_help(@_);
 	my $df = shift;
 	die "drop_cols: undefined data in first position\n" unless defined $df;
 	my @cols  = _cols_arg('drop_cols', @_);
@@ -996,7 +951,6 @@ sub drop_cols {
 }
 
 sub rename_cols {
-	_help('rename_cols') if _want_help(@_);
 	my $df = shift;
 	die "rename_cols: undefined data in first position\n" unless defined $df;
 	my %map;
@@ -1047,7 +1001,6 @@ sub rename_cols {
 }
 
 sub aoh2hoh {
-	_help('aoh2hoh') if _want_help(@_);
 	my ($aoh, $key) = @_;
 	die 'aoh2hoh: first argument is undefined' unless defined $aoh;
 	die 'aoh2hoh: first argument must be an arrayref of hashrefs'
@@ -1066,6 +1019,128 @@ sub aoh2hoh {
 	}
 	return \%out;
 }
+
+# ===========================================================================
+# h2aoh / aoh2h  --  the flat hash as a two-column frame
+#
+# A plain hash is a two-column table that has been folded shut: every pair is
+# one row, the key in one cell and the value in the other.  value_counts() and
+# table() hand one back, and none of the frame functions will take it, because
+# they all want nested data.  h2aoh unfolds the hash into a real AoH; aoh2h
+# folds an AoH back down.  R spells this pair enframe()/deframe() (tibble);
+# pandas spells it pd.Series(d).rename_axis(..).reset_index(name => ..) and
+# Series.to_dict().
+#
+# The column names are var_name / value_name, the same two options melt() uses
+# to name the columns it emits, since the shape they describe is the same.
+#
+# The pair are exact inverses under their defaults, so
+#     is_deeply( aoh2h( h2aoh(\%h) ), \%h )
+# holds for any flat hash whose keys are defined.
+# ===========================================================================
+
+# _kv_names($caller, \%arg) -- var_name / value_name, defaulted and checked.
+# Shared so the two directions cannot drift apart on the names they agree on.
+sub _kv_names {
+	my ($caller, $arg) = @_;
+	my $var   = defined $arg->{var_name}   ? $arg->{var_name}   : 'variable';
+	my $value = defined $arg->{value_name} ? $arg->{value_name} : 'value';
+	die "$caller: var_name and value_name must differ\n" if $var eq $value;
+	return ($var, $value);
+}
+
+sub h2aoh {
+	my $h = shift;
+	die "h2aoh: first argument is undefined\n" unless defined $h;
+	die "h2aoh: first argument must be a hashref\n" unless ref($h) eq 'HASH';
+	die "h2aoh: arguments after the hash must be name => value pairs\n"
+		if @_ % 2;
+	my %arg   = @_;
+	my %known = ( var_name => 1, value_name => 1, sort => 1 );
+	my @bad   = sort grep { !$known{$_} } keys %arg;
+	die "h2aoh: unknown argument(s): @bad\n" if @bad;
+
+	my ($var_name, $value_name) = _kv_names('h2aoh', \%arg);
+
+	# A reference value means the caller has a nested frame in hand, not a flat
+	# hash, and one of the shape converters is the function they wanted.  Say
+	# which, rather than quietly stringifying the ref into a cell.
+	for my $k (sort keys %$h) {
+		next unless ref $h->{$k};
+		die "h2aoh: the value for key '$k' is a " . ref($h->{$k})
+		  . " reference; h2aoh takes a flat hash (hoa2aoh converts a "
+		  . "hash-of-arrays, hoh2hoa a hash-of-hashes)\n";
+	}
+
+	my $how = defined $arg{sort} ? lc $arg{sort} : 'key';
+	my @keys = keys %$h;
+	if ($how eq 'key') {
+		# numeric when every key is a number, else string -- the rule agg()
+		# already uses for its group keys
+		@keys = ( grep { !looks_like_number($_) } @keys )
+		      ? sort @keys
+		      : sort { $a <=> $b } @keys;
+	}
+	elsif ($how eq 'value') {
+		# biggest first for counts, which is what value_counts() output is for
+		# and what pandas' Series.value_counts() gives.  Non-numeric values have
+		# no such convention, so they go up in string order.  undef sorts last
+		# either way, and ties break on the key so the order is total.
+		my $numeric = !grep { !looks_like_number($_) }
+		              grep { defined } values %$h;
+		@keys = sort {
+			   ( defined $h->{$a} ? 0 : 1 ) <=> ( defined $h->{$b} ? 0 : 1 )
+			|| ( !defined $h->{$a} ? 0
+			   : $numeric          ? $h->{$b} <=> $h->{$a}
+			   :                     $h->{$a} cmp $h->{$b} )
+			|| $a cmp $b
+		} @keys;
+	}
+	elsif ($how ne 'none') {
+		die "h2aoh: sort '$how' isn't allowed (key, value, none)\n";
+	}
+
+	return [ map { { $var_name => $_, $value_name => $h->{$_} } } @keys ];
+}
+
+sub aoh2h {
+	my $aoh = shift;
+	die "aoh2h: first argument is undefined\n" unless defined $aoh;
+	die "aoh2h: first argument must be an arrayref of hashrefs\n"
+		unless ref($aoh) eq 'ARRAY';
+	die "aoh2h: arguments after the data frame must be name => value pairs\n"
+		if @_ % 2;
+	my %arg   = @_;
+	my %known = ( var_name => 1, value_name => 1, duplicates => 1 );
+	my @bad   = sort grep { !$known{$_} } keys %arg;
+	die "aoh2h: unknown argument(s): @bad\n" if @bad;
+
+	my ($var_name, $value_name) = _kv_names('aoh2h', \%arg);
+	my $dup = defined $arg{duplicates} ? lc $arg{duplicates} : 'die';
+	die "aoh2h: duplicates '$dup' isn't allowed (die, first, last)\n"
+		unless $dup eq 'die' || $dup eq 'first' || $dup eq 'last';
+
+	my %out;
+	my $i = 0;
+	for my $row (@$aoh) {
+		die "aoh2h: index $i is not a hashref\n" unless ref($row) eq 'HASH';
+		die "aoh2h: index $i has no '$var_name' column\n"
+			unless exists $row->{$var_name};
+		die "aoh2h: index $i has no '$value_name' column\n"
+			unless exists $row->{$value_name};
+		my $k = $row->{$var_name};
+		die "aoh2h: index $i has an undefined '$var_name'; a hash key has to "
+		  . "be defined\n" unless defined $k;
+		if (exists $out{$k}) {
+			die "aoh2h: duplicate key '$k' has >= 2 occurrences\n"
+				if $dup eq 'die';
+			if ($dup eq 'first') { $i++; next }
+		}
+		$out{$k} = $row->{$value_name};
+		$i++;
+	}
+	return \%out;
+}
 # =======================================================================
 # agg / concat / rbind  --  additions to lib/Stats/LikeR.pm
 # Splice these in after the dropna sub. Also add  agg concat rbind  to
@@ -1073,7 +1148,6 @@ sub aoh2hoh {
 # =======================================================================
 
 sub _df_shape {
-	_help('_df_shape') if _want_help(@_);
 	my ($df, $caller) = @_;
 	$caller = 'data frame' unless defined $caller;
 	die "$caller: data frame must be an ARRAY (AoA/AoH) or HASH (HoA/HoH) ref\n"
@@ -1182,7 +1256,6 @@ sub _df_shape {
 	}
 
 	sub agg {
-		_help('agg') if _want_help(@_);
 		my $df = shift;
 		die 'agg: undefined data in first position' unless defined $df;
 		my $shape = _df_shape($df, 'agg');
@@ -1386,7 +1459,6 @@ sub _df_shape {
 # cell stays missing rather than becoming ''.
 # ---------------------------------------------------------------------------
 sub map_cell (&) {
-	_help('map_cell') if _want_help(@_);
 	my ($code) = @_;
 	die "map_cell: expects a code block, e.g. map_cell { s/x//g }\n"
 		unless ref $code eq 'CODE';
@@ -1394,7 +1466,6 @@ sub map_cell (&) {
 }
 
 sub assign {
-	_help('assign') if _want_help(@_);
 	my $df = shift;
 	my $current_sub = (split(/::/,(caller(0))[3]))[-1];
 	die "$current_sub: first argument is undefined" unless defined $df;
@@ -1614,7 +1685,6 @@ sub assign {
 }
 
 sub chunk {
-	_help('chunk') if _want_help(@_);
 	my ($aref, %opt) = @_;
 	die "chunk: first argument must be an ARRAY reference\n"
 		unless ref $aref eq 'ARRAY';
@@ -1658,7 +1728,7 @@ sub chunk {
 # Rules: numeric ops > < >= <= == != compare as numbers; string ops gt lt ge le
 # eq ne compare as strings; & | ! combine; operands may be in either order; a
 # missing/undef cell (and, for numeric ops, a non-numeric cell) never matches.
-sub col { _help('col') if _want_help(@_); Stats::LikeR::col::_new(@_) }
+sub col { Stats::LikeR::col::_new(@_) }
 {
 	package Stats::LikeR::col;
 	use warnings;
@@ -1700,6 +1770,24 @@ sub col { _help('col') if _want_help(@_); Stats::LikeR::col::_new(@_) }
 		'eq' => sub { $_[0] eq $_[1] }, 'ne' => sub { $_[0] ne $_[1] },
 	);
 
+	# Besides the closure, a comparison carries a {plan}: the same test written
+	# as plain data, which filter() (XS) compiles and runs in C, so a whole
+	# frame can be tested without building a row hash or entering perl once per
+	# row.  The plan is [ KIND, OP, column, literal, swap ] for a comparison and
+	# [ KIND, left, right ] / [ KIND, operand ] for & | !.  KIND and OP are the
+	# small integers LikeR.xs knows (FLTP_*/FLTC_*); the operator ids below are
+	# positional, so the two tables must keep this order.
+	#
+	# A plan is only built for what C can reproduce exactly: the literal must be
+	# a defined non-reference (and, for a numeric test, numeric), which rules
+	# out overloaded objects and the warnings a non-numeric operand raises.
+	# Everything else -- ->match/->nomatch, an object operand, any expression
+	# with such a part in it -- carries no plan and takes the closure path, so
+	# the two paths never disagree about a row.
+	my $P_NUM = 0; my $P_STR = 1; my $P_AND = 2; my $P_OR = 3; my $P_NOT = 4;
+	my %NUM_ID = ('>' => 0, '<' => 1, '>=' => 2, '<=' => 3, '==' => 4, '!=' => 5);
+	my %STR_ID = ('gt' => 0, 'lt' => 1, 'ge' => 2, 'le' => 3, 'eq' => 4, 'ne' => 5);
+
 	# numeric comparison: undef OR non-numeric cells never match
 	sub _num {
 		my ($self, $op, $other, $swap) = @_;
@@ -1710,7 +1798,9 @@ sub col { _help('col') if _want_help(@_); Stats::LikeR::col::_new(@_) }
 		my $code = $swap
 			? sub { my $c = $_[0]{$name}; (defined($c) && looks_like_number($c)) ? ($f->($other, $c) ? 1 : 0) : 0 }
 			: sub { my $c = $_[0]{$name}; (defined($c) && looks_like_number($c)) ? ($f->($c, $other) ? 1 : 0) : 0 };
-		return bless { code => $code }, __PACKAGE__;
+		my $plan = (defined($other) && !ref($other) && looks_like_number($other))
+			? [ $P_NUM, $NUM_ID{$op}, $name, $other, ($swap ? 1 : 0) ] : undef;
+		return bless { code => $code, ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
 	}
 
 	# string comparison: undef cells never match
@@ -1723,7 +1813,9 @@ sub col { _help('col') if _want_help(@_); Stats::LikeR::col::_new(@_) }
 		my $code = $swap
 			? sub { my $c = $_[0]{$name}; defined($c) ? ($f->($other, $c) ? 1 : 0) : 0 }
 			: sub { my $c = $_[0]{$name}; defined($c) ? ($f->($c, $other) ? 1 : 0) : 0 };
-		return bless { code => $code }, __PACKAGE__;
+		my $plan = (defined($other) && !ref($other))
+			? [ $P_STR, $STR_ID{$op}, $name, $other, ($swap ? 1 : 0) ] : undef;
+		return bless { code => $code, ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
 	}
 
 	sub _logic {
@@ -1737,7 +1829,9 @@ sub col { _help('col') if _want_help(@_); Stats::LikeR::col::_new(@_) }
 		my $code = $op eq '&'
 			? sub { ($lc->($_[0]) && $rc->($_[0])) ? 1 : 0 }
 			: sub { ($lc->($_[0]) || $rc->($_[0])) ? 1 : 0 };
-		return bless { code => $code }, __PACKAGE__;
+		my $plan = ($self->{plan} && $other->{plan})
+			? [ ($op eq '&' ? $P_AND : $P_OR), $self->{plan}, $other->{plan} ] : undef;
+		return bless { code => $code, ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
 	}
 
 	sub _not {
@@ -1745,7 +1839,9 @@ sub col { _help('col') if _want_help(@_); Stats::LikeR::col::_new(@_) }
 		my $c = $self->{code};
 		die "col(): the operand of '!' is not a comparison (build it like !(col('x') > 0))\n"
 			unless ref $c eq 'CODE';
-		return bless { code => sub { $c->($_[0]) ? 0 : 1 } }, __PACKAGE__;
+		my $plan = $self->{plan} ? [ $P_NOT, $self->{plan} ] : undef;
+		return bless { code => sub { $c->($_[0]) ? 0 : 1 },
+		               ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
 	}
 
 	# regex predicates.  Perl cannot overload =~, so col('x') =~ /re/ can never
@@ -1799,7 +1895,6 @@ sub col { _help('col') if _want_help(@_); Stats::LikeR::col::_new(@_) }
 #        emitted noting that row names collided.
 # ---------------------------------------------------------------------------
 sub concat {
-	_help('concat') if _want_help(@_);
 	my @frames = grep { defined } @_;
 	die "concat: needs at least one data frame\n" unless @frames;
 
@@ -1908,7 +2003,6 @@ sub concat {
 # row references are reused, not deep-copied (dropna never mutates a row).
 #
 sub dropna {
-	_help('dropna') if _want_help(@_);
 	my $df = shift;
 	die 'dropna: first argument is undefined' unless defined $df;
 	die "dropna: first argument must be a data frame (HoA/HoH hashref or AoH arrayref)\n"
@@ -2044,7 +2138,6 @@ sub dropna {
 # AoA/AoH the surviving row refs are reused (cells shared, not deep-copied);
 # for HoA the columns are rebuilt with the surviving cells copied.
 sub drop_duplicates {
-	_help('drop_duplicates') if _want_help(@_);
 	my $df = shift;
 	die "drop_duplicates: undefined data in first position\n" unless defined $df;
 	die "drop_duplicates: arguments after the data frame must be name => value pairs\n"
@@ -2089,13 +2182,15 @@ sub drop_duplicates {
 		return _drop_dups_core($df, 3, [ @sub ], $kc);
 	}
 	if ($shape eq 'AoH') {
-		my $present = _present_keys($df, 'AoH');
+		# same union _present_keys builds, but scanned in C: on a large AoH the
+		# pure-Perl walk over every key of every row cost more than the dedup
+		my %present = map { $_ => 1 } @{ _aoh_key_union($df) };
 		if (@sub) {
 			for my $c (@sub) {
-				die "drop_duplicates: column '$c' not found\n" unless $present->{$c};
+				die "drop_duplicates: column '$c' not found\n" unless $present{$c};
 			}
 		} else {
-			@sub = sort keys %$present;
+			@sub = sort keys %present;
 		}
 		return _drop_dups_core($df, 1, [ @sub ], $kc);
 	}
@@ -2114,7 +2209,6 @@ sub drop_duplicates {
 # Count columns across Stats::LikeR frame forms: AoH, AoA, HoA, HoH
 # (plain vector => 1 column). Uses die, not croak. reftype => blessed frames ok.
 sub ncol {
-	_help('ncol') if _want_help(@_);
 	my ($data) = @_;
 	my $type = reftype $data;
 	die 'ncol: expected an ARRAY or HASH ref (got '
@@ -2199,7 +2293,6 @@ sub ncol {
 }
 
 sub nrow {
-	_help('nrow') if _want_help(@_);
 	my ($data) = @_;
 	my $type = reftype $data;
 	die 'nrow: expected an ARRAY or HASH ref (got '
@@ -2240,10 +2333,9 @@ sub nrow {
 	die 'nrow: HASH values are neither ARRAY refs (HoA) nor HASH refs (HoH)';
 }
 sub qcut {
-	_help('qcut') if _want_help(@_);
 	my ($data, $q, %opt) = @_;
 
-	die "qcut: first argument must be an ARRAY reference (try qcut('h'))\n"
+	die "qcut: first argument must be an ARRAY reference (try h('qcut'))\n"
 		unless ref $data eq 'ARRAY';
 
 	# probability vector: q+1 evenly spaced points, or an explicit list
@@ -2334,7 +2426,6 @@ sub qcut {
 # shows 0 values and 'na' statistics. Output, colour, and the display options
 # are rendered exactly like view() via the shared _render_grid().
 sub summary {
-	_help('summary') if _want_help(@_);
 	my $current_sub = (split(/::/,(caller(0))[3]))[-1];
 	# options view() understands, plus the row-cap synonyms
 	my %opt_key = map { $_ => 1 } qw(
@@ -2468,7 +2559,6 @@ sub summary {
 
 # Return the decompressed bytes of a named archive member, or undef if absent.
 sub _unzip_member {
-	_help('_unzip_member') if _want_help(@_);
 	my ($file, $member) = @_;
 	require IO::Uncompress::Unzip;
 	my $z = IO::Uncompress::Unzip->new($file, Name => $member)
@@ -2515,7 +2605,6 @@ sub _xlsx_col_idx {
 # Shared strings (optional part): each <si> may hold several <t> runs, which
 # are concatenated. Returns an arrayref indexed by shared-string id.
 sub _xlsx_shared_strings {
-	_help('_xlsx_shared_strings') if _want_help(@_);
 	my ($file) = @_;
 	my @sst;
 	if (defined(my $ss = _unzip_member($file, 'xl/sharedStrings.xml'))) {
@@ -2534,7 +2623,6 @@ sub _xlsx_shared_strings {
 # is resolved through workbook.xml.rels; a sheet with no resolvable relationship
 # (or a workbook with no metadata at all) falls back to a positional sheetN.xml.
 sub _xlsx_sheets {
-	_help('_xlsx_sheets') if _want_help(@_);
 	my ($file) = @_;
 	my %target;
 	if (defined(my $rels = _unzip_member($file, 'xl/_rels/workbook.xml.rels'))) {
@@ -2572,7 +2660,6 @@ sub _xlsx_sheets {
 # Resolve a 'sheet' argument (undef -> first; a 1-based index; or a name) to one
 # of the hashrefs from _xlsx_sheets, dying with a clear message on a bad request.
 sub _xlsx_choose_sheet {
-	_help('_xlsx_choose_sheet') if _want_help(@_);
 	my ($file, $sheets, $sheet) = @_;
 	return $sheets->[0] unless defined $sheet;
 	if ($sheet =~ /^\d+\z/) {
@@ -2593,7 +2680,6 @@ sub _xlsx_choose_sheet {
 # contract _parse_csv_file offers read_table's callback. $sst is the shared
 # strings arrayref from _xlsx_shared_strings.
 sub _parse_xlsx_sheet {
-	_help('_parse_xlsx_sheet') if _want_help(@_);
 	my ($file, $sst, $path, $callback) = @_;
 	my $ws = _unzip_member($file, $path);
 	die "read_table: could not read worksheet '$path' in $file\n"
@@ -2674,7 +2760,6 @@ sub _parse_xlsx_sheet {
 }
 
 sub read_table {
-	_help('read_table') if _want_help(@_);
 	my $file = shift;
 	die "read_table: \"$file\" is not a file\n"   unless -f $file;
 	die "read_table: \"$file\" is not readable\n" unless -r $file;
@@ -2958,7 +3043,6 @@ sub read_table {
 # view($data, %opts) -- pretty-print an AoH / HoA / HoH / flat-hash table.
 #
 sub view {
-	_help('view') if _want_help(@_);
 	my $data = shift;
 	if (not defined $data) {
 		die 'view received undefined data';
@@ -3146,7 +3230,6 @@ sub view {
 # wide-char-aware column widths, R-style column chunking to fit the terminal,
 # optional Data::Printer-style colour, and a trailing "... N more rows" note.
 sub _render_grid {
-	_help('_render_grid') if _want_help(@_);
 	my %s = @_;
 	my $kind       = $s{kind};
 	my $total      = $s{total};
@@ -3384,7 +3467,6 @@ sub _render_grid {
 # scale otherwise).  Per-level means are observed marginal means, which
 # match R's model.tables means for one-way (and balanced) designs.
 sub TukeyHSD {
-	_help('TukeyHSD') if _want_help(@_);
 	my ($fit, %opt) = @_;
 	die 'TukeyHSD: first argument must be a fitted-model hashref (from aov/lm/glm)'
 		unless ref($fit) eq 'HASH';
@@ -3572,7 +3654,6 @@ sub _tukey_compare {
 # a fresh per-column slice.  HoH rows are visited in string-sorted key
 # order so a positional axis exists.  Not exported.
 sub _frame_cols {
-	_help('_frame_cols') if _want_help(@_);
 	my ($df, $shape, $need) = @_;
 	my (%col, $R);
 	if ($shape eq 'AoA') {
@@ -3602,7 +3683,6 @@ sub _frame_cols {
 # strings (undef sorts as ''); the same rule agg() uses for its groups.
 # Not exported.
 sub _sort_group_keys {
-	_help('_sort_group_keys') if _want_help(@_);
 	my ($order, $repr) = @_;
 	my $all_num = 1;
 	SORTNUM: for my $k (@$order) {
@@ -3653,7 +3733,6 @@ sub _sort_group_keys {
 # then all rows for value_vars[1], and so on, preserving input row order
 # within each block.  The original frame is never modified.
 sub melt {
-	_help('melt') if _want_help(@_);
 	my $df = shift;
 	die 'melt: undefined data in first position' unless defined $df;
 	my $shape = _df_shape($df, 'melt');
@@ -3780,7 +3859,6 @@ sub melt {
 # pandas' flat output.  A duplicate generated name is an error (raise `sep`).
 # The original frame is never modified.
 sub pivot_table {
-	_help('pivot_table') if _want_help(@_);
 	my $df = shift;
 	die 'pivot_table: undefined data in first position' unless defined $df;
 	my $shape = _df_shape($df, 'pivot_table');
@@ -3938,7 +4016,6 @@ sub pivot_table {
 # of a constant use ffill()/bfill().  Returns
 # a NEW frame (rows/columns rebuilt as needed); the original is never modified.
 sub fillna {
-	_help('fillna') if _want_help(@_);
 	my $df = shift;
 	die 'fillna: undefined data in first position' unless defined $df;
 	my $shape = _df_shape($df, 'fillna');
@@ -4033,7 +4110,6 @@ sub fillna {
 # over runs of undef.  With a defined `limit`, at most `limit` consecutive
 # undefs are filled per gap; the rest stay undef.  Not exported.
 sub _fill_seq {
-	_help('_fill_seq') if _want_help(@_);
 	my ($vals, $dir, $limit) = @_;
 	my $n = scalar @$vals;
 	my @idx = $dir > 0 ? ( 0 .. $n - 1 ) : reverse( 0 .. $n - 1 );
@@ -4059,7 +4135,6 @@ sub _fill_seq {
 # are not extended); AoA rows are not extended past their own length.  Returns
 # a NEW frame; the original is never modified.  Not exported.
 sub _impute_prop {
-	_help('_impute_prop') if _want_help(@_);
 	my $df   = shift;
 	my $name = shift;
 	my $dir  = shift;
@@ -4144,8 +4219,8 @@ sub _impute_prop {
 # ffill($df, cols => \@cols, limit => $n)  -- forward-fill NA (last valid obs).
 # bfill($df, cols => \@cols, limit => $n)  -- back-fill NA (next valid obs).
 # See _impute_prop for the row-axis and shape semantics.
-sub ffill { _help('ffill') if _want_help(@_); _impute_prop( shift, 'ffill',  1, @_ ) }
-sub bfill { _help('bfill') if _want_help(@_); _impute_prop( shift, 'bfill', -1, @_ ) }
+sub ffill { _impute_prop( shift, 'ffill',  1, @_ ) }
+sub bfill { _impute_prop( shift, 'bfill', -1, @_ ) }
 
 # The interpolate() numeric kernels now live in XS (see ip_fill_column and the
 # _interp_column_xs XSUB in LikeR.xs); it is called once per target column below.
@@ -4187,7 +4262,6 @@ sub bfill { _help('bfill') if _want_help(@_); _impute_prop( shift, 'bfill', -1, 
 # blocks interpolation across it).  Interpolated cells are floats.  Fills within
 # each column's existing length only; a non-ref row is passed through untouched.
 sub interpolate {
-	_help('interpolate') if _want_help(@_);
 	my $df = shift;
 	die "interpolate: undefined data in first position" unless defined $df;
 	my $shape = _df_shape($df, 'interpolate');
@@ -4408,7 +4482,6 @@ sub _t1_cat_p {
 }
 
 sub table_one {
-	_help('table_one') if _want_help(@_);
 	my ($df, %opt) = @_;
 	my %known = map { $_ => 1 } qw(by vars types nonparametric digits pct_digits);
 	my @bad = sort grep { !$known{$_} } keys %opt;
@@ -4519,7 +4592,6 @@ sub _num_pair {
 # with the Hedges' g small-sample bias correction and a large-sample
 # (normal-approximation) confidence interval.
 sub cohen_d {
-	_help('cohen_d') if _want_help(@_);
 	my ($x, $y, %opt) = @_;
 	my $cl = defined $opt{conf_level} ? $opt{conf_level}
 	       : defined $opt{'conf.level'} ? $opt{'conf.level'} : 0.95;
@@ -4553,7 +4625,6 @@ sub cohen_d {
 # convention used for covariate-balance "Table 1" diagnostics (R's tableone /
 # stddiff).  Returns the signed value.
 sub smd {
-	_help('smd') if _want_help(@_);
 	my ($x, $y) = @_;
 	my ($xn, $yn) = _num_pair($x, $y, 'smd');
 	my $denom = sqrt((var($xn) + var($yn)) / 2);
@@ -4564,7 +4635,6 @@ sub smd {
 # _xtab(\@a, \@b) -> (\@table, \@rowlevels, \@collevels): contingency table
 # from two parallel categorical vectors (rows = levels of a, cols = levels of b).
 sub _xtab {
-	_help('_xtab') if _want_help(@_);
 	my ($a, $b) = @_;
 	die "cramers_v: the two vectors must have the same length\n"
 		unless @$a == @$b;
@@ -4586,7 +4656,6 @@ sub _xtab {
 # with the Bergsma (2013) bias-corrected variant.  Accepts either a table
 # (array of array refs of counts) or two parallel categorical vectors.
 sub cramers_v {
-	_help('cramers_v') if _want_help(@_);
 	my @args = @_;
 	my $tab;
 	if (ref $args[0] eq 'ARRAY' && ref $args[0][0] eq 'ARRAY') {
@@ -4645,7 +4714,6 @@ sub cramers_v {
 # from the ANOVA sums of squares.  Accepts an aov() result hash (single factor)
 # or raw values + group labels.
 sub eta_squared {
-	_help('eta_squared') if _want_help(@_);
 	my @args = @_;
 	my $aov_res;
 	if (ref $args[0] eq 'HASH') {
@@ -4711,59 +4779,12 @@ sub _qnorm {
 
 # ----------------------------------------------------------------------------
 # Regression diagnostics (Perl level).  Validated numerically against R.
+#
+# _lgamma/_igamc/_pchisq_upper used to be pure-Perl ports of the XS igamc()
+# living here.  They are now XS (see LikeR.xs), so there is one implementation
+# instead of two that could disagree; _lgamma went away entirely because only
+# _igamc ever called it.
 # ----------------------------------------------------------------------------
-
-# _lgamma($x): log gamma for x > 0 (Numerical Recipes gammln, ~1e-10).
-sub _lgamma {
-	my $x = shift;
-	my @cof = (76.18009172947146, -86.50532032941677, 24.01409824083091,
-	           -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5);
-	my $tmp = $x + 5.5;
-	$tmp -= ($x + 0.5) * log($tmp);
-	my $ser = 1.000000000190015;
-	my $y = $x;
-	$ser += $cof[$_] / ++$y for 0 .. 5;
-	return -$tmp + log(2.5066282746310005 * $ser / $x);
-}
-
-# _igamc($a, $x): regularized upper incomplete gamma Q(a,x) (port of the XS
-# igamc), i.e. pchisq(2x, 2a, lower.tail = FALSE) style tail.
-sub _igamc {
-	my ($a, $x) = @_;
-	return 1 if $x <= 0 || $a <= 0;
-	my $gln = _lgamma($a);
-	if ($x < $a + 1) {                       # series expansion
-		my $sum = 1 / $a;
-		my $term = 1 / $a;
-		my $n = 1;
-		while (abs($term) > 1e-15) { $term *= $x / ($a + $n); $sum += $term; $n++; last if $n > 10000; }
-		return 1 - $sum * exp(-$x + $a * log($x) - $gln);
-	}
-	my $b = $x + 1 - $a;                     # continued fraction
-	my $c = 1 / 1e-30;
-	my $d = 1 / $b;
-	my $h = $d;
-	my $i = 1;
-	while ($i < 10000) {
-		my $an = -$i * ($i - $a);
-		$b += 2;
-		$d = $an * $d + $b; $d = 1e-30 if abs($d) < 1e-30;
-		$c = $b + $an / $c; $c = 1e-30 if abs($c) < 1e-30;
-		$d = 1 / $d;
-		my $del = $d * $c;
-		$h *= $del;
-		last if abs($del - 1) < 1e-15;
-		$i++;
-	}
-	return $h * exp(-$x + $a * log($x) - $gln);
-}
-
-# _pchisq_upper($stat, $df): upper-tail chi-square p-value, P(X > stat).
-sub _pchisq_upper {
-	my ($stat, $df) = @_;
-	return 1 if $df <= 0 || $stat <= 0;
-	return _igamc($df / 2, $stat / 2);
-}
 
 # _quantile7(\@sorted_ascending, $p): R's default (type 7) sample quantile.
 sub _quantile7 {
@@ -4785,7 +4806,6 @@ sub _quantile7 {
 # a hash of predictor => VIF.  (Numeric predictors only; categorical predictors
 # would require a generalized VIF.)
 sub vif {
-	_help('vif') if _want_help(@_);
 	my ($data, $spec) = @_;
 	die "vif: first argument must be a data reference\n" unless ref $data;
 	my @preds;
@@ -4817,7 +4837,6 @@ sub vif {
 # cut() on type-7 quantiles, as in ResourceSelection::hoslem.test); the statistic
 # compares observed and expected event counts per bin.  df = g - 2.
 sub hosmer_lemeshow {
-	_help('hosmer_lemeshow') if _want_help(@_);
 	my ($obs, $pred, %opt) = @_;
 	die "hosmer_lemeshow: observed and predicted must be array references\n"
 		unless ref $obs eq 'ARRAY' && ref $pred eq 'ARRAY';
@@ -4898,7 +4917,6 @@ sub _qgamma {
 # R's epitools::ageadjust.direct), which is accurate even for rare events.
 # `per` scales every reported rate (e.g. per => 100_000).  Validated against R.
 sub age_standardize {
-	_help('age_standardize') if _want_help(@_);
 	my @a = @_;
 	my (%opt, $count, $pop, $stdpop, $rate);
 	if (ref $a[0] eq 'ARRAY') {
@@ -4976,7 +4994,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 Synopsis
 
@@ -4999,56 +5017,21 @@ the spirit of R's C<?function> at the prompt. It takes the name three ways:
 
  perl -MStats::LikeR -e 'h(*agg)'   # straight from the shell
 
-C<h> works for every function in the distribution, the XS ones and the pure Perl
-ones alike, because it looks the name up in the module's own POD rather than
-watching an argument list. That POD is generated from this file, so what C<h>
+C<h> works for every function in the distribution looking the name up in the module's own POD rather than watching an argument list. That POD is generated from this file, so what C<h>
 prints is what you are reading.
 
 Note that C<h(bedroc)>, with no quotes and no sigil, cannot be made to work:
 every function here is exported, so Perl parses the bareword as a call to
 C<bedroc()> before C<h> is ever reached. Use one of the three forms above.
 
-=head2 The C<'?'> and C<'h'> arguments
-
-The B<pure Perl> functions additionally accept C<'?'> or C<'h'> in place of their
-arguments. That prints the same text and then B<dies>, because a bare C<'h'>
-where an argument was expected might have been meant as data, so returning a
-result would be a guess:
-
- agg('h');            # prints the agg section, then dies
- read_table('?');     # likewise
- view($df, n => 'h'); # recognized anywhere in the argument list
-
-The functions that take it are the ones implemented in C<lib/Stats/LikeR.pm>:
-C<age_standardize>, C<agg>, C<aoh2hoh>, C<assign>, C<bfill>, C<chunk>, C<cohen_d>,
-C<col>, C<colnames>, C<concat>, C<cramers_v>, C<drop_cols>, C<drop_duplicates>,
-C<dropna>, C<eta_squared>, C<ffill>, C<fillna>, C<hosmer_lemeshow>, C<interpolate>,
-C<map_cell>, C<melt>, C<ncol>, C<nrow>, C<pivot_table>, C<qcut>, C<read_table>,
-C<rename_cols>, C<rownames>, C<select_cols>, C<smd>, C<summary>, C<table_one>,
-C<TukeyHSD>, C<view>, C<vif>. The XS functions deliberately do B<not> do this —
-see below.
-
-Only a defined, non-reference argument of exactly one character can trigger it.
-Data frames, code references, C<col()> objects, C<undef> and plain numbers are all
-safe, as are longer strings such as C<'help'> or C<'hour'>.
-
-What it cannot tell apart is a column, file or option value that really is the
-bare string C<'h'> or C<'?'>: C<col('h')> asks for help, not for a column named
-C<h>. Set C<$Stats::LikeR::HELP = 0> for code that has to pass such a value —
-C<h()> is unaffected either way:
-
- {
-     local $Stats::LikeR::HELP = 0;
-     my $adults = filter($df, col('h') > 3);   # a predicate on column h
- }
-
-This is exactly why the XS functions don't read their arguments for help:
-C<vals($df, 'h')>, C<csort($df, 'h')> and C<group_by($df, 'h', ...)> are ordinary
-calls naming a column, and C<h('vals')> is already unambiguous.
+C<h> is the only way to ask. No function reads its own argument list for a help
+flag, so nothing here has to guess whether you meant data or a question: a
+column, file or option value that really is the bare string C<'h'> or C<'?'> is
+just a value. C<vals($df, 'h')>, C<csort($df, 'h')>, C<< col('h') E<gt> 3 >> and
+C<read_table('?')> all mean exactly what they say, and every function — XS or
+pure Perl — is documented the same way, through C<h('name')>.
 
 =head1 Functions/Subroutines
-
-========================================================================
 
 =head2 add_data
 
@@ -5699,6 +5682,100 @@ I<< (R's C<anova> generic can additionally compare several nested models,
 C<anova(m1, m2)>, giving an F/LRT between them — a capability neither this
 C<anova> nor C<aov> currently provides. Ask if that would be useful.) >>
 
+=head2 aoh2h
+
+Fold a two-column B<array-of-hashes> back down into a plain hash. This is the
+reverse of L<C<h2aoh>|/"h2aoh">, and the two are exact opposites under their
+defaults.
+
+ my $h = aoh2h($aoh);
+ my $h = aoh2h($aoh, var_name => 'gene', value_name => 'n');
+
+One column supplies the keys, the other the values; every other column in the
+row is ignored. R spells this C<tibble::deframe()>; pandas spells it
+C<df.set_index('k')['v'].to_dict()>.
+
+=head3 Arguments
+
+C<$aoh> — an array ref of hash refs. Required. Every row has to be a hash ref
+carrying both named columns.
+
+Everything after it is C<< name =E<gt> value >> pairs:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>var_name</code></td>
+  <td><code>variable</code></td>
+  <td>The column holding the keys.</td>
+</tr>
+<tr>
+  <td><code>value_name</code></td>
+  <td><code>value</code></td>
+  <td>The column holding the values.</td>
+</tr>
+<tr>
+  <td><code>duplicates</code></td>
+  <td><code>die</code></td>
+  <td>What to do when two rows carry the same key: <code>die</code> is fatal, <code>first</code> keeps the earliest row, <code>last</code> keeps the latest.</td>
+</tr>
+</tbody>
+</table>
+
+C<var_name> and C<value_name> must differ.
+
+=head3 Returns
+
+A hash ref mapping each row's C<var_name> cell to its C<value_name> cell. An
+empty array ref gives back C<{}>.
+
+Values are assigned across, so a value that is itself a reference is shared
+with the input rather than cloned — the same shallow copy C<aoh2hoa> makes.
+
+=head3 Example
+
+ my $aoh = [
+     { gene => 'TP53',  n => 12 },
+     { gene => 'BRCA1', n =>  7 },
+ ];
+ my $h = aoh2h($aoh, var_name => 'gene', value_name => 'n');
+ # { TP53 => 12, BRCA1 => 7 }
+
+ # keep the last of a repeated key instead of dying
+ my $last = aoh2h([ { variable => 'a', value => 1 },
+                    { variable => 'a', value => 9 } ], duplicates => 'last');
+ # { a => 9 }
+
+=head3 Round trip
+
+ is_deeply( aoh2h( h2aoh(\%h) ), \%h );   # true for any flat hash
+
+The one thing that does not survive the trip is the I<type> of a key: Perl hash
+keys are strings, so a numeric key comes back as the string that prints the
+same way.
+
+=head3 Errors
+
+C<aoh2h> dies when the first argument is undefined or not an array ref, when the
+options are not C<< name =E<gt> value >> pairs, when an option is unknown, when
+C<var_name> equals C<value_name>, when C<duplicates> is not one of the three
+allowed words, when a row is not a hash ref, when a row is missing either named
+column, when a row's key cell is C<undef>, or — under the default
+C<< duplicates =E<gt> 'die' >> — when two rows share a key. Every message names the
+offending row by index.
+
+=head3 See also
+
+L<C<h2aoh>|/"h2aoh"> is the reverse. L</"C<aoh2hoh>"> also indexes rows by a
+column, but keeps the whole row as the value instead of one cell.
+
 =head2 aoh2hoa
 
 C<aoh2hoa($aoh)> — transpose an B<array-of-hashes> (row-major) into a B<hash-of-arrays> (column-major).
@@ -6262,8 +6339,9 @@ C<ra * n_top>), and C<enrichment_factor> (C<(active_count / n_top) / ra>).
  # string labels
  bedroc(\@scores, ['case','ctrl',...], positive => 'case');
 
-Calling C<bedroc> with a single argument of C<'h'> or C<'?'> prints this section to
-C<STDOUT> (in the spirit of R's C<?function>) and dies. See
+Call C<h('bedroc')> for this section at the prompt. C<bedroc> also carries its own
+short usage summary in XS, printed by C<bedroc('h')>, C<bedroc('H')> or
+C<bedroc('?')>; it is the one function that reads its arguments that way. See
 L</"Getting help">.
 
 =head2 bfill
@@ -8037,6 +8115,8 @@ Predicates compose with bitwise C<&> (and), C<|> (or), and C<!> (not):
 
 Comparison operators bind more tightly than C<&> and C<|>, so C<< (col('a') E<gt> 4) & (col('b') E<lt> 2) >> is parsed correctly, but the parentheses are recommended for readability.
 
+A C<col()> expression is also the quick way to say it: C<filter> compiles the whole expression once and tests every row in C, without building a row hash or calling into Perl at all, which on a large frame is several times faster than the equivalent C<sub>. What C<col()> cannot express — a C<< -E<gt>match >> regex, an operand that is an object — is evaluated the same way a C<sub> is, one call per row.
+
  > Note: C<< col('age') E<gt> 32 >> works because C<col('age')> is an object whose C<< E<gt> >> is overloaded. A B<bare string> cannot do this — C<< 'age' E<gt> 32 >> is computed by Perl to a plain boolean (the string numifies to 0) before C<filter> is ever called, so the column name is lost. Always wrap the column in C<col(...)>.
 
  > C<col()> addresses B<columns only> — it has no handle on a HoH's row name (the outer key). It also cannot express a regex match: there is no C<=~> operator to overload, so C<col('name') =~ /re/> runs the match immediately on the stringified object and never reaches C<filter>. For either case, use the code-reference form below.
@@ -8060,7 +8140,7 @@ Return a true value to keep the row.
  filter($df, sub { $_->{age} % 2 == 0 });            # things col() has no operator for
  filter($df, sub { $_[0]{score} > $_[0]{threshold} });
 
-For a HoA, each row is assembled into a temporary C<< { column =E<gt> value, ... } >> hash before the sub (or the C<col()> test) is called, so the same C<< $_-E<gt>{column} >> syntax works regardless of the input shape.
+For a HoA there are no row hashes to hand over, so the sub is given a C<< { column =E<gt> value, ... } >> hash built for it, and the same C<< $_-E<gt>{column} >> syntax works regardless of the input shape. That hash is reused from row to row for as long as the sub only reads it; keeping the row (or a reference to one of its cells), or adding a key to it, makes C<filter> start a fresh one, so a row you hold on to is always yours alone. A C<col()> predicate needs no row hash at all.
 
 =head4 Filtering on the row name (C<$_[1]>)
 
@@ -8625,9 +8705,10 @@ The name whose documentation was printed, so C<h> is usable in a pipeline:
 
  my @shown = map { h($_) } qw(auc auroc roc);
 
-Unlike the L<C<'?'> and C<'h'> arguments|/"The C<'?'> and C<'h'> arguments">, C<h> does B<not>
-die. You asked for it by name, so there is nothing ambiguous to protect you
-from.
+C<h> does B<not> die, and it is the only route to a function's documentation:
+no function reads its own arguments for a help flag, so a column or file really
+named C<'h'> is never mistaken for a question. See
+L</"Getting help">.
 
 =head3 Where the text comes from
 
@@ -8639,6 +8720,123 @@ list of functions that do have one.
 Output is wrapped to C<$ENV{COLUMNS}> when that is set (clamped to 40-100
 columns), and to 80 otherwise. Parameter tables are rendered as aligned plain
 text.
+
+=head2 h2aoh
+
+Unfold a plain hash into a two-column B<array-of-hashes>, one row per pair.
+
+ my $aoh = h2aoh(\%h);
+ my $aoh = h2aoh(\%h, var_name => 'gene', value_name => 'n');
+
+A flat hash is a two-column table that has been folded shut: every pair is a
+row, the key in one cell and the value in the other. C<h2aoh> unfolds it, which
+turns a result that no frame function will accept — C<value_counts> hands one
+back — into a data frame that all of them will:
+
+ my $counts = value_counts($titanic, 'Pclass');   # { 1 => 216, 2 => 184, 3 => 491 }
+ my $tbl    = h2aoh($counts, var_name => 'Pclass', value_name => 'n',
+                    sort => 'value');
+ view($tbl);
+ # AoH: 3 rows x 2 cols   (showing 3)
+ #    Pclass    n
+ # 0       3  491
+ # 1       1  216
+ # 2       2  184
+
+R spells this C<tibble::enframe()>; base R gets close with
+C<stack()> or C<data.frame(name = names(x), value = unname(x))>. In pandas it is
+C<pd.Series(d).rename_axis('k').reset_index(name = 'v')>, or the shorter
+C<pd.DataFrame(d.items(), columns = ['k', 'v'])>.
+
+=head3 Arguments
+
+C<$h> — a hash ref whose values are plain scalars. Required.
+
+Everything after it is C<< name =E<gt> value >> pairs:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>var_name</code></td>
+  <td><code>variable</code></td>
+  <td>Name of the column that receives the hash keys.</td>
+</tr>
+<tr>
+  <td><code>value_name</code></td>
+  <td><code>value</code></td>
+  <td>Name of the column that receives the hash values.</td>
+</tr>
+<tr>
+  <td><code>sort</code></td>
+  <td><code>key</code></td>
+  <td>Row order — see below.</td>
+</tr>
+</tbody>
+</table>
+
+C<var_name> and C<value_name> must differ. They are the same two option names
+L<C<melt>|/"melt"> uses, because they name the same two columns.
+
+=head3 Row order
+
+Hash iteration order is not reproducible between runs, so the rows are sorted
+by default rather than left to chance.
+
+=for html <table>
+<thead>
+<tr>
+  <th><code>sort</code></th>
+  <th>Order</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>key</code></td>
+  <td>By key. Numerically when every key looks like a number, alphabetically otherwise — the rule [<code>agg</code>](#agg) uses for its group keys. This is the default.</td>
+</tr>
+<tr>
+  <td><code>value</code></td>
+  <td>By value: largest first when every defined value is a number, which is the order <code>value_counts</code> output usually wants; alphabetically ascending when they are not. <code>undef</code> values sort last, and ties break on the key.</td>
+</tr>
+<tr>
+  <td><code>none</code></td>
+  <td>Whatever order the hash iterates in. Cheapest, and the right choice when you are about to sort the result yourself with [<code>csort</code>](#csort).</td>
+</tr>
+</tbody>
+</table>
+
+=head3 Returns
+
+An array ref of two-key hash refs, one per pair:
+
+ h2aoh({ a => 1, b => 2 });
+ # [ { variable => 'a', value => 1 }, { variable => 'b', value => 2 } ]
+
+An empty hash gives back C<[]>. C<undef> values are carried through as C<undef>.
+
+=head3 Errors
+
+C<h2aoh> dies when the argument is undefined or not a hash ref, when the options
+are not C<< name =E<gt> value >> pairs, when an option is unknown, when C<var_name>
+equals C<value_name>, or when C<sort> is not one of the three allowed words.
+
+It also dies when any value is a B<reference>, naming the key and pointing at
+the converter that was probably meant: a hash of array refs is
+L<C<hoa2aoh>|/"hoa2aoh">'s job, and a hash of hash refs is
+L<C<hoh2hoa>|/"hoh2hoa">'s. Stringifying C<ARRAY(0x…)> into a cell would be the
+only other option, and it is never what anyone wanted.
+
+=head3 See also
+
+L<C<aoh2h>|/"aoh2h"> is the reverse. L<C<melt>|/"melt"> does the same folding-out for
+a frame that already has more than two columns.
 
 =head2 hoa2aoh
 
@@ -9995,9 +10193,85 @@ are reserved top-level keys in the result.
 
 =head2 p_adjust
 
-Returns array of false-discovery-rate-corrected p-values, where methods available are "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"
+Corrects a family of p-values for multiple testing, like R's C<p.adjust>. The
+methods available are C<holm> (the default), C<hochberg>, C<hommel>,
+C<bonferroni>, C<BH>, C<BY>, C<fdr> (a synonym for C<BH>) and C<none>. Method names
+are case-insensitive, and the full C<Benjamini-Hochberg> /
+C<Benjamini-Yekutieli> spellings are accepted.
 
- my @q = p_adjust(\@pvalues, $method);
+ my @q = p_adjust(\@pvalues, $method);          # array in, array out
+ my $q = p_adjust($df, $method, columns => ..); # a frame in, a frame out
+
+Given a flat arrayref of p-values it returns the adjusted values as a list, in
+the order they were given. Given a data frame — AoA, AoH, HoA or HoH — it
+returns a B<new> frame of the same kind, with the same rows, columns and row
+labels, holding the adjusted values in the places the raw ones came from. The
+input frame is never modified.
+
+Every p-value in the frame is corrected as B<one family>, whichever shape it
+arrived in, so the family size is the number of p-value cells and not the
+number of rows or columns.
+
+ my $df = [ { gene => 'BRCA1', p_value => 0.010 },
+            { gene => 'TP53',  p_value => 0.040 },
+            { gene => 'EGFR',  p_value => 0.030 },
+            { gene => 'KRAS',  p_value => 0.200 } ];
+ my $q = p_adjust($df, 'BH', columns => 'p_value');
+ # [ { gene => 'BRCA1', p_value => 0.04      },
+ #   { gene => 'TP53',  p_value => 0.0533333 },
+ #   { gene => 'EGFR',  p_value => 0.0533333 },
+ #   { gene => 'KRAS',  p_value => 0.20      } ]
+
+=head3 columns
+
+C<columns> (also spelled C<column>, C<cols> or C<col>) names the columns that hold
+p-values; everything else is copied through untouched. It takes one name or an
+arrayref of names, which are column names for AoH, HoA and HoH and 0-based
+positions for AoA.
+
+ p_adjust($aoh, 'BH', columns => 'p_value');
+ p_adjust($hoh, 'BH', columns => [ 'p_raw', 'p_trend' ]);
+ p_adjust($aoa, 'BH', columns => 1);              # the second column
+ p_adjust($hoa, columns => 'p_value');            # method defaults to holm
+
+Note the shape each name refers to: in a HoA a column I<is> an outer key, while
+in a HoH the outer keys are row labels and the names are the inner keys.
+
+Without C<columns>, every cell in the frame is taken to be a p-value. That is
+what you want for a frame that is nothing but p-values, and an error for one
+with a label column in it — a cell that is neither a number nor C<undef> dies
+with a message pointing at C<columns>. A name that matches no column in the
+frame also dies, rather than quietly correcting nothing.
+
+C<columns> applies only to frames; passing it with a flat list of p-values is an
+error.
+
+=head3 Method may be positional or named
+
+The method still reads positionally, as it always has, and may also be given as
+a C<< method =E<gt> ... >> pair. These three are the same call:
+
+ p_adjust($df, 'BH', columns => 'p_value');
+ p_adjust($df, method => 'BH', columns => 'p_value');
+ p_adjust($df, 'BH');                    # if every column holds p-values
+
+=head3 Ordering and other details
+
+=over
+
+=item * An C<undef> cell counts toward the family as a p-value of 1, which is how the
+flat form has always treated it, and comes back adjusted rather than as
+C<undef>.
+
+=item * Within a frame the family is enumerated in a fixed order — rows in order and
+then columns by name for an AoA, AoH or HoH; columns by name and then rows
+for a HoA; row labels in sorted order for a HoH — so tied p-values break the
+same way on every run instead of following hash iteration order.
+
+=item * An empty arrayref returns an empty list; an empty frame returns an empty
+frame of the same kind.
+
+=back
 
 =head2 pivot_table
 
@@ -10621,16 +10895,18 @@ group) or as two scalars for a single sample.
 
 =head2 qcut
 
-Equal-frequency binning of a numeric column, which is the analog of pandas C<qcut>.
-Where C<cut> would slice a value range into equal-I<width> intervals (and dump
-most of a skewed distribution into one bin), C<qcut> chooses cutpoints so each
-bin holds roughly the same I<number> of observations. This is the binning you
-usually want for ranked-list work: deciles, quartiles, top-5% tranches.
+Equal-frequency binning of a numeric column, which is the analog of pandas
+C<qcut>. Equal-I<width> binning slices the value range into intervals of the same
+size, which dumps most of a skewed distribution into one bin; C<qcut> instead
+chooses cutpoints so each bin holds roughly the same I<number> of observations.
+This is the binning you usually want for ranked-list work: deciles, quartiles,
+top-5% tranches.
 
-Cutpoints are computed by linear interpolation between order statistics, the
-same method as numpy/pandas, so results match C<pandas.qcut> exactly. Bins are
-right-closed, C<(a, b]>, with the lowest bin closed on both ends, C<[a, b]>, so
-the minimum value is always included.
+Cutpoints are computed by linear interpolation between order statistics — the
+numpy/pandas default, and the same rule L<C<quantile>|/"quantile"> uses (R's
+Type 7) — so the edges match C<pandas.qcut> exactly. Bins are right-closed,
+C<(a, b]>, with the lowest bin closed on both ends, C<[a, b]>, so the minimum
+value is always included.
 
 =head3 Signature
 
@@ -10638,56 +10914,139 @@ the minimum value is always included.
 
 =over
 
-=item * C<$data> — an array reference of numbers. C<undef> entries are treated as
-missing (NA): they are skipped when computing cutpoints and, when codes are
-requested, come back as C<undef> in their original positions.
+=item * C<$data> — an array reference of numbers, in any order. C<qcut> sorts an
+internal copy, so your array is left untouched and codes come back in the
+order the values were given. Every defined value must be numeric: a
+non-numeric string such as C<'N/A'> is a fatal C<isn't numeric> error rather
+than a silent zero, so clean or C<undef> such cells first (see
+L<C<dropna>|/"dropna">, L<C<fillna>|/"fillna">). At least two I<distinct> values
+are needed to form a bin.
 
 =item * C<$q> — either a positive integer (the number of equal-frequency bins) or an
 array reference of probabilities in C<[0, 1]> giving explicit cut
-boundaries, e.g. C<[0, 0.5, 0.95, 1]>.
+boundaries, e.g. C<[0, 0.5, 0.95, 1]>. An explicit vector is sorted for you,
+and any probability outside C<[0, 1]> is clamped into it rather than being an
+error.
 
 =back
 
-For a usage reminder at the prompt, call C<qcut('h')> (or C<qcut('?')>); it prints
-this section and dies. Every function takes those two arguments the same way —
-see L</"Getting help">.
+C<undef> entries are treated as missing (NA): they are skipped when computing
+cutpoints and, when codes are requested, come back as C<undef> in their original
+positions.
+
+Only the options listed below are read; a misspelled one is ignored rather than
+refused, so C<< code =E<gt> 1 >> (no C<s>) quietly hands back edges instead of codes.
+
+For a usage reminder at the prompt, call C<h('qcut')>; it prints this section to
+C<STDOUT> and returns. Every function is documented that way — see
+L</"Getting help">.
 
 =head3 What it returns
 
-By default C<qcut> returns the B<edge vector as a flat list> — the cheap,
-common query — so call it in list context:
+=for html <table>
+<thead>
+<tr>
+  <th>Options given</th>
+  <th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>none</td>
+  <td>The edge vector, as a <b>flat list</b> of <code>$q + 1</code> numbers</td>
+</tr>
+<tr>
+  <td><code>codes =&gt; 1</code></td>
+  <td>One array reference: the bin codes, parallel to <code>$data</code></td>
+</tr>
+<tr>
+  <td><code>codes =&gt; 1, edges =&gt; 1</code></td>
+  <td>Two references, <code>($codes, $edges)</code></td>
+</tr>
+</tbody>
+</table>
+
+By default C<qcut> returns the edge vector — the cheap, common query — so call it
+in list context:
 
  my @edges = qcut($data, 4);          # ($e0, $e1, $e2, $e3, $e4)
+
+In B<scalar> context that flat list collapses to its element count, not to a
+reference: C<my $e = qcut($data, 4)> sets C<$e> to C<5>. Assign to an array.
 
 The per-element bin assignment (the expensive part) is opt-in. Ask for it with
 C<< codes =E<gt> 1 >> and you get an array reference parallel to C<$data>:
 
  my $codes = qcut($data, 4, codes => 1);
 
-Ask for both in a single pass and you get two references, C<($codes, $edges)>:
+Asking for codes turns the edge vector I<off>, so
+C<< my ($codes, $edges) = qcut($data, 4, codes =E<gt> 1) >> leaves C<$edges> undefined.
+Ask for both explicitly and they are computed in a single pass:
 
  my ($codes, $edges) = qcut($data, 4, codes => 1, edges => 1);
 
 =head3 Options
 
-=over
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>edges =&gt; 1</code></td>
+  <td>Include the edge vector. On by default, but turned off automatically when codes are requested, so pass it explicitly to get both.</td>
+</tr>
+<tr>
+  <td><code>edges =&gt; 0</code></td>
+  <td>Suppress the edge vector. With no <code>codes</code>/<code>labels</code> there would be nothing left to return, which is a fatal error.</td>
+</tr>
+<tr>
+  <td><code>codes =&gt; 1</code></td>
+  <td>Include the 0-based integer bin codes, one per element of <code>$data</code>.</td>
+</tr>
+<tr>
+  <td><code>labels =&gt; [...]</code></td>
+  <td>Map the bin codes onto your own labels (implies <code>codes =&gt; 1</code>). The list length must equal the number of bins actually produced.</td>
+</tr>
+<tr>
+  <td><code>labels =&gt; 'interval'</code></td>
+  <td>Label each element with its interval string, e.g. <code>(3.25, 5.5]</code> (also implies codes).</td>
+</tr>
+<tr>
+  <td><code>duplicates =&gt; 'raise'</code></td>
+  <td>Die when tied data makes adjacent cutpoints equal. The default, and what pandas does.</td>
+</tr>
+<tr>
+  <td><code>duplicates =&gt; 'drop'</code></td>
+  <td>Merge equal cutpoints into fewer bins instead of dying.</td>
+</tr>
+</tbody>
+</table>
 
-=item * C<< edges =E<gt> 1 >> — include the edge vector. On by default; turned off
-automatically when you request codes, so set it explicitly to get both.
+=head3 How many bins, and how full
 
-=item * C<< codes =E<gt> 1 >> — include the 0-based integer bin codes.
+The bin count is always C<@$edges - 1>, and codes run from C<0> to
+C<@$edges - 2>. That equals C<$q> (or C<@$probs - 1>) I<unless>
+C<< duplicates =E<gt> 'drop' >> merged tied cutpoints, in which case it is fewer — which
+is why a C<labels> list has to match the bins you actually got, not the ones you
+asked for.
 
-=item * C<< labels =E<gt> [...] >> — map the bin codes onto your own labels (implies
-C<< codes =E<gt> 1 >>). The list length must equal the number of bins.
+Bin I<sizes> are equal only when the data permits: the count has to divide
+evenly and no repeated value may straddle a cutpoint. Ties are placed by the
+right-closed rule, which is why C<[1 .. 10]> into quartiles gives 3, 2, 2, 3
+rather than 2.5 each — the same split pandas makes. Count the codes to see what
+you got:
 
-=item * C<< labels =E<gt> 'interval' >> — label each element with its interval string,
-e.g. C<(3.25, 5.5]> (also implies codes).
+ my $codes = qcut($data, 10, codes => 1);
+ my $sizes = value_counts($codes);        # { 0 => n0, 1 => n1, ... }
 
-=item * C<< duplicates =E<gt> 'drop' >> — if tied data produces non-unique cutpoints, merge
-them into fewer bins instead of dying. The default, C<'raise'>, throws an
-error (as pandas does).
-
-=back
+If a probability vector omits C<0> or C<1>, the end bins still stretch over the
+whole range: a value below the first cutpoint lands in bin C<0>, one above the
+last lands in the last bin. pandas returns NA for those, so include C<0> and C<1>
+unless the stretching is what you want.
 
 =head3 Examples
 
@@ -10696,11 +11055,13 @@ Quartile edges (the default). The cutpoints match pandas exactly:
  my @edges = qcut([1 .. 10], 4);
  # @edges = (1, 3.25, 5.5, 7.75, 10)
 
-Bin codes. They are 0-based; note the tie distribution matches pandas (inner
-bins take 2 here, outer bins 3):
+Bin codes. They are 0-based, and unsorted input is fine — codes come back in
+input order:
 
  my $codes = qcut([1 .. 10], 4, codes => 1);
  # $codes = [0, 0, 0, 1, 1, 2, 2, 3, 3, 3]
+ my $c2 = qcut([5, 1, 9, 3, 7], 4, codes => 1);
+ # $c2 = [1, 0, 3, 0, 2]
 
 Edges and codes together, computed in one pass:
 
@@ -10735,17 +11096,69 @@ straight through:
  # $codes->[2] is undef; the rest are binned as usual
 
 Tied data and C<duplicates>. Heavy ties can make adjacent cutpoints equal; the
-default raises, C<'drop'> merges:
+default raises, C<'drop'> merges the empty quantile bands:
 
  my @tied = ((0) x 8, 1, 2, 3, 4);
- qcut(\@tied, 4);                         # dies: bin edges are not unique
+ qcut(\@tied, 4);                          # dies: bin edges are not unique
  my @edges = qcut(\@tied, 4, duplicates => 'drop');
- # fewer than 5 edges; the empty quantile bands are collapsed
+ # @edges = (0, 1.25, 4) -- 2 bins, not 4, so labels => [qw/a b/] here
 
-Get the documentation and stop:
+Binning a data-frame column, which is the usual reason to want codes.
+L<C<vals>|/"vals"> hands C<qcut> the column and L<C<assign>|/"assign"> puts the result
+back as a new one:
 
- qcut('h');   # prints this section to STDOUT, then dies
- qcut('?');   # the same call
+ my $df = { id => [1 .. 10], ldl => [90, 120, 150, 200, 80, 110, 175, 160, 95, 130] };
+ my $q  = qcut(vals($df, 'ldl'), 4, labels => [qw/Q1 Q2 Q3 Q4/]);
+ assign($df, ldl_quartile => $q);
+ # $df->{ldl_quartile} = [qw/Q1 Q2 Q3 Q4 Q1 Q2 Q4 Q4 Q1 Q3/]
+
+Get the documentation:
+
+ h('qcut');   # prints this section to STDOUT and returns
+
+=head3 Errors
+
+C<qcut> dies when C<$data> is not an array reference, when C<$q> is neither a
+positive integer nor an array reference, and when the options ask for nothing
+(C<< edges =E<gt> 0 >> with no codes or labels). It dies with C<no non-missing values>
+when every element is C<undef>, and C<need at least one data value> when C<$data>
+is empty.
+
+Cutpoints are the other source of failures. C<bin edges are not unique> means
+ties collapsed adjacent cutpoints under the default C<< duplicates =E<gt> 'raise' >>:
+either pass C<< duplicates =E<gt> 'drop' >> or ask for fewer bins. Even with C<'drop'>,
+data holding a single distinct value cannot be binned at all and dies with
+C<too few distinct values to form bins>. Finally, a C<labels> arrayref whose
+length differs from the bin count dies naming both numbers
+(C<got 2 bins but 4 labels>).
+
+=head3 Differences from pandas
+
+=over
+
+=item * B<Interval printing.> pandas nudges its lowest edge 0.1% below the minimum
+so every bin can be half-open, e.g. C<(0.999, 3.25]>. C<qcut> keeps the exact
+minimum and closes the lowest bin on both ends, C<[1, 3.25]>. Membership is
+the same; only the printed interval differs.
+
+=item * B<Out-of-range values.> A partial probability vector makes the end bins
+stretch (above), where pandas yields NA.
+
+=item * B<Out-of-range probabilities> are clamped into C<[0, 1]> instead of raising.
+
+=item * B<Return type.> There is no Categorical: you get edges, plain integer
+codes, your own labels, or interval strings.
+
+=back
+
+=head3 See also
+
+L<C<quantile>|/"quantile"> computes the same cutpoints without assigning anything
+to bins. L<C<chunk>|/"chunk"> splits by I<position> instead of value, which works on
+non-numeric data. L<C<value_counts>|/"value_counts"> checks how full the bins came
+out, L<C<rank>|/"rank"> is the alternative when you want the whole ordering rather
+than bins, and L<C<assign>|/"assign"> / L<C<vals>|/"vals"> move a binned column into
+and out of a data frame.
 
 =head2 quantile
 
@@ -12107,12 +12520,22 @@ as of version 0.07, C<write_table> determines comma and tab-separated delimiters
 Args can also be accepted:
     write_table( 'data' => \%flat, 'file' => $f );
 
+=head3 The confirmation line
+
+Every successful write prints one line to standard output naming the file, with the name in black on cyan:
+
+ wrote output.tsv
+
+This is C<say 'wrote ' . colored(['black on_cyan'], $file)>, but the SGR codes (C<\e[30;46m> … C<\e[0m>) are written out inline, so the module takes no dependency on C<Term::ANSIColor>. Every format announces itself the same way — delimited, LaTeX and C<.xlsx> alike — so you always learn where a table went, in the same shape whatever you asked for. Nothing is printed when nothing is written: an empty data frame returns before a file is opened, and a write that cannot open its file croaks instead.
+
+The colour is unconditional; it is not suppressed when standard output is a pipe or a file. If you are capturing the output and want the bytes plain, strip the escapes (C<s/\e\[[\d;]*m//g>) or send them somewhere else. Note also that the line goes to file descriptor 1 directly rather than through Perl's C<STDOUT> glob, so C<< local *STDOUT; open STDOUT, 'E<gt>', \my $buf >> will B<not> capture it — redirect the file descriptor, or run the write in a child process, if you need to.
+
 =head3 LaTeX output (C<tex>)
 
 C<write_table> can write the output file as a LaTeX C<tabular> instead of a delimited table. This is selected either by naming the file C<*.tex> (auto-detected) or by passing C<< tex =E<gt> 1 >>; an explicit C<< tex =E<gt> 0 >> forces a delimited file even when the name ends in C<.tex>. The LaTeX table is built from the same rows as the delimited writer, so it works for every shape above (including arrays of arrays):
     write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
     write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
-The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. Unlike the delimited writer, LaTeX output includes a row-label column as its first column by default: C<row.names> defaults on for LaTeX (matching R's C<write.table>), so pass C<< row.names =E<gt> 0 >> to omit it. The labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. The C<tex.*> options tune the output:
+The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. As with every other format, C<row.names> is B<off> unless you ask for it: pass C<< row.names =E<gt> 1 >> to prepend a label column, whose labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. The C<tex.*> options tune the output:
     write_table(\@rows, 'table.tex',
         'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
         'tex.bold.1st.col' => 0,                     # default 1: bold the first column
@@ -12201,9 +12624,9 @@ C<read_table>.
 </tr>
 <tr>
   <td><code>row.names</code></td>
-  <td>LaTeX: <code>1</code> (on); delimited: <code>0</code> (off)</td>
+  <td><code>0</code> (off)</td>
   <td>both</td>
-  <td>true prepends a label column (numeric 1-based index, or the outer key for a HoH); <code>0</code> omits it. LaTeX output defaults on (R-compatible); delimited output defaults off; an explicit value overrides in either case. For a HoA/AoH a non-numeric <i>column name</i> uses that column's values as the labels and drops it from the body</td>
+  <td>true prepends a label column (numeric 1-based index, or the outer key for a HoH); <code>0</code> omits it. Off by default in <b>every</b> format — delimited, LaTeX and <code>.xlsx</code> alike. (R's <code>write.table</code> defaults it on and this once followed suit for LaTeX; it no longer does.) For a HoA/AoH a non-numeric <i>column name</i> uses that column's values as the labels and drops it from the body</td>
 </tr>
 <tr>
   <td><code>col.names</code></td>
@@ -12293,6 +12716,68 @@ C<read_table>.
 </table>
 
 =head1 Changes
+
+=head2 0.28 2026-08-02 CDT
+
+C<p_adjust> (LikeR.xs) now takes a data frame as well as a flat list of
+p-values, and hands the corrected values back in the shape they arrived in. An
+AoA, AoH, HoA or HoH goes in and a new frame of the same kind comes out, with
+the same rows, columns and row labels; the input is left alone. Everything the
+flat form did is unchanged — an arrayref of p-values still returns a list, in
+order, with the same numbers.
+
+=over
+
+=item * C<< columns =E<gt> 'p_value' >> (or an arrayref of names, or 0-based positions for an
+AoA) says which columns hold p-values, and copies the rest of the frame
+through untouched, so a results table with a C<gene> column no longer has to
+be taken apart and put back together around the call. Without C<columns>
+every cell is treated as a p-value, which is right for a frame that is
+nothing but p-values; a label column in one dies with a message naming the
+offending value and pointing at C<columns>, rather than correcting a string
+coerced to zero.
+
+=item * All the p-values in the frame are corrected as one family, whichever shape
+they came in, so the family size is the number of p-value cells.
+
+=item * The method still reads positionally and may now also be given as
+C<< method =E<gt> ... >>. C<none>, which the function has always accepted, is now
+documented along with the rest.
+
+=item * Cells are visited in a fixed order — by row and then column name, or column
+name and then row for a HoA — so tied p-values break the same way on every
+run instead of following hash iteration order.
+
+=back
+
+C<drop_duplicates>, C<filter>, C<t_test>, C<vals>: speed/RAM improvements
+
+B<Incompatible:> the C<'?'> / C<'h'> argument added in 0.27 is gone (lib/Stats/LikeR.pm). C<agg('h')>, C<read_table('?')> and the fifty-odd other pure-Perl functions that took it no longer print help and die — they treat the string as data, the way the XS functions always have. C<h('agg')>, C<h(*agg)> and C<h(\&agg)> are unchanged and remain the way to ask, for every function in the distribution.
+- It was a help route that only half the module had, so what a lone C<'h'> meant depended on whether the callee happened to be written in XS or in Perl, and a column, file or option value really named C<'h'> needed C<$Stats::LikeR::HELP = 0> to get through. That variable is gone too; nothing reads its arguments for a help flag any more.
+- C<bedroc> still prints its own short XS usage summary for C<bedroc('h' | 'H' | '?')>, which is hand-written and predates all of this.
+
+C<merge> (LikeR.xs) — same joins, a third of the time and a fifth of the memory. Nothing about the result changes: every join type, shape combination and edge case produces exactly what it did before, and C<t/merge.t> now checks all six input/output paths against a plain-Perl reference join over a randomized corpus.
+
+The old implementation transposed both frames into arrays of row hashes, joined those, and transposed the result back. A 10,000-row HoA joined to itself therefore built 20,000 throwaway row hashes and copied every cell three times before returning. It now reads each frame where it lies — a HoA column by column, an AoH/HoH row by row — and writes the result straight into the shape being returned, so the only cells copied are the ones the caller keeps.
+
+=over
+
+=item * The right frame's index is a hash of row numbers chained through a flat array, rather than an array-ref of index scalars per distinct key, and one reused buffer builds every join key instead of one scalar per row.
+
+=item * Column names are resolved to their column (HoA) or interned once as shared hash keys (AoH/HoH) before the join starts, so the per-row work is a lookup rather than a lookup and a rehash.
+
+=item * Measured on the C<benchmark.pl> case (two 10,000-row frames, six columns, inner join on C<id>): 0.052 s and 41.4 MB before, 0.017 s and 7.3 MB after. An outer join of the same frames went from 0.113 s to 0.008 s.
+
+=back
+
+C<write_table> (LikeR.xs) — two changes, one of them incompatible.
+- Every format now prints the coloured C<< wrote E<lt>fileE<gt> >> confirmation line, not just LaTeX and C<.xlsx>. Delimited output (csv/tsv) was silent before. The line is identical in all cases: the file name in black on cyan, with the SGR codes inline so there is still no C<Term::ANSIColor> dependency. Nothing is announced when nothing is written.
+- B<Incompatible:> C<row.names> now defaults to B<off> in every format. It previously defaulted B<on> everywhere, following R's C<write.table>, which meant a call that said nothing about row names got a label column and a leading empty header cell (C<,gene,n>) it had not asked for. Pass C<< row.names =E<gt> 1 >> for the old behaviour; C<< row.names =E<gt> 'col' >> is unchanged.
+
+New C<h2aoh> and C<aoh2h> (lib/Stats/LikeR.pm), which add the flat hash to the shapes the conversion family understands. A plain hash is a two-column table folded shut, and until now nothing would unfold it: C<value_counts> hands one back, and no frame function would take it.
+- C<< h2aoh(\%h, var_name =E<gt> .., value_name =E<gt> ..) >> unfolds a flat hash into a two-column AoH, one row per pair, under column names the caller picks. C<< sort =E<gt> 'key' | 'value' | 'none' >> fixes the row order, which hash iteration otherwise leaves to chance; C<'value'> is biggest-first for numbers, so C<value_counts> output comes out the way pandas' C<Series.value_counts()> orders it.
+- C<aoh2h> folds a two-column AoH back down, with C<< duplicates =E<gt> 'die' | 'first' | 'last' >> deciding what a repeated key means. The two are exact inverses under their defaults.
+- The column options are named C<var_name> / C<value_name> after C<melt>, which emits the same two columns. R spells this pair C<tibble::enframe()> / C<deframe()>; pandas spells it C<pd.Series(d).reset_index()> and C<Series.to_dict()>.
 
 =head2 0.27 2026-07-26 CDT
 
@@ -13193,7 +13678,7 @@ Numerous changes to prevent quadmath/long double CPAN test failures
 
 Minimum Scalar::Util version in dist.ini is now 1.22, see https://www.cpantesters.org/cpan/report/6b682236-6567-11f1-a3bc-a055f9c4ba34
 
-C<Digest::SHA> is no longer needed, and removed as a dependency
+C<Digest::SHA> removed as a dependency
 
 =head3 C<read_table>
 

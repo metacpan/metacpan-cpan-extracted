@@ -7,9 +7,9 @@ use Role::Tiny;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-29'; # DATE
+our $DATE = '2026-04-15'; # DATE
 our $DIST = 'DesktopWorkspace'; # DIST
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 
 # constructor
 requires 'new';
@@ -42,7 +42,7 @@ DesktopWorkspaceRole::Spec::Basic - Required methods for all DesktopWorkspace::*
 
 =head1 VERSION
 
-This document describes version 1.0.0 of DesktopWorkspaceRole::Spec::Basic (from Perl distribution DesktopWorkspace), released on 2026-03-29.
+This document describes version 1.0.1 of DesktopWorkspaceRole::Spec::Basic (from Perl distribution DesktopWorkspace), released on 2026-04-15.
 
 =head1 DESCRIPTION
 

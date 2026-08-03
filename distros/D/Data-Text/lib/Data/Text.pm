@@ -1,16 +1,17 @@
 package Data::Text;
 
-use warnings;
 use strict;
-
-use Carp;
-use Encode;
-use Lingua::Conjunction;
-use Object::Configure 0.16;
-use Params::Get 0.13;
-use Scalar::Util;
-use String::Util;
+use warnings;
+use autodie qw(:all);
 use utf8;
+
+use Carp ();
+use Encode ();
+use Lingua::Conjunction ();
+use Object::Configure 0.23;
+use Params::Get 0.15;
+use Scalar::Util qw(blessed);
+use String::Util ();
 
 =head1 NAME
 
@@ -18,11 +19,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use overload (
 	'==' => \&equal,
@@ -30,7 +31,7 @@ use overload (
 	'""' => \&as_string,
 	# bool => sub { defined $_[0] && defined $_[0]->{'text'} && length $_[0]->{'text'} },
 	bool => sub { 1 },
-	fallback => 1	# So that boolean tests don't cause as_string to be called
+	fallback => 1	# Prevents boolean context from invoking as_string
 );
 
 =head1 DESCRIPTION
@@ -65,32 +66,24 @@ sub new {
 	my $self;
 	my $params;
 
-	if(scalar(@_) == 1) {
-		# Just one parameter - the text to initialize with
+	if(@_ == 1) {
 		$params = Params::Get::get_params('text', \@_);
 	} else {
-		$params = Params::Get::get_params(undef, \@_) || {};
+		$params = Params::Get::get_params(undef, \@_) // {};
 	}
 
 	if(!defined($class)) {
-		# Using Data::Text->new(), not Data::Text::new()
-		# This only works when no arguments are given
-		$self = bless { }, __PACKAGE__;
-	} elsif(Scalar::Util::blessed($class)) {
-		# If $class is an object, clone it with new arguments
-		$self = bless { }, ref($class);
-		return $self->set($class) if(!scalar keys %{$params});
+		$self = bless {}, __PACKAGE__;
+	} elsif(blessed($class)) {
+		$self = bless {}, ref($class);
+		return $self->set($class) if !keys %{$params};
 	} else {
-		# Create a new object
-		$self = bless { }, $class;
+		$self = bless {}, $class;
+		$params = Object::Configure::configure($class, $params);
 	}
 
-	$params = Object::Configure::configure($class, $params);
+	$self->set($params) if $params->{'text'};
 
-	# Set additional attributes if arguments are provided
-	$self->set($params) if($params->{'text'});
-
-	# Return the blessed object
 	return $self;
 }
 
@@ -115,24 +108,20 @@ sub set {
 		return;
 	}
 
-	# @{$self}{'file', 'line'} = (caller(0))[1, 2];
-	my @call_details = caller(0);
-	$self->{'file'} = $call_details[1];
-	$self->{'line'} = $call_details[2];
+	@{$self}{'file', 'line'} = (caller(0))[1, 2];
 
 	if(ref($params->{'text'})) {
-		# Allow the text to be a reference to a list of strings
 		if(ref($params->{'text'}) eq 'ARRAY') {
 			if(scalar(@{$params->{'text'}}) == 0) {
 				Carp::carp(__PACKAGE__, ': no text given');
 				return $self;
 			}
 			delete $self->{'text'};
-			foreach my $text(@{$params->{'text'}}) {
+			for my $text (@{$params->{'text'}}) {
 				$self = $self->append($text);
 			}
 			return $self;
-		} elsif(ref($params->{text}) eq 'HASH') {
+		} elsif(ref($params->{'text'}) eq 'HASH') {
 			Carp::croak(__PACKAGE__, ': set(): text cannot be a hashref');
 		}
 		$self->{'text'} = $params->{'text'}->as_string();
@@ -158,32 +147,25 @@ If called with an object, the message as_string() is sent to it for its contents
 
 =cut
 
-sub append
-{
+sub append {
 	my $self = shift;
 	my $params = Params::Get::get_params('text', @_);
 	my $text = $params->{'text'};
 
-	# Check if text is provided
 	unless(defined $text) {
 		Carp::carp(__PACKAGE__, ': no text given to append()');
 		return;
 	}
 
-	# Capture caller information for debugging
 	my $file = $self->{'file'};
 	my $line = $self->{'line'};
-	# my @call_details = caller(0);
-	# $self->{'file'} = $call_details[1];
-	# $self->{'line'} = $call_details[2];
 	@{$self}{'file', 'line'} = (caller(0))[1, 2];
 
-	# Process if text is a reference
 	if(ref($text)) {
 		if(ref($text) eq 'ARRAY') {
 			unless(@{$text}) {
 				Carp::carp(__PACKAGE__, ': no text given');
-				return
+				return;
 			}
 			$self->append($_) for @{$text};
 			return $self;
@@ -191,18 +173,17 @@ sub append
 		$text = $text->as_string();
 	}
 
-	# Check for consecutive punctuation
 	# FIXME: handle ending with an abbreviation
 	if($self->{'text'} && ($self->{'text'} =~ /\s*[\.,;]\s*$/) && ($text =~ /^\s*[\.,;]/)) {
 		if(my $logger = $self->{'logger'}) {
-			$logger->warn(": attempt to add consecutive punctuation\n\tCurrent = '" . $self->{'text'} .
-			"' at $line of $file\n\tAppend = '", $text, "'");
+			$logger->warn(': attempt to add consecutive punctuation' .
+				"\n\tCurrent = '" . $self->{'text'} .
+				"' at $line of $file\n\tAppend = '$text'");
 		}
 		Carp::carp(__PACKAGE__,
 			": attempt to add consecutive punctuation\n\tCurrent = '", $self->{'text'},
 			"' at $line of $file\n\tAppend = '", $text, "'");
 	} else {
-		# Append text
 		$self->{'text'} .= $text;
 	}
 
@@ -220,9 +201,11 @@ Converts the text to uppercase.
 sub uppercase {
 	my $self = shift;
 
-	Encode::_utf8_on($self->{'text'});	# Ensure characters like é are converted to É
-	$self->{'text'} = uc($self->{'text'}) if(defined($self->{'text'}));
-	Encode::_utf8_off($self->{'text'});
+	if(defined($self->{'text'})) {
+		Encode::_utf8_on($self->{'text'});
+		$self->{'text'} = uc($self->{'text'});
+		Encode::_utf8_off($self->{'text'});
+	}
 
 	return $self;
 }
@@ -236,11 +219,13 @@ Converts the text to lowercase.
 =cut
 
 sub lowercase {
-	my $self = $_[0];
+	my $self = shift;
 
-	Encode::_utf8_on($self->{'text'});	# Ensure characters like é are converted to É
-	$self->{'text'} = lc($self->{'text'}) if(defined($self->{'text'}));
-	Encode::_utf8_off($self->{'text'});
+	if(defined($self->{'text'})) {
+		Encode::_utf8_on($self->{'text'});
+		$self->{'text'} = lc($self->{'text'});
+		Encode::_utf8_off($self->{'text'});
+	}
 
 	return $self;
 }
@@ -272,8 +257,7 @@ Are two texts the same?
 =cut
 
 sub equal {
-	my $self = shift;
-	my $other = shift;
+	my ($self, $other) = @_;
 
 	return $self->as_string() eq $other->as_string();
 }
@@ -289,8 +273,7 @@ Are two texts different?
 =cut
 
 sub not_equal {
-	my $self = shift;
-	my $other = shift;
+	my ($self, $other) = @_;
 
 	return $self->as_string() ne $other->as_string();
 }
@@ -318,12 +301,9 @@ This is actually the number of characters, not the number of bytes.
 sub length {
 	my $self = shift;
 
-	if(!defined($self->{'text'})) {
-		return 0;
-	}
+	return 0 unless defined $self->{'text'};
 
 	my $copy = $self->{'text'};
-
 	Encode::_utf8_on($copy);
 
 	return length($copy);
@@ -371,7 +351,7 @@ sub replace {
 	my ($self, $replacements) = @_;
 
 	if($self->{'text'} && (ref($replacements) eq 'HASH')) {
-		foreach my $search (keys %{$replacements}) {
+		for my $search (keys %{$replacements}) {
 			my $replace = $replacements->{$search};
 			$self->{'text'} =~ s/\b\Q$search\E\b/$replace/g;
 		}
@@ -395,8 +375,7 @@ this code works
 
 =cut
 
-sub appendconjunction
-{
+sub appendconjunction {
 	my $self = shift;
 
 	return $self->append(Lingua::Conjunction::conjunction(@_));
@@ -454,7 +433,9 @@ L<http://deps.cpantesters.org/?module=Data::Text>
 
 Copyright 2021-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

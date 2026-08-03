@@ -3,9 +3,12 @@ BEGIN { require 5.010000 }; ## no critic ( RequireUseStrict, RequireUseWarnings 
 use strict;
 use warnings;
 
+#<<<
 package Version::Semantic;
-
-$Version::Semantic::VERSION = 'v1.3.0';
+BEGIN {
+our $VERSION = 'v2.0.0';
+}
+#>>>
 
 use overload '<=>' => 'compare_to', '""' => 'to_string';
 
@@ -65,11 +68,14 @@ sub has_build       { defined shift->{ build } }
 
   # Constructor as factory method
   sub parse {
+    my $options = ( ref $_[ -1 ] eq 'HASH' ) ? pop : {};
     my ( $class, $version ) = @_;
     $version //= '';
 
-    $version =~ m/\A$semver_re\z/
-      or _croakf "Version '%s' is not a semantic version", $version;
+    unless ( $version =~ m/\A$semver_re\z/ ) {
+      _croakf "Version '%s' is not a semantic version", $version if $options->{ fatal };
+      return
+    }
 
     $class->new( %+ )
   }

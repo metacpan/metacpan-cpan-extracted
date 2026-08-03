@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 
 my $dist = {
 	COMPRESS => 'gzip -9f',
@@ -22,9 +22,11 @@ WriteMakefile(
 	  : ()),
 	'LIBS' => [''],   # e.g., '-lm'
 	'DEFINE' => '',     # e.g., '-DHAVE_SOMETHING'
-	'INC' => '',     # e.g., '-I/usr/include/other'
+	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
-	TEST_REQUIRES => {
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, TEST_REQUIRES => {
 		'Data::Random' => 0,
 		'FindBin' => 0,
 		'IPC::Run3' => 0,
@@ -42,9 +44,9 @@ WriteMakefile(
 		'Carp' => 0,
 		'Encode' => 0,
 		'Lingua::Conjunction' => 0,
-		'Object::Configure' => 0.16,
+		'Object::Configure' => 0.23,
 		'overload' => 0,
-		'Params::Get' => 0.13,
+		'Params::Get' => 0.15,
 		'Scalar::Util' => 0,
 		'String::Util' => 0
 	}, dist => $dist,
@@ -55,11 +57,13 @@ WriteMakefile(
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
+			homepage => 'https://metacpan.org/pod/Data::Text',
 			repository => {
+				repository => 'https://github.com/nigelhorne/Data-Text',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Data-Text.git',
 				web => 'https://github.com/nigelhorne/Data-Text',
-				repository => 'https://github.com/nigelhorne/Data-Text',
+				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text',
 				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text',
@@ -69,5 +73,5 @@ WriteMakefile(
 			}
 		},
 	},
-	# MIN_PERL_VERSION	=> '5.008'
+	MIN_PERL_VERSION	=> '5.008'
 );

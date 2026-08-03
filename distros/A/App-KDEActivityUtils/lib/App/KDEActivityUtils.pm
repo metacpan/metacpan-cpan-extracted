@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-30'; # DATE
+our $DATE = '2026-04-15'; # DATE
 our $DIST = 'App-KDEActivityUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our @EXPORT_OK = qw(
                );
@@ -37,7 +37,7 @@ App::KDEActivityUtils - Utilities related to KDE Activities
 
 =head1 VERSION
 
-This document describes version 0.004 of App::KDEActivityUtils (from Perl distribution App-KDEActivityUtils), released on 2026-03-30.
+This document describes version 0.006 of App::KDEActivityUtils (from Perl distribution App-KDEActivityUtils), released on 2026-04-15.
 
 =head1 SYNOPSIS
 
@@ -47,8 +47,6 @@ This distribution includes several utilities related to KDE activities as
 alternatives/wrappers to L<kactivities-cli>:
 
 =over
-
-=item * L<get-current-kde-activity>
 
 =item * L<getkact>
 
@@ -78,6 +76,12 @@ utilities.
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@gmail.com>
 
 =head1 CONTRIBUTING
 

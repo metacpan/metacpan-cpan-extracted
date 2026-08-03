@@ -1,6 +1,6 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /App/XWindowManagerUtils/get_xwm_window_kde_activity
+# Note: This script is a CLI for Riap function /Desktop/XWindowManager/Util/get_xwm_window_kde_activity
 # and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
@@ -11,12 +11,12 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-06'; # DATE
+our $DATE = '2026-04-15'; # DATE
 our $DIST = 'App-XWindowManagerUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/App/XWindowManagerUtils/get_xwm_window_kde_activity",
+    url => "/Desktop/XWindowManager/Util/get_xwm_window_kde_activity",
     program_name => "get-xwm-window-kde-activity",
     log => 1,
     read_config => 0,
@@ -40,7 +40,7 @@ get-xwm-window-kde-activity - Get the KDE activity GUID(s) of a specific window
 
 =head1 VERSION
 
-This document describes version 0.003 of get-xwm-window-kde-activity (from Perl distribution App-XWindowManagerUtils), released on 2026-04-06.
+This document describes version 0.004 of get-xwm-window-kde-activity (from Perl distribution App-XWindowManagerUtils), released on 2026-04-15.
 
 =head1 SYNOPSIS
 

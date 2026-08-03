@@ -2,8 +2,11 @@ Changes
 cpanfile
 lib/BarefootJS/Backend/Xslate.pm
 LICENSE
+CONTRIBUTING.md
+SECURITY.md
 MANIFEST
 Makefile.PL
+t/meta_provides.t
 t/render.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

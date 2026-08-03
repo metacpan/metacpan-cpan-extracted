@@ -20,13 +20,13 @@ name: DesktopWorkspace
 provides:
   DesktopWorkspace:
     file: lib/DesktopWorkspace.pm
-    version: v1.0.0
+    version: v1.0.1
   DesktopWorkspace::Test::Spec::Basic:
     file: lib/DesktopWorkspace/Test/Spec/Basic.pm
-    version: v1.0.0
+    version: v1.0.1
   DesktopWorkspaceRole::Spec::Basic:
     file: lib/DesktopWorkspaceRole/Spec/Basic.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Data::Clone: '0'
   Role::Tiny: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DesktopWorkspace
   homepage: https://metacpan.org/release/DesktopWorkspace
   repository: git://github.com/perlancar/perl-DesktopWorkspace.git
-version: 1.0.0
+version: 1.0.1
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -493,6 +493,8 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.036'
 x_authority: cpan:PERLANCAR
+x_contributors:
+  - 'perlancar <perlancar@gmail.com>'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

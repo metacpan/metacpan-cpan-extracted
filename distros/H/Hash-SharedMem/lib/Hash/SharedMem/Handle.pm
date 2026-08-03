@@ -82,7 +82,7 @@ use strict;
 
 use Hash::SharedMem ();
 
-our $VERSION = "0.005";
+our $VERSION = "0.006";
 
 =head1 CLASS METHODS
 
@@ -330,16 +330,6 @@ any of the interfaces.
 =head1 SEE ALSO
 
 L<Hash::SharedMem>
-
-=head1 AUTHOR
-
-Andrew Main (Zefram) <zefram@fysh.org>
-
-=head1 COPYRIGHT
-
-Copyright (C) 2014, 2015 PhotoBox Ltd
-
-Copyright (C) 2014, 2015, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

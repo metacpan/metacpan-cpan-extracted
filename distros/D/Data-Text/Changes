@@ -1,5 +1,20 @@
 Revision history for Data::Text
 
+0.20	Sun Aug  2 08:31:47 PM EDT 2026
+	[ Enhancements ]
+	- Only call Object::Configure when sensible
+	- Modernise: use strict/warnings/autodie pragma block; empty import lists
+	  to avoid namespace pollution; || -> // for definedness checks;
+	  scalar(@_) -> @_ in numeric context; consistent brace style;
+	  list-assignment for two-arg methods; foreach -> for
+
+	[ Bug Fixes ]
+	- Fix t/data.t: does_croak_that_matches -> does_confess_that_matches for
+	  calls that Params::Get 0.15 now handles with Carp::confess
+
+	[ Testing ]
+	- Updated the CI scripts
+
 0.19	Fri Jan 23 20:52:56 EST 2026
 	Try harder to handle non-English LANGUAGE setting (RT#168965)
 	Use Object::Configure

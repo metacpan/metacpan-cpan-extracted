@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150011",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -36,11 +36,12 @@
             "Encode" : "0",
             "IPC::System::Simple" : "0",
             "Lingua::Conjunction" : "0",
-            "Object::Configure" : "0.16",
-            "Params::Get" : "0.13",
+            "Object::Configure" : "0.23",
+            "Params::Get" : "0.15",
             "Scalar::Util" : "0",
             "String::Util" : "0",
-            "overload" : "0"
+            "overload" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -67,6 +68,7 @@
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text",
          "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text"
       },
+      "homepage" : "https://metacpan.org/pod/Data::Text",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/Data-Text.git",
@@ -74,6 +76,6 @@
          "x_repository" : "https://github.com/nigelhorne/Data-Text"
       }
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

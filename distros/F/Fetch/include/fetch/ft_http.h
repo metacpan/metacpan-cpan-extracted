@@ -54,6 +54,8 @@ typedef struct ft_conn {
      * coderef as it arrives instead of being buffered, so large or endless
      * (SSE) bodies do not grow memory and the final Response body is empty. */
     SV           *on_body;
+    SV           *on_headers;  /* fired once, ($status, [k,v,...]), before body */
+    int           headers_fired;
     size_t        body_recv;   /* cumulative body bytes seen (streaming) */
     /* request (HTTP/1.1 serialized form) */
     char         *req;
@@ -127,6 +129,26 @@ static void ft_conn_cancel_timer(pTHX_ ft_conn *c) {
  * inherits its simple_response mode (single-threaded loop; safe as a static). */
 static int ft_conn_simple_next = 0;
 
+/* Likewise for the optional on_headers callback (borrowed; consumed at conn
+ * create/revive). Fired once, before the body, with ($status, [k,v,...]). */
+static SV *ft_conn_on_headers_next = NULL;
+
+/* Hand the parsed status line + header list to the on_headers sink, once. */
+static void ft_fire_headers(pTHX_ ft_conn *c) {
+    dSP;
+    SV *hrv = c->headers ? newRV_inc((SV *)c->headers)
+                         : newRV_noinc((SV *)newAV());
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSViv(c->status)));
+    PUSHs(sv_2mortal(hrv));
+    PUTBACK;
+    call_sv(c->on_headers, G_DISCARD | G_EVAL);
+    if (SvTRUE(ERRSV)) warn("Fetch: on_headers callback died: %s", SvPV_nolen(ERRSV));
+    FREETMPS; LEAVE;
+}
+
 static void ft_conn_free(pTHX_ ft_conn *c) {
     if (!c) return;
     ft_conn_cancel_timer(aTHX_ c);
@@ -140,6 +162,7 @@ static void ft_conn_free(pTHX_ ft_conn *c) {
         ft_os_close(c->fd);
     }
     if (c->on_body)      SvREFCNT_dec(c->on_body);
+    if (c->on_headers)   SvREFCNT_dec(c->on_headers);
     if (c->ws_on_message) SvREFCNT_dec(c->ws_on_message);
     if (c->ws_on_close)   SvREFCNT_dec(c->ws_on_close);
     if (c->ws_waiter)     SvREFCNT_dec(c->ws_waiter);
@@ -238,6 +261,8 @@ static void ft_conn_park(pTHX_ ft_conn *c) {
     ft_conn_cancel_timer(aTHX_ c);
     if (c->future)  { SvREFCNT_dec(c->future);  c->future  = NULL; }
     if (c->on_body) { SvREFCNT_dec(c->on_body); c->on_body = NULL; }
+    if (c->on_headers) { SvREFCNT_dec(c->on_headers); c->on_headers = NULL; }
+    c->headers_fired = 0;
     if (c->headers) { SvREFCNT_dec(c->headers); c->headers = NULL; }
     c->rlen = 0; c->have_headers = 0; c->hdr_end = 0; c->status = 0;
     c->content_len = -1; c->want_close = 0; c->chunked = 0;
@@ -299,7 +324,7 @@ static int strncasestr_chunked(const char *s, const char *end) {
 /* parse status line + headers once the \r\n\r\n terminator is in rbuf */
 static int ft_parse_headers(pTHX_ ft_conn *c) {
     char *p   = c->rbuf;
-    char *end = memmem(c->rbuf, c->rlen, "\r\n\r\n", 4);
+    char *end = ft_memmem(c->rbuf, c->rlen, "\r\n\r\n", 4);
     char *line_end;
     if (!end) return 0;                     /* need more bytes */
     c->hdr_end = (size_t)(end - c->rbuf) + 4;
@@ -358,7 +383,7 @@ static void ft_chunk_feed(pTHX_ ft_conn *c) {
         if (c->chunk_left < 0) {                /* need a chunk-size line */
             char  *base = c->rbuf + c->cpos;
             size_t rem  = c->rlen - c->cpos;
-            char  *crlf = (char *)memmem(base, rem, "\r\n", 2);
+            char  *crlf = (char *)ft_memmem(base, rem, "\r\n", 2);
             long   sz;
             if (!crlf) return;                  /* size line incomplete */
             sz = strtol(base, NULL, 16);        /* hex; ignores ;extensions */
@@ -639,6 +664,10 @@ static void ft_conn_step(pTHX_ ft_conn *c) {
                         ft_conn_fail(aTHX_ c, "websocket upgrade rejected");
                         return;
                     }
+                    if (c->on_headers && !c->headers_fired) {
+                        c->headers_fired = 1;
+                        ft_fire_headers(aTHX_ c);
+                    }
                     if (c->chunked) {
                         ft_chunk_feed(aTHX_ c);
                         if (c->on_body && c->cpos > c->hdr_end) {   /* compact */
@@ -741,6 +770,9 @@ static void ft_conn_revive(pTHX_ ft_conn *c, const char *req_bytes, STRLEN req_l
     c->future  = SvREFCNT_inc(future);
     if (c->on_body) { SvREFCNT_dec(c->on_body); c->on_body = NULL; }
     if (on_body && SvOK(on_body) && SvROK(on_body)) c->on_body = SvREFCNT_inc(on_body);
+    if (c->on_headers) { SvREFCNT_dec(c->on_headers); c->on_headers = NULL; }
+    if (ft_conn_on_headers_next) c->on_headers = SvREFCNT_inc(ft_conn_on_headers_next);
+    c->headers_fired = 0;
     if (c->rq_body) { SvREFCNT_dec(c->rq_body); c->rq_body = NULL; }
     if (SvOK(body)) c->rq_body = newSVsv(body);
     c->reused = 1;
@@ -841,6 +873,7 @@ static SV *ft_h1_start(pTHX_ ft_loop *loop, SV *loop_sv, ft_pool *pool,
         if (SvOK(body)) c->rq_body = newSVsv(body);
     }
     if (on_body && SvOK(on_body) && SvROK(on_body)) c->on_body = SvREFCNT_inc(on_body);
+    if (ft_conn_on_headers_next) c->on_headers = SvREFCNT_inc(ft_conn_on_headers_next);
     Newx(c->req, req_len, char);
     memcpy(c->req, req_bytes, req_len);
     c->req_len = req_len;

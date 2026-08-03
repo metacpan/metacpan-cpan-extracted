@@ -1,6 +1,6 @@
 package Proc::ProcessTable::ncps;
 
-use 5.006;
+use 5.010001;
 use strict;
 use warnings;
 use Proc::ProcessTable::Match;
@@ -18,11 +18,11 @@ Proc::ProcessTable::ncps - New Colorized(optional) PS, an enhanced version of PS
 
 =head1 VERSION
 
-Version 0.2.1
+Version 0.2.2
 
 =cut
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.2';
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,12 @@ The return value is a string.
 sub run {
 	my $self = $_[0];
 
-	my $ppt = Proc::ProcessTable->new( 'cache_ttys' => 1 );
+	# cache_ttys is not used as Proc::ProcessTable keeps that cache in a
+	# Storable file under /tmp that is shared by every perl on the machine
+	# with the same byte order, so a cache written by a perl built with a
+	# differing double size makes Storable::retrieve die with
+	# 'Double size is not compatible'
+	my $ppt = Proc::ProcessTable->new;
 	my $pt  = $ppt->table;
 
 	# if this platform does not provide the rss field, compute it from

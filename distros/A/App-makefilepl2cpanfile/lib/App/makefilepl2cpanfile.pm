@@ -20,7 +20,7 @@ App::makefilepl2cpanfile - Convert Makefile.PL to a cpanfile automatically
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # -----------------------------------------------------------------------
 # Constants
@@ -186,7 +186,18 @@ sub generate {
 
 	croak "Cannot read '$makefile'" unless -f $makefile && -r _;
 
-	my $content  = path($makefile)->slurp_utf8;
+	my $content;
+	{
+		local $@;
+		eval { $content = path($makefile)->slurp_utf8 };
+		if ($@) {
+			# Only degrade gracefully for encoding errors; re-throw true I/O failures
+			# so callers can distinguish a corrupt file from an unreadable one.
+			die $@ unless $@ =~ /decode|ill-formed|utf/i;
+			carp "Warning: '$makefile' contains invalid UTF-8; reading as raw bytes: $@";
+			$content = path($makefile)->slurp_raw;
+		}
+	}
 	my $min_perl = _parse_min_perl($content);
 	my $deps     = parse_prereqs($content);
 

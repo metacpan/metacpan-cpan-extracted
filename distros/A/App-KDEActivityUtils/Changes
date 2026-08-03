@@ -1,3 +1,14 @@
+0.006   2026-04-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Move move-windows-to-kde-activity to App-XWindowManagerUtils.
+
+
+0.005   2026-04-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Tweak Rinci metadata: use schema kdeactivity::name for
+          completion.
+
+
 0.004   2026-03-30  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add short aliases: getkact, setkact.

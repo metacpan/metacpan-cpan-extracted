@@ -6,12 +6,16 @@ use_ok $_ for qw(
 );
 
 # make sure we can initiate -- note, get your own API key!
-my $books = Google::ISBNNumbers->new('AIzaSyBorBmYpbBMTCb0wqQuukR93dzmME4Z1mk'); 
-isa_ok( $books, 'Google::ISBNNumbers' );
+SKIP: {
+	skip "Set an GOOGLE_API_KEY environment variable to test", 2 if !$ENV{GOOGLE_API_KEY};
 
-# make sure we can find a good good
-my $book_info = $books->lookup_isbn(9781680500882);
-ok($book_info->{title} =~ /Modern Perl/, 'Able to look up 9781680500882');
+	my $books = Google::ISBNNumbers->new($ENV{GOOGLE_API_KEY}); 
+	isa_ok( $books, 'Google::ISBNNumbers' );
+
+	# make sure we can find a good good
+	my $book_info = $books->lookup_isbn(9781680500882);
+	ok($book_info->{title} =~ /Modern Perl/, 'Able to look up 9781680500882');
+}
 
 done_testing;
 

@@ -78,7 +78,7 @@ DATA: {
 		qr/attempt to add/
 	);
 
-	does_croak_that_matches(
+	does_confess_that_matches(
 		sub {
 			$d = new_ok('Data::Text');
 			$d->append();
@@ -102,7 +102,7 @@ DATA: {
 		qr/no text given/
 	);
 
-	does_croak_that_matches(
+	does_confess_that_matches(
 		sub {
 			$d = new_ok('Data::Text');
 			$d->set([]);
@@ -110,7 +110,7 @@ DATA: {
 		qr/Usage:\s/
 	);
 
-	does_croak_that_matches(
+	does_confess_that_matches(
 		sub {
 			$d = new_ok('Data::Text');
 			$d->append([]);
@@ -118,7 +118,7 @@ DATA: {
 		qr/Usage:\s/
 	);
 
-	does_croak_that_matches(
+	does_confess_that_matches(
 		sub {
 			$d = new_ok('Data::Text');
 			$d->set();

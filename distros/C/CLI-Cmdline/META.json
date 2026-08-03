@@ -32,37 +32,37 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
             "Test::More" : "0.88",
-            "Test::NoWarnings" : "1.04",
-            "Test::Pod::Coverage" : "1.04"
+            "Test::Pod::Coverage" : "1.04",
+            "Test::Warnings" : "0.028"
          }
       }
    },
    "provides" : {
       "CLI::Cmdline" : {
          "file" : "lib/CLI/Cmdline.pm",
-         "version" : "1.25"
+         "version" : "1.28"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/HansH111/CLI-Cmdline.pm/issues"
+         "web" : "https://codeberg.org/HansH111/CLI-Cmdline.pm/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/HansH111/CLI-Cmdline.pm.git",
-         "web" : "https://github.com/HansH111/CLI-Cmdline.pm"
+         "url" : "https://codeberg.org/HansH111/CLI-Cmdline.pm.git",
+         "web" : "https://codeberg.org/HansH111/CLI-Cmdline.pm"
       }
    },
-   "version" : "1.25",
+   "version" : "1.28",
    "x_contributors" : [
-      "Hans Harder <hans@atbas.org>"
+      "Hans Harder <hans at atbas.org>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

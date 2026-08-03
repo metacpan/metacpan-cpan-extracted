@@ -1,17 +1,10 @@
-[![Travis Status](https://travis-ci.org/nigelhorne/CGI-ACL.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-ACL)
-[![Appveyor status](https://ci.appveyor.com/api/projects/status/5wa2lsb6c86x9jp0?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-acl)
-[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-ACL/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-ACL?branch=master)
-[![CPAN](https://img.shields.io/cpan/v/CGI-ACL.svg)](http://search.cpan.org/~nhorne/CGI-ACL/)
-[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
-[![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-ACL.png)](http://cpants.cpanauthors.org/dist/CGI-ACL)
-
 # NAME
 
 CGI::ACL - Decide whether to allow a client to run a CGI script
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 

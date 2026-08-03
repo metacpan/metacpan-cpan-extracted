@@ -1,14 +1,14 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 package CLI::Cmdline;
 
 use strict;
 use warnings;
-use 5.010;
+use 5.014;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(parse);
 our @EXPORT = qw(parse);
-our $VERSION   = '1.25';
+our $VERSION   = '1.28';
 
 use constant {
     MATCH_SWITCH => 1,
@@ -140,7 +140,7 @@ CLI::Cmdline - Minimal command-line parser with short/long options and aliases i
 
 =head1 VERSION
 
-1.25
+1.28
 
 =head1 SYNOPSIS
 
@@ -237,7 +237,7 @@ If you want multiple occurrences but don't want to pre-set an array:
 
 =head2 Realistic full script with clear usage message
 
-    #!/usr/bin/perl
+    #!/usr/bin/env perl
     use strict;
     use warnings;
 

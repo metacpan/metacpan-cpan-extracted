@@ -45,6 +45,7 @@ t/dunn_test.t
 t/effect_sizes.t
 t/epi_2x2.t
 t/fillna.t
+t/filter.compiled.t
 t/filter.rowid.t
 t/filter.t
 t/filter_match.t
@@ -53,6 +54,7 @@ t/friedman_test.t
 t/glm.t
 t/glm_families.t
 t/group_by.HoH.filter.t
+t/h2aoh_aoh2h.t
 t/help.t
 t/hoa2aoh.t
 t/hoa2hoh.t
@@ -104,6 +106,7 @@ t/view2.t
 t/view_aoa.t
 t/vif_hoslem.t
 t/wilcox_test.t
+t/write_table.announce.t
 t/write_table.longtable.t
 t/write_table.t
 t/write_table.tex.escape.t

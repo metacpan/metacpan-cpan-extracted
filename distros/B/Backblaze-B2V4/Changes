@@ -1,5 +1,9 @@
 Revision history for Perl extension Backblaze-B2V4
 
+0.05 2026-08-03T01:25:33Z
+
+     - Add comment for the included testing key
+
 0.04 2026-07-09T01:44:03Z
 
      - Fix bug in retrieving results for b2_upload_file

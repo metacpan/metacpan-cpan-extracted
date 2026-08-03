@@ -4,6 +4,12 @@ use strict;
 use warnings;
 use 5.016003;
 
+# TODO: Add $ENV{TEST_MOCKINGBIRD_DEBUG} tracing flag that emits one line to
+#       STDERR on each mock/unmock/restore_all operation (name, type, caller
+#       location).  diagnose_mocks() covers post-hoc inspection; this would add
+#       real-time per-operation tracing for troubleshooting complex stacking
+#       scenarios.  Inspired by Function::Override's PERL_FUNCTION_OVERRIDE_DEBUG.
+
 use Carp       qw(croak carp);
 use Exporter   'import';
 use Scalar::Util ();
@@ -23,12 +29,14 @@ use constant {
 	_T_BEFORE        => 'before',
 	_T_AFTER         => 'after',
 	_T_AROUND        => 'around',
+	_T_MOCK_CORE     => 'mock_core',
 };
 
 our @EXPORT = qw(
 	mock
 	unmock
 	mock_scoped
+	mock_core
 	before
 	after
 	around
@@ -66,11 +74,11 @@ async Future mocking
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -333,10 +341,16 @@ sub unmock {
 
 	my $prev = pop @{ $mocked{$full_method} };
 
-	{
+	if (defined $prev) {
 		no warnings 'redefine';
 		no strict 'refs';    ## no critic (ProhibitNoStrict)
 		*{$full_method} = $prev;
+	} elsif ($full_method =~ /^CORE::GLOBAL::/) {
+		# No prior CORE::GLOBAL override existed (mock_core pushed undef).
+		# Delete the stash entry so the real CORE builtin is reachable.
+		my ($bname) = ($full_method =~ /::([^:]+)$/);
+		no strict 'refs';    ## no critic (ProhibitNoStrict)
+		delete $CORE::GLOBAL::{$bname};
 	}
 
 	# Pop exactly one meta entry to mirror the mock stack.
@@ -675,12 +689,6 @@ called and its return value is passed back to the caller.
 Returns a coderef that, when invoked, returns the list of captured call
 records. Each record is an arrayref C<[ $full_method, @args ]>.
 
-=head3 Limitation
-
-C<spy()> does not call C<mock()> internally and therefore does not apply
-prototype preservation. Wrapping a prototyped function emits a
-C<Prototype mismatch> warning.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -724,8 +732,16 @@ sub spy {
 		return $orig->(@_);
 	};
 
+	# Preserve the original's prototype to suppress "Prototype mismatch"
+	# warnings and ensure '_'-prototype functions (stat, lstat, etc.) bind
+	# $_ correctly at the call site when wrapped.
+	my $orig_proto = prototype($orig);
+	if (defined $orig_proto) {
+		&Scalar::Util::set_prototype($wrapper, $orig_proto);
+	}
+
 	{
-		no warnings 'redefine';
+		no warnings 'redefine', 'prototype';
 		no strict 'refs';    ## no critic (ProhibitNoStrict)
 		*{$full_method} = $wrapper;
 	}
@@ -902,6 +918,140 @@ sub intercept_new {
 
 	local $TYPE = _T_INTERCEPT_NEW;
 	mock("${class}::new", $replacement);
+
+	return;
+}
+
+=head2 mock_core
+
+Override a CORE Perl builtin globally via C<CORE::GLOBAL>.
+
+    # Intercept 'warn' for code compiled after this point
+    mock_core 'warn' => sub {
+        my ($call_warn, @msgs) = @_;
+        push @captured, @msgs;   # capture without emitting
+    };
+
+    # Call through to the real builtin via $call_builtin
+    mock_core 'stat' => sub {
+        my ($call_stat, $file) = @_;
+        return $call_stat->($file);   # delegates to CORE::stat
+    };
+
+    unmock 'CORE::GLOBAL::warn';   # peel one layer
+    restore_all();                 # drain all layers
+
+The replacement receives C<($call_builtin, @original_args)>, mirroring the
+C<around()> API.  C<$call_builtin> is a coderef that calls C<CORE::$name>
+directly, bypassing any other C<CORE::GLOBAL> override.
+
+The override is installed in C<CORE::GLOBAL::$name>, which is Perl's
+documented mechanism for intercepting named builtins.  It affects all
+packages globally.
+
+B<Compile-time semantics:> C<CORE::GLOBAL> overrides are visible to code
+compiled I<after> the override is installed.  To intercept calls in a module
+under test, install the mock I<before> loading that module (a C<BEGIN> block
+works).  Already-compiled call sites (including direct calls in the current
+test file) are not affected at runtime.  Use string C<eval> when you need
+code compiled in the same test run to see the override.
+
+The wrapper carries the same prototype as C<CORE::$name> so that call-site
+argument binding (such as the C<_> prototype that reads C<$_> when no
+argument is given) is preserved.
+
+Participates in the same LIFO mock stack as C<mock()>.  C<unmock>,
+C<restore()>, and C<restore_all()> accept C<'CORE::GLOBAL::$name'> as the
+target.  C<diagnose_mocks()> records the layer type as C<'mock_core'>.
+
+B<Limitation:> builtins whose prototype begins with C<&> (C<sort>, C<map>,
+C<grep>) require a literal code block at the call site and cannot be wrapped.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    name        -- Str, CORE builtin name (no 'CORE::' prefix required)
+    replacement -- CodeRef; receives ($call_builtin, @original_args)
+
+=head4 Output
+
+    returns: undef
+
+=head3 MESSAGES
+
+  "mock_core requires a builtin name and a replacement coderef" -- wrong arg types
+  "mock_core: '$name' is not a valid identifier"               -- name has punctuation
+  "mock_core: '$name' is not an overridable Perl builtin"      -- unknown builtin
+  "mock_core: cannot build CORE::$name delegator: ..."         -- eval failed
+
+=cut
+
+sub mock_core {
+	my ($name, $replacement) = @_;
+
+	croak 'mock_core requires a builtin name and a replacement coderef'
+		unless defined $name && ref($replacement) eq 'CODE';
+
+	$name =~ s/^CORE:://;    # tolerate an optional 'CORE::' prefix
+
+	croak "mock_core: '$name' is not a valid identifier"
+		unless $name =~ /^\w+$/;
+	croak "mock_core: '$name' is not an overridable Perl builtin"
+		unless _is_core_overridable($name);
+
+	my $core_proto = eval { my $p = prototype("CORE::$name"); $p };
+
+	# Build a delegator that calls CORE::$name directly.  Must be eval'd
+	# because CORE:: names are compile-time constructs -- no runtime coderef
+	# exists.  Calling CORE:: directly bypasses any other CORE::GLOBAL override.
+	# For '_' prototype (e.g. stat), pass $_[0] explicitly to avoid the
+	# "Array passed to stat will be coerced to a scalar" compiler warning that
+	# fires when @_ is passed to a single-arg builtin.
+	my $args      = (defined $core_proto && $core_proto eq '_') ? '$_[0]' : '@_';
+	my $call_core = eval "sub { no warnings 'syntax'; CORE::$name($args) }";  ## no critic (ProhibitStringyEval)
+	croak "mock_core: cannot build CORE::$name delegator: $@" if $@;
+
+	# Wrap in an around-style closure and stamp the CORE prototype onto it
+	# so call-site argument binding (e.g. '_' reads $_ when arg omitted) works.
+	# List-op builtins (warn, die, print ...) have no traditional prototype
+	# string (prototype("CORE::warn") returns undef), but Perl's CORE::GLOBAL
+	# mechanism expects the override to carry '@'.  Use '@' as the fallback so
+	# the wrapper's prototype matches and suppresses "Prototype mismatch" at
+	# eval-compile time.
+	my $wrapper        = sub { $replacement->($call_core, @_) };
+	my $effective_proto = defined($core_proto) ? $core_proto : '@';
+	&Scalar::Util::set_prototype($wrapper, $effective_proto);
+
+	# Install in CORE::GLOBAL -- Perl's documented mechanism for global
+	# builtin overrides.  Track under the full name so unmock/restore_all work.
+	my $full = "CORE::GLOBAL::$name";
+
+	my ($orig, $orig_existed);
+	{
+		no strict 'refs';    ## no critic (ProhibitNoStrict)
+		$orig_existed = defined(&{$full}) ? 1 : 0;
+		# When no prior override existed, push undef rather than \&{$full}.
+		# \&{$full} auto-vivifies the stash entry and returns an undef-stub CV.
+		# Reinstating that stub on restore would leave a CORE::GLOBAL entry
+		# whose non-NULL CV pointer makes Perl treat it as an active override,
+		# preventing fallback to the real builtin.  _drain_and_restore detects
+		# undef and deletes the stash entry instead.
+		$orig = $orig_existed ? \&{$full} : undef;
+	}
+	push @{ $mocked{$full} }, $orig;
+
+	{
+		no warnings 'redefine', 'prototype';
+		no strict 'refs';    ## no critic (ProhibitNoStrict)
+		*{$full} = $wrapper;
+	}
+
+	push @{ $mock_meta{$full} }, {
+		type             => $TYPE // _T_MOCK_CORE,
+		installed_at     => _caller_info(),
+		original_existed => $orig_existed,
+	};
 
 	return;
 }
@@ -1356,6 +1506,15 @@ sub _drain_and_restore {
 		no warnings 'redefine';
 		no strict 'refs';    ## no critic (ProhibitNoStrict)
 		*{$full_method} = $final_prev;
+	} elsif ($full_method =~ /^CORE::GLOBAL::/) {
+		# No prior CORE::GLOBAL override existed (mock_core pushed undef).
+		# Delete the stash entry entirely so Perl's builtin lookup falls back
+		# to the real CORE function.  Reinstating the undef-stub CV is not
+		# sufficient: Perl treats any non-NULL CV in CORE::GLOBAL as an active
+		# user override, so the real builtin would never be reached.
+		my ($bname) = ($full_method =~ /::([^:]+)$/);
+		no strict 'refs';    ## no critic (ProhibitNoStrict)
+		delete $CORE::GLOBAL::{$bname};
 	}
 
 	return;
@@ -1416,7 +1575,23 @@ sub _get_prototype {
 	return prototype($code);
 }
 
+# _is_core_overridable -- Private helper
+#
+# Determine whether a bare name refers to a CORE builtin that
+#       Perl allows packages to shadow with a user sub.
+# Entry:        $_[0] -- Str, simple identifier (no 'CORE::' prefix)
+# Exit:         Bool -- true if prototype("CORE::$name") succeeds (even if
+#               the returned prototype is undef, meaning "no prototype")
+sub _is_core_overridable {
+	my $name = $_[0];
+	local $@;
+	eval { my $p = prototype("CORE::$name"); 1 };
+	return !$@;
+}
+
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 Please report bugs at L<https://github.com/nigelhorne/Test-Mockingbird/issues>.
 
@@ -1488,6 +1663,17 @@ L<https://github.com/nigelhorne/Test-Mockingbird>
         let orig = sym_table[target].CODE •
           post sym_table'[target].CODE = wrapper
                ∧ wrapper(@args) ≙ hook(orig, @args)
+
+=head2 mock_core
+
+    mock_core ≙
+      ∀ name : Str; replacement : CodeRef •
+        pre  _is_core_overridable(name) ∧ ref(replacement) = 'CODE'
+        let  call_core = eval("sub { CORE::name(@_) }") •
+        let  wrapper   = sub { replacement(call_core, @_) } •
+          post CORE::GLOBAL::name.CODE = wrapper
+               ∧ prototype(wrapper) = prototype(CORE::name)
+               ∧ mocked'["CORE::GLOBAL::name"] = ⟨wrapper⟩ ⌢ mocked["CORE::GLOBAL::name"]
 
 =head2 mock_scoped
 
@@ -1618,6 +1804,17 @@ L<https://github.com/nigelhorne/Test-Mockingbird>
         let orig = sym_table[target].CODE •
           post sym_table'[target].CODE = wrapper
                ∧ wrapper(@args) ≙ hook(orig, @args)
+
+=head2 mock_core
+
+    mock_core ≙
+      ∀ name : Str; replacement : CodeRef •
+        pre  _is_core_overridable(name) ∧ ref(replacement) = 'CODE'
+        let  call_core = eval("sub { CORE::name(@_) }") •
+        let  wrapper   = sub { replacement(call_core, @_) } •
+          post CORE::GLOBAL::name.CODE = wrapper
+               ∧ prototype(wrapper) = prototype(CORE::name)
+               ∧ mocked'["CORE::GLOBAL::name"] = ⟨wrapper⟩ ⌢ mocked["CORE::GLOBAL::name"]
 
 =head1 LICENCE AND COPYRIGHT
 

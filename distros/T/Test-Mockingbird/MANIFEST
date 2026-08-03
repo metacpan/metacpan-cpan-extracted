@@ -35,6 +35,7 @@ t/kwalitee.t
 t/locales.t
 t/manifest.t
 t/mock.t
+t/mock_core.t
 t/mock_scoped.t
 t/mock_scoped_multi.t
 t/mutant_killers.t

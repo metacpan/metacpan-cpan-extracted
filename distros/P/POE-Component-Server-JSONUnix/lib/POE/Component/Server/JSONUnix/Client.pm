@@ -16,7 +16,7 @@ use POE qw(
 	Driver::SysRW
 );
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 # Refcount tag used to keep event-style requesters alive while a reply is
 # outstanding.
@@ -327,10 +327,14 @@ sub call {
         },
     );
 
-Perform the server's Unix-ownership challenge: call C<auth_start>, write the
-returned cookie to a fresh file in the server's C<temp_dir> (the OS stamps the
-file with this process's effective UID, which is the proof the server checks),
-then call C<auth_verify> and clean the file up.
+Authenticate to the server. If the server advertises kernel peer-credential
+authentication (C<< peercred => 1 >> in its C<auth_start> reply), this simply
+calls C<auth_verify> with no arguments -- no file is created, the OS proves the
+UID. Otherwise it performs the Unix-ownership challenge: call C<auth_start>,
+write the returned cookie to a fresh file in the server's C<temp_dir> (the OS
+stamps the file with this process's effective UID, which is the proof the
+server checks), then call C<auth_verify> and clean the file up. See
+L<POE::Component::Server::JSONUnix/"KERNEL PEER-CREDENTIAL AUTHENTICATION">.
 
 Takes the same C<callback> / C<event> / C<context> arguments as L</call>. The
 response delivered is the C<auth_verify> response on success, or a synthesised
@@ -343,6 +347,21 @@ sub authenticate {
 	my ( $self, %opt ) = @_;
 
 	my $done = $self->_make_responder(%opt);
+
+	# Record the verified identity from a successful auth_verify, then hand the
+	# response to the caller. Shared by the peercred and cookie paths.
+	my $finish = sub {
+		my ($verdict) = @_;
+		if ( ( $verdict->{status} // '' ) eq 'ok' ) {
+			$self->{auth} = {
+				uid      => $verdict->{result}{uid},
+				username => $verdict->{result}{username},
+				groups   => $verdict->{result}{groups} // [],
+			};
+		}
+		$done->($verdict);
+		return;
+	};
 
 	$self->call(
 		command  => 'auth_start',
@@ -358,6 +377,17 @@ sub authenticate {
 				);
 				return;
 			} ## end unless ( ( $challenge->{status} // '' ) eq 'ok')
+
+			# When the server advertises kernel peer-credential auth, skip the
+			# file entirely: the uid is proven by the OS, so auth_verify needs
+			# no path.
+			if ( $challenge->{result}{peercred} ) {
+				$self->call(
+					command  => 'auth_verify',
+					callback => $finish,
+				);
+				return;
+			}
 
 			my $cookie   = $challenge->{result}{cookie}   // '';
 			my $temp_dir = $challenge->{result}{temp_dir} // '';
@@ -404,14 +434,7 @@ sub authenticate {
 				callback => sub {
 					my ($verdict) = @_;
 					unlink $cookie_path;    # server unlinks it; clean up if it did not
-					if ( ( $verdict->{status} // '' ) eq 'ok' ) {
-						$self->{auth} = {
-							uid      => $verdict->{result}{uid},
-							username => $verdict->{result}{username},
-							groups   => $verdict->{result}{groups} // [],
-						};
-					}
-					$done->($verdict);
+					$finish->($verdict);
 					return;
 				},
 			);
@@ -682,10 +705,18 @@ __END__
 
 =head1 AUTHENTICATION
 
-The server's L<user verification
-scheme|POE::Component::Server::JSONUnix/"USER VERIFICATION"> proves which Unix
-user is on the other end of the socket by file ownership rather than by
-password. This component implements the client half:
+The server proves which Unix user is on the other end of the socket without a
+password. This component implements the client half and picks the right method
+automatically from the C<auth_start> reply.
+
+On platforms with L<kernel peer
+credentials|POE::Component::Server::JSONUnix/"KERNEL PEER-CREDENTIAL AUTHENTICATION">
+(the server's default where available), the handshake is just C<auth_start>
+followed by C<auth_verify> with no arguments -- B<no file is created>; the
+kernel supplies the UID.
+
+Otherwise it falls back to the server's L<file-ownership
+challenge|POE::Component::Server::JSONUnix/"USER VERIFICATION">:
 
 =over 4
 

@@ -3,7 +3,7 @@ package Fetch::Loop::AnyEvent;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use parent -norequire, 'Fetch::Loop';
 use Fetch::Loop ();

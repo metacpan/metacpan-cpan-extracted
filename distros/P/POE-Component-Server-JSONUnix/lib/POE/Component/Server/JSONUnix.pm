@@ -8,7 +8,7 @@ use mro;
 use Carp             qw(carp croak);
 use File::Basename   ();
 use File::Spec       ();
-use Socket           qw(PF_UNIX SOCK_STREAM);
+use Socket           qw(PF_UNIX SOCK_STREAM SOL_SOCKET);
 use IO::Socket::UNIX ();
 use JSON::MaybeXS    ();
 
@@ -19,7 +19,7 @@ use POE qw(
 	Driver::SysRW
 );
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 NAME
 
@@ -158,6 +158,33 @@ If set to a true value, all commands except C<auth_start> and C<auth_verify>
 return an error until the client has successfully completed the ownership
 challenge. Defaults to false.
 
+=head3 auth_method
+
+How clients prove their identity. One of:
+
+=over 4
+
+=item C<auto> (default)
+
+Use kernel peer credentials when the platform supports them (Linux, FreeBSD,
+macOS, and other BSDs -- see L</"KERNEL PEER-CREDENTIAL AUTHENTICATION">),
+falling back to the cookie-file challenge otherwise. C<auth_start> advertises
+the kernel path with C<< peercred => 1 >> while still returning a
+C<cookie>/C<temp_dir>, so a client may use either.
+
+=item C<peercred>
+
+Offer only kernel peer credentials. No cookie is issued; C<auth_verify>
+requires no file. On a platform without support, authentication cannot
+complete.
+
+=item C<cookie>
+
+Offer only the cookie-file challenge, exactly as earlier versions did, even
+where kernel peer credentials are available.
+
+=back
+
 =head3 permissions
 
 Optional user/group permission policy, a hash reference of the form
@@ -181,6 +208,7 @@ sub spawn {
 		on_error        => delete $args{on_error},                          # coderef (optional)
 		auth_temp_dir   => ( delete $args{auth_temp_dir} ) // File::Spec->tmpdir,
 		auth_required   => ( delete $args{auth_required} ) // 0,
+		auth_method     => ( delete $args{auth_method} ) // 'auto',
 		permissions     => undef,                                            # stays undef unless a policy is passed to spawn
 		commands        => {},
 		clients         => {},
@@ -190,6 +218,11 @@ sub spawn {
 			allow_nonref => 0,
 		),
 	}, $class;
+
+	croak "'auth_method' must be 'auto', 'cookie', or 'peercred'"
+		unless $self->{auth_method} eq 'auto'
+		|| $self->{auth_method} eq 'cookie'
+		|| $self->{auth_method} eq 'peercred';
 
 	# Precedence (later overrides earlier): built-ins < cmd_* methods < arg.
 	$self->_register_builtins;
@@ -316,13 +349,29 @@ sub _register_auth_builtins {
 			my ( $server, $req, $ctx ) = @_;
 			my $id     = $ctx->{wheel_id};
 			my $client = $server->{clients}{$id};
-			my $cookie = _random_cookie();
-			$client->{auth_cookie} = $cookie;
-			$client->{auth_time}   = time();
-			return {
-				cookie   => $cookie,
-				temp_dir => $server->{auth_temp_dir},
-			};
+			my $method = $server->{auth_method};
+
+			my %result;
+
+			# Advertise the kernel peer-credential path when the platform gave
+			# us the peer's uid at connect and the configured method allows it.
+			# A client seeing this may skip the cookie file entirely and call
+			# auth_verify with no path.
+			$result{peercred} = 1
+				if $method ne 'cookie' && defined $client->{peer_uid};
+
+			# Unless the server is peercred-only, also hand out a cookie and
+			# temp_dir so an older client -- or one on a host where peercred is
+			# unavailable -- can fall back to the file-ownership challenge.
+			if ( $method ne 'peercred' ) {
+				my $cookie = _random_cookie();
+				$client->{auth_cookie} = $cookie;
+				$client->{auth_time}   = time();
+				$result{cookie}        = $cookie;
+				$result{temp_dir}      = $server->{auth_temp_dir};
+			}
+
+			return \%result;
 		},
 
 		auth_verify => sub {
@@ -330,13 +379,19 @@ sub _register_auth_builtins {
 			my $id     = $ctx->{wheel_id};
 			my $client = $server->{clients}{$id};
 
+			# No path given: authenticate from the kernel-supplied peer
+			# credentials captured at connect, when the platform provided them
+			# and the server permits that method.
+			my $path = $req->{args}{path};
+			return $server->_auth_verify_peercred( $ctx, $client )
+				unless defined $path && length $path;
+
 			unless ( defined $client->{auth_cookie} ) {
 				$ctx->error('no pending auth challenge: call auth_start first');
 				return;
 			}
 
-			my $path = $req->{args}{path} // '';
-			unless ( $path && File::Spec->file_name_is_absolute($path) ) {
+			unless ( File::Spec->file_name_is_absolute($path) ) {
 				$ctx->error('args.path must be an absolute file path');
 				return;
 			}
@@ -388,30 +443,119 @@ sub _register_auth_builtins {
 				return;
 			}
 
-			my $uid      = $st[4];
-			my $username = ( getpwuid($uid) )[0] // '';
-
-			$client->{auth_uid}      = $uid;
-			$client->{auth_username} = $username;
-
-			# With a permission policy in force, resolve and cache the user's
-			# groups now so the first gated request does not pay for it, and
-			# report them back. Without one, the response is exactly what it
-			# always was.
-			if ( $server->{permissions} ) {
-				my $groups = $server->_client_groups( $ctx->{wheel_id} );
-				return {
-					uid      => $uid + 0,
-					username => $username,
-					groups   => $groups ? $groups->{list} : [],
-				};
-			}
-
-			return { uid => $uid + 0, username => $username };
+			my $uid = $st[4];
+			return $server->_auth_success_result( $ctx, $client, $uid );
 		},
 	);
 	return;
 } ## end sub _register_auth_builtins
+
+# Authenticate a connection from the kernel-verified peer credentials captured
+# at connect time (see _read_peer_cred). No cookie, no temp file: the uid comes
+# straight from the OS, so it cannot be forged. Called for an auth_verify with
+# no args.path.
+sub _auth_verify_peercred {
+	my ( $self, $ctx, $client ) = @_;
+
+	if ( $self->{auth_method} eq 'cookie' ) {
+		$ctx->error(
+			'args.path is required: this server uses the cookie-file challenge');
+		return;
+	}
+
+	unless ( defined $client->{peer_uid} ) {
+		$ctx->error( 'kernel peer-credential authentication is unavailable here; '
+				. 'provide args.path to use the cookie-file challenge' );
+		return;
+	}
+
+	# A pending cookie challenge, if any, is moot once we authenticate by
+	# peer credentials.
+	delete $client->{auth_cookie};
+	delete $client->{auth_time};
+
+	return $self->_auth_success_result( $ctx, $client, $client->{peer_uid} );
+} ## end sub _auth_verify_peercred
+
+# Mark a connection authenticated as $uid and build the auth_verify success
+# response. Shared by the cookie-file and peer-credential paths so both report
+# identically. With a permission policy in force, the user's groups are
+# resolved and cached now (so the first gated request does not pay for it) and
+# echoed back; without one the response is just uid and username.
+sub _auth_success_result {
+	my ( $self, $ctx, $client, $uid ) = @_;
+
+	my $username = ( getpwuid($uid) )[0] // '';
+
+	$client->{auth_uid}      = $uid;
+	$client->{auth_username} = $username;
+
+	if ( $self->{permissions} ) {
+		my $groups = $self->_client_groups( $ctx->{wheel_id} );
+		return {
+			uid      => $uid + 0,
+			username => $username,
+			groups   => $groups ? $groups->{list} : [],
+		};
+	}
+
+	return { uid => $uid + 0, username => $username };
+} ## end sub _auth_success_result
+
+# Read the peer's kernel-verified credentials from a connected AF_UNIX socket,
+# returning (uid, gid) on the platforms that support it or an empty list
+# everywhere else (and on error). This is the identity the kernel recorded at
+# connect(2) time -- unforgeable and needing no cookie file. Callers treat an
+# empty return as "peercred unavailable" and fall back to the cookie challenge.
+sub _read_peer_cred {
+	my ( $self, $socket ) = @_;
+
+	my $os = $^O;
+
+	if ( $os eq 'linux' ) {
+		# struct ucred { pid_t pid; uid_t uid; gid_t gid; } -- three 32-bit ints.
+		my $packed = getsockopt( $socket, SOL_SOCKET, 17 )    # SO_PEERCRED
+			or return;
+		my ( $pid, $uid, $gid ) = unpack( 'l!l!l!', $packed );
+		return unless defined $uid;
+		return ( $uid, $gid );
+	}
+
+	if ( $os eq 'freebsd' || $os eq 'darwin' || $os eq 'dragonfly' ) {
+		# struct xucred { u_int cr_version; uid_t cr_uid; short cr_ngroups;
+		#                 gid_t cr_groups[16]; ... }. Level is SOL_LOCAL (0),
+		# option LOCAL_PEERCRED (1). cr_groups[0] is the effective gid.
+		my $packed = getsockopt( $socket, 0, 1 )
+			or return;
+		my ( $version, $uid, $ngroups, @groups ) =
+			unpack( 'L L s x![L] L16', $packed );
+		return unless defined $uid;
+		my $gid = ( defined $ngroups && $ngroups > 0 ) ? $groups[0] : undef;
+		return ( $uid, $gid );
+	}
+
+	if ( $os eq 'netbsd' ) {
+		# struct unpcbid { pid_t unp_pid; uid_t unp_euid; gid_t unp_egid; }.
+		# Level 0, option LOCAL_PEERCRED (1).
+		my $packed = getsockopt( $socket, 0, 1 )
+			or return;
+		my ( $pid, $uid, $gid ) = unpack( 'l!l!l!', $packed );
+		return unless defined $uid;
+		return ( $uid, $gid );
+	}
+
+	if ( $os eq 'openbsd' ) {
+		# struct sockpeercred { uid_t uid; gid_t gid; pid_t pid; }, via
+		# getsockopt(SOL_SOCKET, SO_PEERCRED=0x1022).
+		my $packed = getsockopt( $socket, SOL_SOCKET, 0x1022 )
+			or return;
+		my ( $uid, $gid, $pid ) = unpack( 'L L l', $packed );
+		return unless defined $uid;
+		return ( $uid, $gid );
+	}
+
+	return;    # unsupported platform -- caller falls back to the cookie challenge
+} ## end sub _read_peer_cred
 
 #--- permissions -------------------------------------------------------------
 
@@ -748,6 +892,11 @@ sub _poe_listen_error {
 sub _poe_got_connection {
 	my ( $self, $socket ) = @_[ OBJECT, ARG0 ];
 
+	# Capture the kernel-verified peer credentials while we still hold the raw
+	# handle, before it is wrapped in a wheel. Empty on platforms without
+	# support -- there the cookie challenge remains the only path.
+	my ( $peer_uid, $peer_gid ) = $self->_read_peer_cred($socket);
+
 	my $wheel = POE::Wheel::ReadWrite->new(
 		Handle       => $socket,
 		Driver       => POE::Driver::SysRW->new,
@@ -764,6 +913,8 @@ sub _poe_got_connection {
 		auth_uid          => undef,
 		auth_username     => undef,
 		auth_group_info   => undef,    # filled once by _client_groups
+		peer_uid          => $peer_uid,    # kernel-verified, undef where unsupported
+		peer_gid          => $peer_gid,
 	};
 	return;
 } ## end sub _poe_got_connection
@@ -963,6 +1114,19 @@ sub username {
 	return $self->{server}{clients}{ $self->{wheel_id} }{auth_username};
 }
 
+# Kernel-verified peer credentials, available on supported platforms from the
+# moment the connection is accepted -- independent of any auth handshake.
+# undef where the platform does not provide them.
+sub peer_uid {
+	my ($self) = @_;
+	return $self->{server}{clients}{ $self->{wheel_id} }{peer_uid};
+}
+
+sub peer_gid {
+	my ($self) = @_;
+	return $self->{server}{clients}{ $self->{wheel_id} }{peer_gid};
+}
+
 # Group names of the authenticated user (empty before authentication).
 # Resolved via NSS at most once per connection, then served from the cache.
 sub groups {
@@ -1140,6 +1304,14 @@ The numeric UID of the authenticated user, or C<undef> if not yet verified.
 The username corresponding to C<< $ctx->uid >>, or C<undef> if not yet
 verified.
 
+=item C<< $ctx->peer_uid >>, C<< $ctx->peer_gid >>
+
+The peer process's kernel-verified UID and GID, as recorded by the OS when the
+connection was accepted. Available from the first request -- independent of any
+C<auth_start>/C<auth_verify> handshake -- on platforms that support it (see
+L</"KERNEL PEER-CREDENTIAL AUTHENTICATION">), and C<undef> elsewhere. This is
+the identity the C<peercred> auth path is built on.
+
 =item C<< $ctx->groups >>
 
 Array reference of the authenticated user's group names (primary and
@@ -1175,15 +1347,28 @@ run are listed.
 
 =item C<auth_start>
 
-Begins the Unix-ownership challenge. Returns
-C<< {cookie => "<hex>", temp_dir => "<dir>"} >>. The client must write the
-cookie string to a new regular file inside C<temp_dir> and then call
-C<auth_verify>.
+Begins authentication. Returns
+C<< {cookie => "<hex>", temp_dir => "<dir>"} >> for the Unix-ownership
+challenge: the client writes the cookie string to a new regular file inside
+C<temp_dir> and then calls C<auth_verify>.
+
+When the server offers kernel peer-credential authentication (the default on
+supported platforms; see L</"KERNEL PEER-CREDENTIAL AUTHENTICATION">) the
+response also carries C<< peercred => 1 >>, signalling that the client may skip
+the file and call C<auth_verify> with no arguments. Under
+C<< auth_method => 'peercred' >> only C<< {peercred => 1} >> is returned, with
+no cookie.
 
 =item C<auth_verify>
 
-Completes the challenge. C<args> must contain C<path>: the absolute path of the
-file the client wrote in C<temp_dir>. The server:
+Completes authentication.
+
+Called with no C<args.path> it authenticates from the kernel peer credentials
+recorded at connect -- no file, no cookie -- and returns the same identity
+fields described below. This path is available only when the server offers it.
+
+Called with C<args.path> (the absolute path of the file the client wrote in
+C<temp_dir>) it completes the ownership challenge. The server:
 
 =over 4
 
@@ -1239,6 +1424,78 @@ a correctly-named cookie file owned by UID I<N> must be running as UID I<N>.
 
     send({ command => 'whoami' });
     my $me = recv();                   # {uid => 1000, username => "alice"}
+
+=head1 KERNEL PEER-CREDENTIAL AUTHENTICATION
+
+On platforms that expose it, the kernel already knows the UID and GID of the
+process on the other end of a Unix domain socket -- it recorded them at
+C<connect(2)> time. The server reads them directly from the socket, so a client
+can be authenticated with B<no cookie, no temp file, and no filesystem access
+at all>. The credential is supplied by the kernel and cannot be forged.
+
+This is the default (C<< auth_method => 'auto' >>) where supported and falls
+back to the L</"USER VERIFICATION"> cookie challenge elsewhere, so no
+configuration is required. The wire protocol is unchanged: C<auth_start> simply
+adds C<< peercred => 1 >> to its reply, and the client completes the handshake
+by calling C<auth_verify> with no C<path>:
+
+    # Client side (pseudo-code) -- note: no file is ever created
+    send({ command => 'auth_start' });
+    my $res = recv();                  # {peercred => 1, cookie => ..., temp_dir => ...}
+
+    if ($res->{peercred}) {
+        send({ command => 'auth_verify' });         # no args, no file
+    } else {
+        # ... write the cookie file and verify by path as above ...
+    }
+    my $auth = recv();                 # {uid => 1000, username => "alice"}
+
+The bundled L<POE::Component::Server::JSONUnix::Client> and
+L<POE::Component::Server::JSONUnix::BlockingClient> do this automatically:
+their C<authenticate> uses the kernel path whenever the server advertises it
+and creates no file.
+
+=head2 Supported platforms
+
+=over 4
+
+=item *
+
+B<Linux> -- C<SO_PEERCRED> (C<struct ucred>).
+
+=item *
+
+B<FreeBSD>, B<DragonFly>, B<macOS>/Darwin -- C<LOCAL_PEERCRED>
+(C<struct xucred>).
+
+=item *
+
+B<NetBSD> -- C<LOCAL_PEERCRED> (C<struct unpcbid>).
+
+=item *
+
+B<OpenBSD> -- C<SO_PEERCRED> (C<struct sockpeercred>).
+
+=back
+
+Everywhere else the peer credentials are simply reported as C<undef> and the
+cookie challenge is used. All reads are done with Perl's built-in C<getsockopt>;
+no XS or non-core modules are involved.
+
+=head2 Relationship to the cookie challenge
+
+Both paths end in the same place: the connection is marked authenticated and
+C<< $ctx->uid >>/C<< $ctx->username >> (and, under a policy, C<< $ctx->groups >>)
+are populated identically. The difference is only in how the UID is obtained --
+from the kernel, or from the ownership of a file the client created. The
+kernel path additionally exposes C<< $ctx->peer_uid >> and
+C<< $ctx->peer_gid >> before any handshake at all.
+
+Note one subtlety: kernel credentials reflect the I<connecting process's>
+effective UID/GID, whereas the ownership challenge reflects whoever owns the
+cookie file. These normally coincide. As with the cookie path, group
+membership used by L</"PERMISSIONS"> is still resolved from the platform's user
+database by UID, not taken from the process's live supplementary-group set.
 
 =head1 PERMISSIONS
 

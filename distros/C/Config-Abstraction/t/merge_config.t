@@ -8,11 +8,10 @@ use Test::Most;
 BEGIN { use_ok('Config::Abstraction') }
 
 subtest 'basic hash merge' => sub {
-	my $conf = Config::Abstraction->new(data => {
-		foo => 'baz',
-		nums => [3],
-		nested => { b => 2 }
-	});
+	my $conf = Config::Abstraction->new(
+		data        => { foo => 'baz', nums => [3], nested => { b => 2 } },
+		config_dirs => [],
+	);
 	my $defaults = {
 		foo => 'bar',
 		nums => [1, 2],
@@ -27,7 +26,7 @@ subtest 'basic hash merge' => sub {
 };
 
 subtest 'merge with undefined override' => sub {
-	my $conf = Config::Abstraction->new(data => {'foo' => 1});
+	my $conf = Config::Abstraction->new(data => {'foo' => 1}, config_dirs => []);
 	my $merged = $conf->merge_defaults({});
 
 	is($merged->{'foo'}, 1, 'undefined override treated as empty hash');
@@ -50,7 +49,7 @@ subtest 'deep nested merge' => sub {
 			}
 		}
 	};
-	my $conf = Config::Abstraction->new(data => $b);
+	my $conf = Config::Abstraction->new(data => $b, config_dirs => []);
 
 	my $merged = $conf->merge_defaults(defaults => $a, merge => 1, deep => 1);
 

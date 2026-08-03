@@ -9,6 +9,13 @@
  * are Perl glue over other frameworks).
  */
 
+/* Native Windows: rand_s() (ft_win.h) is only declared by <stdlib.h> when
+ * _CRT_RAND_S is set before it is first included - and perl.h pulls <stdlib.h>
+ * in. So define it here, ahead of every include. No-op off Windows. */
+#ifdef _WIN32
+#define _CRT_RAND_S
+#endif
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -58,11 +65,15 @@ static int ft_obj_can(pTHX_ SV *obj, const char *meth) {
  * redirect following (depends on the statics above, so included here) */
 #include "fetch/ft_ua.h"
 
+/* the C ABI table other XS modules (e.g. Reverse::Proxy) call through */
+#include "fetch/ft_abi.h"
+
 MODULE = Fetch		PACKAGE = Fetch
 
 PROTOTYPES: DISABLE
 
 INCLUDE: xs/fetch.xs
+INCLUDE: xs/abi.xs
 INCLUDE: xs/future.xs
 INCLUDE: xs/loop.xs
 INCLUDE: xs/headers.xs

@@ -1,5 +1,122 @@
 Revision history for Config::Abstraction - Merge and manage configuration data from different sources
 
+0.40	Sun Aug  2 04:37:58 PM EDT 2026
+	[ Security ]
+	- Fix YAML code injection: YAML::XS v0.91 ignores $YAML::XS::DisableCode and
+	  materialises callable CODE refs from !!perl/code tags. New private helper
+	  _sanitize_yaml_values() recursively replaces CODE and GLOB refs with undef
+	  after every LoadFile/Load call. Do not rely on DisableCode for security.
+	- Fix XML external entity (XXE) injection at all four XMLin() call sites: file
+	  content is now pre-read and checked for <!ENTITY ... SYSTEM|PUBLIC declarations
+	  before parsing; XMLin receives a string reference rather than a filename so no
+	  entity is resolved. Files containing external entity declarations are skipped
+	  with a carp warning.
+	- Fix XXE bypass via Config::Auto fallback: after the XML XXE guard blocked a
+	  file and set $data to undef, YAML::XS returned a non-HASH scalar (truthy),
+	  causing the if(!$data) fallback chain to run; Config::Auto then re-read and
+	  expanded the entity. Fixed by saving raw file content before the parsers run
+	  and conditioning the entire fallback chain on the absence of entity declarations.
+	- Fix encryption_key_file silent failure: when encryption_key_file was specified
+	  explicitly in the constructor but the named file did not exist, the module
+	  silently fell back to unencrypted operation. The constructor now croaks
+	  immediately. Files sourced from environment variables still fail silently.
+
+	[ Performance ]
+	- _flatten_keys: eliminate O(N^2) hash copying by delegating to new private
+	  _flatten_into helper that writes each leaf key into a caller-supplied
+	  accumulator hashref exactly once; benchmarks show 2x speedup on a 60-leaf
+	  config (20 000 iter/s -> 40 000+ iter/s).
+	- get()/exists(): cache the compiled sep_char regex as $self->{'_sep_re'} at
+	  construction time instead of recompiling qr/\Q$sep_char\E/ on every key
+	  lookup; benchmarks show ~50% speedup on repeated get() calls.
+	- _is_local_host(): cache Sys::Hostname::hostname() result on the object
+	  ($self->{'_cached_hostname'}) so the syscall is made at most once per
+	  Config::Abstraction instance, not on every directory entry evaluation.
+
+	[ Bug Fixes ]
+	- Fix AUTOLOAD method dispatch using stale $self->{data} (raw constructor
+	  defaults) instead of the fully merged $self->{config}; file and environment
+	  overrides were silently invisible through AUTOLOAD accessor calls.
+	- Fix AUTOLOAD in flatten mode: Hash::Flatten uses '.' as separator regardless
+	  of sep_char, so the sep_char-separated method name is now translated to dotted
+	  form before lookup in the flat config hash.
+	- Fix _load_remote_dir using a hardcoded file list that omitted TOML files and
+	  the new environment-specific tiers (base.{env}.* / local.{env}.*); the
+	  dynamic @_file_list is now passed from _load_config to _load_remote_dir.
+
+	[ Enhancements ]
+	- Add Readonly constants for AES-256-GCM sizes ($_AES_NONCE_SIZE,
+	  $_AES_TAG_SIZE, $_AES_KEY_SIZE, $_ENC_PAYLOAD_MIN, $_HEX_KEY_LEN,
+	  $_B64_KEY_MIN, $_B64_KEY_MAX) replacing inline magic numbers.
+	- Add =head1 LIMITATIONS documenting: separator escaping, Data::Reuse status,
+	  Windows env-var case sensitivity, AUTOLOAD sep_char requirement, and TOML
+	  in remote directories.
+	- Add full POD (EXAMPLE / API SPECIFICATION / MESSAGES / FORMAL SPECIFICATION /
+	  PSEUDOCODE) to get(), exists(), all(), encrypt_value(), and prefer_*().
+	- New t/locales.t: geographic (ISO-3166 country-code environment tiers) and
+	  POSIX locale subtests; uses local $! = ENOENT; my $msg = "$!"; idiom to
+	  obtain locale-specific strings without POSIX::strerror.
+	- Declare CryptX as an optional_features entry in META so installers can prompt
+	  users who want AES-256-GCM encryption support.
+	- New C<environment> constructor option: activates two additional file tiers --
+	  base.{env}.* (loaded immediately after base.*) and local.{env}.* (loaded
+	  immediately after local.*). When not supplied, auto-detected from
+	  {env_prefix}ENV (e.g. APP_ENV), then PLACK_ENV, then NODE_ENV.  Missing
+	  env-specific files are silently skipped; invalid names (anything other than
+	  /^[A-Za-z0-9_\-]+$/) cause a croak.
+	- New C<validators> constructor option: a hashref mapping dotted config keys to
+	  per-key validation rules. Each rule may be a type-name string (integer, number,
+	  float, boolean, string, array, hash), a compiled regex, a coderef, or a hashref
+	  combining type/pattern/min/max/required constraints. Violations croak immediately
+	  after the merge (or on first access when lazy => 1).
+	- New C<checker> constructor option: a YAML string or hashref prototype passed to
+	  Config::Checker for template-based structural validation. Config::Checker is
+	  optional; if absent a carp warning is emitted and validation is skipped.
+	- TOML file support: base.toml and local.toml are now discovered
+	  automatically in config_dirs alongside YAML/JSON/XML/INI equivalents;
+	  TOML is also tried as a fallback parser in the all-parsers chain used
+	  for extensionless config_file entries.  Requires TOML::Tiny (TOML 1.0).
+	  If TOML::Tiny is absent the module gracefully skips .toml files.
+	- New C<lazy> constructor option: when true, all source discovery and file
+	  I/O are deferred until the first accessor call (get/exists/all/explain_sources/
+	  prefer_*/merge_defaults/AUTOLOAD), reducing startup overhead for applications
+	  that may not always consume the configuration.  With lazy loading the
+	  constructor always returns a blessed object; schema validation likewise
+	  runs on first access rather than at construction time.
+	- Remote configuration via the Newcastle Connection convention: entries in
+	  config_dirs beginning with /../hostname/path are fetched from the named
+	  host over SSH using File::Slurp::Remote, processed through the same
+	  format-detection and Hash::Merge pipeline as local files, and merged in
+	  the same position as their equivalent local directory would be
+	- Local-host short-circuit: /../localhost/, /../127.0.0.1/, /../::1/, and
+	  /../$hostname/ (FQDN and short form, case-insensitive) are unwrapped to
+	  their plain directory path and read from disk directly -- no SSH connection
+	  is made, so a shared config entry degrades gracefully on the host itself
+	- New dependency: File::Temp (used to parse INI content fetched as a string,
+	  since Config::IniFiles requires a real filesystem path)
+	- Document the Newcastle Connection convention and the rationale for choosing
+	  the /../ prefix over hostname:/path, file://, ssh://, and plain hostname/path
+	- Honour $CONFIG_DIRS in the environment
+	- New public method explain_sources(): returns a hashref keyed by dotted
+	  config key; each value carries the final merged value and an ordered list of
+	  {type, label, value} source records showing every source that contributed to
+	  that key, from lowest to highest precedence
+	- New public methods prefer_env(), prefer_file(), prefer_data(), prefer_argv():
+	  return the value that a specific source layer contributed to a key, bypassing
+	  higher-precedence sources; fall back to get() when that layer did not set the key
+	- _load_config() and merge_defaults() now save and restore
+	  Hash::Merge::get_clone_behavior() around their set_clone_behavior(0) calls,
+	  preventing the no-clone global state from leaking into unrelated merge() calls
+	  and fixing a "Can't store CODE items" crash when data contains coderefs
+
+	[ Bug Fixes ]
+	- merge_defaults() was permanently mutating $self->{'config'} via
+	  'delete $config->{global}'; fixed by working on a shallow copy
+	- Windows: skip Newcastle Connection localhost subtest when tempdir() returns
+	  a drive-letter path (C:\...) that cannot be embedded in /../localhost$dir
+	- Windows: skip unreadable-file subtests in extended_tests.t where
+	  chmod(0000, $file) is a no-op and files remain readable
+
 0.39	Sun May 24 16:16:50 EDT 2026
 
 	[ Bug Fixes ]

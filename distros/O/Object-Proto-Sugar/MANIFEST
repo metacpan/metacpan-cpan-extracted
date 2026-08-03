@@ -27,6 +27,7 @@ t/18-attributes.t
 t/19-lazier.t
 t/20-constants.t
 t/21-accessor-alias.t
+t/22-private.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

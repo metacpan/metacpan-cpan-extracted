@@ -6,6 +6,7 @@ use Getopt::Long;
 use POSIX ();
 use Proc::ProcessTable;
 use Proc::ProcessTable::ncps;
+use Proc::ProcessTable::InfoString qw(proc_infostring_describe);
 
 # figure out what fields this platform supports so switches
 # that require unsupported fields can be hidden and errored on
@@ -189,46 +190,14 @@ the number.
 !
 
 
-The symbols in the information column are as below.
+The information column is provided by Proc::ProcessTable::InfoString,
+which describes it for this OS as below.
 
-   States  Description
-   Z       Zombie
-   S       Sleep
-   W       Wait
-   R       Run
-   T       Stopped
-   t       Tracing stop
-   I       Idle
-   L       Blocked on a kernel lock
-   D       Uninterruptible sleep
-   X       Dead
-   K       Wakekill
-   P       Parked
-   ?       Unknown state
-
-   Flags   Description
-   O       Swapped Output
 ';
 
-	# flag support varies by OS, so only show the ones
-	# Proc::ProcessTable::InfoString supports on this one
-	if ( $^O =~ /freebsd/ ) {
-		$help_text = $help_text . '   E       Exiting
-   s       Session Leader
-   L       POSIX lock advisory
-   +       has controlling terminal
-   c       controlling tty is active
-   X       traced by a debugger
-   F       being forked
-';
-	} elsif ( $^O =~ /linux/ ) {
-		$help_text = $help_text . '   E       Exiting
-   s       Session Leader
-   +       has controlling terminal
-   X       traced by a debugger
-   F       being forked
-';
-	}
+	# state and flag support varies by OS, so let
+	# Proc::ProcessTable::InfoString describe the ones usable on this one
+	$help_text = $help_text . proc_infostring_describe();
 
 	print $help_text;
 } ## end sub help
@@ -742,37 +711,11 @@ No flags needed passed to use. By default it will show all processes except
 for its own and the idle process.
 
 The info column is provided by L<Proc::ProcessTable::InfoString>. That
-POD has the information on what they all mean. At the time of writing, this is
-as below.
+POD has the information on what they all mean.
 
-   States  Description
-   Z       Zombie
-   S       Sleep
-   W       Wait
-   R       Run
-   T       Stopped
-   t       Tracing stop
-   I       Idle
-   L       Blocked on a kernel lock
-   D       Uninterruptible sleep
-   X       Dead
-   K       Wakekill
-   P       Parked
-   ?       Unknown state
-
-   Flags   Description
-   O       Swapped Output
-   E       Exiting
-   s       Session Leader
-   L       POSIX lock advisory
-   +       has controlling terminal
-   c       controlling tty is active
-   X       traced by a debugger
-   F       being forked
-
-Flag support varies by OS. FreeBSD has the fullest support. On Linux the
-flags O, E, s, +, X, and F are supported. On other platforms only O is.
-The ncps -h output only lists the ones usable on the current OS.
+State and flag support varies by OS, FreeBSD having the fullest support.
+The ncps -h output describes the ones usable on the current OS, via
+L<Proc::ProcessTable::InfoString/proc_infostring_describe>.
 
 Switch availability also varies by OS. Switches requiring process table
 fields the OS does not support are not shown by ncps -h and will error

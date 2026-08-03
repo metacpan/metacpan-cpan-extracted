@@ -16,7 +16,6 @@ Version 0.0.0
 
 our $VERSION = '0.0.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::States;
@@ -69,38 +68,36 @@ If the new method fails, it dies.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# run some basic checks to make sure we have the minimum stuff required to work
-	if ( ! defined( $args{states} ) ){
-		die ('No states key specified in the argument hash');
+	if ( !defined( $args{states} ) ) {
+		die('No states key specified in the argument hash');
 	}
-	if ( ref( $args{states} ) ne 'ARRAY' ){
-		die ('The states key is not a array');
+	if ( ref( $args{states} ) ne 'ARRAY' ) {
+		die('The states key is not a array');
 	}
-	if ( ! defined $args{states}[0] ){
-		die ('No states defined in the states array');
+	if ( !defined $args{states}[0] ) {
+		die('No states defined in the states array');
 	}
 
-    my $self = {
-				states=>[],
-				};
-    bless $self;
+	my $self = { states => [], };
+	bless $self;
 
 	# make sure each cidr is valid before returning it
-	my $states_int=0;
-	while( defined( $args{states}[$states_int] ) ){
-		$self->{states}[$states_int]=lc( $args{states}[$states_int] );
+	my $states_int = 0;
+	while ( defined( $args{states}[$states_int] ) ) {
+		$self->{states}[$states_int] = lc( $args{states}[$states_int] );
 
 		$states_int++;
 	}
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -116,21 +113,21 @@ The returned value is a boolean.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $object=$_[1];
+sub match {
+	my $self   = $_[0];
+	my $object = $_[1];
 
-	if ( !defined( $object ) ){
+	if ( !defined($object) ) {
 		return 0;
 	}
 
-	if ( ref( $object ) ne 'Net::Connection' ){
+	if ( ref($object) ne 'Net::Connection' ) {
 		return 0;
 	}
 
-	my $states_int=0;
-	while( defined( $self->{states}[$states_int] ) ){
-		if ( $self->{states}[$states_int] eq lc( $object->state ) ){
+	my $states_int = 0;
+	while ( defined( $self->{states}[$states_int] ) ) {
+		if ( $self->{states}[$states_int] eq lc( $object->state ) ) {
 			return 1;
 		}
 
@@ -138,7 +135,7 @@ sub match{
 	}
 
 	return 0;
-}
+} ## end sub match
 
 =head1 AUTHOR
 
@@ -229,4 +226,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

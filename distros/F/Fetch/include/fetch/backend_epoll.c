@@ -227,7 +227,7 @@ hm_backend *hm_backend_epoll_new(void) {
     be->add_timer  = ep_add_timer;
     be->del_timer  = ep_del_timer;
     be->add_signal = ep_add_signal;
-    be->wait       = ep_wait;
+    be->wait_ev       = ep_wait;
     be->destroy    = ep_destroy;
     return be;
 }

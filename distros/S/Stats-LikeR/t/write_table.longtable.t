@@ -196,8 +196,7 @@ my ($r_off) = data_rows_of(read_tex($off));
 like($r_on,  qr/\\textbf\{x\}/, 'first cell bolded by default');
 like($r_off, qr/^x & 1/,        'first cell not bolded when disabled');
 
-# Row-name handling: LaTeX defaults row.names ON, so the body leads with an
-# empty header cell and each row with its label.
+# Row-name handling: row.names is off unless asked for, longtable included.
 my %hoh = (
 	r1 => { c1 => 'a', c2 => 'b' },
 	r2 => { c1 => 'c', c2 => 'd' },
@@ -206,9 +205,18 @@ $file = "$dir/rownames.tex";
 write_table(\%hoh, $file, 'tex.longtable' => 1); # no row.names arg
 $c = read_tex($file);
 my $h = header_of($c);
-like($h, qr/^\\textbf\{\} & /, 'header leads with an empty label cell');
-is(ncols($h), 3, 'label column plus c1, c2');
-like($c, qr/\\textbf\{r1\} & a & b/, 'r1 row carries its (bolded) label');
+unlike($h, qr/^\\textbf\{\} & /, 'no empty label cell in the header by default');
+is(ncols($h), 2, 'c1 and c2 alone');
+unlike($c, qr/\\textbf\{r1\} & a & b/, 'the outer key is not emitted as a label');
+
+# ... and row.names => 1 brings the label column back.
+$file = "$dir/rownames.on.tex";
+write_table(\%hoh, $file, 'tex.longtable' => 1, 'row.names' => 1);
+$c = read_tex($file);
+$h = header_of($c);
+like($h, qr/^\\textbf\{\} & /, 'row.names => 1: header leads with an empty label cell');
+is(ncols($h), 3, 'row.names => 1: label column plus c1, c2');
+like($c, qr/\\textbf\{r1\} & a & b/, 'row.names => 1: r1 row carries its (bolded) label');
 
 # Escaping and Greek mapping still run through the shared cell escaper.
 $file = "$dir/escape.tex";

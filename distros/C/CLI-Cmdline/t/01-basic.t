@@ -1,9 +1,9 @@
-#!/usr/bin/perl
+# t/01-basic.t - Test basic functionality
 use strict;
 use warnings;
-use Test::More  tests => 163;
 use Data::Dumper;
-use Test::NoWarnings 'had_no_warnings';
+use Test::More;
+use Test::Warnings;
 
 use CLI::Cmdline qw(parse);
 
@@ -84,5 +84,4 @@ run_test("52 - long and short same name conflict (long wins if --)", ['--v'], '-
 run_test("53 - short v and long verbose", ['-v','--verbose'], '-v --verbose', '', {}, {v=>1,verbose=>1}, [], 1);
 run_test("54 - -- ends after long", ['--verbose','--','--secret'], '--verbose', '', {}, {verbose=>1}, ['--secret'], 1);
 
-had_no_warnings();
 done_testing();

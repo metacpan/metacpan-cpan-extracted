@@ -39,8 +39,10 @@ struct hm_backend {
     int  (*add_timer) (hm_backend *, double secs, int oneshot, void *udata);
     int  (*del_timer) (hm_backend *, void *udata);
     int  (*add_signal)(hm_backend *, int signo);
-    /* timeout < 0 waits forever; returns count or -1 (errno) */
-    int  (*wait)      (hm_backend *, hm_event *out, int max, double timeout);
+    /* timeout < 0 waits forever; returns count or -1 (errno). Named wait_ev,
+     * not wait, because Perl's win32 headers #define wait as a function-like
+     * macro (PerlProc_wait) that would mangle the call site. */
+    int  (*wait_ev)   (hm_backend *, hm_event *out, int max, double timeout);
     void (*destroy)   (hm_backend *);
 };
 

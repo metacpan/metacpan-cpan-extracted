@@ -16,7 +16,6 @@ Version 0.0.0
 
 our $VERSION = '0.0.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::UID;
@@ -80,30 +79,28 @@ If the new method fails, it dies.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# run some basic checks to make sure we have the minimum stuff required to work
-	if ( ! defined( $args{uids} ) ){
-		die ('No uids key specified in the argument hash');
+	if ( !defined( $args{uids} ) ) {
+		die('No uids key specified in the argument hash');
 	}
-	if ( ref( $args{uids} ) ne 'ARRAY' ){
-		die ('The uids key is not a array');
+	if ( ref( $args{uids} ) ne 'ARRAY' ) {
+		die('The uids key is not a array');
 	}
-	if ( ! defined $args{uids}[0] ){
-		die ('Nothing defined in the uids array');
+	if ( !defined $args{uids}[0] ) {
+		die('Nothing defined in the uids array');
 	}
 
-    my $self = {
-				uids=>$args{uids},
-				};
-    bless $self;
+	my $self = { uids => $args{uids}, };
+	bless $self;
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -119,61 +116,60 @@ The returned value is a boolean.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $object=$_[1];
+sub match {
+	my $self   = $_[0];
+	my $object = $_[1];
 
-	if ( !defined( $object ) ){
+	if ( !defined($object) ) {
 		return 0;
 	}
 
-	if ( ref( $object ) ne 'Net::Connection' ){
+	if ( ref($object) ne 'Net::Connection' ) {
 		return 0;
 	}
 
-	my $conn_uid=$object->uid;
+	my $conn_uid = $object->uid;
 
 	# don't bother proceeding, the object won't match ever
 	# as it does not have a UID
-	if ( ! defined( $conn_uid ) ){
+	if ( !defined($conn_uid) ) {
 		return 0;
 	}
 
 	# use while as foreach will reference the value
-	my $uid_int=0;
-	while (defined( $self->{uids}[$uid_int] )){
-		my $uid=$self->{uids}[$uid_int];
-		if (
-			( $uid =~ /^[0-9]+$/ ) &&
-			( $uid eq $conn_uid )
-			){
+	my $uid_int = 0;
+	while ( defined( $self->{uids}[$uid_int] ) ) {
+		my $uid = $self->{uids}[$uid_int];
+		if (   ( $uid =~ /^[0-9]+$/ )
+			&& ( $uid eq $conn_uid ) )
+		{
 			return 1;
-		}elsif( $uid =~ /^\<\=[0-9]+$/ ){
-			$uid=~s/^\<\=//;
-			if ( $conn_uid <= $uid ){
+		} elsif ( $uid =~ /^\<\=[0-9]+$/ ) {
+			$uid =~ s/^\<\=//;
+			if ( $conn_uid <= $uid ) {
 				return 1;
 			}
-		}elsif( $uid =~ /^\<[0-9]+$/ ){
-			$uid=~s/^\<//;
-			if ( $conn_uid < $uid ){
+		} elsif ( $uid =~ /^\<[0-9]+$/ ) {
+			$uid =~ s/^\<//;
+			if ( $conn_uid < $uid ) {
 				return 1;
 			}
-		}elsif( $uid =~ /^\>\=[0-9]+$/ ){
-			$uid=~s/^\>\=//;
-			if ( $conn_uid >= $uid ){
+		} elsif ( $uid =~ /^\>\=[0-9]+$/ ) {
+			$uid =~ s/^\>\=//;
+			if ( $conn_uid >= $uid ) {
 				return 1;
 			}
-		}elsif( $uid =~ /^\>[0-9]+$/ ){
-			$uid=~s/^\>//;
-			if ( $conn_uid > $uid ){
+		} elsif ( $uid =~ /^\>[0-9]+$/ ) {
+			$uid =~ s/^\>//;
+			if ( $conn_uid > $uid ) {
 				return 1;
 			}
 		}
 		$uid_int++;
-	}
+	} ## end while ( defined( $self->{uids}[$uid_int] ) )
 
 	return 0;
-}
+} ## end sub match
 
 =head1 AUTHOR
 
@@ -264,4 +260,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

@@ -26,7 +26,7 @@ no_index:
 provides:
   Google::ISBNNumbers:
     file: lib/Google/ISBNNumbers.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Cpanel::JSON::XS: '4.08'
   HTTP::Tiny: '0.094'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/ericschernoff/Google-ISBNNumbers/issues
   homepage: https://github.com/ericschernoff/Google-ISBNNumbers
   repository: https://github.com/ericschernoff/Google-ISBNNumbers.git
-version: '1.01'
+version: '1.02'
 x_authority: cpan:ECHERNOF
 x_contributors:
   - 'Eric Chernoff <eric@pepper.weaverstreet.net>'

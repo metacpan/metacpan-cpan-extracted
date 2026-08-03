@@ -27,6 +27,5 @@ t/test-table-whitespace.txt
 t/TRTest.pm
 t/write-table.t
 table-readable-mode.el
-versionup.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

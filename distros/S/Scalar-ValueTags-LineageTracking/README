@@ -3,41 +3,59 @@ NAME
 
 SYNOPIS
         # setup: choose type of data to store in tags
-        my $dt = Scalar::ValueTags::LineageTracking->new( tag_type => 'string' );
-        my $dt = Scalar::ValueTags::LineageTracking->new( tag_type => 'ref' );
+        my $lt = Scalar::ValueTags::LineageTracking->new( tag_type => 'string' );
+        my $lt = Scalar::ValueTags::LineageTracking->new( tag_type => 'ref' );
 
         # default tag_type: string
-        my $dt = Scalar::ValueTags::LineageTracking->new();
+        my $lt = Scalar::ValueTags::LineageTracking->new();
 
         ### append tracking data sources when data is received from external sources
         my $names = $dbh->selectcol_arrayref('select name from user where user_id = %s", undef, $id);
         my $name = $names->[0];
 
         # using 'ref' tag_type
-        $dt->add_data_source(\$name,
-            { table => 'user', column => 'name', id => $id, file => __FILE__, line => __LINE__ }
+        $lt->add_data_sources(\$name,
+            [
+                { table => 'user', column => 'name', id => $id, file => __FILE__, line => __LINE__ },
+                ...,
+            ]
         );
 
         # using 'string' tag_type
         my $json = JSON->new->utf8->canonical->pretty(0);
-        $dt->add_data_source(\$name,
-            $json->encode( { table => 'user', column => 'name', id => $id, file => __FILE__, line => __LINE__ } )
+        $lt->add_data_sources( \$name,
+            [
+                $json->encode( { table => 'user', column => 'name', id => $id, file => __FILE__, line => __LINE__ } ),
+                ...,
+            ],
         );
 
         ### clear previous data sources and set data source
-        $dt->set_data_source( \$var, { table => 'user', column => 'name' } ); # 'ref' tag_type
-        $dt->set_data_source( \$var, $json->encode( { table => 'user', column => 'name' } ) ); # 'string' tag_type
+        # 'ref' tag_type
+        $lt->set_data_sources( \$name,
+            [
+                { table => 'user', column => 'name' },
+                ...,
+            ]
+        );
+        # 'string' tag_type
+        $lt->set_data_sources( \$name,
+            [
+                $json->encode( { table => 'user', column => 'name' } ),
+                ...,
+            ]
+        );
 
         ### data sources are propagated any time data is used
-        $dt->add_data_source(\$name, 'tag-one');
-        $dt->add_data_source(\$honorif, 'tag-two');
+        $lt->add_data_source(\$name, 'tag-one');
+        $lt->add_data_source(\$honorif, 'tag-two');
         my $salutation = "Hello, $honorif $name";
 
         # returns data sources set on both $honorif and $name:
-        my $data_sources = get_data_sources(\$salutation);
+        my $sources = $lt->get_data_sources(\$salutation);
 
         ### retrieve and clear data sources, for reporting
-        my $sources = $dt->get_and_clear_data_sources(\$salutation);
+        my $sources = $lt->get_and_clear_data_sources(\$salutation);
         send_lineage( { sources => $sources, var => 'salutation', file => __FILE__, line => __LINE__ } );
 
 DESCRIPTION
@@ -56,45 +74,80 @@ DESCRIPTION
 
     When the tracking items are propagated, they are de-duplicated using
     either the string or the refaddr of the data structure that was set in
-    "set_data_source".
+    "set_data_sources".
 
     The tracking data may be formatted in any way, such as OpenLineage.
 
   Implementation
-    "LineageTracking" uses the "SVTAGS_UNIQUE_REF_ARRAY" behavior, which
-    allows arbitrary references to data structures or serialized data
-    strings to be added to the value magic, and de-duplicates the structures
-    when propagating them to subsequent data values. If the data structure
-    references are used, they are de-duplicated by "refaddr" of the
-    structure.
+    For the "hash" "tag_type", the "SVTAGS_UNIQUE_HASH" behavior is used,
+    allowing string-serialized data to be used as tags. The tags are
+    de-duplicated by the string value, so the serialization must generate
+    canonical strings.
 
-FUNCTIONS
-  set_data_source
-        # using string
-        set_data_source( \$var, JSON->encode( { this => 1, that => 2 } );
+    For the "ref" "tag_type", the "SVTAGS_UNIQUE_REF_ARRAY" behavior is
+    used, allowing any arbitray Perl reference to be used as tags. The tags
+    are de-duplicated by the "refaddr" of the reference rather than the
+    contents, so identical tags must use the same Perl reference.
 
-        # using Perl reference
-        set_data_source( \$var, { this => 1, that => 2 } );
+PARAMETERS
+  tag_type
+    The "tag_type" determines the type of the tags passed to
+    Scalar::ValueTags.
 
-    Set the data source for the value of the given $var to be the given data
-    structure.
+    *   "string"
 
-  get_data_sources
-        $data_sources = get_data_sources(\$var);
-        for my $data_source (@$data_sources) { ... }
+        Each value tag must be a string suitable for use as a hash key.
+        De-duplication is done automatically since the string is used as a
+        hash key.
 
-    Returns arrayref of all data sources inherited by value in given $var.
+    *   "ref"
+
+        Each value tag must be a Perl reference. De-duplication is done by
+        the "refaddr" of the reference.
+
+METHODS
+  add_data_sources
+        # using 'string' tag type
+        $lt->add_data_sources( \$var, [ $string1, $string2, ... ] );
+
+        # using 'ref' tag type
+        $lt->add_data_sources( \$var, [ { this => 1 }, { that => 2 } ] );
+
+    Append the given data sources to the value of the given $var. Each data
+    source must match the tag_type set upon instantiation.
+
+    Does not return anything.
 
   clear_data_sources
-        clear_data_sources(\$var);
+        my $data_sources = $lt->clear_data_sources(\$var);
+        for my $data_source (@$data_sources) { ... }
 
-    Clears all data sources on value in given $var.
+    Clears all data sources on the value in given $var.
 
-  export_and_clear_data_sources
-        export_and_clear_data_sources( \$var, { sink => 'database', table => 'user', id => $id } );
+    Returns an arrayref of all of the data sources that previously existed
+    on the value in $var.
 
-    Captures and sends the tracking data from $var, adding the given
-    metadata to indicate where the data is being exported from.
+  get_data_sources
+        my $data_sources = $lt->get_data_sources(\$var);
+        for my $data_source (@$data_sources) { ... }
+
+    Returns an arrayref of all data sources set for the value in the given
+    $var. Includes all propagated tags from all data values that were used
+    to calculate the value of $var.
+
+  set_data_sources
+        # using 'string' tag type
+        my $prev_sources = $lt->set_data_sources( \$var, [ $string1, $string2, ... ] );
+
+        # using 'ref' tag type
+        my $prev_sources = $lt->set_data_sources( \$var, [ { this => 1 }, { that => 2 } ] );
+
+    Set the data sources for the value of the given $var to be the given
+    data sources, clearing any pervious data sources. Each data source must
+    match the tag_type set upon instantiation.
+
+    Returns an arrayref of the previous data sources that were set on the
+    value in $var.
 
 LICENSE
     This module is released under the same terms as Perl itself.

@@ -41,43 +41,54 @@ void _emit_context_free(emit_context_t * ctx) {
     emit_section_t * sec = ctx->sections;
     while (sec) {
         emit_section_t * next = sec->next;
-        free(sec->name);
-        free(sec->data);
-        free(sec);
+        infix_free(sec->name);
+        infix_free(sec->data);
+        infix_free(sec);
         sec = next;
     }
 
     emit_symbol_t * sym = ctx->symbols;
     while (sym) {
         emit_symbol_t * next = sym->next;
-        free(sym->name);
-        free(sym);
+        infix_free(sym->name);
+        infix_free(sym);
         sym = next;
     }
 
     emit_relocation_t * rel = ctx->relocations;
     while (rel) {
         emit_relocation_t * next = rel->next;
-        free(rel->symbol_name);
-        free(rel->section_name);
-        free(rel);
+        infix_free(rel->symbol_name);
+        infix_free(rel->section_name);
+        infix_free(rel);
         rel = next;
     }
 
-    free(ctx->current_block_name);
+    infix_free(ctx->current_block_name);
+}
+
+static char * _emit_strdup(const char * s) {
+    if (!s)
+        return NULL;
+
+    size_t len = strlen(s) + 1;
+    char * copy = infix_malloc(len);
+    if (copy)
+        memcpy(copy, s, len);
+    return copy;
 }
 
 static emit_section_t * _create_section(const char * name, emit_section_flags_t flags) {
-    emit_section_t * section = calloc(1, sizeof(emit_section_t));
+    emit_section_t * section = infix_calloc(1, sizeof(emit_section_t));
     if (!section)
         return NULL;
 
-    section->name = strdup(name);
+    section->name = _emit_strdup(name);
     section->flags = flags;
-    section->data = malloc(EMIT_DEFAULT_SECTION_CAPACITY);
+    section->data = infix_malloc(EMIT_DEFAULT_SECTION_CAPACITY);
     if (!section->data) {
-        free(section->name);
-        free(section);
+        infix_free(section->name);
+        infix_free(section);
         return NULL;
     }
     section->capacity = EMIT_DEFAULT_SECTION_CAPACITY;
@@ -114,7 +125,7 @@ INFIX_API infix_status emit_create(emit_context_t ** out_ctx, emit_architecture_
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
 
-    emit_context_t * ctx = calloc(1, sizeof(emit_context_t));
+    emit_context_t * ctx = infix_calloc(1, sizeof(emit_context_t));
     if (!ctx)
         return INFIX_ERROR_ALLOCATION_FAILED;
 
@@ -126,7 +137,7 @@ INFIX_API infix_status emit_create(emit_context_t ** out_ctx, emit_architecture_
 
 INFIX_API void emit_destroy(emit_context_t * ctx) {
     _emit_context_free(ctx);
-    free(ctx);
+    infix_free(ctx);
 }
 
 INFIX_API infix_status emit_add_section(emit_context_t * ctx, const char * name, emit_section_flags_t flags) {
@@ -185,11 +196,11 @@ INFIX_API infix_status emit_define_symbol(emit_context_t * ctx,
 
     emit_symbol_t * sym = _emit_lookup_symbol(ctx, name);
     if (!sym) {
-        sym = calloc(1, sizeof(emit_symbol_t));
+        sym = infix_calloc(1, sizeof(emit_symbol_t));
         if (!sym)
             return INFIX_ERROR_ALLOCATION_FAILED;
 
-        sym->name = strdup(name);
+        sym->name = _emit_strdup(name);
         sym->next = ctx->symbols;
         ctx->symbols = sym;
     }
@@ -211,11 +222,11 @@ INFIX_API infix_status emit_emit_label(emit_context_t * ctx, const char * name) 
 
     emit_symbol_t * sym = _emit_lookup_symbol(ctx, name);
     if (!sym) {
-        sym = calloc(1, sizeof(emit_symbol_t));
+        sym = infix_calloc(1, sizeof(emit_symbol_t));
         if (!sym)
             return INFIX_ERROR_ALLOCATION_FAILED;
 
-        sym->name = strdup(name);
+        sym->name = _emit_strdup(name);
         sym->is_defined = true;
         sym->is_function = false;
         sym->section = ctx->current_section;
@@ -248,7 +259,7 @@ static infix_status _ensure_section_capacity(emit_context_t * ctx, uint64_t need
     while (new_capacity < needed)
         new_capacity *= EMIT_SECTION_GROWTH_FACTOR;
 
-    uint8_t * new_data = realloc(ctx->current_section->data, new_capacity);
+    uint8_t * new_data = infix_realloc(ctx->current_section->data, new_capacity);
     if (!new_data)
         return INFIX_ERROR_ALLOCATION_FAILED;
 
@@ -337,12 +348,12 @@ emit_add_relocation(emit_context_t * ctx, const char * name, uint64_t offset, ui
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
 
-    emit_relocation_t * rel = calloc(1, sizeof(emit_relocation_t));
+    emit_relocation_t * rel = infix_calloc(1, sizeof(emit_relocation_t));
     if (!rel)
         return INFIX_ERROR_ALLOCATION_FAILED;
 
-    rel->symbol_name = strdup(name);
-    rel->section_name = ctx->current_section ? strdup(ctx->current_section->name) : NULL;
+    rel->symbol_name = _emit_strdup(name);
+    rel->section_name = ctx->current_section ? _emit_strdup(ctx->current_section->name) : NULL;
     rel->offset = offset;
     rel->size = size;
     rel->inst_size = inst_size;
@@ -355,7 +366,7 @@ emit_add_relocation(emit_context_t * ctx, const char * name, uint64_t offset, ui
 }
 
 static void write_raw_binary(emit_context_t * ctx, uint8_t * buffer, c23_maybe_unused uint64_t total_size) {
-    emit_section_t ** secs = malloc(ctx->section_count * sizeof(emit_section_t *));
+    emit_section_t ** secs = infix_malloc(ctx->section_count * sizeof(emit_section_t *));
     if (!secs)
         return;
 
@@ -374,14 +385,14 @@ static void write_raw_binary(emit_context_t * ctx, uint8_t * buffer, c23_maybe_u
         memcpy(buffer + offset, secs[i]->data, secs[i]->size);
     }
 
-    free(secs);
+    infix_free(secs);
 }
 
 infix_status _emit_resolve_relocations(emit_context_t * ctx) {
     if (!ctx)
         return INFIX_SUCCESS;
 
-    emit_section_t ** secs = malloc(ctx->section_count * sizeof(emit_section_t *));
+    emit_section_t ** secs = infix_malloc(ctx->section_count * sizeof(emit_section_t *));
     if (!secs)
         return INFIX_ERROR_ALLOCATION_FAILED;
 
@@ -444,7 +455,7 @@ infix_status _emit_resolve_relocations(emit_context_t * ctx) {
         }
     }
 
-    free(secs);
+    infix_free(secs);
     return INFIX_SUCCESS;
 }
 
@@ -503,7 +514,7 @@ INFIX_API infix_status emit_get_binary(const emit_context_t * ctx, const uint8_t
     for (emit_section_t * sec = ctx->sections; sec != NULL; sec = sec->next)
         total_size += sec->size;
 
-    uint8_t * buffer = malloc(total_size);
+    uint8_t * buffer = infix_malloc(total_size);
     if (!buffer)
         return INFIX_ERROR_ALLOCATION_FAILED;
 

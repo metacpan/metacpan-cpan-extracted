@@ -16,7 +16,6 @@ Version 0.0.0
 
 our $VERSION = '0.0.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::Protos;
@@ -69,38 +68,36 @@ If the new method fails, it dies.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# run some basic checks to make sure we have the minimum stuff required to work
-	if ( ! defined( $args{protos} ) ){
-		die ('No protos key specified in the argument hash');
+	if ( !defined( $args{protos} ) ) {
+		die('No protos key specified in the argument hash');
 	}
-	if ( ref( $args{protos} ) ne 'ARRAY' ){
-		die ('The protos key is not a array');
+	if ( ref( $args{protos} ) ne 'ARRAY' ) {
+		die('The protos key is not a array');
 	}
-	if ( ! defined $args{protos}[0] ){
-		die ('No states defined in the protos array');
+	if ( !defined $args{protos}[0] ) {
+		die('No states defined in the protos array');
 	}
 
-    my $self = {
-				protos=>[],
-				};
-    bless $self;
+	my $self = { protos => [], };
+	bless $self;
 
 	# lc everything for easier matching later
-	my $protos_int=0;
-	while( defined( $args{protos}[$protos_int] ) ){
-		$self->{protos}[$protos_int]=lc( $args{protos}[$protos_int] );
+	my $protos_int = 0;
+	while ( defined( $args{protos}[$protos_int] ) ) {
+		$self->{protos}[$protos_int] = lc( $args{protos}[$protos_int] );
 
 		$protos_int++;
 	}
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -116,21 +113,21 @@ The returned value is a boolean.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $object=$_[1];
+sub match {
+	my $self   = $_[0];
+	my $object = $_[1];
 
-	if ( !defined( $object ) ){
+	if ( !defined($object) ) {
 		return 0;
 	}
 
-	if ( ref( $object ) ne 'Net::Connection' ){
+	if ( ref($object) ne 'Net::Connection' ) {
 		return 0;
 	}
 
-	my $protos_int=0;
-	while( defined( $self->{protos}[$protos_int] ) ){
-		if ( $self->{protos}[$protos_int] eq lc( $object->proto ) ){
+	my $protos_int = 0;
+	while ( defined( $self->{protos}[$protos_int] ) ) {
+		if ( $self->{protos}[$protos_int] eq lc( $object->proto ) ) {
 			return 1;
 		}
 
@@ -138,7 +135,7 @@ sub match{
 	}
 
 	return 0;
-}
+} ## end sub match
 
 =head1 AUTHOR
 
@@ -229,4 +226,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

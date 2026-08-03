@@ -1,5 +1,20 @@
 Revision history for POE-Component-Server-JSONUnix
 
+0.2.0   2026-08-02/22:30
+        - Add kernel peer-credential authentication. On Linux (SO_PEERCRED),
+          FreeBSD/DragonFly/macOS (LOCAL_PEERCRED), NetBSD, and OpenBSD the
+          server reads the peer's UID/GID straight from the socket, so a
+          client can authenticate with no cookie file: auth_start advertises
+          'peercred', and auth_verify called with no path succeeds. Controlled
+          by the new 'auth_method' spawn argument ('auto' (default), 'peercred',
+          or 'cookie'); 'auto' falls back to the cookie challenge where the
+          platform has no support. Wire-compatible: existing cookie-based
+          clients are unaffected.
+        - Add the peer_uid/peer_gid context accessors, populated from connect
+          time on supported platforms independent of any handshake.
+        - Client and BlockingClient authenticate() now use the peercred path
+          automatically whenever the server offers it, creating no file.
+
 0.1.0   2026-07-21/20:30
         - Add Unix-ownership authentication: auth_start/auth_verify built-in
           commands, the auth_required and auth_temp_dir spawn arguments, and

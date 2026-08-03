@@ -1,6 +1,19 @@
 Revision history for CGI-ACL
 
-0.08
+0.09	Sun Aug  2 08:54:20 PM EDT 2026
+	[ Performance ]
+	- Skip DNS lookup entirely in _is_cloud_host() for private, loopback, and
+	  link-local addresses (IPv4: 127/8, 10/8, 172.16/12, 192.168/16, 169.254/16;
+	  IPv6: ::1, fc00::/7, fe80::/10) — these can never resolve to cloud-provider
+	  hostnames
+	- Cache per-IP cloud-lookup results in all_denied() with a 300-second TTL;
+	  repeated requests from the same IP skip both DNS round-trips entirely.
+	  DNS errors and timeouts are not cached so the next request retries.
+	  Cache is cleared when an object is cloned via new()
+	[ Testing ]
+	- Bump minimum version of Test::Mockingbird
+
+0.08	Sat Jun  6 21:26 EDT 2026
 	[ Bug Fixes ]
 	- Fixed REMOTE_ADDR || DEFAULT_ADDR using || instead of //, which silently
 	  substituted 127.0.0.1 for falsy values "0" and "" — a security bypass if

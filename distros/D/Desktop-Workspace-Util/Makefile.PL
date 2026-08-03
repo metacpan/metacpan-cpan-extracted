@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Desktop::Workspace::Util",
   "PREREQ_PM" => {
     "Desktop::KDEActivity::Util" => "0.002",
-    "Desktop::Open" => "0.004",
+    "Desktop::XWindowManager::Util" => 0,
     "Exporter" => "5.57",
     "IPC::System::Options" => "0.339",
     "List::Util" => "1.54",
@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Perinci::Sub::DepChecker" => 0,
     "Perinci::Sub::Util" => "0.472",
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Desktop::KDEActivity::Util" => "0.002",
-  "Desktop::Open" => "0.004",
+  "Desktop::XWindowManager::Util" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "Perinci::Sub::Util" => "0.472",
   "Test::More" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

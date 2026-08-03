@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -18,6 +18,18 @@
          "t",
          "inc"
       ]
+   },
+   "optional_features" : {
+      "encryption" : {
+         "description" : "AES-256-GCM encryption of config values via ENC[] tokens",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "CryptX" : "0"
+               }
+            }
+         }
+      }
    },
    "prereqs" : {
       "build" : {
@@ -38,17 +50,20 @@
             "File::Basename" : "0",
             "File::Slurp" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0",
             "Getopt::Long" : "0",
-            "Hash::Flatten" : "0",
+            "Hash::Flatten" : "0.05",
             "Hash::Merge" : "0",
             "JSON::MaybeXS" : "0",
             "JSON::Parse" : "0",
-            "Params::Get" : "0.14",
-            "Params::Validate::Strict" : "0.11",
+            "Params::Get" : "0.15",
+            "Params::Validate::Strict" : "0.37",
             "Pod::Usage" : "0",
+            "Readonly" : "0",
             "Scalar::Util" : "0",
+            "TOML::Tiny" : "0",
             "XML::PP" : "0.06",
-            "YAML::XS" : "0",
+            "YAML::XS" : "0.80",
             "perl" : "5.010000"
          }
       },
@@ -58,13 +73,15 @@
             "File::stat" : "0",
             "IPC::System::Simple" : "0",
             "POSIX" : "0",
-            "Readonly" : "0",
             "Test::DescribeMe" : "0",
-            "Test::Mockingbird" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0.12",
             "Test::Most" : "0",
             "Test::Needs" : "0",
+            "Test::Returns" : "0.03",
             "Test::TempDir::Tiny" : "0",
-            "Test::Without::Module" : "0"
+            "Test::Without::Module" : "0",
+            "autodie" : "0"
          }
       }
    },
@@ -83,6 +100,6 @@
          "x_repository" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.39",
+   "version" : "0.40",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,8 +1,15 @@
 # t/05-integration.t - Real-world integration tests using executable scripts
 use strict;
 use warnings;
-use Test::More tests => 25;
-use Test::NoWarnings 'had_no_warnings';
+
+BEGIN {
+    if ($^O eq 'MSWin32') {
+        print "1..0 # SKIP Integration tests not supported on Windows yet\n";
+        exit 0;
+    }
+}
+use Test::More;
+use Test::Warnings;
 
 use File::Temp qw(tempdir);
 use Cwd qw(getcwd);
@@ -19,7 +26,8 @@ sub run_script {
 
     # Write script with shebang
     open my $fh, '>', $filename or die "Cannot write $filename: $!";
-    print $fh "#!/usr/bin/perl\n";   # <-- important shebang
+    # Write script with shebang pointing to the perl that runs the tests
+    print $fh "#!$^X\n";
     print $fh $code;
     close $fh;
 
@@ -216,6 +224,4 @@ script_ok('07 - full script missing required input → die', $code7,
 # Return to original directory
 chdir $orig_dir;
 
-had_no_warnings();
 done_testing();
-

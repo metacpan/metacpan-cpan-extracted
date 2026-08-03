@@ -1,0 +1,73 @@
+Copyright (c) 2015-2026 Eugen Konkov <debugger@konkov.top>
+
+Perl Debugger Evaluation and Commercial License
+
+Scope
+
+This license applies to files in this distribution except those under
+lib/Devel/* and lib/Apache/*. Files in those directories are not subject to
+this license and are governed by the license notices included with them.
+
+The copy of lib/Apache/DB.pm in this distribution includes changes made only
+to make this debugger compatible with CGI applications. Those changes do not
+alter the licensing terms that apply to that file.
+
+1. Evaluation and educational use
+
+The copyright holder grants anyone a free, non-exclusive, non-transferable
+license to download, inspect, investigate, compile, modify, and use this
+software for evaluation, testing, learning, teaching, coursework, and other
+educational purposes.
+
+This permission includes use by students and teachers at universities and by
+students and teachers in programming courses. It does not expire after a
+fixed number of days, but it does not permit ongoing, production, or
+commercial use outside these purposes.
+
+2. Contributions
+
+You may modify the software and submit your modifications as pull requests to
+the project's repository. This permission includes transmitting the changes
+to the repository maintainers for review. Submitting a pull request does not
+grant a license for ongoing, production, or commercial use of the software.
+
+3. Commercial license
+
+Regular, ongoing, production, or commercial use requires a paid license.
+
+Unless the purchase terms state otherwise, one paid license permits one
+named individual to use the software for such purposes. The license holder
+may make and use modified copies internally, but may not distribute,
+publish, sublicense, sell, rent, or otherwise make the software available to
+any third party.
+
+4. Restrictions
+
+You may not redistribute this software or any modified version of it.
+You may not remove copyright or licensing notices.
+You may not use the software for regular, ongoing, production, or commercial
+purposes without a valid paid license.
+
+5. Ownership
+
+The software remains the property of the copyright holder. This license does
+not transfer ownership or copyright.
+
+6. Termination
+
+This license terminates automatically if you violate its terms. Upon
+termination, you must stop using the software and delete all copies. Any copy
+retained where deletion is required to be impossible by law is not licensed
+for use and must be covered by a paid license before any use. Termination
+does not waive or cancel any license fees or other amounts owed; all such
+amounts remain payable.
+
+7. Disclaimer
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER SHALL
+NOT BE LIABLE FOR ANY DAMAGES ARISING FROM THE USE OF THE SOFTWARE.
+
+For commercial licensing, purchase the product using the link in the README.
+For additional questions, open a GitHub issue or contact
+debugger@konkov.top.

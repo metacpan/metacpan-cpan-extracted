@@ -12,7 +12,7 @@ my $bad_file_name = "/holy/non/existent/files/batman";
 die if -f $bad_file_name;
 
 eval {
-    my $f = read_table ($bad_file_name);
+    my @f = read_table ($bad_file_name);
 };
 
 like ($@, qr/Error opening '\Q$bad_file_name\E'/i,

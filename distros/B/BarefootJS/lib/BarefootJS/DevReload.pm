@@ -1,11 +1,13 @@
 package BarefootJS::DevReload;
-our $VERSION = "0.29.0";
+our $VERSION = "0.30.2";
 use strict;
 use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
 use File::Spec;
+
+=encoding utf8
 
 =head1 NAME
 

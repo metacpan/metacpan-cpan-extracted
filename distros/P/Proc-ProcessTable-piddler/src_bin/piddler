@@ -1,0 +1,698 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Proc::ProcessTable::piddler;
+use Proc::ProcessTable::InfoString qw(proc_infostring_describe);
+
+sub version{
+	print 'piddler v. '.$Proc::ProcessTable::piddler::VERSION."\n";
+}
+
+sub help{
+        print '
+
+-h        Print the help.
+--help    Print the help.
+-v        Print the version info.
+--version Print the version info.
+
+-a        Show a_inodes.
+-c        Do not show pipe chains.
+-d        Do not dedup.
+-e <int>  Max number of peers to show. 0 or less shows all. Default is 0.
+-f        Do not show named pipes.
+-j        Show the jail, or the cgroups and namespaces, it is in.
+-l <int>  Max command length in a pipe chain. 0 or less does not truncate. Default is 0.
+-m        Show memory mapped libraries of the REG type.
+-n        Do not resolve PTR addresses.
+--nc      Disable color. The double dash matters, -nc being taken
+          for -n -c.
+-p        Do not show anonymous pipes.
+-r        Show VREG / files.
+-t        Show shared libraries.
+-u        Do not show unix sockets.
+-E        Do not resolve pipe, FIFO, unix socket, and SHM peers.
+-H        Do not humanize sizes.
+
+';
+	print proc_infostring_describe();
+	}
+
+# returns the integer the environmental variable named is set to, falling
+# back to the default passed for one that is not set at all
+sub integer_from_env{
+	my $name=$_[0];
+	my $default=$_[1];
+
+	if ( !defined( $ENV{$name} ) ){
+		return $default;
+	}
+
+	if ( $ENV{$name} !~ /^\-?[0-9]+$/ ){
+		die $name.' is set to "'.$ENV{$name}.'", which is not a integer'."\n";
+	}
+
+	return $ENV{$name};
+	}
+
+# defaults
+my $version;
+my $help;
+my $txt=0;
+my $dont_pipe=0;
+my $dont_unix=0;
+my $vregroot=0;
+my $dont_dedup=0;
+my $dont_resolv=0;
+my $no_color=0;
+my $a_inode=0;
+my $dont_fifo=0;
+my $memreglib=0;
+my $dont_pipe_chains=0;
+my $dont_peers=0;
+my $dont_human_size=0;
+my $jail_info=0;
+# left undefined so the environmental variables may be told apart from the flags
+my $peer_max;
+my $pipe_chain_command_length;
+
+# get the commandline options
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::Configure ('bundling');
+GetOptions(
+		   'h' => \$help,
+		   'help' => \$help,
+		   'v' => \$version,
+		   'version' => \$version,
+		   't' => \$txt,
+		   'p' => \$dont_pipe,
+		   'u' => \$dont_unix,
+		   'E' => \$dont_peers,
+		   'e=i' => \$peer_max,
+		   'H' => \$dont_human_size,
+		   'r' => \$vregroot,
+		   'd' => \$dont_dedup,
+		   'n' => \$dont_resolv,
+		   'nc' => \$no_color,
+		   'f' => \$dont_fifo,
+		   'a' => \$a_inode,
+		   'm' => \$memreglib,
+		   'c' => \$dont_pipe_chains,
+		   'j' => \$jail_info,
+		   'l=i' => \$pipe_chain_command_length,
+		   );
+
+# print the version info if requested
+if ( $version ){
+	&version;
+	exit;
+}
+
+if ( $help ){
+	&version;
+	&help;
+	exit;
+}
+
+# read in the list of PIDs
+my @PIDs;
+foreach my $arg ( @ARGV ){
+	my @possibles=split(/\,/, $arg);
+
+	foreach my $pid ( @possibles ){
+		if ( $pid !~ /^[0-9]+$/ ){
+			die $pid." does not appear to be a PID.\n";
+		}
+		push( @PIDs, $pid );
+	}
+}
+
+# XOR the -t if needed
+if ( defined( $ENV{PIDDLER_txt} ) ){
+	$txt = $txt ^ ( $ENV{PIDDLER_txt} ? 1 : 0 );
+}
+# XOR the -p if needed
+if ( defined( $ENV{PIDDLER_dont_pipe} ) ){
+	$dont_pipe = $dont_pipe ^ ( $ENV{PIDDLER_dont_pipe} ? 1 : 0 );
+}
+# XOR the -u if needed
+if ( defined( $ENV{PIDDLER_dont_unix} ) ){
+	$dont_unix = $dont_unix ^ ( $ENV{PIDDLER_dont_unix} ? 1 : 0 );
+}
+# XOR the -r if needed
+if ( defined( $ENV{PIDDLER_vregroot} ) ){
+	$vregroot = $vregroot ^ ( $ENV{PIDDLER_vregroot} ? 1 : 0 );
+}
+# XOR the -m if needed
+if ( defined( $ENV{PIDDLER_memreglib} ) ){
+	$memreglib = $memreglib ^ ( $ENV{PIDDLER_memreglib} ? 1 : 0 );
+}
+# XOR the -a if needed
+if ( defined( $ENV{PIDDLER_a_inode} ) ){
+	$a_inode = $a_inode ^ ( $ENV{PIDDLER_a_inode} ? 1 : 0 );
+}
+# XOR the -f if needed
+if ( defined( $ENV{PIDDLER_dont_fifo} ) ){
+	$dont_fifo = $dont_fifo ^ ( $ENV{PIDDLER_dont_fifo} ? 1 : 0 );
+}
+# XOR the -d if needed
+if ( defined( $ENV{PIDDLER_dont_dedup} ) ){
+	$dont_dedup = $dont_dedup ^ ( $ENV{PIDDLER_dont_dedup} ? 1 : 0 );
+}
+# XOR the -c if needed
+if ( defined( $ENV{PIDDLER_dont_pipe_chains} ) ){
+	$dont_pipe_chains = $dont_pipe_chains ^ ( $ENV{PIDDLER_dont_pipe_chains} ? 1 : 0 );
+}
+# XOR the -E if needed
+if ( defined( $ENV{PIDDLER_dont_peers} ) ){
+	$dont_peers = $dont_peers ^ ( $ENV{PIDDLER_dont_peers} ? 1 : 0 );
+}
+# XOR the -H if needed
+if ( defined( $ENV{PIDDLER_dont_human_size} ) ){
+	$dont_human_size = $dont_human_size ^ ( $ENV{PIDDLER_dont_human_size} ? 1 : 0 );
+}
+# XOR the -j if needed
+if ( defined( $ENV{PIDDLER_jail_info} ) ){
+	$jail_info = $jail_info ^ ( $ENV{PIDDLER_jail_info} ? 1 : 0 );
+}
+# XOR the -n if needed
+if ( defined( $ENV{PIDDLER_dont_resolv} ) ){
+	$dont_resolv = $dont_resolv ^ ( $ENV{PIDDLER_dont_resolv} ? 1 : 0 );
+}
+# -e and -l are values rather than toggles, so the environmental variables
+# just set the defaults for them, which passing the flags overrides
+if ( !defined( $peer_max ) ){
+	$peer_max=&integer_from_env( 'PIDDLER_peer_max', 0 );
+}
+if ( !defined( $pipe_chain_command_length ) ){
+	$pipe_chain_command_length=&integer_from_env( 'PIDDLER_pipe_chain_command_length', 0 );
+}
+# same for the no color, which per the NO_COLOR spec is any non-empty value
+if (
+	( defined( $ENV{NO_COLOR} ) ) &&
+	( $ENV{NO_COLOR} ne '' )
+	){
+        $no_color = $no_color ^ 1;
+}
+# disable the color if requested
+if ( $no_color ){
+        $ENV{ANSI_COLORS_DISABLED}=1;
+}else{
+        # Term::ANSIColor drops the color for any defined NO_COLOR, so it
+        # has to go for the XOR above to be able to turn the color back on
+        delete( $ENV{NO_COLOR} );
+}
+
+
+my $ppp=Proc::ProcessTable::piddler->new(
+										 {
+										  txt=>$txt,
+										  unix=>( $dont_unix ? 0 : 1 ),
+										  pipe=>( $dont_pipe ? 0 : 1 ),
+										  a_inode=>$a_inode,
+										  fifo=>( $dont_fifo ? 0 : 1 ),
+										  vregroot=>$vregroot,
+										  dont_dedup=>$dont_dedup,
+										  dont_resolv=>$dont_resolv,
+										  memreglib=>$memreglib,
+										  pipe_chains=>( $dont_pipe_chains ? 0 : 1 ),
+										  peers=>( $dont_peers ? 0 : 1 ),
+										  peer_max=>$peer_max,
+										  jail_info=>$jail_info,
+										  pipe_chain_command_length=>$pipe_chain_command_length,
+										  human_size=>( $dont_human_size ? 0 : 1 ),
+										  }
+										 );
+
+print $ppp->run( \@PIDs );
+exit 0;
+
+=head1 NAME
+
+piddler - Display all process table, open files, and network connections for a PID.
+
+=head1 SYNOPSIS
+
+piddler [B<-a>] [B<-c>] [B<-d>] [B<-e> <int>] [B<-f>] [B<-j>] [B<-l> <int>] [B<-m>] [B<-n>] [B<--nc>] [B<-p>] [B<-r>] [B<-t>] [B<-u>] [B<-E>] [B<-H>] <PID>[,<PID>...]
+
+piddler [B<-h>|B<--help>]
+
+piddler [B<-v>|B<--version>]
+
+=head1 FLAGS
+
+=head2 -a
+
+Show a_inodes.
+
+=head2 -c
+
+Do not show pipe chains.
+
+=head2 -d
+
+Do not dedup.
+
+=head2 -e <int>
+
+How many commands to show for the far end of a pipe, FIFO, unix socket,
+or shared memory object and how many PIDs to show for any one of those
+commands, with whatever is left off noted as a count.
+
+Zero or less shows all of them.
+
+Defaults to 0, showing all of them.
+
+=head2 -f
+
+Do not show named pipes, which is to say the FIFOs sitting on the file
+system rather than the anonymous pipes B<-p> covers.
+
+=head2 -j
+
+Show what the process has been shut away in under its own section, that
+being every parameter of the jail it is in on FreeBSD, as per L</JAILS>,
+and the cgroups and namespaces it is in on Linux, as per L</CONTAINERS>.
+
+=head2 -l <int>
+
+How long a command may be in a pipe chain before it is truncated, with
+B<...> tacked onto the end of it to show that it was.
+
+    ps auxw(4821) | grep -i --line-buffered --color=auto...(4822)
+
+Zero or less does not truncate at all.
+
+Only the pipe chains are touched, the commands shown for the far end of
+a endpoint having a length of their own.
+
+Defaults to 0, not truncating at all.
+
+=head2 -m
+
+Show memory mapped libraries of the REG type.
+
+=head2 -n
+
+Do not resolve PTR addresses
+
+=head2 --nc
+
+Disable color.
+
+The double dash matters here. Flag bundling is on for the single
+character flags, so B<-nc> is taken for B<-n> B<-c> rather than this.
+
+=head2 -p
+
+Do not show anonymous pipes, the sort a shell makes when it strings two
+commands together.
+
+Linux hands these the FIFO type rather than one of their own, naming them
+pipe instead of after a path the way a named one is, which is what tells
+the two apart there.
+
+=head2 -r
+
+Show VREG / files.
+
+=head2 -t
+
+Show shared libraries.
+
+=head2 -u
+
+Do not show unix sockets.
+
+=head2 -E
+
+Do not resolve pipe, FIFO, unix socket, and SHM peers.
+
+=head2 -H
+
+Do not humanize sizes.
+
+=head1 ENVIRONMENTAL VARIABLES
+
+These are used for XORing the corresponding flags. So setting
+one to 1 has the same effect as passing the flag, and passing
+the flag as well XORs it back off.
+
+The exceptions are B<PIDDLER_peer_max> and
+B<PIDDLER_pipe_chain_command_length>, which take a value rather
+than being toggles, so they just set the default for the flag
+they belong to and passing that flag overrides it.
+
+=head2 NO_COLOR
+
+If set to a non-empty value, color will be disabled, the same
+as B<--nc>.
+
+=head2 PIDDLER_a_inode
+
+If set to 1, a_inode types will be shown, the same as B<-a>.
+
+=head2 PIDDLER_dont_fifo
+
+If set to 1, FIFOs will not be shown, the same as B<-f>.
+
+=head2 PIDDLER_jail_info
+
+If set to 1, the jail a process is in, or the cgroups and
+namespaces on Linux, will be shown, the same as B<-j>.
+
+=head2 PIDDLER_memreglib
+
+If set to 1, memory mapped libraries with the type REG will be
+shown, the same as B<-m>.
+
+=head2 PIDDLER_txt
+
+If set to 1, libraries with the TXT type will be shown, the
+same as B<-t>.
+
+=head2 PIDDLER_dont_pipe
+
+If set to 1, pipes will not be shown, the same as B<-p>.
+
+=head2 PIDDLER_dont_pipe_chains
+
+If set to 1, pipe chains will not be shown, the same as B<-c>.
+
+=head2 PIDDLER_pipe_chain_command_length
+
+Sets how long a command may be in a pipe chain before it is
+truncated, the same as B<-l>, which overrides it when passed.
+
+=head2 PIDDLER_dont_unix
+
+If set to 1, unix sockets will not be shown, the same as B<-u>.
+
+=head2 PIDDLER_dont_peers
+
+If set to 1, pipe, FIFO, unix socket, and SHM peers will not
+be resolved, the same as B<-E>.
+
+=head2 PIDDLER_peer_max
+
+Sets how many peers will be shown, the same as B<-e>, which
+overrides it when passed.
+
+=head2 PIDDLER_dont_human_size
+
+If set to 1, sizes will be printed as the raw number of
+bytes, the same as B<-H>.
+
+=head2 PIDDLER_vregroot
+
+If set to 1, VREG / will be shown, the same as B<-r>.
+
+=head2 PIDDLER_dont_dedup
+
+If set to 1, duplicate file handles are not removed, the same
+as B<-d>.
+
+=head2 PIDDLER_dont_resolv
+
+If set to 1, PTR addresses will not be resolved for
+network connections, the same as B<-n>.
+
+=head1 PIPE CHAINS
+
+By default a section is shown for the pipelines the process is a part
+of, with the commands printed in the order the data flows through them.
+B<-c> turns this off.
+
+    PIPE CHAINS
+    ps auxw(4821) | grep foo(4822) | wc -l(4823)
+
+Commands are truncated as per B<-l>. Any process that can not be looked
+up, such as one belonging to another user when not running as root, is
+shown as a ?. A process may sit on more than one pipe, so at most 16
+lines are shown for any one of them.
+
+Only a pipe with the one process writing and the one reading is a link in
+a pipeline, that being what a shell makes when it strings two commands
+together. Two processes each running a pipe at the other are talking both
+ways, which is the one channel between them rather than two pipelines
+pointed opposite ways.
+
+    firefox(7375) <-> firefox -contentproc...(24844)
+
+Anything else is left as the one pipe it is, printed as whatever is
+writing to it against whatever is reading, rather than being strung into
+a pipeline it is not. A worker pool sharing a queue out among its workers
+is the usual sort.
+
+    python process.py(8007) | python process.py(8007), inherited(94645, 94646, + 5 more)
+
+A process forked off of one already holding a pipe is handed a copy of it
+whether it has any use for it or not, and a pool that forks a worker at a
+time ends up with every worker holding a end of every pipe made before
+it. Those are printed as B<inherited> so they are not taken for something
+that was given the pipe to use.
+
+Tying the two ends of a pipe together requires a system wide lsof, so it
+is only run for processes that actually have a pipe open, and only once
+no matter how many PIDs are given.
+
+The direction of a pipe is taken from the r and w access characters when
+lsof reports them. Systems such as FreeBSD report pipes as being open
+read/write instead, in which case the descriptor number is used, 0 being
+the input and 1 and 2 being the output. On those systems that means only
+pipes on stdin, stdout, and stderr may be chained together.
+
+=head1 PIPE, FIFO, UNIX SOCKET, AND SHM PEERS
+
+The command holding the far end of a pipe, FIFO, unix socket, or shared
+memory object is appended to the one in question, so B<-p>, B<-f>, and
+B<-u> decide whether it is seen at all for those. B<-E> turns just this
+off.
+
+    7u  unix 0xfffff80022630400 0             ->0xfffff80022635000 (dbus-daemon --session(51092))
+    14u unix 0xfffff80052dee800 0             /tmp/dbus-nWRW4XDDoD (xfce4-panel(63471))
+    3r  FIFO 0xe6               0t0 299839014 /tmp/testfifo (cat(12593))
+    17u SHM                     288876   0    (firefox -contentproc...(7375, 24844, 32640, + 26 more))
+
+The far end is found either by way of the endpoint this one points at,
+by way of whatever points at this one, or by way of what else has the
+same one open. The second is what covers the unix sockets lsof names
+after the path they are bound to, such as the accepted end of a
+connection, and the third the FIFOs, shared memory objects, and pipes
+that both ends hold the same object for.
+
+Commands longer than 40 characters are truncated. A endpoint whose far
+end can not be looked up, such as one held by another user's process when
+not running as root, is shown as a ?. Nothing is shown for one that has
+no far end to speak of, such as a unix socket that is only bound and
+listening or a FIFO no one else has open.
+
+A endpoint may be held by any number of other processes, such as a shared
+memory object inherited across a pile of forks, so the PIDs are gathered
+up under the command they are running, with B<-e> capping how many of
+each are printed.
+
+Tying the two ends together requires a system wide lsof, which is only
+done when a pipe, FIFO, unix socket, or shared memory object is actually
+going to be printed, and only once no matter how many PIDs are given.
+
+Unix sockets are tied together either by way of a lsof that points at the
+far end of one, as FreeBSD does, or by way of B<lsof +E>, which is what is
+used on Linux. A build of lsof with no B<+E> to it just leaves them
+without a far end to speak of, everything else carrying on as it was.
+
+=head1 SHARED MEMORY
+
+The total size of the shared memory a process holds is shown with the
+rest of the memory bits. A object held on more than one FD is counted the
+once, the object being what takes up the memory rather than the handle
+on it.
+
+    Total SHM 1.076M
+
+FreeBSD and the like hand these a SHM type of their own. Linux has no
+such type, giving them the same REG every other file gets, so there they
+are picked out by name instead.
+
+    /dev/shm/*  POSIX objects, which live on a tmpfs
+    /SYSV*      SysV segments, which are named after their key
+    /memfd:*    the anonymous ones made by memfd_create
+
+The TYPE column is whatever lsof called it either way, so these read as
+REG on Linux rather than SHM.
+
+Every one of them is deduped and has its peers looked up in the same
+manner as any other, so what else holds a object is shown for it as per
+L</PIPE, FIFO, UNIX SOCKET, AND SHM PEERS> and the ones that print the
+same are rolled up as per L</FILE HANDLE DEDUPING>.
+
+=head1 JAILS
+
+On FreeBSD, any process with a JID other than 0 has the jail it is in
+looked up, showing the name of it with the number after it in the same
+manner as the UID and GID.
+
+    jid  test(1) test.example.org /jails/test
+
+The hostname and path are only tacked on when they have anything to add,
+the first being more often than not just the name over again and the
+second nothing worth mentioning for a jail sharing the file system it was
+started from. Just the number is shown for a jail that can not be looked
+up, such as one that has gone away since the process table was read.
+
+B<-j> adds a section with every parameter of the jail in it, which is the
+lot of what jls reports for one.
+
+    JAIL ARG      VALUE
+    host.hostname test.example.org
+    jid           1
+    name          test
+    path          /jails/test
+    persist       true
+
+The lookup takes a run of jls, which is only done for a process that is
+in a jail, and only once per jail no matter how many PIDs are given.
+
+=head1 CONTAINERS
+
+Linux has no jails, shutting a process away with cgroups and namespaces
+instead, so that is what is shown in their place there.
+
+The cgroup a process is in is shown with the rest of its info, that being
+what names the systemd unit or the container it belongs to. Nothing is
+shown for one left sitting in the root cgroup it started in, such as a
+kernel thread.
+
+    Cgroup /system.slice/postgresql@17-main.service
+
+Every namespace it does not share with PID 1 is shown as well, those
+being what it has been shut away from the rest of the system in. A
+process sharing the lot of them has nothing to say here.
+
+    Namespaces mnt, net, pid, uts
+
+When the cgroup names a container, the runtime that started it is shown
+with the ID after it, in the same manner as the UID and GID. The long
+hash a runtime hands a container is cut down to the first dozen
+characters, which is how everything else prints them.
+
+    Container docker(3f2a1b8c9d4e)
+
+The runtimes below are the ones picked out. Anything else still has its
+cgroup and namespaces shown, just with no name put to it.
+
+    docker
+    podman
+    containerd
+    crio
+    lxc
+    machine      systemd-nspawn and the like
+
+=head2 CGROUP LIMITS
+
+What the cgroup is using of what it is allowed is shown along with it,
+each line being left off when it has nothing to say, be it a limit that
+was never set or a controller that was never turned on for it.
+
+    Cgroup mem      98.304k / 33.554M peak 33.554M
+    Cgroup cpu      quota 0.1, used 26, throttled 2604 for 4:05
+    Cgroup pids     1 / 50
+    Cgroup events   oom_kill 1, oom 1, max 879
+    Cgroup pressure cpu 74.00/77.31, memory 0.15/2.73
+
+All of it covers the whole cgroup rather than the one process, so a unit
+that started a dozen of them reports what the lot are using between
+them. B<Cgroup mem> takes in the page cache on top of the anonymous
+memory as well, so it is not the RSS over again and will read higher than
+it for anything that has been through a pile of files.
+
+The limit is only shown when there is one, B<memory.max> falling back to
+the softer B<memory.high> with B<high> after it. B<Cgroup cpu> is only
+shown for a cgroup that is either capped or being held back, the time it
+has used saying no more than the process table already does otherwise,
+and its quota is the share of a single core it works out to. B<Cgroup
+events> and B<Cgroup pressure> only turn up when something actually
+happened, everything sitting at zero having nothing to report.
+
+None of it is read for a process in the root cgroup, which has nothing of
+its own to report, nor for one whose cgroup can not be found under the
+mount point, that being what a process in a cgroup namespace of its own
+looks like from outside of it. Reading the root for one of those would
+hand back the whole system's numbers as though they belonged to the
+process.
+
+Only the v2 hierarchy is read. A system still running v1 alone has its
+cgroup paths shown as ever, just with none of this alongside them.
+
+=head2 -j
+
+B<-j> adds a section with every cgroup and namespace in it, the ones not
+shared with PID 1 being called out, followed by the knobs of the cgroup
+itself and what else is sitting in it.
+
+    CONTAINER ARG           VALUE
+    cgroup                  /piddler-test
+    ns:mnt                  4026532643 private
+    ns:net                  4026531833
+    cgroup.controllers      cpuset cpu io memory pids
+    cgroup.procs            1 sh -c while :; do :; done(369709)
+    memory.current          90.112k
+    memory.max              33.554M
+    pids.max                50
+    cpu.max                 10000 100000
+    cpu.stat:nr_throttled   2829
+    memory.events:oom_kill  1
+    cpu.pressure:some       avg10=85.84 avg60=79.75 avg300=47.38
+
+B<cgroup.procs> is everything sitting in the cgroup, gathered up under
+the command each of them is running and capped in the same manner as the
+peers of a endpoint, as per B<-e>. B<cgroup.controllers> is what says why
+any of the rest are missing, a knob only being there for a controller
+that was turned on.
+
+The B<memory.stat> lines break B<memory.current> down into where it
+actually went, which is what says how much of a cgroup is its own
+anonymous memory and how much is page cache it has read through, the two
+often being nothing alike.
+
+    memory.current       40.747M
+    memory.stat:anon     3.871M
+    memory.stat:file     29.131M
+    memory.stat:shmem    12.263M
+
+There are a great many of these, so only the handful worth reading
+through are printed, and only the ones with something in them at that.
+B<memory.stat:shmem> is all the tmpfs and shared memory charged to the
+cgroup, which is not the B<Total SHM> shown with the process info, that
+being the shared memory objects the one process has open as per
+L</SHARED MEMORY>.
+
+All of it is read from /proc and the cgroup mount, so there is nothing to
+run for it the way there is for a jail. The namespaces of a process
+belonging to another user are kept from everyone but root, so those go
+unshown when it is not root doing the asking.
+
+=head1 FILE HANDLE DEDUPING
+
+By default it checks if file handles are open in the same
+mode more than once. If it finds one of these + is appended
+to the value in the FD column.
+
+The following are also RW filehandles.
+
+   u
+   uw
+   ur
+
+Shared memory objects are rolled up as well, as per L</SHARED MEMORY>. A
+process may hold a great many that print the same, anonymous ones having
+nothing to tell them apart but their size and what else holds them, so
+only the first of them is printed, with the number left off tacked onto
+the FD. B<-d> turns this off along with the rest of the deduping.
+
+    40u+43 SHM  262.144k
+
+=cut
+

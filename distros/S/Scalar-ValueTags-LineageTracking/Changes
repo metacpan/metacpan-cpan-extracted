@@ -8,3 +8,10 @@ NOTE: Odd versions are trial versions; even versions are release versions
 0.002 2026-07-27
  - First release version
  - bump Scalar::ValueTags to 0.004
+
+0.004 2026-07-31
+ - API changes:
+  - pluralize to add_data_sources, allowing multiple sources
+  - pluralize to set_data_sources, allowing multiple sources
+  - clear_data_sources now returns previous sources, replacing get_and_clear_sources
+  - re-organize tests

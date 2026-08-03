@@ -5,14 +5,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/KDEActivityUtils.pm'
 );
 
 my @scripts = (
-    'script/get-current-kde-activity',
     'script/getkact',
     'script/list-kde-activities',
     'script/move-windows-to-kde-activity',

@@ -13,7 +13,8 @@ cancels the pending response Future.
 
 Production features: worker respawn, SIGHUP zero-downtime worker recycle,
 graceful shutdown, idle/slow-request timeouts, pipelining fairness,
-SO_REUSEPORT (opt-in, Linux), access_log callback, Hyperman->stats.
+SO_REUSEPORT (opt-in, Linux), a fast built-in Combined-format access log
+(access_log => a path or handle; a coderef for custom logging), Hyperman->stats.
 
 See BENCHMARKS.md for measured numbers and plan/ for the design documents.
 

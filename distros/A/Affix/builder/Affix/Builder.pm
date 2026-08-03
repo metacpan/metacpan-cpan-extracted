@@ -91,7 +91,25 @@ class    #
         make_path( catdir(qw[blib arch]), { chmod => 0755, verbose => $verbose } );
         0;
     }
-    method step_clean() { remove_tree( $_, { verbose => $verbose } ) for qw[blib temp]; 0 }
+
+    method _clean_objects() {
+        my $lib_dir = path('lib');
+        my @objs;
+        $lib_dir->visit(
+            sub ( $path, $state ) {
+                push @objs, $path if $path->is_file && $path =~ /\.(?:o|obj)\z/i;
+            },
+            { recurse => 1 }
+        );
+        remove_tree( $_, { verbose => $verbose } ) for @objs;
+        0;
+    }
+
+    method step_clean() {
+        remove_tree( $_, { verbose => $verbose } ) for qw[blib temp];
+        $self->_clean_objects;
+        0;
+    }
 
     method step_install() {
         $self->step_build() unless -d 'blib';
@@ -109,7 +127,13 @@ class    #
         # In the future, I might check the values of %res according to https://metacpan.org/pod/ExtUtils::Install#install
         0;
     }
-    method step_realclean () { remove_tree( $_, { verbose => $verbose } ) for qw[blib temp Build _build_params MYMETA.yml MYMETA.json]; 0 }
+
+    method step_realclean () {
+        remove_tree( $_,                { verbose => $verbose } ) for qw[blib temp Build _build_params MYMETA.yml MYMETA.json];
+        remove_tree( 'infix/build_lib', { verbose => $verbose } );
+        $self->_clean_objects;
+        0;
+    }
 
     method step_test() {
         $self->step_build() unless -d 'blib';

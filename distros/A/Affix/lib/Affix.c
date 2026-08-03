@@ -5683,6 +5683,28 @@ XS_INTERNAL(Affix_CLONE) {
 
 #include "Affix/marshal.c"
 
+// Runtime allocator callbacks that route infix's memory through Perl's
+// allocator. They are installed once at load time via infix_set_allocator() in
+// boot_Affix below; infix then dispatches every internal heap allocation
+// through this table, so libinfix.a stays a plain standalone library with zero
+// knowledge of Perl. The explicit (MEM_SIZE) casts keep this correct on any
+// perl configuration, and Perl_safesys* derive the current interpreter from
+// the calling thread's thread-local storage (dTHX under ALWAYS_NEED_THX
+// builds), so the allocation is attributed to whichever interpreter the infix
+// call happens on. Combined with Affix's per-thread ownership of infix objects
+// (see Affix_CLONE and Affix_cv_dup), every infix allocation is both created
+// and destroyed on the same interpreter, so Perl's pool validation
+// (PERL_TRACK_MEMPOOL) never fires.
+static void * affix_infix_malloc(size_t nbytes) { return Perl_safesysmalloc((MEM_SIZE)nbytes); }
+
+static void * affix_infix_calloc(size_t nelem, size_t size) {
+    return Perl_safesyscalloc((MEM_SIZE)nelem, (MEM_SIZE)size);
+}
+
+static void * affix_infix_realloc(void * ptr, size_t nbytes) { return Perl_safesysrealloc(ptr, (MEM_SIZE)nbytes); }
+
+static void affix_infix_free(void * ptr) { Perl_safesysfree(ptr); }
+
 void boot_Affix(pTHX_ CV * cv) {
     dVAR;
     dXSBOOTARGSXSAPIVERCHK;
@@ -5696,6 +5718,20 @@ void boot_Affix(pTHX_ CV * cv) {
     MY_CXT.enum_registry = newHV();
     MY_CXT.coercion_cache = newHV();
     MY_CXT.stash_pointer = nullptr;
+
+    // Route all of infix's internal allocations through Perl's allocator before
+    // any infix call below. infix_set_allocator() copies the table, and the
+    // affix_infix_* callbacks above forward to Perl_safesys*, so Perl tracks
+    // infix memory and pool validation (PERL_TRACK_MEMPOOL) never fires.
+    // infix_allocator is process-global and single-threaded here (module load),
+    // and cloned interpreters inherit the installed table.
+    infix_set_allocator(&(infix_allocator_t){
+        .malloc = affix_infix_malloc,
+        .calloc = affix_infix_calloc,
+        .realloc = affix_infix_realloc,
+        .free = affix_infix_free,
+    });
+
     MY_CXT.registry = infix_registry_create();
     if (!MY_CXT.registry)
         croak("Failed to initialize the global type registry");

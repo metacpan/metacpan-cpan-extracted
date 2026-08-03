@@ -16,7 +16,6 @@ Version 0.0.0
 
 our $VERSION = '0.0.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::All;
@@ -50,10 +49,9 @@ None taken.
 
 =cut
 
-sub new{
-    my $self = {
-				};
-    bless $self;
+sub new {
+	my $self = {};
+	bless $self;
 
 	return $self;
 }
@@ -68,7 +66,7 @@ Returns 1.
 
 =cut
 
-sub match{
+sub match {
 	return 1;
 }
 
@@ -161,4 +159,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

@@ -12,7 +12,7 @@ use AllTests;
 MOJO_APP: {
   # plugin configuration
   plugin 'OAuth2::Server' => {
-  jwt_secret => 'foo',
+  jwt_secret => 'foobarbaz',
     clients              => {
       1 => {
     	redirect_uri => 'https://client/cb',

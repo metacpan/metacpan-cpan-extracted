@@ -1,5 +1,13 @@
 Revision history for Perl extension WebService-Mailgun
 
+0.17 2026-08-03T04:25:23Z
+
+0.17 2026-08-03T04:24:10Z
+    - get mailgun credentials for tests from environment variables
+      (MAILGUN_API_KEY, MAILGUN_DOMAIN, MAILGUN_TO). tests are skipped
+      when they are not set.
+    - migrate CI from Travis CI to GitHub Actions
+
 0.16 2023-09-12T09:33:42Z
     - fix document
 

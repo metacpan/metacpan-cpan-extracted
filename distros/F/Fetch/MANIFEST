@@ -6,6 +6,8 @@ include/fetch/backend_iouring.c
 include/fetch/backend_kqueue.c
 include/fetch/backend_poll.c
 include/fetch/backend_select.c
+include/fetch/fetch_abi.h
+include/fetch/ft_abi.h
 include/fetch/ft_backend.h
 include/fetch/ft_cookiejar.h
 include/fetch/ft_core.h
@@ -50,9 +52,11 @@ t/13-cookies.t
 t/14-websocket.t
 t/15-websocket-hyperman.t
 t/16-json.t
+t/16-timeout-hyperman.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xs/abi.xs
 xs/cookiejar.xs
 xs/fetch.xs
 xs/future.xs

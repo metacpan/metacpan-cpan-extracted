@@ -1,5 +1,8 @@
 Revision history for Object-Proto-Sugar
 
+0.06	2026-08-02
+	- Add the prv shortcut and private => 1 option for Object::Proto private attributes.
+
 0.05	2026-04-12
 	- Add accessor_alias keyword for package-level function accessor prefixing
 	- accessor_alias applies to accessor, reader, and writer when set to 1

@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Test::More;
+
+use Object::Proto;
+
+# Define a class
+Object::Proto::define('Cat', qw(name age:private));
+
+package Cat;
+
+sub meow {
+	return $_[0]->age;
+}
+
+package main;
+
+# Test positional constructor
+my $cat1 = new Cat 'Whiskers', 3;
+isa_ok($cat1, 'Cat', 'positional constructor creates Cat');
+is($cat1->name, 'Whiskers', 'positional: name accessor works');
+is($cat1->meow, 3, 'positional: age accessor works');
+eval {
+	$cat1->age
+};
+like($@, qr/cannot call private attribute age on Cat from main/, 'fails');
+
+
+
+# Test named pairs constructor
+my $cat2 = new Cat name => 'Fluffy', age => 5;
+isa_ok($cat2, 'Cat', 'named constructor creates Cat');
+is($cat2->name, 'Fluffy', 'named: name accessor works');
+is($cat2->meow, 5, 'positional: age accessor works');
+eval {
+	$cat2->age
+};
+like($@, qr/cannot call private attribute age on Cat from main/, 'fails');
+
+# Test setter
+eval {
+	$cat1->age(50)
+};
+like($@, qr/cannot call private attribute age on Cat from main/, 'fails');
+
+# Test named pairs order independence
+my $cat3 = new Cat age => 2, name => 'Mittens';
+is($cat3->name, 'Mittens', 'named: order independent - name');
+is($cat3->meow, 2, 'positional: age accessor works');
+eval {
+	$cat3->age
+};
+like($@, qr/cannot call private attribute age on Cat from main/, 'fails');
+
+done_testing;

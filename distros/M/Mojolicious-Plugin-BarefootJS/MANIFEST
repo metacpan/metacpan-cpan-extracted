@@ -4,10 +4,14 @@ lib/BarefootJS/Backend/Mojo.pm
 lib/Mojolicious/Plugin/BarefootJS.pm
 lib/Mojolicious/Plugin/BarefootJS/DevReload.pm
 LICENSE
+CONTRIBUTING.md
+SECURITY.md
 MANIFEST
 Makefile.PL
 t/dev_reload.t
 t/manifest_defaults.t
+t/meta_provides.t
 t/render_named.t
+t/scope_comment.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

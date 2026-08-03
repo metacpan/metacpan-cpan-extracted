@@ -6,7 +6,7 @@ async Future mocking
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -343,12 +343,6 @@ called and its return value is passed back to the caller.
 Returns a coderef that, when invoked, returns the list of captured call
 records. Each record is an arrayref `[ $full_method, @args ]`.
 
-### Limitation
-
-`spy()` does not call `mock()` internally and therefore does not apply
-prototype preservation. Wrapping a prototyped function emits a
-`Prototype mismatch` warning.
-
 ### API SPECIFICATION
 
 #### Input
@@ -447,6 +441,69 @@ and `diagnose_mocks()` all work identically.
 
     "intercept_new requires a class name"                    -- undef/empty class
     "intercept_new requires a replacement object or coderef" -- factory missing
+
+## mock\_core
+
+Override a CORE Perl builtin globally via `CORE::GLOBAL`.
+
+    # Intercept 'warn' for code compiled after this point
+    mock_core 'warn' => sub {
+        my ($call_warn, @msgs) = @_;
+        push @captured, @msgs;   # capture without emitting
+    };
+
+    # Call through to the real builtin via $call_builtin
+    mock_core 'stat' => sub {
+        my ($call_stat, $file) = @_;
+        return $call_stat->($file);   # delegates to CORE::stat
+    };
+
+    unmock 'CORE::GLOBAL::warn';   # peel one layer
+    restore_all();                 # drain all layers
+
+The replacement receives `($call_builtin, @original_args)`, mirroring the
+`around()` API.  `$call_builtin` is a coderef that calls `CORE::$name`
+directly, bypassing any other `CORE::GLOBAL` override.
+
+The override is installed in `CORE::GLOBAL::$name`, which is Perl's
+documented mechanism for intercepting named builtins.  It affects all
+packages globally.
+
+**Compile-time semantics:** `CORE::GLOBAL` overrides are visible to code
+compiled _after_ the override is installed.  To intercept calls in a module
+under test, install the mock _before_ loading that module (a `BEGIN` block
+works).  Already-compiled call sites (including direct calls in the current
+test file) are not affected at runtime.  Use string `eval` when you need
+code compiled in the same test run to see the override.
+
+The wrapper carries the same prototype as `CORE::$name` so that call-site
+argument binding (such as the `_` prototype that reads `$_` when no
+argument is given) is preserved.
+
+Participates in the same LIFO mock stack as `mock()`.  `unmock`,
+`restore()`, and `restore_all()` accept `'CORE::GLOBAL::$name'` as the
+target.  `diagnose_mocks()` records the layer type as `'mock_core'`.
+
+**Limitation:** builtins whose prototype begins with `&` (`sort`, `map`,
+`grep`) require a literal code block at the call site and cannot be wrapped.
+
+### API SPECIFICATION
+
+#### Input
+
+    name        -- Str, CORE builtin name (no 'CORE::' prefix required)
+    replacement -- CodeRef; receives ($call_builtin, @original_args)
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "mock_core requires a builtin name and a replacement coderef" -- wrong arg types
+    "mock_core: '$name' is not a valid identifier"               -- name has punctuation
+    "mock_core: '$name' is not an overridable Perl builtin"      -- unknown builtin
+    "mock_core: cannot build CORE::$name delegator: ..."         -- eval failed
 
 ## restore\_all
 
@@ -664,6 +721,8 @@ Return a human-readable multi-line string of all active mock layers.
 
 # SUPPORT
 
+This module is provided as-is without any warranty.
+
 Please report bugs at [https://github.com/nigelhorne/Test-Mockingbird/issues](https://github.com/nigelhorne/Test-Mockingbird/issues).
 
 # AUTHOR
@@ -727,6 +786,17 @@ Nigel Horne, `<njh at nigelhorne.com>`
         let orig = sym_table[target].CODE •
           post sym_table'[target].CODE = wrapper
                ∧ wrapper(@args) ≙ hook(orig, @args)
+
+## mock\_core
+
+    mock_core ≙
+      ∀ name : Str; replacement : CodeRef •
+        pre  _is_core_overridable(name) ∧ ref(replacement) = 'CODE'
+        let  call_core = eval("sub { CORE::name(@_) }") •
+        let  wrapper   = sub { replacement(call_core, @_) } •
+          post CORE::GLOBAL::name.CODE = wrapper
+               ∧ prototype(wrapper) = prototype(CORE::name)
+               ∧ mocked'["CORE::GLOBAL::name"] = ⟨wrapper⟩ ⌢ mocked["CORE::GLOBAL::name"]
 
 ## mock\_scoped
 
@@ -857,6 +927,17 @@ Nigel Horne, `<njh at nigelhorne.com>`
         let orig = sym_table[target].CODE •
           post sym_table'[target].CODE = wrapper
                ∧ wrapper(@args) ≙ hook(orig, @args)
+
+## mock\_core
+
+    mock_core ≙
+      ∀ name : Str; replacement : CodeRef •
+        pre  _is_core_overridable(name) ∧ ref(replacement) = 'CODE'
+        let  call_core = eval("sub { CORE::name(@_) }") •
+        let  wrapper   = sub { replacement(call_core, @_) } •
+          post CORE::GLOBAL::name.CODE = wrapper
+               ∧ prototype(wrapper) = prototype(CORE::name)
+               ∧ mocked'["CORE::GLOBAL::name"] = ⟨wrapper⟩ ⌢ mocked["CORE::GLOBAL::name"]
 
 # LICENCE AND COPYRIGHT
 

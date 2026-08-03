@@ -1,0 +1,27 @@
+bench/bench.pl
+bench/vs-apache.pl
+Changes
+ignore.txt
+include/fetch_abi.h
+lib/Reverse/Proxy.pm
+Makefile.PL
+MANIFEST			This list of files
+Proxy.xs
+README
+t/00-load.t
+t/01-basic.t
+t/02-routes.t
+t/03-errors.t
+t/04-stream.t
+t/05-websocket.t
+t/06-resolver.t
+t/07-headers.t
+t/08-stream-error.t
+t/09-upgrade-errors.t
+t/10-hyperman.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

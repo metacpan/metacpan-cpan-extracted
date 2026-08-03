@@ -24,11 +24,16 @@ my $build = Module::Build->new(
     create_manifest => 1,
     create_readme   => 1,
     add_to_cleanup  => [
-        'LICENSE',
         'MANIFEST',
         'META.*',
-        'README',
     ],
+    meta_merge      => {
+        resources => {
+            license    => 'https://dev.perl.org/licences/',
+            bugtracker => 'https://github.com/Zhtwn/Scalar-ValueTags-LineageTracking/issues',
+            repository => 'git://github.com/Zhtwn/Scalar-ValueTags-LineageTracking.git',
+        },
+    },
 );
 
 $build->create_build_script;

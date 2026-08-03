@@ -11,12 +11,11 @@ Net::Connection::Match - Runs a stack of checks to match Net::Connection objects
 
 =head1 VERSION
 
-Version 0.5.1
+Version 0.5.2
 
 =cut
 
-our $VERSION = '0.5.1';
-
+our $VERSION = '0.5.2';
 
 =head1 SYNOPSIS
 
@@ -107,23 +106,23 @@ This is either boolean on if the check should be inverted or not.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# Provides some basic checks.
 	# Could make these all one if, but this provides more
 	# granularity for some one using it.
-	if ( ! defined( $args{checks} )	){
-		die ('No check key specified in the argument hash');
+	if ( !defined( $args{checks} ) ) {
+		die('No check key specified in the argument hash');
 	}
-	if ( ref( $args{checks} ) ne 'ARRAY' ){
-		die ('The checks key is not a array');
+	if ( ref( $args{checks} ) ne 'ARRAY' ) {
+		die('The checks key is not a array');
 	}
 	# Will never match anything.
-	if ( ! defined $args{checks}[0] ){
+	if ( !defined $args{checks}[0] ) {
 		$args{checks}[0] = {
 			type   => 'All',
 			invert => 0,
@@ -131,100 +130,95 @@ sub new{
 		};
 
 	}
-	if ( ref( $args{checks}[0] ) ne 'HASH' ){
-		die ('The first item in the checks array is not a hash');
+	if ( ref( $args{checks}[0] ) ne 'HASH' ) {
+		die('The first item in the checks array is not a hash');
 	}
 
-    my $self = {
-				perror=>undef,
-				error=>undef,
-				errorString=>"",
-				testing=>0,
-				errorExtra=>{
-							 flags=>{
-									 1=>'failedCheckInit',
-									 2=>'notNCobj',
-									 3=>'checkErrored',
-									 }
-							 },
-				checks=>[],
-				};
-    bless $self;
+	my $self = {
+		perror      => undef,
+		error       => undef,
+		errorString => "",
+		testing     => 0,
+		errorExtra  => {
+			flags => {
+				1 => 'failedCheckInit',
+				2 => 'notNCobj',
+				3 => 'checkErrored',
+			}
+		},
+		checks => [],
+	};
+	bless $self;
 
 	# Loads up each check or dies if it fails to.
-	my $check_int=0;
-	while( defined( $args{checks}[$check_int] ) ){
-		my %new_check=(
-					   type=>undef,
-					   args=>undef,
-					   invert=>undef,
-					   );
+	my $check_int = 0;
+	while ( defined( $args{checks}[$check_int] ) ) {
+		my %new_check = (
+			type   => undef,
+			args   => undef,
+			invert => undef,
+		);
 
 		# make sure we have a check type
-		if ( defined($args{checks}[$check_int]{'type'}) ){
-		   $new_check{type}=$args{checks}[$check_int]{'type'};
-		}else{
-			die('No type defined for check '.$check_int);
+		if ( defined( $args{checks}[$check_int]{'type'} ) ) {
+			$new_check{type} = $args{checks}[$check_int]{'type'};
+		} else {
+			die( 'No type defined for check ' . $check_int );
 		}
 
 		# does a quick check on the tpye name
-		my $type_test=$new_check{type};
-		$type_test=~s/[A-Za-z0-9]//g;
-		$type_test=~s/\:\://g;
-		if ( $type_test !~ /^$/ ){
-			die 'The type "'.$new_check{type}.'" for check '.$check_int.' is not a valid check name';
+		my $type_test = $new_check{type};
+		$type_test =~ s/[A-Za-z0-9]//g;
+		$type_test =~ s/\:\://g;
+		if ( $type_test !~ /^$/ ) {
+			die 'The type "' . $new_check{type} . '" for check ' . $check_int . ' is not a valid check name';
 		}
 
 		# makes sure we have a args object and that it is a hash
-		if (
-			( defined($args{checks}[$check_int]{'args'}) ) &&
-			( ref( $args{checks}[$check_int]{'args'} ) eq 'HASH' )
-			){
-		   $new_check{args}=$args{checks}[$check_int]{'args'};
-		}else{
-			die('No args defined for check '.$check_int.' or it is not a HASH');
+		if (   ( defined( $args{checks}[$check_int]{'args'} ) )
+			&& ( ref( $args{checks}[$check_int]{'args'} ) eq 'HASH' ) )
+		{
+			$new_check{args} = $args{checks}[$check_int]{'args'};
+		} else {
+			die( 'No args defined for check ' . $check_int . ' or it is not a HASH' );
 		}
 
 		# makes sure we have a args object and that it is a hash
-		if (
-			( defined($args{checks}[$check_int]{'invert'}) ) &&
-			( ref( \$args{checks}[$check_int]{'invert'} ) ne 'SCALAR' )
-			){
-			die('Invert defined for check '.$check_int.' but it is not a SCALAR');
-		}elsif(
-			( defined($args{checks}[$check_int]{'invert'}) ) &&
-			( ref( \$args{checks}[$check_int]{'invert'} ) eq 'SCALAR' )
-			   ){
-			$new_check{invert}=$args{checks}[$check_int]{'invert'};
+		if (   ( defined( $args{checks}[$check_int]{'invert'} ) )
+			&& ( ref( \$args{checks}[$check_int]{'invert'} ) ne 'SCALAR' ) )
+		{
+			die( 'Invert defined for check ' . $check_int . ' but it is not a SCALAR' );
+		} elsif ( ( defined( $args{checks}[$check_int]{'invert'} ) )
+			&& ( ref( \$args{checks}[$check_int]{'invert'} ) eq 'SCALAR' ) )
+		{
+			$new_check{invert} = $args{checks}[$check_int]{'invert'};
 		}
 
 		my $check;
-		my $check_module='Net::Connection::Match::'.$new_check{type};
-		eval( 'require '.$check_module.';' );
-		if ( $@ ){
-			die 'Failed to load the module "'.$check_module.'" for check '.$check_int.'... '.$@;
+		my $check_module = 'Net::Connection::Match::' . $new_check{type};
+		eval( 'require ' . $check_module . ';' );
+		if ($@) {
+			die 'Failed to load the module "' . $check_module . '" for check ' . $check_int . '... ' . $@;
 		}
-		eval{
-			$check=$check_module->new( $new_check{args} );
-		};
+		eval { $check = $check_module->new( $new_check{args} ); };
 
-		if (!defined( $check )){
-			die 'Failed to init the check for '.$check_int.' as it returned undef... '.$@;
+		if ( !defined($check) ) {
+			die 'Failed to init the check for ' . $check_int . ' as it returned undef... ' . $@;
 		}
 
-		$new_check{check}=$check;
+		$new_check{check} = $check;
 
-		push(@{ $self->{checks} }, \%new_check );
+		push( @{ $self->{checks} }, \%new_check );
 
 		$check_int++;
-	}
+	} ## end while ( defined( $args{checks}[$check_int] ) )
 
-	if ( $args{testing} ){
-		$self->{testing}=1;
+	if ( $args{testing} ) {
+		$self->{testing} = 1;
 	}
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -240,40 +234,37 @@ The return value is a boolean.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $conn=$_[1];
+sub match {
+	my $self = $_[0];
+	my $conn = $_[1];
 
-	if( ! $self->errorblank ){
+	if ( !$self->errorblank ) {
 		return undef;
 	}
 
-	if (
-		( ! defined( $conn ) ) ||
-		( ref( $conn ) ne 'Net::Connection' )
-		){
-		$self->{error}=2;
-		$self->{errorString}='Either the connection is undefined or is not a Net::Connection object';
-		if ( ! $self->{testing} ){
+	if (   ( !defined($conn) )
+		|| ( ref($conn) ne 'Net::Connection' ) )
+	{
+		$self->{error}       = 2;
+		$self->{errorString} = 'Either the connection is undefined or is not a Net::Connection object';
+		if ( !$self->{testing} ) {
 			$self->warn;
 		}
 		return undef;
-	}
+	} ## end if ( ( !defined($conn) ) || ( ref($conn) ne...))
 
 	# Stores the number of hits
-	my $hits=0;
-	my $required=0;
-	foreach my $check ( @{ $self->{checks} } ){
+	my $hits     = 0;
+	my $required = 0;
+	foreach my $check ( @{ $self->{checks} } ) {
 		my $hit;
-		eval{
-			$hit=$check->{check}->match($conn);
-		};
+		eval { $hit = $check->{check}->match($conn); };
 
 		# surface the error instead of silently returning a non-match
-		if ( $@ ){
-			$self->{error}=3;
-			$self->{errorString}='The check "'.$check->{type}.'" died... '.$@;
-			if ( ! $self->{testing} ){
+		if ($@) {
+			$self->{error}       = 3;
+			$self->{errorString} = 'The check "' . $check->{type} . '" died... ' . $@;
+			if ( !$self->{testing} ) {
 				$self->warn;
 			}
 			return undef;
@@ -281,29 +272,29 @@ sub match{
 
 		# If $hits is undef, then one of the checks errored and we skip processing the results.
 		# Should only be 0 or 1.
-		if ( defined( $hit ) ){
+		if ( defined($hit) ) {
 			# invert if needed
-			if ( $check->{invert} ){
+			if ( $check->{invert} ) {
 				$hit = $hit ^ 1;
 			}
 
 			# increment the hits count if we hit
-			if ( $hit ){
+			if ($hit) {
 				$hits++;
 			}
-		}
+		} ## end if ( defined($hit) )
 
 		$required++;
-	}
+	} ## end foreach my $check ( @{ $self->{checks} } )
 
 	# if these are the same, then we have a match
-	if ( $required == $hits ){
+	if ( $required == $hits ) {
 		return 1;
 	}
 
 	# If we get here, it is not a match
 	return 0;
-}
+} ## end sub match
 
 =head1 ERROR HANDLING / FLAGS
 
@@ -411,4 +402,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

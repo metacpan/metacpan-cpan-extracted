@@ -25,10 +25,14 @@ This module uses the Google Books API to retrieve basic information on a book by
 ISBN Number.  The Google Books API seems to be more complete and reliable than other
 resources for searching ISBN numbers.
 
-You will need a Google API key from [https://console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials).
-This requires setting up a basic 'Project' in that console, but no sensitive scopes are required,
-so you should be able to get the key instantly.  You can read up on the Google Books API
+You will need a Google API key from [https://console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
+to both test and use this module. This requires setting up a basic 'Project' 
+in that console, but no sensitive scopes are required, so you should be able to 
+get the key instantly.  You can read up on the Google Books API
 here: [https://developers.google.com/books](https://developers.google.com/books)
+
+For running the small tests, place your new key in the GOOGLE\_API\_KEY 
+environmental variable.
 
 This should be one of the simplest modules you'll encounter.  The synopsis above pretty 
 much covers it. You pass your Google API key to new() and you pass a valid ISBN number

@@ -302,7 +302,7 @@ hm_backend *hm_backend_iouring_new(void) {
     be->add_timer  = ur_add_timer;
     be->del_timer  = ur_del_timer;
     be->add_signal = ur_add_signal;
-    be->wait       = ur_wait;
+    be->wait_ev       = ur_wait;
     be->destroy    = ur_destroy;
     return be;
 }

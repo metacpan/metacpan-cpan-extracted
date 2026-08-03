@@ -122,7 +122,7 @@ hm_backend *hm_backend_kqueue_new(void) {
     be->add_timer  = kq_add_timer;
     be->del_timer  = kq_del_timer;
     be->add_signal = kq_add_signal;
-    be->wait       = kq_wait;
+    be->wait_ev       = kq_wait;
     be->destroy    = kq_destroy;
     return be;
 }

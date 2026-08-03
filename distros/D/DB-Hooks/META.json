@@ -1,0 +1,97 @@
+{
+   "abstract" : "Hooks for perl debugger",
+   "author" : [
+      "Eugen Konkov <debugger@konkov.top>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "restricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DB-Hooks",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Async::Loop" : "0",
+            "Log::Log4perl" : "0"
+         },
+         "requires" : {
+            "B::Deparse" : "0",
+            "Data::Dump" : "0",
+            "Package::Stash" : "0",
+            "PadWalker" : "0",
+            "Scope::Cleanup" : "0",
+            "Sub::Metadata" : "0",
+            "Syntax::SourceHighlight" : "0",
+            "Term::ReadLine::Tiny" : "0",
+            "perl" : "v5.12.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Section::Simple" : "0",
+            "Test::CheckDeps" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DB::Commands" : {
+         "file" : "lib/DB/Commands.pm"
+      },
+      "DB::Compilation" : {
+         "file" : "lib/DB/Hooks.pm"
+      },
+      "DB::Error" : {
+         "file" : "lib/DB/Hooks.pm"
+      },
+      "DB::Hooks" : {
+         "file" : "lib/DB/Hooks.pm",
+         "version" : "0.0201"
+      },
+      "DB::Hooks::HistoryTerminal" : {
+         "file" : "lib/DB/Hooks/HistoryTerminal.pm"
+      },
+      "DB::Hooks::Remote" : {
+         "file" : "lib/DB/Hooks/Remote.pm"
+      },
+      "DB::Hooks::Terminal" : {
+         "file" : "lib/DB/Hooks/Terminal.pm"
+      },
+      "DB::Hooks::TraceLoad" : {
+         "file" : "lib/DB/Hooks/TraceLoad.pm"
+      },
+      "DB::Hooks::TraceSubs" : {
+         "file" : "lib/DB/Hooks/TraceSubs.pm"
+      },
+      "DB::Hooks::TraceVariable" : {
+         "file" : "lib/DB/Hooks/TraceVariable.pm"
+      },
+      "DB::Utils" : {
+         "file" : "lib/DB/Utils.pm"
+      },
+      "Logger" : {
+         "file" : "lib/DB/Hooks/TraceVariable.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/KES777/DB-Hooks"
+      },
+      "x_IRC" : "irc://irc.perl.org/#debughooks"
+   },
+   "version" : "0.0201",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

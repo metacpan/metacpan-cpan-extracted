@@ -17,7 +17,6 @@ Version 0.0.0
 
 our $VERSION = '0.0.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::PctCPU;
@@ -80,30 +79,28 @@ If the new method fails, it dies.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# run some basic checks to make sure we have the minimum stuff required to work
-	if ( ! defined( $args{pctcpus} ) ){
-		die ('No pctcpus key specified in the argument hash');
+	if ( !defined( $args{pctcpus} ) ) {
+		die('No pctcpus key specified in the argument hash');
 	}
-	if ( ref( $args{pctcpus} ) ne 'ARRAY' ){
-		die ('The pctcpus key is not a array');
+	if ( ref( $args{pctcpus} ) ne 'ARRAY' ) {
+		die('The pctcpus key is not a array');
 	}
-	if ( ! defined $args{pctcpus}[0] ){
-		die ('Nothing defined in the pctcpus array');
+	if ( !defined $args{pctcpus}[0] ) {
+		die('Nothing defined in the pctcpus array');
 	}
 
-    my $self = {
-				pctcpus=>$args{pctcpus},
-				};
-    bless $self;
+	my $self = { pctcpus => $args{pctcpus}, };
+	bless $self;
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -119,99 +116,96 @@ The returned value is a boolean.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $object=$_[1];
+sub match {
+	my $self   = $_[0];
+	my $object = $_[1];
 
-	if ( !defined( $object ) ){
+	if ( !defined($object) ) {
 		return 0;
 	}
 
-	if ( ref( $object ) ne 'Net::Connection' ){
+	if ( ref($object) ne 'Net::Connection' ) {
 		return 0;
 	}
 
-	my $conn_pid=$object->pid;
+	my $conn_pid = $object->pid;
 
 	# don't bother proceeding, the object won't match ever
 	# as it does not have a PID
-	if ( ! defined( $conn_pid ) ){
+	if ( !defined($conn_pid) ) {
 		return 0;
 	}
 
-
 	my $pctcpu;
-	if ( ! defined( $object->proc ) ){
+	if ( !defined( $object->proc ) ) {
 		# go through each proc and look for a matching pid
-		my $proctable=Proc::ProcessTable->new;
-		my $procs=$proctable->table;
-		my $proc_int=0;
-		my $loop=1;
-		while (
-			   $loop &&
-			   defined( $procs->[$proc_int] )
-			   ){
+		my $proctable = Proc::ProcessTable->new;
+		my $procs     = $proctable->table;
+		my $proc_int  = 0;
+		my $loop      = 1;
+		while ( $loop
+			&& defined( $procs->[$proc_int] ) )
+		{
 
-			if ( $conn_pid eq $procs->[$proc_int]->{pid} ){
-				$pctcpu=$procs->[$proc_int]->{pctcpu};
+			if ( $conn_pid eq $procs->[$proc_int]->{pid} ) {
+				$pctcpu = $procs->[$proc_int]->{pctcpu};
 
 				# exit the loop as we found it
-				$loop=0;
+				$loop = 0;
 			}
 
-		$proc_int++;
-		}
-	}else{
-		$pctcpu=$object->pctcpu;
+			$proc_int++;
+		} ## end while ( $loop && defined( $procs->[$proc_int]...))
+	} else {
+		$pctcpu = $object->pctcpu;
 	}
 
 	# likely a dead connection that is handing around...
 	# or disappeared since grabbing the connection list
 	# and starting processing
-	if ( !defined( $pctcpu ) ){
+	if ( !defined($pctcpu) ) {
 		return 0;
 	}
 
 	# handle non-numeric values, such as inf or nan, some platforms may return
-	if ( $pctcpu !~ /^\s*[0-9]*\.?[0-9]+\s*$/ ){
-		$pctcpu=0;
+	if ( $pctcpu !~ /^\s*[0-9]*\.?[0-9]+\s*$/ ) {
+		$pctcpu = 0;
 	}
 
 	# use while as foreach will reference the value
-	my $pctcpu_int=0;
-	while (defined( $self->{pctcpus}[$pctcpu_int] )){
-		my $value=$self->{pctcpus}[$pctcpu_int];
-		if (
-			( $value =~ /^[0-9]*\.?[0-9]+$/ ) &&
-			( $value == $pctcpu )
-			){
+	my $pctcpu_int = 0;
+	while ( defined( $self->{pctcpus}[$pctcpu_int] ) ) {
+		my $value = $self->{pctcpus}[$pctcpu_int];
+		if (   ( $value =~ /^[0-9]*\.?[0-9]+$/ )
+			&& ( $value == $pctcpu ) )
+		{
 			return 1;
-		}elsif( $value =~ /^\<\=[0-9]*\.?[0-9]+$/ ){
-			$value=~s/^\<\=//;
-			if ( $value <= $pctcpu ){
+		} elsif ( $value =~ /^\<\=[0-9]*\.?[0-9]+$/ ) {
+			$value =~ s/^\<\=//;
+			if ( $pctcpu <= $value ) {
 				return 1;
 			}
-		}elsif( $value =~ /^\<[0-9]*\.?[0-9]+$/ ){
-			$value=~s/^\<//;
-			if ( $pctcpu < $value ){
+		} elsif ( $value =~ /^\<[0-9]*\.?[0-9]+$/ ) {
+			$value =~ s/^\<//;
+			if ( $pctcpu < $value ) {
 				return 1;
 			}
-		}elsif( $value =~ /^\>\=[0-9]*\.?[0-9]+$/ ){
-			$value=~s/^\>\=//;
-			if ( $pctcpu >= $value ){
+		} elsif ( $value =~ /^\>\=[0-9]*\.?[0-9]+$/ ) {
+			$value =~ s/^\>\=//;
+			if ( $pctcpu >= $value ) {
 				return 1;
 			}
-		}elsif( $value =~ /^\>[0-9]*\.?[0-9]+$/ ){
-			$value=~s/^\>//;
-			if ( $pctcpu > $value ){
+		} elsif ( $value =~ /^\>[0-9]*\.?[0-9]+$/ ) {
+			$value =~ s/^\>//;
+			if ( $pctcpu > $value ) {
 				return 1;
 			}
 		}
 		$pctcpu_int++;
-	}
+	} ## end while ( defined( $self->{pctcpus}[$pctcpu_int...]))
 
 	return 0;
-}
+} ## end sub match
 
 =head1 AUTHOR
 
@@ -302,4 +296,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

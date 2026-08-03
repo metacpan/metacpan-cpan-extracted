@@ -8,7 +8,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/CLI/Cmdline.pm',
     ABSTRACT         => 'A minimal command-line parser with short and long options in pure Perl',
     LICENSE          => 'perl',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
 
     PREREQ_PM => {
     },
@@ -17,7 +17,7 @@ WriteMakefile(
     },
     TEST_REQUIRES => {   # for testing
         'Test::More' => '0.88',
-        'Test::NoWarnings' => '1.04',
+        'Test::Warnings' => '0.028',
         'Test::Pod::Coverage' => '1.04',
     },
 
@@ -26,24 +26,23 @@ WriteMakefile(
         resources => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/HansH111/CLI-Cmdline.pm.git',
-                web  => 'https://github.com/HansH111/CLI-Cmdline.pm',
+                url  => 'https://codeberg.org/HansH111/CLI-Cmdline.pm.git',
+                web  => 'https://codeberg.org/HansH111/CLI-Cmdline.pm',
             },
-            bugtracker => { web => 'https://github.com/HansH111/CLI-Cmdline.pm/issues' },
+            bugtracker => { web => 'https://codeberg.org/HansH111/CLI-Cmdline.pm/issues' },
         },
         provides => {
             'CLI::Cmdline' => {
                 file    => 'lib/CLI/Cmdline.pm',
-                version => '1.25',
+                version => '1.28',
             },
         },
         x_contributors => [
-            'Hans Harder <hans@atbas.org>',
+            'Hans Harder <hans at atbas.org>',
         ],
     },
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     clean => { FILES => 'CLI-Cmdline-*' },
-
-    test => { TESTS => 't/*.t' },
+    test  => { TESTS => 't/*.t' },
 );

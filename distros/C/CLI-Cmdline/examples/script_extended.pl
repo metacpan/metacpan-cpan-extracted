@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ my $switches = '-v|verbose -q|quiet --help --dry-run -force|f';
 my $options  = '-input|i -output -mode -tag';
 my %opt      = ( v => 1, mode => 'normal', tag => [] );   # tag = multiple tags allowed
 
-CLI::Cmdline::parse(\%opt, $switches, $options) 
+CLI::Cmdline::parse(\%opt, $switches, $options)
 	or die "Try '$0 --help' for more information. ARGV = @ARGV\n";
 
 #  --- check if ARGV is filled or help is required

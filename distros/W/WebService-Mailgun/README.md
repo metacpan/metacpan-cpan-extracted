@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/kan/p5-web-service-mailgun.svg?branch=master)](https://travis-ci.org/kan/p5-web-service-mailgun) [![Coverage Status](https://img.shields.io/coveralls/kan/p5-web-service-mailgun/master.svg?style=flat)](https://coveralls.io/r/kan/p5-web-service-mailgun?branch=master)
+[![Actions Status](https://github.com/kan/p5-web-service-mailgun/workflows/test/badge.svg)](https://github.com/kan/p5-web-service-mailgun/actions)
 # NAME
 
 WebService::Mailgun - API client for Mailgun ([https://mailgun.com/](https://mailgun.com/))

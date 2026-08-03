@@ -19,18 +19,19 @@ name: App-KDEActivityUtils
 provides:
   App::KDEActivityUtils:
     file: lib/App/KDEActivityUtils.pm
-    version: '0.004'
+    version: '0.006'
 requires:
-  App::XWindowManagerUtils: '0'
+  Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
   Desktop::KDEActivity::Util: '0.002'
+  Desktop::XWindowManager::Util: '0'
   Exporter: '5.57'
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.154'
   Perinci::CmdLine::Lite: '1.924'
   Perinci::Sub::DepChecker: '0'
-  Perinci::Sub::Util: '0.472'
+  Sah::Schema::kdeactivity::name: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-KDEActivityUtils
   homepage: https://metacpan.org/release/App-KDEActivityUtils
   repository: git://github.com/perlancar/perl-App-KDEActivityUtils.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -525,6 +526,8 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.036'
 x_authority: cpan:PERLANCAR
+x_contributors:
+  - 'perlancar <perlancar@gmail.com>'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

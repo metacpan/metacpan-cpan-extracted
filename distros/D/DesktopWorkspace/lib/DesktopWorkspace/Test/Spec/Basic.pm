@@ -9,9 +9,9 @@ use Role::Tiny::With;
 with 'DesktopWorkspaceRole::Spec::Basic';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-29'; # DATE
+our $DATE = '2026-04-15'; # DATE
 our $DIST = 'DesktopWorkspace'; # DIST
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 
 my $spec = {
     summary => 'A summary',
@@ -72,7 +72,7 @@ DesktopWorkspace::Test::Spec::Basic - A test desktop workspace
 
 =head1 VERSION
 
-This document describes version 1.0.0 of DesktopWorkspace::Test::Spec::Basic (from Perl distribution DesktopWorkspace), released on 2026-03-29.
+This document describes version 1.0.1 of DesktopWorkspace::Test::Spec::Basic (from Perl distribution DesktopWorkspace), released on 2026-04-15.
 
 =for Pod::Coverage ^(.+)$
 

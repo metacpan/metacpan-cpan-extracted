@@ -76,6 +76,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-makefilepl2cpanfile"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

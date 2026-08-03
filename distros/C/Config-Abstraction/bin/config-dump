@@ -47,7 +47,26 @@ Show this help message.
 
 Prints the version of L<Config::Abstraction>
 
+=item B<--encrypt-value PLAINTEXT>
+
+Encrypt PLAINTEXT with the configured key and print the resulting C<ENC[...]> token.
+The key must be supplied via C<--encryption-key>, C<--encryption-key-file>,
+C<APP_ENCRYPTION_KEY>, or C<ENCRYPTION_KEY>.  Requires L<CryptX>.
+
+  config-dump --encrypt-value 'my_secret_password'
+  # ENC[AES256GCM,...]
+
+=item B<--encryption-key HEX_OR_BASE64>
+
+256-bit AES key as 64 hex chars or 44 base64url chars.
+
+=item B<--encryption-key-file FILE>
+
+Path to a file whose first line contains the key.
+
 =back
+
+=cut
 
 my $config_dirs;
 my $file;
@@ -55,14 +74,20 @@ my $env_prefix = 'APP_';
 my $help;
 my $version;
 my $format = 'dumper';	# dumper | json | yaml
+my $encrypt_value;
+my $encryption_key;
+my $encryption_key_file;
 
 GetOptions(
-	'file=s' => \$file,
-	'dirs=s' => \$config_dirs,
-	'env_prefix=s' => \$env_prefix,
-	'format=s' => \$format,
-	'version|V' => \$version,
-	'help|?' => \$help,
+	'file=s'               => \$file,
+	'dirs=s'               => \$config_dirs,
+	'env_prefix=s'         => \$env_prefix,
+	'format=s'             => \$format,
+	'version|V'            => \$version,
+	'encrypt-value=s'      => \$encrypt_value,
+	'encryption-key=s'     => \$encryption_key,
+	'encryption-key-file=s' => \$encryption_key_file,
+	'help|?'               => \$help,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -73,9 +98,17 @@ if($version) {
 }
 
 my $args;
-$args->{'env_prefix'} = $env_prefix if($env_prefix);
-$args->{'file'} = $file if($file);
-$args->{'config_dirs'} = split(/,/, $config_dirs) if($config_dirs);
+$args->{'env_prefix'}          = $env_prefix          if $env_prefix;
+$args->{'file'}                = $file                if $file;
+$args->{'config_dirs'}         = [split(/,/, $config_dirs)] if $config_dirs;
+$args->{'encryption_key'}      = $encryption_key      if $encryption_key;
+$args->{'encryption_key_file'} = $encryption_key_file if $encryption_key_file;
+
+if(defined $encrypt_value) {
+	my $cfg = Config::Abstraction->new(data => {}, lazy => 1, %{$args});
+	print $cfg->encrypt_value($encrypt_value), "\n";
+	exit 0;
+}
 
 if(my $cfg = Config::Abstraction->new($args)) {
 	my $data = $cfg->all();

@@ -14,10 +14,12 @@ t/05-auth-server.t
 t/06-client.t
 t/07-blocking-client.t
 t/08-permissions.t
+t/09-auth-peercred.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 examples/auth_client.pl
+examples/auth_peercred_client.pl
 examples/auth_server.pl
 examples/blocking_client.pl
 examples/client.pl

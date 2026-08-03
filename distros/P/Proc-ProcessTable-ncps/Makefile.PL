@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
 	VERSION_FROM       => 'lib/Proc/ProcessTable/ncps.pm',
 	ABSTRACT_FROM      => 'lib/Proc/ProcessTable/ncps.pm',
 	LICENSE            => 'artistic_2',
-	MIN_PERL_VERSION   => '5.006',
+	MIN_PERL_VERSION   => '5.010001',
 	EXE_FILES          => ['src_bin/ncps'],
 	INST_SCRIPT        => 'bin',
 	CONFIGURE_REQUIRES => {
@@ -21,15 +21,22 @@ my %WriteMakefileArgs = (
 	PREREQ_PM => {
 		'Term::ANSIColor'                => '5.01',
 		'Text::ANSITable'                => '0.501',
-		'Getopt::Long'                   => '0.0.0',
+		# Text::ANSI::Util 0.233 calls Text::WideChar::Util::_mbs_indent_width,
+		# which no longer exists as of Text::WideChar::Util 0.172
+		'Text::ANSI::Util'               => '0.234',
+		'Text::WideChar::Util'           => '0.172',
+		'Getopt::Long'                   => '0',
 		'Data::Unixish::Apply'           => '1.572',
 		'Proc::ProcessTable'             => '0.634',
 		'Proc::ProcessTable::Match'      => '0.1.0',
 		'POSIX'                          => '0',
 		'Statistics::Basic'              => '1.6611',
-		'List::Util'                     => '1.63',
-		'Proc::ProcessTable::InfoString' => '0.1.0',
+		'List::Util'                     => '0',
+		# 0.2.0 for proc_infostring_describe
+		'Proc::ProcessTable::InfoString' => '0.2.0',
+		# Text::ANSITable loads these by name, so they are not prereqs of it
 		'ColorTheme::NoColor'            => '0.003',
+		'BorderStyle::ASCII::None'       => '0.014',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Proc-ProcessTable-ncps-*' },

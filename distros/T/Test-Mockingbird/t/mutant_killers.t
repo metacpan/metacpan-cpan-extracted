@@ -17,7 +17,6 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Test::Returns;
 use Scalar::Util qw(refaddr);
 use Readonly;
 
@@ -350,9 +349,6 @@ subtest 'BOOL_NEGATE(341) + RETURN_UNDEF(341): async_spy must return a coderef c
 	ok defined($collector), 'async_spy return is defined (kills RETURN_UNDEF: undef)';
 	is ref($collector), 'CODE',
 		'async_spy return is a CODE ref (kills BOOL_NEGATE: !sub{}="" not CODE)';
-
-	# Validate the returns schema with Test::Returns.
-	returns_is($collector, { type => 'coderef' }, 'async_spy return satisfies coderef schema');
 
 	MK::Spy2::op('p', 'q');
 	MK::Spy2::op('r');

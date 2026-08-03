@@ -13,14 +13,19 @@
 // This is often used when the XS module manages its own thread safety.
 #define NO_XSLOCKS
 #include <XSUB.h>
-// Redirect infix's internal memory allocation to use Perl's safe allocation functions.
-// This ensures all memory is tracked by Perl's memory manager, which is safer and
-// helps with leak detection tools like valgrind.
-#define infix_malloc safemalloc
-#define infix_calloc safecalloc
-#define infix_free safefree
-#define infix_realloc saferealloc
-
+// Route infix's memory allocation through Perl's allocator. boot_Affix
+// (lib/Affix.c) installs the static affix_infix_* callbacks (defined just above
+// it, forwarding to Perl_safesysmalloc/Perl_safesyscalloc/Perl_safesysrealloc/
+// Perl_safesysfree) via infix_set_allocator() once at load time, so ownership
+// is consistent on both sides: every infix allocation goes through Perl's
+// allocator and can be freed here with the same allocator, and Perl tracks all
+// of it (leak detection and pool validation under PERL_TRACK_MEMPOOL).
+//
+// This is only safe because infix objects are never shared across interpreters:
+// library handles, trampolines, arenas, and the type registry are all per-thread
+// (see Affix_CLONE and Affix_cv_dup, which rebuild infix objects for the new
+// interpreter rather than sharing them), so each allocation is created and
+// destroyed on the same interpreter.
 #include "common/infix_internals.h"
 #include <infix/infix.h>
 

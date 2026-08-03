@@ -24,5 +24,5 @@ requires:
   Net::DNS: '1.20'
   Proc::ProcessTable: '0.59'
   perl: '5.006'
-version: v0.5.1
+version: v0.5.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

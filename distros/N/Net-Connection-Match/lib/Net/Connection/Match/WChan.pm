@@ -17,7 +17,6 @@ Version 0.0.0
 
 our $VERSION = '0.0.0';
 
-
 =head1 SYNOPSIS
 
     use Net::Connection::Match::WChan;
@@ -71,30 +70,28 @@ If the new method fails, it dies.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
 	# run some basic checks to make sure we have the minimum stuff required to work
-	if ( ! defined( $args{wchans} ) ){
-		die ('No wchans key specified in the argument hash');
+	if ( !defined( $args{wchans} ) ) {
+		die('No wchans key specified in the argument hash');
 	}
-	if ( ref( $args{wchans} ) ne 'ARRAY' ){
-		die ('The wchans key is not a array');
+	if ( ref( $args{wchans} ) ne 'ARRAY' ) {
+		die('The wchans key is not a array');
 	}
-	if ( ! defined $args{wchans}[0] ){
-		die ('Nothing defined in the commands array');
+	if ( !defined $args{wchans}[0] ) {
+		die('Nothing defined in the commands array');
 	}
 
-    my $self = {
-				wchans=>$args{wchans},
-				};
-    bless $self;
+	my $self = { wchans => $args{wchans}, };
+	bless $self;
 
 	return $self;
-}
+} ## end sub new
 
 =head2 match
 
@@ -110,69 +107,67 @@ The returned value is a boolean.
 
 =cut
 
-sub match{
-	my $self=$_[0];
-	my $object=$_[1];
+sub match {
+	my $self   = $_[0];
+	my $object = $_[1];
 
-	if ( !defined( $object ) ){
+	if ( !defined($object) ) {
 		return 0;
 	}
 
-	if ( ref( $object ) ne 'Net::Connection' ){
+	if ( ref($object) ne 'Net::Connection' ) {
 		return 0;
 	}
 
-	my $conn_pid=$object->pid;
+	my $conn_pid = $object->pid;
 
 	# don't bother proceeding, the object won't match ever
 	# as it does not have a PID
-	if ( ! defined( $conn_pid ) ){
+	if ( !defined($conn_pid) ) {
 		return 0;
 	}
 
-
-	my $loop=0;
+	my $loop = 0;
 	my $wchan;
-	if ( ! defined( $object->proc ) ){
+	if ( !defined( $object->proc ) ) {
 		# go through each proc and look for a matching pid
-		my $proctable=Proc::ProcessTable->new;
-		my $procs=$proctable->table;
-		my $proc_int=0;
-		my $loop=1;
-		while (
-			   $loop &&
-			   defined( $procs->[$proc_int] )
-			   ){
+		my $proctable = Proc::ProcessTable->new;
+		my $procs     = $proctable->table;
+		my $proc_int  = 0;
+		my $loop      = 1;
+		while ( $loop
+			&& defined( $procs->[$proc_int] ) )
+		{
 
-			if ( $conn_pid eq $procs->[$proc_int]->{pid} ){
-				$wchan=$procs->[$proc_int]->wchan;
+			if ( $conn_pid eq $procs->[$proc_int]->{pid} ) {
+				$wchan = $procs->[$proc_int]->wchan;
 
 				# exit the loop as we found it
-				$loop=0;
+				$loop = 0;
 			}
 
-		$proc_int++;
-		}
-	}else{
-		$wchan=$object->wchan;
+			$proc_int++;
+		} ## end while ( $loop && defined( $procs->[$proc_int]...))
+	} else {
+		$wchan = $object->wchan;
 	}
 
 	# likely a dead connection that is handing around...
 	# or disappeared since grabbing the connection list
 	# and starting processing
-	if ( !defined( $wchan ) ){
+	if ( !defined($wchan) ) {
 		return 0;
 	}
 
 	# check each command regex and see if any of them match
-	foreach my $regex ( @{ $self->{wchans} } ){
-		if ( $wchan =~ /$regex/ ){
+	foreach my $regex ( @{ $self->{wchans} } ) {
+		if ( $wchan =~ /$regex/ ) {
 			return 1;
 		}
 	}
 
 	return 0;
-}
+} ## end sub match
 
 =head1 AUTHOR
 
@@ -263,4 +258,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Net::Connection::Match
+1;    # End of Net::Connection::Match

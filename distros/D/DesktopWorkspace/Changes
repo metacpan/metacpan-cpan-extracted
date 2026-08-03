@@ -1,3 +1,11 @@
+1.0.1   2026-04-15  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        - [incompatible change] Rename app_{name,path} to prog_{name,path}.
+
+        - Add item properties: firefox_window_num & dolphin_window_num (to group
+          several items into a single window), new_file_manager_window.
+
+
 1.0.0   2026-03-29  Released-By: PERLANCAR
 
         - Early release.

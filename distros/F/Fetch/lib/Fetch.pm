@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Fetch', $VERSION);
@@ -27,7 +27,7 @@ Fetch - HTTP/2 Future-based user agent
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -211,6 +211,21 @@ endless stream does not grow memory, and the resolved response body is empty.
 
     $ua->get($url, on_body => sub { my ($chunk) = @_; print $chunk })->get;
 
+=item C<on_headers>
+
+A coderef called once, as soon as the response status line and headers have
+been parsed - before any C<on_body> chunk - with the status code and the header
+list:
+
+    $ua->get($url,
+        on_headers => sub { my ($status, $headers) = @_; ... },  # $headers: [k,v,...]
+        on_body    => sub { my ($chunk) = @_; ... },
+    )->get;
+
+This lets a streaming consumer act on the status and headers up front (for
+example, to open a downstream writer) rather than waiting for the whole
+response. Not fired for a WebSocket upgrade.
+
 =back
 
 =head1 WEBSOCKETS
@@ -257,6 +272,124 @@ program - requests then fly concurrently on that one loop without blocking it:
 
 Supported loops: the built-in L<Fetch::Loop::Standalone>, plus
 L<Fetch::Loop::IOAsync>, L<Fetch::Loop::AnyEvent> and L<Fetch::Loop::Hyperman>.
+
+=head1 C ABI
+
+Fetch exposes a small C ABI so another XS module can drive it from C, with no
+per-request Perl round trip on the hot path. It is how L<Reverse::Proxy> builds
+its upstream requests entirely in C. This is not part of the Perl API - if you
+are writing Perl, use the request methods above; the ABI is only for XS
+consumers.
+
+The ABI is a versioned function pointer table. A consumer vendors a copy of the header C<fetch_abi.h> (shipped
+in this distribution under C<include/fetch/>) at a pinned C<FETCH_ABI_VERSION>, then at boot resolves the table and checks the version:
+
+    #include "fetch_abi.h"   /* vendored, after the perl.h includes */
+
+    /* in BOOT: */
+    IV p = 0;
+    if (call_pv("Fetch::_abi_ptr", G_SCALAR) > 0) { SPAGAIN; p = POPi; PUTBACK; }
+    const fetch_abi *FETCH = NULL;
+    if (p) {
+        const fetch_abi *a = INT2PTR(const fetch_abi *, p);
+        if (a && a->abi_version == FETCH_ABI_VERSION) FETCH = a;
+    }
+    /* FETCH == NULL means the running Fetch is too old / mismatched; the
+     * consumer decides whether that is a hard error or a Perl fallback. */
+
+=head2 Fetch::_abi_ptr
+
+Returns the address of Fetch's C<fetch_abi> table as an C<IV>. Call it once, at
+boot, and C<INT2PTR> the result to a C<const fetch_abi *>. A version mismatch
+must never be treated as a crash - compare C<abi_version> first and fall back.
+
+=head2 The table
+
+C<fetch_abi> (see C<fetch_abi.h> for the exact signatures and ownership rules)
+holds, after C<abi_version>:
+
+=over 4
+
+=item C<ua_new(kv, nkv)>
+
+Construct a Fetch user agent from C<nkv> flat key/value SVs (the same options
+C<new> takes: C<loop>, C<pool_size>, C<tls_verify>, C<timeout>, C<agent>,
+C<headers>, C<cookie_jar>, C<keep_alive>, C<max_redirects>,
+C<simple_response>). Returns the blessed Fetch UA SV (+1 owned). A consumer may
+instead call C<< Fetch->new >> from Perl once and cache the object; C<ua_new>
+just removes that last Perl call.
+
+=item C<request(ua_sv, method, url, hdrs, nhdrs, body, blen, timeout, max_redirects, map, ud)>
+
+Issue one HTTP request on C<ua_sv>, building it entirely from C. The headers
+are a flat C<fetch_hdr> array; C<max_redirects> below zero means "use the UA
+default". Returns a L<Fetch::Future> SV (+1 owned) - hand it to an awaiting
+server or call C<< ->get >> on it. When the request settles, your C<map>
+callback shapes the value the future resolves to (for a proxy, a PSGI
+C<[ status, \@headers, \@body ]>).
+
+=item C<res_parts(res, status, headers, body)>
+
+Pull the status, the flat header AV and the content SV out of an
+already-resolved response (a L<Fetch::Response> or a C<simple_response> hash)
+with no method dispatch. Any out-pointer may be C<NULL>; the returned C<headers>
+and C<body> are borrowed. For the blocking (awaited) path.
+
+=item C<request_stream(ua_sv, method, url, hdrs, nhdrs, body, blen, timeout, max_redirects, on_headers, on_body, on_done, ud)>
+
+Like C<request>, but streams the response instead of buffering it: C<on_headers>
+fires once up front with the status and header AV, C<on_body> once per body
+chunk, and C<on_done> at completion (with success/failure). Returns the request
+future SV (+1 owned) - keep it alive until C<on_done> fires. Lets a consumer
+forward a large download or an endless SSE stream with flat memory.
+
+=item C<tunnel_connect(host, port, tls, verify)> and friends
+
+A raw blocking upstream TCP connection Fetch owns, for a proxy's
+Upgrade/WebSocket tunnel where the consumer splices bytes both ways itself.
+When C<tls> is true the connection reuses Fetch's own client C<SSL_CTX> (SNI,
+and hostname/certificate verification when C<verify> is true), so the consumer
+tunnels to a C<wss>/C<https> upstream without linking OpenSSL. This is what lets
+L<Reverse::Proxy> tunnel to a TLS upstream.
+
+Unlike the rest of the table, these six entries are pure C - they take no
+C<pTHX> and touch no SV, so they can be called directly from inside a
+C<select()> splice loop:
+
+=over 4
+
+=item *
+
+C<tunnel_connect(host, port, tls, verify)> - open the connection; returns an
+opaque handle, or C<NULL> on failure (DNS, connect, or TLS handshake).
+
+=item *
+
+C<tunnel_fd(conn)> - the underlying socket fd, to hand to C<select()>/C<poll()>.
+
+=item *
+
+C<tunnel_read(conn, buf, len)> - read bytes; returns the count (E<gt>0), C<0> at
+EOF, or C<-1> on error.
+
+=item *
+
+C<tunnel_write_all(conn, buf, len)> - write the whole buffer; returns C<0> when
+all bytes are written, C<-1> on error.
+
+=item *
+
+C<tunnel_pending(conn)> - bytes already buffered inside the TLS layer; drain
+these before trusting C<select()> readiness (always C<0> for a plain
+connection).
+
+=item *
+
+C<tunnel_close(conn)> - shut the connection down and free the handle.
+
+=back
+
+=back
 
 =head1 SEE ALSO
 

@@ -2,8 +2,8 @@ NAME
     Desktop::Workspace::Util - Utilities related to DesktopWorkspace
 
 VERSION
-    This document describes version 0.002 of Desktop::Workspace::Util (from
-    Perl distribution Desktop-Workspace-Util), released on 2026-03-29.
+    This document describes version 0.003 of Desktop::Workspace::Util (from
+    Perl distribution Desktop-Workspace-Util), released on 2026-04-15.
 
 SYNOPSIS
 DESCRIPTION
@@ -154,10 +154,6 @@ FUNCTIONS
 
     Open desktop workspace items.
 
-    Some notes: - if you do not use "new_browser_window", then URLs will be
-    opened in the previous Firefox window which might be in another KDE
-    activity.
-
     This function is not exported by default, but exportable.
 
     This function supports dry-run operation.
@@ -220,14 +216,6 @@ FUNCTIONS
 
         (No description)
 
-    *   new_browser_window => *bool*
-
-        When having to open one or more browser tabs, open a new browser
-        window.
-
-        Override's desktop workspace specification's "new_browser_window"
-        property.
-
     *   ns_prefixes => *array[perl::modname|str]* (default:
         ["DesktopWorkspace",""])
 
@@ -237,6 +225,10 @@ FUNCTIONS
     *   query => *array[str]*
 
         (No description)
+
+    *   reuse_window => *bool*
+
+        Do not open if existing window is detected.
 
     *   shuffle => *bool*
 
@@ -275,6 +267,9 @@ SEE ALSO
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

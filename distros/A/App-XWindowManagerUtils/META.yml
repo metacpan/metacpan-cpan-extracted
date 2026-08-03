@@ -1,5 +1,5 @@
 ---
-abstract: 'Utilities related to X Window Manager'
+abstract: 'Utilities related to "X Window Manager"'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,14 +19,12 @@ name: App-XWindowManagerUtils
 provides:
   App::XWindowManagerUtils:
     file: lib/App/XWindowManagerUtils.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
-  Desktop::KDEActivity::Util: '0.002'
-  Exporter: '5.57'
-  IPC::System::Options: '0.339'
+  Desktop::XWindowManager::Util: '0'
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.154'
   Perinci::CmdLine::Lite: '1.924'
@@ -38,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-XWindowManagerUtils
   homepage: https://metacpan.org/release/App-XWindowManagerUtils
   repository: git://github.com/perlancar/perl-App-XWindowManagerUtils.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -456,14 +454,6 @@ x_Dist_Zilla:
       name: Prereqs
       version: '6.036'
     -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: x_spec
-      name: DevelopX_spec
-      version: '6.036'
-    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.036'
@@ -513,6 +503,8 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.036'
 x_authority: cpan:PERLANCAR
+x_contributors:
+  - 'perlancar <perlancar@gmail.com>'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

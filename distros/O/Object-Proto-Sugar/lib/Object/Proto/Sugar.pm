@@ -8,7 +8,7 @@ use Devel::Hook;
 use Object::Proto;
 use Carp qw/croak/;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 use constant ro => 'ro';
 use constant is_ro => ( is => ro );
@@ -22,6 +22,7 @@ use constant trg => ( trigger => 1 );
 use constant clr => ( clearer => 1 );
 use constant req => ( required => 1 );
 use constant coe => ( coerce => 1 );
+use constant prv => ( private => 1 );
 use constant lzy_hash => (lazy => 1, isa => 'HashRef', default => {} );
 use constant lzy_array => (lazy => 1, isa => 'ArrayRef', default => [] );
 use constant lzy_str => (lazy => 1, isa => 'Str', default => "");
@@ -36,7 +37,7 @@ BEGIN {
 	%valid_types = map { $_ => 1 } @type_list;
 	%valid_constants = map { $_ => 1 } qw(
 		ro rw is_ro is_rw nan
-		lzy bld lzy_bld trg clr req coe
+		lzy bld lzy_bld trg clr req coe prv
 		lzy_hash lzy_array lzy_str dhash darray dstr
 	);
 	%modifier_dispatch = (
@@ -148,6 +149,7 @@ sub import {
 			$attr = _configure_reader_and_writer($attr, $spec, $caller);
 			$attr = _configure_init_arg($attr, $spec, $caller);
 			$attr = _configure_weak_ref($attr, $spec, $caller);
+			$attr = _configure_private($attr, $spec);
 			push @attributes, $attr;
 		}
 
@@ -401,6 +403,14 @@ sub _configure_weak_ref {
 	return $attr;
 }
 
+sub _configure_private {
+	my ($attr, $spec) = @_;
+	if ($spec->{private}) {
+		$attr .= ':private';
+	}
+	return $attr;
+}
+
 sub _install_func_accessors {
 	my ($caller, $name, $spec, $alias) = @_;
 	my @installed;
@@ -436,7 +446,7 @@ Object::Proto::Sugar - Moo-se-like syntax for Object::Proto
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -495,6 +505,7 @@ Declares an attribute. All options are optional unless noted.
 	    writer    => 1,          # install set_$name (or custom name)
 	    init_arg  => '_age',     # constructor key (alias: arg)
 	    weak_ref  => 1,          # store a weak reference (alias: weak)
+	    private   => 1,          # accessor only callable from the owning package
 	);
 
 =head3 is
@@ -578,6 +589,25 @@ is garbage-collected:
 	has parent => ( is => 'rw', weak_ref => 1 );
 
 C<weak> is an alias for C<weak_ref>.
+
+=head3 private
+
+Restrict an attribute's accessor to the package that declares it; calling it
+from any other package dies. Useful for internal state you do not want callers
+touching:
+
+	has secret => ( is => 'rw', private => 1 );
+
+	# inside the declaring package: fine
+	sub check { $_[0]->secret eq 'xyzzy' }
+
+	# from another package it dies with:
+	#   cannot call private attribute secret on <Class> from <Caller>
+
+Access is decided by the package the calling code is compiled in, so the
+class's own methods may use the accessor (get or set) while outside code
+cannot. The C<prv> sugar constant is shorthand for C<< private =E<gt> 1 >>.
+Requires L<Object::Proto> 0.19 or newer.
 
 =head2 attributes $name => \@spec, ...
 
@@ -876,6 +906,7 @@ lists. See L</IMPORTING> for the full import syntax.
 	trg         # (trigger => 1)
 	clr         # (clearer => 1)
 	coe         # (coerce => 1)
+	prv         # (private => 1)  accessor callable only from the owning package
 
 =head2 Lazy + default constants
 

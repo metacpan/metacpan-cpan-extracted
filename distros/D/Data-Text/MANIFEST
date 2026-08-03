@@ -1,4 +1,5 @@
 Changes
+cpanfile
 lib/Data/Text.pm
 LICENSE
 Makefile.PL
@@ -15,8 +16,8 @@ t/case.t
 t/clear.t
 t/comment-spelling.t
 t/conf/append.yml
-t/conf/set.yml
 t/conf/length.yml
+t/conf/set.yml
 t/conjunction.t
 t/coverage.t
 t/critic.t

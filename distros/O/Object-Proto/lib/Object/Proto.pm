@@ -1,7 +1,7 @@
 package Object::Proto;
 use strict;
 use warnings;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use DynaLoader;
 our @ISA = ('DynaLoader');
@@ -154,6 +154,8 @@ The following types are available with inline checks (zero overhead):
 
 =item * B<arg(name)> - use different name for constructor argument (init_arg)
 
+=item * B<private> - accessor callable only from the owning package (dies elsewhere)
+
 =back
 
 Default values support:
@@ -295,6 +297,33 @@ Combined with other modifiers:
 	    'id:Int:required:readonly:arg(_widget_id)',
 	    'config:HashRef:weak:arg(_config)',
 	);
+
+=head3 Private Attributes
+
+Mark an attribute C<private> to make its accessor callable only from within the
+class's own package. Calling it from anywhere else dies:
+
+	object 'Cat', 'name:Str', 'age:Int:private';
+
+	package Cat;
+	sub meow { my $self = shift; "meow, I am " . $self->age }  # ok
+
+	package main;
+	my $cat = new Cat name => 'Whiskers', age => 3;
+	$cat->name;    # 'Whiskers'
+	$cat->meow;    # 'meow, I am 3'  (age read from inside Cat)
+	$cat->age;     # dies: cannot call private attribute age on Cat from main
+
+Access is decided by the package the calling code is compiled in, not by the
+object's class or inheritance: a method of C<Cat> may use the accessor (getter
+or setter), while code in any other package - including a subclass or the
+caller of a C<Cat> method - cannot. On a violation the accessor dies with:
+
+	cannot call private attribute <name> on <class> from <caller>
+
+The check applies to both the method form (C<< $obj->age >>) and, when the
+accessor is imported as a function (see C<import_accessors>), the
+function-call form.
 
 =head3 Inheritance (extends)
 

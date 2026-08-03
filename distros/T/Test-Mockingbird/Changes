@@ -1,8 +1,43 @@
 Revision history for Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
 
+0.13	Sun Aug  2 05:28:58 PM EDT 2026
+
+  [Enhancements]
+
+  - Added mock_core($name, $coderef): intercepts a Perl builtin globally by
+    installing in CORE::GLOBAL::$name -- Perl's documented compile-time hook.
+    The replacement receives ($call_builtin, @args), where $call_builtin is a
+    coderef that delegates to CORE::$name directly, analogous to around()'s
+    $orig.  Accepts an optional "CORE::" prefix on the name (stripped
+    silently).  Tracked under "CORE::GLOBAL::$name" in the mock stack so
+    unmock() and restore_all() work identically to any other mock.  Prototype
+    is stamped on the wrapper (falling back to '@' for list-op builtins where
+    prototype("CORE::$name") returns undef) to suppress "Prototype mismatch"
+    warnings at eval-compile time.  On restore, if no prior CORE::GLOBAL
+    override existed, the stash entry is deleted (not set to undef-stub) so
+    code compiled after the restore falls back to the real builtin.  Croaks
+    on non-identifier name, unknown or non-overridable builtin, or
+    missing/wrong-typed replacement.
+
+  [ Bug Fixes]
+
+  - Fixed spy(): now calls set_prototype() on the spy wrapper (with
+    no warnings 'prototype'), eliminating the "Prototype mismatch" warning
+    that fired when spying on a prototyped function.  Previously documented
+    as a known limitation.
+
+  [Tests]
+
+  - t/mock_core.t (10 subtests): CORE::GLOBAL interception in string-eval
+    code, $call_builtin delegation and call-through, prototype no-mismatch
+    for stat wrapper, LIFO stacking with unmock, unmock restores real builtin,
+    diagnose_mocks type, CORE:: prefix stripping, freshly compiled module
+    interception, argument error paths, and identifier/builtin validation.
+  - Don't use Test::Returns, since it cycles back to Test::Mockingbird
+
 0.12	Mon Jul 20 11:01:43 EDT 2026
 
-  [New features]
+  [Enhancements]
 
   - Added before($target, $hook): installs a wrapper that calls $hook->(@args)
     (return value discarded) before invoking the original method.  Return value

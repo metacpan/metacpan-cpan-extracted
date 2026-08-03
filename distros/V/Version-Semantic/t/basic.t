@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 15;
+use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 16;
 use Test::Fatal qw( dies_ok exception lives_ok );
 my $class;
 
@@ -23,12 +23,16 @@ like exception { $class->new( major => '01' ) }, qr/\AAttribute .* has invalid v
 
 like exception { $class->new( major => 0 ) }, qr/Required attribute .* not set/, 'Missing required attribute';
 
-like exception { $class->parse( undef ) }, qr/is not a semantic version/,
+like exception { $class->parse( undef, { fatal => 1 } ) }, qr/is not a semantic version/,
   'The undef value is an invalid semantic version';
 
-like exception { $class->parse( '1.0.0-alpha_beta' ) }, qr/is not a semantic version/, 'Invalid semantic version';
-like exception { $class->parse( '1.0.0_01' ) }, qr/is not a semantic version/,
+like exception { $class->parse( '1.0.0-alpha_beta', { fatal => 1 } ) }, qr/is not a semantic version/,
+  'Invalid semantic version';
+
+like exception { $class->parse( '1.0.0_01', { fatal => 1 } ) }, qr/is not a semantic version/,
   'Perl underscore syntax does not refer to a semantic version';
+
+is $class->parse( '0.500005' ), undef, 'Non "fatal" parsing of an invalid semantic version returns undef';
 
 subtest 'Invalid semantic version' => sub {
   plan tests => 39;
@@ -74,7 +78,7 @@ subtest 'Invalid semantic version' => sub {
     9.8.7-whatever+meta+meta
     99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12
   );
-  dies_ok { $class->parse( $_ ) } "$_" for @versions
+  dies_ok { $class->parse( $_, { fatal => 1 } ) } "$_" for @versions
 };
 
 subtest 'Valid semantic versions' => sub {

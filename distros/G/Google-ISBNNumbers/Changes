@@ -1,5 +1,10 @@
 Revision history for Perl extension Google-ISBNNumbers
 
+1.02 2026-08-03T01:19:05Z
+
+    - Remove the included test API key.
+    - Allow users to supply their own API key for testing.
+
 1.01 2026-06-01T06:04:23Z
 
     - Fixes to docs, remove unneeded object and code clean

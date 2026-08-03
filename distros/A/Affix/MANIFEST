@@ -32,6 +32,7 @@ infix/src/common/infix_config.h
 infix/src/common/infix_internals.h
 infix/src/common/platform.h
 infix/src/common/utility.h
+infix/src/core/allocator.c
 infix/src/core/arena.c
 infix/src/core/cache.c
 infix/src/core/error.c

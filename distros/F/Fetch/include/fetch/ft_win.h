@@ -16,7 +16,13 @@
 #ifndef FD_SETSIZE
 #define FD_SETSIZE 4096
 #endif
-#define _CRT_RAND_S          /* enable rand_s() before <stdlib.h> */
+/* rand_s() is gated behind _CRT_RAND_S, which must be set before the FIRST
+ * <stdlib.h> - and perl.h already pulled that in long before us. So the real
+ * define lives at the very top of Fetch.xs (before any include); this is a
+ * guarded backstop that never clashes with it. */
+#ifndef _CRT_RAND_S
+#define _CRT_RAND_S
+#endif
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <io.h>
@@ -163,5 +169,24 @@ static void ft_os_random(unsigned char *out, size_t n) {
 }
 
 #endif /* _WIN32 */
+
+/* memmem is a GNU/BSD extension the MinGW CRT lacks; use the C library's where
+ * it exists and a plain scan on Windows. The needles here (\r\n, \r\n\r\n) are
+ * tiny, so the fallback's O(n*m) is fine. */
+#include <string.h>
+#if defined(_WIN32)
+static void *ft_memmem(const void *hay, size_t hlen, const void *ndl, size_t nlen) {
+    const unsigned char *h = (const unsigned char *)hay;
+    const unsigned char *n = (const unsigned char *)ndl;
+    size_t i;
+    if (nlen == 0) return (void *)hay;
+    if (hlen < nlen) return NULL;
+    for (i = 0; i + nlen <= hlen; i++)
+        if (h[i] == n[0] && memcmp(h + i, n, nlen) == 0) return (void *)(h + i);
+    return NULL;
+}
+#else
+#define ft_memmem memmem
+#endif
 
 #endif /* FT_WIN_H */

@@ -4,9 +4,12 @@ use strict;
 use warnings;
 
 use Test::Needs {
-	'App::Test::Generator' => '0.19'
+	'App::Test::Generator' => '0.43',
+	'perl' => 5.036,	# Later A::T::G need this version
 };
+
 use Test::Which 'fuzz-harness-generator';
+# use Test::DescribeMe qw(extended);
 use FindBin qw($Bin);
 use IPC::Run3;
 use IPC::System::Simple qw(system);
@@ -35,7 +38,7 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 					diag("$filepath: $1 tests run");
 				}
 			} else {
-				diag("$filepath: STDOUT:\n$stdout");
+				diag("$filepath: STDOUT:\n$stdout") if(!$ENV{AUTOMATED_TESTING});
 				diag($stderr) if(length($stderr));
 				diag("$filepath Failed");
 				last;
@@ -43,6 +46,10 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 		}
 	}
 	closedir($dh);
+} else {
+	# ::diag("Needs $dirname");
+	# Need this to fix: "skipped: (no reason given)", e.g. https://www.cpantesters.org/cpan/report/6af2b33e-fef6-11f0-9424-b5d717f4d45d
+	ok(1);
 }
 
 done_testing();

@@ -1,5 +1,18 @@
 Revision history for Perl module CLI::Cmdline
 
+1.28  2026-08-03
+    - use Test::Warnings and only use done_testing() at the end
+    - skip t/05-integration.t test on windows
+
+1.27  2026-08-02
+    - changed repo in Makefile.PL from github.com to codeberg.org
+    - remove fixed perl location from t/01-basic.t
+    - use 5.014 instead of 5.010 as minimum perl version
+
+1.26  2026-08-02
+    - change t/05-integration.t to use $^x instead of fixed path for perl
+    - changed examples and lib files to use as hashbang #!/usr/bin/env perl
+ 
 1.25  2026-01-20
     - make license term consistent
     - change MANIFEST to include only needed files

@@ -49,6 +49,17 @@ static int OPENSSL_init_ssl(unsigned long opts, const void *settings) {
 #define SSL_get1_peer_certificate SSL_get_peer_certificate
 #endif
 
+/* ALPN (server-side protocol negotiation, needed to offer HTTP/2 over TLS)
+ * arrived in OpenSSL 1.0.2 - SSL_CTX_set_alpn_select_cb does not exist before
+ * that. On an older library we simply do not install the callback: h2-over-TLS
+ * is not offered and HTTPS falls back to HTTP/1.1. Without this guard the .so
+ * links an undefined symbol and fails to load (see CPAN Testers on OpenSSL
+ * 1.0.1 smokers). LibreSSL reports >= 1.0.2 and ships ALPN, so it takes this
+ * path too. */
+#if OPENSSL_VERSION_NUMBER >= 0x10002000L
+#define HM_HAVE_ALPN 1
+#endif
+
 /* client-cert verification modes */
 #define HM_TLS_VERIFY_NONE     0
 #define HM_TLS_VERIFY_OPTIONAL 1
@@ -71,7 +82,9 @@ typedef struct {
 
 static int hm_tls_sni_ex_idx = -1;
 
-/* ALPN: prefer h2, fall back to http/1.1. Installed only when HTTP/2 is on. */
+/* ALPN: prefer h2, fall back to http/1.1. Installed only when HTTP/2 is on and
+ * the OpenSSL in use provides ALPN (1.0.2+). */
+#ifdef HM_HAVE_ALPN
 static int hm_tls_alpn_cb(SSL *ssl, const unsigned char **out,
                           unsigned char *outlen, const unsigned char *in,
                           unsigned int inlen, void *arg) {
@@ -84,6 +97,7 @@ static int hm_tls_alpn_cb(SSL *ssl, const unsigned char **out,
         return SSL_TLSEXT_ERR_NOACK;
     return SSL_TLSEXT_ERR_OK;
 }
+#endif
 
 /* optional-mode verify: accept regardless; the real result is read back from
  * SSL_get_verify_result after the handshake and reported in $env. */
@@ -142,7 +156,11 @@ static SSL_CTX *hm_tls_ctx_one(const char *cert, const char *key,
         fprintf(stderr, "Hyperman TLS: certificate and key do not match\n");
         SSL_CTX_free(ctx); return NULL;
     }
+#ifdef HM_HAVE_ALPN
     if (alpn_h2) SSL_CTX_set_alpn_select_cb(ctx, hm_tls_alpn_cb, NULL);
+#else
+    (void)alpn_h2;   /* ALPN unavailable on this OpenSSL; h2-over-TLS not offered */
+#endif
     if (verify != HM_TLS_VERIFY_NONE) {
         int flags = SSL_VERIFY_PEER;
         if (ca && SSL_CTX_load_verify_locations(ctx, ca, NULL) <= 0) {

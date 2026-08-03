@@ -1,5 +1,8 @@
 Revision history for Object-Proto
 
+0.19	2026-08-02
+	- Add a :private attribute modifier. 
+
 0.18	2026-07-04
 	- Fix bug with named constructor
 

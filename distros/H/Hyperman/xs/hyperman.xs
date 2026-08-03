@@ -25,6 +25,7 @@ run(class, ...)
         memset(&cfg, 0, sizeof(cfg));
         cfg.host = "0.0.0.0";
         cfg.port = 8080;
+        cfg.log_fd = -1;
 
         for (i = 1; i + 1 < items; i += 2) {
             const char *key = SvPV_nolen(ST(i));
@@ -37,7 +38,31 @@ run(class, ...)
             else if (strEQ(key, "header_timeout")) cfg.header_t = SvNV(val);
             else if (strEQ(key, "max_pipeline"))   cfg.max_pipe = (int)SvIV(val);
             else if (strEQ(key, "reuseport"))      cfg.reuseport = SvTRUE(val) ? 1 : 0;
-            else if (strEQ(key, "access_log"))     cfg.log_cb = SvOK(val) ? val : NULL;
+            else if (strEQ(key, "access_log")) {
+                /* coderef -> per-request Perl callback (as before);
+                 * a filehandle or a path -> fast C-side Combined-log writer. */
+                if (!SvOK(val)) {
+                    cfg.log_cb = NULL;
+                } else if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVCV) {
+                    cfg.log_cb = val;
+                } else {
+                    SV *g = (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVGV)
+                            ? SvRV(val) : val;
+                    if (SvTYPE(g) == SVt_PVGV) {
+                        IO     *io = GvIO((GV *)g);
+                        PerlIO *fp = io ? (IoOFP(io) ? IoOFP(io) : IoIFP(io)) : NULL;
+                        int raw = fp ? PerlIO_fileno(fp) : -1;
+                        if (raw < 0)
+                            croak("Hyperman->run: access_log handle has no fileno");
+                        cfg.log_fd = dup(raw);   /* own it; freed with the loop */
+                        if (cfg.log_fd < 0)
+                            croak("Hyperman->run: dup access_log fd: %s",
+                                  strerror(errno));
+                    } else {
+                        cfg.log_path = SvPV_nolen(val);   /* opened in the parent */
+                    }
+                }
+            }
             else if (strEQ(key, "max_requests_per_worker"))
                                                    cfg.max_requests = SvUV(val);
             else if (strEQ(key, "shutdown_grace")) cfg.grace = SvNV(val);

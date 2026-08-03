@@ -13,7 +13,7 @@ WriteMakefile (
     PREREQ_PM => {
 	'Carp' => 0,
     },
-    AUTHOR => 'Ben Bullock <bkb@cpan.org>',
+    AUTHOR => 'Ben Bullock <benkasminbullock@gmail.com>',
     META_MERGE => {
         resources => {
             repository => $repo,

@@ -1,6 +1,6 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /Desktop/KDEActivity/Util/get_current_kde_activity
+# Note: This script is a CLI for Riap function /Desktop/KDEActivity/Util/set_current_kde_activity
 # and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
@@ -11,12 +11,12 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-30'; # DATE
+our $DATE = '2026-04-15'; # DATE
 our $DIST = 'App-KDEActivityUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/Desktop/KDEActivity/Util/get_current_kde_activity",
+    url => "/Desktop/KDEActivity/Util/set_current_kde_activity",
     program_name => "setkact",
     log => 1,
     read_config => 0,
@@ -40,7 +40,7 @@ setkact - Shorter alias for set-current-kde-activity
 
 =head1 VERSION
 
-This document describes version 0.004 of setkact (from Perl distribution App-KDEActivityUtils), released on 2026-03-30.
+This document describes version 0.006 of setkact (from Perl distribution App-KDEActivityUtils), released on 2026-04-15.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,13 @@ B<setkact> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?
 
 B<setkact> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<setkact> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--guid|/"--guid">>|B<L<--no-guid|/"--guid">>|B<L<--noguid|/"--guid">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name|/"--no-name">>|B<L<--no-name|/"--no-name">>|B<L<--noname|/"--no-name">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+B<setkact> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<name|/"--name=s*">>E<gt>
+
+=head1 DESCRIPTION
+
+Features:
+- Specifying activity by name (kactivities-cli wants GUID)
+- Tab completion
 
 =head1 OPTIONS
 
@@ -58,19 +64,12 @@ C<*> marks required options.
 
 =over
 
-=item B<--detail>, B<-l>
+=item B<--name>=I<s>*
 
 (No description)
 
 
-=item B<--guid>
-
-Return the GUID instead of the name.
-
-=item B<--no-name>
-
-(No description)
-
+Can also be specified as the 1st command-line argument.
 
 =back
 

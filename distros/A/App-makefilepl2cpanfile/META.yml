@@ -44,5 +44,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/App-makefilepl2cpanfile/issues
   homepage: https://metacpan.org/pod/App::makefilepl2cpanfile
   repository: git://github.com/nigelhorne/App-makefilepl2cpanfile.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

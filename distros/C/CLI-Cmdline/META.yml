@@ -5,8 +5,8 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.52'
   Test::More: '0.88'
-  Test::NoWarnings: '1.04'
   Test::Pod::Coverage: '1.04'
+  Test::Warnings: '0.028'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -23,13 +23,13 @@ no_index:
 provides:
   CLI::Cmdline:
     file: lib/CLI/Cmdline.pm
-    version: '1.25'
+    version: '1.28'
 requires:
-  perl: '5.010'
+  perl: '5.014'
 resources:
-  bugtracker: https://github.com/HansH111/CLI-Cmdline.pm/issues
-  repository: https://github.com/HansH111/CLI-Cmdline.pm.git
-version: '1.25'
+  bugtracker: https://codeberg.org/HansH111/CLI-Cmdline.pm/issues
+  repository: https://codeberg.org/HansH111/CLI-Cmdline.pm.git
+version: '1.28'
 x_contributors:
-  - 'Hans Harder <hans@atbas.org>'
+  - 'Hans Harder <hans at atbas.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

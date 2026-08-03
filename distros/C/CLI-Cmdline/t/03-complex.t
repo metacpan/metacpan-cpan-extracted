@@ -1,8 +1,8 @@
 # t/03-complex.t - Test spec strings with or without -/-- prefixes
 use strict;
 use warnings;
-use Test::More tests => 29;
-use Test::NoWarnings 'had_no_warnings';
+use Test::More;
+use Test::Warnings;
 
 use CLI::Cmdline qw(parse);
 
@@ -85,5 +85,4 @@ run_test('10 - required provided via aliases', \%opt, '', 'src dest|d',
 is($opt{src}, 'a.txt', '10 - src provided');
 is($opt{dest}, 'b.txt', '10 - dest via short alias');
 
-had_no_warnings();
 done_testing();

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 package Datafile::Array;
 
 use strict;
@@ -7,19 +8,21 @@ use Exporter 'import';
 use Carp;
 
 our @EXPORT_OK = qw(readarray writearray parse_csv_line);
-our $VERSION   = '1.05';
+our $VERSION   = '1.06';
 
 sub _trim {
     my ($value, $do_trim) = @_;
-    return $value unless $do_trim && defined $value;
-    $value =~ s/^\s+|\s+$//g;
+    return '' unless defined $value;
+    $value =~ s/^\s+|\s+$//g   if $do_trim;
     return $value;
 }
 
 sub parse_csv_line {
     my ($line, $sep) = @_;
-    $sep //= ',';
     my @fields;
+    return @fields unless defined $line;
+
+    $sep ||= ',';
     my $pos  = 0;
     my $len  = length( $line // '' );
     while ( $pos < $len ) {
@@ -45,8 +48,8 @@ sub parse_csv_line {
                     last;
                 }
             }
-        }
-        else {
+        } 
+	else {
             my $spos = index( $line, $sep, $pos );
             $spos = $len if $spos == -1;
             $field = substr( $line, $pos, $spos - $pos );
@@ -60,7 +63,7 @@ sub parse_csv_line {
 
 sub readarray {
     my ( $filename, $data, $pafields, $opts ) = @_;
-    $opts //= {};
+    $opts ||= {};
 
     my $delim       = $opts->{delimiter}    // ';';
     my $key_fields  = $opts->{key_fields}   // 1;
@@ -107,8 +110,10 @@ sub readarray {
         }
     }
 
-    open( my $fh, '<:encoding(UTF-8)', $filename )
-        or return ( 0, ["WARNING: cannot open '$filename': $!"] );
+    my $fh;
+    unless (open($fh, '<:encoding(UTF-8)', $filename )) {
+        return ( 0, ["WARNING: cannot open '$filename': $!"] );
+    }
 
     my $record_count = 0;
     my $start_idx    = $prefix ? 1 : 0;
@@ -129,8 +134,7 @@ sub readarray {
             $csvline .= $line;
             my $count = () = $csvline =~ /\Q"\E/g;
             next
-                unless $count % 2 == 0
-                && ( $count == 0 || $csvline =~ /"[^"]*$/ );
+                unless $count % 2 == 0 && ( $count == 0 || $csvline =~ /"[^"]*$/ );
             @fields = parse_csv_line( $csvline, $delim );
             $line   = $csvline;
             $csvline = '';
@@ -249,8 +253,10 @@ sub writearray {
         if $verbose;
 
     my $tmp = "$filename.tmp";
-    open( my $fh, '>:encoding(UTF-8):crlf', $tmp )
-        or return ( 0, ["ERROR: cannot open '$tmp' for writing: $!"] );
+    my $fh;
+    unless (open($fh, '>:encoding(UTF-8):crlf', $tmp )) {
+        return ( 0, ["ERROR: cannot open '$tmp' for writing: $!"] );
+    };
 
     if ( my $comment = $opts->{comment} ) {
         my @lines = ref($comment) eq 'ARRAY' ? @$comment : split( /\n/, $comment );
@@ -285,12 +291,14 @@ sub writearray {
         or return ( 0, ["ERROR: failed to close '$tmp': $!"] );
 
     if ($backup && -f $filename) {
-        rename( $filename, $filename . '.bak' )
-            or push @messages,
+        if (!rename( $filename, $filename . '.bak' )) {
+            push @messages,
             "WARNING: backup to ${filename}.bak failed: $!";
+        }
     }
-    rename( $tmp, $filename )
-        or return ( 0, ["ERROR: failed to rename '$tmp' to '$filename': $!"] );
+    if (!rename( $tmp, $filename )) {
+        return ( 0, ["ERROR: failed to rename '$tmp' to '$filename': $!"] );
+    }
     chmod $prot, $filename;
 
     push @messages,
@@ -307,6 +315,10 @@ __END__
 =head1 NAME
 
 Datafile::Array - Pure-Perl utilities for reading and writing delimited data files
+
+=head1 VERSION
+
+1.06
 
 =head1 LICENSE
 

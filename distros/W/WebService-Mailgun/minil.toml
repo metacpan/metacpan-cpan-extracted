@@ -1,6 +1,6 @@
 name = "WebService-Mailgun"
-badges = ["travis", "coveralls"]
+badges = ["github-actions"]
 module_maker = "ModuleBuildTiny"
 markdown_maker = "Pod::Markdown::Github"
 [FileGatherer]
-exclude_match = ["Dockerfile", "docker-compose.yml", ".pause"]
+exclude_match = ["Dockerfile", "docker-compose.yml", ".pause", "CLAUDE.md", "^\\.github/"]

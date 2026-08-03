@@ -193,7 +193,7 @@ static hm_backend *hm_backend_select_new(void) {
     be->add_timer  = sl_add_timer;
     be->del_timer  = sl_del_timer;
     be->add_signal = sl_add_signal;
-    be->wait       = sl_wait;
+    be->wait_ev       = sl_wait;
     be->destroy    = sl_destroy;
     return be;
 }

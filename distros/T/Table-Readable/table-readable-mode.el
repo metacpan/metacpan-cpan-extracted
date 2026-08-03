@@ -2,7 +2,7 @@
 (defvar table-readable-font-lock-defaults
   `((
      ("^#.*$" . font-lock-comment-face)
-     ("^\\(%%\\)?[a-z]+:\\|%%" . font-lock-variable-name-face)
+     ("^\\(%%\\)?[a-z_]+:\\|%%" . font-lock-variable-name-face)
      )))
 (define-derived-mode table-readable-mode text-mode "Table::Readable"
   "A mode for editing the readable table format"

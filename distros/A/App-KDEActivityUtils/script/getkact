@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-30'; # DATE
+our $DATE = '2026-04-15'; # DATE
 our $DIST = 'App-KDEActivityUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Desktop/KDEActivity/Util/get_current_kde_activity",
@@ -40,7 +40,7 @@ getkact - Shorter alias for get-current-kde-activity
 
 =head1 VERSION
 
-This document describes version 0.004 of getkact (from Perl distribution App-KDEActivityUtils), released on 2026-03-30.
+This document describes version 0.006 of getkact (from Perl distribution App-KDEActivityUtils), released on 2026-04-15.
 
 =head1 SYNOPSIS
 

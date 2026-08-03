@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-30'; # DATE
+our $DATE = '2026-04-15'; # DATE
 our $DIST = 'App-KDEActivityUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Desktop/KDEActivity/Util/list_kde_activities",
@@ -40,7 +40,7 @@ list-kde-activities - List all known KDE activities
 
 =head1 VERSION
 
-This document describes version 0.004 of list-kde-activities (from Perl distribution App-KDEActivityUtils), released on 2026-03-30.
+This document describes version 0.006 of list-kde-activities (from Perl distribution App-KDEActivityUtils), released on 2026-04-15.
 
 =head1 SYNOPSIS
 

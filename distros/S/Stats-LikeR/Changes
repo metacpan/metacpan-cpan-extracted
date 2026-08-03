@@ -1,6 +1,55 @@
 Revision history for Stats-LikeR
 
 
+0.28 2026-08-02 CDT
+
+ - `p_adjust` (LikeR.xs) now takes a data frame as well as a flat list of
+   p-values, and hands the corrected values back in the shape they arrived in. An
+   AoA, AoH, HoA or HoH goes in and a new frame of the same kind comes out, with
+   the same rows, columns and row labels; the input is left alone. Everything the
+   flat form did is unchanged — an arrayref of p-values still returns a list, in
+   order, with the same numbers.
+
+ - `columns => 'p_value'` (or an arrayref of names, or 0-based positions for an
+     AoA) says which columns hold p-values, and copies the rest of the frame
+     through untouched, so a results table with a `gene` column no longer has to
+     be taken apart and put back together around the call. Without `columns`
+     every cell is treated as a p-value, which is right for a frame that is
+     nothing but p-values; a label column in one dies with a message naming the
+     offending value and pointing at `columns`, rather than correcting a string
+     coerced to zero.
+ - All the p-values in the frame are corrected as one family, whichever shape
+     they came in, so the family size is the number of p-value cells.
+ - The method still reads positionally and may now also be given as
+     `method => ...`. `none`, which the function has always accepted, is now
+     documented along with the rest.
+ - Cells are visited in a fixed order — by row and then column name, or column
+     name and then row for a HoA — so tied p-values break the same way on every
+     run instead of following hash iteration order.
+
+ - `drop_duplicates`, `filter`, `t_test`, `vals`: speed/RAM improvements
+
+ - Incompatible: the `'?'` / `'h'` argument added in 0.27 is gone (lib/Stats/LikeR.pm). `agg('h')`, `read_table('?')` and the fifty-odd other pure-Perl functions that took it no longer print help and die — they treat the string as data, the way the XS functions always have. `h('agg')`, `h(*agg)` and `h(\&agg)` are unchanged and remain the way to ask, for every function in the distribution.
+ - It was a help route that only half the module had, so what a lone `'h'` meant depended on whether the callee happened to be written in XS or in Perl, and a column, file or option value really named `'h'` needed `$Stats::LikeR::HELP = 0` to get through. That variable is gone too; nothing reads its arguments for a help flag any more.
+ - `bedroc` still prints its own short XS usage summary for `bedroc('h' | 'H' | '?')`, which is hand-written and predates all of this.
+
+ - `merge` (LikeR.xs) — same joins, a third of the time and a fifth of the memory. Nothing about the result changes: every join type, shape combination and edge case produces exactly what it did before, and `t/merge.t` now checks all six input/output paths against a plain-Perl reference join over a randomized corpus.
+
+ - The old implementation transposed both frames into arrays of row hashes, joined those, and transposed the result back. A 10,000-row HoA joined to itself therefore built 20,000 throwaway row hashes and copied every cell three times before returning. It now reads each frame where it lies — a HoA column by column, an AoH/HoH row by row — and writes the result straight into the shape being returned, so the only cells copied are the ones the caller keeps.
+
+ - The right frame's index is a hash of row numbers chained through a flat array, rather than an array-ref of index scalars per distinct key, and one reused buffer builds every join key instead of one scalar per row.
+ - Column names are resolved to their column (HoA) or interned once as shared hash keys (AoH/HoH) before the join starts, so the per-row work is a lookup rather than a lookup and a rehash.
+ - Measured on the `benchmark.pl` case (two 10,000-row frames, six columns, inner join on `id`): 0.052 s and 41.4 MB before, 0.017 s and 7.3 MB after. An outer join of the same frames went from 0.113 s to 0.008 s.
+
+ - `write_table` (LikeR.xs) — two changes, one of them incompatible.
+ - Every format now prints the coloured `wrote <file>` confirmation line, not just LaTeX and `.xlsx`. Delimited output (csv/tsv) was silent before. The line is identical in all cases: the file name in black on cyan, with the SGR codes inline so there is still no `Term::ANSIColor` dependency. Nothing is announced when nothing is written.
+ - **Incompatible:** `row.names` now defaults to **off** in every format. It previously defaulted **on** everywhere, following R's `write.table`, which meant a call that said nothing about row names got a label column and a leading empty header cell (`,gene,n`) it had not asked for. Pass `row.names => 1` for the old behaviour; `row.names => 'col'` is unchanged.
+
+ - New `h2aoh` and `aoh2h` (lib/Stats/LikeR.pm), which add the flat hash to the shapes the conversion family understands. A plain hash is a two-column table folded shut, and until now nothing would unfold it: `value_counts` hands one back, and no frame function would take it.
+ - `h2aoh(\%h, var_name => .., value_name => ..)` unfolds a flat hash into a two-column AoH, one row per pair, under column names the caller picks. `sort => 'key' | 'value' | 'none'` fixes the row order, which hash iteration otherwise leaves to chance; `'value'` is biggest-first for numbers, so `value_counts` output comes out the way pandas' `Series.value_counts()` orders it.
+ - `aoh2h` folds a two-column AoH back down, with `duplicates => 'die' | 'first' | 'last'` deciding what a repeated key means. The two are exact inverses under their defaults.
+ - The column options are named `var_name` / `value_name` after `melt`, which emits the same two columns. R spells this pair `tibble::enframe()` / `deframe()`; pandas spells it `pd.Series(d).reset_index()` and `Series.to_dict()`.
+
 0.27 2026-07-26 CDT
 
  - New `h` function: `h('agg')`, `h(*agg)` or `h(\&agg)` prints that function's section of this document and returns, in the spirit of R's `?function`. `h()` lists every documented function. It covers the XS functions as well as the Perl ones, because it looks the name up in the module's POD instead of reading an argument list — see [Getting help](#getting-help).
@@ -704,7 +753,7 @@ Revision history for Stats-LikeR
 
  - Minimum Scalar::Util version in dist.ini is now 1.22, see https://www.cpantesters.org/cpan/report/6b682236-6567-11f1-a3bc-a055f9c4ba34
 
- - `Digest::SHA` is no longer needed, and removed as a dependency
+ - `Digest::SHA` removed as a dependency
 
  [`read_table`]
 

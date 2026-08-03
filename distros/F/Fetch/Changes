@@ -1,5 +1,28 @@
 Revision history for Fetch
 
+0.06    2026-08-03
+        - Build against older OpenSSL. The TLS code uses the OpenSSL 1.1.0 API
+          (TLS_client_method, SSL_CTX_set_min_proto_version, SSL_set1_host);
+          on libraries that lack it (OpenSSL 1.0.x / 0.9.8 on legacy BSDs,
+          LibreSSL before 2.7) the loadable object failed to load with an
+          undefined symbol. TLS now compiles to stubs there, as when OpenSSL
+          is absent, so the module loads and cleartext HTTP works (https then
+          fails cleanly).
+
+0.05    2026-08-02
+        - Add an on_headers request option: a coderef fired once, before any
+          on_body chunk, with ($status, [k,v,...]). Lets a streaming consumer
+          act on the status/headers up front (e.g. open a downstream writer).
+          Not fired for a WebSocket upgrade.
+        - Add a C ABI so other XS modules can drive Fetch from C without a
+          per-request Perl round trip. 
+
+0.04    2026-08-02
+        - Fixes for Windows build:
+          - Rename the readiness-backend vtable member "wait" to "wait_ev"
+          - Add a portable ft_memmem (a GNU/BSD extension MinGW lacks)
+          - Define _CRT_RAND_S at the very top of Fetch.xs
+
 0.03    2026-08-02
         - Fetch->new(simple_response => 1): resolve to a plain unblessed hashref
           { status, headers, content } instead of a blessed Fetch::Response, so

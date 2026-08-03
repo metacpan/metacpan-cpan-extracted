@@ -1,3 +1,11 @@
+version 0.006; 2026-08-02
+
+  * Allow building on Mac OS
+
+  * Move from Module::Build to ExtUtils::MakeMaker
+
+  * Change authorship to Kurt Starsinic
+
 version 0.005; 2017-08-11
 
   * update to accommodate PERL_OP_PARENT builds of Perl 5.21.11 or later

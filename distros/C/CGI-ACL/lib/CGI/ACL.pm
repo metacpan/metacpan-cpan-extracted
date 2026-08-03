@@ -30,11 +30,31 @@ use Socket;
 # Maximum seconds to wait for a DNS reverse lookup on non-Windows platforms.
 Readonly my $DNS_TIMEOUT  => 10;
 
+# Seconds to cache a cloud-lookup result per IP in the per-object cache.
+# Matches a typical short DNS TTL; balances freshness against resolver load.
+Readonly my $CLOUD_CACHE_TTL => 300;
+
 # Sentinel value stored in deny_countries to mean "deny every country".
 Readonly my $WILDCARD     => q{*};
 
 # Fallback client address when REMOTE_ADDR is absent (e.g. CLI or unit tests).
 Readonly my $DEFAULT_ADDR => '127.0.0.1';
+
+# Compiled regex for IP ranges that can never belong to a cloud provider:
+# IPv4 loopback, RFC 1918 private blocks, link-local, and their IPv6 equivalents.
+# Used by _is_cloud_host() to skip DNS entirely for these addresses.
+Readonly my $PRIVATE_IP_RE => qr{
+    ^(?:
+        127\.                               | # IPv4 loopback (127.0.0.0/8)
+        10\.                                | # RFC 1918 class A (10.0.0.0/8)
+        192\.168\.                          | # RFC 1918 class C (192.168.0.0/16)
+        172\.(?:1[6-9]|2[0-9]|3[01])\.     | # RFC 1918 class B (172.16.0.0/12)
+        169\.254\.                            # IPv4 link-local (169.254.0.0/16)
+    )
+  | ^::1$                                     # IPv6 loopback
+  | ^f[cd][0-9a-f]*:                          # IPv6 unique local (fc00::/7)
+  | ^fe[89ab][0-9a-f]*:                       # IPv6 link-local (fe80::/10)
+}xi;
 
 # Compiled regexes that identify cloud-provider reverse-DNS hostnames.
 # _is_cloud_host() iterates this list; to add a provider, append a qr// here.
@@ -59,11 +79,11 @@ CGI::ACL - Decide whether to allow a client to run a CGI script
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -162,18 +182,15 @@ sub new {
 		for my $key (qw(allowed_ips deny_countries allow_countries)) {
 			$copy{$key} = { %{$copy{$key}} } if ref($copy{$key}) eq 'HASH';
 		}
-		# The CIDR cache depends on allowed_ips; invalidate so it is rebuilt fresh.
+		# Clear derived caches; they will be rebuilt fresh from the cloned state.
 		delete $copy{_cidrlist};
+		delete $copy{_cloud_cache};
 		return bless { %copy, %{$params} }, ref($class);
 	}
 
 	# Merge any config-file or environment-variable overrides
-	$params = Object::Configure::configure($class, $params);
-
-	return bless $params, $class;
+	return bless Object::Configure::configure($class, $params), $class;
 }
-
-# ── allow_ip ───────────────────────────────────────────────────────────────────
 
 =head2 allow_ip
 
@@ -714,10 +731,31 @@ sub all_denied {
 
 	# ── Cloud check (highest precedence; overrides allow_ip) ────────────────
 	if($self->{deny_cloud}) {
-		# Deny if the IP resolves to a cloud provider hostname.
-		# Wrap in eval: DNS failures must not kill the CGI process; fail safe.
-		my $is_cloud = eval { _is_cloud_host($addr) };
-		return 1 if !$@ && $is_cloud;
+		# Consult the per-object cache before performing any DNS round-trips.
+		# The cache stores {result, expires} keyed by IP address string.
+		# This eliminates repeated DNS queries for the same IP within the TTL.
+		my $cached = $self->{_cloud_cache} && $self->{_cloud_cache}{$addr};
+		my ($is_cloud, $dns_error);
+		if($cached && $cached->{expires} > time()) {
+			$is_cloud = $cached->{result};
+		} else {
+			# Cache miss: perform the verified reverse-DNS lookup.
+			# Wrap in eval: DNS failures must not kill the CGI process; fail safe.
+			$is_cloud = eval { _is_cloud_host($addr) };
+			$dns_error = $@;
+			if($dns_error =~ /^DNS timeout: /) {
+				undef $@;
+			}
+			# Only cache definitive answers; skip on DNS errors so the next
+			# request retries rather than caching a failure indefinitely.
+			unless($dns_error) {
+				$self->{_cloud_cache}{$addr} = {
+					result  => $is_cloud,
+					expires => time() + $CLOUD_CACHE_TTL,
+				};
+			}
+		}
+		return 1 if !$dns_error && $is_cloud;
 
 		# Non-cloud and no other restrictions: allow
 		return 0 unless $self->{allowed_ips}
@@ -841,6 +879,11 @@ sub _set_countries {
 sub _is_cloud_host {
 	my $ip = $_[0];
 
+	# Private, loopback, and link-local addresses are never cloud provider IPs.
+	# Skipping DNS for these eliminates the most common source of timeouts in
+	# development environments and internal-network deployments.
+	return 0 if $ip =~ $PRIVATE_IP_RE;
+
 	# Attempt a verified reverse DNS lookup; returns undef on failure
 	my $hostname = _verified_rdns($ip) or return 0;
 
@@ -899,7 +942,7 @@ sub _verified_rdns {
 	if($^O ne 'MSWin32') {
 		# Non-Windows: guard against indefinitely-blocking DNS calls
 		local $SIG{ALRM} = sub { die "DNS timeout: $ip" };
-		alarm($DNS_TIMEOUT);
+		my $old_alarm = alarm($DNS_TIMEOUT) || 0;
 		eval {
 			# Step 1: reverse lookup (IP -> hostname)
 			$hostname = gethostbyaddr($packed, $family);
@@ -908,10 +951,10 @@ sub _verified_rdns {
 				@forward_ips = _rdns_forward($hostname, $family);
 			}
 			# Cancel the alarm inside the eval to avoid a post-eval race
-			alarm(0);
+			alarm($old_alarm);
 		};
-		# Belt-and-suspenders: ensure the alarm is always cancelled
-		alarm(0);
+		# Ensure the alarm is always cancelled
+		alarm($old_alarm);
 		return if $@ || !$hostname;
 	} else {
 		# Windows: no alarm support; perform lookups synchronously

@@ -50,38 +50,40 @@
 // 1. Error Handling: Provides the thread-local error reporting system.
 //    (No dependencies on other infix modules).
 #include "core/error.c"
-// 2. Arena Allocator: The fundamental memory management component.
+// 2. Allocator Table: The process-wide allocator used for all internal heap allocations. (Depends only on malloc/free).
+#include "core/allocator.c"
+// 3. Arena Allocator: The fundamental memory management component.
 //    (Depends only on malloc/free).
 #include "core/arena.c"
-// 3. OS Executor: Handles OS-level memory management for executable code.
+// 4. OS Executor: Handles OS-level memory management for executable code.
 //    (Depends on error handling, debugging utilities).
 #include "jit/executor.c"
-// 4. Type Registry: Manages named types.
+// 5. Type Registry: Manages named types.
 //    (Depends on arena for storage and signature parser for definitions).
 #include "core/type_registry.c"
-// 5. Signature Parser: Implements the high-level string-based API.
+// 6. Signature Parser: Implements the high-level string-based API.
 //    (Depends on types, arena, and registry).
 #include "core/signature.c"
-// 6. Dynamic Library Loader: Implements cross-platform `dlopen`/`dlsym`.
+// 7. Dynamic Library Loader: Implements cross-platform `dlopen`/`dlsym`.
 //    (Depends on error handling, types, and arena).
 #include "core/loader.c"
-// 7. Type System: Defines and manages `infix_type` objects and graph algorithms.
+// 8. Type System: Defines and manages `infix_type` objects and graph algorithms.
 //    (Depends on the arena and error handling).
 #include "core/types.c"
-// 8. Debugging Utilities: Low-level helpers for logging and inspection.
+// 9. Debugging Utilities: Low-level helpers for logging and inspection.
 //    (No dependencies).
 #include "core/utility.c"
-// 9. Platform and processor feature detection.
+// 10. Platform and processor feature detection.
 //    (No dependencies).
 #include "core/platform.c"
-// 10. Trampoline Cache: Deduplication logic.
+// 11. Trampoline Cache: Deduplication logic.
 #include "core/cache.c"
-// 11. Emit System: JIT code generation for machine code.
+// 12. Emit System: JIT code generation for machine code.
 #include "emit/elf/emit_elf.c"
 #include "emit/emit.c"
 #include "emit/emit_math.c"
 #include "emit/pe/emit_pe.c"
-// 12. Trampoline Engine: The central JIT compiler.
+// 13. Trampoline Engine: The central JIT compiler.
 //     This must be last, as it depends on all other components and includes the
 //     final ABI- and architecture-specific C files itself.
 #include "jit/trampoline.c"

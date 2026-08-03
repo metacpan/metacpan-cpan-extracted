@@ -1,3 +1,8 @@
+0.06 2026-08-03
+
+- Add append_table method
+- noslash option to not remove \
+
 0.05 2021-02-07
 
 - Allow read_table_hash to return the order of keys too

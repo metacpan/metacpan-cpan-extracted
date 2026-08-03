@@ -1,0 +1,26 @@
+language: "perl"
+perl:
+  - "5.24"
+  - "5.22"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+
+install:
+    - cpanm -v --installdeps --notest .
+
+script: "perl Build.PL && ./Build test"
+
+notifications:
+  recipients:
+    - kes-kes@yandex.ru
+  email:
+    on_success: change
+    on_failure: always
+  irc:
+    channels:
+      - "irc://irc.perl.org:6667/#debughooks"
+    on_success: change
+    on_failure: always

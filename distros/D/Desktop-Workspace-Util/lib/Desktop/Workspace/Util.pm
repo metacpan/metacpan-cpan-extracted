@@ -2,16 +2,18 @@ package Desktop::Workspace::Util;
 
 use 5.010001;
 use strict 'subs', 'vars';
+use utf8;
 use warnings;
 use Log::ger;
 
 use Exporter qw(import);
+use List::Util qw(first);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-29'; # DATE
+our $DATE = '2026-04-15'; # DATE
 our $DIST = 'Desktop-Workspace-Util'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(
                        get_desktop_workspace_module
@@ -97,6 +99,99 @@ sub instantiate_desktop_workspace_module {
     my $mod = get_desktop_workspace_module(
         module => $args{module}, ns_prefixes => $args{ns_prefixes});
     $mod->new(%{ $args{module_args} // {} });
+}
+
+sub _find_window {
+    my ($re, $all_windows) = @_;
+    log_trace "Checking existing window (%s) ...", $re;
+    for my $row (@$all_windows) {
+        if ($row->{title} =~ $re) {
+            log_trace "Found matching window %s", $row;
+            return $row;
+        }
+    }
+    return;
+}
+
+sub _items2windows {
+    require Desktop::XWindowManager::Util;
+
+    my $items = shift;
+
+    my $windowkey;
+    my $auto_file_num = 0;
+    my $auto_prog_num = 0;
+    my $auto_firefox_num = 0;
+    my $auto_dolphin_num = 0;
+    my %windows; # key = prefix+arbitrary number
+
+    my $all_windows;
+    {
+        my $res = Desktop::XWindowManager::Util::list_xwm_windows(
+            detail=>1,
+            with_kde_activity_name => 1,
+        );
+        return [500, "Can't list windows: $res->[0] - $res->[1]"]
+            unless $res->[0] == 200;
+        $all_windows = $res->[2];
+    }
+
+  ITEM:
+    for my $item (@$items) {
+        if (defined($item->{url}) || defined($item->{dir})) {
+            my $url = $item->{url} // $item->{dir};
+            if (defined $item->{dolphin_window_num}) {
+                $windowkey = "dolphin_".sprintf("%04d", $item->{dolphin_window_num});
+            } elsif (defined $item->{firefox_window_num}) {
+                $windowkey = "firefox_".sprintf("%04d", $item->{firefox_window_num});
+            } else {
+                my ($app, $num);
+                if ($item->{new_browser_window}) {
+                    $app = "firefox";
+                    $num = ++$auto_firefox_num;
+                } elsif ($item->{new_file_manager_window}) {
+                    $app = "dolphin";
+                    $num = ++$auto_dolphin_num;
+                } else {
+                    if (defined($item->{url})) {
+                        $app = "firefox";
+                        $num = $auto_firefox_num;
+                    } else {
+                        $app = "dolphin";
+                        $num = $auto_dolphin_num;
+                    }
+                }
+                $windowkey = "${app}_auto_".sprintf("%04d", $num);
+            }
+        } elsif (defined $item->{file}) {
+            $windowkey = "file_" . (++$auto_file_num);
+        } elsif (defined $item->{prog_name} or defined $item->{prog_path}) {
+            $windowkey = "prog_" . (++$auto_prog_num);
+        }
+
+        $windows{$windowkey} //= { items=>[] };
+        push @{ $windows{$windowkey}{items} }, $item;
+    } # for item
+
+  CHECK_EXISTING_WINDOWS: {
+        for my $windowkey (sort keys %windows) {
+            my $window = $windows{$windowkey};
+            my $re = $window->{items}[-1]{window_title_re};
+            if (!$re && $windowkey =~ /^dolphin/) {
+                my $url = $window->{items}[-1]{url} // $window->{items}[-1]{dir};
+                $re = qr/\Q$url\E — Dolphin$/;
+            }
+            if ($re) {
+                my $w = _find_window($re, $all_windows);
+                if ($w) {
+                    $window->{existing_window_id} = $w->{id};
+                    $window->{existing_window_kde_activity_name} = $w->{kde_activity_name};
+                }
+            }
+        }
+    }
+
+    \%windows;
 }
 
 $SPEC{list_desktop_workspace_items} = {
@@ -303,21 +398,9 @@ gen_modified_sub(
     summary => 'Open desktop workspace items',
     description => <<'MARKDOWN',
 
-Some notes:
-- if you do not use `new_browser_window`, then URLs will be opened in the
-  previous Firefox window which might be in another KDE activity.
 
 MARKDOWN
     add_args => {
-        new_browser_window => {
-            summary => 'When having to open one or more browser tabs, open a new browser window',
-            description => <<'MARKDOWN',
-
-Override's desktop workspace specification's `new_browser_window` property.
-
-MARKDOWN
-            schema => 'bool*',
-        },
         kde_activity => {
             summary => 'Switch to the specified KDE activity name',
             description => <<'MARKDOWN',
@@ -326,6 +409,10 @@ Override's desktop workspace specification's `kde_activity` property.
 
 MARKDOWN
             schema => 'str*',
+        },
+        reuse_window => {
+            summary => 'Do not open if existing window is detected',
+            schema => 'bool*',
         },
     },
     modify_meta => sub {
@@ -361,125 +448,155 @@ MARKDOWN
             $obj = $res->[3]{'func.obj'};
         } # LIST_ITEMS
 
-        my @url_items;
-        my @file_items;
-        my @dir_items;
-        my @prog_items;
-      CATEGORIZE_ITEMS: {
-            for my $item (@$items) {
-                if (defined $item->{url}) {
-                    push @url_items, $item;
-                } elsif (defined $item->{file}) {
-                    push @file_items, $item;
-                } elsif (defined $item->{dir}) {
-                    push @dir_items, $item;
-                } elsif (defined $item->{prog_name} or defined $item->{prog_path}) {
-                    push @prog_items, $item;
-                }
+        my $windows = _items2windows($items);
+
+      WINDOW:
+        for my $windowkey (sort keys %$windows) {
+            my $window = $windows->{$windowkey};
+            my $items = $window->{items};
+
+            my $target_kde_activity;
+          GET_TARGET_KDE_ACTIVITY: {
+                my $item_kde_activity = first {defined $_->{kde_activity}} @$items; $item_kde_activity = $item_kde_activity->{kde_activity} if defined $item_kde_activity;
+                $target_kde_activity = $args{kde_activity} // $item_kde_activity // $obj->{kde_activity};
             }
-        } # CATEGORIZE_ITEMS
 
-      SWITCH_KDE_ACTIVITY: {
-            my $kde_activity = $args{kde_activity} // $obj->{kde_activity};
-            last unless defined $kde_activity;
-            require Desktop::KDEActivity::Util;
-            my $res = Desktop::KDEActivity::Util::set_current_kde_activity(
-                name => $kde_activity);
-            return [500, "Can't set current KDE activity: $res->[0] - $res->[1]"]
-                unless $res->[0] == 200;
-        }
-
-      OPEN_URLS: {
-            last unless @url_items;
-
-            # open URLs as firefox tabs
-            my $new_browser_window = $args{new_browser_window} // $obj->{new_browser_window};
-
-            my $i = 0;
-            for my $item (@url_items) {
-                $i++;
-                my $url = $item->{url};
-
-                my @ff_args;
-                my $env;
-                if (($i == 1 && $new_browser_window) || $item->{new_browser_window}) {
-                    push @ff_args, "--new-window", $url;
-                } else {
-                    push @ff_args, $url;
+          REUSE_EXISTING_WINDOW: {
+                last unless $window->{existing_window_id};
+                log_trace "Window for items %s already exists (ID %s)%s",
+                    $items,
+                    $window->{existing_window_id},
+                    $args{reuse_window} ? ", reusing it" : "";
+                last unless $args{reuse_window};
+                #log_error "D: target kde activity: %s, existing window's kde activity: %s", $target_kde_activity, $window->{existing_window_kde_activity_name};
+                if (defined($window->{existing_window_kde_activity_name}) &&
+                    defined($target_kde_activity) &&
+                    $window->{existing_window_kde_activity_name} ne $target_kde_activity) {
+                    log_trace "%sMoving window ID %s from KDE activity %s to KDE activity %s ...",
+                        $args{-dry_run} ? "[DRY-RUN]" : "",
+                        $window->{existing_window_id},
+                        $window->{existing_window_kde_activity_name},
+                        $target_kde_activity;
+                    last if $args{-dry_run};
+                    require Desktop::XWindowManager::Util;
+                    my $res = Desktop::XWindowManager::Util::move_windows_to_kde_activity(
+                        id => $window->{existing_window_id},
+                        activity_name => $target_kde_activity,
+                    );
+                    log_warn "Can't move window ID %s to KDE activity %s: %d - %s",
+                        $window->{existing_window_id},
+                        $target_kde_activity,
+                        $res->[0], $res->[1]
+                        unless $res->[0] == 200;
                 }
+                next WINDOW;
+            } # REUSE_EXISTING_WINDOW
 
-                if (defined $item->{firefox_container}) {
-                    $env->{FIREFOX_CONTAINER} = $item->{firefox_container};
+          SWITCH_KDE_ACTIVITY: {
+                last unless defined $target_kde_activity;
+                log_trace "%sSetting KDE activity to %s ...",
+                    $args{-dry_run} ? "[DRY-RUN]" : "",
+                    $target_kde_activity;
+                last if $args{-dry_run};
+                require Desktop::KDEActivity::Util;
+                my $res = Desktop::KDEActivity::Util::set_current_kde_activity(
+                    name => $target_kde_activity);
+                return [500, "Can't set current KDE activity: $res->[0] - $res->[1]"]
+                    unless $res->[0] == 200;
+            }
+
+            if ($windowkey =~ /^firefox/) {
+
+                my $i = 0;
+                for my $item (@$items) {
+                    $i++;
+                    my $url = $item->{url};
+
+                    my @ff_args;
+                    my $env;
+                    if ($i == 1) {
+                        push @ff_args, "--new-window", $url;
+                    } else {
+                        push @ff_args, $url;
+                    }
+
+                    if (defined $item->{firefox_container}) {
+                        $env->{FIREFOX_CONTAINER} = $item->{firefox_container};
+                    }
+
+                    log_trace "%sOpening URL %s in firefox (window %s) tab [#%d/%d]%s ...",
+                        $dry_run ? "[DRY-RUN]" : "",
+                        $url,
+                        $windowkey,
+                        $i,
+                        scalar(@$items),
+                        (defined $item->{firefox_container} ? " container $item->{firefox_container}" : "");
+                    unless ($dry_run) {
+                        IPC::System::Options::system(
+                            {env=>$env, log=>1},
+                            "firefox-container", @ff_args);
+                    }
+                } # for item
+
+            } elsif ($windowkey =~ /^file_/) {
+
+                my $i = 0;
+                for my $item (@$items) {
+                    $i++;
+                    my $file = $item->{file};
+                    log_trace "%sOpening file %s (window %s) ...",
+                        $dry_run ? "[DRY-RUN]" : "",
+                        $file,
+                        $windowkey;
+                    unless ($dry_run) {
+                        Desktop::Open::open_desktop($file);
+                    }
+                } # for item
+
+            } elsif ($windowkey =~ /^dolphin_/) {
+
+                my $i = 0;
+                my @urls;
+                for my $item (@$items) {
+                    $i++;
+                    my $url = $item->{dir} // $item->{url};
+                    push @urls, $url;
                 }
-
-                log_trace "%sOpening URL in firefox tab [%d/%d]: %s (%s) ...",
+                log_trace "%sOpening dirs %s (window %s) ...",
                     $dry_run ? "[DRY-RUN]" : "",
-                    $i, scalar(@url_items), $url,
-                    (defined $item->{firefox_container} ? "container=$item->{firefox_container}" : "");
-                unless ($dry_run) {
-                    IPC::System::Options::system(
-                        {env=>$env, log=>1},
-                        "firefox-container", @ff_args);
-                }
-            }
-        } # OPEN_URLS
-
-      OPEN_FILES: {
-            last unless @file_items;
-            require Desktop::Open;
-
-            my $i = 0;
-            for my $item (@file_items) {
-                $i++;
-                my $file = $item->{file};
-                log_trace "%sOpening file [%d/%d] %s ...",
-                    $dry_run ? "[DRY-RUN]" : "",
-                    $i, scalar(@file_items), $file;
-                unless ($dry_run) {
-                    Desktop::Open::open_desktop($file);
-                }
-            }
-        } # OPEN_FILES
-
-      OPEN_DIRS: {
-            # we currently use dolphin to open dirs
-            last unless @dir_items;
-
-            my $i = 0;
-            my @dirs;
-            for my $item (@dir_items) {
-                $i++;
-                my $dir = $item->{dir};
-                push @dirs, $dir;
-            }
-            log_trace "%sOpening dirs %s ...",
-                $dry_run ? "[DRY-RUN]" : "",
-                \@dirs;
-            unless ($dry_run) {
-                IPC::System::Options::system(
-                    {log=>1, shell=>1},
-                    "dolphin", "--new-window", @dirs, \"&");
-            }
-        } # OPEN_DIRS
-
-      OPEN_PROG: {
-            last unless @prog_items;
-
-            my $i = 0;
-            for my $item (@prog_items) {
-                $i++;
-                my $prog = $item->{prog_name} // $item->{prog_path};
-                log_trace "%sOpening program [%d/%d] %s ...",
-                    $dry_run ? "[DRY-RUN]" : "",
-                    $i, scalar(@prog_items), $prog;
+                    \@urls,
+                    $windowkey;
                 unless ($dry_run) {
                     IPC::System::Options::system(
                         {log=>1, shell=>1},
-                        $prog, ($item->{prog_args} ? @{ $item->{prog_args} } : ()),
-                        \"&");
+                        "dolphin", "--new-window", @urls, \"&");
                 }
+
+            } elsif ($windowkey =~ /^prog_/) {
+
+                my $i = 0;
+                for my $item (@$items) {
+                    $i++;
+                    my $prog = $item->{prog_name} // $item->{prog_path};
+                    log_trace "%sOpening program %s (window %s) ...",
+                        $dry_run ? "[DRY-RUN]" : "",
+                        $prog,
+                        $windowkey;
+                    unless ($dry_run) {
+                        IPC::System::Options::system(
+                            {log=>1, shell=>1},
+                            $prog, ($item->{prog_args} ? @{ $item->{prog_args} } : ()),
+                            \"&");
+                    }
+                }
+
+            } else {
+
+                die "BUG: Unknown window type $windowkey";
+
             }
-        } # OPEN_PROGS
+
+        } # for window
 
         [200];
     },
@@ -500,7 +617,7 @@ Desktop::Workspace::Util - Utilities related to DesktopWorkspace
 
 =head1 VERSION
 
-This document describes version 0.002 of Desktop::Workspace::Util (from Perl distribution Desktop-Workspace-Util), released on 2026-03-29.
+This document describes version 0.003 of Desktop::Workspace::Util (from Perl distribution Desktop-Workspace-Util), released on 2026-04-15.
 
 =head1 SYNOPSIS
 
@@ -669,10 +786,6 @@ Usage:
 
 Open desktop workspace items.
 
-Some notes:
-- if you do not use C<new_browser_window>, then URLs will be opened in the
-  previous Firefox window which might be in another KDE activity.
-
 This function is not exported by default, but exportable.
 
 This function supports dry-run operation.
@@ -736,12 +849,6 @@ Override's desktop workspace specification's C<kde_activity> property.
 
 (No description)
 
-=item * B<new_browser_window> => I<bool>
-
-When having to open one or more browser tabs, open a new browser window.
-
-Override's desktop workspace specification's C<new_browser_window> property.
-
 =item * B<ns_prefixes> => I<array[perl::modname|str]> (default: ["DesktopWorkspace",""])
 
 List of namespaces to search for a Desktop Workspace specification modules.
@@ -749,6 +856,10 @@ List of namespaces to search for a Desktop Workspace specification modules.
 =item * B<query> => I<array[str]>
 
 (No description)
+
+=item * B<reuse_window> => I<bool>
+
+Do not open if existing window is detected.
 
 =item * B<shuffle> => I<bool>
 
@@ -793,6 +904,12 @@ L<DesktopWorkspace>
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@gmail.com>
 
 =head1 CONTRIBUTING
 

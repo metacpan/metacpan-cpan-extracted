@@ -6,10 +6,10 @@ use Stats::LikeR;
 use Test::Exception;
 use Test::LeakTrace 'no_leaks_ok';
 
-# NOTE: delimited (csv/tsv) output now defaults row.names ON, matching R's
-# write.table() and the LaTeX path. A call that omits row.names gains a leading
+# NOTE: row.names defaults OFF, in every format. A call that omits it writes the
+# data columns and nothing else. row.names => 1 opts in and prepends a leading
 # empty header cell plus a per-row label column (HoH -> outer key, otherwise
-# 1..n). row.names => 0 opts back out; row.names => 'col' promotes a column.
+# 1..n); row.names => 'col' promotes an existing column to the labels.
 
 sub file2string {
 	my $file = shift;
@@ -83,12 +83,12 @@ no_leaks_ok {
 	};
 } 'write_table: no memory leaks with hash-of-hash input' unless $INC{'Devel/Cover.pm'};
 #---------
-# No row.names passed: the default is now ON, so a numeric label column is
-# prepended (leading empty header cell + 1..n). undef.val still fills gaps.
+# No row.names passed: the default is OFF, so there is no label column and no
+# leading empty header cell. undef.val still fills the gaps.
 write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan');
 $str = file2string('/tmp/undef.val.tsv');
-$expected = "\tr1\tr2\tr3\n1\t42\t99\tnan\n2\thello,world\tnan\t\"tab\tin\"\n3\tnan\t\"quote\"\"here\"\tnan\n4\tnan\tnan\tnan\n";
-is($str, $expected, 'undefined values are switched to nan (default numeric row labels present)');
+$expected = "r1\tr2\tr3\n42\t99\tnan\nhello,world\tnan\t\"tab\tin\"\nnan\t\"quote\"\"here\"\tnan\nnan\tnan\tnan\n";
+is($str, $expected, 'undefined values are switched to nan (no row labels by default)');
 
 # ==============================================================================
 # 4. write_table: Nested Reference Memory Leaks
@@ -109,6 +109,7 @@ no_leaks_ok {
       );
   };
 } 'write_table: No memory leaks when encountering illegal nested references' unless $INC{'Devel/Cover.pm'};
+unlink 'test_output_dummy.csv';
 # test write_table with implicit separator from filename
 my %hoa = (
 	a => [1..3],
@@ -190,26 +191,34 @@ my @aoh  = ( { 'x' => 1, 'y' => 2 }, { 'x' => 3, 'y' => 4 } );
 my %flat = ( 'a' => 1, 'b' => 2, 'c' => 3 );
 
 # ==============================================================================
-# 0. Default row.names is ON for delimited output (R-compatible write.table).
-#    Omitting row.names now yields the same output as row.names => 1: a leading
-#    empty header cell plus a per-row label column. Labels are the outer key for
-#    HoH and 1..n for every other shape. row.names => 0 opts back out.
+# 0. Default row.names is OFF, for every shape and every format. Omitting it
+#    writes the data columns and nothing else -- no label column, and no empty
+#    leading header cell. row.names => 1 opts in; the labels are the outer key
+#    for a HoH and 1..n for every other shape. An explicit 0 is the default.
 # ==============================================================================
-wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n",
-	'default row.names on (HoA): numeric labels + empty header cell', \%hoa, 'undef.val' => 'NA' );
-wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n",
-	'default row.names on (HoH): outer key as label', \%hoh, 'undef.val' => 'NA' );
-wrote_ok( ",x,y\n1,1,2\n2,3,4\n",
-	'default row.names on (AoH): numeric labels', \@aoh, 'undef.val' => 'NA' );
-wrote_ok( ",a,b,c\n1,1,2,3\n",
-	'default row.names on (flat hash): single "1" label', \%flat );
-wrote_ok( ",k,v\n1,x,1\n2,y,2\n",
-	'default row.names on (AoA): numeric labels', [ [qw(k v)], [ 'x', 1 ], [ 'y', 2 ] ] );
-# The opt-out still wins and removes the empty header cell too.
-wrote_ok( "a,b,c\n1,2,3\n",
-	'row.names => 0 opts out of the new default (flat hash)', \%flat, 'row.names' => 0 );
 wrote_ok( "age,name\n30,Alice\n25,Bob\n",
-	'row.names => 0 opts out of the new default (HoA)', \%hoa, 'row.names' => 0, 'undef.val' => 'NA' );
+	'default row.names off (HoA): no label column', \%hoa, 'undef.val' => 'NA' );
+wrote_ok( "a,b\n1,2\n3,4\n",
+	'default row.names off (HoH): the outer key is not emitted', \%hoh, 'undef.val' => 'NA' );
+wrote_ok( "x,y\n1,2\n3,4\n",
+	'default row.names off (AoH): no label column', \@aoh, 'undef.val' => 'NA' );
+wrote_ok( "a,b,c\n1,2,3\n",
+	'default row.names off (flat hash): no label column', \%flat );
+wrote_ok( "k,v\nx,1\ny,2\n",
+	'default row.names off (AoA): no label column', [ [qw(k v)], [ 'x', 1 ], [ 'y', 2 ] ] );
+# The opt-in restores the label column, and the empty header cell it needs.
+wrote_ok( ",a,b,c\n1,1,2,3\n",
+	'row.names => 1 opts in (flat hash)', \%flat, 'row.names' => 1 );
+wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n",
+	'row.names => 1 opts in (HoH): outer key as label', \%hoh, 'row.names' => 1, 'undef.val' => 'NA' );
+wrote_ok( ",k,v\n1,x,1\n2,y,2\n",
+	'row.names => 1 opts in (AoA): numeric labels', [ [qw(k v)], [ 'x', 1 ], [ 'y', 2 ] ],
+	'row.names' => 1 );
+# An explicit 0 says exactly what the default already does.
+wrote_ok( "a,b,c\n1,2,3\n",
+	'row.names => 0 matches the default (flat hash)', \%flat, 'row.names' => 0 );
+wrote_ok( "age,name\n30,Alice\n25,Bob\n",
+	'row.names => 0 matches the default (HoA)', \%hoa, 'row.names' => 0, 'undef.val' => 'NA' );
 
 # 1. Hash of arrays: columns sorted, numeric row names by default.
 wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row names', \%hoa, 'row.names' => 1, 'undef.val' => 'NA' );
@@ -217,48 +226,48 @@ wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row n
 wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n", 'HoH: sorted rows and columns', \%hoh, 'row.names' => 1, 'undef.val' => 'NA' );
 # 3. Array of hashes: union of keys sorted, numeric row names.
 wrote_ok( ",x,y\n1,1,2\n2,3,4\n", 'AoH: union of keys, numeric row names', \@aoh, 'row.names' => 1, 'undef.val' => 'NA' );
-# 4. Flat hash: one row, columns sorted, numeric "1" label by default.
-wrote_ok( ",a,b,c\n1,1,2,3\n", 'flat hash: single row with default label', \%flat );
-# 5. col.names selects/orders columns (default numeric row label present).
-wrote_ok( ",name\n1,Alice\n2,Bob\n", 'col.names selects a subset in order', \%hoa, 'col.names' => [ 'name' ], 'undef.val' => 'NA' );
+# 4. Flat hash: one row, columns sorted, no label column by default.
+wrote_ok( "a,b,c\n1,2,3\n", 'flat hash: single row, unlabelled by default', \%flat );
+# 5. col.names selects/orders columns.
+wrote_ok( "name\nAlice\nBob\n", 'col.names selects a subset in order', \%hoa, 'col.names' => [ 'name' ], 'undef.val' => 'NA' );
 # 6. row.names => 0 turns off the row-name column.
 wrote_ok( "age,name\n30,Alice\n25,Bob\n", 'row.names => 0 omits the label column', \%hoa, 'row.names' => 0, 'undef.val' => 'NA' );
 # 7. row.names => 'col' uses that column as the labels and drops it from headers.
 wrote_ok( ",age\nAlice,30\nBob,25\n", "row.names => 'name' uses that column as labels", \%hoa, 'row.names' => 'name', 'undef.val' => 'NA' );
-# 8. Explicit separator (default numeric row label present).
-wrote_ok( ";a;b;c\n1;1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';', 'undef.val' => 'NA' );
+# 8. Explicit separator.
+wrote_ok( "a;b;c\n1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';', 'undef.val' => 'NA' );
 # 9. delim is an alias for sep.
-wrote_ok( "|a|b|c\n1|1|2|3\n", 'delim => "|" is honored', \%flat, 'delim' => '|', 'undef.val' => 'NA' );
+wrote_ok( "a|b|c\n1|2|3\n", 'delim => "|" is honored', \%flat, 'delim' => '|', 'undef.val' => 'NA' );
 # 10. undef.val fills missing cells (jagged hash of arrays).
 my %jag = ( 'a' => [ 1, 2 ], 'b' => [ 10 ] );
-wrote_ok( ",a,b\n1,1,10\n2,2,NA\n", 'missing cells default to NA', \%jag, 'undef.val' => 'NA' );
-wrote_ok( ",a,b\n1,1,10\n2,2,NULL\n", 'undef.val overrides the fill', \%jag, 'undef.val' => 'NULL' );
+wrote_ok( "a,b\n1,10\n2,NA\n", 'missing cells default to NA', \%jag, 'undef.val' => 'NA' );
+wrote_ok( "a,b\n1,10\n2,NULL\n", 'undef.val overrides the fill', \%jag, 'undef.val' => 'NULL' );
 # 11. CSV quoting: separators, quotes and newlines are quoted; quotes are doubled.
 my %quote = ( 'a' => [ 'x,y' ], 'b' => [ 'p"q' ], 'c' => [ "line1\nline2" ]);
-wrote_ok( qq{,a,b,c\n1,"x,y","p""q","line1\nline2"\n}, 'quoting: comma, quote, newline', \%quote, 'undef.val' => 'NA' );
+wrote_ok( qq{a,b,c\n"x,y","p""q","line1\nline2"\n}, 'quoting: comma, quote, newline', \%quote, 'undef.val' => 'NA' );
 # 12. Auto-detect tab separator from a .tsv extension.
 {
 	my $f = "$dir/auto.tsv";
 	write_table( \%flat, $f );
-	is( slurp($f), "\ta\tb\tc\n1\t1\t2\t3\n", '.tsv extension selects a tab separator' );
+	is( slurp($f), "a\tb\tc\n1\t2\t3\n", '.tsv extension selects a tab separator' );
 }
 # 13. Auto-detect comma from .csv (and an explicit sep still wins over the extension).
 {
 	my $f = "$dir/auto2.tsv";
 	write_table( \%flat, $f, 'sep' => ',' );
-	is( slurp($f), ",a,b,c\n1,1,2,3\n", 'explicit sep overrides the extension' );
+	is( slurp($f), "a,b,c\n1,2,3\n", 'explicit sep overrides the extension' );
 }
 # 14. Fully-named calling style (exercises the positional/named disambiguation).
 {
 	my $f = path();
 	write_table( 'data' => \%flat, 'file' => $f );
-	is( slurp($f), ",a,b,c\n1,1,2,3\n", 'data => ..., file => ... works' );
+	is( slurp($f), "a,b,c\n1,2,3\n", 'data => ..., file => ... works' );
 }
 # 15. Positional data with a named file.
 {
 	my $f = path();
 	write_table( \%flat, 'file' => $f );
-	is( slurp($f), ",a,b,c\n1,1,2,3\n", 'positional data + named file works' );
+	is( slurp($f), "a,b,c\n1,2,3\n", 'positional data + named file works' );
 }
 # 16. Bad inputs die with a clear message.
 dies_ok { write_table() } 'no data dies';
@@ -281,7 +290,7 @@ lives_ok { write_table( \%flat, path(), 'col.names' => [], 'row.names' => 0 ) } 
 
 # 18. Default undef rendering is an empty field (no 'undef.val' supplied).
 my %u_jag = ( 'a' => [ 1, 2 ], 'b' => [ 10 ] );
-wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u_jag );
+wrote_ok( "a,b\n1,10\n2,\n", 'default undef renders as an empty field', \%u_jag );
 
 # 19. 'undef.val' => undef must behave like the default and emit NO
 #     "uninitialized value" warning (regression: SvPV_nolen on PL_sv_undef).
@@ -290,12 +299,12 @@ wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u
 	local $SIG{__WARN__} = sub { push @warnings, @_ };
 	my $f = path();
 	write_table( \%u_jag, $f, 'undef.val' => undef );
-	is( slurp($f), ",a,b\n1,1,10\n2,2,\n", "undef.val => undef behaves like the default" );
+	is( slurp($f), "a,b\n1,10\n2,\n", "undef.val => undef behaves like the default" );
 	is( scalar @warnings, 0, "undef.val => undef emits no warnings" )
 		or diag( join '', @warnings );
 	$f = path();
 	write_table( \%u_jag, $f, 'undef.val' => '' );
-	is( slurp($f), ",a,b\n1,1,10\n2,2,\n", "undef.val => '' is identical to the default" );
+	is( slurp($f), "a,b\n1,10\n2,\n", "undef.val => '' is identical to the default" );
 }
 
 # 20. Empty col.names per input shape. A HANG on any of these is the
@@ -356,8 +365,8 @@ wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u
 }
 
 # 24. Quoting corners.
-# Carriage return forces quoting just like newline (default numeric label present).
-wrote_ok( qq{,a\n1,"x\ry"\n}, 'embedded \r is quoted', { 'a' => [ "x\ry" ] } );
+# Carriage return forces quoting just like newline.
+wrote_ok( qq{a\n"x\ry"\n}, 'embedded \r is quoted', { 'a' => [ "x\ry" ] } );
 # A column NAME containing the separator is quoted in the header row.
 wrote_ok( qq{"a,b"\n1\n}, 'column name containing the separator is quoted',
 	{ 'a,b' => [ 1 ] }, 'row.names' => 0 );
@@ -365,9 +374,8 @@ wrote_ok( qq{"a,b"\n1\n}, 'column name containing the separator is quoted',
 wrote_ok( qq{a::b\n"x::y"::x:y\n}, 'multi-char separator: full match quotes, partial stays bare',
 	{ 'a' => [ 'x::y' ], 'b' => [ 'x:y' ] }, 'sep' => '::', 'row.names' => 0 );
 
-# 25. undef entries inside col.names are skipped, order otherwise preserved
-#     (default numeric row label present).
-wrote_ok( ",b,a\n1,2,1\n", 'undef entries in col.names are skipped',
+# 25. undef entries inside col.names are skipped, order otherwise preserved.
+wrote_ok( "b,a\n2,1\n", 'undef entries in col.names are skipped',
 	{ 'a' => [ 1 ], 'b' => [ 2 ] }, 'col.names' => [ 'b', undef, 'a' ] );
 
 # 26. col.names naming a column absent from the data pads with undef.val
@@ -445,18 +453,17 @@ my $utf8_snow = "\xE2\x98\x83";	# U+2603 SNOWMAN
 wrote_ok( "greeting\n$utf8_cafe\n", 'UTF-8 bytes in a value are written verbatim',
 	{ 'greeting' => $utf8_cafe }, 'row.names' => 0 );
 
-# 32. A non-ASCII value that also contains the separator is quoted, bytes intact
-#     (default numeric row label present).
-wrote_ok( qq{,a\n1,"$utf8_cafe,$utf8_ole"\n},
+# 32. A non-ASCII value that also contains the separator is quoted, bytes intact.
+wrote_ok( qq{a\n"$utf8_cafe,$utf8_ole"\n},
 	'UTF-8 value containing the separator is quoted, bytes preserved',
 	{ 'a' => [ "$utf8_cafe,$utf8_ole" ] } );
 
 # 33. A wide-character (UTF-8-flagged, code point > 0xFF) VALUE is written as
-#     its UTF-8 bytes -- the value-side analogue of test 30's key check. HoH, so
-#     the default label is the outer key 'r1'.
+#     its UTF-8 bytes -- the value-side analogue of test 30's key check. Asked
+#     for with row.names => 1 so the outer key 'r1' is exercised as a label too.
 {
 	my $f = path();
-	write_table( { 'r1' => { 'a' => "\x{263a}" } }, $f );
+	write_table( { 'r1' => { 'a' => "\x{263a}" } }, $f, 'row.names' => 1 );
 	is( slurp($f), ",a\nr1,\x{e2}\x{98}\x{ba}\n",
 		'a wide-character value is written as its UTF-8 bytes on disk' );
 }

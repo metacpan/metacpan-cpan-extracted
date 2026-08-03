@@ -66,12 +66,30 @@ END_TEX
 }
 
 #--------
-# byte-exact output for the default (row.names ON): the same AoA now gains a
-# numeric row-label column, and tex.bold.1st.col bolds that label
+# byte-exact output for the default (row.names OFF): omitting row.names is the
+# same as saying row.names => 0, so this matches the block above exactly
 #--------
 {
 	my ($csv, $tex) = paths();
 	write_table([[qw(k v)], ['x', 1], ['y', 2]], $tex);
+	my $expected = <<'END_TEX';
+\begin{tabular}{|c|c|} \hline
+\textbf{k} & \textbf{v} \\ \hline
+\textbf{x} & 1\\
+\textbf{y} & 2\\
+\hline \end{tabular}
+END_TEX
+	is(body_after_provenance(slurp($tex)), $expected,
+		'default row.names off: AoA output is byte-exact with no label column');
+}
+
+#--------
+# byte-exact output with row.names => 1: the same AoA gains a numeric row-label
+# column, and tex.bold.1st.col bolds that label
+#--------
+{
+	my ($csv, $tex) = paths();
+	write_table([[qw(k v)], ['x', 1], ['y', 2]], $tex, 'row.names' => 1);
 	my $expected = <<'END_TEX';
 \begin{tabular}{|c|c|c|} \hline
 \textbf{} & \textbf{k} & \textbf{v} \\ \hline
@@ -80,7 +98,7 @@ END_TEX
 \hline \end{tabular}
 END_TEX
 	is(body_after_provenance(slurp($tex)), $expected,
-		'default row.names on: AoA output is byte-exact with a numeric label column');
+		'row.names => 1: AoA output is byte-exact with a numeric label column');
 }
 
 #--------
@@ -275,22 +293,36 @@ END_TEX
 	has(slurp($tex), spec(2), 'AoH: 2 columns');
 }
 {
-	# tex now defaults row.names ON (R-compatible write.table): a leading label
-	# column is added when the caller does not pass row.names.
+	# row.names defaults OFF for tex as for everything else: no label column
+	# unless the caller asks. (The first data cell is still bolded by
+	# tex.bold.1st.col, so match the whole row to tell a label from a value.)
 	my ($csv, $tex) = paths();
 	write_table({ a => 1, b => 2, c => 3 }, $tex);
 	my $body = body_after_provenance(slurp($tex));
-	has($body, spec(4), 'row.names default on (tex): label col + a,b,c = 4 columns');
-	has($body, '\textbf{} &', 'row.names default on (tex): empty leading header cell');
-	has($body, '\textbf{1} &', 'row.names default on (tex): flat-hash label is 1');
+	has($body, spec(3), 'row.names default off (tex): a,b,c = 3 columns');
+	lacks($body, '\textbf{} &', 'row.names default off (tex): no empty leading header cell');
+	has($body, '\textbf{a} & \textbf{b} & \textbf{c}',
+		'row.names default off (tex): header is the data columns alone');
+	has($body, '\textbf{1} & 2 & 3\\\\',
+		'row.names default off (tex): the row is the values, with no label');
 }
 {
-	# an explicit row.names => 0 still wins over the tex default
+	# row.names => 1 opts the label column back in
+	my ($csv, $tex) = paths();
+	write_table({ a => 1, b => 2, c => 3 }, $tex, 'row.names' => 1);
+	my $body = body_after_provenance(slurp($tex));
+	has($body, spec(4), 'row.names => 1 (tex): label col + a,b,c = 4 columns');
+	has($body, '\textbf{} &', 'row.names => 1 (tex): empty leading header cell');
+	has($body, '\textbf{1} & 1 & 2 & 3\\\\',
+		'row.names => 1 (tex): flat-hash label is 1, ahead of the values');
+}
+{
+	# an explicit row.names => 0 says what the default already does
 	my ($csv, $tex) = paths();
 	write_table({ a => 1, b => 2, c => 3 }, $tex, 'row.names' => 0);
 	my $body = body_after_provenance(slurp($tex));
-	has($body, spec(3), 'explicit row.names => 0 wins: no label column');
-	lacks($body, '\textbf{} &', 'explicit row.names => 0 wins: no empty leading header');
+	has($body, spec(3), 'explicit row.names => 0: no label column');
+	lacks($body, '\textbf{} &', 'explicit row.names => 0: no empty leading header');
 }
 
 #--------

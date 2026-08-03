@@ -19,56 +19,21 @@ the spirit of R's `?function` at the prompt. It takes the name three ways:
 
     perl -MStats::LikeR -e 'h(*agg)'   # straight from the shell
 
-`h` works for every function in the distribution, the XS ones and the pure Perl
-ones alike, because it looks the name up in the module's own POD rather than
-watching an argument list. That POD is generated from this file, so what `h`
+`h` works for every function in the distribution looking the name up in the module's own POD rather than watching an argument list. That POD is generated from this file, so what `h`
 prints is what you are reading.
 
 Note that `h(bedroc)`, with no quotes and no sigil, cannot be made to work:
 every function here is exported, so Perl parses the bareword as a call to
 `bedroc()` before `h` is ever reached. Use one of the three forms above.
 
-## The `'?'` and `'h'` arguments
-
-The **pure Perl** functions additionally accept `'?'` or `'h'` in place of their
-arguments. That prints the same text and then **dies**, because a bare `'h'`
-where an argument was expected might have been meant as data, so returning a
-result would be a guess:
-
-    agg('h');            # prints the agg section, then dies
-    read_table('?');     # likewise
-    view($df, n => 'h'); # recognized anywhere in the argument list
-
-The functions that take it are the ones implemented in `lib/Stats/LikeR.pm`:
-`age_standardize`, `agg`, `aoh2hoh`, `assign`, `bfill`, `chunk`, `cohen_d`,
-`col`, `colnames`, `concat`, `cramers_v`, `drop_cols`, `drop_duplicates`,
-`dropna`, `eta_squared`, `ffill`, `fillna`, `hosmer_lemeshow`, `interpolate`,
-`map_cell`, `melt`, `ncol`, `nrow`, `pivot_table`, `qcut`, `read_table`,
-`rename_cols`, `rownames`, `select_cols`, `smd`, `summary`, `table_one`,
-`TukeyHSD`, `view`, `vif`. The XS functions deliberately do **not** do this —
-see below.
-
-Only a defined, non-reference argument of exactly one character can trigger it.
-Data frames, code references, `col()` objects, `undef` and plain numbers are all
-safe, as are longer strings such as `'help'` or `'hour'`.
-
-What it cannot tell apart is a column, file or option value that really is the
-bare string `'h'` or `'?'`: `col('h')` asks for help, not for a column named
-`h`. Set `$Stats::LikeR::HELP = 0` for code that has to pass such a value —
-`h()` is unaffected either way:
-
-    {
-        local $Stats::LikeR::HELP = 0;
-        my $adults = filter($df, col('h') > 3);   # a predicate on column h
-    }
-
-This is exactly why the XS functions don't read their arguments for help:
-`vals($df, 'h')`, `csort($df, 'h')` and `group_by($df, 'h', ...)` are ordinary
-calls naming a column, and `h('vals')` is already unambiguous.
+`h` is the only way to ask. No function reads its own argument list for a help
+flag, so nothing here has to guess whether you meant data or a question: a
+column, file or option value that really is the bare string `'h'` or `'?'` is
+just a value. `vals($df, 'h')`, `csort($df, 'h')`, `col('h') > 3` and
+`read_table('?')` all mean exactly what they say, and every function — XS or
+pure Perl — is documented the same way, through `h('name')`.
 
 # Functions/Subroutines
-
----
 
 ## add_data
 
@@ -507,6 +472,79 @@ formula matters, and both share this module's `pf`, so p-values agree with
 `anova(m1, m2)`, giving an F/LRT between them — a capability neither this
 `anova` nor `aov` currently provides. Ask if that would be useful.)*
 
+## aoh2h
+
+Fold a two-column **array-of-hashes** back down into a plain hash. This is the
+reverse of [`h2aoh`](#h2aoh), and the two are exact opposites under their
+defaults.
+
+    my $h = aoh2h($aoh);
+    my $h = aoh2h($aoh, var_name => 'gene', value_name => 'n');
+
+One column supplies the keys, the other the values; every other column in the
+row is ignored. R spells this `tibble::deframe()`; pandas spells it
+`df.set_index('k')['v'].to_dict()`.
+
+### Arguments
+
+`$aoh` — an array ref of hash refs. Required. Every row has to be a hash ref
+carrying both named columns.
+
+Everything after it is `name => value` pairs:
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `var_name` | `variable` | The column holding the keys. |
+| `value_name` | `value` | The column holding the values. |
+| `duplicates` | `die` | What to do when two rows carry the same key: `die` is fatal, `first` keeps the earliest row, `last` keeps the latest. |
+
+`var_name` and `value_name` must differ.
+
+### Returns
+
+A hash ref mapping each row's `var_name` cell to its `value_name` cell. An
+empty array ref gives back `{}`.
+
+Values are assigned across, so a value that is itself a reference is shared
+with the input rather than cloned — the same shallow copy `aoh2hoa` makes.
+
+### Example
+
+    my $aoh = [
+        { gene => 'TP53',  n => 12 },
+        { gene => 'BRCA1', n =>  7 },
+    ];
+    my $h = aoh2h($aoh, var_name => 'gene', value_name => 'n');
+    # { TP53 => 12, BRCA1 => 7 }
+
+    # keep the last of a repeated key instead of dying
+    my $last = aoh2h([ { variable => 'a', value => 1 },
+                       { variable => 'a', value => 9 } ], duplicates => 'last');
+    # { a => 9 }
+
+### Round trip
+
+    is_deeply( aoh2h( h2aoh(\%h) ), \%h );   # true for any flat hash
+
+The one thing that does not survive the trip is the *type* of a key: Perl hash
+keys are strings, so a numeric key comes back as the string that prints the
+same way.
+
+### Errors
+
+`aoh2h` dies when the first argument is undefined or not an array ref, when the
+options are not `name => value` pairs, when an option is unknown, when
+`var_name` equals `value_name`, when `duplicates` is not one of the three
+allowed words, when a row is not a hash ref, when a row is missing either named
+column, when a row's key cell is `undef`, or — under the default
+`duplicates => 'die'` — when two rows share a key. Every message names the
+offending row by index.
+
+### See also
+
+[`h2aoh`](#h2aoh) is the reverse. [`aoh2hoh`](#aoh2hoh) also indexes rows by a
+column, but keeps the whole row as the value instead of one cell.
+
 ## aoh2hoa
 
 `aoh2hoa($aoh)` — transpose an **array-of-hashes** (row-major) into a **hash-of-arrays** (column-major).
@@ -915,8 +953,9 @@ machine precision in a single line.
     # string labels
     bedroc(\@scores, ['case','ctrl',...], positive => 'case');
 
-Calling `bedroc` with a single argument of `'h'` or `'?'` prints this section to
-`STDOUT` (in the spirit of R's `?function`) and dies. See
+Call `h('bedroc')` for this section at the prompt. `bedroc` also carries its own
+short usage summary in XS, printed by `bedroc('h')`, `bedroc('H')` or
+`bedroc('?')`; it is the one function that reads its arguments that way. See
 [Getting help](#getting-help).
 
 ## bfill
@@ -2286,6 +2325,8 @@ Predicates compose with bitwise `&` (and), `|` (or), and `!` (not):
 
 Comparison operators bind more tightly than `&` and `|`, so `(col('a') > 4) & (col('b') < 2)` is parsed correctly, but the parentheses are recommended for readability.
 
+A `col()` expression is also the quick way to say it: `filter` compiles the whole expression once and tests every row in C, without building a row hash or calling into Perl at all, which on a large frame is several times faster than the equivalent `sub`. What `col()` cannot express — a `->match` regex, an operand that is an object — is evaluated the same way a `sub` is, one call per row.
+
 > Note: `col('age') > 32` works because `col('age')` is an object whose `>` is overloaded. A **bare string** cannot do this — `'age' > 32` is computed by Perl to a plain boolean (the string numifies to 0) before `filter` is ever called, so the column name is lost. Always wrap the column in `col(...)`.
 
 > `col()` addresses **columns only** — it has no handle on a HoH's row name (the outer key). It also cannot express a regex match: there is no `=~` operator to overload, so `col('name') =~ /re/` runs the match immediately on the stringified object and never reaches `filter`. For either case, use the code-reference form below.
@@ -2304,7 +2345,7 @@ Return a true value to keep the row.
     filter($df, sub { $_->{age} % 2 == 0 });            # things col() has no operator for
     filter($df, sub { $_[0]{score} > $_[0]{threshold} });
 
-For a HoA, each row is assembled into a temporary `{ column => value, ... }` hash before the sub (or the `col()` test) is called, so the same `$_->{column}` syntax works regardless of the input shape.
+For a HoA there are no row hashes to hand over, so the sub is given a `{ column => value, ... }` hash built for it, and the same `$_->{column}` syntax works regardless of the input shape. That hash is reused from row to row for as long as the sub only reads it; keeping the row (or a reference to one of its cells), or adding a key to it, makes `filter` start a fresh one, so a row you hold on to is always yours alone. A `col()` predicate needs no row hash at all.
 
 #### Filtering on the row name (`$_[1]`)
 
@@ -2658,9 +2699,10 @@ The name whose documentation was printed, so `h` is usable in a pipeline:
 
     my @shown = map { h($_) } qw(auc auroc roc);
 
-Unlike the [`'?'` and `'h'` arguments](#the--and-h-arguments), `h` does **not**
-die. You asked for it by name, so there is nothing ambiguous to protect you
-from.
+`h` does **not** die, and it is the only route to a function's documentation:
+no function reads its own arguments for a help flag, so a column or file really
+named `'h'` is never mistaken for a question. See
+[Getting help](#getting-help).
 
 ### Where the text comes from
 
@@ -2672,6 +2714,85 @@ list of functions that do have one.
 Output is wrapped to `$ENV{COLUMNS}` when that is set (clamped to 40-100
 columns), and to 80 otherwise. Parameter tables are rendered as aligned plain
 text.
+
+## h2aoh
+
+Unfold a plain hash into a two-column **array-of-hashes**, one row per pair.
+
+    my $aoh = h2aoh(\%h);
+    my $aoh = h2aoh(\%h, var_name => 'gene', value_name => 'n');
+
+A flat hash is a two-column table that has been folded shut: every pair is a
+row, the key in one cell and the value in the other. `h2aoh` unfolds it, which
+turns a result that no frame function will accept — `value_counts` hands one
+back — into a data frame that all of them will:
+
+    my $counts = value_counts($titanic, 'Pclass');   # { 1 => 216, 2 => 184, 3 => 491 }
+    my $tbl    = h2aoh($counts, var_name => 'Pclass', value_name => 'n',
+                       sort => 'value');
+    view($tbl);
+    # AoH: 3 rows x 2 cols   (showing 3)
+    #    Pclass    n
+    # 0       3  491
+    # 1       1  216
+    # 2       2  184
+
+R spells this `tibble::enframe()`; base R gets close with
+`stack()` or `data.frame(name = names(x), value = unname(x))`. In pandas it is
+`pd.Series(d).rename_axis('k').reset_index(name = 'v')`, or the shorter
+`pd.DataFrame(d.items(), columns = ['k', 'v'])`.
+
+### Arguments
+
+`$h` — a hash ref whose values are plain scalars. Required.
+
+Everything after it is `name => value` pairs:
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `var_name` | `variable` | Name of the column that receives the hash keys. |
+| `value_name` | `value` | Name of the column that receives the hash values. |
+| `sort` | `key` | Row order — see below. |
+
+`var_name` and `value_name` must differ. They are the same two option names
+[`melt`](#melt) uses, because they name the same two columns.
+
+### Row order
+
+Hash iteration order is not reproducible between runs, so the rows are sorted
+by default rather than left to chance.
+
+| `sort` | Order |
+| --- | --- |
+| `key` | By key. Numerically when every key looks like a number, alphabetically otherwise — the rule [`agg`](#agg) uses for its group keys. This is the default. |
+| `value` | By value: largest first when every defined value is a number, which is the order `value_counts` output usually wants; alphabetically ascending when they are not. `undef` values sort last, and ties break on the key. |
+| `none` | Whatever order the hash iterates in. Cheapest, and the right choice when you are about to sort the result yourself with [`csort`](#csort). |
+
+### Returns
+
+An array ref of two-key hash refs, one per pair:
+
+    h2aoh({ a => 1, b => 2 });
+    # [ { variable => 'a', value => 1 }, { variable => 'b', value => 2 } ]
+
+An empty hash gives back `[]`. `undef` values are carried through as `undef`.
+
+### Errors
+
+`h2aoh` dies when the argument is undefined or not a hash ref, when the options
+are not `name => value` pairs, when an option is unknown, when `var_name`
+equals `value_name`, or when `sort` is not one of the three allowed words.
+
+It also dies when any value is a **reference**, naming the key and pointing at
+the converter that was probably meant: a hash of array refs is
+[`hoa2aoh`](#hoa2aoh)'s job, and a hash of hash refs is
+[`hoh2hoa`](#hoh2hoa)'s. Stringifying `ARRAY(0x…)` into a cell would be the
+only other option, and it is never what anyone wanted.
+
+### See also
+
+[`aoh2h`](#aoh2h) is the reverse. [`melt`](#melt) does the same folding-out for
+a frame that already has more than two columns.
 
 ## hoa2aoh
 
@@ -3668,9 +3789,79 @@ the factor's *name* becomes the top-level key:
 
 ## p_adjust
 
-Returns array of false-discovery-rate-corrected p-values, where methods available are "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"
+Corrects a family of p-values for multiple testing, like R's `p.adjust`. The
+methods available are `holm` (the default), `hochberg`, `hommel`,
+`bonferroni`, `BH`, `BY`, `fdr` (a synonym for `BH`) and `none`. Method names
+are case-insensitive, and the full `Benjamini-Hochberg` /
+`Benjamini-Yekutieli` spellings are accepted.
 
-    my @q = p_adjust(\@pvalues, $method);
+    my @q = p_adjust(\@pvalues, $method);          # array in, array out
+    my $q = p_adjust($df, $method, columns => ..); # a frame in, a frame out
+
+Given a flat arrayref of p-values it returns the adjusted values as a list, in
+the order they were given. Given a data frame — AoA, AoH, HoA or HoH — it
+returns a **new** frame of the same kind, with the same rows, columns and row
+labels, holding the adjusted values in the places the raw ones came from. The
+input frame is never modified.
+
+Every p-value in the frame is corrected as **one family**, whichever shape it
+arrived in, so the family size is the number of p-value cells and not the
+number of rows or columns.
+
+    my $df = [ { gene => 'BRCA1', p_value => 0.010 },
+               { gene => 'TP53',  p_value => 0.040 },
+               { gene => 'EGFR',  p_value => 0.030 },
+               { gene => 'KRAS',  p_value => 0.200 } ];
+    my $q = p_adjust($df, 'BH', columns => 'p_value');
+    # [ { gene => 'BRCA1', p_value => 0.04      },
+    #   { gene => 'TP53',  p_value => 0.0533333 },
+    #   { gene => 'EGFR',  p_value => 0.0533333 },
+    #   { gene => 'KRAS',  p_value => 0.20      } ]
+
+### columns
+
+`columns` (also spelled `column`, `cols` or `col`) names the columns that hold
+p-values; everything else is copied through untouched. It takes one name or an
+arrayref of names, which are column names for AoH, HoA and HoH and 0-based
+positions for AoA.
+
+    p_adjust($aoh, 'BH', columns => 'p_value');
+    p_adjust($hoh, 'BH', columns => [ 'p_raw', 'p_trend' ]);
+    p_adjust($aoa, 'BH', columns => 1);              # the second column
+    p_adjust($hoa, columns => 'p_value');            # method defaults to holm
+
+Note the shape each name refers to: in a HoA a column *is* an outer key, while
+in a HoH the outer keys are row labels and the names are the inner keys.
+
+Without `columns`, every cell in the frame is taken to be a p-value. That is
+what you want for a frame that is nothing but p-values, and an error for one
+with a label column in it — a cell that is neither a number nor `undef` dies
+with a message pointing at `columns`. A name that matches no column in the
+frame also dies, rather than quietly correcting nothing.
+
+`columns` applies only to frames; passing it with a flat list of p-values is an
+error.
+
+### Method may be positional or named
+
+The method still reads positionally, as it always has, and may also be given as
+a `method => ...` pair. These three are the same call:
+
+    p_adjust($df, 'BH', columns => 'p_value');
+    p_adjust($df, method => 'BH', columns => 'p_value');
+    p_adjust($df, 'BH');                    # if every column holds p-values
+
+### Ordering and other details
+
+- An `undef` cell counts toward the family as a p-value of 1, which is how the
+  flat form has always treated it, and comes back adjusted rather than as
+  `undef`.
+- Within a frame the family is enumerated in a fixed order — rows in order and
+  then columns by name for an AoA, AoH or HoH; columns by name and then rows
+  for a HoA; row labels in sorted order for a HoH — so tied p-values break the
+  same way on every run instead of following hash iteration order.
+- An empty arrayref returns an empty list; an empty frame returns an empty
+  frame of the same kind.
 
 ## pivot_table
 
@@ -4020,60 +4211,107 @@ group) or as two scalars for a single sample.
 
 ## qcut
 
-Equal-frequency binning of a numeric column, which is the analog of pandas `qcut`.
-Where `cut` would slice a value range into equal-*width* intervals (and dump
-most of a skewed distribution into one bin), `qcut` chooses cutpoints so each
-bin holds roughly the same *number* of observations. This is the binning you
-usually want for ranked-list work: deciles, quartiles, top-5% tranches.
+Equal-frequency binning of a numeric column, which is the analog of pandas
+`qcut`. Equal-*width* binning slices the value range into intervals of the same
+size, which dumps most of a skewed distribution into one bin; `qcut` instead
+chooses cutpoints so each bin holds roughly the same *number* of observations.
+This is the binning you usually want for ranked-list work: deciles, quartiles,
+top-5% tranches.
 
-Cutpoints are computed by linear interpolation between order statistics, the
-same method as numpy/pandas, so results match `pandas.qcut` exactly. Bins are
-right-closed, `(a, b]`, with the lowest bin closed on both ends, `[a, b]`, so
-the minimum value is always included.
+Cutpoints are computed by linear interpolation between order statistics — the
+numpy/pandas default, and the same rule [`quantile`](#quantile) uses (R's
+Type 7) — so the edges match `pandas.qcut` exactly. Bins are right-closed,
+`(a, b]`, with the lowest bin closed on both ends, `[a, b]`, so the minimum
+value is always included.
 
 ### Signature
 
     qcut($data, $q, %options)
 
-  - `$data` — an array reference of numbers. `undef` entries are treated as
-    missing (NA): they are skipped when computing cutpoints and, when codes are
-    requested, come back as `undef` in their original positions.
+  - `$data` — an array reference of numbers, in any order. `qcut` sorts an
+    internal copy, so your array is left untouched and codes come back in the
+    order the values were given. Every defined value must be numeric: a
+    non-numeric string such as `'N/A'` is a fatal `isn't numeric` error rather
+    than a silent zero, so clean or `undef` such cells first (see
+    [`dropna`](#dropna), [`fillna`](#fillna)). At least two *distinct* values
+    are needed to form a bin.
   - `$q` — either a positive integer (the number of equal-frequency bins) or an
     array reference of probabilities in `[0, 1]` giving explicit cut
-    boundaries, e.g. `[0, 0.5, 0.95, 1]`.
+    boundaries, e.g. `[0, 0.5, 0.95, 1]`. An explicit vector is sorted for you,
+    and any probability outside `[0, 1]` is clamped into it rather than being an
+    error.
 
-For a usage reminder at the prompt, call `qcut('h')` (or `qcut('?')`); it prints
-this section and dies. Every function takes those two arguments the same way —
-see [Getting help](#getting-help).
+`undef` entries are treated as missing (NA): they are skipped when computing
+cutpoints and, when codes are requested, come back as `undef` in their original
+positions.
+
+Only the options listed below are read; a misspelled one is ignored rather than
+refused, so `code => 1` (no `s`) quietly hands back edges instead of codes.
+
+For a usage reminder at the prompt, call `h('qcut')`; it prints this section to
+`STDOUT` and returns. Every function is documented that way — see
+[Getting help](#getting-help).
 
 ### What it returns
 
-By default `qcut` returns the **edge vector as a flat list** — the cheap,
-common query — so call it in list context:
+| Options given | Returns |
+| --- | --- |
+| none | The edge vector, as a **flat list** of `$q + 1` numbers |
+| `codes => 1` | One array reference: the bin codes, parallel to `$data` |
+| `codes => 1, edges => 1` | Two references, `($codes, $edges)` |
+
+By default `qcut` returns the edge vector — the cheap, common query — so call it
+in list context:
 
     my @edges = qcut($data, 4);          # ($e0, $e1, $e2, $e3, $e4)
+
+In **scalar** context that flat list collapses to its element count, not to a
+reference: `my $e = qcut($data, 4)` sets `$e` to `5`. Assign to an array.
 
 The per-element bin assignment (the expensive part) is opt-in. Ask for it with
 `codes => 1` and you get an array reference parallel to `$data`:
 
     my $codes = qcut($data, 4, codes => 1);
 
-Ask for both in a single pass and you get two references, `($codes, $edges)`:
+Asking for codes turns the edge vector *off*, so
+`my ($codes, $edges) = qcut($data, 4, codes => 1)` leaves `$edges` undefined.
+Ask for both explicitly and they are computed in a single pass:
 
     my ($codes, $edges) = qcut($data, 4, codes => 1, edges => 1);
 
 ### Options
 
-  - `edges => 1` — include the edge vector. On by default; turned off
-    automatically when you request codes, so set it explicitly to get both.
-  - `codes => 1` — include the 0-based integer bin codes.
-  - `labels => [...]` — map the bin codes onto your own labels (implies
-    `codes => 1`). The list length must equal the number of bins.
-  - `labels => 'interval'` — label each element with its interval string,
-    e.g. `(3.25, 5.5]` (also implies codes).
-  - `duplicates => 'drop'` — if tied data produces non-unique cutpoints, merge
-    them into fewer bins instead of dying. The default, `'raise'`, throws an
-    error (as pandas does).
+| Option | Meaning |
+| --- | --- |
+| `edges => 1` | Include the edge vector. On by default, but turned off automatically when codes are requested, so pass it explicitly to get both. |
+| `edges => 0` | Suppress the edge vector. With no `codes`/`labels` there would be nothing left to return, which is a fatal error. |
+| `codes => 1` | Include the 0-based integer bin codes, one per element of `$data`. |
+| `labels => [...]` | Map the bin codes onto your own labels (implies `codes => 1`). The list length must equal the number of bins actually produced. |
+| `labels => 'interval'` | Label each element with its interval string, e.g. `(3.25, 5.5]` (also implies codes). |
+| `duplicates => 'raise'` | Die when tied data makes adjacent cutpoints equal. The default, and what pandas does. |
+| `duplicates => 'drop'` | Merge equal cutpoints into fewer bins instead of dying. |
+
+### How many bins, and how full
+
+The bin count is always `@$edges - 1`, and codes run from `0` to
+`@$edges - 2`. That equals `$q` (or `@$probs - 1`) *unless*
+`duplicates => 'drop'` merged tied cutpoints, in which case it is fewer — which
+is why a `labels` list has to match the bins you actually got, not the ones you
+asked for.
+
+Bin *sizes* are equal only when the data permits: the count has to divide
+evenly and no repeated value may straddle a cutpoint. Ties are placed by the
+right-closed rule, which is why `[1 .. 10]` into quartiles gives 3, 2, 2, 3
+rather than 2.5 each — the same split pandas makes. Count the codes to see what
+you got:
+
+    my $codes = qcut($data, 10, codes => 1);
+    my $sizes = value_counts($codes);        # { 0 => n0, 1 => n1, ... }
+
+If a probability vector omits `0` or `1`, the end bins still stretch over the
+whole range: a value below the first cutpoint lands in bin `0`, one above the
+last lands in the last bin. pandas returns NA for those, so include `0` and `1`
+unless the stretching is what you want.
 
 ### Examples
 
@@ -4082,11 +4320,13 @@ Quartile edges (the default). The cutpoints match pandas exactly:
     my @edges = qcut([1 .. 10], 4);
     # @edges = (1, 3.25, 5.5, 7.75, 10)
 
-Bin codes. They are 0-based; note the tie distribution matches pandas (inner
-bins take 2 here, outer bins 3):
+Bin codes. They are 0-based, and unsorted input is fine — codes come back in
+input order:
 
     my $codes = qcut([1 .. 10], 4, codes => 1);
     # $codes = [0, 0, 0, 1, 1, 2, 2, 3, 3, 3]
+    my $c2 = qcut([5, 1, 9, 3, 7], 4, codes => 1);
+    # $c2 = [1, 0, 3, 0, 2]
 
 Edges and codes together, computed in one pass:
 
@@ -4121,17 +4361,62 @@ straight through:
     # $codes->[2] is undef; the rest are binned as usual
 
 Tied data and `duplicates`. Heavy ties can make adjacent cutpoints equal; the
-default raises, `'drop'` merges:
+default raises, `'drop'` merges the empty quantile bands:
 
     my @tied = ((0) x 8, 1, 2, 3, 4);
-    qcut(\@tied, 4);                         # dies: bin edges are not unique
+    qcut(\@tied, 4);                          # dies: bin edges are not unique
     my @edges = qcut(\@tied, 4, duplicates => 'drop');
-    # fewer than 5 edges; the empty quantile bands are collapsed
+    # @edges = (0, 1.25, 4) -- 2 bins, not 4, so labels => [qw/a b/] here
 
-Get the documentation and stop:
+Binning a data-frame column, which is the usual reason to want codes.
+[`vals`](#vals) hands `qcut` the column and [`assign`](#assign) puts the result
+back as a new one:
 
-    qcut('h');   # prints this section to STDOUT, then dies
-    qcut('?');   # the same call
+    my $df = { id => [1 .. 10], ldl => [90, 120, 150, 200, 80, 110, 175, 160, 95, 130] };
+    my $q  = qcut(vals($df, 'ldl'), 4, labels => [qw/Q1 Q2 Q3 Q4/]);
+    assign($df, ldl_quartile => $q);
+    # $df->{ldl_quartile} = [qw/Q1 Q2 Q3 Q4 Q1 Q2 Q4 Q4 Q1 Q3/]
+
+Get the documentation:
+
+    h('qcut');   # prints this section to STDOUT and returns
+
+### Errors
+
+`qcut` dies when `$data` is not an array reference, when `$q` is neither a
+positive integer nor an array reference, and when the options ask for nothing
+(`edges => 0` with no codes or labels). It dies with `no non-missing values`
+when every element is `undef`, and `need at least one data value` when `$data`
+is empty.
+
+Cutpoints are the other source of failures. `bin edges are not unique` means
+ties collapsed adjacent cutpoints under the default `duplicates => 'raise'`:
+either pass `duplicates => 'drop'` or ask for fewer bins. Even with `'drop'`,
+data holding a single distinct value cannot be binned at all and dies with
+`too few distinct values to form bins`. Finally, a `labels` arrayref whose
+length differs from the bin count dies naming both numbers
+(`got 2 bins but 4 labels`).
+
+### Differences from pandas
+
+  - **Interval printing.** pandas nudges its lowest edge 0.1% below the minimum
+    so every bin can be half-open, e.g. `(0.999, 3.25]`. `qcut` keeps the exact
+    minimum and closes the lowest bin on both ends, `[1, 3.25]`. Membership is
+    the same; only the printed interval differs.
+  - **Out-of-range values.** A partial probability vector makes the end bins
+    stretch (above), where pandas yields NA.
+  - **Out-of-range probabilities** are clamped into `[0, 1]` instead of raising.
+  - **Return type.** There is no Categorical: you get edges, plain integer
+    codes, your own labels, or interval strings.
+
+### See also
+
+[`quantile`](#quantile) computes the same cutpoints without assigning anything
+to bins. [`chunk`](#chunk) splits by *position* instead of value, which works on
+non-numeric data. [`value_counts`](#value_counts) checks how full the bins came
+out, [`rank`](#rank) is the alternative when you want the whole ordering rather
+than bins, and [`assign`](#assign) / [`vals`](#vals) move a binned column into
+and out of a data frame.
 
 ## quantile
 
@@ -5078,11 +5363,21 @@ undefined variables are printed as `NA` by default, but can be set as you wish u
 as of version 0.07, `write_table` determines comma and tab-separated delimiters from the filename, but will override if `sep` or `delim` are explicitly set.
 Args can also be accepted:
     write_table( 'data' => \%flat, 'file' => $f );
+
+### The confirmation line
+
+Every successful write prints one line to standard output naming the file, with the name in black on cyan:
+
+    wrote output.tsv
+
+This is `say 'wrote ' . colored(['black on_cyan'], $file)`, but the SGR codes (`\e[30;46m` … `\e[0m`) are written out inline, so the module takes no dependency on `Term::ANSIColor`. Every format announces itself the same way — delimited, LaTeX and `.xlsx` alike — so you always learn where a table went, in the same shape whatever you asked for. Nothing is printed when nothing is written: an empty data frame returns before a file is opened, and a write that cannot open its file croaks instead.
+
+The colour is unconditional; it is not suppressed when standard output is a pipe or a file. If you are capturing the output and want the bytes plain, strip the escapes (`s/\e\[[\d;]*m//g`) or send them somewhere else. Note also that the line goes to file descriptor 1 directly rather than through Perl's `STDOUT` glob, so `local *STDOUT; open STDOUT, '>', \my $buf` will **not** capture it — redirect the file descriptor, or run the write in a child process, if you need to.
 ### LaTeX output (`tex`)
 `write_table` can write the output file as a LaTeX `tabular` instead of a delimited table. This is selected either by naming the file `*.tex` (auto-detected) or by passing `tex => 1`; an explicit `tex => 0` forces a delimited file even when the name ends in `.tex`. The LaTeX table is built from the same rows as the delimited writer, so it works for every shape above (including arrays of arrays):
     write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
     write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
-The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. Unlike the delimited writer, LaTeX output includes a row-label column as its first column by default: `row.names` defaults on for LaTeX (matching R's `write.table`), so pass `row.names => 0` to omit it. The labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
+The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. As with every other format, `row.names` is **off** unless you ask for it: pass `row.names => 1` to prepend a label column, whose labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
     write_table(\@rows, 'table.tex',
         'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
         'tex.bold.1st.col' => 0,                     # default 1: bold the first column
@@ -5144,7 +5439,7 @@ raw values (no cell number formats), matching the round-trip behaviour of
 | `data` (1st positional, or `data =>`) | *required* | both | the table: flat hash, HoA, HoH, AoH, or AoA |
 | `file` (2nd positional, or `file =>`) | *required* | both | output path; written as a delimited table, or as LaTeX when `tex` is on |
 | `sep` / `delim` | from extension (`,` for `.csv`, tab for `.tsv`), else `,` | delimited | field separator; the two are aliases |
-| `row.names` | LaTeX: `1` (on); delimited: `0` (off) | both | true prepends a label column (numeric 1-based index, or the outer key for a HoH); `0` omits it. LaTeX output defaults on (R-compatible); delimited output defaults off; an explicit value overrides in either case. For a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body |
+| `row.names` | `0` (off) | both | true prepends a label column (numeric 1-based index, or the outer key for a HoH); `0` omits it. Off by default in **every** format — delimited, LaTeX and `.xlsx` alike. (R's `write.table` defaults it on and this once followed suit for LaTeX; it no longer does.) For a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body |
 | `col.names` | all columns, sorted | both | array ref selecting and ordering columns; for an AoA it also supplies the column names |
 | `undef.val` | `''` (empty field) | both | text written for an undefined/missing cell, e.g. `'NA'` |
 | `tex` | auto: `1` when `file` ends in `.tex`, else `0` | LaTeX | write the output file as a LaTeX `tabular` instead of a delimited table; `tex => 0` forces delimited even for a `.tex` name |
@@ -5161,6 +5456,55 @@ raw values (no cell number formats), matching the round-trip behaviour of
 | `xlsx.freeze.cols` | `0` (none) | Excel | number of leading columns to freeze in place (freeze panes) |
 
 # Changes
+
+## 0.28 2026-08-02 CDT
+
+`p_adjust` (LikeR.xs) now takes a data frame as well as a flat list of
+p-values, and hands the corrected values back in the shape they arrived in. An
+AoA, AoH, HoA or HoH goes in and a new frame of the same kind comes out, with
+the same rows, columns and row labels; the input is left alone. Everything the
+flat form did is unchanged — an arrayref of p-values still returns a list, in
+order, with the same numbers.
+
+- `columns => 'p_value'` (or an arrayref of names, or 0-based positions for an
+  AoA) says which columns hold p-values, and copies the rest of the frame
+  through untouched, so a results table with a `gene` column no longer has to
+  be taken apart and put back together around the call. Without `columns`
+  every cell is treated as a p-value, which is right for a frame that is
+  nothing but p-values; a label column in one dies with a message naming the
+  offending value and pointing at `columns`, rather than correcting a string
+  coerced to zero.
+- All the p-values in the frame are corrected as one family, whichever shape
+  they came in, so the family size is the number of p-value cells.
+- The method still reads positionally and may now also be given as
+  `method => ...`. `none`, which the function has always accepted, is now
+  documented along with the rest.
+- Cells are visited in a fixed order — by row and then column name, or column
+  name and then row for a HoA — so tied p-values break the same way on every
+  run instead of following hash iteration order.
+
+`drop_duplicates`, `filter`, `t_test`, `vals`: speed/RAM improvements
+
+**Incompatible:** the `'?'` / `'h'` argument added in 0.27 is gone (lib/Stats/LikeR.pm). `agg('h')`, `read_table('?')` and the fifty-odd other pure-Perl functions that took it no longer print help and die — they treat the string as data, the way the XS functions always have. `h('agg')`, `h(*agg)` and `h(\&agg)` are unchanged and remain the way to ask, for every function in the distribution.
+- It was a help route that only half the module had, so what a lone `'h'` meant depended on whether the callee happened to be written in XS or in Perl, and a column, file or option value really named `'h'` needed `$Stats::LikeR::HELP = 0` to get through. That variable is gone too; nothing reads its arguments for a help flag any more.
+- `bedroc` still prints its own short XS usage summary for `bedroc('h' | 'H' | '?')`, which is hand-written and predates all of this.
+
+`merge` (LikeR.xs) — same joins, a third of the time and a fifth of the memory. Nothing about the result changes: every join type, shape combination and edge case produces exactly what it did before, and `t/merge.t` now checks all six input/output paths against a plain-Perl reference join over a randomized corpus.
+
+The old implementation transposed both frames into arrays of row hashes, joined those, and transposed the result back. A 10,000-row HoA joined to itself therefore built 20,000 throwaway row hashes and copied every cell three times before returning. It now reads each frame where it lies — a HoA column by column, an AoH/HoH row by row — and writes the result straight into the shape being returned, so the only cells copied are the ones the caller keeps.
+
+- The right frame's index is a hash of row numbers chained through a flat array, rather than an array-ref of index scalars per distinct key, and one reused buffer builds every join key instead of one scalar per row.
+- Column names are resolved to their column (HoA) or interned once as shared hash keys (AoH/HoH) before the join starts, so the per-row work is a lookup rather than a lookup and a rehash.
+- Measured on the `benchmark.pl` case (two 10,000-row frames, six columns, inner join on `id`): 0.052 s and 41.4 MB before, 0.017 s and 7.3 MB after. An outer join of the same frames went from 0.113 s to 0.008 s.
+
+`write_table` (LikeR.xs) — two changes, one of them incompatible.
+- Every format now prints the coloured `wrote <file>` confirmation line, not just LaTeX and `.xlsx`. Delimited output (csv/tsv) was silent before. The line is identical in all cases: the file name in black on cyan, with the SGR codes inline so there is still no `Term::ANSIColor` dependency. Nothing is announced when nothing is written.
+- **Incompatible:** `row.names` now defaults to **off** in every format. It previously defaulted **on** everywhere, following R's `write.table`, which meant a call that said nothing about row names got a label column and a leading empty header cell (`,gene,n`) it had not asked for. Pass `row.names => 1` for the old behaviour; `row.names => 'col'` is unchanged.
+
+New `h2aoh` and `aoh2h` (lib/Stats/LikeR.pm), which add the flat hash to the shapes the conversion family understands. A plain hash is a two-column table folded shut, and until now nothing would unfold it: `value_counts` hands one back, and no frame function would take it.
+- `h2aoh(\%h, var_name => .., value_name => ..)` unfolds a flat hash into a two-column AoH, one row per pair, under column names the caller picks. `sort => 'key' | 'value' | 'none'` fixes the row order, which hash iteration otherwise leaves to chance; `'value'` is biggest-first for numbers, so `value_counts` output comes out the way pandas' `Series.value_counts()` orders it.
+- `aoh2h` folds a two-column AoH back down, with `duplicates => 'die' | 'first' | 'last'` deciding what a repeated key means. The two are exact inverses under their defaults.
+- The column options are named `var_name` / `value_name` after `melt`, which emits the same two columns. R spells this pair `tibble::enframe()` / `deframe()`; pandas spells it `pd.Series(d).reset_index()` and `Series.to_dict()`.
 
 ## 0.27 2026-07-26 CDT
 
@@ -5865,7 +6209,7 @@ Numerous changes to prevent quadmath/long double CPAN test failures
 
 Minimum Scalar::Util version in dist.ini is now 1.22, see https://www.cpantesters.org/cpan/report/6b682236-6567-11f1-a3bc-a055f9c4ba34
 
-`Digest::SHA` is no longer needed, and removed as a dependency
+`Digest::SHA` removed as a dependency
 
 ### `read_table`
 

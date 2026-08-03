@@ -50,15 +50,15 @@
    "provides" : {
       "DesktopWorkspace" : {
          "file" : "lib/DesktopWorkspace.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "DesktopWorkspace::Test::Spec::Basic" : {
          "file" : "lib/DesktopWorkspace/Test/Spec/Basic.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "DesktopWorkspaceRole::Spec::Basic" : {
          "file" : "lib/DesktopWorkspaceRole/Spec/Basic.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-DesktopWorkspace"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -658,6 +658,9 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
+   "x_contributors" : [
+      "perlancar <perlancar@gmail.com>"
+   ],
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

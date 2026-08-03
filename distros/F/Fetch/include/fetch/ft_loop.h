@@ -122,7 +122,7 @@ static void hm_loop_run(pTHX_ struct hm_loop *l, SV *until) {
         hmf_pump(aTHX);                       /* drain future continuations */
         if (until && hmf_state(aTHX_ until) != HMF_PENDING) break;
 
-        n = l->be->wait(l->be, evs, HM_MAXEV, -1.0);
+        n = l->be->wait_ev(l->be, evs, HM_MAXEV, -1.0);
         if (n < 0) { if (errno == EINTR) continue; break; }
 
         for (i = 0; i < n && !l->stop; i++) {

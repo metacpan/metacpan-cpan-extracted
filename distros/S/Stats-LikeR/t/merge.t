@@ -158,6 +158,133 @@ same( merge($emp, $dept, on => 'dept', how => 'inner', suffixes => ['_emp','_dep
 	merge($L, $R, on => 'a');
 	is_deeply $L, [ { a => 1, x => 'L' } ], 'left frame is untouched';
 	is_deeply $R, [ { a => 1, x => 'R' } ], 'right frame is untouched';
+
+	my $HL = { a => [1], x => ['L'] };
+	my $HR = { a => [1], x => ['R'] };
+	merge($HL, $HR, on => 'a', 'output.type' => 'hoa');
+	is_deeply $HL, { a => [1], x => ['L'] }, 'left HoA frame is untouched';
+	is_deeply $HR, { a => [1], x => ['R'] }, 'right HoA frame is untouched';
+}
+
+# ---- a HoA whose columns are ragged ----
+# merge reads a HoA column by column rather than transposing it into rows
+# first, so a column that stops short has to keep reading as undef, which is
+# what padding the transpose used to do.
+{
+	my $L = { id => [ 1, 2, 3 ], v => [ 'a' ] };          # v is two cells short
+	same( merge($L, { id => [ 1, 2, 3 ], w => [ 'x', 'y', 'z' ] },
+	            on => 'id', how => 'inner'),
+		[ { id => 1, v => 'a',   w => 'x' },
+		  { id => 2, v => undef, w => 'y' },
+		  { id => 3, v => undef, w => 'z' } ],
+		'a short HoA column reads as undef past its end' );
+}
+
+# ---- against a reference implementation, over every shape combination ----
+# The join reads HoA frames column-wise and AoH/HoH frames row-wise, and
+# writes AoH or HoA directly; that is six input/output paths through the same
+# semantics, and they have to agree with each other and with the documented
+# rules.  ref_join spells those rules out in plain Perl: stringified keys, an
+# undef key cell that never matches, the left name kept for a join column, a
+# key value taken from the left when it has one, and non-key columns present
+# on both sides suffixed.
+{
+	sub ref_join {
+		my ($L, $R, $keys, $how) = @_;
+		my (%lall, %rall);
+		$lall{$_} = 1 for map { keys %$_ } @$L;
+		$rall{$_} = 1 for map { keys %$_ } @$R;
+		my %kset  = map { $_ => 1 } @$keys;
+		my @lc    = grep { !$kset{$_} } sort keys %lall;
+		my @rc    = grep { !$kset{$_} } sort keys %rall;
+		my %lcset = map { $_ => 1 } @lc;
+		my %rcset = map { $_ => 1 } @rc;
+
+		my $key_of = sub {
+			my $r = shift;
+			my @p;
+			for my $k (@$keys) {
+				return undef unless defined $r->{$k};
+				push @p, length($r->{$k}) . "\x1e" . $r->{$k};
+			}
+			return join "\x1e", @p;
+		};
+		my $emit = sub {
+			my ($l, $r) = @_;
+			my %o;
+			for my $k (@$keys) {
+				$o{$k} = (defined $l && defined $l->{$k}) ? $l->{$k}
+				       : (defined $r) ? $r->{$k} : undef;
+			}
+			$o{ $rcset{$_} ? "$_.x" : $_ } = defined $l ? $l->{$_} : undef for @lc;
+			$o{ $lcset{$_} ? "$_.y" : $_ } = defined $r ? $r->{$_} : undef for @rc;
+			return \%o;
+		};
+
+		my @out;
+		if ($how eq 'cross') {
+			for my $l (@$L) { push @out, $emit->($l, $_) for @$R }
+			return \@out;
+		}
+		my %idx;
+		for my $j (0 .. $#$R) {
+			my $k = $key_of->($R->[$j]);
+			push @{ $idx{$k} }, $j if defined $k;
+		}
+		my %matched;
+		for my $l (@$L) {
+			my $k = $key_of->($l);
+			my $m = defined $k ? $idx{$k} : undef;
+			if ($m) { for my $j (@$m) { push @out, $emit->($l, $R->[$j]); $matched{$j} = 1 } }
+			elsif ($how eq 'left' || $how eq 'outer') { push @out, $emit->($l, undef) }
+		}
+		if ($how eq 'right' || $how eq 'outer') {
+			push @out, $emit->(undef, $R->[$_]) for grep { !$matched{$_} } 0 .. $#$R;
+		}
+		return \@out;
+	}
+
+	sub to_hoa {
+		my ($aoh, $cols) = @_;
+		return { map { my $c = $_; ($c => [ map { $_->{$c} } @$aoh ]) } @$cols };
+	}
+
+	srand 20260802;                       # a fixed corpus, so a failure repeats
+	my @lcols = qw(k1 k2 a shared);
+	my @rcols = qw(k1 k2 b shared);
+	my @vals  = (1, 2, '2', 'x', undef);  # 2 and '2' collide; undef never matches
+	my $mk = sub {
+		my ($cols, $n) = @_;
+		return [ map { +{ map { $_ => $vals[ rand @vals ] } @$cols } } 1 .. $n ];
+	};
+
+	my $mismatch = '';
+	my $cases = 0;
+	TRIAL: for my $trial (1 .. 120) {
+		my $L    = $mk->(\@lcols, 1 + int rand 5);
+		my $R    = $mk->(\@rcols, 1 + int rand 5);
+		my $keys = (int rand 2) ? ['k1'] : ['k1', 'k2'];
+		my $how  = (qw(inner left right outer cross))[ int rand 5 ];
+		my @args = $how eq 'cross' ? (how => 'cross') : (how => $how, on => $keys);
+		my $want = ref_join($L, $R, $how eq 'cross' ? [] : $keys, $how);
+
+		for my $lshape (qw(aoh hoa)) {
+			for my $rshape (qw(aoh hoa)) {
+				for my $oshape (qw(aoh hoa)) {
+					my $got = merge($lshape eq 'aoh' ? $L : to_hoa($L, \@lcols),
+					                $rshape eq 'aoh' ? $R : to_hoa($R, \@rcols),
+					                @args, 'output.type' => $oshape);
+					$cases++;
+					next if sig($got) eq sig($want);
+					$mismatch = "trial $trial: how=$how on=[@$keys] "
+					          . "$lshape+$rshape -> $oshape\ngot:\n" . sig($got)
+					          . "\nwant:\n" . sig($want);
+					last TRIAL;
+				}
+			}
+		}
+	}
+	is $mismatch, '', "every shape combination matches the reference ($cases joins)";
 }
 
 # ---- error handling ----

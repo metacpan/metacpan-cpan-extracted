@@ -1,0 +1,99 @@
+#!perl
+use strict;
+use warnings;
+use Test::More;
+use IO::Socket::INET;
+use Time::HiRes ();
+use File::Temp ();
+
+# The fast default access-log writer: access_log => $path formats a Combined
+# Log Format line in C (no per-request Perl call) and appends to the file,
+# shared O_APPEND across workers. Also checks REMOTE_ADDR reaches the env.
+
+my $dir     = File::Temp::tempdir(CLEANUP => 1);
+my $logfile = "$dir/access.log";
+my $port    = 20000 + ($$ % 1000) + 1;
+
+my $sup = fork;
+die "fork: $!" unless defined $sup;
+if ($sup == 0) {
+    open STDERR, '>', '/dev/null';
+    require Hyperman;
+    Hyperman->run(
+        app => sub {
+            my $env = shift;
+            my $body = "remote=" . ($env->{REMOTE_ADDR} // '?');
+            [ 200, [ 'Content-Type' => 'text/plain' ], [ $body ] ];
+        },
+        access_log => $logfile,           # <-- fast C writer, not a coderef
+        host       => '127.0.0.1',
+        port       => $port,
+        workers    => 1,
+    );
+    exit 0;
+}
+
+sub get {
+    my ($path, %opt) = @_;
+    for (1 .. 50) {
+        my $s = IO::Socket::INET->new(
+            PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp')
+            or (Time::HiRes::sleep(0.1), next);
+        my $req = "GET $path HTTP/1.0\r\n";
+        $req .= "User-Agent: $opt{ua}\r\n" if defined $opt{ua};
+        $req .= "Referer: $opt{ref}\r\n"   if defined $opt{ref};
+        $req .= "\r\n";
+        $s->print($req);
+        local $/;
+        my $r = <$s>;
+        return $1 if defined $r && $r =~ /\r\n\r\n(.*)\z/s;
+        Time::HiRes::sleep(0.1);
+    }
+    return undef;
+}
+
+sub slurp_log {
+    open my $fh, '<', $logfile or return '';
+    local $/;
+    return scalar <$fh>;
+}
+
+# wait for the server to come up and confirm REMOTE_ADDR made it into the env
+my $body = get('/hello');
+like($body, qr/^remote=127\.0\.0\.1$/, 'REMOTE_ADDR populated in the PSGI env')
+    or diag "body was: " . (defined $body ? $body : '(undef)');
+
+# a request with recognizable Referer / User-Agent to check the quoted fields
+get('/track?x=1', ua => 'AcmeBot/2.0', ref => 'http://ref.example/');
+
+# the writer flushes once per loop wakeup; poll briefly for the lines
+my $log = '';
+for (1 .. 30) {
+    $log = slurp_log();
+    last if $log =~ m{/track};
+    Time::HiRes::sleep(0.1);
+}
+
+like(
+    $log,
+    qr{^127\.0\.0\.1 - - \[[^\]]+\] "GET /hello HTTP/1\.0" 200 \d+ "-" "-"$}m,
+    'Combined Log Format line for the plain request',
+) or diag "log:\n$log";
+
+like(
+    $log,
+    qr{^127\.0\.0\.1 - - \[[^\]]+\] "GET /track\?x=1 HTTP/1\.0" 200 \d+ "http://ref\.example/" "AcmeBot/2\.0"$}m,
+    'Combined line carries the request URI, Referer and User-Agent',
+) or diag "log:\n$log";
+
+# the timestamp field is apache-style: [dd/Mon/YYYY:HH:MM:SS +ZZZZ]
+like(
+    $log,
+    qr{\[\d\d/[A-Z][a-z]{2}/\d{4}:\d\d:\d\d:\d\d [-+]\d{4}\]},
+    'timestamp is in Common/Combined Log Format',
+);
+
+kill 'TERM', $sup;
+waitpid $sup, 0;
+
+done_testing;

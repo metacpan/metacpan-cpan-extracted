@@ -4,7 +4,7 @@ use QDB::Installs qw/run_per_install/;    # before Test2::V0: it loads Test2::IP
 use Test2::V0;
 
 # The parent process must not load DBIx::QuickDB or Test2::Tools::QuickDB;
-# each install's body runs in a forked child that sets $PATH first. See
+# each install's body runs in an isolated child that sets $PATH first. See
 # t/lib/QDB/Installs.pm.
 run_per_install(Percona => sub {
     # Contaminate the env vars the driver should mask, to prove it does.

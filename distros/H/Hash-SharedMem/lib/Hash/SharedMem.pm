@@ -346,7 +346,7 @@ package Hash::SharedMem;
 use warnings;
 use strict;
 
-our $VERSION = "0.005";
+our $VERSION = "0.006";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -905,13 +905,15 @@ L<Sereal>
 
 =head1 AUTHOR
 
-Andrew Main (Zefram) <zefram@fysh.org>
+Kurt Starsinic <cpan@kstar.fastmail.fm>
 
 =head1 COPYRIGHT
 
 Copyright (C) 2014, 2015 PhotoBox Ltd
 
 Copyright (C) 2014, 2015, 2017 Andrew Main (Zefram) <zefram@fysh.org>
+
+Copyright (C) 2026 Kurt Starsinic <cpan@kstar.fastmail.fm>
 
 =head1 LICENSE
 

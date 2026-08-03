@@ -269,7 +269,7 @@ hm_backend *hm_backend_poll_new(void) {
     be->add_timer  = pl_add_timer;
     be->del_timer  = pl_del_timer;
     be->add_signal = pl_add_signal;
-    be->wait       = pl_wait;
+    be->wait_ev       = pl_wait;
     be->destroy    = pl_destroy;
     return be;
 }

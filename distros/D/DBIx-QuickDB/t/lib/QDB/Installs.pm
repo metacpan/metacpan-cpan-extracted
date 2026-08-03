@@ -4,7 +4,8 @@ use warnings;
 
 # Test-only helper (never shipped, never referenced by lib/): find every
 # usable installation of a database flavor, then run a test body against each
-# one in its own forked subprocess.
+# one in an isolated child. Unix uses fork; MSWin32 launches a fresh Perl
+# because its thread-based pseudo-fork is not supported by Test2.
 #
 # Installations come from two places:
 #  - The system install found via $PATH (always considered).
@@ -27,7 +28,7 @@ use warnings;
 
 use Test2::IPC;    # Load before Test2::V0 and before any fork, so child events reach the harness.
 use Test2::API qw/context/;
-use Test2::Tools::Subtest qw/subtest_buffered/;
+use Test2::Tools::Subtest qw/subtest_buffered subtest_streamed/;
 use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
 use Carp qw/confess/;
@@ -240,12 +241,117 @@ my $MAX_PAR = ($ENV{QDB_INSTALL_JOBS} && $ENV{QDB_INSTALL_JOBS} =~ /^\d+$/ && $E
     ? $ENV{QDB_INSTALL_JOBS}
     : 4;
 
-# Run $body->($install) once per install, each in its own forked subprocess
-# wrapped in a subtest, up to $MAX_PAR at a time. The child prepends the
-# install's bin dir to $PATH BEFORE any DBIx::QuickDB code loads (see the
-# warning at the top). skip_all when no install is usable.
+my $CHILD_FLAVOR_ENV = 'QDB_INSTALL_EXTERNAL_FLAVOR';
+my $CHILD_NAME_ENV   = 'QDB_INSTALL_EXTERNAL_NAME';
+my $CHILD_BIN_ENV    = 'QDB_INSTALL_EXTERNAL_BIN_DIR';
+
+sub _external_child_command {
+    my @inc = map { "-I$_" } grep { defined($_) && length($_) && !ref($_) } @INC;
+    return ($^X, @inc, $0);
+}
+
+sub _with_external_child_env {
+    my ($flavor, $inst, $code) = @_;
+
+    local $ENV{$CHILD_FLAVOR_ENV} = $flavor;
+    local $ENV{$CHILD_NAME_ENV}   = $inst->{name};
+    local $ENV{$CHILD_BIN_ENV}    = defined($inst->{bin_dir}) ? $inst->{bin_dir} : '';
+
+    return $code->();
+}
+
+# With one install, let the real child write TAP directly to the outer harness
+# and mirror its exit status. This preserves partial TAP if an XS module crashes.
+# The tiny parent has not loaded QuickDB, so POSIX::_exit is safe here.
+sub _run_single_external_install {
+    my ($flavor, $inst) = @_;
+    my @cmd = _external_child_command();
+
+    _with_external_child_env($flavor, $inst, sub {
+        system(@cmd);
+        my $status = $?;
+        if ($status == -1) {
+            print STDERR "Could not launch isolated $flavor test process: $!\n";
+            POSIX::_exit(255);
+        }
+        my $signal = $status & 127;
+        POSIX::_exit($signal ? 128 + $signal : $status >> 8);
+    });
+}
+
+# Multiple developer installs cannot share one process: drivers capture PATH at
+# load time. Run each in a real child sequentially, reducing its TAP to one
+# parent assertion while retaining full child TAP on failure and any child
+# stderr. QDB_INSTALL_JOBS deliberately applies only to the Unix fork path;
+# serial execution also keeps captured child output from interleaving.
+sub _run_external_install {
+    my ($flavor, $inst) = @_;
+    my @cmd = _external_child_command();
+    my ($stdout, $stderr, $status, $launch_error);
+
+    _with_external_child_env($flavor, $inst, sub {
+        ($stdout, $stderr) = capture {
+            system(@cmd);
+            $status = $?;
+            $launch_error = "$!" if $status == -1;
+        };
+    });
+
+    my ($failed, $note);
+    if ($status == -1) {
+        $failed = 1;
+        $note = "(launch failed: $launch_error)";
+    }
+    else {
+        $failed = $status ? 1 : 0;
+        $note = "(exit " . ($status >> 8) . ", sig " . ($status & 127) . ")";
+    }
+
+    my $ctx = context();
+    $ctx->ok(!$failed, "install '$inst->{name}': external subprocess completed cleanly $note");
+    $ctx->diag("child TAP:\n$stdout") if $failed && defined($stdout) && length($stdout);
+    if (defined($stderr) && length($stderr)) {
+        my $label = $failed ? 'child stderr' : 'child stderr (subprocess passed; informational)';
+        $ctx->diag("$label:\n$stderr");
+    }
+    $ctx->release;
+    return;
+}
+
+# Run $body->($install) once per install in an isolated process. Unix uses
+# buffered subtests in real forks, up to $MAX_PAR at a time; MSWin32 uses fresh
+# Perl processes. The child prepends the install's bin dir to $PATH BEFORE any
+# DBIx::QuickDB code loads (see the warning at the top). skip_all when no
+# install is usable.
 sub run_per_install {
     my ($flavor, $body) = @_;
+
+    # A real subprocess launched by the MSWin32 parent comes back through the
+    # same test file. Run only its selected body in a streamed subtest, so the
+    # existing wrapper semantics are preserved and a crash still leaves every
+    # TAP event produced before it.
+    if (defined(my $child_flavor = $ENV{$CHILD_FLAVOR_ENV})) {
+        confess "External install child expected '$child_flavor', got '$flavor'"
+            unless $child_flavor eq $flavor;
+
+        # Test2::Plugin::SRand gives fresh test processes the same date-derived
+        # seed. Reseed with the real child pid before File::Temp or test code
+        # uses rand(), matching the collision defense in the Unix fork child.
+        srand($$ ^ $^T);
+
+        my $bin_dir = $ENV{$CHILD_BIN_ENV};
+        $bin_dir = undef unless defined($bin_dir) && length($bin_dir);
+        if ($bin_dir) {
+            my $separator = $^O eq 'MSWin32' ? ';' : ':';
+            $ENV{PATH} = length($ENV{PATH} || '')
+                ? "$bin_dir$separator$ENV{PATH}"
+                : $bin_dir;
+        }
+
+        my $inst = {name => $ENV{$CHILD_NAME_ENV}, bin_dir => $bin_dir};
+        subtest_streamed("$flavor install: $inst->{name}" => sub { $body->($inst) });
+        return;
+    }
 
     my @installs = qdb_installs($flavor);
 
@@ -253,6 +359,18 @@ sub run_per_install {
         my $ctx = context();
         $ctx->plan(0, SKIP => _no_install_reason($flavor));    # exits the process
         $ctx->release;
+        return;
+    }
+
+    # Test2 supports real fork but explicitly does not support the thread-based
+    # pseudo-fork supplied by Windows Perl. QDB_INSTALL_NO_FORK is test-only
+    # plumbing that exercises this path on Unix CI/developer machines.
+    if ($^O eq 'MSWin32' || $ENV{QDB_INSTALL_NO_FORK}) {
+        if (@installs == 1) {
+            _run_single_external_install($flavor, $installs[0]);
+            confess "External install process unexpectedly returned";
+        }
+        _run_external_install($flavor, $_) for @installs;
         return;
     }
 

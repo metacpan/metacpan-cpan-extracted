@@ -32,7 +32,7 @@ WriteMakefile(
 		'Test::DescribeMe' => 0,
 		'Test::Memory::Cycle' => 0,
 		'Test::MockObject' => 0,
-		'Test::Mockingbird' => 0,
+		'Test::Mockingbird' => 0.12,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::Returns' => 0,

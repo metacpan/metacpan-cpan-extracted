@@ -8,7 +8,7 @@ use Test2::V0;
 # skipall_unless_can_db() enforce that at least one usable DBD is present.
 
 # The parent process must not load DBIx::QuickDB or Test2::Tools::QuickDB;
-# each install's body runs in a forked child that sets $PATH first. See
+# each install's body runs in an isolated child that sets $PATH first. See
 # t/lib/QDB/Installs.pm.
 run_per_install(MariaDB => sub {
     # Contaminate the env vars the driver should mask, to prove it does.

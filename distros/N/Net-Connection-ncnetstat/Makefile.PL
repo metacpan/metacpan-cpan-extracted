@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
 		'Getopt::Long'           => '0.0.0',
 		'Data::Unixish::Apply'   => '1.570',
 		'Net::Connection::lsof'  => '0.3.0',
+		'Proc::ProcessTable'     => '0.59',
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES    => 'Net-Connection-ncnetstat-*' },

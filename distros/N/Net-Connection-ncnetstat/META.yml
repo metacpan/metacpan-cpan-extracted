@@ -27,8 +27,9 @@ requires:
   Net::Connection::Match: v0.5.0
   Net::Connection::Sort: v0.1.1
   Net::Connection::lsof: v0.3.0
+  Proc::ProcessTable: '0.59'
   Term::ANSIColor: '4.06'
   Text::ANSITable: '0.601'
   perl: '5.006'
-version: v0.9.0
+version: v0.9.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

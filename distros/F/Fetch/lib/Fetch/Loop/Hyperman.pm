@@ -3,10 +3,11 @@ package Fetch::Loop::Hyperman;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use parent -norequire, 'Fetch::Loop';
 use Fetch::Loop ();
+use Time::HiRes ();
 
 sub new {
     my ($class, $loop) = @_;
@@ -45,16 +46,52 @@ sub _ft_arm {
     return;
 }
 
+# Per-request deadlines are not armed as one kernel timer each: under load that
+# is two hot paths at once - a kevent syscall to arm every request, and (since a
+# normally-completing request only marks its timer cancelled) a kqueue that
+# accumulates one live ~timeout-long timer per request. Instead we keep the
+# pending deadlines in a plain list and run a SINGLE coarse repeating timer that
+# sweeps it, firing whatever is due. One kernel timer total, re-armed only while
+# deadlines are outstanding, so an idle loop stops ticking. The cost is up to
+# SWEEP granularity of slack before a timeout fires - immaterial for the
+# second(s)-scale request timeouts this exists to enforce.
+use constant _SWEEP => 0.1;    # sweep granularity (seconds)
+
 sub _ft_timer {
     my ($self, $secs, $cv) = @_;
-    my $g = { cancelled => 0 };
-    $self->{loop}->timer($secs, sub { $cv->() unless $g->{cancelled} });
+    my $g = { at => Time::HiRes::time() + $secs, cv => $cv, cancelled => 0 };
+    push @{ $self->{timers} }, $g;
+    unless ($self->{sweeping}) {
+        $self->{sweeping} = 1;
+        $self->_arm_sweep;
+    }
     return $g;
 }
 
 sub _ft_untimer {
     my ($self, $g) = @_;
     $g->{cancelled} = 1 if ref $g;
+    return;
+}
+
+sub _arm_sweep {
+    my ($self) = @_;
+    $self->{loop}->timer(_SWEEP, sub { $self->_sweep });
+    return;
+}
+
+sub _sweep {
+    my ($self) = @_;
+    my $now = Time::HiRes::time();
+    my $due = delete $self->{timers} || [];
+    $self->{timers} = [];       # a fired timeout may enqueue a fresh request
+    for my $g (@$due) {
+        next if $g->{cancelled};
+        if ($g->{at} <= $now) { $g->{cancelled} = 1; $g->{cv}->() }
+        else                  { push @{ $self->{timers} }, $g }
+    }
+    if (@{ $self->{timers} }) { $self->_arm_sweep }
+    else                      { $self->{sweeping} = 0 }
     return;
 }
 

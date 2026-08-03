@@ -10,6 +10,19 @@
  * and starting a TLS request fails cleanly. */
 
 #ifdef FT_HAVE_OPENSSL
+#  include <openssl/opensslv.h>
+#endif
+
+/* The real implementation uses the OpenSSL 1.1.0 API (TLS_client_method,
+ * SSL_CTX_set_min_proto_version, SSL_set1_host, SSL_set_hostflags). Older
+ * libraries - e.g. OpenSSL 1.0.x / 0.9.8 on legacy BSDs, or LibreSSL before
+ * 2.7 - lack those symbols, which would make the loadable object fail to load
+ * (undefined symbol). There TLS compiles to the same stubs as when OpenSSL is
+ * absent: the module still loads and cleartext HTTP works, and an https
+ * request fails cleanly. */
+#if defined(FT_HAVE_OPENSSL) \
+ && OPENSSL_VERSION_NUMBER >= 0x10100000L \
+ && (!defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
 
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -121,7 +134,7 @@ static void ft_tls_free(ft_conn *c) {
 
 #define FT_TLS_AVAILABLE 1
 
-#else  /* !FT_HAVE_OPENSSL: stubs */
+#else  /* no OpenSSL, or too old for the 1.1.0 API: stubs */
 
 static int ft_tls_is_h2(ft_conn *c) { (void)c; return 0; }
 
