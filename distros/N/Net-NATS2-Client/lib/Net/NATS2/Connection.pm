@@ -7,39 +7,20 @@ use warnings;
 use IO::Socket::INET;
 use Errno  qw(EAGAIN EINTR EWOULDBLOCK);
 use Encode qw(encode_utf8);
+use Net::NATS2::Base qw(-no_new);
 
 use constant CRLF => "\r\n";
 use constant _0E0 => '0E0';
 
-sub _new {
-    my $class = shift;
-    return bless {@_}, $class;
-}
-
-sub socket_args {
-    my $self = shift;
-    $self->{socket_args} = shift if @_;
-    return $self->{socket_args};
-}
-
-sub _socket {
-    my $self = shift;
-    $self->{_socket} = shift if @_;
-    return $self->{_socket};
-}
-
-sub buffer              : lvalue { $_[0]->{buffer} }
-sub default_buffer_size : lvalue { $_[0]->{default_buffer_size} }
-sub eobuf               : lvalue { $_[0]->{eobuf} }
-sub eof                 : lvalue { $_[0]->{eof} }
-sub error               : lvalue { $_[0]->{error} }
+has $_ for qw(socket_args _socket buffer default_buffer_size eobuf eof error);
 
 sub new {
     my $class = shift;
-    my $self  = $class->_new(@_);
+    my $self  = bless {@_}, $class;
 
     $self->socket_args->{Proto} = 'tcp';
-    $self->default_buffer_size ||= $self->socket_args->{BufferSize} || 1024;
+    $self->default_buffer_size($self->socket_args->{BufferSize} || 1024)
+        unless $self->default_buffer_size;
 
     my $socket = IO::Socket::INET->new(%{$self->socket_args}) or return;
     $self->_socket($socket);
@@ -69,10 +50,10 @@ sub upgrade {
 sub flush {
     my $self = shift;
 
-    $self->buffer = '';
-    $self->eobuf  = 0;
-    $self->eof    = 0;
-    $self->error  = '';
+    $self->buffer('');
+    $self->eobuf(0);
+    $self->eof(0);
+    $self->error('');
     return 1;
 }
 
@@ -112,7 +93,7 @@ sub nb_getline {
     if ($idx < 0) {
 
         # EOL was not found, so suck in more data if we can
-        $self->eobuf = length $buffer;
+        $self->eobuf(length $buffer);
 
         # append to our buffer from the file handle if any data is there.
         my $chunk = '';
@@ -121,12 +102,12 @@ sub nb_getline {
         if (!defined $count) {
             return _0E0 if $! == EWOULDBLOCK;    # we handle this error
 
-            $self->error = $!;                   # remember the error for later
+            $self->error($!);                     # remember the error for later
             $_[0] = $buffer;                     # return whatever we read
             return length($_[0]);
         }
         elsif ($count == 0) {                    # EOF
-            $self->eof = 1;                      # remember for later
+            $self->eof(1);                       # remember for later
             $_[0] = $buffer;                     # return whatever we read
             return length($_[0]);
         }
@@ -138,8 +119,8 @@ sub nb_getline {
 
             # if not found, pretend this was EWOULDBLOCK
             if ($idx < 0) {
-                $self->buffer = $buffer;
-                $self->eobuf  = length $buffer;
+                $self->buffer($buffer);
+                $self->eobuf(length $buffer);
                 return _0E0;
             }
         }
@@ -148,8 +129,8 @@ sub nb_getline {
     # we successfully read what we needed up to a new line
     $_[0] = substr($buffer, 0, $idx + length($/));
     substr($buffer, 0, $idx + length($/)) = '';
-    $self->buffer = $buffer;
-    $self->eobuf  = length $buffer;
+    $self->buffer($buffer);
+    $self->eobuf(length $buffer);
     return length($_[0]);
 }
 
@@ -167,7 +148,7 @@ sub nb_read {
     if (length $buffer < $length) {
 
         # not enough, so suck in more data if we can
-        $self->eobuf = length $buffer;
+        $self->eobuf(length $buffer);
 
         # append to our buffer from the file handle if any data is there.
         my $chunk = '';
@@ -176,12 +157,12 @@ sub nb_read {
         if (!defined $count) {
             return _0E0 if $! == EWOULDBLOCK;    # we handle this error
 
-            $self->error = $!;                   # remember the error for later
+            $self->error($!);                     # remember the error for later
             $_[0] = $buffer;                     # return whatever we read
             return length($_[0]);
         }
         elsif ($count == 0) {                    # EOF
-            $self->eof = 1;                      # remember for later
+            $self->eof(1);                       # remember for later
             $_[0] = $buffer;                     # return whatever we read
             return length($_[0]);
         }
@@ -189,11 +170,11 @@ sub nb_read {
             $buffer .= $chunk;
 
             # check length again
-            $self->eobuf = length $buffer;
+            $self->eobuf(length $buffer);
 
             # if not, pretend this was EWOULDBLOCK
             if ($self->eobuf < $length) {
-                $self->buffer = $buffer;
+                $self->buffer($buffer);
                 return _0E0;
             }
         }
@@ -202,8 +183,8 @@ sub nb_read {
     # we successfully read what we needed
     $_[0] = substr($buffer, 0, $length);
     substr($buffer, 0, $length) = '';
-    $self->buffer = $buffer;
-    $self->eobuf  = length $buffer;
+    $self->buffer($buffer);
+    $self->eobuf(length $buffer);
     return length($_[0]);
 }
 
@@ -228,7 +209,7 @@ sub send {
                 $self->can_write();               # block until ready to write
             }
             else {
-                $self->error = $!;
+                $self->error($!);
                 return;                           # can't do anything with failed write. socket likely closed.
             }
         }

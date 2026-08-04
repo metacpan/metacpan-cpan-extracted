@@ -1,5 +1,9 @@
 -----
 
+12.6.0    2026-08-03
+   [Changed]
+       * Updated to libvirt tag v12.6.0
+
 12.5.1    2026-07-01
    [Added]
        * Support for the 'argv' URI query parameter for the 'ext' transport

@@ -8,8 +8,12 @@ Makefile.PL
 README
 dist.ini
 lib/App/XWindowManagerUtils.pm
+script/get-window-kde-activity
 script/get-xwm-window-kde-activity
+script/list-windows
 script/list-xwm-windows
+script/move-windows-to-kde-activity
+script/move-windows-to-this-kde-activity
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

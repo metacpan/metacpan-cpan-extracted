@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 25;
+plan tests => 26;
 
 my @module_files = (
     'JMAP/Tester.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'JMAP/Tester/Logger.pm',
     'JMAP/Tester/Logger/HTTP.pm',
     'JMAP/Tester/Logger/Null.pm',
+    'JMAP/Tester/Manual.pm',
     'JMAP/Tester/Response.pm',
     'JMAP/Tester/Response/Paragraph.pm',
     'JMAP/Tester/Response/Sentence.pm',

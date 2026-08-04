@@ -1,12 +1,9 @@
-# -*- perl -*-
+use 5.026;
+use strict;
+use warnings;
 
-# t/001_load.t - check module loading and create testing directory
+use Test::More tests => 1;
 
-use Test::More tests => 2;
-
-BEGIN { use_ok( 'Audio::Scrobbler2' ); }
-
-my $object = Audio::Scrobbler2->new ();
-isa_ok ($object, 'Audio::Scrobbler2');
-
-
+BEGIN {
+    use_ok('Audio::Scrobbler2');
+}

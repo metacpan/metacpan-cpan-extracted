@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use Encode qw(encode_utf8);
 use Try::Tiny;
@@ -296,6 +296,8 @@ sub sign {
 sub verify {
     my $self = shift;
     delete $self->{signer_cert};
+    delete $self->{verified_ids};
+    delete $self->{verified_elements};
     my $xml = shift;
 
     my $dom = $self->_load_xml($xml);
@@ -323,6 +325,12 @@ sub verify {
     print ("NodeSet Size: $numsigs\n") if $DEBUG;
 
     die 'XML::Sig - XML does not include any signatures' if $numsigs <= 0;
+
+    # References actually verified.  $numsigs counts Signature elements
+    # present, not signatures verified - the loop below skips some before
+    # any cryptographic check runs.
+    my @verified;
+
     # Loop through each Signature in the document checking each
     my $i;
     while (my $signature_node = $signature_nodeset->shift()) {
@@ -509,8 +517,19 @@ sub verify {
         # Return 0 - fail verification on the first XML signature that fails
         return 0 unless ($refdigest eq _trim(encode_base64($digest, '')));
 
+        push @verified, { id => $reference, element => $signed_xml };
+
         print ( "Signature $i Valid\n") if $DEBUG;
     }
+
+    # Every signature was skipped, so nothing was verified.
+    if (!@verified) {
+        print ("   No signature in the document was verified\n") if $DEBUG;
+        return 0;
+    }
+
+    $self->{verified_ids}      = [ map { $_->{id} } @verified ];
+    $self->{verified_elements} = [ map { $_->{element} } @verified ];
 
     return 1;
 }
@@ -519,6 +538,18 @@ sub verify {
 sub signer_cert {
     my $self = shift;
     return $self->{signer_cert};
+}
+
+
+sub verified_ids {
+    my $self = shift;
+    return $self->{verified_ids} || [];
+}
+
+
+sub verified_elements {
+    my $self = shift;
+    return $self->{verified_elements} || [];
 }
 
 ##
@@ -1826,7 +1857,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 
@@ -2059,6 +2090,57 @@ Crypt::OpenSSL::X509 object.
 Arguments: none
 
 Returns: Crypt::OpenSSL::X509: Certificate used to sign the XML
+
+=head3 B<verified_ids()>
+
+Following a successful verify, returns an ARRAY reference of the ID
+attribute values that were covered by a verified signature - that is, the
+Reference URIs whose digests were checked and matched.
+
+Callers that extract a specific element from a verified document (for
+example C<//saml:Assertion>) should confirm that the element's ID appears
+in this list.  Without that check the element acted on may not be the
+element that was signed, which is the basis of the XML Signature Wrapping
+(XSW) attack class.
+
+    if ($sig->verify($xml)) {
+        my %signed = map { $_ => 1 } @{ $sig->verified_ids };
+        die "element was not signed"
+            unless $signed{ $element->getAttribute('ID') };
+    }
+
+Arguments: none
+
+Returns: ARRAY reference of ID strings.  Empty after a failed verify or
+before verify is called.
+
+=head3 B<verified_elements()>
+
+Following a successful verify, returns an ARRAY reference of the
+XML::LibXML::Element objects that were covered by a verified signature,
+in the order the signatures were processed.
+
+This is the safer counterpart to C<verified_ids()>: rather than
+re-extracting an element from the document and checking its ID, work
+directly from the elements returned here and no re-extraction step exists
+to get wrong.
+
+    if ($sig->verify($xml)) {
+        for my $el (@{ $sig->verified_elements }) {
+            my @attrs = $el->findnodes('.//saml:Attribute');
+        }
+    }
+
+Note that the returned elements are live nodes in the document parsed by
+C<verify()> and still contain their C<Signature> child, which verify()
+detaches and reattaches during canonicalization.  Reattachment appends,
+so a Signature that was not the last child originally will have moved to
+the end.
+
+Arguments: none
+
+Returns: ARRAY reference of XML::LibXML::Element objects.  Empty after a
+failed verify or before verify is called.
 
 =head3 B<check_dsa_version()>
 

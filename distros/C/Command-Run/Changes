@@ -1,5 +1,20 @@
 Revision history for Perl extension Command-Run
 
+1.03 2026-08-03T14:38:29Z
+
+    - run() now takes command, stdout and stderr as temporary
+      parameters, as PARAMETERS has been describing.  They were
+      silently ignored before, so this breaks nothing that worked.
+
+          my $result = Command::Run->new->run(command => \@command,
+                                              stdin   => $data);
+
+      The only visible difference is that stderr given as a scalar
+      reference is now captured instead of passing through to the
+      terminal.
+    - Fix POD examples giving a command list to new(), which takes
+      key-value pairs and never worked that way.
+
 1.02 2026-07-05T01:19:46Z
 
     - Fix PerlIO encoding layer accumulation on STDIN/STDOUT in

@@ -18,22 +18,22 @@ WriteMakefile(
         resources => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/HansH111/Datafile-Hash.pm.git',
-                web  => 'https://github.com/HansH111/Datafile-Hash.pm',
+                url  => 'https://codeberg.org/HansH111/Datafile-Hash.pm.git',
+                web  => 'https://codeberg.org/HansH111/Datafile-Hash.pm',
             },
             bugtracker => {
-                web => 'https://github.com/HansH111/Datafile-Hash.pm/issues',
+                web => 'https://codeberg.org/HansH111/Datafile-Hash.pm/issues',
             },
         },
         provides => {
             'Datafile::Hash' => {
                 file    => 'lib/Datafile/Hash.pm',
+                version => '1.06',
             },
         },
     },
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     clean => { FILES => 'Datafile-Hash-*' },
-
     test => { TESTS => 't/*.t' },
 );

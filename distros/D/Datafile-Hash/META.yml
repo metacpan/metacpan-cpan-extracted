@@ -20,10 +20,11 @@ no_index:
 provides:
   Datafile::Hash:
     file: lib/Datafile/Hash.pm
+    version: '1.06'
 requires:
   perl: '5.014'
 resources:
-  bugtracker: https://github.com/HansH111/Datafile-Hash.pm/issues
-  repository: https://github.com/HansH111/Datafile-Hash.pm.git
-version: '1.05'
+  bugtracker: https://codeberg.org/HansH111/Datafile-Hash.pm/issues
+  repository: https://codeberg.org/HansH111/Datafile-Hash.pm.git
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

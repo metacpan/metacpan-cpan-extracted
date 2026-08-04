@@ -1,5 +1,11 @@
 -----
 
+0.6.6   2026-08-03
+   [Added]
+       * Domain life cycle constant LIFECYCLE_ACTION_PRESERVE_RUNNING
+   [Changed]
+       * Updated libvirt to v12.6.0
+
 0.6.5   2026-07-01
    [Added]
        * Constants GET_DOMAIN_CAPABILITIES_SUPPORTED_CPU_FEATURES,

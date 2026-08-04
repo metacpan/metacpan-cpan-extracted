@@ -1,12 +1,9 @@
 package Web::Request::Types;
-BEGIN {
-  $Web::Request::Types::AUTHORITY = 'cpan:DOY';
-}
-{
-  $Web::Request::Types::VERSION = '0.11';
-}
+our $AUTHORITY = 'cpan:PTC';
+$Web::Request::Types::VERSION = '0.12';
 use strict;
 use warnings;
+# ABSTRACT: package defining subtypes for this distribution
 
 use Moose::Util::TypeConstraints;
 
@@ -47,21 +44,33 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Web::Request::Types
+Web::Request::Types - package defining subtypes for this distribution
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Jesse Luehrs <doy@tozt.net>
 
+=item *
+
+Paul Cochrane <paul@peateasea.de>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Jesse Luehrs.
+This software is copyright (c) 2012--2026 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

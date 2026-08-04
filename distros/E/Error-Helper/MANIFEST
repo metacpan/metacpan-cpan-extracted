@@ -1,9 +1,14 @@
 Changes
+LICENSE
 MANIFEST
 Makefile.PL
 README.md
 lib/Error/Helper.pm
 t/00-load.t
+t/01-basics.t
+t/02-fatal.t
+t/03-shared-variables.t
+t/04-outside-of-sub.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

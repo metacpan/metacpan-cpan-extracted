@@ -1,5 +1,8 @@
 Revision history for Perl module RT::Extension::ResetPassword
 
+2.01 2026-08-03
+ - Restore "Back to Login" link when the reset form is hidden
+
 2.00 2025-08-05
  - Update for RT 6.0
 

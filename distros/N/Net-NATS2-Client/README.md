@@ -64,6 +64,28 @@ The client advertises header support during `CONNECT` and will not send an
 `HPUB` command if the server's `INFO` message reports no header support. Text
 payloads are UTF-8 encoded before sending; byte strings are sent unchanged.
 
+## NKey authentication
+
+Pass the user NKey public key in `nkey` and a callback in `nkey_sig_cb` that
+signs the server nonce. The callback receives the nonce and must return the raw
+Ed25519 signature bytes; the client encodes the signature for `CONNECT`.
+
+```perl
+use Crypt::PK::Ed25519;
+
+my $signer = Crypt::PK::Ed25519->new('/secure/path/user-ed25519.pem');
+# The NATS-encoded public NKey matching the private key loaded above.
+my $nkey = $ENV{NATS_USER_NKEY};
+my $client = Net::NATS2::Client->new(
+    uri         => 'nats://localhost:4222',
+    nkey        => $nkey,
+    nkey_sig_cb => sub {
+        my ($nonce) = @_;
+        return $signer->sign_message($nonce);
+    },
+);
+```
+
 ## Reconnection
 
 Automatic reconnection is disabled by default. Enable it to retry a lost

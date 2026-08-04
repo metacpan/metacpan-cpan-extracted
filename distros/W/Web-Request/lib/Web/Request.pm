@@ -1,10 +1,6 @@
 package Web::Request;
-BEGIN {
-  $Web::Request::AUTHORITY = 'cpan:DOY';
-}
-{
-  $Web::Request::VERSION = '0.11';
-}
+our $AUTHORITY = 'cpan:PTC';
+$Web::Request::VERSION = '0.12';
 use Moose;
 # ABSTRACT: common request class for web frameworks
 
@@ -226,8 +222,12 @@ has query_parameters => (
             $self->uri->query_form,
             (map { $_ => '' } $self->uri->query_keywords),
         );
+        for my $value (values %params) {
+            $value = ''
+                if !defined $value;
+        }
         return {
-            map { $self->_decode($_) } map { $_ => $params{$_} } keys %params
+            map { $self->_decode($_) } %params
         };
     },
 );
@@ -503,13 +503,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Web::Request - common request class for web frameworks
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -715,7 +717,8 @@ single value.
 
 =head2 new_response(@params)
 
-Returns a new response object, passing C<@params> to its constructor.
+Returns a new response object, passing C<@params> to its constructor. If the
+request's encoding is defined, this is applied to the response object.
 
 =head2 env
 
@@ -780,9 +783,8 @@ C<undef> is passed, no encoding or decoding will be done.
 
 No known bugs.
 
-Please report any bugs through RT: email
-C<bug-web-request at rt.cpan.org>, or browse to
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-Request>.
+Please report any bugs to GitHub Issues at
+L<https://github.com/paultcochrane/web-request/issues>.
 
 =head1 SEE ALSO
 
@@ -805,7 +807,7 @@ L<https://metacpan.org/release/Web-Request>
 
 =item * Github
 
-L<https://github.com/doy/web-request>
+L<https://github.com/paultcochrane/web-request>
 
 =item * RT: CPAN's request tracker
 
@@ -819,13 +821,23 @@ L<http://cpanratings.perl.org/d/Web-Request>
 
 =for Pod::Coverage BUILD
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Jesse Luehrs <doy@tozt.net>
 
+=item *
+
+Paul Cochrane <paul@peateasea.de>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Jesse Luehrs.
+This software is copyright (c) 2012--2026 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

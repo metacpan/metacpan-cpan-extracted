@@ -8,14 +8,16 @@ use Config;
 use File::Compare qw(compare);
 use File::Path qw(mkpath remove_tree);
 use File::Spec;
-use File::Temp qw(tempfile);
+use File::Temp qw(tempdir tempfile);
 use FindBin qw($Bin);
 use IPC::Open3 qw(open3);
 use IO::Uncompress::Gunzip;
+use IO::Uncompress::Unzip qw($UnzipError);
 use JSON::XS qw(decode_json);
 use Text::CSV_XS;
 use lib qw(./lib ../lib);
 use Convert::Pheno;
+use Convert::Pheno::DB::Bundle qw(bundled_database_path);
 use Convert::Pheno::IO::FileIO qw(io_yaml_or_json);
 
 our @EXPORT_OK = qw(
@@ -23,6 +25,7 @@ our @EXPORT_OK = qw(
   is_ld_arch
   is_windows
   has_ohdsi_db
+  test_ohdsi_db_dir
   slurp_file
   load_json_file
   read_first_json_object
@@ -40,8 +43,11 @@ our @EXPORT_OK = qw(
   remove_dir_if_exists
   csv_files_match
   gunzip_file_content
+  slurp_zip_member
   run_command_capture
 );
+
+my $TEST_OHDSI_DB_DIR;
 
 sub build_convert {
     my (%args) = @_;
@@ -50,7 +56,7 @@ sub build_convert {
         in_files             => [],
         in_textfile          => 1,
         self_validate_schema => 0,
-        schema_file          => 'share/schema/mapping.json',
+        schema_file          => 'share/schema/mapping-v2.json',
         stream               => 0,
         omop_tables          => [],
         search               => 'exact',
@@ -74,7 +80,121 @@ sub is_windows {
 }
 
 sub has_ohdsi_db {
-    return -f 'share/db/ohdsi.db' ? 1 : 0;
+    return -f bundled_database_path( $Convert::Pheno::share_dir, 'ohdsi' )
+      ? 1
+      : 0;
+}
+
+sub test_ohdsi_db_dir {
+    return $TEST_OHDSI_DB_DIR if defined $TEST_OHDSI_DB_DIR;
+
+    $TEST_OHDSI_DB_DIR = tempdir(
+        'convert-pheno-ohdsi-XXXXXX',
+        TMPDIR  => 1,
+        CLEANUP => 1,
+    );
+    my $db_file = File::Spec->catfile( $TEST_OHDSI_DB_DIR, 'ohdsi.db' );
+    my $fixture      = 't/fixtures/ohdsi-concepts.tsv';
+    my $maps_fixture = 't/fixtures/ohdsi-maps-to.tsv';
+
+    open my $fh, '<:encoding(UTF-8)', $fixture
+      or die "Could not open test vocabulary '$fixture': $!";
+    my $csv = Text::CSV_XS->new( { binary => 1, sep_char => "\t" } );
+    my $headers = $csv->getline($fh)
+      or die "Test vocabulary '$fixture' has no header";
+    $csv->column_names( @{$headers} );
+
+    require DBI;
+    my $dbh = DBI->connect(
+        "dbi:SQLite:dbname=$db_file",
+        q{},
+        q{},
+        {
+            AutoCommit => 1,
+            PrintError => 0,
+            RaiseError => 1,
+        },
+    );
+    # Mirror the production schema so query preparation and bounded fuzzy
+    # retrieval are exercised against FTS5 rather than a compatibility table.
+    $dbh->do(
+        'CREATE TABLE OHDSI_table ('
+          . 'label TEXT, id TEXT, concept_id INTEGER, vocabulary_id TEXT, '
+          . 'domain_id TEXT, concept_class_id TEXT, standard_concept TEXT, '
+          . 'valid_start_date TEXT, valid_end_date TEXT, invalid_reason TEXT)'
+    );
+    $dbh->do(
+        'CREATE VIRTUAL TABLE OHDSI_fts USING fts5(label, id, concept_id, vocabulary_id)'
+    );
+    $dbh->do(
+        'CREATE TABLE OHDSI_maps_to ('
+          . 'source_concept_id INTEGER NOT NULL, target_concept_id INTEGER NOT NULL, '
+          . 'relationship_id TEXT NOT NULL, valid_start_date TEXT NOT NULL, '
+          . 'valid_end_date TEXT NOT NULL, invalid_reason TEXT NOT NULL, '
+          . 'PRIMARY KEY (source_concept_id, target_concept_id, relationship_id)) WITHOUT ROWID'
+    );
+
+    my $insert_table = $dbh->prepare(
+        'INSERT INTO OHDSI_table ('
+          . 'label, id, concept_id, vocabulary_id, domain_id, concept_class_id, '
+          . 'standard_concept, valid_start_date, valid_end_date, invalid_reason'
+          . ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+    my $insert_fts = $dbh->prepare(
+        'INSERT INTO OHDSI_fts (label, id, concept_id, vocabulary_id) VALUES (?, ?, ?, ?)'
+    );
+    my @concept_columns = qw(
+      label id concept_id vocabulary_id domain_id concept_class_id
+      standard_concept valid_start_date valid_end_date invalid_reason
+    );
+    while ( my $row = $csv->getline_hr($fh) ) {
+        my @values = map { $row->{$_} // q{} } @concept_columns;
+        $insert_table->execute(@values);
+        $insert_fts->execute( @values[ 0 .. 3 ] );
+    }
+    close $fh;
+
+    open my $maps_fh, '<:encoding(UTF-8)', $maps_fixture
+      or die "Could not open test mappings '$maps_fixture': $!";
+    my $maps_csv = Text::CSV_XS->new( { binary => 1, sep_char => "\t" } );
+    my $maps_headers = $maps_csv->getline($maps_fh)
+      or die "Test mappings '$maps_fixture' has no header";
+    $maps_csv->column_names( @{$maps_headers} );
+    my @mapping_columns = qw(
+      source_concept_id target_concept_id relationship_id
+      valid_start_date valid_end_date invalid_reason
+    );
+    my $insert_mapping = $dbh->prepare(
+        'INSERT INTO OHDSI_maps_to ('
+          . join( q{, }, @mapping_columns )
+          . ') VALUES (?, ?, ?, ?, ?, ?)'
+    );
+    while ( my $row = $maps_csv->getline_hr($maps_fh) ) {
+        $insert_mapping->execute(
+            map { $row->{$_} // q{} } @mapping_columns
+        );
+    }
+    close $maps_fh;
+
+    $dbh->do(
+        'CREATE INDEX idx_ohdsi_label_nocase ON OHDSI_table(label COLLATE NOCASE)'
+    );
+    $dbh->do(
+        'CREATE INDEX idx_ohdsi_id_nocase ON OHDSI_table(id COLLATE NOCASE)'
+    );
+    $dbh->do('CREATE UNIQUE INDEX idx_ohdsi_concept_id ON OHDSI_table(concept_id)');
+    $dbh->do(
+        'CREATE INDEX idx_ohdsi_vocabulary_code_nocase '
+          . 'ON OHDSI_table(vocabulary_id COLLATE NOCASE, id COLLATE NOCASE)'
+    );
+    $dbh->do(
+        'CREATE INDEX idx_ohdsi_standard_domain_label_nocase '
+          . 'ON OHDSI_table(domain_id COLLATE NOCASE, standard_concept, label COLLATE NOCASE) '
+          . q{WHERE invalid_reason = ''}
+    );
+    $dbh->disconnect;
+
+    return $TEST_OHDSI_DB_DIR;
 }
 
 sub slurp_file {
@@ -84,6 +204,28 @@ sub slurp_file {
     my $content = <$fh>;
     close $fh;
     return $content;
+}
+
+sub slurp_zip_member {
+    my ( $archive_path, $member_name ) = @_;
+    my $zip = IO::Uncompress::Unzip->new($archive_path)
+      or die "Cannot open ZIP archive '$archive_path': $UnzipError\n";
+
+    while (1) {
+        my $header = $zip->getHeaderInfo();
+        my $name   = $header->{Name};
+        my $text   = q{};
+        my $buffer;
+
+        while ( $zip->read($buffer) > 0 ) {
+            $text .= $buffer;
+        }
+
+        return $text if $name eq $member_name;
+        last unless $zip->nextStream();
+    }
+
+    die "Archive member '$member_name' not found in '$archive_path'\n";
 }
 
 sub load_json_file {

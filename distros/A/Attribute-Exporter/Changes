@@ -1,0 +1,9 @@
+Revision history for Perl extension Attribute::Exporter.
+
+0.02 2014-07-
+    - Regexp bug meant you could only have tags of one character
+
+0.01  Thu Jul 19 13:44:38 2012
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -AX Attribute::Exporter
+

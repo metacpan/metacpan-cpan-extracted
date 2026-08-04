@@ -81,8 +81,12 @@ sub select {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @pre = ( undef, $sf->{i}{ok} );
+    my $add_distinct = 'd*';
     if ( $sf->{o}{enable}{extended_cols} ) {
         push @pre, $sf->{i}{menu_addition};
+    }
+    else {
+        push @pre, $add_distinct;
     }
     my $cols = $sf->__avail_cols( $sql, $clause );
     my $menu = [ @pre, @$cols ];
@@ -122,6 +126,9 @@ sub select {
             };
             return 1;
         }
+        elsif ( $menu->[$idx[0]] eq $add_distinct ) {
+            $sf->__distinct( $sql );
+        }
         elsif ( $menu->[$idx[0]] eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $complex_col = $ext->column( $sql, $clause );
@@ -129,7 +136,12 @@ sub select {
                 next COLUMNS
             }
             elsif ( ref( $complex_col ) eq 'HASH' ) {
-                $sql->{alias} = $complex_col;
+                if ( exists $complex_col->{alias} ) {
+                    $sql->{alias} = $complex_col->{alias} ;
+                }
+                elsif ( exists $complex_col->{distinct} ) {
+                    $sf->__distinct( $sql );
+                }
             }
             else {
                 my $alias = $ax->alias( $sql, 'complex_cols_select', $complex_col );
@@ -173,32 +185,28 @@ sub __add_chosen_cols {
 }
 
 
-sub distinct {
+sub __distinct {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my @pre = ( undef, $sf->{i}{ok} );
-
-    DISTINCT: while ( 1 ) {
-        my $menu = [ @pre, "DISTINCT", "ALL" ];
-        my $info = $ax->get_sql_info( $sql );
-        # Choose
-        my $select_distinct = $tc->choose(
-            $menu,
-            { %{$sf->{i}{lyt_h}}, info => $info }
-        );
-        $ax->print_sql_info( $info );
-        if ( ! defined $select_distinct ) {
-            if ( $sql->{distinct_stmt} ) {
-                $sql->{distinct_stmt} = '';
-                next DISTINCT;
-            }
-            return;
-        }
-        elsif ( $select_distinct eq $sf->{i}{ok} ) {
-            return 1;
-        }
-        $sql->{distinct_stmt} = ' ' . $select_distinct;
+    my @pre = ( undef );
+    my $yes = 'Yes';
+    my $menu = [ @pre, $yes, 'No' ];
+    my $info = $ax->get_sql_info( $sql );
+    # Choose
+    my $chosen_distinct = $tc->choose(
+        $menu,
+        { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Select DISTINCT:' }
+    );
+    $ax->print_sql_info( $info );
+    if ( ! defined $chosen_distinct ) {
+        return;
+    }
+    elsif ( $chosen_distinct eq $yes ) {
+        $sql->{distinct_stmt} = " DISTINCT";
+    }
+    else {
+        $sql->{distinct_stmt} = '';
     }
 }
 

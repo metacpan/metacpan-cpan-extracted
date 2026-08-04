@@ -76,7 +76,7 @@ sub defaults {
             update      => 0,
             delete      => 0,
 
-            extended_cols   => 0,
+            extended_cols   => 1,
             extended_values => 0,
             extended_args   => 0,
 

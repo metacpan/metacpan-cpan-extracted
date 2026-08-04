@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use List::Util qw(any);
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use parent 'Lingua::famibeib::Fragment';
 
@@ -33,6 +33,7 @@ sub new {
 }
 
 
+#@returns Lingua::famibeib::Word
 sub type {
     my ($self, @opts) = @_;
 
@@ -78,6 +79,7 @@ sub is_exclamation {
 }
 
 
+#@returns Lingua::famibeib::Word
 sub main_verb {
     my ($self, @opts) = @_;
 
@@ -133,7 +135,7 @@ Lingua::famibeib::Sentence - module to interact with the famibeib sentences
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -143,6 +145,8 @@ This module implements a fragment that is a proper well formed sentence.
 This is ensured at construction time.
 
 This module inherits from L<Lingua::famibeib::Fragment>.
+
+=head1 METHODS
 
 =head2 type
 

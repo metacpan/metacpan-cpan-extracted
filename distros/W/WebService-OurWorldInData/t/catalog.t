@@ -20,24 +20,28 @@ is $catalog, object {
     }, 'Base class object correct';
 
 subtest 'find all charts (partial list)' => sub {
-    ok my $charts = $catalog->find( '' ), 'Can find charts';
-    is scalar @$charts, 1822, 'Found number of charts correct as of v0.03';
+    ok my $charts = $catalog->find, 'Can find charts';
+    is scalar @$charts, 3659, 'Found number of charts correct as of v0.04';
     is $charts, array { all_items match qr/\w/; etc; }, 'No blank lines';
 };
 
 subtest 'find search term' => sub {
     ok my $results = $catalog->find( 'covid' ), 'Can use the fake OWID search';
 
-    is scalar @$results, 25, 'Found covid results';
+    is @$results, 25, 'Found covid results';
     is $results, array {
             all_items match qr/covid/;
             etc();
         }, 'Results match search criteria';
+
+    ok my $more_results = $catalog->find( qr/covid|death/ ), 'Can find with a regex';
+
+    is @$more_results, 566, 'Found covid and death results';
 };
 
 subtest 'get_topics (partial list)' => sub {
     ok my @topics = $catalog->get_topics, 'Can get topics list';
-    is scalar @topics, 29, 'Found number of topics correct as of v0.03';
+    is @topics, 123, 'Found number of topics correct as of v0.04';
 };
 
 done_testing;

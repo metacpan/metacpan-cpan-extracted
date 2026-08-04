@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use parent 'Data::Identifier::Interface::Known';
 
@@ -44,14 +44,14 @@ Lingua::famibeib - module to interact with the famibeib language
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
     use Lingua::famibeib;
 
 This is the top level module for famibeib support.
-famibeib is a artificial language.
+famibeib is an artificial language.
 
 Most users are likely interested in
 L<Lingua::famibeib::Text> (for text handling and parsing),

@@ -6,6 +6,7 @@ examples/pub.pl
 examples/request.pl
 examples/sub-pub.pl
 examples/sub.pl
+lib/Net/NATS2/Base.pm
 lib/Net/NATS2/Client.pm
 lib/Net/NATS2/ConnectInfo.pm
 lib/Net/NATS2/Connection.pm
@@ -26,5 +27,6 @@ t/jetstream.t
 t/nats.t
 t/reconnect.t
 test.sh
+TODO.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -30,7 +30,7 @@ use Convert::Pheno::Emit::OMOP qw(
   omop_streams_multiple_entities
 );
 use Convert::Pheno::OMOP::ParticipantStream qw(
-  omop_require_concept
+  omop_require_core_tables
   omop_init_caches_and_metadata
   omop_prepare_data_shape
 );
@@ -44,6 +44,7 @@ use Convert::Pheno::PXF::ToBFF;
 use Convert::Pheno::OpenEHR::ToBFF;
 use Convert::Pheno::BFF::ToPXF;
 use Convert::Pheno::BFF::ToOMOP;
+use Convert::Pheno::CBioPortal::ToBFF;
 use Convert::Pheno::CDISC::ODM;
 use Convert::Pheno::CDISC::SDTM::ToBFF;
 use Convert::Pheno::FHIR::ToBFF;
@@ -58,7 +59,7 @@ our @EXPORT =
 use constant DEVEL_MODE => 0;
 
 # Global variables:
-our $VERSION   = '0.33';
+our $VERSION   = '0.34';
 our $share_dir = dist_dir('Convert-Pheno');
 
 # SQLite database
@@ -76,29 +77,33 @@ my $default_username = sub {
 
 # Complex defaults here
 has search => (
-    is     => 'ro',
-    coerce => sub { $_[0] // 'exact' },
-    isa    => Enum [qw(exact mixed fuzzy)]
+    is      => 'ro',
+    default => sub { 'exact' },
+    coerce  => sub { $_[0] // 'exact' },
+    isa     => Enum [qw(exact mixed fuzzy)]
 );
 
 has text_similarity_method => (
-    is     => 'ro',
-    coerce => sub { $_[0] // 'cosine' },
-    isa    => Enum [qw(cosine dice)]
+    is      => 'ro',
+    default => sub { 'cosine' },
+    coerce  => sub { $_[0] // 'cosine' },
+    isa     => Enum [qw(cosine dice)]
 );
 
 has min_text_similarity_score => (
-    is     => 'ro',
-    coerce => sub { $_[0] // 0.8 },
-    isa    => sub {
+    is      => 'ro',
+    default => sub { 0.8 },
+    coerce  => sub { $_[0] // 0.8 },
+    isa     => sub {
         die "Only values between 0 .. 1 supported!"
           unless ( $_[0] >= 0.0 && $_[0] <= 1.0 );
     }
 );
 has levenshtein_weight => (
-    is     => 'ro',
-    coerce => sub { $_[0] // 0.1 },
-    isa    => sub {
+    is      => 'ro',
+    default => sub { 0.1 },
+    coerce  => sub { $_[0] // 0.1 },
+    isa     => sub {
         die "Only values between 0 .. 1 supported!"
           unless ( $_[0] >= 0.0 && $_[0] <= 1.0 );
     }
@@ -155,7 +160,7 @@ has exposures_file => (
 );
 
 # Miscellanea atributes here
-has [qw /test print_hidden_labels self_validate_schema path_to_ohdsi_db/] =>
+has [qw /test self_validate_schema path_to_ohdsi_db/] =>
   ( default => undef, is => 'ro' );
 
 has [qw /stream ohdsi_db/] => ( default => 0, is => 'ro' );
@@ -170,7 +175,7 @@ has default_vital_status => (
 has [qw /in_files/] => ( default => sub { [] }, is => 'ro' );
 
 has [
-    qw /out_file out_dir in_textfile in_file sep sql2csv redcap_dictionary mapping_file schema_file debug log verbose search_audit_file/
+    qw /out_file out_dir in_textfile in_file sep sql2csv redcap_dictionary mapping_file schema_file define_xml debug log verbose term_audit_file/
 ] => ( is => 'ro' );
 
 has [qw /data method/] => ( is => 'rw' );
@@ -277,6 +282,48 @@ sub redcap2omop {
     return run_conversion_pipeline($self);
 }
 
+###################
+###################
+# CBIOPORTAL2BFF   #
+###################
+###################
+
+sub cbioportal2bff {
+    my $self = shift;
+    _prepare_cbioportal2bff_input($self);
+    $self->{conversion_context} = Convert::Pheno::Context->from_self(
+        $self,
+        {
+            source_format => 'cbioportal',
+            target_format => 'beacon',
+            entities      => $self->{entities} || ['individuals'],
+        }
+    );
+    return _run_primary_view($self);
+}
+
+###################
+###################
+# CBIOPORTAL2PXF   #
+###################
+###################
+
+sub cbioportal2pxf {
+    my $self = shift;
+    return run_conversion_pipeline($self);
+}
+
+###################
+###################
+# CBIOPORTAL2OMOP  #
+###################
+###################
+
+sub cbioportal2omop {
+    my $self = shift;
+    return run_conversion_pipeline($self);
+}
+
 ##########################################################
 # OMOP helpers - contain state mutation & pipeline       #
 ##########################################################
@@ -291,8 +338,8 @@ sub _omop_collect_input {
     return source_adapter( $self, 'omop' )->load;
 }
 
-sub _omop_require_concept {
-    return omop_require_concept(@_);
+sub _omop_require_core_tables {
+    return omop_require_core_tables(@_);
 }
 
 sub _omop_init_caches_and_metadata {
@@ -423,6 +470,49 @@ sub datasetjson2pxf {
 ####################
 
 sub datasetjson2omop {
+    my $self = shift;
+    return run_conversion_pipeline($self);
+}
+
+###################
+###################
+# DATASETXML2BFF   #
+###################
+###################
+
+sub datasetxml2bff {
+    my $self = shift;
+    _prepare_datasetxml2bff_input($self);
+    $self->{convertPheno} ||= get_info($self);
+    $self->{conversion_context} = Convert::Pheno::Context->from_self(
+        $self,
+        {
+            source_format => 'dataset-xml',
+            target_format => 'beacon',
+            entities      => $self->{entities} || ['individuals'],
+        }
+    );
+    return _run_primary_view($self);
+}
+
+###################
+###################
+# DATASETXML2PXF   #
+###################
+###################
+
+sub datasetxml2pxf {
+    my $self = shift;
+    return run_conversion_pipeline($self);
+}
+
+###################
+###################
+# DATASETXML2OMOP  #
+###################
+###################
+
+sub datasetxml2omop {
     my $self = shift;
     return run_conversion_pipeline($self);
 }
@@ -672,10 +762,14 @@ sub _prepare_bundle_input {
     my ($self) = @_;
 
     return _prepare_redcap2bff_input($self) if $self->{method} eq 'redcap2bff';
+    return _prepare_cbioportal2bff_input($self)
+      if $self->{method} eq 'cbioportal2bff';
     return _prepare_cdiscodm2bff_input($self)
       if $self->{method} eq 'cdiscodm2bff';
     return _prepare_datasetjson2bff_input($self)
       if $self->{method} eq 'datasetjson2bff';
+    return _prepare_datasetxml2bff_input($self)
+      if $self->{method} eq 'datasetxml2bff';
     return _prepare_fhir2bff_input($self)
       if $self->{method} eq 'fhir2bff';
     return _prepare_csv2bff_input($self)    if $self->{method} eq 'csv2bff';
@@ -703,6 +797,39 @@ sub _prepare_redcap2bff_input {
     return _prepare_tabular_input( $self, 'redcap' );
 }
 
+sub _prepare_cbioportal2bff_input {
+    my ($self) = @_;
+    return 1 if $self->{cbioportal_input_prepared} && exists $self->{data};
+
+    # Keep a module caller's in-memory package reusable while releasing the
+    # normalized patient-scoped records after each conversion.
+    $self->{_cbioportal_source_data} = $self->{data}
+      if exists $self->{data} && !exists $self->{_cbioportal_source_data};
+    $self->{data} = $self->{_cbioportal_source_data}
+      if !exists $self->{data} && exists $self->{_cbioportal_source_data};
+
+    my $source = source_adapter( $self, 'cbioportal' )->load;
+    $self->{data} = $source->data;
+    $self->{_owns_prepared_data} = 1 if $source->owned;
+    $self->{cbioportal_study} = $source->artifact('study');
+
+    my $compiled_mapping = $source->artifact('entity_mapping');
+    if ( defined $compiled_mapping ) {
+        $self->{data_mapping_file} = $compiled_mapping;
+    }
+    else {
+        delete $self->{data_mapping_file};
+    }
+
+    my $loaded_mapping = $source->artifact('mapping');
+    $self->{mapping_file_derived_entity_overrides} =
+      _mapping_file_derived_entity_overrides($loaded_mapping);
+    $self->{metaData}     = get_metaData($self);
+    $self->{convertPheno} = get_info($self);
+    $self->{cbioportal_input_prepared} = 1;
+    return 1;
+}
+
 sub _prepare_cdiscodm2bff_input {
     my ($self) = @_;
     return 1 if exists $self->{data} && exists $self->{data_mapping_file};
@@ -711,27 +838,45 @@ sub _prepare_cdiscodm2bff_input {
 
 sub _prepare_datasetjson2bff_input {
     my ($self) = @_;
-    return 1
-      if $self->{dataset_json_input_prepared} && exists $self->{data};
+    return _prepare_sdtm_dataset_input( $self, 'dataset-json', 'dataset_json' );
+}
 
-    # Keep the caller's Dataset-JSON documents separate from the normalized
-    # participant buffer. The latter is released after each conversion, while
-    # the former allows a module caller to reuse the same converter safely.
-    $self->{_dataset_json_source_data} = $self->{data}
-      if exists $self->{data} && !exists $self->{_dataset_json_source_data};
-    $self->{data} = $self->{_dataset_json_source_data}
-      if !exists $self->{data} && exists $self->{_dataset_json_source_data};
+sub _prepare_datasetxml2bff_input {
+    my ($self) = @_;
+    return _prepare_sdtm_dataset_input( $self, 'dataset-xml', 'dataset_xml' );
+}
 
-    my $source = source_adapter( $self, 'dataset-json' )->load;
+sub _prepare_sdtm_dataset_input {
+    my ( $self, $source_format, $state_prefix ) = @_;
+    my $prepared_key    = $state_prefix . '_input_prepared';
+    my $source_data_key = '_' . $state_prefix . '_source_data';
+
+    return 1 if $self->{$prepared_key} && exists $self->{data};
+
+    # Keep caller-owned source documents separate from the normalized
+    # participant buffer so a module converter can be reused safely.
+    $self->{$source_data_key} = $self->{data}
+      if exists $self->{data} && !exists $self->{$source_data_key};
+    $self->{data} = $self->{$source_data_key}
+      if !exists $self->{data} && exists $self->{$source_data_key};
+
+    my $source = source_adapter( $self, $source_format )->load;
     $self->{data} = $source->data;
     $self->{_owns_prepared_data} = 1 if $source->owned;
-    $self->{dataset_json_metadata} = $source->artifact('dataset_metadata');
-    $self->{dataset_json_subject_independent_domains} =
+    $self->{ $state_prefix . '_metadata' } =
+      $source->artifact('dataset_metadata');
+    $self->{ $state_prefix . '_subject_independent_domains' } =
       $source->artifact('subject_independent_domains');
     $self->{source_derived_entity_overrides} =
       $source->artifact('derived_entity_overrides') || {};
+    $self->{sdtm_terminology_mapping} =
+      $source->artifact('terminology_mapping') || {};
+    $self->{sdtm_source_terms} =
+      $source->artifact('source_terminology') || {};
+    $self->{terminology_lookup_required} =
+      $source->artifact('terminology_requires_sqlite') ? 1 : 0;
     $self->{convertPheno} ||= get_info($self);
-    $self->{dataset_json_input_prepared} = 1;
+    $self->{$prepared_key} = 1;
 
     return 1;
 }
@@ -789,7 +934,14 @@ sub _prepare_tabular_input {
 
 sub _prepare_omop2bff_input {
     my ($self) = @_;
-    return 1 if exists $self->{data};
+    return 1 if $self->{omop_input_prepared} && exists $self->{data};
+
+    # Keep caller-owned table data reusable. The OMOP source adapter clones
+    # this input before cache construction and participant grouping consume it.
+    $self->{_omop_source_data} = $self->{data}
+      if exists $self->{data} && !exists $self->{_omop_source_data};
+    $self->{data} = $self->{_omop_source_data}
+      if !exists $self->{data} && exists $self->{_omop_source_data};
 
     $self->{method_ori} =
       exists $self->{method_ori} ? $self->{method_ori} : 'omop2bff';
@@ -799,7 +951,7 @@ sub _prepare_omop2bff_input {
     my $source = _omop_collect_input($self);
     my $data   = $source->data;
 
-    _omop_require_concept( $self, $data );
+    _omop_require_core_tables( $self, $data );
     _require_omop_specimen_for_biosamples(
         $self,
         $data,
@@ -815,6 +967,7 @@ sub _prepare_omop2bff_input {
     $self->{filepath_sql} = $source->artifact('filepath_sql')
       if defined $source->artifact('filepath_sql');
     $self->{filepaths_csv} = $source->artifact('filepaths_csv') || [];
+    $self->{omop_input_prepared} = 1;
 
     return 1;
 }
@@ -1174,8 +1327,9 @@ Convert::Pheno - Convert clinical and phenotypic data between supported models
 C<Convert::Pheno> is the conversion engine used by the C<convert-pheno>
 command-line program. It converts supported in-memory data structures and
 route-specific file inputs between Beacon v2 Models Format (BFF),
-Phenopackets v2 (PXF), OMOP-CDM, REDCap, CDISC-ODM, CDISC Dataset-JSON,
-FHIR R4, openEHR, and tabular representations.
+Phenopackets v2 (PXF), OMOP-CDM, REDCap, cBioPortal clinical study packages,
+CDISC-ODM, CDISC Dataset-JSON, CDISC Dataset-XML, FHIR R4, openEHR, and tabular
+representations.
 
 Conversion availability and required arguments depend on the selected route.
 Mapping-file conversions use the Mapping V2 contract and require

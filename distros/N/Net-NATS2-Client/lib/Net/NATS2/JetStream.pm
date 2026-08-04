@@ -6,29 +6,9 @@ use warnings;
 
 use JSON qw(decode_json encode_json);
 use Time::HiRes 'time';
+use Net::NATS2::Base;
 
-sub new {
-    my $class = shift;
-    return bless {@_}, $class;
-}
-
-sub client {
-    my $self = shift;
-    $self->{client} = shift if @_;
-    return $self->{client};
-}
-
-sub timeout {
-    my $self = shift;
-    $self->{timeout} = shift if @_;
-    return $self->{timeout};
-}
-
-sub last_error {
-    my $self = shift;
-    $self->{last_error} = shift if @_;
-    return $self->{last_error};
-}
+has $_ for qw(client timeout last_error);
 
 sub api_info {
     my ($self, $timeout) = @_;

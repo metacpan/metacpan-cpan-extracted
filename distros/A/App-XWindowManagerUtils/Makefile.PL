@@ -14,8 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-XWindowManagerUtils",
   "EXE_FILES" => [
+    "script/get-window-kde-activity",
     "script/get-xwm-window-kde-activity",
-    "script/list-xwm-windows"
+    "script/list-windows",
+    "script/list-xwm-windows",
+    "script/move-windows-to-kde-activity",
+    "script/move-windows-to-this-kde-activity"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -24,11 +28,12 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::array" => "0.914",
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
-    "Desktop::XWindowManager::Util" => 0,
+    "Desktop::XWindowManager::Util" => "0.005",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
     "Perinci::Sub::DepChecker" => 0,
+    "Sah::Schema::kdeactivity::name" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -38,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +54,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::array" => "0.914",
   "Data::Sah::Compiler::perl::TH::bool" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
-  "Desktop::XWindowManager::Util" => 0,
+  "Desktop::XWindowManager::Util" => "0.005",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
@@ -57,6 +62,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",
   "Perinci::Sub::DepChecker" => 0,
+  "Sah::Schema::kdeactivity::name" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

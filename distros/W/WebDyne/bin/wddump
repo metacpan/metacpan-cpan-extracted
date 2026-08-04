@@ -42,7 +42,7 @@ local $Data::Dumper::Sortkeys=1;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.006';
+$VERSION='3.007';
 
 
 #  Run main

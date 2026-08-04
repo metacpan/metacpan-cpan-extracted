@@ -14,14 +14,14 @@ use Scalar::Util qw(looks_like_number);
 use List::Util   qw(first);
 use Cwd          qw(cwd);
 use Sys::Hostname;
-use IO::Compress::Gzip qw($GzipError);
+use Convert::Pheno::Audit::Terminology;
 use Convert::Pheno::DB::SQLite;
 use Convert::Pheno::Utils::Default qw(get_defaults);
 use Exporter 'import';
 use open qw(:std :encoding(UTF-8));
 
 our @EXPORT =
-  qw(map_ontology_term dotify_and_coerce_number get_current_utc_iso8601_timestamp map_iso8601_date2timestamp map_iso8601_timestamp2date get_date_component map_reference_range map_reference_range_csv map_age_range map2redcap_dict map2ohdsi convert2boolean get_age_from_date_and_birthday get_date_at_age generate_random_alphanumeric_string allocate_surrogate_integer map_operator_concept_id map_info_field map_omop_visit_occurrence convert_date_to_iso8601 validate_format get_metaData get_info merge_omop_tables convert_label_to_days finalize_search_audit);
+  qw(map_ontology_term dotify_and_coerce_number get_current_utc_iso8601_timestamp map_iso8601_date2timestamp map_iso8601_timestamp2date get_date_component map_reference_range map_reference_range_csv map_age_range map2redcap_dict map2ohdsi convert2boolean get_age_from_date_and_birthday get_date_at_age generate_random_alphanumeric_string allocate_surrogate_integer map_operator_concept_id map_info_field map_omop_visit_occurrence convert_date_to_iso8601 validate_format get_metaData get_info merge_omop_tables convert_label_to_days finalize_term_audit record_term_audit);
 
 my $DEFAULT = get_defaults();
 use constant DEVEL_MODE => 0;
@@ -31,27 +31,36 @@ sub _public_ontology_entry {
     my ($entry) = @_;
     my %public_entry = %{$entry};
     delete $public_entry{search_resolution};
+    delete $public_entry{match_source};
+    delete $public_entry{search_evidence};
     return \%public_entry;
 }
 
-sub _tsv_field {
-    my ($value) = @_;
-    return q{} unless defined $value;
-    $value =~ s/[\t\r\n]+/ /g;
-    return $value;
+sub _term_match_status {
+    my ($entry) = @_;
+    return 'not_found'
+      if !defined $entry->{id} || $entry->{id} =~ /:NA0000\z/;
+    return 'matched';
 }
 
-sub _search_audit_match_status {
-    my ( $ontology, $entry ) = @_;
-    my $fallback_id =
-      $ontology eq 'hpo' ? 'HP:NA0000' : uc($ontology) . ':NA0000';
-
-    # get_ontology_terms uses <...:NA0000> as the canonical "not found"
-    # marker, so the audit can expose that directly without another DB query.
-    return $entry->{id} eq $fallback_id ? 'not_found' : 'matched';
+sub _term_decision_reason {
+    my ( $status, $resolution, $evidence ) = @_;
+    return 'direct_mapping'
+      if $status eq 'configured' || $resolution eq 'direct_term';
+    return 'not_searched' if $status eq 'not_searched';
+    return 'score_below_threshold'
+      if $status eq 'not_found'
+      && defined $evidence->{best_candidate_score};
+    return 'no_candidate' if $status eq 'not_found';
+    return 'spelling_variant_accepted'
+      if $status eq 'matched' && $evidence->{spelling_variant};
+    return 'similarity_accepted' if $resolution eq 'similarity';
+    return 'exact_match'          if $resolution eq 'exact';
+    return 'source_fallback'      if $resolution eq 'fallback_source';
+    return 'resolved';
 }
 
-sub _search_audit_config {
+sub _term_audit_config {
     my ($self) = @_;
     my $search = $self->can('search')
       ? $self->search
@@ -81,67 +90,85 @@ sub _search_audit_config {
     };
 }
 
-sub _record_search_audit {
-    my ( $self, $query, $ontology, $entry, $source ) = @_;
-    return 1 unless defined $self->{search_audit_file} && length $self->{search_audit_file};
-    my $status = _search_audit_match_status( $ontology, $entry );
-    my $resolution = $entry->{search_resolution}
-      // ( $status eq 'matched' ? 'exact' : 'fallback_na' );
-    my $config = _search_audit_config($self);
+sub record_term_audit {
+    my ($arg) = @_;
+    my $self = $arg->{self};
+    return 1 unless defined $self->{term_audit_file} && length $self->{term_audit_file};
 
-    my $fh = $self->{_search_audit_fh};
-    unless ($fh) {
-        my $audit_fh = _open_search_audit_handle( $self->{search_audit_file} );
-        print {$audit_fh}
-          join(
-            "\t",
-            qw(row original_term_label converted_term_label converted_term_id ontology configured_search_mode text_similarity_method min_text_similarity_score levenshtein_weight match_status match_source lookup_resolution)
-          ) . "\n";
-        $self->{_search_audit_fh} = $audit_fh;
-        $fh = $audit_fh;
+    my $entry = $arg->{term} || {};
+    my $config = _term_audit_config($self);
+    my $lookup_column = $arg->{lookup_column} // q{};
+    my $status = $arg->{match_status} // _term_match_status($entry);
+    my $effective_search_mode = $arg->{effective_search_mode}
+      // ( $lookup_column eq 'id' || $lookup_column eq 'concept_id'
+        ? 'exact'
+        : length($lookup_column) ? $config->{search} : 'not_used' );
+    my $resolution = $arg->{lookup_resolution}
+      // $entry->{search_resolution}
+      // ( $status eq 'matched' ? 'exact' : 'fallback_na' );
+    my $fallback_action = $arg->{fallback_action}
+      // ( $status eq 'not_found' ? 'na' : 'none' );
+    my $evidence = $entry->{search_evidence} || {};
+    my $decision_reason = $arg->{decision_reason}
+      // _term_decision_reason( $status, $resolution, $evidence );
+    my %retrieval_path_name = (
+        exact_index => 'exact_lookup',
+        strict_fts  => 'all_tokens',
+        relaxed_fts => 'one_token_relaxed',
+        not_used    => 'not_used',
+    );
+    my $retrieval_path = exists $retrieval_path_name{ $evidence->{candidate_strategy} // q{} }
+      ? $retrieval_path_name{ $evidence->{candidate_strategy} }
+      : ( $effective_search_mode eq 'not_used' ? 'not_used' : q{} );
+
+    my $writer = $self->{_term_audit_writer};
+    unless ($writer) {
+        $writer = Convert::Pheno::Audit::Terminology->new(
+            path   => $self->{term_audit_file},
+            config => $config,
+        );
+        $self->{_term_audit_writer} = $writer;
     }
 
-    print {$fh} join(
-        "\t",
-        map { _tsv_field($_) } (
-            $self->{current_row},
-            $query,
-            $entry->{label},
-            $entry->{id},
-            $ontology,
-            $config->{search},
-            $config->{text_similarity_method},
-            $config->{min_text_similarity_score},
-            $config->{levenshtein_weight},
-            $status,
-            $source,
-            $resolution,
-        )
-      ),
-      "\n";
+    $writer->write_row(
+        {
+            row                       => $self->{current_row},
+            source_record             => $arg->{source_record},
+            source_field              => $arg->{source_field},
+            source_value              => $arg->{source_value},
+            source_label              => $arg->{source_label},
+            lookup_query              => $arg->{lookup_query},
+            lookup_column             => $lookup_column,
+            converted_term_label      => $entry->{label},
+            converted_term_id         => $entry->{id},
+            ontology                  => $arg->{ontology},
+            configured_search_mode    => $config->{search},
+            effective_search_mode     => $effective_search_mode,
+            text_similarity_method    => $config->{text_similarity_method},
+            min_text_similarity_score => $config->{min_text_similarity_score},
+            levenshtein_weight        => $config->{levenshtein_weight},
+            match_status              => $status,
+            decision_reason           => $decision_reason,
+            match_source              => $arg->{match_source},
+            lookup_resolution         => $resolution,
+            fallback_action           => $fallback_action,
+            retrieval_path            => $retrieval_path,
+            best_candidate_label      => $evidence->{best_candidate_label},
+            best_candidate_id         => $evidence->{best_candidate_id},
+            best_candidate_score      => $evidence->{best_candidate_score},
+            score_margin              => $evidence->{score_margin},
+        }
+    );
 
     return 1;
 }
 
-sub _open_search_audit_handle {
-    my ($filepath) = @_;
-
-    if ( $filepath =~ /\.gz$/ ) {
-        my $fh = IO::Compress::Gzip->new($filepath)
-          or die "Cannot gzip <$filepath>: $GzipError";
-        binmode( $fh, ':encoding(UTF-8)' );
-        return $fh;
-    }
-
-    open my $fh, '>:encoding(UTF-8)', $filepath;
-    return $fh;
-}
-
-sub finalize_search_audit {
+sub finalize_term_audit {
     my ($self) = @_;
-    return 1 unless exists $self->{_search_audit_fh};
+    return 1 unless exists $self->{_term_audit_writer};
 
-    close delete $self->{_search_audit_fh};
+    my $writer = delete $self->{_term_audit_writer};
+    $writer->close;
     return 1;
 }
 
@@ -156,6 +183,11 @@ sub map_ontology_term {
     my $query    = $arg->{query};
     my $ontology = $arg->{ontology};
     my $self     = $arg->{self};
+    my $column   = $arg->{column} // 'label';
+    my $effective_search =
+      $column eq 'id' || $column eq 'concept_id'
+      ? 'exact'
+      : ( $arg->{search} // $self->{search} // 'exact' );
     my $profile_enabled =
       $self && defined $self->{debug} && $self->{debug} >= 2;
 
@@ -170,14 +202,15 @@ sub map_ontology_term {
     # or OMOP fallback by concept_id will never reach the DB.
     return $DEFAULT->{ontology_term}
       if looks_like_number($query)
-      && ( !defined $arg->{column} || $arg->{column} ne 'concept_id' );
+      && $column ne 'concept_id'
+      && $column ne 'id';
 
     # 2) If already an object, assume pre‑mapped
     return $query if ref $query eq 'HASH';
 
     # Cache lookup semantics as well as the query itself. Keeping the cache on
     # the converter prevents results leaking between API requests.
-    my $column_key = defined $arg->{column} ? $arg->{column} : q{};
+    my $column_key = $column;
     my $result_key = $arg->{require_concept_id} ? 'with_concept_id' : 'term';
     my $cache =
       ( $self->{_ontology_term_cache} ||= {} )->{$ontology}{$column_key}
@@ -196,8 +229,26 @@ sub map_ontology_term {
             $self->{db_profile}{ontology}{$ontology}{final_resolution}
               {$resolution}++;
         }
-        _record_search_audit( $self, $query, $ontology, $cache->{$query}, 'cache' );
-        return _public_ontology_entry( $cache->{$query} );
+        my $cached = { %{ $cache->{$query} }, match_source => 'cache' };
+        record_term_audit(
+            {
+                self                  => $self,
+                source_record         => $arg->{source_record},
+                source_field          => $arg->{source_field},
+                source_value          => $arg->{source_value} // $query,
+                source_label          => $arg->{source_label} // $query,
+                lookup_query          => $query,
+                lookup_column         => $column,
+                ontology              => $ontology,
+                term                  => $cached,
+                effective_search_mode => $effective_search,
+                match_source          => 'cache',
+            }
+          )
+          unless exists $arg->{audit} && !$arg->{audit};
+        return $arg->{return_metadata}
+          ? $cached
+          : _public_ontology_entry($cached);
     }
 
     # 4) --ohdsi-db
@@ -221,15 +272,16 @@ sub map_ontology_term {
         $self->{db_profile}{mapping}{db_lookups}++;
         $self->{db_profile}{ontology}{$ontology}{db_lookups}++;
     }
-    my ( $id, $label, $concept_id, $search_resolution ) = get_ontology_terms(
+    my ( $id, $label, $concept_id, $search_resolution, $search_evidence ) =
+      get_ontology_terms(
         {
             self                   => $self,
-            sth_column_ref         => $self->{sth}{$ontology}{ $arg->{column} },
+            sth_column_ref         => $self->{sth}{$ontology}{$column},
             query                  => $query,
             ontology               => $ontology,
             databases              => $self->{databases},
-            column                 => $arg->{column},
-            search                 => $self->{search},
+            column                 => $column,
+            search                 => $effective_search,
             text_similarity_method => $self->{text_similarity_method},
             min_text_similarity_score => $self->{min_text_similarity_score},
             levenshtein_weight        => $self->{levenshtein_weight},
@@ -250,27 +302,39 @@ sub map_ontology_term {
         label             => $label,
         concept_id        => $concept_id,
         search_resolution => $search_resolution,
+        search_evidence   => $search_evidence,
       }
       : {
         id                => $id,
         label             => $label,
         search_resolution => $search_resolution,
+        search_evidence   => $search_evidence,
       };
 
+    my $match_source = _term_match_status($entry) eq 'matched'
+      ? 'db'
+      : 'fallback_na';
+    $entry->{match_source} = $match_source;
     $cache->{$query} = $entry;
-    _record_search_audit(
-        $self,
-        $query,
-        $ontology,
-        $entry,
-        _search_audit_match_status( $ontology, $entry ) eq 'matched'
-        ? 'db'
-        : 'fallback_na'
-    );
+    record_term_audit(
+        {
+            self                  => $self,
+            source_record         => $arg->{source_record},
+            source_field          => $arg->{source_field},
+            source_value          => $arg->{source_value} // $query,
+            source_label          => $arg->{source_label} // $query,
+            lookup_query          => $query,
+            lookup_column         => $column,
+            ontology              => $ontology,
+            term                  => $entry,
+            effective_search_mode => $effective_search,
+            match_source          => $match_source,
+        }
+      )
+      unless exists $arg->{audit} && !$arg->{audit};
 
-    # 7) Return (with optional hidden‐label)
-    return $arg->{print_hidden_labels}
-      ? { %{ _public_ontology_entry($entry) }, _label => $query }
+    return $arg->{return_metadata}
+      ? { %{$entry} }
       : _public_ontology_entry($entry);
 }
 

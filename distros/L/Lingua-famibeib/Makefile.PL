@@ -18,14 +18,16 @@ my %WriteMakefileArgs = (
   "NAME" => "Lingua::famibeib",
   "PREREQ_PM" => {
     "Carp" => "1.35",
-    "Data::Identifier" => "0.25.0"
+    "Data::Displaycolour" => "0.7.0",
+    "Data::IconText" => "0.6.0",
+    "Data::Identifier" => "0.33.0"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.03",
+  "VERSION" => "v0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +36,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
-  "Data::Identifier" => "0.25.0",
+  "Data::Displaycolour" => "0.7.0",
+  "Data::IconText" => "0.6.0",
+  "Data::Identifier" => "0.33.0",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",
   "Test::Warn" => "0.30"

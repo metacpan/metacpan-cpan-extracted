@@ -110,8 +110,8 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   }
   elsif ($TYPE eq 'mojo') {
     $req = Mojo::Message::Request->new(method => $method, url => Mojo::URL->new($uri_string));
+    $req->${\ (ref $body_content ? 'content' : 'body')}($body_content) if defined $body_content;
     $req->headers->add(@$_) foreach pairs @$headers;
-    $req->body($body_content) if defined $body_content;
 
     # add missing Content-Length, etc
     $req->fix_headers;
@@ -135,8 +135,8 @@ sub response ($code, $headers = [], $body_content = undef) {
   my $res;
   if ($TYPE eq 'mojo') {
     $res = Mojo::Message::Response->new(code => $code);
+    $res->${\ (ref $body_content ? 'content' : 'body') }($body_content) if defined $body_content;
     $res->headers->add(@$_) foreach pairs @$headers;
-    $res->body($body_content) if defined $body_content;
 
     # add missing Content-Length, etc
     $res->fix_headers;
@@ -254,6 +254,17 @@ sub _generate_body ($headers, $body_content) {
   if ($content_type eq 'application/x-www-form-urlencoded') {
     $body_content = _form_urlencoded_content($body_content);
   }
+  elsif ($content_type eq 'multipart/form-data') {
+    # Content-Type is constructed by _multipart_body
+    @$headers = pairgrep { fc($a) ne fc('Content-Type') } @$headers;
+
+    $body_content = _multipart_body($body_content);
+
+    if ($TYPE ne 'mojo') {
+      push @$headers, 'Content-Type', $body_content->headers->content_type;
+      $body_content = _multipart_body_string($body_content);
+    }
+  }
   else {
     die 'unsupported Content-Type '.$content_type;
   }
@@ -280,6 +291,50 @@ sub _form_urlencoded_content ($body_content) {
   ])->to_string
 
   : die 'unknown ref type';
+}
+
+# Accepts an arrayref of message parts; returns a Mojo::Content::MultiPart object
+# only supports multipart/form-data (for now)
+# Each part consists of an arrayref in this format:
+# [ $name => $value, $header_name1 => '..', $header_name2 => '..' ]
+# If value is an arrayref, then a part is created for each value with the same name and headers
+# (see Mojo::UserAgent::Transactor::_parts)
+sub _multipart_body ($raw_parts) {
+  my @parts;
+  foreach my $part_spec ($raw_parts->@*) {
+    my ($name, $value, @headers) = $part_spec->@*;
+
+    foreach my $value (ref $value eq 'ARRAY' ? @$value : ($value)) {
+      # construct nested types other than multipart by serializing manually
+      die 'unsupported data type '.ref($value) if ref $value;
+
+      my $part = Mojo::Content::Single->new->asset(Mojo::Asset::Memory->new->add_chunk($value));
+
+      $part->headers->add($_->[0], ref $_->[1] eq 'ARRAY' ? (map +($_.''), $_->[1]->@*) : $_->[1].'')
+        foreach pairs @headers;
+
+      if (not defined $part->headers->content_disposition) {
+        $name = Mojo::Util::url_escape($name, '"');
+        $part->headers->content_disposition(qq{form-data; name="$name"});
+      }
+      push @parts, $part;
+    }
+  }
+
+  my $content = Mojo::Content::MultiPart->new(parts => \@parts);
+  $content->headers->content_type('multipart/form-data');
+  $content->build_boundary;
+  return $content;
+}
+
+# stringify Mojo::Content::MultiPart and calculate real Content-Type (e.g. boundary for form-data)
+sub _multipart_body_string ($content_obj) {
+  my ($i, $body_content) = (0, '');
+  while (my $length = length(my $chunk = $content_obj->get_body_chunk($i))) {
+    $i += $length;
+    $body_content .= $chunk;
+  }
+  return $body_content;
 }
 
 # prints the method and URI of the request, or the response code and message of the response,

@@ -1,10 +1,11 @@
 package Net::NATS2::Client;
 
-our $VERSION = '0.3.3';
+our $VERSION = '0.3.4';
 
 use IO::Select;
 use Time::HiRes qw(time sleep);
 use Encode      qw(encode_utf8);
+use MIME::Base64 qw(encode_base64);
 
 use v5.10;
 use strict;
@@ -21,71 +22,18 @@ use Net::NATS2::Message;
 use Net::NATS2::ServerInfo;
 use Net::NATS2::ConnectInfo;
 use Net::NATS2::Subscription;
+use Net::NATS2::Base qw(-no_new);
 
-sub _new {
-    my $class = shift;
-    return bless {@_}, $class;
-}
-
-sub connection {
-    my $self = shift;
-    $self->{connection} = shift if @_;
-    return $self->{connection};
-}
-
-sub server_info {
-    my $self = shift;
-    $self->{server_info} = shift if @_;
-    return $self->{server_info};
-}
-
-sub socket_args {
-    my $self = shift;
-    $self->{socket_args} = shift if @_;
-    return $self->{socket_args};
-}
-
-sub auto_reconnect {
-    my $self = shift;
-    $self->{auto_reconnect} = shift if @_;
-    return $self->{auto_reconnect};
-}
-
-sub reconnect_attempts {
-    my $self = shift;
-    $self->{reconnect_attempts} = shift if @_;
-    return $self->{reconnect_attempts};
-}
-
-sub reconnect_delay {
-    my $self = shift;
-    $self->{reconnect_delay} = shift if @_;
-    return $self->{reconnect_delay};
-}
-
-sub subscriptions {
-    my $self = shift;
-    $self->{subscriptions} = shift if @_;
-    return $self->{subscriptions};
-}
-
-sub uri {
-    my $self = shift;
-    $self->{uri} = shift if @_;
-    return $self->{uri};
-}
-
-sub current_sid   : lvalue { $_[0]->{current_sid} }
-sub message_count : lvalue { $_[0]->{message_count} }
+has $_ for qw(connection server_info socket_args auto_reconnect reconnect_attempts reconnect_delay subscriptions uri current_sid message_count nkey nkey_sig_cb);
 
 sub new {
     my $class = shift;
 
-    my $self = $class->_new(@_);
+    my $self = bless {@_}, $class;
     $self->socket_args({}) unless defined $self->socket_args;
     $self->subscriptions({});
-    $self->current_sid   = 0;
-    $self->message_count = 0;
+    $self->current_sid(0);
+    $self->message_count(0);
     $self->reconnect_attempts(3) unless defined $self->reconnect_attempts;
     $self->reconnect_delay(1)    unless defined $self->reconnect_delay;
 
@@ -108,22 +56,7 @@ sub connect {
     my $info = Net::NATS2::ServerInfo->new(%{decode_json($args[0])});
     $self->server_info($info);
 
-    my $connect_info = Net::NATS2::ConnectInfo->new(
-        lang         => 'perl',
-        version      => $VERSION,
-        headers      => 1,
-        tls_required => $info->ssl_required || $info->tls_required,
-    );
-
-    if ($info->auth_required) {
-        if (!defined $uri->password) {
-            $connect_info->auth_token($uri->user);
-        }
-        else {
-            $connect_info->user($uri->user);
-            $connect_info->pass($uri->password);
-        }
-    }
+    my $connect_info = $self->_connect_info($info, $uri);
 
     if ($info->ssl_required || $info->tls_required) {
         $connection->upgrade() || return;
@@ -134,6 +67,48 @@ sub connect {
     $self->connection->send($connect);
 
     return 1;
+}
+
+sub _connect_info {
+    my ($self, $info, $uri) = @_;
+
+    my $connect_info = Net::NATS2::ConnectInfo->new(
+        lang         => 'perl',
+        version      => $VERSION,
+        headers      => 1,
+        tls_required => $info->ssl_required || $info->tls_required,
+    );
+
+    if ($info->auth_required && !defined $self->nkey) {
+        if (!defined $uri->password) {
+            $connect_info->auth_token($uri->user);
+        }
+        else {
+            $connect_info->user($uri->user);
+            $connect_info->pass($uri->password);
+        }
+    }
+
+    if (defined $self->nkey) {
+        die 'NKey authentication requires a server nonce' unless defined $info->nonce;
+        die 'NKey authentication requires nkey_sig_cb' unless ref $self->nkey_sig_cb eq 'CODE';
+
+        my $signature = $self->nkey_sig_cb->($info->nonce);
+        die 'NKey signature callback returned undef' unless defined $signature;
+
+        $connect_info->nkey($self->nkey);
+        $connect_info->sig(_base64url($signature));
+    }
+
+    return $connect_info;
+}
+
+sub _base64url {
+    my ($value) = @_;
+    $value = encode_base64($value, '');
+    $value =~ tr!+/!-_!;
+    $value =~ s/=+\z//;
+    return $value;
 }
 
 sub subscribe {
@@ -169,7 +144,7 @@ sub unsubscribe {
     my $self = shift;
     my ($subscription, $max_msgs) = @_;
 
-    $subscription->max_msgs = $max_msgs;
+    $subscription->max_msgs($max_msgs);
 
     my $sid = $subscription->sid;
     $sid .= " $max_msgs" if defined $max_msgs;
@@ -323,8 +298,8 @@ sub parse_msg {
         subscription => $subscription,
     );
 
-    $subscription->message_count++;
-    $self->message_count++;
+    $subscription->message_count($subscription->message_count + 1);
+    $self->message_count($self->message_count + 1);
 
     if ($subscription->defined_max && $subscription->message_count >= $subscription->max_msgs) {
         $self->_remove_subscription($subscription);
@@ -362,8 +337,8 @@ sub parse_hmsg {
         subscription  => $subscription,
     );
 
-    $subscription->message_count++;
-    $self->message_count++;
+    $subscription->message_count($subscription->message_count + 1);
+    $self->message_count($self->message_count + 1);
 
     if ($subscription->defined_max && $subscription->message_count >= $subscription->max_msgs) {
         $self->_remove_subscription($subscription);
@@ -435,11 +410,13 @@ sub _chomp {
 }
 
 sub handle_ping {
-    $_[0]->connection->send("PONG");
+    $_[0]->connection->send('PONG');
 }
 
 sub next_sid {
-    ++$_[0]->current_sid;
+    my $self = shift;
+    $self->current_sid($self->current_sid + 1);
+    return $self->current_sid;
 }
 
 sub close {
@@ -447,7 +424,7 @@ sub close {
 }
 
 sub new_inbox {
-    sprintf("_INBOX.%08X%08X%06X", rand(2**32), rand(2**32), rand(2**24));
+    sprintf('_INBOX.%08X%08X%06X', rand(2**32), rand(2**32), rand(2**24));
 }
 
 1;
@@ -578,6 +555,28 @@ C<< $message->header_length >>, and the payload through C<< $message->data >>.
 Protocol lengths are measured in bytes. UTF-8-flagged outbound strings are
 encoded as UTF-8 before being written; byte strings are sent unchanged. This
 applies to C<PUB> and C<HPUB> payloads as well as protocol control lines.
+
+=head1 NKEY AUTHENTICATION
+
+Set C<nkey> to the user NKey public key and C<nkey_sig_cb> to a coderef that
+accepts the server nonce and returns raw Ed25519 signature bytes. The client
+base64url-encodes the signature and includes both fields in C<CONNECT>. The
+application is responsible for securely loading and using the NKey seed or
+private key.
+
+For example, C<Crypt::PK::Ed25519> can load an application-managed private
+key and sign the nonce:
+
+  use Crypt::PK::Ed25519;
+
+  my $signer = Crypt::PK::Ed25519->new('/secure/path/user-ed25519.pem');
+  # The NATS-encoded public NKey matching the private key above.
+  my $nkey = $ENV{NATS_USER_NKEY};
+  my $client = Net::NATS2::Client->new(
+      uri         => 'nats://localhost:4222',
+      nkey        => $nkey,
+      nkey_sig_cb => sub { $signer->sign_message($_[0]) },
+  );
 
 =head1 RECONNECTION
 

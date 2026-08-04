@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.32;
+our $VERSION = v0.33;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -185,8 +185,7 @@ sub import {
             }
 
             if ($displayname_is_tagname && defined($displayname)) {
-                my %tagnames = map {$_ => undef} $displayname, $identifier->tagname(list => 1, default => [], no_defaults => 1);
-                $identifier->{tagname} = [keys %tagnames];
+                $identifier->_add_tagnames($displayname);
             } else {
                 $identifier->{displayname} //= $displayname; # force-update, using internal API. DO NOT TRY AT HOME!
             }
@@ -276,7 +275,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.32
+version v0.33
 
 =head1 SYNOPSIS
 

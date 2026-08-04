@@ -8,6 +8,7 @@ use JSON::PP ();
 use Scalar::Util qw(looks_like_number refaddr);
 use Storable qw(dclone);
 
+use Convert::Pheno::BFF::Biosample qw(biosample_to_phenopacket);
 use Convert::Pheno::Context;
 use Convert::Pheno::FHIR::Util qw(
   canonical_reference
@@ -15,6 +16,10 @@ use Convert::Pheno::FHIR::Util qw(
   quantity_unit_to_term
   resolve_reference
   source_term
+);
+use Convert::Pheno::FHIR::Profile::MCode qw(
+  condition_stage
+  detected_profile_metadata
 );
 use Convert::Pheno::Mapping::Shared qw(get_age_from_date_and_birthday);
 use Convert::Pheno::Model::Bundle;
@@ -31,6 +36,12 @@ my %MAPPED_RESOURCE = map { $_ => 1 } qw(
   Observation
   Procedure
   Specimen
+);
+my %SPECIMEN_STATUS_DISPLAY = (
+    available          => 'Available',
+    unavailable        => 'Unavailable',
+    unsatisfactory     => 'Unsatisfactory',
+    'entered-in-error' => 'Entered in Error',
 );
 
 sub run_fhir_to_bundle {
@@ -69,7 +80,11 @@ sub run_fhir_to_bundle {
         my $type = $resource->{resourceType} || q{};
 
         if ( $type eq 'Condition' ) {
-            _push_mapped( $individual, 'diseases', _map_condition( $resource, $patient ) );
+            _push_mapped(
+                $individual,
+                'diseases',
+                _map_condition( $resource, $patient, $index ),
+            );
             next;
         }
 
@@ -132,7 +147,7 @@ sub run_fhir_to_bundle {
     # carried between pipeline stages.
     if (@biosamples) {
         $individual->{info}{phenopacket}{biosamples} = [
-            map { _biosample_to_phenopacket($_) } @biosamples
+            map { biosample_to_phenopacket($_) } @biosamples
         ];
     }
 
@@ -146,6 +161,12 @@ sub run_fhir_to_bundle {
         };
         $individual->{info}{fhir}{unmappedResourceTypes} = \@unmapped_types
           if @unmapped_types;
+        my $mcode = detected_profile_metadata(
+            @{ $record->{bundleMetadata} || [] },
+            $patient,
+            @{$resources},
+        );
+        $individual->{info}{fhir}{profiles}{mcode} = $mcode if $mcode;
     }
 
     unless ( $self->{test} ) {
@@ -276,7 +297,7 @@ sub _patient_geographic_origin {
 }
 
 sub _map_condition {
-    my ( $condition, $patient ) = @_;
+    my ( $condition, $patient, $resource_index ) = @_;
     my $code = codeable_concept_to_term( $condition->{code}, 'Condition' );
     return unless $code;
 
@@ -300,6 +321,12 @@ sub _map_condition {
     if ( $verification && $verification->{id} =~ /:(?:refuted|entered-in-error)\z/i ) {
         $disease->{excluded} = JSON::PP::true();
     }
+
+    # mCODE identifies the cancer stage through an explicit profile contract.
+    # Generic FHIR Conditions remain unchanged because arbitrary stage content
+    # cannot be interpreted safely without knowing the governing profile.
+    my $stage = condition_stage( $condition, $resource_index );
+    $disease->{stage} = $stage if $stage;
 
     return $disease;
 }
@@ -566,10 +593,13 @@ sub _map_specimen {
     my $id = $specimen->{id};
     return unless defined $id && !ref($id) && length $id;
 
+    my $status_code = lc( $specimen->{status} // 'unknown' );
+    # Specimen.status is a required FHIR code: preserve that source identity
+    # instead of inferring a cross-ontology term, but use its canonical display.
     my $status = source_term(
         'SpecimenStatus',
-        $specimen->{status} // 'unknown',
-        $specimen->{status} // 'unknown',
+        $status_code,
+        $SPECIMEN_STATUS_DISPLAY{$status_code} // $status_code,
     );
     my $origin = codeable_concept_to_term( $specimen->{type}, 'SpecimenType' )
       || dclone( $DEFAULT->{ontology_term} );
@@ -632,41 +662,6 @@ sub _map_specimen {
     }
 
     return $biosample;
-}
-
-sub _biosample_to_phenopacket {
-    my ($biosample) = @_;
-    my $pxf = {
-        id             => $biosample->{id},
-        individualId   => $biosample->{individualId},
-        materialSample => dclone( $biosample->{biosampleStatus} ),
-        sampleType     => dclone( $biosample->{sampleOriginType} ),
-    };
-
-    $pxf->{sampledTissue} = dclone( $biosample->{sampleOriginDetail} )
-      if exists $biosample->{sampleOriginDetail};
-    $pxf->{timeOfCollection} = {
-        timestamp => $biosample->{collectionDate} . 'T00:00:00Z',
-      }
-      if exists $biosample->{collectionDate};
-
-    if ( ref( $biosample->{measurements} ) eq 'ARRAY' ) {
-        $pxf->{measurements} = [
-            map {
-                my $measurement = {
-                    assay => dclone( $_->{assayCode} ),
-                    value => dclone( $_->{measurementValue} ),
-                };
-                $measurement->{timeObserved} = {
-                    timestamp => $_->{date} . 'T00:00:00Z',
-                  }
-                  if exists $_->{date};
-                $measurement;
-            } @{ $biosample->{measurements} }
-        ];
-    }
-
-    return $pxf;
 }
 
 sub _observation_datetime {

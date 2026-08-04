@@ -3906,6 +3906,8 @@ async sub sse {
 }
 ```
 
+[Run](https://demo.webdyne.org/example/progress.psp)
+
 If you do not wish to use the &lt;start_html&gt; tag with the sse attribute
 you can use a meta tag to denote which subroutine to call for sse
 events, e.g. &lt;meta name="WebDyne" content="sse=sse"&gt;
@@ -3982,6 +3984,8 @@ async sub ws {
     return;
 }
 ```
+
+[Run](https://demo.webdyne.org/example/ws.psp)
 
 If you do not wish to use the &lt;start_html&gt; tag with the ws attribute
 you can use a meta tag to denote which subroutine to call for WebSocket

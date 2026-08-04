@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use lib qw(./lib ../lib);
+
 use Test::More;
 
 use Convert::Pheno;
@@ -52,6 +54,48 @@ is_deeply(
     conversion_spec('datasetjson2omop')->{pipeline},
     [ 'datasetjson2bff', 'bff2omop' ],
     'registry defines Dataset-JSON to OMOP as a compound conversion'
+);
+
+my $datasetxml_to_bff = conversion_spec('datasetxml2bff');
+is_deeply(
+    $datasetxml_to_bff->{pipeline},
+    ['datasetxml2bff'],
+    'registry defines Dataset-XML as a direct BFF bundle operation'
+);
+is_deeply(
+    $datasetxml_to_bff->{entities}{supported},
+    [ 'individuals', 'datasets', 'cohorts' ],
+    'registry limits Dataset-XML BFF output to implemented entities'
+);
+ok(
+    !is_http_conversion('datasetxml2bff'),
+    'registry keeps Dataset-XML plus Define-XML outside HTTP'
+);
+is_deeply(
+    conversion_spec('datasetxml2omop')->{pipeline},
+    [ 'datasetxml2bff', 'bff2omop' ],
+    'registry defines Dataset-XML to OMOP as a compound conversion'
+);
+
+my $cbioportal_to_bff = conversion_spec('cbioportal2bff');
+is_deeply(
+    $cbioportal_to_bff->{pipeline},
+    ['cbioportal2bff'],
+    'registry defines cBioPortal as a direct BFF bundle operation'
+);
+is_deeply(
+    $cbioportal_to_bff->{entities}{supported},
+    [ 'individuals', 'biosamples', 'datasets', 'cohorts' ],
+    'registry exposes the implemented cBioPortal-derived BFF entities'
+);
+ok(
+    !is_http_conversion('cbioportal2bff'),
+    'registry keeps filesystem cBioPortal study packages outside HTTP'
+);
+is_deeply(
+    conversion_spec('cbioportal2pxf')->{pipeline},
+    [ 'cbioportal2bff', 'bff2pxf' ],
+    'registry defines cBioPortal to PXF as a compound conversion'
 );
 
 my $fhir_to_bff = conversion_spec('fhir2bff');

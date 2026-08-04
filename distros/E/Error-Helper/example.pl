@@ -60,22 +60,22 @@ use strict;
 	} ## end sub new
 
 	sub foo {
-		my $self = $_[0];
-		my $a    = $_[1];
+		my $self  = $_[0];
+		my $value = $_[1];
 
 		if ( !$self->errorblank ) {
 			return undef;
 		}
 
-		if ( !defined($a) ) {
+		if ( !defined($value) ) {
 			$self->{error}       = 1;
 			$self->{errorString} = 'No value specified';
 			$self->warn;
 			return undef;
 		}
 
-		# this will be fatal as it error flag derp is set to fatal
-		if ( $a eq 'derp' ) {
+		# this will be fatal as the error flag derp is set to fatal
+		if ( $value eq 'derp' ) {
 			$self->{error}       = 3;
 			$self->{errorString} = 'foo was called with a value of derp';
 			$self->warn;
@@ -88,7 +88,7 @@ use strict;
 my $foo_obj;
 eval {
 	$foo_obj = Foo->new( $ARGV[0] );
-	# will never be evaulated as perrors are fatal
+	# not reached when a perror is set, as perrors are fatal by default
 	if ( $foo_obj->error ) {
 		warn( 'error:' . $foo_obj->error . ': ' . $foo_obj->errorString );
 		exit $foo_obj->error;

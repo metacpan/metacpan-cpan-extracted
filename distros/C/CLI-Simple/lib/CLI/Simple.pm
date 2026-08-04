@@ -4,7 +4,7 @@ package CLI::Simple;
 use strict;
 use warnings;
 
-use CLI::Simple::Constants qw(:booleans :chars :log-levels @VALID_OPTIONS $LOG4PERL_CONF);
+use CLI::Simple::Constants qw(:booleans :chars :log-levels @VALID_OPTIONS :color-config);
 use CLI::Simple::Utils qw(normalize_options slurp dmp choose);
 use CLI::Simple::DumpSpec qw(_cmd_dump_spec);
 use CLI::Simple::Migrate qw(_cmd_migrate);
@@ -21,15 +21,15 @@ use File::Which qw(which);
 use Getopt::Long qw(:config no_ignore_case);
 use IO::Interactive;
 use List::Util qw(zip none pairs any);
-use Log::Log4perl qw();
-use Pod::Usage;
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.0';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
 our $GETOPT_ERROR_MESSAGE;
+
+my %GENERATED_ACCESSOR;  # tracks accessors mk_accessors itself created, per class
 
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_accessors(
@@ -55,7 +55,7 @@ our %INTERNAL_COMMANDS = (
   '-scaffold'            => \&_cmd_scaffold,
 );
 
-our @EXPORT_OK = qw($AUTO_HELP $AUTO_DEFAULT $PAGER);
+our @EXPORT_OK = qw($AUTO_HELP $AUTO_DEFAULT $PAGER $USE_LOGGER);
 
 use parent qw(Exporter Class::Accessor::Fast);
 
@@ -180,12 +180,32 @@ sub use_log4perl {
 ########################################################################
   my ( $self, %args ) = @_;
 
-  my $class = ref $self || $self;
+  my @valid_options = qw(
+    log_level
+    level
+    loglevel
+    log-level
+    config
+    color
+    debug_color
+    info_color
+    warn_color
+    error_color
+    trace_color
+    fatal_color
+  );
 
   foreach my $o ( keys %args ) {
     die "ERROR: unknown argument ($_)\n"
-      if none { $o eq $_ } qw(log_level level loglevel log-level config color);
+      if none { $o eq $_ } @valid_options;
   }
+
+  eval { require Log::Log4perl; 1; };
+
+  die "ERROR: Log4perl is not installed\n"
+    if $EVAL_ERROR;
+
+  my $class = ref $self || $self;
 
   die "ERROR: color and config are mutually exclusive - color uses CLI::Simple's built-in colorized config\n"
     if $args{color} && $args{config};
@@ -195,17 +215,14 @@ sub use_log4perl {
 
   my $log4perl_conf = $args{config};
 
-  my $color = $args{color};
-
-  if ( $args{color} ) {
-    $log4perl_conf = $LOG4PERL_CONF;
+  if ( $args{color} && !$log4perl_conf ) {
+    $log4perl_conf = $self->_set_color_config(%args);
   }
 
   {
-    no strict 'refs'; ## no critic (ProhibitNoStrict)
-
     $USE_LOGGER = $TRUE;
 
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
     *{"${class}::get_log4perl_conf"}  = sub { return $log4perl_conf };
     *{"${class}::set_log4perl_conf"}  = sub { $log4perl_conf = $_[1] };
     *{"${class}::get_log4perl_level"} = sub { return $level };
@@ -213,10 +230,12 @@ sub use_log4perl {
 
   if ( !$self->can('set_logger') ) {
     $self->mk_accessors('logger');
+    $GENERATED_ACCESSOR{$class}{logger} = $TRUE;
   }
 
   if ( !$self->can('set_log_level') ) {
     $self->mk_accessors('log_level');
+    $GENERATED_ACCESSOR{$class}{log_level} = $TRUE;
   }
 
   return $self;
@@ -321,8 +340,21 @@ sub new {
   foreach (@accessors) {
     s/\-/_/xsmg;
 
-    if ( !$class->can( 'get_' . $_ ) ) {
+    # can() can't tell "a human hand-wrote this method" apart from
+    # "mk_accessors already generated this on an earlier ->new() call
+    # for this same class" -- both look identical. Only the latter is
+    # fine (constructing multiple instances of the same class within
+    # one process is completely normal); only the former is the
+    # genuine naming collision this check exists to catch. Track what
+    # this class has already generated, per class, so a repeat
+    # construction doesn't get mistaken for a hand-written conflict.
+    if ( !$GENERATED_ACCESSOR{$class}{$_} ) {
+      die "ERROR: accessor for $_ already exists!\n"
+        if $class->can( 'get_' . $_ ) || $class->can( 'set_' . $_ );
+
       $class->mk_accessors($_);
+
+      $GENERATED_ACCESSOR{$class}{$_} = $TRUE;
     }
 
     $cli_options{$_} = $options->{$_};
@@ -375,6 +407,7 @@ sub new {
 
   if ( !$self->can('get_help_sections') ) {
     $self->mk_accessors('help_sections');
+    $GENERATED_ACCESSOR{$class}{help_sections} = $TRUE;
   }
   else {
     $help_sections //= $self->get_help_sections;
@@ -456,11 +489,25 @@ sub _leave {
 }
 
 ########################################################################
+sub _set_color_config {
+########################################################################
+  my ( $self, %args ) = @_;
+
+  return sprintf $LOG4PERL_CONF,
+    $args{debug_color} // $LOG4PERL_COLOR_DEBUG,
+    $args{info_color}  // $LOG4PERL_COLOR_INFO,
+    $args{warn_color}  // $LOG4PERL_COLOR_WARN,
+    $args{error_color} // $LOG4PERL_COLOR_ERROR,
+    $args{fatal_color} // $LOG4PERL_COLOR_FATAL,
+    $args{trace_color} // $LOG4PERL_COLOR_TRACE;
+}
+
+########################################################################
 sub init_logger {
 ########################################################################
   my ($self) = @_;
 
-  if ( $self->_use_logger ) {
+  if ( $self->_use_logger && $self->can('get_log4perl_conf') ) {
 
     my $config = $self->get_log4perl_conf;
 
@@ -468,11 +515,11 @@ sub init_logger {
 
     $color = $color && eval { require Term::ANSIColor; 1; };
 
-    # color on?
+    # color on, but not done through use_log4perl?
     if ( $color && !$config ) {
-      $config = $LOG4PERL_CONF;
+      $config = $self->_set_color_config;
     }
-    elsif ( !$color && $config && $config eq $LOG4PERL_CONF ) {
+    elsif ( !$color && $config && $config =~ /screencoloredlevels/xsmi ) {
       $config = q{};
     }
 
@@ -564,6 +611,8 @@ sub usage {
 ########################################################################
   my ($self) = @_;
 
+  require Pod::Usage;
+
   my $wrapper = $ENV{MODULINO_WRAPPER} // q{};
 
   my $input = $wrapper eq 'cli-simple' ? $INC{'CLI/Simple/Shell.pm'} : $self->get__program;
@@ -575,7 +624,7 @@ sub usage {
     };
   }
 
-  pod2usage(
+  Pod::Usage::pod2usage(
     -noperldoc => 1,
     -exitval   => 'NOEXIT',
     -input     => $input,
@@ -929,7 +978,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.1.1.
+This documentation refers to version 2.2.0.
 
 =head1 FEATURES
 

@@ -35,6 +35,7 @@ my $e_par_close = ')';
 my $e_col_aliases = 'alias';
 my $e_skip_col = ''; # no length
 my $e_multi_col = 'mc'; ##
+my $e_distinct = 'distinct';
 
 
 sub new {
@@ -57,6 +58,7 @@ sub column {
         $extensions = [ $e_subquery, $e_scalar_func, $e_window_func, $e_case, $e_math ];
         if ( $clause eq 'select' && ! @$r_data ) {
             push @$extensions, $e_col_aliases;
+            push @$extensions, $e_distinct;
         }
     }
     else {
@@ -341,7 +343,10 @@ sub __choose_extension {
                 return if @$extensions == 1;
                 next EXTENSION;
             }
-            return $col_aliases;
+            return { alias => $col_aliases };
+        }
+        elsif ( $extension eq $e_distinct  ) {
+            return { distinct => 1 }
         }
         elsif ( $extension eq $e_multi_col ) {
             # Choose

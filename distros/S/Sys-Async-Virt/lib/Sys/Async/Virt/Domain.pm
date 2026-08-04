@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v12.5.0
+#                   and LibVirt version v12.6.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -18,14 +18,14 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt::Domain v0.6.5;
+class Sys::Async::Virt::Domain v0.6.6;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::TypedParams v12.5.0;
-use Protocol::Sys::Virt::URI v12.5.0;
-use Protocol::Sys::Virt::Remote::XDR v12.5.0;
+use Protocol::Sys::Virt::TypedParams v12.6.0;
+use Protocol::Sys::Virt::URI v12.6.0;
+use Protocol::Sys::Virt::Remote::XDR v12.6.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -831,6 +831,7 @@ use constant {
     LIFECYCLE_ACTION_PRESERVE                                         => 3,
     LIFECYCLE_ACTION_COREDUMP_DESTROY                                 => 4,
     LIFECYCLE_ACTION_COREDUMP_RESTART                                 => 5,
+    LIFECYCLE_ACTION_PRESERVE_RUNNING                                 => 6,
     LAUNCH_SECURITY_SEV_MEASUREMENT                                   => "sev-measurement",
     LAUNCH_SECURITY_SEV_API_MAJOR                                     => "sev-api-major",
     LAUNCH_SECURITY_SEV_API_MINOR                                     => "sev-api-minor",
@@ -2384,7 +2385,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.6.5
+v0.6.6
 
 =head1 SYNOPSIS
 
@@ -5326,6 +5327,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item LIFECYCLE_ACTION_COREDUMP_DESTROY
 
 =item LIFECYCLE_ACTION_COREDUMP_RESTART
+
+=item LIFECYCLE_ACTION_PRESERVE_RUNNING
 
 =item LAUNCH_SECURITY_SEV_MEASUREMENT
 

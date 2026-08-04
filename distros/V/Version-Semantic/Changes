@@ -1,5 +1,10 @@
 Release history for Version-Semantic
 
+v2.1.0    2026-08-04T06:50:11Z
+          - Add is_core() predicate object method
+          - Use Test2::V1 in all test scripts
+          - Remove useless use of PerlX::Maybe::maybe()
+
 v2.0.0    2026-08-03T08:43:10Z
           - BREAKING CHANGE: parse() returns undef unless it is fatalized
           - Use Test2::V1 in some test scripts

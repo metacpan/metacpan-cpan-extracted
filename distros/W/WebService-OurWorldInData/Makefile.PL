@@ -27,11 +27,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test2::V0" => 0,
+    "LWP::UserAgent" => 0,
+    "LWP::UserAgent::Mockable" => 0,
+    "Test2::V0" => "0.000139",
     "Test::More" => 0,
-    "Time::Piece" => 0
+    "Time::Piece" => 0,
+    "URI" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t t/chart/*.t"
   }
@@ -44,12 +47,15 @@ my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
   "IO::Socket::SSL" => 0,
   "JSON" => 0,
+  "LWP::UserAgent" => 0,
+  "LWP::UserAgent::Mockable" => 0,
   "Moo" => 0,
   "PerlX::Maybe" => 0,
-  "Test2::V0" => 0,
+  "Test2::V0" => "0.000139",
   "Test::More" => 0,
   "Time::Piece" => 0,
-  "Types::Standard" => 0
+  "Types::Standard" => 0,
+  "URI" => 0
 );
 
 

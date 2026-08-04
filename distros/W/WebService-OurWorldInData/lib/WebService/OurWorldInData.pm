@@ -2,7 +2,7 @@ package WebService::OurWorldInData;
 # ABSTRACT: Perl library to connect with the Our World in Data API
 # https://ourworldindata.org
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use v5.8;
 use Moo;
@@ -15,7 +15,9 @@ has ua    => (
     default => sub {
         require HTTP::Tiny;
         require IO::Socket::SSL;
-        HTTP::Tiny->new;
+        HTTP::Tiny->new(
+            agent => "WebService-OurWorldInData/$VERSION ",
+        );
     },
 );
 
@@ -37,7 +39,7 @@ sub get_response {
     elsif ( ref $self->ua eq 'LWP::UserAgent' ) {
         require URI;
         my $uri = URI->new( $url );
-        $uri->query( %$query ) if $query;
+        $uri->query_form( $query ) if $query;
         $res = $self->ua->get( $uri->as_string );
         _report_status_full($res);
     }
@@ -86,12 +88,29 @@ sub post_response {
 
 =head1 DESCRIPTION
 
-This is a base class for Our World in Data APIs. You probably should be
-using the L<WebService::OurWorldInData::Chart> class.
+This is a base class for Our World in Data APIs. You will want the modules
+for each endpoint:
+
+=over 4
+
+=item * L<WebService::OurWorldInData::Chart>
+
+=item * L<WebService::OurWorldInData::Tables>
+
+=item * L<WebService::OurWorldInData::Indicators>
+
+=item * L<WebService::OurWorldInData::Search>
+
+=back
+
+B<WARNING>: from the OWID dev page, I<These APIs are under active development>.
+For that reason, I will start by only providing the JSON responses from their
+server. As the API design crystalizes, I will add convenience handling classes
+for the Results so that you can iterate through them for specific bits of data.
 
 =head2 Getting Started
 
-Documentation for L<Chart API|https://docs.owid.io/projects/etl/api/chart-api/>
+OWID's L<Technical Documentation|https://docs.owid.io/projects/etl/api/>
 
 =head2 Proxies
 

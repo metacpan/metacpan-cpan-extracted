@@ -10,7 +10,6 @@
       "min_text_similarity_score",
       "ohdsi_db",
       "omop_tables",
-      "print_hidden_labels",
       "search",
       "source_info",
       "test",
@@ -69,6 +68,36 @@
       "streaming": false,
       "http_enabled": true
     },
+    "cbioportal2bff": {
+      "source": "cbioportal",
+      "target": "beacon",
+      "operation": "bundle",
+      "pipeline": ["cbioportal2bff"],
+      "resources": { "sqlite": true },
+      "entities": { "default": ["individuals"], "supported": ["individuals", "biosamples", "datasets", "cohorts"], "primary": "individuals" },
+      "streaming": false,
+      "http_enabled": false
+    },
+    "cbioportal2omop": {
+      "source": "cbioportal",
+      "target": "omop",
+      "operation": "pipeline",
+      "pipeline": ["cbioportal2bff", "bff2omop"],
+      "resources": { "sqlite": true },
+      "entities": { "default": [], "supported": [], "primary": null },
+      "streaming": false,
+      "http_enabled": false
+    },
+    "cbioportal2pxf": {
+      "source": "cbioportal",
+      "target": "pxf",
+      "operation": "pipeline",
+      "pipeline": ["cbioportal2bff", "bff2pxf"],
+      "resources": { "sqlite": true },
+      "entities": { "default": [], "supported": [], "primary": null },
+      "streaming": false,
+      "http_enabled": false
+    },
     "cdiscodm2bff": {
       "source": "cdisc-odm",
       "target": "beacon",
@@ -124,6 +153,36 @@
       "target": "pxf",
       "operation": "pipeline",
       "pipeline": ["datasetjson2bff", "bff2pxf"],
+      "resources": { "sqlite": false },
+      "entities": { "default": [], "supported": [], "primary": null },
+      "streaming": false,
+      "http_enabled": false
+    },
+    "datasetxml2bff": {
+      "source": "dataset-xml",
+      "target": "beacon",
+      "operation": "bundle",
+      "pipeline": ["datasetxml2bff"],
+      "resources": { "sqlite": false },
+      "entities": { "default": ["individuals"], "supported": ["individuals", "datasets", "cohorts"], "primary": "individuals" },
+      "streaming": false,
+      "http_enabled": false
+    },
+    "datasetxml2omop": {
+      "source": "dataset-xml",
+      "target": "omop",
+      "operation": "pipeline",
+      "pipeline": ["datasetxml2bff", "bff2omop"],
+      "resources": { "sqlite": true },
+      "entities": { "default": [], "supported": [], "primary": null },
+      "streaming": false,
+      "http_enabled": false
+    },
+    "datasetxml2pxf": {
+      "source": "dataset-xml",
+      "target": "pxf",
+      "operation": "pipeline",
+      "pipeline": ["datasetxml2bff", "bff2pxf"],
       "resources": { "sqlite": false },
       "entities": { "default": [], "supported": [], "primary": null },
       "streaming": false,

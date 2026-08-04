@@ -39,6 +39,8 @@ t/027_no_signatures_should_fail.t
 t/028_croak_with_no_xml.t
 t/029_verify_id_formats.t
 t/030-reject-duplicate-id.t
+t/031_verify_must_verify_something.t
+t/032_verified_ids.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t

@@ -1,4 +1,4 @@
-package JMAP::Tester 0.110;
+package JMAP::Tester 0.112;
 # ABSTRACT: a JMAP client made for testing JMAP servers
 
 use v5.20.0;
@@ -1021,7 +1021,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.110
+version 0.112
 
 =head1 OVERVIEW
 

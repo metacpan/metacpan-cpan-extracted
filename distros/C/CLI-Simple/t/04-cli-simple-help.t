@@ -6,12 +6,16 @@ use Test::More;
 use Test::Output;
 use Pod::Usage;
 
+BEGIN {
+  use_ok( qw(CLI::Simple), qw($AUTO_HELP) );
+}
+
 package Foo;
 
 use strict;
 use warnings;
 
-use parent qw(CLI::Simple);
+our @ISA = qw(CLI::Simple);
 
 =pod
 
@@ -35,7 +39,9 @@ local @ARGV = qw(--help);
 local $ENV{PAGER}   = q{};
 local $ENV{PERLDOC} = q{};
 
-use CLI::Simple qw($AUTO_HELP);
+BEGIN {
+  use_ok( qw(CLI::Simple), qw($AUTO_HELP) );
+}
 
 ########################################################################
 subtest 'help' => sub {

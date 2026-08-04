@@ -4,7 +4,7 @@ Mojolicious::Sessions::Store - another server-side session storage for Mojolicio
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 

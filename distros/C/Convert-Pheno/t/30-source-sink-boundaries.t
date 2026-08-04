@@ -5,9 +5,17 @@ use warnings;
 use lib qw(./lib ../lib t/lib);
 use File::Spec;
 use File::Temp qw(tempdir);
+use JSON::XS;
+use Path::Tiny qw(path);
+use Test::Exception;
 use Test::More;
 
 use Convert::Pheno;
+use Convert::Pheno::Emit::OMOP qw(
+  omop_stream_targets_finalize
+  omop_stream_targets_open
+  omop_stream_targets_write
+);
 use Convert::Pheno::IO::FileIO qw(io_yaml_or_json);
 use Convert::Pheno::Model::Bundle;
 use Convert::Pheno::Sink::FileSet qw(
@@ -15,6 +23,31 @@ use Convert::Pheno::Sink::FileSet qw(
   resolve_omop_table_output_file
 );
 use Convert::Pheno::Source qw(source_adapter);
+
+{
+    my $data = {
+        CONCEPT => [ { concept_id => 0, concept_name => 'No matching concept' } ],
+        PERSON  => [ { person_id => 7, gender_concept_id => 0 } ],
+    };
+    my $before = JSON::XS->new->canonical->encode($data);
+    my $convert = Convert::Pheno->new(
+        {
+            method => 'omop2bff',
+            data   => $data,
+        }
+    );
+    my $source = source_adapter( $convert, 'omop' )->load;
+
+    isnt( $source->data, $data, 'OMOP memory source creates an owned table buffer' );
+    ok( $source->owned, 'OMOP memory source marks its table buffer as adapter-owned' );
+    $source->data->{PERSON}[0]{person_id} = 8;
+    is( $data->{PERSON}[0]{person_id}, 7, 'OMOP memory source clones nested row data' );
+    is(
+        JSON::XS->new->canonical->encode($data),
+        $before,
+        'OMOP source preparation does not modify caller-owned tables'
+    );
+}
 
 {
     my $data = { subject => { id => 'caller-1' } };
@@ -50,7 +83,7 @@ use Convert::Pheno::Source qw(source_adapter);
             method       => 'csv2bff',
             in_file      => 't/csv2bff/in/csv_data.csv',
             mapping_file => 't/csv2bff/in/csv_mapping.yaml',
-            schema_file  => 'share/schema/mapping.json',
+            schema_file  => 'share/schema/mapping-v2.json',
             sep          => ',',
         }
     );
@@ -71,12 +104,16 @@ use Convert::Pheno::Source qw(source_adapter);
             in_file            => 't/cdiscodm2bff/in/cdisc_odm_data.xml',
             mapping_file       => 't/redcap2bff/in/redcap_mapping.yaml',
             redcap_dictionary  => 't/redcap2bff/in/redcap_dictionary.csv',
-            schema_file        => 'share/schema/mapping.json',
+            schema_file        => 'share/schema/mapping-v2.json',
         }
     );
     my $source = source_adapter( $convert, 'cdisc-odm' )->load;
 
-    ok( @{ $source->data }, 'CDISC-ODM source adapter emits tabular participant rows' );
+    isa_ok(
+        $source->data->[0],
+        'Convert::Pheno::CDISC::ODM::Record',
+        'CDISC-ODM source adapter emits occurrence-aware records',
+    );
     isa_ok(
         $source->artifact('redcap_dictionary'),
         'Convert::Pheno::Tabular::REDCap::Dictionary',
@@ -143,6 +180,73 @@ use Convert::Pheno::Source qw(source_adapter);
         qr/No source adapter is registered for <unsupported-format>/,
         'unknown source formats fail at the adapter boundary'
     );
+}
+
+{
+    my $tmpdir = tempdir( CLEANUP => 1 );
+    my $outfile = File::Spec->catfile( $tmpdir, 'streamed-individuals.jsonl' );
+    my $convert = bless {
+        entities => ['individuals'],
+        out_dir  => $tmpdir,
+        out_file => $outfile,
+    }, 'Convert::Pheno';
+
+    ok( omop_stream_targets_write( $convert, undef ), 'stream sink accepts an empty participant result' );
+    ok( omop_stream_targets_write( $convert, { id => 'person-1' } ), 'stream sink writes an individual' );
+    ok( omop_stream_targets_write( $convert, { id => 'person-1' } ), 'stream sink accepts a duplicate individual' );
+    ok( omop_stream_targets_write( $convert, { id => 'person-2' } ), 'stream sink writes the next individual' );
+    ok( omop_stream_targets_finalize($convert), 'stream sink commits scalar participant output' );
+
+    my @rows = map { JSON::XS->new->decode($_) }
+      grep { length }
+      split /\n/, path($outfile)->slurp_utf8;
+    is_deeply(
+        [ map { $_->{id} } @rows ],
+        [qw(person-1 person-2)],
+        'stream sink suppresses duplicate participant rows',
+    );
+    ok( omop_stream_targets_finalize($convert), 'finalizing an inactive stream is harmless' );
+}
+
+{
+    my $tmpdir = tempdir( CLEANUP => 1 );
+    my $biosamples_file = File::Spec->catfile( $tmpdir, 'samples.jsonl' );
+    my $convert = bless {
+        entities => [qw(individuals biosamples)],
+        out_dir  => $tmpdir,
+        output_name_overrides => { biosamples => $biosamples_file },
+    }, 'Convert::Pheno';
+    my $bundle = Convert::Pheno::Model::Bundle->new(
+        { entities => [qw(individuals biosamples)] }
+    );
+    $bundle->add_entity( individuals => { id => 'person-1' } );
+    $bundle->add_entity( biosamples  => { id => 'sample-1' } );
+
+    ok( omop_stream_targets_write( $convert, $bundle ), 'stream sink writes entity-aware bundles' );
+    ok( omop_stream_targets_finalize( $convert, 0 ), 'stream sink can discard an incomplete entity bundle' );
+    ok( !-e File::Spec->catfile( $tmpdir, 'individuals.json' ), 'discarded stream does not publish individuals' );
+    ok( !-e $biosamples_file, 'discarded stream does not publish an overridden biosample file' );
+}
+
+{
+    my $tmpdir = tempdir( CLEANUP => 1 );
+    my $convert = bless {
+        entities => [qw(individuals biosamples)],
+        out_dir  => $tmpdir,
+        output_name_overrides => {
+            biosamples => File::Spec->catfile( $tmpdir, 'missing', 'biosamples.json' ),
+        },
+    }, 'Convert::Pheno';
+
+    throws_ok(
+        sub { omop_stream_targets_open($convert) },
+        qr/(?:No such file|Error in tempfile)/,
+        'opening multiple stream targets rolls back when a later path is invalid',
+    );
+    opendir( my $dir, $tmpdir );
+    my @staged = grep { /^\.convert-pheno-/ } readdir $dir;
+    closedir($dir);
+    is_deeply( \@staged, [], 'failed stream setup removes earlier staged files' );
 }
 
 {

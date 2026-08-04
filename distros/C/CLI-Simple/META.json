@@ -33,10 +33,6 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "IO::Pager" : "0",
-            "Term::ANSIColor" : "0"
-         },
          "requires" : {
             "Class::Accessor::Fast" : "0.51",
             "File::ShareDir" : "1.118",
@@ -44,12 +40,15 @@
             "IO::Interactive" : "1.027",
             "JSON" : "4.07",
             "List::Util" : "1.56",
-            "Log::Log4perl" : "1.57",
-            "Log::Log4perl::Level" : "0",
             "Readonly" : "2.05",
             "Role::Tiny" : "0",
             "YAML::Tiny" : "1.76",
             "perl" : "5.010"
+         },
+         "suggests" : {
+            "IO::Pager" : "2.10",
+            "Log::Log4perl" : "1.57",
+            "Perl::Tidy" : "20260204"
          }
       },
       "test" : {
@@ -64,11 +63,11 @@
    "provides" : {
       "CLI::Simple" : {
          "file" : "lib/CLI/Simple.pm",
-         "version" : "v2.1.1"
+         "version" : "v2.2.0"
       },
       "CLI::Simple::Constants" : {
          "file" : "lib/CLI/Simple/Constants.pm",
-         "version" : "v2.1.1"
+         "version" : "v2.2.0"
       },
       "CLI::Simple::DumpSpec" : {
          "file" : "lib/CLI/Simple/DumpSpec.pm",
@@ -96,7 +95,7 @@
       },
       "CLI::Simple::Utils" : {
          "file" : "lib/CLI/Simple/Utils.pm",
-         "version" : "v2.1.1"
+         "version" : "v2.2.0"
       }
    },
    "release_status" : "stable",
@@ -112,6 +111,6 @@
          "web" : "http://github.com/rlauer6/CLI-Simple"
       }
    },
-   "version" : "v2.1.1",
+   "version" : "v2.2.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

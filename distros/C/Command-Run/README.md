@@ -46,7 +46,7 @@ Command::Run - Execute external command or code reference
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
@@ -143,7 +143,7 @@ With `run`, parameters are temporary and do not modify the object.
     for method chaining.
 
         my ($out, $err);
-        Command::Run->new("command")
+        Command::Run->new(command => [ 'command', @args ])
             ->with(stdin => $data, stdout => \$out, stderr => \$err)
             ->run;
 
@@ -161,13 +161,17 @@ With `run`, parameters are temporary and do not modify the object.
         );
 
         # Reuse runner with different input
-        my $runner = Command::Run->new('cat');
+        my $runner = Command::Run->new(command => ['cat']);
         $runner->run(stdin => $input1);
         $runner->run(stdin => $input2);  # object state unchanged
 
-- **update**()
+    Note that `new` takes key-value pairs, not a command list.
 
-    Execute the command and store the output.
+- **update**(_%parameters_)
+
+    Execute the command and store the output.  Accepts the same
+    parameters as `run`, except `stdout` and `stderr` scalar
+    references, which are filled by `run`.
     Returns the object for method chaining.
 
 - **result**()

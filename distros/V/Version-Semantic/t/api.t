@@ -7,4 +7,4 @@ use Test::API import => [ qw( public_ok ) ];
 plan 1;
 
 public_ok CLASS,
-  qw( new parse prefix major minor patch pre_release build version_core has_prefix has_pre_release has_build increment compare_to to_string semver_re )
+  qw( new parse prefix major minor patch pre_release build version_core has_prefix has_pre_release has_build increment is_core compare_to to_string semver_re )

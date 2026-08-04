@@ -1,3 +1,13 @@
+v0.04  2026-08-03Z
+    - Improved documentation
+    - Added Lingua::famibeib::Wellknown
+    - Updated dependencies
+    - Mark words in Data::Displaycolour and Data::IconText
+    - Added $as to $word->as_number()
+    - Added annotations to aid IDEs
+    - Added experimental generator for proper names as Lingua::famibeib::NameGenerator
+    - Register word and modifier generators via Data::Identifier::Util
+
 v0.03  2026-06-15Z
     - Fixed modifier mora, somehow wrong ones got into the code base.
       This will correct the parsing of verbs, adjectives, and applications.

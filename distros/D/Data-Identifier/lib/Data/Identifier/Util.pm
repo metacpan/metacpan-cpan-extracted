@@ -18,7 +18,7 @@ use Carp;
 use Data::Identifier;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.32;
+our $VERSION = v0.33;
 
 use constant {
     BOOL_TRUE  => Data::Identifier->new(uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5')->register,
@@ -756,8 +756,7 @@ sub _update_tag {
     $id_cache->{Data::Identifier::WK_SNI()} //= $sni if defined $sni;
 
     if (defined $tagname) {
-        my %tagnames = map {$_ => undef} $tagname, $identifier->tagname(list => 1, default => [], no_defaults => 1);
-        $identifier->{tagname} = [keys %tagnames];
+        $identifier->_add_tagnames($tagname);
     }
 
     $identifier->register; # re-register
@@ -779,8 +778,7 @@ sub _register_base {
     }
 
     if (defined(my $tagname = delete $opts{tagname})) {
-        my %tagnames = map {$_ => undef} (ref $tagname ? @{$tagname} : $tagname), $identifier->tagname(list => 1, default => [], no_defaults => 1);
-        $identifier->{tagname} = [keys %tagnames];
+        $identifier->_add_tagnames($tagname);
     }
 
     return ($self, $identifier, %opts);
@@ -800,7 +798,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.32
+version v0.33
 
 =head1 SYNOPSIS
 

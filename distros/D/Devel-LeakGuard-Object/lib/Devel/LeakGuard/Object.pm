@@ -31,11 +31,11 @@ Devel::LeakGuard::Object - Scoped checks for object leaks
 
 =head1 VERSION
 
-This document describes Devel::LeakGuard::Object version 0.08
+This document describes Devel::LeakGuard::Object version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -64,13 +64,13 @@ our $VERSION = '0.08';
 =head1 DESCRIPTION
 
 This module provides tracking of objects, for the purpose of
-detecting memory leaks due to circular references or innappropriate
+detecting memory leaks due to circular references or inappropriate
 caching schemes.
 
 It is derived from, and backwards compatible with Adam Kennedy's
 L<Devel::Leak::Object>. Any errors are mine.
 
-It works by overridding C<bless> and adding a synthetic C<DESTROY>
+It works by overriding C<bless> and adding a synthetic C<DESTROY>
 method to any tracked classes so that it can maintain a count of blessed
 objects per-class.
 
@@ -93,7 +93,7 @@ Track individual objects like this:
   use Devel::LeakGuard::Object qw( track );
 
   # Later...
-  track( my $obj = new Foo );
+  track( my $obj = Foo->new );
 
 =head2 Tracking object leaks in a block of code
 
@@ -547,6 +547,8 @@ C<https://github.com/AndyA/Devel--LeakGuard--Object/issues>.
 
 Andy Armstrong  C<< <andy@hexten.net> >>
 
+Currently maintained by Paul Cochrane C<< <paul@peateasea.de> >>
+
 Based on code taken from Adam Kennedy's L<Devel::Leak::Object> which
 carries this copyright notice:
 
@@ -558,7 +560,7 @@ carries this copyright notice:
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009-2015, Andy Armstrong C<< <andy@hexten.net> >>.
+Copyright (c) 2009-2026, Andy Armstrong C<< <andy@hexten.net> >>.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

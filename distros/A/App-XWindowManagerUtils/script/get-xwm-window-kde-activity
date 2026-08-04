@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-15'; # DATE
+our $DATE = '2026-05-18'; # DATE
 our $DIST = 'App-XWindowManagerUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Desktop/XWindowManager/Util/get_xwm_window_kde_activity",
@@ -40,7 +40,7 @@ get-xwm-window-kde-activity - Get the KDE activity GUID(s) of a specific window
 
 =head1 VERSION
 
-This document describes version 0.004 of get-xwm-window-kde-activity (from Perl distribution App-XWindowManagerUtils), released on 2026-04-15.
+This document describes version 0.005 of get-xwm-window-kde-activity (from Perl distribution App-XWindowManagerUtils), released on 2026-05-18.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,7 @@
+Revision history for JSON-Schema-Fast
+
+0.02	2026-08-03
+	Propagate defaults into callers params when apply_defaults is true as it's more usefull.
+
+0.01    2026-08-03
+	First version

@@ -1,5 +1,5 @@
 package DBIx::Class::Relationship::ManyToMany::Async;
-
+$DBIx::Class::Relationship::ManyToMany::Async::VERSION = '0.02';
 # ABSTRACT: many_to_many for DBIx::Class::Async — generates Future-returning
 # accessor methods (groups, add_to_groups, remove_from_groups, set_groups).
 
@@ -9,7 +9,6 @@ use warnings;
 use Future;
 use Exporter 'import';
 
-our $VERSION = '0.01';
 our @EXPORT = qw(many_to_many_async);
 
 
@@ -28,12 +27,35 @@ sub many_to_many_async {
         my $set_meth    = "set_${meth}";
 
         # ── $meth — list accessor (returns Future → arrayref of targets) ──
-        # Single DB query: pivot rows with target prefetched via JOIN.
-        # Each $_->$f_rel returns a Future resolved from memory (no extra query).
+        # When prefetched data is available (via search_with_prefetch),
+        # uses the cached ResultSet directly — no extra DB queries.
+        # Otherwise falls back to the standard async chain.
         {
             my $meth_name = join '::', $class, $meth;
             *$meth_name = sub {
                 my $self = shift;
+
+                # Prefetched path: data already loaded via search_with_prefetch.
+                # Prefetched path: collapse => 1 stores nested data in
+                # _relationship_data (arrayref of raw hashrefs) or
+                # _prefetched (ResultSet with _entries).
+                my $rs = $self->{_relationship_data}{$rel}
+                      || $self->{_prefetched}{$rel};
+                if ($rs) {
+                    my $entries = ref $rs eq 'ARRAY' ? $rs : $rs->{_entries};
+                    my @targets;
+                    if ($entries && @$entries) {
+                        for my $entry (@$entries) {
+                            my $target = ref $entry eq 'HASH'
+                                ? $entry->{$f_rel}
+                                : eval { $entry->$f_rel };
+                            push @targets, $target if $target;
+                        }
+                    }
+                    return Future->done(\@targets);
+                }
+
+                # Standard async path
                 return $self->search_related($rel, {}, { prefetch => $f_rel })->all
                     ->then(sub {
                         my $pivot_rows = shift;
@@ -103,6 +125,14 @@ sub many_to_many_async {
             };
         }
     }
+    {
+        no strict 'refs';
+        # Store in a package variable so workers (forked processes)
+        # inherit the metadata correctly without triggering reload issues.
+        ${ $class . '::_many_to_many' } //= {};
+        ${ $class . '::_many_to_many' }->{$meth}
+            = { rel => $rel, f_rel => $f_rel };
+    }
 }
 
 1;
@@ -119,7 +149,7 @@ DBIx::Class::Relationship::ManyToMany::Async - many_to_many for DBIx::Class::Asy
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

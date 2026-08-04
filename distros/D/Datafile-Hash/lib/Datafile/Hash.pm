@@ -7,7 +7,7 @@ use Exporter 'import';
 use Carp;
 
 our @EXPORT_OK  = qw(readhash writehash);
-our $VERSION    = '1.05';
+our $VERSION    = '1.06';
 
 sub _trim { $_[0] =~ s/^\s+|\s+$//gr if defined $_[0] && $_[1] }
 
@@ -23,7 +23,9 @@ sub readhash {
     my $search       = $opts->{search};
     my $verbose      = $opts->{verbose}      // 0;
     my $group_mode   = $opts->{group}        // 2;
-    my $ini_mode = ( $delim eq '=' || $delim eq ':' ) ? 1 : 0;
+    my $ini_mode     = 0;
+    $ini_mode = 1    if $delim eq '=';
+    $ini_mode = 1    if $delim eq ':';
 
     my @messages = ();
     if ($verbose) {
@@ -41,12 +43,13 @@ sub readhash {
             push @compiled_patterns, $regex;
         }
     }
-    croak
-"datafile::hash::readhash: second argument (\$data) must be a HASH reference"
+    return (-1, [ "datafile::hash::readhash: second argument (\$data) must be a HASH reference"])
         unless ref $data eq 'HASH';
 
-    open my $fh, '<:encoding(UTF-8)', $filename
-        or return ( 0, ["WARNING: cannot open '$filename': $!"] );
+    my $fh;
+    unless (open($fh, '<:encoding(UTF-8)', $filename)) {
+        return ( 0, ["WARNING: cannot open '$filename': $!"] );
+    }
     %$data = ();
 
     my $entry_count   = 0;
@@ -155,17 +158,13 @@ sub writehash {
     my $prot         = $opts->{prot}         // 0660;
     my $backup       = $opts->{backup}       // 0;
     my $verbose      = $opts->{verbose}      // 0;
-    my $ini_mode     = ( $delim eq '=' || $delim eq ':' ) ? 1 : 0;
+    my $ini_mode = 0;
+    $ini_mode = 1    if $delim eq '=';
+    $ini_mode = 1    if $delim eq ':';
 
     unless ( $hash && ref $hash eq 'HASH' && keys %$hash ) {
-        if ( -f $filename ) {
-            unlink($filename)
-                or return ( 0,
-                ["ERROR: file $filename could not be deleted $!"] );
-            return ( 1, ["SUCCESS: file $filename was deleted.\n"] );
-        }
-        croak
-"datafile::hash::writehash: second argument (\$data) must be a HASH reference"
+        unlink($filename) if -f $filename;
+        return(0, ["datafile::hash::writehash: second argument (\$data) must be a HASH reference"] );
     }
 
     my $tmp = "$filename.tmp";
@@ -176,8 +175,10 @@ sub writehash {
             "# opts: " . join( ", ", map { "$_=$opts->{$_}" } sort keys %$opts ) . "\n";
     }
 
-    open my $fh, '>:encoding(UTF-8):crlf', $tmp
-        or return ( 0, ["ERROR: cannot open '$tmp' for writing: $!"] );
+    my $fh;
+    unless (open( $fh, '>:encoding(UTF-8):crlf', $tmp)) {
+        return ( 0, ["ERROR: cannot open '$tmp' for writing: $!"] );
+    }
 
     if ( my $comment = $opts->{comment} ) {
         my @lines = ref $comment eq 'ARRAY' ? @$comment : split /\n/, $comment;
@@ -258,13 +259,10 @@ sub writehash {
         }
     }
     print $fh "#EOF\n" if $comment_char eq '#';
-    close $fh
-        or return ( 0, ["ERROR: failed to close '$tmp': $!"] );
+    close $fh;
 
     if ( $backup && -f $filename ) {
-        rename( $filename, $filename . '.bak' )
-            or push @messages,
-            "WARNING: backup to ${filename}.bak failed: $!";
+        rename( $filename, $filename . '.bak' );
     }
     rename( $tmp, $filename )
         or return ( 0, ["ERROR: failed to rename '$tmp' to '$filename': $!"] );
@@ -284,6 +282,10 @@ __END__
 =head1 NAME
 
 Datafile::Hash - Pure-Perl utilities for datafiles and INI-style config files with multi-level sections
+
+=head1 VERSION
+
+1.06
 
 =head1 LICENSE
 

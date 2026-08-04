@@ -1,5 +1,5 @@
 use v5.20.0;
-package JMAP::Tester::Role::SentenceCollection 0.110;
+package JMAP::Tester::Role::SentenceCollection 0.112;
 
 use Moo::Role;
 
@@ -320,7 +320,7 @@ JMAP::Tester::Role::SentenceCollection
 
 =head1 VERSION
 
-version 0.110
+version 0.112
 
 =head1 PERL VERSION
 

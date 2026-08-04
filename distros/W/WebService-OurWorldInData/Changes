@@ -1,3 +1,7 @@
+0.04      2026 Aug 04
+====
+* adding client for Indicators API which include the server health check
+
 0.03      2025 Jul 20
 ====
 * adding fake Catalog module as a placeholder

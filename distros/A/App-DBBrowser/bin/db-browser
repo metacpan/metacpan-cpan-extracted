@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.443';
+our $VERSION = '2.444';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.443
+Version 2.444
 
 =head1 SYNOPSIS
 
@@ -362,7 +362,7 @@ C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is
 When aggregate mode is active, the user can select from the available aggregate functions C<AVG>, C<COUNT>, C<COUNT(*)>,
 C<GROUP_CONCAT>, C<MAX>, C<MIN>, C<SUM> and the added GROUP BY columns.
 
-=head4 DISTINCT
+To add C<DISTINCT> to the C<SELECT> statement, use C<%%> if L<Extended Columns> is enabled; otherwise, use the C<d*> menu entry.
 
 =head4 WHERE
 
@@ -779,41 +779,98 @@ These settings are also valid when C<Intersect> or C<Except> is used.
 
 =head3 Columns and Values
 
+=head4 Extended Columns
+
+If enabled, C<%%> is displayed as an additional entry in the column menus. Selecting C<%%> lets you choose from the following extensions:
+
 =over
 
 =item
 
-Extended Columns
+SQL
 
-If enabled, C<%%> is shown as an additional menu entry in the column menus. Selecting C<%%> lets one choose between the
-available extensions.
+Selecting C<SQL> opens the subqueries menu.
 
-=item
+See L<Subquery> for the different possibilities to enter a subquery or any other SQL text.
 
-Extended Values
-
-If enabled, then - in addition to constants - subqueries, functions and more (see the following list) are available for
-the right side of operators. Places where extended values are available: C<WHERE>, C<HAVING>, C<SET> in update, and
-C<WHEN>, C<THEN> and C<ELSE> in case expressions.
+Entries beginning with SELECT or WITH followed by a space are automatically enclosed in parentheses.
 
 =item
 
-Extended Arguments
+Scalar Functions
 
-If enabled, subqueries, functions and more (see the following list) are available for entering arguments in addition to
-constants in the scalar and window functions.
+Selecting C<scalar()> opens the menu, where the user can choose from a list of scalar functions.
 
-This option can also be enabled later in the functions menu by selecting the prompt line.
+For some scalar functions, you can use the C<Up-Arrow> and C<Down-Arrow> keys to choose from predefined values for the
+arguments.
+
+Scalar functions may not work with the C<ODBC> plugin.
+
+See also L</Extended Arguments>.
+
+=item
+
+Window Functions (C<SELECT>, C<ORDER BY>)
+
+Selecting C<win()> opens the menu, where the user can choose from a list of window functions.
+
+See also L</Extended Arguments>.
+
+=item
+
+Case Expression
+
+Selecting C<case> opens the menu, where the user can build a C<CASE> expression.
+
+=item
+
+Maths
+
+Selecting C<math()> opens the menu, where the user can combine expressions with arithmetic operators.
+
+=item
+
+mc (C<WHERE>)
+
+Use more than one column on the left-hand side of the operator.
+
+=item
+
+skip (C<WHERE>)
+
+Skip the column and use the EXISTS or the NOT EXISTS operator.
+
+=item
+
+Parentheses  (C<WHERE>, C<WHEN>, C<HAVING>)
+
+In the C<%%> menu are also available parentheses.
+
+=item
+
+Column Aliases (C<SELECT>)
+
+Selecting C<alias> allows the user to add, change or remove aliases for the selected columns. It is also possible to
+change the table alias and rearrange the selected columns.
+
+=item
+
+distinct (C<SELECT>)
+
+Add C<DISTINCT> to a select statement.
 
 =back
 
-=head4 Column/Value/Argument Extensions
+=head4 Extended Values
 
-Not all of these extensions are available everywhere.
+If enabled, the following options are available for entering values on the right-hand side of operators (C<WHERE>,
+C<HAVING>, C<SET> in update, and C<WHEN>, C<THEN> and C<ELSE> in case expressions).
 
 =over
 
-=item Value
+=item
+
+Value
 
 Enter a constant value.
 
@@ -825,73 +882,85 @@ quotation marks; otherwise, they are.
 
 To enter a value quoted manually, use the C<SQL> menu entry from the C<%%> menu.
 
-=item SQL
+=item
 
-Selecting C<SQL> opens the subqueries menu.
+SQL
 
-See L<Subquery> for the different possibilities to enter a subquery or any other SQL text.
+=item
 
-Entries beginning with SELECT or WITH followed by a space are automatically enclosed in parentheses.
+Scalar Functions
 
-=item Scalar Functions
+=item
 
-Selecting C<scalar()> opens the menu, where the user can choose from a list of scalar functions.
+Window Functions (C<SELECT>, C<ORDER BY>)
 
-Extended arguments for scalar functions can be temporarily enabled by selecting the prompt line (I<Scalar functions:>)
-of the scalar function menu.
+=item
 
-C<DATEADD>, C<EXTRACT> and some other functions: use the keys C<Up-Arrow> and C<Down-Arrow> to choose one of the
-predefined fields (in C<Value> if the extended arguments are enabled).
+Maths
 
-C<TO_EPOCH> and C<Oracle>: The argument I<Column type> can be any of the following: I<DATE>, I<TIMESTAMP> or
-I<TIMESTAMP_TZ>. If the column type is I<DATE> or I<TIMESTAMP> the session timezone is used as timezone.
+=item
 
-Scalar functions may not work with the C<ODBC> plugin.
+Column
 
-=item Window Functions
+Selecting C<Column> opens a menu where the user can choose a column.
 
-Selecting C<win()> opens the menu, where the user can choose from a list of window functions.
+Within this menu, selecting C<%%> allows the user to choose a column from a different table.
 
-=item Case Expression
+=item
 
-Selecting C<case> opens the menu, where the user can build a C<CASE> expression.
+Set to C<NULL> (C<SET>)
 
-=item Maths
+Available after C<SET> in an C<UPDATE> statement.
 
-Selecting C<math()> opens the menu, where the user can combine expressions with arithmetic operators.
+=item
 
-=item Column
+)end
 
-Selecting C<Column> opens the menu, where the user can choose a column.
-
-By selecting C<%%> one can choose a column from a different table.
-
-=item Set to C<NULL>
-
-Available after the C<SET> in an C<UPDATE> statement.
-
-=item )end
-
-Close the IN operator parentheses.
-
-=item mc
-
-C<WHERE>: Use more than one column on the left-hand side of the operator.
-
-=item skip
-
-C<WHERE>: Skip the column and use the EXISTS or the NOT EXISTS operator.
-
-=item Parentheses
-
-C<WHERE>, C<WHEN> and C<HAVING>: In the C<%%> menu are also available parentheses.
-
-=item Column Aliases
-
-Selecting C<alias> allows the user to add, change or remove aliases for the selected columns and the current table. It
-is also possible to change the table alias and rearrange the selected columns.
+Closes the parentheses for the C<IN> operator.
 
 =back
+
+For details about I<SQL>, I<Scalar Functions>, I<Window Functions>, I<Case Expression> and I<Maths>, see
+L</Extended Columns>.
+
+=head4 Extended Arguments
+
+If enabled, the following options are available for entering arguments in scalar and window functions.
+
+=over
+
+=item
+
+Value
+
+=item
+
+SQL
+
+=item
+
+Scalar Functions
+
+=item
+
+Case Expression
+
+=item
+
+Maths
+
+=item
+
+Column
+
+=back
+
+For details about I<Value> and I<Column>, see L</Extended Values>.
+
+For details about I<SQL>, I<Scalar Functions>, I<Case Expression> and I<Maths>, see L</Extended Columns>.
+
+The I<Extended Arguments> option can also be enabled later from the scalar function menu or the windows function menu by
+selecting the corresponding prompt line.
 
 =head3 Write Access
 
@@ -934,6 +1003,8 @@ Drop View
 =head3 System Data
 
 If I<System data> is enabled, system tables/schemas/databases are appended to their respective lists.
+
+C<DB2>: Disable this option to allow creating a table in an empty database.
 
 =head3 Operators
 

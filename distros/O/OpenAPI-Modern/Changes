@@ -1,5 +1,13 @@
 Revision history for OpenAPI-Modern
 
+0.145     2026-08-03 22:05:54Z
+          - fix data mutation at a distance issue on perls < 5.36
+
+0.144     2026-08-03 19:44:51Z
+          - support for message bodies encoded with the multipart/form-data
+            media-type (with or without "encoding" objects), including header
+            collection from parts
+
 0.143     2026-07-28 20:47:56Z
           - fix more path matching edge cases involving url-escaped characters
             and a path template of "/"

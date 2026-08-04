@@ -32,7 +32,7 @@ use constant {
 };
 
 
-our $VERSION = v0.32;
+our $VERSION = v0.33;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -154,8 +154,8 @@ my %_hash_type_aliases = (
 #@returns Data::Identifier
 sub integer {
     my ($pkg, $request, %opts) = @_;
-    $opts{request}      = $request;
-    $opts{displayname}//= $request;
+    $opts{request}      = $request.'';
+    $opts{displayname}//= $request.'';
     $opts{generator}    = $request >= 0 ? WK_UNSIGNED_INTEGER_GENERATOR : WK_SIGNED_INTEGER_GENERATOR;
 
     # We currently don't set one for $request == 0
@@ -282,7 +282,7 @@ sub date {
     $opts{request}      = $request;
     $opts{input}      //= $request; # force raw value!
     $opts{style}        = undef;
-    $opts{displayname}//= $request;
+    $opts{tagname}    //= $request;
     $opts{generator}    = WK_DATE_GENERATOR;
 
     return $pkg->generic(%opts);
@@ -436,15 +436,10 @@ sub digest {
 
     croak 'Bad request: '.$utag unless $utag =~ /^[a-z]{2,6}-(?:0|[1-9][0-9]*)-[1-9][0-9]*\z/;
 
-    $identifier = $pkg->generic(request => $utag, generator => $generator, %opts);
+    $identifier = $pkg->generic(request => $utag, generator => $generator, tagname => $utag, %opts);
 
     $identifier->{generator}    //= $generator;
     $identifier->{request}      //= $utag;
-
-    {
-        my %tagnames = map {$_ => undef} $utag, $identifier->tagname(list => 1, default => [], no_defaults => 1);
-        $identifier->{tagname} = [keys %tagnames];
-    }
 
     {
         my $id_cache = $identifier->{id_cache} //= {};
@@ -455,9 +450,6 @@ sub digest {
             $id_cache->{$type} //= $v;
         }
     }
-
-    use Data::Dumper;
-    warn Dumper($identifier);
 
     return $identifier;
 }
@@ -559,6 +551,7 @@ sub generic {
         foreach my $key (qw(request displaycolour description icontext)) {
             $tag->{$key} //= $opts{$key} if defined $opts{$key};
         }
+        $tag->_add_tagnames(ref $opts{tagname} ? @{$opts{tagname}} : $opts{tagname}) if defined $opts{tagname};
         $tag->{generator} //= $generator;
         return $tag;
     }
@@ -672,7 +665,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.32
+version v0.33
 
 =head1 SYNOPSIS
 
@@ -1084,6 +1077,13 @@ The following options are supported:
 =item C<displayname>
 
 The displayname as to be used for the identifier.
+This is the same as defined by L<Data::Identifier/new>.
+
+This option is optional.
+
+=item C<tagname>
+
+The tagname as to be used for the identifier.
 This is the same as defined by L<Data::Identifier/new>.
 
 This option is optional.

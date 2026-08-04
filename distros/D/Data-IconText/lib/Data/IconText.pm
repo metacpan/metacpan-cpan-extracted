@@ -12,7 +12,7 @@ use warnings;
 
 use Carp;
 use Scalar::Util qw(looks_like_number weaken);
-use Data::Identifier v0.12;
+use Data::Identifier v0.32;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Simple Data::Identifier::Interface::Known);
 
@@ -24,7 +24,7 @@ use constant {
 
 use overload '""' => sub {$_[0]->as_string};
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %_for_version = (
     v0.01 => {
@@ -433,6 +433,50 @@ my %_for_version = (
             },
         }
     },
+    v0.07 => {
+        parent => v0.06,
+        identifier => {
+            '8be115d2-dc2f-4a98-91e1-a6e3075cbc31' => { # uuid
+                '86e1dc74-c11c-48aa-adad-ccf50b100469' => 0x1F407,  # chat0w:259    rabbit
+                '56372460-a363-4064-b21e-6d16c4e98a2c' => 0x1F439,  # chat0w:260    hamster
+                'a7453da2-5ce9-4bbe-9ed3-52c0a767709c' => 0x1FACF,  # chat0w:267    donkey
+                '8c8ef3ab-4b45-46a1-ad9a-17e597ff5c85' => 0x1F426,  # chat0w:275    bird
+                '15aa3baf-d079-4fa3-9610-dc977b376ba4' => 0x1F41F,  # chat0w:276    fish
+                '212419b2-af42-4eea-aac9-e923922672f4' => 0x1F30A,  # chat0w:288    water
+                'ec9af69b-09ab-448f-bace-2c7803649fc6' => 0x1F95B,  # chat0w:289    milk
+                '4b977824-0017-400d-a97a-7672549e2c16' => 0x1F375,  # chat0w:290    tea
+                'ee895a1a-1e68-4aad-9af3-eaa322e72401' => 0x2615,   # chat0w:291    coffee
+                '706379e8-fd45-4b29-9f5d-ef9f18c41006' => 0x1F37A,  # chat0w:292    beer
+                '721d1163-f097-41fa-85e0-8fb7a36432d2' => 0x1F377,  # chat0w:293    wine
+                '3df75373-a3b2-496c-a52e-a70a9f9187dc' => 0x1F35E,  # chat0w:320    bread
+                '6de84502-631e-440d-a61d-f2c2947f643e' => 0x1F355,  # chat0w:322    pizza
+                '3efce853-eae9-4429-9d5d-c4420f846005' => 0x1F468,  # chat0w:224    father
+                'a3e1528a-5258-420d-92aa-401d973c43a8' => 0x1F469,  # chat0w:225    mother
+                '33ceb091-0dd2-4557-83d6-77aec4301c29' => 0x1F468,  # chat0w:226    parent
+                'b148ee3a-2547-4b0a-a7e2-a160024c4053' => 0x1F466,  # chat0w:227    child
+                'e7c73208-81ea-4ac7-b937-87070bbb9126' => 0x1F466,  # chat0w:228    son
+                'cf65827f-bc2b-49fa-a270-16fee39993a1' => 0x1F467,  # chat0w:229    girl
+                'd10e8e27-98fb-4973-90da-f27e8df49279' => 0x1F46A,  # chat0w:234    family
+                '5c706b0b-8f63-4799-97ea-f2f000044b16' => 0x1F474,  # chat0w:235    master
+                '5ecb4562-dad7-431d-94a6-d301dcea8d37' => 0x1F468,  # sid:99        parent
+                '1a9215b2-ad06-4f4f-a1e7-4cbb908f7c7c' => 0x1F466,  # sid:100       child
+            },
+        },
+        languages => {
+            '4fc82126-3ead-594a-9846-a0f2db006347' => 'za', # language-tag-identifier:af
+            '6895ad9b-2ba6-5933-8455-968aa781a88b' => 'de', # language-tag-identifier:de
+            'c50134ca-0a32-5c5c-833c-2686043c0b3f' => 'gb', # language-tag-identifier:en
+            '52b75ef6-f7fd-5786-8512-0e6cb8374675' => 'es', # language-tag-identifier:es
+            'c9b228e0-7440-548f-976f-ad5d73be0d5e' => 'fr', # language-tag-identifier:fr
+            '5ce4def5-43e8-5f62-bd04-f7215c23fbdc' => 'id', # language-tag-identifier:id
+            '8b433bc6-d6cb-59dc-8187-e7f6588670e1' => 'jp', # language-tag-identifier:ja
+            'da816af7-e49b-5406-b712-8dc96d968541' => 'nl', # language-tag-identifier:nl
+            'e9b8fc07-e8e1-5b0c-909d-af7e8479604c' => 'pt', # language-tag-identifier:pt
+            '636b9d36-a7b9-52fc-98c5-822569ba7a70' => 'ru', # language-tag-identifier:ru
+            '89f9f556-1cd9-561a-b1bd-556da6283bb1' => 'vn', # language-tag-identifier:vi
+            'a27015a5-e6f1-5d38-b00e-a65f7ddd39a3' => 'cn', # language-tag-identifier:zh
+        },
+    },
 );
 
 while (1) {
@@ -470,6 +514,7 @@ sub new {
     my ($pkg, %opts) = @_;
     my $self = bless {for_version => (delete($opts{for_version}) // $VERSION)}, $pkg;
     my $for_version_info = $self->_find_for_version_info;
+    my $ignore_bad_for;
     my @mimetypes;
 
     if (defined(my $new_for = $opts{for})) {
@@ -477,9 +522,13 @@ sub new {
             foreach my $key (qw(unicode from)) {
                 my $v = scalar(eval {$new_for->userdata(__PACKAGE__, 'mark_'.$key)}) // next;
                 $opts{$key} //= $v;
+                $ignore_bad_for = 1;
             }
             $new_for = scalar(eval {$new_for->userdata(__PACKAGE__, 'mark_for')});
-            $opts{for} = $new_for;
+            if (defined $new_for) {
+                $opts{for} = $new_for;
+                $ignore_bad_for = 1;
+            }
         }
     }
 
@@ -529,7 +578,9 @@ sub new {
             }
 
             {
-                my $for_id = $for->Data::Identifier::as('Data::Identifier');
+                my $for_id = eval {$for->Data::Identifier::as('Data::Identifier')};
+
+                $for_id //= Data::Identifier->new(sid => 0) if $ignore_bad_for;
 
                 if (defined(my $table = $for_version_info->{identifier}{$for_id->type->uuid})) {
                     $self->{unicode} //= $table->{$for_id->id};
@@ -539,6 +590,10 @@ sub new {
                     if ($for_id->id =~ /^flag-([a-z]{2})$/) {
                         $opts{flag} //= $1;
                     }
+                }
+
+                if (defined(my $flag = $for_version_info->{languages}{$for_id->uuid(default => '_NX', no_defaults => 1)})) {
+                    $opts{flag} //= $flag;
                 }
 
                 unless (defined $self->{unicode}) {
@@ -633,7 +688,7 @@ sub new {
                 } elsif ($for->isa('Data::Identifier')) {
                     # no-op, handled above.
                 } else {
-                    croak 'Invalid object passed for "for"';
+                    croak 'Invalid object passed for "for"' unless $ignore_bad_for;
                 }
             };
             $running = undef;
@@ -874,7 +929,7 @@ Data::IconText - Work with icon text
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

@@ -23,6 +23,7 @@ WriteMakefile(
         },
     TEST_REQUIRES   => {
             'latest'            => 0,
+            'Capture::Tiny'     => 0,
             'Class::Load'       => 0,
             'File::Find'        => 0,
             'Test::Kwalitee'    => 0,

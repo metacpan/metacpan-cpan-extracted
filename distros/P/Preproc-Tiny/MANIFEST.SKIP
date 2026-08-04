@@ -8,4 +8,5 @@
 ^\.gitignore
 ^\.vscode/
 \.bak$
-^Preproc-Tiny-.*.tar.gz
+^Preproc-Tiny-.*\.tar\.gz
+^Preproc-Tiny-.*\.tar

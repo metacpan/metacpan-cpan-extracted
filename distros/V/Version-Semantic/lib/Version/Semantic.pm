@@ -6,13 +6,11 @@ use warnings;
 #<<<
 package Version::Semantic;
 BEGIN {
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.1.0';
 }
 #>>>
 
 use overload '<=>' => 'compare_to', '""' => 'to_string';
-
-use PerlX::Maybe ();
 
 sub _croakf ( $@ );
 
@@ -52,6 +50,10 @@ sub build        { shift->{ build } }
 sub has_prefix      { defined shift->{ prefix } }
 sub has_pre_release { defined shift->{ pre_release } }
 sub has_build       { defined shift->{ build } }
+
+sub is_core {
+  ( () = grep { defined } @{ +shift }{ qw( pre_release build ) } ) == 0
+}
 
 {
   ## no critic ( ProhibitComplexRegexes )
@@ -101,6 +103,7 @@ sub has_build       { defined shift->{ build } }
       %args = @_
     };
     foreach ( keys %args ) {
+      # PerlX::Maybe::maybe
       unless ( defined $args{ $_ } ) {
         delete $args{ $_ };
         next
@@ -147,11 +150,11 @@ sub has_build       { defined shift->{ build } }
         _croakf "Cannot apply '%s' version incrementation strategy to non pre-release version '%s'", $strategy, $self
       }
     }
-    return $self->new( patch => $self->patch + 1, PerlX::Maybe::maybe pre_release => $pre_release )
+    return $self->new( patch => $self->patch + 1, pre_release => $pre_release )
       if $strategy eq 'patch';
-    return $self->new( minor => $self->minor + 1, patch => 0, PerlX::Maybe::maybe pre_release => $pre_release )
+    return $self->new( minor => $self->minor + 1, patch => 0, pre_release => $pre_release )
       if $strategy eq 'minor';
-    return $self->new( major => $self->major + 1, minor => 0, patch => 0, PerlX::Maybe::maybe pre_release => $pre_release )
+    return $self->new( major => $self->major + 1, minor => 0, patch => 0, pre_release => $pre_release )
       if $strategy eq 'major';
 
     _croakf "Version incrementation strategy '%s' is not implemented", $strategy

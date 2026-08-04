@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.143';
+our $VERSION = '0.145';
 
 use 5.020;
 use strictures 2;
@@ -17,13 +17,14 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use File::ShareDir 'dist_dir';
-use List::Util 1.45 'uniqstr';
+use List::Util 1.45 qw(uniqstr pairs);
 use Scalar::Util 'looks_like_number';
 use Mojo::Util qw(url_unescape url_escape);
 use Carp 'croak';
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
-use JSON::Schema::Modern::Utilities qw(register_schema load_cached_document true false);
+use builtin::compat 'blessed';
+use JSON::Schema::Modern::Utilities qw(register_schema load_cached_document true false match_media_type);
 use namespace::clean;
 
 use Exporter 'import';
@@ -43,6 +44,8 @@ our @EXPORT_OK = qw(
   OAS_SCHEMAS
   add_vocab_and_default_schemas
   add_formats
+  convert_request
+  convert_response
   uri_decode
   uri_encode
   uri_encode_strict
@@ -51,6 +54,7 @@ our @EXPORT_OK = qw(
   is_cookie_name
   is_cookie_value
   elem
+  deserialize_multipart
 );
 
 our %EXPORT_TAGS = (
@@ -126,10 +130,10 @@ use constant _BUNDLED_SCHEMAS => {
 # and also made available as s/<date>/latest/
 # { <oas version> => [ <uri>, <uri>, .. ]
 use constant OAS_SCHEMAS => {
-  map {
+  map do {
     my $version = $_;
     $version => [ grep m{/oas/$version/}, keys _BUNDLED_SCHEMAS->%* ]
-  } OAS_VERSIONS->@*
+  }, OAS_VERSIONS->@*
 };
 
 
@@ -188,6 +192,115 @@ sub add_formats ($evaluator, $version = OAS_VERSIONS->[-1]) {
       return 0+!!($x =~ m{^$TOKEN/$TOKEN(?:$OWS;$OWS$TOKEN=(?:$TOKEN|$QUOTED_STRING))*\z});
     },
   }) if not $evaluator->_get_format_validation('media-range');
+}
+
+# generates the equivalent Mojo::Message::Request from any of:
+# - HTTP::Request
+# - Plack::Request
+# - Catalyst::Request
+# - Dancer2::Core::Request
+# results may be unsatisfactory if not a valid HTTP request.
+sub convert_request ($request) {
+  return $request if $request->isa('Mojo::Message::Request');
+
+  my $req = Mojo::Message::Request->new;
+
+  if ($request->isa('HTTP::Request')) {
+    $req->method($request->method);
+    $req->url(Mojo::URL->new($request->uri));
+    $req->version($request->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}r) if $request->protocol;
+    my $body = $request->content;
+
+    if (match_media_type(scalar $request->content_type, ['multipart/form-data'])) {
+      $req->content(Mojo::Content::MultiPart->new);
+      $req->headers->add(@$_) foreach pairs $request->headers->flatten;
+      $req->content->emit(read => $body);
+    }
+    else {
+      $req->headers->add(@$_) foreach pairs $request->headers->flatten;
+      $req->body($body) if length $body;
+    }
+  }
+  # note: Dancer2::Core::Request inherits from Plack::Request
+  elsif ($request->isa('Plack::Request') or $request->isa('Catalyst::Request')) {
+    # make $request->content work
+    $request = do { +require Plack::Request; Plack::Request->new($request->env) }
+      if not $request->isa('Plack::Request');
+
+    if (match_media_type($request->content_type, ['multipart/form-data'])) {
+      $req->content(Mojo::Content::MultiPart->new);
+      $req->parse($request->env);
+      $req->content->emit(read => $request->content);
+    }
+    else {
+      $req->parse($request->env); # parsing psgi.input alters it; must read content afterwards
+      my $body = $request->content;
+      $req->body($body) if length $body;
+    }
+
+    # Plack is unable to distinguish between %2F and /, so the raw (undecoded) uri can be passed
+    # here. see PSGI::FAQ
+    $req->url(Mojo::URL->new($request->env->{REQUEST_URI})) if exists $request->env->{REQUEST_URI};
+  }
+  else {
+    return $req->error({ message => 'unknown type '.ref($request) });
+  }
+
+  # we could call $req->fix_headers here to add a missing Content-Length or Host, but proper
+  # requests from the network should always have these set.
+
+  $req->finish;
+  return $req;
+}
+
+# generates the equivalent Mojo::Message::Response from any of:
+# - HTTP::Response
+# - Plack::Response
+# - Catalyst::Response
+# - Dancer2::Core::Response
+# results may be unsatisfactory if not a valid HTTP response.
+sub convert_response ($response) {
+  return $response if $response->isa('Mojo::Message::Response');
+
+  my $res = Mojo::Message::Response->new;
+
+  my (@headers, $body);
+  if ($response->isa('HTTP::Response')) {
+    $res->code($response->code);
+    $res->version($response->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}r) if $response->protocol;
+    @headers = pairs $response->headers->flatten;
+    $body = $response->content;
+  }
+  elsif ($response->isa('Plack::Response') or $response->isa('Dancer2::Core::Response')) {
+    $res->code($response->status);
+    @headers = pairs $response->headers->psgi_flatten_without_sort->@*;
+    $body = $response->content;
+  }
+  elsif ($response->isa('Catalyst::Response')) {
+    $res->code($response->status);
+    HTTP::Headers->VERSION('6.07');
+    @headers = pairs $response->headers->flatten;
+    $body = $response->body;
+  }
+  else {
+    return $res->error({ message => 'unknown type '.ref($response) });
+  }
+
+  if (match_media_type(scalar $response->content_type, ['multipart/form-data'])) {
+    $res->content(Mojo::Content::MultiPart->new);
+    $res->headers->add(@$_) foreach @headers;
+    $res->content->emit(read => $body);
+  }
+  else {
+    $res->headers->add(@$_) foreach @headers;
+    $res->body($body) if length $body;
+  }
+
+  # we could call $res->fix_headers here to add a missing Content-Length, but proper responses from
+  # the network should always have it set.
+
+  $res->finish;
+  return $res;
 }
 
 # url-percent-decode and UTF-8-decode a string
@@ -268,6 +381,37 @@ sub elem ($items, $set) {
   @$items;
 }
 
+# Operates on a Mojo::Content object; returns two values:
+# - all parts as an arrayref of objects:
+#   [ { $name => $value }, { ... }, ... ]
+# - headers for each part as an arrayref of objects:
+#   [ { $header1 => $value, $header2 => $value, ... }, { ... }, ... ]
+# Only the top level is operated on; if there are parts nested inside of parts, those parts will be
+# returned without deserialization, so this function will need to be called again on those parts.
+# Strings are not decoded with charset here, but individual fields' Content-Type are included so
+# that can be done afterwards (or correlated with an encoding object)
+# Based loosely on Mojo::Message::_parse_formdata
+sub deserialize_multipart ($content) {
+  die 'body is not multipart' if not blessed $content or not $content->is_multipart;
+
+  my (@content, @headers);
+
+  foreach my $part ($content->parts->@*) {
+    my $headers = $part->headers->to_hash('multi');
+    push @headers, +{ map +($_ => ($headers->{$_}->@* == 1 ? $headers->{$_}[0] : $headers->{$_} )),
+      keys $headers->%* };
+
+    my $disposition = $part->headers->content_disposition;
+    die 'missing Content-Disposition' if not defined $disposition;
+
+    my ($name) = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
+    my $value = $part->is_multipart ? $part : $part->asset->slurp;
+    push @content, { $name => $value };
+  }
+
+  return (\@content, \@headers);
+}
+
 {
   # make all bundled schemas available via JSON::Schema::Modern::load_cached_document
   my $share_dir = dist_dir('OpenAPI-Modern');
@@ -290,7 +434,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.143
+version 0.145
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -314,6 +458,8 @@ STRICT_METASCHEMA
 SUPPORTED_OAD_VERSIONS
 add_vocab_and_default_schemas
 add_formats
+convert_request
+convert_response
 uri_decode
 uri_encode
 uri_encode_strict
@@ -322,6 +468,7 @@ coerce_primitive
 is_cookie_name
 is_cookie_value
 elem
+deserialize_multipart
 
 The constant values are updated automatically by C<update-schemas>, in the root of this distribution.
 

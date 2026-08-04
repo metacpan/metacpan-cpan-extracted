@@ -21,12 +21,12 @@ sub new {
     # FreeBSD where /dev/fd/0,1,2 always exist as device nodes but
     # /dev/fd/N (N>2) requires fdescfs to be mounted.
     $fdpath //= do {
-	my $fd = $fh->fileno;
-	my $found;
-	for my $path (qw(/proc/self/fd /dev/fd)) {
-	    -r "$path/$fd" and do { $found = $path; last };
-	}
-	$found // '';
+        my $fd = $fh->fileno;
+        my $found;
+        for my $path (qw(/proc/self/fd /dev/fd)) {
+            -r "$path/$fd" and do { $found = $path; last };
+        }
+        $found // '';
     };
     bless { FH => $fh }, $class;
 }
@@ -35,8 +35,8 @@ sub write {
     my $obj = shift;
     my $fh = $obj->fh;
     if (@_) {
-	my $data = join '', @_;
-	$fh->print($data);
+        my $data = join '', @_;
+        $fh->print($data);
     }
     $obj;
 }

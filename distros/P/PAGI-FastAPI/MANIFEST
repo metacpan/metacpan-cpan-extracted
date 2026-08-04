@@ -1,0 +1,24 @@
+Changes
+eg/app.pl
+lib/PAGI/FastAPI.pm
+lib/PAGI/FastAPI/Context.pm
+lib/PAGI/FastAPI/Depends.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/01-async_routing.t
+t/02-context.t
+t/03-post_body_validation.t
+t/04-middleware.t
+t/05-dependency_injection.t
+t/06-lifespan_events.t
+t/07-docs_openapi.t
+xt/changes.t
+xt/manifest.t
+xt/pod.t
+xt/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

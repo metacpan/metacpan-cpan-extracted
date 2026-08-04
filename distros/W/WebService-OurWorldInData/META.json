@@ -67,16 +67,17 @@
       "test" : {
          "recommends" : {
             "Archive::Extract" : "0",
-            "CPAN::Meta" : "2.120900",
-            "LWP::UserAgent" : "0",
-            "LWP::UserAgent::Mockable" : "0"
+            "CPAN::Meta" : "2.120900"
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Test2::V0" : "0",
+            "LWP::UserAgent" : "0",
+            "LWP::UserAgent::Mockable" : "0",
+            "Test2::V0" : "0.000139",
             "Test::More" : "0",
-            "Time::Piece" : "0"
+            "Time::Piece" : "0",
+            "URI" : "0"
          },
          "suggests" : {
             "Archive::Zip" : "0"
@@ -86,15 +87,19 @@
    "provides" : {
       "WebService::OurWorldInData" : {
          "file" : "lib/WebService/OurWorldInData.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "WebService::OurWorldInData::Catalog" : {
          "file" : "lib/WebService/OurWorldInData/Catalog.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "WebService::OurWorldInData::Chart" : {
          "file" : "lib/WebService/OurWorldInData/Chart.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "WebService::OurWorldInData::Indicators" : {
+         "file" : "lib/WebService/OurWorldInData/Indicators.pm",
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -109,7 +114,7 @@
          "web" : "https://github.com/duffee/perl-OurWorldInData"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -379,7 +384,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.03",
+                  "tag" : "v0.04",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

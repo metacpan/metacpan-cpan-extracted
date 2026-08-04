@@ -282,6 +282,8 @@ t/32-not-found.t
 t/33-error-format.t
 t/34-pagi-sse.t
 t/35-pagi-websocket.t
+t/37-psgi-api.t
+t/36-pagi-api.t
 t/alpine.psp                             
 t/apache_harness_helper.pm
 t/api_bare.psp                           

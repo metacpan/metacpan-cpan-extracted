@@ -3,34 +3,41 @@ package CLI::Simple::Constants;
 use strict;
 use warnings;
 
-use Log::Log4perl::Level;
-
 use parent qw(Exporter);
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.0';
 
 use Readonly;
+
+Readonly::Scalar our $LOG4PERL_COLOR_DEBUG => 'magenta';
+Readonly::Scalar our $LOG4PERL_COLOR_INFO  => 'green';
+Readonly::Scalar our $LOG4PERL_COLOR_WARN  => 'yellow';
+Readonly::Scalar our $LOG4PERL_COLOR_ERROR => 'red';
+Readonly::Scalar our $LOG4PERL_COLOR_FATAL => 'bold red';
+Readonly::Scalar our $LOG4PERL_COLOR_TRACE => 'bold magenta';
+
 Readonly::Scalar our $LOG4PERL_CONF => <<'END_OF_CONF';
 log4perl.logger = INFO, Screen
 log4perl.appender.Screen = Log::Log4perl::Appender::ScreenColoredLevels
 log4perl.appender.Screen.stderr = 1
 log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
-log4perl.appender.Screen.layout.ConversionPattern = [%d] %m%n
-log4perl.appender.Screen.color.DEBUG=magenta
-log4perl.appender.Screen.color.INFO=green
-log4perl.appender.Screen.color.WARN=yellow
-log4perl.appender.Screen.color.ERROR=red
-log4perl.appender.Screen.color.FATAL=bold red
-log4perl.appender.Screen.color.TRACE=bold white
+log4perl.appender.Screen.layout.ConversionPattern = [%%d] %%m%%n
+log4perl.appender.Screen.color.DEBUG=%s
+log4perl.appender.Screen.color.INFO=%s
+log4perl.appender.Screen.color.WARN=%s
+log4perl.appender.Screen.color.ERROR=%s
+log4perl.appender.Screen.color.FATAL=%s
+log4perl.appender.Screen.color.TRACE=%s
 END_OF_CONF
 
+# this bad but let's avoid load Log::Log4perl::Level
 Readonly::Hash our %LOG_LEVELS => (
-  debug => $DEBUG,
-  trace => $TRACE,
-  warn  => $WARN,
-  error => $ERROR,
-  fatal => $FATAL,
-  info  => $INFO,
+  trace => 5000,
+  debug => 10_000,
+  info  => 20_000,
+  warn  => 30_000,
+  error => 40_000,
+  fatal => 50_000,
 );
 
 our @EXPORT_OK = ();
@@ -72,6 +79,17 @@ our %EXPORT_TAGS = (
     qw{
       $PADDING
     }
+  ],
+  'color-config' => [
+    qw(
+      $LOG4PERL_CONF
+      $LOG4PERL_COLOR_DEBUG
+      $LOG4PERL_COLOR_INFO
+      $LOG4PERL_COLOR_WARN
+      $LOG4PERL_COLOR_ERROR
+      $LOG4PERL_COLOR_FATAL
+      $LOG4PERL_COLOR_TRACE
+    )
   ],
 );
 
@@ -118,7 +136,15 @@ Readonly::Array our @VALID_OPTIONS => qw(
 );
 
 foreach my $k ( keys %EXPORT_TAGS ) {
-  push @EXPORT_OK, @{ $EXPORT_TAGS{$k} }, '@VALID_OPTIONS', '$LOG4PERL_CONF';
+  push @EXPORT_OK, @{ $EXPORT_TAGS{$k} }, '@VALID_OPTIONS', qw(
+    $LOG4PERL_CONF
+    $LOG4PERL_COLOR_DEBUG
+    $LOG4PERL_COLOR_INFO
+    $LOG4PERL_COLOR_WARN
+    $LOG4PERL_COLOR_ERROR
+    $LOG4PERL_COLOR_FATAL
+    $LOG4PERL_COLRO_TRACE
+  );
 }
 
 $EXPORT_TAGS{'all'} = [@EXPORT_OK];

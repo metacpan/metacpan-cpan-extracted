@@ -9,7 +9,7 @@ use POSIX qw(strftime);
 use URI::Escape qw(uri_escape_utf8 uri_unescape);
 use Data::Dumper;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.3';
 
 my @SERVICE_URL_PATTERNS = (
   qr/(s3)[.]amazonaws[.]com\z/xsm,
@@ -113,8 +113,18 @@ sub sign {
     $canon_query = join '&', @pairs;
   }
 
-  # canonical request
-  my $canon_request = join "\n", $method, _encode_path($path), $canon_query, $canon_headers, $signed_headers, $payload_hash;
+  # canonical request path.
+  #
+  # SigV4 encodes the path segment TWICE for every service EXCEPT S3,
+  # which is encoded ONCE. The caller supplies a URL whose path is
+  # already percent-encoded once, so for S3 we use it verbatim; for all
+  # other services we apply the second encoding via _encode_path.
+  # Re-encoding an already-encoded S3 key (e.g. %23 -> %2523) is what
+  # produces SignatureDoesNotMatch on keys with reserved characters.
+  my $canon_path
+    = ( $self->{service} eq 's3' ) ? $path : _encode_path($path);
+
+  my $canon_request = join "\n", $method, $canon_path, $canon_query, $canon_headers, $signed_headers, $payload_hash;
 
   # credential scope
   my $service = $self->{service};

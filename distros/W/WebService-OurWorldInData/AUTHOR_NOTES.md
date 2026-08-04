@@ -8,6 +8,12 @@ Module::Release. Next time I'll migrate away if I see this note to self.
 
 The one thing I did learn was not to copy the dist.ini file into the tarball.
 
+### Getting ready for release
+
+Update Changes with git log messages under the `{{NEXT}}` tag.
+Bump version numbers with `vi dist.ini lib/WebService/OurWorldInData.pm`
+Commit all files
+
 ### checklist
 
 * ```dzil build```      - builds the module

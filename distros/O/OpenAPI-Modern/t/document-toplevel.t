@@ -318,10 +318,10 @@ ERRORS
 };
 
 subtest 'openapi version checks' => sub {
-  foreach my $version (map {
+  foreach my $version (map do {
         my @oad_version = split /\./, $_;
         map join('.', @oad_version[0..1], $_), 0 .. $oad_version[2]
-      } SUPPORTED_OAD_VERSIONS->@*) {
+      }, SUPPORTED_OAD_VERSIONS->@*) {
     cmp_result(
       [ warnings {
         JSON::Schema::Modern::Document::OpenAPI->new(
@@ -339,10 +339,10 @@ YAML
     );
   }
 
-  foreach my $version (map {
+  foreach my $version (map do {
         my @oad_version = split /\./, $_;
         map join('.', @oad_version[0..1], $_), (map $oad_version[2]+$_, 1..10)
-      } SUPPORTED_OAD_VERSIONS->@*) {
+      }, SUPPORTED_OAD_VERSIONS->@*) {
     my $prefix = join('.', (split(/\./, $version))[0..1], '');
     my ($tested_version) = grep /^\Q$prefix\E/, SUPPORTED_OAD_VERSIONS->@*;
     cmp_result(

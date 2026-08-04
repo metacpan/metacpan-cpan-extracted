@@ -1,3 +1,7 @@
+0.04      2026-08-03 12:20:41+02:00 Europe/Paris
+    - with(): read _many_to_many scalar instead of hash
+    - dependency on v0.02 DBIx::Class::Relationship::ManyToMany::Async.
+
 0.03      2026-07-12 00:14:42+02:00 Europe/Paris
     - add setup (Future Fondation::Setup)
     - move Fondation::Model::DBIx::Async::ResultSet to Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet;

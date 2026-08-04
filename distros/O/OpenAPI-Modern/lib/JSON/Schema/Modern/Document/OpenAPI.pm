@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.143';
+our $VERSION = '0.145';
 
 use 5.020;
 use utf8;
@@ -144,10 +144,10 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   my @oad_version = split /[.-]/, $schema->{openapi};
   $self->_set_oas_version(join('.', @oad_version[0..1]));
 
-  my ($max_supported) = grep {
+  my ($max_supported) = grep do {
     my @supported = split /\./;
     $supported[0] == $oad_version[0] && $supported[1] == $oad_version[1]
-  } reverse SUPPORTED_OAD_VERSIONS->@*;
+  }, reverse SUPPORTED_OAD_VERSIONS->@*;
 
   ()= E($state, 'unrecognized/unsupported openapi version: "%s"', $schema->{openapi}), return $state
     if not defined $max_supported;
@@ -754,7 +754,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.143
+version 0.145
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

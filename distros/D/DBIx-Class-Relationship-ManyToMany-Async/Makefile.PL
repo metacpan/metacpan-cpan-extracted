@@ -19,9 +19,10 @@ my %WriteMakefileArgs = (
     "DBD::SQLite" => 0,
     "DBIx::Class" => 0,
     "DBIx::Class::Async" => "1.0.4",
-    "Future" => 0
+    "Future" => 0,
+    "SQL::Translator" => "0.11018"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +33,8 @@ my %FallbackPrereqs = (
   "DBD::SQLite" => 0,
   "DBIx::Class" => 0,
   "DBIx::Class::Async" => "1.0.4",
-  "Future" => 0
+  "Future" => 0,
+  "SQL::Translator" => "0.11018"
 );
 
 

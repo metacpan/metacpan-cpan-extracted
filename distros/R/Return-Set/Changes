@@ -1,8 +1,27 @@
 Revision history for Return-Set
 
+0.05	Mon Aug  3 09:04:38 PM EDT 2026
+	[ Enhancements ]
+	- Explicit guard clause croaks with Usage message on zero arguments
+	- Dispatch key strings extracted as named constants to eliminate magic strings
+	[ Bug Fixes ]
+	- Dead code branch removed: validate_strict treats undef as optional/not-provided,
+	  so the "value is undefined" error path was provably unreachable
+	[ Tests ]
+	- Tests rewritten as formal equivalence-partition proofs with premise/conclusion comments
+
+0.04	Mon Aug  3 03:33:19 PM EDT 2026
+	[ Enhancements ]
+	- Better error messages when validation fails
+	- Named-parameter form now prefers 'output' key over 'value' (both still accepted)
+	- Bump the minimum version of Params::Validate::Strict to 0.37
+	[ Documentation ]
+	- Document all three calling forms in POD
+	- Rename POD section from METHODS to FUNCTIONS (set_return is a function, not a method)
+
 0.03	Tue Aug 26 15:00:17 EDT 2025
-	Explictly die when no arguments are given
-	Bump the version of Validate::Params::Strict to get latest features to Test::Returns
+	Explicitly die when no arguments are given
+	Bump the version of Params::Validate::Strict to get latest features to Test::Returns
 	args can now also be output, to be used with Params::Get which takes input
 
 0.02	Mon Jul 28 20:42:49 EDT 2025

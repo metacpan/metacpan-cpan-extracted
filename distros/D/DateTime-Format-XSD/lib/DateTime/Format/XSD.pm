@@ -4,7 +4,7 @@ package DateTime::Format::XSD;
 use strict;
 use warnings;
 use base qw(DateTime::Format::ISO8601);
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 sub format_datetime {
     my ($format, $date) = @_;
@@ -26,7 +26,7 @@ DateTime::Format::XSD - Format DateTime according to xsd:dateTime
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ L<DateTime>, L<DateTime::Format::ISO8601>, The XML Schema speficitation.
 =head1 BUG REPORTS
 
 Please submit all bugs regarding C<DateTime::Format::XSD> to
-C<bug-datetime-format-xsd@rt.cpan.org>
+the issue tracker.  See SECURITY.md for security issues.
 
 =head1 COPYRIGHT
 
@@ -62,23 +62,13 @@ C<bug-datetime-format-xsd@rt.cpan.org>
 This library is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Daniel Ruoso <daniel@ruoso.com>
-
-=item *
+=head1 AUTHOR
 
 Timothy Legge <timlegge@gmail.com>
 
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Daniel Ruoso.
+This software is copyright (c) 2026 by Daniel Ruoso.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -44,6 +44,29 @@ sub base_mapping {
     };
 }
 
+sub base_sdtm_mapping {
+    return {
+        mappingVersion => 2,
+        source         => { profile => 'sdtm' },
+        target         => {
+            model         => 'beacon',
+            schemaVersion => '2.0.0',
+        },
+        project  => { id => 'sdtm_terms_test', version => '1' },
+        defaults => { ontology => 'ncit' },
+        terminology => {
+            'AE.AESEV' => {
+                terms => {
+                    MILD => {
+                        id    => 'NCIT:C70666',
+                        label => 'Mild',
+                    },
+                },
+            },
+        },
+    };
+}
+
 my $compiled;
 lives_ok {
     $compiled = compile_mapping(
@@ -61,6 +84,35 @@ is(
     'Biological Sex',
     'a concise fixed-label query is normalized for execution',
 );
+
+{
+    my ( $fh, $file ) = tempfile( SUFFIX => '.json', UNLINK => 1 );
+    close $fh;
+    write_json_file( $file, base_sdtm_mapping() );
+
+    my $validated;
+    lives_ok {
+        $validated = read_mapping_file(
+            {
+                mapping_file         => $file,
+                schema_file          => 'share/schema/mapping-v2.json',
+                self_validate_schema => 0,
+            }
+        );
+    }
+    'an SDTM terminology map may use reviewed per-value terms without a DB query';
+
+    my $compiled_sdtm = compile_mapping(
+        $validated,
+        source_profile => 'sdtm',
+        headers        => [qw(DM.USUBJID AE.AESEV)],
+    );
+    is(
+        $compiled_sdtm->{terminology}{'AE.AESEV'}{terms}{MILD}{id},
+        'NCIT:C70666',
+        'the compact SDTM terminology dictionary survives compilation',
+    );
+}
 
 {
     my $mapping = base_mapping();
@@ -96,6 +148,7 @@ qr/Mapping source profile mismatch/,
     my $compiled_cdisc = compile_mapping(
         $mapping,
         source_profile => 'cdisc-odm',
+        record_profile => 'redcap',
         headers        => [qw(PatientId Sex)],
     );
     is(
@@ -106,7 +159,23 @@ qr/Mapping source profile mismatch/,
     is(
         $compiled_cdisc->{_compiled}{recordProfile},
         'redcap',
-        'CDISC-ODM shares the normalized REDCap mapping profile',
+        'REDCap-origin CDISC-ODM selects the REDCap record profile explicitly',
+    );
+}
+
+{
+    my $mapping = base_mapping();
+    $mapping->{source}{profile} = 'cdisc-odm';
+    my $compiled_cdisc = compile_mapping(
+        $mapping,
+        source_profile => 'cdisc-odm',
+        record_profile => 'cdisc-odm',
+        headers        => [qw(PatientId Sex)],
+    );
+    is(
+        $compiled_cdisc->{_compiled}{recordProfile},
+        'cdisc-odm',
+        'generic CDISC-ODM uses its embedded-metadata record profile',
     );
 }
 
@@ -182,7 +251,7 @@ qr/source columns not present.*<Sex>/s,
             read_mapping_file(
                 {
                     mapping_file         => $file,
-                    schema_file          => 'share/schema/mapping.json',
+                    schema_file          => 'share/schema/mapping-v2.json',
                     self_validate_schema => 0,
                 }
             );

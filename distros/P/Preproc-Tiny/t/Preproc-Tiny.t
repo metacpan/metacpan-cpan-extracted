@@ -179,6 +179,20 @@ int main() {
 OUT
 
 
+test(<<'IN', <<'OUT');
+sub test { my($a) = @_; }
+IN
+sub test { my($a) = @_; }
+OUT
+
+
+test(<<'IN', <<'OUT');
+sub test { return []; }
+IN
+sub test { return []; }
+OUT
+
+
 write_input(<<'IN');
 @@ ok=1;
 IN

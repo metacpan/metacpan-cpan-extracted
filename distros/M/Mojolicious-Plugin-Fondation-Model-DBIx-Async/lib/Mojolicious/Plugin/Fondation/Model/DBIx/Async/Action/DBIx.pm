@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx;
-$Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx::VERSION = '0.04';
 # ABSTRACT: Post-load action — discovers and registers DBIC Result/ResultSet
 # classes from plugins into the native DBIx::Class schema before workers fork.
 
@@ -101,7 +101,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx - Post-load act
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

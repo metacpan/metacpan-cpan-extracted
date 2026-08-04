@@ -1,0 +1,18 @@
+# Build artifacts and cruft - keep out of the distribution MANIFEST.
+^Fast\.c$
+^Fast\.o$
+^Fast\.bs$
+\.o$
+\.obj$
+\.bundle$
+\.so$
+^blib/
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^MYMETA\.
+~$
+\.bak$
+^JSON-Schema-Fast-
+\.tar\.gz$
+^\.git

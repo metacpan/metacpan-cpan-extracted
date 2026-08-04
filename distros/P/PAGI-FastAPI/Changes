@@ -1,0 +1,9 @@
+Revision history for Perl extension PAGI::FastAPI
+
+0.0.1   2026-08-03
+        - Initial CPAN release.
+        - Asynchronous routing engine built on top of PAGI ($scope, $receive, $send).
+        - Type-safe parameter & POST JSON body validation via Type::Tiny.
+        - Async Middleware pipeline support with built-in CORS helper (add_cors).
+        - FastAPI-style Dependency Injection system via PAGI::FastAPI::Depends.
+        - Integrated OpenAPI 3.1 schema (/openapi.json) and interactive Swagger UI (/docs).

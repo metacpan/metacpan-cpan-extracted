@@ -1,0 +1,397 @@
+# Copyright 2022 Jeffrey Kegler
+# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# Marpa::R2 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with Marpa::R2.  If not, see
+# http://www.gnu.org/licenses/.
+
+=head1 NAME
+
+Marpa::R2::Algorithm - The Earley algorithm
+
+=head1 Description
+
+For most purposes, the user does not need to know anything
+about the Earley algorithm or Marpa algorithm,
+and can ignore this document.
+This document describes those aspects of the Earley 
+and Marpa
+algorithms which 
+are relevant in certain cases,
+when using Marpa.
+These cases include
+L<tracing and
+debugging|Marpa::R2::Progress.pod>
+and
+L<use of the recognizer's ranking
+methods|Marpa::R2::Rank.pod>.
+
+Resources for readers who want to know 
+the details of the Marpa algorithm that are
+beyond the scope of this document are
+given L<below|/"Resources on the Marpa algorithm">.
+A reader of this document should
+be familiar with the basic parsing terminology
+described in L<Marpa::R2::Vocabulary.pod>.
+
+Marpa is based on Jay Earley's algorithm for parsing.
+The idea behind Earley's algorithm is that you can
+parse by building a table of rules
+and where you are in those rules.
+"Where" means two things: location in the rule relative to the rule's
+symbols,
+and location relative to the parse's input stream.
+
+=head1 Dotted Rules
+
+To understand this document,
+it is important to understand what a dotted rule is.
+An acquaintance with
+dotted rules is also important in understanding
+Marpa's progress reports.
+Dotted rules
+are thoroughly described
+L<in the progress report
+documentation|Marpa::R2::Progress>.
+This section repeats the main ideas
+from the perspective of this document.
+
+Recall that a rule is a B<LHS> (left hand side)
+and a B<RHS> (right hand side).
+The B<LHS> is always exactly one symbol.
+The B<RHS> is zero or more symbols.
+Consider the following example of a rule,
+given in the syntax of Marpa's DSL.
+
+=for Marpa::R2::Display
+ignore: 1
+
+    S ::= A B C
+
+=for Marpa::R2::Display
+
+Dotted rules are used to track the
+progress of a parse through a rule.
+Within a rule, position relative to the symbols of the rule
+is traditionally indicated with a dot.
+In fact, the symbol-relative
+rule position is usually called the B<dot location>.
+Taken as
+a pair, a rule and a dot location are called a B<dotted rule>.
+The symbol before the dot is called
+the B<predot symbol>.
+
+In parsing this rule, we can be at any of four possible locations.
+One location is at the beginning, before all of the symbols.
+The other three locations are immediately after each of the rule's
+three symbols.
+The following is an example of a dotted rule,
+with the dot after the second RHS symbol.
+
+=for Marpa::R2::Display
+ignore: 1
+
+    S ::= A B . C
+
+=for Marpa::R2::Display
+
+In this rule, C<B> is the B<predot symbol>.
+This rule indicates that we have recognized
+an C<A>, followed by a C<B>,
+but that we have yet to see a C<C>.
+
+When the dot is after the last symbol of the RHS,
+the dotted rule is called a B<completed rule>,
+or a B<completion>.
+A completion indicates that a rule has been fully recognized.
+
+Here is the completion for the above rule:
+
+=for Marpa::R2::Display
+ignore: 1
+
+    S ::= A B C .
+
+=for Marpa::R2::Display
+
+In this completion example, the symbol C<C>
+is the predot symbol.
+
+In every grammar,
+a special rule is reserved as
+the start rule.
+When the rule of a dotted rule is the start rule,
+and the dot is before the first symbol of the RHS,
+the dotted rule is the B<start dotted rule>.
+The start dotted rule does not have a predot symbol.
+
+When the dot is before the first symbol of the RHS,
+and the rule is not the start rule,
+the dotted rule is called a B<predicted rule>,
+or a B<prediction>.
+Here is the prediction of the rule we've been
+using for our examples:
+
+=for Marpa::R2::Display
+ignore: 1
+
+    S ::= . A B C
+
+=for Marpa::R2::Display
+
+A prediction indicates
+that we have not yet recognized any of the symbols in the rule.
+All a prediction does is to predict that the rule will occur.
+In predictions, there is no predot symbol.
+
+=head1 Earley items
+
+The dotted rules contain
+all but one piece of the information
+that Marpa
+needs to track.
+The missing piece is the second of the two "wheres": where in the input stream.
+To associate input stream location and dotted rules, Marpa uses what are now called Earley items.
+
+A convenient way to think of an B<Earley item> is as a triple, or 3-tuple,
+consisting of dotted rule, origin and current location.
+The B<origin> is the location in the input stream where the dotted rule starts.
+The B<current location>
+is the location in the input stream which corresponds to the
+dot position.
+
+Two noteworthy consequences
+follow from the way in which origin and current location are defined.
+First,
+if a dotted rule is a prediction,
+then origin and current location will always be the same.
+Second,
+the location where a rule ends is not tracked unless the
+dotted rule is a completion.
+If its dotted rule is not a completion,
+an Earley item does not tell us
+if a rule will
+ever be completed,
+much less at which location.
+
+=head1 Confluences
+
+In every parse,
+the Marpa algorithm starts
+with
+
+=over 4
+
+=item *
+
+an B<Earley table>
+containing
+a B<start Earley item>, and
+
+=item *
+
+a sequence of sets of tokens.
+
+=back
+
+The Marpa algorithm then performs one of a set of operations until no more Earley items
+can be added to the Earley table.
+(We will not describe these operations in detail here.
+See L<below|Resources on the Marpa algorithm>.)
+
+If we count addition of the start Earley item as an "operation",
+this means that every Earley item has at least one reason for
+being in the Earley table.
+(Duplicate Earley items are not added to the table,
+so that, in an ambiguous parse,
+a single Earley item may have more than one reason
+for being in the table.)
+
+For describing the reasons for the presence of Earley items
+in the Earley table, we use hydrological terminology.
+Intuitively, the tokens and/or Earley items are
+"upstream" from the Earley items they cause.
+
+Every Earley item has one or more B<confluences> which
+record the reason for 
+that Earley item's presence in the Earley table.
+Each confluence has two B<inflows>,
+but both of the inflows may be B<ill-defined>.
+
+The first inflow is the B<mainstem>.
+When well-defined, a mainstem is always an Earley item.
+The second inflow is the B<tributary>.
+When well-defined, a tributary is an Earley item or a
+token.
+
+=over 4
+
+=item *
+
+The start Earley item always has exactly one
+confluence.
+Both inflows of its confluence are ill-defined.
+
+=item *
+
+A predicted Earley item may have many confluences.
+The mainstem of a predicted Earley item is always
+another Earley item.
+The tributary of a predicted Earley item is always
+ill-defined.
+
+=item *
+
+An Earley item whose predot symbol is a terminal is
+a scanned Earley item.
+A scanned Earley item may have multiple confluences.
+The mainstem of a scanned Earley item is always
+another Earley item.
+The tributary of a scanned Earley item is always
+a token.
+
+=item *
+
+An Earley item whose predot symbol is a non-terminal is
+a reduction.
+A reduction may have many confluences.
+The mainstem of a reduction is always
+another Earley item.
+The tributary of a reduction is always
+a completed Earley item.
+
+=back
+
+=head1 Resources on the Marpa algorithm
+
+This document is not intended as an full explanation
+of the workings of the Marpa algorithm.
+Those who want to learn more about the Marpa
+algorithm,
+and who are not already familiar with Earley's
+algorithm,
+should consult an introductory presentation of
+it.
+One good start is the
+Wikipedia article
+L<https://en.wikipedia.org/wiki/Earley_parser>.
+For the workings of the Marpa algorithm
+there are L<two arxiv.org
+papers|Marpa::R2::Advanced::Bibliography/"Marpa papers">.
+
+=head1 Earley item correctness
+
+For the definition of Earley item correctness,
+we show symbols in angle brackets, for example C<< <A> >>,
+and sentential forms in double angle brackets, for example C<< <<alpha>> >>.
+
+Without loss of generality, we call
+our grammar C<G> and we call our input C<W>.
+The input is a sequence of tokens.
+C<W[i]> is the C<i>'th terminal of C<W>,
+so that the first terminal of C<W> is
+C<W[0]>.
+We write C<W[i...j]> for the segment of C<W> whose
+first term is C<W[i]> and whose last term is C<W[j]>.
+As a special case, C<W[a...b]> is the empty string
+if C<b> is less than C<a>.
+
+Let C<< <<alpha>> =>* <<beta>> >> mean that,
+using grammar C<G>,
+the sentential form C<< <<alpha>> >>
+derives the sentential form C<< <<beta>> >>
+in zero or more steps.
+We recall from L<the vocabulary
+document|Marpa::R2::Vocabulary>
+that a sentential form is a sequence of zero or
+more symbols from the grammar.
+In a derivation, a single symbol represents the sentential form
+of length 1 consisting only of that symbol.
+
+Also without loss of generality,
+we let the grammar C<G> be such that we have the following:
+
+=over 4
+
+=item *
+
+C<Syms> is the set of symbols in C<G>.
+
+=item *
+
+Exactly one of the symbols
+in C<Syms> is distinguished as the
+"start symbol".
+Call the "start symbol", C<< <Start> >>.
+
+=item *
+
+Let C<Terms> be a subset of C<Syms>
+called the "terminals" of C<G>.
+The symbols of the tokens in the input C<W> are
+elements of C<Terms>.
+
+=item *
+
+C<G> contains the rule
+
+   <A> ::= <<beta>> <<gamma>>
+
+where C<< <<beta>> >> and C<< <<gamma>> >> are sentential forms.
+
+=back
+
+We say the Earley item
+
+    [ [ <A> ::= <<beta>> . <<gamma>> ], origin, current ]
+
+is B<correct> if and only if,
+where C<< <<alpha>> >> and C<< <<delta>> >> are sentential forms,
+we have all of the following:
+
+   1. <Start> => <<alpha>> <A> <<delta>>
+
+   2. <<alpha>> => W[0...(origin-1)]
+
+   3. <<beta>> => W[origin...(current-1)]
+
+A proof that the Earley algorithm adds all correct Earley items,
+and only correct Earley items,
+to the Earley table
+can be found in L<Jay Earley's original
+paper|Marpa::R2::Advanced::Bibliography/"Earley 1970">,
+and in L<Aho and Ullmann's 1972
+textbook|Marpa::R2::Advanced::Bibliography/"Aho and Ullman 1972">.
+
+=head1 Copyright and License
+
+=for Marpa::R2::Display
+ignore: 1
+
+  Copyright 2022 Jeffrey Kegler
+  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  redistribute it and/or modify it under the terms of the GNU Lesser
+  General Public License as published by the Free Software Foundation,
+  either version 3 of the License, or (at your option) any later version.
+
+  Marpa::R2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser
+  General Public License along with Marpa::R2.  If not, see
+  http://www.gnu.org/licenses/.
+
+=for Marpa::R2::Display::End
+
+=cut
+

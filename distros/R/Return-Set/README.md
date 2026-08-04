@@ -4,32 +4,51 @@ Return::Set - Return a value optionally validated against a strict schema
 
 # VERSION
 
-Version 0.03
+Version 0.05
 
 # SYNOPSIS
 
     use Return::Set qw(set_return);
 
-    my $value = set_return($value);  # Just returns $value
-
-    my $value = set_return($value, { type => 'integer' });  # Validates $value is an integer
+    return set_return($value);
+    return set_return($value, { type => 'integer' });
+    return set_return({ output => $value, schema => { type => 'integer' } });
 
 # DESCRIPTION
 
-Exports a single function, `set_return`, which returns a given value.
 If a validation schema is provided, the value is validated using
 [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
 If validation fails, it croaks.
 
-When used hand-in-hand with [Params::Get](https://metacpan.org/pod/Params%3A%3AGet) you should be able to formally specify the input and output sets for a method.
+When used hand-in-hand with [Params::Get](https://metacpan.org/pod/Params%3A%3AGet),
+you should be able to formally specify the input and output sets for a method.
 
-# METHODS
+Exports a single function, `set_return`, which returns a given value.
 
-## set\_return($value, $schema)
+# FUNCTIONS
 
-Returns `$value`.
-If `$schema` is provided, it validates the value against it.
-Croaks if validation fails.
+## set\_return
+
+Returns the given value, optionally validating it against a schema.
+
+Three calling forms are accepted:
+
+- set\_return($value)
+
+    Returns `$value` immediately with no validation.
+
+- set\_return($value, $schema)
+
+    Returns `$value` after validating it against `$schema`
+    (a [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) schema hashref, e.g. `{ type => 'integer' }`).
+    Croaks if validation fails.
+
+- set\_return(\\%args)
+
+    Named-parameter form.
+    `%args` may contain `output` (preferred) or `value` (accepted for backwards
+    compatibility) for the return value, and `schema` for the optional schema.
+    Croaks if validation fails.
 
 # AUTHOR
 
@@ -46,13 +65,8 @@ This module is provided as-is without any warranty.
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-- Personal single user, single computer use: GPL2
-- All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.

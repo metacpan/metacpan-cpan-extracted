@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Asset::Command::asset;
-$Mojolicious::Plugin::Fondation::Asset::Command::asset::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Asset::Command::asset::VERSION = '0.04';
 # ABSTRACT: Generate merged assetpack.def and process assets through AssetPack
 
 use Mojo::Base 'Mojolicious::Command', -signatures;
@@ -173,7 +173,7 @@ Mojolicious::Plugin::Fondation::Asset::Command::asset - Generate merged assetpac
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

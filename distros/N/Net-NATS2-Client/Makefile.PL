@@ -2,6 +2,12 @@ use v5.10;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
+
+my $provides = Module::Metadata->provides(
+    dir     => 'lib',
+    version => 2
+);
 
 WriteMakefile(
     NAME         => 'Net::NATS2::Client',
@@ -23,8 +29,13 @@ WriteMakefile(
                 url  => 'git@github.com:dshadow/perl-nats2.git',
                 web  => 'https://github.com/dshadow/perl-nats2',
             }
-        }
+        },
+        provides => $provides,
     },
     MIN_PERL_VERSION => '5.10.1',
-    PREREQ_PM        => {'IO::Socket::INET' => 0, 'JSON' => 0, 'URI' => 0,},
+    PREREQ_PM        => {'IO::Socket::INET' => 0, 'JSON' => 0, 'MIME::Base64' => 0, 'URI' => 0,},
+    dist => {
+        TAR         => 'COPYFILE_DISABLE=1 tar',
+        TARFLAGS    => 'cvf',
+    },
 );

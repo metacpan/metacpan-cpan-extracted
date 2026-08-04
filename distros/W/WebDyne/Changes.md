@@ -1,5 +1,18 @@
 # Revision history for WebDyne
 
+## Unreleased
+
+- Added REST-style `<api>` route discovery and `PATH_INFO` mapping to
+  `WebDyne::PAGI`, bringing PAGI API support in line with PSGI.
+- Added per-application API filename caches for PSGI and PAGI. API
+  filename or route-structure changes may require a server restart.
+- Ensured PAGI emits a valid empty HTTP response when an API document
+  produces no body, avoiding PAGI lint errors.
+- Clarified that Apache mod_perl does not provide automatic extensionless
+  API route discovery without additional Apache rewrite or routing rules.
+- Added integration coverage for PSGI and PAGI API routing, caching,
+  normal PSP requests, and 404 handling.
+
 ## 3.005 - 2026-08-02
 
 Major Version 3 release.

@@ -1,3 +1,13 @@
+v0.33  2026-08-03Z
+    - Better support for Math::BigInt (from, as)
+    - Removed deprecated methods
+        * Data::Identifier->wellknown(): replaced by Data::Identifier->known()
+        * $cl->db(), $cl->extractor(), $cl->fii(), $cl->store(): replaced by $cl->so_get()
+    - Made $id->displaycolour(), $id->icontext(), and $id->description() die when no value is known
+      to unify the API
+    - Removed stray debugging output
+    - Improve support for tagnames with generators
+
 v0.32  2026-07-31Z
     - Updated documentation
     - Marked removal versions for some functions

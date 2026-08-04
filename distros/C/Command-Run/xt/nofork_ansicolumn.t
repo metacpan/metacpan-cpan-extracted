@@ -4,7 +4,7 @@ use Test::More;
 
 BEGIN {
     eval { require App::ansicolumn }
-	or plan skip_all => 'App::ansicolumn not installed';
+        or plan skip_all => 'App::ansicolumn not installed';
 }
 
 use Command::Run;
@@ -31,9 +31,9 @@ subtest 'fork vs nofork+raw: same output' => sub {
 
 subtest 'nofork: column options' => sub {
     my $result = Command::Run->new(
-	command => [$func, '-c80', '-C4'],
-	stdin   => $input,
-	nofork  => 1,
+        command => [$func, '-c80', '-C4'],
+        stdin   => $input,
+        nofork  => 1,
     )->run;
     is $result->{result}, 0, 'exit status 0';
     my @lines = split /\n/, $result->{data};
@@ -42,9 +42,9 @@ subtest 'nofork: column options' => sub {
 
 subtest 'nofork: fillrows mode' => sub {
     my $result = Command::Run->new(
-	command => [$func, '-c80', '-C4', '-x'],
-	stdin   => $input,
-	nofork  => 1,
+        command => [$func, '-c80', '-C4', '-x'],
+        stdin   => $input,
+        nofork  => 1,
     )->run;
     is $result->{result}, 0, 'exit status 0';
     like $result->{data}, qr/^1\s+2\s+3\s+4\s*$/m, 'fillrows order';
@@ -53,11 +53,11 @@ subtest 'nofork: fillrows mode' => sub {
 subtest 'nofork: stdout/stderr references' => sub {
     my ($out, $err);
     Command::Run->new(
-	command => [$func, '-c80', '-C2'],
-	stdin   => $input,
-	stdout  => \$out,
-	stderr  => \$err,
-	nofork  => 1,
+        command => [$func, '-c80', '-C2'],
+        stdin   => $input,
+        stdout  => \$out,
+        stderr  => \$err,
+        nofork  => 1,
     )->run;
     ok length($out) > 0, 'stdout captured via reference';
     is $err, '', 'no stderr on success';
@@ -65,8 +65,8 @@ subtest 'nofork: stdout/stderr references' => sub {
 
 subtest 'nofork: repeated execution' => sub {
     my $runner = Command::Run->new(
-	command => [$func, '-c80', '-C2'],
-	nofork  => 1,
+        command => [$func, '-c80', '-C2'],
+        nofork  => 1,
     );
     my $r1 = $runner->run(stdin => join("\n", 'a'..'j') . "\n");
     my $r2 = $runner->run(stdin => join("\n", 1..10) . "\n");

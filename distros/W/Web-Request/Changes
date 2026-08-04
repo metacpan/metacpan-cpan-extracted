@@ -1,5 +1,23 @@
 Revision history for Web-Request
 
+0.12  2026-08-03
+      - skip test image in Dist::Zilla GatherDir step to avoid build
+        failures.
+      - add vertical whitespace required by Dist::Zilla::PkgVersion.
+      - add missing ABSTRACT in Web::Request::Types.
+      - document the encoding behaviour when using new_response(), thus
+        addressing https://github.com/doy/web-request/issues/3.
+      - decode undef query parameters as the empty string, and thus fix
+        compatibility with URI 5.19 and allow the `t/uri.t` tests to pass
+        again.  This merges a modified version of
+        https://github.com/doy/web-request/pull/5 and resolves
+        https://github.com/doy/web-request/issues/4.
+      - replace Travis-CI with GitHub action.
+      - remove reliance on author Dist::Zilla bundle.
+      - replace EOLTests Dist::Zilla plugin with Test::EOL and thus resolve
+        build warnings.
+      - add Paul Cochrane as maintainer.
+
 0.11  2013-09-02
       - fix form parameters (domm, #1)
       - backport a couple fixes from Plack::Request/Plack::Response

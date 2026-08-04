@@ -21,9 +21,30 @@ no_index:
     - t
   package:
     - Net::NATS2::URI
+provides:
+  Net::NATS2::Base:
+    file: lib/Net/NATS2/Base.pm
+  Net::NATS2::Client:
+    file: lib/Net/NATS2/Client.pm
+    version: v0.3.4
+  Net::NATS2::ConnectInfo:
+    file: lib/Net/NATS2/ConnectInfo.pm
+  Net::NATS2::Connection:
+    file: lib/Net/NATS2/Connection.pm
+  Net::NATS2::JetStream:
+    file: lib/Net/NATS2/JetStream.pm
+  Net::NATS2::Message:
+    file: lib/Net/NATS2/Message.pm
+  Net::NATS2::ServerInfo:
+    file: lib/Net/NATS2/ServerInfo.pm
+  Net::NATS2::Subscription:
+    file: lib/Net/NATS2/Subscription.pm
+  Net::NATS2::URI:
+    file: lib/Net/NATS2/URI.pm
 requires:
   IO::Socket::INET: '0'
   JSON: '0'
+  MIME::Base64: '0'
   URI: '0'
   perl: '5.010'
 resources:
@@ -31,5 +52,5 @@ resources:
   homepage: https://github.com/dshadow/perl-nats2
   license: https://opensource.org/license/mit
   repository: https://github.com/dshadow/perl-nats2
-version: v0.3.3
+version: v0.3.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -35,12 +35,13 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Params::Get" : "0.13",
-            "Params::Validate::Strict" : "0.1",
+            "Params::Validate::Strict" : "0.37",
             "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "IPC::System::Simple" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0"
@@ -62,6 +63,6 @@
          "x_repository" : "https://github.com/nigelhorne/Return-Set"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,5 +1,21 @@
 Revision history for DateTime-Format-XSD
 
+0.5 -- Mon Aug 03 13:26:34 ADT 2026
+
+  [Significant Changes since 0.4]
+  - DateTime::Format::ISO8601 minimum update for nanoseconds fix
+  - Added a SECURITY Policy
+  - Minor packaging updates
+
+  [Detailed Changes]
+  - c604eb3 Automaticall tag and commit Changes
+  - db86fe2 Automatically get and update version and Changes
+  - a5f9c83 Update contact information and add a SECURITY Policy
+  - c1025ab Retire Module::Signature signing and use SigStore
+  - 8ac3a6a Increment version for DateTime::Format::ISO8601
+  - 59e2c05 Add generated README to repo
+  - 62ed98c Release 0.4
+
 0.4 - 2021-04-18
 
   [Release Official Version]

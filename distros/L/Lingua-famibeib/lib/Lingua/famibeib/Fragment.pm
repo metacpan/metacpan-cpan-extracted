@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use Carp;
 
 use Lingua::famibeib::Word;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use parent 'Data::Identifier::Interface::Subobjects';
 
@@ -74,13 +74,15 @@ Lingua::famibeib::Fragment - module to interact with the famibeib fragments
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
     use Lingua::famibeib::Fragment;
 
 This module inherits from L<Data::Identifier::Interface::Subobjects>.
+
+=head1 METHODS
 
 =head2 new
 

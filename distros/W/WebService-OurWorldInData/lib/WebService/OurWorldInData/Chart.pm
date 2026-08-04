@@ -73,16 +73,6 @@ sub zip {
     return $response;
 }
 
-=head2 parse_data
-
-Takes the output from the C<data> method and uses Text::CSV
-to read each line, returning an arrayref of rows.
-
-If the parsing throws an error, it bails warning you to save
-the file and parse it in full.
-
-=cut
-
 sub parse_data {
     my ($self, $body) = @_;
 
@@ -117,9 +107,18 @@ sub parse_data {
 Queries the Our World in Data Chart api which provides data and metadata
 in CSV format. The Chart object can be created with the following attributes:
 
-short_names - a boolean flag to affect the results
-csv_type - either full (default) or filtered
-time/country - filter the results you request
+=over 4
+
+=item short_names - a boolean flag to affect the results
+
+=item csv_type - either full (default) or filtered
+
+=item country - filter results based on country code
+
+=item time - filter results on years, ranges declared with ".."
+
+=back
+
 
 as described by the OWiD API.
 
@@ -146,9 +145,11 @@ or save the data to a file
 
 =head2 parse_data
 
-This is a convenience function to turn your csv data into a perl arrayref.
-It's not very clever, but it will warn you when it runs into trouble and
-suggests saving to a file instead.
+Takes the output from the C<data> method and uses Text::CSV
+to read each line, returning an arrayref of rows.
+
+If the parsing throws an error, it bails warning you to save
+the file and parse it in full.
 
 =head2 metadata
 

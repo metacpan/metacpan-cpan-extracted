@@ -15,6 +15,7 @@ t/03_coderef.t
 t/04_with.t
 t/05_nofork.t
 t/06_layers.t
+t/07_run_params.t
 t/bench.pl
 xt/nofork_ansicolumn.t
 META.yml

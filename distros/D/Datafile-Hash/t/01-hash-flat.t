@@ -1,4 +1,4 @@
-# t/04-hash-flat.t
+# t/01-hash-flat.t
 use strict;
 use warnings;
 use Test::More;

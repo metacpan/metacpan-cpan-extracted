@@ -25,7 +25,7 @@ our @EXPORT_OK = qw(
   to_snake_case
 );
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.0';
 
 sub toPascalCase { goto &_toCamelCase; }
 sub ToCamelCase  { goto &_toCamelCase; }
@@ -260,7 +260,12 @@ Returns a Perl object from a presumably JSON encoded file.
 
  slurp(file)
 
-Return the entire contents of a file.
+Return the entire contents of a file. C<file> can be the path to a
+file or an open file handle.
+
+=head1 VERSION
+
+This documentation referes to version 2.2.0
 
 =head1 LICENSE AND COPYRIGHT
 

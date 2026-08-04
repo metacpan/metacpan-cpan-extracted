@@ -32,11 +32,12 @@
             "Data::Sah::Compiler::perl::TH::array" : "0.914",
             "Data::Sah::Compiler::perl::TH::bool" : "0.914",
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
-            "Desktop::XWindowManager::Util" : "0",
+            "Desktop::XWindowManager::Util" : "0.005",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
             "Perinci::Sub::DepChecker" : "0",
+            "Sah::Schema::kdeactivity::name" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -54,7 +55,7 @@
    "provides" : {
       "App::XWindowManagerUtils" : {
          "file" : "lib/App/XWindowManagerUtils.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-App-XWindowManagerUtils"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -77,12 +78,32 @@
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript get-xwm-window-kde-activity",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript get-window-kde-activity",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript list-windows",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript list-xwm-windows",
             "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript get-xwm-window-kde-activity",
+            "name" : "GenPericmdScript move-windows-to-kde-activity",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript move-windows-to-this-kde-activity",
             "version" : "0.425"
          },
          {

@@ -1,3 +1,8 @@
+v0.07  2026-08-03Z
+    - Fixed new(for => $x)'s code path for mark()
+    - Added more well known tags
+    - Updated required version of Data::Identifier to v0.32
+
 v0.06  2026-08-01Z
     - Added more well known tags
     - Implemented

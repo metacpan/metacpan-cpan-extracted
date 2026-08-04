@@ -55,6 +55,6 @@
          "web" : "https://github.com/pauloscustodio/perl-Preproc-Tiny"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

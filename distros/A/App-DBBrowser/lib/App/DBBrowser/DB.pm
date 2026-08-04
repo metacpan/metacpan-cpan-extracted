@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.016;
 
-our $VERSION = '2.443';
+our $VERSION = '2.444';
 
 use Encode       qw( decode );
 #use bytes;      # required
@@ -188,6 +188,7 @@ sub get_schemas {
     $user_schemas //= [];
     $sys_schemas //= [];
     if ( $is_system_db ) {
+        # System database: all schemas are treated as system schemas.
         return [], [ @$user_schemas, @$sys_schemas ];
     }
     else {
@@ -196,7 +197,6 @@ sub get_schemas {
             # In the previous sections we created tables without specifying any schema names. By default such tables
             # (and other objects) are automatically put into a schema named “public”. Every new database contains such a schema.
             $user_schemas = [ 'public' ];
-            # add 'public' only if db is user-db
         }
         return $user_schemas, $sys_schemas;
     }
@@ -336,7 +336,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.443
+Version 2.444
 
 =head1 DESCRIPTION
 

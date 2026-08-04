@@ -227,6 +227,54 @@ $file = "$dir/greek.tex";
 write_table({ "\x{0394}" => 1 }, $file, 'row.names' => 0, 'tex.longtable' => 1);
 like(read_tex($file), qr/\\textDelta\{\}/, 'U+0394 -> \textDelta{}');
 
+# tex.longtable.head: the header goes inside longtable's repeat machinery, so
+# the header frozen at every page break is generated from col.names rather than
+# hand-written by the caller.
+my @aoh = ({ feature => 'a_b', n => 1 }, { feature => 'c', n => 2 });
+my @order = ('feature', 'n');
+$file = "$dir/head.tex";
+write_table(\@aoh, $file, 'col.names' => \@order, 'tex.longtable.head' => 1);
+$c = read_tex($file);
+like($c, qr/\\endfirsthead/, 'tex.longtable.head emits \endfirsthead');
+like($c, qr/\\endhead/,      'tex.longtable.head emits \endhead');
+like($c, qr/\\endfoot/,      'tex.longtable.head emits \endfoot');
+unlike($c, qr/\\begin\{tabular\}/, 'tex.longtable.head implies the body-only form');
+# \hline is \noalign, and TeX has begun a row by the time it expands the
+# caller's \input, so a rule as the first token is a "Misplaced \noalign".
+is((body_lines($c))[0], '\textbf{feature} & \textbf{n} \\\\ \hline',
+	'file opens on the header row, not on a rule');
+# Both copies of the header must exist and follow col.names, not hash order.
+my @heads = grep { /\\textbf\{feature\}/ } split /\n/, $c;
+is(scalar @heads, 2, 'header written once for \endfirsthead and once for \endhead');
+is($heads[0], $heads[1], 'the two frozen headers are identical');
+like($heads[0], qr/^\\textbf\{feature\} & \\textbf\{n\} \\\\ \\hline$/,
+	'frozen header follows col.names order');
+# ... and the header is no longer duplicated as a body row.
+is(scalar(grep { /\\textbf\{a\\_b\}/ } data_rows_of($c)), 1, 'data rows unaffected');
+unlike($c, qr/\\endhead\n\\hline\n\\endfoot\n\\textbf\{feature\}/,
+	'no leftover header row at the top of the body');
+
+# A non-numeric value is the continuation caption, passed through verbatim.
+$file = "$dir/head.caption.tex";
+write_table(\@aoh, $file, 'col.names' => \@order,
+	'tex.longtable.head' => '220 \textDelta{}G (continued)');
+$c = read_tex($file);
+like($c, qr/\\endfirsthead\n\\caption\[\]\{220 \\textDelta\{\}G \(continued\)\}\\\\\n/,
+	'continuation caption sits at the top of the \endhead block, unescaped');
+unlike($c, qr/\\endfirsthead\n\\caption[^\n]*\n[^\n]*\\endfirsthead/,
+	'caption is not repeated in the first head');
+
+# A true-but-numeric value asks for the machinery with no continuation caption.
+$file = "$dir/head.nocaption.tex";
+write_table(\@aoh, $file, 'col.names' => \@order, 'tex.longtable.head' => 1);
+unlike(read_tex($file), qr/\\caption/, 'no caption emitted for a numeric value');
+
+# Off by default: plain tex.longtable keeps the old plain-header body.
+$file = "$dir/head.off.tex";
+write_table(\@aoh, $file, 'col.names' => \@order, 'tex.longtable' => 1);
+unlike(read_tex($file), qr/\\endfirsthead|\\endhead|\\endfoot/,
+	'tex.longtable alone emits no repeat machinery');
+
 # Error paths still fire with longtable on.
 dies_ok {
 	write_table({ 'x' => { 'y' => [1, 2] } }, "$dir/bad.tex", 'tex.longtable' => 1);

@@ -4,6 +4,7 @@ lib/Devel/LeakGuard/Object.pm
 lib/Devel/LeakGuard/Object/State.pm
 LICENSE
 MANIFEST
+MANIFEST.SKIP
 README.md
 t/auto.t
 t/basic.t

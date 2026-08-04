@@ -1,5 +1,11 @@
 Revision history for JMAP-Tester
 
+0.112     2026-08-03 13:04:57-04:00 America/New_York
+        - tweak formatting of bullet lists in Manual
+
+0.111     2026-08-03 12:10:36-04:00 America/New_York
+        - add JMAP::Tester::Manual, a sort of quick start
+
 0.110     2026-06-17 20:59:46-04:00 America/New_York
         - provide all Result types with the option to issue a diagnostic abort,
           previously limited to Response

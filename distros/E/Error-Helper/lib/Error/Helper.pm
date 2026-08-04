@@ -9,11 +9,11 @@ Error::Helper - Provides some easy error related methods.
 
 =head1 VERSION
 
-Version 2.1.0
+Version 3.0.0
 
 =cut
 
-our $VERSION = '2.1.0';
+our $VERSION = '3.0.0';
 
 our $error             = undef;
 our $perror            = undef;
@@ -28,12 +28,13 @@ our $errorSubShort     = undef;
 
 =head1 SYNOPSIS
 
-Below is a example script showing it's usage.
+Below is an example script showing its usage.
 
     use warnings;
     use strict;
 
     {
+
     	package Foo;
     	use base 'Error::Helper';
 
@@ -57,6 +58,9 @@ Below is a example script showing it's usage.
     				fatal_flags => {
     					derp => 1,
     				},
+    				fatal_errors => {
+    					4 => 1,
+    				},
     				perror_not_fatal => 0,
     			},
     		};
@@ -64,7 +68,7 @@ Below is a example script showing it's usage.
 
     		# error if $arg is set to "test"
     		if ( defined($arg)
-			&& $arg eq "test" )
+    			&& $arg eq "test" )
     		{
     			$self->{perror}      = 1;
     			$self->{error}       = 2;
@@ -75,11 +79,11 @@ Below is a example script showing it's usage.
 
     		# error if $arg is set to "test2", error fatally
     		if ( defined($arg)
-			&& $arg eq "test" )
+    			&& $arg eq "test2" )
     		{
     			$self->{perror}      = 1;
     			$self->{error}       = 4;
-    			$self->{errorString} = 'A value of "test" has been set';
+    			$self->{errorString} = 'A value of "test2" has been set';
     			$self->warn;
     			return $self;
     		}
@@ -88,22 +92,22 @@ Below is a example script showing it's usage.
     	} ## end sub new
 
     	sub foo {
-    		my $self = $_[0];
-    		my $a    = $_[1];
+    		my $self  = $_[0];
+    		my $value = $_[1];
 
     		if ( !$self->errorblank ) {
     			return undef;
     		}
 
-    		if ( !defined($a) ) {
+    		if ( !defined($value) ) {
     			$self->{error}       = 1;
     			$self->{errorString} = 'No value specified';
     			$self->warn;
     			return undef;
     		}
 
-            # this will be fatal as it error flag derp is set to fatal
-    		if ( $a eq 'derp' ) {
+    		# this will be fatal as the error flag derp is set to fatal
+    		if ( $value eq 'derp' ) {
     			$self->{error}       = 3;
     			$self->{errorString} = 'foo was called with a value of derp';
     			$self->warn;
@@ -115,41 +119,48 @@ Below is a example script showing it's usage.
 
     my $foo_obj;
     eval {
-        $foo_obj = Foo->new( $ARGV[0] );
-        # will never be evaulated as perrors are fatal
-        if ( $foo_obj->error ) {
-        	warn( 'error:' . $foo_obj->error . ': ' . $foo_obj->errorString );
-        	exit $foo_obj->error;
-        }
+    	$foo_obj = Foo->new( $ARGV[0] );
+    	# not reached when a perror is set, as perrors are fatal by default
+    	if ( $foo_obj->error ) {
+    		warn( 'error:' . $foo_obj->error . ': ' . $foo_obj->errorString );
+    		exit $foo_obj->error;
+    	}
     };
     if ($@) {
-        print 'Error: ' . $Error::Helper::error .
-            "\nError String: " . $Error::Helper::errorString .
-            "\nError Flag: " . $Error::Helper::errorFlag .
-            "\nError File: " . $Error::Helper::errorFilename .
-            "\nError Line: " . $Error::Helper::errorLine .
-            "\nError Sub: " . $Error::Helper::errorSub .
-            "\nError Sub Short: " . $Error::Helper::errorSubShort .
-            "\nError Package: " . $Error::Helper::errorPackage .
-            "\nError PackageShort: " . $Error::Helper::errorPackageShort . "\n";
+    	print 'Error: '
+    		. $Error::Helper::error
+    		. "\nError String: "
+    		. $Error::Helper::errorString
+    		. "\nError Flag: "
+    		. $Error::Helper::errorFlag
+    		. "\nError File: "
+    		. $Error::Helper::errorFilename
+    		. "\nError Line: "
+    		. $Error::Helper::errorLine
+    		. "\nError Sub: "
+    		. $Error::Helper::errorSub
+    		. "\nError Sub Short: "
+    		. $Error::Helper::errorSubShort
+    		. "\nError Package: "
+    		. $Error::Helper::errorPackage
+    		. "\nError PackageShort: "
+    		. $Error::Helper::errorPackageShort . "\n";
 
-        exit $Error::Helper::error;
-    }
+    	exit $Error::Helper::error;
+    } ## end if ($@)
 
     # catches fatal errors
-    eval{
-        $foo_obj->foo( $ARGV[1] );
-    };
+    eval { $foo_obj->foo( $ARGV[1] ); };
     if ($@) {
     	# do something...
-    	warn( '$foo_obj->foo( $ARGV[1] ) errored.... '.$@);
-    	if ($foo_obj->errorFlag eq 'derp') {
-	    	warn('error flag derp found... calling again with a value of default');
-    		$foo_obj->foo( 'default' );
+    	warn( '$foo_obj->foo( $ARGV[1] ) errored.... ' . $@ );
+    	if ( $foo_obj->errorFlag eq 'derp' ) {
+    		warn('error flag derp found... calling again with a value of default');
+    		$foo_obj->foo('default');
     	}
-    } elsif ($foo_obj->error) {
+    } elsif ( $foo_obj->error ) {
     	# do something...
-       	warn( '$foo_obj->foo( $ARGV[1] ) errored');
+    	warn('$foo_obj->foo( $ARGV[1] ) errored');
     }
 
 There are five required variables in the blessed hash object.
@@ -166,8 +177,8 @@ There are five required variables in the blessed hash object.
     - $self->{errorString} :: This contains a description of the current error.
         - Type :: string or undef
 
-    - $self->{perror} :: This is set to true is a permanent error is present.
-            If note, it needs set to false.
+    - $self->{perror} :: This is set to true if a permanent error is present.
+            If not, it needs to be set to false.
         - Type :: Perl boolean
 
 The following are optional.
@@ -180,28 +191,33 @@ The following are optional.
             return of $self->errorFlag.
         - Type :: Perl boolean
         - Default :: undef
+        - Alias :: all_fatal, which is what 2.0.0 and 2.1.0 checked for and is still honored.
 
-    - $self->{errorExtra}{fatal_errors} :: This is a hash in which the keys are errors codes that are fatal. When
-            $self->warn is called it will check if the error code is fatal or not. $self->{errorExtra}{fatal_errors}{33}=>1
-            would be fatal, but $self->{errorExtra}{fatal_errors}{33}=>0 would now.
+    - $self->{errorExtra}{fatal_errors} :: This is a hash in which the keys are error codes that are fatal. When
+            $self->warn is called it will check if the error code is fatal or not. Setting
+            $self->{errorExtra}{fatal_errors}{33}=1 would make error 33 fatal, but
+            $self->{errorExtra}{fatal_errors}{33}=0 would not.
+        - Type :: hash
 
     - $self->{errorExtra}{flags} :: This hash contains error integer to flag mapping. The
             keys are the error integer and the value is the flag. For any unmatched error
             integers, 'other' is returned.
+        - Type :: hash
 
     - $self->{errorExtra}{fatal_flags} :: This is a hash in which the keys are error flags that are fatal. When
-            $self->warn is called it will check if the flag for the error code is fatal or not. For the flag foo
-            $self->{errorExtra}{fatal_flags}{foo}=>1 would be fatal, but
-            $self->{errorExtra}{fatal_flags}{foo}=>0 would now.
+            $self->warn is called it will check if the flag for the error code is fatal or not. For the flag foo,
+            setting $self->{errorExtra}{fatal_flags}{foo}=1 would make it fatal, but
+            $self->{errorExtra}{fatal_flags}{foo}=0 would not.
+        - Type :: hash
 
     - $self->{errorExtra}{perror_not_fatal} :: Controls if $self->{perror} is fatal or not.
         - Type :: Perl boolean
         - Default :: undef
 
 This module also sets several other variables as well for when something like a new method is called
-and dies, before something blessed can be returned. These allow examining the the error that resulted in it dieing.
+and dies, before something blessed can be returned. These allow examining the error that resulted in it dying.
 
-The following are mapped to the the ones above.
+The following are mapped to the ones above.
 
     $Error::Helper::perror
     $Error::Helper::error
@@ -217,9 +233,9 @@ The following don't have mappings above.
     - $Error::Helper::errorSubShort :: Same as errorSub, but everything prior to the subname is
             removed. So Foo::bar would become bar.
 
-    - $Error::Helper::errorPackage :: The package from which warn was called from.
+    - $Error::Helper::errorPackage :: The package that warn was called from.
 
-    - $Error::Helper::errorPackageShort :: Saome as package, but everthing prior to the last item
+    - $Error::Helper::errorPackageShort :: Same as errorPackage, but everything prior to the last item
             in the name space is removed. So Foo::Foo::Bar would just become Bar.
 
 =head1 METHODS
@@ -251,8 +267,13 @@ It does the following.
 	$self->{errorLine}     = undef;
 	$self->{errorString}   = "";
 
-If $self->{perror} is set, it will not be able to blank any current
-errors.
+The shared $Error::Helper::* variables are cleared as well.
+
+If $self->{perror} is set, it will not be able to blank any current errors. It
+will die in that case, unless $self->{errorExtra}{perror_not_fatal} is true, in
+which case it prints to STDERR and returns undef.
+
+Returns 1 upon success.
 
 =cut
 
@@ -262,16 +283,22 @@ sub errorblank {
 	if ( $self->{perror} ) {
 		my ( $package, $filename, $line ) = caller;
 
-		#get the calling sub
+		#get the calling sub, which will be undef if errorblank was called outside of a sub
 		my @called     = caller(1);
 		my $subroutine = $called[3];
-		$subroutine =~ s/.*\:\://g;
+		if ( defined($subroutine) ) {
+			$subroutine =~ s/.*\:\://;
+		}
 
 		$package =~ s/\:\:/\-/g;
 
-		my $error
-			= $package . ' '
-			. $subroutine
+		my $error_location = $package;
+		if ( defined($subroutine) ) {
+			$error_location .= ' ' . $subroutine;
+		}
+
+		my $error_message
+			= $error_location
 			. ': Unable to blank, as a permanent error is set. '
 			. 'error="'
 			. $self->error
@@ -283,13 +310,13 @@ sub errorblank {
 			. $self->errorString
 			. '" file="'
 			. $filename
-			. ' line='
-			. $line;
+			. '" line="'
+			. $line . '"';
 
 		if ( !$self->{errorExtra}{perror_not_fatal} ) {
-			die($error);
+			die($error_message);
 		} else {
-			print STDERR $error;
+			print STDERR $error_message;
 		}
 
 		return undef;
@@ -316,7 +343,7 @@ sub errorblank {
 
 =head2 errorFilename
 
-This returns the filename in which the error occured or other wise returns undef.
+This returns the filename in which the error occurred or otherwise returns undef.
 
     if($self->error){
         print 'error happened in '.$self->errorFilename."\n";
@@ -332,7 +359,8 @@ sub errorFilename {
 
 This returns the error flag for the current error.
 
-If none is set, undef is returned.
+If there is no error, undef is returned. If there is an error, but no flag is
+mapped to it via $self->{errorExtra}{flags}, then 'other' is returned.
 
 This may be used in a similar manner as the error method.
 
@@ -365,7 +393,7 @@ sub errorFlag {
 
 =head2 errorLine
 
-This returns the filename in which the error occured or other wise returns undef.
+This returns the line the error occurred on or otherwise returns undef.
 
     if($self->error){
         print 'error happened at line '.$self->errorLine."\n";
@@ -409,9 +437,21 @@ sub perror {
 
 =head2 warn
 
-Throws a warn like error message based using the contents of $self->errorString
+Throws a warn like error message based on the contents of $self->errorString. The
+shared $Error::Helper::* variables are set as well.
 
     $self->warn;
+
+The error will be fatal, dying instead of printing to STDERR, if any of the
+following are true.
+
+    - $self->{perror} is set and $self->{errorExtra}{perror_not_fatal} is not.
+
+    - $self->{errorExtra}{all_errors_fatal} or $self->{errorExtra}{all_fatal} is true.
+
+    - The current error code is set to true in $self->{errorExtra}{fatal_errors}.
+
+    - The current error flag is set to true in $self->{errorExtra}{fatal_flags}.
 
 =cut
 
@@ -441,19 +481,25 @@ sub warn {
 
 	$errorFlag = $self->errorFlag;
 
-	#get the calling sub
+	#get the calling sub, which will be undef if warn was called outside of a sub
 	my @called     = caller(1);
 	my $subroutine = $called[3];
 	$errorSub = $subroutine;
-	$subroutine =~ s/.*\:\://g;
+	if ( defined($subroutine) ) {
+		$subroutine =~ s/.*\:\://;
+	}
 	$errorSubShort = $subroutine;
 
+	( $errorPackageShort = $package ) =~ s/.*\:\://;
 	$package =~ s/\:\:/\-/g;
-	$errorPackageShort = $package;
 
-	my $error
-		= $package . ' '
-		. $subroutine . ':'
+	my $error_location = $package;
+	if ( defined($subroutine) ) {
+		$error_location .= ' ' . $subroutine;
+	}
+
+	my $error_message
+		= $error_location . ':'
 		. $self->error . ':'
 		. $errorFlag . ': '
 		. $errorString
@@ -462,7 +508,8 @@ sub warn {
 		. $filename . "\n";
 
 	if (
-		$self->{errorExtra}{all_fatal}
+		   $self->{errorExtra}{all_errors_fatal}
+		|| $self->{errorExtra}{all_fatal}
 		|| (
 			$self->perror
 			&& !(
@@ -483,15 +530,15 @@ sub warn {
 			&& $self->{errorExtra}{fatal_flags}{ $self->errorFlag } )
 		)
 	{
-		die($error);
-	} ## end if ( $self->{errorExtra}{all_fatal} || ( $self...))
+		die($error_message);
+	} ## end if ( $self->{errorExtra}{all_errors_fatal}...)
 
-	print STDERR $error;
+	print STDERR $error_message;
 } ## end sub warn
 
 =head2 warnString
 
-Throws a warn like error in the same for mate as warn, but with a freeform message.
+Throws a warn like error in the same format as warn, but with a freeform message.
 
 This will not trigger any of the fatality checks. It will also not set any of the error values.
 
@@ -556,13 +603,13 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Error-Helper>
 
 =item * Search CPAN
 
-<https://metacpan.org/dist/Error-Helper>
+L<https://metacpan.org/dist/Error-Helper>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023 Zane C. Bowers-Hadley.
+Copyright 2026 Zane C. Bowers-Hadley.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

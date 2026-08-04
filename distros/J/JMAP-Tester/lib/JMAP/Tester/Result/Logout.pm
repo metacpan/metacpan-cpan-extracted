@@ -1,6 +1,6 @@
 use v5.20.0;
 
-package JMAP::Tester::Result::Logout 0.110;
+package JMAP::Tester::Result::Logout 0.112;
 # ABSTRACT: a successful logout
 
 use Moo;
@@ -30,7 +30,7 @@ JMAP::Tester::Result::Logout - a successful logout
 
 =head1 VERSION
 
-version 0.110
+version 0.112
 
 =head1 OVERVIEW
 

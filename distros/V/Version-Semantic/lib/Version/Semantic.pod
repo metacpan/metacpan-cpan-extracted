@@ -45,7 +45,8 @@ methods exist too.
 
 The C<version_core()> object method returns the semantic version string of an
 object with the C<v> prefix (if originally set) but without the pre-release
-and the build extensions.
+and the build extensions. The C<is_core()> predicate method indicates if a
+version object has no pre-release extension and no build extension.
 
 The C<to_string()> object method returns the semantic version string of an
 object including the C<v> prefix (if originally set). The method is used to

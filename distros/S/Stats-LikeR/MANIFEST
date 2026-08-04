@@ -34,6 +34,8 @@ t/col2col.t
 t/colnames_rownames.t
 t/concat.t
 t/cor.t
+t/cor_test.tails.t
+t/croak.messages.t
 t/csort.AoA.t
 t/csort.HoH.t
 t/csort.cmp.undef.t
@@ -67,11 +69,15 @@ t/ks_test.t
 t/lm.bugs.t
 t/mcnemar_test.t
 t/mean.t
+t/median.t
 t/melt.t
 t/merge.t
+t/model_pvalue_tails.t
 t/ncol.t
 t/nrow.t
+t/oneway_test.R.scipy.t
 t/oneway_test.bugs.t
+t/p_adjust.frames.t
 t/parse_read.t
 t/pivot_table.t
 t/pm.coverage.t
@@ -90,8 +96,10 @@ t/read_table.xlsx.t
 t/roc.t
 t/select_drop_rename_cols.t
 t/set_ops.t
+t/skew_kurtosis.t
 t/summary.t
 t/survival.t
+t/t_test.t
 t/table_one.t
 t/transpose.t
 t/tukey.t

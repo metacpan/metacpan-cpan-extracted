@@ -1,5 +1,10 @@
 Revision history for DBIx-Class-Relationship-ManyToMany-Async
 
+0.02      2026-08-03 12:14:03+02:00 Europe/Paris
+     - Fix _many_to_many package variable: initialize scalar explicitly
+     - uses the cached ResultSet directly
+     - Fix groups accessor returning null for Row objects in _prefetched path — use belongs_to accessor instead of hash key lookup
+
 0.01      2026-06-19 20:45:53+02:00 Europe/Paris
-        - Initial release (experimental).
-        - Async many_to_many accessors for DBIx::Class::Async:
+     - Initial release (experimental).
+     - Async many_to_many accessors for DBIx::Class::Async:

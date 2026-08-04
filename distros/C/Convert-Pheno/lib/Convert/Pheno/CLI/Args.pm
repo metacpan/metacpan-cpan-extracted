@@ -27,8 +27,10 @@ sub _normalize_cli_type {
         openehr      => 'openehr',
         ehrbase      => 'openehr',
         redcap       => 'redcap',
+        cbioportal   => 'cbioportal',
         cdiscodm     => 'cdiscodm',
         datasetjson  => 'datasetjson',
+        datasetxml   => 'datasetxml',
         fhir         => 'fhir',
         csv          => 'csv',
         jsonf        => 'jsonf',
@@ -59,8 +61,9 @@ sub build_cli_request {
     my $ohdsi_db       = exists $arg{ohdsi_db}  ? $arg{ohdsi_db}  : 0;
 
     my ( $in_type_arg, $out_type_arg );
-    my ( $in_pxf, $in_bff, $in_redcap, $in_cdiscodm, $in_csv );
+    my ( $in_pxf, $in_bff, $in_cbioportal, $in_redcap, $in_cdiscodm, $in_csv );
     my @datasetjson_files;
+    my @datasetxml_files;
     my @fhir_files;
     my @openehr_files;
     my @omop_files;
@@ -69,10 +72,10 @@ sub build_cli_request {
     my $out_bff_selected = 0;
     my @entities_args;
     my @out_name_specs;
-    my ( $help, $man, $mapping_file, $max_lines_sql, $search );
+    my ( $help, $man, $mapping_file, $define_xml, $max_lines_sql, $search );
     my ( $text_similarity_method, $min_text_similarity_score, $levenshtein_weight );
-    my ( $debug, $verbose, $sep, $exposures_file, $sql2csv, $test, $search_audit_tsv );
-    my ( @omop_tables, $redcap_dictionary, $path_to_ohdsi_db, $print_hidden_labels );
+    my ( $debug, $verbose, $sep, $exposures_file, $sql2csv, $test, $term_audit );
+    my ( @omop_tables, $redcap_dictionary, $path_to_ohdsi_db );
     my ( $self_validate_schema, $overwrite, $username, $log, $version );
     my $default_vital_status;
     my $schema_file = $schema_default;
@@ -84,9 +87,11 @@ sub build_cli_request {
         'o=s'                         => \$out_type_arg,
         'ipxf=s'                      => \$in_pxf,
         'ibff=s'                      => \$in_bff,
+        'icbioportal=s'               => \$in_cbioportal,
         'iredcap=s'                   => \$in_redcap,
         'icdisc-odm=s'                => \$in_cdiscodm,
         'idataset-json=s{1,}'          => \@datasetjson_files,
+        'idataset-xml=s{1,}'           => \@datasetxml_files,
         'ifhir=s{1,}'                  => \@fhir_files,
         'iomop=s{1,}'                 => \@omop_files,
         'iopenehr=s{1,}'              => \@openehr_files,
@@ -107,6 +112,7 @@ sub build_cli_request {
         'help|?'                      => \$help,
         'man'                         => \$man,
         'mapping-file=s'              => \$mapping_file,
+        'define-xml=s'                 => \$define_xml,
         'max-lines-sql=i'             => \$max_lines_sql,
         'search=s'                    => \$search,
         'text-similarity-method=s'    => \$text_similarity_method,
@@ -121,13 +127,12 @@ sub build_cli_request {
         'stream!'                     => \$stream,
         'sql2csv'                     => \$sql2csv,
         'test'                        => \$test,
-        'search-audit-tsv=s'          => \$search_audit_tsv,
+        'term-audit=s'                => \$term_audit,
         'source-info!'                => \$source_info,
         'ohdsi-db'                    => \$ohdsi_db,
         'omop-tables=s{1,}'           => \@omop_tables,
         'redcap-dictionary|rcd=s'     => \$redcap_dictionary,
         'path-to-ohdsi-db=s'          => \$path_to_ohdsi_db,
-        'print-hidden-labels|phl'     => \$print_hidden_labels,
         'self-validate-schema|svs'    => \$self_validate_schema,
         'default-vital-status=s'      => \$default_vital_status,
         'O'                           => \$overwrite,
@@ -161,7 +166,7 @@ sub build_cli_request {
 
     $usage_error->("Please use either the generic <-i/-o> syntax or the compact <-ixxx/-oxxx> flags for each side, not both")
       if ( defined $normalized_in_type
-        && _count_defined( $in_pxf, $in_bff, $in_redcap, $in_cdiscodm, $in_csv, @datasetjson_files ? 1 : undef, @fhir_files ? 1 : undef, @omop_files ? 1 : undef, @openehr_files ? 1 : undef ) )
+        && _count_defined( $in_pxf, $in_bff, $in_cbioportal, $in_redcap, $in_cdiscodm, $in_csv, @datasetjson_files ? 1 : undef, @datasetxml_files ? 1 : undef, @fhir_files ? 1 : undef, @omop_files ? 1 : undef, @openehr_files ? 1 : undef ) )
       || ( defined $normalized_out_type
         && _count_defined( $out_bff_selected ? 1 : undef, $out_pxf, $out_csv, $out_jsonf, $out_jsonld, $out_omop_selected ? 1 : undef ) );
 
@@ -169,6 +174,7 @@ sub build_cli_request {
         if ( $normalized_in_type eq 'omop'
             || $normalized_in_type eq 'openehr'
             || $normalized_in_type eq 'datasetjson'
+            || $normalized_in_type eq 'datasetxml'
             || $normalized_in_type eq 'fhir' )
         {
             $usage_error->("Please provide $in_type_arg input file(s) after <-i $in_type_arg>") unless @{$argv};
@@ -182,6 +188,9 @@ sub build_cli_request {
                     }
                     elsif ( $normalized_in_type eq 'openehr' ) {
                         @openehr_files = @{$argv};
+                    }
+                    elsif ( $normalized_in_type eq 'datasetxml' ) {
+                        @datasetxml_files = @{$argv};
                     }
                     else {
                         @datasetjson_files = @{$argv};
@@ -199,6 +208,9 @@ sub build_cli_request {
                     }
                     elsif ( $normalized_in_type eq 'openehr' ) {
                         @openehr_files = @{$argv}[ 0 .. $#{$argv} - 1 ];
+                    }
+                    elsif ( $normalized_in_type eq 'datasetxml' ) {
+                        @datasetxml_files = @{$argv}[ 0 .. $#{$argv} - 1 ];
                     }
                     else {
                         @datasetjson_files = @{$argv}[ 0 .. $#{$argv} - 1 ];
@@ -221,6 +233,9 @@ sub build_cli_request {
                 elsif ( $normalized_in_type eq 'openehr' ) {
                     @openehr_files = @{$argv};
                 }
+                elsif ( $normalized_in_type eq 'datasetxml' ) {
+                    @datasetxml_files = @{$argv};
+                }
                 else {
                     @datasetjson_files = @{$argv};
                 }
@@ -233,6 +248,7 @@ sub build_cli_request {
             my $generic_infile = shift @{$argv};
             if    ( $normalized_in_type eq 'pxf' )    { $in_pxf    = $generic_infile }
             elsif ( $normalized_in_type eq 'bff' )    { $in_bff    = $generic_infile }
+            elsif ( $normalized_in_type eq 'cbioportal' ) { $in_cbioportal = $generic_infile }
             elsif ( $normalized_in_type eq 'redcap' ) { $in_redcap = $generic_infile }
             elsif ( $normalized_in_type eq 'cdiscodm' ) { $in_cdiscodm = $generic_infile }
             elsif ( $normalized_in_type eq 'csv' )    { $in_csv    = $generic_infile }
@@ -272,10 +288,12 @@ sub build_cli_request {
             condition => sub {
                 !(     ( defined $in_pxf && -f $in_pxf )
                     || ( defined $in_bff    && -f $in_bff )
+                    || defined $in_cbioportal
                     || ( defined $in_redcap && -f $in_redcap )
                     || ( defined $in_cdiscodm && -f $in_cdiscodm )
                     || ( defined $in_csv    && -f $in_csv )
                     || ( @datasetjson_files && -f $datasetjson_files[0] )
+                    || ( @datasetxml_files  && -f $datasetxml_files[0] )
                     || ( @fhir_files        && -f $fhir_files[0] )
                     || ( @omop_files        && -f $omop_files[0] )
                     || ( @openehr_files     && -f $openehr_files[0] ) );
@@ -284,7 +302,15 @@ sub build_cli_request {
         },
         { condition => sub { !-d $out_dir }, message => "Please specify a valid directory for --out-dir\n", },
         {
-            condition => sub { ( $in_redcap || $in_cdiscodm ) && !$redcap_dictionary },
+            condition => sub {
+                defined $in_cbioportal
+                  && !-d $in_cbioportal
+                  && !( -f $in_cbioportal && $in_cbioportal =~ /\.zip\z/i );
+            },
+            message => "Please specify a valid cBioPortal study directory or ZIP file\n",
+        },
+        {
+            condition => sub { $in_redcap && !$redcap_dictionary },
             message   => "Please specify a valid REDCap data dictionary --rcd <file>\n",
         },
         {
@@ -298,6 +324,24 @@ sub build_cli_request {
                   @datasetjson_files;
             },
             message   => "Please specify valid CDISC Dataset-JSON file(s) (.json or .json.gz)\n",
+        },
+        {
+            condition => sub {
+                @datasetxml_files
+                  && grep { !-f $_ || $_ !~ m/\.xml$/i }
+                  @datasetxml_files;
+            },
+            message   => "Please specify valid CDISC Dataset-XML file(s) (.xml)\n",
+        },
+        {
+            condition => sub {
+                @datasetxml_files && ( !defined $define_xml || !-f $define_xml );
+            },
+            message   => "Please specify the accompanying Define-XML file with --define-xml <file>\n",
+        },
+        {
+            condition => sub { defined $define_xml && !@datasetxml_files && !@datasetjson_files },
+            message   => "The flag <--define-xml> is only valid with <-idataset-json> or <-idataset-xml>\n",
         },
         {
             condition => sub {
@@ -347,6 +391,13 @@ sub build_cli_request {
         {
             condition => sub { defined $exposures_file && !-f $exposures_file },
             message   => "Please specify a valid --exposures-file <file>\n",
+        },
+        {
+            condition => sub {
+                defined $term_audit
+                  && $term_audit !~ /\.(?:tsv(?:\.gz)?|xlsx)\z/i;
+            },
+            message => "Please use --term-audit with a .tsv, .tsv.gz, or .xlsx output file\n",
         },
         {
             condition => sub { ( $out_csv || $out_jsonf || $out_jsonld ) && ( !$in_bff && !$in_pxf ); },
@@ -451,17 +502,19 @@ sub build_cli_request {
 
     my $log_file =
       catfile( $out_dir, ( $log ? $log : 'convert-pheno-log.json' ) );
-    my $search_audit_file =
-      defined $search_audit_tsv
-      ? _resolve_output_path( $out_dir, $search_audit_tsv )
+    my $term_audit_file =
+      defined $term_audit
+      ? _resolve_output_path( $out_dir, $term_audit )
       : undef;
 
     my $in_type =
         $in_pxf     ? 'pxf'
       : $in_bff     ? 'bff'
+      : $in_cbioportal ? 'cbioportal'
       : $in_redcap  ? 'redcap'
       : $in_cdiscodm ? 'cdiscodm'
       : @datasetjson_files ? 'datasetjson'
+      : @datasetxml_files ? 'datasetxml'
       : @fhir_files  ? 'fhir'
       : $in_csv     ? 'csv'
       : @openehr_files ? 'openehr'
@@ -523,6 +576,7 @@ sub build_cli_request {
     my $resolved_in_file =
         $in_pxf     ? $in_pxf
       : $in_bff     ? $in_bff
+      : $in_cbioportal ? $in_cbioportal
       : $in_redcap  ? $in_redcap
       : $in_cdiscodm ? $in_cdiscodm
       : $in_csv     ? $in_csv
@@ -530,16 +584,17 @@ sub build_cli_request {
 
     $data{in_file}              = $resolved_in_file if defined $resolved_in_file;
     $data{in_files}             = \@datasetjson_files if @datasetjson_files;
+    $data{in_files}             = \@datasetxml_files  if @datasetxml_files;
     $data{in_files}             = \@fhir_files       if @fhir_files;
     $data{in_files}             = \@omop_files      if @omop_files;
     $data{in_files}             = \@openehr_files   if @openehr_files;
     $data{sep}                  = $sep if defined $sep;
     $data{redcap_dictionary}    = $redcap_dictionary if defined $redcap_dictionary;
     $data{mapping_file}         = $mapping_file if defined $mapping_file;
+    $data{define_xml}           = $define_xml if defined $define_xml;
     $data{self_validate_schema} = $self_validate_schema if defined $self_validate_schema;
     $data{path_to_ohdsi_db}     = $path_to_ohdsi_db if defined $path_to_ohdsi_db;
-    $data{print_hidden_labels}  = $print_hidden_labels ? 1 : 0 if defined $print_hidden_labels;
-    $data{search_audit_file}    = $search_audit_file if defined $search_audit_file;
+    $data{term_audit_file}      = $term_audit_file if defined $term_audit_file;
     $data{default_vital_status} = $default_vital_status if defined $default_vital_status;
     $data{debug}                = $debug if defined $debug;
     $data{log}                  = $log if defined $log;

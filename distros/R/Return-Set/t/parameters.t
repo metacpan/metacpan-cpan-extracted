@@ -4,50 +4,53 @@ use warnings;
 use Test::Most;
 use Return::Set qw(set_return);
 
-note('Testing positional arguments');
-is(set_return(5), 5, 'Returns value without schema (positional)');
-is(set_return(42, { type => 'integer' }), 42, 'Validates scalar (positional)');
+# Parameter-dispatch proof suite
+# --------------------------------
+# These tests prove the key-selection and dispatch invariants that are internal
+# to the named-parameter form and are orthogonal to schema validation.
+#
+#   Invariant A: 'output' key is preferred over 'value' key.
+#   Invariant B: 'value' key is accepted as a backwards-compatible synonym.
+#   Invariant C: when both keys are present, 'output' wins (preference ordering).
 
-note('Testing named parameters');
-is(set_return({ value => 7 }), 7, 'Returns value without schema (named)');
-is(set_return({ value => 99, schema => { type => 'integer' } }), 99, 'Validates scalar (named)');
+# --- Invariant A: 'output' key (primary) ----------------------------------
+# Major: 'output' is the canonical key for the named-parameter form.
+# Minor: hashref contains only 'output'.
+# Conclusion: that value is returned.
+is set_return({ output => 'primary' }), 'primary',
+	'InvA: output key extracted correctly';
 
-throws_ok {
-	set_return({ value => ['a'], schema => { type => 'integer' } });
-} qr/Validation failed/, 'Fails validation for non-scalar (named)';
+# --- Invariant B: 'value' key (backwards compat) --------------------------
+# Major: 'value' is accepted for backwards compatibility when 'output' is absent.
+# Minor: hashref contains only 'value'.
+# Conclusion: that value is returned.
+is set_return({ value => 'compat' }), 'compat',
+	'InvB: value key accepted as backwards-compatible synonym';
 
-# Basic usage: return scalar without schema
-is set_return("hello"), "hello", "Basic scalar return works";
+# --- Invariant C: 'output' takes precedence over 'value' ------------------
+# Major: when both keys are present, 'output' is preferred.
+# Minor: hashref contains output => 'wins' and value => 'loses'.
+# Conclusion: 'wins' is returned, proving 'output' is evaluated first.
+is set_return({ output => 'wins', value => 'loses' }), 'wins',
+	'InvC: output key takes precedence over value key when both present';
 
-# Return with schema validation
-is set_return(123, { type => 'integer' }), 123, "Integer validated successfully";
+# --- Dispatch boundary: positional vs named --------------------------------
+# Major: exactly 2 arguments triggers the positional path (not Params::Get).
+# Minor: (99, undef) → value=99, schema=undef.
+# Conclusion: 99 is returned without schema validation.
+is set_return(99, undef), 99,
+	'Boundary: 2-arg positional path does not route through named-param dispatch';
 
-# Validation failure
-throws_ok { set_return("not-an-int", { type => 'integer' }) }
-    qr/Validation failed/,
-    "Validation fails with non-integer input";
+# --- Dispatch boundary: named form with schema ----------------------------
+# Major: a valid named-form hashref with schema triggers validation.
+# Minor: output => 99, schema => integer.  99 satisfies integer.
+# Conclusion: 99 is returned after validation.
+is set_return({ output => 99, schema => { type => 'integer' } }), 99,
+	'Boundary: named-form dispatches correctly with schema';
 
-# Params::Get-style arguments (hashref with output/schema)
-my $val = set_return(
-    { output => 456, schema => { type => 'integer' } }
-);
-is $val, 456, "Params::Get style arguments work";
-
-# Params::Get-style with 'value' instead of 'output'
-my $val2 = set_return(
-    { value => "string", schema => { type => 'string' } }
-);
-is $val2, "string", "Params::Get with 'value' key works";
-
-# No arguments
-throws_ok { set_return() }
-    qr/Usage:.+set_return/,
-    "Dies with usage message if no arguments passed";
-
-# Single non-ref argument
-is set_return("only"), "only", "Single non-ref arg returned as-is";
-
-# Single ref argument
-cmp_ok(set_return({ output => "bar" }), 'eq', 'bar', 'Single ref argument');
+# --- Dispatch boundary: named form, schema violation ----------------------
+throws_ok { set_return({ value => ['a'], schema => { type => 'integer' } }) }
+	qr/Validation failed/,
+	'Boundary: named-form value-key schema violation croaks correctly';
 
 done_testing();

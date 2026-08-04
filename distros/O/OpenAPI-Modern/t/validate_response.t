@@ -1480,6 +1480,162 @@ YAML
   );
 };
 
+subtest 'multipart responses' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  headers:
+    multipart:
+      content:
+        multipart/form-data: {}
+  responses:
+    multipart:
+      headers:
+        X-Test:
+          $ref: '#/components/headers/multipart'
+      content:
+        multipart/form-data:
+          encoding:
+            a:
+              headers:
+                X-Test:
+                  $ref: '#/components/headers/multipart'
+paths:
+  /foo:
+    post:
+      operationId: me
+      responses:
+        default:
+          $ref: '#/components/responses/multipart'
+YAML
+
+  my $result = $openapi->validate_response(response(200,
+      [ 'Content-Type' => 'multipart/form-data', 'X-Test' => 1 ], [ [ a => 1, 'X-Test' => 1 ] ]),
+    { operation_id => 'me' });
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => false,
+        errors => [
+          {
+            instanceLocation => '/response/header/X-Test',
+            keywordLocation => jsonp(qw(/paths /foo post responses default $ref headers X-Test $ref content)),
+            absoluteKeywordLocation => $doc_uri->clone->fragment('/components/headers/multipart/content')->to_string,
+            error => 'multipart content is not permitted outside request and response bodies',
+          },
+          {
+            instanceLocation => '/response/body/header/0/X-Test',
+            keywordLocation => jsonp(qw(/paths /foo post responses default $ref content multipart/form-data encoding a headers X-Test $ref content)),
+            absoluteKeywordLocation => $doc_uri->clone->fragment('/components/headers/multipart/content')->to_string,
+            error => 'multipart content is not permitted outside request and response bodies',
+          },
+        ],
+      },
+      {
+        response => {
+          body => {
+            header => [ { 'Content-Disposition' => 'form-data; name="a"', 'X-Test' => '1' } ],
+            content => { 'a' => '1' },
+          },
+        },
+      },
+    ],
+    'multipart/form-data cannot be used in parameters',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    post:
+      operationId: me
+      responses:
+        default:
+          headers:
+            X-Test:
+              required: true
+              schema:
+                const: yes
+          content:
+            multipart/form-data:
+              schema:
+                type: array
+                prefixItems:
+                  - type: object
+                    properties:
+                      id:
+                        # default content type for a string without `contentEncoding` is `text/plain`
+                        type: string
+                        format: uuid
+                  - type: object
+                    properties:
+                      # default content type for a schema without `type` is `application/octet-stream`
+                      profileImage: {}
+                  - type: object
+                    properties:
+                      address:
+                        # each property is an object, so the default content type
+                        # for each is `application/json`
+                        type: object
+                        properties:
+                          streetAddress:
+                            type: string
+                          city:
+                            type: string
+                          state:
+                            type: string
+                          zip:
+                            type: string
+YAML
+
+  $result = $openapi->validate_response(response(200,
+      [ 'Content-Type' => 'multipart/form-data', 'X-Test' => 'yes' ],
+      [
+        [ id => 'f81d4fae-7dec-11d0-a765-00a0c91e6bf6' ],
+        [ profileImage => my $raw_image = 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAABGdBTUEAALGPC_xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAqADAAQAAAABAAAAAgAAAADO0J6QAAAAEElEQVQIHWP8zwACTGCSAQANHQEDqtPptQAAAABJRU5ErkJggg==' ],
+        [ address => $::dumper->encode({ streetAddress => '123 Example Dr', city => 'Somewhere', state => 'CA', zip => '99999+1234' }) ],
+      ]),
+    { operation_id => 'me' });
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        response => {
+          header => {
+            'X-Test' => 'yes',
+          },
+          body => {
+            header => [
+              { 'Content-Disposition' => 'form-data; name="id"' },
+              { 'Content-Disposition' => 'form-data; name="profileImage"' },
+              { 'Content-Disposition' => 'form-data; name="address"' },
+            ],
+            content => [
+              { id => 'f81d4fae-7dec-11d0-a765-00a0c91e6bf6' },
+              { profileImage => $raw_image },
+              { address => { streetAddress => '123 Example Dr', city => 'Somewhere', state => 'CA', zip => '99999+1234' } },
+            ],
+          },
+        },
+      },
+    ],
+    'multipart/form-data response content is deserialized to an array of objects',
+  );
+};
+
 if (++$type_index < @::TYPES) {
   bail_if_not_passing if $ENV{AUTHOR_TESTING};
   goto START;

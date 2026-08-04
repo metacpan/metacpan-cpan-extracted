@@ -37,7 +37,7 @@ my $result_data = {
 # we fork before loading anything, including extra vocabularies
 my ($pid, $child_stdin);
 
-if ("$]" >= '5.022' or $^O ne 'MSWin32') {
+if ($^O ne 'MSWin32') {
   $pid = open($child_stdin, '|-');
   goto CHILD if $pid == 0;
 }

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet;
-$Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet::VERSION = '0.04';
 # ABSTRACT: Fondation ResultSet — with() for fluent prefetch (many_to_many + has_many)
 
 use strict;
@@ -12,7 +12,7 @@ use base 'DBIx::Class::Async::ResultSet';
 #   $rs->with('orders')            # has_many
 #   $rs->with('groups', 'orders')  # both at once
 #
-# Many_to_many relationships are discovered via the _fondation_many_to_many
+# Many_to_many relationships are discovered via the _many_to_many
 # metadata hash (populated by many_to_many_async). Has_many relationships
 # are discovered via DBIx::Class's has_relationship().
 #
@@ -27,7 +27,7 @@ sub with {
         or die "Cannot resolve result_class for source";
 
     no strict 'refs';
-    my $mtm_meta = \%{ $class . '::_fondation_many_to_many' };
+    my $mtm_meta = ${ $class . '::_many_to_many' };
 
     for my $name (@names) {
 
@@ -149,7 +149,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet - Fondation Result
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ C<with()> accepts one or more relationship names:
 
 =item *
 
-B<many_to_many> — discovered via the C<_fondation_many_to_many>
+B<many_to_many> — discovered via the C<_many_to_many>
 package hash populated by L<DBIx::Class::Relationship::ManyToMany::Async>.
 Stored as C<< { pivot => target } >> in the prefetch hash.
 

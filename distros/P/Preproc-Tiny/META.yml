@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/pauloscustodio/perl-Preproc-Tiny/issues
   repository: https://github.com/pauloscustodio/perl-Preproc-Tiny.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

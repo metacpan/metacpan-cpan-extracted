@@ -26,9 +26,10 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => "1.22",
     "Test::Exception" => 0,
     "Test::LeakTrace" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "autodie" => 0
   },
-  "VERSION" => "0.28",
+  "VERSION" => "0.29",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +46,8 @@ my %FallbackPrereqs = (
   "Scalar::Util" => "1.22",
   "Test::Exception" => 0,
   "Test::LeakTrace" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "autodie" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

@@ -4,7 +4,7 @@ requires 'perl' => '5.026';
 
 # Runtime
 requires 'Mojolicious' => '9.46';
-requires 'Bytes::Random::Secure';
+recommends 'Crypt::PRNG' => '0.090';
 
 # Testing
 on test => sub {

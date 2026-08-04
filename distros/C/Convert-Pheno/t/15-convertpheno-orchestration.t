@@ -18,6 +18,14 @@ local $SIG{__WARN__} = sub {
 };
 
 {
+    my $convert = Convert::Pheno->new( {} );
+    is( $convert->search, 'exact', 'module defaults ontology search to exact' );
+    is( $convert->text_similarity_method, 'cosine', 'module defaults text similarity to cosine' );
+    is( $convert->min_text_similarity_score, 0.8, 'module supplies the documented similarity threshold' );
+    is( $convert->levenshtein_weight, 0.1, 'module supplies the documented Levenshtein weight' );
+}
+
+{
     no warnings 'redefine';
 
     local *Convert::Pheno::redcap2bff = sub { return [ { id => 'r1' } ] };
@@ -52,6 +60,15 @@ local $SIG{__WARN__} = sub {
     ok(
         !exists $redcap_converter->{data},
         'compound conversion does not attach intermediate data to the caller converter'
+    );
+
+    my $redcap_omop =
+      Convert::Pheno->new( { method => 'redcap2omop', in_textfile => 1 } )
+      ->redcap2omop;
+    is(
+        $redcap_omop->{merged}{data}[0]{id},
+        'r1',
+        'redcap2omop merges redcap2bff output',
     );
 
     my $cdisc = Convert::Pheno->new( { method => 'cdiscodm2omop', in_textfile => 1 } )->cdiscodm2omop;
@@ -258,8 +275,21 @@ local $SIG{__WARN__} = sub {
 
 {
     my $convert = Convert::Pheno->new( {} );
-    dies_ok { Convert::Pheno::_omop_require_concept( $convert, {} ) } '_omop_require_concept dies when CONCEPT is missing';
-    ok( Convert::Pheno::_omop_require_concept( $convert, { CONCEPT => [] } ), '_omop_require_concept passes when CONCEPT exists' );
+    dies_ok {
+        Convert::Pheno::_omop_require_core_tables( $convert, {} )
+    }
+    'OMOP preparation dies when CONCEPT is missing';
+    dies_ok {
+        Convert::Pheno::_omop_require_core_tables( $convert, { CONCEPT => [] } )
+    }
+    'OMOP preparation dies when PERSON is missing';
+    ok(
+        Convert::Pheno::_omop_require_core_tables(
+            $convert,
+            { CONCEPT => [], PERSON => [] },
+        ),
+        'OMOP preparation accepts its core tables',
+    );
 }
 
 {
@@ -290,7 +320,7 @@ local $SIG{__WARN__} = sub {
 
     local *Convert::Pheno::open_connections_SQLite = sub { return 1 };
     local *Convert::Pheno::close_connections_SQLite = sub { $closed++; return 1 };
-    local *Convert::Pheno::finalize_search_audit = sub { $audit_finalized++; return 1 };
+    local *Convert::Pheno::finalize_term_audit = sub { $audit_finalized++; return 1 };
     local *Convert::Pheno::omop_streams_multiple_entities_wrapper = sub { return 1 };
     local *Convert::Pheno::omop_stream_targets_open_wrapper = sub { return 1 };
     local *Convert::Pheno::omop_stream_targets_finalize_wrapper = sub {
@@ -314,7 +344,7 @@ local $SIG{__WARN__} = sub {
     );
     is( $stream_commit, 0, 'failed streams discard staged entity outputs' );
     is( $closed, 1, 'stream dispatcher closes SQLite connections after failure' );
-    is( $audit_finalized, 1, 'stream dispatcher finalizes search audits after failure' );
+    is( $audit_finalized, 1, 'stream dispatcher finalizes terminology audits after failure' );
 }
 
 {
@@ -349,7 +379,7 @@ local $SIG{__WARN__} = sub {
 
     local *Convert::Pheno::open_connections_SQLite       = sub { return 1 };
     local *Convert::Pheno::close_connections_SQLite      = sub { return 1 };
-    local *Convert::Pheno::finalize_search_audit         = sub { return 1 };
+    local *Convert::Pheno::finalize_term_audit           = sub { return 1 };
     local *Convert::Pheno::_dispatcher_open_stream_out   = sub { return undef };
 
     my $res = run_operation( $convert, { id => 'bundle-1' }, operation => $op, view => 'primary' );
@@ -386,7 +416,7 @@ local $SIG{__WARN__} = sub {
         $closed++;
         return 1;
     };
-    local *Convert::Pheno::finalize_search_audit = sub {
+    local *Convert::Pheno::finalize_term_audit = sub {
         $finalized++;
         return 1;
     };
@@ -398,7 +428,7 @@ local $SIG{__WARN__} = sub {
         'runner preserves conversion failures'
     );
     is( $closed, 1, 'runner closes SQLite connections after a conversion failure' );
-    is( $finalized, 1, 'runner finalizes search audit output after a conversion failure' );
+    is( $finalized, 1, 'runner finalizes terminology audit output after a conversion failure' );
     ok( !exists $convert->{current_row}, 'runner clears transient row state after a conversion failure' );
 }
 
@@ -414,7 +444,7 @@ local $SIG{__WARN__} = sub {
 
     local *Convert::Pheno::open_connections_SQLite       = sub { return 1 };
     local *Convert::Pheno::close_connections_SQLite      = sub { return 1 };
-    local *Convert::Pheno::finalize_search_audit         = sub { return 1 };
+    local *Convert::Pheno::finalize_term_audit           = sub { return 1 };
     local *Convert::Pheno::_dispatcher_open_stream_out   = sub { return undef };
 
     local *Convert::Pheno::OMOP::ToBFF::run_omop_to_bundle = sub {
@@ -461,7 +491,7 @@ local $SIG{__WARN__} = sub {
 
     local *Convert::Pheno::open_connections_SQLite     = sub { return 1 };
     local *Convert::Pheno::close_connections_SQLite    = sub { return 1 };
-    local *Convert::Pheno::finalize_search_audit       = sub { return 1 };
+    local *Convert::Pheno::finalize_term_audit         = sub { return 1 };
     local *Convert::Pheno::_dispatcher_open_stream_out = sub { return undef };
 
     local *Convert::Pheno::OMOP::ToBFF::run_omop_to_bundle = sub {

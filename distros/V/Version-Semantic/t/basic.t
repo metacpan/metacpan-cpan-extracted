@@ -1,41 +1,36 @@
-use strict;
-use warnings;
+use Test2::V1
+  -pragmas,
+  -target => { CLASS => 'Version::Semantic' },
+  qw( dies is isa_ok lives like ok plan subtest );
 
-use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 16;
-use Test::Fatal qw( dies_ok exception lives_ok );
-my $class;
+plan 15;
 
-BEGIN {
-  $class = 'Version::Semantic';
-  require_ok $class or BAIL_OUT "Cannot load class '$class'!"
-}
-
-like exception { $class->new( major => 0, 'minor' ) }, qr/\AOdd number of elements in hash assignment at/,
+like dies { CLASS->new( major => 0, 'minor' ) }, qr/\AOdd number of elements in hash assignment at/,
   'Odd number of arguments';
 
 ## no critic ( ProhibitComplexRegexes )
-like exception { $class->new( undef, 0 ) }, qr/\AUse of uninitialized value within \@_ in list assignment at/,
+like dies { CLASS->new( undef, 0 ) }, qr/\AUse of uninitialized value within \@_ in list assignment at/,
   'Attribute name cannot be undefined';
 
-like exception { $class->new( trial => 'TRIAL1' ) }, qr/\AUnknown attribute name/, 'Unknown attribute name';
+like dies { CLASS->new( trial => 'TRIAL1' ) }, qr/\AUnknown attribute name/, 'Unknown attribute name';
 
-like exception { $class->new( major => '01' ) }, qr/\AAttribute .* has invalid value/, 'Invalid attribute value';
+like dies { CLASS->new( major => '01' ) }, qr/\AAttribute .* has invalid value/, 'Invalid attribute value';
 
-like exception { $class->new( major => 0 ) }, qr/Required attribute .* not set/, 'Missing required attribute';
+like dies { CLASS->new( major => 0 ) }, qr/Required attribute .* not set/, 'Missing required attribute';
 
-like exception { $class->parse( undef, { fatal => 1 } ) }, qr/is not a semantic version/,
+like dies { CLASS->parse( undef, { fatal => 1 } ) }, qr/is not a semantic version/,
   'The undef value is an invalid semantic version';
 
-like exception { $class->parse( '1.0.0-alpha_beta', { fatal => 1 } ) }, qr/is not a semantic version/,
+like dies { CLASS->parse( '1.0.0-alpha_beta', { fatal => 1 } ) }, qr/is not a semantic version/,
   'Invalid semantic version';
 
-like exception { $class->parse( '1.0.0_01', { fatal => 1 } ) }, qr/is not a semantic version/,
+like dies { CLASS->parse( '1.0.0_01', { fatal => 1 } ) }, qr/is not a semantic version/,
   'Perl underscore syntax does not refer to a semantic version';
 
-is $class->parse( '0.500005' ), undef, 'Non "fatal" parsing of an invalid semantic version returns undef';
+is CLASS->parse( '0.500005' ), undef, 'Non "fatal" parsing of an invalid semantic version returns undef';
 
 subtest 'Invalid semantic version' => sub {
-  plan tests => 39;
+  plan 39;
 
   my @versions = qw(
     1.2
@@ -78,11 +73,11 @@ subtest 'Invalid semantic version' => sub {
     9.8.7-whatever+meta+meta
     99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12
   );
-  dies_ok { $class->parse( $_, { fatal => 1 } ) } "$_" for @versions
+  ok defined( dies { CLASS->parse( $_, { fatal => 1 } ) } ), "$_" for @versions
 };
 
 subtest 'Valid semantic versions' => sub {
-  plan tests => 32;
+  plan 32;
 
   my @versions = qw(
     0.0.4
@@ -118,19 +113,20 @@ subtest 'Valid semantic versions' => sub {
     1.0.0-0A.is.legal
     1.0.8-20260216170758-TRIAL
   );
-  lives_ok { $class->parse( $_ ) } "$_" for @versions
+  ok lives { CLASS->parse( $_ ) }, "$_" for @versions
 };
 
 subtest 'Test named capture group accessors' => sub {
-  plan tests => 11;
+  plan 12;
 
-  isa_ok my $self = $class->parse( '1.2.3-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay' ), $class;
+  isa_ok my $self = CLASS->parse( '1.2.3-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay' ), CLASS;
   ok not( $self->has_prefix ), 'prefix is not defined';
-  is $self->major,        1,                           'major';
-  is $self->minor,        2,                           'minor';
-  is $self->patch,        3,                           'patch';
-  is $self->version_core, '1.2.3',                     'version_core';
-  is $self->pre_release,  'alpha-a.b-c-somethinglong', 'pre_release';
+  is $self->major,        1,       'major';
+  is $self->minor,        2,       'minor';
+  is $self->patch,        3,       'patch';
+  is $self->version_core, '1.2.3', 'version_core';
+  ok not( $self->is_core ), 'Is not core version';
+  is $self->pre_release, 'alpha-a.b-c-somethinglong', 'pre_release';
   ok $self->has_pre_release, 'pre_release is defined';
   is $self->build, 'build.1-aef.1-its-okay', 'build';
   ok $self->has_build, 'build is defined';
@@ -138,14 +134,15 @@ subtest 'Test named capture group accessors' => sub {
 };
 
 subtest 'Test named capture group accessors: no pre-release but build information' => sub {
-  plan tests => 10;
+  plan 11;
 
-  isa_ok my $self = $class->parse( '2.0.0+build.1848' ), $class;
+  isa_ok my $self = CLASS->parse( '2.0.0+build.1848' ), CLASS;
   ok not( $self->has_prefix ), 'prefix is not defined';
   is $self->major,        2,       'major';
   is $self->minor,        0,       'minor';
   is $self->patch,        0,       'patch';
   is $self->version_core, '2.0.0', 'version_core';
+  ok not( $self->is_core ),         'Is not core version';
   ok not( $self->has_pre_release ), 'pre_release is not defined';
   is $self->build, 'build.1848', 'build';
   ok $self->has_build, 'build is defined';
@@ -153,38 +150,40 @@ subtest 'Test named capture group accessors: no pre-release but build informatio
 };
 
 subtest 'Test named capture group accessors: "v" prefixed semantic version' => sub {
-  plan tests => 10;
+  plan 11;
 
-  isa_ok my $self = $class->parse( 'v0.0.4' ), $class;
+  isa_ok my $self = CLASS->parse( 'v0.0.4' ), CLASS;
   ok $self->has_prefix, 'prefix is defined';
   is $self->prefix,       'v',      'prefix';
   is $self->major,        0,        'major';
   is $self->minor,        0,        'minor';
   is $self->patch,        4,        'patch';
   is $self->version_core, 'v0.0.4', 'version_core';
+  ok $self->is_core,                'Is core version';
   ok not( $self->has_pre_release ), 'pre_release is not defined';
   ok not( $self->has_build ),       'build is not defined';
   is "$self", 'v0.0.4', 'Stringification'
 };
 
 subtest 'Test named capture group accessors: "-TRIAL[0-9]*" pre-releases' => sub {
-  plan tests => 24;
+  plan 25;
 
   my $expected_pre_release = 'TRIAL';
-  isa_ok my $self = $class->parse( "1.0.5-$expected_pre_release" ), $class;
+  isa_ok my $self = CLASS->parse( "1.0.5-$expected_pre_release" ), CLASS;
   ok not( $self->has_prefix ), 'prefix is not defined';
-  is $self->major,        1,                     'major';
-  is $self->minor,        0,                     'minor';
-  is $self->patch,        5,                     'patch';
-  is $self->version_core, '1.0.5',               'version_core';
-  is $self->pre_release,  $expected_pre_release, "pre_release: $expected_pre_release";
+  is $self->major,        1,       'major';
+  is $self->minor,        0,       'minor';
+  is $self->patch,        5,       'patch';
+  is $self->version_core, '1.0.5', 'version_core';
+  ok not( $self->is_core ), 'Is not core version';
+  is $self->pre_release, $expected_pre_release, "pre_release: $expected_pre_release";
   ok $self->has_pre_release,  'pre_release is defined';
   ok not( $self->has_build ), 'build is not defined';
   is "$self", "1.0.5-$expected_pre_release", 'Stringification';
 
   for ( 0 .. 13 ) {
     $expected_pre_release = "TRIAL$_";
-    $self                 = $class->parse( "1.2.3-$expected_pre_release" );
+    $self                 = CLASS->parse( "1.2.3-$expected_pre_release" );
     is $self->pre_release, $expected_pre_release, "pre_release: $expected_pre_release"
   }
 }

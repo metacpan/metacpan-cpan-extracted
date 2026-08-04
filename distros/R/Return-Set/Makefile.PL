@@ -22,6 +22,7 @@ WriteMakefile(
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, TEST_REQUIRES => {
+		'IPC::System::Simple' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -29,7 +30,7 @@ WriteMakefile(
 		'Carp' => 0,
 		'Exporter' => 0,
 		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.10,
+		'Params::Validate::Strict' => 0.37,
 	}, dist => $dist,
 	clean => { FILES => 'Return-Set-*' },
 	# META_ADD => {

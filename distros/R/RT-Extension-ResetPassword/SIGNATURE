@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.88.
+signed via the Module::Signature module, version 0.96.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,9 +14,9 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: RIPEMD160
 
-SHA256 f95bfbc6be1c7aea66f312518f69808b932edb7f6e376ff445f866c30ab2863c Changes
+SHA256 335f0a6920e0efb43d759b6d4840cfef1093488b9db3623270ce57a1aa7e420e Changes
 SHA256 539c2e7e90b9b986257409fcc3eb4c9f3907bad64700eadcf3b39b2ac4af17ea MANIFEST
-SHA256 1d326d7bbea8207e5ce2d44c46725d28c878ec2d58a8e41c6b97e90a449f2f9e META.yml
+SHA256 1462c948957dfd0826c266c5e082d3e18bd0ad444e2831ba5b9a3ab23e066cda META.yml
 SHA256 e270cfeddd613e6c221fb31fcf28f1560dd5bf12a412ff5b5e6825865cb28b3d Makefile.PL
 SHA256 41a322183b41398b3100385b15f2bbf6d6a5ce0cac6a17a968a5a54a8e10a240 README
 SHA256 ec273beec622cbc98484f1167ac579622b400a5a071c91e0a73afd15dd9d8aff etc/initialdata
@@ -28,7 +28,7 @@ SHA256 2a58cbda259ea4da64b4449b2e33cb6c33340bfb5ad6952d43307dc0db3f5a69 html/Cal
 SHA256 80aab99b1b4cfa7f760548fa3b8f52f953970f8252411f40f7e2b3467a1643a8 html/Callbacks/RT-Extension-ResetPassword/Elements/Login/Default
 SHA256 6eb89ce6b252ef5cfba3150d8c7aec50517b69189b066228413f41b24243c5f4 html/Elements/EditPassword
 SHA256 7952d1bfe3c33083667b01d2ca2c6a9a43fadee43a7406b7da8ab204375851b7 html/NoAuth/ResetPassword/Request.html
-SHA256 84c27fd5ea36f9b0a739ea5dadc857a27222bf429319528554f9c711324822e7 html/NoAuth/ResetPassword/Reset/dhandler
+SHA256 d9dd263fb9f709a8574ab5c8410ae23aa47ad51e43f9e195d109bf9db14ca242 html/NoAuth/ResetPassword/Reset/dhandler
 SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
 SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
 SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
@@ -42,23 +42,7 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
 SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
 SHA256 7c4ad7f9916feb5fa7e045af6ac6ecf8230942c18576c100509f978f6504a1db inc/YAML/Tiny.pm
-SHA256 518e0255d8c151d92cb92aba3bbffadffe1547e3630d6ee3068517db642520f6 lib/RT/Extension/ResetPassword.pm
+SHA256 169cbcdf944e986cf2b27d0b34f801c4afb40376bb549e48e3274a524b616ca0 lib/RT/Extension/ResetPassword.pm
 SHA256 bcf1e71f86b0098757a7d49833ed32e9321dad56f924e0f254f016ed535f8bdc patches/4-user-admin-callbacks.patch
 SHA256 847558f30c6548749e4edd6715b2baa0194e5b09ff724e6fbe7ea5a0a09c0b8e patches/4.4.4-user-admin-callbacks.patch
 SHA256 89ffefa6ed3c734f37211ab41f30d78b18443f277a6b27997a1e296c4a27804d patches/user-admin-callbacks.patch
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBAwAdFiEEbn9h2azDQTpw4+gUmnkrNzXUEXIFAmiSiakACgkQmnkrNzXU
-EXLfRRAA1xVQDwXF+rcXR+7lz6oYJlECEXb87CAmjn3PLjRtzjD8LaurzEuThKFD
-Fp8QPR7nHUjubbMPumpG/EowcjUUSPCy/TSyPRCJrkVYerICNo4SXIJMRnxqwzQQ
-TB026lH2u5KHpGLnVCDcu7CpJhwO6/TBEWozTQBmxZqX2XPP+RzKHx7FdqlxbNLa
-r1Infms4TNTp72FEqMzeXDAZZrpDxGYAp8DkNvYPhh1pc5E3nxfWL/VvhJa+bHub
-e/y/oM9U+O3ufRhFO2FlPVzPuY6nBa2u8tJ+tmQoqR1xmfBNP3AyRoX85ogw+c7t
-/+Gi8KvkJCv99CCC/dWbUvm+KbbO4EQWK3orTLC72zPbMnTAKZaJBYHN5Mu5bgTE
-xKOSMbzVLZdZBsH5AJj8QdsJ1dDPUs1T4p/0u6IbSVF+blGLrnt5aI3ijKxAGXEe
-vtpE0s0IjSWfPjJAuKLtUUdYF3di4UHa49oTaelHiamyjUqJIHXaQnWxe61R1Vv9
-YmKxemuXt48CZjbiSDa2jH8KeB2gbp+6ZS9BotrJfZoiFg6wKIpvsZTtGF8NadKI
-RxmIDJvZ3/D17SEvLuDBuz19BpCc++R+q2ohAJ/CKMRlJ0Y3GDuOzvQ98liLqKNe
-WHjpPrjZOJbQEUEtt8oDqVlA3FLOh5I/sPwR6obJqKOVYDTbZok=
-=MptQ
------END PGP SIGNATURE-----

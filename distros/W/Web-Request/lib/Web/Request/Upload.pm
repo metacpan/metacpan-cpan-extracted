@@ -1,10 +1,6 @@
 package Web::Request::Upload;
-BEGIN {
-  $Web::Request::Upload::AUTHORITY = 'cpan:DOY';
-}
-{
-  $Web::Request::Upload::VERSION = '0.11';
-}
+our $AUTHORITY = 'cpan:PTC';
+$Web::Request::Upload::VERSION = '0.12';
 use Moose;
 # ABSTRACT: class representing a file upload
 
@@ -65,13 +61,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Web::Request::Upload - class representing a file upload
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -119,13 +117,23 @@ Returns the preferred filename of the uploaded file.
 Returns the filename portion of C<filename>, with all directory components
 stripped.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Jesse Luehrs <doy@tozt.net>
 
+=item *
+
+Paul Cochrane <paul@peateasea.de>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Jesse Luehrs.
+This software is copyright (c) 2012--2026 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,17 +2,25 @@ NAME
     App::XWindowManagerUtils - Utilities related to "X Window Manager"
 
 VERSION
-    This document describes version 0.004 of App::XWindowManagerUtils (from
-    Perl distribution App-XWindowManagerUtils), released on 2026-04-15.
+    This document describes version 0.005 of App::XWindowManagerUtils (from
+    Perl distribution App-XWindowManagerUtils), released on 2026-05-18.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to "X Window
     Manager":
 
+    *   get-window-kde-activity
+
     *   get-xwm-window-kde-activity
 
+    *   list-windows
+
     *   list-xwm-windows
+
+    *   move-windows-to-kde-activity
+
+    *   move-windows-to-this-kde-activity
 
 HOMEPAGE
     Please visit the project's homepage at

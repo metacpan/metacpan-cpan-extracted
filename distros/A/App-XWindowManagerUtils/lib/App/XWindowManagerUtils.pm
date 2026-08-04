@@ -5,9 +5,9 @@ use strict 'subs', 'vars';
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-15'; # DATE
+our $DATE = '2026-05-18'; # DATE
 our $DIST = 'App-XWindowManagerUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to "X Window Manager"
@@ -24,7 +24,7 @@ App::XWindowManagerUtils - Utilities related to "X Window Manager"
 
 =head1 VERSION
 
-This document describes version 0.004 of App::XWindowManagerUtils (from Perl distribution App-XWindowManagerUtils), released on 2026-04-15.
+This document describes version 0.005 of App::XWindowManagerUtils (from Perl distribution App-XWindowManagerUtils), released on 2026-05-18.
 
 =head1 SYNOPSIS
 
@@ -34,9 +34,17 @@ This distribution includes several utilities related to "X Window Manager":
 
 =over
 
+=item * L<get-window-kde-activity>
+
 =item * L<get-xwm-window-kde-activity>
 
+=item * L<list-windows>
+
 =item * L<list-xwm-windows>
+
+=item * L<move-windows-to-kde-activity>
+
+=item * L<move-windows-to-this-kde-activity>
 
 =back
 

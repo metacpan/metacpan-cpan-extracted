@@ -1,6 +1,6 @@
 package Command::Run;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 use v5.14;
 use warnings;
@@ -42,23 +42,23 @@ sub configure {
     my $obj = shift;
     my %args = @_;
     for my $key (keys %args) {
-	my $val = $args{$key};
-	if ($key eq 'command') {
-	    $obj->command(ref $val eq 'ARRAY' ? @$val : $val);
-	} elsif ($key eq 'stdin') {
-	    $obj->_set_stdin($val);
-	} elsif ($key eq 'stdout') {
-	    $obj->{STDOUT_REF} = $val;
-	} elsif ($key eq 'stderr') {
-	    if (ref $val eq 'SCALAR') {
-		$obj->{STDERR_REF} = $val;
-		$obj->option(stderr => 'capture');
-	    } else {
-		$obj->option(stderr => $val);
-	    }
-	} else {
-	    $obj->option($key => $val);
-	}
+        my $val = $args{$key};
+        if ($key eq 'command') {
+            $obj->command(ref $val eq 'ARRAY' ? @$val : $val);
+        } elsif ($key eq 'stdin') {
+            $obj->_set_stdin($val);
+        } elsif ($key eq 'stdout') {
+            $obj->{STDOUT_REF} = $val;
+        } elsif ($key eq 'stderr') {
+            if (ref $val eq 'SCALAR') {
+                $obj->{STDERR_REF} = $val;
+                $obj->option(stderr => 'capture');
+            } else {
+                $obj->option(stderr => $val);
+            }
+        } else {
+            $obj->option($key => $val);
+        }
     }
     $obj;
 }
@@ -66,33 +66,37 @@ sub configure {
 sub command {
     my $obj = shift;
     if (@_) {
-	$obj->{COMMAND} = [ @_ ];
-	$obj;
+        $obj->{COMMAND} = [ @_ ];
+        $obj;
     } else {
-	@{$obj->{COMMAND} // []};
+        @{$obj->{COMMAND} // []};
     }
 }
 
 sub option {
     my $obj = shift;
     if (@_ == 1) {
-	return $obj->{OPTION}->{+shift};
+        return $obj->{OPTION}->{+shift};
     } else {
-	while (my($k, $v) = splice @_, 0, 2) {
-	    $obj->{OPTION}->{$k} = $v;
-	}
-	return $obj;
+        while (my($k, $v) = splice @_, 0, 2) {
+            $obj->{OPTION}->{$k} = $v;
+        }
+        return $obj;
     }
 }
 
 sub run {
     my $obj = shift;
-    $obj->update(@_);
-    if (my $ref = $obj->{STDOUT_REF}) {
-	$$ref = $obj->data;
+    my %args = @_;
+    my $stdout_ref = delete $args{stdout};
+    my $stderr_ref = ref $args{stderr} eq 'SCALAR' ? delete $args{stderr} : undef;
+    $args{stderr} = 'capture' if $stderr_ref;
+    $obj->update(%args);
+    if (my $ref = $stdout_ref // $obj->{STDOUT_REF}) {
+        $$ref = $obj->data;
     }
-    if (my $ref = $obj->{STDERR_REF}) {
-	$$ref = $obj->error;
+    if (my $ref = $stderr_ref // $obj->{STDERR_REF}) {
+        $$ref = $obj->error;
     }
     return $obj->result;
 }
@@ -100,16 +104,19 @@ sub run {
 sub update {
     use Time::localtime;
     my $obj = shift;
-    my @command = $obj->command;
+    my %args = @_;
+    my $command = delete $args{command};
+    my @command = defined $command ?
+        (ref $command eq 'ARRAY' ? @$command : $command) : $obj->command;
     if (@command) {
-	$obj->{RESULT} = $obj->execute(\@command, @_);
-	# Store stdout in temp file for path access
-	my $fh = $obj->fh;
-	$fh->seek(0, 0)  or die "seek: $!\n";
-	$fh->truncate(0) or die "truncate: $!\n";
-	$fh->print($obj->{RESULT}->{data} // '');
-	$fh->flush;
-	$fh->seek(0, 0)  or die "seek: $!\n";
+        $obj->{RESULT} = $obj->execute(\@command, %args);
+        # Store stdout in temp file for path access
+        my $fh = $obj->fh;
+        $fh->seek(0, 0)  or die "seek: $!\n";
+        $fh->truncate(0) or die "truncate: $!\n";
+        $fh->print($obj->{RESULT}->{data} // '');
+        $fh->flush;
+        $fh->seek(0, 0)  or die "seek: $!\n";
     }
     $obj->date(ctime());
     $obj;
@@ -128,7 +135,7 @@ sub execute {
 
     # Use nofork path for code references when requested
     if ($opt{nofork} and ref $command[0] eq 'CODE') {
-	return $obj->_execute_in_place(\@command, %opt);
+        return $obj->_execute_in_place(\@command, %opt);
     }
 
     my $stderr = $opt{stderr} // '';
@@ -139,41 +146,41 @@ sub execute {
 
     my $pid = fork // die "fork: $!\n";
     if ($pid == 0) {
-	# Child process
-	close $stdout_r;
-	close $stderr_r if $stderr eq 'capture';
+        # Child process
+        close $stdout_r;
+        close $stderr_r if $stderr eq 'capture';
 
-	if (exists $opt{stdin}) {
-	    my $tmp = new_tmpfile IO::File or die "tmpfile: $!\n";
-	    binmode $tmp, ':encoding(utf8)';
-	    $tmp->print($opt{stdin});
-	    $tmp->seek(0, 0) or die "seek: $!\n";
-	    open STDIN, '<&', $tmp or die "dup: $!\n";
-	    binmode STDIN, ':encoding(utf8)';
-	} elsif (my $input = $obj->{INPUT}) {
-	    open STDIN, "<&=", $input->fileno or die "open: $!\n";
-	    binmode STDIN, ':encoding(utf8)';
-	}
+        if (exists $opt{stdin}) {
+            my $tmp = new_tmpfile IO::File or die "tmpfile: $!\n";
+            binmode $tmp, ':encoding(utf8)';
+            $tmp->print($opt{stdin});
+            $tmp->seek(0, 0) or die "seek: $!\n";
+            open STDIN, '<&', $tmp or die "dup: $!\n";
+            binmode STDIN, ':encoding(utf8)';
+        } elsif (my $input = $obj->{INPUT}) {
+            open STDIN, "<&=", $input->fileno or die "open: $!\n";
+            binmode STDIN, ':encoding(utf8)';
+        }
 
-	open STDOUT, ">&=", $stdout_w->fileno or die "open stdout: $!\n";
-	if ($stderr eq 'redirect') {
-	    open STDERR, ">&STDOUT" or die "open stderr: $!\n";
-	} elsif ($stderr eq 'capture') {
-	    open STDERR, ">&=", $stderr_w->fileno or die "open stderr: $!\n";
-	}
-	# else: stderr passes through to terminal
+        open STDOUT, ">&=", $stdout_w->fileno or die "open stdout: $!\n";
+        if ($stderr eq 'redirect') {
+            open STDERR, ">&STDOUT" or die "open stderr: $!\n";
+        } elsif ($stderr eq 'capture') {
+            open STDERR, ">&=", $stderr_w->fileno or die "open stderr: $!\n";
+        }
+        # else: stderr passes through to terminal
 
-	if (ref $command[0] eq 'CODE') {
-	    my $code = shift @command;
-	    @ARGV = @command;
-	    if (my $name = code_name($code)) {
-		$0 = $name;
-	    }
-	    $code->(@command);
-	    exit 0;
-	}
-	exec @command;
-	die "exec: $@\n";
+        if (ref $command[0] eq 'CODE') {
+            my $code = shift @command;
+            @ARGV = @command;
+            if (my $name = code_name($code)) {
+                $0 = $name;
+            }
+            $code->(@command);
+            exit 0;
+        }
+        exec @command;
+        die "exec: $@\n";
     }
 
     # Parent process
@@ -193,10 +200,10 @@ sub execute {
     my $result = $?;
 
     return {
-	result => $result,
-	data   => $stdout,
-	error  => $stderr_out,
-	pid    => $pid,
+        result => $result,
+        data   => $stdout,
+        error  => $stderr_out,
+        pid    => $pid,
     };
 }
 
@@ -204,9 +211,9 @@ sub _tmpfile {
     my ($obj, $key, %opt) = @_;
     $key .= '_RAW' if $opt{raw};
     my $fh = $obj->{$key} //= do {
-	my $f = new_tmpfile IO::File or die "tmpfile: $!\n";
-	binmode $f, $opt{raw} ? ':utf8' : ':encoding(utf8)';
-	$f;
+        my $f = new_tmpfile IO::File or die "tmpfile: $!\n";
+        binmode $f, $opt{raw} ? ':utf8' : ':encoding(utf8)';
+        $f;
     };
     $fh->seek(0, 0)  or die "seek: $!\n";
     $fh->truncate(0) or die "truncate: $!\n";
@@ -224,7 +231,7 @@ sub _pop_encoding {
     my $fh = shift;
     my @layers = PerlIO::get_layers($fh);
     if (grep { defined && /^encoding\b/ } @layers[-2 .. -1]) {
-	binmode $fh, ':pop';
+        binmode $fh, ':pop';
     }
 }
 
@@ -240,9 +247,9 @@ sub _utf8_flagged {
 sub _restore_encoding {
     my($fh, $raw, $was_utf8) = @_;
     if ($raw) {
-	binmode $fh, ':bytes' unless $was_utf8;
+        binmode $fh, ':bytes' unless $was_utf8;
     } else {
-	_pop_encoding($fh);
+        _pop_encoding($fh);
     }
 }
 
@@ -267,31 +274,31 @@ sub _execute_in_place {
     # Handle STDERR — only save/redirect when needed
     my ($save_stderr, $tmp_stderr);
     if ($stderr_mode eq 'redirect') {
-	open $save_stderr, '>&', \*STDERR or die "dup STDERR: $!\n";
-	open STDERR, '>&', \*STDOUT or die "redirect STDERR: $!\n";
+        open $save_stderr, '>&', \*STDERR or die "dup STDERR: $!\n";
+        open STDERR, '>&', \*STDOUT or die "redirect STDERR: $!\n";
     } elsif ($stderr_mode eq 'capture') {
-	$tmp_stderr = $obj->_tmpfile('NOFORK_STDERR', raw => $raw);
-	open $save_stderr, '>&', \*STDERR or die "dup STDERR: $!\n";
-	open STDERR, '>&', $tmp_stderr or die "redirect STDERR: $!\n";
+        $tmp_stderr = $obj->_tmpfile('NOFORK_STDERR', raw => $raw);
+        open $save_stderr, '>&', \*STDERR or die "dup STDERR: $!\n";
+        open STDERR, '>&', $tmp_stderr or die "redirect STDERR: $!\n";
     }
 
     # Handle STDIN — only save/redirect when needed
     my $save_stdin;
     my $stdin_was_utf8;
     if (exists $opt{stdin}) {
-	my $tmp_stdin = $obj->_tmpfile('NOFORK_STDIN', raw => $raw);
-	$tmp_stdin->print($opt{stdin});
-	$tmp_stdin->seek(0, 0) or die "seek: $!\n";
-	open $save_stdin, '<&', \*STDIN or die "dup STDIN: $!\n";
-	$stdin_was_utf8 = _utf8_flagged(\*STDIN);
-	open STDIN, '<&', $tmp_stdin or die "redirect STDIN: $!\n";
-	binmode STDIN, $raw ? ':utf8' : ':encoding(utf8)';
+        my $tmp_stdin = $obj->_tmpfile('NOFORK_STDIN', raw => $raw);
+        $tmp_stdin->print($opt{stdin});
+        $tmp_stdin->seek(0, 0) or die "seek: $!\n";
+        open $save_stdin, '<&', \*STDIN or die "dup STDIN: $!\n";
+        $stdin_was_utf8 = _utf8_flagged(\*STDIN);
+        open STDIN, '<&', $tmp_stdin or die "redirect STDIN: $!\n";
+        binmode STDIN, $raw ? ':utf8' : ':encoding(utf8)';
     } elsif (my $input = $obj->{INPUT}) {
-	$input->seek(0, 0) or die "seek: $!\n";
-	open $save_stdin, '<&', \*STDIN or die "dup STDIN: $!\n";
-	$stdin_was_utf8 = _utf8_flagged(\*STDIN);
-	open STDIN, '<&', $input->fileno or die "redirect STDIN: $!\n";
-	binmode STDIN, $raw ? ':utf8' : ':encoding(utf8)';
+        $input->seek(0, 0) or die "seek: $!\n";
+        open $save_stdin, '<&', \*STDIN or die "dup STDIN: $!\n";
+        $stdin_was_utf8 = _utf8_flagged(\*STDIN);
+        open STDIN, '<&', $input->fileno or die "redirect STDIN: $!\n";
+        binmode STDIN, $raw ? ':utf8' : ':encoding(utf8)';
     }
 
     # Set global state
@@ -299,15 +306,15 @@ sub _execute_in_place {
     local @ARGV = @command;
     my $orig_0;
     if (my $name = code_name($code)) {
-	$orig_0 = $0;
-	$0 = $name;
+        $orig_0 = $0;
+        $0 = $name;
     }
 
     # Execute
     my $result = 0;
     eval { $code->(@command) };
     if ($@) {
-	$result = -1;
+        $result = -1;
     }
 
     # Flush and restore — only what was redirected.  Undo the layer
@@ -318,15 +325,15 @@ sub _execute_in_place {
     _restore_encoding(\*STDOUT, $raw, $stdout_was_utf8);
     open STDOUT, '>&', $save_stdout or die "restore STDOUT: $!\n";
     if ($save_stderr) {
-	STDERR->flush;
-	open STDERR, '>&', $save_stderr or die "restore STDERR: $!\n";
+        STDERR->flush;
+        open STDERR, '>&', $save_stderr or die "restore STDERR: $!\n";
     }
     if ($save_stdin) {
-	_restore_encoding(\*STDIN, $raw, $stdin_was_utf8);
-	open STDIN, '<&', $save_stdin or die "restore STDIN: $!\n";
+        _restore_encoding(\*STDIN, $raw, $stdin_was_utf8);
+        open STDIN, '<&', $save_stdin or die "restore STDIN: $!\n";
     }
     if (defined $orig_0) {
-	$0 = $orig_0;
+        $0 = $orig_0;
     }
 
     # Read captured output from tmpfiles
@@ -335,29 +342,29 @@ sub _execute_in_place {
 
     my $stderr_data = '';
     if ($tmp_stderr) {
-	$tmp_stderr->seek(0, 0) or die "seek: $!\n";
-	$stderr_data = do { local $/; <$tmp_stderr> };
+        $tmp_stderr->seek(0, 0) or die "seek: $!\n";
+        $stderr_data = do { local $/; <$tmp_stderr> };
     }
 
     return {
-	result => $result,
-	data   => $stdout_data,
-	error  => $stderr_data,
+        result => $result,
+        data   => $stdout_data,
+        error  => $stderr_data,
     };
 }
 
 sub data {
     my $obj = shift;
     if (@_) {
-	my $data = shift;
-	$obj->{RESULT}->{data} = $data;
-	my $fh = $obj->fh;
-	$fh->seek(0, 0)  or die "seek: $!\n";
-	$fh->truncate(0) or die "truncate: $!\n";
-	$fh->print($data);
-	$fh->flush;
-	$fh->seek(0, 0)  or die "seek: $!\n";
-	return $obj;
+        my $data = shift;
+        $obj->{RESULT}->{data} = $data;
+        my $fh = $obj->fh;
+        $fh->seek(0, 0)  or die "seek: $!\n";
+        $fh->truncate(0) or die "truncate: $!\n";
+        $fh->print($data);
+        $fh->flush;
+        $fh->seek(0, 0)  or die "seek: $!\n";
+        return $obj;
     }
     $obj->{RESULT}->{data};
 }
@@ -440,7 +447,7 @@ Command::Run - Execute external command or code reference
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 DESCRIPTION
 
@@ -559,7 +566,7 @@ object and persist across multiple C<run> calls.  Returns the object
 for method chaining.
 
     my ($out, $err);
-    Command::Run->new("command")
+    Command::Run->new(command => [ 'command', @args ])
         ->with(stdin => $data, stdout => \$out, stderr => \$err)
         ->run;
 
@@ -577,13 +584,17 @@ temporary and do not modify the object state.
     );
 
     # Reuse runner with different input
-    my $runner = Command::Run->new('cat');
+    my $runner = Command::Run->new(command => ['cat']);
     $runner->run(stdin => $input1);
     $runner->run(stdin => $input2);  # object state unchanged
 
-=item B<update>()
+Note that C<new> takes key-value pairs, not a command list.
 
-Execute the command and store the output.
+=item B<update>(I<%parameters>)
+
+Execute the command and store the output.  Accepts the same
+parameters as C<run>, except C<stdout> and C<stderr> scalar
+references, which are filled by C<run>.
 Returns the object for method chaining.
 
 =item B<result>()

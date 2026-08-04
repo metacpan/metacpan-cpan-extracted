@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async - Fondation plugin exposing D
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # SYNOPSIS
 

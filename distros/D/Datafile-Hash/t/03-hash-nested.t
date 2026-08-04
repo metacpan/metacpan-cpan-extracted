@@ -1,4 +1,4 @@
-# t/06-hash-nested.t
+# t/03-hash-nested.t
 use strict;
 use warnings;
 use Test::More;

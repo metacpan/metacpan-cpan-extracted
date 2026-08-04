@@ -10,7 +10,9 @@ use Test::More;
 use Test::Output;
 use Test::Exit;
 
-use CLI::Simple qw($AUTO_DEFAULT);
+BEGIN {
+  use_ok( qw(CLI::Simple), qw($AUTO_DEFAULT $AUTO_HELP) );
+}
 
 use vars qw(@ARGV);
 
@@ -25,11 +27,10 @@ subtest 'one command' => sub {
 
   local @ARGV = qw();
 
- 
-  local $CLI::Simple::AUTO_DEFAULT = 1;
-  
+  $AUTO_DEFAULT = 1;
+
   my $app = CLI::Simple->new( commands => { foo => sub { print "Hello World\n"; return 0; } } );
-  
+
   stdout_like( sub { $app->run(); }, qr/hello/xsmi, 'defaults to only command' );
 };
 
@@ -39,7 +40,7 @@ subtest 'one command w/args' => sub {
 
   local @ARGV = qw(bar biz);
 
-  local $CLI::Simple::AUTO_DEFAULT = 1;
+  $AUTO_DEFAULT = 1;
 
   my $app = CLI::Simple->new( commands => { foo => sub { print join q{,}, $_[0]->get_args; return 0; } } );
 
@@ -51,8 +52,6 @@ subtest 'AUTO_HELP' => sub {
 ########################################################################
 
   local @ARGV = qw();
-
-  use CLI::Simple qw($AUTO_HELP);
 
   $AUTO_HELP = 1;
 

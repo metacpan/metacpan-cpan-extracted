@@ -15,11 +15,11 @@ Devel::LeakGuard::Object::State - Scoped object leak checking
 
 =head1 VERSION
 
-This document describes Devel::LeakGuard::Object::State version 0.08
+This document describes Devel::LeakGuard::Object::State version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -221,9 +221,11 @@ sub DESTROY { shift->done }
 
 Andy Armstrong  C<< <andy@hexten.net> >>
 
+Currently maintained by Paul Cochrane C<< <paul@peateasea.de> >>
+
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009-2015, Andy Armstrong C<< <andy@hexten.net> >>.
+Copyright (c) 2009-2026, Andy Armstrong C<< <andy@hexten.net> >>.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

@@ -5,15 +5,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/XWindowManagerUtils.pm'
 );
 
 my @scripts = (
+    'script/get-window-kde-activity',
     'script/get-xwm-window-kde-activity',
-    'script/list-xwm-windows'
+    'script/list-windows',
+    'script/list-xwm-windows',
+    'script/move-windows-to-kde-activity',
+    'script/move-windows-to-this-kde-activity'
 );
 
 # no fake home requested

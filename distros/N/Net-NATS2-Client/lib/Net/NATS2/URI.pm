@@ -1,5 +1,8 @@
 package Net::NATS2::URI;
 
+use strict;
+use warnings;
+
 use URI ();
 
 require URI::_server;

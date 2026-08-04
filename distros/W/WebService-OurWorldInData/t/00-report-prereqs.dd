@@ -42,16 +42,17 @@ do { my $x = {
        'test' => {
                    'recommends' => {
                                      'Archive::Extract' => '0',
-                                     'CPAN::Meta' => '2.120900',
-                                     'LWP::UserAgent' => '0',
-                                     'LWP::UserAgent::Mockable' => '0'
+                                     'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test2::V0' => '0',
+                                   'LWP::UserAgent' => '0',
+                                   'LWP::UserAgent::Mockable' => '0',
+                                   'Test2::V0' => '0.000139',
                                    'Test::More' => '0',
-                                   'Time::Piece' => '0'
+                                   'Time::Piece' => '0',
+                                   'URI' => '0'
                                  },
                    'suggests' => {
                                    'Archive::Zip' => '0'

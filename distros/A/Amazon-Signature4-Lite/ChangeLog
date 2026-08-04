@@ -1,3 +1,35 @@
+Mon Aug  3 10:23:20 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.3]:
+	* VERSION: modified
+	* cpanfile: remove Amazon::Signature4::Lite
+	* test-requires: likewise
+	* t/01-signature4-lite.t: use_ok to prevent including Amazon::Signature4::Lite in test-requires
+
+Mon Aug  3 09:18:24 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.2]:
+	* release-notes.md: updataed
+	* release-notes/release-notes-1.0.2.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .gitignore: updated by CPAN::Maker::Bootstrapper
+	* .includes/git.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* requires: likewise
+	* cpanfile: likewise
+	* lib/Amazon/Signature4/Lite.pm.in
+	(sign)
+	- do not double encode for S3 service
+	* deps.mk: new
+	* project.mk: new
+	* recommends: new
+	* suggests: new
+	* t/02-s3-path-encoding.t: new
+
 Mon Jun 22 13:08:08 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.0.1]:

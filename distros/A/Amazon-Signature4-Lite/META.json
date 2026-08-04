@@ -34,21 +34,18 @@
       },
       "runtime" : {
          "requires" : {
-            "Digest::SHA" : "6.04",
             "URI::Escape" : "5.34",
             "perl" : "5.010"
          }
       },
       "test" : {
-         "requires" : {
-            "Amazon::Signature4::Lite" : "0"
-         }
+         "requires" : {}
       }
    },
    "provides" : {
       "Amazon::Signature4::Lite" : {
          "file" : "lib/Amazon/Signature4/Lite.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -63,6 +60,6 @@
          "web" : "https://github.com/rlauer6/Amazon-Signature4-Lite"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

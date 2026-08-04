@@ -1,6 +1,6 @@
 use v5.20.0;
 
-package JMAP::Tester::Response 0.110;
+package JMAP::Tester::Response 0.112;
 # ABSTRACT: what you get in reply to a succesful JMAP request
 
 use Moo;
@@ -84,7 +84,7 @@ JMAP::Tester::Response - what you get in reply to a succesful JMAP request
 
 =head1 VERSION
 
-version 0.110
+version 0.112
 
 =head1 OVERVIEW
 

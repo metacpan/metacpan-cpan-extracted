@@ -13,4 +13,6 @@ is $owid, object {
         end();
     }, 'Base class object correct';
 
+like $owid->ua->agent, qr/WebService-OurWorldInData/, 'User-Agent string populated';
+
 done_testing;

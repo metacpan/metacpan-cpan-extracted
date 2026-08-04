@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.026",
   "NAME" => "Mojolicious::Sessions::Store",
   "PREREQ_PM" => {
-    "Bytes::Random::Secure" => 0,
     "Mojolicious" => "9.46"
   },
   "TEST_REQUIRES" => {
@@ -26,7 +25,7 @@ my %WriteMakefileArgs = (
     "FindBin" => "1.00",
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +33,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bytes::Random::Secure" => 0,
   "File::Spec" => "3.00",
   "File::Temp" => "0.01",
   "FindBin" => "1.00",

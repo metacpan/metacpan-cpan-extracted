@@ -222,10 +222,11 @@ TMP_DIR := $(SRC_DIR)/build
 PSP_DIR := $(SRC_DIR)/example
 PSP_FILES := $(shell find $(PSP_DIR) -type f -name '*.psp')
 BIN_DOC_FILES := $(wildcard bin/*.md)
-LIB_DOC_FILES := $(shell find lib -type f -name '*.md' | sort)
+LIB_DOC_FILES := $(shell find lib -type f -name '*.md' ! -name '._*' | sort)
 
 DOC_DIR := docs
 SCRIPTS_DIR := scripts
+GH_PAGES_DOMAIN := webdyne.org
 
 DOCKER_DIR := mkdocs/docker
 DOCKER_IMAGE := webdyne-mkdocs:latest
@@ -253,6 +254,8 @@ $(SRC_DIR)/webdyne.md : $(SRC_DIR)/webdyne.xml $(BIN_DOC_FILES) $(LIB_DOC_FILES)
 	perl -MFile::Copy=copy -e 'for my $$src (@ARGV) { (my $$dst=$$src)=~s{^lib/}{}; $$dst=~s{\.pm\.md$$}{.md}; $$dst=~s{/}{_}g; $$dst="$(DOC_DIR)/modules/$$dst"; copy($$src,$$dst) or die "$$src -> $$dst: $$!" }' $(LIB_DOC_FILES)
 
 gh-deploy : $(SRC_DIR)/webdyne.md
+	find $(DOC_DIR) -type f -name '*._*' -delete
+	printf '%s\n' $(GH_PAGES_DOMAIN) > $(DOC_DIR)/CNAME
 	mkdocs gh-deploy -f mkdocs.gh.yml
 
 serve : $(SRC_DIR)/webdyne.md docker

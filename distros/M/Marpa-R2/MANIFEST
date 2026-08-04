@@ -191,6 +191,7 @@ meta/Makefile
 meta/make_internal_pm.pl
 pod/ASF.pod
 pod/Acknowledgements.pod
+pod/Algorithm.pod
 pod/Advanced/Bibliography.pod
 pod/Advanced/Input_Models.pod
 pod/Advanced/Thin.pod
@@ -277,6 +278,9 @@ t/progress1.t
 t/progress2.t
 t/rabend.t
 t/randal.t
+t/rankfact.t
+t/rankord.t
+t/rankord3.t
 t/rewrite.t
 t/sequence.t
 t/sequence2.t

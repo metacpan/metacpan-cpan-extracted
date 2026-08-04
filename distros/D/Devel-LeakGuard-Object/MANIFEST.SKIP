@@ -1,0 +1,34 @@
+\.tmproj$
+\.tar\.gz$
+\B\.git\b
+^\.gitignore
+^\.appveyor.yml
+^\.github
+^\.coveralls.yml
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^MYMETA\.(yml|json)$
+^andy/
+^ref/
+^incoming/
+^t/disabled/
+^blib/
+^pm_to_blib$
+^_build/
+
+# Temp, old and emacs backup files.
+~$
+^\.DS_Store
+\.(old|tmp|bak)$
+^#.*#$
+^\.#
+^cover_db
+^try[.]store$
+^TODO$
+\.swp$
+^\.prove$
+^Devel-LeakTrack-Object-
+^Session\.vim$
+^tools/

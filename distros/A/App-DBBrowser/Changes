@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.444   2026-08-04
+    - Option 'extended columns' enabled by default.
+    - Select DISTINCT from within the SELECT submenu.
+    - Update documentation.
+
 2.443   2026-06-23
     - ODBC (mysql,MariaDB): bugfix in get_schemas.
     - Refactoring tables_info.

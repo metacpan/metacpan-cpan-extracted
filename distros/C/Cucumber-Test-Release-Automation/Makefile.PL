@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "mit",
   "NAME" => "Cucumber::Test::Release::Automation",
   "PREREQ_PM" => {},
-  "VERSION" => "v0.0.136",
+  "VERSION" => "v0.0.138",
   "test" => {
     "TESTS" => ""
   }

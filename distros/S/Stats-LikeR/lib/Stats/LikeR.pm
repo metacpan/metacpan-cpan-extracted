@@ -3,14 +3,14 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.28;
+our $VERSION = 0.29;
 require XSLoader;
 use autodie ':default';
 use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table);
+our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
 
 # ===========================================================================
@@ -4994,7 +4994,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 Synopsis
 
@@ -5023,13 +5023,6 @@ prints is what you are reading.
 Note that C<h(bedroc)>, with no quotes and no sigil, cannot be made to work:
 every function here is exported, so Perl parses the bareword as a call to
 C<bedroc()> before C<h> is ever reached. Use one of the three forms above.
-
-C<h> is the only way to ask. No function reads its own argument list for a help
-flag, so nothing here has to guess whether you meant data or a question: a
-column, file or option value that really is the bare string C<'h'> or C<'?'> is
-just a value. C<vals($df, 'h')>, C<csort($df, 'h')>, C<< col('h') E<gt> 3 >> and
-C<read_table('?')> all mean exactly what they say, and every function — XS or
-pure Perl — is documented the same way, through C<h('name')>.
 
 =head1 Functions/Subroutines
 
@@ -5588,6 +5581,18 @@ reference); numeric columns and C<I(x^2)> enter as single regressors. It is
 robust against rank deficiency: collinear terms gracefully receive 0 degrees
 of freedom and 0 sum of squares, matching R's behavior.
 
+Given two or more formulas, C<anova> compares nested models instead and returns
+an B<array ref> of rows, one per model in the order supplied — R's
+C<anova(m1, m2, ...)>. Each row carries C<Res.Df>, C<RSS> and C<formula>; every row
+after the first adds C<Df>, C<Sum of Sq>, C<F> and C<< Pr(E<gt>F) >>:
+
+ my $tab = anova($data, 'y ~ x1', 'y ~ x1 + x2');
+ printf "adding x2: F = %.4g, p = %.4g\n", $tab->[1]{F}, $tab->[1]{'Pr(>F)'};
+
+Both forms evaluate C<< Pr(E<gt>F) >> in the upper tail of the F distribution rather
+than as C<1 - pf(F, df1, df2)>; see
+L</"F and z tail p-values">.
+
 =head3 Input Parameters
 
 =for html <table>
@@ -5963,6 +5968,10 @@ You can also perform Two-Way ANOVA with categorical interactions using the C<*> 
 
 It is robust against rank deficiency; collinear terms will gracefully receive 0 degrees of freedom and 0 sum of squares, matching R's behavior.
 
+C<< Pr(E<gt>F) >> is evaluated in the upper tail of the F distribution rather than as
+C<1 - pf(F, df1, df2)>, so a highly significant term reports its actual p-value
+instead of a flat C<0>; see L</"F and z tail p-values">.
+
 =head3 Input Parameters
 
 =for html <table>
@@ -6034,7 +6043,7 @@ The function returns a single C<HashRef> containing the evaluated statistical re
 
 =head3 omitting formula
 
-As of version 0.07, in the case of an omitted formula, stacking is done:
+In the case of an omitted formula, stacking is done:
 
  aov(
  {
@@ -7371,6 +7380,21 @@ If you provide an array of arrays (a matrix), C<cor> will compute the correlatio
 
 C<cor_test> safely handles C<undef> (or C<NA>) values seamlessly by computing over pairwise complete observations. 
 
+For the C<spearman> and C<kendall> methods, C<cor_test> falls back to a
+large-sample normal approximation when I<n> is large or the data contain ties
+(and always when you pass C<< exact =E<gt> 0 >>). That approximation's C<p.value> is
+evaluated on the tail it belongs to, so a strong rank correlation reports its
+actual p-value instead of a flat C<0>; see
+L</"F and z tail p-values">. Checked against R's
+C<cor.test(..., exact = FALSE)> over 54 Spearman and Kendall cases spanning
+I<n> = 60 to 500 and all three alternatives: C<estimate> agrees to C<3e-15>,
+Kendall's C<statistic> to C<2e-15>, and C<p.value> to C<1.7e-12> — the worst of
+those at a p-value of C<2.2e-297>.
+
+Note that C<statistic> is the z of the approximation, whereas R reports
+Spearman's I<S>; the two are different quantities, so compare C<estimate> and
+C<p.value> rather than C<statistic> when checking against R for that method.
+
 =head2 cov
 
  cov($array1, $array2, 'pearson')
@@ -8409,6 +8433,16 @@ For every non-gaussian family, C<glm> also returns the exponentiated coefficient
  my $nb = glm(formula => 'cases ~ age + sex', data => \%d, family => 'negbin');
  printf "IRR(age) = %.2f (%.2f–%.2f)\n",
      $nb->{exp}{age}{estimate}, $nb->{exp}{age}{'conf.low'}, $nb->{exp}{age}{'conf.high'};
+
+For the families that report a Wald C<z> (everything but C<gaussian>),
+C<< Pr(E<gt>|z|) >> is computed as C<2 * pnorm(-|z|)> rather than
+C<2 * (1 - pnorm(|z|))>, so a strong effect reports its actual p-value instead
+of a flat C<0>; see L</"F and z tail p-values">. The
+C<gaussian> family reports C<< Pr(E<gt>|t|) >> from a direct two-tail probability and was
+never affected. Note that the C<z> itself comes from this module's IRLS fit and
+can differ from R's in the 6th to 8th significant digit, which a p-value far
+out in the tail amplifies — at C<|z| = 37> a 1.5e-5 difference in C<z> moves the
+p-value by about 2%.
 
 =head3 Input Parameters
 
@@ -9531,6 +9565,99 @@ For example:
          $ks->{statistic}, $ks->{p_value}, $ks->{method};
  }
 
+=head2 kurtosis
+
+Sample excess kurtosis — how much of the variance sits in the tails rather than
+near the shoulders. The C<3> of a normal distribution is already subtracted, so a
+normal sample gives roughly C<0>, a heavy-tailed one a positive number, and a flat
+or bimodal one a negative number. Add C<3> if you want the plain fourth
+standardized moment. Validated numerically against R.
+
+ kurtosis(2, 4, 4, 4, 5, 5, 7, 9);        # 0.940625
+
+Arguments work as they do for L</"sd"> and L</"var">: plain numbers, array
+references, or any mixture of the two, all flattened into one sample.
+
+ my @x = (2, 4, 4, 4, 5, 5, 7, 9);
+ kurtosis(@x);                  # a list
+ kurtosis(\@x);                 # an array reference
+ kurtosis([2, 4, 4], 4, [5, 5, 7, 9]);   # mixed; same sample
+ kurtosis(x => \@x);            # named, if you prefer it
+
+=head3 C<type>
+
+There are three conventions in circulation for turning the moment ratio into a
+sample statistic, and they disagree noticeably on small samples. C<type> picks
+one; the default is C<2>.
+
+=for html <table>
+<thead>
+<tr>
+  <th><code>type</code></th>
+  <th>Statistic</th>
+  <th>Also known as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td><code>g2</code></td>
+  <td>the plain moment ratio; R's <code>moments::kurtosis</code> minus 3</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>G2</code></td>
+  <td><b>the default</b>; SAS, SPSS, Stata, Excel's <code>KURT()</code>, <code>scipy.stats.kurtosis(bias =&gt; FALSE)</code></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>b2</code></td>
+  <td><code>e1071::kurtosis</code>'s own default</td>
+</tr>
+</tbody>
+</table>
+
+where, writing C<m2> and C<m4> for the second and fourth central moments (each
+divided by C<n>):
+
+ g2 = m4 / m2**2 - 3                                     # type 1
+ G2 = ((n + 1) * g2 + 6) * (n - 1) / ((n - 2) * (n - 3))  # type 2, the default
+ b2 = (g2 + 3) * (1 - 1 / n)**2 - 3                      # type 3
+
+ my @x = (1, 2, 3, 10);
+ kurtosis(\@x, type => 1);   # -0.7696   plain moment ratio
+ kurtosis(\@x);              #  3.228    G2, the default
+ kurtosis(\@x, type => 3);   # -1.7454   b2
+
+C<< type =E<gt> 2 >> is the estimator that is unbiased for a normal sample, which is why
+it is the default and why it is what every general-purpose statistics package
+reports. It divides by C<n - 3>, so it needs at least four values; the other two
+need at least two.
+
+ my $shape = { skew => skew($lab), kurtosis => kurtosis($lab) };
+
+=head3 Errors
+
+C<kurtosis> croaks, naming the offending position, on an undefined value:
+
+ kurtosis(1, undef, 3);
+ # kurtosis: undefined value at argument index 1
+
+ kurtosis([1, 2, undef]);
+ # kurtosis: undefined value at array ref index 2 (argument 0)
+
+and on a sample too small for the chosen C<type>, on a C<type> outside C<1 .. 3>, or
+on a constant sample, which has no shape to report:
+
+ kurtosis([7, 7, 7, 7]);
+ # kurtosis: zero variance (all 4 values are equal), so kurtosis is undefined
+
+=head3 See also
+
+L</"skew"> for the third moment, L</"sd"> and L</"var"> for the second,
+L</"shapiro_test"> to test normality rather than describe the
+departure from it.
+
 =head2 ljoin
 
 Consider a hash: C<$h{$row}{$col}>, and another hash C<$i{$row}{$col2}>.
@@ -9582,6 +9709,14 @@ the dot operator also works:
 
  $lm = lm(formula => 'y ~ .', data => $dot_data);
 
+The overall model F test is returned as C<fstatistic> (an array ref of C<F>,
+numerator df, denominator df) and C<f.pvalue>. C<f.pvalue> is evaluated in the
+upper tail of the F distribution rather than as C<1 - pf(F, df1, df2)>, so a
+strongly significant model reports its actual p-value instead of a flat C<0>;
+see L</"F and z tail p-values">. The per-coefficient
+C<< Pr(E<gt>|t|) >> values were already computed as a direct two-tail probability and
+are unaffected.
+
 =head2 logrank_test
 
 The log-rank (Mantel–Cox) test: do the survival curves of two or more groups
@@ -9627,7 +9762,7 @@ defaults to the first list.
 
 You can also pass C<< byrow =E<gt> 1 >> if you want the matrix populated row-wise instead of column-wise.
 
-As of version 0.10, parameters do not need to be named, so that C<matrix> works more like R:
+Parameters do not need to be named, so that C<matrix> works more like R:
 
  my $d = matrix(rnorm(32000), 1000, 32);
 
@@ -9642,7 +9777,7 @@ or
  my @arr = 1..8;
  max(@arr, 4, 5)
 
-as of version 0.02, max will die if any undefined values are provided
+max will die if any undefined values are provided
 
 =head2 mcnemar_test
 
@@ -9764,7 +9899,7 @@ or
 
  mean([1,1], [2,2]) # 1.5
 
-as of version 0.02, mean will die if any undefined values are provided
+mean will die if any undefined values are provided
 
 =head2 median
 
@@ -9772,7 +9907,7 @@ works like mean, taking array references and arrays:
 
  median( $test_data[$i][0] )
 
-as of version 0.02, median will die if any undefined values are provided
+median will die if any undefined values are provided
 
 =head2 melt
 
@@ -9888,7 +10023,7 @@ or
  my @arr = 1..8;
  min(@arr, 4, 5)
 
-as of version 0.02, min will die if any undefined values are provided
+min will die if any undefined values are provided
 
 =head2 mode
 
@@ -10081,7 +10216,16 @@ I<group> is a vector of at least two numeric observations.
 Every observation must be B<defined and numeric>; an C<undef> or non-numeric
 cell makes the call C<die> with the offending group and position. This matches
 the rest of C<Stats::LikeR> (C<mean>, C<sum>, C<cor>, … all die on C<undef>) and
-prevents missing values from being silently treated as C<0>.
+prevents missing values from being silently treated as C<0>. All three input
+shapes enforce this, C<formula> included:
+
+ # dies: "formula: response observation 3 (group 'b') is undefined or non-numeric"
+ oneway_test({ y => [1, 2, 3, undef, 5, 6], lab => [qw(a a a b b b)] },
+     formula => 'y ~ lab');
+
+Note that this differs from R, which drops incomplete cases via C<na.action>
+rather than complaining. If you want R's behaviour, filter the missing values
+out yourself first (see C<dropna>).
 
 Each group needs at least two observations, and you need at least two groups.
 
@@ -10127,7 +10271,7 @@ A hash reference with three top-level keys:
          "Sum Sq"  => 61.6533333333333,
          "Mean Sq" => 61.6533333333333,
          "F value" => 177.504798464491,
-         "Pr(>F)"  => 1.31343255160843e-07,
+         "Pr(>F)"  => 1.31343255150313e-07,
      },
      Residuals => {
          Df        => 9.81767348326473,   # fractional: Welch correction
@@ -10172,6 +10316,81 @@ the factor's I<name> becomes the top-level key:
 =head3 Classic equal-variance form
 
  my $res = oneway_test(\%groups, var_equal => 1);   # or 'var.equal' => 1
+
+=head3 Accuracy
+
+C<oneway_test> is cross-validated against R's C<stats::oneway.test> (both
+branches), R's C<anova(aov())> (the C<Sum Sq> / C<Mean Sq> columns),
+C<statsmodels.stats.oneway.anova_oneway(use_var="unequal")> and
+C<scipy.stats.f_oneway>. Across 37 data sets — R's C<chickwts>, C<InsectSprays>,
+C<PlantGrowth>, C<iris>, C<ToothGrowth>, C<mtcars>, C<warpbreaks>, C<sleep>,
+C<airquality>, C<CO2>, C<esoph>, C<OrchardSprays>, C<faithful> and C<quakes>, plus
+numerical edge cases — the statistic, both degrees of freedom and the p-value
+agree with R to within C<1.3e-12> relative error. On 2000 randomised comparisons
+against R — both branches, 2 to 8 groups, group sizes 2 to 40, deliberately
+heteroscedastic (per-group standard deviations spanning four orders of
+magnitude) and data scales spanning 1e-4 to 1e4 — the statistic and the degrees
+of freedom agree to C<1e-12> and the p-value to C<8e-11>, the worst of those being
+a p-value of C<2.4e-66>.
+
+Two places where the agreement takes some care:
+
+=over
+
+=item * B<Tail p-values.> C<< Pr(E<gt>F) >> is evaluated in the upper tail directly, using
+the beta symmetry C<1 - I_x(a, b) = I_{1-x}(b, a)>, rather than as
+C<1 - pf(F, df1, df2)>. The naive form has no resolution below the ulp of
+C<1.0>, so it collapses every small p-value to a flat C<0> and loses relative
+precision from about C<1e-9> downward. C<faithful> split at C<< waiting E<gt> 70 >>
+gives C<1.2099104551915e-76> (Welch) and C<5.50783574504386e-103> (pooled),
+matching R's C<pf(F, df1, df2, lower.tail = FALSE)>.
+
+=item * B<Sums of squares.> These are accumulated with a two-pass mean-then-deviation
+scheme, which is more accurate than R's QR-based C<aov> on badly scaled data:
+for two groups near C<1e8>, C<Residuals>/C<Sum Sq> comes out at exactly C<10>
+where C<anova(aov())> reports C<10.0000000521067>.
+
+=back
+
+=head3 Degenerate variances
+
+A group with B<zero variance> gives it an infinite Welch weight
+(C<w_i = n_i / 0>), and the test degenerates. C<oneway_test> reproduces what R
+does rather than papering over it:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Situation</th>
+  <th>Welch (default)</th>
+  <th><code>var_equal =&gt; 1</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>One or more groups constant, others not</td>
+  <td><code>F</code>, <code>Residuals</code>/<code>Df</code>, <code>Residuals</code>/<code>Mean Sq</code> and <code>Pr(&gt;F)</code> are all <code>NaN</code>; the two <code>Sum Sq</code> entries stay finite</td>
+  <td>ordinary result (<code>Residuals</code>/<code>Sum Sq</code> is unaffected by the constant group)</td>
+</tr>
+<tr>
+  <td>Every group constant, means differ</td>
+  <td><code>NaN</code></td>
+  <td><code>F</code> is <code>Inf</code>, <code>Pr(&gt;F)</code> is <code>0</code></td>
+</tr>
+<tr>
+  <td>Every observation identical</td>
+  <td><code>NaN</code></td>
+  <td><code>F</code> and <code>Pr(&gt;F)</code> are <code>NaN</code> (a genuine <code>0/0</code>)</td>
+</tr>
+</tbody>
+</table>
+
+ # one constant group: Welch has nothing to work with, exactly as in R
+ my $r = oneway_test({ a => [5, 5, 5, 5], b => [1, 2, 3, 4] });
+ # $r->{Group}{'F value'}, $r->{Residuals}{Df}, $r->{Group}{'Pr(>F)'} are all NaN
+
+Test for these with C<$x != $x> (the standard C<NaN> idiom) rather than assuming
+a finite number came back.
 
 =head3 Notes
 
@@ -11594,7 +11813,7 @@ C<sd> can accept both array references as well as arrays:
 
  my $stdev = sd([2,4,4,4,5,5,7,9]);
 
-As of version 0.02, sd will croak/die if any undefined values are provided.
+sd will croak/die if any undefined values are provided.
 
 =head2 select_cols
 
@@ -11671,6 +11890,103 @@ and returns the hash reference:
  W           0.960870680168535
  }
 
+=head2 skew
+
+Sample skewness — the direction and degree of a distribution's asymmetry.
+Positive means a long right tail (the usual shape of lab values, costs and
+lengths of stay), negative a long left tail, and about zero a symmetric sample.
+Validated numerically against R.
+
+ skew(2, 4, 4, 4, 5, 5, 7, 9);        # 0.8184875533568
+
+Arguments work as they do for L</"sd"> and L</"var">: plain numbers, array
+references, or any mixture of the two, all flattened into one sample.
+
+ my @x = (2, 4, 4, 4, 5, 5, 7, 9);
+ skew(@x);                  # a list
+ skew(\@x);                 # an array reference
+ skew([2, 4, 4], 4, [5, 5, 7, 9]);   # mixed; same sample
+ skew(x => \@x);            # named, if you prefer it
+
+=head3 C<type>
+
+There are three conventions in circulation for turning the moment ratio into a
+sample statistic, and they disagree noticeably on small samples. C<type> picks
+one; the default is C<2>.
+
+=for html <table>
+<thead>
+<tr>
+  <th><code>type</code></th>
+  <th>Statistic</th>
+  <th>Also known as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td><code>g1</code></td>
+  <td>the plain moment ratio; R's <code>moments::skewness</code></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>G1</code></td>
+  <td><b>the default</b>; SAS, SPSS, Stata, Excel's <code>SKEW()</code>, <code>scipy.stats.skew(bias =&gt; FALSE)</code></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>b1</code></td>
+  <td><code>e1071::skewness</code>'s own default</td>
+</tr>
+</tbody>
+</table>
+
+where, writing C<m2> and C<m3> for the second and third central moments (each
+divided by C<n>):
+
+ g1 = m3 / m2**1.5                     # type 1
+ G1 = g1 * sqrt(n * (n - 1)) / (n - 2) # type 2, the default
+ b1 = g1 * ((n - 1) / n)**1.5          # type 3
+
+ my @x = (1, 2, 4);
+ skew(\@x, type => 1);   # 0.3818017742   plain moment ratio
+ skew(\@x);              # 0.9352195296   G1, the default
+ skew(\@x, type => 3);   # 0.2078265621   b1
+
+C<< type =E<gt> 2 >> is the estimator that is unbiased for a normal sample, which is why
+it is the default and why it is what every general-purpose statistics package
+reports. It divides by C<n - 2>, so it needs at least three values; the other two
+need at least two.
+
+Both statistics are computed in one pass over the sample, so a whole column can
+be summarized without materializing it twice:
+
+ my $df = read_table('labs.tsv');
+ printf "%-24s skew %7.3f  kurtosis %7.3f\n", $_,
+     skew($df->{$_}), kurtosis($df->{$_}) for qw(alt ast bilirubin);
+
+=head3 Errors
+
+C<skew> croaks, naming the offending position, on an undefined value:
+
+ skew(1, undef, 3);
+ # skew: undefined value at argument index 1
+
+ skew([1, 2, undef]);
+ # skew: undefined value at array ref index 2 (argument 0)
+
+and on a sample too small for the chosen C<type>, on a C<type> outside C<1 .. 3>, or
+on a constant sample, which has no shape to report:
+
+ skew([7, 7, 7, 7]);
+ # skew: zero variance (all 4 values are equal), so skewness is undefined
+
+=head3 See also
+
+L</"kurtosis"> for the fourth moment, L</"sd"> and L</"var"> for the
+second, L</"shapiro_test"> to test normality rather than describe the
+departure from it.
+
 =head2 smd
 
 Standardized mean difference between two continuous groups, standardizing by the
@@ -11696,7 +12012,7 @@ which I prefer, compared to List::Util's required casting into an array:
 
 which passing a reference is shorter and much easier to read.  Stats::LikeR, however, will work for B<both>
 
-as of version 0.02, C<sum> will cause the script to die if any undefined values are provided
+C<sum> will cause the script to die if any undefined values are provided
 
 =head2 summary
 
@@ -11837,19 +12153,19 @@ the two groups compared can be specified, though not necessarily, as C<x> and C<
   <td><code>x</code></td>
   <td>Array Reference</td>
   <td>Required</td>
-  <td>The first vector of data. Must contain at least 2 elements.</td>
+  <td>The first vector of data. Must have at least 2 non-missing elements (1 is enough for the <code>y</code> of a <code>var_equal</code> test).</td>
 </tr>
 <tr>
   <td><code>y</code></td>
   <td>Array Reference</td>
   <td><code>undef</code></td>
-  <td>The second vector of data. Required for two-sample or paired tests.</td>
+  <td>The second vector of data. Required for two-sample or paired tests. An explicit <code>undef</code> means "absent", as R's <code>y = NULL</code> does; anything else that is not an array reference is a fatal error rather than a silently ignored argument.</td>
 </tr>
 <tr>
   <td><code>mu</code></td>
   <td>Float</td>
   <td>0.0</td>
-  <td>The true value of the mean (or difference in means) for the null hypothesis.</td>
+  <td>The true value of the mean (or difference in means) for the null hypothesis. Shifts <code>statistic</code> and <code>p_value</code>; <code>conf_int</code> is centred on the estimate and does not move.</td>
 </tr>
 <tr>
   <td><code>paired</code></td>
@@ -11867,16 +12183,69 @@ the two groups compared can be specified, though not necessarily, as C<x> and C<
   <td><code>conf_level</code></td>
   <td>Float</td>
   <td>0.95</td>
-  <td>Confidence level for the returned confidence interval. Must be between 0 and 1.</td>
+  <td>Confidence level for the returned confidence interval. Must be strictly between 0 and 1 (R also accepts the degenerate 0 and 1). See [Extreme <code>conf_level</code>](#extreme-conf_level) for the precision limit past about <code>0.9999</code>.</td>
 </tr>
 <tr>
   <td><code>alternative</code></td>
   <td>String</td>
   <td><code>"two.sided"</code></td>
-  <td>Direction of the alternative hypothesis: <code>"two.sided"</code>, <code>"less"</code>, or <code>"greater"</code>.</td>
+  <td>Direction of the alternative hypothesis: <code>"two.sided"</code>, <code>"less"</code>, or <code>"greater"</code>. <code>"two-sided"</code> and <code>"two_sided"</code> are accepted as <code>scipy</code>'s spelling of the same thing. Anything else is a fatal error — an unrecognised value must not quietly become a two-sided test.</td>
 </tr>
 </tbody>
 </table>
+
+=head3 Extreme C<conf_level>
+
+C<conf_int> is exact to the last few digits at ordinary confidence levels, and the
+t quantile behind it neither saturates nor loses accuracy as the data's scale
+grows. Past about C<< conf_level =E<gt> 0.9999 >>, though, the interval's accuracy is
+capped by the I<argument>, not by the quantile — and no implementation can do
+better, R's included.
+
+The reason is that C<conf_level> arrives as a float, so the tail has to be
+recovered as C<(1 - conf_level) / 2>, and that subtraction discards most of the
+tail it is trying to express. The nearest double to C<0.99999999> puts the tail at
+C<5.0000000251e-9> rather than C<5e-9> — a relative error of C<5.0e-9> — and for
+C<0.9999999999> the error is C<8.3e-8>. Since C<qt(p, 1) ~ 1/(pi * p)>, the
+quantile, and therefore each interval bound, inherits that relative error
+exactly.
+
+One consequence worth knowing: the answer depends on your perl's C<nvtype>. A
+C<long double> build (C<perl -V:nvtype>) represents C<0.99999999> to 19 digits and
+so recovers the tail correctly, while an ordinary C<double> build cannot:
+
+ # t_test([1, 3], conf_level => 0.99999999), upper bound minus the mean
+ #   nvtype double        63661976.9168721   (5.0e-9 low)
+ #   nvtype long double   63661977.2367910   (5.2e-13 low)
+ #   qt(5e-9, 1, lower.tail = FALSE) in R  = 63661977.2367581
+
+If you need a tail that small exactly, compute it yourself and work from the
+quantile rather than passing a C<conf_level> that cannot hold it.
+
+=head3 Missing values
+
+C<undef> and C<NaN> are dropped, as R's C<t.test> drops C<NA>; infinities are kept,
+as R keeps them. A one-sample or unpaired two-sample test filters each vector on
+its own, so the two may lose different numbers of observations and C<df> reflects
+what survived. A paired test filters on complete cases: if either side of a pair
+is missing the pair goes whole, keeping the differences aligned.
+
+=head3 Errors
+
+Dies if:
+- C<x> is missing or is not an array reference, or C<y> is defined but is not one
+- C<alternative> is not one of the values above
+- C<conf_level> is not strictly between 0 and 1
+- C<paired> is set without a C<y>, or with an C<x> and C<y> of different lengths
+- fewer than 2 observations survive: 2 in C<x> for a one-sample test, 2 complete
+  pairs when C<paired>, and for two samples R's own thresholds — a Welch test
+  needs 2 on each side, while C<var_equal> accepts a side of 1 (it contributes no
+  sum of squares to the pooled variance) so long as the two together reach 3
+- the data are essentially constant, meaning the standard error has fallen below
+  C<10 * DBL_EPSILON> times the magnitude of the estimate. The comparison is
+  relative, so a sample whose spread a double cannot resolve at its own scale is
+  rejected instead of being reported as an enormous C<statistic>. R returns C<NaN>
+  rather than raising for the exactly-zero case; this raises for both.
 
 =head3 Return Hash
 
@@ -12154,7 +12523,7 @@ as simple as possible:
 
  var(2, 4, 5, 8, 9)
 
-as of version 0.02, C<var> will die if any undefined values are provided
+C<var> will die if any undefined values are provided
 
 like C<min>, C<max>, etc., C<var> can accept array references, to make code simpler:
 
@@ -12516,7 +12885,7 @@ You can also precisely filter and reorder which columns are written by passing a
     write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
 undefined variables are printed as C<NA> by default, but can be set as you wish using C<undef.val>
     write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
-as of version 0.07, C<write_table> determines comma and tab-separated delimiters from the filename, but will override if C<sep> or C<delim> are explicitly set.
+C<write_table> determines comma and tab-separated delimiters from the filename, but will override if C<sep> or C<delim> are explicitly set.
 Args can also be accepted:
     write_table( 'data' => \%flat, 'file' => $f );
 
@@ -12558,6 +12927,28 @@ which you wrap yourself:
     \caption{}
     \label{}
     \end{longtable}
+In that plain form the header is an ordinary first row, which is I<not> the header LaTeX freezes at the top of each page: a C<longtable> repeats only what sits inside C<\endfirsthead> / C<\endhead>. Hand-writing those blocks means retyping the column labels, and they then silently stop matching C<col.names> the first time the column order changes — the frozen header says one thing while the columns underneath say another, and the generated header shows up a second time as the first body row. C<tex.longtable.head> closes that gap by generating the repeat machinery from the same header record as the body:
+    write_table(\@rows, 'output.file.tex',
+        'col.names'          => ['a', 'b', 'c'],
+        'tex.longtable.head' => '(continued)', # or just 1 for no continuation caption
+    );
+    %written by /home/con/Scripts/stats/make_table.pl
+    % \begin{longtable}{ccc}
+    \textbf{a} & \textbf{b} & \textbf{c} \ \hline
+    \endfirsthead
+    \caption[]{(continued)}\
+    \hline
+    \textbf{a} & \textbf{b} & \textbf{c} \ \hline
+    \endhead
+    \hline
+    \endfoot
+    1 & 2 & 3\
+Setting C<tex.longtable.head> implies C<tex.longtable> (and so C<< tex =E<gt> 1 >>). A true-but-numeric value emits the machinery with no continuation caption; any other true value is the caption text for every page after the first, written verbatim so LaTeX macros survive, with an empty C<\caption[]> optional argument so the continuation stays out of the List of Tables. C<\endfoot> carries the closing C<\hline> and no C<\endlastfoot> is emitted, so every page — the last one included — gets a bottom rule. The wrapper then holds nothing that has to track the data:
+    \begin{longtable}{ccc}
+    \caption{}\label{}\ \hline
+    \input{output.file.tex}
+    \end{longtable}
+The trailing C<\hline> on the caption line is the rule above the header on the I<first> page, and it has to live there rather than in the generated file: C<\hline> expands to C<\noalign>, and TeX has already begun a table row by the time it expands your C<\input>, so a rule as the file's first token is a C<Misplaced \noalign> error. A bare C<\hline> encodes neither column order nor column count, so unlike a hand-written header it cannot go stale — drop it if you do not want a top rule. Every other C<\hline> in the generated file follows a C<\\> inside that file, where it is legal.
 
 =head3 Excel output (C<xlsx>)
 
@@ -12683,6 +13074,12 @@ C<read_table>.
   <td>write only the table body (header + data rows + <code>\hline</code>, no <code>\begin{tabular}</code>/<code>\end{tabular}</code> or column spec) for <code>\input{}</code> into a caller-supplied <code>longtable</code>; implies <code>tex =&gt; 1</code>, and emits a <code>% \begin{longtable}{...}</code> hint with one <code>tex.col.align</code> char per column</td>
 </tr>
 <tr>
+  <td><code>tex.longtable.head</code></td>
+  <td><code>0</code> (off)</td>
+  <td>LaTeX</td>
+  <td>generate <code>longtable</code>'s repeat-header machinery (<code>\endfirsthead</code> / <code>\endhead</code> / <code>\endfoot</code>) from the table's own header, so the header frozen at every page break tracks <code>col.names</code> instead of being hand-written; a non-numeric value is the continuation caption. Implies <code>tex.longtable</code>. Put the first page's top rule on your own <code>\caption</code> line (<code>\\ \hline</code>) — a leading <code>\hline</code> in an <code>\input</code>ed file is a <code>Misplaced \noalign</code> error</td>
+</tr>
+<tr>
   <td><code>xlsx</code></td>
   <td>auto: <code>1</code> when <code>file</code> ends in <code>.xlsx</code>, else <code>0</code></td>
   <td>Excel</td>
@@ -12715,7 +13112,354 @@ C<read_table>.
 </tbody>
 </table>
 
+=head1 Numerical accuracy
+
+=head2 F and z tail p-values
+
+A p-value is an upper-tail probability, and the obvious way to get one from a
+CDF — subtract it from 1 — throws the answer away exactly when the answer
+matters most. C<1 - pf(F, df1, df2)> cannot represent anything below the ulp of
+C<1.0>, about C<2.2e-16>, so every p-value past that point comes back as a flat
+C<0>, and relative precision is already eroding from roughly C<1e-9> down. The
+same applies to C<2 * (1 - pnorm(|z|))> for a Wald z.
+
+Every F and z p-value in C<Stats::LikeR> is therefore evaluated in the tail
+itself:
+
+=over
+
+=item * B<F tests> (C<oneway_test>, C<aov>, C<anova> in both its forms, and C<lm>'s
+C<f.pvalue>) use the regularized-incomplete-beta symmetry
+C<1 - I_x(a, b) = I_{1-x}(b, a)>. With C<x = df1·F / (df1·F + df2)>, the
+complement C<1 - x> is just C<df2 / (df1·F + df2)>, which is formed without any
+subtraction, so the tail keeps full relative precision.
+
+=item * B<Normal / z tails> (C<glm>'s C<< Pr(E<gt>|z|) >>, and C<cor_test>'s large-sample
+approximation for the C<spearman> and C<kendall> methods) use
+C<2 * pnorm(-|z|)> two-sided and C<pnorm(-z)> for the upper one-sided
+alternative. C<pnorm> is C<0.5 * erfc(-x/√2)>, and C<erfc> is accurate deep into
+its own tail, so evaluating at C<-|z|> rather than subtracting at C<+|z|> costs
+nothing and loses nothing. R writes it the same way.
+
+=item * B<Two-tailed t> (C<t_test>, C<cor_test>'s Pearson path, and the C<< Pr(E<gt>|t|) >>
+columns of C<lm> and C<glm>) was always computed as a direct two-tail
+incomplete-beta probability, so it never had the problem. So were the exact
+permutation p-values C<cor_test> uses for small I<n>.
+
+=back
+
+Three functions outside this set still form a normal-tail p-value
+subtractively, so a p-value from them below about C<1e-16> reads as C<0>:
+C<wilcox_test> (the C<greater> alternative of the normal approximation, in both
+the two-sample and the one-sample/paired branch — its C<two.sided> and C<less>
+alternatives are already computed on the correct side), C<prop_test> (the
+C<greater> alternative; C<two.sided> goes through the chi-squared path instead)
+and C<dunn_test> (the two-sided per-comparison p-values that C<p_adjust> then
+corrects).
+
+The practical difference: C<lm> on a near-noiseless fit reports
+C<f.pvalue = 7.0165242049e-220> where the subtractive form returned C<0>, and
+C<anova>'s sequential table reports C<1.1543232446e-171> for the same reason.
+Where the true value underflows a double even when computed correctly — a Wald
+z beyond about 38.5 — the result is C<0>, and R and SciPy return C<0> there too.
+
+Verified against R 4.6.1 (C<oneway.test>, C<anova(aov())>, C<anova(lm())>,
+C<summary(lm())$fstatistic>, C<summary(glm())$coefficients>) and against SciPy's
+C<f.sf> / C<norm.sf> and statsmodels' C<anova_oneway>; see
+C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
+
 =head1 Changes
+
+=head2 0.29 2026-08-03 CDT
+
+=head3 t_test
+
+C<t_test> was cross-checked against R's C<stats::t.test> and C<scipy.stats> case by
+case, including the cases their own suites pin: R's regression tests
+(C<reg-tests-1a.R>, "t.test with one group of size one") and scipy's
+C<TestTTest_1samp>, C<TestTTest_ind.test_special_cases>, C<test_ttest_rel_ci_1d>,
+C<test_1samp_ci_1d> and C<test_pvalue_ci>. On 2000 randomised comparisons against
+R — all four modes, all three alternatives, random C<mu> and C<conf_level>, sample
+sizes 2 to 40 and data scales spanning 1e-4 to 1e4 — the statistic and the
+degrees of freedom agree to 2e-11 and the p-value to 3e-9, holding to eight
+digits even where the p-value is subnormal (5e-310). What the comparison did
+turn up was seven ways a call could come back wrong rather than loud, all of
+them now fixed and covered by C<t/t_test.t>.
+
+=over
+
+=item * B<< C<undef> was coerced to 0 instead of being dropped. >> This is the one worth
+re-running results over. C<t_test> did not filter missing values, so a column
+with gaps in it was tested with every gap counted as a zero: R gives
+C<t.test(c(1,2,NA,4,5))> a C<t> of 3.286 on 3 degrees of freedom, and C<t_test>
+answered 2.588 on 4. No error, no warning, and an answer close enough to the
+real one to look right. C<undef> and C<NaN> are now dropped the way R drops C<NA>,
+per-vector for a one-sample or unpaired test, and on complete cases when
+C<paired> so a half-missing pair goes whole rather than contributing a
+difference against zero.
+
+=item * B<< A C<y> of fewer than two observations returned a silent C<NaN>. >> C<var_y>
+divided by C<ny - 1>, so C<t_test(\@x, [$one_value])> propagated C<0/0> into the
+statistic, the p-value and both interval bounds without raising. The two
+thresholds R uses are now both in place: a Welch test needs a variance from
+each side and refuses without one, while a pooled test tolerates a side of one
+observation, since that side contributes no sum of squares. That second case is
+what R's own regression suite pins — C<t.test(y=x[1], x=x[-1], var.equal=TRUE)>
+is a well-defined test with 8 degrees of freedom, and C<t_test> now answers it
+instead of returning C<NaN> in one direction and croaking in the other. An empty
+C<y> is caught by the same check.
+
+=item * B<< C<alternative> was never validated. >> The p-value helper fell through to
+two-sided for any string it did not recognise, so a typo — C<'gerater'> — ran a
+different test than the caller asked for and reported nothing. It is now
+checked the way R's C<match.arg> checks it. C<scipy>'s C<"two-sided"> spelling is
+unambiguous, so it is accepted rather than rejected.
+
+=item * B<< A one-sided interval was wrong when C<< conf_level E<lt> 0.5 >>. >> That case needs a
+negative t quantile, and C<qt_tail> searched upward from zero only, so it
+returned roughly zero and collapsed the bound onto C<mu>: R puts the upper bound
+of C<t.test(1:10, mu=5, conf.level=0.3, alternative="less")> at 4.9797 where
+C<t_test> reported 5.0000000036. C<qt_tail> now reduces by symmetry first, so the
+root it brackets is always positive.
+
+=item * B<< C<qt_tail> silently saturated at 1e6. >> Past that its doubling loop gave up
+and returned the ceiling, so C<conf_level> of 0.99999999 and 0.9999999999 came
+back with the I<identical> interval, ±1048576, against R's ±6.4e7 and ±6.4e9.
+The ceiling is gone; the loop now runs until C<t * t> would overflow.
+
+=item * B<Interval accuracy no longer depends on the data's scale.> C<qt_tail>
+bisected to an absolute 1e-8 on the quantile, which is 1e-8 × C<std_err> on the
+interval — fine for data around 1, an error of 2 units for data around 1e9. It
+now bisects to adjacent doubles. Worst interval error across the 2000
+randomised cases went from 2.1e-4 to 5.3e-11 relative. At extreme
+C<conf_level> this makes C<t_test> the more accurate of the two: C<t.test> asks
+for C<qt(1 - alpha/2, df)>, and representing a 5e-9 tail as the double
+C<1 - 5e-9> costs eight significant figures of it, so R's own interval for
+C<conf.level=0.99999999> is off by 0.7 in the eighth digit. Working in the upper
+tail throughout agrees with R's C<qt(alpha/2, df, lower.tail=FALSE)> to 15
+digits.
+
+=item * B<"Essentially constant" was an absolute test.> Only an exactly-zero variance
+was rejected, so a spread below what a double can resolve at the data's own
+magnitude was reported as a finding: four values around 1e10 differing by 1e-5
+gave C<t> = 4e15 and a p-value of 3e-47. The comparison is now relative, as R's
+is. The exactly-zero case, where R returns C<NaN>, raises here instead.
+
+=item * B<< A defined non-array C<y> was ignored. >> C<< t_test(\@x, y =E<gt> 5) >> quietly ran a
+one-sample test. It now raises. An explicit C<undef> still means absent, as R's
+C<y = NULL> does.
+
+=back
+
+C<qt_tail> is shared with C<power_t_test>, which gains the same precision; it is
+only ever called there with a tail below 0.5, so nothing about its behaviour
+changes. C<t_test> remains allocation-free — the missing-value filtering happens
+inside the same single Welford pass that was already there, and the result hash
+is built after the last error check rather than before the first.
+
+=head3 write_table: C<tex.longtable.head>
+
+A C<longtable> freezes only the header sitting inside C<\endfirsthead> /
+C<\endhead>, and C<tex.longtable> never wrote those blocks — its header was an
+ordinary first body row, leaving the frozen one to be hand-written by the
+caller. That header then had no link to C<col.names>: reorder the columns and
+the labels at the top of every page keep the old order while the data below
+them moves, and the generated header appears again as a duplicate first row.
+
+C<tex.longtable.head> generates the repeat machinery from the table's own header
+record, so it cannot drift. A true-but-numeric value emits
+C<\endfirsthead>/C<\endhead>/C<\endfoot> with no continuation caption; any other
+true value is the caption used on pages after the first, written verbatim.
+Implies C<tex.longtable>. C<tex.longtable> on its own is unchanged.
+
+The wrapper keeps one static token, the C<\hline> closing its C<\caption> line,
+because a leading C<\hline> in an C<\input>ed file is a C<Misplaced \noalign>
+error — TeX has already begun the row by the time it expands the C<\input>.
+
+=head3 skew, kurtosis
+
+Two new XS functions describing the shape of a sample beyond its spread:
+C<skew> for the third central moment and C<kurtosis> for the fourth. Both take
+arguments the way C<sd> and C<var> do — numbers, array references or a mixture,
+flattened into one sample — and both also accept C<< x =E<gt> \@data >> and
+C<< type =E<gt> 1|2|3 >>.
+
+C<type> selects among the three sample conventions, which disagree noticeably on
+small samples. The default is C<< type =E<gt> 2 >>: C<G1> and C<G2>, the estimators
+unbiased for a normal sample, as reported by SAS, SPSS, Stata, Excel's C<SKEW()>
+and C<KURT()>, and C<scipy.stats> with C<< bias =E<gt> FALSE >>. C<< type =E<gt> 1 >> is the plain
+moment ratio (C<moments::skewness>) and C<< type =E<gt> 3 >> is C<b1>/C<b2>
+(C<e1071::skewness>'s own default). All three, for both functions, agree with R
+to about 1e-15. C<kurtosis> returns I<excess> kurtosis — 3 is already subtracted,
+so a normal sample sits near 0.
+
+=over
+
+=item * One pass, no allocation: the third and fourth central moments accumulate
+through Welford's recurrence extended to higher moments (Terriberry) rather
+than the textbook expansion in raw moments. That expansion is not usable on
+real data — for a column of values around 1e7, a lab value in the wrong units
+or a timestamp, C<sum(x**3)/n> is about 1e21 while the third central moment is
+single digits, so every significant figure cancels away.
+
+=item * A constant sample croaks rather than returning a silent C<NaN> from C<0/0>, and
+a C<type> whose denominator the sample is too small for (C<< type =E<gt> 2 >> needs
+C<< n E<gt>= 3 >> for C<skew> and C<< n E<gt>= 4 >> for C<kurtosis>) says which.
+
+=item * Both read tied arrays. C<av_fetch> on a tied array returns a deferred C<PVLV>
+rather than the value, and C<SvOK> on one of those is false until its
+get-magic has run, so without an C<SvGETMAGIC> every element of a tied array
+looks undefined.
+
+=back
+
+=head3 median
+
+C<median> now reads tied arrays too. It already had a separate C<av_fetch> path
+for them — a tied array keeps nothing in C<AvARRAY>, so the fast path would read
+off a null pointer — but that path was missing the C<SvGETMAGIC> described
+above, so it rejected every tied array as undefined instead of computing the
+answer. C<mean>, C<sd>, C<var>, C<sum>, C<min> and C<max> still reject tied arrays.
+They have no C<AvARRAY> fast path to guard, so they croak rather than crash, and
+the same one-line fix would make each of them work.
+
+=head3 oneway_test
+
+C<oneway_test> was cross-checked case by case against R's C<stats::oneway.test>
+(both branches), R's C<anova(aov())> for the C<Sum Sq> / C<Mean Sq> columns,
+C<statsmodels.stats.oneway.anova_oneway(use_var="unequal")> and
+C<scipy.stats.f_oneway>. The 37 data sets are R's own built-ins — C<chickwts>,
+C<InsectSprays>, C<PlantGrowth>, C<iris>, C<ToothGrowth>, C<mtcars>, C<warpbreaks>,
+C<sleep>, C<airquality>, C<CO2>, C<esoph>, C<OrchardSprays>, C<faithful>, C<quakes> —
+plus hand-built numerical edge cases. The statistic and both degrees of freedom
+already matched R everywhere; what the comparison turned up was four ways a call
+could come back wrong rather than loud, all now fixed and covered by
+C<t/oneway_test.R.scipy.t>. Statistic, degrees of freedom and p-value now agree
+with R to 1.3e-12 relative error across all 37, and on 2000 randomised
+comparisons against R — both branches, 2 to 8 groups, sizes 2 to 40,
+deliberately heteroscedastic, data scales 1e-4 to 1e4 — the statistic and the
+degrees of freedom agree to 1e-12 and the p-value to 8e-11, the worst of those
+being a p-value of 2.4e-66.
+
+=over
+
+=item * B<Every p-value below about 1e-16 was returned as a flat 0.> C<< Pr(E<gt>F) >> was
+built as C<1 - pf(F, df1, df2)>, and 1 minus something that close to 1 has no
+bits left to carry the answer: C<faithful> split at C<< waiting E<gt> 70 >> should give
+C<1.2099104551915e-76> under Welch and C<5.50783574504386e-103> pooled, and
+C<oneway_test> reported C<0> for both. Anything from about 1e-9 downward was
+losing relative precision the same way, quietly — C<ToothGrowth> by dose came
+back as C<9.99200722162641e-16> against R's C<9.53272701169993e-16>, off by 4.6%
+with nothing to indicate it. The p-value is now evaluated in the upper tail
+directly, via the beta symmetry C<1 - I_x(a, b) = I_{1-x}(b, a)>, so no
+subtraction from 1 happens at any point, and the range down to the smallest
+representable double is reported at full precision.
+
+=item * B<< An C<F> of C<Inf> produced a p-value of C<NaN> instead of 0. >> When every group
+is constant but their means differ, the within-group sum of squares is 0 and
+C<F> is legitimately infinite; R reports C<p = 0>. C<pf> formed
+C<df1*f/(df1*f + df2)>, which is C<Inf/Inf> — a C<NaN> that propagated straight
+into C<< Pr(E<gt>F) >>. C<Inf> and C<NaN> are now handled explicitly, matching R's
+C<p = 0> and C<p = NaN> respectively.
+
+=item * B<< A C<NaN> Welch denominator df was reported as 1e300. >> A group with zero
+variance gets an infinite Welch weight, which makes R's C<tmp> term C<NaN> and
+its denominator df C<NaN> with it. C<oneway_test> had a C<< (tmp E<gt> 0.0) >> guard that
+a C<NaN> fails, so it substituted a magic C<1e300> — a number that reads as a
+real, very large degrees of freedom and would be believed as one. The guard is
+gone; C<Residuals>/C<Df> and C<Residuals>/C<Mean Sq> are C<NaN> there, as in R.
+
+=item * B<< C<formula> mode read C<undef> and non-numeric response cells as 0.0. >> The
+hash and array-of-arrays shapes were already fixed to die on these (and pinned
+by C<t/oneway_test.bugs.t>), but the formula path has its own fill loop and was
+missed, so
+
+=back
+
+ oneway_test({ y => [1, 2, 3, undef, 5, 6], lab => [qw(a a a b b b)] },
+     formula => 'y ~ lab');
+
+  silently tested group C<b> as C<(0, 5, 6)> — a mean of 3.67 instead of 5.5 — and
+  returned an C<F> of 0.735 with no complaint. All three input shapes now enforce
+  the documented contract identically.
+
+Two places where C<oneway_test> is the more accurate side and the reference is
+not, now documented rather than treated as disagreements: the sums of squares
+are accumulated two-pass, so on two groups near 1e8 C<Residuals>/C<Sum Sq> is
+exactly C<10> where R's QR-based C<anova(aov())> gives C<10.0000000521067>; and
+where the exact between-group sum of squares is 0, C<oneway_test> returns 0
+rather than R's 1e-30-scale residue.
+
+=head2 0.281 2026-08-03 CDT
+
+C<median> (LikeR.xs) — the same answers in about an eighth of the time. On the
+C<benchmark.pl> case (10,000 normals in one array ref) a call went from 0.83 ms
+to 0.097 ms, which puts it ahead of the two implementations it was behind:
+C<numpy.median> at 0.105 ms and R's C<median> at 0.196 ms, measured on the same
+machine. Small samples — a per-group median under C<agg> or C<group_by>, which is
+where most calls to it come from — went from 647 ns to 251 ns.
+
+A median is the middle one or two values, so most of the sort the function used
+to do was wasted work: C<qsort> orders all n elements at a cost of n log n
+comparisons, every one an indirect call through a function pointer the compiler
+cannot see into, to answer a question that depends on one or two of them. Those
+values are now selected instead, and the sample is walked once rather than
+twice.
+
+=over
+
+=item * The selection is introselect, the same shape numpy's C<partition> uses:
+quickselect with a median-of-three pivot, an insertion sort once a range is
+small, and a heapsort fallback past a depth limit, so an input crafted to
+defeat the pivot choice degrades to O(n log n) rather than O(n²). The awkward
+data people actually have comes out faster than random data rather than
+slower — sorted, reversed, all-equal and organ-pipe samples of 100,000 values
+each take about 0.25 ms against 0.90 ms for random ones. For an even count the
+lower of the middle pair is the largest value left below the upper one, which
+a scan of that side finds without a second selection.
+
+=item * The counting pass is gone. It walked every element through C<av_fetch> before
+any arithmetic, only to size the buffer; the array lengths give the same
+count, exactly, because an undef anywhere still dies.
+
+=item * The pass that remains reads cells through C<AvARRAY> instead of C<av_fetch>,
+with tied arrays kept on the C<av_fetch> path, since only it sees their values.
+
+=item * A sample of 256 values or fewer is copied to the C stack rather than the heap,
+so the common small call no longer pays for a malloc and free at all: 10,000
+of them now grow RSS by nothing. Larger samples still copy n values, which is
+what leaves the caller's array in its original order — the selection reorders
+whatever it works on, and C<t/median.t> checks that the input comes back
+untouched.
+
+=back
+
+Error messages that carry an index or a count were unreadable on older perls,
+in nineteen places across LikeR.xs, and now are not. C<croak> runs perl's own
+formatter rather than the C library's, and that formatter does not understand
+C99's C<z> length modifier: it printed the conversion literally, so
+C<median(1, undef)> on perl 5.10 or 5.12 said C<undefined value at argument index
+%zu> instead of naming the argument that was undefined — the one thing the
+message existed to say. C<min>, C<max>, C<mode>, C<sum>, C<sd>, C<var>, C<median>,
+C<mcnemar_test>, C<friedman_test>, C<hoa2hoh> and C<oneway_test> were all affected.
+They now use C<UVuf>, as the rest of the file already did. The C<snprintf> calls
+elsewhere in the file are unaffected and unchanged: those do go to the C
+library, where C<%zu> means what it says.
+
+New C<t/croak.messages.t> covers every one of those messages: each is triggered,
+checked for the number it should name, and then swept for any conversion left
+unexpanded, which is what will catch the next one written with C<%zu>. Run
+against the code as it stood before this change, thirty-two of its assertions
+fail on perl 5.10.
+
+New C<t/median.t>: every length from 1 to 25 and from 254 to 258 — either side of
+the insertion-sort cutoff and of the point where the buffer moves off the stack
+— across sorted, reversed, all-equal, two-valued, duplicate-heavy, organ-pipe
+and median-of-three-killer samples, each checked against a plain Perl sort,
+together with the error messages and C<Test::LeakTrace> over the stack, heap,
+mixed-argument and croak paths.
+
+fix for threaded Perls https://www.cpantesters.org/cpan/report/2dbacf8f-7138-1014-a1ab-f0f91cf3b922
 
 =head2 0.28 2026-08-02 CDT
 

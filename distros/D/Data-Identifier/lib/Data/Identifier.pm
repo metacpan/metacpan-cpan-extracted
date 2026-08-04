@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.32;
+our $VERSION = v0.33;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -383,6 +383,9 @@ sub new {
             } elsif ($id->isa('JSON::PP::Boolean') || $id->isa('JSON::XS::Boolean')) {
                 require Data::Identifier::Util;
                 return Data::Identifier::Util->from_bool($id);
+            } elsif ($id->isa('Math::BigInt')) {
+                require Data::Identifier::Generate;
+                return Data::Identifier::Generate->integer($id);
             } else {
                 croak 'Unsupported input data';
             }
@@ -536,13 +539,6 @@ sub random {
     return $pkg->new(uuid => $uuid, %opts{'displayname'});
 }
 
-
-
-#@deprecated
-sub wellknown {
-    my ($pkg, @args) = @_;
-    return $pkg->known('wellknown', @args);
-}
 
 
 #@returns __PACKAGE__
@@ -767,6 +763,9 @@ sub as {
         require Business::ISBN;
         my $val = Business::ISBN->new($self->id);
         return $val if defined($val) && $val->is_valid;
+    } elsif ($as eq 'Math::BigInt' && defined($self->request(default => undef, no_defaults => 1)) && eval { $self->generator->eq('53863a15-68d4-448d-bd69-a9b19289a191') || $self->generator->eq('e8aa9e01-8d37-4b4b-8899-42ca0a2a906f')}) {
+        require Math::BigInt;
+        return Math::BigInt->new($self->request);
     }
 
     return $opts{default} if exists $opts{default};
@@ -966,7 +965,8 @@ sub displaycolour {
         return $value if defined($value) && length($value);
     }
 
-    return $opts{default};
+    return $opts{default} if exists $opts{default};
+    croak 'No value found';
 }
 sub icontext {
     my ($self, %opts) = @_;
@@ -978,7 +978,8 @@ sub icontext {
         return $value if defined($value) && length($value);
     }
 
-    return $opts{default};
+    return $opts{default} if exists $opts{default};
+    croak 'No value found';
 }
 sub description {
     my ($self, %opts) = @_;
@@ -990,7 +991,8 @@ sub description {
         return $value if defined($value) && length($value);
     }
 
-    return $opts{default};
+    return $opts{default} if exists $opts{default};
+    croak 'No value found';
 }
 
 
@@ -1097,6 +1099,14 @@ sub _known_provider {
     croak 'Unsupported class';
 }
 
+#@returns __PACKAGE__
+sub _add_tagnames {
+    my ($self, @tagnames) = @_;
+    my %tagnames = map {$_ => undef} grep {defined} @{$self->{tagname} //= []}, @tagnames;
+    @{$self->{tagname}} = keys %tagnames;
+    return $self;
+}
+
 1;
 
 __END__
@@ -1111,7 +1121,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.32
+version v0.33
 
 =head1 SYNOPSIS
 
@@ -1221,6 +1231,7 @@ L<Data::TagDB::Tag>,
 L<File::FStore::Base> (see limitations of L<File::FStore::Base/contentise>),
 L<SIRTX::Datecode>,
 L<Data::Identifier::Interface::Simple>,
+L<Math::BigInt>,
 and L<Business::ISBN>. If C<$id> is not a reference it is parsed as with C<ise>.
 
 The following type names are currently well known:
@@ -1387,19 +1398,6 @@ Returns the list of all currently known identifiers.
 
 =back
 
-=head2 wellknown
-
-    my @wellknown = Data::Identifier->wellknown(%opts);
-
-This is an alias for:
-
-    my @wellknown = Data::Identifier->known('wellknown', %opts);
-
-(deprecated since v0.13)
-
-See also L</known>.
-This method will be removed in C<v0.33>.
-
 =head2 type
 
     my Data::Identifier $type = $identifier->type;
@@ -1473,6 +1471,7 @@ L<Data::URIID::Service>,
 L<Data::TagDB::Tag>,
 L<File::FStore::File> (requires version v0.03 or later),
 L<SIRTX::Datecode> (requires version v0.03 or later),
+L<Math::BigInt>,
 L<Business::ISBN>.
 Other packages might be supported. Packages need to be installed in order to be supported.
 Also some packages need special options to be passed to be available.
@@ -1757,13 +1756,10 @@ It is undefined (since v0.29) if this includes names known by L</tagname>.
     my $icontext      = $identifier->icontext( [ %opts ] );
     my $description   = $identifier->description( [ %opts ] );
 
-These functions return C<undef>. They are for compatibility with L<Data::TagDB::Tag>.
+These methods return a displaycolour, an icon text, and a description, respectively.
+They are for compatibility with L<Data::TagDB::Tag> and similar.
 
-B<Note:>
-Starting with version C<v0.33> of this module those methods will C<die> if no value is found (most likely) unless C<default> is given.
-
-B<Note:>
-Future versions may return some actual data.
+If no value is known those methods C<die> unless a value for C<default> is given.
 
 The following options (all optional) are supported:
 
@@ -1772,6 +1768,7 @@ The following options (all optional) are supported:
 =item C<default>
 
 The default value to return if no other value is available (which is always the case).
+When set to C<undef> this can be used to switch this method to returning C<undef> (not C<die>) in case no value is known.
 This is for compatibility with L</displayname> and implementations of other packages.
 
 =item C<no_defaults>

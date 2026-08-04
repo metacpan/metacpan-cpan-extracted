@@ -1,3 +1,9 @@
+0.005   2026-05-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: get-xwm-window-kde-activity, list-windows,
+          move-windows-to-this-kde-activity.
+
+
 0.004   2026-04-15  Released-By: PERLANCAR; Urgency: medium
 
         - Refactor routines to its own distro: Desktop-XWindowManager-Util.

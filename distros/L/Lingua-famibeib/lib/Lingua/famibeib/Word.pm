@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
 
@@ -260,18 +260,43 @@ sub as_string {
 
 
 sub as_number {
-    my ($self) = @_;
+    my ($self, $as) = @_;
+
+    $as //= 'int';
 
     if ($self->as_string =~ /^be((?:[bfklmst][aeiou])+)((?:ub)?)\z/) {
         my ($mora, $neg) = ($1, $2);
-        my $value = 0;
 
-        while ($mora =~ /([bfklmst][aeiou])/g) {
-            $value *= 35;
-            $value += $_word_mora{$1};
+        if ($as eq 'int' && length($mora) <= 12) {
+            my $value = 0;
+
+            while ($mora =~ /([bfklmst][aeiou])/g) {
+                $value *= 35;
+                $value += $_word_mora{$1};
+            }
+
+            return length($neg) ? -$value : $value;
+        } elsif ($as eq 'Math::BigInt' || $as eq 'Data::Identifier') {
+            require Math::BigInt;
+
+            my $value = Math::BigInt->bzero;
+
+            while ($mora =~ /([bfklmst][aeiou])/g) {
+                $value->bmul(35);
+                $value->badd($_word_mora{$1});
+            }
+
+            $value = length($neg) ? $value->bneg : $value;
+
+            if ($as eq 'Data::Identifier') {
+                require Data::Identifier::Generate;
+                $value = Data::Identifier::Generate->integer($value);
+            }
+
+            return $value;
+        } else {
+            croak 'Invalid/Unsupported (as, value)-pair; value too large?';
         }
-
-        return length($neg) ? -$value : $value;
     } elsif ($self->as_string =~ /^be/) {
         croak 'Not a simple number';
     } else {
@@ -280,6 +305,7 @@ sub as_number {
 }
 
 
+#@returns __PACKAGE__
 sub stem {
     my ($self, @opts) = @_;
     my $stem = $self->{stem};
@@ -304,6 +330,7 @@ sub modifiers {
 }
 
 
+#@returns Lingua::famibeib::Modifier
 sub get_modifier_by_master_mora {
     my ($self, $mora, %opts) = @_;
     my $has_default = exists $opts{default};
@@ -400,6 +427,7 @@ sub is_application {
 }
 
 
+#@returns __PACKAGE__
 sub register {
     my ($self) = @_;
 
@@ -424,6 +452,7 @@ sub as {
         Data::Identifier::Generate->generic(
             request => $str,
             displayname => $str,
+            tagname => $str,
             style => 'id-based',
             namespace => '10ce38bf-6238-4ed7-96ef-98ea9642a4c6',
             generator => _GENERATOR,
@@ -455,7 +484,7 @@ Lingua::famibeib::Word - module to interact with the famibeib words
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -469,6 +498,8 @@ This package is used to store individual famibeib words and query them about the
 
 This module inherits from L<Data::Identifier::Interface::Simple>, and L<Data::Identifier::Interface::Subobjects>.
 Instances are overloaded so they will stringify to their string representation as per L</as_string>.
+
+=head1 METHODS
 
 =head2 new
 
@@ -542,6 +573,8 @@ Returns the string representation of the word.
 =head2 as_number
 
     my $num = $word->as_number;
+    # or:
+    my $obj = $word->as_number($as); # since v0.04
 
 (since v0.02)
 
@@ -551,6 +584,13 @@ Simple numbers are numbers with no modifiers (only a stem) or with the single mo
 
 To process more complex numbers (such as ordinals) process the modifiers individually and parse the value using
 this method applied to the stem as returned by L</stem>.
+
+Since v0.04 an object type can be requested. Currently supported are:
+L<Math::BigInt>,
+L<Data::Identifier>.
+
+B<Note:>
+If the value is too big to be represented safely by the selected type this method might C<die>.
 
 =head2 stem
 

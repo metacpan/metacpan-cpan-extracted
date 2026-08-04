@@ -16,8 +16,7 @@ use Test::ConvertPheno qw(
   slurp_file
   load_json_file
   write_json_file
-  has_ohdsi_db
-  test_tmpdir
+  test_ohdsi_db_dir
   run_command_capture
 );
 
@@ -26,8 +25,10 @@ plan skip_all => "convert-pheno CLI not found at $cli" unless -f $cli;
 plan skip_all => 'Skipping CLI regression tests on ld architectures due to known issues'
   if $Config{archname} =~ /-ld\b/;
 
-my $tmpdir = test_tmpdir();
+my $tmpdir = tempdir( CLEANUP => 1 );
+my $test_ohdsi_db_dir = test_ohdsi_db_dir();
 my @datasetjson_files = sort glob 't/datasetjson2bff/in/*.json';
+my @datasetxml_files = map { "t/datasetxml2bff/in/$_.xml" } qw(dm mh lb ts);
 
 my @cases = (
     {
@@ -168,6 +169,39 @@ my @cases = (
         compare  => 'structured',
     },
     {
+        name => 'datasetjson2bff_terminology',
+        cmd  => [
+            '-idataset-json', @datasetjson_files,
+            '--mapping-file', 't/datasetjson2bff/in/sdtm_terminology.yaml',
+            '-obff', '__OUT__',
+        ],
+        expected => 't/datasetjson2bff/out/terminology/individuals.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
+        name => 'datasetxml2bff',
+        cmd  => [
+            '-idataset-xml', @datasetxml_files,
+            '--define-xml', 't/datasetxml2bff/in/define.xml',
+            '-obff', '__OUT__',
+        ],
+        expected => 't/datasetxml2bff/out/individuals.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
+        name => 'datasetxml2bff_terminology',
+        cmd  => [
+            '-idataset-xml', 't/datasetxml2bff/in/terminology/dm.xml',
+            '--define-xml', 't/datasetxml2bff/in/terminology/define.xml',
+            '-obff', '__OUT__',
+        ],
+        expected => 't/datasetxml2bff/out/terminology/individuals.json',
+        suffix   => '.json',
+        compare  => 'structured',
+    },
+    {
         name     => 'datasetjson2pxf',
         cmd      => [ '-idataset-json', @datasetjson_files, '-opxf', '__OUT__' ],
         expected => 't/datasetjson2pxf/out/pxf.json',
@@ -287,33 +321,25 @@ sub run_cli {
 }
 
 for my $case (@cases) {
-  SKIP: {
-        skip q{share/db/ohdsi.db is required for this CLI OMOP test}, 2
-          if $case->{requires_db} && !has_ohdsi_db();
+    my $tmp_file = temp_output_file( suffix => $case->{suffix}, dir => $tmpdir );
+    my @cmd      = map { $_ eq '__OUT__' ? $tmp_file : $_ } @{ $case->{cmd} };
+    unshift @cmd, $^X, $cli;
+    push @cmd, '-O', '--test';
 
-        my $tmp_file = temp_output_file( suffix => $case->{suffix}, dir => $tmpdir );
-        my @cmd      = map { $_ eq '__OUT__' ? $tmp_file : $_ } @{ $case->{cmd} };
-        unshift @cmd, $^X, $cli;
-        push @cmd, '-O', '--test';
+    my $actual_file = $case->{entity_output}
+      ? File::Spec->catfile( $tmpdir, $case->{entity_output} )
+      : $tmp_file;
 
-        my $actual_file = $case->{entity_output}
-          ? File::Spec->catfile( $tmpdir, $case->{entity_output} )
-          : $tmp_file;
-
-        my ( $status, $output ) = run_cli(@cmd);
-        diag($output) if $status != 0 && defined $output && length $output;
-        is( $status, 0, "CLI $case->{name} exits successfully" );
-        ok(
-            compare_case_output( $case->{compare}, $case->{expected}, $actual_file ),
-            "CLI $case->{name} matches reference output",
-        );
-    }
+    my ( $status, $output ) = run_cli(@cmd);
+    diag($output) if $status != 0 && defined $output && length $output;
+    is( $status, 0, "CLI $case->{name} exits successfully" );
+    ok(
+        compare_case_output( $case->{compare}, $case->{expected}, $actual_file ),
+        "CLI $case->{name} matches reference output",
+    );
 }
 
-SKIP: {
-    skip q{share/db/ohdsi.db is required for the CLI fhir2omop test}, 7
-      unless has_ohdsi_db();
-
+{
     my $omop_dir = tempdir( CLEANUP => 1 );
     my @cmd = (
         $^X, $cli,
@@ -321,6 +347,7 @@ SKIP: {
         '-oomop',
         '--out-dir', $omop_dir,
         '--ohdsi-db',
+        '--path-to-ohdsi-db', $test_ohdsi_db_dir,
         '-O',
         '--test',
     );

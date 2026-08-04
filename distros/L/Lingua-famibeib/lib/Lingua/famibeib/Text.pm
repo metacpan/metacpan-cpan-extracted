@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -18,7 +18,7 @@ use Lingua::famibeib::Word;
 use Lingua::famibeib::Fragment;
 use Lingua::famibeib::Sentence;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use parent 'Data::Identifier::Interface::Subobjects';
 
@@ -44,6 +44,7 @@ sub fragments {
 }
 
 
+#@returns __PACKAGE__
 sub parse_string {
     my ($self, $str, @opts) = @_;
     my $words = $self->{words};
@@ -88,6 +89,7 @@ sub parse_string {
 }
 
 
+#@returns __PACKAGE__
 sub parse_done {
     my ($self, @opts) = @_;
 
@@ -130,7 +132,7 @@ Lingua::famibeib::Text - module to interact with the famibeib texts
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -146,6 +148,8 @@ version v0.03
 This module is used to store and parse larger blocks of text.
 
 This module inherits from L<Data::Identifier::Interface::Subobjects>.
+
+=head1 METHODS
 
 =head2 new
 

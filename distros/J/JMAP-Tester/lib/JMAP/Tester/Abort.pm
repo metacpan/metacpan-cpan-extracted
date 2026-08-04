@@ -1,5 +1,5 @@
 use v5.20.0;
-package JMAP::Tester::Abort 0.110;
+package JMAP::Tester::Abort 0.112;
 
 use Moo;
 extends 'Throwable::Error';
@@ -54,7 +54,7 @@ JMAP::Tester::Abort
 
 =head1 VERSION
 
-version 0.110
+version 0.112
 
 =head1 PERL VERSION
 

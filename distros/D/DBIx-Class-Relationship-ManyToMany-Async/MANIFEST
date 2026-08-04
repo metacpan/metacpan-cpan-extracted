@@ -12,6 +12,7 @@ dist.ini
 lib/DBIx/Class/Relationship/ManyToMany/Async.pm
 t/01-many-to-many.t
 t/02-quote-char.t
+t/03-prefetch.t
 t/lib/TestSchema.pm
 t/lib/TestSchema/Result/Group.pm
 t/lib/TestSchema/Result/User.pm

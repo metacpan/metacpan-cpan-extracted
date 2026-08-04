@@ -2,3 +2,4 @@ requires 'DBIx::Class';
 requires 'DBIx::Class::Async' => '1.0.4';
 requires 'Future';
 requires 'DBD::SQLite';
+requires 'SQL::Translator' => '0.11018';

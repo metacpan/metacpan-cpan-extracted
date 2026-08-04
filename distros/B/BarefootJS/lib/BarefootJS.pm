@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.30.2";
+our $VERSION = "0.30.6";
 use strict;
 use warnings;
 use utf8;
@@ -990,6 +990,35 @@ sub length ($self, $recv) {
     my $n = 0;
     $n += ord($_) > 0xFFFF ? 2 : 1 for split //, ($recv // '');
     return $n;
+}
+
+# `arr[index]` / `hash[key]` — a runtime-polymorphic dynamic-key element
+# access (`emitIndexAccessPerl`, expr/operand.ts). Perl's deref syntax
+# forces a compile-time choice between `->{$k}` (hash) and `->[$k]`
+# (array), but the shared analyzer can't tell at compile time whether a
+# dynamic key (e.g. a destructured `.map()` param used as a key,
+# `tone[k]`) will turn out string- or number-shaped — it types it
+# `{kind:'unknown'}`. The previous compile-time guess picked `->[$k]`
+# (array deref) whenever it couldn't prove string-typed, which is a
+# FATAL "Not an ARRAY reference" against a hash row (#2491). Dispatch on
+# the receiver's RUNTIME `ref` instead — mirrors the Go adapter's
+# `getFieldValue`/`bf_get` and Twig's `attribute()`.
+sub get ($self, $collection, $key) {
+    return undef unless defined $key;
+    if (ref($collection) eq 'HASH') {
+        return $collection->{$key};
+    }
+    if (ref($collection) eq 'ARRAY') {
+        return undef unless $key =~ /^-?\d+$/;
+        my $idx = $key + 0;
+        # JS-semantics negative index is "not found" (`arr[-1] ===
+        # undefined`), NOT Perl's native from-the-end wraparound — guard
+        # it explicitly so this stays a superset of `->[]`, not a
+        # divergent accessor.
+        return undef if $idx < 0 || $idx >= scalar @$collection;
+        return $collection->[$idx];
+    }
+    return undef;
 }
 
 # `isValidElement(x)` -- the framework "is this a renderable element (not
@@ -2022,7 +2051,7 @@ package BarefootJS::Date;
 # compartment where `$BarefootJS::VERSION` is not visible and collapses to
 # 0. scripts/sync-perl-versions.ts bumps every `our $VERSION` line in the
 # file, so this stays in lockstep with the package version above.
-our $VERSION = "0.30.2";
+our $VERSION = "0.30.6";
 
 sub new {
     my ($class, $epoch_ms) = @_;

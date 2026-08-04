@@ -65,7 +65,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.006';
+$VERSION='3.007';
 
 
 #==================================================================================================
@@ -95,6 +95,11 @@ sub new {
     #  Fix document root
     #
     $opt{'root'}=File::Spec->rel2abs($opt{'root'});
+
+
+    #  API file name cache
+    #
+    $opt{'API_fn'}={};
     
     
     #  Done
@@ -294,36 +299,54 @@ sub handler_http {
         debug('in handler, scope:%s receive:%s, send:%s', Dumper($scope, $receive, $send));
         
 
-        #  Restrict local env
+        #  Restrict local env and expose the PAGI request path to WebDyne's
+        #  shared Router::Simple based API implementation.
         #
-        local *ENV=\%ENV_BASE;
+        my ($r, $html, $html_fh, $status);
+        {
+            #  Keep the request environment localized only while WebDyne is
+            #  constructing and executing the request. Do not retain a
+            #  localized global %ENV across an asynchronous response await.
+            #
+            local *ENV=\%ENV_BASE;
+            @ENV{qw(PATH_INFO QUERY_STRING REQUEST_METHOD)}=(
+                $scope->{'path'} || '',
+                $scope->{'query_string'} || '',
+                $scope->{'method'} || '',
+            );
 
-        
-        #  Only need request and response helper objects
-        #
-        my $req_or=PAGI::Request->new($scope, $receive) ||
-            return err('unable to get PAGI::Request object');
-        my $res_or=PAGI::Response->new($scope) ||
-            return err('unable to get PAGI::Response object');
-        
+            #  If the requested path is not a file, an API PSP may own a path
+            #  prefix such as /api.psp or /example/api.psp. Resolve that prefix
+            #  before constructing the request so the normal WebDyne handler can
+            #  process the PSP and retain the original PATH_INFO for routing.
+            #
+            my $api_fn=api_filename($self, $scope);
 
-        #  Create new WebDyne  Request object, will pull filename from
-        #  environment. 
-        #
-        my $html;
-        my $html_fh=IO::String->new($html);
-        my $r=WebDyne::Request::PAGI->new(select => $html_fh, document_root => $self->{'root'}, document_default => $self->{'index'}, scope=>$scope, req=>$req_or, res=>$res_or, 
-            receive => $receive, send=> $send) ||
-                return err('unable to create new WebDyne::Request::PAGI object: %s', 
-                    $@ || errclr() || 'unknown error');
-        debug("r: $r");
+            #  Only need request and response helper objects
+            #
+            my $req_or=PAGI::Request->new($scope, $receive) ||
+                return err('unable to get PAGI::Request object');
+            my $res_or=PAGI::Response->new($scope) ||
+                return err('unable to get PAGI::Response object');
 
-        
-        #  Call handler and evaluate results
-        #
-        my $status=WebDyne->handler($r);
-        debug("handler returned status: $status");
-        $r->status($status);
+            #  Create new WebDyne Request object, optionally using the API
+            #  prefix resolved above as its PSP filename.
+            #
+            $html_fh=IO::String->new($html);
+            my %request_opt=(select => $html_fh, document_root => $self->{'root'}, document_default => $self->{'index'}, scope=>$scope, req=>$req_or, res=>$res_or,
+                receive => $receive, send=> $send);
+            $request_opt{'filename'}=$api_fn if $api_fn;
+            $r=WebDyne::Request::PAGI->new(%request_opt) ||
+                    return err('unable to create new WebDyne::Request::PAGI object: %s',
+                        $@ || errclr() || 'unknown error');
+            debug("r: $r");
+
+            #  Call handler and evaluate results
+            #
+            $status=WebDyne->handler($r);
+            debug("handler returned status: $status");
+            $r->status($status);
+        }
 
 
         #  Can close html file handle now
@@ -406,25 +429,54 @@ sub handler_http {
         }
         
         
-        #  If html defined set header content type unless already set during handler run and send
+        #  If html is defined set header content type unless already set during
+        #  handler execution, then always send the response. An API page with
+        #  no matching route legitimately returns an empty 200 response; PAGI
+        #  still requires response.start to be emitted in that case.
         #
-        if ($html) {
+        my $body=$html || '';
+        if ($body) {
             debug('sending html to client via await()');
             $r->res->content_type($r->content_type() || $WEBDYNE_CONTENT_TYPE_HTML);
-            my $respond_status=await $r->res->send($html || err)->respond($send);
-            $r->DESTROY();
-            return $respond_status;
         }
-        
-        
-        #  Done with response handler now
-        #
+        my $respond_status=await $r->res->send($body)->respond($send);
         $r->DESTROY();
+        return $respond_status;
 
 
         
     })
     
+}
+
+
+sub api_filename {
+
+    my ($self, $scope)=@_;
+    return unless WEBDYNE_API_ENABLE;
+
+    my $path=$scope->{'path'} || '';
+    return unless length($path);
+
+    my @part=grep { length($_) } split(m{/+}, $path);
+    return if grep { $_ eq '.' || $_ eq '..' } @part;
+
+    my $root=File::Spec->rel2abs($self->{'root'});
+    my $API_fn=$self->{'API_fn'};
+    for my $ix (0 .. $#part) {
+        my $candidate=File::Spec->catfile($root, @part[0 .. $ix]);
+        $candidate .= WEBDYNE_PSP_EXT unless $candidate =~ WEBDYNE_PSP_EXT_RE;
+
+        my $relative=File::Spec->abs2rel($candidate, $root);
+        next if $relative eq '..' || $relative =~ /^\.\.(?:[\\\/]|$)/;
+        if ($API_fn->{$candidate} || (-f $candidate)) {
+            debug("found api file name: $candidate, %s, dispatching", Dumper($API_fn));
+            $API_fn->{$candidate}++; # Cache so not stat()ing on file system
+            return $candidate;
+        }
+    }
+
+    return;
 }
 
 

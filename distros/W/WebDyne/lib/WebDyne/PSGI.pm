@@ -46,11 +46,6 @@ use WebDyne::PSGI::Constant;
 use WebDyne::Request::PSGI;
 
 
-#  Vars. API file name cache
-#
-our (%API_fn);
-
-
 #  Environment
 #
 my %ENV_BASE=(
@@ -68,7 +63,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.006';
+$VERSION='3.007';
 
 
 #==================================================================================================
@@ -98,6 +93,11 @@ sub new {
     #  Fix document root
     #
     $opt{'root'}=File::Spec->rel2abs($opt{'root'});
+
+
+    #  API file name cache
+    #
+    $opt{'API_fn'}={};
     
 
     #  Done
@@ -199,26 +199,10 @@ sub handler {
                 #  is /api/user/42 go back looking for /api/user.psp or /api.psp in the treet
                 #
                 debug("status: $status, fn: $fn");
-                my $document_root=$r->document_root;
-                if ($WEBDYNE_API_ENABLE) {
-                    debug("status: $status, fn:$fn (%s), looking for API match", $r->filename());
-                    #(my $api_dn=$fn)=~s/^${document_root}//;
-                    (my $api_dn=$ENV{'PATH_INFO'})=~s/^${document_root}//;
-                    my @api_dn=grep {$_} File::Spec::Unix->splitdir($api_dn);
-                    my @api_fn;
-                    while (my $dn=shift @api_dn) {
-                        push @api_fn, $dn;
-                        my $api_fn=File::Spec->catfile($document_root, @api_fn) . WEBDYNE_PSP_EXT;
-                        debug("check $api_fn");
-                        #  Check of outside docroot
-                        last if (index($api_fn, $document_root) !=0);
-                        if ($API_fn{$api_fn} || (-f $api_fn)) {
-                            debug("found api file name: $api_fn, %s, dispatching", Dumper(\%API_fn));
-                            $API_fn{$api_fn}++; # Cache so not stat()ing on file system
-                            #return &handler($env_hr, filename=>$api_fn);
-                            return $self->handler($env_hr, filename=>$api_fn);
-                        }
-                    }
+                if (my $api_fn=$self->api_filename($r)) {
+                    debug("status: $status, fn:$fn (%s), found API match, dispatching", $r->filename());
+                    #return &handler($env_hr, filename=>$api_fn);
+                    return $self->handler($env_hr, filename=>$api_fn);
                 }
                 
                 
@@ -318,6 +302,34 @@ sub handler {
     return \@return;
 
 
+}
+
+
+sub api_filename {
+
+    my ($self, $r)=@_;
+    return unless WEBDYNE_API_ENABLE;
+
+    my $document_root=$r->document_root;
+    my $api_dn=$ENV{'PATH_INFO'} || '';
+    $api_dn=~s/^${document_root}//;
+    my @api_dn=grep {$_} File::Spec::Unix->splitdir($api_dn);
+    my @api_fn;
+    my $API_fn=$self->{'API_fn'};
+    while (my $dn=shift @api_dn) {
+        push @api_fn, $dn;
+        my $api_fn=File::Spec->catfile($document_root, @api_fn) . WEBDYNE_PSP_EXT;
+        debug("check $api_fn");
+        #  Check of outside docroot
+        last if (index($api_fn, $document_root) !=0);
+        if ($API_fn->{$api_fn} || (-f $api_fn)) {
+            debug("found api file name: $api_fn, %s, dispatching", Dumper($API_fn));
+            $API_fn->{$api_fn}++; # Cache so not stat()ing on file system
+            return $api_fn;
+        }
+    }
+
+    return;
 }
 
 

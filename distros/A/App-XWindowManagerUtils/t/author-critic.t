@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/XWindowManagerUtils.pm','script/get-xwm-window-kde-activity','script/list-xwm-windows'];
+my $filenames = ['lib/App/XWindowManagerUtils.pm','script/get-window-kde-activity','script/get-xwm-window-kde-activity','script/list-windows','script/list-xwm-windows','script/move-windows-to-kde-activity','script/move-windows-to-this-kde-activity'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

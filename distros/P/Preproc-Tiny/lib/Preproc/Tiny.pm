@@ -14,7 +14,7 @@ require Exporter;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( pp pp_files pp_text );
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 #------------------------------------------------------------------------------
 # Code borrowed from Data::Dump

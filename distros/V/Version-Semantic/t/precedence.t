@@ -1,16 +1,12 @@
-use strict;
-use warnings;
+use Test2::V1
+  -pragmas,
+  -target => { CLASS => 'Version::Semantic' },
+  qw( cmp_ok ok plan subtest );
 
-use Test::More import => [ qw( BAIL_OUT cmp_ok ok plan require_ok subtest ) ], tests => 4;
-my $class;
-
-BEGIN {
-  $class = 'Version::Semantic';
-  require_ok $class or BAIL_OUT "Cannot load class '$class'!"
-}
+plan 3;
 
 subtest '11.2' => sub {
-  plan tests => 3;
+  plan 3;
 
   my @versions = qw(
     1.0.0
@@ -19,22 +15,22 @@ subtest '11.2' => sub {
     2.1.1
   );
   for ( my $i = 0 ; $i < $#versions ; ++$i ) {
-    ok $class->parse( $versions[ $i ] ) < $class->parse( $versions[ $i + 1 ] ), "$versions[ $i ] < $versions[ $i + 1 ]"
+    ok CLASS->parse( $versions[ $i ] ) < CLASS->parse( $versions[ $i + 1 ] ), "$versions[ $i ] < $versions[ $i + 1 ]"
   }
 };
 
 subtest '11.3' => sub {
-  plan tests => 3;
+  plan 3;
 
   my @tests = ( [ '1.0.0-alpha', '<', '1.0.0' ], [ '1.0.0', '==', '1.0.0' ], [ '1.0.0', '>', '1.0.0-alpha' ] );
   for ( @tests ) {
     my ( $l, $o, $r ) = @$_;
-    cmp_ok $class->parse( $l ), $o, $class->parse( $r ), "$l $o $r"
+    cmp_ok CLASS->parse( $l ), $o, CLASS->parse( $r ), "$l $o $r"
   }
 };
 
 subtest '11.4' => sub {
-  plan tests => 21;
+  plan 21;
 
   my @versions = qw(
     0.9.0
@@ -55,17 +51,17 @@ subtest '11.4' => sub {
   );
 
   for ( my $i = 0 ; $i < $#versions ; ++$i ) {
-    ok $class->parse( $versions[ $i ] ) < $class->parse( $versions[ $i + 1 ] ), "$versions[ $i ] < $versions[ $i + 1 ]"
+    ok CLASS->parse( $versions[ $i ] ) < CLASS->parse( $versions[ $i + 1 ] ), "$versions[ $i ] < $versions[ $i + 1 ]"
   }
-  ok $class->parse( '1.0.0-alpha.beta' ) > $class->parse( '1.0.0-alpha.1' ), '1.0.0-alpha.beta > 1.0.0-alpha.1';
-  ok $class->parse( '1.0.0-beta' ) > $class->parse( '1.0.0-alpha' ),         '1.0.0-beta > 1.0.0-alpha';
-  ok $class->parse( '1.0.0-alpha' ) == $class->parse( '1.0.0-alpha' ),
+  ok CLASS->parse( '1.0.0-alpha.beta' ) > CLASS->parse( '1.0.0-alpha.1' ), '1.0.0-alpha.beta > 1.0.0-alpha.1';
+  ok CLASS->parse( '1.0.0-beta' ) > CLASS->parse( '1.0.0-alpha' ),         '1.0.0-beta > 1.0.0-alpha';
+  ok CLASS->parse( '1.0.0-alpha' ) == CLASS->parse( '1.0.0-alpha' ),
     '1.0.0-alpha == 1.0.0-alpha (same pre-release lists)';
-  ok $class->parse( '1.0.0-5' ) == $class->parse( '1.0.0-5' ), '1.0.0-5 == 1.0.0-5 (same pre-release lists)';
-  ok $class->parse( '1.0.8-20260216170758-TRIAL' ) < $class->parse( '1.0.8-20260223134407-TRIAL' ),
+  ok CLASS->parse( '1.0.0-5' ) == CLASS->parse( '1.0.0-5' ), '1.0.0-5 == 1.0.0-5 (same pre-release lists)';
+  ok CLASS->parse( '1.0.8-20260216170758-TRIAL' ) < CLASS->parse( '1.0.8-20260223134407-TRIAL' ),
 '1.0.8-20260216170758-TRIAL < 1.0.8-20260223134407-TRIAL; lexical order matches chronological order if the date format is numeric %Y%m%d%H%M%S';
-  ok $class->parse( '5.3.0-20260307100725-TRIAL' ) < $class->parse( '5.3.0-TRIAL3' ),
+  ok CLASS->parse( '5.3.0-20260307100725-TRIAL' ) < CLASS->parse( '5.3.0-TRIAL3' ),
     '5.3.0-20260307100725-TRIAL < 5.3.0-TRIAL3';
-  ok $class->parse( '5.3.0-20260307100725.TRIAL' ) < $class->parse( '5.3.0-TRIAL3' ),
+  ok CLASS->parse( '5.3.0-20260307100725.TRIAL' ) < CLASS->parse( '5.3.0-TRIAL3' ),
 '5.3.0-20260307100725.TRIAL < 5.3.0-TRIAL3; numeric identifiers (20260307100725) always have lower precedence than non-numeric identifiers (TRIAL3)'
 }

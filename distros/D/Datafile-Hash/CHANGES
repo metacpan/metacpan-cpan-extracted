@@ -1,5 +1,11 @@
 Revision history for Datafile-Hash
 
+1.06 2025-08-03
+    - improve test results
+    - use version for kwalitee improvement
+    - added t/04-coverage.t for coverage improvement
+    - repo moved from github.com to codeberg.org
+
 1.05 2025-01-18
     - Added search filtering with regex/string/array patterns
     - Added verbose messaging for debugging

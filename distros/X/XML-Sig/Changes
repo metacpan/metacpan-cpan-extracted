@@ -1,5 +1,17 @@
 Revision history for XML-Sig
 
+0.72 -- Mon Aug 03 09:19:23 ADT 2026
+
+  [Notable Changes]
+  - Security Fixes CVE-2026-18568 (Upgrade immediately)
+  - Provide accessors for verified_ids() and verified_elements()
+
+  [Change Log]
+  - fed89d1 Increment version for a release
+  - e758467 Add verified_ids() and verified_elements()
+  - ef22cfe Fail verification when no signature was actually verified
+  - 1e6bc9d v0.71
+
 0.71 -- Thu Jul 30 22:50:01 ADT 2026
 
   [Notable Changes]

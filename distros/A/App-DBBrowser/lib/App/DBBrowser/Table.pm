@@ -42,10 +42,9 @@ sub browse_the_table {
     $sf->{d}{stmt_types} = [ 'Select' ];
     my $changed = {};
     my $hidden = 'Customize:';
-    my ( $print_table, $select, $distinct, $where, $group_by, $having, $order_by, $limit, $offset, $export ) =
+    my ( $print_table, $select, $where, $group_by, $having, $order_by, $limit, $offset, $export ) =
        ( 'Print TABLE',
          '- SELECT',
-         '- DISTINCT',
          '- WHERE',
          '- GROUP BY',
          '- HAVING',
@@ -54,7 +53,7 @@ sub browse_the_table {
          '- OFFSET',
          '  Export',
     );
-    my @choices = ( $print_table, $select, $distinct, $where, $group_by, $having, $order_by, $limit, $offset, $export );
+    my @choices = ( $print_table, $select, $where, $group_by, $having, $order_by, $limit, $offset, $export );
     my @pre = ( $hidden, undef );
     my $back = $sf->{i}{back};
     my ( $return_statement, $hidden_print ) = ( $sf->{i}{_confirm}, $return_stmt_prompt );
@@ -96,10 +95,6 @@ sub browse_the_table {
         my $sub_stmt = $menu->[$idx];
         if ( $sub_stmt eq $select ) {
             my $ret = $sb->select( $sql );
-            $changed->{$sub_stmt} = $ret;
-        }
-        elsif ( $sub_stmt eq $distinct ) {
-            my $ret = $sb->distinct( $sql );
             $changed->{$sub_stmt} = $ret;
         }
         elsif ( $sub_stmt eq $where ) {

@@ -10,6 +10,7 @@ use Convert::Pheno::BFF::DerivedEntities qw(
   execution_entities
   synthesize_bundle_entities
 );
+use Convert::Pheno::CBioPortal::ToBFF qw(run_cbioportal_to_bundle);
 use Convert::Pheno::Context;
 use Convert::Pheno::ConversionRequest;
 use Convert::Pheno::CDISC::SDTM::ToBFF qw(run_sdtm_to_bundle);
@@ -42,6 +43,14 @@ sub resolve_operation {
         spec => $spec,
         run  => sub {
             my ( $convert, $input, $context ) = @_;
+            return run_cbioportal_to_bundle( $convert, $input, $context );
+        },
+    ) if $self->{method} eq 'cbioportal2bff';
+
+    return _bundle_operation(
+        spec => $spec,
+        run  => sub {
+            my ( $convert, $input, $context ) = @_;
             return run_tabular_to_bundle( $convert, $input, $context );
         },
     ) if $self->{method} eq 'redcap2bff';
@@ -60,7 +69,8 @@ sub resolve_operation {
             my ( $convert, $input, $context ) = @_;
             return run_sdtm_to_bundle( $convert, $input, $context );
         },
-    ) if $self->{method} eq 'datasetjson2bff';
+    ) if $self->{method} eq 'datasetjson2bff'
+      || $self->{method} eq 'datasetxml2bff';
 
     return _bundle_operation(
         spec => $spec,
@@ -165,7 +175,7 @@ sub run_operation {
     my ( $ok, $error );
 
     $ok = eval {
-        if ( $operation->{requires_sqlite} ) {
+        if ( $operation->{requires_sqlite} || $self->{terminology_lookup_required} ) {
             Convert::Pheno::open_connections_SQLite($self);
             $connections_open = 1;
             $execution->set_resource( sqlite_open => 1 );
@@ -196,8 +206,8 @@ sub run_operation {
     $execution->set_resource( sqlite_open => 0 ) if $connections_open;
     _run_cleanup(
         \@cleanup_errors,
-        'closing the search audit',
-        sub { Convert::Pheno::finalize_search_audit($self) },
+        'closing the terminology audit',
+        sub { Convert::Pheno::finalize_term_audit($self) },
     );
     delete $self->{current_row};
     $execution->clear_current_row;

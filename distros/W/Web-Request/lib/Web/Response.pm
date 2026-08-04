@@ -1,10 +1,6 @@
 package Web::Response;
-BEGIN {
-  $Web::Response::AUTHORITY = 'cpan:DOY';
-}
-{
-  $Web::Response::VERSION = '0.11';
-}
+our $AUTHORITY = 'cpan:PTC';
+$Web::Response::VERSION = '0.12';
 use Moose;
 # ABSTRACT: common response class for web frameworks
 
@@ -244,13 +240,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Web::Response - common response class for web frameworks
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -390,13 +388,23 @@ the C<headers> attribute, and the third element if it exists will be stored as
 the C<content> attribute. If a coderef is passed, it will be stored in the
 C<streaming_response> attribute.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Jesse Luehrs <doy@tozt.net>
 
+=item *
+
+Paul Cochrane <paul@peateasea.de>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Jesse Luehrs.
+This software is copyright (c) 2012--2026 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

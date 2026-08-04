@@ -1,24 +1,32 @@
 Revision history for Error-Helper
 
-2.1.0	2023-12-10/15:30
-		 - Add shared variables for getting error info when a initiator methode dies and
-		does return a blessed object.
+3.0.0   2026-08-03/20:30
+        - Fix all_errors_fatal being ignored, as all_fatal was checked for instead. Both are now honored.
+        - errorPackageShort is now the last part of the package name, as documented, instead of the
+          full package name with :: replaced with -.
+        - No longer warns about undef when warn or errorblank is called outside of a sub.
+        - Fix quoting of file and line in the errorblank message.
+        - Doc cleanup. Document the fatality checks and sync the synopsis and README with example.pl.
+        - Add tests for the error methods, fatality checks, and shared variables.
 
-2.0.0	2023-12-03/20:45
-		-adds fatal errors to allow easy usage with eval
-		-errors can all be fatal, by error code, or by error flag
-		-perrors are fatal by default
+2.1.0   2023-12-10/15:30
+        - Add shared variables for getting error info when a initiator methode dies and does not return a blessed object.
 
-1.0.0	 2012-06-15/17:
-		 -Add error flags.
-		 -Bump major revision given internal data structure addition.
-		 -Add the methods below.
-		 	  perror
-			  errorFlag
+2.0.0   2023-12-03/20:45
+        -adds fatal errors to allow easy usage with eval
+        -errors can all be fatal, by error code, or by error flag
+        -perrors are fatal by default
 
-0.1.0	2011-08-18/01:00
-		-Add 'warnString'. 
+1.0.0   2012-06-15/17:
+        -Add error flags.
+        -Bump major revision given internal data structure addition.
+        -Add the methods below.
+          perror
+          errorFlag
 
-0.0.0	2011-08-12/13:40
-		-Initial release.
+0.1.0   2011-08-18/01:00
+        -Add 'warnString'.
+
+0.0.0   2011-08-12/13:40
+-Initial release.
 

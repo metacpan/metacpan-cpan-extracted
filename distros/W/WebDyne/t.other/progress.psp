@@ -56,8 +56,11 @@ async sub sse {
         );
 
         if ($progress >= 100) {
-            await $sse_or->send_event(event => 'done');
-            $sse_or->close;  # stop stream
+            await $sse_or->send_event(
+                event => 'done',
+                data  => '',
+            );
+            await $sse_or->close;  # stop stream
         }
     });
 

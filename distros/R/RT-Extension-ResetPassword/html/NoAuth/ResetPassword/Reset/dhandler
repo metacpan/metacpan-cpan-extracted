@@ -148,6 +148,12 @@ if ($show_form) {
   </div>
 
 </form>
+% } else {
+  <div class="row mt-2">
+    <div class="col-12 text-center">
+      <a class="btn btn-primary" href="<%$RT::WebURL|n%>"><&|/l&>Back to Login</&></a>
+    </div>
+  </div>
 % }
 
 </div>

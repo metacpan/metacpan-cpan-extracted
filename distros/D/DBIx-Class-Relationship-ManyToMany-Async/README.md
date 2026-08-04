@@ -4,7 +4,7 @@ DBIx::Class::Relationship::ManyToMany::Async - many\_to\_many for DBIx::Class::A
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 

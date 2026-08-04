@@ -25,9 +25,16 @@ Revision history for Perl module Devel::LeakGuard::Object
       - Replace Module::Build with ExtUtils::MakeMaker
       - Basic code and distribution cleanup
 
-0.08  Unknown
+0.08  2015-09-10
       - Specify minimum perl version
       - Some perlcritic-related cleanup
       - Relax ExtUtils::MakeMaker minimum version requirement
       - Add kwalitee tests
       - Fix installation instructions in README
+
+0.09  2026-08-03
+      - Fix typos and update documentation (Filippo Biondi)
+      - Add tests of leakstate() and status() (Filippo Biondi)
+      - Add AppVeyor configuration
+      - Improve clarity of basic.t test messages
+      - Replace Travis-CI with GitHub actions

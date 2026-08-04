@@ -1,11 +1,10 @@
 {
    "abstract" : "DateTime::Format::XSD - Format DateTime according to xsd:dateTime",
    "author" : [
-      "Daniel Ruoso <daniel@ruoso.com>",
       "Timothy Legge <timlegge@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.038, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -23,6 +22,7 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Software::Security::Policy::Individual" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
             "Test::More" : "0.88",
@@ -35,7 +35,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime::Format::ISO8601" : "0",
+            "DateTime::Format::ISO8601" : "0.19",
             "base" : "0",
             "perl" : "5.008",
             "strict" : "0",
@@ -51,7 +51,7 @@
    "provides" : {
       "DateTime::Format::XSD" : {
          "file" : "lib/DateTime/Format/XSD.pm",
-         "version" : "0.4"
+         "version" : "0.5"
       }
    },
    "release_status" : "stable",
@@ -65,12 +65,12 @@
          "web" : "https://github.com/perl-net-saml2/perl-DateTime-Format-XSD"
       }
    },
-   "version" : "0.4",
-   "x_generated_by_perl" : "v5.30.3",
+   "version" : "0.5",
+   "x_generated_by_perl" : "v5.42.0",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

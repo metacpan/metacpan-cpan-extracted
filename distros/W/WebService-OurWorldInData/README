@@ -8,13 +8,26 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This is a base class for Our World in Data APIs. You probably should be
-    using the WebService::OurWorldInData::Chart class.
+    This is a base class for Our World in Data APIs. You will want the
+    modules for each endpoint:
+
+      * WebService::OurWorldInData::Chart
+
+      * WebService::OurWorldInData::Tables
+
+      * WebService::OurWorldInData::Indicators
+
+      * WebService::OurWorldInData::Search
+
+    WARNING: from the OWID dev page, These APIs are under active
+    development. For that reason, I will start by only providing the JSON
+    responses from their server. As the API design crystalizes, I will add
+    convenience handling classes for the Results so that you can iterate
+    through them for specific bits of data.
 
  Getting Started
 
-    Documentation for Chart API
-    <https://docs.owid.io/projects/etl/api/chart-api/>
+    OWID's Technical Documentation <https://docs.owid.io/projects/etl/api/>
 
  Proxies
 

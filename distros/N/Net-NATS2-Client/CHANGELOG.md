@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.4 - 2026-08-03
+
+### Added
+
+- Added `Net::NATS2::Base`, which exports `has` for generating fluent
+  getter/setter accessors with scalar or lazy defaults.
+- Added NKey authentication with a public key and nonce-signing callback.
+- Added `TODO.md` to track planned NATS Server 2.xx and broader client support.
+
+### Changed
+
+- Refactored NATS2 model classes to use the shared accessor implementation.
+- Replaced internal lvalue accessor updates with fluent setter calls while
+  preserving numeric subscription ID and message-count behavior.
+
 ## 0.3.3 - 2026-07-31
 
 ### Fixes

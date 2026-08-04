@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Amazon::Signature4::Lite;
+use_ok(qw( Amazon::Signature4::Lite));
 
 ########################################################################
 # Helpers

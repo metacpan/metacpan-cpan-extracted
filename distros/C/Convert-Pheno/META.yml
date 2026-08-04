@@ -30,8 +30,10 @@ requires:
   Data::Leaf::Walker: '0.21'
   DateTime::Format::ISO8601: '0.17'
   Devel::Size: '0.84'
+  Excel::Writer::XLSX: '1.12'
   File::ShareDir::ProjectDistDir: '1.000009'
   Hash::Fold: v1.0.0
+  IO::Uncompress::Unzip: '0'
   JSON::Validator: '5.14'
   JSON::XS: '4.03'
   JSONLD: '0.006'
@@ -53,6 +55,6 @@ resources:
   homepage: https://github.com/CNAG-Biomedical-Informatics/convert-pheno
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/CNAG-Biomedical-Informatics/convert-pheno.git
-version: '0.33'
+version: '0.34'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

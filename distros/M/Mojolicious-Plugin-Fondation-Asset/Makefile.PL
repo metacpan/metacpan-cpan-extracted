@@ -20,13 +20,13 @@ my %WriteMakefileArgs = (
     "CSS::Minifier::XS" => "0.13",
     "Mojolicious" => "9.46",
     "Mojolicious::Plugin::AssetPack" => "2.15",
-    "Mojolicious::Plugin::Fondation" => "0.01",
+    "Mojolicious::Plugin::Fondation" => "0.05",
     "YAML::XS" => "0.90"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %FallbackPrereqs = (
   "CSS::Minifier::XS" => "0.13",
   "Mojolicious" => "9.46",
   "Mojolicious::Plugin::AssetPack" => "2.15",
-  "Mojolicious::Plugin::Fondation" => "0.01",
+  "Mojolicious::Plugin::Fondation" => "0.05",
   "Test::More" => "1.00",
   "YAML::XS" => "0.90"
 );

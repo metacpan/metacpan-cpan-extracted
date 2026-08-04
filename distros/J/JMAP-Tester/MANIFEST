@@ -14,6 +14,7 @@ lib/JMAP/Tester/LogWriter.pm
 lib/JMAP/Tester/Logger.pm
 lib/JMAP/Tester/Logger/HTTP.pm
 lib/JMAP/Tester/Logger/Null.pm
+lib/JMAP/Tester/Manual.pm
 lib/JMAP/Tester/Response.pm
 lib/JMAP/Tester/Response/Paragraph.pm
 lib/JMAP/Tester/Response/Sentence.pm

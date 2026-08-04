@@ -1,83 +1,88 @@
-use strict;
-use warnings;
+use Test2::V1
+  -pragmas,
+  -target => { CLASS => 'Version::Semantic' },
+  qw( dies is isa_ok like ok plan subtest );
 
-use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 8;
-use Test::Fatal qw( exception );
-my $class;
+plan 7;
 
-BEGIN {
-  $class = 'Version::Semantic';
-  require_ok $class or BAIL_OUT "Cannot load class '$class'!"
-}
-
-like exception { $class->parse( 'v1.2.3' )->increment( 'pre_release' ) }, qr/not implemented/,
+like dies { CLASS->parse( 'v1.2.3' )->increment( 'pre_release' ) }, qr/not implemented/,
   'Unknown version incrementation strategy';
 
 my $strategy;
 
 subtest 'No strategy' => sub {
-  plan tests => 15;
+  plan 19;
 
-  my $start = $class->parse( 'v1.2.3' );
-  isa_ok my $self = $start->increment(), $class;
+  my $start = CLASS->parse( 'v1.2.3' );
+  ok $start->is_core, 'Is core version';
+  isa_ok my $self = $start->increment(), CLASS;
   is $self->prefix,       'v',      'prefix';
   is $self->major,        1,        'major';
   is $self->minor,        2,        'minor';
   is $self->patch,        4,        'patch';
   is $self->version_core, 'v1.2.4', 'version_core';
+  ok $self->is_core, 'Is core version';
   ok $start < $self, 'Incremented';
 
-  $start = $class->parse( '2.0.1' );
-  isa_ok $self = $start->increment( undef, 'alpha.beta.1' ), $class;
-  is $self->prefix,       undef,                'prefix';
-  is $self->major,        2,                    'major';
-  is $self->minor,        0,                    'minor';
-  is $self->patch,        2,                    'patch';
-  is $self->version_core, '2.0.2',              'version_core';
-  is "$self",             '2.0.2-alpha.beta.1', 'Stringification';
+  $start = CLASS->parse( '2.0.1' );
+  ok $start->is_core, 'Is core version';
+  isa_ok $self = $start->increment( undef, 'alpha.beta.1' ), CLASS;
+  is $self->prefix,       undef,   'prefix';
+  is $self->major,        2,       'major';
+  is $self->minor,        0,       'minor';
+  is $self->patch,        2,       'patch';
+  is $self->version_core, '2.0.2', 'version_core';
+  ok not( $self->is_core ), 'Is not core version';
+  is "$self", '2.0.2-alpha.beta.1', 'Stringification';
   ok $start < $self, 'Incremented'
 };
 
 $strategy = 'patch';
 subtest "\"$strategy\" strategy" => sub {
-  plan tests => 7;
+  plan 9;
 
-  my $start = $class->parse( '1.2.3' );
-  isa_ok my $self = $start->increment( $strategy ), $class;
+  my $start = CLASS->parse( '1.2.3' );
+  ok $start->is_core, 'Is core version';
+  isa_ok my $self = $start->increment( $strategy ), CLASS;
   is $self->prefix,       undef,   'prefix';
   is $self->major,        1,       'major';
   is $self->minor,        2,       'minor';
   is $self->patch,        4,       'patch';
   is $self->version_core, '1.2.4', 'version_core';
+  ok $self->is_core, 'Is core version';
   ok $start < $self, 'Incremented'
 };
 
 subtest "\"$strategy\" strategy with TRIAL pre-release" => sub {
-  plan tests => 8;
+  plan 10;
 
-  my $start = $class->parse( '1.2.3' );
-  isa_ok my $self = $start->increment( $strategy, 'TRIAL' ), $class;
-  is $self->prefix,       undef,         'prefix';
-  is $self->major,        1,             'major';
-  is $self->minor,        2,             'minor';
-  is $self->patch,        4,             'patch';
-  is $self->version_core, '1.2.4',       'version_core';
-  is "$self",             '1.2.4-TRIAL', 'Stringification';
+  my $start = CLASS->parse( '1.2.3' );
+  ok $start->is_core, 'Is core version';
+  isa_ok my $self = $start->increment( $strategy, 'TRIAL' ), CLASS;
+  is $self->prefix,       undef,   'prefix';
+  is $self->major,        1,       'major';
+  is $self->minor,        2,       'minor';
+  is $self->patch,        4,       'patch';
+  is $self->version_core, '1.2.4', 'version_core';
+  ok not( $self->is_core ), 'Is not core version';
+  is "$self", '1.2.4-TRIAL', 'Stringification';
   ok $start < $self, 'Incremented'
 };
 
 $strategy = 'minor';
 subtest "\"$strategy\" strategy" => sub {
-  plan tests => 11;
+  plan 13;
 
-  my $start = $class->parse( 'v1.2.3-beta' );
-  isa_ok my $self = $start->increment( $strategy ), $class;
+  my $start = CLASS->parse( 'v1.2.3-beta' );
+  ok not( $start->is_core ), 'Is not core version';
+  isa_ok my $self = $start->increment( $strategy ), CLASS;
   is $self->prefix,       'v',      'prefix';
   is $self->major,        1,        'major';
   is $self->minor,        3,        'minor';
   is $self->patch,        0,        'patch';
   is $self->version_core, 'v1.3.0', 'version_core';
-  is $self->pre_release,  'beta',   'pre_release';
+  ok not( $self->is_core ), 'Is not core version';
+  is $self->pre_release, 'beta', 'pre_release';
   ok $self->has_pre_release,  'pre_release is defined';
   ok not( $self->has_build ), 'build is not defined';
   is "$self", 'v1.3.0-beta', 'Stringification';
@@ -86,52 +91,58 @@ subtest "\"$strategy\" strategy" => sub {
 
 $strategy = 'major';
 subtest "\"$strategy\" strategy" => sub {
-  plan tests => 7;
+  plan 9;
 
-  my $start = $class->parse( '1.2.3' );
-  isa_ok my $self = $start->increment( $strategy ), $class;
+  my $start = CLASS->parse( '1.2.3' );
+  ok $start->is_core, 'Is core version';
+  isa_ok my $self = $start->increment( $strategy ), CLASS;
   is $self->prefix,       undef,   'prefix';
   is $self->major,        2,       'major';
   is $self->minor,        0,       'minor';
   is $self->patch,        0,       'patch';
   is $self->version_core, '2.0.0', 'version_core';
+  ok $self->is_core, 'Is core version';
   ok $start < $self, 'Incremented'
 };
 
 $strategy = 'trial';
 subtest "\"$strategy\" strategy" => sub {
-  plan tests => 20;
+  plan 24;
 
-  like exception { $class->parse( 'v1.2.3' )->increment( 'trial' ) }, qr/\ACannot apply '$strategy'/,
+  like dies { CLASS->parse( 'v1.2.3' )->increment( 'trial' ) }, qr/\ACannot apply '$strategy'/,
     'Version is not a pre-release version';
-  like exception { $class->parse( 'v1.2.3-alpha.1' )->increment( 'trial' ) }, qr/does not match/,
+  like dies { CLASS->parse( 'v1.2.3-alpha.1' )->increment( 'trial' ) }, qr/does not match/,
     'Invalid pre-release extension';
 
-  my $start = $class->parse( '1.2.3-TRIAL' );
-  isa_ok my $self = $start->increment( $strategy ), $class;
-  is $self->prefix,       undef,    'prefix';
-  is $self->major,        1,        'major';
-  is $self->minor,        2,        'minor';
-  is $self->patch,        3,        'patch';
-  is $self->version_core, '1.2.3',  'version_core';
-  is $self->pre_release,  'TRIAL1', 'pre_release';
+  my $start = CLASS->parse( '1.2.3-TRIAL' );
+  ok not( $start->is_core ), 'Is not core version';
+  isa_ok my $self = $start->increment( $strategy ), CLASS;
+  is $self->prefix,       undef,   'prefix';
+  is $self->major,        1,       'major';
+  is $self->minor,        2,       'minor';
+  is $self->patch,        3,       'patch';
+  is $self->version_core, '1.2.3', 'version_core';
+  ok not( $self->is_core ), 'Is not core version';
+  is $self->pre_release, 'TRIAL1', 'pre_release';
   ok $self->has_pre_release, 'pre_release is defined';
   ok $start < $self,         'Incremented';
 
-  $start = $class->new(
+  $start = CLASS->new(
     prefix      => 'v',
     major       => 4,
     minor       => 5,
     patch       => 8,
     pre_release => 'TRIAL004'
   );
-  isa_ok $self = $start->increment( $strategy ), $class;
+  ok not( $start->is_core ), 'Is not core version';
+  isa_ok $self = $start->increment( $strategy ), CLASS;
   is $self->prefix,       'v',      'prefix';
   is $self->major,        4,        'major';
   is $self->minor,        5,        'minor';
   is $self->patch,        8,        'patch';
   is $self->version_core, 'v4.5.8', 'version_core';
-  is $self->pre_release,  'TRIAL5', 'pre_release (leading zeros removed!)';
+  ok not( $self->is_core ), 'Is not core version';
+  is $self->pre_release, 'TRIAL5', 'pre_release (leading zeros removed!)';
   ok $self->has_pre_release, 'pre_release is defined';
   ok $start < $self,         'Incremented'
 }

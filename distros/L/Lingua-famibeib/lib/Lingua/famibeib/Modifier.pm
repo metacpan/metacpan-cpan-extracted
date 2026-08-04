@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
 
@@ -171,6 +171,7 @@ sub cmp {
 }
 
 
+#@returns __PACKAGE__
 sub register {
     my ($self) = @_;
 
@@ -193,6 +194,7 @@ sub as {
         Data::Identifier::Generate->generic(
             request => $str,
             displayname => $str,
+            tagname => $str,
             style => 'id-based',
             namespace => '5c2b24f0-e0d9-4746-bd72-0d07061d0dd7',
             generator => _GENERATOR,
@@ -224,7 +226,7 @@ Lingua::famibeib::Modifier - module to interact with the famibeib word modifiers
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -235,6 +237,8 @@ See also L<Lingua::famibeib::Word>.
 
 This module inherits from L<Data::Identifier::Interface::Simple>, and L<Data::Identifier::Interface::Subobjects>.
 Instances are overloaded so they will stringify to their string representation as per L</as_string>.
+
+=head1 METHODS
 
 =head2 new
 

@@ -1,4 +1,4 @@
-# t/05-hash-ini.t
+# t/02-hash-ini.t
 use strict;
 use warnings;
 use Test::More;

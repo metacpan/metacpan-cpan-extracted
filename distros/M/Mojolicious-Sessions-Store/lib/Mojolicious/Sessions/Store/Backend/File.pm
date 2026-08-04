@@ -1,5 +1,5 @@
 package Mojolicious::Sessions::Store::Backend::File;
-$Mojolicious::Sessions::Store::Backend::File::VERSION = '0.01';
+$Mojolicious::Sessions::Store::Backend::File::VERSION = '0.02';
 # ABSTRACT: File-based session storage backend
 
 use Mojo::Base 'Mojolicious::Sessions::Store::Backend', -signatures;
@@ -71,7 +71,7 @@ Mojolicious::Sessions::Store::Backend::File - File-based session storage backend
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

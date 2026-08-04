@@ -6,5 +6,6 @@ MANIFEST.SKIP
 share/README.md
 t/00-amazon-signature4-lite.t
 t/01-signature4-lite.t
+t/02-s3-path-encoding.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

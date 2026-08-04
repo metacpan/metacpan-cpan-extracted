@@ -17,7 +17,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.32;
+our $VERSION = v0.33;
 
 my @_old_subobjects = qw(db extractor fii store);
 
@@ -163,31 +163,6 @@ sub add_entry {
     }
 }
 
-
-#@returns Data::TagDB
-sub db {
-    my ($self, %opts) = @_;
-    return $self->so_get('db', %opts);
-}
-
-#@returns Data::URIID
-sub extractor {
-    my ($self, %opts) = @_;
-    return $self->so_get('extractor', %opts);
-}
-
-#@returns File::Information
-sub fii {
-    my ($self, %opts) = @_;
-    return $self->so_get('fii', %opts);
-}
-
-#@returns File::FStore
-sub store {
-    my ($self, %opts) = @_;
-    return $self->so_get('store', %opts);
-}
-
 1;
 
 __END__
@@ -202,7 +177,7 @@ Data::Identifier::Cloudlet - format independent identifier object
 
 =head1 VERSION
 
-version v0.32
+version v0.33
 
 =head1 SYNOPSIS
 
@@ -468,34 +443,6 @@ Accepts the same type of objects as L</new> in C<root>. See there for how the ma
 
 Adds one or more entries (non-root) to the cloudlet.
 The same rules apply as for L</new>.
-
-=head2 db, extractor, fii, store
-
-    my Data::TagDB $db        = $cl->db;
-    my Data::URIID $extractor = $cl->extractor;
-    my File::Information $fii = $cl->fii;
-    my File::FStore $store    = $cl->store;
-
-(deprecated since v0.32, will be removed in v0.33)
-
-Gets the corresponding object as passed to L</new>.
-
-If no such object is known, those methods C<die>.
-This can be changed to return C<undef> by passing C<undef> via C<default>.
-
-The following (all optional) options are supported:
-
-=over
-
-=item C<default>
-
-The default value to return if the value is unknown.
-
-=item C<no_defaults>
-
-This option has currently no effect and is ignored.
-
-=back
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 package Mojolicious::Sessions::Store::Backend;
-$Mojolicious::Sessions::Store::Backend::VERSION = '0.01';
+$Mojolicious::Sessions::Store::Backend::VERSION = '0.02';
 # ABSTRACT: Backend interface for Mojolicious::Sessions::Store
 
 use Mojo::Base -base, -signatures;
@@ -30,7 +30,7 @@ Mojolicious::Sessions::Store::Backend - Backend interface for Mojolicious::Sessi
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

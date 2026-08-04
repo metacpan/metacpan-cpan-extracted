@@ -5,7 +5,9 @@ use warnings;
 
 use Exporter 'import';
 
+use Convert::Pheno::Source::CBioPortal;
 use Convert::Pheno::Source::CDISC::DatasetJSON;
+use Convert::Pheno::Source::CDISC::DatasetXML;
 use Convert::Pheno::Source::CDISC::ODM;
 use Convert::Pheno::Source::FHIR;
 use Convert::Pheno::Source::OMOP;
@@ -20,6 +22,8 @@ sub source_adapter {
 
     return Convert::Pheno::Source::Structured->new($converter)
       if $format eq 'beacon' || $format eq 'pxf';
+    return Convert::Pheno::Source::CBioPortal->new($converter)
+      if $format eq 'cbioportal';
     return Convert::Pheno::Source::Tabular->new( $converter, kind => 'csv' )
       if $format eq 'csv';
     return Convert::Pheno::Source::Tabular->new( $converter, kind => 'redcap' )
@@ -28,6 +32,8 @@ sub source_adapter {
       if $format eq 'cdisc-odm';
     return Convert::Pheno::Source::CDISC::DatasetJSON->new($converter)
       if $format eq 'dataset-json';
+    return Convert::Pheno::Source::CDISC::DatasetXML->new($converter)
+      if $format eq 'dataset-xml';
     return Convert::Pheno::Source::FHIR->new($converter)
       if $format eq 'fhir';
     return Convert::Pheno::Source::OpenEHR->new($converter)
