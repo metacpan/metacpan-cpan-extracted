@@ -1,7 +1,7 @@
 ---
 abstract: 'A configurable TCP/HTTP server with file uploads, rate limiting, and threading support (Pure Perl OOP)'
 author:
-  - 'Hans Harder'
+  - 'Hans Harder E<lt>hans[at]atbas.orgE<gt>'
 build_requires:
   Test::More: '0'
 configure_requires:
@@ -17,15 +17,19 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  LightTCP::Server:
+    file: lib/LightTCP/Server.pm
+    version: '2.05'
 requires:
   File::Temp: '0'
   IO::Socket::INET: '0'
   IPC::Open3: '0'
-  perl: '5.008'
+  perl: '5.010'
   threads: '0'
   threads::shared: '0'
 resources:
-  bugtracker: https://github.com/HansH111/LightTCP-Server.pm/issues
-  repository: https://github.com/HansH111/LightTCP-Server.pm.git
-version: '2.04'
+  bugtracker: https://codeberg.org/HansH111/LightTCP-Server.pm/issues
+  repository: https://codeberg.org/HansH111/LightTCP-Server.pm.git
+version: '2.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

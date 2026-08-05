@@ -29,6 +29,9 @@
 #include "jsf_ir.h"
 #include "jsf_err.h"
 #include "jsf_compiled.h"
+#include "jsf_uri.h"
+#include "jsf_frj.h"     /* JSON decode via File::Raw::JSON's C ABI */
+#include "jsf_fetch.h"
 #include "jsf_parse.h"
 #include "jsf_interp.h"
 

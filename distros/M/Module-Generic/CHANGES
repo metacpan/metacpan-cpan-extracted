@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Generic
 
+v1.7.0 2026-07-14T07:48:21+0900
+    [New features]
+    - Added Module::Generic::File::mime that will return the mime type of the underlying
+      element.
+
 v1.6.2 2026-07-06T11:20:51+0900
     [Bug fixes]
     - Fixed Module::Generic::SharedMem op() to update the stored semaphore identifier

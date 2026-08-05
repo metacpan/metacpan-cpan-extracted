@@ -4,7 +4,7 @@ Markdent - An event-based Markdown parser toolkit
 
 # VERSION
 
-version 0.40
+version 0.41
 
 # SYNOPSIS
 
@@ -104,8 +104,6 @@ changes.
 
 Bugs may be submitted at [https://github.com/houseabsolute/Markdent/issues](https://github.com/houseabsolute/Markdent/issues).
 
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
-
 # SOURCE
 
 The source code repository for Markdent can be found at [https://github.com/houseabsolute/Markdent](https://github.com/houseabsolute/Markdent).
@@ -125,7 +123,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHOR
 
@@ -137,6 +135,7 @@ Dave Rolsky <autarch@urth.org>
 - Denis Ibaev <dionys@gmail.com>
 - Jason McIntosh <jmac@appleseed-sc.com>
 - Jonas Smedegaard <dr@jones.dk>
+- Karen Etheridge <ether@cpan.org>
 - Konrad Bucheli <konrad.bucheli@gmx.ch>
 - Polina Shubina <925043@mai.com>
 - Shlomi Fish <shlomif@shlomifish.org>
@@ -145,7 +144,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Dave Rolsky.
+This software is copyright (c) 2026 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

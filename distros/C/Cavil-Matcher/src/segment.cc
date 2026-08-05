@@ -152,7 +152,7 @@ bool Segment::open_owned(std::vector<char>&& buf) {
   return open(_owned.data(), _owned.size());
 }
 
-bool Segment::open(const char* data, size_t len) {
+bool Segment::open(const char* data, size_t len, bool verify_crc) {
   _valid  = false;
   _base   = data;
   _len    = len;
@@ -185,7 +185,11 @@ bool Segment::open(const char* data, size_t len) {
   total += skip_bytes;
   if (total != len) return false;
 
-  if (cavil_crc32(data + sizeof(SegmentHeader), total - sizeof(SegmentHeader)) != h->payload_crc32) return false;
+  // Corruption detection over the whole payload. Skipped on the trusted scan path (see the header doc):
+  // structural validation below still runs, so a corrupt segment is rejected or safe regardless.
+  if (verify_crc
+    && cavil_crc32(data + sizeof(SegmentHeader), total - sizeof(SegmentHeader)) != h->payload_crc32)
+    return false;
 
   // Semantic header invariants. The CRC only proves the bytes are the ones the writer produced; it does
   // not prove a *malicious or buggy* writer produced sane values. These fields steer the scan (notably

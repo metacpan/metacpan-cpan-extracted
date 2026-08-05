@@ -85,21 +85,29 @@ for my $fn (sort glob('t/fixtures/licenses/04license.*.txt')) {
 # --- Format safety: corrupt segments are rejected, never mis-read or crashed on -------------------
 my $good = slurp($seg_a);
 
-sub attach_bytes {
-  my $bytes = shift;
-  my $f     = "$dir/corrupt.$$." . int(rand(1e9));
+# The scan path (attach/load) always validates a segment's shape and structure - that is what keeps a bad
+# file from ever being mis-read or crashed on. It deliberately does NOT re-checksum the whole payload:
+# segments are Cavil's own immutable, atomically-published cache, CRC-verified when written. The full CRC
+# is available on demand via verify() (and runs at publish time).
+sub attach_bytes { _try_bytes('attach', @_) }
+sub verify_bytes { _try_bytes('verify', @_) }
+
+sub _try_bytes {
+  my ($method, $bytes) = @_;
+  my $f = "$dir/corrupt.$$." . int(rand(1e9));
   open my $fh, '>', $f or die $!;
   binmode $fh;
   print {$fh} $bytes;
   close $fh;
   my $m  = Cavil::Matcher::init_matcher();
-  my $ok = $m->attach($f);
+  my $ok = $m->$method($f);
   unlink $f;
   return $ok;
 }
 
 is(attach_bytes($good), 1, 'a valid segment attaches');
 
+# Structural/shape corruption is always rejected, even on the trusted scan path.
 my $bad_magic = $good;
 substr($bad_magic, 0, 1) = 'X';
 is(attach_bytes($bad_magic), 0, 'wrong magic rejected');
@@ -108,14 +116,33 @@ my $bad_version = $good;
 substr($bad_version, 8, 4) = pack('L', 999);
 is(attach_bytes($bad_version), 0, 'wrong format version rejected');
 
-my $bad_crc = $good;
-substr($bad_crc, length($bad_crc) - 1, 1) = chr((ord(substr($bad_crc, length($bad_crc) - 1, 1)) ^ 0xFF));
-is(attach_bytes($bad_crc), 0, 'flipped payload byte fails CRC');
-
 is(attach_bytes(substr($good, 0, 20)),                                0, 'truncated file rejected');
 is(attach_bytes(''),                                                  0, 'empty file rejected');
 is(attach_bytes('not a segment at all, just random text bytes here'), 0, 'garbage file rejected');
 is(attach_bytes($good . 'trailing junk'),                             0, 'trailing bytes after payload rejected');
+
+# An out-of-range index is caught by the structural walk, which runs on the scan path regardless of the
+# CRC - so memory safety never depends on the checksum. Packed layout is header(56) | nodes | children |
+# skips; FlatNode is 20 bytes, and each FlatChild starts with an 8-byte hash then a 4-byte child_node.
+my ($node_count, $child_count) = unpack('L L', substr($good, 32, 8));
+cmp_ok($child_count, '>', 0, 'segment A has children to corrupt');
+my $bad_index      = $good;
+my $child_node_off = 56 + $node_count * 20 + 8;
+substr($bad_index, $child_node_off, 4) = pack('L', 0xFFFFFFFF);
+is(attach_bytes($bad_index), 0, 'out-of-range child index rejected on the scan path (memory safety)');
+
+# The whole-payload CRC is checked by verify(), not by the scan path. Corrupt only the stored CRC field
+# (header offset 48) so the payload and structure stay valid: verify() rejects it, the scan path trusts it.
+is(verify_bytes($good), 1, 'verify() passes a good segment');
+my $bad_stored_crc = $good;
+substr($bad_stored_crc, 48, 4) = pack('L', unpack('L', substr($good, 48, 4)) ^ 0xFFFFFFFF);
+is(verify_bytes($bad_stored_crc), 0, 'verify() catches a bad CRC');
+is(attach_bytes($bad_stored_crc), 1, 'scan path trusts a structurally-valid segment despite a bad CRC');
+
+# A flipped payload byte is likewise caught by the full check.
+my $bad_crc = $good;
+substr($bad_crc, length($bad_crc) - 1, 1) = chr((ord(substr($bad_crc, length($bad_crc) - 1, 1)) ^ 0xFF));
+is(verify_bytes($bad_crc), 0, 'verify() catches a flipped payload byte');
 
 # A matcher whose only segment failed to attach simply finds nothing (no crash).
 my $none = Cavil::Matcher::init_matcher();
@@ -302,12 +329,11 @@ cmp_deeply($none->find_matches('t/fixtures/licenses/04license.1.txt'), [], 'miss
   ok($e->load($good_seg), 'load a good segment');
   cmp_deeply($e->find_matches($probe), [[1, 1, 1]], 'the loaded segment matches');
 
-  # A corrupt segment (flipped payload byte -> CRC failure) fails to load...
-  my $bad_bytes = slurp($good_seg);
-  substr($bad_bytes, length($bad_bytes) - 1, 1) = chr(ord(substr($bad_bytes, length($bad_bytes) - 1, 1)) ^ 0xFF);
+  # A structurally-invalid segment (truncated) fails to load - the scan path rejects malformed structure
+  # even though it trusts the CRC of a well-formed file...
   my $bad_seg = "$dir/loadbad.seg";
   open my $bf, '>:raw', $bad_seg or die $!;
-  print {$bf} $bad_bytes;
+  print {$bf} substr(slurp($good_seg), 0, 20);
   close $bf;
   is($e->load($bad_seg), 0, 'loading a corrupt segment fails');
 

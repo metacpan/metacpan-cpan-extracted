@@ -49,6 +49,16 @@ own work, and an **agent** (role `agent`) driving tasks. Agent execution is
 opt-in (`claude: true` or an explicit `command:`); with no agent configured its
 default action is the read-only **Overview**.
 
+**Disabled board**:
+A board that opted out of automated agent runs in its own karr state
+(`foundation.enabled` in `refs/karr/config`, written by `karr disable
+[--reason]`). Board state, not machine state — it syncs, so every foundation
+instance on every machine honours it, unlike the local `.karr` file. The opt-out
+is absolute: checked before agent-command resolution and before the drain
+decision, so it wins over `--command`, `default_command`, the `.karr` `command`
+and `claude: true`, and `--force` does not override it. A parked backlog stays
+fully usable by hand; only automation is switched off.
+
 **Overview**:
 Foundation's read-only dashboard (`--status` / `--overview`, or the default when
 no agent is configured) — per board: status counts and what is

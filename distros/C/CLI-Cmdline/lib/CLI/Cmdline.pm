@@ -8,7 +8,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(parse);
 our @EXPORT = qw(parse);
-our $VERSION   = '1.28';
+our $VERSION   = '1.30';
 
 use constant {
     MATCH_SWITCH => 1,
@@ -140,7 +140,13 @@ CLI::Cmdline - Minimal command-line parser with short/long options and aliases i
 
 =head1 VERSION
 
-1.28
+1.30
+
+=head1 LICENSE
+
+This module is free software.
+
+You may redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 SYNOPSIS
 
@@ -370,20 +376,5 @@ Modifies C<%opt> in place. Removes processed options from C<@ARGV>, leaving only
 positional arguments.
 
 =back
-
-=head1 AUTHOR
-
-Hans Harder <hans@atbas.org>
-
-=head1 LICENSE
-
-LICENSE AND COPYRIGHT
-
-This software is Copyright (c) 2026 by Hans Harder.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-See the official Perl licensing terms: https://dev.perl.org/licenses/
 
 =cut

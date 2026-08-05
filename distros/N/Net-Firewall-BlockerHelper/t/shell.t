@@ -92,6 +92,34 @@ eval {
 		die('$banned[1] not undef');
 	}
 
+	if ( !$backend_obj->{cidr_supported} ) {
+		die('$backend_obj->{cidr_supported} not true');
+	}
+
+	$fw_helper->ban_cidr( ban => '1.2.3.0/24' );
+	if ( !defined( $fw_helper->{test_data} ) ) {
+		die('Backend did not set $fw_helper->{test_data}');
+	} elsif ( $fw_helper->{test_data} ne 'echo ban 1.2.3.0/24' ) {
+		die('($fw_helper->{test_data} ne "echo ban 1.2.3.0/24"... '.Dumper($fw_helper->{test_data}));
+	}
+
+	my @banned_cidr = $fw_helper->list_cidr;
+	if ( $banned_cidr[0] ne '1.2.3.0/24' ) {
+		die('$banned_cidr[0] ne "1.2.3.0/24"... '.Dumper(\@banned_cidr));
+	}
+
+	$fw_helper->unban_cidr( ban => '1.2.3.0/24' );
+	if ( !defined( $fw_helper->{test_data} ) ) {
+		die('Backend did not set $fw_helper->{test_data}');
+	} elsif ( $fw_helper->{test_data} ne 'echo unban 1.2.3.0/24' ) {
+		die('($fw_helper->{test_data} ne "echo unban 1.2.3.0/24"... '.Dumper($fw_helper->{test_data}));
+	}
+
+	@banned_cidr = $fw_helper->list_cidr;
+	if ( defined( $banned_cidr[0] ) ) {
+		die('$banned_cidr[0] not undef after unban_cidr... '.Dumper(\@banned_cidr));
+	}
+
 	$fw_helper->re_init;
 	if ( !defined( $fw_helper->{test_data} ) ) {
 		die('Backend did not set $fw_helper->{test_data}');

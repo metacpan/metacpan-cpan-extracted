@@ -1424,6 +1424,15 @@ no_leaks_ok {
 #---------------------------
 #   rnorm
 #----------------------------
+# rnorm, runif and rbinom all draw from Drand01, which is Perl_drand48 and so
+# gives the same stream on every platform for a given seed. Seed it: the checks
+# below compare a sample statistic against its population value, and an
+# unconditional tolerance on an unseeded draw fails at some rate no matter how
+# wide it is. The min and max of 9999 uniforms are the sharpest of them --
+# P(min > 1e-3) = 0.999**9999 = 4.5e-5 each -- which is about 1 failure per
+# 11,000 runs of this file, rare enough to look like a real bug when a smoker
+# finally hits it and impossible to reproduce afterwards.
+srand 20260804;
 my ($rmean, $sd, $n) = (10, 2, 9999);
 my $normals = rnorm( n => $n, mean => $rmean, sd => $sd);
 no_leaks_ok {

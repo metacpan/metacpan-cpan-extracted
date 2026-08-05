@@ -1,7 +1,7 @@
 # ABSTRACT: Atomically find and claim the next available task
 
 package App::karr::Cmd::Pick;
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -164,7 +164,7 @@ App::karr::Cmd::Pick - Atomically find and claim the next available task
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

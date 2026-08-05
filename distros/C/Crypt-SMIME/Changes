@@ -1,5 +1,10 @@
 Revision history for Crypt::SMIME
 
+0.34    Tue Aug  4 17:31:25 JST 2026
+        - Fixed a build issue with OpenSSL 4.0, Patch by steve.traylen
+          [...] cern.ch
+          (https://rt.cpan.org/Public/Bug/Display.html?id=180472)
+
 0.33    Thu Apr 16 13:59:10 JST 2026
         - Fixed a build issue on Windows, reported by
           Thomas.Eckardt [...] thockar.com

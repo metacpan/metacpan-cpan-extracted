@@ -297,6 +297,8 @@ EOT
     isa_ok( $io => 'Module::Generic::Scalar::IO' );
     {
         no warnings;
+        # IO::Handle still emits warnings even after 'no warnings' :(
+        local $SIG{__WARN__} = sub{};
         $rv = $io->print( "print should not work\n" );
     }
     ok( !$rv, 'cannot print in read-only mode' );

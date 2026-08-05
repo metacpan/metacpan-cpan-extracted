@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use File::Raw;
 use Tie::OrderedHash;
@@ -263,6 +263,98 @@ largest single JSON value in the stream.
 
 To abort mid-stream, C<die> from the callback. The exception
 propagates and the buffer is freed.
+
+=head1 C ABI
+
+File::Raw::JSON exposes a small C ABI so that B<other XS modules> can decode and
+encode JSON entirely in C, with no per-call Perl codec dispatch. The motivating
+consumer is an event-loop server (L<Hyperman>) that decodes a JSON request body
+on the worker hot path.
+
+The header is distributed through L<ExtUtils::Depends> - a consumer B<does not
+copy it>. This dist is an ExtUtils::Depends provider (it also consumes File::Raw
+and Tie::OrderedHash the same way): building installs F<frj_abi.h> and writes
+C<File::Raw::JSON::Install::Files>, so a dependent's F<Makefile.PL> that says
+
+    my $pkg = ExtUtils::Depends->new('My::Consumer', 'File::Raw::JSON');
+    WriteMakefile( ..., $pkg->get_makefile_vars );
+
+picks up F<frj_abi.h> on its include path automatically.
+
+This is an integration surface for XS authors, not part of the Perl API. Perl
+callers should use L</DIRECT CODEC> (C<file_json_decode> / C<file_json_encode>).
+
+=head2 The table
+
+The contract lives in F<include/frj_abi.h> (installed via ExtUtils::Depends):
+
+    #define FRJ_ABI_VERSION 1
+
+    typedef struct frj_opts {
+        int utf8, ordered, relaxed, allow_nonref, allow_nan_inf;
+        int max_depth;                 /* 0 => default (512)     */
+        int pretty, indent;            /* indent 0 => default (2) */
+        int sort_keys, canonical;
+    } frj_opts;
+
+    typedef struct frj_abi {
+        int abi_version;                          /* == FRJ_ABI_VERSION */
+        void (*opts_init)(frj_opts *o);
+        SV  *(*decode)(pTHX_ const char *bytes, STRLEN len, const frj_opts *o);
+        AV  *(*decode_lines)(pTHX_ const char *bytes, STRLEN len, const frj_opts *o);
+        SV  *(*encode)(pTHX_ SV *value, const frj_opts *o);
+        SV  *(*encode_lines)(pTHX_ SV *payload, const frj_opts *o);
+    } frj_abi;
+
+=head2 File::Raw::JSON::_abi_ptr
+
+    my $iv = File::Raw::JSON::_abi_ptr;
+
+Returns the address of the process-wide C<frj_abi> table as an integer (an
+C<IV>). A consumer calls this once at C<BOOT>, C<INT2PTR>s it to a
+C<< const frj_abi * >>, and checks C<< ->abi_version == FRJ_ABI_VERSION >>
+before using it. Not intended to be called from Perl for any other purpose.
+
+=head2 Functions
+
+C<opts_init> fills C<*o> with the File::Raw::JSON defaults; call it, then set the
+fields you want (or pass C<NULL> as the C<opts> argument to any call for the
+defaults). C<decode> / C<decode_lines> return an C<SV> / C<AV> with a reference
+count of one owned by the caller, and croak on malformed input with a byte-offset
+message. C<encode> / C<encode_lines> return JSON bytes as an C<SV> (+1 owned) and
+croak on an unencodable shape. C<decode_lines> / C<encode_lines> handle JSONL
+(one record per line).
+
+=head2 Example: a Hyperman handler decoding a JSON body
+
+Vendor nothing - add File::Raw::JSON via ExtUtils::Depends (above), resolve the
+table at boot, then decode per request:
+
+    #include "frj_abi.h"   /* found via ExtUtils::Depends, not copied */
+
+    static const frj_abi *FRJ = NULL;
+
+    MODULE = My::Consumer   PACKAGE = My::Consumer
+
+    BOOT:
+    {
+        IV p = 0; dSP;
+        eval_pv("require File::Raw::JSON;", FALSE);
+        PUSHMARK(SP); PUTBACK;
+        if (call_pv("File::Raw::JSON::_abi_ptr", G_SCALAR|G_EVAL) > 0) {
+            SPAGAIN; p = POPi; PUTBACK;
+        }
+        if (p) {
+            const frj_abi *a = INT2PTR(const frj_abi *, p);
+            if (a && a->abi_version == FRJ_ABI_VERSION) FRJ = a;
+        }
+        /* FRJ == NULL => the installed File::Raw::JSON is too old or absent;
+         * fall back to the Perl codec. */
+    }
+
+    # per request, on the JSON body bytes:
+    #   SV *val = FRJ->decode(aTHX_ body, body_len, NULL);
+    #   ... use val ...  (sv_2mortal it or SvREFCNT_dec when done)
 
 =head1 SEE ALSO
 

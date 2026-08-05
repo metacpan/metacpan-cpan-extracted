@@ -9,9 +9,25 @@
 #define HM_POOL_MAX     1024   /* pooled hm_conn structs kept per loop     */
 #define HM_IOV_MAX      64     /* writev: header + up to 63 body chunks    */
 #define HM_SWEEP_SECS   5.0    /* timeout sweep interval                    */
+#define HM_HIDX_STACK   64     /* header-line index on the stack before
+                                  falling back to the loop's growable one  */
+
+#include "hm_parse.h"   /* hm_hline, hm_parse_index, hm_chunked_* */
 
 typedef struct hm_loop hm_loop;
 typedef struct hm_conn hm_conn;
+
+/* A bound listening socket. The loop holds an array of these; a connection
+ * remembers the one it was accepted on so TLS-wrap, SERVER_PORT, and the
+ * built-in https redirect are all per-listener. */
+typedef struct {
+    int   fd;             /* bound listener fd, -1 until bound        */
+    char *host;           /* bind host (owned)                        */
+    int   port;
+    void *tls_ctx;        /* SSL_CTX*; NULL = plain                   */
+    int   http2;          /* per-listener h2 (h2c / ALPN)             */
+    int   redirect_https; /* 0 = off; else target https port for 301  */
+} hm_listener;
 
 struct hm_conn {
     int      fd;
@@ -25,6 +41,11 @@ struct hm_conn {
     UV       id;            /* generation id, guards fd reuse       */
     UV       nreqs;         /* requests served on this connection   */
     SV      *io_sv;         /* psgix.io: dup'd filehandle, per conn */
+    SV      *peer_sv;       /* cached env values, constant for the  */
+    SV      *peer_host_sv;  /* life of the connection: REMOTE_ADDR, */
+    SV      *peer_port_sv;  /* REMOTE_HOST, REMOTE_PORT,            */
+    SV      *sname_sv;      /* SERVER_NAME,                         */
+    SV      *sport_sv;      /* SERVER_PORT                          */
     SV      *resp_f;        /* pending response Future (awaiting)   */
     SV      *env_sv;        /* held while parked, for access_log    */
     void    *h2;            /* hm_h2_sess* when in HTTP/2 mode       */
@@ -36,11 +57,13 @@ struct hm_conn {
     int      last_status;   /* last response status/bytes (logging) */
     size_t   last_blen;
     char     peer[INET6_ADDRSTRLEN];  /* REMOTE_ADDR, filled at accept    */
+    int      peer_port;               /* REMOTE_PORT, filled at accept    */
     time_t   last_active;
     time_t   req_start;     /* first byte of an incomplete request  */
     hm_conn *lru_prev, *lru_next;
     hm_conn *pool_next;
     hm_loop *loop;
+    hm_listener *lst;       /* listener this conn was accepted on   */
 };
 
 /* app-owned fd watcher: a one-shot Future or a persistent callback */
@@ -62,12 +85,15 @@ struct hm_loop {
     AV         *deferred;           /* run-soon callbacks          */
     hm_again   *again;              /* conns with buffered requests */
     int         again_n, again_cap;
+    hm_hline   *hidx;               /* header-line index overflow buffer */
+    int         hidx_cap;
     hm_conn    *lru_head, *lru_tail;
     hm_conn    *pool; int pool_n;
     hm_tw      *sweep_tw;
     SV         *app;                /* server: PSGI app coderef     */
-    int         listen_fd;          /* server: -1 when not attached */
-    int         port;
+    hm_listener *listeners;         /* server: bound listeners      */
+    int         nlisteners;
+    int         attached;           /* server attached (>=1 listener) */
     int         nconns;
     int         stop;
     int         stopping;           /* graceful shutdown in progress */
@@ -78,7 +104,6 @@ struct hm_loop {
     double      header_timeout;
     int         max_pipeline;       /* fairness: requests per conn per wakeup */
     size_t      max_read;           /* request size ceiling (headers + body) */
-    char       *host;               /* bind host, for SERVER_NAME */
     SV         *self_sv;            /* cached psgix.loop wrapper */
     SV         *log_cb;             /* access_log coderef, or NULL */
     int         log_fd;             /* fast access-log fd (C writer), or -1 */
@@ -93,9 +118,15 @@ struct hm_loop {
     int         recycle_pending;    /* max_requests hit; drain at loop top */
     double      shutdown_grace;     /* graceful-drain bound (secs)   */
     hm_tw      *hardstop_tw;
-    int         http2;              /* enable HTTP/2 (h2c) detection */
-    void       *tls_ctx;            /* SSL_CTX* when serving HTTPS    */
 };
+
+/* Find the listener owning a ready fd (listener count is tiny). */
+static hm_listener *hm_listener_for_fd(hm_loop *loop, int fd) {
+    int i;
+    for (i = 0; i < loop->nlisteners; i++)
+        if (loop->listeners[i].fd == fd) return &loop->listeners[i];
+    return NULL;
+}
 
 static SV      *hm_empty_input;     /* shared empty psgi.input */
 static pid_t    hm_children[1024];
@@ -130,17 +161,67 @@ static const char *hm_reason(int s) {
     }
 }
 
-/* Format a peer sockaddr into a printable REMOTE_ADDR string ("" on failure
- * or for address families we don't serve). */
-static void hm_fmt_peer(char *out, size_t outlen, const struct sockaddr *sa) {
+/* Tiny decimal formatters: snprintf's format parsing and locale machinery
+ * are measurable at hot-path request rates. Return bytes written. */
+static size_t hm_utoa(char *out, unsigned long v) {
+    char tmp[20];
+    size_t n = 0, i;
+    do { tmp[n++] = (char)('0' + v % 10); v /= 10; } while (v);
+    for (i = 0; i < n; i++) out[i] = tmp[n - 1 - i];
+    return n;
+}
+static size_t hm_itoa(char *out, long v) {
+    if (v < 0) { out[0] = '-'; return 1 + hm_utoa(out + 1, 0UL - (unsigned long)v); }
+    return hm_utoa(out, (unsigned long)v);
+}
+
+/* Status line for the response: precomputed for the common statuses, built
+ * into buf (>= 64 bytes) otherwise. Sets *len, returns the line. */
+static const char *hm_status_line(int s, size_t *len, char *buf) {
+#define HM_SL(str) do { *len = sizeof(str) - 1; return str; } while (0)
+    switch (s) {
+        case 200: HM_SL("HTTP/1.1 200 OK\r\n");
+        case 201: HM_SL("HTTP/1.1 201 Created\r\n");
+        case 204: HM_SL("HTTP/1.1 204 No Content\r\n");
+        case 301: HM_SL("HTTP/1.1 301 Moved Permanently\r\n");
+        case 302: HM_SL("HTTP/1.1 302 Found\r\n");
+        case 304: HM_SL("HTTP/1.1 304 Not Modified\r\n");
+        case 400: HM_SL("HTTP/1.1 400 Bad Request\r\n");
+        case 401: HM_SL("HTTP/1.1 401 Unauthorized\r\n");
+        case 403: HM_SL("HTTP/1.1 403 Forbidden\r\n");
+        case 404: HM_SL("HTTP/1.1 404 Not Found\r\n");
+        case 405: HM_SL("HTTP/1.1 405 Method Not Allowed\r\n");
+        case 500: HM_SL("HTTP/1.1 500 Internal Server Error\r\n");
+    }
+#undef HM_SL
+    {
+        const char *r = hm_reason(s);
+        size_t rl = strlen(r), n = 9;
+        memcpy(buf, "HTTP/1.1 ", 9);
+        n += hm_itoa(buf + n, (long)s);
+        buf[n++] = ' ';
+        memcpy(buf + n, r, rl); n += rl;
+        buf[n++] = '\r'; buf[n++] = '\n';
+        *len = n;
+        return buf;
+    }
+}
+
+/* Format a peer sockaddr into a printable REMOTE_ADDR string and its port ("" /
+ * 0 on failure or for address families we don't serve). */
+static void hm_fmt_peer(char *out, size_t outlen, int *port, const struct sockaddr *sa) {
     out[0] = '\0';
+    if (port) *port = 0;
     if (!sa) return;
-    if (sa->sa_family == AF_INET)
-        inet_ntop(AF_INET, &((const struct sockaddr_in *)sa)->sin_addr,
-                  out, (socklen_t)outlen);
-    else if (sa->sa_family == AF_INET6)
-        inet_ntop(AF_INET6, &((const struct sockaddr_in6 *)sa)->sin6_addr,
-                  out, (socklen_t)outlen);
+    if (sa->sa_family == AF_INET) {
+        const struct sockaddr_in *s4 = (const struct sockaddr_in *)sa;
+        inet_ntop(AF_INET, &s4->sin_addr, out, (socklen_t)outlen);
+        if (port) *port = ntohs(s4->sin_port);
+    } else if (sa->sa_family == AF_INET6) {
+        const struct sockaddr_in6 *s6 = (const struct sockaddr_in6 *)sa;
+        inet_ntop(AF_INET6, &s6->sin6_addr, out, (socklen_t)outlen);
+        if (port) *port = ntohs(s6->sin6_port);
+    }
 }
 
 static void hm_set_nonblock(int fd) {
@@ -299,6 +380,11 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
     loop->nconns--;
     if (c->io_sv)  { SvREFCNT_dec(c->io_sv);  c->io_sv = NULL; }
     if (c->env_sv) { SvREFCNT_dec(c->env_sv); c->env_sv = NULL; }
+    if (c->peer_sv)      { SvREFCNT_dec(c->peer_sv);      c->peer_sv = NULL; }
+    if (c->peer_host_sv) { SvREFCNT_dec(c->peer_host_sv); c->peer_host_sv = NULL; }
+    if (c->peer_port_sv) { SvREFCNT_dec(c->peer_port_sv); c->peer_port_sv = NULL; }
+    if (c->sname_sv)     { SvREFCNT_dec(c->sname_sv);     c->sname_sv = NULL; }
+    if (c->sport_sv)     { SvREFCNT_dec(c->sport_sv);     c->sport_sv = NULL; }
     if (c->h2)     { hm_h2_free(aTHX_ c->h2); c->h2 = NULL; }
     if (loop->pool_n < HM_POOL_MAX) {
         c->pool_next = loop->pool;
@@ -323,7 +409,7 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
     }
 }
 
-static hm_conn *hm_new_conn(hm_loop *loop, int fd) {
+static hm_conn *hm_new_conn(hm_loop *loop, int fd, hm_listener *lst) {
     hm_conn *c;
     if (loop->pool) {
         char  *wbuf, *rbuf; size_t wcap, rcap;
@@ -336,23 +422,24 @@ static hm_conn *hm_new_conn(hm_loop *loop, int fd) {
         c->wbuf = wbuf; c->wcap = wcap;
         c->rbuf = rbuf; c->rcap = rcap;
     } else {
-        c = (hm_conn *)calloc(1, sizeof(hm_conn));
+        c = (hm_conn *)hm_xcalloc(1, sizeof(hm_conn));
     }
     if (!c->rbuf) {
-        c->rbuf = (char *)malloc(HM_RBUF);
+        c->rbuf = (char *)hm_xmalloc(HM_RBUF);
         c->rcap = HM_RBUF;
     }
     c->fd = fd;
     c->keepalive = 1;
     c->id = ++hm_id_counter;
     c->loop = loop;
+    c->lst = lst;
     c->last_active = loop->now;
     loop->conns[fd] = c;
     loop->nconns++;
     hm_set_nonblock(fd);
     { int one = 1; setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one)); }
     loop->be->add_io(loop->be, fd, HM_EV_READ, 0);
-    if (loop->tls_ctx) hm_tls_wrap(c, loop->tls_ctx);   /* TLS: handshake first */
+    if (lst && lst->tls_ctx) hm_tls_wrap(c, lst->tls_ctx);   /* TLS: handshake first */
     /* append to LRU tail */
     c->lru_prev = loop->lru_tail;
     if (loop->lru_tail) loop->lru_tail->lru_next = c;
@@ -362,22 +449,6 @@ static hm_conn *hm_new_conn(hm_loop *loop, int fd) {
 }
 
 /* ---- HTTP parse ---------------------------------------------------------- */
-
-/* Scan the header block for Content-Length; return its value or 0. */
-static long hm_scan_content_length(const char *head, size_t headlen) {
-    const char *p = head, *hend = head + headlen;
-    while (p < hend) {
-        const char *eol = (const char *)memchr(p, '\n', hend - p);
-        size_t len = eol ? (size_t)(eol - p) : (size_t)(hend - p);
-        if (len >= 15 && strncasecmp(p, "Content-Length:", 15) == 0) {
-            const char *v = p + 15;
-            while (v < p + len && (*v == ' ' || *v == '\t')) v++;
-            return strtol(v, NULL, 10);
-        }
-        p = eol ? eol + 1 : hend;
-    }
-    return 0;
-}
 
 /* Find a request header's value in the header block (case-insensitive name).
  * Returns a pointer to the (trimmed) value and sets *vlen, or NULL. */
@@ -437,12 +508,67 @@ static SV *hm_pct_decode(pTHX_ const char *p, STRLEN n) {
     return sv;
 }
 
-/* Build a full PSGI env from the header block (request line + headers) and,
- * if present, the request body. Sets c->keepalive from the request. */
+/* ---- $env fast path ------------------------------------------------------
+ * The fixed $env keys as shared-string SVs: the hash is computed once and
+ * cached in the shared string table, so hv_store_ent skips both the hashing
+ * and the key copy on every request. Values that never vary per process
+ * ([1,1], the 0/1 flags, psgi.errors) are read-only singletons shared by
+ * refcount; per-connection constants (REMOTE_*, SERVER_*) are cached on the
+ * connection. Anything a middleware conventionally assigns in place
+ * (psgi.url_scheme, SCRIPT_NAME, PATH_INFO) stays a fresh SV per request. */
+
+enum {
+    HMK_REQUEST_METHOD, HMK_REQUEST_URI, HMK_PATH_INFO, HMK_QUERY_STRING,
+    HMK_SERVER_PROTOCOL, HMK_SCRIPT_NAME, HMK_SERVER_NAME, HMK_SERVER_PORT,
+    HMK_REMOTE_ADDR, HMK_REMOTE_HOST, HMK_REMOTE_PORT,
+    HMK_PSGI_VERSION, HMK_PSGI_URL_SCHEME, HMK_PSGI_MULTITHREAD,
+    HMK_PSGI_MULTIPROCESS, HMK_PSGI_RUN_ONCE, HMK_PSGI_STREAMING,
+    HMK_PSGI_NONBLOCKING, HMK_PSGI_ERRORS, HMK_PSGIX_LOOP, HMK_PSGIX_IO,
+    HMK_PSGI_INPUT, HMK_PSGIX_INPUT_BUFFERED, HMK_CONTENT_LENGTH,
+    HMK_CONTENT_TYPE, HMK_COUNT
+};
+static const char *const hm_env_key_name[HMK_COUNT] = {
+    "REQUEST_METHOD", "REQUEST_URI", "PATH_INFO", "QUERY_STRING",
+    "SERVER_PROTOCOL", "SCRIPT_NAME", "SERVER_NAME", "SERVER_PORT",
+    "REMOTE_ADDR", "REMOTE_HOST", "REMOTE_PORT",
+    "psgi.version", "psgi.url_scheme", "psgi.multithread",
+    "psgi.multiprocess", "psgi.run_once", "psgi.streaming",
+    "psgi.nonblocking", "psgi.errors", "psgix.loop", "psgix.io",
+    "psgi.input", "psgix.input.buffered", "CONTENT_LENGTH",
+    "CONTENT_TYPE"
+};
+static SV *hm_env_key[HMK_COUNT];
+static SV *hm_env_zero, *hm_env_one;   /* read-only 0/1 flag values      */
+static SV *hm_env_version;             /* read-only [1,1]                */
+static SV *hm_env_errors;              /* read-only \*STDERR             */
+
+static void hm_env_init(pTHX) {
+    int i;
+    AV *ver;
+    if (hm_env_key[0]) return;
+    for (i = 0; i < HMK_COUNT; i++)
+        hm_env_key[i] = newSVpvn_share(hm_env_key_name[i],
+                                       strlen(hm_env_key_name[i]), 0);
+    hm_env_zero = newSViv(0); SvREADONLY_on(hm_env_zero);
+    hm_env_one  = newSViv(1); SvREADONLY_on(hm_env_one);
+    ver = newAV();
+    av_push(ver, newSViv(1)); av_push(ver, newSViv(1));
+    SvREADONLY_on((SV *)ver);
+    hm_env_version = newRV_noinc((SV *)ver); SvREADONLY_on(hm_env_version);
+    hm_env_errors  = newRV_inc((SV *)PL_stderrgv); SvREADONLY_on(hm_env_errors);
+}
+
+#define hm_env_store(env, k, val) \
+    (void)hv_store_ent((env), hm_env_key[(k)], (val), 0)
+
+/* Build a full PSGI env from the request line, the header lines indexed by
+ * idx (from hm_parse_index) and, if present, the request body. Sets
+ * c->keepalive from the request. */
 static HV *hm_build_env(pTHX_ char *head, size_t headlen,
-                        const char *body, long clen, hm_conn *c) {
+                        const char *body, long clen, hm_conn *c,
+                        const hm_hline *idx, int nlines) {
     HV *env = newHV();
-    AV *ver = newAV(); av_push(ver, newSViv(1)); av_push(ver, newSViv(1));
+    hm_env_init(aTHX);
 
     /* request line */
     char *line_end = (char *)memchr(head, '\r', headlen);
@@ -465,83 +591,104 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     const char *qs = ""; STRLEN qs_l = 0;
     if (qmark) { path_l = (STRLEN)(qmark - uri); qs = qmark + 1; qs_l = ulen - path_l - 1; }
 
-    hv_stores(env, "REQUEST_METHOD",   newSVpvn(method, mlen));
-    hv_stores(env, "REQUEST_URI",      newSVpvn(uri, ulen));
-    hv_stores(env, "PATH_INFO",        hm_pct_decode(aTHX_ path, path_l));
-    hv_stores(env, "QUERY_STRING",     newSVpvn(qs, qs_l));
-    hv_stores(env, "SERVER_PROTOCOL",  newSVpvn(proto, plen));
-    hv_stores(env, "SCRIPT_NAME",      newSVpvs(""));
-    hv_stores(env, "SERVER_NAME",      newSVpv(c->loop->host ? c->loop->host : "0.0.0.0", 0));
-    hv_stores(env, "SERVER_PORT",      newSViv(c->loop->port));
-    if (c->peer[0]) hv_stores(env, "REMOTE_ADDR", newSVpv(c->peer, 0));
-    hv_stores(env, "psgi.version",     newRV_noinc((SV *)ver));
-    hv_stores(env, "psgi.url_scheme",  newSVpv(c->ssl ? "https" : "http", 0));
-    hv_stores(env, "psgi.multithread", newSViv(0));
-    hv_stores(env, "psgi.multiprocess",newSViv(1));
-    hv_stores(env, "psgi.run_once",    newSViv(0));
-    hv_stores(env, "psgi.streaming",   newSViv(1));
-    hv_stores(env, "psgi.nonblocking", newSViv(1));
-    hv_stores(env, "psgi.errors",      newRV_inc((SV *)PL_stderrgv));
+    hm_env_store(env, HMK_REQUEST_METHOD,  newSVpvn(method, mlen));
+    hm_env_store(env, HMK_REQUEST_URI,     newSVpvn(uri, ulen));
+    hm_env_store(env, HMK_PATH_INFO,       hm_pct_decode(aTHX_ path, path_l));
+    hm_env_store(env, HMK_QUERY_STRING,    newSVpvn(qs, qs_l));
+    hm_env_store(env, HMK_SERVER_PROTOCOL, newSVpvn(proto, plen));
+    hm_env_store(env, HMK_SCRIPT_NAME,     newSVpvs(""));
+    if (!c->sname_sv) {
+        c->sname_sv = newSVpv(c->lst && c->lst->host ? c->lst->host : "0.0.0.0", 0);
+        c->sport_sv = newSViv(c->lst ? c->lst->port : 0);
+    }
+    hm_env_store(env, HMK_SERVER_NAME, SvREFCNT_inc(c->sname_sv));
+    hm_env_store(env, HMK_SERVER_PORT, SvREFCNT_inc(c->sport_sv));
+    if (c->peer[0]) {
+        if (!c->peer_sv) {
+            c->peer_sv      = newSVpv(c->peer, 0);
+            c->peer_host_sv = newSVpv(c->peer, 0);
+        }
+        hm_env_store(env, HMK_REMOTE_ADDR, SvREFCNT_inc(c->peer_sv));
+        hm_env_store(env, HMK_REMOTE_HOST, SvREFCNT_inc(c->peer_host_sv));
+    }
+    if (c->peer_port) {
+        if (!c->peer_port_sv) c->peer_port_sv = newSViv(c->peer_port);
+        hm_env_store(env, HMK_REMOTE_PORT, SvREFCNT_inc(c->peer_port_sv));
+    }
+    hm_env_store(env, HMK_PSGI_VERSION,      SvREFCNT_inc(hm_env_version));
+    hm_env_store(env, HMK_PSGI_URL_SCHEME,
+                 c->ssl ? newSVpvs("https") : newSVpvs("http"));
+    hm_env_store(env, HMK_PSGI_MULTITHREAD,  SvREFCNT_inc(hm_env_zero));
+    hm_env_store(env, HMK_PSGI_MULTIPROCESS, SvREFCNT_inc(hm_env_one));
+    hm_env_store(env, HMK_PSGI_RUN_ONCE,     SvREFCNT_inc(hm_env_zero));
+    hm_env_store(env, HMK_PSGI_STREAMING,    SvREFCNT_inc(hm_env_one));
+    hm_env_store(env, HMK_PSGI_NONBLOCKING,  SvREFCNT_inc(hm_env_one));
+    hm_env_store(env, HMK_PSGI_ERRORS,       SvREFCNT_inc(hm_env_errors));
 
     /* psgix.loop: this worker's loop, so apps/clients can create loop
      * Futures; psgix.io: the client socket, dup'd so an app that
      * hijacks it keeps the socket alive after we close our fd. */
     if (!c->loop->self_sv) c->loop->self_sv = hm_loop_to_sv(aTHX_ c->loop);
-    hv_stores(env, "psgix.loop", SvREFCNT_inc(c->loop->self_sv));
+    hm_env_store(env, HMK_PSGIX_LOOP, SvREFCNT_inc(c->loop->self_sv));
     if (!c->io_sv) c->io_sv = hm_fh_for_fd(aTHX_ c->fd);
-    hv_stores(env, "psgix.io", SvREFCNT_inc(c->io_sv));
+    hm_env_store(env, HMK_PSGIX_IO, SvREFCNT_inc(c->io_sv));
     if (c->ssl) hm_tls_env(aTHX_ c, env);
 
     c->keepalive = (plen == 8 && memcmp(proto, "HTTP/1.1", 8) == 0);
 
-    /* header lines */
-    char *p = line_end ? line_end + 2 : head + headlen;
-    char *hend = head + headlen;
+    /* header lines, from the framing pass's index (no rescan) */
     char keybuf[300];
-    while (p < hend) {
-        char *eol = (char *)memchr(p, '\r', hend - p);
-        size_t len = eol ? (size_t)(eol - p) : (size_t)(hend - p);
-        char *colon = (char *)memchr(p, ':', len);
-        if (colon && colon > p) {
-            size_t nk = (size_t)(colon - p);
-            const char *vp = colon + 1;
-            size_t nv = (size_t)((p + len) - vp);
-            while (nv && (*vp == ' ' || *vp == '\t')) { vp++; nv--; }
+    int have_cl = 0;
+    int li;
+    for (li = 0; li < nlines; li++) {
+        const char *p = head + idx[li].off;
+        size_t nk = idx[li].klen;
+        const char *vp = head + idx[li].voff;
+        size_t nv = idx[li].vlen;
 
-            if (nk == 14 && strncasecmp(p, "Content-Length", 14) == 0) {
-                hv_stores(env, "CONTENT_LENGTH", newSVpvn(vp, nv));
-            } else if (nk == 12 && strncasecmp(p, "Content-Type", 12) == 0) {
-                hv_stores(env, "CONTENT_TYPE", newSVpvn(vp, nv));
-            } else if (nk + 5 < sizeof(keybuf)) {
-                size_t i;
-                memcpy(keybuf, "HTTP_", 5);
-                for (i = 0; i < nk; i++) {
-                    unsigned char ch = (unsigned char)p[i];
-                    if (ch >= 'a' && ch <= 'z') ch -= 32;
-                    else if (ch == '-') ch = '_';
-                    keybuf[5 + i] = (char)ch;
-                }
-                {
-                    /* repeated header: join values with ", " (PSGI) */
-                    SV **old = hv_fetch(env, keybuf, (I32)(nk + 5), 0);
-                    if (old) {
-                        sv_catpvs(*old, ", ");
-                        sv_catpvn(*old, vp, nv);
-                    } else {
-                        hv_store(env, keybuf, (I32)(nk + 5), newSVpvn(vp, nv), 0);
-                    }
-                }
-                if (nk == 10 && strncasecmp(p, "Connection", 10) == 0) {
-                    if (nv >= 5 && strncasecmp(vp, "close", 5) == 0) c->keepalive = 0;
-                    else if (nv >= 10 && strncasecmp(vp, "keep-alive", 10) == 0) c->keepalive = 1;
+        if (nk == 14 && strncasecmp(p, "Content-Length", 14) == 0) {
+            hm_env_store(env, HMK_CONTENT_LENGTH, newSVpvn(vp, nv));
+            have_cl = 1;
+        } else if (nk == 12 && strncasecmp(p, "Content-Type", 12) == 0) {
+            hm_env_store(env, HMK_CONTENT_TYPE, newSVpvn(vp, nv));
+        } else if (nk == 17 && strncasecmp(p, "Transfer-Encoding", 17) == 0) {
+            /* consumed by framing (already dechunked); not exposed to the
+             * app, whose psgi.input is the decoded body with CONTENT_LENGTH */
+        } else if (nk + 5 < sizeof(keybuf)) {
+            size_t i;
+            memcpy(keybuf, "HTTP_", 5);
+            for (i = 0; i < nk; i++) {
+                unsigned char ch = (unsigned char)p[i];
+                if (ch >= 'a' && ch <= 'z') ch -= 32;
+                else if (ch == '-') ch = '_';
+                keybuf[5 + i] = (char)ch;
+            }
+            {
+                /* repeated header: join values with ", " (PSGI) */
+                SV **old = hv_fetch(env, keybuf, (I32)(nk + 5), 0);
+                if (old) {
+                    sv_catpvs(*old, ", ");
+                    sv_catpvn(*old, vp, nv);
+                } else {
+                    hv_store(env, keybuf, (I32)(nk + 5), newSVpvn(vp, nv), 0);
                 }
             }
+            if (nk == 10 && strncasecmp(p, "Connection", 10) == 0) {
+                if (nv >= 5 && strncasecmp(vp, "close", 5) == 0) c->keepalive = 0;
+                else if (nv >= 10 && strncasecmp(vp, "keep-alive", 10) == 0) c->keepalive = 1;
+            }
         }
-        p = eol ? eol + 2 : hend;
     }
+    /* dechunked request: no Content-Length header, but we know the decoded
+     * length - present it so apps/middleware see the real body size */
+    if (!have_cl && clen > 0)
+        hm_env_store(env, HMK_CONTENT_LENGTH, newSViv((IV)clen));
 
-    if (clen > 0) hv_stores(env, "psgi.input", hm_new_input(aTHX_ body, (STRLEN)clen));
-    else          hv_stores(env, "psgi.input", SvREFCNT_inc(hm_empty_input));
+    if (clen > 0)
+        hm_env_store(env, HMK_PSGI_INPUT, hm_new_input(aTHX_ body, (STRLEN)clen));
+    else
+        hm_env_store(env, HMK_PSGI_INPUT, SvREFCNT_inc(hm_empty_input));
+    hm_env_store(env, HMK_PSGIX_INPUT_BUFFERED, SvREFCNT_inc(hm_env_one));
 
     return env;
 }
@@ -622,7 +769,7 @@ static void hm_log_raw(hm_loop *loop, const char *p, size_t n) {
     if (loop->log_len + n > loop->log_cap) {
         size_t ncap = loop->log_cap ? loop->log_cap : 8192;
         while (ncap < loop->log_len + n) ncap *= 2;
-        loop->log_buf = (char *)realloc(loop->log_buf, ncap);
+        loop->log_buf = (char *)hm_xrealloc(loop->log_buf, ncap);
         loop->log_cap = ncap;
     }
     memcpy(loop->log_buf + loop->log_len, p, n);
@@ -703,9 +850,9 @@ static void hm_log_clf(pTHX_ hm_loop *loop, SV *env_rv, int status, ssize_t blen
     hm_log_raw(loop, " ", 1);
     s = hm_env_str(aTHX_ env, "SERVER_PROTOCOL", 15, &n); hm_log_quoted(loop, s, n);
     hm_log_raw(loop, "\" ", 2);
-    ln = (int)snprintf(num, sizeof(num), "%d", status); hm_log_raw(loop, num, (size_t)ln);
+    ln = (int)hm_itoa(num, (long)status); hm_log_raw(loop, num, (size_t)ln);
     hm_log_raw(loop, " ", 1);
-    if (blen >= 0) { ln = (int)snprintf(num, sizeof(num), "%ld", (long)blen);
+    if (blen >= 0) { ln = (int)hm_utoa(num, (unsigned long)blen);
                      hm_log_raw(loop, num, (size_t)ln); }
     else           hm_log_raw(loop, "-", 1);
     hm_log_raw(loop, " \"", 2);
@@ -743,7 +890,7 @@ static void hm_wb_reserve(hm_conn *c, size_t need) {
     if (c->wlen + need > c->wcap) {
         size_t ncap = c->wcap ? c->wcap : 4096;
         while (ncap < c->wlen + need) ncap *= 2;
-        c->wbuf = (char *)realloc(c->wbuf, ncap);
+        c->wbuf = (char *)hm_xrealloc(c->wbuf, ncap);
         c->wcap = ncap;
     }
 }
@@ -809,8 +956,11 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
     /* status line + headers */
     c->last_status = status;
     c->last_blen = blen;
-    ln = snprintf(line, sizeof(line), "HTTP/1.1 %d %s\r\n", status, hm_reason(status));
-    hm_wb_put(c, line, (size_t)ln);
+    {
+        size_t sll;
+        const char *sl = hm_status_line(status, &sll, line);
+        hm_wb_put(c, sl, sll);
+    }
     if (hav) {
         SSize_t i, hn = av_len(hav) + 1;
         for (i = 0; i + 1 < hn; i += 2) {
@@ -834,7 +984,9 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
             if (fh_body) { SvREFCNT_dec(fh_body); fh_body = NULL; }
             bav = NULL; bn = 0; blen = 0;
         } else if (!has_len) {
-            ln = snprintf(line, sizeof(line), "Content-Length: %lu\r\n", (unsigned long)blen);
+            memcpy(line, "Content-Length: ", 16);
+            ln = 16 + (int)hm_utoa(line + 16, (unsigned long)blen);
+            line[ln++] = '\r'; line[ln++] = '\n';
             hm_wb_put(c, line, (size_t)ln);
         }
     }
@@ -992,7 +1144,6 @@ static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
     hm_loop *loop = hm_cur_loop;
     hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
     char line[64];
-    int ln;
     if (!(c && c->id == id)) return;
     c->keepalive = 0;
     if (c->env_sv) {
@@ -1000,8 +1151,11 @@ static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
         SvREFCNT_dec(c->env_sv);
         c->env_sv = NULL;
     }
-    ln = snprintf(line, sizeof(line), "HTTP/1.1 %d %s\r\n", status, hm_reason(status));
-    hm_wb_put(c, line, (size_t)ln);
+    {
+        size_t sll;
+        const char *sl = hm_status_line(status, &sll, line);
+        hm_wb_put(c, sl, sll);
+    }
     if (headers && SvROK(headers) && SvTYPE(SvRV(headers)) == SVt_PVAV) {
         AV *hav = (AV *)SvRV(headers);
         SSize_t i, hn = av_len(hav) + 1;
@@ -1170,12 +1324,52 @@ static void hm_delayed(pTHX_ hm_conn *c, SV *code) {
 static void hm_again_push(hm_loop *loop, hm_conn *c) {
     if (loop->again_n == loop->again_cap) {
         loop->again_cap = loop->again_cap ? loop->again_cap * 2 : 64;
-        loop->again = (hm_again *)realloc(loop->again,
+        loop->again = (hm_again *)hm_xrealloc(loop->again,
                           loop->again_cap * sizeof(hm_again));
     }
     loop->again[loop->again_n].fd = c->fd;
     loop->again[loop->again_n].id = c->id;
     loop->again_n++;
+}
+
+/* Built-in https redirect: synthesize a 301 to the same host and target on
+ * the https port, so a plain :80 listener can bounce browsers to :443 without
+ * ever touching the app. Host comes from the request (its :port is stripped);
+ * the target port is omitted when it is the standard 443. */
+static SV *hm_redirect_response(pTHX_ HV *env, int https_port) {
+    const char *host, *uri;
+    STRLEN hlen, ulen;
+    SV *loc;
+    AV *rav, *hav, *bav;
+    host = hm_env_str(aTHX_ env, "HTTP_HOST", 9, &hlen);
+    uri  = hm_env_str(aTHX_ env, "REQUEST_URI", 11, &ulen);
+    if (!uri) { uri = "/"; ulen = 1; }
+    loc = newSVpvs("https://");
+    /* Host and request-target are reflected into a response header, so stop at
+     * the first control or space byte: a header value is only \r-delimited, so
+     * a bare LF could otherwise smuggle a CRLF and inject/split the response.
+     * A valid host[:port] / request-target contains no CTL or SP anyway. */
+    if (host) {
+        STRLEN i = 0;                                    /* host, up to :port */
+        while (i < hlen && (unsigned char)host[i] > ' ' && host[i] != ':') i++;
+        sv_catpvn(loc, host, i);
+    }
+    if (https_port != 443) sv_catpvf(loc, ":%d", https_port);
+    {
+        STRLEN i = 0;                                    /* request-target */
+        while (i < ulen && (unsigned char)uri[i] > ' ') i++;
+        sv_catpvn(loc, uri, i);
+    }
+
+    hav = newAV();
+    av_push(hav, newSVpvs("Location"));       av_push(hav, loc);
+    av_push(hav, newSVpvs("Content-Length")); av_push(hav, newSVpvs("0"));
+    bav = newAV();
+    rav = newAV();
+    av_push(rav, newSViv(301));
+    av_push(rav, newRV_noinc((SV *)hav));
+    av_push(rav, newRV_noinc((SV *)bav));
+    return newRV_noinc((SV *)rav);
 }
 
 /* Process complete requests buffered in c->rbuf, capped per wakeup so one
@@ -1187,7 +1381,7 @@ static void hm_process(pTHX_ hm_conn *c) {
     /* HTTP/2: once a connection is in h2 mode, all bytes go to nghttp2.
      * On a fresh connection with http2 enabled, sniff the h2 preface. */
     if (c->h2) { hm_h2_input(aTHX_ c); return; }
-    if (loop->http2 && c->nreqs == 0 && c->rlen > 0) {
+    if (c->lst && c->lst->http2 && c->nreqs == 0 && c->rlen > 0) {
         if (hm_h2_detect(aTHX_ c) != 0) return;   /* started, or need more */
     }
 
@@ -1205,22 +1399,82 @@ static void hm_process(pTHX_ hm_conn *c) {
         size_t headlen = (size_t)(end - c->rbuf);
         size_t bodystart = headlen + 4;
 
-        long clen = hm_scan_content_length(c->rbuf, headlen);
-        if (clen < 0) clen = 0;
-        if (bodystart + (size_t)clen > loop->max_read) {   /* can never fit */
-            static const char e413[] =
-                "HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n"
-                "Connection: close\r\n\r\n";
-            hm_wb_put(c, e413, sizeof(e413) - 1);
+        /* one pass: framing decision + header-line index for the env build */
+        hm_hline hidx_stack[HM_HIDX_STACK];
+        const hm_hline *hidx = hidx_stack;
+        int nhl = 0;
+        long clen = 0;
+        int frame = hm_parse_index(c->rbuf, headlen, &clen,
+                                   hidx_stack, HM_HIDX_STACK, &nhl);
+        if (frame == -2) {          /* > HM_HIDX_STACK header lines: rescan
+                                       into the loop's growable index */
+            if (nhl > loop->hidx_cap) {
+                loop->hidx = (hm_hline *)hm_xrealloc(loop->hidx,
+                                 (size_t)nhl * sizeof(hm_hline));
+                loop->hidx_cap = nhl;
+            }
+            frame = hm_parse_index(c->rbuf, headlen, &clen,
+                                   loop->hidx, loop->hidx_cap, &nhl);
+            hidx = loop->hidx;
+        }
+        if (frame) {                            /* smuggling/framing: reject + close */
+            if (frame == 501) {
+                static const char e501[] =
+                    "HTTP/1.1 501 Not Implemented\r\nContent-Length: 0\r\n"
+                    "Connection: close\r\n\r\n";
+                hm_wb_put(c, e501, sizeof(e501) - 1);
+            } else {
+                static const char e400[] =
+                    "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n"
+                    "Connection: close\r\n\r\n";
+                hm_wb_put(c, e400, sizeof(e400) - 1);
+            }
             c->keepalive = 0;
             break;
         }
-        if (c->rlen - bodystart < (size_t)clen) break;   /* await full body */
+        size_t body_consumed;   /* wire octets after the headers this request uses */
+        if (clen < 0) {         /* chunked: validate, then decode in place */
+            size_t enc = 0, dec = 0;
+            int r = hm_chunked_scan(c->rbuf + bodystart, c->rlen - bodystart,
+                                    &enc, &dec, loop->max_read);
+            if (r < 0) {                                 /* malformed chunked */
+                static const char e400[] =
+                    "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n"
+                    "Connection: close\r\n\r\n";
+                hm_wb_put(c, e400, sizeof(e400) - 1);
+                c->keepalive = 0;
+                break;
+            }
+            if (r == 0) {                                /* need more bytes */
+                if (c->rlen - bodystart >= loop->max_read) {   /* too big to fit */
+                    static const char e413[] =
+                        "HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n"
+                        "Connection: close\r\n\r\n";
+                    hm_wb_put(c, e413, sizeof(e413) - 1);
+                    c->keepalive = 0;
+                }
+                break;
+            }
+            hm_chunked_compact(c->rbuf + bodystart);     /* -> dec octets @ bodystart */
+            clen = (long)dec;
+            body_consumed = enc;
+        } else {
+            if (bodystart + (size_t)clen > loop->max_read) {   /* can never fit */
+                static const char e413[] =
+                    "HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n"
+                    "Connection: close\r\n\r\n";
+                hm_wb_put(c, e413, sizeof(e413) - 1);
+                c->keepalive = 0;
+                break;
+            }
+            if (c->rlen - bodystart < (size_t)clen) break;   /* await full body */
+            body_consumed = (size_t)clen;
+        }
 
 #ifdef HM_HAVE_NGHTTP2
         /* HTTP/1.1 Upgrade: h2c (cleartext, first request only). h2c-over-TLS
          * is forbidden by RFC 7540; the TLS path uses ALPN. */
-        if (loop->http2 && !c->ssl && !c->h2 && c->nreqs == 0) {
+        if (c->lst && c->lst->http2 && !c->ssl && !c->h2 && c->nreqs == 0) {
             size_t ul = 0, sl = 0;
             const char *up = hm_find_header(c->rbuf, headlen, "upgrade", 7, &ul);
             const char *se = hm_find_header(c->rbuf, headlen, "http2-settings", 14, &sl);
@@ -1230,11 +1484,11 @@ static void hm_process(pTHX_ hm_conn *c) {
                     "Connection: Upgrade\r\nUpgrade: h2c\r\n\r\n";
                 int is_head = (headlen >= 5 && strncasecmp(c->rbuf, "HEAD ", 5) == 0);
                 HV *env = hm_build_env(aTHX_ c->rbuf, headlen,
-                                       c->rbuf + bodystart, clen, c);
+                                       c->rbuf + bodystart, clen, c, hidx, nhl);
                 (void)hv_stores(env, "SERVER_PROTOCOL", newSVpvs("HTTP/2"));
                 hm_wb_put(c, resp101, sizeof(resp101) - 1);
                 {
-                    size_t consumed = bodystart + (size_t)clen;
+                    size_t consumed = bodystart + body_consumed;
                     memmove(c->rbuf, c->rbuf + consumed, c->rlen - consumed);
                     c->rlen -= consumed;
                     c->nreqs++;
@@ -1250,17 +1504,22 @@ static void hm_process(pTHX_ hm_conn *c) {
         }
 #endif
 
-        HV *env = hm_build_env(aTHX_ c->rbuf, headlen, c->rbuf + bodystart, clen, c);
+        HV *env = hm_build_env(aTHX_ c->rbuf, headlen, c->rbuf + bodystart,
+                               clen, c, hidx, nhl);
         SV *env_rv = NULL;
         SV *resp;
-        if (hm_logging(loop)) {             /* env survives for access_log */
+        if (c->lst && c->lst->redirect_https) {   /* built-in :80 -> :443 bounce */
+            resp = hm_redirect_response(aTHX_ env, c->lst->redirect_https);
+            if (hm_logging(loop)) env_rv = newRV_noinc((SV *)env);
+            else                  SvREFCNT_dec((SV *)env);
+        } else if (hm_logging(loop)) {      /* env survives for access_log */
             env_rv = newRV_noinc((SV *)env);
             resp = hm_call_app(aTHX_ loop, env_rv);
         } else {
             resp = hm_call_app0(aTHX_ loop, env);
         }
 
-        size_t consumed = bodystart + (size_t)clen;
+        size_t consumed = bodystart + body_consumed;
         memmove(c->rbuf, c->rbuf + consumed, c->rlen - consumed);
         c->rlen -= consumed;
         c->req_start = 0;
@@ -1268,7 +1527,7 @@ static void hm_process(pTHX_ hm_conn *c) {
         c->nreqs++;
         loop->requests++;
         if (loop->max_requests && loop->requests >= loop->max_requests
-            && !loop->stopping && loop->listen_fd >= 0)
+            && !loop->stopping && loop->attached)
             loop->recycle_pending = 1;  /* drain at the loop iteration boundary */
 
         /* async: handler returned a Future -> park and wait; hold the
@@ -1321,7 +1580,7 @@ static void hm_readable(pTHX_ hm_conn *c) {
             {
                 size_t ncap = c->rcap * 2;
                 if (ncap > loop->max_read) ncap = loop->max_read;
-                c->rbuf = (char *)realloc(c->rbuf, ncap);
+                c->rbuf = (char *)hm_xrealloc(c->rbuf, ncap);
                 c->rcap = ncap;
             }
         }
@@ -1349,18 +1608,18 @@ static void hm_readable(pTHX_ hm_conn *c) {
     if (loop->conns[c->fd] == c) hm_flush(aTHX_ c);
 }
 
-static void hm_accept(pTHX_ hm_loop *loop) {
+static void hm_accept(pTHX_ hm_loop *loop, hm_listener *lst) {
     int batch = 0;
     if (loop->stopping) return;
     for (;;) {
         struct sockaddr_storage ss;
         socklen_t slen = sizeof(ss);
         hm_conn *c;
-        int fd = accept(loop->listen_fd, (struct sockaddr *)&ss, &slen);
+        int fd = accept(lst->fd, (struct sockaddr *)&ss, &slen);
         if (fd < 0) break;                     /* EAGAIN: drained */
         if (fd >= HM_MAXFD) { close(fd); continue; }
-        c = hm_new_conn(loop, fd);
-        hm_fmt_peer(c->peer, sizeof(c->peer), (struct sockaddr *)&ss);
+        c = hm_new_conn(loop, fd, lst);
+        hm_fmt_peer(c->peer, sizeof(c->peer), &c->peer_port, (struct sockaddr *)&ss);
         loop->accepts++;
         /* fairness: don't grab the whole queue in one wakeup; the listener
          * stays level-readable, so the next iteration resumes */
@@ -1386,7 +1645,7 @@ static void hm_tls_handshake(pTHX_ hm_conn *c) {
             c->writing = 0;
         }
 #ifdef HM_HAVE_NGHTTP2
-        if (loop->http2) {
+        if (c->lst && c->lst->http2) {
             const unsigned char *proto = NULL;
             unsigned int plen = 0;
             SSL_get0_alpn_selected(ssl, &proto, &plen);
@@ -1464,8 +1723,12 @@ static void hm_on_signal(pTHX_ hm_loop *loop) {
     hm_conn *c;
     if (loop->stopping) { loop->stop = 1; return; }   /* second signal: hard */
     loop->stopping = 1;
-    if (loop->listen_fd >= 0)
-        loop->be->remove_io(loop->be, loop->listen_fd, HM_EV_READ);
+    {
+        int i;
+        for (i = 0; i < loop->nlisteners; i++)
+            if (loop->listeners[i].fd >= 0)
+                loop->be->remove_io(loop->be, loop->listeners[i].fd, HM_EV_READ);
+    }
     c = loop->lru_head;
     while (c) {
         hm_conn *next = c->lru_next;
@@ -1475,7 +1738,7 @@ static void hm_on_signal(pTHX_ hm_loop *loop) {
     }
     if (loop->nconns == 0) { loop->stop = 1; return; }
     if (!loop->hardstop_tw) {
-        loop->hardstop_tw = (hm_tw *)calloc(1, sizeof(hm_tw));
+        loop->hardstop_tw = (hm_tw *)hm_xcalloc(1, sizeof(hm_tw));
         loop->hardstop_tw->kind = HM_TW_HARDSTOP;
         loop->hardstop_tw->loop = loop;
         loop->be->add_timer(loop->be, loop->shutdown_grace, 1, loop->hardstop_tw);
@@ -1554,7 +1817,8 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
     case HM_EV_READ: {
         int fd = ev->fd;
         hm_conn *c;
-        if (fd == loop->listen_fd)      { hm_accept(aTHX_ loop); return; }
+        hm_listener *lst;
+        if ((lst = hm_listener_for_fd(loop, fd))) { hm_accept(aTHX_ loop, lst); return; }
         if ((c = loop->conns[fd])) {
             if (c->tls_hs)              hm_tls_handshake(aTHX_ c);
             else                        hm_readable(aTHX_ c);
@@ -1616,17 +1880,16 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
 /* ---- loop lifecycle ------------------------------------------------------- */
 
 static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
-    hm_loop *loop = (hm_loop *)calloc(1, sizeof(hm_loop));
+    hm_loop *loop = (hm_loop *)hm_xcalloc(1, sizeof(hm_loop));
     if (!loop) return NULL;
     if (!backend_name || !*backend_name)
         backend_name = getenv("HYPERMAN_BACKEND");
     loop->be = hm_backend_create(backend_name);
     if (!loop->be) { free(loop); return NULL; }
-    loop->conns = (hm_conn **)calloc(HM_MAXFD, sizeof(hm_conn *));
-    loop->io_r  = (hm_iow *)calloc(HM_MAXFD, sizeof(hm_iow));
-    loop->io_w  = (hm_iow *)calloc(HM_MAXFD, sizeof(hm_iow));
+    loop->conns = (hm_conn **)hm_xcalloc(HM_MAXFD, sizeof(hm_conn *));
+    loop->io_r  = (hm_iow *)hm_xcalloc(HM_MAXFD, sizeof(hm_iow));
+    loop->io_w  = (hm_iow *)hm_xcalloc(HM_MAXFD, sizeof(hm_iow));
     loop->deferred = newAV();
-    loop->listen_fd = -1;
     loop->log_fd = -1;
     loop->now = time(NULL);
     loop->idle_timeout   = 60.0;
@@ -1648,6 +1911,11 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
             if (c->io_sv)  SvREFCNT_dec(c->io_sv);
             if (c->resp_f) SvREFCNT_dec(c->resp_f);
             if (c->env_sv) SvREFCNT_dec(c->env_sv);
+            if (c->peer_sv)      SvREFCNT_dec(c->peer_sv);
+            if (c->peer_host_sv) SvREFCNT_dec(c->peer_host_sv);
+            if (c->peer_port_sv) SvREFCNT_dec(c->peer_port_sv);
+            if (c->sname_sv)     SvREFCNT_dec(c->sname_sv);
+            if (c->sport_sv)     SvREFCNT_dec(c->sport_sv);
             if (c->wbuf) free(c->wbuf);
             if (c->rbuf) free(c->rbuf);
             free(c);
@@ -1665,12 +1933,15 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
     }
     if (loop->log_fd >= 0) { hm_log_flush(loop); close(loop->log_fd); }
     if (loop->log_buf) free(loop->log_buf);
-    if (loop->host) free(loop->host);
+    for (i = 0; i < loop->nlisteners; i++)
+        if (loop->listeners[i].host) free(loop->listeners[i].host);
+    if (loop->listeners) free(loop->listeners);
     if (loop->self_sv) SvREFCNT_dec(loop->self_sv);
     if (loop->log_cb)  SvREFCNT_dec(loop->log_cb);
     if (loop->app) SvREFCNT_dec(loop->app);
     SvREFCNT_dec((SV *)loop->deferred);
     if (loop->again) free(loop->again);
+    if (loop->hidx) free(loop->hidx);
     if (loop->sweep_tw) free(loop->sweep_tw);
     if (loop->hardstop_tw) free(loop->hardstop_tw);
     loop->be->destroy(loop->be);
@@ -1682,13 +1953,12 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
 
 /* Attach the PSGI server to a loop: listener, shutdown/stats signals via
  * the backend's signal watcher, and the timeout sweep timer. */
-static void hm_attach_server(pTHX_ hm_loop *loop, SV *app, int listen_fd,
-                             const char *host, int port) {
+static void hm_attach_server(pTHX_ hm_loop *loop, SV *app) {
+    int i;
     loop->app = SvREFCNT_inc(app);
-    loop->listen_fd = listen_fd;
-    loop->host = strdup(host && *host ? host : "0.0.0.0");
-    loop->port = port;
-    loop->be->add_io(loop->be, listen_fd, HM_EV_READ, 0);
+    loop->attached = 1;
+    for (i = 0; i < loop->nlisteners; i++)
+        loop->be->add_io(loop->be, loop->listeners[i].fd, HM_EV_READ, 0);
     signal(SIGPIPE, SIG_IGN);
     signal(SIGTERM, SIG_IGN);      /* delivered through the backend instead */
     signal(SIGINT,  SIG_IGN);
@@ -1696,7 +1966,7 @@ static void hm_attach_server(pTHX_ hm_loop *loop, SV *app, int listen_fd,
     loop->be->add_signal(loop->be, SIGTERM);
     loop->be->add_signal(loop->be, SIGINT);
     loop->be->add_signal(loop->be, SIGUSR1);
-    loop->sweep_tw = (hm_tw *)calloc(1, sizeof(hm_tw));
+    loop->sweep_tw = (hm_tw *)hm_xcalloc(1, sizeof(hm_tw));
     loop->sweep_tw->kind = HM_TW_SWEEP;
     loop->sweep_tw->loop = loop;
     loop->be->add_timer(loop->be, HM_SWEEP_SECS, 0, loop->sweep_tw);
@@ -1704,7 +1974,7 @@ static void hm_attach_server(pTHX_ hm_loop *loop, SV *app, int listen_fd,
 
 /* register a timer watcher resolving a Future / running a callback */
 static void hm_add_timer_watch(pTHX_ hm_loop *loop, double secs, SV *sv, int kind) {
-    hm_tw *tw = (hm_tw *)calloc(1, sizeof(hm_tw));
+    hm_tw *tw = (hm_tw *)hm_xcalloc(1, sizeof(hm_tw));
     tw->kind = kind;
     tw->sv   = SvREFCNT_inc(sv);
     tw->loop = loop;
@@ -1768,25 +2038,104 @@ static void hm_sup_sig(int sig) {
     else                                 hm_sup_term = 1;
 }
 
+/* One listener as configured by run(): its bind address, optional TLS, h2,
+ * and https-redirect target. The bound fd and built SSL_CTX are filled in by
+ * hm_run_server before the workers fork. */
+typedef struct {
+    const char *host;
+    int         port;
+    const char *tls_cert, *tls_key, *tls_ca;
+    int         tls_verify;
+    SV         *tls_sni;
+    int         http2;
+    int         redirect_https;
+    int         fd;                 /* bound fd (parent), or -1 under reuseport */
+    void       *tls_ctx;            /* built SSL_CTX*, or NULL for plain        */
+} hm_listener_spec;
+
+/* Validate one listener's options at run() time (before any bind/fork). */
+static void hm_check_listener(pTHX_ const hm_listener_spec *s) {
+    if (s->tls_cert || s->tls_key || s->tls_ca || s->tls_sni || s->tls_verify) {
+        if (!(s->tls_cert && s->tls_key))
+            croak("Hyperman->run: tls_cert and tls_key must be given together");
+        if (!hm_tls_available())
+            croak("Hyperman->run: TLS requested but OpenSSL support was not "
+                  "built (install libssl-dev and reinstall Hyperman)");
+        if (s->tls_verify && !s->tls_ca)
+            croak("Hyperman->run: tls_verify needs tls_ca (the CA to verify "
+                  "client certificates against)");
+    }
+    if (s->http2 && !hm_h2_available())
+        croak("Hyperman->run: http2 requested but nghttp2 support was not "
+              "built (install libnghttp2-dev and reinstall Hyperman)");
+    if (s->redirect_https && (s->tls_cert || s->tls_key))
+        croak("Hyperman->run: redirect_https on a TLS listener makes no sense");
+}
+
+/* Overlay per-listener options from a `listen => [ {..} ]` hashref onto a spec
+ * pre-seeded with the top-level defaults. Unknown keys croak. A bare true
+ * redirect_https means "the standard 443". */
+static void hm_listener_from_hv(pTHX_ HV *h, hm_listener_spec *s) {
+    HE *he;
+    hv_iterinit(h);
+    while ((he = hv_iternext(h))) {
+        STRLEN klen; const char *k = HePV(he, klen); SV *v = HeVAL(he);
+        if      (strEQ(k, "port"))     s->port = (int)SvIV(v);
+        else if (strEQ(k, "host"))     { if (SvOK(v)) s->host = SvPV_nolen(v); }
+        else if (strEQ(k, "tls_cert")) s->tls_cert = SvOK(v) ? SvPV_nolen(v) : NULL;
+        else if (strEQ(k, "tls_key"))  s->tls_key  = SvOK(v) ? SvPV_nolen(v) : NULL;
+        else if (strEQ(k, "tls_ca"))   s->tls_ca   = SvOK(v) ? SvPV_nolen(v) : NULL;
+        else if (strEQ(k, "tls_sni"))  s->tls_sni  = SvOK(v) ? v : NULL;
+        else if (strEQ(k, "http2"))    s->http2 = SvTRUE(v) ? 1 : 0;
+        else if (strEQ(k, "redirect_https")) s->redirect_https = (int)SvIV(v);
+        else if (strEQ(k, "tls_verify")) {
+            const char *m = SvPV_nolen(v);
+            if      (strEQ(m, "require"))  s->tls_verify = 2;
+            else if (strEQ(m, "optional")) s->tls_verify = 1;
+            else if (strEQ(m, "none"))     s->tls_verify = 0;
+            else croak("Hyperman->run: tls_verify must be none/optional/require");
+        }
+        else croak("Hyperman->run: unknown listen option '%s'", k);
+    }
+    if (s->redirect_https == 1) s->redirect_https = 443;
+}
+
 /* Everything a worker needs; one struct so spawn plumbing stays sane. */
 typedef struct {
     SV         *app;
-    int         listen_fd;
-    const char *host;
-    int         port;
+    hm_listener_spec *lspecs;       /* one or more listeners                 */
+    int         nlspecs;
     double      idle_t, header_t, grace;
-    int         max_pipe, reuseport, affinity, nworkers, http2;
+    int         max_pipe, reuseport, affinity, nworkers;
     UV          max_requests;
     SV         *log_cb;              /* access_log coderef, or NULL          */
     int         log_fd;             /* fast access-log fd, or -1            */
     const char *log_path;           /* access_log file to open (parent), or NULL */
-    const char *tls_cert, *tls_key, *tls_ca;
-    int         tls_verify;
-    SV         *tls_sni;
-    void       *tls_ctx;
 } hm_worker_cfg;
 
-static void hm_worker(pTHX_ const hm_worker_cfg *cfg, int listen_fd) {
+/* Populate the loop's listener array from the (already bound) specs. Under
+ * reuseport each worker rebinds, so fds are passed in; otherwise they are the
+ * parent's inherited fds. Returns 0, or -1 if a reuseport rebind failed. */
+static int hm_worker_listeners(hm_loop *loop, const hm_worker_cfg *cfg,
+                               const int *fds) {
+    int i;
+    loop->listeners = (hm_listener *)hm_xcalloc(cfg->nlspecs, sizeof(hm_listener));
+    loop->nlisteners = cfg->nlspecs;
+    for (i = 0; i < cfg->nlspecs; i++) {
+        const hm_listener_spec *s = &cfg->lspecs[i];
+        hm_listener *l = &loop->listeners[i];
+        l->fd = fds ? fds[i] : s->fd;
+        if (l->fd < 0) return -1;
+        l->host = strdup(s->host && *s->host ? s->host : "0.0.0.0");
+        l->port = s->port;
+        l->tls_ctx = s->tls_ctx;
+        l->http2 = s->http2;
+        l->redirect_https = s->redirect_https;
+    }
+    return 0;
+}
+
+static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
     hm_loop *loop = hm_loop_new(aTHX_ NULL);
     if (!loop) croak("Hyperman: cannot create event loop");
     if (cfg->idle_t   > 0) loop->idle_timeout   = cfg->idle_t;
@@ -1794,23 +2143,26 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, int listen_fd) {
     if (cfg->max_pipe > 0) loop->max_pipeline   = cfg->max_pipe;
     if (cfg->grace    > 0) loop->shutdown_grace = cfg->grace;
     loop->max_requests = cfg->max_requests;
-    loop->http2 = cfg->http2;
-    loop->tls_ctx = cfg->tls_ctx;
+    if (hm_worker_listeners(loop, cfg, fds) < 0) {
+        hm_loop_free(aTHX_ loop);
+        _exit(1);
+    }
     if (cfg->log_fd >= 0)
         loop->log_fd = cfg->log_fd;               /* fast C writer wins */
     else if (cfg->log_cb && SvOK(cfg->log_cb))
         loop->log_cb = SvREFCNT_inc(cfg->log_cb);
-    hm_attach_server(aTHX_ loop, cfg->app, listen_fd, cfg->host, cfg->port);
+    hm_attach_server(aTHX_ loop, cfg->app);
     hm_loop_run(aTHX_ loop, NULL);
     hm_loop_free(aTHX_ loop);
 }
 
-/* Fork one worker. With reuseport each worker binds its own listener; with
+/* Fork one worker. With reuseport each worker binds its own listeners; with
  * affinity (Linux) worker widx is pinned to core widx % ncpu. */
 static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
     pid_t pid = fork();
     if (pid == 0) {
-        int fd = cfg->listen_fd;
+        int  stackfds[8];
+        int *fds = NULL;
 #if defined(__linux__) && defined(CPU_SET)
         if (cfg->affinity) {
             long ncpu = sysconf(_SC_NPROCESSORS_ONLN);
@@ -1825,10 +2177,17 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
         (void)widx;
 #endif
         if (cfg->reuseport) {
-            fd = hm_make_listener(cfg->host, cfg->port, 1);
-            if (fd < 0) _exit(1);
+            int i;
+            fds = cfg->nlspecs <= (int)(sizeof(stackfds)/sizeof(stackfds[0]))
+                  ? stackfds
+                  : (int *)hm_xmalloc(sizeof(int) * cfg->nlspecs);
+            for (i = 0; i < cfg->nlspecs; i++) {
+                fds[i] = hm_make_listener(cfg->lspecs[i].host,
+                                          cfg->lspecs[i].port, 1);
+                if (fds[i] < 0) _exit(1);
+            }
         }
-        hm_worker(aTHX_ cfg, fd);
+        hm_worker(aTHX_ cfg, fds);
         _exit(0);
     }
     return pid;
@@ -1854,15 +2213,24 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
     if (cfg->affinity) croak("Hyperman: CPU affinity is Linux-only");
 #endif
 
-    /* build the TLS context before forking, so a bad cert/key fails fast and
-     * the (read-only) SSL_CTX is shared copy-on-write across workers */
-    if (cfg->tls_cert && cfg->tls_key) {
-        cfg->tls_ctx = hm_tls_ctx_build(aTHX_ cfg->tls_cert, cfg->tls_key,
-                                        cfg->tls_ca, cfg->tls_verify,
-                                        cfg->tls_sni, cfg->http2);
-        if (!cfg->tls_ctx)
-            croak("Hyperman: TLS: could not initialise from cert '%s' / key '%s'",
-                  cfg->tls_cert, cfg->tls_key);
+    /* Per listener: build the TLS context before forking, so a bad cert/key
+     * fails fast and the (read-only) SSL_CTX is shared copy-on-write across
+     * workers. Then bind - in the parent, unless reuseport (each worker binds
+     * its own). Under reuseport the parent still binds one probe fd so an
+     * unusable address (e.g. a privileged port without root) fails fast. */
+    {
+        int i;
+        for (i = 0; i < cfg->nlspecs; i++) {
+            hm_listener_spec *s = &cfg->lspecs[i];
+            if (s->tls_cert && s->tls_key) {
+                s->tls_ctx = hm_tls_ctx_build(aTHX_ s->tls_cert, s->tls_key,
+                                              s->tls_ca, s->tls_verify,
+                                              s->tls_sni, s->http2);
+                if (!s->tls_ctx)
+                    croak("Hyperman: TLS: could not initialise from cert '%s' "
+                          "/ key '%s'", s->tls_cert, s->tls_key);
+            }
+        }
     }
 
     /* Open the access-log file once in the parent so all workers share (and
@@ -1875,13 +2243,31 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                   cfg->log_path, strerror(errno));
     }
 
-    cfg->listen_fd = hm_make_listener(cfg->host, cfg->port, cfg->reuseport);
-    if (cfg->listen_fd < 0)
-        croak("Hyperman: bind %s:%d: %s", cfg->host, cfg->port, strerror(errno));
+    {
+        int i;
+        for (i = 0; i < cfg->nlspecs; i++) {
+            hm_listener_spec *s = &cfg->lspecs[i];
+            s->fd = hm_make_listener(s->host, s->port, cfg->reuseport);
+            if (s->fd < 0)
+                croak("Hyperman: bind %s:%d: %s", s->host, s->port, strerror(errno));
+            if (cfg->reuseport) { close(s->fd); s->fd = -1; }  /* probe only */
+        }
+    }
 
     if (workers == 1) {
-        /* dev mode: run the worker in this process, no supervisor */
-        hm_worker(aTHX_ cfg, cfg->listen_fd);
+        /* dev mode: run the worker in this process, no supervisor. reuseport
+         * needs a real bound fd here since there is no per-worker rebind. */
+        if (cfg->reuseport) {
+            int i;
+            for (i = 0; i < cfg->nlspecs; i++) {
+                cfg->lspecs[i].fd = hm_make_listener(cfg->lspecs[i].host,
+                                                     cfg->lspecs[i].port, 1);
+                if (cfg->lspecs[i].fd < 0)
+                    croak("Hyperman: bind %s:%d: %s", cfg->lspecs[i].host,
+                          cfg->lspecs[i].port, strerror(errno));
+            }
+        }
+        hm_worker(aTHX_ cfg, NULL);
         return;
     }
 

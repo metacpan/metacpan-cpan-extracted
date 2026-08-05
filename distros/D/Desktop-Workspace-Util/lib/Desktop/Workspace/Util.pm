@@ -11,9 +11,9 @@ use List::Util qw(first);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-15'; # DATE
+our $DATE = '2026-05-04'; # DATE
 our $DIST = 'Desktop-Workspace-Util'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(
                        get_desktop_workspace_module
@@ -549,6 +549,7 @@ MARKDOWN
                         $file,
                         $windowkey;
                     unless ($dry_run) {
+                        require Desktop::Open;
                         Desktop::Open::open_desktop($file);
                     }
                 } # for item
@@ -617,7 +618,7 @@ Desktop::Workspace::Util - Utilities related to DesktopWorkspace
 
 =head1 VERSION
 
-This document describes version 0.003 of Desktop::Workspace::Util (from Perl distribution Desktop-Workspace-Util), released on 2026-04-15.
+This document describes version 0.004 of Desktop::Workspace::Util (from Perl distribution Desktop-Workspace-Util), released on 2026-05-04.
 
 =head1 SYNOPSIS
 

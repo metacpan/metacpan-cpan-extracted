@@ -1,9 +1,9 @@
-package Concierge v0.11.0;
+package Concierge v0.13.0;
 use v5.36;
 
-our $VERSION = 'v0.11.0';
+our $VERSION = 'v0.13.0';
 
-# ABSTRACT: Service layer orchestrator for authentication, sessions, and user data
+# ABSTRACT: Extensible service layer that manages the relationship between an application and its users
 
 use Carp qw<carp croak>;
 use JSON::PP qw< encode_json decode_json >;
@@ -11,10 +11,11 @@ use File::Spec;
 use Params::Filter qw< make_filter >;
 
 # === COMPONENT MODULES ===
+use Concierge::Desk::User;
+use Concierge::Desk::Component;
 use Concierge::Auth;
 use Concierge::Sessions;
 use Concierge::Users;
-use Concierge::Desk::User;
 
 # === PARAMETER FILTERS ===
 # Shared filters for secure data segregation
@@ -162,50 +163,62 @@ sub open_desk ($class, $desk_location) {
 	# never open half-instantiated. An optional component's new() failure
 	# is substituted with a Concierge::Desk::UnavailableComponent stand-in
 	# instead. See Concierge::Desk::Component for the full contract.
+	#
+	# A 'defer' entry (always also 'optional' -- enforced at build time)
+	# skips the real new($payload) call here entirely. Instead, its class
+	# is still require()d eagerly (catching a missing/broken module
+	# immediately, at open_desk() time, rather than deferring even that
+	# far) and revalidated via the same probe_component() helper used at
+	# build time's tier 1b. A passing probe installs a
+	# Concierge::Desk::DeferredComponent stand-in, which defers the real,
+	# potentially expensive new($payload) call until first actual use. A
+	# failing probe resolves immediately to UnavailableComponent, exactly
+	# like any other optional component failure. See
+	# Concierge::Desk::Component/PROBING for the full tier model.
 	for my $name (keys %{ $concierge_config->{components} // {} }) {
 		my $entry = $concierge_config->{components}{$name};
 		my $comp;
-		eval {
+		if ($entry->{defer}) {
 			(my $file = $entry->{class}) =~ s{::}{/}g;
 			require "$file.pm";
-			$comp = $entry->{class}->new($entry->{payload});
-		};
-		if ($@) {
-			if ($entry->{optional}) {
-				require Concierge::Desk::UnavailableComponent;
-				$comp = Concierge::Desk::UnavailableComponent->new(
-					name => $name, reason => $@,
+
+			my $probe = Concierge::Desk::Component::probe_component(
+				$entry->{class}, $entry->{payload},
+			);
+
+			if ($probe->{success}) {
+				require Concierge::Desk::DeferredComponent;
+				$comp = Concierge::Desk::DeferredComponent->new(
+					name => $name, class => $entry->{class}, payload => $entry->{payload},
 				);
 			} else {
-				croak "Failed to load required component '$name' ($entry->{class}): $@";
+				require Concierge::Desk::UnavailableComponent;
+				$comp = Concierge::Desk::UnavailableComponent->new(
+					name => $name, reason => $probe->{message},
+				);
+			}
+		}
+		else {
+			eval {
+				(my $file = $entry->{class}) =~ s{::}{/}g;
+				require "$file.pm";
+				$comp = $entry->{class}->new($entry->{payload});
+			};
+			if ($@) {
+				if ($entry->{optional}) {
+					require Concierge::Desk::UnavailableComponent;
+					$comp = Concierge::Desk::UnavailableComponent->new(
+						name => $name, reason => $@,
+					);
+				} else {
+					croak "Failed to load required component '$name' ($entry->{class}): $@";
+				}
 			}
 		}
 		$concierge->{$name} = $comp;
 		unless ($concierge->can($name)) {
 			no strict 'refs';
 			*{"Concierge::$name"} = sub { $_[0]->{$name} };
-		}
-
-		# Replay this component's 'promote' entries, already fully
-		# validated once, at build time, by build_desk() -- shape,
-		# method-existence (can()), and name-collisions. open_desk()
-		# performs none of that validation itself; concierge.conf is
-		# trusted completely. A forwarding sub calling ->$method_name
-		# on an UnavailableComponent stand-in resolves via its
-		# AUTOLOAD and returns the standard failure hashref, with no
-		# special-casing needed here.
-		if (defined $entry->{promote}) {
-			my $promote = $entry->{promote};
-			my @pairs = ref $promote eq 'HASH'
-				? (map { [$_, $promote->{$_}] } keys %$promote)
-				: (map { [$_, $_] } @$promote);
-			for my $pair (@pairs) {
-				my ($top_name, $method_name) = @$pair;
-				unless ($concierge->can($top_name)) {
-					no strict 'refs';
-					*{"Concierge::$top_name"} = sub { shift->{$name}->$method_name(@_) };
-				}
-			}
 		}
 	}
 
@@ -519,7 +532,15 @@ sub _make_user_closures ($self, $user_id) {
         return $self->users->update_user($user_id, $updates);
     };
 
-    return ($get_user_data, $update_user_data);
+    my $verify_password = sub ($password) {
+        return $self->verify_password($user_id, $password);
+    };
+
+    my $reset_password = sub ($new_password) {
+        return $self->reset_password($user_id, $new_password);
+    };
+
+    return ($get_user_data, $update_user_data, $verify_password, $reset_password);
 }
 
 # Admit visitor: assign user_key only (no session, no user data)
@@ -560,10 +581,17 @@ sub checkin_guest ($self, $session_opts={}) {
 	my $session = $result->{session};
 	my $session_id = $session->session_id();
 
-	# Create user object for guest (no user_data, no backend closures)
+	# Guest has a session, so it can log itself out, even though it has
+	# no Auth-backed identity for the password-related closures.
+	my $logout = sub { $self->logout_user($session_id) };
+	my $session_valid = sub { $self->sessions->get_session($session_id) };
+
+	# Create user object for guest (no user_data, no data-backend closures)
 	my $user = Concierge::Desk::User->enable_user($guest_id, {
-		session  => $session,
-		user_key => $guest_id,  # Use guest_id as user_key for simplicity
+		session        => $session,
+		user_key       => $guest_id,  # Use guest_id as user_key for simplicity
+		_logout        => $logout,
+		_session_valid => $session_valid,
 	});
 
 	# Store user_key mapping
@@ -583,7 +611,9 @@ sub checkin_guest ($self, $session_opts={}) {
 sub login_guest($self, $user_input, $guest_user_key) {
     # Convert guest to logged-in user, transferring session data (shopping cart, etc.)
     # $user_input: hashref with user_id, moniker, password (and optional email, etc.)
-    # This creates a new user account and transfers the guest's session data to it.
+    # Registers a new user account unless user_id already belongs to a known
+    # user, in which case this just logs them in -- transferring the guest's
+    # session data either way.
 
     # Step 1: Lookup guest's session_id from user_key mapping
     my $guest_mapping = $self->{user_keys}{$guest_user_key};
@@ -601,11 +631,26 @@ sub login_guest($self, $user_input, $guest_user_key) {
     my $guest_data_result = $guest_session->get_data();
     my $guest_data = $guest_data_result->{value} || {};
 
-    # Step 3: Create the new user account (Auth + Users)
-    my $add_result = $self->add_user($user_input);
-    return $add_result unless $add_result->{success};
+    # Step 3: Register a new user account (Auth + Users), unless user_id
+    # already belongs to a known user -- then skip straight to login.
+    my $user_id = $user_input->{user_id};
+    my $is_known_user = 0;
 
-    # Step 4: Log in the newly created user (authenticate, create session, get User object)
+    if (defined $user_id && length $user_id) {
+        my $verify = $self->verify_user($user_id);
+        if ($verify->{exists_in_auth} || $verify->{exists_in_users}) {
+            return { success => 0, message => "Account '$user_id' is in an inconsistent state; contact support" }
+                unless $verify->{verified};
+            $is_known_user = 1;
+        }
+    }
+
+    unless ($is_known_user) {
+        my $add_result = $self->add_user($user_input);
+        return $add_result unless $add_result->{success};
+    }
+
+    # Step 4: Log in the (new or known) user (authenticate, create session, get User object)
     my $auth_data = $auth_data_filter->($user_input);
     my $login_result = $self->login_user({
         user_id  => $auth_data->{user_id},
@@ -667,13 +712,19 @@ sub restore_user ($self, $user_key) {
 
     if ($user_result->{success}) {
         # Logged-in user: rebuild with user data and backend closures
-        my ($get, $update) = $self->_make_user_closures($user_id);
+        my ($get, $update, $verify_password, $reset_password) = $self->_make_user_closures($user_id);
+        my $logout = sub { $self->logout_user($session_id) };
+        my $session_valid = sub { $self->sessions->get_session($session_id) };
         my $user = Concierge::Desk::User->enable_user($user_id, {
             session           => $session,
             user_data         => $user_result->{user},
             user_key          => $user_key,
             _get_user_data    => $get,
             _update_user_data => $update,
+            _verify_password  => $verify_password,
+            _reset_password   => $reset_password,
+            _logout           => $logout,
+            _session_valid    => $session_valid,
         });
 
         return {
@@ -683,10 +734,15 @@ sub restore_user ($self, $user_key) {
         };
     }
     else {
-        # Guest: session only, no user data
+        # Guest: session only, no user data -- but a session still means
+        # it can log itself out.
+        my $logout = sub { $self->logout_user($session_id) };
+        my $session_valid = sub { $self->sessions->get_session($session_id) };
         my $user = Concierge::Desk::User->enable_user($user_id, {
-            session  => $session,
-            user_key => $user_key,
+            session        => $session,
+            user_key       => $user_key,
+            _logout        => $logout,
+            _session_valid => $session_valid,
         });
 
         return {
@@ -731,12 +787,18 @@ sub login_user ($self, $credentials, $session_opts={}) {
     my $session_id = $session->session_id();
 
     # Create user object for logged-in user
-    my ($get, $update) = $self->_make_user_closures($user_id);
+    my ($get, $update, $verify_password, $reset_password) = $self->_make_user_closures($user_id);
+    my $logout = sub { $self->logout_user($session_id) };
+    my $session_valid = sub { $self->sessions->get_session($session_id) };
     my $user = Concierge::Desk::User->enable_user($user_id, {
         session           => $session,
         user_data         => $user_result->{user},
         _get_user_data    => $get,
         _update_user_data => $update,
+        _verify_password  => $verify_password,
+        _reset_password   => $reset_password,
+        _logout           => $logout,
+        _session_valid    => $session_valid,
     });
 
     # Store user_key mapping
@@ -850,30 +912,18 @@ sub logout_user ($self, $session_id) {
     };
 }
 
-# Snapshot of Concierge's own method names, taken once when this module
-# is loaded -- i.e. before any component-driven dynamic sub (bare
-# accessors, promoted methods) has ever been installed into this
-# package by open_desk(). Concierge::Desk::Setup::build_desk() uses
-# this list to refuse a 'promote' entry that would shadow a real core
-# method. open_desk() never needs this: by the time a desk is opened,
-# its promote entries were already validated once, at build time, and
-# are trusted as part of concierge.conf.
-my @CORE_METHODS = grep { defined &{"Concierge::$_"} } keys %Concierge::;
-sub core_methods { return @CORE_METHODS }
-
 1;
 
 __END__
 
 =head1 NAME
 
-Concierge - Extensible service layer orchestrator of operational resources
-for applications, with built-in provisions for authentication, sessions,
-and user data.
+Concierge - Extensible service layer that manages the relationship
+between an application and its users.
 
 =head1 VERSION
 
-v0.11.0
+v0.13.0
 
 =head1 SYNOPSIS
 
@@ -907,8 +957,9 @@ v0.11.0
     my $restore = $concierge->restore_user($user->user_key);
     my $same_user = $restore->{user};
 
-    # Log out
+    # Log out -- via Concierge, or directly on the user object
     $concierge->logout_user($user->session_id);
+    $user->logout;
 
 =head1 CONCEPTS
 
@@ -941,13 +992,7 @@ treat an added component purely as a pass-through:
     # or my $OthCompObj = $concierge->{'OthComp'};
     my $res = $OthCompObj->OthCompMthd(); # $concierge no longer involved
 
-Additionally, selected methods of a component may be I<promoted> to be
-direct methods of the concierge object.
-
-    # OthComp's OthCompMthd specified in setup to be promoted
-    my $res = $concierge->OthCompMthd();
-
-See L</Additional Components> and L</Component Method Promotion>.
+See L</Additional Components>.
 
 =back
 
@@ -1025,14 +1070,8 @@ creates a session via Sessions in one coordinated call.
 For an added component, Concierge's involvement can end at handoff: the
 component satisfies the minimal contract in L<Concierge::Desk::Component> so
 it can be loaded and reached through the concierge, but Concierge does not
-inherit from it or in any way intervene in its operations - that is for the 
+inherit from it or in any way intervene in its operations - that is for the
 application as it uses the component.
-
-Alternatively, if useful to the application, methods from added components 
-may be promoted to be methods of the concierge object itself. 
-Promoted methods may be called with their own names if not conflicting
-with built-ins, and may be aliased to avoid conflicts or provide recognizable
-names. See Extensibility, above. 
 
 =back
 
@@ -1050,20 +1089,10 @@ deployed, and provided to the application the same way.
 
 =head1 DESCRIPTION
 
-Concierge is an extensible service layer orchestrator of operational
-resources for applications -- see L</CONCEPTS> above for what that means.
-Out of the box, its identity core coordinates three component modules
-behind a single API:
-
-=over 4
-
-=item * B<Concierge::Auth> -- password authentication (Argon2)
-
-=item * B<Concierge::Sessions> -- session management (SQLite or file backends)
-
-=item * B<Concierge::Users> -- user data storage (SQLite, YAML, or CSV/TSV backends)
-
-=back
+Concierge manages the relationship between an application and its users:
+identity, sessions, access, and the information an application keeps
+about who is using it. It does this through an extensible service layer
+-- see L</CONCEPTS> for the terms used throughout this documentation.
 
 Applications primarily interact with Concierge and the L<Concierge::Desk::User>
 objects it returns; most operations never require touching a component
@@ -1074,9 +1103,16 @@ through its own accessor (see L</Component Accessors> and L</EXTENSIBILITY>).
 =head2 What the Suite Provides
 
 Concierge handles orchestration -- coordinating components and returning
-consistent structured results.
+consistent structured results. As L</Orchestration> above describes,
+this takes one of two co-equal forms: direct, built-in coordination for
+the identity core, or handoff to whatever additional components a desk
+is configured with.
 
-The core capabilities of the suite live in the three components:
+The identity core -- Auth, Sessions, and Users -- ships with every
+installation and is described in detail below. An added component is
+just as much a capability of the suite once it's attached to a desk; see
+L</Additional Components> for how those are configured, loaded, and
+reached.
 
 B<Authentication> (L<Concierge::Auth>): Argon2id password hashing and
 verification; no plaintext credentials are ever written to disk. Also
@@ -1214,10 +1250,14 @@ Concierge ships with three I<identity core> components:
 
 These three are tightly orchestrated: a single C<login_user()> call
 authenticates via Auth, retrieves a record from Users, and creates a
-session through Sessions.  This coordination is the purpose of
-Concierge -- applications interact with the Concierge API and the
-L<Concierge::Desk::User> objects it returns, not with the components
-directly.
+session through Sessions.  This coordination is what the identity core
+exists to provide -- applications interact with the Concierge API and
+the L<Concierge::Desk::User> objects it returns, not with the components
+directly. It is one of the two orchestration forms described in
+L</CONCEPTS>, not the whole of what Concierge does: the same
+Concierge-level API also hands off to any added component, reached
+through its own accessor, with the application composing its own
+capabilities from what it gets back.
 
 The identity core is designed to be sufficient on its own, but the
 component pattern it follows -- backend abstraction, setup-time
@@ -1279,10 +1319,7 @@ Read-only accessors returning the live, already-instantiated component
 object ( L<Concierge::Auth>, L<Concierge::Sessions>, or L<Concierge::Users>,
 or a substitute -- see L</EXTENSIBILITY> ) for direct use when an operation
 isn't exposed as a Concierge-level convenience method. This is the same
-"bare accessor" direct component access described in L</Component Substitution>
-and L<Concierge::Desk::Component>'s C<promote> mechanism -- it remains available
-regardless of what a component chooses to C<promote> onto C<$concierge>
-directly.
+"bare accessor" direct component access described in L</Component Substitution>.
 
 =head2 User Lifecycle
 
@@ -1337,15 +1374,29 @@ also include C<< is_guest => 1 >>.
     my $result = $concierge->login_guest(\%credentials, $guest_user_key);
     my $user = $result->{user};    # Concierge::Desk::User (logged-in)
 
-Converts a guest to a logged-in user. Authenticates with C<%credentials>,
-transfers any data from the guest's session to the new session, then
-deletes the guest session and removes the guest's user_key mapping.
+Converts a guest to a logged-in user. If C<%credentials>' C<user_id> does
+not already belong to a known user, registers a new account first (same
+requirements as C<add_user()>); if it does belong to a known user (e.g. a
+returning customer who browsed as a guest before logging in to pay),
+registration is skipped and the existing account is used instead.
+Authenticates with C<%credentials>, transfers any data from the guest's
+session to the new session, then deletes the guest session and removes
+the guest's user_key mapping.
+
+Returns failure if C<user_id> exists in only one of the Auth/Users
+components (an inconsistent state) rather than attempting either path.
 
 =head3 logout_user
 
     my $result = $concierge->logout_user($session_id);
 
 Deletes the session and removes the user_key mapping entry.
+
+Also available directly on the returned user object as C<< $user->logout >>
+-- see L<Concierge::Desk::User>. Unlike this method, the user-object form
+needs no C<$session_id> argument (it's bound at construction) and works for
+both guest and logged-in users, since logout only needs a session, not an
+Auth-backed identity.
 
 =head2 Admin Operations
 
@@ -1423,12 +1474,26 @@ for existing users.
 Checks whether C<$password> is correct for C<$user_id>. Returns
 C<< success => 1 >> if the password matches.
 
+Also available directly on a logged-in user object as
+C<< $user->verify_password($password) >> -- see L<Concierge::Desk::User>.
+The user-object form needs no C<$user_id> argument (it's bound at
+construction) and collapses the hashref result to a plain C<1>/C<0>/
+C<undef> scalar; C<undef> means the method isn't applicable to that user
+(guests and visitors have no Auth-backed identity to check against).
+
 =head3 reset_password
 
     my $result = $concierge->reset_password($user_id, $new_password);
 
 Sets a new password for an existing user. The application is responsible
 for verifying the user's identity before calling this method.
+
+Also available directly on a logged-in user object as
+C<< $user->reset_password($new_password) >> -- see
+L<Concierge::Desk::User>. Same argument-binding and scalar-collapsing
+behavior as C<verify_password> above, except success collapses to C<1>
+and any non-success (including inapplicability to guests/visitors)
+collapses to C<undef>.
 
 =head1 PARAMETER FILTERS
 
@@ -1588,40 +1653,74 @@ they remain hardcoded core affordances, loaded unconditionally by
 C<open_desk()> as described above. The C<components> block is only for
 components genuinely additional to that identity core.
 
-=head2 Component Method Promotion
+=head3 Deferred component initialization (defer)
 
-A component's own bare accessor (C<< $concierge->{name}->method(...) >>
-or C<< $concierge->name->method(...) >>) always exposes its complete
-API -- this is the standard access Concierge provides the application
-for using the component, and needs no configuration.
-C<promote> is an optional, convenience layer on top of it: a
-curated allowlist of a component's methods forwarded directly onto
-C<$concierge>, declared in the same C<components> config block:
+C<< defer => 1 >> postpones a component's real, potentially expensive
+C<new($payload)> call until the component's first actual use, instead of
+paying that cost for every process that opens the desk regardless of
+whether the component is ever called. This is an opt-in escape valve, not
+a new default -- reach for it only when a specific component's own
+startup (a network database, an external API handshake) has demonstrated
+it's a problem in practice.
 
     components => {
         reports => {
-            class   => 'Concierge::Reports',
-            promote => ['get_signal_report'],                   # same-name
-            # or:
-            promote => { fetch_signal_report => 'get_signal_report' },  # aliased
+            class    => 'Concierge::Reports',
+            defer    => 1,     # defer new() until first real use
+            optional => 1,     # REQUIRED to be true whenever defer is true
         },
     },
 
-    my $c = Concierge->open_desk($desk_dir)->{concierge};
-    $c->fetch_signal_report(...);               # promoted sugar, using alias
-    $c->{reports}->get_signal_report(...);      # direct component access,
-                                                 # always works, promoted or not
+C<defer> B<forces> C<optional>: C<build_desk()> rejects
+C<< defer => 1, optional => 0 >>. This preserves Concierge's guarantee
+that, once a desk is open, its API methods are never fatal to the
+application -- a required-and-deferred component's eventual failure would
+happen mid-process, potentially while other users are already being
+served, which C<croak>ing would violate.
 
-In other words, the concierge may use its own alias to call the
-component's real method -- e.g. C<< $concierge->fetch_signal_report(...) >>
-calls the component's C<get_signal_report()>.
+Three checks apply to a C<defer> component, in addition to the ordinary
+build-time C<setup()> check every component gets:
 
-C<promote> is not access control -- it never restricts what's reachable
-via direct component access. All validation (shape, method-existence, and
-name-collision checks against core methods and other components) happens
-once, at C<build_desk()> time; C<open_desk()> trusts the persisted result
-completely. See L<Concierge::Desk::Component/PROMOTION: EXPOSING
-COMPONENT METHODS ON $concierge> for the full contract.
+=over 4
+
+=item * B<Build-time probe (tier 1b).> Immediately after C<setup()>
+succeeds, C<build_desk()> runs the same cheap reachability check tier 2
+will later run (the component's own C<probe()> class method if it has
+one, otherwise a default require-only check -- see
+L<Concierge::Desk::Component/PROBING>). This check is B<unconditionally
+build-fatal>, regardless of C<optional> -- deliberately, to catch a
+broken probe or an unrequireable class at a human-attended build, rather
+than only discovering it later, unattended, as a silent
+C<UnavailableComponent> substitution.
+
+=item * B<Open-time revalidation (tier 2).> C<open_desk()> runs the same
+probe-or-default check again, on every process start. A passing probe
+installs a L<Concierge::Desk::DeferredComponent> stand-in in place of the
+real component. A failing probe resolves immediately to
+L<Concierge::Desk::UnavailableComponent>, exactly like any other optional
+component failure -- since C<defer> always implies C<optional>, this is
+never open-fatal.
+
+=item * B<First real use (tier 3).> The C<DeferredComponent> stand-in
+defers the actual C<new($payload)> call until the first method is
+actually called on it, then caches the result (or, on failure, an
+C<UnavailableComponent> stand-in) and delegates every subsequent call to
+it. A tier 3 failure is permanent for the life of the process -- Concierge
+never retries a failed deferred build, matching the existing
+C<UnavailableComponent> precedent.
+
+=back
+
+Concierge never enforces a timeout around a component's C<probe()> or
+C<new()>, at any tier. If a component's own startup can hang or block, its
+author is expected to self-enforce a reasonable C<$max_wait_for_load>
+inside its own C<probe()>/C<new()>. This matters especially for C<defer>:
+Concierge runs single-process with cooperative concurrency, so a blocking
+sleep-and-retry loop inside a component's C<probe()> or C<new()> stalls
+the entire application for every current user, not just the caller that
+triggered it -- and a tier 3 (first-use) stall is worse than a tier
+1b/2 (build/open-time) one, since it can happen mid-process, while other
+users' requests are in flight.
 
 =head2 Future Components
 

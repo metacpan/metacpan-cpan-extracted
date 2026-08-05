@@ -1,7 +1,7 @@
 # ABSTRACT: Kanban Assignment & Responsibility Registry
 
 package App::karr;
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moo;
 use MooX::Cmd;
 use MooX::Options;
@@ -36,6 +36,8 @@ my @COMMANDS = (
   [ handoff   => 'Hand off a task for review' ],
   [ destroy   => 'Delete the entire refs/karr/* board' ],
   [ config    => 'View or modify board config' ],
+  [ disable   => 'Disable automated agent runs on this board' ],
+  [ enable    => 'Re-enable automated agent runs on this board' ],
   [ context   => 'Generate board context summary' ],
   [ log       => 'Show activity log' ],
   [ backup    => 'Export refs/karr/* as YAML' ],
@@ -145,7 +147,7 @@ App::karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

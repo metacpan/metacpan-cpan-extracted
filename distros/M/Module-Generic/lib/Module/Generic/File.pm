@@ -1,15 +1,15 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.16.2
+## Version v0.17.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2026/06/04
+## Modified 2026/07/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package Module::Generic::File;
 BEGIN
 {
@@ -143,7 +143,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.16.2';
+    our $VERSION = 'v0.17.0';
 };
 
 use strict;
@@ -2975,6 +2975,32 @@ sub max_recursion { return( shift->_set_get_number( 'max_recursion', @_ ) ); }
 
 sub makepath { return( shift->mkpath( @_ ) ); }
 
+sub mime
+{
+    my $self = shift( @_ );
+    if( !$self->exists )
+    {
+        return( '' );
+    }
+    $self->_load_class( 'Module::Generic::File::Magic' ) ||
+        return( $self->pass_error );
+    my $magic = Module::Generic::File::Magic->new ||
+        return( $self->pass_error( Module::Generic::File::Magic->error ) );
+    my $mime = $magic->mime_type_from_file( $self );
+    if( !defined( $mime ) && $magic->error )
+    {
+        return( $self->pass_error( $magic->error ) );
+    }
+    return( $mime );
+}
+
+{
+    no warnings 'once';
+    *mtype     = \&mime;
+    *mimetype  = \&mime;
+    *mime_type = \&mime;
+}
+
 sub mkdir
 {
     my $self = shift( @_ );
@@ -4766,6 +4792,7 @@ sub unload_perl
     else
     {
         $self->_load_class( 'Data::Dump' ) || return( $self->pass_error );
+        no warnings 'once';
         local $Data::Dump::INDENT = $opts->{indent} if( exists( $opts->{indent} ) );
         local $Data::Dump::TRY_BASE64 = $opts->{max_binary_size} if( exists( $opts->{max_binary_size} ) );
         local $Data::Dump::LINEWIDTH = $opts->{max_width} if( exists( $opts->{max_width} ) );
@@ -5879,7 +5906,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.16.2
+    v0.17.0
 
 =head1 DESCRIPTION
 
@@ -7204,6 +7231,25 @@ It returns true upon success and C<undef> upon failure. The error, if any, can b
 =head2 makepath
 
 This is an alias to L</mkpath>
+
+=head2 mime
+
+    my $file = Module::Generic::File->new( '/some/pdf/file.pdf' );
+
+    say $file->mime;       # application/pdf
+    say $file->mtype;      # application/pdf
+    say $file->mimetype;   # application/pdf
+    say $file->mime_type;  # application/pdf
+
+    my $file = Module::Generic::File->new( '/var/log' );
+    say $file->mime;       # inode/directory
+
+This returns the mime type of the underlying file if it exists.
+If it does not exist yet, it returns an empty string.
+
+If the target is a symbolic link it will return C<inode/symlink> instead of the linked file.
+
+It returns true upon success and C<undef> upon failure. The error, if any, can be retrieved with L<error|Module::Generic/error>
 
 =head2 max_recursion
 

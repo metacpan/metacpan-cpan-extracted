@@ -109,7 +109,12 @@ static void hmf_pump(pTHX) {
         PUSHMARK(SP);
         XPUSHs(fut);
         PUTBACK;
-        call_sv(cb, G_DISCARD);
+        /* user code runs here: trap death into a warning so one bad
+         * callback cannot take down the loop (the guard used to live in
+         * ft_call0; C closures are now dispatched directly) */
+        call_sv(cb, G_DISCARD | G_EVAL);
+        if (SvTRUE(ERRSV))
+            warn("Fetch: future callback died: %s", SvPV_nolen(ERRSV));
     }
     LEAVE;
 }

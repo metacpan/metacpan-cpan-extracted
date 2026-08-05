@@ -2,6 +2,8 @@ use 5.008003;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
+use File::Find ();
 use Config;
 
 # Fetch vendors its own C core (event loop backends, Future, client TLS, and
@@ -125,6 +127,38 @@ if ($^O eq 'MSWin32') {
     $LIBS .= ' -lws2_32';
 }
 
+# --- ExtUtils::Depends -----------------------------------------------------
+# Fetch is BOTH a consumer (of File::Raw::JSON's frj_abi, used by ft_json.h to
+# decode/encode JSON in C) and a provider (it installs fetch_abi.h so dependents
+# like JSON::Schema::Fast reach Fetch's ABI without vendoring a copy).
+my $pkg;
+eval { $pkg = ExtUtils::Depends->new('Fetch', 'File::Raw::JSON'); 1 };
+if (!$pkg) {
+    die "Cannot find the File::Raw::JSON dependency.\n"
+      . "Install File::Raw::JSON 0.05+, or place it as a sibling directory.\n"
+        unless -d '../File-Raw-JSON/include';
+    $pkg = ExtUtils::Depends->new('Fetch');            # provider only
+    $INC .= ' -I../File-Raw-JSON/include';             # frj_abi.h fallback
+}
+$pkg->install('include/fetch/fetch_abi.h');            # provide fetch_abi.h
+mkdir 'Install' unless -d 'Install';
+$pkg->save_config('Install/Files.pm');
+my %dep = $pkg->get_makefile_vars;
+$INC  .= ' ' . delete $dep{INC} if $dep{INC};          # merge frj + provider inc
+# Merge (don't clobber) LIBS - EU::Depends returns an empty LIBS that would
+# otherwise wipe out Fetch's own -lssl/-lcrypto/-lnghttp2 and silently break
+# TLS/HTTP2. LDFROM likewise defaults to $(OBJECT); drop EU::Depends' copy.
+$LIBS  = join ' ', grep { defined && length } $LIBS, delete $dep{LIBS};
+delete $dep{LDFROM};
+
+# EU::Depends' PM map (installing fetch_abi.h + Files.pm) replaces MakeMaker's
+# auto-detected PM, so re-add the module's own .pm files.
+File::Find::find(sub {
+    return unless /\.pm\z/;
+    (my $rel = $File::Find::name) =~ s{^lib/}{};
+    $dep{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
+}, 'lib');
+
 my %WriteMakefileArgs = (
     NAME             => 'Fetch',
     AUTHOR           => ['LNATION <email@lnation.org>'],
@@ -138,17 +172,17 @@ my %WriteMakefileArgs = (
     LIBS             => [$LIBS],
     XS               => { 'Fetch.xs' => 'Fetch.c' },
     OBJECT           => 'Fetch$(OBJ_EXT)',
-    CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '0' },
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::Depends'   => '0.404',
+        'File::Raw::JSON'     => '0.05',
+    },
     TEST_REQUIRES    => { 'Test::More' => '0' },
-    PREREQ_PM        => {},
-    # JSON helpers prefer Cpanel::JSON::XS but fall back to core JSON::PP, so
-    # it is only a recommendation, not a hard requirement.
-    META_MERGE       => {
-        'meta-spec' => { version => 2 },
-        prereqs => { runtime => { recommends => { 'Cpanel::JSON::XS' => '0' } } },
+    PREREQ_PM        => {
+        'File::Raw::JSON' => '0.05',   # JSON encode/decode via its C ABI
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Fetch-* Fetch.c Fetch.o Fetch.bs' },
+    clean => { FILES => 'Fetch-* Fetch.c Fetch.o Fetch.bs Install/Files.pm' },
     # Fetch.xs is a thin wrapper that INCLUDE:s the per-package fragments under
     # xs/; regenerate Fetch.c when any fragment changes. MakeMaker also does not
     # scan XS #includes, so rebuild the object when any vendored header changes
@@ -157,6 +191,7 @@ my %WriteMakefileArgs = (
         'Fetch.c'            => join(' ', glob('xs/*.xs')),
         'Fetch$(OBJ_EXT)'    => join(' ', glob('include/fetch/*.h')),
     },
+    %dep,   # ExtUtils::Depends: TYPEMAPS + PM (installs fetch_abi.h + our .pm)
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

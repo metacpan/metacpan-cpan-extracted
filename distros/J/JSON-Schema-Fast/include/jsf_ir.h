@@ -46,6 +46,9 @@
 #define JSF_HAS_REF        (1ULL<<33)
 #define JSF_HAS_DEFAULT    (1ULL<<34)
 #define JSF_HAS_DEPSCHEMAS (1ULL<<35)
+#define JSF_HAS_UNEVALPROPS (1ULL<<36)
+#define JSF_HAS_UNEVALITEMS (1ULL<<37)
+#define JSF_HAS_DYNREF      (1ULL<<38)
 
 /* ---- fast-path tags (principle 4) --------------------------------------- */
 #define JSF_TAG_NORMAL        0
@@ -132,6 +135,8 @@ typedef struct jsf_node {
     uint32_t propnames_off;/* node */
     uint32_t depreq_off;   /* jsf_deptab */
     uint32_t depsch_off;   /* jsf_dstab */
+    uint32_t unevalprops_off; /* node (unevaluatedProperties) */
+    uint32_t unevalitems_off; /* node (unevaluatedItems) */
 
     /* applicators */
     uint32_t allof_off, anyof_off, oneof_off;  /* jsf_offlist */
@@ -139,8 +144,10 @@ typedef struct jsf_node {
     uint32_t if_off, then_off, else_off;       /* node */
 
     /* core */
-    uint32_t ref_off;         /* resolved target node (same-doc $ref) */
+    uint32_t ref_off;         /* resolved target node ($ref, or $dynamicRef fallback) */
     uint32_t schema_path_off; /* interned JSON Pointer to this subschema (no '#') */
+    uint32_t base_off;        /* interned base URI of this node's resource */
+    uint32_t dynref_name_off; /* interned $dynamicRef fragment name (dynamic search) */
 } jsf_node_t;
 
 #endif /* JSF_IR_H */

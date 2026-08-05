@@ -193,9 +193,9 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
     if (sni_hv && SvROK(sni_hv) && SvTYPE(SvRV(sni_hv)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(sni_hv);
         I32 n = hv_iterinit(hv), i = 0;
-        hm_sni_registry *reg = (hm_sni_registry *)calloc(1, sizeof(hm_sni_registry));
+        hm_sni_registry *reg = (hm_sni_registry *)hm_xcalloc(1, sizeof(hm_sni_registry));
         HE *he;
-        reg->entries = (hm_sni_entry *)calloc(n > 0 ? n : 1, sizeof(hm_sni_entry));
+        reg->entries = (hm_sni_entry *)hm_xcalloc(n > 0 ? n : 1, sizeof(hm_sni_entry));
         while ((he = hv_iternext(hv))) {
             I32 klen; char *host = hv_iterkey(he, &klen);
             SV *val = hv_iterval(hv, he);
@@ -239,7 +239,7 @@ static int hm_tls_wrap(hm_conn *c, void *ctx) {
 /* After a successful handshake, record protocol/cipher and any client cert. */
 static void hm_tls_capture_peer(hm_conn *c) {
     SSL *ssl = (SSL *)c->ssl;
-    hm_tls_peer *p = (hm_tls_peer *)calloc(1, sizeof(hm_tls_peer));
+    hm_tls_peer *p = (hm_tls_peer *)hm_xcalloc(1, sizeof(hm_tls_peer));
     X509 *cert;
     p->proto  = SSL_get_version(ssl);
     p->cipher = SSL_get_cipher(ssl);

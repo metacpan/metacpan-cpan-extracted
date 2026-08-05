@@ -1,5 +1,8 @@
 Revision history for Reverse-Proxy
 
+0.03    2026-08-05
+        - include/rp_compat.h shims XS_INTERNAL and mg_findext
+
 0.02    2026-08-03
         - t/03-errors.t: make the DNS-failure test robust on CPAN Testers hosts
           whose resolvers hijack NXDOMAIN and answer a parking page 

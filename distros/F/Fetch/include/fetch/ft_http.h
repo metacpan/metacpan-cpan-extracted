@@ -368,6 +368,19 @@ static int ft_parse_headers(pTHX_ ft_conn *c) {
         }
         p = eol + 2;
     }
+    /* RFC 7230 3.3.3: Transfer-Encoding overrides Content-Length. A response
+     * carrying both is a response-smuggling signal; frame strictly by the
+     * chunked encoding and drop the ambiguous Content-Length so no code path
+     * (ft_body_complete, keep-alive completion) can ever frame by it. */
+    if (c->chunked) c->content_len = -1;
+    /* RFC 7230 3.3.3: 1xx, 204 and 304 responses never carry a body, and a
+     * server MUST NOT send Content-Length on 1xx/204 - without this a 204 on
+     * a keep-alive connection would wait for close/timeout that never comes. */
+    if (c->status == 204 || c->status == 304 ||
+        (c->status >= 100 && c->status < 200)) {
+        c->content_len = 0;
+        c->chunked = 0;
+    }
     c->have_headers = 1;
     c->cpos = c->hdr_end;       /* body decoding starts here */
     if (c->chunked) c->chunk_left = -1;

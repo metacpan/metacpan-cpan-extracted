@@ -10,8 +10,12 @@
 
 typedef struct jsf_pctx {
     jsf_compiled_t *C;
-    HV             *path2off;   /* JSON Pointer string -> IV node offset */
-    AV             *refreqs;    /* flat: node_off(IV), pointer(PV), ... */
+    HV             *path2off;   /* full URI string -> IV node offset */
+    AV             *refreqs;    /* flat triples: node_off(IV), ref(PV), base(PV) */
+    SV             *base;       /* current base URI (from the nearest $id scope) */
+    SV             *resolver;   /* coderef: uri -> schema ref (remote docs), or undef */
+    HV             *loaded;     /* document URIs already fetched */
+    int             auto_fetch; /* fetch remote docs via Fetch when no resolver */
 } jsf_pctx;
 
 static uint32_t jsf_parse_schema(pTHX_ jsf_pctx *P, SV *schema, SV *path);
@@ -69,6 +73,7 @@ static int jsf__recognised(const char *k, STRLEN l) {
         "additionalProperties","required","minProperties","maxProperties",
         "propertyNames","dependentRequired","dependentSchemas","allOf","anyOf",
         "oneOf","not","if","then","else","$ref","$defs",
+        "unevaluatedProperties","unevaluatedItems","$dynamicRef","$dynamicAnchor",
         /* benign annotations / identifiers */
         "$schema","$id","$anchor","$comment","$vocabulary","title","description",
         "default","examples","deprecated","readOnly","writeOnly","example",
@@ -296,16 +301,48 @@ static uint32_t jsf_parse_schema(pTHX_ jsf_pctx *P, SV *schema, SV *path) {
     uint32_t propnames_off=0, depreq_off=0, depsch_off=0;
     uint32_t allof_off=0, anyof_off=0, oneof_off=0, not_off=0;
     uint32_t if_off=0, then_off=0, else_off=0;
+    uint32_t unevalprops_off=0, unevalitems_off=0;
+    uint32_t dynref_name_off=0;
     uint8_t  tag = JSF_TAG_NORMAL;
     int bval;
     jsf_node_t *n;
     SV **e;
+    SV *saved_base = NULL;   /* restored on the way out if $id opened a scope */
 
     if (off == JSF_NULL_OFF) croak("JSON::Schema::Fast: out of memory");
-    (void)hv_store_ent(P->path2off, path, newSViv((IV)off), 0);
 
-    /* remember this subschema's JSON Pointer (minus the leading '#') for the
-     * schemaLocation of any error it raises. */
+    /* $id opens a new base-URI scope (reset the base-relative pointer to "#" and
+     * register the node under its bare $id); $anchor registers a named location;
+     * every node is registered under its canonical URI (base + pointer). */
+    if (SvROK(schema) && SvTYPE(SvRV(schema)) == SVt_PVHV) {
+        HV *hh = (HV *)SvRV(schema);
+        SV **idv = hv_fetchs(hh, "$id", 0), **anv;
+        if (idv && *idv && SvPOK(*idv) && SvCUR(*idv)) {
+            SV *resolved = jsf_uri_resolve(aTHX_ P->base, *idv);
+            saved_base = P->base;
+            P->base = jsf_uri_base_of(aTHX_ resolved);
+            path = sv_2mortal(newSVpvs("#"));
+            { SV *k = sv_2mortal(newSVsv(P->base)); (void)hv_store_ent(P->path2off, k, newSViv((IV)off), 0); }
+        }
+        { SV *k = sv_2mortal(newSVsv(P->base)); sv_catsv(k, path); (void)hv_store_ent(P->path2off, k, newSViv((IV)off), 0); }
+        if ((anv = hv_fetchs(hh, "$anchor", 0)) && *anv && SvPOK(*anv)) {
+            SV *k = sv_2mortal(newSVsv(P->base)); sv_catpvs(k, "#"); sv_catsv(k, *anv);
+            (void)hv_store_ent(P->path2off, k, newSViv((IV)off), 0);
+        }
+        /* $dynamicAnchor registers as a plain anchor AND in the dynamic map */
+        if ((anv = hv_fetchs(hh, "$dynamicAnchor", 0)) && *anv && SvPOK(*anv)) {
+            SV *k1 = sv_2mortal(newSVsv(P->base)); sv_catpvs(k1, "#"); sv_catsv(k1, *anv);
+            (void)hv_store_ent(P->path2off, k1, newSViv((IV)off), 0);
+            { SV *k2 = sv_2mortal(newSVsv(P->base)); sv_catpvs(k2, "#"); sv_catsv(k2, *anv);
+              (void)hv_store_ent(P->C->dynmap, k2, newSViv((IV)off), 0); }
+            P->C->has_dynamic = 1;
+        }
+    } else {
+        SV *k = sv_2mortal(newSVsv(P->base)); sv_catsv(k, path);
+        (void)hv_store_ent(P->path2off, k, newSViv((IV)off), 0);
+    }
+
+    /* schemaLocation pointer (base-relative), minus the leading '#'. */
     {
         STRLEN pl; const char *pp = SvPV_const(path, pl);
         uint32_t sp = jsf_arena_intern(a, pl > 0 ? pp + 1 : pp,
@@ -404,6 +441,8 @@ static uint32_t jsf_parse_schema(pTHX_ jsf_pctx *P, SV *schema, SV *path) {
     if ((e = hv_fetchs(h, "allOf", 0)) && *e && SvROK(*e) && SvTYPE(SvRV(*e))==SVt_PVAV) { allof_off = jsf__build_offlist(aTHX_ P, *e, path, "allOf"); present |= JSF_HAS_ALLOF; }
     if ((e = hv_fetchs(h, "anyOf", 0)) && *e && SvROK(*e) && SvTYPE(SvRV(*e))==SVt_PVAV) { anyof_off = jsf__build_offlist(aTHX_ P, *e, path, "anyOf"); present |= JSF_HAS_ANYOF; }
     if ((e = hv_fetchs(h, "oneOf", 0)) && *e && SvROK(*e) && SvTYPE(SvRV(*e))==SVt_PVAV) { oneof_off = jsf__build_offlist(aTHX_ P, *e, path, "oneOf"); present |= JSF_HAS_ONEOF; }
+    if ((e = hv_fetchs(h, "unevaluatedProperties", 0)) && *e) { unevalprops_off = jsf_parse_schema(aTHX_ P, *e, jsf__child_path(aTHX_ path, "unevaluatedProperties", NULL, 0)); present |= JSF_HAS_UNEVALPROPS; P->C->has_unevaluated = 1; }
+    if ((e = hv_fetchs(h, "unevaluatedItems", 0)) && *e)      { unevalitems_off = jsf_parse_schema(aTHX_ P, *e, jsf__child_path(aTHX_ path, "unevaluatedItems", NULL, 0)); present |= JSF_HAS_UNEVALITEMS; P->C->has_unevaluated = 1; }
     if ((e = hv_fetchs(h, "not", 0)) && *e)   { not_off = jsf_parse_schema(aTHX_ P, *e, jsf__child_path(aTHX_ path, "not", NULL, 0)); present |= JSF_HAS_NOT; }
     if ((e = hv_fetchs(h, "if", 0)) && *e)    { if_off = jsf_parse_schema(aTHX_ P, *e, jsf__child_path(aTHX_ path, "if", NULL, 0)); present |= JSF_HAS_IF; }
     if ((e = hv_fetchs(h, "then", 0)) && *e)  { then_off = jsf_parse_schema(aTHX_ P, *e, jsf__child_path(aTHX_ path, "then", NULL, 0)); }
@@ -412,7 +451,21 @@ static uint32_t jsf_parse_schema(pTHX_ jsf_pctx *P, SV *schema, SV *path) {
     if ((e = hv_fetchs(h, "$ref", 0)) && *e && SvPOK(*e)) {
         av_push(P->refreqs, newSViv((IV)off));
         av_push(P->refreqs, newSVsv(*e));
+        av_push(P->refreqs, newSVsv(P->base));
         present |= JSF_HAS_REF;
+    }
+    /* $dynamicRef: lexical fallback resolves like $ref (into ref_off); the
+     * fragment name drives the runtime dynamic-scope search. */
+    if ((e = hv_fetchs(h, "$dynamicRef", 0)) && *e && SvPOK(*e)) {
+        STRLEN dl; const char *dp = SvPV_const(*e, dl);
+        const char *hh2 = (const char *)memchr(dp, '#', dl);
+        av_push(P->refreqs, newSViv((IV)off));
+        av_push(P->refreqs, newSVsv(*e));
+        av_push(P->refreqs, newSVsv(P->base));
+        if (hh2 && dp + dl - (hh2 + 1) > 0)
+            dynref_name_off = jsf_arena_intern(a, hh2 + 1, (uint32_t)(dp + dl - (hh2 + 1)));
+        present |= JSF_HAS_DYNREF;
+        P->C->has_dynamic = 1;
     }
 
     /* fast-path tag */
@@ -421,8 +474,14 @@ static uint32_t jsf_parse_schema(pTHX_ jsf_pctx *P, SV *schema, SV *path) {
     else if (present == JSF_HAS_CONST) tag = JSF_TAG_CONST_LEAF;
     else if (present == JSF_HAS_ENUM)  tag = JSF_TAG_ENUM_LEAF;
 
-    /* commit: fetch the node fresh (arena may have moved) and write it once */
-    n = (jsf_node_t *)jsf_arena_ptr(a, off);
+    /* commit: fetch the node fresh (arena may have moved) and write it once.
+     * intern the resource base URI first (interning may move the arena). */
+    {
+        uint32_t base_off = jsf_arena_intern(a, SvPVX(P->base), (uint32_t)SvCUR(P->base));
+        n = (jsf_node_t *)jsf_arena_ptr(a, off);
+        n->base_off = base_off;
+        n->dynref_name_off = dynref_name_off;
+    }
     n->present = present; n->type_mask = type_mask; n->tag = tag; n->unique = unique;
     n->enum_keep = enum_keep; n->enum_n = enum_n; n->const_keep = const_keep;
     n->default_keep = default_keep;
@@ -438,6 +497,8 @@ static uint32_t jsf_parse_schema(pTHX_ jsf_pctx *P, SV *schema, SV *path) {
     n->depsch_off = depsch_off;
     n->allof_off = allof_off; n->anyof_off = anyof_off; n->oneof_off = oneof_off; n->not_off = not_off;
     n->if_off = if_off; n->then_off = then_off; n->else_off = else_off;
+    n->unevalprops_off = unevalprops_off; n->unevalitems_off = unevalitems_off;
+    if (saved_base) P->base = saved_base;   /* leave the $id scope */
     return off;
 }
 
@@ -471,30 +532,103 @@ static SV *jsf_ptr_decode(pTHX_ const char *s, STRLEN len) {
     return p2;
 }
 
+/* Ask the resolver coderef for the schema document at `uri`; a returned ref is
+ * used, anything else (undef) means "not available". Result is mortal. */
+static SV *jsf_call_resolver(pTHX_ SV *resolver, const char *uri, STRLEN ulen) {
+    dSP; int count; SV *ret = NULL;
+    if (!resolver || !SvOK(resolver)) return NULL;
+    ENTER; SAVETMPS; PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpvn(uri, ulen)));
+    PUTBACK;
+    count = call_sv(resolver, G_SCALAR);
+    SPAGAIN;
+    if (count > 0) { SV *r = POPs; if (SvROK(r)) ret = newSVsv(r); }
+    PUTBACK; FREETMPS; LEAVE;
+    return ret ? sv_2mortal(ret) : NULL;
+}
+
+/* Resolve each $ref against its base URI (fragment percent/~-decoded), looking
+ * the canonical URI up in the registry. When the target document has not been
+ * loaded, fetch it via the resolver, parse it into the same arena (which may
+ * append further refs), and retry. The refreqs array grows as documents load;
+ * the loop consumes it to the end. */
 static void jsf_resolve_refs(pTHX_ jsf_pctx *P) {
-    SSize_t i, n = av_len(P->refreqs) + 1;
-    for (i = 0; i + 1 < n; i += 2) {
-        SV **oe = av_fetch(P->refreqs, i, 0);
-        SV **pe = av_fetch(P->refreqs, i + 1, 0);
+    SSize_t idx = 0;
+    while (idx + 2 <= av_len(P->refreqs)) {
+        SV **oe = av_fetch(P->refreqs, idx, 0);
+        SV **pe = av_fetch(P->refreqs, idx + 1, 0);
+        SV **be = av_fetch(P->refreqs, idx + 2, 0);
         uint32_t node_off = (uint32_t)SvIV(*oe);
-        STRLEN pl; const char *ptr = SvPV_const(*pe, pl);
-        SV *dec = jsf_ptr_decode(aTHX_ ptr, pl);
-        STRLEN dl; const char *dp = SvPV_const(dec, dl);
-        SV **te = hv_fetch(P->path2off, dp, (I32)dl, 0);
-        if (te && *te && SvIOK(*te)) {
-            jsf_node_t *n = (jsf_node_t *)jsf_arena_ptr(P->C->arena, node_off);
-            n->ref_off = (uint32_t)SvIV(*te);
-        } else if (pl && ptr[0] == '#') {
-            croak("JSON::Schema::Fast: unresolved $ref '%.*s'", (int)pl, ptr);
+        SV *ref_copy = sv_2mortal(newSVsv(*pe));           /* survives re-parse */
+        SV *abs = jsf_uri_resolve(aTHX_ *be, *pe);
+        STRLEN al; const char *ap = SvPV_const(abs, al);
+        const char *hash = (const char *)memchr(ap, '#', al);
+        SV *doc = sv_2mortal(newSVpvn(ap, hash ? (STRLEN)(hash - ap) : al));
+        SV *key;
+        SV **te;
+        STRLEN kl; const char *kp;
+        idx += 3;
+
+        if (hash) {
+            SV *frag = jsf_ptr_decode(aTHX_ hash + 1, al - (hash - ap) - 1);
+            key = sv_2mortal(newSVpvn(ap, hash - ap));
+            sv_catpvs(key, "#"); sv_catsv(key, frag);
         } else {
-            croak("JSON::Schema::Fast: remote $ref not supported in v0.01: '%.*s'", (int)pl, ptr);
+            key = sv_2mortal(newSVsv(abs));
+        }
+        kp = SvPV_const(key, kl);
+        te = hv_fetch(P->path2off, kp, (I32)kl, 0);
+
+        if (!(te && *te && SvIOK(*te))) {
+            STRLEN dl; const char *dp = SvPV_const(doc, dl);
+            if (dl && !hv_exists(P->loaded, dp, (I32)dl)) {
+                SV *sub = NULL;
+                (void)hv_store(P->loaded, dp, (I32)dl, &PL_sv_yes, 0);
+                if (P->resolver) sub = jsf_call_resolver(aTHX_ P->resolver, dp, dl);
+                if (!sub && P->auto_fetch) sub = jsf_fetch_uri(aTHX_ dp, dl);
+                if (sub) {
+                    SV *saved = P->base;
+                    uint32_t root2;
+                    P->base = sv_2mortal(newSVsv(doc));
+                    root2 = jsf_parse_schema(aTHX_ P, sub, sv_2mortal(newSVpvs("#")));
+                    P->base = saved;
+                    /* register the retrieval URI (in case $id is absent/differs) */
+                    { SV *k1 = sv_2mortal(newSVsv(doc)); (void)hv_store_ent(P->path2off, k1, newSViv((IV)root2), 0);
+                      SV *k2 = sv_2mortal(newSVsv(doc)); sv_catpvs(k2, "#"); (void)hv_store_ent(P->path2off, k2, newSViv((IV)root2), 0); }
+                    kp = SvPV_const(key, kl);                 /* key SV unchanged */
+                    te = hv_fetch(P->path2off, kp, (I32)kl, 0);
+                }
+            }
+        }
+
+        if (te && *te && SvIOK(*te)) {
+            jsf_node_t *nd = (jsf_node_t *)jsf_arena_ptr(P->C->arena, node_off);
+            nd->ref_off = (uint32_t)SvIV(*te);
+            /* $dynamicRef "bookend": the dynamic-scope search only applies when
+             * the lexical target is itself the matching $dynamicAnchor; else it
+             * is a plain $ref (clear the dynamic name so runtime uses ref_off). */
+            if ((nd->present & JSF_HAS_DYNREF) && nd->dynref_name_off) {
+                jsf_node_t *tgt = (jsf_node_t *)jsf_arena_ptr(P->C->arena, nd->ref_off);
+                uint32_t nml; const char *nm = jsf_str_bytes(P->C->arena, nd->dynref_name_off, &nml);
+                uint32_t tbl; const char *tb = jsf_str_bytes(P->C->arena, tgt->base_off, &tbl);
+                SV *dk = sv_2mortal(newSVpvn(tb, tbl)); STRLEN dkl; const char *dkp;
+                SV **de;
+                sv_catpvs(dk, "#"); sv_catpvn(dk, nm, nml);
+                dkp = SvPV_const(dk, dkl);
+                de = hv_fetch(P->C->dynmap, dkp, (I32)dkl, 0);
+                if (!(de && *de && SvIOK(*de) && (uint32_t)SvIV(*de) == nd->ref_off))
+                    nd->dynref_name_off = 0;
+            }
+        } else {
+            STRLEN rl; const char *rp = SvPV_const(ref_copy, rl);
+            croak("JSON::Schema::Fast: cannot resolve $ref '%.*s'", (int)rl, rp);
         }
     }
 }
 
 /* ---- top-level compile -------------------------------------------------- */
 
-static jsf_compiled_t *jsf_compile_sv(pTHX_ SV *schema) {
+static jsf_compiled_t *jsf_compile_sv(pTHX_ SV *schema, SV *resolver, int auto_fetch) {
     jsf_compiled_t *C = jsf_compiled_new(aTHX);
     jsf_pctx P;
     SV *root_path;
@@ -502,9 +636,34 @@ static jsf_compiled_t *jsf_compile_sv(pTHX_ SV *schema) {
     P.C = C;
     P.path2off = (HV *)sv_2mortal((SV *)newHV());
     P.refreqs  = (AV *)sv_2mortal((SV *)newAV());
+    P.base     = sv_2mortal(newSVpvs(""));   /* default base URI */
+    P.resolver = (resolver && SvOK(resolver)) ? resolver : NULL;
+    P.loaded   = (HV *)sv_2mortal((SV *)newHV());
+    P.auto_fetch = auto_fetch;
     root_path  = sv_2mortal(newSVpvs("#"));
     C->root = jsf_parse_schema(aTHX_ &P, schema, root_path);
     jsf_resolve_refs(aTHX_ &P);
+
+    /* $schema: a custom metaschema whose $vocabulary omits (or disables) the
+     * validation vocabulary turns the validation keywords into annotations. */
+    if (SvROK(schema) && SvTYPE(SvRV(schema)) == SVt_PVHV) {
+        SV **sc = hv_fetchs((HV *)SvRV(schema), "$schema", 0);
+        if (sc && *sc && SvPOK(*sc)) {
+            STRLEN sl; const char *sp = SvPV_const(*sc, sl);
+            static const char *STD = "https://json-schema.org/draft/2020-12/schema";
+            if (P.resolver && !(sl == strlen(STD) && memEQ(sp, STD, sl))) {
+                SV *meta = jsf_call_resolver(aTHX_ P.resolver, sp, sl);
+                if (meta && SvROK(meta) && SvTYPE(SvRV(meta)) == SVt_PVHV) {
+                    SV **vv = hv_fetchs((HV *)SvRV(meta), "$vocabulary", 0);
+                    if (vv && *vv && SvROK(*vv) && SvTYPE(SvRV(*vv)) == SVt_PVHV) {
+                        static const char *VV = "https://json-schema.org/draft/2020-12/vocab/validation";
+                        SV **val = hv_fetch((HV *)SvRV(*vv), VV, (I32)strlen(VV), 0);
+                        if (!val || !*val || !SvTRUE(*val)) C->no_validation_vocab = 1;
+                    }
+                }
+            }
+        }
+    }
     return C;
 }
 

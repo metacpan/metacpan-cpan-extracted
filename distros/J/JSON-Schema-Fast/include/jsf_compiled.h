@@ -23,6 +23,10 @@ typedef struct jsf_compiled {
     int          rxn, rxcap;
     int          coerce;         /* string<->number/boolean coercion (opt-in) */
     int          apply_defaults; /* fill missing props from `default` (opt-in) */
+    int          has_unevaluated;/* schema uses unevaluatedProperties/Items */
+    int          has_dynamic;    /* schema uses $dynamicRef/$dynamicAnchor */
+    int          no_validation_vocab; /* $schema metaschema disables validation vocab */
+    HV          *dynmap;         /* "base#anchor" -> IV node offset (dynamic anchors) */
     SV          *schema_sv;      /* keepalive of the (decoded) schema, for schema() */
 } jsf_compiled_t;
 
@@ -36,9 +40,13 @@ static jsf_compiled_t *jsf_compiled_new(pTHX) {
     c->unsupported = 0;
     c->rx          = NULL;
     c->rxn = c->rxcap = 0;
-    c->coerce         = 0;
-    c->apply_defaults = 0;
-    c->schema_sv      = NULL;
+    c->coerce          = 0;
+    c->apply_defaults  = 0;
+    c->has_unevaluated = 0;
+    c->has_dynamic     = 0;
+    c->no_validation_vocab = 0;
+    c->dynmap          = newHV();
+    c->schema_sv       = NULL;
     return c;
 }
 
@@ -49,6 +57,7 @@ static void jsf_compiled_free(pTHX_ jsf_compiled_t *c) {
     free(c->rx);
     jsf_arena_free(c->arena);
     if (c->keep) SvREFCNT_dec((SV *)c->keep);
+    if (c->dynmap) SvREFCNT_dec((SV *)c->dynmap);
     if (c->schema_sv) SvREFCNT_dec(c->schema_sv);
     free(c);
 }

@@ -4,7 +4,9 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
+
+use File::Raw::JSON ();   # JSON encode/decode via its C ABI (ft_json.h / _abi_ptr)
 
 require XSLoader;
 XSLoader::load('Fetch', $VERSION);
@@ -27,7 +29,7 @@ Fetch - HTTP/2 Future-based user agent
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.29;
+our $VERSION = 0.291;
 require XSLoader;
 use autodie ':default';
 use warnings FATAL => 'all';
@@ -4994,7 +4994,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.29
+version 0.291
 
 =head1 Synopsis
 
@@ -6077,7 +6077,7 @@ Add new columns to a data frame, computed from the columns already there — or 
 
 =head3 Usage
 
- assign($df, new\_name => VALUE, another => VALUE, ...);
+ assign($df, new_name => VALUE, another => VALUE, ...);
 
 =over
 
@@ -8461,14 +8461,14 @@ p-value by about 2%.
   <td><code>formula</code></td>
   <td><code>String</code></td>
   <td><i>None (Required)</i></td>
-  <td>A symbolic description of the model to be fitted. Supports operators like <code>+</code>, <code>:</code>, <code>*</code>, <code>^</code>, and <code>-1</code> (to remove the intercept).</td>
-  <td><code>'am ~ wt + hp'</code>, <code>'y ~ x - 1'</code></td>
+  <td>A symbolic description of the model to be fitted. Parsed by the same code as [<code>lm</code>](#lm)'s, so it takes the same operators: <code>+</code>, <code>:</code>, <code>*</code>, <code>^</code>, <code>.</code> for every remaining column, and <code>-1</code> / <code>+0</code> to remove the intercept.</td>
+  <td><code>'am ~ wt + hp'</code>, <code>'y ~ x - 1'</code>, <code>'y ~ .'</code></td>
 </tr>
 <tr>
   <td><code>data</code></td>
   <td><code>HashRef</code> or <code>ArrayRef</code></td>
   <td><i>None (Required)</i></td>
-  <td>The dataset containing the variables used in the formula. Accepts either a Hash of Arrays (HoA) or an Array of Hashes (AoH).</td>
+  <td>The dataset containing the variables used in the formula. Accepts a Hash of Arrays (HoA), a Hash of Hashes (HoH) or an Array of Hashes (AoH). Rows are named as described under [<code>lm</code>](#lm).</td>
   <td><code>\%mtcars</code>, <code>[{x =&gt; 1, y =&gt; 2}, ...]</code></td>
 </tr>
 <tr>
@@ -8967,10 +8967,11 @@ cells down the rows).
  my $hoa = hoh2hoa(\%hoh);
 
 which returns
-    {
-      a => [1, 3],
-      b => [2, 4],
-    }
+
+ {
+   a => [1, 3],
+   b => [2, 4],
+ }
 
 =head3 Behavior
 
@@ -9673,14 +9674,15 @@ For example,
  }
 
 and a second hash,
-    {
-        "Jack Smith"   {
-            dept   "Engineering"
-        },
-        "Jane Doe"     {
-            age   25
-        }
-    }
+
+ {
+     "Jack Smith"   {
+         dept   "Engineering"
+     },
+     "Jane Doe"     {
+         age   25
+     }
+ }
 
 in this case, running C<ljoin(\%h, \%i)> will modify \%h to result:
 
@@ -9703,11 +9705,63 @@ C<lm> also supports generating interaction terms directly within the formula usi
 
  my $lm = lm(formula => 'mpg ~ wt * hp^2', data => \%mtcars);
 
-If your data contains missing numbers (C<NA> or C<undef>), C<lm> handles listwise deletion dynamically to ensure mathematical integrity before fitting.
+Crossing is associative, so C<*> chains to any depth: C<y ~ a * b * c> expands to
+every non-empty subset of the three (C<a>, C<b>, C<c>, C<a:b>, C<a:c>, C<b:c>,
+C<a:b:c>), ordered by degree as R's C<terms()> orders them. Writing C<a:b> directly
+gives just that one product.
+
+Either side of an interaction may be a string (categorical) column, in which
+case it expands to indicator columns the same way a main effect does:
+C<len ~ dose * supp> yields C<dose>, C<suppVC> and C<dose:suppVC>.
+
+Whether a categorical column keeps all of its levels or drops the first as a
+reference follows R's margin rule: the reference level is dropped when the term
+with that column removed is itself in the model. A main effect's margin is the
+intercept, so C<y ~ g> drops g's first level — but C<y ~ g - 1> has no intercept
+to measure against and so keeps every level, one column per group. Where two
+categorical main effects both have no intercept, only the first can be coded in
+full (C<y ~ a + b - 1> gives every level of C<a> and drops C<b>'s reference),
+because coding both in full would be rank deficient. A bare C<y ~ a:b> with
+neither main effect present codes both in full and spans the whole
+cross-classification.
+
+If your data contains missing numbers (C<NA> or C<undef>), C<lm> handles listwise deletion dynamically to ensure mathematical integrity before fitting. A row whose categorical value is missing is dropped the same way.
+
+Three details differ from R deliberately:
+
+=over
+
+=item * Levels are sorted with C<strcmp>, i.e. by byte value, which is what
+C<patsy>/C<pandas> does. R sorts with the collation of the running locale, so a
+factor whose levels differ only in case takes a different reference level in
+the two: on C<c("b", "A", "a")> R takes C<a> and C<lm> takes C<A>. Both
+parameterise the same fit — residual sum of squares, rank and fitted values
+agree — but the coefficient names and values differ.
+
+=item * A term crossed with itself keeps the product, so C<wt:wt> is C<wt> squared and
+C<y ~ wt*wt> fits C<y ~ wt + I(wt^2)>. R's formula algebra collapses C<a:a> to
+C<a>, making the same formula mean C<y ~ wt> there.
+
+=item * A categorical column with only one level contributes no column, so
+C<y ~ x + g> fits C<y ~ x>. R refuses the model outright ("contrasts can be
+applied only to factors with 2 or more levels").
+
+=back
 
 the dot operator also works:
 
  $lm = lm(formula => 'y ~ .', data => $dot_data);
+
+C<lm> and C<glm> read their formula and their data through the same code, so
+everything above holds for both, and a fit's C<terms> are the terms the other
+function would have produced from the same string.
+
+Rows are labelled from a C<row.names>, C<_row>, C<rownames> or C<.rownames> column if
+the data has one (a HoH labels rows with its outer keys, which needs no such
+column), and 1-based integers otherwise. Those labels are the keys of
+C<fitted.values> and C<residuals>, and the row names C<predict> returns. A row-name
+column is a label rather than a measurement, so C<y ~ .> leaves it out of the
+predictors.
 
 The overall model F test is returned as C<fstatistic> (an array ref of C<F>,
 numerator df, denominator df) and C<f.pvalue>. C<f.pvalue> is evaluated in the
@@ -11559,31 +11613,38 @@ minimal example:
 </table>
 
 output types can be AOH (aoh), HOA (hoa), HOH (hoh)
-    read_table($filename, 'output.type' => 'aoh');
-    read_table($filename, 'output.type' => 'hoa');
+
+ read_table($filename, 'output.type' => 'aoh');
+ read_table($filename, 'output.type' => 'hoa');
+
 and, like Text::CSV_XS, filters can be applied in order to save RAM on big files:
-    $test_data = read_table(
-        't/HepatitisCdata.csv',
-        filter => {
-            Sex => sub {$_ eq 'f'} # where "Sex" is the column name, and "$_" is the value for that column
-        },
-        'output.type' => 'aoh'
-    );
+
+ $test_data = read_table(
+     't/HepatitisCdata.csv',
+     filter => {
+         Sex => sub {$_ eq 'f'} # where "Sex" is the column name, and "$_" is the value for that column
+     },
+     'output.type' => 'aoh'
+ );
+
 the default delimiter is C<,>
 Suffixes C<.csv> and C<.tsv> are automatically detected from file names, but if specified, are overridden by C<delim> and/or C<sep>. C<sep> is given priority.
 
 =head3 commented-out headers
 
 A header that is itself commented out is detected and used automatically, so
-    # PDB   score
-    1a2b    10
-    3c4d    20
+
+ # PDB    score
+ 1a2b    10
+ 3c4d    20
+
 reads as though the header were C<PDB, score> (the comment marker and any
 following whitespace are stripped from the first column). A commented line is
 only taken as the header when its field count matches the data, so ordinary
 leading comments are never mistaken for one. You may name such a column in a
 C<filter> either as it appears in the file or by its clean name:
-    read_table('ranks.tabular.tsv', filter => { '# PDB' => sub { $_ == 2 } });
+
+ read_table('ranks.tabular.tsv', filter => { '# PDB' => sub { $_ == 2 } });
 
 =head3 Excel (.xlsx) files
 
@@ -12449,13 +12510,13 @@ Count the values in a given data set, return a hash reference showing how many t
 
 =head3 Scalar
 
- $hash = value\_counts('c');
+ $hash = value_counts('c');
 
 returns C<< { c =E<gt> 1 } >>
 
 =head3 Array reference
 
- value\_counts(['a','b','b']);
+ value_counts(['a','b','b']);
 
 returns C<< { a =E<gt> 1, b =E<gt> 2} >>
 
@@ -12479,13 +12540,13 @@ with a key, the value at that key is counted in each hash, so the above returns 
 =head3 Array of arrays
 
  my @rows = (['a', 1], ['b', 1], ['a', 2]);
- my $vc = value\_counts(\@rows, 0);
+ my $vc = value_counts(\@rows, 0);
 
 when the elements are array references, the key is treated as a numeric column index, so the above returns C<< { a =E<gt> 2, b =E<gt> 1 } >>. A non-numeric index against array-reference elements is a fatal error.
 
 =head3 Hash
 
- my $value\_counts = value\_counts( { A => 'a', B => 'a', C => 'b' } );
+ my $value_counts = value_counts( { A => 'a', B => 'a', C => 'b' } );
 
 returns C<< { a =E<gt> 2, b =E<gt> 1} >>
 
@@ -12877,17 +12938,26 @@ Ties are detected during ranking and trigger the tie-corrected variance in the n
 =head2 write_table
 
 mimics R's C<write.table>, with data as first argument to subroutine, and output file as second
-    write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
+
+ write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
+
 C<write_table> accepts every data-frame shape: a flat hash (one row), a hash of arrays (HoA), a hash of hashes (HoH), an array of hashes (AoH), and an array of arrays (AoA). For an AoA the first inner array is taken as the header row unless C<col.names> is given, in which case every inner array is treated as data:
-    write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
-    write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
+
+ write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
+ write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
+
 You can also precisely filter and reorder which columns are written by passing an array reference to C<col.names>:
-    write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
+
+ write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
+
 undefined variables are printed as C<NA> by default, but can be set as you wish using C<undef.val>
-    write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
+
+ write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
+
 C<write_table> determines comma and tab-separated delimiters from the filename, but will override if C<sep> or C<delim> are explicitly set.
 Args can also be accepted:
-    write_table( 'data' => \%flat, 'file' => $f );
+
+ write_table( 'data' => \%flat, 'file' => $f );
 
 =head3 The confirmation line
 
@@ -12902,52 +12972,66 @@ The colour is unconditional; it is not suppressed when standard output is a pipe
 =head3 LaTeX output (C<tex>)
 
 C<write_table> can write the output file as a LaTeX C<tabular> instead of a delimited table. This is selected either by naming the file C<*.tex> (auto-detected) or by passing C<< tex =E<gt> 1 >>; an explicit C<< tex =E<gt> 0 >> forces a delimited file even when the name ends in C<.tex>. The LaTeX table is built from the same rows as the delimited writer, so it works for every shape above (including arrays of arrays):
-    write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
-    write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
+
+ write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
+ write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
+
 The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. As with every other format, C<row.names> is B<off> unless you ask for it: pass C<< row.names =E<gt> 1 >> to prepend a label column, whose labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. The C<tex.*> options tune the output:
-    write_table(\@rows, 'table.tex',
-        'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
-        'tex.bold.1st.col' => 0,                     # default 1: bold the first column
-        'tex.format'       => 1,                     # %.4g-format numeric cells
-        'tex.size'         => '\small',              # size directive after \begin{tabular}
-        'tex.comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
-    );
+
+ write_table(\@rows, 'table.tex',
+     'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
+     'tex.bold.1st.col' => 0,                     # default 1: bold the first column
+     'tex.format'       => 1,                     # %.4g-format numeric cells
+     'tex.size'         => '\small',              # size directive after \begin{tabular}
+     'tex.comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
+ );
+
 For a table that must span page breaks, C<< tex.longtable =E<gt> 1 >> writes only the table I<body> — the bold header row and the data rows, ruled with C<\hline> — but no C<\begin{tabular}>/C<\end{tabular}> and no column spec, so you can C<\input{}> it into a C<longtable> environment you write yourself. Setting C<tex.longtable> implies C<< tex =E<gt> 1 >>, so it applies to any file name (and overrides C<< tex =E<gt> 0 >>). After the provenance comment (and any C<tex.comment> lines) the file emits a C<% \begin{longtable}{...}> hint with one C<tex.col.align> character per column, so you can copy a column spec with the right count. In this mode C<tex.col.align> affects only that hint — the real alignment lives on your own C<\begin{longtable}>; the other C<tex.*> options (C<tex.bold.1st.col>, C<tex.format>, C<tex.size>, C<tex.comment>) still apply:
-    write_table(\@rows, 'output.file.tex', 'tex.longtable' => 1);
+
+ write_table(\@rows, 'output.file.tex', 'tex.longtable' => 1);
+
 writes a body-only file such as
-    %written by /home/con/Scripts/stats/make_table.pl
-    % \begin{longtable}{ccc}
-    \hline
-    \textbf{a} & \textbf{b} & \textbf{c} \ \hline
-    1 & 2 & 3\
-    \hline
+
+ %written by /home/con/Scripts/stats/make_table.pl
+ % \begin{longtable}{ccc}
+ \hline
+ \textbf{a} & \textbf{b} & \textbf{c} \\ \hline
+ 1 & 2 & 3\\
+ \hline
+
 which you wrap yourself:
-    \begin{longtable}{ccc}
-    \input{output.file.tex}
-    \caption{}
-    \label{}
-    \end{longtable}
+
+ \begin{longtable}{ccc}
+ \input{output.file.tex}
+ \caption{}
+ \label{}
+ \end{longtable}
+
 In that plain form the header is an ordinary first row, which is I<not> the header LaTeX freezes at the top of each page: a C<longtable> repeats only what sits inside C<\endfirsthead> / C<\endhead>. Hand-writing those blocks means retyping the column labels, and they then silently stop matching C<col.names> the first time the column order changes — the frozen header says one thing while the columns underneath say another, and the generated header shows up a second time as the first body row. C<tex.longtable.head> closes that gap by generating the repeat machinery from the same header record as the body:
-    write_table(\@rows, 'output.file.tex',
-        'col.names'          => ['a', 'b', 'c'],
-        'tex.longtable.head' => '(continued)', # or just 1 for no continuation caption
-    );
-    %written by /home/con/Scripts/stats/make_table.pl
-    % \begin{longtable}{ccc}
-    \textbf{a} & \textbf{b} & \textbf{c} \ \hline
-    \endfirsthead
-    \caption[]{(continued)}\
-    \hline
-    \textbf{a} & \textbf{b} & \textbf{c} \ \hline
-    \endhead
-    \hline
-    \endfoot
-    1 & 2 & 3\
+
+ write_table(\@rows, 'output.file.tex',
+     'col.names'          => ['a', 'b', 'c'],
+     'tex.longtable.head' => '(continued)', # or just 1 for no continuation caption
+ );
+ %written by /home/con/Scripts/stats/make_table.pl
+ % \begin{longtable}{ccc}
+ \textbf{a} & \textbf{b} & \textbf{c} \\ \hline
+ \endfirsthead
+ \caption[]{(continued)}\\
+ \hline
+ \textbf{a} & \textbf{b} & \textbf{c} \\ \hline
+ \endhead
+ \hline
+ \endfoot
+ 1 & 2 & 3\\
+
 Setting C<tex.longtable.head> implies C<tex.longtable> (and so C<< tex =E<gt> 1 >>). A true-but-numeric value emits the machinery with no continuation caption; any other true value is the caption text for every page after the first, written verbatim so LaTeX macros survive, with an empty C<\caption[]> optional argument so the continuation stays out of the List of Tables. C<\endfoot> carries the closing C<\hline> and no C<\endlastfoot> is emitted, so every page — the last one included — gets a bottom rule. The wrapper then holds nothing that has to track the data:
-    \begin{longtable}{ccc}
-    \caption{}\label{}\ \hline
-    \input{output.file.tex}
-    \end{longtable}
+
+ \begin{longtable}{ccc}
+ \caption{}\label{}\\ \hline
+ \input{output.file.tex}
+ \end{longtable}
+
 The trailing C<\hline> on the caption line is the rule above the header on the I<first> page, and it has to live there rather than in the generated file: C<\hline> expands to C<\noalign>, and TeX has already begun a table row by the time it expands your C<\input>, so a rule as the file's first token is a C<Misplaced \noalign> error. A bare C<\hline> encodes neither column order nor column count, so unlike a hand-written header it cannot go stale — drop it if you do not want a top rule. Every other C<\hline> in the generated file follows a C<\\> inside that file, where it is legal.
 
 =head3 Excel output (C<xlsx>)
@@ -13169,6 +13253,177 @@ C<f.sf> / C<norm.sf> and statsmodels' C<anova_oneway>; see
 C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
 
 =head1 Changes
+
+=head2 0.291 2026-08-04 CDT
+
+POD formatting improvements
+
+=head3 C<lm>, C<glm>
+
+Formula parsing and data reading are now shared between C<lm> and C<glm> too, so the
+two agree on what a formula means and on what a row is called. C<lm> had the better
+parser and C<glm> the better row naming; each now has both.
+
+B<< C<lm> now names rows the way C<glm> does >> — from a C<row.names>, C<_row>,
+C<rownames> or C<.rownames> column when the data has one, and 1-based integers
+otherwise. C<lm> previously always used integers, so C<fitted.values> and
+C<residuals> came back keyed C<1..n> for data whose rows had names, and did not
+match what C<glm> or C<predict> returned for the same data; the C<predict>
+documentation already described the shared behaviour. A row-name column is a label
+rather than a measurement, so C<y ~ .> now excludes it in both.
+
+Design-matrix construction is now shared between C<lm> and C<glm>, and decides a
+categorical column's coding term by term using R's margin rule: the reference
+level is dropped when the term with that column removed is itself in the model.
+Three bugs fall out of that, all confirmed against R 4.6.1 and statsmodels
+0.14.6.
+
+=head4 Bug fixes
+
+Four in C<glm>, from the parser it now shares with C<lm>. Three of them ended the
+same way: a term that names no column evaluates to C<NaN> for every row, every row
+is dropped as incomplete, and the fit dies with C<< 0 degrees of freedom (too many
+NAs or parameters E<gt> observations) >> — never mentioning the formula.
+
+=over
+
+=item * B<< C<glm> truncated a formula at 511 characters. >> It copied the formula into a
+fixed C<char[512]>, so a model with enough predictors to overrun that lost the
+tail. The buffer now grows with the formula.
+
+=item * B<< C<glm> did not understand C<.>. >> It parsed the formula before reading the data,
+so there were no column names to expand C<.> into and the term stayed a literal
+C<.>. Formula splitting now happens first and term expansion after the data is
+read, so C<y ~ .> works in both.
+
+=item * B<< C<glm> did not understand C<+ 0> or a leading C<0 +>. >> Only C<- 1> suppressed the
+intercept; the other two spellings R accepts left a term named C<0>. All three now
+work in both, as do C<+ 1> and a leading C<1 +>.
+
+=item * B<< C<glm> read the C<-1> inside C<I(...)> as intercept suppression. >> It searched the
+whole right-hand side for the substring, so C<y ~ I(x-1)> silently became
+C<y ~ I(x) - 1>: a different model, fitted without complaint. The scan now steps
+over C<I(...)>, leaving the term alone. C<I()> still supports only C<^power>, so
+that formula is an error in both rather than a wrong answer in one.
+
+=back
+
+And the three that fall out of the shared design matrix:
+
+=over
+
+=item * B<A categorical column in a model with no intercept lost a level.> With no
+intercept there is no baseline for a reference level to be measured against, so
+R codes the factor in full — one column per group, each coefficient that
+group's own mean. Both functions dropped the reference level anyway, so
+C<len ~ supp - 1> fitted C<len ~ suppVC - 1>: a model forcing every observation
+at the reference level to a fitted value of 0. On R's C<ToothGrowth> that meant
+a residual sum of squares of 16056 against R's 3247, and an R² of 0.35 against
+0.87. Where two categorical main effects appear with no intercept only the
+first is coded in full, as in R, since coding both would be rank deficient.
+
+=item * B<An interaction involving a categorical column could not be built.> The
+interaction was looked up as a single column literally named C<dose:supp>;
+finding none, it evaluated to C<NaN> for every row, every row was dropped as
+incomplete, and the fit died with C<< 0 degrees of freedom (too many NAs or
+parameters E<gt> observations) >>. Interactions now expand to the product of their
+components' indicator columns, so C<len ~ dose * supp> gives C<dose>, C<suppVC>
+and C<dose:suppVC>. C<predict> already understood such coefficient names; now
+they can be produced.
+
+=item * B<< C<a*b*c> expanded only its first C<*>. >> Crossing is associative, so
+C<y ~ a * b * c> now yields every non-empty subset (C<a>, C<b>, C<c>, C<a:b>, C<a:c>,
+C<b:c>, C<a:b:c>), ordered by degree as R's C<terms()> orders them. Previously the
+chunk was split once, producing the unusable terms C<b*c> and C<a:b*c>, and the
+fit died the same way as above. Crossing more than 16 columns now croaks rather
+than expanding to 2^n terms.
+
+=item * B<< C<predict> scored reference-level rows as if the term were absent. >> It
+registered factor dummies from C<levels[1..]> only, on the assumption that a
+reference level never has a coefficient — true for a factor coded by contrasts,
+but not for one coded in full. Every row at the reference level of a
+no-intercept model therefore came back 0.
+
+=item * B<< C<glm> halved its IRLS step whenever the deviance rose, costing iterations and
+accuracy in the standard errors. >> R truncates a step only when the deviance
+comes out non-finite; a deviance that merely increases is not divergence. The
+standard IRLS start puts C<mu> at C<y + 0.1>, essentially on the data, so the
+initial deviance is near zero and the first real step almost always raises it —
+on the nine-point poisson fit in C<t/glm.t>, from 0.016 to 1.54. That was read as
+divergence and the step was halved ten times over, turning R's four iterations
+into seven.
+
+The extra iterations reached the same coefficients, so the symptom appeared
+only in the standard errors. They are built from the information matrix of the
+I<penultimate> iterate — in R because C<summary.glm> inverts the QR that
+C<glm.fit> kept from its last weighted least squares call, and here because the
+IRLS sweep leaves that inverse in place — so stopping on a different iteration
+than R means reporting a different matrix. Poisson standard errors were 5e-8 to
+2e-5 away from R's while the coefficients agreed to twelve digits; they now
+agree to about 1e-14. Binomial standard errors were up to 6e-7 out and now
+agree to 2e-14, except on a near-separable fit, where the C<varmu> floor of
+1e-10 (a guard against dividing by an underflowed variance) accounts for the
+remaining difference — 1.9e-9 on C<am ~ wt * hp>, where three of 32 fitted
+probabilities are within 1e-12 of 0 or 1 and R itself warns. Gaussian fits are
+unaffected: their weights are all 1, so the matrix is C<X'X> either way.
+
+The same condition had its C<isfinite> test on the accepting side, so a
+genuinely divergent step producing a non-finite deviance was kept rather than
+truncated. That is now the one case that does trigger halving.
+
+=item * B<The negative-binomial theta alternation stopped early and started from the
+wrong place.> C<MASS::glm.nb> does not simply maximise over theta; it alternates
+between an IRLS fit at the current theta and a fresh ML estimate of theta at the
+current fitted means, and which fit it lands on depends on the schedule. Four
+details of that schedule were wrong here, and all four are now reproduced:
+
+=over
+
+=item * The alternation stopped on a relative test of the log-likelihood alone,
+C<< |dll| E<lt> 1e-7 * (|ll| + 0.1) >>. C<glm.nb> requires
+C<< (|dLm| / d1 + |dtheta|) E<lt> 1e-8 >> with C<d1 = sqrt(2 * max(1, df.residual))>
+taken from its Poisson pass — theta itself has to have settled, not just the
+log-likelihood. The old test was satisfied roughly 2e-5 of log-likelihood
+early, which left theta 8e-7 out and dragged the coefficients 8e-6 with it.
+
+=item * The first pass now runs as a genuine B<Poisson> fit, as C<glm.nb>'s does,
+rather than a negative-binomial fit at a large stand-in theta. That pass
+supplies both the first theta and the C<d1> above.
+
+=item * Later passes are B<warm started> from the previous pass's means
+(C<etastart = log(mu)>), so they converge to the fit C<glm.nb> reaches rather
+than to the same optimum approached from a cold start.
+
+=item * Theta is re-estimated at the means each pass B<started> from, not the ones it
+produced: C<glm.nb> calls C<theta.ml(Y, mu)> and only then reassigns
+C<< mu E<lt>- fit$fitted.values >>. C<theta.ml> itself now also uses MASS's own stopping
+rule, an absolute Newton-step tolerance of C<.Machine$double.eps^0.25>.
+
+=back
+
+Across eighteen fits spanning dispersion from theta 0.41 to theta 69000, theta
+now agrees with C<glm.nb> to 3.4e-9, coefficients to 5.8e-9, standard errors to
+8.4e-10 and deviance to 1.3e-9 — previously 8e-7, 8e-6, 3e-6 and 6e-7. The one
+exception is genuinely near-Poisson data, where theta is not identified at all
+(its own standard error exceeds the estimate, and C<glm.nb>'s C<theta.ml> reports
+"iteration limit reached"); theta there agrees only to about 4e-6 relative,
+while the coefficients still agree to 1.6e-10.
+
+A separate consequence: a negative-binomial fit with theta supplied was
+starting from the Poisson C<mustart> of C<y + 0.1>, where R's
+C<negative.binomial()$initialize> sets C<y + (y == 0)/6>. Different starting
+values walk different iterates, and since the standard errors come from the
+penultimate one, that showed as standard errors 6e-7 from R's while the
+coefficients agreed to 1e-9. Such fits now match R to 2e-15.
+
+Note on that comparison: standard errors for a negative-binomial fit hold the
+dispersion at 1, which is what C<glm.nb> and C<summary.negbin> do. R's
+C<summary.glm>, handed a C<negative.binomial> family directly, instead I<estimates>
+the dispersion and prints standard errors scaled by its square root — 1.0839 on
+one of the test data sets, so about 4% larger. Compare against
+C<summary(fit, dispersion = 1)> to see the values this module reports.
+
+=back
 
 =head2 0.29 2026-08-03 CDT
 
@@ -14410,9 +14665,10 @@ Corrected four bugs in the C<wilcox_test> XSUB plus a portability fix in its exa
 C<view> function added, similar to R's C<head>
 
 C<read_table>:
-    filter => {
-        'Testosterone, total (nmol/L)' => sub { defined $_ },
-    }
+
+ filter => {
+     'Testosterone, total (nmol/L)' => sub { defined $_ },
+ }
 
 was broken by the change in undefined variables in 0.14, but is back to being C<undef>
 

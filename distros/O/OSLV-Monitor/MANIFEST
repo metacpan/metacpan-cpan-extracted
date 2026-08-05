@@ -9,6 +9,11 @@ README.md
 t/00-load.t
 t/01-load.t
 t/02-load.t
+t/cgroups-cache-process.t
+t/cgroups-mapping.t
+t/cgroups-new.t
+t/cgroups-proc-cgroup.t
+t/cgroups-run.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

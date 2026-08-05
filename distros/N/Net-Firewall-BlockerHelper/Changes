@@ -1,5 +1,79 @@
 Revision history for Net-Firewall-BlockerHelper
 
+0.1.0   2026-08-05/00:00
+        - Add CIDR ban support via new ban_cidr, unban_cidr, and list_cidr
+          methods, for backends advertising cidr_supported.
+        - New backends:
+          - nftables       :: per-instance inet table with v4/v6 sets.
+          - firewalld      :: ipset plus firewall-cmd --direct rules.
+          - ufw            :: per-IP prepend/delete rules.
+          - linux_ip_route :: iproute2 null routes; needs no firewall.
+          - npf            :: NetBSD npf table declared in npf.conf.
+          - shorewall      :: Shorewall dynamic blacklist.
+          - hosts_deny     :: TCP wrappers; marked region in /etc/hosts.deny.
+          - file_reload    :: render the ban list to a file, run a reload hook.
+          - xdp            :: XDP/eBPF drops via xdp-filter.
+          - bgp_rtbh       :: BGP Remote Triggered Black Hole via ExaBGP,
+            gobgp, or FRR; optional FlowSpec announcements.
+          - dns_rpz        :: DNS RPZ triggers via nsupdate.
+          - nsupdate       :: DNS blocklist via BIND dynamic updates.
+          - routeros       :: MikroTik RouterOS address-list over ssh.
+          - routeros_api   :: RouterOS address-list via the REST API.
+          - vyos           :: VyOS firewall address-group via the HTTP API.
+          - pfsense        :: pfSense alias via the pfSense-API package.
+          - opnsense       :: OPNsense alias via its REST API.
+          - fortigate      :: FortiGate address group via the FortiOS REST API.
+          - panos          :: PAN-OS User-ID tag registration for a Dynamic
+            Address Group.
+          - juniper_srx    :: Junos address-book/address-set via REST.
+          - cisco_fmc      :: Cisco Firepower (FMC) network group literals.
+          - checkpoint     :: Check Point host objects in a group via the
+            Management API.
+          - f5_bigip       :: F5 BIG-IP address-list via iControl REST.
+          - netscaler      :: NetScaler/ADC policy dataset via NITRO.
+          - cloudflare     :: Cloudflare IP access rules via the v4 API.
+          - aws_wafv2      :: AWS WAFv2 IP sets via the aws CLI.
+          - azure          :: Azure NSG deny rule source prefixes via az.
+          - cloud_armor    :: GCP Cloud Armor rule source ranges via gcloud.
+          - fastly         :: Fastly Edge ACL entries.
+          - akamai         :: Akamai Network Lists v2, EdgeGrid authenticated.
+          - abuseipdb      :: report bans to AbuseIPDB; reporting only, pairs
+            with a blocking backend.
+        - Rework the iptables backend to use ipset with iptables/ip6tables.
+          Adds tarpit and delude ban types via xtables-addons (TCP only).
+        - Add stop, check, and flush methods to the frontend and all backends.
+        - Add optional self healing: re_init the firewall setup if it was
+          removed externally. On by default via the self_heal option.
+        - re_init now treats teardown as best effort.
+        - Kill commands now handle IPv6 as well as IPv4 and are scoped to the
+          configured protocols and ports.
+        - Security: anchor the IPv4/IPv6 validation regexps, preventing shell
+          command injection via crafted ban targets.
+        - Validate the prefix + name length against kernel object name limits
+          at new, raising nameTooLong instead of a confusing init failure.
+        - Validate ports as 1-65535 so bad ports fail at new, not at init.
+        - Lowercase IPs on ban/unban so IPv6 case differences can not create
+          duplicate or orphaned entries.
+        - ipfw: block IPv4 and IPv6 by default with family-correct rules.
+          The type option is now deny-vs-reject; legacy values still accepted.
+        - ipfw: fix the kill option; remove the no-op UDP pipeline and match
+          the IP as a fixed word.
+        - ipfw/pf: only attach ports to port-capable protocols (tcp/udp/sctp),
+          defaulting to tcp/udp when ports are given without protocols.
+        - pf: fix ban/unban pfctl table syntax; kill without ports now kills
+          all connections for the IP; kill pipelines are recorded instead of
+          run in testing mode.
+        - Frontend: fix swapped error/perror for a bad backend name; methods
+          called before init_backend now raise a clear error.
+        - Fix backends reporting invalidPrefixSpecified instead of invalidName
+          for a bad or missing name.
+        - Fix exit-code checks to use numeric comparison.
+        - Fix protocol validation errors to reference getprotobyname.
+        - init_backend now loads backends via require instead of string eval.
+        - Only write test_data in testing mode.
+        - Add tests covering command execution and failure handling,
+          self-heal, IPv6 handling, and error codes.
+        - Documentation and packaging fixes.
+
 0.0.1   2025-07-09/22:00
         - Initial release.
-

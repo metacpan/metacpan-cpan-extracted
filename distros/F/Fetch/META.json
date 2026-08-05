@@ -27,14 +27,14 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::Depends" : "0.404",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Raw::JSON" : "0.05"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Cpanel::JSON::XS" : "0"
-         },
          "requires" : {
+            "File::Raw::JSON" : "0.05",
             "perl" : "5.008003"
          }
       },
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

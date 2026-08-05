@@ -19,13 +19,15 @@ my $handler = Markdent::Handler::MinimalTree->new();
     );
 
     ok(
-        $parser->_block_parser()->meta()
+        $parser->_block_parser()
+            ->meta()
             ->does_role('Markdent::Dialect::Theory::BlockParser'),
         '$parser->_block_parser() with dialects = Theory'
     );
 
     ok(
-        $parser->_span_parser()->meta()
+        $parser->_span_parser()
+            ->meta()
             ->does_role('Markdent::Dialect::Theory::SpanParser'),
         '$parser->_span_parser() with dialects = Theory'
     );
@@ -38,13 +40,15 @@ my $handler = Markdent::Handler::MinimalTree->new();
     );
 
     ok(
-        $parser->_block_parser()->meta()
+        $parser->_block_parser()
+            ->meta()
             ->does_role('Markdent::Dialect::Theory::BlockParser'),
         '$parser->_block_parser() with dialects = [Theory]'
     );
 
     ok(
-        $parser->_span_parser()->meta()
+        $parser->_span_parser()
+            ->meta()
             ->does_role('Markdent::Dialect::Theory::SpanParser'),
         '$parser->_span_parser() with dialects = [Theory]'
     );
@@ -71,13 +75,15 @@ my $handler = Markdent::Handler::MinimalTree->new();
     );
 
     ok(
-        $parser->_block_parser()->meta()
+        $parser->_block_parser()
+            ->meta()
             ->does_role('Example::Dialect::BlockParser'),
         '$parser->_block_parser() with dialects = Example::Dialect'
     );
 
     ok(
-        $parser->_span_parser()->meta()
+        $parser->_span_parser()
+            ->meta()
             ->does_role('Example::Dialect::SpanParser'),
         '$parser->_span_parser() with dialects = Example::Dialect'
     );
@@ -90,7 +96,8 @@ my $handler = Markdent::Handler::MinimalTree->new();
     );
 
     ok(
-        $parser->_span_parser()->meta()
+        $parser->_span_parser()
+            ->meta()
             ->does_role('Example::Dialect2::SpanParser'),
         '$parser->_span_parser() with dialects = Example::Dialect2 - only provides a SpanParser class'
     );
@@ -103,13 +110,15 @@ my $handler = Markdent::Handler::MinimalTree->new();
     );
 
     ok(
-        $parser->_block_parser()->meta()
+        $parser->_block_parser()
+            ->meta()
             ->does_role('Markdent::Dialect::Theory::BlockParser'),
         '$parser->_block_parser() with dialect = Theory (dialect as synonym for dialects)'
     );
 
     ok(
-        $parser->_span_parser()->meta()
+        $parser->_span_parser()
+            ->meta()
             ->does_role('Markdent::Dialect::Theory::SpanParser'),
         '$parser->_span_parser() with dialect = Theory (dialect as synonym for dialects)'
     );

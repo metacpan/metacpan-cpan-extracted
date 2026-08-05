@@ -1,6 +1,3 @@
-bench/app.psgi
-bench/bench.sh
-bench/soak.sh
 BENCHMARKS.md
 Changes
 Hyperman.xs
@@ -10,6 +7,7 @@ include/hyperman/backend_kqueue.c
 include/hyperman/backend_poll.c
 include/hyperman/hm_compat.h
 include/hyperman/hm_core.h
+include/hyperman/hm_parse.h
 include/hyperman/hm_future.h
 include/hyperman/hm_http2.h
 include/hyperman/hm_tls.h
@@ -38,6 +36,8 @@ t/16-http2.t
 t/17-tls.t
 t/18-tls-advanced.t
 t/19-access-log.t
+t/20-listen.t
+t/21-smuggling.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

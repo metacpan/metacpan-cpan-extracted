@@ -23,6 +23,20 @@ if (!$pkg) {
     $pkg->set_inc('-I. -Iinclude ' . ($vars{INC} || ''));
 }
 
+# Provider side: install the public C ABI header so XS consumers (e.g. Hyperman)
+# reach it through ExtUtils::Depends - no vendoring/copying. save_config writes
+# File/Raw/JSON/Install/Files.pm recording the include dir for dependents.
+$pkg->install('include/frj_abi.h');
+mkdir 'Install' unless -d 'Install';
+$pkg->save_config('Install/Files.pm');
+
+# As a provider, get_makefile_vars now returns a PM map (to install frj_abi.h
+# and Files.pm) which REPLACES MakeMaker's auto-detected PM - so re-add the
+# module's own .pm files, exactly as File::Raw's Makefile.PL does.
+my %dep_vars = $pkg->get_makefile_vars;
+$dep_vars{PM}{'lib/File/Raw/JSON.pm'}         = '$(INST_LIB)/File/Raw/JSON.pm';
+$dep_vars{PM}{'lib/File/Raw/JSON/Boolean.pm'} = '$(INST_LIB)/File/Raw/JSON/Boolean.pm';
+
 
 my %platform_args;
 if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'openbsd'
@@ -67,10 +81,11 @@ my %WriteMakefileArgs = (
     DEFINE => '-DYYJSON_HAS_STDINT_H=1 -DYYJSON_HAS_STDBOOL_H=1',
     dist   => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean  => {
-        FILES => 'File-Raw-JSON-* JSON.c JSON.o file_raw_json.o yyjson.o'
+        FILES => 'File-Raw-JSON-* JSON.c JSON.o file_raw_json.o yyjson.o '
+               . 'Install/Files.pm'
     },
     %platform_args,
-    $pkg->get_makefile_vars,
+    %dep_vars,
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

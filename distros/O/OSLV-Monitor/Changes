@@ -1,5 +1,17 @@
 Revision history for OSLV-Monitor
 
+1.0.6   2026-08-04/13:15
+        - cgroups: get the cgroup from /proc/<pid>/cgroup as ps truncates the
+          cgroup column to 27 characters, mangling names and breaking stat reads
+        - cgroups: sum the stats of all cgroups mapping to the same name
+        - cgroups: read stats from the cgroup dir the name is for, as cgroup v2
+          stats include those of all descendants
+        - cgroups: name nested service cgroups after the service
+        - cgroups: cache raw counters per cgroup dir instead of per name
+        - cgroups: record context switches per oslvm, not just in the totals
+        - cgroups: skip the root cgroup
+        - cgroups: add tests for the backend
+
 1.0.5   2026-07-24/20:00
         - cgroups: fix io.stat parsing so IO stats are recorded
         - cgroups: emit throttled/burst/force_idle-time, percpu, thp_swpout, and zswpwb stats

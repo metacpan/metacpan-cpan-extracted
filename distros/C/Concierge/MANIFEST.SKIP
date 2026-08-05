@@ -39,3 +39,4 @@ pm_to_blib
 ^examples/
 ^ZZZ_archive/
 ^paad/
+^Dev_Notes/

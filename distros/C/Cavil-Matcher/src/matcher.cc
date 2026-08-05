@@ -64,14 +64,30 @@ bool Matcher::attach(const std::string& path) {
   auto mf = std::make_unique<MappedFile>();
   if (!mf->map(path)) return false;
   auto seg = std::make_unique<Segment>();
-  if (!seg->open(mf->data(), mf->size())) return false;
+  // Trusted scan path: skip the whole-payload CRC (verified at publish), keep structural validation.
+  if (!seg->open(mf->data(), mf->size(), /*verify_crc=*/false)) return false;
   _maps.push_back(std::move(mf));
   _segments.push_back(std::move(seg));
   return true;
 }
 
+bool Matcher::verify(const std::string& path) const {
+  // Full integrity check (CRC + structure) of a segment file, for an explicit fsck. The scan path
+  // (load/attach) trusts the CRC of the immutable published cache; this is how it is proven on demand.
+  MappedFile mf;
+  if (!mf.map(path)) return false;
+  Segment seg;
+  return seg.open(mf.data(), mf.size(), /*verify_crc=*/true);
+}
+
 bool Matcher::dump(const std::string& path) {
   std::vector<char> buf = _build.compile(_generation);
+
+  // Publish is the one place integrity is proven: full-verify (CRC + structure) the freshly compiled
+  // buffer before it is written, so the scan path can safely trust this immutable file without re-CRCing
+  // it on every open. A buffer that fails here is never published.
+  Segment check;
+  if (!check.open(buf.data(), buf.size(), /*verify_crc=*/true)) return false;
 
   // Write to a temp file and rename into place, so a crash/short write/full disk mid-dump cannot damage
   // an existing good cache at `path` (and a concurrent reader mmapping the old file keeps a valid inode
@@ -94,7 +110,8 @@ bool Matcher::load(const std::string& path) {
   auto mf = std::make_unique<MappedFile>();
   if (!mf->map(path)) return false;
   auto seg = std::make_unique<Segment>();
-  if (!seg->open(mf->data(), mf->size())) return false;
+  // Trusted scan path: skip the whole-payload CRC (verified at publish), keep structural validation.
+  if (!seg->open(mf->data(), mf->size(), /*verify_crc=*/false)) return false;
 
   clear();
   _maps.push_back(std::move(mf));

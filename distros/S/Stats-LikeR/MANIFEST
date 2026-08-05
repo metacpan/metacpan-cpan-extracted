@@ -66,7 +66,9 @@ t/interpolate_methods.t
 t/intersection.t
 t/is_equivalent.t
 t/ks_test.t
+t/lm.R.scipy.t
 t/lm.bugs.t
+t/lm_glm_shared.t
 t/mcnemar_test.t
 t/mean.t
 t/median.t

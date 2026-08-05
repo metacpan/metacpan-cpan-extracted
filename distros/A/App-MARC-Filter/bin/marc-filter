@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Filter;
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Run.
 exit App::MARC::Filter->new->run;
@@ -28,7 +28,7 @@ marc-filter - Tool to filter records in MARC dataset.
 
 =head1 SYNOPSIS
 
- marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_file search_item [sub_search_item] value
+ marc-filter [-e] [-h] [-i] [-n num] [-o format] [-r] [--version] marc_file search_item [sub_search_item] [value]
 
 =head1 DESCRIPTION
 
@@ -41,9 +41,17 @@ It supports MARC XML and USMARC files now.
 
 =over 8
 
+=item * C<-e>
+
+Match field/subfield existence.
+
 =item * C<-h>
 
 Print help.
+
+=item * C<-i>
+
+Invert searching.
 
 =item * C<-n num>
 
@@ -68,6 +76,10 @@ Print version of script.
 =item * C<marc_file>
 
 MARC XML or USMARC file name.
+
+Input file could be compressed by L<IO::Uncompress::AnyUncompress> module.
+Possibility is to uncompress gzip, zip, bzip2, zstd, xz, lzma, lzip, lzf or
+lzop.
 
 =item * C<search_item>
 
@@ -97,10 +109,12 @@ Possible material type strings are:
 =item * C<sub_search_item>
 
 In the case of MARC field this could be a subfield.
+It's optional with C<-e>.
 
 =item * C<value>
 
 Value to filter.
+It's required without C<-e>.
 
 =back
 
@@ -120,8 +134,15 @@ L<http://skim.cz>
 
 BSD 2-Clause License
 
+=head1 ACKNOWLEDGEMENTS
+
+Development of this software has been made possible by institutional support
+for the long-term strategic development of the National Library of the Czech
+Republic as a research organization provided by the Ministry of Culture of
+the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
+
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

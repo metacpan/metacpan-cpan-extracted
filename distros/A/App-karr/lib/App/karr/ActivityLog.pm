@@ -1,7 +1,7 @@
 # ABSTRACT: Activity log writer for karr board operations
 
 package App::karr::ActivityLog;
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moo;
 use JSON::MaybeXS qw( encode_json decode_json );
 use POSIX qw( strftime );
@@ -97,7 +97,7 @@ App::karr::ActivityLog - Activity log writer for karr board operations
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 # Revision history for WebDyne
 
-## Unreleased
+## 3.008 - 2026-08-04
 
 - Added REST-style `<api>` route discovery and `PATH_INFO` mapping to
   `WebDyne::PAGI`, bringing PAGI API support in line with PSGI.
@@ -12,6 +12,14 @@
   API route discovery without additional Apache rewrite or routing rules.
 - Added integration coverage for PSGI and PAGI API routing, caching,
   normal PSP requests, and 404 handling.
+- Fixed labelled `<textfield>` rendering so label-wrapped text inputs
+  retain the correct HTML input type.
+- Added `default`/`defaults` handling for grouped form controls and popup
+  menus, aligning generated form state with the documented attributes.
+- Added labelled textfield render fixtures and included them in the
+  distribution manifest.
+- Updated the XML and generated Markdown documentation for the latest API,
+  form-control, and demo example behaviour.
 
 ## 3.005 - 2026-08-02
 

@@ -25,7 +25,18 @@ my %WriteMakefileArgs = (
 	clean      => { FILES    => 'Net-Firewall-BlockerHelper-*' },
 	META_MERGE => {
 		"meta-spec" => { version => 2 },
-		resources   => {
+		prereqs     => {
+			runtime => {
+				# only needed by the HTTP API backends (abuseipdb, cloudflare,
+				# fortigate, netscaler, panos, and routeros_api),
+				# which load it at run time
+				recommends => {
+					'LWP::UserAgent'       => '0',
+					'LWP::Protocol::https' => '0',
+				},
+			},
+		},
+		resources => {
 			repository => {
 				type => 'git',
 				url  => 'https://github.com/LilithSec/Net-Firewall-BlockerHelper.git',

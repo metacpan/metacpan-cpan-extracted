@@ -6,7 +6,7 @@ use warnings;
 use Carp ();
 use Fetch;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Reverse::Proxy', $VERSION);
@@ -26,7 +26,7 @@ Reverse::Proxy - a generic, non-blocking PSGI reverse proxy
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,11 @@
+0.317     2026-08-04 22:16:54Z
+
+  - Add "tag_format" bundle option, forwarded to Git::Tag.tag_format (or the
+    @Git bundle for task/manual_version dists). Defaults to "%v" as before;
+    lets a consuming dist.ini override the release tag's format, e.g. to
+    "v%v" when a tag also needs to satisfy another ecosystem's tooling (a Go
+    module published from the same tag requires strict vMAJOR.MINOR.PATCH).
+
 0.316     2026-06-19 14:52:42Z
 
   - Add Gitea/Forgejo repository metadata support via the new

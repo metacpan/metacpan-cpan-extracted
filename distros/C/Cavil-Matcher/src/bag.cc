@@ -166,6 +166,9 @@ bool Bag::dump(const std::string& path) const {
   bool ok = fwrite(&h, sizeof(h), 1, file) == 1;
   if (ok && !payload.empty()) ok = fwrite(payload.data(), payload.size(), 1, file) == 1;
   if (fclose(file) != 0) ok = false;
+  // Prove integrity once, at publish: fully re-read and check the temp (CRC + parse) before it becomes
+  // the live cache, so the load path can trust it without re-checksumming on every open.
+  if (ok && !verify(tmp)) ok = false;
   if (ok && rename(tmp.c_str(), path.c_str()) != 0) ok = false;
   if (!ok) remove(tmp.c_str());    // don't leave a partial temp behind
   return ok;
@@ -193,7 +196,14 @@ struct Cursor {
 };
 }    // namespace
 
-bool Bag::load(const std::string& path) {
+bool Bag::verify(const std::string& path) const {
+  // Full integrity check (CRC + parse) of a bag file, for an explicit fsck. The load path trusts the CRC
+  // of the immutable published cache; this is how it is proven on demand.
+  Bag tmp;
+  return tmp.load(path, /*verify_crc=*/true);
+}
+
+bool Bag::load(const std::string& path, bool verify_crc) {
   FILE* file = fopen(path.c_str(), "rb");
   if (!file) return false;
 
@@ -225,7 +235,9 @@ bool Bag::load(const std::string& path) {
 
   const char* payload     = buf.data() + sizeof(BagHeader);
   size_t      payload_len = buf.size() - sizeof(BagHeader);
-  if (cavil_crc32(payload, payload_len) != h.crc32) return false;
+  // Corruption detection over the whole payload. Skipped on the trusted load path (see the header doc):
+  // the record parse below bounds-checks every read, so a malformed bag is rejected either way.
+  if (verify_crc && cavil_crc32(payload, payload_len) != h.crc32) return false;
 
   // Reject counts that could not possibly fit in the payload before allocating anything.
   if (h.idf_count > payload_len / 16) return false;             // each idf entry is 16 bytes

@@ -20,6 +20,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "fetch/ft_compat.h"   /* perl-version portability shims (pre-5.16) */
 #include "fetch/ft_core.h"
 
 /* ---- helpers -------------------------------------------------------------- */

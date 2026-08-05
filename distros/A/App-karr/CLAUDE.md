@@ -88,6 +88,12 @@ storage backend.
 | `skill` | implemented | `skill` |
 | `materialize` | implemented | — (refs→files bridge) |
 | `import` | implemented | — (files→refs bridge) |
+| `sync` | implemented | — (explicit refs pull/push) |
+| `backup` | implemented | — (board snapshot to YAML) |
+| `restore` | implemented | — (snapshot→refs, destructive) |
+| `destroy` | implemented | — (remove `refs/karr/*` incl. remote) |
+| `set-refs` / `get-refs` | implemented | — (helper refs outside the board) |
+| `disable` / `enable` | implemented | — (board-level opt-out from karr-foundation runs) |
 
 ## Key design decisions
 

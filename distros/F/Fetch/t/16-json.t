@@ -7,8 +7,8 @@ use Test::More;
 use Fetch;
 
 # JSON helpers: the `json =>` request option encodes the body and sets
-# Content-Type, and $res->json decodes the response. Booleans follow JSON::PP
-# semantics (JSON::PP::Boolean / undef), so values round-trip.
+# Content-Type, and $res->json decodes the response, both via File::Raw::JSON's
+# C ABI. Booleans decode to File::Raw::JSON::Boolean, null to undef.
 
 plan skip_all => 'no JSON module (Cpanel::JSON::XS or JSON::PP)'
     unless eval { require Cpanel::JSON::XS; 1 } or eval { require JSON::PP; 1 };
@@ -74,8 +74,8 @@ is($d->{echo}{name}, 'x', 'nested string round-tripped');
 is_deeply($d->{echo}{nums}, [ 1, 2, 3 ], 'nested array round-tripped');
 ok($d->{echo}{on}, 'boolean true round-tripped as a true value');
 
-# booleans/null decode to JSON::PP-compatible values
-isa_ok($d->{yes}, 'JSON::PP::Boolean', 'true decodes to a JSON::PP::Boolean');
+# booleans/null decode via File::Raw::JSON
+isa_ok($d->{yes}, 'File::Raw::JSON::Boolean', 'true decodes to a File::Raw::JSON::Boolean');
 ok(!defined $d->{nil}, 'null decodes to undef');
 
 END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }

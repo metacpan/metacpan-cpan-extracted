@@ -33,9 +33,9 @@ use constant { T_STR => 8 };
 {
     my $c = JSON::Schema::Fast->compile({
         type => 'object',
-        unevaluatedProperties => JSON::Schema::Fast->can('compile') ? 0 : 0,
+        xUnknownVendorKeyword => 1,   # not a draft 2020-12 keyword
     });
-    ok($c->_unsupported >= 1, 'unevaluatedProperties counted as unsupported');
+    ok($c->_unsupported >= 1, 'an unknown keyword is counted as unsupported');
 }
 
 # benign annotations are NOT counted as unsupported

@@ -1,16 +1,16 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.6.2
+## Version v1.7.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/07/06
+## Modified 2026/07/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package Module::Generic;
 BEGIN
 {
@@ -118,7 +118,7 @@ BEGIN
     # shared state on the way out.
     *_in_end_phase = sub{ ${^GLOBAL_PHASE} eq 'END' };
 
-    our $VERSION   = 'v1.6.2';
+    our $VERSION   = 'v1.7.0';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -3275,7 +3275,7 @@ sub __message
     {
         my $r;
         # We check which phase we are in, because in destruction phase, Apache2::ApacheRec is not available.
-        if( $MOD_PERL && &_in_global_destruction() )
+        if( $MOD_PERL && !&_in_global_destruction() )
         {
             # try-catch
             local $@;
@@ -3378,7 +3378,7 @@ sub __message
         };
         $info->{type} = $opts->{type} if( $opts->{type} );
 
-        ## If Mod perl is activated AND we are not using a private log
+        # If Mod perl is activated AND we are not using a private log
         if( $r && !${ "${class}::LOG_DEBUG" } )
         {
             if( my $log_handler = $r->get_handlers( 'PerlPrivateLogHandler' ) )
@@ -8972,6 +8972,7 @@ sub _is_empty
     # $self->__message( 104, "Got here with '", join( "', '", @_ ), "'" );
     return(1) if( !@_ );
     return(1) if( !defined( $_[0] ) );
+    # Check scalar reference or simply strings.
     if( (
             ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'SCALAR' && 
             !CORE::length( ${$_[0]} // '' )
@@ -8983,12 +8984,14 @@ sub _is_empty
     {
         return(1);
     }
+    # Checking array reference
     elsif( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' &&
         !scalar( @{$_[0]} ) )
     {
         # $self->__message( 104, "Found that array $_[0] (is blessed ? ", ( Scalar::Util::blessed( $_[0] ) ? 'yes' : 'no' ), ") is empty with ", scalar( @{$_[0]} ), " element. is_empty on array returns -> ", $_[0]->is_empty );
         return(1);
     }
+    # Checking blessed hash reference
     elsif( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' &&
         Scalar::Util::blessed( $_[0] ) && 
         $_[0]->can( 'is_empty' ) && 
@@ -8996,6 +8999,7 @@ sub _is_empty
     {
         return(1);
     }
+    # Checking hash reference
     elsif( ref( $_[0] ) eq 'HASH' && 
         !scalar( keys( %{$_[0]} ) ) )
     {
@@ -13517,7 +13521,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.6.2
+    v1.7.0
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,31 @@
 #!/usr/bin/env perl
+
+# Start the server
+#
+#   pagi-server app.pl
+#
+# In another terminal, try these web requests:
+#
+# 1. Public GET request with a query parameter
+#
+#   curl http://localhost:5000/items/123?verbose=1
+#
+# 2. Protected POST Request
+#
+# Send a POST request with the required JSON body and the valid authorisation.
+#
+#   curl -X POST http://localhost:5000/items \
+#        -H "Authorization: Bearer secret123" \
+#        -H "Content-Type: application/json" \
+#        -d '{"name": "Camel Plushie", "price": 25}'
+#
+# 3. Fetch OpenAPI Docs
+#
+# You can also request the generated OpenAPI spec or Swagger UI endpoints:
+#
+#   curl http://localhost:5000/openapi.json
+#
+
 use v5.36;
 use warnings;
 
@@ -60,11 +87,8 @@ $app->post('/items',
     }
 );
 
-# Print startup banner to STDERR so it doesn't pollute stdout
-warn "PAGI::FastAPI app initialized.\n";
+warn "PAGI::FastAPI app initialised.\n";
 warn "OpenAPI Spec available at /openapi.json\n";
 warn "Swagger UI available at /docs\n";
 
-# Return the PAGI handler coderef as the last statement!
-my $pagi_app = $app->to_app;
-$pagi_app;
+$app->to_app;

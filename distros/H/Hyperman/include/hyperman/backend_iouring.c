@@ -133,7 +133,7 @@ static void ur_arm_timer(hm_ur_state *st, ur_timer *t) {
 
 static int ur_add_timer(hm_backend *be, double secs, int oneshot, void *udata) {
     hm_ur_state *st = (hm_ur_state *)be->state;
-    ur_timer *t = (ur_timer *)calloc(1, sizeof(ur_timer));
+    ur_timer *t = (ur_timer *)hm_xcalloc(1, sizeof(ur_timer));
     if (!t) return -1;
     t->ts.tv_sec  = (int64_t)secs;
     t->ts.tv_nsec = (int64_t)((secs - (double)t->ts.tv_sec) * 1e9);
@@ -286,8 +286,8 @@ static void ur_destroy(hm_backend *be) {
 }
 
 hm_backend *hm_backend_iouring_new(void) {
-    hm_backend  *be = (hm_backend *)calloc(1, sizeof(hm_backend));
-    hm_ur_state *st = (hm_ur_state *)calloc(1, sizeof(hm_ur_state));
+    hm_backend  *be = (hm_backend *)hm_xcalloc(1, sizeof(hm_backend));
+    hm_ur_state *st = (hm_ur_state *)hm_xcalloc(1, sizeof(hm_ur_state));
     if (!be || !st) { free(be); free(st); return NULL; }
     st->sfd = -1;
     sigemptyset(&st->sigs);

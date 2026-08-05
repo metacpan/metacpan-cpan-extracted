@@ -5,8 +5,8 @@ use FindBin qw( $Bin );
 use lib "$Bin/../t/lib";
 
 use File::Basename qw( basename );
-use File::Find qw( find );
-use File::Slurper qw( read_text );
+use File::Find     qw( find );
+use File::Slurper  qw( read_text );
 use Test2::V0;
 use Test::Markdent;
 

@@ -1,5 +1,50 @@
 Revision history for Concierge
 
+v0.13.0  2026-08-04
+    - BREAKING: Removed component method promotion (the 'promote' key in
+      a components-block entry). Per spec V3, an added component's
+      methods are reachable only through the object the component
+      itself returns ($concierge->{$compName} / $concierge->$compName()),
+      never merged into the concierge's own method namespace. No
+      automatic access is provided in either direction between added
+      components and Concierge's core objects ($desk, $concierge,
+      $auth, $sessions, $users, $user, $session); the application is
+      responsible for passing whatever arguments a component's methods
+      need.
+    - Added $user-level mirror methods verify_password(), reset_password(),
+      and logout(), delegating to the same closures used internally.
+      logout() clears the user object's session and credential-checking
+      closures on success (self-cleanup), and capability-bearing mirror
+      methods are gated by a live session-validity check
+      (_session_valid()/_session_ok()) so a second, stale $user instance
+      can no longer mutate data after another instance has logged out.
+
+v0.12.0  2026-07-25
+    - Added deferred component initialization: a components-block entry
+      may set defer => 1 to postpone its real, potentially expensive
+      new() call until first actual use, instead of paying that cost for
+      every process that opens the desk regardless of whether the
+      component is ever called. defer forces optional (build_desk()
+      rejects defer => 1, optional => 0), preserving Concierge's
+      guarantee that its API is never fatal once a desk is open.
+      Implemented as a three-tier model: a mandatory build-time probe
+      (tier 1b, unconditionally build-fatal, via the new
+      Concierge::Desk::Component::probe_component() shared helper), an
+      open-time revalidation of the same probe (tier 2, resolving to
+      Concierge::Desk::UnavailableComponent on failure), and a new
+      Concierge::Desk::DeferredComponent AUTOLOAD proxy that performs
+      the real build on first use, caches the result, and never retries
+      a failed build (tier 3). No existing component or desk config is
+      affected unless defer is explicitly set.
+    - Fixed login_guest(): a known user browsing as a guest (e.g.
+      building a shopping cart before logging in at checkout) no longer
+      fails with an "already exists" error. login_guest() now checks
+      verify_user() first: a known user (found in both Auth and Users)
+      skips straight to login and carries over guest session/cart data;
+      an unknown user is registered as before; a user found in only one
+      of Auth/Users (an inconsistent state) fails fast with a clear
+      message instead of attempting either path.
+
 v0.11.0  2026-07-23
     - BREAKING: Sessions and Users backend selection now follows the same
       backend_class convention as Auth (introduced in v0.9.0): Desk::Setup

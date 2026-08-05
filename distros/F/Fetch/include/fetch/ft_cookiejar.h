@@ -275,6 +275,16 @@ static int ft_jar_set_cookie(ft_jar *j, const char *str, const char *host,
     if (dom_attr && dom_len) {
         c.host_only = 0;
         c.domain = ft_strdup_n(dom_attr, dom_len);
+        /* Reject a single-label / public-suffix Domain (e.g. "com", ".com",
+         * "localhost"): a cookie must not be scoped to a whole TLD, or it would
+         * be sent to every host under it. Full Public Suffix List handling is
+         * out of scope; requiring an interior dot blocks the blatant TLD
+         * supercookie. */
+        {
+            const char *d = c.domain;
+            if (*d == '.') d++;                    /* ignore a single leading dot */
+            if (!strchr(d, '.')) { ft_cookie_wipe(&c); return 0; }
+        }
         if (!ft_domain_match(host, c.domain, 0)) { ft_cookie_wipe(&c); return 0; }
     } else {
         c.host_only = 1;

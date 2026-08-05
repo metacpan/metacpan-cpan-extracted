@@ -6,16 +6,18 @@ BOOT:
     hm_fq = newAV();
 
 # Run the server. Key/value options as documented in Hyperman.pm:
-# app (required), host, port, workers, idle_timeout, header_timeout,
-# max_pipeline, reuseport, access_log, max_requests_per_worker,
-# shutdown_grace, affinity.
+# app (required), host, port (scalar or arrayref), listen (arrayref of
+# per-listener hashrefs), workers, idle_timeout, header_timeout, max_pipeline,
+# reuseport, access_log, max_requests_per_worker, shutdown_grace, affinity,
+# http2, tls_*, redirect_https.
 void
 run(class, ...)
     SV *class
     CODE:
     {
         hm_worker_cfg cfg;
-        SV *host_sv = NULL, *cert_sv = NULL, *key_sv = NULL;
+        hm_listener_spec dfl;     /* top-level defaults, seeded into each spec */
+        SV *port_sv = NULL, *listen_sv = NULL;
         int i;
         PERL_UNUSED_VAR(class);
 
@@ -23,16 +25,18 @@ run(class, ...)
             croak("Hyperman->run: odd number of options");
 
         memset(&cfg, 0, sizeof(cfg));
-        cfg.host = "0.0.0.0";
-        cfg.port = 8080;
         cfg.log_fd = -1;
+        memset(&dfl, 0, sizeof(dfl));
+        dfl.host = "0.0.0.0";
+        dfl.port = 8080;
 
         for (i = 1; i + 1 < items; i += 2) {
             const char *key = SvPV_nolen(ST(i));
             SV *val = ST(i + 1);
             if (strEQ(key, "app"))                 cfg.app = val;
-            else if (strEQ(key, "host"))           { host_sv = val; }
-            else if (strEQ(key, "port"))           cfg.port = (int)SvIV(val);
+            else if (strEQ(key, "host"))           { if (SvOK(val)) dfl.host = SvPV_nolen(val); }
+            else if (strEQ(key, "port"))           port_sv = val;
+            else if (strEQ(key, "listen"))         listen_sv = SvOK(val) ? val : NULL;
             else if (strEQ(key, "workers"))        cfg.nworkers = (int)SvIV(val);
             else if (strEQ(key, "idle_timeout"))   cfg.idle_t = SvNV(val);
             else if (strEQ(key, "header_timeout")) cfg.header_t = SvNV(val);
@@ -67,41 +71,69 @@ run(class, ...)
                                                    cfg.max_requests = SvUV(val);
             else if (strEQ(key, "shutdown_grace")) cfg.grace = SvNV(val);
             else if (strEQ(key, "affinity"))       cfg.affinity = SvTRUE(val) ? 1 : 0;
-            else if (strEQ(key, "http2"))          cfg.http2 = SvTRUE(val) ? 1 : 0;
-            else if (strEQ(key, "tls_cert"))       cert_sv = SvOK(val) ? val : NULL;
-            else if (strEQ(key, "tls_key"))        key_sv  = SvOK(val) ? val : NULL;
-            else if (strEQ(key, "tls_ca"))
-                cfg.tls_ca = SvOK(val) ? SvPV_nolen(val) : NULL;
-            else if (strEQ(key, "tls_sni"))        cfg.tls_sni = SvOK(val) ? val : NULL;
+            else if (strEQ(key, "http2"))          dfl.http2 = SvTRUE(val) ? 1 : 0;
+            else if (strEQ(key, "tls_cert"))       dfl.tls_cert = SvOK(val) ? SvPV_nolen(val) : NULL;
+            else if (strEQ(key, "tls_key"))        dfl.tls_key  = SvOK(val) ? SvPV_nolen(val) : NULL;
+            else if (strEQ(key, "tls_ca"))         dfl.tls_ca   = SvOK(val) ? SvPV_nolen(val) : NULL;
+            else if (strEQ(key, "tls_sni"))        dfl.tls_sni  = SvOK(val) ? val : NULL;
+            else if (strEQ(key, "redirect_https")) dfl.redirect_https = (int)SvIV(val);
             else if (strEQ(key, "tls_verify")) {
                 const char *m = SvPV_nolen(val);
-                if      (strEQ(m, "require"))  cfg.tls_verify = 2;
-                else if (strEQ(m, "optional")) cfg.tls_verify = 1;
-                else if (strEQ(m, "none"))     cfg.tls_verify = 0;
+                if      (strEQ(m, "require"))  dfl.tls_verify = 2;
+                else if (strEQ(m, "optional")) dfl.tls_verify = 1;
+                else if (strEQ(m, "none"))     dfl.tls_verify = 0;
                 else croak("Hyperman->run: tls_verify must be none/optional/require");
             }
             else croak("Hyperman->run: unknown option '%s'", key);
         }
         if (!(cfg.app && SvROK(cfg.app) && SvTYPE(SvRV(cfg.app)) == SVt_PVCV))
             croak("Hyperman->run: 'app' is required");
-        if (host_sv && SvOK(host_sv)) cfg.host = SvPV_nolen(host_sv);
-        if (cfg.http2 && !hm_h2_available())
-            croak("Hyperman->run: http2 requested but nghttp2 support was not "
-                  "built (install libnghttp2-dev and reinstall Hyperman)");
-        if (cert_sv || key_sv || cfg.tls_ca || cfg.tls_sni || cfg.tls_verify) {
-            if (!(cert_sv && key_sv))
-                croak("Hyperman->run: tls_cert and tls_key must be given together");
-            if (!hm_tls_available())
-                croak("Hyperman->run: TLS requested but OpenSSL support was not "
-                      "built (install libssl-dev and reinstall Hyperman)");
-            if (cfg.tls_verify && !cfg.tls_ca)
-                croak("Hyperman->run: tls_verify needs tls_ca (the CA to verify "
-                      "client certificates against)");
-            cfg.tls_cert = SvPV_nolen(cert_sv);
-            cfg.tls_key  = SvPV_nolen(key_sv);
-        }
+        if (dfl.redirect_https == 1) dfl.redirect_https = 443;
 
-        hm_run_server(aTHX_ &cfg);
+        /* Build the listener specs. Three shapes, most specific wins:
+         *   listen => [ {..}, .. ]  - full per-listener control (incl. TLS)
+         *   port   => [ N, M ]      - several plain listeners sharing defaults
+         *   port   => N (or unset)  - one listener from the top-level options  */
+        {
+            hm_listener_spec *ls;
+            int n, j;
+            AV *lav = (listen_sv && SvROK(listen_sv)
+                       && SvTYPE(SvRV(listen_sv)) == SVt_PVAV)
+                      ? (AV *)SvRV(listen_sv) : NULL;
+            AV *pav = (port_sv && SvROK(port_sv)
+                       && SvTYPE(SvRV(port_sv)) == SVt_PVAV)
+                      ? (AV *)SvRV(port_sv) : NULL;
+
+            if (listen_sv && !lav)
+                croak("Hyperman->run: 'listen' must be an arrayref of hashrefs");
+
+            n = lav ? (int)(av_len(lav) + 1)
+              : pav ? (int)(av_len(pav) + 1)
+              : 1;
+            if (n < 1) croak("Hyperman->run: 'listen'/'port' is empty");
+            ls = (hm_listener_spec *)hm_xcalloc(n, sizeof(hm_listener_spec));
+
+            for (j = 0; j < n; j++) {
+                ls[j] = dfl;                       /* seed with top-level defaults */
+                if (lav) {
+                    SV **e = av_fetch(lav, j, 0);
+                    if (!(e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV))
+                        croak("Hyperman->run: listen[%d] must be a hashref", j);
+                    hm_listener_from_hv(aTHX_ (HV *)SvRV(*e), &ls[j]);
+                } else if (pav) {
+                    SV **e = av_fetch(pav, j, 0);
+                    if (e) ls[j].port = (int)SvIV(*e);
+                } else if (port_sv && SvOK(port_sv)) {
+                    ls[j].port = (int)SvIV(port_sv);
+                }
+                hm_check_listener(aTHX_ &ls[j]);
+            }
+
+            cfg.lspecs  = ls;
+            cfg.nlspecs = n;
+            hm_run_server(aTHX_ &cfg);   /* normally blocks until shutdown */
+            free(ls);
+        }
     }
 
 # A Future resolved after $secs by the worker loop's timer watcher.

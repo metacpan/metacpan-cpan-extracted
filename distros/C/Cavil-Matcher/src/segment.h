@@ -106,7 +106,15 @@ public:
 
   // Open a segment over an external, read-only buffer (e.g. an mmap). Returns false (and leaves the
   // segment unusable) if the buffer is not a valid segment. Never crashes on bad input.
-  bool open(const char* data, size_t len);
+  //
+  // verify_crc controls only the whole-payload CRC32 (corruption detection). It defaults to true - the
+  // compile/publish path and explicit integrity checks re-checksum everything. The scan path passes
+  // false: segments are Cavil's own immutable, atomically-published cache, already CRC-verified when
+  // written, so re-CRCing the entire payload on every mmap-open in every forked job is wasted work.
+  // The O(1) header/size checks and the full structural validation walk run either way, so a bad
+  // segment is always rejected or safe to scan - skipping the CRC never costs memory safety, only
+  // per-scan detection of on-disk bit-rot (which publish-time verification already covers).
+  bool open(const char* data, size_t len, bool verify_crc = true);
 
   // Take ownership of an in-memory compiled buffer.
   bool open_owned(std::vector<char>&& buf);

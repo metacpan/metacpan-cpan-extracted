@@ -6,7 +6,7 @@ package Cavil::Matcher;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require XSLoader;
 XSLoader::load('Cavil::Matcher', $VERSION);
@@ -142,12 +142,25 @@ Scan a file and return the resolved matches as C<[[pattern_id, start_line, end_l
 =item dump($file) / load($file)
 
 Write the in-memory patterns to a compiled segment file / replace the engine's state with a single mmapped
-segment file.
+segment file. C<dump> fully verifies the compiled segment before publishing it, so a bad segment is never
+written.
+
+C<load> (like C<attach>) validates the segment's structure but does not re-checksum its whole payload: a
+compiled segment is an immutable, already-verified cache, and re-checksumming hundreds of megabytes on every
+open is almost the entire cost of a load. Structure is always validated, so a malformed file is still rejected
+and scanning is always memory-safe; only on-disk corruption of an otherwise well-formed file goes undetected
+here (use L</verify> for that).
 
 =item attach($file)
 
 Memory-map an additional compiled segment into the active set. Returns false (without dying) on a missing or
-invalid file.
+structurally invalid file. Trusts the payload checksum like L</load>.
+
+=item verify($file)
+
+Fully check a segment file on disk — structure B<and> whole-payload checksum — and return true iff it is
+intact. This is the corruption check that the scan path (C<load>/C<attach>) deliberately skips for speed; run
+it on demand (an fsck for a cache directory) when you need to prove a segment has not rotted on disk.
 
 =item set_tombstones(\@pattern_ids)
 
@@ -169,8 +182,10 @@ and C<hash64>.
 =head1 Cavil::Matcher::Bag
 
 tf-idf closest-match model from L</init_bag_of_patterns>: C<set_patterns(\%id_to_text)>,
-C<best_for($text, $count)>, C<dump($file)> and C<load($file)>. C<dump> and C<load> return true on
-success; a failed C<load> (missing/truncated file) leaves the model unchanged.
+C<best_for($text, $count)>, C<dump($file)>, C<load($file)> and C<verify($file)>. C<dump> and C<load>
+return true on success; a failed C<load> (missing/truncated/malformed file) leaves the model unchanged.
+Like the engine, C<load> validates structure but trusts the payload checksum of this immutable,
+already-verified cache; C<verify> is the on-demand full check (structure B<and> CRC) for an fsck.
 
 =head1 SEE ALSO
 

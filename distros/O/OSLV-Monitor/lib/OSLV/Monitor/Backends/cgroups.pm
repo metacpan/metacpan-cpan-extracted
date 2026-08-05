@@ -16,11 +16,11 @@ OSLV::Monitor::Backends::cgroups - Backend for Linux cgroups.
 
 =head1 VERSION
 
-Version 1.0.4
+Version 1.0.6
 
 =cut
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.6';
 
 =head1 SYNOPSIS
 
@@ -579,7 +579,7 @@ sub run {
 	#	my $ps_output = `ps -haxo pid,uid,gid,cgroupns,%cpu,%mem,rss,vsize,trs,drs,size,cgroup 2> /dev/null`;
 	#	if ( $? != 0 ) {
 	#		$self->{cgroupns_usable} = 0;
-	my $ps_output = `ps -haxo pid,uid,gid,%cpu,%mem,rss,vsize,trs,drs,size,etimes,cgroup,comm 2> /dev/null`;
+	my $ps_output = `ps -haxo pid,uid,gid,%cpu,%mem,rss,vsize,trs,drs,size,etimes,comm 2> /dev/null`;
 	#	}
 	my @ps_output_split = split( /\n/, $ps_output );
 	my %found_cgroups;
@@ -600,16 +600,11 @@ sub run {
 		$line =~ s/^\s+//;
 		my $vol_ctxt_switches   = 0;
 		my $invol_ctxt_switches = 0;
-		my ( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup, $comm );
-		#		if ( $self->{cgroupns_usable} ) {
-		#			( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )#
-		#				= split( /\s+/, $line );
-		#		} else {
+		my ( $pid, $uid, $gid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $comm );
 		# comm is captured last, with a split limit, so a command name containing
 		# whitespace does not shift the earlier fields
-		( $pid, $uid, $gid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup, $comm )
-			= split( /\s+/, $line, 13 );
-		#		}
+		( $pid, $uid, $gid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $comm )
+			= split( /\s+/, $line, 12 );
 		# skip the idle/swapper task... the Linux equivalent of FreeBSD's
 		# [idle]... the true idle is PID 0 (swapper), which ps normally does
 		# not list, but guard against it defensively so it can never be
@@ -617,116 +612,155 @@ sub run {
 		if ( defined($comm) && ( $comm eq 'swapper' || $comm =~ m{^swapper/} ) ) {
 			next;
 		}
-		if ( $cgroup =~ /^0\:\:\// ) {
 
-			my $cache_name = 'proc-' . $pid . '-' . $uid . '-' . $gid . '-' . $cgroup;
+		# the cgroup is read from procfs rather than being fetched via ps as ps
+		# hard truncates the cgroup column to 27 characters when it is not the
+		# final column, regardless of -w/--width or COLUMNS... that both mangles
+		# the name, mapping unrelated units to the same one, and leaves the path
+		# under /sys/fs/cgroup non-existent, meaning no stats get read at all
+		my $cgroup = $self->proc_cgroup($pid);
+		# undef if the proc exited or is not under the unified hierarchy
+		if ( !defined($cgroup) ) {
+			next;
+		}
 
-			$found_cgroups{$cgroup}           = $cgroup;
+		my $cache_name = 'proc-' . $pid . '-' . $uid . '-' . $gid . '-' . $cgroup;
 
-			# save the root fs path as seen by this process, resolving chroots
-			# and the like... for the usual case this is just /
-			my $proc_root_path = readlink( '/proc/' . $pid . '/root' );
-			if ( defined($proc_root_path) ) {
-				$cgroups_root_paths{$cgroup}{$proc_root_path} = 1;
-			}
+		$found_cgroups{$cgroup} = $cgroup;
 
-			$data->{totals}{'percent-cpu'}    = $data->{totals}{'percent-cpu'} + $percpu;
-			$data->{totals}{'percent-memory'} = $data->{totals}{'percent-memory'} + $permem;
-			$data->{totals}{rss}              = $data->{totals}{rss} + $rss;
-			$data->{totals}{'virtual-size'}   = $data->{totals}{'virtual-size'} + $vsize;
-			$data->{totals}{'text-size'}      = $data->{totals}{'text-size'} + $trs;
-			$data->{totals}{'data-size'}      = $data->{totals}{'data-size'} + $drs;
-			$data->{totals}{'size'}           = $data->{totals}{'size'} + $size;
-			$data->{totals}{'elapsed-times'}  = $data->{totals}{'elapsed-times'} + $etimes;
+		# save the root fs path as seen by this process, resolving chroots
+		# and the like... for the usual case this is just /
+		my $proc_root_path = readlink( '/proc/' . $pid . '/root' );
+		if ( defined($proc_root_path) ) {
+			$cgroups_root_paths{$cgroup}{$proc_root_path} = 1;
+		}
 
-			eval {
-				if ( -f '/proc/' . $pid . '/status' ) {
-					my @switches_find
-						= grep( /voluntary\_ctxt\_switches\:/, read_file( '/proc/' . $pid . '/status' ) );
-					foreach my $found_switch (@switches_find) {
-						chomp($found_switch);
-						my @switch_split = split( /\:[\ \t]+/, $found_switch );
-						if ( defined( $switch_split[0] ) && defined( $switch_split[1] ) ) {
-							if ( $switch_split[0] eq 'voluntary_ctxt_switches' ) {
-								$vol_ctxt_switches = $switch_split[1];
-							} elsif ( $switch_split[0] eq 'involuntary_ctxt_switches' ) {
-								$invol_ctxt_switches = $switch_split[1];
-							}
+		$data->{totals}{'percent-cpu'}    = $data->{totals}{'percent-cpu'} + $percpu;
+		$data->{totals}{'percent-memory'} = $data->{totals}{'percent-memory'} + $permem;
+		$data->{totals}{rss}              = $data->{totals}{rss} + $rss;
+		$data->{totals}{'virtual-size'}   = $data->{totals}{'virtual-size'} + $vsize;
+		$data->{totals}{'text-size'}      = $data->{totals}{'text-size'} + $trs;
+		$data->{totals}{'data-size'}      = $data->{totals}{'data-size'} + $drs;
+		$data->{totals}{'size'}           = $data->{totals}{'size'} + $size;
+		$data->{totals}{'elapsed-times'}  = $data->{totals}{'elapsed-times'} + $etimes;
+
+		eval {
+			if ( -f '/proc/' . $pid . '/status' ) {
+				my @switches_find = grep( /voluntary\_ctxt\_switches\:/, read_file( '/proc/' . $pid . '/status' ) );
+				foreach my $found_switch (@switches_find) {
+					chomp($found_switch);
+					my @switch_split = split( /\:[\ \t]+/, $found_switch );
+					if ( defined( $switch_split[0] ) && defined( $switch_split[1] ) ) {
+						if ( $switch_split[0] eq 'voluntary_ctxt_switches' ) {
+							$vol_ctxt_switches = $switch_split[1];
+						} elsif ( $switch_split[0] eq 'involuntary_ctxt_switches' ) {
+							$invol_ctxt_switches = $switch_split[1];
 						}
-					} ## end foreach my $found_switch (@switches_find)
-				} ## end if ( -f '/proc/' . $pid . '/status' )
-			};
-			$vol_ctxt_switches
-				= $self->cache_process( $cache_name, 'voluntary-context-switches', $vol_ctxt_switches, $etimes );
-			$data->{totals}{'voluntary-context-switches'}
-				= $data->{totals}{'voluntary-context-switches'} + $vol_ctxt_switches;
-			$invol_ctxt_switches
-				= $self->cache_process( $cache_name, 'involuntary-context-switches', $invol_ctxt_switches, $etimes );
-			$data->{totals}{'involuntary-context-switches'}
-				= $data->{totals}{'involuntary-context-switches'} + $invol_ctxt_switches;
+					}
+				} ## end foreach my $found_switch (@switches_find)
+			} ## end if ( -f '/proc/' . $pid . '/status' )
+		};
+		$vol_ctxt_switches
+			= $self->cache_process( $cache_name, 'voluntary-context-switches', $vol_ctxt_switches, $etimes );
+		$data->{totals}{'voluntary-context-switches'}
+			= $data->{totals}{'voluntary-context-switches'} + $vol_ctxt_switches;
+		$invol_ctxt_switches
+			= $self->cache_process( $cache_name, 'involuntary-context-switches', $invol_ctxt_switches, $etimes );
+		$data->{totals}{'involuntary-context-switches'}
+			= $data->{totals}{'involuntary-context-switches'} + $invol_ctxt_switches;
 
-			if ( !defined( $cgroups_permem{$cgroup} ) ) {
-				$cgroups_permem{$cgroup}               = $permem;
-				$cgroups_percpu{$cgroup}               = $percpu;
-				$cgroups_procs{$cgroup}                = 1;
-				$cgroups_rss{$cgroup}                  = $rss;
-				$cgroups_vsize{$cgroup}                = $vsize;
-				$cgroups_trs{$cgroup}                  = $trs;
-				$cgroups_drs{$cgroup}                  = $drs;
-				$cgroups_size{$cgroup}                 = $size;
-				$cgroups_etimes{$cgroup}               = $etimes;
-				$cgroups_invvol_ctxt_switches{$cgroup} = $invol_ctxt_switches;
-				$cgroups_vol_ctxt_switches{$cgroup}    = $vol_ctxt_switches;
-			} else {
-				$cgroups_permem{$cgroup} = $cgroups_permem{$cgroup} + $permem;
-				$cgroups_percpu{$cgroup} = $cgroups_percpu{$cgroup} + $percpu;
-				$cgroups_procs{$cgroup}++;
-				$cgroups_rss{$cgroup}                  = $cgroups_rss{$cgroup} + $rss;
-				$cgroups_vsize{$cgroup}                = $cgroups_vsize{$cgroup} + $vsize;
-				$cgroups_trs{$cgroup}                  = $cgroups_trs{$cgroup} + $trs;
-				$cgroups_drs{$cgroup}                  = $cgroups_drs{$cgroup} + $drs;
-				$cgroups_size{$cgroup}                 = $cgroups_size{$cgroup} + $size;
-				$cgroups_etimes{$cgroup}               = $cgroups_etimes{$cgroup} + $etimes;
-				$cgroups_invvol_ctxt_switches{$cgroup} = $cgroups_invvol_ctxt_switches{$cgroup} + $invol_ctxt_switches;
-				$cgroups_vol_ctxt_switches{$cgroup}    = $cgroups_vol_ctxt_switches{$cgroup} + $vol_ctxt_switches;
-			} ## end else [ if ( !defined( $cgroups_permem{$cgroup} ) )]
-		} ## end if ( $cgroup =~ /^0\:\:\// )
+		if ( !defined( $cgroups_permem{$cgroup} ) ) {
+			$cgroups_permem{$cgroup}               = $permem;
+			$cgroups_percpu{$cgroup}               = $percpu;
+			$cgroups_procs{$cgroup}                = 1;
+			$cgroups_rss{$cgroup}                  = $rss;
+			$cgroups_vsize{$cgroup}                = $vsize;
+			$cgroups_trs{$cgroup}                  = $trs;
+			$cgroups_drs{$cgroup}                  = $drs;
+			$cgroups_size{$cgroup}                 = $size;
+			$cgroups_etimes{$cgroup}               = $etimes;
+			$cgroups_invvol_ctxt_switches{$cgroup} = $invol_ctxt_switches;
+			$cgroups_vol_ctxt_switches{$cgroup}    = $vol_ctxt_switches;
+		} else {
+			$cgroups_permem{$cgroup} = $cgroups_permem{$cgroup} + $permem;
+			$cgroups_percpu{$cgroup} = $cgroups_percpu{$cgroup} + $percpu;
+			$cgroups_procs{$cgroup}++;
+			$cgroups_rss{$cgroup}                  = $cgroups_rss{$cgroup} + $rss;
+			$cgroups_vsize{$cgroup}                = $cgroups_vsize{$cgroup} + $vsize;
+			$cgroups_trs{$cgroup}                  = $cgroups_trs{$cgroup} + $trs;
+			$cgroups_drs{$cgroup}                  = $cgroups_drs{$cgroup} + $drs;
+			$cgroups_size{$cgroup}                 = $cgroups_size{$cgroup} + $size;
+			$cgroups_etimes{$cgroup}               = $cgroups_etimes{$cgroup} + $etimes;
+			$cgroups_invvol_ctxt_switches{$cgroup} = $cgroups_invvol_ctxt_switches{$cgroup} + $invol_ctxt_switches;
+			$cgroups_vol_ctxt_switches{$cgroup}    = $cgroups_vol_ctxt_switches{$cgroup} + $vol_ctxt_switches;
+		} ## end else [ if ( !defined( $cgroups_permem{$cgroup} ) )]
 	} ## end foreach my $line (@ps_output_split)
 
 	#
 	# build a list of mappings
 	#
+	# more than one cgroup will commonly map to the same name, such as each
+	# session scope for a user or a service with cgroups nested under it, so the
+	# cgroups are grouped up by the name they map to... each also maps to the dir
+	# under /sys/fs/cgroup to read the stats from, which for the likes of a user is
+	# the slice for that user and not the individual session scopes, given that
+	# with cgroup v2 the stats for a cgroup include those of all its descendants
+	my %name_to_cgroups;
+	my %name_to_stat_dirs;
 	foreach my $cgroup ( keys(%found_cgroups) ) {
 		#my $cgroupns = $found_cgroups{$cgroup};
-		my $map_to = $self->cgroup_mapping($cgroup);
+		my ( $map_to, $stat_dir ) = $self->cgroup_mapping($cgroup);
 		if ( defined($map_to) ) {
 			$self->{mappings}{$cgroup} = $map_to;
+			push( @{ $name_to_cgroups{$map_to} }, $cgroup );
+			if ( defined($stat_dir) ) {
+				# keyed on the dir so that one shared by several cgroups is only read
+				# once, otherwise the same values would be counted repeatedly
+				$name_to_stat_dirs{$map_to}{$stat_dir} = 1;
+			}
 		}
-	}
+	} ## end foreach my $cgroup ( keys(%found_cgroups) )
 
 	#
 	# get the stats
 	#
-	foreach my $cgroup ( keys( %{ $self->{mappings} } ) ) {
-		my $name = $self->{mappings}{$cgroup};
+	foreach my $name ( keys(%name_to_cgroups) ) {
 
 		# only process this cgroup if the include check returns true, otherwise ignore it
 		if ( $self->{obj}->include($name) ) {
 
-			my $cache_name = 'cgroup-' . $name;
-
 			$data->{oslvms}{$name} = clone($base_stats);
 
-			$data->{oslvms}{$name}{'percent-cpu'}    = $cgroups_percpu{$cgroup};
-			$data->{oslvms}{$name}{'percent-memory'} = $cgroups_permem{$cgroup};
-			$data->{oslvms}{$name}{procs}            = $cgroups_procs{$cgroup};
-			$data->{totals}{procs}                   = $data->{totals}{procs} + $cgroups_procs{$cgroup};
-			$data->{oslvms}{$name}{rss}              = $cgroups_rss{$cgroup};
-			$data->{oslvms}{$name}{'virtual-size'}   = $cgroups_vsize{$cgroup};
-			$data->{oslvms}{$name}{'text-size'}      = $cgroups_trs{$cgroup};
-			$data->{oslvms}{$name}{'data-size'}      = $cgroups_drs{$cgroup};
-			$data->{oslvms}{$name}{'size'}           = $cgroups_size{$cgroup};
-			$data->{oslvms}{$name}{'elapsed-times'}  = $cgroups_etimes{$cgroup};
+			# these all come from ps and are per proc, so they are just summed up
+			# across every cgroup mapping to this name
+			my %root_paths_found;
+			foreach my $cgroup ( @{ $name_to_cgroups{$name} } ) {
+				$data->{oslvms}{$name}{'percent-cpu'}
+					= $data->{oslvms}{$name}{'percent-cpu'} + $cgroups_percpu{$cgroup};
+				$data->{oslvms}{$name}{'percent-memory'}
+					= $data->{oslvms}{$name}{'percent-memory'} + $cgroups_permem{$cgroup};
+				$data->{oslvms}{$name}{procs}  = $data->{oslvms}{$name}{procs} + $cgroups_procs{$cgroup};
+				$data->{totals}{procs}         = $data->{totals}{procs} + $cgroups_procs{$cgroup};
+				$data->{oslvms}{$name}{rss}    = $data->{oslvms}{$name}{rss} + $cgroups_rss{$cgroup};
+				$data->{oslvms}{$name}{'size'} = $data->{oslvms}{$name}{'size'} + $cgroups_size{$cgroup};
+				$data->{oslvms}{$name}{'virtual-size'}
+					= $data->{oslvms}{$name}{'virtual-size'} + $cgroups_vsize{$cgroup};
+				$data->{oslvms}{$name}{'text-size'} = $data->{oslvms}{$name}{'text-size'} + $cgroups_trs{$cgroup};
+				$data->{oslvms}{$name}{'data-size'} = $data->{oslvms}{$name}{'data-size'} + $cgroups_drs{$cgroup};
+				$data->{oslvms}{$name}{'elapsed-times'}
+					= $data->{oslvms}{$name}{'elapsed-times'} + $cgroups_etimes{$cgroup};
+				$data->{oslvms}{$name}{'voluntary-context-switches'}
+					= $data->{oslvms}{$name}{'voluntary-context-switches'} + $cgroups_vol_ctxt_switches{$cgroup};
+				$data->{oslvms}{$name}{'involuntary-context-switches'}
+					= $data->{oslvms}{$name}{'involuntary-context-switches'}
+					+ $cgroups_invvol_ctxt_switches{$cgroup};
+
+				if ( defined( $cgroups_root_paths{$cgroup} ) ) {
+					foreach my $root_path ( keys( %{ $cgroups_root_paths{$cgroup} } ) ) {
+						$root_paths_found{$root_path} = 1;
+					}
+				}
+			} ## end foreach my $cgroup ( @{ $name_to_cgroups{$name}...})
 
 			if ( $name =~ /^p\_/ || $name =~ /^d\_/ ) {
 				my $container_name = $name;
@@ -737,10 +771,6 @@ sub run {
 					$data->{oslvms}{$name}{'ip'} = $self->{docker_info}{$container_name}{ip};
 				}
 			}
-
-			my $base_dir = $cgroup;
-			$base_dir =~ s/^0\:\://;
-			$base_dir = '/sys/fs/cgroup' . $base_dir;
 
 			# record the root fs path for this oslvm, akin to the path for a FreeBSD
 			# jail... for containers prefer the rootfs reported by "inspect" as the
@@ -757,90 +787,101 @@ sub run {
 					push( @root_paths, $self->{$info_key}{$container_name}{path} );
 				}
 			}
-			if ( !@root_paths && defined( $cgroups_root_paths{$cgroup} ) ) {
-				@root_paths = sort( keys( %{ $cgroups_root_paths{$cgroup} } ) );
+			if ( !@root_paths ) {
+				@root_paths = sort( keys(%root_paths_found) );
 			}
 			if ( !@root_paths ) {
 				push( @root_paths, '/' );
 			}
 			push( @{ $data->{oslvms}{$name}{path} }, @root_paths );
 
-			my $cpu_stats_raw;
-			if ( -f $base_dir . '/cpu.stat' && -r $base_dir . '/cpu.stat' ) {
-				eval { $cpu_stats_raw = read_file( $base_dir . '/cpu.stat' ); };
-				if ( defined($cpu_stats_raw) ) {
-					my @cpu_stats_split = split( /\n/, $cpu_stats_raw );
-					foreach my $line (@cpu_stats_split) {
-						my ( $stat, $value ) = split( /\s+/, $line, 2 );
-						if ( defined( $stat_mapping->{$stat} ) ) {
-							$stat = $stat_mapping->{$stat};
-						}
-						if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9\.]+/ ) {
-							$value                        = $self->cache_process( $cache_name, $stat, $value );
-							$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
-							$data->{totals}{$stat}        = $data->{totals}{$stat} + $value;
-							if ( $stat eq 'nr_bursts' ) {
-								$data->{has}{burst_count} = 1;
-							}
-							if ( $stat eq 'burst-time' ) {
-								$data->{has}{burst_time} = 1;
-							}
-							if ( $stat eq 'throttled-time' ) {
-								$data->{has}{throttled_time} = 1;
-							}
-							if ( $stat eq 'nr_throttled' ) {
-								$data->{has}{throttled_count} = 1;
-							}
-						} ## end if ( defined( $data->{oslvms}{$name}{$stat...}))
-					} ## end foreach my $line (@cpu_stats_split)
-				} ## end if ( defined($cpu_stats_raw) )
-			} ## end if ( -f $base_dir . '/cpu.stat' && -r $base_dir...)
+			foreach my $stat_dir ( sort( keys( %{ $name_to_stat_dirs{$name} } ) ) ) {
+				my $base_dir = '/sys/fs/cgroup' . $stat_dir;
 
-			my $memory_stats_raw;
-			if ( -f $base_dir . '/memory.stat' && -r $base_dir . '/memory.stat' ) {
-				eval { $memory_stats_raw = read_file( $base_dir . '/memory.stat' ); };
-				if ( defined($memory_stats_raw) ) {
-					my @memory_stats_split = split( /\n/, $memory_stats_raw );
-					foreach my $line (@memory_stats_split) {
-						my ( $stat, $value ) = split( /\s+/, $line, 2 );
-						if ( defined( $stat_mapping->{$stat} ) ) {
-							$stat = $stat_mapping->{$stat};
-						}
-						if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9\.]+/ ) {
-							$value                        = $self->cache_process( $cache_name, $stat, $value );
-							$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
-							$data->{totals}{$stat}        = $data->{totals}{$stat} + $value;
-						}
-					} ## end foreach my $line (@memory_stats_split)
-				} ## end if ( defined($memory_stats_raw) )
-			} ## end if ( -f $base_dir . '/memory.stat' && -r $base_dir...)
+				# cached per cgroup dir rather than per name so the deltas stay correct
+				# as the cgroups making up a name come and go
+				my $cache_name = 'cgroup-' . $stat_dir;
 
-			my $io_stats_raw;
-			if ( -f $base_dir . '/io.stat' && -r $base_dir . '/io.stat' ) {
-				eval { $io_stats_raw = read_file( $base_dir . '/io.stat' ); };
-				if ( defined($io_stats_raw) ) {
-					$data->{has}{rwdops}   = 1;
-					$data->{has}{rwdbytes} = 1;
-					my @io_stats_split = split( /\n/, $io_stats_raw );
-					foreach my $line (@io_stats_split) {
-						my @line_split = split( /\s/, $line );
-						shift(@line_split);
-						foreach my $item (@line_split) {
-							my ( $stat, $value ) = split( /\=/, $item, 2 );
+				my $cpu_stats_raw;
+				if ( -f $base_dir . '/cpu.stat' && -r $base_dir . '/cpu.stat' ) {
+					eval { $cpu_stats_raw = read_file( $base_dir . '/cpu.stat' ); };
+					if ( defined($cpu_stats_raw) ) {
+						my @cpu_stats_split = split( /\n/, $cpu_stats_raw );
+						foreach my $line (@cpu_stats_split) {
+							my ( $stat, $value ) = split( /\s+/, $line, 2 );
 							if ( defined( $stat_mapping->{$stat} ) ) {
 								$stat = $stat_mapping->{$stat};
 							}
-							if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9]+/ ) {
+							if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9\.]+/ ) {
+								$value                        = $self->cache_process( $cache_name, $stat, $value );
+								$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
+								$data->{totals}{$stat}        = $data->{totals}{$stat} + $value;
+								if ( $stat eq 'nr_bursts' ) {
+									$data->{has}{burst_count} = 1;
+								}
+								if ( $stat eq 'burst-time' ) {
+									$data->{has}{burst_time} = 1;
+								}
+								if ( $stat eq 'throttled-time' ) {
+									$data->{has}{throttled_time} = 1;
+								}
+								if ( $stat eq 'nr_throttled' ) {
+									$data->{has}{throttled_count} = 1;
+								}
+							} ## end if ( defined( $data->{oslvms}{$name}{$stat...}))
+						} ## end foreach my $line (@cpu_stats_split)
+					} ## end if ( defined($cpu_stats_raw) )
+				} ## end if ( -f $base_dir . '/cpu.stat' && -r $base_dir...)
+
+				my $memory_stats_raw;
+				if ( -f $base_dir . '/memory.stat' && -r $base_dir . '/memory.stat' ) {
+					eval { $memory_stats_raw = read_file( $base_dir . '/memory.stat' ); };
+					if ( defined($memory_stats_raw) ) {
+						my @memory_stats_split = split( /\n/, $memory_stats_raw );
+						foreach my $line (@memory_stats_split) {
+							my ( $stat, $value ) = split( /\s+/, $line, 2 );
+							if ( defined( $stat_mapping->{$stat} ) ) {
+								$stat = $stat_mapping->{$stat};
+							}
+							if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9\.]+/ ) {
 								$value                        = $self->cache_process( $cache_name, $stat, $value );
 								$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
 								$data->{totals}{$stat}        = $data->{totals}{$stat} + $value;
 							}
-						} ## end foreach my $item (@line_split)
-					} ## end foreach my $line (@io_stats_split)
-				} ## end if ( defined($io_stats_raw) )
-			} ## end if ( -f $base_dir . '/io.stat' && -r $base_dir...)
+						} ## end foreach my $line (@memory_stats_split)
+					} ## end if ( defined($memory_stats_raw) )
+				} ## end if ( -f $base_dir . '/memory.stat' && -r $base_dir...)
+
+				my $io_stats_raw;
+				if ( -f $base_dir . '/io.stat' && -r $base_dir . '/io.stat' ) {
+					eval { $io_stats_raw = read_file( $base_dir . '/io.stat' ); };
+					if ( defined($io_stats_raw) ) {
+						$data->{has}{rwdops}   = 1;
+						$data->{has}{rwdbytes} = 1;
+						my @io_stats_split = split( /\n/, $io_stats_raw );
+						foreach my $line (@io_stats_split) {
+							my @line_split = split( /\s/, $line );
+							shift(@line_split);
+							foreach my $item (@line_split) {
+								my ( $stat, $value ) = split( /\=/, $item, 2 );
+								if ( defined( $stat_mapping->{$stat} ) ) {
+									$stat = $stat_mapping->{$stat};
+								}
+								if (   defined( $data->{oslvms}{$name}{$stat} )
+									&& defined($value)
+									&& $value =~ /[0-9]+/ )
+								{
+									$value = $self->cache_process( $cache_name, $stat, $value );
+									$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
+									$data->{totals}{$stat}        = $data->{totals}{$stat} + $value;
+								}
+							} ## end foreach my $item (@line_split)
+						} ## end foreach my $line (@io_stats_split)
+					} ## end if ( defined($io_stats_raw) )
+				} ## end if ( -f $base_dir . '/io.stat' && -r $base_dir...)
+			} ## end foreach my $stat_dir ( sort( keys( %{ $name_to_stat_dirs...})))
 		} ## end if ( $self->{obj}->include($name) )
-	} ## end foreach my $cgroup ( keys( %{ $self->{mappings}...}))
+	} ## end foreach my $name ( keys(%name_to_cgroups) )
 
 	$data->{uid_mapping} = $self->{uid_mapping};
 
@@ -889,6 +930,39 @@ sub usable {
 	return 1;
 } ## end sub usable
 
+sub proc_cgroup {
+	my $self = $_[0];
+	my $pid  = $_[1];
+
+	if ( !defined($pid) || !looks_like_number($pid) ) {
+		return undef;
+	}
+
+	my $raw;
+	# the proc may exit between being listed by ps and being read here, so a
+	# failure to read it is entirely expected and not worth noting as a error
+	eval { $raw = read_file( '/proc/' . $pid . '/cgroup' ); };
+	if ( !defined($raw) ) {
+		return undef;
+	}
+
+	# only the unified hierarchy, hierarchy ID 0 with a empty controller list,
+	# is of interest here... on a hybrid setup the v1 lines are also present
+	foreach my $line ( split( /\n/, $raw ) ) {
+		if ( $line =~ /^0\:\:\// ) {
+			# the root cgroup, where kernel threads and the like live, is not a
+			# container of any sort and has no name to map to, so it is skipped,
+			# matching what ps did previously by printing "-" for those
+			if ( $line eq '0::/' ) {
+				return undef;
+			}
+			return $line;
+		}
+	} ## end foreach my $line ( split( /\n/, $raw ) )
+
+	return undef;
+} ## end sub proc_cgroup
+
 sub cgroup_mapping {
 	my $self        = $_[0];
 	my $cgroup_name = $_[1];
@@ -899,33 +973,69 @@ sub cgroup_mapping {
 	}
 
 	if ( $cgroup_name eq '0::/init.scope' ) {
-		return 'init';
+		return ( 'init', '/init.scope' );
 	}
 
 	if ( $cgroup_name =~ /^0\:\:\/system\.slice\/docker\-[a-zA-Z0-9]+\.scope/ ) {
-		$cgroup_name =~ s/^0\:\:\/system\.slice\/docker\-//;
-		$cgroup_name =~ s/\.scope.*$//;
-		if ( defined( $self->{docker_mapping}{$cgroup_name} ) ) {
-			return 'd_' . $self->{docker_mapping}{$cgroup_name}{name};
+		my $id = $cgroup_name;
+		$id =~ s/^0\:\:\/system\.slice\/docker\-//;
+		$id =~ s/\.scope.*$//;
+		# the scope for the container is what the stats are wanted for, not any of
+		# the cgroups nested under it
+		my $stat_dir = '/system.slice/docker-' . $id . '.scope';
+		if ( defined( $self->{docker_mapping}{$id} ) ) {
+			return ( 'd_' . $self->{docker_mapping}{$id}{name}, $stat_dir );
 		}
-		return 'd_' . $cgroup_name;
+		return ( 'd_' . $id, $stat_dir );
 	} elsif ( $cgroup_name =~ /^0\:\:\/docker\// ) {
-		$cgroup_name =~ s/^0\:\:\/docker\///;
-		$cgroup_name =~ s/\/.*$//;
-		return 'd_' . $cgroup_name;
+		my $id = $cgroup_name;
+		$id =~ s/^0\:\:\/docker\///;
+		$id =~ s/\/.*$//;
+		return ( 'd_' . $id, '/docker/' . $id );
 	} elsif ( $cgroup_name =~ /^0\:\:\/system\.slice\// ) {
-		$cgroup_name =~ s/^.*\///;
-		$cgroup_name =~ s/\.service$//;
-		return 's_' . $cgroup_name;
+		my $under_slice = $cgroup_name;
+		$under_slice =~ s/^0\:\:\/system\.slice\///;
+		# the first unit in the path is used so that a service with nested
+		# cgroups, such as systemd-udevd.service/udev, is grouped under the
+		# service and not under the name of the nested cgroup... nested slices,
+		# such as system-getty.slice, are skipped over as the unit of interest
+		# lives under them
+		my @path_split = split( /\//, $under_slice );
+		my @unit_path;
+		my $unit;
+		foreach my $part (@path_split) {
+			if ( !defined($unit) ) {
+				push( @unit_path, $part );
+				if ( $part =~ /\.(service|scope)$/ ) {
+					$unit = $part;
+				}
+			}
+		}
+		if ( !defined($unit) ) {
+			$unit = $path_split[-1];
+		}
+		if ( !defined($unit) || $unit eq '' ) {
+			return undef;
+		}
+		# stats are read from the unit and not from the cgroups nested under it as
+		# the name is for the unit as a whole
+		my $stat_dir = '/system.slice/' . join( '/', @unit_path );
+		$unit =~ s/\.(service|scope)$//;
+		return ( 's_' . $unit, $stat_dir );
 	} elsif ( $cgroup_name =~ /^0\:\:\/user\.slice\// ) {
-		$cgroup_name =~ s/^0\:\:\/user\.slice\///;
-		$cgroup_name =~ s/\.slice.*$//;
-		$cgroup_name =~ s/^user[\-\_]//;
+		my $user = $cgroup_name;
+		$user =~ s/^0\:\:\/user\.slice\///;
+		$user =~ s/\/.*$//;
+		# the slice for the user is where the stats come from, meaning the session
+		# scopes and the like nested under it are all accounted for
+		my $stat_dir = '/user.slice/' . $user;
+		$user =~ s/\.slice$//;
+		$user =~ s/^user[\-\_]//;
 
-		if ( $cgroup_name =~ /^\d+$/ ) {
-			my ( $name, $passwd, $uid, $gid, $quota, $comment, $gecos, $dir, $shell, $expire ) = getpwuid($cgroup_name);
+		if ( $user =~ /^\d+$/ ) {
+			my ( $name, $passwd, $uid, $gid, $quota, $comment, $gecos, $dir, $shell, $expire ) = getpwuid($user);
 			if ( defined($name) ) {
-				$self->{uid_mapping}{$cgroup_name} = {
+				$self->{uid_mapping}{$user} = {
 					name  => $name,
 					gid   => $gid,
 					home  => $dir,
@@ -933,23 +1043,33 @@ sub cgroup_mapping {
 					shell => $shell,
 				};
 			}
-		} ## end if ( $cgroup_name =~ /^\d+$/ )
+		} ## end if ( $user =~ /^\d+$/ )
 
-		return 'u_' . $cgroup_name;
+		return ( 'u_' . $user, $stat_dir );
 	} elsif ( $cgroup_name =~ /^0\:\:\/machine\.slice\/libpod\-conmon-/ ) {
-		return 'libpod-conmon';
+		# every container has its own conmon scope and all of them are lumped in
+		# under the one name, so the stats are read from each of those scopes
+		my $scope = $cgroup_name;
+		$scope =~ s/^0\:\:\/machine\.slice\///;
+		$scope =~ s/\/.*$//;
+		return ( 'libpod-conmon', '/machine.slice/' . $scope );
 	} elsif ( $cgroup_name =~ /^0\:\:\/machine\.slice\/libpod\-/ ) {
-		$cgroup_name =~ s/^^0\:\:\/machine\.slice\/libpod\-//;
-		$cgroup_name =~ s/\.scope.*$//;
-		if ( defined( $self->{podman_mapping}{$cgroup_name} ) ) {
-			return 'p_' . $self->{podman_mapping}{$cgroup_name}{name};
+		my $id = $cgroup_name;
+		$id =~ s/^0\:\:\/machine\.slice\/libpod\-//;
+		$id =~ s/\.scope.*$//;
+		my $stat_dir = '/machine.slice/libpod-' . $id . '.scope';
+		if ( defined( $self->{podman_mapping}{$id} ) ) {
+			return ( 'p_' . $self->{podman_mapping}{$id}{name}, $stat_dir );
 		}
-		return 'libpod';
+		return ( 'libpod', $stat_dir );
 	}
 
 	$cgroup_name =~ s/^0\:\:\///;
 	$cgroup_name =~ s/\/.*//;
-	return $cgroup_name;
+	if ( $cgroup_name eq '' ) {
+		return undef;
+	}
+	return ( $cgroup_name, '/' . $cgroup_name );
 } ## end sub cgroup_mapping
 
 sub ip_to_if {

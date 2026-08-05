@@ -70,7 +70,7 @@ static int pl_add_io(hm_backend *be, int fd, int mask, int oneshot) {
     if (i < 0) {
         if (st->npfds == st->cap) {
             st->cap = st->cap ? st->cap * 2 : 64;
-            st->pfds = (struct pollfd *)realloc(st->pfds,
+            st->pfds = (struct pollfd *)hm_xrealloc(st->pfds,
                             st->cap * sizeof(struct pollfd));
         }
         i = st->npfds++;
@@ -112,7 +112,7 @@ static int pl_add_timer(hm_backend *be, double secs, int oneshot, void *udata) {
     hm_poll_state *st = (hm_poll_state *)be->state;
     if (st->ntimers == st->tcap) {
         st->tcap = st->tcap ? st->tcap * 2 : 16;
-        st->timers = (hm_ptimer *)realloc(st->timers,
+        st->timers = (hm_ptimer *)hm_xrealloc(st->timers,
                           st->tcap * sizeof(hm_ptimer));
     }
     st->timers[st->ntimers].when     = hm_poll_now() + secs;
@@ -250,8 +250,8 @@ static void pl_destroy(hm_backend *be) {
 }
 
 hm_backend *hm_backend_poll_new(void) {
-    hm_backend    *be = (hm_backend *)calloc(1, sizeof(hm_backend));
-    hm_poll_state *st = (hm_poll_state *)calloc(1, sizeof(hm_poll_state));
+    hm_backend    *be = (hm_backend *)hm_xcalloc(1, sizeof(hm_backend));
+    hm_poll_state *st = (hm_poll_state *)hm_xcalloc(1, sizeof(hm_poll_state));
     int i;
     if (!be || !st) { free(be); free(st); return NULL; }
     for (i = 0; i < HM_MAXFD; i++) st->idx[i] = -1;

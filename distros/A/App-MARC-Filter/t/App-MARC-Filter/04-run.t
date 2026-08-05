@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 25;
+use Test::More 'tests' => 30;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -73,6 +73,23 @@ stderr_is(
 
 # Test.
 @ARGV = (
+	'-e',
+	'-r',
+	$data_dir->file('ex1.xml')->s,
+	'710',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (-e and -r combination).',
+);
+
+# Test.
+@ARGV = (
 	'-x',
 );
 $right_ret = help();
@@ -101,6 +118,75 @@ stdout_is(
 	},
 	$right_ret,
 	'Run filter for MARC XML file with 1 record (015a = cnb000000096).',
+);
+
+# Test.
+@ARGV = (
+	'-e',
+	$data_dir->file('ex1.xml')->s,
+	'710',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run existence filter for MARC XML file with 1 record (710 exists).',
+);
+
+# Test.
+@ARGV = (
+	'-e',
+	$data_dir->file('ex1.xml')->s,
+	'710',
+	'a',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run existence filter for MARC XML file with 1 record (710a exists).',
+);
+
+# Test.
+@ARGV = (
+	'-i',
+	'-e',
+	'-n 1',
+	$data_dir->file('ex3.xml')->s,
+	'710',
+);
+$right_ret = slurp($data_dir->file('ex5.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run existence inverse filter for MARC XML file with 1 record (710 not exists).',
+);
+
+# Test.
+@ARGV = (
+	'-e',
+	$data_dir->file('ex1.xml')->s,
+	'710',
+	'a',
+	'ignored-value',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (-e with unexpected subfield value).',
 );
 
 # Test.
@@ -383,13 +469,13 @@ stdout_is(
 );
 
 sub help {
-	my $script = abs2rel(File::Object->new->file('04-run.t')->s);
-	# XXX Hack for missing abs2rel on Windows.
+	my $script = abs2rel(__FILE__);
 	if ($OSNAME eq 'MSWin32') {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-h] [-i] [-n num] [-o format] [-r] [-v] [--version] marc_file search_item [sub_search_item] value
+Usage: $script [-e] [-h] [-i] [-n num] [-o format] [-r] [-v] [--version] marc_file search_item [sub_search_item] [value]
+	-e		Match field/subfield existence.
 	-h		Print help.
 	-i		Invert searching.
 	-n num		Number of records to output (default value is all records).
@@ -397,10 +483,10 @@ Usage: $script [-h] [-i] [-n num] [-o format] [-r] [-v] [--version] marc_file se
 	-r		Use value as Perl regexp.
 	-v		Verbose mode.
 	--version	Print version.
-	marc_file	MARC XML or USMARC file.
+	marc_file	MARC XML or USMARC file, could be compressed.
 	search_item	Search item.
-	sub_search_item	Search sub item (required in case of MARC field).
-	value		Value to filter.
+	sub_search_item	Search sub item (optional in case of MARC field).
+	value		Value to filter (required without -e).
 END
 
 	return $help;

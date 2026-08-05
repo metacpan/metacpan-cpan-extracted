@@ -2,6 +2,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "rp_compat.h"   /* pre-5.16 perl shims (XS_INTERNAL, mg_findext) */
 #include "fetch_abi.h"   /* vendored copy; runtime version-checked in BOOT */
 
 /* Raw sockets for the WebSocket/Upgrade tunnel (Unix). On Windows the tunnel
@@ -762,10 +763,11 @@ static SV *rp_tunnel(pTHX_ HV *self, HV *env, SV *base, SV *path) {
     /* read the response header block (may carry first frame bytes), relay it */
     resp = sv_2mortal(newSVpvs(""));
     while (!seen) {
+        static const char crlf2[] = "\r\n\r\n";
         n = (ssize_t)FETCH->tunnel_read(uc, buf, (IV)sizeof buf);
         if (n <= 0) break;
         sv_catpvn(resp, buf, n);
-        if (ninstr(SvPVX(resp), SvPVX(resp) + SvCUR(resp), "\r\n\r\n", "\r\n\r\n" + 4))
+        if (ninstr(SvPVX(resp), SvPVX(resp) + SvCUR(resp), crlf2, crlf2 + 4))
             seen = 1;
     }
     if (SvCUR(resp) == 0) { FETCH->tunnel_close(uc);

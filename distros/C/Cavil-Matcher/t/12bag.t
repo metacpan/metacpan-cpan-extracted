@@ -71,8 +71,10 @@ for my $text ('', 'x', "binary\x00text", join('', map { chr(int(rand(256))) } 1 
 is_deeply($bag->best_for('permission is hereby granted',  0), [], 'best_for(count=0) returns empty');
 is_deeply($bag->best_for('permission is hereby granted', -1), [], 'best_for(negative count) returns empty');
 
-# The cache is a versioned, CRC-checked format: truncated / wrong-magic / wrong-version / corrupt
-# files are all rejected, and a rejected load must leave any existing model intact (not wipe it).
+# The load path validates structure (the record parse bounds-checks every read) but does NOT re-checksum
+# the whole payload: the bag is Cavil's own immutable, atomically-published cache. Structural corruption
+# is still rejected on load; whole-payload corruption is caught by verify() (and at publish time). A
+# rejected load must leave any existing model intact (not wipe it).
 my $sample = slurp('t/fixtures/licenses/04license.1.txt');
 my $before = $loaded->best_for($sample, 1);
 ok(@$before, 'model matches before a bad load');
@@ -80,17 +82,26 @@ my $good = slurp($file);
 
 sub write_bytes { my ($p, $b) = @_; open my $o, '>:raw', $p or die $!; print {$o} $b; close $o; $p }
 
-# Truncated payload (valid header, partial body): CRC fails.
+# Truncated payload (valid header, partial body): the record parse runs out and rejects it.
 is($loaded->load(write_bytes("$dir/truncated", substr($good, 0, 48))), 0, 'truncated bag rejected');
 
 # Not a bag at all (wrong magic).
 is($loaded->load(write_bytes("$dir/garbage", 'not a bag file, just some bytes here at all')),
   0, 'wrong-magic bag rejected');
 
-# Valid magic but a flipped payload byte fails the CRC.
+# The whole-payload CRC is checked by verify(), not by the load path. Corrupt only the stored CRC field
+# (header offset 12) so the payload stays valid: verify() rejects it, load() trusts it.
+is($loaded->verify($file), 1, 'verify() passes a good bag');
+my $bad_stored_crc = $good;
+substr($bad_stored_crc, 12, 4) = pack('V', unpack('V', substr($good, 12, 4)) ^ 0xFFFFFFFF);
+is($loaded->verify(write_bytes("$dir/badcrc", $bad_stored_crc)), 0, 'verify() catches a bad CRC');
+is($loaded->load(write_bytes("$dir/badcrc", $bad_stored_crc)), 1,
+  'load() trusts a valid-payload bag despite a bad CRC');
+
+# A flipped payload byte is likewise caught by the full check.
 my $corrupt = $good;
 substr($corrupt, length($corrupt) - 1, 1) = chr(ord(substr($corrupt, length($corrupt) - 1, 1)) ^ 0xFF);
-is($loaded->load(write_bytes("$dir/corrupt", $corrupt)), 0, 'flipped payload byte fails CRC');
+is($loaded->verify(write_bytes("$dir/corrupt", $corrupt)), 0, 'verify() catches a flipped payload byte');
 
 # Strictness (like the segment reader): a CRC-valid file with trailing bytes after the declared records,
 # or with a pattern's tf_idfs not in the strictly-ascending order compare2 relies on, must be rejected -

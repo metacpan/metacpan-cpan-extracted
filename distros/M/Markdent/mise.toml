@@ -1,0 +1,6 @@
+[tools]
+node = "24.14.0"
+"npm:prettier" = "3.9.6"
+taplo = "0.10.0"
+"github:houseabsolute/omegasort" = "0.1.3"
+"github:houseabsolute/precious" = "0.11.0"

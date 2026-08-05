@@ -35,4 +35,5 @@ t/github_autodetect.t
 t/irc_user.t
 t/readme_exclusion.t
 t/release-changes_has_content.t
+t/tag_format.t
 t/version_finder.t

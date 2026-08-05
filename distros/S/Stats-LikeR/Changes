@@ -1,6 +1,162 @@
 Revision history for Stats-LikeR
 
 
+0.291 2026-08-04 CDT
+
+ - POD formatting improvements
+
+ [`lm`, `glm`]
+
+ - Formula parsing and data reading are now shared between `lm` and `glm` too, so the
+   two agree on what a formula means and on what a row is called. `lm` had the better
+   parser and `glm` the better row naming; each now has both.
+
+ - `lm` now names rows the way `glm` does — from a `row.names`, `_row`,
+   `rownames` or `.rownames` column when the data has one, and 1-based integers
+   otherwise. `lm` previously always used integers, so `fitted.values` and
+   `residuals` came back keyed `1..n` for data whose rows had names, and did not
+   match what `glm` or `predict` returned for the same data; the `predict`
+   documentation already described the shared behaviour. A row-name column is a label
+   rather than a measurement, so `y ~ .` now excludes it in both.
+
+ - Design-matrix construction is now shared between `lm` and `glm`, and decides a
+   categorical column's coding term by term using R's margin rule: the reference
+   level is dropped when the term with that column removed is itself in the model.
+   Three bugs fall out of that, all confirmed against R 4.6.1 and statsmodels
+   0.14.6.
+
+ - Bug fixes:
+
+ - Four in `glm`, from the parser it now shares with `lm`. Three of them ended the
+   same way: a term that names no column evaluates to `NaN` for every row, every row
+   is dropped as incomplete, and the fit dies with `0 degrees of freedom (too many
+   NAs or parameters > observations)` — never mentioning the formula.
+
+ - **`glm` truncated a formula at 511 characters.** It copied the formula into a
+     fixed `char[512]`, so a model with enough predictors to overrun that lost the
+     tail. The buffer now grows with the formula.
+
+ - **`glm` did not understand `.`.** It parsed the formula before reading the data,
+     so there were no column names to expand `.` into and the term stayed a literal
+     `.`. Formula splitting now happens first and term expansion after the data is
+     read, so `y ~ .` works in both.
+
+ - **`glm` did not understand `+ 0` or a leading `0 +`.** Only `- 1` suppressed the
+     intercept; the other two spellings R accepts left a term named `0`. All three now
+     work in both, as do `+ 1` and a leading `1 +`.
+
+ - **`glm` read the `-1` inside `I(...)` as intercept suppression.** It searched the
+     whole right-hand side for the substring, so `y ~ I(x-1)` silently became
+     `y ~ I(x) - 1`: a different model, fitted without complaint. The scan now steps
+     over `I(...)`, leaving the term alone. `I()` still supports only `^power`, so
+     that formula is an error in both rather than a wrong answer in one.
+
+ - And the three that fall out of the shared design matrix:
+
+ - **A categorical column in a model with no intercept lost a level.** With no
+     intercept there is no baseline for a reference level to be measured against, so
+     R codes the factor in full — one column per group, each coefficient that
+     group's own mean. Both functions dropped the reference level anyway, so
+     `len ~ supp - 1` fitted `len ~ suppVC - 1`: a model forcing every observation
+     at the reference level to a fitted value of 0. On R's `ToothGrowth` that meant
+     a residual sum of squares of 16056 against R's 3247, and an R² of 0.35 against
+     0.87. Where two categorical main effects appear with no intercept only the
+     first is coded in full, as in R, since coding both would be rank deficient.
+
+ - **An interaction involving a categorical column could not be built.** The
+     interaction was looked up as a single column literally named `dose:supp`;
+     finding none, it evaluated to `NaN` for every row, every row was dropped as
+     incomplete, and the fit died with `0 degrees of freedom (too many NAs or
+     parameters > observations)`. Interactions now expand to the product of their
+     components' indicator columns, so `len ~ dose * supp` gives `dose`, `suppVC`
+     and `dose:suppVC`. `predict` already understood such coefficient names; now
+     they can be produced.
+
+ - **`a*b*c` expanded only its first `*`.** Crossing is associative, so
+     `y ~ a * b * c` now yields every non-empty subset (`a`, `b`, `c`, `a:b`, `a:c`,
+     `b:c`, `a:b:c`), ordered by degree as R's `terms()` orders them. Previously the
+     chunk was split once, producing the unusable terms `b*c` and `a:b*c`, and the
+     fit died the same way as above. Crossing more than 16 columns now croaks rather
+     than expanding to 2^n terms.
+
+ - **`predict` scored reference-level rows as if the term were absent.** It
+     registered factor dummies from `levels[1..]` only, on the assumption that a
+     reference level never has a coefficient — true for a factor coded by contrasts,
+     but not for one coded in full. Every row at the reference level of a
+     no-intercept model therefore came back 0.
+
+ - **`glm` halved its IRLS step whenever the deviance rose, costing iterations and
+     accuracy in the standard errors.** R truncates a step only when the deviance
+     comes out non-finite; a deviance that merely increases is not divergence. The
+     standard IRLS start puts `mu` at `y + 0.1`, essentially on the data, so the
+     initial deviance is near zero and the first real step almost always raises it —
+     on the nine-point poisson fit in `t/glm.t`, from 0.016 to 1.54. That was read as
+     divergence and the step was halved ten times over, turning R's four iterations
+     into seven.
+
+ -   The extra iterations reached the same coefficients, so the symptom appeared
+     only in the standard errors. They are built from the information matrix of the
+     *penultimate* iterate — in R because `summary.glm` inverts the QR that
+     `glm.fit` kept from its last weighted least squares call, and here because the
+     IRLS sweep leaves that inverse in place — so stopping on a different iteration
+     than R means reporting a different matrix. Poisson standard errors were 5e-8 to
+     2e-5 away from R's while the coefficients agreed to twelve digits; they now
+     agree to about 1e-14. Binomial standard errors were up to 6e-7 out and now
+     agree to 2e-14, except on a near-separable fit, where the `varmu` floor of
+     1e-10 (a guard against dividing by an underflowed variance) accounts for the
+     remaining difference — 1.9e-9 on `am ~ wt * hp`, where three of 32 fitted
+     probabilities are within 1e-12 of 0 or 1 and R itself warns. Gaussian fits are
+     unaffected: their weights are all 1, so the matrix is `X'X` either way.
+
+ -   The same condition had its `isfinite` test on the accepting side, so a
+     genuinely divergent step producing a non-finite deviance was kept rather than
+     truncated. That is now the one case that does trigger halving.
+
+ - **The negative-binomial theta alternation stopped early and started from the
+     wrong place.** `MASS::glm.nb` does not simply maximise over theta; it alternates
+     between an IRLS fit at the current theta and a fresh ML estimate of theta at the
+     current fitted means, and which fit it lands on depends on the schedule. Four
+     details of that schedule were wrong here, and all four are now reproduced:
+
+ - The alternation stopped on a relative test of the log-likelihood alone,
+     `|dll| < 1e-7 * (|ll| + 0.1)`. `glm.nb` requires
+     `(|dLm| / d1 + |dtheta|) < 1e-8` with `d1 = sqrt(2 * max(1, df.residual))`
+     taken from its Poisson pass — theta itself has to have settled, not just the
+     log-likelihood. The old test was satisfied roughly 2e-5 of log-likelihood
+     early, which left theta 8e-7 out and dragged the coefficients 8e-6 with it.
+ - The first pass now runs as a genuine **Poisson** fit, as `glm.nb`'s does,
+     rather than a negative-binomial fit at a large stand-in theta. That pass
+     supplies both the first theta and the `d1` above.
+ - Later passes are **warm started** from the previous pass's means
+     (`etastart = log(mu)`), so they converge to the fit `glm.nb` reaches rather
+     than to the same optimum approached from a cold start.
+ - Theta is re-estimated at the means each pass **started** from, not the ones it
+     produced: `glm.nb` calls `theta.ml(Y, mu)` and only then reassigns
+     `mu <- fit$fitted.values`. `theta.ml` itself now also uses MASS's own stopping
+     rule, an absolute Newton-step tolerance of `.Machine$double.eps^0.25`.
+
+ -   Across eighteen fits spanning dispersion from theta 0.41 to theta 69000, theta
+     now agrees with `glm.nb` to 3.4e-9, coefficients to 5.8e-9, standard errors to
+     8.4e-10 and deviance to 1.3e-9 — previously 8e-7, 8e-6, 3e-6 and 6e-7. The one
+     exception is genuinely near-Poisson data, where theta is not identified at all
+     (its own standard error exceeds the estimate, and `glm.nb`'s `theta.ml` reports
+     "iteration limit reached"); theta there agrees only to about 4e-6 relative,
+     while the coefficients still agree to 1.6e-10.
+
+ -   A separate consequence: a negative-binomial fit with theta supplied was
+     starting from the Poisson `mustart` of `y + 0.1`, where R's
+     `negative.binomial()$initialize` sets `y + (y == 0)/6`. Different starting
+     values walk different iterates, and since the standard errors come from the
+     penultimate one, that showed as standard errors 6e-7 from R's while the
+     coefficients agreed to 1e-9. Such fits now match R to 2e-15.
+
+ -   Note on that comparison: standard errors for a negative-binomial fit hold the
+     dispersion at 1, which is what `glm.nb` and `summary.negbin` do. R's
+     `summary.glm`, handed a `negative.binomial` family directly, instead *estimates*
+     the dispersion and prints standard errors scaled by its square root — 1.0839 on
+     one of the test data sets, so about 4% larger. Compare against
+     `summary(fit, dispersion = 1)` to see the values this module reports.
+
 0.29 2026-08-03 CDT
 
  [t_test]
@@ -1001,6 +1157,7 @@ Revision history for Stats-LikeR
  - `view` function added, similar to R's `head`
 
  - `read_table`:
+
      filter => {
          'Testosterone, total (nmol/L)' => sub { defined $_ },
      }

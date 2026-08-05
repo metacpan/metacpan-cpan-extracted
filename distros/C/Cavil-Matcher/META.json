@@ -4,7 +4,7 @@
       "Sebastian Riedel <sriedel@suse.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "gpl_2"
    ],
@@ -60,6 +60,6 @@
          "web" : "https://github.com/openSUSE/cavil-matcher"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

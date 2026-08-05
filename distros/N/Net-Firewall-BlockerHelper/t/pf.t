@@ -91,16 +91,16 @@ block drop quick proto udp from <derp_ssh> to any port 22
 	$fw_helper->ban( ban => '1.2.3.4' );
 	if ( !defined( $fw_helper->{test_data} ) ) {
 		die('Backend did not set $fw_helper->{test_data}');
-	} elsif ( $fw_helper->{test_data} ne 'pfctl -a derp/ssh -T derp_ssh add 1.2.3.4' ) {
-		die( '($fw_helper->{test_data} ne "pfctl -a derp/ssh -T derp_ssh add 1.2.3.4"... '
+	} elsif ( $fw_helper->{test_data} ne 'pfctl -a derp/ssh -t derp_ssh -T add 1.2.3.4' ) {
+		die( '($fw_helper->{test_data} ne "pfctl -a derp/ssh -t derp_ssh -T add 1.2.3.4"... '
 				. Dumper( $fw_helper->{test_data} ) );
 	}
 
 	$fw_helper->ban( ban => '5.6.7.8' );
 	if ( !defined( $fw_helper->{test_data} ) ) {
 		die('Backend did not set $fw_helper->{test_data}');
-	} elsif ( $fw_helper->{test_data} ne 'pfctl -a derp/ssh -T derp_ssh add 5.6.7.8' ) {
-		die( '($fw_helper->{test_data} ne "pfctl -a derp/ssh -T derp_ssh add 5.6.7.8"... '
+	} elsif ( $fw_helper->{test_data} ne 'pfctl -a derp/ssh -t derp_ssh -T add 5.6.7.8' ) {
+		die( '($fw_helper->{test_data} ne "pfctl -a derp/ssh -t derp_ssh -T add 5.6.7.8"... '
 				. Dumper( $fw_helper->{test_data} ) );
 	}
 
@@ -114,8 +114,8 @@ block drop quick proto udp from <derp_ssh> to any port 22
 	$fw_helper->unban( ban => '1.2.3.4' );
 	if ( !defined( $fw_helper->{test_data} ) ) {
 		die('Backend did not set $fw_helper->{test_data}');
-	} elsif ( $fw_helper->{test_data} ne 'pfctl -a derp/ssh -T derp_ssh delete 1.2.3.4' ) {
-		die( '($fw_helper->{test_data} ne "pfctl -a derp/ssh -T derp_ssh delete 1.2.3.4"... '
+	} elsif ( $fw_helper->{test_data} ne 'pfctl -a derp/ssh -t derp_ssh -T delete 1.2.3.4' ) {
+		die( '($fw_helper->{test_data} ne "pfctl -a derp/ssh -t derp_ssh -T delete 1.2.3.4"... '
 				. Dumper( $fw_helper->{test_data} ) );
 	}
 
@@ -136,8 +136,8 @@ block drop quick proto udp from <derp_ssh> to any port 22
 	$fw_helper->re_init;
 	if ( !defined( $fw_helper->{test_data} ) ) {
 		die('Backend did not set $fw_helper->{test_data}');
-	} elsif ( $fw_helper->{test_data}[0] ne 'pfctl -a derp/ssh -T derp_ssh add 5.6.7.8' ) {
-		die( '($fw_helper->{test_data}[0] ne "pfctl -a derp/ssh -T derp_ssh add 5.6.7.8"... '
+	} elsif ( $fw_helper->{test_data}[0] ne 'pfctl -a derp/ssh -t derp_ssh -T add 5.6.7.8' ) {
+		die( '($fw_helper->{test_data}[0] ne "pfctl -a derp/ssh -t derp_ssh -T add 5.6.7.8"... '
 				. Dumper( $fw_helper->{test_data} ) );
 	}
 

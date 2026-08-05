@@ -2,7 +2,7 @@ NAME
     marc-filter - Tool to filter records in MARC dataset.
 
 SYNOPSIS
-     marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_file search_item [sub_search_item] value
+     marc-filter [-e] [-h] [-i] [-n num] [-o format] [-r] [--version] marc_file search_item [sub_search_item] [value]
 
 DESCRIPTION
     Tool to filter MARC records in big datasets. Could filter by control
@@ -12,9 +12,17 @@ DESCRIPTION
     It supports MARC XML and USMARC files now.
 
 ARGUMENTS
+    *       "-e"
+
+            Match field/subfield existence.
+
     *       "-h"
 
             Print help.
+
+    *       "-i"
+
+            Invert searching.
 
     *       "-n num"
 
@@ -40,6 +48,10 @@ ARGUMENTS
 
             MARC XML or USMARC file name.
 
+            Input file could be compressed by IO::Uncompress::AnyUncompress
+            module. Possibility is to uncompress gzip, zip, bzip2, zstd, xz,
+            lzma, lzip, lzf or lzop.
+
     *       "search_item"
 
             Search item could be MARC control field or MARC field or
@@ -63,11 +75,12 @@ ARGUMENTS
 
     *       "sub_search_item"
 
-            In the case of MARC field this could be a subfield.
+            In the case of MARC field this could be a subfield. It's
+            optional with "-e".
 
     *       "value"
 
-            Value to filter.
+            Value to filter. It's required without "-e".
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-MARC-Filter>
@@ -82,6 +95,13 @@ LICENSE AND COPYRIGHT
 
     BSD 2-Clause License
 
+ACKNOWLEDGEMENTS
+    Development of this software has been made possible by institutional
+    support for the long-term strategic development of the National Library
+    of the Czech Republic as a research organization provided by the
+    Ministry of Culture of the Czech Republic (DKRVO 2024–2028), Area 11:
+    Linked Open Data.
+
 VERSION
-    0.10
+    0.11
 

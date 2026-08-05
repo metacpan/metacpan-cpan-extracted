@@ -22,7 +22,11 @@ if ($sup == 0) {
     Hyperman->run(
         app => sub {
             my $env = shift;
-            my $body = "remote=" . ($env->{REMOTE_ADDR} // '?');
+            my $body = join ';',
+                "remote=" . ($env->{REMOTE_ADDR} // '?'),
+                "host="   . ($env->{REMOTE_HOST} // '?'),
+                "port="   . (($env->{REMOTE_PORT} // 0) > 0 ? 'ok' : 'bad'),
+                "buffered=" . ($env->{'psgix.input.buffered'} ? 1 : 0);
             [ 200, [ 'Content-Type' => 'text/plain' ], [ $body ] ];
         },
         access_log => $logfile,           # <-- fast C writer, not a coderef
@@ -58,10 +62,13 @@ sub slurp_log {
     return scalar <$fh>;
 }
 
-# wait for the server to come up and confirm REMOTE_ADDR made it into the env
+# wait for the server to come up and confirm the peer/env fields made it in
 my $body = get('/hello');
-like($body, qr/^remote=127\.0\.0\.1$/, 'REMOTE_ADDR populated in the PSGI env')
+like($body, qr/\bremote=127\.0\.0\.1\b/,   'REMOTE_ADDR populated in the PSGI env')
     or diag "body was: " . (defined $body ? $body : '(undef)');
+like($body, qr/\bhost=127\.0\.0\.1\b/,     'REMOTE_HOST populated');
+like($body, qr/\bport=ok\b/,               'REMOTE_PORT populated (peer port)');
+like($body, qr/\bbuffered=1\b/,            'psgix.input.buffered set (seekable :scalar input)');
 
 # a request with recognizable Referer / User-Agent to check the quoted fields
 get('/track?x=1', ua => 'AcmeBot/2.0', ref => 'http://ref.example/');

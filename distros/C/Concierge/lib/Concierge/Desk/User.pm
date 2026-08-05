@@ -1,7 +1,7 @@
-package Concierge::Desk::User v0.11.0;
+package Concierge::Desk::User v0.13.0;
 use v5.36;
 
-our $VERSION = 'v0.11.0';
+our $VERSION = 'v0.13.0';
 
 # ABSTRACT: User object enabled by Concierge
 
@@ -23,6 +23,10 @@ sub enable_user {
     #     user_key           => $external_key,         # optional - reuse existing or generate new
     #     _get_user_data     => $closure,              # optional - for logged-in users
     #     _update_user_data  => $closure,              # optional - for logged-in users
+    #     _verify_password   => $closure,              # optional - for logged-in users
+    #     _reset_password    => $closure,              # optional - for logged-in users
+    #     _logout            => $closure,              # optional - for guest/logged-in (any user with a session)
+    #     _session_valid     => $closure,              # optional - for guest/logged-in (any user with a session)
     # }
 
     my $self = bless {
@@ -42,6 +46,10 @@ sub enable_user {
     # Store closures for backend access (if logged-in user)
     $self->{_get_user_data} = $options->{_get_user_data} if $options->{_get_user_data};
     $self->{_update_user_data} = $options->{_update_user_data} if $options->{_update_user_data};
+    $self->{_verify_password} = $options->{_verify_password} if $options->{_verify_password};
+    $self->{_reset_password} = $options->{_reset_password} if $options->{_reset_password};
+    $self->{_logout} = $options->{_logout} if $options->{_logout};
+    $self->{_session_valid} = $options->{_session_valid} if $options->{_session_valid};
 
     # Determine user type (for status methods)
     $self->{is_visitor} = !$options->{session} && !$options->{user_data};
@@ -91,14 +99,28 @@ sub session ($self) {
     return $self->{session};  # undef if no session (visitor)
 }
 
+# Internal: is this object's session still live on the backend right now?
+# Deliberately a fresh backend check via the _session_valid closure, not a
+# check of cached in-memory state -- a *different* Concierge::Desk::User
+# instance for the same identity (e.g. from a second restore_user() call)
+# can still hold a populated (but now stale) session field after this
+# object's own logout() ran, and cached session status wouldn't catch that.
+sub _session_ok ($self) {
+    return 0 unless $self->{_session_valid};
+    my $result = $self->{_session_valid}->();
+    return $result->{success} ? 1 : 0;
+}
+
 sub get_session_data ($self) {
     return undef unless $self->{session};
+    return undef unless $self->_session_ok;
     my $result = $self->{session}->get_data();
     return $result->{value} // {};
 }
 
 sub update_session_data ($self, $updates) {
     return undef unless $self->{session};
+    return undef unless $self->_session_ok;
 
     my $result = $self->{session}->get_data();
     my $current = $result->{value} // {};
@@ -145,6 +167,7 @@ sub get_user_field ($self, $field) {
 sub refresh_user_data ($self) {
     # Fetch fresh data from backend, update memory snapshot
     return undef unless $self->{_get_user_data};
+    return undef unless $self->_session_ok;
 
     my $result = $self->{_get_user_data}->();
     return undef unless $result->{success};
@@ -156,6 +179,7 @@ sub refresh_user_data ($self) {
 sub update_user_data ($self, $updates) {
     # Update backend AND memory snapshot
     return undef unless $self->{_update_user_data};
+    return undef unless $self->_session_ok;
 
     my $result = $self->{_update_user_data}->($updates);
     return undef unless $result->{success};
@@ -164,6 +188,50 @@ sub update_user_data ($self, $updates) {
     for my $field (keys %$updates) {
         $self->{user_data}{$field} = $updates->{$field};
     }
+
+    return 1;
+}
+
+# =============================================================================
+# PASSWORD & LOGOUT - Mirror operations via closures
+# =============================================================================
+
+sub verify_password ($self, $password) {
+    return undef unless $self->{_verify_password};
+    return undef unless $self->_session_ok;
+
+    my $result = $self->{_verify_password}->($password);
+    return $result->{success} ? 1 : 0;
+}
+
+sub reset_password ($self, $new_password) {
+    return undef unless $self->{_reset_password};
+    return undef unless $self->_session_ok;
+
+    my $result = $self->{_reset_password}->($new_password);
+    return $result->{success} ? 1 : undef;
+}
+
+sub logout ($self) {
+    return undef unless $self->{_logout};
+
+    my $result = $self->{_logout}->();
+    return undef unless $result->{success};
+
+    # Concierge has already done the real work (session deleted, user_key
+    # mapping removed). Clean up this object in place so any reference to
+    # it the application is still holding degrades to visitor-equivalent
+    # status rather than silently retaining backend-write capability or
+    # reporting stale identity/session state. user_id and user_key are
+    # left intact -- they're inert identity strings, not capabilities.
+    delete $self->{$_} for qw(
+        _get_user_data _update_user_data
+        _verify_password _reset_password _logout _session_valid
+        session session_id user_data
+    );
+    $self->{is_logged_in} = 0;
+    $self->{is_guest}     = 0;
+    $self->{is_visitor}   = 1;
 
     return 1;
 }
@@ -178,7 +246,7 @@ Concierge::Desk::User - User object enabled by Concierge
 
 =head1 VERSION
 
-v0.11.0
+v0.13.0
 
 =head1 SYNOPSIS
 
@@ -219,6 +287,11 @@ v0.11.0
     # Raw session access when needed
     my $session = $user->session;
 
+    # Password & logout (logged-in users; logout also works for guests)
+    $user->verify_password('secret123');            # 1, 0, or undef
+    $user->reset_password('newsecret456');           # 1 or undef
+    $user->logout;                                   # 1 or undef
+
 =head1 DESCRIPTION
 
 Concierge::Desk::User represents a user operating an instance of the application.
@@ -231,9 +304,10 @@ The available methods depend on the user's participation level:
 
 =item B<Visitor> -- identity and status methods only
 
-=item B<Guest> -- adds session access
+=item B<Guest> -- adds session access, including C<logout>
 
-=item B<Logged-in> -- adds user data access, backend read/write
+=item B<Logged-in> -- adds user data access, backend read/write, and
+password operations (C<verify_password>, C<reset_password>)
 
 =back
 
@@ -241,6 +315,15 @@ Logged-in user objects hold a snapshot of user data in memory. The
 C<refresh_user_data> and C<update_user_data> methods synchronize with the
 backend storage via closures provided at construction time. The user object
 does not need to know about or contact the concierge to access its backends.
+C<verify_password>, C<reset_password>, and C<logout> follow the same
+closure-based pattern -- see L</Password & Logout> below for which
+participation levels each applies to and why.
+
+A successful C<logout> degrades a guest or logged-in object to
+visitor-equivalent status in place -- see L</logout> for exactly what
+gets cleared. Participation level is therefore not necessarily fixed
+for the lifetime of a C<$user> object; it can only ever move toward
+visitor, never the other way.
 
 =head1 CONSTRUCTOR
 
@@ -264,7 +347,31 @@ C<%options> may include:
 
 =item C<_update_user_data> -- closure for writing to the Users backend
 
+=item C<_verify_password> -- closure for checking a password via Auth
+
+=item C<_reset_password> -- closure for setting a new password via Auth
+
+=item C<_logout> -- closure for deleting the user's session
+
+=item C<_session_valid> -- closure for checking the session is still live
+
 =back
+
+C<_get_user_data>, C<_update_user_data>, C<_verify_password>, and
+C<_reset_password> are only ever provided for logged-in users -- they
+require an Auth-backed identity and/or a Users-backend record that
+guests and visitors don't have. C<_logout> and C<_session_valid> are
+provided for any user holding a session (guest or logged-in), since
+both only require a C<session_id>, not an identity.
+
+C<_session_valid> backs a fresh, per-call check against the Sessions
+backend (not a check of any cached in-memory field) used internally by
+every method that reads or writes session data, user data, or a
+password -- see L</Password & Logout> and L</Session Access> below. It
+exists because a session can become invalid out from under a C<$user>
+object through no fault of that object's own C<logout> (e.g. expiry, or
+a I<different> C<Concierge::Desk::User> instance for the same identity
+logging out first); relying on cached status would miss that.
 
 =head1 METHODS
 
@@ -328,7 +435,10 @@ full replace, are actually needed.
     my $data = $user->get_session_data;
 
 Returns the user's session data as a hashref, or an empty hashref if
-no data has been stored. Returns C<undef> for visitors (no session).
+no data has been stored. Returns C<undef> for visitors (no session), or
+if the session is no longer valid on the backend (e.g. expired, or
+logged out via a different C<$user> object instance for the same
+identity).
 
 =head3 update_session_data
 
@@ -338,7 +448,7 @@ Merges C<%updates> into the existing session data and saves to persistent
 storage, which as a side effect also extends the session's expiration
 (sliding-window renewal). Existing keys not present in C<%updates> are
 preserved. Returns 1 on success, C<undef> if the user has no session
-(visitors).
+(visitors) or the session is no longer valid on the backend.
 
 =head2 User Data -- Memory Snapshot
 
@@ -357,22 +467,93 @@ Returns the value of any field in the user data snapshot.
 
 =head2 User Data -- Backend Operations
 
-These methods require a logged-in user (backend closures must be present).
-They return C<undef> if called on a visitor or guest.
+These methods require a logged-in user (backend closures must be present)
+with a currently valid session. They return C<undef> if called on a
+visitor or guest, or if the session has since become invalid (expired,
+or logged out via a different C<$user> object instance for the same
+identity) -- even though the closures themselves are still present.
 
 =head3 refresh_user_data
 
     $user->refresh_user_data;
 
 Fetches fresh data from the Users backend and replaces the in-memory
-snapshot. Returns 1 on success, C<undef> on failure.
+snapshot. Returns 1 on success, C<undef> on failure or if the session
+is no longer valid.
 
 =head3 update_user_data
 
     $user->update_user_data({ theme => 'dark', role => 'editor' });
 
 Writes C<%updates> to the Users backend and merges them into the
-in-memory snapshot. Returns 1 on success, C<undef> on failure.
+in-memory snapshot. Returns 1 on success, C<undef> on failure or if the
+session is no longer valid.
+
+=head2 Password & Logout
+
+These methods mirror L<Concierge>'s own C<verify_password>,
+C<reset_password>, and C<logout_user>, bound at construction time so the
+user object doesn't need a C<user_id> or C<session_id> argument, or any
+contact with the concierge, to use them. They return a plain scalar
+rather than the C<< { success => ... } >> hashref the Concierge-level
+methods return -- a deliberate simplification at this convenience layer.
+
+C<verify_password> and C<reset_password> require a logged-in user (an
+Auth-backed identity) I<with a currently valid session>; they return
+C<undef> for guests and visitors, and also for a logged-in object whose
+session has since become invalid (see C<_session_valid> under
+L</enable_user> above), even though the object's closures are still in
+place. C<logout> only requires a session, so it works for guests as
+well as logged-in users; it returns C<undef> only for visitors, who
+have no session to log out of.
+
+This session requirement is deliberately I<not> shared by the
+corresponding L<Concierge> methods that these mirrors wrap
+(C<< $concierge->verify_password($user_id, ...) >>,
+C<< $concierge->reset_password($user_id, ...) >>): those remain
+identity-scoped and work with no session at all, which real flows
+depend on (password-reset-by-email, admin-initiated resets, and
+similar). The session check belongs only at this convenience layer,
+where the object represents an interactive login and a missing or
+invalidated session means it no longer should.
+
+=head3 verify_password
+
+    my $ok = $user->verify_password($password);
+
+Checks C<$password> against the logged-in user's stored credential.
+Returns C<1> if correct, C<0> if incorrect, or C<undef> if not
+applicable (guest, visitor, or session no longer valid).
+
+=head3 reset_password
+
+    $user->reset_password($new_password);
+
+Sets a new password for the logged-in user. Returns C<1> on success,
+C<undef> on failure or if not applicable (guest, visitor, or session no
+longer valid).
+
+=head3 logout
+
+    $user->logout;
+
+Deletes the user's session (and the concierge's user_key mapping for
+it). Works for guests as well as logged-in users. Returns C<1> on
+success, C<undef> on failure or if not applicable (visitor, no session).
+
+On success, also cleans up this object in place: all backend closures
+(C<_get_user_data>, C<_update_user_data>, C<_verify_password>,
+C<_reset_password>, C<_logout>, C<_session_valid>) and the
+C<session>/C<session_id>/C<user_data> fields are cleared, and status
+flips so C<is_logged_in>
+and C<is_guest> become false and C<is_visitor> becomes true. A C<$user>
+reference held past C<logout> therefore degrades to visitor-equivalent
+status rather than retaining stale session data or backend-write
+capability -- every other method's existing "return C<undef> if not
+applicable" guards then apply naturally, with no special-casing needed.
+C<user_id> and C<user_key> are left untouched; they're inert identity
+strings, not capabilities, and the concierge's own C<user_keys> mapping
+entry for this session is already gone by this point regardless.
 
 =head1 SEE ALSO
 

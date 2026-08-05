@@ -19,15 +19,17 @@ lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
+ignore-stderr = ["The .+ file is not sorted", "The .+ file is not unique"]
 
 [commands.omegasort-stopwords]
 type = "both"
 include = ".stopwords"
-cmd = ["omegasort", "--sort", "text", "--case-insensitive", "--locale", "en-US", "--unique"]
+cmd = ["omegasort", "--sort", "text", "--case-insensitive", "--unique"]
 lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
+ignore-stderr = ["The .+ file is not sorted", "The .+ file is not unique"]
 
 [commands.perlcritic]
 type = "lint"
@@ -44,41 +46,43 @@ lint_flags = ["--assert-tidy", "--no-standard-output", "--outfile=/dev/null"]
 tidy_flags = ["--backup-and-modify-in-place", "--backup-file-extension=/"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 2
-expect_stderr = true
+ignore_stderr = "Begin Error Output Stream"
 
 [commands.podchecker]
 type = "lint"
 include = ["**/*.{pl,pm,pod}"]
-exclude = "tools/templates/*.pod"
 cmd = ["podchecker", "--warnings", "--warnings"]
 ok_exit_codes = [0, 2]
 lint_failure_exit_codes = 1
-expect_stderr = true
+ignore_stderr = [
+    ".+ pod syntax OK",
+    ".+ does not contain any pod commands",
+    '\*\*\* WARNING: multiple occurrences \(\d+\) of link target .+',
+    '\*\*\* WARNING: empty section in previous paragraph .+',
+]
 
 [commands.podtidy]
 type = "tidy"
 include = ["**/*.{pl,pm,pod}"]
-exclude = "tools/templates/*.pod"
 cmd = ["podtidy", "--columns", "80", "--inplace", "--nobackup"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
 
-[commands.prettier]
+[commands.oxfmt]
 type = "both"
-include = ["**/*.yml"]
-exclude = "META.yml"
-cmd = ["prettier", "--no-config", "--prose-wrap", "always", "--print-width", "100"]
-lint_flags = "--check"
-tidy_flags = "--write"
-ok_exit_codes = 0
-lint_failure_exit_codes = 1
-ignore_stderr = "Code style issues"
+include = ["**/*.yml", "**/*.toml"]
+cmd = ["oxfmt"]
+lint-flags = "--check"
+tidy-flags = "--write"
+ok-exit-codes = 0
+lint-failure-exit-codes = 1
 
-[commands.taplo]
+[commands.typos]
 type = "both"
-include = "**/*.toml"
-cmd = ["taplo", "format", "--option", "indent_string=    ", "--option", "column_width=100"]
-lint_flags = "--check"
-ok_exit_codes = 0
-lint_failure_exit_codes = 1
-ignore_stderr = "INFO taplo.+"
+include = "**/*"
+exclude = [".stopwords"]
+cmd = "typos"
+tidy_flags = "--write-changes"
+invoke = "once"
+ok-exit-codes = 0
+lint-failure-exit-codes = 2

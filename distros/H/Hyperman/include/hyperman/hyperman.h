@@ -56,4 +56,29 @@ int         hm_backend_iouring_available(void);
 /* pick by name ("kqueue"/"epoll"/"poll"), or best-available when NULL */
 hm_backend *hm_backend_create(const char *name);
 
+/* Allocation wrappers used throughout the core, backends and XS glue. An
+ * out-of-memory result croaks (noreturn) rather than returning NULL, so no
+ * caller has to null-check a hot-path allocation. Compiled in the single
+ * Hyperman unity translation unit, after perl.h. */
+#include <stdlib.h>
+
+static void *hm_xmalloc(size_t n) {
+    void *p = malloc(n);
+    if (!p) Perl_croak_nocontext("Hyperman: out of memory (%llu bytes)",
+                                 (unsigned long long)n);
+    return p;
+}
+static void *hm_xcalloc(size_t count, size_t size) {
+    void *p = calloc(count, size);
+    if (!p) Perl_croak_nocontext("Hyperman: out of memory (%llu x %llu bytes)",
+                                 (unsigned long long)count, (unsigned long long)size);
+    return p;
+}
+static void *hm_xrealloc(void *old, size_t n) {
+    void *p = realloc(old, n);
+    if (!p) Perl_croak_nocontext("Hyperman: out of memory (%llu bytes)",
+                                 (unsigned long long)n);
+    return p;
+}
+
 #endif

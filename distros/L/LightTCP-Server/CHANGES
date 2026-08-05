@@ -1,5 +1,10 @@
 Revision history for LightTCP::Server
 
+2.05 2026-08-04
+  - make threads optional, change module and test to ignore threads
+  - Cleanup of Makefile.PL
+  - repo moved from github.com to codeberg.org
+
 2.04 2026-01-18
   - Fixed version mismatch between POD and $VERSION for kwalitee compliance
 

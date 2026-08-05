@@ -223,4 +223,48 @@ no_leaks_ok {
 	eval { predict({}, { x => [1] }) };
 } 'predict: no memory leaks on a die path' unless $INC{'Devel/Cover.pm'};
 
+# ---------------------------------------------------------------------------
+# Scoring a factor coded in full.
+#
+# predict() recovers each factor dummy by name from the model's xlevels. It used
+# to register only levels[1..], on the assumption that a reference level never
+# has a coefficient of its own -- true for a factor coded by contrasts, but not
+# for one coded in full, which is what a factor in a model with no intercept
+# gets. Reference rows were then scored as if the term were absent: every OJ row
+# of `len ~ supp - 1` came back 0 instead of the OJ group mean.
+{
+	my %tooth = (
+		len  => [ 4.2, 11.5, 7.3, 5.8, 6.4, 15.2, 21.5, 17.6, 9.7, 14.5,
+		          23.6, 18.5, 33.9, 25.5, 26.4, 25.5, 26.4, 22.4, 24.5, 24.8 ],
+		supp => [ ('VC') x 10, ('OJ') x 10 ],
+		dose => [ (0.5) x 5, (2.0) x 5, (0.5) x 5, (2.0) x 5 ],
+	);
+
+	for my $f ('len ~ supp - 1', 'len ~ supp', 'len ~ dose * supp', 'len ~ dose:supp') {
+		my $fit  = lm(formula => $f, data => \%tooth);
+		my $pred = predict($fit, \%tooth);
+		my $worst = 0;
+		for my $row (keys %{ $fit->{'fitted.values'} }) {
+			my ($got, $want) = ($pred->{$row}, $fit->{'fitted.values'}{$row});
+			unless (defined $got) { $worst = 9e99; last }
+			my $scale = abs($want) > 1 ? abs($want) : 1;
+			my $rel = abs($got - $want) / $scale;
+			$worst = $rel if $rel > $worst;
+		}
+		cmp_ok($worst, '<', 1e-9,
+			"predict: '$f' reproduces lm's own fitted values for every row");
+	}
+
+	# The concrete regression: the reference group must not score as zero.
+	my $noint = lm(formula => 'len ~ supp - 1', data => \%tooth);
+	my $p     = predict($noint, \%tooth);
+	my @oj    = grep { $tooth{supp}[$_ - 1] eq 'OJ' } 1 .. 20;
+	ok(scalar(@oj), 'predict: the test data really does have OJ rows');
+	my $scored = 1;
+	for my $r (@oj) { $scored = 0 unless defined $p->{$r} && $p->{$r} > 1 }
+	ok($scored, 'predict: rows at the reference level are scored, not left at 0');
+	cmp_ok(abs($p->{ $oj[0] } - $noint->{coefficients}{suppOJ}), '<', 1e-9,
+		'predict: a reference-level row gets the suppOJ coefficient');
+}
+
 done_testing;

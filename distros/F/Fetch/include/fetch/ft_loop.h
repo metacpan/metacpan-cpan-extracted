@@ -53,11 +53,29 @@ static void ft_loop_free(pTHX_ ft_loop *l) {
 
 /* call $cb->() discarding the result, trapping death into a warning */
 static void ft_call0(pTHX_ SV *cb) {
-    dSP;
-    ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
-    call_sv(cb, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) warn("Fetch: loop callback died: %s", SvPV_nolen(ERRSV));
-    FREETMPS; LEAVE;
+    /* Fast path: the loop's own watchers are C closures (hm_closure XSUBs
+     * carrying hm_clos magic) - call the XSUB body directly, skipping
+     * pp_entersub, the eval frame and the Perl stack dance. These callbacks
+     * do not die; any user Perl code they reach (future on_ready callbacks)
+     * is eval-guarded where it runs, in hmf_pump. */
+    if (SvROK(cb)) {
+        CV *cv = (CV *)SvRV(cb);
+        if (SvTYPE((SV *)cv) == SVt_PVCV && CvISXSUB(cv)
+            && hm_clos_of(aTHX_ cv)) {
+            dSP;
+            PUSHMARK(SP);
+            PUTBACK;
+            (CvXSUB(cv))(aTHX_ cv);
+            return;
+        }
+    }
+    {
+        dSP;
+        ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
+        call_sv(cb, G_DISCARD | G_EVAL);
+        if (SvTRUE(ERRSV)) warn("Fetch: loop callback died: %s", SvPV_nolen(ERRSV));
+        FREETMPS; LEAVE;
+    }
 }
 
 static void ft_watch_io(pTHX_ ft_loop *l, int fd, int mask, SV *cb) {

@@ -1,5 +1,5 @@
 ---
-name: kanban-issues-karr-foundation-cli
+name: karr-foundation-cli
 description: Use when managing karr-foundation — periodic agent execution across multiple karr boards, drain loops, and auto-block logic.
 ---
 
@@ -13,10 +13,10 @@ when work is available. Designed for cron/systemd-timer invocation.
 ```bash
 # Config at ~/.config/karr-foundation/config.yml
 dirs:
-  - /storage/raid/home/getty/dev/perl/dbio-dev/dbio
-  - /storage/raid/home/getty/dev/perl/dbio-dev/dbio-postgresql
+  - /path/to/repo1
+  - /path/to/repo2
 scan:
-  - /storage/raid/home/getty/dev/perl/dbio-dev   # finds dirs with .karr file
+  - /path/to/parent-dir   # finds dirs with .karr file
 
 # Per-repo .karr file (in each repo root)
 command: claude -p "Use karr-coordinator agent, pick next task"
@@ -72,11 +72,62 @@ error_patterns:           # extra case-insensitive substrings → common-error
 set globally in `config.yml` (`default_command` / `default_prompt`); the per-repo
 `.karr` value wins.
 
+## Board-level disable
+
+A board can opt out of automated agent runs in **its own karr state**, not in the
+local `.karr` file:
+
+```bash
+cd /path/to/repo
+karr disable --reason "abandoned driver, backlog parked"
+karr enable                                  # allow agent runs again
+```
+
+The flag is `foundation.enabled` in `refs/karr/config`, so it syncs with the
+board — every foundation instance on every machine honours it. That is the
+difference to `.karr`, which is local machine state and cannot express "this
+board is parked" for the whole fleet.
+
+**Precedence — absolute.** A disabled board is skipped **whole**: the flag is
+checked before the agent command is resolved and before the drain decision, so
+there is no drain, no auto-block and no agent run. It wins over `--command`, the
+config's `default_command`, the `.karr` `command` and `claude: true`, and
+`--force` does **not** override it. Disabled means disabled.
+
+This closes the gap where a global `default_command` in `config.yml` turned
+every discovered board into an agent board with no way for a repo to opt out.
+Use it for a repository whose backlog is parked rather than abandoned, so an
+automation host that drains every discovered board leaves this one alone.
+
+The same state is readable and writable through `karr config`:
+
+```bash
+karr config get foundation.enabled           # -> 0 or 1
+karr config set foundation.enabled false     # true/false, yes/no, on/off, 1/0
+karr config set foundation.reason "why"
+```
+
+`karr disable` without `--reason` clears any previously stored reason. When
+every discovered board is disabled (or has no agent), `karr-foundation` falls
+back to the overview instead of draining.
+
 ## Overview
 
 `karr-foundation --status` (and the default when no board has an agent) prints a
 read-only dashboard of every board: status counts, in-progress/blocked tasks,
-and lock/cooldown state. No agent is run — usable by a human to coordinate work.
+and disabled/lock/cooldown state. No agent is run — usable by a human to
+coordinate work.
+
+```
+dbio-informix
+  7 tasks  [disabled]
+  backlog:5  review:2
+  disabled:    abandoned driver, backlog parked
+```
+
+`disabled` leads the flag list and the `disabled:` line carries the reason
+(`no reason given` when none was stored). The `agent` flag is suppressed for a
+disabled board, because that agent will never run there.
 
 ## Options
 
@@ -142,9 +193,9 @@ During agent execution foundation sets:
 */5 * * * * karr-foundation --verbose 2>&1 | logger -t karr-foundation
 ```
 
-## For dbio-dev repos
+## Enabling agent runs for a repo fleet
 
-Each dbio-* repo needs a `.karr` file with a command that invokes claude on the
+Each repo needs a `.karr` file with a command that invokes an agent on the
 next available task. Example:
 
 ```yaml
@@ -157,11 +208,14 @@ cooldown_base: 2
 cooldown_max: 32
 ```
 
-To initialize karr in a dbio repo:
+To initialize karr in a repo:
 ```bash
-cd /path/to/dbio-postgresql
-karr init --name dbio-postgresql
+cd /path/to/repo
+karr init --name my-project
 karr create "Example task" --priority high
 ```
 
 Then add the `.karr` file and configure foundation to scan the parent dir.
+
+To take a single repo out of a fleet that runs on a global `default_command`,
+run `karr disable --reason "why"` in that repo — see "Board-level disable".

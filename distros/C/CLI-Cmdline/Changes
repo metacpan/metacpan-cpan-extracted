@@ -1,5 +1,12 @@
 Revision history for Perl module CLI::Cmdline
 
+1.30  2026-08-05
+    - added CONTRIBUTING.md and SECURITY.md files
+
+1.29  2026-08-04
+    - align README.md with README content.
+    - align LICENSE with other repos
+
 1.28  2026-08-03
     - use Test::Warnings and only use done_testing() at the end
     - skip t/05-integration.t test on windows

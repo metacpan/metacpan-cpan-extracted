@@ -1,3 +1,8 @@
+1.25     2026-08-04
+
+- Removed the `Test::Precious` plugin. I will add a separate CI linting job for my projects.
+
+
 1.24     2025-12-06
 
 - Updated the generated `CONTRIBUTING.md` to reflect my switch to `mise` and `precious` for all my
@@ -17,7 +22,7 @@
 
 1.21     2022-10-03
 
-- The config generator for precious has been changed to use hte
+- The config generator for precious has been changed to use the
   "ignore_stderr" config key added in precious 0.3.0.
 
 
@@ -268,7 +273,7 @@
 0.81     2017-02-01
 
 - Require Code::TidyAll 0.56 so we can use the global ignore feature in the
-  geneated tidyall.ini file.
+  generated tidyall.ini file.
 
 
 0.80     2017-01-08

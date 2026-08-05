@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use File::Slurper qw( read_text );
 
@@ -25,7 +25,7 @@ MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
 
 has file => (
     is            => 'ro',
-    isa           => => t('ExistingFile'),
+    isa           => t('ExistingFile'),
     predicate     => 'has_file',
     documentation =>
         'A Markdown file (or - for STDIN) to parse and turn into HTML. Conflicts with --text.',
@@ -33,7 +33,7 @@ has file => (
 
 has text => (
     is            => 'ro',
-    isa           => => t('Str'),
+    isa           => t('Str'),
     predicate     => 'has_text',
     documentation =>
         'Markdown text to parse and turn into HTML. Conflicts with --file.',
@@ -41,28 +41,28 @@ has text => (
 
 has title => (
     is            => 'ro',
-    isa           => => t('Str'),
+    isa           => t('Str'),
     predicate     => '_has_title',
     documentation => 'The title for the created document. Optional.',
 );
 
 has charset => (
     is            => 'ro',
-    isa           => => t('Str'),
+    isa           => t('Str'),
     predicate     => '_has_charset',
     documentation => 'The charset for the created document. Optional.',
 );
 
 has language => (
     is            => 'ro',
-    isa           => => t('Str'),
+    isa           => t('Str'),
     predicate     => '_has_language',
     documentation => 'The language for the created document. Optional.',
 );
 
 has dialects => (
     is            => 'ro',
-    isa           => => t( 'ArrayRef', of => t('Str') ),
+    isa           => t( 'ArrayRef', of => t('Str') ),
     default       => sub { [] },
     documentation => 'One oe more dialects to use when parsing.',
 );

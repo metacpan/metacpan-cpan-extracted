@@ -494,9 +494,12 @@ sub init
     my $self = shift( @_ );
     return( $self->error( "No number was provided." ) ) if( !scalar( @_ ) );
     my $num  = shift( @_ );
-    if( isinf( $num ) || isnan( $num ) )
     {
-        return( $self->error( "The number provided is an Infinite or NaN, and cannot be formatted." ) );
+        no warnings;
+        if( isinf( $num ) || isnan( $num ) )
+        {
+            return( $self->error( "The number provided is an Infinite or NaN, and cannot be formatted." ) );
+        }
     }
     my $opts = $self->_get_args_as_hash( @_ );
     $self->debug( CORE::delete( $opts->{debug} ) ) if( CORE::exists( $opts->{debug} ) );
@@ -1394,7 +1397,7 @@ sub set_locale
     my $locale = shift( @_ ) ||
         return( $self->error( "No locale was provided to set." ) );
     return( $self->error( 'set_locale() can only be called on an instance of ', __PACKAGE__ ) ) unless( $self->_is_object( $self ) );
-    my( $locale, $locale_enc ) = split( /\./, $locale, 2 );
+    ( $locale, my $locale_enc ) = split( /\./, $locale, 2 );
     $locale =~ tr/-/_/;
     $locale = join( '.', $locale, $locale_enc ) if( defined( $locale_enc ) );
     # Lock the threads while we change the locale to check if it is available, and get its definition.

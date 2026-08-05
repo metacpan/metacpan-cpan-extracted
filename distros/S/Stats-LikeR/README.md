@@ -116,6 +116,7 @@ When the target is a Hash of Arrays, incoming arrays are pushed onto the existin
 * **Target is Hash, Source is Array:** The function converts the Array indices into stringified Hash keys. (e.g., source array index `[1]` merges into target hash key `"1"`).
 
 ### Source is a mixed Hash. Keys dictate the target array index!
+
     $n = {
         '0' => { y => 20 },                 # Merges into $data->[0]
         '1' => [ 'z', 30 ],                 # Array pair coerced to Hash, creates $data->[1]
@@ -755,6 +756,7 @@ in R
 Add new columns to a data frame, computed from the columns already there — or handed in ready-made.
 
 ### Usage
+
     assign($df, new_name => VALUE, another => VALUE, ...);
 
 - **`$df`** — your data frame, in any of three shapes:
@@ -2608,8 +2610,8 @@ p-value by about 2%.
 
 | Parameter | Type | Default | Description | Example |
 | --- | --- | --- | --- | --- |
-| `formula` | `String` | *None (Required)* | A symbolic description of the model to be fitted. Supports operators like `+`, `:`, `*`, `^`, and `-1` (to remove the intercept). | `'am ~ wt + hp'`, `'y ~ x - 1'` |
-| `data` | `HashRef` or `ArrayRef` | *None (Required)* | The dataset containing the variables used in the formula. Accepts either a Hash of Arrays (HoA) or an Array of Hashes (AoH). | `\%mtcars`, `[{x => 1, y => 2}, ...]` |
+| `formula` | `String` | *None (Required)* | A symbolic description of the model to be fitted. Parsed by the same code as [`lm`](#lm)'s, so it takes the same operators: `+`, `:`, `*`, `^`, `.` for every remaining column, and `-1` / `+0` to remove the intercept. | `'am ~ wt + hp'`, `'y ~ x - 1'`, `'y ~ .'` |
+| `data` | `HashRef` or `ArrayRef` | *None (Required)* | The dataset containing the variables used in the formula. Accepts a Hash of Arrays (HoA), a Hash of Hashes (HoH) or an Array of Hashes (AoH). Rows are named as described under [`lm`](#lm). | `\%mtcars`, `[{x => 1, y => 2}, ...]` |
 | `family` | `String` | `'gaussian'` | The error distribution / link function: `'gaussian'` (identity link), `'binomial'` (logit link), `'poisson'` (log link) or `'negbin'` (negative binomial, log link). | `'poisson'` |
 | `theta` | `Number` | *estimated by ML* | Negative-binomial dispersion. When omitted (with `family => 'negbin'`) it is estimated by maximum likelihood as in `MASS::glm.nb`; supply a value to hold it fixed. | `1.7` |
 | `conf.level` | `Number` | `0.95` | Confidence level for the Wald coefficient / exponentiated-coefficient intervals. | `0.90` |
@@ -2908,6 +2910,7 @@ cells down the rows).
     my $hoa = hoh2hoa(\%hoh);
 
 which returns
+
     {
       a => [1, 3],
       b => [2, 4],
@@ -3412,6 +3415,7 @@ For example,
     }
 
 and a second hash,
+
     {
         "Jack Smith"   {
             dept   "Engineering"
@@ -3442,11 +3446,57 @@ where `$mtcars` is a hash of hashes
 
     my $lm = lm(formula => 'mpg ~ wt * hp^2', data => \%mtcars);
 
-If your data contains missing numbers (`NA` or `undef`), `lm` handles listwise deletion dynamically to ensure mathematical integrity before fitting.
+Crossing is associative, so `*` chains to any depth: `y ~ a * b * c` expands to
+every non-empty subset of the three (`a`, `b`, `c`, `a:b`, `a:c`, `b:c`,
+`a:b:c`), ordered by degree as R's `terms()` orders them. Writing `a:b` directly
+gives just that one product.
+
+Either side of an interaction may be a string (categorical) column, in which
+case it expands to indicator columns the same way a main effect does:
+`len ~ dose * supp` yields `dose`, `suppVC` and `dose:suppVC`.
+
+Whether a categorical column keeps all of its levels or drops the first as a
+reference follows R's margin rule: the reference level is dropped when the term
+with that column removed is itself in the model. A main effect's margin is the
+intercept, so `y ~ g` drops g's first level — but `y ~ g - 1` has no intercept
+to measure against and so keeps every level, one column per group. Where two
+categorical main effects both have no intercept, only the first can be coded in
+full (`y ~ a + b - 1` gives every level of `a` and drops `b`'s reference),
+because coding both in full would be rank deficient. A bare `y ~ a:b` with
+neither main effect present codes both in full and spans the whole
+cross-classification.
+
+If your data contains missing numbers (`NA` or `undef`), `lm` handles listwise deletion dynamically to ensure mathematical integrity before fitting. A row whose categorical value is missing is dropped the same way.
+
+Three details differ from R deliberately:
+
+- Levels are sorted with `strcmp`, i.e. by byte value, which is what
+  `patsy`/`pandas` does. R sorts with the collation of the running locale, so a
+  factor whose levels differ only in case takes a different reference level in
+  the two: on `c("b", "A", "a")` R takes `a` and `lm` takes `A`. Both
+  parameterise the same fit — residual sum of squares, rank and fitted values
+  agree — but the coefficient names and values differ.
+- A term crossed with itself keeps the product, so `wt:wt` is `wt` squared and
+  `y ~ wt*wt` fits `y ~ wt + I(wt^2)`. R's formula algebra collapses `a:a` to
+  `a`, making the same formula mean `y ~ wt` there.
+- A categorical column with only one level contributes no column, so
+  `y ~ x + g` fits `y ~ x`. R refuses the model outright ("contrasts can be
+  applied only to factors with 2 or more levels").
 
 the dot operator also works:
 
     $lm = lm(formula => 'y ~ .', data => $dot_data);
+
+`lm` and `glm` read their formula and their data through the same code, so
+everything above holds for both, and a fit's `terms` are the terms the other
+function would have produced from the same string.
+
+Rows are labelled from a `row.names`, `_row`, `rownames` or `.rownames` column if
+the data has one (a HoH labels rows with its outer keys, which needs no such
+column), and 1-based integers otherwise. Those labels are the keys of
+`fitted.values` and `residuals`, and the row names `predict` returns. A row-name
+column is a label rather than a measurement, so `y ~ .` leaves it out of the
+predictors.
 
 The overall model F test is returned as `fstatistic` (an array ref of `F`,
 numerator df, denominator df) and `f.pvalue`. `f.pvalue` is evaluated in the
@@ -4673,9 +4723,11 @@ minimal example:
 | `delim`| field separator character; synonym with `sep`| `delim => "\t"` |
 | `sheet`| which worksheet to read from an `.xlsx` file: a 1-based index or a sheet name (default: first sheet). Ignored for text files | `sheet => 'Sheet2'` |
 output types can be AOH (aoh), HOA (hoa), HOH (hoh)
+
     read_table($filename, 'output.type' => 'aoh');
     read_table($filename, 'output.type' => 'hoa');
 and, like Text::CSV_XS, filters can be applied in order to save RAM on big files:
+
     $test_data = read_table(
         't/HepatitisCdata.csv',
         filter => {
@@ -4687,6 +4739,7 @@ the default delimiter is `,`
 Suffixes `.csv` and `.tsv` are automatically detected from file names, but if specified, are overridden by `delim` and/or `sep`. `sep` is given priority.
 ### commented-out headers
 A header that is itself commented out is detected and used automatically, so
+
     # PDB	score
     1a2b	10
     3c4d	20
@@ -4695,6 +4748,7 @@ following whitespace are stripped from the first column). A commented line is
 only taken as the header when its field count matches the data, so ordinary
 leading comments are never mistaken for one. You may name such a column in a
 `filter` either as it appears in the file or by its clean name:
+
     read_table('ranks.tabular.tsv', filter => { '# PDB' => sub { $_ == 2 } });
 
 ### Excel (.xlsx) files
@@ -5389,11 +5443,13 @@ Extract a single column from a data frame as a flat array reference, similar to 
 Count the values in a given data set, return a hash reference showing how many times each particular value is present.
 
 ### Scalar
+
     $hash = value_counts('c');
 
 returns `{ c => 1 }`
 
 ### Array reference
+
     value_counts(['a','b','b']);
 
 returns `{ a => 1, b => 2}`
@@ -5416,12 +5472,14 @@ like an array reference above, returns `{ a => 1, b => 2}`
 with a key, the value at that key is counted in each hash, so the above returns `{ Sales => 2, Eng => 1 }`. A record that lacks the key is skipped. Passing an array of hashes without a key, or with an element that is not a hash reference, is a fatal error.
 
 ### Array of arrays
+
     my @rows = (['a', 1], ['b', 1], ['a', 2]);
     my $vc = value_counts(\@rows, 0);
 
 when the elements are array references, the key is treated as a numeric column index, so the above returns `{ a => 2, b => 1 }`. A non-numeric index against array-reference elements is a fatal error.
 
 ### Hash
+
     my $value_counts = value_counts( { A => 'a', B => 'a', C => 'b' } );
 
 returns `{ a => 2, b => 1}`
@@ -5653,16 +5711,21 @@ Ties are detected during ranking and trigger the tie-corrected variance in the n
 
 ## write_table
 mimics R's `write.table`, with data as first argument to subroutine, and output file as second
+
     write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
 `write_table` accepts every data-frame shape: a flat hash (one row), a hash of arrays (HoA), a hash of hashes (HoH), an array of hashes (AoH), and an array of arrays (AoA). For an AoA the first inner array is taken as the header row unless `col.names` is given, in which case every inner array is treated as data:
+
     write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
     write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
 You can also precisely filter and reorder which columns are written by passing an array reference to `col.names`:
+
     write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
 undefined variables are printed as `NA` by default, but can be set as you wish using `undef.val`
+
     write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
 `write_table` determines comma and tab-separated delimiters from the filename, but will override if `sep` or `delim` are explicitly set.
 Args can also be accepted:
+
     write_table( 'data' => \%flat, 'file' => $f );
 
 ### The confirmation line
@@ -5676,9 +5739,11 @@ This is `say 'wrote ' . colored(['black on_cyan'], $file)`, but the SGR codes (`
 The colour is unconditional; it is not suppressed when standard output is a pipe or a file. If you are capturing the output and want the bytes plain, strip the escapes (`s/\e\[[\d;]*m//g`) or send them somewhere else. Note also that the line goes to file descriptor 1 directly rather than through Perl's `STDOUT` glob, so `local *STDOUT; open STDOUT, '>', \my $buf` will **not** capture it — redirect the file descriptor, or run the write in a child process, if you need to.
 ### LaTeX output (`tex`)
 `write_table` can write the output file as a LaTeX `tabular` instead of a delimited table. This is selected either by naming the file `*.tex` (auto-detected) or by passing `tex => 1`; an explicit `tex => 0` forces a delimited file even when the name ends in `.tex`. The LaTeX table is built from the same rows as the delimited writer, so it works for every shape above (including arrays of arrays):
+
     write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
     write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
 The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. As with every other format, `row.names` is **off** unless you ask for it: pass `row.names => 1` to prepend a label column, whose labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
+
     write_table(\@rows, 'table.tex',
         'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
         'tex.bold.1st.col' => 0,                     # default 1: bold the first column
@@ -5687,8 +5752,10 @@ The file begins with a `%written by <cwd>/<script>` provenance comment (the work
         'tex.comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
     );
 For a table that must span page breaks, `tex.longtable => 1` writes only the table *body* — the bold header row and the data rows, ruled with `\hline` — but no `\begin{tabular}`/`\end{tabular}` and no column spec, so you can `\input{}` it into a `longtable` environment you write yourself. Setting `tex.longtable` implies `tex => 1`, so it applies to any file name (and overrides `tex => 0`). After the provenance comment (and any `tex.comment` lines) the file emits a `% \begin{longtable}{...}` hint with one `tex.col.align` character per column, so you can copy a column spec with the right count. In this mode `tex.col.align` affects only that hint — the real alignment lives on your own `\begin{longtable}`; the other `tex.*` options (`tex.bold.1st.col`, `tex.format`, `tex.size`, `tex.comment`) still apply:
+
     write_table(\@rows, 'output.file.tex', 'tex.longtable' => 1);
 writes a body-only file such as
+
     %written by /home/con/Scripts/stats/make_table.pl
     % \begin{longtable}{ccc}
     \hline
@@ -5696,12 +5763,14 @@ writes a body-only file such as
     1 & 2 & 3\\
     \hline
 which you wrap yourself:
+
     \begin{longtable}{ccc}
     \input{output.file.tex}
     \caption{}
     \label{}
     \end{longtable}
 In that plain form the header is an ordinary first row, which is *not* the header LaTeX freezes at the top of each page: a `longtable` repeats only what sits inside `\endfirsthead` / `\endhead`. Hand-writing those blocks means retyping the column labels, and they then silently stop matching `col.names` the first time the column order changes — the frozen header says one thing while the columns underneath say another, and the generated header shows up a second time as the first body row. `tex.longtable.head` closes that gap by generating the repeat machinery from the same header record as the body:
+
     write_table(\@rows, 'output.file.tex',
         'col.names'          => ['a', 'b', 'c'],
         'tex.longtable.head' => '(continued)', # or just 1 for no continuation caption
@@ -5718,6 +5787,7 @@ In that plain form the header is an ordinary first row, which is *not* the heade
     \endfoot
     1 & 2 & 3\\
 Setting `tex.longtable.head` implies `tex.longtable` (and so `tex => 1`). A true-but-numeric value emits the machinery with no continuation caption; any other true value is the caption text for every page after the first, written verbatim so LaTeX macros survive, with an empty `\caption[]` optional argument so the continuation stays out of the List of Tables. `\endfoot` carries the closing `\hline` and no `\endlastfoot` is emitted, so every page — the last one included — gets a bottom rule. The wrapper then holds nothing that has to track the data:
+
     \begin{longtable}{ccc}
     \caption{}\label{}\\ \hline
     \input{output.file.tex}
@@ -5830,6 +5900,162 @@ Verified against R 4.6.1 (`oneway.test`, `anova(aov())`, `anova(lm())`,
 `t/model_pvalue_tails.t` and `t/oneway_test.R.scipy.t`.
 
 # Changes
+
+## 0.291 2026-08-04 CDT
+
+POD formatting improvements
+
+### `lm`, `glm`
+
+Formula parsing and data reading are now shared between `lm` and `glm` too, so the
+two agree on what a formula means and on what a row is called. `lm` had the better
+parser and `glm` the better row naming; each now has both.
+
+**`lm` now names rows the way `glm` does** — from a `row.names`, `_row`,
+`rownames` or `.rownames` column when the data has one, and 1-based integers
+otherwise. `lm` previously always used integers, so `fitted.values` and
+`residuals` came back keyed `1..n` for data whose rows had names, and did not
+match what `glm` or `predict` returned for the same data; the `predict`
+documentation already described the shared behaviour. A row-name column is a label
+rather than a measurement, so `y ~ .` now excludes it in both.
+
+Design-matrix construction is now shared between `lm` and `glm`, and decides a
+categorical column's coding term by term using R's margin rule: the reference
+level is dropped when the term with that column removed is itself in the model.
+Three bugs fall out of that, all confirmed against R 4.6.1 and statsmodels
+0.14.6.
+
+#### Bug fixes
+
+Four in `glm`, from the parser it now shares with `lm`. Three of them ended the
+same way: a term that names no column evaluates to `NaN` for every row, every row
+is dropped as incomplete, and the fit dies with `0 degrees of freedom (too many
+NAs or parameters > observations)` — never mentioning the formula.
+
+- **`glm` truncated a formula at 511 characters.** It copied the formula into a
+  fixed `char[512]`, so a model with enough predictors to overrun that lost the
+  tail. The buffer now grows with the formula.
+
+- **`glm` did not understand `.`.** It parsed the formula before reading the data,
+  so there were no column names to expand `.` into and the term stayed a literal
+  `.`. Formula splitting now happens first and term expansion after the data is
+  read, so `y ~ .` works in both.
+
+- **`glm` did not understand `+ 0` or a leading `0 +`.** Only `- 1` suppressed the
+  intercept; the other two spellings R accepts left a term named `0`. All three now
+  work in both, as do `+ 1` and a leading `1 +`.
+
+- **`glm` read the `-1` inside `I(...)` as intercept suppression.** It searched the
+  whole right-hand side for the substring, so `y ~ I(x-1)` silently became
+  `y ~ I(x) - 1`: a different model, fitted without complaint. The scan now steps
+  over `I(...)`, leaving the term alone. `I()` still supports only `^power`, so
+  that formula is an error in both rather than a wrong answer in one.
+
+And the three that fall out of the shared design matrix:
+
+- **A categorical column in a model with no intercept lost a level.** With no
+  intercept there is no baseline for a reference level to be measured against, so
+  R codes the factor in full — one column per group, each coefficient that
+  group's own mean. Both functions dropped the reference level anyway, so
+  `len ~ supp - 1` fitted `len ~ suppVC - 1`: a model forcing every observation
+  at the reference level to a fitted value of 0. On R's `ToothGrowth` that meant
+  a residual sum of squares of 16056 against R's 3247, and an R² of 0.35 against
+  0.87. Where two categorical main effects appear with no intercept only the
+  first is coded in full, as in R, since coding both would be rank deficient.
+
+- **An interaction involving a categorical column could not be built.** The
+  interaction was looked up as a single column literally named `dose:supp`;
+  finding none, it evaluated to `NaN` for every row, every row was dropped as
+  incomplete, and the fit died with `0 degrees of freedom (too many NAs or
+  parameters > observations)`. Interactions now expand to the product of their
+  components' indicator columns, so `len ~ dose * supp` gives `dose`, `suppVC`
+  and `dose:suppVC`. `predict` already understood such coefficient names; now
+  they can be produced.
+
+- **`a*b*c` expanded only its first `*`.** Crossing is associative, so
+  `y ~ a * b * c` now yields every non-empty subset (`a`, `b`, `c`, `a:b`, `a:c`,
+  `b:c`, `a:b:c`), ordered by degree as R's `terms()` orders them. Previously the
+  chunk was split once, producing the unusable terms `b*c` and `a:b*c`, and the
+  fit died the same way as above. Crossing more than 16 columns now croaks rather
+  than expanding to 2^n terms.
+
+- **`predict` scored reference-level rows as if the term were absent.** It
+  registered factor dummies from `levels[1..]` only, on the assumption that a
+  reference level never has a coefficient — true for a factor coded by contrasts,
+  but not for one coded in full. Every row at the reference level of a
+  no-intercept model therefore came back 0.
+
+- **`glm` halved its IRLS step whenever the deviance rose, costing iterations and
+  accuracy in the standard errors.** R truncates a step only when the deviance
+  comes out non-finite; a deviance that merely increases is not divergence. The
+  standard IRLS start puts `mu` at `y + 0.1`, essentially on the data, so the
+  initial deviance is near zero and the first real step almost always raises it —
+  on the nine-point poisson fit in `t/glm.t`, from 0.016 to 1.54. That was read as
+  divergence and the step was halved ten times over, turning R's four iterations
+  into seven.
+
+  The extra iterations reached the same coefficients, so the symptom appeared
+  only in the standard errors. They are built from the information matrix of the
+  *penultimate* iterate — in R because `summary.glm` inverts the QR that
+  `glm.fit` kept from its last weighted least squares call, and here because the
+  IRLS sweep leaves that inverse in place — so stopping on a different iteration
+  than R means reporting a different matrix. Poisson standard errors were 5e-8 to
+  2e-5 away from R's while the coefficients agreed to twelve digits; they now
+  agree to about 1e-14. Binomial standard errors were up to 6e-7 out and now
+  agree to 2e-14, except on a near-separable fit, where the `varmu` floor of
+  1e-10 (a guard against dividing by an underflowed variance) accounts for the
+  remaining difference — 1.9e-9 on `am ~ wt * hp`, where three of 32 fitted
+  probabilities are within 1e-12 of 0 or 1 and R itself warns. Gaussian fits are
+  unaffected: their weights are all 1, so the matrix is `X'X` either way.
+
+  The same condition had its `isfinite` test on the accepting side, so a
+  genuinely divergent step producing a non-finite deviance was kept rather than
+  truncated. That is now the one case that does trigger halving.
+
+- **The negative-binomial theta alternation stopped early and started from the
+  wrong place.** `MASS::glm.nb` does not simply maximise over theta; it alternates
+  between an IRLS fit at the current theta and a fresh ML estimate of theta at the
+  current fitted means, and which fit it lands on depends on the schedule. Four
+  details of that schedule were wrong here, and all four are now reproduced:
+
+  - The alternation stopped on a relative test of the log-likelihood alone,
+    `|dll| < 1e-7 * (|ll| + 0.1)`. `glm.nb` requires
+    `(|dLm| / d1 + |dtheta|) < 1e-8` with `d1 = sqrt(2 * max(1, df.residual))`
+    taken from its Poisson pass — theta itself has to have settled, not just the
+    log-likelihood. The old test was satisfied roughly 2e-5 of log-likelihood
+    early, which left theta 8e-7 out and dragged the coefficients 8e-6 with it.
+  - The first pass now runs as a genuine **Poisson** fit, as `glm.nb`'s does,
+    rather than a negative-binomial fit at a large stand-in theta. That pass
+    supplies both the first theta and the `d1` above.
+  - Later passes are **warm started** from the previous pass's means
+    (`etastart = log(mu)`), so they converge to the fit `glm.nb` reaches rather
+    than to the same optimum approached from a cold start.
+  - Theta is re-estimated at the means each pass **started** from, not the ones it
+    produced: `glm.nb` calls `theta.ml(Y, mu)` and only then reassigns
+    `mu <- fit$fitted.values`. `theta.ml` itself now also uses MASS's own stopping
+    rule, an absolute Newton-step tolerance of `.Machine$double.eps^0.25`.
+
+  Across eighteen fits spanning dispersion from theta 0.41 to theta 69000, theta
+  now agrees with `glm.nb` to 3.4e-9, coefficients to 5.8e-9, standard errors to
+  8.4e-10 and deviance to 1.3e-9 — previously 8e-7, 8e-6, 3e-6 and 6e-7. The one
+  exception is genuinely near-Poisson data, where theta is not identified at all
+  (its own standard error exceeds the estimate, and `glm.nb`'s `theta.ml` reports
+  "iteration limit reached"); theta there agrees only to about 4e-6 relative,
+  while the coefficients still agree to 1.6e-10.
+
+  A separate consequence: a negative-binomial fit with theta supplied was
+  starting from the Poisson `mustart` of `y + 0.1`, where R's
+  `negative.binomial()$initialize` sets `y + (y == 0)/6`. Different starting
+  values walk different iterates, and since the standard errors come from the
+  penultimate one, that showed as standard errors 6e-7 from R's while the
+  coefficients agreed to 1e-9. Such fits now match R to 2e-15.
+
+  Note on that comparison: standard errors for a negative-binomial fit hold the
+  dispersion at 1, which is what `glm.nb` and `summary.negbin` do. R's
+  `summary.glm`, handed a `negative.binomial` family directly, instead *estimates*
+  the dispersion and prints standard errors scaled by its square root — 1.0839 on
+  one of the test data sets, so about 4% larger. Compare against
+  `summary(fit, dispersion = 1)` to see the values this module reports.
 
 ## 0.29 2026-08-03 CDT
 
@@ -6831,6 +7057,7 @@ Corrected four bugs in the `wilcox_test` XSUB plus a portability fix in its exac
 `view` function added, similar to R's `head`
 
 `read_table`:
+
     filter => {
         'Testosterone, total (nmol/L)' => sub { defined $_ },
     }

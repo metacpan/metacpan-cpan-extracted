@@ -44,7 +44,7 @@ use WebDyne::PSGI::Constant;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.007';
+$VERSION='3.008';
 
 
 #  Check for supporting modules

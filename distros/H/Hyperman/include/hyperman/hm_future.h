@@ -50,7 +50,7 @@ static MGVTBL hm_clos_vtbl = { NULL, NULL, NULL, NULL, hm_clos_free,
 static SV *hm_closure(pTHX_ XSUBADDR_t body, SV *a, SV *b, SV *c, SV *d,
                       IV i, UV u) {
     CV *cv = newXS(NULL, body, __FILE__);
-    hm_clos *cl = (hm_clos *)calloc(1, sizeof(hm_clos));
+    hm_clos *cl = (hm_clos *)hm_xcalloc(1, sizeof(hm_clos));
     cl->a = a ? SvREFCNT_inc(a) : NULL;
     cl->b = b ? SvREFCNT_inc(b) : NULL;
     cl->c = c ? SvREFCNT_inc(c) : NULL;

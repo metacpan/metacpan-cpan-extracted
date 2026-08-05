@@ -1,5 +1,46 @@
 Revision history for Fetch
 
+0.09    2026-08-04
+        - Security: credential headers (Authorization, Cookie, Proxy-
+          Authorization) are no longer sent across a redirect that changes
+          origin (scheme, host or port). A token or explicit cookie set for the
+          original host is dropped when a 3xx points at a different one; jar
+          cookies were already re-scoped per host. t/17-redirect-auth.t.
+        - Security: reject a Set-Cookie whose Domain is a bare public suffix /
+          single label (e.g. "com", ".com", "localhost") - it must carry an
+          interior dot, so a server cannot scope a cookie to a whole TLD. 
+        - Security: a response carrying both Content-Length and Transfer-
+          Encoding: chunked is now framed strictly by the chunked encoding
+          (RFC 7230 3.3.3, TE overrides CL) with the ambiguous Content-Length
+          dropped - it cannot truncate the body or desync a keep-alive
+          connection. t/18-cl-te.t.
+        - Loop watcher callbacks (the per-readiness-event hot path) are now
+          dispatched directly: the standalone loop recognises its own C
+          closures and calls the XSUB body straight, skipping pp_entersub.
+
+0.08    2026-08-04
+        - JSON (the `json =>` request option and Fetch::Response->json) now goes
+          through File::Raw::JSON's C ABI
+        - Fetch is now an ExtUtils::Depends provider
+        - Bodyless responses: 1xx, 204 and 304 never carry a body (RFC 7230
+          3.3.3), and a server MUST NOT send Content-Length on 1xx/204, so
+          the h1 parser treated the missing length as read-until-close - a
+          204 on a keep-alive connection hung until timeout. Those statuses
+          now complete at the end of headers.
+
+0.07    2026-08-04
+        - Build and run on perl before 5.14. A new include/fetch/ft_compat.h
+          supplies fallbacks for perl API the C core used but which predates
+          the perls Fetch claims (5.8.3+), all guarded by PERL_VERSION so newer
+          perls are untouched:
+          - XSPROTO / XS_INTERNAL / XS_EXTERNAL (the closure-callback macros,
+            added to XSUB.h at 5.16): without them the build failed to compile
+            ("XS_INTERNAL undeclared" / "cv undeclared") before any test ran.
+          - mg_findext (5.14), used by the C-closure machinery to fetch a
+            closure's captured magic: without it the module built but died at
+            runtime ("undefined symbol: mg_findext"), failing most tests.
+          - croak_sv (5.13.1), used on a few error paths.
+
 0.06    2026-08-03
         - Build against older OpenSSL. The TLS code uses the OpenSSL 1.1.0 API
           (TLS_client_method, SSL_CTX_set_min_proto_version, SSL_set1_host);

@@ -184,14 +184,19 @@ sub init
     {
         $opts->{locale} = CORE::delete( $opts->{lang} );
     }
-    $self->{locale} = exists( $opts->{locale} ) ? CORE::delete( $opts->{locale} ) : '';
+    my $locale = exists( $opts->{locale} ) ? CORE::delete( $opts->{locale} ) : '';
+    $locale //= '';
+    my( $locale2, $locale_enc ) = split( /\./, $locale, 2 );
+    $locale = $locale2 // '';
+    $locale =~ tr/-/_/;
+    $locale = join( '.', $locale, $locale_enc ) if( defined( $locale_enc ) );
+    $self->{locale} = $locale;
     $self->debug( CORE::delete( $opts->{debug} ) ) if( exists( $opts->{debug} ) );
     # Convert Japanese double bytes numbers to regular digits.
     $num =~ tr/[\x{FF10}-\x{FF19}]＋ー/[0-9]+-/;
     if( $num !~ /^$NUMBER_RE$/ )
     {
         $self->_load_class( 'Module::Generic::Number::Format' ) || return( $self->pass_error );
-        my $locale = $self->{locale};
         my $fmt = Module::Generic::Number::Format->new( "$num", ( $locale ? ( locale => $locale ) : () ) ) ||
             return( $self->pass_error( Module::Generic::Number::Format->error ) );
         $self->{_number} = $fmt->as_string;
@@ -544,6 +549,9 @@ sub locale { return( shift->_set_get_scalar_as_object(
         set => sub
         {
             my( $self, $locale ) = @_;
+            ( $locale, my $locale_enc ) = split( /\./, $locale, 2 );
+            $locale =~ tr/-/_/;
+            $locale = join( '.', $locale, $locale_enc ) if( defined( $locale_enc ) );
             # If we have a formatter, we pass along the locale value.
             if( defined( $locale ) && $self->{_formatter} )
             {
@@ -781,6 +789,8 @@ sub _func
     my $val  = @_ ? shift( @_ ) : undef;
     my $expr = defined( $val ) ? "${namespace}::${func}( \$self->{_number}, $val )" : "${namespace}::${func}( \$self->{_number} )";
     local $@;
+    # Should we avoid warnings?
+    no warnings;
     my $res = eval( $expr );
     return( $self->error( $@ ) ) if( $@ );
     $self->clear_error;

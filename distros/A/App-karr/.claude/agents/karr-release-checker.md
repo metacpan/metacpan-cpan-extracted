@@ -8,6 +8,7 @@ briefing:
     - perl-release-author-getty
     - perl-release-dist-ini
     - perl-core
+    - kanban-issues-karr-cli
 ---
 
 You are the karr-release-checker for **App::karr**. Conventions from the skills above are non-negotiable — apply silently.

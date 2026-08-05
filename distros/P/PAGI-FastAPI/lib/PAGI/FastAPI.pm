@@ -4,7 +4,7 @@ use v5.36;
 use experimental qw/try for_list/;
 use version;
 
-our $VERSION   = qv('v0.0.1');
+our $VERSION   = qv('v0.0.3');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ PAGI::FastAPI - Asynchronous, Type-Safe Micro-Framework with Dependency Injectio
 
 =head1 VERSION
 
-Version v0.0.1
+Version v0.0.3
 
 =head1 SYNOPSIS
 
@@ -378,12 +378,12 @@ sub to_app ($self) {
             return;
         }
 
-        # Safe Query String Parsing
+        # Safe Query String Parsing (application/x-www-form-urlencoded)
         my %query_params;
         if (defined $scope->{query_string} && length $scope->{query_string}) {
             for my $pair (split '&', $scope->{query_string}) {
                 my ($k, $v) = split '=', $pair, 2;
-                $query_params{$k} = $v // '';
+                $query_params{_uri_unescape($k)} = _uri_unescape($v // '');
             }
         }
 
@@ -395,6 +395,11 @@ sub to_app ($self) {
                 if ($event->{type} eq 'http.request') {
                     $raw_body .= $event->{body} // '';
                     last unless $event->{more_body};
+                }
+                else {
+                    # e.g. 'http.disconnect' or any other event the server
+                    # may emit mid-stream: stop waiting rather than loop forever.
+                    last;
                 }
             }
 
@@ -425,7 +430,7 @@ sub to_app ($self) {
                     my %query_params_validated;
 
                     for my $i (0 .. $#{$route->{path_params}}) {
-                        $path_params{$route->{path_params}[$i]} = $captures[$i];
+                        $path_params{$route->{path_params}[$i]} = _uri_unescape($captures[$i]);
                     }
                     $c->{path_params} = \%path_params;
 
@@ -526,15 +531,32 @@ sub to_app ($self) {
 
 # PRIVATE METHODS
 
+# Minimal application/x-www-form-urlencoded decoder ('+' -> space, %XX -> byte).
+# Avoids adding a URI::Escape dependency for this one bit of logic.
+sub _uri_unescape ($str) {
+    return $str unless defined $str;
+    $str =~ tr/+/ /;
+    $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+    return $str;
+}
+
 sub _register_route ($self, $method, $path, $opts) {
     my $query_types = $opts->{query}   // {};
     my $body_spec   = $opts->{body};
     my $raw_deps    = $opts->{dependencies} // [];
-    my $handler     = $opts->{handler} // async sub {};
+    my $handler     = $opts->{handler};
+
+    die "Route '$method $path' requires a 'handler' async coderef"
+        unless ref $handler eq 'CODE';
+
+    die "Route '$method $path' 'dependencies' must be a HashRef or ArrayRef"
+        unless ref $raw_deps eq 'HASH' || ref $raw_deps eq 'ARRAY';
 
     my @dependencies;
     if (ref $raw_deps eq 'HASH') {
         for my ($key, $code) (%$raw_deps) {
+            die "Route '$method $path' dependency '$key' must be a CODE reference"
+                unless ref $code eq 'CODE';
             push @dependencies, { key => $key, code => $code };
         }
     } elsif (ref $raw_deps eq 'ARRAY') {
@@ -543,15 +565,26 @@ sub _register_route ($self, $method, $path, $opts) {
                 push @dependencies, { key => $dep->key, code => $dep->code };
             } elsif (ref $dep eq 'CODE') {
                 push @dependencies, { key => undef, code => $dep };
+            } else {
+                die "Route '$method $path' has an unrecognized dependency entry "
+                  . "(expected CODE ref or PAGI::FastAPI::Depends instance)";
             }
         }
     }
 
+    # Build the route regex by escaping literal path segments (so characters
+    # like '.', '+', '?' in a static path are matched literally, not as
+    # regex metacharacters) while turning {param} tokens into captures.
     my @path_params;
-    my $regex_path = $path;
-    while ($regex_path =~ s/\{([a-zA-Z_]\w*)\}/([^\/]+)/) {
+    my $regex_path = '';
+    my $last_pos   = 0;
+    while ($path =~ /\{([a-zA-Z_]\w*)\}/g) {
         push @path_params, $1;
+        $regex_path .= quotemeta(substr($path, $last_pos, $-[0] - $last_pos));
+        $regex_path .= '([^/]+)';
+        $last_pos = $+[0];
     }
+    $regex_path .= quotemeta(substr($path, $last_pos));
     $regex_path = "^$regex_path\$";
 
     my @parameters;

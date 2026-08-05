@@ -4,7 +4,7 @@
       "Zane C. Bowers-Hadley <vvelox@vvelox.ent>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -31,6 +31,10 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0"
+         },
          "requires" : {
             "Error::Helper" : "v2.0.0",
             "Regexp::IPv4" : "0",
@@ -52,6 +56,6 @@
          "web" : "https://github.com/LilithSec/Net-Firewall-BlockerHelper"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

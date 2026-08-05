@@ -26,10 +26,10 @@ requires 'Getopt::Std' => 0;
 requires 'IO::Uncompress::AnyUncompress' => 0;
 requires 'List::Util' => 1.33;
 requires 'MARC::Batch' => 0;
-requires 'MARC::Leader' => 0;
-requires 'MARC::Leader::Utils' => 0.02;
 requires 'MARC::File::USMARC' => 0;
 requires 'MARC::File::XML' => '1.0.4';
+requires 'MARC::Leader' => 0;
+requires 'MARC::Leader::Utils' => 0.02;
 requires 'Readonly' => 0;
 requires 'Unicode::UTF8' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-MARC-Filter/issues',
@@ -45,7 +45,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 test_requires 'Test::Warn' => 0.31;
 tests_recursive;
-version '0.10';
+version '0.11';
 
 # Run.
 WriteAll();

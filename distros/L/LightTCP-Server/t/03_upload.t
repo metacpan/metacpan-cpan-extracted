@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# t/03_upload.t
 use strict;
 use warnings;
 use File::Temp qw(tempdir);

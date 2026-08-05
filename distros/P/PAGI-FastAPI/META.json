@@ -48,15 +48,15 @@
    "provides" : {
       "PAGI::FastAPI" : {
          "file" : "lib/PAGI/FastAPI.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.3"
       },
       "PAGI::FastAPI::Context" : {
          "file" : "lib/PAGI/FastAPI/Context.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.3"
       },
       "PAGI::FastAPI::Depends" : {
          "file" : "lib/PAGI/FastAPI/Depends.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "web" : "https://github.com/manwar/PAGI-FastAPI"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

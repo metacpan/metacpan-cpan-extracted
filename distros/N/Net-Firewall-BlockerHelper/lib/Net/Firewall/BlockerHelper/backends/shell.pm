@@ -9,17 +9,23 @@ use Regexp::IPv6 qw($IPv6_re);
 
 =head1 NAME
 
-Net::Firewall::BlockerHelper::backends::shell - A shell backend for Net::Firewall::BlockHelper.
+Net::Firewall::BlockerHelper::backends::shell - A shell backend for Net::Firewall::BlockerHelper.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
+
+This backend just runs the commands configured via the options hash, so
+what init, ban, and the like actually do is entirely up to the commands
+supplied. Wiring them up to something that really blocks traffic is the
+user's job. The example below just creates and removes files under C</tmp>
+to show the flow and blocks nothing.
 
     use Net::Firewall::BlockerHelper;
 
@@ -45,7 +51,7 @@ our $VERSION = '0.0.1';
             . $Error::Helper::errorFlag . "\n";
     }
 
-    $fw_helper->init;
+    $fw_helper->init_backend;
 
     $fw_helper->ban(ban => '5.6.7.8');
     $fw_helper->ban(ban => '1.2.3.4');
@@ -80,6 +86,15 @@ The values used for options is as below. All must be defined and can't be ''.
          Default :: undef
 
     - unban :: The command to run to un ban a IP. %%%BAN%%% is replaced with the IP.
+         Default :: undef
+
+    - check :: Optional command to run to verify the blocking is still in place.
+         A zero exit is treated as healthy. If not defined, check always
+         reports healthy.
+         Default :: undef
+
+    - flush :: Optional command to run to remove all bans at once. If not
+         defined, flush falls back to unbanning each currently banned IP.
          Default :: undef
 
 All errors are considered fatal, meaning if new fails it will die.
@@ -119,6 +134,9 @@ sub new {
 		errorString   => "",
 		errorExtra    => {
 			all_errors_fatal => 1,
+			# all_fatal is what Error::Helper 2.1.0 actually checks; all_errors_fatal
+			# is kept for the name documented in its POD
+			all_fatal        => 1,
 			flags            => {
 				1  => 'notInited',
 				2  => 'initInvalid',
@@ -136,21 +154,29 @@ sub new {
 				16 => 'reInitFailed',
 				17 => 'teardownFailed',
 				18 => 'alreadyInited',
+				24 => 'checkFailed',
+				25 => 'flushFailed',
+				26 => 'banCidrFailed',
+				27 => 'unbanCidrFailed',
+				28 => 'cidrItemNotCidr',
+				29 => 'cidrNotSupported',
+				30 => 'listCidrFailed',
 			},
 			fatal_flags      => {},
 			perror_not_fatal => 0,
 		},
-		backend      => undef,
-		options      => {},
-		ports        => [],
-		protocols    => [],
-		testing      => undef,
-		test_data    => undef,
-		prefix       => 'kur',
-		postfix      => undef,
-		frontend_obj => undef,
-		inited       => 0,
-		banned       => {},
+		backend        => undef,
+		options        => {},
+		ports          => [],
+		protocols      => [],
+		testing        => undef,
+		test_data      => undef,
+		prefix         => 'kur',
+		frontend_obj   => undef,
+		inited         => 0,
+		banned         => {},
+		banned_cidr    => {},
+		cidr_supported => 1,
 	};
 	bless $self;
 
@@ -178,8 +204,8 @@ sub new {
 			$self->warn;
 		} elsif ( $opts{options}{init} eq '' ) {
 			$self->{perror}      = 1;
-			$self->{error}       = 3;
-			$self->{errorString} = 'init is not blank';
+			$self->{error}       = 2;
+			$self->{errorString} = 'init is blank';
 			$self->warn;
 		} elsif ( !defined( $opts{options}{teardown} ) ) {
 			$self->{perror}      = 1;
@@ -189,7 +215,7 @@ sub new {
 		} elsif ( $opts{options}{teardown} eq '' ) {
 			$self->{perror}      = 1;
 			$self->{error}       = 4;
-			$self->{errorString} = 'teardown is not blank';
+			$self->{errorString} = 'teardown is blank';
 			$self->warn;
 		} elsif ( !defined( $opts{options}{ban} ) ) {
 			$self->{perror}      = 1;
@@ -199,7 +225,7 @@ sub new {
 		} elsif ( $opts{options}{ban} eq '' ) {
 			$self->{perror}      = 1;
 			$self->{error}       = 5;
-			$self->{errorString} = 'ban is not blank';
+			$self->{errorString} = 'ban is blank';
 			$self->warn;
 		} elsif ( !defined( $opts{options}{unban} ) ) {
 			$self->{perror}      = 1;
@@ -208,8 +234,8 @@ sub new {
 			$self->warn;
 		} elsif ( $opts{options}{unban} eq '' ) {
 			$self->{perror}      = 1;
-			$self->{error}       = 5;
-			$self->{errorString} = 'unban is not blank';
+			$self->{error}       = 6;
+			$self->{errorString} = 'unban is blank';
 			$self->warn;
 		}
 	} else {
@@ -226,9 +252,17 @@ sub new {
 
 =head2 init
 
-Initiates the backend.
+Initiates the backend by running the configured C<init> command with
+'2>&1' appended. A non-zero exit is an error.
+
+Note that what this actually sets up is entirely down to the configured
+command. See L</SYNOPSIS>.
 
 No arguments are taken.
+
+If called a second time, it will error.
+
+    $backend->init;
 
 =cut
 
@@ -249,7 +283,7 @@ sub init {
 		$self->{frontend_obj}->{test_data} = $command;
 	} else {
 		my $output = `$command 2>&1`;
-		if ( $? ne '0' ) {
+		if ( $? != 0 ) {
 			$self->{error}       = 12;
 			$self->{errorString} = 'Init failed... command "' . $command . '" resulted in... ' . $output;
 			$self->warn;
@@ -261,7 +295,9 @@ sub init {
 
 =head2 ban
 
-Bans the IP.
+Bans an IP. The value of ban is validated as being a IPv4 or IPv6 address
+and lowercased, then the configured C<ban> command is run with %%%BAN%%%
+replaced by the IP. A non-zero exit is an error.
 
     $fw_helper->ban(ban => $ip);
 
@@ -289,14 +325,17 @@ sub ban {
 		$self->{errorString} = 'Bad ref type for ban... ref is "' . ref( $opts{ban} ) . '"';
 		$self->warn;
 		return;
-	} elsif ( $opts{ban} !~ /$IPv4_re/
-		&& $opts{ban} !~ /$IPv6_re/ )
+	} elsif ( $opts{ban} !~ /\A$IPv4_re\z/
+		&& $opts{ban} !~ /\A$IPv6_re\z/ )
 	{
 		$self->{error}       = 10;
 		$self->{errorString} = 'ban item,"' . $opts{ban} . '", does not appear to be a IPv4 or IPv6 IP';
 		$self->warn;
 		return;
 	}
+
+	# lowercase so the same IPv6 IP in differing cases can't result in duplicate entries
+	$opts{ban} = lc( $opts{ban} );
 
 	my $command = $self->{options}{ban};
 	$command =~ s/\%\%\%BAN\%\%\%/$opts{ban}/g;
@@ -305,7 +344,7 @@ sub ban {
 		$self->{frontend_obj}->{test_data} = $command;
 	} else {
 		my $output = `$command 2>&1`;
-		if ( $? ne '0' ) {
+		if ( $? != 0 ) {
 			$self->{error}       = 13;
 			$self->{errorString} = 'Ban failed... command "' . $command . '" resulted in... ' . $output;
 			$self->warn;
@@ -317,9 +356,11 @@ sub ban {
 
 =head2 unban
 
-Unbans the an IP.
+Unbans an IP. The value of ban is validated as being a IPv4 or IPv6 address
+and lowercased, then the configured C<unban> command is run with %%%BAN%%%
+replaced by the IP. A non-zero exit is an error.
 
-    $fw_helper->ban(ban => $ip);
+    $fw_helper->unban(ban => $ip);
 
 =cut
 
@@ -345,14 +386,17 @@ sub unban {
 		$self->{errorString} = 'Bad ref type for ban... ref is "' . ref( $opts{ban} ) . '"';
 		$self->warn;
 		return;
-	} elsif ( $opts{ban} !~ /$IPv4_re/
-		&& $opts{ban} !~ /$IPv6_re/ )
+	} elsif ( $opts{ban} !~ /\A$IPv4_re\z/
+		&& $opts{ban} !~ /\A$IPv6_re\z/ )
 	{
 		$self->{error}       = 10;
 		$self->{errorString} = 'ban item,"' . $opts{ban} . '", does not appear to be a IPv4 or IPv6 IP';
 		$self->warn;
 		return;
 	}
+
+	# lowercase so the same IPv6 IP in differing cases can't result in duplicate entries
+	$opts{ban} = lc( $opts{ban} );
 
 	my $command = $self->{options}{unban};
 	$command =~ s/\%\%\%BAN\%\%\%/$opts{ban}/g;
@@ -361,7 +405,7 @@ sub unban {
 		$self->{frontend_obj}->{test_data} = $command;
 	} else {
 		my $output = `$command 2>&1`;
-		if ( $? ne '0' ) {
+		if ( $? != 0 ) {
 			$self->{error}       = 14;
 			$self->{errorString} = 'Unban failed... command "' . $command . '" resulted in... ' . $output;
 			$self->warn;
@@ -371,9 +415,167 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
+# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
+# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
+# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
+# IPv6). Returns false otherwise.
+sub _valid_cidr {
+	my ( $self, $cidr ) = @_;
+
+	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
+
+	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
+		my ( $addr, $prefix ) = ( $1, $2 );
+		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
+		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
+	}
+
+	return 0;
+} ## end sub _valid_cidr
+
+=head2 ban_cidr
+
+Bans a CIDR range. The value of ban is validated as being a IPv4 or IPv6
+CIDR range and lowercased, then the configured C<ban> command is run with
+%%%BAN%%% replaced by the CIDR.
+
+    $fw_helper->ban_cidr(ban => '1.2.3.0/24');
+
+=cut
+
+sub ban_cidr {
+	my ( $self, %opts ) = @_;
+
+	$self->errorblank;
+
+	if ( !$self->{inited} ) {
+		$self->{error}       = 1;
+		$self->{errorString} = 'backend has not been inited';
+		$self->warn;
+		return;
+	}
+
+	if ( !defined( $opts{ban} ) ) {
+		$self->{error}       = 9;
+		$self->{errorString} = 'Nothing specified for the value ban';
+		$self->warn;
+		return;
+	} elsif ( ref( $opts{ban} ) ne '' ) {
+		$self->{error}       = 28;
+		$self->{errorString} = 'Bad ref type for ban... ref is "' . ref( $opts{ban} ) . '"';
+		$self->warn;
+		return;
+	} elsif ( !$self->_valid_cidr( $opts{ban} ) ) {
+		$self->{error}       = 28;
+		$self->{errorString} = 'ban item,"' . $opts{ban} . '", does not appear to be a IPv4 or IPv6 CIDR';
+		$self->warn;
+		return;
+	}
+
+	# lowercase so the same IPv6 CIDR in differing cases can't result in duplicate entries
+	$opts{ban} = lc( $opts{ban} );
+
+	my $command = $self->{options}{ban};
+	$command =~ s/\%\%\%BAN\%\%\%/$opts{ban}/g;
+
+	if ( $self->{testing} ) {
+		$self->{frontend_obj}->{test_data} = $command;
+	} else {
+		my $output = `$command 2>&1`;
+		if ( $? != 0 ) {
+			$self->{error}       = 26;
+			$self->{errorString} = 'Ban failed... command "' . $command . '" resulted in... ' . $output;
+			$self->warn;
+		}
+	}
+
+	$self->{banned_cidr}{ $opts{ban} } = 1;
+} ## end sub ban_cidr
+
+=head2 unban_cidr
+
+Unbans a CIDR range. The value of ban is validated as being a IPv4 or IPv6
+CIDR range and lowercased, then the configured C<unban> command is run with
+%%%BAN%%% replaced by the CIDR.
+
+    $fw_helper->unban_cidr(ban => '1.2.3.0/24');
+
+=cut
+
+sub unban_cidr {
+	my ( $self, %opts ) = @_;
+
+	$self->errorblank;
+
+	if ( !$self->{inited} ) {
+		$self->{error}       = 1;
+		$self->{errorString} = 'backend has not been inited';
+		$self->warn;
+		return;
+	}
+
+	if ( !defined( $opts{ban} ) ) {
+		$self->{error}       = 9;
+		$self->{errorString} = 'Nothing specified for the value ban';
+		$self->warn;
+		return;
+	} elsif ( ref( $opts{ban} ) ne '' ) {
+		$self->{error}       = 28;
+		$self->{errorString} = 'Bad ref type for ban... ref is "' . ref( $opts{ban} ) . '"';
+		$self->warn;
+		return;
+	} elsif ( !$self->_valid_cidr( $opts{ban} ) ) {
+		$self->{error}       = 28;
+		$self->{errorString} = 'ban item,"' . $opts{ban} . '", does not appear to be a IPv4 or IPv6 CIDR';
+		$self->warn;
+		return;
+	}
+
+	# lowercase so the same IPv6 CIDR in differing cases can't result in duplicate entries
+	$opts{ban} = lc( $opts{ban} );
+
+	my $command = $self->{options}{unban};
+	$command =~ s/\%\%\%BAN\%\%\%/$opts{ban}/g;
+
+	if ( $self->{testing} ) {
+		$self->{frontend_obj}->{test_data} = $command;
+	} else {
+		my $output = `$command 2>&1`;
+		if ( $? != 0 ) {
+			$self->{error}       = 27;
+			$self->{errorString} = 'Unban failed... command "' . $command . '" resulted in... ' . $output;
+			$self->warn;
+		}
+	}
+
+	delete( $self->{banned_cidr}{ $opts{ban} } );
+} ## end sub unban_cidr
+
+=head2 list_cidr
+
+List banned CIDR ranges. Returns an array of the currently banned CIDR
+ranges. Single IPs are not included; for those see L</list>.
+
+    my @banned_cidrs = $fw_helper->list_cidr;
+
+=cut
+
+sub list_cidr {
+	my ( $self, %opts ) = @_;
+
+	$self->errorblank;
+
+	if ( $self->{testing} ) {
+		$self->{frontend_obj}->{test_data} = 'list_cidr';
+	}
+
+	return keys( %{ $self->{banned_cidr} } );
+}
+
 =head2 list
 
-List banned IPs.
+List banned IPs. Returns an array of the currently banned single IPs. CIDR
+ranges are not included; for those see L</list_cidr>.
 
     my @banned = $fw_helper->list;
 
@@ -384,7 +586,9 @@ sub list {
 
 	$self->errorblank;
 
-	$self->{frontend_obj}->{test_data} = 'list';
+	if ( $self->{testing} ) {
+		$self->{frontend_obj}->{test_data} = 'list';
+	}
 
 	return keys( %{ $self->{banned} } );
 }
@@ -393,6 +597,13 @@ sub list {
 
 Tells the backend to re-init it's self.
 
+This will call teardown and init again, re-running the configured
+C<teardown> and C<init> commands. teardown is best effort. After that the
+configured C<ban> command is re-run for every previously banned IP and CIDR
+range.
+
+    $fw_helper->re_init;
+
 =cut
 
 sub re_init {
@@ -400,10 +611,23 @@ sub re_init {
 
 	$self->errorblank;
 
-	$self->teardown;
+	if ( !$self->{inited} ) {
+		$self->{error}       = 1;
+		$self->{errorString} = 'backend has not been inited';
+		$self->warn;
+		return;
+	}
+
+	# teardown is best effort here as a partially or fully wiped setup is
+	# exactly what re_init needs to recover from; init cleans up any remnants
+	{
+		local $@;
+		eval { $self->teardown; };
+	}
 	$self->init;
 
-	my @to_re_ban = keys( %{ $self->{banned} } );
+	# both single IPs and CIDR ranges are re-added the same way
+	my @to_re_ban = ( keys( %{ $self->{banned} } ), keys( %{ $self->{banned_cidr} } ) );
 
 	foreach my $item (@to_re_ban) {
 		my $command = $self->{options}{ban};
@@ -411,7 +635,7 @@ sub re_init {
 
 		if ( !$self->{testing} ) {
 			my $output = `$command 2>&1`;
-			if ( $? ne '0' ) {
+			if ( $? != 0 ) {
 				$self->{error}       = 13;
 				$self->{errorString} = 'Ban failed... command "' . $command . '" resulted in... ' . $output;
 				$self->warn;
@@ -428,16 +652,19 @@ sub re_init {
 
 =head2 teardown
 
-Tears down the setup for the backend.
+Tears down the setup for the backend by running the configured C<teardown>
+command. A non-zero exit is an error.
+
+    $fw_helper->teardown;
 
 =cut
 
 sub teardown {
 	my ( $self, %opts ) = @_;
 
-	$self->{inited} = 0;
-
 	$self->errorblank;
+
+	$self->{inited} = 0;
 
 	my $command = $self->{options}{teardown};
 
@@ -445,41 +672,143 @@ sub teardown {
 		$self->{frontend_obj}->{test_data} = $command;
 	} else {
 		my $output = `$command 2>&1`;
-		if ( $? ne '0' ) {
+		if ( $? != 0 ) {
 			$self->{error}       = 17;
 			$self->{errorString} = 'Teardown failed... command "' . $command . '" resulted in... ' . $output;
 			$self->warn;
 		}
 	}
-
-	$self->{inited} = 0;
 } ## end sub teardown
+
+=head2 stop
+
+Alias for L</teardown>, provided for parity with the fail2ban C<actionstop>
+concept.
+
+    $fw_helper->stop;
+
+=cut
+
+sub stop {
+	my ( $self, %opts ) = @_;
+
+	return $self->teardown(%opts);
+}
+
+=head2 check
+
+Runs the optional C<check> command from the options hash. A zero exit code
+is treated as healthy. If no C<check> command was configured, this always
+reports healthy. This is the equivalent of fail2ban's C<actioncheck>.
+
+    if ( !$fw_helper->check ) {
+        $fw_helper->re_init;
+    }
+
+=cut
+
+sub check {
+	my ( $self, %opts ) = @_;
+
+	$self->errorblank;
+
+	# no check command configured -> assume healthy
+	if ( !defined( $self->{options}{check} ) || $self->{options}{check} eq '' ) {
+		if ( $self->{testing} ) {
+			$self->{frontend_obj}->{test_data} = 'check';
+		}
+		return 1;
+	}
+
+	my $command = $self->{options}{check};
+
+	if ( $self->{testing} ) {
+		$self->{frontend_obj}->{test_data} = $command;
+		return 1;
+	}
+
+	my $output = `$command 2>&1`;
+	return $? == 0 ? 1 : 0;
+} ## end sub check
+
+=head2 flush
+
+Removes all currently banned IPs at once. If a C<flush> command was
+configured in the options hash it is run; otherwise it falls back to
+unbanning each currently banned IP. This is the equivalent of fail2ban's
+C<actionflush>.
+
+    $fw_helper->flush;
+
+=cut
+
+sub flush {
+	my ( $self, %opts ) = @_;
+
+	$self->errorblank;
+
+	if ( !$self->{inited} ) {
+		$self->{error}       = 1;
+		$self->{errorString} = 'backend has not been inited';
+		$self->warn;
+		return;
+	}
+
+	if ( defined( $self->{options}{flush} ) && $self->{options}{flush} ne '' ) {
+		my $command = $self->{options}{flush};
+
+		if ( $self->{testing} ) {
+			$self->{frontend_obj}->{test_data} = $command;
+		} else {
+			my $output = `$command 2>&1`;
+			if ( $? != 0 ) {
+				$self->{error}       = 25;
+				$self->{errorString} = 'Flush failed... command "' . $command . '" resulted in... ' . $output;
+				$self->warn;
+			}
+		}
+
+		$self->{banned}      = {};
+		$self->{banned_cidr} = {};
+	} else {
+		# no bulk flush command configured -> unban each currently banned IP
+		foreach my $item ( keys( %{ $self->{banned} } ) ) {
+			$self->unban( ban => $item );
+		}
+		foreach my $item ( keys( %{ $self->{banned_cidr} } ) ) {
+			$self->unban_cidr( ban => $item );
+		}
+	}
+} ## end sub flush
 
 =head1 ERROR CODES / FLAGS
 
+Error handling is provided by L<Error::Helper>. All
+errors are considered fatal.
+
 =head2 1, notInited
 
-Backend has not been initted yet.
+The backend has not been inited yet.
 
 =head2 2, initInvalid
 
-'init' for options hash is invalid. Either undef or blank.
+The option init is undef or blank.
 
-=head 3, optionsUndef
+=head2 3, optionsUndef
 
-Options is not a hash.
+The options hash passed to new is undef.
 
 =head2 4, teardownInvalid
 
-'teardown' for options hash is invalid. Either undef or blank.
+The option teardown is undef or blank.
 
 =head2 5, banInvalid
 
-'ban' for options hash is invalid. Either undef or blank.
+The option ban is undef or blank.
 
 =head2 6, unbanInvalid
 
-'unban' for options hash is invalid. Either undef or blank.
+The option unban is undef or blank.
 
 =head2 8, optionsNotHash
 
@@ -487,17 +816,12 @@ The item passed to new for options is not a hash.
 
 =head2 9, noBanItem
 
-No IP specified to ban.
+No IP or CIDR range specified to ban or unban.
 
 =head2 10, banItemNotIP
 
 The item to ban is not an IP. Either wrong ref type or regexp
 test using L<Regexp::IPv4> and L<Regexp::IPv6> failed.
-
-=head2 11, invalidBackend
-
-The specified backend failed to pass a basic sanity check of making sure it
-matches the regexp /^[a-zA-Z0-9\_]+$/.
 
 =head2 12, backendInitError
 
@@ -513,7 +837,7 @@ Failed to unban the item.
 
 =head2 15, listFailed
 
-Failed get a list of bans.
+Failed to get a list of bans.
 
 =head2 16, reInitFailed
 
@@ -525,7 +849,36 @@ Failed to teardown the backend.
 
 =head2 18, alreadyInited
 
-Backend has already been initiated.
+init called, but the backend has already been inited.
+
+=head2 24, checkFailed
+
+The backend check raised an error.
+
+=head2 25, flushFailed
+
+Failed to flush the bans.
+
+=head2 26, banCidrFailed
+
+Failed to ban the CIDR range.
+
+=head2 27, unbanCidrFailed
+
+Failed to unban the CIDR range.
+
+=head2 28, cidrItemNotCidr
+
+The item to ban is not a CIDR range. Either wrong ref type or it is not an
+IPv4 or IPv6 address followed by a prefix length valid for its family.
+
+=head2 29, cidrNotSupported
+
+The backend does not support CIDR bans.
+
+=head2 30, listCidrFailed
+
+Failed to get a list of CIDR bans.
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@ package Fetch::Loop;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 use Exporter 'import';
 

@@ -58,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='3.007';
+$VERSION='3.008';
 
 
 #  Debug load
@@ -194,7 +194,7 @@ sub _init {
                 #  Wrap in label if needed
                 #
                 if ($label) {
-                    return $self->label(join('', grep {$_} @param, $label) . $self->input({type => $type{tag}, %attr}));
+                    return $self->label(join('', grep {$_} @param, $label) . $self->input({type => $type{$tag} || $tag, %attr}));
                 }
                 else {
                     return $self->input({type => $type{$tag} || $tag, %attr}, @param);
@@ -890,7 +890,7 @@ sub _radio_checkbox_group {
     #  Convert arrays of default values (i.e checked/enabled) and any disabled entries into hash - easier to check
     #
     my %attr_group;
-    foreach my $attr (qw(defaults checked disabled)) {
+    foreach my $attr (qw(default defaults checked disabled)) {
         map {$attr_group{$attr}{$_}=1} @{(ref($attr{$attr}) eq 'ARRAY') ? $attr{$attr} : [$attr{$attr}]}
             if $attr{$attr};
     }
@@ -1148,7 +1148,7 @@ sub popup_menu {
 
     #  Carefully handle options
     #
-    foreach my $attr (qw(default selected disabled)) {
+    foreach my $attr (qw(default defaults selected disabled)) {
 
         next unless exists $attr_select{$attr};
         my @values;

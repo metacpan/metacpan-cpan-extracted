@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.316';
+our $VERSION = '0.317';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -82,6 +82,13 @@ has release_branch => (
   isa     => 'Str',
   lazy    => 1,
   default => sub { $_[0]->payload->{release_branch} || 'main' },
+);
+
+has tag_format => (
+  is      => 'ro',
+  isa     => 'Str',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{tag_format} || '%v' },
 );
 
 has deprecated => (
@@ -633,7 +640,7 @@ sub configure {
   unless ($self->is_task || $self->manual_version) {
     $self->add_bundle('@Git::VersionManager' => {
       'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
-      'Git::Tag.tag_format' => '%v',
+      'Git::Tag.tag_format' => $self->tag_format,
       $self->no_changes ? ( 'NextRelease.format' => '' ) : (),
       @{ $self->commit_files_after_release } ? ( commit_files_after_release => $self->commit_files_after_release ) : (),
       @{ $self->version_finder } ? (
@@ -646,7 +653,7 @@ sub configure {
     ]);
   } else {
     $self->add_bundle('@Git' => {
-      tag_format => '%v',
+      tag_format => $self->tag_format,
       push_to    => [ qw(origin) ],
     });
   }
@@ -688,7 +695,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.316
+version 0.317
 
 =head1 SYNOPSIS
 
@@ -711,6 +718,7 @@ are default):
   authority = ; optional, overrides author
   deprecated = 0
   release_branch = main
+  tag_format = %v
   weaver_config = @Author::GETTY
   no_cpan = 0
   no_install = 0
@@ -839,6 +847,22 @@ Adds L<Dist::Zilla::Plugin::Deprecated> to the distribution.
 
 This variable is used to set the release_branch, only releases on this branch
 will be allowed. See L<Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch/release_branch>.
+
+=head2 tag_format
+
+Forwarded to L<@Git::VersionManager|Dist::Zilla::PluginBundle::Git::VersionManager>'s
+C<Git::Tag.tag_format> (or, for C<task>/C<manual_version> dists, to
+L<Dist::Zilla::Plugin::Git::Tag/tag_format> directly). Defaults to C<%v>, the bare
+C<$VERSION> string (e.g. C<0.317>) — I<not> a C<v>-prefixed SemVer tag.
+
+Override this when a release tag needs to satisfy another ecosystem's tooling, e.g. a
+Go module published from the same tag, which requires strict C<vMAJOR.MINOR.PATCH>:
+
+  [@Author::GETTY]
+  tag_format = v%v
+
+Note that C<%v> is still whatever C<$VERSION> is (Perl's own decimal versioning); this
+option only changes the tag's formatting, not the version scheme itself.
 
 =head2 weaver_config
 

@@ -36,7 +36,6 @@ Precious
 Role
 Rolsky
 Rolsky's
-Test
 Weaver
 WeaverConfig
 Zilla

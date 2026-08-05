@@ -91,6 +91,12 @@ int attach(Cavil::Matcher::Engine self, const char *filename)
   OUTPUT:
     RETVAL
 
+int verify(Cavil::Matcher::Engine self, const char *filename)
+  CODE:
+    RETVAL = matcher_verify(self, filename);
+  OUTPUT:
+    RETVAL
+
 void set_tombstones(Cavil::Matcher::Engine self, AV *ids)
   CODE:
     matcher_set_tombstones(self, ids);
@@ -150,5 +156,11 @@ int dump(Cavil::Matcher::Bag self, const char *filename)
 int load(Cavil::Matcher::Bag self, const char *filename)
   CODE:
     RETVAL = bag_load(self, filename);
+  OUTPUT:
+    RETVAL
+
+int verify(Cavil::Matcher::Bag self, const char *filename)
+  CODE:
+    RETVAL = bag_verify(self, filename);
   OUTPUT:
     RETVAL

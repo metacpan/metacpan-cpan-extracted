@@ -16,6 +16,7 @@
 
 #include "file_plugin.h"
 #include "file_raw_json.h"
+#include "frj_abi.h"       /* public C ABI table reached via _abi_ptr */
 
 #include <string.h>
 #include <stdlib.h>
@@ -479,6 +480,91 @@ jsonl_stream(pTHX_ FilePluginContext *ctx,
 static FilePlugin json_plugin;
 static FilePlugin jsonl_plugin;
 
+/* ============================================================
+ * Public C ABI (frj_abi.h)
+ *
+ * A versioned function-pointer table consumers reach through
+ * File::Raw::JSON::_abi_ptr: parse/serialise JSON entirely in C with
+ * no per-call Perl codec dispatch. The wrappers translate the stable
+ * frj_opts into json_options_t (seeded from json_options_defaults so
+ * new internal fields keep sane values) and reuse the same internal
+ * entry points as file_json_decode / file_json_encode.
+ * ============================================================ */
+
+static void frj_opts_to_internal(const frj_opts *in, json_options_t *o)
+{
+    json_options_defaults(o);
+    if (!in) return;
+    o->utf8          = in->utf8;
+    o->ordered       = in->ordered;
+    o->relaxed       = in->relaxed;
+    o->allow_nonref  = in->allow_nonref;
+    o->allow_nan_inf = in->allow_nan_inf;
+    o->pretty        = in->pretty;
+    o->sort_keys     = in->sort_keys;
+    o->canonical     = in->canonical;
+    if (in->max_depth > 0) o->max_depth = in->max_depth;   /* 0 => keep default */
+    if (in->indent    > 0) o->indent    = in->indent;      /* 0 => keep default */
+}
+
+static void frj_abi_opts_init(frj_opts *o)
+{
+    json_options_t d;
+    if (!o) return;
+    json_options_defaults(&d);
+    o->utf8          = d.utf8;
+    o->ordered       = d.ordered;
+    o->relaxed       = d.relaxed;
+    o->allow_nonref  = d.allow_nonref;
+    o->allow_nan_inf = d.allow_nan_inf;
+    o->max_depth     = d.max_depth;
+    o->pretty        = d.pretty;
+    o->indent        = d.indent;
+    o->sort_keys     = d.sort_keys;
+    o->canonical     = d.canonical;
+}
+
+static SV *frj_abi_decode(pTHX_ const char *bytes, STRLEN len, const frj_opts *in)
+{
+    json_options_t o;
+    frj_opts_to_internal(in, &o);
+    o.mode = JSON_MODE_DOCUMENT;
+    return json_decode_document(aTHX_ bytes, len, &o, get_boolean_stash(aTHX));
+}
+
+static AV *frj_abi_decode_lines(pTHX_ const char *bytes, STRLEN len, const frj_opts *in)
+{
+    json_options_t o;
+    frj_opts_to_internal(in, &o);
+    o.mode = JSON_MODE_LINES;
+    return json_decode_lines(aTHX_ bytes, len, &o, get_boolean_stash(aTHX));
+}
+
+static SV *frj_abi_encode(pTHX_ SV *value, const frj_opts *in)
+{
+    json_options_t o;
+    frj_opts_to_internal(in, &o);
+    o.mode = JSON_MODE_DOCUMENT;
+    return json_encode_document(aTHX_ value, &o);
+}
+
+static SV *frj_abi_encode_lines(pTHX_ SV *payload, const frj_opts *in)
+{
+    json_options_t o;
+    frj_opts_to_internal(in, &o);
+    o.mode = JSON_MODE_LINES;
+    return json_encode_lines(aTHX_ payload, &o);
+}
+
+static const frj_abi FRJ_ABI = {
+    FRJ_ABI_VERSION,
+    frj_abi_opts_init,
+    frj_abi_decode,
+    frj_abi_decode_lines,
+    frj_abi_encode,
+    frj_abi_encode_lines,
+};
+
 /* ============================================================ */
 
 MODULE = File::Raw::JSON    PACKAGE = File::Raw::JSON
@@ -589,6 +675,46 @@ CODE:
     }
 OUTPUT:
     RETVAL
+
+# Address of the C ABI table (frj_abi.h). A consumer XS module (e.g. Hyperman)
+# fetches this once at boot, INT2PTRs it to a `const frj_abi *`, and checks
+# ->abi_version == FRJ_ABI_VERSION before use. Not part of the public Perl API.
+IV
+_abi_ptr()
+    CODE:
+        RETVAL = PTR2IV(&FRJ_ABI);
+    OUTPUT:
+        RETVAL
+
+# Self-test: resolve the ABI table and round-trip a small document through the
+# function pointers entirely in C. Returns 1 on success, 0 on any mismatch.
+# Exercises the same path a real consumer takes, without a second dist.
+IV
+_abi_selftest()
+    CODE:
+    {
+        const frj_abi *A = &FRJ_ABI;
+        const char *src = "{\"a\":[1,true,null]}";
+        STRLEN slen = strlen(src);
+        frj_opts o;
+        SV *decoded, *encoded;
+        STRLEN elen;
+        const char *ep;
+        RETVAL = 0;
+        if (A->abi_version == FRJ_ABI_VERSION) {
+            A->opts_init(&o);
+            o.canonical = 1;
+            decoded = A->decode(aTHX_ src, slen, &o);
+            encoded = A->encode(aTHX_ decoded, &o);
+            ep = SvPV(encoded, elen);
+            if (elen == slen && memcmp(ep, src, slen) == 0)
+                RETVAL = 1;
+            SvREFCNT_dec(decoded);
+            SvREFCNT_dec(encoded);
+        }
+    }
+    OUTPUT:
+        RETVAL
 
 BOOT:
 {

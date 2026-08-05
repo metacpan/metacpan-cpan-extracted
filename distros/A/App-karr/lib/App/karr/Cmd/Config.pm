@@ -1,7 +1,7 @@
 # ABSTRACT: View or modify board configuration
 
 package App::karr::Cmd::Config;
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -18,6 +18,7 @@ my %WRITABLE = map { $_ => 1 } qw(
   board.name board.description
   defaults.status defaults.priority defaults.class
   claim_timeout
+  foundation.enabled foundation.reason
 );
 
 sub execute {
@@ -79,6 +80,8 @@ sub _display_keys {
   push @out, ['defaults.class',     $d->{defaults}{class}]    if $d->{defaults}{class};
   push @out, ['claim_timeout',      $d->{claim_timeout}];
   push @out, ['classes',            [map { $_->{name} } @{$d->{classes} // []}]];
+  push @out, ['foundation.enabled', App::karr::Config->from_merged($d)->foundation_enabled];
+  push @out, ['foundation.reason',  $d->{foundation}{reason}] if $d->{foundation}{reason};
   return @out;
 }
 
@@ -118,6 +121,10 @@ sub _set_key {
   } elsif ($key eq 'claim_timeout') {
     die "Invalid timeout format: $val (use e.g. 1h, 30m)\n"
       unless $val =~ /^\d+[hm]$/;
+  } elsif ($key eq 'foundation.enabled') {
+    # A bare "false" from the command line is true in Perl -- coerce here so the
+    # stored value is the same 1/0 `karr disable`/`karr enable` write.
+    $val = App::karr::Config->parse_bool($val);
   }
 
   # Set the value
@@ -169,7 +176,7 @@ App::karr::Cmd::Config - View or modify board configuration
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 
@@ -200,6 +207,13 @@ Default values applied by L<App::karr::Cmd::Create>.
 =item * C<claim_timeout>
 
 Claim expiry duration in C<Nh> or C<Nm> format.
+
+=item * C<foundation.enabled>, C<foundation.reason>
+
+Board-level switch for automated agent runs (L<App::karr::Foundation>) and the
+free-text reason recorded with it. C<foundation.enabled> takes a boolean word
+(C<true>/C<false>, C<yes>/C<no>, C<on>/C<off>, C<1>/C<0>) and is the same state
+L<App::karr::Cmd::Disable> and L<App::karr::Cmd::Enable> write.
 
 =back
 

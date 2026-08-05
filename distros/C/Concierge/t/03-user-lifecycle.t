@@ -142,4 +142,65 @@ subtest 'Guest to logged-in conversion' => sub {
     ok !exists $concierge->{user_keys}{$guest_key}, 'guest user_key removed from mapping';
 };
 
+subtest 'Guest to logged-in conversion for an already-known user' => sub {
+    # Register the account ahead of time, as if the user had signed up
+    # previously (e.g. on another device) before browsing as a guest here.
+    my $add_result = $concierge->add_user(
+        { user_id => 'returning_user', moniker => 'Returning', password => 'return123' }
+    );
+    ok $add_result->{success}, 'pre-existing account registered';
+
+    # Create guest with session data
+    my $guest_result = $concierge->checkin_guest();
+    my $guest = $guest_result->{user};
+    my $guest_key = $guest->user_key();
+
+    # Add cart data to guest session
+    $guest->update_session_data({ cart => ['item3'] });
+
+    # Convert guest to logged-in user using the *existing* user_id --
+    # login_guest should log in rather than attempt (and fail) registration.
+    my $convert_result = $concierge->login_guest(
+        { user_id => 'returning_user', moniker => 'Returning', password => 'return123' },
+        $guest_key
+    );
+
+    ok $convert_result->{success}, 'login_guest succeeds for known user'
+        or diag $convert_result->{message};
+    isa_ok $convert_result->{user}, ['Concierge::Desk::User'], 'returns User object';
+
+    my $user = $convert_result->{user};
+    is $user->user_id(), 'returning_user', 'logged in as correct existing user';
+    is $user->is_logged_in(), 1, 'user is logged in';
+
+    # Check if cart data transferred
+    my $session_data = $user->get_session_data();
+    is $session_data->{cart}, ['item3'], 'cart data transferred to existing user session';
+
+    # Verify guest session/key was deleted
+    ok !exists $concierge->{user_keys}{$guest_key}, 'guest user_key removed from mapping';
+};
+
+subtest 'Guest to logged-in conversion fails on inconsistent account state' => sub {
+    # Simulate a data inconsistency: user_id known to Auth but not to Users
+    # (e.g. a previous registration that partially failed).
+    my $enroll = $concierge->auth->enroll('ghost_user', 'ghostpass');
+    ok $enroll->{success}, 'ghost_user enrolled in Auth only';
+
+    my $guest_result = $concierge->checkin_guest();
+    my $guest = $guest_result->{user};
+    my $guest_key = $guest->user_key();
+
+    my $convert_result = $concierge->login_guest(
+        { user_id => 'ghost_user', moniker => 'Ghost', password => 'ghostpass' },
+        $guest_key
+    );
+
+    ok !$convert_result->{success}, 'login_guest fails for inconsistent account state';
+    like $convert_result->{message}, qr/inconsistent state/, 'failure message explains inconsistency';
+
+    # Guest mapping should be untouched since conversion never proceeded
+    ok exists $concierge->{user_keys}{$guest_key}, 'guest user_key mapping untouched';
+};
+
 done_testing;

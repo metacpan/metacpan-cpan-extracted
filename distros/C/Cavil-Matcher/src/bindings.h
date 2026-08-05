@@ -35,6 +35,7 @@ AV*      matcher_find_matches(Matcher* m, const char* filename);
 int      matcher_dump(Matcher* m, const char* filename);
 int      matcher_load(Matcher* m, const char* filename);
 int      matcher_attach(Matcher* m, const char* filename);
+int      matcher_verify(Matcher* m, const char* filename);
 void     matcher_set_tombstones(Matcher* m, AV* ids);
 void     matcher_set_generation(Matcher* m, UV generation);
 UV       matcher_generation(Matcher* m);
@@ -46,5 +47,6 @@ void bag_set_patterns(Bag* b, HV* patterns);
 AV*  bag_best_for(Bag* b, const char* str, int count);
 int  bag_dump(Bag* b, const char* filename);
 int  bag_load(Bag* b, const char* filename);
+int  bag_verify(Bag* b, const char* filename);
 
 #endif

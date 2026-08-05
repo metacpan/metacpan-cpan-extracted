@@ -1,0 +1,88 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Petstore (security + CSRF example)", "version": "1.0.0" },
+  "security": [ { "session": [] } ],
+  "paths": {
+    "/login": {
+      "post": {
+        "operationId": "login",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [ "username" ],
+                "properties": { "username": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "logged in",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/pets": {
+      "get": {
+        "operationId": "listPets",
+        "responses": {
+          "200": {
+            "description": "the pets",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Pet" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createPet",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } }
+            }
+          }
+        }
+      }
+    },
+    "/pets/{petId}": {
+      "delete": {
+        "operationId": "deletePet",
+        "parameters": [
+          { "name": "petId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "204": { "description": "deleted" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "session": { "type": "apiKey", "in": "cookie", "name": "sid" }
+    },
+    "schemas": {
+      "Pet": {
+        "type": "object",
+        "required": [ "id", "name" ],
+        "properties": {
+          "id":   { "type": "integer" },
+          "name": { "type": "string" },
+          "tag":  { "type": "string" }
+        }
+      }
+    }
+  }
+}

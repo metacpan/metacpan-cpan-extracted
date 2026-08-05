@@ -112,12 +112,21 @@ in one step — so a reader never observes a half-written collection.
 ## The on-disk format
 
 Each segment file begins with a header identifying it, stating its format version, and carrying a checksum of
-everything that follows. When a segment is opened, all of this is verified, and every internal reference in the
-file is bounds-checked before it is ever used. A file that is truncated, corrupted, of the wrong version, or
+everything that follows. Opening a segment always validates its **structure** — the header fields, the size,
+and every internal reference — so a file that is truncated, of the wrong version, structurally impossible, or
 simply not a segment at all is rejected cleanly; it is never partially trusted and never able to send the
-scanner off the end of the data. The manifest additionally records a checksum for each segment, so a segment
-that has been damaged or swapped underneath a running system is detected and skipped rather than used. This
-validated, versioned format is the deliberate replacement for the old engine's headerless, unchecked file.
+scanner off the end of the data. This structural validation is cheap and always on, so memory safety never
+depends on the checksum.
+
+The whole-payload **checksum** is a separate, corruption-detection concern, and it is deliberately *not*
+recomputed on the hot scan path. A segment is Cavil's own derived cache: it is checksummed when compiled,
+published atomically (written to the side and renamed into place), and thereafter immutable and regenerable
+from the database. Re-checksumming a multi-hundred-megabyte payload on every one of the thousands of indexing
+opens — where the mmap already shares one physical copy — is almost the entire cost of a load (measured at
+~97%), and it guards against a corruption that atomic publishing already prevents. So the CRC is verified where
+it is meaningful: once when the segment is written, and on demand through the engine's `verify` entry point (an
+fsck for operators). The manifest additionally records a checksum for each segment for that on-demand check.
+This validated, versioned format is the deliberate replacement for the old engine's headerless, unchecked file.
 
 ## Robustness
 

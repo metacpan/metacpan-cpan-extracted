@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-Fondation
 
+0.06      2026-08-04 22:53:56+02:00 Europe/Paris
+    - See on which plugin the action is performed
+    - fallback format_date helper
+    - Migrate to Schema::Result::Base TO_JSON
+
 0.05      2026-07-13 14:12:33+02:00 Europe/Paris
     - add fondation.js with no-op JS fallbacks
     - scan dev_plugins_dir to add local plugins

@@ -1284,6 +1284,15 @@ t/data/02-textarea_label.dat.5
 t/data/02-textarea_label.dat.final       
 t/data/02-textarea_label.html            
 t/data/02-textarea_label.tree            
+t/data/02-textfield_label.dat.0          
+t/data/02-textfield_label.dat.1          
+t/data/02-textfield_label.dat.2          
+t/data/02-textfield_label.dat.3          
+t/data/02-textfield_label.dat.4          
+t/data/02-textfield_label.dat.5          
+t/data/02-textfield_label.dat.final      
+t/data/02-textfield_label.html           
+t/data/02-textfield_label.tree           
 t/data/02-title_blank.dat.0              
 t/data/02-title_blank.dat.1              
 t/data/02-title_blank.dat.2              
@@ -1451,6 +1460,7 @@ t/template_content.psp
 t/template.psp                           
 t/test_diff_helper.pm
 t/textarea_label.psp                     
+t/textfield_label.psp                    
 t/title_blank.psp                        
 t/title_default.psp                      
 t/title_normal.psp                       

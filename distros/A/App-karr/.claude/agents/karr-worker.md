@@ -1,7 +1,7 @@
 ---
 name: karr-worker
 description: "Default App::karr worker — implement, refactor, debug, and test code in this distribution. Pre-loaded with karr CLI, Perl conventions, and dist-zilla bundle skills."
-model: opus
+model: inherit
 allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:

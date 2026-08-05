@@ -10,8 +10,8 @@ use Getopt::Std;
 use IO::Uncompress::AnyUncompress qw($AnyUncompressError);
 use List::Util 1.33 qw(any none);
 use MARC::Batch;
-use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::File::USMARC;
+use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Leader;
 use MARC::Leader::Utils 0.02 qw(check_material_type  material_type);
 use Readonly;
@@ -20,7 +20,7 @@ use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
 Readonly::Array our @CONTROL_FIELDS => qw(001 003 005 006 007 008);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 $| = 1;
 
@@ -44,6 +44,7 @@ sub run {
 
 	# Process arguments.
 	$self->{'_opts'} = {
+		'e' => 0,
 		'h' => 0,
 		'i' => undef,
 		'n' => undef,
@@ -51,26 +52,38 @@ sub run {
 		'r' => 0,
 		'v' => 0,
 	};
-	if (! getopts('hin:o:rv', $self->{'_opts'})
+	if (! getopts('ehin:o:rv', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
-		|| @ARGV < 3) {
+		|| @ARGV < 2) {
 
 		$self->_usage;
 		return 1;
 	}
 	$self->{'_marc_file'} = shift @ARGV;
 	$self->{'_marc_field'} = shift @ARGV;
-	if ($self->{'_marc_field'} ne 'leader'
-		&& $self->{'_marc_field'} ne 'material_type'
-		&& none { $_ eq $self->{'_marc_field'} } @CONTROL_FIELDS) {
-
+	$self->{'_marc_subfield'} = undef;
+	$self->{'_marc_value'} = undef;
+	my $control_like = $self->{'_marc_field'} eq 'leader'
+		|| $self->{'_marc_field'} eq 'material_type'
+		|| any { $_ eq $self->{'_marc_field'} } @CONTROL_FIELDS;
+	if (! $control_like && (! $self->{'_opts'}->{'e'} || @ARGV)) {
 		$self->{'_marc_subfield'} = shift @ARGV;
 	}
-	$self->{'_marc_value'} = shift @ARGV;
-	if (! defined $self->{'_marc_value'}) {
-		$self->_usage;
-		return 1;
+	if ($self->{'_opts'}->{'e'}) {
+		if ($self->{'_opts'}->{'r'}
+			|| $self->{'_marc_field'} eq 'leader'
+			|| $self->{'_marc_field'} eq 'material_type'
+			|| @ARGV) {
+
+			$self->_usage;
+			return 1;
+		}
 	} else {
+		$self->{'_marc_value'} = shift @ARGV;
+		if (! defined $self->{'_marc_value'}) {
+			$self->_usage;
+			return 1;
+		}
 		$self->{'_marc_value'} = decode_utf8($self->{'_marc_value'});
 	}
 
@@ -158,37 +171,60 @@ sub run {
 		# Control fields.
 		} elsif (any { $self->{'_marc_field'} eq $_ } @CONTROL_FIELDS) {
 			my $control_field = $record->field($self->{'_marc_field'});
-			my $record_to_print = $self->_match($record, $control_field->as_string);
+			my $record_to_print;
+			if ($self->{'_opts'}->{'e'}) {
+				$record_to_print = $self->_match_exists($record,
+					defined $control_field);
+			} else {
+				$record_to_print = $self->_match($record,
+					defined $control_field ? $control_field->as_string : undef);
+			}
 			$self->_print($record_to_print);
 
 		# Other.
 		} else {
 			my @fields = $record->field($self->{'_marc_field'});
 			my $record_to_print;
-			foreach my $field (@fields) {
-				my @subfield_values = $field->subfield($self->{'_marc_subfield'});
-				if ($self->{'_opts'}->{'i'}) {
-					my $match = 1;
-					foreach my $subfield_value (@subfield_values) {
-						if (! $self->_match_inverse($record, $subfield_value)) {
-							$match = 0;
+			if ($self->{'_opts'}->{'e'}) {
+				if (defined $self->{'_marc_subfield'}) {
+					my $subfield_exists = 0;
+					foreach my $field (@fields) {
+						my @subfield_values = $field->subfield($self->{'_marc_subfield'});
+						if (@subfield_values) {
+							$subfield_exists = 1;
 							last;
 						}
 					}
-					if ($match) {
-						$self->{'_num_found'}++;
-						$record_to_print = $record;
-						last;
-					}
+					$record_to_print = $self->_match_exists($record, $subfield_exists);
 				} else {
-					foreach my $subfield_value (@subfield_values) {
-						$record_to_print = $self->_match($record, $subfield_value);
+					$record_to_print = $self->_match_exists($record, scalar @fields);
+				}
+			} else {
+				foreach my $field (@fields) {
+					my @subfield_values = $field->subfield($self->{'_marc_subfield'});
+					if ($self->{'_opts'}->{'i'}) {
+						my $match = 1;
+						foreach my $subfield_value (@subfield_values) {
+							if (! $self->_match_inverse($record, $subfield_value)) {
+								$match = 0;
+								last;
+							}
+						}
+						if ($match) {
+							$self->{'_num_found'}++;
+							$record_to_print = $record;
+							last;
+						}
+					} else {
+						foreach my $subfield_value (@subfield_values) {
+							$record_to_print = $self->_match($record, $subfield_value);
+							if (defined $record_to_print) {
+								last;
+							}
+						}
 						if (defined $record_to_print) {
 							last;
 						}
-					}
-					if (defined $record_to_print) {
-						last;
 					}
 				}
 			}
@@ -241,6 +277,24 @@ sub _match {
 				$self->{'_num_found'}++;
 				return $record;
 			}
+		}
+	}
+
+	return;
+}
+
+sub _match_exists {
+	my ($self, $record, $exists) = @_;
+
+	if ($self->{'_opts'}->{'i'}) {
+		if (! $exists) {
+			$self->{'_num_found'}++;
+			return $record;
+		}
+	} else {
+		if ($exists) {
+			$self->{'_num_found'}++;
+			return $record;
 		}
 	}
 
@@ -308,7 +362,8 @@ sub _print {
 sub _usage {
 	my $self = shift;
 
-	print STDERR "Usage: $0 [-h] [-i] [-n num] [-o format] [-r] [-v] [--version] marc_file search_item [sub_search_item] value\n";
+	print STDERR "Usage: $0 [-e] [-h] [-i] [-n num] [-o format] [-r] [-v] [--version] marc_file search_item [sub_search_item] [value]\n";
+	print STDERR "\t-e\t\tMatch field/subfield existence.\n";
 	print STDERR "\t-h\t\tPrint help.\n";
 	print STDERR "\t-i\t\tInvert searching.\n";
 	print STDERR "\t-n num\t\tNumber of records to output (default value is all records).\n";
@@ -316,10 +371,10 @@ sub _usage {
 	print STDERR "\t-r\t\tUse value as Perl regexp.\n";
 	print STDERR "\t-v\t\tVerbose mode.\n";
 	print STDERR "\t--version\tPrint version.\n";
-	print STDERR "\tmarc_file\tMARC XML or USMARC file.\n";
+	print STDERR "\tmarc_file\tMARC XML or USMARC file, could be compressed.\n";
 	print STDERR "\tsearch_item\tSearch item.\n";
-	print STDERR "\tsub_search_item\tSearch sub item (required in case of MARC field).\n";
-	print STDERR "\tvalue\t\tValue to filter.\n";
+	print STDERR "\tsub_search_item\tSearch sub item (optional in case of MARC field).\n";
+	print STDERR "\tvalue\t\tValue to filter (required without -e).\n";
 
 	return;
 }
@@ -335,7 +390,7 @@ __END__
 
 =head1 NAME
 
-App::MARC::Filter - Base class for marc-count script.
+App::MARC::Filter - Base class for L<marc-filter> script.
 
 =head1 SYNOPSIS
 
@@ -371,7 +426,9 @@ Returns 1 for error, 0 for success.
  run():
          Output format '%s' doesn't supported.
 
-=head1 EXAMPLE
+=head1 EXAMPLES
+
+=head2 EXAMPLE
 
 =for comment filename=filter_by_field015a.pl
 
@@ -631,7 +688,10 @@ L<Getopt::Std>,
 L<IO::Uncompress::AnyUncompress>,
 L<List::Util>,
 L<MARC::Batch>,
+L<MARC::File::USMARC>,
 L<MARC::File::XML>,
+L<MARC::Leader>,
+L<MARC::Leader::Utils>,
 L<Readonly>,
 L<Unicode::UTF8>.
 
@@ -651,8 +711,15 @@ L<http://skim.cz>
 
 BSD 2-Clause License
 
+=head1 ACKNOWLEDGEMENTS
+
+Development of this software has been made possible by institutional support
+for the long-term strategic development of the National Library of the Czech
+Republic as a research organization provided by the Ministry of Culture of
+the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
+
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

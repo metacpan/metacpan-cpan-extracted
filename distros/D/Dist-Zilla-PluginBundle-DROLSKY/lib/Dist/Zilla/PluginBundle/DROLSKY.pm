@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -30,7 +30,6 @@ use Dist::Zilla::Plugin::DROLSKY::License;
 use Dist::Zilla::Plugin::DROLSKY::MakeMaker;
 use Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles;
 use Dist::Zilla::Plugin::DROLSKY::Precious;
-use Dist::Zilla::Plugin::DROLSKY::Test::Precious;
 use Dist::Zilla::Plugin::DROLSKY::WeaverConfig;
 use Dist::Zilla::Plugin::EnsureChangesHasContent 0.02;
 use Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.013;
@@ -588,7 +587,6 @@ sub _prompt_if_stale_plugin {
                         Dist::Zilla::Plugin::DROLSKY::MakeMaker
                         Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
                         Dist::Zilla::Plugin::DROLSKY::Precious
-                        Dist::Zilla::Plugin::DROLSKY::Test::Precious
                         Dist::Zilla::Plugin::DROLSKY::WeaverConfig
                         Pod::Weaver::PluginBundle::DROLSKY
                     )
@@ -683,8 +681,7 @@ sub _extra_test_plugins {
         [ 'Test::Version'       => { is_strict      => 1 } ],
     );
 
-    push @plugins,
-        -f 'tidyall.ini' ? 'Test::TidyAll' : 'DROLSKY::Test::Precious';
+    push @plugins, 'Test::TidyAll' if -f 'tidyall.ini';
 
     return @plugins;
 }
@@ -865,7 +862,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -1021,7 +1018,6 @@ This is more or less equivalent to the following F<dist.ini>:
     skip = Dist::Zilla::Plugin::DROLSKY::MakeMaker
     skip = Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
     skip = Dist::Zilla::Plugin::DROLSKY::Precious
-    skip = Dist::Zilla::Plugin::DROLSKY::Test::Precious
     skip = Dist::Zilla::Plugin::DROLSKY::WeaverConfig
     skip = Pod::Weaver::PluginBundle::DROLSKY
 
@@ -1039,7 +1035,6 @@ This is more or less equivalent to the following F<dist.ini>:
 
     [PodSyntaxTests]
 
-    [DROLSKY::Test::Precious]
     [MojibakeTests]
     [Test::CleanNamespaces]
     [Test::CPAN::Changes]
@@ -1193,7 +1188,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2025 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2026 by Dave Rolsky.
 
 This is free software, licensed under:
 

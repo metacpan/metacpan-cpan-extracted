@@ -24,7 +24,12 @@ public:
   void             set_patterns(const std::vector<std::pair<uint64_t, std::string>>& patterns);
   std::vector<Hit> best_for(const std::string& snippet, unsigned int count) const;
   bool             dump(const std::string& path) const;
-  bool             load(const std::string& path);
+  // verify_crc controls only the whole-payload CRC32. It defaults to true; the load path (bag_load)
+  // passes false. Parsing the records already bounds-checks every read and rejects a malformed file, so
+  // skipping the CRC on load costs no safety - only per-load detection of on-disk bit-rot, which the
+  // publish-time check and verify() cover. The bag is Cavil's own immutable, atomically-published cache.
+  bool             load(const std::string& path, bool verify_crc = true);
+  bool             verify(const std::string& path) const;    // full CRC + parse check of a bag file
 
 private:
   struct TfIdf {

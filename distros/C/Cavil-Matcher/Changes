@@ -1,5 +1,20 @@
 Revision history for Cavil::Matcher
 
+1.01   2026-08-04
+        - Big indexing speedup: the scan path (load/attach) no longer re-checksums a segment's whole
+          payload on every open. A compiled segment is an immutable, atomically-published cache that is
+          already CRC-checked when written, so re-CRCing hundreds of megabytes in every forked index job
+          was almost the entire cost of a load (~97% in a 160 MB corpus: ~293ms -> ~8ms). Structural
+          validation still always runs, so bad segments are rejected and scanning stays memory-safe;
+          only per-scan detection of on-disk bit-rot is dropped.
+        - CRC is now verified where it is meaningful: once at publish (dump() fully verifies before the
+          atomic rename) and on demand via the new Engine verify($file) method (an fsck for a cache dir).
+        - Same treatment for the closest-match "bag of patterns" cache (Bag::load, used by analyze): the
+          load path trusts the payload CRC (the record parse still bounds-checks every read), with a new
+          Bag verify($file) method and a publish-time check.
+        - No on-disk format change: existing segments load as-is, no reindex, and old/new engines
+          interoperate on the same files (in-place upgrade is seamless).
+
 1.00   2026-07-22
         - Initial release: the next-generation license pattern matcher for Cavil.
         - Segmented, incrementally-updatable index: adding or removing a pattern no longer

@@ -758,7 +758,7 @@ Revision history for StreamFinder
         Also allow the -format-fallback option to be set to "" or 0 to allow 
         fallback to any available format (no -f option appended to yt-dlp or 
         youtube-dl) - unless -formatonly option is set.
-2.50    2016/01/29
+2.50    2026/01/29
         - Add StreamFinder::PragerU to handle www.prageru.com videos.
         - StreamFinder::Subsplash - Refactor to optionally use yt-dlp to fetch 
         video streams (-youtube => {yes|no|first|last|ifneeded}) similar to 
@@ -774,7 +774,7 @@ Revision history for StreamFinder
         - StreamFinder::Youtube - Prevent sometimes non-URLs being returned as 
         valid streams causing failure to fallback to StreamFinder::Anystream 
         when no valid streams found.
-2.51    2016/01/31
+2.51    2026/01/31
         - StreamFinder::EpochTV - Fix returning mostly invalid stream URLs.
         Also add "-speakericon" (boolean) to return artist's icon instead of 
         the default channel icon (EpochTV offers separate ones, like 
@@ -784,7 +784,7 @@ Revision history for StreamFinder
         "yes" as yt-dlp is now required to fetch Bitchute streams.  Also 
         clean up code & docs a bit.
         StreamFinder::(Anystream,Subsplash) - Touch up docs a bit.
-2.60    2016/02/07
+2.60    2026/02/07
         - Did a quick test of all StreamFinder modules to see if they still 
         work (many I haven't used in ages, and sites change!).  Results below:
         - StreamFinder::BrandNewTube - Refactor to work again after 
@@ -849,3 +849,6 @@ Revision history for StreamFinder
         ffmpeg (libavmormat) from recognizing them as valid video streams.
         - StreamFinder::Youtube - Better handle more embedded Youtube and 
         Rumble videos found in non-Youtube pages.
+2.64    2026/08/04
+        - StreamFinder::Rumble - Fix uninitialized variable issue & improve 
+        debug output.

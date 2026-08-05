@@ -1,7 +1,7 @@
 # ABSTRACT: Ref-backed board storage for karr
 
 package App::karr::BoardStore;
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moo;
 use Path::Tiny qw( path );
 use YAML::XS qw( DumpFile LoadFile );
@@ -53,6 +53,34 @@ sub status_requires_claim {
 sub is_terminal_status {
     my ($self, $status_name) = @_;
     return App::karr::Config->is_terminal_status($status_name);
+}
+
+
+sub foundation_enabled {
+    my ($self) = @_;
+    return App::karr::Config->from_merged( $self->effective_config )
+        ->foundation_enabled;
+}
+
+
+sub foundation_reason {
+    my ($self) = @_;
+    return App::karr::Config->from_merged( $self->effective_config )
+        ->foundation_reason;
+}
+
+
+sub set_foundation_enabled {
+    my ( $self, $enabled, $reason ) = @_;
+    my $effective = $self->effective_config;
+    $effective->{foundation} = {} unless ref $effective->{foundation} eq 'HASH';
+    $effective->{foundation}{enabled} = $enabled ? 1 : 0;
+    if ( defined $reason && length $reason ) {
+        $effective->{foundation}{reason} = $reason;
+    } else {
+        delete $effective->{foundation}{reason};
+    }
+    return $self->save_config($effective);
 }
 
 
@@ -301,7 +329,7 @@ App::karr::BoardStore - Ref-backed board storage for karr
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 
@@ -343,6 +371,32 @@ Returns true if the status is terminal (done or archived).
     unless ($store->is_terminal_status($task->status)) {
         # task is still active
     }
+
+=head2 foundation_enabled
+
+Returns true when automated agent runs are allowed on this board
+(C<foundation.enabled> in C<refs/karr/config>; boards default to enabled).
+
+    unless ($store->foundation_enabled) {
+        # karr-foundation skips this board entirely
+    }
+
+=head2 foundation_reason
+
+Returns the reason recorded with the disable flag, or undef when none was
+given.
+
+    my $why = $store->foundation_reason;
+
+=head2 set_foundation_enabled
+
+Writes the board-level agent switch and its optional reason back into
+C<refs/karr/config>. Re-enabling drops the reason, and because C<enabled> then
+matches the code default the whole C<foundation> key disappears from the sparse
+overrides again.
+
+    $store->set_foundation_enabled( 0, 'abandoned driver' );
+    $store->set_foundation_enabled( 1 );
 
 =head1 SUPPORT
 

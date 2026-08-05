@@ -79,6 +79,20 @@ static char *ft_authority(const char *host, int port, int tls) {
     }
 }
 
+/* Same origin = same scheme, host (case-insensitive) and effective port.
+ * Used to decide whether a redirect may carry credential headers along. */
+static int ft_same_origin(const char *a, const char *b) {
+    ft_url ua, ub;
+    int pa = ft_parse_url(a, &ua), pb = ft_parse_url(b, &ub);
+    int same = pa && pb
+            && strcmp(ua.scheme, ub.scheme) == 0
+            && strcasecmp(ua.host, ub.host) == 0
+            && ua.port == ub.port;
+    ft_url_free(&ua);   /* memset-zeroed on parse failure, so free is safe */
+    ft_url_free(&ub);
+    return same;
+}
+
 /* ---- redirect helpers --------------------------------------------------- */
 
 /* 307/308 keep method+body; 303 or POST become GET without a body; otherwise
@@ -331,6 +345,31 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
         SV **oh = hv_fetchs(opt, "headers", 0);
         if (oh && *oh) ft_hdr_merge(aTHX_ hav, *oh);
     }
+    /* Redirect crossing origin: drop credential-bearing headers so a token or
+     * explicit cookie set for the original host is never sent to another one
+     * (jar cookies are re-scoped to u.host below, so they stay safe).
+     * _redirect_from carries the previous hop's URL; absent on the first hop. */
+    if (opt) {
+        SV **rf = hv_fetchs(opt, "_redirect_from", 0);
+        if (rf && *rf && SvOK(*rf)
+            && !ft_same_origin(SvPV_nolen(*rf), url)) {
+            AV *keep = newAV();
+            SSize_t hn = av_len(hav) + 1, j;
+            sv_2mortal((SV *)keep);
+            for (j = 0; j + 1 < hn; j += 2) {
+                SV **k = av_fetch(hav, j, 0);
+                SV **v = av_fetch(hav, j + 1, 0);
+                STRLEN kl; const char *ks = (k && *k) ? SvPV_const(*k, kl) : (kl = 0, "");
+                if ((kl == 13 && strncasecmp(ks, "Authorization", 13) == 0)
+                 || (kl ==  6 && strncasecmp(ks, "Cookie", 6) == 0)
+                 || (kl == 19 && strncasecmp(ks, "Proxy-Authorization", 19) == 0))
+                    continue;                    /* strip on the cross-origin hop */
+                av_push(keep, k && *k ? newSVsv(*k) : newSV(0));
+                av_push(keep, v && *v ? newSVsv(*v) : newSV(0));
+            }
+            hav = keep;
+        }
+    }
     if (!ft_hdr_exists(aTHX_ hav, "User-Agent", 10)) {
         av_push(hav, newSVpvs("User-Agent"));
         av_push(hav, newSVsv(ua->agent));
@@ -521,6 +560,9 @@ XS_INTERNAL(ft_redirect_cb) {
                 }
             }
             if (drop_body) (void)hv_delete(o2, "body", 4, G_DISCARD);
+            /* record the origin we are leaving so ft_request_once can strip
+             * credential headers if this hop crosses to a different origin */
+            (void)hv_store(o2, "_redirect_from", 14, newSVpv(url, 0), 0);
 
             child = ft_follow(aTHX_ self_sv, ft_ua_of(aTHX_ self_sv),
                               m2, SvPV_nolen(u2), o2, left - 1);

@@ -1,9 +1,9 @@
 package Mojolicious::Plugin::Fondation::Manager;
-$Mojolicious::Plugin::Fondation::Manager::VERSION = '0.05';
+$Mojolicious::Plugin::Fondation::Manager::VERSION = '0.06';
 # ABSTRACT: Plugin registry, post-load actions, and finalyze initialization
 
 use Mojo::Base -base, -signatures;
-use Mojolicious::Plugin::Fondation::Utils qw(find_share_dir share_relative);
+use Mojolicious::Plugin::Fondation::Utils qw(find_share_dir share_relative short_name);
 
 has 'app';
 has 'config';
@@ -111,7 +111,8 @@ sub _run_post_load_actions_for ($self, $long, $conf = {}) {
         };
 
         my ($action_short) = $action_class =~ /::Action::(.+)$/;
-        my $action_log = $self->app->log->context("[$action_short >]");
+        my $shotname = short_name($long);
+        my $action_log = $self->app->log->context("[$shotname > $action_short]");
 
         my $action = $action_class->new(
             manager => $self,
@@ -214,7 +215,7 @@ Mojolicious::Plugin::Fondation::Manager - Plugin registry, post-load actions, an
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

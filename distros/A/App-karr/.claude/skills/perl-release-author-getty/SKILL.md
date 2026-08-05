@@ -37,6 +37,7 @@ copyright_holder = Copyright Owner
 - `task = 1` - TaskWeaver + AutoVersion
 - `manual_version = x.x` - Manual version
 - `major_version = 2` - Major version for AutoVersion
+- `version_finder = :MainModule` - restrict `$VERSION` rewrites/bumps to the main module only (see "Version lives ONLY in the main module" below). Multi-value; forwarded to RewriteVersion::Transitional + BumpVersionAfterRelease (default path) and PkgVersion (task/manual_version path).
 
 ### Support
 - `irc = #channel` - IRC channel
@@ -118,6 +119,40 @@ After `dzil release` runs:
 **Do NOT treat the version in dist.ini as the released version.** If the user asks "what version is released?", check CPAN or git tags — not the current `$VERSION` in the files.
 
 **Do NOT bump the version manually before a release** — `dzil release` handles this automatically.
+
+### Version lives ONLY in the main module (current convention)
+
+New `[@Author::GETTY]` distributions keep `our $VERSION = '...'` in **the main module only**
+(`lib/Foo.pm`). Sibling `.pm` files carry **no** `$VERSION` line.
+
+Set it up with:
+
+```ini
+[@Author::GETTY]
+version_finder = :MainModule
+```
+
+How it works:
+- The default release path uses `[@Git::VersionManager]` (RewriteVersion::Transitional +
+  BumpVersionAfterRelease) — NOT `[PkgVersion]`. `version_finder = :MainModule` scopes the
+  rewrite/bump to the main module, so sibling files are never touched.
+- `[MetaProvides::Package] inherit_version=1, inherit_missing=1` (always in the bundle) fills
+  `META.json` `provides` with the dist version for **every** package, so PAUSE/CPAN indexing
+  stays correct even though the sibling `.pm` files have no `$VERSION` at runtime.
+
+Rules:
+- **Do NOT add `our $VERSION` to new sibling modules.** Only the main module gets it.
+- The main module's `$VERSION` is still the next-release version (bumped post-release as above).
+
+Verify before release:
+```bash
+grep -rl 'our $VERSION' lib      # must list ONLY the main module
+dzil build && perl -MJSON::PP -0777 -e '...'   # META provides → every package at dist version
+```
+
+Legacy distributions (and older ones in the workspace) still carry `our $VERSION` in every
+`.pm`; that also works (RewriteVersion::Transitional rewrites them all) but is no longer the
+preferred style for new dists.
 
 ## Release Workflow
 

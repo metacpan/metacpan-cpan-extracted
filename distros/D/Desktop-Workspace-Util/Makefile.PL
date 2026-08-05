@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Desktop::Workspace::Util",
   "PREREQ_PM" => {
     "Desktop::KDEActivity::Util" => "0.002",
+    "Desktop::Open" => "0.004",
     "Desktop::XWindowManager::Util" => 0,
     "Exporter" => "5.57",
     "IPC::System::Options" => "0.339",
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Desktop::KDEActivity::Util" => "0.002",
+  "Desktop::Open" => "0.004",
   "Desktop::XWindowManager::Util" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,

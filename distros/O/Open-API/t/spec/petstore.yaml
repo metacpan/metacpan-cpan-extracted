@@ -1,0 +1,106 @@
+components:
+  schemas:
+    NewPet:
+      properties:
+        name:
+          minLength: 1
+          type: string
+        tag:
+          type: string
+      required:
+      - name
+      type: object
+    Pet:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        tag:
+          type: string
+      required:
+      - id
+      - name
+      type: object
+info:
+  title: Petstore
+  version: 1.0.0
+openapi: 3.1.0
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          default: 10
+          maximum: 100
+          minimum: 1
+          type: integer
+      - in: query
+        name: tags
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Pet"
+                type: array
+          description: pets
+    post:
+      operationId: createPet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewPet"
+          text/plain: {}
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+          description: created
+  /pets/{petId}:
+    delete:
+      operationId: deletePet
+      parameters:
+      - in: cookie
+        name: session
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: deleted
+    get:
+      operationId: getPet
+      parameters:
+      - in: header
+        name: X-Request-Id
+        schema:
+          minLength: 4
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+          description: one pet
+        "404":
+          description: no such pet
+    parameters:
+    - in: path
+      name: petId
+      required: true
+      schema:
+        type: integer

@@ -1,5 +1,27 @@
 Revision history for JSON-Schema-Fast
 
+0.05    2026-08-04
+        - Consume Fetch's and File::Raw::JSON's C ABIs through ExtUtils::Depends
+        - Also an ExtUtils::Depends provider now
+        - JSON schema text (and fetched remote documents) are now decoded via
+          File::Raw::JSON's C ABI (frj_abi.h) rather than a per-call Perl call
+          to file_json_decode.
+
+0.04	2026-08-04
+	Become 100% conformance with json schema 2020-12 
+	- Full URI reference model: $id opens base-URI scopes, $anchor registers
+	  named locations, and $ref resolves against the base URI 
+	- Remote / cross-document $ref: compile(..., resolver => sub { $uri -> $doc })
+	  lazily fetches and parses referenced documents into the same arena.
+	- unevaluatedProperties / unevaluatedItems: a per-schema evaluated set
+	  annotation, collected from a schema's keywords and its in place applicators
+	- $dynamicRef / $dynamicAnchor
+	- $vocabulary / $schema
+	- Default remote resolution: a $ref/$dynamicRef to an http(s) document with
+	  no resolver is fetched through Fetch's C ABI 
+	- Provide a C ABI (include/jsf_abi.h) so other XS modules - e.g. an OpenAPI
+	  layer - can compile a schema once and validate per request entirely in C
+
 0.02	2026-08-03
 	Propagate defaults into callers params when apply_defaults is true as it's more usefull.
 

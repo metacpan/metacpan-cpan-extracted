@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::Fondation::Helpers;
 # ABSTRACT: All Fondation helpers in one place -- keeps Fondation.pm minimal
-$Mojolicious::Plugin::Fondation::Helpers::VERSION = '0.05';
+$Mojolicious::Plugin::Fondation::Helpers::VERSION = '0.06';
 use Mojo::Base -base, -signatures;
 use Mojo::ByteStream 'b';
 
@@ -21,6 +21,13 @@ sub register ($class, $app, $manager) {
 
     # Overridden by I18N-like plugins
     $app->helper(l => sub { $_[1] });
+
+    # Overridden by I18N — returns ISO date string when I18N absent
+    $app->helper(format_date => sub ($c, $val) {
+        return '' unless $val;
+        return $val->strftime('%Y-%m-%d %H:%M') if ref $val;
+        return $val;
+    });
 
     # Fallback i18n_js -- injected by layout before app JS.
     # Identity function when I18N absent; overridden by I18N-like plugins.
@@ -139,7 +146,7 @@ Mojolicious::Plugin::Fondation::Helpers - All Fondation helpers in one place -- 
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

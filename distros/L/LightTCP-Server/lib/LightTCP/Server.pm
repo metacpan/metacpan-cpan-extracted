@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 package LightTCP::Server;
 
 use strict;
@@ -6,11 +7,16 @@ use warnings;
 use Carp qw(croak);
 use IO::Socket::INET;
 use IPC::Open3;
-use threads;
-use threads::shared;
 use File::Temp;
 
-our $VERSION = '2.04';
+# Make threads support optional
+our $HAS_THREADS = eval { 
+    require threads; 
+    require threads::shared; 
+    1; 
+} || 0;
+
+our $VERSION = '2.05';
 
 use constant {
     DEFAULT_ADDR        => '0.0.0.0:8881',
@@ -36,7 +42,6 @@ sub new {
     if (@args == 1 && ref $args[0] eq 'HASH') {
         @args = %{$args[0]};
     }
-
     $self->{server_addr} = DEFAULT_ADDR;
     $self->{server_name} = DEFAULT_NAME;
     $self->{server_type} = DEFAULT_TYPE;
@@ -505,7 +510,11 @@ sub start {
 
     my $server = $self->_create_server();
     return 0 unless defined $server;
-
+    if ($self->{server_type} eq 'thread' && !$HAS_THREADS) {
+        warn "Threads not available in this Perl. Falling back to fork mode.\n"
+            if $self->{verbose};
+        $self->{server_type} = 'fork';   # or 'single'
+    }
     $self->_set_runas();
 
     $self->_serverloop(1);
@@ -1578,6 +1587,16 @@ sub _send_rate_limit_response {
 
 LightTCP::Server - A configurable TCP/HTTP server with file uploads, rate limiting, and threading support (Pure Perl OOP)
 
+=head1 VERSION
+
+Version 2.05
+
+=head1 LICENSE
+
+This module is free software.
+
+You may redistribute it and/or modify it under the same terms as Perl itself.
+
 =head1 SYNOPSIS
 
     use LightTCP::Server;
@@ -2009,24 +2028,3 @@ See L<examples/demo.pl> for a complete demonstration server.
 
 =back
 
-=head1 AUTHOR
-
-Hans Harder E<lt>hans.harder@atbas.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2026 by Hans Harder.
-
-This module is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=head1 LICENSE
-
-This module is free software. You may redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=head1 VERSION
-
-Version 2.04
-
-=cut

@@ -51,6 +51,7 @@ public:
 
   // Segmented surface used by the Perl manifest layer.
   bool attach(const std::string& path);                       // add one mmapped segment to the active set
+  bool verify(const std::string& path) const;                 // full CRC+structure check of a segment file
   void set_tombstones(const std::vector<uint32_t>& ids);      // pattern ids to drop before resolution
   void     set_generation(uint64_t g) { _generation = g; }
   uint64_t generation() const { return _generation; }    // the generation this engine was pinned to

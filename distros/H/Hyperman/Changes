@@ -1,5 +1,36 @@
 Revision history for Hyperman
 
+0.09    2026-08-04
+        - Chunked request bodies (Transfer-Encoding: chunked) are now decoded
+          (HTTP/1). The decoded body is presented as psgi.input with a matching
+          CONTENT_LENGTH; chunk extensions and trailers are accepted.
+        - Security: harden HTTP/1 request framing against request smuggling
+          (RFC 7230 3.3.3). Transfer-Encoding together with Content-Length, a
+          repeated Transfer-Encoding, or a duplicate/malformed Content-Length
+          (a sign, whitespace, trailing junk, or overflow) is rejected 400; an
+          unsupported transfer coding is 501. All close the connection so no
+          chunk data can be mis-framed as a following pipelined request.
+          t/21-smuggling.t.
+        - Security: the built-in redirect_https listener now truncates the
+          reflected Host and request-target at the first control/space byte, so
+          a bare LF in the Host header cannot inject or split the 301 response.
+          Fuzz harness for the request parser under ASan/UBSan in tools/fuzz/.
+        - Robustness: allocation helpers hm_xmalloc/hm_xcalloc/hm_xrealloc that
+          croak on OOM, so no hot-path allocation dereferences a NULL result.
+          tools/cppcheck.sh runs a static-analysis scan (clean).
+        - PSGI env: add REMOTE_HOST (the peer address, like REMOTE_ADDR),
+          REMOTE_PORT (the peer's port, captured at accept), and
+          psgix.input.buffered => 1 (psgi.input is a seekable in-memory :scalar
+          handle). Set for both HTTP/1 and HTTP/2.
+        - Multiple listeners in one run(). Pass listen => [ {..}, .. ] to bind
+          several listeners, each independently plain or TLS - the driving case
+          being plain :80 beside HTTPS :443 - or port => [80, 8080] as sugar for
+          several plain listeners sharing the top-level options. SERVER_PORT and
+          psgi.url_scheme reflect the listener each request arrived on.
+        - Built-in https redirect. A listener with redirect_https => $port
+          answers every request with a 301 to the same host and target on that
+          https port.
+
 0.07    2026-08-03
         - Build on OpenSSL older than 1.0.2. ALPN (SSL_CTX_set_alpn_select_cb),
           used to offer HTTP/2 over TLS, is absent before 1.0.2, so the module

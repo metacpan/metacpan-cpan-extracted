@@ -50,13 +50,18 @@ static const char HM_H2_PREFACE[24] =
 
 static void hm_h2_env_init(pTHX_ hm_h2_sess *s, HV *env) {
     hm_loop *loop = s->conn->loop;
+    hm_listener *lst = s->conn->lst;
     AV *ver = newAV();
     av_push(ver, newSViv(1)); av_push(ver, newSViv(1));
     hv_stores(env, "SCRIPT_NAME",       newSVpvs(""));
     hv_stores(env, "SERVER_PROTOCOL",   newSVpvs("HTTP/2"));
-    hv_stores(env, "SERVER_NAME",       newSVpv(loop->host ? loop->host : "0.0.0.0", 0));
-    hv_stores(env, "SERVER_PORT",       newSViv(loop->port));
-    if (s->conn->peer[0]) hv_stores(env, "REMOTE_ADDR", newSVpv(s->conn->peer, 0));
+    hv_stores(env, "SERVER_NAME",       newSVpv(lst && lst->host ? lst->host : "0.0.0.0", 0));
+    hv_stores(env, "SERVER_PORT",       newSViv(lst ? lst->port : 0));
+    if (s->conn->peer[0]) {
+        hv_stores(env, "REMOTE_ADDR", newSVpv(s->conn->peer, 0));
+        hv_stores(env, "REMOTE_HOST", newSVpv(s->conn->peer, 0));
+    }
+    if (s->conn->peer_port) hv_stores(env, "REMOTE_PORT", newSViv(s->conn->peer_port));
     hv_stores(env, "QUERY_STRING",      newSVpvs(""));
     hv_stores(env, "psgi.version",      newRV_noinc((SV *)ver));
     hv_stores(env, "psgi.url_scheme",   newSVpv(s->conn->ssl ? "https" : "http", 0));
@@ -166,8 +171,8 @@ static void hm_h2_submit_response(pTHX_ hm_h2_sess *s, hm_h2_stream *st,
                                   int status, AV *hav) {
     SSize_t hn = hav ? av_len(hav) + 1 : 0;
     size_t maxnv = 1 + (size_t)(hn / 2);
-    nghttp2_nv *nva = (nghttp2_nv *)malloc(maxnv * sizeof(nghttp2_nv));
-    char **freelist = (char **)malloc(maxnv * sizeof(char *));
+    nghttp2_nv *nva = (nghttp2_nv *)hm_xmalloc(maxnv * sizeof(nghttp2_nv));
+    char **freelist = (char **)hm_xmalloc(maxnv * sizeof(char *));
     size_t nfree = 0, n = 0;
     char sbuf[8];
     int sl;
@@ -186,7 +191,7 @@ static void hm_h2_submit_response(pTHX_ hm_h2_sess *s, hm_h2_stream *st,
         char *lname; STRLEN j;
         if (!k || !v) continue;
         ks = SvPV(*k, kl); vs = SvPV(*v, vl);
-        lname = (char *)malloc(kl ? kl : 1);
+        lname = (char *)hm_xmalloc(kl ? kl : 1);
         for (j = 0; j < kl; j++) {
             unsigned char ch = (unsigned char)ks[j];
             lname[j] = (ch >= 'A' && ch <= 'Z') ? (char)(ch + 32) : (char)ch;
@@ -434,6 +439,7 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
         else
             hv_stores(env, "psgi.input", SvREFCNT_inc(hm_empty_input));
     }
+    hv_stores(env, "psgix.input.buffered", newSViv(1));  /* :scalar handle, seekable */
     env_rv = newRV_noinc((SV *)env);
     resp = hm_call_app(aTHX_ loop, env_rv);
     loop->requests++;
@@ -476,7 +482,7 @@ static int hm_h2_cb_begin_headers(nghttp2_session *ses,
     if (frame->hd.type != NGHTTP2_HEADERS
         || frame->headers.cat != NGHTTP2_HCAT_REQUEST)
         return 0;
-    st = (hm_h2_stream *)calloc(1, sizeof(hm_h2_stream));
+    st = (hm_h2_stream *)hm_xcalloc(1, sizeof(hm_h2_stream));
     st->id = frame->hd.stream_id;
     st->env = newHV();
     hm_h2_env_init(aTHX_ s, st->env);
@@ -568,7 +574,7 @@ static int hm_h2_flush_send(pTHX_ hm_h2_sess *s) {
  * connection, without submitting SETTINGS yet (the upgrade path must call
  * nghttp2_session_upgrade2 in between). */
 static int hm_h2_new_session(pTHX_ hm_conn *c) {
-    hm_h2_sess *s = (hm_h2_sess *)calloc(1, sizeof(hm_h2_sess));
+    hm_h2_sess *s = (hm_h2_sess *)hm_xcalloc(1, sizeof(hm_h2_sess));
     nghttp2_session_callbacks *cbs;
     if (!s) return -1;
     s->conn = c;
@@ -653,7 +659,7 @@ static int hm_h2_start_upgrade(pTHX_ hm_conn *c, const char *settings,
     if (n < 0) return -1;
     if (hm_h2_new_session(aTHX_ c) < 0) return -1;
     s = (hm_h2_sess *)c->h2;
-    st = (hm_h2_stream *)calloc(1, sizeof(hm_h2_stream));
+    st = (hm_h2_stream *)hm_xcalloc(1, sizeof(hm_h2_stream));
     st->id = 1;
     st->env = env;
     st->next = s->streams;

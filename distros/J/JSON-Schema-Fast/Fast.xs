@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include "jsf.h"
+#include "jsf_abi.h"   /* the C ABI table consumers (e.g. OpenAPI::Fast) call */
 
 /* ---- Compiled object plumbing ------------------------------------------- */
 
@@ -12,21 +13,34 @@ static jsf_compiled_t *jsf_compiled_of(pTHX_ SV *self) {
     return (jsf_compiled_t *)INT2PTR(void *, SvIV(SvRV(self)));
 }
 
-/* Decode JSON schema text via File::Raw::JSON (required by Fast.pm). */
+/* Decode JSON schema text via File::Raw::JSON's C ABI (jsf_frj.h; required by
+ * Fast.pm). Croaks (byte-offset message) on malformed JSON. */
 static SV *jsf_json_decode(pTHX_ SV *text) {
-    dSP; int count; SV *ret;
-    ENTER; SAVETMPS; PUSHMARK(SP);
-    XPUSHs(text); PUTBACK;
-    count = call_pv("File::Raw::JSON::file_json_decode", G_SCALAR | G_EVAL);
-    SPAGAIN;
-    if (SvTRUE(ERRSV)) {
-        SV *e = newSVsv(ERRSV);
-        PUTBACK; FREETMPS; LEAVE;
-        croak("JSON::Schema::Fast: schema JSON parse failed: %s", SvPV_nolen(e));
-    }
-    ret = count > 0 ? newSVsv(POPs) : &PL_sv_undef;
-    PUTBACK; FREETMPS; LEAVE;
-    return sv_2mortal(ret);
+    SV *v = jsf_frj_decode(aTHX_ text);
+    if (!v)
+        croak("JSON::Schema::Fast: File::Raw::JSON with a compatible C ABI "
+              "(FRJ_ABI_VERSION %d) is required to decode a JSON schema",
+              FRJ_ABI_VERSION);
+    return v;
+}
+
+/* Compile a schema into a blessed JSON::Schema::Fast::Compiled SV. Shared by
+ * the XS compile() and the C ABI (jsf_abi.h): `schema` is a hashref/arrayref/
+ * boolean or JSON-text scalar; `resolver` is an optional coderef (NULL/undef
+ * => auto-fetch remote $ref via Fetch's ABI). Returns a +1-owned blessed SV. */
+static SV *jsf_compile_api(pTHX_ SV *schema, SV *resolver, int coerce,
+                           int apply_defaults) {
+    SV *actual = schema;
+    int auto_fetch = (resolver && SvOK(resolver)) ? 0 : 1;
+    jsf_compiled_t *C;
+    if (SvOK(schema) && !SvROK(schema) && SvPOK(schema))
+        actual = jsf_json_decode(aTHX_ schema);
+    C = jsf_compile_sv(aTHX_ actual, auto_fetch ? NULL : resolver, auto_fetch);
+    C->coerce         = coerce ? 1 : 0;
+    C->apply_defaults = apply_defaults ? 1 : 0;
+    C->schema_sv      = newSVsv(actual);
+    return sv_bless(newRV_noinc(newSViv(PTR2IV(C))),
+                    gv_stashpv("JSON::Schema::Fast::Compiled", GV_ADD));
 }
 
 /* ---- IR dump (debug shim for the phase-02 tests) ------------------------ */
@@ -122,37 +136,57 @@ static SV *jsf_dump_node(pTHX_ jsf_compiled_t *C, uint32_t off) {
     return newRV_noinc((SV *)h);
 }
 
+/* ---- C ABI (jsf_abi.h) --------------------------------------------------- *
+ * The table consumers reach through JSON::Schema::Fast::_abi_ptr: compile once
+ * from C, then validate per call with no Perl method dispatch. compile is the
+ * shared jsf_compile_api above; is_valid/validate wrap the interpreter. */
+static int jsf_abi_is_valid(pTHX_ SV *compiled, SV *data) {
+    return jsf_is_valid(aTHX_ jsf_compiled_of(aTHX_ compiled), data);
+}
+static int jsf_abi_validate(pTHX_ SV *compiled, SV *data, AV *errors) {
+    return jsf_run(aTHX_ jsf_compiled_of(aTHX_ compiled), data, errors);
+}
+static const jsf_abi JSF_ABI = {
+    JSF_ABI_VERSION,
+    jsf_compile_api,
+    jsf_abi_is_valid,
+    jsf_abi_validate,
+};
+
 MODULE = JSON::Schema::Fast        PACKAGE = JSON::Schema::Fast
 
 PROTOTYPES: DISABLE
 
 # Compile a schema (Perl hashref/boolean, or JSON text) into a compiled object.
-# Options: coerce => 0|1 (string<->number/boolean). format_assert / apply_defaults
-# / shortcircuit are accepted for forward-compat but are no-ops in v0.01.
+# Options: coerce, apply_defaults, resolver. Remote references without a resolver
+# are fetched via Fetch's C ABI (see include/jsf_fetch.h).
 SV *
 compile(class, schema, ...)
         SV *class
         SV *schema
     CODE:
     {
-        SV *actual = schema;
-        jsf_compiled_t *C;
+        SV *resolver = NULL;
         int i, coerce = 0, apply_defaults = 0;
         for (i = 2; i + 1 < items; i += 2) {
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);
-            if      (kl == 6  && memEQ(k, "coerce", 6))         coerce = SvTRUE(ST(i + 1)) ? 1 : 0;
+            if      (kl == 6  && memEQ(k, "coerce", 6))          coerce = SvTRUE(ST(i + 1)) ? 1 : 0;
             else if (kl == 14 && memEQ(k, "apply_defaults", 14)) apply_defaults = SvTRUE(ST(i + 1)) ? 1 : 0;
+            else if (kl == 8  && memEQ(k, "resolver", 8))        resolver = ST(i + 1);
         }
-        if (SvOK(schema) && !SvROK(schema) && SvPOK(schema))
-            actual = jsf_json_decode(aTHX_ schema);
-        C = jsf_compile_sv(aTHX_ actual);
-        C->coerce         = coerce;
-        C->apply_defaults = apply_defaults;
-        C->schema_sv      = newSVsv(actual);
-        RETVAL = sv_bless(newRV_noinc(newSViv(PTR2IV(C))),
-                          gv_stashpv("JSON::Schema::Fast::Compiled", GV_ADD));
+        RETVAL = jsf_compile_api(aTHX_ schema, resolver, coerce, apply_defaults);
         PERL_UNUSED_VAR(class);
     }
+    OUTPUT:
+        RETVAL
+
+# Address of the C ABI table (jsf_abi.h). A consumer XS module (OpenAPI::Fast)
+# fetches this once at boot, INT2PTRs it to a `const jsf_abi *`, and checks
+# ->abi_version before use. Not part of the public Perl API.
+IV
+_abi_ptr()
+    CODE:
+        RETVAL = PTR2IV(&JSF_ABI);
     OUTPUT:
         RETVAL
 

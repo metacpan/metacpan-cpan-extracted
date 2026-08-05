@@ -14,6 +14,9 @@ A configurable TCP server package with HTTP support, file uploads, and rate limi
 - **Logging**: Configurable logging with daily log rotation
 - **Perl-only mode**: Handle Perl scripts directly without CGI overhead
 
+[![Perl](https://img.shields.io/badge/perl-5.010%2B-brightgreen)](https://www.perl.org/)
+[![License](https://img.shields.io/badge/license-Perl-orange)](https://dev.perl.org/licenses/)
+
 ## Installation
 
 ### Manual Installation
@@ -39,8 +42,8 @@ make install
 - Perl 5.8 or higher
 - IO::Socket::INET (network sockets)
 - IPC::Open3 (CGI support)
-- threads / threads::shared (threaded mode)
 - File::Temp (file uploads)
+- Optional: threads / threads::shared (threaded mode)
 
 ## Quick Start
 
@@ -301,13 +304,12 @@ sub custom_log {
 }
 ```
 
-## Version
-
-2.04
-
 ## License
 
-This software is licensed under the same terms as Perl itself.
+This module is free software.
+You can redistribute it and/or modify it under the same terms as Perl itself.
+
+See the official Perl licensing terms: https://dev.perl.org/licenses/
 
 ## See Also
 

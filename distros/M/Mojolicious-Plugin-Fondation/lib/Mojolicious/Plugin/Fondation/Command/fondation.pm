@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Command::fondation;
-
+$Mojolicious::Plugin::Fondation::Command::fondation::VERSION = '0.06';
 # ABSTRACT: Fondation orchestration commands -- init, upgrade, clean, refresh
 
 use Mojo::Base 'Mojolicious::Command', -signatures;
@@ -7,8 +7,6 @@ use Mojo::Base 'Mojolicious::Command', -signatures;
 use utf8;
 use Mojo::File 'path';
 use File::Path qw(remove_tree);
-
-our $VERSION = '0.01';
 
 has description => 'Orchestrate Fondation plugins: init, upgrade, clean, refresh';
 has usage       => sub ($self) {
@@ -256,7 +254,7 @@ Mojolicious::Plugin::Fondation::Command::fondation - Fondation orchestration com
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

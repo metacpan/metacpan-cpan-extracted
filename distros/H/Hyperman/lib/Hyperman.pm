@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -51,7 +51,9 @@ interfaces (F<xs/>).
     Hyperman->run(
         app            => $psgi_app,   # required
         host           => '0.0.0.0',
-        port           => 8080,
+        port           => 8080,        # a scalar, or an arrayref of ports
+                                       # ([80, 8080]) for several plain
+                                       # listeners sharing these options
         workers        => 0,           # 0/unset = one per CPU; 1 = in-process
                                        # dev mode (no supervisor)
         idle_timeout   => 60,          # close idle keep-alive conns (secs)
@@ -82,6 +84,34 @@ interfaces (F<xs/>).
 
 The event backend is chosen automatically (kqueue, io_uring, epoll, then poll) and can
 be forced with C<HYPERMAN_BACKEND>.
+
+=head2 Multiple listeners
+
+A single C<run> can bind several listeners, each independently plain or TLS -
+the common case being plain B<:80> beside HTTPS B<:443>. Pass C<listen> an
+arrayref of per-listener hashrefs; each takes its own C<port> (required) plus
+any of C<host>, C<tls_cert>, C<tls_key>, C<tls_ca>, C<tls_verify>, C<tls_sni>,
+C<http2>, and C<redirect_https>. A missing per-listener field falls back to the
+top-level value of the same name, and the top-level C<port>/C<listen> are
+mutually exclusive shorthands - C<< port => [80, 8080] >> is sugar for several
+plain listeners sharing the top-level options.
+
+    Hyperman->run(
+        app     => $app,
+        workers => 8,
+        listen  => [
+            { port => 80,  redirect_https => 443 },   # 301 every request to https
+            { port => 443, tls_cert => $cert, tls_key => $key },
+        ],
+    );
+
+C<redirect_https> makes a listener answer B<every> request with a C<301> to the
+same host and request-target on the given https port (in C, before the app is
+reached); the value is that target port, and a bare true value means the
+standard C<443>. Its C<SERVER_PORT> and, for TLS listeners, C<psgi.url_scheme>
+reflect the listener the request arrived on. All listeners serve the one C<app>.
+Ports below 1024 (80, 443) still require the process to start as root or hold
+C<CAP_NET_BIND_SERVICE>.
 
 =head3 access_log
 

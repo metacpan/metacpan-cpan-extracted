@@ -1,17 +1,17 @@
+bench/json-codec.pl
 Changes
-LICENSE.yyjson
-MANIFEST			This list of files
-Makefile.PL
-README
-JSON.xs
 file_raw_json.c
-yyjson.c
-include/file_raw_json.h
-include/yyjson.h
 ignore.txt
+include/file_raw_json.h
+include/frj_abi.h
+include/yyjson.h
+JSON.xs
 lib/File/Raw/JSON.pm
 lib/File/Raw/JSON/Boolean.pm
-bench/json-codec.pl
+LICENSE.yyjson
+Makefile.PL
+MANIFEST			This list of files
+README
 t/00-load.t
 t/01-decode-rfc8259.t
 t/02-encode-rfc8259.t
@@ -41,8 +41,10 @@ t/25-port-chunked-decode.t
 t/26-ordered-encode-dynamic.t
 t/27-nested-data.t
 t/28-ordered-nested-data.t
+t/29-abi.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+yyjson.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

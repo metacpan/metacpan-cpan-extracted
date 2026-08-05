@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing common output format options
 
 package App::karr::Role::Output;
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moo::Role;
 use MooX::Options;
 
@@ -43,7 +43,7 @@ App::karr::Role::Output - Role providing common output format options
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 DESCRIPTION
 

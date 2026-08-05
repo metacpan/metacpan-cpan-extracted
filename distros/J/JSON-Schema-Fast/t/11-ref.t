@@ -17,16 +17,16 @@ use constant { T_INT => 32, H_PROPS => 1 << 20 };
     is($d->{ref_target}{type_mask}, T_INT, '$ref points at the integer $defs node');
 }
 
-# remote $ref croaks (not a silent no-op)
+# an unresolvable remote $ref croaks (resolver => undef keeps it offline)
 {
-    eval { JSON::Schema::Fast->compile({ '$ref' => 'https://example/x#/a' }) };
-    like($@, qr/remote \$ref not supported/, 'remote $ref croaks');
+    eval { JSON::Schema::Fast->compile({ '$ref' => 'https://example/x#/a' }, resolver => undef) };
+    like($@, qr/cannot resolve \$ref/, 'unresolvable remote $ref croaks (no resolver)');
 }
 
 # unresolved local $ref croaks, naming the pointer
 {
-    eval { JSON::Schema::Fast->compile({ '$ref' => '#/$defs/Nope' }) };
-    like($@, qr{unresolved \$ref '#/\$defs/Nope'}, 'unresolved local $ref croaks with the pointer');
+    eval { JSON::Schema::Fast->compile({ '$ref' => '#/$defs/Nope' }, resolver => undef) };
+    like($@, qr{cannot resolve \$ref '#/\$defs/Nope'}, 'unresolved local $ref croaks with the pointer');
 }
 
 # recursive schema compiles without hanging and resolves the back-reference

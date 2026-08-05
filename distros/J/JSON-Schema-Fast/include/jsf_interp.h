@@ -16,6 +16,43 @@
 
 static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx_t *ctx);
 
+/* ---- annotation collector for unevaluatedProperties/Items --------------- *
+ * Per data-instance: the set of property names / item indices that some
+ * keyword or successful in-place applicator has already evaluated. Only used
+ * when the schema declares unevaluated* (C->has_unevaluated); NULL otherwise. */
+typedef struct jsf_annot { HV *props; HV *items; int all_items; } jsf_annot;
+
+static jsf_annot *jsf_annot_new(pTHX) {
+    jsf_annot *a = (jsf_annot *)malloc(sizeof *a);
+    if (!a) return NULL;
+    a->props = newHV(); a->items = newHV(); a->all_items = 0;
+    return a;
+}
+static void jsf_annot_free(pTHX_ jsf_annot *a) {
+    if (!a) return;
+    SvREFCNT_dec((SV *)a->props); SvREFCNT_dec((SV *)a->items); free(a);
+}
+static void jsf_annot_merge(pTHX_ jsf_annot *dst, jsf_annot *src) {
+    HE *he;
+    if (!dst || !src) return;
+    hv_iterinit(src->props); while ((he = hv_iternext(src->props))) { STRLEN kl; char *k = HePV(he, kl); (void)hv_store(dst->props, k, kl, &PL_sv_yes, 0); }
+    hv_iterinit(src->items); while ((he = hv_iternext(src->items))) { STRLEN kl; char *k = HePV(he, kl); (void)hv_store(dst->items, k, kl, &PL_sv_yes, 0); }
+    dst->all_items |= src->all_items;
+}
+static void jsf_annot_add_key(pTHX_ jsf_annot *a, const char *k, STRLEN kl) {
+    if (a) (void)hv_store(a->props, k, kl, &PL_sv_yes, 0);
+}
+static void jsf_annot_add_idx(pTHX_ jsf_annot *a, IV i) {
+    if (a) { char b[24]; int n = (int)my_snprintf(b, sizeof b, "%" IVdf, i); (void)hv_store(a->items, b, n, &PL_sv_yes, 0); }
+}
+static int jsf_annot_has_idx(pTHX_ jsf_annot *a, IV i) {
+    char b[24]; int n;
+    if (!a) return 0;
+    if (a->all_items) return 1;
+    n = (int)my_snprintf(b, sizeof b, "%" IVdf, i);
+    return hv_exists(a->items, b, n);
+}
+
 /* ---- JSON value equality (const/enum, uniqueItems) ---------------------- */
 static int jsf_json_equal(pTHX_ SV *a, SV *b) {
     unsigned ta = jsf_classify_type(aTHX_ a);
@@ -145,10 +182,20 @@ static unsigned jsf_coerce_bits(pTHX_ uint32_t mask, SV *data, unsigned t) {
     return 0;
 }
 
-/* run a subschema as a boolean probe (no error leakage) */
+/* run a subschema as a boolean probe (no error leakage, no annotations) */
 static int jsf_probe(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx_t *parent) {
     jsf_ctx_t p;
-    p.errors = NULL; p.iloc = NULL; p.collect = 0; p.depth = parent->depth;
+    p.errors = NULL; p.iloc = NULL; p.collect = 0; p.depth = parent->depth; p.ann = NULL;
+    p.dynscope = parent->dynscope;
+    return jsf_validate(aTHX_ C, off, data, &p);
+}
+
+/* probe that collects annotations into `ann` (for in-place applicators whose
+ * successful branches contribute to the parent's evaluated set) */
+static int jsf_probe_ann(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx_t *parent, jsf_annot *ann) {
+    jsf_ctx_t p;
+    p.errors = NULL; p.iloc = NULL; p.collect = 0; p.depth = parent->depth; p.ann = ann;
+    p.dynscope = parent->dynscope;
     return jsf_validate(aTHX_ C, off, data, &p);
 }
 
@@ -157,11 +204,15 @@ static int jsf_probe(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx_t 
     ok = 0; if (!ctx->collect) goto done; \
 } while (0)
 
-/* recurse into a data child, keeping the instanceLocation in sync */
+/* recurse into a data child (a new instance): keep the instanceLocation in sync
+ * and give the child its own annotation collector. */
 #define JSF_CHILD(coff, cdata, pushexpr) do { \
-    STRLEN _sav = 0; int _r; \
+    STRLEN _sav = 0; int _r; jsf_annot *_oa = ctx->ann; \
     if (ctx->errors) _sav = (pushexpr); \
+    ctx->ann = C->has_unevaluated ? jsf_annot_new(aTHX) : NULL; \
     _r = jsf_validate(aTHX_ C, (coff), (cdata), ctx); \
+    if (ctx->ann) jsf_annot_free(aTHX_ ctx->ann); \
+    ctx->ann = _oa; \
     if (ctx->errors) jsf_iloc_pop(ctx->iloc, _sav); \
     if (!_r) { ok = 0; if (!ctx->collect) goto done; } \
 } while (0)
@@ -172,18 +223,59 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
     unsigned t;
     int ok = 1;
     HV *filled = NULL;   /* apply_defaults working copy (freed at done) */
+    jsf_annot *sink = NULL, *local = NULL;   /* evaluated-set (unevaluated*) */
+    int pushed_dyn = 0;  /* pushed this resource's base onto the dynamic scope */
 
     if (n->tag == JSF_TAG_TRUE)  return 1;
     if (n->tag == JSF_TAG_FALSE) { if (ctx->errors) jsf_err_push(aTHX_ ctx, C, off, "false"); return 0; }
     if (++ctx->depth > JSF_MAX_DEPTH) { ctx->depth--; return 0; }
 
+    /* This frame collects its own evaluated set (from its keywords and its
+     * in-place applicators); on success it merges into the caller's set (sink).
+     * A sibling ("cousin") subschema therefore does not see it. */
+    sink = ctx->ann;
+    if (C->has_unevaluated) { local = jsf_annot_new(aTHX); ctx->ann = local; }
+
+    /* track the dynamic scope: push this node's resource base when it differs
+     * from the current innermost, so $dynamicRef can search it. */
+    if (C->has_dynamic && ctx->dynscope) {
+        uint32_t bl2; const char *bp2 = jsf_str_bytes(a, n->base_off, &bl2);
+        SSize_t top = av_len(ctx->dynscope); int same = 0;
+        if (top >= 0) { SV **tp = av_fetch(ctx->dynscope, top, 0);
+            if (tp && *tp) { STRLEN tl; const char *ts = SvPV_const(*tp, tl); if (tl == bl2 && memEQ(ts, bp2, bl2)) same = 1; } }
+        if (!same) { av_push(ctx->dynscope, newSVpvn(bp2, bl2)); pushed_dyn = 1; }
+    }
+
     if ((n->present & JSF_HAS_REF) && n->ref_off) {
         if (!jsf_validate(aTHX_ C, n->ref_off, data, ctx)) { ok = 0; if (!ctx->collect) goto done; }
+    }
+    /* $dynamicRef: outermost matching $dynamicAnchor in the dynamic scope wins;
+     * otherwise fall back to the lexical target (ref_off). */
+    if (n->present & JSF_HAS_DYNREF) {
+        uint32_t target = n->ref_off;
+        if (ctx->dynscope && n->dynref_name_off) {
+            uint32_t nml; const char *nm = jsf_str_bytes(a, n->dynref_name_off, &nml);
+            SSize_t i, top = av_len(ctx->dynscope);
+            for (i = 0; i <= top; i++) {
+                SV **b = av_fetch(ctx->dynscope, i, 0);
+                SV *key; STRLEN kl; const char *kp; SV **te;
+                if (!b || !*b) continue;
+                key = sv_2mortal(newSVsv(*b)); sv_catpvs(key, "#"); sv_catpvn(key, nm, nml);
+                kp = SvPV_const(key, kl);
+                te = hv_fetch(C->dynmap, kp, (I32)kl, 0);
+                if (te && *te && SvIOK(*te)) { target = (uint32_t)SvIV(*te); break; }
+            }
+        }
+        if (target && !jsf_validate(aTHX_ C, target, data, ctx)) { ok = 0; if (!ctx->collect) goto done; }
     }
 
     t = jsf_classify_type(aTHX_ data);
     if (C->coerce && (n->present & JSF_HAS_TYPE) && !(t & n->type_mask))
         t |= jsf_coerce_bits(aTHX_ n->type_mask, data, t);
+
+    /* the validation vocabulary (type/const/enum, the numeric/string/count
+     * keywords) is skipped when a custom $schema metaschema disables it. */
+    if (!C->no_validation_vocab) {
 
     if ((n->present & JSF_HAS_TYPE) && !(t & n->type_mask)) JSF_FAIL("type");
 
@@ -225,6 +317,8 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
             !jsf_rx_match(aTHX_ jsf_get_regex(aTHX_ C, n->pattern_off), data)) JSF_FAIL("pattern");
     }
 
+    }   /* end validation-vocabulary scalar keywords */
+
     if (t & JSF_T_ARRAY) {
         AV *av = (AV *)SvRV(data);
         SSize_t i, cnt = av_len(av) + 1;
@@ -237,6 +331,7 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
             prefn = ol->n;
             for (i = 0; i < cnt && (uint32_t)i < prefn; i++) {
                 SV **el = av_fetch(av, i, 0);
+                jsf_annot_add_idx(aTHX_ ctx->ann, i);
                 if (el) JSF_CHILD(offs[i], *el, jsf_iloc_push_idx(aTHX_ ctx->iloc, i));
             }
         }
@@ -245,6 +340,7 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
                 SV **el = av_fetch(av, i, 0);
                 if (el) JSF_CHILD(n->items_off, *el, jsf_iloc_push_idx(aTHX_ ctx->iloc, i));
             }
+            if (ctx->ann && cnt > (SSize_t)prefn) ctx->ann->all_items = 1;  /* items covers the tail */
         }
         if (n->unique) {
             for (i = 0; i < cnt; i++) {
@@ -259,7 +355,7 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
             UV matched = 0, minc = (n->present & JSF_HAS_MINCONT) ? n->min_contains : 1;
             for (i = 0; i < cnt; i++) {
                 SV **el = av_fetch(av, i, 0);
-                if (el && jsf_probe(aTHX_ C, n->contains_off, *el, ctx)) matched++;
+                if (el && jsf_probe(aTHX_ C, n->contains_off, *el, ctx)) { matched++; jsf_annot_add_idx(aTHX_ ctx->ann, i); }
             }
             if (matched < minc) JSF_FAIL("contains");
             if ((n->present & JSF_HAS_MAXCONT) && matched > n->max_contains) JSF_FAIL("maxContains");
@@ -305,7 +401,10 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
             for (p = 0; p < pt->n; p++) {
                 uint32_t nl; const char *nm = jsf_str_bytes(a, en[p].name_off, &nl);
                 SV **vp = (SV **)hv_common(hv, NULL, nm, nl, 0, HV_FETCH_JUST_SV, NULL, en[p].hash);
-                if (vp && *vp) JSF_CHILD(en[p].child_off, *vp, jsf_iloc_push_key(aTHX_ ctx->iloc, nm, nl));
+                if (vp && *vp) {
+                    jsf_annot_add_key(aTHX_ ctx->ann, nm, nl);
+                    JSF_CHILD(en[p].child_off, *vp, jsf_iloc_push_key(aTHX_ ctx->iloc, nm, nl));
+                }
             }
         }
         if (n->present & (JSF_HAS_PATPROPS | JSF_HAS_ADDPROPS | JSF_HAS_PROPNAMES)) {
@@ -321,6 +420,7 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
                     for (q = 0; q < qt->n; q++) {
                         if (jsf_rx_match(aTHX_ jsf_get_regex(aTHX_ C, pe[q].pat_off), ksv)) {
                             matched = 1;
+                            jsf_annot_add_key(aTHX_ ctx->ann, k, kl);
                             JSF_CHILD(pe[q].child_off, val, jsf_iloc_push_key(aTHX_ ctx->iloc, k, kl));
                         }
                     }
@@ -332,6 +432,7 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
                         JSF_FAIL("additionalProperties");
                         if (ctx->errors) jsf_iloc_pop(ctx->iloc, sav);
                     } else {
+                        jsf_annot_add_key(aTHX_ ctx->ann, k, kl);
                         JSF_CHILD(n->addprops_off, val, jsf_iloc_push_key(aTHX_ ctx->iloc, k, kl));
                     }
                 }
@@ -391,31 +492,67 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
         for (i = 0; i < ol->n; i++)
             if (!jsf_validate(aTHX_ C, offs[i], data, ctx)) { ok = 0; if (!ctx->collect) goto done; }
     }
+    /* anyOf: probe EVERY branch (no break); each successful branch merges its
+     * evaluated set into this frame's set (jsf_probe_ann's frame merges into
+     * ctx->ann on success). Collecting from all matches is required by spec. */
     if (n->present & JSF_HAS_ANYOF) {
         jsf_offlist *ol = (jsf_offlist *)jsf_arena_ptr(a, n->anyof_off);
         uint32_t *offs = (uint32_t *)((char *)ol + sizeof(jsf_offlist)); uint32_t i; int any = 0;
-        for (i = 0; i < ol->n; i++) if (jsf_probe(aTHX_ C, offs[i], data, ctx)) { any = 1; break; }
+        for (i = 0; i < ol->n; i++)
+            if (jsf_probe_ann(aTHX_ C, offs[i], data, ctx, ctx->ann)) any = 1;
         if (!any) JSF_FAIL("anyOf");
     }
     if (n->present & JSF_HAS_ONEOF) {
         jsf_offlist *ol = (jsf_offlist *)jsf_arena_ptr(a, n->oneof_off);
         uint32_t *offs = (uint32_t *)((char *)ol + sizeof(jsf_offlist)); uint32_t i, c2 = 0;
-        for (i = 0; i < ol->n; i++) if (jsf_probe(aTHX_ C, offs[i], data, ctx)) c2++;
+        for (i = 0; i < ol->n; i++)
+            if (jsf_probe_ann(aTHX_ C, offs[i], data, ctx, ctx->ann)) c2++;
         if (c2 != 1) JSF_FAIL("oneOf");
     }
     if (n->present & JSF_HAS_NOT) {
+        /* `not` discards its own annotations, but its internal unevaluated* must
+         * still apply - jsf_probe gives it its own frame with no sink. */
         if (jsf_probe(aTHX_ C, n->not_off, data, ctx)) JSF_FAIL("not");
     }
     if (n->present & JSF_HAS_IF) {
-        if (jsf_probe(aTHX_ C, n->if_off, data, ctx)) {
-            if (n->then_off && !jsf_validate(aTHX_ C, n->then_off, data, ctx)) { ok = 0; if (!ctx->collect) goto done; }
+        int branchok = 1;
+        if (jsf_probe_ann(aTHX_ C, n->if_off, data, ctx, ctx->ann)) {
+            if (n->then_off) branchok = jsf_validate(aTHX_ C, n->then_off, data, ctx);
         } else {
-            if (n->else_off && !jsf_validate(aTHX_ C, n->else_off, data, ctx)) { ok = 0; if (!ctx->collect) goto done; }
+            if (n->else_off) branchok = jsf_validate(aTHX_ C, n->else_off, data, ctx);
+        }
+        if (!branchok) { ok = 0; if (!ctx->collect) goto done; }
+    }
+
+    /* unevaluated*: after every other keyword and in-place applicator, apply to
+     * any property / item not in this instance's evaluated set. */
+    if ((n->present & JSF_HAS_UNEVALPROPS) && (t & JSF_T_OBJECT)) {
+        HV *hv = (HV *)SvRV(data); HE *he;
+        hv_iterinit(hv);
+        while ((he = hv_iternext(hv))) {
+            STRLEN kl; char *k = HePV(he, kl); SV *val = HeVAL(he);
+            if (ctx->ann && hv_exists(ctx->ann->props, k, kl)) continue;
+            jsf_annot_add_key(aTHX_ ctx->ann, k, kl);
+            JSF_CHILD(n->unevalprops_off, val, jsf_iloc_push_key(aTHX_ ctx->iloc, k, kl));
+        }
+    }
+    if ((n->present & JSF_HAS_UNEVALITEMS) && (t & JSF_T_ARRAY)) {
+        AV *av = (AV *)SvRV(data); SSize_t i, cnt = av_len(av) + 1;
+        for (i = 0; i < cnt; i++) {
+            SV **el;
+            if (jsf_annot_has_idx(aTHX_ ctx->ann, i)) continue;
+            el = av_fetch(av, i, 0);
+            jsf_annot_add_idx(aTHX_ ctx->ann, i);
+            if (el) JSF_CHILD(n->unevalitems_off, *el, jsf_iloc_push_idx(aTHX_ ctx->iloc, i));
         }
     }
 
 done:
     if (filled) SvREFCNT_dec((SV *)filled);
+    if (pushed_dyn) { SV *x = av_pop(ctx->dynscope); if (x) SvREFCNT_dec(x); }
+    ctx->ann = sink;                                        /* restore caller's set */
+    if (ok && sink && local) jsf_annot_merge(aTHX_ sink, local);
+    if (local) jsf_annot_free(aTHX_ local);
     ctx->depth--;
     return ok;
 }
@@ -429,6 +566,8 @@ static int jsf_run(pTHX_ jsf_compiled_t *C, SV *data, AV *errors) {
     ctx.collect = errors ? 1 : 0;
     ctx.depth   = 0;
     ctx.iloc    = errors ? sv_2mortal(newSVpvs("")) : NULL;
+    ctx.ann     = NULL;   /* the root frame creates its own collector */
+    ctx.dynscope = C->has_dynamic ? (AV *)sv_2mortal((SV *)newAV()) : NULL;
     return jsf_validate(aTHX_ C, C->root, data, &ctx);
 }
 

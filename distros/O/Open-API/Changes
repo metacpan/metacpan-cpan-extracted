@@ -1,0 +1,32 @@
+Revision history for Open-API
+
+0.02    2026-08-04
+        - Security: components.securitySchemes are now enforced. to_app takes a
+          security => { scheme => checker } map
+        - Open::API::Client attaches credentials to match: security => { scheme
+          => credential } sends apiKey / bearer / basic automatically, 
+        - CSRF protection on to_app: an always-on Origin/Referer check on
+          state-changing methods (GET/HEAD/OPTIONS/TRACE are exempt), plus an
+          optional server-side single-use token via a check callback. The
+          callback verifies against your own store, its return is stashed as
+          $env->{'openapi.csrf'}, and returning a string rotates the token
+          cookie for you.
+        - Open::API::Client handles CSRF transparently with csrf => 1
+        - Secure response headers on by default (X-Content-Type-Options,
+          Content-Security-Policy, X-Frame-Options, Referrer-Policy)
+        - CORS: the cors => {} option answers preflight OPTIONS and adds
+          Access-Control-* headers to actual responses, with an origin
+          allowlist, credentials, exposed headers and max-age. A wildcard
+          origin with credentials is refused at to_app.
+        - max_body_size => N rejects an over-large request body with 413.
+        - Opt-in content negotiation (negotiate => 1): 415 for an undeclared
+          request Content-Type, 406 when Accept admits no declared response
+          type.
+        - error_format => 'problem' emits RFC 7807 application/problem+json for
+          the errors this layer generates.
+        - examples/ - a runnable, login-based petstore showing authentication,
+          CSRF and the transparent client together.
+
+0.01    2026-08-04
+        First version.
+

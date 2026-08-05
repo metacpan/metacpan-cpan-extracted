@@ -1,0 +1,33 @@
+Open-API
+
+Fast OpenAPI 3.1 server and client. The document is compiled once - every
+parameter, header, cookie and body schema through JSON::Schema::Fast's C ABI -
+and each request is routed and validated on a C hot path before the handler
+runs. The same compiled spec drives Open::API::Client, a spec-driven HTTP
+client on Fetch's C ABI. On the bundled bench the whole OpenAPI layer costs
+about half a percent of a bare hand-rolled PSGI app.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Open::API
+    perldoc Open::API::Client
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

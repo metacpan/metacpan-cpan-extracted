@@ -1,3 +1,8 @@
+0.41   2026-08-04
+
+- Fix code that triggers a warning in Perl 5.43.2+. Implemented by @ether (Karen Etheridge). GH #30.
+
+
 0.40   2021-03-21
 
 - Add support for email auto-links without "mailto:", so "<autarch@urth.org>"

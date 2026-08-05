@@ -7,7 +7,7 @@ use Test::More tests => 4;
 BEGIN { use_ok('JSON::Schema::Fast') || print "Bail out!\n" }
 BEGIN { use_ok('JSON::Schema::Fast::Compiled') }
 
-is($JSON::Schema::Fast::VERSION, '0.03', 'VERSION set');
+is($JSON::Schema::Fast::VERSION, '0.05', 'VERSION set');
 
 # the XS bootstrapped: compile + the debug shims are present
 can_ok('JSON::Schema::Fast', qw/compile _classify _arena_selftest _prehash/);

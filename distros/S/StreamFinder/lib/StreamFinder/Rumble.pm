@@ -614,13 +614,16 @@ sub new
 				next  if ($bitrate > $self->{'bitrate'});
 				next  if ($stream =~ /\.[A-Z]aa(?:\.rec)?\.(?:mp4|webm)$/o);  #THESE WON'T PLAY! (VIDEO-ONLY?)
 
+				$ext = undef;
 				for (my $i=0;$i<=$#okStreams;$i++) {
 					if ($stream =~ /\.$okStreams[$i]\b/) {
 						$ext = $okStreams[$i];
 						last;
 					}
 				}
-				$quality = 1  if (defined($ext) && $ext =~ /aac/o);  #MAKE AUDIO-ONLY STREAMS LOWEST QUALITY TO SORT LAST.
+				next  unless (defined $ext);
+
+				$quality = 1  if ($ext =~ /aac/o);  #MAKE AUDIO-ONLY STREAMS LOWEST QUALITY TO SORT LAST.
 				if ($quality =~ /\D/o) {
 					if ($quality =~ /audio/o) {
 						$quality = 1;
@@ -632,12 +635,13 @@ sub new
 				}
 				next  if ($quality > $self->{'quality'});  #EXCLUDE ANY HIGHER-RES THAN SELECTED QUALITY.
 
+				$stream =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//;
 				$quality{$stream} = $quality;
 				$ext{$stream} = $ext;
 				$qualities{$quality} = 1;
 				push @streams, $stream;
 			}
-			print STDERR "--Max res(quality)=".$self->{'quality'}."= bitrate=".$self->{'bitrate'}."= order=".join(',',@okStreams)."=\n"  if ($DEBUG);
+			print STDERR "--Max res(quality)=".$self->{'quality'}."= bitrate=".$self->{'bitrate'}."=\n"  if ($DEBUG);
 
 			if ($self->{'order'} =~ /ext/i) {
 				print STDERR "--order streams by kept extensions:\n"  if ($DEBUG);
@@ -645,13 +649,14 @@ sub new
 					print STDERR "\n--keep extension=$ext:\n"  if ($DEBUG);
 					foreach my $quality (sort { $b <=> $a } keys %qualities) {
 						foreach my $stream (@streams) {
-							print STDERR "------found($quality) stream=$stream=\n"  if ($DEBUG);
 							next  unless ($quality{$stream} == $quality &&
 									($ext =~ /any/io || $ext{$stream} =~ /$ext/));
+
 							unless (defined $streamHash{$stream}
 									|| ($self->{'secure'} && $stream !~ /^https/o)) {
 								#JWT:NEXT TEST NEEDED BY RECENT libavformat CHANGES:
-								$stream =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//;
+								print STDERR "------found($quality) quality="
+										.$quality{$stream}."= stream=$stream=\n"  if ($DEBUG);
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}
@@ -664,13 +669,14 @@ sub new
 					print STDERR "\n--keep quality=$quality:\n"  if ($DEBUG);
 					foreach my $ext (@okStreams) {
 						foreach my $stream (@streams) {
-							print STDERR "------found($ext) ext=".$ext{$stream}."= stream=$stream=\n"  if ($DEBUG);
 							next  unless ($quality{$stream} == $quality && 
 									($ext =~ /any/io || $ext{$stream} =~ /$ext/));
+
 							unless (defined $streamHash{$stream}
 									|| ($self->{'secure'} && $stream !~ /^https/o)) {
 								#JWT:NEXT TEST NEEDED BY RECENT libavformat CHANGES:
-								$stream =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//;
+								print STDERR "------found($ext) ext=".$ext{$stream}
+										."= stream=$stream=\n"  if ($DEBUG);
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}

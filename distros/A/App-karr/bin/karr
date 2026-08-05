@@ -51,7 +51,7 @@ karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 
@@ -120,6 +120,16 @@ project skill for Claude Code.
 
 Shows or updates writable board settings such as the board name, defaults, and
 claim timeout.
+
+=item * L<App::karr::Cmd::Disable>
+
+Turns off automated agent runs for this board (L<karr-foundation>), optionally
+recording a reason. The flag lives in C<refs/karr/config> and syncs with the
+board.
+
+=item * L<App::karr::Cmd::Enable>
+
+Turns automated agent runs back on.
 
 =item * L<App::karr::Cmd::Context>
 

@@ -1,3 +1,8 @@
+0.004   2026-05-04  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to require Desktop::Open.
+
+
 0.003   2026-04-15  Released-By: PERLANCAR; Urgency: medium
 
         - Update to DesktopWorkspace 1.0.1.

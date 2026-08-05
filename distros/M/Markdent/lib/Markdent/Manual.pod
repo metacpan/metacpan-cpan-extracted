@@ -13,15 +13,15 @@ let's go through that piece by piece, starting at the end.
 
 Markdown is a wiki-esque plain text markup format that is easy to read and easy
 to write. It draws inspiration from how people have communicated in plain text
-email for a long time. For example, some text like "*really*" is parsed as
+email for a long time. For example, some text like C<*really*> is parsed as
 emphasis around the word "really".
 
 Existing Markdown tools in Perl (and in most other languages) are only able to
 convert Markdown directly to HTML. They are not really parsers, they're
 combined parser/converters. This is problematic if you want to do something
 with the document besides turn it into HTML. Maybe you'd like to parse it and
-cache an intermediate representation. Maybe you want to turn into markup-free
-text. Maybe you want to pull out just the links.
+cache an intermediate representation. Maybe you want to turn it into
+markup-free text. Maybe you want to pull out just the links.
 
 With Markdent, you can do any and all of those things (and you can turn
 Markdown into HTML too).
@@ -54,7 +54,7 @@ implementation that calls a different method for each type of event.
 This is used by the L<Markdent::Handler::HTMLStream::Document> and
 L<Markdent::Handler::HTMLStream::Fragment> handlers, for example. Since it
 generates a different tag for each event, it makes sense to have one method per
-event which knows what tag to generate.
+event, where each method which knows what tag to generate.
 
 On the other hand, the L<CaptureEvents
 handler|Markdent::Handler::CaptureEvents> doesn't care what type of event it
@@ -80,7 +80,7 @@ generate a complete HTML document.
 
 Use the L<Markdent::Handler::CaptureEvents> handler to capture events for
 caching. You can then store the generated L<Markdent::CapturedEvents> object
-using L<Storable>.
+using L<Storable> or some other serialization module.
 
 =head2 Do Both
 

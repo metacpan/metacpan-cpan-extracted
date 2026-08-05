@@ -265,6 +265,7 @@ AV* matcher_find_matches(Matcher* m, const char* filename) {
 int matcher_dump(Matcher* m, const char* filename) { return m->dump(filename) ? 1 : 0; }
 int matcher_load(Matcher* m, const char* filename) { return m->load(filename) ? 1 : 0; }
 int matcher_attach(Matcher* m, const char* filename) { return m->attach(filename) ? 1 : 0; }
+int matcher_verify(Matcher* m, const char* filename) { return m->verify(filename) ? 1 : 0; }
 
 void matcher_set_tombstones(Matcher* m, AV* ids) {
   dTHX;
@@ -349,4 +350,5 @@ AV* bag_best_for(Bag* b, const char* str, int count) {
 }
 
 int  bag_dump(Bag* b, const char* filename) { return b->dump(filename) ? 1 : 0; }
-int  bag_load(Bag* b, const char* filename) { return b->load(filename) ? 1 : 0; }
+int  bag_load(Bag* b, const char* filename) { return b->load(filename, /*verify_crc=*/false) ? 1 : 0; }
+int  bag_verify(Bag* b, const char* filename) { return b->verify(filename) ? 1 : 0; }

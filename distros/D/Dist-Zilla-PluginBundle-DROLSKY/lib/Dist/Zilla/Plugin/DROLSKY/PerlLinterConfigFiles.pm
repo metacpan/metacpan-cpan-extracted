@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 use Path::Tiny qw( path );
 use Path::Tiny::Rule;
@@ -148,7 +148,7 @@ Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles - Creates default perltidyrc
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =for Pod::Coverage .*
 
@@ -166,7 +166,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2025 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2026 by Dave Rolsky.
 
 This is free software, licensed under:
 

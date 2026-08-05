@@ -263,4 +263,123 @@ subtest 'list_users with fields option' => sub {
     ref_ok $result->{user_ids}, 'ARRAY', 'user_ids is array';
 };
 
+subtest '$user-level verify_password/reset_password/logout mirrors -- logged-in user' => sub {
+    $concierge->add_user({
+        user_id  => 'usermirror',
+        moniker  => 'UserMirror',
+        password => 'origpass1',
+    });
+
+    my $login = $concierge->login_user({
+        user_id  => 'usermirror',
+        password => 'origpass1',
+    });
+    ok $login->{success}, 'login succeeds';
+    my $user = $login->{user};
+    my $session_id = $user->session_id();
+
+    is $user->verify_password('origpass1'), 1, 'verify_password true for correct password';
+    is $user->verify_password('wrongpass'), 0, 'verify_password 0 for wrong password';
+
+    ok $user->reset_password('newpass456'), 'reset_password succeeds';
+    is $user->verify_password('newpass456'), 1, 'verify_password true for new password after reset';
+    is $user->verify_password('origpass1'), 0, 'old password no longer verifies';
+
+    ok $user->logout(), 'logout succeeds';
+    my $check_session = $concierge->sessions->get_session($session_id);
+    ok !$check_session->{success}, 'session gone after logout';
+
+    # Post-logout cleanup: $user degrades to visitor-equivalent status
+    # in place, rather than retaining stale session/backend capability.
+    ok !$user->is_logged_in, 'is_logged_in false after logout';
+    ok !$user->is_guest, 'is_guest false after logout';
+    ok $user->is_visitor, 'is_visitor true after logout';
+    is $user->session_id, undef, 'session_id cleared after logout';
+    is $user->session, undef, 'session object cleared after logout';
+    is $user->get_session_data, undef, 'get_session_data undef after logout';
+    is $user->verify_password('newpass456'), undef, 'verify_password no longer works after logout';
+    is $user->reset_password('anotherpass'), undef, 'reset_password no longer works after logout';
+    is $user->refresh_user_data, undef, 'refresh_user_data no longer works after logout';
+    is $user->update_user_data({ theme => 'dark' }), undef, 'update_user_data no longer works after logout';
+    is $user->logout, undef, 'calling logout again is a graceful no-op';
+    is $user->user_id, 'usermirror', 'user_id preserved after logout';
+    ok $user->user_key, 'user_key preserved after logout';
+};
+
+subtest '$user-level verify_password/reset_password/logout mirrors -- guest' => sub {
+    my $guest_result = $concierge->checkin_guest();
+    ok $guest_result->{success}, 'checkin_guest succeeds';
+    my $user = $guest_result->{user};
+    my $session_id = $user->session_id();
+
+    is $user->verify_password('whatever'), undef, 'verify_password undef for guest (no Auth identity)';
+    is $user->reset_password('whatever'), undef, 'reset_password undef for guest (no Auth identity)';
+
+    ok $user->logout(), 'logout succeeds for guest (session-only, no backend needed)';
+    my $check_session = $concierge->sessions->get_session($session_id);
+    ok !$check_session->{success}, 'session gone after guest logout';
+
+    ok $user->is_visitor, 'guest degrades to is_visitor after logout';
+    is $user->session_id, undef, 'session_id cleared after guest logout';
+    is $user->logout, undef, 'calling logout again is a graceful no-op for former guest';
+};
+
+subtest '$user-level verify_password/reset_password/logout mirrors -- visitor' => sub {
+    my $visitor_result = $concierge->admit_visitor();
+    ok $visitor_result->{success}, 'admit_visitor succeeds';
+    my $user = $visitor_result->{user};
+
+    is $user->verify_password('whatever'), undef, 'verify_password undef for visitor (no closures)';
+    is $user->reset_password('whatever'), undef, 'reset_password undef for visitor (no closures)';
+    is $user->logout(), undef, 'logout undef for visitor (no session, no closures)';
+};
+
+subtest '$user session-validity gating -- second stale instance after logout elsewhere' => sub {
+    $concierge->add_user({
+        user_id  => 'staleinstance',
+        moniker  => 'StaleInstance',
+        password => 'origpass1',
+    });
+
+    my $login = $concierge->login_user({
+        user_id  => 'staleinstance',
+        password => 'origpass1',
+    });
+    ok $login->{success}, 'login succeeds';
+    my $user1 = $login->{user};
+
+    # A second, independent object instance for the same identity/session,
+    # as if reconstructed from a cookie in a different request.
+    my $restore = $concierge->restore_user($user1->user_key);
+    ok $restore->{success}, 'restore_user succeeds for second instance';
+    my $user2 = $restore->{user};
+
+    # user2's closures are all present and untouched -- confirm it looks
+    # fully live before user1 logs out.
+    is $user2->verify_password('origpass1'), 1, 'user2 verify_password works before any logout';
+
+    ok $user1->logout(), 'user1 logs itself out';
+
+    # user2 never had ->logout() called on it -- its own fields (session,
+    # closures) are all still populated -- but the session backing both
+    # instances is now gone, so the live _session_valid check must catch it.
+    is $user2->verify_password('origpass1'), undef,
+        'user2 verify_password now undef (session invalidated elsewhere), not silently working';
+    is $user2->reset_password('newerpass'), undef,
+        'user2 reset_password now undef (session invalidated elsewhere)';
+    is $user2->refresh_user_data, undef,
+        'user2 refresh_user_data now undef (session invalidated elsewhere)';
+    is $user2->update_user_data({ theme => 'dark' }), undef,
+        'user2 update_user_data now undef (session invalidated elsewhere)';
+    is $user2->get_session_data, undef,
+        'user2 get_session_data now undef (session invalidated elsewhere)';
+    is $user2->update_session_data({ foo => 'bar' }), undef,
+        'user2 update_session_data now undef (session invalidated elsewhere)';
+
+    # user2's own status/closures were never touched by user1's cleanup --
+    # this confirms the protection comes from the live _session_valid
+    # check, not from any cross-instance mutation.
+    ok $user2->is_logged_in, 'user2 still reports is_logged_in (stale, uncleaned -- by design)';
+};
+
 done_testing;

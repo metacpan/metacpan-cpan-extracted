@@ -79,8 +79,14 @@ eval {
 	} elsif ( $fw_helper->{test_data}{commands}[1] ne 'ipfw add 150 deny tcp from "table(derp_ssh)" to me 22' ) {
 		die( '$fw_helper->{test_data}{commands}[1] ne "ipfw add 150 deny tcp from \"table(derp_ssh)\" to me 22"... '
 				. Dumper( $fw_helper->{test_data} ) );
-	} elsif ( $fw_helper->{test_data}{commands}[2] ne 'ipfw add 150 deny udp from "table(derp_ssh)" to me 22' ) {
-		die( '$fw_helper->{test_data}{commands}[2] ne "ipfw add 150 deny udp from \"table(derp_ssh)\" to me 22"... '
+	} elsif ( $fw_helper->{test_data}{commands}[2] ne 'ipfw add 150 deny tcp from "table(derp_ssh)" to me6 22' ) {
+		die( '$fw_helper->{test_data}{commands}[2] ne "ipfw add 150 deny tcp from \"table(derp_ssh)\" to me6 22"... '
+				. Dumper( $fw_helper->{test_data} ) );
+	} elsif ( $fw_helper->{test_data}{commands}[3] ne 'ipfw add 150 deny udp from "table(derp_ssh)" to me 22' ) {
+		die( '$fw_helper->{test_data}{commands}[3] ne "ipfw add 150 deny udp from \"table(derp_ssh)\" to me 22"... '
+				. Dumper( $fw_helper->{test_data} ) );
+	} elsif ( $fw_helper->{test_data}{commands}[4] ne 'ipfw add 150 deny udp from "table(derp_ssh)" to me6 22' ) {
+		die( '$fw_helper->{test_data}{commands}[4] ne "ipfw add 150 deny udp from \"table(derp_ssh)\" to me6 22"... '
 				. Dumper( $fw_helper->{test_data} ) );
 	}
 
@@ -91,17 +97,13 @@ eval {
 		die( '($fw_helper->{test_data}[0] ne "ipfw table derp_ssh add 1.2.3.4"... '
 				. Dumper( $fw_helper->{test_data} ) );
 	} elsif ( $fw_helper->{test_data}[1] ne
-		'sockstat -nc4 -P tcp |sed "s/.*tcp[46]  *//" | sed "s/:/ /g" | grep -i 1.2.3.4 | xargs -n 4 tcpdrop' )
+		'sockstat -nc4 -P tcp |sed "s/.*tcp[46]  *//" | sed "s/:/ /g" | grep -wF 1.2.3.4 | xargs -n 4 tcpdrop' )
 	{
 		die(
-			'($fw_helper->{test_data}[1] ne \'sockstat -nc4 -P tcp |sed "s/.*tcp[46]  *//" | sed "s/:/ /g" | grep -i 1.2.3.4 | xargs -n 4 tcpdrop\'... '
+			'($fw_helper->{test_data}[1] ne \'sockstat -nc4 -P tcp |sed "s/.*tcp[46]  *//" | sed "s/:/ /g" | grep -wF 1.2.3.4 | xargs -n 4 tcpdrop\'... '
 				. Dumper( $fw_helper->{test_data} ) );
-	} elsif ( $fw_helper->{test_data}[2] ne
-		'sockstat -n6 -P udp | grep -i 1.2.3.4 | perl -lpe \'$_=~s/.*udp[46]  *//; $_=~s/:([0-9]+) / $1 /; $_=~s/:([0-9]+)$/ $1/; $_=~s/\\%[a-zA-Z0-9]+/ /g ; print $_\''
-		)
-	{
-		die(
-			'($fw_helper->{test_data}[2] ne \'sockstat -n6 -P udp | grep -i 1.2.3.4 | perl -lpe \'$_=~s/.*udp[46]  *//; $_=~s/:([0-9]+) / $1 /; $_=~s/:([0-9]+)$/ $1/; $_=~s/\\%[a-zA-Z0-9]+/ /g ; print $_\'\'... '
+	} elsif ( defined( $fw_helper->{test_data}[2] ) ) {
+		die( '($fw_helper->{test_data}[2] is defined, but the UDP kill command was removed... '
 				. Dumper( $fw_helper->{test_data} ) );
 	}
 
@@ -140,6 +142,26 @@ eval {
 		die('$banned[0] ne "5.6.7.8"');
 	} elsif ( defined( $banned[1] ) ) {
 		die('$banned[1] not undef');
+	}
+
+	if ( !$backend_obj->{cidr_supported} ) {
+		die('$backend_obj->{cidr_supported} is not true');
+	}
+
+	$fw_helper->ban_cidr( ban => '1.2.3.0/24' );
+	if ( !defined( $fw_helper->{test_data} ) ) {
+		die('Backend did not set $fw_helper->{test_data}');
+	} elsif ( $fw_helper->{test_data}[0] ne 'ipfw table derp_ssh add 1.2.3.0/24' ) {
+		die( '($fw_helper->{test_data}[0] ne "ipfw table derp_ssh add 1.2.3.0/24"... '
+				. Dumper( $fw_helper->{test_data} ) );
+	}
+
+	$fw_helper->unban_cidr( ban => '1.2.3.0/24' );
+	if ( !defined( $fw_helper->{test_data} ) ) {
+		die('Backend did not set $fw_helper->{test_data}');
+	} elsif ( $fw_helper->{test_data} ne 'ipfw table derp_ssh delete 1.2.3.0/24' ) {
+		die( '($fw_helper->{test_data} ne "ipfw table derp_ssh delete 1.2.3.0/24"... '
+				. Dumper( $fw_helper->{test_data} ) );
 	}
 
 	$fw_helper->re_init;

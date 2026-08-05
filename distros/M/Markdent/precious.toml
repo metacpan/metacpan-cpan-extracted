@@ -1,24 +1,26 @@
 exclude = [
-    ".build/**/*",
-    "Markdent-*/**/*",
-    "blib/**/*",
+    ".build/**",
+    "Markdent-*",
+    "META.yml",
+    "MYMETA.yml",
+    "blib/**",
     "t/00-*",
     "t/author-*",
     "t/release-*",
     "t/zzz-*",
-    "xt/author",
-    "xt/release",
+    "xt/author/**/*",
+    "xt/release/**/*",
 ]
 
 [commands.omegasort-gitignore]
 type = "both"
 include = "**/.gitignore"
-cmd = [ "omegasort", "--sort=path" ]
+cmd = [ "omegasort", "--sort", "path", "--unique" ]
 lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
-expect_stderr = true
+ignore-stderr = ["The .+ file is not sorted", "The .+ file is not unique"]
 
 [commands.perlcritic]
 type = "lint"

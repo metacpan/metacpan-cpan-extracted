@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.24
+version 1.25
 
 # SYNOPSIS
 
@@ -160,7 +160,6 @@ This is more or less equivalent to the following `dist.ini`:
     skip = Dist::Zilla::Plugin::DROLSKY::MakeMaker
     skip = Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
     skip = Dist::Zilla::Plugin::DROLSKY::Precious
-    skip = Dist::Zilla::Plugin::DROLSKY::Test::Precious
     skip = Dist::Zilla::Plugin::DROLSKY::WeaverConfig
     skip = Pod::Weaver::PluginBundle::DROLSKY
 
@@ -178,7 +177,6 @@ This is more or less equivalent to the following `dist.ini`:
 
     [PodSyntaxTests]
 
-    [DROLSKY::Test::Precious]
     [MojibakeTests]
     [Test::CleanNamespaces]
     [Test::CPAN::Changes]
@@ -319,7 +317,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2025 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2026 by Dave Rolsky.
 
 This is free software, licensed under:
 

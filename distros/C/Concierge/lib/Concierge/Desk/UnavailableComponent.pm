@@ -1,7 +1,7 @@
-package Concierge::Desk::UnavailableComponent v0.11.0;
+package Concierge::Desk::UnavailableComponent v0.13.0;
 use v5.36;
 
-our $VERSION = 'v0.11.0';
+our $VERSION = 'v0.13.0';
 
 # ABSTRACT: Stand-in substituted for a failed optional Concierge desk component
 
@@ -48,7 +48,7 @@ Concierge::Desk::UnavailableComponent - Stand-in substituted for a failed option
 
 =head1 VERSION
 
-v0.11.0
+v0.13.0
 
 =head1 SYNOPSIS
 

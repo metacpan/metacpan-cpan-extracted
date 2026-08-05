@@ -1,3 +1,25 @@
+0.402     2026-08-04 04:46:25Z
+
+    - New board-level opt-out from automated agent runs: `karr disable
+      [--reason "why"]` / `karr enable`. Unlike the per-machine .karr file the
+      flag is board state (`foundation.enabled` in refs/karr/config), so it
+      syncs with the board and every karr-foundation instance on every machine
+      honours it. karr-foundation checks it first — before agent-command
+      resolution and before the drain decision — and skips a disabled board
+      whole: no drain, no auto-block, no agent run. It therefore wins over
+      --command, the config's default_command, the .karr `command` and
+      `claude: true`, and --force does not override it. This closes the gap
+      where a global `default_command` turned every discovered board into an
+      agent board with no way for a repo to opt out. The same state is visible
+      and settable through `karr config` (foundation.enabled /
+      foundation.reason), and `karr-foundation --status` shows a disabled board
+      with a `disabled` flag plus its reason.
+    - Shipped skill doc (share/claude-skill.md) caught up with the CLI: now
+      documents the `karr show` variants (bare, --last, --me, --agent), WIP
+      utilization in `karr board`, and wip_limits in the config example. A
+      repo-hygiene test (t/62-skill-doc-sync.t) keeps it in sync with the
+      in-repo copy of the skill so the two can no longer drift apart.
+
 0.401     2026-07-14 14:32:22Z
 
     - Fix `karr sync` reporting success even when pull or push failed: it

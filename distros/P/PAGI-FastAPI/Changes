@@ -1,9 +1,40 @@
 Revision history for Perl extension PAGI::FastAPI
 
-0.0.1   2026-08-03
-        - Initial CPAN release.
-        - Asynchronous routing engine built on top of PAGI ($scope, $receive, $send).
-        - Type-safe parameter & POST JSON body validation via Type::Tiny.
-        - Async Middleware pipeline support with built-in CORS helper (add_cors).
-        - FastAPI-style Dependency Injection system via PAGI::FastAPI::Depends.
-        - Integrated OpenAPI 3.1 schema (/openapi.json) and interactive Swagger UI (/docs).
+0.0.3  2026-08-04
+       [EXAMPLE]
+       - Added integration demo script:
+         eg/integration_demo.pl
+
+0.0.2  2026-08-04
+        [BUGFIX]
+        - Routes no longer consider metacharacters in their static paths
+          (like ".", "+", "?") as wildcards. Only placeholders {param}
+          are transformed into capture groups. Previously, it would allow
+          the route '/items.json/{id}' to match paths like '/itemsXjson/{id}'.
+        - The values of path parameters and query string parameters are now
+          appropriately decoded: '%XX' and '+' decoding is now done as it
+          should be according to the application/x-www-form-urlencoded rules.
+          Until now strings like 'John%20Doe' were sent to handlers unchanged.
+        - The request body reader no longer goes into an infinite loop when
+          the PAGI server sends a non-'http.request' event (for example
+          'http.disconnect') while transmitting POST/PUT/PATCH requests.
+        - When registering routes, the process now fails with a clear message
+          instead of just ignoring misconfiguration. For instance, absence
+          of a 'handler' property, 'dependencies' property not being a HashRef
+          or an ArrayRef is rejected immediately during route registration.
+        [TESTING]
+        - A new test was added in t/08-input_handling_and_registration.t
+          covering the above-mentioned aspects.
+        - A new test was added in t/09-external-async-resource-integration.t
+          to cover DBIx::Class::Async integration.
+        [EXAMPLE]
+        - Added additional DBIx::Class::Async integrated application:
+          eg/dbic_async_integration.pl
+
+0.0.1  2026-08-03
+       - Initial CPAN release.
+       - Asynchronous routing engine built on top of PAGI ($scope, $receive, $send).
+       - Type-safe parameter & POST JSON body validation via Type::Tiny.
+       - Async Middleware pipeline support with built-in CORS helper (add_cors).
+       - FastAPI-style Dependency Injection system via PAGI::FastAPI::Depends.
+       - Integrated OpenAPI 3.1 schema (/openapi.json) and interactive Swagger UI (/docs).

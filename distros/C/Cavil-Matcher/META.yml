@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.12'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/openSUSE/cavil-matcher/issues
   license: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
   repository: https://github.com/openSUSE/cavil-matcher.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

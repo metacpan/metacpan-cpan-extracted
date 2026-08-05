@@ -56,6 +56,13 @@ my $good = slurp($seg);
 is(accepts($good),           1,                                 'the untampered segment attaches');
 is(crc32(substr($good, 56)), unpack('V', substr($good, 48, 4)), 'pure-Perl CRC32 matches the stored payload CRC');
 
+# Guardrail: the on-disk format version must stay 2. The scan path trusts an already-published segment's
+# CRC (it verifies structure but not the whole-payload checksum), which makes an in-place production
+# upgrade seamless ONLY as long as the format is unchanged. Bumping this without a migration plan would
+# let a new writer publish segments an old reader rejects (and vice versa) - so if this fails, the format
+# changed and the upgrade is no longer drop-in.
+is(unpack('V', substr($good, 8, 4)), 2, 'segment format version is still 2 (in-place upgrade stays seamless)');
+
 my $node_count  = unpack('V', substr($good, 32, 4));
 my $child_count = unpack('V', substr($good, 36, 4));
 my $skip_count  = unpack('V', substr($good, 40, 4));

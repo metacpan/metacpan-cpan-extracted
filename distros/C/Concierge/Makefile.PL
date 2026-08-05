@@ -27,6 +27,7 @@ WriteMakefile(
     PM => {
         'lib/Concierge.pm'                           => '$(INST_LIB)/Concierge.pm',
         'lib/Concierge/Desk/Component.pm'            => '$(INST_LIB)/Concierge/Desk/Component.pm',
+        'lib/Concierge/Desk/DeferredComponent.pm'    => '$(INST_LIB)/Concierge/Desk/DeferredComponent.pm',
         'lib/Concierge/Desk/UnavailableComponent.pm' => '$(INST_LIB)/Concierge/Desk/UnavailableComponent.pm',
         'lib/Concierge/Desk/Setup.pm'                => '$(INST_LIB)/Concierge/Desk/Setup.pm',
         'lib/Concierge/Desk/User.pm'                 => '$(INST_LIB)/Concierge/Desk/User.pm',
@@ -47,23 +48,27 @@ WriteMakefile(
         provides => {
             'Concierge' => {
                 file    => 'lib/Concierge.pm',
-                version => 'v0.11.0',
+                version => 'v0.13.0',
             },
             'Concierge::Desk::Component' => {
                 file    => 'lib/Concierge/Desk/Component.pm',
-                version => 'v0.11.0',
+                version => 'v0.13.0',
+            },
+            'Concierge::Desk::DeferredComponent' => {
+                file    => 'lib/Concierge/Desk/DeferredComponent.pm',
+                version => 'v0.13.0',
             },
             'Concierge::Desk::UnavailableComponent' => {
                 file    => 'lib/Concierge/Desk/UnavailableComponent.pm',
-                version => 'v0.11.0',
+                version => 'v0.13.0',
             },
             'Concierge::Desk::Setup' => {
                 file    => 'lib/Concierge/Desk/Setup.pm',
-                version => 'v0.11.0',
+                version => 'v0.13.0',
             },
             'Concierge::Desk::User' => {
                 file    => 'lib/Concierge/Desk/User.pm',
-                version => 'v0.11.0',
+                version => 'v0.13.0',
             },
         },
     },

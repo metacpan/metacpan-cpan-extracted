@@ -1,7 +1,7 @@
 {
-   "abstract" : "A minimal command-line parser with short and long options in pure Perl",
+   "abstract" : "Minimal command-line parser with short/long options and aliases in pure Perl",
    "author" : [
-      "Hans Harder <hans at atbas.org>"
+      "Hans Harder"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -46,7 +46,7 @@
    "provides" : {
       "CLI::Cmdline" : {
          "file" : "lib/CLI/Cmdline.pm",
-         "version" : "1.28"
+         "version" : "1.30"
       }
    },
    "release_status" : "stable",
@@ -60,9 +60,6 @@
          "web" : "https://codeberg.org/HansH111/CLI-Cmdline.pm"
       }
    },
-   "version" : "1.28",
-   "x_contributors" : [
-      "Hans Harder <hans at atbas.org>"
-   ],
+   "version" : "1.30",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

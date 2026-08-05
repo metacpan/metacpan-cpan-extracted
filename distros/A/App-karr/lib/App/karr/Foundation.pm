@@ -1,7 +1,7 @@
 # ABSTRACT: Single-shot foundation daemon — periodic agent execution across karr boards
 
 package App::karr::Foundation;
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moo;
 use MooX::Options (
   usage_string => 'USAGE: karr-foundation [options]',
@@ -148,13 +148,17 @@ sub run {
 
   # foundation is a multi-board coordinator: agent execution is opt-in. When no
   # board has an agent configured, the default action is the overview — a human
-  # can use foundation purely to see what is happening across boards.
+  # can use foundation purely to see what is happening across boards. A board
+  # disabled in its own karr state never counts as an agent board here either,
+  # so a config of nothing but disabled boards falls back to the overview.
   my $any_agent = grep {
-    defined $self->_agent_command( $_, $self->_load_karr($_) )
+    !$self->_board_disabled( $_ )
+      && defined $self->_agent_command( $_, $self->_load_karr($_) )
   } @repos;
   unless ( $any_agent ) {
-    print "No agent configured on any board. Showing overview "
-        . "(set 'claude: true' or 'command:' in a .karr file to enable agents).\n\n";
+    print "No agent will run on any board. Showing overview "
+        . "(set 'claude: true' or 'command:' in a .karr file to enable agents; "
+        . "a board disabled with 'karr disable' never runs one).\n\n";
     $self->_print_overview( \@repos );
     return 0;
   }
@@ -241,6 +245,13 @@ sub _process_repo {
     return;
   }
 
+  # Board-level disable flag, checked FIRST: before the agent command is even
+  # resolved and before the drain decision. A disabled board is skipped whole —
+  # no drain, no auto-block, no agent run — so the flag wins over --command,
+  # the config's default_command, the .karr command and 'claude: true'. It is
+  # deliberately absolute: --force does not override it.
+  return if $self->_skip_disabled( $repo );
+
   my $karr = $self->_load_karr( $repo );
 
   # Resolve the agent command (CLI > default_command > .karr command >
@@ -267,6 +278,11 @@ sub _process_repo {
 
   # Pull latest refs
   $self->_sync_pull( $repo );
+
+  # The pull may have just brought the disable flag in from another machine —
+  # re-check before committing to a drain, so a board disabled elsewhere is
+  # never drained even once by this host.
+  return if $self->_skip_disabled( $repo );
 
   # Decide whether to start a drain at all
   my $should_run = $self->force;
@@ -334,6 +350,34 @@ sub _ref_hash {
   # Deterministic fingerprint of refs/karr/* (ref name + target OID).
   my $out = join '', map { "$_ $oids->{$_}\n" } sort keys %$oids;
   return md5_hex( $out );
+}
+
+# ---------------------------------------------------------------------------
+# Board-level disable flag (refs/karr/config: foundation.enabled)
+# ---------------------------------------------------------------------------
+
+# The board's own opt-out, stored in karr state rather than in the local .karr
+# file so it syncs with the board and every foundation instance on every machine
+# honours it. Returns { reason => $text_or_undef } when the board is disabled
+# and undef when it is enabled (the default for a board that never set it).
+sub _board_disabled {
+  my ( $self, $repo ) = @_;
+  my $git = App::karr::Git->new( dir => "$repo" );
+  return undef unless $git->is_repo;
+  my $store = App::karr::BoardStore->new( git => $git );
+  return undef if $store->foundation_enabled;
+  return { reason => $store->foundation_reason };
+}
+
+# Skip predicate used at the two checkpoints in _process_repo. True (and a
+# verbose note) when the board is disabled.
+sub _skip_disabled {
+  my ( $self, $repo ) = @_;
+  my $off = $self->_board_disabled( $repo ) or return 0;
+  my $reason = $off->{reason};
+  $self->_say_verbose(
+    "skip $repo — board disabled" . ( defined $reason ? ": $reason" : '' ) );
+  return 1;
 }
 
 # ---------------------------------------------------------------------------
@@ -591,7 +635,7 @@ App::karr::Foundation - Single-shot foundation daemon — periodic agent executi
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 
@@ -645,6 +689,19 @@ B<Per-repo .karr file:>
 C<claude>, C<claude_bin>, C<claude_max_turns>, C<claude_permission_mode>,
 C<command> and C<prompt>/C<default_prompt> may also be set globally in the
 config file; the per-repo F<.karr> value wins.
+
+B<Board-level disable.> A board can opt out of automated agent runs in its own
+karr state — C<foundation.enabled> in C<refs/karr/config>, set with
+C<karr disable [--reason "why"]> and cleared with C<karr enable>. Because the
+flag is board state it syncs with the board, so every foundation instance on
+every machine honours it. A disabled board is skipped B<whole>: the flag is
+checked before the agent command is resolved and before the drain decision, so
+there is no drain, no auto-block and no agent run. It therefore wins over
+C<--command>, the config's C<default_command>, the F<.karr> C<command> and
+C<< claude: true >>, and C<--force> does B<not> override it. Use it for a
+repository whose backlog is parked (an abandoned project kept for reference)
+that a globally configured C<default_command> would otherwise drain. C<--status>
+shows such a board with a C<disabled> flag and its reason.
 
 B<Coordinator and overview.> Agent execution is opt-in — a board runs an agent
 only via C<command> or C<< claude: true >>. When B<no> board has an agent

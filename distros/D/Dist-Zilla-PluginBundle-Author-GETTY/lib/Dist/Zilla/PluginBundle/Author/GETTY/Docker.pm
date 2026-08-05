@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY::Docker;
 # ABSTRACT: Docker image subsection for @Author::GETTY
-our $VERSION = '0.316';
+our $VERSION = '0.317';
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
@@ -75,7 +75,7 @@ Dist::Zilla::PluginBundle::Author::GETTY::Docker - Docker image subsection for @
 
 =head1 VERSION
 
-version 0.316
+version 0.317
 
 =head1 SYNOPSIS
 

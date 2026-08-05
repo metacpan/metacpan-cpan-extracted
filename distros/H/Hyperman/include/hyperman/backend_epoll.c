@@ -212,8 +212,8 @@ static void ep_destroy(hm_backend *be) {
 }
 
 hm_backend *hm_backend_epoll_new(void) {
-    hm_backend  *be = (hm_backend *)calloc(1, sizeof(hm_backend));
-    hm_ep_state *st = (hm_ep_state *)calloc(1, sizeof(hm_ep_state));
+    hm_backend  *be = (hm_backend *)hm_xcalloc(1, sizeof(hm_backend));
+    hm_ep_state *st = (hm_ep_state *)hm_xcalloc(1, sizeof(hm_ep_state));
     if (!be || !st) { free(be); free(st); return NULL; }
     st->ep = epoll_create1(EPOLL_CLOEXEC);
     if (st->ep < 0) { free(be); free(st); return NULL; }

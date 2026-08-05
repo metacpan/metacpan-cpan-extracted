@@ -1,7 +1,7 @@
 # ABSTRACT: karr-foundation read-only overview — multi-board status dashboard
 
 package App::karr::Foundation::Overview;
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moo;
 
 
@@ -30,13 +30,20 @@ sub _print_overview {
       push @blocked,     $id if $st->{blocked};
     }
 
+    # The board's own opt-out (refs/karr/config: foundation.enabled) is the
+    # dominant fact about a board, so it leads the flag list — and suppresses
+    # the 'agent' flag, because that agent will never run here.
+    my $disabled = $self->foundation->_board_disabled($repo);
+
     my @flags;
+    push @flags, 'disabled' if $disabled;
     push @flags, 'agent-running' if $self->foundation->_lock_held($repo);
     if ( $self->foundation->_cooldown_active($repo) ) {
       my $until = $self->foundation->_state_get( $repo, 'cooldown_until' ) // 0;
       push @flags, 'cooldown ' . ( $until - time ) . 's';
     }
-    push @flags, 'agent' if defined $self->foundation->_agent_command( $repo, $karr );
+    push @flags, 'agent'
+      if !$disabled && defined $self->foundation->_agent_command( $repo, $karr );
 
     my $total = keys %states;
     printf "%s\n", $repo->basename;
@@ -46,6 +53,8 @@ sub _print_overview {
     if (%count) {
       printf "  %s\n", join( '  ', map { "$_:$count{$_}" } sort keys %count );
     }
+    printf "  disabled:    %s\n", $disabled->{reason} // 'no reason given'
+      if $disabled;
     printf "  in-progress: %s\n", join( ', ', map { "#$_" } @in_progress ) if @in_progress;
     printf "  blocked:     %s\n", join( ', ', map { "#$_" } @blocked )     if @blocked;
     print "\n";
@@ -67,15 +76,18 @@ App::karr::Foundation::Overview - karr-foundation read-only overview — multi-b
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 DESCRIPTION
 
 L<App::karr::Foundation::Overview> renders the read-only cross-board dashboard
 shown by C<karr-foundation --status> and whenever no board has an agent
 configured: per repo it prints the task-status counts, the in-progress and
-blocked task ids, and lock / cooldown / agent flags. A weak back-reference to
-the owning foundation supplies the board data and state helpers.
+blocked task ids, and disabled / lock / cooldown / agent flags. A board that
+opted out of automated agent runs (C<karr disable>) is shown with a C<disabled>
+flag and a C<disabled:> line carrying its reason; its C<agent> flag is
+suppressed, because no agent runs there. A weak back-reference to the owning
+foundation supplies the board data and state helpers.
 
 =head1 SUPPORT
 

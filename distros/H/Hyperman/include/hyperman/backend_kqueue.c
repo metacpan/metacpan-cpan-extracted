@@ -109,8 +109,8 @@ static void kq_destroy(hm_backend *be) {
 }
 
 hm_backend *hm_backend_kqueue_new(void) {
-    hm_backend  *be = (hm_backend *)calloc(1, sizeof(hm_backend));
-    hm_kq_state *st = (hm_kq_state *)calloc(1, sizeof(hm_kq_state));
+    hm_backend  *be = (hm_backend *)hm_xcalloc(1, sizeof(hm_backend));
+    hm_kq_state *st = (hm_kq_state *)hm_xcalloc(1, sizeof(hm_kq_state));
     if (!be || !st) { free(be); free(st); return NULL; }
     st->kq = kqueue();
     if (st->kq < 0) { free(be); free(st); return NULL; }
