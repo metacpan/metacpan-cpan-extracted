@@ -2,14 +2,13 @@
 use strict;
 use warnings;
 use Test::More;
-use Try::Tiny;
 use Log::Any '$log';
 use Log::Any::Adapter 'TAP';
 use Data::TableReader::Decoder::CSV;
 
 my $csvmod;
 plan skip_all => 'Need a CSV parser for this test'
-	unless try { $csvmod= Data::TableReader::Decoder::CSV->default_csv_module };
+	unless eval { $csvmod= Data::TableReader::Decoder::CSV->default_csv_module };
 note "CSV decoder is ".$csvmod." version ".$csvmod->VERSION;
 
 my $log_fn= sub { $log->can($_[0])->($log, $_[1]) };
@@ -50,7 +49,7 @@ sub test_multi_iterator {
 	ok( my $iter= $d->iterator, 'create first iterator' );
 	
 	# This might be supported in the future, but for now ensure it dies
-	like( (try { $d->iterator } catch {$_}), qr/multiple iterator/i, 'error for multiple iterators' );
+	like( do { local $@; eval { $d->iterator }; my $e= $@ }, qr/multiple iterator/i, 'error for multiple iterators' );
 
 	undef $iter; # release old iterator, freeing up the file handle to create a new one
 	ok( $iter= $d->iterator, 'new iterator' );
@@ -90,7 +89,7 @@ sub test_utf_bom {
 			if ($input_fn =~ /deceptive/) {
 				# Some inputs on non-seekable file handles will result in this exception.
 				# This is expected.
-				like( (try { $d->iterator } catch {$_}), qr/seek/, 'can\'t seek exception' );
+				like( do { local $@; eval { $d->iterator }; my $e= $@ }, qr/seek/, 'can\'t seek exception' );
 			} else {
 				ok( my $iter= $d->iterator, 'got iterator' );
 				like( $iter->()[0], qr/^\x{FFFD}?test$/, 'first row' );

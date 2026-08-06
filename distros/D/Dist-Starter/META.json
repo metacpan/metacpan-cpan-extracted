@@ -1,0 +1,99 @@
+{
+   "abstract" : "A command-line utility for rendering Perl project templates",
+   "author" : [
+      "Sven Willenbuecher <sven.willenbuecher@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Starter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.76",
+            "ExtUtils::MakeMaker::CPANfile" : "0.11",
+            "File::ShareDir::Install" : "0",
+            "File::Spec::Functions" : "0",
+            "Module::Load::Conditional" : "0",
+            "Module::Loaded" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.32",
+            "Fcntl" : "0",
+            "File::Copy::Recursive::Reduced" : "0",
+            "File::Find" : "0",
+            "File::ShareDir::Tiny" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Getopt::Guided" : "v3.2.2",
+            "PerlX::Maybe" : "0",
+            "Safe::Isa" : "0",
+            "Try::Tiny" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.010000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "File::Which" : "0",
+            "Test2::Require::ReleaseTesting" : "0",
+            "Test2::V1" : "0",
+            "Test::Mock::Cmd" : "0",
+            "Test::Output" : "0",
+            "Test::Script" : "1.31"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Starter" : {
+         "file" : "lib/Dist/Starter.pm",
+         "version" : "v0.1.0"
+      },
+      "Dist::Starter::Context" : {
+         "file" : "lib/Dist/Starter/Context.pm",
+         "version" : "v0.1.0"
+      },
+      "Dist::Starter::Exception" : {
+         "file" : "lib/Dist/Starter/Exception.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/XSven/Dist-Starter/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/XSven/Dist-Starter.git",
+         "web" : "https://codeberg.org/XSven/Dist-Starter"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

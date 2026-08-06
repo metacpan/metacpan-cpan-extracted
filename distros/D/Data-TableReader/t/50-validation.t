@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Try::Tiny;
 use File::Spec::Functions 'catfile';
 use Log::Any '$log';
 use Log::Any::Adapter 'TAP', filter => 'none';
@@ -21,9 +20,9 @@ subtest validation_die => sub {
 			log => \@log
 		], 'TableReader' );
 	my $i= $tr->iterator;
-	is_deeply( (try { $i->() }), { X => 'abc' }, 'valid row' );
-	like( (try { $i->() } catch { $_ }), qr/not alpha/, 'invalid row' );
-	is_deeply( (try { $i->() }), { X => 'def' }, 'valid row' );
+	is_deeply( eval { $i->() }, { X => 'abc' }, 'valid row' );
+	like( do { local $@; eval { $i->() }; my $e= $@ }, qr/not alpha/, 'invalid row' );
+	is_deeply( eval { $i->() }, { X => 'def' }, 'valid row' );
 	is( $i->(), undef, 'eof' );
 };
 

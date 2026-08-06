@@ -20,12 +20,13 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.33;
+our $VERSION = v0.34;
 
 use constant {
-    WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
-    WK_SID  => 'f87a38cb-fd13-4e15-866c-e49901adbec5', # small-identifier
-    WK_SNI  => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', # sirtx-numerical-identifier
+    WK_UUID         => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
+    WK_SID          => 'f87a38cb-fd13-4e15-866c-e49901adbec5', # small-identifier
+    WK_SNI          => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', # sirtx-numerical-identifier
+    WK_CHAT0W       => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a', # chat-0-word-identifier
 };
 
 my %imported;
@@ -182,6 +183,11 @@ sub import {
                     $identifier->{id_cache} //= {};
                     $identifier->{id_cache}->{WK_SNI()} //= $special{sni};
                 }
+
+                if (defined $special{chat0w}) {
+                    $identifier->{id_cache} //= {};
+                    $identifier->{id_cache}->{WK_CHAT0W()} //= $special{chat0w};
+                }
             }
 
             if ($displayname_is_tagname && defined($displayname)) {
@@ -275,7 +281,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.33
+version v0.34
 
 =head1 SYNOPSIS
 
@@ -367,17 +373,17 @@ $extra_classes colour
 $displayname_is_tagname true
 $type uuid
 
-.   fade296d-c34f-4ded-abd5-d9adaf37c284    black       sid=61
-.   1a2c23fa-2321-47ce-bf4f-5f08934502de    white       sid=62
-.   f9bb5cd8-d8e6-4f29-805f-cc6f2b74802d    grey        sid=63
-.   c9ec3bea-558e-4992-9b76-91f128b6cf29    red         sid=119
-.   c0e957d0-b5cf-4e53-8e8a-ff0f5f2f3f03    green       sid=120
-.   3dcef9a3-2ecc-482d-a98b-afffbc2f64b9    blue        sid=121
-.   abcbf48d-c302-4be1-8c5c-a8de4471bcbb    cyan        sid=122
-.   a30d070d-9909-40d4-a33a-474c89e5cd45    magenta     sid=123
-.   2892c143-2ae7-48f1-95f4-279e059e7fc3    yellow      sid=124
-.   5c41829f-5062-4868-9c31-2ec98414c53d    orange      sid=125
-.   c90acb33-b8ea-4f55-bd86-beb7fa5cf80a    savannah    sid=126
+.   fade296d-c34f-4ded-abd5-d9adaf37c284    black       sid=61,chat0w=112
+.   1a2c23fa-2321-47ce-bf4f-5f08934502de    white       sid=62,chat0w=113
+.   f9bb5cd8-d8e6-4f29-805f-cc6f2b74802d    grey        sid=63,chat0w=114
+.   c9ec3bea-558e-4992-9b76-91f128b6cf29    red         sid=119,chat0w=115
+.   c0e957d0-b5cf-4e53-8e8a-ff0f5f2f3f03    green       sid=120,chat0w=116
+.   3dcef9a3-2ecc-482d-a98b-afffbc2f64b9    blue        sid=121,chat0w=117
+.   abcbf48d-c302-4be1-8c5c-a8de4471bcbb    cyan        sid=122,chat0w=118
+.   a30d070d-9909-40d4-a33a-474c89e5cd45    magenta     sid=123,chat0w=119
+.   2892c143-2ae7-48f1-95f4-279e059e7fc3    yellow      sid=124,chat0w=120
+.   5c41829f-5062-4868-9c31-2ec98414c53d    orange      sid=125,chat0w=121
+.   c90acb33-b8ea-4f55-bd86-beb7fa5cf80a    savannah    sid=126,chat0w=122
 .   215d7fe0-8513-4e38-8477-bdcc3b277779    key
 .   11a5ad35-251f-4ec8-b980-eee9ebf2dead    violet
 .   f2e45f11-b1a8-421f-9c03-61a30bd23e78    brown
@@ -563,18 +569,18 @@ $class any-taxon
 $displayname_is_tagname true
 $type uuid
 
-.   838eede5-3f93-46a9-8e10-75165d10caa1    cat                         sid=80
-.   252314f9-1467-48bf-80fd-f8b74036189f    dog                         sid=81
+.   838eede5-3f93-46a9-8e10-75165d10caa1    cat                         sid=80,chat0w=256
+.   252314f9-1467-48bf-80fd-f8b74036189f    dog                         sid=81,chat0w=257
 .   571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1    lion                        sid=82
 .   36297a27-0673-44ad-b2d8-0e4e97a9022d    tiger                       sid=83
 .   5d006ca0-c27b-4529-b051-ac39c784d5ee    fox                         sid=84
 .   914b3a09-4e01-4afc-a065-513c199b6c24    squirrel                    sid=85
 .   95f1b56e-c576-4f32-ac9b-bfdd397c36a6    wolf                        sid=86
-.   dcf8f4f0-c15e-44bd-ad76-0d483079db16    human                       sid=87
+.   dcf8f4f0-c15e-44bd-ad76-0d483079db16    human                       sid=87,chat0w=274
 
-.   f901e5e0-e217-41c8-b752-f7287af6e6c3    mammal                      sid=89
-.   7ed4160e-06d6-44a2-afe8-457e2228304d    vertebrate                  sid=90
-.   0510390c-9604-4362-b603-ea09e48de7b7    animal                      sid=91
+.   f901e5e0-e217-41c8-b752-f7287af6e6c3    mammal                      sid=89,chat0w=281
+.   7ed4160e-06d6-44a2-afe8-457e2228304d    vertebrate                  sid=90,chat0w=282
+.   0510390c-9604-4362-b603-ea09e48de7b7    animal                      sid=91,chat0w=283
 .   bccdaf71-0c82-422e-af44-bb8396bf90ed    plant                       sid=92
 .   a0b8122e-d11b-4b78-a266-0bb90d1c1cbe    fungus                      sid=93
 .   3e92ac2d-f8fe-48bf-acd7-8505d23d07ab    organism                    sid=94
@@ -1007,13 +1013,13 @@ $class day-of-week
 $displayname_is_tagname true
 $generator style=integer-based,namespace=01a1ba02-c6a4-4468-a0dd-2944896c14c7,generator=7d7e0a5c-a244-43b6-90be-414059279a1e
 
-.   1   Monday
-.   2   Tuesday
-.   3   Wednesday
-.   4   Thursday
-.   5   Friday
-.   6   Saturday
-.   7   Sunday
+.   1   Monday          chat0w=248
+.   2   Tuesday         chat0w=249
+.   3   Wednesday       chat0w=250
+.   4   Thursday        chat0w=251
+.   5   Friday          chat0w=252
+.   6   Saturday        chat0w=253
+.   7   Sunday          chat0w=254
 
 
 $class rdf

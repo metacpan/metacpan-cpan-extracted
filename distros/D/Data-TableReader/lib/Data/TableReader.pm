@@ -1,32 +1,34 @@
 package Data::TableReader;
 use Moo 2;
-use Try::Tiny;
 use Carp;
 use Scalar::Util qw( blessed refaddr );
 use List::Util 'max';
 use Module::Runtime 'require_module';
 use Data::TableReader::Field;
 use Data::TableReader::Iterator;
+use Encode ();
 use namespace::clean;
 
 # ABSTRACT: Extract records from "dirty" tabular data sources
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 
 has input               => ( is => 'rw', required => 1 );
 has _file_handle        => ( is => 'lazy' );
+has _real_file_name     => ( is => 'rw', lazy => 1, builder => 1 );
+has _client_file_name   => ( is => 'rw', lazy => 1, builder => 1 );
 has _decoder_arg        => ( is => 'rw', init_arg => 'decoder' );
 has decoder             => ( is => 'lazy', init_arg => undef );
-has fields              => ( is => 'rw', required => 1, coerce => \&_coerce_field_list );
+has fields              => ( is => 'rw', required => 1, coerce => \&_coerce_field_list, trigger => \&_update_fields );
 sub field_list             { @{ shift->fields } }
-has field_by_name       => ( is => 'lazy' );
-has field_by_addr       => ( is => 'lazy' );
+has field_by_name       => ( is => 'lazy', clearer => 1 );
+has field_by_addr       => ( is => 'lazy', clearer => 1 );
 has record_class        => ( is => 'rw', required => 1, default => sub { 'HASH' } );
 has static_field_order  => ( is => 'rw' ); # force order of columns
 has header_row_at       => ( is => 'rw', default => sub { [1,10] } ); # row of header, or range to scan
-has header_row_combine  => ( is => 'rw', lazy => 1, builder => 1 );
+has header_row_combine  => ( is => 'rw', lazy => 1, builder => 1, clearer => 1 );
 has table_search_results=> ( is => 'rw', lazy => 1, builder => 1, clearer => 1, predicate => 1 );
-has col_map             => ( is => 'rw', lazy => 1, builder => 1, predicate => 1 );
+has col_map             => ( is => 'rw', reader => '_get_col_map', writer => '_set_col_map' );
 has on_partial_match    => ( is => 'rw', default => sub { 'next' } );
 has on_ambiguous_columns=> ( is => 'rw', default => sub { 'error' } );
 has on_unknown_columns  => ( is => 'rw', default => sub { 'warn' } );
@@ -34,13 +36,17 @@ has on_blank_row        => ( is => 'rw', default => sub { 'next' } );
 has on_validation_error => ( is => 'rw', default => sub { 'die' } );
 has log                 => ( is => 'rw', trigger => sub { shift->_clear_log } );
 
+sub _update_fields {
+	my $self= shift;
+	# clear derived attributes
+	$self->clear_field_by_name;
+	$self->clear_field_by_addr;
+	$self->clear_header_row_combine;
+	$self->clear_table_search_results;
+}
+
 sub BUILD {
 	my ($self, $args)= @_;
-	# If user supplied col_map, it probably contains names instead of Field objects.
-	if ($self->has_col_map) {
-		# Make a new array in case other parts of user code refer to current one
-		$self->col_map($self->_resolve_colmap_names([ @{ $self->col_map } ]));
-	}
 	# Back-compat for previous API
 	if (defined (my $act= $args->{on_validation_fail})) {
 		croak "on_validation_fail (back-compat alias) conflicts with on_validation_error"
@@ -64,25 +70,99 @@ sub on_validation_fail {
 # Modifies array to replace name with field ref
 sub _resolve_colmap_names {
 	my ($self, $col_map)= @_;
-	for (grep defined && !ref, @$col_map) {
-		defined(my $f= $self->field_by_name->{$_})
-			or croak("col_map specifies non-existent field '$_'");
+	for (grep defined, @$col_map) {
+		my $name= ref $_ && ref($_)->can('name')? $_->name : "$_";
+		defined(my $f= $self->field_by_name->{$name})
+			or croak("col_map specifies non-existent field '$name'");
 		$_= $f;
 	}
 	$col_map;
+}
+
+# Only consider it a "client"-facing filename if we have a definite method that
+# tells us this is true.
+sub _build__client_file_name {
+	my $self= shift;
+	my $i= $self->input;
+	if (my $cls= blessed($i)) {
+		# All major framework upload objects have this attribute in common
+		return $i->filename if $i->can('filename') && $cls =~ /::Upload/;
+	}
+	return undef;
+}
+
+sub _build__real_file_name {
+	my $self= shift;
+	my $i= $self->input;
+	if (my $cls= blessed($i)) {
+		return $i->filename if $cls->isa('File::Temp');
+		# Path::Tiny, Class::Path::File, etc.
+		require overload;
+		return "$i" if $cls =~ /File|Path/ && overload::Method($i, q{""});
+		# Support for Catalyst::Request::Upload, Dancer::Request::Upload,
+		# and Dancer2::Core::Request::Upload, all of which have 'tempname'.
+		return '' . $i->tempname
+			if $i->can('tempname') && defined $i->tempname;
+		# Mojo::Upload needs to refer to the asset
+		if ($cls->isa('Mojo::Upload')) {
+			$i= $i->asset;
+			$cls= blessed($i);
+		}
+		return '' . $i->path
+			if ($cls->isa('Plack::Request::Upload') || $cls->isa('Mojo::Asset::File'))
+			&& defined $i->path;
+	}
+	# plain scalars default to being the filename
+	return ref $i? undef : $i;
 }
 
 # Open 'input' if it isn't already a file handle
 sub _build__file_handle {
 	my $self= shift;
 	my $i= $self->input;
-	return undef if ref($i) && (
-		(blessed($i) && ($i->can('get_cell') || $i->can('worksheets')))
-		or ref($i) eq 'ARRAY'
-	);
-	return $i if ref($i) && (ref($i) eq 'GLOB' or ref($i)->can('read'));
+	if (ref $i) {
+		my $cls= blessed($i) || '';
+		return $i if ref $i eq 'GLOB' # file handle
+					 or $cls && $i->can('read') && $i->can('eof'); # IO::Handle-ish object
+
+		# When supplied a spreadsheet object, no handle is needed
+		return undef if ref $i eq 'ARRAY'
+		             or $cls && ($i->can('get_cell') || $i->can('worksheets'));
+
+		# Support web framework upload objects
+		if ($cls =~ /::Upload/) {
+			# Support for Catalyst::Request::Upload, Dancer::Request::Upload,
+			# and Dancer2::Core::Request::Upload, all of which have 'tempname'.
+			if ($i->can('tempname') && defined $i->tempname) {
+				$i= '' . $i->tempname;
+				$cls= '';
+			}
+			# Support Mojo::Upload
+			elsif ($cls->isa('Mojo::Upload')) {
+				$i= $i->asset;     # change input to the Mojo::Asset
+				$cls= blessed($i);
+			}
+			# Support for Plack::Request::Upload
+			elsif ($cls->isa('Plack::Request::Upload')) {
+				$i= '' . $i->path;
+				$cls= '';
+			}
+		}
+
+		# Support for Mojo::Asset
+		if ($cls && $cls->isa('Mojo::Asset')) {
+			return $i->handle if $cls->isa('Mojo::Asset::File');
+			my $str= $i->slurp;
+			$i= \$str;
+		}
+	}
+
 	open(my $fh, '<', $i) or croak "open($i): $!";
 	binmode $fh;
+	# This attempt to open $i was more permissive than the rules that build _real_file_name,
+	# so if open() succeeded, update that attribute with the thing we successfully opened.
+	# ...unless it was a scalar-ref.
+	$self->_real_file_name($i) unless ref $i;
 	return $fh;
 }
 
@@ -94,6 +174,7 @@ sub _build_decoder {
 	my ($class, @args);
 	if (!$decoder_arg) {
 		($class, @args)= $self->detect_input_format;
+		croak "Can't determine file format" unless defined $class;
 		$self->_log->('trace', "Detected input format as %s", $class);
 	}
 	elsif (!$decoder_ref) {
@@ -106,8 +187,8 @@ sub _build_decoder {
 		};
 		if(!$class) {
 			my ($input_class, @input_args)= $self->detect_input_format;
-			croak "decoder class not in arguments and unable to identify decoder class from input"
-				if !$input_class;
+			croak "decoder class not specified in arguments, and unable to identify decoder class from input"
+				unless $input_class;
 			($class, @args)= ($input_class, @input_args, @args);
 		}
 	}
@@ -119,12 +200,13 @@ sub _build_decoder {
 	}
 	$class= "Data::TableReader::Decoder::$class"
 		unless $class =~ /::/;
-	require_module($class) or croak "$class does not exist or is not installed";
+	require_module($class);
 	$self->_log->('trace', 'Creating decoder %s on input %s', $class, $self->input);
 	return $class->new(
-		file_name   => ($self->input eq ($self->_file_handle||"") ? '' : $self->input),
-		file_handle => $self->_file_handle,
-		_log        => $self->_log,
+		file_handle      => $self->_file_handle,
+		real_file_name   => $self->_real_file_name,
+		client_file_name => $self->_client_file_name,
+		_log             => $self->_log,
 		@args
 	);
 }
@@ -132,7 +214,7 @@ sub _build_decoder {
 # User supplies any old perl data, but this field should always be an arrayref of ::Field
 sub _coerce_field_list {
 	my ($list)= @_;
-	defined $list and ref $list eq 'ARRAY' or croak "'fields' must be a non-empty arrayref";
+	defined $list and ref $list eq 'ARRAY' or croak "'fields' must be an arrayref";
 	my @list= @$list; # clone it, to make sure we don't unexpectedly alter the caller's data
 	for (@list) {
 		if (!ref $_) {
@@ -165,7 +247,7 @@ sub _build_header_row_combine {
 	my $self= shift;
 	# If headers contain "\n", we need to collect multiple cells per column
 	# Find the maximum number of \n contained in any regex.
-	max map { 1+(()= ($_->header_regex =~ /\\n|\n/g)) } $self->field_list;
+	max 0, map { 1+(()= ($_->header_regex =~ /\\n|\n/g)) } $self->field_list;
 }
 
 # 'log' can be a variety of things, but '_log' will always be a coderef
@@ -181,6 +263,11 @@ sub _log_fn {
 		$msg= sprintf($msg, @args) if @args;
 		warn $msg."\n";
 	}
+	: ref($dest) eq 'CODE'? sub {
+		my ($level, $msg, @args)= @_;
+		$msg= sprintf($msg, @args) if @args;
+		$dest->($level, $msg);
+	}
 	: ref $dest eq 'ARRAY'? sub {
 		my ($level, $msg, @args)= @_;
 		return unless $level eq 'warn' or $level eq 'error';
@@ -189,23 +276,103 @@ sub _log_fn {
 	}
 	: ref($dest)->can('info')? sub {
 		my ($level, $msg, @args)= @_;
+		my $is_level= $dest->can('is_'.$level) or croak "Logger object lacks required 'is_$level' method";
+		# If it can("is_$level"), probably no sense wasting time checking for can($level)
 		$dest->$level( @args? sprintf($msg, @args) : $msg )
-			if $dest->can('is_'.$level)->($dest);
+			if $is_level->($dest);
 	}
 	: croak "Don't know how to log to $dest";
 }
 
 
-sub detect_input_format {
-	my ($self, $filename, $magic)= @_;
+# Routine to lazily load first block of file
+sub _get_content_head {
+	my ($self, $hints)= @_;
+	unless (exists $hints->{content_head}) {
+		my $fh= $self->_file_handle;
+		if (!defined $fh) {
+			# Decoder will be using something other than a file handle anyway
+			$hints->{content_head}= undef;
+		}
+		# Need to be able to seek.
+		elsif (seek($fh, 0, 1)) {
+			my $fpos= tell $fh;
+			defined read($fh, my $buf, 4096) or croak "read: $!";
+			defined seek($fh, $fpos, 0) or croak "seek: $!";
+			$hints->{content_head}= $buf;
+		}
+		elsif ($fh->can('ungets')) {
+			defined read($fh, my $buf, 4096) or croak "read: $!";
+			$fh->ungets($buf);
+			$hints->{content_head}= $buf;
+		}
+		else {
+			$self->_log->('info',"Can't fully detect input format because handle is not seekable."
+				." Consider fully buffering the file, or using FileHandle::Unget");
+			$hints->{content_head}= undef;
+		}
+	}
+	$hints->{content_head};
+}
 
+sub _get_content_head_text {
+	my ($self, $hints)= @_;
+	unless (exists $hints->{content_head_text}) {
+		my $text;
+		if (defined $self->_get_content_head($hints)) {
+			$self->detect_input_charset($hints)
+				unless defined $hints->{charset};
+			$text= substr($hints->{content_head}, $hints->{content_ofs}||0);
+			$text= Encode::decode($hints->{charset}, $text) if defined $hints->{charset};
+		}
+		$hints->{content_head_text}= $text;
+	}
+	$hints->{content_head_text};
+}
+
+our @_decoder_classes;
+
+our %_decoder_mime_types= (
+	'text/csv'                         => 'CSV',
+	'text/tab-separated-values'        => 'TSV',
+	'application/vnd.ms-excel'         => 'XLS',
+	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'XLSX',
+	# common nonstandard mime types, according to AI
+	'application/csv'                  => 'CSV',
+	'application/x-csv'                => 'CSV',
+	'text/x-csv'                       => 'CSV',
+	'text/comma-separated-values'      => 'CSV',
+	'text/x-comma-separated-values'    => 'CSV',
+	'text/tsv'                         => 'TSV',
+	'application/tab-separated-values' => 'TSV',
+	'application/x-tsv'                => 'TSV',
+	'text/x-tsv'                       => 'TSV',
+	'application/msexcel'              => 'XLS',
+	'application/x-msexcel'            => 'XLS',
+	'application/excel'                => 'XLS',
+	'application/x-excel'              => 'XLS',
+	'application/vnd.ms-office'        => 'XLS',
+	'application/x-dos_ms_excel'       => 'XLS',
+	'application/xlsx'                 => 'XLSX',
+	'application/x-xlsx'               => 'XLSX',
+);
+
+sub detect_input_format {
+	my $self= shift;
+	my $hints= @_ == 1 && ref $_[0] eq 'HASH'? $_[0]
+	         : { filename => $_[0], content_head => $_[1] };
 	my $input= $self->input;
+	# this and all related routines want a lowercase content type
+	$hints->{content_type}= lc($hints->{content_type})
+		if defined $hints->{content_type};
+
 	# As convenience to spreadsheet users, let input be a parsed workbook/worksheet object.
 	return ('XLSX', sheet => $input)
 		if ref($input) && ref($input)->can('get_cell');
 	return ('XLSX', workbook => $input)
 		if ref($input) && ref($input)->can('worksheets');
-	# Convenience for passing already-parsed data
+
+	# Convenience for passing already-parsed data as an array of arrays
 	if (ref($input) eq 'ARRAY') {
 		# if user supplied single table of data, wrap it in an array to make an array of tables.
 		$input= [ $input ]
@@ -214,68 +381,183 @@ sub detect_input_format {
 		return ('Mock', datasets => $input);
 	}
 
-	# Load first block of file, unless supplied
-	my $fpos;
-	if (!defined $magic) {
-		my $fh= $self->_file_handle;
-		# Need to be able to seek.
-		if (seek($fh, 0, 1)) {
-			$fpos= tell $fh;
-			read($fh, $magic, 4096);
-			seek($fh, $fpos, 0) or croak "seek: $!";
+	my ($headers, $ct, $charset)= @{$hints}{qw( http_headers content_type charset )};
+
+	# Support for web framework upload objects
+	if (!$headers && blessed($input) && $input->can('headers')) {
+		# Catalyst and Plack have ->headers => HTTP::Headers, though in plack the ->headers is
+		#  not documented....
+		# Dancer & Dancer2 have ->headers => HASH
+		# Mojo has ->headers => Mojo::Headers
+		$headers= $input->headers;
+	}
+	# the full content-type header, where the user-supplied '$ct' may only be the portion before ';'
+	my $full_ct= defined $ct && $ct =~ /;/ ? $ct : undef;
+	if (!defined $full_ct && $headers) {
+		# Dancer uses hashref of headers, case-normalized
+		if (ref $headers eq 'HASH') {
+			my $ct_key= defined $headers->{'Content-Type'}? 'Content-Type'
+						 : (grep /^content[-_]type\z/i, keys %$headers)[0];
+			$full_ct= $headers->{$ct_key} if $ct_key;
 		}
-		elsif ($fh->can('ungets')) {
-			$fpos= 0; # to indicate that we did try reading the file
-			read($fh, $magic, 4096);
-			$fh->ungets($magic);
+		# HTTP::Headers object or Mojo::Headers object
+		elsif (blessed($headers) && $headers->can('header')) {
+			$full_ct= $headers->header('Content-Type');
 		}
-		else {
-			$self->_log->('notice',"Can't fully detect input format because handle is not seekable."
-				." Consider fully buffering the file, or using FileHandle::Unget");
-			$magic= '';
+		$full_ct= lc($full_ct) if defined $full_ct;
+	}
+	# Extract charset and content type from full content-type header.
+	# But, don't if the user supplied a content-type value and it doesn't match the HTTP header.
+	if (defined $full_ct && $full_ct =~ /^\s*([^;\s]+)/ && (!defined $ct || $ct eq $full_ct || $ct eq $1)) {
+		$ct= $1;
+		if (!defined $charset && $full_ct =~ /;\s*charset\s*=\s*(?:"((?:[^"\\]|\\.)*)"|([^;\s]+))/i) {
+			# Could remove the '\\' escapes, but any value that has escapes will be an invalid
+			# charset anyway.
+			$charset= defined $1? $1 : $2;
 		}
 	}
+	if (defined $charset) {
+		if (my $enc= Encode::find_encoding($charset)) {
+			$charset= $enc->name;
+		} else {
+			$self->_log->('warn', "Unknown character encoding '$charset'");
+			undef $charset;
+		}
+	}
+
+	# Trust the content type
+	if (defined $ct && length $ct) {
+		my $class= $_decoder_mime_types{$ct};
+		if ($class) {
+			my @args;
+			($class, @args)= @$class if ref $class eq 'ARRAY';
+			if ($class eq 'CSV' || $class eq 'TSV' || $class eq 'HTML') {
+				# Use the MIME declared charset to read the stream.  If the content type wasn't
+				# declared, it is up to the module to detect something appropriate.
+				push @args, encoding => $charset
+					if defined $charset;
+			}
+			return ($class, @args);
+		} else {
+			$self->_log->('warn', "Unknown content type '$ct'");
+		}
+	}
+
+	@{$hints}{qw( http_headers content_type charset )}= ($headers, $ct, $charset);
+
+	# Consult any registered decoders first
+	for my $cls (grep $_->can('detect_input_format'), @_decoder_classes) {
+		my @answer= $cls->detect_input_format($self, $hints);
+		return @answer if @answer;
+	}
+
+	# Lacking a content-type, fall back to probing the contents of the file.
+	my $content_head= $self->_get_content_head($hints);
 
 	# Excel is obvious so check it first.  This handles cases where an excel file is
-	# erroneously named ".csv" and sillyness like that.
-	return ( 'XLSX' ) if $magic =~ /^PK(\x03\x04|\x05\x06|\x07\x08)/;
-	return ( 'XLS'  ) if $magic =~ /^\xD0\xCF\x11\xE0/;
+	# erroneously named ".csv" and silliness like that.
+	if (defined $content_head) {
+		return ( 'XLSX' ) if $content_head =~ /^PK(\x03\x04|\x05\x06|\x07\x08)/;
+		return ( 'XLS'  ) if $content_head =~ /^\xD0\xCF\x11\xE0/;
+	}
 
-	# Else trust the file extension, because TSV with commas can be very similar to CSV with
-	# tabs in the data, and some crazy person might store an HTML document as the first element
-	# of a CSV file.
+	# Remaining options are CSV, TSV, and HTML.  Trust the file extension, because TSV with
+	# commas can be very similar to CSV with tabs in the data, and some crazy person might store
+	# an HTML document as the first element of a CSV file.
 	# Detect filename if not supplied
-	if (!defined $filename) {
-		$filename= '';
-		$filename= "$input" if defined $input and (!ref $input || ref($input) =~ /path|file/i);
-	}
-	if ($filename =~ /\.([^.]+)$/) {
-		my $suffix= uc($1);
-		return 'HTML' if $suffix eq 'HTM';
-		return $suffix;
+	$hints->{filename}= $self->_client_file_name unless defined $hints->{filename};
+	$hints->{filename}= $self->_real_file_name   unless defined $hints->{filename};
+	if (defined $hints->{filename} && $hints->{filename} =~ /\.(
+		  csv   (?{"CSV"})
+		| tsv   (?{"TSV"})
+		| html? (?{"HTML"})
+	)\z/xi) {
+		return ($^R, defined $charset? (encoding => $charset) : ());
 	}
 
-	# Else probe some more...
-	$self->_log->('debug',"Probing file format because no filename suffix");
-	length $magic or croak "Can't probe format. No filename suffix, and "
-		.(!defined $fpos? "unseekable file handle" : "no content");
+	# Try to decide between CSV or TSV or HTML based on content alone.
+	# To do this, we also have to guess the content-type if it wasn't supplied.
+	if (defined $content_head && length $content_head) {
+		$self->_log->('debug',"Probing file format because no known filename suffix");
+	} else {
+		my $reason= defined $content_head? "empty file" : "unseekable file handle";
+		$self->_log->('debug',"Can't probe $reason");
+		return ();
+	}
+	$charset= $self->detect_input_charset($hints)
+		unless defined $charset;
+	my $text= $self->_get_content_head_text($hints);
 
-	# HTML is pretty obvious
-	return 'HTML' if $magic =~ /^(\xEF\xBB\xBF|\xFF\xFE|\xFE\xFF)?<(!DOCTYPE )HTML/i;
+	# HTML is pretty obvious.  Look for either <html> or <!doctype html>
+	return ( 'HTML', defined $charset? (encoding => $charset) : ())
+		if $text =~ /^<(?:!DOCTYPE\s+)?HTML\b/i;
+
 	# Else guess between CSV and TSV
 	my ($probably_csv, $probably_tsv)= (0,0);
-	++$probably_csv if $magic =~ /^(\xEF\xBB\xBF|\xFF\xFE|\xFE\xFF)?["']?[\w ]+["']?,/;
-	++$probably_tsv if $magic =~ /^(\xEF\xBB\xBF|\xFF\xFE|\xFE\xFF)?["']?[\w ]+["']?\t/;
-	my $comma_count= () = ($magic =~ /,/g);
-	my $tab_count= () = ($magic =~ /\t/g);
-	my $eol_count= () = ($magic =~ /\n/g);
-	++$probably_csv if $comma_count > $eol_count and $comma_count > $tab_count;
-	++$probably_tsv if $tab_count > $eol_count and $tab_count > $comma_count;
+	++$probably_csv if $text =~ /^("(?:[^"]|"")*"|[^,"]+),/;   # first field appears terminated with comma
+	++$probably_tsv if $text =~ /^("(?:[^"]|"")*"|[^\t"]+)\t/; # first field appears terminated with tab
+	my $comma_count= () = ($text =~ /,/g);
+	my $tab_count= () = ($text =~ /\t/g);
+	my $eol_count= () = ($text =~ /\n/g);
+	++$probably_csv if $comma_count >= $eol_count and $comma_count > $tab_count;
+	++$probably_tsv if $tab_count >= $eol_count and $tab_count > $comma_count;
 	$self->_log->('debug', 'probe results: comma_count=%d tab_count=%d eol_count=%d probably_csv=%d probably_tsv=%d',
 		$comma_count, $tab_count, $eol_count, $probably_csv, $probably_tsv);
-	return 'CSV' if $probably_csv and $probably_csv > $probably_tsv;
-	return 'TSV' if $probably_tsv and $probably_tsv > $probably_csv;
-	croak "Can't determine file format";
+	my $class= $probably_csv && $probably_csv > $probably_tsv? 'CSV'
+	         : $probably_tsv && $probably_tsv > $probably_csv? 'TSV'
+	         : undef;
+	return () unless $class;
+	return ($class, $charset? (encoding => $charset) : ());
+}
+
+
+sub detect_input_charset {
+	my ($self, $hints)= @_;
+	# Need to have the content_head available
+	unless (defined $self->_get_content_head($hints)) {
+		# Use existence of the hint key as a flag for whether this has been called yet
+		# though it doesn't change the behavior of this method.
+		$hints->{charset}= undef unless exists $hints->{charset};
+		return undef;
+	}
+	my ($charset, $ofs)= (undef, $hints->{content_ofs});
+	# Check for explicit byte-order-mark
+	pos($hints->{content_head})= $ofs || 0;
+	if ($hints->{content_head} =~ /\G(?:
+		  \xFF\xFE\x00\x00  (?{"UTF-32LE"})
+		| \x00\x00\xFE\xFF  (?{"UTF-32BE"})
+		| \xFF\xFE          (?{"UTF-16LE"})
+		| \xFE\xFF          (?{"UTF-16BE"})
+		| \xEF\xBB\xBF      (?{"utf-8-strict"})
+	)/xgc) {
+		$charset= $^R;
+		$ofs= $+[0];
+	}
+	if (!$charset) {
+		# Other heuristics: a CSV or TSV likely begin with a line of headers,
+		# and the headers are likely ascii identifier strings even if the data
+		# contains lots of non-english.  Also HTML and JSON begin with at least
+		# 2 ascii chars.
+		if ($hints->{content_head} =~ /\G(?:
+			  (?:[\t\n\x20-\x7E]\0\0\0){2} (?{"UTF-32LE"})  # ascii char x2
+			| (?:\0\0\0[\t\n\x20-\x7E]){2} (?{"UTF-32BE"})  # ascii char x2
+			| (?:[\t\n\x20-\x7E]\0){2}     (?{"UTF-16LE"})  # ascii char x2
+			| (?:\0[\t\n\x20-\x7E]){2}     (?{"UTF-16BE"})  # ascii char x2
+		)/gc) {
+			$charset= $^R;
+		}
+		# any buffer that has NULs in it is likely 16/32 encoded.  Look for a newline.
+		elsif ($hints->{content_head} =~ /\G.*?\0/) {
+			$charset= $hints->{content_head} =~ /\G(....)*?\n\0\0\0/gcs? 'UTF-32LE'
+			        : $hints->{content_head} =~ /\G(....)*?\0\0\0\n/gcs? 'UTF-32BE'
+			        : $hints->{content_head} =~ /\G(..)*?\n\0/gcs?       'UTF-16LE'
+			        : $hints->{content_head} =~ /\G(..)*?\0\n/gcs?       'UTF-16BE'
+			        : undef;
+		}
+	}
+	($hints->{charset}, $hints->{content_ofs})= ($charset, $ofs)
+		if defined $charset;
+	return $charset;
 }
 
 
@@ -284,19 +566,60 @@ sub _build_table_search_results {
 	my $result= $self->_find_table($self->decoder->iterator);
 	# When called during lazy-build, not finding the table is fatal
 	if (!$result->{found}) {
-		my $err= $$result->{fatal} || "Can't locate valid header";
+		my $err= $result->{fatal} || "Can't locate valid header";
 		$self->_log->('error', $err);
 		croak $err;
 	}
 	$result;
 }
 
-sub _build_col_map {
-	shift->table_search_results->{found}{col_map}
+# The col_map attribute has some awkward back-compat.  It originally triggered a lazy-build
+# of ->find_table and stored the result.  Users could inspect and modify it afterward.
+# Then I added the ability to pass it to the constructor, and start from that initial value
+# to build the col_map for the table_search_results.  I probably should have used a new
+# attribute name like 'base_col_map' or something, but didn't.  The user-assigned value is now
+# the only thing stored in the attribute, not the built value, but the accessor returns the
+# built value if one exists before falling back to the stored value.
+sub col_map {
+	my $self= shift;
+	my $ret;
+	if (@_) {
+		if (@_ == 1 && !defined $_[0]) {
+			$self->_set_col_map($ret= undef);
+		} else {
+			@_ == 1 && ref $_[0] eq 'ARRAY' or croak 'Expected arrayref';
+			$ret= [ @{$_[0]} ];
+			$self->_resolve_colmap_names($ret);
+			$self->_set_col_map($ret);
+		}
+	} else {
+		my $supplied= $self->_get_col_map;
+		# lazy-build search results, like original API
+		$self->table_search_results unless defined $supplied;
+		$ret= ($self->has_table_search_results && $self->table_search_results->{found})? $self->table_search_results->{found}{col_map}
+			# supplied col_map might be using strings or stale/foreign field objects
+		    : $supplied? $self->_resolve_colmap_names($supplied)
+			 : undef;
+	}
+	return $ret;
+}
+# Accessor is documented to return true if an initial col_map was supplied,
+# or if a col_map has been derived by find_table.
+sub has_col_map {
+	my $self= shift;
+	defined $self->_get_col_map
+	or $self->has_table_search_results && $self->table_search_results->{found}
+}
+# Accessor for only the user-supplied list, but resolved to field objects
+sub _supplied_col_map {
+	my $self= shift;
+	my $supplied= $self->_get_col_map;
+	defined $supplied? $self->_resolve_colmap_names($supplied) : undef;
 }
 
 sub find_table {
 	my $self= shift;
+	$self->clear_table_search_results;
 	my $result= $self->_find_table($self->decoder->iterator);
 	$self->table_search_results($result);
 	return defined $result->{found};
@@ -320,28 +643,13 @@ sub _field_map {
 
 sub _find_table {
 	my ($self, $data_iter)= @_;
-#	$stash ||= {};
-#	while (1) {
-#		$success= $self->_find_table_in_dataset($data_iter, $stash);
-#		&& !defined $stash->{fatal}
-#		&& $data_iter->next_dataset
-#	) {}
-#	if ($success) {
-#		# And record the stream position of the start of the table
-#		$self->col_map($stash->{col_map});
-#		$stash->{first_record_pos}= $data_iter->tell;
-#		$stash->{data_iter}= $data_iter;
-#		return $stash;
-#	}
-#	else {
-#		my $err= $stash->{fatal} || "Can't locate valid header";
-#		$self->_log->('error', $err);
-#		croak $err if $stash->{croak_on_fail};
-#		return undef;
-#	}
 	my @fields= $self->field_list;
 	my $header_at= $self->header_row_at;
 	my %result;
+
+	# It is not an error to construct a TableReader with no fields, but they must be assigned
+	# before we can attempt detecting a table.
+	croak "No fields were defined" unless @fields;
 
 	# Special case for the file not having any headers in it.
 	# If header_row_at is undef, then there is no header.
@@ -349,9 +657,9 @@ sub _find_table {
 	if (!defined $header_at) {
 		unless ($self->static_field_order) {
 			$result{fatal}= "You must enable 'static_field_order' if there is no header row";
-			return;
+			return \%result;
 		}
-		my $col_map= [ $self->has_col_map? @{$self->col_map} : @fields ];
+		my $col_map= [ @{ $self->_supplied_col_map || \@fields } ];
 		$result{found}= {
 			row_idx => -1,
 			row => undef,
@@ -414,7 +722,6 @@ sub _find_table {
 			if ($found) {
 				$result{found}= \%attempt;
 				$result{found}{_data_iter}= $data_iter;
-				$self->col_map($attempt{col_map});
 				$self->_log->(info => 'Found header at '.$attempt{context});
 				return \%result;
 			} else {
@@ -422,12 +729,13 @@ sub _find_table {
 				last dataset
 					if delete $attempt{fatal};
 				# Was this a partial match?  See if any col_map entries were added vs. what user already gave us.
-				my $initial_colmap_count= !$self->has_col_map? 0
-					: scalar(grep defined, @{$self->col_map});
+				my $initial_colmap_count= !$self->_get_col_map? 0
+					: scalar(grep defined, @{$self->_get_col_map});
 				if ($initial_colmap_count < scalar(grep defined, @{$attempt{col_map}})) {
 					# Handling of partial match determined by on_partial_match setting
 					my $act= $self->on_partial_match;
-					$act= $act->($self, \%attempt) if ref $act eq 'CODE';
+					$act= $act->($self, \%attempt, $vals)
+						if ref $act eq 'CODE';
 					last dataset
 						if $act eq 'last';
 				}
@@ -440,19 +748,20 @@ sub _find_table {
 	return \%result;
 }
 
-# This mode assumes all headers match exactly as perscribed in the fields list or user-supplied col_map
+# This mode assumes all headers match exactly as prescribed in the fields list or user-supplied col_map
 sub _match_headers_static {
 	my ($self, $header, $attempt)= @_;
-	my @col_map= $self->has_col_map? @{$self->col_map} : @{$self->fields};
+	my @col_map= @{ $self->_supplied_col_map || $self->fields };
 	$attempt->{col_map}= \@col_map;
 	for my $i (0 .. $#col_map) {
 		next unless defined $col_map[$i];
-		next if $header->[$i] =~ $col_map[$i]->header_regex;
+		next if defined $header->[$i] && $header->[$i] =~ $col_map[$i]->header_regex;
 		# Field header doesn't match.  Start over on next row.
-		push @{$attempt->{messages}}, [ error => "Header at column $i does not look like field ".$col_map[$i]->name ];
+		push @{$attempt->{messages}},
+			[ error => "Header at column ".($i+1)." does not look like field ".$col_map[$i]->name ];
 		return 0;
 	}
-	# found a match for every field!
+	# found a match for every mapped field
 	$self->_log->('debug','%s: Found!', $attempt->{context});
 	return 1;
 }
@@ -462,7 +771,7 @@ sub _match_headers_dynamic {
 	my $context= $attempt->{context};
 	my $fields= $self->fields;
 	# Colmap starts empty unless user supplied one
-	my $user_colmap= $self->has_col_map? $self->col_map : [];
+	my $user_colmap= $self->_supplied_col_map || [];
 	my @colmap= map +(defined $_? [ $_ ] : undef), @$user_colmap;
 	$attempt->{col_map}= \@colmap;
 	# Search every cell of the header, except ones specified by the user
@@ -487,7 +796,7 @@ sub _match_headers_dynamic {
 	for my $f (@free_fields) {
 		my $hr= $f->header_regex;
 		push @{$attempt->{messages}}, [ trace => "looking for $hr" ];
-		my @found_idx= grep $header->[$_] =~ $hr, @col_search_idx;
+		my @found_idx= grep +(defined $header->[$_] && $header->[$_] =~ $hr), @col_search_idx;
 		push @{$attempt->{messages}}, [ debug => "found ".$f->name." header at col [".join(',', map $_+1, @found_idx).']' ];
 		for my $idx (@found_idx) {
 			# If another field of the same name matches a column, the first gets priority.
@@ -504,8 +813,8 @@ sub _match_headers_dynamic {
 		if (!@found_idx && $f->required) {
 			push @{$attempt->{missing_required}}, $f;
 			push @{$attempt->{messages}}, [ error => 'No match for required field '.$f->name ];
-			# Missing required fields probably means this isn't he header row, or the input is
-			# garbage, so might as well stop here before genering a bunch of analysis.
+			# Missing required fields probably means this isn't the header row, or the input is
+			# garbage, so might as well stop here before generating a bunch of analysis.
 			last;
 		}
 	}
@@ -520,7 +829,7 @@ sub _match_headers_dynamic {
 				my $val= $header->[$idx];
 				for my $f (@follows_fields) {
 					next unless grep $following{$_}, $f->follows_list;
-					next unless $val =~ $f->header_regex;
+					next unless defined $val && $val =~ $f->header_regex;
 					# If another field of the same name matches a column, the first gets priority.
 					# ignore the duplicate.
 					if ($fieldname_cols{$f->name}{$idx}) {
@@ -575,7 +884,6 @@ sub _match_headers_dynamic {
 
 	# Ambiguity check: there must be only one field claiming each column
 	# If it's OK, resolve the arrayref down to its single member.
-	my $col_collision= 0;
 	for my $idx (0 .. $#colmap) {
 		next unless defined $colmap[$idx];
 		if (@{$colmap[$idx]} == 1) { # only claimed by one field
@@ -611,7 +919,7 @@ sub _match_headers_dynamic {
 	if (@unmatched) {
 		my $act= $self->on_unknown_columns;
 		my $unknown_list= join(', ', map $self->_fmt_header_text($header->[$_]), @unmatched);
-		$act= $act->($self, $header, \@unmatched) if ref $act eq 'CODE';
+		$act= $act->($self, $header, \@unmatched, $attempt) if ref $act eq 'CODE';
 		if ($act eq 'warn' || $act eq 'use') { # 'use' is back-compat, 'warn' is official now.
 			push @{$attempt->{messages}}, [ warn => 'Ignoring unknown columns: '.$unknown_list ];
 		} elsif ($act eq 'error' || $act eq 'next') { # 'next' is back-compat, 'error' is official now.
@@ -630,8 +938,9 @@ sub _match_headers_dynamic {
 }
 # Make header string readable for log messages
 sub _fmt_header_text {
-	shift if ref $_[0];
+	shift if ref $_[0]; # ignore $self, but still a method in case someone wants to subclass it
 	my $x= shift;
+	return '<undef>' unless defined $x;
 	$x =~ s/ ( [^[:print:]] ) / sprintf("\\x%02X", ord $1 ) /gex;
 	qq{"$x"};
 }
@@ -690,7 +999,7 @@ sub iterator {
 	my @output_keys;  # list of hash key names where values get stored
 	my @array_ranges; # list of value indices that get bundled into an arrayref
 	my @blank_val;    # blank value per each fetched column
-	my @trim;         # list of trim functions and the value indicies they should be applied to
+	my @trim;         # list of trim functions and the value indices they should be applied to
 	my @type_check;   # list of validation coderefs that should be applied
 	my $class;        # optional object class to construct for the resulting rows
 	my ($n_blank, $first_blank, $eof);
@@ -811,7 +1120,13 @@ sub iterator {
 	@trim= values %trimmer;
 
 	return Data::TableReader::_RecIter->new(
-		$sub, { data_iter => $data_iter, reader => $self },
+		$sub, {
+			data_iter => $data_iter,
+			reader => $self,
+			n_blank => \$n_blank,
+			first_blank => \$first_blank,
+			eof => \$eof,
+		},
 	);
 }
 
@@ -923,6 +1238,7 @@ sub _handle_validation_error {
 		$self->_log->('error', $msg);
 		croak $msg;
 	}
+	croak "Invalid value for 'on_validation_error': \"$act\"";
 }
 
 # This is back-compat for the previous callback API which was an attribute named 'on_validation_fail'
@@ -946,7 +1262,7 @@ BEGIN { @Data::TableReader::_RecIter::ISA= ( 'Data::TableReader::Iterator' ) }
 sub Data::TableReader::_RecIter::all {
 	my $self= shift;
 	my (@rec, $x);
-	push @rec, $x while ($x= $self->());
+	push @rec, $x while defined($x= $self->());
 	return \@rec;
 }
 sub Data::TableReader::_RecIter::dataset_idx {
@@ -962,10 +1278,21 @@ sub Data::TableReader::_RecIter::progress {
 	shift->_fields->{data_iter}->progress(@_);
 }
 sub Data::TableReader::_RecIter::tell {
-	shift->_fields->{data_iter}->tell(@_);
+	my $fields= shift->_fields;
+	my $dec_pos= $fields->{data_iter}->tell;
+	return [ $dec_pos, ${$fields->{eof}}, ${$fields->{first_blank}}, ${$fields->{n_blank}} ];
 }
 sub Data::TableReader::_RecIter::seek {
-	shift->_fields->{data_iter}->seek(@_);
+	my ($self, $state)= @_;
+	my $fields= $self->_fields;
+	ref $state eq 'ARRAY' && @$state == 4
+		or croak "Expected arrayref of 4 elements, as returned by ->tell";
+	my ($dec_pos, $eof, $first_blank, $n_blank)= @$state;
+	$fields->{data_iter}->seek($dec_pos);
+	${$fields->{eof}}= $eof;
+	${$fields->{first_blank}}= $first_blank;
+	${$fields->{n_blank}}= $n_blank;
+	return $self;
 }
 sub Data::TableReader::_RecIter::next_dataset {
 	shift->_fields->{reader}->_log
@@ -987,7 +1314,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -995,7 +1322,7 @@ version 0.021
   #   "address", "city", "state", "zip" (in any order)
   # and then convert each row under that into a hashref of those fields.
   
-  my $records= Data::TableReader>new(
+  my $records= Data::TableReader->new(
       input => 'path/to/file.xlsx',
       fields => [qw( address city state zip )],
     )
@@ -1102,6 +1429,10 @@ Map of C<< { refaddr($field) => $field } >>.
 
 =back
 
+If you need to, you can supply an empty list of fields and then update the attribute later.
+(Be sure to write via the accessor rather than modify the arrayref.)  This can be useful if you
+want to use the input detection features before sorting out the details of which fields to use.
+
 =head2 record_class
 
 Default is the special value C<'HASH'> for un-blessed hashref records.
@@ -1129,18 +1460,18 @@ to undef if you also set C<< static_field_order => 1 >>.
 This is an arrayref, one element per column of input data, listing which field was detected
 to come from that column.  If you specify this to the constructor, L</find_table> will respect
 any defined element of the array, but still search for matching headers in the undefined
-columns.  After a successful L</find_table>, C<col_map> is changed to refer to the same hash as
-C<< ->table_search_results->{found}{col_map} >>.  (If you wanted to re-run the search for the
-table, you need to both C<clear_table_search_results> I<and> reset C<col_map> to whatever
-you passed to the constructor.)
+columns.  After a successful L</find_table>, the C<col_map> accessor refers to the same array as
+C<< ->table_search_results->{found}{col_map} >>.  If you call C<clear_table_search_results>,
+the C<col_map> accessor returns to the previous value.
 
 For backward compatibility, if you did not specify this attribute to the constructor and try
 accessing it before calling L</find_table>, it automatically calls L</find_table> for you
-(and die if it fails).
+(and dies if it fails).
 
 =head2 has_col_map
 
-Check whether col_map has been defined, to avoid lazy-building it.
+Returns true if you assigned an initial value to col_map, or if a value was determined by
+table_search_results.
 
 =head2 table_search_results
 
@@ -1205,13 +1536,13 @@ in various ways:
 
 If a Field matches multiple columns (and isn't an array field) omit the field from the col_map
 entirely.  If a column matches multiple fields, leave the col_map blank for this column.
-Both generate warnings, but the header match can still proceeed to a successful result.
+Both generate warnings, but the header match can still proceed to a successful result.
 
 =item C<'error'> (default)
 
 Any ambiguities (field matching multiple columns, multiple fields matching a column) cause the
 match of the header on this row to fail.  Further attempts at finding the header depend on the
-L</on_partial_headers> setting.
+L</on_partial_match> setting.
 
 =back
 
@@ -1220,7 +1551,10 @@ L</on_partial_headers> setting.
   on_unknown_columns => 'warn'  # warn, and then accept these headers
   on_unknown_columns => 'error' # fail the header match for this row
   on_unknown_columns => sub {
-    my ($reader, $col_headers)= @_;
+    my ($reader, $headers, $unmatched, $candidate)= @_;
+	 # @headers is an array of the header of each column
+	 # @unmatched is an array of which @header indices are unmatched
+	 # %candidate is the structure from ->table_search_results->{candidates}
     ...;
     return $opt; # one of the above values
   }
@@ -1240,7 +1574,7 @@ from this table.
 =item C<'error'>
 
 Extra columns mean that you didn't find the table you wanted.  Log the near-miss, and
-keep searching additional rows or additional tables, according to L</on_partial_headers>.
+keep searching additional rows or additional tables, according to L</on_partial_match>.
 
 =item C<sub {}>
 
@@ -1249,13 +1583,12 @@ return one of the above values.
 
 =back
 
-=head2 on_blank_rows
+=head2 on_blank_row
 
-  on_blank_rows => 'next' # warn, and then skip the row(s)
-  on_blank_rows => 'last' # warn, and stop iterating the table
-  on_blank_rows => 'die'  # fatal error
-  on_blank_rows => 'use'  # actually try to return the blank rows as records
-  on_blank_rows => sub {
+  on_blank_row => 'next' # warn, and then skip the row(s)
+  on_blank_row => 'last' # warn, and stop iterating the table
+  on_blank_row => 'die'  # fatal error
+  on_blank_row => sub {
     my ($reader, $first_blank_rownum, $last_blank_rownum)= @_;
     ...;
     return $opt; # one of the above values
@@ -1285,7 +1618,7 @@ The default is C<'next'>.
       # $$value_ref is the string that failed validation
       # $message is the error returned from the validation function
       # $path is the element (and maybe sub-element) of $record
-      #   i.e.  $value_ref= \$record->{$path[0]}[$path[1]]
+      #   i.e.  $value_ref= \$record->{$path->[0]}[$path->[1]]
       # You may modify $$value_ref or $record to alter the output
     }
     # Clear the failures array to suppress warnings, if you actually corrected
@@ -1312,7 +1645,7 @@ C<warn "$message\n">.  If set to an object, it should support an API of:
   warn,   is_warn
   error,  is_error
 
-such as L<Log::Any> and may other perl logging modules use.  You can also
+such as L<Log::Any> and many other perl logging modules use.  You can also
 set it to a coderef such as:
 
   my @messages;
@@ -1329,14 +1662,53 @@ any message that would otherwise have gone to 'warn' or 'error'.
 
 =head2 detect_input_format
 
-   my ($class, @args)= $tr->detect_input_format( $filename, $head_of_file );
+   my ($decoder_class, @args)= $tr->detect_input_format(\%hints);
+   my ($decoder_class, @args)= $tr->detect_input_format( $filename, $head_of_file );
 
 This is used internally to detect the format of a file, but you can call it manually if you
-like.  The first argument (optional) is a file name, and the second argument (also optional)
-is the first few hundred bytes of the file.  Missing arguments will be pulled from L</input>
-if possible.  The return value is the best guess of module name and constructor arguments that
+like.  The following hints can be supplied as a hashref:
+
+  { http_headers => ...,  # hashref or various objects representing HTTP headers
+    content_type => ...,  # a MIME content-type, optional charset
+	 charset      => ...,  # a character set, as seen in charset=X on a MIME type
+    filename     => ...,  # filename, using file extension to guess content-type
+	 content_head => ...,  # the first block(s) of the file, to probe magic numbers
+	 content_ofs  => ...,  # a byte offset from which the input file should be read
+  }
+
+Missing hints will be pulled from L</input> if possible, updating the supplied hashref.
+The two-argument form was the previous calling convention, and doesn't provide a way to retrieve
+the generated hint values.
+
+The return value is the best guess of module name and constructor arguments that
 should be used to parse the file.  However, this doesn't guarantee such module actually exists
-or is installed; it might just echo the file extension back to you.
+or is installed; it might just echo the file extension back to you.  (which could be useful if
+you write your own Decoder subclass with that name)
+
+On failure, it returns an empty list.
+
+=head2 detect_input_charset
+
+   my $charset= $tr->detect_input_charset(\%hints);
+
+This is used internally to detect the text encoding of a file, but you can call it manually if
+you like.  The following hints can be supplied as a hashref:
+
+  { charset      => ...,  # a character set, as seen in charset=X on a MIME type
+	 content_head => ...,  # the first block(s) of the file
+	 content_ofs  => ...,  # byte offset from which detection should start
+  }
+
+Missing hints will be pulled from L</input> if possible, modifying the supplied hashref.
+
+The return value is the best guess of C<charset> based on the content.  If the content can't be
+read, or isn't conclusive, this returns C<undef>.  If successful, the C<charset> is stored into
+C<< $hints->{charset} >> overwriting any previous value, though it doesn't clear a previously
+set C<charset> hint on failure.
+
+If the content started with a byte-order-mark (BOM) the length of the BOM will be added to
+C<< $hints->{content_ofs} >>.  Note that this means you shouldn't call C<detect_input_charset>
+twice without resetting C<content_ofs> inbetween.
 
 =head2 find_table
 
@@ -1381,15 +1753,29 @@ and L<Candela Corporation|https://www.candelacorp.com/>.
 
 Michael Conrad <mike@nrdvana.net>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Christian Walde
+=for stopwords Christian Walde Étienne Mollier Michael Conrad
+
+=over 4
+
+=item *
 
 Christian Walde <walde.christian@gmail.com>
 
+=item *
+
+Étienne Mollier <emollier@debian.org>
+
+=item *
+
+Michael Conrad <mconrad@intellitree.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

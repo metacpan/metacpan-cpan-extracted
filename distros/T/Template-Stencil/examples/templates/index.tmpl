@@ -1,0 +1,7 @@
+{% include header.tmpl %}
+<ul>
+{% for item in items %}  <li class="{% if loop.first %}first{% elsif loop.last %}last{% else %}mid{% end %}">
+    #{% loop.index1 %}/{% loop.size %}: {% item.name | trim %}
+  </li>
+{% end %}</ul>
+{% unless items %}<p>nothing to show</p>{% end %}

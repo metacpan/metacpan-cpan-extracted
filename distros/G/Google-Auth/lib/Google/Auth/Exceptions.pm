@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC.
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,11 +24,9 @@ Google::Auth::Exceptions - Exceptions used in the Google::Auth package
 
 =head1 VERSION
 
-Version 0.05
+Version 0.09
 
 =cut
-
-our $VERSION = '0.06';
 
 # Base class for all google.auth errors
 
@@ -36,20 +34,20 @@ package Google::Auth::Error;
 use Moo;
 use overload '""' => \&to_string, fallback => 1;
 
-has message => ( is => 'ro', required => 1 );
+has message => (is => 'ro', required => 1);
 
 sub to_string {
-    my ($self) = @_;
-    return $self->message;
+  my ($self) = @_;
+  return $self->message;
 }
 
 sub throw {
-    my ($class, $message) = @_;
-    if (ref $class) {
-        die $class;
-    }
-    my $self = $class->new({ message => $message || 'Unknown error' });
-    die $self;
+  my ($class, $message) = @_;
+  if (ref $class) {
+    die $class;
+  }
+  my $self = $class->new({message => $message || 'Unknown error'});
+  die $self;
 }
 
 # Used to indicate an error occurred during an HTTP request
@@ -104,7 +102,7 @@ L<https://metacpan.org/release/Google-Auth>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020,2021 Google LLC
+Copyright 2020 Google LLC and contributors
 
 This program is released under the following license: Apache 2.0
 

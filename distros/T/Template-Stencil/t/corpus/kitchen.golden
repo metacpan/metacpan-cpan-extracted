@@ -1,0 +1,17 @@
+<page title=" The Title ">
+	<h1>THE TITLE</h1>
+	literal brace: {%raw%}
+	adult Ada &lt;A&gt;
+	no-missing
+	<t o="0" i="0" f="y" l="n" e="o">x</t><t o="0" i="1" f="n" l="y" e="e">y</t>
+	<side for="Ada &lt;A&gt;" at="0/1"></side>
+	<t o="1" i="0" f="y" l="y" e="o">z</t>
+	<side for="Ada &lt;A&gt;" at="1/2"></side>
+	[alpha=A][beta=B&amp;B]
+	esc: &lt;em a=&quot;1&amp;2&quot;&gt;&#39;q&#39;&lt;/em&gt; raw: <em a="1&2">'q'</em> html: &lt;em a=&quot;1&amp;2&quot;&gt;&#39;q&#39;&lt;/em&gt; double: &amp;lt;em a=&amp;quot;1&amp;amp;2&amp;quot;&amp;gt;&amp;#39;q&amp;#39;&amp;lt;/em&amp;gt;
+	uri: a%20b%2Fc%3Fd%3De%26f%3Dcaf%C3%A9 default: &lt;d&gt;
+	money: 3.50 chain: MIXED
+	greeting: hi &quot; num: two-and-a-half
+	str: exact not: absent
+	paths: found undef-quiet: []
+</page>

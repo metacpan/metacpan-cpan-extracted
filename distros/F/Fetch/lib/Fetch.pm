@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use File::Raw::JSON ();   # JSON encode/decode via its C ABI (ft_json.h / _abi_ptr)
 

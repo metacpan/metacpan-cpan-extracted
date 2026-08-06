@@ -24,6 +24,8 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
     );
 
     # 2. Add Authentication Middleware Hook
+    #    (hand-rolled here for illustration only, for ready-made schemes,
+    #    including proper 401 challenges, see PAGI::FastAPI::Security)
     $app->add_middleware(async sub ($c, $next) {
         my $auth = $c->header('Authorization') // '';
         if ($auth ne 'Bearer secret_token') {
@@ -112,6 +114,42 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
 
     my $pagi_app = $app->to_app;
 
+    # 9. Authentication via the companion PAGI::FastAPI::Security distribution
+    #    (extraction only, you supply the verification logic)
+    #
+    #    use PAGI::FastAPI::Security::HTTPBearer;
+    #    my $bearer = PAGI::FastAPI::Security::HTTPBearer->new;
+    #    $app->get('/secure',
+    #        dependencies => [ $bearer->depends(key => 'token') ],
+    #        handler      => async sub ($c) {
+    #            return { token => $c->stash->{token} };
+    #        }
+    #    );
+    #
+    #    See PAGI::FastAPI::Security for HTTP Basic, API Key
+    #    (header/query/cookie), and OAuth2 password-bearer schemes.
+
+## AUTHENTICATION AND SECURITY
+
+`PAGI::FastAPI` has no authentication built in by design, auth needs vary too
+much between applications to standardise.
+
+Instead you get two general-purpose building blocks:
+
+* **Middleware** (`add_middleware`), runs for every request.
+* **Dependencies** (the `dependencies` route option), runs per-route.
+
+A dependency signals failure by calling `$c->status($code)` with a code >= 400 and returning a body HashRef (not by `die`ing, dependency execution isn't wrapped in `eval`).
+
+For ready-made schemes instead of hand-rolling this every time, see the companion distribution **[PAGI::FastAPI::Security](https://metacpan.org/pod/PAGI::FastAPI::Security)**:
+
+* `PAGI::FastAPI::Security::HTTPBearer`: `Authorization: Bearer <token>`, with a `401` + `WWW-Authenticate: Bearer` challenge.
+* `PAGI::FastAPI::Security::HTTPBasic`: `Authorization: Basic <base64>`, with a `401` + `WWW-Authenticate: Basic realm="..."` challenge.
+* `PAGI::FastAPI::Security::APIKey`: header, query string, or cookie, with a `403` on failure.
+* `PAGI::FastAPI::Security::OAuth2::PasswordBearer`: OAuth2 bearer-token extraction plus `token_url`/`scopes` metadata.
+
+Each scheme only *extracts* the credential, verification (JWT signature checking, password hashing, database/cache lookups) is left to you, so you aren't locked into one library. All schemes accept `auto_error => 0` for optional-auth routes. See `PAGI::FastAPI::Security`'s own docs for a full JWT-verification example.
+
 ## LICENSE AND COPYRIGHT
 
 Copyright (C) 2026 Mohammad Sajid Anwar.
@@ -121,31 +159,3 @@ the terms of the Artistic License (2.0). You may obtain a copy of the full
 license at:
 
 http://www.perlfoundation.org/artistic_license_2_0
-
-Any use, modification, and distribution of the Standard or Modified Versions is
-governed by this Artistic License. By using, modifying or distributing the Package,
-you accept this license. Do not use, modify, or distribute the Package, if you do
-not accept this license.
-
-If your Modified Version has been derived from a Modified Version made by someone
-other than you, you are nevertheless required to ensure that your Modified Version
-complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service mark,
-tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge patent license
-to make, have made, use, offer to sell, sell, import and otherwise transfer the
-Package with respect to any patent claims licensable by the Copyright Holder that
-are necessarily infringed by the Package. If you institute patent litigation
-(including a cross-claim or counterclaim) against any party alleging that the
-Package constitutes direct or contributory patent infringement, then this Artistic
-License to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND
-CONTRIBUTORS "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
-NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
-REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
-INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
-OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

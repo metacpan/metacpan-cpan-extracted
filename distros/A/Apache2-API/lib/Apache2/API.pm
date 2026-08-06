@@ -1,16 +1,16 @@
 ##----------------------------------------------------------------------------
-## Apache2 API Framework - ~/lib/m
-## Version v0.5.4
+## Apache2 API Framework - ~/lib/Apache2/API.pm
+## Version v0.5.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2026/06/17
+## Modified 2026/08/05
 ## All rights reserved
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package Apache2::API;
 BEGIN
 {
@@ -41,7 +41,7 @@ BEGIN
     use Scalar::Util ();
     our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.5.4';
+    $VERSION = 'v0.5.5';
 };
 
 use strict;
@@ -947,6 +947,8 @@ sub reply
             $ref->{error} = {} unless( $use_rfc_error );
         }
 
+        # See rfc2616 and rfc6585: Retry-After is only for errors.
+        $resp->retry_after( $ref->{retry_after} ) if( exists( $ref->{retry_after} ) && defined( $ref->{retry_after} ) );
         $set_payload_locale->( $ref, $msg );
 
         if( $use_rfc_error )
@@ -965,6 +967,8 @@ sub reply
         # We format the message like in bailout, ie { error => { message => '', code => '' } }
         if( $is_error )
         {
+            # See rfc2616 and rfc6585: Retry-After is only for errors.
+            $resp->retry_after( $ref->{retry_after} ) if( exists( $ref->{retry_after} ) && defined( $ref->{retry_after} ) );
             if( $use_rfc_error )
             {
                 $build_rfc_error->( $ref, $code, $msg );
@@ -986,6 +990,8 @@ sub reply
     # Or we just have a code to go on with
     elsif( $is_error )
     {
+        # See rfc2616 and rfc6585: Retry-After is only for errors.
+        $resp->retry_after( $ref->{retry_after} ) if( exists( $ref->{retry_after} ) && defined( $ref->{retry_after} ) );
         # No message, just a code => build minimal error body
         if( $use_rfc_error )
         {
@@ -1960,7 +1966,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.5.4
+    v0.5.5
 
 =head1 DESCRIPTION
 

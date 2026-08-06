@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::Data;
 # ABSTRACT: Class to retrieve data files
-our $VERSION = '3.20260302'; # VERSION
+our $VERSION = '3.20260806'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI::Prelude;
@@ -38,7 +38,7 @@ Mail::BIMI::Role::Data - Class to retrieve data files
 
 =head1 VERSION
 
-version 3.20260302
+version 3.20260806
 
 =head1 DESCRIPTION
 
@@ -68,11 +68,11 @@ Returns the contents of included file $file
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

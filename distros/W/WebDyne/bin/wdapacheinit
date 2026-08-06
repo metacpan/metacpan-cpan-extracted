@@ -39,7 +39,7 @@ local $Data::Dumper::Sortkeys=1;
 
 #  Version info
 #
-$VERSION='3.008';
+$VERSION='3.009';
 
 
 #  Get command line options, add them to environment so picked up

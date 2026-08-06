@@ -59,7 +59,9 @@ xh_h2x_native_attr(xh_h2x_ctx_t *ctx, xh_char_t *key, I32 key_len, SV *value, xh
         done = 0;
 
         if (len > 1 && ctx->opts.canonical) {
+            ENTER;
             sorted_hash = xh_sort_hash((HV *) value, len);
+            SAVEDESTRUCTOR_X(xh_sort_hash_free, sorted_hash);
 
             for (i = 0; i < len; i++) {
                 done += xh_h2x_native_attr(ctx, sorted_hash[i].key, sorted_hash[i].key_len, sorted_hash[i].value, XH_H2X_F_SIMPLE);
@@ -78,7 +80,7 @@ xh_h2x_native_attr(xh_h2x_ctx_t *ctx, xh_char_t *key, I32 key_len, SV *value, xh
                 xh_xml_write_end_node(&ctx->writer, key, key_len);
             }
 
-            free(sorted_hash);
+            LEAVE;
         }
         else {
             hv_iterinit((HV *) value);
@@ -187,7 +189,9 @@ xh_h2d_native_attr(xh_h2x_ctx_t *ctx, xmlNodePtr rootNode, xh_char_t *key, I32 k
         done = 0;
 
         if (len > 1 && ctx->opts.canonical) {
+            ENTER;
             sorted_hash = xh_sort_hash((HV *) value, len);
+            SAVEDESTRUCTOR_X(xh_sort_hash_free, sorted_hash);
 
             for (i = 0; i < len; i++) {
                 done += xh_h2d_native_attr(ctx, rootNode, sorted_hash[i].key, sorted_hash[i].key_len, sorted_hash[i].value, XH_H2X_F_SIMPLE);
@@ -199,7 +203,7 @@ xh_h2d_native_attr(xh_h2x_ctx_t *ctx, xmlNodePtr rootNode, xh_char_t *key, I32 k
                 }
             }
 
-            free(sorted_hash);
+            LEAVE;
         }
         else {
             hv_iterinit((HV *) value);

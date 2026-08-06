@@ -884,6 +884,11 @@ static void _infix_type_recalculate_layout_recursive(infix_arena_t * temp_arena,
     case INFIX_TYPE_ARRAY:
         _infix_type_recalculate_layout_recursive(temp_arena, type->meta.array_info.element_type, visited_head);
         break;
+    case INFIX_TYPE_REVERSE_TRAMPOLINE:
+        _infix_type_recalculate_layout_recursive(temp_arena, type->meta.func_ptr_info.return_type, visited_head);
+        for (size_t i = 0; i < type->meta.func_ptr_info.num_args; ++i)
+            _infix_type_recalculate_layout_recursive(temp_arena, type->meta.func_ptr_info.args[i].type, visited_head);
+        break;
     case INFIX_TYPE_STRUCT:
     case INFIX_TYPE_UNION:
         for (size_t i = 0; i < type->meta.aggregate_info.num_members; ++i) {

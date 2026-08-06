@@ -1,3 +1,29 @@
+Version 0.022 - 2026-08-05
+ - Support various web framework Upload objects being used as ->input
+ - Use content_type if available in preference to file extension or
+   content heuristics.
+ - Differentiate between real_file_name and client_file_name, and ignore
+   the file extension of real_file_name if client_file_name exists.
+   (e.g. things broke when Catalyst changed the file extension to .upload)
+   These show as new attributes on the Decoder.
+ - Much improved detection and handling of charset for CSV, TSV, and HTML
+ - Properly handle consequences of writes to the ->fields(...) attribute
+   by clearing other attributes.
+ - Fix several col_map lifecycle bugs: preserve the caller's original
+   array, restore the supplied map after clearing search results, re-resolve
+   it after fields change, and avoid reusing a previous search result during
+   subsequent find_table calls.
+ - Fix bug when using ->seek on a record iterator which had reached EOF
+   or was in the middle of counting blank lines.
+ - Fix ability to use ->all on a record iterator where record objects could
+   stringify to a false value.
+ - More API validation and better error messages in a variety of edge cases.
+ - Stop logging at 'notice' level since it isn't supported by all common
+   logger objects.
+ - Fix numerous documentation mistakes, including callback argument list of
+   on_partial_match and on_unknown_columns.
+ - Additionally pass the %candidate structure to on_unknown_columns callback.
+
 Version 0.021 - 2024-05-02
  - Use ->table_search_results->{...}{row} instead of {row_idx}
  - Allow initializing TableReader 'fields' attribute with Field objects

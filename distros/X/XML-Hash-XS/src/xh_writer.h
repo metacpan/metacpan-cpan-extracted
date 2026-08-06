@@ -17,17 +17,50 @@ struct _xh_writer_t {
 #endif
     PerlIO                *perl_io;
     SV                    *perl_obj;
+    SV                    *perl_cb;
     xh_perl_buffer_t       main_buf;
     xh_int_t               indent;
     xh_int_t               indent_count;
     xh_bool_t              trim;
+    xh_bool_t              utf8;
 };
 
 SV *xh_writer_flush_buffer(xh_writer_t *writer, xh_perl_buffer_t *buf);
 SV *xh_writer_flush(xh_writer_t *writer);
 void xh_writer_resize_buffer(xh_writer_t *writer, size_t inc);
 void xh_writer_destroy(xh_writer_t *writer);
-void xh_writer_init(xh_writer_t *writer, xh_char_t *encoding, void *output, size_t size, xh_uint_t indent, xh_bool_t trim);
+void xh_writer_init(xh_writer_t *writer, xh_char_t *encoding, SV *output, SV *output_cb, size_t size, xh_uint_t indent, xh_bool_t trim, xh_bool_t utf8);
+
+XH_INLINE void
+xh_writer_write_to_perl_cb(xh_perl_buffer_t *buf, SV *perl_cb, xh_bool_t utf8)
+{
+    size_t len = buf->cur - buf->start;
+
+    if (len > 0) {
+        SV *chunk;
+        dSP;
+
+        /* The callback owns a stable copy; the writer buffer can be reused
+         * immediately, including when the callback throws an exception. */
+        buf->cur = buf->start;
+
+        ENTER;
+        SAVETMPS;
+
+        chunk = sv_2mortal(newSVpvn(XH_CHAR_CAST buf->start, len));
+        if (utf8)
+            SvUTF8_on(chunk);
+
+        PUSHMARK(SP);
+        XPUSHs(chunk);
+        PUTBACK;
+
+        call_sv(perl_cb, G_DISCARD);
+
+        FREETMPS;
+        LEAVE;
+    }
+}
 
 XH_INLINE void
 xh_writer_write_to_perl_obj(xh_perl_buffer_t *buf, SV *perl_obj)

@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use v5.20;
+use warnings;
 use File::Temp 'tempfile';
 use Text::Stencil;
 

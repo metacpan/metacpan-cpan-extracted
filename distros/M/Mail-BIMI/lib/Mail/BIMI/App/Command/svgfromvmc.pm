@@ -1,6 +1,6 @@
 package Mail::BIMI::App::Command::svgfromvmc;
 # ABSTRACT: Extract the SVG from a VMC
-our $VERSION = '3.20260302'; # VERSION
+our $VERSION = '3.20260806'; # VERSION
 use 5.20.0;
 BEGIN { $ENV{MAIL_BIMI_CACHE_DEFAULT_BACKEND} = 'Null' };
 use Mail::BIMI::Prelude;
@@ -99,7 +99,7 @@ Mail::BIMI::App::Command::svgfromvmc - Extract the SVG from a VMC
 
 =head1 VERSION
 
-version 3.20260302
+version 3.20260806
 
 =head1 DESCRIPTION
 
@@ -125,11 +125,11 @@ App::Cmd class implementing the 'mailbimi svgfromvmc' command
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

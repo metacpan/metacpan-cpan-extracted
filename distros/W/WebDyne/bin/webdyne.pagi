@@ -45,7 +45,7 @@ use WebDyne::PAGI::Constant;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.008';
+$VERSION='3.009';
 
 
 #  Check for supporting modules
@@ -163,6 +163,14 @@ sub build {
     #  Build app code ref, options passed for builder
     #
     my $opt_hr=shift();
+
+
+    #  Read in local webdyne.conf.pl before middleware and app setup so
+    #  wrapper and external server loading use the same root config.
+    #
+    &local_constant_load($opt_hr->{'root'});
+
+
     my $builder_or=PAGI::Middleware::Builder->new();
     
     
@@ -252,11 +260,6 @@ sub startup {
         $pagi_or->parse_options(map {split(/\s+/)} @argv);
     }
     
-
-    #  Read in local webdyne.conf.pl
-    #
-    &local_constant_load($opt_hr->{'root'});
-
 
     #  Get app code ref from WebDyne::PAGI
     #
@@ -450,7 +453,7 @@ This script is a frontend to the WebDyne PAGI stack. It uses WebDyne configurati
 
     Supplies the relevant WebDyne settings used by the PAGI modules.
 
-When launched from the command line, the wrapper also reads local WebDyne configuration from `DOCUMENT_ROOT/.webdyne.conf.pl` before starting the PAGI runner.
+When the PAGI app is built, the wrapper also reads local WebDyne configuration from `DOCUMENT_ROOT/.webdyne.conf.pl`. This applies both when `webdyne.pagi` is launched directly and when it is loaded by an external PAGI server.
 
 Relevant PAGI-specific settings from `WebDyne::PAGI::Constant` include:
 
@@ -749,7 +752,7 @@ Supplies the relevant WebDyne settings used by the PAGI modules.
 
 =back
 
-When launched from the command line, the wrapper also reads local WebDyne configuration from C<DOCUMENT_ROOT/.webdyne.conf.pl> before starting the PAGI runner.
+When the PAGI app is built, the wrapper also reads local WebDyne configuration from C<DOCUMENT_ROOT/.webdyne.conf.pl>. This applies both when C<webdyne.pagi> is launched directly and when it is loaded by an external PAGI server.
 
 Relevant PAGI-specific settings from C<WebDyne::PAGI::Constant> include:
 

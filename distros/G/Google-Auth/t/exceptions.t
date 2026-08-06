@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2022 Google LLC
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-BEGIN
-{
-    use_ok('Google::Auth::Exceptions') || print "Bail out!\n";
+BEGIN {
+  use_ok('Google::Auth::Exceptions') || print "Bail out!\n";
 }
 
-note("Testing Google::Auth::Exceptions $Google::Auth::Exceptions::VERSION, Perl $], $^X");
+note("Testing Google::Auth::Exceptions, Perl $], $^X");
 
 throws_ok { Google::Auth::Error->throw("generic Google Auth Error"); }
 qr/generic/;

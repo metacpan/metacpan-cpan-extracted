@@ -1,11 +1,12 @@
 ---
-abstract: 'Fast XS list/table renderer with escaping, formatting, and transform chaining'
+abstract: 'fast XS list/table renderer with escaping, formatting, and transform chaining'
 author:
   - vividsnow
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
@@ -17,10 +18,14 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Text::Stencil:
+    file: lib/Text/Stencil.pm
+    version: '0.03'
 requires:
   perl: '5.020'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-text-stencil/issues
   repository: https://github.com/vividsnow/perl5-text-stencil.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

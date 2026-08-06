@@ -11,6 +11,7 @@ use warnings;
 use Test::Most;
 use Test::Mockingbird;
 use Test::Returns;
+use Test::Without::Module ();	# loaded without hiding any modules; used at runtime in one subtest
 use Readonly;
 use Scalar::Util qw(refaddr);
 use Socket qw(AF_INET);
@@ -54,7 +55,7 @@ Readonly my %config => (
 	NONCLOUD_HOST     => 'mail.example.com',
 );
 
-# ── Helper ───────────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 # Run all_denied() with a fixed REMOTE_ADDR without polluting the global env
 sub denied_at {
@@ -63,11 +64,46 @@ sub denied_at {
 	return $acl->all_denied(@rest);
 }
 
-# Build a real CGI::Lingua for a given REMOTE_ADDR (resolves country from GeoIP)
+# Per-run lingua cache: each IP address makes exactly one WHOIS query for the
+# entire test run.  CGI::Lingua caches the resolved country inside the object;
+# subsequent calls to country() on the cached object return the stored value
+# without a new network round-trip.
+#
+# local $_ protects the caller's loop variable: CGI::Lingua and the WHOIS
+# modules it calls use $_ internally (e.g. in grep/map inside
+# Net::Whois::IANA), and without localisation that clobbers map/grep
+# iterations in the calling code, producing scrambled results.
+my %_lingua_cache;
 sub lingua_for {
 	my $addr = shift;
-	local $ENV{REMOTE_ADDR} = $addr;
-	return CGI::Lingua->new(supported => ['en']);
+	unless(exists $_lingua_cache{$addr}) {
+		local $_;
+		local $ENV{REMOTE_ADDR} = $addr;
+		my $l = CGI::Lingua->new(supported => ['en']);
+		do { local $SIG{__WARN__} = sub {}; $l->country() };
+		$_lingua_cache{$addr} = $l;
+	}
+	return $_lingua_cache{$addr};
+}
+
+# ── RIPE WHOIS availability check ─────────────────────────────────────────────
+# Subtests that rely on RIPE-registered IPs (GB, RU) are wrapped in a SKIP
+# block when RIPE's WHOIS server is rate-limiting.  ARIN (US) and APNIC (CN)
+# use independent servers and are unaffected.
+#
+# Pre-resolve now so every subsequent lingua_for() call hits the cache and makes
+# zero additional WHOIS requests.
+my %_ripe_ips = map { $config{$_} => 1 } qw(IP_GB IP_RU);
+my $ripe_ok = 1;
+
+# Pre-resolve RIPE IPs once: populates the lingua cache and detects rate-limiting.
+# Using lingua_for() here means zero additional WHOIS calls inside the subtests.
+for my $ip (sort keys %_ripe_ips) {
+	my $country = do { local $SIG{__WARN__} = sub {}; lingua_for($ip)->country() };
+	unless(defined $country) {
+		$ripe_ok = 0;
+		last;
+	}
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -228,22 +264,15 @@ subtest 'Concurrent instances: independent access policies' => sub {
 # Purpose: test real GeoIP lookup + deny_country working together
 # ─────────────────────────────────────────────────────────────────────────────
 subtest 'CGI::Lingua integration: deny_country with real GeoIP' => sub {
-	# Deny Russian Federation by ISO code
+	plan skip_all => 'RIPE WHOIS rate-limited; run again later' unless $ripe_ok;
+
 	my $acl = CGI::ACL->new()->deny_country($config{COUNTRY_RU});
 
-	# Build lingua for each test IP under the right REMOTE_ADDR
-	local $ENV{REMOTE_ADDR} = $config{IP_RU};
-	my $ru_lingua = CGI::Lingua->new(supported => ['en']);
-	diag "RU lingua->country=" . ($ru_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
+	diag "RU country=" . (lingua_for($config{IP_RU})->country() // 'undef') if $ENV{TEST_VERBOSE};
+	is(denied_at($acl, $config{IP_RU}, lingua => lingua_for($config{IP_RU})), 1, 'Russian IP is denied');
 
-	# Russian IP must be denied
-	is($acl->all_denied(lingua => $ru_lingua), 1, 'Russian IP is denied');
-
-	# UK IP must be allowed (not on the deny list)
-	local $ENV{REMOTE_ADDR} = $config{IP_GB};
-	my $gb_lingua = CGI::Lingua->new(supported => ['en']);
-	diag "GB lingua->country=" . ($gb_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
-	is($acl->all_denied(lingua => $gb_lingua), 0, 'UK IP is allowed');
+	diag "GB country=" . (lingua_for($config{IP_GB})->country() // 'undef') if $ENV{TEST_VERBOSE};
+	is(denied_at($acl, $config{IP_GB}, lingua => lingua_for($config{IP_GB})), 0, 'UK IP is allowed');
 };
 
 # Purpose: wildcard deny with an explicit allow list
@@ -287,19 +316,13 @@ subtest 'CGI::Lingua integration: lingua->country() is called by all_denied' => 
 
 # Purpose: multiple country restrictions in an arrayref work correctly
 subtest 'CGI::Lingua integration: arrayref of denied countries' => sub {
-	# Deny both RU and BR in a single call
+	plan skip_all => 'RIPE WHOIS rate-limited; run again later' unless $ripe_ok;
+
 	my $acl = CGI::ACL->new()->deny_country(country => [$config{COUNTRY_RU}, $config{COUNTRY_BR}]);
 	diag "deny_countries: " . join(',', sort keys %{$acl->{deny_countries}}) if $ENV{TEST_VERBOSE};
 
-	# Russian IP must be denied
-	local $ENV{REMOTE_ADDR} = $config{IP_RU};
-	my $ru_lingua = CGI::Lingua->new(supported => ['en']);
-	is($acl->all_denied(lingua => $ru_lingua), 1, 'Russian IP denied from arrayref list');
-
-	# UK IP must be allowed
-	local $ENV{REMOTE_ADDR} = $config{IP_GB};
-	my $gb_lingua = CGI::Lingua->new(supported => ['en']);
-	is($acl->all_denied(lingua => $gb_lingua), 0, 'UK IP allowed (not in deny list)');
+	is(denied_at($acl, $config{IP_RU}, lingua => lingua_for($config{IP_RU})), 1, 'Russian IP denied from arrayref list');
+	is(denied_at($acl, $config{IP_GB}, lingua => lingua_for($config{IP_GB})), 0, 'UK IP allowed (not in deny list)');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -307,24 +330,19 @@ subtest 'CGI::Lingua integration: arrayref of denied countries' => sub {
 # Purpose: when an IP is in the allow-list, country is not consulted
 # ─────────────────────────────────────────────────────────────────────────────
 subtest 'IP allow-list overrides country deny (IP match short-circuits country check)' => sub {
-	# Deny the UK country, but allow the specific IP explicitly
+	plan skip_all => 'RIPE WHOIS rate-limited; run again later' unless $ripe_ok;
+
 	my $acl = CGI::ACL->new()
 		->deny_country($config{COUNTRY_GB})
 		->allow_ip($config{IP_GB});
 
-	# The IP is explicitly allowed, so it must not be denied despite the country rule
-	local $ENV{REMOTE_ADDR} = $config{IP_GB};
-	my $gb_lingua = CGI::Lingua->new(supported => ['en']);
-	diag "IP allow beats country deny: IP=$config{IP_GB} country=" . ($gb_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
-	is($acl->all_denied(lingua => $gb_lingua), 0, 'explicitly allowed IP is not denied by country rule');
+	# Explicitly allowed IP must not be denied despite the country rule
+	diag "IP allow beats country deny: IP=$config{IP_GB} country=" . (lingua_for($config{IP_GB})->country() // 'undef') if $ENV{TEST_VERBOSE};
+	is(denied_at($acl, $config{IP_GB}, lingua => lingua_for($config{IP_GB})), 0, 'explicitly allowed IP is not denied by country rule');
 
-	# A non-GB, non-allowed IP falls through to the country check: RU is not in
-	# the deny list, so it should be allowed.  This confirms the deny_country rule
-	# is selective — only clients from GB are denied.
-	local $ENV{REMOTE_ADDR} = $config{IP_RU};
-	my $other_lingua = CGI::Lingua->new(supported => ['en']);
-	diag "non-GB, non-allowed IP: country=" . ($other_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
-	is($acl->all_denied(lingua => $other_lingua), 0, 'non-GB non-allowed IP is allowed (only GB is denied)');
+	# Non-GB, non-allowed IP: RU is not in the deny list so it should be allowed
+	diag "non-GB, non-allowed IP: country=" . (lingua_for($config{IP_RU})->country() // 'undef') if $ENV{TEST_VERBOSE};
+	is(denied_at($acl, $config{IP_RU}, lingua => lingua_for($config{IP_RU})), 0, 'non-GB non-allowed IP is allowed (only GB is denied)');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -565,6 +583,315 @@ subtest 'Return value schemas match POD specifications' => sub {
 	my $result = denied_at($acl, $config{RFC_IP_1}, lingua => lingua_for($config{IP_US}));
 	returns_ok($result, { type => 'SCALAR', regex => qr/^[01]$/ }, 'all_denied() return schema');
 	diag "all_denied return value: $result" if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: deny_all_countries() convenience method end-to-end
+# Purpose: verify the POD-documented sugar method produces identical behaviour
+# to deny_country('*') in a real multi-step workflow
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'deny_all_countries() workflow: permit-list with real GeoIP' => sub {
+	# POD: "Sugar for deny_country('*'); switches all_denied() into default-deny
+	# mode for country checks."  Build two ACLs — one using the sugar, one using
+	# deny_country('*') directly — and verify both produce identical results.
+	my $acl_sugar = CGI::ACL->new()
+		->deny_all_countries()
+		->allow_country($config{COUNTRY_US});
+
+	my $acl_raw = CGI::ACL->new()
+		->deny_country($config{WILDCARD})
+		->allow_country($config{COUNTRY_US});
+
+	# US IP: both ACLs must allow it
+	local $ENV{REMOTE_ADDR} = $config{IP_US};
+	my $us_lingua = CGI::Lingua->new(supported => ['en']);
+	diag "deny_all_countries sugar: US country=" . ($us_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
+
+	my $sugar_us = $acl_sugar->all_denied(lingua => $us_lingua);
+	my $raw_us   = $acl_raw->all_denied(  lingua => $us_lingua);
+	is($sugar_us, 0,       'deny_all_countries + allow US: US is permitted');
+	is($sugar_us, $raw_us, 'deny_all_countries result identical to deny_country("*") for allowed country');
+
+	# Non-US IP (GB is not in permit list): both ACLs must deny it
+	local $ENV{REMOTE_ADDR} = $config{IP_GB};
+	my $gb_lingua = CGI::Lingua->new(supported => ['en']);
+	diag "deny_all_countries sugar: GB country=" . ($gb_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
+
+	my $sugar_gb = $acl_sugar->all_denied(lingua => $gb_lingua);
+	my $raw_gb   = $acl_raw->all_denied(  lingua => $gb_lingua);
+	is($sugar_gb, 1,       'deny_all_countries + allow US: GB is denied (not in permit list)');
+	is($sugar_gb, $raw_gb, 'deny_all_countries result identical to deny_country("*") for non-listed country');
+
+	# Returns $self: verify method chaining produced a functional object
+	isa_ok($acl_sugar, 'CGI::ACL', 'deny_all_countries chained object is still valid');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: clone isolation — cloud cache is cleared on new()
+# Purpose: a cloned object must re-query DNS for IPs that were cached in the
+# parent; the per-object cloud cache must not be shared between instances
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'Clone isolation: cloud cache is cleared on clone, forcing fresh DNS lookup' => sub {
+	# Each call to the mock increments $dns_calls, letting us verify exactly
+	# when the DNS path is taken vs. the cache hit path.
+	my $dns_calls = 0;
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub {
+		$dns_calls++;
+		diag "_verified_rdns call #$dns_calls for $_[0]" if $ENV{TEST_VERBOSE};
+		return $config{AWS_HOST} if $_[0] eq $config{RFC_IP_1};
+		return undef;
+	};
+
+	my $orig = CGI::ACL->new()->deny_cloud();
+
+	# First call on orig: cache miss → DNS queried → result cached
+	is(denied_at($orig, $config{RFC_IP_1}), 1, 'cloud IP denied (first call: DNS queried)');
+	my $calls_after_first = $dns_calls;
+
+	# Second call on orig: cache hit → DNS must NOT be queried again
+	is(denied_at($orig, $config{RFC_IP_1}), 1, 'cloud IP denied again (second call: served from cache)');
+	is($dns_calls, $calls_after_first, 'no additional DNS call on second all_denied() (cache hit)');
+
+	# Clone the object: POD says cache is cleared (consistent with _cidrlist)
+	my $clone = $orig->new();
+	isa_ok($clone, 'CGI::ACL', 'clone is a valid CGI::ACL object');
+	isnt(refaddr($orig), refaddr($clone), 'clone is a distinct object reference');
+
+	# First call on clone: cache is empty → DNS must be queried again
+	is(denied_at($clone, $config{RFC_IP_1}), 1, 'cloud IP denied on clone (cache cleared → fresh DNS)');
+	ok($dns_calls > $calls_after_first, 'DNS was re-queried for the clone (cache not inherited from parent)');
+	diag "total DNS calls: $dns_calls (expected >$calls_after_first)" if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: concurrent ACL instances with different country deny policies
+# Purpose: modifying one object's country set must never bleed into another
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'Concurrent ACLs: independent country deny policies do not share state' => sub {
+	plan skip_all => 'RIPE WHOIS rate-limited; run again later' unless $ripe_ok;
+
+	# ACL A denies Russia; ACL B denies the UK.  Each must act independently.
+	my $acl_a = CGI::ACL->new()->deny_country($config{COUNTRY_RU});
+	my $acl_b = CGI::ACL->new()->deny_country($config{COUNTRY_GB});
+
+	my $ru_lingua = lingua_for($config{IP_RU});
+	my $gb_lingua = lingua_for($config{IP_GB});
+
+	diag "concurrent ACLs: RU=" . ($ru_lingua->country() // 'undef')
+	   . " GB=" . ($gb_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
+
+	# Russian IP: A denies (RU in A's list), B allows (RU not in B's list)
+	is(denied_at($acl_a, $config{IP_RU}, lingua => $ru_lingua), 1, 'ACL A denies Russian IP');
+	is(denied_at($acl_b, $config{IP_RU}, lingua => $ru_lingua), 0, 'ACL B allows Russian IP (not in B deny list)');
+
+	# UK IP: A allows (GB not in A's list), B denies (GB in B's list)
+	is(denied_at($acl_a, $config{IP_GB}, lingua => $gb_lingua), 0, 'ACL A allows UK IP (not in A deny list)');
+	is(denied_at($acl_b, $config{IP_GB}, lingua => $gb_lingua), 1, 'ACL B denies UK IP');
+
+	# After adding RU to ACL B, ACL A must be unaffected
+	$acl_b->deny_country($config{COUNTRY_RU});
+	is(denied_at($acl_a, $config{IP_RU}, lingua => $ru_lingua), 1, 'ACL A unchanged after ACL B was modified');
+	ok(!$acl_a->{deny_countries}{$config{COUNTRY_GB}}, 'ACL A deny_countries does not contain GB (no state bleed from B)');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: SYNOPSIS §5 — production-grade combined policy
+# Purpose: exercise the full rule-evaluation order from the POD with all four
+# restriction types active simultaneously (cloud + IP + deny-all + allow-country)
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'SYNOPSIS §5: production-grade combined policy (cloud + IP + deny-all + allow-country)' => sub {
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub {
+		return $config{AWS_HOST} if $_[0] eq $config{RFC_IP_1};
+		return undef;
+	};
+
+	# Production ACL from POD §5: block cloud, allow one IP, deny all countries
+	# except US.  Tests each rule tier in the documented evaluation order.
+	my $acl = CGI::ACL->new()
+		->deny_cloud()                           # tier 3: cloud check
+		->allow_ip($config{RFC_IP_2})            # tier 4: IP allow-list
+		->deny_all_countries()                   # tier 5a: default-deny
+		->allow_country($config{COUNTRY_US});    # tier 5b: permit list
+
+	# Tier 3 wins: cloud IP denied regardless of everything else
+	is(denied_at($acl, $config{RFC_IP_1}), 1, '§5: cloud IP denied (cloud check takes precedence)');
+
+	# Tier 4 wins: explicitly allowed IP passes without a country check
+	is(denied_at($acl, $config{RFC_IP_2}), 0, '§5: explicitly allowed IP permitted (IP check short-circuits country)');
+
+	# Tier 5: non-cloud, non-listed IP reaches the country check
+	local $ENV{REMOTE_ADDR} = $config{IP_US};
+	my $us_lingua = CGI::Lingua->new(supported => ['en']);
+	diag "§5 US lingua->country=" . ($us_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
+	is($acl->all_denied(lingua => $us_lingua), 0, '§5: US visitor permitted by country allow-list');
+
+	local $ENV{REMOTE_ADDR} = $config{IP_GB};
+	my $gb_lingua = CGI::Lingua->new(supported => ['en']);
+	diag "§5 GB lingua->country=" . ($gb_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
+	is($acl->all_denied(lingua => $gb_lingua), 1, '§5: GB visitor denied (not in country allow-list)');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: SYNOPSIS §6 — shared base ACL cloned for route-specific policies
+# Purpose: verify that a base ACL cloned for an admin route correctly inherits
+# base restrictions while adding route-specific ones independently
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'SYNOPSIS §6: base ACL cloned for route-specific admin policy' => sub {
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub { undef };
+
+	# Base ACL: deny cloud + permit US only (used by all public routes)
+	my $base_acl = CGI::ACL->new()
+		->deny_cloud()
+		->deny_all_countries()
+		->allow_country($config{COUNTRY_US});
+
+	# Admin route: clone base, then restrict to one trusted IP as well
+	my $admin_acl = $base_acl->new()
+		->allow_ip($config{RFC_IP_2});
+
+	isa_ok($admin_acl, 'CGI::ACL', 'admin clone is a valid CGI::ACL object');
+	isnt(refaddr($base_acl), refaddr($admin_acl), 'admin clone is a distinct object');
+
+	# Admin clone: explicitly allowed IP passes without a country check
+	is(denied_at($admin_acl, $config{RFC_IP_2}), 0, 'admin clone: trusted IP permitted');
+
+	# Admin clone: unlisted IP still goes through country check (US only)
+	local $ENV{REMOTE_ADDR} = $config{IP_US};
+	my $us_lingua = lingua_for($config{IP_US});
+	diag "§6 admin US lingua->country=" . ($us_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
+	is($admin_acl->all_denied(lingua => $us_lingua), 0, 'admin clone: US visitor permitted by country');
+
+	local $ENV{REMOTE_ADDR} = $config{IP_GB};
+	my $gb_lingua = CGI::Lingua->new(supported => ['en']);
+	diag "§6 admin GB lingua->country=" . ($gb_lingua->country() // 'undef') if $ENV{TEST_VERBOSE};
+	is($admin_acl->all_denied(lingua => $gb_lingua), 1, 'admin clone: GB visitor denied (not in permit list)');
+
+	# Mutations to the admin clone must NOT leak into the base ACL
+	ok(!defined($base_acl->{allowed_ips}) || !$base_acl->{allowed_ips}{ $config{RFC_IP_2} },
+		'base ACL unaffected: trusted IP added to admin clone is not visible in base');
+
+	# Base ACL: must still work independently after clone was modified
+	local $ENV{REMOTE_ADDR} = $config{IP_US};
+	is($base_acl->all_denied(lingua => $us_lingua), 0, 'base ACL still allows US after admin clone was modified');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: deny_cloud + allow_country fast-path (no lingua needed)
+# Purpose: when deny_cloud is the only "meaningful" restriction (allow_countries
+# alone is explicitly documented as not meaningful), a non-cloud IP must be
+# allowed immediately without consulting the lingua argument
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'deny_cloud + allow_country fast-path: non-cloud IP allowed without lingua' => sub {
+	# POD PSEUDOCODE: after the cloud check, if "no meaningful further restrictions"
+	# (i.e. allowed_ips = ∅ AND deny_countries = ∅), return 0 immediately.
+	# allow_countries alone is explicitly "not meaningful" — documented in the
+	# FORMAL SPECIFICATION: "allow_countries alone is not meaningful".
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub { undef };
+
+	my $acl = CGI::ACL->new()
+		->deny_cloud()
+		->allow_country($config{COUNTRY_US});    # allow_country WITHOUT deny_country('*')
+
+	# Non-cloud IP: fast-path returns 0 without needing a lingua object.
+	# Calling all_denied() without lingua must NOT carp (no country restriction active).
+	my @carps;
+	{
+		local $SIG{__WARN__} = sub { push @carps, $_[0] };
+		my $result = denied_at($acl, $config{RFC_IP_1});
+		is($result, 0, 'non-cloud IP allowed (deny_cloud + allow_country fast-path, no lingua needed)');
+	}
+	ok(!@carps, 'no carp emitted: country check was not reached (no deny_countries set)');
+	diag "carp messages (expected none): @carps" if $ENV{TEST_VERBOSE} && @carps;
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: Object::Configure _* key injection prevention
+# Purpose: env-var injection of _cloud_cache via Object::Configure must be
+# stripped so an attacker cannot pre-seed the DNS cache to bypass cloud detection
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'Object::Configure: _cloud_cache env-var injection is stripped (security)' => sub {
+	# The env var CGI__ACL___cloud_cache would set the _cloud_cache key if not
+	# stripped.  If accepted as a string (JSON-ish), hash-dereferencing it inside
+	# all_denied() would die.  If somehow parsed as a real hashref (not possible
+	# via env vars, but via future injection vectors), cloud detection would be
+	# bypassed for the targeted IP.  The fix: new() strips all _* keys from
+	# Object::Configure output before merging them into the object.
+	local $ENV{'CGI__ACL___cloud_cache'} = '{"1.2.3.4":{"result":0,"expires":9999999999}}';
+
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub {
+		return $config{AWS_HOST} if $_[0] eq '1.2.3.4';
+		return undef;
+	};
+
+	my $acl = CGI::ACL->new()->deny_cloud();
+
+	# Verify the injected string was not stored (key must be stripped)
+	ok(!defined($acl->{_cloud_cache}), '_cloud_cache not initialised from env-var injection');
+
+	# Functional check: cloud IP must still be detected and denied
+	my $result = eval { denied_at($acl, '1.2.3.4') };
+	my $err = $@; undef $@;
+	ok(!$err,        'no exception when _cloud_cache injection is stripped (no hash-deref on string)');
+	is($result, 1,   'cloud IP correctly denied (injection stripped → real DNS mock ran)');
+	diag "Object::Configure security: result=$result err=$err" if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: CIDR list cache invalidation after allow_ip()
+# Purpose: adding a new address via allow_ip() must clear and rebuild the
+# internal Net::CIDR list (_cidrlist) so the new entry becomes effective
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'CIDR list cache invalidation: allow_ip() clears and rebuilds _cidrlist' => sub {
+	my $acl = CGI::ACL->new()->allow_ip($config{RFC_CIDR});
+
+	# Warm the CIDR cache by running a lookup
+	is(denied_at($acl, $config{CIDR_INSIDE}),  0, 'CIDR inside allowed (cache warm)');
+	is(denied_at($acl, $config{CIDR_OUTSIDE}), 1, 'CIDR outside denied (cache warm)');
+	ok(defined $acl->{_cidrlist}, '_cidrlist is memoised after first CIDR lookup');
+
+	# Adding a new IP must clear the cache so it is rebuilt with both entries
+	$acl->allow_ip($config{RFC_IP_1});
+	ok(!defined($acl->{_cidrlist}), '_cidrlist cleared after allow_ip() call');
+
+	# Verify that BOTH the original CIDR and the newly added IP work after rebuild
+	is(denied_at($acl, $config{CIDR_INSIDE}), 0, 'original CIDR inside still allowed after cache rebuild');
+	is(denied_at($acl, $config{RFC_IP_1}),    0, 'newly added IP allowed after cache rebuild');
+	is(denied_at($acl, $config{RFC_IP_2}),    1, 'unlisted IP still denied after cache rebuild');
+	ok(defined $acl->{_cidrlist}, '_cidrlist re-memoised after rebuild lookup');
+	diag "CIDR list rebuilt successfully" if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario: optional dependency — CGI::Lingua
+# Purpose: CGI::ACL documents that lingua is optional (only needed for country
+# checks).  IP-only and cloud-only workflows must succeed even when CGI::Lingua
+# is removed from Perl's module loader, proving CGI::ACL has no implicit
+# dependency on it for non-country operations.
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'Test::Without::Module: IP-only ACL unaffected when CGI::Lingua unavailable' => sub {
+	# Hide CGI::Lingua from future require() calls.  Since CGI::ACL itself never
+	# calls require/use CGI::Lingua internally, this must have no effect on its
+	# IP-allow and deny_cloud logic paths.
+	Test::Without::Module->import('CGI::Lingua');
+
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub { undef };
+
+	my $acl = CGI::ACL->new()
+		->allow_ip($config{RFC_IP_1})
+		->allow_ip($config{RFC_CIDR})
+		->deny_cloud();
+
+	my $r1 = eval { denied_at($acl, $config{RFC_IP_1}) };
+	my $r2 = eval { denied_at($acl, $config{CIDR_INSIDE}) };
+	my $r3 = eval { denied_at($acl, $config{RFC_IP_2}) };
+
+	# Restore CGI::Lingua before any assertions so failures don't strand the loader
+	Test::Without::Module->unimport('CGI::Lingua');
+
+	is($r1, 0, 'exact IP allowed when CGI::Lingua is unavailable');
+	is($r2, 0, 'CIDR inside allowed when CGI::Lingua is unavailable');
+	is($r3, 1, 'unlisted IP denied when CGI::Lingua is unavailable');
+	diag "IP-only ACL works without CGI::Lingua: r1=$r1 r2=$r2 r3=$r3" if $ENV{TEST_VERBOSE};
 };
 
 done_testing();

@@ -190,19 +190,25 @@ subtest 'deny_cloud: cloud IP is denied even when it is in the allow-list' => su
 };
 
 subtest 'deny_cloud: allow_country alone alongside deny_cloud (no deny wildcard)' => sub {
-	# allow_country without deny_country('*') has no *country-based* restrictive
-	# effect (any country passes).  However the country check still runs and
-	# REQUIRES a lingua argument; without one, all_denied carps and returns 1.
-	# When lingua IS provided, any country is allowed (no deny rule).
+	# Premise: allow_country without deny_country('*') is vacuous — it never changes
+	# the access decision and does not count as a meaningful further restriction.
+	# Premise: the cloud fast-path now reads "return 0 unless allowed_ips || deny_countries",
+	# intentionally excluding allow_countries (same principle as the early-return guard).
+	# Conclusion: a non-cloud IP is allowed immediately from the cloud fast-path
+	# without consulting lingua — no carp, no country lookup.
 	my $acl    = CGI::ACL->new()->deny_cloud()->allow_country($config{CC_US});
 	my $guard  = mock_scoped 'CGI::ACL::_verified_rdns' => sub { undef };
 	my $lingua = MockLingua->new(country => $config{CC_DE});
 
-	diag "deny_cloud + allow_country (no wildcard deny) + lingua" if $ENV{TEST_VERBOSE};
+	diag "deny_cloud + allow_country (no wildcard deny): fast-path allows" if $ENV{TEST_VERBOSE};
 
-	# With a valid lingua: any country is allowed (no deny rule active)
+	# Fast-path returns 0 regardless of lingua (lingua is not consulted)
 	is(denied_at($acl, $config{RFC5737_IP}, lingua => $lingua), 0,
-		'non-cloud IP + any country allowed when no deny rule active');
+		'non-cloud IP allowed via fast-path; allow_country alone is not a further restriction');
+
+	# Without lingua the result is still 0 (fast-path fires before country check)
+	is(denied_at($acl, $config{RFC5737_IP}), 0,
+		'non-cloud IP allowed even without lingua when allow_country has no wildcard deny');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────

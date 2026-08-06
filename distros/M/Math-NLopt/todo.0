@@ -1,0 +1,113 @@
+• The implementation now covers the main synchronous callback path correctly:
+
+  - proxy_func() uses G_SCALAR | G_EVAL.
+  - proxy_mfunc() and proxy_precond() use G_VOID | G_EVAL.
+  - The first callback exception is copied into ProxyNLopt.
+  - nlopt_force_stop() lets NLopt unwind normally.
+  - The optimize XSUB rethrows the original exception after nlopt_optimize() returns.
+  - The tests cover objective, preconditioner, scalar constraint, and vector constraint callbacks in both min/max or equality/inequality
+    forms, and verify class/message plus reuse.
+
+  I see several improvements still needed.
+
+  ### 1. SvTRUE(ERRSV) can miss valid exceptions
+
+  All three wrappers use:
+
+  if (SvTRUE(err_tmp))
+
+  An exception can be a defined object whose boolean overload is false. Such an exception would be treated as “no error,” and the callback’s
+  return/result arrays would then be processed normally.
+
+  Use a definedness check instead:
+
+  if (SvOK(err_tmp))
+
+  The tests should include an exception object with false boolean overload, or at least a defined empty-string exception, to protect this
+  boundary.
+
+  ### 2. Pending-exception ownership should be explicit
+
+  opt->exception is reset with:
+
+  opt->exception = NULL;
+
+  If an unexpected path leaves a pending exception there, that loses its reference. The destructor also does not release it.
+
+  A small helper would clarify and harden this:
+
+  static void
+  clear_exception(ProxyNLopt *opt) {
+      if (opt->exception) {
+          SvREFCNT_dec(opt->exception);
+          opt->exception = NULL;
+      }
+  }
+
+  Use it before starting an optimization and during destruction. The comments should state that exception owns one reference until it is
+  rethrown.
+
+  ### 3. Test the NLopt result status
+
+  The callback tests verify that optimize() throws the original exception, but they do not verify the underlying NLopt status. After catching
+  the exception, each test should also assert:
+
+  is(
+      $opt->last_optimize_result,
+      NLOPT_FORCED_STOP,
+      'callback exception stops optimization with NLOPT_FORCED_STOP',
+  );
+
+  This is especially important because optimize() returns optimized parameters on success; its status is exposed separately through
+  last_optimize_result.
+
+  ### 4. Add nested-optimizer coverage
+
+  The current tests use MMA, SLSQP, and CCSAQ directly. NLopt also invokes callbacks through nested nlopt_optimize_limited() calls in:
+
+  - AUGLAG;
+  - MLSL;
+  - MMA/CCSAQ internal dual or preconditioner optimizers.
+
+  At least one regression should use an algorithm with a nested optimizer and verify that:
+
+  - the original callback exception is preserved;
+  - the outer optimization stops;
+  - the result status is NLOPT_FORCED_STOP;
+  - the optimizer remains usable afterward.
+
+  This is the main untested consequence of removing in_optimize.
+
+  ### 5. Test repeated callback failures
+
+  The current callbacks fail only on the first call and then succeed. Add a case where the callback always throws, and call optimize() twice.
+  This checks that:
+
+  - the first pending exception is not stale;
+  - the second exception is independently captured;
+  - the optimizer’s exception slot is cleared correctly between calls.
+
+  ### 6. Test callback/data cleanup after an exception
+
+  The forked tests protect the main harness from a crash, but they do not verify that callback, data, proxy, and pending-exception references
+  are released after a failed optimization. Add weak-reference assertions in t/callback/exceptions.t, or corresponding Test::LeakTrace
+  coverage under xt/lifetime.
+
+  ### 7. Document the exception bridge
+
+  The comments in the wrappers explain the immediate mechanics, but the invariant should be documented once near ProxyNLopt::exception:
+
+  - callbacks must not croak through NLopt;
+  - they catch and copy Perl exceptions;
+  - they request NLopt forced stop;
+  - the enclosing XSUB rethrows after NLopt returns;
+  - NLopt’s status remains NLOPT_FORCED_STOP.
+
+  Also document why proxy_mfunc() and proxy_precond() do not inspect a return count: their results are written through mutable array
+  arguments.
+
+  ### 8. Reconsider NO_XSLOCKS
+
+  NO_XSLOCKS disables Perl’s XS locking support. The callbacks are synchronous, so this does not appear necessary for the exception bridge
+  and may reduce safety for threaded Perl builds. It should either be removed or documented with a clear reason and tested under the
+  supported threading configuration.

@@ -1,3 +1,8 @@
+v0.34  2026-08-05Z
+    - Updated documentation
+    - Added chat0w identifier to those identifiers we already have in Data::Identifier::Wellknown
+    - Made Data::Identifier inherit from Data::Identifier::Interface::Simple
+
 v0.33  2026-08-03Z
     - Better support for Math::BigInt (from, as)
     - Removed deprecated methods

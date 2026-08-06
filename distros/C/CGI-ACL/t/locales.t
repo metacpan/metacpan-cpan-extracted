@@ -19,6 +19,18 @@ BEGIN {
 	use_ok('CGI::Lingua') or BAIL_OUT('CGI::Lingua failed to load');
 }
 
+# Pre-load Net::Whois::IANA and reduce all WHOIS timeouts from 30 s to 5 s.
+# The module embeds the timeout in %IANA at compile time, so we must patch
+# the nested arrayrefs directly.  Without this, a stalled RIPE connection
+# (rate-limited server that accepts TCP but never replies) hangs make test
+# for up to 5 × 30 s per IP lookup.
+if(eval { require Net::Whois::IANA; 1 }) {
+	no warnings 'once';
+	for my $servers (values %Net::Whois::IANA::IANA) {
+		$_->[2] = 5 for @{$servers};
+	}
+}
+
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 # All IPs were verified against the installed GeoIP database before use.
@@ -34,7 +46,7 @@ Readonly my %config => (
 
 	# German-speaking region
 	IP_DE   => '217.0.0.1',         # Deutsche Telekom, Germany         -> de
-	IP_DE2  => '193.197.62.1',      # University of Stuttgart, Germany  -> de
+	IP_DE2  => '80.128.128.1',      # Deutsche Telekom AG, Germany      -> de
 
 	# Mandarin-speaking region
 	IP_CN   => '61.135.169.125',    # Baidu, China                      -> cn
@@ -53,11 +65,28 @@ Readonly my %config => (
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-# Build a CGI::Lingua for the given IP, scoping REMOTE_ADDR cleanly
+# Per-run cache: each IP makes exactly one WHOIS query for the entire test run.
+# country() is called while REMOTE_ADDR is set so the result is stored in
+# $l->{_country}; all later calls on the same object hit that cache.
+my %_lingua_cache;
 sub lingua_for {
 	my $ip = shift;
-	local $ENV{REMOTE_ADDR} = $ip;
-	return CGI::Lingua->new(supported => ['en']);
+	unless(exists $_lingua_cache{$ip}) {
+		# CGI::Lingua and its WHOIS dependencies use $_ internally (e.g. in
+		# grep/map inside Net::Whois::IANA::ripe_read_query).  Without local $_,
+		# a call to lingua_for() from inside a map/grep block would clobber the
+		# block's loop variable, scrambling the outer hash assignment.
+		local $_;
+		local $ENV{REMOTE_ADDR} = $ip;
+		my $l = CGI::Lingua->new(supported => ['en']);
+		# Resolve country now while REMOTE_ADDR is set; the result is cached
+		# inside the lingua object.  WHOIS modules may emit uninitialized-value
+		# warnings when a server is rate-limited — suppress them here so they
+		# don't pollute the test output.
+		do { local $SIG{__WARN__} = sub {}; $l->country() };
+		$_lingua_cache{$ip} = $l;
+	}
+	return $_lingua_cache{$ip};
 }
 
 # Call all_denied() with the given IP set as REMOTE_ADDR
@@ -68,33 +97,57 @@ sub denied_at {
 }
 
 # ── GeoIP sanity checks ───────────────────────────────────────────────────────
-# Verify that our test IPs resolve to the expected countries before running
-# any ACL tests.  A GeoIP database update could change mappings; these checks
-# make failures fast and obvious rather than cryptic.
+# Verify that the five primary test IPs resolve to the expected countries.
+# Secondary IPs (IP_FR2, IP_DE2, IP_CN2) are omitted here to limit WHOIS
+# traffic; they are still exercised in the ACL subtests below.
+# lingua_for() caches each lookup, so these are the only WHOIS queries the
+# entire test run makes — the ACL subtests reuse the same objects.
+# IPs managed by RIPE (whois.ripe.net) — subject to per-IP rate-limiting.
+# ARIN (US) and APNIC (CN) use separate servers and are unaffected.
+my %is_ripe = map { $config{$_} => 1 } qw(IP_GB IP_FR IP_FR2 IP_DE IP_DE2);
+
+# $ripe_ok is set by the sanity subtest; the SKIP block below reads it.
+my $ripe_ok = 1;
+
 subtest 'GeoIP sanity: test IPs resolve to expected countries' => sub {
 	my %expected = (
-		$config{IP_GB}  => $config{CC_GB},
-		$config{IP_US}  => $config{CC_US},
-		$config{IP_FR}  => $config{CC_FR},
-		$config{IP_FR2} => $config{CC_FR},
-		$config{IP_DE}  => $config{CC_DE},
-		$config{IP_DE2} => $config{CC_DE},
-		$config{IP_CN}  => $config{CC_CN},
-		$config{IP_CN2} => $config{CC_CN},
+		$config{IP_GB} => $config{CC_GB},
+		$config{IP_US} => $config{CC_US},
+		$config{IP_FR} => $config{CC_FR},
+		$config{IP_DE} => $config{CC_DE},
+		$config{IP_CN} => $config{CC_CN},
 	);
 
-	# CGI::Lingua resolves country lazily (on the first country() call), so
-	# REMOTE_ADDR must remain set through the country() call, not just at new().
-	# Both new() and country() are therefore called inside the same local scope.
-	while(my ($ip, $expected_cc) = each %expected) {
-		local $ENV{REMOTE_ADDR} = $ip;
-		my $lingua  = CGI::Lingua->new(supported => ['en']);
-		my $got_cc  = $lingua->country() // 'undef';
-		diag "GeoIP: $ip => $got_cc" if $ENV{TEST_VERBOSE};
-		is($got_cc, $expected_cc, "GeoIP: $ip maps to $expected_cc")
-			or BAIL_OUT("GeoIP mapping changed for $ip ($got_cc != $expected_cc)");
+	# Resolve all IPs first (populates the lingua cache for ACL subtests too).
+	my %got = map { $_ => (lingua_for($_)->country() // '') } sort keys %expected;
+	if($ENV{TEST_VERBOSE}) { diag "GeoIP: $_ => $got{$_}" for sort keys %got; }
+
+	my @ripe_fails  = grep { $got{$_} ne $expected{$_} && $is_ripe{$_}  } sort keys %expected;
+	my @other_fails = grep { $got{$_} ne $expected{$_} && !$is_ripe{$_} } sort keys %expected;
+
+	# Non-RIPE failures (ARIN/APNIC) indicate a real GeoIP change.
+	BAIL_OUT('GeoIP mappings changed: '
+		. join(', ', map { "$_ (got '$got{$_}' != '$expected{$_}')" } @other_fails))
+		if @other_fails;
+
+	# RIPE-only failures are the fingerprint of per-IP rate-limiting — not a
+	# real mapping change.  Skip both this subtest and the country ACL tests.
+	if(@ripe_fails) {
+		$ripe_ok = 0;
+		plan skip_all =>
+			'RIPE WHOIS rate-limited (ARIN/APNIC still respond); '
+			. 'run again later. Failed IPs: ' . join(', ', @ripe_fails);
+		return;
 	}
+
+	is($got{$_}, $expected{$_}, "GeoIP: $_ maps to $expected{$_}") for sort keys %expected;
 };
+
+# The 10 subtests below all use lingua_for(), which hits the cache populated
+# above, adding zero extra WHOIS queries.  They are skipped as a group when
+# RIPE is rate-limited so that rate-limited runs still exit 0.
+SKIP: {
+	skip 'RIPE WHOIS rate-limited; run again later', 10 unless $ripe_ok;
 
 # ── Locale scenario: English-only site ───────────────────────────────────────
 # Purpose: allow only English-speaking regions (GB and US), deny everything else
@@ -147,7 +200,7 @@ subtest 'German-only site: allow DE, deny others' => sub {
 
 	# Both German IPs must be allowed
 	is(denied_at($acl, $config{IP_DE},  lingua => lingua_for($config{IP_DE})),  0, 'DE (T-Online) allowed on German-only site');
-	is(denied_at($acl, $config{IP_DE2}, lingua => lingua_for($config{IP_DE2})), 0, 'DE (Uni Stuttgart) allowed on German-only site');
+	is(denied_at($acl, $config{IP_DE2}, lingua => lingua_for($config{IP_DE2})), 0, 'DE (T-Online2) allowed on German-only site');
 
 	# All other locales must be denied
 	is(denied_at($acl, $config{IP_GB}, lingua => lingua_for($config{IP_GB})), 1, 'GB denied on German-only site');
@@ -219,9 +272,8 @@ subtest 'Multilingual site: all four locales allowed' => sub {
 	is(denied_at($acl, $config{IP_CN}, lingua => lingua_for($config{IP_CN})), 0, 'CN allowed on multilingual site');
 
 	# Russian IP (not in the permit list) must still be denied
-	is(denied_at($acl, '87.226.159.0',
-		lingua => do { local $ENV{REMOTE_ADDR} = '87.226.159.0'; CGI::Lingua->new(supported => ['en']) }
-	), 1, 'RU denied on multilingual site (not in permit list)');
+	is(denied_at($acl, '87.226.159.0', lingua => lingua_for('87.226.159.0')),
+		1, 'RU denied on multilingual site (not in permit list)');
 };
 
 # ── Locale scenario: explicit deny by language region ───────────────────────
@@ -312,6 +364,8 @@ subtest 'Concurrent locale ACLs: French site and German site are independent' =>
 	is(denied_at($acl_fr, $config{IP_US}, lingua => lingua_for($config{IP_US})), 0, 'US now allowed by (modified) FR ACL');
 	is(denied_at($acl_de, $config{IP_US}, lingua => lingua_for($config{IP_US})), 1, 'US still denied by DE ACL (unaffected)');
 };
+
+} # end SKIP block for RIPE-dependent country ACL tests
 
 # ── System locale: error path behaviour ──────────────────────────────────────
 # Purpose: verify that CGI::ACL->new() with a missing config file throws an

@@ -1,0 +1,13 @@
+{% welcome %}
+{% include header.tmpl %}
+{% for item in items %}
+	{% set item_loop = loop %}
+	{% for inner in item.inner %}
+		<div {% if loop.first %}class="first"{% else %}class="other"{% end %} data-item-loop="{% item_loop.index %}" data-inner-loop="{% loop.index %}">
+			{% inner %}
+		</div>
+	{% end %}
+	{% if loop.last %}
+		<p>{% loop.index %} last item_loop only once</p>
+	{% end %}
+{% end %}

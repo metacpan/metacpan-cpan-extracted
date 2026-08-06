@@ -4,7 +4,7 @@ use v5.36;
 use experimental qw/try for_list/;
 use version;
 
-our $VERSION   = qv('v0.0.3');
+our $VERSION   = qv('v0.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ PAGI::FastAPI - Asynchronous, Type-Safe Micro-Framework with Dependency Injectio
 
 =head1 VERSION
 
-Version v0.0.3
+Version v0.0.4
 
 =head1 SYNOPSIS
 
@@ -43,6 +43,8 @@ Version v0.0.3
     );
 
     # 2. Add Authentication Middleware Hook
+    #    (hand-rolled here for illustration only, for ready-made schemes,
+    #    including proper 401 challenges, see PAGI::FastAPI::Security)
     $app->add_middleware(async sub ($c, $next) {
         my $auth = $c->header('Authorization') // '';
         if ($auth ne 'Bearer secret_token') {
@@ -131,6 +133,21 @@ Version v0.0.3
 
     my $pagi_app = $app->to_app;
 
+    # 9. Authentication via the companion PAGI::FastAPI::Security distribution
+    #    (extraction only, you supply the verification logic)
+    #
+    #    use PAGI::FastAPI::Security::HTTPBearer;
+    #    my $bearer = PAGI::FastAPI::Security::HTTPBearer->new;
+    #    $app->get('/secure',
+    #        dependencies => [ $bearer->depends(key => 'token') ],
+    #        handler      => async sub ($c) {
+    #            return { token => $c->stash->{token} };
+    #        }
+    #    );
+    #
+    #    See L<PAGI::FastAPI::Security> for HTTP Basic, API Key
+    #    (header/query/cookie), and OAuth2 password-bearer schemes.
+
 =head1 DESCRIPTION
 
 C<PAGI::FastAPI> is an asynchronous micro-framework for modern Perl (5.36+) inspired by Python's FastAPI.
@@ -151,6 +168,8 @@ documentation generation.
 =item * B<Automatic Interactive Docs:> Serves an interactive Swagger UI interface at C</docs> and machine-readable OpenAPI 3.1 JSON at C</openapi.json>.
 
 =item * B<HTTP 422 Interception:> Automatically intercepts invalid or missing parameters and returns formatted JSON errors with an C<HTTP 422 Unprocessable Entity> status code.
+
+=item * B<Pluggable Authentication:> Authentication is implemented as ordinary dependencies and middleware, with no framework lock-in. For ready-made schemes (HTTP Bearer, HTTP Basic, API Key, OAuth2 password bearer), see the companion distribution L<PAGI::FastAPI::Security>, see L</AUTHENTICATION AND SECURITY> below.
 
 =back
 
@@ -678,13 +697,103 @@ C<PAGI::FastAPI> automatically registers the following system endpoints:
 
 =head1 ERROR HANDLING
 
-When a request fails parameter validation (either query string or JSON payload), C<PAGI::FastAPI> short-circuits handler execution and returns C<HTTP 422 Unprocessable Entity> with a JSON body:
+When a request fails parameter validation (either query string or JSON payload),
+C<PAGI::FastAPI> short-circuits handler execution and returns C<HTTP 422 Unprocessable Entity>
+with a JSON body:
 
     {
         "detail": "Query param 'priority' invalid: Undef did not pass type constraint"
     }
 
 Unmatched routes return C<HTTP 404 Not Found> with C<{"detail": "Not Found"}>.
+
+=head1 AUTHENTICATION AND SECURITY
+
+C<PAGI::FastAPI> has no authentication built in by design, auth needs vary
+too much between applications to standardize, so the framework gives you two
+general-purpose building blocks instead:
+
+=over 4
+
+=item * B<Middleware> (C<add_middleware>), runs for every request, good
+for a single global auth check.
+
+=item * B<Dependencies> (the C<dependencies> route option, or
+L<PAGI::FastAPI::Depends>), runs per-route, good for auth that varies
+by endpoint (e.g. some routes public, some requiring a token, some
+requiring a specific role).
+
+=back
+
+A dependency signals an auth failure the same way any other dependency
+signals failure: by calling C<< $c->status($code) >> with a code E<gt>=
+400 and returning a body HashRef, which short-circuits the route handler
+before it runs:
+
+    my $get_current_user = async sub ($c) {
+        my $token = $c->header('Authorization') // '';
+        unless ($token eq 'Bearer secret_token') {
+            $c->status(401);
+            return { detail => 'Invalid credentials' };
+        }
+        return { user_id => 42, role => 'admin' };
+    };
+
+Note that a dependency must signal failure this way, not by C<die>ing,
+dependency execution is not wrapped in an C<eval>, so a dying dependency
+propagates as an uncaught exception instead of a clean HTTP response.
+
+=head2 Ready-made schemes: PAGI::FastAPI::Security
+
+Writing the token-extraction and 401/403-response boilerplate above by
+hand for every scheme gets repetitive. The companion distribution
+L<PAGI::FastAPI::Security> provides ready-made, C<Depends()>-compatible
+classes for the common HTTP authentication schemes, modelled on Python
+FastAPI's C<fastapi.security> module:
+
+=over 4
+
+=item * L<PAGI::FastAPI::Security::HTTPBearer> - C<Authorization: Bearer E<lt>tokenE<gt>>, with a proper C<401> + C<WWW-Authenticate: Bearer> challenge on failure.
+
+=item * L<PAGI::FastAPI::Security::HTTPBasic> - C<Authorization: Basic E<lt>base64E<gt>>, with a C<401> + C<WWW-Authenticate: Basic realm="...">> challenge.
+
+=item * L<PAGI::FastAPI::Security::APIKey> - an API key read from a header, query string parameter, or cookie, with a C<403> on failure.
+
+=item * L<PAGI::FastAPI::Security::OAuth2::PasswordBearer> - OAuth2 bearer-token extraction plus C<token_url>/C<scopes> metadata for future OpenAPI C<securitySchemes> generation.
+
+=back
+
+Each scheme only I<extracts> the credential, it deliberately does not
+verify it, so you aren't locked into one JWT library, password-hashing
+scheme, or identity provider. Pair it with your own verification as a
+second dependency:
+
+    use PAGI::FastAPI::Security::HTTPBearer;
+    use PAGI::FastAPI::Depends qw(Depends);
+
+    my $bearer = PAGI::FastAPI::Security::HTTPBearer->new;
+
+    $app->get('/items',
+        dependencies => [
+            $bearer->depends(key => 'token'),
+            Depends(async sub ($c) {
+                my $claims = eval { verify_jwt($c->stash->{token}) };
+                unless ($claims) {
+                    $c->status(401);
+                    return { detail => 'Invalid or expired token' };
+                }
+                return $claims;
+            }, key => 'claims'),
+        ],
+        handler => async sub ($c) {
+            return { user_id => $c->stash->{claims}{sub} };
+        },
+    );
+
+Every scheme also accepts C<auto_error =E<gt> 0>, resolving to C<undef>
+instead of short-circuiting, for routes that behave differently for
+authenticated vs. anonymous requests. See L<PAGI::FastAPI::Security> for
+the full documentation and an end-to-end JWT-verification example.
 
 =head1 SEE ALSO
 
@@ -695,6 +804,10 @@ Unmatched routes return C<HTTP 404 Not Found> with C<{"detail": "Not Found"}>.
 =item * L<PAGI::FastAPI::Context> - Context object passed to route handlers.
 
 =item * L<PAGI::FastAPI::Depends> - Dependency injection helper.
+
+=item * L<PAGI::FastAPI::Security> - Ready-made authentication schemes (HTTP Bearer, HTTP Basic, API Key, OAuth2 password bearer) for C<dependencies>.
+
+=item * L<DBIx::Class::Async> - Async DBIx::Class integration; see F<eg/dbic_async_integration.pl> for a worked example with this framework.
 
 =item * L<Type::Tiny> - Efficient Perl type constraint system.
 
@@ -749,34 +862,6 @@ the terms of the Artistic License (2.0). You may obtain a copy of the full
 license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified Versions is
-governed by this Artistic License. By using, modifying or distributing the Package,
-you accept this license. Do not use, modify, or distribute the Package, if you do
-not accept this license.
-
-If your Modified Version has been derived from a Modified Version made by someone
-other than you, you are nevertheless required to ensure that your Modified Version
-complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service mark,
-tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge patent license
-to make, have made, use, offer to sell, sell, import and otherwise transfer the
-Package with respect to any patent claims licensable by the Copyright Holder that
-are necessarily infringed by the Package. If you institute patent litigation
-(including a cross-claim or counterclaim) against any party alleging that the
-Package constitutes direct or contributory patent infringement, then this Artistic
-License to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND
-CONTRIBUTORS "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
-NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
-REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
-INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
-OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 

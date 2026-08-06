@@ -13,7 +13,7 @@ Test::Returns - Verify that a method's output agrees with its specification
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # DESCRIPTION
 

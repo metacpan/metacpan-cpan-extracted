@@ -5,17 +5,24 @@ use strict;
 use warnings;
 use vars qw($VERSION @EXPORT @EXPORT_OK);
 use base 'Exporter';
-@EXPORT_OK = @EXPORT = qw( hash2xml xml2hash );
+@EXPORT = qw( hash2xml xml2hash );
+@EXPORT_OK = (@EXPORT, qw(
+    XML_HASH_XS_CONTINUE XML_HASH_XS_STOP XML_HASH_XS_SKIP
+));
 
-$VERSION = '0.64';
+sub XML_HASH_XS_CONTINUE () { 'XML_HASH_XS_CONTINUE' }
+sub XML_HASH_XS_STOP     () { 'XML_HASH_XS_STOP' }
+sub XML_HASH_XS_SKIP     () { 'XML_HASH_XS_SKIP' }
+
+$VERSION = '0.65';
 
 require XSLoader;
 XSLoader::load('XML::Hash::XS', $VERSION);
 
-use vars qw($method $output $root $version $encoding $utf8 $indent $canonical
+use vars qw($method $output $output_cb $root $version $encoding $utf8 $indent $canonical
     $use_attr $content $xml_decl $doc $max_depth $attr $text $trim $cdata
     $comm $buf_size $keep_root $force_array $force_content $merge_text
-    $suppress_empty
+    $suppress_empty $cb_mode
 );
 
 # 'NATIVE' or 'LX'
@@ -23,6 +30,7 @@ $method         = 'NATIVE';
 
 # native options
 $output         = undef;
+$output_cb      = undef;
 $root           = 'root';
 $version        = '1.0';
 $encoding       = '';
@@ -41,6 +49,7 @@ $force_array    = undef;
 $force_content  = 0;
 $merge_text     = 0;
 $suppress_empty = 0;
+$cb_mode        = 'node';
 
 # XML::Hash::LX options
 $attr           = '-';
@@ -56,7 +65,7 @@ XML::Hash::XS - Simple and fast hash to XML and XML to hash conversion written i
 
 =begin HTML
 
-<p><a href="https://metacpan.org/pod/XML::Hash::XS" target="_blank"><img alt="CPAN version" src="https://badge.fury.io/pl/XML-Hash-XS.svg"></a> <a href="https://travis-ci.org/yoreek/XML-Hash-XS" target="_blank"><img title="Build Status Images" src="https://travis-ci.org/yoreek/XML-Hash-XS.svg"></a></p>
+<p><a href="https://metacpan.org/pod/XML::Hash::XS" target="_blank"><img alt="CPAN version" src="https://badge.fury.io/pl/XML-Hash-XS.svg"></a> <a href="https://github.com/yoreek/XML-Hash-XS/actions/workflows/ci.yml" target="_blank"><img title="CI status" alt="CI status" src="https://github.com/yoreek/XML-Hash-XS/actions/workflows/ci.yml/badge.svg?branch=master"></a></p>
 
 =end HTML
 
@@ -66,6 +75,7 @@ XML::Hash::XS - Simple and fast hash to XML and XML to hash conversion written i
 
     my $xmlstr = hash2xml \%hash;
     hash2xml \%hash, output => $fh;
+    hash2xml \%hash, output_cb => sub { my ($chunk) = @_; print $chunk };
 
     my $hash = xml2hash $xmlstr;
     my $hash = xml2hash \$xmlstr;
@@ -80,6 +90,16 @@ Or OOP way:
     my $conv   = XML::Hash::XS->new(utf8 => 0, encoding => 'utf-8')
     my $xmlstr = $conv->hash2xml(\%hash, utf8 => 1);
     my $hash   = $conv->xml2hash($xmlstr, encoding => 'cp1251');
+
+For incremental XML input, create a parser:
+
+    my $parser = XML::Hash::XS::Parser->new(keep_root => 1);
+    $parser->feed('<root><item>one</item>');
+    $parser->feed('<item>two</item></root>');
+    my $hash = $parser->finish;
+
+Chunks must be UTF-8; bytes are retained only when a token spans two calls
+to C<feed>.
 
 =head1 DESCRIPTION
 
@@ -206,6 +226,13 @@ if output is undefined, XML document dumped into string.
 
 if output is FH, XML document writes directly to a filehandle or a stream.
 
+=item output_cb [ = undef ] I<# hash2xml>
+
+Callback invoked as C<< sub { my ($chunk) = @_ } >> for each generated XML
+chunk. The complete XML string is not accumulated and C<hash2xml> returns
+undef. Chunk size is controlled by C<buf_size>, except that a single value may
+require a larger chunk. C<output> and C<output_cb> are mutually exclusive.
+
 =item canonical [ = 0 ] I<# hash2xml>
 
 if canonical is "1", converter will be write hashes sorted by key.
@@ -302,6 +329,24 @@ Sample:
     # 111
     # 222
     # 333
+
+The callback may return C<XML_HASH_XS_STOP> to stop successfully after the
+current matched node. Other return values preserve the legacy behaviour and
+continue parsing.
+
+=item cb_mode [ = 'node' ] I<# xml2hash>
+
+With C<cb_mode =E<gt> 'events'> the callback receives
+C<($event, $value, $meta)>. A C<start> event contains element C<name>, C<path>,
+C<depth> and C<attributes> in C<$meta>. Returning C<XML_HASH_XS_SKIP> from
+C<start> skips construction of the element contents and suppresses its
+C<end> event. C<end> receives the completed node in C<$value>.
+
+The control constants are imported explicitly:
+
+    use XML::Hash::XS qw(
+        XML_HASH_XS_CONTINUE XML_HASH_XS_STOP XML_HASH_XS_SKIP
+    );
 
 =item method [ = 'NATIVE' ] I<# hash2xml>
 

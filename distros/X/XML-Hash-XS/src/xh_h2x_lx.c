@@ -97,11 +97,13 @@ xh_h2x_lx(xh_h2x_ctx_t *ctx, SV *value, xh_char_t *key, I32 key_len, xh_int_t fl
         len = HvUSEDKEYS((HV *) value);
 
         if (len > 1 && ctx->opts.canonical) {
+            ENTER;
             sorted_hash = xh_sort_hash((HV *) value, len);
+            SAVEDESTRUCTOR_X(xh_sort_hash_free, sorted_hash);
             for (i = 0; i < len; i++) {
                 _xh_h2x_lx(ctx, sorted_hash[i].key, sorted_hash[i].key_len, sorted_hash[i].value, flag);
             }
-            free(sorted_hash);
+            LEAVE;
         }
         else {
             hv_iterinit((HV *) value);
@@ -213,11 +215,13 @@ xh_h2d_lx(xh_h2x_ctx_t *ctx, xmlNodePtr rootNode, SV *value, xh_char_t *key, I32
         hv_iterinit((HV *) value);
 
         if (len > 1 && ctx->opts.canonical) {
+            ENTER;
             sorted_hash = xh_sort_hash((HV *) value, len);
+            SAVEDESTRUCTOR_X(xh_sort_hash_free, sorted_hash);
             for (i = 0; i < len; i++) {
                 _xh_h2d_lx(ctx, rootNode, sorted_hash[i].key, sorted_hash[i].key_len, sorted_hash[i].value, flag);
             }
-            free(sorted_hash);
+            LEAVE;
         }
         else {
             while ((hash_value = hv_iternextsv((HV *) value, (char **) &key, &key_len))) {

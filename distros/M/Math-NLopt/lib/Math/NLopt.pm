@@ -8,22 +8,16 @@ use warnings;
 
 #<<<
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 #>>>
 
 # don't inherit.  We're a class by-golly, and don't want Exporter's methods.
 use Exporter 'import';
 
+use Ref::Util;
+use Scalar::Util;
 use Math::NLopt::Exception;
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Math::NLopt ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
 
 our %EXPORT_TAGS = (
     algorithms => [ qw(
@@ -107,12 +101,6 @@ $EXPORT_TAGS{all} = [ map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS ];
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-
-sub _croak {
-    require Carp;
-    goto \&Carp::croak;
-}
-
 # This AUTOLOAD is used to 'autoload' constants from the constant()
 # XS function.
 
@@ -121,11 +109,11 @@ sub AUTOLOAD {    ## no critic (ClassHierarchies::ProhibitAutoload)
     my $constname;
     our $AUTOLOAD;
     ( $constname = $AUTOLOAD ) =~ s/.*:://;
-    _croak Math::NLopt::Exception->new( 'Math::NLopt::constant not defined' )
+    Math::NLopt::Exception::InvalidArgs->throw( 'Math::NLopt::constant not defined' )
       if $constname eq 'constant';
     my ( $error, $val ) = constant( $constname );
     if ( $error ) {
-        _croak Math::NLopt::Exception->new( $error );
+        Math::NLopt::Exception->throw( $error );
     }
 
     {
@@ -136,10 +124,98 @@ sub AUTOLOAD {    ## no critic (ClassHierarchies::ProhibitAutoload)
     goto &$AUTOLOAD;
 }
 
+
+my $check_mconstraint = sub {
+
+    my $func = shift;
+    @_ % 2 and Math::NLopt::Exception::InvalidArgs->throw( 'expected key => value pairs' );
+    my %par = @_;
+
+    Ref::Util::is_coderef( $func )
+      or Math::NLopt::Exception::InvalidArgs->throw( '$func is not a coderef' );
+
+    my %args;
+    @args{ 'data', 'm', 'tol' } = delete @par{ 'data', 'm', 'tol' };
+
+    %par
+      and Math::NLopt::Exception::InvalidArgs->throw( 'extra args: ', join q{, }, keys %par );
+
+    delete @args{ grep !defined $args{$_}, keys %args };
+
+    # individual tests must go below
+
+    exists $args{m}
+      or exists $args{tol}
+      or Math::NLopt::Exception::MissingParameter->throw( 'must specify at least one of <m> or <tol>: ',
+        join q{, }, keys %par );
+
+    exists $args{tol}
+      and !Ref::Util::is_plain_arrayref( $args{tol} )
+      and Math::NLopt::Exception::InvalidArgs->throw( '<tol> is not a plain arrayref' );
+
+    exists $args{m} && exists $args{tol} && @{ $args{tol} } != $args{m}
+      and Math::NLopt::Exception::InvalidArgs->throw( '<m> != number of elements in <tol>' );
+
+    $args{m} //= exists( $args{tol} ) ? @{ $args{tol} } : 0;
+
+    Scalar::Util::looks_like_number( $args{m} ) && $args{m} >= 1 && int( $args{m} ) == $args{m}
+      or Math::NLopt::Exception::InvalidArgs->throw( "illegal value for <m>: $args{m}" );
+
+    return ( $func, @args{ 'm', 'tol', 'data' } );
+};
+
+my $check_constraint = sub {
+
+    my $func = shift;
+    @_ % 2 and Math::NLopt::Exception::InvalidArgs->throw( 'expected key => value pairs' );
+    my %par = @_;
+
+    Ref::Util::is_coderef( $func )
+      or Math::NLopt::Exception::InvalidArgs->throw( '$func is not a coderef' );
+
+    my %args;
+    @args{ 'data', 'tol' } = delete @par{ 'data', 'tol' };
+
+    %par
+      and Math::NLopt::Exception::InvalidArgs->throw( 'extra args: ', join q{, }, keys %par );
+
+    delete @args{ grep !defined $args{$_}, keys %args };
+
+    # individual tests must go below
+
+    exists $args{tol}
+      and Ref::Util::is_ref( $args{tol} )
+      and Math::NLopt::Exception::InvalidArgs->throw( '<tol> is not a scalar' );
+
+    return ( $func, @args{ 'tol', 'data' } );
+};
+
+sub add_equality_constraint {
+    my $opt = shift;
+    return $opt->_add_equality_constraint( $check_constraint->( @_ ) );
+}
+
+
+sub add_inequality_constraint {
+    my $opt = shift;
+    return $opt->_add_inequality_constraint( $check_constraint->( @_ ) );
+}
+
+
+sub add_equality_mconstraint {
+    my $opt = shift;
+    return $opt->_add_equality_mconstraint( $check_mconstraint->( @_ ) );
+}
+
+
+sub add_inequality_mconstraint {
+    my $opt = shift;
+    return $opt->_add_inequality_mconstraint( $check_mconstraint->( @_ ) );
+}
+
 require XSLoader;
 XSLoader::load( 'Math::NLopt', $VERSION );
 
-# Preloaded methods go here.
 
 1;
 
@@ -166,7 +242,7 @@ Math::NLopt - Math::NLopt - Perl interface to the NLopt optimization library
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -235,17 +311,11 @@ The Perl interface (similar to the Python and C++ versions) is
    $result_code = $opt->last_optimize_result;
 
 The Perl API throws exceptions on failures, similar to the behavior of
-the C++ and Python API's.  Where the C API returns error codes,
-C<Math::NLopt> throws objects in similarly named exception classes:
-
-  Math::NLopt::Exception::Failure
-  Math::NLopt::Exception::OutOfMemory
-  Math::NLopt::Exception::InvalidArgs
-  Math::NLopt::Exception::RoundoffLimited>
-  Math::NLopt::Exception::ForcedStop
-
-These all extend the L<Math::NLopt::Exception> class; see it for more
-information on retrieving messages from the objects.
+the C++ and Python APIs. Where the C API returns an error code,
+C<Math::NLopt> normally returns the corresponding numeric result code
+on success and throws an object in the corresponding exception class on
+failure. These classes extend L<Math::NLopt::Exception>; see it for
+more information on retrieving messages from the objects.
 
 =head2 Constants
 
@@ -264,10 +334,53 @@ Importing result codes is similar:
   use Math::NLopt 'NLOPT_FORCED_STOP';
   use Math::NLopt ':results';
 
-As are the utility subroutines:
+=head2 B<NLopt> Results, Errors and Exceptions
 
-  use Math::NLopt 'algorithm_from_string';
-  use Math::NLopt ':utils';
+=head3 Result codes
+
+While most methods (excluding L</new> and L</optimize>) return a
+result code of B<NLOPT_SUCCESS> upon success, they will all throw on
+error.
+
+Methods returning arrays or other values either return that value or
+throw if the underlying operation fails.
+
+=head3 Exceptions
+
+C<Math::NLopt> will throw exceptions if the underlying B<NLopt>
+library detects an error.
+
+Unfortunately, this behavior affects the results returned by
+L</optimize>, which are lost when an exception is raised.  Depending
+upon the error, the results may actually be valid, so this is truly
+unfortunate.
+
+There are a couple of ways to avoid the loss of information.
+
+=over
+
+=item *
+
+The simplest is to retrieve them via the L</last_optimum_params>
+method.
+
+=item *
+
+Disable exceptions from NLopt result codes for L</optimize> via the
+L</set_exceptions_enabled> method. This is the approach used by the
+Python and C++ APIs.
+
+L</optimize> will always return the last set of evaluated parameters.
+However, the caller will have to call L</last_optimize_result>
+to determine how the optimization concluded, and whether the results
+are valid.
+
+Disabling exceptions only affects errors reported by L</optimize>.
+Other methods continue to throw exceptions, and exceptions thrown by
+user-provided objective, constraint, or pre-conditioner callbacks are
+always propagated.
+
+=back
 
 =head2 Callbacks
 
@@ -279,6 +392,15 @@ The callback subroutines are called with a user-provided structure
 which can be used to pass additional information to the callback
 (or the subroutines can use closures).
 
+=head3 Exceptions thrown by Callback subroutines
+
+Exceptions thrown by callback subroutines during processing by
+L</optimize> are caught so that they do not unwind through the NLopt C
+stack. The optimization is halted with a forced stop (as if by
+L</force_stop>) and the original exception is rethrown after NLopt has
+returned.
+L</last_optimize_result> will return C<NLOPT_FORCED_STOP>.
+
 =head3 Objective Functions
 
 Objective functions callbacks are registered via either
@@ -286,8 +408,8 @@ Objective functions callbacks are registered via either
   $opt->set_min_objective( \&func, ?$data );
   $opt->set_max_objective( \&func, ?$data );
 
-where C<$data> is an optional structure passed to the callback which
-can be used for any purpose.
+where C<$data> is an optional scalar, reference, or other Perl value
+passed to the callback unchanged.
 
 The objective function has the signature
 
@@ -299,41 +421,82 @@ passed set parameters, B<@params>.
 if B<\@gradient> is not C<undef>, it must be filled in by the
 objective function.
 
-C<$data> is the structure registered with the callback. It will be
+C<$data> is the value registered with the callback. It will be
 C<undef> if none was provided.
 
 =head2 Non-linear Constraints
 
-Nonlinear constraint callbacks are registered via either of
+=head3 Scalar-valued Constraints
 
-  $opt->add_equality_constraint( \&func, ?$data, ?$tol = 0 );
-  $opt->add_inequality_constraint( \&func, ?$data, ?$tol = 0 );
+Scalar constraint callbacks are registered via either of
 
-where C<$data> is an optional structure passed to the callback which
-can be used for any purpose, and C<$tol> is a tolerance.  Pass
-C<undef> for C<$data> if a tolerance is required but C<$data> is not.
+  $opt->add_equality_constraint( \&func, %options );
+  $opt->add_inequality_constraint( \&func, %options );
 
-The callbacks have the same signature as the objective callbacks.
+C<%options> accepts the following entries.
+
+=over
+
+=item C<tol> I<scalar> [optional]
+
+The tolerance. Defaults to C<0>.
+
+=item C<data> [optional]
+
+A structure passed to the callback function.
+
+=back
+
+The constraint function has the signature
+
+  $value = sub ( \@params, \@gradient, $data ) { ... }
+
+and must return exactly one numeric value, the value of the
+constraint function for the passed set of parameters, B<@params>.
 
 =head3 Vector-valued Constraints
 
-Vector-valued constraint callbacks are registered via either of
+Vector-valued callbacks are registered via either of
 
-  $opt->add_equality_mconstraint( \&func, $m, ?$data, ?\@tol );
-  $opt->add_inequality_mconstraint( \&func, $m, ?$data, ?\@tol );
+  $opt->add_equality_mconstraint( \&func, %options );
+  $opt->add_inequality_mconstraint( \&func, %options );
 
-where C<$m> is the length of the vector, C<$data> is an optional
-structure passed on to the callback function, and C<@tol> is an
-optional array of length C<$m> containing the tolerance for each
-component of the vector
+C<%options> accepts the following entries.
+
+=over
+
+=item C<m> I<integer>
+
+The length of the vector.
+
+=item C<tol> I<arrayref>
+
+An array of length C<m> containing the tolerance for each
+component of the vector.
+
+=item C<data> [optional]
+
+an optional scalar, reference, or other Perl value passed to the
+callback unchanged.
+
+=back
+
+One of C<m> or C<tol> must be provided. If C<tol> is provided without
+C<m>, its length is used for C<m>. If both are provided, the number of
+array elements in C<tol> must be equal to C<m>.
 
 Vector valued constraints callbacks have the signature
 
   sub ( \@result, \@params, \@gradient, $data ) { ... }
 
 The C<$m> length vector of constraints should be stored in C<\@result>.
-If C<\@gradient> is not C<undef>, it is a I<< $n x $m >> length
-array which should be filled by the callback.
+If C<\@gradient> is not C<undef>, it is an C<$m> by C<$n>
+two-dimensional array which should be filled by the callback.
+
+The outer dimension indexes the C<$m> constraint components, and the
+inner dimension indexes the C<$n> optimization parameters; in other
+words, C<< $gradient->[$i][$j] >> is the derivative of constraint
+C<$i> with respect to parameter C<$j>.
 
 C<$data> is the optional structure passed to the callback.
 
@@ -352,7 +515,8 @@ The C<\&precond> fallback has this signature:
    sub (\@x, \@v, \@vpre, $data) {...}
 
 C<\@x>, C<\@v>, and C<\@vpre> are arrays of length C<$n>.
-C<\@x>, C<\@v>  are input and C<\@vpre> should be filled in by the routine.
+C<\@x> and C<\@v> are inputs. C<\@vpre> must be filled in by the
+routine before it returns.
 
 =head1 CONSTRUCTORS
 
@@ -366,6 +530,11 @@ B<$algorithm> is one of the algorithm constants, e.g.
   use Math::NLopt 'NLOPT_LD_MMA';
   my $opt = Math::NLopt->new( NLOPT_LD_MMA, 3 );
 
+C<$n> must be a positive integer.
+
+Invalid inputs or failure to create the underlying NLopt object
+results in an exception.
+
 =head1 METHODS
 
 Most methods have the same calling signature as their C versions, but
@@ -373,23 +542,42 @@ not all!
 
 =head2 add_equality_constraint
 
-  $opt->add_equality_constraint( \&func, ?$data, ?$tol = 0 );
+  $opt->add_equality_constraint( \&func, %options );
+
+See L</Scalar-valued Constraints>.
+
+Returns an NLopt result code, normally C<NLOPT_SUCCESS>.
 
 =head2 add_equality_mconstraint
 
-  $opt->add_equality_mconstraint( \&func, $m, ?$data, ?\@tol );
+  $opt->add_equality_mconstraint( \&func, %options );
+
+See L</Vector-valued Constraints>.
+
+Returns an NLopt result code, normally C<NLOPT_SUCCESS>.
 
 =head2 add_inequality_constraint
 
-  $opt->add_inequality_constraint( \&func, ?$data, ?$tol = 0 );
+  $opt->add_inequality_constraint( \&func, %options );
+
+See L</Scalar-valued Constraints>.
+
+Returns an NLopt result code, normally C<NLOPT_SUCCESS>.
 
 =head2 add_inequality_mconstraint
 
-  $opt->add_inequality_mconstraint( \&func, $m, ?$data, ?\@tol );
+  $opt->add_inequality_mconstraint( \&func, %options );
+
+See L</Vector-valued Constraints>.
+
+Returns an NLopt result code, normally C<NLOPT_SUCCESS>.
 
 =head2 force_stop
 
   $opt->force_stop;
+
+Requests that the current optimization stop. Returns an NLopt result
+code.
 
 =head2 get_algorithm
 
@@ -399,9 +587,18 @@ not all!
 
   $n = $opt->get_dimension;
 
+=head2 get_exceptions_enabled
+
+  $bool = $opt->get_exceptions_enabled;
+
+Returns true if errors in the L</optimize> method will result in
+exceptions.
+
 =head2 get_errmsg
 
-  $string  $opt->get_errmsg;
+  $string = $opt->get_errmsg;
+
+Returns the most recent error message from NLopt.
 
 =head2 get_force_stop
 
@@ -418,6 +615,9 @@ not all!
 =head2 get_initial_step
 
   \@steps = $opt->get_initial_step( \@init_x );
+
+Returns an arrayref of initial steps for the supplied parameter
+vector, which must of length C<$n>, the length passed to L</new>.
 
 =head2 get_lower_bounds
 
@@ -485,13 +685,24 @@ Return the name of algorithm specific parameter C<$i>.
 
   $result_code = $opt->last_optimize_result;
 
-Return the result code after an optimization.
+Return the result code after an optimization.  Returns
+C<NLOPT_FAILURE> prior to the first optimization.
 
 =head2 last_optimum_value
 
   $min_f = $opt->last_optimum_value;
 
-Return the objective value obtained after an optimization.
+Return the objective value obtained during the last call to L</optimize>.
+Returns NaN prior to the first call.
+
+=head2 last_optimum_params
+
+  \@params = $opt->last_optimum_params;
+
+Returns the final parameter vector recorded by the last call to
+L</optimize>. It is also updated when L</optimize> stops with an NLopt
+error or a callback exception, so it can be used to inspect the last
+available result after catching an exception.
 
 =head2 num_params
 
@@ -506,57 +717,105 @@ Return the number of algorithm specific parameters.
 Returns the parameter values determined from the optimization.  The
 status of the optimization (e.g. NLopt's result code) can be retrieved
 via the L</last_optimize_result> method. The final value of the
-objective function is available via the L</last_aptimum_value> method.
+objective function is available via the L</last_optimum_value> method.
+
+The input arrayref must have length C<$n>. With exceptions enabled,
+NLopt errors cause this method to throw instead of returning a
+parameter vector; use L</last_optimum_params> to retrieve the vector
+recorded before the error. With exceptions disabled, NLopt errors are
+reported by L</last_optimize_result> and the recorded parameter vector
+is returned. Exceptions raised by callbacks are always rethrown.
+
+See L</Exceptions thrown by Callback subroutines> for how
+callback exceptions are handled.
 
 =head2 remove_equality_constraints
 
   $opt->remove_equality_constraints;
 
+Returns an NLopt result code.
+
 =head2 remove_inequality_constraints
 
   $opt->remove_inequality_constraints;
+
+Returns an NLopt result code.
+
+=head2 set_exceptions_enabled
+
+  $opt->set_exceptions_enabled( $bool );
+
+Controls whether NLopt result-code failures from L</optimize> are
+thrown. The default is true. This setting does not suppress exceptions
+from other methods or from callbacks.
 
 =head2 set_force_stop
 
   $opt->set_force_stop( $val );
 
+Returns an NLopt result code.
+
 =head2 set_ftol_abs
 
   $opt->set_ftol_abs( $tol );
+
+Returns an NLopt result code.
 
 =head2 set_ftol_rel
 
   $opt->set_ftol_rel( $tol );
 
+Returns an NLopt result code.
+
 =head2 set_initial_step
 
   $opt->set_initial_step(\@dx);
 
-C<@dx> has length C<$n>.
+Set the initial step. C<@dx> must have length C<$n>, the length
+passed to L</new>.
+
+Returns an NLopt result code.
 
 =head2 set_initial_step1
 
   $opt->set_initial_step1( $dx );
 
+Sets the same initial step C<$dx> for every parameter.
+
+Returns an NLopt result code.
+
 =head2 set_local_optimizer
 
-  $opt->set_local_optmizer( $local_opt );
+  $opt->set_local_optimizer( $local_opt );
+
+Sets the local optimizer used by a composite algorithm. C<$local_opt>
+must be another C<Math::NLopt> optimizer object.
+
+Returns an NLopt result code.
 
 =head2 set_lower_bound
 
-  $opt->set_lower_bound( $i, $ub );
+  $opt->set_lower_bound( $i, $lb );
 
-Set the lower bound for parameter C<$i> (zero based) to C<$ub>
+Set the lower bound for parameter C<$i> (zero based) to C<$lb>.
+
+Returns an NLopt result code.
 
 =head2 set_lower_bounds
 
-  $opt->set_lower_bounds(\@ub);
+  $opt->set_lower_bounds(\@lb);
 
-C<@ub> has length C<$n>.
+C<@lb> must have length C<$n>, the length passed to L</new>.
+
+Returns an NLopt result code.
 
 =head2 set_lower_bounds1
 
-  $opt->set_lower_bounds1 ($ub);
+  $opt->set_lower_bounds1( $lb );
+
+Sets the same lower bound C<$lb> for every parameter.
+
+Returns an NLopt result code.
 
 =head2 set_max_objective
 
@@ -564,13 +823,19 @@ C<@ub> has length C<$n>.
 
 See L<Objective Functions>
 
+Returns an NLopt result code.
+
 =head2 set_maxeval
 
    $opt->set_maxeval( $max_iterations );
 
+Returns an NLopt result code.
+
 =head2 set_maxtime
 
    $opt->set_maxtime( $time );
+
+Returns an NLopt result code.
 
 =head2 set_min_objective
 
@@ -578,17 +843,25 @@ See L<Objective Functions>
 
 See L<Objective Functions>
 
+Returns an NLopt result code.
+
 =head2 set_param
 
   $opt->set_param( $name, $value );
+
+Returns an NLopt result code.
 
 =head2 set_population
 
   $opt->set_population( $pop );
 
+Returns an NLopt result code.
+
 =head2 set_precond_max_objective
 
   $opt->set_precond_max_objective( \&func, \&precond, ?$data);
+
+Returns an NLopt result code.
 
 See L</Preconditioned Objectives>
 
@@ -598,9 +871,13 @@ See L</Preconditioned Objectives>
 
 See L</Preconditioned Objectives>
 
+Returns an NLopt result code.
+
 =head2 set_stopval
 
   $opt->set_stopval( $stopval);
+
+Returns an NLopt result code.
 
 =head2 set_upper_bound
 
@@ -608,43 +885,69 @@ See L</Preconditioned Objectives>
 
 Set the upper bound for parameter C<$i> (zero based) to C<$ub>
 
+Returns an NLopt result code.
+
 =head2 set_upper_bounds
 
   $opt->set_upper_bounds(\@ub);
 
-C<@ub> has length C<$n>.
+C<@ub> must have length C<$n>, the length passed to L</new>.
+
+Returns an NLopt result code.
 
 =head2 set_upper_bounds1
 
-  $opt->set_upper_bounds1 ($ub);
+  $opt->set_upper_bounds1( $ub );
+
+Sets the same upper bound C<$ub> for every parameter.
+
+Returns an NLopt result code.
 
 =head2 set_vector_storage
 
-  $opt->set_vector_storage( $dim )
+  $opt->set_vector_storage( $dim );
+
+Sets the amount of vector storage used by the algorithm.
+
+Returns an NLopt result code.
 
 =head2 set_x_weights
 
   $opt->set_x_weights( \@weights );
 
-C<@weights> has length C<$n>.
+C<@weights> must have length C<$n>, the length passed to L</new>.
+
+Returns an NLopt result code.
 
 =head2 set_x_weights1
 
   $opt->set_x_weights1( $weight );
 
+Sets the same weight for every parameter.
+
+Returns an NLopt result code.
+
 =head2 set_xtol_abs
 
   $opt->set_xtol_abs( \@tol );
 
-C<@tol> has length C<$n>.
+C<@tol> must have length C<$n>, the length passed to L</new>.
+
+Returns an NLopt result code.
 
 =head2 set_xtol_abs1
 
   $opt->set_xtol_abs1( $tol );
 
+Sets the same absolute tolerance for every parameter.
+
+Returns an NLopt result code.
+
 =head2 set_xtol_rel
 
   $opt->set_xtol_rel( $tol );
+
+Returns an NLopt result code.
 
 =head1 SUBROUTINES
 
@@ -689,7 +992,76 @@ return an integer id (e.g. B<NLOPT_SUCCESS>) from a string id (e.g. 'SUCCESS').
   ($major, $minor, $bugfix ) = Math::NLopt::version()
 
 =for Pod::Coverage constant
-create
+
+=head1 CONSTANTS
+
+=head2 Result Codes
+
+These are constants available for import individually, or in bulk via the C<:result> tag.
+
+  NLOPT_FAILURE
+  NLOPT_FORCED_STOP
+  NLOPT_FTOL_REACHED
+  NLOPT_INVALID_ARGS
+  NLOPT_MAXEVAL_REACHED
+  NLOPT_MAXTIME_REACHED
+  NLOPT_MINF_MAX_REACHED
+  NLOPT_NUM_FAILURES
+  NLOPT_NUM_RESULTS
+  NLOPT_OUT_OF_MEMORY
+  NLOPT_ROUNDOFF_LIMITED
+  NLOPT_STOPVAL_REACHED
+  NLOPT_SUCCESS
+  NLOPT_XTOL_REACHED
+
+=head2 Algorithms
+
+These are constants available for import individually, or in bulk via the C<:algorithms> tag.
+
+  NLOPT_AUGLAG
+  NLOPT_AUGLAG_EQ
+  NLOPT_GD_MLSL
+  NLOPT_GD_MLSL_LDS
+  NLOPT_GD_STOGO
+  NLOPT_GD_STOGO_RAND
+  NLOPT_GN_AGS
+  NLOPT_GN_CRS2_LM
+  NLOPT_GN_DIRECT
+  NLOPT_GN_DIRECT_L
+  NLOPT_GN_DIRECT_L_NOSCAL
+  NLOPT_GN_DIRECT_L_RAND
+  NLOPT_GN_DIRECT_L_RAND_NOSCAL
+  NLOPT_GN_DIRECT_NOSCAL
+  NLOPT_GN_ESCH
+  NLOPT_GN_ISRES
+  NLOPT_GN_MLSL
+  NLOPT_GN_MLSL_LDS
+  NLOPT_GN_ORIG_DIRECT
+  NLOPT_GN_ORIG_DIRECT_L
+  NLOPT_G_MLSL
+  NLOPT_G_MLSL_LDS
+  NLOPT_LD_AUGLAG
+  NLOPT_LD_AUGLAG_EQ
+  NLOPT_LD_CCSAQ
+  NLOPT_LD_LBFGS
+  NLOPT_LD_MMA
+  NLOPT_LD_SLSQP
+  NLOPT_LD_TNEWTON
+  NLOPT_LD_TNEWTON_PRECOND
+  NLOPT_LD_TNEWTON_PRECOND_RESTART
+  NLOPT_LD_TNEWTON_RESTART
+  NLOPT_LD_VAR1
+  NLOPT_LD_VAR2
+  NLOPT_LN_AUGLAG
+  NLOPT_LN_AUGLAG_EQ
+  NLOPT_LN_BOBYQA
+  NLOPT_LN_COBYLA
+  NLOPT_LN_NELDERMEAD
+  NLOPT_LN_NEWUOA
+  NLOPT_LN_NEWUOA_BOUND
+  NLOPT_LN_PRAXIS
+  NLOPT_LN_SBPLX
+  NLOPT_NUM_ALGORITHMS
 
 =head1 SUPPORT
 
@@ -701,11 +1073,11 @@ Please report any bugs or feature requests to bug-math-nlopt@rt.cpan.org  or thr
 
 Source is available at
 
-  https://gitlab.com/djerius/math-nlopt
+  https://codeberg.org/djerius/p5-Math-NLopt
 
 and may be cloned from
 
-  https://gitlab.com/djerius/math-nlopt.git
+  https://codeberg.org/djerius/p5-Math-NLopt.git
 
 =head1 SEE ALSO
 

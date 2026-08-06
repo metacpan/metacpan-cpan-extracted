@@ -45,6 +45,7 @@
 
 #include "hm_future.h"
 #include "hm_core.h"
+#include "hm_abi_impl.h"
 
 MODULE = Hyperman		PACKAGE = Hyperman
 
@@ -55,3 +56,4 @@ INCLUDE: xs/future.xs
 INCLUDE: xs/loop.xs
 INCLUDE: xs/writer.xs
 INCLUDE: xs/event.xs
+INCLUDE: xs/abi.xs

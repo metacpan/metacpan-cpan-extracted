@@ -14,5 +14,5 @@ brand-specific indicators to be displayed next to peoperly authenticated email m
 Copyright
 ---------
 
-(c)2020 Marc Bradshaw <marc@marcbradshaw.net>
+(c)2026 Jemma Bradshaw <jemma@nothingbutstatic.dev>
 

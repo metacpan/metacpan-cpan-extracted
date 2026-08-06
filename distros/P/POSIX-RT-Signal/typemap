@@ -1,10 +1,12 @@
 TYPEMAP
 Signal::Info	T_OPAQUEOBJ
-sigset_t*	T_SIGSET
 signo_t	T_SIGNO
+sigset_t*	T_SIGSET
 struct timespec	T_TIMESPEC
 
 INPUT
+T_SIGNO
+	$var = (SvIOK($arg) || looks_like_number($arg)) ? SvIV($arg) : whichsig(SvPV_nolen($arg));
 T_SIGSET
 	if (SvROK($arg)) {
 		if (!sv_derived_from($arg, \"POSIX::SigSet\")) {
@@ -27,8 +29,6 @@ T_SIGSET
 	} else {
 		$var = NULL;
 	}
-T_SIGNO
-	$var = (SvIOK($arg) || looks_like_number($arg)) && SvIV($arg) ? SvIV($arg) : whichsig(SvPV_nolen($arg));
 T_TIMESPEC
 	if (SvROK($arg) && sv_derived_from($arg, \"Time::Spec\")) {
 		$var = *(struct timespec*)SvPV_nolen(SvRV($arg));

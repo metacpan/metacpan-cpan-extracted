@@ -31,6 +31,9 @@
 #define XH_DEF_FORCE_CONTENT  FALSE
 #define XH_DEF_MERGE_TEXT     FALSE
 #define XH_DEF_SUPPRESS_EMPTY XH_SUPPRESS_EMPTY_NONE
+#define XH_CB_CONTINUE 0
+#define XH_CB_STOP     1
+#define XH_CB_SKIP     2
 
 #define XH_DEF_ATTR           "-"
 #define XH_DEF_TEXT           "#text"
@@ -47,6 +50,11 @@ typedef enum {
     XH_METHOD_LX
 } xh_method_t;
 
+typedef enum {
+    XH_CB_MODE_NODE = 0,
+    XH_CB_MODE_EVENTS
+} xh_cb_mode_t;
+
 typedef struct {
     xh_method_t            method;
 
@@ -60,7 +68,8 @@ typedef struct {
     xh_bool_t              canonical;
     xh_char_t              content[XH_PARAM_LEN];
     xh_int_t               indent;
-    void                  *output;
+    SV                    *output;
+    SV                    *output_cb;
 #ifdef XH_HAVE_DOM
     xh_bool_t              doc;
 #endif
@@ -72,6 +81,7 @@ typedef struct {
     xh_int_t               suppress_empty;
     xh_pattern_t           filter;
     SV                    *cb;
+    xh_cb_mode_t           cb_mode;
 
     /* LX options */
     xh_char_t              attr[XH_PARAM_LEN];

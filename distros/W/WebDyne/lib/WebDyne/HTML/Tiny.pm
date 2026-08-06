@@ -58,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='3.008';
+$VERSION='3.009';
 
 
 #  Debug load
@@ -333,10 +333,14 @@ sub _start_html {
         title
         meta
         style
+        style_prepend
+        style_append
         base
         target
         author
         script
+        script_prepend
+        script_append
         include
         include_script
         include_style
@@ -393,6 +397,32 @@ sub _start_html {
                 $attr_page{$type}=$href_ar
             }
         }
+    }
+
+
+    #  Allow stylesheets to be added around configured/default styles without
+    #  replacing them. Explicit style remains the base value if supplied.
+    #
+    if ($attr_page{'style_prepend'} || $attr_page{'style_append'}) {
+        my @style=map { ref($_) eq 'ARRAY' ? @{$_} : $_ } grep {$_} (
+            $attr_page{'style_prepend'},
+            $attr_page{'style'},
+            $attr_page{'style_append'}
+        );
+        $attr_page{'style'}=\@style if @style;
+    }
+
+
+    #  Allow scripts to be added around configured/default scripts without
+    #  replacing them. Explicit script remains the base value if supplied.
+    #
+    if ($attr_page{'script_prepend'} || $attr_page{'script_append'}) {
+        my @script=map { ref($_) eq 'ARRAY' ? @{$_} : $_ } grep {$_} (
+            $attr_page{'script_prepend'},
+            $attr_page{'script'},
+            $attr_page{'script_append'}
+        );
+        $attr_page{'script'}=\@script if @script;
     }
 
 

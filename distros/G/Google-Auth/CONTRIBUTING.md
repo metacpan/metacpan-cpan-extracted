@@ -1,74 +1,71 @@
-# How to become a contributor and submit your own code
+# How to Contribute to the Google Auth Library for Perl
 
-## Contributor License Agreements
+## Overview: We Welcome Your Contributions
 
-We'd love to accept your sample apps and patches! Before we can take them, we
-have to jump a couple of legal hurdles.
+Welcome and thank you for your interest in contributing to the Google Auth Library for
+Perl. Open source contributions are important to foster a vibrant developer community and help
+us provide a world-class developer experience. We value your contributions, no matter how small.
+Even small documentation fixes can go a long way in helping other developers use our API. Before
+contributing, please review the guidelines and best practices below.
 
-Please fill out either the individual or corporate Contributor License Agreement
-(CLA).
+*  [Providing Feedback](#providing-feedback)
+    *  [Feature Requests](#feature-requests)
+    *  [Bug Reports](#bug-reports)
+*  [Contributing](#contributing)
+    *  [Contributor License Agreement (CLA)](#contributor-license-agreement-cla)
+    *  [Pull Request Submission Best Practices](#pull-request-submission-best-practices)
+    *  [Style Guidelines & Naming Conventions](#style-guidelines--naming-conventions)
+    *  [Testing](#testing)
+ * [Community Guidelines](#community-guidelines)
 
-  * If you are an individual writing original source code and you're sure you
-    own the intellectual property, then you'll need to sign an [individual CLA].
-  * If you work for a company that wants to allow you to contribute your work,
-    then you'll need to sign a [corporate CLA].
+## Providing Feedback
 
-[individual CLA]: http://code.google.com/legal/individual-cla-v1.0.html
-[corporate CLA]: http://code.google.com/legal/corporate-cla-v1.0.html
+### Feature Requests
 
-Follow either of the two links above to access the appropriate CLA and
-instructions for how to sign and return it. Once we receive it, we'll be able to
-accept your pull requests.
+We appreciate your feedback and encourage you to submit feature requests that
+will help improve this library. You can submit feature requests by opening an issue on GitHub:
+https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues
 
-## Issue reporting
+### Bug Reports
 
-* Check that the issue has not already been reported.
-* Check that the issue has not already been fixed in the latest code
-  (a.k.a. the `main` branch).
-* Be clear, concise and precise in your description of the problem.
-* Open an issue with a descriptive title and a summary in grammatically correct,
-    complete sentences.
-* Include any relevant code to the issue summary.
+We appreciate your feedback and encourage you to report bugs that will help
+improve this library. Please report bugs by opening an issue on GitHub:
+https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues
 
-## Pull requests
+**Please do not include any personal identifiable information or authorization/access data
+in any of the information you post.**
 
-* Read [how to properly contribute to open source projects on Github][2].
-* Fork the project.
-* Use a topic/feature branch to easily amend a pull request later, if necessary.
-* Write [good commit messages][3].
-* Use the same coding conventions as the rest of the project.
-* Commit and push until you are happy with your contribution.
-* Make sure to add tests for it. This is important so I don't break it
-  in a future version unintentionally.
-* Add an entry to the [Changelog](CHANGELOG.md) accordingly. See [changelog entry format](#changelog-entry-format).
-* Please try not to mess with the Rakefile, version, or history. If you want to
-  have your own version, or is otherwise necessary, that is fine, but please
-  isolate to its own commit so I can cherry-pick around it.
-* Make sure the test suite is passing and the code you wrote doesn't produce
-  RuboCop offenses.
-* [Squash related commits together][5].
-* Open a [pull request][4] that relates to *only* one subject with a clear title
-  and description in grammatically correct, complete sentences.
+## Contributing
 
-### Changelog entry format
+### Contributor License Agreement (CLA)
 
-Here are a few examples:
+Contributions to this project must be accompanied by a Contributor License Agreement.
+You (or your employer) retain the copyright to your contribution; this simply gives us permission
+to use and redistribute your contributions as part of the project. Head over to
+https://cla.developers.google.com/ to see your current agreements on file or to sign a new one.
 
-```
-* makes the scope parameter's optional in all APIs. (@tbetbetbe[])
-* [#14](https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues/14): ADC Support for JWT Service Tokens. ([@tbetbetbe][])
-```
+### Pull Request Submission Best Practices
 
-* Mark it up in [Markdown syntax][6].
-* The entry line should start with `* ` (an asterisk and a space).
-* If the change has a related GitHub issue (e.g. a bug fix for a reported issue), put a link to the issue as `[#123](https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues/11): `.
-* Describe the brief of the change. The sentence should end with a punctuation.
-* At the end of the entry, add an implicit link to your GitHub user page as `([@username][])`.
-* If this is your first contribution to google-auth-library-perl project, add a link definition for the implicit link to the bottom of the changelog as `[@username]: https://github.com/username`.
+When making a pull request, first make your own forked copy of this repository, make any changes
+on a separate branch of that forked copy, then submit the pull request from your new fork/branch to:
+https://github.com/GoogleCloudPlatform/google-auth-library-perl/pulls
 
-[1]: https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues
-[2]: http://gun.io/blog/how-to-github-fork-branch-and-pull-request
-[3]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[4]: https://help.github.com/articles/using-pull-requests
-[5]: http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html
-[6]: http://daringfireball.net/projects/markdown/syntax
+### Style Guidelines & Naming Conventions
+
+Please conform your submitted code to the official
+[Perl style guide](https://perldoc.perl.org/perlstyle.html). You can use
+[perltidy](https://metacpan.org/pod/perltidy) to reformat your code based on the
+[.perltidyrc](.perltidyrc) file to comply with Google Style. In addition, please leave comments
+in your code in a manner consistent with other code in this repository.
+
+### Testing
+
+If you make any changes to this codebase, ensure that all existing tests continue to pass.
+In addition, add tests that validate your changes to ensure that future changes do not break
+your new feature or bug fix.
+
+## Community Guidelines
+
+This project follows
+[Google's Open Source Community Guidelines](https://opensource.google/conduct/).
+

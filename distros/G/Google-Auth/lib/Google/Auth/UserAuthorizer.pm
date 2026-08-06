@@ -1,4 +1,4 @@
-# Copyright 2022 Google, LLC
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,11 +19,9 @@ use warnings;
 
 use Moo;
 
-our $VERSION = '0.06';
-
 has json_key => (
-    is       => 'ro',
-    required => 0,
+  is       => 'ro',
+  required => 0,
 );
 
 1;

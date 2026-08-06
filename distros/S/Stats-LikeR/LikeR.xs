@@ -80,28 +80,157 @@ sample__rand(size_t upper) {
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-// C helper for EXACT Non-central T-distribution CDF via Numerical Integration.
-// This perfectly replicates R's pt(..., ncp) exactness without requiring complex Beta functions.
-static NV exact_pnt(NV t, NV df, NV ncp) {
-	if (df <= 0.0) return 0.0;
-	unsigned short int n_steps = 30000;
-	NV step = 1.0 / n_steps;
-	NV integral = 0.0, half_df = df / 2.0;
-	NV log_coef = log(2.0) + half_df * log(half_df) - lgamma(half_df);
-	NV root_half = 0.70710678118654752440; // 1 / sqrt(2)
-	for (unsigned short i = 1; i < n_steps; i++) {
-		NV u = i * step;
-		NV w = u / (1.0 - u);
-		// Scaled Chi-distribution log-density
-		NV log_M = log_coef + (df - 1.0) * log(w) - half_df * w * w;
-		NV M = exp(log_M);
-		// Exact Normal CDF using the C standard library's erfc function
-		NV z = t * w - ncp;
-		NV pnorm_val = 0.5 * erfc(-z * root_half);
-		NV weight = (i % 2 != 0) ? 4.0 : 2.0;
-		integral += weight * (pnorm_val * M / ((1.0 - u) * (1.0 - u)));
+/* Where the standard normal's lower tail stops being a number a double can
+ * hold, and so the point past which this file stops asking erfc() for it.
+ *
+ * 0.5 * erfc(-x/sqrt(2)) reaches DBL_MIN at x = -37.5194 and its last
+ * subnormal just past -38.4674; R's pnorm() returns a flat 0 below that, as
+ * does scipy. erfc() takes and returns a double whatever perl's NV is, so
+ * nothing it says out here can be trusted -- and on i386, where a double is
+ * returned in an x87 register, what it says is not even 0: glibc spells
+ * erfc()'s underflow case as a product of two 1e-300 constants, formed in
+ * extended precision and handed back in st(0) still holding 1e-600. A perl
+ * whose NV is a double rounds that away on return; a perl built
+ * -Duselongdouble keeps it. glm's Wald p-value for |z| = 149 duly came back
+ * as 1e-600 from a 32-bit long-double smoker (CPAN Testers, perl
+ * 5.32.1-longdouble, i686-linux-ld) where every other build reported 0.
+ * Stopping short of the call gives every build the same answer, which is
+ * also R's and scipy's. */
+#define PNORM_LOWER_ZERO (-38.4674)   /* R's own cutoff, nmath/pnorm.c */
+NV approx_pnorm(NV x);                /* defined below, after the histogram code */
+
+// C helper for the non-central T-distribution CDF: quadrature over the scaled
+// chi density up to PNT_NORMAL_DF, an asymptotic form above it. Matches R's
+// pt(..., ncp) without needing the non-central beta function.
+/* Thresholds between exact_pnt()'s three regimes. Below PNT_LARGE_DF the chi
+ * density is broad enough to integrate over its whole support; above it the
+ * density is a narrow spike and the steps have to be packed around the mode.
+ * 1e3 suits both: the support integral still holds ~2e-13 there, and the spike
+ * integral needs df/2 > 500 for its Stirling series to be good to 4e-14. Past
+ * PNT_NORMAL_DF no quadrature is worth running -- see the asymptotic form in
+ * exact_pnt(). That second cut-off is R's, from nmath/pnt.c; the first has no
+ * counterpart there, R using one series throughout. */
+#define PNT_LARGE_DF 1.0e3
+#define PNT_NORMAL_DF 4.0e5
+
+/* Integer power by squaring, for the w = z^m substitution below: m is a small
+ * integer, and pow() would neither be exact at z^4 nor as quick. */
+static NV pow_uint(NV base, unsigned int e) {
+	NV r = 1.0;
+	while (e) {
+		if (e & 1u) r *= base;
+		base *= base;
+		e >>= 1u;
 	}
-	return integral * (step / 3.0);
+	return r;
+}
+
+/* Scaled chi log-density of W = sqrt(chi2_df / df) at its mode, w = 1:
+ *
+ *   log f(1) = log 2 + x log x - lgamma(x) - x,   x = df/2
+ *
+ * Evaluated as written, the three large terms cancel down to a result of order
+ * log(df): at df = 1e8 that is 8.9e8 - 8.4e8 - 5e7 = 8.7, which keeps only eight
+ * of sixteen digits. Stirling's series for lgamma collapses the same expression
+ * to log 2 + 0.5 log(x/2pi) - 1/(12x) + 1/(360x^3), where nothing cancels at
+ * all. Only used for x > 500, where truncating after the x^-3 term costs
+ * 1/(1260 x^5) < 4e-14. */
+static NV chi_log_peak(NV half_df) {
+	const NV x = half_df;
+	return M_LN2 + 0.5 * log(x / (2.0 * M_PI))
+		 - 1.0 / (12.0 * x) + 1.0 / (360.0 * x * x * x);
+}
+
+/* `upper` picks which tail comes back: the lower CDF P(T <= t), or the upper
+ * tail P(T > t) obtained by integrating Phi(ncp - t*w) instead of
+ * Phi(t*w - ncp), the two differing by 1 - Phi(z) = Phi(-z) under an integral
+ * whose weight sums to exactly 1. Forming the upper tail as 1 - lower loses it
+ * to cancellation whenever the answer is small: power_t_test(n => 2.182,
+ * delta => 0.4088, sd => 0.9733, sig_level => 0.001) has a power of 1.03e-3, and
+ * subtracting a lower tail of 0.99897 from 1 left only four good digits of it. */
+static NV exact_pnt(NV t, NV df, NV ncp, bool upper) {
+	if (df <= 0.0) return 0.0;
+	const unsigned int n_steps = 30000;            /* even, for Simpson */
+	NV integral = 0.0;
+	const NV half_df = df / 2.0;
+
+	/* W = sqrt(chi2_df / df) has mean ~1 and standard deviation ~1/sqrt(2 df),
+	 * so its density narrows as df grows while a fixed 30000-step grid does not.
+	 * By df ~ 1e8 the steps go clean over the peak: power_t_test(n => 4e7,
+	 * delta => 0) returned 0.138 where the answer has to be sig_level/2 = 0.025,
+	 * and the n solved for a large-cohort effect size came back 9% low. Above
+	 * PNT_LARGE_DF, spend the steps on w across +/- 12 standard deviations of the
+	 * mode -- 12 sd of a density this symmetric leaves under 1e-30 in the tails,
+	 * and the peak then gets ~1250 steps per standard deviation.
+	 *
+	 * That holds to ~1e-11 up to df ~ 4e5 and then gives way, because log_M's
+	 * two large terms cancel harder as df climbs: 1e-8 by df = 8e7 and 5e-7 by
+	 * df = 1e9. Beyond there, don't integrate at all. T is asymptotically
+	 * normal, and Abramowitz & Stegun 26.7.10 carries the O(1/df) correction, so
+	 * its error falls as 1/df^2 -- 4e-12 at the cut-off and 3e-16 by df = 1e9,
+	 * i.e. it gets better exactly where the quadrature gets worse. R's pnt.c
+	 * switches to the same formula at the same df. */
+	if (df > PNT_NORMAL_DF) {
+		const NV s = 1.0 / (4.0 * df);
+		const NV num = upper ? (ncp - t * (1.0 - s)) : (t * (1.0 - s) - ncp);
+		return approx_pnorm(num / sqrt(1.0 + t * t * 2.0 * s));
+	}
+
+	if (df > PNT_LARGE_DF) {
+		const NV s = 1.0 / sqrt(2.0 * df);
+		const NV lo = 1.0 - 12.0 * s, hi = 1.0 + 12.0 * s;   /* lo > 0.7 here */
+		const NV w_step = (hi - lo) / (NV)n_steps;
+		const NV log_peak = chi_log_peak(half_df);
+		for (unsigned int i = 0; i <= n_steps; i++) {
+			const NV w = lo + i * w_step;
+			const NV e = w - 1.0;
+			/* Written against the mode rather than from log_coef: (df-1)log(w)
+			 * and half_df*w^2 are each ~1e5 at the ends of this interval and
+			 * cancel to ~70, so pairing them as one difference keeps thirteen
+			 * digits where summing the raw terms keeps eight. */
+			const NV log_M = log_peak + (df - 1.0) * log1p(e) - half_df * e * (e + 2.0);
+			const NV weight = (i == 0 || i == n_steps) ? 1.0 : ((i % 2) ? 4.0 : 2.0);
+			const NV z = upper ? (ncp - t * w) : (t * w - ncp);
+			integral += weight * approx_pnorm(z) * exp(log_M);
+		}
+		return integral * (w_step / 3.0);
+	}
+
+	/* Ordinary df. The density carries w^(df-1), so unless df is a whole number
+	 * that factor has a derivative of some order that is infinite at w = 0, and
+	 * Simpson -- which assumes four bounded derivatives -- cannot have it. The
+	 * earlier u = w/(1+w) grid took the full brunt: nine good digits at df = 1.8,
+	 * five at df = 1.2, two at df = 1.2 with sig_level = 1e-4, while whole-number
+	 * df stayed at machine precision because there the factor is a polynomial.
+	 *
+	 * Substituting w = z^m turns the measure into z^(m*df - 1) dz, so choosing m
+	 * with m*df - 1 >= 3 leaves the first three derivatives bounded and Simpson
+	 * gets what it needs. m = 4 covers every df >= 1; below that it has to grow,
+	 * and is capped because z^m must stay computable. The substitution also
+	 * clusters the steps towards w = 0 exactly where the old grid was thinnest,
+	 * and puts the origin's contribution at z^(m*df - 1) = 0, which is why no
+	 * separate endpoint term is needed here.
+	 *
+	 * The upper limit only has to reach past the density: sqrt(120/df) puts
+	 * exp(-df w^2 / 2) below e^-60 for a mode near zero, and 1 + 12/sqrt(2 df)
+	 * covers twelve standard deviations once the mode has settled near w = 1.
+	 * Whichever is larger serves both shapes. */
+	const unsigned int m = (df >= 1.0) ? 4u
+		: (unsigned int)(ceil(4.0 / df) > 64.0 ? 64.0 : ceil(4.0 / df));
+	const NV log_coef = log(2.0) + half_df * log(half_df) - lgamma(half_df);
+	const NV w_max = fmax(sqrt(120.0 / df), 1.0 + 12.0 / sqrt(2.0 * df));
+	const NV z_step = pow(w_max, 1.0 / (NV)m) / (NV)n_steps;
+	/* i = 0 is skipped: z = 0 makes log(z) -inf, and the term it belongs to is
+	 * zero anyway since m*df - 1 > 0 by construction. */
+	for (unsigned int i = 1; i <= n_steps; i++) {
+		const NV zq = i * z_step;
+		const NV w = pow_uint(zq, m);
+		const NV log_M = log_coef + ((NV)m * df - 1.0) * log(zq) - half_df * w * w;
+		const NV z = upper ? (ncp - t * w) : (t * w - ncp);
+		const NV weight = (i == n_steps) ? 1.0 : ((i % 2) ? 4.0 : 2.0);
+		integral += weight * approx_pnorm(z) * exp(log_M);
+	}
+	return integral * (NV)m * (z_step / 3.0);
 }
 // --- Math Helpers for P-values and Confidence Intervals --- 
 // Ranking helper with tie adjustment (matches R's tie handling)
@@ -1705,6 +1834,8 @@ static void compute_hist_logic(NV *restrict x, size_t n, NV *restrict breaks, si
 
 // Standard Normal CDF approximation
 NV approx_pnorm(NV x) {
+	// Nothing erfc() returns this far out is a number: see PNORM_LOWER_ZERO
+	if (x <= PNORM_LOWER_ZERO) return 0.0;
 	return 0.5 * erfc(-x * 0.70710678118654752440); // 0.707... = 1/sqrt(2)
 }
 #ifndef M_SQRT1_2
@@ -3090,8 +3221,11 @@ static NV psmirnov_exact_uniq_upper(NV q, size_t m, size_t n, bool two_sided) {
 }
 
 static NV p_body(NV n, NV delta, NV sd, NV sig_level, int tsample, int tside, bool strict) {
-	NV nu = (n - 1.0) * (NV)tsample;
-	if (nu < 1e-7) nu = 1e-7; 
+	/* R floors n - 1 and only then scales by tsample: pmax(1e-07, n - 1) *
+	 * tsample. Flooring the product instead left the two-sample case with half
+	 * of R's nu whenever the floor bit. power_t_test() refuses n < 2 outright,
+	 * so this is only a backstop now, but it should be R's backstop. */
+	NV nu = ((n - 1.0) > 1e-7 ? (n - 1.0) : 1e-7) * (NV)tsample;
 
 	// Ensure sig_level/tside is not truncated
 	NV p_tail = sig_level / (NV)tside;
@@ -3099,14 +3233,95 @@ static NV p_body(NV n, NV delta, NV sd, NV sig_level, int tsample, int tside, bo
 
 	NV ncp = sqrt(n / (NV)tsample) * (delta / sd);
 
+	/* R writes these as 1 - pt(qu, ...) and pt(-qu, ...); taking the upper tail
+	 * straight from exact_pnt() is the same quantity without the subtraction. */
 	if (strict && tside == 2) {
-	  // Use R-style tail calls: 1 - P(T < qu) + P(T < -qu)
-	  return (1.0 - exact_pnt(qu, nu, ncp)) + exact_pnt(-qu, nu, ncp);
+	  return exact_pnt(qu, nu, ncp, TRUE) + exact_pnt(-qu, nu, ncp, FALSE);
 	} else {
-	  // Default: 1 - P(T < qu)
-	  // Ensure exact_pnt is using a convergence tolerance of at least 1e-15
-	  return 1.0 - exact_pnt(qu, nu, ncp);
+	  return exact_pnt(qu, nu, ncp, TRUE);
 	}
+}
+
+/* --- power_t_test's inverse solvers ---
+ *
+ * Each of n, delta, sd and sig_level is recovered by driving p_body() to the
+ * requested power. The four searches differ only in which argument is free, so
+ * they share one context and one root finder. */
+enum { PTT_N = 0, PTT_DELTA, PTT_SD, PTT_SIG };
+
+typedef struct {
+	NV n, delta, sd, sig_level, target;
+	int tsample, tside, which;
+	bool strict;
+} ptt_ctx;
+
+/* p_body() with c->which held free, less the requested power: the function the
+ * solver drives to zero. */
+static NV ptt_f(const ptt_ctx *restrict c, NV x) {
+	switch (c->which) {
+	  case PTT_N:     return p_body(x, c->delta, c->sd, c->sig_level, c->tsample, c->tside, c->strict) - c->target;
+	  case PTT_DELTA: return p_body(c->n, x, c->sd, c->sig_level, c->tsample, c->tside, c->strict) - c->target;
+	  case PTT_SD:    return p_body(c->n, c->delta, x, c->sig_level, c->tsample, c->tside, c->strict) - c->target;
+	  default:        return p_body(c->n, c->delta, c->sd, x, c->tsample, c->tside, c->strict) - c->target;
+	}
+}
+
+/* Regula falsi with the Illinois correction. It stays bracketed the way the
+ * plain bisection this replaces did, but converges superlinearly, so it reaches
+ * a far tighter answer in fewer evaluations of p_body() -- around a dozen
+ * against bisection's three dozen.
+ *
+ * `tol` is a *relative* tolerance on the step between successive iterates, not
+ * on the width of the bracket. Illinois shrinks one side of the bracket much
+ * faster than the other, so a bracket-width test declares victory while the
+ * iterate is still poor; and R's uniroot() bracket-width default of
+ * .Machine$double.eps^0.25 is why R's own delta and sig.level come back with
+ * only four or five good digits.
+ *
+ * Returns NaN when [lo, hi] holds no sign change. Callers croak on that instead
+ * of handing back a bracket endpoint dressed up as an answer, which is how
+ * solving for sd used to report a standard deviation of delta * 1e7. */
+static NV ptt_root(const ptt_ctx *restrict c, NV lo, NV hi, NV tol) {
+	if (!(lo < hi)) return NAN;
+	NV flo = ptt_f(c, lo), fhi = ptt_f(c, hi);
+	if (flo == 0.0) return lo;
+	if (fhi == 0.0) return hi;
+	if (flo != flo || fhi != fhi) return NAN;
+	if ((flo > 0.0) == (fhi > 0.0)) return NAN;
+	NV x = 0.5 * (lo + hi), prev = INFINITY;
+	/* Which endpoint the previous step replaced: -1 for lo, +1 for hi, 0 for
+	 * neither yet. The Illinois halving below is applied only when the same
+	 * endpoint is replaced twice running, i.e. when the far side really has gone
+	 * stale. Halving it on every step -- the way the correction is usually
+	 * written -- discounts a value that was fresh one iteration ago, and once
+	 * the iterates start straddling the root (which they do here from about the
+	 * fifteenth step) both stored values end up scaled down together and the
+	 * secant degenerates to bisection: |f| then halves exactly, step after step.
+	 * Waiting for the second retention holds the p_body() count near two dozen,
+	 * against roughly fifty for the unconditional halving and sixty for plain
+	 * bisection, and matches what Brent's method needs on the same brackets. */
+	int side = 0;
+	for (unsigned short int i = 0; i < 200; i++) {
+		x = hi - fhi * (hi - lo) / (fhi - flo);
+		/* an interpolation that lands on or outside the bracket (which the
+		 * halved stale value can produce) falls back to the midpoint */
+		if (!(x > lo && x < hi)) x = 0.5 * (lo + hi);
+		NV fx = ptt_f(c, x);
+		/* x == prev is the machine-precision floor: the step has stopped
+		 * changing the iterate at all, so no tol can ask for more. */
+		if (fx == 0.0 || x == prev || fabs(x - prev) <= tol * fabs(x)) return x;
+		prev = x;
+		if ((fx > 0.0) == (flo > 0.0)) {
+			lo = x; flo = fx;
+			if (side == -1) fhi *= 0.5;
+			side = -1;
+		} else {
+			hi = x; fhi = fx;
+			if (side == 1) flo *= 0.5;
+			side = 1;
+		}
+	}
+	return x;
 }
 
 // Bisection algorithm to find the inverse F-distribution (Quantile function)
@@ -12792,8 +13007,9 @@ PPCODE:
 				NV sig_val= 1.3822 + nn * (-0.77857  + nn * ( 0.062767  - nn * 0.0020322));
 				NV sigma  = exp(sig_val);
 				z = (-log(gamma - y) - mu) / sigma;
-				// Upper-tail probability P(Z > z): small W → large z → small p-value
-				p_val = 0.5 * erfc(z * M_SQRT1_2);
+				// Upper-tail probability P(Z > z): small W → large z → small
+				// p-value. pnorm(-z) is that tail exactly, by symmetry.
+				p_val = approx_pnorm(-z);
 			}
 		} else {
 			// Royston's branch for n >= 12 (AS R94, large-sample path)
@@ -12803,7 +13019,7 @@ PPCODE:
 			NV sig_val= -0.4803 + ln_n * (-0.082676 + ln_n * 0.0030302);
 			NV sigma  = exp(sig_val);
 			z = (y - mu) / sigma;
-			p_val = 0.5 * erfc(z * M_SQRT1_2);
+			p_val = approx_pnorm(-z);
 		}
 		// Clamp the p-value
 		if (p_val > 1.0) p_val = 1.0;
@@ -17096,7 +17312,12 @@ CODE:
 	const char* restrict type = "two.sample";
 	const char* restrict alternative = "two.sided";
 	bool strict = FALSE;
-	NV tol = pow(2.2204460492503131e-16, 0.25); 
+	/* R's default is .Machine$double.eps^0.25 (1.2e-4) on uniroot's bracket
+	 * width, which leaves its own delta and sig.level good to four or five
+	 * digits. ptt_root() converges superlinearly, so a tolerance this tight
+	 * costs a couple of extra p_body() calls and still runs in fewer than the
+	 * bisection it replaced. */
+	NV tol = 1e-12;
 
 	if (items % 2 != 0) croak("Usage: power_t_test(n => 30, delta => 0.5, sd => 1.0, ...)");
 	for (unsigned short int i = 0; i < items; i += 2) {
@@ -17137,45 +17358,91 @@ CODE:
 	NV sd = (!sv_sd || is_null_sd) ? 1.0 : SvNV(sv_sd);
 	NV sig_level = (!sv_sig_level || is_null_sig_level) ? 0.05 : SvNV(sv_sig_level);
 	NV power = is_null_power ? 0.0 : SvNV(sv_power);
-	short int tsample = (strEQ(type, "one.sample") || strEQ(type, "paired")) ? 1 : 2;
-	short int tside = (strEQ(alternative, "one.sided") || strEQ(alternative, "greater") || strEQ(alternative, "less")) ? 1 : 2;
+
+	/* R's assert_NULL_or_prob(): a probability outside [0, 1] is a typo, not a
+	 * place to start searching from. power => 1.5 used to run the n bracket out
+	 * to 1.3e12 and hand that back as the required sample size. */
+	if (!is_null_sig_level && !(sig_level >= 0.0 && sig_level <= 1.0))
+	  croak("power_t_test: 'sig_level' must be numeric in [0, 1]");
+	if (!is_null_power && !(power >= 0.0 && power <= 1.0))
+	  croak("power_t_test: 'power' must be numeric in [0, 1]");
+	/* nu = (n - 1) * tsample, so below n = 2 there is no variance left to
+	 * estimate: the critical value runs off to infinity and exact_pnt()'s grid
+	 * loses the whole chi density, which is how n => 1 used to report a power
+	 * of 0.99998. R hides the same degeneracy behind pmax(1e-07, n - 1) and
+	 * returns a power of 0; saying so outright is more use than either number. */
+	/* croak() reads a double for %g, so an NV has to be cast: on a long-double
+	 * build the promotion would not happen on its own. */
+	if (!is_null_n && !(n >= 2.0))
+	  croak("power_t_test: 'n' must be at least 2, not %g", (double)n);
+	if (!is_null_sd && sd < 0.0)
+	  croak("power_t_test: 'sd' must not be negative, not %g", (double)sd);
+
+	/* R reaches these through match.arg(), so a misspelling is an error there.
+	 * Silently reading an unrecognised type as "two.sample" turned every typo
+	 * into a plausible-looking answer for the wrong test. */
+	short int tsample;
+	if      (strEQ(type, "two.sample")) tsample = 2;
+	else if (strEQ(type, "one.sample") || strEQ(type, "paired")) tsample = 1;
+	else croak("power_t_test: 'type' must be 'two.sample', 'one.sample', or 'paired', not '%s'", type);
+
+	short int tside;
+	if      (strEQ(alternative, "two.sided")) tside = 2;
+	else if (strEQ(alternative, "one.sided") || strEQ(alternative, "greater")
+			  || strEQ(alternative, "less")) tside = 1;
+	else croak("power_t_test: 'alternative' must be 'two.sided', 'one.sided', 'greater', or 'less', not '%s'", alternative);
+
 	if (tside == 2 && !is_null_delta) delta = fabs(delta);
+
+	ptt_ctx c;
+	c.n = n; c.delta = delta; c.sd = sd; c.sig_level = sig_level;
+	c.tsample = tsample; c.tside = tside; c.strict = strict; c.target = power;
+
 	if (is_null_power) {
 	  power = p_body(n, delta, sd, sig_level, tsample, tside, strict);
 	} else if (is_null_n) {
-		NV low = 2.0, high = 1e7;
-		while (p_body(high, delta, sd, sig_level, tsample, tside, strict) < power && high < 1e12) high *= 2.0;
-		while (high - low > tol) {
-			NV mid = low + (high - low) / 2.0;
-			if (p_body(mid, delta, sd, sig_level, tsample, tside, strict) < power) low = mid;
-			else high = mid;
-		}
-		n = low + (high - low) / 2.0;
+	  /* power rises with n; R's bracket is c(2, 1e7), grown upward as needed */
+	  c.which = PTT_N;
+	  NV low = 2.0, high = 1e7;
+	  while (high < 1e12 && ptt_f(&c, high) < 0.0) high *= 2.0;
+	  n = ptt_root(&c, low, high, tol);
+	  if (n != n) croak("power_t_test: no 'n' in [%g, %g] gives a power of %g "
+			  "(delta = %g, sd = %g, sig_level = %g)",
+			  (double)low, (double)high, (double)power,
+			  (double)delta, (double)sd, (double)sig_level);
 	} else if (is_null_sd) {
-	  NV low = delta * 1e-7, high = delta * 1e7;
-	  while (high - low > tol) {
-		   NV mid = low + (high - low) / 2.0;
-		   if (p_body(n, delta, mid, sig_level, tsample, tside, strict) > power) low = mid;
-		   else high = mid;
-	  }
-	  sd = low + (high - low) / 2.0;
+	  /* power falls as sd rises. The bracket scales with |delta|, so a delta of
+	   * 0 collapses it to a single point -- R fails there with "lower < upper is
+	   * not fulfilled"; this says why. */
+	  if (delta == 0.0) croak("power_t_test: cannot solve for 'sd' when 'delta' is 0");
+	  c.which = PTT_SD;
+	  NV ad = fabs(delta), low = ad * 1e-7, high = ad * 1e7;
+	  while (high < ad * 1e12 && ptt_f(&c, high) > 0.0) high *= 2.0;
+	  while (low > ad * 1e-12 && ptt_f(&c, low) < 0.0) low *= 0.5;
+	  sd = ptt_root(&c, low, high, tol);
+	  if (sd != sd) croak("power_t_test: no 'sd' in [%g, %g] gives a power of %g "
+			  "(n = %g, delta = %g, sig_level = %g)",
+			  (double)low, (double)high, (double)power,
+			  (double)n, (double)delta, (double)sig_level);
 	} else if (is_null_delta) {
+	  if (!(sd > 0.0)) croak("power_t_test: cannot solve for 'delta' unless 'sd' is positive");
+	  c.which = PTT_DELTA;
 	  NV low = sd * 1e-7, high = sd * 1e7;
-	  while (p_body(n, high, sd, sig_level, tsample, tside, strict) < power && high < 1e12) high *= 2.0;
-	  while (high - low > tol) {
-		   NV mid = low + (high - low) / 2.0;
-		   if (p_body(n, mid, sd, sig_level, tsample, tside, strict) < power) low = mid;
-		   else high = mid;
-	  }
-	  delta = low + (high - low) / 2.0;
-	} else if (is_null_sig_level) {
-	  NV low = 1e-10, high = 1.0 - 1e-10;
-	  while (high - low > tol) {
-		   NV mid = low + (high - low) / 2.0;
-		   if (p_body(n, delta, sd, mid, tsample, tside, strict) < power) low = mid;
-		   else high = mid;
-	  }
-	  sig_level = low + (high - low) / 2.0;
+	  while (high < sd * 1e12 && ptt_f(&c, high) < 0.0) high *= 2.0;
+	  delta = ptt_root(&c, low, high, tol);
+	  if (delta != delta) croak("power_t_test: no 'delta' in [%g, %g] gives a power of %g "
+			  "(n = %g, sd = %g, sig_level = %g)",
+			  (double)low, (double)high, (double)power,
+			  (double)n, (double)sd, (double)sig_level);
+	} else { /* is_null_sig_level */
+	  /* A significance level is a probability, so unlike the others this bracket
+	   * cannot be widened. R widens it anyway (extendInt = "yes") and will
+	   * happily return a sig.level above 1; refusing is the honest answer. */
+	  c.which = PTT_SIG;
+	  sig_level = ptt_root(&c, 1e-10, 1.0 - 1e-10, tol);
+	  if (sig_level != sig_level) croak("power_t_test: no 'sig_level' in (0, 1) gives a power of %g "
+			  "(n = %g, delta = %g, sd = %g)",
+			  (double)power, (double)n, (double)delta, (double)sd);
 	}
 	HV*restrict ret = newHV();
 	hv_stores(ret, "n", newSVnv(n));

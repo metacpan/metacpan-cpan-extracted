@@ -93,7 +93,7 @@ sub nlopt_minimize {
         $algorithm, $n,        $f,        $f_data,   $lb,       $ub,      $x, $minf,
         $minf_max,  $ftol_rel, $ftol_abs, $xtol_rel, $xtol_abs, $maxeval, $maxtime,
     ) = @_;
-    my $opt = Math::NLopt::create( $algorithm, $n );
+    my $opt = Math::NLopt->new( $algorithm, $n );
 
     $opt->set_min_objective( $f, $f_data );
 

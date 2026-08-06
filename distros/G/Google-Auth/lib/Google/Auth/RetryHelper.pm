@@ -1,4 +1,4 @@
-# Copyright 2026 Google LLC
+# Copyright 2026 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,43 +21,46 @@ use Google::Auth::Exceptions;
 use Time::HiRes;
 use Log::Any qw($log);
 
-our $VERSION = '0.06';
-
 sub execute_with_retry {
-    my ( $class, $code, %options ) = @_;
+  my ($class, $code, %options) = @_;
 
-    my $max_retries    = $options{max_retries}    // 3;
-    my $initial_delay  = $options{initial_delay}  // 1.0;
-    my $backoff_factor = $options{backoff_factor} // 2.0;
+  my $max_retries    = $options{max_retries}    // 3;
+  my $initial_delay  = $options{initial_delay}  // 1.0;
+  my $backoff_factor = $options{backoff_factor} // 2.0;
 
-    my $attempt = 0;
-    my $delay   = $initial_delay;
+  my $attempt = 0;
+  my $delay   = $initial_delay;
 
-    while (1) {
-        $attempt++;
-        my $res = eval { $code->() };
-        if (!$@) {
-            return $res;
-        }
-
-        my $err = $@;
-        if ( $attempt >= $max_retries ) {
-            $log->errorf('Max retry attempts (%d/%d) reached. Throwing error: %s', $attempt, $max_retries, $err);
-            die $err;
-        }
-
-        if ( $err =~ /Credential file.*does not exist/i 
-          || $err =~ /Missing required/i 
-          || $err =~ /Ambiguous/i 
-          || $err =~ /Invalid credential_source/i ) {
-            $log->errorf('Fatal un-retryable error encountered: %s. Propagating...', $err);
-            die $err;
-        }
-
-        $log->warnf('Transient error on attempt %d/%d: %s. Retrying in %s seconds...', $attempt, $max_retries, $err, $delay);
-        Time::HiRes::sleep($delay);
-        $delay *= $backoff_factor;
+  while (1) {
+    $attempt++;
+    my $res = eval { $code->() };
+    if (!$@) {
+      return $res;
     }
+
+    my $err = $@;
+    if ($attempt >= $max_retries) {
+      $log->errorf('Max retry attempts (%d/%d) reached. Throwing error: %s',
+        $attempt, $max_retries, $err);
+      die $err;
+    }
+
+    if ( $err =~ /Credential file.*does not exist/i
+      || $err =~ /Missing required/i
+      || $err =~ /Ambiguous/i
+      || $err =~ /Invalid credential_source/i)
+    {
+      $log->errorf('Fatal un-retryable error encountered: %s. Propagating...',
+        $err);
+      die $err;
+    }
+
+    $log->warnf(
+      'Transient error on attempt %d/%d: %s. Retrying in %s seconds...',
+      $attempt, $max_retries, $err, $delay);
+    Time::HiRes::sleep($delay);
+    $delay *= $backoff_factor;
+  }
 }
 
 1;

@@ -1,5 +1,11 @@
 Revision history for Fetch
 
+0.10    2026-08-05
+        - Drive Hyperman loops through Hyperman's public C ABI 
+        - Awaiting on a Hyperman loop ($future->get) is also C now: the
+          AWAIT hook bridges the Fetch::Future to a Hyperman::Future through
+          the ABI and pumps with run_until 
+
 0.09    2026-08-04
         - Security: credential headers (Authorization, Cookie, Proxy-
           Authorization) are no longer sent across a redirect that changes

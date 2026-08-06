@@ -133,6 +133,16 @@ outbound HTTP/2 calls with the same non-blocking machinery it serves with.
 Pass a raw C<Hyperman::Loop> as C<< Fetch->new(loop => ...) >> and it is
 wrapped automatically.
 
+Since Fetch 0.10 (with Hyperman 0.10+) the wrapping is mostly ceremonial:
+Fetch drives the loop directly through Hyperman's public B<C ABI> (resolved
+at runtime via C<Hyperman::_abi_ptr>; see "C ABI" in L<Hyperman>). Socket
+readiness reaches Fetch's connection state machine with no Perl call frame,
+interest changes skip the C<_ft_arm> method dispatch below, and per-request
+deadlines are precise one-shot kernel timers armed and cancelled in C rather
+than entries in this adapter's 0.1s sweep list. The Perl methods in this
+class remain as the fallback when the running Hyperman predates its C ABI,
+and as the reference implementation of the adapter seam.
+
 =head2 new([$hyperman_loop])
 
 Wrap the given loop, or make a fresh C<< Hyperman::Loop->new >>.
@@ -147,6 +157,13 @@ Install C<$Fetch::Future::AWAIT> so a bare C<< $future->get >> pumps the loop
 (C<run> until the future readies, then C<stop>). Because Hyperman's C<run> is
 re-entrant, awaiting from inside a running worker services other connections
 instead of blocking them.
+
+With Hyperman's C ABI available (0.10+), Fetch replaces this hook with a C
+closure at UA construction: the awaited future is bridged to a native
+Hyperman::Future and the loop pumped with the ABI's C<run_until>. Besides
+skipping the Perl dispatch, that retires the C<stop> flag - a nested await
+returns exactly when its own future readies rather than stopping whichever
+C<run> happens to be innermost. This Perl version remains as the fallback.
 
 =head1 AUTHOR
 

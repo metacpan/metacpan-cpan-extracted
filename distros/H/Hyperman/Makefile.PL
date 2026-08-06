@@ -2,6 +2,8 @@ use 5.008003;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
+use File::Find ();
 use Config;
 
 # Hyperman is a Unix event-loop server: it relies on fork(2), BSD sockets,
@@ -221,6 +223,32 @@ if (!probe_clock_gettime('') && probe_clock_gettime('-lrt')) {
     print "clock_gettime needs -lrt (old glibc): linking it.\n";
 }
 
+# --- ExtUtils::Depends: provide the public C ABI --------------------------
+# Hyperman is a PROVIDER: it installs hm_abi.h (the versioned function-pointer
+# table consumers resolve at runtime via Hyperman::_abi_ptr) so dependents
+# like DBIx::Loop reach the header without vendoring a copy. save_config
+# writes Install/Files.pm; consumers then ExtUtils::Depends->new(X,'Hyperman').
+my $pkg = ExtUtils::Depends->new('Hyperman');
+$pkg->set_inc('-Iinclude/hyperman');
+$pkg->install('include/hyperman/hm_abi.h');
+mkdir 'Install' unless -d 'Install';
+$pkg->save_config('Install/Files.pm');
+my %DEP = $pkg->get_makefile_vars;
+my $dep_inc = delete $DEP{INC};
+# Merge (don't clobber) LIBS - EU::Depends returns an empty LIBS that would
+# otherwise wipe out -lssl/-lcrypto/-lnghttp2/-luring and silently disable
+# TLS/h2/io_uring. LDFROM likewise defaults to $(OBJECT); drop EU::Depends'.
+my $dep_libs = delete $DEP{LIBS};
+delete $DEP{LDFROM};
+
+# EU::Depends' PM map (installing hm_abi.h + Files.pm) replaces MakeMaker's
+# auto-detected PM, so re-add the module's own .pm files.
+File::Find::find(sub {
+    return unless /\.pm\z/;
+    (my $rel = $File::Find::name) =~ s{^lib/}{};
+    $DEP{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
+}, 'lib');
+
 my %WriteMakefileArgs = (
     NAME             => 'Hyperman',
     AUTHOR           => ['LNATION <email@lnation.org>'],
@@ -229,20 +257,24 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.010000',
     OBJECT           => 'Hyperman$(OBJ_EXT)',
-    INC              => '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc,
-    LIBS             => [ join(' ', grep { length } $uring_libs, $h2_libs, $tls_libs, $rt_libs) ],
+    INC              => join(' ', grep { defined && length }
+                            '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc,
+                            $dep_inc),
+    LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $rt_libs, $dep_libs) ],
     depend           => {
         'Hyperman.c' => 'xs/hyperman.xs xs/future.xs xs/loop.xs '
-                      . 'xs/writer.xs xs/event.xs',
+                      . 'xs/writer.xs xs/event.xs xs/abi.xs',
         'Hyperman$(OBJ_EXT)' =>
             'include/hyperman/hyperman.h include/hyperman/hm_core.h '
           . 'include/hyperman/hm_future.h include/hyperman/backend_kqueue.c '
           . 'include/hyperman/backend_epoll.c include/hyperman/backend_poll.c '
           . 'include/hyperman/backend_iouring.c include/hyperman/hm_http2.h '
-          . 'include/hyperman/hm_tls.h',
+          . 'include/hyperman/hm_tls.h include/hyperman/hm_abi.h '
+          . 'include/hyperman/hm_abi_impl.h',
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::Depends'   => '0.404',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -254,7 +286,8 @@ my %WriteMakefileArgs = (
     },
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Hyperman-*' },
+    clean => { FILES => 'Hyperman-* Install/Files.pm' },
+    %DEP,   # ExtUtils::Depends: PM map (installs hm_abi.h + Files.pm + our .pm)
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

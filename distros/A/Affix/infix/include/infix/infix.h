@@ -81,8 +81,8 @@
  * @{
  */
 #define INFIX_MAJOR 0 /**< The major version number. Changes with incompatible API updates. */
-#define INFIX_MINOR 1 /**< The minor version number. Changes with new, backward-compatible features. */
-#define INFIX_PATCH 7 /**< The patch version number. Changes with backward-compatible bug fixes. */
+#define INFIX_MINOR 2 /**< The minor version number. Changes with new, backward-compatible features. */
+#define INFIX_PATCH 1 /**< The patch version number. Changes with backward-compatible bug fixes. */
 
 #if defined(__has_c_attribute)
 #define _INFIX_HAS_C_ATTRIBUTE(x) __has_c_attribute(x)

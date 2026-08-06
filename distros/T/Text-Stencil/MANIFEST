@@ -1,5 +1,11 @@
-bench.pl
 Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+XS.xs
+bench.pl
 eg/csv_export.pl
 eg/from_file.pl
 eg/html_table.pl
@@ -8,14 +14,13 @@ eg/skip_and_sort.pl
 eg/streaming.pl
 eg/transforms.pl
 lib/Text/Stencil.pm
-Makefile.PL
-MANIFEST
-MANIFEST.SKIP
-README.md
+t/edge_coverage.t
+t/examples.t
 t/fortune.t
 t/generic.t
+t/readme.t
+t/regressions.t
 t/render_cb_croak.t
-t/edge_coverage.t
-XS.xs
+t/threads.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

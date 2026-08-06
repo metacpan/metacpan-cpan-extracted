@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Try::Tiny;
 use File::Spec::Functions 'catfile';
 use Data::TableReader::Decoder::XLSX;
 use Data::TableReader::Decoder::XLS;
@@ -10,7 +9,7 @@ use Data::TableReader;
 
 SKIP: {
 skip "Need an XLS parser", 1
-	unless try { Data::TableReader::Decoder::XLS->default_xls_module };
+	unless eval { Data::TableReader::Decoder::XLS->default_xls_module };
 subtest XLS => sub {
 	my $xls= new_ok( 'Data::TableReader::Decoder::XLS',
 		[ file_name => '', file_handle => open_data('AddressAuxData.xls'), _log => sub {} ],
@@ -22,7 +21,7 @@ subtest XLS => sub {
 
 SKIP: {
 skip "Need an XLSX parser", 1
-	unless try { Data::TableReader::Decoder::XLSX->default_xlsx_module };
+	unless eval { Data::TableReader::Decoder::XLSX->default_xlsx_module };
 subtest XLSX => sub {
 	my $xlsx= new_ok( 'Data::TableReader::Decoder::XLSX',
 		[ file_name => '', file_handle => open_data('AddressAuxData.xlsx'), _log => sub {} ],

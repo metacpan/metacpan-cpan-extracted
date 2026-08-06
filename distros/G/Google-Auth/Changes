@@ -1,7 +1,31 @@
 Revision history for Google-Auth
 
+0.10    Tue Aug 4 2026
+    - Call env_proxy by default on internal LWP::UserAgent instances to respect standard proxy environment variables (HTTPS_PROXY, NO_PROXY, etc.).
+    - Hardened Pluggable credential execution against command injection (CWE-78, CWE-77, CWE-88) and untrusted search paths (CWE-426) by using Text::ParseWords and indirect system execution.
+    - Removed insecure blind de-tainting in Pluggable credentials (CWE-184).
+
+0.09    Mon Aug 3 2026
+    - Hardened ServiceAccountCredentials against SSRF by validating token_uri domain.
+    - Added regression test for ServiceAccountCredentials token_uri SSRF.
+    - Corrected typo in .perlcriticrc policy name (ProhibitStringEval -> ProhibitStringyEval).
+
+0.08    Sun Aug 2 2026
+    - Improve safety and validation for external credentials.
+    - Added regression tests for universe domain bypass and sibling class validation gaps.
+
+0.07    Fri Jul 31 2026
+    - Hardened credential validation and handling (Custom Universe opt-in safeguards).
+    - Added untainting and validation for pluggable credentials commands.
+    - Centralized version management (removed redundant submodule $VERSIONs).
+    - Normalized Copyright headers to "Google LLC and contributors" with first contribution year.
+    - Applied uniform code formatting via .perltidyrc.
+    - Restored MANIFEST hygiene and aligned contributing guidelines.
+
 0.06    Tue Jul 28 2026
     - Added SECURITY.md
+    - Pluggable credentials "executable" now require explicit opt-in via GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES=1.
+    - Added URL Domain Validation (`ExternalAccountCredentials::_validate_url`) to reject any `credential_source.url`, `token_url`, or `service_account_impersonation_url` whose host is not `googleapis.com`, `*.googleapis.com`, `$universe_domain`, or `*.$universe_domain`.
 
 0.05    Wed Jul 22 2026
         - Fixed POD test failures.

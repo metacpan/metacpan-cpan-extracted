@@ -6,7 +6,7 @@ WriteMakefile(
     NAME             => 'Datafile::Hash',
     AUTHOR           => 'Hans Harder',
     VERSION_FROM     => 'lib/Datafile/Hash.pm',
-    ABSTRACT         => 'Pure-Perl utilities for reading and writing key-value and INI-style config files',
+    ABSTRACT_FROM    => 'lib/Datafile/Hash.pm',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.014',
 
@@ -28,7 +28,7 @@ WriteMakefile(
         provides => {
             'Datafile::Hash' => {
                 file    => 'lib/Datafile/Hash.pm',
-                version => '1.06',
+                version => '1.08',
             },
         },
     },

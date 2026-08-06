@@ -71,8 +71,6 @@ unwatch_io(self, watcher, ...)
         hm_loop *loop = hm_loop_from_sv(aTHX_ self);
         int fd;
         const char *m = "r";
-        hm_iow *slot;
-        int mask;
         if (SvROK(watcher) && SvTYPE(SvRV(watcher)) == SVt_PVAV
             && !SvOBJECT(SvRV(watcher))) {
             AV *h = (AV *)SvRV(watcher);
@@ -84,15 +82,8 @@ unwatch_io(self, watcher, ...)
             fd = hm_fd_of(aTHX_ watcher);
             if (items > 2 && SvOK(ST(2))) m = SvPV_nolen(ST(2));
         }
-        if (fd < 0 || fd >= HM_MAXFD) XSRETURN_EMPTY;
-        if (m[0] == 'w') { slot = &loop->io_w[fd]; mask = HM_EV_WRITE; }
-        else             { slot = &loop->io_r[fd]; mask = HM_EV_READ;  }
-        if (slot->sv) {
-            loop->be->remove_io(loop->be, fd, mask);
-            SvREFCNT_dec(slot->sv);
-            slot->sv = NULL;
-            slot->is_cb = 0;
-        }
+        hm_del_io_watch(aTHX_ loop, fd,
+                        m[0] == 'w' ? HM_EV_WRITE : HM_EV_READ);
     }
 
 # One-shot callback timer.

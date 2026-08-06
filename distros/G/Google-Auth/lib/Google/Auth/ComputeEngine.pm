@@ -1,4 +1,4 @@
-# Copyright 2022 Google, LLC
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,12 +19,10 @@ use warnings;
 
 use Moo;
 
-our $VERSION = '0.06';
-
 sub on_gce {
-    my ( $class, %options ) = @_;
-    # Return false for now until metadata server detection is implemented
-    return 0;
+  my ($class, %options) = @_;
+  # Return false for now until metadata server detection is implemented
+  return 0;
 }
 
 1;

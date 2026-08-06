@@ -35,11 +35,19 @@ use Test::More;
 # The regression guard. Where the reference is a positive number, a 0 here
 # means the `1 - ...` form is back. Where |z| is so large that 2*pnorm(-|z|)
 # underflows a double even computed correctly -- R and scipy return 0 too --
-# 0 is the right answer and anything else would be wrong.
+# anything at or above DBL_MIN would be wrong.
+#
+# Not `is($got, 0)`: a perl whose NV is a long double has exponent range to
+# spare below where the double that the reference implementations (and erfc())
+# work in gives out, so a tail this far out can come back as a number there
+# rather than a flat 0 -- and did, as 1e-600 out of glibc's i386 erfc(). Below
+# DBL_MIN there is no accuracy left to hold the module to; the assertion is
+# that the tail underflowed, not which side of it perl landed on.
 sub undeflow_ok {
 	my ($got, $exp, $lbl) = @_;
 	return ok($got > 0, "$lbl: p-value did not underflow to 0") if $exp > 0;
-	return is($got, 0, "$lbl: p-value underflows to 0 in R and scipy too");
+	return cmp_ok($got, '<', 2.2250738585072014e-308,  # DBL_MIN
+		"$lbl: p-value underflows, as it does in R and scipy");
 }
 
 # How much a tiny difference in the statistic moves the p-value.

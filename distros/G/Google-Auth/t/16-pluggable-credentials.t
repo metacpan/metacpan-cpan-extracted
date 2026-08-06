@@ -1,4 +1,4 @@
-# Copyright 2026 Google LLC
+# Copyright 2026 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -22,146 +22,162 @@ use Test::LWP::UserAgent;
 use HTTP::Response;
 use JSON::PP;
 
-BEGIN
-{
-    use_ok('Google::Auth::ExternalAccountCredentials') || print "Bail out!\n";
+BEGIN {
+  use_ok('Google::Auth::ExternalAccountCredentials') || print "Bail out!\n";
 }
 
 subtest 'Pluggable WIF Initialization and Factory' => sub {
-    my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
-        audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
-        subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
-        token_url          => 'https://sts.googleapis.com/v1/token',
-        credential_source  => {
-            executable => {
-                command => 'echo 1',
-            },
-        },
-    );
+  my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      executable => {
+        command => 'echo 1',
+      },
+    },
+  );
 
-    ok( defined $creds, 'Pluggable credentials object created via factory' );
-    isa_ok( $creds, 'Google::Auth::ExternalAccountCredentials::Pluggable' );
+  ok(defined $creds, 'Pluggable credentials object created via factory');
+  isa_ok($creds, 'Google::Auth::ExternalAccountCredentials::Pluggable');
 };
 
 subtest 'Pluggable WIF Disabled without Env Var' => sub {
-    local $ENV{GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES} = '0';
-    my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
-        audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
-        subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
-        token_url          => 'https://sts.googleapis.com/v1/token',
-        credential_source  => {
-            executable => {
-                command => 'echo 1',
-            },
-        },
-    );
-    eval {
-        $creds->retrieve_subject_token();
-    };
-    like( $@, qr/Pluggable credentials are not enabled/, 'throws when env var is not 1' );
+  local $ENV{GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES} = '0';
+  my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      executable => {
+        command => 'echo 1',
+      },
+    },
+  );
+  eval { $creds->retrieve_subject_token(); };
+  like(
+    $@,
+    qr/Pluggable credentials are not enabled/,
+    'throws when env var is not 1'
+  );
 };
 
 subtest 'Pluggable WIF Success JSON Output' => sub {
-    my $command = sprintf('"%s" -e "print q({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"my_token_field\":\"mock_pluggable_token\"})"', $^X);
-    my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
-        audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
-        subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
-        token_url          => 'https://sts.googleapis.com/v1/token',
-        credential_source  => {
-            executable => {
-                command => $command,
-            },
-            format => {
-                type                     => 'json',
-                subject_token_field_name => 'my_token_field',
-            },
-        },
-    );
+  my $command = sprintf(
+    '"%s" -e print+qq({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"my_token_field\":\"mock_pluggable_token\"})',
+    $^X);
+  my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      executable => {
+        command => $command,
+      },
+      format => {
+        type                     => 'json',
+        subject_token_field_name => 'my_token_field',
+      },
+    },
+  );
 
-    my $token = $creds->retrieve_subject_token();
-    is( $token, 'mock_pluggable_token', 'parses custom subject_token_field_name correctly' );
+  my $token = $creds->retrieve_subject_token();
+  is($token, 'mock_pluggable_token',
+    'parses custom subject_token_field_name correctly');
 };
 
 subtest 'Pluggable WIF Success Text Output' => sub {
-    my $command = '"' . $^X . '" -e "print q(raw-plain-text-token)"';
-    my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
-        audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
-        subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
-        token_url          => 'https://sts.googleapis.com/v1/token',
-        credential_source  => {
-            executable => {
-                command => $command,
-            },
-            format => {
-                type => 'text',
-            },
-        },
-    );
+  my $command = '"' . $^X . '" -e "print q(raw-plain-text-token)"';
+  my $creds   = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      executable => {
+        command => $command,
+      },
+      format => {
+        type => 'text',
+      },
+    },
+  );
 
-    my $token = $creds->retrieve_subject_token();
-    is( $token, 'raw-plain-text-token', 'returns raw output with newline stripped' );
+  my $token = $creds->retrieve_subject_token();
+  is($token, 'raw-plain-text-token',
+    'returns raw output with newline stripped');
 };
 
 subtest 'Pluggable WIF Environment Variable Injection' => sub {
-    # Command that prints a JSON containing the value of the environment variable MOCK_ENV_VAR
-    # We use perl to print it portably
-    my $env_sigil = $^O eq 'MSWin32' ? '$' : '\$';
-    my $command = '"' . $^X . '" -e "print q({) . chr(34) . q(version) . chr(34) . q(:1,) . chr(34) . q(success) . chr(34) . q(:true,) . chr(34) . q(expiration_time) . chr(34) . q(:1234567890,) . chr(34) . q(id_token) . chr(34) . q(:) . chr(34) . ' . $env_sigil . 'ENV{MOCK_ENV_VAR} . chr(34) . q(})"';
+  # Command that prints a JSON containing the value of the environment variable MOCK_ENV_VAR
+  # We use perl to print it portably
+  my $command = sprintf(
+    '"%s" -e print+qq({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"id_token\":\"$ENV{MOCK_ENV_VAR}\"})',
+    $^X);
 
-    my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
-        audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
-        subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
-        token_url          => 'https://sts.googleapis.com/v1/token',
-        credential_source  => {
-            executable => {
-                command               => $command,
-                environment_variables => {
-                    MOCK_ENV_VAR => 'injected-env-value',
-                },
-            },
+  my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      executable => {
+        command               => $command,
+        environment_variables => {
+          MOCK_ENV_VAR => 'injected-env-value',
         },
-    );
+      },
+    },
+  );
 
-    my $token = $creds->retrieve_subject_token();
-    is( $token, 'injected-env-value', 'successfully injected environment variable into command execution context' );
+  my $token = $creds->retrieve_subject_token();
+  is($token, 'injected-env-value',
+    'successfully injected environment variable into command execution context'
+  );
 };
 
 subtest 'Pluggable WIF Error Handling' => sub {
-    # Command that produces invalid JSON
-    my $bad_json_command = '"' . $^X . '" -e "print q({) . chr(34) . q(invalid_json:)"';
-    my $creds_bad_json = Google::Auth::ExternalAccountCredentials->make_creds(
-        audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
-        subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
-        token_url          => 'https://sts.googleapis.com/v1/token',
-        credential_source  => {
-            executable => {
-                command => $bad_json_command,
-            },
-        },
-    );
+  # Command that produces invalid JSON
+  my $bad_json_command =
+    '"' . $^X . '" -e "print q({) . chr(34) . q(invalid_json:)"';
+  my $creds_bad_json = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      executable => {
+        command => $bad_json_command,
+      },
+    },
+  );
 
-    eval {
-        $creds_bad_json->retrieve_subject_token();
-    };
-    like( $@, qr/Failed to parse JSON from pluggable command output/, 'throws when command output is invalid JSON' );
+  eval { $creds_bad_json->retrieve_subject_token(); };
+  like(
+    $@,
+    qr/Failed to parse JSON from pluggable command output/,
+    'throws when command output is invalid JSON'
+  );
 
-    # Command that fails to execute (invalid command name)
-    my $invalid_cmd = 'non_existent_pluggable_command_12345';
-    my $creds_invalid = Google::Auth::ExternalAccountCredentials->make_creds(
-        audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
-        subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
-        token_url          => 'https://sts.googleapis.com/v1/token',
-        credential_source  => {
-            executable => {
-                command => $invalid_cmd,
-            },
-        },
-    );
+  # Command that fails to execute (invalid command name)
+  my $invalid_cmd   = 'non_existent_pluggable_command_12345';
+  my $creds_invalid = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      executable => {
+        command => $invalid_cmd,
+      },
+    },
+  );
 
-    eval {
-        $creds_invalid->retrieve_subject_token();
-    };
-    ok( $@, 'throws when pluggable command fails to execute or exits with error' );
+  eval { $creds_invalid->retrieve_subject_token(); };
+  ok($@, 'throws when pluggable command fails to execute or exits with error');
 };
 
 done_testing();

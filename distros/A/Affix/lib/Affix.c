@@ -4938,13 +4938,17 @@ XS_INTERNAL(Affix_realloc) {
     // We trace back to the SV/AV that actually holds the address for the GC.
     SV * owner = _borrow_lifeline(aTHX_ arg);
     if (owner) {
-        if (SvTYPE(owner) == SVt_PVAV) {
-            SV ** p = av_fetch((AV *)owner, 0, 0);
+        /* owner may be the blessed Affix::Memory RV (whose referent holds the
+           address) or a raw storage SV. Unwrap the RV so we never write into
+           the reference header itself. */
+        SV * storage = SvROK(owner) ? SvRV(owner) : owner;
+        if (SvTYPE(storage) == SVt_PVAV) {
+            SV ** p = av_fetch((AV *)storage, 0, 0);
             if (p && *p)
                 sv_setuv(*p, PTR2UV(new_ptr));
         }
         else {
-            sv_setuv(owner, PTR2UV(new_ptr));
+            sv_setuv(storage, PTR2UV(new_ptr));
         }
     }
 

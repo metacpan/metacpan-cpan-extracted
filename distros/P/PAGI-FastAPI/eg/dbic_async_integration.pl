@@ -1,55 +1,48 @@
 #!/usr/bin/env perl
 
-# Integrating DBIx::Class::Async with PAGI::FastAPI
-#
-# The three things that make this work:
-#
-#   1. Create ONE DBIx::Class::Async::Schema for the app's whole lifetime,
-#      in on_startup(), and disconnect it in on_shutdown().
-#      PAGI::FastAPI's lifespan hooks map directly onto DBIx::Class::Async's
-#      own "create once / disconnect once" guidance.
-#
-#   2. Hand the schema (or a resultset) to route handlers via Depends(),
-#      the same DI mechanism you'd use for anything else. Handlers then
-#      just `await` the Future-returning DBIx::Class::Async calls directly,
-#      since both modules build on Future::AsyncAwait.
-#
-#   3. Whatever event loop actually drives your PAGI server MUST be the
-#      same loop instance passed to
-#      DBIx::Class::Async::Schema->connect(..., { loop => $loop }).
-#
-#      DBIx::Class::Async's worker pool talks to the main process over
-#      pipes, and something has to be pumping that loop for the
-#      resulting Futures to ever resolve, this is exactly the same
-#      requirement documented in DBIx::Class::Async's own "EVENT LOOP
-#      INTEGRATION" section for Mojolicious (IO::Async::Loop::Mojo).
+# Integrating DBIx::Class::Async with PAGI::FastAPI and JWT Authentication
 #
 # How to run:
 #
-# Start the server
+# Start the server:
 #
 #       pagi-server dbic_async_integration.pl
 #
-# In another terminal, try this:
+# Obtain a test token in another terminal:
 #
-#       curl -X POST http://127.0.0.1:5000/users -d '{"name":"Grace Hopper","email":"grace@example.com"}'
-#       curl http://127.0.0.1:5000/users/1
-#       curl http://127.0.0.1:5000/dashboard
-#       curl http://127.0.0.1:5000/users/999
+#       TOKEN=$(perl -MCrypt::JWT=encode_jwt -E 'say encode_jwt(payload=>{sub=>"alice",role=>"admin"}, key=>"demo-shared-secret", alg=>"HS256")')
+#
+# Try the routes using the token:
+#
+#       curl -X POST http://127.0.0.1:5000/users \
+#            -H "Authorization: Bearer $TOKEN" \
+#            -d '{"name":"Grace Hopper","email":"grace@example.com"}'
+#
+#       curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:5000/users/1
+#       curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:5000/dashboard
+#       curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:5000/users/999
 #
 use v5.36;
-use lib 'lib/';
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 use File::Temp;
+use IO::Async::Loop;
+use DBIx::Class::Async::Schema;
+
 use Future::AsyncAwait;
 use Types::Standard qw(Str);
+use Crypt::JWT qw(decode_jwt);
+
 use PAGI::FastAPI;
 use PAGI::FastAPI::Depends qw(Depends);
-use DBIx::Class::Async::Schema;
-use IO::Async::Loop;
+use PAGI::FastAPI::Security::HTTPBearer;
 
-# In a real deployment this is whatever loop pagi-server hands you /
-# constructs internally, reuse it rather than creating a second one.
-my $loop = IO::Async::Loop->new;
+# In a real app, load this from config/environment, not a literal.
+use constant JWT_SECRET => 'demo-shared-secret';
+
+my $loop   = IO::Async::Loop->new;
+my $bearer = PAGI::FastAPI::Security::HTTPBearer->new;
 
 my $app = PAGI::FastAPI->new(
     title   => 'Users API',
@@ -70,23 +63,35 @@ $app->on_startup(async sub {
         }
     );
     await $schema->deploy;
-    # NOTE: deploy() (like most DDL) broadcasts to every worker's own
-    # connection. With workers > 1, workers after the first will report
-    # harmless "table already exists" errors for a schema that already
-    # exists on disk, expected, not a failure. Skip deploy() entirely
-    # in production once the schema is already migrated.
 });
 
 $app->on_shutdown(async sub {
     DBIx::Class::Async->disconnect($schema) if $schema;
 });
 
-# Dependency: inject the schema into any route that needs DB access.
-my $get_schema = async sub ($c) { return $schema };
+# Dependencies:
+# 1. DB Schema Injector
+my $get_schema = Depends(async sub ($c) { return $schema }, key => 'schema');
+
+# 2. JWT Verification Dependency
+my $auth_deps = [
+    $bearer->depends(key => 'token'),
+    Depends(async sub ($c) {
+        my $claims = eval {
+            decode_jwt(token => $c->stash->{token}, key => JWT_SECRET);
+        };
+        unless ($claims) {
+            $c->status(401);
+            $c->set_header('WWW-Authenticate' => 'Bearer');
+            return { detail => 'Invalid or expired token' };
+        }
+        return $claims;
+    }, key => 'claims'),
+];
 
 $app->post('/users',
     body         => { name => Str, email => Str },
-    dependencies => { schema => $get_schema },
+    dependencies => [ @$auth_deps, $get_schema ],
     handler      => async sub ($c) {
         my $user = await $c->stash->{schema}
                            ->resultset('User')
@@ -101,7 +106,7 @@ $app->post('/users',
 );
 
 $app->get('/users/{id}',
-    dependencies => { schema => $get_schema },
+    dependencies => [ @$auth_deps, $get_schema ],
     handler      => async sub ($c) {
         my $user = await $c->stash->{schema}
                            ->resultset('User')
@@ -118,11 +123,8 @@ $app->get('/users/{id}',
     }
 );
 
-# Concurrent queries: fire several Future-returning DBIx::Class::Async
-# calls together and await them as a batch instead of one at a time,
-# so the worker pool actually runs them in parallel.
 $app->get('/dashboard',
-    dependencies => { schema => $get_schema },
+    dependencies => [ @$auth_deps, $get_schema ],
     handler      => async sub ($c) {
         my $rs = $c->stash->{schema}->resultset('User');
         my ($total, $active) = await Future->needs_all(

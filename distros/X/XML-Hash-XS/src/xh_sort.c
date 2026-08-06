@@ -28,3 +28,13 @@ xh_sort_hash(HV *hash, size_t len)
 
     return sorted_hash;
 }
+
+/* Callers register this with SAVEDESTRUCTOR_X so that the sorted hash is
+ * released both on the normal path and when a perl callback dies in the
+ * middle of the loop and longjmps past the end of the block. */
+void
+xh_sort_hash_free(pTHX_ void *sorted_hash)
+{
+    PERL_UNUSED_CONTEXT;
+    free(sorted_hash);
+}

@@ -1,7 +1,7 @@
 ---
 abstract: 'Lightweight pure-Perl data file handlers for array/tabular/csv data'
 author:
-  - 'Hans Harder <hans at atbas.org>'
+  - 'Hans Harder'
 build_requires:
   ExtUtils::MakeMaker: '6.52'
   Test::More: '0.88'
@@ -23,13 +23,11 @@ no_index:
 provides:
   Datafile::Array:
     file: lib/Datafile/Array.pm
-    version: '1.06'
+    version: '1.08'
 requires:
   perl: '5.014'
 resources:
   bugtracker: https://codeberg.org/HansH111/Datafile-Array.pm/issues
   repository: https://codeberg.org/HansH111/Datafile-Array.pm.git
-version: '1.06'
-x_contributors:
-  - 'Hans Harder <hans at atbas.org>'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

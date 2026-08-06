@@ -1,0 +1,49 @@
+---
+abstract: 'Authentication scheme building blocks for PAGI::FastAPI'
+author:
+  - 'Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PAGI-FastAPI-Security
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  PAGI::FastAPI::Security:
+    file: lib/PAGI/FastAPI/Security.pm
+    version: v0.0.2
+  PAGI::FastAPI::Security::APIKey:
+    file: lib/PAGI/FastAPI/Security/APIKey.pm
+    version: v0.0.2
+  PAGI::FastAPI::Security::Base:
+    file: lib/PAGI/FastAPI/Security/Base.pm
+    version: v0.0.2
+  PAGI::FastAPI::Security::HTTPBasic:
+    file: lib/PAGI/FastAPI/Security/HTTPBasic.pm
+    version: v0.0.2
+  PAGI::FastAPI::Security::HTTPBearer:
+    file: lib/PAGI/FastAPI/Security/HTTPBearer.pm
+    version: v0.0.2
+  PAGI::FastAPI::Security::OAuth2::PasswordBearer:
+    file: lib/PAGI/FastAPI/Security/OAuth2/PasswordBearer.pm
+    version: v0.0.2
+requires:
+  Future::AsyncAwait: '0.60'
+  MIME::Base64: '3.15'
+  PAGI::FastAPI: v0.0.3
+  perl: '5.036'
+resources:
+  bugtracker: https://github.com/manwar/PAGI-FastAPI-Security/issues
+  repository: https://github.com/manwar/PAGI-FastAPI-Security.git
+version: v0.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

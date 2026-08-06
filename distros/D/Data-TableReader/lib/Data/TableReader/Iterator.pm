@@ -1,12 +1,11 @@
 package Data::TableReader::Iterator;
 use strict;
 use warnings;
-use Try::Tiny;
 use Carp;
 use Scalar::Util 'refaddr';
 
 # ABSTRACT: Base class for iterators (blessed coderefs)
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 
 our %_iterator_fields;
@@ -64,7 +63,7 @@ Data::TableReader::Iterator - Base class for iterators (blessed coderefs)
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -149,7 +148,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

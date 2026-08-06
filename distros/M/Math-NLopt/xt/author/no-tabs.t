@@ -12,11 +12,18 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/api.t',
+    't/assert_result.t',
+    't/callback/exceptions.t',
     't/constants.t',
-    't/exceptions.t',
+    't/lifetime/construction.t',
+    't/lifetime/mconstraints.t',
+    't/lifetime/objective.t',
+    't/lifetime/preconditioner.t',
+    't/lifetime/scalar_constraints.t',
     't/lorentzfit.t',
-    't/perl.t',
-    't/tempdata.t'
+    't/object-safety.t',
+    't/perl.t'
 );
 
 notabs_ok($_) foreach @files;

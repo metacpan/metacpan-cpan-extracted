@@ -1,0 +1,465 @@
+NAME
+    Text::Stencil - fast XS list/table renderer with escaping, formatting, and
+    transform chaining
+
+SYNOPSIS
+        use Text::Stencil;
+
+        my @rows = ([1, 'Alice'], [2, 'Bob & Co']);
+
+        my $table = Text::Stencil->new(
+            header => '<table><tr><th>id</th><th>name</th></tr>',
+            row    => '<tr><td>{0:int}</td><td>{1:html}</td></tr>',
+            footer => '</table>',
+        );
+        my $html = $table->render(\@rows);
+
+        # hashrefs, chaining, separator
+        my $list = Text::Stencil->new(
+            header => '<ul>',
+            row    => '<li>{title:default:Untitled|trim|trunc:80|html}</li>',
+            footer => '</ul>',
+            separator => "\n",
+        );
+        print $list->render_one({ id => 1, title => 'Hello' });
+
+        # stream to a byte handle
+        open my $fh, '>:raw', 'out.html' or die $!;
+        $table->render_to_fh($fh, \@rows);
+        close $fh or die $!;
+
+DESCRIPTION
+    Renders lists of uniform data (arrayrefs or hashrefs) into text output
+    using a pre-compiled row template. The template is parsed once at
+    construction; rendering is a tight C loop with direct buffer writes and
+    zero Perl interpretation overhead.
+
+    About 2x faster than Text::Xslate for arrayref rows, ~1.6x for hashref
+    rows (see "PERFORMANCE"). Not safe for concurrent renders from multiple
+    threads (see "THREAD SAFETY").
+
+CONSTRUCTOR
+  new
+        my $s = Text::Stencil->new(%opts);
+
+    Options:
+
+    "header"
+        String prepended before all rows (default: empty).
+
+    "row"
+        Row template with "{field:type}" placeholders. Omitting it renders
+        just the header and footer.
+
+    "footer"
+        String appended after all rows (default: empty).
+
+    "separator"
+        String inserted between rows (default: none).
+
+    "escape_char"
+        Delimiter character instead of "{" (default: "{"). Paired closing: "["
+        → "]", "(" → ")", "<" → ">"; others use the same character for open
+        and close. Useful for JSON templates where literal braces are needed.
+
+        It must be exactly one byte, and not "NUL". Anything else is an error:
+        a two-character string, or a character that encodes to more than one
+        byte, would match nothing - the whole template would then render
+        literally with no field ever substituted.
+
+        A byte above 0x7F is accepted only when the row template is a byte
+        string. Against a character string it is an error, because the row is
+        split on raw bytes and a high delimiter would cut a multi-byte
+        character in half. Note that "from_file" always decodes, so a template
+        loaded from a file always needs an ASCII delimiter.
+
+    "skip_if"
+        Column index or field name. Rows where this field is truthy
+        (non-empty, not "0", not undef) are skipped.
+
+    "skip_unless"
+        Column index or field name. Rows where this field is not truthy are
+        skipped.
+
+    An unrecognised option is an error, not a silent no-op: a misspelled
+    "seperator" would otherwise give you a table with no separators and
+    nothing to explain it.
+
+    As a shorthand, "new" may be called with a single string argument, which
+    is used as the "row" template: "Text::Stencil->new($template)" is
+    equivalent to "Text::Stencil->new(row => $template)".
+
+  from_file
+        my $s = Text::Stencil->from_file('template.tpl', separator => "\n");
+
+    Load template from a file. The file is read as UTF-8. It can use section
+    markers:
+
+        __HEADER__
+        <table>
+        __ROW__
+        <tr><td>{0:html}</td></tr>
+        __FOOTER__
+        </table>
+
+    Any subset of the markers may be used, in any order, as long as "__ROW__"
+    is present; any text before the first marker is ignored. Without markers,
+    the entire file content is used as the row template.
+
+  clone
+        my $s2 = $s->clone(row => '{0:uc}');
+        my $s3 = $s->clone(row => '{0:uc}', separator => "\n");
+
+    Create a new renderer reusing the original's header, footer, "escape_char"
+    and skip conditions. "row" is required; "separator" may also be replaced.
+    Any other option is an error rather than a silent no-op, since everything
+    else is inherited.
+
+METHODS
+  render
+        my $output = $s->render(\@rows);
+
+    Render all rows. Returns a string (see "UNICODE" for its encoding).
+
+  render_one
+        my $output = $s->render_one(\@row);
+        my $output = $s->render_one(\%row);
+
+    Render a single row without wrapping in an arrayref. The header and footer
+    are still applied, and "skip_if"/"skip_unless" still apply - a skipped row
+    gives "". Only "row_count" is left alone.
+
+  render_sorted
+        my $output = $s->render_sorted(\@rows, $sort_by);
+        my $output = $s->render_sorted(\@rows, $sort_by, {descending => 1, numeric => 1});
+
+    Render rows sorted by a field. $sort_by is a column index for arrayref
+    rows or a field name for hashref rows. A leading "-" on the field name
+    sorts descending: '-score'. It can also be an arrayref for multi-column
+    sort: "[0, 1]" or "['name', 'age']". Sorts lexically ascending by default.
+    Optional third argument is a hashref: "descending" sorts descending,
+    "numeric" compares numerically. "descending" and a leading "-" select the
+    same thing rather than cancelling: with either one present the sort
+    descends, so '-name' with "{descending => 0}" still descends. A spec of
+    the wrong kind for the template - field names against "{0}", or column
+    indices against "{name}" - is an error rather than a sort that quietly
+    does nothing, since it could not have fetched a key from any row. As with
+    "new", an unrecognised key in that hashref is an error - a misspelled
+    "decending" would otherwise sort the wrong way with nothing to explain it.
+
+    The leading "-" is a hashref-only shorthand. On arrayref rows a leading
+    "-" is a negative column index, exactly as in a template, so
+    "render_sorted(\@rows, '-1')" sorts ascending by the last column; use
+    "{descending => 1}" there.
+
+    In the multi-field form the "-" works the same way, but direction belongs
+    to the sort as a whole rather than to one field: "['-name', 'age']" sorts
+    by name then age, all descending. Per-field directions are not supported.
+
+  render_to_fh
+        $s->render_to_fh($fh, \@rows);
+
+    Render directly to a filehandle, flushing in 64KB chunks. Bytes are
+    written as assembled, so use a byte handle; an ":encoding" layer will
+    mangle non-ASCII output. Print the result of "render" instead if you want
+    the handle's layers applied.
+
+    A failing write croaks. As with "print", an error the handle only notices
+    when its own buffer is flushed surfaces at "close" rather than here, so
+    still check "close".
+
+    The handle is resolved once, at the start. Closing or reopening it from
+    code that runs during the render - a tied "FETCH", an overloaded "" -
+    leaves the rest of the output going to whatever now occupies that slot, so
+    don't. Don't write to it either: the render's own output is buffered in
+    chunks, so anything you "print" to the same handle mid-render - or send
+    there with a nested "render_to_fh" - lands ahead of the output being
+    assembled around it, not where you wrote it.
+
+  render_cb
+        my $output = $s->render_cb(sub { return \@row_or_undef });
+        $s->render_cb(sub { return \@row_or_undef }, $fh);
+
+    Callback-based rendering. The callback is called repeatedly and should
+    return an arrayref or hashref (one row) or undef to stop. Anything else -
+    undef, a plain string, some other kind of reference - also stops it. If a
+    filehandle is given, output is streamed to it; otherwise returns a string.
+
+    Leaving the callback with "last", "next" or "goto" aimed at a label
+    outside the sub does not work, but it fails cleanly: the callback runs on
+    a call stack of its own, so the jump finds no such label and dies - Label
+    not found for "last LABEL", or "Can't find label LABEL" for "goto" - which
+    you can catch like any other error. (Before 0.03 it unwound this call
+    mid-flight and the interpreter could resume inside a block it had already
+    left, run the following statements twice, or crash.) "die" is the
+    supported way to abort early; it propagates out of "render_cb" unchanged.
+    To stop without an error, return "undef".
+
+  columns
+        my $cols = $s->columns;    # [0, 2] or ['name', 'id']
+
+    Field references used in the row template, each listed once, in the order
+    it first appears. "{#}" is the row number rather than a field reference,
+    and is not listed.
+
+  row_count
+        $s->render(\@rows);
+        my $n = $s->row_count;
+
+    Number of rows the last "render", "render_sorted", "render_to_fh" or
+    "render_cb" was given, including any skipped by "skip_if"/"skip_unless".
+    "render_one" does not change it.
+
+TEMPLATE SYNTAX
+  Field references
+    "{0}", "{1}" for arrayref rows. "{name}", "{id}" for hashref rows. Mode
+    auto-detected from the template. Negative indices count from the end:
+    "{-1}" is the last element, "{-2}" the second-to-last, etc.
+
+    A template uses one row mode throughout, so mixing numeric and named
+    references ('{0} {name}') is a compile-time error, as is an empty
+    reference ("{}") or an unclosed delimiter.
+
+    "{#}" is the current row number (0-based). It numbers the rows you passed
+    in, not the ones that come out, so with "skip_if"/"skip_unless" the
+    numbers have gaps and need not start at 0 - the same rows "row_count"
+    counts. Under "render_sorted" it is the position after sorting rather than
+    the position you passed the row in at, since sorting is what the row
+    number is usually wanted for; skipped rows still leave gaps. Works with
+    chaining: "{#:int_comma}", "{#:pad:4}". In "render_one", the row number is
+    0.
+
+  Literal delimiters
+    "{{" produces a literal "{" in output. Useful for JSON templates:
+
+        {{"id":{0:int}}    # produces {"id":42}
+
+    Works with any "escape_char": "[[" produces "[" when using "escape_char =>
+    '['".
+
+  Types
+   Escaping / encoding
+    "html", "html_br", "url", "json", "hex", "base64", "base64url", "raw"
+
+   Numeric
+    "int", "int_comma", "float:N", "sprintf:FMT"
+
+    Values are read leniently, not validated. "int", "int_comma", "float" and
+    "sprintf" numify as Perl would; "date", "elapsed", "ago" and "plural"
+    instead take the digits and ignore everything else, so "1e3" is 13 to them
+    and 1000 to "int". "plural" keeps a leading "-", the other three drop it.
+    Junk formats as zero rather than failing.
+
+    The integer conversions then narrow the number the way C does, so a value
+    too large for an "IV" wraps exactly as Perl's own "sprintf "%d"" wraps it:
+    "1e19" and "1e30" give the same answers here as there. An infinite value
+    is the one place to be careful - Perl's %d prints the word "Inf", while
+    this hands the value to the platform's "IV" conversion, and what that
+    produces differs between perl versions. "NaN" is 0 everywhere, like other
+    junk.
+
+    The Perl-numification half of that holds only where those four come first
+    in a chain, which is where the original scalar is still there to numify.
+    Later in a chain they are reading the previous transform's text instead,
+    and change behaviour accordingly: "int", "int_comma" and "sprintf"'s
+    integer conversions become digit-takers, so "{0:int}" on " 1e3 " is 1000
+    while "{0:trim|int}" is 13; "float" and "sprintf"'s floating conversions
+    fall back to C "strtod", which accepts forms Perl does not, so
+    "{0:float:2}" on "0x1f" is 0.00 while "{0:raw|float:2}" is 31.00. The
+    digit-takers are digit-takers in either position - there is nothing for
+    them to change to.
+
+    "number_si" and "bytes_si" follow neither rule: they always use C
+    "strtod", first in a chain or not. So on "0x1f" "int" gives 0, "elapsed"
+    gives "1s", and "number_si" gives 31.
+
+    "float" formats at C "double" precision, so on a perl built with
+    "-Duselongdouble" or "-Dusequadmath" it will show fewer significant digits
+    than Perl's own "sprintf".
+
+    "sprintf" accepts one conversion written as
+    "%[flags][width][.precision]CONV", where "CONV" is one of "dixXoufegs" and
+    is the last character of the format. Flags are "-+ #0"; width and
+    precision are at most eight digits. Anything else - a trailing literal
+    (%dx), a second conversion, "*", a positional specifier ("%2$d"), or a
+    length modifier (%ld) - is not applied and the value passes through
+    unchanged.
+
+    Formatting is done by the C library, so an accepted format follows C's
+    printf rather than Perl's "sprintf": %08s pads with spaces, where Perl
+    would pad with zeros. %s also stops at the first NUL byte, since that is
+    where a C string ends - every other transform passes NULs through, so use
+    "raw" rather than "sprintf:%s" for values that may contain one.
+
+   String transforms
+    "trim", "uc", "lc", "pad:N", "rpad:N", "trunc:N", "substr:S:L",
+    "replace:OLD:NEW", "mask:N", "length"
+
+    "trunc:N" never returns more than N bytes: above 3 it appends "..." within
+    the budget, at or below 3 it cuts hard.
+
+    "mask:N" keeps the last N bytes and replaces what precedes them with "*".
+    A value of N bytes or fewer is left untouched - "mask:4" on "abc" is
+    "abc", not "***" - so choose N against your shortest value.
+
+    "replace:OLD:NEW" replaces every non-overlapping occurrence left to right,
+    never re-examining what it inserted. "replace:OLD" deletes "OLD"; an empty
+    "OLD" is a no-op.
+
+   Logic / conversion
+    "default:VALUE", "bool:TRUTHY:FALSY", "if:TEXT", "unless:TEXT",
+    "map:K1=V1:K2=V2:*=DEFAULT", "wrap:PREFIX:SUFFIX" - with one parameter the
+    prefix alone; an empty or absent value emits nothing at all, not the
+    wrapper
+
+    "default:VALUE" supplies VALUE only when the field is undef or absent; an
+    empty string is a value and passes through.
+
+   Data formatting
+    "count", "date:FMT" (a Unix epoch formatted in UTC by strftime; the format
+    goes straight to the platform "strftime", and a few GNU extensions -
+    notably %s - are computed in local time there rather than UTC),
+    "plural:SINGULAR:PLURAL" - emits the count and the word ("2 items"); with
+    one form given, the plural is that form plus "s", "number_si", "bytes_si",
+    "elapsed" - a duration in seconds as "1d 1h 1m 1s", dropping the larger
+    units that are zero but always ending in seconds (3600 is "1h 0s"), and
+    always non-negative, "ago" - a Unix epoch as "5m ago", "2d ago", "1mo ago"
+    (a month is 30 days, a year 365) or "in the future",
+    "coalesce:FIELD1:FIELD2:DEFAULT" - use the primary field if non-empty
+    (unlike "bool"/"if", the string "0" counts as present), otherwise try each
+    fallback field in order; the last parameter is a literal default string
+
+    "count" is the size of the arrayref or hashref in the field, tied
+    containers included, and 0 for any other defined value; an undef or absent
+    field renders empty. "number_si" scales by 1000 up to "P" and "bytes_si"
+    by 1024 up to "EB"; past the top tier the mantissa keeps growing rather
+    than gaining a larger prefix.
+
+  Chaining
+        {0:trim|trunc:80|html}     # pipe transforms left to right
+
+    "count" and "coalesce" act on the raw field value (a container's size, or
+    the first non-empty field), so each must be the first transform in its
+    chain. Using either later in a chain is a compile-time error.
+
+    An unrecognised transform name is a compile-time error too, so a typo such
+    as "{0:hmtl}" is reported rather than quietly passing the value through
+    unescaped. Names are case-sensitive and are not trimmed, so "{0:HTML}" and
+    "{0: html}" are errors as well. A trailing delimiter with nothing after it
+    - "{0:}" or "{0:trim|}" - is not a transform at all and is simply ignored.
+    An empty segment anywhere else ("{0:|trim}", "{0:trim||}") is an error.
+
+    A parameter given to a transform that does not take one - "{0:uc:1}",
+    "{0:html:5}" - is a compile-time error for the same reason: it reads as
+    though it does something.
+
+  Transform parameters
+    Transforms taking a number ("float", "pad", "rpad", "trunc", "mask",
+    "substr") require a non-negative decimal integer; anything else, or a
+    value above 100_000_000, is a compile-time error. An empty parameter is
+    the exception: it is ignored, leaving the transform its own default - zero
+    for "trunc", "pad", "rpad" and the "substr" offset, but 2 for "float" and
+    4 for "mask", so "{0:mask:}" still shows the last four bytes. Precision
+    above 30 decimals (and within the 100_000_000 bound) is silently clamped
+    to 30 rather than rejected. An omitted "substr" bound is unbounded:
+    "substr:3:" runs to the end.
+
+    The 100_000_000 bound caps the value, not the work it implies:
+    "{0:pad:100000000}" compiles and then allocates 100MB per row.
+
+    Column indices may be negative, and an index with no matching element
+    simply renders empty. They must still fit in a C "int": a larger one is
+    rejected, in a template at compile time and in "skip_if", "skip_unless" or
+    a "render_sorted" sort spec when the call is made.
+
+    A field value larger than 2GB is returned unchanged by the string
+    transforms. The ones that read the scalar as a number rather than as text
+    - "int", "int_comma", "float", "count", and "sprintf" with any conversion
+    but %s - never look at the string, so they behave the same at any length.
+
+UNICODE
+    The output follows the input. The result is a character string only if
+    something character-ish contributed and nothing ruled it out: a high byte
+    in a template piece or field value that arrived as bytes forces a byte
+    string, as does a transform that cuts a character in half. That holds even
+    where the assembled output happens to be well-formed UTF-8 - a character
+    template rendering the bytes "\xc3\xa9" gives those two bytes back
+    unflagged. Rendering only byte strings therefore round-trips Latin-1 and
+    binary data unchanged.
+
+    Do not mix the two in one render: decode your inputs, or leave them all as
+    bytes. Feeding already-encoded UTF-8 bytes alongside decoded characters is
+    ambiguous, and whether the result comes back flagged then depends on the
+    order the values are seen in - where a byte value carrying high bytes is
+    seen before anything character-ish, the decision is deferred and settled
+    by validating the whole output instead.
+
+    A row that is not an arrayref or hashref renders every field empty rather
+    than failing, and still counts towards "row_count".
+
+    All string operations are byte-level: "length" counts bytes and
+    "pad"/"rpad" pad to a byte width, while "trunc", "substr" and "mask" can
+    cut a multi-byte character in half; the result is then returned as bytes
+    rather than as a malformed character string. "uc"/"lc" are ASCII-only.
+    "json" escapes only what JSON requires and passes bytes >= 0x80 through
+    untouched, so encode the value first if the consumer expects UTF-8.
+
+THREAD SAFETY
+    The object is not safe for concurrent renders from multiple threads due to
+    shared render buffer and "last_row_count" state. Create separate objects
+    per thread, or serialize access. Separate objects are enough: no render
+    path keeps state outside its own object.
+
+    Under ithreads the compiled template is not cloned into new threads
+    ("CLONE_SKIP"), so an object must be created in the thread that uses it.
+    On Windows "fork" is implemented with ithreads, so the same applies there:
+    build the renderer in the child, not before the fork.
+
+PERFORMANCE
+    Perl 5.40, x86_64 Linux. Absolute rates depend heavily on the machine and
+    move 20% or more between runs on a busy one, so the comparisons below are
+    given as ratios; the absolute figures in the later sections are from a
+    single run and are only useful against each other. Run "perl -Mblib
+    bench.pl" for your own numbers.
+
+    HTML table (13 rows, html escape), relative to Text::Xslate:
+
+        render arrayref     ~2.0-2.1x
+        render chained      ~1.6x
+        render hashref      ~1.6x
+        render_one          ~8-11x     (one row against Xslate rendering the whole
+                                       13-row table; not a per-row comparison)
+
+    Hashref rows cost a hash lookup per field where arrayref rows index
+    directly, which is most of the gap between the two.
+
+    Transform throughput (1000 rows, single transform):
+
+        int_comma  28.1K/s    int       27.8K/s    trunc:20  27.7K/s
+        uc         26.6K/s    default:x 25.3K/s    json      23.8K/s
+        raw        23.3K/s    url       22.6K/s    html      14.4K/s
+        trim|html  13.9K/s    float:2    4.2K/s
+
+    Chain depth scaling (1000 rows), relative to a single "html":
+
+        2 (trim|html)               ~0.8x
+        3 (trim|uc|html)            ~0.6x
+        4 (trim|uc|trunc:20|html)   ~0.6x   (trunc shortens the string before
+                                             html, offsetting its own cost)
+
+    Row count scaling (int + html escape per row):
+
+        ~11-17M rows/s; roughly flat from 100 to 10000 rows, ~20% lower at 10
+        where the per-render setup is not amortised
+
+    render vs render_one (single row):
+
+        render_one  ~4-5M/s  (~40% faster than render for single rows)
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

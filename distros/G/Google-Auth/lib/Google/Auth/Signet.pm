@@ -1,4 +1,4 @@
-# Copyright 2021 Google, LLC
+# Copyright 2021 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,9 @@ package Google::Auth::Signet;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
-
 package Google::Auth::Signet::OAuth2;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.06';
 
 # to be based on googleapis/google-auth-library-ruby/lib/googleauth/signet.rb

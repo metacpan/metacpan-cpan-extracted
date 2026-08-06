@@ -38,7 +38,7 @@ require WebDyne::Constant;
 
 #  Version information
 #
-$VERSION='3.008';
+$VERSION='3.009';
 
 
 

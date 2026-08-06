@@ -68,9 +68,20 @@ my %WriteMakefileArgs = (
                 },
             },
             test => {
+                # 0.98 for done_testing() and subtest(), used by the
+                # incremental parser and callback tests
                 requires => {
-                    'Test::More'      => 0,
+                    'Test::More'      => 0.98,
                     'Data::Dumper'    => 0,
+                },
+            },
+            # modules required by the author tests in xt/,
+            # install with: cpanm --with-develop --installdeps .
+            develop => {
+                requires => {
+                    'Test::Pod'           => 1.22,
+                    'Test::Perl::Critic'  => 0,
+                    'Test::CPAN::Changes' => 0,
                 },
             },
         },
@@ -80,6 +91,11 @@ my %WriteMakefileArgs = (
     CCFLAGS          => $Config{ccflags} . ( $IS_VC ? ' /Fosrc/' : ' -o $@' ),
     OBJECT           => q/$(O_FILES)/,
     XS               => { 'src/XS.xs' => 'src/XS.c',  },
+    # ExtUtils::ParseXS before perl 5.22 chdirs into the directory of the .xs
+    # file, so a relative typemap path is looked up in src/ and never found.
+    # The file lives in src/ so that MakeMaker does not also add a bare
+    # "typemap" argument of its own, which would hit the same problem.
+    TYPEMAPS         => [ File::Spec->rel2abs(File::Spec->catfile('src', 'typemap')) ],
     C                => [ 'src/XS.c', glob('src/*.c') ],
     H                => [ glob('src/*.h') ],
     clean            => { FILES => 'src/*.o* *.o* src/*.pdb *.pdb' },

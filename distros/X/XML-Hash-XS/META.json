@@ -4,7 +4,7 @@
       "Yuriy Ustushenko <yuriy.ustushenko@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,6 +34,13 @@
             "File::Spec" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.22"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Exporter" : "5.57",
@@ -44,7 +51,7 @@
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.98"
          }
       }
    },
@@ -63,6 +70,6 @@
          "web" : "https://github.com/yoreek/XML-Hash-XS"
       }
    },
-   "version" : "0.64",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.65",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

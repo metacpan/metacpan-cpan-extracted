@@ -8,7 +8,7 @@ use warnings;
 
 #<<<
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 #>>>
 
@@ -48,32 +48,43 @@ sub message {
 
 
 
-{
-    package Math::NLopt::Exception::Failure;
-    use parent -norequire => 'Math::NLopt::Exception';
-}
 
-{
-    package Math::NLopt::Exception::OutOfMemory;
-    use parent -norequire => 'Math::NLopt::Exception';
-}
 
-{
-    package Math::NLopt::Exception::InvalidArgs;
-    use parent -norequire => 'Math::NLopt::Exception';
-}
 
-{
-    package Math::NLopt::Exception::RoundoffLimited;
-    use parent -norequire => 'Math::NLopt::Exception';
-}
 
-{
-    package Math::NLopt::Exception::ForcedStop;
-    use parent -norequire => 'Math::NLopt::Exception';
+
+
+
+
+sub throw {
+    my $class = shift;
+    require Carp;
+    Carp::croak( $class->new( @_ ) );
 }
 
 
+BEGIN {
+    my @Exceptions = qw(
+      Failure
+      ForcedStop
+      ImproperType
+      InternalError
+      InvalidArgs
+      InvalidDimensions
+      InvalidReturn
+      InvalidUse
+      MissingParameter
+      OutOfMemory
+      RoundoffLimited
+    );
+
+    ## no critic (StringyEval)
+    eval(
+        join( q{},
+            ( map { "{ package ${\__PACKAGE__}::$_; our \@ISA = ('${ \__PACKAGE__ }') }" } @Exceptions ),
+            '1;' ),
+    ) or die( 'internal error' );
+}
 1;
 
 #
@@ -98,26 +109,31 @@ Math::NLopt::Exception - Basic Exception Classes
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 SYNOPSIS
 
   use Math::NLopt::Exception;
 
-  croak( Math::NLopt::Exception::Failure->new( "error messsage" ) );
+  Math::NLopt::Exception::Failure->throw( "error messsage" ) );
 
 =head1 DESCRIPTION
 
-This is a very simple exception class used by L<Math::NLopt>. Importing
-this module also imports the
+This is a very simple exception class used by
+L<Math::NLopt>. Importing this module provides the following classes,
+which correspond to NLopt failures and user callback errors.
 
   Math::NLopt::Exception::Failure
-  Math::NLopt::Exception::OutOfMemory
-  Math::NLopt::Exception::InvalidArgs
-  Math::NLopt::Exception::RoundoffLimited>
   Math::NLopt::Exception::ForcedStop
-
-subclasses.
+  Math::NLopt::Exception::ImproperType
+  Math::NLopt::Exception::InternalError
+  Math::NLopt::Exception::InvalidArgs
+  Math::NLopt::Exception::InvalidDimensions
+  Math::NLopt::Exception::InvalidReturn
+  Math::NLopt::Exception::InvalidUse
+  Math::NLopt::Exception::MissingParameter
+  Math::NLopt::Exception::OutOfMemory
+  Math::NLopt::Exception::RoundoffLimited
 
 =head1 CLASS METHODS
 
@@ -126,6 +142,14 @@ subclasses.
   $object = Math::NLopt::Exception->new( $message );
 
 Construct an object containing the following method
+
+=head2 throw
+
+   $class->throw( ... );
+
+Equivalent to
+
+   croak( $class->new( ...) )
 
 =head1 METHODS
 
@@ -150,11 +174,11 @@ Please report any bugs or feature requests to bug-math-nlopt@rt.cpan.org  or thr
 
 Source is available at
 
-  https://gitlab.com/djerius/math-nlopt
+  https://codeberg.org/djerius/p5-Math-NLopt
 
 and may be cloned from
 
-  https://gitlab.com/djerius/math-nlopt.git
+  https://codeberg.org/djerius/p5-Math-NLopt.git
 
 =head1 SEE ALSO
 

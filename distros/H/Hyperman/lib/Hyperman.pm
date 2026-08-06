@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -189,6 +189,206 @@ worker's L<Hyperman::Loop> (or undef outside one).
     #   backend => 'kqueue', pid => $$ }
 
 Per-worker counters; returns undef outside a running loop.
+
+=head1 C ABI
+
+Hyperman exposes a public C ABI so that B<other XS modules> can drive its
+event loop and futures entirely from C - fd watchers and timers whose
+callbacks run with no Perl call frame per event, and Hyperman::Future
+create/settle/inspect without method dispatch.
+
+This is an integration surface for XS authors, not part of the Perl API.
+
+=head2 Getting the header
+
+The contract lives in F<include/hyperman/hm_abi.h>. Two ways to reach it:
+
+B<ExtUtils::Depends> (no copying). Hyperman is a provider: building installs
+F<hm_abi.h> and writes C<Hyperman::Install::Files>, so a dependent's
+F<Makefile.PL> that says
+
+    my $pkg = ExtUtils::Depends->new('My::Consumer', 'Hyperman');
+    WriteMakefile( ..., $pkg->get_makefile_vars );
+
+picks up F<hm_abi.h> on its include path automatically - but makes Hyperman
+a configure-time dependency of the consumer.
+
+B<Vendoring a pinned copy>. Because the table is resolved at runtime and the
+header is pure declarations, a consumer that wants Hyperman to stay
+B<optional> (as DBIx::Loop does) instead ships its own copy of F<hm_abi.h>
+pinned at a known C<HM_ABI_VERSION> and simply fails its resolve when
+Hyperman is not loaded.
+
+Perl headers (F<EXTERN.h> / F<perl.h> / F<XSUB.h>) must be included before
+F<hm_abi.h>.
+
+=head2 The table
+
+    #define HM_ABI_VERSION 1
+
+    #define HM_ABI_READ  0x1        /* io_watch masks     */
+    #define HM_ABI_WRITE 0x2
+
+    #define HM_ABI_PENDING   0      /* future_state       */
+    #define HM_ABI_DONE      1
+    #define HM_ABI_FAILED    2
+    #define HM_ABI_CANCELLED 3
+
+    typedef struct hm_abi_timer hm_abi_timer;    /* opaque handle */
+
+    typedef void (*hm_abi_io_cb)(pTHX_ int fd, int mask, void *ud);
+    typedef void (*hm_abi_timer_cb)(pTHX_ void *ud);
+    typedef void (*hm_abi_ready_cb)(pTHX_ SV *future, void *ud);
+
+    typedef struct hm_abi {
+        int abi_version;                          /* == HM_ABI_VERSION */
+
+        /* loop handles (opaque hm_loop*) */
+        void *(*cur_loop)(pTHX);
+        void *(*loop_of_sv)(pTHX_ SV *loop_sv);
+        SV   *(*sv_of_loop)(pTHX_ void *loop);
+
+        /* persistent fd watchers, pure C dispatch */
+        void (*io_watch)(pTHX_ void *loop, int fd, int mask,
+                         hm_abi_io_cb cb, void *ud);
+        void (*io_unwatch)(pTHX_ void *loop, int fd, int mask);
+
+        /* one-shot timer with cancellation */
+        hm_abi_timer *(*timer)(pTHX_ void *loop, double secs,
+                               hm_abi_timer_cb cb, void *ud);
+        void (*timer_cancel)(pTHX_ void *loop, hm_abi_timer *t);
+
+        /* Hyperman::Future */
+        SV  *(*future_new)(pTHX);
+        int  (*is_future)(pTHX_ SV *sv);
+        IV   (*future_state)(pTHX_ SV *f);
+        void (*future_done)(pTHX_ SV *f, SV **vals, SSize_t n);
+        void (*future_fail)(pTHX_ SV *f, SV *err);
+        void (*future_on_ready)(pTHX_ SV *f, hm_abi_ready_cb cb, void *ud);
+
+        /* await: pump the loop until f settles (re-entrant) */
+        void (*run_until)(pTHX_ void *loop, SV *f);
+    } hm_abi;
+
+=head2 Hyperman::_abi_ptr
+
+    my $iv = Hyperman::_abi_ptr;
+
+Returns the address of the process-wide C<hm_abi> table as an integer (an
+C<IV>). A consumer calls this once (at C<BOOT>, or lazily on first use),
+C<INT2PTR>s it to a C<< const hm_abi * >>, and checks
+C<< ->abi_version >= HM_ABI_VERSION >> (the version it was compiled
+against) before using it. Not intended to be called from Perl for any other
+purpose. C<Hyperman::_abi_selftest> exercises the whole table from C and
+returns 1; it exists for Hyperman's own test suite.
+
+=head2 Loop handles
+
+C<cur_loop> returns the currently running loop or C<NULL> - inside a
+Hyperman worker it is the worker's loop, so a consumer resolving at request
+time needs no loop object at all. C<loop_of_sv> unwraps a L<Hyperman::Loop>
+SV (croaks on anything else); C<sv_of_loop> returns the loop's blessed
+wrapper SV (+1, caller owns), the same shared wrapper C<psgix.loop> uses.
+The handle is opaque; pass it back to every loop-taking entry.
+
+=head2 Watchers and timers
+
+C<io_watch> installs a B<persistent> C watcher for one direction of one fd
+(C<HM_ABI_READ> or C<HM_ABI_WRITE> - one direction per call). The callback
+fires on every readiness event with no Perl call frame, receiving the fd,
+the direction that fired, and C<ud>. Installing replaces any existing
+watcher (C, Perl callback, or future) for that fd+direction; C<io_unwatch>
+is idempotent and safe from inside the callback. fd must be below
+Hyperman's fd ceiling (65536); a bad fd croaks.
+
+C<timer> arms a B<one-shot> timer and returns an opaque handle;
+C<timer_cancel> disarms a timer that has not fired yet. The handle dies
+when the callback fires - never cancel after the fire (clear any stored
+handle inside the callback). Cancel live timers before dropping a loop.
+
+=head2 Futures
+
+C<future_new> returns a pending L<Hyperman::Future> (+1, caller owns).
+C<future_done> / C<future_fail> settle it and run its continuations through
+the normal trampoline; both are no-ops on an already-settled future, and
+values are copied, not stolen. C<future_state> returns the C<HM_ABI_*>
+state without dispatch. C<future_on_ready> attaches a C continuation that
+fires exactly once when the future settles - B<including cancellation>
+(check C<future_state> to see which); this is how a consumer hooks
+cancellation, e.g. issuing a database cancel when a caller cancels the
+future. It fires immediately if the future is already settled.
+
+C<run_until> pumps the loop until the given future settles. It is
+re-entrant - calling it from inside a callback nests, exactly like
+C<< ->get >> inside a Hyperman worker - so a blocking-style C<await> can be
+built on it directly.
+
+=head2 Contracts
+
+Everything is single-threaded and fires on the loop thread, inside the
+loop's dispatch:
+
+=over 4
+
+=item * C callbacks must B<not croak>. Trap errors (C<G_EVAL> around any
+Perl you call) and settle a future instead; a longjmp out of the dispatch
+loop leaves it inconsistent.
+
+=item * C<ud> lifetime is the consumer's problem: it must stay valid until
+the watcher is removed, the timer fires or is cancelled, or C<on_ready>
+fires. Remove watchers before freeing their C<ud>.
+
+=item * Callbacks may re-enter the table freely, including C<run_until>.
+
+=item * The table only ever grows at the end. C<HM_ABI_VERSION> bumps on
+any append; a consumer requires C<< abi_version >= >> the version it was
+written against.
+
+=back
+
+=head2 Example: resolve and use
+
+    #include "hm_abi.h"     /* via ExtUtils::Depends, or a vendored copy */
+
+    static const hm_abi *HM = NULL;   /* resolved on first use */
+
+    static const hm_abi *my_hm(pTHX) {
+        if (!HM) {
+            dSP; int n;
+            ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
+            n = call_pv("Hyperman::_abi_ptr", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (!SvTRUE(ERRSV) && n > 0) {
+                IV p = POPi;
+                if (p) {
+                    const hm_abi *a = INT2PTR(const hm_abi *, p);
+                    if (a->abi_version >= HM_ABI_VERSION) HM = a;
+                }
+            } else if (n > 0) (void)POPs;
+            PUTBACK; FREETMPS; LEAVE;
+        }
+        return HM;   /* NULL => Hyperman absent or too old: fall back */
+    }
+
+    /* watch a DB socket; on readable, collect the result and settle */
+    static void on_db_readable(pTHX_ int fd, int mask, void *ud) {
+        my_req *r = (my_req *)ud;            /* must not croak */
+        if (collect_result(r) == DONE) {
+            HM->io_unwatch(aTHX_ r->loop, fd, HM_ABI_READ);
+            if (r->timeout) {
+                HM->timer_cancel(aTHX_ r->loop, r->timeout);
+                r->timeout = NULL;
+            }
+            HM->future_done(aTHX_ r->future, &r->result_sv, 1);
+        }
+    }
+
+    /* fire a query: future + fd watch + timeout, all C */
+    void *loop = HM->cur_loop(aTHX);         /* the worker's loop */
+    r->future  = HM->future_new(aTHX);
+    HM->io_watch(aTHX_ loop, db_fd, HM_ABI_READ, on_db_readable, r);
+    r->timeout = HM->timer(aTHX_ loop, 5.0, on_db_timeout, r);
+    HM->future_on_ready(aTHX_ r->future, on_settled_or_cancelled, r);
 
 =head1 AUTHOR
 

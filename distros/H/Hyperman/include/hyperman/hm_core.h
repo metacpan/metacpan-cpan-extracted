@@ -13,6 +13,7 @@
                                   falling back to the loop's growable one  */
 
 #include "hm_parse.h"   /* hm_hline, hm_parse_index, hm_chunked_* */
+#include "hm_abi.h"     /* public C ABI: hm_abi table + callback typedefs */
 
 typedef struct hm_loop hm_loop;
 typedef struct hm_conn hm_conn;
@@ -66,15 +67,28 @@ struct hm_conn {
     hm_listener *lst;       /* listener this conn was accepted on   */
 };
 
-/* app-owned fd watcher: a one-shot Future or a persistent callback */
-typedef struct { SV *sv; unsigned char is_cb; } hm_iow;
+/* app-owned fd watcher: a one-shot Future, a persistent Perl callback, or a
+ * persistent C callback (the ABI path - dispatched with no Perl frame) */
+typedef struct {
+    SV            *sv;      /* future or Perl cb; NULL for a C watcher */
+    unsigned char  is_cb;
+    hm_abi_io_cb   c_cb;    /* C watcher; checked before sv            */
+    void          *c_ud;
+} hm_iow;
 
 /* timer watcher */
 #define HM_TW_FUTURE 0
 #define HM_TW_CB     1
 #define HM_TW_SWEEP  2
 #define HM_TW_HARDSTOP 3
-typedef struct { int kind; SV *sv; hm_loop *loop; } hm_tw;
+#define HM_TW_C      4      /* ABI: C callback, cancellable via handle */
+typedef struct {
+    int kind;
+    SV *sv;
+    hm_loop *loop;
+    hm_abi_timer_cb c_cb;   /* HM_TW_C only */
+    void           *c_ud;
+} hm_tw;
 
 typedef struct { int fd; UV id; } hm_again;
 
@@ -1680,9 +1694,10 @@ static void hm_tls_handshake(pTHX_ hm_conn *c) {
 
 /* Resolve an app io-readiness Future (fd became readable/writable), or run
  * a persistent watch_io callback. */
-static void hm_io_event(pTHX_ hm_loop *loop, hm_iow *slot) {
+static void hm_io_event(pTHX_ hm_loop *loop, int fd, int mask, hm_iow *slot) {
     SV *sv = slot->sv;
     PERL_UNUSED_VAR(loop);
+    if (slot->c_cb) { slot->c_cb(aTHX_ fd, mask, slot->c_ud); return; }
     if (!sv) return;
     if (slot->is_cb) {
         dSP;
@@ -1784,6 +1799,13 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
         if (!tw) return;
         if (tw->kind == HM_TW_SWEEP) { hm_sweep(aTHX_ loop); return; }
         if (tw->kind == HM_TW_HARDSTOP) { loop->stop = 1; return; }
+        if (tw->kind == HM_TW_C) {          /* ABI timer: no Perl frame */
+            hm_abi_timer_cb cb = tw->c_cb;
+            void *ud = tw->c_ud;
+            free(tw);
+            cb(aTHX_ ud);
+            return;
+        }
         {
             SV *sv = tw->sv;
             int kind = tw->kind;
@@ -1823,7 +1845,8 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
             if (c->tls_hs)              hm_tls_handshake(aTHX_ c);
             else                        hm_readable(aTHX_ c);
         }
-        else if (loop->io_r[fd].sv)     hm_io_event(aTHX_ loop, &loop->io_r[fd]);
+        else if (loop->io_r[fd].sv || loop->io_r[fd].c_cb)
+            hm_io_event(aTHX_ loop, fd, HM_EV_READ, &loop->io_r[fd]);
         return;
     }
     case HM_EV_WRITE: {
@@ -1837,7 +1860,8 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
             else if (c->ssl)            hm_readable(aTHX_ c);
             else                        hm_flush(aTHX_ c);
         }
-        else if (loop->io_w[fd].sv)     hm_io_event(aTHX_ loop, &loop->io_w[fd]);
+        else if (loop->io_w[fd].sv || loop->io_w[fd].c_cb)
+            hm_io_event(aTHX_ loop, fd, HM_EV_WRITE, &loop->io_w[fd]);
         return;
     }
     }
@@ -1991,7 +2015,58 @@ static void hm_add_io_watch(pTHX_ hm_loop *loop, int fd, const char *mode,
     if (slot->sv) SvREFCNT_dec(slot->sv);
     slot->sv    = SvREFCNT_inc(sv);
     slot->is_cb = (unsigned char)is_cb;
+    slot->c_cb  = NULL;
+    slot->c_ud  = NULL;
     loop->be->add_io(loop->be, fd, mask, is_cb ? 0 : 1);
+}
+
+/* ABI: persistent C watcher, replacing whatever held the slot. */
+static void hm_add_io_watch_c(pTHX_ hm_loop *loop, int fd, int mask,
+                              hm_abi_io_cb cb, void *ud) {
+    hm_iow *slot;
+    if (fd < 0 || fd >= HM_MAXFD) croak("Hyperman: bad fd %d", fd);
+    slot = (mask & HM_EV_WRITE) ? &loop->io_w[fd] : &loop->io_r[fd];
+    if (slot->sv) { SvREFCNT_dec(slot->sv); slot->sv = NULL; }
+    slot->is_cb = 0;
+    slot->c_cb  = cb;
+    slot->c_ud  = ud;
+    loop->be->add_io(loop->be, fd,
+                     (mask & HM_EV_WRITE) ? HM_EV_WRITE : HM_EV_READ, 0);
+}
+
+/* Drop one direction's watcher (any kind); idempotent. */
+static void hm_del_io_watch(pTHX_ hm_loop *loop, int fd, int mask) {
+    hm_iow *slot;
+    if (fd < 0 || fd >= HM_MAXFD) return;
+    slot = (mask & HM_EV_WRITE) ? &loop->io_w[fd] : &loop->io_r[fd];
+    if (!slot->sv && !slot->c_cb) return;
+    loop->be->remove_io(loop->be, fd,
+                        (mask & HM_EV_WRITE) ? HM_EV_WRITE : HM_EV_READ);
+    if (slot->sv) SvREFCNT_dec(slot->sv);
+    slot->sv    = NULL;
+    slot->is_cb = 0;
+    slot->c_cb  = NULL;
+    slot->c_ud  = NULL;
+}
+
+/* ABI: one-shot C timer; the returned watcher doubles as the cancel handle
+ * (freed on fire or on cancel, never both - single-threaded). */
+static hm_tw *hm_add_timer_watch_c(hm_loop *loop, double secs,
+                                   hm_abi_timer_cb cb, void *ud) {
+    hm_tw *tw = (hm_tw *)hm_xcalloc(1, sizeof(hm_tw));
+    tw->kind = HM_TW_C;
+    tw->loop = loop;
+    tw->c_cb = cb;
+    tw->c_ud = ud;
+    loop->be->add_timer(loop->be, secs, 1, tw);
+    return tw;
+}
+
+static void hm_del_timer_watch(pTHX_ hm_loop *loop, hm_tw *tw) {
+    if (!tw) return;
+    loop->be->del_timer(loop->be, tw);
+    if (tw->sv) SvREFCNT_dec(tw->sv);
+    free(tw);
 }
 
 static hm_loop *hm_need_loop(void) {

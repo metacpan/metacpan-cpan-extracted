@@ -41,6 +41,9 @@ xh_param_assign_pattern(xh_pattern_t *patt, SV *value)
         patt->expr = NULL;
     }
 
+    patt->enable = FALSE;
+    patt->always = FALSE;
+
     if ( SvOK(value) && SvTRUE(value) ) {
         patt->enable = TRUE;
         if ( SvRXOK(value) || (SvROK(value) && SvTYPE(SvRV(value)) == SVt_PVAV) ) {
@@ -65,6 +68,9 @@ xh_param_assign_filter(xh_pattern_t *patt, SV *value)
         patt->expr = NULL;
     }
 
+    patt->enable = FALSE;
+    patt->always = FALSE;
+
     if ( SvOK(value) ) {
         patt->enable = TRUE;
         patt->always = FALSE;
@@ -76,18 +82,35 @@ xh_param_assign_filter(xh_pattern_t *patt, SV *value)
     }
 }
 
-SV *
-xh_param_assign_cb(char *name, SV *value)
+void
+xh_param_assign_cb(SV **param, char *name, SV *value)
 {
+    if (*param != NULL) {
+        SvREFCNT_dec(*param);
+        *param = NULL;
+    }
+
     if ( !SvOK(value) )
-        return NULL;
+        return;
 
     if ( !SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVCV)
         croak("Parameter '%s' is not CODE reference", name);
 
-    value = SvRV(value);
+    *param = SvRV(value);
 
-    SvREFCNT_inc(value);
+    SvREFCNT_inc(*param);
+}
 
-    return value;
+void
+xh_param_assign_output(SV **param, SV *value)
+{
+    if (*param != NULL) {
+        SvREFCNT_dec(*param);
+        *param = NULL;
+    }
+
+    if ( SvOK(value) && SvROK(value) ) {
+        *param = SvRV(value);
+        SvREFCNT_inc(*param);
+    }
 }

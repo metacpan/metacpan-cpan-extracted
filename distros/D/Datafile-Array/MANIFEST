@@ -1,11 +1,13 @@
 CHANGES
+CONTRIBUTING.md
 lib/Datafile/Array.pm
 LICENSE
 Makefile.PL
 MANIFEST
 META.json
 META.yml
-README
+README.md
+SECURITY.md
 t/00-load.t
 t/01-array-basic.t
 t/02-array-csv.t

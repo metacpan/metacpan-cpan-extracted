@@ -1,5 +1,13 @@
 Revision history for Datafile-Array.pm
 
+1.08 2026-08-05
+    - modified SECURITY.md with the correct repo name
+
+1.07 2026-08-04
+    - minor adaptions to align with other repos
+    - Added CONTRIBUTING.MD and SECURITY.md and adjusted MANIFEST content
+    - Added t/05-coverage.t
+
 1.06 2026-08-02
     - make sure version is in all required files
     - move github.com to codeberg.org 

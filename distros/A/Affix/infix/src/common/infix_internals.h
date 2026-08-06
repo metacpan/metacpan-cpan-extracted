@@ -249,17 +249,23 @@ struct infix_library_t {
  * classification process.
  */
 typedef enum {
-    /** @brief Argument is passed in a general-purpose integer register (e.g., `RCX`, `RDI`, `X0`). */
+    /** @brief Argument is passed in a general-purpose integer register (e.g., `RCX`, `RDI`, `X0`, `a0`). */
     ARG_LOCATION_GPR,
-#if defined(INFIX_ABI_AAPCS64)
-    /** @brief (AArch64) Argument is passed in a vector/floating-point register (e.g., `V0`). */
+#if defined(INFIX_ABI_AAPCS64) || defined(INFIX_ABI_RISCV64)
+    /** @brief (AArch64/RISCV) Argument is passed in a floating-point register (e.g., `V0`, `fa0`). */
     ARG_LOCATION_VPR,
-    /** @brief (AArch64) A struct <= 16 bytes passed in a pair of GPRs (e.g., `X0`, `X1`). */
+    /** @brief (AArch64/RISCV) A struct <= 16 bytes passed in a pair of GPRs (e.g., `X0`, `X1`). */
     ARG_LOCATION_GPR_PAIR,
-    /** @brief (AArch64) A large struct (> 16 bytes) passed by reference; the pointer is in a GPR. */
+    /** @brief (AArch64/RISCV) A large struct (> 16 bytes) passed by reference; the pointer is in a GPR. */
     ARG_LOCATION_GPR_REFERENCE,
-    /** @brief (AArch64) A Homogeneous Floating-point Aggregate passed in consecutive VPRs. */
+    /** @brief (AArch64/RISCV) A Homogeneous Floating-point Aggregate passed in consecutive VPRs. */
     ARG_LOCATION_VPR_HFA,
+    /** @brief (RISC-V) An aggregate <= 16 bytes split across GPRs and FPRs; the GPR base is
+     *         `reg_index`, the FPR base is `reg_index2`, and `num_regs` packs `(num_gpr << 8) | num_fpr`. */
+    ARG_LOCATION_MIXED,
+    /** @brief (RISC-V) A 16-byte value with exactly one GPR remaining: the low half goes in
+     *         `reg_index` (a7) and the high half goes on the stack at `stack_offset`. */
+    ARG_LOCATION_GPR_STACK_SPLIT,
 #else  // x64 ABIs
     /** @brief (x64) Argument is passed in an SSE/XMM register (e.g., `XMM0`). */
     ARG_LOCATION_XMM,
@@ -301,7 +307,7 @@ typedef struct {
 typedef struct {
     size_t total_stack_alloc; /**< Total bytes to allocate on the stack for arguments and ABI-required space. */
     uint8_t num_gpr_args;     /**< The number of GPRs used for arguments. */
-#if defined(INFIX_ABI_AAPCS64)
+#if defined(INFIX_ABI_AAPCS64) || defined(INFIX_ABI_RISCV64)
     uint8_t num_vpr_args; /**< The number of VPRs used for arguments. */
 #else
     uint8_t num_xmm_args; /**< The number of XMMs used for arguments. */
@@ -806,14 +812,21 @@ static inline bool is_long_double(const infix_type * type) {
 #include "arch/x64/abi_x64_emitters.h"
 #elif defined(INFIX_ABI_AAPCS64)
 #include "arch/aarch64/abi_arm64_emitters.h"
+#elif defined(INFIX_ABI_RISCV64)
+#include "arch/riscv/abi_riscv64_emitters.h"
 #endif
 
 // Trampoline Caching
+/** @internal Maximum number of trampoline handles the global forward cache will retain.
+ *  The cache is bounded so that applications creating many unique trampoline signatures
+ *  cannot exhaust memory by permanently retaining every JIT-compiled handle. */
+#define INFIX_CACHE_MAX_ENTRIES 1024
 INFIX_INTERNAL infix_forward_t * _infix_cache_lookup(const char * signature, void * target_fn, bool is_safe);
 INFIX_INTERNAL void _infix_cache_insert(infix_forward_t * trampoline);
 INFIX_INTERNAL bool _infix_cache_remove(infix_forward_t * trampoline);
 INFIX_INTERNAL void _infix_cache_release(infix_forward_t * trampoline);
 INFIX_INTERNAL void _infix_cache_clear(void);
+INFIX_INTERNAL size_t _infix_cache_count(void);
 
 // Internal Cleanup
 INFIX_INTERNAL void _infix_forward_destroy_internal(infix_forward_t * trampoline);

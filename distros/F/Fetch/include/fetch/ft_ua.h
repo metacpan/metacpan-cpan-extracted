@@ -14,6 +14,13 @@
 
 typedef struct {
     SV     *loop;         /* resolved Fetch::Loop adapter */
+    /* Hyperman-direct mode (ft_hm.h): set at UA build when `loop` is a
+     * Fetch::Loop::Hyperman and Hyperman's C ABI resolved; connections then
+     * arm interest/deadlines through the table instead of _ft_arm/_ft_timer.
+     * The adapter (held in `loop`) owns the Hyperman::Loop SV, which keeps
+     * hm_loop valid for the UA's lifetime. */
+    const hm_abi *hm;     /* the resolved table, or NULL */
+    void   *hm_loop;      /* opaque Hyperman loop handle */
     SV     *pool;         /* Fetch::_Pool, or NULL when keep_alive is off */
     SV     *headers;      /* default headers, a Fetch::Headers */
     SV     *agent;        /* User-Agent string */
@@ -462,6 +469,8 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
         STRLEN rl;
         const char *rb = SvPV_const(req, rl);
         ft_conn_simple_next = ua->simple_response;   /* inherited by a fresh conn */
+        ft_conn_hm_next      = ua->hm;
+        ft_conn_hm_loop_next = ua->hm_loop;
         ft_conn_on_headers_next =
             (on_headers && SvROK(on_headers)) ? on_headers : NULL;
         f = ft_h1_start(aTHX_ l, lsv, pl, u.host, portbuf, rb, rl, tls, verify,
@@ -712,6 +721,8 @@ static SV *ft_websocket(pTHX_ ft_ua *ua, const char *url, HV *opt) {
     {
         STRLEN rl;
         const char *rb = SvPV_const(req, rl);
+        ft_conn_hm_next      = ua->hm;
+        ft_conn_hm_loop_next = ua->hm_loop;
         /* pool = NULL (never pooled); ws_key drives want_ws + the 101 check */
         f = ft_h1_start(aTHX_ l, lsv, NULL, u.host, portbuf, rb, rl, tls, verify,
                         timeout, m_sv, sc_sv, au_sv, pa_sv, empty_rv,

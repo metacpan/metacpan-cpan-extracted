@@ -1,20 +1,26 @@
+# A local MANIFEST.SKIP replaces ExtUtils::Manifest's built-in list rather than
+# adding to it, so pull the defaults back in (core dumps, VCS leftovers, ...).
+#!include_default
+
 # Build artifacts
 ^Makefile$
 ^Makefile\.old$
 ^MYMETA\.
 ^blib/
 ^pm_to_blib$
-^\.c$
 ^XS\.c$
 ^XS\.o$
 ^Stencil\.bs$
 ^MANIFEST\.bak$
 ^Text-Stencil-.*\.tar\.gz$
+# the distdir itself, so `make manifest` after `make distdir` does not ingest it
+^Text-Stencil-[0-9._]+/
 
 # Dev/CI
 ^\.git/
 ^\.github/
 ^\.claude/
+^\.pcg/
 ^CLAUDE\.md$
 
 # Editor/OS

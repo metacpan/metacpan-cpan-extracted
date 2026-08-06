@@ -84,6 +84,7 @@ t/parse_read.t
 t/pivot_table.t
 t/pm.coverage.t
 t/pnorm.t
+t/power_t_test.R.scipy.t
 t/prcomp.t
 t/predict.t
 t/predict2.t

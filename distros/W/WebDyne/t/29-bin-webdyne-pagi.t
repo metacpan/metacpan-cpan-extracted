@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin";
-use bin_helper qw(run_cmd write_module);
+use bin_helper qw(run_cmd write_file write_module);
 use File::Temp qw(tempdir);
 use File::Spec;
 
@@ -24,10 +24,13 @@ write_module($stub_dn, 'WebDyne::PAGI', <<'END_MODULE');
 package WebDyne::PAGI;
 use strict;
 use warnings;
+use WebDyne::Constant;
 our $LAST_INDEX;
+our $LAST_TITLE;
 sub new {
     my ($class, %opt)=@_;
     $LAST_INDEX=$opt{index};
+    $LAST_TITLE=$WEBDYNE_HTML_DEFAULT_TITLE;
     return bless \%opt, $class;
 }
 sub to_app {
@@ -137,5 +140,24 @@ like($stderr, qr/'root'\s*=>\s*'\Q$tmp_dn\E'/, 'webdyne.pagi --dump_opt dumps ro
 );
 isnt($rc, 0, 'webdyne.pagi rejects invalid env mode');
 like($stderr, qr/--env must be development, production, or none/, 'webdyne.pagi reports valid env modes');
+
+my $load_dn=tempdir(CLEANUP => 1);
+write_file("$load_dn/app.psp", "<start_html>pagi\n");
+write_file("$load_dn/.webdyne.conf.pl", <<'END_CONF');
+$_={
+    'WebDyne::Constant' => {
+        WEBDYNE_HTML_DEFAULT_TITLE => 'PAGI Root Config Loaded'
+    }
+};
+END_CONF
+
+local $ENV{DOCUMENT_ROOT}=$load_dn;
+($stdout, $stderr, $rc)=run_cmd(
+    $^X, '-I', $stub_dn, '-Ilib', '-e',
+    'my $app=do "./bin/webdyne.pagi"; die($@ || $!) unless $app; print "title=" . ($WebDyne::PAGI::LAST_TITLE // "") . "\n";'
+);
+is($rc, 0, 'webdyne.pagi loads through external server path');
+like($stdout, qr/^title=PAGI Root Config Loaded$/m, 'webdyne.pagi build loads DOCUMENT_ROOT .webdyne.conf.pl');
+is($stderr, '', 'webdyne.pagi external load writes no stderr');
 
 done_testing();

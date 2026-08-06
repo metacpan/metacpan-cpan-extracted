@@ -1,5 +1,11 @@
 Revision history for Datafile-Hash
 
+1.08 2025-08-05
+    - modified SECURITY.md with the correct repo name
+
+1.07 2025-08-05
+    - added CONTRIBUTING.md and SECURITY.md and added them to MANIFEST
+
 1.06 2025-08-03
     - improve test results
     - use version for kwalitee improvement

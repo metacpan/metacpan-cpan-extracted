@@ -1,5 +1,8 @@
 Revision history for Hyperman
 
+0.10    2026-08-05
+        - Public C ABI for XS consumers 
+
 0.09    2026-08-04
         - Chunked request bodies (Transfer-Encoding: chunked) are now decoded
           (HTTP/1). The decoded body is presented as psgi.input with a matching

@@ -10,7 +10,7 @@ use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
 
-plan tests => 12;
+plan tests => 13;
 
 is_deeply(
   test_record( 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg', 'example.com', 'default' ),
@@ -78,6 +78,11 @@ is_deeply(
   test_record( 'v=bimi1; l=', 'example.com', 'default' ),
   [ 0, ['EMPTY_L_TAG'] ],
   'Empty l tag'
+);
+is_deeply(
+  test_record( "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.\r\nsvg", 'example.com', 'default' ),
+  [ 0, ['INVALID_RECORD'] ],
+  'Invalid characters in record'
 );
 
 sub test_record {

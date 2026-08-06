@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "BIMI object",
-  "AUTHOR" => "Marc Bradshaw <marc\@marcbradshaw.net>",
+  "AUTHOR" => "Jemma Bradshaw <jemma\@nothingbutstatic.dev>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -79,7 +79,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.20260302",
+  "VERSION" => "3.20260806",
   "test" => {
     "TESTS" => "t/*.t"
   }

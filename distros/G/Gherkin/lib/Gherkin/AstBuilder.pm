@@ -1,5 +1,5 @@
 package Gherkin::AstBuilder;
-$Gherkin::AstBuilder::VERSION = '42.0.0';
+$Gherkin::AstBuilder::VERSION = '42.0.1';
 use strict;
 use warnings;
 use Scalar::Util qw(reftype);

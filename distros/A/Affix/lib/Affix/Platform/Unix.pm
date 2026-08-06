@@ -1,4 +1,4 @@
-package Affix::Platform::Unix v1.2.1 {
+package Affix::Platform::Unix v1.2.2 {
     use v5.40;
     use Path::Tiny qw[path];
     use Config     qw[%Config];
@@ -24,9 +24,12 @@ package Affix::Platform::Unix v1.2.1 {
             'x86_64'  => 'x86_64',
             'amd64'   => 'x86_64',    # A common alias
             'aarch64' => 'ARM64',
+            'arm64'   => 'ARM64',
             'ppc64'   => 'PPC64',
             'sparc64' => 'SPARC64',
             'ia64'    => 'Itanium',
+            'riscv64' => 'RISCV',
+            'riscv'   => 'RISCV',
         }->{$arch_part};
         $architecture // die "Unsupported architecture for ldconfig lookup: $arch_part";
 
@@ -37,7 +40,8 @@ package Affix::Platform::Unix v1.2.1 {
             'PPC64-64'   => 'libc6,64bit',
             'SPARC64-64' => 'libc6,64bit',
             'Itanium-64' => 'libc6,IA-64',
-            'ARM64-64'   => 'libc6,AArch64'
+            'ARM64-64'   => 'libc6,AArch64',
+            'RISCV-64'   => 'libc6,rv64gc'
         }->{$lookup_key};
 
         # If this specific architecture/bitness combination isn't in our list, return nothing.

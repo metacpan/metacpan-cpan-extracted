@@ -26,8 +26,7 @@ static void get_sys_error(char* buffer, size_t buffer_size, int errnum) {
 #endif
 }
 
-#if defined(USE_ITHREADS) && (defined(__linux) || defined(__FreeBSD__))
-#define THREAD_SCHED
+#ifdef HAVE_PTHREAD_SIGQUEUE
 static pthread_t S_get_pthread(pTHX_ SV* thread_handle) {
 	SV* tmp;
 	pthread_t* ret;
@@ -43,8 +42,6 @@ static pthread_t S_get_pthread(pTHX_ SV* thread_handle) {
 }
 #define get_pthread(handle) S_get_pthread(aTHX_ handle)
 #endif
-
-#define undef &PL_sv_undef
 
 typedef int signo_t;
 typedef siginfo_t* Signal__Info;
@@ -95,7 +92,7 @@ bool sigqueue(SV* pid, signo_t signo, int number = 0)
 		union sigval number_val;
 	CODE:
 		number_val.sival_int = number;
-#ifdef THREAD_SCHED
+#ifdef HAVE_PTHREAD_SIGQUEUE
 		if (SvOK(pid) && SvROK(pid) && sv_derived_from(pid, "threads"))
 			ret = pthread_sigqueue(get_pthread(pid), signo, number_val);
 		else

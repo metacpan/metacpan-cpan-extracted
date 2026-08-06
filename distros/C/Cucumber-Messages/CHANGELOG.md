@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [34.2.1] - 2026-08-05
+### Fixed
+- [Java] Use version range for `org.jspecify:jspecify`
+
 ## [34.2.0] - 2026-07-19
 ### Added
 - [dart] Add equals, hashCode, and toString to generated messages ([#474](https://github.com/cucumber/messages/pull/474))
@@ -739,7 +743,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v34.2.0...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v34.2.1...HEAD
+[34.2.1]: https://github.com/cucumber/messages/compare/v34.2.0...v34.2.1
 [34.2.0]: https://github.com/cucumber/messages/compare/v34.1.0...v34.2.0
 [34.1.0]: https://github.com/cucumber/messages/compare/v34.0.2...v34.1.0
 [34.0.2]: https://github.com/cucumber/messages/compare/v34.0.1...v34.0.2

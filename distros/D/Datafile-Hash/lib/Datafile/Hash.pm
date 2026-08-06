@@ -7,7 +7,7 @@ use Exporter 'import';
 use Carp;
 
 our @EXPORT_OK  = qw(readhash writehash);
-our $VERSION    = '1.06';
+our $VERSION    = '1.08';
 
 sub _trim { $_[0] =~ s/^\s+|\s+$//gr if defined $_[0] && $_[1] }
 
@@ -285,7 +285,7 @@ Datafile::Hash - Pure-Perl utilities for datafiles and INI-style config files wi
 
 =head1 VERSION
 
-1.06
+1.08
 
 =head1 LICENSE
 
@@ -407,3 +407,4 @@ INI mode automatically handles:
 - Section headers [section.subsection]
 - Quoted values with escaped quotes (\")
 - Proper value quoting on write when needed (contains special chars, newlines, leading/trailing space, or empty)
+

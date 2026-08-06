@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 39;
+use Test::Most tests => 38;
 use Test::Carp;
 use Test::NoWarnings;
 
@@ -19,7 +19,17 @@ COUNTRY: {
 
 	my $lingua = new_ok('CGI::Lingua', [ supported => ['en'] ]);
 
-	is($lingua->country(), 'gb');
+	# Resolve the country once while REMOTE_ADDR is set; suppress WHOIS
+	# warnings that appear when RIPE is rate-limiting.  Both tests that require
+	# the GB country ('gb') are gated on $gb_country being defined so they are
+	# gracefully skipped rather than failing during RIPE rate-limit windows.
+	my $gb_country = do { local $SIG{__WARN__} = sub {}; $lingua->country() };
+
+	SKIP: {
+		skip 'RIPE WHOIS unavailable for GB IP (212.159.106.41)', 1
+			unless defined $gb_country;
+		is($gb_country, 'gb');
+	}
 	ok($acl->all_denied(lingua => $lingua));
 
 	my @country_list = (
@@ -55,7 +65,14 @@ COUNTRY: {
 
 	$ENV{'REMOTE_ADDR'} = '212.159.106.41';	# F9
 
-	ok(!$acl->all_denied(lingua => new_ok('CGI::Lingua', [ supported => [ 'en' ] ])));
+	# Wildcard-deny + allow GB: $lingua must resolve to 'gb' for the ACL to
+	# allow it.  Skip when RIPE is rate-limited (same $gb_country guard as
+	# the is() test above — no additional WHOIS call needed).
+	SKIP: {
+		skip 'RIPE WHOIS unavailable for GB IP (212.159.106.41)', 1
+			unless defined $gb_country;
+		ok(!$acl->all_denied(lingua => $lingua));
+	}
 
 	$ENV{'REMOTE_ADDR'} = '87.226.159.0';	# RT
 

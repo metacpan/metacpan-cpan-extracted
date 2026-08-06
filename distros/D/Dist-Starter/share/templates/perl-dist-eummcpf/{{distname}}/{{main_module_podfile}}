@@ -1,0 +1,17 @@
+=pod
+
+=head1 NAME
+
+{{main_module}} - {{abstract}}
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+{{author.full_name}} <{{author.email}}>
+
+=cut

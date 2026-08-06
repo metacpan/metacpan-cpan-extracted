@@ -106,6 +106,7 @@ SRL_STATIC_INLINE void srl_read_header(pTHX_ srl_decoder_t *dec, SV *header_user
 SRL_STATIC_INLINE void srl_read_single_value(pTHX_ srl_decoder_t *dec, SV* into, SV** container); /* main recursive dump routine */
 SRL_STATIC_INLINE void srl_finalize_structure(pTHX_ srl_decoder_t *dec);             /* optional finalize structure logic */
 SRL_STATIC_INLINE void srl_clear_decoder(pTHX_ srl_decoder_t *dec);                 /* clean up decoder after a dump */
+SRL_STATIC_INLINE void srl_clear_thaw_state(pTHX_ srl_decoder_t *dec);              /* discard pending frozen-object state */
 
 /* the internal routines to handle each kind of object we have to deserialize */
 SRL_STATIC_INLINE void srl_read_copy(pTHX_ srl_decoder_t *dec, SV* into);
@@ -618,7 +619,34 @@ srl_clear_decoder_body_state(pTHX_ srl_decoder_t *dec)
         PTABLE_clear(dec->ref_bless_av);
     }
 
+    srl_clear_thaw_state(aTHX_ dec);
+
     dec->recursion_depth = 0;
+}
+
+/* Discard the pending frozen-object bookkeeping.
+ *
+ * thaw_av holds the frozen items awaiting a THAW call, and ref_thawhash maps the
+ * address of each frozen item's argument AV to its class stash (see the
+ * PTABLE_store in srl_read_frozen_object). Both are consumed by
+ * srl_finalize_structure, which frees those argument AVs as it goes.
+ *
+ * Neither may survive into another document. An entry left in ref_thawhash is
+ * keyed on an address perl is free to recycle, so a later PTABLE_find can match
+ * an unrelated AV and hand back a stale class stash -- or a mortal info AV that
+ * died documents ago. An item left in thaw_av gets thawed as part of the *next*
+ * document, operating on an SV that belongs to the previous one.
+ *
+ * Both happen in practice when a decode dies before reaching finalize, e.g. on a
+ * truncated document: srl_read_frozen_object has already pushed onto thaw_av by
+ * the time the buffer runs out. */
+SRL_STATIC_INLINE void
+srl_clear_thaw_state(pTHX_ srl_decoder_t *dec)
+{
+    if (dec->ref_thawhash)
+        PTABLE_clear(dec->ref_thawhash);
+    if (dec->thaw_av)
+        av_clear(dec->thaw_av);
 }
 
 SRL_STATIC_INLINE srl_decoder_t *
@@ -641,6 +669,14 @@ srl_begin_decoding(pTHX_ srl_decoder_t *dec, SV *src, UV start_offset)
 
     /* Set to being in use. */;
     SRL_DEC_SET_OPTION(dec, SRL_F_DECODER_DIRTY);
+
+    /* Start from a clean slate regardless of how the previous decode on this
+     * decoder ended. srl_clear_decoder() returns early when buf.start ==
+     * buf.end, so cleanup on the way out is not guaranteed to have run -- and
+     * after a croak there may have been no cleanup at all. Leftover frozen-object
+     * state is not merely stale, it is a use-after-free waiting to happen
+     * (see srl_clear_thaw_state). */
+    srl_clear_thaw_state(aTHX_ dec);
 
     /* Register our structure for destruction on scope exit */
     SAVEDESTRUCTOR_X(&srl_decoder_destructor_hook, (void *)dec);

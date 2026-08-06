@@ -25,14 +25,15 @@ WriteMakefile(
 	PL_FILES => {},
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-	}, TEST_REQUIRES => {
-		'Test::DescribeMe' => 0,
-		'Test::Most' => 0,
-		'Test::Needs' => 0,
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Exporter' => 0,
-		'Return::Set' => 0.01,
+		'Return::Set' => 0.04,
+	}, TEST_REQUIRES => {
+		'IPC::System::Simple' => 0,
+		'Test::DescribeMe' => 0,
+		'Test::Most' => 0,
+		'Test::Needs' => 0,
 	}, dist => $dist,
 	clean => { FILES => 'Test-Returns-*' },
 	# META_ADD => {

@@ -1,6 +1,6 @@
 package Mail::BIMI::CacheBackend::File;
 # ABSTRACT: Cache handling
-our $VERSION = '3.20260302'; # VERSION
+our $VERSION = '3.20260806'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -54,7 +54,7 @@ Mail::BIMI::CacheBackend::File - Cache handling
 
 =head1 VERSION
 
-version 3.20260302
+version 3.20260806
 
 =head1 DESCRIPTION
 
@@ -116,11 +116,11 @@ Delete the cache entry for this class
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

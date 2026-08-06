@@ -1,0 +1,14 @@
+# Prefer numeric version for backwards compatibility
+BEGIN { require {{min_perl_version}} }; ## no critic ( RequireUseStrict, RequireUseWarnings )
+use strict;
+use warnings;
+
+#<<<
+package {{main_module}};
+BEGIN {
+our $VERSION = '{{initial_version}}';
+}
+#>>>
+
+no warnings 'void'; ## no critic ( ProhibitNoWarnings )
+__PACKAGE__

@@ -26,6 +26,7 @@ foreach my $constname ( qw(
     NLOPT_STOPVAL_REACHED NLOPT_SUCCESS NLOPT_XTOL_REACHED)
   )
 {
+    ## no critic (StringyEval ReturnValueOfEval)
     ok( lives { eval "my \$a = $constname; 1" }, $constname );
 }
 

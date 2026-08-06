@@ -1,0 +1,391 @@
+--- before weaken
+SV = IV(0x564cf4f99808) at 0x564cf4f99818
+  REFCNT = 1
+  FLAGS = (ROK)
+  RV = 0x564cf5b3bb08
+  SV = PVHV(0x564cf5abfdd0) at 0x564cf5b3bb08
+    REFCNT = 2
+    FLAGS = (SHAREKEYS)
+    ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+    hash quality = 100.0%
+    KEYS = 1
+    FILL = 1
+    MAX = 7
+    Elt "name" HASH = 0x5ed8aa48
+    SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+      REFCNT = 1
+      FLAGS = (POK,IsCOW,pPOK)
+      PV = 0x564cf5ae1020 "set_min_objective"\0
+      CUR = 17
+      LEN = 19
+      COW_REFCNT = 3
+SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+  REFCNT = 1
+  FLAGS = (ROK)
+  RV = 0x564cf5b3bb08
+  SV = PVHV(0x564cf5abfdd0) at 0x564cf5b3bb08
+    REFCNT = 2
+    FLAGS = (SHAREKEYS)
+    ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+    hash quality = 100.0%
+    KEYS = 1
+    FILL = 1
+    MAX = 7
+    Elt "name" HASH = 0x5ed8aa48
+    SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+      REFCNT = 1
+      FLAGS = (POK,IsCOW,pPOK)
+      PV = 0x564cf5ae1020 "set_min_objective"\0
+      CUR = 17
+      LEN = 19
+      COW_REFCNT = 3
+--- after weaken
+SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+  REFCNT = 1
+  FLAGS = (ROK,WEAKREF)
+  RV = 0x564cf5b3bb08
+  SV = PVHV(0x564cf5ac5840) at 0x564cf5b3bb08
+    REFCNT = 1
+    FLAGS = (OOK,SHAREKEYS)
+    AUX_FLAGS = 0
+    ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+    hash quality = 100.0%
+    KEYS = 1
+    FILL = 1
+    MAX = 7
+    RITER = -1
+    EITER = 0x0
+    RAND = 0xe54a7123
+    BACKREFS = 0x564cf4f99800
+    SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+      REFCNT = 1
+      FLAGS = (ROK,WEAKREF)
+      RV = 0x564cf5b3bb08
+      SV = PVHV(0x564cf5ac5840) at 0x564cf5b3bb08
+        REFCNT = 1
+        FLAGS = (OOK,SHAREKEYS)
+        AUX_FLAGS = 0
+        ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+        hash quality = 100.0%
+        KEYS = 1
+        FILL = 1
+        MAX = 7
+        RITER = -1
+        EITER = 0x0
+        RAND = 0xe54a7123
+        BACKREFS = 0x564cf4f99800
+        SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+          REFCNT = 1
+          FLAGS = (ROK,WEAKREF)
+          RV = 0x564cf5b3bb08
+        Elt "name" HASH = 0x5ed8aa48
+        SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+          REFCNT = 1
+          FLAGS = (POK,IsCOW,pPOK)
+          PV = 0x564cf5ae1020 "set_min_objective"\0
+          CUR = 17
+          LEN = 19
+          COW_REFCNT = 3
+    Elt "name" HASH = 0x5ed8aa48
+    SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+      REFCNT = 1
+      FLAGS = (POK,IsCOW,pPOK)
+      PV = 0x564cf5ae1020 "set_min_objective"\0
+      CUR = 17
+      LEN = 19
+      COW_REFCNT = 3
+SV = PVAV(0x564cf5b45ff0) at 0x564cf554da68
+  REFCNT = 1
+  FLAGS = ()
+  ARRAY = 0x564cf5ac72e0
+  FILL = 2
+  MAX = 3
+  FLAGS = (REAL)
+    Elt No. 0
+    SV = PV(0x564cf5b5db90) at 0x564cf4f9e368
+      REFCNT = 1
+      FLAGS = ()
+      PV = 0x564cf5b75db0 ""
+      CUR = 0
+      LEN = 50
+    Elt No. 1
+    SV = IV(0x564cf5b3bb10) at 0x564cf5b3bb20
+      REFCNT = 1
+      FLAGS = (ROK)
+      RV = 0x564cf560b9d8
+        SV = PVCV(0x564cf5b50588) at 0x564cf560b9d8
+          REFCNT = 2
+          FLAGS = (RMG,ANON,CLONED,CVGV_RC,DYNFILE)
+          MAGIC = 0x564cf4f93f30
+            MG_VIRTUAL = &PL_vtbl_backref
+            MG_TYPE = PERL_MAGIC_backref(<)
+            MG_OBJ = 0x564cf4f997e8
+          COMP_STASH = 0x564cf4f5c598	"main"
+          START = 0x564cf5b05b40 ===> 1
+          ROOT = 0x564cf5b05fd0
+          GVGV::GV = 0x564cf5adc218	"main" :: "__ANON__"
+          FILE = "t/lifetime/objective.t"
+          DEPTH = 0
+          FLAGS = 0x14c0
+          OUTSIDE_SEQ = 11051
+          PADLIST = 0x564cf5ac72c0
+            PADNAME = 0x564cf5563f00(0x564cf5b06410) PAD = 0x564cf55f2cb0(0x564cf5ac7330)
+                 1. 0x564cf5b3baf0<1> (11052,11053) "$x"
+                 2. 0x564cf5b3bac0<1> (11052,11053) "$gradient"
+                 3. 0x564cf5b3ba90<1> (11052,11053) "$callback_data"
+                 7. 0x564cf4f99860<2> FAKE "$calls" flags=0x1 index=5
+                 8. 0x564cf5ac9dd0<4> FAKE "$method" flags=0x0 index=7
+          OUTSIDE = 0x0 (null)
+    Elt No. 2
+    SV = IV(0x564cf4f99808) at 0x564cf4f99818
+      REFCNT = 2
+      FLAGS = (ROK)
+      RV = 0x564cf5b3bb08
+        SV = PVHV(0x564cf5ac5840) at 0x564cf5b3bb08
+          REFCNT = 1
+          FLAGS = (OOK,SHAREKEYS)
+          AUX_FLAGS = 0
+          ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+          hash quality = 100.0%
+          KEYS = 1
+          FILL = 1
+          MAX = 7
+          RITER = -1
+          EITER = 0x0
+          RAND = 0xe54a7123
+          BACKREFS = 0x564cf4f99800
+            SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+              REFCNT = 1
+              FLAGS = (ROK,WEAKREF)
+              RV = 0x564cf5b3bb08
+            Elt "name" HASH = 0x5ed8aa48
+            SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+              REFCNT = 1
+              FLAGS = (POK,IsCOW,pPOK)
+              PV = 0x564cf5ae1020 "set_min_objective"\0
+              CUR = 17
+              LEN = 19
+              COW_REFCNT = 3
+--- after call
+SV = IV(0x564cf4f99808) at 0x564cf4f99818
+  REFCNT = 2
+  FLAGS = (ROK)
+  RV = 0x564cf5b3bb08
+  SV = PVHV(0x564cf5ac5840) at 0x564cf5b3bb08
+    REFCNT = 1
+    FLAGS = (OOK,SHAREKEYS)
+    AUX_FLAGS = 0
+    ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+    hash quality = 100.0%
+    KEYS = 1
+    FILL = 1
+    MAX = 7
+    RITER = -1
+    EITER = 0x0
+    RAND = 0xe54a7123
+    BACKREFS = 0x564cf4f99800
+    SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+      REFCNT = 1
+      FLAGS = (ROK,WEAKREF)
+      RV = 0x564cf5b3bb08
+      SV = PVHV(0x564cf5ac5840) at 0x564cf5b3bb08
+        REFCNT = 1
+        FLAGS = (OOK,SHAREKEYS)
+        AUX_FLAGS = 0
+        ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+        hash quality = 100.0%
+        KEYS = 1
+        FILL = 1
+        MAX = 7
+        RITER = -1
+        EITER = 0x0
+        RAND = 0xe54a7123
+        BACKREFS = 0x564cf4f99800
+        SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+          REFCNT = 1
+          FLAGS = (ROK,WEAKREF)
+          RV = 0x564cf5b3bb08
+        Elt "name" HASH = 0x5ed8aa48
+        SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+          REFCNT = 1
+          FLAGS = (POK,IsCOW,pPOK)
+          PV = 0x564cf5ae1020 "set_min_objective"\0
+          CUR = 17
+          LEN = 19
+          COW_REFCNT = 3
+    Elt "name" HASH = 0x5ed8aa48
+    SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+      REFCNT = 1
+      FLAGS = (POK,IsCOW,pPOK)
+      PV = 0x564cf5ae1020 "set_min_objective"\0
+      CUR = 17
+      LEN = 19
+      COW_REFCNT = 3
+SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+  REFCNT = 1
+  FLAGS = (ROK,WEAKREF)
+  RV = 0x564cf5b3bb08
+  SV = PVHV(0x564cf5ac5840) at 0x564cf5b3bb08
+    REFCNT = 1
+    FLAGS = (OOK,SHAREKEYS)
+    AUX_FLAGS = 0
+    ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+    hash quality = 100.0%
+    KEYS = 1
+    FILL = 1
+    MAX = 7
+    RITER = -1
+    EITER = 0x0
+    RAND = 0xe54a7123
+    BACKREFS = 0x564cf4f99800
+    SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+      REFCNT = 1
+      FLAGS = (ROK,WEAKREF)
+      RV = 0x564cf5b3bb08
+      SV = PVHV(0x564cf5ac5840) at 0x564cf5b3bb08
+        REFCNT = 1
+        FLAGS = (OOK,SHAREKEYS)
+        AUX_FLAGS = 0
+        ARRAY = 0x564cf5ac73c0  (0:7, 1:1)
+        hash quality = 100.0%
+        KEYS = 1
+        FILL = 1
+        MAX = 7
+        RITER = -1
+        EITER = 0x0
+        RAND = 0xe54a7123
+        BACKREFS = 0x564cf4f99800
+        SV = IV(0x564cf4f997f0) at 0x564cf4f99800
+          REFCNT = 1
+          FLAGS = (ROK,WEAKREF)
+          RV = 0x564cf5b3bb08
+        Elt "name" HASH = 0x5ed8aa48
+        SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+          REFCNT = 1
+          FLAGS = (POK,IsCOW,pPOK)
+          PV = 0x564cf5ae1020 "set_min_objective"\0
+          CUR = 17
+          LEN = 19
+          COW_REFCNT = 3
+    Elt "name" HASH = 0x5ed8aa48
+    SV = PV(0x564cf5b5db10) at 0x564cf5b3bb38
+      REFCNT = 1
+      FLAGS = (POK,IsCOW,pPOK)
+      PV = 0x564cf5ae1020 "set_min_objective"\0
+      CUR = 17
+      LEN = 19
+      COW_REFCNT = 3
+--- after undef
+--- in optimize
+SV = PVAV(0x564cf5b45ff0) at 0x564cf554da68
+  REFCNT = 1
+  FLAGS = ()
+  ARRAY = 0x564cf5ac72e0
+  FILL = 4
+  MAX = 4
+  FLAGS = (REAL)
+    Elt No. 0
+    SV = PV(0x564cf5b5db90) at 0x564cf4f9e368
+      REFCNT = 1
+      FLAGS = ()
+      PV = 0x564cf5b75db0 ""
+      CUR = 0
+      LEN = 50
+    Elt No. 1
+    SV = IV(0x564cf5b3bb10) at 0x564cf5b3bb20
+      REFCNT = 1
+      FLAGS = (ROK)
+      RV = 0x564cf560b9d8
+        SV = PVCV(0x564cf5b50588) at 0x564cf560b9d8
+          REFCNT = 1
+          FLAGS = (RMG,ANON,CLONED,CVGV_RC,DYNFILE)
+          MAGIC = 0x564cf4f93f30
+            MG_VIRTUAL = &PL_vtbl_backref
+            MG_TYPE = PERL_MAGIC_backref(<)
+            MG_OBJ = 0x564cf4f997e8
+          COMP_STASH = 0x564cf4f5c598	"main"
+          START = 0x564cf5b05b40 ===> 1
+          ROOT = 0x564cf5b05fd0
+          GVGV::GV = 0x564cf5adc218	"main" :: "__ANON__"
+          FILE = "t/lifetime/objective.t"
+          DEPTH = 0
+          FLAGS = 0x14c0
+          OUTSIDE_SEQ = 11051
+          PADLIST = 0x564cf5ac72c0
+            PADNAME = 0x564cf5563f00(0x564cf5b06410) PAD = 0x564cf55f2cb0(0x564cf5ac7330)
+                 1. 0x564cf5b3baf0<1> (11052,11053) "$x"
+                 2. 0x564cf5b3bac0<1> (11052,11053) "$gradient"
+                 3. 0x564cf5b3ba90<1> (11052,11053) "$callback_data"
+                 7. 0x564cf4f99860<2> FAKE "$calls" flags=0x1 index=5
+                 8. 0x564cf5ac9dd0<4> FAKE "$method" flags=0x0 index=7
+          OUTSIDE = 0x0 (null)
+    Elt No. 2
+    SV = IV(0x564cf4f99808) at 0x564cf4f99818
+      REFCNT = 2
+      FLAGS = ()
+      IV = 0
+--- in destroy
+SV = PVAV(0x564cf5b45ff0) at 0x564cf554da68
+  REFCNT = 1
+  FLAGS = ()
+  ARRAY = 0x564cf5ac72e0
+  FILL = 4
+  MAX = 4
+  FLAGS = (REAL)
+    Elt No. 0
+    SV = PV(0x564cf5b5db90) at 0x564cf4f9e368
+      REFCNT = 1
+      FLAGS = ()
+      PV = 0x564cf5b75db0 ""
+      CUR = 0
+      LEN = 50
+    Elt No. 1
+    SV = IV(0x564cf5b3bb10) at 0x564cf5b3bb20
+      REFCNT = 1
+      FLAGS = (ROK)
+      RV = 0x564cf560b9d8
+        SV = PVCV(0x564cf5b50588) at 0x564cf560b9d8
+          REFCNT = 1
+          FLAGS = (RMG,ANON,CLONED,CVGV_RC,DYNFILE)
+          MAGIC = 0x564cf4f93f30
+            MG_VIRTUAL = &PL_vtbl_backref
+            MG_TYPE = PERL_MAGIC_backref(<)
+            MG_OBJ = 0x564cf4f997e8
+          COMP_STASH = 0x564cf4f5c598	"main"
+          START = 0x564cf5b05b40 ===> 1
+          ROOT = 0x564cf5b05fd0
+          GVGV::GV = 0x564cf5adc218	"main" :: "__ANON__"
+          FILE = "t/lifetime/objective.t"
+          DEPTH = 0
+          FLAGS = 0x14c0
+          OUTSIDE_SEQ = 11051
+          PADLIST = 0x564cf5ac72c0
+            PADNAME = 0x564cf5563f00(0x564cf5b06410) PAD = 0x564cf55f2cb0(0x564cf5ac7330)
+                 1. 0x564cf5b3baf0<1> (11052,11053) "$x"
+                 2. 0x564cf5b3bac0<1> (11052,11053) "$gradient"
+                 3. 0x564cf5b3ba90<1> (11052,11053) "$callback_data"
+                 7. 0x564cf4f99860<2> FAKE "$calls" flags=0x1 index=5
+                 8. 0x564cf5ac9dd0<4> FAKE "$method" flags=0x0 index=7
+          OUTSIDE = 0x0 (null)
+    Elt No. 2
+    SV = IV(0x564cf4f99808) at 0x564cf4f99818
+      REFCNT = 2
+      FLAGS = ()
+      IV = 0
+    # Failed test 'optimizer retains callback data'
+    # at t/lifetime/objective.t line 48.
+
+# Failed test 'set_min_objective'
+# at t/lifetime/objective.t line 61.
+# Seeded srand with seed '20260727' from local date.
+t/lifetime/objective.t .. 
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/1 subtests 
+
+Test Summary Report
+-------------------
+t/lifetime/objective.t (Wstat: 256 (exited 1) Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 1
+Files=1, Tests=1,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.08 cusr  0.03 csys =  0.14 CPU)
+Result: FAIL

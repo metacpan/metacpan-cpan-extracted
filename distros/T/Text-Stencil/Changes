@@ -1,5 +1,13 @@
 Revision history for Text::Stencil
 
+0.03  2026-08-05
+    - Correctness and robustness fixes across compilation, rendering,
+      transforms, encoding and I/O
+    - INCOMPATIBLE: templates that were accepted but rendered wrong now fail
+      to compile; a field selector of the wrong kind for the template is an
+      error; a hole in the rows array renders as an empty row rather than
+      being skipped
+
 0.02  2026-06-01
     - Fix render-buffer use-after-free on croak
     - Free buffers when a callback dies or render aborts
@@ -9,15 +17,15 @@ Revision history for Text::Stencil
 
 0.01  2026-04-03
     - Initial release
-    - 35 transform types: html, html_br, url, json, hex, base64, base64url,
+    - 36 transform types: html, html_br, url, json, hex, base64, base64url,
       raw, int, int_comma, float, sprintf, trim, uc, lc, pad, rpad, trunc,
-      substr, replace, mask, default, bool, if, unless, map, wrap, count,
-      date, plural, number_si, bytes_si, elapsed, ago
+      substr, replace, mask, length, default, bool, if, unless, map, wrap,
+      count, coalesce, date, plural, number_si, bytes_si, elapsed, ago
     - Transform chaining with | (pipe)
     - Arrayref and hashref row modes (auto-detected)
-    - Methods: new, from_file, render, render_one, render_to_fh, clone,
-      columns, row_count
+    - Methods: new, from_file, render, render_one, render_sorted,
+      render_to_fh, render_cb, clone, columns, row_count
     - Custom delimiter via escape_char option
     - Shorthand new($row_template)
-    - UTF-8 transparent, thread-safe
-    - 2-3x faster than Text::Xslate for table rendering
+    - UTF-8 transparent
+    - About 2x faster than Text::Xslate for table rendering

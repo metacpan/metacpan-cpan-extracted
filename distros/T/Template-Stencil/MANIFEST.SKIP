@@ -1,0 +1,32 @@
+# Version control
+\B\.git\b
+\B\.gitignore\b
+
+# MakeMaker droppings
+^Makefile$
+^Makefile\.old$
+^Makefile\.PL\.bak$
+^MYMETA\.
+^blib/
+^pm_to_blib$
+^MANIFEST\.bak$
+^MANIFEST\.SKIP\.bak$
+
+# Build artifacts
+\.o$
+\.obj$
+\.bs$
+^Stencil\.c$
+^ts_probe_
+
+# Dist tarballs
+^Template-Stencil-[\d\.\_]+
+
+# Editor and OS droppings
+~$
+\.swp$
+^\.DS_Store$
+\.DS_Store$
+
+# Local scratch
+^ignore\.txt$

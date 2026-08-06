@@ -20,6 +20,7 @@
 
 #include "ft_future.h"
 #include "ft_loop.h"
+#include "ft_hm.h"        /* Hyperman C ABI (optional, runtime-resolved) */
 #include "ft_http.h"      /* HTTP/1.1 client state machine */
 
 #include "ft_headers.h"   /* Fetch::Headers container ops */

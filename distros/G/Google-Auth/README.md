@@ -48,6 +48,6 @@ You can also look for information at:
 
 ## License and Copyright
 
-Copyright (C) 2020, 2021, 2022 Google, LLC
+Copyright 2020 Google LLC and contributors
 
 This program is released under the Apache 2.0 license.

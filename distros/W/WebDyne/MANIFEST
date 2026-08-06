@@ -284,6 +284,7 @@ t/34-pagi-sse.t
 t/35-pagi-websocket.t
 t/37-psgi-api.t
 t/36-pagi-api.t
+t/38-start-html-style-extend.t
 t/alpine.psp                             
 t/apache_harness_helper.pm
 t/api_bare.psp                           
@@ -1445,6 +1446,7 @@ t/start_html_script_array.psp
 t/start_html_script_fragment.psp         
 t/start_html_script.psp                  
 t/start_html_text.psp
+t/start_html_style_extend.conf.pl
 t/start_multipart_form.psp               
 t/static_meta.psp                        
 t/static_start_html_attr.psp             

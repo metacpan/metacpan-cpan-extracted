@@ -1,9 +1,12 @@
 #!/usr/bin/env perl
 use v5.20;
+use warnings;
 use Text::Stencil;
 
 my $csv = Text::Stencil->new(
-    row       => '"{name:json}",{age:int},"{email:json}"',
+    # CSV quotes a literal quote by doubling it (RFC 4180); json would escape
+    # it as \" instead, which a standards-conforming parser rejects.
+    row       => q{"{name:replace:":""}",{age:int},"{email:replace:":""}"},
     separator => "\n",
 );
 

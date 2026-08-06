@@ -1835,6 +1835,7 @@ sub status_message
         $code = shift( @_ );
         $lang = 'en_GB';
     }
+    return( $self->error( "No language code was provided." ) ) if( !defined( $lang ) || !CORE::length( $lang ) );
     $lang = 'en_GB' if( !exists( $HTTP_CODES->{ $lang } ) );
     my $ref = $HTTP_CODES->{ $lang };
     return( $ref->{ $code } );

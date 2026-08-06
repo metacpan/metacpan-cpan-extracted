@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2022 Google LLC
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@ use strict;
 use warnings;
 use Test::More;
 
-unless ( $ENV{RELEASE_TESTING} )
-{
-    plan( skip_all => "Author tests not required for installation" );
+unless ($ENV{RELEASE_TESTING}) {
+  plan(skip_all => "Author tests not required for installation");
 }
 
 # Ensure a recent version of Test::Pod

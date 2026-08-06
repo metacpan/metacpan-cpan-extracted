@@ -67,12 +67,15 @@ our $xml_decl = qq{<?xml version="1.0" encoding="utf-8"?>};
 
 SKIP: {
     my $data;
-    eval { $data = fix_xml $c->hash2xml( { node1 => 'Тест' }, encoding => 'cp1251' )->toString(); };
+    eval { $data = $c->hash2xml( { node1 => 'Тест' }, encoding => 'cp1251' )->toString(); };
     my $err = $@;
     chomp $err;
     skip $err, 1 if $err;
+    # a libxml2 built without iconv/ICU only knows its built-in encodings and
+    # reports "unknown encoding" on stderr, returning undef instead of dying
+    skip 'libxml2 without cp1251 encoding handler', 1 unless defined $data;
     is
-        $data,
+        fix_xml($data),
         qq{<?xml version="1.0" encoding="cp1251"?>\n<root><node1>\322\345\361\362</node1></root>},
         'encoding support',
     ;

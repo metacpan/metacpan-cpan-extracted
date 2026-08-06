@@ -1,5 +1,5 @@
 {
-   "abstract" : "Pure-Perl utilities for reading and writing key-value and INI-style config files",
+   "abstract" : "Pure-Perl utilities for datafiles and INI-style config files with multi-level sections",
    "author" : [
       "Hans Harder"
    ],
@@ -39,7 +39,7 @@
    "provides" : {
       "Datafile::Hash" : {
          "file" : "lib/Datafile/Hash.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://codeberg.org/HansH111/Datafile-Hash.pm"
       }
    },
-   "version" : "1.06",
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,4 +1,4 @@
-package Affix::Platform::MacOS v1.2.1 {
+package Affix::Platform::MacOS v1.2.2 {
     use v5.40;
     use DynaLoader;
     use parent 'Affix::Platform::Unix';

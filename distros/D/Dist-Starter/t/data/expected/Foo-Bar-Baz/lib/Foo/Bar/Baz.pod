@@ -1,0 +1,17 @@
+=pod
+
+=head1 NAME
+
+Foo::Bar::Baz - The great new Foo::Bar::Baz
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Fred Flintstone <fred.flintstone@example.com>
+
+=cut

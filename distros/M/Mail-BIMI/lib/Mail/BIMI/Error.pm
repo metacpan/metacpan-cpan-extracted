@@ -1,6 +1,6 @@
 package Mail::BIMI::Error;
 # ABSTRACT: Class to represent an error condition
-our $VERSION = '3.20260302'; # VERSION
+our $VERSION = '3.20260806'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -19,6 +19,7 @@ my %ERROR_MAP = (
   DUPLICATE_KEY            => { description => 'Duplicate key in record' },
   EMPTY_L_TAG              => { description => 'Domain declined to participate', result => 'declined' },
   EMPTY_V_TAG              => { description => 'Empty v tag' },
+  INVALID_RECORD           => { description => 'BIMI record is invalid' },
   INVALID_TRANSPORT_A      => { description => 'Invalid transport in authority' },
   INVALID_TRANSPORT_L      => { description => 'Invalid transport in location' },
   INVALID_V_TAG            => { description => 'Invalid v tag' },
@@ -77,7 +78,7 @@ Mail::BIMI::Error - Class to represent an error condition
 
 =head1 VERSION
 
-version 3.20260302
+version 3.20260806
 
 =head1 DESCRIPTION
 
@@ -131,11 +132,11 @@ Return the Authentication-Results bimi= result for this class of error
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

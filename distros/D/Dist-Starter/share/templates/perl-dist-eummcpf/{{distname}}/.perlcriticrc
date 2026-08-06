@@ -1,0 +1,34 @@
+# harsh  (3)
+# cruel  (2)
+# brutal (1)
+severity           = harsh
+program-extensions = .PL .pl .t
+verbose            = %f: %m at line %l, column %c.  (Policy: %p, Severity: %s)\n
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+[InputOutput::ProhibitBacktickOperators]
+only_in_void_context = 1
+[-Modules::RequireEndWithOne]
+[-Modules::RequireExplicitPackage]
+[-RegularExpressions::RequireExtendedFormatting]
+[-Subroutines::ProtectPrivateSubs]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+allow_name_regex = _(?:build|trigger)_\w+
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::RequireFinalReturn]
+# https://github.com/Perl-Critic/Perl-Critic/issues/1094
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = once
+# https://github.com/Perl-Critic/Perl-Critic/issues/1094
+[-TestingAndDebugging::RequireTestLabels]
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Test2::V1
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Test2::V1
+[-ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+severity = 3
+allow_if_string_contains_single_quote = 1
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]

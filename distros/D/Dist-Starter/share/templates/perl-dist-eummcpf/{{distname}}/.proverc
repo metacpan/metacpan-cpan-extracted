@@ -1,0 +1,7 @@
+-w
+-r
+-s
+# keep the order of the following additional test library directories
+-b
+-It/lib
+-Ilocal/lib/perl5

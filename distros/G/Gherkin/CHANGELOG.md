@@ -8,6 +8,13 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [42.0.1] - 2026-08-05
+### Added
+- [Java] Added builder option to use non-deprecated `IdGenerator`.
+
+### Fixed
+- [Java] Use version range for `org.jspecify:jspecify`
+
 ## [42.0.0] - 2026-07-19
 ### Added
 - (i18n) Added Persian translation of "Rule" ([#642](https://github.com/cucumber/gherkin/pull/642))
@@ -25,7 +32,7 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [41.0.0] - 2026-06-20
 ### Changed
-- [PHP] BREAKING CHANGE: Require PHP 8.4
+- [PHP] Require PHP 8.4
 
 ### Fixed
 - [JavaScript] Remove namespace imports from messages
@@ -33,7 +40,7 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ## [40.0.0] - 2026-06-10
 ### Changed
 - [.Net] Replaced FluentAssertions with AwesomeAssertions
-- [JavaScript] BREAKING CHANGE: Switch to ESM ([#610](https://github.com/cucumber/gherkin/pull/610))
+- [JavaScript] Switch to ESM ([#610](https://github.com/cucumber/gherkin/pull/610))
 
 ## [39.1.0] - 2026-05-06
 ### Added
@@ -80,7 +87,7 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 - Add `location` to `Pickle` ([#433](https://github.com/cucumber/gherkin/pull/433))
 
 ### Changed
-- BREAKING CHANGE: Require messages v31 or greater
+- Require messages v31 or greater
 
 ### Fixed
 - [Java] Fixed `AstNode` conditions which never occur in `GherkinDocumentBuilder` ([#497](https://github.com/cucumber/gherkin/pull/497)).
@@ -187,7 +194,7 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 - [.NET] Changed some types from class to struct, removed IGherkinLine interface and changes some functions from Array to Enumerable
 - [Ruby] Update minimum ruby requirement from 3.0 to 3.2
 - [Ruby] Introduce rubocop subgems to facilitate optimisations
-- [JavaScript] BREAKING CHANGE: Update supported Node.js versions to 18, 20, 22 and 23 ([#365](https://github.com/cucumber/gherkin/pull/365))
+- [JavaScript] Update supported Node.js versions to 18, 20, 22 and 23 ([#365](https://github.com/cucumber/gherkin/pull/365))
 
 ### Fixed
 - [.NET] Fix NuGet package generation
@@ -938,7 +945,8 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v42.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v42.0.1...HEAD
+[42.0.1]: https://github.com/cucumber/gherkin/compare/v42.0.0...v42.0.1
 [42.0.0]: https://github.com/cucumber/gherkin/compare/v41.0.0...v42.0.0
 [41.0.0]: https://github.com/cucumber/gherkin/compare/v40.0.0...v41.0.0
 [40.0.0]: https://github.com/cucumber/gherkin/compare/v39.1.0...v40.0.0

@@ -1,5 +1,184 @@
 Revision history for CGI-ACL
 
+0.10	Wed Aug  5 10:12:35 AM EDT 2026
+	[ Enhancements ]
+	- Add deny_all_countries() convenience method: sugar for deny_country('*'),
+	  switches all_denied() into default-deny mode for country checks
+	- Fix $@ not cleared after capturing DNS eval error and lingua->country()
+	  eval error; callers were seeing stale $@ state
+	- Fix `my $ip = $_[0]` → `my ($ip) = @_` in _is_cloud_host and
+	  _verified_rdns (idiomatic Perl list-assignment style)
+	- Remove vacuous /o modifier from literal `if($ip =~ /:/)` pattern (/o is
+	  a no-op when there are no interpolated variables)
+	- Fix misleading alarm comment: "cancel the alarm" → "restore the previous
+	  alarm that was active before we started"
+	- Fix $PRIVATE_IP_RE fc00::/7 branch: ^f[cd][0-9a-f]*: accepted 2- and
+	  3-char first groups (e.g. fc:, fc0:) which decode to public unicast
+	  addresses, causing those IPs to bypass cloud DNS checks; fixed to {2}
+	  (exactly 4 hex chars, matching all genuine fc00::/7 first groups)
+	- Fix $PRIVATE_IP_RE fe80::/10 branch: same false-positive bug; fe8: decodes
+	  to 0x0fe8 (public unicast), not link-local; fixed to bare [0-9a-f] (no
+	  quantifier = exactly 1 additional char = 4 hex chars total)
+	- Fix @CLOUD_PATTERNS OVH entry: ^ip-\d+-\d+-\d+-\d+\.eu$ had four
+	  unbounded \d+ groups with literal separators, producing O(n^4) backtracking
+	  on hostile hostnames that match structure but have wrong suffix; IPv4
+	  octets are 1-3 digits, so \d{1,3} is both semantically correct and limits
+	  worst-case backtracking to O(1) per group
+	[ Documentation ]
+	- Move =encoding utf-8 to be the first POD directive (before =head1 NAME) so
+	  the parser handles Z-calculus Unicode symbols correctly throughout the file
+	- Add =head1 LIMITATIONS section documenting: VPN bypass, GeoIP inaccuracy,
+	  cloud detection gaps, DNS blocking latency, cache not shared between
+	  processes, Sub::Private white-box exemption, Windows alarm limitation,
+	  deferred rate-limiter
+	- Add PSEUDOCODE to all_denied() (public method > 15 lines)
+	- Add FORMAL SPECIFICATION (Z-calculus) inline per public method,
+	  replacing the old monolithic =head2 FORMAL SPECIFICATION bulk section
+	- Rename =head3 USAGE → =head3 EXAMPLE in all public-method POD blocks
+	- Expand =head1 SYNOPSIS from one example to six labelled real-world patterns
+	  covering: cloud-only block, IP allowlist, country deny-list, country
+	  allowlist (deny_all_countries + allow_country), combined production-grade
+	  policy, and ACL cloning
+	- Add =head1 COMMON PITFALLS section documenting eight common mistakes:
+	  allow_country alone has no effect, deny_cloud overrides allow_ip, localhost
+	  not automatically allowed, missing lingua causes deny, VPN/proxy bypass,
+	  country code case handling, DNS cache not shared between CGI requests
+	- Add =head1 VERSION HISTORY section with per-release summaries from 0.01
+	  through 0.10 in plain English
+	[ Performance ]
+	- _rdns_forward(): use gethostbyname() instead of inet_aton() for the IPv4
+	  path so all A records are returned rather than just the first; false-negative
+	  forward confirmation was possible when a cloud provider PTR resolves to a
+	  multi-A hostname and the confirming IP is not the first record returned.
+	  Falls back to inet_aton() on resolvers that return no results for a
+	  dotted-quad string (resolver-configuration-dependent behaviour)
+	[ Bug Fixes ]
+	- Correct minimum Perl version to 5.014 (was 5.006_001); Socket::getaddrinfo
+	  and Socket::getnameinfo require Socket 2.000, first shipped with Perl 5.14
+	- Correct MIN_PERL_VERSION to '5.014' in Makefile.PL accordingly
+	- Fix all_denied() early-return guard: allow_countries was incorrectly
+	  included in the guard, causing allow_country()-only ACLs to fall through
+	  to the country-check code.  The country check then denied requests when
+	  lingua->country() returned undef (e.g. during RIPE WHOIS rate-limiting),
+	  contradicting the documented "allow_country alone has no effect" behaviour.
+	  allow_countries is now intentionally absent from the guard so ACLs with
+	  only allow_country() set return 0 (allow all) immediately.
+	[ Tests ]
+	- Add 5 subtests for deny_all_countries() in t/function.t
+	- Fix t/locales.t, t/country.t, t/integration.t: add CGI::Lingua result
+	  caching (lingua_for() with local $_ to prevent $_ clobbering by WHOIS
+	  modules inside map/grep), RIPE rate-limit detection, and SKIP blocks so
+	  tests that depend on RIPE WHOIS resolve gracefully when the server is
+	  rate-limiting.  Reduces WHOIS round-trips per test run from O(N subtests)
+	  to O(distinct IPs) (338 tests total)
+	- Fix all_denied() country check entry condition: replace
+	  "if(deny_countries || allow_countries)" with "if(deny_countries)".
+	  Premise: allow_countries alone always produces 0 in non-wildcard mode.
+	  Conclusion: it is vacuous in the condition and triggers an unnecessary
+	  lingua lookup; removing it is a strict boolean reduction.  Transitive
+	  reduction also removes the now-redundant inner "$self->{deny_countries} &&"
+	  guards (proved non-nil by the block entry condition)
+	- Apply fail-fast guard-clause style to allow_ip(), deny_country(),
+	  allow_country(): each error path is a guard at the top with explicit
+	  return; the happy path is at the bottom with no nesting
+	- Add t/logic_reducer.t: equivalence-partition proofs for all_denied() boolean
+	  logic; each subtest targets one decision boundary.  Includes the key proofs
+	  that deny_cloud()->allow_country('X') without lingua allows non-cloud IPs,
+	  and that allow_ip() + allow_country() (no deny_country) correctly denies
+	  unlisted IPs without carping about a missing lingua (339 tests total)
+	- Fix stale comment in t/extended_tests.t "deny_cloud + allow_country" subtest:
+	  the country check no longer runs in that case; the cloud fast-path returns 0
+	- Add t/function.t: 32 new white-box subtests covering all dispatch
+	  paths, new() clone isolation and cache-clearing, deny_country/allow_country empty-
+	  arrayref no-op and undef-element filtering, _set_countries() undef filtering,
+	  all_denied() absent-REMOTE_ADDR default, DNS exception fail-safe, $@ clearing
+	  after DNS/country exceptions, per-object cloud cache hit and isolation, non-blessed
+	  lingua deny, dying country() deny, deny_cloud+allow_country fast-path optimization,
+	  invalid CIDR eval guard, and all 8 _is_cloud_host() private-IP short-circuit paths
+	  verified with killing mocks
+	[ Security ]
+	- Fix all_denied() IP validator: replace ^ / $ anchors with \A / \z so that
+	  a trailing-newline REMOTE_ADDR ("1.2.3.4\n") cannot slip past the regex check;
+	  Perl's $ matches before a terminating \n, \z never does
+	- Fix all_denied(): add capture-based detaint step after IP validation so that $addr
+	  is never a tainted value downstream; any future caller of _is_cloud_host() or the
+	  CIDR lookup that adds an exec/system operation inherits a clean value
+	- Fix new() clone path: filter _* (private/cache) keys from caller-supplied params
+	  before merging; accepting _cloud_cache allowed a caller to pre-seed DNS cache
+	  entries to permanently suppress cloud detection for a targeted IP address
+	- Fix new() class path: strip _* keys from Object::Configure::configure() output;
+	  CGI__ACL__* env vars could previously inject _cloud_cache or _cidrlist state
+	- Fix allow_ip(): validate IP/CIDR format before storage; inject strings such as
+	  '"; DROP TABLE; --' were previously stored and silently discarded by the eval-
+	  wrapped Net::CIDR calls — now rejected early with a carp, preventing memory
+	  accumulation in persistent processes and O(n) cidradd overhead per request;
+	  allowed_ips is initialised to {} so the early-return guard treats the ACL as
+	  "has IP restrictions" even when all entries were invalid (fail-closed, not
+	  fail-open)
+	- Fix _is_cloud_host(): add RFC 1035 §3.1 hostname length check (>253 chars) before
+	  running cloud patterns; protocol-invalid hostnames from DNS are now rejected before
+	  any regex matching
+	- Fix t/function.t: add `use Carp` to prevent Test::Carp glob aliasing from clearing
+	  Carp::carp; the missing use caused subsequent calls to Carp::carp from allow_ip()
+	  to die with "Undefined subroutine" inside subtests that follow does_carp_that_matches
+	- Add t/edge_cases.t: two new security subtests — private cache key injection via
+	  new() (clone and class paths), and allow_ip() injection string behaviour change
+	  (carp+fail-closed instead of silent-store+deny) (373 tests total)
+	- Add t/unit.t: 51 new black-box subtests covering every public method's
+	  documented API contracts via a %ledger tracking hash; each entry represents
+	  a documented carp message or return state from the POD, deleted as conditions
+	  are triggered, asserted empty at the end; file-level DNS mock prevents real
+	  DNS calls; covers all three argument forms (positional, named key-value,
+	  hashref), $@ hygiene after DNS/lingua exceptions, and all method-chaining
+	  return-$self paths
+	- Extend t/integration.t: 9 new end-to-end subtests — deny_all_countries()
+	  workflow with real CGI::Lingua, clone cloud-cache isolation, concurrent
+	  country ACLs, SYNOPSIS §5 combined production policy (cloud + IP + country),
+	  SYNOPSIS §6 base→admin clone, deny_cloud+allow_country fast-path (no lingua
+	  consulted), Object::Configure _cloud_cache env-var injection stripping,
+	  CIDR cache invalidation after allow_ip(), and Test::Without::Module
+	  verification that IP-only ACLs work without CGI::Lingua installed
+	- Extend t/edge_cases.t: 20 new destructive/boundary/security subtests —
+	  REMOTE_ADDR \z anchor regression ("1.2.3.4\n" must be denied; $ passed it),
+	  leading/trailing whitespace in REMOTE_ADDR, typeglob as allow_ip argument
+	  (carps "not a valid", returns $self), hashref {ip=>addr} positive path,
+	  allow_ip with impossible CIDR prefix /33 (no carp, eval guard, fail-closed),
+	  IPv6 CIDR allow_ip (2001:db8::/32), 100-entry allow-list stress test, dying
+	  lingua->country() caught by eval (treated as unknown → deny), 64 KiB lingua
+	  return (no crash), typeglob as lingua argument (carps, returns 1), cloud
+	  cache TTL expiry forces re-query (DNS call count verified), 127.0.0.1
+	  bypasses _verified_rdns entirely (private IP short-circuit), CRLF-contaminated
+	  PTR hostname (no crash, no false cloud match), $@ cleared after DNS exception,
+	  $@ cleared after lingua->country() exception, $@ clean after normal call,
+	  injection string in deny_country (stored as literal lowercase, no execution),
+	  allow_country("*") alone does not deny (wildcard is inert without deny_country),
+	  multi-level clone chain (three levels, independent state), typeglob value in
+	  constructor argument (no crash, object still functional) (524 tests total)
+	[ Distribution ]
+	- Fix =encoding utf-8 placement: was after =head1 NAME / =head1 VERSION; moved
+	  to be the very first POD directive so parsers see it before any Unicode content
+	- Add Readonly to PREREQ_PM and cpanfile requires: used at runtime for every
+	  module constant ($PRIVATE_IP_RE, @CLOUD_PATTERNS, $DNS_TIMEOUT, etc.) but was
+	  previously undeclared, causing installation failure on clean systems
+	- Add Scalar::Util to PREREQ_PM and cpanfile requires: used at runtime for
+	  blessed() in the lingua type check; was undeclared
+	- Add Socket >= 2.000 to PREREQ_PM and cpanfile requires: getaddrinfo,
+	  getnameinfo, inet_pton, inet_ntop, AF_INET6, and NI_NUMERICHOST all require
+	  Socket 2.000; MIN_PERL_VERSION 5.014 implies it but the explicit pin is
+	  clearer and guards against a manually downgraded Socket on a 5.14 system
+	- Remove File::Spec from PREREQ_PM: the module itself does not use File::Spec;
+	  it was only needed by Makefile.PL (which is not installed); it was also
+	  listed twice with conflicting versions (3.4 in PREREQ_PM, 0 in TEST_REQUIRES)
+	- Add Test::Warn to TEST_REQUIRES and cpanfile test block: used by t/edge_cases.t
+	  for warning_is{} but was undeclared, causing test failures on clean installers
+	- Add Readonly to TEST_REQUIRES and cpanfile test block: used in 8 test files
+	- Remove Data::Dumper from TEST_REQUIRES: confirmed unused in all test files
+	- Remove autodie, strict, warnings from TEST_REQUIRES: core pragmas always
+	  available at MIN_PERL_VERSION 5.014; listing them adds install noise
+	- Move WWW::RT::CPAN from TEST_REQUIRES to cpanfile develop block: only used
+	  by t/noopentickets.t which is gated by Test::DescribeMe qw(author) and skips
+	  gracefully when the module is absent; not a burden for normal installers
+
 0.09	Sun Aug  2 08:54:20 PM EDT 2026
 	[ Performance ]
 	- Skip DNS lookup entirely in _is_cloud_host() for private, loopback, and

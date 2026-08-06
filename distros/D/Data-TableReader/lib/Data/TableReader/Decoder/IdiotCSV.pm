@@ -1,13 +1,12 @@
 package Data::TableReader::Decoder::IdiotCSV;
 use Moo 2;
-use Try::Tiny;
 use Carp;
 use Log::Any '$log';
 
 extends 'Data::TableReader::Decoder::CSV';
 
 # ABSTRACT: Access rows of a badly formatted comma-delimited text file
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 
 sub _build_parser {
@@ -36,7 +35,7 @@ Data::TableReader::Decoder::IdiotCSV - Access rows of a badly formatted comma-de
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 
@@ -78,7 +77,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

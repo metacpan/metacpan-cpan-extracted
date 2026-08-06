@@ -35,11 +35,13 @@ xh_h2x_native(xh_h2x_ctx_t *ctx, xh_char_t *key, I32 key_len, SV *value)
             xh_xml_write_start_node(&ctx->writer, key, key_len);
 
         if (len > 1 && ctx->opts.canonical) {
+            ENTER;
             sorted_hash = xh_sort_hash((HV *) value, len);
+            SAVEDESTRUCTOR_X(xh_sort_hash_free, sorted_hash);
             for (i = 0; i < len; i++) {
                 xh_h2x_native(ctx, sorted_hash[i].key, sorted_hash[i].key_len, sorted_hash[i].value);
             }
-            free(sorted_hash);
+            LEAVE;
         }
         else {
             hv_iterinit((HV *) value);
@@ -101,11 +103,13 @@ xh_h2d_native(xh_h2x_ctx_t *ctx, xmlNodePtr rootNode, xh_char_t *key, I32 key_le
         rootNode = xh_dom_new_node(ctx, rootNode, key, key_len, NULL, FALSE);
 
         if (len > 1 && ctx->opts.canonical) {
+            ENTER;
             sorted_hash = xh_sort_hash((HV *) value, len);
+            SAVEDESTRUCTOR_X(xh_sort_hash_free, sorted_hash);
             for (i = 0; i < len; i++) {
                 xh_h2d_native(ctx, rootNode, sorted_hash[i].key, sorted_hash[i].key_len, sorted_hash[i].value);
             }
-            free(sorted_hash);
+            LEAVE;
         }
         else {
             hv_iterinit((HV *) value);

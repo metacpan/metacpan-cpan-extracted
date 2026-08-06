@@ -964,6 +964,12 @@ c23_nodiscard bool infix_executable_make_executable(infix_executable_t * exec,
     for (uintptr_t addr = start & ~(i_line_size - 1); addr < end; addr += i_line_size)
         __asm__ __volatile__("ic ivau, %0" ::"r"(addr) : "memory");
     __asm__ __volatile__("dsb ish\n\tisb" ::: "memory");
+#elif defined(INFIX_ARCH_RISCV)
+    // `__builtin___clear_cache` expands to `fence.i`, which lives in the Zifencei
+    // extension. Some RISC-V toolchains (e.g. OpenBSD's egcc with a newer binutils)
+    // do not enable Zifencei in the default `-march` and reject the opcode, so
+    // enable it explicitly for the flush.
+    __asm__ __volatile__(".option arch, +zifencei\n\tfence.i" ::: "memory");
 #else
     // Use the GCC/Clang built-in for other platforms.
     __builtin___clear_cache((char *)exec->rw_ptr, (char *)exec->rw_ptr + exec->size);

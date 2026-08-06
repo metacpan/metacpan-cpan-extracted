@@ -1,7 +1,7 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to Apache2::API::Password, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to Apache2::API, including, but not limited to bug reports, feature requests, general comments, and patches.
 
 Feel free to clone it from its gitlab repository at <https://gitlab.com/deguest/Apache2-API> and issue a pull request.
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/degues
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Apache2-API-Password-v0.1.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Apache2-API-v0.5.4/README.md)
 
 ## Author
 

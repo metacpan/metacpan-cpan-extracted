@@ -22,6 +22,14 @@ typedef struct ft_conn {
     SV           *loop_sv;     /* foreign loop object (IO::Async/AnyEvent/
                                 * Hyperman); interest is armed by calling its
                                 * _ft_arm method. NULL for the native loop. */
+    /* Hyperman-direct mode: when the foreign loop is a Fetch::Loop::Hyperman
+     * and Hyperman's C ABI resolved (ft_hm.h), interest and deadlines go
+     * straight through the table - no _ft_arm dispatch, no Perl frame per
+     * readiness event. loop_sv is still held (it keeps the loop alive) but
+     * its methods are never called while hm is set. */
+    const hm_abi *hm;          /* the resolved table, or NULL       */
+    void         *hm_loop;     /* opaque Hyperman loop handle       */
+    hm_abi_timer *hm_timer;    /* pending deadline handle, or NULL  */
     int           fd;
     int           armed;       /* HM_EV_* currently watched */
     ft_http_state state;
@@ -117,10 +125,15 @@ static void ft_h2_free(ft_conn *c);   /* defined in ft_h2.h */
 static void ft_loop_arm(pTHX_ ft_conn *c, int mask);       /* foreign, below */
 static void ft_loop_untimer(pTHX_ ft_conn *c);             /* foreign, below */
 static void ft_arm(pTHX_ ft_conn *c, int mask);            /* below */
+static void ft_hm_ready(pTHX_ int fd, int mask, void *ud); /* hm-direct, below */
 
 /* Cancel a pending deadline timer (nothing to do if it already fired: the
- * fire path clears c->timer/c->timer_h before running). */
+ * fire path clears c->timer/c->timer_h/c->hm_timer before running). */
 static void ft_conn_cancel_timer(pTHX_ ft_conn *c) {
+    if (c->hm_timer) {
+        if (!PL_dirty) c->hm->timer_cancel(aTHX_ c->hm_loop, c->hm_timer);
+        c->hm_timer = NULL;
+    }
     if (c->timer)   { ft_del_timer(aTHX_ c->loop, c->timer); c->timer = NULL; }
     if (c->timer_h) { ft_loop_untimer(aTHX_ c); }
 }
@@ -128,6 +141,10 @@ static void ft_conn_cancel_timer(pTHX_ ft_conn *c) {
 /* Set by the UA immediately before ft_h1_start so a freshly created connection
  * inherits its simple_response mode (single-threaded loop; safe as a static). */
 static int ft_conn_simple_next = 0;
+
+/* Likewise the UA's Hyperman-direct mode (ft_hm.h): both set, or both NULL. */
+static const hm_abi *ft_conn_hm_next = NULL;
+static void *ft_conn_hm_loop_next = NULL;
 
 /* Likewise for the optional on_headers callback (borrowed; consumed at conn
  * create/revive). Fired once, before the body, with ($status, [k,v,...]). */
@@ -156,8 +173,16 @@ static void ft_conn_free(pTHX_ ft_conn *c) {
     ft_tls_free(c);
     if (c->fd >= 0) {
         if (c->armed) {
-            if (c->loop_sv) ft_loop_arm(aTHX_ c, 0);
-            else            ft_unwatch_io(aTHX_ c->loop, c->fd, c->armed);
+            if (c->hm) {
+                if (!PL_dirty) {   /* at global destruction the loop may be gone */
+                    if (c->armed & HM_EV_READ)
+                        c->hm->io_unwatch(aTHX_ c->hm_loop, c->fd, HM_ABI_READ);
+                    if (c->armed & HM_EV_WRITE)
+                        c->hm->io_unwatch(aTHX_ c->hm_loop, c->fd, HM_ABI_WRITE);
+                }
+            }
+            else if (c->loop_sv) ft_loop_arm(aTHX_ c, 0);
+            else                 ft_unwatch_io(aTHX_ c->loop, c->fd, c->armed);
         }
         ft_os_close(c->fd);
     }
@@ -519,7 +544,19 @@ static void ft_loop_untimer(pTHX_ ft_conn *c) {
 /* Re-arm the loop for the readiness direction(s) we currently need. */
 static void ft_arm(pTHX_ ft_conn *c, int mask) {
     if (c->armed == mask) return;
-    if (c->loop_sv) {
+    if (c->hm) {
+        /* Hyperman-direct: reconcile per direction through the C ABI, so an
+         * unchanged direction is left alone (no drop+re-add churn). */
+        int drop = c->armed & ~mask, add = mask & ~c->armed;
+        if (drop & HM_EV_READ)
+            c->hm->io_unwatch(aTHX_ c->hm_loop, c->fd, HM_ABI_READ);
+        if (drop & HM_EV_WRITE)
+            c->hm->io_unwatch(aTHX_ c->hm_loop, c->fd, HM_ABI_WRITE);
+        if (add & HM_EV_READ)
+            c->hm->io_watch(aTHX_ c->hm_loop, c->fd, HM_ABI_READ, ft_hm_ready, c);
+        if (add & HM_EV_WRITE)
+            c->hm->io_watch(aTHX_ c->hm_loop, c->fd, HM_ABI_WRITE, ft_hm_ready, c);
+    } else if (c->loop_sv) {
         ft_loop_arm(aTHX_ c, mask);
     } else {
         if (c->armed) ft_unwatch_io(aTHX_ c->loop, c->fd, c->armed);
@@ -751,10 +788,34 @@ XS_INTERNAL(ft_conn_timeout_cb) {
     XSRETURN_EMPTY;
 }
 
+/* Hyperman-direct (hm_abi) callbacks: same behavior as the closures above,
+ * with the ft_conn as ud - no CV, no Perl call frame. */
+static void ft_hm_ready(pTHX_ int fd, int mask, void *ud) {
+    ft_conn *c = (ft_conn *)ud;
+    PERL_UNUSED_VAR(fd);
+    PERL_UNUSED_VAR(mask);
+    if (c->state == FT_PARKED) {   /* readable while idle: the server hung up */
+        if (c->pool) ft_pool_remove(c->pool, c);
+        ft_conn_free(aTHX_ c);
+        return;
+    }
+    ft_conn_step(aTHX_ c);
+}
+
+static void ft_hm_timeout(pTHX_ void *ud) {
+    ft_conn *c = (ft_conn *)ud;
+    c->hm_timer = NULL;            /* the handle died with the fire */
+    ft_conn_fail(aTHX_ c, "request timed out");
+}
+
 /* Arm the per-request deadline (seconds). Native loop uses the C timer;
  * a foreign loop is asked via _ft_timer. */
 static void ft_conn_arm_timeout(pTHX_ ft_conn *c, double secs) {
     if (secs <= 0) return;
+    if (c->hm) {   /* precise one-shot kernel timer, C callback, cancellable */
+        c->hm_timer = c->hm->timer(aTHX_ c->hm_loop, secs, ft_hm_timeout, c);
+        return;
+    }
     c->timer_cb = hm_closure(aTHX_ ft_conn_timeout_cb, NULL, NULL, NULL, NULL,
                              PTR2IV(c), 0);
     if (c->loop_sv) ft_loop_timer(aTHX_ c, secs);
@@ -891,8 +952,11 @@ static SV *ft_h1_start(pTHX_ ft_loop *loop, SV *loop_sv, ft_pool *pool,
     memcpy(c->req, req_bytes, req_len);
     c->req_len = req_len;
 
-    c->watcher = hm_closure(aTHX_ ft_conn_ready_cb, NULL, NULL, NULL, NULL,
-                            PTR2IV(c), 0);
+    c->hm      = ft_conn_hm_next;        /* Hyperman-direct mode, per UA */
+    c->hm_loop = ft_conn_hm_loop_next;
+    if (!c->hm)   /* the hm path never fires a coderef; skip building one */
+        c->watcher = hm_closure(aTHX_ ft_conn_ready_cb, NULL, NULL, NULL, NULL,
+                                PTR2IV(c), 0);
     ft_arm(aTHX_ c, HM_EV_WRITE);   /* wait for connect() to complete */
     ft_conn_arm_timeout(aTHX_ c, timeout);
     return future;

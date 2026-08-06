@@ -1,0 +1,11 @@
+lib/Object/Cache/Sqlite.pm
+t/01-basic.t
+t/02-expiry.t
+t/03-serialization.t
+Makefile.PL
+README.md
+Changes
+LICENSE
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

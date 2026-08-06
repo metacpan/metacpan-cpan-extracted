@@ -1,4 +1,4 @@
-# Copyright 2026 Google LLC
+# Copyright 2026 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,27 +19,26 @@ use Test::Exception;
 use Test::LWP::UserAgent;
 use HTTP::Response;
 
-BEGIN
-{
-    $ENV{TESTING} = 1;
-    use_ok('Google::Auth::IDTokens::KeySources') || print "Bail out!\n";
-    use_ok('Google::Auth::IDTokens::Verifier')   || print "Bail out!\n";
+BEGIN {
+  $ENV{TESTING} = 1;
+  use_ok('Google::Auth::IDTokens::KeySources') || print "Bail out!\n";
+  use_ok('Google::Auth::IDTokens::Verifier')   || print "Bail out!\n";
 }
 
 my $oidc_token =
-    'eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ5MjcxMGE3ZmNkYjE1Mzk2MGNlMDFmNzYwNTIwY'
-  . 'TMyYzg0NTVkZmYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJodHRwOi8vZXhhbXBsZS5jb20'
-  . 'iLCJhenAiOiI1NDIzMzkzNTc2MzgtY3IwZHNlcnIyZXZnN3N2MW1lZ2hxZXU3MDMyNzRm'
-  . 'M2hAZGV2ZWxvcGVyLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJlbWFpbCI6IjU0MjMzOTM1N'
-  . 'zYzOC1jcjBkc2VycjJldmc3c3YxbWVnaHFldTcwMzI3NGYzaEBkZXZlbG9wZXIuZ3Nlcn'
-  . 'ZpY2VhY2NvdW50LmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJleHAiOjE1OTEzNDI'
-  . '3NzYsImlhdCI6MTU5MTMzOTE3NiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUu'
-  . 'Y29tIiwic3ViIjoiMTA0MzQxNDczMTMxODI1OTU3NjAzIn0.GGDE_5HoLacyqdufdxnAC'
-  . 'rXxYySKQYAzSQ5qfGjSUriuO3uLm2-rwSPFfLzzBeflEHdVX7XRFFszpxKajuZklF4dXd'
-  . '0evB1u5i3QeCJ8MSZKKx6qus_ETJv4rtuPNEuyhaRcShB7BwI8RY0IZ4_EDrhYqYInrO2'
-  . 'wQyJGYvc41JcmoKzRoNnEVydN0Qppt9bqevq_lJg-9UjJkJ2QHjPfTgMjwhLIgNptKgtR'
-  . 'qdoRpJmleFlbuUqyPPJfAzv3Tc6h3kw88tEcI8R3n04xmHOSMwERFFQYJdQDMd2F9SSDe'
-  . 'rh40codO_GuPZ7bEUiKq9Lkx2LH5TuhythfsMzIwJpaEA';
+  'eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ5MjcxMGE3ZmNkYjE1Mzk2MGNlMDFmNzYwNTIwY' .
+  'TMyYzg0NTVkZmYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJodHRwOi8vZXhhbXBsZS5jb20' .
+  'iLCJhenAiOiI1NDIzMzkzNTc2MzgtY3IwZHNlcnIyZXZnN3N2MW1lZ2hxZXU3MDMyNzRm' .
+  'M2hAZGV2ZWxvcGVyLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJlbWFpbCI6IjU0MjMzOTM1N' .
+  'zYzOC1jcjBkc2VycjJldmc3c3YxbWVnaHFldTcwMzI3NGYzaEBkZXZlbG9wZXIuZ3Nlcn' .
+  'ZpY2VhY2NvdW50LmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJleHAiOjE1OTEzNDI' .
+  '3NzYsImlhdCI6MTU5MTMzOTE3NiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUu' .
+  'Y29tIiwic3ViIjoiMTA0MzQxNDczMTMxODI1OTU3NjAzIn0.GGDE_5HoLacyqdufdxnAC' .
+  'rXxYySKQYAzSQ5qfGjSUriuO3uLm2-rwSPFfLzzBeflEHdVX7XRFFszpxKajuZklF4dXd' .
+  '0evB1u5i3QeCJ8MSZKKx6qus_ETJv4rtuPNEuyhaRcShB7BwI8RY0IZ4_EDrhYqYInrO2' .
+  'wQyJGYvc41JcmoKzRoNnEVydN0Qppt9bqevq_lJg-9UjJkJ2QHjPfTgMjwhLIgNptKgtR' .
+  'qdoRpJmleFlbuUqyPPJfAzv3Tc6h3kw88tEcI8R3n04xmHOSMwERFFQYJdQDMd2F9SSDe' .
+  'rh40codO_GuPZ7bEUiKq9Lkx2LH5TuhythfsMzIwJpaEA';
 
 my $oidc_jwk_body = q{
 {
@@ -57,80 +56,88 @@ my $oidc_jwk_body = q{
 };
 
 my $expected_oidc_aud = 'http://example.com';
-my $expected_oidc_azp = '542339357638-cr0dserr2evg7sv1meghqeu703274f3h@developer.gserviceaccount.com';
+my $expected_oidc_azp =
+  '542339357638-cr0dserr2evg7sv1meghqeu703274f3h@developer.gserviceaccount.com';
 my $unexpired_oidc_test_time = 1591339181;
 
 # Stub HTTP mock user agent
 package KeySourcesTest;
 our $useragent = Test::LWP::UserAgent->new();
+
 package main;
 
 my $ua = $KeySourcesTest::useragent;
 $ua->unmap_all();
 $ua->map_response(
-    qr/oauth2\/v3\/certs/,
-    HTTP::Response->new( '200', 'OK', [ 'Content-Type' => 'application/json' ], $oidc_jwk_body )
-);
+  qr/oauth2\/v3\/certs/,
+  HTTP::Response->new(
+    '200', 'OK', ['Content-Type' => 'application/json'],
+    $oidc_jwk_body
+  ));
 
 subtest 'Custom Verifier Instantiation and Validation' => sub {
-    my $key_source = Google::Auth::IDTokens::JwkHttpKeySource->new({
-        uri => 'https://www.googleapis.com/oauth2/v3/certs'
-    });
+  my $key_source = Google::Auth::IDTokens::JwkHttpKeySource->new({
+    uri => 'https://www.googleapis.com/oauth2/v3/certs'
+  });
 
-    # Instantiate Verifier with defaults
-    my $verifier = Google::Auth::IDTokens::Verifier->new(
-        key_source => $key_source,
-        aud        => $expected_oidc_aud,
-        azp        => $expected_oidc_azp,
-        iss        => 'https://accounts.google.com'
+  # Instantiate Verifier with defaults
+  my $verifier = Google::Auth::IDTokens::Verifier->new(
+    key_source => $key_source,
+    aud        => $expected_oidc_aud,
+    azp        => $expected_oidc_azp,
+    iss        => 'https://accounts.google.com'
+  );
+
+  # Perform verify
+  my $payload = eval {
+    $verifier->verify($oidc_token, time_now => $unexpired_oidc_test_time);
+  };
+  is($@, '', 'verify succeeded without throwing');
+  ok(defined $payload, 'payload is defined');
+
+  # Aud array check support
+  my $payload_arr = eval {
+    $verifier->verify(
+      $oidc_token,
+      aud      => ['hello.com', $expected_oidc_aud],
+      time_now => $unexpired_oidc_test_time
     );
+  };
+  is($@, '', 'verify succeeded with custom aud array');
+  ok(defined $payload_arr, 'payload_arr is defined');
 
-    # Perform verify
-    my $payload = eval {
-        $verifier->verify( $oidc_token, time_now => $unexpired_oidc_test_time );
-    };
-    is( $@, '', 'verify succeeded without throwing' );
-    ok( defined $payload, 'payload is defined' );
+  # Fails with aud mismatch
+  throws_ok {
+    $verifier->verify(
+      $oidc_token,
+      aud      => 'mismatch.com',
+      time_now => $unexpired_oidc_test_time
+    );
+  }
+  qr/AudienceMismatchError: Token aud mismatch/, 'throws AudienceMismatchError';
 
-    # Aud array check support
-    my $payload_arr = eval {
-        $verifier->verify(
-            $oidc_token,
-            aud      => [ 'hello.com', $expected_oidc_aud ],
-            time_now => $unexpired_oidc_test_time
-        );
-    };
-    is( $@, '', 'verify succeeded with custom aud array' );
-    ok( defined $payload_arr, 'payload_arr is defined' );
+  # Fails with azp mismatch
+  throws_ok {
+    $verifier->verify(
+      $oidc_token,
+      azp      => 'mismatch_azp',
+      time_now => $unexpired_oidc_test_time
+    );
+  }
+  qr/AuthorizedPartyMismatchError: Token azp mismatch/,
+    'throws AuthorizedPartyMismatchError';
 
-    # Fails with aud mismatch
-    throws_ok {
-        $verifier->verify(
-            $oidc_token,
-            aud      => 'mismatch.com',
-            time_now => $unexpired_oidc_test_time
-        );
-    } qr/AudienceMismatchError: Token aud mismatch/, 'throws AudienceMismatchError';
+  # Fails with iss mismatch
+  throws_ok {
+    $verifier->verify(
+      $oidc_token,
+      iss      => 'mismatch_issuer.com',
+      time_now => $unexpired_oidc_test_time
+    );
+  }
+  qr/IssuerMismatchError: Token iss mismatch/, 'throws IssuerMismatchError';
 
-    # Fails with azp mismatch
-    throws_ok {
-        $verifier->verify(
-            $oidc_token,
-            azp      => 'mismatch_azp',
-            time_now => $unexpired_oidc_test_time
-        );
-    } qr/AuthorizedPartyMismatchError: Token azp mismatch/, 'throws AuthorizedPartyMismatchError';
-
-    # Fails with iss mismatch
-    throws_ok {
-        $verifier->verify(
-            $oidc_token,
-            iss      => 'mismatch_issuer.com',
-            time_now => $unexpired_oidc_test_time
-        );
-    } qr/IssuerMismatchError: Token iss mismatch/, 'throws IssuerMismatchError';
-    
-    done_testing();
+  done_testing();
 };
 
 done_testing();

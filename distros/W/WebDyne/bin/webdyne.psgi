@@ -44,7 +44,7 @@ use WebDyne::PSGI::Constant;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.008';
+$VERSION='3.009';
 
 
 #  Check for supporting modules
@@ -162,6 +162,14 @@ sub build {
     #  Build app code ref, options passed for builder
     #
     my $opt_hr=shift();
+
+
+    #  Read in local webdyne.conf.pl before middleware and app setup so
+    #  wrapper and external server loading use the same root config.
+    #
+    &local_constant_load($opt_hr->{'root'});
+
+
     my $builder_or=Plack::Builder->new();
     
     
@@ -247,12 +255,7 @@ sub startup {
     }
     
 
-    #  Read in local webdyne.conf.pl
-    #
-    &local_constant_load($opt_hr->{'root'});
-
-
-    #  Get app code ref from WebDyne::PAGI
+    #  Get app code ref from WebDyne::PSGI
     #
     my $app_cr=&build($opt_hr);
 
@@ -419,6 +422,8 @@ This script is a frontend to the WebDyne PSGI stack. In addition to `Plack::Runn
 * **WEBDYNE_***
 
     Supplies the relevant WebDyne settings used by the PSGI modules.
+
+When the PSGI app is built, the wrapper also reads local WebDyne configuration from `DOCUMENT_ROOT/.webdyne.conf.pl`. This applies both when `webdyne.psgi` is launched directly and when it is loaded by an external PSGI server such as `plackup` or `starman`.
 
 # AUTHOR
 
@@ -662,6 +667,7 @@ Supplies the relevant WebDyne settings used by the PSGI modules.
 
 =back
 
+When the PSGI app is built, the wrapper also reads local WebDyne configuration from C<DOCUMENT_ROOT/.webdyne.conf.pl>. This applies both when C<webdyne.psgi> is launched directly and when it is loaded by an external PSGI server such as C<plackup> or C<starman>.
 
 =head1 AUTHOR
 

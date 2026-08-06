@@ -1,7 +1,7 @@
 ---
 abstract: 'BIMI object'
 author:
-  - 'Marc Bradshaw <marc@marcbradshaw.net>'
+  - 'Jemma Bradshaw <jemma@nothingbutstatic.dev>'
 build_requires:
   App::Cmd::Tester: '0'
   Capture::Tiny: '0'
@@ -73,7 +73,7 @@ requires:
 resources:
   bugtracker: https://github.com/marcbradshaw/mail-bimi/issues
   repository: git://github.com/marcbradshaw/mail-bimi.git
-version: '3.20260302'
+version: '3.20260806'
 x_contributors:
   - 'Andrew Davis <adavis@fastmailteam.com>'
   - 'Freddie Leeman <freddie@freddieleeman.nl>'
@@ -81,6 +81,7 @@ x_contributors:
   - 'Keith Ealanta <kealanta@fastmailteam.com>'
   - 'Kurt Starsinic <kstarsinic@gmail.com>'
   - 'Marc Bradshaw <marc@fastmailteam.com>'
+  - 'Marc Bradshaw <marc@marcbradshaw.net>'
   - 'Norikatsu Shigemura <nork@ninth-nine.com>'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'

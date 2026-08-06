@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,22 +33,24 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "File::Spec" : "3.4",
             "Net::CIDR" : "0",
             "Object::Configure" : "0",
             "Params::Get" : "0",
+            "Readonly" : "0",
             "Regexp::Common" : "0",
+            "Scalar::Util" : "0",
+            "Socket" : "2.000",
+            "Sub::Protected" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.006002"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
             "CGI::Lingua" : "0.15",
-            "Data::Dumper" : "0",
             "English" : "0",
-            "File::Spec" : "0",
             "IPC::System::Simple" : "0",
+            "Readonly" : "0",
             "Test::Carp" : "0",
             "Test::CleanNamespaces" : "0",
             "Test::DescribeMe" : "0",
@@ -59,11 +61,10 @@
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
-            "Test::Returns" : "0",
-            "WWW::RT::CPAN" : "0",
-            "autodie" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "Test::Returns" : "0.03",
+            "Test::Warn" : "0",
+            "Test::Without::Module" : "0",
+            "WWW::RT::CPAN" : "0"
          }
       }
    },
@@ -81,6 +82,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-ACL"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

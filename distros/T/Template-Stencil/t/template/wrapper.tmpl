@@ -1,0 +1,11 @@
+<html>
+	<head>
+		{% for js_script in js_scripts %}
+		<script src="{% js_script %}">
+		</script>
+		{% end %}
+	</head>
+	<body>
+		{% content %}
+	</body>
+</html>

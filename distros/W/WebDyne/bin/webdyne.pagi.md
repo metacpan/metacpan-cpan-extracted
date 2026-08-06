@@ -155,7 +155,7 @@ This script is a frontend to the WebDyne PAGI stack. It uses WebDyne configurati
 
     Supplies the relevant WebDyne settings used by the PAGI modules.
 
-When launched from the command line, the wrapper also reads local WebDyne configuration from `DOCUMENT_ROOT/.webdyne.conf.pl` before starting the PAGI runner.
+When the PAGI app is built, the wrapper also reads local WebDyne configuration from `DOCUMENT_ROOT/.webdyne.conf.pl`. This applies both when `webdyne.pagi` is launched directly and when it is loaded by an external PAGI server.
 
 Relevant PAGI-specific settings from `WebDyne::PAGI::Constant` include:
 

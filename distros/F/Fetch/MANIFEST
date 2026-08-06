@@ -15,6 +15,7 @@ include/fetch/ft_core.h
 include/fetch/ft_future.h
 include/fetch/ft_h2.h
 include/fetch/ft_headers.h
+include/fetch/ft_hm.h
 include/fetch/ft_http.h
 include/fetch/ft_json.h
 include/fetch/ft_loop.h
@@ -22,6 +23,7 @@ include/fetch/ft_tls.h
 include/fetch/ft_ua.h
 include/fetch/ft_win.h
 include/fetch/ft_ws.h
+include/fetch/hm_abi.h
 lib/Fetch.pm
 lib/Fetch/CookieJar.pm
 lib/Fetch/Future.pm

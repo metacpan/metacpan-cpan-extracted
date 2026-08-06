@@ -1,0 +1,29 @@
+Revision history for PAGI::FastAPI::Security
+
+0.0.2   2026-08-05
+        [DOCUMENTATION]
+        - Updated SYNOPSIS code.
+
+0.0.1   2026-08-05
+        - Initial release.
+        - PAGI::FastAPI::Security::HTTPBearer - Obtain authorization via
+          bearer token  while return 401 error with WWW-Authenticate: Bearer
+          in case of failure.
+        - PAGI::FastAPI::Security::HTTPBasic - Acquire authorization using
+          given Base64 username and password <base64>, and return 401 error
+          message with WWW-Authenticate: Basic with realm="..." on failing.
+        - PAGI::FastAPI::Security::APIKey - Extract API key from request
+          header, query string, or cookie and return error code 403 if this
+          action fails. Reads query string directly and doesn't depend on
+          declared query types, which allows to avoid requiring a protected
+          route to specify API key as a query parameter.
+        - PAGI::FastAPI::Security::OAuth2::PasswordBearer - Handles extraction
+          of OAuth2 bearer token (with the same wire format as HTTPBearer)
+          and obtaining token_url/scopes metadata so it could be used for
+          creating securitySchemes for OpenAPI in the future. Token endpoint
+          and verification are not implemented in former entity.
+        - All schemes implement auto_error parameter (by default set to true)
+          for routes that use optional authentication.
+        - None of the schemes check user's credentials (there’s no inclusion
+          of JWT/crypto library) and thus it's left for the application to
+          verify.

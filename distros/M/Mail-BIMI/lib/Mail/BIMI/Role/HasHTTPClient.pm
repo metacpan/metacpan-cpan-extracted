@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::HasHTTPClient;
 # ABSTRACT: Class to model a HTTP client
-our $VERSION = '3.20260302'; # VERSION
+our $VERSION = '3.20260806'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI::Prelude;
@@ -93,7 +93,7 @@ Mail::BIMI::Role::HasHTTPClient - Class to model a HTTP client
 
 =head1 VERSION
 
-version 3.20260302
+version 3.20260806
 
 =head1 DESCRIPTION
 
@@ -122,11 +122,11 @@ to catch timeouts that the HTTP::Tiny timeout does not catch.
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

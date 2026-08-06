@@ -1,3 +1,10 @@
+0.05 2026-08-06T10:59:53+02:00
+ - Add support for compressed input file.
+ - Remove XXX from tests.
+ - Rewrite doc to use =head1 EXAMPLES.
+ - Sort modules in EXAMPLE section in doc.
+ - Update copyright years.
+
 0.04 2025-01-06T23:15:32+01:00
  - Finish cover testing.
  - Fix count.

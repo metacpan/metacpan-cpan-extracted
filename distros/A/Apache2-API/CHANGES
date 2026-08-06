@@ -1,5 +1,8 @@
 Revision history for Perl module Apache2::API
 
+v0.5.5 2026-08-05T23:04:36+0900
+    - Added support for retry_after property of a JSON response, which will set the HTTP header Retry-After.
+
 v0.5.4 2026-06-17T21:14:20+0900
     - No API change.
     - Updated dependencies for DateTime::Lite

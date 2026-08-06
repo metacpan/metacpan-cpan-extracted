@@ -1,4 +1,4 @@
-# Copyright 2026 Google LLC
+# Copyright 2026 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,117 +26,140 @@ use Google::Auth::Exceptions;
 use Google::Auth::RetryHelper;
 use Log::Any qw($log);
 
-our $VERSION = '0.06';
-
 has base_credentials => (
-    is       => 'ro',
-    required => 0,
+  is       => 'ro',
+  required => 0,
 );
 
 has source_credentials => (
-    is       => 'ro',
-    required => 0,
+  is       => 'ro',
+  required => 0,
 );
 
 has impersonation_url => (
-    is       => 'ro',
-    required => 1,
+  is       => 'ro',
+  required => 1,
 );
 
 has scope => (
-    is       => 'ro',
-    required => 1,
+  is       => 'ro',
+  required => 1,
 );
 
 has ua => (
-    is      => 'ro',
-    default => sub { LWP::UserAgent->new( timeout => 10 ) },
+  is      => 'ro',
+  default => sub {
+    my $ua = LWP::UserAgent->new(timeout => 10);
+    $ua->env_proxy;
+    return $ua;
+  },
 );
 
 around BUILDARGS => sub {
-    my ( $orig, $class, @args ) = @_;
-    my $args = $class->$orig(@args);
+  my ($orig, $class, @args) = @_;
+  my $args = $class->$orig(@args);
 
-    if ( my $json = $args->{json_key} ) {
-        $args->{impersonation_url} //= $json->{service_account_impersonation_url};
-        $args->{scope}             //= $json->{scopes};
-        if ( my $source_creds_info = $json->{source_credentials} ) {
-            if ( $source_creds_info->{type} eq 'impersonated_service_account' ) {
-                Google::Auth::Error->throw('Source credentials can\'t be of type impersonated_service_account, use delegates to chain impersonation.');
-            }
-            require Google::Auth::DefaultCredentials;
-            $args->{source_credentials} //= Google::Auth::DefaultCredentials->make_creds(
-                json_key => $source_creds_info,
-            );
-        }
+  if (my $json = $args->{json_key}) {
+    $args->{impersonation_url} //= $json->{service_account_impersonation_url};
+    $args->{scope}             //= $json->{scopes};
+    if (my $source_creds_info = $json->{source_credentials}) {
+      if ($source_creds_info->{type} eq 'impersonated_service_account') {
+        Google::Auth::Error->throw(
+'Source credentials can\'t be of type impersonated_service_account, use delegates to chain impersonation.'
+        );
+      }
+      require Google::Auth::DefaultCredentials;
+      $args->{source_credentials} //=
+        Google::Auth::DefaultCredentials->make_creds(
+        json_key => $source_creds_info,);
     }
+  }
 
-    if ( !defined $args->{source_credentials} && !defined $args->{base_credentials} ) {
-        Google::Auth::Error->throw('Missing required option: either source_credentials or base_credentials must be provided');
-    }
+  if ( !defined $args->{source_credentials}
+    && !defined $args->{base_credentials})
+  {
+    Google::Auth::Error->throw(
+'Missing required option: either source_credentials or base_credentials must be provided'
+    );
+  }
 
-    $args->{source_credentials} //= $args->{base_credentials};
+  $args->{source_credentials} //= $args->{base_credentials};
 
-    return $args;
+  return $args;
 };
 
 sub BUILD {
-    my ($self) = @_;
+  my ($self) = @_;
 
-    my $source_creds = $self->source_credentials;
-    if ( $source_creds->isa('Google::Auth::ImpersonatedServiceAccountCredentials') ) {
-        Google::Auth::Error->throw('Source credentials can\'t be of type impersonated_service_account, use delegates to chain impersonation.');
-    }
+  my $source_creds = $self->source_credentials;
+  if ($source_creds->isa('Google::Auth::ImpersonatedServiceAccountCredentials'))
+  {
+    Google::Auth::Error->throw(
+'Source credentials can\'t be of type impersonated_service_account, use delegates to chain impersonation.'
+    );
+  }
 }
 
 sub fetch_access_token {
-    my ( $self, %options ) = @_;
+  my ($self, %options) = @_;
 
-    my $source_creds = $self->source_credentials;
-    my $source_token;
+  $self->_validate_url($self->impersonation_url, 'impersonation_url');
 
-    if ( $source_creds->can('get_token') ) {
-        $log->tracef('Fetching source credentials token using get_token...');
-        $source_token = $source_creds->get_token(%options);
-    }
-    elsif ( $source_creds->can('access_token') && defined $source_creds->access_token ) {
-        $log->tracef('Using cached access_token from source credentials...');
-        $source_token = $source_creds->access_token;
-    }
-    elsif ( $source_creds->can('fetch_access_token') ) {
-        $log->tracef('Fetching source credentials token using fetch_access_token...');
-        $source_token = $source_creds->fetch_access_token(%options);
-    }
-    else {
-        $log->errorf('Source credentials do not contain a valid token retrieval mechanism');
-        Google::Auth::Error->throw('Source credentials do not have a valid access token or fetch_access_token method');
-    }
+  my $source_creds = $self->source_credentials;
+  my $source_token;
 
-    my $req_body = encode_json({
-        scope => ref $self->scope eq 'ARRAY' ? $self->scope : [ $self->scope ]
-    });
+  if ($source_creds->can('get_token')) {
+    $log->tracef('Fetching source credentials token using get_token...');
+    $source_token = $source_creds->get_token(%options);
+  } elsif ($source_creds->can('access_token')
+    && defined $source_creds->access_token)
+  {
+    $log->tracef('Using cached access_token from source credentials...');
+    $source_token = $source_creds->access_token;
+  } elsif ($source_creds->can('fetch_access_token')) {
+    $log->tracef(
+      'Fetching source credentials token using fetch_access_token...');
+    $source_token = $source_creds->fetch_access_token(%options);
+  } else {
+    $log->errorf(
+      'Source credentials do not contain a valid token retrieval mechanism');
+    Google::Auth::Error->throw(
+'Source credentials do not have a valid access token or fetch_access_token method'
+    );
+  }
 
-    my $ua = $self->ua;
-    $log->infof('Requesting impersonated access token from %s...', $self->impersonation_url);
-    my $response = Google::Auth::RetryHelper->execute_with_retry(sub {
-        my $res = $ua->post(
-            $self->impersonation_url,
-            'Content-Type'  => 'application/json',
-            'Authorization' => 'Bearer ' . $source_token,
-            'Content'       => $req_body
-        );
-        if ( !$res->is_success ) {
-            $log->warnf('Impersonated token exchange failed: status %s', $res->code);
-            Google::Auth::Error->throw('Service account impersonation failed with status ' . $res->code . ': ' . $res->decoded_content);
-        }
-        return $res;
-    }, %options);
+  my $req_body = encode_json({
+      scope => ref $self->scope eq 'ARRAY' ? $self->scope : [$self->scope]});
 
-    my $res_data = decode_json($response->decoded_content);
-    $self->access_token($res_data->{accessToken});
-    $self->expires_at($res_data->{expireTime});
+  my $ua = $self->ua;
+  $log->infof('Requesting impersonated access token from %s...',
+    $self->impersonation_url);
+  my $response = Google::Auth::RetryHelper->execute_with_retry(
+    sub {
+      my $res = $ua->post(
+        $self->impersonation_url,
+        'Content-Type'  => 'application/json',
+        'Authorization' => 'Bearer ' . $source_token,
+        'Content'       => $req_body
+      );
+      if (!$res->is_success) {
+        $log->warnf('Impersonated token exchange failed: status %s',
+          $res->code);
+        Google::Auth::Error->throw(
+          'Service account impersonation failed with status ' .
+            $res->code . ': ' .
+            $res->decoded_content);
+      }
+      return $res;
+    },
+    %options
+  );
 
-    return $res_data->{accessToken};
+  my $res_data = decode_json($response->decoded_content);
+  $self->access_token($res_data->{accessToken});
+  $self->expires_at($res_data->{expireTime});
+
+  return $res_data->{accessToken};
 }
 
 1;

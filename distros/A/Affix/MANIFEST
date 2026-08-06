@@ -21,6 +21,10 @@ infix/src/arch/aarch64/abi_arm64.c
 infix/src/arch/aarch64/abi_arm64_common.h
 infix/src/arch/aarch64/abi_arm64_emitters.c
 infix/src/arch/aarch64/abi_arm64_emitters.h
+infix/src/arch/riscv/abi_riscv64.c
+infix/src/arch/riscv/abi_riscv64_common.h
+infix/src/arch/riscv/abi_riscv64_emitters.c
+infix/src/arch/riscv/abi_riscv64_emitters.h
 infix/src/arch/x64/abi_sysv_x64.c
 infix/src/arch/x64/abi_win_x64.c
 infix/src/arch/x64/abi_x64_common.h
@@ -116,6 +120,8 @@ t/084_enum_aliases.t
 t/085_simd_m256.t
 t/090_cb_struct_byval.t
 t/091_cb_struct_member.t
+t/092_struct_signature_layout.t
+t/093_malloc_lifeline.t
 t/900_leak.t
 t/999_marshaller_2.t
 t/src/std.h

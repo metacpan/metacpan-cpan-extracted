@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC.
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,11 +26,9 @@ Google::Auth::EnvironmentVars - Environment variables used by Google::Auth
 
 =head1 VERSION
 
-Version 0.05
+Version 0.09
 
 =cut
-
-our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -47,9 +45,9 @@ Library.
 =cut
 
 has PROJECT => (
-    is            => 'ro',
-    builder       => sub { $ENV{GOOGLE_CLOUD_PROJECT} },
-    documentation => 'Environment variable defining default project',
+  is            => 'ro',
+  builder       => sub { $ENV{GOOGLE_CLOUD_PROJECT} },
+  documentation => 'Environment variable defining default project',
 );
 
 =head2 LEGACY_PROJECT
@@ -60,10 +58,10 @@ situations (such as Google App Engine).
 =cut
 
 has LEGACY_PROJECT => (
-    is            => 'ro',
-    builder       => sub { $ENV{GCLOUD_PROJECT} },
-    documentation =>
-        'Previously used environment variable defining the default project',
+  is            => 'ro',
+  builder       => sub { $ENV{GCLOUD_PROJECT} },
+  documentation =>
+    'Previously used environment variable defining the default project',
 );
 
 =head2 CREDENTIALS
@@ -74,9 +72,9 @@ default credentials
 =cut
 
 has CREDENTIALS => (
-    is            => 'ro',
-    builder       => sub { $ENV{GOOGLE_APPLICATION_CREDENTIALS} },
-    documentation =>
+  is            => 'ro',
+  builder       => sub { $ENV{GOOGLE_APPLICATION_CREDENTIALS} },
+  documentation =>
 'Environment variable defining the location of Google application default credentials',
 );
 
@@ -87,9 +85,9 @@ The environment variable name which can replace ~/.config if set
 =cut
 
 has CLOUD_SDK_CONFIG_DIR => (
-    is            => 'ro',
-    builder       => sub { $ENV{CLOUDSDK_CONFIG} },
-    documentation =>
+  is            => 'ro',
+  builder       => sub { $ENV{CLOUDSDK_CONFIG} },
+  documentation =>
 q{Environment variable defines the location of Google Cloud SDK's config files},
 );
 
@@ -101,11 +99,11 @@ addresses used when contacting the GCE metadata service.
 =cut
 
 has GCE_METADATA_ROOT => (
-    is            => 'ro',
-    builder       => sub { $ENV{GCE_METADATA_ROOT} },
-    documentation =>
-'Environment variable providing an alternate hostname or host:port to be '
-        . 'used for GCE metadata requests',
+  is            => 'ro',
+  builder       => sub { $ENV{GCE_METADATA_ROOT} },
+  documentation =>
+    'Environment variable providing an alternate hostname or host:port to be '
+    . 'used for GCE metadata requests',
 );
 
 =head2 GCE_METADATA_IP
@@ -113,11 +111,11 @@ has GCE_METADATA_ROOT => (
 =cut
 
 has GCE_METADATA_IP => (
-    is            => 'ro',
-    builder       => sub { $ENV{GCE_METADATA_IP} },
-    documentation =>
+  is            => 'ro',
+  builder       => sub { $ENV{GCE_METADATA_IP} },
+  documentation =>
 'Environment variable providing an alternate ip:port to be used for ip-only '
-        . 'GCE metadata requests',
+    . 'GCE metadata requests',
 );
 
 =head1 AUTHOR
@@ -154,7 +152,7 @@ L<https://metacpan.org/release/Google-Auth>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020,2021 Google LLC
+Copyright 2020 Google LLC and contributors
 
 This program is released under the following license: Apache 2.0
 

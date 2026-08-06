@@ -5,6 +5,15 @@ Revision history for Perl extension Sereal-Decoder
 *          of the decoder before upgrading to version 5 of the *
 *          encoder!                                            *
 ****************************************************************
+5.010
+    * Reset the pending frozen-object state (thaw_av and ref_thawhash) at the
+      start of every decode. A decode that died before srl_finalize_structure
+      ran -- a truncated document, for example -- left those populated, and the
+      next decode on the same decoder then thawed items belonging to the failed
+      document and looked up ref_thawhash keys pointing at freed AVs. That
+      segfaulted or silently produced the wrong class.
+      See https://github.com/Sereal/Sereal/pull/316
+
 5.009
     * Only use Perl's C<$Config{ccflags}> when building bundled zstd on
       AIX / IBM toolchains, or when C<SEREAL_ZSTD_USE_CONFIG_CCFLAGS> is

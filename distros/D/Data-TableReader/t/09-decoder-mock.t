@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Try::Tiny;
 use Log::Any '$log';
 use Log::Any::Adapter 'TAP';
 use Data::TableReader::Decoder::Mock;

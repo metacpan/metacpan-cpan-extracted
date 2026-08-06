@@ -27,8 +27,6 @@
 #
 
 use v5.36;
-use warnings;
-
 use Future::AsyncAwait;
 use Types::Standard qw(Int Str);
 use PAGI::FastAPI;
@@ -42,6 +40,12 @@ my $app = PAGI::FastAPI->new(
 $app->add_cors(allow_origins => ['*']);
 
 # 2. Asynchronous Dependencies
+#    NOTE: this hand-rolled 'eq' comparison against a hardcoded token is
+#    for demo purposes only. For a real app, use PAGI::FastAPI::Security
+#    (e.g. PAGI::FastAPI::Security::HTTPBearer) to get proper 401 +
+#    WWW-Authenticate handling, then verify the extracted token yourself
+#    (JWT signature check, DB/cache lookup, etc.), see that module's
+#    docs for a full example with Crypt::JWT.
 my $get_db = async sub ($c) {
     return { status => 'connected', pool_size => 5 };
 };

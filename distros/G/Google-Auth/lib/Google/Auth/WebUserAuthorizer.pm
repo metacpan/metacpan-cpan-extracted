@@ -1,4 +1,4 @@
-# Copyright 2022 Google, LLC
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@ package Google::Auth::WebUserAuthorizer;
 
 use JSON::MaybeXS;
 use strict;
-
-our $VERSION = '0.06';
 
 my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 
@@ -91,13 +89,12 @@ my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 # @param [Rack::Request] request
 #  Current request
 
-sub handle_auth_callback_deferred
-{
-    my ( $self,           $request )      = @_;
-    my ( $callback_state, $redirect_uri ) = extract_callback_state($request);
-    $request->{session}->{ $self->{CALLBACK_STATE_KEY} } =
-        $coder->encode($callback_state);
-    $redirect_uri;
+sub handle_auth_callback_deferred {
+  my ($self,           $request)      = @_;
+  my ($callback_state, $redirect_uri) = extract_callback_state($request);
+  $request->{session}->{$self->{CALLBACK_STATE_KEY}} =
+    $coder->encode($callback_state);
+  $redirect_uri;
 
 =begin comment
       def self.handle_auth_callback_deferred request
@@ -122,8 +119,7 @@ sub handle_auth_callback_deferred
 #  URL (either absolute or relative) of the auth callback. Defaults
 #  to '/oauth2callback'
 
-sub initialize
-{
+sub initialize {
 
 =begin comment
       def initialize client_id, scope, token_store, callback_uri = nil
@@ -144,8 +140,7 @@ sub initialize
 # @return (Google::Auth::UserRefreshCredentials, String)
 #  credentials & next URL to redirect to
 
-sub handle_auth_callback
-{
+sub handle_auth_callback {
 
 =begin comment
       def handle_auth_callback user_id, request
@@ -184,8 +179,7 @@ sub handle_auth_callback
 # @return [String]
 #  Authorization url
 
-sub get_authorization_url
-{
+sub get_authorization_url {
 
 =begin comment
 
@@ -227,8 +221,7 @@ sub get_authorization_url
 #  May raise an error if an authorization code is present in the session
 #  and exchange of the code fails
 
-sub get_credentials
-{
+sub get_credentials {
 
 =begin comment
 
@@ -254,8 +247,7 @@ sub get_credentials
 
 }
 
-sub extract_callback_state
-{
+sub extract_callback_state {
 
 =begin comment
 
@@ -286,8 +278,7 @@ sub extract_callback_state
 # @param [Rack::Request] request
 #  Current request
 
-sub validate_callback_state
-{
+sub validate_callback_state {
 
 =begin comment
 

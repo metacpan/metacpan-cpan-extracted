@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use v5.20;
+use warnings;
 use Text::Stencil;
 
 my @users = (
@@ -12,7 +13,7 @@ my @users = (
 
 # skip inactive users, sort by score descending
 my $s = Text::Stencil->new(
-    header      => " #  | Name    | Score\n" . ('-' x 30) . "\n",
+    header      => " # | Name    | Score\n" . ("-" x 24) . "\n",
     row         => '{#:pad:2} | {name:rpad:7} | {score:int}',
     separator   => "\n",
     skip_unless => 'active',

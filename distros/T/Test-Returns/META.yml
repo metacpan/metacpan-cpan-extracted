@@ -4,6 +4,7 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  IPC::System::Simple: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
@@ -23,11 +24,11 @@ no_index:
 requires:
   Carp: '0'
   Exporter: '0'
-  Return::Set: '0.01'
+  Return::Set: '0.04'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/nigelhorne/Test-Returns/issues
   homepage: https://metacpan.org/pod/Test::Returns
   repository: git://github.com/nigelhorne/Test-Returns.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

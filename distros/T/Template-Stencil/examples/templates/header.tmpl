@@ -1,0 +1,4 @@
+<header>
+  <h1>{% title | upper %}</h1>
+  {% if user %}<p>hello, {% user.name %}</p>{% else %}<p>hello, guest</p>{% end %}
+</header>

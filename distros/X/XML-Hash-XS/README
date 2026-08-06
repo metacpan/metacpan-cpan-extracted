@@ -7,6 +7,7 @@ SYNOPSIS
 
         my $xmlstr = hash2xml \%hash;
         hash2xml \%hash, output => $fh;
+        hash2xml \%hash, output_cb => sub { my ($chunk) = @_; print $chunk };
 
         my $hash = xml2hash $xmlstr;
         my $hash = xml2hash \$xmlstr;
@@ -21,6 +22,16 @@ SYNOPSIS
         my $conv   = XML::Hash::XS->new(utf8 => 0, encoding => 'utf-8')
         my $xmlstr = $conv->hash2xml(\%hash, utf8 => 1);
         my $hash   = $conv->xml2hash($xmlstr, encoding => 'cp1251');
+
+    For incremental XML input, create a parser:
+
+        my $parser = XML::Hash::XS::Parser->new(keep_root => 1);
+        $parser->feed('<root><item>one</item>');
+        $parser->feed('<item>two</item></root>');
+        my $hash = $parser->finish;
+
+    Chunks must be UTF-8; bytes are retained only when a token spans two
+    calls to "feed".
 
 DESCRIPTION
     This module implements simple hash to XML and XML to hash conversion
@@ -135,6 +146,13 @@ OPTIONS
         if output is FH, XML document writes directly to a filehandle or a
         stream.
 
+    output_cb [ = undef ] *# hash2xml*
+        Callback invoked as "sub { my ($chunk) = @_ }" for each generated
+        XML chunk. The complete XML string is not accumulated and "hash2xml"
+        returns undef. Chunk size is controlled by "buf_size", except that a
+        single value may require a larger chunk. "output" and "output_cb"
+        are mutually exclusive.
+
     canonical [ = 0 ] *# hash2xml*
         if canonical is "1", converter will be write hashes sorted by key.
 
@@ -226,6 +244,23 @@ OPTIONS
             # 111
             # 222
             # 333
+
+        The callback may return "XML_HASH_XS_STOP" to stop successfully
+        after the current matched node. Other return values preserve the
+        legacy behaviour and continue parsing.
+
+    cb_mode [ = 'node' ] *# xml2hash*
+        With "cb_mode => 'events'" the callback receives "($event, $value,
+        $meta)". A "start" event contains element "name", "path", "depth"
+        and "attributes" in $meta. Returning "XML_HASH_XS_SKIP" from "start"
+        skips construction of the element contents and suppresses its "end"
+        event. "end" receives the completed node in $value.
+
+        The control constants are imported explicitly:
+
+            use XML::Hash::XS qw(
+                XML_HASH_XS_CONTINUE XML_HASH_XS_STOP XML_HASH_XS_SKIP
+            );
 
     method [ = 'NATIVE' ] *# hash2xml*
         experimental support the conversion methods other libraries

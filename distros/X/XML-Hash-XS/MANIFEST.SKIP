@@ -58,7 +58,10 @@
 #!end included /usr/lib64/perl5/vendor_perl/5.12.4/ExtUtils/MANIFEST.SKIP
 
 
-\B\.travis.yml$
+\B\.github\b
+\B\.idea\b
+\B\.claude\b
+^DEVELOPMENT_PLAN\.md$
 \.o$
 XS\.c$
 \.bs$

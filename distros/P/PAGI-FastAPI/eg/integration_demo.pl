@@ -1,6 +1,8 @@
-use v5.36;
+#!/usr/bin/env perl
 
-use lib 'lib';
+use v5.36;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Future::AsyncAwait;
 use Types::Standard qw(Str);
 use PAGI::FastAPI;

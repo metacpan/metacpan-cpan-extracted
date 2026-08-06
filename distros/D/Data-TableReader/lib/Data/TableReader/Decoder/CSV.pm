@@ -1,12 +1,11 @@
 package Data::TableReader::Decoder::CSV;
 use Moo 2;
-use Try::Tiny;
 use Carp;
 use IO::Handle;
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Access rows of a comma-delimited text file
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 our @csv_probe_modules= ( ['Text::CSV_XS' => 1.06], ['Text::CSV' => 1.91] );
 our $default_csv_module;
@@ -34,16 +33,23 @@ sub _build_parser {
 
 has autodetect_encoding => ( is => 'rw', default => sub { 1 } );
 
+sub BUILD {
+	my ($self, $args)= @_;
+	$self->encoding($args->{encoding}) if defined $args->{encoding};
+}
+
 sub encoding {
 	my ($self, $enc)= @_;
 	my $fh= $self->file_handle;
 	if (defined $enc) {
+		# protect against binmode string injection
+		croak "invalid/unknown encoding '$enc'" unless Encode::find_encoding($enc);
 		binmode($fh, ":encoding($enc)");
 		return $enc;
 	}
 	
 	my @layers= PerlIO::get_layers($fh);
-	if (($enc)= grep { /^encoding|^utf/ } @layers) {
+	if (($enc)= grep { /^encoding|^utf/i } @layers) {
 		# extract encoding name
 		return 'UTF-8' if $enc eq 'utf8';
 		return uc($1) if $enc =~ /encoding\(([^)]+)\)/;
@@ -202,7 +208,7 @@ Data::TableReader::Decoder::CSV - Access rows of a comma-delimited text file
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 
@@ -280,7 +286,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

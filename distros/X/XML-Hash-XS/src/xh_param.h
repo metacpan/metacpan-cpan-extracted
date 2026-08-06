@@ -15,7 +15,8 @@ void xh_param_assign_int(xh_char_t *name, xh_int_t *param, SV *value);
 xh_bool_t xh_param_assign_bool(SV *value);
 void xh_param_assign_pattern(xh_pattern_t *param, SV *value);
 void xh_param_assign_filter(xh_pattern_t *param, SV *value);
-SV *xh_param_assign_cb(char *name, SV *value);
+void xh_param_assign_cb(SV **param, char *name, SV *value);
+void xh_param_assign_output(SV **param, SV *value);
 
 #define XH_PARAM_LEN 32
 
@@ -53,19 +54,6 @@ SV *xh_param_assign_cb(char *name, SV *value);
 #define XH_PARAM_READ_INT(var, name, def_value)         \
     if ( (sv = get_sv(name, 0)) != NULL ) {             \
         var = SvIV(sv);                                 \
-    }                                                   \
-    else {                                              \
-        var = def_value;                                \
-    }
-
-#define XH_PARAM_READ_REF(var, name, def_value)         \
-    if ( (sv = get_sv(name, 0)) != NULL ) {             \
-        if ( SvOK(sv) && SvROK(sv) ) {                  \
-            var = sv;                                   \
-        }                                               \
-        else {                                          \
-            var = NULL;                                 \
-        }                                               \
     }                                                   \
     else {                                              \
         var = def_value;                                \

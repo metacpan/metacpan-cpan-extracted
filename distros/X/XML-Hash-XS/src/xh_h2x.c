@@ -11,7 +11,7 @@ xh_h2x(xh_h2x_ctx_t *ctx)
     XCPT_TRY_START
     {
         xh_stack_init(&ctx->stash, XH_H2X_STASH_SIZE, sizeof(SV *));
-        xh_writer_init(&ctx->writer, ctx->opts.encoding, ctx->opts.output, ctx->opts.buf_size, ctx->opts.indent, ctx->opts.trim);
+        xh_writer_init(&ctx->writer, ctx->opts.encoding, ctx->opts.output, ctx->opts.output_cb, ctx->opts.buf_size, ctx->opts.indent, ctx->opts.trim, ctx->opts.utf8);
 
         if (ctx->opts.xml_decl) {
             xh_xml_write_xml_declaration(&ctx->writer, ctx->opts.version, ctx->opts.encoding);
@@ -36,22 +36,25 @@ xh_h2x(xh_h2x_ctx_t *ctx)
             default:
                 croak("Invalid method");
         }
+
+        result = xh_writer_flush(&ctx->writer);
     } XCPT_TRY_END
 
     XCPT_CATCH
     {
         xh_stash_clean(&ctx->stash);
-        result = xh_writer_flush(&ctx->writer);
-        if (result != NULL && result != &PL_sv_undef) {
-            SvREFCNT_dec(result);
+        if (ctx->opts.output_cb == NULL) {
+            result = xh_writer_flush(&ctx->writer);
+            if (result != NULL && result != &PL_sv_undef) {
+                SvREFCNT_dec(result);
+            }
         }
         xh_writer_destroy(&ctx->writer);
         XCPT_RETHROW;
     }
 
     xh_stash_clean(&ctx->stash);
-    result = xh_writer_flush(&ctx->writer);
-    if (result != NULL && ctx->opts.utf8) {
+    if (result != NULL && result != &PL_sv_undef && ctx->opts.utf8) {
 #ifdef XH_HAVE_ENCODER
         if (ctx->writer.encoder == NULL) {
             SvUTF8_on(result);

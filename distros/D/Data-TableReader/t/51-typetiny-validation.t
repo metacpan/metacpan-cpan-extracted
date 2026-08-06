@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Try::Tiny;
 use File::Spec::Functions 'catfile';
 use Log::Any '$log';
 use Log::Any::Adapter 'TAP', filter => 'warn';

@@ -53,16 +53,10 @@ The Perl interface (similar to the Python and C++ versions) is
    $result_code = $opt->last_optimize_result;
 
 The Perl API throws exceptions on failures, similar to the behavior of
-the C++ and Python API's. Where the C API returns error codes,
-"Math::NLopt" throws objects in similarly named exception classes:
-
-  Math::NLopt::Exception::Failure
-  Math::NLopt::Exception::OutOfMemory
-  Math::NLopt::Exception::InvalidArgs
-  Math::NLopt::Exception::RoundoffLimited>
-  Math::NLopt::Exception::ForcedStop
-
-These all extend the Math::NLopt::Exception class; see it for more
+the C++ and Python APIs. Where the C API returns an error code,
+"Math::NLopt" normally returns the corresponding numeric result code on
+success and throws an object in the corresponding exception class on
+failure. These classes extend Math::NLopt::Exception; see it for more
 information on retrieving messages from the objects.
 
   Constants
@@ -82,10 +76,43 @@ Importing result codes is similar:
   use Math::NLopt 'NLOPT_FORCED_STOP';
   use Math::NLopt ':results';
 
-As are the utility subroutines:
+  NLopt Results, Errors and Exceptions
 
-  use Math::NLopt 'algorithm_from_string';
-  use Math::NLopt ':utils';
+   Result codes
+
+While most methods (excluding "new" and "optimize") return a result code
+of NLOPT_SUCCESS upon success, they will all throw on error.
+
+Methods returning arrays or other values either return that value or
+throw if the underlying operation fails.
+
+   Exceptions
+
+"Math::NLopt" will throw exceptions if the underlying NLopt library
+detects an error.
+
+Unfortunately, this behavior affects the results returned by "optimize",
+which are lost when an exception is raised. Depending upon the error,
+the results may actually be valid, so this is truly unfortunate.
+
+There are a couple of ways to avoid the loss of information.
+
+*   The simplest is to retrieve them via the "last_optimum_params"
+    method.
+
+*   Disable exceptions from NLopt result codes for "optimize" via the
+    "set_exceptions_enabled" method. This is the approach used by the
+    Python and C++ APIs.
+
+    "optimize" will always return the last set of evaluated parameters.
+    However, the caller will have to call "last_optimize_result" to
+    determine how the optimization concluded, and whether the results
+    are valid.
+
+    Disabling exceptions only affects errors reported by "optimize".
+    Other methods continue to throw exceptions, and exceptions thrown by
+    user-provided objective, constraint, or pre-conditioner callbacks
+    are always propagated.
 
   Callbacks
 
@@ -97,6 +124,14 @@ The callback subroutines are called with a user-provided structure which
 can be used to pass additional information to the callback (or the
 subroutines can use closures).
 
+   Exceptions thrown by Callback subroutines
+
+Exceptions thrown by callback subroutines during processing by
+"optimize" are caught so that they do not unwind through the NLopt C
+stack. The optimization is halted with a forced stop (as if by
+"force_stop") and the original exception is rethrown after NLopt has
+returned. "last_optimize_result" will return "NLOPT_FORCED_STOP".
+
    Objective Functions
 
 Objective functions callbacks are registered via either
@@ -104,8 +139,8 @@ Objective functions callbacks are registered via either
   $opt->set_min_objective( \&func, ?$data );
   $opt->set_max_objective( \&func, ?$data );
 
-where $data is an optional structure passed to the callback which can be
-used for any purpose.
+where $data is an optional scalar, reference, or other Perl value passed
+to the callback unchanged.
 
 The objective function has the signature
 
@@ -117,40 +152,69 @@ parameters, @params.
 if \@gradient is not "undef", it must be filled in by the objective
 function.
 
-$data is the structure registered with the callback. It will be "undef"
-if none was provided.
+$data is the value registered with the callback. It will be "undef" if
+none was provided.
 
   Non-linear Constraints
 
-Nonlinear constraint callbacks are registered via either of
+   Scalar-valued Constraints
 
-  $opt->add_equality_constraint( \&func, ?$data, ?$tol = 0 );
-  $opt->add_inequality_constraint( \&func, ?$data, ?$tol = 0 );
+Scalar constraint callbacks are registered via either of
 
-where $data is an optional structure passed to the callback which can be
-used for any purpose, and $tol is a tolerance. Pass "undef" for $data if
-a tolerance is required but $data is not.
+  $opt->add_equality_constraint( \&func, %options );
+  $opt->add_inequality_constraint( \&func, %options );
 
-The callbacks have the same signature as the objective callbacks.
+%options accepts the following entries.
+
+"tol" *scalar* [optional]
+    The tolerance. Defaults to 0.
+
+"data" [optional]
+    A structure passed to the callback function.
+
+The constraint function has the signature
+
+  $value = sub ( \@params, \@gradient, $data ) { ... }
+
+and must return exactly one numeric value, the value of the constraint
+function for the passed set of parameters, @params.
 
    Vector-valued Constraints
 
-Vector-valued constraint callbacks are registered via either of
+Vector-valued callbacks are registered via either of
 
-  $opt->add_equality_mconstraint( \&func, $m, ?$data, ?\@tol );
-  $opt->add_inequality_mconstraint( \&func, $m, ?$data, ?\@tol );
+  $opt->add_equality_mconstraint( \&func, %options );
+  $opt->add_inequality_mconstraint( \&func, %options );
 
-where $m is the length of the vector, $data is an optional structure
-passed on to the callback function, and @tol is an optional array of
-length $m containing the tolerance for each component of the vector
+%options accepts the following entries.
+
+"m" *integer*
+    The length of the vector.
+
+"tol" *arrayref*
+    An array of length "m" containing the tolerance for each component
+    of the vector.
+
+"data" [optional]
+    an optional scalar, reference, or other Perl value passed to the
+    callback unchanged.
+
+One of "m" or "tol" must be provided. If "tol" is provided without "m",
+its length is used for "m". If both are provided, the number of array
+elements in "tol" must be equal to "m".
 
 Vector valued constraints callbacks have the signature
 
   sub ( \@result, \@params, \@gradient, $data ) { ... }
 
 The $m length vector of constraints should be stored in "\@result". If
-"\@gradient" is not "undef", it is a *$n x $m* length array which should
-be filled by the callback.
+"\@gradient" is not "undef", it is an $m by $n two-dimensional array
+which should be filled by the callback.
+
+The outer dimension indexes the $m constraint components, and the inner
+dimension indexes the $n optimization parameters; in other words,
+"$gradient->[$i][$j]" is the derivative of constraint $i with respect to
+parameter $j.
 
 $data is the optional structure passed to the callback.
 
@@ -168,8 +232,8 @@ The "\&precond" fallback has this signature:
 
    sub (\@x, \@v, \@vpre, $data) {...}
 
-"\@x", "\@v", and "\@vpre" are arrays of length $n. "\@x", "\@v" are
-input and "\@vpre" should be filled in by the routine.
+"\@x", "\@v", and "\@vpre" are arrays of length $n. "\@x" and "\@v" are
+inputs. "\@vpre" must be filled in by the routine before it returns.
 
 INSTALLATION
 

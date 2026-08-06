@@ -1545,7 +1545,10 @@ SV * cast(pTHX_ SV * in, const char * name) {
     if (!addr)
         return &PL_sv_undef;
 
-    SV * owner = (SvROK(in) && sv_derived_from(in, "Affix::Memory")) ? SvRV(in) : nullptr;
+    /* Keep the blessed Affix::Memory object itself as the lifeline so the pin
+       holds a strong reference to it. This keeps the memory alive for as long as
+       any derived pin exists and lets free()/DESTROY locate the owner. */
+    SV * owner = (SvROK(in) && sv_derived_from(in, "Affix::Memory")) ? in : nullptr;
     infix_type * new_type = nullptr;
     infix_arena_t * local_arena = nullptr;
 

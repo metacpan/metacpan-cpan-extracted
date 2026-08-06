@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2022 Google LLC
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@ use Test::More;
 
 plan tests => 2;
 
-BEGIN
-{
-    use_ok('Google::Auth')                       || print "Bail out!\n";
-    use_ok('Google::Auth::IDTokens::KeySources') || print "Bail out!\n";
+BEGIN {
+  use_ok('Google::Auth')                       || print "Bail out!\n";
+  use_ok('Google::Auth::IDTokens::KeySources') || print "Bail out!\n";
 }
 note("Testing Google::Auth $Google::Auth::VERSION, Perl $], $^X");

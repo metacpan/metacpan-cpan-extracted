@@ -12,7 +12,11 @@ xh_writer_resize_buffer(xh_writer_t *writer, size_t inc)
 SV *
 xh_writer_flush_buffer(xh_writer_t *writer, xh_perl_buffer_t *buf)
 {
-    if (writer->perl_obj != NULL) {
+    if (writer->perl_cb != NULL) {
+        xh_writer_write_to_perl_cb(buf, writer->perl_cb, writer->utf8);
+        return &PL_sv_undef;
+    }
+    else if (writer->perl_obj != NULL) {
         xh_writer_write_to_perl_obj(buf, writer->perl_obj);
         return &PL_sv_undef;
     }
@@ -40,6 +44,7 @@ xh_writer_encode_buffer(xh_writer_t *writer, xh_perl_buffer_t *main_buf, xh_perl
     }
 
     xh_encoder_encode_perl_buffer(writer->encoder, main_buf, enc_buf);
+    main_buf->cur = main_buf->start;
 }
 #endif
 
@@ -66,7 +71,7 @@ xh_writer_flush(xh_writer_t *writer)
 void
 xh_writer_destroy(xh_writer_t *writer)
 {
-    if (writer->perl_obj != NULL || writer->perl_io != NULL) {
+    if (writer->perl_cb != NULL || writer->perl_obj != NULL || writer->perl_io != NULL) {
         if (writer->main_buf.scalar != NULL)
             SvREFCNT_dec(writer->main_buf.scalar);
 #ifdef XH_HAVE_ENCODER
@@ -85,10 +90,12 @@ xh_writer_destroy(xh_writer_t *writer)
 }
 
 void
-xh_writer_init(xh_writer_t *writer, xh_char_t *encoding, void *output, size_t size, xh_uint_t indent, xh_bool_t trim)
+xh_writer_init(xh_writer_t *writer, xh_char_t *encoding, SV *output, SV *output_cb, size_t size, xh_uint_t indent, xh_bool_t trim, xh_bool_t utf8)
 {
     writer->indent = indent;
     writer->trim   = trim;
+    writer->perl_cb = output_cb;
+    writer->utf8 = utf8;
 
     xh_perl_buffer_init(&writer->main_buf, size);
 
@@ -100,6 +107,7 @@ xh_writer_init(xh_writer_t *writer, xh_char_t *encoding, void *output, size_t si
         }
 
         xh_perl_buffer_init(&writer->enc_buf, size * 4);
+        writer->utf8 = FALSE;
 #else
         croak("Can't create encoder for '%s'", encoding);
 #endif
@@ -107,8 +115,14 @@ xh_writer_init(xh_writer_t *writer, xh_char_t *encoding, void *output, size_t si
 
     if (output != NULL) {
         MAGIC  *mg;
-        GV     *gv = (GV *) output;
-        IO     *io = GvIO(gv);
+        GV     *gv;
+        IO     *io;
+
+        if (SvTYPE(output) != SVt_PVGV)
+            croak("Can't use file handle as a PerlIO handle");
+
+        gv = (GV *) output;
+        io = GvIO(gv);
 
         if (!io)
             croak("Can't use file handle as a PerlIO handle");

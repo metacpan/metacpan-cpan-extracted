@@ -6,10 +6,12 @@ use warnings;
 use Class::Utils qw(set_params);
 use English;
 use Getopt::Std;
+use IO::Uncompress::AnyUncompress qw($AnyUncompressError);
+use MARC::Batch;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -45,14 +47,30 @@ sub run {
 	}
 	$self->{'_marc_xml_file'} = shift @ARGV;
 
-	my $marc_file = MARC::File::XML->in($self->{'_marc_xml_file'});
+	my ($fh, $errno);
+	if ($self->_open_marc_input($self->{'_marc_xml_file'}, \$fh, \$errno)) {
+		print STDERR "Cannot open file '$self->{'_marc_xml_file'}'.";
+		if (defined $errno) {
+			print STDERR "\tErrno: $errno\n";
+		}
+		return 1;
+	}
+	my $stream = 'XML';
+	my $marc_batch = eval {
+		MARC::Batch->new('XML', $fh);
+	};
+	if ($EVAL_ERROR) {
+		print STDERR "Cannot open MARC $stream stream.\n";
+		print STDERR "\tError: $EVAL_ERROR\n";
+		return 1;
+	}
 	my $ret_hr = {};
 	my $num = 0;
 	my $previous_record;
 	while (1) {
 		$num++;
 		my $record = eval {
-			$marc_file->next;
+			$marc_batch->next;
 		};
 		if ($EVAL_ERROR) {
 			print STDERR "Cannot process '$num' record. ".
@@ -77,8 +95,20 @@ sub run {
 	return 0;
 }
 
-1;
+sub _open_marc_input {
+	my ($self, $path, $fh_sr, $errno_sr) = @_;
 
+	# Compression autodetection.
+	${$fh_sr} = IO::Uncompress::AnyUncompress->new($path);
+	if (defined ${$fh_sr}) {
+		return 0;
+	}
+	${$errno_sr} = $AnyUncompressError;
+
+	return 1;
+}
+
+1;
 
 __END__
 
@@ -121,7 +151,9 @@ Returns 1 for error, 0 for success.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
 
-=head1 EXAMPLE
+=head1 EXAMPLES
+
+=head2 EXAMPLE
 
 =for comment filename=example_count.pl
 
@@ -129,8 +161,8 @@ Returns 1 for error, 0 for success.
  use warnings;
 
  use App::MARC::Count;
- use IO::Barf qw(barf);
  use File::Temp qw(tempfile);
+ use IO::Barf qw(barf);
  use MIME::Base64;
 
  # Content.
@@ -297,12 +329,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2025 Michal Josef Špaček
+© 2022-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

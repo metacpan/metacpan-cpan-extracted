@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<script src="lala.js">
+		</script>
+	</head>
+	<body>
+		Welcome
+		<div class="page-header">
+			This is a header > 3
+		</div>
+		<div class="first" data-item-loop="0" data-inner-loop="0">
+			one
+		</div>
+		<div class="other" data-item-loop="0" data-inner-loop="1">
+			two
+		</div>
+		<div class="other" data-item-loop="0" data-inner-loop="2">
+			three
+		</div>
+		<div class="first" data-item-loop="1" data-inner-loop="0">
+			four
+		</div>
+		<div class="other" data-item-loop="1" data-inner-loop="1">
+			five
+		</div>
+		<div class="other" data-item-loop="1" data-inner-loop="2">
+			six
+		</div>
+		<p>1 last item_loop only once</p>
+	</body>
+</html>

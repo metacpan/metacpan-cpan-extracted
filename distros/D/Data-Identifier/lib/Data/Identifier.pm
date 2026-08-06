@@ -13,13 +13,13 @@ use v5.20;
 use strict;
 use warnings;
 
-use parent qw(Data::Identifier::Interface::Known Data::Identifier::Interface::Userdata);
+use parent qw(Data::Identifier::Interface::Known Data::Identifier::Interface::Userdata Data::Identifier::Interface::Simple);
 
 use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.33;
+our $VERSION = v0.34;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -91,7 +91,8 @@ my %well_known = (
 
     # Unofficial, not part of public API:
     # Also used by Data::Identifier::Util!
-    unicodecp => __PACKAGE__->new($well_known_uuid => WK_UNICODE_CP, validate => RE_UNICODE, generate => 'id-based'),
+    unicodecp   => __PACKAGE__->new($well_known_uuid => WK_UNICODE_CP, validate => RE_UNICODE, generate => 'id-based'),
+    chat0w      => __PACKAGE__->new($well_known_uuid => WK_CHAT0W,     validate => RE_UINT),
 
     hdi  => __PACKAGE__->new($well_known_uuid => WK_HDI, validate => RE_UINT),
     udi  => __PACKAGE__->new($well_known_uuid => WK_UDI, validate => RE_UINT),
@@ -1121,7 +1122,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.33
+version v0.34
 
 =head1 SYNOPSIS
 
@@ -1157,6 +1158,7 @@ Also note that deduplication is done with performance in mind. This means that t
 guarantee for two equal identifiers to become deduplicated. See also L</register>.
 
 This package inherits from L<Data::Identifier::Interface::Known> (since v0.06),
+L<Data::Identifier::Interface::Simple> (since v0.34),
 and L<Data::Identifier::Interface::Userdata> (since v0.14).
 
 =head2 OPTIONS
@@ -1620,6 +1622,9 @@ Otherwise returns the identifier itself.
 
 If C<$identifier> is not an instance of this package is parsed as with C<from> in L</new>.
 In this case it's undefined if the orginal value or an instance of this package is returned.
+
+See also
+L<Data::Identifier::Util/register_type> (specifically C<null_value>).
 
 =head2 is_null
 

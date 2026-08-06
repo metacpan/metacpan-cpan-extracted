@@ -131,6 +131,8 @@ This script is a frontend to the WebDyne PSGI stack. In addition to `Plack::Runn
 
     Supplies the relevant WebDyne settings used by the PSGI modules.
 
+When the PSGI app is built, the wrapper also reads local WebDyne configuration from `DOCUMENT_ROOT/.webdyne.conf.pl`. This applies both when `webdyne.psgi` is launched directly and when it is loaded by an external PSGI server such as `plackup` or `starman`.
+
 # AUTHOR
 
 Andrew Speer <andrew.speer@isolutions.com.au>

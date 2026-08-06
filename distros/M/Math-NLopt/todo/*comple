@@ -1,0 +1,64 @@
+• Analysis found a real exception-safety concern, but no confirmed Perl-level leak in the current build.
+
+  Each wrapper establishes a Perl temporary scope:
+
+  - lib/Math/NLopt.xs:361
+  - lib/Math/NLopt.xs:455
+  - lib/Math/NLopt.xs:546
+
+  They all follow this pattern:
+
+  ENTER;
+  SAVETMPS;
+  ...
+  call_sv(...);
+  ...
+  LEAVE;
+
+  However, several paths can throw before LEAVE:
+
+  - the Perl callback dies;
+  - proxy_func() receives the wrong number of return values;
+  - validate_av_length() rejects a callback-provided array;
+  - cp_av_to_double() or related conversion code fails.
+
+  The callback calls also use G_SCALAR/G_VOID without G_EVAL, so a Perl exception propagates directly through NLopt’s C call stack. That can
+  bypass both the wrapper’s LEAVE and any cleanup NLopt expects after its callback returns. Perl’s exception unwinding cleaned up the
+  observed Perl temporaries in testing, but this is not an explicit or robust cleanup boundary for C allocations.
+
+  I verified the following manually:
+
+  - callback exceptions from all three wrappers are caught by Perl;
+  - the optimizer can be used again afterward in this build;
+  - Test::LeakTrace reported zero Perl leaks for callback exceptions in all three wrappers;
+  - wrong callback output lengths also produced no reported Perl leaks.
+
+  That does not establish that NLopt’s own C allocations are leak-free; Test::LeakTrace cannot detect every C-side allocation skipped by a
+  longjmp.
+
+  The recommended fix is to make each wrapper exception-safe:
+
+  1. invoke the callback with G_EVAL;
+  2. copy $@ immediately if an exception occurred;
+  3. perform PUTBACK, FREETMPS, and LEAVE;
+  4. rethrow the saved exception afterward.
+
+  The same cleanup discipline should apply to validation failures after the callback, rather than allowing validate_av_length() to croak
+  while the temporary scope is active.
+
+  The missing regression coverage should exercise, for each wrapper:
+
+  - callback die;
+  - wrong scalar return count for proxy_func;
+  - invalid result/gradient lengths for proxy_mfunc;
+  - invalid vpre length for proxy_precond;
+  - catching the exception;
+  - successfully optimizing again;
+  - releasing the callback and data afterward.
+
+  Those tests should run under fork_subtest so an unsafe XS unwind cannot take down the main test process, with Test::LeakTrace for Perl-
+  level leaks and Valgrind/ASan for C-level leak detection.
+
+• PDL callback warnings currently use Perl's warning channel directly. Add a
+  mechanism to silence these warnings or convert them into exception objects,
+  as appropriate for the caller's error-handling policy.

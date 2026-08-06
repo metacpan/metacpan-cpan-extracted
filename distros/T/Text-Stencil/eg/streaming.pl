@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use v5.20;
+use warnings;
 use Text::Stencil;
 
 # render_to_fh: stream large output to a file

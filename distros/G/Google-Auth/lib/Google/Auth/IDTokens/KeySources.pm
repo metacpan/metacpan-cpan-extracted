@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-# Copyright 2020,2021,2022 Google LLC
+# Copyright 2020 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@ use HTTP::Tiny;
 use Google::Auth;
 use MIME::Base64 qw(decode_base64);
 
-
-our $VERSION = '0.06';
-
 1;
 
 ##
@@ -50,17 +47,16 @@ my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 # @param key [Crypt::PK::RSA,Crypt::PK::ECC] The key itself.
 # @param algorithm [String] The algorithm (normally `RS256` or `ES256`)
 #
-sub new
-{
-    my ( $class, $params ) = @_;
-    $params //= {};
-    $class = ref $class if ref $class;
-    my $self = bless {
-        id        => $params->{id}        // undef,
-        key       => $params->{key}       // undef,
-        algorithm => $params->{algorithm} // undef,
-    }, $class;
-    return $self;
+sub new {
+  my ($class, $params) = @_;
+  $params //= {};
+  $class = ref $class if ref $class;
+  my $self = bless {
+    id        => $params->{id}        // undef,
+    key       => $params->{key}       // undef,
+    algorithm => $params->{algorithm} // undef,
+  }, $class;
+  return $self;
 }
 
 ##
@@ -90,33 +86,25 @@ sub algorithm { return $_[0]->{algorithm} }
 # @raise [KeySourceError] If the key could not be extracted from the
 #     JWK.
 #
-sub from_jwk
-{
-    my ( $self, $jwk ) = @_;
-    $jwk = $self->ensure_json_parsed($jwk);
+sub from_jwk {
+  my ($self, $jwk) = @_;
+  $jwk = $self->ensure_json_parsed($jwk);
 
-    my $instance = ref $self ? $self : $self->new();
+  my $instance = ref $self ? $self : $self->new();
 
-    if ( $jwk->{kty} eq 'RSA' )
-    {
-        $instance->{key} = $instance->extract_rsa_key($jwk);
-    }
-    elsif ( $jwk->{kty} eq 'EC' )
-    {
-        $instance->{key} = $instance->extract_ec_key($jwk);
-    }
-    elsif ( !defined $jwk->{kty} )
-    {
-        die 'Key type not found';
-    }
-    else
-    {
-        die 'Cannot use key type ' . $jwk->{kty};
-    }
-    $instance->{id}        = $jwk->{kid};
-    $instance->{algorithm} = $jwk->{alg};
+  if ($jwk->{kty} eq 'RSA') {
+    $instance->{key} = $instance->extract_rsa_key($jwk);
+  } elsif ($jwk->{kty} eq 'EC') {
+    $instance->{key} = $instance->extract_ec_key($jwk);
+  } elsif (!defined $jwk->{kty}) {
+    die 'Key type not found';
+  } else {
+    die 'Cannot use key type ' . $jwk->{kty};
+  }
+  $instance->{id}        = $jwk->{kid};
+  $instance->{algorithm} = $jwk->{alg};
 
-    return $instance;
+  return $instance;
 }
 ##
 # Create an array of KeyInfo from a JWK Set, which may be given as
@@ -127,85 +115,77 @@ sub from_jwk
 # @raise [KeySourceError] If a key could not be extracted from the
 #     JWK Set.
 #
-sub from_jwk_set
-{
-    my ( $self, $jwk_set ) = @_;
-    confess 'jwk_set is a required argument' unless $jwk_set;
-    $jwk_set = $self->ensure_json_parsed($jwk_set);
-    confess "No keys found in jwk set"
-        unless ( exists $jwk_set->{keys}
-        && ref $jwk_set->{keys} eq 'ARRAY' );
-    my $jwks = [ map { $self->from_jwk($_) } @{ $jwk_set->{keys} } ];
+sub from_jwk_set {
+  my ($self, $jwk_set) = @_;
+  confess 'jwk_set is a required argument' unless $jwk_set;
+  $jwk_set = $self->ensure_json_parsed($jwk_set);
+  confess "No keys found in jwk set"
+    unless (exists $jwk_set->{keys}
+    && ref $jwk_set->{keys} eq 'ARRAY');
+  my $jwks = [map { $self->from_jwk($_) } @{$jwk_set->{keys}}];
 
-    return $jwks;
+  return $jwks;
 }
 
-sub ensure_json_parsed
-{
-    my ( $self, $input ) = @_;
-    confess 'input is a required argument' unless $input;
-    return $input if ref $input;
-    my $decoded = eval { $coder->decode($input) };
+sub ensure_json_parsed {
+  my ($self, $input) = @_;
+  confess 'input is a required argument' unless $input;
+  return $input if ref $input;
+  my $decoded = eval { $coder->decode($input) };
 
-    confess( "Unable to parse JSON: $@$/" . "input: $input" ) if $@;
-    return $decoded;
+  confess("Unable to parse JSON: $@$/" . "input: $input") if $@;
+  return $decoded;
 }
 
-sub symbolize_keys
-{
-    my ( $self, $hash ) = @_;
-    my $result = {};
-    while ( my ( $key, $val ) = each %$hash )
-    {
-        $result->{$key} = $val;
-    }
-    return $result;
+sub symbolize_keys {
+  my ($self, $hash) = @_;
+  my $result = {};
+  while (my ($key, $val) = each %$hash) {
+    $result->{$key} = $val;
+  }
+  return $result;
 }
 
-sub _decode_base64url
-{
-    my ($s) = @_;
-    $s =~ tr{-_}{+/};
-    my $padding = length($s) % 4;
-    if ($padding)
-    {
-        $s .= '=' x ( 4 - $padding );
-    }
-    return MIME::Base64::decode_base64($s);
+sub _decode_base64url {
+  my ($s) = @_;
+  $s =~ tr{-_}{+/};
+  my $padding = length($s) % 4;
+  if ($padding) {
+    $s .= '=' x (4 - $padding);
+  }
+  return MIME::Base64::decode_base64($s);
 }
 
-sub extract_rsa_key
-{
-    my ( $self, $jwk ) = @_;
-    my $n = _decode_base64url( $jwk->{n} );
-    my $e = _decode_base64url( $jwk->{e} );
-    my $pubkey = Google::Auth::load_rsa_pubkey( $n, $e );
-    die 'Failed to load RSA public key' unless defined $pubkey;
-    return $pubkey;
+sub extract_rsa_key {
+  my ($self, $jwk) = @_;
+  my $n      = _decode_base64url($jwk->{n});
+  my $e      = _decode_base64url($jwk->{e});
+  my $pubkey = Google::Auth::load_rsa_pubkey($n, $e);
+  die 'Failed to load RSA public key' unless defined $pubkey;
+  return $pubkey;
 }
 
 # @private
 my $CURVE_NAME_MAP = {
-    'P-256'     => 'prime256v1',
-    'P-384'     => 'secp384r1',
-    'P-521'     => 'secp521r1',
-    'secp256k1' => 'secp256k1'
+  'P-256'     => 'prime256v1',
+  'P-384'     => 'secp384r1',
+  'P-521'     => 'secp521r1',
+  'secp256k1' => 'secp256k1'
 };
 
-sub extract_ec_key
-{
-    my ( $self, $jwk ) = @_;
-    my $curve = $jwk->{crv};
-    die 'Unsupported EC curve ' . $curve
-        unless exists $CURVE_NAME_MAP->{$curve};
+sub extract_ec_key {
+  my ($self, $jwk) = @_;
+  my $curve = $jwk->{crv};
+  die 'Unsupported EC curve ' . $curve
+    unless exists $CURVE_NAME_MAP->{$curve};
 
-    my $x = _decode_base64url( $jwk->{x} );
-    my $y = _decode_base64url( $jwk->{y} );
+  my $x = _decode_base64url($jwk->{x});
+  my $y = _decode_base64url($jwk->{y});
 
-    my $openssl_curve = $CURVE_NAME_MAP->{$curve};
-    my $pubkey = Google::Auth::load_ec_pubkey( $openssl_curve, $x, $y );
-    die 'Failed to load EC public key' unless defined $pubkey;
-    return $pubkey;
+  my $openssl_curve = $CURVE_NAME_MAP->{$curve};
+  my $pubkey        = Google::Auth::load_ec_pubkey($openssl_curve, $x, $y);
+  die 'Failed to load EC public key' unless defined $pubkey;
+  return $pubkey;
 }
 
 1;
@@ -219,12 +199,11 @@ package Google::Auth::IDTokens::StaticKeySource;
 #
 # @param keys [Array<KeyInfo>] The keys
 #
-sub new
-{
-    my ( $class, $params ) = @_;
-    $class = ref $class if ref $class;
-    my $self = bless { current_keys => [ @{ $params->{keys} } ] }, $class;
-    return $self;
+sub new {
+  my ($class, $params) = @_;
+  $class = ref $class if ref $class;
+  my $self = bless {current_keys => [@{$params->{keys}}]}, $class;
+  return $self;
 }
 
 ##
@@ -243,10 +222,9 @@ sub current_keys { return $_[0]->{current_keys} }
 # @param jwk [Hash,String] The JWK specification.
 # @return [StaticKeySource]
 #
-sub from_jwk
-{
-    my ( $self, $jwk ) = @_;
-    return Google::Auth::IDTokens::KeyInfo->new()->from_jwk($jwk);
+sub from_jwk {
+  my ($self, $jwk) = @_;
+  return Google::Auth::IDTokens::KeyInfo->new()->from_jwk($jwk);
 }
 
 ##
@@ -257,10 +235,9 @@ sub from_jwk
 # @param jwk_set [Hash,String] The JWK Set specification.
 # @return [StaticKeySource]
 #
-sub from_jwk_set
-{
-    my ( $self, $jwk_set ) = @_;
-    return Google::Auth::IDTokens::KeyInfo->new()->from_jwk_set($jwk_set);
+sub from_jwk_set {
+  my ($self, $jwk_set) = @_;
+  return Google::Auth::IDTokens::KeyInfo->new()->from_jwk_set($jwk_set);
 }
 
 1;
@@ -285,30 +262,26 @@ our $DEFAULT_RETRY_INTERVAL = 3600;
 #     seconds. This is the minimum time between retries of failed key
 #     downloads.
 #
-sub new
-{
-    my ( $class, $params ) = @_;
-    $class = ref $class if ref $class;
-    die "uri is a required parameter$/" . Data::Dumper::Dumper($params)
-        unless ( exists $params->{uri} && $params->{uri} );
+sub new {
+  my ($class, $params) = @_;
+  $class = ref $class if ref $class;
+  die "uri is a required parameter$/" . Data::Dumper::Dumper($params)
+    unless (exists $params->{uri} && $params->{uri});
 
-    my $self = bless {
-        retry_interval => $params->{retry_interval} || $DEFAULT_RETRY_INTERVAL,
-        allow_refresh_at => time(),
-        current_keys     => [],
-        uri              => URI->new( $params->{uri} ),
-    }, $class;
+  my $self = bless {
+    retry_interval   => $params->{retry_interval} || $DEFAULT_RETRY_INTERVAL,
+    allow_refresh_at => time(),
+    current_keys     => [],
+    uri              => URI->new($params->{uri}),
+  }, $class;
 
-    if ( exists $ENV{TESTING} && $ENV{TESTING} )
-    {
-        $self->{ua} = $KeySourcesTest::useragent;
-    }
-    else
-    {
-        $self->{ua} = HTTP::Tiny->new( timeout => 10 );
-    }
+  if (exists $ENV{TESTING} && $ENV{TESTING}) {
+    $self->{ua} = $KeySourcesTest::useragent;
+  } else {
+    $self->{ua} = HTTP::Tiny->new(timeout => 10);
+  }
 
-    return $self;
+  return $self;
 }
 
 ##
@@ -331,55 +304,50 @@ sub current_keys { return $_[0]->{current_keys} }
 # @return [Array<KeyInfo>]
 # @raise [KeySourceError] if key retrieval failed.
 #
-sub refresh_keys
-{
-    my ($self) = @_;
-    $self->{allow_refresh_at} = time()
-      unless( exists $self->{allow_refresh_at} );
+sub refresh_keys {
+  my ($self) = @_;
+  $self->{allow_refresh_at} = time()
+    unless (exists $self->{allow_refresh_at});
 
-    if ( time() < $self->{allow_refresh_at} )
-    {
-        print STDERR 'cache hit', $/ if $ENV{TESTING} && $ENV{VERBOSE};
-        return $self->{current_keys};
-    }
-    print STDERR 'cache miss', $/ if $ENV{TESTING} && $ENV{VERBOSE};
-
-    my $response = $self->{ua}->get( $self->{uri} );
-
-    my ( $success, $status, $reason, $content );
-    if ( ref($response) eq 'HASH' )
-    {
-        $success = $response->{success};
-        $status  = $response->{status};
-        $reason  = $response->{reason};
-        $content = $response->{content};
-    }
-    else
-    {
-        $success = $response->is_success;
-        $status  = $response->code;
-        $reason  = $response->message;
-        $content = $response->decoded_content;
-    }
-
-    die( "KeySourceError: Unable to retrieve data from $self->{uri}: $status $reason" )
-        unless $success;
-
-    $self->{last_response} = $response;
-    my $data = eval { $coder->decode($content) };
-    die("KeySourceError: Unable to parse JSON: $@") if $@;
-
-    $self->{current_keys} = [ $self->interpret_json($data) ];
-
-    $self->{allow_refresh_at} = time() + $self->{retry_interval};
-
+  if (time() < $self->{allow_refresh_at}) {
+    print STDERR 'cache hit', $/ if $ENV{TESTING} && $ENV{VERBOSE};
     return $self->{current_keys};
+  }
+  print STDERR 'cache miss', $/ if $ENV{TESTING} && $ENV{VERBOSE};
+
+  my $response = $self->{ua}->get($self->{uri});
+
+  my ($success, $status, $reason, $content);
+  if (ref($response) eq 'HASH') {
+    $success = $response->{success};
+    $status  = $response->{status};
+    $reason  = $response->{reason};
+    $content = $response->{content};
+  } else {
+    $success = $response->is_success;
+    $status  = $response->code;
+    $reason  = $response->message;
+    $content = $response->decoded_content;
+  }
+
+  die(
+    "KeySourceError: Unable to retrieve data from $self->{uri}: $status $reason"
+  ) unless $success;
+
+  $self->{last_response} = $response;
+  my $data = eval { $coder->decode($content) };
+  die("KeySourceError: Unable to parse JSON: $@") if $@;
+
+  $self->{current_keys} = [$self->interpret_json($data)];
+
+  $self->{allow_refresh_at} = time() + $self->{retry_interval};
+
+  return $self->{current_keys};
 }
 
-sub interpret_json
-{
-    my ( $self, $data ) = @_;
-    return ();
+sub interpret_json {
+  my ($self, $data) = @_;
+  return ();
 }
 
 1;
@@ -401,33 +369,28 @@ use base 'Google::Auth::IDTokens::HttpKeySource';
 #     seconds. This is the minimum time between retries of failed key
 #     downloads.
 #
-sub new
-{
-    my ( $class, $params ) = @_;
-    $class = ref $class if ref $class;
+sub new {
+  my ($class, $params) = @_;
+  $class = ref $class if ref $class;
 
-    die "missing required parameters"
-        unless exists $params->{uri} && $params->{uri};
+  die "missing required parameters"
+    unless exists $params->{uri} && $params->{uri};
 
-    $params->{retry_interval} //= 30;
+  $params->{retry_interval} //= 30;
 
-    my $self = $class->SUPER::new($params);
-    $self->{algorithm} = $params->{algorithm} || 'RS256';
-    return $self;
+  my $self = $class->SUPER::new($params);
+  $self->{algorithm} = $params->{algorithm} || 'RS256';
+  return $self;
 }
 
-sub interpret_json
-{
-    my ( $self, $data ) = @_;
-    return map {
-        Google::Auth::IDTokens::KeyInfo->new(
-            {
-                id        => $_,
-                key       => Google::Auth::load_pubkey_from_x509_cert( $data->{$_} ),
-                algorithm => $self->{algorithm}
-            }
-        );
-    } sort keys %$data;
+sub interpret_json {
+  my ($self, $data) = @_;
+  return map {
+    Google::Auth::IDTokens::KeyInfo->new({
+        id        => $_,
+        key       => Google::Auth::load_pubkey_from_x509_cert($data->{$_}),
+        algorithm => $self->{algorithm}});
+  } sort keys %$data;
 }
 
 package Google::Auth::IDTokens::JwkHttpKeySource;
@@ -444,22 +407,20 @@ use Carp;
 #     seconds. This is the minimum time between retries of failed key
 #     downloads.
 #
-sub new
-{
-    my ( $self, $params ) = @_;
-    my $class = ref $self ? ref $self : $self;
+sub new {
+  my ($self, $params) = @_;
+  my $class = ref $self ? ref $self : $self;
 
-    die "uri is a required parameter$/" . Data::Dumper::Dumper($params)
-        unless exists( $params->{uri} );
-    $class->SUPER::new($params);
+  die "uri is a required parameter$/" . Data::Dumper::Dumper($params)
+    unless exists($params->{uri});
+  $class->SUPER::new($params);
 }
 
-sub interpret_json
-{
-    my ( $self, $data ) = @_;
-    confess 'data is a required argument' unless $data;
-    my $jwks = Google::Auth::IDTokens::KeyInfo->from_jwk_set($data);
-    return @$jwks;
+sub interpret_json {
+  my ($self, $data) = @_;
+  confess 'data is a required argument' unless $data;
+  my $jwks = Google::Auth::IDTokens::KeyInfo->from_jwk_set($data);
+  return @$jwks;
 }
 
 ##
@@ -479,15 +440,14 @@ package Google::Auth::IDTokens::AggregateKeySource;
 #
 # @param sources [Array<key source>] The key sources to aggregate.
 #
-sub new
-{
-    my ( $class, $params ) = @_;
-    die "sources is a required parameter$/" . Data::Dumper::Dumper($params)
-        unless exists $params->{sources} && $params->{sources};
+sub new {
+  my ($class, $params) = @_;
+  die "sources is a required parameter$/" . Data::Dumper::Dumper($params)
+    unless exists $params->{sources} && $params->{sources};
 
-    $class = ref $class if ref $class;
-    my $self = bless { sources => [ @{ $params->{sources} } ] }, $class;
-    return $self;
+  $class = ref $class if ref $class;
+  my $self = bless {sources => [@{$params->{sources}}]}, $class;
+  return $self;
 }
 
 ##
@@ -495,15 +455,13 @@ sub new
 #
 # @return [Array<KeyInfo>]
 #
-sub current_keys
-{
-    my ($self) = @_;
-    my @current_keys_set;
-    foreach my $source ( @{ $self->{sources} } )
-    {
-        push( @current_keys_set, $source->current_keys );
-    }
-    return @current_keys_set;
+sub current_keys {
+  my ($self) = @_;
+  my @current_keys_set;
+  foreach my $source (@{$self->{sources}}) {
+    push(@current_keys_set, $source->current_keys);
+  }
+  return @current_keys_set;
 }
 
 ##
@@ -512,15 +470,13 @@ sub current_keys
 # @return [Array<KeyInfo>]
 # @raise [KeySourceError] if key retrieval failed.
 #
-sub refresh_keys
-{
-    my ($self) = @_;
-    my @current_keys_set;
-    foreach my $source ( @{ $self->{sources} } )
-    {
-        eval { $source->refresh_keys(); };
-        die "KeySourceError: $@" if $@;
-        push( @current_keys_set, $source->current_keys );
-    }
-    return @current_keys_set;
+sub refresh_keys {
+  my ($self) = @_;
+  my @current_keys_set;
+  foreach my $source (@{$self->{sources}}) {
+    eval { $source->refresh_keys(); };
+    die "KeySourceError: $@" if $@;
+    push(@current_keys_set, $source->current_keys);
+  }
+  return @current_keys_set;
 }

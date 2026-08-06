@@ -1,4 +1,4 @@
-# Copyright 2026 Google LLC
+# Copyright 2026 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,27 +19,26 @@ use Test::Exception;
 use Test::LWP::UserAgent;
 use HTTP::Response;
 
-BEGIN
-{
-    $ENV{TESTING} = 1;
-    use_ok('Google::Auth::IDTokens::KeySources') || print "Bail out!\n";
-    use_ok('Google::Auth::IDTokens::Verifier')   || print "Bail out!\n";
+BEGIN {
+  $ENV{TESTING} = 1;
+  use_ok('Google::Auth::IDTokens::KeySources') || print "Bail out!\n";
+  use_ok('Google::Auth::IDTokens::Verifier')   || print "Bail out!\n";
 }
 
 my $oidc_token =
-    'eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ5MjcxMGE3ZmNkYjE1Mzk2MGNlMDFmNzYwNTIwY'
-  . 'TMyYzg0NTVkZmYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJodHRwOi8vZXhhbXBsZS5jb20'
-  . 'iLCJhenAiOiI1NDIzMzkzNTc2MzgtY3IwZHNlcnIyZXZnN3N2MW1lZ2hxZXU3MDMyNzRm'
-  . 'M2hAZGV2ZWxvcGVyLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJlbWFpbCI6IjU0MjMzOTM1N'
-  . 'zYzOC1jcjBkc2VycjJldmc3c3YxbWVnaHFldTcwMzI3NGYzaEBkZXZlbG9wZXIuZ3Nlcn'
-  . 'ZpY2VhY2NvdW50LmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJleHAiOjE1OTEzNDI'
-  . '3NzYsImlhdCI6MTU5MTMzOTE3NiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUu'
-  . 'Y29tIiwic3ViIjoiMTA0MzQxNDczMTMxODI1OTU3NjAzIn0.GGDE_5HoLacyqdufdxnAC'
-  . 'rXxYySKQYAzSQ5qfGjSUriuO3uLm2-rwSPFfLzzBeflEHdVX7XRFFszpxKajuZklF4dXd'
-  . '0evB1u5i3QeCJ8MSZKKx6qus_ETJv4rtuPNEuyhaRcShB7BwI8RY0IZ4_EDrhYqYInrO2'
-  . 'wQyJGYvc41JcmoKzRoNnEVydN0Qppt9bqevq_lJg-9UjJkJ2QHjPfTgMjwhLIgNptKgtR'
-  . 'qdoRpJmleFlbuUqyPPJfAzv3Tc6h3kw88tEcI8R3n04xmHOSMwERFFQYJdQDMd2F9SSDe'
-  . 'rh40codO_GuPZ7bEUiKq9Lkx2LH5TuhythfsMzIwJpaEA';
+  'eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ5MjcxMGE3ZmNkYjE1Mzk2MGNlMDFmNzYwNTIwY' .
+  'TMyYzg0NTVkZmYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJodHRwOi8vZXhhbXBsZS5jb20' .
+  'iLCJhenAiOiI1NDIzMzkzNTc2MzgtY3IwZHNlcnIyZXZnN3N2MW1lZ2hxZXU3MDMyNzRm' .
+  'M2hAZGV2ZWxvcGVyLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJlbWFpbCI6IjU0MjMzOTM1N' .
+  'zYzOC1jcjBkc2VycjJldmc3c3YxbWVnaHFldTcwMzI3NGYzaEBkZXZlbG9wZXIuZ3Nlcn' .
+  'ZpY2VhY2NvdW50LmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJleHAiOjE1OTEzNDI' .
+  '3NzYsImlhdCI6MTU5MTMzOTE3NiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUu' .
+  'Y29tIiwic3ViIjoiMTA0MzQxNDczMTMxODI1OTU3NjAzIn0.GGDE_5HoLacyqdufdxnAC' .
+  'rXxYySKQYAzSQ5qfGjSUriuO3uLm2-rwSPFfLzzBeflEHdVX7XRFFszpxKajuZklF4dXd' .
+  '0evB1u5i3QeCJ8MSZKKx6qus_ETJv4rtuPNEuyhaRcShB7BwI8RY0IZ4_EDrhYqYInrO2' .
+  'wQyJGYvc41JcmoKzRoNnEVydN0Qppt9bqevq_lJg-9UjJkJ2QHjPfTgMjwhLIgNptKgtR' .
+  'qdoRpJmleFlbuUqyPPJfAzv3Tc6h3kw88tEcI8R3n04xmHOSMwERFFQYJdQDMd2F9SSDe' .
+  'rh40codO_GuPZ7bEUiKq9Lkx2LH5TuhythfsMzIwJpaEA';
 
 my $oidc_jwk_body = q{
 {
@@ -65,59 +64,67 @@ my $oidc_jwk_body = q{
 };
 
 my $expected_oidc_aud = 'http://example.com';
-my $expected_oidc_azp = '542339357638-cr0dserr2evg7sv1meghqeu703274f3h@developer.gserviceaccount.com';
+my $expected_oidc_azp =
+  '542339357638-cr0dserr2evg7sv1meghqeu703274f3h@developer.gserviceaccount.com';
 my $unexpired_oidc_test_time = 1591339181;
 my $expired_oidc_test_time   = $unexpired_oidc_test_time + 86400;
 
 # Stub HTTP mock user agent
 package KeySourcesTest;
 our $useragent = Test::LWP::UserAgent->new();
+
 package main;
 
 my $ua = $KeySourcesTest::useragent;
 $ua->unmap_all();
 $ua->map_response(
-    qr/oauth2\/v3\/certs/,
-    HTTP::Response->new( '200', 'OK', [ 'Content-Type' => 'application/json' ], $oidc_jwk_body )
-);
+  qr/oauth2\/v3\/certs/,
+  HTTP::Response->new(
+    '200', 'OK', ['Content-Type' => 'application/json'],
+    $oidc_jwk_body
+  ));
 
 subtest 'OIDC good validation' => sub {
-    my $payload = eval {
-        Google::Auth::IDTokens::Verifier->verify_oidc(
-            $oidc_token,
-            aud       => $expected_oidc_aud,
-            azp       => $expected_oidc_azp,
-            time_now  => $unexpired_oidc_test_time
-        );
-    };
-    is( $@, '', 'OIDC verification succeeded without throwing' );
-    ok( defined $payload, 'payload is defined' );
-    is( $payload->{aud}, $expected_oidc_aud, 'aud matches expected' );
-    is( $payload->{azp}, $expected_oidc_azp, 'azp matches expected' );
-    is( $payload->{iss}, 'https://accounts.google.com', 'iss matches expected' );
-    done_testing();
+  my $payload = eval {
+    Google::Auth::IDTokens::Verifier->verify_oidc(
+      $oidc_token,
+      aud      => $expected_oidc_aud,
+      azp      => $expected_oidc_azp,
+      time_now => $unexpired_oidc_test_time
+    );
+  };
+  is($@, '', 'OIDC verification succeeded without throwing');
+  ok(defined $payload, 'payload is defined');
+  is($payload->{aud}, $expected_oidc_aud,            'aud matches expected');
+  is($payload->{azp}, $expected_oidc_azp,            'azp matches expected');
+  is($payload->{iss}, 'https://accounts.google.com', 'iss matches expected');
+  done_testing();
 };
 
 subtest 'OIDC corrupted token' => sub {
-    throws_ok {
-        Google::Auth::IDTokens::Verifier->verify_oidc(
-            $oidc_token . 'modified',
-            aud       => $expected_oidc_aud,
-            time_now  => $unexpired_oidc_test_time
-        );
-    } qr/SignatureError: Token signature verification failed/, 'throws SignatureError on corrupted token signature';
-    done_testing();
+  throws_ok {
+    Google::Auth::IDTokens::Verifier->verify_oidc(
+      $oidc_token . 'modified',
+      aud      => $expected_oidc_aud,
+      time_now => $unexpired_oidc_test_time
+    );
+  }
+  qr/SignatureError: Token signature verification failed/,
+    'throws SignatureError on corrupted token signature';
+  done_testing();
 };
 
 subtest 'OIDC expired token' => sub {
-    throws_ok {
-        Google::Auth::IDTokens::Verifier->verify_oidc(
-            $oidc_token,
-            aud       => $expected_oidc_aud,
-            time_now  => $expired_oidc_test_time
-        );
-    } qr/ExpiredTokenError: Token signature is expired/, 'throws ExpiredTokenError on expired token';
-    done_testing();
+  throws_ok {
+    Google::Auth::IDTokens::Verifier->verify_oidc(
+      $oidc_token,
+      aud      => $expected_oidc_aud,
+      time_now => $expired_oidc_test_time
+    );
+  }
+  qr/ExpiredTokenError: Token signature is expired/,
+    'throws ExpiredTokenError on expired token';
+  done_testing();
 };
 
 done_testing();

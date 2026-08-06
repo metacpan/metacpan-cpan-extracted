@@ -21,33 +21,23 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "7.12"
   },
   "DISTNAME" => "Math-NLopt",
-  "LICENSE" => "gpl",
+  "LICENSE" => "open_source",
   "NAME" => "Math::NLopt",
   "PREREQ_PM" => {
     "Alien::NLopt" => 0,
-    "Carp" => 0,
-    "Exporter" => 0,
-    "XSLoader" => 0,
-    "overload" => 0,
-    "parent" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Ref::Util" => 0
   },
   "TEST_REQUIRES" => {
-    "Class::Struct" => 0,
-    "Devel::Peek" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "POSIX" => 0,
     "Test2::V0" => 0,
-    "Test::More" => 0,
-    "constant" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.11",
+  "VERSION" => "0.13",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/callback/*.t t/lifetime/*.t"
   }
 );
 
@@ -59,23 +49,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Alien::NLopt" => 0,
-  "Carp" => 0,
-  "Class::Struct" => 0,
-  "Devel::Peek" => 0,
-  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "POSIX" => 0,
+  "Ref::Util" => 0,
   "Test2::V0" => 0,
-  "Test::More" => 0,
-  "XSLoader" => 0,
-  "constant" => 0,
-  "overload" => 0,
-  "parent" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

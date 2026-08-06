@@ -40,6 +40,23 @@ static SV *ft_ua_new(pTHX_ const char *cls, SV **kv, int nkv) {
         call_method("install_await", G_DISCARD);
         FREETMPS; LEAVE;
     }
+    /* Hyperman-direct mode: when the adapter is Fetch::Loop::Hyperman and
+     * Hyperman's C ABI resolves (ft_hm.h), connections drive fd interest and
+     * deadlines straight through the table. Absent/old Hyperman leaves both
+     * NULL and the Perl _ft_arm/_ft_timer seam is used as before. */
+    if (sv_isobject(ua->loop)
+        && sv_derived_from(ua->loop, "Fetch::Loop::Hyperman")
+        && SvTYPE(SvRV(ua->loop)) == SVt_PVHV) {
+        const hm_abi *A = ft_hm(aTHX);
+        SV **e = hv_fetchs((HV *)SvRV(ua->loop), "loop", 0);
+        if (A && e && *e && sv_isobject(*e)
+            && sv_derived_from(*e, "Hyperman::Loop")) {
+            ua->hm_loop = A->loop_of_sv(aTHX_ *e);
+            ua->hm      = A;
+            /* C await: bridge + run_until instead of the Perl AWAIT sub */
+            ft_hm_install_await(aTHX_ ua->loop, ua->hm_loop);
+        }
+    }
     ua->keep_alive = have_keep ? keep : 1;
     ua->simple_response = simple;
     if (jar_arg && SvOK(jar_arg)) {

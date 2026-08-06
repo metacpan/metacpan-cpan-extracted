@@ -38,6 +38,7 @@ src/xh_stack.c
 src/xh_stack.h
 src/xh_stash.c
 src/xh_stash.h
+src/typemap
 src/xh_string.h
 src/xh_writer.c
 src/xh_writer.h
@@ -63,12 +64,16 @@ t/14-x2h_merge_text.t
 t/15-x2h_doctype.t
 t/16-x2h_suppress_empty.t
 t/17-x2h_stylesheet.t
+t/18-oop-lifetime.t
+t/19-x2h-incremental.t
+t/20-x2h-incremental-boundaries.t
+t/21-x2h-callback-control.t
+t/22-h2x-output-cb.t
 t/test.xml
 t/test_cp1251.xml
 t/test_cp1251_wo_decl.xml
 t/test_null_terminated.xml
 t/test_utf8.xml
-typemap
 xt/91-pod-syntax.t
 xt/92-critic.t
 xt/93-changes.t

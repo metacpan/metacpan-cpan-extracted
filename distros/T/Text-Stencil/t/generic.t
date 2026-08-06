@@ -542,9 +542,10 @@ is(Text::Stencil->new(row => '{name:raw}', separator => ',')->render_sorted(
     [{name=>'a'},{name=>'c'},{name=>'b'}], ['name'], {descending => 1}),
     'c,b,a', 'render_sorted array descending via opts');
 
-# substr with negative offset (should produce empty, not crash)
-is(Text::Stencil->new(row => '{0:substr:-1}')->render([['hello']]),
-    '', 'substr negative offset empty');
+# substr with a negative offset is a template error, not silent garbage
+# (the digit-accumulating parser used to turn "-1" into -29)
+ok !eval { Text::Stencil->new(row => '{0:substr:-1}'); 1 }, 'substr negative offset dies';
+like $@, qr/non-negative integer/, '  with a clear message';
 
 # render_one respects skip_if
 is(Text::Stencil->new(row => '{0:raw}', skip_if => 1)->render_one(['val', '1']),

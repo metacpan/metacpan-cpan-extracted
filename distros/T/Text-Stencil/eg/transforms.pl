@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use v5.20;
+use warnings;
 use Text::Stencil;
 
 # chaining transforms: trim, then truncate, then html-escape

@@ -33,6 +33,10 @@
 ^tmp/
 ^Google-Auth-
 ^MYMETA\.
+^META\.yml$
+^\[0\],\$
+
+
 
 # Avoid cpanm or local testing artifacts.
 ^\.cpanm/

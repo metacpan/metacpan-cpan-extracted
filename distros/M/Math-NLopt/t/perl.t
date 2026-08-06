@@ -60,7 +60,7 @@ $opt->add_inequality_constraint(
         my ( $x, $grad ) = @_;
         return myconstraint( $x, $grad, 2, 0 );
     },
-    1e-8,
+    tol => 1e-8,
 );
 
 $opt->add_inequality_constraint(
@@ -68,7 +68,7 @@ $opt->add_inequality_constraint(
         my ( $x, $grad ) = @_;
         return myconstraint( $x, $grad, -1, 1 );
     },
-    1e-8,
+    tol => 1e-8,
 );
 $opt->set_xtol_rel( 1e-4 );
 my @x0 = ( 1.234, 5.678 );

@@ -3,9 +3,12 @@
 
 static const char DEF_CONTENT_KEY[] = "content";
 
+static void xh_x2h_parse_chunk(xh_x2h_ctx_t *ctx, xh_char_t **buf, size_t *bytesleft, xh_bool_t terminate);
+
 void
 xh_x2h_destroy_ctx(xh_x2h_ctx_t *ctx)
 {
+    if (ctx->hash  != NULL) SvREFCNT_dec(ctx->hash);
     if (ctx->nodes != NULL) free(ctx->nodes);
     if (ctx->tmp   != NULL) free(ctx->tmp);
 
@@ -28,6 +31,170 @@ xh_x2h_init_ctx(xh_x2h_ctx_t *ctx, I32 ax, I32 items)
         croak("Memory allocation error");
     }
     memset(ctx->nodes, 0, sizeof(xh_x2h_node_t) * ctx->opts.max_depth);
+}
+
+static void
+xh_x2h_init_result(xh_x2h_ctx_t *ctx)
+{
+    if (ctx->opts.filter.enable) {
+        ctx->flags |= XH_X2H_FILTER_ENABLED;
+        if (ctx->opts.cb == NULL)
+            ctx->result = newRV_noinc((SV *) newAV());
+    }
+    else {
+        ctx->result = newRV_noinc((SV *) newHV());
+        ctx->nodes[0].lval = ctx->lval = &ctx->result;
+    }
+}
+
+static void
+xh_x2h_adjust_pointers(xh_x2h_ctx_t *ctx, xh_char_t *from, xh_char_t *to)
+{
+    intptr_t delta = (intptr_t) to - (intptr_t) from;
+
+    if (ctx->node != NULL) ctx->node += delta;
+    if (ctx->content != NULL) ctx->content += delta;
+    if (ctx->end != NULL) ctx->end += delta;
+    if (ctx->end_of_attr_value != NULL) ctx->end_of_attr_value += delta;
+}
+
+void
+xh_x2h_stream_init(xh_x2h_stream_t *stream, xh_opts_t *opts, I32 ax, I32 items)
+{
+    xh_x2h_ctx_t *ctx = &stream->ctx;
+
+    memset(stream, 0, sizeof(*stream));
+    xh_merge_opts(&ctx->opts, opts, 1, ax, items);
+    if (ctx->opts.encoding[0] != '\0' &&
+        xh_strcasecmp(ctx->opts.encoding, XH_INTERNAL_ENCODING) != 0)
+        croak("Incremental parser supports UTF-8 input only");
+    if ((ctx->nodes = malloc(sizeof(xh_x2h_node_t) * ctx->opts.max_depth)) == NULL)
+        croak("Memory allocation error");
+    memset(ctx->nodes, 0, sizeof(xh_x2h_node_t) * ctx->opts.max_depth);
+    xh_x2h_init_result(ctx);
+}
+
+void
+xh_x2h_stream_destroy(xh_x2h_stream_t *stream)
+{
+    if (stream->ctx.result != NULL)
+        SvREFCNT_dec(stream->ctx.result);
+    xh_buffer_destroy(&stream->tail);
+    xh_x2h_destroy_ctx(&stream->ctx);
+}
+
+void
+xh_x2h_stream_feed(xh_x2h_stream_t *stream, xh_char_t *data, size_t len, xh_bool_t finish)
+{
+    xh_x2h_ctx_t *ctx = &stream->ctx;
+    xh_char_t *buf, *preserve, *old_start;
+    size_t input_len = len, saved_len;
+
+    if (stream->finished) croak("Parser is already finished");
+    if (stream->stopped) croak("Parser is stopped");
+    if (stream->failed) croak("Parser is in failed state");
+    if (stream->busy) croak("Recursive feed on the same parser");
+    stream->busy = TRUE;
+
+    preserve = ctx->node != NULL ? ctx->node : ctx->content;
+    if (stream->tail.start != NULL) {
+        if (preserve == NULL) {
+            stream->tail.cur = stream->tail.start;
+        }
+        else {
+            saved_len = stream->tail.cur - preserve;
+            if (preserve != stream->tail.start)
+                xh_memmove(stream->tail.start, preserve, saved_len);
+            xh_x2h_adjust_pointers(ctx, preserve, stream->tail.start);
+            stream->tail.cur = stream->tail.start + saved_len;
+        }
+        old_start = stream->tail.start;
+        xh_buffer_grow(&stream->tail, len);
+        if (old_start != stream->tail.start)
+            xh_x2h_adjust_pointers(ctx, old_start, stream->tail.start);
+        buf = stream->tail.cur;
+        if (len) memcpy(buf, data, len);
+        stream->tail.cur += len;
+    }
+    else {
+        buf = data;
+    }
+
+    do {
+        xh_x2h_parse_chunk(ctx, &buf, &len, finish);
+
+        if (ctx->flags & XH_X2H_STOPPED) {
+            stream->stopped = TRUE;
+            len = 0;
+            break;
+        }
+
+        if (ctx->state == XML_DECL_FOUND && ctx->encoding[0] != '\0' &&
+            xh_strcasecmp(ctx->encoding, XH_INTERNAL_ENCODING) != 0)
+            croak("Incremental parser supports UTF-8 input only");
+    } while (len > 0);
+
+    if (stream->stopped) {
+        stream->busy = FALSE;
+        return;
+    }
+
+    if (stream->tail.start == NULL && !finish) {
+        preserve = ctx->node != NULL ? ctx->node : ctx->content;
+        if (preserve != NULL) {
+            saved_len = (data + input_len) - preserve;
+            xh_buffer_init(&stream->tail, saved_len);
+            memcpy(stream->tail.start, preserve, saved_len);
+            stream->tail.cur = stream->tail.start + saved_len;
+            xh_x2h_adjust_pointers(ctx, preserve, stream->tail.start);
+        }
+    }
+
+    stream->busy = FALSE;
+}
+
+SV *
+xh_x2h_stream_finish(xh_x2h_stream_t *stream)
+{
+    xh_x2h_ctx_t *ctx = &stream->ctx;
+    HV *hv;
+    HE *he;
+    SV *result, *root;
+    xh_char_t empty = '\0';
+
+    if (stream->finished) croak("Parser is already finished");
+    if (stream->stopped) {
+        stream->finished = TRUE;
+        return NULL;
+    }
+
+    xh_x2h_stream_feed(stream, &empty, 0, TRUE);
+    if (ctx->state != PARSER_ST_DONE)
+        croak("Invalid XML");
+    stream->finished = TRUE;
+
+    result = ctx->result;
+    ctx->result = NULL;
+    if (ctx->opts.filter.enable) {
+        if (ctx->opts.cb != NULL) {
+            SvREFCNT_dec(result);
+            result = NULL;
+        }
+    }
+    else if (!ctx->opts.keep_root) {
+        root = result;
+        hv = (HV *) SvRV(root);
+        hv_iterinit(hv);
+        if ((he = hv_iternext(hv))) {
+            result = hv_iterval(hv, he);
+            SvREFCNT_inc(result);
+        }
+        else {
+            result = NULL;
+        }
+        SvREFCNT_dec(root);
+    }
+    return result;
 }
 
 XH_INLINE void
@@ -113,9 +280,26 @@ MATCHED:
     return matched;
 }
 
-XH_INLINE void
+XH_INLINE xh_int_t
+xh_x2h_callback_action(SV *result)
+{
+    xh_char_t *value;
+    STRLEN len;
+
+    if (!SvOK(result)) return XH_CB_CONTINUE;
+    value = XH_CHAR_CAST SvPV(result, len);
+    if (len == 16 && xh_strncmp(value, XH_CHAR_CAST "XML_HASH_XS_STOP", 16) == 0)
+        return XH_CB_STOP;
+    if (len == 16 && xh_strncmp(value, XH_CHAR_CAST "XML_HASH_XS_SKIP", 16) == 0)
+        return XH_CB_SKIP;
+    return XH_CB_CONTINUE;
+}
+
+XH_INLINE xh_int_t
 xh_x2h_pass_matched_node(SV *cb, SV *val)
 {
+    xh_int_t action = XH_CB_CONTINUE;
+    int count;
     dSP;
 
     ENTER; SAVETMPS;
@@ -123,10 +307,72 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
     XPUSHs(val);
     PUTBACK;
 
-    (void) call_sv(cb, G_DISCARD);
+    count = call_sv(cb, G_SCALAR);
+
+    SPAGAIN;
+    if (count > 0) {
+        SV *result = POPs;
+        action = xh_x2h_callback_action(result);
+    }
+    PUTBACK;
 
     FREETMPS;
     LEAVE;
+
+    return action;
+}
+
+static xh_int_t
+xh_x2h_pass_event(xh_x2h_ctx_t *ctx, const char *event, SV *val, unsigned int event_depth)
+{
+    xh_int_t action = XH_CB_CONTINUE;
+    const char *name;
+    HV *meta, *attrs;
+    HE *he;
+    SV *meta_ref;
+    int count;
+    dSP;
+
+    meta = newHV();
+    name = strrchr((const char *) ctx->xpath, '/');
+    name = name == NULL ? (const char *) ctx->xpath : name + 1;
+    (void) hv_store(meta, "name", 4, newSVpv(name, 0), 0);
+    (void) hv_store(meta, "path", 4, newSVpv((const char *) ctx->xpath, 0), 0);
+    (void) hv_store(meta, "depth", 5, newSVuv(event_depth), 0);
+
+    if (event[0] == 's') {
+        attrs = newHV();
+        if (val != NULL && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
+            hv_iterinit((HV *) SvRV(val));
+            while ((he = hv_iternext((HV *) SvRV(val))) != NULL) {
+                (void) hv_store_ent(attrs, hv_iterkeysv(he),
+                    newSVsv(hv_iterval((HV *) SvRV(val), he)), 0);
+            }
+        }
+        (void) hv_store(meta, "attributes", 10, newRV_noinc((SV *) attrs), 0);
+    }
+
+    ENTER; SAVETMPS;
+    meta_ref = sv_2mortal(newRV_noinc((SV *) meta));
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpv(event, 0)));
+    XPUSHs(val == NULL ? &PL_sv_undef : val);
+    XPUSHs(meta_ref);
+    PUTBACK;
+
+    count = call_sv(ctx->opts.cb, G_SCALAR);
+
+    SPAGAIN;
+    if (count > 0) {
+        SV *result = POPs;
+        action = xh_x2h_callback_action(result);
+    }
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+
+    return action;
 }
 
 #define NEW_STRING(s, l, f)                                             \
@@ -225,7 +471,10 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
         if (flags & XH_X2H_ROOT_FOUND) goto INVALID_XML;                \
         flags |= XH_X2H_ROOT_FOUND;                                     \
     }                                                                   \
-    if (XH_X2H_FILTER_SEARCH(flags)) {                                  \
+    if (flags & XH_X2H_SKIP_SUBTREE) {                                  \
+        (s) = NULL;                                                     \
+    }                                                                   \
+    else if (XH_X2H_FILTER_SEARCH(flags)) {                             \
         xh_x2h_xpath_update(ctx->xpath, s, l);                          \
         if (xh_x2h_match_node(ctx->xpath, xh_strlen(ctx->xpath), ctx->opts.filter.expr)) {\
             xh_log_trace2("match node: [%.*s]", l, s);                  \
@@ -239,6 +488,25 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
         _OPEN_TAG(s, l)                                                 \
     }                                                                   \
     real_depth++;
+
+#define EVENT_START                                                     \
+    if (ctx->opts.cb_mode == XH_CB_MODE_EVENTS &&                       \
+        ctx->opts.cb != NULL &&                                         \
+        (flags & XH_X2H_FILTER_MATCHED) && depth == 1                   \
+    ) {                                                                 \
+        val = *nodes[depth].lval;                                       \
+        code = xh_x2h_pass_event(ctx, "start", val, real_depth);        \
+        if (code == XH_CB_STOP || code == XH_CB_SKIP) {                 \
+            SvREFCNT_dec(ctx->hash);                                    \
+            ctx->hash = NULL;                                           \
+            nodes[0].lval = lval = &ctx->hash;                          \
+            depth = 0;                                                  \
+            flags ^= XH_X2H_FILTER_MATCHED;                             \
+            if (code == XH_CB_STOP) goto PARSER_STOP;                   \
+            flags |= XH_X2H_SKIP_SUBTREE;                               \
+            skip_depth = real_depth;                                    \
+        }                                                               \
+    }
 
 #define _CLOSE_TAG                                                      \
     val = *nodes[depth].lval;                                           \
@@ -262,10 +530,17 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
     xh_log_trace0("close tag");                                         \
     flags &= ~XH_X2H_TEXT_NODE;                                         \
     if (real_depth == 0) goto INVALID_XML;                              \
-    if (!XH_X2H_FILTER_SEARCH(flags)) {                                 \
+    if (flags & XH_X2H_SKIP_SUBTREE) {                                  \
+        if (real_depth == skip_depth) {                                 \
+            flags ^= XH_X2H_SKIP_SUBTREE;                               \
+        }                                                               \
+    }                                                                   \
+    else if (!XH_X2H_FILTER_SEARCH(flags)) {                            \
         _CLOSE_TAG                                                      \
     }                                                                   \
-    if ((flags & XH_X2H_FILTER_MATCHED) && depth == 0) {                \
+    if (!(flags & XH_X2H_SKIP_SUBTREE) &&                               \
+        (flags & XH_X2H_FILTER_MATCHED) && depth == 0                   \
+    ) {                                                                 \
         xh_log_trace0("match node finished");                           \
         val = *nodes[0].lval;                                           \
         if (!ctx->opts.keep_root) {                                     \
@@ -274,17 +549,26 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
             val = hv_iterval((HV *) val, hv_iternext((HV *) val));      \
             SvREFCNT_inc(val);                                          \
             SvREFCNT_dec(*nodes[0].lval);                               \
+            ctx->hash = NULL;                                           \
         }                                                               \
         if (ctx->opts.cb == NULL) {                                     \
             av_push((AV *) SvRV(ctx->result), val);                     \
+            ctx->hash = NULL;                                           \
         }                                                               \
         else {                                                          \
-            xh_x2h_pass_matched_node(ctx->opts.cb, val);                \
+            code = ctx->opts.cb_mode == XH_CB_MODE_EVENTS               \
+                ? xh_x2h_pass_event(ctx, "end", val, real_depth)        \
+                : xh_x2h_pass_matched_node(ctx->opts.cb, val);          \
             SvREFCNT_dec(val);                                          \
+            ctx->hash = NULL;                                           \
+            if (code == XH_CB_SKIP) croak("SKIP is valid only for start events");\
+            if (code == XH_CB_STOP) goto PARSER_STOP;                   \
         }                                                               \
         flags ^= XH_X2H_FILTER_MATCHED;                                 \
     }                                                                   \
-    if ((flags & (XH_X2H_FILTER_ENABLED | XH_X2H_FILTER_MATCHED)) == XH_X2H_FILTER_ENABLED) {\
+    if (!(flags & XH_X2H_SKIP_SUBTREE) &&                               \
+        (flags & (XH_X2H_FILTER_ENABLED | XH_X2H_FILTER_MATCHED)) == XH_X2H_FILTER_ENABLED\
+    ) {                                                                 \
         xh_x2h_xpath_update(ctx->xpath, NULL, 0);                       \
     }                                                                   \
     real_depth--;
@@ -486,8 +770,10 @@ PPCAT(loop, _FINISH):
 
 #define SEARCH_END_TAG                                                  \
     EXPECT_CHAR("end tag", '>')                                         \
+        EVENT_START                                                     \
         goto PARSE_CONTENT;                                             \
     EXPECT_CHAR("self closing tag", '/')                                \
+        EVENT_START                                                     \
         CLOSE_TAG                                                       \
         DO(SEARCH_END_TAG)                                              \
             EXPECT_CHAR("end tag", '>')                                 \
@@ -965,7 +1251,7 @@ xh_x2h_parse_chunk(xh_x2h_ctx_t *ctx, xh_char_t **buf, size_t *bytesleft, xh_boo
     xh_char_t          c, *cur, *node, *end, *content, *eof, *enc,
                       *enc_cur, *old_cur, *old_eof, *content_key,
                       *end_of_attr_value;
-    unsigned int       depth, real_depth, code, flags, extra_flags;
+    unsigned int       depth, real_depth, code, flags, extra_flags, skip_depth;
     int                bits;
     SV               **lval, *val;
     xh_x2h_node_t     *nodes;
@@ -983,6 +1269,7 @@ xh_x2h_parse_chunk(xh_x2h_ctx_t *ctx, xh_char_t **buf, size_t *bytesleft, xh_boo
     end_of_attr_value = ctx->end_of_attr_value;
     content           = ctx->content;
     code              = ctx->code;
+    skip_depth        = ctx->skip_depth;
     lval              = ctx->lval;
     enc               = enc_cur = old_eof = old_cur = NULL;
     c                 = '\0';
@@ -1100,9 +1387,11 @@ PARSE_CONTENT:
                     DO(PARSE_OPENING_TAG)
                         EXPECT_CHAR("end tag", '>')
                             OPEN_TAG(node, cur - node - 1)
+                            EVENT_START
                             goto PARSE_CONTENT;
                         EXPECT_CHAR("self closing tag", '/')
                             OPEN_TAG(node, cur - node - 1)
+                            EVENT_START
                             CLOSE_TAG
 
                             DO(SEARCH_OPENING_END_TAG)
@@ -1184,6 +1473,9 @@ PARSE_DOCTYPE_INTSUBSET_START:
 
 XML_DECL_FOUND:
     ctx->state = XML_DECL_FOUND;
+    goto CHUNK_FINISH;
+PARSER_STOP:
+    flags |= XH_X2H_STOPPED;
 CHUNK_FINISH:
     ctx->content = content;
     ctx->node = node;
@@ -1193,6 +1485,7 @@ CHUNK_FINISH:
     ctx->real_depth = real_depth;
     ctx->flags = flags;
     ctx->code = code;
+    ctx->skip_depth = skip_depth;
     ctx->lval = lval;
     *bytesleft = eof - cur;
     *buf = cur;
@@ -1236,6 +1529,9 @@ xh_x2h_parse(xh_x2h_ctx_t *ctx, xh_reader_t *reader)
 
             xh_x2h_parse_chunk(ctx, &buf, &len, eof);
 
+            if (ctx->flags & XH_X2H_STOPPED)
+                return;
+
             if (ctx->state == XML_DECL_FOUND && ctx->opts.encoding[0] == '\0' && ctx->encoding[0] != '\0') {
                 reader->switch_encoding(reader, ctx->encoding, &buf, &len);
             }
@@ -1256,15 +1552,7 @@ xh_x2h(xh_x2h_ctx_t *ctx)
     dXCPT;
     XCPT_TRY_START
     {
-        if (ctx->opts.filter.enable) {
-            ctx->flags |= XH_X2H_FILTER_ENABLED;
-            if (ctx->opts.cb == NULL)
-                ctx->result = newRV_noinc((SV *) newAV());
-        }
-        else {
-            ctx->result = newRV_noinc((SV *) newHV());
-            ctx->nodes[0].lval = ctx->lval = &ctx->result;
-        }
+        xh_x2h_init_result(ctx);
 
         xh_reader_init(&ctx->reader, ctx->input, ctx->opts.encoding, ctx->opts.buf_size);
 

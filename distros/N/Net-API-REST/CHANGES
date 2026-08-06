@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::REST
 
+v1.2.6 2026-08-05T16:43:28+0900
+    - Improvement of handler in handling exception returned by endpoint.
+
 v1.2.5 2026-03-20T19:05:36+0900
     - Improvement of endpoint handling in route
 

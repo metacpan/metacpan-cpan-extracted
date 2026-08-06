@@ -1,0 +1,3 @@
+#!perl
+
+exit( ( require Dist::Starter )->run ) ## no critic ( RequireUseStrict, RequireUseWarnings )

@@ -1,0 +1,25 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README.md
+eg/jwt_protected_app.pl
+lib/PAGI/FastAPI/Security.pm
+lib/PAGI/FastAPI/Security/APIKey.pm
+lib/PAGI/FastAPI/Security/Base.pm
+lib/PAGI/FastAPI/Security/HTTPBasic.pm
+lib/PAGI/FastAPI/Security/HTTPBearer.pm
+lib/PAGI/FastAPI/Security/OAuth2/PasswordBearer.pm
+t/00-load.t
+t/01-http_bearer.t
+t/02-http_basic.t
+t/03-api_key.t
+t/04-oauth2_password_bearer.t
+t/lib/TestHarness.pm
+xt/changes.t
+xt/manifest.t
+xt/pod.t
+xt/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

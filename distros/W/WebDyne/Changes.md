@@ -1,5 +1,27 @@
 # Revision history for WebDyne
 
+## 3.009 - 2026-08-06
+
+- Added `style_prepend`/`style_append` and
+  `script_prepend`/`script_append` pseudo attributes for `<start_html>`,
+  allowing pages to add resources around configured
+  `WEBDYNE_START_HTML_PARAM` defaults without replacing them.
+- Clarified `<start_html>` default-attribute override behaviour: page
+  attributes replace matching `WEBDYNE_START_HTML_PARAM` values, while the
+  new prepend/append variants preserve and extend configured style/script
+  resources.
+- Documented `<start_html>` resource ordering for linked styles versus
+  `include_style` content, and external scripts versus `include_script`
+  content.
+- Made PSGI and PAGI wrapper configuration loading consistent by loading
+  `DOCUMENT_ROOT/.webdyne.conf.pl` when the app is built, including when
+  `webdyne.psgi` or `webdyne.pagi` is loaded by an external server.
+- Clarified root `.webdyne.conf.pl` loading versus per-request directory
+  `.webdyne.conf.pl` handling, where only `WEBDYNE_DIR_CONFIG` is read from
+  PSP-directory config files.
+- Added regression coverage for `<start_html>` style/script extension
+  attributes and PSGI/PAGI external-loader root configuration loading.
+
 ## 3.008 - 2026-08-04
 
 - Added REST-style `<api>` route discovery and `PATH_INFO` mapping to

@@ -1,0 +1,11 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{% title | default('Stencil') %}</title>
+    {% for s in js_scripts %}<script src="{% s | uri %}"></script>
+    {% end %}
+  </head>
+  <body>
+{% content %}
+  </body>
+</html>

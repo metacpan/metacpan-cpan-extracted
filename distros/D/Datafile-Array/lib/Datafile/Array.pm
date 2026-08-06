@@ -8,7 +8,7 @@ use Exporter 'import';
 use Carp;
 
 our @EXPORT_OK = qw(readarray writearray parse_csv_line);
-our $VERSION   = '1.06';
+our $VERSION   = '1.08';
 
 sub _trim {
     my ($value, $do_trim) = @_;
@@ -161,8 +161,7 @@ sub readarray {
                 next;
             }
             else {
-                croak
-"datafile::array::readarray: no field names provided and none found in file"
+                return( -1,  "datafile::array::readarray: no field names provided and none found in file")
                     unless @field_names;
                 $header_done = 1;
             }
@@ -197,8 +196,7 @@ sub readarray {
         $record_count++;
     }
     close $fh;
-    croak
-"datafile::array::readarray: no field names provided and none found in file"
+    return( -1,  "datafile::array::readarray: no field names provided and none found in file")
         unless @field_names;
 
     if ( defined $pafields && @field_names && !@$pafields ) {
@@ -236,13 +234,7 @@ sub writearray {
     }
 
     if ( ref $data ne 'ARRAY' && ref $data ne 'HASH' && !@field_names ) {
-        if ( -f $filename ) {
-            unlink($filename)
-                or return ( 0, ["WARNING: unable to delete file $filename"] );
-            return ( 1, ["SUCCESS: file $filename is deleted"] );
-        }
-        croak
-"datafile::array::writearray: 'data' parameter must be an ARRAY or HASH reference";
+        croak "datafile::array::writearray: 'data' parameter must be an ARRAY or HASH reference";
     }
 
     my @messages = ();
@@ -287,8 +279,7 @@ sub writearray {
         $record_count++;
     }
     print $fh "#EOF\n" if $comment_char eq '#';
-    close $fh
-        or return ( 0, ["ERROR: failed to close '$tmp': $!"] );
+    close $fh;
 
     if ($backup && -f $filename) {
         if (!rename( $filename, $filename . '.bak' )) {
@@ -314,11 +305,11 @@ __END__
 
 =head1 NAME
 
-Datafile::Array - Pure-Perl utilities for reading and writing delimited data files
+Datafile::Array - Lightweight pure-Perl data file handlers for array/tabular/csv data
 
 =head1 VERSION
 
-1.06
+1.08
 
 =head1 LICENSE
 

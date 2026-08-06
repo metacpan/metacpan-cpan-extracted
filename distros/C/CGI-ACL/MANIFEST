@@ -11,6 +11,7 @@ README.md
 t/00-load.t
 t/30-basics.t
 t/boiler.t
+t/cgi_security.t
 t/changes.t
 t/comment_spelling.t
 t/country.t
@@ -29,6 +30,7 @@ t/integration.t
 t/ip.t
 t/kwalitee.t
 t/locales.t
+t/logic_reducer.t
 t/manifest.t
 t/metrics.t
 t/mutant_killers.t
@@ -46,6 +48,7 @@ t/prereq.t
 t/snippets.t
 t/strict.t
 t/undef.t
+t/unit.t
 t/unused.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

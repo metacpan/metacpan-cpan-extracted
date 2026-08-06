@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use v5.20;
+use warnings;
 use Benchmark qw'cmpthese';
 use Text::Stencil;
 
@@ -116,7 +117,9 @@ say "\n=== 4. Row count scaling ===";
 my $simple = Text::Stencil->new(row => '{0:int},{1:html}', separator => "\n");
 for my $n (10, 100, 1000, 10000) {
     my @rows = map { [$_, "<v$_>"] } 1..$n;
-    my $iters = int(500000 / $n) || 1;
+    # ~20M rows per size: 500_000 timed only 20-30ms, which against a 100Hz
+    # clock reports whole ticks and reads as a difference between row counts
+    my $iters = int(20_000_000 / $n) || 1;
     my $t = Benchmark::timeit(1, sub { $simple->render(\@rows) for 1..$iters });
     my $elapsed = $t->[1] + $t->[2];
     printf "  %5d rows x%d: %.3fs (%.1fM rows/s)\n", $n, $iters, $elapsed, $n * $iters / ($elapsed || 0.001) / 1e6;

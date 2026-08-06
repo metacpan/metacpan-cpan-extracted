@@ -1,5 +1,49 @@
 Revision history for Math-NLopt
 
+0.13      2026-08-05 15:30:41-04:00 America/New_York
+
+  [BUILD]
+
+    * fix compiler errors on threaded Perl
+
+0.12      2026-08-05 13:51:17-04:00 America/New_York
+
+  [API BREAKAGE]
+
+    * add_(in)?equality_(m)?constraint function have a different API.
+      The breakage is minimal, as they were functionally broken in
+      previous releases.
+
+    * the create class mathod was removed; use the class constructor instead.
+
+    * vector contraint functions receive proper 2D Perl arrays, rather than
+      a flat 1D array
+
+  [NEW BEHAVIOR]
+
+    * using the Perl object after the NLopt C object has been freed
+      will now result in exceptions. (This is possible if the Perl
+      object's DESTROY method is called explicitly, which is rather
+      uncommon).  Calling the DESTROY method multiple times is a no-op
+      after the first call.
+
+  [BUGFIX]
+
+    * algorithm_from_string, algorithm_name, algorithm_to_string: no longer broken
+    * user data is now shallow copied rather than used directly
+    * set_procond_(min|max)_objective didn't pass the preconditioning function correctly
+    * set_max_objective didn't pass the user data
+    * vector constraint functions always returned an error when called by NLopt
+    * vector constraint functions allocated the incorrect number of elements for the constraint.
+    * various memory and object leaks have been plugged.
+
+  [ENHANCEMENTS]
+
+    * more robust test suite
+    * more sanity checking of parameters and edge cases
+    * more more
+
+
 0.11      2025-06-17 20:58:48-04:00 America/New_York
 
   [BUGFIX]

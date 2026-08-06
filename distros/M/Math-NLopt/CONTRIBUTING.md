@@ -14,17 +14,10 @@ repository.  Patches against the distributed code are welcome, but
 patches or pull requests against the code in the repository are even
 more welcome.
 
-The public repository for this code is managed with git and is hosted at GitLab.
-It is available via the web at:
 
-  https://gitlab.com/djerius/math-nlopt
+The public repository for this code is managed with git and is found here:
 
-You can submit code changes by forking the repository, pushing your code
-changes to your clone, and then submitting a merge request. Detailed
-instructions for doing that is available here:
-
-  https://docs.gitlab.com/ee/user
-  https://docs.gitlab.com/ee/user/project/merge_requests/getting_started.html
+    https://codeberg.org/djerius/p5-Math-NLopt 
 
 
 My primary repository actually uses Mercurial, so if you are more

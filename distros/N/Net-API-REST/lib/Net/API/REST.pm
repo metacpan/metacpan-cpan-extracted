@@ -1,16 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/m
-## Version v1.2.5
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v1.2.6
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2026/03/20
+## Modified 2026/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package Net::API::REST;
 BEGIN
 {
@@ -39,7 +39,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Apache2::API::Status;
-    $VERSION = 'v1.2.5';
+    $VERSION = 'v1.2.6';
 };
 
 use strict;
@@ -61,7 +61,7 @@ sub init
     $self->{default_methods}        = [qw( GET POST )] unless( $self->{default_methods} );
     $self->{is_allowed}             = {} unless( $self->{is_allowed} && scalar( keys( %{$self->{is_allowed}} ) ) );
     $self->{supported_content_types} = [] unless( $self->{supported_methods} );
-    $self->{supported_methods}      = [qw( DELETE GET HEAD OPTIONS POST PUT )] unless( $self->{supported_methods} );
+    $self->{supported_methods}      = [qw( DELETE GET HEAD OPTIONS PATCH POST PUT )] unless( $self->{supported_methods} );
     $self->{supported_api_versions} = [qw( 1 )] unless( $self->{supported_api_versions} );
     $self->{key}                    = '' unless( length( $self->{key} ) );
     $self->{jwt_accepted_algo}      = [] unless( length( $self->{jwt_accepted_algo} ) );
@@ -364,10 +364,19 @@ EOT
         # Server error
         if( !defined( $rc ) )
         {
-            # Net::API::REST::reply will automatically set a json with an error message based on the user language
-            # It is ok to set a reply ourself here, because if it were a normal response, we would not be getting an undef value
-            return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR }) );
-            # return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+            my $ex = $self->error;
+            if( $ex )
+            {
+                # Apache2::API->reply that we inherit from recognises exception, and will extract code, message, locale from it.
+                return( $self->reply( $ex ) );
+            }
+            else
+            {
+                # Net::API::REST::reply will automatically set a json with an error message based on the user language
+                # It is ok to set a reply ourself here, because if it were a normal response, we would not be getting an undef value
+                return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR }) );
+                # return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+            }
         }
         elsif( $rc == Apache2::Const::HTTP_OK )
         {
@@ -867,7 +876,7 @@ sub route
     # Clean up empty path
     my $parts = [ grep{ length( $_ ) > 0 } @points ];
     my $client_api_version = '';
-    if( $parts->[0] =~ /^v?(\d+(?:\.\d+)*)$/ )
+    if( ( $parts->[0] // '' ) =~ /^v?(\d+(?:\.\d+)*)$/ )
     {
         $client_api_version = $1;
         shift( @$parts );
@@ -1628,7 +1637,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v1.2.5
+    v1.2.6
 
 =head1 DESCRIPTION
 

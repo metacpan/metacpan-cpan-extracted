@@ -1,0 +1,131 @@
+=pod
+
+=head1 NAME
+
+Dist::Starter - A command-line utility for rendering Perl project templates
+
+=head1 DESCRIPTION
+
+This is an B<alpha> release. It is yet another starter kit implementation for a
+Perl project (distribution). It provides the C<diststarter> script as a CLI.
+The script has a single mandatory argument that is the C<distname>. The
+following table lists the options/flags of the script:
+
+  Option | Placeholder         | Default                       | Example
+  -------+---------------------+-------------------------------+--------------------
+  T:     | n/a                 | 'templates/perl-dist-eummcpf' |
+  V      | n/a                 | not set (version info)        |
+  h      | n/a                 | not set (usage info)          |
+  n      | n/a                 | not set                       |
+  o:     | n/a                 | current directory             |
+  A:     | abstract            | 'The great new Foo::Bar::Baz' |
+  G:     | git_base_url        | ''                            |
+  M:     | min_perl_version    | '5.010000'                    |
+  a:     | author.full_name    | from GECOS                    |
+  a:     | author.email        | from GECOS, fallback EMAIL    |
+  none   | initial_version     | 'v0.1.0'                      |
+  none   | license             | 'perl_5'                      |
+  n/a    | distname            |                               | Foo-Bar-Baz
+  n/a    | main_module         |                               | Foo::Bar::Baz
+  n/a    | main_module_file    |                               | lib/Foo/Bar/Baz.pm
+  n/a    | main_module_podfile |                               | lib/Foo/Bar/Baz.pod
+
+The options that have a "Placeholder" value control the scaffolding. It is
+recommended to overwrite the "Default" of some of them in your run-control
+file. Example:
+
+  cat ${XDG_CONFIG_HOME}/diststarterrc
+  G https://github.com/sitcom
+  M 5.042003
+  a FROM_GIT
+
+The C<-a> option allows the special values FROM_GIT and FROM_ENV. If you
+use FROM_GIT, the author information is taken from the C<user.name> and
+C<user.email> git configuration attributes. If you use FROM_ENV, the author
+information is taken from the environment variables FULL_NAME and EMAIL. The
+default is to take the author information (at least its full name) from the
+GECOS string and if the email extraction isn't possible to fall back to the
+EMAIL environment variable. The author information has the format
+
+  Fred Flintstone <fred.flintstone@example.com> # with email
+  Fred Flintstone                               # without email
+
+The value of the C<-T> option specifies a directory that includes the template
+definition. The default refers to a directory shared by this distribution.
+
+The value of the C<-o> option specifies a directory where the generated project
+should be created. The default refers to the current directory. The special
+value TEM_DIR can be used to create the project in a temporary directory.
+
+If you set the C<-n> (dry-run) flag, the project will not be created but the
+so-called context will be printed to standard output. The context is a YAML
+document that contains the placeholder names and their values.
+
+=head1 TODO
+
+=over 2
+
+=item *
+
+Explain how to create a new template definition
+
+=item *
+
+Reorganize documentation
+
+=item *
+
+Add script (C<-s>) and share (C<-S>) options
+
+=item *
+
+Provide options to customize the initial version and the license
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<Cookiecutter|https://cookiecutter.readthedocs.io/en/stable/README.html>
+
+=item *
+
+L<Copier|https://copier.readthedocs.io/en/stable/>
+
+=item *
+
+L<App::Starter>
+
+=item *
+
+L<CPAN::Maker>
+
+=item *
+
+L<Distribution::Cooker>
+
+=item *
+
+L<Module::New>
+
+=item *
+
+L<Module::Starter>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut

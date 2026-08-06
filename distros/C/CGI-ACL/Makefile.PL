@@ -19,40 +19,40 @@ WriteMakefile(
 	ABSTRACT_FROM	=> 'lib/CGI/ACL.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-	  ? ('LICENSE'=> 'GPL')
+	  ? ('LICENSE'=> 'gpl_2')
 	  : ()),
 	PL_FILES	=> {},
-	TEST_REQUIRES => {
+	PREREQ_PM => {
+		'Carp' => 0,
+		'namespace::clean' => 0,
+		'Net::CIDR' => 0,
+		'Object::Configure' => 0,
+		'Params::Get' => 0,
+		'Readonly' => 0,
+		'Regexp::Common' => 0,
+		'Scalar::Util' => 0,
+		'Socket' => '2.000',
+		'Sub::Protected' => 0,
+	}, TEST_REQUIRES => {
 		'CGI::Lingua' => 0.15,
-		'Data::Dumper' => 0,
 		'English' => 0,
+		'IPC::System::Simple' => 0,
+		'Readonly' => 0,
 		'Test::Carp' => 0,
 		'Test::CleanNamespaces' => 0,
-		'Test::Distribution' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Distribution' => 0,
 		'Test::Memory::Cycle' => 0,
 		'Test::MockObject' => 0,
 		'Test::Mockingbird' => 0.12,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
-		'Test::Returns' => 0,
-		'File::Spec' => 0,
 		'Test::NoWarnings' => 0,
-		'autodie' => 0,
-		'strict' => 0,
-		'warnings' => 0,
-		'IPC::System::Simple' => 0,
-		'WWW::RT::CPAN' => 0
-	}, PREREQ_PM => {
-		'Carp' => 0,
-		'File::Spec' => 3.4,
-		'namespace::clean' => 0,
-		'Net::CIDR' => 0,
-		'Object::Configure' => 0,
-		'Params::Get' => 0,
-		'Regexp::Common' => 0
-	},
-	dist => $dist,
+		'Test::Returns' => 0.03,
+		'Test::Warn' => 0,
+		'Test::Without::Module' => 0,
+		'WWW::RT::CPAN' => 0,
+	}, dist => $dist,
 	clean		=> { FILES => 'CGI-ACL-*' },
 	META_MERGE		=> {
 		'meta-spec' => { version => 2 },
@@ -70,5 +70,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.014'	# Socket::getaddrinfo requires Socket 2.000 (first in Perl 5.14)
 );

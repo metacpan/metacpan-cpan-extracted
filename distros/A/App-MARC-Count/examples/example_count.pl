@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 use App::MARC::Count;
-use IO::Barf qw(barf);
 use File::Temp qw(tempfile);
+use IO::Barf qw(barf);
 use MIME::Base64;
 
 # Content.

@@ -11,7 +11,7 @@ sub default_xls_module {
 }
 
 # ABSTRACT: Access sheets/rows of a Microsoft Excel '97 workbook
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 
 sub _build_workbook {
@@ -42,7 +42,7 @@ Data::TableReader::Decoder::XLS - Access sheets/rows of a Microsoft Excel '97 wo
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

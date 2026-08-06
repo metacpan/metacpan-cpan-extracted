@@ -134,16 +134,22 @@ typedef ptrdiff_t ssize_t;
 #endif
 // CPU Architecture Detection
 /**
- * @details Defines `INFIX_ARCH_*` for the two currently supported architectures.
+ * @details Defines `INFIX_ARCH_*` for the supported architectures.
  * The library will fail to compile if the architecture is not one of these, as
  * the JIT code emitters are architecture-specific.
  */
 #if defined(__aarch64__) || defined(_M_ARM64)
 #define INFIX_ARCH_AARCH64
+#elif defined(__riscv)
+#if __riscv_xlen == 64
+#define INFIX_ARCH_RISCV
+#else
+#error "Unsupported RISC-V variant. Only RV64 is currently supported."
+#endif
 #elif defined(__x86_64__) || defined(_M_X64)
 #define INFIX_ARCH_X64
 #else
-#error "Unsupported architecture. Only x86-64 and AArch64 are currently supported."
+#error "Unsupported architecture. Only x86-64, AArch64, and RV64 are currently supported."
 #endif
 // Target ABI Logic Selection
 /**
@@ -168,6 +174,9 @@ typedef ptrdiff_t ssize_t;
 #elif defined(INFIX_FORCE_ABI_AAPCS64)
 #define INFIX_ABI_AAPCS64 1
 #define INFIX_ABI_FORCED 1
+#elif defined(INFIX_FORCE_ABI_RISCV64)
+#define INFIX_ABI_RISCV64 1
+#define INFIX_ABI_FORCED 1
 #endif
 // Automatic ABI detection if not forced by the user.
 #ifndef INFIX_ABI_FORCED
@@ -176,6 +185,9 @@ typedef ptrdiff_t ssize_t;
 // convention (AAPCS64), although with minor differences for variadic arguments
 // that are handled within the `abi_arm64.c` implementation.
 #define INFIX_ABI_AAPCS64
+#elif defined(INFIX_ARCH_RISCV)
+// RISC-V 64-bit platforms use the RISC-V ELF psABI (lp64d for hard-float Linux).
+#define INFIX_ABI_RISCV64
 #elif defined(INFIX_ARCH_X64)
 #if defined(INFIX_OS_WINDOWS)
 // Windows on x86-64 uses the Microsoft x64 calling convention.

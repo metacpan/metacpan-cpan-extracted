@@ -71,6 +71,10 @@ extern const infix_direct_forward_abi_spec g_sysv_x64_direct_forward_spec;
 extern const infix_forward_abi_spec g_arm64_forward_spec;
 extern const infix_reverse_abi_spec g_arm64_reverse_spec;
 extern const infix_direct_forward_abi_spec g_arm64_direct_forward_spec;
+#elif defined(INFIX_ABI_RISCV64)
+extern const infix_forward_abi_spec g_riscv64_forward_spec;
+extern const infix_reverse_abi_spec g_riscv64_reverse_spec;
+extern const infix_direct_forward_abi_spec g_riscv64_direct_forward_spec;
 #endif
 /**
  * @internal
@@ -88,6 +92,8 @@ const infix_forward_abi_spec * get_current_forward_abi_spec() {
     return &g_sysv_x64_forward_spec;
 #elif defined(INFIX_ABI_AAPCS64)
     return &g_arm64_forward_spec;
+#elif defined(INFIX_ABI_RISCV64)
+    return &g_riscv64_forward_spec;
 #else
     return nullptr;
 #endif
@@ -105,6 +111,8 @@ const infix_reverse_abi_spec * get_current_reverse_abi_spec() {
     return &g_sysv_x64_reverse_spec;
 #elif defined(INFIX_ABI_AAPCS64)
     return &g_arm64_reverse_spec;
+#elif defined(INFIX_ABI_RISCV64)
+    return &g_riscv64_reverse_spec;
 #else
     return nullptr;
 #endif
@@ -121,6 +129,8 @@ const infix_direct_forward_abi_spec * get_current_direct_forward_abi_spec() {
     return &g_sysv_x64_direct_forward_spec;
 #elif defined(INFIX_ABI_AAPCS64)
     return &g_arm64_direct_forward_spec;
+#elif defined(INFIX_ABI_RISCV64)
+    return &g_riscv64_direct_forward_spec;
 #else
     return nullptr;
 #endif
@@ -1229,6 +1239,9 @@ c23_nodiscard infix_status infix_reverse_create_closure(infix_reverse_t ** out_c
 #elif defined(INFIX_ABI_AAPCS64)
 #include "../arch/aarch64/abi_arm64.c"
 #include "../arch/aarch64/abi_arm64_emitters.c"
+#elif defined(INFIX_ABI_RISCV64)
+#include "../arch/riscv/abi_riscv64.c"
+#include "../arch/riscv/abi_riscv64_emitters.c"
 #else
 #error "No supported ABI was selected for the unity build in trampoline.c."
 #endif

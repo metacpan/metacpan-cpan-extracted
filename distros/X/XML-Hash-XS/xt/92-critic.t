@@ -4,8 +4,12 @@ use strict;
 use warnings;
 use Test::More;
 
-eval { use Test::Perl::Critic };
-plan skip_all => 'Test::Perl::Critic required' if $@;
+eval {
+    require Test::Perl::Critic;
+    Test::Perl::Critic->import();
+    require Perl::Critic::Utils;
+    1;
+} or plan skip_all => 'Test::Perl::Critic required';
 
 # check only new code
 my @dirs = qw( lib );

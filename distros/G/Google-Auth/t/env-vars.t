@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2022 Google LLC
+# Copyright 2022 Google LLC and contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,18 +17,17 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN
-{
-    use_ok('Google::Auth::EnvironmentVars') || print "Bail out!\n";
+BEGIN {
+  use_ok('Google::Auth::EnvironmentVars') || print "Bail out!\n";
 }
 
-note("Testing Google::Auth::EnvironmentVars $Google::Auth::EnvironmentVars::VERSION, Perl $], $^X");
+note("Testing Google::Auth::EnvironmentVars, Perl $], $^X");
 
 my $prj_str = 'test-project-string';
 
 my $gaev = Google::Auth::EnvironmentVars->new();
 
-is( $gaev->PROJECT, undef,
+is($gaev->PROJECT, undef,
 '$gaev->PROJECT undefined when environment variable GOOGLE_CLOUD_PROJECT unset'
 );
 
@@ -36,8 +35,7 @@ $ENV{GOOGLE_CLOUD_PROJECT} = $prj_str;
 
 $gaev = Google::Auth::EnvironmentVars->new();
 
-is( $gaev->PROJECT, $prj_str,
-    '$gaev->PROJECT defined when environment variable GOOGLE_CLOUD_PROJECT set'
-);
+is($gaev->PROJECT, $prj_str,
+  '$gaev->PROJECT defined when environment variable GOOGLE_CLOUD_PROJECT set');
 
 done_testing(3);

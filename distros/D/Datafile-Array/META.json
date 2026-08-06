@@ -1,7 +1,7 @@
 {
    "abstract" : "Lightweight pure-Perl data file handlers for array/tabular/csv data",
    "author" : [
-      "Hans Harder <hans at atbas.org>"
+      "Hans Harder"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -46,7 +46,7 @@
    "provides" : {
       "Datafile::Array" : {
          "file" : "lib/Datafile/Array.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -60,9 +60,6 @@
          "web" : "https://codeberg.org/HansH111/Datafile-Array.pm"
       }
    },
-   "version" : "1.06",
-   "x_contributors" : [
-      "Hans Harder <hans at atbas.org>"
-   ],
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

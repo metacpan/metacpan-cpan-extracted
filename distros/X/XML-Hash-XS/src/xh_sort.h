@@ -11,5 +11,6 @@ typedef struct {
 } xh_sort_hash_t;
 
 xh_sort_hash_t *xh_sort_hash(HV *hash, size_t len);
+void xh_sort_hash_free(pTHX_ void *sorted_hash);
 
 #endif /* _XH_SORT_H_ */

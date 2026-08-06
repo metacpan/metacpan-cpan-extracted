@@ -1,7 +1,7 @@
 {
    "abstract" : "BIMI object",
    "author" : [
-      "Marc Bradshaw <marc@marcbradshaw.net>"
+      "Jemma Bradshaw <jemma@nothingbutstatic.dev>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150012",
@@ -101,7 +101,7 @@
          "web" : "https://github.com/marcbradshaw/mail-bimi"
       }
    },
-   "version" : "3.20260302",
+   "version" : "3.20260806",
    "x_contributors" : [
       "Andrew Davis <adavis@fastmailteam.com>",
       "Freddie Leeman <freddie@freddieleeman.nl>",
@@ -109,6 +109,7 @@
       "Keith Ealanta <kealanta@fastmailteam.com>",
       "Kurt Starsinic <kstarsinic@gmail.com>",
       "Marc Bradshaw <marc@fastmailteam.com>",
+      "Marc Bradshaw <marc@marcbradshaw.net>",
       "Norikatsu Shigemura <nork@ninth-nine.com>"
    ],
    "x_generated_by_perl" : "v5.42.0",

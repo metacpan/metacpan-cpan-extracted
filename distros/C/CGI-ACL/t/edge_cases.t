@@ -117,6 +117,40 @@ subtest 'new(): circular reference in params does not crash' => sub {
 	isa_ok($acl, 'CGI::ACL', 'still returns a CGI::ACL object');
 };
 
+subtest 'new(): private cache keys are stripped from clone constructor params' => sub {
+	# Exploit scenario: caller passes _cloud_cache with a pre-seeded entry that
+	# marks a cloud IP as non-cloud (result => 0) with a far-future expiry.
+	# If the cache entry were accepted, all_denied() would trust the cache hit
+	# and never call DNS, silently bypassing deny_cloud() for the targeted IP.
+	my $orig  = CGI::ACL->new()->deny_cloud();
+	my $clone = $orig->new(
+		_cloud_cache => { $config{VALID_IP} => { result => 0, expires => 9_999_999_999 } },
+		_cidrlist    => ['synthetic-cidr-entry'],
+	);
+
+	ok(!defined($clone->{_cloud_cache}),
+		'_cloud_cache is stripped from clone params (cache injection prevented)');
+	ok(!defined($clone->{_cidrlist}),
+		'_cidrlist is stripped from clone params (CIDR injection prevented)');
+	ok($clone->{deny_cloud},
+		'deny_cloud (public key) is preserved through clone');
+};
+
+subtest 'new(): private cache keys are stripped from class constructor params' => sub {
+	# Same injection via the class-method path (CGI::ACL->new(_cloud_cache => ...))
+	# The injected key flows through Object::Configure::configure; it must be
+	# stripped from the bless'd hashref before the object is returned.
+	my $acl = CGI::ACL->new(
+		deny_cloud   => 1,
+		_cloud_cache => { $config{VALID_IP} => { result => 0, expires => 9_999_999_999 } },
+	);
+
+	ok(!defined($acl->{_cloud_cache}),
+		'_cloud_cache is stripped from class constructor (env-var injection path closed)');
+	ok($acl->{deny_cloud},
+		'deny_cloud (public key) survives stripping');
+};
+
 # ─────────────────────────────────────────────────────────────────────────────
 # allow_ip EDGE CASES
 # ─────────────────────────────────────────────────────────────────────────────
@@ -159,22 +193,30 @@ subtest 'allow_ip(): "0.0.0.0/0" (default-route CIDR) allows every IP' => sub {
 	is(denied_at($acl, $config{ZERO_IP}),   0, '0.0.0.0/0 allows 0.0.0.0');
 };
 
-subtest 'allow_ip(): injection strings stored in allow-list do not crash all_denied' => sub {
-	# An injection string would never match a real REMOTE_ADDR, but its
-	# presence must not cause Net::CIDR to die inside all_denied.
+subtest 'allow_ip(): injection strings are rejected with carp, not stored' => sub {
+	# allow_ip() now validates format at input and carps on invalid values.
+	# Previously invalid strings were silently stored and discarded by the
+	# eval-wrapped Net::CIDR calls; this change rejects them early, preventing
+	# memory accumulation in persistent processes and O(n) cidradd overhead.
 	my $acl = CGI::ACL->new();
 
-	# These should store without crashing (allow_ip does not validate format)
-	# but all_denied must handle them gracefully when building the CIDR list.
 	for my $bad ($config{SHELL_INJECT}, $config{SQL_INJECT}, $config{LONG_STRING}) {
-		$acl->allow_ip($bad);
+		my $ret;
+		does_carp(sub { $ret = $acl->allow_ip($bad) });
+		is($ret, $acl, 'allow_ip returns $self on invalid input (chaining not broken)');
 	}
-	diag "allow_ip with injection strings stored" if $ENV{TEST_VERBOSE};
+	diag "allow_ip with injection strings rejected" if $ENV{TEST_VERBOSE};
 
-	# VALID_IP is not in the list → must be denied without an unhandled exception
+	# allowed_ips MUST be defined (as an empty hashref) so that the early-return
+	# guard in all_denied() sees "IP restrictions configured" and does not allow
+	# all traffic (fail-open).  The values must be empty (nothing stored).
+	ok(defined($acl->{allowed_ips}),        'allowed_ips initialised to signal IP restrictions intended');
+	ok(!%{$acl->{allowed_ips}},             'allowed_ips is empty — invalid entries were not stored');
+
+	# With an empty allow-list the IP check finds no match → all_denied denies (fail-closed).
 	my $result = eval { denied_at($acl, $config{VALID_IP}) };
-	ok(!$@,              'all_denied does not throw when allow-list has invalid entries');
-	is($result, 1,       'VALID_IP is denied (not in the (invalid) allow-list)');
+	ok(!$@,     'all_denied does not throw when only invalid entries were attempted');
+	is($result, 1, 'VALID_IP denied — empty allow-list fails closed, not open');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -564,6 +606,383 @@ subtest 'deny_country(): adding same country twice is idempotent' => sub {
 		->deny_country($config{CC_GB});   # duplicate
 
 	is(scalar keys %{$acl->{deny_countries}}, 1, 'duplicate deny_country does not create two entries');
+};
+
+# ── Additional constants for new edge-case subtests ───────────────────────────
+
+Readonly my $IPv6_CIDR        => '2001:db8::/32';   # IPv6 CIDR for range tests
+Readonly my $IPv6_IN_CIDR     => '2001:db8::42';    # inside $IPv6_CIDR
+Readonly my $IPv6_NOT_IN_CIDR => '2001:db9::1';     # outside $IPv6_CIDR
+Readonly my $INVALID_CIDR_PFX => '192.0.2.1/33';    # valid base IP, impossible prefix
+Readonly my $CRLF_PTR_HOST    => "harmless-host.example.com\r\n";  # PTR record with CRLF
+Readonly my $STRESS_IP_COUNT  => 100;
+
+# Lingua stubs: extra types needed for new tests
+{
+	package DyingLingua;
+	sub new     { bless {}, shift }
+	sub country { die "country() exploded\n" }
+}
+
+{
+	package HugeLingua;
+	sub new     { bless {}, shift }
+	sub country { 'A' x 65_536 }    # 64 KiB return value — must not crash
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRESSION 0.10: \z ANCHOR IN REMOTE_ADDR VALIDATOR
+# POD change note: "Fix all_denied() IP validator: replace ^ / $ anchors with
+# \A / \z so that a trailing-newline REMOTE_ADDR cannot slip past the regex."
+# Perl's $ matches before a terminating \n; \z never does.
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'REGRESSION 0.10: "1.2.3.4\n" in REMOTE_ADDR is denied (\z anchor)' => sub {
+	# The old $ anchor accepted "1.2.3.4\n" because $ matches before a final \n.
+	# If allowed through, the address "1.2.3.4" (without the newline) could match
+	# an allow-list entry — a bypass for any ACL that allows that exact IP.
+	my $acl = CGI::ACL->new()->allow_ip($config{VALID_IP});
+
+	is(denied_at($acl, "$config{VALID_IP}\n"), 1,
+		'"IP\n" denied (\z anchor prevents $ bypass — regression guard)');
+	is(denied_at($acl, "$config{VALID_IP}\n\r"), 1,
+		'"IP\n\r" denied (CRLF variant also rejected)');
+	is(denied_at($acl, $config{VALID_IP}), 0,
+		'clean IP (no newline) still allowed (positive anchor check)');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRESSION: whitespace padding in REMOTE_ADDR
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'REMOTE_ADDR with leading or trailing whitespace is denied' => sub {
+	# An IP padded with whitespace must not be normalised and allowed; the validator
+	# must reject it outright.  Under the old ^ / $ anchors a trailing space would
+	# not match IPv4 regex, but under \A / \z it definitely does not — both anchors
+	# guard against whitespace.  This test documents the expected deny behaviour.
+	my $acl = CGI::ACL->new()->allow_ip($config{VALID_IP});
+
+	is(denied_at($acl, " $config{VALID_IP}"),  1, 'leading space in REMOTE_ADDR → denied');
+	is(denied_at($acl, "$config{VALID_IP} "),  1, 'trailing space in REMOTE_ADDR → denied');
+	is(denied_at($acl, "\t$config{VALID_IP}"), 1, 'leading tab in REMOTE_ADDR → denied');
+	diag "whitespace REMOTE_ADDR regression" if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# allow_ip(): ADDITIONAL ARGUMENT TYPES
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'allow_ip(): typeglob argument carps and returns $self (no crash)' => sub {
+	# Typeglobs are an unusual but valid Perl value type that a caller might
+	# accidentally pass (e.g., via an unguarded *STDOUT argument).
+	# A typeglob stringifies to "*main::STDOUT" — defined, but not a valid IP.
+	# allow_ip() emits the "not a valid IP address or CIDR block" carp (not the
+	# "Usage:" carp, which fires only on undef/missing args).
+	my $acl = CGI::ACL->new();
+	my $ret;
+	does_carp_that_matches(
+		sub { $ret = $acl->allow_ip(*STDOUT) },
+		qr/allow_ip.*not a valid/i,
+	);
+	is($ret, $acl, 'allow_ip(glob) returns $self for chaining safety');
+	ok(!$acl->{allowed_ips} || !%{$acl->{allowed_ips}},
+		'typeglob is not stored in allowed_ips');
+};
+
+subtest 'allow_ip(): hashref {ip => $addr} is a documented positive path' => sub {
+	# POD API SPECIFICATION documents three argument forms; hashref is one of them.
+	# Verify the hashref form routes through _get_param correctly.
+	my $acl = CGI::ACL->new()->allow_ip({ip => $config{VALID_IP}});
+
+	is(denied_at($acl, $config{VALID_IP}),  0, 'hashref form allow_ip: IP is permitted');
+	is(denied_at($acl, $config{VALID_IP2}), 1, 'hashref form allow_ip: other IP still denied');
+};
+
+subtest 'allow_ip(): valid IP with impossible CIDR prefix — no carp, eval guard, denied' => sub {
+	# '192.0.2.1' is a valid IPv4 base address so format validation passes (no carp).
+	# '/33' is an impossible IPv4 prefix; Net::CIDR::cidradd dies.  The eval guard
+	# in all_denied() catches the die, the CIDR list ends up empty, and every IP is
+	# denied — no crash, fail-closed behaviour.
+	my $acl = CGI::ACL->new();
+
+	# No carp should be emitted (base IP is valid; only the prefix is bad)
+	my $ret;
+	warning_is { $ret = $acl->allow_ip($INVALID_CIDR_PFX) } undef,
+		'allow_ip(valid-IP/bad-prefix) emits no warning';
+	is($ret, $acl, 'returns $self on bad-prefix entry');
+
+	# The stored entry has a valid-looking key but cidradd will fail at lookup time
+	ok(defined($acl->{allowed_ips}),    'allowed_ips is defined (guard sees IP restriction)');
+	ok($acl->{allowed_ips}{$INVALID_CIDR_PFX}, 'bad-prefix entry is stored under its original key');
+
+	# Fail-closed: no IP should match, even the base address
+	my $result = eval { denied_at($acl, '192.0.2.1') };
+	ok(!$@,        'all_denied() does not throw on bad-prefix CIDR entry');
+	is($result, 1, 'fail-closed: base IP denied (CIDR range lookup failed)');
+	diag "all_denied with bad CIDR prefix: $result" if $ENV{TEST_VERBOSE};
+};
+
+subtest 'allow_ip(): IPv6 CIDR block allows addresses inside the range' => sub {
+	# Net::CIDR supports IPv6; verify that a /32 prefix works end-to-end.
+	my $acl = CGI::ACL->new()->allow_ip($IPv6_CIDR);
+
+	is(denied_at($acl, $IPv6_IN_CIDR),     0, 'IPv6 address inside CIDR is allowed');
+	is(denied_at($acl, $IPv6_NOT_IN_CIDR), 1, 'IPv6 address outside CIDR is denied');
+	is(denied_at($acl, $config{VALID_IP}), 1, 'IPv4 address denied when only IPv6 CIDR is set');
+};
+
+subtest "allow_ip(): ${\$STRESS_IP_COUNT}-entry allow-list stress test — no crash" => sub {
+	# Build an ACL with many individual CIDR /32 entries and verify the CIDR
+	# rebuild machinery handles large lists without blowing the stack or OOM.
+	my $acl = CGI::ACL->new();
+
+	for my $i (1 .. $STRESS_IP_COUNT) {
+		$acl->allow_ip("10.0.0.$i");    # RFC 1918, safe to use in tests
+	}
+
+	is(scalar keys %{$acl->{allowed_ips}}, $STRESS_IP_COUNT,
+		"$STRESS_IP_COUNT entries stored");
+
+	# Spot-check a few endpoints
+	is(denied_at($acl, '10.0.0.1'),   0, 'first entry allowed after large list build');
+	is(denied_at($acl, "10.0.0.$STRESS_IP_COUNT"), 0, 'last entry allowed');
+	is(denied_at($acl, '10.0.0.' . ($STRESS_IP_COUNT + 1)), 1, 'entry beyond range denied');
+	diag "stress list: $STRESS_IP_COUNT entries, CIDR cache holds" if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# all_denied(): HOSTILE LINGUA OBJECTS
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'all_denied(): lingua->country() that dies is caught, treated as unknown → deny' => sub {
+	# The country() call is wrapped in eval per the 0.08 fix.  A dying lingua
+	# must not propagate the exception to the CGI caller.
+	my $acl = CGI::ACL->new()->deny_country($config{CC_GB});
+
+	my $result = eval { denied_at($acl, $config{VALID_IP}, lingua => DyingLingua->new()) };
+	ok(!$@,        'dying lingua->country() does not propagate an unhandled exception');
+	is($result, 1, 'dying lingua->country() is treated as unknown country → deny');
+	diag "dying lingua result: $result" if $ENV{TEST_VERBOSE};
+};
+
+subtest 'all_denied(): lingua->country() returning 64 KiB string does not crash' => sub {
+	# An unexpectedly large country() return must not blow the stack or trigger
+	# a fatal regex error.  The 64 KiB value is not a valid country code so it
+	# must not match any deny-list entry; the result must be a safe 0 or 1.
+	my $acl_deny_gb = CGI::ACL->new()->deny_country($config{CC_GB});
+	my $acl_wildcard = CGI::ACL->new()->deny_country($config{WILDCARD});
+
+	my $result_deny = eval { denied_at($acl_deny_gb, $config{VALID_IP}, lingua => HugeLingua->new()) };
+	my $result_wild = eval { denied_at($acl_wildcard, $config{VALID_IP}, lingua => HugeLingua->new()) };
+
+	ok(!$@, 'huge lingua->country() return does not throw');
+	ok(defined $result_deny && $result_deny =~ /^[01]$/, 'result is 0 or 1 for specific deny');
+	is($result_wild, 1, 'huge country code: wildcard-deny treats unknown/unmatched as deny');
+	diag "HugeLingua results: deny_gb=$result_deny wildcard=$result_wild" if $ENV{TEST_VERBOSE};
+};
+
+subtest 'all_denied(): typeglob passed as lingua argument — carps, returns 1 (deny)' => sub {
+	# Typeglobs are not blessed objects; blessed() returns undef for them.
+	# The lingua type check must fire, carp once, and return 1.
+	my $acl = CGI::ACL->new()->deny_country($config{CC_GB});
+
+	local $ENV{REMOTE_ADDR} = $config{VALID_IP};
+	my $result = eval { $acl->all_denied(lingua => *STDOUT) };
+
+	ok(!$@,        'typeglob as lingua does not throw');
+	is($result, 1, 'typeglob as lingua → deny (not a blessed object)');
+	diag "typeglob lingua result: $result" if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# deny_cloud: CLOUD CACHE TTL EXPIRY AND PRIVATE-IP BYPASS
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'deny_cloud: expired cache entry forces a fresh DNS lookup' => sub {
+	# The cache stores {result, expires}; once expires < time() the entry is stale
+	# and must NOT be used.  A fresh DNS query must be triggered instead.
+	my $dns_calls = 0;
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub {
+		$dns_calls++;
+		return undef;    # non-cloud for this test
+	};
+
+	my $acl = CGI::ACL->new()->deny_cloud();
+
+	# First call: cache miss → DNS queried, result stored
+	is(denied_at($acl, $config{VALID_IP}), 0, 'first call: non-cloud → allowed');
+	my $after_first = $dns_calls;
+	is($after_first, 1, 'DNS queried exactly once on first call');
+
+	# Second call: cache hit → DNS NOT queried
+	is(denied_at($acl, $config{VALID_IP}), 0, 'second call: allowed (from cache)');
+	is($dns_calls, $after_first, 'cache hit: no additional DNS call');
+
+	# Manually expire the cache entry
+	$acl->{_cloud_cache}{ $config{VALID_IP} }{expires} = time() - 1;
+	diag "cache entry manually expired" if $ENV{TEST_VERBOSE};
+
+	# Third call: expired cache → cache miss → DNS queried again
+	is(denied_at($acl, $config{VALID_IP}), 0, 'third call: allowed (re-queried after expiry)');
+	ok($dns_calls > $after_first, 'expired cache triggered a fresh DNS lookup');
+	diag "total DNS calls: $dns_calls" if $ENV{TEST_VERBOSE};
+};
+
+subtest 'deny_cloud: private IP (loopback) bypasses _verified_rdns entirely' => sub {
+	# _is_cloud_host() skips DNS for private/loopback addresses per the documented
+	# short-circuit.  Installing a counting mock verifies DNS is NEVER called.
+	my $dns_calls = 0;
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub { $dns_calls++ };
+
+	my $acl = CGI::ACL->new()->deny_cloud();
+
+	# 127.0.0.1 matches the private-IP regex → _is_cloud_host returns 0 immediately
+	my $result = eval { denied_at($acl, $config{LOCAL_IP}) };
+	ok(!$@,             'loopback with deny_cloud does not throw');
+	is($dns_calls, 0,   '_verified_rdns not called for 127.0.0.1 (private IP short-circuit)');
+	is($result, 0,      'loopback is non-cloud → allowed (only deny_cloud set, no other rules)');
+	diag "loopback cloud check: dns_calls=$dns_calls result=$result" if $ENV{TEST_VERBOSE};
+};
+
+subtest 'deny_cloud: _verified_rdns returning CRLF-contaminated hostname — no crash' => sub {
+	# A hostile PTR record might embed \r\n to attempt response splitting.
+	# The cloud patterns are matched against the raw hostname string; a CRLF
+	# must not cause an exception or a false-positive cloud match.
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub { $CRLF_PTR_HOST };
+	my $acl = CGI::ACL->new()->deny_cloud();
+
+	my $result = eval { denied_at($acl, $config{VALID_IP}) };
+	ok(!$@, 'CRLF-contaminated PTR hostname does not throw');
+	ok(defined $result && $result =~ /^[01]$/, 'result is 0 or 1 for CRLF PTR');
+	diag "CRLF PTR result: $result" if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRESSION 0.10: $@ IS CLEARED AFTER EVAL BLOCKS IN all_denied()
+# Changes note: "Fix $@ not cleared after capturing DNS eval error and
+# lingua->country() eval error; callers were seeing stale $@ state."
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'REGRESSION 0.10: $@ cleared after DNS exception in all_denied()' => sub {
+	# Before the fix, $@ retained the DNS die message after all_denied() returned.
+	# A caller wrapping all_denied() in eval would see a spurious $@ even though
+	# the cloud check had already handled the error (fail-safe: treat as non-cloud).
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns'
+		=> sub { die "simulated DNS timeout\n" };
+	my $acl = CGI::ACL->new()->deny_cloud();
+
+	$@ = 'stale-error-before-call';
+	my $result = denied_at($acl, $config{VALID_IP});
+	my $err = $@; undef $@;
+
+	is($result, 0,   'DNS exception: fail-safe result is allow (0)');
+	ok(!$err,        '$@ is cleared after DNS exception in all_denied() (0.10 regression)');
+	diag "DNS exception $@ regression: result=$result err=" . ($err // 'undef') if $ENV{TEST_VERBOSE};
+};
+
+subtest 'REGRESSION 0.10: $@ cleared after lingua->country() exception in all_denied()' => sub {
+	# Same $@ leakage risk for the lingua->country() eval path.
+	my $acl = CGI::ACL->new()->deny_country($config{CC_GB});
+
+	$@ = 'stale-error-before-call';
+	my $result = denied_at($acl, $config{VALID_IP}, lingua => DyingLingua->new());
+	my $err = $@; undef $@;
+
+	is($result, 1, 'lingua exception: safe deny (1)');
+	ok(!$err,      '$@ cleared after lingua->country() exception (0.10 regression)');
+	diag "lingua exception $@ regression: err=" . ($err // 'undef') if $ENV{TEST_VERBOSE};
+};
+
+subtest 'REGRESSION 0.10: $@ not polluted by a normal (no exception) all_denied() call' => sub {
+	# all_denied() uses several eval blocks; each must ensure $@ is cleared on
+	# both success and failure paths so callers see a clean $@.
+	my $guard = mock_scoped 'CGI::ACL::_verified_rdns' => sub { undef };
+	my $acl   = CGI::ACL->new()->deny_cloud()->allow_ip($config{VALID_IP});
+
+	$@ = 'stale-error-before-call';
+	my $result = denied_at($acl, $config{VALID_IP});
+	my $err = $@; undef $@;
+
+	is($result, 0, 'allowed IP returns 0');
+	ok(!$err,      '$@ is clean after a normal all_denied() call (0.10 regression)');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# COUNTRY CODE SAFETY AND BOUNDARY
+# ─────────────────────────────────────────────────────────────────────────────
+subtest "deny_country(): injection strings stored as literal lowercase keys (no code execution)" => sub {
+	# deny_country() stores country codes as hash keys and compares them to
+	# lingua->country() output.  There is no database, no shell, no template
+	# engine — injection strings are inert literal strings.  This test verifies:
+	# (a) no crash, (b) the string is stored (lowercased), (c) all_denied
+	# respects it only when lingua returns the exact same string.
+	my $injection = "'; DROP TABLE countries; --";
+	my $acl = CGI::ACL->new()->deny_country($injection);
+
+	ok(defined($acl->{deny_countries}), 'deny_countries was initialised');
+	my $lc_inject = lc($injection);
+	ok($acl->{deny_countries}{$lc_inject}, 'injection string stored as lowercase key');
+	diag "injection key: $lc_inject" if $ENV{TEST_VERBOSE};
+
+	# Only the exact same string (lowercased) from lingua would trigger the deny
+	my $matches = MockLingua->new(country => $lc_inject);
+	my $no_match = MockLingua->new(country => $config{CC_US});
+
+	is(denied_at($acl, $config{VALID_IP}, lingua => $matches),  1, 'exact injection match → deny');
+	is(denied_at($acl, $config{VALID_IP}, lingua => $no_match), 0, 'normal country code → allow');
+};
+
+subtest 'allow_country("*"): wildcard stored but no unexpected denial without deny_country("*")' => sub {
+	# allow_country('*') stores '*' as a permit-list key.  Without deny_country('*'),
+	# the permit list is never consulted (allow_country alone has no effect).
+	# This test documents that storing '*' does not accidentally deny all traffic.
+	my $acl = CGI::ACL->new()->allow_country($config{WILDCARD});
+
+	is(denied_at($acl, $config{VALID_IP}), 0,
+		'allow_country("*") alone: all_denied still returns 0 (no restriction active)');
+	ok($acl->{allow_countries}{ $config{WILDCARD} },
+		'"*" key is stored in allow_countries');
+
+	# Even with deny_country('*') active, allow_country('*') should permit anyone
+	# because '*' in the allow list is checked as a literal country code,
+	# and lingua->country() would need to return '*' literally for it to match.
+	# Verify no crash when this unusual state exists.
+	$acl->deny_country($config{WILDCARD});
+	my $result = eval {
+		denied_at($acl, $config{VALID_IP}, lingua => MockLingua->new(country => $config{CC_US}))
+	};
+	ok(!$@,        'deny_country("*") + allow_country("*") does not throw');
+	ok(defined $result, 'result is defined (not undef)');
+	is($result, 1, 'US not in allow list (only "*" literal is) → denied');
+	diag 'allow_country("*") edge case: result=' . ($result // 'undef') if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CONSTRUCTOR DESTRUCTIVE CASES
+# ─────────────────────────────────────────────────────────────────────────────
+subtest 'new(): multi-level clone chain (clone of a clone) — independent, no crash' => sub {
+	# Verify that cloning a clone works and that all three levels are independent.
+	my $level1 = CGI::ACL->new()->allow_ip($config{VALID_IP});
+	my $level2 = $level1->new()->allow_ip($config{VALID_IP2});
+	my $level3 = $level2->new();
+
+	# level3 inherits both IPs from level2 (which inherited from level1)
+	is(denied_at($level3, $config{VALID_IP}),  0, 'level3: IP from level1 allowed');
+	is(denied_at($level3, $config{VALID_IP2}), 0, 'level3: IP from level2 allowed');
+
+	# Mutating level3 must not affect level2 or level1
+	$level3->deny_country($config{CC_US});
+	ok(!$level2->{deny_countries}, 'level2 unaffected by level3 deny_country');
+	ok(!$level1->{deny_countries}, 'level1 unaffected by level3 deny_country');
+	diag 'multi-level clone: all levels independent' if $ENV{TEST_VERBOSE};
+};
+
+subtest 'new(): typeglob value in constructor parameter — no crash, object still usable' => sub {
+	# An unusual but syntactically valid caller might pass a typeglob value.
+	# Object::Configure will see it in the constructor hash; the module must not
+	# crash, and the resulting object must behave correctly for normal operations.
+	my $acl = eval { CGI::ACL->new(some_unknown_key => *STDOUT) };
+	ok(!$@,     'constructor with typeglob value does not throw');
+	isa_ok($acl, 'CGI::ACL', 'typeglob-value constructor still returns a CGI::ACL object');
+
+	# Basic operation must be unaffected
+	$acl->allow_ip($config{VALID_IP});
+	is(denied_at($acl, $config{VALID_IP}),  0, 'IP allow still works after typeglob constructor');
+	is(denied_at($acl, $config{VALID_IP2}), 1, 'IP deny still works after typeglob constructor');
 };
 
 done_testing();

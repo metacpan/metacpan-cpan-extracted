@@ -1,6 +1,27 @@
 #include "xh_config.h"
 #include "xh_core.h"
 
+static void
+xh_assign_cb_mode(xh_opts_t *opts, SV *value)
+{
+    xh_char_t *mode;
+    STRLEN len;
+
+    if (!SvOK(value))
+        croak("Parameter 'cb_mode' is undefined");
+
+    mode = XH_CHAR_CAST SvPV(value, len);
+    if (len == 4 && xh_strncmp(mode, XH_CHAR_CAST "node", 4) == 0) {
+        opts->cb_mode = XH_CB_MODE_NODE;
+    }
+    else if (len == 6 && xh_strncmp(mode, XH_CHAR_CAST "events", 6) == 0) {
+        opts->cb_mode = XH_CB_MODE_EVENTS;
+    }
+    else {
+        croak("Invalid parameter value for 'cb_mode': %s", mode);
+    }
+}
+
 xh_bool_t
 xh_init_opts(xh_opts_t *opts)
 {
@@ -28,6 +49,12 @@ xh_init_opts(xh_opts_t *opts)
     XH_PARAM_READ_PATTERN(opts->force_array,   "XML::Hash::XS::force_array",   XH_DEF_FORCE_ARRAY);
     XH_PARAM_READ_BOOL   (opts->force_content, "XML::Hash::XS::force_content", XH_DEF_FORCE_CONTENT);
     XH_PARAM_READ_BOOL   (opts->merge_text,    "XML::Hash::XS::merge_text",    XH_DEF_MERGE_TEXT);
+    if ( (sv = get_sv("XML::Hash::XS::cb_mode", 0)) != NULL ) {
+        xh_assign_cb_mode(opts, sv);
+    }
+    else {
+        opts->cb_mode = XH_CB_MODE_NODE;
+    }
 
     /* XML::Hash::LX options */
     XH_PARAM_READ_STRING (opts->attr,          "XML::Hash::XS::attr",          XH_DEF_ATTR);
@@ -50,7 +77,15 @@ xh_init_opts(xh_opts_t *opts)
     }
 
     /* output, NULL - to string */
-    XH_PARAM_READ_REF    (opts->output,        "XML::Hash::XS::output",        XH_DEF_OUTPUT);
+    if ( (sv = get_sv("XML::Hash::XS::output", 0)) != NULL ) {
+        xh_param_assign_output(&opts->output, sv);
+    }
+    else {
+        opts->output = XH_DEF_OUTPUT;
+    }
+    if ( (sv = get_sv("XML::Hash::XS::output_cb", 0)) != NULL ) {
+        xh_param_assign_cb(&opts->output_cb, "output_cb", sv);
+    }
 
     /* suppress empty */
     if ( (sv = get_sv("XML::Hash::XS::suppress_empty", 0)) != NULL ) {
@@ -102,6 +137,12 @@ xh_destroy_opts(xh_opts_t *opts)
 
     if (opts->cb != NULL)
         SvREFCNT_dec(opts->cb);
+
+    if (opts->output != NULL)
+        SvREFCNT_dec(opts->output);
+
+    if (opts->output_cb != NULL)
+        SvREFCNT_dec(opts->output_cb);
 }
 
 void
@@ -110,6 +151,18 @@ xh_copy_opts(xh_opts_t *dst, xh_opts_t *src)
     memcpy(dst, src, sizeof(xh_opts_t));
     if (dst->force_array.expr != NULL) {
         SvREFCNT_inc(dst->force_array.expr);
+    }
+    if (dst->filter.expr != NULL) {
+        SvREFCNT_inc(dst->filter.expr);
+    }
+    if (dst->cb != NULL) {
+        SvREFCNT_inc(dst->cb);
+    }
+    if (dst->output != NULL) {
+        SvREFCNT_inc(dst->output);
+    }
+    if (dst->output_cb != NULL) {
+        SvREFCNT_inc(dst->output_cb);
     }
 }
 
@@ -138,7 +191,7 @@ xh_parse_param(xh_opts_t *opts, xh_int_t first, I32 ax, I32 items)
         switch (len) {
             case 2:
                 if (xh_str_equal2(p, 'c', 'b')) {
-                    opts->cb = xh_param_assign_cb("cb", v);
+                    xh_param_assign_cb(&opts->cb, "cb", v);
                     break;
                 }
                 goto error;
@@ -217,12 +270,7 @@ xh_parse_param(xh_opts_t *opts, xh_int_t first, I32 ax, I32 items)
                     break;
                 }
                 if (xh_str_equal6(p, 'o', 'u', 't', 'p', 'u', 't')) {
-                    if ( SvOK(v) && SvROK(v) ) {
-                        opts->output = SvRV(v);
-                    }
-                    else {
-                        opts->output = NULL;
-                    }
+                    xh_param_assign_output(&opts->output, v);
                     break;
                 }
                 if (xh_str_equal6(p, 'f', 'i', 'l', 't', 'e', 'r')) {
@@ -231,6 +279,10 @@ xh_parse_param(xh_opts_t *opts, xh_int_t first, I32 ax, I32 items)
                 }
                 goto error;
             case 7:
+                if (xh_str_equal7(p, 'c', 'b', '_', 'm', 'o', 'd', 'e')) {
+                    xh_assign_cb_mode(opts, v);
+                    break;
+                }
                 if (xh_str_equal7(p, 'c', 'o', 'n', 't', 'e', 'n', 't')) {
                     xh_param_assign_string(opts->content, v);
                     break;
@@ -259,6 +311,10 @@ xh_parse_param(xh_opts_t *opts, xh_int_t first, I32 ax, I32 items)
                 }
                 goto error;
             case 9:
+                if (xh_str_equal9(p, 'o', 'u', 't', 'p', 'u', 't', '_', 'c', 'b')) {
+                    xh_param_assign_cb(&opts->output_cb, "output_cb", v);
+                    break;
+                }
                 if (xh_str_equal9(p, 'c', 'a', 'n', 'o', 'n', 'i', 'c', 'a', 'l')) {
                     opts->canonical = xh_param_assign_bool(v);
                     break;
@@ -317,6 +373,10 @@ xh_parse_param(xh_opts_t *opts, xh_int_t first, I32 ax, I32 items)
         else {
             opts->method = XH_METHOD_NATIVE;
         }
+    }
+
+    if (opts->output != NULL && opts->output_cb != NULL) {
+        croak("Parameters 'output' and 'output_cb' are mutually exclusive");
     }
 
     return;
@@ -405,5 +465,7 @@ xh_merge_opts(xh_opts_t *ctx_opts, xh_opts_t *opts, xh_int_t nparam, I32 ax, I32
     if (nparam < items) {
         xh_parse_param(ctx_opts, nparam, ax, items);
     }
+    if (ctx_opts->output != NULL && ctx_opts->output_cb != NULL) {
+        croak("Parameters 'output' and 'output_cb' are mutually exclusive");
+    }
 }
-

@@ -1,4 +1,21 @@
-Revision history for Perl extension PAGI::FastAPI
+Revision history for PAGI::FastAPI
+
+0.0.4  2026-08-05
+       [DOCUMENTATION]
+       - Included an AUTHENTICATION AND SECURITY part in the POD to highlight
+         the dependencies and components of middleware and provided information
+         about the new companion distribution called PAGI::FastAPI::Security
+         for the ready-to-use schemes related to HTTP Bearer, HTTP Basic,
+         API Key, and OAuth2 password-bearer.
+       - Added a Pluggable Authentication item in Key Features List.
+       - Added PAGI::FastAPI::Security and DBIx::Class::Async to SEE ALSO section.
+       - Mentioned in the SYNOPSIS the introduction about the functionality
+         of hand-rolled Bearer-token checks in this context and referring to
+         PAGI::FastAPI::Security for production use.
+       - Added a similar entry in README.md as well.
+       [EXAMPLE]
+       - Updated the example to demo authentication using PAGI::FastAPI::Security:
+         eg/dbic_async_integration.pl
 
 0.0.3  2026-08-04
        [EXAMPLE]
@@ -6,30 +23,30 @@ Revision history for Perl extension PAGI::FastAPI
          eg/integration_demo.pl
 
 0.0.2  2026-08-04
-        [BUGFIX]
-        - Routes no longer consider metacharacters in their static paths
-          (like ".", "+", "?") as wildcards. Only placeholders {param}
-          are transformed into capture groups. Previously, it would allow
-          the route '/items.json/{id}' to match paths like '/itemsXjson/{id}'.
-        - The values of path parameters and query string parameters are now
-          appropriately decoded: '%XX' and '+' decoding is now done as it
-          should be according to the application/x-www-form-urlencoded rules.
-          Until now strings like 'John%20Doe' were sent to handlers unchanged.
-        - The request body reader no longer goes into an infinite loop when
-          the PAGI server sends a non-'http.request' event (for example
-          'http.disconnect') while transmitting POST/PUT/PATCH requests.
-        - When registering routes, the process now fails with a clear message
-          instead of just ignoring misconfiguration. For instance, absence
-          of a 'handler' property, 'dependencies' property not being a HashRef
-          or an ArrayRef is rejected immediately during route registration.
-        [TESTING]
-        - A new test was added in t/08-input_handling_and_registration.t
-          covering the above-mentioned aspects.
-        - A new test was added in t/09-external-async-resource-integration.t
-          to cover DBIx::Class::Async integration.
-        [EXAMPLE]
-        - Added additional DBIx::Class::Async integrated application:
-          eg/dbic_async_integration.pl
+       [BUGFIX]
+       - Routes no longer consider metacharacters in their static paths
+         (like ".", "+", "?") as wildcards. Only placeholders {param}
+         are transformed into capture groups. Previously, it would allow
+         the route '/items.json/{id}' to match paths like '/itemsXjson/{id}'.
+       - The values of path parameters and query string parameters are now
+         appropriately decoded: '%XX' and '+' decoding is now done as it
+         should be according to the application/x-www-form-urlencoded rules.
+         Until now strings like 'John%20Doe' were sent to handlers unchanged.
+       - The request body reader no longer goes into an infinite loop when
+         the PAGI server sends a non-'http.request' event (for example
+         'http.disconnect') while transmitting POST/PUT/PATCH requests.
+       - When registering routes, the process now fails with a clear message
+         instead of just ignoring misconfiguration. For instance, absence
+         of a 'handler' property, 'dependencies' property not being a HashRef
+         or an ArrayRef is rejected immediately during route registration.
+       [TESTING]
+       - A new test was added in t/08-input_handling_and_registration.t
+         covering the above-mentioned aspects.
+       - A new test was added in t/09-external-async-resource-integration.t
+         to cover DBIx::Class::Async integration.
+       [EXAMPLE]
+       - Added additional DBIx::Class::Async integrated application:
+         eg/dbic_async_integration.pl
 
 0.0.1  2026-08-03
        - Initial CPAN release.

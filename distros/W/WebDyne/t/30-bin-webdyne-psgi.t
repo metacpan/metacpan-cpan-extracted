@@ -24,10 +24,13 @@ write_module($stub_dn, 'WebDyne::PSGI', <<'END_MODULE');
 package WebDyne::PSGI;
 use strict;
 use warnings;
+use WebDyne::Constant;
 our $LAST_INDEX;
+our $LAST_TITLE;
 sub new {
     my ($class, %opt)=@_;
     $LAST_INDEX=$opt{index};
+    $LAST_TITLE=$WEBDYNE_HTML_DEFAULT_TITLE;
     return bless \%opt, $class;
 }
 sub to_app {
@@ -160,5 +163,24 @@ like($stderr, qr/'root'\s*=>\s*'\Q$tmp_dn\E'/, 'webdyne.psgi --dump_opt dumps ro
 );
 isnt($rc, 0, 'webdyne.psgi rejects invalid env mode');
 like($stderr, qr/--env must be development, production, or none/, 'webdyne.psgi reports valid env modes');
+
+my $load_dn=tempdir(CLEANUP => 1);
+write_file("$load_dn/app.psp", "<start_html>psgi\n");
+write_file("$load_dn/.webdyne.conf.pl", <<'END_CONF');
+$_={
+    'WebDyne::Constant' => {
+        WEBDYNE_HTML_DEFAULT_TITLE => 'PSGI Root Config Loaded'
+    }
+};
+END_CONF
+
+local $ENV{DOCUMENT_ROOT}=$load_dn;
+($stdout, $stderr, $rc)=run_cmd(
+    $^X, '-I', $stub_dn, '-Ilib', '-e',
+    'my $app=do "./bin/webdyne.psgi"; die($@ || $!) unless $app; print "title=" . ($WebDyne::PSGI::LAST_TITLE // "") . "\n";'
+);
+is($rc, 0, 'webdyne.psgi loads through external server path');
+like($stdout, qr/^title=PSGI Root Config Loaded$/m, 'webdyne.psgi build loads DOCUMENT_ROOT .webdyne.conf.pl');
+is($stderr, '', 'webdyne.psgi external load writes no stderr');
 
 done_testing();

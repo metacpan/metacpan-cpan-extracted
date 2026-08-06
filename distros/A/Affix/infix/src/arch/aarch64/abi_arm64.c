@@ -632,6 +632,10 @@ static infix_status generate_forward_argument_moves_arm64(code_buffer * buf,
                 }
                 break;
             }
+        default:
+            // ARG_LOCATION_MIXED and ARG_LOCATION_GPR_STACK_SPLIT are only ever
+            // produced by the RISC-V backend's classifier and cannot occur here.
+            break;
         }
     }
     return INFIX_SUCCESS;

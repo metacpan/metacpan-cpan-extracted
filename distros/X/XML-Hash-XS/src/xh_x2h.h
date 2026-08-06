@@ -15,6 +15,8 @@
 #define XH_X2H_DOCTYPE_FOUND        64
 #define XH_X2H_TEXT_NODE            128
 #define XH_X2H_TAG_EXISTS           256
+#define XH_X2H_STOPPED              512
+#define XH_X2H_SKIP_SUBTREE         1024
 
 #define XH_X2H_NEED_NORMALIZE       (XH_X2H_NORMALIZE_REF |             \
                                      XH_X2H_NORMALIZE_LINE_FEED)
@@ -154,15 +156,28 @@ typedef struct {
     unsigned int        flags;
     xh_x2h_node_t      *nodes;
     SV                **lval;
-    unsigned int        depth, real_depth, code;
+    unsigned int        depth, real_depth, code, skip_depth;
     xh_x2h_state_t      state;
     xh_reader_t         reader;
     SV                 *result, *input;
     xh_char_t           xpath[XH_X2H_XPATH_MAX_LEN + 1];
 } xh_x2h_ctx_t;
 
+typedef struct {
+    xh_x2h_ctx_t  ctx;
+    xh_buffer_t    tail;
+    xh_bool_t      finished;
+    xh_bool_t      failed;
+    xh_bool_t      busy;
+    xh_bool_t      stopped;
+} xh_x2h_stream_t;
+
 SV *xh_x2h(xh_x2h_ctx_t *ctx);
 void xh_x2h_destroy_ctx(xh_x2h_ctx_t *ctx);
 void xh_x2h_init_ctx(xh_x2h_ctx_t *ctx, I32 ax, I32 items);
+void xh_x2h_stream_init(xh_x2h_stream_t *stream, xh_opts_t *opts, I32 ax, I32 items);
+void xh_x2h_stream_destroy(xh_x2h_stream_t *stream);
+void xh_x2h_stream_feed(xh_x2h_stream_t *stream, xh_char_t *data, size_t len, xh_bool_t finish);
+SV *xh_x2h_stream_finish(xh_x2h_stream_t *stream);
 
 #endif /* _XH_X2H_H_ */

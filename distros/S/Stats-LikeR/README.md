@@ -258,7 +258,7 @@ Named aggregators may be combined in any order per column:
 | `last`    | last defined cell (undef if none)                           |
 | `mode`    | modal defined cell; ties broken deterministically           |
 
-The numeric aggregators call the module's XS functions of the same name, so they
+The numeric aggregators call the module's functions of the same name, so they
 inherit their precision. `agg` filters undef itself before calling them, so they
 never croak on missing cells. `mode` is made deterministic: on a tie it returns
 the smallest number, or the lowest string when the values are not numeric.
@@ -663,10 +663,6 @@ A row that is not a hashref, or that lacks a defined value at `$key`, is fatal.
 
 Reach for `aoh2hoa` when you want columns (vectors to feed a statistic or a plot); reach for `aoh2hoh` when you want addressable rows keyed by a unique field.
 
-### Implementation note
-
-The operation is a single pass over the rows with one hash insert per row -- the same asymptotics in pure Perl as in XS, and Perl's hash operations are already C underneath. There is no meaningful speed or memory advantage to an XS implementation here, so pure Perl is preferred unless it must live in the same `.xs` for packaging parity. The duplicate check is a single `exists` per row and does not change that. (An XS version would `croak` on the duplicate before allocating the second copy, so there is no extra cleanup to manage.)
-
 ## aov
 
 Warning: assumes normal distribution
@@ -1046,13 +1042,7 @@ The full result is a hashref:
 The p-value is the chance of seeing a result **at least this surprising** if the
 toddler were really just guessing.
 
-Here `p = 0.75`. That is enormous: a pure guesser scores 6/10 (or something
-even further from 5) about three times out of four. So 6/10 is completely
-ordinary luck — no evidence of skill.
-
-The common cutoff is `0.05`. Below it, you start to believe something real is
-going on. Above it, chance explains the result fine. `0.75` is nowhere close,
-so we call this **just chance**.
+Here `p = 0.75` means no evidence of skill.
 
 ### What "legit" would look like
 
@@ -4162,17 +4152,72 @@ a generated duplicate column name.
 
 It also allows configuring the test type (`type => 'one.sample'`, `'two.sample'`, `'paired'`) and alternative hypothesis (`alternative => 'one.sided'`). You can also pass `strict => 1` to strictly evaluate both tails of the distribution.
 
+Exactly one of `n`, `delta`, `sd`, `power` and `sig_level` must be `undef`: that
+is the quantity solved for. `sd` and `sig_level` have defaults, so solving for
+either means passing it explicitly as `undef`; `power` has no default, so
+omitting it entirely is how you ask for the power.
+
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `n` | Float | `undef` | Number of observations (per group for two-sample, pairs for paired). |
-| `delta` | Float | `undef` | True difference in means. |
+| `n` | Float | `undef` | Number of observations (per group for two-sample, pairs for paired). Must be at least 2. |
+| `delta` | Float | `undef` | True difference in means. Used as `abs(delta)` when the test is two-sided. |
 | `sd` | Float | 1.0 | Standard deviation. |
-| `sig_level` | Float | 0.05 | Significance level (Type I error probability). Also accepts `sig.level`. |
-| `power` | Float | `undef` | Power of test (1 minus Type II error probability). |
+| `sig_level` | Float | 0.05 | Significance level (Type I error probability), in `[0, 1]`. Also accepts `sig.level`. |
+| `power` | Float | `undef` | Power of test (1 minus Type II error probability), in `[0, 1]`. |
 | `type` | String | `"two.sample"` | Type of t-test: `"two.sample"`, `"one.sample"`, or `"paired"`. |
 | `alternative` | String | `"two.sided"` | One- or two-sided test: `"two.sided"`, `"one.sided"`, `"greater"`, or `"less"`. |
 | `strict` | Boolean | 0 (False) | Use strict interpretation of two-sided power calculations. |
-| `tol` | Float | ~`1.22e-4` | Numerical tolerance used for the internal root-finding algorithm. |
+| `tol` | Float | `1e-12` | Relative tolerance on the root when solving for `n`, `delta`, `sd` or `sig_level`. |
+
+The result is a hashref carrying `n`, `delta`, `sd`, `sig.level`, `power`,
+`alternative`, `method`, and -- for `two.sample` and `paired` -- `note`, the same
+fields R's `power.t.test` returns.
+
+### Accuracy
+
+The power itself is computed from a noncentral *t* CDF and agrees with R's
+`power.t.test` and with `scipy.stats.nct.sf` to about `1e-13` relative.
+
+The four inverse problems are solved by regula falsi with the Illinois
+correction, driven to the relative `tol` above rather than to the width of the
+bracket. R solves them with `uniroot` at a default tolerance of
+`.Machine$double.eps^0.25` (`1.22e-4`) measured on the bracket width, which
+leaves R's own `n`, `delta`, `sd` and `sig.level` good to four or five
+significant figures; `power_t_test` matches high-precision
+`scipy.optimize.brentq` roots to about `1e-13` instead. Expect agreement with R
+to R's precision, not to this one.
+
+Over 1200 random cases spanning all five solved-for parameters, `n` from 2 to
+5000, `delta` from 0.01 to 5, `sd` from 0.05 to 20 and `sig_level` from 0.001 to
+0.2, 1078 of the 1080 that all three implementations answer land within `1e-8`
+relative of the high-precision scipy value; R lands 379 of them there, and is
+past `1e-3` on 56. Neither of the two remaining is a case where R does better:
+one solves a `sig_level` of `5.9e-10` to `1.3e-5` relative (`7.7e-15` absolute)
+where R returns its bracket endpoint and is 83% out, and the other is `3.4e-8`
+where R is out by a factor of 300.
+
+The one place R is still ahead is **df past about 1e7** -- 500,000 or more
+observations per group -- where it holds `1e-14` against this `1e-8`. What is
+left there is not the noncentral *t* CDF, which is exact to `3e-16` in that range,
+but the critical value: `qt_tail` inverts `incbeta` at `x = 1 - 5e-8` with
+`a = 4e7`, right at the edge of where its continued fraction converges. That
+routine is shared with `t_test`, `cor_test`, `var_test` and the rest, so it is
+left alone here rather than retuned for this one caller. The drift is `1.3e-11`
+at `n = 1e6`, `1.0e-8` at `4e7` and `1.5e-7` at `1e8`.
+
+### Errors
+
+Dies on: an odd trailing argument list; an unknown argument; anything other than
+exactly one of `n`, `delta`, `sd`, `power` and `sig_level` left `undef`; a
+`sig_level` or `power` outside `[0, 1]`; an `n` below 2 (there is no variance to
+estimate below two observations); a negative `sd`; an unrecognised `type` or
+`alternative`; solving for `sd` when `delta` is 0, or for `delta` when `sd` is
+not positive; and a target that the requested parameter cannot reach at all --
+for instance a `power` below `sig_level / tside`, which no `sd` attains, or one
+that would need a `sig_level` above 1. R answers those last cases with a bracket
+endpoint (a `sig.level` of 1.07, an `n` of 1.4) or with `uniroot`'s own "no sign
+change found"; `power_t_test` names the range it searched and the target it could
+not reach.
 
 ## pnorm
 
@@ -5900,6 +5945,55 @@ Verified against R 4.6.1 (`oneway.test`, `anova(aov())`, `anova(lm())`,
 `t/model_pvalue_tails.t` and `t/oneway_test.R.scipy.t`.
 
 # Changes
+
+## 0.292 2026-08-05 CDT
+
+fixed long-double bug https://www.cpantesters.org/cpan/report/506975f6-906a-11f1-8f30-a201c4f2440e
+
+`power_t_test` was cross-validated against R 4.6.1 `power.t.test` and against
+`scipy.stats.nct` driven by `scipy.optimize.brentq`, over a grid of 288 cases
+covering all five solved-for parameters, all three types, both alternatives and
+`strict`. Three fixes came out of it:
+
+ - The Simpson sum behind the noncentral *t* CDF put a fixed 30000-step grid on
+   `u = w/(1+w)`, and the chi density it integrates defeats that at both ends.
+   The density carries `w**(df-1)`, so unless `df` is a whole number some
+   derivative of it is infinite at `w = 0` and Simpson's error bound does not
+   hold: two good digits at `df = 1.2` with `sig_level = 1e-4`, five at
+   `df = 1.2`, nine at `df = 1.8`. Substituting `w = z**m`, with `m` chosen so
+   that `m*df - 1 >= 3`, restores the bounded derivatives and brings all of
+   those to machine precision. It also puts the origin's contribution at zero,
+   which subsumes a separate bug: the sum had been dropping its `u = 0` endpoint
+   term, worth 7e-7 of absolute power at `df == 1`. `nu` is now also floored the
+   way R floors it, per sample rather than in total.
+ - The same density has standard deviation `1/sqrt(2*df)` and so narrows without
+   bound, while the grid did not. Past `df` of about 1e7 the steps went clean
+   over the peak: `power_t_test(n => 4e7, delta => 0)` returned 0.138 where the
+   answer can only be `sig_level/2`, and a large-cohort `n` solved 9% low. Above
+   `df` of 1e3 the steps now go on `w` across +/- 12 standard deviations of the
+   mode, with the chi normalisation taken from Stirling's series to keep the peak
+   height from cancelling away; and above 4e5, where those log terms cancel too
+   hard for any grid to help, the Abramowitz & Stegun 26.7.10 asymptotic form
+   takes over -- the same formula, at the same cut-off, that R's `pnt.c` uses.
+   That is also 25 times quicker than integrating.
+ - The power was formed as `1 - P(T <= t)`, which loses most of its digits to
+   cancellation when the power is small. It is now integrated as the upper tail
+   directly.
+ - The four inverse solvers were plain bisection stopped at the bracket width,
+   which capped `n`, `delta`, `sd` and `sig_level` at R's own four or five
+   significant figures. They now use regula falsi with the Illinois correction
+   against a relative tolerance, so they match machine-precision `brentq` roots
+   to ~1e-13 in fewer evaluations than the bisection took. The `tol` default
+   moved from `1.22e-4` to `1e-12` to match.
+ - Nothing checked that the bracket held a root, so an unreachable target came
+   back as a bracket endpoint wearing the requested power: solving for `sd` with
+   `power => 0.01` returned `delta * 1e7`, and with a negative `delta` returned a
+   negative standard deviation. Unreachable targets now croak and name the range
+   searched. `sig_level` and `power` outside `[0, 1]`, an `n` below 2, a negative
+   `sd`, and an unrecognised `type` or `alternative` are rejected as well --
+   `type => 'twosample'` used to be read silently as `'two.sample'`.
+
+New test file `t/power_t_test.R.scipy.t` carries the cross-validated grid.
 
 ## 0.291 2026-08-04 CDT
 
