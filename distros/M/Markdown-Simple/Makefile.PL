@@ -201,6 +201,15 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Markdown-Simple-* Install/Files.pm' },
+    # The engine is a unity build: Simple.xs #includes every src/*.c, so the
+    # only compilation unit MakeMaker knows about is Simple.xs itself and it
+    # never rescans those includes. Without this an edit to src/ leaves the
+    # old object in place and `make` reports success having rebuilt nothing.
+    depend => {
+        'lib/Markdown/Simple$(OBJ_EXT)' => join(' ',
+            sort(glob('src/*.c'), glob('src/*.h'),
+                 glob('src/simd/*.c'), glob('src/simd/*.h'))),
+    },
     %dep_vars,
 );
 # ExtUtils::Depends sets PM explicitly, which causes init_PM to return early

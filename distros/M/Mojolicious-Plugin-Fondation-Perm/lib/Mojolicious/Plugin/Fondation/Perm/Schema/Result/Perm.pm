@@ -1,11 +1,11 @@
 package Mojolicious::Plugin::Fondation::Perm::Schema::Result::Perm;
-$Mojolicious::Plugin::Fondation::Perm::Schema::Result::Perm::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Perm::Schema::Result::Perm::VERSION = '0.03';
 # ABSTRACT: DBIx::Class Result class for perms table
 
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Core';
+use base 'Mojolicious::Plugin::Fondation::Schema::Result::Base';
 
 __PACKAGE__->load_components(qw/TimeStamp Core/);
 
@@ -59,7 +59,7 @@ Mojolicious::Plugin::Fondation::Perm::Schema::Result::Perm - DBIx::Class Result 
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

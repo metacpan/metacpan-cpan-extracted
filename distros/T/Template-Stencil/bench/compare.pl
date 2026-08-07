@@ -9,7 +9,7 @@
 # a measurable gate fails (bench/ is not part of make test - run it by
 # hand or from CI that tolerates timing noise).
 
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use Time::HiRes ();

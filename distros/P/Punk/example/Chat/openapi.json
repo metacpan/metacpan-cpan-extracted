@@ -1,0 +1,257 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Punk Chat API",
+    "version": "1.0.0",
+    "description": "The REST half of the Punk chat example. It reads and writes the same `messages` table the WebSocket handler does, and a message posted here is broadcast to every socket connected to that room - so a `curl` against this API appears instantly in an open browser tab.\n\nMounted under `/api`; the interactive docs are at `/docs`.\n\nNote on style: schemas are shared through `$ref` into `#/components/schemas`, which Open::API resolves at compile time. Parameters and responses are written out in full, because those two `$ref` targets are not resolved - the spec is the routing table, so it has to say what it means where the operation is."
+  },
+  "servers": [
+    { "url": "/api", "description": "this server" }
+  ],
+  "tags": [
+    { "name": "rooms",    "description": "Rooms and who is in them" },
+    { "name": "messages", "description": "Reading and writing chat history" }
+  ],
+  "paths": {
+    "/rooms": {
+      "get": {
+        "operationId": "listRooms",
+        "tags": [ "rooms" ],
+        "summary": "Every room that has been spoken in",
+        "description": "Message counts come from the database; `connected` is the number of live WebSocket connections this worker is holding for the room.",
+        "responses": {
+          "200": {
+            "description": "the rooms",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RoomList" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room}/presence": {
+      "get": {
+        "operationId": "getPresence",
+        "tags": [ "rooms" ],
+        "summary": "Live connection count for one room",
+        "parameters": [
+          {
+            "name": "room", "in": "path", "required": true,
+            "description": "the room name",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*$",
+              "maxLength": 32
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "who is connected",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Presence" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room}/messages": {
+      "parameters": [
+        {
+          "name": "room", "in": "path", "required": true,
+          "description": "the room name",
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "maxLength": 32
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listMessages",
+        "tags": [ "messages" ],
+        "summary": "A page of a room's history",
+        "description": "Keyset pagination, oldest first: pass the `next` token from a response back as the `next` parameter to fetch the following page.",
+        "parameters": [
+          {
+            "name": "limit", "in": "query", "required": false,
+            "description": "how many messages to return",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+          },
+          {
+            "name": "next", "in": "query", "required": false,
+            "description": "the pagination token from a previous response",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "a page of messages",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessagePage" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "postMessage",
+        "tags": [ "messages" ],
+        "summary": "Say something in a room",
+        "description": "Stores the message and broadcasts it to every WebSocket connected to the room. Open the room in a browser and watch it arrive.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NewMessage" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "stored and broadcast",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Message" }
+              }
+            }
+          },
+          "400": {
+            "description": "the request did not match the schema",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "clearRoom",
+        "tags": [ "messages" ],
+        "summary": "Delete a room's history",
+        "description": "Requires the admin bearer token. The token is `punk-admin` unless `PUNK_CHAT_ADMIN_TOKEN` says otherwise.",
+        "security": [ { "adminToken": [] } ],
+        "responses": {
+          "200": {
+            "description": "how many messages were removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "room":    { "type": "string" },
+                    "deleted": { "type": "integer" }
+                  },
+                  "required": [ "room", "deleted" ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "the admin token was missing or wrong",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "adminToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "An admin bearer token, checked by Chat::Controller::API::Auth."
+      }
+    },
+    "schemas": {
+      "Message": {
+        "type": "object",
+        "description": "One thing somebody said.",
+        "properties": {
+          "type":    { "type": "string" },
+          "id":      { "type": "integer" },
+          "room":    { "type": "string" },
+          "nick":    { "type": "string" },
+          "body":    { "type": "string" },
+          "created": { "type": "string" }
+        },
+        "required": [ "id", "room", "nick", "body" ]
+      },
+      "NewMessage": {
+        "type": "object",
+        "properties": {
+          "nick": {
+            "type": "string", "minLength": 1, "maxLength": 32,
+            "description": "who is saying it"
+          },
+          "text": {
+            "type": "string", "minLength": 1, "maxLength": 1000,
+            "description": "what they are saying"
+          }
+        },
+        "required": [ "nick", "text" ],
+        "additionalProperties": false
+      },
+      "MessagePage": {
+        "type": "object",
+        "properties": {
+          "room":          { "type": "string" },
+          "messages":      { "type": "array",
+                             "items": { "$ref": "#/components/schemas/Message" } },
+          "has_more_data": { "type": "boolean" },
+          "next":          { "type": [ "string", "null" ] }
+        },
+        "required": [ "room", "messages", "has_more_data" ]
+      },
+      "RoomList": {
+        "type": "object",
+        "properties": {
+          "rooms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "room":      { "type": "string" },
+                "messages":  { "type": "integer" },
+                "last_at":   { "type": [ "string", "null" ] },
+                "connected": { "type": "integer" }
+              },
+              "required": [ "room", "messages", "connected" ]
+            }
+          }
+        },
+        "required": [ "rooms" ]
+      },
+      "Presence": {
+        "type": "object",
+        "properties": {
+          "room":      { "type": "string" },
+          "connected": { "type": "integer" }
+        },
+        "required": [ "room", "connected" ]
+      },
+      "Errors": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": { "message": { "type": "string" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

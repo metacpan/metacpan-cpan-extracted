@@ -4,10 +4,8 @@ use strict;
 use warnings;
 
 #<<<
-package Dist::Starter::Exception;
-BEGIN {
-our $VERSION = 'v0.1.0';
-}
+package
+  Dist::Starter::Exception;
 #>>>
 
 sub new {

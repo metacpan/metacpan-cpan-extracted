@@ -14,7 +14,7 @@ use Time::Piece; # core module
 
 my $time = localtime;
 my $record_date = $ENV{ LWP_UA_MOCK } eq 'playback'
-    ? '2025-07-20'
+    ? '2026-08-06'
     : $time->ymd;
 diag 'Remember to set $record_date = ', $time->ymd, " in $0"
     if $ENV{ LWP_UA_MOCK } eq 'record';
@@ -37,16 +37,6 @@ subtest 'Chart object ok' => sub {
 
         end();
     }, 'Chart object correct';
-};
-
-subtest data => sub {
-    my $body = get_data_subset();
-
-    my $data = $chart->parse_data( $body );
-    is ref $data, 'ARRAY';
-        
-    ok my $result = $chart->data(), "Fetch chart data for $dataset";
-    like $result, qr/^Entity,Code,Year,Annual sea surface temperature/, 'returns CSV data';
 };
 
 subtest 'filtered data' => sub {
@@ -95,8 +85,9 @@ subtest 'fetch metadata' => sub {
     my $column_check = hash {
             field citationShort => E();
             field citationLong => E();
-            field descriptionKey => array { all_items match qr/\w/; etc(); };
+            field descriptionKey => match qr/\w/;
             field descriptionShort => E();
+            field descriptionProcessing => E();
             field fullMetadata
                 => match qr(^https://api.ourworldindata.org/v1/indicators/\d+.metadata.json);
             field lastUpdated => match $date_check;
@@ -104,7 +95,7 @@ subtest 'fetch metadata' => sub {
             field owidVariableId => match qr/^\d+$/;
             field shortName => match qr/^sea_temperature/;
             field shortUnit => E();
-            field timespan => "1850-2025";
+            field timespan => match qr/^1850-20\d{2}/;
             field titleLong => E();
             field titleShort => E();
             field type => 'Numeric';
@@ -130,19 +121,70 @@ subtest 'fetch metadata' => sub {
     }
 };
 
+subtest 'fetch readme' => sub {
+    ok my $result = $chart->readme, 'Get readme';
+
+    like $result, qr/^# Annual sea surface temperature/,
+        'check README.md title';
+    like $result, qr/^## CSV Structure/m,
+        'check README.md heading';
+};
+
+subtest 'fetch config' => sub {
+    ok my $result = $chart->config, 'Get config';
+
+    is $result,
+        hash {
+            field id => E();
+            field note => E();
+
+            etc();
+        },
+        'check JSON fields';
+};
+
+subtest 'fetch values' => sub {
+    ok my $result = $chart->values, 'Get values';
+
+    is $result,
+        hash {
+            field entityName => E();
+            field columns => E();
+            field startTime => E();
+            field endTime => E();
+            field source => E();
+            field startValues => E();
+            field endValues => E();
+
+            end();
+        },
+        'check JSON fields';
+};
+
+subtest 'fetch search_result' => sub {
+    ok my $result = $chart->search_result, 'Get search_result';
+
+    is $result,
+        hash {
+            field dataTable => E();
+            field entityType => E();
+            field entityTypePlural => E();
+            field grapherQueryParams => E();
+            field layout => E();
+            field numAvailableEntities => E();
+            field source => E();
+            field subtitle => E();
+            field title => E();
+            field unit => E();
+
+            end();
+        },
+        'check JSON fields';
+};
+
 done_testing();
 
 END {
     # END block ensures cleanup if script dies early
     LWP::UserAgent::Mockable->finished;
-}
-
-sub get_data_subset {
-    return <<DATA;
-Entity,Code,Year,Annual sea surface temperature anomalies,Annual sea surface temperature anomalies (lower bound),Annual sea surface temperature anomalies (upper bound)
-Northern Hemisphere,,1850,-0.053766724,-0.12948489,-0.0016253028
-Northern Hemisphere,,1851,0.06586428,-0.008639886,0.11984695
-Northern Hemisphere,,1852,0.14944454,0.079167694,0.20091112
-Northern Hemisphere,,1853,0.11939995,0.054722864,0.17239437
-DATA
 }

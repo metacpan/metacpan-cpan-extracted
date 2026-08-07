@@ -1,0 +1,13 @@
+<%INIT>
+use RT::Extension::AwayMode;
+
+my $user = $session{'CurrentUser'} && $session{'CurrentUser'}->UserObj;
+return unless $user && $user->Id;
+return unless RT::Extension::AwayMode->IsUserAway($user);
+
+my $prefs = $user->Preferences( 'AwayMode', {} );
+my $msg   = loc("Away Mode is active for your account. New replies on tickets you own will be reassigned to Nobody.");
+$msg .= ' ' . loc( "You're expected back [_1].", $prefs->{'EndDate'} ) if $prefs->{'EndDate'};
+
+push @{ $m->notes('SystemWarnings') }, $msg;
+</%INIT>

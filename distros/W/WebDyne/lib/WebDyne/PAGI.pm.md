@@ -13,6 +13,11 @@ my $app = WebDyne::PAGI->new(
     root  => '.',
     index => 1,
 )->to_app;
+
+my $single_file_app = WebDyne::PAGI->new(
+    root     => '.',
+    filename => 'app.psp',
+)->to_app;
 ```
 
 # DESCRIPTION #
@@ -23,7 +28,9 @@ my $app = WebDyne::PAGI->new(
 
 * **new(%options)**
 
-    Construct a PAGI application wrapper. Options include `root`, `index`, `test`, and related runtime settings.
+    Construct a PAGI application wrapper. Options include `root`, `index`, `test`, `filename`, and related runtime settings.
+
+    The `filename` option is an explicit source-file override for the application. When supplied, it is passed to `WebDyne::Request::PAGI` for every HTTP request and always wins over normal filename derivation from the PAGI request scope, including path-based dispatch, document-root resolution, default document handling, and API-style fallback resolution. This is useful for helper tools or deliberate single-file PAGI applications; do not set it for normal multi-page applications that should dispatch from the request path.
 
 * **to_app()**
 

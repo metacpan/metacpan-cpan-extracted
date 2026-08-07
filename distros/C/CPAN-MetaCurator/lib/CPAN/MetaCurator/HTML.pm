@@ -13,7 +13,7 @@ use Mew;
 
 has logo_path => (Str, default => '', chained => 1);
 
-our $VERSION = '1.27';
+our $VERSION = '1.29';
 
 # ------------------------------------------------
 

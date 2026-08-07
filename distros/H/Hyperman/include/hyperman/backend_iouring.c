@@ -49,6 +49,7 @@ typedef struct ur_timer {
     struct __kernel_timespec ts;
     void            *udata;
     int              interval;   /* re-arm on fire?  */
+    int              cancelled;  /* freed when its completion lands, not before */
     struct ur_timer *prev, *next;
 } ur_timer;
 
@@ -153,13 +154,30 @@ static void ur_timer_unlink(hm_ur_state *st, ur_timer *t) {
     if (t->next) t->next->prev = t->prev;
 }
 
+/* Cancel a timer. The timeout is already in flight in the kernel and its
+ * user_data IS this pointer, so freeing here would leave the kernel holding a
+ * dangling reference: the completion still arrives, ur_wait dereferences it
+ * and frees it a second time. Worse, the block is the right size to be handed
+ * straight back to the next ur_add_timer, so the stale completion lands on a
+ * live timer and takes that down instead - which is why this showed up as an
+ * intermittent "double free or corruption" rather than a reliable one.
+ *
+ * So: ask the kernel to remove the timeout and mark the watcher dead, but
+ * leave it linked and allocated. Its completion (-ECANCELED, or a genuine
+ * fire that raced the removal) frees it in ur_wait; anything still linked at
+ * shutdown is freed by ur_destroy. */
 static int ur_del_timer(hm_backend *be, void *udata) {
     hm_ur_state *st = (hm_ur_state *)be->state;
     ur_timer *t;
     for (t = st->timers; t; t = t->next) {
-        if (t->udata == udata) {
-            ur_timer_unlink(st, t);
-            free(t);
+        if (t->udata == udata && !t->cancelled) {
+            struct io_uring_sqe *sqe;
+            t->cancelled = 1;
+            t->interval  = 0;          /* never re-arm a cancelled timer */
+            if ((sqe = ur_sqe(st)) != NULL) {
+                io_uring_prep_timeout_remove(sqe, (__u64)(uintptr_t)t, 0);
+                UR_SET_DATA(sqe, UR_TAG_IGNORE);
+            }
             return 0;
         }
     }
@@ -254,6 +272,15 @@ static int ur_wait(hm_backend *be, hm_event *out, int max, double timeout) {
         {   /* timer: user_data is the ur_timer pointer (tag 0) */
             ur_timer *t = (ur_timer *)(uintptr_t)data;
             if (!t) continue;
+            /* A cancelled timer's completion still arrives; it owns the
+             * struct, and it must not be reported to the loop. -ECANCELED
+             * covers the removal succeeding, t->cancelled the case where the
+             * timeout fired before the removal reached the kernel. */
+            if (t->cancelled || res == -ECANCELED) {
+                ur_timer_unlink(st, t);
+                free(t);
+                continue;
+            }
             out[nev].kind  = HM_EV_TIMER;
             out[nev].fd    = -1;
             out[nev].udata = t->udata;

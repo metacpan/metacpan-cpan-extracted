@@ -77,6 +77,8 @@ t/41-tables-thead-tbody.t
 t/50-render-options.t
 t/50-strip-markdown-inlines.t
 t/51-disable-syntax.t
+t/52-highlight.t
+t/56-render-leak.t
 t/90-session.t
 t/90-simd-equivalence.t
 t/98-gfm-spec.t

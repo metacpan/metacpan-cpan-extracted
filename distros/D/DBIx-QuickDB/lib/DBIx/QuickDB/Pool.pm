@@ -2,7 +2,7 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000061';
+our $VERSION = '0.000062';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
@@ -264,6 +264,22 @@ sub add_driver {
     return;
 }
 
+sub instance_dir_user {
+    my $self = shift;
+
+    my $user = $ENV{USER} // $ENV{USERNAME} // 'quickdb';
+
+    # A '/' would send tempdir looking for a subdir that does not exist. Real
+    # logins that hit this: 'jdoe@corp.example.com', 'DOMAIN\jdoe'.
+    $user =~ s/[^\w.-]+/_/g;
+    $user = 'quickdb' unless length $user;
+
+    # The instance dir must hold a unix socket, and sun_path caps at 107 bytes.
+    $user = substr($user, 0, 12) if length($user) > 12;
+
+    return $user;
+}
+
 sub fetch_db {
     my $self = shift;
     my ($name, %params) = @_;
@@ -280,8 +296,13 @@ sub fetch_db {
     my %add_args;
     if (my $dir = $self->{+INSTANCE_DIR}) {
         require File::Temp;
-        my $user = $ENV{USER} // $ENV{USERNAME} // 'quickdb';
-        $add_args{dir} = File::Temp::tempdir("$user-XXXXXX", CLEANUP => 0, DIR => $dir);
+        my $user = $self->instance_dir_user;
+
+        # $$ because File::Temp draws names from rand(): identically-seeded
+        # processes walk the same sequence and recycle freed names, and two of
+        # them copying into one dir corrupts the clone. Only 6 X's -- the pid
+        # does the work, and the name competes for the 107-byte socket budget.
+        $add_args{dir} = File::Temp::tempdir("$user-$$-XXXXXX", CLEANUP => 0, DIR => $dir);
     }
 
     return $from->clone(autostart => 1, autostop => 1, cleanup => 1, %add_args, %{$spec->{clone_args} || {}}, %params);
@@ -920,6 +941,18 @@ No accessors.
 Normally db's are spun up in the system temp dir. This allows you to provide an
 alternate temporary database location.
 
+Each instance gets its own directory here, named
+C<< <user>-<pid>-<random> >>. The username comes from
+C<instance_dir_user()>, which sanitizes and length-caps it. The pid is
+required for correctness: File::Temp derives its random part from C<rand()>, so
+forked or identically-seeded processes would otherwise recycle each other's
+directory names.
+
+Keep this path short. The instance directory has to hold the database's unix
+socket, and C<sun_path> is limited to 107 bytes, so a long C<instance_dir> plus
+the instance name and socket name can exceed it and leave the server unable to
+start.
+
 =item library => $PACKAGE
 
 =item $pkg = $pool->library
@@ -1146,6 +1179,13 @@ subclass.
 =item $pool->vivify_db()
 
 =item $pool->reclaim()
+
+=item $user = $pool->instance_dir_user()
+
+The username prefixed onto each directory created under L</instance_dir>,
+sanitized and length-capped. Exposed so that tests and subclasses can predict
+the directory name instead of rebuilding it from C<$ENV{USER}> and drifting from
+the rules used here.
 
 =back
 

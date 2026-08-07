@@ -136,7 +136,7 @@ static uint32_t jsf__build_props(pTHX_ jsf_pctx *P, SV *pv, SV *path) {
         while (j > 0 && jsf__cmp_propent(base, &tmp[j - 1], &key) > 0) { tmp[j] = tmp[j - 1]; j--; }
         tmp[j] = key;
     }
-    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_proptab) + cnt * sizeof(jsf_propent)), 8);
+    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_proptab) + cnt * sizeof(jsf_propent)), JSF_ALIGNOF(jsf_propent));
     pt = (jsf_proptab *)jsf_arena_ptr(a, off);
     pt->n = cnt;
     if (cnt) memcpy((char *)pt + sizeof(jsf_proptab), tmp, cnt * sizeof(jsf_propent));
@@ -164,7 +164,7 @@ static uint32_t jsf__build_reqset(pTHX_ jsf_pctx *P, SV *rv, uint32_t props_off)
         }
         tmp[i].name_off = name_off; tmp[i].prop_idx = idx;
     }
-    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_reqset) + n * sizeof(jsf_reqent)), 4);
+    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_reqset) + n * sizeof(jsf_reqent)), JSF_ALIGNOF(jsf_reqent));
     rs = (jsf_reqset *)jsf_arena_ptr(a, off);
     rs->n = (uint32_t)n;
     if (n) memcpy((char *)rs + sizeof(jsf_reqset), tmp, n * sizeof(jsf_reqent));
@@ -186,7 +186,7 @@ static uint32_t jsf__build_offlist(pTHX_ jsf_pctx *P, SV *av_sv, SV *path, const
         sv_catpvf(cp, "/%d", (int)i);
         tmp[i] = (e && *e) ? jsf_parse_schema(aTHX_ P, *e, cp) : JSF_NULL_OFF;
     }
-    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_offlist) + n * sizeof(uint32_t)), 4);
+    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_offlist) + n * sizeof(uint32_t)), JSF_ALIGNOF(uint32_t));
     ol = (jsf_offlist *)jsf_arena_ptr(a, off);
     ol->n = (uint32_t)n;
     if (n) memcpy((char *)ol + sizeof(jsf_offlist), tmp, n * sizeof(uint32_t));
@@ -208,7 +208,7 @@ static uint32_t jsf__build_pattab(pTHX_ jsf_pctx *P, SV *pv, SV *path) {
         uint32_t pat_off   = jsf_arena_intern(a, k, (uint32_t)kl);
         tmp[cnt].pat_off = pat_off; tmp[cnt].child_off = child_off; cnt++;
     }
-    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_pattab) + cnt * sizeof(jsf_patent)), 4);
+    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_pattab) + cnt * sizeof(jsf_patent)), JSF_ALIGNOF(jsf_patent));
     pt = (jsf_pattab *)jsf_arena_ptr(a, off);
     pt->n = cnt;
     if (cnt) memcpy((char *)pt + sizeof(jsf_pattab), tmp, cnt * sizeof(jsf_patent));
@@ -229,7 +229,7 @@ static uint32_t jsf__build_namelist(pTHX_ jsf_pctx *P, SV *av_sv) {
         STRLEN kl; const char *k = (e && *e) ? SvPV_const(*e, kl) : "";
         tmp[i] = jsf_arena_intern(a, k, (uint32_t)(e && *e ? kl : 0));
     }
-    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_offlist) + n * sizeof(uint32_t)), 4);
+    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_offlist) + n * sizeof(uint32_t)), JSF_ALIGNOF(uint32_t));
     ol = (jsf_offlist *)jsf_arena_ptr(a, off);
     ol->n = (uint32_t)n;
     if (n) memcpy((char *)ol + sizeof(jsf_offlist), tmp, n * sizeof(uint32_t));
@@ -251,7 +251,7 @@ static uint32_t jsf__build_depsch(pTHX_ jsf_pctx *P, SV *pv, SV *path) {
         uint32_t name_off = jsf_arena_intern(a, k, (uint32_t)kl);
         tmp[cnt].name_off = name_off; tmp[cnt].sch_off = sch; cnt++;
     }
-    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_dstab) + cnt * sizeof(jsf_dsent)), 4);
+    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_dstab) + cnt * sizeof(jsf_dsent)), JSF_ALIGNOF(jsf_dsent));
     dt = (jsf_dstab *)jsf_arena_ptr(a, off);
     dt->n = cnt;
     if (cnt) memcpy((char *)dt + sizeof(jsf_dstab), tmp, cnt * sizeof(jsf_dsent));
@@ -274,7 +274,7 @@ static uint32_t jsf__build_deptab(pTHX_ jsf_pctx *P, SV *pv) {
         uint32_t name_off  = jsf_arena_intern(a, k, (uint32_t)kl);
         tmp[cnt].name_off = name_off; tmp[cnt].names_off = names_off; cnt++;
     }
-    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_deptab) + cnt * sizeof(jsf_depent)), 4);
+    off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_deptab) + cnt * sizeof(jsf_depent)), JSF_ALIGNOF(jsf_depent));
     dt = (jsf_deptab *)jsf_arena_ptr(a, off);
     dt->n = cnt;
     if (cnt) memcpy((char *)dt + sizeof(jsf_deptab), tmp, cnt * sizeof(jsf_depent));
@@ -286,9 +286,9 @@ static uint32_t jsf__build_deptab(pTHX_ jsf_pctx *P, SV *pv) {
 
 static uint32_t jsf_parse_schema(pTHX_ jsf_pctx *P, SV *schema, SV *path) {
     jsf_arena_t *a = P->C->arena;
-    uint32_t off = jsf_arena_alloc(a, (uint32_t)sizeof(jsf_node_t), 8);
+    uint32_t off = jsf_arena_alloc(a, (uint32_t)sizeof(jsf_node_t), JSF_ALIGNOF(jsf_node_t));
     HV *h;
-    U64 present = 0;
+    uint64_t present = 0;
     uint32_t type_mask = 0;
     uint8_t  unique = 0;
     /* local field accumulators */

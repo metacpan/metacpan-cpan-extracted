@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Workflow::Schema::Result::Workflow;
-$Mojolicious::Plugin::Fondation::Workflow::Schema::Result::Workflow::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Workflow::Schema::Result::Workflow::VERSION = '0.02';
 # ABSTRACT: DBIx::Class Result for the `workflow` table
 #
 # Column names match Workflow::Persister::DBI expectations:
@@ -9,8 +9,9 @@ $Mojolicious::Plugin::Fondation::Workflow::Schema::Result::Workflow::VERSION = '
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Core';
+use base 'Mojolicious::Plugin::Fondation::Schema::Result::Base';
 
+__PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('workflow');
 
 __PACKAGE__->add_columns(
@@ -68,7 +69,7 @@ Mojolicious::Plugin::Fondation::Workflow::Schema::Result::Workflow - DBIx::Class
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

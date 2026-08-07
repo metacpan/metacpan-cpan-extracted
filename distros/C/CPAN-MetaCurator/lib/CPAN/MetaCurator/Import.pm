@@ -18,7 +18,7 @@ use Text::CSV::Encoded;
 
 has -constants_csv_path => (Str, default => sub{return 'data/cpan.metacurator.constants.csv'}, chained => 1);
 
-our $VERSION = '1.27';
+our $VERSION = '1.29';
 
 # -----------------------------------------------
 
@@ -135,7 +135,7 @@ sub populate_topics_table
 	$self -> logger -> info("Start populate_topics_table()");
 
 	# We have just populated the constants table, so read it to get the names of the special (TiddlyWiki) paragraphs.
-	# Typically: GettingStarted|MainMenu.
+	# Typically: ChangeLog1|ChangeLog2|GettingStarted|MainMenu|TableOfContents.
 
 	my($root_id)		= $self -> insert_hashref($table_name, $record);
 	my($pad)			= $self -> pad; # For temporary use, during import.

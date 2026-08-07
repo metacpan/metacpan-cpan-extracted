@@ -49,5 +49,6 @@ xs/future.xs
 xs/hyperman.xs
 xs/loop.xs
 xs/writer.xs
+t/23-detach.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

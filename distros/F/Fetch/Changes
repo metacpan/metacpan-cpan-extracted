@@ -1,5 +1,21 @@
 Revision history for Fetch
 
+0.11    Date/time
+        - $ua->clone(%overrides): another agent over this one's connection
+          pool and loop, with the named options replaced. The case it exists
+          for is a per-request cookie jar - a jar belongs to the agent, so a
+          jar on a long-lived agent is shared by every request that agent
+          serves, which is a cross-request leak the moment the cookies
+          identify an end user rather than the application. Building a fresh
+          agent per request avoids that but throws away the keep-alive pool
+          and re-resolves the loop adapter, which is most of what new()
+          costs; a clone gives the isolation without the bill.
+        - cookie_jar, headers, agent, timeout, tls_verify, max_redirects,
+          keep_alive and simple_response are overridable, and
+          cookie_jar => undef drops an inherited jar. Headers are copied
+          rather than shared, so a clone cannot write into the parent's
+          defaults.
+
 0.10    2026-08-05
         - Drive Hyperman loops through Hyperman's public C ABI 
         - Awaiting on a Hyperman loop ($future->get) is also C now: the

@@ -4,7 +4,7 @@ use Moo;
 
 ## no critic (Modules::RequireExplicitInclusion, Subroutines::ProhibitCallsToUnexportedSubs, TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000060';
+our $VERSION = '0.000061';
 
 use App::perlimports::Sandbox ();
 use Class::Inspector          ();
@@ -17,27 +17,29 @@ use Types::Standard qw(ArrayRef Bool HashRef Int InstanceOf Str);
 with 'App::perlimports::Role::Logger';
 
 has at_export => (
-    is          => 'ro',
-    isa         => ArrayRef [Str],
-    lazy        => 1,
-    handles_via => 'Array',
-    handles     => {
-        has_at_export => 'count',
-    },
+    is      => 'ro',
+    isa     => ArrayRef [Str],
+    lazy    => 1,
     default => sub { shift->_implicit->{export} },
 );
 
+# Explicit accessor rather than a Sub::HandlesVia 'count' delegation. Array
+# handlers route through the Sub::HandlesVia::XS backend, whose XS array handler
+# caches the Perl stack pointer across the attribute builder's call_sv and can
+# write through it after the builder has reallocated the stack. See issue #171.
+sub has_at_export { return scalar @{ $_[0]->at_export }; }
+
 has at_export_ok => (
-    is          => 'ro',
-    isa         => ArrayRef [Str],
-    lazy        => 1,
-    handles_via => 'Array',
-    handles     => {
-        all_at_export_ok => 'elements',
-        has_at_export_ok => 'count',
-    },
+    is      => 'ro',
+    isa     => ArrayRef [Str],
+    lazy    => 1,
     default => sub { shift->_implicit->{export_ok} },
 );
+
+# Explicit accessor rather than a Sub::HandlesVia 'count' delegation; see the
+# note on has_at_export above and issue #171. (An unused 'elements' delegation
+# was dropped here at the same time.)
+sub has_at_export_ok { return scalar @{ $_[0]->at_export_ok }; }
 
 has at_export_fail => (
     is      => 'ro',
@@ -81,15 +83,15 @@ has _implicit => (
 );
 
 has import_flags => (
-    is          => 'ro',
-    isa         => ArrayRef,
-    lazy        => 1,
-    handles_via => 'Array',
-    handles     => {
-        has_import_flags => 'count',
-    },
+    is      => 'ro',
+    isa     => ArrayRef,
+    lazy    => 1,
     builder => '_build_import_flags',
 );
+
+# Explicit accessor rather than a Sub::HandlesVia 'count' delegation; see the
+# note on has_at_export above and issue #171.
+sub has_import_flags { return scalar @{ $_[0]->import_flags }; }
 
 has is_exporter => (
     is      => 'ro',
@@ -535,7 +537,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000060
+version 0.000061
 
 =head1 SYNOPSIS
 

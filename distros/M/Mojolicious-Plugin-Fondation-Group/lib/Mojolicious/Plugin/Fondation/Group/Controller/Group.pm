@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Group::Controller::Group;
-$Mojolicious::Plugin::Fondation::Group::Controller::Group::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Group::Controller::Group::VERSION = '0.02';
 # ABSTRACT: REST controller for Group CRUD via DBIx::Class::Async
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -8,17 +8,9 @@ use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
 # Helpers
 # ---------------------------------------------------------------------------
 
-# Check if Perm plugin is loaded and ?with=perms was requested
+# Condition: ?with=perms triggers m2m prefetch
 sub _want_perms ($self) {
-    return 0 unless $self->param('with') && $self->param('with') eq 'perms';
-    return 0 unless $self->has_helper('fondation');
-    return exists $self->fondation->registry->{'Mojolicious::Plugin::Fondation::Perm'};
-}
-
-# Check if Perm plugin is loaded
-sub _has_perm_plugin ($self) {
-    return 0 unless $self->has_helper('fondation');
-    return exists $self->fondation->registry->{'Mojolicious::Plugin::Fondation::Perm'};
+    return $self->param('with') && $self->param('with') eq 'perms';
 }
 
 # ---------------------------------------------------------------------------
@@ -31,6 +23,7 @@ sub index ($self) {
 }
 
 # List all groups (GET /api/Group)
+# m2m perms are auto-included by Base::TO_JSON when $rs->with('perms') is used.
 sub list ($self) {
     $self->render_later;
 
@@ -38,15 +31,13 @@ sub list ($self) {
         ? $self->model('group')->with('perms')
         : $self->model('group');
 
-    my $schema = $self->schema;
-    $rs->all->on_done(sub {
-        my $groups = shift;
-        my @data   = map { _to_data($_, $schema) } @$groups;
-        $self->render(openapi => \@data);
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    $rs->TO_JSON->then(sub ($data) {
+        $self->render(openapi => $data);
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Read a group by ID (GET /api/Group/:id)
+# m2m perms auto-included by Base::TO_JSON when with('perms') prefetched.
 sub read ($self) {
     $self = $self->openapi->valid_input or return;
     $self->render_later;
@@ -56,17 +47,16 @@ sub read ($self) {
         ? $self->model('group')->with('perms')
         : $self->model('group');
 
-    my $schema = $self->schema;
     $rs->find($id)->on_done(sub {
         my $group = shift;
         if ($group) {
-            $self->render(openapi => _to_data($group, $schema));
+            $self->render(openapi => $group->TO_JSON);
         }
         else {
             $self->render(status => 404, openapi =>
                 { errors => [{ message => 'Not found', path => '/' }] });
         }
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Create a group (POST /api/Group)
@@ -77,11 +67,11 @@ sub create ($self) {
     my $perm_ids = delete $data->{perms};
     $self->model('group')->create($data)->on_done(sub {
         my $group = shift;
-        my $d    = _to_data($group);
+        my $d    = $group->TO_JSON;
 
         # Sync permission assignments (blocking in this worker)
         $self->_sync_group_perms($d->{id}, $perm_ids)
-            if $perm_ids && @$perm_ids && $self->_has_perm_plugin;
+            if $perm_ids && @$perm_ids;
 
         $self->res->headers->location($self->url_for('read_group', id => $d->{id}));
         $self->render(status => 201, openapi => $d);
@@ -91,7 +81,7 @@ sub create ($self) {
             title => $self->l('Group created'),
             body  => sprintf($self->l("Group '%s' has been created."), $d->{name} // ''),
         });
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Update a group (PUT /api/Group/:id)
@@ -112,11 +102,11 @@ sub update ($self) {
         }
         $group->update($json)->on_done(sub {
             my $updated = shift;
-            my $d       = _to_data($updated);
+            my $d       = $updated->TO_JSON;
 
             # Sync permission assignments (blocking in this worker)
             $self->_sync_group_perms($id, $perm_ids)
-                if $perm_ids && $self->_has_perm_plugin;
+                if $perm_ids;
 
             $self->render(openapi => $d);
 
@@ -125,8 +115,8 @@ sub update ($self) {
                 title => $self->l('Group updated'),
                 body  => sprintf($self->l("Group '%s' has been updated."), $d->{name} // ''),
             });
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Delete a group (DELETE /api/Group/:id)
@@ -150,8 +140,8 @@ sub delete ($self) {
                 title => $self->l('Group deleted'),
                 body  => sprintf($self->l("Group '%s' has been deleted."), $name // ''),
             });
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # ---------------------------------------------------------------------------
@@ -162,11 +152,9 @@ sub members ($self) {
     $self = $self->openapi->valid_input or return;
     $self->render_later;
     my $group_id = $self->param('id');
-    $self->model('user_group')->search({ group_id => $group_id })->all->on_done(sub {
-        my $members = shift;
-        my @data    = map { _to_data($_) } @$members;
-        $self->render(openapi => \@data);
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    $self->model('user_group')->search({ group_id => $group_id })->TO_JSON->then(sub ($data) {
+        $self->render(openapi => $data);
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 sub add_member ($self) {
@@ -177,8 +165,8 @@ sub add_member ($self) {
     $data->{group_id} = $group_id;
     $self->model('user_group')->create($data)->on_done(sub {
         my $membership = shift;
-        $self->render(status => 201, openapi => _to_data($membership));
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+        $self->render(status => 201, openapi => $membership->TO_JSON);
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 sub remove_member ($self) {
@@ -195,8 +183,8 @@ sub remove_member ($self) {
         }
         $members->[0]->delete->on_done(sub {
             $self->render(status => 204, openapi => {});
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # ---------------------------------------------------------------------------
@@ -222,36 +210,6 @@ sub _sync_group_perms ($self, $group_id, $perm_ids) {
     ));
 }
 
-# ---------------------------------------------------------------------------
-# Private helpers
-# ---------------------------------------------------------------------------
-
-sub _render_error ($self, $err) {
-    $self->app->log->error('[Group::Controller] _render_error: ' . $self->dumper($err));
-    $self->render(status => 500, openapi =>
-        { errors => [{ message => "$err", path => '/' }] });
-}
-
-sub _to_data ($row, $schema = undef) {
-    my $data = { $row->get_columns };
-
-    # Serialize DateTime objects to ISO 8601 strings
-    for my $key (keys %$data) {
-        my $val = $data->{$key};
-        if (ref $val && eval { $val->isa('DateTime') }) {
-            $data->{$key} = $val->iso8601;
-        }
-    }
-
-    # Include many_to_many perms if available (resolved via prefetched data,
-    # Future->done returns instantly — no extra query).
-    if ($schema && $row->can('perms')) {
-        $data->{perms} = $schema->await($row->perms);
-    }
-
-    return $data;
-}
-
 1;
 
 __END__
@@ -266,7 +224,7 @@ Mojolicious::Plugin::Fondation::Group::Controller::Group - REST controller for G
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

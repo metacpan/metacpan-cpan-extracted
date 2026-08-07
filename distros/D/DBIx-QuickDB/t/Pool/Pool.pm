@@ -35,7 +35,7 @@ use Capture::Tiny qw/capture/;
 our @POOL_TEMP_DIRS;
 sub pool_tempdir {
     my $cleanup = $^O eq 'MSWin32' ? 0 : 1;
-    my $dir = tempdir(CLEANUP => $cleanup);
+    my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => $cleanup);
     push @POOL_TEMP_DIRS => $dir unless $cleanup;
     return $dir;
 }
@@ -582,9 +582,14 @@ subtest instance_dir => sub {
     }
     opendir(my $dh, $instdir) or die "Could not open dir: $!";
 
+    # Ask the Pool for the prefix rather than rebuilding it from $ENV{USER}:
+    # fetch_db sanitizes and length-caps that name, so a raw $ENV{USER} holding
+    # (say) a space or an LDAP-style 'jdoe@corp.example.com' would not match the
+    # directory that actually got created.
+    my $user = $CLASS->instance_dir_user;
+
     my $found = 0;
     for my $path (readdir($dh)) {
-        my $user = $ENV{USER} // $ENV{USERNAME} // 'quickdb';
         next unless $path =~ m/^\Q$user\E-.*$/;
         is(File::Spec->canonpath("$instdir/$path"), File::Spec->canonpath($db->dir), "Database was stored in the instance dir");
         $found++;

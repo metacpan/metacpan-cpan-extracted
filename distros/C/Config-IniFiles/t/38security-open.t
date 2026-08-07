@@ -15,6 +15,9 @@ use File::Temp       qw( tempdir );
 use File::Spec       ();
 use Test::More tests => 5;
 
+use lib "./t/lib";
+use Config::IniFiles::Slurp qw( slurp utf8_slurp utf8_spew );
+
 my $dir = tempdir( CLEANUP => 1 );
 
 # A trailing-pipe payload must not run a command.
@@ -47,7 +50,12 @@ my $dir = tempdir( CLEANUP => 1 );
     close $made if $made;
 
     # TEST
-    is -s $victim, 15, "redirect payload does not truncate a file";
+    my $contents = utf8_slurp($victim);
+    like(
+        $contents,
+        qr#\Aimportant data[\r\n]+\z#ms,
+        "redirect payload does not truncate a file",
+    );
 }
 
 # A plain filename still opens as a file.

@@ -29,7 +29,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='3.009';
+$VERSION='3.011';
 
 
 #  Debug
@@ -449,12 +449,13 @@ Andrew Speer L<mailto:andrew.speer@isolutions.com.au> and contributors.
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2026 by Andrew Speer E<lt>andrew.speer@isolutions.com.auE<gt>.
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
-This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
 
-E<lt>L<http://dev.perl.org/licenses/&gt;>
+L<http://dev.perl.org/licenses/>
 
 =cut

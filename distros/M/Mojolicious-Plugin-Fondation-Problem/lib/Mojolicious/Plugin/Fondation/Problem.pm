@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Problem;
-$Mojolicious::Plugin::Fondation::Problem::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Problem::VERSION = '0.03';
 # ABSTRACT: Unified API (RFC 9457) and HTML error responses for Fondation
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -20,6 +20,11 @@ sub register ($self, $app, $config) {
         my $type     = $args{type};
         my $errors   = $args{errors};
         my $instance = $args{instance};
+
+        # Auto-log server errors
+        if ($status >= 500 && defined $detail) {
+            $c->app->log->error($c->dumper($detail));
+        }
 
         my $is_dev = $c->app->mode eq 'development';
 
@@ -78,7 +83,7 @@ Mojolicious::Plugin::Fondation::Problem - Unified API (RFC 9457) and HTML error 
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -115,14 +120,6 @@ In development mode, all fields are returned (C<type>, C<detail>,
 C<errors>, C<instance>). In production mode, only C<status> and
 C<title> are sent — no internal information is leaked.
 
-=head1 NAME
-
-Mojolicious::Plugin::Fondation::Problem - Unified API (RFC 9457) and HTML error responses for Fondation
-
-=head1 VERSION
-
-version 0.01
-
 =head1 HELPERS
 
 =head2 problem
@@ -137,9 +134,6 @@ version 0.01
     );
 
 All arguments are optional. Defaults: C<status> = 500, C<title> = 'Internal Server Error'.
-
-In production mode, only C<status> and C<title> are included in the response.
-C<detail>, C<type>, C<errors>, and C<instance> are suppressed.
 
 =head1 TEMPLATES
 
@@ -156,12 +150,6 @@ Rendered for HTML error responses. Receives stash values:
 =item C<problem_detail> — Detailed message (only in development mode)
 
 =back
-
-Uses C<% layout 'main'> — if C<Fondation::Layout::Bootstrap> is loaded,
-its Bootstrap layout applies. Without any layout plugin, Mojo renders
-the template content directly (no HTML wrapper) — the page remains
-functional. A future Fondation core release may provide a minimal
-HTML5 layout as a dedicated plugin loaded after Bootstrap.
 
 =head1 RFC 9457 RESPONSE FORMAT
 

@@ -20,6 +20,7 @@ App
 CLI
 Choroba
 Config
+Copilot
 Document
 ExportInspector
 Include
@@ -44,7 +45,6 @@ Rodríguez
 Role
 Sandbox
 choroba
-copilot
 dependabot
 dump
 git

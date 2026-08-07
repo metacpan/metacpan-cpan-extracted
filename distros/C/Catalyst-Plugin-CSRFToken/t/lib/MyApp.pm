@@ -12,7 +12,6 @@ MyApp->config(
     'token_param_key' => 'csrf_token2',
     'max_age' => 8888,
     'default_secret' => 'begin',
-
     'auto_check' => 1,
   }
 );

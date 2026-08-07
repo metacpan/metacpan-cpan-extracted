@@ -70,7 +70,6 @@ my(%params) =
 		'Text::CSV::Encoded'		=> 0.25,
 		'Tree::DAG_Node'			=> 1.35,
 		'Types::Standard'			=> 2.006000,
-		'utf8'						=> 1.25,
 		'warnings'					=> 1.58,
 	},
 	TEST_REQUIRES =>

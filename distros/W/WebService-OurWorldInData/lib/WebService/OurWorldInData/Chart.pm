@@ -73,10 +73,53 @@ sub zip {
     return $response;
 }
 
+sub readme {
+    my ($self) = @_;
+
+    my $url = $self->get_path . '.readme.md';
+
+    my $response = $self->get_response( $url );
+    return $response;
+}
+
+sub config {
+    my ($self) = @_;
+
+    my $url = $self->get_path . '.config.json';
+
+    my $response = $self->get_response( $url );
+    my $json = decode_json( $response );
+    return $json;
+}
+
+sub values {
+    my ($self) = @_;
+
+    my $url = $self->get_path . '.values.json';
+
+    my $response = $self->get_response( $url );
+    my $json = decode_json( $response );
+    return $json;
+}
+
+sub search_result {
+    my ($self) = @_;
+
+    my $url = $self->get_path . '.search-result.json';
+
+    my $response = $self->get_response( $url );
+    my $json = decode_json( $response );
+    return $json;
+}
+
 sub parse_data {
     my ($self, $body) = @_;
 
-    require Text::CSV;
+    eval { require Text::CSV };
+    if ($@) {
+        carp "Install the Text::CSV module to use parse_data()\n", @_;
+        return;
+    }
     my $csv = Text::CSV->new;
     my @rows = ();
     for my $line (split /\n/, $body) {
@@ -147,6 +190,7 @@ or save the data to a file
 
 Takes the output from the C<data> method and uses Text::CSV
 to read each line, returning an arrayref of rows.
+You will need to have the Text::CSV module installed.
 
 If the parsing throws an error, it bails warning you to save
 the file and parse it in full.

@@ -10,6 +10,7 @@ use Getopt::Std;
 use IO::Uncompress::AnyUncompress qw($AnyUncompressError);
 use List::Util 1.33 qw(any none);
 use MARC::Batch;
+use MARC::Field008;
 use MARC::File::USMARC;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Leader;
@@ -19,8 +20,12 @@ use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
 Readonly::Array our @CONTROL_FIELDS => qw(001 003 005 006 007 008);
+Readonly::Array our @FIELD_008_METHODS => qw(cataloging_source date1 date2
+	date_entered_on_file language modified_record place_of_publication
+	type_of_date);
+Readonly::Array our @FIELD_008_DATE_METHODS => qw(date1 date2);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 $| = 1;
 
@@ -63,6 +68,11 @@ sub run {
 	$self->{'_marc_field'} = shift @ARGV;
 	$self->{'_marc_subfield'} = undef;
 	$self->{'_marc_value'} = undef;
+	$self->{'_marc_field008_method'} = undef;
+	if ($self->{'_marc_field'} =~ m/^008\.(\w+)$/ms) {
+		$self->{'_marc_field'} = '008';
+		$self->{'_marc_field008_method'} = $1;
+	}
 	my $control_like = $self->{'_marc_field'} eq 'leader'
 		|| $self->{'_marc_field'} eq 'material_type'
 		|| any { $_ eq $self->{'_marc_field'} } @CONTROL_FIELDS;
@@ -73,6 +83,7 @@ sub run {
 		if ($self->{'_opts'}->{'r'}
 			|| $self->{'_marc_field'} eq 'leader'
 			|| $self->{'_marc_field'} eq 'material_type'
+			|| defined $self->{'_marc_field008_method'}
 			|| @ARGV) {
 
 			$self->_usage;
@@ -85,6 +96,12 @@ sub run {
 			return 1;
 		}
 		$self->{'_marc_value'} = decode_utf8($self->{'_marc_value'});
+	}
+	if (defined $self->{'_marc_field008_method'}
+		&& none { $self->{'_marc_field008_method'} eq $_ } @FIELD_008_METHODS) {
+
+		$self->_usage;
+		return 1;
 	}
 
 	# Check output format.
@@ -176,8 +193,13 @@ sub run {
 				$record_to_print = $self->_match_exists($record,
 					defined $control_field);
 			} else {
-				$record_to_print = $self->_match($record,
-					defined $control_field ? $control_field->as_string : undef);
+				my $value;
+				if (defined $self->{'_marc_field008_method'}) {
+					$value = $self->_field_008_value($record, $control_field);
+				} else {
+					$value = defined $control_field ? $control_field->as_string : undef;
+				}
+				$record_to_print = $self->_match_field_008($record, $value);
 			}
 			$self->_print($record_to_print);
 
@@ -321,6 +343,71 @@ sub _match_inverse {
 	return 0;
 }
 
+sub _field_008_value {
+	my ($self, $record, $control_field) = @_;
+
+	if (! defined $control_field) {
+		return;
+	}
+
+	my $leader = MARC::Leader->new->parse($record->leader);
+	my $field_008 = MARC::Field008->new(
+		'ignore_data_errors' => 1,
+		'leader' => $leader,
+	);
+	my $field_008_obj = eval {
+		$field_008->parse($control_field->as_string);
+	};
+	if ($EVAL_ERROR) {
+		return;
+	}
+
+	return $field_008_obj->${\$self->{'_marc_field008_method'}};
+}
+
+sub _is_field_008_date_method {
+	my $self = shift;
+
+	return defined $self->{'_marc_field008_method'}
+		&& any { $self->{'_marc_field008_method'} eq $_ } @FIELD_008_DATE_METHODS;
+}
+
+sub _match_field_008 {
+	my ($self, $record, $value) = @_;
+
+	if (! defined $self->{'_marc_field008_method'}) {
+		return $self->_match($record, $value);
+	}
+	if ($self->{'_opts'}->{'r'} || ! $self->_is_field_008_date_method) {
+		return $self->_match($record, $value);
+	}
+
+	return $self->_match_range($record, $value);
+}
+
+sub _match_range {
+	my ($self, $record, $value) = @_;
+
+	my ($from, $to) = $self->{'_marc_value'} =~ m/^(\d{4})\.\.(\d{4})$/ms;
+	if (! defined $from || ! defined $to) {
+		return $self->_match($record, $value);
+	}
+	if (! defined $value || $value !~ m/^\d{4}$/ms) {
+		return;
+	}
+
+	my $match = $from <= $value && $value <= $to ? 1 : 0;
+	if ($self->{'_opts'}->{'i'}) {
+		$match = ! $match;
+	}
+	if ($match) {
+		$self->{'_num_found'}++;
+		return $record;
+	}
+
+	return;
+}
+
 sub _open_marc_input {
 	my ($self, $path, $fh_sr, $errno_sr) = @_;
 
@@ -372,7 +459,7 @@ sub _usage {
 	print STDERR "\t-v\t\tVerbose mode.\n";
 	print STDERR "\t--version\tPrint version.\n";
 	print STDERR "\tmarc_file\tMARC XML or USMARC file, could be compressed.\n";
-	print STDERR "\tsearch_item\tSearch item.\n";
+	print STDERR "\tsearch_item\tSearch item. See man page for more information.\n";
 	print STDERR "\tsub_search_item\tSearch sub item (optional in case of MARC field).\n";
 	print STDERR "\tvalue\t\tValue to filter (required without -e).\n";
 
@@ -688,6 +775,7 @@ L<Getopt::Std>,
 L<IO::Uncompress::AnyUncompress>,
 L<List::Util>,
 L<MARC::Batch>,
+L<MARC::Field008>,
 L<MARC::File::USMARC>,
 L<MARC::File::XML>,
 L<MARC::Leader>,
@@ -720,6 +808,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

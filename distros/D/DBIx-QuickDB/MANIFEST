@@ -58,10 +58,13 @@ t/Tools/QuickDB.t
 t/broken_mariadb_versions.t
 t/clone_cleanup.t
 t/clone_dir.t
+t/clone_dir_rsync.t
 t/clone_sequence.t
 t/driver_destroy_wait.t
 t/fast_destroy.t
+t/instance_dir_user.t
 t/lib/QDB/DriverBody.pm
+t/lib/QDB/FakeDriver.pm
 t/lib/QDB/Installs.pm
 t/mariadb_triggers.t
 t/mysql_root_user.t
@@ -75,8 +78,11 @@ t/schema/mysqlcom.sql
 t/schema/percona.sql
 t/schema/postgresql.sql
 t/schema/sqlite.sql
+t/server_exit_status.t
 t/stop_socket_cleanup.t
+t/tempdir_pid.t
 t/watcher_fast_kill.t
+t/watcher_inc_args.t
 t/watcher_owner_death.t
 t/windows_cleanup.t
 xt/author/pod-syntax.t

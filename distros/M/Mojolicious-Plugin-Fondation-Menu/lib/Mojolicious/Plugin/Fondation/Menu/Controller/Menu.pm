@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Menu::Controller::Menu;
-$Mojolicious::Plugin::Fondation::Menu::Controller::Menu::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Menu::Controller::Menu::VERSION = '0.03';
 # ABSTRACT: REST controller for Menu CRUD via DBIx::Class::Async
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -8,11 +8,9 @@ use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
 
 sub list ($self) {
     $self->render_later;
-    $self->model('menu')->all->on_done(sub {
-        my $menus = shift;
-        my @data = map { _to_data($_) } @$menus;
-        $self->render(openapi => \@data);
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    $self->model('menu')->TO_JSON->then(sub ($data) {
+        $self->render(openapi => $data);
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 sub create ($self) {
@@ -21,11 +19,11 @@ sub create ($self) {
     my $json = $self->req->json;
     $self->model('menu')->create($json)->on_done(sub {
         my $menu = shift;
-        my $data = _to_data($menu);
+        my $data = $menu->TO_JSON;
         $self->res->headers->location($self->url_for('read_menu', id => $data->{id}));
         $self->render(status => 201, openapi => $data);
         $self->menu_cache_invalidate if $self->has_helper('menu_cache_invalidate');
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 sub read ($self) {
@@ -35,12 +33,12 @@ sub read ($self) {
     $self->model('menu')->find($id)->on_done(sub {
         my $menu = shift;
         if ($menu) {
-            $self->render(openapi => _to_data($menu));
+            $self->render(openapi => $menu->TO_JSON);
         } else {
             $self->render(status => 404, openapi =>
                 { errors => [{ message => 'Not found', path => '/' }] });
         }
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 sub update ($self) {
@@ -58,11 +56,11 @@ sub update ($self) {
         }
         $menu->update($json)->on_done(sub {
             my $updated = shift;
-            my $data    = _to_data($updated);
+            my $data    = $updated->TO_JSON;
             $self->render(openapi => $data);
             $self->menu_cache_invalidate if $self->has_helper('menu_cache_invalidate');
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 sub delete ($self) {
@@ -79,20 +77,8 @@ sub delete ($self) {
         $menu->delete->on_done(sub {
             $self->render(status => 204, openapi => {});
             $self->menu_cache_invalidate if $self->has_helper('menu_cache_invalidate');
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
-}
-
-# ── Private ──────────────────────────────────────────────────────────────
-
-sub _render_error ($self, $err) {
-    $self->app->log->error('[Menu::Controller] ' . $self->dumper($err));
-    $self->render(status => 500, openapi =>
-        { errors => [{ message => "$err", path => '/' }] });
-}
-
-sub _to_data ($row) {
-    return { $row->get_columns };
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 1;
@@ -109,7 +95,7 @@ Mojolicious::Plugin::Fondation::Menu::Controller::Menu - REST controller for Men
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

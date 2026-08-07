@@ -1,5 +1,5 @@
 This archive contains the distribution Mojolicious-Plugin-Fondation-Model-DBIx-Async,
-version 0.04:
+version 0.05:
 
   Fondation plugin exposing DBIx::Class::Async natively
 

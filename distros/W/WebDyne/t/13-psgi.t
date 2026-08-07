@@ -106,6 +106,15 @@ sub main {
     #  Iterate over files
     #
     note('');
+
+    ok(my $header_res=$test_or->request(GET('/start_html_bare.psp')));
+    my @content_type_header=grep { lc($_) eq 'content-type' } $header_res->headers->header_field_names();
+    is(scalar(@content_type_header), 1, 'PSGI response emits one Content-Type header');
+    is(
+        $header_res->header('Content-Type'),
+        'text/html; charset=UTF-8',
+        'PSGI response keeps encoded HTML Content-Type'
+    );
     
     
     #  Repeat as required

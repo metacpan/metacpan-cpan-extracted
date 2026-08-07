@@ -69,7 +69,11 @@ Options can also be preloaded from `~/.wdrender.opt` by creating an anonymous ha
 
 * **--warn**
 
-    Enable or disable warnings about missing Tidy or Colourise modules
+    Enable or disable warnings about missing Tidy or Colourise modules.
+
+* **--quiet**
+
+    Suppress informational output, including warnings about missing optional Tidy or Colourise modules.
 
 * **--head_insert**
 

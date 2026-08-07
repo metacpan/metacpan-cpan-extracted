@@ -3,8 +3,36 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <time.h>
+
+#ifdef _WIN32
+#  include <io.h>          /* open/read/close live here, not in unistd.h */
+#else
+#  include <unistd.h>
+#endif
+
+/* Templates are read as bytes: without O_BINARY the Windows CRT eats the
+ * CR of every CRLF, so the read returns fewer bytes than the stat said and
+ * the tail of the buffer is garbage. Everywhere else it is a no-op. */
+#ifndef O_BINARY
+#  define O_BINARY 0
+#endif
+
+/* MSVC ships neither S_ISREG nor S_ISDIR. */
+#ifndef S_ISREG
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
+#ifndef S_ISDIR
+#  define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+/* Path separator set: on Windows a backslash separates too, so both the
+ * traversal guard and the extension sniff have to honour it. */
+#ifdef _WIN32
+#  define STENCIL_IS_SEP(c) ((c) == '/' || (c) == '\\')
+#else
+#  define STENCIL_IS_SEP(c) ((c) == '/')
+#endif
 
 UV stencil_stat_compiles   = 0;
 UV stencil_stat_engines    = 0;
@@ -110,15 +138,23 @@ static SV *eshu_prettify(pTHX_ SV *html, SV **err)
 /* ---- path safety and resolution -------------------------------------- */
 
 /* Templates never escape template_dir: no absolute paths, no '..'
- * segments anywhere. */
+ * segments anywhere. Template names are always '/'-joined logical paths,
+ * so a backslash in one is never legitimate - the traversal scan splits on
+ * it too, on every platform, rather than letting 'a\..\..\etc' through on
+ * the one OS where the kernel would honour it. */
 static int name_unsafe(const char *n, size_t len)
 {
     size_t i = 0;
-    if (!len || n[0] == '/')
+    if (!len || n[0] == '/' || n[0] == '\\')
         return 1;
+#ifdef _WIN32
+    /* 'C:foo' and 'C:/foo' both leave template_dir behind. */
+    if (len >= 2 && n[1] == ':')
+        return 1;
+#endif
     while (i < len) {
         size_t j = i;
-        while (j < len && n[j] != '/')
+        while (j < len && n[j] != '/' && n[j] != '\\')
             j++;
         if (j - i == 2 && n[i] == '.' && n[i + 1] == '.')
             return 1;
@@ -130,7 +166,7 @@ static int name_unsafe(const char *n, size_t len)
 static int final_seg_has_dot(const char *n, size_t len)
 {
     size_t i = len;
-    while (i > 0 && n[i - 1] != '/') {
+    while (i > 0 && !STENCIL_IS_SEP(n[i - 1])) {
         if (n[i - 1] == '.')
             return 1;
         i--;
@@ -138,7 +174,7 @@ static int final_seg_has_dot(const char *n, size_t len)
     return 0;
 }
 
-static int try_stat(const char *path, struct stat *st)
+static int try_stat(const char *path, Stat_t *st)
 {
     stencil_stat_stats++;
     return stat(path, st) == 0 && S_ISREG(st->st_mode);
@@ -146,30 +182,39 @@ static int try_stat(const char *path, struct stat *st)
 
 /* Try template_dir/name[.tmpl], then cwd-relative name[.tmpl] (the
  * draft test renders 't/template/loops' with template_dir already set
- * to t/template). Returns 1 with out+st filled. */
+ * to t/template). Returns 1 with out+st filled.
+ *
+ * Each snprintf is followed by an explicit terminator: perl's win32.h maps
+ * snprintf onto _snprintf for the older Windows toolchains, and that one
+ * leaves the buffer unterminated when it truncates. On a C99 snprintf the
+ * store is a no-op. */
 static int resolve_file(const stencil_engine *e, const char *name,
                         size_t nlen, char *out, size_t outsz,
-                        struct stat *st)
+                        Stat_t *st)
 {
     int has_dot = final_seg_has_dot(name, nlen);
     if (name_unsafe(name, nlen))
         return 0;
     if (e->template_dir) {
         snprintf(out, outsz, "%s/%.*s", e->template_dir, (int)nlen, name);
+        out[outsz - 1] = '\0';
         if (try_stat(out, st))
             return 1;
         if (!has_dot) {
             snprintf(out, outsz, "%s/%.*s.tmpl", e->template_dir,
                      (int)nlen, name);
+            out[outsz - 1] = '\0';
             if (try_stat(out, st))
                 return 1;
         }
     }
     snprintf(out, outsz, "%.*s", (int)nlen, name);
+    out[outsz - 1] = '\0';
     if (try_stat(out, st))
         return 1;
     if (!has_dot) {
         snprintf(out, outsz, "%.*s.tmpl", (int)nlen, name);
+        out[outsz - 1] = '\0';
         if (try_stat(out, st))
             return 1;
     }
@@ -179,13 +224,13 @@ static int resolve_file(const stencil_engine *e, const char *name,
 /* Read a file: the (mtime,size) snapshot is taken before the read so a
  * mid-read write is caught by the next revalidation. */
 static char *slurp(pTHX_ const char *path, STRLEN *lenp, time_t *mtime,
-                   off_t *fsize, SV **err)
+                   Off_t *fsize, SV **err)
 {
-    struct stat st;
+    Stat_t st;
     char       *buf = NULL;
-    ssize_t     got;
+    SSize_t     got;
     size_t      have = 0;
-    int         fd = open(path, O_RDONLY);
+    int         fd = open(path, O_RDONLY | O_BINARY);
     if (fd < 0 || fstat(fd, &st) != 0 || !S_ISREG(st.st_mode)) {
         if (fd >= 0)
             close(fd);
@@ -204,7 +249,13 @@ static char *slurp(pTHX_ const char *path, STRLEN *lenp, time_t *mtime,
         return NULL;
     }
     while (have < (size_t)st.st_size) {
-        got = read(fd, buf + have, (size_t)st.st_size - have);
+        /* The Windows CRT read() counts in unsigned int and read(2) itself
+         * refuses more than ~2GB, so cap the chunk: after this the cast is
+         * lossless on every platform. */
+        size_t want = (size_t)st.st_size - have;
+        if (want > 0x7ffff000u)
+            want = 0x7ffff000u;
+        got = read(fd, buf + have, (unsigned int)want);
         if (got <= 0)
             break;
         have += (size_t)got;
@@ -419,13 +470,13 @@ static stencil_cache_ent *get_file_ent(pTHX_ stencil_engine *e,
                                        int *notfound, SV **err)
 {
     char               path[STENCIL_PATH_MAX];
-    struct stat        st;
+    Stat_t        st;
     uint64_t           h;
     stencil_cache_ent *ent;
     char              *src;
     STRLEN             slen;
     time_t             mtime;
-    off_t              fsize;
+    Off_t              fsize;
     stencil_program   *prog;
 
     if (notfound)
@@ -614,7 +665,7 @@ static stencil_cache_ent *get_page_ent(pTHX_ stencil_engine *e,
 
     if (!looks_like_source(p, len)) {
         char        path[STENCIL_PATH_MAX];
-        struct stat st;
+        Stat_t st;
         if (resolve_file(e, p, len, path, sizeof path, &st)) {
             int notfound = 0;
             stencil_cache_ent *file =
@@ -639,7 +690,7 @@ static stencil_cache_ent *get_page_ent(pTHX_ stencil_engine *e,
 static int revalidate_ent(pTHX_ stencil_engine *e, stencil_cache_ent *ent,
                           SV **err)
 {
-    struct stat st;
+    Stat_t st;
     time_t      now;
     if (!ent->abs_path || e->stat_ttl < 0)
         return 1;
@@ -662,7 +713,7 @@ static int revalidate_ent(pTHX_ stencil_engine *e, stencil_cache_ent *ent,
         char            *src;
         STRLEN           slen;
         time_t           mtime;
-        off_t            fsize;
+        Off_t            fsize;
         stencil_program *prog;
         src = slurp(aTHX_ ent->abs_path, &slen, &mtime, &fsize, err);
         if (!src)

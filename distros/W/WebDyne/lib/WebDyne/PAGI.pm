@@ -65,7 +65,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.009';
+$VERSION='3.011';
 
 
 #==================================================================================================
@@ -334,8 +334,8 @@ sub handler_http {
             #
             $html_fh=IO::String->new($html);
             my %request_opt=(select => $html_fh, document_root => $self->{'root'}, document_default => $self->{'index'}, scope=>$scope, req=>$req_or, res=>$res_or,
-                receive => $receive, send=> $send);
-            $request_opt{'filename'}=$api_fn if $api_fn;
+                receive => $receive, send=> $send, no_head_insert=>$self->{'no_head_insert'}, filename=>$self->{'filename'});
+            $request_opt{'filename'} ||= do {$api_fn if $api_fn};
             $r=WebDyne::Request::PAGI->new(%request_opt) ||
                     return err('unable to create new WebDyne::Request::PAGI object: %s',
                         $@ || errclr() || 'unknown error');

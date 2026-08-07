@@ -49,10 +49,11 @@
             "Digest::MD5" : "2.0",
             "Digest::SHA" : "5.0",
             "File::Find" : "0",
+            "File::HomeDir" : "0",
             "HTTP::Tiny" : "0",
             "IO::Compress::Gzip" : "0",
             "IO::Compress::RawDeflate" : "0",
-            "JSON" : "0",
+            "IPC::Open2" : "0",
             "JSON::PP" : "0",
             "MIME::Base64" : "3.00",
             "Math::Prime::Util" : "0.74",
@@ -102,7 +103,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "26.07"
+         "version" : "26.08"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -285,7 +286,7 @@
          "web" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "26.07",
+   "version" : "26.08",
    "x_authority" : "cpan:TRIZEN",
    "x_contributors" : [
       "Daniel Șuteu",

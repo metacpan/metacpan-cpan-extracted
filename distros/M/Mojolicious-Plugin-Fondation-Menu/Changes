@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-Fondation-Menu
 
+0.03      2026-08-06 23:48:28+02:00 Europe/Paris
+   - use Mojolicious::Plugin::Fondation::Schema::Result::Base
+   - drop _render_error, simplify create on_fail
+   - use $c->problem() throughout
+
 0.02      2026-07-21 17:40:12+02:00 Europe/Paris
 
 0.01      2026-07-15 18:35:33+02:00 Europe/Paris

@@ -15,6 +15,7 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git' => '0'
                                       },
                       'requires' => {
+                                      'Data::Dumper::Concise' => '0',
                                       'Dist::Zilla' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
@@ -45,6 +46,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Data::Dumper::Concise' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'LWP::UserAgent' => '0',

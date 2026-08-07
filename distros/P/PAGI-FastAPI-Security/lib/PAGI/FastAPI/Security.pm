@@ -3,7 +3,7 @@ package PAGI::FastAPI::Security;
 use v5.36;
 use version;
 
-our $VERSION   = qv('v0.0.2');
+our $VERSION   = qv('v0.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf-8
@@ -14,7 +14,7 @@ PAGI::FastAPI::Security - Authentication scheme building blocks for PAGI::FastAP
 
 =head1 VERSION
 
-Version v0.0.2
+Version v0.0.4
 
 =head1 SYNOPSIS
 

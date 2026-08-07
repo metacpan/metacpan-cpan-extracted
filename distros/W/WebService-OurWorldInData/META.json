@@ -40,6 +40,7 @@
             "Dist::Zilla::PluginBundle::Git" : "0"
          },
          "requires" : {
+            "Data::Dumper::Concise" : "0",
             "Dist::Zilla" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -70,6 +71,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Data::Dumper::Concise" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "LWP::UserAgent" : "0",
@@ -87,19 +89,27 @@
    "provides" : {
       "WebService::OurWorldInData" : {
          "file" : "lib/WebService/OurWorldInData.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "WebService::OurWorldInData::Catalog" : {
          "file" : "lib/WebService/OurWorldInData/Catalog.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "WebService::OurWorldInData::Chart" : {
          "file" : "lib/WebService/OurWorldInData/Chart.pm",
-         "version" : "0.04"
+         "version" : "0.06"
+      },
+      "WebService::OurWorldInData::Error" : {
+         "file" : "lib/WebService/OurWorldInData/Error.pm",
+         "version" : "0.06"
       },
       "WebService::OurWorldInData::Indicators" : {
          "file" : "lib/WebService/OurWorldInData/Indicators.pm",
-         "version" : "0.04"
+         "version" : "0.06"
+      },
+      "WebService::OurWorldInData::Search" : {
+         "file" : "lib/WebService/OurWorldInData/Search.pm",
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -114,7 +124,7 @@
          "web" : "https://github.com/duffee/perl-OurWorldInData"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -384,7 +394,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.04",
+                  "tag" : "v0.06",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

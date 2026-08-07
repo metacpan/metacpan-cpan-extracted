@@ -25,5 +25,5 @@ requires:
   File::Raw: '0.12'
   Tie::OrderedHash: '0.02'
   perl: '5.010000'
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

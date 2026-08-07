@@ -1,0 +1,72 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "MyApp Books API",
+    "version": "1.0.0",
+    "description": "The API side of the Punk example app."
+  },
+  "paths": {
+    "/books": {
+      "get": {
+        "operationId": "allBooks",
+        "summary": "Every book",
+        "parameters": [
+          {
+            "name": "limit", "in": "query", "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "next", "in": "query", "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "the books" }
+        }
+      },
+      "post": {
+        "operationId": "addBook",
+        "summary": "Add a book",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NewBook" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "created" }
+        }
+      }
+    },
+    "/books/{id}": {
+      "get": {
+        "operationId": "getBook",
+        "summary": "One book",
+        "parameters": [
+          {
+            "name": "id", "in": "path", "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "the book" },
+          "404": { "description": "no such book" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NewBook": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title":  { "type": "string", "minLength": 1 },
+          "author": { "type": "string" }
+        }
+      }
+    }
+  }
+}

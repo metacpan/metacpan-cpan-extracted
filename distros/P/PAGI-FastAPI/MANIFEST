@@ -21,7 +21,8 @@ t/05-dependency_injection.t
 t/06-lifespan_events.t
 t/07-docs_openapi.t
 t/08-input_handling_and_registration.t
-t/09-external-async-resource-integration.t
+t/09-external_async_resource_integration.t
+t/10-form_urlencoded_body.t
 xt/changes.t
 xt/manifest.t
 xt/pod.t

@@ -10,6 +10,8 @@ use File::Which           qw( which );
 
 plan 18;
 
+local $ENV{ XDG_CONFIG_HOME } = catdir( $ENV{ HOME }, '.config' );
+
 stdout_like { is CLASS->run( '-V' ), CLASS->EXIT_SUCCESS, 'Successful run' }
 qr/\A api\.t \  v\d+.\d+.\d+ \n perl \  v\d+.\d+.\d+ \n \z/x, 'Show version';
 

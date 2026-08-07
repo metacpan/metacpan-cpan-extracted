@@ -17,7 +17,6 @@ my $main_module_podfile   = catfile( 'lib', @main_module_namespace ) . '.pod';
 # because we have to set the main module version in META_MERGE/provides too
 my $main_module_version = MM->parse_version( $main_module_file );
 
-my $file;
 my %att = (
   NAME          => $main_module,
   AUTHOR        => 'Sven Willenbuecher <sven.willenbuecher@gmx.de>',
@@ -35,15 +34,10 @@ my %att = (
       $main_module => {
         file    => $main_module_file,
         version => $main_module_version
-      },
-      join( '::', $main_module, 'Context' ) => {
-        file    => $file = catfile( 'lib', @main_module_namespace, 'Context' ) . '.pm',
-        version => MM->parse_version( $file )
-      },
-      join( '::', $main_module, 'Exception' ) => {
-        file    => $file = catfile( 'lib', @main_module_namespace, 'Exception' ) . '.pm',
-        version => MM->parse_version( $file )
       }
+    },
+    no_index => {
+      package => [ map { join( '::', $main_module, $_ ) } qw( Context Exception ) ],
     },
     resources => {
       repository => {

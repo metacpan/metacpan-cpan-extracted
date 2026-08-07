@@ -56,7 +56,7 @@
    "provides" : {
       "Version::Semantic" : {
          "file" : "lib/Version/Semantic.pm",
-         "version" : "v2.1.0"
+         "version" : "v2.1.1"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "web" : "https://codeberg.org/XSven/Version-Semantic"
       }
    },
-   "version" : "v2.1.0",
+   "version" : "v2.1.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,0 +1,221 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin ();
+use Getopt::Long ();
+use lib "$FindBin::Bin/../lib";
+
+# Start the example: the Punk app on a loopback-only plain port, and a TLS
+# terminator in front of it on the port the browser talks to.
+#
+#   browser  --https/wss-->  bin/tls-proxy  --http/ws-->  Hyperman + Punk
+#            :5443                                       127.0.0.1:5010
+#
+# Two processes rather than one because Hyperman's detach - what a WebSocket
+# upgrade is built on - refuses TLS connections, so the socket the chat needs
+# to take over has to arrive as plain HTTP/1. README.pod has the long version.
+# It is also how this is really deployed, with nginx where tls-proxy sits.
+
+BEGIN {
+    my $punk = "$FindBin::Bin/../..";
+    unshift @INC, "$punk/blib/lib", "$punk/blib/arch"
+        if -d "$punk/blib/arch" && !$ENV{PUNK_CHAT_NO_BLIB};
+}
+
+$| = 1;    # the banner should appear when it happens, not at exit
+
+# 5010 rather than the traditional 5000: macOS hands that to the AirPlay
+# receiver in Control Center, and the failure it produces (a 403 from
+# something that is not your app) costs an afternoon to recognise.
+my %o = (
+    port     => 5443,
+    app_port => 5010,
+    host     => '0.0.0.0',
+    workers  => 1,
+    tls      => 1,
+);
+
+Getopt::Long::GetOptions(
+    'port=i'     => \$o{port},
+    'app-port=i' => \$o{app_port},
+    'host=s'     => \$o{host},
+    'workers=i'  => \$o{workers},
+    'tls!'       => \$o{tls},
+    'help'       => sub { print _usage(); exit 0 },
+) or die _usage();
+
+my $home = "$FindBin::Bin/..";
+
+# ---- preflight, with errors that say what to do ----------------------------
+
+eval { require Hyperman; 1 }
+    or die "punk-chat: Hyperman is required to run this example.\n$@";
+
+require Punk::WebSocket;
+unless (Punk::WebSocket::_hm_available()) {
+    die <<"WHY";
+punk-chat: this Hyperman has no detach ABI, so websocket routes cannot work.
+
+  Hyperman $Hyperman::VERSION is loaded from
+    $INC{'Hyperman.pm'}
+
+  Websockets need 0.11 or later. If you have a newer checkout that is built
+  but not installed, point PERL5LIB at it:
+
+    PERL5LIB=/path/to/Hyperman/blib/lib:/path/to/Hyperman/blib/arch \\
+      $0
+
+WHY
+}
+
+# Rooms are per worker: a Punk room holds only the connections its own worker
+# accepted, so with several workers an API post would reach some of the
+# browsers in a room and not others. One worker keeps the demo honest.
+if ($o{workers} != 1) {
+    warn "punk-chat: --workers $o{workers} - rooms are per worker, so "
+       . "broadcasts will only reach the clients that landed on the same "
+       . "one. Use 1 unless you are demonstrating exactly that.\n";
+}
+
+require Chat::Schema;
+my $dsn = Chat::Schema::ensure();
+
+if ($o{tls}) {
+    my $cert = "$home/tls/server.crt";
+    unless (-r $cert && -r "$home/tls/server.key") {
+        print "punk-chat: no certificate yet, making one\n";
+        system($^X, "$FindBin::Bin/make-cert") == 0
+            or die "punk-chat: make-cert failed\n";
+    }
+}
+
+require Chat;
+my $app = Chat->to_app;      # croaks here if anything is misconfigured
+
+# ---- children ---------------------------------------------------------------
+
+my @kids;
+
+my $app_host = $o{tls} ? '127.0.0.1' : $o{host};
+my $app_port = $o{tls} ? $o{app_port} : $o{port};
+
+my $server = fork // die "punk-chat: fork: $!\n";
+if (!$server) {
+    $SIG{INT} = $SIG{TERM} = 'DEFAULT';
+    Hyperman->run(
+        app     => $app,
+        host    => $app_host,
+        port    => $app_port,
+        workers => $o{workers},
+    );
+    exit 0;
+}
+push @kids, $server;
+
+if ($o{tls}) {
+    _wait_for_port('127.0.0.1', $app_port)
+        or _die_kids("punk-chat: the app never came up on port $app_port\n");
+
+    my $proxy = fork // _die_kids("punk-chat: fork: $!\n");
+    if (!$proxy) {
+        $SIG{INT} = $SIG{TERM} = 'DEFAULT';
+        exec $^X, "$FindBin::Bin/tls-proxy",
+             '--listen'   => "$o{host}:$o{port}",
+             '--upstream' => "127.0.0.1:$app_port",
+             '--cert'     => "$home/tls/server.crt",
+             '--key'      => "$home/tls/server.key";
+        die "punk-chat: cannot exec tls-proxy: $!\n";
+    }
+    push @kids, $proxy;
+}
+
+# ---- the banner -------------------------------------------------------------
+
+my $scheme = $o{tls} ? 'https' : 'http';
+my $shown  = $o{host} eq '0.0.0.0' ? 'localhost' : $o{host};
+my $base   = "$scheme://$shown:$o{port}";
+
+print <<"READY";
+
+  Punk Chat is up.
+
+    rooms      $base/
+    a room     $base/chat/lobby
+    API docs   $base/docs
+    the spec   $base/api/rooms
+
+    database   $dsn
+@{[ $o{tls} ? "    tls        self-signed - your browser will warn once, that
+               is expected; accept it and carry on.\n" : '' ]}
+  Two tabs on the same room show the chat working. Then, from a shell:
+
+    curl -k -X POST $base/api/rooms/lobby/messages \\
+         -H 'content-type: application/json' \\
+         -d '{"nick":"curl","text":"hello from the API"}'
+
+  and watch it arrive in both tabs. Ctrl-C to stop.
+
+READY
+
+# ---- supervise --------------------------------------------------------------
+
+my $stopping = 0;
+$SIG{INT} = $SIG{TERM} = sub {
+    return if $stopping++;
+    print "\npunk-chat: stopping\n";
+    kill 'TERM', @kids;
+};
+
+# Either child dying takes the whole thing down - a half-running demo that
+# looks alive but cannot serve is worse than an exit.
+while (@kids) {
+    my $gone = waitpid -1, 0;
+    last if $gone <= 0;
+    @kids = grep { $_ != $gone } @kids;
+    if (!$stopping && @kids) {
+        warn "punk-chat: a child exited unexpectedly, shutting down\n";
+        kill 'TERM', @kids;
+        $stopping = 1;
+    }
+}
+
+exit 0;
+
+# Poll until something is listening, so the terminator is not started against
+# a port that is not open yet.
+sub _wait_for_port {
+    my ($host, $port) = @_;
+    require IO::Socket::INET;
+    for (1 .. 100) {
+        my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port,
+                                      Proto => 'tcp', Timeout => 1);
+        if ($s) { close $s; return 1 }
+        select undef, undef, undef, 0.1;
+    }
+    return 0;
+}
+
+sub _die_kids {
+    my ($message) = @_;
+    kill 'TERM', @kids;
+    die $message;
+}
+
+sub _usage {
+    return <<'USAGE';
+usage: punk-chat [options]
+
+  --port N       the port the browser talks to    (default 5443)
+  --app-port N   the plain port Punk listens on   (default 5010)
+  --host ADDR    address to bind                  (default 0.0.0.0)
+  --workers N    Hyperman workers                 (default 1; see the note
+                 about rooms being per worker)
+  --no-tls       skip the terminator and serve plain http on --port
+                 (the chat still works; the point is comparing the two)
+
+environment:
+
+  PUNK_CHAT_DSN           override the SQLite dsn
+  PUNK_CHAT_ADMIN_TOKEN   the bearer token for DELETE (default punk-admin)
+USAGE
+}

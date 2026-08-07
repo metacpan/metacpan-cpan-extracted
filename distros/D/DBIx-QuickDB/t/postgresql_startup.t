@@ -29,7 +29,7 @@ use Test2::Tools::QuickDB qw/skipall_on_resource_error/;
     sub disconnect { shift->{disconnected}++; return 1 }
 }
 
-my $dir = tempdir(CLEANUP => 1);
+my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 my $launch_log = "$dir/launch.log";
 open(my $launch_fh, '>', $launch_log) or die "Cannot write $launch_log: $!";
 print {$launch_fh} <<'LOG';

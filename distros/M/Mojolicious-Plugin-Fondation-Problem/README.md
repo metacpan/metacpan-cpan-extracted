@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Problem - Unified API (RFC 9457) and HTML error 
 
 # VERSION
 
-version 0.01
+version 0.03
 
 # SYNOPSIS
 
@@ -41,14 +41,6 @@ In development mode, all fields are returned (`type`, `detail`,
 `errors`, `instance`). In production mode, only `status` and
 `title` are sent — no internal information is leaked.
 
-# NAME
-
-Mojolicious::Plugin::Fondation::Problem - Unified API (RFC 9457) and HTML error responses for Fondation
-
-# VERSION
-
-version 0.01
-
 # HELPERS
 
 ## problem
@@ -64,9 +56,6 @@ version 0.01
 
 All arguments are optional. Defaults: `status` = 500, `title` = 'Internal Server Error'.
 
-In production mode, only `status` and `title` are included in the response.
-`detail`, `type`, `errors`, and `instance` are suppressed.
-
 # TEMPLATES
 
 ## problem.html.ep
@@ -76,12 +65,6 @@ Rendered for HTML error responses. Receives stash values:
 - `problem_status` — HTTP status code
 - `problem_title` — Human-readable error title
 - `problem_detail` — Detailed message (only in development mode)
-
-Uses `% layout 'main'` — if `Fondation::Layout::Bootstrap` is loaded,
-its Bootstrap layout applies. Without any layout plugin, Mojo renders
-the template content directly (no HTML wrapper) — the page remains
-functional. A future Fondation core release may provide a minimal
-HTML5 layout as a dedicated plugin loaded after Bootstrap.
 
 # RFC 9457 RESPONSE FORMAT
 

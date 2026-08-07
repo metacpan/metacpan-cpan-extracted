@@ -217,3 +217,54 @@ loop(...)
         else             RETVAL = &PL_sv_undef;
     OUTPUT:
         RETVAL
+
+# Hyperman::detach($env) - take this request's socket over for a protocol
+# upgrade (WebSocket). Returns the client fd, now owned by the caller: the
+# server has stopped watching it, forgotten the connection and will not
+# close it. Watch it on psgix.loop, and close it when done.
+IV
+detach(env)
+        SV *env
+    CODE:
+    {
+        HV *ehv;
+        SV **e;
+        AV *cid;
+        SV **fsv, **isv;
+        int fd, rc;
+        UV id;
+        if (!hm_cur_loop)
+            croak("Hyperman::detach: no running loop (call it from inside "
+                  "a request)");
+        if (!SvROK(env) || SvTYPE(SvRV(env)) != SVt_PVHV)
+            croak("Hyperman::detach: give it the PSGI env hashref");
+        ehv = (HV *)SvRV(env);
+        e = hv_fetchs(ehv, "psgix.hyperman.conn", 0);
+        if (!(e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVAV))
+            croak("Hyperman::detach: no psgix.hyperman.conn in this env "
+                  "(HTTP/2 streams and non-Hyperman servers cannot detach)");
+        cid = (AV *)SvRV(*e);
+        fsv = av_fetch(cid, 0, 0);
+        isv = av_fetch(cid, 1, 0);
+        if (!(fsv && *fsv && isv && *isv))
+            croak("Hyperman::detach: malformed psgix.hyperman.conn");
+        fd = (int)SvIV(*fsv);
+        id = SvUV(*isv);
+        rc = hm_detach(aTHX_ hm_cur_loop, fd, id);
+        switch (rc) {
+            case  0: break;
+            case -1: croak("Hyperman::detach: the connection is gone "
+                           "(the client hung up, or this env is stale)");
+            case -2: croak("Hyperman::detach: HTTP/2 connections cannot be "
+                           "detached (streams share one socket)");
+            case -3: croak("Hyperman::detach: TLS connections cannot be "
+                           "detached (terminate TLS in front of Hyperman)");
+            case -4: croak("Hyperman::detach: a response is still draining "
+                           "on this connection");
+            case -5: croak("Hyperman::detach: already detached");
+            default: croak("Hyperman::detach: failed (%d)", rc);
+        }
+        RETVAL = (IV)fd;
+    }
+    OUTPUT:
+        RETVAL

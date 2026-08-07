@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Auth::Token;
-$Mojolicious::Plugin::Fondation::Auth::Token::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Auth::Token::VERSION = '0.02';
 # ABSTRACT: Personal Access Token authentication for Fondation
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -197,7 +197,7 @@ Mojolicious::Plugin::Fondation::Auth::Token - Personal Access Token authenticati
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

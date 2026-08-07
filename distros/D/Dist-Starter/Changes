@@ -1,4 +1,10 @@
 Release history for Dist-Starter
 
+v0.1.1    2026-08-06T14:40:21Z    Alpha release
+          - Set XDG_CONFIG_HOME environment variable to fallback in api test
+            script
+          - Make the Dist::Starter::Context and the Dist::Starter::Exception
+            sub-modules private
+
 v0.1.0    2026-08-06T07:35:22Z    Alpha release
           - Initial release

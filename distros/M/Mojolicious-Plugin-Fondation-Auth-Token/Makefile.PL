@@ -27,17 +27,17 @@ my %WriteMakefileArgs = (
     "Crypt::URandom" => 0,
     "Digest::SHA" => 0,
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => 0,
-    "Mojolicious::Plugin::Fondation::Auth" => 0,
-    "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => 0,
-    "Mojolicious::Plugin::Fondation::Problem" => 0
+    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation::Auth" => "0.02",
+    "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.05",
+    "Mojolicious::Plugin::Fondation::Problem" => "0.03"
   },
   "TEST_REQUIRES" => {
     "File::Temp" => "0.01",
     "Test::Mojo" => 0,
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,10 +49,10 @@ my %FallbackPrereqs = (
   "Digest::SHA" => 0,
   "File::Temp" => "0.01",
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => 0,
-  "Mojolicious::Plugin::Fondation::Auth" => 0,
-  "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => 0,
-  "Mojolicious::Plugin::Fondation::Problem" => 0,
+  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation::Auth" => "0.02",
+  "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.05",
+  "Mojolicious::Plugin::Fondation::Problem" => "0.03",
   "Test::Mojo" => 0,
   "Test::More" => "1.00"
 );

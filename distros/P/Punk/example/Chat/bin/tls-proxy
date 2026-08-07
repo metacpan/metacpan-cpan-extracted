@@ -1,0 +1,288 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Basename ();
+use Getopt::Long ();
+use IO::Select ();
+use IO::Socket::INET ();
+use IO::Socket::SSL qw(SSL_WANT_READ SSL_WANT_WRITE $SSL_ERROR);
+
+# A TLS terminator: accept HTTPS on one port, speak plain HTTP to Punk on
+# another, and copy bytes in both directions until somebody hangs up.
+#
+# WHY THIS EXISTS
+#
+# Hyperman can serve HTTPS itself (tls_cert/tls_key), and for an app that is
+# only pages and JSON that is what you would use. This example cannot, and
+# the reason is worth stating plainly rather than working around silently:
+#
+#   Hyperman's `detach` - the seam that hands a live socket to the
+#   application, and the thing a WebSocket upgrade is built on - refuses a
+#   TLS connection. hm_core.h returns -3 for it, and Punk turns that into
+#   "TLS cannot be detached". The OpenSSL session state belongs to the
+#   server's connection object; there is no way to hand it across.
+#
+# So on a TLS listener the pages would serve and the chat would not. Serving
+# the WebSocket from a second, plain port does not rescue it either: a
+# browser refuses a ws:// socket opened from an https:// page (mixed
+# content), so it has to be wss:// on the same origin.
+#
+# Terminating TLS in front is the answer, and not a consolation prize - it is
+# how this is deployed in practice, with nginx or a load balancer in the
+# position this script occupies. Everything downstream is plain HTTP/1, which
+# is exactly what detach wants. After the handshake a WebSocket is just a
+# long-lived byte stream, so a terminator that copies bytes carries it
+# without knowing anything about the protocol.
+#
+# One process per connection: a demo terminator should be obvious, and the
+# alternative (one event loop multiplexing every connection's TLS state) is
+# the thing you would reach for nginx to do properly anyway.
+
+my $home = File::Basename::dirname(__FILE__) . '/..';
+my %o = (
+    listen   => '0.0.0.0:5443',
+    upstream => '127.0.0.1:5010',
+    cert     => "$home/tls/server.crt",
+    key      => "$home/tls/server.key",
+    backlog  => 128,
+    quiet    => 0,
+);
+
+Getopt::Long::GetOptions(
+    'listen=s'   => \$o{listen},
+    'upstream=s' => \$o{upstream},
+    'cert=s'     => \$o{cert},
+    'key=s'      => \$o{key},
+    'backlog=i'  => \$o{backlog},
+    'quiet'      => \$o{quiet},
+    'help'       => sub { print _usage(); exit 0 },
+) or die _usage();
+
+-r $o{cert} or die "tls-proxy: cannot read the certificate '$o{cert}' "
+                 . "(run bin/make-cert first)\n";
+-r $o{key}  or die "tls-proxy: cannot read the key '$o{key}' "
+                 . "(run bin/make-cert first)\n";
+
+my ($lhost, $lport) = _hostport($o{listen}, '0.0.0.0');
+my ($uhost, $uport) = _hostport($o{upstream}, '127.0.0.1');
+
+$SIG{PIPE} = 'IGNORE';     # a peer that vanishes mid-write is normal here
+$SIG{CHLD} = 'IGNORE';     # let the kernel reap the per-connection children
+
+# SSL_startHandshake => 0 accepts the TCP connection without doing the TLS
+# handshake, so the handshake happens in the child. Otherwise one client that
+# opens a socket and says nothing stalls every other connection.
+my $server = IO::Socket::SSL->new(
+    LocalAddr     => $lhost,
+    LocalPort     => $lport,
+    Listen        => $o{backlog},
+    ReuseAddr     => 1,
+    SSL_server    => 1,
+    SSL_cert_file => $o{cert},
+    SSL_key_file  => $o{key},
+    SSL_startHandshake => 0,
+) or die "tls-proxy: cannot listen on $o{listen}: $!"
+       . (IO::Socket::SSL->can('errstr') ? ' (' . IO::Socket::SSL::errstr() . ')' : '')
+       . "\n";
+
+_say("listening for https on $o{listen}, forwarding to $o{upstream}");
+
+my $running = 1;
+$SIG{INT} = $SIG{TERM} = sub { $running = 0; close $server; };
+
+while ($running) {
+    my $client = $server->accept or next;
+
+    my $pid = fork;
+    if (!defined $pid) { close $client; next }
+    if ($pid) { close $client; next }       # parent: back to accepting
+
+    # ---- child: one connection, start to finish ----
+    close $server;
+    $SIG{INT} = $SIG{TERM} = 'DEFAULT';
+
+    my $ok = eval { _serve($client); 1 };
+    _say("connection error: $@") if !$ok && !$o{quiet};
+    exit 0;
+}
+
+exit 0;
+
+sub _serve {
+    my ($client) = @_;
+
+    # The handshake, now that we are alone in this process. A browser that
+    # has not been told to trust the certificate aborts here; that is the
+    # one-time warning, not a bug.
+    unless ($client->accept_SSL) {
+        _say('tls handshake failed: ' . ($SSL_ERROR || $!));
+        return;
+    }
+
+    my $upstream = IO::Socket::INET->new(
+        PeerAddr => $uhost, PeerPort => $uport, Proto => 'tcp',
+    );
+    unless ($upstream) {
+        _say("upstream $o{upstream} is not answering: $!");
+        _refuse($client);
+        return;
+    }
+    $upstream->autoflush(1);
+
+    _pump($client, $upstream);
+
+    # SSL_no_shutdown: the peer is already gone in the common case, and
+    # insisting on a close_notify exchange only stalls the child.
+    $client->close(SSL_no_shutdown => 1);
+    close $upstream;
+    return;
+}
+
+# Copy in both directions until each side has reported EOF and everything
+# owed to it has been written.
+#
+# Both sockets are non-blocking and each direction has its own buffer, so a
+# slow reader on one side cannot deadlock the other - which matters here in a
+# way it would not for plain HTTP: a WebSocket is bidirectional and long
+# lived, and a strict read-then-write loop would hang the moment both peers
+# spoke at once.
+sub _pump {
+    my ($client, $upstream) = @_;
+
+    $client->blocking(0);
+    $upstream->blocking(0);
+
+    my $to_upstream = '';        # read from the browser, owed to Punk
+    my $to_client   = '';        # read from Punk, owed to the browser
+    my ($client_eof, $upstream_eof, $upstream_shut) = (0, 0, 0);
+    my $high_water = 256 * 1024;
+
+    while (1) {
+        last if $client_eof && $upstream_eof
+             && !length($to_upstream) && !length($to_client);
+
+        my $readers = IO::Select->new;
+        my $writers = IO::Select->new;
+
+        # Stop reading a side whose buffer is already full: back-pressure,
+        # so a fast producer cannot make this process grow without bound.
+        $readers->add($client)   if !$client_eof
+                                 && length($to_upstream) < $high_water;
+        $readers->add($upstream) if !$upstream_eof
+                                 && length($to_client) < $high_water;
+        $writers->add($upstream) if length $to_upstream;
+        $writers->add($client)   if length $to_client;
+
+        last unless $readers->count || $writers->count;
+
+        # OpenSSL reads whole TLS records, so it can be holding decrypted
+        # bytes that the kernel socket will never announce again. Poll
+        # instead of sleeping when it is.
+        my $timeout = $client->pending ? 0 : undef;
+        my ($can_read, $can_write) = IO::Select->select(
+            $readers, $writers, undef, $timeout);
+        $can_read  ||= [];
+        $can_write ||= [];
+
+        my %readable = map { fileno($_) => 1 } @$can_read;
+        my %writable = map { fileno($_) => 1 } @$can_write;
+
+        if (!$client_eof
+            && ($client->pending || $readable{ fileno $client })) {
+            $client_eof = 1 unless _read($client, \$to_upstream, 1);
+        }
+        if (!$upstream_eof && $readable{ fileno $upstream }) {
+            $upstream_eof = 1 unless _read($upstream, \$to_client, 0);
+        }
+        if (length($to_upstream) && $writable{ fileno $upstream }) {
+            $upstream_eof = 1 unless _write($upstream, \$to_upstream, 0);
+        }
+        if (length($to_client) && $writable{ fileno $client }) {
+            $client_eof = 1 unless _write($client, \$to_client, 1);
+        }
+
+        # The browser is done talking and Punk has heard all of it: close
+        # that half so the upstream sees a real EOF rather than waiting.
+        if ($client_eof && !$upstream_shut && !length $to_upstream) {
+            shutdown $upstream, 1;
+            $upstream_shut = 1;
+        }
+        # Punk has hung up and the browser has been told everything.
+        last if $upstream_eof && !length $to_client;
+    }
+    return;
+}
+
+# Read what is available onto the end of a buffer. False means this side is
+# finished (clean EOF or an error there is nothing useful to do about).
+sub _read {
+    my ($fh, $buf, $is_ssl) = @_;
+    my $n = sysread $fh, my $chunk, 65536;
+    if (defined $n) {
+        return 0 unless $n;      # 0 is EOF
+        $$buf .= $chunk;
+        return 1;
+    }
+    return 1 if _retry($is_ssl);
+    return 0;
+}
+
+# Write as much of a buffer as the socket will take, and keep the rest.
+sub _write {
+    my ($fh, $buf, $is_ssl) = @_;
+    my $n = syswrite $fh, $$buf;
+    if (defined $n) {
+        substr $$buf, 0, $n, '';
+        return 1;
+    }
+    return 1 if _retry($is_ssl);
+    return 0;
+}
+
+# Would-block, or TLS asking for the other direction before it can make
+# progress (a renegotiation or a TLS 1.3 key update mid-stream). Either way
+# the next select round handles it.
+sub _retry {
+    my ($is_ssl) = @_;
+    return 1 if $!{EWOULDBLOCK} || $!{EAGAIN} || $!{EINTR};
+    return 1 if $is_ssl && $SSL_ERROR
+             && ($SSL_ERROR == SSL_WANT_READ || $SSL_ERROR == SSL_WANT_WRITE);
+    return 0;
+}
+
+# Upstream is down - answer the browser rather than dropping the connection,
+# because "connection reset" sends people hunting for a TLS problem.
+sub _refuse {
+    my ($client) = @_;
+    my $body = "The Punk app is not answering on $o{upstream}.\n";
+    $client->blocking(1);
+    print {$client} "HTTP/1.1 502 Bad Gateway\r\n",
+                    "Content-Type: text/plain; charset=utf-8\r\n",
+                    'Content-Length: ', length $body, "\r\n",
+                    "Connection: close\r\n\r\n", $body;
+    $client->close(SSL_no_shutdown => 1);
+    return;
+}
+
+sub _hostport {
+    my ($spec, $default_host) = @_;
+    return ($1, $2) if $spec =~ /\A\[(.+)\]:(\d+)\z/;   # [::1]:5443
+    return ($1, $2) if $spec =~ /\A(.+):(\d+)\z/;
+    return ($default_host, $spec) if $spec =~ /\A\d+\z/;
+    die "tls-proxy: cannot parse '$spec' as host:port\n";
+}
+
+sub _say { print STDERR "[tls-proxy] $_[0]\n" unless $o{quiet}; return }
+
+sub _usage {
+    return <<'USAGE';
+usage: tls-proxy [options]
+
+  --listen HOST:PORT     where to accept https  (default 0.0.0.0:5443)
+  --upstream HOST:PORT   where the plain app is (default 127.0.0.1:5010)
+  --cert FILE            PEM certificate        (default ../tls/server.crt)
+  --key FILE             PEM private key        (default ../tls/server.key)
+  --backlog N            listen backlog         (default 128)
+  --quiet                do not log to stderr
+USAGE
+}

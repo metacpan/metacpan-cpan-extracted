@@ -30,6 +30,7 @@ BEGIN {
     }
 }
 use Open::API;
+use Open::API::Plack;
 use Open::API::Client;
 use File::Raw::JSON ();
 
@@ -75,12 +76,12 @@ my $oa_pid  = fork // die;
 if (!$oa_pid) {
     open STDERR, '>', '/dev/null';
     my $api = Open::API->new(spec => $SPEC);
-    my $app = $api->to_app(handlers => {
+    my $app = Open::API::Plack->new(api => $api, handlers => {
         listPets  => sub { [ { id => 42, name => 'rex', tag => 'dog' } ] },
         getPet    => sub { [ 200, ['Content-Type' => 'application/json'], [$PET] ] },
         createPet => sub { $_[0]->{body} },
         deletePet => sub { [ 204, [], [''] ] },
-    });
+    })->to_app;
     Hyperman->run(app => $app, host => '127.0.0.1', port => $oa_port,
                   workers => $WORKERS);
     exit 0;

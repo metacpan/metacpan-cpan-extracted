@@ -2,13 +2,31 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000061';
+our $VERSION = '0.000062';
 
 use Carp qw/croak/;
+use Cwd qw/abs_path/;
+use Errno qw/ESRCH/;
 use POSIX qw/:sys_wait_h/;
 use Time::HiRes qw/sleep time/;
 use Scalar::Util qw/weaken/;
 use File::Path qw/remove_tree/;
+
+# Resolved at load time, not at spawn time: $INC{} can be relative, and an
+# application may chdir before starting a database, which would resolve it
+# against the wrong directory and hand the watcher a different Watcher.pm.
+my $LOADED_FROM = do {
+    my $file = $INC{'DBIx/QuickDB/Watcher.pm'};
+
+    my $dir;
+    if (defined($file) && length($file)) {
+        my $root = $file;
+        $root =~ s{[\\/]?\QDBIx/QuickDB/Watcher.pm\E$}{};
+        $dir = abs_path(length($root) ? $root : '.');
+    }
+
+    (defined($dir) && length($dir) && -d $dir) ? $dir : undef;
+};
 
 use DBIx::QuickDB::Util::HashBase qw{
     <db <args
@@ -16,18 +34,38 @@ use DBIx::QuickDB::Util::HashBase qw{
     <watcher_pid
     <master_pid
     <log_file
+    <data_dir
 
     <stopped
     <eliminated
     <detached
 
     <delete_data
+    <server_reaped
 };
+
+# The watch loop records its reap inside the data dir, which disposable teardown
+# then deletes -- so the proof is gone by the time wait() wants it. Latch it
+# before signalling, while the dir is still there.
+sub _latch_server_reaped {
+    my $self = shift;
+
+    return if $self->{+SERVER_REAPED};
+
+    my $dir = $self->{+DATA_DIR} or return;
+    $self->{+SERVER_REAPED} = 1 if -f $self->server_exit_status_file($dir);
+
+    return;
+}
 
 sub init {
     my $self = shift;
 
     $self->{+MASTER_PID} ||= $$;
+
+    # Captured up front: wait() needs it after teardown, when the DB reference
+    # has been weakened and may already be gone.
+    $self->{+DATA_DIR} //= $self->{+DB}->dir;
 
     $self->{+LOG_FILE} = $self->{+DB}->gen_log;
 
@@ -72,6 +110,37 @@ sub start {
     POSIX::_exit(0);
 }
 
+# -I args for the re-exec'd watcher: the directory this module was loaded from,
+# then the rest of @INC. The watcher must load the same Watcher.pm its parent
+# did, so the parent's own resolution is forwarded rather than guessed.
+#
+# -I rather than PERL5LIB, which the MySQLCom and MariaDB drivers deliberately
+# blank so vendor scripts cannot reach application modules.
+#
+# $root is only passed by tests; it defaults to the load-time capture.
+sub _watcher_inc_args {
+    my ($root) = @_ ? @_ : ($LOADED_FROM);
+
+    my @dirs;
+    push @dirs => $root if defined $root;
+
+    # @INC hooks (refs) cannot be expressed as -I.
+    push @dirs => grep { !ref($_) && defined($_) && length($_) } @INC;
+
+    # Absolutizing the rest is hygiene only -- this runs in the forked watcher,
+    # which shares the caller's cwd, so a relative entry would resolve the same
+    # either way. $LOADED_FROM above is what actually pins the module.
+    my (@out, %seen);
+    for my $dir (@dirs) {
+        my $abs = abs_path($dir);
+        $dir = $abs if defined($abs) && length($abs);
+        next if $seen{$dir}++;
+        push @out => $dir;
+    }
+
+    return map {"-I$_"} @out;
+}
+
 sub watch {
     my $self = shift;
     my ($wh) = @_;
@@ -85,6 +154,11 @@ sub watch {
     local $SIG{USR1} = sub { $kill = 'FAST_TERM' };
     local $SIG{HUP} = sub { $hup = 1 };
 
+    # Own child reaping before spawning. An inherited SIGCHLD of IGNORE makes
+    # the kernel reap the server first, losing its exit status. Protects the
+    # window between spawn() and the exec below.
+    local $SIG{CHLD} = 'DEFAULT';
+
     my $start_pid = $$;
     my $pid = $self->spawn();
     print $wh "$pid\n";
@@ -93,7 +167,7 @@ sub watch {
     my $mpid = $self->{+MASTER_PID};
     my $spid = $self->{+SERVER_PID} or die "No server pid";
 
-    my $ddir = $self->{+DB}->dir;
+    my $ddir = $self->{+DATA_DIR};
     my $ssig = $self->{+DB}->stop_sig // 'TERM';
     my $fsig = $self->{+DB}->fast_stop_sig // 'KILL';
     my $delete_data = $self->{+DB}->should_cleanup ? 1 : 0;
@@ -119,7 +193,7 @@ sub watch {
     POSIX::sigprocmask(POSIX::SIG_BLOCK(), POSIX::SigSet->new(POSIX::SIGUSR1(), POSIX::SIGINT(), POSIX::SIGTERM()));
 
     exec(
-        $^X, '-Ilib',
+        $^X, _watcher_inc_args(),
 
         '-e' => "require DBIx::QuickDB::Watcher; DBIx::QuickDB::Watcher->_do_watch()",
 
@@ -167,6 +241,7 @@ sub _do_watch {
     my $delete_data = $params{delete_data} // 0;
     my $owner_kill  = $params{owner_kill} // 'TERM';
 
+    my $reaped = 0;
     my $hupped = 0;
     while (!$kill) {
         if ($hup && !$hupped) {
@@ -174,21 +249,64 @@ sub _do_watch {
             open(STDOUT, '>', \$blah) or warn "$!";
             close(STDERR);
             open(STDERR, '>', \$blah) or warn "$!";
+            $hupped = 1;
         }
 
         sleep 0.1;
+
+        # Nothing else reaps the server, so a crashed one would linger as a
+        # zombie -- and kill(0) succeeds on a zombie, which made start() report
+        # it alive and wait out the whole timeout. Keep watching after the reap:
+        # exiting here would run teardown and delete the logs start() needs.
+        $reaped ||= $class->_reap_server($server_pid, $data_dir);
 
         next if kill(0, $master_pid);
         $kill = $owner_kill;
     }
 
-    unless (eval { $class->_watcher_terminate(send_sig => $signal, fast_sig => $fast_signal, got_sig => $kill, pid => $server_pid, dir => $data_dir, delete_data => $delete_data); 1 }) {
+    unless (eval { $class->_watcher_terminate(send_sig => $signal, fast_sig => $fast_signal, got_sig => $kill, pid => $server_pid, dir => $data_dir, delete_data => $delete_data, already_reaped => $reaped); 1 }) {
+        # warn $err, not $@: entering an eval BLOCK clears $@, which stripped
+        # the message off every teardown failure.
         my $err = $@;
-        eval { warn $@ };
+        eval { warn $err };
         POSIX::_exit(1);
     }
 
     POSIX::_exit(0);
+}
+
+sub server_exit_status_file {
+    my $class = shift;
+    my ($dir) = @_;
+    return "$dir/server-exit-status";
+}
+
+# Non-blocking reap; writes the wait status to server_exit_status_file() and
+# returns true once collected. Never dies -- this runs in the watch loop, and
+# taking the watcher down would orphan the server.
+sub _reap_server {
+    my $class = shift;
+    my ($pid, $dir) = @_;
+
+    my ($got, $status);
+    {
+        local $?;
+        $got    = waitpid($pid, WNOHANG);
+        $status = $?;
+    }
+
+    # Only a real reap counts. Negative is ECHILD, which yields no status and
+    # cannot distinguish "auto-reaped" from "never our child"; teardown keys off
+    # this to decide whether it may skip the kill, so do not overclaim.
+    return 0 unless $got > 0;
+
+    my $file = $class->server_exit_status_file($dir);
+    if (open(my $fh, '>', $file)) {
+        print $fh "$status\n";
+        close($fh);
+    }
+
+    return 1;
 }
 
 sub spawn {
@@ -217,31 +335,40 @@ sub _watcher_terminate {
     my $got_sig  = $params{got_sig};
     my $send_sig = $params{send_sig} // $got_sig // 'TERM';
 
-    # fast_eliminate(): kill the server immediately with its fast-stop signal
-    # (SIGKILL by default, or a clean immediate-shutdown signal the driver picks
-    # to avoid leaking OS resources), reap it, drop the data dir. No graceful
-    # shutdown -- the data dir is disposable so its integrity does not matter.
-    # Used only for clones being deleted.
-    if ($got_sig && $got_sig eq 'FAST_TERM') {
-        $class->_watcher_kill_fast($pid, $params{fast_sig});
+    # Already reaped by the watch loop: signalling the pid now could hit an
+    # unrelated process that has since been given it.
+    my $reaped = $params{already_reaped};
 
-        # Ignore errors here. eval because File::Path hard-dies (not routed
-        # through the 'error' handler) if the owner process deletes this same
-        # tree concurrently; deletion is idempotent best-effort.
-        my $err = [];
-        eval { remove_tree($dir, {safe => 1, error => \$err}) }
-            if $params{delete_data} && -d $dir;
+    # Removing the data dir is a goal in its own right, not a reward for a
+    # successful kill. A server we cannot stop is already pathological, and
+    # leaving its dir behind to outlive the process that asked for it is the
+    # failure we are here to prevent. On Linux the server's open handles keep
+    # working after the unlink; Windows may fare worse, which is accepted for a
+    # case this rare. So the kill is best-effort and never blocks the removal.
+    if ($got_sig && $got_sig eq 'FAST_TERM') {
+        eval { $class->_watcher_kill_fast($pid, $params{fast_sig}) unless $reaped; 1 } or warn $@;
+
+        _remove_data_dir($dir) if $params{delete_data};
 
         return;
     }
 
-    $class->_watcher_kill($send_sig, $pid, $params{fast_sig});
+    eval { $class->_watcher_kill($send_sig, $pid, $params{fast_sig}) unless $reaped; 1 } or warn $@;
 
-    if ($params{delete_data} && $got_sig && $got_sig eq 'TERM') {
-        # Ignore errors here (eval: see FAST_TERM above).
-        my $err = [];
-        eval { remove_tree($dir, {safe => 1, error => \$err}) } if -d $dir;
-    }
+    _remove_data_dir($dir) if $params{delete_data} && $got_sig && $got_sig eq 'TERM';
+}
+
+# Best-effort, and eval'd: File::Path hard-dies rather than routing through its
+# error handler when the owner deletes this same tree concurrently.
+sub _remove_data_dir {
+    my ($dir) = @_;
+
+    return unless -d $dir;
+
+    my $err = [];
+    eval { remove_tree($dir, {safe => 1, error => \$err}) };
+
+    return;
 }
 
 sub _watcher_kill_fast {
@@ -250,7 +377,11 @@ sub _watcher_kill_fast {
 
     $sig ||= 'KILL';
 
-    kill($sig, $pid) or return;
+    unless (kill($sig, $pid)) {
+        return if $! == ESRCH;
+        warn "Could not signal server pid $pid with SIG$sig: $!";
+        return;
+    }
 
     # Reap the server. With SIGKILL this resolves almost immediately. With a
     # clean immediate-shutdown signal (e.g. PostgreSQL's SIGQUIT, chosen so the
@@ -316,7 +447,20 @@ sub _watcher_kill {
 
     $fast_sig ||= 'KILL';
 
-    kill($sig, $pid) or die "Could not send kill signal";
+    # A signal that cannot even be delivered is warning-only. The reap failures
+    # further down still throw; _watcher_terminate catches those and removes the
+    # data dir anyway.
+    unless (kill($sig, $pid)) {
+        my $err = $!;
+
+        # ESRCH just means it beat us to it.
+        return if $err == ESRCH;
+
+        # Anything else (EINVAL from a bad stop_sig, EPERM from a recycled pid)
+        # leaves a server we cannot stop. Worth saying so.
+        warn "Could not signal server pid $pid with SIG$sig: $err";
+        return;
+    }
 
     # How long to wait for a graceful shutdown before escalating, and how much
     # longer before giving up entirely. Keep this generous: a slow or loaded
@@ -399,6 +543,7 @@ sub stop {
     my $self = shift;
     return if $self->{+STOPPED}++ || $self->{+ELIMINATED};
     my $pid = $self->{+WATCHER_PID} or return;
+    $self->_latch_server_reaped;
     kill('INT', $pid);
 }
 
@@ -406,6 +551,7 @@ sub eliminate {
     my $self = shift;
     return if $self->{+ELIMINATED}++ || $self->{+STOPPED};
     my $pid = $self->{+WATCHER_PID} or return;
+    $self->_latch_server_reaped;
     kill('TERM', $pid);
 }
 
@@ -418,6 +564,7 @@ sub fast_eliminate {
     my $self = shift;
     return if $self->{+ELIMINATED}++ || $self->{+STOPPED};
     my $pid = $self->{+WATCHER_PID} or return;
+    $self->_latch_server_reaped;
     kill('USR1', $pid);
 }
 
@@ -474,15 +621,18 @@ sub wait {
     # from DESTROY) can land on a recycled pid now owned by another process.
     delete $self->{+WATCHER_PID};
 
-    # A voluntary watcher exit guarantees the server was reaped first, but the
-    # watcher can also die abnormally (or we just SIGKILLed it above), leaving
-    # the server alive. Verify with a read-only kill(0) probe -- NEVER send
-    # the server pid a real signal here: the pid may already be recycled to an
-    # unrelated process (the pid-reuse hazard the watcher teardown guards
-    # against), so a false "alive" can only cost a bounded wait and a warning,
-    # never a wrong-process kill. In the normal case the server is long dead
-    # and this costs a single failed kill(0).
-    if (my $spid = $self->{+SERVER_PID}) {
+    # The server may have outlived the watcher, so verify with a read-only
+    # kill(0). Never send a real signal here -- the pid may have been recycled,
+    # and a false "alive" should cost a warning, not a wrong kill.
+    #
+    # Skipped only when the watch loop recorded an exit status, which proves it
+    # reaped the server; the pid may since have been recycled, and probing it
+    # would report a false "alive" and stall for the whole timeout. A missing
+    # data dir proves nothing here -- teardown removes a disposable dir whether
+    # or not it managed to stop the server.
+    $self->_latch_server_reaped;
+
+    if (!$self->{+SERVER_REAPED} and my $spid = $self->{+SERVER_PID}) {
         my $sstart = time;
         while (kill(0, $spid)) {
             if (time - $sstart > $timeout) {
@@ -530,6 +680,23 @@ this process will kill the database server and delete the data dir, then exit.
 
 The main process can also send signals to this one to make it stop, clean up,
 etc.
+
+=head1 METHODS
+
+=over 4
+
+=item $path = DBIx::QuickDB::Watcher->server_exit_status_file($instance_dir)
+
+Path of the file the watcher writes when it reaps the database server, holding
+the raw wait status.
+
+The owning process is not the server's parent, so it cannot C<waitpid> and
+cannot tell a crashed server from a slow one -- C<kill(0)> succeeds on a zombie.
+This file is how it finds out. L<DBIx::QuickDB::Driver/start> polls for it to
+fail fast on a server that died during startup, and removes it before spawning a
+new server so a previous crash cannot fail the next start.
+
+=back
 
 =head1 SIGNALS
 

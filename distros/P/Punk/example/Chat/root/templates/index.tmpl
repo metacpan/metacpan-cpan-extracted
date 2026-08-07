@@ -1,0 +1,55 @@
+<h1>Rooms</h1>
+
+<p class="lede">
+  Every room below is backed by one <code>websocket '/ws/:room'</code> route
+  and one OpenAPI mount over the same table. Join one in two tabs, then
+  post to the API and watch the message arrive in both.
+</p>
+
+<form class="joiner" action="/chat/lobby" method="get" id="joiner">
+  <label>room <input name="room" id="room-name" value="lobby"
+                    pattern="[a-zA-Z0-9-]+" maxlength="32" required></label>
+  <label>as <input name="nick" id="nick-name" placeholder="your name"
+                   maxlength="32"></label>
+  <button type="submit">join</button>
+</form>
+
+{% if rooms %}
+<table class="rooms">
+  <thead><tr><th>room</th><th>messages</th><th>connected</th><th>last said</th></tr></thead>
+  <tbody>
+  {% for r in rooms %}
+    <tr>
+      <td><a href="/chat/{% r.room | uri %}">#{% r.room %}</a></td>
+      <td class="num">{% r.messages %}</td>
+      <td class="num">{% r.connected %}</td>
+      <td class="when">{% r.last_at | default('-') %}</td>
+    </tr>
+  {% end %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">Nothing has been said yet. Join <a href="/chat/lobby">#lobby</a> and say something.</p>
+{% end %}
+
+<section class="tryit">
+  <h2>Try the API</h2>
+  <p>The same message, over REST - it is broadcast to every open socket in the room:</p>
+  <pre><code>curl -k -X POST https://localhost:5443/api/rooms/lobby/messages \
+     -H 'content-type: application/json' \
+     -d '{"nick":"curl","text":"hello from the API"}'</code></pre>
+  <p>Clearing a room needs the bearer token the spec declares:</p>
+  <pre><code>curl -k -X DELETE https://localhost:5443/api/rooms/lobby/messages \
+     -H 'authorization: Bearer punk-admin'</code></pre>
+</section>
+
+<script>
+document.getElementById('joiner').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var room = document.getElementById('room-name').value.toLowerCase()
+               .replace(/[^a-z0-9-]/g, '') || 'lobby';
+  var nick = document.getElementById('nick-name').value.trim();
+  location.href = '/chat/' + encodeURIComponent(room)
+    + (nick ? '?nick=' + encodeURIComponent(nick) : '');
+});
+</script>

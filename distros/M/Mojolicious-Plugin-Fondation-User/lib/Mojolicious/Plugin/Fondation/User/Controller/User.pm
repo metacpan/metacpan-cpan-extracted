@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::User::Controller::User;
-$Mojolicious::Plugin::Fondation::User::Controller::User::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::User::Controller::User::VERSION = '0.03';
 # ABSTRACT: REST controller for User CRUD via DBIx::Class::Async
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -8,17 +8,9 @@ use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
 # Helpers
 # ────────────────────────────────────────────────────────────────────────────
 
-# Check if Group plugin is loaded and ?with=groups was requested
+# Condition: ?with=groups triggers m2m prefetch
 sub _want_groups ($self) {
-    return 0 unless $self->param('with') && $self->param('with') eq 'groups';
-    return 0 unless $self->has_helper('fondation');
-    return exists $self->fondation->registry->{'Mojolicious::Plugin::Fondation::Group'};
-}
-
-# Check if Group plugin is loaded
-sub _has_group_plugin ($self) {
-    return 0 unless $self->has_helper('fondation');
-    return exists $self->fondation->registry->{'Mojolicious::Plugin::Fondation::Group'};
+    return $self->param('with') && $self->param('with') eq 'groups';
 }
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -31,6 +23,7 @@ sub index ($self) {
 }
 
 # List all users (GET /api/User)
+# m2m groups are auto-included by Base::TO_JSON when $rs->with('groups') is used.
 sub list ($self) {
     $self->render_later;
 
@@ -38,12 +31,9 @@ sub list ($self) {
         ? $self->model('user')->with('groups')
         : $self->model('user');
 
-    my $schema = $self->schema;
-    $rs->all->on_done(sub {
-        my $users = shift;
-        my @data  = map { _to_data($_, $schema) } @$users;
-        $self->render(openapi => \@data);
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    $rs->TO_JSON->then(sub ($data) {
+        $self->render(openapi => $data);
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Create a user (POST /api/User)
@@ -54,11 +44,12 @@ sub create ($self) {
     my $group_ids = delete $json->{groups};
     $self->model('user')->create($json)->on_done(sub {
         my $user = shift;
-        my $data = _to_data($user);
+
+        my $data = $user->TO_JSON;
 
         # Sync group assignments (blocking in this worker — fast, no I/O wait)
         $self->_sync_user_groups($data->{id}, $group_ids)
-            if $group_ids && @$group_ids && $self->_has_group_plugin;
+            if $group_ids && @$group_ids;
 
         $self->res->headers->location($self->url_for('read_user', id => $data->{id}));
         $self->render(status => 201, openapi => $data);
@@ -68,14 +59,11 @@ sub create ($self) {
             title => $self->l('User created'),
             body  => sprintf($self->l("User '%s' has been created."), $data->{username} // ''),
         });
-    })->on_fail(sub {
-        my $err = shift;
-        $self->app->log->error('[User::create] on_fail: ' . $self->dumper($err));
-        $self->_render_error($err);
-    })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Read a user by ID (GET /api/User/:id)
+# m2m groups auto-included by Base::TO_JSON when with('groups') prefetched.
 sub read ($self) {
     $self = $self->openapi->valid_input or return;
     $self->render_later;
@@ -85,17 +73,16 @@ sub read ($self) {
         ? $self->model('user')->with('groups')
         : $self->model('user');
 
-    my $schema = $self->schema;
     $rs->find($id)->on_done(sub {
         my $user = shift;
         if ($user) {
-            $self->render(openapi => _to_data($user, $schema));
+            $self->render(openapi => $user->TO_JSON);
         }
         else {
             $self->render(status => 404, openapi =>
                 { errors => [{ message => 'Not found', path => '/' }] });
         }
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Update a user (PUT /api/User/:id)
@@ -119,11 +106,12 @@ sub update ($self) {
         }
         $user->update($json)->on_done(sub {
             my $updated = shift;
-            my $data    = _to_data($updated);
+
+            my $data = $updated->TO_JSON;
 
             # Sync group assignments (blocking in this worker)
             $self->_sync_user_groups($id, $group_ids)
-                if $group_ids && $self->_has_group_plugin;
+                if $group_ids;
 
             $self->render(openapi => $data);
 
@@ -132,8 +120,8 @@ sub update ($self) {
                 title => $self->l('User updated'),
                 body  => sprintf($self->l("User '%s' has been updated."), $data->{username} // ''),
             });
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Delete a user (DELETE /api/User/:id)
@@ -156,8 +144,8 @@ sub delete ($self) {
                 body  => sprintf($self->l("User '%s' has been deleted."), $username // ''),
             });
             $self->render(status => 204, openapi => {});
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -183,37 +171,6 @@ sub _sync_user_groups ($self, $user_id, $group_ids) {
     ));
 }
 
-# ────────────────────────────────────────────────────────────────────────────
-# Private helpers
-# ────────────────────────────────────────────────────────────────────────────
-
-sub _render_error ($self, $err) {
-    $self->app->log->error('[User::Controller] _render_error: ' . $self->dumper($err));
-    $self->render(status => 500, openapi =>
-        { errors => [{ message => "$err", path => '/' }] });
-}
-
-sub _to_data ($row, $schema = undef) {
-    my $data = { $row->get_columns };
-    delete $data->{password};
-
-    # Serialize DateTime objects to ISO 8601 strings
-    for my $key (keys %$data) {
-        my $val = $data->{$key};
-        if (ref $val && eval { $val->isa('DateTime') }) {
-            $data->{$key} = $val->iso8601;
-        }
-    }
-
-    # Include many_to_many groups if available (resolved via prefetched data,
-    # Future->done returns instantly — no extra query).
-    if ($schema && $row->can('groups')) {
-        $data->{groups} = $schema->await($row->groups);
-    }
-
-    return $data;
-}
-
 1;
 
 __END__
@@ -228,7 +185,7 @@ Mojolicious::Plugin::Fondation::User::Controller::User - REST controller for Use
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

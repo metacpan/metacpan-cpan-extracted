@@ -42,6 +42,17 @@ any patches you have. I use `prove` for 99% of my testing during development.
 Please try to match any existing coding style.  If there is a `.perltidyrc`
 file, please install Perl::Tidy and use perltidy before submitting patches.
 
+## AI/LLM contributions
+
+Contributions containing code written by LLM tools will not be accepted.
+Documentation or metadata written by LLM tools, and code written by humans with
+the assistance of LLM tools, will be evaluated with the same rigor as any other
+contributions.
+
+Failure to notate the participation of LLM tools in an attempt to subvert this
+policy, or excessive volume of unsolicited contributions from such tools, may
+result in warnings or bans from contributing to this project.
+
 ## Installing and using Dist::Zilla
 
 [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) is a very powerful

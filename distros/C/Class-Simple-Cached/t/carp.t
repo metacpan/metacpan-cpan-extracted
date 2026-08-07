@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Class::Simple::Cached;
-use CHI;
 use Test::Most;
 use Test::Needs 'Test::Carp';
 

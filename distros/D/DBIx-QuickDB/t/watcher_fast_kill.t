@@ -18,7 +18,7 @@ use DBIx::QuickDB::Driver::PostgreSQL;
 # These need fork() and real signals; skip where that does not apply.
 skip_all "fork/POSIX signals not supported on $^O" if $^O eq 'MSWin32';
 
-my $tmp = tempdir(CLEANUP => 1);
+my $tmp = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
 sub pid_alive { my $p = shift; return kill(0, $p) ? 1 : 0 }
 

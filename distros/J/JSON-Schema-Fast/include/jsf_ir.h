@@ -99,7 +99,7 @@ typedef struct jsf_dstab { uint32_t n; /* jsf_dsent[n] follows */ } jsf_dstab;
 
 /* ---- the schema node ---------------------------------------------------- */
 typedef struct jsf_node {
-    U64      present;      /* JSF_HAS_* bitmap */
+    uint64_t present;      /* JSF_HAS_* bitmap */
     uint32_t type_mask;    /* JSF_T_* from `type` */
     uint8_t  tag;          /* JSF_TAG_* */
     uint8_t  unique;       /* uniqueItems bool */

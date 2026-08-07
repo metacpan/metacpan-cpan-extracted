@@ -6,7 +6,7 @@ use warnings;
 #<<<
 package Version::Semantic;
 BEGIN {
-our $VERSION = 'v2.1.0';
+our $VERSION = 'v2.1.1';
 }
 #>>>
 
@@ -16,25 +16,19 @@ sub _croakf ( $@ );
 
 my $prefix_re = qr/v/;
 
-# <identifier characters>
-my $id_re = qr/(?: [0-9] | [a-zA-Z-] )+/x;
-
-# <numeric identifier> (ok)
-my $num_id_re = qr/0 | [1-9] | [1-9] [0-9]+/x;
-
-# <alphanumeric identifier>
-my $alnum_id_re = qr/[a-zA-Z-] | [a-zA-Z-] $id_re | $id_re [a-zA-Z-] | $id_re [a-zA-Z-] $id_re/x;
+# <numeric identifier>
+my $num_id_re = qr/0 | [1-9] [0-9]*/x;
 
 # <build identifier>
-#my $build_id_re = qr/[0-9a-zA-Z-]+/;
-my $build_id_re = qr/$alnum_id_re | [0-9]+/x;
-# <build> (ok)
+my $build_id_re = qr/[0-9a-zA-Z-]+/;
+
+# <build>
 my $build_re = qr/$build_id_re (?: \. $build_id_re )*/x;
 
 # <pre-release identifier>
-#my $pre_release_id_re = qr/$num_id_re | [0-9]* [a-zA-Z-] [0-9a-zA-Z-]*/x;
-my $pre_release_id_re = qr/$num_id_re | $alnum_id_re/x;
-# <pre-release> (ok)
+my $pre_release_id_re = qr/$num_id_re | [0-9A-Za-z-]* [A-Za-z-] [0-9A-Za-z-]*/x;
+
+# <pre-release>
 my $pre_release_re = qr/$pre_release_id_re (?: \. $pre_release_id_re )*/x;
 
 # Use BNF terminology

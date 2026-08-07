@@ -47,6 +47,18 @@ void mds_footnote_init(struct mds_footnote_tab* t, mds_arena* a) {
     t->arena = a;
 }
 
+/* The entry strings are arena copies and go with the arena, but the entry
+ * array itself is grown with realloc off the general heap, so it needs an
+ * explicit release. Call this before the arena is reset or freed: the table
+ * struct is itself arena-allocated. */
+void mds_footnote_free(struct mds_footnote_tab* t) {
+    if (!t) return;
+    free(t->entries);
+    t->entries = NULL;
+    t->len = 0;
+    t->cap = 0;
+}
+
 const mds_footnote* mds_footnote_get(const struct mds_footnote_tab* t,
                                      const char* label, size_t llen) {
     char buf[4096];

@@ -16,6 +16,30 @@
 #include <string.h>
 #include <strings.h>
 #include <stdint.h> // uint64_t — harmless if perl.h already pulled it in
+/* croak() with an NV argument: croak() carries a printf format attribute, but
+the compiler's format checker doesn't know the "Q" length modifier that NVgf
+expands to on a quadmath build, so every NV-bearing croak() draws a bogus
+-Wformat / -Wformat-extra-args pair there (harmless, but it buries the real
+warnings). The format is read by Perl's own formatter, not the C library, and
+that handles NVgf on every build, so route those messages through vcroak(),
+which has no format attribute. -Wformat stays useful everywhere else. */
+static void croak_nv(const char *pat, ...) __attribute__noreturn__;
+static void croak_nv(const char *pat, ...)
+{
+	dTHX;
+	va_list args;
+	va_start(args, pat);
+	vcroak(pat, &args); // noreturn; no va_end needed
+}
+/* Format a single NV with my_snprintf(). my_snprintf() carries a format
+attribute of its own, so an NVgf format written at the call site draws the same
+bogus warning pair described above; taking the format as an ordinary argument
+keeps the checker out of it. my_snprintf() is the portable spelling here --
+plain snprintf() cannot print an NV on a quadmath build. */
+static int snprintf_nv(char *buf, Size_t buflen, const char *fmt, NV x)
+{
+	return my_snprintf(buf, buflen, fmt, x);
+}
 /*
 SvROK = scalar value reference is OK
 */
@@ -266,6 +290,32 @@ static NV ft_lchoose(long n, long k) {
 	return lgamma((NV)n + 1) - lgamma((NV)k + 1) - lgamma((NV)(n - k) + 1);
 }
 
+/* Loader's saddle-point binomial, in log form; defined with the binom_test
+ * helpers further down.  Declared here because the hypergeometric density
+ * below is built out of it. */
+static NV bt_dbinom_raw_log(NV x, NV n, NV p, NV q);
+
+/* log dhyper(x; m white, n black, k drawn), by R's dhyper():
+ *
+ *      dhyper = dbinom(x; m, p) * dbinom(k-x; n, p) / dbinom(k; m+n, p),
+ *      p = k/(m+n)
+ *
+ * Differencing lgamma() gets the same answer for small tables and loses the
+ * back half of it for large ones: lgamma(8.4e7) is about 1.4e9, where a
+ * double's spacing is 2.4e-7, so a table like SciPy's gh-3014
+ * ([[1,2],[9,84419233]]) came out right to only seven digits.  The three
+ * saddle-point terms stay O(1) whatever the margins are, which is exactly why
+ * R computes its own hypergeometric this way. */
+static NV ft_dhyper_log(long x, long m, long n, long k) {
+	if (x < 0 || x > k || x > m || k - x > n) return -INFINITY;
+	if (k == 0) return (x == 0) ? 0.0 : -INFINITY;
+	NV N = (NV)m + (NV)n;
+	NV p = (NV)k / N, q = (N - (NV)k) / N;
+	return bt_dbinom_raw_log((NV)x, (NV)m, p, q)
+	     + bt_dbinom_raw_log((NV)(k - x), (NV)n, p, q)
+	     - bt_dbinom_raw_log((NV)k, N, p, q);
+}
+
 typedef struct {
 	long lo, hi, ns, m, n, k, x;
 	NV *restrict logdc;   // central log hypergeometric density over the support
@@ -280,8 +330,7 @@ static int ft_init(ft_support *S, long a, long b, long c, long d) {
 	Newx(S->logdc, S->ns, NV);
 	for (long i = 0; i < S->ns; i++) {
 	  long j = S->lo + i;
-	  S->logdc[i] = ft_lchoose(S->m, j) + ft_lchoose(S->n, S->k - j)
-				   - ft_lchoose(S->m + S->n, S->k);
+	  S->logdc[i] = ft_dhyper_log(j, S->m, S->n, S->k);
 	}
 	return 1;
 }
@@ -449,14 +498,89 @@ typedef struct {
 	int nrow, ncol;
 	const long *restrict R;   /* fixed row totals                       */
 	long *restrict C_rem;     /* remaining column totals (mutated)      */
+	const NV *restrict lgR;   /* lgR[i]  = sum_{k>=i} lgamma(R_k+1)     */
+	const NV *restrict jenR;  /* jenR[i] = sum_{k>=i} cheapest split of R_k  */
 	NV const_term;            /* sum lgamma(R_i+1)+lgamma(C_j+1)-lgamma(N+1) */
 	NV log_p_obs_tol;         /* log P(observed) + log1p(relErr)        */
 	NV p_total;               /* accumulated p-value                    */
-	long long nodes, cap;     /* leaf counter + overflow guard          */
+	long long nodes, cap;     /* work counter + runaway guard           */
 	int aborted;              /* set once cap is exceeded               */
 } ft_rxc_ctx;
 
 static void ft_rxc_row(ft_rxc_ctx *restrict X, int row, int col, long row_rem, NV cur_lc);
+
+/* qsort comparator: ascending margin totals. */
+static int ft_long_cmp(const void *a, const void *b) {
+	long x = *(const long *)a, y = *(const long *)b;
+	return (x > y) - (x < y);
+}
+
+/* The smallest sum of lgamma(t+1) that k cells adding up to `total` can have.
+ * lgamma(x+1) is convex, so the minimum is the most even split there is: the
+ * remainder r gets q+1 and the other k-r cells get q.  The continuous Jensen
+ * bound k*lgamma(total/k + 1) is easier to write but slacker, and the slack
+ * is what decides whether a subtree gets summed in closed form or walked. */
+static NV ft_even_split_lc(long total, long k) {
+	long q = total / k, r = total % k;
+	return (NV)r * lgamma((NV)q + 2.0) + (NV)(k - r) * lgamma((NV)q + 1.0);
+}
+
+/* Decide a whole subtree without walking it, where that is possible.
+ *
+ * With rows 0..row-1 placed (their lgamma(t+1) terms already summed into
+ * cur_lc) and C_rem holding what is left of each column, every completion T
+ * of the table satisfies
+ *
+ *      log P(T) = const_term - cur_lc - S,
+ *      S = sum of lgamma(t_ij + 1) over the cells still to be filled,
+ *
+ * so bounding S bounds log P over the entire subtree.  lgamma(x+1) is convex,
+ * so Jensen puts a floor under S -- spreading a row (or column) total evenly
+ * is the cheapest it can ever be -- and a! b! <= (a+b)! puts a ceiling on it,
+ * since piling a total into one cell is the dearest.  Rows and columns each
+ * yield both bounds; the tighter of the two is used.
+ *
+ * If even the most probable completion is already at or below the observed
+ * table's probability then every completion counts, and their combined mass
+ * has a closed form.  Counting the N' = sum(C_rem) remaining observations two
+ * ways -- assigned directly to rows, or column by column -- gives
+ *
+ *      sum over completions of prod 1/t_ij!
+ *          = N'! / ( prod_{i>=row} R_i!  prod_j C_rem_j! )
+ *
+ * which is the whole subtree in a single exp() instead of a walk over it.  If
+ * even the least probable completion sits above the threshold, nothing in the
+ * subtree counts and it is dropped outright.  Both tests are exact: they skip
+ * only work the enumeration would have done, and never change the sum.
+ *
+ * Returns 1 if the subtree was added whole, 2 if it was discarded whole, and
+ * 0 if it has to be enumerated after all. */
+static int ft_rxc_prune(ft_rxc_ctx *restrict X, int row, NV cur_lc) {
+	const long nrem = (long)(X->nrow - row);
+	NV n_left = 0.0;      /* N'                                       */
+	NV lg_c = 0.0;        /* sum_j lgamma(C_rem_j + 1)                */
+	NV jen_c = 0.0;       /* sum_j (cheapest split of C_rem_j over nrem cells) */
+	for (int j = 0; j < X->ncol; j++) {
+		long c = X->C_rem[j];
+		n_left += (NV)c;
+		lg_c   += lgamma((NV)c + 1.0);
+		jen_c  += ft_even_split_lc(c, nrem);
+	}
+	NV s_lo = X->jenR[row] > jen_c ? X->jenR[row] : jen_c;  /* S >= s_lo */
+	NV s_hi = X->lgR[row]  < lg_c  ? X->lgR[row]  : lg_c;   /* S <= s_hi */
+	NV base = X->const_term - cur_lc;
+
+	/* A rounding wobble at the threshold must not take a shortcut the
+	 * enumeration itself would not have taken, so both tests are asked for a
+	 * little more than they strictly need; falling through is always safe. */
+	const NV slack = 1e-9;
+	if (base - s_lo <= X->log_p_obs_tol - slack) {
+		X->p_total += exp(base + lgamma(n_left + 1.0) - X->lgR[row] - lg_c);
+		return 1;
+	}
+	if (base - s_hi > X->log_p_obs_tol + slack) return 2;
+	return 0;
+}
 
 /* Finish the current row; either recurse to the next free row, or (once the
  * last free row is placed) derive the final row from the column residuals. */
@@ -477,6 +601,14 @@ static void ft_rxc_after_row(ft_rxc_ctx *restrict X, int row, NV cur_lc) {
  * value that keeps both the row and the column residuals nonnegative. */
 static void ft_rxc_row(ft_rxc_ctx *restrict X, int row, int col, long row_rem, NV cur_lc) {
 	if (X->aborted) return;
+	/* Every visit is counted, not just the leaves: a table like PR#4688's
+	 * (4x3, N = 16442) spends minutes inside the interior of the tree before
+	 * it reaches enough leaves for a leaf-only counter to notice. */
+	if (++X->nodes > X->cap) { X->aborted = 1; return; }
+	if (col == 0) {
+		int decided = ft_rxc_prune(X, row, cur_lc);
+		if (decided) return;
+	}
 	if (col == X->ncol - 1) {
 		long v = row_rem;
 		if (v < 0 || v > X->C_rem[col]) return;
@@ -514,18 +646,48 @@ static NV fisher_rxc_pvalue(pTHX_ const long *restrict cells, int nrow, int ncol
 	NV obs_lc = 0.0;
 	for (int i = 0; i < nrow * ncol; i++) obs_lc += lgamma((NV)cells[i] + 1.0);
 
+	/* Everything the enumeration needs -- the two margins, const_term and
+	 * obs_lc -- is unchanged by permuting rows and columns or by transposing
+	 * the table, but the amount of walking is not, so the margins are put in
+	 * the cheapest arrangement before the walk starts.
+	 *
+	 * A row is laid out one cell at a time with its last cell forced by what
+	 * is left of the row, and the final row is forced outright by the column
+	 * residuals, so the branching factor of a row grows like R_i^(ncol-1) and
+	 * whatever lands last costs nothing.  Two consequences: keep the shorter
+	 * side as the columns (transposing MP6's 5x7 to 7x5 drops its worst case
+	 * from ~1e14 completions to ~1e11), and sort both margins ascending so
+	 * that the fattest row and the fattest column are the ones forced. */
+	if (ncol > nrow) {
+		long *restrict t = R; R = C; C = t;
+		int ti = nrow; nrow = ncol; ncol = ti;
+	}
+	qsort(R, nrow, sizeof(long), ft_long_cmp);
+	qsort(C, ncol, sizeof(long), ft_long_cmp);
+
+	/* Suffix sums over the rows still to be placed, for ft_rxc_prune(). */
+	NV *restrict lgR = NULL, *restrict jenR = NULL;
+	Newx(lgR, nrow + 1, NV);
+	Newx(jenR, nrow + 1, NV);
+	lgR[nrow] = jenR[nrow] = 0.0;
+	for (int i = nrow - 1; i >= 0; i--) {
+		lgR[i]  = lgR[i + 1]  + lgamma((NV)R[i] + 1.0);
+		jenR[i] = jenR[i + 1] + ft_even_split_lc(R[i], ncol);
+	}
+
 	ft_rxc_ctx X;
 	X.nrow = nrow; X.ncol = ncol; X.R = R; X.C_rem = C;
+	X.lgR = lgR; X.jenR = jenR;
 	X.const_term = const_term;
 	X.log_p_obs_tol = (const_term - obs_lc) + log1p(1e-7);
 	X.p_total = 0.0;
-	X.nodes = 0; X.cap = 200000000LL; X.aborted = 0;
+	X.nodes = 0; X.cap = 50000000LL; X.aborted = 0;
 
 	ft_rxc_row(&X, 0, 0, R[0], 0.0);
 
 	NV p = X.aborted ? -1.0 : X.p_total;
 	if (p > 1.0) p = 1.0;
-	Safefree(R); Safefree(C);
+	Safefree(R); Safefree(C); Safefree(lgR); Safefree(jenR);
 	return p;
 }
 
@@ -2229,7 +2391,13 @@ static void tex_escape_sv(pTHX_ SV *restrict out, const char *restrict s,
 	if (do_format && *s) {
 		SV *restrict tmp = sv_2mortal(newSVpv(s, 0));
 		if (looks_like_number(tmp)) {
-			snprintf(numbuf, sizeof(numbuf), "%.4" NVgf, SvNV(tmp)); // NVgf expands to "Lg" on long-double builds
+// snprintf_nv (my_snprintf), not snprintf: NVgf is "g", "Lg" or "Qg"
+// depending on the build, and the C library only knows the first two. A
+// quadmath build gets "%.4Qg" right here only because libquadmath's
+// constructor teaches glibc the Q modifier -- a glibc extension no other
+// platform offers. my_snprintf routes through quadmath_snprintf() itself,
+// so it is correct on every build.
+			snprintf_nv(numbuf, sizeof(numbuf), "%.4" NVgf, SvNV(tmp));
 			s = numbuf;
 			is_utf8 = 0; // the formatted number is plain ASCII
 		}
@@ -5096,24 +5264,26 @@ static NV bt_bd0(NV x, NV np) {
 	return x * log(x / np) + np - x;
 }
 
-/* Binomial PMF via R's dbinom_raw (q = 1 - p) */
-static NV bt_dbinom_raw(NV x, NV n, NV p, NV q) {
-	if (p == 0.0) return (x == 0.0) ? 1.0 : 0.0;
-	if (q == 0.0) return (x == n)   ? 1.0 : 0.0;
+/* Binomial PMF via R's dbinom_raw (q = 1 - p), in log form.  The plain form
+ * below is exp() of this, so the two cannot drift apart; the log form is what
+ * the hypergeometric density wants, since a term there can be 1e-178. */
+static NV bt_dbinom_raw_log(NV x, NV n, NV p, NV q) {
+	if (p == 0.0) return (x == 0.0) ? 0.0 : -INFINITY;
+	if (q == 0.0) return (x == n)   ? 0.0 : -INFINITY;
 	if (x == 0.0) {
-		if (n == 0.0) return 1.0;
-		NV lc = (p < 0.1) ? -bt_bd0(n, n * q) - n * p : n * log(q);
-		return exp(lc);
+		if (n == 0.0) return 0.0;
+		return (p < 0.1) ? -bt_bd0(n, n * q) - n * p : n * log(q);
 	}
-	if (x == n) {
-		NV lc = (q < 0.1) ? -bt_bd0(n, n * p) - n * q : n * log(p);
-		return exp(lc);
-	}
-	if (x < 0.0 || x > n) return 0.0;
+	if (x == n) return (q < 0.1) ? -bt_bd0(n, n * p) - n * q : n * log(p);
+	if (x < 0.0 || x > n) return -INFINITY;
 	NV lc = bt_stirlerr(n) - bt_stirlerr(x) - bt_stirlerr(n - x)
 	      - bt_bd0(x, n * p) - bt_bd0(n - x, n * q);
 	NV lf = M_LN_2PI + log(x) + log1p(-x / n); // better than log(n-x)-log(n) for x<<n
-	return exp(lc - 0.5 * lf);
+	return lc - 0.5 * lf;
+}
+
+static NV bt_dbinom_raw(NV x, NV n, NV p, NV q) {
+	return exp(bt_dbinom_raw_log(x, n, p, q));
 }
 
 static NV bt_dbinom(long x, long n, NV p) {
@@ -17371,12 +17541,16 @@ CODE:
 	 * loses the whole chi density, which is how n => 1 used to report a power
 	 * of 0.99998. R hides the same degeneracy behind pmax(1e-07, n - 1) and
 	 * returns a power of 0; saying so outright is more use than either number. */
-	/* croak() reads a double for %g, so an NV has to be cast: on a long-double
-	 * build the promotion would not happen on its own. */
+	/* croak() formats through Perl, not the C library, so an NV needs NVgf
+	 * ("g", "Lg", or "Qg") rather than a bare %g: a quadmath build rejects a
+	 * format without the Q modifier outright ("panic: quadmath invalid
+	 * format"), and casting the argument to double cannot rescue it.
+	 * croak_nv() (see the top of this file) is croak() minus the format
+	 * attribute, which the compiler's format checker mis-flags on "Qg". */
 	if (!is_null_n && !(n >= 2.0))
-	  croak("power_t_test: 'n' must be at least 2, not %g", (double)n);
+	  croak_nv("power_t_test: 'n' must be at least 2, not %" NVgf, n);
 	if (!is_null_sd && sd < 0.0)
-	  croak("power_t_test: 'sd' must not be negative, not %g", (double)sd);
+	  croak_nv("power_t_test: 'sd' must not be negative, not %" NVgf, sd);
 
 	/* R reaches these through match.arg(), so a misspelling is an error there.
 	 * Silently reading an unrecognised type as "two.sample" turned every typo
@@ -17406,10 +17580,9 @@ CODE:
 	  NV low = 2.0, high = 1e7;
 	  while (high < 1e12 && ptt_f(&c, high) < 0.0) high *= 2.0;
 	  n = ptt_root(&c, low, high, tol);
-	  if (n != n) croak("power_t_test: no 'n' in [%g, %g] gives a power of %g "
-			  "(delta = %g, sd = %g, sig_level = %g)",
-			  (double)low, (double)high, (double)power,
-			  (double)delta, (double)sd, (double)sig_level);
+	  if (n != n) croak_nv("power_t_test: no 'n' in [%" NVgf ", %" NVgf "] gives a power of %" NVgf " "
+			  "(delta = %" NVgf ", sd = %" NVgf ", sig_level = %" NVgf ")",
+			  low, high, power, delta, sd, sig_level);
 	} else if (is_null_sd) {
 	  /* power falls as sd rises. The bracket scales with |delta|, so a delta of
 	   * 0 collapses it to a single point -- R fails there with "lower < upper is
@@ -17420,29 +17593,27 @@ CODE:
 	  while (high < ad * 1e12 && ptt_f(&c, high) > 0.0) high *= 2.0;
 	  while (low > ad * 1e-12 && ptt_f(&c, low) < 0.0) low *= 0.5;
 	  sd = ptt_root(&c, low, high, tol);
-	  if (sd != sd) croak("power_t_test: no 'sd' in [%g, %g] gives a power of %g "
-			  "(n = %g, delta = %g, sig_level = %g)",
-			  (double)low, (double)high, (double)power,
-			  (double)n, (double)delta, (double)sig_level);
+	  if (sd != sd) croak_nv("power_t_test: no 'sd' in [%" NVgf ", %" NVgf "] gives a power of %" NVgf " "
+			  "(n = %" NVgf ", delta = %" NVgf ", sig_level = %" NVgf ")",
+			  low, high, power, n, delta, sig_level);
 	} else if (is_null_delta) {
 	  if (!(sd > 0.0)) croak("power_t_test: cannot solve for 'delta' unless 'sd' is positive");
 	  c.which = PTT_DELTA;
 	  NV low = sd * 1e-7, high = sd * 1e7;
 	  while (high < sd * 1e12 && ptt_f(&c, high) < 0.0) high *= 2.0;
 	  delta = ptt_root(&c, low, high, tol);
-	  if (delta != delta) croak("power_t_test: no 'delta' in [%g, %g] gives a power of %g "
-			  "(n = %g, sd = %g, sig_level = %g)",
-			  (double)low, (double)high, (double)power,
-			  (double)n, (double)sd, (double)sig_level);
+	  if (delta != delta) croak_nv("power_t_test: no 'delta' in [%" NVgf ", %" NVgf "] gives a power of %" NVgf " "
+			  "(n = %" NVgf ", sd = %" NVgf ", sig_level = %" NVgf ")",
+			  low, high, power, n, sd, sig_level);
 	} else { /* is_null_sig_level */
 	  /* A significance level is a probability, so unlike the others this bracket
 	   * cannot be widened. R widens it anyway (extendInt = "yes") and will
 	   * happily return a sig.level above 1; refusing is the honest answer. */
 	  c.which = PTT_SIG;
 	  sig_level = ptt_root(&c, 1e-10, 1.0 - 1e-10, tol);
-	  if (sig_level != sig_level) croak("power_t_test: no 'sig_level' in (0, 1) gives a power of %g "
-			  "(n = %g, delta = %g, sd = %g)",
-			  (double)power, (double)n, (double)delta, (double)sd);
+	  if (sig_level != sig_level) croak_nv("power_t_test: no 'sig_level' in (0, 1) gives a power of %" NVgf " "
+			  "(n = %" NVgf ", delta = %" NVgf ", sd = %" NVgf ")",
+			  power, n, delta, sd);
 	}
 	HV*restrict ret = newHV();
 	hv_stores(ret, "n", newSVnv(n));

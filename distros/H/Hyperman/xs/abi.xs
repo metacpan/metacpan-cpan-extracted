@@ -20,3 +20,12 @@ _abi_selftest()
         RETVAL = hm_abi_selftest(aTHX);
     OUTPUT:
         RETVAL
+
+# The table's version, for tests and for a consumer that would rather ask
+# than dereference the pointer itself.
+IV
+_abi_version()
+    CODE:
+        RETVAL = hm_abi_table.abi_version;
+    OUTPUT:
+        RETVAL

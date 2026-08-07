@@ -17,6 +17,10 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "package" : [
+         "Dist::Starter::Context",
+         "Dist::Starter::Exception"
       ]
    },
    "prereqs" : {
@@ -72,15 +76,7 @@
    "provides" : {
       "Dist::Starter" : {
          "file" : "lib/Dist/Starter.pm",
-         "version" : "v0.1.0"
-      },
-      "Dist::Starter::Context" : {
-         "file" : "lib/Dist/Starter/Context.pm",
-         "version" : "v0.1.0"
-      },
-      "Dist::Starter::Exception" : {
-         "file" : "lib/Dist/Starter/Exception.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
@@ -94,6 +90,6 @@
          "web" : "https://codeberg.org/XSven/Dist-Starter"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -88,6 +88,92 @@ static SV *ft_ua_new(pTHX_ const char *cls, SV **kv, int nkv) {
     return sv_bless(newRV_noinc(newSViv(PTR2IV(ua))), gv_stashpv(cls, GV_ADD));
 }
 
+/* A second agent over this one's connection pool and loop, with some options
+ * replaced.
+ *
+ * The case this exists for is a per-request cookie jar. A jar on a long-lived
+ * agent is shared by every request that agent serves, which leaks between them
+ * the moment the cookies identify an end user rather than the application; and
+ * building a whole fresh agent per request to avoid that throws away the
+ * keep-alive pool and re-resolves the loop adapter, which is most of what
+ * new() costs. A clone gives the caller its own jar over the same pool.
+ *
+ * Sharing is safe because DESTROY only releases references: the pool and the
+ * loop live until the last agent holding them goes. `loop` and `pool_size`
+ * cannot be overridden - they are the things being shared, and a clone on a
+ * different loop would be driving the parent's parked connections from the
+ * wrong place. */
+static SV *ft_ua_clone(pTHX_ SV *self, SV **kv, int nkv) {
+    ft_ua *src = ft_ua_of(aTHX_ self);
+    ft_ua *ua;
+    SV *headers_arg = NULL, *agent_arg = NULL, *jar_arg = NULL;
+    int have_jar = 0, have_keep = 0, keep = 0, have_verify = 0, verify = 0;
+    int have_maxr = 0, maxr = 0, have_simple = 0, simple = 0, have_to = 0;
+    double timeout = 0.0;
+    const char *cls;
+    int i;
+
+    if (!(SvROK(self) && SvOBJECT(SvRV(self))))
+        croak("Fetch->clone: not a Fetch user agent");
+    cls = HvNAME(SvSTASH(SvRV(self)));
+
+    for (i = 0; i + 1 < nkv; i += 2) {
+        const char *k = SvPV_nolen(kv[i]);
+        SV *v = kv[i + 1];
+        if      (strEQ(k, "cookie_jar"))     { have_jar = 1; jar_arg = v; }
+        else if (strEQ(k, "headers"))          headers_arg = v;
+        else if (strEQ(k, "agent"))            agent_arg = v;
+        else if (strEQ(k, "keep_alive"))     { have_keep = 1;   keep = SvTRUE(v) ? 1 : 0; }
+        else if (strEQ(k, "tls_verify"))     { have_verify = 1; verify = SvTRUE(v) ? 1 : 0; }
+        else if (strEQ(k, "max_redirects"))  { have_maxr = 1;   maxr = (int)SvIV(v); }
+        else if (strEQ(k, "timeout"))        { have_to = 1;     timeout = SvNV(v); }
+        else if (strEQ(k, "simple_response")){ have_simple = 1; simple = SvTRUE(v) ? 1 : 0; }
+        else if (strEQ(k, "loop") || strEQ(k, "pool_size"))
+            croak("Fetch->clone: '%s' cannot be overridden on a clone; the "
+                  "loop and the connection pool are what it shares", k);
+    }
+
+    Newxz(ua, 1, ft_ua);
+    /* shared with the parent, by reference */
+    ua->loop    = src->loop ? SvREFCNT_inc(src->loop) : NULL;
+    ua->pool    = src->pool ? SvREFCNT_inc(src->pool) : NULL;
+    ua->hm      = src->hm;
+    ua->hm_loop = src->hm_loop;
+    /* inherited unless overridden */
+    ua->keep_alive      = have_keep    ? keep    : src->keep_alive;
+    ua->tls_verify      = have_verify  ? verify  : src->tls_verify;
+    ua->max_redirects   = have_maxr    ? maxr    : src->max_redirects;
+    ua->simple_response = have_simple  ? simple  : src->simple_response;
+    ua->timeout         = have_to      ? timeout : src->timeout;
+
+    if (have_jar) {
+        /* an explicit undef/0 means "no jar", which is how a clone drops one */
+        if (jar_arg && SvOK(jar_arg)) {
+            if (SvROK(jar_arg))       ua->cookie_jar = SvREFCNT_inc(jar_arg);
+            else if (SvTRUE(jar_arg)) ua->cookie_jar =
+                ft_load_new(aTHX_ "Fetch::CookieJar", NULL);
+        }
+    }
+    else ua->cookie_jar = src->cookie_jar ? SvREFCNT_inc(src->cookie_jar) : NULL;
+
+    /* Headers are copied, not shared: a clone that mutated a shared list would
+     * be writing into every other agent's defaults. */
+    {
+        AV *hav = newAV();
+        if (src->headers) ft_hdr_pairs_into(aTHX_ hav, src->headers);
+        if (headers_arg && SvOK(headers_arg))
+            ft_hdr_pairs_into(aTHX_ hav, headers_arg);
+        ua->headers = sv_bless(newRV_noinc((SV *)hav),
+                               gv_stashpv("Fetch::Headers", GV_ADD));
+    }
+
+    ua->agent = (agent_arg && SvOK(agent_arg))
+              ? newSVsv(agent_arg)
+              : (src->agent ? SvREFCNT_inc(src->agent) : NULL);
+
+    return sv_bless(newRV_noinc(newSViv(PTR2IV(ua))), gv_stashpv(cls, GV_ADD));
+}
+
 static SV *ft_abi_ua_new(pTHX_ SV **kv, int nkv) {
     return ft_ua_new(aTHX_ "Fetch", kv, nkv);
 }

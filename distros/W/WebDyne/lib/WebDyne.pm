@@ -62,7 +62,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='3.009';
+$VERSION='3.011';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -215,7 +215,8 @@ sub handler : method {    # no subsort
     if (ref($r)=~/^Apache/) {
         debug("converting r: $r to WebDyne::Request::Apache module");
         require WebDyne::Request::Apache;
-        $r=WebDyne::Request::Apache->new($r);
+        my %opt=map { do { (my $k=lc($_))=~s/^webdyne_request_//i; ($k=>$ENV{$_}) } } (grep {/^WEBDYNE_REQUEST_/} keys %ENV);
+        $r=WebDyne::Request::Apache->new($r, %opt);
         debug("r now: $r");
     }
 
@@ -892,7 +893,7 @@ sub handler : method {    # no subsort
 
     );
     debug('header_out_hr: %s', Dumper($header_out_hr));
-    foreach (keys %header_out) {$header_out_hr->{$_}=$header_out{$_}}
+    foreach (keys %header_out) {$r->headers_out($_ => $header_out{$_})}
 
 
     #  Debug
@@ -5044,8 +5045,17 @@ L<Plack|https://metacpan.org/pod/Plack> L<Catalyst|https://metacpan.org/pod/Cata
 Andrew Speer L<mailto:andrew.speer@isolutions.com.au> and contributors.
 
 
-=head1 LICENSE
+=head1 LICENSE and COPYRIGHT
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See  L<http://dev.perl.org/licenses/|http://dev.perl.org/licenses/> .
+This file is part of WebDyne.
+
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
 
 =cut

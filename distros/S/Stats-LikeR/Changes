@@ -1,6 +1,54 @@
 Revision history for Stats-LikeR
 
 
+0.293 2026-08-06 CDT
+
+ - Fixed quadmath error https://www.cpantesters.org/cpan/report/83bcd9a2-9123-11f1-aac1-f3cd035a6881
+
+ - `fisher_test` was cross-validated against R 4.6.1 `stats::fisher.test` and SciPy
+   1.17.1 `scipy.stats.fisher_exact` using their own test suites rather than cases
+   invented here: SciPy's 84-case R-generated corpus
+   (`scipy/stats/tests/data/fisher_exact_results_from_r.py`, four numbers per case
+   over two confidence levels and all three alternatives), its
+   `TestFisherExact`, R's regression suite (`tests/reg-tests-1{a,b,d,e}.R`:
+   PR#644, PR#1662, PR#4688, PR#10558, PR#18336, PR#17671 and the "exact
+   fisher.test" entry) and the `?fisher.test` examples. They are in
+   `t/fisher_test.R.scipy.t`. Three fixes came out of it:
+
+ - The 2x2 hypergeometric density was built by differencing `lgamma`, which
+     costs the back half of a large table's p-value: at a margin of 8.4e7,
+     `lgamma` is about 1.4e9, where a double's spacing is 2.4e-7, and exponentiating
+     that turns into a relative error of the same size. SciPy's gh-3014 case came
+     out right to only seven digits. The density is now assembled from Loader's
+     saddle-point binomial, which is how R's own `dhyper` avoids this and which
+     `binom_test` already had in the file; its three terms stay O(1) whatever the
+     margins are. Worst-case agreement with R over the 84-case corpus went from
+     2.1e-12 to 5.2e-14 relative, and gh-3014 from 2.2e-07 to 1.5e-16.
+ - The R x C enumeration charged only its leaves against its safety cap, so a
+     table wide enough to spend the time in the interior of the tree neither
+     finished nor stopped: R's PR#4688 table (4x3, N = 16442), whose whole point
+     upstream is that `fisher.test` must fail rather than return `p = Inf`, ran for
+     over five minutes here without doing either. Every node is now counted, and
+     that table is declined in about a second.
+ - The R x C enumeration now bounds each subtree before walking it. `lgamma(x+1)`
+     is convex and `a!b! <= (a+b)!`, which together bracket the probability of every
+     completion of a partial table; when the whole subtree falls inside the tail its
+     mass is added in closed form (`N'! / (prod R_i! prod C_j!)`, from counting the
+     remaining observations into rows two ways), and when it falls outside the
+     subtree is dropped. The margins are also transposed and sorted first, so the
+     fattest row and column are the ones the enumeration gets for free. R's Job
+     Satisfaction 4x4 example went from 7.5s to 0.3s and PR#644's 19x2 from 1.0s to
+     under 0.05s, and the 6x6 table of PR#18336 -- which segfaulted R before 4.2.0
+     and which R 4.6.1 still declines with `hash key 5e+09 > INT_MAX` -- is now
+     computable at 0.6322160531, agreeing with R's own 2e6-replicate
+     `simulate.p.value` fallback to within its sampling error.
+
+ - Two behaviours that the two references disagree about are now pinned by tests
+   rather than left to chance: a table with an empty row or column returns R's
+   `p = 1` with an odds ratio of 0 and a CI of (0, Inf), not SciPy's NaN odds ratio;
+   and a table with a single row or column is rejected as R rejects it, rather than
+   returning SciPy's `p = 1`.
+
 0.292 2026-08-05 CDT
 
  - fixed long-double bug https://www.cpantesters.org/cpan/report/506975f6-906a-11f1-8f30-a201c4f2440e

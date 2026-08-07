@@ -10,6 +10,7 @@ The one thing I did learn was not to copy the dist.ini file into the tarball.
 
 ### Getting ready for release
 
+Check Issues for cpants reports
 Update Changes with git log messages under the `{{NEXT}}` tag.
 Bump version numbers with `vi dist.ini lib/WebService/OurWorldInData.pm`
 Commit all files

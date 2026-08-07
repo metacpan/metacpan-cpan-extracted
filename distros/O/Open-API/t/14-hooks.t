@@ -5,6 +5,7 @@ use warnings;
 use FindBin ();
 use Test::More;
 use Open::API;
+use Open::API::Plack;
 use File::Raw::JSON qw(file_json_decode);
 
 # before / after request hooks: auth-style short-circuit from before, header
@@ -40,7 +41,7 @@ my %handlers = (
 # ---- before: auth short-circuit -------------------------------------------------
 {
     my $handler_ran = 0;
-    my $app = $api->to_app(
+    my $app = Open::API::Plack->new(api => $api,
         handlers => { %handlers, listPets => sub { $handler_ran++; [] } },
         before   => sub {
             my ($env, $op_id) = @_;
@@ -49,7 +50,7 @@ my %handlers = (
             $env->{'openapi.user'} = 'alice';   # stash for the handler
             return;                              # continue
         },
-    );
+    )->to_app;
 
     my $r = req($app, path => '/pets');
     is($r->[0], 401, 'before short-circuits without auth');
@@ -64,10 +65,10 @@ my %handlers = (
 
 # ---- before: non-reference returns continue; die is a 500 ------------------------
 {
-    my $app = $api->to_app(handlers => \%handlers, before => sub { 1 });
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, before => sub { 1 })->to_app;
     is(req($app, path => '/pets')->[0], 200, 'non-ref before return continues');
 
-    $app = $api->to_app(handlers => \%handlers, before => sub { die "authsplode\n" });
+    $app = Open::API::Plack->new(api => $api, handlers => \%handlers, before => sub { die "authsplode\n" })->to_app;
     my $r = req($app, path => '/pets');
     is($r->[0], 500, 'before die is a 500');
     like(body_json($r)->{errors}[0]{message}, qr/authsplode/, 'die message kept');
@@ -76,21 +77,21 @@ my %handlers = (
 # ---- after: mutate in place / replace / ignore non-triplet ------------------------
 {
     my @seen;
-    my $app = $api->to_app(handlers => \%handlers, after => sub {
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, after => sub {
         my ($resp, $env, $op_id) = @_;
         push @seen, "$op_id:$resp->[0]";
         push @{ $resp->[1] }, 'X-Served-By' => 'hook';   # mutate in place
         return 1;                                        # non-triplet: ignored
-    });
+    })->to_app;
     my $r = req($app, path => '/pets');
     is($r->[0], 200, 'after non-triplet return keeps the response');
     my %h = @{ $r->[1] };
     is($h{'X-Served-By'}, 'hook', 'after mutated headers in place');
     is_deeply(\@seen, ['listPets:200'], 'after saw op + status');
 
-    $app = $api->to_app(handlers => \%handlers, after => sub {
+    $app = Open::API::Plack->new(api => $api, handlers => \%handlers, after => sub {
         [ 418, ['Content-Type' => 'text/plain'], ['teapot'] ];
-    });
+    })->to_app;
     $r = req($app, path => '/pets');
     is($r->[0], 418, 'after triplet return replaces the response');
 }
@@ -98,10 +99,10 @@ my %handlers = (
 # ---- after runs on op-matched errors, not on 404 -----------------------------------
 {
     my @codes;
-    my $app = $api->to_app(
+    my $app = Open::API::Plack->new(api => $api,
         handlers => { %handlers, listPets => sub { die "boom\n" } },
         after    => sub { push @codes, $_[0][0]; return },
-    );
+    )->to_app;
     req($app, path => '/pets/abc');   # 400 validation
     req($app, path => '/pets');      # 500 handler die
     req($app, path => '/nope');      # 404 - no op, no hook
@@ -115,13 +116,13 @@ my %handlers = (
         sub before { return }
         sub after  { push @{ $_[0][1] }, 'X-Pkg' => 'yes'; return }
     }
-    my $app = $api->to_app(handlers => \%handlers,
-        before => 'My::Hooks::before', after => 'My::Hooks::after');
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers,
+        before => 'My::Hooks::before', after => 'My::Hooks::after')->to_app;
     my %h = @{ req($app, path => '/pets')->[1] };
     is($h{'X-Pkg'}, 'yes', 'string hook names resolve');
 
     my $err;
-    eval { $api->to_app(handlers => \%handlers, before => 'No::Such::hook') }
+    eval { Open::API::Plack->new(api => $api, handlers => \%handlers, before => 'No::Such::hook')->to_app }
         or $err = $@;
     like($err, qr/'before' hook names no such sub/, 'bad hook name croaks at to_app');
 }
@@ -130,13 +131,13 @@ my %handlers = (
 SKIP: {
     skip 'Fetch not installed', 5 unless eval { require Fetch; 1 };
 
-    my $app = $api->to_app(
+    my $app = Open::API::Plack->new(api => $api,
         handlers => { %handlers, listPets => sub {
             Fetch::Future->done_future(
                 [ 200, ['Content-Type' => 'application/json'], ['[{"id":1,"name":"rex"}]'] ]);
         } },
         after => sub { push @{ $_[0][1] }, 'X-Async' => 'yes'; return },
-    );
+    )->to_app;
     my $f = req($app, path => '/pets', env => { 'psgi.nonblocking' => 1 });
     ok($f && ref($f) && $f->can('get'), 'nonblocking + after returns a future');
     my $r = $f->get;
@@ -145,12 +146,12 @@ SKIP: {
     is($h{'X-Async'}, 'yes', 'after hook ran inside the chain');
 
     # response validation now applies to Future returns too
-    my $lying = $api->to_app(
+    my $lying = Open::API::Plack->new(api => $api,
         validate_responses => 1,
         handlers => { %handlers, getPet => sub {
             Fetch::Future->done_future({ wrong => 'shape' });
         } },
-    );
+    )->to_app;
     my $vf = req($lying, path => '/pets/1', env => { 'psgi.nonblocking' => 1 });
     my $vr = $vf->get;
     is($vr->[0], 500, 'response validation catches a lying future handler');

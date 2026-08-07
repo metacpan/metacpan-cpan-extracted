@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000061';
+our $VERSION = '0.000062';
 
 use Errno qw/EEXIST/;
 use File::Path qw/remove_tree/;
@@ -201,22 +201,153 @@ BEGIN {
     $CP    = can_run('cp');
 }
 
+# clone_dir($src, $dest, %params) -- copy a data dir, dying on failure with the
+# decoded exit status, both paths and the tool's stderr. %params: checksum,
+# verbose. The rsync backend retries a partial transfer and warns when it does.
 sub clone_dir {
     return _clone_dir_rsync(@_) if $RSYNC;
     return _clone_dir_cp(@_)    if $CP;
     return _clone_dir_fcr(@_);
 }
 
+# Decode a wait status into an actionable message. $bang is passed in because
+# the filehandle ops between system() and this call would have clobbered $!.
+sub _copy_error {
+    my ($cmd, $status, $src, $dest, $stderr, $bang) = @_;
+
+    my $msg = "$cmd failed copying '$src' -> '$dest': ";
+
+    if ($status == -1) {
+        $msg .= "could not execute (" . (defined($bang) ? $bang : $!) . ")";
+    }
+    elsif (my $sig = $status & 127) {
+        $msg .= "terminated by signal $sig" . (($status & 128) ? " (core dumped)" : "");
+    }
+    else {
+        $msg .= "exited " . ($status >> 8);
+    }
+
+    $msg .= "\n=== $cmd stderr ===\n$stderr" if defined($stderr) && length($stderr);
+
+    return $msg;
+}
+
+# Run $cmd with its stderr captured to a scratch file, returning ($status,
+# $stderr, $errno). Only stderr is redirected: rsync writes -vP progress to
+# STDOUT, so verbose runs still stream live exactly as before.
+sub _run_captured {
+    my (@cmd) = @_;
+
+    require File::Temp;
+
+    # QDB_TMPDIR because File::Spec->tmpdir falls back to the CURRENT DIRECTORY
+    # when /tmp is unwritable. UNLINK is only a backstop -- File::Temp keeps the
+    # handle registered, so a leak here would hold the fd until process exit;
+    # every path below unlinks explicitly.
+    my ($fh, $file) = File::Temp::tempfile(
+        "qdb-copy-err-$$-XXXXXXXX",
+        $ENV{QDB_TMPDIR} ? (DIR => $ENV{QDB_TMPDIR}) : (TMPDIR => 1),
+        UNLINK => 1,
+    );
+
+    # Best effort: a caller that closed STDERR (a daemonizer, say) makes this
+    # dup fail, and it could copy fine before capturing existed. Run uncaptured
+    # rather than failing the copy over diagnostics.
+    my $save;
+    unless (open($save, '>&', \*STDERR)) {
+        close($fh);
+        unlink($file);
+
+        system(@cmd);
+        my ($st, $bg) = ($?, $!);
+
+        return ($st, '', $bg);
+    }
+
+    # Restore STDERR on every path: reopening it closes it first, so bailing out
+    # mid-way would leave the process with no STDERR and free fd 2 for the next
+    # open(). Redirect through File::Temp's handle rather than reopening the
+    # path by name, which is the symlink race File::Temp exists to avoid.
+    my ($status, $bang);
+    my $ok = eval {
+        open(STDERR, '>&', $fh) or die "Could not redirect STDERR: $!";
+
+        system(@cmd);
+        ($status, $bang) = ($?, $!);    # before anything can clobber them
+
+        1;
+    };
+    my $err = $@;
+
+    open(STDERR, '>&', $save) or warn "Could not restore STDERR: $!";
+    close($save);
+
+    # Drain and clean up before any rethrow: an escaping exception would leave
+    # $fh registered with File::Temp, holding the fd until process exit. Rewind
+    # first, since the dup shared its offset with the child's writes.
+    my $stderr = '';
+    if (seek($fh, 0, 0)) {
+        local $/;
+        $stderr = <$fh> // '';
+    }
+    close($fh);
+    unlink($file);
+
+    die $err unless $ok;
+
+    return ($status, $stderr, $bang);
+}
+
+# Attempts for rsync exit 23, "partial transfer due to error". Exit 24
+# ("vanished source files") is not retried -- the source is gone.
+my $RSYNC_RETRIES = 3;
+
 sub _clone_dir_rsync {
     my ($src, $dest, %params) = @_;
-    system($RSYNC, '-a', '--delete', '--exclude' => '.nfs*', $params{checksum} ? ('-c') : (), $params{verbose} ? ( '-vP' ) : (), "$src/", $dest) and die "$RSYNC returned $?";
+
+    my @cmd = (
+        $RSYNC, '-a', '--delete', '--exclude' => '.nfs*',
+        $params{checksum} ? ('-c') : (),
+        $params{verbose}  ? ('-vP') : (),
+        "$src/", $dest,
+    );
+
+    for my $try (1 .. $RSYNC_RETRIES) {
+        my ($status, $stderr, $bang) = _run_captured(@cmd);
+
+        unless ($status) {
+            print STDERR $stderr if length $stderr;
+            return;
+        }
+
+        my $code = ($status == -1 || ($status & 127)) ? undef : ($status >> 8);
+
+        die _copy_error($RSYNC, $status, $src, $dest, $stderr, $bang)
+            if !defined($code) || $code != 23 || $try == $RSYNC_RETRIES;
+
+        # A retry that succeeds leaves this warning as the only record that a
+        # partial transfer happened at all.
+        my $msg = "$RSYNC exited 23 (partial transfer) copying '$src' -> '$dest'"
+            . " on attempt $try of $RSYNC_RETRIES, retrying";
+        $msg .= "\n=== $RSYNC stderr ===\n$stderr" if length $stderr;
+        warn "$msg\n";
+
+        sleep(0.25 * $try);
+    }
+
+    return;
 }
 
 sub _clone_dir_cp {
     my ($src, $dest, %params) = @_;
     my $err;
     remove_tree($dest, {safe => 1, keep_root => 1, error => \$err}) if -d $dest;
-    system($CP, '-a', $params{verbose} ? ( '-v' ) : (), "$src/.", $dest) and die "$CP returned $?";
+
+    my ($status, $stderr, $bang) = _run_captured($CP, '-a', $params{verbose} ? ('-v') : (), "$src/.", $dest);
+    die _copy_error($CP, $status, $src, $dest, $stderr, $bang) if $status;
+    print STDERR $stderr if length $stderr;
+
+    return;
 }
 
 sub _clone_dir_fcr {
@@ -225,7 +356,8 @@ sub _clone_dir_fcr {
 
     my $err;
     remove_tree($dest, {safe => 1, keep_root => 1, error => \$err}) if -d $dest;
-    File::Copy::Recursive::dircopy($src, $dest) or die "$!";
+    File::Copy::Recursive::dircopy($src, $dest)
+        or die "File::Copy::Recursive::dircopy failed copying '$src' -> '$dest': $!";
 }
 
 sub strip_hash_defaults {

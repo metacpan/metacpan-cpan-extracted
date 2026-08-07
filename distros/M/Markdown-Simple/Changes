@@ -1,5 +1,10 @@
 Revision history for Markdown-Simple
 
+0.19    2026-08-07
+        - Fix a memory leak on every render.
+        - Fix a second leak in the block scanner.
+        - Add t/56-render-leak.t
+
 0.17    2026-07-12
         - Add highlight => 1 render option: fenced code blocks with a
           language tag are syntax-highlighted via Eshu's eshu_hl.h pass,

@@ -13,7 +13,9 @@ lib/Sidef/Deparse/Sidef.pod
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
 lib/Sidef/Module/Func.pm
+lib/Sidef/Module/Func.pod
 lib/Sidef/Module/OO.pm
+lib/Sidef/Module/OO.pod
 lib/Sidef/Object/Convert.pm
 lib/Sidef/Object/Convert.pod
 lib/Sidef/Object/Enumerator.pm
@@ -932,7 +934,6 @@ scripts/Tests/method_expressions.sf
 scripts/Tests/miller_rabin_primality_test.sf
 scripts/Tests/mod_class.sf
 scripts/Tests/modular_k-th_root_all_solutions_znlog.sf
-scripts/Tests/modular_quadratic_formula.sf
 scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
 scripts/Tests/Module/Fib.sm
@@ -1064,7 +1065,6 @@ scripts/Tests/sets_1.sf
 scripts/Tests/sets_2.sf
 scripts/Tests/sidef_executor.sf
 scripts/Tests/sidef_keywords.sf
-scripts/Tests/sidef_to_json.sf
 scripts/Tests/sierpinski_alphabet.sf
 scripts/Tests/sierpinski_carpet.sf
 scripts/Tests/sierpinski_diamond.sf
@@ -1079,7 +1079,7 @@ scripts/Tests/slurpy_static.sf
 scripts/Tests/smart_match_operator.sf
 scripts/Tests/smooth_numbers.sf
 scripts/Tests/smooth_rough.sf
-scripts/Tests/solve_lcg.sf
+scripts/Tests/solve_modular_congruences.sf
 scripts/Tests/sort_disjoint_sublist.sf
 scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf
@@ -1206,7 +1206,9 @@ utils/find_undefined_methods.pl
 utils/gource-video.sh
 utils/grep_errors.sh
 utils/make_pdfs.sh
+utils/make_pod2pdf.pl
 utils/pod_generator.pl
+utils/pod_word_unwrap.sf
 utils/sidef2bin.sh
 utils/sidef2exe.txt
 utils/test_deparser.pl

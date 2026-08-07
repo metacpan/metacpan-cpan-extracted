@@ -45,7 +45,11 @@ CLASS: {
 	ok(scalar(@a) == 1);
 	ok($a[0] eq 'a');
 
-	# FIXME: why is this test different from t/hash.t?
+	# First call: list context — empty list is NOT cached (see hash.t for why).
+	# Second and third calls: SCALAR context — object returns undef, which IS
+	# cached as UNDEF_SENTINEL, so the object is only called once more (call 2),
+	# and call 3 is a sentinel cache-hit returning undef.  Compare t/hash.t
+	# where all calls stay in list context and the object is called every time.
 	my @empty = $l->empty();
 	ok(scalar(@empty) == 0);
 	ok(!defined($l->empty()));

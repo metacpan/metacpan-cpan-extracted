@@ -4,7 +4,10 @@ MANIFEST
 MANIFEST.SKIP
 Makefile.PL
 README.md
+eg/api_key_protected_app.pl
+eg/basic_auth_protected_app.pl
 eg/jwt_protected_app.pl
+eg/oauth2_password_bearer_app.pl
 lib/PAGI/FastAPI/Security.pm
 lib/PAGI/FastAPI/Security/APIKey.pm
 lib/PAGI/FastAPI/Security/Base.pm

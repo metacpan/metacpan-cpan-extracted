@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Bool::Bool
+Sidef::Types::Bool::Bool - Boolean value type supporting logical operations and conversions.
 
 =head1 DESCRIPTION
 
@@ -14,17 +14,17 @@ This class implements the Boolean type in Sidef, representing logical true and f
     var obj = Bool(0)           # false
     var obj = Bool("string")    # true
     var obj = Bool(nil)         # false
-    
+
     # Boolean operations
     true & false                # false (logical AND)
     true | false                # true (logical OR)
     true ^ false                # true (logical XOR)
     !true                       # false (logical NOT)
-    
+
     # Comparisons return Bool
     5 > 3                       # true
     "hello" == "world"          # false
-    
+
     # Conditionals use Bool
     if (true) {
         say "This executes"
@@ -32,9 +32,7 @@ This class implements the Boolean type in Sidef, representing logical true and f
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -112,19 +110,17 @@ Aliases: I<not>, I<flip>, I<toggle>, I<is_false>
 
 =head2 new
 
-    self.new
-    Bool.new(value)
+    Bool(value)
 
-Creates a new Boolean object from the given value. Any value can be converted to a boolean:
-- C<false>, C<0>, empty string, C<nil> become C<false>
-- Everything else becomes C<true>
+Creates a new Boolean object from the given value. Any value can be converted to a boolean: - C<false>, C<0>, empty string, C<nil> become C<false> - Everything else becomes C<true>
 
-    Bool.new(1)          # true
-    Bool.new(0)          # false
-    Bool.new("text")     # true
-    Bool.new("")         # false
-    Bool.new(nil)        # false
-    Bool.new([])         # true (empty array is truthy)
+    Bool(1)          # true
+    Bool(0)          # false
+    Bool("text")     # true
+    Bool("0")        # false
+    Bool("")         # false
+    Bool(nil)        # false
+    Bool([])         # false
 
 Aliases: I<call>
 
@@ -226,6 +222,12 @@ In Sidef, the following values are considered false:
 
 =item * C<""> - empty string
 
+=item * C<"0"> - zero string
+
+=item * C<[]> - empty array
+
+=item * C<Hash()> - empty hash
+
 =item * C<nil> - the null/undefined value
 
 =back
@@ -238,11 +240,11 @@ All other values are considered true, including:
 
 =item * Any non-zero number
 
-=item * Any non-empty string (including C<"0">)
+=item * Any non-empty string (excluding C<"0">)
 
-=item * Any array or hash (even if empty)
+=item * Any non-empty array or hash
 
-=item * Any object
+=item * Any object that doesn't numify to C<0> or boolify to C<false>
 
 =back
 
@@ -253,7 +255,7 @@ All other values are considered true, including:
     if (is_valid) {
         say "Valid!"
     }
-    
+
     # Boolean algebra
     var a = true
     var b = false
@@ -261,18 +263,18 @@ All other values are considered true, including:
     say (a | b)          # true
     say (a ^ b)          # true
     say !a               # false
-    
+
     # Comparison operations return Bool
     var result = (10 > 5)
     say result.class     # Bool
     say result           # true
-    
+
     # Converting to boolean
     say Bool(42)         # true
     say Bool(0)          # false
     say Bool(nil)        # false
-    say Bool([])         # true
-    
+    say Bool([])         # false
+
     # Random boolean
     var coin_flip = Bool.pick
     say (coin_flip ? "Heads" : "Tails")

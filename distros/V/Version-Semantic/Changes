@@ -1,5 +1,9 @@
 Release history for Version-Semantic
 
+v2.1.1    2026-08-07T06:10:49Z
+          - Configure "develop" phase dependencies
+          - Fix greediness of semver_re() if not anchored at the end
+
 v2.1.0    2026-08-04T06:50:11Z
           - Add is_core() predicate object method
           - Use Test2::V1 in all test scripts

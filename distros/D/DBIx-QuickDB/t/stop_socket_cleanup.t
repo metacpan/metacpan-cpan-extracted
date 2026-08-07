@@ -47,7 +47,7 @@ eval { require DBI; 1 }
     sub socket { $_[0]->{socket_path} }
 }
 
-my $dir = tempdir(CLEANUP => 1);
+my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
 # A pid that is guaranteed dead: fork a child, let it exit, reap it.
 my $dead_pid = fork();

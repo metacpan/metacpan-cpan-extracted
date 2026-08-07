@@ -19,14 +19,14 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => "1.35",
     "Data::Displaycolour" => "0.7.0",
-    "Data::Identifier" => "0.33.0"
+    "Data::Identifier" => "0.34.0"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.01",
+  "VERSION" => "v0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => "1.35",
   "Data::Displaycolour" => "0.7.0",
-  "Data::Identifier" => "0.33.0",
+  "Data::Identifier" => "0.34.0",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",
   "Test::Warn" => "0.30"

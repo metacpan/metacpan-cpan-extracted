@@ -1,5 +1,48 @@
 Revision history for WebDyne
 
+3.011 2026-08-07
+
+    * Extended wdrender --quiet/--silent to suppress advisory warnings about
+      missing optional HTML::Tidy5 or syntax-highlighting modules while
+      leaving rendering behaviour unchanged.
+
+    * Updated wdrender regression coverage so --header output remains clean
+      on machines without libtidy-devel and HTML::Tidy5 installed.
+
+    * Made wdrender head-insert tests tolerant of harmless HTML/CSS
+      whitespace differences while still checking that the default head
+      insert is present or absent as requested.
+
+3.010 2026-08-07
+
+    * Fixed duplicate response header emission when WebDyne handlers set
+      headers through the request object, avoiding malformed HTTP response
+      headers in PSGI and other runtimes.
+
+    * Fixed wdrender --header output so response headers are included
+      consistently regardless of colour, line-number, pretty-print, or tidy
+      settings.
+
+    * Added wdrender regression coverage for duplicate Content-Type headers
+      and for --header behaviour with colour/tidy output enabled and
+      disabled.
+
+    * Added explicit filename override support for WebDyne::PSGI and
+      WebDyne::PAGI helper applications, allowing tools such as wdrender to
+      render a fixed source file while still exercising PSGI or PAGI request
+      handling.
+
+    * Documented that the WebDyne::PSGI and WebDyne::PAGI filename option
+      is an application-level source-file override and always wins over
+      normal request-path filename derivation.
+
+    * Propagated wdrender --no-head-insert/--head-insert handling through
+      PSGI, PAGI, and temporary Apache/mod_perl render paths.
+
+    * Simplified wdrender test-file routing for PSGI and PAGI helper modes
+      by passing an explicit filename override instead of depending on
+      request path rewriting.
+
 3.009 2026-08-06
 
     * Added style_prepend/style_append and script_prepend/script_append

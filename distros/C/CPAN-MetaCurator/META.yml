@@ -59,11 +59,10 @@ requires:
   parent: '0.242'
   perl: v5.40.0
   strict: '1.12'
-  utf8: '1.25'
   warnings: '1.58'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaCurator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/CPAN-MetaCurator.git
-version: '1.27'
+version: '1.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

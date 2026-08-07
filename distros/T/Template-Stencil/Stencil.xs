@@ -1,3 +1,7 @@
+/* mg_findext is 5.14; ask ppport.h (included from stencil.h) to emit its
+ * back-compat implementation into this TU, the only one that needs it. */
+#define NEED_mg_findext
+
 #include "stencil.h"
 
 /* ====================================================================
@@ -118,6 +122,7 @@ static SV *stencil_obj_render(pTHX_ SV *self, SV *tmpl, SV *data,
     return out;
 }
 
+#ifdef STENCIL_HAVE_CALL_CHECKER
 /* Fast path installed by the call checker for statically resolved
  * calls: the entersub's op_ppaddr is swapped for this pp, which reads
  * the args directly (the trailing stack item is the CV, skipped) and
@@ -149,6 +154,10 @@ static OP *stencil_render_checker(pTHX_ OP *entersubop, GV *namegv,
     entersubop->op_ppaddr = stencil_pp_render;
     return entersubop;
 }
+#endif /* STENCIL_HAVE_CALL_CHECKER */
+
+/* The shared C ABI, after the object magic and the engine builder it wraps. */
+#include "st_abi_impl.h"
 
 MODULE = Template::Stencil    PACKAGE = Template::Stencil
 
@@ -156,12 +165,14 @@ PROTOTYPES: DISABLE
 
 BOOT:
     stencil_boot(aTHX);
+#ifdef STENCIL_HAVE_CALL_CHECKER
     {
         CV *rcv = get_cv("Template::Stencil::render", 0);
         if (rcv)
             cv_set_call_checker(rcv, stencil_render_checker,
                                 (SV *)rcv);
     }
+#endif
 
 UV
 _stencil_built()
@@ -211,7 +222,7 @@ new(class, ...)
             SV         *v = *av_fetch(pairs, i + 1, 0);
             if (klen == 12 && memEQ(k, "template_dir", 12)) {
                 if (SvOK(v)) {
-                    struct stat st;
+                    Stat_t st;
                     if (stat(SvPV_nolen(v), &st) != 0
                         || !S_ISDIR(st.st_mode))
                         croak("Template::Stencil->new: template_dir "
@@ -563,3 +574,72 @@ _buf_selftest()
     }
     OUTPUT:
         RETVAL
+
+# Address of Template::Stencil's own C ABI table (st_abi.h). A consumer XS
+# module (Punk's view tier) fetches this once at boot, INT2PTRs it to a
+# `const st_abi *`, and checks ->abi_version before using it. Not part of the
+# public Perl API.
+IV
+_abi_ptr()
+    CODE:
+        RETVAL = PTR2IV(&ST_ABI);
+    OUTPUT:
+        RETVAL
+
+# Exercise the whole st_abi table the way a C consumer would: resolve it from
+# the IV _abi_ptr hands back, gate on abi_version, then drive engine_of ->
+# render through the function pointers rather than calling the C directly.
+# Returns the rendered bytes; (undef, $error) when the template fails; and an
+# empty list when the gate rejects the table or the invocant is not a Stencil
+# object - which is where a consumer would fall back to the render method.
+void
+_abi_selftest(self, tmpl, data = &PL_sv_undef, opts = &PL_sv_undef)
+        SV *self
+        SV *tmpl
+        SV *data
+        SV *opts
+    PPCODE:
+    {
+        const st_abi *abi = NULL;
+        void         *engine;
+        SV           *err = NULL, *out;
+        HV           *dhv;
+        {
+            dSP;
+            IV  ptr   = 0;
+            int count;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            PUTBACK;
+            count = call_pv("Template::Stencil::_abi_ptr", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (count > 0) {
+                /* Pop into a local first: before 5.30 SvIV was a macro that
+                 * evaluated its argument twice (SvIOK(sv) ? SvIVX(sv) :
+                 * sv_2iv(sv)), so SvIV(POPs) popped twice and read the IV
+                 * off whatever sat one slot lower. Modern perls make it an
+                 * inline function, which is why this only ever bit on old
+                 * ones. */
+                SV *rv = POPs;
+                if (!SvTRUE(ERRSV)) ptr = SvIV(rv);
+            }
+            PUTBACK; FREETMPS; LEAVE;
+            if (ptr) abi = INT2PTR(const st_abi *, ptr);
+        }
+        if (!abi || abi->abi_version < ST_ABI_VERSION) XSRETURN_EMPTY;
+        engine = abi->engine_of(aTHX_ self);
+        if (!engine) XSRETURN_EMPTY;
+        dhv = (data && SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV)
+            ? (HV *)SvRV(data) : NULL;
+        out = abi->render(aTHX_ engine, tmpl, dhv,
+                          (opts && SvOK(opts)) ? opts : NULL, &err);
+        if (!out) {
+            EXTEND(SP, 2);
+            mPUSHs(newSV(0));
+            PUSHs(err ? err : sv_2mortal(newSVpvs("unknown render error")));
+            XSRETURN(2);
+        }
+        EXTEND(SP, 1);
+        mPUSHs(out);
+        XSRETURN(1);
+    }

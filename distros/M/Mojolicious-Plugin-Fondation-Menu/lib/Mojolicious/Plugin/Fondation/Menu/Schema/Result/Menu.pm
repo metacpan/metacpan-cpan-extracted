@@ -1,11 +1,11 @@
 package Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu;
-$Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu::VERSION = '0.03';
 # ABSTRACT: DBIx::Class Result class for menus table
 
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Core';
+use base 'Mojolicious::Plugin::Fondation::Schema::Result::Base';
 
 __PACKAGE__->load_components(qw/TimeStamp Core/);
 
@@ -200,7 +200,7 @@ Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu - DBIx::Class Result 
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

@@ -1,9 +1,10 @@
 #!perl
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use Test::More;
 use Config;
+use File::Temp ();
 use Template::Stencil;
 
 sub engines { Template::Stencil::_stencil_stats()->{engines} }
@@ -40,12 +41,26 @@ sub engines { Template::Stencil::_stencil_stats()->{engines} }
 # Global destruction: an engine held in a package global at exit must
 # not warn or crash (PL_dirty path in the free callback).
 {
+    # Via a script file, not -e: cmd.exe does not honour single quotes, so
+    # a one-liner passed through the shell arrives mangled on Windows.
+    my ($fh, $script) = File::Temp::tempfile('stencil-destroyXXXXX',
+                                             SUFFIX => '.pl', TMPDIR => 1);
+    print $fh <<'SCRIPT';
+use strict; use warnings;
+use Template::Stencil;
+our $S = Template::Stencil->new(filters => { f => sub { $_[0] } });
+$S->render('{% v | f %}', { v => 1 });
+print "done\n";
+SCRIPT
+    close $fh;
+
     my $perl = $Config{perlpath};
-    my $out = qx{"$perl" -Mblib -MTemplate::Stencil -we 'our \$S = Template::Stencil->new(filters => { f => sub { \$_[0] } }); \$S->render("{% v | f %}", { v => 1 }); print "done\\n"' 2>&1};
+    my $out  = qx{"$perl" -Mblib "$script" 2>&1};
     is($?, 0, 'global-destruction exit status clean');
     like($out, qr/^done$/m, 'ran to completion');
     unlike($out, qr/warning|panic|Attempt to free/i,
            'no destruction warnings');
+    unlink $script;
 }
 
 done_testing;

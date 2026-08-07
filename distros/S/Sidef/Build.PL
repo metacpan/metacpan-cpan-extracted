@@ -120,10 +120,13 @@ my $builder = $class->new(
 
         # factordb.com support inside the Number class (with `Number!USE_FACTORDB = true`)
         'HTTP::Tiny' => 0,
-        'JSON::PP'   => 0,
+        'JSON::PP'   => 0,      # String .from_json and Object .to_json
 
-        # String .from_json and Object .to_json
-        'JSON' => 0,
+        # For executing PARI/GP (with `Number!USE_PARI_GP = true`)
+        'IPC::Open2' => 0,
+
+        # For Dir.home (as a last resort)
+        'File::HomeDir' => 0,
                   },
 
     # Metadata and Resources

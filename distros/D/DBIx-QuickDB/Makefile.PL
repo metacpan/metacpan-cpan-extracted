@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Capture::Tiny" => "0.20",
     "Carp" => 0,
+    "Cwd" => 0,
     "Digest::SHA" => 0,
     "Errno" => 0,
     "Fcntl" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.000061",
+  "VERSION" => "0.000062",
   "test" => {
     "TESTS" => "t/*.t t/Drivers/*.t t/Pool/*.t t/QuickDB/*.t t/Tools/*.t"
   }
@@ -47,6 +48,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => "0.20",
   "Carp" => 0,
+  "Cwd" => 0,
   "Digest::SHA" => 0,
   "Errno" => 0,
   "Fcntl" => 0,

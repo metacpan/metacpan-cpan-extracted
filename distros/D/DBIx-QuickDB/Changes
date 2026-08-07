@@ -1,3 +1,35 @@
+0.000062  2026-08-06 15:35:35-07:00 America/Los_Angeles
+
+    - Pool instance directory names now include the pid. Identically-seeded or
+      forked processes drew the same File::Temp names and could recycle a freed
+      one, letting two processes copy into one directory and corrupt a clone.
+    - Pool instance directory names are now sanitized and length-capped, via the
+      new Pool->instance_dir_user. An '@' or '\' in a login no longer reaches
+      the File::Temp template verbatim.
+    - UPGRADE NOTE: instance directory names grow by up to 8 characters, against
+      the 107-byte limit on unix socket paths. An instance_dir already close to
+      that limit may need shortening.
+    - clone_dir failures now report the decoded exit code, any terminating
+      signal, both paths and the tool's stderr, instead of a raw wait status
+      such as "rsync returned 5888".
+    - clone_dir now retries an rsync exit 23 (partial transfer) twice before
+      giving up, and warns when a retry recovers.
+    - The watcher now reaps its server. A server that died during startup became
+      a zombie, and kill(0) succeeds on a zombie, so start() called it alive and
+      waited out the whole QDB_START_TIMEOUT; it now fails in milliseconds with
+      the real exit status.
+    - The watcher now resets SIGCHLD to its default before spawning the server.
+      An application that ignores SIGCHLD had the kernel reap the server first,
+      leaving no exit status to record.
+    - Watcher teardown now removes a disposable data directory even when the
+      server cannot be stopped. Reusable directories (cleanup => 0, used for
+      Pool templates) are still never removed.
+    - Watcher teardown failures now report their reason instead of a bare
+      "Warning: something's wrong".
+    - The watcher no longer re-execs itself with a hardcoded relative "-Ilib",
+      which could load a different version of the watcher than the process that
+      spawned it. It forwards the parent's own resolution, fixed at load time.
+
 0.000061  2026-08-02 19:49:26-07:00 America/Los_Angeles
 
     - Per-install tests now use real child Perl processes on MSWin32 instead of

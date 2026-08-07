@@ -74,7 +74,7 @@ local $Data::Dumper::Sortkeys=1;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.009';
+$VERSION='3.011';
 
 
 #  Run main
@@ -183,6 +183,7 @@ sub main {
     #
     #map {$opt{"no_${_}"}=!($opt{$_})} qw(head_insert);
     map {$opt{"no_${_}"}=!($opt{$_})} map { /^([^|!:=+]+)/ } grep {/\!$/} @opt;
+    $opt{'warn'}=0 if $opt{'silent'};
     
 
     #  Special config ?
@@ -218,7 +219,7 @@ sub main {
     my $srce_fn=$opt{'test'} ? $WEBDYNE_DEFAULT_TEST_FN : shift(@{$argv_ar});
     $srce_fn ||
         pod2usage("$Script: no source file specified !");
-    (-f $srce_fn) ||
+    (-f $srce_fn) || do { (-f File::Spec->catfile($opt{'root'}, $srce_fn)) if $opt{'mod_perl'} } ||
         pod2usage("$Script: input file not found !");
 
 
@@ -392,9 +393,14 @@ sub main {
                     unless ($opt{'outfile'}) {
                         if ($opt{'colour'} && ($res_or->content_type eq 'text/html')) {
                             $html=&html_colour($html, $header, \%opt);
+                            undef $header;
                         }
                     }
                 
+                }
+
+                if ($header) {
+                    $html=join("\n", $header, $html);
                 }
                 
                 
@@ -495,8 +501,9 @@ sub request_psgi {
 
     #  Create new instance of WebDyne PSGI handler
     #
+    my $source_fn=File::Spec->rel2abs($req_or->uri->path());
     my $app_cr=($_{'psgi_app_cr'} ||= 
-        (my $psgi_or=WebDyne::PSGI->new(root=>$opt_hr->{'root'}))->to_app());
+        WebDyne::PSGI->new(root=>$opt_hr->{'root'}, no_head_insert=>$opt_hr->{'no_head_insert'}, filename=>$source_fn )->to_app());
 
 
     #  Now run. For some reason PSGI manipulates request object so clone first and restore
@@ -542,8 +549,9 @@ sub request_pagi {
 
     #  Create new instance of WebDyne::PAGI handler
     #
+    my $source_fn=File::Spec->rel2abs($req_or->uri->path());
     my $app_cr=($_{'pagi_app_cr'} ||=
-        WebDyne::PAGI->new(root=>$opt_hr->{'root'})->to_app());
+        WebDyne::PAGI->new(root=>$opt_hr->{'root'}, no_head_insert=>$opt_hr->{'no_head_insert'}, filename=>$source_fn)->to_app());
     my $test_or=($_{'pagi_test_or'} ||=
         PAGI::Test::Client->new(app => $app_cr, headers=>{$req_or->headers->flatten}));
 
@@ -593,15 +601,14 @@ sub request_mod_perl {
 
     #  Get response object
     #
-    #
     my $res_or;
     my $method=uc($req_or->method());
     if (grep { $method eq $_ } qw(GET PUT HEAD)) {
-        $res_or=&{"Apache::TestRequest::${method}"}($req_or->uri, $req_or->headers->flatten());
+        $res_or=&{"Apache::TestRequest::${method}"}($req_or->uri(), $req_or->headers->flatten());
     }
     elsif ($method eq 'POST') {
         #$res_or=&{"Apache::TestRequest::${method}"}($req_or->uri, content => [$req_or->content], $req_or->headers->flatten());
-        $res_or=&{"Apache::TestRequest::${method}"}($req_or->uri, $opt_hr->{'query_string'}, $req_or->headers->flatten());
+        $res_or=&{"Apache::TestRequest::${method}"}($req_or->uri(), $opt_hr->{'query_string'}, $req_or->headers->flatten());
     }
     else {
         return err('method %s not supported for mod_perl/apache request type', $method);
@@ -621,6 +628,7 @@ sub request_mod_perl_startup {
     #  Startup Apache test instance
     #
     my $opt_hr=shift();
+
 
     #  Get postamble with WebDyne config
     #
@@ -673,15 +681,20 @@ sub request_mod_perl_postamble {
         grep { defined($ENV{$_}) && $ENV{$_} ne '' }
         grep { /^WEBDYNE_/ } keys %ENV;
     push (@PerlSetEnv, "PerlSetEnv WEBDYNE_ERROR_TEXT 1") unless defined($ENV{'WEBDYNE_ERROR_TEXT'});
+    push (@PerlSetEnv, sprintf("PerlSetEnv WEBDYNE_REQUEST_NO_HEAD_INSERT %s", $opt_hr->{'no_head_insert'} ? 1 : 0));
+    push (@PerlSetEnv, "PerlSetEnv WEBDYNE_REQUEST_FILENAME \"$WEBDYNE_DEFAULT_TEST_FN\"") if $opt_hr->{'test'};
     my $PerlSetEnv=join("\n", @PerlSetEnv);
     my $PerlSwitches=join("\n", map { sprintf('PerlSwitches -I%s', $_) } @perl_inc_dn);
     my $postamble= <<"END"
-$PerlSetEnv
 $PerlSwitches
+$PerlSetEnv
 PerlModule WebDyne
 AddHandler modperl .psp
 PerlResponseHandler WebDyne
-
+<Location "/">
+    SetHandler modperl
+    PerlResponseHandler WebDyne
+</Location>
 ErrorLog $stderr_fn
 LogLevel debug
 LogFormat "%h %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\"" combined
@@ -1028,7 +1041,11 @@ Options can also be preloaded from `~/.wdrender.opt` by creating an anonymous ha
 
 * **--warn**
 
-    Enable or disable warnings about missing Tidy or Colourise modules
+    Enable or disable warnings about missing Tidy or Colourise modules.
+
+* **--quiet**
+
+    Suppress informational output, including warnings about missing optional Tidy or Colourise modules.
 
 * **--head_insert**
 
@@ -1399,9 +1416,13 @@ Use WebDyne's built-in default test page as the source file.
 
 B<--warn>
 
-Enable or disable warnings about missing Tidy or Colourise modules
+Enable or disable warnings about missing Tidy or Colourise modules.
 
+=item *
 
+B<--quiet>
+
+Suppress informational output, including warnings about missing optional Tidy or Colourise modules.
 
 =item *
 
@@ -1752,13 +1773,14 @@ C<wdrender> aims to reproduce WebDyne output from the command line, but it canno
 Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
 
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENSE and COPYRIGHT
 
 This file is part of WebDyne.
 
 This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
-This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
 

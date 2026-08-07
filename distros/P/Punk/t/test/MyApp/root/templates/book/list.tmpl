@@ -1,0 +1,6 @@
+<h1>Books</h1>
+<ul>
+{% for book in books %}<li><a href="/books/{% book.id %}">{% book.title %}</a> - {% book.author %}</li>
+{% end %}</ul>
+{% if has_more_data %}<a href="/books?next={% next | uri %}">more</a>
+{% end %}

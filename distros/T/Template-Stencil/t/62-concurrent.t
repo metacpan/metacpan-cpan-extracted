@@ -1,9 +1,11 @@
 #!perl
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use Test::More;
 use Template::Stencil;
+
+plan skip_all => 'no real fork on this platform' if $^O eq 'MSWin32';
 
 # Fork model sanity: several children rendering the same configuration
 # produce byte-identical output, whether each constructs its own engine

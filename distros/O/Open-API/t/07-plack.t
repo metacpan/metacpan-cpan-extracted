@@ -5,6 +5,7 @@ use warnings;
 use FindBin ();
 use Test::More;
 use Open::API;
+use Open::API::Plack;
 use File::Raw::JSON qw(file_json_decode);
 
 # The PSGI app driven with in-process env hashes: happy paths, auto-JSON
@@ -20,7 +21,7 @@ my $api = Open::API->new(spec => "$FindBin::Bin/spec/petstore.json");
 
 my %pets = ( 1 => { id => 1, name => 'rex' } );
 
-my $app = $api->to_app(handlers => {
+my $app = Open::API::Plack->new(api => $api, handlers => {
     listPets  => sub { [ values %pets ] },                       # auto-JSON
     getPet    => sub {
         my ($p) = @_;
@@ -35,7 +36,7 @@ my $app = $api->to_app(handlers => {
     },
     deletePet => sub { die "boom\n" },                            # 500 path
     # no ping handler in petstore; use listPets etc.
-});
+})->to_app;
 
 sub req {
     my (%o) = @_;
@@ -122,7 +123,7 @@ sub body_json { file_json_decode($_[0][2][0]) }
 
 # ---- 501 when no handler -------------------------------------------------------------------
 {
-    my $app2 = $api->to_app(handlers => {});
+    my $app2 = Open::API::Plack->new(api => $api, handlers => {})->to_app;
     open my $in, '<', \(my $b = '') or die;
     my $r = $app2->({ REQUEST_METHOD => 'GET', PATH_INFO => '/pets',
                       QUERY_STRING => '', 'psgi.input' => $in });
@@ -131,10 +132,10 @@ sub body_json { file_json_decode($_[0][2][0]) }
 
 # ---- handlers as fully qualified package sub names ------------------------------------------
 {
-    my $app3 = $api->to_app(handlers => {
+    my $app3 = Open::API::Plack->new(api => $api, handlers => {
         listPets => 'My::Pets::list',                 # string, resolved now
         getPet   => sub { { id => 1, name => 'rex' } },
-    });
+    })->to_app;
     open my $in, '<', \(my $b = '') or die;
     my $r = $app3->({ REQUEST_METHOD => 'GET', PATH_INFO => '/pets',
                       QUERY_STRING => '', 'psgi.input' => $in });
@@ -142,22 +143,22 @@ sub body_json { file_json_decode($_[0][2][0]) }
     is(body_json($r)->[0]{name}, 'package', 'ran the named sub');
 
     my $err;
-    eval { $api->to_app(handlers => { listPets => 'No::Such::sub_here' }) }
+    eval { Open::API::Plack->new(api => $api, handlers => { listPets => 'No::Such::sub_here' })->to_app }
         or $err = $@;
     like($err, qr/names no such sub 'No::Such::sub_here'/,
         'unknown sub name croaks at to_app time');
 
     undef $err;
-    eval { $api->to_app(handlers => { listPets => [1, 2] }) } or $err = $@;
+    eval { Open::API::Plack->new(api => $api, handlers => { listPets => [1, 2] })->to_app } or $err = $@;
     like($err, qr/coderef or a fully qualified sub name/,
         'bad handler value croaks');
 }
 
 # ---- validate_responses --------------------------------------------------------------------
 {
-    my $lying = $api->to_app(validate_responses => 1, handlers => {
+    my $lying = Open::API::Plack->new(api => $api, validate_responses => 1, handlers => {
         getPet => sub { { wrong => 'shape' } },   # not a Pet
-    });
+    })->to_app;
     open my $in, '<', \(my $b = '') or die;
     my $r = $lying->({ REQUEST_METHOD => 'GET', PATH_INFO => '/pets/1',
                        QUERY_STRING => '', 'psgi.input' => $in });

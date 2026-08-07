@@ -6,7 +6,7 @@ use Carp qw(croak);
 use Future::AsyncAwait;
 use PAGI::FastAPI::Depends qw(Depends);
 
-our $VERSION   = qv('v0.0.2');
+our $VERSION   = qv('v0.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf-8
@@ -17,7 +17,7 @@ PAGI::FastAPI::Security::Base - Internal base class for PAGI::FastAPI::Security 
 
 =head1 VERSION
 
-Version v0.0.2
+Version v0.0.4
 
 =head1 DESCRIPTION
 

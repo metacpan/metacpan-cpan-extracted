@@ -4,10 +4,8 @@ use strict;
 use warnings;
 
 #<<<
-package Dist::Starter::Context;
-BEGIN {
-our $VERSION = 'v0.1.0';
-}
+package
+  Dist::Starter::Context;
 #>>>
 
 use File::Spec::Functions qw( catfile );

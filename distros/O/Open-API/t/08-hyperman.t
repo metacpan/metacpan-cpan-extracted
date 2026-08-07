@@ -39,9 +39,10 @@ my $pid  = fork // die "fork: $!";
 if (!$pid) {
     open STDERR, '>', '/dev/null';
     require Open::API;
+    require Open::API::Plack;
     require File::Raw::JSON;
     my $api = Open::API->new(spec => "$FindBin::Bin/spec/petstore.json");
-    my $app = $api->to_app(handlers => {
+    my $app = Open::API::Plack->new(api => $api, handlers => {
         listPets => sub { [ { id => 1, name => 'rex' } ] },
         getPet   => sub {
             my ($p) = @_;
@@ -51,7 +52,7 @@ if (!$pid) {
                   [ File::Raw::JSON::file_json_encode({ id => $id, name => "pet$id" }) ] ];
             });
         },
-    });
+    })->to_app;
     Hyperman->run(app => $app, host => '127.0.0.1', port => $port, workers => 1);
     exit 0;
 }

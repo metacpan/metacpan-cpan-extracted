@@ -15,25 +15,14 @@ use Getopt::Long;
 
 use Pod::Usage; # For pod2usage().
 
-use Text::CSV::Encoded;
-
 # ----------------------------------------------
 
 sub process
 {
 	my($option)	= @_;
 	my(@lines)	= read_lines($$option{input_file});
-	my($csv)	= Text::CSV -> new;
 
-	open(my $fh_out, ">:encoding(UTF_8)", $$option{output_file});
-
-	my($column_names)	= ['Module', 'New', 'Description'];
-	my($status)			= $csv -> say($fh_out, $column_names);
-
-	if (! $status)
-	{
-		die "Failed to write header";
-	}
+	open(my $fh, ">:encoding(UTF_8)", $$option{output_file});
 
 	my($description);
 	my(@fields);
@@ -41,6 +30,8 @@ sub process
 	my($module);
 	my($new);
 	my($target);
+
+	my($uri) = 'https://metacpan.org/pod/';
 
 	for my $line_number (0 .. $#lines)
 	{
@@ -61,13 +52,14 @@ sub process
 		pop @fields if ($fields[$#fields] =~ /v?[0-9]/);
 
 		$module	= join('::', @fields);
-		$status	= $csv -> say($fh_out, [$module, $description]);
 
-		if (! $status)
-		{
-			die "Failed to write CSV record for $module";
-		}
+		print $fh "o $module\n";
+		print $fh "- $description\n";
+		print $fh "- $uri$module\n";
+		print $fh "\n";
 	}
+
+	close $fh;
 
 } # End of process.
 

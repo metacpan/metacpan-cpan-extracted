@@ -23,6 +23,7 @@ static int oa_fetch_init(pTHX) {
     OA_FETCH_TRIED = 1;
     eval_pv("require Fetch;", FALSE);
     if (SvTRUE(ERRSV)) return 0;
+    SPAGAIN;   /* the require may have reallocated the value stack */
     ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
     count = call_pv("Fetch::_abi_ptr", G_SCALAR | G_EVAL);
     SPAGAIN;

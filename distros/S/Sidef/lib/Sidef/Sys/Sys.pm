@@ -181,7 +181,7 @@ sub read {
 
     state $term = do {
         require Term::ReadLine;
-        Term::ReadLine->new("$0");
+        $Sidef::Term::ReadLine //= Term::ReadLine->new("$0");
     };
 
     my $input = $term->readline($message) // return undef;
@@ -250,7 +250,7 @@ sub unweaken {
 
 sub select {
     my ($self, $fh) = @_;
-    CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value);
+    Sidef::Types::Glob::FileHandle->new(scalar CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value));
 }
 
 sub system {

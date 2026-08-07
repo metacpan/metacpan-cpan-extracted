@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::HTTPS::NB.
 
+0.16  Thu Aug  6 19:20:21 +07 2026
+       - Add license files (gh #3)
+
 0.15  Thu Aug 25 23:42:24 NOVT 2016
        - Add SNI support (gh #1)
 

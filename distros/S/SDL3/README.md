@@ -36,13 +36,16 @@ sub SDL_AppIterate($app) {
 sub SDL_AppQuit { }
 ```
 
+<div>
+    <center><img src="https://raw.githubusercontent.com/Perl-SDL3/.github/refs/heads/main/screenshots/synopsis.gif" /></center>
+</div>
+
 # DESCRIPTION
 
 This module provides a Perl wrapper for SDL3, a cross-platform development library designed to provide low level access
 to audio, keyboard, mouse, joystick, and graphics hardware.
 
-There are a few examples in this distribution's `eg/` directory but games and other demos I've written may be found on
-github: [https://github.com/sanko/SDL3.pm-demos](https://github.com/sanko/SDL3.pm-demos).
+There are a few examples in this distribution's `eg/` directory.
 
 ## Features
 
@@ -476,7 +479,7 @@ See [SDL3: CategoryVulkan](https://wiki.libsdl.org/SDL3/CategoryVulkan)
 
 # See Also
 
-The project's repo: [https://github.com/Perl-SDL3/SDL3.pm](https://github.com/Perl-SDL3/SDL3.pm)
+The project's repo: [https://github.com/Perl-SDL3/](https://github.com/Perl-SDL3/)
 
 The SDL3 Wiki: [https://wiki.libsdl.org/SDL3/FrontPage](https://wiki.libsdl.org/SDL3/FrontPage)
 

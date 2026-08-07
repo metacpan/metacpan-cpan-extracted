@@ -15,7 +15,7 @@ typedef struct stencil_cache_ent {
     STRLEN           src_len;
     uint64_t         src_hash;   /* FNV-1a of source (string entries) */
     time_t           mtime;
-    off_t            fsize;
+    Off_t            fsize;
     time_t           checked_at; /* last stat time */
     stencil_program *prog;
     struct stencil_cache_ent **incs; /* n_incs link vector */

@@ -32,15 +32,15 @@ if ($has_dbix_async) {
     push @deps,
         {'Fondation::Model::DBIx::Async' => {
             backends => [
-                test => {
+                main => {
                     dsn          => "dbi:SQLite:dbname=$dbfile",
                     schema_class => 'TestWorkflowSchema',
                     workers      => 1,
                 },
             ],
             models => {
-                workflow         => { source => 'Workflow' },
-                workflow_history => { source => 'WorkflowHistory' },
+                workflow         => { source => 'Workflow', backend => 'main' },
+                workflow_history => { source => 'WorkflowHistory', backend => 'main' },
             },
         }},
         {'Fondation::Workflow' => {
@@ -83,9 +83,9 @@ $app->plugin('Fondation' => {
 });
 
 if ($needs_deploy) {
-    my $c     = $app->build_controller;
+    my $c      = $app->build_controller;
     my $schema = $c->schema;
-    $schema->deploy->get;
+    $schema->await($schema->deploy);
 }
 
 my $t = Test::Mojo->new($app);

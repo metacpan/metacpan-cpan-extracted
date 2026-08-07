@@ -1,5 +1,14 @@
 Revision history for Perl extension HTML::Defang.
 
+1.09  Wed Aug 6 12:00:00 2026
+  - Treat the contents of the RCDATA/RAWTEXT "text" elements <title>,
+    <textarea>, <noembed> and <noframes> as opaque text (like <script>/
+    <style>), consuming up to the matching end tag instead of parsing
+    comments and nested tags inside them. Fixes an XSS bypass where a literal
+    end tag plus active markup could be smuggled inside what the defanger
+    treated as an inert comment or attribute value, e.g.
+      <title><!-- </title> <img src=x onerror=alert(1)> --></title>
+
 1.08  Thu Nov 6 22:00:00 2025
   - Fix defang bug with <script> tag and mangled comment data
 

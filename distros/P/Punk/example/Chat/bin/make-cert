@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Basename ();
+use Getopt::Long ();
+
+# Write a self-signed certificate and key for local development.
+#
+# Done in Perl through IO::Socket::SSL::Utils rather than by shelling out to
+# `openssl req`, so the example has no dependency on the openssl binary being
+# installed or on which of its half-dozen incompatible command spellings the
+# local version wants.
+#
+# The certificate carries subjectAltNames for localhost, 127.0.0.1 and ::1.
+# Browsers have ignored commonName for host matching for years - without SANs
+# a cert is rejected outright rather than merely warned about, and the click
+# through does not appear.
+
+my $dir = File::Basename::dirname(__FILE__) . '/../tls';
+my ($days, $force, @hosts) = (825, 0);
+
+Getopt::Long::GetOptions(
+    'dir=s'   => \$dir,
+    'days=i'  => \$days,
+    'host=s'  => \@hosts,
+    'force'   => \$force,
+    'help'    => sub { print _usage(); exit 0 },
+) or die _usage();
+
+@hosts = qw(localhost 127.0.0.1 ::1) unless @hosts;
+
+my $cert_file = "$dir/server.crt";
+my $key_file  = "$dir/server.key";
+
+if (-f $cert_file && -f $key_file && !$force) {
+    print "keeping the certificate already in $dir (--force to replace)\n";
+    exit 0;
+}
+
+eval { require IO::Socket::SSL::Utils; 1 }
+    or die "make-cert needs IO::Socket::SSL (for IO::Socket::SSL::Utils): $@";
+IO::Socket::SSL::Utils->import(qw(CERT_create PEM_cert2file PEM_key2file));
+
+mkdir $dir unless -d $dir;
+
+# An IPv4/IPv6 literal has to be declared as an IP SAN; a name as a DNS one.
+my @san = map { /\A[\d.]+\z/ || /:/ ? [ IP => $_ ] : [ DNS => $_ ] } @hosts;
+
+my ($cert, $key) = CERT_create(
+    subject => {
+        commonName         => $hosts[0],
+        organizationName   => 'Punk Chat example',
+        organizationalUnitName => 'development only',
+    },
+    subjectAltNames => \@san,
+    purpose         => 'server',
+    not_before      => time - 3600,          # tolerate a slow clock
+    not_after       => time + $days * 86400,
+);
+
+PEM_cert2file($cert, $cert_file);
+PEM_key2file($key, $key_file);
+chmod 0600, $key_file;
+
+print "wrote $cert_file\n";
+print "wrote $key_file\n";
+print "  valid for $days days, for: ", join(', ', @hosts), "\n";
+print "  self-signed, so a browser will warn once - that is the point of\n",
+      "  the exercise, not a failure. Accept it and carry on.\n";
+
+sub _usage {
+    return <<'USAGE';
+usage: make-cert [options]
+
+  --dir DIR      where to write server.crt / server.key (default: ../tls)
+  --days N       validity in days (default: 825)
+  --host NAME    a hostname or IP for the SAN list; repeatable
+                 (default: localhost 127.0.0.1 ::1)
+  --force        replace an existing certificate
+USAGE
+}

@@ -1,5 +1,132 @@
 Revision history for Class::Simple::Cached
 
+0.07	Thu Aug  6 22:00:57 EDT 2026
+	[ Security ]
+	- clone path: always recalculate _is_hash_cache and _cache_prefix after the
+	  %merged hash is built, so caller-supplied internal-field args cannot override
+	  the dispatch type flag (internal field injection vulnerability, CVE-class:
+	  object property tampering via constructor argument pollution)
+	- AUTOLOAD getter: add !ref($rc) pre-check before UNDEF_SENTINEL eq comparison
+	  to prevent a wrapped object returning a blessed value with overloaded eq from
+	  triggering a false cached-undef result
+	- AUTOLOAD getter: apply same !ref() guard to array-element sentinel check
+	- t/coverage.t: replace eval "use Foo $version" (string eval with interpolated
+	  variable) with eval { require Foo; Foo->VERSION($min) } (block eval) to
+	  eliminate the code-injection surface if the constant is ever changed to a
+	  runtime value
+	[ Performance ]
+	- AUTOLOAD: replace regex /::(\w+)\z/ with substr+rindex to avoid regex engine
+	  startup on every method dispatch (~200 ns/call)
+	- new(): precompute _cache_prefix (= "ClassName:") and _is_hash_cache (Bool) so
+	  AUTOLOAD and the cache helpers avoid ref() and string concat on the hot path
+	- DESTROY: read _cache_prefix directly instead of interpolating "$class:" per grep
+	  iteration; use precomputed _is_hash_cache flag instead of ref($cache)
+	- use constant _GLOBAL_PHASE_AVAILABLE: evaluate Perl version check once at
+	  compile time rather than on every DESTROY call
+	[ Refactoring ]
+	- Extract _cache_get() and _cache_set() private helpers to eliminate 4x repeated
+	  hash-ref vs. CHI dispatch conditional in AUTOLOAD
+	- Mark _cache_get() and _cache_set() :Protected via Sub::Protected to enforce
+	  private access at the package boundary
+	- Hoist $key and $object before the getter/setter branch in AUTOLOAD
+	- Consolidate array-setter undef path: remove duplicated _cache_set calls
+	- AUTOLOAD: replace /::(\w+)$/ with /::(\w+)\z/ — \z is absolute end-of-string,
+	  unlike $ which matches before a trailing newline
+	[ Bug Fixes ]
+	- Fix t/carp.t failure: new() now calls Carp::croak (not Params::Get's Carp::confess) when called with no arguments
+	  Fixes https://github.com/nigelhorne/Class-Simple-Cached/issues/7
+	- Fix array-setter undef path writing to $cache->{$param} instead of $cache->{$key} (missing class-prefix in key)
+	- Fix multi-arg detection: replace if($_[1]) truthiness check with scalar(@_) > 1
+	- Fix CHI scalar setter returning CHI->set() status instead of the stored value
+	- Remove dead AUTOLOAD DESTROY branch (redundant with explicit DESTROY sub)
+	- Replace die with Carp::croak for sentinel-collision error in AUTOLOAD
+	- Use constant UNDEF_SENTINEL instead of repeated __PACKAGE__ string concatenation
+	- Clone path did not validate a newly-supplied cache argument: $obj->new(cache =>
+	  undef) created an object that crashed on first method call instead of croaking
+	  at construction.  Added the same validation block that the non-clone path uses.
+	- can(undef): the $method eq 'new' comparison emitted "uninitialized value"
+	  warnings when method was undef.  Added `return unless defined $method` guard.
+	- isa(undef): same root cause; added `return unless defined $class` guard.
+	[ Tests ]
+	- Expand t/30-basics.t: undef caching, sentinel storage, array-setter key correctness, clone behaviour
+	- Remove unused CHI import from t/carp.t
+	- t/manifest.t: replace capturing groups with non-capturing (?:...) in filter regex;
+	  replace $ anchor with \z; modernise to Test::DescribeMe + Test::Needs
+	- t/unit.t: new black-box API contract test suite — 35 subtests proving every
+	  documented message, return state, and side-effect from the POD; includes an
+	  API ledger that asserts 100% coverage of documented states, global-state
+	  integrity checks ($@, $_, alarm()), and Test::Mockingbird spy verification
+	  of the Carp::carp signalling path; uses Test::Returns for return-type schema
+	  validation and tests all four documented new() error messages, all getter
+	  cache-hit branches, all cache-miss branches, all setter paths, and all isa()
+	  and can() paths
+	- t/function.t: new white-box function test suite — 42 subtests covering
+	  every code path in new() (8 paths), can(), isa(), DESTROY() (4 paths),
+	  _cache_get() and _cache_set() (hash and CHI backends each), and AUTOLOAD
+	  (all 5 cache-hit branches + 4 cache-miss branches + scalar and array setter
+	  paths); uses Test::Mockingbird spies to observe Carp::carp and CHI method
+	  calls, Test::Memory::Cycle to verify no circular references, and
+	  Test::Returns for return-type schema checks
+	- Makefile.PL, cpanfile: add Test::Mockingbird and Test::Memory::Cycle to
+	  TEST_REQUIRES (used by t/function.t)
+	- t/cgi_security.t: new adversarial penetration test suite — 9 subtests
+	  covering constructor validation, clone-path field injection, overloaded-eq
+	  sentinel bypass, array sentinel croak, resource-exhaustion (1 kB method name),
+	  key namespace isolation, undef sentinel storage, and return-type schema checks
+	  via Test::Returns
+	- t/edge_cases.t: new destructive/pathological/security test suite — 50 subtests
+	  covering every hostile constructor input type (undef, 0, "", arrayref, coderef,
+	  scalar ref, typeglob, each missing CHI method), internal field injection via
+	  both the fresh-new and clone constructors (_is_hash_cache, _cache_prefix),
+	  clone-path cache validation (regression for the three bugs below), falsy values
+	  (0, "", "0") documented as never cached, sentinel-collision round-trip (two
+	  calls: miss returns sentinel string, hit decodes to undef), array-sentinel
+	  croak, setter with explicit undef arg, circular reference in cache, 1 MB value
+	  round-trip, 10 KB method name, upstream inner-getter/inner-setter/CHI-get/
+	  CHI-set failures, DESTROY with missing cache field / empty hash / 500 entries,
+	  global state preservation ($_ / $@ / $! / alarm()), can(undef) and isa(undef)
+	  regression, CSC-wrapping-CSC double-layer caching, stale cache after direct
+	  inner mutation, void-context getter, and object=>falsy defaulting behavior
+	- t/integration.t: new end-to-end workflow test suite — 16 subtests covering
+	  hash-ref and CHI-backend complete lifecycles (new/setter/getter/DESTROY),
+	  multi-instance isolation (separate caches, no cross-pollution), shared
+	  hash-ref cache namespace isolation between different subclasses, shared
+	  hash-ref DESTROY impact when two same-class instances share a cache,
+	  CHI global-purge LIMITATION (DESTROY purges all entries from a shared
+	  CHI cache), clone workflow (shared cache reference, prefix reuse),
+	  subclass key isolation (different prefix per concrete class), can()/isa()
+	  delegation to inner object, optional-CHI simulation via
+	  Test::Without::Module (proves CHI is a caller-supplied runtime dependency,
+	  not a compile-time one), concurrent instances (five simultaneous objects
+	  with independent caches), undef sentinel round-trip, array setter/getter
+	  parity across both backends, and a backend-parity subtest that runs the
+	  same scalar setter/getter workflow against both hash-ref and CHI and
+	  asserts identical caller-visible outcomes
+	- Test::Mockingbird spies verify CHI set() receives the 'never' expiry token
+	  and purge() is called exactly once on DESTROY
+	- t/logic.t: new formal equivalence-partition proof suite — 12 subtests
+	  proving getter dispatch (G1 plain scalar, G3 arrayref, G4 blessed object),
+	  setter arg-count partitions (S1 scalar, A1 array), CHI AND-conjunction
+	  (missing get, set, or purge each independently croaks), falsy-scalar
+	  boundary (0 is not cached per documented limitation), and the context
+	  asymmetry between empty list context (never cached) vs scalar undef (cached)
+	- t/hash.t, t/chi.t: replace FIXME comments with formal explanation of the
+	  context asymmetry (list-context empty vs scalar-context undef caching)
+	[ Dependencies ]
+	- Add Test::Without::Module to TEST_REQUIRES in Makefile.PL and cpanfile
+	  (used by t/integration.t)
+	- Add Test::Returns and Readonly to TEST_REQUIRES in Makefile.PL and cpanfile (used by t/cgi_security.t)
+	[ Documentation ]
+	- Full POD rewrite: add EXAMPLE, API SPECIFICATION, MESSAGES, FORMAL SPECIFICATION, PSEUDOCODE per method
+	- Add LIMITATIONS section covering falsy-value caching, sentinel collision, shared-cache purge, and Memoize
+	[ Logic / Deductive Reductions ]
+	- AUTOLOAD cache-hit dispatch: replace second `if(ref($rc) eq 'ARRAY')` with
+	  `elsif` — after the `if(!ref($rc))` block always returns, ref($rc) is
+	  guaranteed truthy; the elsif encodes this mutual exclusivity explicitly
+	- new(): replace redundant `ref($params->{'cache'}) eq 'HASH'` in the final
+	  branch with `$params->{'_is_hash_cache'}` (transitive reduction: value was
+	  already computed and stored two statements earlier)
+
 0.06	Sat Apr  5 08:20:10 EDT 2025
 	Use Test::DescribeMe to simplify tests
 	Use Test::Needs

@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000060';
+our $VERSION = '0.000061';
 
 ## no critic (Bangs::ProhibitDebuggingModules)
 
@@ -115,14 +115,9 @@ has module_name => (
 );
 
 has _found_imports => (
-    is          => 'ro',
-    isa         => Maybe [ArrayRef],
-    init_arg    => 'found_imports',
-    handles_via => 'Array',
-    handles     => {
-        _all_found_imports => 'elements',
-        _has_found_imports => 'count',
-    },
+    is       => 'ro',
+    isa      => Maybe [ArrayRef],
+    init_arg => 'found_imports',
 );
 
 has _indent => (
@@ -788,7 +783,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000060
+version 0.000061
 
 =head1 METHODS
 

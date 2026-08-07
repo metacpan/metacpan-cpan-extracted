@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Menu::Helpers;
-$Mojolicious::Plugin::Fondation::Menu::Helpers::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Menu::Helpers::VERSION = '0.03';
 # ABSTRACT: Menu helpers — server-side cache, rendering, breadcrumb
 
 use strict;
@@ -239,7 +239,7 @@ Mojolicious::Plugin::Fondation::Menu::Helpers - Menu helpers — server-side cac
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

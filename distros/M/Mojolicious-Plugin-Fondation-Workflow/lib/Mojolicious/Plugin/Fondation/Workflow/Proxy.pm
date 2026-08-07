@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Workflow::Proxy;
-$Mojolicious::Plugin::Fondation::Workflow::Proxy::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Workflow::Proxy::VERSION = '0.02';
 use Mojo::Base -base, -signatures;
 
 has [qw(wf factory c type)];
@@ -188,7 +188,7 @@ Mojolicious::Plugin::Fondation::Workflow::Proxy
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

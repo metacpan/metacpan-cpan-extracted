@@ -3,6 +3,8 @@ bench/openapi.pl
 Changes
 ignore.txt
 include/oa.h
+include/oa_abi.h
+include/oa_abi_impl.h
 include/oa_client.h
 include/oa_compat.h
 include/oa_compile.h
@@ -12,6 +14,7 @@ include/oa_types.h
 include/oa_validate.h
 lib/Open/API.pm
 lib/Open/API/Client.pm
+lib/Open/API/Plack.pm
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -34,6 +37,7 @@ t/15-client-ua.t
 t/16-security.t
 t/17-csrf.t
 t/18-server-options.t
+t/19-plack-object.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -47,5 +51,14 @@ examples/README.md
 examples/petstore.json
 examples/server.pl
 examples/client.pl
+lib/Open/API/UI.pm
+lib/Open/API/UI/templates/wrapper.tmpl
+lib/Open/API/UI/templates/index.tmpl
+lib/Open/API/UI/templates/operation.tmpl
+lib/Open/API/UI/static/app.css
+lib/Open/API/UI/static/app.js
+t/23-ui.t
+t/24-plack-ui.t
+t/25-abi.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

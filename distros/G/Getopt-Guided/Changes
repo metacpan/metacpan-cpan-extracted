@@ -1,5 +1,10 @@
 Release history for Getopt-Guided
 
+v3.2.3    2026-08-07T06:54:37Z
+          - Use fallback if XDG_CONFIG_HOME environment variable isn't defined
+          - Use Test2::V1 in one more test script
+          - Configure "develop" phase dependencies
+
 v3.2.2    2026-07-31T07:02:33Z
           - Change $VERSION assignment to overcome deficits of
             some static "our $VERSION" line parsers

@@ -28,10 +28,10 @@ my %WriteMakefileArgs = (
     "DBIx::Class::Relationship::ManyToMany::Async" => "0.02",
     "IO::Async::Loop::Mojo" => 0,
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => "0.01",
+    "Mojolicious::Plugin::Fondation" => "0.07",
     "SQL::Translator" => "0.11018"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %FallbackPrereqs = (
   "DBIx::Class::Relationship::ManyToMany::Async" => "0.02",
   "IO::Async::Loop::Mojo" => 0,
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => "0.01",
+  "Mojolicious::Plugin::Fondation" => "0.07",
   "SQL::Translator" => "0.11018"
 );
 

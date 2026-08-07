@@ -102,6 +102,18 @@ static SV *oa_read_body_env(pTHX_ HV *env) {
     if (!cl || !in) return NULL;
     len = SvIV(cl);
     if (len <= 0) return NULL;
+    /* psgi.input is usually a plain filehandle, and read() on one is a method
+     * call. Perl only auto-loads IO::Handle to resolve filehandle methods from
+     * 5.14 on; before that the call simply fails, and under the G_EVAL below
+     * that failure is silent - the body read back empty and a perfectly good
+     * POST was rejected as "missing required request body". Load it once. */
+    {
+        static int oa_io_handle_loaded = 0;
+        if (!oa_io_handle_loaded) {
+            oa_io_handle_loaded = 1;
+            eval_pv("require IO::Handle;", FALSE);
+        }
+    }
     body = sv_2mortal(newSVpvs(""));
     while (off < len) {
         dSP; int n; IV got;

@@ -1,11 +1,11 @@
 package Mojolicious::Plugin::Fondation::Group::Schema::Result::Group;
-$Mojolicious::Plugin::Fondation::Group::Schema::Result::Group::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Group::Schema::Result::Group::VERSION = '0.02';
 # ABSTRACT: DBIx::Class Result class for groups table
 
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Core';
+use base 'Mojolicious::Plugin::Fondation::Schema::Result::Base';
 
 __PACKAGE__->load_components(qw/TimeStamp Core/);
 
@@ -66,7 +66,7 @@ Mojolicious::Plugin::Fondation::Group::Schema::Result::Group - DBIx::Class Resul
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

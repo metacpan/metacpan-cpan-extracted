@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Workflow;
-$Mojolicious::Plugin::Fondation::Workflow::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Workflow::VERSION = '0.02';
 # ABSTRACT: Workflow plugin — state machines with UI and authorization for Fondation
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -11,11 +11,12 @@ use Mojolicious::Plugin::Fondation::Workflow::Proxy;
 
 sub fondation_meta {
     return {
-        dependencies => [],
-        after        => ['Fondation::Model::DBIx::Async'],
+        dependencies      => [],
+        provides_actions  => ['Workflow'],
+        after             => ['Fondation::Model::DBIx::Async'],
         defaults     => {
             workflow_dir      => 'share/workflows',
-            persister_file_dir => 'data/setup',
+            persister_file_dir => 'data/workflows',
             models => {
                 workflow         => { source => 'Workflow' },
                 workflow_history => { source => 'WorkflowHistory' },
@@ -25,6 +26,30 @@ sub fondation_meta {
             label       => 'Workflow',
             description => 'Workflow engine configuration',
             parameters  => [
+                {
+                    key         => 'persister.dsn',
+                    label       => 'Persister DSN',
+                    type        => 'string',
+                    default     => 'dbi:SQLite:dbname=data/app.db',
+                    required    => 1,
+                    placeholder => 'dbi:SQLite:dbname=data/app.db',
+                },
+                {
+                    key         => 'persister.user',
+                    label       => 'Persister user',
+                    type        => 'string',
+                    default     => '',
+                    required    => 0,
+                    placeholder => '',
+                },
+                {
+                    key         => 'persister.password',
+                    label       => 'Persister password',
+                    type        => 'password',
+                    default     => '',
+                    required    => 0,
+                    placeholder => '',
+                },
                 {
                     key         => 'workflow_dir',
                     label       => 'Workflow directory',
@@ -37,9 +62,9 @@ sub fondation_meta {
                     key         => 'persister_file_dir',
                     label       => 'File persister directory',
                     type        => 'string',
-                    default     => 'data/setup',
+                    default     => 'data/workflows',
                     required    => 1,
-                    placeholder => 'data/setup',
+                    placeholder => 'data/workflows',
                 },
                 {
                     key         => 'models.workflow.source',
@@ -69,6 +94,28 @@ sub register ($self, $app, $config) {
     my $factory = Workflow::Factory->instance;
 
     # Configure the DBI persister (default for DB-backed workflows)
+    if (!$persister_cfg->{dsn}) {
+        # Auto-detect DSN from Fondation::Model::DBIx::Async if loaded
+        my $api = eval { $app->fondation };
+        my $reg = $api ? $api->registry : {};
+        my $dbix = $reg->{'Mojolicious::Plugin::Fondation::Model::DBIx::Async'};
+        if ($dbix) {
+            my $be_name = $dbix->{config}{default_backend}
+                       || ($dbix->{config}{backends} && $dbix->{config}{backends}[0]);
+            if ($be_name) {
+                my $belist = $dbix->{config}{backends} // [];
+                for (my $i = 0; $i < @$belist; $i += 2) {
+                    next unless $belist->[$i] eq $be_name;
+                    my $be = $belist->[$i + 1] // {};
+                    $persister_cfg->{dsn}      = $be->{dsn}      if $be->{dsn};
+                    $persister_cfg->{user}     = $be->{user}     if $be->{user};
+                    $persister_cfg->{password} = $be->{password} if $be->{password};
+                    last;
+                }
+            }
+        }
+    }
+
     if ($persister_cfg->{dsn}) {
         $factory->add_config(
             persister => {
@@ -115,7 +162,7 @@ sub register ($self, $app, $config) {
                 next if $registered_persisters{$name}++;
                 # Set default path for File persistors and create the directory
                 if (($p->{class} // '') eq 'Workflow::Persister::File') {
-                    $p->{path} //= $config->{persister_file_dir} // 'data/setup';
+                    $p->{path} //= $config->{persister_file_dir} // 'data/workflows';
                     my $dir = $app->home->child($p->{path});
                     $dir->make_path unless -d $dir;
                 }
@@ -191,7 +238,7 @@ Mojolicious::Plugin::Fondation::Workflow - Workflow plugin — state machines wi
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -255,14 +302,6 @@ wizards like L<Fondation::Setup> that use C<Workflow::Persister::File>.
 When C<Fondation::Model::DBIx::Async> IS present, the C<after> hint ensures
 Workflow loads after it, so the C<models> default (C<Workflow>, C<WorkflowHistory>)
 is picked up by C<Action::DBIx>.
-
-=head1 NAME
-
-Mojolicious::Plugin::Fondation::Workflow - State-machine workflows with UI, authorization and hooks for Fondation
-
-=head1 VERSION
-
-version 0.02
 
 =head1 CONFIGURATION
 

@@ -32,16 +32,13 @@ no_index:
   directory:
     - t
     - inc
+  package:
+    - Dist::Starter::Context
+    - Dist::Starter::Exception
 provides:
   Dist::Starter:
     file: lib/Dist/Starter.pm
-    version: v0.1.0
-  Dist::Starter::Context:
-    file: lib/Dist/Starter/Context.pm
-    version: v0.1.0
-  Dist::Starter::Exception:
-    file: lib/Dist/Starter/Exception.pm
-    version: v0.1.0
+    version: v0.1.1
 requires:
   Carp: '1.32'
   Fcntl: '0'
@@ -61,5 +58,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/XSven/Dist-Starter/issues
   repository: https://codeberg.org/XSven/Dist-Starter.git
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

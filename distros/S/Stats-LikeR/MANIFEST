@@ -23,6 +23,8 @@ t/aoh2hoh.t
 t/aov.t
 t/assign.HoH.t
 t/assign.t
+t/bedroc.python.py
+t/bedroc.python.t
 t/bedroc.t
 t/better.coverage.t
 t/binom_test.t
@@ -51,6 +53,7 @@ t/filter.compiled.t
 t/filter.rowid.t
 t/filter.t
 t/filter_match.t
+t/fisher_test.R.scipy.t
 t/fisher_test.t
 t/friedman_test.t
 t/glm.t

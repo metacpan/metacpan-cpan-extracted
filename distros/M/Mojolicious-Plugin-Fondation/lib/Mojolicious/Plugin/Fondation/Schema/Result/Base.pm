@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Schema::Result::Base;
-$Mojolicious::Plugin::Fondation::Schema::Result::Base::VERSION = '0.06';
+$Mojolicious::Plugin::Fondation::Schema::Result::Base::VERSION = '0.07';
 # ABSTRACT: Base class for all Fondation DBIx::Class Result classes
 
 use strict;
@@ -32,6 +32,28 @@ sub TO_JSON {
             $data{$rel} = $obj;  # unblessed hashref (prefetched async)
         }
     }
+
+    # ── many_to_many_async relationships ──
+    # Discovered via _many_to_many metadata (populated by
+    # DBIx::Class::Relationship::ManyToMany::Async).
+    # When data was prefetched (e.g. $rs->with('groups')),
+    # the accessor returns Future->done(\@targets) — we
+    # extract synchronously via is_done + get.
+    # Without prefetch, the Future is not done → silently skipped.
+    {
+        no strict 'refs';
+        my $m2m = ${ ref($self) . '::_many_to_many' } // {};
+        for my $meth (keys %$m2m) {
+            next unless $self->can($meth);
+            my $future = $self->$meth;
+            next unless $future->is_done;
+            my $targets = $future->get;
+            $data{$meth}
+                = [ map { blessed($_) ? $_->TO_JSON : $_ } @$targets ]
+                if $targets && @$targets;
+        }
+    }
+
     # Serialize DateTime columns to ISO 8601 strings
     for my $key (keys %data) {
         my $val = $data{$key};
@@ -55,7 +77,7 @@ Mojolicious::Plugin::Fondation::Schema::Result::Base - Base class for all Fondat
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

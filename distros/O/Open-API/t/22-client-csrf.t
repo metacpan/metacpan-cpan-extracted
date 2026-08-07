@@ -13,6 +13,7 @@ use Test::More;
 plan skip_all => 'Hyperman not installed' unless eval { require Hyperman; 1 };
 plan skip_all => 'Fetch not installed'    unless eval { require Fetch; 1 };
 require Open::API;
+require Open::API::Plack;
 require Open::API::Client;
 
 my $port = do {
@@ -31,7 +32,7 @@ if (!$pid) {
     my %SESS;                 # sid => current csrf token
     my ($sid_seq, $tok_seq) = (0, 0);
     my $api2 = Open::API->new(spec => $SPEC);
-    my $app  = $api2->to_app(
+    my $app  = Open::API::Plack->new(api => $api2,
         handlers => {
             listPets  => sub { [ 200, ['Content-Type' => 'application/json'], ['[]'] ] },
             createPet => sub { [ 201, ['Content-Type' => 'application/json'], ['{"ok":1}'] ] },
@@ -63,7 +64,7 @@ if (!$pid) {
             push @{ $resp->[1] }, 'Set-Cookie' => "csrf=$tok; Path=/; SameSite=Strict";
             return;
         },
-    );
+    )->to_app;
     Hyperman->run(app => $app, host => '127.0.0.1', port => $port, workers => 1);
     exit 0;
 }

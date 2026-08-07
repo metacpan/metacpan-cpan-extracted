@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::OpenAPI::Command::openapi;
-$Mojolicious::Plugin::Fondation::OpenAPI::Command::openapi::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::OpenAPI::Command::openapi::VERSION = '0.03';
 # ABSTRACT: Generate OpenAPI specification from DBIx::Class sources
 
 use Mojo::Base 'Mojolicious::Command', -signatures;
@@ -86,7 +86,7 @@ sub run ($self, @args) {
     say "OpenAPI spec written to $output ($source_count source(s))";
 
     # Generate and write client-side validators.js
-    my $validators_js = $self->_build_validators_js($spec);
+    my $validators_js = $self->_build_validators_js($spec, $config->{no_validator_js});
     my $validators_path = $app->home->child('public', 'js', 'validators.js');
     $validators_path->dirname->make_path;
     $validators_path->spurt($validators_js);
@@ -209,7 +209,7 @@ sub _sync_permissions ($self, $app, $config, @args) {
 # Build client-side validators.js from the OpenAPI spec
 # ---------------------------------------------------------------------------
 
-sub _build_validators_js ($self, $spec) {
+sub _build_validators_js ($self, $spec, $permissive = 0) {
     my $schemas = $spec->{components}{schemas};
     my $schemas_js = '';
 
@@ -232,6 +232,14 @@ sub _build_validators_js ($self, $spec) {
                 if $def->{minLength};
             push @rules, "maxLength: " . $def->{maxLength}
                 if $def->{maxLength};
+            if ($def->{pattern}) {
+                # Patterns MUST be authored in ECMA-262 dialect (JSON Schema requirement):
+                # valid for both JSON::Validator (Perl) and new RegExp() client-side.
+                # We only escape the regex for the JS string literal -- no dialect change.
+                (my $escaped_pattern = $def->{pattern}) =~ s/\\/\\\\/g;
+                $escaped_pattern =~ s/'/\\'/g;
+                push @rules, "pattern: '$escaped_pattern'";
+            }
             push @rules, "format: '" . $def->{format} . "'"
                 if $def->{format};
             push @rules, "nullable: true"
@@ -306,6 +314,11 @@ window.FondationValidators = {
                 errors.push(prop + ' must be at most ' + rules.maxLength + ' characters');
             }
 
+            // Pattern check (ECMA-262 regex, authored in the Result class)
+            if (rules.pattern && typeof val === 'string' && !new RegExp(rules.pattern).test(val)) {
+                errors.push(prop + ' does not match the required pattern');
+            }
+
             // Enum check
             if (rules.enum) {
                 var match = false;
@@ -338,6 +351,21 @@ window.FondationValidators = {
 VALIDATORS
 
     $validators =~ s/SCHEMAS_PLACEHOLDER/$schemas_js/;
+
+    # no_validator_js: replace the whole client-side validation logic with an
+    # accept-everything stub, so only server-side OpenAPI validation applies.
+    if ($permissive) {
+        my $start_marker = "validate: function(schemaName, data) {\n";
+        my $end_marker   = "\n    }\n};";
+        my $s            = index($validators, $start_marker);
+        my $e            = index($validators, $end_marker, $s);
+        if ($s >= 0 && $e > $s) {
+            substr($validators, $s + length($start_marker),
+                $e - $s - length($start_marker),
+                "        return { valid: true, errors: [] };\n");
+        }
+    }
+
     return $validators;
 }
 
@@ -711,7 +739,7 @@ sub _resolve_type ($self, $info) {
 
 sub _apply_openapi_flat ($self, $prop, $openapi) {
     my %flat_keys = map { $_ => 1 } qw(
-        format minLength maxLength minimum maximum
+        format pattern minLength maxLength minimum maximum
         enum writeOnly readOnly description
         type nullable default
     );
@@ -840,7 +868,7 @@ Mojolicious::Plugin::Fondation::OpenAPI::Command::openapi - Generate OpenAPI spe
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -924,6 +952,8 @@ Result class via C<extra-E<gt>{openapi}>:
   format      -- "email", "password", "uri", etc.
   minLength   -- minimum string length
   maxLength   -- maximum string length (overrides DBIx size)
+  pattern     -- ECMA-262 regex; used by JSON::Validator (Perl) server-side
+                 and new RegExp() in validators.js client-side
   minimum     -- minimum numeric value
   maximum     -- maximum numeric value
   enum        -- arrayref of allowed values

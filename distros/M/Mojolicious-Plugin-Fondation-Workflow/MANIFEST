@@ -10,6 +10,7 @@ README.md
 cpanfile
 dist.ini
 lib/Mojolicious/Plugin/Fondation/Workflow.pm
+lib/Mojolicious/Plugin/Fondation/Workflow/Action/Workflow.pm
 lib/Mojolicious/Plugin/Fondation/Workflow/Proxy.pm
 lib/Mojolicious/Plugin/Fondation/Workflow/Schema/Result/Workflow.pm
 lib/Mojolicious/Plugin/Fondation/Workflow/Schema/Result/WorkflowHistory.pm

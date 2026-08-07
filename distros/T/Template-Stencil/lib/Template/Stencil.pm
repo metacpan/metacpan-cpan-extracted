@@ -1,10 +1,10 @@
 package Template::Stencil;
 
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Template::Stencil', $VERSION);
@@ -344,6 +344,33 @@ simply construct the object before or after fork - a child inherits a
 private copy either way. Under ithreads a cloned object lazily
 rebuilds its own engine, with an empty cache, from its cloned options
 on first use. No locks exist anywhere because nothing is shared.
+
+=head1 C ABI
+
+An XS module can render through the engine without a Perl frame in
+between. F<include/st_abi.h> declares a function-pointer table with two
+entries - C<engine_of>, which hands back the opaque engine behind a
+blessed Template::Stencil object, and C<render>, which is the render
+path minus the XS prologue and the croak. A template error arrives
+through an out-parameter rather than as an exception, so a consumer can
+turn one into its own error response.
+
+The table is resolved at runtime through C<Template::Stencil::_abi_ptr>
+and gated on its C<abi_version>, so there is no link-time coupling and
+the two distributions upgrade independently; entries are only ever
+appended. Reach the header with L<ExtUtils::Depends>:
+
+    my $pkg = ExtUtils::Depends->new('My::Module', 'Template::Stencil');
+
+Hold a reference to the B<object> and call C<engine_of> on each render
+rather than caching the engine pointer: under ithreads a cloned object
+drops its engine and rebuilds a fresh one lazily, so a cached handle
+would outlive what it points at. The lookup is a walk of the object's
+magic chain, which is cheap enough to mean that.
+
+The returned SV belongs to the caller. Do not assign it to a plain
+lexical and return that - perl may steal the buffer; store it where it
+is going directly.
 
 =head1 CAVEATS
 

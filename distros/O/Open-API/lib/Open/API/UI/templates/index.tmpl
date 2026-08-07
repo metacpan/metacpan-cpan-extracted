@@ -1,0 +1,46 @@
+<header class="oa-head">
+  <h1>{% info.title %}{% if info.version %} <span class="oa-version">{% info.version %}</span>{% end %}</h1>
+{% if info.description_html %}
+  <div class="oa-description oa-md">{% raw info.description_html %}</div>
+{% end %}
+{% if servers %}
+  <div class="oa-servers">
+    <label for="oa-server">Server</label>
+    <select id="oa-server">
+{% for s in servers %}
+      <option value="{% s.url %}">{% s.url %}{% if s.description %} - {% s.description %}{% end %}</option>
+{% end %}
+    </select>
+  </div>
+{% end %}
+{% if schemes %}
+  <details class="oa-authorize" id="oa-authorize">
+    <summary>Authorize</summary>
+{% for sc in schemes %}
+    <div class="oa-scheme" data-scheme="{% sc.name %}" data-type="{% sc.type %}"
+         data-http="{% sc.scheme %}" data-in="{% sc.in %}" data-key="{% sc.key %}">
+      <h3>{% sc.name %} <span class="oa-scheme-type">{% sc.label %}</span></h3>
+    </div>
+{% end %}
+    <div class="oa-csrf" id="oa-csrf"></div>
+    <label class="oa-remember"><input type="checkbox" id="oa-remember"> remember for this tab</label>
+  </details>
+{% end %}
+</header>
+<main>
+{% for tag in tags %}
+  <section class="oa-tag">
+    <h2 id="tag-{% tag.slug %}">{% tag.name %}</h2>
+{% if tag.description_html %}
+    <div class="oa-description oa-md">{% raw tag.description_html %}</div>
+{% end %}
+{% for op in tag.ops %}
+{% include operation %}
+{% end %}
+  </section>
+{% end %}
+  <section class="oa-schemas" id="oa-schemas" hidden>
+    <h2>Schemas</h2>
+    <div id="oa-schemas-body"></div>
+  </section>
+</main>

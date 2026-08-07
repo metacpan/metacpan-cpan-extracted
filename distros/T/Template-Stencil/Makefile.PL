@@ -1,8 +1,30 @@
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
+use File::Find ();
 use Config;
+
+# Template::Stencil is a provider: it installs st_abi.h so a dependent (Punk's
+# view tier) can render through the engine in C, resolving the table at runtime
+# from Template::Stencil::_abi_ptr. It consumes nothing itself.
+my $pkg = ExtUtils::Depends->new('Template::Stencil');
+$pkg->install('include/st_abi.h');
+mkdir 'Install' unless -d 'Install';
+$pkg->save_config('Install/Files.pm');
+my %dep = $pkg->get_makefile_vars;
+# EU::Depends returns an empty LIBS/LDFROM that would otherwise clobber
+# MakeMaker's defaults, and an OBJECT that would drop the src/ objects; this
+# module links nothing extra and builds its own object list below.
+delete @dep{qw(LIBS LDFROM OBJECT INC)};
+# Its PM map (installing st_abi.h + Files.pm) replaces MakeMaker's
+# auto-detected one, so re-add everything shipped under lib/.
+File::Find::find(sub {
+    return unless -f;
+    (my $rel = $File::Find::name) =~ s{^lib/}{};
+    $dep{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
+}, 'lib');
 
 # --- capability probes ---------------------------------------------------
 #
@@ -25,14 +47,20 @@ sub try_compile {
         close $fh;
         my $cc  = $Config{cc} || 'cc';
         my $c   = $link ? '' : '-c';
-        $ok = system("$cc $flags $c $src -o $out >/dev/null 2>&1") == 0;
+        # cmd.exe has no /dev/null and no 2>&1-after-redirect ordering
+        # quirks worth fighting; NUL does the same job there.
+        my $null = $^O eq 'MSWin32' ? 'NUL' : '/dev/null';
+        $ok = system("$cc $flags $c $src -o $out >$null 2>&1") == 0;
     }
     unlink $src, $out;
     rmdir $dir;
     return $ok;
 }
 
-my @defines;
+# Keep XSUB.h from rewriting malloc/free/stat/open/read/close into the
+# per-interpreter PERL_IMPLICIT_SYS vtable (threaded Windows perls). The C
+# core has no pTHX in scope and owns its own memory; see include/stencil.h.
+my @defines = ('-DNO_XSLOCKS');
 
 push @defines, '-DSTENCIL_HAVE_COMPUTED_GOTO' if try_compile(<<'C');
 int main(void) { static void *t[] = { &&a }; goto *t[0]; a: return 0; }
@@ -97,19 +125,23 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Template/Stencil.pm',
     ABSTRACT_FROM    => 'lib/Template/Stencil.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.016000',
+    MIN_PERL_VERSION => '5.010000',
     OBJECT           => join(' ', 'Stencil$(OBJ_EXT)',
                              map { (my $o = $_) =~ s/\.c$/\$(OBJ_EXT)/; $o }
                                  sort glob 'src/*.c'),
-    INC              => '-Iinclude',
+    # '-I.' so include/stencil.h finds ppport.h at the dist root; the
+    # compile runs from the root but '.' is not on the quote-include path.
+    INC              => '-I. -Iinclude',
     OPTIMIZE         => $optimize,
     DEFINE           => join(' ', @defines),
     ($ldflags ? (dynamic_lib => { OTHERLDFLAGS => $ldflags }) : ()),
     depend           => {
-        'Stencil$(OBJ_EXT)' => join(' ', sort glob 'include/*.h'),
+        'Stencil$(OBJ_EXT)' => join(' ', 'ppport.h', sort glob 'include/*.h'),
     },
+    %dep,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::Depends'   => '0.404',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -145,7 +177,8 @@ WriteMakefile(%WriteMakefileArgs);
 # where the link step expects it. Generated from the glob so new phases
 # get their rules for free.
 sub MY::postamble {
-    my $headers = join ' ', sort(glob('include/*.h'), glob('src/*.inc'));
+    my $headers = join ' ', 'ppport.h',
+                            sort(glob('include/*.h'), glob('src/*.inc'));
     my $mk = '';
     for my $c (sort glob 'src/*.c') {
         (my $o = $c) =~ s/\.c$/\$(OBJ_EXT)/;

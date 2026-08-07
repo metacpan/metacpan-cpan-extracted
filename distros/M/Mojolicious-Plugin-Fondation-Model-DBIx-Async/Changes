@@ -1,3 +1,7 @@
+0.05      2026-08-06 23:38:58+02:00 Europe/Paris
+    - add To_JSON ResultSet
+    - Fondation v0.07 dependency
+
 0.04      2026-08-03 12:20:41+02:00 Europe/Paris
     - with(): read _many_to_many scalar instead of hash
     - dependency on v0.02 DBIx::Class::Relationship::ManyToMany::Async.

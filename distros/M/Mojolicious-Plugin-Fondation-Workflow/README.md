@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Workflow - Workflow plugin — state machines wi
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 
@@ -61,14 +61,6 @@ wizards like [Fondation::Setup](https://metacpan.org/pod/Fondation%3A%3ASetup) t
 When `Fondation::Model::DBIx::Async` IS present, the `after` hint ensures
 Workflow loads after it, so the `models` default (`Workflow`, `WorkflowHistory`)
 is picked up by `Action::DBIx`.
-
-# NAME
-
-Mojolicious::Plugin::Fondation::Workflow - State-machine workflows with UI, authorization and hooks for Fondation
-
-# VERSION
-
-version 0.02
 
 # CONFIGURATION
 

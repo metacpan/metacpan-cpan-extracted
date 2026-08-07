@@ -1,5 +1,25 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::CSRFToken.
 
+1.100 - 2026-08-06
+  - UPGRADE WARNING: the on-the-wire token format has changed and tokens
+    issued by 1.001 or earlier are rejected. Any page already rendered by
+    the old version stops validating the moment this is deployed, so users
+    part way through a form will get a 403 and have to reload. Drain or
+    expire sessions as part of the upgrade if that matters to you.
+  - Security: mask each CSRF token with fresh randomness before returning
+    it to the caller, preventing a stable token representation from being
+    recovered through a BREACH compression oracle. Reported by dcook on
+    irc.perl.org; the same issue Mojolicious addressed in GHSA-cf46-h6jw-mj3r.
+  - Stop logging submitted and expected CSRF token values in debug mode.
+  - Documentation fix: the overridable failure hook is
+    'delegate_failed_csrf_token_check'. Earlier docs named a
+    'csrf_failure_response' method that never existed, so overrides written
+    against the documented name were silently ignored.
+  - Documentation fix: the attribute that skips automatic checks is
+    'DisableCSRF', not 'NoCSRF' as the prose claimed.
+  - Dropped the unused Bytes::Random::Secure prerequisite and raised the
+    MIME::Base64 floor to 3.11, the first release with encode_base64url.
+
 1.001 - 2025-03-09
   - Back compatibility warning: The previous version has been buggy
     for quite a while due to errors I made in version 0.001 and I've
@@ -9,7 +29,8 @@
     I did my best to be compatible in terms of the public API. This works
     for all my existing code but please shout out if you run into issues.
     FWIW I believe you should upgrade as I consider previous versions
-    insecure and I will be removing them from CPAN in the future.
+    insecure and I will be removing them from CPAN in the future.  Sorry for
+    the trouble.
 
 0.008 - 2024-10-27
   - Force session id to exist if one doesn't already.

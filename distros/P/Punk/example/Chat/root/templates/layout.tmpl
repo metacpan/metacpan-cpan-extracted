@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% title | default('Punk Chat') %}</title>
+<link rel="stylesheet" href="/static/chat.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/">punk<span>chat</span></a>
+  <nav>
+    <a href="/">rooms</a>
+    <a href="/docs">API docs</a>
+    <a href="/api/rooms">/api/rooms</a>
+  </nav>
+  <span class="lock" title="served over TLS by the terminator in bin/punk-chat">TLS</span>
+</header>
+
+<main>
+{% content %}
+</main>
+
+<footer class="bar foot">
+  <span>Punk - routes, guards and the OpenAPI spec compiled once, at boot.</span>
+</footer>
+</body>
+</html>

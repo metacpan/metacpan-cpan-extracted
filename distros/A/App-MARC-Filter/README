@@ -6,8 +6,9 @@ SYNOPSIS
 
 DESCRIPTION
     Tool to filter MARC records in big datasets. Could filter by control
-    field or field/subfield or leader or material type. Tool could filter by
-    number of output records.
+    field or field/subfield or leader or material type. Field 008 also
+    supports item selectors in the form "008.item", parsed by
+    MARC::Field008. Tool could filter by number of output records.
 
     It supports MARC XML and USMARC files now.
 
@@ -55,7 +56,26 @@ ARGUMENTS
     *       "search_item"
 
             Search item could be MARC control field or MARC field or
-            'leader' string or material type string.
+            'leader' string or material type string. Field 008 also supports
+            item selectors in the form "008.item".
+
+            Possible field 008 items are:
+
+            *   cataloging_source
+
+            *   date1
+
+            *   date2
+
+            *   date_entered_on_file
+
+            *   language
+
+            *   modified_record
+
+            *   place_of_publication
+
+            *   type_of_date
 
             Possible material type strings are:
 
@@ -80,7 +100,9 @@ ARGUMENTS
 
     *       "value"
 
-            Value to filter. It's required without "-e".
+            Value to filter. For "008.date1" and "008.date2" it's possible to
+            use range syntax in the form "YYYY..YYYY". It's required without
+            "-e".
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-MARC-Filter>
@@ -103,5 +125,4 @@ ACKNOWLEDGEMENTS
     Linked Open Data.
 
 VERSION
-    0.11
-
+    0.12

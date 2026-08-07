@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::OpenAPI;
-$Mojolicious::Plugin::Fondation::OpenAPI::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::OpenAPI::VERSION = '0.03';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
 
@@ -14,6 +14,7 @@ sub fondation_meta {
         after        => ['Fondation::MigrationDBIx'],
         defaults     => {
             backend           => undef,
+            no_validator_js   => 0,
             fondation_init    => [
                 ['openapi', 'generate', '-y'],
                 ['openapi', 'sync-permissions', '-q'],
@@ -27,14 +28,28 @@ sub fondation_meta {
                 'public/js/validators.js',
             ],
         },
+        setup => {
+            label       => 'OpenAPI',
+            description => 'OpenAPI spec generation and request validation',
+            parameters  => [
+                {
+                    key      => 'no_validator_js',
+                    label    => 'Disable client-side validators.js',
+                    type     => 'boolean',
+                    default  => 0,
+                    required => 0,
+                },
+            ],
+        },
     };
 }
 
 
 sub register ($self, $app, $conf = {}) {
     $app->defaults('openapi.config' => {
-        backend => $conf->{backend},
-        schemas => $conf->{schemas} // {},
+        backend         => $conf->{backend},
+        schemas         => $conf->{schemas} // {},
+        no_validator_js => $conf->{no_validator_js} // 0,
     });
 
     push @{$app->commands->namespaces},
@@ -140,7 +155,7 @@ Mojolicious::Plugin::Fondation::OpenAPI - OpenAPI specification generator and ru
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -158,6 +173,11 @@ version 0.02
               },
           },
       },
+  }
+
+  # Optional: disable the client-side validators.js rules
+  'Fondation::OpenAPI' => {
+      no_validator_js => 1,
   }
 
   # CLI
@@ -180,7 +200,28 @@ Swagger UI routes in development mode.
   'Fondation::OpenAPI' => {
       backend => 'main',          # optional -- falls back to DBIx::Async default
       schemas => { ... },         # optional -- column overrides
+      no_validator_js => 0,       # optional -- default 0 (client validation on)
   }
+
+=head3 C<no_validator_js>
+
+When set to C<1>, C<openapi generate> still writes C<public/js/validators.js>
+but the generated C<validate()> function accepts everything
+(C<return { valid: true, errors: [] }>). Server-side OpenAPI validation is
+unaffected. Use it to rely solely on server validation (e.g. during testing).
+
+Re-enable client validation by setting it back to C<0> (or removing the key)
+and regenerating. The same setting is exposed as a boolean parameter in the
+plugin's C<fondation_meta> C<setup> block (default C<0>).
+
+=head3 C<pattern> in column overrides
+
+Column C<pattern> (like C<minLength>, C<maxLength>, C<format>...) is a flat
+key accepted both in C<extra->{openapi}> (DBIx Result classes) and in the
+C<schemas> config override. Patterns MUST be authored in ECMA-262 dialect:
+the same regex is used by JSON::Validator server-side (Perl) and by
+C<new RegExp()> in the generated validators.js. Avoid Perl-only constructs
+(C<\z>, C<\A>, POSIX classes, variable lookbehind, ...).
 
 =head2 Backend resolution
 

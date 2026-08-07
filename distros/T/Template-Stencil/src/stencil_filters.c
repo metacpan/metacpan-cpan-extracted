@@ -1,3 +1,7 @@
+/* utf8_to_uvchr_buf is 5.16; ask ppport.h (included from stencil.h) to
+ * emit its back-compat implementation into this TU, the only user. */
+#define NEED_utf8_to_uvchr_buf
+
 #include "stencil.h"
 
 void stencil_filt_case(pTHX_ SV *in, SV *out, int to_upper)

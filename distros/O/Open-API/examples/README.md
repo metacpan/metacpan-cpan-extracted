@@ -22,6 +22,12 @@ In another:
 
     perl examples/client.pl http://127.0.0.1:5000
 
+Or open <http://127.0.0.1:5000/docs> in a browser: `ui => 1` on the server
+serves the built-in docs UI (see `perldoc Open::API::UI`; it needs the
+sibling Template::Stencil built). Log in via try-it-out on `POST /login`
+with `security: []`, then create a pet - the page reads the rotated `csrf`
+cookie and sends `X-CSRF-Token` on every unsafe call automatically.
+
 Expected output from the client:
 
     GET  /pets (anon)  -> 401 (not logged in)

@@ -1,5 +1,17 @@
 Revision history for JSON-Schema-Fast
 
+0.06    Date/time
+        - Build fix for perl 5.14 through 5.20: U64 is behind #ifdef PERL_CORE
+          until 5.22
+        - Arena allocations take their alignment from the type instead of a
+          hardcoded 8. jsf_node_t holds five NVs, and on a perl built
+          -Duselongdouble or -Dusequadmath an NV is 16-byte aligned, so every
+          node was landing on an odd 8-byte boundary. 
+        - SPAGAIN after the require in the Fetch and File::Raw::JSON ABI
+          resolvers. Both captured SP, ran arbitrary Perl, then PUSHMARKed and
+          PUTBACKed through the stale pointer; if the require had grown the
+          value stack, that pointer was into the freed block.
+
 0.05    2026-08-04
         - Consume Fetch's and File::Raw::JSON's C ABIs through ExtUtils::Depends
         - Also an ExtUtils::Depends provider now

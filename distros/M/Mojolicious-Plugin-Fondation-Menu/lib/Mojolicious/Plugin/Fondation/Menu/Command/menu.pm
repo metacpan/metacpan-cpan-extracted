@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Menu::Command::menu;
-$Mojolicious::Plugin::Fondation::Menu::Command::menu::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Menu::Command::menu::VERSION = '0.03';
 # ABSTRACT: Menu sync command — scan plugins for menus.json and insert entries
 
 use Mojo::Base 'Mojolicious::Command', -signatures;
@@ -217,7 +217,7 @@ Mojolicious::Plugin::Fondation::Menu::Command::menu - Menu sync command — scan
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

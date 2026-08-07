@@ -12,6 +12,7 @@ use Test::More;
 plan skip_all => 'Hyperman not installed' unless eval { require Hyperman; 1 };
 plan skip_all => 'Fetch not installed'    unless eval { require Fetch; 1 };
 require Open::API;
+require Open::API::Plack;
 require Open::API::Client;
 
 my $SPEC = {
@@ -33,7 +34,7 @@ my $pid = fork // die "fork: $!";
 if (!$pid) {
     open STDERR, '>', '/dev/null';
     my $api = Open::API->new(spec => $SPEC);
-    my $app = $api->to_app(handlers => {
+    my $app = Open::API::Plack->new(api => $api, handlers => {
         login  => sub { [ 200, ['Set-Cookie' => 'sid=s3cr3t; Path=/',
                                 'Content-Type' => 'application/json'], ['{}'] ] },
         whoami => sub {
@@ -43,7 +44,7 @@ if (!$pid) {
                 $env->{HTTP_COOKIE} || '', $env->{HTTP_AUTHORIZATION} || '',
                 $env->{HTTP_USER_AGENT} || '' ] ];
         },
-    });
+    })->to_app;
     Hyperman->run(app => $app, host => '127.0.0.1', port => $port, workers => 1);
     exit 0;
 }

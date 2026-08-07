@@ -74,6 +74,12 @@ sub get {
     is($failures, 0, 'no failed requests across worker recycles');
     cmp_ok(scalar keys %pids, '>', 2,
         'workers recycled after max_requests (' . (keys %pids) . ' pids seen)');
+
+    # The supervisor never serves. $$ is a plain SV that perl only refreshes
+    # inside pp_fork, so a worker forked from C reported the supervisor's pid
+    # until hm_spawn started setting it - which made every worker look like
+    # the same process to the application (and to the assertion above).
+    ok(!$pids{$sup}, "workers report their own pid, not the supervisor's ($sup)");
 }
 
 # ---- USR1: workers dump stats to stderr ----------------------------------

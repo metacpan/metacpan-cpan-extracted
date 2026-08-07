@@ -27,15 +27,16 @@ my %WriteMakefileArgs = (
     "DBIx::Class" => "0.082843",
     "DBIx::Class::TimeStamp" => 0,
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => "0.01",
-    "Mojolicious::Plugin::Fondation::Authorization" => "0.01",
-    "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.01",
-    "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.01"
+    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation::Authorization" => "0.02",
+    "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.04",
+    "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.05",
+    "Mojolicious::Plugin::Fondation::Problem" => "0.03"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.302190"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,10 +47,11 @@ my %FallbackPrereqs = (
   "DBIx::Class" => "0.082843",
   "DBIx::Class::TimeStamp" => 0,
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => "0.01",
-  "Mojolicious::Plugin::Fondation::Authorization" => "0.01",
-  "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.01",
-  "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.01",
+  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation::Authorization" => "0.02",
+  "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.04",
+  "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.05",
+  "Mojolicious::Plugin::Fondation::Problem" => "0.03",
   "Test::More" => "1.302190"
 );
 

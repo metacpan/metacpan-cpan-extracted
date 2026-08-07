@@ -1,4 +1,5 @@
 Changes
+cpanfile
 lib/Class/Simple/Cached.pm
 LICENSE
 Makefile.PL
@@ -9,18 +10,24 @@ t/00-load.t
 t/10-new.t
 t/30-basics.t
 t/carp.t
+t/cgi_security.t
 t/chi.t
 t/comment-spelling.t
 t/coverage.t
 t/critic.t
 t/dist.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/function.t
 t/hash.t
+t/integration.t
 t/kwalitee.t
 t/links.t
+t/logic.t
 t/manifest.t
 t/metrics.t
+t/modules-used.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t
@@ -33,8 +40,8 @@ t/prereq.t
 t/snippets.t
 t/strict.t
 t/test.t
+t/unit.t
 t/unused.t
-t/used.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

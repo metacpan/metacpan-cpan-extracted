@@ -17,9 +17,10 @@ use utf8;
 use Test::More tests => 12;
 
 use lib "./t/lib";
-use Config::IniFiles;
-use File::Spec;
+
+use Config::IniFiles        ();
 use Config::IniFiles::Slurp qw( slurp utf8_slurp utf8_spew );
+use File::Spec              ();
 
 use File::Temp qw(tempdir);
 

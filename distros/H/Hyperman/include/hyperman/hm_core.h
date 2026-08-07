@@ -42,6 +42,7 @@ struct hm_conn {
     UV       id;            /* generation id, guards fd reuse       */
     UV       nreqs;         /* requests served on this connection   */
     SV      *io_sv;         /* psgix.io: dup'd filehandle, per conn */
+    SV      *cid_sv;        /* psgix.hyperman.conn: [fd, id], per conn */
     SV      *peer_sv;       /* cached env values, constant for the  */
     SV      *peer_host_sv;  /* life of the connection: REMOTE_ADDR, */
     SV      *peer_port_sv;  /* REMOTE_HOST, REMOTE_PORT,            */
@@ -55,6 +56,7 @@ struct hm_conn {
     unsigned char tls_hs;         /* TLS handshake in progress       */
     unsigned char tls_r_wants_w;  /* SSL_read blocked wanting write  */
     unsigned char tls_w_wants_r;  /* SSL_write blocked wanting read  */
+    unsigned char detached;       /* app took the socket (see hm_detach) */
     int      last_status;   /* last response status/bytes (logging) */
     size_t   last_blen;
     char     peer[INET6_ADDRSTRLEN];  /* REMOTE_ADDR, filled at accept    */
@@ -164,12 +166,15 @@ static void hm_readable(pTHX_ hm_conn *c);
 
 static const char *hm_reason(int s) {
     switch (s) {
+        case 100: return "Continue";      case 101: return "Switching Protocols";
+        case 102: return "Processing";    case 103: return "Early Hints";
         case 200: return "OK";            case 201: return "Created";
         case 204: return "No Content";    case 301: return "Moved Permanently";
         case 302: return "Found";         case 304: return "Not Modified";
         case 400: return "Bad Request";   case 401: return "Unauthorized";
         case 403: return "Forbidden";     case 404: return "Not Found";
         case 405: return "Method Not Allowed";
+        case 426: return "Upgrade Required";
         case 500: return "Internal Server Error";
         default:  return "OK";
     }
@@ -393,6 +398,7 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
     loop->conns[fd] = NULL;
     loop->nconns--;
     if (c->io_sv)  { SvREFCNT_dec(c->io_sv);  c->io_sv = NULL; }
+    if (c->cid_sv) { SvREFCNT_dec(c->cid_sv); c->cid_sv = NULL; }
     if (c->env_sv) { SvREFCNT_dec(c->env_sv); c->env_sv = NULL; }
     if (c->peer_sv)      { SvREFCNT_dec(c->peer_sv);      c->peer_sv = NULL; }
     if (c->peer_host_sv) { SvREFCNT_dec(c->peer_host_sv); c->peer_host_sv = NULL; }
@@ -421,6 +427,71 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
         FREETMPS; LEAVE;
         SvREFCNT_dec(pending);
     }
+}
+
+/* ---- detach: hand a live HTTP/1 connection to the application ------------ *
+ * The seam a protocol upgrade (WebSocket) needs: the socket stays open and
+ * becomes the app's, while the server forgets it entirely so the app's own
+ * io watchers on that fd fire (hm_dispatch routes to loop->io_r/io_w only
+ * when conns[fd] is NULL).
+ *
+ * Two phases, because the callers of the app frame keep using the conn after
+ * it returns (hm_process's consumed/memmove, hm_deliver's flush):
+ *
+ *   hm_detach        - immediate: validate, disarm the server's watchers so
+ *                      no further bytes are pulled in, flag the conn.
+ *   hm_conn_release  - deferred: hm_close minus the close(2) and minus the
+ *                      watcher removal, run once the caller is done with the
+ *                      conn. After it, conns[fd] is NULL and the fd is the
+ *                      application's to own and to close.
+ *
+ * The app must not have produced any response bytes for this request, and
+ * returns a sentinel (conventionally [101, [], []]) which is discarded. */
+static int hm_detach(pTHX_ hm_loop *loop, int fd, UV id) {
+    hm_conn *c;
+    if (fd < 0 || fd >= HM_MAXFD) return -1;
+    c = loop->conns[fd];
+    if (!c || c->id != id)       return -1;   /* gone, or a stale ticket    */
+    if (c->h2)                   return -2;   /* HTTP/2 streams share a conn */
+    if (c->ssl)                  return -3;   /* TLS state cannot be handed on */
+    if (c->wlen != c->woff)      return -4;   /* output still draining      */
+    if (c->detached)             return -5;   /* already handed over        */
+    loop->be->remove_io(loop->be, fd,
+                        HM_EV_READ | (c->writing ? HM_EV_WRITE : 0));
+    c->writing  = 0;
+    c->detached = 1;
+    return 0;
+}
+
+/* Deferred half of hm_detach: forget the connection without closing its fd. */
+static void hm_conn_release(pTHX_ hm_loop *loop, hm_conn *c) {
+    int fd = c->fd;
+    SV *pending = c->resp_f;
+    c->resp_f = NULL;
+    hm_lru_unlink(loop, c);
+    loop->conns[fd] = NULL;
+    loop->nconns--;
+    if (c->io_sv)  { SvREFCNT_dec(c->io_sv);  c->io_sv = NULL; }
+    if (c->cid_sv) { SvREFCNT_dec(c->cid_sv); c->cid_sv = NULL; }
+    if (c->env_sv) { SvREFCNT_dec(c->env_sv); c->env_sv = NULL; }
+    if (c->peer_sv)      { SvREFCNT_dec(c->peer_sv);      c->peer_sv = NULL; }
+    if (c->peer_host_sv) { SvREFCNT_dec(c->peer_host_sv); c->peer_host_sv = NULL; }
+    if (c->peer_port_sv) { SvREFCNT_dec(c->peer_port_sv); c->peer_port_sv = NULL; }
+    if (c->sname_sv)     { SvREFCNT_dec(c->sname_sv);     c->sname_sv = NULL; }
+    if (c->sport_sv)     { SvREFCNT_dec(c->sport_sv);     c->sport_sv = NULL; }
+    if (loop->pool_n < HM_POOL_MAX) {
+        c->pool_next = loop->pool;
+        loop->pool = c;
+        loop->pool_n++;
+    } else {
+        if (c->wbuf) free(c->wbuf);
+        if (c->rbuf) free(c->rbuf);
+        free(c);
+    }
+    if (loop->stopping && loop->nconns == 0) loop->stop = 1;
+    /* the request's own Future, if any, is simply dropped - the app owns
+     * the socket now, so there is nothing left to cancel it for */
+    if (pending) SvREFCNT_dec(pending);
 }
 
 static hm_conn *hm_new_conn(hm_loop *loop, int fd, hm_listener *lst) {
@@ -539,7 +610,7 @@ enum {
     HMK_PSGI_MULTIPROCESS, HMK_PSGI_RUN_ONCE, HMK_PSGI_STREAMING,
     HMK_PSGI_NONBLOCKING, HMK_PSGI_ERRORS, HMK_PSGIX_LOOP, HMK_PSGIX_IO,
     HMK_PSGI_INPUT, HMK_PSGIX_INPUT_BUFFERED, HMK_CONTENT_LENGTH,
-    HMK_CONTENT_TYPE, HMK_COUNT
+    HMK_CONTENT_TYPE, HMK_PSGIX_HM_CONN, HMK_COUNT
 };
 static const char *const hm_env_key_name[HMK_COUNT] = {
     "REQUEST_METHOD", "REQUEST_URI", "PATH_INFO", "QUERY_STRING",
@@ -549,7 +620,7 @@ static const char *const hm_env_key_name[HMK_COUNT] = {
     "psgi.multiprocess", "psgi.run_once", "psgi.streaming",
     "psgi.nonblocking", "psgi.errors", "psgix.loop", "psgix.io",
     "psgi.input", "psgix.input.buffered", "CONTENT_LENGTH",
-    "CONTENT_TYPE"
+    "CONTENT_TYPE", "psgix.hyperman.conn"
 };
 static SV *hm_env_key[HMK_COUNT];
 static SV *hm_env_zero, *hm_env_one;   /* read-only 0/1 flag values      */
@@ -646,6 +717,18 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     hm_env_store(env, HMK_PSGIX_LOOP, SvREFCNT_inc(c->loop->self_sv));
     if (!c->io_sv) c->io_sv = hm_fh_for_fd(aTHX_ c->fd);
     hm_env_store(env, HMK_PSGIX_IO, SvREFCNT_inc(c->io_sv));
+    /* psgix.hyperman.conn: [fd, generation id] - the ticket an app hands
+     * back to Hyperman::detach (or the ABI's conn_detach) to take this
+     * socket over for a protocol upgrade. HTTP/1 only; the generation id
+     * makes a stale ticket a no-op rather than a wrong-connection hit. */
+    if (!c->cid_sv) {
+        AV *cid = newAV();
+        av_extend(cid, 1);
+        av_store(cid, 0, newSViv(c->fd));
+        av_store(cid, 1, newSVuv(c->id));
+        c->cid_sv = newRV_noinc((SV *)cid);
+    }
+    hm_env_store(env, HMK_PSGIX_HM_CONN, SvREFCNT_inc(c->cid_sv));
     if (c->ssl) hm_tls_env(aTHX_ c, env);
 
     c->keepalive = (plen == 8 && memcmp(proto, "HTTP/1.1", 8) == 0);
@@ -1125,6 +1208,19 @@ static void hm_deliver(pTHX_ int fd, UV id, SV *resp) {
     hm_loop *loop = hm_cur_loop;
     hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
     if (!(c && c->id == id)) return;
+    /* detached from inside a Future continuation (async work before an
+     * upgrade): the app owns the socket, so drop the response it resolved
+     * with and forget the connection */
+    if (c->detached) {
+        c->awaiting = 0;
+        if (c->env_sv) {
+            hm_access_log(aTHX_ loop, c->env_sv, 101, -1);
+            SvREFCNT_dec(c->env_sv);
+            c->env_sv = NULL;
+        }
+        hm_conn_release(aTHX_ loop, c);
+        return;
+    }
     c->awaiting = 0;
     if (c->resp_f) { SvREFCNT_dec(c->resp_f); c->resp_f = NULL; }
     if (c->env_sv) {
@@ -1531,6 +1627,23 @@ static void hm_process(pTHX_ hm_conn *c) {
             resp = hm_call_app(aTHX_ loop, env_rv);
         } else {
             resp = hm_call_app0(aTHX_ loop, env);
+        }
+
+        /* The app called detach: the socket is its own now. Drop whatever it
+         * returned (the sentinel), forget the connection, and do not touch c
+         * again. Any bytes past this request are dropped with it - RFC 6455
+         * forbids the client sending before the 101, so they are a protocol
+         * violation, not data we owe anyone. */
+        if (c->detached) {
+            if (env_rv) {
+                hm_access_log(aTHX_ loop, env_rv, 101, -1);
+                SvREFCNT_dec(env_rv);
+            }
+            if (resp) SvREFCNT_dec(resp);
+            c->nreqs++;
+            loop->requests++;
+            hm_conn_release(aTHX_ loop, c);
+            return;
         }
 
         size_t consumed = bodystart + body_consumed;
@@ -2238,6 +2351,23 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
     if (pid == 0) {
         int  stackfds[8];
         int *fds = NULL;
+
+        /* Tell perl it has been forked. $$ is a plain SV that perl only
+         * refreshes inside pp_fork; forking from C here happens behind its
+         * back, so without this the worker keeps reporting the supervisor's
+         * pid - and POSIX::getpid is `sub getpid { $$ }`, so that reads wrong
+         * too. Anything in the application that names a log line, a temp file
+         * or a pid file after $$ then collides across the whole pool. This is
+         * what pp_fork itself does in the child. */
+        {
+            GV *pidgv = gv_fetchpvs("$", GV_ADD|GV_NOTQUAL, SVt_PV);
+            if (pidgv) {
+                SvREADONLY_off(GvSV(pidgv));
+                sv_setiv(GvSV(pidgv), (IV)getpid());
+                SvREADONLY_on(GvSV(pidgv));
+            }
+        }
+
 #if defined(__linux__) && defined(CPU_SET)
         if (cfg->affinity) {
             long ncpu = sysconf(_SC_NPROCESSORS_ONLN);

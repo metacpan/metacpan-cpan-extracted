@@ -63,7 +63,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.009';
+$VERSION='3.011';
 
 
 #==================================================================================================
@@ -155,7 +155,7 @@ sub handler {
     #
     my $html;
     my $html_fh=IO::String->new($html);
-    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $self->{'root'}, document_default => $self->{'index'}, uri0=>$ENV{'PATH_INFO'}, env=>$env_hr, req=>$req_or, res=>$res_or, @param) ||
+    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $self->{'root'}, document_default => $self->{'index'}, env=>$env_hr, req=>$req_or, res=>$res_or, no_head_insert=>$self->{'no_head_insert'}, filename=>$self->{'filename'}, @param) ||
         return err('unable to create new WebDyne::Request::PSGI object: %s', 
     			$@ || errclr() || 'unknown error');
     debug("r: $r");

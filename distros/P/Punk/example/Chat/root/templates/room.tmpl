@@ -1,0 +1,22 @@
+<section class="chat" data-room="{% room %}">
+  <div class="chat-head">
+    <h1>#{% room %}</h1>
+    <span class="status" id="status" data-state="connecting">connecting</span>
+    <span class="count" id="count"></span>
+  </div>
+
+  <ol class="log" id="log" aria-live="polite"></ol>
+
+  <form class="say" id="say" autocomplete="off">
+    <input id="text" placeholder="say something" maxlength="1000" required>
+    <button type="submit" id="send">send</button>
+  </form>
+
+  <p class="hint">
+    Posting to
+    <code>POST /api/rooms/{% room %}/messages</code>
+    appears here too - see the <a href="/docs">docs</a>.
+  </p>
+</section>
+
+<script src="/static/chat.js"></script>

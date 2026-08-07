@@ -1,5 +1,27 @@
 Revision history for PAGI::FastAPI
 
+0.0.5  2026-08-06
+       [ENHANCEMENT]
+       - The POST/PUT/PATCH request bodies can now be in the application/x-www-form-urlencoded
+         format instead of being restricted to JSON. The body parser examines
+         the Content-Type header; therefore, the charset suffix (such as ";charset=utf-8")
+         will be ignored.
+         Furthermore, the body parser will process url-encoded data in the
+         same manner as query string in which the body is decoded using
+         percent-/plus-decode algorithm. However, the same Type::Tiny
+         validation can be applied in either format and the handler will
+         receive a HashRef object as a result of a processed request
+         regardless of the sent format.
+       - It is backward compatible, i.e., if the Content-Type header is not
+         set or not recognised, the body will be processed in the same way
+         as before. In particular, the default behavior of parsing requests
+         is JSON parsing.
+       - Also the new feature was tested in t/10-form_urlencoded_body.t.
+       - The plugin is documented in the `body` configuration option as well
+         as in the ERROR HANDLING section. The decision to implement this
+         feature was influenced by the example provided on a
+         PAGI::FastAPI::Security page.
+
 0.0.4  2026-08-05
        [DOCUMENTATION]
        - Included an AUTHENTICATION AND SECURITY part in the POD to highlight
@@ -42,7 +64,7 @@ Revision history for PAGI::FastAPI
        [TESTING]
        - A new test was added in t/08-input_handling_and_registration.t
          covering the above-mentioned aspects.
-       - A new test was added in t/09-external-async-resource-integration.t
+       - A new test was added in t/09-external_async_resource_integration.t
          to cover DBIx::Class::Async integration.
        [EXAMPLE]
        - Added additional DBIx::Class::Async integrated application:

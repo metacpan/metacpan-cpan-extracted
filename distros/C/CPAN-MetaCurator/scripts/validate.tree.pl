@@ -22,7 +22,7 @@ sub process
 
 	return CPAN::MetaCurator::Validate
 			-> new(home_path => $options{home_path}, include_packages => $options{include_packages}, log_level => $options{log_level})
-			-> run;
+			-> validate;
 
 } # End of process.
 

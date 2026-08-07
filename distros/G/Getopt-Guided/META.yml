@@ -35,7 +35,7 @@ no_index:
 provides:
   Getopt::Guided:
     file: lib/Getopt/Guided.pm
-    version: v3.2.2
+    version: v3.2.3
 requires:
   Carp: '1.32'
   File::Basename: '0'
@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/XSven/Getopt-Guided/issues
   repository: https://codeberg.org/XSven/Getopt-Guided.git
-version: v3.2.2
+version: v3.2.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

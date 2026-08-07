@@ -1,0 +1,87 @@
+<& /Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form method="post" action="AwayMode.html" name="ModifyAwayMode">
+<&|/Widgets/TitleBox, title => loc('Away Mode') &>
+
+<p>
+% if ($is_away) {
+<strong><&|/l&>Away Mode is currently ACTIVE.</&></strong>
+<&|/l&>New replies to tickets you own will be reassigned to Nobody, with a comment noting you're away.</&>
+% } else {
+<&|/l&>Away Mode is currently not active.</&>
+% }
+</p>
+
+<div class="form-check">
+  <input class="form-check-input checkbox" type="checkbox" id="Enabled" name="Enabled" value="1"
+% if ($pref->{'Enabled'}) {
+checked="checked"
+% }
+  />
+  <label class="form-check-label" for="Enabled"><&|/l&>I am away/on holiday</&></label>
+</div>
+
+<div class="form-group">
+  <label for="StartDate"><&|/l&>Start date (optional)</&></label>
+  <& /Elements/SelectDate, Name => 'StartDate', Default => $pref->{'StartDate'} || '', ShowTime => 0, current => 0 &>
+</div>
+
+<div class="form-group">
+  <label for="EndDate"><&|/l&>End date (optional)</&></label>
+  <& /Elements/SelectDate, Name => 'EndDate', Default => $pref->{'EndDate'} || '', ShowTime => 0, current => 0 &>
+</div>
+
+<p class="text-muted">
+<&|/l&>Leave both dates blank to stay away for as long as the checkbox above is on, or set one or both to bound the away window (inclusive). Dates are matched against your account's local date.</&>
+</p>
+
+</&>
+
+<& /Elements/Submit, Name => 'Update', Label => loc('Save Changes') &>
+</form>
+<%INIT>
+my @results;
+my $title = loc('Away Mode');
+my $user  = $session{'CurrentUser'}->UserObj;
+
+my $pref = $user->Preferences( 'AwayMode', {} );
+
+if ($Update) {
+    my $start_iso = '';
+    my $end_iso   = '';
+
+    if ( length $StartDate ) {
+        my $start_date = RT::Date->new( $session{'CurrentUser'} );
+        $start_date->Set( Format => 'unknown', Value => $StartDate );
+        $start_iso = $start_date->ISO( Time => 0 ) if $start_date->Unix > 0;
+    }
+    if ( length $EndDate ) {
+        my $end_date = RT::Date->new( $session{'CurrentUser'} );
+        $end_date->Set( Format => 'unknown', Value => $EndDate );
+        $end_iso = $end_date->ISO( Time => 0 ) if $end_date->Unix > 0;
+    }
+
+    if ( $start_iso && $end_iso && $end_iso lt $start_iso ) {
+        push @results, loc("End date can't be before start date.");
+    }
+    else {
+        $pref = {
+            Enabled   => ( $Enabled ? 1 : 0 ),
+            StartDate => $start_iso,
+            EndDate   => $end_iso,
+        };
+        my ( $ok, $msg ) = $user->SetPreferences( 'AwayMode', $pref );
+        push @results, $ok ? loc('Away Mode preferences updated.') : $msg;
+    }
+}
+
+my $is_away = RT::Extension::AwayMode->IsUserAway($user);
+</%INIT>
+<%ARGS>
+$Enabled => 0
+$StartDate => ''
+$EndDate => ''
+$Update => 0
+</%ARGS>

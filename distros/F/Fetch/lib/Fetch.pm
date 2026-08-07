@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use File::Raw::JSON ();   # JSON encode/decode via its C ABI (ft_json.h / _abi_ptr)
 
@@ -29,7 +29,7 @@ Fetch - HTTP/2 Future-based user agent
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =head1 SYNOPSIS
 
@@ -240,6 +240,35 @@ Open a WebSocket (RFC 6455). Returns a L<Fetch::Future> that resolves, after
 the C<101> handshake, to a L<Fetch::WebSocket> for sending and receiving
 messages. Accepts C<ws://>/C<wss://> (and C<http>/C<https>); C<tls_verify> and
 C<timeout> options apply to the handshake.
+
+=head2 clone(%overrides)
+
+    my $shared  = Fetch->new;                        # built once
+    my $scoped  = $shared->clone(cookie_jar => 1);   # its own jar, same pool
+
+Another agent over this one's connection pool and event loop, with the given
+options replaced. Everything not named is inherited.
+
+The case it exists for is a B<per-request cookie jar>. A jar belongs to the
+agent, so a jar on a long-lived agent is shared by every request that agent
+serves: fine when the cookies authenticate the application itself, a
+cross-request leak the moment they identify an end user. Building a whole fresh
+agent per request avoids the leak but throws away the keep-alive pool and
+re-resolves the loop adapter, which is most of what C<new> costs. A clone gives
+you the isolation without the bill.
+
+C<cookie_jar>, C<headers>, C<agent>, C<timeout>, C<tls_verify>,
+C<max_redirects>, C<keep_alive> and C<simple_response> can be overridden;
+C<< cookie_jar => undef >> drops an inherited jar. Headers are copied rather
+than shared, so a clone cannot write into the parent's defaults.
+
+C<loop> and C<pool_size> cannot be overridden and croak if given: they are what
+the clone shares, and an agent on a different loop driving the parent's parked
+connections would be reaching into the wrong one.
+
+A clone holds references to the shared pool and loop, so they live until the
+last agent using them goes. Keep the parent alive for as long as its clones, as
+you would anyway.
 
 =head1 ACCESSORS
 

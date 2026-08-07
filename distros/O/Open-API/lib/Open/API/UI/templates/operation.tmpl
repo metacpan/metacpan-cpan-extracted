@@ -1,0 +1,14 @@
+<details class="oa-op m-{% op.method_lc %}{% if op.deprecated %} oa-deprecated{% end %}" id="op-{% op.id %}" data-op="{% op.id %}">
+  <summary>
+    <span class="oa-method">{% op.method %}</span>
+    <code class="oa-path">{% op.path %}</code>
+    <span class="oa-summary">{% op.summary %}</span>
+{% if op.deprecated %}
+    <span class="oa-flag">deprecated</span>
+{% end %}
+  </summary>
+{% if op.description_html %}
+  <div class="oa-description oa-md">{% raw op.description_html %}</div>
+{% end %}
+  <div class="oa-op-body"></div>
+</details>

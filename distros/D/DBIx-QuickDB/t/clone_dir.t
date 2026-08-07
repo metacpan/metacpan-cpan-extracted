@@ -9,7 +9,7 @@ my $CP    = can_run('cp');
 my $FCR   = eval { require File::Copy::Recursive; 1 };
 
 sub make_src {
-    my $src = tempdir(CLEANUP => 1);
+    my $src = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
     # Regular file
     open(my $fh, '>', "$src/file1") or die "$!";
@@ -62,7 +62,7 @@ subtest rsync => sub {
     skip_all "rsync not available" unless $RSYNC;
 
     my $src  = make_src();
-    my $dest = tempdir(CLEANUP => 1);
+    my $dest = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
     DBIx::QuickDB::Util::_clone_dir_rsync($src, $dest);
     check_dest($dest, 'rsync');
@@ -72,7 +72,7 @@ subtest cp => sub {
     skip_all "cp not available" unless $CP;
 
     my $src  = make_src();
-    my $dest = tempdir(CLEANUP => 1);
+    my $dest = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
     DBIx::QuickDB::Util::_clone_dir_cp($src, $dest);
     check_dest($dest, 'cp');
@@ -82,7 +82,7 @@ subtest fcr => sub {
     skip_all "File::Copy::Recursive not available" unless $FCR;
 
     my $src  = make_src();
-    my $dest = tempdir(CLEANUP => 1);
+    my $dest = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
     DBIx::QuickDB::Util::_clone_dir_fcr($src, $dest);
     check_dest($dest, 'fcr');
@@ -92,7 +92,7 @@ subtest rsync_overwrites_existing => sub {
     skip_all "rsync not available" unless $RSYNC;
 
     my $src  = make_src();
-    my $dest = tempdir(CLEANUP => 1);
+    my $dest = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
     # Pre-populate dest with a file that should be removed by --delete
     open(my $fh, '>', "$dest/stale") or die "$!";
@@ -108,7 +108,7 @@ subtest cp_overwrites_existing => sub {
     skip_all "cp not available" unless $CP;
 
     my $src  = make_src();
-    my $dest = tempdir(CLEANUP => 1);
+    my $dest = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
     # Pre-populate dest with a file that should be removed
     open(my $fh, '>', "$dest/stale") or die "$!";
@@ -124,7 +124,7 @@ subtest fcr_overwrites_existing => sub {
     skip_all "File::Copy::Recursive not available" unless $FCR;
 
     my $src  = make_src();
-    my $dest = tempdir(CLEANUP => 1);
+    my $dest = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
     # Pre-populate dest with a file that should be removed
     open(my $fh, '>', "$dest/stale") or die "$!";

@@ -5,7 +5,7 @@ use version;
 use Carp qw(croak);
 use parent 'PAGI::FastAPI::Security::Base';
 
-our $VERSION   = qv('v0.0.2');
+our $VERSION   = qv('v0.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf-8
@@ -16,7 +16,7 @@ PAGI::FastAPI::Security::OAuth2::PasswordBearer - OAuth2 password-bearer scheme 
 
 =head1 VERSION
 
-Version v0.0.2
+Version v0.0.4
 
 =head1 SYNOPSIS
 

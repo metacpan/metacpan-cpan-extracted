@@ -1,24 +1,30 @@
 ---
-abstract: 'cache messages to an object'
+abstract: 'cache getter results for any get/set object'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   CHI: '0'
   Class::Simple: '0'
   English: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  IPC::System::Simple: '0'
+  Readonly: '0'
   Test::Carp: '0'
   Test::DescribeMe: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
   Test::Requires: '0'
+  Test::Returns: '0'
+  Test::Without::Module: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -30,11 +36,12 @@ no_index:
 requires:
   Carp: '0'
   Class::Simple: '0'
-  Params::Get: '0'
+  Params::Get: '0.15'
   Scalar::Util: '0'
+  Sub::Protected: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://github.com/nigelhorne/Class-Simple-Cached/issues
   repository: git://github.com/nigelhorne/Class-Simple-Cached.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

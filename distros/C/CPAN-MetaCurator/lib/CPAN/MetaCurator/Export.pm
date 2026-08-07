@@ -2,7 +2,6 @@ package CPAN::MetaCurator::Export;
 
 use boolean;
 use feature 'say';
-use open qw(:std :utf8);
 use parent 'CPAN::MetaCurator::HTML';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
@@ -29,7 +28,7 @@ has jstree_html_path => (Str, default => sub{return ''}, chained => 1);
 our $leaf_id;
 our %seen;
 
-our $VERSION = '1.27';
+our $VERSION = '1.29';
 
 # --------------------------------------------------
 
@@ -86,11 +85,11 @@ sub build_dag_tree
 			$module				= $token;
 			$note_count			= 0;
 
-			if (! $seen{$module})
+			$self -> gather_statistics(\%node_type, $pad, $module, $topic);
+
+			if (! $seen{$module} && ($$topic{title} ne 'Acronyms') )
 			{
 				$seen{$module} = $self -> insert_hashref('modules', {name => $module});
-
-				$self -> gather_statistics(\%node_type, $pad, $module, $topic);
 			}
 		}
 		elsif ($line =~ /<pre>/)
@@ -172,24 +171,12 @@ sub build_dag_tree
 
 # -----------------------------------------------
 
-sub export_tree
+sub build_tree
 {
-	my($self) = @_;
-
-	$self -> init_config;
-	$self -> init_db;
-
-	my($pad)					= $self -> build_pad;
-	$$pad{jstree_html_path}		= $self -> jstree_html_path;
-	my($header, $body, $footer)	= $self -> build_html($pad); # Returns templates.
-	my($origin)					= shift @{$$pad{topics} }; # I.e.: {parent_id => 1, text => 'Root', title => 'MetaCurator'}.
-	$leaf_id					= 0;
-	my($root)					= Tree::DAG_Node -> new({name => $$origin{title}, attributes => {id => $leaf_id, description => 'Root'} });
-
-	$self -> logger -> info($self -> visual_break);
-	$self -> logger -> info("Topic: id: $leaf_id. title: $$origin{title}");
-
-	# Phase 1: Build the DAG_Node tree.
+	my($self, $pad)	= @_;
+	my($origin)		= shift @{$$pad{topics} }; # I.e.: {id => 1, parent_id => 1, text => 'Root', title => 'MetaCurator'}.
+	$leaf_id		= 0;
+	my($root)		= Tree::DAG_Node -> new({name => $$origin{title}, attributes => {id => $leaf_id, description => 'Root'} });
 
 	my($daughter);
 
@@ -201,6 +188,24 @@ sub export_tree
 
 		$self -> build_dag_tree($daughter, $pad, $topic);
 	}
+
+	return $root;
+
+} # End of build_tree.
+
+# -----------------------------------------------
+
+sub export_tree
+{
+	my($self) = @_;
+
+	$self -> init_config;
+	$self -> init_db;
+
+	# Phase 1: Build the DAG_Node tree.
+
+	my($pad)	= $self -> build_pad;
+	my($root)	= $self -> build_tree($pad);
 
 	# Phase 2: Save the DAG_Node tree to disk.
 
@@ -297,8 +302,10 @@ sub export_tree
 	# Phase 5: Build the web page which uses JSTree.
 	# And save it to html/cpan.metacurator.tree.html
 
-	my($list)	= join("\n", @list);
-	$body		=~ s/!list!/$list/;
+	$$pad{jstree_html_path}		= $self -> jstree_html_path;
+	my($header, $body, $footer)	= $self -> build_html($pad); # Returns templates.
+	my($list)					= join("\n", @list);
+	$body						=~ s/!list!/$list/;
 
 	for $_ (keys %{$$pad{count} })
 	{
@@ -345,10 +352,10 @@ sub gather_statistics
 {
 	my($self, $node_type, $pad, $token, $topic) = @_;
 
-	$$node_type{acronym}	= $$topic{title} eq 'Acronyms'	? true : false;
-	$$node_type{topic}		= $$pad{topic_names}{$token}	? true : false;
-	$$node_type{known}		= $$pad{module_names}{$token}	? true : false;
-	$$node_type{unknown}	= ! ($$node_type{acronym} || $$node_type{known} || $$node_type{topic});
+	$$node_type{acronym}	= $$topic{title} eq 'Acronyms'			? true : false;
+	$$node_type{topic}		= exists($$pad{topic_names}{$token})	? true : false;
+	$$node_type{known}		= exists($$pad{module_names}{$token})	? true : false;
+	$$node_type{unknown}	= ( (! $$node_type{acronym}) && (! $$node_type{known}) && (! $$node_type{topic}) ) ? true : false;
 
 	$$pad{count}{acronym}++	if ($$node_type{acronym});
 	$$pad{count}{known}++	if ($$node_type{known});

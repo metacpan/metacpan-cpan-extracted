@@ -22,10 +22,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "9.00",
-            "Mojolicious::Plugin::Fondation" : "0.01",
-            "Mojolicious::Plugin::Fondation::MigrationDBIx" : "0.01",
-            "Mojolicious::Plugin::Fondation::Model::DBIx::Async" : "0.01",
+            "Mojolicious" : "9.46",
+            "Mojolicious::Plugin::Fondation" : "0.07",
+            "Mojolicious::Plugin::Fondation::MigrationDBIx" : "0.05",
+            "Mojolicious::Plugin::Fondation::Model::DBIx::Async" : "0.05",
+            "Mojolicious::Plugin::Fondation::Problem" : "0.03",
             "perl" : "5.026"
          }
       },
@@ -37,6 +38,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Perm/issues"
+      },
       "homepage" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Perm",
       "repository" : {
          "type" : "git",
@@ -44,7 +48,7 @@
          "web" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Perm"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -9,15 +9,26 @@ use Hyperman;
 # config that lets a consumer (e.g. DBIx::Loop) find the header without
 # copying it.
 
-# _abi_ptr returns the address of the process-wide table as a positive IV.
+# _abi_ptr returns the address of the process-wide table. It is an IV carrying
+# a raw pointer, so it may legitimately be negative - Solaris x86-64 maps shared
+# objects around 0xFFFFFC7F..., which sets the sign bit. INT2PTR round-trips the
+# bits either way; what matters is that it is non-zero and stable, and
+# _abi_selftest below is what proves the table actually works.
 my $ptr = Hyperman::_abi_ptr();
-ok(defined $ptr && $ptr > 0, "_abi_ptr returns a table address ($ptr)");
+ok(defined $ptr && $ptr != 0, "_abi_ptr returns a table address ($ptr)");
+is(Hyperman::_abi_ptr(), $ptr, 'the table is static - same address');
 
 # _abi_selftest resolves the table in C and drives every entry: future
 # lifecycle (done/fail/on_ready, double-settle no-op), a C io watcher on a
 # pipe, a cancelled timer, and a live timer, pumped with run_until.
 is(Hyperman::_abi_selftest(), 1,
    '_abi_selftest: loop, watchers, timers and futures through the ABI table');
+
+# The table only ever grows at the tail, so a consumer compiled against an
+# older header keeps working: existing entries never move. The selftest
+# above also exercises the v2 conn_detach entry's rejection path (a ticket
+# naming no connection); t/23-detach.t covers the success path live.
+is(Hyperman::_abi_version(), 2, 'ABI version 2 (v2 added conn_detach)');
 
 # Provider config: ExtUtils::Depends wrote Hyperman::Install::Files with an
 # include path, so a dependent's ExtUtils::Depends->new(..., 'Hyperman')

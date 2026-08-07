@@ -21,14 +21,14 @@ my %WriteMakefileArgs = (
     "DBIx::Class::Fixtures" => 0,
     "JSON::MaybeXS" => 0,
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => "0.01",
-    "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.01"
+    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.05"
   },
   "TEST_REQUIRES" => {
     "Test::Mojo" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,8 +40,8 @@ my %FallbackPrereqs = (
   "DBIx::Class::Fixtures" => 0,
   "JSON::MaybeXS" => 0,
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => "0.01",
-  "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.01",
+  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.05",
   "Test::Mojo" => 0,
   "Test::More" => 0
 );

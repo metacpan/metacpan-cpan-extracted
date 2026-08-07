@@ -6,13 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5;
+plan tests => 7;
 
 my @module_files = (
     'WebService/OurWorldInData.pm',
     'WebService/OurWorldInData/Catalog.pm',
     'WebService/OurWorldInData/Chart.pm',
-    'WebService/OurWorldInData/Indicators.pm'
+    'WebService/OurWorldInData/Error.pm',
+    'WebService/OurWorldInData/Indicators.pm',
+    'WebService/OurWorldInData/Search.pm'
 );
 
 

@@ -1,5 +1,5 @@
 #!perl
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use Test::More;
@@ -42,6 +42,18 @@ like($@, qr/cannot find include/, 'traversal include rejected');
 eval { Template::Stencil::_engine_render($e,
     '{% include a/../../secret.txt %}', {}) };
 like($@, qr/cannot find include/, 'embedded .. rejected');
+
+# Backslash is a separator to the traversal scan on every platform, not
+# just the one where the kernel would honour it.
+eval { Template::Stencil::_engine_render($e,
+    '{% include ..\\secret.txt %}', {}) };
+like($@, qr/cannot find include/, 'backslash traversal rejected');
+eval { Template::Stencil::_engine_render($e,
+    '{% include a\\..\\..\\secret.txt %}', {}) };
+like($@, qr/cannot find include/, 'embedded backslash .. rejected');
+eval { Template::Stencil::_engine_render($e,
+    '{% include \\secret.txt %}', {}) };
+like($@, qr/cannot find include/, 'leading backslash rejected');
 
 Template::Stencil::_engine_free($e);
 

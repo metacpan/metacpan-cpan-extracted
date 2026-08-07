@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('JSON::Schema::Fast', $VERSION);
@@ -23,7 +23,7 @@ JSON::Schema::Fast - a fast JSON Schema (draft 2020-12) validator
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =head1 SYNOPSIS
 

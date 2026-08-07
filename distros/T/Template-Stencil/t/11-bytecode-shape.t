@@ -1,5 +1,5 @@
 #!perl
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use Test::More;
@@ -72,18 +72,44 @@ is(inspect('{% x %}')->{is_wrapper}, 0, 'no content, no wrapper');
     is($got, $want, 'loops.tmpl golden op sequence');
 }
 
-# Cold-compile budget (informational diag; generous assert only to
-# catch catastrophic regressions).
+# Cold-compile budget. An absolute microsecond bound is not a property of
+# the compiler, it is a property of the smoker: a 1000us ceiling that holds
+# on a laptop fails on an ARMv6 Pi that is simply ~5x slower at everything.
+# What we actually want to catch is the compiler going non-linear, so
+# measure the same template at two sizes and assert the ratio. That is
+# scale-free - a slow box slows both halves equally - and a quadratic
+# regression shows up as ~100x where linear shows ~10x.
 {
-    my $tmpl = ('<li>' . ('x' x 20) . '{% item.name %}</li>') x 20;
-    $tmpl .= '{% if a %}{% for i in items %}{% i %}{% end %}{% end %}';
-    my $n  = 2000;
-    my $t0 = Time::HiRes::time();
-    inspect($tmpl) for 1 .. $n;   # includes inspect overhead
-    my $us = (Time::HiRes::time() - $t0) / $n * 1e6;
-    diag(sprintf 'cold compile+inspect of %d-byte template: %.1f us',
-         length $tmpl, $us);
-    cmp_ok($us, '<', 1000, 'compile time within catastrophic bound');
+    my $unit = '<li>' . ('x' x 20) . '{% item.name %}</li>';
+    my $tail = '{% if a %}{% for i in items %}{% i %}{% end %}{% end %}';
+
+    sub time_compile {
+        my ($tmpl, $n) = @_;
+        inspect($tmpl) for 1 .. 20;      # warm caches, discard
+        my $t0 = Time::HiRes::time();
+        inspect($tmpl) for 1 .. $n;      # includes inspect overhead
+        return (Time::HiRes::time() - $t0) / $n * 1e6;
+    }
+
+    my $small = ($unit x 20)  . $tail;
+    my $big   = ($unit x 200) . $tail;
+    my $us_small = time_compile($small, 2000);
+    my $us_big   = time_compile($big,   200);
+    my $ratio    = $us_big / ($us_small || 1e-9);
+
+    diag(sprintf 'cold compile+inspect: %d bytes %.1f us, %d bytes %.1f us '
+               . '(%.1fx for 10x input)',
+         length $small, $us_small, length $big, $us_big, $ratio);
+
+    # 10x the input for <=40x the time. Linear lands near 10x; anything
+    # quadratic lands near 100x and trips this on any machine.
+    cmp_ok($ratio, '<', 40, 'compile time scales linearly with input');
+
+    # The absolute budget is a real number worth defending, but only on
+    # hardware we control - it says nothing on a random smoker.
+    if ($ENV{AUTHOR_TESTING} || $ENV{EXTENDED_TESTING}) {
+        cmp_ok($us_small, '<', 1000, 'compile time within absolute budget');
+    }
 }
 
 done_testing;

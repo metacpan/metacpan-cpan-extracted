@@ -1523,6 +1523,21 @@ void mds_render_html_install(mds_callbacks* cb, void** ud_out, mds_buf* buf,
     cb->raw          = cb_raw;
 }
 
+void mds_render_html_cleanup(void* ud) {
+    render_state* st = (render_state*)ud;
+    if (!st) return;
+    free(st->alt);           st->alt = NULL;
+    st->alt_len = st->alt_cap = 0;
+    free(st->pending_text);  st->pending_text = NULL;
+    st->pending_len = st->pending_cap = 0;
+    free(st->hl_buf);        st->hl_buf = NULL;
+    st->hl_len = st->hl_cap = 0;
+    free(st->fn_labels);     st->fn_labels = NULL;
+    free(st->fn_label_lens); st->fn_label_lens = NULL;
+    free(st->fn_uses);       st->fn_uses = NULL;
+    st->fn_count = st->fn_cap = 0;
+}
+
 int mds_render_html_used_footnote(void* ud, size_t i,
                                   const char** label_out,
                                   size_t* label_len_out) {

@@ -5,6 +5,7 @@ use warnings;
 use FindBin ();
 use Test::More;
 use Open::API;
+use Open::API::Plack;
 
 # CSRF protection on to_app: safe methods bypass; Origin/Referer checking
 # (same-origin default and explicit allowlist) on state-changing methods; the
@@ -38,7 +39,7 @@ my $HOST = 'api.example.com';
 
 # ---- same-origin default --------------------------------------------------------
 {
-    my $app = $api->to_app(handlers => \%handlers, csrf => {});
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, csrf => {})->to_app;
 
     is(req($app, path => '/pets',
            env => { HTTP_HOST => $HOST })->[0], 200,
@@ -66,8 +67,8 @@ my $HOST = 'api.example.com';
 
 # ---- explicit origin allowlist --------------------------------------------------
 {
-    my $app = $api->to_app(handlers => \%handlers,
-        csrf => { origins => [ 'https://app.example.com' ] });
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers,
+        csrf => { origins => [ 'https://app.example.com' ] })->to_app;
 
     is(req($app, method => 'DELETE', path => '/pets/5',
            env => { HTTP_HOST => $HOST, HTTP_COOKIE => 'session=s',
@@ -87,7 +88,7 @@ my $HOST = 'api.example.com';
 
 # ---- custom header / cookie names (check reads the header, rotates the cookie) --
 {
-    my $app = $api->to_app(handlers => \%handlers, csrf => {
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, csrf => {
         origins => [ "https://$HOST" ],
         header  => 'X-XSRF',      # submitted token comes from here
         cookie  => 'xsrf',        # rotation Set-Cookie uses this name
@@ -96,7 +97,7 @@ my $HOST = 'api.example.com';
             return 0 unless defined $submitted && $submitted eq 'good';
             return 'next';        # rotate
         },
-    });
+    })->to_app;
     my $r = req($app, method => 'DELETE', path => '/pets/5', env => {
         HTTP_HOST => $HOST, HTTP_ORIGIN => "https://$HOST",
         HTTP_COOKIE => 'session=s', 'HTTP_X_XSRF' => 'good',
@@ -109,12 +110,12 @@ my $HOST = 'api.example.com';
 
 # ---- after hook runs on a CSRF 403 ----------------------------------------------
 {
-    my $app = $api->to_app(handlers => \%handlers, csrf => {},
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, csrf => {},
         after => sub {
             my ($resp) = @_;
             push @{ $resp->[1] }, 'X-Blocked' => 'csrf';
             return;
-        });
+        })->to_app;
     my $r = req($app, method => 'DELETE', path => '/pets/5',
                 env => { HTTP_HOST => $HOST,
                          HTTP_ORIGIN => 'https://evil.example.net' });
@@ -129,7 +130,7 @@ my $HOST = 'api.example.com';
     my %session = ( 'sess-abc' => 'stored-token-xyz' );
 
     my @seen;
-    my $app = $api->to_app(handlers => \%handlers, csrf => {
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, csrf => {
         origins => [ "https://$HOST" ],
         check   => sub {
             my ($submitted, $env, $op_id) = @_;
@@ -138,7 +139,7 @@ my $HOST = 'api.example.com';
             my $stored = defined $sid ? $session{$sid} : undef;
             return defined $stored && defined $submitted && $stored eq $submitted;
         },
-    });
+    })->to_app;
     my %ok_origin = (HTTP_HOST => $HOST, HTTP_ORIGIN => "https://$HOST");
 
     is(req($app, method => 'DELETE', path => '/pets/5', env => {
@@ -168,10 +169,10 @@ my $HOST = 'api.example.com';
 # ---- a truthy non-string return authorises without rotating ---------------------
 {
     my $ran = 0;
-    my $app = $api->to_app(handlers => \%handlers, csrf => {
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, csrf => {
         origins => [ "https://$HOST" ],
         check   => sub { $ran++; 1 },   # 1 = pass, no cookie rotation
-    });
+    })->to_app;
     my $r = req($app, method => 'DELETE', path => '/pets/5', env => {
         HTTP_HOST => $HOST, HTTP_ORIGIN => "https://$HOST",
         HTTP_COOKIE => 'session=s',
@@ -185,7 +186,7 @@ my $HOST = 'api.example.com';
 # ---- check's truthy return is stashed as $env->{'openapi.csrf'} -----------------
 {
     my $seen_stash;
-    my $app = $api->to_app(handlers => {
+    my $app = Open::API::Plack->new(api => $api, handlers => {
         %handlers,
         deletePet => sub {
             my ($p, $env) = @_;
@@ -195,7 +196,7 @@ my $HOST = 'api.example.com';
     }, csrf => {
         origins => [ "https://$HOST" ],
         check   => sub { 'the-stored-token' },      # return the token, not 1
-    });
+    })->to_app;
     my $r = req($app, method => 'DELETE', path => '/pets/5', env => {
         HTTP_HOST => $HOST, HTTP_ORIGIN => "https://$HOST",
         HTTP_COOKIE => 'session=s', 'HTTP_X_CSRF_TOKEN' => 'x',
@@ -210,7 +211,7 @@ my $HOST = 'api.example.com';
     # a tiny "session store": one token, consumed and rotated on use
     my %store = (tok => 'token-1');
     my $mint  = 'token-2';
-    my $app = $api->to_app(handlers => \%handlers, csrf => {
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, csrf => {
         origins => [ "https://$HOST" ], cookie => 'csrf',
         check   => sub {
             my ($submitted) = @_;
@@ -220,7 +221,7 @@ my $HOST = 'api.example.com';
             $store{tok} = $mint;                          # store the next
             return $mint;                                 # framework sets it
         },
-    });
+    })->to_app;
     my $r = req($app, method => 'DELETE', path => '/pets/5', env => {
         HTTP_HOST => $HOST, HTTP_ORIGIN => "https://$HOST",
         HTTP_COOKIE => 'session=s', 'HTTP_X_CSRF_TOKEN' => 'token-1',
@@ -239,10 +240,10 @@ my $HOST = 'api.example.com';
 
 # ---- a dying check callback becomes a 500 ---------------------------------------
 {
-    my $app = $api->to_app(handlers => \%handlers, csrf => {
+    my $app = Open::API::Plack->new(api => $api, handlers => \%handlers, csrf => {
         origins => [ "https://$HOST" ],
         check   => sub { die "session store unavailable\n" },
-    });
+    })->to_app;
     is(req($app, method => 'DELETE', path => '/pets/5', env => {
            HTTP_HOST => $HOST, HTTP_ORIGIN => "https://$HOST",
            HTTP_COOKIE => 'session=s', 'HTTP_X_CSRF_TOKEN' => 't',

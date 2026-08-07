@@ -8,7 +8,7 @@ use Time::HiRes qw(time);
 use Test::More;
 
 # The end-to-end proof: ONE spec drives both sides. A Hyperman worker serves
-# $api->to_app; an Open::API::Client built from the same spec calls every
+# Open::API::Plack->new(...)->to_app; an Open::API::Client built from the same spec calls every
 # operation over real HTTP - sync, then concurrently on a shared loop - and
 # response validation catches a deliberately lying handler.
 
@@ -18,6 +18,7 @@ plan skip_all => 'Fetch not installed'
     unless eval { require Fetch; 1 };
 
 require Open::API;
+require Open::API::Plack;
 require Open::API::Client;
 
 my $SPEC = "$FindBin::Bin/spec/petstore.json";
@@ -43,7 +44,7 @@ if (!$pid) {
     my $api  = Open::API->new(spec => $SPEC);
     my %pets = ( 1 => { id => 1, name => 'rex', tag => 'dog' } );
     my $next = 2;
-    my $app  = $api->to_app(handlers => {
+    my $app  = Open::API::Plack->new(api => $api, handlers => {
         listPets  => sub {
             my ($p) = @_;
             my @all = map { $pets{$_} } sort keys %pets;
@@ -67,7 +68,7 @@ if (!$pid) {
             delete $pets{ $p->{path}{petId} };
             [ 204, [], [''] ];
         },
-    });
+    })->to_app;
     Hyperman->run(app => $app, host => '127.0.0.1', port => $port, workers => 1);
     exit 0;
 }

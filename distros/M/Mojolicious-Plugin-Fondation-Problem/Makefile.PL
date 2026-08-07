@@ -26,13 +26,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Mojo::JSON" => 0,
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => 0
+    "Mojolicious::Plugin::Fondation" => "0.07"
   },
   "TEST_REQUIRES" => {
     "Test::Mojo" => 0,
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Mojo::JSON" => 0,
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => 0,
+  "Mojolicious::Plugin::Fondation" => "0.07",
   "Test::Mojo" => 0,
   "Test::More" => "1.00"
 );

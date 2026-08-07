@@ -1,5 +1,5 @@
 #!perl
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use Config;
@@ -7,8 +7,11 @@ use Test::More;
 use Template::Stencil;
 
 # Fork is the production model (Hyperman workers): the child inherits
-# the engine memory wholesale and renders independently.
-{
+# the engine memory wholesale and renders independently. Windows has no
+# fork - perl emulates it with an ithread, which exercises the clone path
+# below rather than the COW-inherit path this block is here to check.
+SKIP: {
+    skip 'no real fork on this platform', 3 if $^O eq 'MSWin32';
     my $s = Template::Stencil->new;
     is($s->render('{% v %}', { v => 'pre' }), 'pre', 'parent warm');
     my $pid = open my $rd, '-|';

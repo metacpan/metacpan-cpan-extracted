@@ -1,0 +1,40 @@
+Changes
+graph/cisa.dot
+graph/cisa.png
+graph/cisa_bod_26_04.dot
+graph/cisa_bod_26_04.png
+graph/coordinator_publication.dot
+graph/coordinator_publication.png
+graph/coordinator_triage.dot
+graph/coordinator_triage.png
+graph/deployer.dot
+graph/deployer.png
+graph/supplier.dot
+graph/supplier.png
+INSTALL.md
+lib/SSVC.pm
+lib/SSVC/Base.pm
+lib/SSVC/CISA.pm
+lib/SSVC/CISA/BOD2604.pm
+lib/SSVC/CoordinatorPublication.pm
+lib/SSVC/CoordinatorTriage.pm
+lib/SSVC/Deployer.pm
+lib/SSVC/Supplier.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/10-cisa.t
+t/11-cisa-vector.t
+t/20-coordinator-publication.t
+t/30-coordinator-triage.t
+t/40-deployer.t
+t/50-supplier.t
+t/60-cisa-bod-26-04.t
+t/kwalitee.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

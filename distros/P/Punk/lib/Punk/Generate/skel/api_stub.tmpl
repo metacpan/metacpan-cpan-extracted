@@ -1,0 +1,9 @@
+
+sub {% op.id %} {
+    my ($c) = @_;
+
+    # {% op.method %} {% op.path %}{% if op.summary %} - {% op.summary %}{% end %}
+    return $c->status(501)->json({
+        errors => [ { message => "{% op.id %} is not implemented yet" } ],
+    });
+}

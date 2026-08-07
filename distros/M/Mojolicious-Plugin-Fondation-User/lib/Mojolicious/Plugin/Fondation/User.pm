@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::User;
-$Mojolicious::Plugin::Fondation::User::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::User::VERSION = '0.03';
 # ABSTRACT: User management plugin for Fondation
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -44,7 +44,7 @@ Mojolicious::Plugin::Fondation::User - User management plugin for Fondation
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -105,6 +105,25 @@ The C<password> field is never returned in API responses.
   $c->model('user')->active;           # users with active = 1
   $c->model('user')->created_today;    # users created today
   $c->model('user')->latest;           # latest 10 users
+
+=head3 with() — many_to_many prefetch
+
+  # Include groups in list/read responses (requires Fondation::Group)
+  GET /api/User?with=groups
+
+  # Or programmatically:
+  $c->model('user')->with('groups')->TO_JSON->then(sub ($data) {
+      $self->render(openapi => $data);
+  });
+
+C<with('groups')> triggers a single-query prefetch via the
+C<user_group> pivot table.  Each user row includes a C<groups>
+arrayref with the full group objects — no extra DB round-trips.
+The automatic C<TO_JSON> serialization (inherited from
+L<Mojolicious::Plugin::Fondation::Schema::Result::Base>) includes
+the groups when the data is available.
+
+Without C<with()>, m2m relationships are silently excluded.
 
 =head2 Translations
 

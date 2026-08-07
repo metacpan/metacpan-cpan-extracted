@@ -30,4 +30,9 @@ on test => sub {
   requires 'Test::Warn'                     => '0';
   requires 'Test2::Require::ReleaseTesting' => '0';
   requires 'Test2::V1'                      => '0'
+};
+
+on develop => sub {
+  requires 'Perl::Tidy'         => '0';
+  requires 'Test::Perl::Critic' => '0'
 }

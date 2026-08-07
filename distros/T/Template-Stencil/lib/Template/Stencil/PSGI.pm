@@ -1,11 +1,11 @@
 package Template::Stencil::PSGI;
 
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use Template::Stencil;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     my ($class, %opts) = @_;

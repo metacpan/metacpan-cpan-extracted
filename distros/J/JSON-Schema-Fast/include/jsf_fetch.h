@@ -23,6 +23,9 @@ static int jsf_fetch_init(pTHX) {
 
     eval_pv("require Fetch;", FALSE);           /* trap a missing Fetch */
     if (SvTRUE(ERRSV)) return 0;
+    /* The require may have grown (and so reallocated) the value stack; SP was
+     * captured before it and would now point into the freed block. */
+    SPAGAIN;
 
     ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
     count = call_pv("Fetch::_abi_ptr", G_SCALAR | G_EVAL);

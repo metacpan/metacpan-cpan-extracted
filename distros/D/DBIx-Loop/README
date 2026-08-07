@@ -1,0 +1,35 @@
+DBIx-Loop
+
+Non-blocking DBI on your event loop. One future-returning API over two
+backends: a forked worker pool that works with any DBD (SQLite included), and
+native fd async for DBD::Pg. Transactions pin to one connection. The engine is
+XS/C; you bring the event loop (IO::Async, Mojo::IOLoop, AnyEvent, Hyperman) -
+DBIx::Loop ships none, by design.
+
+This is about concurrency and latency isolation, not per-query speed: a slow
+query no longer stalls the loop, and N queries overlap across workers. See the
+PERFORMANCE section of the POD for honest numbers.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::Loop
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

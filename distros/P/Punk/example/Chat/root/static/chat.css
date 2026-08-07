@@ -1,0 +1,176 @@
+/* Punk Chat - one stylesheet, no build step, no CDN. */
+
+:root {
+  --bg:     #12111a;
+  --panel:  #1b1a25;
+  --edge:   #2e2c3d;
+  --ink:    #e6e4f0;
+  --muted:  #8f8ba6;
+  --accent: #ff4d7e;
+  --live:   #4ade80;
+  --warn:   #fbbf24;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+code, pre, .at, .num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---- chrome ------------------------------------------------------------ */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--edge);
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-size: 1.1rem;
+}
+.brand span { color: var(--accent); }
+
+.bar nav { display: flex; gap: 1rem; flex: 1; }
+.bar nav a { color: var(--muted); font-size: 0.9rem; }
+.bar nav a:hover { color: var(--ink); }
+
+.lock {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--live);
+  border-radius: 999px;
+  color: var(--live);
+}
+
+.foot {
+  border-top: 1px solid var(--edge);
+  border-bottom: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+main {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 3rem;
+}
+
+h1 { font-size: 1.6rem; margin: 0 0 0.75rem; letter-spacing: -0.02em; }
+h2 { font-size: 1.1rem; margin: 2rem 0 0.6rem; }
+
+.lede { color: var(--muted); max-width: 46rem; }
+
+/* ---- the room index ---------------------------------------------------- */
+
+.joiner {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+}
+.joiner label { display: flex; flex-direction: column; gap: 0.3rem;
+                font-size: 0.8rem; color: var(--muted); }
+
+input, button {
+  font: inherit;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--edge);
+  background: var(--bg);
+  color: var(--ink);
+}
+input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a0a11;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+table.rooms { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+table.rooms th, table.rooms td {
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--edge);
+}
+table.rooms th { color: var(--muted); font-size: 0.75rem;
+                 text-transform: uppercase; letter-spacing: 0.06em; }
+table.rooms .num, table.rooms .when { color: var(--muted); }
+
+.empty { color: var(--muted); }
+
+.tryit pre {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+
+/* ---- the chat ---------------------------------------------------------- */
+
+.chat-head { display: flex; align-items: baseline; gap: 0.75rem; }
+
+.status {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.status[data-state="connecting"] { color: var(--warn); }
+.status[data-state="open"]       { color: var(--live); }
+.status[data-state="closed"]     { color: var(--accent); }
+
+.count { color: var(--muted); font-size: 0.8rem; }
+
+.log {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  height: 26rem;
+  overflow-y: auto;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+}
+
+.line { display: flex; gap: 0.6rem; padding: 0.18rem 0.25rem; }
+.line .at   { color: var(--muted); font-size: 0.75rem; min-width: 5.5rem; }
+.line .nick { color: var(--accent); font-weight: 600; min-width: 6rem; }
+.line .body { flex: 1; overflow-wrap: anywhere; }
+
+.msg.mine .nick { color: var(--live); }
+.note { color: var(--muted); font-style: italic; font-size: 0.85rem; }
+.note.error .body { color: var(--warn); font-style: normal; }
+
+.say { display: flex; gap: 0.6rem; }
+.say input { flex: 1; }
+
+.hint { color: var(--muted); font-size: 0.85rem; margin-top: 1rem; }
+.hint code { color: var(--ink); }

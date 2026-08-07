@@ -3,7 +3,7 @@ use Test2::V1
   -target => { CLASS => 'Version::Semantic' },
   qw( dies is isa_ok lives like ok plan subtest );
 
-plan 15;
+plan 16;
 
 like dies { CLASS->new( major => 0, 'minor' ) }, qr/\AOdd number of elements in hash assignment at/,
   'Odd number of arguments';
@@ -186,4 +186,12 @@ subtest 'Test named capture group accessors: "-TRIAL[0-9]*" pre-releases' => sub
     $self                 = CLASS->parse( "1.2.3-$expected_pre_release" );
     is $self->pre_release, $expected_pre_release, "pre_release: $expected_pre_release"
   }
+};
+
+subtest 'Prove greediness of semver_re() if not anchored at the end' => sub {
+  plan 1;
+
+  my $expected_version = 'v1.4.8-TRIAL';
+  my ( $got_version ) = ( $expected_version =~ m/\A ( ${ \( CLASS->semver_re ) } )/x );
+  is $got_version, $expected_version;
 }

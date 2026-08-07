@@ -1,4 +1,11 @@
 Revision history for Mojolicious-Plugin-Fondation-Group
 
+0.02      2026-08-06 23:41:42+02:00 Europe/Paris
+  - Add issues = 1 to GithubMeta to point bugtracker to GitHub issues
+  - add POD
+  - use Mojolicious::Plugin::Fondation::Schema::Result::Base
+  - drop _render_error/_has_perm_plugin, simplify _want_perms
+  - use $c->problem()
+
 0.01      2026-07-15 18:05:13+02:00 Europe/Paris
   - Initial release

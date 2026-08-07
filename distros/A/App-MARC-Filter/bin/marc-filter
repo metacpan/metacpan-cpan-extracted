@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Filter;
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 # Run.
 exit App::MARC::Filter->new->run;
@@ -33,7 +33,9 @@ marc-filter - Tool to filter records in MARC dataset.
 =head1 DESCRIPTION
 
 Tool to filter MARC records in big datasets. Could filter by control field or field/subfield or
-leader or material type. Tool could filter by number of output records.
+leader or material type. Field 008 also supports item selectors in the form
+C<008.item>, parsed by L<MARC::Field008>. Tool could filter by number of output
+records.
 
 It supports MARC XML and USMARC files now.
 
@@ -84,7 +86,30 @@ lzop.
 =item * C<search_item>
 
 Search item could be MARC control field or MARC field or 'leader' string or
-material type string.
+material type string. Field 008 also supports item selectors in the form
+C<008.item>.
+
+Possible field 008 items are:
+
+=over
+
+=item * cataloging_source
+
+=item * date1
+
+=item * date2
+
+=item * date_entered_on_file
+
+=item * language
+
+=item * modified_record
+
+=item * place_of_publication
+
+=item * type_of_date
+
+=back
 
 Possible material type strings are:
 
@@ -114,6 +139,8 @@ It's optional with C<-e>.
 =item * C<value>
 
 Value to filter.
+For C<008.date1> and C<008.date2> it's possible to use range syntax in the
+form C<YYYY..YYYY>.
 It's required without C<-e>.
 
 =back
@@ -143,6 +170,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

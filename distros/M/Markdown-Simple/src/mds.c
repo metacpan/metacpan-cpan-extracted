@@ -9,6 +9,8 @@
 #include "mds_ctx.h"
 #include "mds_arena.h"
 #include "mds_block.h"
+#include "mds_linkref.h"
+#include "mds_footnote.h"
 #include "mds_render_html.h"
 #include "simd/mds_simd.h"
 
@@ -19,7 +21,15 @@
 /* Opaque blob sized comfortably larger than the renderer's private
  * `render_state`. The renderer placement-initialises this via the
  * pointer returned in ud_out. Keeping it stack-local keeps us
- * thread-safe and alloc-free. */
+ * thread-safe and costs no allocation for the state itself.
+ *
+ * The state is not entirely allocation free, though: the renderer grows
+ * several buffers through it on demand (alt text, autolink coalescing,
+ * the highlight accumulator, the footnote tables). Because the blob is a
+ * stack local, nothing reclaims those when it goes out of scope, so every
+ * exit path below has to call mds_render_html_cleanup. Before that call
+ * existed each render leaked between 60 bytes and a few kilobytes
+ * depending on which features the document used. */
 struct mds_render_state_blob {
     unsigned char bytes[16 * 1024];
 };
@@ -82,6 +92,7 @@ int mds_render_html_to_sv_ex(pTHX_
                 *arena = ctx.arena;
                 if (borrowed_arena) mds_arena_reset(arena);
                 else                mds_arena_free(arena);
+                mds_render_html_cleanup(ud);
                 mds_buf_finalize(aTHX_ &buf);
                 return -1;                         /* malformed UTF-8 */
             }
@@ -111,10 +122,17 @@ int mds_render_html_to_sv_ex(pTHX_
 
     mds_block_scan(&ctx);
 
+    /* Both tables live in the arena but grow their entry arrays off the
+     * general heap, so they have to be released while the arena that holds
+     * the table structs is still valid. */
+    mds_linkref_free(ctx.refs);
+    mds_footnote_free(ctx.footnotes);
+
     mds_arena_snapshot(&ctx.arena, &mds_last_arena_profile);
     *arena = ctx.arena;
     if (borrowed_arena) mds_arena_reset(arena);
     else                mds_arena_free(arena);
+    mds_render_html_cleanup(ud);
     mds_buf_finalize(aTHX_ &buf);
     return 0;
 }

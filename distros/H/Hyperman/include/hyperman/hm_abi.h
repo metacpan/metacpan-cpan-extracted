@@ -24,7 +24,12 @@
  * Perl headers (EXTERN.h / perl.h / XSUB.h) must be included before this
  * file so SV, IV, SSize_t and pTHX are defined. */
 
-#define HM_ABI_VERSION 1
+/* Version history (the table only ever grows at the tail, so a consumer
+ * built against an older header keeps working against a newer provider -
+ * check `abi_version >= the version you need`):
+ *   1 - loop handles, io watchers, timers, futures, run_until
+ *   2 - conn_detach */
+#define HM_ABI_VERSION 2
 
 /* io_watch masks (match Hyperman's internal HM_EV_READ/HM_EV_WRITE) */
 #define HM_ABI_READ  0x1
@@ -90,6 +95,25 @@ typedef struct hm_abi {
 
     /* ---- await: pump the loop until f settles (re-entrant) -------------- */
     void (*run_until)(pTHX_ void *loop, SV *f);
+
+    /* ---- v2 ------------------------------------------------------------- *
+     * conn_detach: hand a live HTTP/1 connection to the application - the
+     * server stops watching the fd, forgets the connection and does NOT
+     * close it, so the consumer's own io_watch on that fd starts firing.
+     * The ticket (fd, id) comes from $env->{'psgix.hyperman.conn'}; the
+     * generation id makes a stale ticket fail rather than hit the wrong
+     * connection. Call it from inside the request's app frame or from a
+     * continuation of its response Future; whatever response the app then
+     * produces for that request is discarded, and the consumer owns the fd
+     * (including closing it). This is the WebSocket/upgrade seam.
+     *
+     * Returns 0 on success, or:
+     *   -1 no such connection, or the ticket is stale
+     *   -2 HTTP/2 (streams share one connection - not detachable)
+     *   -3 TLS (the SSL session cannot be handed over)
+     *   -4 output still draining for an earlier response
+     *   -5 already detached */
+    int (*conn_detach)(pTHX_ void *loop, int fd, UV id);
 } hm_abi;
 
 #endif /* HM_ABI_H */

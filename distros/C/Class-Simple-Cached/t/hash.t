@@ -42,7 +42,10 @@ CLASS: {
 	ok(scalar(@a) == 1);
 	ok($a[0] eq 'a');
 
-	# FIXME: why is this test different from t/chi.t?
+	# Both calls use list context (@empty = ...).
+	# An empty list is never cached (AUTOLOAD guard: return unless scalar(@result)).
+	# So each call re-invokes the object.  Compare t/chi.t where the second and
+	# third calls use SCALAR context, which hits the undef/sentinel path instead.
 	my @empty = $cached->empty();
 	ok(scalar(@empty) == 0);
 	@empty = $cached->empty();

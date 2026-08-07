@@ -1,0 +1,13 @@
+Revision history for Punk
+
+0.02    2026-08-06
+        - $c->ua: an outbound HTTP agent on the context
+        - The agent is one per worker, not one per request: it owns a
+          keep-alive pool and its DNS state.
+        - More than one agent: `ua partner => { ... }` names a second, the
+          same shape `database` uses for a second database, and
+          $c->ua('partner') asks for it. 
+        - Needs Fetch 0.11 for the per-request jar (Fetch->clone).
+
+0.01    2026-08-06
+        First version

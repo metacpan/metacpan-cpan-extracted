@@ -45,7 +45,7 @@ static SV *jsf_compile_api(pTHX_ SV *schema, SV *resolver, int coerce,
 
 /* ---- IR dump (debug shim for the phase-02 tests) ------------------------ */
 
-static const struct { U64 bit; const char *name; } jsf_bitnames[] = {
+static const struct { uint64_t bit; const char *name; } jsf_bitnames[] = {
     { JSF_HAS_TYPE,"type" },{ JSF_HAS_ENUM,"enum" },{ JSF_HAS_CONST,"const" },
     { JSF_HAS_MIN,"minimum" },{ JSF_HAS_MAX,"maximum" },
     { JSF_HAS_EXMIN,"exclusiveMinimum" },{ JSF_HAS_EXMAX,"exclusiveMaximum" },
@@ -217,9 +217,9 @@ _arena_selftest()
     CODE:
     {
         jsf_arena_t *a;
-        uint32_t o1, o2, o3, blk, len;
+        uint32_t o1, o2, o3, blk, len, na;
         const char *b;
-        int dedup_ok, bytes_ok;
+        int dedup_ok, bytes_ok, align_ok;
         a = jsf_arena_new(16);
         if (!a) croak("oom");
         o1  = jsf_arena_intern(a, "hello", 5);
@@ -229,8 +229,57 @@ _arena_selftest()
         b   = jsf_str_bytes(a, o1, &len);
         dedup_ok = (o1 == o2) && (o1 != o3) && (o1 != JSF_NULL_OFF);
         bytes_ok = (len == 5) && (memcmp(b, "hello", 5) == 0) && (blk != JSF_NULL_OFF);
+
+        na = JSF_ALIGNOF(jsf_node_t);
+        align_ok = (na > 0) && ((na & (na - 1)) == 0)
+                 && (((uintptr_t)a->base % na) == 0);
         jsf_arena_free(a);
-        RETVAL = newSVpvf("%d:%d", dedup_ok, bytes_ok);
+        RETVAL = newSVpvf("%d:%d:%d:%u", dedup_ok, bytes_ok, align_ok,
+                          (unsigned)na);
+    }
+    OUTPUT:
+        RETVAL
+
+# Alignment of the nodes the PARSER actually produced, which is the thing that
+# broke in 0.05: jsf_parse.h asked the arena for alignment 8 while jsf_node_t
+# holds NVs, and an NV is 16-byte aligned on a perl built -Duselongdouble or
+# -Dusequadmath. Asserting against a freshly compiled schema (rather than
+# against an allocation this function makes itself) is what makes this a real
+# guard - it fails if the parser ever goes back to a hardcoded alignment.
+# Returns "<all_aligned>:<alignof>:<nodes_checked>".
+SV *
+_node_align_selftest(schema)
+        SV *schema
+    CODE:
+    {
+        jsf_compiled_t *c;
+        SV       *obj;
+        uint32_t  na = JSF_ALIGNOF(jsf_node_t);
+        uint32_t  off;
+        int       ok = 1, seen = 0;
+
+        obj = jsf_compile_api(aTHX_ schema, NULL, 0, 0);
+        if (!obj) croak("compile failed");
+        c = jsf_compiled_of(aTHX_ obj);
+
+        if (!c || !c->arena || ((uintptr_t)c->arena->base % na) != 0) ok = 0;
+
+        /* Walk every node-sized slot the parser laid down. Node offsets are
+         * not enumerable from outside, so scan the arena at the alignment the
+         * parser should have used: if it used a smaller one, the root offset
+         * itself will not be on this grid. */
+        if (c && c->arena && c->root != JSF_NULL_OFF) {
+            if ((c->root % na) != 0) ok = 0;
+            if (((uintptr_t)jsf_arena_ptr(c->arena, c->root) % na) != 0) ok = 0;
+            seen++;
+            for (off = c->root; off + sizeof(jsf_node_t) <= c->arena->used;
+                 off += (uint32_t)sizeof(jsf_node_t)) {
+                if (((uintptr_t)jsf_arena_ptr(c->arena, off) % na) != 0) ok = 0;
+                seen++;
+            }
+        }
+        SvREFCNT_dec(obj);
+        RETVAL = newSVpvf("%d:%u:%d", ok, (unsigned)na, seen);
     }
     OUTPUT:
         RETVAL

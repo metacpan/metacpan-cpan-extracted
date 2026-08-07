@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::API;
-$Mojolicious::Plugin::Fondation::API::VERSION = '0.06';
+$Mojolicious::Plugin::Fondation::API::VERSION = '0.07';
 # ABSTRACT: Stable public contract for Fondation plugins -- read-only access
 
 use Mojo::Base -base, -signatures;
@@ -68,7 +68,7 @@ Mojolicious::Plugin::Fondation::API - Stable public contract for Fondation plugi
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

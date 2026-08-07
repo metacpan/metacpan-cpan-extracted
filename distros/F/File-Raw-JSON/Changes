@@ -1,5 +1,8 @@
 Revision history for File-Raw-JSON
 
+0.06    2026-08-06
+        - Fix a false FAILING: t/29-abi.t
+
 0.05    2026-08-04
         - Public C ABI (include/frj_abi.h)
         - The dist is now an ExtUtils::Depends provider

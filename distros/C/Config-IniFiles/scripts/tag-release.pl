@@ -7,7 +7,7 @@ use Path::Tiny qw/ path /;
 
 my ($version) =
     ( map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-        path("./lib/Config/IniFiles/")->lines_utf8() );
+        path("./lib/Config/IniFiles.pm")->lines_utf8() );
 
 if ( !defined($version) )
 {

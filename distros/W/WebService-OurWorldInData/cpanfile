@@ -15,6 +15,7 @@ recommends 'URI';
 on test => sub {
     requires 'Test2::V0' => '0.000139';
 
+    requires 'Data::Dumper::Concise';
     requires 'LWP::UserAgent';
     requires 'LWP::UserAgent::Mockable';
     requires 'Time::Piece';
@@ -28,6 +29,7 @@ on test => sub {
 on 'develop' => sub {
   requires 'perl' => '5.026'; # postfix deref, hash slices, Test2, indented here-docs
 
+  requires 'Data::Dumper::Concise';
   requires 'Dist::Zilla';
 
   recommends 'Data::Dumper::Concise';

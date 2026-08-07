@@ -88,6 +88,10 @@ static void hm_abi_run_until(pTHX_ void *vl, SV *f) {
     hm_loop_run(aTHX_ (hm_loop *)vl, f);
 }
 
+static int hm_abi_conn_detach(pTHX_ void *vl, int fd, UV id) {
+    return hm_detach(aTHX_ (hm_loop *)vl, fd, id);
+}
+
 static const hm_abi hm_abi_table = {
     HM_ABI_VERSION,
     hm_abi_cur_loop,
@@ -104,6 +108,7 @@ static const hm_abi hm_abi_table = {
     hm_abi_future_fail,
     hm_abi_future_on_ready,
     hm_abi_run_until,
+    hm_abi_conn_detach,          /* v2 */
 };
 
 /* ---- _abi_selftest: drive the whole table from C (t/22-abi.t) ----------- */
@@ -185,6 +190,13 @@ static int hm_abi_selftest(pTHX) {
             close(fds[0]);
             close(fds[1]);
         } else ok = 0;
+
+        /* v2 conn_detach: the entry is present and rejects tickets that
+         * name no connection. The success path needs a live HTTP
+         * connection and is covered end to end by t/23-detach.t. */
+        if (!A->conn_detach)                                      ok = 0;
+        else if (A->conn_detach(aTHX_ (void *)loop, 4094, 1) != -1) ok = 0;
+
         hm_loop_free(aTHX_ loop);
     }
 

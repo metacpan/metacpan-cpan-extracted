@@ -1,0 +1,72 @@
+NAME
+    RT::Extension::AwayMode - Automatically hand off tickets while an owner
+    is away
+
+DESCRIPTION
+    This extension lets any user flag themselves as "away" (on holiday, out
+    of office, ...) on their own Preferences page, optionally scoped to a
+    start and/or end date. While a user's away flag is active, any new reply
+    (Correspond transaction) on a ticket they own causes the ticket to be
+    reassigned to Nobody, with an internal comment explaining why. Because
+    unowned tickets are visible to the whole queue/team, this ensures
+    tickets aren't silently stuck waiting on someone who is on holiday.
+
+    While their away flag is active, the user also sees a prominent warning
+    banner on every page of RT, reminding them (and anyone looking over
+    their shoulder) that Away Mode is on.
+
+RT VERSION
+    Works with RT 6.0.3.
+
+INSTALLATION
+    "perl Makefile.PL"
+    "make"
+    "make install"
+        May need root permissions.
+
+    "make initdb"
+        Only run this the first time you install this module.
+
+        If you run this twice, you may end up with duplicate scrips.
+
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::AwayMode');
+
+    Clear your mason cache
+            rm -rf /opt/rt6/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+    Users manage their own away status from Settings -> Away Mode
+    (/Prefs/AwayMode.html): a checkbox to enable away mode, and optional
+    start/end dates. With no dates set, away mode applies for as long as the
+    checkbox stays on. With dates set, away mode is only active while today
+    falls within the (inclusive) start/end range.
+
+METHODS
+  IsAwayForPrefs
+    Pure logic, independent of RT, so it can be unit tested without an RT
+    installation. Takes the stored AwayMode preference hashref (as produced
+    by the /Prefs/AwayMode.html page: "{ Enabled => 0|1, StartDate =>
+    'YYYY-MM-DD'|'', EndDate => 'YYYY-MM-DD'|'' }") and an optional "today"
+    in "YYYY-MM-DD" form (defaults to the current local date). Returns true
+    if away mode is currently active for those preferences.
+
+    Both "StartDate" and "EndDate" are optional and, when present, are
+    inclusive bounds.
+
+  IsUserAway
+    Takes an "RT::User" object, loads its "AwayMode" preference, and returns
+    whether away mode is currently active for that user. Thin wrapper around
+    "IsAwayForPrefs".
+
+AUTHOR
+    Christian Mehlmauer
+
+LICENSE AND COPYRIGHT
+    This is free software, licensed under version 3 of the GNU General
+    Public License.
+

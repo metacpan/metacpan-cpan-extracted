@@ -1,5 +1,38 @@
 Revision history for Template-Stencil
 
+0.03    Date/time
+        - Windows fixes 
+        - Path safety now treats '\' as a separator alongside '/' when
+          scanning a template name for traversal.
+        - Perl 5.10.0 is the new minimum, down from 5.16. ppport.h supplies
+          av_top_index, croak_sv, mg_findext, SvREFCNT_dec_NN, HeUTF8 and
+          utf8_to_uvchr_buf; sv_eq_flags/sv_cmp_flags fall back to
+          sv_eq/sv_cmp, which take the identical path for the already
+          fetched non-magical SVs the VM compares. cv_set_call_checker
+          needs 5.14 and cannot be back-ported, so below that the
+          statically-resolved fast path is simply not installed and every
+          call takes the ordinary XSUB 
+        - Fixed a latent stack bug in the ABI self-test: SvIV(POPs) popped
+          twice
+        - t/11-bytecode-shape.t asserted a 1000us compile budget, which is
+          a property of the smoker rather than of the compiler
+
+0.02    Date/time
+        - A shared C ABI (include/st_abi.h), so a consumer XS module can
+          render through the engine without a Perl frame: engine_of hands
+          back the opaque engine behind a blessed Template::Stencil object
+          (building it lazily, as the render method does), and render is
+          the render path minus the XS prologue and the croak. Template
+          errors come back through an out-parameter rather than as an
+          exception, so a consumer can turn one into its own 500. The table
+          is resolved at runtime through Template::Stencil::_abi_ptr and
+          gated on abi_version, so there is no link-time coupling and the
+          two dists upgrade independently; it grows only at the end.
+        - Installed through ExtUtils::Depends, so a dependent reaches
+          st_abi.h without vendoring a copy. t/57-abi.t drives the table
+          the way a consumer does and checks its output byte-for-byte
+          against the render method, UTF-8 flag included.
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

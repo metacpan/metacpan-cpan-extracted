@@ -13,6 +13,7 @@ use Test::More;
 plan skip_all => 'Hyperman not installed' unless eval { require Hyperman; 1 };
 plan skip_all => 'Fetch not installed'    unless eval { require Fetch; 1 };
 require Open::API;
+require Open::API::Plack;
 require Open::API::Client;
 
 my $SPEC = {
@@ -68,7 +69,7 @@ if (!$pid) {
     };
     my %h = map { $_ => $ok }
         qw(keyOp queryOp cookieOp bearerOp basicOp eitherOp bothOp openOp);
-    my $app = $api->to_app(
+    my $app = Open::API::Plack->new(api => $api,
         handlers => \%h,
         security => {
             ApiKey => sub { $_[0] eq 'secret-key'   ? { k => 1 } : 0 },
@@ -77,7 +78,7 @@ if (!$pid) {
             Bearer => sub { $_[0] eq 'tok'           ? { u => 'a' } : 0 },
             Basic  => sub { $_[0] eq 'alice:pw'      ? { u => 'alice' } : 0 },
         },
-    );
+    )->to_app;
     Hyperman->run(app => $app, host => '127.0.0.1', port => $port, workers => 1);
     exit 0;
 }
@@ -148,10 +149,10 @@ is($ua->get("$base/open")->get->status, 200, 'empty security disables auth');
         $pid = 0;   # do not let this child's END reap the main server
         open STDERR, '>', '/dev/null';
         my $api = Open::API->new(spec => $sspec);
-        my $app = $api->to_app(
+        my $app = Open::API::Plack->new(api => $api,
             handlers => { boomOp => sub { [200, [], ['']] } },
             security => { Boom => sub { die "checker exploded\n" } },
-        );
+        )->to_app;
         Hyperman->run(app => $app, host => '127.0.0.1', port => $sport, workers => 1);
         exit 0;
     }
@@ -207,8 +208,8 @@ is($ua->get("$base/open")->get->status, 200, 'empty security disables auth');
 {
     my $api = Open::API->new(spec => $SPEC);
     my $err;
-    eval { $api->to_app(handlers => { keyOp => sub { [200,[],['']] } },
-                        security => {}) } or $err = $@;
+    eval { Open::API::Plack->new(api => $api, handlers => { keyOp => sub { [200,[],['']] } },
+                        security => {})->to_app } or $err = $@;
     like($err, qr/requires securityScheme '\w+' but no checker/,
         'to_app croaks when a required scheme has no checker');
 }

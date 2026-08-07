@@ -1,5 +1,29 @@
 Revision history for PAGI::FastAPI::Security
 
+0.0.4   2026-08-06
+        [IMPROVEMENTS]
+        - Upgraded requirement to PAGI::FastAPI v0.0.5.
+        - Updated eg/oauth2_password_bearer_app.pl to make use of
+          form-urlencoded body as it is now supported by
+          PAGI::FastAPI v0.0.5.
+
+0.0.3   2026-08-06
+        - Added eg/api_key_protected_app.pl, a runnable example chaining
+          PAGI::FastAPI::Security::APIKey with a lookup against a demo API
+          key store, demonstrating the extract-then-verify pattern for
+          header-based keys.
+        - Added eg/basic_auth_protected_app.pl, a runnable example
+          chaining PAGI::FastAPI::Security::HTTPBasic with a demo
+          username/password store.
+        - Added eg/oauth2_password_bearer_app.pl, a runnable example for
+          PAGI::FastAPI::Security::OAuth2::PasswordBearer, including a toy
+          POST /token endpoint that issues a signed JWT, so the full OAuth2
+          password grant flow can be exercised end-to-end. Notes that the
+          token endpoint is application code, not something this
+          distribution provides.
+        - No changes to library code. All four schemes now have a matching
+          eg/ example (HTTPBearer already had eg/jwt_protected_app.pl).
+
 0.0.2   2026-08-05
         [DOCUMENTATION]
         - Updated SYNOPSIS code.

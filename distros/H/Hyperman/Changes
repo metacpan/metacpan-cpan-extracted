@@ -1,5 +1,37 @@
 Revision history for Hyperman
 
+0.12    2026-08-06
+        - io_uring: cancelling a timer could corrupt the heap. ur_del_timer
+          freed the ur_timer immediately, but the timeout is already in flight
+          in the kernel and its user_data IS that pointer, so the completion
+          still arrived, was dereferenced, and freed a second time. 
+        - Workers report their own pid again on perl below 5.14. $$ is a plain
+          SV that perl only refreshes inside pp_fork, and hm_spawn forks from
+          C, so every worker in the pool kept reporting the supervisor's pid -
+          and POSIX::getpid is `sub getpid { $$ }`, so that read wrong too.
+        - t/15-process.t asserts the invariant directly: no worker may answer
+          with the supervisor's pid.
+        - t/22-abi.t asserted _abi_ptr returns a positive IV. It returns a raw
+          pointer, and Solaris x86-64 maps shared objects high enough to set
+          the sign bit, so the assertion was wrong rather than the table.
+
+0.11    2026-08-06
+        - Connection detach, the protocol-upgrade seam: Hyperman::detach($env)
+          hands a live HTTP/1 socket to the application. The server stops
+          watching the fd, forgets the connection and does not close it, so
+          the app's own psgix.loop watchers on that fd fire. The app writes
+          its own upgrade response and returns a discarded sentinel
+          ([101, [], []]). This is what a WebSocket layer needs; before it,
+          a hijacked socket kept racing the server's own read watcher.
+        - $env->{'psgix.hyperman.conn'} = [ fd, generation id ] - the ticket
+          detach works from, and the way an app detects that detaching is
+          possible (HTTP/2 streams and other servers do not provide it).
+        - Detach is refused, with a specific message, for HTTP/2 and TLS
+          connections, a stale ticket, a response still draining, and a
+          second detach of the same connection.
+        - 1xx and 426 responses now carry their real reason phrase: a 101
+          serialised as "HTTP/1.1 101 OK" before this.
+
 0.10    2026-08-05
         - Public C ABI for XS consumers 
 

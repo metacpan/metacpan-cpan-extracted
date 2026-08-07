@@ -1,0 +1,212 @@
+=head1 NAME
+
+Punk Chat - the example application
+
+=head1 SYNOPSIS
+
+    cd example
+    ./bin/punk-chat
+
+    # then open https://localhost:5443/ and accept the warning
+
+=head1 DESCRIPTION
+
+A small chat application that exercises the three things Punk does which
+are awkward to show separately, in one app class, over one router, against
+one table:
+
+=over 4
+
+=item * B<a WebSocket chat interface> - C<websocket '/ws/:room'>, a
+L<Punk::WebSocket::Room> per room, and a browser client in
+F<root/static/chat.js>;
+
+=item * B<a spec-first OpenAPI mount> - F<openapi.json> under C</api>, with
+the interactive docs at C</docs>, a bearer security scheme compiled into a
+guard, and keyset pagination over the history;
+
+=item * B<HTTPS with a self-signed certificate> - generated in Perl, no
+C<openssl> binary needed, terminated in front of the app.
+
+=back
+
+The two halves are wired to each other rather than merely coexisting: a
+message POSTed to the API is stored and then broadcast to every socket in
+that room, so C<curl> into a shell arrives in an open browser tab. That is
+the whole point of the example.
+
+=head1 RUNNING IT
+
+    ./bin/punk-chat
+
+Then:
+
+=over 4
+
+=item * C<https://localhost:5443/> - the rooms
+
+=item * C<https://localhost:5443/chat/lobby> - a room (open it twice)
+
+=item * C<https://localhost:5443/docs> - the OpenAPI docs UI
+
+=back
+
+The certificate is self-signed, so the browser warns once. That is expected
+- accept it and carry on. Firefox and Chrome both need the SAN entries the
+generator writes (F<bin/make-cert>); a certificate with only a commonName
+is rejected outright these days rather than warned about.
+
+With two tabs open on the same room, post from a shell:
+
+    curl -k -X POST https://localhost:5443/api/rooms/lobby/messages \
+         -H 'content-type: application/json' \
+         -d '{"nick":"curl","text":"hello from the API"}'
+
+and it appears in both. Clearing a room needs the bearer token the spec
+declares:
+
+    curl -k -X DELETE https://localhost:5443/api/rooms/lobby/messages \
+         -H 'authorization: Bearer punk-admin'
+
+Options: C<--port>, C<--app-port>, C<--host>, C<--workers>, C<--no-tls>
+(C<punk-chat --help>). C<PUNK_CHAT_DSN> moves the database,
+C<PUNK_CHAT_ADMIN_TOKEN> changes the admin token.
+
+=head2 Requirements
+
+L<Hyperman> B<0.11 or later> - earlier versions have no C<detach> ABI, and
+C<websocket> routes croak at boot rather than start an app that cannot serve
+them. Also L<Open::API> (with L<Open::API::UI> for C</docs>),
+L<Template::Stencil>, L<File::Raw::JSON>, L<DBD::SQLite>, and
+L<IO::Socket::SSL> for the certificate and the terminator.
+
+Running from a Punk checkout that is built but not installed, F<bin/punk-chat>
+and F<app.psgi> add the sibling F<blib> themselves. For Hyperman, point
+C<PERL5LIB> at its F<blib>.
+
+=head1 WHY TLS IS TERMINATED IN FRONT
+
+This is the part worth reading, because the obvious arrangement does not
+work and the reason is structural rather than a missing feature.
+
+Hyperman serves HTTPS perfectly well on its own - C<tls_cert> and C<tls_key>,
+with SNI, ALPN and client certificates. For an app that is pages and JSON,
+that is what you would use and there would be nothing else to say.
+
+A WebSocket is different. Upgrading one means taking the socket away from the
+server: Hyperman's C<detach> stops watching the fd, forgets the connection
+and does not close it, and the application drives it from there. On a TLS
+connection there is nothing coherent to hand over - the OpenSSL session state
+belongs to the server's connection object, and the fd on its own is useless
+without it. So C<hm_detach> refuses:
+
+    if (c->ssl) return -3;    /* TLS state cannot be handed on */
+
+which Punk reports as C<< TLS cannot be detached >>. On a TLS listener the
+pages would serve and the chat would not.
+
+Serving the WebSocket from a second, plain port does not rescue it: a browser
+refuses a C<ws://> socket opened from an C<https://> page, so it has to be
+C<wss://> on the same origin as the page.
+
+What is left is to terminate TLS in front, which is what F<bin/tls-proxy>
+does:
+
+    browser  --https/wss-->  bin/tls-proxy  --http/ws-->  Hyperman + Punk
+             :5443                                        127.0.0.1:5010
+
+Everything reaching Hyperman is plain HTTP/1, which is exactly what C<detach>
+wants, and after the handshake a WebSocket is just a long-lived byte stream -
+so a terminator that copies bytes carries it without knowing the protocol
+exists.
+
+This is not a workaround so much as the deployment everybody already runs.
+Put nginx, HAProxy or a load balancer where F<tls-proxy> sits and the
+application does not change: TLS is a property of the listener, and Punk
+never mentions it. F<bin/tls-proxy> is a readable stand-in - one process per
+connection, non-blocking on both sides - not a production terminator.
+
+=head1 LAYOUT
+
+    app.psgi                     PSGI entry point (plain http)
+    openapi.json                 the API - routing table and contract
+
+    bin/punk-chat                start everything (app + terminator)
+    bin/tls-proxy                the TLS terminator
+    bin/make-cert                self-signed certificate, in pure Perl
+
+    lib/Chat.pm                  the app class: every route, in one file
+    lib/Chat/Auth.pm             the adminToken security checker
+    lib/Chat/Bus.pm              rooms, the wire format, broadcasting
+    lib/Chat/Schema.pm           the one table, created on demand
+    lib/Chat/Model/Message.pm    the model, plus three custom queries
+    lib/Chat/Controller/Web/Chat.pm    the pages
+    lib/Chat/Controller/WS/Chat.pm     the WebSocket handler
+    lib/Chat/Controller/API/Message.pm the five operations
+
+    root/templates/              Stencil templates
+    root/static/                 the browser client
+    tls/                         generated certificate (gitignored)
+
+=head1 THINGS TO NOTICE
+
+=head2 The spec is the routing table
+
+Nothing in F<lib/Chat/Controller/API/Message.pm> declares a route, a
+parameter or a status code. F<openapi.json> does, and at boot Punk resolves
+each C<operationId> to the method of the same name, compiles every schema,
+and turns the C<security> requirement on C<clearRoom> into a guard. By the
+time an operation runs, the request has been matched, guarded, size-checked
+and validated in C. A typo in an operationId croaks at boot.
+
+One wrinkle the spec comments on: Open::API resolves C<$ref> into
+C<#/components/schemas>, so the schemas are shared that way, but parameter
+and response C<$ref>s are not resolved - those are written out in full.
+
+=head2 A WebSocket route is an ordinary route
+
+C<websocket '/ws/:room'> takes a path capture, sits under the same router as
+everything else, and could sit under the same guards - a guard can reject a
+client with a normal HTTP response before the upgrade happens. The handler
+is called with the context B<and> the connection once the handshake is
+answered; it wires its events and returns, and the connection then lives on
+the worker's event loop with no Perl until a whole message arrives.
+
+Note what F<lib/Chat/Controller/WS/Chat.pm> closes over: the room name, the
+nick and the model instance, read off the context while the request is still
+a request. The callbacks outlive it.
+
+=head2 Rooms are per worker
+
+A L<Punk::WebSocket::Room> holds the connections B<its own worker> accepted.
+With several workers, an API post handled by worker 2 would reach the
+browsers worker 2 happens to hold and no others. That is why F<punk-chat>
+runs a single worker and warns if you ask for more. Fanning out across
+workers needs a message bus, which Punk deliberately does not pretend to be
+- see L<Punk::WebSocket::Room/DESCRIPTION>.
+
+=head2 Everything untrusted goes in as text
+
+Nicks and message bodies are other people's input. F<chat.js> builds every
+line with C<textContent>, never C<innerHTML>, so there is no path from a
+chat message to markup.
+
+=head1 SEE ALSO
+
+L<Punk>, L<Punk::WebSocket>, L<Punk::WebSocket::Room>,
+L<Punk::Mount::OpenAPI>, L<Punk::Model>, L<Open::API>, L<Template::Stencil>,
+L<Hyperman>.
+
+=head1 AUTHOR
+
+LNATION <email@lnation.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

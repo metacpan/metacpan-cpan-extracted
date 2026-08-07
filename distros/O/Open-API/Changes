@@ -1,5 +1,41 @@
 Revision history for Open-API
 
+0.05    2026-08-06
+        - The PSGI app segfaulted on perl below 5.20. The closure capture
+          pushed &PL_sv_undef for an absent csrf config, and perl before 5.20
+          treats an array element that IS &PL_sv_undef as a deleted one, so
+          av_fetch handed back NULL and the request path dereferenced it.
+        - $client->$operationId sugar croaked on nothing below 5.16. Perl
+          hands an XSUB AUTOLOAD its method name one of two ways: newer perls
+          set $AUTOLOAD, older ones skip that and store the name in the CV's
+          own PV slot. AUTOLOAD read only $AUTOLOAD, found it undef, and
+          returned empty - so a typo'd method silently did nothing instead of
+          dying. 
+        - Build fix for perl below 5.26: hv_deletes is 5.25.6.
+
+0.04    2026-08-05
+        - Public C ABI: include/oa_abi.h,
+        - Open::API is now a provider as well as a consumer: it installs
+          oa_abi.h through ExtUtils::Depends
+        - t/25-abi.t drives the whole table in C (api_of -> route -> op_id ->
+          validate) and proves it agrees with match / validate_request. It
+          treats _abi_ptr as a raw pointer rather than a positive IV, since
+          Solaris x86-64 maps shared objects high enough to set the sign bit.
+        - Build fix for perl below 5.26: hv_deletes is 5.25.6
+        - SPAGAIN after every require in the ABI resolvers (File::Raw::JSON,
+          Fetch, JSON::Schema::Fast at BOOT, and the Open::API::UI wrap).
+          Each captured SP
+
+0.03    2026-08-05
+        - The PSGI app moved into its own module, Open::API::Plack, replacing
+          $api->to_app(%opts). 
+        - Open::API::UI: a self-contained Swagger UI clone for the compiled
+          spec. 
+        - Framework contract for other adapters: $ui->routes returns static
+          GET routes as PSGI-shaped triplets for Open::API::Catalyst and a
+          future Open::API::Mojo to mount; $ui->to_app is a standalone
+          PSGI app.
+
 0.02    2026-08-04
         - Security: components.securitySchemes are now enforced. to_app takes a
           security => { scheme => checker } map

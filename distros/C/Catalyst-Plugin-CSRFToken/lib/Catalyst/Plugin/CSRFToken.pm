@@ -7,7 +7,7 @@ use Digest::SHA qw(hmac_sha256_hex);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom qw(urandom);
 
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 
 requires 'session', 'stash', 'req', 'detach';
 
@@ -74,7 +74,7 @@ sub _build_single_use_csrf_token {
 
 before 'dispatch' => sub {
   my $c = shift;
-  $c->check_csrf_token 
+  $c->check_csrf_token
     if (
       ($c->auto_check_csrf_token || $c->action->attributes->{EnableCSRF})
       && $c->req->method =~ /^(POST|PUT|DELETE|PATCH)$/i
@@ -91,16 +91,23 @@ sub check_csrf_token {
     return 1;
   }
 
-  my $token   = $c->find_csrf_token_in_request
+  my $token = $c->find_csrf_token_in_request
     or return $c->delegate_failed_csrf_token_check;
 
-  $c->log->debug("Found CSRF token '$token' in request") if $c->debug;
+  $c->log->debug('Found CSRF token in request') if $c->debug;
 
-  # $form_id is extracted from $token, in the form of "form_id:token"
-  my $form_id = 'default';
-  if ($token =~ /^(.*?):(.*)$/) {
-    $form_id = $1;
-    $token   = $2;
+  return $c->delegate_failed_csrf_token_check if ref $token;
+
+  my ($form_id, $version, $payload) = split /:/, $token, 3;
+  unless (
+    defined($form_id)
+      && length($form_id)
+      && defined($version)
+      && $version eq 'v2'
+      && defined($payload)
+  ) {
+    $c->log->debug('Malformed CSRF token') if $c->debug;
+    return $c->delegate_failed_csrf_token_check;
   }
 
   my $session_key = join('_', $c->csrf_token_session_key, $form_id);
@@ -120,14 +127,13 @@ sub check_csrf_token {
     return $c->delegate_failed_csrf_token_check;
   }
 
-  my $expected_token = $entry->{value};
-  if ($c->has_csrf_default_secret) {
-    $expected_token = hmac_sha256_hex($expected_token, $c->csrf_default_secret);
-  }
+  my $expected_token = $c->_csrf_expected_token($entry);
+  my $candidate_token = $c->_unmask_csrf_token($payload, length($expected_token));
 
-  $c->log->debug("Expected CSRF token from session: $expected_token") if $c->debug;
-
-  unless ($c->secure_compare($token, $expected_token)) {
+  unless (
+    defined($candidate_token)
+      && $c->secure_compare($candidate_token, $expected_token)
+  ) {
     $c->log->debug('CSRF token mismatch') if $c->debug;
     return $c->delegate_failed_csrf_token_check;
   }
@@ -146,7 +152,7 @@ sub find_csrf_token_in_request {
       if exists($c->req->body_parameters->{$c->csrf_token_param_key});
     return $c->req->body_data->{$c->csrf_token_param_key}
       if exists($c->req->body_data->{$c->csrf_token_param_key});
-    $c->log->debug('No CSRF token found in request') if $c->debug;    
+    $c->log->debug('No CSRF token found in request') if $c->debug;
     return undef;
   }
 }
@@ -174,17 +180,53 @@ sub csrf_token {
     $c->log->debug("Reusing existing CSRF token for form ID '$form_id'") if $c->debug;
   }
 
-  my $token = $entry->{value};
+  my $expected_token = $c->_csrf_expected_token($entry);
+  my $payload = $c->_mask_csrf_token($expected_token);
+  my $token = "$form_id:v2:$payload";
 
-  if ($c->has_csrf_default_secret) {
-    $token = hmac_sha256_hex($token, $c->csrf_default_secret);
-  }
-
-  $token = "$form_id:$token";
-
-  $c->log->debug("Using CSRF token '$token'") if $c->debug;
+  $c->log->debug("Using masked CSRF token for form ID '$form_id'") if $c->debug;
 
   return $token;
+}
+
+sub _csrf_expected_token {
+  my ($c, $entry) = @_;
+  my $expected_token = $entry->{value};
+  my $secret = $c->csrf_default_secret;
+
+  if (defined $secret) {
+    $expected_token = hmac_sha256_hex($expected_token, $secret);
+  }
+
+  return $expected_token;
+}
+
+sub _mask_csrf_token {
+  my ($c, $expected_token) = @_;
+  return undef unless defined $expected_token && length $expected_token;
+
+  my $mask = urandom(length($expected_token));
+  my $masked_token = $mask ^ $expected_token;
+
+  return encode_base64url($mask.$masked_token);
+}
+
+sub _unmask_csrf_token {
+  my ($c, $payload, $expected_length) = @_;
+  return undef unless defined $payload
+    && length($payload)
+    && $payload =~ /\A[A-Za-z0-9_-]+\z/
+    && defined($expected_length)
+    && $expected_length > 0;
+
+  my $decoded = decode_base64url($payload);
+  return undef unless encode_base64url($decoded) eq $payload;
+  return undef unless length($decoded) == $expected_length * 2;
+
+  my $mask = substr($decoded, 0, $expected_length);
+  my $masked_token = substr($decoded, $expected_length, $expected_length);
+
+  return $mask ^ $masked_token;
 }
 
 sub secure_compare {
@@ -305,10 +347,17 @@ generate a token and pass it to your view layer where it should be added to the 
 trying to process, typically as a hidden field called 'csrf_token' (although you can change
 that in configuration if needed).
 
-All POST, PUT, and PATCH requests are automatically checked for a valid CSRF token when
+The value returned by C<csrf_token> is an opaque, masked representation of
+the token held in the session.  A fresh random mask is generated on every
+call, so repeated calls return different strings while all remain valid for
+the same session token.  This prevents the stable response secret required
+by BREACH compression-oracle attacks.  Applications must not parse or alter
+the returned value.
+
+All POST, PUT, DELETE, and PATCH requests are automatically checked for a valid CSRF token when
 'auto_check_csrf_token' is enabled. If the check fails, a 403 Forbidden response is returned.  The
-response can be customized by overriding the 'csrf_failure_response' method or as otherwise
-documented below.
+response can be customized by overriding the 'delegate_failed_csrf_token_check' method or as
+otherwise documented below.
 
 If you leave this disabled, you will need to manually check the token using the 'check_csrf_token'
 method.  Example:
@@ -326,9 +375,27 @@ action.  Example:
     # CSRF check is automatically performed
   }
 
+=head2 Version 1.100 Notes
+
+This version changes the on-the-wire token format and does not accept tokens
+issued by version 1.001 or earlier.  Read this before you deploy.
+
+Version 1.001 returned the same token representation for a given session and
+form until it expired.  In an application that reflects attacker-controlled
+input into a compressed response containing that token, the stable value can
+become the secret in a BREACH compression oracle.  Tokens are now masked with
+fresh randomness on every call, so the representation differs each time while
+still validating against the same session token.
+
+The practical consequence of the format change is that any page rendered by
+the old version stops validating the moment the new version is deployed.
+Users part way through a form will get a 403 and have to reload.  If that
+matters for your deployment, drain or expire sessions as part of the upgrade,
+or plan for the rejections.
+
 =head2 Version 1.001 Notes
 
-Older versions of this plugin contained security and related bugs stemming from a 
+Older versions of this plugin contained security and related bugs stemming from a
 mistake I made in the first release.   Over the years I've tried to tweak it to
 make it more secure and robust.  However, I've come to the conclusion that the
 best way to fix the issue required me to substantially rewrite the guts.  I did
@@ -345,8 +412,7 @@ generation and validation.   But the log is more noisy.
 
 =head1 CONFIGURATION
 
-=head2 param_key
-=head2 token_param_key
+=head2 param_key, token_param_key
 
 Name of the request parameter used to carry the CSRF token. Defaults to 'csrf_token'.
 
@@ -358,7 +424,7 @@ in a 403 Forbidden response if the token is used in a request for validation.
 
 =head2 auto_check_csrf_token
 
-Boolean attribute controlling whether automatic CSRF checks on incoming requests are enabled. 
+Boolean attribute controlling whether automatic CSRF checks on incoming requests are enabled.
 Defaults to 0 (disabled).  Highly recommended to enable this feature.  If you leave it off
 you will need to manually check the token using the 'check_csrf_token' method or you can enable
 on a per action basis by adding the 'EnableCSRF' attribute to the action.  Examples:
@@ -376,13 +442,14 @@ on a per action basis by adding the 'EnableCSRF' attribute to the action.  Examp
 
 =head2 default_secret
 
-Optional secret key to enhance security by hashing tokens with HMAC.  You can use this for
-example to force invalidation when restarting the service or just to add an extra layer of
-security.  If you don't provide a secret, the token is stored in the session as is.  If you
-provide a secret, the token is hashed with the secret before being stored in the session.
+Optional secret used to derive the expected token with HMAC-SHA256 before
+masking and comparison. The random session value itself remains unchanged.
+When this setting is omitted, the random session value is masked and compared
+directly.
 
-Using a secret can improve the security of your tokens and reduce the risk of playback attacks.
-But you should have a key rotation policy for this to be effective.  If you don't provide a
+Changing the secret invalidates outstanding tokens. Keep the secret outside
+source control and rotate it according to the application's secret-management
+policy.
 
 =head2 session_key
 
@@ -395,7 +462,7 @@ Boolean attribute controlling whether CSRF tokens are single-use. Defaults to 0 
 enabled, the token is deleted from the session after the first validation. If disabled, the
 token can be used multiple times until it expires.
 
-This is disabled by default because enabling it  can lead to some tricky UI experiences, like if the 
+This is disabled by default because enabling it  can lead to some tricky UI experiences, like if the
 user clicks the back button and resubmits the form, which then generated a CSRF token validation error.
 You can mitigate this issue and similar ones by setting you HTML form to not cache, or by using
 JavaScript to prevent the user from resubmitting, Example:
@@ -424,14 +491,15 @@ or logging in.
 
 =head2 csrf_token(form_id=>$form_id)
 
-Generates and returns a CSRF token for the given form ID. Defaults to 'default' if not provided.
-Calling this method will return a token you can embed in your form as a hidden field. If your
-webpage has multiple forms, you can generate a token for each form by providing a unique form ID.
+Generates and returns a masked CSRF token for the given form ID. Defaults to
+C<default> if not provided. Calling this method will return an opaque value
+that can be embedded in a form field or sent in the C<X-CSRF-Token> header.
 
-Token is stored in the session and used to perform CSRF checks on form submissions. Please keep
-in mind that this session key is deleted once the token is used, so you can't use the same token
-twice. You should also deal with 'back' buttons and similar actions that might cause a token to be
-reused and return an error. 
+The underlying token and creation time are stored in the session. Every call
+uses fresh randomness to mask that token, so two returned values will differ
+but will both validate until the underlying token expires. If single-use
+checking is enabled, a validation attempt consumes the underlying session
+token and invalidates every masked representation of it.
 
 =head2 check_csrf_token
 
@@ -443,12 +511,13 @@ response is returned. Returns 1 if the token is valid.
 Generates and returns a secure random token encoded in base64 format. Default length is 48 bytes.
 Useful when you just need a disposable token that is cryptographically secure.
 
-=head2 csrf_failure_response
+=head2 delegate_failed_csrf_token_check
 
 This is the method that is called when a CSRF token check fails.  It first checks if the controller
 has a 'handle_failed_csrf_token_check' method and calls that if it does.  If not it calls the
 'handle_failed_csrf_token_check' method on the context object if that exists.  If neither of those
-methods exist it creates a default response and finalizes it.
+methods exist it creates a default 403 response, finalizes it, and throws a
+L<Catalyst::Exception> with the message 'csrf_token failed validation'.
 
 Override this method if you want to provide a custom response when a CSRF token check fails or
 implement one of the other two methods mentioned above.
@@ -456,7 +525,7 @@ implement one of the other two methods mentioned above.
 =head1 SKIPPING AUTOMATIC CSRF CHECKS
 
 You can skip automatic CSRF checks (when using the 'auto_check' configuration option) for specific
-actions by adding the 'NoCSRF' attribute to the action:
+actions by adding the 'DisableCSRF' attribute to the action:
 
     sub skip :Path(skip) DisableCSRF Args(0) {
       my ($self, $c) = @_;
@@ -484,16 +553,24 @@ attribte to the final action in the chain for this to work.  Example:
 
 If you don't place the attribute on the final action the plugin will not see it.
 
+=head1 RESPONSE COMPRESSION
+
+CSRF tokens are masked with fresh randomness on every call to prevent a
+stable token value from becoming a BREACH compression oracle. Applications
+should still avoid reflecting attacker-controlled input into responses that
+contain secrets and should apply appropriate response-compression policy,
+rate limiting, and monitoring as defense in depth.
+
 =head1 AUTHOR
 
-  John Napiorkowski <jnapiork@cpan.org>
- 
+  John Napiorkowski <jjnapiork@cpan.org>
+
 =head1 COPYRIGHT
- 
-  Copyright (c) 2025 the above named AUTHOR
- 
+
+  Copyright (c) 2026 the above named AUTHOR
+
 =head1 LICENSE
- 
+
 You may distribute this code under the same terms as Perl itself.
- 
+
 =cut

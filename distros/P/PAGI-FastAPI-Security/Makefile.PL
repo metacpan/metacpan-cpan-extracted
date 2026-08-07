@@ -17,7 +17,7 @@ WriteMakefile(
     },
 
     PREREQ_PM => {
-        'PAGI::FastAPI'       => '0.0.3',
+        'PAGI::FastAPI'       => '0.0.5',
         'Future::AsyncAwait'  => '0.60',
         'MIME::Base64'        => '3.15',
     },

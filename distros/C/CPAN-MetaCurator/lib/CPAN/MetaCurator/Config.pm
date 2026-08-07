@@ -12,8 +12,6 @@ use File::Spec;
 use Mew;
 use Mojo::Log;
 
-use utf8;
-
 has config => (HashRef, default => sub {return {} }, chained => 1);
 
 has -config_path => (Str, default => 'data/cpan.metacurator.conf');
@@ -49,7 +47,7 @@ has -tiddlers_path => (Str, default => 'data/tiddlers.json');
 
 has -visual_break => (Str, default => sub{return '-' x 50});
 
-our $VERSION = '1.27';
+our $VERSION = '1.29';
 
 # -----------------------------------------------
 
@@ -64,11 +62,6 @@ sub init_config
 
 	$self -> config($conf);
 	$self -> logger(Mojo::Log -> new(level => $self -> log_level, path => $$conf{log_path}) );
-
-	# Fix me. Test UTF8 char handling.
-
-	$self -> logger -> info("Testing write of utf8 chars to logger. I ♥ Mojolicious");
-	$self -> logger -> debug("Leaving Config.init_config()");
 
 } # End of init_config.
 

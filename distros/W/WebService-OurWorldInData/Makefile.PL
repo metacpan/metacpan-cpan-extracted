@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Types::Standard" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Dumper::Concise" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "LWP::UserAgent" => 0,
@@ -34,14 +35,15 @@ my %WriteMakefileArgs = (
     "Time::Piece" => 0,
     "URI" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.06",
   "test" => {
-    "TESTS" => "t/*.t t/chart/*.t"
+    "TESTS" => "t/*.t t/chart/*.t t/errors/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
+  "Data::Dumper::Concise" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "HTTP::Tiny" => 0,

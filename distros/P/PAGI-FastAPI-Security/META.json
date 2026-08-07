@@ -34,7 +34,7 @@
          "requires" : {
             "Future::AsyncAwait" : "0.60",
             "MIME::Base64" : "3.15",
-            "PAGI::FastAPI" : "v0.0.3",
+            "PAGI::FastAPI" : "v0.0.5",
             "perl" : "5.036"
          }
       },
@@ -47,27 +47,27 @@
    "provides" : {
       "PAGI::FastAPI::Security" : {
          "file" : "lib/PAGI/FastAPI/Security.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.4"
       },
       "PAGI::FastAPI::Security::APIKey" : {
          "file" : "lib/PAGI/FastAPI/Security/APIKey.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.4"
       },
       "PAGI::FastAPI::Security::Base" : {
          "file" : "lib/PAGI/FastAPI/Security/Base.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.4"
       },
       "PAGI::FastAPI::Security::HTTPBasic" : {
          "file" : "lib/PAGI/FastAPI/Security/HTTPBasic.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.4"
       },
       "PAGI::FastAPI::Security::HTTPBearer" : {
          "file" : "lib/PAGI/FastAPI/Security/HTTPBearer.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.4"
       },
       "PAGI::FastAPI::Security::OAuth2::PasswordBearer" : {
          "file" : "lib/PAGI/FastAPI/Security/OAuth2/PasswordBearer.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -81,6 +81,6 @@
          "web" : "https://github.com/manwar/PAGI-FastAPI-Security"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

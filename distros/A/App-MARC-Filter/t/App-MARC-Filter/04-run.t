@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 30;
+use Test::More 'tests' => 38;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -276,6 +276,134 @@ stdout_is(
 # Test.
 @ARGV = (
 	$data_dir->file('ex1.xml')->s,
+	'008.date1',
+	'1982',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (008.date1 = 1982).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'008.date2',
+	'    ',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (008.date2 = \'    \').',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'008.date1',
+	'1980..1985',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (008.date1 in range 1980..1985).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'008.date1',
+	'1983..1985',
+);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	'',
+	'Run filter for MARC XML file with 0 record (008.date1 not in range 1983..1985).',
+);
+
+# Test.
+@ARGV = (
+	'-i',
+	$data_dir->file('ex1.xml')->s,
+	'008.date1',
+	'1983..1985',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run inverse filter for MARC XML file with 1 record (008.date1 not in range 1983..1985).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'008.type_of_date',
+	's',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (008.type_of_date = s).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'008.language',
+	'cze',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (008.language = cze).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'008.foo',
+	'bar',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help for bad field 008 item (008.foo).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
 	'material_type',
 	'book',
 );
@@ -484,7 +612,7 @@ Usage: $script [-e] [-h] [-i] [-n num] [-o format] [-r] [-v] [--version] marc_fi
 	-v		Verbose mode.
 	--version	Print version.
 	marc_file	MARC XML or USMARC file, could be compressed.
-	search_item	Search item.
+	search_item	Search item. See man page for more information.
 	sub_search_item	Search sub item (optional in case of MARC field).
 	value		Value to filter (required without -e).
 END

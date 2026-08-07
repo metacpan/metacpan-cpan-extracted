@@ -8,9 +8,15 @@ use File::Raw::JSON;
 # reached through File::Raw::JSON::_abi_ptr, and the EU::Depends provider config
 # that lets a consumer (e.g. Hyperman) find the header without copying it.
 
-# _abi_ptr returns the address of the process-wide table as a positive IV.
+# _abi_ptr returns the address of the process-wide table. It is an IV carrying
+# a raw pointer, so it may legitimately be negative - Solaris x86-64 maps shared
+# objects around 0xFFFFFC7F..., which sets the sign bit and made the old
+# '$ptr > 0' assertion fail there on a table that was perfectly fine. What
+# matters is that it is non-zero and stable; that the bits survive the round
+# trip through INT2PTR is what _abi_selftest below actually proves.
 my $ptr = File::Raw::JSON::_abi_ptr();
-ok(defined $ptr && $ptr > 0, "_abi_ptr returns a table address ($ptr)");
+ok(defined $ptr && $ptr != 0, "_abi_ptr returns a table address ($ptr)");
+is(File::Raw::JSON::_abi_ptr(), $ptr, 'the table is static - same address');
 
 # _abi_selftest resolves the table in C and round-trips a document through the
 # opts_init/decode/encode function pointers - proving the whole table wires up.

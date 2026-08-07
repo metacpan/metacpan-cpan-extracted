@@ -13,31 +13,37 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	NAME		=> 'Class::Simple::Cached',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	VERSION_FROM	=> 'lib/Class/Simple/Cached.pm',
 	ABSTRACT_FROM   => 'lib/Class/Simple/Cached.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-	  ? ('LICENSE'=> 'GPL')
+	  ? ('LICENSE'=> 'gpl_2')
 	  : ()),
 	PL_FILES	=> {},
 	PREREQ_PM => {
 		'Carp' => 0,
 		'Class::Simple' => 0,
-		'Params::Get' => 0,
-		'Scalar::Util' => 0
+		'Params::Get' => 0.15,
+		'Scalar::Util' => 0,
+		'Sub::Protected' => 0
 	}, TEST_REQUIRES => {
 		'CHI' => 0,
 		'Class::Simple' => 0,
 		'English' => 0,
 		'File::Spec' => 0,
+		'IPC::System::Simple' => 0,
 		'Test::Carp' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
+		'Test::Without::Module' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Requires' => 0,
-		# 'Test::Kwalitee' => 0,
+		'Test::Memory::Cycle' => 0,
+		'Test::Mockingbird' => 0,
+		'Test::Returns' => 0,
+		'Readonly' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Class-Simple-Cached-*' },
 	# META_ADD => {

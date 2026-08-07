@@ -1,0 +1,55 @@
+# {% name %} configuration. Safe to commit: secrets are referenced here,
+# never written here.
+#
+# Layered - this file, then punk.$PUNK_ENV.yml, then punk.local.yml, each
+# merged over the last. Put deployment differences in the environment file
+# and machine-local ones in punk.local.yml, which is gitignored.
+
+views:
+  Stencil:
+    template_dir: root/templates
+    wrapper: layout.tmpl
+
+static:
+  /static: root/static
+
+# A database, and the shape a secret takes. The value of `password` is
+# resolved at boot from outside this file and kept out of $app->config, which
+# reads [redacted] in its place - so the configuration can be logged or
+# serialised without leaking it. Reach the real value with
+# $app->secret('database.password').
+#
+# database:
+#   dsn:      dbi:Pg:dbname={% lc_name %};host=localhost
+#   user:     {% lc_name %}
+#   password: { $env: {% uc_name %}_DB_PASSWORD }
+#
+# Other forms: { $file: /run/secrets/db } (how Docker and Kubernetes deliver
+# one), { $exec: [vault, read, -field=password, secret/db] }, and
+# { $literal: ... } when you really do mean the value inline.
+
+# Signed cookie sessions, and single-use CSRF tokens over them. The session
+# secret belongs outside this file, like any other secret.
+#
+# session:
+#   secret:   { $env: {% uc_name %}_SESSION_KEY }
+#   expires:  7d
+#   secure:   true
+#   samesite: Lax
+#
+# csrf: true
+#   # every POST/PUT/PATCH/DELETE then needs a live token; put
+#   # {%%} raw csrf %} in the form and pass csrf => $c->csrf_field when
+#   # you render it. See perldoc Punk::CSRF.
+
+# Cross-origin access, if a browser on another origin calls this. A bare
+# `cors: true` is Allow-Origin: * with no credentials - right for a public
+# API. Cookies need the origins named; see perldoc Punk::CORS.
+#
+# cors:
+#   origins:     [ https://app.example.com ]
+#   credentials: true
+#   paths:       [ /api ]
+
+# plugins:
+#   RequestId: {}

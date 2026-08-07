@@ -22,20 +22,20 @@ no_index:
 provides:
   BarefootJS::Backend::Mojo:
     file: lib/BarefootJS/Backend/Mojo.pm
-    version: v0.30.6
+    version: v0.31.1
   Mojolicious::Plugin::BarefootJS:
     file: lib/Mojolicious/Plugin/BarefootJS.pm
-    version: v0.30.6
+    version: v0.31.1
   Mojolicious::Plugin::BarefootJS::DevReload:
     file: lib/Mojolicious/Plugin/BarefootJS/DevReload.pm
-    version: v0.30.6
+    version: v0.31.1
 requires:
-  BarefootJS: v0.30.6
+  BarefootJS: v0.31.1
   Mojolicious: '9.0'
   perl: '5.020'
 resources:
   bugtracker: https://github.com/piconic-ai/barefootjs/issues
   homepage: https://barefootjs.dev
   repository: https://github.com/piconic-ai/barefootjs.git
-version: v0.30.6
+version: v0.31.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

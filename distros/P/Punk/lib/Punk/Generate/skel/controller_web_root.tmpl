@@ -1,0 +1,43 @@
+package {% name %}::Controller::Web::Root;
+
+use strict;
+use warnings;
+use parent 'Punk::Controller';
+
+our $VERSION = '0.01';
+
+# Controller methods are plain subs receiving the context - no instance, no
+# dispatch overhead. The coderef is resolved once at to_app and called
+# directly per request.
+
+sub index {
+    my ($c) = @_;
+    return $c->render('welcome', {
+        title   => '{% name %}',
+        app     => '{% name %}',
+        version => $Punk::VERSION,
+        routes  => [
+            { method => 'GET', path => '/',        target => 'Web::Root#index' },
+            { method => 'GET', path => '/static/', target => 'root/static'     },
+{% if api %}            { method => 'ANY', path => '/api/',    target => 'openapi.json'   },
+            { method => 'GET', path => '/docs',    target => 'Open::API::UI'   },
+{% end %}        ],
+    });
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+{% name %}::Controller::Web::Root - the front page
+
+=head1 METHODS
+
+=head2 index
+
+Renders the welcome page. Replace it with your own - or delete it and
+point C<get '/'> somewhere else in L<{% name %}>.
+
+=cut

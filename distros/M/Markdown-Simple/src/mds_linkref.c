@@ -145,6 +145,18 @@ void mds_linkref_init(struct mds_linkref_tab* t, mds_arena* a) {
     t->arena   = a;
 }
 
+/* The entry strings are arena copies and go with the arena, but the entry
+ * array itself is grown with realloc off the general heap, so it needs an
+ * explicit release. Call this before the arena is reset or freed: the table
+ * struct is itself arena-allocated. */
+void mds_linkref_free(struct mds_linkref_tab* t) {
+    if (!t) return;
+    free(t->entries);
+    t->entries = NULL;
+    t->len     = 0;
+    t->cap     = 0;
+}
+
 const mds_linkref* mds_linkref_get(const struct mds_linkref_tab* t,
                                    const char* label, size_t llen) {
     /* Normalise into a stack buffer. Max expansion is 4x (4-byte UTF-8

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Open::API', $VERSION);
@@ -25,7 +25,7 @@ Open::API - OpenAPI 3.1 server and client
 
 =head1 VERSION
 
-Version 0.02
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -34,18 +34,16 @@ Version 0.02
     # a spec: hashref, JSON text, YAML text, or a filename
     my $api = Open::API->new(spec => 'openapi.json');
 
-    # a PSGI app: operationId => handler (a coderef, or a fully qualified
-    # sub name); requests are routed and validated in C before a handler runs
-    my $app = $api->to_app(handlers => {
-        listPets => 'MyApp::Pets::list',    # resolved once, at to_app time
-        getPet   => sub {
-            my ($params, $env) = @_;
-            my $pet = find_pet($params->{path}{petId});   # already typed
-            $pet || [ 404, ['Content-Type' => 'text/plain'], ['gone'] ];
+    # the compiled spec drives a PSGI app (see Open::API::Plack) ...
+    my $app = Open::API::Plack->new(
+        api      => $api,
+        handlers => {
+            listPets => 'MyApp::Pets::list',
+            getPet   => sub { ... },
         },
-    });
+    )->to_app;
 
-    # the same spec drives a client (see Open::API::Client)
+    # ... and an HTTP client (see Open::API::Client)
     my $client = Open::API::Client->new(
         api => $api,
         base_url => 'http://127.0.0.1:5000'
@@ -58,10 +56,12 @@ C<Open::API> loads an OpenAPI 3.1 document once and compiles every parameter,
 header, cookie and body schema through L<JSON::Schema::Fast> at
 startup. Each request is then routed and validated on a C hot path.
 
-It runs on any PSGI server. On L<Hyperman> a handler may return a Future and
-the worker keeps serving other connections while it resolves. The same
-compiled object also drives L<Open::API::Client>, a spec-driven HTTP client on
-L<Fetch>'s C ABI, so one document defines both sides of the wire.
+The compiled object is the shared core of two consumers: L<Open::API::Plack>
+serves it as a PSGI app (routing, validation, security, CSRF, CORS - all in
+C before a handler runs), and L<Open::API::Client> is a spec-driven HTTP
+client on L<Fetch>'s C ABI, so one document defines both sides of the wire.
+The L</match> and L</validate_request> methods below expose the router and
+validator directly for any other framework adapter.
 
 OpenAPI B<3.1 only>: 3.1 schemas are native JSON Schema 2020-12, which is what
 JSON::Schema::Fast validates. A document with any other C<openapi> version
@@ -97,316 +97,6 @@ schema is compiled through the JSF ABI - parameters with coercion enabled
 and C<default>-filling on. C<$ref>s to C<#/components/schemas/...> are
 resolved at compile time. A malformed document, a missing or duplicate
 operationId, or an unresolvable reference croaks here, at startup.
-
-=head1 THE PSGI APP
-
-=head2 to_app
-
-    my $app = $api->to_app(
-        handlers           => { $operationId => sub { ... }, ... },
-        before             => sub { ... },   # optional (see HOOKS)
-        after              => sub { ... },   # optional (see HOOKS)
-        security           => { $scheme => sub { ... }, ... },  # see SECURITY
-        csrf               => { ... },        # optional (see CSRF)
-        headers            => { ... },        # response headers (see RESPONSE HEADERS)
-        cors               => { ... },        # optional (see CORS)
-        max_body_size      => 1_048_576,      # bytes; 413 over this
-        negotiate          => 0,              # 415 / 406 (see NEGOTIATION)
-        error_format       => 'json',         # or 'problem' (RFC 7807)
-        validate_responses => 0,
-    );
-
-Returns a PSGI coderef whose request path runs in C: route the method and
-path, validate and assemble every declared input, then call
-
-    $handlers->{$operationId}->(\%params, $env);
-
-A handler is a coderef, or a B<fully qualified sub name> as a string
-(C<'MyApp::listPets'>) - names are resolved once, at C<to_app> time, so a typo
-croaks at startup rather than surfacing per request:
-
-    my $app = $api->to_app(handlers => {
-        listPets => 'MyApp::Pets::list',
-        getPet   => \&MyApp::Pets::get,
-    });
-
-C<%params> has C<path>, C<query>, C<header> and C<cookie> hashes (validated,
-percent-decoded, defaults applied; query parameters declared as arrays become
-arrayrefs) and C<body> - the JSON-decoded, schema-validated request body (raw
-bytes for declared non-JSON content types).
-
-The handler may return:
-
-=over 4
-
-=item * a PSGI triplet - passed through untouched;
-
-=item * any other value - JSON-encoded as a C<200 application/json>;
-
-=item * an object with C<on_ready> (a Future). On a non-blocking server
-(C<psgi.nonblocking>, e.g. Hyperman) it is handed to the server to await -
-the worker serves other connections meanwhile - and must resolve to a PSGI
-triplet. On blocking servers it is awaited inline.
-
-=back
-
-Requests that never reach a handler:
-
-    400  validation failed  - { errors => [ ... ] } (see ERRORS)
-    404  no matching path
-    405  path exists, method does not - with an Allow header
-    406  Accept admits none of the responses (negotiate; see NEGOTIATION)
-    413  request body over max_body_size
-    415  request Content-Type is not declared (negotiate)
-    500  the handler died   - { errors => [ { message => $@ } ] }
-    501  matched operation has no handler
-
-Every response - handler successes and all of the above alike - is passed
-through response finalization: the RFC 7807 rewrite (when C<error_format> is
-C<'problem'>), CORS headers for an allowed cross-origin request, and the
-security header set. See L</RESPONSE HEADERS>, L</CORS> and L</NEGOTIATION>.
-
-C<< validate_responses => 1 >> additionally checks each response body against
-the operation's response schema for that status and turns a mismatch into a
-500 carrying the validation errors marked C<< in => 'response' >> - a
-development-mode tool, off by default. It applies to Future returns too (the
-check runs when the future resolves).
-
-=head1 HOOKS
-
-C<to_app> takes optional C<before> and C<after> hooks - each a coderef or a
-fully qualified sub name, resolved at C<to_app> time like handlers. The
-canonical use is auth:
-
-    my $app = $api->to_app(
-        handlers => \%handlers,
-        before   => sub {
-            my ($env, $operationId) = @_;
-            my $user = check_token($env->{HTTP_AUTHORIZATION})
-                or return [ 401, ['Content-Type' => 'application/json'],
-                            ['{"errors":[{"message":"unauthorized"}]}'] ];
-            $env->{'openapi.user'} = $user;   # visible to the handler
-            return;                            # continue
-        },
-        after    => sub {
-            my ($resp, $env, $operationId) = @_;
-            push @{ $resp->[1] }, 'X-Request-Id' => $env->{'openapi.rid'} // '-';
-            return;
-        },
-    );
-
-=over 4
-
-=item C<before($env, $operationId)>
-
-Runs after routing (so 404s and 405s never reach it - the operation is known)
-and B<before validation> (an unauthorized caller costs no validation work and
-gets its 401 rather than a 400). Return a B<reference> to short-circuit the
-request: a PSGI triplet is sent as-is, any other reference is JSON-encoded as
-a 200. Non-reference returns (including undef) continue to validation. A die
-becomes a 500. Stash anything the handler needs into C<$env>.
-
-=item C<after($response, $env, $operationId)>
-
-Runs on every response for a matched operation - handler successes and the
-400/500/501 error responses alike (404/405 have no operation, so no hook).
-C<$response> is the final PSGI triplet: mutate it in place (add headers, log
-C<< $response->[0] >>), or return a new triplet to replace it outright; any
-other return value is ignored. A die becomes a 500.
-
-When a handler returns a Future on a non-blocking server, the after hook (and
-response validation) are chained onto the future and run when it resolves -
-the worker is never blocked.
-
-=back
-
-=head1 SECURITY
-
-The spec's C<securitySchemes> and C<security> requirements are enforced for
-you: give C<to_app> a C<security> map of scheme name to a checker, and each
-matched operation's requirements are checked in C before validation or the
-C<before> hook run. This is the declarative complement to a hand-written
-C<before> hook - the spec already says which operations need which schemes,
-so you supply only the verify step.
-
-    my $app = $api->to_app(
-        handlers => \%handlers,
-        security => {
-            # scheme name (from components.securitySchemes) => checker
-            ApiKey => sub {
-                my ($credential, $env, $operationId, $scopes) = @_;
-                my $user = lookup_api_key($credential) or return 0;
-                return $user;          # truthy = authorized; stashed
-            },
-            BearerAuth => sub {
-                my ($token) = @_;
-                verify_jwt($token);    # truthy user object, or 0/undef
-            },
-        },
-    );
-
-The checker receives the extracted C<$credential>, the C<$env>, the
-C<$operationId>, and the requirement's C<$scopes> arrayref (the values from the
-C<security> entry, C<undef> when none). What is extracted depends on the
-scheme type:
-
-=over 4
-
-=item * C<apiKey> - the raw value of the named header, query parameter or
-cookie (C<in: header|query|cookie>).
-
-=item * C<http> C<bearer> (and C<oauth2> / C<openIdConnect>, treated as bearer)
-- the token after C<Authorization: Bearer >.
-
-=item * C<http> C<basic> - the base64-decoded C<"user:pass"> string.
-
-=back
-
-Return a B<true> value to authorize: it is collected under the scheme name in
-C<< $env->{'openapi.auth'} >> (a hashref) and the request proceeds to the
-handler. Return false (C<0>, C<undef>, empty string) to reject. A checker that
-C<die>s becomes a 500.
-
-Requirements follow the OpenAPI semantics: an operation's C<security> is a
-list of alternatives (B<OR>), and the schemes within one alternative are all
-required together (B<AND>). The first alternative whose schemes all pass wins.
-When none pass the request gets a C<401>; no C<before> hook or handler runs.
-An operation-level C<security> overrides the document-level default, and an
-explicit empty C<security: []> disables auth for that operation.
-
-Only C<http basic>, C<http bearer>, C<apiKey>, C<oauth2> and C<openIdConnect>
-scheme B<types> are supported; a spec that references any other type croaks at
-C<new>. Every scheme any matched operation requires must have a checker in the
-C<security> map, or C<to_app> croaks at startup - a missing checker is a
-configuration error, never a silent open door. Unsupported flows (the OAuth2
-token exchange itself) are out of scope: you verify an already-issued token.
-
-L<Open::API::Client> is the mirror image - give it the credentials and it
-attaches them automatically. See L<Open::API::Client/SECURITY>.
-
-=head1 CSRF
-
-C<to_app> takes a C<csrf> option that guards every state-changing
-method (anything other than GET, HEAD, OPTIONS and TRACE) in C, before
-validation, the security check or the C<before> hook run. It combines two
-defenses:
-
-    my $app = $api->to_app(
-        handlers => \%handlers,
-        csrf => {
-            origins => [ 'https://app.example.com' ],  # Origin allowlist
-            # a server-side token, verified against your own session/DB store:
-            header  => 'X-CSRF-Token',                 # where the token arrives
-            cookie  => 'csrf',                         # name used when rotating
-            check => sub {
-                my ($submitted, $env) = @_;
-                my $session = load_session($env);
-                my $stored  = delete $session->{csrf} || "";   # atomic take-and-remove
-                return 0 unless defined $submited && $submitted =~ m/^$stored$/;
-                my $fresh = random_token();              # your own unguessable value
-                $session->{csrf} = $fresh;
-                save_session($env, $session);
-                return $fresh;                           # framework sets the cookie
-           },
-        },
-    );
-
-=head2 Origin / Referer check
-
-Always on when C<csrf> is given. On an unsafe method the request's C<Origin>
-(or C<Referer>, when C<Origin> is absent) must be acceptable, or the request
-gets a B<403>. With an C<origins> list the request origin's authority
-(host:port) must match one of the listed origins; B<without> a list the
-default is same-origin - the origin authority must equal the C<Host> header. A
-missing C<Origin> and C<Referer> on an unsafe method is rejected. This is
-stateless, needs nothing on the client, and is the whole defense for a modern
-C<SameSite> cookie setup - set your session cookie C<SameSite=Lax> or
-C<Strict> and the Origin check is belt-and-braces.
-
-=head1 RESPONSE HEADERS
-
-A secure default header set is stamped onto B<every> response - handler
-successes and the 4xx/5xx errors alike - suitable for a JSON API:
-
-    X-Content-Type-Options: nosniff
-    Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
-    X-Frame-Options: DENY
-    Referrer-Policy: no-referrer
-
-They are applied B<set-if-absent>, so a handler (or the C<after> hook) that
-sets one of these on a particular response keeps the last word. The C<headers>
-option overrides the defaults, adds headers, or removes a default by mapping it
-to C<undef>:
-
-    headers => {
-        'Content-Security-Policy'   => "default-src 'self'",   # override
-        'Strict-Transport-Security' => 'max-age=63072000',     # add
-        'Referrer-Policy'           => undef,                  # drop a default
-    }
-
-Header names match case-insensitively, so C<< 'x-frame-options' => undef >>
-removes the default C<X-Frame-Options>. C<Strict-Transport-Security> (HSTS) is
-B<not> a default - it only makes sense over HTTPS and can lock a domain out of
-plain HTTP, so it is opt-in. To ship nothing but what you list, map each
-default to C<undef> (or just override the ones you keep).
-
-=head1 CORS
-
-For a browser API served to a different origin, C<cors> answers preflight
-C<OPTIONS> requests and adds C<Access-Control-*> headers to actual responses:
-
-    cors => {
-        origins     => [ 'https://app.example.com' ],  # or '*' (the default)
-        credentials => 0,                              # allow cookies/auth
-        headers     => [ 'Content-Type', 'X-CSRF-Token' ],  # preflight allow
-        expose      => [ 'X-Request-Id' ],             # readable by JS
-        max_age     => 600,                            # cache the preflight
-    }
-
-An C<Origin> is allowed when C<origins> is C<'*'> or lists it exactly (scheme,
-host and port). For an allowed request C<Access-Control-Allow-Origin> is set
-(the concrete origin, plus C<Vary: Origin>, unless C<origins> is the wildcard),
-along with C<Access-Control-Allow-Credentials> when C<credentials> is on and
-C<Access-Control-Expose-Headers> from C<expose>. A preflight (an C<OPTIONS>
-carrying C<Access-Control-Request-Method> for a path that has no C<OPTIONS>
-operation) gets a 204 whose C<Access-Control-Allow-Methods> is the path's
-declared methods, with C<Allow-Headers> echoed from the request or taken from
-C<headers>, and C<Max-Age> from C<max_age>. C<credentials =E<gt> 1> with a
-wildcard origin is refused at C<to_app> - the browser forbids it and it would
-be a serious hole, so you must name the origins.
-
-=head1 NEGOTIATION
-
-With C<< negotiate => 1 >> the request path enforces the spec's media types:
-
-=over 4
-
-=item * B<415> when a request carries a body whose C<Content-Type> matches none
-of the operation's declared C<requestBody> content types.
-
-=item * B<406> when the request's C<Accept> admits none of the operation's
-declared response content types (a C<*/*>, an absent C<Accept>, or an operation
-that declares no response types always passes - the check is lenient).
-
-=back
-
-It is off by default because it rejects requests the validator would otherwise
-accept (a non-JSON body passes through raw without it). Both checks run in C
-before validation.
-
-=head1 ERROR FORMAT
-
-By default an error is C<< { errors => [ ... ] } >> as C<application/json> (see
-L</ERRORS>). C<< error_format => 'problem' >> instead emits RFC 7807
-C<application/problem+json> for every error this layer generates:
-
-    { "type": "about:blank", "title": "Bad Request", "status": 400,
-      "detail": "...", "errors": [ ... ] }
-
-C<title> is the status reason phrase, C<detail> the first error's message, and
-the original C<errors> array is carried along. Only this layer's own JSON error
-envelope is rewritten; a handler that returns its own error body is left
-untouched.
 
 =head1 METHODS
 
@@ -457,14 +147,6 @@ with C<in> (path / query / header / cookie / body / response) and C<name>
 (the parameter name). Missing required inputs use C<< keyword => 'required' >>;
 an undecodable JSON body uses C<< keyword => 'json' >>.
 
-=head1 PERFORMANCE
-
-The point of compiling the spec: on the bench in F<bench/openapi.pl> (two
-Hyperman workers, wrk, 64 connections, this machine) a fully routed and
-validated operation serves B<200,909 req/s against a bare hand-rolled PSGI
-ceiling of 202,013 req/s - the whole OpenAPI layer costs about half a
-percent>..
-
 =head1 ARCHITECTURE
 
 Open::API is a consumer of two runtime-resolved C ABIs, the same DBI-style
@@ -482,12 +164,168 @@ never loads it.
 
 =back
 
+It is also a B<provider> of one: C<include/oa_abi.h> exposes the router and
+validator to another XS module's own C dispatcher, so an operation is routed
+and validated with no Perl frame between the socket and the controller. See
+L</C ABI> below.
+
 There is no link-time coupling: each distribution builds and upgrades
-independently, and a version skew fails cleanly at boot (t/12-abi-guard.t).
+independently, and a version skew fails cleanly at boot (t/12-abi-guard.t on
+the consumer side, t/25-abi.t for the provider table).
+
+=head1 C ABI
+
+C<include/oa_abi.h> is the C form of L</match> and L</validate_request>: a
+versioned function-pointer table resolved at B<runtime>, in the DBI style used
+across the Semantic stack. There is no link-time symbol coupling, so provider
+and consumer build and upgrade independently. L<Punk> is the first consumer -
+its C dispatcher routes, validates and hands the typed parameters to a
+controller without unwinding into Perl.
+
+=head2 Getting the header
+
+Open::API installs C<oa_abi.h> through L<ExtUtils::Depends>, so a consumer's
+F<Makefile.PL> picks up the include path with no vendoring:
+
+    use ExtUtils::Depends;
+    my $pkg = ExtUtils::Depends->new('My::Consumer', 'Open::API');
+    WriteMakefile(
+        ...
+        $pkg->get_makefile_vars,   # INC reaches oa_abi.h
+        PREREQ_PM => { 'Open::API' => '0.04' },
+    );
+
+The alternative is to vendor a copy of the header pinned at a known
+C<OA_ABI_VERSION>. Either way the header only declares the table; nothing is
+linked.
+
+Perl's own headers (F<EXTERN.h>, F<perl.h>, F<XSUB.h>) must be included before
+C<oa_abi.h>, which needs C<SV>, C<AV>, C<HV>, C<STRLEN> and C<pTHX>.
+
+=head2 Resolving the table
+
+C<Open::API::_abi_ptr> returns the address of the process-wide table as an IV.
+It is not a Perl-level API - it is the ABI entry point, and the only supported
+thing to do with it is C<INT2PTR> it back to a C<< const oa_abi * >> and check
+C<abi_version> before the first call:
+
+    #include "oa_abi.h"
+
+    static const oa_abi *OA = NULL;
+
+    static const oa_abi *my_oa(pTHX) {
+        if (!OA) {
+            IV p = 0;
+            dSP;
+            eval_pv("require Open::API;", FALSE);
+            SPAGAIN;                    /* the require may have moved the stack */
+            if (!SvTRUE(ERRSV)) {
+                ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
+                if (call_pv("Open::API::_abi_ptr", G_SCALAR | G_EVAL) > 0) {
+                    SPAGAIN;
+                    p = POPi;
+                }
+                PUTBACK; FREETMPS; LEAVE;
+            }
+            if (p) {
+                const oa_abi *a = INT2PTR(const oa_abi *, p);
+                if (a && a->abi_version == OA_ABI_VERSION) OA = a;
+            }
+        }
+        return OA;   /* NULL means: use the Perl-visible methods instead */
+    }
+
+The address is static for the life of the process, so resolve it once at boot
+and cache it. The IV may legitimately be negative on platforms that map shared
+objects high in the address space; C<INT2PTR> round-trips the bits either way,
+so test for non-zero, not for positive.
+
+A NULL result means Open::API is absent, too old, or built without the table.
+That is not an error in itself - the documented answer is to fall back to
+L</match> and L</validate_request>, which do the same work with Perl frames.
+A consumer that hard-requires the ABI should croak at boot, not per request.
+
+=head2 The table
+
+    typedef struct oa_abi {
+        int abi_version;
+        void *(*api_of)   (pTHX_ SV *api_sv);
+        void *(*route)    (pTHX_ void *api, const char *method, STRLEN mlen,
+                           const char *path, STRLEN plen, HV *caps, AV *allow);
+        void *(*op_by_id) (pTHX_ void *api, SV *op_id);
+        int   (*validate) (pTHX_ void *api, void *op, HV *raw, HV *typed,
+                           AV *errors);
+        SV   *(*op_id)    (pTHX_ void *op);
+    } oa_abi;
+
+=over 4
+
+=item * C<abi_version> - equals C<OA_ABI_VERSION> in the header the provider
+was built with. Compare it before calling anything else.
+
+=item * C<api_of> - the opaque API handle behind a blessed Open::API SV (what
+L</new> returns). Returns NULL when the SV is not a reference; it never
+croaks, so it is safe on the fall-back path. The handle lives as long as the
+SV does and is not freed by the caller.
+
+=item * C<route> - the C form of L</match>. C<method> and C<path> are given
+with explicit lengths, and C<path> is the request path only, already
+prefix-stripped by the caller (a mount strips its own prefix). On a match it
+returns the opaque operation handle and fills C<caps> with the raw captured
+path segments (name =E<gt> borrowed value SV). On a 405 - the path exists but
+not for this method - it returns NULL and fills C<allow> with the upper-case
+method names, an AV of SVs. On a 404 it returns NULL and leaves C<allow>
+empty. C<caps> and C<allow> are caller-owned and must be empty on entry;
+either may be NULL to discard that output.
+
+=item * C<op_by_id> - the opaque operation handle for an operationId, for a
+consumer that dispatches by name rather than by path. NULL when the id is
+unknown.
+
+=item * C<validate> - the C form of L</validate_request>. C<raw> is the same
+hash that method documents:
+
+    { path   => \%captures,           # e.g. the caps from route()
+      query  => $query_string | \%hash,
+      header => \%lowercased_headers, # cookies ride the "cookie" header
+      body   => $raw_bytes | $decoded_ref }
+
+On success it fills C<typed> with the validated, coerced, percent-decoded
+parameters (the path/query/header/cookie hashes and the body, exactly the
+shape L</validate_request> returns) and returns 1. On failure it pushes error
+hashrefs - the L</ERRORS> shape - into C<errors> and returns 0. Both
+containers are caller-owned and should be empty on entry; either may be NULL
+to discard it, and a NULL C<typed> validates without materialising the
+parameters.
+
+=item * C<op_id> - the operationId SV of a routed operation. It is borrowed:
+do not free it, and copy it if it must outlive the API object.
+
+=back
+
+Every call takes C<pTHX_> and must be made on the interpreter that owns the
+API SV. The table itself is C<const> and shared; the handles it hands back are
+owned by the Open::API object, so keep that object alive for as long as the
+dispatcher uses them.
+
+=head2 Versioning
+
+The table only ever grows at the end. C<OA_ABI_VERSION> bumps on any append,
+and a consumer requires C<abi_version> to equal the version it was written
+against, or to be greater than it if it treats a later table as a superset and
+uses only the prefix it knows. Fields are never reordered, retyped or removed
+within a major line, so a consumer built against version I<N> keeps working
+against any provider that still reports I<N>.
+
+The provider table is exercised end to end by F<t/25-abi.t>, which drives
+C<api_of>, C<route>, C<op_id> and C<validate> through the pointers and asserts
+the results match the Perl-visible L</match> and L</validate_request> - the
+ABI is the same behaviour with the Perl frames removed.
 
 =head1 SEE ALSO
 
-L<Open::API::Client>, L<JSON::Schema::Fast>, L<Fetch>, L<Hyperman>.
+L<Open::API::Plack>, L<Open::API::Client>, L<JSON::Schema::Fast>, L<Fetch>,
+L<Hyperman>, L<Punk>.
 
 =head1 AUTHOR
 

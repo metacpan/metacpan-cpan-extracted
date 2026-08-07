@@ -11,8 +11,6 @@ use Test2::Require::Module 'LWP::UserAgent';
 use Test2::Require::Module 'LWP::UserAgent::Mockable';
 use Test2::Require::Module 'URI';
 
-use Data::Dumper::Concise;
-
 my $ua = LWP::UserAgent->new;
 $ua->agent('WebService::OurWorldInData-test/0.5');
 my $indicator = WebService::OurWorldInData::Indicators->new( ua => $ua );

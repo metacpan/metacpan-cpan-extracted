@@ -6,7 +6,7 @@ use warnings;
 #<<<
 package Getopt::Guided;
 BEGIN {
-our $VERSION = 'v3.2.2';
+our $VERSION = 'v3.2.3';
 }
 #>>>
 
@@ -237,7 +237,13 @@ sub readopts ( \@ ) {
   my ( $argv ) = @_;
 
   require File::Spec::Functions;
-  return unless -f ( my $file = File::Spec::Functions::catfile( $ENV{ XDG_CONFIG_HOME }, program_name() . 'rc' ) );
+  return
+    unless -f (
+    my $file = File::Spec::Functions::catfile(
+      $ENV{ XDG_CONFIG_HOME } // File::Spec::Functions::catdir( $ENV{ HOME }, '.config' ),
+      program_name() . 'rc'
+    )
+    );
 
   open my $fh, '<:encoding(UTF-8)', $file ## no critic ( RequireBriefOpen )
     or croakf "Cannot open file '%s' for reading (%s)", $file, $!;

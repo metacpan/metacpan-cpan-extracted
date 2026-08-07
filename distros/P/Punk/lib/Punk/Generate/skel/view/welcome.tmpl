@@ -1,0 +1,44 @@
+<header class="masthead">
+  <p class="wordmark" aria-label="Punk"><b>P</b><b>U</b><b>N</b><b>K</b></p>
+  <h1>{% app %}</h1>
+  <p class="sticker">it&rsquo;s alive</p>
+  <p class="lede">Compiled at boot.</p>
+</header>
+
+<section>
+  <h2>Routes</h2>
+  <div class="routes">
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Target</th></tr>
+{% for r in routes %}    <tr><td><span class="verb">{% r.method %}</span></td><td><code>{% r.path %}</code></td><td><code>{% r.target %}</code></td></tr>
+{% end %}  </table>
+  </div>
+</section>
+
+<section>
+  <h2>Now wreck it</h2>
+  <ul class="next">
+    <li>
+      <strong>This page</strong> is <code>root/templates/welcome.tmpl</code>,
+      rendered by <code>lib/{% app %}/Controller/Web/Root.pm</code>.
+      Delete both when you have something better.
+    </li>
+    <li>
+      <strong>Routes</strong> live in <code>lib/{% app %}.pm</code>:
+      <pre>get '/hello/:name' =&gt; sub {
+    my ($c) = @_;
+    return $c-&gt;text('oi ' . $c-&gt;param('name'));
+};</pre>
+    </li>
+    <li>
+      <strong>Views, database and plugins</strong> are configured in
+      <code>config/punk.yml</code>. Secrets go in as
+      <code>{ $env: NAME }</code> - a reference, never the value.
+    </li>
+  </ul>
+</section>
+
+<p class="foot">
+  <span class="tape">Punk {% version %}</span>
+  <span></span>
+</p>

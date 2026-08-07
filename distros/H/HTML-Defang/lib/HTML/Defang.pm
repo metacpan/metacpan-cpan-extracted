@@ -131,7 +131,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION=1.08;
+our $VERSION=1.09;
 
 use constant DEFANG_NONE => 0;
 use constant DEFANG_ALWAYS => 1;
@@ -699,6 +699,15 @@ my %NestInlineTags = map { $_ => 1 } qw(span abbr acronym q sub sup cite code em
 
 # Default list of mismatched tags to track
 my %MismatchedTags = (%BlockTags, %InlineTags);
+
+# Elements whose contents are RCDATA (title, textarea) or RAWTEXT (noembed,
+#  noframes): the browser does not parse comments or nested tags inside them,
+#  only a matching end tag. We must consume their content as opaque text
+#  rather than parsing it as HTML, or an attacker can smuggle a literal end
+#  tag + active markup past us. See defang_rcdata_content(). (<script>,
+#  <style> and the defanged raw-text tags like <xmp>/<iframe> are handled
+#  separately.)
+my %RawTextTags = map { $_ => 1 } qw(title textarea noembed noframes);
 
 =head1 CONSTRUCTOR
 
@@ -1289,6 +1298,17 @@ sub defang {
         die "Callback reset pos on Tag=$Tag IsEndTag=$IsEndTag" if !defined pos($I);
         warn "defang Defang=$Defang" if $Debug;
 
+        # RCDATA/RAWTEXT elements (title, textarea, noembed, noframes): their
+        #  content is opaque text to a browser, not HTML. Consume it verbatim
+        #  up to the matching end tag so we don't parse comments/tags inside
+        #  it (which would let an attacker smuggle a literal end tag + active
+        #  markup past the defanger). Skipped if a user tags_callback owns the
+        #  tag, since it is then responsible for the content.
+        if (!$IsEndTag && $RawTextTags{$lcTag}
+            && !exists $Self->{tags_to_callback}->{$lcTag}) {
+          $Self->defang_rcdata_content(\$I, $lcTag);
+        }
+
         # Build tag content, because if we defang, we have to remove --'s within it
 
         # @Attributes can have unicode values, but we're within "use bytes", so it's flattened ok
@@ -1562,6 +1582,57 @@ sub defang_script_tag {
 
   # Also defang tag
   return DEFANG_ALWAYS;
+}
+
+=item I<defang_rcdata_content($HtmlR, $lcTag)>
+
+Consume the RCDATA/RAWTEXT content of a "text" element and pass it straight
+through to the output as opaque text.
+
+The elements this applies to are C<< <title> >> and C<< <textarea> >>
+(RCDATA) and C<< <noembed> >> and C<< <noframes> >> (RAWTEXT) - see the
+listing in C<%RawTextTags>. Per the HTML5 tree construction/tokenization
+spec, a start tag for one of these switches the tokenizer into a raw text
+mode in which the browser does I<not> parse comments or nested tags - the
+only markup it recognises is a matching C<< </tag >> end tag, everything
+else is text (RCDATA additionally decodes character references). Comments in
+particular are not a thing inside these elements.
+
+If we instead let the normal HTML parser loose on the content it would
+happily interpret C<< <!-- ... --> >> comments and nested tags inside. That
+diverges from the browser and is exploitable: an attacker can hide a literal
+end tag plus active markup inside what we think is an inert comment or
+attribute value, e.g.
+
+  <title><!-- </title> <img src=x onerror=alert(1)> --></title>
+
+We would emit the C<< <img> >> unchanged (believing it comment data), but a
+browser closes the title at the literal C<< </title> >> and then runs the
+C<< <img> >> as live markup.
+
+So, like <script> and <style>, we consume everything up to the matching
+C<< </tag >> (whose name is C<$lcTag>) as opaque text. That content contains
+no C<< </tag >> (we stop before the first one), so re-parsed as raw text it
+stays inert right up to the end tag that follows it in the output.
+
+=cut
+sub defang_rcdata_content {
+  my ($Self, $HtmlR, $lcTag) = @_;
+
+  warn "defang_rcdata_content Tag=$lcTag" if $Self->{Debug};
+
+  # Do the raw text scan in byte mode (see defang())
+  use bytes;
+
+  # Consume raw content verbatim up to the matching end tag (or EOF if
+  #  there's no closing tag, just as a browser would leave the element open)
+  if ($$HtmlR =~ m{\G(.*?)(?=</\Q$lcTag\E\b)}gcis || $$HtmlR =~ m{\G(.*)$}gcs) {
+    my $Content = $1;
+    warn "defang_rcdata_content Content=$Content" if $Self->{Debug};
+    $Self->add_to_output($Content) if defined($Content) && length($Content);
+  }
+
+  return;
 }
 
 sub defang_style_tag {

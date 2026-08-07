@@ -4,7 +4,7 @@ use v5.36;
 use experimental qw/try for_list/;
 use version;
 
-our $VERSION   = qv('v0.0.4');
+our $VERSION   = qv('v0.0.5');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ PAGI::FastAPI - Asynchronous, Type-Safe Micro-Framework with Dependency Injectio
 
 =head1 VERSION
 
-Version v0.0.4
+Version v0.0.5
 
 =head1 SYNOPSIS
 
@@ -131,8 +131,6 @@ Version v0.0.4
         }
     );
 
-    my $pagi_app = $app->to_app;
-
     # 9. Authentication via the companion PAGI::FastAPI::Security distribution
     #    (extraction only, you supply the verification logic)
     #
@@ -147,6 +145,9 @@ Version v0.0.4
     #
     #    See L<PAGI::FastAPI::Security> for HTTP Basic, API Key
     #    (header/query/cookie), and OAuth2 password-bearer schemes.
+
+    my $pagi_app = $app->to_app;
+
 
 =head1 DESCRIPTION
 
@@ -208,7 +209,7 @@ Registers a route for the specified HTTP verb. Options include:
 
 =item * C<query> - (Optional) HashRef mapping query string keys to L<Type::Tiny> type constraints.
 
-=item * C<body> - (Optional) HashRef mapping JSON request body keys to L<Type::Tiny> type constraints.
+=item * C<body> - (Optional) HashRef mapping request body keys to L<Type::Tiny> type constraints. The request body is parsed as JSON by default; if the C<Content-Type> header is C<application/x-www-form-urlencoded>, it is parsed as form-urlencoded data instead. Either way, the same type constraints and validation apply.
 
 =item * C<dependencies> - (Optional) HashRef or ArrayRef of dependency code blocks or L<PAGI::FastAPI::Depends> specs.
 
@@ -423,13 +424,34 @@ sub to_app ($self) {
             }
 
             if (length $raw_body) {
-                try {
-                    $body_data = decode_json($raw_body);
+                # Determine how to decode the body from Content-Type. Default
+                # (missing/unrecognised Content-Type) remains JSON.
+                my $content_type = '';
+                for my $h (@{ $scope->{headers} // [] }) {
+                    if (lc($h->[0]) eq 'content-type') {
+                        $content_type = lc($h->[1] // '');
+                        last;
+                    }
                 }
-                catch ($err) {
-                    await $send->({ type => 'http.response.start', status => 422, headers => [['content-type', 'application/json']] });
-                    await $send->({ type => 'http.response.body',  body => encode_json({ detail => 'Invalid JSON body payload' }) });
-                    return;
+
+                if (index($content_type, 'application/x-www-form-urlencoded') == 0) {
+                    my %form;
+                    for my $pair (split '&', $raw_body) {
+                        my ($k, $v) = split '=', $pair, 2;
+                        next unless defined $k && length $k;
+                        $form{_uri_unescape($k)} = _uri_unescape($v // '');
+                    }
+                    $body_data = \%form;
+                }
+                else {
+                    try {
+                        $body_data = decode_json($raw_body);
+                    }
+                    catch ($err) {
+                        await $send->({ type => 'http.response.start', status => 422, headers => [['content-type', 'application/json']] });
+                        await $send->({ type => 'http.response.body',  body => encode_json({ detail => 'Invalid JSON body payload' }) });
+                        return;
+                    }
                 }
             }
         }
@@ -697,7 +719,7 @@ C<PAGI::FastAPI> automatically registers the following system endpoints:
 
 =head1 ERROR HANDLING
 
-When a request fails parameter validation (either query string or JSON payload),
+When a request fails parameter validation (either query string or JSON/form-urlencoded body),
 C<PAGI::FastAPI> short-circuits handler execution and returns C<HTTP 422 Unprocessable Entity>
 with a JSON body:
 
@@ -710,7 +732,7 @@ Unmatched routes return C<HTTP 404 Not Found> with C<{"detail": "Not Found"}>.
 =head1 AUTHENTICATION AND SECURITY
 
 C<PAGI::FastAPI> has no authentication built in by design, auth needs vary
-too much between applications to standardize, so the framework gives you two
+too much between applications to standardise, so the framework gives you two
 general-purpose building blocks instead:
 
 =over 4

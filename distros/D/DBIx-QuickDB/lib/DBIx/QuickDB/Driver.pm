@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000061';
+our $VERSION = '0.000062';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -231,6 +231,10 @@ sub clone {
     if (my $log = $clone->error_log) { unlink($log) if -f $log }
     unlink($_) for glob("$new_dir/cmd-log-*");
 
+    # Defensive hygiene, not the load-bearing guard: start() scrubs this too. It
+    # keeps a clone that is never started from carrying its template's crash.
+    unlink(DBIx::QuickDB::Watcher->server_exit_status_file($new_dir));
+
     $clone->write_config();
     $clone->start if $clone->{+AUTOSTART};
 
@@ -351,6 +355,26 @@ sub connect {
     return $dbh;
 }
 
+# Decoded wait status the watcher recorded, or undef while the server runs.
+sub _server_exit_status {
+    my $self = shift;
+
+    my $file = DBIx::QuickDB::Watcher->server_exit_status_file($self->{+DIR});
+    return undef unless -f $file;
+
+    open(my $fh, '<', $file) or return undef;
+    chomp(my $status = <$fh> // '');
+    close($fh);
+
+    return undef unless length($status) && $status =~ m/^\d+$/;
+
+    if (my $sig = $status & 127) {
+        return "killed by signal $sig" . (($status & 128) ? ", core dumped" : "");
+    }
+
+    return "exit value " . ($status >> 8);
+}
+
 sub started {
     my $self = shift;
 
@@ -368,6 +392,10 @@ sub start {
 
     return if $self->{+WATCHER} || -S $socket;
 
+    # Drop a previous server's recorded crash, or a legitimate restart would
+    # fail instantly for it. Before the watcher exists, so nothing is writing.
+    unlink(DBIx::QuickDB::Watcher->server_exit_status_file($dir));
+
     my $watcher = $self->{+WATCHER} = DBIx::QuickDB::Watcher->new(db => $self, args => \@args);
 
     # Defaults to 10s; tunable via QDB_START_TIMEOUT for slow hosts that need
@@ -378,6 +406,23 @@ sub start {
     until (-S $socket) {
         my $waited = time - $start;
 
+        # A server that aborts during startup is dead in milliseconds; there is
+        # nothing left to wait for. Re-check the socket first so one that came
+        # up and then exited still counts as started.
+        if (my $status = $self->_server_exit_status) {
+            last if -S $socket;
+
+            my $launch_log = $self->_read_file($watcher->log_file);
+            my $error_log  = $self->read_error_log;
+
+            $watcher->eliminate();
+
+            my $msg = "Server exited during startup after ${\ sprintf('%.2f', $waited)}s ($status).";
+            $msg .= "\n=== server launch log ===\n$launch_log" if length $launch_log;
+            $msg .= "\n=== error log ===\n$error_log"          if length $error_log;
+            confess $msg;
+        }
+
         if ($waited > $timeout) {
             # Capture diagnostics BEFORE eliminate() removes the data dir (which
             # holds both the error log and the watcher's launch log). The server
@@ -387,8 +432,14 @@ sub start {
             # template history -- the real failure is in the launch log. Also
             # report whether the server pid is still alive: "not running" points
             # at a launch/early-exit failure, "alive" at a slow or hung startup.
-            my $spid       = $watcher->server_pid;
-            my $alive      = ($spid && kill(0, $spid)) ? "alive (pid $spid)" : "not running";
+            # Recorded status before kill(0), which succeeds on a zombie and so
+            # mislabelled a crashed server as a slow start.
+            my $spid   = $watcher->server_pid;
+            my $status = $self->_server_exit_status;
+            my $alive
+                = $status                  ? "not running ($status)"
+                : ($spid && kill(0, $spid)) ? "alive (pid $spid)"
+                :                             "not running";
             my $error_log  = $self->read_error_log;
             my $launch_log = $self->_read_file($watcher->log_file);
 
@@ -450,12 +501,10 @@ sub stop {
     $watcher->stop();
 
     unless ($params{no_wait}) {
-        # wait() blocks until the watcher process exits, and the watcher reaps
-        # the server before it exits -- so once wait() returns the server is
-        # gone. Trust that instead of polling a stored server pid: after the
-        # watcher exits that pid may have been recycled by the OS to an
-        # unrelated process, and polling it could hang/confess on the wrong
-        # process (the same pid-reuse hazard the watcher teardown guards against).
+        # Blocks until the watcher exits, having done everything it could to
+        # stop the server. If the server somehow survived, wait() spends its
+        # timeout confirming that and then warns. Do not poll the stored server
+        # pid instead: once the watcher is gone that pid may have been recycled.
         $watcher->wait();
 
         # Remove a stale unix socket left behind by a hard kill so it does not
@@ -485,8 +534,8 @@ sub destroy_quietly {
         $watcher->fast_eliminate();
         $watcher->wait();
 
-        # The watcher removes the data dir; this is a defensive fallback in case
-        # it exited before doing so.
+        # The watcher removes the data dir; fallback for one that exited
+        # without doing so.
         $self->cleanup() if $self->should_cleanup;
     }
     elsif ($self->should_cleanup) {

@@ -18,6 +18,16 @@ new(class, ...)
     OUTPUT:
         RETVAL
 
+# $ua->clone(%overrides): another agent over this one's connection pool and
+# loop. For a per-request cookie jar, where a fresh agent would cost the pool.
+SV *
+clone(self, ...)
+    SV *self
+    CODE:
+        RETVAL = ft_ua_clone(aTHX_ self, &ST(1), items - 1);
+    OUTPUT:
+        RETVAL
+
 void
 DESTROY(self)
     SV *self

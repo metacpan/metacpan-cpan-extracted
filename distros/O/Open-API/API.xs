@@ -26,6 +26,7 @@ static const frj_abi *oa_frj(pTHX);   /* defined below; used by the headers */
 #include "oa_validate.h"
 #include "oa_plack.h"
 #include "oa_client.h"
+#include "oa_abi_impl.h"  /* the OA_ABI table (needs route/validate/compile) */
 
 /* the PSGI app coderef body: captures
  * ($api, \%handlers, $vresp, $before, $after, \%security, \%csrf, \%opts) */
@@ -94,6 +95,10 @@ static const frj_abi *oa_frj(pTHX) {
         dSP; int count; IV p = 0;
         OA_FRJ_TRIED = 1;
         eval_pv("require File::Raw::JSON;", FALSE);
+        /* The require runs arbitrary Perl; if that grew the value stack it was
+         * reallocated, and the SP captured above now points into the freed
+         * block - which PUTBACK would hand straight back to the interpreter. */
+        SPAGAIN;
         if (!SvTRUE(ERRSV)) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("File::Raw::JSON::_abi_ptr", G_SCALAR | G_EVAL);
@@ -143,6 +148,9 @@ static SV *oa_yaml_decode(pTHX_ SV *text) {
             "}", TRUE);
         shim = 1;
     }
+    /* Both eval_pv calls above can grow (and so reallocate) the value stack;
+     * SP was captured before them. */
+    SPAGAIN;
     ENTER; SAVETMPS; PUSHMARK(SP);
     XPUSHs(text); PUTBACK;
     count = call_pv("Open::API::_yaml_load", G_SCALAR | G_EVAL);
@@ -256,6 +264,56 @@ static SV *oa_new_from_spec(pTHX_ const char *cls, SV *spec) {
     return sv_bless(newRV_noinc(newSViv(PTR2IV(a))), gv_stashpv(cls, GV_ADD));
 }
 
+/* ---- Open::API::Plack configuration --------------------------------------- *
+ * An Open::API::Plack instance is a blessed config HV: options accumulate
+ * through new and the accessors, and to_app compiles them into the app. */
+
+static HV *oa_plack_hv(pTHX_ SV *self) {
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV
+        || !sv_derived_from(self, "Open::API::Plack"))
+        croak("Open::API::Plack: not an Open::API::Plack object");
+    return (HV *)SvRV(self);
+}
+
+/* Fetch-or-create a keyed map entry (handlers / security) on the config HV. */
+static HV *oa_plack_map(pTHX_ HV *cfg, const char *key, I32 kl) {
+    SV **e = hv_fetch(cfg, key, kl, 0);
+    HV *m;
+    if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)
+        return (HV *)SvRV(*e);
+    m = newHV();
+    (void)hv_store(cfg, key, kl, newRV_noinc((SV *)m), 0);
+    return m;
+}
+
+/* Store one configuration option. `api` is type-checked and `spec` compiled
+ * right away (both land under `api`); `handlers` and `security` merge a
+ * hashref into the stored map; anything else is a plain replace. Shared by
+ * new and the accessors so the semantics are identical everywhere. */
+static void oa_plack_set(pTHX_ HV *cfg, const char *k, STRLEN kl, SV *v) {
+    if (kl == 3 && memEQ(k, "api", 3)) {
+        if (!SvROK(v) || !sv_derived_from(v, "Open::API"))
+            croak("Open::API::Plack: 'api' must be an Open::API");
+        (void)hv_stores(cfg, "api", newSVsv(v));
+    } else if (kl == 4 && memEQ(k, "spec", 4)) {
+        (void)hv_stores(cfg, "api", oa_new_from_spec(aTHX_ "Open::API", v));
+    } else if ((kl == 8 && memEQ(k, "handlers", 8))
+            || (kl == 8 && memEQ(k, "security", 8))) {
+        HV *src = oa_hv_of(v), *dst;
+        HE *he;
+        if (!src)
+            croak("Open::API::Plack: '%.*s' must be a hashref", (int)kl, k);
+        dst = oa_plack_map(aTHX_ cfg, k, (I32)kl);
+        hv_iterinit(src);
+        while ((he = hv_iternext(src))) {
+            I32 ekl; const char *ek = hv_iterkey(he, &ekl);
+            (void)hv_store(dst, ek, ekl, newSVsv(hv_iterval(src, he)), 0);
+        }
+    } else {
+        (void)hv_store(cfg, k, (I32)kl, newSVsv(v), 0);
+    }
+}
+
 MODULE = Open::API        PACKAGE = Open::API
 
 PROTOTYPES: DISABLE
@@ -265,6 +323,7 @@ BOOT:
     IV p = 0;
     dSP;
     eval_pv("require JSON::Schema::Fast;", FALSE);
+    SPAGAIN;   /* the require may have reallocated the value stack */
     if (!SvTRUE(ERRSV)) {
         PUSHMARK(SP);
         PUTBACK;
@@ -292,6 +351,74 @@ _abi_ok()
         RETVAL = JSF ? 1 : 0;
     OUTPUT:
         RETVAL
+
+# Address of Open::API's own C ABI table (oa_abi.h). A consumer XS module
+# (Punk's C dispatcher) fetches this once at boot, INT2PTRs it to a
+# `const oa_abi *`, and checks ->abi_version before using it. Not part of the
+# public Perl API.
+IV
+_abi_ptr()
+    CODE:
+        RETVAL = PTR2IV(&OA_ABI);
+    OUTPUT:
+        RETVAL
+
+# Exercise the whole oa_abi table the way a C consumer (Punk) would: resolve
+# it from the IV _abi_ptr hands back, gate on abi_version, then drive
+# api_of -> route -> op_id -> validate through the function pointers. Returns a
+# fixed 3-tuple the test compares against native match/validate_request:
+#   (undef, undef, undef)      404 - no such path
+#   (undef, \@allow, undef)    405 - path exists, wrong method
+#   ($op_id, undef, undef)     matched; $raw undef, so no validation
+#   ($op_id, $ok, $ref)        matched + validated: (1, \%params) or (0, \@errors)
+# Private; the version guard returning empty stands in for a consumer's
+# fall-back to the Perl-visible API.
+void
+_abi_selftest(self, method, path, raw)
+        SV *self
+        SV *method
+        SV *path
+        SV *raw
+    PPCODE:
+    {
+        const oa_abi *A = INT2PTR(const oa_abi *, PTR2IV(&OA_ABI));
+        STRLEN ml, pl;
+        const char *mp = SvPV_const(method, ml);
+        const char *pp = SvPV_const(path, pl);
+        void *api, *op;
+        HV *caps  = (HV *)sv_2mortal((SV *)newHV());
+        AV *allow = (AV *)sv_2mortal((SV *)newAV());
+        SV *oid;
+        if (!A || A->abi_version != OA_ABI_VERSION) XSRETURN_EMPTY;
+        api = A->api_of(aTHX_ self);
+        if (!api) XSRETURN_EMPTY;
+        op = A->route(aTHX_ api, mp, ml, pp, pl, caps, allow);
+        if (!op) {
+            if (av_len(allow) >= 0) {           /* 405 */
+                XPUSHs(&PL_sv_undef);
+                mXPUSHs(newRV_inc((SV *)allow));
+                XPUSHs(&PL_sv_undef);
+            } else {                            /* 404 */
+                XPUSHs(&PL_sv_undef);
+                XPUSHs(&PL_sv_undef);
+                XPUSHs(&PL_sv_undef);
+            }
+        } else {
+            oid = A->op_id(aTHX_ op);
+            mXPUSHs(oid ? newSVsv(oid) : &PL_sv_undef);
+            if (raw && SvROK(raw) && SvTYPE(SvRV(raw)) == SVt_PVHV) {
+                HV *typed = (HV *)sv_2mortal((SV *)newHV());
+                AV *errs  = (AV *)sv_2mortal((SV *)newAV());
+                int ok = A->validate(aTHX_ api, op, (HV *)SvRV(raw),
+                                     typed, errs);
+                mXPUSHs(newSViv(ok));
+                mXPUSHs(ok ? newRV_inc((SV *)typed) : newRV_inc((SV *)errs));
+            } else {
+                XPUSHs(&PL_sv_undef);
+                XPUSHs(&PL_sv_undef);
+            }
+        }
+    }
 
 # Direct frj-ABI trampolines. They croak on bad input (the ABI's semantics);
 # the request path calls them on cached CVs with G_EVAL so a malformed body
@@ -486,55 +613,170 @@ validate_request(self, op_id, raw)
         }
     }
 
-# The PSGI app: $api->to_app(handlers => { opId => sub {...} },
-# validate_responses => 0|1). The coderef's request path is entirely C:
-# route -> validate -> dispatch -> respond (see oa_plack.h).
+MODULE = Open::API        PACKAGE = Open::API::Plack
+
+# Open::API::Plack->new(api => $api | spec => ..., handlers => {...},
+# before => ..., after => ..., security => {...}, csrf => {...},
+# headers => {...}, cors => {...}, max_body_size => N, negotiate => 0|1,
+# error_format => 'json'|'problem', validate_responses => 0|1).
+# Configuration only: options accumulate here and via the accessors, and
+# everything is resolved, validated and compiled by to_app.
 SV *
-to_app(self, ...)
+new(class, ...)
+        SV *class
+    CODE:
+    {
+        const char *cls = (SvROK(class) && SvOBJECT(SvRV(class)))
+                        ? HvNAME(SvSTASH(SvRV(class))) : SvPV_nolen(class);
+        HV *cfg = (HV *)sv_2mortal((SV *)newHV());  /* mortal until blessed */
+        int i;
+        for (i = 1; i + 1 < items; i += 2) {
+            STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+            oa_plack_set(aTHX_ cfg, k, kl, ST(i + 1));
+        }
+        RETVAL = sv_bless(newRV_inc((SV *)cfg), gv_stashpv(cls, GV_ADD));
+    }
+    OUTPUT:
+        RETVAL
+
+# $plack->handlers            the live map hashref (created on first use)
+# $plack->handlers(%pairs)    merge, return $plack (chainable)
+# $plack->handlers(\%map)     merge, return $plack
+# `security` is the same accessor for the scheme => checker map.
+SV *
+handlers(self, ...)
+        SV *self
+    ALIAS:
+        security = 1
+    CODE:
+    {
+        HV *cfg = oa_plack_hv(aTHX_ self);
+        const char *key = ix ? "security" : "handlers";
+        if (items == 1) {
+            RETVAL = newRV_inc((SV *)oa_plack_map(aTHX_ cfg, key, 8));
+        } else if (items == 2) {
+            oa_plack_set(aTHX_ cfg, key, 8, ST(1));
+            RETVAL = newSVsv(self);
+        } else {
+            HV *dst = oa_plack_map(aTHX_ cfg, key, 8);
+            int i;
+            for (i = 1; i + 1 < items; i += 2) {
+                STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+                (void)hv_store(dst, k, (I32)kl, newSVsv(ST(i + 1)), 0);
+            }
+            RETVAL = newSVsv(self);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+# Get/set accessors for the remaining options; setters return $plack so
+# calls chain. `spec` compiles the document into `api` right away, so both
+# its getter and `api`'s return the Open::API.
+SV *
+before(self, ...)
+        SV *self
+    ALIAS:
+        after              = 1
+        csrf               = 2
+        cors               = 3
+        headers            = 4
+        max_body_size      = 5
+        negotiate          = 6
+        error_format       = 7
+        validate_responses = 8
+        api                = 9
+        spec               = 10
+        ui                 = 11
+    CODE:
+    {
+        static const char *const keys[] = {
+            "before", "after", "csrf", "cors", "headers", "max_body_size",
+            "negotiate", "error_format", "validate_responses", "api", "spec",
+            "ui"
+        };
+        HV *cfg = oa_plack_hv(aTHX_ self);
+        const char *k = keys[ix];
+        if (items == 1) {
+            SV **e = (ix == 9 || ix == 10)
+                             ? hv_fetchs(cfg, "api", 0)
+                             : hv_fetch(cfg, k, (I32)strlen(k), 0);
+            RETVAL = (e && *e) ? newSVsv(*e) : newSV(0);
+        } else {
+            oa_plack_set(aTHX_ cfg, k, strlen(k), ST(1));
+            RETVAL = newSVsv(self);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+# Finalise: compile the stored configuration into the PSGI app coderef.
+# Handler names and hooks resolve here (a typo croaks at startup, not per
+# request), the spec's security coverage is checked, csrf / cors / header
+# options are normalised, and the closure is built. The request path is
+# entirely C: route -> validate -> dispatch -> respond (see oa_plack.h).
+SV *
+to_app(self)
         SV *self
     CODE:
     {
-        SV *handlers = NULL, *before = NULL, *after = NULL, *security = NULL;
-        SV *csrf = NULL;
-        int vresp = 0, i;
+        HV *cfg = oa_plack_hv(aTHX_ self);
+        SV *api = NULL, *handlers = NULL, *before = NULL, *after = NULL;
+        SV *security = NULL, *csrf = NULL;
+        SV *headers_opt = NULL, *cors_opt = NULL, *errfmt_opt = NULL;
+        IV maxbody = 0;
+        int negotiate = 0, vresp = 0;
         AV *cap;
-        oa_api *a = oa_api_of(aTHX_ self);   /* type check */
-        for (i = 1; i + 1 < items; i += 2) {
-            STRLEN kl; const char *k = SvPV_const(ST(i), kl);
-            if (kl == 8 && memEQ(k, "handlers", 8)) handlers = ST(i + 1);
-            else if (kl == 6 && memEQ(k, "before", 6)) before = ST(i + 1);
-            else if (kl == 5 && memEQ(k, "after", 5))  after  = ST(i + 1);
-            else if (kl == 8 && memEQ(k, "security", 8)) security = ST(i + 1);
-            else if (kl == 4 && memEQ(k, "csrf", 4))     csrf   = ST(i + 1);
-            else if (kl == 18 && memEQ(k, "validate_responses", 18))
-                vresp = SvTRUE(ST(i + 1)) ? 1 : 0;
-        }
-        if (!handlers || !SvROK(handlers)
-            || SvTYPE(SvRV(handlers)) != SVt_PVHV)
-            croak("Open::API->to_app: a 'handlers' hashref is required");
+        oa_api *a;
+        SV **e;
+        if ((e = hv_fetchs(cfg, "api", 0))      && *e && SvOK(*e)) api = *e;
+        if ((e = hv_fetchs(cfg, "handlers", 0)) && *e && SvOK(*e)) handlers = *e;
+        if ((e = hv_fetchs(cfg, "before", 0))   && *e && SvOK(*e)) before = *e;
+        if ((e = hv_fetchs(cfg, "after", 0))    && *e && SvOK(*e)) after = *e;
+        if ((e = hv_fetchs(cfg, "security", 0)) && *e && SvOK(*e)) security = *e;
+        if ((e = hv_fetchs(cfg, "csrf", 0))     && *e) csrf = *e;
+        if ((e = hv_fetchs(cfg, "headers", 0))  && *e && SvOK(*e)) headers_opt = *e;
+        if ((e = hv_fetchs(cfg, "cors", 0))     && *e && SvOK(*e)) cors_opt = *e;
+        if ((e = hv_fetchs(cfg, "error_format", 0)) && *e && SvOK(*e))
+            errfmt_opt = *e;
+        if ((e = hv_fetchs(cfg, "max_body_size", 0)) && *e && SvOK(*e))
+            maxbody = SvIV(*e);
+        if ((e = hv_fetchs(cfg, "negotiate", 0)) && *e)
+            negotiate = SvTRUE(*e) ? 1 : 0;
+        if ((e = hv_fetchs(cfg, "validate_responses", 0)) && *e)
+            vresp = SvTRUE(*e) ? 1 : 0;
+        if (!api)
+            croak("Open::API::Plack->to_app: give 'api' or 'spec'");
+        a = oa_api_of(aTHX_ api);
         {   /* normalise: values are coderefs, or fully qualified sub names
              * ('MyApp::listPets') resolved right here - a typo croaks at
-             * to_app time, not per request. */
-            HV *src = (HV *)SvRV(handlers);
+             * to_app time, not per request. No registered handlers is legal
+             * (every matched operation answers 501). */
+            HV *src = handlers ? oa_hv_of(handlers) : NULL;
             HV *dst = newHV();
             HE *he;
-            hv_iterinit(src);
-            while ((he = hv_iternext(src))) {
-                I32 kl; const char *k = hv_iterkey(he, &kl);
-                SV *v = hv_iterval(src, he);
-                if (v && SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVCV) {
-                    (void)hv_store(dst, k, kl, newSVsv(v), 0);
-                } else if (v && SvOK(v) && !SvROK(v)) {
-                    STRLEN nl; const char *np = SvPV_const(v, nl);
-                    CV *cv = get_cv(np, 0);
-                    if (!cv)
-                        croak("Open::API->to_app: handler for '%.*s' names "
-                              "no such sub '%.*s'",
-                              (int)kl, k, (int)nl, np);
-                    (void)hv_store(dst, k, kl, newRV_inc((SV *)cv), 0);
-                } else {
-                    croak("Open::API->to_app: handler for '%.*s' must be a "
-                          "coderef or a fully qualified sub name", (int)kl, k);
+            if (handlers && !src)
+                croak("Open::API::Plack->to_app: 'handlers' must be a hashref");
+            if (src) {
+                hv_iterinit(src);
+                while ((he = hv_iternext(src))) {
+                    I32 kl; const char *k = hv_iterkey(he, &kl);
+                    SV *v = hv_iterval(src, he);
+                    if (v && SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVCV) {
+                        (void)hv_store(dst, k, kl, newSVsv(v), 0);
+                    } else if (v && SvOK(v) && !SvROK(v)) {
+                        STRLEN nl; const char *np = SvPV_const(v, nl);
+                        CV *cv = get_cv(np, 0);
+                        if (!cv)
+                            croak("Open::API::Plack->to_app: handler for '%.*s' "
+                                  "names no such sub '%.*s'",
+                                  (int)kl, k, (int)nl, np);
+                        (void)hv_store(dst, k, kl, newRV_inc((SV *)cv), 0);
+                    } else {
+                        croak("Open::API::Plack->to_app: handler for '%.*s' must "
+                              "be a coderef or a fully qualified sub name",
+                              (int)kl, k);
+                    }
                 }
             }
             handlers = sv_2mortal(newRV_noinc((SV *)dst));
@@ -548,7 +790,7 @@ to_app(self, ...)
             if (security) {
                 HV *src = oa_hv_of(security);
                 HE *he;
-                if (!src) croak("Open::API->to_app: 'security' must be a "
+                if (!src) croak("Open::API::Plack->to_app: 'security' must be a "
                                 "hashref of scheme => checker");
                 hv_iterinit(src);
                 while ((he = hv_iternext(src))) {
@@ -570,7 +812,7 @@ to_app(self, ...)
                                 &t->schemes[o->sec[ai].items[ii].scheme];
                             STRLEN nl; const char *np = SvPV_const(s->name, nl);
                             if (!hv_fetch(seccb, np, (I32)nl, 0))
-                                croak("Open::API->to_app: operation '%s' "
+                                croak("Open::API::Plack->to_app: operation '%s' "
                                       "requires securityScheme '%.*s' but no "
                                       "checker was given (security => { '%.*s' "
                                       "=> sub { ... } })",
@@ -581,7 +823,7 @@ to_app(self, ...)
                 }
             }
             cap = newAV();
-            av_push(cap, SvREFCNT_inc(self));
+            av_push(cap, SvREFCNT_inc(api));
             av_push(cap, SvREFCNT_inc(handlers));
             av_push(cap, newSViv(vresp));
             av_push(cap, before ? oa_cv_or_name(aTHX_ before, "'before' hook")
@@ -593,12 +835,12 @@ to_app(self, ...)
         {   /* csrf: normalise into a config HV (origins AV, check callback,
              * cookie + header names) once, so the request path only reads it.
              * undef when no csrf option was given. */
-            SV *cfg = &PL_sv_undef;
+            SV *ccfg = NULL;
             if (csrf && SvOK(csrf)) {
                 HV *src = oa_hv_of(csrf);
                 HV *dst;
                 SV **v;
-                if (!src) croak("Open::API->to_app: 'csrf' must be a hashref");
+                if (!src) croak("Open::API::Plack->to_app: 'csrf' must be a hashref");
                 dst = newHV();
                 if ((v = hv_fetchs(src, "origins", 0)) && *v && SvROK(*v)
                     && SvTYPE(SvRV(*v)) == SVt_PVAV)
@@ -612,9 +854,15 @@ to_app(self, ...)
                 v = hv_fetchs(src, "header", 0);
                 (void)hv_stores(dst, "header",
                     (v && *v && SvOK(*v)) ? newSVsv(*v) : newSVpvs("X-CSRF-Token"));
-                cfg = sv_2mortal(newRV_noinc((SV *)dst));
+                ccfg = sv_2mortal(newRV_noinc((SV *)dst));
             }
-            av_push(cap, SvREFCNT_inc(cfg));
+            /* newSV(0), never &PL_sv_undef, and for the same reason the
+             * 'before'/'after' slots above use it: perl before 5.20 treats an
+             * array element that IS &PL_sv_undef as a deleted one, so
+             * av_fetch hands back NULL and the request path dereferences it.
+             * A fresh undef SV reads identically to every caller and survives
+             * the round trip on every perl. */
+            av_push(cap, ccfg ? SvREFCNT_inc(ccfg) : newSV(0));
         }
         {   /* server options (slot 7): security headers (secure defaults on,
              * overridable / removable), body-size limit, CORS, error format,
@@ -622,19 +870,6 @@ to_app(self, ...)
              * stamped onto every response in finalize. */
             HV *o_opts = newHV();
             HV *hdrs   = newHV();
-            SV *headers_opt = NULL, *cors_opt = NULL, *errfmt_opt = NULL;
-            IV maxbody = 0; int negotiate = 0;
-
-            for (i = 1; i + 1 < items; i += 2) {
-                STRLEN kl; const char *k = SvPV_const(ST(i), kl);
-                SV *v = ST(i + 1);
-                if (kl == 7 && memEQ(k, "headers", 7)) headers_opt = v;
-                else if (kl == 4 && memEQ(k, "cors", 4)) cors_opt = v;
-                else if (kl == 13 && memEQ(k, "max_body_size", 13))
-                    maxbody = SvOK(v) ? SvIV(v) : 0;
-                else if (kl == 12 && memEQ(k, "error_format", 12)) errfmt_opt = v;
-                else if (kl == 9 && memEQ(k, "negotiate", 9)) negotiate = SvTRUE(v);
-            }
 
             /* secure defaults appropriate for a JSON API (HSTS is opt-in) */
             (void)hv_stores(hdrs, "X-Content-Type-Options", newSVpvs("nosniff"));
@@ -645,7 +880,7 @@ to_app(self, ...)
             if (headers_opt && SvOK(headers_opt)) {
                 HV *uh = oa_hv_of(headers_opt);
                 HE *he;
-                if (!uh) croak("Open::API->to_app: 'headers' must be a hashref");
+                if (!uh) croak("Open::API::Plack->to_app: 'headers' must be a hashref");
                 hv_iterinit(uh);
                 while ((he = hv_iternext(uh))) {
                     I32 kl; const char *k = hv_iterkey(he, &kl);
@@ -678,14 +913,14 @@ to_app(self, ...)
                 if (l == 7 && memEQ(p, "problem", 7))
                     (void)hv_stores(o_opts, "error_format", newSVpvs("problem"));
                 else if (!(l == 4 && memEQ(p, "json", 4)))
-                    croak("Open::API->to_app: 'error_format' must be "
+                    croak("Open::API::Plack->to_app: 'error_format' must be "
                           "'json' or 'problem'");
             }
             if (cors_opt && SvOK(cors_opt)) {
                 HV *cs = oa_hv_of(cors_opt), *cd;
                 SV **v, *origins;
                 int creds = 0, wild;
-                if (!cs) croak("Open::API->to_app: 'cors' must be a hashref");
+                if (!cs) croak("Open::API::Plack->to_app: 'cors' must be a hashref");
                 cd = newHV();
                 if ((v = hv_fetchs(cs, "origins", 0)) && *v && SvOK(*v))
                     origins = newSVsv(*v);
@@ -709,7 +944,7 @@ to_app(self, ...)
                     }
                 }
                 if (creds && wild)
-                    croak("Open::API->to_app: cors credentials => 1 needs an "
+                    croak("Open::API::Plack->to_app: cors credentials => 1 needs an "
                           "explicit origins list (a wildcard '*' origin cannot "
                           "be used with credentials)");
                 (void)hv_stores(cd, "origins", origins);
@@ -725,9 +960,37 @@ to_app(self, ...)
             av_push(cap, newRV_noinc((SV *)o_opts));
         }
         RETVAL = oa_closure(aTHX_ oa_app_cb, cap);
+        {   /* ui option: wrap the finished app so the docs routes answer
+             * before the router sees them. The wrap itself lives in Perl
+             * (Open::API::UI); a missing Template::Stencil croaks through
+             * here - a startup configuration error like everything else. */
+            SV **u = hv_fetchs(cfg, "ui", 0);
+            if (u && *u && SvTRUE(*u)) {
+                dSP;
+                int n;
+                eval_pv("require Open::API::UI;", TRUE);
+                SPAGAIN;   /* the require may have reallocated the value stack */
+                ENTER; SAVETMPS;
+                PUSHMARK(SP);
+                EXTEND(SP, 2);
+                PUSHs(self);
+                mPUSHs(RETVAL);   /* ownership of the inner app moves to
+                                   * the wrapping closure (or the tmps) */
+                PUTBACK;
+                n = call_pv("Open::API::UI::_wrap_psgi", G_SCALAR);
+                SPAGAIN;
+                if (n != 1)
+                    croak("Open::API::UI::_wrap_psgi returned no app");
+                RETVAL = newSVsv(POPs);
+                PUTBACK;
+                FREETMPS; LEAVE;
+            }
+        }
     }
     OUTPUT:
         RETVAL
+
+MODULE = Open::API        PACKAGE = Open::API
 
 # ---- test shims (validate one value through a compiled handle) -------------
 
@@ -924,12 +1187,24 @@ AUTOLOAD(self, ...)
     PPCODE:
     {
         SV *avar = get_sv("Open::API::Client::AUTOLOAD", 0);
-        const char *full, *mp;
+        const char *full = NULL, *mp;
         SV *op, *ret;
         HV *params;
         int i;
-        if (!avar || !SvOK(avar)) XSRETURN_EMPTY;
-        full = SvPV_nolen(avar);
+        /* Perl hands an XSUB AUTOLOAD its method name one of two ways. Newer
+         * perls set $AUTOLOAD; perls through 5.14 skip that deliberately -
+         * rather than build the variable only for the XSUB to parse it back
+         * apart, gv_autoload stores the name in the CV's own PV slot - so
+         * $AUTOLOAD is simply undef there and a typo'd method silently
+         * returned empty instead of croaking. Read whichever one is present.
+         *
+         * Test SvPVX/SvCUR rather than SvPOK: gv_autoload does the assignment
+         * with SvPV_set/SvCUR_set and never turns the POK flag on, so the CV
+         * carries the name with POK clear. The CV holds no prototype that
+         * could be mistaken for it - PROTOTYPES is DISABLE above. */
+        if (avar && SvOK(avar))                             full = SvPV_nolen(avar);
+        else if (SvPVX((SV *)cv) && SvCUR((SV *)cv))        full = SvPVX((SV *)cv);
+        if (!full) XSRETURN_EMPTY;
         mp   = strrchr(full, ':');
         mp   = mp ? mp + 1 : full;
         if (strEQ(mp, "DESTROY")) XSRETURN_EMPTY;

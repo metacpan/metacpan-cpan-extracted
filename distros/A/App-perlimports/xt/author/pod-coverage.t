@@ -32,7 +32,7 @@ my %trustme = (
            );
 
 my @also_private = (
-                  qr/(BUILD|BUILDARGS)/
+                  qr/^(?:BUILD|BUILDARGS|all_includes|possibly_imported_tokens|sub_exporter_export_list|has_at_export|has_at_export_ok|has_import_flags)$/
                 );
 
 for my $module ( sort @modules ) {

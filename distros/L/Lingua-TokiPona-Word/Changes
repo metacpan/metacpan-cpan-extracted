@@ -1,2 +1,12 @@
+v0.02  2026-08-06Z
+    - Improved documentation
+    - Added support for Under-ConScript Unicode Registry (UCSUR) code points
+    - Added new(ise => ...) in addition to new(from => ...)
+    - Added new classes to known:
+        * words (all words)
+        * stopword (all words that should be ignored e.g. by search engines)
+    - Return additional relevant identifiers via known(':all')
+    - Added $word->has_type to aid interaction with databases
+
 v0.01  2026-08-05Z
     - Initial release

@@ -5,6 +5,7 @@ use warnings;
 use FindBin ();
 use Test::More;
 use Open::API;
+use Open::API::Plack;
 use File::Raw::JSON qw(file_json_decode);
 
 # Server options on to_app: secure response headers (defaults on, overridable
@@ -48,7 +49,7 @@ my $VALID = '{"id":1,"name":"rex"}';
 
 # ---- security headers: secure defaults on ---------------------------------------
 {
-    my $app = $api->to_app(handlers => \%H);
+    my $app = Open::API::Plack->new(api => $api, handlers => \%H)->to_app;
     my $r = req($app, path => '/pets');
     is(hdr($r, 'X-Content-Type-Options'), 'nosniff', 'default nosniff');
     like(hdr($r, 'Content-Security-Policy'), qr/default-src 'none'/, 'default CSP');
@@ -66,7 +67,7 @@ my $VALID = '{"id":1,"name":"rex"}';
 
 # ---- security headers: override, remove, add, handler wins ----------------------
 {
-    my $app = $api->to_app(handlers => {
+    my $app = Open::API::Plack->new(api => $api, handlers => {
         %H,
         listPets => sub {   # handler sets its own X-Frame-Options
             [ 200, ['Content-Type' => 'application/json',
@@ -76,7 +77,7 @@ my $VALID = '{"id":1,"name":"rex"}';
         'Content-Security-Policy'   => "default-src 'self'",   # override
         'Referrer-Policy'           => undef,                  # remove
         'Strict-Transport-Security' => 'max-age=63072000',     # add (HSTS)
-    });
+    })->to_app;
     my $r = req($app, path => '/pets/5');
     is(hdr($r, 'Content-Security-Policy'), "default-src 'self'", 'CSP overridden');
     is(hdr($r, 'Referrer-Policy'), undef, 'Referrer-Policy removed via undef');
@@ -90,7 +91,7 @@ my $VALID = '{"id":1,"name":"rex"}';
 
 # ---- max_body_size -> 413 -------------------------------------------------------
 {
-    my $app = $api->to_app(handlers => \%H, max_body_size => 100);
+    my $app = Open::API::Plack->new(api => $api, handlers => \%H, max_body_size => 100)->to_app;
     my $over = req($app, method => 'POST', path => '/pets',
                    ctype => 'application/json',
                    clen => 5000, body => $VALID);
@@ -102,8 +103,8 @@ my $VALID = '{"id":1,"name":"rex"}';
 
 # ---- CORS: actual request + preflight -------------------------------------------
 {
-    my $app = $api->to_app(handlers => \%H,
-        cors => { origins => [ 'https://app.example.com' ], max_age => 600 });
+    my $app = Open::API::Plack->new(api => $api, handlers => \%H,
+        cors => { origins => [ 'https://app.example.com' ], max_age => 600 })->to_app;
 
     my $ok = req($app, path => '/pets',
                  env => { HTTP_ORIGIN => 'https://app.example.com' });
@@ -129,14 +130,14 @@ my $VALID = '{"id":1,"name":"rex"}';
 
 # ---- CORS: wildcard default + credentials footgun -------------------------------
 {
-    my $app = $api->to_app(handlers => \%H, cors => {});
+    my $app = Open::API::Plack->new(api => $api, handlers => \%H, cors => {})->to_app;
     is(hdr(req($app, path => '/pets',
                env => { HTTP_ORIGIN => 'https://anywhere.example' }),
            'Access-Control-Allow-Origin'), '*',
        'default CORS is public (wildcard ACAO)');
 
-    my $cred = $api->to_app(handlers => \%H,
-        cors => { origins => [ 'https://app.example.com' ], credentials => 1 });
+    my $cred = Open::API::Plack->new(api => $api, handlers => \%H,
+        cors => { origins => [ 'https://app.example.com' ], credentials => 1 })->to_app;
     my $r = req($cred, path => '/pets',
                 env => { HTTP_ORIGIN => 'https://app.example.com' });
     is(hdr($r, 'Access-Control-Allow-Credentials'), 'true',
@@ -145,7 +146,7 @@ my $VALID = '{"id":1,"name":"rex"}';
        'credentialed ACAO echoes the concrete origin');
 
     my $err;
-    eval { $api->to_app(handlers => \%H, cors => { credentials => 1 }) }
+    eval { Open::API::Plack->new(api => $api, handlers => \%H, cors => { credentials => 1 })->to_app }
         or $err = $@;
     like($err, qr/wildcard '\*' origin cannot be used with credentials/,
          'wildcard origin + credentials is refused at to_app');
@@ -153,7 +154,7 @@ my $VALID = '{"id":1,"name":"rex"}';
 
 # ---- content negotiation: 415 / 406 (opt-in) ------------------------------------
 {
-    my $app = $api->to_app(handlers => \%H, negotiate => 1);
+    my $app = Open::API::Plack->new(api => $api, handlers => \%H, negotiate => 1)->to_app;
 
     is(req($app, method => 'POST', path => '/pets',
            ctype => 'application/xml', body => '<pet/>')->[0], 415,
@@ -175,7 +176,7 @@ my $VALID = '{"id":1,"name":"rex"}';
 
 # ---- RFC 7807 problem+json ------------------------------------------------------
 {
-    my $app = $api->to_app(handlers => \%H, error_format => 'problem');
+    my $app = Open::API::Plack->new(api => $api, handlers => \%H, error_format => 'problem')->to_app;
 
     my $nf = req($app, path => '/nope');
     is($nf->[0], 404, 'a 404 status');

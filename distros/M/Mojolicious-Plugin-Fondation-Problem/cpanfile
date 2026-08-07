@@ -4,7 +4,7 @@ requires 'perl' => '5.026';
 
 # Runtime
 requires 'Mojolicious' => '9.46';
-requires 'Mojolicious::Plugin::Fondation';
+requires 'Mojolicious::Plugin::Fondation' => '0.07';
 requires 'Mojo::JSON';
 
 # Testing

@@ -1,0 +1,10 @@
+<%INIT>
+if (   $session{'CurrentUser'}->UserObj
+    && $session{'CurrentUser'}->HasRight( Right => 'ModifySelf', Object => RT->System ) )
+{
+    Menu->child('preferences')->child('settings')->child(
+        away_mode => title => loc('Away Mode'),
+        path      => '/Prefs/AwayMode.html',
+    );
+}
+</%INIT>

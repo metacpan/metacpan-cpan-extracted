@@ -35,6 +35,10 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Markdown::Simple" : "0.18",
+            "Template::Stencil" : "0.02"
+         },
          "requires" : {
             "File::Raw::JSON" : "0.05",
             "JSON::Schema::Fast" : "0.05",
@@ -48,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

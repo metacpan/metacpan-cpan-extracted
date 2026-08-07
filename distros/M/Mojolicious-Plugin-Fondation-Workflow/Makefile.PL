@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Fondation::Workflow",
   "PREREQ_PM" => {
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => "0.01",
+    "Mojolicious::Plugin::Fondation" => "0.07",
     "Workflow" => "2.10",
     "YAML::XS" => "0.01"
   },
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "FindBin" => "1.00",
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %FallbackPrereqs = (
   "File::Temp" => "0.01",
   "FindBin" => "1.00",
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => "0.01",
+  "Mojolicious::Plugin::Fondation" => "0.07",
   "Test::More" => "1.00",
   "Workflow" => "2.10",
   "YAML::XS" => "0.01"

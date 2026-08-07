@@ -9,6 +9,24 @@
  * All functions are C89-clean (declarations at block start) so the module
  * builds under perl's conservative C dialect on every smoker. */
 
+/* Alignment a type actually requires, asked of the compiler rather than
+ * guessed. Every jsf_arena_alloc passes JSF_ALIGNOF(T) for the T it is about
+ * to store: a hardcoded 8 was correct only while NV was a double. Build perl
+ * -Duselongdouble or -Dusequadmath and NV becomes a 16-byte-aligned type, so
+ * jsf_node_t needs 16; at 8 every node landed on an odd 8-byte boundary and
+ * the SSE load gcc emits for __float128 faulted, segfaulting the first
+ * compile() on x86-64. Deriving it from the type keeps that true for any
+ * member anyone adds later. */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#  define JSF_ALIGNOF(T) ((uint32_t)_Alignof(T))
+#elif defined(__GNUC__)
+#  define JSF_ALIGNOF(T) ((uint32_t)__alignof__(T))
+#elif defined(_MSC_VER)
+#  define JSF_ALIGNOF(T) ((uint32_t)__alignof(T))
+#else
+#  define JSF_ALIGNOF(T) ((uint32_t)offsetof(struct { char c_; T t_; }, t_))
+#endif
+
 typedef struct jsf_arena {
     char     *base;        /* the block */
     uint32_t  used;        /* bytes in use (offset 0 reserved as null) */
@@ -94,7 +112,7 @@ static uint32_t jsf_arena_intern(jsf_arena_t *a, const char *s, uint32_t len) {
             return o;
     }
     off = jsf_arena_alloc(a, (uint32_t)(sizeof(jsf_str_t) + len + 1),
-                          (uint32_t)sizeof(uint32_t));
+                          JSF_ALIGNOF(jsf_str_t));
     if (off == JSF_NULL_OFF) return JSF_NULL_OFF;
     st = (jsf_str_t *)(a->base + off);
     st->len = len;

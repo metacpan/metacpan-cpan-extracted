@@ -23,7 +23,7 @@ use File::Temp qw/tempdir/;
 skip_all "stub servers require a POSIX shell (#!/bin/sh), unavailable on $^O"
     if $^O eq 'MSWin32';
 
-my $dir = tempdir(CLEANUP => 1);
+my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
 sub stub_at {
     my ($path, $version_line) = @_;

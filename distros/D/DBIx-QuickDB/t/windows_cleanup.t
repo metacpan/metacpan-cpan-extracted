@@ -43,7 +43,7 @@ subtest multiple_retained_handles => sub {
     plan(skip_all => 'DBI and DBD::SQLite are required for handle cleanup tests')
         unless $has_sqlite;
 
-    my $dir = tempdir(CLEANUP => 1);
+    my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
     my @dbh = map {
         DBI->connect("dbi:SQLite:dbname=$dir/db$_", '', '', {RaiseError => 1})
     } 1 .. 3;
@@ -61,7 +61,7 @@ subtest multiple_retained_handles => sub {
 subtest sqlite_load_sql_disconnects_explicitly => sub {
     require DBIx::QuickDB::Driver::SQLite;
 
-    my $dir = tempdir(CLEANUP => 1);
+    my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
     my $db = DBIx::QuickDB::Driver::SQLite->new(dir => $dir);
 
     no warnings qw/redefine once/;
@@ -88,7 +88,7 @@ subtest sqlite_load_sql_disconnects_explicitly => sub {
 subtest driver_quarantines_a_tree_that_survives_removal => sub {
     require DBIx::QuickDB::Driver::SQLite;
 
-    my $base = tempdir(CLEANUP => 1);
+    my $base = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
     my $dir = "$base/database";
     make_path($dir);
     open(my $fh, '>', "$dir/sqlite-file") or die "Could not create cleanup marker: $!";
@@ -133,7 +133,7 @@ subtest driver_quarantines_a_tree_that_survives_removal => sub {
 };
 
 subtest transient_quarantine_rename_is_retried => sub {
-    my $base = tempdir(CLEANUP => 1);
+    my $base = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
     my $dir = "$base/database";
     make_path($dir);
 
@@ -171,7 +171,7 @@ subtest transient_quarantine_rename_is_retried => sub {
 subtest driver_reports_terminal_cleanup_failure => sub {
     require DBIx::QuickDB::Driver::SQLite;
 
-    my $base = tempdir(CLEANUP => 1);
+    my $base = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
     my $dir = "$base/database";
     make_path($dir);
     my $db = DBIx::QuickDB::Driver::SQLite->new(dir => $dir, cleanup => 1);
@@ -205,7 +205,7 @@ subtest driver_reports_terminal_cleanup_failure => sub {
 };
 
 subtest later_cleanup_retries_a_quarantine => sub {
-    my $base = tempdir(CLEANUP => 1);
+    my $base = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
     my $first = "$base/first";
     my $second = "$base/second";
     make_path($first, $second);
@@ -229,7 +229,7 @@ subtest later_cleanup_retries_a_quarantine => sub {
 subtest pool_never_rebuilds_in_stale_tree => sub {
     require DBIx::QuickDB::Pool;
 
-    my $base  = tempdir(CLEANUP => 1);
+    my $base  = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
     my $cache = "$base/cache with space";
     make_path($cache);
     my $dir   = "$cache/database-checksum";
@@ -280,7 +280,7 @@ subtest pool_never_rebuilds_in_stale_tree => sub {
 subtest locale_formatted_clone_timestamp => sub {
     require DBIx::QuickDB::Pool;
 
-    my $base = tempdir(CLEANUP => 1);
+    my $base = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
     my $cache = "$base/cache";
     my $dir = "$cache/database-checksum";
     my $empty = "$cache/empty-checksum";

@@ -11,6 +11,16 @@ sub get :Path(get) Args(0) {
   $c->res->body($c->csrf_token);
 }
 
+sub get_reusable :Path(get_reusable) Args(0) {
+  my ($self, $c) = @_;
+  $c->res->body($c->csrf_token(form_id => 'reusable'));
+}
+
+sub reusable :Path(reusable) Args(0) {
+  my ($self, $c) = @_;
+  $c->res->body('ok');
+}
+
 sub test :Path(test) SingleUseCSRF Args(0) {
   my ($self, $c) = @_;
   $c->res->body('ok');

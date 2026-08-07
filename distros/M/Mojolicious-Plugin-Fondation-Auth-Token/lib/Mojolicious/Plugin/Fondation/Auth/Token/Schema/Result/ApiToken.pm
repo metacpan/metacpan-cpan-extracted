@@ -1,11 +1,11 @@
 package Mojolicious::Plugin::Fondation::Auth::Token::Schema::Result::ApiToken;
-$Mojolicious::Plugin::Fondation::Auth::Token::Schema::Result::ApiToken::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Auth::Token::Schema::Result::ApiToken::VERSION = '0.02';
 # ABSTRACT: DBIx::Class Result class for api_tokens table
 
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Core';
+use base 'Mojolicious::Plugin::Fondation::Schema::Result::Base';
 
 __PACKAGE__->load_components(qw/TimeStamp Core/);
 
@@ -94,7 +94,7 @@ Mojolicious::Plugin::Fondation::Auth::Token::Schema::Result::ApiToken - DBIx::Cl
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 #!perl
-use 5.016;
+use 5.010;
 use strict;
 use warnings;
 use Test::More;
@@ -13,14 +13,24 @@ my $data = { v => '<hi>' };
 # Statically resolved calls go through the checker-installed custom pp
 # (observable via the counter); method calls use the plain XSUB. Both
 # must produce identical results.
+# cv_set_call_checker needs perl 5.14; below that every call goes through
+# the ordinary XSUB, so the counter never moves. Results must be identical
+# either way - that is the part worth asserting on every perl.
+my $has_checker = $] >= 5.014;
+
 my $c0 = checker();
 my $via_fn = Template::Stencil::render($s, '{% v %}', $data);
 my $c1 = checker();
-cmp_ok($c1, '>', $c0, 'function-style call took the fast path');
+SKIP: {
+    skip 'call checker needs perl 5.14+', 2 unless $has_checker;
+    cmp_ok($c1, '>', $c0, 'function-style call took the fast path');
+
+    my $via_method_c = $s->render('{% v %}', $data);
+    my $c2 = checker();
+    is($c2, $c1, 'method call does not take the checker path');
+}
 
 my $via_method = $s->render('{% v %}', $data);
-my $c2 = checker();
-is($c2, $c1, 'method call does not take the checker path');
 is($via_fn, $via_method, 'both paths byte-identical');
 is($via_fn, '&lt;hi&gt;', 'and correct');
 

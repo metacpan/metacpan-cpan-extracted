@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::OpenAPI - OpenAPI specification generator and ru
 
 # VERSION
 
-version 0.02
+version 0.03
 
 # SYNOPSIS
 
@@ -22,6 +22,11 @@ version 0.02
                 },
             },
         },
+    }
+
+    # Optional: disable the client-side validators.js rules
+    'Fondation::OpenAPI' => {
+        no_validator_js => 1,
     }
 
     # CLI
@@ -44,7 +49,28 @@ Swagger UI routes in development mode.
     'Fondation::OpenAPI' => {
         backend => 'main',          # optional -- falls back to DBIx::Async default
         schemas => { ... },         # optional -- column overrides
+        no_validator_js => 0,       # optional -- default 0 (client validation on)
     }
+
+### `no_validator_js`
+
+When set to `1`, `openapi generate` still writes `public/js/validators.js`
+but the generated `validate()` function accepts everything
+(`return { valid: true, errors: [] }`). Server-side OpenAPI validation is
+unaffected. Use it to rely solely on server validation (e.g. during testing).
+
+Re-enable client validation by setting it back to `0` (or removing the key)
+and regenerating. The same setting is exposed as a boolean parameter in the
+plugin's `fondation_meta` `setup` block (default `0`).
+
+### `pattern` in column overrides
+
+Column `pattern` (like `minLength`, `maxLength`, `format`...) is a flat
+key accepted both in `extra-`{openapi}> (DBIx Result classes) and in the
+`schemas` config override. Patterns MUST be authored in ECMA-262 dialect:
+the same regex is used by JSON::Validator server-side (Perl) and by
+`new RegExp()` in the generated validators.js. Avoid Perl-only constructs
+(`\z`, `\A`, POSIX classes, variable lookbehind, ...).
 
 ## Backend resolution
 

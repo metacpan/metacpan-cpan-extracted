@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -190,14 +190,43 @@ worker's L<Hyperman::Loop> (or undef outside one).
 
 Per-worker counters; returns undef outside a running loop.
 
+=head2 detach
+
+    my $fd = Hyperman::detach($env);
+
+Hand a live HTTP/1 connection to the application. The server removes its
+watchers for the socket, forgets the connection and B<does not close it>,
+so from that point the application's own C<psgix.loop> watchers on that
+descriptor are what drive it. This is the seam a protocol upgrade needs:
+before it, a hijacked socket raced the server's own read watcher, which
+consumed post-upgrade bytes into a buffer nothing drained.
+
+The application writes its own upgrade response - the server's writer is
+out of the picture - and returns C<[101, [], []]>, which is discarded.
+Returns the real file descriptor.
+
+    my $conn = $env->{'psgix.hyperman.conn'};   # [ fd, generation id ]
+
+C<psgix.hyperman.conn> is both the ticket detach works from and the way an
+application detects that detaching is possible at all: it is absent on
+HTTP/2 and on servers that are not Hyperman. Detaching croaks, with the
+reason, when the connection is gone or the ticket is stale, on HTTP/2, on
+TLS, when output is still queued, or when it has already been detached.
+
+Detach is legal from a Future continuation - asynchronous authentication
+before an upgrade - but not from a C<psgi.streaming> responder, which has
+already forced C<Connection: close>, nor once response bytes are queued.
+
+The equivalent for a C consumer is the table's C<conn_detach>.
+
 =head1 C ABI
 
 Hyperman exposes a public C ABI so that B<other XS modules> can drive its
 event loop and futures entirely from C - fd watchers and timers whose
 callbacks run with no Perl call frame per event, and Hyperman::Future
-create/settle/inspect without method dispatch.
-
-This is an integration surface for XS authors, not part of the Perl API.
+create/settle/inspect without method dispatch. The motivating consumer is
+L<DBIx::Loop>, whose pure-XS loop adapter watches database socket fds and
+settles futures on the worker loop C-to-C.
 
 =head2 Getting the header
 
@@ -224,7 +253,7 @@ F<hm_abi.h>.
 
 =head2 The table
 
-    #define HM_ABI_VERSION 1
+    #define HM_ABI_VERSION 2
 
     #define HM_ABI_READ  0x1        /* io_watch masks     */
     #define HM_ABI_WRITE 0x2
@@ -268,6 +297,11 @@ F<hm_abi.h>.
 
         /* await: pump the loop until f settles (re-entrant) */
         void (*run_until)(pTHX_ void *loop, SV *f);
+
+        /* v2: detach a live HTTP/1 connection (see Hyperman::detach).
+         * 0 ok; -1 no such connection or a stale id; -2 HTTP/2; -3 TLS;
+         * -4 output still queued; -5 already detached. */
+        int (*conn_detach)(pTHX_ void *loop, int fd, UV id);
     } hm_abi;
 
 =head2 Hyperman::_abi_ptr

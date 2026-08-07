@@ -46,7 +46,7 @@ has -pad => (HashRef, default => sub{return {} }, chained => 1);
 
 has -time_option => (Str, default => sub{return ''}, chained => 1);
 
-our $VERSION = '1.27';
+our $VERSION = '1.29';
 
 # -----------------------------------------------
 

@@ -26,6 +26,7 @@ use warnings;
 use FindBin ();
 use Hyperman;
 use Open::API;
+use Open::API::Plack;
 
 my $port   = shift || 5000;
 my $origin = "http://127.0.0.1:$port";
@@ -39,7 +40,8 @@ my %SESSION;
 my ($sid_seq, $tok_seq) = (0, 0);
 sub new_token { 'csrf-' . (++$tok_seq) }
 
-my $app = $api->to_app(
+my $app = Open::API::Plack->new(api => $api,
+    ui => 1,
     handlers => {
         # POST /login: authenticate (toy), then establish a session and hand
         # out the first CSRF token. This is where a client "gets in".
@@ -101,7 +103,7 @@ my $app = $api->to_app(
             return $fresh;
         },
     },
-);
+)->to_app;
 
 print "Petstore listening on $origin (workers=2)\n";
 Hyperman->run(app => $app, host => '127.0.0.1', port => $port, workers => 2, access_log => \*STDERR);

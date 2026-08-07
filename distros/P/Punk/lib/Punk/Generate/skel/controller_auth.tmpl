@@ -1,0 +1,65 @@
+package {% name %}::Controller::API::{% auth_class %};
+
+use strict;
+use warnings;
+use parent 'Punk::Controller';
+
+our $VERSION = '0.01';
+
+# The security checkers openapi.json requires. One sub per securityScheme the
+# document actually asks for; the mount in lib/{% path %}.pm names them.
+#
+# A checker is called as ($credential, $c, $operation_id, $scopes) before the
+# request is validated and before the operation runs. Return a true value to
+# authorise - it lands in $c->stash->{auth} - or false to refuse. Refusing
+# answers 401 without reading the body; alternatives in the spec are OR'd and
+# schemes within one alternative are AND'ed, so returning false here does not
+# necessarily end the request.
+#
+# THESE STUBS REFUSE EVERYTHING. That is deliberate: a generated checker that
+# returned true would leave the operations the spec marked as protected open
+# to anyone, and that failure is silent. Fill each one in.
+{% for s in schemes %}
+# {% s.name %}{% if s.type %} - {% s.type %}{% end %}{% if s.scheme %} {% s.scheme %}{% end %}{% if s.key %} ({% s.in %} '{% s.key %}'){% end %}
+{% if s.description %}# {% s.description %}
+{% end %}sub {% s.method %} {
+    my ($credential, $c, $operation_id, $scopes) = @_;
+
+    # $credential is {% s.credential %}.
+    # Return what you want in $c->stash->{auth}, for example:
+    #
+    #   my $user = $c->model('User')->get( token => $credential ) or return;
+    #   return $user;
+
+    return;
+}
+{% end %}
+1;
+
+__END__
+
+=head1 NAME
+
+{% name %}::Controller::API::{% auth_class %} - generated security checkers
+
+=head1 DESCRIPTION
+
+One checker per C<securityScheme> that F<openapi.json> requires, generated
+by C<punk new --api> and wired into the mount in L<{% name %}>.
+
+Each is called as C<< ($credential, $c, $operation_id, $scopes) >> and
+returns a true value to authorise - which becomes
+C<< $c->stash->{auth} >> - or false to answer C<401>.
+
+B<Every one of these refuses until you implement it>, so the operations
+the specification protects stay protected rather than being opened by a
+placeholder.
+
+=head1 METHODS
+{% for s in schemes %}
+=head2 {% s.method %}
+
+The C<{% s.name %}> scheme{% if s.type %} (C<{% s.type %}>{% if s.scheme %} C<{% s.scheme %}>{% end %}{% if s.key %}, {% s.in %} C<{% s.key %}>{% end %}){% end %}. The credential is
+{% s.credential %}.
+{% end %}
+=cut

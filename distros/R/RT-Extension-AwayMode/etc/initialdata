@@ -1,0 +1,25 @@
+@ScripConditions = (
+    {   Name                 => 'Owner Away',
+        Description          => 'Whenever correspondence arrives on a ticket whose owner has Away Mode active',
+        ApplicableTransTypes => 'Correspond',
+        ExecModule           => 'OwnerAway',
+    },
+);
+
+@ScripActions = (
+    {   Name        => 'Reassign Away Owner to Nobody',
+        Description => 'Sets ticket owner to Nobody and adds an internal comment when the owner is away',
+        ExecModule  => 'OwnerAwayReassign',
+    },
+);
+
+@Scrips = (
+    {   Description    => 'Away Mode: reassign ticket to Nobody when owner is away',
+        ScripCondition => 'Owner Away',
+        ScripAction    => 'Reassign Away Owner to Nobody',
+        Template       => 'Blank',
+        Stage          => 'TransactionCreate',
+    },
+);
+
+1;

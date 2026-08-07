@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Perm::Controller::Perm;
-$Mojolicious::Plugin::Fondation::Perm::Controller::Perm::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Perm::Controller::Perm::VERSION = '0.03';
 # ABSTRACT: REST controller for Perm CRUD via DBIx::Class::Async
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -16,11 +16,9 @@ sub index ($self) {
 # List all permissions (GET /api/Perm)
 sub list ($self) {
     $self->render_later;
-    $self->model('perm')->search({})->all->on_done(sub {
-        my $perms = shift;
-        my @data  = map { _to_data($_) } @$perms;
-        $self->render(openapi => \@data);
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    $self->model('perm')->search({})->TO_JSON->then(sub ($data) {
+        $self->render(openapi => $data);
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Read a permission by ID (GET /api/Perm/:id)
@@ -31,13 +29,13 @@ sub read ($self) {
     $self->model('perm')->find($id)->on_done(sub {
         my $perm = shift;
         if ($perm) {
-            $self->render(openapi => _to_data($perm));
+            $self->render(openapi => $perm->TO_JSON);
         }
         else {
             $self->render(status => 404, openapi =>
                 { errors => [{ message => 'Not found', path => '/' }] });
         }
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Create a permission (POST /api/Perm)
@@ -47,7 +45,7 @@ sub create ($self) {
     my $data = $self->req->json;
     $self->model('perm')->create($data)->on_done(sub {
         my $perm = shift;
-        my $d    = _to_data($perm);
+        my $d    = $perm->TO_JSON;
         $self->res->headers->location($self->url_for('read_perm', id => $d->{id}));
         $self->render(status => 201, openapi => $d);
 
@@ -56,7 +54,7 @@ sub create ($self) {
             title => $self->l('Permission created'),
             body  => sprintf($self->l("Permission '%s' has been created."), $d->{name} // ''),
         });
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Update a permission (PUT /api/Perm/:id)
@@ -76,7 +74,7 @@ sub update ($self) {
         }
         $perm->update($json)->on_done(sub {
             my $updated = shift;
-            my $d       = _to_data($updated);
+            my $d       = $updated->TO_JSON;
             $self->render(openapi => $d);
 
             $self->notify_user({
@@ -84,8 +82,8 @@ sub update ($self) {
                 title => $self->l('Permission updated'),
                 body  => sprintf($self->l("Permission '%s' has been updated."), $d->{name} // ''),
             });
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 # Delete a permission (DELETE /api/Perm/:id)
@@ -109,32 +107,8 @@ sub delete ($self) {
                 title => $self->l('Permission deleted'),
                 body  => sprintf($self->l("Permission '%s' has been deleted."), $name // ''),
             });
-        })->on_fail(sub { $self->_render_error(shift) })->retain;
-    })->on_fail(sub { $self->_render_error(shift) })->retain;
-}
-
-# ---------------------------------------------------------------------------
-# Private helpers
-# ---------------------------------------------------------------------------
-
-sub _render_error ($self, $err) {
-    $self->app->log->error('[Perm::Controller] _render_error: ' . $self->dumper($err));
-    $self->render(status => 500, openapi =>
-        { errors => [{ message => "$err", path => '/' }] });
-}
-
-sub _to_data ($row) {
-    my $data = { $row->get_columns };
-
-    # Serialize DateTime objects to ISO 8601 strings
-    for my $key (keys %$data) {
-        my $val = $data->{$key};
-        if (ref $val && eval { $val->isa('DateTime') }) {
-            $data->{$key} = $val->iso8601;
-        }
-    }
-
-    return $data;
+        })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
+    })->on_fail(sub ($err) { $self->problem(status => 500, detail => "$err") })->retain;
 }
 
 1;
@@ -151,7 +125,7 @@ Mojolicious::Plugin::Fondation::Perm::Controller::Perm - REST controller for Per
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

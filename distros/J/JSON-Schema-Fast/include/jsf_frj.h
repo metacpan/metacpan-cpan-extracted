@@ -18,6 +18,11 @@ static const frj_abi *jsf_frj(pTHX) {
         dSP; int count; IV p = 0;
         JSF_FRJ_TRIED = 1;
         eval_pv("require File::Raw::JSON;", FALSE);
+        /* The require runs arbitrary Perl and may have grown the value stack,
+         * which reallocates it; SP was captured before that and would then be
+         * a pointer into the freed block, published straight back to the
+         * interpreter by the PUTBACK below. */
+        SPAGAIN;
         if (!SvTRUE(ERRSV)) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("File::Raw::JSON::_abi_ptr", G_SCALAR | G_EVAL);

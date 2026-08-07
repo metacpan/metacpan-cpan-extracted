@@ -27,6 +27,9 @@ struct mds_footnote_tab {
 };
 
 void   mds_footnote_init(struct mds_footnote_tab* t, mds_arena* a);
+/* Release the heap-grown entry array. Must run before the arena holding
+ * the table struct is reset or freed. */
+void   mds_footnote_free(struct mds_footnote_tab* t);
 /* Insert if not present. Returns 1 if inserted, 0 if duplicate label. */
 int    mds_footnote_add(struct mds_footnote_tab* t,
                         const char* label, size_t llen,

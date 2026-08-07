@@ -631,9 +631,9 @@ static int filter_apply(pTHX_ stencil_rstate *r, uint32_t idx)
     {                                                                    \
         stencil_val vb = r->stack[--r->sp];                              \
         stencil_val va = r->stack[--r->sp];                              \
-        NV na = (va.sv && SvOK(va.sv)) ? SvNV(va.sv) : 0.0;              \
-        NV nb = (vb.sv && SvOK(vb.sv)) ? SvNV(vb.sv) : 0.0;              \
-        int res = na OPR nb;                                             \
+        NV nva = (va.sv && SvOK(va.sv)) ? SvNV(va.sv) : 0.0;             \
+        NV nvb = (vb.sv && SvOK(vb.sv)) ? SvNV(vb.sv) : 0.0;             \
+        int res = nva OPR nvb;                                           \
         val_release(aTHX_ &va);                                                \
         val_release(aTHX_ &vb);                                                \
         r->stack[r->sp].sv    = res ? &PL_sv_yes : &PL_sv_no;            \

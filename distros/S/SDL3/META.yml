@@ -51,7 +51,7 @@ optional_features:
 provides:
   SDL3:
     file: lib/SDL3.pm
-    version: v0.0.4
+    version: v0.0.5
 requires:
   Affix: v1.1.0
   Alien::SDL3: v2.24.0
@@ -63,7 +63,7 @@ resources:
   homepage: https://github.com/Perl-SDL3/SDL3.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/Perl-SDL3/SDL3.pm.git
-version: v0.0.4
+version: v0.0.5
 x_help_wanted:
   - Tester
   - Documenter

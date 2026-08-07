@@ -30,7 +30,7 @@ After [installing Sidef](https://github.com/trizen/sidef/blob/master/SIDEF_BEGIN
 
 ```
 $ sidef
-Sidef 26.07, running on Linux, using Perl v5.42.1.
+Sidef 26.08, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -166,7 +166,7 @@ sqrt_cfrac_period_len(n)    # length of the continued fraction period of sqrt(n)
 convergents(n)              # continued fraction convergents of n
 rat_approx(n)               # rational approximation of n
 
-var(x,y)=solve_pell(n)      # smallest solution to Pell's equation: x^2 - n*y^2 = 1
+solve_pell(d, n)            # solutions to generalized Pell's equation: x^2 - d*y^2 = n
 
 digits(n, base=10)          # array with digits of n in a given base
 digits_sum(n, base=10)      # sum of digits of n in a given base
@@ -362,7 +362,7 @@ for n in (0..30) {
 
 This section briefly describes the built-in classes related to computational number theory.
 
-For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.07/sidef-book.pdf)).
+For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.08/sidef-book.pdf)).
 
 ## Mod class
 
@@ -1533,9 +1533,9 @@ The `special_factor(n)` function efficiently tries to find special factors (not 
 * Lucas factorization method
 * Fibonacci factorization method
 * FLT factorization method
-* Pollard's p-1 method
+* Pollard's $p-1$ method
 * Pollard's rho method
-* Williams' p+1 method
+* Williams' $p+1$ method
 * Chebyshev factorization method
 * Cyclotomic factorization method
 * Lenstra's Elliptic Curve Method
@@ -1773,21 +1773,25 @@ If $n$ is less than $B^3$, and the function returns `true`, then $n$ is definite
 
 If the $B$ parameter is omitted, multiple limits are tested internally, trying to find a square factor of $n$, up to $B = 10^7$.
 
-### Official Documentation
+### Documentation & Learning Resources
 
 | Resource | Description |
 |----------|-------------|
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
-| 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
-| 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
+| 📄 [Beginner's Guide](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md) | Start here if you're new to Sidef |
+| 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | Comprehensive language tutorial |
+| 📕 [Full PDF Documentation](https://github.com/trizen/sidef/releases/download/26.08/sidef-documentation.pdf) | Offline PDF version of the complete language documentation |
+| 📑 [Number Theory Cheatsheet](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_CHEATSHEET.md) | Quick reference for Sidef's number theory functions |
+| 📚 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
 | 🔢 [Computational Algebra Guide](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md) | Complete guide for computational algebra |
 
-### Example Code
+### Additional resources
 
 | Resource | Description |
 |----------|-------------|
 | 📂 [sidef-scripts](https://github.com/trizen/sidef-scripts) | Hundreds of real Sidef programs — the best way to learn by reading |
 | 🌹 [RosettaCode — Sidef](https://rosettacode.org/wiki/Sidef) | Classic programming tasks solved in Sidef, side-by-side with other languages |
+| 📄 [Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) | Full documentation for the Number class |
 
 # The end
 

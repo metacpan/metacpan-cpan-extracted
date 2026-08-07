@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Action::Templates;
-$Mojolicious::Plugin::Fondation::Action::Templates::VERSION = '0.06';
+$Mojolicious::Plugin::Fondation::Action::Templates::VERSION = '0.07';
 # ABSTRACT: Registers templates and zones from plugin share directories
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Action::Base', -signatures;
@@ -102,7 +102,7 @@ Mojolicious::Plugin::Fondation::Action::Templates - Registers templates and zone
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

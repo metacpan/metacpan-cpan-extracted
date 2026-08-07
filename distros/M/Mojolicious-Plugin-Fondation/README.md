@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 # VERSION
 
-version 0.06
+version 0.07
 
 # SYNOPSIS
 

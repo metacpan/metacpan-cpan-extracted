@@ -4,7 +4,7 @@ use v5.36;
 use version;
 use parent 'PAGI::FastAPI::Security::Base';
 
-our $VERSION   = qv('v0.0.2');
+our $VERSION   = qv('v0.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf-8
@@ -15,7 +15,7 @@ PAGI::FastAPI::Security::HTTPBearer - HTTP Bearer token scheme for PAGI::FastAPI
 
 =head1 VERSION
 
-Version v0.0.2
+Version v0.0.4
 
 =head1 SYNOPSIS
 
