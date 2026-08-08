@@ -37,6 +37,12 @@ Punk::Model - the storage-agnostic model tier
     my $page = $c->model('Book')->search({ author => 'Gibson' },
                                          { limit => 20 });
 
+    # ... or, on the non-blocking backend, the same calls return futures
+    return $c->model('Book')->get(id => $c->param('id'))->then(sub {
+        my ($book) = @_;
+        $c->render('book/view', { book => $book });
+    });
+
 =head1 DESCRIPTION
 
 A model class C<use>s C<Punk::Model>, names its C<table> and its
@@ -48,6 +54,37 @@ The class is registered with C<< model 'Book' >> in the app; the
 instance is built once per worker on first C<< $c->model('Book') >> and
 cached (fork-safe). Backends swap with C<< database backend => 'Class' >>
 - any class honouring the contract works.
+
+=head2 A backend may return futures
+
+The contract fixes the B<methods> and the B<result shapes>, not whether a
+result has arrived yet. The model tier passes a backend's return value
+through untouched, and Punk's dispatcher awaits any future a handler
+returns, so a backend is free to be asynchronous.
+
+Both shipped backends use that freedom differently, and which one you pick
+decides how handlers are written:
+
+=over 4
+
+=item * L<Punk::Model::DBI> (the B<default>) returns the value itself, and
+blocks the worker for the whole database round trip.
+
+    my $book = $c->model('Book')->get(id => 1);
+
+=item * L<Punk::Model::DBIx::Loop> returns a L<Punk::Future> from every
+method. The query runs on the worker's event loop, so the worker serves
+other requests while it is in flight. Select it with
+C<< database backend => 'Punk::Model::DBIx::Loop' >>.
+
+    return $c->model('Book')->get(id => 1)->then(sub { ... });
+
+=back
+
+Validation is synchronous on both: C<create>/C<update> croak at the call
+site on a bad payload rather than failing a future, because a payload that
+does not match the field schema is a programming error rather than a query
+failure.
 
 =head1 DECLARING A MODEL
 
@@ -89,8 +126,13 @@ Every model on the same database shares one connection per worker.
 C<create> validates C<\%data> against the field schema (required
 included); C<update> validates the changes (the primary key excluded,
 required relaxed). A validation failure croaks. C<search> options are
-the backend's; L<Punk::Model::DBI> takes C<limit> and an opaque C<after>
-pagination token.
+the backend's; both shipped backends take C<limit> and an opaque
+C<after> pagination token, and mint the token the same way, so a C<next>
+from one decodes on the other.
+
+On L<Punk::Model::DBIx::Loop> each of these is the result the returned
+L<Punk::Future> B<resolves to>, not what the call hands back - see
+L</"A backend may return futures">.
 
 =head1 METHODS
 

@@ -13,7 +13,6 @@ on 'configure' => sub {
 on 'test' => sub {
 	requires 'Error';
 	requires 'IPC::System::Simple';
-	requires 'Params::Validate::Strict';
 	requires 'Test::DescribeMe';
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird', '0.08';

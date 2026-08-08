@@ -3,23 +3,25 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/legendre_phi/;
+use Math::Prime::Util qw/legendre_phi prime_count/;
 
-#my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
+my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 #my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 #my $usegmp= Math::Prime::Util::prime_get_config->{'gmp'};
 #my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
-#$use64 = 0 if $use64 && 18446744073709550592 == ~0;
 
 my @legendre_sums = (
   [ 0,  92372, 0],
   [ 5,  15, 1],
+  [100, 25, 1],
   [ 89, 4, 21 ],
   [ 46, 4, 11 ],
   [ 47, 4, 12 ],
   [ 48, 4, 12 ],
   [ 52, 4, 12 ],
   [ 53, 4, 13 ],
+  [ 50,20, 1 ],
+  [ 52,16, 1 ],
   [10000, 5, 2077],
   [526, 7, 95],
   [588, 6, 111],
@@ -31,11 +33,13 @@ my @legendre_sums = (
   [800000, 213, 63739],
   [4000,255,296],
 );
+push @legendre_sums, ["18446744073709551616", 18, "2427358202919104547"]
+  if $extra;
 
 plan tests => scalar(@legendre_sums);
 
 ###### Legendre phi
 foreach my $r (@legendre_sums) {
   my($x, $a, $exp) = @$r;
-  is( legendre_phi($x, $a), $exp, "legendre_phi($x,$a) = $exp" );
+  is( "".legendre_phi($x, $a), $exp, "legendre_phi($x,$a) = $exp" );
 }

@@ -150,23 +150,32 @@ MODULE = Imager::File::TIFF  PACKAGE = Imager::File::TIFF  PREFIX = i_tiff_
 
 const char *
 i_tiff_builddate(...)
-  C_ARGS:
+  CODE:
+    (void)items; /* the ... args means items is unused */
+    RETVAL = i_tiff_builddate();
+  OUTPUT: RETVAL
 
 const char *
 i_tiff_buildversion(...)
-  C_ARGS:
+  CODE:
+    (void)items; /* the ... args means items is unused */
+    RETVAL = i_tiff_buildversion();
+  OUTPUT: RETVAL
 
 const char *
 i_tiff_libversion(...)
-  C_ARGS:
+  CODE:
+    (void)items; /* the ... args means items is unused */
+    RETVAL = i_tiff_libversion();
+  OUTPUT: RETVAL
 
 void
 i_tiff_codecs(class)
     PPCODE:
       size_t count;
       i_tiff_codec *codecs = i_tiff_get_codecs(&count);
-      EXTEND(SP, count);
-      for (int i = 0; i < count; ++i) {
+      EXTEND(SP, (ssize_t)count);
+      for (unsigned i = 0; i < count; ++i) {
         i_tiff_codec *codec = codecs + i;
         HV *hv = newHV();
         hv_stores(hv, "description", newSVpvn(codec->description, strlen(codec->description)));

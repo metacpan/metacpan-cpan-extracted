@@ -169,7 +169,11 @@ my $EXTRA_LDDLFLAGS = defined $ENV{MDS_PGO_LDFLAGS} ? $ENV{MDS_PGO_LDFLAGS} : ''
 print "LDDLFLAGS extras: $EXTRA_LDDLFLAGS\n" if length $EXTRA_LDDLFLAGS;
 
 my $pkg = ExtUtils::Depends->new('Markdown::Simple', 'Eshu');
-$pkg->set_inc('-Isrc');
+$pkg->set_inc('-Isrc -Iinclude');
+# The runtime C ABI consumers resolve through Markdown::Simple::_abi_ptr.
+# Only the interface header is installed; mds_abi_impl.h and everything under
+# src/ stay private to this build.
+$pkg->install('include/mds_abi.h');
 mkdir 'Install' unless -d 'Install';
 $pkg->save_config('Install/Files.pm');
 my %dep_vars = $pkg->get_makefile_vars;
@@ -208,7 +212,8 @@ my %WriteMakefileArgs = (
     depend => {
         'lib/Markdown/Simple$(OBJ_EXT)' => join(' ',
             sort(glob('src/*.c'), glob('src/*.h'),
-                 glob('src/simd/*.c'), glob('src/simd/*.h'))),
+                 glob('src/simd/*.c'), glob('src/simd/*.h'),
+                 glob('include/*.h'))),
     },
     %dep_vars,
 );

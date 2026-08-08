@@ -37,11 +37,14 @@
             "Future" : "0"
          },
          "requires" : {
+            "DBIx::Loop" : "0.02",
             "Fetch" : "0.11",
             "File::Raw::JSON" : "0.05",
-            "Hyperman" : "0.11",
+            "Hyperman" : "0.13",
             "JSON::Schema::Fast" : "0.05",
+            "Markdown::Simple" : "0.20",
             "Open::API" : "0.04",
+            "Search::Trigram" : "0.02",
             "Template::Stencil" : "0.02",
             "YAML::XS" : "0",
             "perl" : "5.010000"
@@ -54,6 +57,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

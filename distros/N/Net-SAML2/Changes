@@ -1,5 +1,44 @@
 Revision history for Perl extension Net::SAML2.
 
+0.89 -- Fri Aug 07 13:04:03 ADT 2026
+
+    [Significant Changes]
+    - Implement cert_text as a first class anchor (0.86 said it was)
+    - Update Changes for 0.86 and 0.88, CVE-2026-18108 was also fixed 
+    - Increment minimum version for XML::Sig to 0.72
+    - Fix some test issues
+    - Windows tests are still an issue - will fix soon
+
+    BREAKING CHANGE: As of Release 0.86, one of cacert, cert_text or
+    insecure_trust_embedded_cert must be provided when instantiating:
+
+    - Net::SAML2::SP                     (forwards cacert to sp_post_binding)
+    - Net::SAML2::Binding::POST
+    - Net::SAML2::Object::Response
+    - Net::SAML2::Protocol::Assertion
+
+    insecure_trust_embedded_cert trusts the certificate embedded in the
+    message itself, which provides no protection against a forged Assertion.
+    It exists for test and development use only.
+
+    As of Release 0.79 the following have been changed and the old version may be
+    removed in an upcoming release.
+
+    - Net::SAML2::Protocol::Artifact
+        - response_to changed to in_response_to
+    - Net::SAML2::Protocol::LogoutResponse
+        - response_to changed to in_response_to
+
+    [Detailed Change Log]
+    - 4e6d446 Fixes #248 Sub::Override calling method in t/23-post-binding.t
+    - ee6cd22 Fixes #248 - nanosecond issue
+    - 51ad4c3 Fixes #249 Make cert_text a first class anchor
+    - 025912d Increment minimum version for XML::Sig
+    - 1fe9849 CVE-2026-18108 was also fixed in version 0.86
+    - f0d771a Remove GitHub::CreateRelease
+    - 3c43c05 Increment repo version
+    - d1fa6e0 v0.88
+
 0.88 -- Thu Jul 30 23:49:54 ADT 2026
 
     - Re-issue 0.86 as the version number was incorrect in lib/Net/SAML2.pm
@@ -9,6 +48,7 @@ Revision history for Perl extension Net::SAML2.
     strongly recommended. Fixes:
     - CVE-2026-18089
     - CVE-2026-18092
+    - CVE-2026-18108
 
     [Significant Changes]
     BREAKING CHANGE: a trust anchor (cacert or cert_text) is now required to
@@ -90,7 +130,7 @@ Revision history for Perl extension Net::SAML2.
     - 9733ba4 v0.85
 
 0.87 -- Unreleased
-    - Version 0.86 had the the incorrect version in lin/Net/SAML2.pm
+    - Version 0.86 had the the incorrect version in lib/Net/SAML2.pm
 
 0.86 -- Thu Jul 30 23:14:40 ADT 2026
 
@@ -99,6 +139,7 @@ Revision history for Perl extension Net::SAML2.
     strongly recommended. Fixes:
     - CVE-2026-18089
     - CVE-2026-18092
+    - CVE-2026-18108
 
     [Significant Changes]
     BREAKING CHANGE: a trust anchor (cacert or cert_text) is now required to

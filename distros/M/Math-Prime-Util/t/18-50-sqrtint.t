@@ -20,7 +20,10 @@ my @vals = (
   [qw/18446744082299486208 4294967296/],
   [qw/18446744082299486209 4294967297/],
 
+  # 64-bit:  bigint with native result
   [qw/84274086103068221283760416414557757 290299993288095377/],
+  # 64-bit:  bigint with bigint result
+  [qw/703703558473748583730026303516370264750663 838870406245057964096/],
 );
 
 plan tests => 3;
@@ -29,6 +32,6 @@ ok(!defined eval { sqrtint(-1) }, "sqrtint(n): n must not be negative");
 
 is_deeply( [map { sqrtint($_) } 0..100], [map { int(sqrt($_)) } 0..100], "sqrtint 0 .. 100" );
 
-is_deeply( [map { sqrtint($_->[0]) } @vals],
+is_deeply( [map { "".sqrtint($_->[0]) } @vals],
            [map { $_->[1] } @vals],
            "sqrtint(n) for multiple values" );

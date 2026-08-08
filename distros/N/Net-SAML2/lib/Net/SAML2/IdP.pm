@@ -2,7 +2,7 @@ package Net::SAML2::IdP;
 use Moose;
 with 'Net::SAML2::Role::XMLCertificate';
 
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.89'; # VERSION
 
 # ABSTRACT: SAML Identity Provider object
 
@@ -247,7 +247,7 @@ Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 SYNOPSIS
 

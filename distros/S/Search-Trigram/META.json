@@ -1,5 +1,5 @@
 {
-   "abstract" : "Trigram inverted index with Dice coefficient scoring",
+   "abstract" : "Trigram inverted index search with Dice coefficient scoring",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -42,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

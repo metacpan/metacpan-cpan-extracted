@@ -4,7 +4,7 @@ use XML::Generator;
 use URN::OASIS::SAML2 qw(URN_METADATA NS_METADATA);
 with 'Net::SAML2::Role::XMLLang';
 
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.89'; # VERSION
 
 # ABSTRACT: An attribute consuming service object
 
@@ -88,7 +88,7 @@ Net::SAML2::AttributeConsumingService - An attribute consuming service object
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 SYNOPSIS
 

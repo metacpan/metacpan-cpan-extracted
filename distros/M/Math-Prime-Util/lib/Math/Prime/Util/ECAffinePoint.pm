@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::ECAffinePoint::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::ECAffinePoint::VERSION = '0.74';
+  $Math::Prime::Util::ECAffinePoint::VERSION = '0.75';
 }
 
 BEGIN {
@@ -120,13 +120,7 @@ sub mul {
   my $a = $self->{'a'};
   my $n = $self->{'n'};
   my $f = $self->{'f'};
-  if (ref($k) eq 'Math::BigInt' && $k < ''.~0) {
-    if ($] >= 5.008 || ~0 == 4294967295) {
-      $k = int($k->bstr);
-    } elsif ($] < 5.008 && ~0 > 4294967295 && $k < 562949953421312) {
-      $k = unpack('Q',pack('Q',$k->bstr));
-    }
-  }
+  $k = int($k->bstr) if ref($k) eq 'Math::BigInt' && $k < ''.~0;
 
   my $Bx = $n->copy->bzero;
   my $By = $n->copy->bone;
@@ -202,7 +196,7 @@ Math::Prime::Util::ECAffinePoint - Elliptic curve operations for affine points
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 
 =head1 SYNOPSIS

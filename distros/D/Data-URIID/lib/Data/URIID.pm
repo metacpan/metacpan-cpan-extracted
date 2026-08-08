@@ -21,7 +21,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.22;
+our $VERSION = v0.23;
 
 my %names = (
     service => {
@@ -72,6 +72,7 @@ my %names = (
         'danbooru2chanjp'   => 'dac7a0ba-9090-4db7-bb94-373fabf98103', # danbooru.2chan.jp
         'sirtxkeepcoolorg'  => '0d7be696-accc-4d52-9cea-9c2362a57d62', # sirtx.keep-cool.org
         'denkxweb-hessen'   => '05bbc5d4-b77f-48bb-b458-97ddc16ab48f', # denkxweb.denkmalpflege-hessen.de
+        'ibbco'             => '39b7c20f-5521-49ec-9292-5794131e4291', # ibb.co
 
         # schemes using namespace 0883381d-1d01-4aa2-bd15-e8bb7ac7673d
         'scheme-ni'         => '0293c674-7576-572e-ab19-81d8e1ce0300',
@@ -133,6 +134,7 @@ my %names = (
         'danbooru2chanjp-post-identifier' => '6e3590b6-2a0c-4850-a71f-8ba196a52280',
         'danbooru2chanjp-tag'           => 'c5632c60-5da2-41af-8b60-75810b622756',
         'denkxweb-hessen-identifier'    => '3b215e80-0df1-4b77-aa25-69df66db7b3b', # P1769
+        'ibbco-identifier'              => '308d4b1c-6007-42d0-8d83-c13c92c03426',
     },
     action => {
         #What about: search/lookup? list? content?
@@ -540,7 +542,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.22
+version v0.23
 
 =head1 SYNOPSIS
 
@@ -574,6 +576,8 @@ In order to do so, an extractor (instance of this package) is created.
 On that extractor L</lookup> is called for every input to process resulting in a L<Data::URIID::Result> object holding the acquired knowledge.
 
 The module supports both online and offline lookups. See L</online>.
+
+Depending on which kind of data lookups are performed on it might be useful to load L<Data::Identifier::Wellknown> with C<:all> before this module.
 
 This package inherits from L<Data::Identifier::Interface::Known>.
 

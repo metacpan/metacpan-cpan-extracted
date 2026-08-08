@@ -37,7 +37,7 @@ my @expect = (
 plan tests => 0
             + 2*scalar(@expect)
             + 2
-            + 5;
+            + 7;
             ;
 
 for my $k (3 .. 25) {
@@ -72,4 +72,10 @@ ok(is_polygonal("510622052816898545467859772308206986101878",3), "51062205281689
   ok( $is, "1 is a polygonal number" );
   is( $r, 1, "is_polygonal with 1 sets r to 1" );
   ok( !is_polygonal(-1, 3), "-1 is not a polygonal number" );
+
+  eval { is_polygonal(6, 3, undef); 1 };
+  like($@, qr/scalar reference/i, "is_polygonal rejects undef root reference");
+
+  eval { is_polygonal(6, 3, []); 1 };
+  like($@, qr/scalar reference/i, "is_polygonal rejects array root reference");
 }

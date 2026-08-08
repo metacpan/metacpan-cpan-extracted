@@ -1,5 +1,12 @@
 Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com.
 
-OPT has Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com and is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
+OPT is free software; you can redistribute it and/or modify it under
+the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any
+later version.
 
-OPTcue has Copyright (C) 2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com, proprietary. All right reserved
+
+OPT is distributed in the hope that it will be useful, but WITHOUT 
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+or FITNESS FOR A PARTICULAR PURPOSE. 
+See the GNU General Public License for more details.

@@ -29,15 +29,17 @@ use Test::Needs qw(
 use Params::Validate::Strict qw(validate_strict);
 use Test::Mockingbird 0.08;
 use Test::Returns;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
 use Readonly;
 use Scalar::Util ();
 use Params::Get qw(get_params);
+use TestHelper qw($USAGE_RE);
 
 # -------------------------------------------------------------------------
 # Named constants -- no magic strings/numbers in assertions.
 # -------------------------------------------------------------------------
-Readonly::Scalar my $PKG      => 'Params::Get';
-Readonly::Scalar my $USAGE_RE => qr/Usage:/;
+Readonly::Scalar my $PKG => 'Params::Get';
 
 # =========================================================================
 # Test classes -- defined once; used across multiple sections.
@@ -162,7 +164,7 @@ subtest 'validation pipeline: out-of-range latitude rejected by PVS (croaks)' =>
 	# The croak must propagate out of where_am_i to the caller.
 	throws_ok(
 		sub { Integration::Geo->where_am_i(latitude => 999, longitude => 0) },
-		qr/latitude.*must be no more than/i,
+		qr/latitude .*? must \s+ be \s+ no \s+ more \s+ than/xi,
 		'out-of-range latitude: PVS croak propagates to caller',
 	);
 

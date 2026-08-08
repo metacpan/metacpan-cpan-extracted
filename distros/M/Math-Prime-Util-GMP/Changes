@@ -1,5 +1,115 @@
 Revision history for Perl module Math::Prime::Util::GMP
 
+0.54 2026-08-08
+
+    [API CHANGES]
+
+    - lucas_sequence and is_frobenius_pseudoprime take any integer P,Q
+      instead of only native.
+
+    - multifactorial supports large integer n,m.  m must be positive.
+
+    - factor accepts negative inputs.  In list context, negative inputs have
+      a leading -1 factor.  Scalar context counts factors of the absolute
+      value and does not count the sign.
+
+    - Ranged moebius and euler_phi, plus sieve_primes, sieve_twin_primes,
+      and sieve_prime_cluster, return the result count in scalar context.
+
+    [ADDED]
+
+    - muladdint(a,b,c)         returns a*b+c
+    - mulsubint(a,b,c)         returns a*b-c
+    - addmulint(a,b,c)         returns a+b*c
+    - submulint(a,b,c)         returns a-b*c
+    - vecprefixsum(list)       prefix sum / cumulative sum of integer list
+    - fibonacci(k)             the k-th Fibonacci number
+    - lucas_number(k)          the k-th Lucas number
+    - catalan_number(n)        the n-th Catalan number
+    - bell_number(n)           the n-th Bell number
+    - fubini(n)                the n-th ordered Bell number
+    - partitionsq(n)           partitions of n into distinct parts
+    - euler_phi(n[,nhi])       totient or ranged totient
+    - twin_primes([lo,]hi)     returns an array ref of lower twin primes
+    - remove_factors(n,k)      returns r: n with all factors of k removed
+    - remove_factors_exp(n,k)  as above, returns (r,e) e = times removed
+    - znlog(a,g,n)             solve for k where g^k = a mod n
+    - rootmod(a,k,n)           modular k-th root
+    - allsqrtmod(a,n)          all square roots of a (mod n)
+    - allrootmod(a,k,n)        all k-th roots of a (mod n)
+    - legendre_phi(n,a)        Legendre's phi function
+    - sopf(n)                  sum of distinct prime factors
+    - sopfr(n)                 sum of prime factors with multiplicity
+    - prime_signature(n)       sorted factorization exponents
+    - dedekind_psi(n)          Dedekind psi function
+    - aliquot_sum(n)           sum of proper divisors
+    - abundance(n)             aliquot_sum(n)-n
+    - is_safe_prime(n)         n and (n-1)/2 are both prime
+
+    [FIXES]
+
+    - drand treats a zero limit like an omitted limit and always returns below
+      the upper endpoint before scaling.
+
+    - factorialmod takes large (a,m) instead of silently reducing a to UL.
+      We guard against values that would result in excessive time, while still
+      returning zero for large inputs known to vanish modulo composite m.
+
+    - binomial handles large k more carefully, reflecting k before native
+      conversion where possible and croaking instead of silently truncating.
+
+    - binomialmod avoids constructing huge intermediate binomial values for
+      more large-input cases.
+
+    - powint croaks on huge exponents instead of truncating.
+
+    - logint accepts large bases.  rootint accepts large roots.
+
+    - fromdigits accepts large bases and digit coefficients without
+      truncation, and validates string digits consistently.
+
+    - urandomr accepts signed ranges.
+
+    - is_almost_prime validates k as a non-negative integer and avoids
+      truncating large k values.
+
+    - is_power validates large exponents instead of silently truncating them.
+
+    - stirling validates large inputs instead of silently reducing them.
+
+    - primes accepts non-negative ranges matching Math::Prime::Util.
+
+    - Non-negative XS validation accepts signed zero strings.
+
+    - rising_factorial, falling_factorial don't accept a negative second arg.
+
+    - invmod, negmod, sqrtmod, factorialmod, znorder, is_qr, and
+      is_primitive_root consistently use |n| for the modulus.
+
+    - random_nbit_prime and related native-count functions croak on oversized
+      inputs instead of silently truncating them.
+
+    - random_prime preserves uniform selection after exhausting its initial
+      trials, replacing the biased next-prime fallback present since v0.42.
+
+    - random_{maurer,shawe_taylor}_prime_with_cert wasn't producing a cert for
+      very small primes (32 and fewer bits).
+
+    - sieve_range width and depth arguments now croak if they don't fit into
+      a UV instead of truncating.
+
+    - Frobenius-Khashin algorithm changed from 2013 to 2018 algorithm.
+
+    [PERFORMANCE]
+
+    - znorder(a, p^e) is much faster for large prime powers p^e. (Trizen)
+
+    - is_power is much faster for large-exponent perfect powers with a small
+      prime factor.
+
+    - BPSW uses AES Lucas for 64-bit inputs, about 30% faster.
+
+
 0.53 2026-03-11
 
     [ADDED]
@@ -55,6 +165,7 @@ Revision history for Perl module Math::Prime::Util::GMP
     - cdivint(a,b)             integer a/b quotient  (ceiling)
     - fdivrem(a,b)             integer a/b quo + rem (floor)
     - cdivrem(a,b)             integer a/b quo + rem (ceiling)
+    - negmod(a,n)              (-a) % n
     - submod(a,b,n)            (a - b) % n
     - muladdmod(a, b, c, n)    (a * b + c) % n
     - mulsubmod(a, b, c, n)    (a * b - c) % n

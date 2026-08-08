@@ -10,44 +10,8 @@ SV *
 new(class, ...)
         SV *class
     CODE:
-    {
-        HV *h = newHV();
-        HV *col = newHV();
-        SV *table = NULL, *primary = NULL, *columns = NULL, *database = NULL;
-        int i;
-        for (i = 1; i + 1 < items; i += 2) {
-            STRLEN kl; const char *k = SvPV_const(ST(i), kl);
-            if      (kl == 5 && memEQ(k, "table",    5)) table    = ST(i + 1);
-            else if (kl == 7 && memEQ(k, "primary",  7)) primary  = ST(i + 1);
-            else if (kl == 7 && memEQ(k, "columns",  7)) columns  = ST(i + 1);
-            else if (kl == 8 && memEQ(k, "database", 8)) database = ST(i + 1);
-        }
-        if (!(table && SvOK(table) && SvTRUE(table))) {
-            SvREFCNT_dec((SV *)h); SvREFCNT_dec((SV *)col);
-            croak("Punk::Model::DBI: a model with no table");
-        }
-        /* the column set, for the create/update filters */
-        if (columns && SvROK(columns) && SvTYPE(SvRV(columns)) == SVt_PVAV) {
-            AV *c = (AV *)SvRV(columns);
-            SSize_t n = av_len(c) + 1, j;
-            for (j = 0; j < n; j++) {
-                SV **e = av_fetch(c, j, 0);
-                if (e && *e) (void)hv_store_ent(col, *e, newSViv(1), 0);
-            }
-        }
-        (void)hv_stores(h, "opts",
-            (database && SvROK(database) && SvTYPE(SvRV(database)) == SVt_PVHV)
-                ? newSVsv(database) : newRV_noinc((SV *)newHV()));
-        (void)hv_stores(h, "table",   newSVsv(table));
-        (void)hv_stores(h, "primary",
-            (primary && SvOK(primary)) ? newSVsv(primary) : newSV(0));
-        (void)hv_stores(h, "columns",
-            (columns && SvROK(columns) && SvTYPE(SvRV(columns)) == SVt_PVAV)
-                ? newSVsv(columns) : newRV_noinc((SV *)newAV()));
-        (void)hv_stores(h, "col", newRV_noinc((SV *)col));
-        (void)hv_stores(h, "returning", newSViv(0));
-        RETVAL = sv_bless(newRV_noinc((SV *)h), gv_stashsv(class, GV_ADD));
-    }
+        RETVAL = pdbi_build_self(aTHX_ class, &ST(0), items,
+                                 "Punk::Model::DBI");
     OUTPUT:
         RETVAL
 
@@ -113,18 +77,30 @@ get(self, ...)
     CODE:
     {
         HV *key;
-        AV *keys = pdbi_key_args(aTHX_ &ST(0), items, &key, "get");
+        AV *keys = pdbi_key_args(aTHX_ &ST(0), items, &key, "get", "Punk::Model::DBI");
         AV *bind = (AV *)sv_2mortal((SV *)newAV());
-        SV *where = pdbi_where_eq(aTHX_ self, key, keys, bind);
-        SV *table = pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "table");
-        SV *sql = sv_2mortal(newSVpvs("SELECT * FROM "));
+        HV *slot = pdbi_slot_for(aTHX_ self);
+        SV *sig  = pdbi_sig(aTHX_ "get",
+                            pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "table"), keys);
+        SV *sql  = pdbi_sql_cached(aTHX_ slot, sig, NULL);
         SV *sth, *row;
-        sv_catsv(sql, pdbi_qi(aTHX_ self, table));
-        sv_catpvs(sql, " WHERE ");
-        sv_catsv(sql, where);
-        sv_catpvs(sql, " LIMIT 1");
 
-        sth = pdbi_sth(aTHX_ self, sql);
+        /* the statement is the same for every get on these key columns, so it
+         * is built once and only the bind values change */
+        if (sql) pdbi_bind_keys(aTHX_ key, keys, bind);
+        else {
+            SV *dbh   = pdbi_get(aTHX_ slot, "dbh");
+            SV *where = pdbi_where_eq_slot(aTHX_ slot, dbh, key, keys, bind);
+            SV *table = pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "table");
+            SV *built = sv_2mortal(newSVpvs("SELECT * FROM "));
+            sv_catsv(built, pdbi_qi_slot(aTHX_ slot, dbh, table));
+            sv_catpvs(built, " WHERE ");
+            sv_catsv(built, where);
+            sv_catpvs(built, " LIMIT 1");
+            sql = pdbi_sql_cached(aTHX_ slot, sig, built);
+        }
+
+        sth = pdbi_sth_dbh(aTHX_ pdbi_get(aTHX_ slot, "dbh"), sql);
         pdbi_execute(aTHX_ sth, bind);
         row = pdbi_meth0(aTHX_ sth, "fetchrow_hashref");
         { SV *f = pdbi_meth0(aTHX_ sth, "finish"); if (f) SvREFCNT_dec(f); }
@@ -192,7 +168,7 @@ search(self, filter = &PL_sv_undef, opts = &PL_sv_undef)
                 if (av_len(keys) >= 0) sv_catpvs(sql, " AND ");
                 sv_catsv(sql, pdbi_qi(aTHX_ self, pk));
                 sv_catpvs(sql, " > ?");
-                av_push(bind, pdbi_decode_token(aTHX_ after));
+                av_push(bind, pdbi_decode_token(aTHX_ after, "Punk::Model::DBI"));
             }
         }
         if (pk && SvOK(pk)) {
@@ -423,17 +399,27 @@ delete(self, ...)
     CODE:
     {
         HV *key;
-        AV *keys = pdbi_key_args(aTHX_ &ST(0), items, &key, "delete");
+        AV *keys = pdbi_key_args(aTHX_ &ST(0), items, &key, "delete", "Punk::Model::DBI");
         AV *bind = (AV *)sv_2mortal((SV *)newAV());
-        SV *where = pdbi_where_eq(aTHX_ self, key, keys, bind);
-        SV *table = pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "table");
-        SV *sql = sv_2mortal(newSVpvs("DELETE FROM "));
+        HV *slot = pdbi_slot_for(aTHX_ self);
+        SV *sig  = pdbi_sig(aTHX_ "delete",
+                            pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "table"), keys);
+        SV *sql  = pdbi_sql_cached(aTHX_ slot, sig, NULL);
         SV *sth, *n;
-        sv_catsv(sql, pdbi_qi(aTHX_ self, table));
-        sv_catpvs(sql, " WHERE ");
-        sv_catsv(sql, where);
 
-        sth = pdbi_sth(aTHX_ self, sql);
+        if (sql) pdbi_bind_keys(aTHX_ key, keys, bind);
+        else {
+            SV *dbh   = pdbi_get(aTHX_ slot, "dbh");
+            SV *where = pdbi_where_eq_slot(aTHX_ slot, dbh, key, keys, bind);
+            SV *table = pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "table");
+            SV *built = sv_2mortal(newSVpvs("DELETE FROM "));
+            sv_catsv(built, pdbi_qi_slot(aTHX_ slot, dbh, table));
+            sv_catpvs(built, " WHERE ");
+            sv_catsv(built, where);
+            sql = pdbi_sql_cached(aTHX_ slot, sig, built);
+        }
+
+        sth = pdbi_sth_dbh(aTHX_ pdbi_get(aTHX_ slot, "dbh"), sql);
         pdbi_execute(aTHX_ sth, bind);
         n = pdbi_meth0(aTHX_ sth, "rows");
         { SV *f = pdbi_meth0(aTHX_ sth, "finish"); if (f) SvREFCNT_dec(f); }
@@ -461,6 +447,6 @@ _decode_token(self, tok)
         SV *tok
     CODE:
         PERL_UNUSED_VAR(self);
-        RETVAL = pdbi_decode_token(aTHX_ tok);
+        RETVAL = pdbi_decode_token(aTHX_ tok, "Punk::Model::DBI");
     OUTPUT:
         RETVAL

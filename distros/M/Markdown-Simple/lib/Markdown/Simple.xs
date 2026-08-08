@@ -229,6 +229,7 @@ static unsigned mds_flags_from_hv(pTHX_ HV* h) {
 	if ((v = hv_fetch(h, "html",            4,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_HTML;
 	if ((v = hv_fetch(h, "references",      10, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_REFERENCES;
 	if ((v = hv_fetch(h, "highlight",        9, 0)) && SvTRUE(*v))  flags |= MDS_FLAG_HIGHLIGHT;
+	if ((v = hv_fetch(h, "heading_ids",     11, 0)) && SvTRUE(*v))  flags |= MDS_FLAG_HEADING_IDS;
 	return flags;
 }
 
@@ -287,6 +288,10 @@ static mds_session* mds_session_from_self(pTHX_ SV* self, const char* who) {
 	croak("%s: invocant has no Markdown::Simple session attached", who);
 	return NULL; /* not reached */
 }
+
+/* The shared C ABI. Must come after mds_session_mg_vtbl, mds_flags_from_hv
+ * and strip_markdown_except_lists_tables, which its wrappers reach directly. */
+#include "mds_abi_impl.h"
 
 MODULE = Markdown::Simple    PACKAGE = Markdown::Simple
 
@@ -396,6 +401,62 @@ CODE:
 OUTPUT:
 	RETVAL
 
+# Render, and hand back the heading list alongside the HTML. Returns
+# ($html, \@headings) where each heading is { level, text, id }; the ids are
+# the ones actually emitted on the <hN> tags, so a caller can build a table
+# of contents that links into the document without re-deriving anything.
+#
+# Asking for the list turns heading ids on for this render regardless of the
+# session's own flags.
+void
+render_with_toc(self, input)
+	SV* self;
+	SV* input;
+PREINIT:
+	mds_session* s;
+	STRLEN n;
+	const char* in;
+	SV* out;
+	AV* toc;
+PPCODE:
+{
+	s = mds_session_from_self(aTHX_ self, "Markdown::Simple::render_with_toc");
+	in = SvOK(input) ? SvPV(input, n) : (n = 0, "");
+	out = newSVpv("", 0);
+	toc = newAV();
+	mds_render_html_to_sv_toc(aTHX_ in, n, s->flags, out,
+	                          &s->arena, &s->scratch, toc);
+	if (SvCUR(out) == 0 && (s->flags & MDS_FLAG_STRICT_UTF8) && n) {
+		const mds_simd_ops* ops = (s->flags & MDS_FLAG_NO_SIMD)
+			? mds_simd_ops_scalar() : mds_simd_get();
+		if (!ops->validate_utf8(in, n)) {
+			SvREFCNT_dec(out);
+			SvREFCNT_dec((SV*)toc);
+			croak("render_with_toc: input is not valid UTF-8");
+		}
+	}
+	/* The renderer emits raw bytes throughout and leaves the character
+	 * question to us, so propagate the input's flag to everything we
+	 * hand back rather than letting the HTML and the heading text
+	 * disagree about their encoding. */
+	if (SvUTF8(input)) {
+		SSize_t i, top = av_len(toc);
+		SvUTF8_on(out);
+		for (i = 0; i <= top; i++) {
+			SV** e = av_fetch(toc, i, 0);
+			HV* h;
+			SV** f;
+			if (!e || !*e || !SvROK(*e)) continue;
+			h = (HV*)SvRV(*e);
+			if ((f = hv_fetchs(h, "text", 0)) && *f) SvUTF8_on(*f);
+			if ((f = hv_fetchs(h, "id",   0)) && *f) SvUTF8_on(*f);
+		}
+	}
+	EXTEND(SP, 2);
+	PUSHs(sv_2mortal(out));
+	PUSHs(sv_2mortal(newRV_noinc((SV*)toc)));
+}
+
 UV
 flags(self)
 	SV* self;
@@ -406,6 +467,161 @@ CODE:
 }
 OUTPUT:
 	RETVAL
+
+# ---- shared C ABI --------------------------------------------------------
+
+# Address of Markdown::Simple's own C ABI table (mds_abi.h). A consumer XS
+# module (Punk's markdown mount) fetches this once at boot, INT2PTRs it to a
+# `const mds_abi *`, and checks ->abi_version before using it. Not part of the
+# public Perl API.
+IV
+_abi_ptr()
+    CODE:
+        RETVAL = PTR2IV(&MDS_ABI);
+    OUTPUT:
+        RETVAL
+
+# Exercise the whole mds_abi table the way a C consumer would: resolve it from
+# the IV _abi_ptr hands back, gate on abi_version, then drive the entries
+# through the function pointers rather than calling the C directly. This is
+# how the ABI gets tested without a second distribution to consume it.
+#
+# Returns ($html, \@toc, $plain) on success; (undef, $error) when a render
+# fails; and an empty list when the gate rejects the table or the invocant is
+# not a session, which is where a consumer would fall back to the methods.
+void
+_abi_selftest(self, input, opts = &PL_sv_undef)
+        SV* self
+        SV* input
+        SV* opts
+    PPCODE:
+    {
+        const mds_abi* abi = NULL;
+        void*    session;
+        SV*      err = NULL;
+        SV*      html;
+        SV*      plain;
+        AV*      toc;
+        STRLEN   n;
+        const char* in;
+        {
+            dSP;
+            IV  ptr = 0;
+            int count;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            PUTBACK;
+            count = call_pv("Markdown::Simple::_abi_ptr", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (count > 0) {
+                /* Pop into a local first: before 5.30 SvIV was a macro that
+                 * evaluated its argument twice, so SvIV(POPs) popped twice
+                 * and read the IV off whatever sat one slot lower. */
+                SV* rv = POPs;
+                if (!SvTRUE(ERRSV)) ptr = SvIV(rv);
+            }
+            PUTBACK; FREETMPS; LEAVE;
+            if (ptr) abi = INT2PTR(const mds_abi*, ptr);
+        }
+        if (!abi || abi->abi_version < MDS_ABI_VERSION) XSRETURN_EMPTY;
+
+        session = abi->session_of(aTHX_ self);
+        if (!session) XSRETURN_EMPTY;
+
+        /* Prove flags_from_hv is reachable and agrees with the session by
+         * decoding the caller's options, even though session_render uses the
+         * flags already bound to the session. */
+        if (SvOK(opts) && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
+            (void)abi->flags_from_hv(aTHX_ (HV*)SvRV(opts));
+
+        in = SvOK(input) ? SvPV(input, n) : (n = 0, "");
+
+        html = newSVpvs("");
+        toc  = newAV();
+        if (abi->session_render(aTHX_ session, in, n, html, toc, &err) != 0) {
+            SvREFCNT_dec(html);
+            SvREFCNT_dec((SV*)toc);
+            EXTEND(SP, 2);
+            mPUSHs(newSV(0));
+            PUSHs(err ? err : sv_2mortal(newSVpvs("unknown render error")));
+            XSRETURN(2);
+        }
+
+        plain = newSVpvs("");
+        if (abi->strip(aTHX_ in, n, plain, &err) != 0) {
+            SvREFCNT_dec(html);
+            SvREFCNT_dec((SV*)toc);
+            SvREFCNT_dec(plain);
+            EXTEND(SP, 2);
+            mPUSHs(newSV(0));
+            PUSHs(err ? err : sv_2mortal(newSVpvs("unknown strip error")));
+            XSRETURN(2);
+        }
+
+        EXTEND(SP, 3);
+        mPUSHs(html);
+        mPUSHs(newRV_noinc((SV*)toc));
+        mPUSHs(plain);
+        XSRETURN(3);
+    }
+
+# The sessionless entry, driven the same way. Returns the rendered bytes, or
+# (undef, $error).
+void
+_abi_selftest_render(input, opts = &PL_sv_undef)
+        SV* input
+        SV* opts
+    PPCODE:
+    {
+        const mds_abi* abi = NULL;
+        SV* err = NULL;
+        SV* html;
+        unsigned flags;
+        STRLEN n;
+        const char* in;
+        {
+            dSP;
+            IV  ptr = 0;
+            int count;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            PUTBACK;
+            count = call_pv("Markdown::Simple::_abi_ptr", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (count > 0) {
+                SV* rv = POPs;
+                if (!SvTRUE(ERRSV)) ptr = SvIV(rv);
+            }
+            PUTBACK; FREETMPS; LEAVE;
+            if (ptr) abi = INT2PTR(const mds_abi*, ptr);
+        }
+        if (!abi || abi->abi_version < MDS_ABI_VERSION) XSRETURN_EMPTY;
+
+        flags = abi->flags_from_hv(aTHX_
+            (SvOK(opts) && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
+                ? (HV*)SvRV(opts) : NULL);
+
+        in = SvOK(input) ? SvPV(input, n) : (n = 0, "");
+        html = newSVpvs("");
+        if (abi->render(aTHX_ in, n, flags, html, NULL, &err) != 0) {
+            SvREFCNT_dec(html);
+            EXTEND(SP, 2);
+            mPUSHs(newSV(0));
+            PUSHs(err ? err : sv_2mortal(newSVpvs("unknown render error")));
+            XSRETURN(2);
+        }
+        EXTEND(SP, 1);
+        mPUSHs(html);
+        XSRETURN(1);
+    }
+
+# The ABI version this build compiled against, for a consumer's diagnostics.
+IV
+_abi_version()
+    CODE:
+        RETVAL = MDS_ABI_VERSION;
+    OUTPUT:
+        RETVAL
 
 # ---- SIMD backend introspection ----------------------------------------
 

@@ -34,13 +34,14 @@ struct mds_render_state_blob {
     unsigned char bytes[16 * 1024];
 };
 
-int mds_render_html_to_sv_ex(pTHX_
-                             const char*        input,
-                             size_t             len,
-                             unsigned           flags,
-                             SV*                output_sv,
-                             mds_arena*         borrowed_arena,
-                             mds_block_scratch* borrowed_scratch) {
+int mds_render_html_to_sv_toc(pTHX_
+                              const char*        input,
+                              size_t             len,
+                              unsigned           flags,
+                              SV*                output_sv,
+                              mds_arena*         borrowed_arena,
+                              mds_block_scratch* borrowed_scratch,
+                              AV*                toc) {
     mds_buf buf;
     struct mds_render_state_blob blob;
     void* ud;
@@ -57,7 +58,7 @@ int mds_render_html_to_sv_ex(pTHX_
     ud = &blob;
 
     memset(&cb, 0, sizeof cb);
-    mds_render_html_install(&cb, &ud, &buf, flags);
+    mds_render_html_install(&cb, &ud, &buf, flags, toc);
 
     memset(&ctx, 0, sizeof ctx);
     ctx.input   = input;
@@ -137,12 +138,24 @@ int mds_render_html_to_sv_ex(pTHX_
     return 0;
 }
 
+int mds_render_html_to_sv_ex(pTHX_
+                             const char*        input,
+                             size_t             len,
+                             unsigned           flags,
+                             SV*                output_sv,
+                             mds_arena*         borrowed_arena,
+                             mds_block_scratch* borrowed_scratch) {
+    return mds_render_html_to_sv_toc(aTHX_ input, len, flags, output_sv,
+                                     borrowed_arena, borrowed_scratch, NULL);
+}
+
 int mds_render_html_to_sv(pTHX_
                           const char* input,
                           size_t      len,
                           unsigned    flags,
                           SV*         output_sv) {
-    return mds_render_html_to_sv_ex(aTHX_ input, len, flags, output_sv, NULL, NULL);
+    return mds_render_html_to_sv_toc(aTHX_ input, len, flags, output_sv,
+                                     NULL, NULL, NULL);
 }
 
 /* Last-parse arena snapshot, populated unconditionally

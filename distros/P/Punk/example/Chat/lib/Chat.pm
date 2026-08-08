@@ -6,12 +6,13 @@ use Chat::Auth ();
 
 # Punk Chat - the example application.
 #
-# Three things share one app class, one router and one model tier:
+# Four things share one app class, one router and one model tier:
 #
 #   * a Stencil-rendered web page (the chat UI),
 #   * a WebSocket route per room, broadcasting through a Punk room,
 #   * a spec-first OpenAPI mount whose writes land in the same table and
-#     fan out to the live sockets, with the docs UI over it.
+#     fan out to the live sockets, with the docs UI over it,
+#   * a written guide, from a directory of markdown under /guide.
 #
 # HTTPS is not configured here, and deliberately so: TLS is a listener
 # property, not an application one. bin/punk-chat terminates TLS in front
@@ -27,7 +28,23 @@ views Stencil => {
 
 static '/static' => "$home/root/static";
 
-database dsn => $ENV{PUNK_CHAT_DSN} || "dbi:SQLite:dbname=$home/chat.db";
+# The written guide, from a directory of markdown. Rendered once at boot -
+# tree walked, pages wrapped, search index filled - and served from frozen
+# bytes thereafter, so a docs request costs a hash lookup. PUNK_CHAT_DEV
+# turns on the re-render-on-change path for writing them.
+#
+# Note this is not the same thing as `docs` further down: that one generates
+# the interactive reference from the OpenAPI spec. Prose and generated
+# reference answer different questions, and an app usually wants both.
+markdown '/guide' => "$home/docs",
+    title  => 'Punk Chat Guide',
+    reload => $ENV{PUNK_CHAT_DEV} ? 1 : 0;
+
+# Punk::Model::DBIx::Loop, not the default Punk::Model::DBI: every model
+# call then returns a Punk::Future and the query runs on the worker's own
+# event loop instead of stopping it. See README.pod.
+database dsn     => $ENV{PUNK_CHAT_DSN} || "dbi:SQLite:dbname=$home/chat.db",
+         backend => 'Punk::Model::DBIx::Loop';
 model 'Message';
 
 # ---- the web tier ----------------------------------------------------------

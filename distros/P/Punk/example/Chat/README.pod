@@ -26,9 +26,19 @@ the interactive docs at C</docs>, a bearer security scheme compiled into a
 guard, and keyset pagination over the history;
 
 =item * B<HTTPS with a self-signed certificate> - generated in Perl, no
-C<openssl> binary needed, terminated in front of the app.
+C<openssl> binary needed, terminated in front of the app;
+
+=item * B<a written guide> - C<< markdown '/guide' => "$home/docs" >>, a
+directory of markdown rendered once at boot into a navigable site with a
+per-page table of contents and search, at C</guide>.
 
 =back
+
+Note that C</docs> and C</guide> are different things doing different jobs.
+C</docs> is the interactive OpenAPI reference, generated from the spec by the
+C<docs> keyword; C</guide> is prose written by hand and served by the
+C<markdown> keyword. An application generally wants both, so the example has
+both.
 
 The two halves are wired to each other rather than merely coexisting: a
 message POSTed to the API is stored and then broadcast to every socket in
@@ -175,6 +185,21 @@ the worker's event loop with no Perl until a whole message arrives.
 Note what F<lib/Chat/Controller/WS/Chat.pm> closes over: the room name, the
 nick and the model instance, read off the context while the request is still
 a request. The callbacks outlive it.
+
+=head2 The database never blocks the worker
+
+The C<database> keyword asks for L<Punk::Model::DBIx::Loop> rather than the
+default L<Punk::Model::DBI>, so every model call returns a L<Punk::Future>
+and the query runs on the worker's own event loop rather than stopping it.
+Handlers hand the chain back and the dispatcher awaits it:
+
+    return $c->model('Message')->rooms->then(sub { ... });
+
+The three custom queries in F<lib/Chat/Model/Message.pm> are written the same
+way, over C<< $self->backend->db >> - a custom method that blocked would undo
+the point of the backend. The WebSocket handler shows the other shape: its
+C<open> callback has no request left to answer, so it just lets the future
+settle and sends the backlog when it does.
 
 =head2 Rooms are per worker
 

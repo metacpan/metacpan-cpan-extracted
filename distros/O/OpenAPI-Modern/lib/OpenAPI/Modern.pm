@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.144-3-g5a0dae62
+package OpenAPI::Modern; # git description: v0.145-7-gb9a19e75
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.145';
+our $VERSION = '0.146';
 
 use 5.020;
 use utf8;
@@ -495,35 +495,30 @@ sub find_path_item ($self, $options, $state = {}) {
     if exists $options->{path_template}
       and not exists(($schema->{paths}//{})->{$options->{path_template}});
 
-  my $captures;  # hashref of template variable names -> concrete values from the uri
+  # hashrefs of template variable names -> concrete values from the uri
+  my ($server_captures, $path_captures);
 
   if (not $options->{path_template} and $options->{uri}) {
     # derive path_template and capture values from the request URI
 
+    my $errors = $state->{errors};  # most likely [], but bound to $options
     foreach my $pt ($self->openapi_document->path_templates->@*) {
-      my $local_state = +{ %$state };
+      my $local_state = +{ %$state, errors => [] };   # we do not keep errors from match attempts
       $local_state->{path_item} = $schema->{paths}{$pt};
       $local_state->{keyword_path} = jsonp('/paths', $pt);
-      $captures = $self->_match_uri($options->@{qw(method uri)}, $pt, $local_state);
+      ($server_captures, $path_captures) = $self->_match_uri($options->@{qw(method uri)}, $pt, $local_state);
 
-      if ($captures) {
+      if ($path_captures) {
         # a URI can match multiple /paths entries, and an operationId can be reachable from multiple
         # /paths entries, so keep searching until both are a match
         next if exists $options->{operation_id}
           and (not exists $local_state->{operation}{operationId}
             or $local_state->{operation}{operationId} ne $options->{operation_id});
 
-        %$state = %$local_state;
+        # preserve location of the match
+        %$state = (%$local_state, errors => $errors);
         $options->{path_template} = $pt;
         last;
-      }
-
-      # something went wrong, but the match succeeded so we will stop iterating
-      if ($local_state->{errors}->@*) {
-        %$state = %$local_state;
-        $options->{path_template} = $pt;
-        $options->@{qw(_path_item _operation _operation_path_suffix)} = $state->@{qw(path_item operation operation_path_suffix)};
-        return;
       }
     }
 
@@ -537,9 +532,9 @@ sub find_path_item ($self, $options, $state = {}) {
     # we were passed path_template in options, and now we verify it against the request URI
     $state->{path_item} = $schema->{paths}{$options->{path_template}};
     $state->{keyword_path} = jsonp('/paths', $options->{path_template});
-    $captures = $self->_match_uri($options->@{qw(method uri path_template)}, $state);
+    ($server_captures, $path_captures) = $self->_match_uri($options->@{qw(method uri path_template)}, $state);
 
-    if (not $captures) {
+    if (not $path_captures) {
       #  no path-item and operation found that matches the request's method and uri
       delete $options->{operation_id};
 
@@ -609,9 +604,9 @@ sub find_path_item ($self, $options, $state = {}) {
     if exists $options->{path_captures}
       and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @path_capture_names ]);
 
-  return 1 if not $captures;
+  return 1 if not $path_captures;
 
-  my @uri_capture_names = keys %$captures;
+  my @uri_capture_names = uniq keys %$server_captures, keys %$path_captures;
 
   if (exists $options->{uri_captures}) {
     return E({ %$state, $options->{uri} ? (data_path => '/request/uri') : (), recommended_response => [ 500 ] },
@@ -619,24 +614,27 @@ sub find_path_item ($self, $options, $state = {}) {
       if not is_equal([ sort keys $options->{uri_captures}->%* ], [ sort @uri_capture_names ]);
 
     # $equal_state will contain { path => '/0' } indicating the index of the mismatch
-    if (not is_equal([ $options->{uri_captures}->@{@uri_capture_names} ], [ $captures->@{@uri_capture_names} ], my $equal_state = { stringy_numbers => 1 })) {
+    if (not is_equal([ $options->{uri_captures}->@{@uri_capture_names} ], [ { %$path_captures, %$server_captures }->@{@uri_capture_names} ], my $equal_state = { stringy_numbers => 1 })) {
       return E({ %$state, data_path => '/request/uri', recommended_response => [ 500 ] },
         'provided uri_captures values do not match request URI (value for %s differs)', $uri_capture_names[substr($equal_state->{path}, 1)]);
     }
   }
   else {
-    $options->{uri_captures} = $captures;
+    # server capture values are fully decoded and do not need further deserialization, so we will
+    # always provide that value here in the case of name reuse; use path_captures if the encoded
+    # form is needed
+    $options->{uri_captures} = { %$path_captures, %$server_captures };
   }
 
   if (exists $options->{path_captures}) {
     # $equal_state will contain { path => '/0' } indicating the index of the mismatch
-    if (not is_equal([ $options->{path_captures}->@{@path_capture_names} ], [ $captures->@{@path_capture_names} ], my $equal_state = { stringy_numbers => 1 })) {
+    if (not is_equal([ $options->{path_captures}->@{@path_capture_names} ], [ $path_captures->@{@path_capture_names} ], my $equal_state = { stringy_numbers => 1 })) {
       return E({ %$state, data_path => '/request/uri', recommended_response => [ 500 ] },
         'provided path_captures values do not match request URI (value for %s differs)', $path_capture_names[substr($equal_state->{path}, 1)]);
     }
   }
   else {
-    $options->{path_captures} = +{ $captures->%{@path_capture_names} };
+    $options->{path_captures} = $path_captures;
   }
 
   return 1;
@@ -750,7 +748,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
   my @path_capture_names = ($path_template =~ /\{([^{}]+)\}/g);
 
   foreach my $index_and_server (pairs indexed @$servers) {
-    my ($index, $server) = @$index_and_server;
+    my ($server_index, $server) = @$index_and_server;
 
     # We need a full uri to match against the full uri taken from the request (scheme and host)
     # we fall back to using the request's scheme, host and port, otherwise the match can never
@@ -791,38 +789,33 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 
     my @server_capture_names = ($server->{url} =~ /\{([^{}]+)\}/g);
 
-    my ($valid, %seen) = (1);
-    foreach my $name (@server_capture_names, @path_capture_names) {
-      # TODO: ideally this should be caught at document load time, but the use of $refs between
-      # /paths entries and path-items makes this difficult
-      $valid = E({ %$state, keyword => 'url', data_path => '/request/uri',
-            defined $base_schema_uri
-              ? (initial_schema_uri => $base_schema_uri, traversed_keyword_path => '', keyword_path => '/servers/'.$index)
-              : (keyword_path => $state->{keyword_path}.$more_keyword_path.'/servers/'.$index) },
-          'duplicate template name "%s" in server url and path template', $name)
-        if $seen{$name}++;
-    }
-    return if not $valid;
+    next if any {
+      my $server_capture_name = $server_capture_names[$_];
+      my ($index) = grep $path_capture_names[$_] eq $server_capture_name, 0..$#path_capture_names;
+      defined $index && uri_decode($path_capture_values[$index]) ne $server_capture_values[$_];
+    } 0..$#server_capture_names;
 
-    my %captures;
-    @captures{@server_capture_names} = @server_capture_values;
-
-    foreach my $name (@server_capture_names) {
+    my $valid = 1;
+    foreach my $name_index (0..$#server_capture_names) {
+      my $name = $server_capture_names[$name_index];
       next if not exists((($server->{variables}//{})->{$name}//{})->{enum});
 
       $valid = E({ %$state, data_path => '/request/uri', keyword => 'enum',
             defined $base_schema_uri
               ? (initial_schema_uri => $base_schema_uri, traversed_keyword_path => '',
-                  keyword_path => jsonp('/servers', $index, 'variables', $name))
-              : (keyword_path => jsonp($state->{keyword_path}.$more_keyword_path, 'servers', $index, 'variables', $name)) },
+                  keyword_path => jsonp('/servers', $server_index, 'variables', $name))
+              : (keyword_path => jsonp($state->{keyword_path}.$more_keyword_path, 'servers', $server_index, 'variables', $name)) },
           'server url value does not match any of the allowed values')
-        if not elem($captures{$name}, $server->{variables}{$name}{enum});
+        if not elem($server_capture_values[$name_index], $server->{variables}{$name}{enum});
     }
 
-    return if not $valid;
+    next if not $valid;
 
-    @captures{@path_capture_names} = @path_capture_values;
-    return \%captures;
+    my (%server_captures, %path_captures);
+    @server_captures{@server_capture_names} = @server_capture_values;
+    @path_captures{@path_capture_names} = @path_capture_values;
+
+    return \%server_captures, \%path_captures;
   }
 
   # no match against any servers urls
@@ -2408,7 +2401,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.145
+version 0.146
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

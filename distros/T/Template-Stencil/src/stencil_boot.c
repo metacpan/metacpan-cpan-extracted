@@ -14,8 +14,13 @@ static const char *stencil_scan_scalar(const char *p, const char *end)
     return hit ? hit : end;
 }
 
+/* cpuid.h first shipped in gcc 4.3; older x86 gccs (FreeBSD 9's base
+ * gcc 4.2.1) define __GNUC__ but lack the header, so without the version
+ * check caps stays 0 and the scalar paths are used there. */
 #if (defined(__x86_64__) || defined(__i386__) || defined(_M_X64)) \
-    && defined(__GNUC__)
+    && defined(__GNUC__) \
+    && (defined(__clang__) \
+        || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
 #  include <cpuid.h>
 #  define STENCIL_X86_CPUID 1
 static uint32_t stencil_x86_caps(void)

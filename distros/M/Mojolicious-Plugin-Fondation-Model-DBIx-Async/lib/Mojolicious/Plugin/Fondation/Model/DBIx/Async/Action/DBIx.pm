@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx;
-$Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx::VERSION = '0.05';
+$Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx::VERSION = '0.06';
 # ABSTRACT: Post-load action — discovers and registers DBIC Result/ResultSet
 # classes from plugins into the native DBIx::Class schema before workers fork.
 
@@ -40,30 +40,36 @@ sub after_load ($self, $long_name, $conf, $share_dir) {
 
     # Register Result classes on the native schema class
     # (before workers fork — so they inherit the sources)
+    # NOTE: failures here are FATAL (not swallowed) — a Result class that
+    # cannot load or register is a real bug (e.g. missing dependency such
+    # as DBIx::Class::TimeStamp) and must never fail silently.
     my %registered_results;
     for my $module (@result_modules) {
 
-        eval "require $module; 1" or do {
-            $self->log->warn("[$short] Cannot load Result $module: $@");
-            next;
-        };
+        eval "require $module; 1"
+            or die "[$short] Cannot load Result class $module: $@";
 
-        my $source = eval { $module->result_source_instance };
-        unless ($source) {
-            $self->log->warn("[$short] Cannot get result_source_instance for $module: $@");
+        # Skip abstract base classes that are not full Result classes
+        # (e.g. Schema::Result::Base — no table, no loaded components),
+        # they are not registerable sources.
+        unless ($module->can('result_source_instance')) {
+            $self->log->debug(
+                "[$short] Skipping non-Result class $module (no result_source_instance)");
             next;
         }
+
+        my $source = eval { $module->result_source_instance };
+        die "[$short] Cannot get result_source_instance for $module: $@"
+            unless $source;
+
         # Derive the source moniker from the class name (last segment(s)
         # after ::Result::), matching the standard DBIx::Class
         # load_namespaces convention (e.g. Result::UserGroup → 'UserGroup').
-        my ($moniker) = $module =~ /::Result::(.+)$/;
-        unless ($moniker) {
-            $self->log->warn("[$short] Cannot derive moniker from $module");
-            next;
-        }
+        my ($moniker) = $module =~ /::Result::(.+)$/
+            or die "[$short] Cannot derive source moniker from $module";
 
         eval { $schema_class->register_source($moniker, $source); 1 }
-            or $self->log->warn("[$short] register_source failed for $moniker: $@");
+            or die "[$short] register_source failed for '$moniker' ($module): $@";
 
         $registered_results{$moniker} = $module;
         $self->log->debug("[$short] Registered DBIC Result: $moniker ($module)");
@@ -101,7 +107,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx - Post-load act
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

@@ -2,23 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
+#include <errno.h>
 
 #include "ptypes.h"
 #define FUNC_isqrt 1
-#define FUNC_lcm_ui 1
 #define FUNC_ctz 1
+#define FUNC_gcd_ui 1
 #define FUNC_log2floor 1
 #define FUNC_is_perfect_square
 #define FUNC_next_prime_in_sieve 1
 #define FUNC_prev_prime_in_sieve 1
 #define FUNC_ipow 1
 #include "util.h"
+#include "moebius.h"
+#include "factmod.h"
 #include "sieve.h"
 #include "primality.h"
 #include "cache.h"
 #include "legendre_phi.h"
 #include "prime_counts.h"
 #include "prime_powers.h"
+#include "totients.h"
 #include "factor.h"
 #include "mulmod.h"
 #include "constants.h"
@@ -37,36 +41,70 @@ static int _call_gmp = 0;
 void _XS_set_callgmp(int v) { _call_gmp = v; }
 int  _XS_get_callgmp(void) { return _call_gmp; }
 
+static int _nobigint = 0;
+void _XS_set_nobigint(int v) { _nobigint = v; }
+int  _XS_get_nobigint(void) { return _nobigint; }
+
 static bool _secure = 0;
 void _XS_set_secure(void) { _secure = 1; }
 bool  _XS_get_secure(void) { return _secure; }
 
 /******************************************************************************/
 
-/* Returns 0 if not found, index+1 if found (returns leftmost if dups) */
-unsigned long index_in_sorted_uv_array(UV v, UV* L, unsigned long len)
+#if HAVE_UINT128
+void* mpu_aligned_alloc(UV count, Size_t size, Size_t alignment)
 {
-  unsigned long lo, hi;
+  unsigned char *raw;
+  uintptr_t addr;
+  Size_t overhead;
+
+  if (alignment < sizeof(void*) || (alignment & (alignment-1)) != 0 ||
+      alignment > MAX_SIZET - sizeof(void*) + 1)
+    croak("internal: invalid aligned allocation");
+  overhead = alignment - 1 + sizeof(void*);
+  if (size == 0 || count > (UV)((MAX_SIZET-overhead)/size))
+    croak("internal: aligned allocation too large");
+
+  New(0, raw, (Size_t)count*size + overhead, unsigned char);
+  if (raw == 0) croak("internal: aligned allocation failed");
+  addr = ((uintptr_t)raw + sizeof(void*) + alignment-1)
+       & ~((uintptr_t)alignment-1);
+  ((void**)addr)[-1] = raw;
+  return (void*)addr;
+}
+
+void mpu_aligned_free(void* ptr)
+{
+  if (ptr != 0) Safefree(((void**)ptr)[-1]);
+}
+#endif
+
+/******************************************************************************/
+
+/* Returns 0 if not found, index+1 if found (returns leftmost if dups) */
+size_t index_in_sorted_uv_array(UV v, const UV* L, size_t len)
+{
+  size_t lo, hi;
   if (len == 0 || v < L[0] || v > L[len-1])
     return 0;
   lo = 0;
   hi = len-1;
   while (lo < hi) {
-    unsigned long mid = lo + ((hi-lo) >> 1);
+    size_t mid = lo + ((hi-lo) >> 1);
     if (L[mid] < v)  lo = mid + 1;
     else             hi = mid;
   }
   return (L[lo] == v)  ?  lo+1  :  0;
 }
-unsigned long index_in_sorted_iv_array(IV v, IV* L, unsigned long len)
+size_t index_in_sorted_iv_array(IV v, const IV* L, size_t len)
 {
-  unsigned long lo, hi;
+  size_t lo, hi;
   if (len == 0 || v < L[0] || v > L[len-1])
     return 0;
   lo = 0;
   hi = len-1;
   while (lo < hi) {
-    unsigned long mid = lo + ((hi-lo) >> 1);
+    size_t mid = lo + ((hi-lo) >> 1);
     if (L[mid] < v)  lo = mid + 1;
     else             hi = mid;
   }
@@ -128,13 +166,27 @@ static const unsigned char prime_sieve30[] =
    0x3c,0xda,0xf5,0xcf};
 #define NPRIME_SIEVE30 (sizeof(prime_sieve30)/sizeof(prime_sieve30[0]))
 
-static const unsigned short primes_tiny[] =
+/* Small table of primes; primes_small[0]=0 then 2, 3, 5, 7, ... 2011 */
+const unsigned short primes_small[] =
   {0,2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,
    101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,
    193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,
    293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,
-   409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503};
-#define NPRIMES_TINY (sizeof(primes_tiny)/sizeof(primes_tiny[0]))
+   409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,
+   521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,
+   641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,
+   757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,
+   881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997,1009,
+   1013,1019,1021,1031,1033,1039,1049,1051,1061,1063,1069,1087,1091,1093,
+   1097,1103,1109,1117,1123,1129,1151,1153,1163,1171,1181,1187,1193,1201,
+   1213,1217,1223,1229,1231,1237,1249,1259,1277,1279,1283,1289,1291,1297,
+   1301,1303,1307,1319,1321,1327,1361,1367,1373,1381,1399,1409,1423,1427,
+   1429,1433,1439,1447,1451,1453,1459,1471,1481,1483,1487,1489,1493,1499,
+   1511,1523,1531,1543,1549,1553,1559,1567,1571,1579,1583,1597,1601,1607,
+   1609,1613,1619,1621,1627,1637,1657,1663,1667,1669,1693,1697,1699,1709,
+   1721,1723,1733,1741,1747,1753,1759,1777,1783,1787,1789,1801,1811,1823,
+   1831,1847,1861,1867,1871,1873,1877,1879,1889,1901,1907,1913,1931,1933,
+   1949,1951,1973,1979,1987,1993,1997,1999,2003,2011};
 
 /* Return true if n is prime, false if not.  Do it fast. */
 bool is_prime(UV n)
@@ -263,12 +315,22 @@ static int my_sprint(char* ptr, UV val) {
   while (--s > ptr) { char c = *s; *s = *ptr; *ptr++ = c; }
   return nchars;
 }
-static char* write_buf(int fd, char* buf, char* bend) {
-  int res = (int) write(fd, buf, bend-buf);
-  if (res == -1) croak("print_primes write error");
-  return buf;
+static bool write_buf(int fd, char* buf, char* bend) {
+  while (buf < bend) {
+    SSize_t res = write(fd, buf, bend-buf);
+    if (res < 0) {
+      if (errno == EINTR) continue;
+      return 0;
+    }
+    if (res == 0) {
+      errno = EIO;
+      return 0;
+    }
+    buf += res;
+  }
+  return 1;
 }
-void print_primes(UV low, UV high, int fd) {
+bool print_primes(UV low, UV high, int fd) {
   char buf[8000+25];
   char* bend = buf;
   if ((low <= 2) && (high >= 2)) bend += my_sprint(bend,2);
@@ -283,359 +345,16 @@ void print_primes(UV low, UV high, int fd) {
     while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
       START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
         bend += my_sprint(bend,p);
-        if (bend-buf > 8000) { bend = write_buf(fd, buf, bend); }
+        if (bend-buf > 8000) {
+          if (!write_buf(fd, buf, bend)) { end_segment_primes(ctx); return 0; }
+          bend = buf;
+        }
       END_DO_FOR_EACH_SIEVE_PRIME
     }
     end_segment_primes(ctx);
   }
-  if (bend > buf) { bend = write_buf(fd, buf, bend); }
-}
-
-/******************************************************************************/
-/*                     TOTIENT, MOEBIUS, MERTENS                              */
-/******************************************************************************/
-
-/* Return a char array with lo-hi+1 elements. mu[k-lo] = µ(k) for k = lo .. hi.
- * It is the callers responsibility to call Safefree on the result. */
-signed char* range_moebius(UV lo, UV hi)
-{
-  signed char* mu;
-  UV i, sqrtn = isqrt(hi), count = hi-lo+1;
-
-  /* Kuznetsov indicates that the Deléglise & Rivat (1996) method can be
-   * modified to work on logs, which allows us to operate with no
-   * intermediate memory at all.  Same time as the D&R method, less memory. */
-  unsigned char logp;
-  UV nextlog, nextlogi;
-
-  if (hi < lo) croak("range_mobius error hi %"UVuf" < lo %"UVuf"\n", hi, lo);
-
-  Newz(0, mu, count, signed char);
-  if (sqrtn*sqrtn != hi && sqrtn < (UVCONST(1)<<(BITS_PER_WORD/2))-1) sqrtn++;
-
-  /* For small ranges, do it by hand */
-  if (hi < 100 || count <= 10 || (hi > (1UL<<25) && count < icbrt(hi)/4)) {
-    for (i = 0; i < count; i++)
-      mu[i] = (signed char)moebius(lo+i);
-    return mu;
-  }
-
-  logp = 1; nextlog = 3; /* 2+1 */
-  START_DO_FOR_EACH_PRIME(2, sqrtn) {
-    UV p2 = p*p;
-    if (p > nextlog) {
-      logp += 2;   /* logp is 1 | ceil(log(p)/log(2)) */
-      nextlog = ((nextlog-1)*4)+1;
-    }
-    for (i = P_GT_LO(p, p, lo); i >= lo && i <= hi; i += p)
-      mu[i-lo] += logp;
-    for (i = P_GT_LO(p2, p2, lo); i >= lo && i <= hi; i += p2)
-      mu[i-lo] = (signed char)0x80;
-  } END_DO_FOR_EACH_PRIME
-
-  logp = (unsigned char)log2floor(lo);
-  nextlogi = (UVCONST(2) << logp) - lo;
-  for (i = 0; i < count; i++) {
-    unsigned char a = mu[i];
-    if (i >= nextlogi) nextlogi = (UVCONST(2) << ++logp) - lo;
-    if (a & 0x80)       { a = 0; }
-    else if (a >= logp) { a =  1 - 2*(a&1); }
-    else                { a = -1 + 2*(a&1); }
-    mu[i] = a;
-  }
-  if (lo == 0)  mu[0] = 0;
-
-  return mu;
-}
-
-static short* mertens_array(UV hi)
-{
-  signed char* mu;
-  short* M;
-  UV i;
-
-  /* We could blend this with range_moebius but it seems not worth it. */
-  mu = range_moebius(0, hi);
-  New(0, M, hi+1, short);
-  M[0] = 0;
-  for (i = 1; i <= hi; i++)
-    M[i] = M[i-1] + mu[i];
-  Safefree(mu);
-
-  return M;
-}
-
-
-#if 0
-IV mertens(UV n) {
-  /* See Deléglise and Rivat (1996) for O(n^2/3 log(log(n))^1/3) algorithm.
-   * This implementation uses their lemma 2.1 directly, so is ~ O(n).
-   * In serial it is quite a bit faster than segmented summation of mu
-   * ranges, though the latter seems to be a favored method for GPUs.
-   */
-  UV u, j, m, nmk, maxmu;
-  signed char* mu;
-  short* M;   /* 16 bits is enough range for all 32-bit M => 64-bit n */
-  IV sum;
-
-  if (n <= 1)  return n;
-  u = isqrt(n);
-  maxmu = (n/(u+1));              /* maxmu lets us handle u < sqrt(n) */
-  if (maxmu < u) maxmu = u;
-  mu = range_moebius(0, maxmu);
-  New(0, M, maxmu+1, short);      /* Works up to maxmu < 7613644886 */
-  M[0] = 0;
-  for (j = 1; j <= maxmu; j++)
-    M[j] = M[j-1] + mu[j];
-  sum = M[u];
-  for (m = 1; m <= u; m++) {
-    if (mu[m] != 0) {
-      IV inner_sum = 0;
-      UV lower = (u/m) + 1;
-      UV last_nmk = n/(m*lower);
-      UV this_k = 0;
-      UV next_k = n/(m*1);
-      UV nmkm = m * 2;
-      for (nmk = 1; nmk <= last_nmk; nmk++, nmkm += m) {
-        this_k = next_k;
-        next_k = n/nmkm;
-        inner_sum += M[nmk] * (this_k - next_k);
-      }
-      sum += (mu[m] > 0) ? -inner_sum : inner_sum;
-    }
-  }
-  Safefree(M);
-  Safefree(mu);
-  return sum;
-}
-#endif
-
-typedef struct {
-  UV n;
-  IV sum;
-} mertens_value_t;
-static void _insert_mert_hash(mertens_value_t *H, UV hsize, UV n, IV sum) {
-  UV idx = n % hsize;
-  H[idx].n = n;
-  H[idx].sum = sum;
-}
-static int _get_mert_hash(mertens_value_t *H, UV hsize, UV n, IV *sum) {
-  UV idx = n % hsize;
-  if (H[idx].n == n) {
-    *sum = H[idx].sum;
-    return 1;
-  }
-  return 0;
-}
-
-/* Thanks to Trizen for this algorithm. */
-static IV _rmertens(UV n, UV maxmu, short *M, mertens_value_t *H, UV hsize) {
-  UV s, k, ns, nk, nk1, mk, mnk;
-  IV sum;
-
-  if (n <= maxmu)
-    return M[n];
-
-  if (_get_mert_hash(H, hsize, n, &sum))
-    return sum;
-
-  s = isqrt(n);
-  ns = n / (s+1);
-  sum = 1;
-
-#if 0
-  for (k = 2; k <= ns; k++)
-    sum -= _rmertens(n/k, maxmu, M, H, hsize);
-  for (k = 1; k <= s; k++)
-    sum -= M[k] * (n/k - n/(k+1));
-#else
-  /* Take the above: merge the loops and iterate the divides. */
-  if (s != ns && s != ns+1) croak("mertens  s / ns");
-  nk  = n;
-  nk1 = n/2;
-  sum -= (nk - nk1);
-  for (k = 2; k <= ns; k++) {
-    nk = nk1;
-    nk1 = n/(k+1);
-    mnk = (nk <= maxmu)  ?  M[nk]  :  _rmertens(nk, maxmu, M, H, hsize);
-    mk  = (k  <= maxmu)  ?  M[k]   :  _rmertens(k,  maxmu, M, H, hsize);
-    sum -= mnk + mk * (nk-nk1);
-  }
-  if (s > ns)
-    sum -= _rmertens(s, maxmu, M, H, hsize) * (n/s - n/(s+1));
-#endif
-
-  _insert_mert_hash(H, hsize, n, sum);
-  return sum;
-}
-
-static short* _prep_rmertens(UV n, UV* pmaxmu, UV* phsize) {
-  UV j = icbrt(n);
-  UV maxmu = 1 * j * j;
-  UV hsize = next_prime(100 + 8*j);
-
-  /* At large sizes, start clamping memory use. */
-  if (maxmu > 100000000UL) {
-    /* Exponential decay, reduce by factor of 1 to 8 */
-    double rfactor = 1.0 + 7.0 * (1.0 - exp(-(double)maxmu/8000000000.0));
-    maxmu /= rfactor;
-    hsize = next_prime(hsize * 16);  /* Increase the result cache size */
-  }
-
-#if BITS_PER_WORD == 64
-  /* A 16-bit signed short will overflow at maxmu > 7613644883 */
-  if (maxmu > UVCONST(7613644883))  maxmu = UVCONST(7613644883);
-#endif
-
-  *pmaxmu = maxmu;
-  *phsize = hsize;
-  return mertens_array(maxmu);
-}
-
-IV mertens(UV n) {
-  UV j, maxmu, hsize;
-  short* M;   /* 16 bits is enough range for all 32-bit M => 64-bit n */
-  mertens_value_t *H;  /* Cache of calculated values */
-  IV sum;
-
-  if (n <= 512) {
-    static signed char MV16[33] = {0,-1,-4,-3,-1,-4,2,-4,-2,-1,0,-4,-5,-3,3,-1,-1,-3,-7,-2,-4,2,1,-1,-2,1,1,-3,-6,-6,-6,-5,-4};
-    j = n/16;
-    sum = MV16[j];
-    for (j = j*16 + 1; j <= n; j++)
-      sum += moebius(j);
-    return sum;
-  }
-
-  M = _prep_rmertens(n, &maxmu, &hsize);
-  Newz(0, H, hsize, mertens_value_t);
-
-  sum = _rmertens(n, maxmu, M, H, hsize);
-
-  Safefree(H);
-  Safefree(M);
-  return sum;
-}
-
-static const signed char _small_liouville[16] = {-1,1,-1,-1,1,-1,1,-1,-1,1,1,-1,-1,-1,1,1};
-
-static signed char* liouville_array(UV hi)
-{
-  signed char* l;
-  UV a, b, k;
-
-  if (hi < 16) hi = 15;
-  New(0, l, hi+1, signed char);
-  memcpy(l, _small_liouville, 16);
-  if (hi >= 16) memset(l+16, -1, hi-16+1);
-
-  for (a = 16; a <= hi; a = b+1) {
-    /* TODO: 2*a >= UV_MAX */
-    b = (2*a-1 <= hi)  ?  2*a-1  :  hi;
-    START_DO_FOR_EACH_PRIME(2, isqrt(b)) {
-      for (k = 2*p; k <= b; k += p) {
-        if (k >= a)
-          l[k] = -1 * l[k/p];
-      }
-    } END_DO_FOR_EACH_PRIME
-  }
-
-  return l;
-}
-
-int liouville(UV n) {
-  if (n < 16)
-    return _small_liouville[n];
-  else
-    return( (prime_bigomega(n) & 1) ? -1 : 1 );
-}
-
-IV sumliouville(UV n) {
-  short* M;
-  mertens_value_t *H;
-  UV j, maxmu, hsize, k, nk, sqrtn;
-  IV sum;
-
-  if (n <= 96) {
-    signed char* l = liouville_array(n);
-    for (sum = 0, j = 1; j <= n; j++)
-      sum += l[j];
-    Safefree(l);
-    return sum;
-  }
-
-  M = _prep_rmertens(n, &maxmu, &hsize);
-  Newz(0, H, hsize, mertens_value_t);
-
-  sqrtn = isqrt(n);
-  sum = _rmertens(n, maxmu, M, H, hsize);
-  for (k = 2; k <= sqrtn; k++) {
-    nk = n / (k*k);
-    if (nk == 1) break;
-    sum += (nk <= maxmu) ? M[nk] : _rmertens(nk, maxmu, M, H, hsize);
-  }
-  sum += (sqrtn + 1 - k);  /* all k where n/(k*k) == 1 */
-  /* TODO: find method to get exact number of n/(k*k)==1 .. 4.  Halves k */
-  /*       Ends up with method like Lehmer's g. */
-
-  Safefree(H);
-  Safefree(M);
-  return sum;
-}
-
-/* This paper shows an algorithm for sieving an interval:
- *https://www.ams.org/journals/mcom/2008-77-263/S0025-5718-08-02036-X/S0025-5718-08-02036-X.pdf */
-signed char* range_liouville(UV lo, UV hi)
-{
-  UV i;
-  signed char *l;
-  unsigned char *nf;
-
-  if (hi < lo) croak("range_liouvillle error hi %"UVuf" < lo %"UVuf"\n",hi,lo);
-  nf = range_nfactor_sieve(lo, hi, 1);
-  New(0, l, hi-lo+1, signed char);
-  for (i = 0; i < hi-lo+1; i++)
-    l[i] = (nf[i] & 1) ? -1 : 1;
-  Safefree(nf);
-  return l;
-}
-
-UV carmichael_lambda(UV n) {
-  const unsigned char _totient[8] = {0,1,1,2,2,4,2,6};
-  uint32_t i;
-  UV lambda = 1;
-
-  if (n < 8) return _totient[n];
-  if ((n & (n-1)) == 0) return n >> 2;
-
-  i = ctz(n);
-  if (i > 0) {
-    n >>= i;
-    lambda <<= (i>2) ? i-2 : i-1;
-  }
-  {
-#if 1 /* This is very slightly faster */
-    UV fac[MPU_MAX_FACTORS+1];
-    uint32_t nfactors = factor(n, fac);
-    for (i = 0; i < nfactors; i++) {
-      UV p = fac[i], pk = p-1;
-      while (i+1 < nfactors && p == fac[i+1]) {
-        i++;
-        pk *= p;
-      }
-      lambda = lcm_ui(lambda, pk);
-    }
-#else
-    factored_t nf = factorint(n);
-    for (i = 0; i < nf.nfactors; i++) {
-      UV p = nf.f[i], pk = p-1, e = nf.e[i];
-      while (e-- > 1)
-        pk *= p;
-      lambda = lcm_ui(lambda, pk);
-    }
-#endif
-  }
-  return lambda;
+  if (bend > buf && !write_buf(fd, buf, bend)) return 0;
+  return 1;
 }
 
 
@@ -752,8 +471,10 @@ static const uint32_t root_max[1+MPU_MAX_POW3] = {0,0,4294967295U,2642245,65535,
 static const uint32_t root_max[1+MPU_MAX_POW3] = {0,0,65535,1625,255,84,40,23,15,11,9,7,6,5,4,4,3,3,3,3,3};
 #endif
 
-UV rootint(UV n, uint32_t k)
+UV rootint(UV n, UV k)
 {
+  uint32_t k32;
+
   if (n <= 1) return (k != 0 && n != 0);
 
   switch (k) {
@@ -770,26 +491,36 @@ UV rootint(UV n, uint32_t k)
   /*  32-bit:       10               16                 20       */
   /*  64-bit:       15               32                 40       */
 
-  if (n >> k == 0)           return 1;
+  if (k >= BITS_PER_WORD || n >> k == 0)  return 1;
+  k32 = (uint32_t) k;
 
-  if (k <= MAX_IROOTN)       return _irootn(n,k);
+  if (k32 <= MAX_IROOTN)        return _irootn(n,k32);
 
-  if (k > MPU_MAX_POW3)      return 1 + (k < BITS_PER_WORD);
-  if (k >= BITS_PER_WORD/2)  return 2 + (n >= ipow(3,k));
+  if (k32 > MPU_MAX_POW3)       return 1 + (k32 < BITS_PER_WORD);
+  if (k32 >= BITS_PER_WORD/2)   return 2 + (n >= ipow(3,k32));
 
   /* k is now in range 11-15 (32-bit), 16-31 (64-bit).  Binary search. */
   {
-    uint32_t lo = 1U << (log2floor(n)/k);
-    uint32_t hi = root_max[k];
+    uint32_t lo = 1U << (log2floor(n)/k32);
+    uint32_t hi = root_max[k32];
     if (hi >= lo*2) hi = lo*2 - 1;
 
     while (lo < hi) {
       uint32_t mid = lo + (hi-lo+1)/2;
-      if (ipow(mid,k) > n) hi = mid-1;
+      if (ipow(mid,k32) > n) hi = mid-1;
       else                 lo = mid;
     }
     return lo;
   }
+}
+
+UV crootint(UV n, UV k)
+{
+  UV r;
+  if (k == 0) return 0;
+  if (n <= 1 || k == 1) return n;
+  r = rootint(n, k);
+  return r + (ipowsafe(r, k) < n);
 }
 
 /* Like ipow but returns UV_MAX if overflow */
@@ -827,9 +558,9 @@ static const uint32_t _rootmask32[41] = {
   0xf7fffffe,0xfffdfffe,0xfff7fffe,0xfdfffffe,0xfffff7fe,0xfffffffc /* 35-40 */
 };
 
-bool is_power_ret(UV n, uint32_t k, uint32_t *root)
+bool is_power_ret(UV n, UV k, uint32_t *root)
 {
-  uint32_t r, msbit;
+  uint32_t r, msbit, k32;
 
   /* Simple edge cases */
   if (n < 2 || k == 1) {
@@ -842,24 +573,25 @@ bool is_power_ret(UV n, uint32_t k, uint32_t *root)
     if (root) *root = 2;
     return (k < BITS_PER_WORD && n == (UV)1 << k);
   }
+  k32 = (uint32_t) k;
 
-  if (k == 2) return is_perfect_square_ret(n,root);
+  if (k32 == 2) return is_perfect_square_ret(n,root);
 
   /* Filter out many numbers which cannot be k-th roots */
-  if ((1U << (n&31)) & _rootmask32[k]) return 0;
+  if ((1U << (n&31)) & _rootmask32[k32]) return 0;
 
-  if (k == 3) {
+  if (k32 == 3) {
     r = n % 117; if ((r*833230740) & (r*120676722) & 813764715) return 0;
     r = icbrt(n);
     if (root) *root = r;
     return (UV)r*r*r == n;
   }
 
-  for (msbit = 8 /* k >= 4 */; k >= msbit; msbit <<= 1)  ;
+  for (msbit = 8 /* k >= 4 */; k32 >= msbit; msbit <<= 1)  ;
   msbit >>= 1;
-  r = _est_root(n, k, msbit);
+  r = _est_root(n, k32, msbit);
   if (root) *root = r;
-  return _ipow(r, k, msbit) == n;
+  return _ipow(r, k32, msbit) == n;
 }
 
 #define PORET(base,exp)  do { \
@@ -948,14 +680,16 @@ UV valuation(UV n, UV k)
   if (k < 2 || n < 2) return 0;
   if (k == 2) return ctz(n);
   while ( !(n % kpower) ) {
-    kpower *= k;
     v++;
+    if (kpower > n/k) break;
+    kpower *= k;
   }
   return v;
 }
 /* N => k^s * t   =>   s = valuation_remainder(N, k, &t); */
 UV valuation_remainder(UV n, UV k, UV *r) {
   UV v;
+  MPUassert(n > 0, "valuation_remainder: n must be > 0");
   if      (k <= 1) { v = 0; }
   else if (k == 2) { v = ctz(n); n >>= v; }
   else {
@@ -985,8 +719,15 @@ UV logint(UV n, UV b)
 
 unsigned char* range_issquarefree(UV lo, UV hi) {
   unsigned char* isf;
-  UV i, p2, range = hi-lo+1, sqrthi = isqrt(hi);
+  UV i, p2, range, sqrthi;
+
   if (hi < lo) return 0;
+  if (hi-lo == UV_MAX || hi-lo+1 > (UV)MAX_SIZET)
+    croak("range_issquarefree: range too large");
+
+  range = hi - lo + 1;
+  sqrthi = isqrt(hi);
+
   New(0, isf, range, unsigned char);
   memset(isf, 1, range);
   if (lo == 0) isf[0] = 0;
@@ -994,8 +735,8 @@ unsigned char* range_issquarefree(UV lo, UV hi) {
   { /* Sieve multiples of 2^2,3^2,5^2 */
     UV p = 2;
     while (p < 7 && p <= sqrthi) {
-      for (p2=p*p, i = P_GT_LO(p2, p2, lo); i >= lo && i <= hi; i += p2)
-        isf[i-lo] = 0;
+      for (p2=p*p, i = P_GT_LO_0(p2, p2, lo); i < range; i += p2)
+        isf[i] = 0;
       p += 1 + (p > 2);
     }
   }
@@ -1005,8 +746,11 @@ unsigned char* range_issquarefree(UV lo, UV hi) {
     void* ctx = start_segment_primes(7, sqrthi, &segment);
     while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
       START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
-        for (p2=p*p, i = P_GT_LO(p2, p2, lo); i >= lo && i <= hi; i += p2)
-          isf[i-lo] = 0;
+        for (p2=p*p, i = P_GT_LO_0(p2, p2, lo); i < range; i += p2) {
+          isf[i] = 0;
+          if (range-i <= p2)
+            break;
+        }
       END_DO_FOR_EACH_SIEVE_PRIME
     }
     end_segment_primes(ctx);
@@ -1028,7 +772,7 @@ UV powersum(UV n, UV k)
   UV a, a2, i, sum;
 
   if (n <= 1 || k == 0) return n;
-  if (k >= BITS_PER_WORD || n > _max_ps_n[k]) return 0;
+  if (k >= BITS_PER_WORD || n > _max_ps_n[k]) return UV_MAX;
   if (n == 2) return 1 + (UVCONST(1) << k);
 
   a = (n+1)/2 * (n|1);    /* (n*(n+1))/2 */
@@ -1062,15 +806,18 @@ UV powersum(UV n, UV k)
 }
 
 
-UV mpu_popcount_string(const char* ptr, uint32_t len)
+UV mpu_popcount_string(const char* ptr, STRLEN len)
 {
-  uint32_t count = 0, i, j, d, v, power, slen, *s, *sptr;
+  UV count = 0;
+  STRLEN i, slen;
+  uint32_t j, d, v, power, *s, *sptr;
 
   while (len > 0 && (*ptr == '0' || *ptr == '+' || *ptr == '-'))
     {  ptr++;  len--;  }
+  if (len == 0) return 0;
 
   /* Create s as array of base 10^8 numbers */
-  slen = (len + 7) / 8;
+  slen = len / 8 + (len % 8 != 0);
   Newz(0, s, slen, uint32_t);
   for (i = 0; i < slen; i++) {  /* Chunks of 8 digits */
     for (j = 0, d = 0, power = 1;  j < 8 && len > 0;  j++, power *= 10) {
@@ -1121,6 +868,7 @@ static int kronecker_uu_sign(UV a, UV b, int s) {
 
 int kronecker_uu(UV a, UV b) {
   int r, s;
+  if (b == 0)  return (a == 1);
   if (b & 1)   return kronecker_uu_sign(a, b, 1);
   if (!(a&1))  return 0;
   s = 1;
@@ -1144,9 +892,8 @@ int kronecker_su(IV a, UV b) {
     if ((r&1) && IS_MOD8_3OR5(a))  s = -s;
     b >>= r;
   }
-  rem = (-a) % b;
-  a = (rem == 0) ? 0 : b-rem;
-  return kronecker_uu_sign(a, b, s);
+  rem = ((UV)0 - (UV)a) % b;
+  return kronecker_uu_sign((rem == 0) ? 0 : b-rem, b, s);
 }
 
 int kronecker_ss(IV a, IV b) {
@@ -1154,7 +901,7 @@ int kronecker_ss(IV a, IV b) {
     return (b & 1)  ?  kronecker_uu_sign(a, b, 1)  :  kronecker_uu(a,b);
   if (b >= 0)
     return kronecker_su(a, b);
-  return kronecker_su(a, -b) * ((a < 0) ? -1 : 1);
+  return kronecker_su(a, (UV)0 - (UV)b) * ((a < 0) ? -1 : 1);
 }
 
 #define MAX_PNPRIM ( (BITS_PER_WORD == 64) ? 15 : 9 )
@@ -1191,12 +938,32 @@ UV subfactorial(UV n) {
   return (n * subfactorial(n-1) + ((n & 1) ? -1 : 1));
 }
 
+UV multifactorial(UV n, UV k) {
+  UV i, r = 1;
+  if (k == 0) return 0;
+  for (i = n; i > 0; ) {
+    if (r > UV_MAX / i) return 0;
+    r *= i;
+    if (i <= k) break;
+    i -= k;
+  }
+  return r;
+}
+
 UV binomial(UV n, UV k) {    /* Thanks to MJD and RosettaCode for ideas */
   UV d, g, r = 1;
   if (k == 0) return 1;
   if (k == 1) return n;
   if (k >= n) return (k == n);
   if (k > n/2) k = n-k;
+  /* Quick check of values that we know will overflow a UV */
+#if BITS_PER_WORD == 64
+  if ((n >= 73 && k >= 25) || (n >= 92 && k >= 19) || (n >= 131 && k >= 15))
+    return 0;
+#else
+  if ((n >= 40 && k >= 12) || (n >= 64 && k >=  8) || (n >= 124 && k >=  6))
+    return 0;
+#endif
   for (d = 1; d <= k; d++) {
     if (r >= UV_MAX/n) {  /* Possible overflow */
       UV nr, dr;  /* reduced numerator / denominator */
@@ -1211,6 +978,13 @@ UV binomial(UV n, UV k) {    /* Thanks to MJD and RosettaCode for ideas */
       r /= d;
     }
   }
+  return r;
+}
+
+UV catalan_number(UV n) {
+  UV r = binomial(2*n,n);
+  if (r != 0)
+    r /= (n+1);
   return r;
 }
 
@@ -1253,7 +1027,8 @@ IV stirling2(UV n, UV m) {
 }
 
 IV stirling1(UV n, UV m) {
-  IV k, t, b1, b2, s2, s = 0;
+  UV b1, b2;
+  IV k, t, s2, s = 0;
 
   if (m == n) return 1;
   if (n == 0 || m == 0 || m > n) return 0;
@@ -1267,13 +1042,29 @@ IV stirling1(UV n, UV m) {
     b1 = binomial(k + n - 1, n - m + k);
     b2 = binomial(2 * n - m, n - m - k);
     s2 = stirling2(n - m + k, k);
-    if (b1 == 0 || b2 == 0 || s2 == 0 || b1 > IV_MAX/b2) return 0;
-    t = b1 * b2;
+    if (b1 == 0 || b2 == 0 || s2 == 0 || b1 > (UV)IV_MAX/b2) return 0;
+    t = (IV)(b1 * b2);
     if (s2 > IV_MAX/t) return 0;
     t *= s2;
     s += (k & 1) ? -t : t;
   }
   return s;
+}
+
+UV bell_number(UV n) {
+  UV row[27], next[27];
+  uint32_t i,j;
+  if (n <= 1) return 1;
+  if (n >= ((BITS_PER_WORD == 64) ? 26 : 16))  return 0;
+  row[0] = 1;
+  for (i = 1; i <= n; i++) {
+    next[0] = row[i-1];
+    for (j = 0; j < i; j++)
+      next[j+1] = next[j] + row[j];
+    for (j = 0; j <= i; j++)
+      row[j] = next[j];
+  }
+  return row[0];
 }
 
 UV fubini(UV n) {
@@ -1305,13 +1096,15 @@ UV rising_factorial(UV n, UV m)
 
 IV falling_factorial_s(IV n, UV m)
 {
-  UV r = (n>=0) ? falling_factorial(n,m) : rising_factorial(-n,m);
+  UV un = (n >= 0) ? (UV)n : (UV)0 - (UV)n;
+  UV r = (n >= 0) ? falling_factorial(un,m) : rising_factorial(un,m);
   if (r >= IV_MAX) return IV_MAX;  /* Overflow */
   return (n < 0 && (m&1)) ? -(IV)r : (IV)r;
 }
 IV rising_factorial_s(IV n, UV m)
 {
-  UV r = (n>=0) ? rising_factorial(n,m) : falling_factorial(-n,m);
+  UV un = (n >= 0) ? (UV)n : (UV)0 - (UV)n;
+  UV r = (n >= 0) ? rising_factorial(un,m) : falling_factorial(un,m);
   if (r >= IV_MAX) return IV_MAX;  /* Overflow */
   return (n < 0 && (m&1)) ? -(IV)r : (IV)r;
 }
@@ -1519,7 +1312,7 @@ bool is_semiprime(UV n) {
   /* 27% of random inputs left */
   n3 = icbrt(n);
   for (sp = 4; sp < 60; sp++) {
-    p = primes_tiny[sp];
+    p = primes_small[sp];
     if (p > n3)
       break;
     if ((n % p) == 0)
@@ -1544,7 +1337,8 @@ bool is_almost_prime(UV k, UV n) {
   if (k == 1) return is_prob_prime(n);
   if (k == 2) return is_semiprime(n);
 
-  if ((n >> k) == 0) return 0;  /* The smallest k-almost prime is 2^k */
+  /* The smallest k-almost prime is 2^k. */
+  if (k >= BITS_PER_WORD || (n >> k) == 0) return 0;
 
   while (k > 0 && !(n& 1)) { k--; n >>= 1; }
   while (k > 0 && !(n% 3)) { k--; n /=  3; }
@@ -1552,14 +1346,14 @@ bool is_almost_prime(UV k, UV n) {
   while (k > 0 && !(n% 7)) { k--; n /=  7; }
   p = 11;
   if (k >= 5) {
-    for (sp = 5; k > 1 && n > 1 && sp < NPRIMES_TINY-1; sp++) {
-      p = primes_tiny[sp];
+    for (sp = 5; k > 1 && n > 1 && sp < NPRIMES_SMALL-1; sp++) {
+      p = primes_small[sp];
       if (n < ipowsafe(p,k))
         return 0;
       while ((n % p) == 0 && k > 0)
         { k--; n /= p; }
     }
-    p = primes_tiny[sp];
+    p = primes_small[sp];
   }
   if (k == 0) return (n == 1);
   if (k == 1) return is_prob_prime(n);
@@ -1602,23 +1396,6 @@ UV pillai_v(UV n) {
   return 0;
 }
 
-
-#define MOB_TESTP(p) \
-  { uint32_t psq = p*p;  if (n >= psq && (n % psq) == 0) return 0; }
-
-/* mpu 'for (0..255) { $x=moebius($_)+1; $b[$_ >> 4] |= ($x << (2*($_%16))); } say join ",",@b;' */
-static const uint32_t _smoebius[16] = {2703565065U,23406865,620863913,1630114197,157354249,2844895525U,2166423889U,363177345,2835441929U,2709852521U,1095049497,92897577,1772687649,162113833,160497957,689538385};
-int moebius(UV n) {
-  if (n < 256)  return (int)((_smoebius[n >> 4] >> (2*(n % 16))) & 3) - 1;
-
-  if (!(n % 4) || !(n % 9) || !(n % 25) || !(n % 49) || !(n %121) || !(n %169))
-    return 0;
-
-  MOB_TESTP(17); MOB_TESTP(19); MOB_TESTP(23);
-  MOB_TESTP(29); MOB_TESTP(31); MOB_TESTP(37);
-
-  return factored_moebius(factorint(n));
-}
 
 #define ISF_TESTP(p) \
   { uint32_t psq = p*p;  if (psq > n) return 1;  if ((n % psq) == 0) return 0; }
@@ -1978,9 +1755,81 @@ UV ivmod(IV a, UV n) {   /* a mod n with signed a (0 <= r < n) */
   if (a >= 0) {
     return (UV)(a) % n;
   } else {
-    UV r = (UV)(-a) % n;
+    UV r = ((UV)0 - (UV)a) % n;
     return (r == 0)  ?  0  :  n-r;
   }
+}
+
+bool muladd_uv_signmag(int *sign, UV *hi, UV *lo,
+                       UV a, UV b, UV c,
+                       int asign, int bsign, int csign)
+{
+  int prodneg = (asign == -1) ^ (bsign == -1);
+  int cneg = (csign == -1);
+
+#if BITS_PER_WORD == 64 && HAVE_UINT128
+  uint128_t prod = (uint128_t)a * (uint128_t)b;
+  uint128_t ret;
+
+  if (prodneg == cneg) {
+    ret = prod + c;
+    *sign = prodneg ? -1 : 1;
+  } else if (prod >= c) {
+    ret = prod - c;
+    *sign = prodneg ? -1 : 1;
+  } else {
+    ret = (uint128_t)c - prod;
+    *sign = cneg ? -1 : 1;
+  }
+
+  if (ret == 0) *sign = 0;
+  *hi = (UV)(ret >> BITS_PER_WORD);
+  *lo = (UV) ret;
+  return 1;
+#elif BITS_PER_WORD == 32 && HAVE_UINT64
+  uint64_t prod = (uint64_t)a * (uint64_t)b;
+  uint64_t ret;
+
+  if (prodneg == cneg) {
+    ret = prod + c;
+    *sign = prodneg ? -1 : 1;
+  } else if (prod >= c) {
+    ret = prod - c;
+    *sign = prodneg ? -1 : 1;
+  } else {
+    ret = (uint64_t)c - prod;
+    *sign = cneg ? -1 : 1;
+  }
+
+  if (ret == 0) *sign = 0;
+  *hi = (UV)(ret >> BITS_PER_WORD);
+  *lo = (UV) ret;
+  return 1;
+#else
+  int overflow;
+  UV prod, ret = 0;
+
+  overflow = (a > 0 && UV_MAX/a < b);
+  if (overflow) return 0;
+
+  prod = a * b;
+  if (prodneg == cneg) {
+    if (UV_MAX - prod < c) return 0;
+    ret = prod + c;
+    *sign = prodneg ? -1 : 1;
+  } else if (prod >= c) {
+    ret = prod - c;
+    *sign = prodneg ? -1 : 1;
+  } else {
+    ret = c - prod;
+    *sign = cneg ? -1 : 1;
+  }
+
+  if (ret == 0) *sign = 0;
+  *hi = 0;
+  *lo = ret;
+  return 1;
+#endif
 }
 
 #if 0
@@ -1993,377 +1842,6 @@ int is_regular(UV a, UV n) {  /* there exists an x s.t. a^2*x = a mod n */
 #endif
 
 
-/******************************************************************************/
-/*                                  N! MOD M                                  */
-/******************************************************************************/
-
-static UV _powersin(UV p, UV d) {
-  UV td = d/p, e = td;
-  do { td/=p; e += td; } while (td > 0);
-  return e;
-}
-
-static UV _facmod(UV n, UV m) {
-  UV i, res = 1;
-
-  if (n < 1000) {
-
-    for (i = 2; i <= n && res != 0; i++)
-      res = mulmod(res,i,m);
-
-  } else {
-
-    unsigned char* segment;
-    UV seg_base, seg_low, seg_high;
-    UV sqn = isqrt(n), nsqn = n/sqn, j = sqn, nlo = 0, nhi = 0, s1 = 1;
-    void* ctx = start_segment_primes(7, n, &segment);
-
-    for (i = 1; i <= 3; i++) {  /* Handle 2,3,5 assume n>=25*/
-      UV p = primes_tiny[i];
-      res = mulmod(res, powmod(p,_powersin(p, n),m), m);
-    }
-    while (res!=0 && next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
-      START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
-        if (p <= nsqn) {
-          res = mulmod(res, powmod(p,_powersin(p,n),m), m);
-        } else {
-          while (p > nhi) {
-            res = mulmod(res, powmod(s1,j,m), m);
-            s1 = 1;
-            j--;
-            nlo = n/(j+1)+1;
-            nhi = n/j;
-          }
-          if (p >= nlo)
-            s1 = mulmod(s1, p, m);
-        }
-        if (res == 0) break;
-      END_DO_FOR_EACH_SIEVE_PRIME
-    }
-    end_segment_primes(ctx);
-    res = mulmod(res, s1, m);
-
-  }
-
-  return res;
-}
-#if USE_MONTMATH
-static UV _facmod_mont(UV n, UV m) {
-  const uint64_t npi = mont_inverse(m),  mont1 = mont_get1(m);
-  uint64_t monti = mont1;
-  UV i, res = mont1;
-
-  if (n < 1000) {
-
-    for (i = 2; i <= n && res != 0; i++) {
-      monti = addmod(monti,mont1,m);
-      res = mont_mulmod(res,monti,m);
-    }
-
-  } else {
-
-    unsigned char* segment;
-    UV seg_base, seg_low, seg_high;
-    UV sqn = isqrt(n), nsqn = n/sqn, j = sqn, nlo = 0, nhi = 0;
-    UV s1 = mont1;
-    void* ctx = start_segment_primes(7, n, &segment);
-
-    for (i = 1; i <= 3; i++) {  /* Handle 2,3,5 assume n>=25*/
-      UV p = primes_tiny[i];
-      UV mp = mont_geta(p,m);
-      res = mont_mulmod(res, mont_powmod(mp,_powersin(p,n),m), m);
-    }
-    while (res!=0 && next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
-      START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
-        UV mp = mont_geta(p,m);
-        if (p <= nsqn) {
-          res = mont_mulmod(res, mont_powmod(mp,_powersin(p,n),m), m);
-        } else {
-          while (p > nhi) {
-            res = mont_mulmod(res, mont_powmod(s1,j,m), m);
-            s1 = mont1;
-            j--;
-            nlo = n/(j+1)+1;
-            nhi = n/j;
-          }
-          if (p >= nlo)
-            s1 = mont_mulmod(s1, mp, m);
-        }
-        if (res == 0) break;
-      END_DO_FOR_EACH_SIEVE_PRIME
-    }
-    end_segment_primes(ctx);
-    res = mont_mulmod(res, s1, m);
-
-  }
-
-  res = mont_recover(res, m);
-  return res;
-}
-#endif
-
-UV factorialmod(UV n, UV m) {  /*  n! mod m */
-  UV d = n, res = 1;
-  uint32_t i;
-  bool m_prime;
-
-  if (n >= m || m == 1) return 0;
-  if (n <= 1 || m == 2) return (n <= 1);
-
-  if (n <= 10) { /* Keep things simple for small n */
-    for (i = 2; i <= n && res != 0; i++)
-      res = (res * i) % m;
-    return res;
-  }
-
-  m_prime = is_prime(m);
-  if (n > m/2 && m_prime)    /* Check if we can go backwards */
-    d = m-n-1;
-  if (d < 2)
-    return (d == 0) ? m-1 : 1;   /* Wilson's Theorem: n = m-1 and n = m-2 */
-
-  if (d > 100 && !m_prime) {   /* Check for composite m that leads to 0 */
-    factored_t mf = factorint(m);
-    UV maxpk = 0;
-    for (i = 0; i < mf.nfactors; i++) {
-      UV t = mf.f[i] * mf.e[i];   /* Possibly too high if exp[j] > fac[j] */
-      if (t > maxpk)
-        maxpk = t;
-    }
-    /* Maxpk is >= S(m), the Kempner number A002034 */
-    if (n >= maxpk)
-      return 0;
-  }
-
-#if USE_MONTMATH
-  if (m & 1) {
-    res = _facmod_mont(d, m);
-  } else
-#endif
-  {
-    res = _facmod(d, m);
-  }
-
-  if (d != n && res != 0) {      /* Handle backwards case */
-    if (!(d&1)) res = submod(m,res,m);
-    res = modinverse(res,m);
-  }
-
-  return res;
-}
-
-
-/******************************************************************************/
-/*                          BINOMIAL(N,K) MOD M                               */
-/******************************************************************************/
-
-static UV _factorial_valuation(UV n, UV p) {
-  UV k = 0;
-  while (n >= p) {
-    n /= p;
-    k += n;
-  }
-  return k;
-}
-static int _binoval(UV n, UV k, UV m) {
-  return _factorial_valuation(n,m) - _factorial_valuation(k,m) - _factorial_valuation(n-k,m);
-}
-static UV _factorialmod_without_prime(UV n, UV p, UV m) {
-  UV i, pmod, r = 1;
-  MPUassert(p >= 2 && m >= p && (m % p) == 0, "_factorialmod called with wrong args");
-  if (n <= 1) return 1;
-
-  if (n >= m) {
-    /* Note with p=2 the behaviour is different */
-    if ( ((n/m) & 1) && (p > 2 || m == 4) )  r = m-1;
-    n %= m;
-  }
-
-#if USE_MONTMATH
-  if (m & 1) {
-    const uint64_t npi = mont_inverse(m),  mont1 = mont_get1(m);
-    uint64_t mi = mont1;
-    r = mont_geta(r, m);
-    for (i = pmod = 2; i <= n; i++) {
-      mi = addmod(mi, mont1, m);
-      if (pmod++ == p) pmod = 1;
-      else             r = mont_mulmod(r, mi, m);
-    }
-    r = mont_recover(r, m);
-  } else
-#endif
-  {
-    for (i = pmod = 2; i <= n; i++) {
-      if (pmod++ == p) pmod = 1;
-      else             r = mulmod(r, i, m);
-    }
-  }
-  return r;
-}
-static UV _factorialmod_without_prime_powers(UV n, UV p, UV m) {
-  UV ip, r = 1;
-
-  for (ip = n; ip > 1; ip /= p)
-    r = mulmod(r, _factorialmod_without_prime(ip, p, m), m);
-
-  return r;
-}
-static UV _binomial_mod_prime_power(UV n, UV k, UV p, UV e) {
-  UV r, b, m, i, num, den, ip, ires;
-
-  if (k > n) return 0;
-  if (k == 0 || k == n) return 1;
-  if (k > n/2)  k = n-k;
-
-  b = _binoval(n,k,p);
-  if (e <= b) return 0;
-  m = ipow(p,e);
-
-  if (k == 1) return n % m;
-
-  /* Both methods work fine -- choose based on performance. */
-  den  = _factorialmod_without_prime_powers(k, p, m);
-  if (k >= m) {
-    num  = _factorialmod_without_prime_powers(n, p, m);
-    ip   = _factorialmod_without_prime_powers(n-k, p, m);
-    den = mulmod(den, ip, m);
-  } else {
-#if USE_MONTMATH
-    if (m & 1) {
-      const uint64_t npi = mont_inverse(m),  mont1 = mont_get1(m);
-      num = mont1;
-      for (i = n-k+1, ires = (i-1)%p; i <= n; i++) {
-        ip = i;
-        if (++ires == p) { ires = 0; do { ip /= p; } while ((ip % p) == 0); }
-        num = mont_mulmod(num, mont_geta(ip, m), m);
-      }
-      num = mont_recover(num, m);
-    } else
-#endif
-    {
-      num = 1;
-      for (i = n-k+1, ires = (i-1) % p; i <= n; i++) {
-        ip = i;
-        if (++ires == p) { ires = 0; do { ip /= p; } while ((ip % p) == 0); }
-        num = mulmod(num, ip, m);
-      }
-    }
-  }
-
-  r = divmod(num, den, m);
-  if (b > 0) r = mulmod(r, ipow(p,b), m);
-  return r;
-}
-
-static UV _binomial_lucas_mod_prime(UV n, UV k, UV p) {
-  UV res, t, vn[BITS_PER_WORD], vk[BITS_PER_WORD];
-  int i, ln, lk;
-
-  if (p < 2) return 0;
-  if (p == 2) return !(~n & k);
-
-  for (t = n, ln = 0; t > 0; t /= p)
-    vn[ln++] = t % p;
-  for (t = k, lk = 0; t > 0; t /= p)
-    vk[lk++] = t % p;
-
-  res = 1;
-  for (i = ln-1; i >= 0; i--) {
-    UV ni = vn[i];
-    UV ki = (i < lk) ? vk[i] : 0;
-    res = mulmod(res, _binomial_mod_prime_power(ni, ki, p, 1), p);
-  }
-  return res;
-}
-
-/* Based on Granville's paper on the generalization of Lucas's theorem to
- * prime powers: https://www.dms.umontreal.ca/~andrew/Binomial/genlucas.html
- * and Max Alekseyev's binomod.gp program. */
-static UV _binomial_lucas_mod_prime_power(UV n, UV k, UV p, UV q) {
-  UV N[BITS_PER_WORD], K[BITS_PER_WORD], R[BITS_PER_WORD], e[BITS_PER_WORD];
-  UV i, d, m, n1, k1, r1, m1, res;
-
-  MPUassert(q < BITS_PER_WORD, "bad exponent in binomialmod generalized lucas");
-  m = ipow(p, q);
-
-  /* Construct the digits for N, K, and N-K (R). */
-  n1 = n;   k1 = k;  r1 = n-k;
-  for (d = 0; n1 > 0; d++) {
-    N[d] = n1 % p;  n1 /= p;
-    K[d] = k1 % p;  k1 /= p;
-    R[d] = r1 % p;  r1 /= p;
-  }
-  /* Compute the number of carries. */
-  for (i = 0; i < d; i++)
-    e[i] = (N[i] < (K[i] + ((i > 0) ? e[i-1] : 0)));
-  /* Turn the carries into a cumulative count. */
-  for (i = d-1; i >= 1; i--)
-    e[i-1] += e[i];
-
-  if (e[0] >= q) return 0;
-  q -= e[0];
-  m1 = ipow(p, q);
-
-  /* Now make the digits for the reduced N, K, N-K */
-  n1 = n;   k1 = k;  r1 = n-k;
-  for (d = 0; n1 > 0; d++) {
-    N[d] = n1 % m1;  n1 /= p;
-    K[d] = k1 % m1;  k1 /= p;
-    R[d] = r1 % m1;  r1 /= p;
-  }
-
-  /* Theorem 1 from Granville indicates the +/- 1.  */
-  res = ((p > 2 || q < 3) && q < d && e[q-1] % 2)  ?  m-1  :  1;
-  res = mulmod(res, powmod(p, e[0], m), m);
-
-  /* Compute the individual binomials (again, theorem 1) */
-  for (i = 0; i < d; i++) {
-    UV ni = _factorialmod_without_prime(N[i], p, m);
-    UV ki = _factorialmod_without_prime(K[i], p, m);
-    UV ri = _factorialmod_without_prime(R[i], p, m);
-    UV r = divmod(ni, mulmod(ki, ri, m), m);
-    res = mulmod(res, r, m);
-  }
-  return res;
-}
-
-bool binomialmod(UV *res, UV n, UV k, UV m) {
-
-  if (m <= 1)           { *res = 0; return 1; }
-  if (k == 0 || k >= n) { *res = (k == 0 || k == n); return 1; }
-
-  if (m == 2) { *res = !(~n & k); return 1; }
-
-#if 0
-    if ( (*res = binomial(n,k)) )
-      { *res %= m; return 1; }
-#endif
-
-  if (is_prime(m)) {
-    *res = _binomial_lucas_mod_prime(n, k, m);
-    return 1;
-  }
-  {
-    UV bin[MPU_MAX_DFACTORS], mod[MPU_MAX_DFACTORS];
-    uint32_t i;
-    factored_t mf = factorint(m);
-
-    for (i = 0; i < mf.nfactors; i++) {
-      if (mf.e[i] == 1) {
-        bin[i] = _binomial_lucas_mod_prime(n, k, mf.f[i]);
-        mod[i] = mf.f[i];
-      } else {
-        /* bin[i] = _binomial_mod_prime_power(n, k, mf.f[i], mf.e[i]); */
-        /* Use generalized Lucas */
-        bin[i] = _binomial_lucas_mod_prime_power(n, k, mf.f[i], mf.e[i]);
-        mod[i] = ipow(mf.f[i], mf.e[i]);
-      }
-    }
-    /* chinese with p^e as modulos, so should never get -1 back */
-    return chinese(res, 0, bin, mod, mf.nfactors) == 1;
-  }
-}
-
 /* Pisano period.  */
 /* Thanks to Trizen & Charles R Greathouse IV for ideas and working examples. */
 /* Algorithm from Charles R Greathouse IV, https://oeis.org/A001175 */
@@ -2371,7 +1849,7 @@ static UV _pisano_prime_power(UV p, UV e)
 {
   UV k;
   if (e == 0) return 1;
-  if (p == 2) return 3UL << (e-1);
+  if (p == 2) return UVCONST(3) << (e-1);
   if      (p == 3) k = 8;
   else if (p == 5) k = 20;
   else if (p == 7) k = 16;
@@ -2408,7 +1886,7 @@ UV pisano_period(UV n)
   nf = factorint(n);
   for (i = 0, k = 1; i < nf.nfactors; i++) {
     k = lcmsafe(k, _pisano_prime_power(nf.f[i], nf.e[i]));
-    if (k == 0) return 0;
+    if (k == 0) return UV_MAX;
   }
 
   /* Do this carefully to avoid overflow */
@@ -2420,27 +1898,67 @@ UV pisano_period(UV n)
       return r;
   } while (r <= (lim-k));
 
-  return 0;
+  return UV_MAX;
+}
+
+#if BITS_PER_WORD == 32
+#define MAX_NNM1D2 UVCONST(92682)
+#else
+#define MAX_NNM1D2 UVCONST(6074001000)
+#endif
+
+UV floor_sum(UV n, UV m, UV a, UV b)
+{
+  UV sum = 0;
+  if (m == 0) croak("floor_sum: divide by zero");
+  if (n == 0) return 0;
+  while (1) {
+    UV Y, W, ymax;
+    if (a >= m) {
+      Y = (n/2) * ((n-1)|1);  /* (n*(n-1))/2, overflow checked below. */
+      W = a / m;
+      a = a % m;
+      if (n > MAX_NNM1D2 || Y > (UV_MAX-sum)/W) return UV_MAX;
+      sum += Y * W;
+    }
+    if (b >= m) {
+      Y = n;
+      W = b / m;
+      b = b % m;
+      if (Y > (UV_MAX-sum)/W) return UV_MAX;
+      sum += Y * W;
+    }
+    if (a > (UV_MAX-b)/n) return UV_MAX;
+    ymax = a * n + b;
+    if (ymax < m) break;
+    n = (ymax / m);
+    b = (ymax % m);
+    { UV t = m; m = a; a = t; }
+  }
+  return sum;
 }
 
 /******************************************************************************/
 /*                                   HAPPY                                    */
 /******************************************************************************/
 
-static UV sum_of_digits(UV n, uint32_t base, uint32_t k) {
-  UV t, r, sum = 0;
+static bool sum_of_digits(UV *result, UV n, uint32_t base, uint32_t k) {
+  UV t, r, term, sum = 0;
   while (n) {
     t = n / base;
     r = n - base * t;
     switch (k) {
-      case 0:  sum += 1;         break;
-      case 1:  sum += r;         break;
-      case 2:  sum += r*r;       break;
-      default: sum += ipow(r,k); break;
+      case 0:  term = 1;           break;
+      case 1:  term = r;           break;
+      case 2:  term = r*r;         break;
+      default: term = ipowsafe(r,k); break;
     }
+    if (term == UV_MAX || sum > UV_MAX-term) return 0;
+    sum += term;
     n = t;
   }
-  return sum;
+  *result = sum;
+  return 1;
 }
 static UV sum_of_squared_digits(UV n) {
   UV t, r, sum = 0;
@@ -2462,10 +1980,11 @@ int happy_height(UV n, uint32_t base, uint32_t exponent) {
       n = sum_of_squared_digits(n);
     return (sh[n] == 0) ? 0 : h+sh[n];
   } else {
-    UV ncheck = 0;
+    UV next, ncheck = 0;
     for (h = 1;  n > 1 && n != ncheck;  h++) {
       if ((h & (h-1)) == 0) ncheck = n;         /* Brent cycle finding */
-      n = sum_of_digits(n, base, exponent);
+      if (!sum_of_digits(&next, n, base, exponent)) return -1;
+      n = next;
     }
   }
   return (n == 1) ? h : 0;
@@ -2549,17 +2068,30 @@ bool prep_pow_inv(UV *a, UV *k, int kstatus, UV n) {
   if (kstatus < 0) {
     if (*a != 0) *a = modinverse(*a, n);
     if (*a == 0) return 0;
-    *k = -(IV)*k;
+    *k = (UV)0 - *k;
   }
   return 1;
 }
 
 
-
+/* The 306M limit prevents a 32-bit size_t from overflowing.
+ * A 64-bit size_t would allow double that, but it isn't worth pursuing here.
+ * This method is not time-practical for millions of digits.
+ *
+ * GMP AGM for 300,000,000 digits on M1 Pro: 4 minutes.  This: 6+ YEARS.
+ *
+ * The point is that it works everywhere, doesn't require ANY bigint support,
+ * is small code, and is quite fast for smaller digit counts.
+ */
 #if HAVE_UINT64
   #define U64T uint64_t
+  #define PIDIGITS_MAX 306783370U
+#elif BITS_PER_WORD == 64
+  #define U64T UV
+  #define PIDIGITS_MAX 306783370U
 #else
   #define U64T UV
+  #define PIDIGITS_MAX 30566U
 #endif
 
 /* Spigot from Arndt, Haenel, Winter, and Flammenkamp. */
@@ -2571,12 +2103,14 @@ char* pidigits(uint32_t digits)
   uint32_t const f = 10000;
   U64T d64;  /* 64-bit intermediate for 2*2*10000*b > 2^32 (~30k digits) */
 
-  if (digits == 0) return 0;
-  if (digits >= 1 && digits <= DBL_DIG && digits <= 18) {
-    Newz(0, out, 20, char);
-    (void)snprintf(out, 20, "%.*lf", (digits-1), 3.141592653589793238);
+  if (digits <= 1) {
+    Newz(0, out, 2, char);
+    out[0] = '3';
+    out[digits] = '\0';
     return out;
   }
+  if (digits > PIDIGITS_MAX)
+    croak("_pidigits: too many digits for %u-bit calculations", (unsigned int)(sizeof(U64T)*8));
   digits++;   /* For rounding */
   c = 14*(digits/4 + 2);
   /* 1 for decimal point, 3 for possible extra in loop. */
@@ -2627,98 +2161,12 @@ char* pidigits(uint32_t digits)
   return out;
 }
 
-static int strnum_parse(const char **sp, STRLEN *slen)
-{
-  const char* s = *sp;
-  STRLEN i = 0, len = *slen;
-  int neg = 0;
 
-  if (s != 0 && len > 0) {
-    neg = (s[0] == '-');
-    if (s[0] == '-' || s[0] == '+') { s++; len--; }
-    while (len > 0 && *s == '0') { s++; len--; }
-    if (len == 0) { s--; len = 1; neg = 0; }  /* value is 0 */
-    for (i = 0; i < len; i++)
-      if (!isDIGIT(s[i]))
-        break;
-  }
-  if (s == 0 || len == 0 || i < len) croak("Parameter must be an integer");
-  *sp = s;
-  *slen = len;
-  return neg;
-}
-int strnum_cmp(const char* a, STRLEN alen, const char* b, STRLEN blen) {
-  STRLEN i;
-  int aneg = strnum_parse(&a, &alen);
-  int bneg = strnum_parse(&b, &blen);
-  if (aneg != bneg)  return (bneg) ? 1 : -1;
-  if (aneg) { /* swap a and b if both negative */
-    const char* t = a;  STRLEN tlen = alen;
-    a = b; b = t;  alen = blen;  blen = tlen;
-  }
-  if (alen != blen)  return (alen > blen) ? 1 : -1;
-  for (i = 0; i < blen; i++)
-    if (a[i] != b[i])
-      return  (a[i] > b[i]) ? 1 : -1;
-  return 0;
-}
-
-/* 1. Perform signed integer validation on b/blen.
- * 2. Compare to a/alen using min or max based on first arg.
- * 3. Return 0 to select a, 1 to select b.
- */
-bool strnum_minmax(bool min, const char* a, STRLEN alen, const char* b, STRLEN blen)
-{
-  int aneg, bneg;
-  STRLEN i;
-
-  /* a is checked, process b */
-  bneg = strnum_parse(&b, &blen);
-
-  if (a == 0) return 1;
-
-  aneg = (a[0] == '-');
-  if (a[0] == '-' || a[0] == '+') { a++; alen--; }
-  while (alen > 0 && *a == '0') { a++; alen--; }
-
-  if (aneg != bneg)  return  min  ?  (bneg == 1)  :  (aneg == 1);
-  if (aneg == 1)  min = !min;
-  if (alen != blen)  return  min  ?  (alen > blen) :  (blen > alen);
-
-  for (i = 0; i < blen; i++)
-    if (a[i] != b[i])
-      return  min  ?  (a[i] > b[i])  :  (b[i] > a[i]);
-  return 0; /* equal */
-}
-
-bool from_digit_string(UV* rn, const char* s, int base)
-{
-  UV max, n = 0;
-  int i, len;
-
-  /* Skip leading -/+ and zeros */
-  if (s[0] == '-' || s[0] == '+') s++;
-  while (s[0] == '0') s++;
-
-  len = strlen(s);
-  max = (UV_MAX-base+1)/base;
-
-  for (i = 0; i < len; i++) {
-    const char c = s[i];
-    int d = !isalnum(c) ? 255 : (c <= '9') ? c-'0' : (c <= 'Z') ? c-'A'+10 : c-'a'+10;
-    if (d >= base) croak("Invalid digit for base %d", base);
-    if (n > max) return 0;   /* Overflow */
-    n = n * base + d;
-  }
-  *rn = n;
-  return 1;
-}
-
-bool from_digit_to_UV(UV* rn, const UV* r, int len, int base)
+bool from_digit_to_UV(UV* rn, const UV* r, size_t len, UV base)
 {
   UV d, n = 0;
-  int i;
-  if (len < 0 || len > BITS_PER_WORD)
+  size_t i;
+  if (base < 2 || len > BITS_PER_WORD)
     return 0;
   for (i = 0; i < len; i++) {
     d = r[i];
@@ -2730,31 +2178,7 @@ bool from_digit_to_UV(UV* rn, const UV* r, int len, int base)
 }
 
 
-bool from_digit_to_str(char** rstr, const UV* r, int len, int base)
-{
-  char *so, *s;
-  int i;
-
-  if (len < 0 || !(base == 2 || base == 10 || base == 16)) return 0;
-
-  if (r[0] >= (UV) base) return 0;  /* TODO: We don't apply extended carry */
-
-  New(0, so, len + 3, char);
-  s = so;
-  if (base == 2 || base == 16) {
-    *s++ = '0';
-    *s++ = (base == 2) ? 'b' : 'x';
-  }
-  for (i = 0; i < len; i++) {
-    UV d = r[i];
-    s[i] = (d < 10) ? '0'+(char)d : 'a'+(char)(d-10);
-  }
-  s[len] = '\0';
-  *rstr = so;
-  return 1;
-}
-
-int to_digit_array(int* bits, UV n, int base, int length)
+int to_digit_array(UV* bits, UV n, UV base, int length)
 {
   int d;
 
@@ -2773,77 +2197,85 @@ int to_digit_array(int* bits, UV n, int base, int length)
   return length;
 }
 
-int to_digit_string(char* s, UV n, int base, int length)
+int to_digit_string(char* s, UV n, UV base, int length)
 {
-  int digits[128];
+  UV digits[128];
   int i, len = to_digit_array(digits, n, base, length);
 
   if (len < 0) return -1;
-  if (base > 36) croak("invalid base for string: %d", base);
+  if (base < 2 || base > 36) croak("invalid base for string: %"UVuf, base);
 
   for (i = 0; i < len; i++) {
-    int dig = digits[len-i-1];
+    UV dig = digits[len-i-1];
     s[i] = (dig < 10) ? '0'+(char)dig : 'a'+(char)(dig-10);
   }
   s[len] = '\0';
   return len;
 }
 
-int to_string_128(char str[40], IV hi, UV lo)
+int uv_uv_to_str(char str[41], UV hi, UV lo)
 {
-  int i, slen = 0, isneg = 0;
+  int slen = 0;
 
-  if (hi < 0) {
-    isneg = 1;
-    if (lo == 0) {
-      hi = -hi;
-    } else {
-      hi = -(hi+1);
-      lo = UV_MAX - lo + 1;
-    }
-  }
-#if BITS_PER_WORD == 64 && HAVE_UINT128
-  {
-    uint128_t dd, sum = (((uint128_t) hi) << 64) + lo;
-    do {
-      dd = sum / 10;
-      str[slen++] = '0' + (char)(sum - dd*10);
-      sum = dd;
-    } while (sum);
-  }
+#if BITS_PER_WORD == 32 && HAVE_UINT64
+  uint64_t dd, val = (((uint64_t) hi) << BITS_PER_WORD) + lo;
+  do {
+    dd = val / 10;
+    str[slen++] = '0' + (char)(val - dd*10);
+    val = dd;
+  } while (val);
+#elif BITS_PER_WORD == 64 && HAVE_UINT128
+  uint128_t dd, val = (((uint128_t) hi) << BITS_PER_WORD) + lo;
+  do {
+    dd = val / 10;
+    str[slen++] = '0' + (char)(val - dd*10);
+    val = dd;
+  } while (val);
 #else
-  {
-    UV d, r;
-    uint32_t a[4];
-    a[0] = hi >> (BITS_PER_WORD/2);
-    a[1] = hi & (UV_MAX >> (BITS_PER_WORD/2));
-    a[2] = lo >> (BITS_PER_WORD/2);
-    a[3] = lo & (UV_MAX >> (BITS_PER_WORD/2));
-    do {
-      r = a[0];
-      d = r/10;  r = ((r-d*10) << (BITS_PER_WORD/2)) + a[1];  a[0] = d;
-      d = r/10;  r = ((r-d*10) << (BITS_PER_WORD/2)) + a[2];  a[1] = d;
-      d = r/10;  r = ((r-d*10) << (BITS_PER_WORD/2)) + a[3];  a[2] = d;
-      d = r/10;  r = r-d*10;  a[3] = d;
-      str[slen++] = '0'+(r%10);
-    } while (a[0] || a[1] || a[2] || a[3]);
-  }
+  UV d, r;
+  uint32_t a[4];
+  a[0] = hi >> (BITS_PER_WORD/2);
+  a[1] = hi & (UV_MAX >> (BITS_PER_WORD/2));
+  a[2] = lo >> (BITS_PER_WORD/2);
+  a[3] = lo & (UV_MAX >> (BITS_PER_WORD/2));
+  do {
+    r = a[0];
+    d = r/10;  r = ((r-d*10) << (BITS_PER_WORD/2)) + a[1];  a[0] = d;
+    d = r/10;  r = ((r-d*10) << (BITS_PER_WORD/2)) + a[2];  a[1] = d;
+    d = r/10;  r = ((r-d*10) << (BITS_PER_WORD/2)) + a[3];  a[2] = d;
+    d = r/10;  r = r-d*10;  a[3] = d;
+    str[slen++] = '0'+(r%10);
+  } while (a[0] || a[1] || a[2] || a[3]);
 #endif
-  /* Reverse the order */
-  for (i=0; i < slen/2; i++) {
-    char t=str[i];
-    str[i]=str[slen-i-1];
-    str[slen-i-1] = t;
+
+  str[slen] = '\0';
+  if (slen > 1) {
+    char *L = str, *R = str+slen;
+    while (--R > L) { char t = *R; *R = *L; *L++ = t; } /* Reverse digits. */
   }
-  /* Prepend a negative sign if needed */
+  return slen;
+}
+
+int iv_uv_to_str(char str[41], IV hi, UV lo)
+{
+  int i, slen, isneg = (hi < 0);
+  UV uhi = (UV)hi;
+
   if (isneg) {
+    uhi = ~uhi;
+    lo = ~lo + 1;
+    if (lo == 0) uhi++;
+  }
+
+  slen = uv_uv_to_str(str, uhi, lo);
+
+  if (isneg) {  /* Prepend a negative sign */
     for (i = slen; i > 0; i--)
       str[i] = str[i-1];
     str[0] = '-';
     slen++;
+    str[slen] = '\0';
   }
-  /* Add terminator */
-  str[slen] = '\0';
   return slen;
 }
 
@@ -2857,15 +2289,15 @@ int to_string_128(char str[40], IV hi, UV lo)
 #define MAX_FIB_VAL (MAX_FIB_LEN+1)
 
 /* 0 = bad,   -1 = not canonical,   1 = good,   2 = ok but out of UV range */
-int validate_zeckendorf(const char* str)
+int validate_zeckendorf(const char* str, size_t len)
 {
-  int i;
-  if (str == 0)
+  size_t i;
+  if (str == 0 || len == 0)
     return 0;
   if (str[0] != '1')
-    return (str[0] == '0' && str[1] == '\0');
+    return (str[0] == '0' && len == 1);
   /* str[0] = 1 */
-  for (i = 1; str[i] != '\0'; i++) {
+  for (i = 1; i < len; i++) {
     if (str[i] == '1') {
       if (str[i-1] == '1')
         return -1;
@@ -2874,23 +2306,24 @@ int validate_zeckendorf(const char* str)
     }
   }
   /* Valid number.  Check if in range. */
-  if (i > MAX_FIB_LEN || (i == MAX_FIB_LEN && strcmp(str, MAX_FIB_STR) > 0))
+  if (len > MAX_FIB_LEN ||
+      (len == MAX_FIB_LEN && memcmp(str, MAX_FIB_STR, len) > 0))
     return 2;
   return 1;
 }
 
-UV from_zeckendorf(const char* str)
+UV from_zeckendorf(const char* str, size_t len)
 {
-  int i, len;
+  size_t i;
   UV n, fa = 0, fb = 1, fc = 1;  /* fc = fib(2) */
 
-  if (str == 0) return 0;
-  for (len = 0; len < MAX_FIB_LEN && str[len] != '\0'; len++)
-    if (str[len] != '0' && str[len] != '1')
+  if (str == 0 || len == 0 || len > MAX_FIB_LEN) return 0;
+  for (i = 0; i < len; i++)
+    if (str[i] != '0' && str[i] != '1')
       return 0;
-  if (len == 0 || len > MAX_FIB_LEN) return 0;
   n = (str[len-1] == '1');
-  for (i = len-2; i >= 0; i--) {
+  for (i = len-1; i > 0; ) {
+    i--;
     fa = fb; fb = fc; fc = fa+fb;  /* Advance */
     if (str[i] == '1') n += fc;
   }
@@ -2919,8 +2352,8 @@ char* to_zeckendorf(UV n)
   }
   str[spos++] = '\0';
 #if 0
-  if (validate_zeckendorf(str) != 1) croak("to_zeckendorf bad for %lu\n",n);
-  if (from_zeckendorf(str) != n) croak("to_zeckendorf wrong for %lu\n",n);
+  if (validate_zeckendorf(str, spos-1) != 1) croak("to_zeckendorf bad for %lu\n",n);
+  if (from_zeckendorf(str, spos-1) != n) croak("to_zeckendorf wrong for %lu\n",n);
 #endif
   return str;
 }
@@ -2976,9 +2409,11 @@ bool is_catalan_pseudoprime(UV n) {
     uint32_t i;
     factored_t nf = factorint(n);
 #if BITS_PER_WORD == 32
-    if (nf.nfactors == 2) return 0;  /* Page 9, all 32-bit semiprimes */
+    if (nf.nfactors == 2 && nf.e[0] == 1 && nf.e[1] == 1)
+      return 0;  /* Page 9, all 32-bit semiprimes */
 #else
-    if (nf.nfactors == 2) {   /* Conditions from Aebi and Cairns (2008) */
+    if (nf.nfactors == 2 && nf.e[0] == 1 && nf.e[1] == 1) {
+      /* Conditions from Aebi and Cairns (2008) */
       if (n < UVCONST(10000000000)) return 0;  /* Page 9 */
       if (2*nf.f[0]+1 >= nf.f[1])   return 0;  /* Corollary 2 and 3 */
     }
@@ -3078,11 +2513,12 @@ static UV _count_class_div(UV s, UV b2) {
 /* Returns 12 * H(n).  See Cohen 5.3.5 or Pari/GP.
  * Pari/GP uses a different method for n > 500000, which is quite a bit
  * faster, but assumes the GRH. */
-IV hclassno(UV n) {
-  UV nmod4 = n % 4, b2, b, h;
+UV hclassno(UV n) {
+  UV nmod4 = n % 4, b2, b, h, corr;
   int square;
 
-  if (n == 0) return -1;
+  /* H(0) = -1/12, all other H(n) are non-negative. */
+  if (n == 0 || n > IV_MAX) return UV_MAX;
   if (nmod4 == 1 || nmod4 == 2) return 0;
   if (n == 3) return 4;
 
@@ -3100,7 +2536,9 @@ IV hclassno(UV n) {
       +  is_perfect_square(b2)
       +  (_count_class_div(b+1, b2) << 1);
   }
-  return 12*h + ((b2*3 == n) ? 4 : square && !(n&1) ? 6 : 0);
+
+  corr = (b2*3 == n) ? 4 : square && !(n&1) ? 6 : 0;
+  return (h > (UV_MAX-corr)/12)  ?  UV_MAX  :  12*h + corr;
 }
 
 UV polygonal_root(UV n, UV k, bool* overflow) {
@@ -3176,6 +2614,49 @@ UV npartitions(UV n) {
   return npart;
 }
 
+UV npartitionsq(UV n) {
+  UV *part, *pent, i, j, k, d, npart;
+
+  if (n <= 3)  return 1 + (n==3);
+  if (n > ((BITS_PER_WORD == 32) ? 237 : 791)) return 0;  /* Overflow */
+
+  d = isqrt(n+1);
+  New(0, pent, 2*d+2, UV);
+  pent[0] = 0;
+  pent[1] = 1;
+  for (i = 1; i <= d; i++) {
+    pent[2*i  ] = ( i   *(3*i+1)) / 2;
+    pent[2*i+1] = ((i+1)*(3*i+2)) / 2;
+  }
+  New(0, part, n+1, UV);
+  part[0] = 1;
+  for (j = 1; j <= n; j++) {
+    UV psum = 0;
+    /* same pentagonal recurrence as npartitions */
+    for (k = 1; pent[k] <= j; k++) {
+      if ((k+1) & 2) psum += part[j - pent[k]];
+      else           psum -= part[j - pent[k]];
+    }
+    /* E(x^2) correction: nonzero at double-pentagonals 2*pent[k],
+       with sign opposite to the recurrence sign at index k */
+    if ((j & 1) == 0) {
+      UV hj = j >> 1;
+      for (k = 1; pent[k] <= hj; k++) {
+        if (pent[k] == hj) {
+          if ((k+1) & 2) psum--;
+          else           psum++;
+          break;
+        }
+      }
+    }
+    part[j] = psum;
+  }
+  npart = part[n];
+  Safefree(part);
+  Safefree(pent);
+  return npart;
+}
+
 UV consecutive_integer_lcm(UV n)
 {
   UV i, ilcm, sqrtn;
@@ -3184,8 +2665,8 @@ UV consecutive_integer_lcm(UV n)
 
   ilcm = 1;
   sqrtn = isqrt(n);
-  for (i = 1; i < NPRIMES_TINY; i++) {
-    uint32_t p = primes_tiny[i];
+  for (i = 1; i < NPRIMES_SMALL; i++) {
+    UV p = primes_small[i];
     if (p > n) break;
     if (p <= sqrtn) p = ipow(p, logint(n,p));
     if (ilcm > UV_MAX/p) return 0;
@@ -3225,6 +2706,7 @@ UV frobenius_number(UV* A, uint32_t alen)
 
   nlen = A[0];
   /* if (nlen > 1000000000U) croak("overflow in frobenius number"); */
+  if (nlen+1 > (UV)(MAX_SIZET/sizeof(UV))) return UV_MAX;
   New(0, N, nlen+1, UV);
   N[0] = 0;
   for (j = 1; j < nlen; j++)
@@ -3243,7 +2725,8 @@ UV frobenius_number(UV* A, uint32_t alen)
             n = N[q];
       }
       if (n != UV_MAX) {
-        for (j = 0; j < (nlen / d); j++) {
+        for (j = 1; j < (nlen / d); j++) {
+          if (n > UV_MAX-ai) { Safefree(N); return UV_MAX; }
           n += ai;
           p = n % nlen;
           if (N[p] >= n)  N[p] = n;
@@ -3308,87 +2791,222 @@ bool perm_to_num(int n, int *vec, UV *rank) {
   return 1;
 }
 
+/******************************************************************************/
+
+#define RANDPERM_SMALLMAP_MAX 16
+
+static UV randperm_smallmap_get(UV key, UV *keys, UV *vals, UV len) {
+  UV i;
+  for (i = 0; i < len; i++)
+    if (keys[i] == key)
+      return vals[i];
+  return key;   /* identity value */
+}
+
+static void randperm_smallmap_set(UV key, UV val, UV *keys, UV *vals, UV *len) {
+  UV i;
+  for (i = 0; i < *len; i++) {
+    if (keys[i] == key) {
+      vals[i] = val;
+      return;
+    }
+  }
+  keys[*len] = key;
+  vals[*len] = val;
+  (*len)++;
+}
+
+/* Select ordered k-permutation from 0..n-1, using sparse Fisher-Yates. */
+static void randperm_sparse_fy_small(void* ctx, UV n, UV k, UV *S) {
+  UV keys[RANDPERM_SMALLMAP_MAX], vals[RANDPERM_SMALLMAP_MAX];
+  UV i, mlen = 0;
+
+  for (i = 0; i < k; i++) {
+    UV r = i + urandomm64(ctx, n - i);
+    UV out = randperm_smallmap_get(r, keys, vals, mlen);
+    UV vi  = randperm_smallmap_get(i, keys, vals, mlen);
+
+    S[i] = out;
+
+    if (r != i)
+      randperm_smallmap_set(r, vi, keys, vals, &mlen);
+  }
+}
+
+#define RANDPERM_EMPTY_KEY 0
+#define RANDPERM_HASHMAP (size_t)key & mask  /* key is already randomized */
+
+static UV randperm_map_get0(const UV *keys, const UV *vals, size_t mask, UV key) {
+  size_t h = RANDPERM_HASHMAP;
+  UV skey = key + 1;
+
+  while (keys[h] != RANDPERM_EMPTY_KEY) {
+    if (keys[h] == skey)
+      return vals[h];
+    h = (h + 1) & mask;
+  }
+  return key;
+}
+
+/* Return value at key, and also return slot where key is or should be stored. */
+static UV randperm_map_getslot0(const UV *keys, const UV *vals,
+                                size_t mask, UV key, size_t *slot) {
+  size_t h = RANDPERM_HASHMAP;
+  UV skey = key + 1;
+
+  while (keys[h] != RANDPERM_EMPTY_KEY) {
+    if (keys[h] == skey) {
+      *slot = h;
+      return vals[h];
+    }
+    h = (h + 1) & mask;
+  }
+
+  *slot = h;
+  return key;
+}
+
+static void randperm_sparse_fy_hash(void *ctx, UV n, UV k, UV *S) {
+  UV i;
+  size_t cap = 16, mask;
+  UV *table, *keys, *vals;
+
+  while (cap / 2 < k) {
+    if (cap > MAX_SIZET / 2)
+      croak("randperm: requested permutation is too large");
+    cap <<= 1;
+  }
+  if (cap > MAX_SIZET / (2 * sizeof(UV)))
+    croak("randperm: requested permutation is too large");
+  mask = cap - 1;
+
+  New(0, table, 2 * cap, UV);
+  keys = table;
+  vals = table + cap;
+  Zero(keys, cap, UV);
+
+  for (i = 0; i < k; i++) {
+    size_t rslot;
+    UV r   = i + urandomm64(ctx, n - i);
+    UV out = randperm_map_getslot0(keys, vals, mask, r, &rslot);
+    UV vi  = randperm_map_get0(keys, vals, mask, i);
+
+    S[i] = out;
+
+    if (r != i) {
+      UV skey = r + 1;
+
+      /*
+       * If the slot was empty and vi == r, the virtual array already has
+       * identity at r, so no entry is needed.  If the slot already exists,
+       * write even when vi == r to overwrite a stale non-identity mapping.
+       */
+      if (keys[rslot] != RANDPERM_EMPTY_KEY || vi != r) {
+        keys[rslot] = skey;
+        vals[rslot] = vi;
+      }
+    }
+  }
+
+  Safefree(table);
+}
+
+
 /*
- * For k<n, an O(k) time and space method is shown on page 39 of
- *    https://www.math.upenn.edu/~wilf/website/CombinatorialAlgorithms.pdf
- * Note it requires an O(k) complete shuffle as the results are sorted.
+ * Select k values from 0..n-1.
  *
  * This seems to be 4-100x faster than NumPy's random.{permutation,choice}
  * for n under 100k or so.  It's even faster with larger n.  For example
  *   from numpy.random import choice;  choice(100000000, 4, replace=False)
  * uses 774MB and takes 55 seconds.  We take less than 1 microsecond.
+ *
+ * We do not use anything from this source, but it's interesting to read page 39:
+ *    https://www.math.upenn.edu/~wilf/website/CombinatorialAlgorithms.pdf
+ *
+ *
+ * We would like to be performant (obviously) but we also try to avoid allocating
+ * needless space when k is much smaller than n, especially with huge n.
  */
 void randperm(void* ctx, UV n, UV k, UV *S) {
-  UV i, j;
+  UV i, j, m;
 
   if (k > n)  k = n;
 
-  if        (k == 0) {                  /* 0 of n */
-  } else if (k == 1) {                  /* 1 of n.  Pick one at random */
-    S[0] = urandomm64(ctx,n);
-  } else if (k == 2 && n == 2) {        /* 2 of 2.  Flip a coin */
-    S[0] = urandomb(ctx,1);
-    S[1] = 1-S[0];
-  } else if (k == 2) {                  /* 2 of n.  Pick 2 skipping dup */
-    S[0] = urandomm64(ctx,n);
-    S[1] = urandomm64(ctx,n-1);
-    if (S[1] >= S[0]) S[1]++;
-  } else if (k < n/100 && k < 30) {     /* k of n.  Pick k with loop */
-    for (i = 0; i < k; i++) {
-      do {
-        S[i] = urandomm64(ctx,n);
-        for (j = 0; j < i; j++)
-          if (S[j] == S[i])
-            break;
-      } while (j < i);
-    }
-  } else if (k < n/100 && n > 1000000) {/* k of n.  Pick k with dedup retry */
-    for (j = 0; j < k; ) {
-      for (i = j; i < k; i++) /* Fill S[j .. k-1] then sort S */
-        S[i] = urandomm64(ctx,n);
-      sort_uv_array(S, k);
-      for (j = 0, i = 1; i < k; i++)  /* Find and remove dups.  O(n). */
-        if (S[j] != S[i])
-          S[++j] = S[i];
-      j++;
-    }
-    /* S is sorted unique k-selection of 0 to n-1.  Shuffle. */
-    for (i = 0; i < k; i++) {
-      j = urandomm64(ctx,k-i);
-      { UV t = S[i]; S[i] = S[i+j]; S[i+j] = t; }
-    }
-  } else if (k < n/4) {                 /* k of n.  Pick k with mask */
-    uint32_t *mask, smask[8] = {0};
-    if (n <= 32*8) mask = smask;
-    else           Newz(0, mask, n/32 + ((n%32)?1:0), uint32_t);
-    for (i = 0; i < k; i++) {
-      do {
-        j = urandomm64(ctx,n);
-      } while ( mask[j>>5] & (1U << (j&0x1F)) );
-      S[i] = j;
-      mask[j>>5] |= (1U << (j&0x1F));
-    }
-    if (mask != smask) Safefree(mask);
-  } else if (k < n) {                   /* k of n.  FYK shuffle n, pick k */
-    UV *T;
-    New(0, T, n, UV);
-    for (i = 0; i < n; i++)
-      T[i] = i;
-    for (i = 0; i < k && i <= n-2; i++) {
-      j = urandomm64(ctx,n-i);
-      S[i] = T[i+j];
-      T[i+j] = T[i];
-    }
-    Safefree(T);
-  } else {                              /* n of n.  FYK shuffle. */
+  if (k == 0)                           /* 0 of n.  Return nothing. */
+    return;
+
+  if (k == 1) {                         /* 1 of n.  Pick one. */
+    S[0] = urandomm64(ctx, n);
+    return;
+  }
+
+  if (k == n) {                         /* n of n.  FYK shuffle. */
     for (i = 0; i < n; i++)
       S[i] = i;
     for (i = 0; i < k && i <= n-2; i++) {
       j = urandomm64(ctx,n-i);
       { UV t = S[i]; S[i] = S[i+j]; S[i+j] = t; }
     }
+    return;
+  }
+
+  /* k of n, k < n.  Do either sparse FYK shuffle or a k-selection FYK. */
+
+  if (k == 2) {                         /* 2 of n.  Unrolled FYK k=2 */
+    i = urandomm64(ctx, n);
+    j = 1 + urandomm64(ctx, n-1);
+    S[0] = i;
+    S[1] = (j == i) ? 0 : j;
+
+  } else if (k == 3) {                  /* 3 of n.  Unrolled FYK k=3 */
+    i = urandomm64(ctx, n);
+    j = 1 + urandomm64(ctx, n-1);
+    m = 2 + urandomm64(ctx, n-2);
+    S[0] = i;
+    S[1] = (j == i) ? 0 : j;
+    S[2] = (m == j) ? (UV)(i != 1) : (m == i) ? 0 : m;
+
+  } else if (k <= RANDPERM_SMALLMAP_MAX) {
+    /* For very small k, use FYK map with small fixed stack allocation. */
+    randperm_sparse_fy_small(ctx, n, k, S);
+
+  } else if (n >= 32768 && k <= 64) {
+    /* For small k relative to n, use dynamic FYK map. */
+    randperm_sparse_fy_hash(ctx, n, k, S);
+
+  } else if ((n >= 2147483647U && k <= n/4) ||  /* lower memory */
+             (n >= 100000      && k <= n/64)) { /* lower memory and speed */
+    /* If n is quite large, use dynamic FYK map for memory reasons */
+    randperm_sparse_fy_hash(ctx, n, k, S);
+
+  } else if (n < 65536) {               /* k of n.  FYK shuffle small n */
+    uint16_t *T;
+    New(0, T, n, uint16_t);
+    for (i = 0; i < n; i++)
+      T[i] = i;
+    for (i = 0; i < k && i <= n-2; i++) {
+      j = i + urandomm32(ctx,n-i);
+      S[i] = T[j];
+      T[j] = T[i];
+    }
+    Safefree(T);
+  } else {                              /* k of n.  FYK shuffle n, pick k */
+    UV *T;
+    if (n > (UV)(MAX_SIZET / sizeof(UV)))
+      croak("randperm: requested permutation is too large");
+    New(0, T, n, UV);
+    for (i = 0; i < n; i++)
+      T[i] = i;
+    for (i = 0; i < k && i <= n-2; i++) {
+      j = i + urandomm64(ctx,n-i);
+      S[i] = T[j];
+      T[j] = T[i];
+    }
+    Safefree(T);
   }
 }
+
+/******************************************************************************/
 
 #define SMOOTH_TEST(n,k,p,nextprime) \
   if (n < p*p) return (n <= k);  /* p*p > n means n is prime */ \
@@ -3414,13 +3032,14 @@ bool is_smooth(UV n, UV k) {
 
   SMOOTH_TEST(n, k, 3,  5);  /* after this, k >=  5, n > 3*3 */
   SMOOTH_TEST(n, k, 5,  7);  /* after this, k >=  7, n > 5*5 */
-  SMOOTH_TEST(n, k, 7, 11);  /* after this, k >= 11, n > 7*7 */
 
-  /* Remove tiny factors.  Tests to 499. */
-  for (i = 5, pn = primes_tiny[i]; i < NPRIMES_TINY-1; i++) {
-    p = pn;  pn = primes_tiny[i+1];
+  /* Remove tiny factors. */
+  for (i = 4; i < NPRIMES_SMALL-1; i++) {
+    p  = primes_small[i];
+    pn = primes_small[i+1];
     SMOOTH_TEST(n, k, p, pn);
-  }
+    if (pn >= 1000) break;      /* Tests to here */
+  }                                           /* suppose pn = 503, then ... */
   if (k < pn || n < pn*pn) return (n <= k);   /* k >= 503 and n >= 503*503. */
 
   if (is_prime(n)) return 0;
@@ -3446,11 +3065,10 @@ bool is_rough(UV n, UV k) {
   /* True if no prime factors of n are smaller than k. */
 
   if (n == 0) return (k == 0);
-  if (n == 1) return 1;
-  /* n >= 2 */
-  if (k <= 1) return 1;
-  if (k == 2) return (n >= 1);
-  if (k == 3) return (n > 1 && (n&1));
+  if (n == 1 || k <= 1) return 1;
+  if (k > n)  return 0;
+  if (k == 2) return 1;
+  if (k == 3) return n & 1;
   /* k >= 4 */
 
   if (!(n&1)) return 0;
@@ -3458,8 +3076,10 @@ bool is_rough(UV n, UV k) {
   if (k <= 5) return 1;
   if (!(n%5)) return 0;
 
+  if (k > isqrt(n)) return is_prime(n);
+
   if (k <= 2500) {
-    nfac = trial_factor(n, fac, 7, k);
+    (void) trial_factor(n, fac, 7, k);
     return (fac[0] >= k);
   }
 
@@ -3806,8 +3426,10 @@ UV buchstab_phi(UV x, UV y) {
 
 UV random_factored_integer(void* ctx, UV n, int *nf, UV *factors) {
   UV r, s, nfac;
-  if (n < 1)
+  if (n < 1) {
+    *nf = 0;
     return 0;
+  }
 #if BITS_PER_WORD == 64 && (USE_MONTMATH || MULMODS_ARE_FAST)
   if (1)   /* Our factoring is very fast, just use it */
 #elif BITS_PER_WORD == 64

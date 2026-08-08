@@ -2,10 +2,11 @@ package Math::Prime::Util::PP;
 use strict;
 use warnings;
 use Carp qw/carp croak confess/;
+use Scalar::Util qw/looks_like_number refaddr reftype/;
 
 BEGIN {
   $Math::Prime::Util::PP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PP::VERSION = '0.74';
+  $Math::Prime::Util::PP::VERSION = '0.75';
 }
 
 our $BIGINTVERSION = 0.0;
@@ -25,7 +26,6 @@ BEGIN {
 # code for more detailed comments, including references to papers.
 
 BEGIN {
-  use constant OLD_PERL_VERSION=> $] < 5.008;
   use constant MPU_MAXBITS     => (~0 == 4294967295) ? 32 : 64;
   use constant MPU_64BIT       => MPU_MAXBITS == 64;
   use constant MPU_32BIT       => MPU_MAXBITS == 32;
@@ -33,14 +33,16 @@ BEGIN {
  #use constant MPU_MAXDIGITS   => MPU_32BIT ? 10 : 20;
   use constant MPU_MAXPRIME    => MPU_32BIT ? 4294967291 : 18446744073709551557;
   use constant MPU_MAXPRIMEIDX => MPU_32BIT ?  203280221 :  425656284035217743;
-  use constant MPU_HALFWORD    => MPU_32BIT ? 65536 : OLD_PERL_VERSION ? 33554432 : 4294967296;
+  use constant MPU_HALFWORD    => MPU_32BIT ? 65536 : 4294967296;
   use constant UVPACKLET       => MPU_32BIT ? 'L' : 'Q';
   use constant MPU_INFINITY    => (65535 > 0+'inf') ? 20**20**20 : 0+'inf';
-  use constant INTMAX          => (!OLD_PERL_VERSION || MPU_32BIT) ? ~0 : 562949953421312;
-  use constant INTMIN          => (MPU_32BIT ? -2147483648 : !OLD_PERL_VERSION ? -9223372036854775808 : -562949953421312);
+  use constant INTMAX          => ~0;
+  use constant INTMIN          => MPU_32BIT ? -2147483648 : -9223372036854775808;
   use constant SINTMAX         => (INTMAX >> 1);
   use constant B_PRIM235       => Math::BigInt->new("30");
   use constant PI_TIMES_8      => 25.13274122871834590770114707;
+  use constant MAX_RANDOM_BITS => 4294967295;
+  use constant MAX_RANDOM_DIGITS => 4294967295;
 }
 
 # TODO: Change this whole file to use this / tobigint
@@ -64,37 +66,51 @@ our $_BIGINT;
 # implementation would be to make the perl subs here use a pp_{...} prefix.
 
 
+*tobigint = \&Math::Prime::Util::_to_bigint;
+*maybetobigint = \&Math::Prime::Util::_maybe_bigint;
+*maybetobigintall = \&Math::Prime::Util::_maybe_bigint_allargs;
+*_bigint_to_int = \&Math::Prime::Util::_bigint_to_int;
+*getconfig = \&Math::Prime::Util::prime_get_config;
+
+BEGIN {  # These should happen at compile time to take advantage of custom ops
+*canonicalized_integer = \&Math::Prime::Util::_canonicalized_integer;
+*canonicalize_integers = \&Math::Prime::Util::_canonicalize_integers;
 *validate_integer = \&Math::Prime::Util::_validate_integer;
 *validate_integer_nonneg = \&Math::Prime::Util::_validate_integer_nonneg;
 *validate_integer_positive = \&Math::Prime::Util::_validate_integer_positive;
 *validate_integer_abs = \&Math::Prime::Util::_validate_integer_abs;
-*_bigint_to_int = \&Math::Prime::Util::_bigint_to_int;
-*reftyped = \&Math::Prime::Util::_reftyped;
-#*load_bigint = \&Math::Prime::Util::_load_bigint;
-*tobigint = \&Math::Prime::Util::_to_bigint;
-*maybetobigint = \&Math::Prime::Util::_to_bigint_if_needed;
-*maybetobigintall = \&Math::Prime::Util::_maybe_bigint_allargs;
-*getconfig = \&Math::Prime::Util::prime_get_config;
-
 *Maddint = \&Math::Prime::Util::addint;
 *Msubint = \&Math::Prime::Util::subint;
-*Madd1int = \&Math::Prime::Util::add1int;
-*Msub1int = \&Math::Prime::Util::sub1int;
 *Mmulint = \&Math::Prime::Util::mulint;
 *Mdivint = \&Math::Prime::Util::divint;
-*Mpowint = \&Math::Prime::Util::powint;
 *Mmodint = \&Math::Prime::Util::modint;
 *Mcdivint = \&Math::Prime::Util::cdivint;
+*Mpowint = \&Math::Prime::Util::powint;
+*Madd1int = \&Math::Prime::Util::add1int;
+*Msub1int = \&Math::Prime::Util::sub1int;
+*Mis_odd = \&Math::Prime::Util::is_odd;
+*Mis_even = \&Math::Prime::Util::is_even;
+*Mcmpint = \&Math::Prime::Util::cmpint;
+*Mkronecker = \&Math::Prime::Util::kronecker;
+# Mis_square
+*Mdrand = \&Math::Prime::Util::drand;
+*Mirand32 = \&Math::Prime::Util::irand32;
+*Mirand64 = \&Math::Prime::Util::irand64;
+}
+
+*Mtoint = \&Math::Prime::Util::toint;
+*Mmuladdint = \&Math::Prime::Util::muladdint;
+*Mmulsubint = \&Math::Prime::Util::mulsubint;
 *Mabsint = \&Math::Prime::Util::absint;
 *Msqrtint = \&Math::Prime::Util::sqrtint;
 *Mrootint = \&Math::Prime::Util::rootint;
 *Mlogint = \&Math::Prime::Util::logint;
 *Mnegint = \&Math::Prime::Util::negint;
-*Mcmpint = \&Math::Prime::Util::cmpint;
 *Mlshiftint = \&Math::Prime::Util::lshiftint;
 *Mrshiftint = \&Math::Prime::Util::rshiftint;
 *Mdivrem  = \&Math::Prime::Util::divrem;
 *Mtdivrem = \&Math::Prime::Util::tdivrem;
+*Mfloor_sum = \&Math::Prime::Util::floor_sum;
 
 *Maddmod = \&Math::Prime::Util::addmod;
 *Msubmod = \&Math::Prime::Util::submod;
@@ -114,19 +130,18 @@ our $_BIGINT;
 *Mtrial_factor = \&Math::Prime::Util::trial_factor;
 *Mdivisors = \&Math::Prime::Util::divisors;
 *Mdivisor_sum = \&Math::Prime::Util::divisor_sum;
+*Mis_prob_prime = \&Math::Prime::Util::is_prob_prime;
 *Mis_prime = \&Math::Prime::Util::is_prime;
 *Mis_semiprime = \&Math::Prime::Util::is_semiprime;
 *Mis_prime_power = \&Math::Prime::Util::is_prime_power;
 *Mis_power = \&Math::Prime::Util::is_power;
 *Mis_square_free = \&Math::Prime::Util::is_square_free;
-*Mis_odd = \&Math::Prime::Util::is_odd;
-*Mis_even = \&Math::Prime::Util::is_even;
 *Mis_congruent = \&Math::Prime::Util::is_congruent;
 *Mis_divisible = \&Math::Prime::Util::is_divisible;
 *Mchinese = \&Math::Prime::Util::chinese;
 *Mvaluation = \&Math::Prime::Util::valuation;
-*Mkronecker = \&Math::Prime::Util::kronecker;
 *Mmoebius = \&Math::Prime::Util::moebius;
+*Mmertens = \&Math::Prime::Util::mertens;
 *Mtotient = \&Math::Prime::Util::euler_phi;
 *Mfactorial = \&Math::Prime::Util::factorial;
 *Mfalling_factorial = \&Math::Prime::Util::falling_factorial;
@@ -143,12 +158,14 @@ our $_BIGINT;
 *Mlucasumod = \&Math::Prime::Util::lucasumod;
 *Mznorder = \&Math::Prime::Util::znorder;
 *Mhclassno = \&Math::Prime::Util::hclassno;
+*Mlegendre_phi = \&Math::Prime::Util::legendre_phi;
 
 *Mvecall = \&Math::Prime::Util::vecall;
 *Mvecany = \&Math::Prime::Util::vecany;
 *Mvecnone = \&Math::Prime::Util::vecnone;
 *Mvecsum = \&Math::Prime::Util::vecsum;
 *Mvecprod = \&Math::Prime::Util::vecprod;
+*Mvecuniq = \&Math::Prime::Util::vecuniq;
 *Mvecmin = \&Math::Prime::Util::vecmin;
 *Mvecmax = \&Math::Prime::Util::vecmax;
 *Mvecfirst = \&Math::Prime::Util::vecfirst;
@@ -171,27 +188,25 @@ our $_BIGINT;
 *MLi = \&Math::Prime::Util::LogarithmicIntegral;
 *Mprime_omega = \&Math::Prime::Util::prime_omega;
 *Mnth_prime_upper = \&Math::Prime::Util::nth_prime_upper;
+*Mprime_power_count = \&Math::Prime::Util::prime_power_count;
+*Msemiprime_count = \&Math::Prime::Util::semiprime_count;
 
+BEGIN {
 if (defined $Math::Prime::Util::GMP::VERSION && $Math::Prime::Util::GMP::VERSION >= 0.53) {
   *Saddint = \&Math::Prime::Util::GMP::addint;
   *Ssubint = \&Math::Prime::Util::GMP::subint;
   *Smulint = \&Math::Prime::Util::GMP::mulint;
   *Sdivint = \&Math::Prime::Util::GMP::divint;
   *Spowint = \&Math::Prime::Util::GMP::powint;
+  *Surandomm = \&Math::Prime::Util::GMP::urandomm;
 } else {
   *Saddint = \&Math::Prime::Util::addint;
   *Ssubint = \&Math::Prime::Util::subint;
   *Smulint = \&Math::Prime::Util::mulint;
   *Sdivint = \&Math::Prime::Util::divint;
   *Spowint = \&Math::Prime::Util::powint;
+  *Surandomm = \&Math::Prime::Util::urandomm;
 }
-
-# We don't have this function yet.  Use a simple version for now.
-*Mtoint = \&_toint_simple;
-
-
-sub _is_nonneg_int {
-  ((defined $_[0]) && $_[0] ne '' && ($_[0] !~ tr/0123456789//c));
 }
 
 sub _upgrade_to_float {
@@ -245,11 +260,27 @@ sub _bfdigits {
 }
 
 
-sub _validate_integer {
-  if (OLD_PERL_VERSION && defined $_[0] && !ref($_[0])) {
-    no warnings 'numeric';
-    $_[0] = "$_[0]" if "$_[0]" > 1e15 || "$_[0]" < -1e15;
+# Be careful optimizing this without consideration.
+# When XS is enabled, this is never used.
+#
+# Most paths use this as if it were:
+#   canonicalized_result() with good internal input we just want to shape
+# but some paths use this as if it were:
+#   validated_result() with user input to be validated + canonicalized
+#
+# What we have here is conservative, with only one fast path for small ints.
+#
+sub _canonicalized_integer {
+  my $n = $_[0];
+  if (defined $n) {
+    return 0+$n if !ref($n) && $n =~ /\A[+-]?\d{1,9}\z/;
+    validate_integer($n);
+    $n = tobigint($n) if ref($n);
   }
+  $n;
+}
+
+sub _validate_integer {
   my($n) = @_;
   croak "Parameter must be defined" if !defined $n;
 
@@ -260,15 +291,13 @@ sub _validate_integer {
       if $n eq '' || ($n =~ tr/0123456789//c && $n !~ /^([+-]?)\d+\z/);
     substr($_[0],0,1,'') if $1 && (substr($n,0,1) eq '+' || $n eq '-0');
     $_[0] = maybetobigint($n) if $n >= INTMAX || $n <= INTMIN;
+    $_[0] = 0 + $_[0] unless ref($_[0]);
   } elsif ($refn eq 'Math::BigInt') {
     croak "Parameter '$n' must be an integer" unless $n->is_int;
     if ($n->is_negative) { $_[0]=_bigint_to_int($_[0]) if $n >= INTMIN; }
     else                 { $_[0]=_bigint_to_int($_[0]) if $n <= INTMAX; }
-  } elsif ($refn =~ /^Math::/ && $refn ne 'Math::BigFloat') {
+  } elsif (defined $_BIGINT && $refn eq $_BIGINT) {
     $_[0] = _bigint_to_int($_[0]) if $n <= INTMAX && $n >= INTMIN;
-  } elsif ($refn eq 'CODE') {
-    $_[0] = $_[0]->();
-    return _validate_integer($_[0]);
   } else {
     $_[0] = "$_[0]";
     return _validate_integer($_[0]);
@@ -277,10 +306,6 @@ sub _validate_integer {
   1;
 }
 sub _validate_integer_nonneg {
-  if (OLD_PERL_VERSION && defined $_[0] && !ref($_[0])) {
-    no warnings 'numeric';
-    $_[0] = "$_[0]" if "$_[0]" > 1e15;
-  }
   my($n) = @_;
   croak "Parameter must be defined" if !defined $n;
 
@@ -292,16 +317,14 @@ sub _validate_integer_nonneg {
     substr($_[0],0,1,'') if $1 && substr($n,0,1) eq '+';
     # If probably a bigint, do the upgrade, then verify for edge cases.
     $_[0] = maybetobigint($n) if $n >= INTMAX;
+    $_[0] = 0 + $_[0] unless ref($_[0]);
   } elsif ($refn eq 'Math::BigInt') {
     croak "Parameter '$n' must be a non-negative integer"
       if !$n->is_int || $n->is_negative;
     $_[0] = _bigint_to_int($_[0]) if $n <= INTMAX;
-  } elsif ($refn =~ /^Math::/ && $refn ne 'Math::BigFloat') {
+  } elsif (defined $_BIGINT && $refn eq $_BIGINT) {
     croak "Parameter '$n' must be a non-negative integer" if $n < 0;
     $_[0] = _bigint_to_int($_[0]) if $n <= INTMAX;
-  } elsif ($refn eq 'CODE') {
-    $_[0] = $_[0]->();
-    return _validate_integer_nonneg($_[0]);
   } else {
      $_[0] = "$_[0]";
      return _validate_integer_nonneg($_[0]);
@@ -319,9 +342,27 @@ sub _validate_integer_abs {
   if (ref($_[0])) {
     $_[0] = -$_[0] if $_[0] < 0;
   } else {
-    $_[0] =~ s/^-// if "$_[0]" < 0;
+    $_[0] =~ s/^-// if defined $_[0] && $_[0] =~ /^-/;
   }
   _validate_integer($_[0]);
+}
+
+sub _is_aref {
+  my $type = reftype($_[0]);
+  defined($type) && $type eq 'ARRAY';
+}
+sub _is_href {
+  my $type = reftype($_[0]);
+  defined($type) && $type eq 'HASH';
+}
+sub _is_cref {
+  my $type = reftype($_[0]);
+  defined($type) && $type eq 'CODE';
+}
+sub _is_sref {
+  my $type = reftype($_[0]);
+  # Return true if we can write a scalar in it, regardless of current contents.
+  defined($type) && ($type eq 'SCALAR' || $type eq 'REF');
 }
 
 sub _try_real_gmp_func {
@@ -336,6 +377,9 @@ sub _try_real_gmp_func {
     return $fr if !ref($x) || ($fr < 1e15 && $fr > -1e15);
   }
   my $dig = _find_big_acc($x);
+  if (ref($x) && ref($x) ne 'Math::BigFloat') {
+    $dig = length($x) > $dig  ?  length($x)  :  $dig;
+  }
   my $str = $fref->($x, $dig);
   return _upgrade_to_float($str);
 }
@@ -353,81 +397,110 @@ sub _binary_search {
 
 ################################################################################
 
-# TODO: this is in progress.
-#   It's TBD what should be done on failures (undef? croak?)
-#   Handling of trivial floats is terrible.
-#   A single native int should be as fast as possible
-sub _toint {
-  my @v = @_;  # copy them all
-  my @out;
-  for my $v (@v) {
-    if (!defined $v) { push @out, 0; next; }
-    if (ref($v)) {
-      $v = $v->as_int() if ref($v) eq 'Math::BigFloat';
-    } elsif ($v =~ /^[+-]?\d+\z/) {
-      # Good as-is
-    } elsif ($v =~ /e/i || $v =~ /\./) {
-      $v = _upgrade_to_float($v)->as_int();
-    } else {
-      $v = int($v);
-    }
-    if ($v =~ /^nan\z/i) { push @out, undef; next; }
-
-    validate_integer($v);
-    push @out, $v;
-  }
-  @out;
+sub _truncate_bigfloat_to_string {
+  my $ns;
+  if (Math::BigFloat->can('bint')) { $ns = $_[0]->copy->bint->bstr; }
+  elsif ($_[0]->{sign} eq '+')     { $ns = $_[0]->copy->bfloor->bstr; }
+  else                             { $ns = $_[0]->copy->bceil->bstr; }
+  $ns =~ s/\.0*$//;
+  return $ns;
 }
 
-sub _toint_simple {
+sub toint {
+  croak "toint: requires an argument" unless @_;
   my($n) = @_;
-  if ($n >= 0) {
-    my $max = MPU_32BIT ? 4294967295 : 70368744177664;  # 2^46
-    if ($n =~ /^[+]?\d+\z/) {
-      return int("$n") if $n < $max;
-    } elsif ($n < $max) {
-      return int("$n");
-    } else {
-      $n = "" . _upgrade_to_float("$n")->bfloor;
-    }
+  return 0 unless defined $n && length("$n");   # undef and "" return 0
+  my $ns = "$n";
+
+  if (ref($n)) {
+    $n = _truncate_bigfloat_to_string($n) if ref($n) eq 'Math::BigFloat';
   } else {
-    my $min = MPU_32BIT ? -2147483648 : -35184372088832;  # -2^45
-    if ($n =~ /^[-]\d+\z/) {
-      return int($n) if $n > $min;
-    } elsif ($n > $min) {
-      return int($n);
+    $ns =~ s/\A[ \t\r\n\f\x0b]+//;
+    $ns =~ s/[ \t\r\n\f\x0b]+\z//;
+    croak "toint: '$ns' is not a valid number" unless length($ns);
+
+    if (index($ns, '_') >= 0) {
+      my $digit = $ns =~ /\A[+-]?0[xX]/ ? '[0-9A-Fa-f]' :
+                  $ns =~ /\A[+-]?0[oO]/ ? '[0-7]' :
+                  $ns =~ /\A[+-]?0[bB]/ ? '[01]' : '[0-9]';
+      1 while $ns =~ s/($digit)_($digit)/$1$2/g;
+      croak "toint: '$ns' is not a valid number" if index($ns, '_') >= 0;
+    }
+    $n = $ns;
+
+    if ($ns =~ /\A([+-]?)0[xX]([0-9a-fA-F]+)\z/) {
+      my($sign, $digits) = ($1, $2);
+      my $r = fromdigits($digits, 16);
+      return $sign eq '-' ? negint($r) : $r;
+    }
+    if ($ns =~ /\A([+-]?)0[bB]([01]+)\z/) {
+      my($sign, $digits) = ($1, $2);
+      my $r = fromdigits($digits, 2);
+      return $sign eq '-' ? negint($r) : $r;
+    }
+    if ($ns =~ /\A([+-]?)0[oO]([0-7]+)\z/) {
+      my($sign, $digits) = ($1, $2);
+      my $r = fromdigits($digits, 8);
+      return $sign eq '-' ? negint($r) : $r;
+    }
+    croak "toint: '$ns' is not a valid number"
+      if $ns =~ /\A[+-]?0[xXbBoO]/;
+
+    # Be careful with int($ns) on non-NV input, as it is limited to NV's
+    # precision.  We should be able to use 1 << _nvmantbits() as the unsigned
+    # threshold, but for various reasons we are being very conservative.
+    # In XS we can safely and efficiently discover the full values.
+    if ($ns !~ tr/0-9//c) {
+      my $max = MPU_32BIT ?  4294967295 :  70368744177664;  # 2^46
+      return int($ns) if $n < $max;
+    } elsif ($ns =~ /\A[-]\d+\z/) {
+      my $min = MPU_32BIT ? -2147483648 : -35184372088832;  # -2^45
+      return int($ns) if $n > $min;
     } else {
-      $n = "" . _upgrade_to_float("$n")->bceil;
+      croak "toint: '$ns' is not a valid number"
+        if ($ns =~ /\A[+-]?(?:[0-9]|\.)/ || $ns =~ /\A[+-]?\z/) &&
+           $ns !~ /\A[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?\z/;
+      $n = _truncate_bigfloat_to_string(_upgrade_to_float($ns));
     }
   }
+  croak "toint: '$ns' is not a valid number" if $n =~ tr/-0-9//c;
   validate_integer($n);
-  $n = tobigint($n) if ref($n) && defined $_BIGINT && ref($n) ne $_BIGINT;
+  if (ref($n)) {
+    Math::Prime::Util::_load_bigint() unless defined $_BIGINT;
+    $n = tobigint($n) if ref($n) ne $_BIGINT;
+  }
   $n;
 }
 
-sub _frombinary {
-  my($bstr) = @_;
-  $bstr =~ s/^0//;
-  return oct('0b' . $bstr) if length($bstr) <= 32;
-  # Avoid the useless portable warning that can't be silenced.
-  if (MPU_MAXBITS >= 64 && length($bstr) <= 64) {  # 64-bit Perl, 33-64 bit str
-    my $low = substr($bstr,-32,32,'');
-    return (oct('0b'.$bstr) << 32) + oct('0b'.$low);
+sub _fromhex {
+  my($hstr) = @_;
+  $hstr =~ s/^0+//;
+  return 0 unless length($hstr);
+  return hex($hstr) if length($hstr) <= 8;
+  if (MPU_MAXBITS >= 64 && length($hstr) <= 16) {
+    my $lo = hex(substr($hstr,-8,8,''));
+    return (hex($hstr) << 32) | $lo;
   }
-  # Length is bigger than word size, so must be a bigint
-  if (!defined $_BIGINT) {
-    return Math::BigInt->new("0b$bstr");
-  } elsif ($_BIGINT =~ /^Math::(BigInt|GMPz|GMP)$/) {
-    return $_BIGINT->new("0b$bstr");
-  } else {
-    return tobigint( Math::BigInt->new("0b$bstr") );
+  tobigint("0x$hstr");
+}
+sub _frombytes {
+  my($bytes) = @_;
+  if (defined $_BIGINT) {
+    if ($_BIGINT eq 'Math::GMPz') {
+      my $r = Math::GMPz::Rmpz_init();
+      Math::GMPz::Rmpz_import($r, length($bytes), 1, 1, 1, 0, $bytes);
+      return $r;
+    }
+    return Math::BigInt->from_bytes($bytes)
+      if $_BIGINT eq 'Math::BigInt' && Math::BigInt->can('from_bytes');
   }
+  return _fromhex(unpack("H*", $bytes));
 }
 
 ################################################################################
 ################################################################################
 
-my($_precalc_size, @_primes_small) = (2,undef,2);
+my($_precalc_size, @_primes_small, @_prime_count_small) = (2,undef,2);
 {
   my $_init_precalc_size = 5003;
   _register_free_sub(sub {
@@ -479,6 +552,22 @@ sub _tiny_prime_count {
     else                            { $j = $mid;   }
   }
   return $i-1;
+}
+sub _small_prime_count {
+  my($n) = @_;
+  return unless defined $n && !ref($n) && $n <= 16383;
+  if ($#_prime_count_small < 16383) {
+    _expand_prime_cache(16384);
+    my($pc, $pi) = (0, 1);
+    for my $i (0 .. 16383) {
+      if ($pi <= $#_primes_small && $_primes_small[$pi] == $i) {
+        $pc++;
+        $pi++;
+      }
+      $_prime_count_small[$i] = $pc;
+    }
+  }
+  $_prime_count_small[$n];
 }
 
 sub _is_prime7 {  # n must not be divisible by 2, 3, or 5
@@ -565,6 +654,7 @@ sub is_prime {
   return 0 if $n < 2;
 
   if (ref($n) eq 'Math::BigInt') {
+    # This is faster with Math::BigInt, but not with the other classes.
     return 0 unless Math::BigInt::bgcd($n, B_PRIM235)->is_one;
   } else {
     if ($n < 7) { return ($n == 2) || ($n == 3) || ($n == 5) ? 2 : 0; }
@@ -594,14 +684,6 @@ sub is_bpsw_prime {
   my($n) = @_;
   validate_integer($n);
   return _is_bpsw_prime($n);
-}
-
-sub is_provable_prime {
-  my($n) = @_;
-  validate_integer($n);
-  return _is_bpsw_prime($n) if $n <= 18446744073709551615;
-  my($is_prime, $cert) = Math::Prime::Util::is_provable_prime_with_cert($n);
-  $is_prime;
 }
 
 # Possible sieve storage:
@@ -669,8 +751,8 @@ sub _sieve_erat_string {
 
 sub _sieve_segment {
   my($beg,$end,$limit) = @_;
-  ($beg, $end) = map { _bigint_to_int($_) } ($beg, $end)
-    if ref($end) && $end <= INTMAX;
+  $beg = _bigint_to_int($beg) if ref($beg) && $beg <= INTMAX;
+  $end = _bigint_to_int($end) if ref($end) && $end <= INTMAX;
   croak "Internal error: segment beg is even" if ($beg % 2) == 0;
   croak "Internal error: segment end is even" if ($end % 2) == 0;
   croak "Internal error: segment end < beg" if $end < $beg;
@@ -722,14 +804,69 @@ sub _sieve_segment {
   \$sieve;
 }
 
-sub trial_primes {
-  my($low,$high) = @_;
-  if (!defined $high) {
-    $high = $low;
-    $low = 2;
+sub _parse_k_args {   # caller must validate n after
+  my $name = shift;
+  my $defk = shift;
+  croak "$name: expected (n) or (n,k)" if @_ != 1 && @_ != 2;
+  my($n, $k) = @_;
+  if (@_ == 1) {
+    $k = $defk;
+  } else {
+    validate_integer_nonneg($k);
   }
-  validate_integer_nonneg($low);
-  validate_integer_nonneg($high);
+  ($n, $k);
+}
+sub _parse_powerfree_args {   # caller must validate n after
+  my $name = $_[0];
+  my($n, $k) = _parse_k_args(@_);
+  croak "$name: k must be <= 4294967295" if $k > 4294967295;
+  ($n, $k);
+}
+
+sub _parse_base_args {   # caller must validate n after
+  my $name = shift;
+  my $maxb = shift;
+  croak "$name: expected (n) or (n,base)" if @_ != 1 && @_ != 2;
+  my($n, $b) = @_;
+  if (@_ == 1) {
+    $b = 10;
+  } else {
+    validate_integer_nonneg($b);
+    croak "$name: invalid base: $b" if $b < 2 || ($maxb && $b > $maxb);
+  }
+  ($n, $b);
+}
+
+sub _parse_range_args {
+  my $name = shift;
+  my $defbeg = shift;
+  croak "$name: expected hi or lo,hi" if @_ != 1 && @_ != 2;
+  my($beg, $end) = @_;
+  if (@_ == 1) {
+    ($beg,$end) = ($defbeg, $beg);
+  } else {
+    validate_integer_nonneg($beg);
+    $beg = $defbeg if $beg < $defbeg;
+  }
+  validate_integer_nonneg($end);
+  ($beg, $end);
+}
+
+sub _parse_factor_args {
+  my $name = shift;
+  my $noptargs = shift;
+  croak "$name: expected n and up to $noptargs optional arguments"
+    if @_ < 1 || @_ > 1+$noptargs;
+  my $n = shift;
+  validate_integer_nonneg($n);
+  my (@A) = @_;
+  validate_integer_nonneg($_) for @A;
+  return (canonicalized_integer($n),@A);
+}
+
+
+sub trial_primes {
+  my($low,$high) = _parse_range_args("trial_primes",2,@_);
   return if $low > $high;
   my @primes;
 
@@ -761,14 +898,7 @@ sub trial_primes {
 }
 
 sub primes {
-  my($low,$high) = @_;
-  if (scalar @_ > 1) {
-    validate_integer_nonneg($low);
-    $low = 2 if $low < 2;
-  } else {
-    ($low,$high) = (2, $low);
-  }
-  validate_integer_nonneg($high);
+  my($low,$high) = _parse_range_args("primes",2,@_);
   my $sref = [];
   return $sref if ($low > $high) || ($high < 2);
   return [grep { $_ >= $low && $_ <= $high } @_primes_small]
@@ -812,6 +942,9 @@ sub sieve_range {
   validate_integer_nonneg($n);
   validate_integer_nonneg($width);
   validate_integer_nonneg($depth);
+  croak "sieve_range: width must fit in native unsigned integer" if ref($width);
+  croak "sieve_range: depth must fit in native unsigned integer" if ref($depth);
+  return wantarray ? () : 0 if $width == 0;
 
   my @candidates;
   my $start = $n;
@@ -824,7 +957,19 @@ sub sieve_range {
     $width -= ($start - $n);
   }
 
+  return scalar(@candidates) + (($width > 0) ? $width : 0)
+    if !wantarray && $depth < 2;
   return @candidates, map {$start+$_-$n } 0 .. $width-1 if $depth < 2;
+  if (!wantarray && $depth < 5) {
+    my $count = scalar(@candidates);
+    if ($width > 0) {
+      for my $i (0 .. $width-1) {
+        my $v = $start + $i;
+        $count++ if ($v & 1) && ($depth < 3 || ($v % 3));
+      }
+    }
+    return $count;
+  }
   return @candidates, map { $_ - $n }
                       grep { ($_ & 1) && ($depth < 3 || ($_ % 3)) }
                       map { $start+$_ }
@@ -836,6 +981,11 @@ sub sieve_range {
 
   my $sieveref = _sieve_segment($start, $start+$width-1, $depth);
   my $offset = $start - $n - 2;
+  if (!wantarray) {
+    my $count = scalar(@candidates);
+    $count++ while $$sieveref =~ m/0/g;
+    return $count;
+  }
   while ($$sieveref =~ m/0/g) {
     push @candidates, $offset + (pos($$sieveref) << 1);
   }
@@ -848,20 +998,21 @@ sub sieve_prime_cluster {
   validate_integer_nonneg($lo);
   validate_integer_nonneg($hi);
 
-  if ($Math::Prime::Util::_GMPfunc{"sieve_prime_cluster"}) {
-    return maybetobigintall(
-             Math::Prime::Util::GMP::sieve_prime_cluster($lo,$hi,@cl)
-           );
-  }
-
   return @{Mprimes($lo,$hi)} if scalar(@cl) == 0;
 
-  unshift @cl, 0;
-  for my $i (1 .. $#cl) {
+  for my $i (0 .. $#cl) {
     validate_integer_nonneg($cl[$i]);
     croak "sieve_prime_cluster: values must be even" if $cl[$i] & 1;
-    croak "sieve_prime_cluster: values must be increasing" if $cl[$i] <= $cl[$i-1];
+    croak "sieve_prime_cluster: values must be increasing" if $i > 0 && $cl[$i] <= $cl[$i-1];
   }
+  shift @cl if $cl[0] == 0;
+  return @{Mprimes($lo,$hi)} if scalar(@cl) == 0;
+
+  return maybetobigintall(
+             Math::Prime::Util::GMP::sieve_prime_cluster($lo,$hi,@cl)
+         ) if $Math::Prime::Util::_GMPfunc{"sieve_prime_cluster"} && $cl[-1] <= 2147483647;
+
+  unshift @cl, 0;
   my($p,$sievelim,@p) = (17, 3000);
   if (defined $_BIGINT && (ref($lo) || ref($hi))) {
     ($lo,$hi) = map {tobigint($_)} ($lo,$hi) if ref($lo) ne $_BIGINT || ref($hi) ne $_BIGINT;
@@ -886,7 +1037,7 @@ sub sieve_prime_cluster {
 
   # Compute acceptable residues.
   my $pr = Mprimorial($p);
-  my $startpr = _bigint_to_int($lo % $pr);
+  my $startpr = Mmodint($lo,$pr);
 
   my @acc = grep { ($_ & 1) && $_%3 }  ($startpr .. $startpr + $pr - 1);
   for my $c (@cl) {
@@ -909,7 +1060,7 @@ sub sieve_prime_cluster {
   my(@lorem,@vprem);
   for my $pidx (0..$#mprimes) {
     my $p = $mprimes[$pidx];
-    $lorem[$pidx] = _bigint_to_int($lo % $p);
+    $lorem[$pidx] = Mmodint($lo,$p);
     for my $c (@cl) {
       $vprem[$pidx]->[ ($p-($c%$p)) % $p ] = 1;
     }
@@ -923,7 +1074,7 @@ sub sieve_prime_cluster {
 
     # Make sure we don't do anything past the limit
     if (($lo+$acc[-1]) > $hi) {
-      my $max = _bigint_to_int($hi-$lo);
+      my $max = Msubint($hi,$lo);
       @racc = grep { $_ <= $max } @racc;
     }
 
@@ -971,14 +1122,7 @@ sub sieve_prime_cluster {
 }
 
 sub prime_powers {
-  my($low,$high) = @_;
-  if (scalar @_ > 1) {
-    validate_integer_nonneg($low);
-    $low = 2 if $low < 2;
-  } else {
-    ($low,$high) = (2, $low);
-  }
-  validate_integer_nonneg($high);
+  my($low,$high) = _parse_range_args("prime_powers",2,@_);
 
   if ($high > 1e18 || ($high-$low) < 10) {
     my $sref = [];
@@ -1010,16 +1154,9 @@ sub prime_powers {
 }
 
 sub twin_primes {
-  my($low,$high) = @_;
-  if (scalar @_ > 1) {
-    validate_integer_nonneg($low);
-    $low = 2 if $low < 2;
-  } else {
-    ($low,$high) = (2, $low);
-  }
-  validate_integer_nonneg($high);
+  my($low,$high) = _parse_range_args("twin_primes",2,@_);
   my @tp;
-  if ($Math::Prime::Util::_GMPfunc{"twin_twin_primes"}) {
+  if ($Math::Prime::Util::_GMPfunc{"sieve_twin_primes"}) {
     @tp = Math::Prime::Util::GMP::sieve_twin_primes($low, $high);
   } else {
     @tp = sieve_prime_cluster($low, $high, 2);
@@ -1028,14 +1165,7 @@ sub twin_primes {
 }
 
 sub semi_primes {
-  my($low,$high) = @_;
-  if (scalar @_ > 1) {
-    validate_integer_nonneg($low);
-    $low = 4 if $low < 4;
-  } else {
-    ($low,$high) = (4, $low);
-  }
-  validate_integer_nonneg($high);
+  my($low,$high) = _parse_range_args("semi_primes",4,@_);
   my @sp;
   Math::Prime::Util::forsemiprimes(sub { push @sp,$_; }, $low, $high);
   \@sp;
@@ -1062,14 +1192,7 @@ sub _n_ramanujan_primes {
 }
 
 sub ramanujan_primes {
-  my($low,$high) = @_;
-  if (scalar @_ > 1) {
-    validate_integer_nonneg($low);
-    $low = 2 if $low < 2;
-  } else {
-    ($low,$high) = (2, $low);
-  }
-  validate_integer_nonneg($high);
+  my($low,$high) = _parse_range_args("ramanujan_primes",2,@_);
   return [] if ($low > $high) || ($high < 2);
   my $nn = Math::Prime::Util::prime_count_upper($high) >> 1;
   my $L = _n_ramanujan_primes($nn);
@@ -1080,8 +1203,8 @@ sub ramanujan_primes {
 
 sub is_ramanujan_prime {
   my($n) = @_;
-  return 1 if $n == 2;
-  return 0 if $n < 11;
+  validate_integer($n);
+  return 0+($n==2) if $n < 11;
   my $L = Math::Prime::Util::ramanujan_primes($n,$n);
   return (scalar(@$L) > 0) ? 1 : 0;
 }
@@ -1104,36 +1227,28 @@ sub next_prime {
   return tobigint(MPU_32BIT ? "4294967311" : "18446744073709551629") if !ref($n) && $n >= MPU_MAXPRIME;
   # n is now either 1) not bigint and < maxprime, or (2) bigint and >= uvmax
 
-  if ($n > 4294967295 && getconfig()->{'gmp'}) {
-    return reftyped($_[0], Math::Prime::Util::GMP::next_prime($n));
-  }
-
   do {
     $n += $_wheeladvance30[$n%30];
   } while !($n%7) || !_is_prime7($n);
 
-  $n;
+  canonicalized_integer($n);
 }
 
 sub prev_prime {
   my($n) = @_;
   validate_integer_nonneg($n);
   return (undef,undef,undef,2,3,3,5,5,7,7,7,7)[$n] if $n <= 11;
-  if ($n > 4294967295 && getconfig()->{'gmp'}) {
-    return reftyped($_[0], Math::Prime::Util::GMP::prev_prime($n));
-  }
 
   do {
     $n -= $_wheelretreat30[$n%30];
   } while !($n%7) || !_is_prime7($n);
 
-  $n = _bigint_to_int($n) if ref($n) && $n <= INTMAX;
-  $n;
+  canonicalized_integer($n);
 }
 
 sub next_prime_power {
   my($n) = @_;
-  validate_integer_nonneg($n);
+  validate_integer_abs($n);
   return (2,2,3,4,5,7,7,8,9)[$n] if $n <= 8;
   while (1) {
     $n = Madd1int($n);
@@ -1142,7 +1257,7 @@ sub next_prime_power {
 }
 sub prev_prime_power {
   my($n) = @_;
-  validate_integer_nonneg($n);
+  validate_integer_abs($n);
   return (undef,undef,undef,2,3,4,5,5,7)[$n] if $n <= 8;
   while (1) {
     $n = Msub1int($n);
@@ -1153,6 +1268,7 @@ sub prev_prime_power {
 sub partitions {
   my($n) = @_;
   validate_integer_nonneg($n);
+  croak "partitions: n must fit in native signed integer" if $n > SINTMAX;
 
   my $d = Msqrtint(Madd1int($n));
   my @pent = (1, map { (($_*(3*$_+1))>>1, (($_+1)*(3*$_+2))>>1) } 1 .. $d);
@@ -1169,8 +1285,40 @@ sub partitions {
     }
     $part[$j] = $psum1 - $psum2;
   }
-  return $part[$n];
+  canonicalized_integer($part[$n]);
 }
+
+sub partitionsq {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  croak "partitionsq: n must fit in native signed integer" if $n > SINTMAX;
+  # n = 462 exceeds 2^49 intermediates
+  my($ZERO,$ONE) = $n < 462  ?  (0,1)  :  (tobigint(0),tobigint(1));
+  my @part = ($ONE);
+  for my $j (1..$n) {
+    my($pos, $neg) = ($ZERO, $ZERO);
+    my($i, $sign) = (1, 1);
+    while ((my $a = ($i*(3*$i-1)) >> 1) <= $j) {
+      my $b = ($i*(3*$i+1)) >> 1;
+      if ($sign > 0) {
+        $pos += $part[$j-$a];
+        $pos += $part[$j-$b] if $b <= $j;
+      } else {
+        $neg += $part[$j-$a];
+        $neg += $part[$j-$b] if $b <= $j;
+      }
+      # E(x²) correction: nonzero when j = 2*a or 2*b (j/2 is pentagonal)
+      # sign of e₂(j) is opposite the recurrence sign
+      if ($a*2 == $j || $b*2 == $j) {
+        $sign > 0 ? $neg++ : $pos++;
+      }
+      $i++;  $sign = -$sign;
+    }
+    $part[$j] = $pos-$neg;
+  }
+  canonicalized_integer($part[$n]);
+}
+
 
 my @_lf63 = (0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,1,1,1,0,0,1,0,0,1,1,1,1,0,0,1,0,0,1,0,0,1,1,1,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,1,1,1,1,1,1,0,0);
 my @_small_lucky = (undef,1,3,7,9,13,15,21,25,31,33,37,43,49,51,63,67,69,73,75,79,87,93,99,105,111,115,127,129,133,135,141,151,159,163,169,171,189,193,195);
@@ -1323,6 +1471,7 @@ sub nth_lucky_lower {
 
 sub is_lucky {
   my($n) = @_;
+  validate_integer($n);
 
   # Pretests
   return 0 if $n <= 0 || !($n % 2) || ($n % 6) == 5 || $_lf63[$n % 63];
@@ -1372,20 +1521,22 @@ sub goldbach_pairs {
   return goldbach_pair_count($n) unless wantarray;
   validate_integer_nonneg($n);
   return () if $n < 4;
-  return Mis_prime($n-2) ? (2) : ()  if $n & 1 || $n == 4;
+  return Mis_prime($n-2) ? (2) : ()  if $n == 4 || Mis_odd($n);
   my @L;
   Mforprimes( sub {
     push @L,$n-$_ if Mis_prime($n-$_);
-  }, Mrshiftint($n,1), $n-3);
+  }, Mrshiftint($n), $n-3);
   reverse @L;
 }
 
 
 sub primorial {
   my($n) = @_;
+  validate_integer_nonneg($n);
+  croak "primorial: n must fit in native signed integer" if $n > SINTMAX;
 
   my @plist = @{Mprimes($n)};
-  my $max = (MPU_32BIT) ? 29 : (OLD_PERL_VERSION) ? 43 : 53;
+  my $max = (MPU_32BIT) ? 29 : 53;
 
   # If small enough, multiply the small primes.
   if ($n < $max) {
@@ -1406,6 +1557,8 @@ sub primorial {
 
 sub pn_primorial {
   my($n) = @_;
+  validate_integer_nonneg($n);
+  croak "pn_primorial: n must fit in native signed integer" if $n > SINTMAX;
   return (1,2,6,30,210,2310,30030,510510,9699690,223092870)[$n] if $n < 10;
   Mprimorial(nth_prime($n));
 }
@@ -1413,6 +1566,7 @@ sub pn_primorial {
 sub consecutive_integer_lcm {
   my($n) = @_;
   validate_integer_nonneg($n);
+  croak "consecutive_integer_lcm: n must fit in native signed integer" if $n > SINTMAX;
 
   return (1,1,2)[$n] if $n <= 2;
   my @powers;
@@ -1421,9 +1575,7 @@ sub consecutive_integer_lcm {
     $p_power = Mmulint($p_power,$p) while $p_power <= $pmin;
     push @powers, $p_power;
   }
-  my $pn = Mvecprod(@powers);
-  $pn = _bigint_to_int($pn) if $pn <= INTMAX;
-  return $pn;
+  Mvecprod(@powers);
 }
 
 sub frobenius_number {
@@ -1435,7 +1587,7 @@ sub frobenius_number {
   return undef if $A[0] <= 1 || scalar(@A) <= 1;
   croak "Frobenius number set must be coprime" unless Mgcd(@A) == 1;
 
-  return Msubint(Msubint(Mmulint($A[0],$A[1]),$A[0]),$A[1]) if scalar(@A) == 2;
+  return Msubint(Mmulsubint($A[0],$A[1],$A[0]), $A[1]) if scalar(@A) == 2;
 
   # Basic Round Robin algorithm from Böcker and Lipták
   # https://bio.informatik.uni-jena.de/wp/wp-content/uploads/2024/01/BoeckerLiptak_FastSimpleAlgorithm_reprint_2007.pdf
@@ -1454,7 +1606,7 @@ sub frobenius_number {
       my $n = ($r == 0) ? 0
             : Mvecmin(grep {defined} @N[map { $r+$_*$d } 0..$nlend]);
       if (defined $n) {
-        if (Maddint($n,Mmulint($A[$i],$nlend-1)) <= INTMAX) {
+        if (Mmuladdint($A[$i], $nlend-1, $n) <= INTMAX) {
           for (1 .. $nlend-1) {
             $n += $A[$i];
             my $p = $n % $nlen;
@@ -1479,12 +1631,11 @@ sub jordan_totient {
   my($k, $n) = @_;
   validate_integer_nonneg($k);
   validate_integer_nonneg($n);
+  croak "jordan_totient: k must fit in a UV" if $k > INTMAX;
+
   return ($n == 1) ? 1 : 0  if $k == 0;
   return Mtotient($n)       if $k == 1;
   return ($n == 1) ? 1 : 0  if $n <= 1;
-
-  return reftyped($_[0], Math::Prime::Util::GMP::jordan_totient($k, $n))
-    if $Math::Prime::Util::_GMPfunc{"jordan_totient"};
 
   my $totient = 1;
   foreach my $f (Mfactor_exp($n)) {
@@ -1499,13 +1650,11 @@ sub jordan_totient {
 sub euler_phi {
   return _euler_phi_range(@_) if scalar @_ > 1;
   my($n) = @_;
-  return 0 if defined $n && $n < 0;
+  validate_integer($n);
+  return 0+($n==1) if $n <= 1;
 
-  return reftyped($_[0],Math::Prime::Util::GMP::totient($n))
+  return maybetobigint(Math::Prime::Util::GMP::totient($n))
     if $Math::Prime::Util::_GMPfunc{"totient"};
-
-  validate_integer_nonneg($n);
-  return $n if $n <= 1;
 
   my ($t2, $tot) = (1,1);
 
@@ -1624,6 +1773,9 @@ sub _euler_phi_range {
   validate_integer($lo);
   validate_integer($hi);
 
+  return ($hi < $lo) ? 0 : Madd1int(Msubint($hi,$lo)) unless wantarray;
+  return () if $hi < $lo;
+
   my @totients;
   while ($lo < 0 && $lo <= $hi) {
     push @totients, 0;
@@ -1694,6 +1846,22 @@ sub sumtotient {
   _sumtot($n, \@sumcache, {});
 }
 
+sub dedekind_psi {
+  my($n) = @_;
+  validate_integer($n);
+  return 0 if $n <= 0;
+  my @P;
+  for my $pe (Mfactor_exp($n)) {
+    my($f,$e) = @$pe;
+    if ($e == 1) {
+      push @P, Madd1int($f);
+    } else {
+      my $T = Mpowint($f,$e-1);
+      push @P, Mmuladdint($T, $f, $T);
+    }
+  }
+  Mvecprod(@P);
+}
 
 sub prime_bigomega {
   my($n) = @_;
@@ -1747,7 +1915,6 @@ sub is_odd {
   my $R = ref($n);
   return $n->is_odd() ? 1 : 0 if $R eq 'Math::BigInt';
   return Math::GMPz::Rmpz_odd_p($n) ? 1 : 0 if $R eq 'Math::GMPz';
-  return (my $k = substr("$n",-1,1)) =~ tr/13579/13579/ if OLD_PERL_VERSION;
   return $n % 2 ? 1 : 0;
 }
 sub is_even {
@@ -1756,7 +1923,6 @@ sub is_even {
   my $R = ref($n);
   return $n->is_even() ? 1 : 0 if $R eq 'Math::BigInt';
   return Math::GMPz::Rmpz_even_p($n) ? 1 : 0 if $R eq 'Math::GMPz';
-  return (my $k = substr("$n",-1,1)) =~ tr/02468/02468/ if OLD_PERL_VERSION;
   return $n % 2 ? 0 : 1;
 }
 
@@ -1791,9 +1957,6 @@ sub is_smooth {
   return 0 if $k <= 1;
   return 1 if $n <= $k;
 
-  return Math::Prime::Util::GMP::is_smooth($n,$k)
-    if $Math::Prime::Util::_GMPfunc{"is_smooth"};
-
   if ($k <= 10000000) {
     my @f;
     while (1) {
@@ -1817,9 +1980,6 @@ sub is_rough {
   return 0 if $k > $n;
   return 0+($n >= 1) if $k == 2;
 
-  return Math::Prime::Util::GMP::is_rough($n,$k)
-    if $Math::Prime::Util::_GMPfunc{"is_rough"};
-
   if ($k < 50000) {
     my @f = Mtrial_factor($n, $k-1);
     return 0 + ($f[0] >= $k);
@@ -1828,15 +1988,10 @@ sub is_rough {
   return (Mvecnone(sub { $_ < $k }, Mfactor($n))) ? 1 : 0;
 }
 sub is_powerful {
-  my($n, $k) = @_;
+  my($n, $k) = _parse_k_args("is_powerful", 2, @_);
   validate_integer($n);
-  if (defined $k) { validate_integer_nonneg($k); } else { $k = 2; }
-
-  return 0 if $n < 1;
-  return 1 if $n == 1 || $k <= 1;
-
-  return Math::Prime::Util::GMP::is_powerful($n,$k)
-    if $Math::Prime::Util::_GMPfunc{"is_powerful"};
+  return 0+($n==1) if $n <= 1;
+  return 1 if $k <= 1;
 
   # First quick checks for inadmissibility.
   if ($k == 2) {
@@ -1929,11 +2084,10 @@ sub _powerful_count_recurse {
 }
 
 sub powerful_count {
-  my($n, $k) = @_;
-  validate_integer($n);   $n = 0 if $n < 0;
-  if (defined $k) { validate_integer_nonneg($k); } else { $k = 2; }
-
-  return $n if $k <= 1 || $n <= 1;
+  my($n, $k) = _parse_k_args("powerful_count", 2, @_);
+  validate_integer($n);
+  return 0+($n==1) if $n <= 1;
+  return canonicalized_integer($n) if $k <= 1;
 
   if ($k == 2) {
     my $sum = 0;
@@ -1958,12 +2112,11 @@ sub powerful_count {
 }
 
 sub nth_powerful {
-  my($n, $k) = @_;
+  my($n, $k) = _parse_k_args("nth_powerful", 2, @_);
   validate_integer_nonneg($n);
-  if (defined $k) { validate_integer_nonneg($k); } else { $k = 2; }
 
   return undef if $n == 0;
-  return $n if $k <= 1 || $n <= 1;
+  return canonicalized_integer($n) if $k <= 1 || $n <= 1;
   return Mpowint(2,$k) if $n == 2;
   return Mpowint(2,$k+1) if $n == 3;
 
@@ -2045,11 +2198,9 @@ sub _sumpowerful2 {
 }
 
 sub sumpowerful {
-  my($n, $k) = @_;
-  validate_integer($n);   $n = 0 if $n < 0;
-  if (defined $k) { validate_integer_nonneg($k); } else { $k = 2; }
-
-  return $n if $n <= 1;
+  my($n, $k) = _parse_k_args("sumpowerful", 2, @_);
+  validate_integer($n);
+  return 0+($n==1) if $n <= 1;
   return Mrshiftint(Mmulint($n,Madd1int($n))) if $k <= 1;
 
   return _sumpowerful2($n) if $k == 2;
@@ -2087,31 +2238,40 @@ sub _pcg {
   }
 }
 sub powerful_numbers {
-  my($lo, $hi, $k) = @_;
-  if (defined $k) { validate_integer_nonneg($k); } else { $k = 2; }
-  if (defined $hi) {
-    validate_integer_nonneg($lo);
-  } else {
-    ($lo, $hi) = (1, $lo);
-  }
+  my($lo, $hi, $k) = (1,undef,2);
+  if    (@_ == 1) { ($hi)        = @_; }
+  elsif (@_ == 2) { ($lo,$hi)    = @_; }
+  elsif (@_ == 3) { ($lo,$hi,$k) = @_; }
+  else { croak "powerful_numbers: expected (hi), (lo,hi), or (lo,hi,k)"; }
+  validate_integer_nonneg($lo);
   validate_integer_nonneg($hi);
+  validate_integer_nonneg($k);
+
+  $lo = 1 if $lo < 1;
   return [] if $hi < $lo;
-  return [$lo .. $hi] if $k <= 1;
+  return [$lo .. $hi] if $k <= 1 && Mcmpint($hi, SINTMAX) <= 0;
 
   my $pn = [];
+  if ($k <= 1) {
+    while (Mcmpint($lo,$hi) <= 0) {
+      push @$pn, $lo;
+      $lo = Madd1int($lo);
+    }
+    return $pn;
+  }
+  return $lo == 1 ? [1] : [] if $k > Mlogint($hi,2);
   _pcg($lo, $hi, $k, 1, 2*$k-1, $pn);
   Mvecsorti($pn);
 }
 
 sub is_powerfree {
-  my($n, $k) = @_;
+  my($n, $k) = _parse_powerfree_args("is_powerfree", 2, @_);
   validate_integer_abs($n);
-  if (defined $k) { validate_integer_nonneg($k); }
-  else            { $k = 2; }
 
   return (($n == 1) ? 1 : 0)  if $k < 2 || $n <= 1;
   #return 1 if $n < Mpowint(2,$k);
   return 1 if $n < 4;
+  return 1 if $k > Mlogint($n,2);
 
   if ($k == 2) {
     return 0 if !($n % 4) || !($n % 9) || !($n % 25);
@@ -2129,12 +2289,11 @@ sub is_powerfree {
 }
 
 sub powerfree_count {
-  my($n, $k) = @_;
-  validate_integer_abs($n);
-  if (defined $k) { validate_integer_nonneg($k); }
-  else            { $k = 2; }
-
-  return (($n >= 1) ? 1 : 0)  if $k < 2 || $n <= 1;
+  my($n, $k) = _parse_powerfree_args("powerfree_count", 2, @_);
+  validate_integer($n);
+  return 0+($n==1) if $n <= 1;
+  return (($n >= 1) ? 1 : 0)  if $k < 2;
+  return $n if $k > Mlogint($n,2);
 
   my $count = 0;
   my $nk = Mrootint($n, $k);
@@ -2156,7 +2315,7 @@ sub powerfree_count {
       $count += $mu[$i] * $n/($i**$k) if $mu[$i];
     }
     #@mu = Mmoebius($L1+1, $nk);   my $c1 = 0;   $c1 += $_ for @mu;
-    my $c1 = Math::Prime::Util::mertens($nk) - Math::Prime::Util::mertens($L1);
+    my $c1 = Mmertens(Madd1int($L1), $nk);
     return Mvecsum($count,$c1,$n);
   }
 
@@ -2174,8 +2333,10 @@ sub powerfree_count {
   # Optimization 2:  Use GMP basic arithmetic functions if possible, saving
   #                  all the bigint object overhead.  Can be 10x faster.
 
-  my $A = Msqrtint($nk);
-  my @L = (0, $nk, map { Mrootint(Mdivint($n,$_),$k) } 2..$A);
+  my $A = Mmulint(4,Msqrtint($nk));
+  $A = $nk if $A > $nk;
+  my $lastlo = Mrootint(Mdivint($n,$A),$k);
+  my $native_mertens = getconfig()->{'xs'} && $nk <= INTMAX;
   my @C;
 
   Math::Prime::Util::forsquarefree(
@@ -2184,30 +2345,34 @@ sub powerfree_count {
              ? Ssubint($count, Sdivint($n, Spowint($_, $k)))
              : Saddint($count, Sdivint($n, Spowint($_, $k)));
     },
-    2, $L[$A]
+    2, $lastlo
   );
+  my $hi = $nk;
   for my $i (2 .. $A) {
-    my($c, $lo, $hi) = (0, $L[$i], $L[$i-1]);
-    if ($i < 15) {
-      $c = Math::Prime::Util::mertens($hi) - Math::Prime::Util::mertens($lo);
-    } else {
-      $c += $_ for Mmoebius( Madd1int($lo), $hi );
+    my $lo = Mrootint(Mdivint($n,$i),$k);
+    if ($lo < $hi) {
+      my $c = 0;
+      if ($native_mertens || ($nk > 4294967296 && $i < 15)) {
+        $c = Mmertens(Madd1int($lo), $hi);
+      } else {
+        $c += $_ for Mmoebius(Madd1int($lo), $hi);
+      }
+      push @C, $c * ($i-1);
+      @C = (Mvecsum(@C)) if scalar(@C) > 100000;  # Save/restrict memory.
     }
-    push @C, $c * ($i-1);
-    @C = (Mvecsum(@C)) if scalar(@C) > 100000;  # Save/restrict memory.
+    $hi = $lo;
   }
   my $ctot = Mvecsum(@C); # Can typically be done in native math.
   Mvecsum($count, $n, $ctot);
 }
 
 sub nth_powerfree {
-  my($n, $k) = @_;
+  my($n, $k) = _parse_powerfree_args("nth_powerfree", 2, @_);
   validate_integer_nonneg($n);
-  if (defined $k) { validate_integer_nonneg($k); }
-  else            { $k = 2; }
 
   return undef if $n == 0 || $k < 2;
   return $n if $n < 4;
+  return $n if $k > Mlogint($n,2);
 
   # 1. zm is the zeta multiplier (float), qk is the expected value (integer).
   my($zm, $qk);
@@ -2228,12 +2393,12 @@ sub nth_powerfree {
 
   my($count, $diff);
   # In practice this converges very rapidly, usually needing only one iteration.
-  for (1 .. 10) {
+  for my $iter (1 .. 10) {
     # 2. Get the actual count at qk and the difference from our goal.
     $count = Math::Prime::Util::powerfree_count($qk,$k);
     $diff = ($count >= $n)  ?  $count-$n  :  $n-$count;
-    print "nth_powerfree: iter $_, count $count diff $diff\n" if $verbose;
-    last if $diff <= 300;   # Threshold could be improved.
+    print "nth_powerfree: iter $iter, count $count diff $diff\n" if $verbose;
+    last if $diff <= 300 || $iter == 10;  # Threshold could be improved.
 
     # 3. If not close, update the estimate using the expected density zm.
     my $delta = Mtoint($zm * "$diff");
@@ -2255,12 +2420,11 @@ sub nth_powerfree {
 }
 
 sub powerfree_sum {
-  my($n, $k) = @_;
-  validate_integer_nonneg($n);
-  if (defined $k) { validate_integer_nonneg($k); }
-  else            { $k = 2; }
-
-  return (($n >= 1) ? 1 : 0)  if $k < 2 || $n <= 1;
+  my($n, $k) = _parse_powerfree_args("powerfree_sum", 2, @_);
+  validate_integer($n);
+  return 0 if $n < 1;
+  return 1 if $n == 1 || $k < 2;
+  return _T($n) if $k > Mlogint($n,2);
 
   my $sum = 0;
   my($ik, $nik, $T);
@@ -2270,7 +2434,7 @@ sub powerfree_sum {
       $nik = Mdivint($n, $ik);
       $T = Mrshiftint(Mmulint($nik, Madd1int($nik)));
       $sum = (scalar(@_) & 1) ? Msubint($sum, Mmulint($ik,$T)) :
-                                Maddint($sum, Mmulint($ik,$T));
+                                Mmuladdint($ik, $T, $sum);
     },
     Mrootint($n, $k)
   );
@@ -2278,14 +2442,16 @@ sub powerfree_sum {
 }
 
 sub powerfree_part {
-  my($n, $k) = @_;
-  my $negmul = ($n < 0) ? -1 : 1;
-  validate_integer_abs($n);
-  if (defined $k) { validate_integer_nonneg($k); }
-  else            { $k = 2; }
-
+  my($n, $k) = _parse_powerfree_args("powerfree_part", 2, @_);
+  validate_integer($n);
+  my $negmul = 1;
+  if ($n < 0) {
+    $negmul = -1;
+    $n = Mnegint($n);
+  }
   return $negmul if $n == 1;
   return 0 if $k < 2 || $n == 0;
+  return $negmul == 1 ? $n : Mnegint($n) if $k > Mlogint($n,2);
 
   #return Mvecprod(map { Mpowint($_->[0], $_->[1] % $k) } Mfactor_exp($n));
 
@@ -2309,17 +2475,18 @@ sub _fprod {
 }
 
 sub powerfree_part_sum {
-  my($n, $k) = @_;
-  validate_integer_abs($n);
-  if (defined $k) { validate_integer_nonneg($k); }
-  else            { $k = 2; }
+  my($n, $k) = _parse_powerfree_args("powerfree_part_sum", 2, @_);
+  validate_integer($n);
+  return 0 if $n < 1;
+  return 1 if $n == 1 || $k < 2;
+  return _T($n) if $k > Mlogint($n,2);
 
-  return (($n >= 1) ? 1 : 0)  if $k < 2 || $n <= 1;
-
-  Mvecsum( _T($n),
-           map { Mmulint(_fprod($_,$k), _T(Mdivint($n, Mpowint($_, $k)))) }
-              2 .. Mrootint($n,$k)
-         );
+  my @A = (_T($n));
+  for my $i (2 .. Mrootint($n,$k)) {
+    push @A, Mmulint(_fprod($i,$k), _T(Mdivint($n, Mpowint($i, $k))));
+    @A = (Mvecsum(@A)) if @A >= 16384;
+  }
+  Mvecsum(@A);
 }
 
 sub squarefree_kernel {
@@ -2343,7 +2510,7 @@ sub is_perfect_power {
 sub _perfect_power_count {
   my($n) = @_;
   return 0+($n>=1)+($n>=4) if $n < 8;
-  #return reftyped($_[0], Math::Prime::Util::GMP::perfect_power_count($n))
+  #return maybetobigint(Math::Prime::Util::GMP::perfect_power_count($n))
   #  if $Math::Prime::Util::_GMPfunc{"perfect_power_count"};
   my @T = (1);
 
@@ -2395,7 +2562,7 @@ sub _next_perfect_power {
   for (my $k = $kinit+$kinc; $k <= 1+$log2n; $k += $kinc) {
     my $r = Mrootint($n,$k);
     my $c = Mpowint(Madd1int($r),$k);
-    $best = addint($c,0) if $c < $best && $c > $n;  # OLD_PERL_VERSION
+    $best = $c if $c < $best && $c > $n;
   }
   $best;
 }
@@ -2416,7 +2583,7 @@ sub _prev_perfect_power {
     if ($r > 1) {
       my $c = Mpowint($r,$k);
       $c = Mpowint(Msub1int($r),$k) if $c >= $n;
-      $best = addint($c,0) if $c > $best && $c < $n;  # OLD_PERL_VERSION
+      $best = $c if $c > $best && $c < $n;
     }
   }
   $best;
@@ -2639,10 +2806,40 @@ sub nth_prime_power {
   my($n) = @_;
   validate_integer_nonneg($n);
   return (undef,2,3,4,5,7,8,9)[$n] if $n < 8;
-  # TODO: This is a good candidte for the approx interpolation method
+
+  # The approximation is usually very close.
+  my $apn = Math::Prime::Util::nth_prime_power_approx($n);
+  my $guess = $apn;
+  my $count = Mprime_power_count($guess);
+  my $miss  = ($count >= $n) ? Msubint($count,$n) : Msubint($n,$count);
+  # Refine the guess.  This typically converges very quickly.
+  for (1 .. 10) {
+    last if $miss <= 800;
+    my $adjust = Msubint($apn, Math::Prime::Util::nth_prime_power_approx($count));
+    last if $adjust == 0;
+    my $newguess = Maddint($guess,$adjust);
+    last if $newguess == $guess || $newguess < 2;
+    $guess = $newguess;
+    $count = Mprime_power_count($guess);
+    $miss  = ($count >= $n) ? Msubint($count,$n) : Msubint($n,$count);
+  }
+  # Walk using prev/next.
+  if ($miss <= 10_000) {
+    my $steps = 0+$miss;
+    if ($count >= $n) {
+      $guess = Math::Prime::Util::prev_prime_power(Madd1int($guess));
+      $guess = Math::Prime::Util::prev_prime_power($guess) while $steps--;
+    } else {
+      $guess = Math::Prime::Util::next_prime_power($guess) while $steps--;
+    }
+    return $guess;
+  }
+
+  # Just in case we weren't able to get the approx method to converge.
+  # Keep the inverse interpolation here.  We don't expect it to be used.
   my($lo,$hi) = (_simple_nth_prime_power_lower($n), _simple_nth_prime_power_upper($n));
-  1+_binary_search($n, $lo, $hi,
-                   sub{Math::Prime::Util::prime_power_count(shift)});
+  _inverse_interpolate($lo, $hi, $n, 0,
+                       sub { Mprime_power_count($_[1]) });
 }
 
 
@@ -2652,7 +2849,7 @@ sub smooth_count {
   validate_integer_nonneg($k);
   return 0 if $n < 1;
   return 1 if $k <= 1;
-  return $n if $k >= $n;
+  return canonicalized_integer($n) if $k >= $n;
 
   my $sum = 1 + Mlogint($n,2);
   if ($k >= 3) {
@@ -2690,9 +2887,9 @@ sub rough_count {
   my($n, $k) = @_;
   validate_integer_nonneg($n);
   validate_integer_nonneg($k);
-  return $n if $k <= 2;
-  return $n-($n>>1) if $k <= 3;
-  Math::Prime::Util::legendre_phi($n, Mprime_count($k-1));
+  return canonicalized_integer($n) if $k <= 2;
+  return Msubint($n,Mrshiftint($n)) if $k == 3;
+  Mlegendre_phi($n, Mprime_count($k-1));
 }
 
 
@@ -2722,11 +2919,10 @@ sub _generate_almost_primes {
 
 
 sub almost_primes {
-  my($k, $low, $high) = @_;
+  croak "almost_primes: expected k and 1 or 2 integers" if @_ != 2 && @_ != 3;
+  my $k = shift;
   validate_integer_nonneg($k);
-  if (defined $high) { validate_integer_nonneg($low); }
-  else               { ($low,$high) = (1, $low);      }
-  validate_integer_nonneg($high);
+  my($low,$high) = _parse_range_args("almost_primes",1,@_);
 
   if ($k == 0) { return ($low <= 1 && $high >= 1) ? [1] : [] }
   if ($k == 1) { return Mprimes($low,$high); }
@@ -2767,11 +2963,10 @@ sub _rec_omega_primes {
 }
 
 sub omega_primes {
-  my($k, $low, $high) = @_;
+  croak "omega_primes: expected k and 1 or 2 integers" if @_ != 2 && @_ != 3;
+  my $k = shift;
   validate_integer_nonneg($k);
-  if (defined $high) { validate_integer_nonneg($low); }
-  else               { ($low,$high) = (1, $low);      }
-  validate_integer_nonneg($high);
+  my($low,$high) = _parse_range_args("omega_primes",1,@_);
 
   if ($k == 0) { return ($low <= 1 && $high >= 1) ? [1] : [] }
   if ($k == 1) { return Math::Prime::Util::prime_powers($low,$high); }
@@ -2803,29 +2998,10 @@ sub is_semiprime {
     return 0 if ($n %  4) == 0 || ($n %  6) == 0 || ($n %  9) == 0
              || ($n % 10) == 0 || ($n % 14) == 0 || ($n % 15) == 0;
   }
-  return (Math::Prime::Util::is_prob_prime($n>>1) ? 1 : 0) if ($n % 2) == 0;
-  return (Math::Prime::Util::is_prob_prime($n/3)  ? 1 : 0) if ($n % 3) == 0;
-  return (Math::Prime::Util::is_prob_prime($n/5)  ? 1 : 0) if ($n % 5) == 0;
+  return Mis_prob_prime(Mdivint($n,2)) ? 1 : 0 if ($n % 2) == 0;
+  return Mis_prob_prime(Mdivint($n,3)) ? 1 : 0 if ($n % 3) == 0;
+  return Mis_prob_prime(Mdivint($n,5)) ? 1 : 0 if ($n % 5) == 0;
 
-if (0) {  # TODO:  This is all REALLY slow without GMP
-  # TODO: Something with GMP.  If nothing else, just factor.
-  {
-    my @f = trial_factor($n, 4999);
-    return 0 if @f > 2;
-    return (_is_prime7($f[1]) ? 1 : 0) if @f == 2;
-  }
-  return 0 if _is_prime7($n);
-  {
-    my @f = pminus1_factor ($n, 250_000);
-    return 0 if @f > 2;
-    return (_is_prime7($f[1]) ? 1 : 0) if @f == 2;
-  }
-  {
-    my @f = pbrent_factor ($n, 128*1024, 3, 1);
-    return 0 if @f > 2;
-    return (_is_prime7($f[1]) ? 1 : 0) if @f == 2;
-  }
-}
   return (scalar(Mfactor($n)) == 2) ? 1 : 0;
 }
 
@@ -2833,24 +3009,15 @@ sub is_almost_prime {
   my($k, $n) = @_;
   validate_integer_nonneg($k);
   validate_integer($n);
-  return 0 if $n <= 0;
 
+  return 0 if $n <= 0;
   return 0+($n==1) if $k == 0;
   return (Mis_prime($n) ? 1 : 0) if $k == 1;
   return Mis_semiprime($n) if $k == 2;
-  return 0 if ($n >> $k) == 0;
+  return 0 if ref($k) ? $k > Mlogint($n, 2) : ($n >> $k) == 0;
 
-  # TODO: Optimization here
-  if (0) {  # This seems to just be slower
-    while ($k > 0 && !($n % 2)) { $k--;  $n >>= 1; }
-    while ($k > 0 && !($n % 3)) { $k--;  $n /= 3; }
-    while ($k > 0 && !($n % 5)) { $k--;  $n /= 5; }
-    while ($k > 0 && !($n % 7)) { $k--;  $n /= 7; }
-    return 0+($n == 1) if $k == 0;
-    return (Mis_prime($n) ? 1 : 0) if $k == 1;
-    return Mis_semiprime($n) if $k == 2;
-    return 0 if $n < Mpowint(11,$k);
-  }
+  return 0+Math::Prime::Util::GMP::is_almost_prime($k,$n)
+    if $Math::Prime::Util::_GMPfunc{"is_almost_prime"} && !ref($k);
 
   return (scalar(Mfactor($n)) == $k) ? 1 : 0;
 }
@@ -2859,7 +3026,7 @@ sub is_chen_prime {
   validate_integer($n);
   return 0 if $n < 2;
   my $n2 = Maddint($n,2);
-  return (Mis_prime($n) && (Mis_prime($n2) || Mis_semiprime($n2)));
+  return 0+!!(Mis_prime($n) && (Mis_prime($n2) || Mis_semiprime($n2)));
 }
 sub next_chen_prime {
   my($n) = @_;
@@ -2881,6 +3048,20 @@ sub is_omega_prime {
   return 0+($n==1) if $k == 0;
 
   return (Mprime_omega($n) == $k) ? 1 : 0;
+}
+
+sub is_safe_prime {
+  my($n) = @_;
+  validate_integer($n);
+  return 0 if $n < 0;
+  if ($n < 23) { return ($n == 5 || $n == 7 || $n == 11) ? 1 : 0; }
+  my $n210 = Mmodint($n,210);
+  return 0 if $n210 % 6 != 5;
+  return 0 if $n210 % 5 == 0 || $n210 % 7 == 0;
+  return 0 if $n210 % 10 == 1 || $n210 % 14 == 1;
+  return 0 unless Mis_prime(Mrshiftint($n));
+  return 0 unless Mis_prime($n);
+  1;
 }
 
 sub is_practical {
@@ -2911,15 +3092,10 @@ sub is_practical {
 }
 
 sub is_delicate_prime {
-  my($n, $b) = @_;
-  validate_integer_nonneg($n);
-  if (defined $b) {
-    validate_integer_nonneg($b);
-    croak "is_delicate_prime base must be >= 2" if $b < 2;
-  } else {
-    $b = 10;
-  }
+  my($n, $b) = _parse_base_args("is_delicate_prime", SINTMAX, @_);
+  validate_integer($n);
 
+  return 0 if $n < 0;
   return 0 if $b == 10 && $n < 100;   # Easy shown.
   return 1 if $b ==  3 && $n == 2;
   return 0 unless Mis_prime($n);
@@ -2973,7 +3149,7 @@ sub _totpred {
     my $r = Mdivint($n,$d);
     while (1) {
       return 1 if $r == $p || _totpred($r, $d);
-      my($Q,$R) = divrem($r,$p);
+      my($Q,$R) = Mdivrem($r,$p);
       last if $R != 0;
       $r = $Q;
     }
@@ -2992,6 +3168,7 @@ sub _moebius_range {
   my($lo, $hi) = @_;
   validate_integer($lo);
   validate_integer($hi);
+  return ($hi < $lo) ? 0 : Madd1int(Msubint($hi,$lo)) unless wantarray;
   return () if $hi < $lo;
   return moebius($lo) if $lo == $hi;
   if ($lo < 0) {
@@ -3087,20 +3264,29 @@ sub _rmertens {
 }
 
 sub mertens {
-  my($n) = @_;
-  validate_integer_nonneg($n);
+  my($lo, $hi) = _parse_range_args("mertens", 1, @_);
+  return 0 if $lo > $hi;
+  return Mmoebius($lo) if $lo == $hi;
+  return Mvecsum(Mmoebius($lo, $hi)) if Msubint($hi, $lo) < 10;
 
-  return _omertens($n) if $n < 20000;
+  if ($hi < 20000) {
+    my $sum = _omertens($hi);
+    $sum -= _omertens(Msub1int($lo)) if $lo > 1;
+    return $sum;
+  }
 
   # Larger size would be faster, but more memory.
-  my $size = (Mrootint($n, 3)**2) >> 2;
-  $size = Msqrtint($n) if $size < Msqrtint($n);
+  my $size = (Mrootint($hi, 3)**2) >> 2;
+  $size = Msqrtint($hi) if $size < Msqrtint($hi);
 
   my @M = (0);
   push @M, $M[-1] + $_ for Mmoebius(1, $size);
 
   my %seen;
-  return _rmertens($n, \@M, \%seen, $size);
+  my $sum = _rmertens($hi, \@M, \%seen, $size);
+  $sum = Msubint($sum, _rmertens(Msub1int($lo), \@M, \%seen, $size))
+    if $lo > 1;
+  return $sum;
 }
 
 
@@ -3109,10 +3295,10 @@ sub ramanujan_sum {
   validate_integer_nonneg($k);
   validate_integer_nonneg($n);
   return 0 if $k < 1 || $n <  1;
-  my $g = $k / Mgcd($k,$n);
+  my $g = Mdivint($k,Mgcd($k,$n));
   my $m = Mmoebius($g);
   return $m if $m == 0 || $k == $g;
-  $m * (Mtotient($k) / Mtotient($g));
+  Mmulint($m, Mdivint(Mtotient($k),Mtotient($g)));
 }
 
 sub liouville {
@@ -3160,8 +3346,8 @@ sub exp_mangoldt {
 sub carmichael_lambda {
   my($n) = @_;
   validate_integer_nonneg($n);
-  return Mtotient($n) if $n < 8;           # = phi(n) for n < 8
-  return $n >> 2 if ($n & ($n-1)) == 0;    # = phi(n)/2 = n/4 for 2^k, k>2
+  return Mtotient($n) if $n < 8;                 # = phi(n) for n < 8
+  return Mrshiftint($n,2) if ($n & ($n-1)) == 0; # = phi(n)/2 = n/4 for 2^k, k>2
 
   my @pe = Mfactor_exp($n);
   $pe[0]->[1]-- if $pe[0]->[0] == 2 && $pe[0]->[1] > 2;
@@ -3187,9 +3373,6 @@ sub is_carmichael {
   validate_integer($n);
   return 0 if $n < 561 || ($n % 2) == 0;
 
-  return reftyped($_[0], Math::Prime::Util::GMP::is_carmichael($n))
-    if $Math::Prime::Util::_GMPfunc{"is_carmichael"};
-
   # This works fine, but very slow
   # return !is_prime($n) && ($n % carmichael_lambda($n)) == 1;
 
@@ -3200,7 +3383,7 @@ sub is_carmichael {
   for my $a (5,7,11,13,17,19,23,29,31,37,41,43) {
     if (($fn % $a) == 0) {
       return 0 if (($n-1) % ($a-1)) != 0;   # Korselt
-      $fn /= $a;
+      $fn = Mdivint($fn,$a);
       return 0 unless $fn % $a;             # not square free
     }
   }
@@ -3219,7 +3402,7 @@ sub is_carmichael {
       } else {
         return 0 if $gcd != $a;              # Not square free
         return 0 if (($n-1) % ($a-1)) != 0;  # factor doesn't divide
-        $fn /= $a;
+        $fn = Mdivint($fn,$a);
       }
     }
     return 1;
@@ -3253,7 +3436,7 @@ sub is_quasi_carmichael {
   if ($n < 2000) {
     # In theory for performance, but mainly keeping to show direct method.
     my $lim = $f[-1];
-    $lim = (($n-$lim*$lim) + $lim - 1) / $lim;
+    $lim = Mcdivint($n-$lim*$lim,$lim);
     for my $b (1 .. $f[0]-1) {
       my $nb = $n - $b;
       $nbases++ if Mvecall(sub { $nb % ($_-$b) == 0 }, @f);
@@ -3267,18 +3450,24 @@ sub is_quasi_carmichael {
   } else {
     my($spf,$lpf) = ($f[0], $f[-1]);
     if (scalar(@f) == 2) {
-      foreach my $d (Mdivisors($n/$spf - 1)) {
-        my $k = $spf - $d;
-        my $p = $n - $k;
-        last if $d >= $spf;
-        $nbases++ if Mvecall(sub { my $j = $_-$k;  $j && ($p % $j) == 0 }, @f);
+      foreach my $d (Mdivisors(Msub1int(Mdivint($n,$spf)))) {
+        last if Mcmpint($d,$spf) >= 0;
+        my $k = Msubint($spf,$d);
+        my $p = Msubint($n,$k);
+        $nbases++ if Mvecall(sub {
+          my $j = Msubint($_,$k);
+          Mcmpint($j,0) != 0 && Mis_divisible($p,$j);
+        }, @f);
       }
     } else {
-      foreach my $d (Mdivisors($lpf * ($n/$lpf - 1))) {
-        my $k = $lpf - $d;
-        my $p = $n - $k;
-        next if $k == 0 || $k >= $spf;
-        $nbases++ if Mvecall(sub { my $j = $_-$k;  $j && ($p % $j) == 0 }, @f);
+      foreach my $d (Mdivisors(Mmulint($lpf,Msub1int(Mdivint($n,$lpf))))) {
+        my $k = Msubint($lpf,$d);
+        next if Mcmpint($k,0) == 0 || Mcmpint($k,$spf) >= 0;
+        my $p = Msubint($n,$k);
+        $nbases++ if Mvecall(sub {
+          my $j = Msubint($_,$k);
+          Mcmpint($j,0) != 0 && Mis_divisible($p,$j);
+        }, @f);
       }
     }
   }
@@ -3319,31 +3508,24 @@ sub is_fundamental {
   0;
 }
 
-my @_ds_overflow =  # We'll use BigInt math if the input is larger than this.
-  (~0 > 4294967295)
-   ? (124, 3000000000000000000, 3000000000, 2487240, 64260, 7026)
-   : ( 50,           845404560,      52560,    1548,   252,   84);
 sub divisor_sum {
+  croak "divisor_sum: expected (n), (n,k), or (n,sub)" if @_ < 1 || @_ > 2;
   my($n, $k) = @_;
   validate_integer_nonneg($n);
-  return 0 if $n == 0;
-
-  if (defined $k && ref($k) eq 'CODE') {
-    my $sum = $n-$n;
-    my $refn = ref($n);
-    foreach my $d (Mdivisors($n)) {
-      $sum += $k->( $refn ? $refn->new("$d") : $d );
-    }
+  if (@_ == 1) {
+    $k = 1;
+  } elsif (_is_cref($k)) {
+    my $sum = 0;
+    Mfordivisors(sub { $sum += $k->($_); }, $n);
     return $sum;
+  } else {
+    validate_integer_nonneg($k);
   }
+  return 0 if $n == 0;
   return 1 if $n == 1;
 
-  croak "Second argument must be a code ref or number"
-    unless !defined $k || validate_integer_nonneg($k);
-  $k = 1 if !defined $k;
-
-  return reftyped($_[0], Math::Prime::Util::GMP::sigma($n, $k))
-    if $Math::Prime::Util::_GMPfunc{"sigma"};
+  return maybetobigint(Math::Prime::Util::GMP::sigma($n, $k))
+    if $Math::Prime::Util::_GMPfunc{"sigma"} && !ref($k);
 
   my @factors = Mfactor_exp($n);
 
@@ -3383,6 +3565,183 @@ sub divisor_sum {
   Mvecprod(@prod);
 }
 
+sub aliquot_sum {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  return 0 if $n <= 1;
+  my @factors = Mfactor_exp($n);
+  if (@factors == 1) {
+    my($p,$e) = @{$factors[0]};
+    my($pke,$fmult) = (1,1);
+    while ($e-- > 1) {
+      $pke = Mmulint($pke,$p);
+      $fmult = Maddint($fmult,$pke);
+    }
+    return $fmult;
+  }
+  my @prod;
+  foreach my $f (@factors) {
+    my($p,$e) = @$f;
+    my($pke,$fmult) = ($p,Madd1int($p));
+    while ($e-- > 1) {
+      $pke = Mmulint($pke,$p);
+      $fmult = Maddint($fmult,$pke);
+    }
+    push @prod, $fmult;
+  }
+  Msubint(Mvecprod(@prod),$n);
+}
+
+sub abundance {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  Msubint(aliquot_sum($n),$n);
+}
+
+sub _sigma0_from_factor_list {
+  return 1 unless @_;
+  my($tau, $e, $last) = (1, 0, undef);
+  for my $f (@_) {
+    if (defined $last && $f == $last) {
+      $e++;
+    } else {
+      $tau *= $e+1 if defined $last;
+      ($last, $e) = ($f, 1);
+    }
+  }
+  $tau * ($e+1);
+}
+
+sub _sigma0_possible_from_nfactors {
+  my($nf, $k) = @_;
+  return $k == 1 if $nf == 0;
+  return 0 if $k < $nf+1;
+  return 1 if $nf >= 30;
+  $k <= (1 << $nf);
+}
+
+sub _inverse_sigma0_generate {
+  my($k, $low, $high, $want_list) = @_;
+  my(@result, %divs, %minsum);
+  my $count = 0;
+  my $recurse;
+  $recurse = sub {
+    my($n, $pmin, $rem) = @_;
+    if ($rem == 1) {
+      if ($n >= $low) { $want_list ? push(@result,$n) : ($count=Madd1int($count)); }
+      return;
+    }
+
+    my $D = $divs{$rem} ||= [grep { $_ >= 2 } Mdivisors($rem)];
+    if (@$D == 1) {  # The final exponent is rem-1 for one prime.
+      my $e = $rem - 1;
+      my $minpow = ($n >= $low) ? 1 : Mcdivint($low,$n);
+      my $maxpow = Mdivint($high,$n);
+      my $plo = ($e == 1) ? $minpow : Math::Prime::Util::crootint($minpow,$e);
+      my $phi = ($e == 1) ? $maxpow : Mrootint($maxpow,$e);
+      $plo = $pmin if $plo < $pmin;
+      return if $plo > $phi;
+      if ($want_list) {
+        push @result, map { Mmulint($n, Mpowint($_,$e)) } @{Mprimes($plo,$phi)};
+      } else {
+        $count = Maddint($count, Mprime_count($plo,$phi));
+      }
+      return;
+    }
+    my $maxpow = Mdivint($high,$n);
+    for my $d (@$D) {
+      my($e, $nextrem) = ($d-1, Mdivint($rem,$d));
+      if (!defined $minsum{$nextrem}) {
+        $minsum{$nextrem} = 0;
+        $minsum{$nextrem} += $_-1 for Mfactor($nextrem);
+      }
+      my $phi = Mrootint($maxpow, $e+$minsum{$nextrem});
+      next if $pmin > $phi;
+      Mforprimes( sub {
+        my $v = Mmulint($n, Mpowint($_,$e));
+        $recurse->($v, Madd1int($_), $nextrem);
+      }, $pmin, $phi);
+    }
+  };
+  $recurse->(1, 2, $k);
+  undef $recurse;
+  if ($want_list) {
+    @result = Mvecsort(@result) if @result > 1;
+    return \@result;
+  }
+  $count;
+}
+
+sub inverse_sigma0_count {
+  croak "inverse_sigma0_count: expected k and 1 or 2 integers" if @_ != 2 && @_ != 3;
+  my $k = shift;
+  validate_integer_nonneg($k);
+  my($low,$high) = _parse_range_args("inverse_sigma0_count",1,@_);
+
+  return 0 if $k == 0 || $high < 1;
+  return ($low <= 1 && $high >= 1) ? 1 : 0 if $k == 1;
+  return Mprime_count($low,$high) if $k == 2;
+  $low = 1 if $low < 1;
+  return 0 if $low > $high;
+  return 0 if $k > $high;
+  return _inverse_sigma0_generate($k,$low,$high,0)
+    if !ref($k) && $low <= Mdivint($high,2);
+  my $count = 0;
+  Math::Prime::Util::forfactored(sub {
+    my $nf = @_;
+    $count++ if _sigma0_possible_from_nfactors($nf, $k)
+             && _sigma0_from_factor_list(@_) == $k;
+  }, $low, $high);
+  $count;
+}
+
+sub inverse_sigma0 {
+  croak "inverse_sigma0: expected k and 1 or 2 integers" if @_ != 2 && @_ != 3;
+  my $k = shift;
+  validate_integer_nonneg($k);
+  my($low,$high) = _parse_range_args("inverse_sigma0",1,@_);
+
+  return [] if $k == 0 || $high < 1;
+  return ($low <= 1 && $high >= 1) ? [1] : [] if $k == 1;
+  return Mprimes($low,$high) if $k == 2;
+  $low = 1 if $low < 1;
+  return [] if $low > $high;
+  return [] if $k > $high;
+  return _inverse_sigma0_generate($k,$low,$high,1)
+    if !ref($k) && $low <= Mdivint($high,2);
+  my @result;
+  Math::Prime::Util::forfactored(sub {
+    my $nf = @_;
+    push @result, $_ if _sigma0_possible_from_nfactors($nf, $k)
+                     && _sigma0_from_factor_list(@_) == $k;
+  }, $low, $high);
+  \@result;
+}
+
+sub prime_signature {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  if ($n < 4) {
+    if (wantarray) { return ($n==1) ? () : (1); }
+    else           { return ($n==1) ? 0 : 2; };
+  }
+  my @S = reverse Mvecsort(map { $_->[1] } Mfactor_exp($n));
+  return @S if wantarray;
+  Mvecprod(map { Mpowint($_primes_small[1+$_],$S[$_]) } 0..$#S);
+}
+
+sub sopfr {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  Mvecsum(Mfactor($n));
+}
+
+sub sopf {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  Mvecsum(Mvecuniq(Mfactor($n)));
+}
+
 #############################################################################
 #                       Lehmer prime count
 #
@@ -3394,8 +3753,30 @@ sub divisor_sum {
 my(@_s3,@_s4);
 my @_pred5 = (1,0,1,2,3,4,5,0,1,2,3,0,1,0,1,2,3,0,1,0,1,2,3,0,1,2,3,4,5,0);
 
+sub _tablephi_big {
+  my($x, $a) = @_;
+  if    ($a == 0) { return $x; }
+  elsif ($a == 1) { return Msubint($x, Mdivint($x,2)); }
+  elsif ($a == 2) { return Maddint(Msubint(Msubint($x, Mdivint($x,2)), Mdivint($x,3)), Mdivint($x,6)); }
+  elsif ($a == 3) { return Maddint(Mmulint(8, Mdivint($x,30)), $_s3[0+Mmodint($x,30)]); }
+
+  my $x4 = Maddint(Mmulint(48, Mdivint($x,210)), $_s4[0+Mmodint($x,210)]);
+  if ($a == 4) { return $x4; }
+
+  my $xp = Mdivint($x,11);
+  my $xp4 = Maddint(Mmulint(48,Mdivint($xp,210)), $_s4[0+Mmodint($xp,210)]);
+  if ($a == 5) { return Msubint($x4, $xp4); }
+
+  my $xq = Mdivint($x,13);
+  my $xq4 = Maddint(Mmulint(48,Mdivint($xq,210)), $_s4[0+Mmodint($xq,210)]);
+  my $xqp = Mdivint($xq,11);
+  my $xqp4= Maddint(Mmulint(48,Mdivint($xqp,210)), $_s4[0+Mmodint($xqp,210)]);
+  return Maddint(Msubint(Msubint($x4, $xp4), $xq4), $xqp4);
+}
+
 sub _tablephi {
   my($x, $a) = @_;
+  return _tablephi_big($x,$a) if ref($x) || $x > 562949953421312;
   if ($a == 0) { return $x; }
   elsif ($a == 1) { return $x-int($x/2); }
   elsif ($a == 2) { return $x-int($x/2) - int($x/3) + int($x/6); }
@@ -3420,18 +3801,26 @@ sub legendre_phi {
     @_s3 = (0,1,1,1,1,1,1,2,2,2,2,3,3,4,4,4,4,5,5,6,6,6,6,7,7,7,7,7,7,8);
     @_s4 = (0,1,1,1,1,1,1,1,1,1,1,2,2,3,3,3,3,4,4,5,5,5,5,6,6,6,6,6,6,7,7,8,8,8,8,8,8,9,9,9,9,10,10,11,11,11,11,12,12,12,12,12,12,13,13,13,13,13,13,14,14,15,15,15,15,15,15,16,16,16,16,17,17,18,18,18,18,18,18,19,19,19,19,20,20,20,20,20,20,21,21,21,21,21,21,21,21,22,22,22,22,23,23,24,24,24,24,25,25,26,26,26,26,27,27,27,27,27,27,27,27,28,28,28,28,28,28,29,29,29,29,30,30,30,30,30,30,31,31,32,32,32,32,33,33,33,33,33,33,34,34,35,35,35,35,35,35,36,36,36,36,36,36,37,37,37,37,38,38,39,39,39,39,40,40,40,40,40,40,41,41,42,42,42,42,42,42,43,43,43,43,44,44,45,45,45,45,46,46,47,47,47,47,47,47,47,47,47,47,48);
   }
-  return _tablephi($x,$a) if $a <= 6;
+  return canonicalized_integer(_tablephi($x,$a)) if $a <= 6;
+  return 0+($x>0) if $a >= Math::Prime::Util::prime_count_upper($x); # Huge $a
   $primes = Mprimes(Mnth_prime_upper($a+1)) unless defined $primes;
   return ($x > 0 ? 1 : 0) if $x < $primes->[$a];
 
   my $sum = 0;
+  my $bigx = ref($x) || $x > 562949953421312;
   my %vals = ( $x => 1 );
   while ($a > 6) {
     my $primea = $primes->[$a-1];
     my %newvals;
     while (my($v,$c) = each %vals) {
-      my $sval = int($v / $primea);
-      $sval -= $_pred5[$sval % 30];   # Reduce sval to one with same phi.
+      my $sval;
+      if ($bigx) {
+        $sval = Mdivint($v, $primea);
+        $sval = Msubint($sval, $_pred5[0+Mmodint($sval,30)]);
+      } else {
+        $sval = int($v / $primea);
+        $sval = $sval - $_pred5[$sval % 30]; # Reduce sval to one with same phi.
+      }
       if ($sval < $primea) {
         $sum -= $c;
       } else {
@@ -3445,10 +3834,13 @@ sub legendre_phi {
     }
     $a--;
   }
+  my @T = ($sum);
   while (my($v,$c) = each %vals) {
-    $sum += $c * _tablephi($v, $a);
+    my $term = _tablephi($v, $a);
+    $term = Mmulint($c, $term) if $c != 1;
+    push @T, $term;
   }
-  return $sum;
+  Mvecsum(@T);
 }
 
 sub _sieve_prime_count {
@@ -3526,10 +3918,15 @@ sub prime_count {
   validate_integer_nonneg($high);
 
   return 0 if $high < 2 || $low > $high;
+  if (!ref($low) && !ref($high) && $high <= 16383) {
+    my $hpc = _small_prime_count($high);
+    return $hpc if $low <= 2;
+    return $hpc - _small_prime_count($low-1);
+  }
 
-  return reftyped($high, Math::Prime::Util::GMP::prime_count($low,$high))
+  return maybetobigint(Math::Prime::Util::GMP::prime_count($low,$high))
     if $Math::Prime::Util::_GMPfunc{"prime_count"}
-    && (ref($high) eq 'Math::BigInt' || ($high-$low) < int($low/1_000_000));
+    && (ref($high) || ($high-$low) < int($low/1_000_000));
 
   my $count = 0;
   $count++ if ($low <= 2) && ($high >= 2);   # Count 2
@@ -3538,7 +3935,7 @@ sub prime_count {
   $high-- if ($high % 2) == 0; # Make high go to odd number.
   return $count if $low > $high;
 
-  if (   ref($low) eq 'Math::BigInt' || ref($high) eq 'Math::BigInt'
+  if (   ref($low) || ref($high)
       || ($high-$low) < 10
       || ($high-$low) < int($low/100_000_000_000) ) {
     # Trial primes seems best.  Needs some tuning.
@@ -3679,8 +4076,15 @@ sub nth_prime_lower {
 
 sub inverse_li_nv {
   my($n) = @_;
-  $n = 0.0 + "$n";
-  my $t = $n * log($n);
+  my $nstr = defined($n) ? "$n" : '';
+  croak "inverse_li_nv: x must be a finite non-negative real number"
+    if !defined($n) || !looks_like_number($nstr) || $nstr =~ /(?:inf|nan)/i;
+  $n = 0.0 + (ref($n) ? $nstr : $n);
+  croak "inverse_li_nv: x must be a finite non-negative real number"
+    if $n < 0.0 || $n*0 != 0;
+
+  my $t = ($n < 2.719) ? 2.0 + ($n >= 1.668)
+                       : $n * (log($n) + log(log($n)));
 
   # Iterate Halley's method until error term grows
   my $old_term = MPU_INFINITY;
@@ -3693,7 +4097,43 @@ sub inverse_li_nv {
     $t -= $term;
     last if abs($term) < 1e-6;
   }
+  croak "inverse_li_nv: result is outside native floating-point range"
+    if $t*0 != 0;
   $t;
+}
+
+sub _inverse_li_bigfloat_value {
+  my($x, $acc) = @_;
+  my $workacc = $acc + 5;
+
+  # Explicit construction accuracy avoids losing digits to a user-set
+  # Math::BigFloat class accuracy before we can raise it here.
+  my $bx = _upgrade_to_float("$x", $workacc);
+  my $logx = $bx->copy->blog(undef, $workacc);
+
+  if ($Math::Prime::Util::_GMPfunc{"li"} &&
+      defined $Math::Prime::Util::GMP::VERSION &&
+      $Math::Prime::Util::GMP::VERSION >= 0.53) {
+    my $li = Math::BigFloat->new(
+      Math::Prime::Util::GMP::li("$x", $workacc), $workacc
+    );
+    return ($li, $logx);
+  }
+
+  # The asymptotic Li series cannot distinguish adjacent large integers.
+  # This convergent Ei(log(x)) series is slower, but gives the needed digits.
+  my $tol = Math::BigFloat->new("1e-" . ($acc + 2), $workacc);
+  my $fact_n = Math::BigFloat->new(1, $workacc);
+  my $sum = Math::BigFloat->new(0, $workacc);
+  for (my $k = 1; ; $k++) {
+    $fact_n->bmul($logx)->bdiv($k, $workacc);
+    my $term = $fact_n->copy->bdiv($k, $workacc);
+    $sum->badd($term);
+    last if $term < $tol;
+  }
+  $sum->badd(Math::BigFloat->new(_Euler($workacc), $workacc));
+  $sum->badd($logx->copy->blog(undef, $workacc));
+  return ($sum, $logx);
 }
 
 sub inverse_li {
@@ -3705,21 +4145,74 @@ sub inverse_li {
 
   $t = Mtoint($t + 0.5);
 
-  # Make it an exact answer
-  my $inc = ($n > 4e16) ? 2048 : 128;
-  if (int(MLi($t-1)) >= $n) {
-    $t -= $inc while int(MLi($t-$inc)) >= $n;
-    for ($inc = $inc >> 1;  $inc > 0;  $inc >>= 1) {
-      $t -= $inc if int(MLi($t-$inc)) >= $n;
+  # Native Li has enough precision to distinguish adjacent values here.
+  if ($n <= 1_000_000_000_000) {
+    my $inc = 128;
+    if (int(MLi($t-1)) >= $n) {
+      $t -= $inc while int(MLi($t-$inc)) >= $n;
+      for ($inc = $inc >> 1;  $inc > 0;  $inc >>= 1) {
+        $t -= $inc if int(MLi($t-$inc)) >= $n;
+      }
+    } elsif (int(MLi($t)) < $n) {
+      $t += $inc while int(MLi($t+$inc-1)) < $n;
+      for ($inc = $inc >> 1;  $inc > 0;  $inc >>= 1) {
+        $t += $inc if int(MLi($t+$inc-1)) < $n;
+      }
     }
-  } elsif (int(MLi($t)) < $n) {
-    $t += $inc while int(MLi($t+$inc-1)) < $n;
-    for ($inc = $inc >> 1;  $inc > 0;  $inc >>= 1) {
-      $t += $inc if int(MLi($t+$inc-1)) < $n;
+    return $t;
+  }
+
+  no warnings 'once';
+  local $Math::BigFloat::accuracy = undef;
+  local $Math::BigFloat::precision = undef;
+
+  my $acc = length("$n") + 20;
+  my $target = _upgrade_to_float("$n", $acc);
+
+  # Native floating point starts with about 15 useful digits.  Repeated
+  # high-precision Newton corrections recover accuracy for much larger input.
+  for (1 .. 10) {
+    my($li, $logt) = _inverse_li_bigfloat_value($t, $acc);
+    my $move = _truncate_bigfloat_to_string(
+      $li->copy->bsub($target)->bmul($logt)
+    );
+    last if $move eq '0';
+    $t = Msubint($t, $move);
+  }
+
+  my($li) = _inverse_li_bigfloat_value($t, $acc);
+  my $cmp = $li->bcmp($target);
+  my $cmp_at = sub {
+    my($v) = _inverse_li_bigfloat_value($_[0], $acc);
+    $v->bcmp($target);
+  };
+  my($lo, $hi, $step);
+  if ($cmp >= 0) {
+    $hi = $t;
+    $step = 1;
+    $lo = Msubint($t, $step);
+    while ($cmp_at->($lo) >= 0) {
+      $hi = $lo;
+      $step = Mmulint($step, 2);
+      $lo = Msubint($t, $step);
+    }
+  } else {
+    $lo = $t;
+    $step = 1;
+    $hi = Maddint($t, $step);
+    while ($cmp_at->($hi) < 0) {
+      $lo = $hi;
+      $step = Mmulint($step, 2);
+      $hi = Maddint($t, $step);
     }
   }
 
-  $t;
+  while (Msubint($hi, $lo) > 1) {
+    my $mid = Mdivint(Maddint($lo, $hi), 2);
+    if ($cmp_at->($mid) >= 0) { $hi = $mid; }
+    else                      { $lo = $mid; }
+  }
+  $hi;
 }
 sub _inverse_R {
   # uncoverable subroutine
@@ -3750,8 +4243,10 @@ sub nth_prime_approx {
   return undef if $n <= 0;  ## no critic qw(ProhibitExplicitReturnUndef)
   return $_primes_small[$n] if $n <= 0+$#_primes_small;
 
-  # Once past 10^12 or so, inverse_li gives better results.
-  return Math::Prime::Util::inverse_li($n) if $n > 1e12;
+  # Once past 10^12 or so, inverse Li gives better results.  The floating
+  # version is sufficient here; inverse_li also pays to identify the exact k.
+  return Mtoint(Math::Prime::Util::inverse_li_nv(0.0+"$n") + 0.5)
+    if $n > 1e12;
 
   $n = _upgrade_to_float($n) if ref($n) || $n >= MPU_MAXPRIMEIDX;
 
@@ -3829,35 +4324,48 @@ sub prime_count_approx {
   # my $result = int(LogarithmicIntegral($x) - LogarithmicIntegral(sqrt($x))/2);
   # my $result = RiemannR($x) + 0.5;
 
-  # Make sure we get enough accuracy, and also not too much more than needed
-  $x->accuracy(length($x->copy->as_int->bstr())+2) if $floatx;
+  return Mtoint(Math::Prime::Util::RiemannR($x) + 0.5) if !$floatx;
 
-  my $result;
-  if ($Math::Prime::Util::_GMPfunc{"riemannr"} || !ref($x)) {
-    # Fast if we have our GMP backend, and ok for native.
-    $result = Math::Prime::Util::PP::RiemannR($x);
-  } else {
-    $result = $floatx ? Math::BigFloat->bzero : 0;
-    $result->accuracy($x->accuracy) if $floatx;
-    $result += MLi($x);
-    $result -= MLi(sqrt($x))/2;
-    my $intx = $floatx ? tobigint($x->bfround(0)) : $x;
-    for my $k (3 .. 1000) {
-      my $m = Mmoebius($k);
-      next unless $m != 0;
-      # With Math::BigFloat and the Calc backend, FP root is ungodly slow.
-      # Use integer root instead.  For more accuracy (not useful here):
-      # my $v = Math::BigFloat->new( "" . Mrootint($x->as_int,$k) );
-      # $v->accuracy(length($v)+5);
-      # $v = $v - Math::BigFloat->new(($v**$k - $x))->bdiv($k * $v**($k-1));
-      # my $term = LogarithmicIntegral($v)/$k;
-      my $term = MLi(Mrootint($intx,$k)) / $k;
-      last if $term < .25;
-      if ($m == 1) { $result += $term; }
-      else         { $result -= $term; }
+  # Make sure we get enough accuracy, and also not too much more than needed
+  my $intx = tobigint($x->copy->bfround(0));
+  my $xacc = 2+length($intx);
+  $x->accuracy($xacc);
+
+  return Mtoint(RiemannR($x)+0.5) if $Math::Prime::Util::_GMPfunc{"riemannr"};
+
+  my @terms;
+  push @terms, MLi($x);
+
+  my $root = Mrootint($intx,2);
+  if ($root > 2**53) {
+    $root = Math::BigFloat->new("$root");
+    $root->accuracy(length("$root")+5);
+  }
+  push @terms, -MLi($root)/2;
+
+  for my $k (3 .. 2000) {
+    my $m = Mmoebius($k);
+    next unless $m != 0;
+
+    # This is very slow.  We'll use the integer root instead.
+    #my $tli = MLi($x->copy->broot($k,$xacc));
+
+    $root = Mrootint($intx,$k);
+    last if $root <= 1;
+    if ($root > 2**53) {
+      $root = Math::BigFloat->new("$root");
+      $root->accuracy(length("$root")+5);
     }
+    my $tli = MLi($root);
+
+    my $term = Math::BigFloat->new($tli)->bdiv($k,$xacc);
+    last if $term < .001;
+    push @terms, $m == 1 ? $term : -$term;
   }
 
+  # Sum the terms from smallest to largest.
+  my $result = Math::BigFloat->bzero;
+  $result->badd($_,$xacc) for reverse @terms;
   Mtoint($result+0.5);
 }
 
@@ -3867,7 +4375,7 @@ sub prime_count_lower {
 
   return _tiny_prime_count($x) if $x < $_primes_small[-1];
 
-  return reftyped($_[0], Math::Prime::Util::GMP::prime_count_lower($x))
+  return maybetobigint(Math::Prime::Util::GMP::prime_count_lower($x))
     if $Math::Prime::Util::_GMPfunc{"prime_count_lower"};
 
   $x = _upgrade_to_float($x) if $x > 10000000000000000;
@@ -3890,8 +4398,8 @@ sub prime_count_lower {
   # Johnston 2021 Cor3.3 li(x)-logx*sqrtx/8Pi    x > 2657, x <= 1.101 * 10^26
 
   # Also see Dusart 2018: if RH and x >= 5639,
-  #     |pi(x)-li(x)|<= x * (logx-loglogx)/(8*Pi*sqrtx)
-  # TODO: evaluate this
+  #   |pi(x)-li(x)| <= sqrt(x)/(8*Pi) * log(x/log(x))    RH x >= 5639
+  #   li(x) - 2 * sqrt(x) / log(x)] <= pi(x) for 1090877 <= x <= 10^20
 
   if ($x < 599) {                         # Decent for small numbers
     $result = $x / ($fl1 - 0.7);
@@ -3907,24 +4415,31 @@ sub prime_count_lower {
     elsif ($x <    4500000) { $a = 2.31; }
     else                    { $a = 2.35; }
     $result = ($x/$fl1) * ($one + $one/$fl1 + $a/$fl2);
-  } elsif ($x < 1.1e26 || getconfig()->{'assume_rh'}){
-                                          # Büthe 2014/2015
-    my $lix = MLi($x);
-    my $sqx = sqrt($x);
-    if ($x < 1e19) {
-      $result = $lix - ($sqx/$fl1) * (1.94 + 3.88/$fl1 + 27.57/$fl2);
-    } else {
-      if (ref($x) eq 'Math::BigFloat') {
-        my $xdigits = _find_big_acc($x);
-        $result = $lix - ($fl1*$sqx / (Math::BigFloat->bpi($xdigits)*8));
-      } else {
-        $result = $lix - ($fl1*$sqx / PI_TIMES_8);
-      }
-    }
-  } else {                                # Axler 2014 1.4
+  } elsif ($x <= 1e20) {
+    # Büthe 2015:  $lix - ($sqx/$fl1) * (1.94 + 3.88/$fl1 + 27.57/$fl2); # 1e19
+    # Dusart 2018: $lix - ($sqx/$fl1) * 2;                               # 1e20
+    my($lix,$sqx) = (MLi($x),sqrt($x));
+    $result = $lix - 2 * $sqx / $fl1;
+  } elsif (getconfig()->{'assume_rh'}) {
+    # Dusart 2018, Proposition 2.6:
+    my($lix,$sqx) = (MLi($x),sqrt($x));
+    my $pi8 = ref($x) ? Math::BigFloat->bpi(_find_big_acc($x))*8 : PI_TIMES_8;
+    $result = $lix - log($x/$fl1) * $sqx / $pi8;
+  } elsif ($x < 1.101e26) {
+    # Johnston 2021 Corollary 3.3
+    my($lix,$sqx) = (MLi($x),sqrt($x));
+    my $pi8 = ref($x) ? Math::BigFloat->bpi(_find_big_acc($x))*8 : PI_TIMES_8;
+    $result = $lix - $fl1 * $sqx / $pi8;
+  } else {
     my($fl3,$fl4) = ($fl2*$fl1,$fl2*$fl2);
     my($fl5,$fl6) = ($fl4*$fl1,$fl4*$fl2);
-    $result = $x / ($fl1 - $one - $one/$fl1 - 2.65/$fl2 - 13.35/$fl3 - 70.3/$fl4 - 455.6275/$fl5 - 3404.4225/$fl6);
+    # Axler 2014 Theorem 1.4:
+    # $result = $x / ($fl1 - $one - $one/$fl1 - 2.65/$fl2 - 13.35/$fl3 - 70.3/$fl4 - 455.6275/$fl5 - 3404.4225/$fl6);
+    # Axler 2022 Theorem 1.4:
+    #$result = $x / ($fl1 - $one - $one/$fl1 - 2.975666/$fl2 - 13.024334/$fl3 - 70.951332/$fl4 - 460.634397856444/$fl5 - 3444.031844143556/$fl6);
+    # Axler 2022 Corollary 5.5:
+    my $r = 1/$fl1;
+    $result = $x*$r * (1 + $r*(1 + $r*(2 + $r*(5.975666 + $r*(23.975666 + $r*(119.87833 + $r*(719.26998 + 5034.88986*$r)))))));
   }
   # This will truncate bigfloat or floats to native int or bigint class.
   Mtoint($result);
@@ -3937,7 +4452,7 @@ sub prime_count_upper {
   # Give an exact answer for what we have in our little table.
   return _tiny_prime_count($x) if $x < $_primes_small[-1];
 
-  return reftyped($_[0], Math::Prime::Util::GMP::prime_count_upper($x))
+  return maybetobigint(Math::Prime::Util::GMP::prime_count_upper($x))
     if $Math::Prime::Util::_GMPfunc{"prime_count_upper"};
 
   $x = _upgrade_to_float($x) if $x > 10000000000000000;
@@ -3956,8 +4471,8 @@ sub prime_count_upper {
   # Johnston 2021 Cor 3.3 Schoenfeld bounds hold to x <= 1.0e26
   # Skewes                li(x)                x < 1e14
 
-  # TODO: Also look at these from Dusart (2018) [paywalled].
-  # 1  If RH and x >= 5639, |pi(x)-li(x)|<= x * (logx-loglogx)/(8*Pi*sqrtx)
+  # Pierre Dusart graciously provided me with his 2018 paper:
+  # 1  If RH and x >= 5639, |pi(x)-li(x)| <= (logx-loglogx)*sqrtx/(8*Pi)
   # 2  pi(x) <= li(x) for all 2 <= x <= 10^20
   # 3  [li(x) - 2sqrt(x)/log(x)] <= pi(x) for 1090877 <= x <= 10^20
   #
@@ -4002,24 +4517,26 @@ sub prime_count_upper {
     elsif ($x < 2953652287) { $a = 2.362; }
     else                    { $a = 2.334; } # Dusart 2010, page 2
     $result = ($x/$fl1) * ($one + $one/$fl1 + $a/$fl2) + $one;
-  } elsif ($x < 1e19) {                     # Skewes number lower limit
-    $a = ($x < 110e7) ? 0.032 : ($x < 1001e7) ? 0.027 : ($x < 10126e7) ? 0.021 : 0.0;
-    $result = MLi($x) - $a * $fl1*sqrt($x)/PI_TIMES_8;
-  } elsif ($x < 1.1e26 || getconfig()->{'assume_rh'}) {
-                                            # Schoenfeld / Büthe 2014 Th 7.4
-    my $lix = MLi($x);
-    my $sqx = sqrt($x);
-    if (ref($x) eq 'Math::BigFloat') {
-      my $xdigits = _find_big_acc($x);
-      $result = $lix + ($fl1*$sqx / (Math::BigFloat->bpi($xdigits)*8));
-    } else {
-      $result = $lix + ($fl1*$sqx / PI_TIMES_8);
+  } elsif ($x < 1e20) {                     # Skewes number lower limit
+    $result = MLi($x);
+    if ($x < 10126e7) {
+      $a = ($x < 110e7) ? 0.032 : ($x < 1001e7) ? 0.027 : 0.021;
+      $result -= $a * $fl1*sqrt($x)/PI_TIMES_8;
     }
-  } else {                                  # Axler 2014 1.3
-    my($fl3,$fl4) = ($fl2*$fl1,$fl2*$fl2);
-    my($fl5,$fl6) = ($fl4*$fl1,$fl4*$fl2);
-    $result = $x / ($fl1 - $one - $one/$fl1 - 3.35/$fl2 - 12.65/$fl3 - 71.7/$fl4 - 466.1275/$fl5 - 3489.8225/$fl6);
+  } elsif ($x < 1.101e26 || getconfig()->{'assume_rh'}) {
+    my($lix,$sqx) = (MLi($x),sqrt($x));     # Schoenfeld / Johnston 2021
+    my $pi8 = ref($x) ? Math::BigFloat->bpi(_find_big_acc($x))*8 : PI_TIMES_8;
+    $result = $lix + $fl1 * $sqx / $pi8;
+  } else {                                  # Axler 2022
+    # Axler 2022 Theorem 1.3:
+    #my($fl3,$fl4) = ($fl2*$fl1,$fl2*$fl2);
+    #my($fl5,$fl6) = ($fl4*$fl1,$fl4*$fl2);
+    #$result = $x / ($fl1 - $one - $one/$fl1 - 3.024334/$fl2 - 12.975666/$fl3 - 71.048668/$fl4 - 461.364417856444/$fl5 - 4331.1/$fl6);
+    # Axler 2022 Proposition 4.6:
+    my $r = 1/$fl1;
+    $result = $x*$r * (1 + $r*(1 + $r*(2 + $r*(6.024334 + $r*(24.024334 + $r*(120.12167 + $r*(720.73002 + 6098*$r)))))));
   }
+
   # This will truncate bigfloat or floats to native int or bigint class.
   Mtoint($result);
 }
@@ -4031,10 +4548,10 @@ sub twin_prime_count {
   validate_integer_nonneg($high);
   my $sum = 0;
   while ($low <= $high) {
-    my $seghigh = ($high-$high) + $low + 1e7 - 1;
+    my $seghigh = Maddint($low, 9_999_999);
     $seghigh = $high if $seghigh > $high;
     $sum += scalar(@{Math::Prime::Util::twin_primes($low,$seghigh)});
-    $low = $seghigh + 1;
+    $low = Madd1int($seghigh);
   }
   $sum;
 }
@@ -4100,15 +4617,17 @@ sub almost_prime_count {
   my($k,$n) = @_;
   validate_integer_nonneg($k);
   validate_integer_nonneg($n);
+
   return ($n >= 1) if $k == 0;
+  return 0 if ($n >> $k) == 0;
+
   my $ok = $k;
   ($k, $n) = _kap_reduce_count($k, $n);
-  return $n if $k == 0;
+  return ($n >= 1) if $k == 0;
   # If we reduced parameters, try again if XS might be able to do it.
   return Math::Prime::Util::almost_prime_count($k,$n) if $ok != $k && !ref($n) && getconfig()->{'xs'};
   return Mprime_count($n) if $k == 1;
-  return Math::Prime::Util::semiprime_count($n) if $k == 2;
-  return 0 if ($n >> $k) == 0;
+  return Msemiprime_count($n) if $k == 2;
 
   _kapc_count($n, 1, 2, $k);
 }
@@ -4159,7 +4678,7 @@ sub omega_prime_count {
   validate_integer_nonneg($n);
 
   return ($n >= 1) ? 1 : 0 if $k == 0;
-  return prime_power_count($n) if $k == 1;
+  return Mprime_power_count($n) if $k == 1;
   # find a simple formula for k=2.
 
   # Naive method
@@ -4179,10 +4698,10 @@ sub ramanujan_prime_count {
   validate_integer_nonneg($high);
   my $sum = 0;
   while ($low <= $high) {
-    my $seghigh = ($high-$high) + $low + 1e9 - 1;
+    my $seghigh = Maddint($low, 999_999_999);
     $seghigh = $high if $seghigh > $high;
     $sum += scalar(@{Math::Prime::Util::ramanujan_primes($low,$seghigh)});
-    $low = $seghigh + 1;
+    $low = Madd1int($seghigh);
   }
   $sum;
 }
@@ -4279,14 +4798,14 @@ sub almost_prime_count_approx {
     return Mtoint($lo + ($hi - $lo) * $mult + 0.5) unless ref($lo) || ref($hi);
 
     my $imult = int($mult * (1<<16));
-    my $est = Maddint( Mlshiftint($lo,16), Mmulint(Msubint($hi,$lo),$imult) );
+    my $est = Mmuladdint(Msubint($hi,$lo), $imult, Mlshiftint($lo,16));
     return Mrshiftint($est,16);
   }
 }
 
 sub nth_twin_prime {
   my($n) = @_;
-  return undef if $n < 0;  ## no critic qw(ProhibitExplicitReturnUndef)
+  validate_integer_nonneg($n);
   return (undef,3,5,11,17,29,41)[$n] if $n <= 6;
 
   my $p = Math::Prime::Util::nth_twin_prime_approx($n+200);
@@ -4302,7 +4821,7 @@ sub nth_twin_prime {
 sub nth_twin_prime_approx {
   my($n) = @_;
   validate_integer_nonneg($n);
-  return nth_twin_prime($n) if $n < 6;
+  return (undef,3,5,11,17,29,41)[$n] if $n <= 6;
   $n = _upgrade_to_float($n) if ref($n) || $n > 127e14;   # TODO lower for 32-bit
   my $logn = log($n);
   my $nlogn2 = $n * $logn * $logn;
@@ -4323,6 +4842,39 @@ sub nth_semiprime {
   my($n) = @_;
   validate_integer_nonneg($n);
   return (undef,4,6,9,10,14,15,21,22)[$n] if $n <= 8;
+
+  if ($n >= 10_000) {
+    my $asn = Math::Prime::Util::nth_semiprime_approx($n);
+    my $guess = $asn;
+    my $count = Msemiprime_count($guess);
+    my $miss  = ($count >= $n) ? Msubint($count,$n) : Msubint($n,$count);
+    for (1 .. 10) {
+      last if $miss <= 1_000;
+      my $adjust = Msubint($asn, Math::Prime::Util::nth_semiprime_approx($count));
+      last if $adjust == 0;
+      my $newguess = Maddint($guess,$adjust);
+      last if $newguess == $guess || $newguess < 4;
+      $guess = $newguess;
+      $count = Msemiprime_count($guess);
+      $miss  = ($count >= $n) ? Msubint($count,$n) : Msubint($n,$count);
+    }
+    if ($miss <= 10_000) {
+      if ($count >= $n) {
+        while ($count > $n) {
+          $count-- if Math::Prime::Util::is_semiprime($guess);
+          $guess = Msub1int($guess);
+        }
+        $guess = Msub1int($guess) until Math::Prime::Util::is_semiprime($guess);
+      } else {
+        while ($count < $n) {
+          $guess = Madd1int($guess);
+          $count++ if Math::Prime::Util::is_semiprime($guess);
+        }
+      }
+      return $guess;
+    }
+  }
+
   my $x = "$n" + 0.000000001; # Get rid of bigint so we can safely call log
   my $logx = log($x);
   my $loglogx = log($logx);
@@ -4330,7 +4882,7 @@ sub nth_semiprime {
   my $est = $a * $x * $logx / $loglogx;
   my $lo = ($n < 20000) ? int(0.97*$est)-1 : int(0.98*$est)-1;
   my $hi = ($n < 20000) ? int(1.07*$est)+1 : int(1.02*$est)+1;
-  1+_binary_search($n,$lo,$hi, sub{Math::Prime::Util::semiprime_count(shift)});
+  1+_binary_search($n,$lo,$hi, sub{Msemiprime_count(shift)});
 }
 
 sub nth_semiprime_approx {
@@ -4388,7 +4940,6 @@ sub almost_prime_count_lower {
   my($k, $n) = @_;
   validate_integer_nonneg($k);
   validate_integer_nonneg($n);
-
 
   return 0 if ($n >> $k) == 0;
   ($k, $n) = _kap_reduce_count($k, $n);
@@ -4565,6 +5116,8 @@ sub _fast_small_nth_almost_prime {
 
 sub nth_almost_prime_upper {
   my($k, $n) = @_;
+  validate_integer_nonneg($k);
+  validate_integer_nonneg($n);
   return undef if $n == 0;
   return (($n == 1) ? 1 : 0) if $k == 0;
   return Mnth_prime_upper($n) if $k == 1;
@@ -4594,6 +5147,8 @@ sub nth_almost_prime_upper {
 }
 sub nth_almost_prime_lower {
   my($k, $n) = @_;
+  validate_integer_nonneg($k);
+  validate_integer_nonneg($n);
   return undef if $n == 0;
   return (($n == 1) ? 1 : 0) if $k == 0;
   return Math::Prime::Util::nth_prime_lower($n) if $k == 1;
@@ -4624,6 +5179,8 @@ sub nth_almost_prime_lower {
 
 sub nth_almost_prime_approx {
   my($k, $n) = @_;
+  validate_integer_nonneg($k);
+  validate_integer_nonneg($n);
   return undef if $n == 0;
   return Mlshiftint(1,$k) if $n == 1;
   return undef if $k == 0;  # n==1 already returned
@@ -4735,7 +5292,7 @@ sub _inverse_interpolate {
     #my $x3 = $x1 - int($pos+0.5);
     # Rather convoluted so it's all in integer.
     my $num = Mmulint($fx1, Msubint($x1,$x0));
-    my $d1  = Msubint(Mmulint($fx1,$fx1),Mmulint($fx0,$fx2));
+    my $d1  = Mmulsubint($fx1,$fx1,Mmulint($fx0,$fx2));
     my $den = Msqrtint(Mlshiftint($d1,64));
        $num = Mlshiftint($num, 32);
     my $pos = Mdivint(Maddint($num,$den>>1), $den);
@@ -4777,6 +5334,8 @@ sub _inverse_interpolate {
 
 sub nth_almost_prime {
   my($k, $n) = @_;
+  validate_integer_nonneg($k);
+  validate_integer_nonneg($n);
   return undef if $n == 0;
   return Mlshiftint(1,$k) if $n == 1;
   return undef if $k == 0;  # n==1 already returned
@@ -4802,23 +5361,28 @@ sub nth_almost_prime {
 
 sub nth_omega_prime {
   my($k, $n) = @_;
+  validate_integer_nonneg($k);
+  validate_integer_nonneg($n);
   return undef if $n == 0;
   return Mpn_primorial($k) if $n == 1;
   return undef if $k == 0;  # n==1 already returned
 
-  # Very inefficient algorithm.
-  my $i = Mpn_primorial($k);
-  while (1) {
-    $i++ while Mprime_omega($i) != $k;
-    return $i if --$n == 0;
-    $i++;
-  }
+  return Math::Prime::Util::nth_prime_power($n) if $k == 1;
+
+  my $lo = Mpn_primorial($k);
+  return $lo if $n == 1;
+
+  return _inverse_interpolate(
+    $lo, 0, $n, $k,
+    sub { Math::Prime::Util::omega_prime_count($_[0], $_[1]) }
+  );
 }
 
 sub nth_ramanujan_prime_upper {
   my($n) = @_;
   validate_integer_nonneg($n);
-  return (0,2,11)[$n] if $n <= 2;
+  return undef if $n == 0;
+  return (2,11)[$n-1] if $n <= 2;
 
   if ($n < 50) {
     return Mnth_prime_upper(int(2.6*$n)) if $n <= 20;
@@ -4845,7 +5409,8 @@ sub nth_ramanujan_prime_upper {
 sub nth_ramanujan_prime_lower {
   my($n) = @_;
   validate_integer_nonneg($n);
-  return (0,2,11)[$n] if $n <= 2;
+  return undef if $n == 0;
+  return (2,11)[$n-1] if $n <= 2;
   my $nth = Math::Prime::Util::nth_prime_lower(Mmulint($n,2));
   return Mdivint(Mmulint(275,$nth),256) if $n < 10000;
   return Mdivint(Mmulint(262,$nth),256) if $n < 1e10;
@@ -4854,7 +5419,8 @@ sub nth_ramanujan_prime_lower {
 sub nth_ramanujan_prime_approx {
   my($n) = @_;
   validate_integer_nonneg($n);
-  return (0,2,11)[$n] if $n <= 2;
+  return undef if $n == 0;
+  return (2,11)[$n-1] if $n <= 2;
   my($lo,$hi) = (nth_ramanujan_prime_lower($n),nth_ramanujan_prime_upper($n));
   $lo + (($hi-$lo)>>1);
 }
@@ -4871,8 +5437,8 @@ sub ramanujan_prime_count_lower {
   my($n) = @_;
   validate_integer_nonneg($n);
   return (($n < 2) ? 0 : 1) if $n < 11;
-  my $lo = int(prime_count_lower($n) / 3);
-  my $hi = prime_count_upper($n) >> 1;
+  my $lo = Mdivint(prime_count_lower($n),3);
+  my $hi = Mrshiftint(prime_count_upper($n));
   _binary_search($n, $lo, $hi,
                  sub{Math::Prime::Util::nth_ramanujan_prime_upper(shift)});
 }
@@ -4917,10 +5483,7 @@ sub _sum_primes_n {
   $S[$r2];
 }
 sub sum_primes {
-  my($low,$high) = @_;
-  if (defined $high) { validate_integer_nonneg($low); }
-  else               { ($low,$high) = (2, $low);      }
-  validate_integer_nonneg($high);
+  my($low,$high) = _parse_range_args("sum_primes",2,@_);
   my $sum = 0;
 
   return $sum if $high < $low;
@@ -4963,19 +5526,22 @@ sub sum_primes {
 }
 
 sub print_primes {
-  my($low,$high,$fd) = @_;
-  if (defined $high) { validate_integer_nonneg($low); }
-  else               { ($low,$high) = (2, $low);      }
-  validate_integer_nonneg($high);
+  my($lo, $hi, $fd) = (2,undef,fileno(STDOUT));
+  if    (@_ == 1) { ($hi)         = @_; }
+  elsif (@_ == 2) { ($lo,$hi)     = @_; }
+  elsif (@_ == 3) { ($lo,$hi,$fd) = @_; }
+  else { croak "print_primes: expected (hi), (lo,hi), or (lo,hi,fd)"; }
+  validate_integer_nonneg($lo);
+  validate_integer_nonneg($hi);
+  validate_integer_nonneg($fd);
 
-  $fd = fileno(STDOUT) unless defined $fd;
-  open(my $fh, ">>&=", $fd);  # TODO .... or die
+  open(my $fh, ">>&=", $fd) or croak "print_primes: open fd $fd failed: $!";
 
-  if ($high >= $low) {
-    my $p1 = $low;
-    while ($p1 <= $high) {
+  if ($hi >= $lo) {
+    my $p1 = $lo;
+    while ($p1 <= $hi) {
       my $p2 = $p1 + 15_000_000 - 1;
-      $p2 = $high if $p2 > $high;
+      $p2 = $hi if $p2 > $hi;
       if ($Math::Prime::Util::_GMPfunc{"sieve_primes"}) {
         print $fh "$_\n" for Math::Prime::Util::GMP::sieve_primes($p1,$p2,0);
       } else {
@@ -4984,7 +5550,7 @@ sub print_primes {
       $p1 = $p2+1;
     }
   }
-  close($fh);
+  close($fh) or croak "print_primes: close fd $fd failed: $!";
 }
 
 
@@ -5026,7 +5592,6 @@ sub _addmod {
   $x + $y;
 }
 
-# Note that Perl 5.6.2 with largish 64-bit numbers will break.  As usual.
 sub _native_powmod {
   my($n, $power, $m) = @_;
   my $t = 1;
@@ -5064,8 +5629,6 @@ sub powint {
   my($a, $b) = @_;
   validate_integer($a);
   validate_integer($b);
-  return reftyped($_[0], Math::Prime::Util::GMP::powint($a,$b))
-    if $Math::Prime::Util::_GMPfunc{"powint"};
   croak "powint: exponent must be >= 0" if $b < 0;
 
   # Special cases for small a and b
@@ -5083,16 +5646,19 @@ sub powint {
   }
 
   return 1 if $b == 0;
-  return $a if $b == 1;
+  return canonicalized_integer($a) if $b == 1;
   if ($b == 2) {
     return int("$a")*int("$a") if abs($a) < MPU_HALFWORD;
     return Mmulint($a,$a);
   }
 
+  return maybetobigint(Math::Prime::Util::GMP::powint($a,$b))
+    if $Math::Prime::Util::_GMPfunc{"powint"} && !ref($b);
+
   if (!ref($a) && !ref($b) && $b < MPU_MAXBITS) {
     if ($b == 3) {
-      return int($a*$a*$a) if $a <= 99999;
-      return Mmulint(int($a*$a), $a) if $a <= 31622776;
+      return int($a*$a*$a) if $a <= 99999 && $a >= -99999;
+      return Mmulint(int($a*$a), $a) if $a <= 31622776 && $a >= -31622776;
     } else {
       # Check if inside limit of int on 32-bit
       my $r = $a ** $b;
@@ -5109,7 +5675,7 @@ sub powint {
   return Mmulint(Mmulint($a,$a),$a) if $b == 3;
 
   my $r = tobigint($a) ** tobigint($b);
-  return $r <= INTMAX && $r >= INTMIN  ?  _bigint_to_int($r)  :  $r;
+  canonicalized_integer($r);
 }
 
 sub mulint {
@@ -5117,8 +5683,6 @@ sub mulint {
   validate_integer($a);
   validate_integer($b);
   return 0 if $a == 0 || $b == 0;
-  return reftyped($_[0], Math::Prime::Util::GMP::mulint($a,$b))
-    if $Math::Prime::Util::_GMPfunc{"mulint"};
 
   my $r = $a * $b;
 
@@ -5126,14 +5690,12 @@ sub mulint {
     return $r if $r < INTMAX && $r > INTMIN;
     $r = tobigint($a) * $b;
   }
-  return $r <= INTMAX && $r >= INTMIN  ?  _bigint_to_int($r)  :  $r;
+  canonicalized_integer($r);
 }
 sub addint {
   my($a, $b) = @_;
   validate_integer($a);
   validate_integer($b);
-  return reftyped($_[0], Math::Prime::Util::GMP::addint($a,$b))
-    if $Math::Prime::Util::_GMPfunc{"addint"};
 
   my $r = $a + $b;
 
@@ -5141,14 +5703,12 @@ sub addint {
     return $r if $r < INTMAX && $r > INTMIN;
     $r = tobigint($a) + $b;
   }
-  return $r <= INTMAX && $r >= INTMIN  ?  _bigint_to_int($r)  :  $r;
+  canonicalized_integer($r);
 }
 sub subint {
   my($a, $b) = @_;
   validate_integer($a);
   validate_integer($b);
-  return reftyped($_[0], Math::Prime::Util::GMP::subint($a,$b))
-    if $Math::Prime::Util::_GMPfunc{"subint"};
 
   my $r = $a - $b;
 
@@ -5156,28 +5716,29 @@ sub subint {
     return $r if $r < INTMAX && $r > INTMIN;
     $r = tobigint($a) - $b;
   }
-  return $r <= INTMAX && $r >= INTMIN  ?  _bigint_to_int($r)  :  $r;
+  canonicalized_integer($r);
 }
 sub add1int {
   my($a) = @_;
   validate_integer($a);
-  my $r = $a+1;
-  if (!ref($r)) {
-    return $r if $r < INTMAX;
-    $r = tobigint($a) + 1;
-  }
-  return $r <= INTMAX && $r >= INTMIN  ?  _bigint_to_int($r)  :  $r;
+  return $a + 1 if !ref($a) && $a < INTMAX;
+  my $r = tobigint($a) + 1;
+  canonicalize_integers(\$r);
+  $r;
 }
 sub sub1int {
   my($a) = @_;
   validate_integer($a);
-  my $r = $a-1;
-  if (!ref($r)) {
-    return $r if $r < INTMAX;
-    $r = tobigint($a) - 1;
-  }
-  return $r <= INTMAX && $r >= INTMIN  ?  _bigint_to_int($r)  :  $r;
+  return $a - 1 if !ref($a) && $a > INTMIN;
+  my $r = tobigint($a) - 1;
+  canonicalized_integer($r);
 }
+
+# We could streamline these, but there is little benefit, and in theory
+# if we end up here then GMP's muladdint/mulsubint aren't available.
+
+sub muladdint { Maddint(Mmulint($_[0],$_[1]),$_[2]); }
+sub mulsubint { Msubint(Mmulint($_[0],$_[1]),$_[2]); }
 
 # For division / modulo, see:
 #
@@ -5187,7 +5748,7 @@ sub sub1int {
 
 sub _tquotient {
   my($a,$b) = @_;
-  return $a if $b == 1;
+  return canonicalized_integer($a) if $b == 1;
 
   $a = tobigint($a) if ($a >= SINTMAX || $a <= INTMIN) && !ref($a);
   $b = tobigint($b) if ($b >= SINTMAX || $b <= INTMIN) && !ref($b);
@@ -5219,13 +5780,15 @@ sub _tquotient {
     $b = Math::Pari->new("$b") unless $refb eq 'Math::Pari';
     $q = Math::Pari::gdivent(abs($a),abs($b));
     $q = Math::Pari::gneg($q) if ($a < 0) != ($b < 0);
+  } elsif ($refa || $refb) {
+    my($A,$B) = (Math::BigInt->new("$a"), Math::BigInt->new("$b"));
+    $A->upgrade(undef);  $B->upgrade(undef);
+    $q = abs($A) / abs($B);
+    $q = -$q if ($A < 0) != ($B < 0);
+    $q = tobigint($q) if defined $_BIGINT && ref($q) ne $_BIGINT;
   } else {
-    # Force no upgrade so 'use bignum' won't screw us over.
-    my $A = Math::BigInt->new("$a")->upgrade(undef);
-    my $B = Math::BigInt->new("$b")->upgrade(undef);
     $q = abs($a) / abs($b);
     $q = -$q if ($a < 0) != ($b < 0);
-    $q = $refa->new("$q") if $refa ne 'Math::BigInt' && $refb ne 'Math::BigInt';
   }
   $q;
   #return $q <= INTMAX && $q >= INTMIN  ?  _bigint_to_int($q)  :  $q;
@@ -5244,17 +5807,14 @@ sub tdivrem {
   } else {
     $q = _tquotient($a, $b);
     $r = $a - $b * $q;
-    $q = _bigint_to_int($q) if ref($q) && $q <= INTMAX && $q >= INTMIN;
-    $r = _bigint_to_int($r) if ref($r) && $r <= INTMAX && $r >= INTMIN;
+    canonicalize_integers(\$q) if ref($q);
+    canonicalize_integers(\$r) if ref($r);
   }
   ($q,$r);
 }
 # Floored Division
-sub fdivrem {
+sub _fdivrem {
   my($a,$b) = @_;
-  validate_integer($a);
-  validate_integer($b);
-  croak "fdivrem: divide by zero" if $b == 0;
   my($q,$r);
   if (!ref($a) && !ref($b) && $a>=0 && $b>=0 && $a<SINTMAX && $b<SINTMAX) {
     use integer; $q = $a / $b;
@@ -5266,16 +5826,20 @@ sub fdivrem {
   # qf = qt-I     rf = rt+I*d    I = (signum(rt) = -signum(b)) 1 : 0
   if ( ($r < 0 && $b > 0) || ($r > 0 && $b < 0) )
     { $q--; $r += $b; }
-  $q = _bigint_to_int($q) if ref($q) && $q <= INTMAX && $q >= INTMIN;
-  $r = _bigint_to_int($r) if ref($r) && $r <= INTMAX && $r >= INTMIN;
+  canonicalize_integers(\$q) if ref($q);
+  canonicalize_integers(\$r) if ref($r);
   ($q,$r);
 }
-# Ceiling Division
-sub cdivrem {
+sub fdivrem {
   my($a,$b) = @_;
   validate_integer($a);
   validate_integer($b);
-  croak "cdivrem: divide by zero" if $b == 0;
+  croak "fdivrem: divide by zero" if $b == 0;
+  _fdivrem($a,$b);
+}
+# Ceiling Division
+sub _cdivrem {
+  my($a,$b) = @_;
   my($q,$r);
   if (!ref($a) && !ref($b) && $a>=0 && $b>=0 && $a<SINTMAX && $b<SINTMAX) {
     use integer; $q = $a / $b;
@@ -5285,9 +5849,16 @@ sub cdivrem {
   $r = $a - $b * $q;
   if ($r != 0 && (($a >= 0) == ($b >= 0)))
     { $q++; $r -= $b; }
-  $q = _bigint_to_int($q) if ref($q) && $q <= INTMAX && $q >= INTMIN;
-  $r = _bigint_to_int($r) if ref($r) && $r <= INTMAX && $r >= INTMIN;
+  canonicalize_integers(\$q) if ref($q);
+  canonicalize_integers(\$r) if ref($r);
   ($q,$r);
+}
+sub cdivrem {
+  my($a,$b) = @_;
+  validate_integer($a);
+  validate_integer($b);
+  croak "cdivrem: divide by zero" if $b == 0;
+  _cdivrem($a,$b);
 }
 # Euclidean Division
 sub divrem {
@@ -5306,73 +5877,55 @@ sub divrem {
     if ($b > 0) { $q--; $r += $b; }
     else        { $q++; $r -= $b; }
   }
-  $q = _bigint_to_int($q) if ref($q) && $q <= INTMAX && $q >= INTMIN;
-  $r = _bigint_to_int($r) if ref($r) && $r <= INTMAX && $r >= INTMIN;
+  canonicalize_integers(\$q) if ref($q);
+  canonicalize_integers(\$r) if ref($r);
   ($q,$r);
 }
 
 sub divint {
-  if (!OLD_PERL_VERSION && $_[1] > 0 && $_[0] >= 0) {
-    # Simple no-error all positive case
-    my($a,$b) = @_;
-    my $q;
-    if (!ref($a) && !ref($b) && $a<SINTMAX && $b<SINTMAX) {
-      use integer; $q = $a / $b;
-    } else {
-      $q = _tquotient($a, $b);
-      $q = _bigint_to_int($q) if ref($q) && $q <= INTMAX;
-    }
-    return $q;
-  }
-  (fdivrem(@_))[0];
-}
-sub _posmodint {   # Simple no-error all positive case
-  #croak "Invalid call to _posmodint(@_)" unless $_[1] > 0 && $_[0] >= 0;
   my($a,$b) = @_;
   validate_integer($a);
   validate_integer($b);
-  my $r;
-  if (ref($b) || ref($a)) {
-    $r = $a % $b;
-    $r = _bigint_to_int($r) if $r <= INTMAX;
-  } elsif ($b < INTMAX && $a < INTMAX) {
-    $r = $a % $b;
-  } else {
-    $r = tobigint($a) % tobigint($b);
-    $r = _bigint_to_int($r) if $r <= INTMAX;
+  croak "divint: divide by zero" if $b == 0;
+
+  if ($b > 0 && $a >= 0) {
+    my $q;
+    if (!ref($a) && !ref($b) && $a < SINTMAX && $b < SINTMAX) {
+      use integer;
+      $q = $a / $b;
+    } else {
+      $q = _tquotient($a, $b);
+      $q = _bigint_to_int($q) if ref($q) && $q <= INTMAX;
+    }
+    return $q;
   }
-  $r;
+  (_fdivrem($a,$b))[0];
 }
 sub modint {
-  # Fast processing for simple cases
-  if ($_[1] > 0 && $_[0] >= 0) {
-    return _posmodint(@_);
-  } elsif ($_[1] < 0 && $_[0] >= 0) {
-    if ($_[0] < INTMAX && -$_[1] < INTMAX) {
-      my $r = _posmodint($_[0],-$_[1]);
-      return $r == 0 ? 0 : $_[1]+$r;
-    }
-  } elsif ($_[1] > 0 && $_[0] <= 0) {
-    if (-$_[0] < INTMAX && $_[1] < INTMAX) {
-      my $r = _posmodint(-$_[0],$_[1]);
-      return $r == 0 ? 0 : $_[1]-$r;
-    }
-  } elsif ($_[1] < 0 && $_[0] <= 0) {
-    if (-$_[0] < INTMAX && -$_[1] < INTMAX) {
-      my $r = _posmodint(-$_[0],-$_[1]);
-      return $r == 0 ? 0 : -$r;
-    }
+  my($a,$b) = @_;
+  validate_integer($a);
+  validate_integer($b);
+  croak "modint: divide by zero" if $b == 0;
+
+  if (!ref($a) && !ref($b) &&
+      $a >= 0 && $b > 0 && $a < SINTMAX && $b < SINTMAX) {
+    use integer;
+    return $a % $b;
   }
-  (fdivrem(@_))[1];
+  (_fdivrem($a,$b))[1];
 }
+
 sub cdivint {
-  if ($_[1] > 0 && $_[0] >= 0) {   # Simple no-error all positive case
-    my($a,$b) = @_;
-    validate_integer($a);
-    validate_integer($b);
+  my($a,$b) = @_;
+  validate_integer($a);
+  validate_integer($b);
+  croak "cdivint: divide by zero" if $b == 0;
+
+  if ($b > 0 && $a >= 0) {
     my $q;
-    if (!ref($a) && !ref($b) && $a<SINTMAX && $b<SINTMAX) {
-      use integer; $q = $a / $b;
+    if (!ref($a) && !ref($b) && $a < SINTMAX && $b < SINTMAX) {
+      use integer;
+      $q = $a / $b;
       $q++ if $a != $b*$q;
     } else {
       $q = _tquotient($a, $b);
@@ -5381,22 +5934,23 @@ sub cdivint {
     }
     return $q;
   }
-  (cdivrem(@_))[0];
+  (_cdivrem($a,$b))[0];
 }
 
 sub absint {
   my($n) = @_;
   validate_integer_abs($n);
-  reftyped($_[0], $n);
+  canonicalized_integer($n);
 }
 sub negint {
   my($n) = @_;
   validate_integer($n);
-  return 0 if $n == 0;  # Perl 5.6 has to have this: if $n=0 => -$n = -0
-  return -$n if ref($n) || $n < SINTMAX;
+  return 0 if $n == 0;  # Prevents possibility of '-0' being returned.
+  return canonicalized_integer(-$n) if ref($n);
+  return -$n if $n < SINTMAX;
   if ($n > 0) { $n = "-$n"; }
   else        { $n =~ s/^-//; }
-  reftyped($_[0], $n);
+  canonicalized_integer($n);
 }
 sub signint {
   my($n) = @_;
@@ -5418,9 +5972,10 @@ sub cmpint {
 }
 
 sub lshiftint {
-  my($n, $k) = @_;
+  croak "lshiftint: expected (n) or (n,k)" if @_ != 1 && @_ != 2;
+  my($n,$k) = @_;
   validate_integer($n);
-  if (!defined $k) { $k = 1; } else { validate_integer($k); }
+  if (@_ == 1) { $k = 1; } else { validate_integer($k); }
 
   return rshiftint($n, Mnegint($k)) if $k < 0;
   return Mnegint(lshiftint(Mnegint($n),$k)) if $n < 0;
@@ -5430,15 +5985,16 @@ sub lshiftint {
     $n = tobigint($n);
   }
   $n = $n << $k;
-  return $n <= INTMAX ? _bigint_to_int($n) : $n;
+  canonicalized_integer($n);
 
   #my $k2 = (!defined $k) ? 2 : ($k < MPU_MAXBITS) ? (1<<$k) : Mpowint(2,$k);
   #Mmulint($n, $k2);
 }
 sub rshiftint {
-  my($n, $k) = @_;
+  croak "rshiftint: expected (n) or (n,k)" if @_ != 1 && @_ != 2;
+  my($n,$k) = @_;
   validate_integer($n);
-  if (!defined $k) { $k = 1; } else { validate_integer($k); }
+  if (@_ == 1) { $k = 1; } else { validate_integer($k); }
 
   return lshiftint($n, Mnegint($k)) if $k < 0;
   return Mnegint(rshiftint(Mnegint($n),$k)) if $n < 0;
@@ -5449,16 +6005,17 @@ sub rshiftint {
     $n = tobigint($n);
   }
   $n = $n >> $k;
-  return $n <= INTMAX ? _bigint_to_int($n) : $n;
+  canonicalized_integer($n);
 
   #my $k2 = (!defined $k) ? 2 : ($k < MPU_MAXBITS) ? (1<<$k) : Mpowint(2,$k);
   #(Mtdivrem($n, $k2))[0];
 }
 
 sub rashiftint {
-  my($n, $k) = @_;
+  croak "rashiftint: expected (n) or (n,k)" if @_ != 1 && @_ != 2;
+  my($n,$k) = @_;
   validate_integer($n);
-  if (!defined $k) { $k = 1; } else { validate_integer($k); }
+  if (@_ == 1) { $k = 1; } else { validate_integer($k); }
   return lshiftint($n, Mnegint($k)) if $k < 0;
   my $k2 = $k < MPU_MAXBITS ? (1<<$k) : Mpowint(2,$k);
   Mdivint($n, $k2);
@@ -5468,8 +6025,9 @@ sub powersum {
   my($n, $k) = @_;
   validate_integer_nonneg($n);
   validate_integer_nonneg($k);
+  croak "powersum: k must fit in a UV" if $k > INTMAX;
 
-  return $n if $n <= 1 || $k == 0;
+  return canonicalized_integer($n) if $n <= 1 || $k == 0;
 
   return Mdivint(Mvecprod($n, Madd1int($n), Madd1int(Mmulint($n,2))),6) if $k==2;
   return Mdivint(Mvecprod(
@@ -5480,17 +6038,19 @@ sub powersum {
   my $a = Mrshiftint(Mmulint($n,Madd1int($n)));
   return $a if $k == 1;
   return Mmulint($a,$a) if $k == 3;
-  return Mdivint(Msubint(Mmulint(4,Mpowint($a,3)),Mmulint($a,$a)),3) if $k == 5;
+  return Mdivint(Mmulsubint(4,Mpowint($a,3),Mmulint($a,$a)), 3) if $k == 5;
 
   my @v;
   if ($k < $n) {
+    my $np1 = Madd1int($n);
     for my $j (1..$k) {
       my $F = Mfactorial($j);
-      my $B = Mbinomial($n+1,$j+1);
+      my $B = Mbinomial($np1,$j+1);
       my $S = Mstirling($k,$j,2);
       push @v, Mvecprod($F,$B,$S);
     }
   } else {
+    croak "powersum: n too large for direct summation" if $n > 10000;
     @v = map { Mpowint($_,$k) } 1..$n;
   }
   Mvecsum(@v);
@@ -5530,10 +6090,8 @@ sub gcd {
     $gcd = Math::GMP::gcd($gcd,$_) for @N;
   } else {
     $gcd = Math::BigInt::bgcd(map { Math::BigInt->new("$_") } @N);
-    $gcd = tobigint($gcd);
   }
-  $gcd = _bigint_to_int($gcd) if $gcd <= INTMAX;
-  $gcd;
+  canonicalized_integer($gcd);
 }
 sub lcm {
   my(@v) = @_;
@@ -5544,22 +6102,14 @@ sub lcm {
     if ($y <= 0) { return 0 if $y == 0;  $y = Mabsint($y); }
     $lcm = defined $lcm ? Mmulint($lcm, Mdivint($y, Mgcd($lcm,$y))) : $y;
   }
-  return $lcm;
+  canonicalized_integer($lcm);
 }
 sub gcdext {
   my($x,$y) = @_;
   validate_integer($x);
   validate_integer($y);
-  if ($x == 0) { return (0, (-1,0,1)[($y>=0)+($y>0)], abs($y)); }
-  if ($y == 0) { return ((-1,0,1)[($x>=0)+($x>0)], 0, abs($x)); }
-
-  if ($Math::Prime::Util::_GMPfunc{"gcdext"}) {
-    my($a,$b,$g) = Math::Prime::Util::GMP::gcdext($x,$y);
-    $a = reftyped($_[0], $a);
-    $b = reftyped($_[0], $b);
-    $g = reftyped($_[0], $g);
-    return ($a,$b,$g);
-  }
+  if ($x == 0) { return (0, (-1,0,1)[($y>=0)+($y>0)], Mabsint($y)); }
+  if ($y == 0) { return ((-1,0,1)[($x>=0)+($x>0)], 0, Mabsint($x)); }
 
   my($a,$b,$g,$u,$v,$w);
   if (abs($x) < (~0>>1) && abs($y) < (~0>>1)) {
@@ -5588,24 +6138,17 @@ sub chinese2 {
   return (0,0) unless scalar @_;
   my($lcm, $sum);
 
-  if ($Math::Prime::Util::_GMPfunc{"chinese2"} && $Math::Prime::Util::GMP::VERSION >= 0.53) {
-    return maybetobigintall(
-             Math::Prime::Util::GMP::chinese2(@_)
-           );
-  }
-
   # Validate, copy, and do abs on the inputs.
   my @items;
   foreach my $aref (@_) {
-    die "chinese arguments are two-element array references"
-      unless ref($aref) eq 'ARRAY' && scalar @$aref == 2;
+    croak "chinese arguments are two-element array references"
+      unless _is_aref($aref) && scalar @$aref == 2;
     my($a,$n) = @$aref;
     validate_integer($a);
     validate_integer($n);
     return (undef,undef) if $n == 0;
     $n = Mabsint($n);
     $a = Mmodint($a,$n);
-    if (OLD_PERL_VERSION) { ($a,$n) = ("$a","$n"); }
     push @items, [$a,$n];
   }
   return @{$items[0]} if scalar @items == 1;
@@ -5651,24 +6194,45 @@ sub _from_128 {
 }
 
 sub vecsum {
-  return reftyped($_[0], @_ ? $_[0] : 0)  if @_ <= 1;
+  return 0 if @_ == 0;
+  return canonicalized_integer($_[0]) if @_ == 1;
 
-  return reftyped($_[0], Math::Prime::Util::GMP::vecsum(@_))
-    if $Math::Prime::Util::_GMPfunc{"vecsum"};
   my $sum = 0;
-  if (OLD_PERL_VERSION) { $_="$_" for @_ };
   foreach my $v (@_) {
     $sum += $v;
-    if ($sum > (INTMAX-250) || $sum < (INTMIN+250)) {
+    if ($sum > (INTMAX-513) || $sum < (INTMIN+513)) {
       # Sum again from the start using bigint sum
       $sum = tobigint(0);
       if (ref($sum) eq 'Math::Pari') { $sum += "$_" for @_; }
       else                           { $sum += $_   for @_; }
-      $sum = _bigint_to_int($sum) if $sum <= INTMAX && $sum >= INTMIN;
-      return $sum;
+      return canonicalized_integer($sum);
     }
   }
   $sum;
+}
+
+sub vecprefixsum {
+  my @v = (@_ == 1 && _is_aref($_[0])) ? @{$_[0]} : @_;
+  return wantarray ? () : 0 unless @v;
+  if (@v == 1) {
+    validate_integer($v[0]);
+    return wantarray ? canonicalized_integer($v[0]) : 1;
+  }
+
+  my @psum;
+  my $sum = 0;
+  my $need_post = 0;
+
+  foreach my $v (@v) {
+    validate_integer($v);
+    if (!ref $sum && ($sum+$v > (INTMAX-513) || $sum+$v < (INTMIN+513))) {
+      $sum = tobigint($sum);
+      $need_post = 1;
+    }
+    push @psum, $sum += $v;
+  }
+  canonicalize_integers(\@psum) if $need_post;
+  wantarray ? @psum : scalar(@psum);
 }
 
 sub _product_mulint {
@@ -5690,17 +6254,7 @@ sub _product_mult {
 
 sub vecprod {
   return 1 unless @_;
-  return reftyped($_[0], Math::Prime::Util::GMP::vecprod(@_))
-    if $Math::Prime::Util::_GMPfunc{"vecprod"};
-
-  return $_[0] if @_ == 1;
-
-  # Argh, Perl 5.6.2.
-  if (OLD_PERL_VERSION) {
-    my $prod = _product_mult(0, $#_, [map { tobigint($_) } @_]);
-    $prod = _bigint_to_int($prod) if ref($prod) && $prod <= INTMAX && $prod >= INTMIN;
-    return $prod;
-  }
+  return canonicalized_integer($_[0]) if @_ == 1;
 
   # Try native for non-negative/non-zero inputs
   if ($_[0] > 0 && $_[0] <= INTMAX && $_[1] > 0 && $_[1] <= INTMAX) {
@@ -5716,28 +6270,32 @@ sub vecprod {
   # Product tree
   # my $prod = _product_mulint(0, $#_, \@_);
   my $prod = _product_mult(0, $#_, [map { tobigint($_) } @_]);
-
-  $prod = _bigint_to_int($prod) if ref($prod) && $prod <= INTMAX && $prod >= INTMIN;
-  $prod;
+  canonicalized_integer($prod);
 }
 
 sub vecmin {
   return unless @_;
   my $min = shift;
   for (@_) { $min = $_ if $_ < $min; }
-  $min;
+  canonicalized_integer($min);
 }
 sub vecmax {
   return unless @_;
   my $max = shift;
   for (@_) { $max = $_ if $_ > $max; }
-  $max;
+  canonicalized_integer($max);
 }
 
 sub vecextract {
   my($aref, $mask) = @_;
+  croak "vecextract first argument must be an array reference"
+    unless _is_aref($aref);
 
-  return @$aref[@$mask] if ref($mask) eq 'ARRAY';
+  if (_is_aref($mask)) {
+    validate_integer($_) for @$mask;
+    return @$aref[@$mask];
+  }
+  validate_integer_nonneg($mask);
 
   # This is concise but very slow.
   # map { $aref->[$_] }  grep { $mask & (1 << $_) }  0 .. $#$aref;
@@ -5752,20 +6310,42 @@ sub vecextract {
 }
 
 sub vecequal {
-  my($aref, $bref) = @_;
+  _vecequal($_[0], $_[1], undef);
+}
+
+sub _vecequal {
+  my($aref, $bref, $path) = @_;
   croak "vecequal element not scalar or array reference"
-    unless ref($aref) eq 'ARRAY' && ref($bref) eq 'ARRAY';
+    unless _is_aref($aref) && _is_aref($bref);
+  my($aaddr, $baddr) = (refaddr($aref), refaddr($bref));
+  for (my $p = $path; defined $p; $p = $p->[2]) {
+    return 1 if $p->[0] == $aaddr && $p->[1] == $baddr;
+  }
+  my $current = [$aaddr, $baddr, $path];
   return 0 unless $#$aref == $#$bref;
   my $i = 0;
   for my $av (@$aref) {
     my $bv = $bref->[$i++];
     next if !defined $av && !defined $bv;
     return 0 if !defined $av || !defined $bv;
-    if (ref($av) && ref($bv) &&
-        (ref($av) =~ /^(ARRAY|HASH|CODE|FORMAT|IO|REGEXP)$/i ||
-         ref($bv) =~ /^(ARRAY|HASH|CODE|FORMAT|IO|REGEXP)$/i) ) {
-      next if (ref($av) eq ref($bv)) && vecequal($av, $bv);
-      return 0;
+    if (ref($av) || ref($bv)) {
+      my $av_is_array = _is_aref($av);
+      my $bv_is_array = _is_aref($bv);
+      if ($av_is_array || $bv_is_array) {
+        # arrayref + arrayref: recurse
+        if ($av_is_array && $bv_is_array) {
+          next if _vecequal($av, $bv, $current);
+          return 0;
+        }
+        # arrayref + scalar: return 0
+        return 0 if !ref($av) || !ref($bv);
+        # arrayref + other: croak
+        croak "vecequal element not scalar or array reference";
+      }
+      # Known Perl reference types that we can't compare.
+      croak "vecequal element not scalar or array reference"
+        if ref($av) =~ /^(HASH|CODE|FORMAT|IO|REGEXP|SCALAR|REF|GLOB|LVALUE)$/i
+        || ref($bv) =~ /^(HASH|CODE|FORMAT|IO|REGEXP|SCALAR|REF|GLOB|LVALUE)$/i;
     }
     # About 7x faster if we skip the validates.
     # validate_integer($av);
@@ -5776,10 +6356,12 @@ sub vecequal {
 }
 
 sub vecmex {
-  my $items = scalar(@_);
+  my(@v) = @_;
+  my $items = scalar(@v);
   my @seen;
-  for (@_) {
-    $seen[$_] = 0 if $_ < $items;
+  for my $v (@v) {
+    validate_integer_nonneg($v);
+    $seen[$v] = 0 if $v < $items;
   }
   for (0 .. $items-1) {
     return $_ unless defined $seen[$_];
@@ -5788,10 +6370,12 @@ sub vecmex {
 }
 
 sub vecpmex {
-  my $items = scalar(@_);
+  my(@v) = @_;
+  my $items = scalar(@v);
   my @seen;
-  for (@_) {
-    $seen[$_] = 0 if $_ <= $items;
+  for my $v (@v) {
+    validate_integer_positive($v);
+    $seen[$v] = 0 if $v <= $items;
   }
   for (1 .. $items) {
     return $_ unless defined $seen[$_];
@@ -5800,15 +6384,19 @@ sub vecpmex {
 }
 
 sub sumdigits {
-  my($n,$base) = @_;
+  my($n, $base) = _parse_base_args("sumdigits", 36, @_);
+  croak "Parameter must be defined" if !defined $n;
+  # If base wasn't given, check prefix on n
+  if (@_ == 1) {
+    if    ($n =~ s/^0b//) { $base = 2; }
+    elsif ($n =~ s/^0x//) { $base = 16; }
+  }
+
   my $sum = 0;
-  $base =  2 if !defined $base && $n =~ s/^0b//;
-  $base = 16 if !defined $base && $n =~ s/^0x//;
-  if (!defined $base || $base == 10) {
+  if ($base == 10) {
     $n =~ tr/0123456789//cd;
     $sum += $_ for (split(//,$n));
   } else {
-    croak "sumdigits: invalid base $base" if $base < 2;
     my $cmap = substr("0123456789abcdefghijklmnopqrstuvwxyz",0,$base);
     for my $c (split(//,lc($n))) {
       my $p = index($cmap,$c);
@@ -5818,52 +6406,62 @@ sub sumdigits {
   $sum;
 }
 
+sub reverse_digits {
+  my($n, $base) = _parse_base_args("reverse_digits", 0, @_);
+  validate_integer_abs($n);
+  return Mtoint(scalar reverse "$n") if $base == 10;
+  Mfromdigits([reverse Mtodigits($n, $base)], $base);
+}
+
+sub digital_root {
+  my($n, $base) = _parse_base_args("digital_root", 0, @_);
+  validate_integer_nonneg($n);
+  return 0 if $n == 0;
+  1 + Mmodint($n-1,$base-1);
+}
+sub mult_digital_root {
+  my($n, $base) = _parse_base_args("mult_digital_root", 0, @_);
+  validate_integer_nonneg($n);
+  my $dr = $n;
+  $dr = Mvecprod(Mtodigits($dr,$base))  while $dr >= $base;
+  canonicalized_integer($dr);
+}
+
 sub is_happy {
-  my($n, $base, $k) = @_;
+  croak "is_happy: expected (n), (n,base), or (n,base,k)" if @_ < 1 || @_ > 3;
+  my $k = 2;
+  if (@_ == 3) {
+    $k = pop;
+    validate_integer_nonneg($k);
+    croak "is_happy: invalid exponent $k" if $k > 10;
+  }
+  my($n, $base) = _parse_base_args("is_happy", 36, @_);
   validate_integer_nonneg($n);
 
   my $h = 1;
 
-  if (!defined $base && !defined $k) {   # default base 10 exponent 2
+  if ($base == 10 && $k == 2) {  # defaults
     while ($n > 1 && $n != 4) {
-      my $sum = 0;
-      $sum += $_*$_ for (split(//,$n));
-      $n = $sum;
+      $n = Mvecsum( map { $_*$_ } split(//,$n) );
       $h++;
     }
     return ($n == 1) ? $h : 0;
   }
 
-  if (defined $base) {
-    validate_integer_nonneg($base);
-    croak "is_happy: invalid base $base" if $base < 2 || $base > 36;
-  } else {
-    $base = 10;
-  }
-  if (defined $k) {
-    validate_integer_nonneg($k);
-    croak "is_happy: invalid exponent $k" if $k > 10;
-  } else {
-    $k = 2;
-  }
-
   my %seen;
   while ($n > 1 && !exists $seen{$n}) {
     $seen{$n} = undef;
+    my @d;
     if ($base == 10) {
-      my $sum = 0;
-      $sum += $_ ** $k for (split(//,$n));
-      $n = $sum;
+      @d = map { Mpowint($_,$k) } split(//,$n);
     } else {
-      my @d;
       while ($n >= 1) {
         my $rem = $n % $base;
         push @d, ($k <= 6) ? int($rem ** $k) : Mpowint($rem,$k);
-        #push @d, Mpowint($rem,$k);
-        $n = ($n-$rem)/$base;    # Always an exact division
+        $n = Mdivint($n-$rem,$base);    # Always an exact division
       }
-      $n = Mvecsum(@d);
     }
+    $n = Mvecsum(@d);
     $h++;
   }
   return ($n == 1) ? $h : 0;
@@ -6024,7 +6622,7 @@ sub _allsqrtmodpk {
     my $pj = Mdivint($pk, $p);
     return map {
       my $qp = Mmulint($_,$p);
-      map Maddint($qp,Mmulint($_,$pj)), 0 .. $p - 1;
+      map Mmuladdint($_, $pj, $qp), 0 .. $p - 1;
     } _allsqrtmodpk(Mdivint($a2,$p), $p, $k - 2);
   }
   my $q = _sqrtmod_prime_power($a,$p,$k);
@@ -6057,7 +6655,8 @@ sub allsqrtmod {
   my($A,$n) = @_;
   validate_integer($A);
   validate_integer_abs($n);
-  return $n ? (0) : () if $n <= 1;
+  return wantarray ? ()  : 0 if $n == 0;
+  return wantarray ? (0) : 1 if $n == 1;
   $A = Mmodint($A,$n);
   my @R = Mis_prime($n) ? _allsqrtmodpk($A,$n,1)
                         : _allsqrtmodfact($A, $n, [Mfactor_exp($n)]);
@@ -6076,8 +6675,8 @@ sub _find_ts_generator {
 
   my($e,$r) = (0, $p-1);
   while (!($r % $k)) {
+    $r = Mdivint($r,$k);
     $e++;
-    $r /= $k;
   }
   my $ke1 = Mpowint($k, $e-1);
   my($x,$m,$y) = (2,1);
@@ -6095,8 +6694,8 @@ sub _ts_rootmod {
 
   my($e,$r) = (0, $p-1);
   while (!($r % $k)) {
+    $r = Mdivint($r,$k);
     $e++;
-    $r /= $k;
   }
   # p-1 = r * k^e
   my $x = Mpowmod($a, Minvmod($k % $r, $r), $p);
@@ -6229,8 +6828,8 @@ sub _ts_prime {
 
   my($e,$r) = (0, $p-1);
   while (!($r % $k)) {
+    $r = Mdivint($r,$k);
     $e++;
-    $r /= $k;
   }
   my $ke = Mdivint($p-1, $r);
 
@@ -6392,7 +6991,7 @@ sub _allrootmod_cprod {
   my($aroots1, $p1, $aroots2, $p2) = @_;
   my($t, $n, $inv);
 
-  $n = mulint($p1, $p2);
+  $n = Mmulint($p1, $p2);
   $inv = Minvmod($p1, $p2);
   croak("CRT has undefined inverse") unless defined $inv;
 
@@ -6539,24 +7138,33 @@ sub allrootmod {
   validate_integer($k);
   validate_integer_abs($n);
 
-  return () if $n == 0;
-  $A = Mmodint($A,$n);
-
-  return () if $k <= 0 && $A == 0;
-
-  if ($k < 0) {
-    $A = Minvmod($A, $n);
-    return () unless defined $A && $A > 0;
-    $k = -$k;
+  if (wantarray) {    # LIST RETURN
+    return () if $n == 0;
+    $A = Mmodint($A,$n);
+    return ($A) if $n == 1;
+    if ($k == 0) {
+      return $A == 1 ? (0..$n-1) : ();
+    } elsif ($k < 0) {
+      return () if $A == 0;
+      $A = Minvmod($A, $n);
+      return () unless defined $A && $A > 0;
+      $k = -$k;
+    }
+    return ($A) if $n == 2 || $k == 1;
+  } else {            # COUNT RETURN
+    return 0 if $n == 0;
+    $A = Mmodint($A,$n);
+    return 1 if $n == 1;
+    if ($k == 0) {
+      return $A == 1 ? $n : 0;
+    } elsif ($k < 0) {
+      return 0 if $A == 0;
+      $A = Minvmod($A, $n);
+      return 0 unless defined $A && $A > 0;
+      $k = -$k;
+    }
+    return 1 if $n == 2 || $k == 1;
   }
-
-  # TODO: For testing
-  #my @roots = sort { $a <=> $b }
-  #            grep { Mpowmod($_,$k,$n) == $A } 0 .. $n-1;
-  #return @roots;
-
-  return ($A) if $n <= 2 || $k == 1;
-  return ($A == 1) ? (0..$n-1) : ()  if $k == 0;
 
   my @roots;
   my @nf = Mis_prime($n) ? ([$n,1]) : Mfactor_exp($n);
@@ -6580,29 +7188,22 @@ sub allrootmod {
 ################################################################################
 ################################################################################
 
+# n must be a native integer > 1.  a is a valid integer of some sort.
 sub _modabsint {
   my($a, $n) = @_;
-  if ($n <= 1) {
-    if ($n < 0) { $n = tobigint($n) if $n <= INTMIN && !ref($n);  $n = -$n; }
-    return (undef,0)[$n] if $n <= 1;
-  }
-  if ($n < INTMAX && $a < INTMAX && $a > INTMIN) {
-    $a = $n - ((-$a) % $n) if $a < 0;
-    $a %= $n if $a >= $n;
-  } else {
-    $a = tobigint($a) % $n;
-    $a = _bigint_to_int($a) if $a <= INTMAX;
-  }
+  return _bigint_to_int(tobigint($a) % $n) if ref($a) || $a == INTMIN;
+  $a = $n - ((-$a) % $n) if $a < 0;
+  $a %= $n if $a >= $n;
   $a;
 }
 
 sub addmod {
   my($a, $b, $n) = @_;
-  if ($n <= 1) {
-    if ($n < 0) { $n = tobigint($n) if $n <= INTMIN && !ref($n);  $n = -$n; }
-    return (undef,0)[$n] if $n <= 1;
-  }
-  if ($n <= INTMAX && $a <= INTMAX && $b <= INTMAX && $a >= INTMIN && $b >= INTMIN) {
+  validate_integer($a);
+  validate_integer($b);
+  validate_integer_abs($n);
+  return (undef,0)[$n] if $n <= 1;
+  if (!ref($n) && !ref($a) && !ref($b)) {
     $a = $n - ((-$a) % $n) if $a < 0;
     $b = $n - ((-$b) % $n) if $b < 0;
     $a %= $n if $a >= $n;
@@ -6626,11 +7227,11 @@ sub addmod {
 }
 sub submod {
   my($a, $b, $n) = @_;
-  if ($n <= 1) {
-    if ($n < 0) { $n = tobigint($n) if $n <= INTMIN && !ref($n);  $n = -$n; }
-    return (undef,0)[$n] if $n <= 1;
-  }
-  if ($n <= INTMAX && $a <= INTMAX && $b <= INTMAX && $a >= INTMIN && $b >= INTMIN) {
+  validate_integer($a);
+  validate_integer($b);
+  validate_integer_abs($n);
+  return (undef,0)[$n] if $n <= 1;
+  if (!ref($n) && !ref($a) && !ref($b)) {
     $a = $n - ((-$a) % $n) if $a < 0;
     $b = $n - ((-$b) % $n) if $b < 0;
     $a %= $n if $a >= $n;
@@ -6648,35 +7249,22 @@ sub submod {
 
 sub mulmod {
   my($a, $b, $n) = @_;
-  #if ($n <= 1) { # ABS(n) and handle mod 0 | mod 1.
-  #  if ($n < 0) { $n = tobigint($n) if $n <= INTMIN && !ref($n);  $n = -$n; }
-  #  return (undef,0)[$n] if $n <= 1;
-  #}
-  if ($n <= 1) {
-    return (undef,0)[$n] if $n >= 0;
-    $n = tobigint($n) if $n <= INTMIN && !ref($n);
-    $n = -$n;
-    return 0 if $n == 1;
-  }
+  validate_integer($a);
+  validate_integer($b);
+  validate_integer_abs($n);
+  return (undef,0)[$n] if $n <= 1;
 
   # If n is a native int, we can reduce a and b then do everything native
-  if ($n < INTMAX) {
-    if ($a >= INTMAX || $a < 0 || $b >= INTMAX || $b < 0) {
-      $a = _bigint_to_int(tobigint($a) % $n) if $a >= INTMAX || $a < 0;
-      $b = _bigint_to_int(tobigint($b) % $n) if $b >= INTMAX || $b < 0;
+  if (!ref($n)) {
+    if (ref($a) || $a < 0 || ref($b) || $b < 0) {
+      $a = _bigint_to_int(tobigint($a) % $n) if ref($a) || $a < 0;
+      $b = _bigint_to_int(tobigint($b) % $n) if ref($b) || $b < 0;
     }
     return _mulmod($a,$b,$n);
   }
 
-  # Try GMP
-  return reftyped($_[0], Math::Prime::Util::GMP::mulmod($a,$b,$n))
-    if $Math::Prime::Util::_GMPfunc{"mulmod"};
-
+  $n = tobigint($n) if !ref($n) || (defined $_BIGINT && ref($n) ne $_BIGINT);
   my $refn = ref($n);
-  if (!$refn) {
-    $n = tobigint($n);
-    $refn = ref($n);
-  }
   $a = $refn->new("$a") unless ref($a) eq $refn;
   $b = $refn->new("$b") unless ref($b) eq $refn;
   my $r = ($a * $b) % $n;
@@ -6688,11 +7276,8 @@ sub _bi_powmod {
   croak "_bi_powmod must have positive exponent" if $b < 0;
   croak "_bi_powmod must have n > 1" if $n <= 1;
 
+  $n = tobigint($n) if !ref($n) || (defined $_BIGINT && ref($n) ne $_BIGINT);
   my $refn = ref($n);
-  if (!$refn) {
-    $n = tobigint($n);
-    $refn = ref($n);
-  }
   $b = $refn->new($b) unless ref($b) eq $refn;
 
   my $r = $refn->new($a);
@@ -6719,16 +7304,11 @@ sub _bi_powmod {
 
 sub powmod {
   my($a, $b, $n) = @_;
-  if ($n <= 1) {
-    if ($n < 0) { $n = tobigint($n) if $n <= INTMIN && !ref($n);  $n = -$n; }
-    return (undef,0)[$n] if $n <= 1;
-  }
-  return ($b > 0) ? 0 : 1  if $a == 0;
-
-  if ($Math::Prime::Util::_GMPfunc{"powmod"}) {
-    my $r = Math::Prime::Util::GMP::powmod($a,$b,$n);
-    return (defined $r) ? reftyped($_[0], $r) : undef;
-  }
+  validate_integer($a);
+  validate_integer($b);
+  validate_integer_abs($n);
+  return (undef,0)[$n] if $n <= 1;
+  return $b < 0 ? undef : $b > 0 ? 0 : 1 if $a == 0;
 
   # If the exponent is negative: a=1/a ; b=-b
   if ($b < 0) {
@@ -6740,7 +7320,7 @@ sub powmod {
 
   if ($b <= 8) {
     return 1 if $b == 0;
-    return _modabsint($a,$n) if $b == 1;
+    return !ref($n) ? _modabsint($a,$n) : Mmodint($a,$n) if $b == 1;
     return Mmulmod($a,$a,$n) if $b == 2;
     # For exponents 3-8, this can be 20x faster for native n
     if (!ref($n) && $a <= 31622776 && $a >= -31622776) {
@@ -6761,22 +7341,19 @@ sub powmod {
 
 sub muladdmod {
   my($a, $b, $c, $n) = @_;
-  if ($n <= 1) {
-    $n = Mnegint($n) if $n < 0;
-    return (undef,0)[$n] if $n <= 1;
-  }
+  validate_integer($a);
+  validate_integer($b);
+  validate_integer($c);
+  validate_integer_abs($n);
+  return (undef,0)[$n] if $n <= 1;
 
-  if (!ref($n) && $n <= INTMAX
-               && $a <= INTMAX && $b <= INTMAX && $c <= INTMAX
-               && $a >= INTMIN && $b >= INTMIN && $c >= INTMIN) {
+  if (!ref($n) && !ref($a) && !ref($b) && !ref($c)) {
     $a = $n - ((-$a) % $n) if $a < 0;
     $b = $n - ((-$b) % $n) if $b < 0;
     $c = $n - ((-$c) % $n) if $c < 0;
     #$c %= $n if $c >= $n;   # For mulsubmod
     return _addmod(_mulmod($a,$b,$n),$c,$n);
   }
-  return reftyped($_[0], Math::Prime::Util::GMP::muladdmod($a,$b,$c,$n))
-    if $Math::Prime::Util::_GMPfunc{"muladdmod"};
 
   $n = tobigint($n) unless ref($n);
   if (ref($n) eq 'Math::Pari') {
@@ -6787,26 +7364,23 @@ sub muladdmod {
   }
   $c = tobigint($c) unless ref($c);
   my $r = (($a * $b) + $c) % $n;
-  return $r <= INTMAX ? _bigint_to_int($r) : $r;
+  canonicalized_integer($r);
 }
 sub mulsubmod {
   my($a, $b, $c, $n) = @_;
-  if ($n <= 1) {
-    $n = Mnegint($n) if $n < 0;
-    return (undef,0)[$n] if $n <= 1;
-  }
+  validate_integer($a);
+  validate_integer($b);
+  validate_integer($c);
+  validate_integer_abs($n);
+  return (undef,0)[$n] if $n <= 1;
 
-  if (!ref($n) && $n <= INTMAX
-               && $a <= INTMAX && $b <= INTMAX && $c <= INTMAX
-               && $a >= INTMIN && $b >= INTMIN && $c >= INTMIN) {
+  if (!ref($n) && !ref($a) && !ref($b) && !ref($c)) {
     $a = $n - ((-$a) % $n) if $a < 0;
     $b = $n - ((-$b) % $n) if $b < 0;
     $c = $n - ((-$c) % $n) if $c < 0;
     $c = ($c < $n)  ?  $n-$c  :  $n-($c % $n);  # $c = -$c (mod n)
     return _addmod(_mulmod($a,$b,$n),$c,$n);
   }
-  return reftyped($_[0], Math::Prime::Util::GMP::mulsubmod($a,$b,$c,$n))
-    if $Math::Prime::Util::_GMPfunc{"mulsubmod"};
 
   # return Msubmod(Mmulmod($a,$b,$n),$c,$n);
 
@@ -6819,18 +7393,17 @@ sub mulsubmod {
   }
   $c = tobigint($c) unless ref($c);
   my $r = (($a * $b) - $c) % $n;
-  return $r <= INTMAX ? _bigint_to_int($r) : $r;
+  canonicalized_integer($r);
 }
 
 sub invmod {
   my($a,$n) = @_;
-  if ($n <= 1) {
-    if ($n < 0) { $n = tobigint($n) if $n <= INTMIN && !ref($n);  $n = -$n; }
-    return (undef,0)[$n] if $n <= 1;
-  }
+  validate_integer($a);
+  validate_integer_abs($n);
+  return (undef,0)[$n] if $n <= 1;
   return if $a == 0;
 
-  if ($n < INTMAX) {  # Fast all native math
+  if (!ref($n)) {  # Fast all native math
     my($t,$nt,$r,$nr) = (0, 1, $n, _modabsint($a,$n));
     while ($nr != 0) {
       # Use mod before divide to force correct behavior with high bit set
@@ -6864,18 +7437,16 @@ sub invmod {
   } else {
     $I = Math::BigInt->new("$a")->bmodinv("$n");
     $I = undef if defined $I && !$I->is_int();
-    $I = tobigint("$I") if defined $I;
   }
-  $I = _bigint_to_int($I) if defined $I && $I <= INTMAX;
-  return $I;
+  canonicalized_integer($I);
 }
 
 sub divmod {
   my($a, $b, $n) = @_;
-  if ($n <= 1) {
-    if ($n < 0) { $n = tobigint($n) if $n <= INTMIN && !ref($n);  $n = -$n; }
-    return (undef,0)[$n] if $n <= 1;
-  }
+  validate_integer($a);
+  validate_integer($b);
+  validate_integer_abs($n);
+  return (undef,0)[$n] if $n <= 1;
 
   my $invb = Minvmod($b,$n);
   return undef unless defined $invb;
@@ -6889,14 +7460,14 @@ sub negmod {
 
   if ($n <= 0) {
     return undef if $n == 0;   # standard mod behavior with n = 0
-    $n = tobigint($n) if $n <= INTMIN && !ref($n);
-    $n = -$n;                  # we use |n|, unlike modint
+    $n = Mnegint($n);          # we use |n|, unlike modint
   }
   # Easy:
   # Msubmod(0, $a, $n);
 
   $a = Mmodint($a,$n) if $a >= $n || $a < 0;
-  return $a ? $n-$a : 0;
+  return 0 if $a == 0;
+  return ref($n) ? Msubint($n,$a) : $n - $a;
 }
 
 # No validation.
@@ -6945,31 +7516,34 @@ sub _powerof_ret {
 }
 
 sub is_power {
-  my ($n, $a, $refp) = @_;
+  croak "is_power: expected (n), (n,k), (n,\\root), or (n,k,\\root)" if @_ < 1 || @_ > 3;
+  my($n, $a, $refp) = @_;
   validate_integer($n);
-  if (!defined $a) { $a = 0; } else { validate_integer_nonneg($a); }
-  croak("is_power third argument not a scalar reference") if defined($refp) && !ref($refp);
-  return 0 if abs($n) <= 3 && !$a;
+  if (@_ == 2 && _is_sref($a)) {
+    ($a, $refp) = (0, $a);
+  } elsif (@_ == 3) {
+    croak "is_power third argument not a scalar reference" if !_is_sref($refp);
+  }
+  if (@_ < 2 || !defined $a)  { $a = 0; }
+  else                        { validate_integer_nonneg($a); }
+
+  return 0 if !$a && !ref($n) && abs($n) <= 3;
 
   if ($Math::Prime::Util::_GMPfunc{"is_power"} &&
-      ($Math::Prime::Util::GMP::VERSION >= 0.42 ||
-       ($Math::Prime::Util::GMP::VERSION >= 0.28 && $n > 0))) {
+      $Math::Prime::Util::GMP::VERSION >= 0.42 && !ref($a)) {
     my $k = Math::Prime::Util::GMP::is_power($n,$a);
     return 0 unless $k > 0;
     if (defined $refp) {
       $a = $k unless $a;
-      my $isneg = ($n < 0);
-      $n =~ s/^-// if $isneg;
-      $$refp = Mrootint($n, $a);
-      $$refp = reftyped($_[0], $$refp) if $$refp > INTMAX;
-      $$refp = Mnegint($$refp) if $isneg;
+      $$refp = ($n >= 0) ? Mrootint($n, $a)
+                         : Mnegint(Mrootint(Mabsint($n), $a));
     }
     return $k;
   }
 
   if ($a != 0) {
     if ($a == 1) {
-      $$refp = $n if defined $refp;
+      $$refp = canonicalized_integer($n) if defined $refp;
       return 1;                           # Everything is a 1st power
     }
     return 0 if $n < 0 && $a % 2 == 0;    # Negative n never an even power
@@ -7023,19 +7597,23 @@ sub is_power {
 
 sub is_square {
   my($n) = @_;
-  return 0 if $n < 0;
   #Mis_power($n,2);
   validate_integer($n);
+  return 0 if $n < 0;
   _is_perfect_square($n);
 }
 
 sub is_prime_power {
+  croak "is_prime_power: expected (n) or (n,\\root)" if @_ < 1 || @_ > 2;
   my ($n, $refp) = @_;
   validate_integer($n);
-  croak("is_prime_power second argument not a scalar reference") if defined($refp) && !ref($refp);
+  croak "is_prime_power second argument not a scalar reference"
+    if @_ == 2 && !_is_sref($refp);
   return 0 if $n <= 1;
 
-  if (Mis_prime($n)) { $$refp = $n if defined $refp; return 1; }
+  if (Mis_prime($n)) {
+    $$refp = canonicalized_integer($n) if defined $refp; return 1;
+  }
   my $r;
   my $k = Mis_power($n,0,\$r);
   if ($k) {
@@ -7052,22 +7630,25 @@ sub is_gaussian_prime {
   validate_integer_abs($b);
   return ((($b % 4) == 3) ? Mis_prime($b) : 0) if $a == 0;
   return ((($a % 4) == 3) ? Mis_prime($a) : 0) if $b == 0;
-  Mis_prime( Maddint( Mmulint($a,$a), Mmulint($b,$b) ) );
+  Mis_prime( Mmuladdint($a, $a, Mmulint($b,$b)) );
 }
 
 sub is_polygonal {
+  croak "is_polygonal: expected (n,k), or (n,k,\\root)" if @_ < 2 || @_ > 3;
   my ($n, $k, $refp) = @_;
   validate_integer($n);
   validate_integer_nonneg($k);
-  croak("is_polygonal third argument not a scalar reference") if defined($refp) && !ref($refp);
+  croak "is_polygonal third argument not a scalar reference"
+    if @_ == 3 && !_is_sref($refp);
   croak("is_polygonal: k must be >= 3") if $k < 3;
+
   return 0 if $n < 0;
   if ($n <= 1) { $$refp = $n if defined $refp; return 1; }
 
-  if ($Math::Prime::Util::_GMPfunc{"polygonal_nth"}) {
+  if ($Math::Prime::Util::_GMPfunc{"polygonal_nth"} && !ref($k)) {
     my $nth = Math::Prime::Util::GMP::polygonal_nth($n, $k);
     return 0 unless $nth;
-    $$refp = reftyped($_[0], $nth) if defined $refp;
+    $$refp = maybetobigint($nth) if defined $refp;
     return 1;
   }
 
@@ -7084,25 +7665,22 @@ sub is_polygonal {
     $R = 2*$k-4;
   } else {
     if ($k == 3) {
-      $D = Maddint(1, Mmulint($n, 8));
+      $D = Mmuladdint($n, 8, 1);
     } else {
-      $D = Maddint(Mmulint($n, Mmulint(8, $k) - 16), Mmulint($k-4,$k-4));
+      $D = Mmuladdint($n, Mmulint(8, $k) - 16, Mmulint($k-4,$k-4));
     }
     return 0 unless _is_perfect_square($D);
     $D = Maddint( Msqrtint($D), $k-4 );
     $R = Mmulint(2, $k) - 4;
   }
   return 0 if ($D % $R) != 0;
-  $$refp = $D / $R if defined $refp;
+  $$refp = Mdivint($D,$R) if defined $refp;
   1;
 }
 
 sub is_sum_of_squares {
-  my($n, $k) = @_;
+  my($n, $k) = _parse_k_args("is_sum_of_squares", 2, @_);
   validate_integer_abs($n);
-  if (defined $k) { validate_integer_nonneg($k); }
-  else            { $k = 2; }
-
   return ($n == 0) ? 1 : 0 if $k == 0;
   return 1 if $k > 3;
   return _is_perfect_square($n) if $k == 1;
@@ -7141,6 +7719,7 @@ sub cornacchia {
   if (Mis_prime($n)) {
     my ($u,$rk);
     my $negd = _negmod($d,$n);
+    return ($d == $n) ? (0,1) : undef if $negd == 0;
     return undef if Mkronecker($negd, $n) == -1;
     $u = _sqrtmod_prime($negd, $n);
     return undef unless defined $u;
@@ -7204,14 +7783,14 @@ sub is_congruent_number {
       my($p, $q) = ($factors[0], $factors[1]);
       my($p8, $q8) = ($p % 8, $q %8);
       return 0 if $p8 == 3 && $q8 == 3;
-      return 0 if $p8 == 1 && $q8 == 3 && kronecker($p,$q) == -1;
-      return 0 if $p8 == 3 && $q8 == 1 && kronecker($q,$p) == -1;
+      return 0 if $p8 == 1 && $q8 == 3 && Mkronecker($p,$q) == -1;
+      return 0 if $p8 == 3 && $q8 == 1 && Mkronecker($q,$p) == -1;
     } elsif (scalar(@factors) == 3 && $factors[0] == 2) {
       my($p, $q) = ($factors[1], $factors[2]);
       my($p8, $q8) = ($p % 8, $q %8);
       return 0 if $p8 == 5 && $q8 == 5;
-      return 0 if $p8 == 1 && $q8 == 5 && kronecker($p,$q) == -1;
-      return 0 if $p8 == 5 && $q8 == 1 && kronecker($q,$p) == -1;
+      return 0 if $p8 == 1 && $q8 == 5 && Mkronecker($p,$q) == -1;
+      return 0 if $p8 == 5 && $q8 == 1 && Mkronecker($q,$p) == -1;
     }
   }
 
@@ -7269,16 +7848,30 @@ sub is_perfect_number {
   Mcmpint($n,Msubint(Mdivisor_sum($n),$n)) == 0;
 }
 
+sub _remove_factors {   # No validation.  REQUIRES k > 1.
+  my($n,$k) = @_;
+  my($neg, $e) = ($n <= 0, 0);
+  if ($neg) {
+    return (undef,undef) if $n == 0;
+    $n = Mnegint($n);
+  }
+  if ($n <= 562949953421312) {  # 2^49 safe arithmetic
+    while (!($n % $k)) { $n /= $k; $e++; }
+  } else {
+    while (Mis_divisible($n,$k)) { $n = Mdivint($n,$k); $e++; }
+  }
+  $n = Mnegint($n) if $neg;
+  ($n,$e);
+}
+
 sub valuation {
   my($n, $k) = @_;
   # The validation in PP is 2x more time than our actual work.
   validate_integer_abs($n);
-  validate_integer_positive($k);
+  validate_integer_nonneg($k);
   croak "valuation: k must be > 1" if $k <= 1;
-
-  return if $k < 2;
   return (undef,0)[$n] if $n <= 1;
-  my $v = 0;
+
   if ($k == 2) { # Accelerate power of 2
     my $s;
     if (!ref($n)) {
@@ -7295,11 +7888,23 @@ sub valuation {
     }
     return length($s) - rindex($s,'1') - 1;
   }
-  while ( !($n % $k) ) {
-    $n /= $k;
-    $v++;
-  }
-  $v;
+
+  (_remove_factors($n,$k))[1];
+}
+
+sub remove_factors_exp {
+  my($n,$k) = @_;
+  validate_integer($n);
+  validate_integer_nonneg($k);
+  croak "remove_factors_exp: k must be > 1" if $k <= 1;
+  _remove_factors($n,$k);
+}
+sub remove_factors {
+  my($n,$k) = @_;
+  validate_integer($n);
+  validate_integer_nonneg($k);
+  croak "remove_factors: k must be > 1" if $k <= 1;
+  (_remove_factors($n,$k))[0];
 }
 
 sub hammingweight {
@@ -7310,7 +7915,6 @@ my @_digitmap = (0..9, 'a'..'z');
 my %_mapdigit = map { $_digitmap[$_] => $_ } 0 .. $#_digitmap;
 sub _splitdigits {
   my($n, $base, $len) = @_;    # n is num or bigint, base is in range
-  validate_integer_nonneg($n);
   my @d;
   if ($base == 10) {
     @d = split(//,"$n");
@@ -7323,31 +7927,45 @@ sub _splitdigits {
     while ($n >= 1) {
       my $rem = $n % $base;
       unshift @d, $rem;
-      $n = ($n-$rem)/$base;    # Always an exact division
+      $n = Mdivint($n-$rem,$base);    # Always an exact division
     }
   }
-  if ($len >= 0 && $len != scalar(@d)) {
+  if (defined $len && $len >= 0 && $len != scalar(@d)) {
     while (@d < $len) { unshift @d, 0; }
     while (@d > $len) { shift @d; }
   }
   @d;
 }
 
-sub todigits {
-  my($n,$base,$len) = @_;
+sub _parse_todig_args {
+  my $name = shift;
+  my $maxb = shift;
+  croak "$name: expected (n) or (n,base) or (n,base,len)" if @_ < 1 || @_ > 3;
+  my($n, $b, $len) = @_;
   validate_integer_abs($n);
-  $base = 10 unless defined $base;
-  $len = -1 unless defined $len;
-  die "Invalid base: $base" if $base < 2;
-  return if $n == 0;
-  _splitdigits($n, $base, $len);
+  if (@_ == 1) {
+    $b = 10;
+  } else {
+    validate_integer_nonneg($b);
+    croak "$name: invalid base: $b" if $b < 2 || ($maxb && $b > $maxb);
+  }
+  validate_integer_nonneg($len) if @_ == 3;
+  ($n, $b, $len);
+}
+
+
+sub todigits {
+  my($n,$base,$len) = _parse_todig_args("todigits", 0, @_);
+  return wantarray ? () : 0 if defined $len && $len == 0;
+  return wantarray ? () : 0 if $n == 0 && !defined $len;
+  my @d = _splitdigits($n, $base, $len);
+  wantarray ? @d : scalar(@d);
 }
 
 sub _tobinarystring {
   my($n) = @_;
-  $n =~ s/^-//;
   return "" if $n == 0;
-  return sprintf("%b",$n) if $n < INTMAX;
+  return sprintf("%b",$n) if !ref($n);
   $n = tobigint($n) unless ref($n);
   my $refn = ref($n);
   return Math::GMPz::Rmpz_get_str($n,2) if $refn eq 'Math::GMPz';
@@ -7356,21 +7974,16 @@ sub _tobinarystring {
     $n = Math::BigInt->new("$n") if $refn ne 'Math::BigInt';
     return $n->to_base(2);
   }
-  return join("", _splitdigits($n, 2, -1));
+  return join("", _splitdigits($n, 2));
 }
 
 sub todigitstring {
-  my($n,$base,$len) = @_;
-  validate_integer($n);
-  $base = 10 unless defined $base;
+  my($n,$base,$len) = _parse_todig_args("todigitstring", 36, @_);
   return _tobinarystring($n) if $base == 2 && !defined $len;
-  croak "Invalid base for string: $base" if $base < 2 || $base > 36;
-  $len = -1 unless defined $len;
-  $n =~ s/^-//;
+  return "" if defined $len && $len == 0;
+  return "" if $n == 0 && !defined $len;
 
-  return "" if $len == 0 || $n == 0;
-
-  if ($n < INTMAX) {
+  if (!ref($n)) {
     if ($base != 2 && $base != 8 && $base != 16) {
       return join "", _splitdigits($n, $base, $len)  if $base <= 10;
       return join "", map { $_digitmap[$_] } _splitdigits($n, $base, $len);
@@ -7379,14 +7992,13 @@ sub todigitstring {
     $s = sprintf("%b",$n)  if $base ==  2;
     $s = sprintf("%o",$n)  if $base ==  8;
     $s = sprintf("%x",$n)  if $base == 16;
-    if ($len > 0) {
-      $s = substr($s,0,$len);
+    if (defined $len) {
+      $s = substr($s,-$len,$len);
       $s = '0' x ($len-length($s)) . $s if length($s) < $len;
     }
     return $s;
   }
 
-  $n = tobigint($n) unless ref($n);
   my $refn = ref($n);
   my $s;
 
@@ -7402,12 +8014,11 @@ sub todigitstring {
     if ($base <= 10) {
       $s = join("", @d);
     } else {
-      die "Invalid base for string: $base" if $base > 36;
       $s = join("", map { $_digitmap[$_] } @d);
     }
   }
-  if ($len > 0) {
-    $s = substr($s,0,$len);
+  if (defined $len) {
+    $s = substr($s,-$len,$len);
     $s = '0' x ($len-length($s)) . $s if length($s) < $len;
   }
   return lc($s);
@@ -7424,7 +8035,7 @@ sub _FastIntegerInput {
     for my $i (1 .. $k>>1) {
       my $x = $L->[2*$i-2];
       my $y = $L->[2*$i-1];
-      push(@T, Maddint($x, Mmulint($B, $y)));
+      push @T, Mmuladdint($B, $y, $x);
     }
     push(@T, $L->[$k-1]) if ($k&1);
     $L = \@T;
@@ -7435,25 +8046,25 @@ sub _FastIntegerInput {
 }
 
 sub fromdigits {
-  my($r, $base) = @_;
-  $base = 10 unless defined $base;
+  my($r, $base) = _parse_base_args("fromdigits", 0, @_);
+  croak "Parameter must be defined" if !defined $r;
   my $refr = ref($r);
 
-  if ($refr && $refr !~ /^Math::/) {
-    croak "fromdigits: first argument must be a string or array reference"
-      unless $refr eq 'ARRAY';
-    # Math::BigInt->from_base_num is identical but slower
-    return _FastIntegerInput($r,$base);
-  }
+  return _FastIntegerInput($r,$base) if _is_aref($r);
+
+  croak "fromdigits: first argument must be a string or array reference"
+    if $refr && $refr !~ /^Math::/;
 
   my $n;
   $r =~ s/^0*//;
   return 0 if $r eq "";
   { # Validate string
-    my $cmap = substr("0123456789abcdefghijklmnopqrstuvwxyz",0,$base);
-    croak "Invalid digit for base $base" if $r =~ /[^$cmap]/i;
+    my $cchars = "0123456789abcdefghijklmnopqrstuvwxyz";
+    my $clen = $base > length($cchars) ? length($cchars) : int($base);
+    my $cmap = substr($cchars,0,$clen);
+    croak "fromdigits: invalid digit for base $base" if $r =~ /[^$cmap]/i;
   }
-  if (defined $_BIGINT && $_BIGINT =~ /^Math::(GMPz|GMP)$/) {
+  if (defined $_BIGINT && $_BIGINT =~ /^Math::(GMPz|GMP)$/ && $base <= 36) {
     $n = $_BIGINT->new($r, $base);
   } elsif ($BIGINTVERSION < 1.999814) {
     $n=_FastIntegerInput([map{index("0123456789abcdefghijklmnopqrstuvwxyz",$_)}split(//,lc($r))],$base);
@@ -7464,13 +8075,29 @@ sub fromdigits {
     elsif ($base == 10) { $n = Math::BigInt->new($r); }
     elsif ($base == 16) { $n = Math::BigInt->from_hex($r); }
     else {                $n = Math::BigInt->from_base($r,$base); }
-    $n = tobigint($n) if defined $_BIGINT && $_BIGINT ne 'Math::BigInt';
   }
-  return $n <= INTMAX ? _bigint_to_int($n) : $n;
+  canonicalized_integer($n);
+}
+
+sub is_harshad {
+  my($n, $base) = _parse_base_args("is_harshad", 0, @_);
+  validate_integer($n);
+  return 0 if $n <= 0;
+  my $sum = Mvecsum(Mtodigits($n,$base));
+  Mis_divisible($n,$sum);
+}
+
+sub is_palindrome {
+  my($n, $base) = _parse_base_args("is_palindrome", 0, @_);
+  validate_integer_nonneg($n);
+  my @dig = Mtodigits($n,$base);
+  my @rdig = reverse @dig;
+  vecequal(\@dig,\@rdig);
 }
 
 sub _validate_zeckendorf {
   my($s) = @_;
+  croak "Parameter must be defined" if !defined $s;
   if ($s ne '0') {
     croak "fromzeckendorf: expected binary string"
       unless $s =~ /^1[01]*\z/;
@@ -7534,17 +8161,19 @@ sub sqrtint {
   } else {
     $R = Math::BigInt->new("$n")->bsqrt;
   }
-  $R = _bigint_to_int($R) if $R <= INTMAX;
-  $R;
+  canonicalized_integer($R);
 }
 
 sub rootint {
+  croak "rootint: expected (n,k), or (n,k,\\rk)" if @_ < 2 || @_ > 3;
   my ($n, $k, $refp) = @_;
   validate_integer_nonneg($n);
   validate_integer_positive($k);
-  croak("rootint: third argument not a scalar reference") if defined $refp && !ref($refp);
+  croak "rootint: third argument not a scalar reference"
+    if @_ == 3 && !_is_sref($refp);
 
   if ($k == 1) {
+    canonicalize_integers(\$n);
     $$refp = $n if defined $refp;
     return $n;
   }
@@ -7578,8 +8207,22 @@ sub rootint {
     return $R;
   }
 
-  # It's unclear whether we should add GMPfunc here.  We want it in logint
-  # because it's slow or not included in Perl bigint classes.
+  # A positive d-digit integer is less than 10^d, hence less than 2^(4d).
+  if ($k >= 4 * length("$n")) {
+    $$refp = 1 if defined $refp;
+    return 1;
+  }
+
+  if ($Math::Prime::Util::_GMPfunc{"rootint"} && !ref($k)) {
+    my $R = Math::Prime::Util::GMP::rootint($n, $k);
+    if (defined $refp) {
+      # logint in 0.47, powmod in 0.36, powint in 0.52
+      my $e = Math::Prime::Util::GMP::powmod($R, $k, $n);
+      $e = $n if $e == 0;
+      $$refp = maybetobigint($e);
+    }
+    return maybetobigint($R);
+  }
 
   my $refn = ref($n);
   my $R;
@@ -7593,9 +8236,23 @@ sub rootint {
   } else {
     $R = Math::BigInt->new("$n")->broot($k);
   }
-  $R = _bigint_to_int($R) if $R <= INTMAX;
+  canonicalize_integers(\$R);
   $$refp = Mpowint($R,$k) if defined $refp;
   $R;
+}
+
+sub crootint {
+  my ($n, $k) = @_;
+  validate_integer_nonneg($n);
+  validate_integer_positive($k);
+
+  return canonicalized_integer($n) if $k == 1;
+  return 0 if $n == 0;
+
+  my $rk;
+  my $r = rootint($n, $k, \$rk);
+  return $r if $rk == $n;
+  Madd1int($r);
 }
 
 sub _logint {
@@ -7616,13 +8273,12 @@ sub _logint {
   } else {
     $l = log("$n");
   }
-  $l /= log($b);
+  $l /= log("$b");
 
   # Just in case something failed, escape via using Math::BigInt's blog
   if ($l == MPU_INFINITY || !defined($l<=>MPU_INFINITY)) {
     my $R = Math::BigInt->new("$n")->copy->blog($b);
-    $R = _bigint_to_int($R) if $R <= INTMAX;
-    return $R;
+    return canonicalized_integer($R);
   }
 
   my $R = int($l);
@@ -7639,21 +8295,23 @@ sub _logint {
 }
 
 sub logint {
+  croak "logint: expected (n,b), or (n,b,\\be)" if @_ < 2 || @_ > 3;
   my ($n, $b, $refp) = @_;
   validate_integer_positive($n);
   validate_integer_nonneg($b);
+  croak "logint: third argument not a scalar reference"
+    if @_ == 3 && !_is_sref($refp);
   croak "logint: base must be > 1" if $b <= 1;
-  croak("logint third argument not a scalar reference") if defined($refp) && !ref($refp);
 
-  if ($Math::Prime::Util::_GMPfunc{"logint"}) {
+  if ($Math::Prime::Util::_GMPfunc{"logint"} && !ref($b)) {
     my $e = Math::Prime::Util::GMP::logint($n, $b);
     if (defined $refp) {
       # logint in 0.47, powmod in 0.36, powint in 0.52
       my $r = Math::Prime::Util::GMP::powmod($b, $e, $n);
       $r = $n if $r == 0;
-      $$refp = reftyped($_[0], $r);
+      $$refp = maybetobigint($r);
     }
-    return reftyped($_[0], $e);
+    return maybetobigint($e);
   }
 
   my $log = _logint($n,$b);
@@ -7701,18 +8359,28 @@ sub bernfrac {
 
 sub stirling {
   my($n, $m, $type) = @_;
+  validate_integer_nonneg($n);
+  validate_integer_nonneg($m);
+  if (@_ < 3) {
+    $type = 1;
+  } else {
+    validate_integer_nonneg($type);
+    croak "stirling type must be 1, 2, or 3" unless $type == 1 || $type == 2 || $type == 3;
+  }
+
   return 1 if $m == $n;
   return 0 if $n == 0 || $m == 0 || $m > $n;
-  $type = 1 unless defined $type;
-  croak "stirling type must be 1, 2, or 3" unless $type == 1 || $type == 2 || $type == 3;
+
   if ($m == 1) {
     return 1 if $type == 2;
     return Mfactorial($n) if $type == 3;
     return Mfactorial($n-1) if $n & 1;
     return Mvecprod(-1, Mfactorial($n-1));
   }
-  return reftyped($_[0], Math::Prime::Util::GMP::stirling($n,$m,$type))
-    if $Math::Prime::Util::_GMPfunc{"stirling"};
+
+  return maybetobigint(Math::Prime::Util::GMP::stirling($n,$m,$type))
+    if $Math::Prime::Util::_GMPfunc{"stirling"} && !ref($n) && !ref($m);
+
   # Go through vecsum with quoted negatives to make sure we don't overflow.
   my $s;
   if ($type == 3) {
@@ -7736,7 +8404,7 @@ sub stirling {
       my @S = (0)x($n+1);
       $S[1]=1;
       for my $k (2 .. $n) {
-        $S[$_] = addint($S[$_-1],mulint($k-1,$S[$_])) for reverse(1..$k);
+        $S[$_] = Mmuladdint($k-1, $S[$_], $S[$_-1]) for reverse(1..$k);
       }
       $s = $S[$m];
     } else {                      # Concrete Mathematics, eq 6.27
@@ -7753,11 +8421,11 @@ sub stirling {
 sub _harmonic_split { # From Fredrik Johansson
   my($a,$b) = @_;
   return (1, $a) if $b-$a == 1;
-  return (Mvecsum($a,$a,1), Maddint(Mmulint($a,$a),$a)) if $b-$a == 2;
+  return (Mvecsum($a,$a,1), Mmuladdint($a,$a,$a)) if $b-$a == 2;
   my $m = Mrshiftint(Maddint($a,$b));
   my ($p,$q) = _harmonic_split($a, $m);
   my ($r,$s) = _harmonic_split($m, $b);
-  (Maddint(Mmulint($p,$s),Mmulint($q,$r)), Mmulint($q,$s));
+  (Mmuladdint($p, $s, Mmulint($q,$r)), Mmulint($q,$s));
 }
 
 sub harmfrac {
@@ -7817,7 +8485,8 @@ sub is_pseudoprime {
   return 0+($n >= 2) if $n < 3;
 
   foreach my $a (@bases) {
-    croak "Base $a is invalid" if $a < 2;
+    validate_integer_nonneg($a);
+    croak "is_pseudoprime: invalid base: $a" if $a < 2;
     $a = $a % $n if $a >= $n;
     return 0 unless $a == 1 || Mpowmod($a, $n-1, $n) == 1;
   }
@@ -7833,7 +8502,8 @@ sub is_euler_pseudoprime {
   return 0 if ($n % 2) == 0;
 
   foreach my $a (@bases) {
-    croak "Base $a is invalid" if $a < 2;
+    validate_integer_nonneg($a);
+    croak "is_euler_pseudoprime: invalid base: $a" if $a < 2;
     $a = $a % $n if $a >= $n;
     my $j = Mkronecker($a, $n);
     return 0 if $j == 0;   # gcd(a,n) != 1
@@ -7849,6 +8519,7 @@ sub is_euler_plumb_pseudoprime {
   return 0 if $n < 0;
   return 0+($n >= 2) if $n < 4;
   return 0 if ($n % 2) == 0;
+
   my $nmod8 = $n % 8;
   my $exp = 1 + ($nmod8 == 1);
   my $ap = Mpowmod(2, ($n-1) >> $exp, $n);
@@ -7917,12 +8588,13 @@ sub is_strong_pseudoprime {
   return 0 if $n < 0;
   return _miller_rabin_2($n) if scalar(@bases) == 0;
 
-  return 0+($n >= 2) if $n < 4;
+  return 0+($n >= 2) if $n < 3;
   return 0 if ($n % 2) == 0;
 
   my @newbases;
   for my $a (@bases) {
-    croak "Base $a is invalid" if $a < 2;
+    validate_integer_nonneg($a);
+    croak "is_strong_pseudoprime: invalid base: $a" if $a < 2;
     $a %= $n if $a >= $n;
     next if $a <= 1 || $a == $n-1;
     if ($a == 2) {
@@ -7993,12 +8665,14 @@ sub is_strong_pseudoprime {
 # Extension of the Jacobi symbol, itself an extension of the Legendre symbol.
 sub kronecker {
   my($a, $b) = @_;
+  validate_integer($a);
+  validate_integer($b);
   return (abs($a) == 1) ? 1 : 0  if $b == 0;
   my $k = 1;
   if ($b % 2 == 0) {
     return 0 if $a % 2 == 0;
     my $v = 0;
-    do { $v++; $b /= 2; } while $b % 2 == 0;
+    do { $b = Mrshiftint($b); $v++; } while $b % 2 == 0;
     $k = -$k if $v % 2 == 1 && ($a % 8 == 3 || $a % 8 == 5);
   }
   if ($b < 0) {
@@ -8012,13 +8686,13 @@ sub kronecker {
   while ($a != 0) {
     if ($a % 2 == 0) {
       my $v = 0;
-      do { $v++; $a /= 2; } while $a % 2 == 0;
+      do { $a = Mrshiftint($a); $v++; } while $a % 2 == 0;
       $k = -$k if $v % 2 == 1 && ($b % 8 == 3 || $b % 8 == 5);
     }
     $k = -$k if $a % 4 == 3 && $b % 4 == 3;
     ($a, $b) = ($b % $a, $a);
     # If a,b are bigints and now small enough, finish as native.
-    return $k * kronecker(_bigint_to_int($a),_bigint_to_int($b))
+    return $k * Mkronecker(_bigint_to_int($a),_bigint_to_int($b))
       if $a <= INTMAX && $b <= INTMAX && ref($a) && ref($b);
   }
   return ($b == 1) ? $k : 0;
@@ -8069,15 +8743,17 @@ sub binomial {
   validate_integer($n);
   validate_integer($k);
 
-  # 1. Try GMP
-  return reftyped($_[0], Math::Prime::Util::GMP::binomial($n,$k))
-    if $Math::Prime::Util::_GMPfunc{"binomial"} &&
-       ($Math::Prime::Util::GMP::VERSION >= 0.53 || ($n >= 0 && $k >= 0 && $n < 4294967296 && $k < 4294967296));
-
-  # 2. Exit early for known 0 cases, and adjust k to be positive.
+  # 1. Exit early for known 0 cases, and adjust k to be positive.
   if ($n >= 0) {  return 0 if $k < 0 || $k > $n;  }
   else         {  return 0 if $k < 0 && $k > $n;  }
   $k = $n - $k if $k < 0;
+
+  # 2. Try GMP (0.54 supports everything, 0.53 UI k, 0.22 uint32_t n and k).
+  return maybetobigint(Math::Prime::Util::GMP::binomial($n,$k))
+    if $Math::Prime::Util::_GMPfunc{"binomial"} &&
+       (   $Math::Prime::Util::GMP::VERSION >= 0.54 ||
+          ($Math::Prime::Util::GMP::VERSION >= 0.53 && !ref($k)) ||
+          ($n >= 0 && $k >= 0 && $n < 4294967296 && $k < 4294967296)  );
 
   # TODO: consider reflection for large k (e.g. k=n-2 => k=2)
   # Also, be careful with large n and k with bigints.
@@ -8099,8 +8775,10 @@ sub binomial {
   }
 
   # 4. Overflow.  Solve using Math::BigInt
-  return 1 if $k == 0;                   # Work around bug in old
-  return $n if $k == 1 || $k == $n-1;    # Math::BigInt (fixed in 1.90)
+
+  # Special cases, partly to work around bug in old Math::BigInt (pre 1.90)
+  return 1 if $k == 0 || $k == $n;
+  return canonicalized_integer($n) if $k == 1 || $k == $n-1;
 
   my $R;
   $n = tobigint($n) unless ref($n);
@@ -8112,23 +8790,26 @@ sub binomial {
     $negate = 1 if $k & 1;
   }
 
-  if (defined $Math::GMPz::VERSION) {
+  if (defined $Math::GMPz::VERSION && !ref($k)) {
     $R = Math::GMPz->new();
-    Math::GMPz::Rmpz_bin_ui($R, Math::GMPz->new($n), $k);
+    if ($n < 4294967296) {
+      Math::GMPz::Rmpz_bin_uiui($R, "$n", $k);
+    } else {
+      Math::GMPz::Rmpz_bin_ui($R, Math::GMPz->new($n), $k);
+    }
   } elsif (defined $Math::GMP::VERSION && $Math::GMP::VERSION >= 2.23 && $n < 4294967296) {
     # This will silently coerce inputs to C 'long' type.
     $R = Math::GMP::bnok("$n","$k");
   } elsif ($n > INTMAX && $k < 100) {
-    # Incomplete work around problem with Math::BigInt not liking bigint n.
-    # Fixed in 2.003003.
+    # This is higher performance than bnok for most cases.
+    # More importantly, some versions of Math::BigInt pre-2.003003 will crash
+    # on these cases, so this works around them.
     $R = Mdivint(Mfalling_factorial($n,$k),Mfactorial($k));
   } else {
     $R = Math::BigInt::bnok("$n","$k");
   }
   $R = -$R if $negate;
-  return $R <= INTMAX && $R >= INTMIN            ?  _bigint_to_int($R)
-       : defined $_BIGINT && $_BIGINT eq ref($R) ?  $R
-       :                                            tobigint($R);
+  canonicalized_integer($R);
 }
 
 sub binomialmod {
@@ -8138,20 +8819,26 @@ sub binomialmod {
   validate_integer_abs($m);
   return (undef,0)[$m] if $m <= 1;
 
-  return reftyped($_[0], Math::Prime::Util::GMP::binomialmod($n,$k,$m))
-    if $Math::Prime::Util::_GMPfunc{"binomialmod"};
-
-  # Avoid the possible enormously slow bigint creation.
-  if ($Math::Prime::Util::_GMPfunc{"binomial"} && $Math::Prime::Util::_GMPfunc{"modint"}) {
-    if ($Math::Prime::Util::GMP::VERSION >= 0.53 || ($n >= 0 && $k >= 0 && $n < 4294967296 && $k < 4294967296)) {
-      return reftyped($_[2], Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::binomial($n,$k),$m));
-    }
-  }
-
   return 1 if $k == 0 || $k == $n;
   return 0 if $n >= 0 && ($k < 0 || $k > $n);
   return 0 if $n  < 0 && ($k < 0 && $k > $n);
   return 0+!(($n-$k) & $k) if $m == 2;
+
+  # XS should have dispatched directly to GMP binomialmod if it was available.
+  # Considering it didn't, we have the unenviable task of doing this ourselves.
+  #
+  # Use the GMP binomialmod path directly if it has the improved implementation.
+  # For older GMP, try binomial+mod so we avoid slow bigint creation here.
+  #
+  if (!ref($k)) {
+    return maybetobigint(Math::Prime::Util::GMP::binomialmod($n,$k,$m))
+      if $Math::Prime::Util::_GMPfunc{"binomialmod"} && $Math::Prime::Util::GMP::VERSION >= 0.54;
+    if ($Math::Prime::Util::_GMPfunc{"binomial"} && $Math::Prime::Util::_GMPfunc{"modint"}) {
+      if ($Math::Prime::Util::GMP::VERSION >= 0.53 || ($n >= 0 && $k >= 0 && $n < 4294967296 && $k < 4294967296)) {
+        return maybetobigint(Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::binomial($n,$k),$m));
+      }
+    }
+  }
 
   # TODO: Lucas split, etc.
   # 1. factorexp
@@ -8164,9 +8851,29 @@ sub binomialmod {
   return Mmodint(Mbinomial($n,$k),$m);
 }
 
+sub multifactorial {
+  my($n, $k) = @_;
+  validate_integer_nonneg($n);
+  validate_integer_positive($k);
+  return 1 if $n == 0;
+  return Mfactorial($n) if $k == 1;
+  return maybetobigint(Math::Prime::Util::GMP::multifactorial($n,$k))
+    if $Math::Prime::Util::_GMPfunc{"multifactorial"} &&
+       $Math::Prime::Util::GMP::VERSION >= 0.51 &&
+       !ref($n) && !ref($k);
+  # TODO: If we have Math::GMPz, we could call Rmpz_mfac_uiui(R,n,k)
+  my($i, @t) = ($n);
+  while (1) {
+    push @t, $i;
+    last if $i <= $k;
+    $i = Msubint($i, $k);
+  }
+  Mvecprod(@t);
+}
 sub _falling_factorial {
   my($n,$m) = @_;
-  if ($m <= 1) { return ($m == 0) ? 1 : $n }
+  return 1 if $m == 0;
+  return canonicalized_integer($n) if $m == 1;
   return 0 if $n >= 0 && $m > $n;
   return Mvecprod($n,map { Msubint($n,$_) } 1 .. Msubint($m,1))  if $m < 250;
   Mmulint(Mbinomial($n,$m),Mfactorial($m));
@@ -8186,46 +8893,43 @@ sub rising_factorial {
 
 sub factorial {
   my($n) = @_;
-  return (1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600)[$n] if $n <= 12;
-  return Math::GMP::bfac($n) if ref($n) eq 'Math::GMP';
-  do { my $r = Math::GMPz->new(); Math::GMPz::Rmpz_fac_ui($r,$n); return $r; }
-    if ref($n) eq 'Math::GMPz';
-  if (Math::BigInt->config()->{lib} !~ /GMP|Pari/) {
-    # It's not a GMP or GMPz object, and we have a slow bigint library.
-    my $r;
-    if (defined $Math::GMPz::VERSION) {
-      $r = Math::GMPz->new(); Math::GMPz::Rmpz_fac_ui($r,$n);
-    } elsif (defined $Math::GMP::VERSION) {
-      $r = Math::GMP::bfac($n);
-    } elsif (defined &Math::Prime::Util::GMP::factorial && getconfig()->{'gmp'}) {
-      $r = Math::Prime::Util::GMP::factorial($n);
-    }
-    return reftyped($_[0], $r)    if defined $r;
+  validate_integer_nonneg($n);
+  return (1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600)[$n]
+    if $n <= 12;
+  croak "factorial: n must fit in native unsigned integer" if ref($n);
+
+  my $r = tobigint(1);   # make sure $_BIGINT is loaded.
+
+  if ($_BIGINT eq 'Math::GMPz') {
+    $r = Math::GMPz->new();
+    Math::GMPz::Rmpz_fac_ui($r, $n);
+  } elsif ($_BIGINT eq 'Math::GMP') {
+    $r = Math::GMP::bfac($n);
+  } elsif ($Math::Prime::Util::_GMPfunc{"factorial"}) {
+    $r = Math::Prime::Util::GMP::factorial($n);
+  } else {
+    $r = Math::BigInt->new("$n")->bfac();
   }
-  # maybe roll our own: https://oeis.org/A000142/a000142.pdf
-  my $r = Math::BigInt->new($n)->bfac();
-  $r = _bigint_to_int($r) if $r <= INTMAX;
-  $r;
+  canonicalized_integer($r);
 }
 
 sub factorialmod {
   my($n,$m) = @_;
-  validate_integer($n);
+  validate_integer_nonneg($n);
   validate_integer_abs($m);
   return (undef,0)[$m] if $m <= 1;
-
-  return reftyped($_[1], Math::Prime::Util::GMP::factorialmod($n,$m))
-    if $Math::Prime::Util::_GMPfunc{"factorialmod"} && $n < ~0;
-
   return 0 if $n >= $m || $m == 1;
 
-  return factorial($n) % $m if $n <= 10;
+  return maybetobigint(Math::Prime::Util::GMP::factorialmod($n,$m))
+    if $Math::Prime::Util::_GMPfunc{"factorialmod"} && !ref($n) && $n <= SINTMAX;
+
+  return Mmodint(factorial($n),$m) if $n <= 10;
 
   my($F, $N, $m_prime) = (1, $n, Mis_prime($m));
 
   # Check for Wilson's theorem letting us go backwards
   $n = $m-$n-1 if $m_prime && $n > Mrshiftint($m);
-  return ($n == 0) ? ($m-1) : 1  if $n < 2;
+  return ($n == 0) ? Msubint($m,1) : 1  if $n < 2;
 
   if ($n > 100 && !$m_prime) {   # Check for a composite that leads to zero
     my $maxpk = 0;
@@ -8261,6 +8965,7 @@ sub factorialmod {
 sub subfactorial {
   my($n) = @_;
   validate_integer_nonneg($n);
+  croak "subfactorial: n must fit in native signed integer" if $n > SINTMAX;
   if ($n <= 3) { return ($n == 0) ? 1 : $n-1; }
   my $r = 0;
   for my $k (2..$n) {
@@ -8270,7 +8975,27 @@ sub subfactorial {
   $r;
 }
 
+sub catalan_number {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  croak "catalan_number: n must fit in native signed integer" if $n > SINTMAX;
+  return 1 if $n <= 1;
+  # C(n) = binomial(2n,n) / (n+1)
+  Mdivint(Mbinomial(Mmulint(2,$n), $n), Madd1int($n));
+}
+
+sub bell_number {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  croak "bell_number: n must fit in native signed integer" if $n > SINTMAX;
+  # Bell triangle: B(k) is the first element of row k.
+  my @row = (1);
+  @row = vecprefixsum($row[-1],@row)  for 1 .. $n;
+  return $row[0];
+}
+
 my $_fubinis = [1,1,3,13,75];
+_register_free_sub(sub { $_fubinis = [1,1,3,13,75]; });
 sub _add_fubini {  # Add the next Fubini sequence term to an array reference.
   my($A)= @_;
   my $N = @$A;
@@ -8286,18 +9011,76 @@ sub _add_fubini {  # Add the next Fubini sequence term to an array reference.
                           $t = Sdivint($t, $_+1);
                           $x } 0..$N-1);
 }
-_register_free_sub(sub { $_fubinis = [1,1,3,13,75]; });
 sub fubini {
   my($n) = @_;
   validate_integer_nonneg($n);
+  croak "fubini: n must fit in native signed integer" if $n > SINTMAX;
 
   my $cmax = $n < 500 ? $n : 500;
   _add_fubini($_fubinis) until defined $_fubinis->[$cmax];
-  return $_fubinis->[$n] if defined $_fubinis->[$n];
+  return canonicalized_integer($_fubinis->[$n]) if defined $_fubinis->[$n];
 
   my @F = @$_fubinis;  # copy the cached values to our own.
   _add_fubini(\@F) until defined $F[$n];
-  return $F[$n];
+  canonicalized_integer($F[$n]);
+}
+
+
+my @_A000792 = ();
+my @_A005245 = (0,1,2,3);
+_register_free_sub(sub { @_A000792=(); @_A005245=(0,1,2,3); });
+sub _expand_A005245 {  # Based on Martin N. Fuller's code from OEIS.
+  my($n) = @_;
+
+  if (@_A000792 < 128) {
+    my $calcg = sub { my($n,$res)=(shift,1); while ($n >= 5 || $n == 3) { $res=Mmulint($res,3); $n -= 3; } Mlshiftint($res,$n >> 1); };
+    @_A000792 = map { $calcg->($_) } 0 .. 127;
+  }
+
+  my $first = $#_A005245+1;
+  return if $first > $n;
+
+  my $A = \@_A005245;
+  $A->[$_] = 127 for $first .. $n;
+
+  # Calcs for first .. n based on existing data
+  for my $i (2 .. $first-1) {
+    my $ij = $i;
+    for my $j (2 .. $i) {
+      $ij += $i;
+      last if $ij > $n;
+      next if $ij < $first;
+      $A->[$ij] = $A->[$i] + $A->[$j] if $A->[$i]+$A->[$j] < $A->[$ij];
+    }
+  }
+  # Now complete the rest
+  for my $i ($first .. $n) {
+    my($t,$k) = ($A->[$i-1],1);
+    $A->[$i] = $t+1 if $t+1 < $A->[$i];
+    $k++ while $k < ($t>>1) && $_A000792[$k+1]+$_A000792[$t-$k-1] >= $i;
+    for my $j (6 .. $_A000792[$k]) {  # 2-5 cannot be better than 1
+      $A->[$i] = $A->[$j] + $A->[$i-$j] if $A->[$j]+$A->[$i-$j] < $A->[$i];
+    }
+    my $ij = $i;
+    for my $j (2 .. $i) {
+      $ij += $i;
+      last if $ij > $n;
+      $A->[$ij] = $A->[$i] + $A->[$j] if $A->[$i]+$A->[$j] < $A->[$ij];
+    }
+  }
+  1;
+}
+sub integer_complexity {
+  my($n) = @_;
+  validate_integer_nonneg($n);
+  croak "integer_complexity: n must fit in native signed integer"
+    if $n > SINTMAX;
+  if ($n == 0) {  # clear the cache in addition to returning undef
+    @_A000792=(); @_A005245=(0,1,2,3);
+    return undef;
+  }
+  _expand_A005245($n+1024) unless defined $_A005245[$n];
+  $_A005245[$n];
 }
 
 
@@ -8343,29 +9126,137 @@ sub from_contfrac {
 
   my $b0 = shift @_;
   validate_integer($b0);
+  canonicalize_integers(\$b0);
 
   my($A0,$A1,$B0,$B1) = (1,$b0,0,1);
 
   while (@_) {
     my $bi = shift @_;
     validate_integer_positive($bi);
-    ($A0,$A1) = ($A1, Maddint(Mmulint($bi,$A1),$A0));
-    ($B0,$B1) = ($B1, Maddint(Mmulint($bi,$B1),$B0));
+    ($A0,$A1) = ($A1, Mmuladdint($bi, $A1, $A0));
+    ($B0,$B1) = ($B1, Mmuladdint($bi, $B1, $B0));
   }
   return ($A1,$B1);
+}
+
+sub convergents {
+  return wantarray ? () : 0 unless @_;
+  my @cf = @_;    # copy so validate can normalize in-place (args may be read-only)
+  validate_integer($cf[0]);
+  validate_integer_positive($cf[$_]) for 1..$#cf;
+
+  my @result;
+  my($p0,$q0) = (1, 0);        # convergent_{-1}
+  my($p1,$q1) = ($cf[0], 1);   # convergent_0
+  canonicalize_integers(\$p1);
+
+  push @result, [$p1, $q1];
+  for my $i (1..$#cf) {
+    my $a = $cf[$i];
+    my($p2,$q2) = (Mmuladdint($a, $p1, $p0), Mmuladdint($a, $q1,$q0));
+    push @result, [$p2, $q2];
+    ($p0,$q0) = ($p1,$q1);
+    ($p1,$q1) = ($p2,$q2);
+  }
+  @result;
+}
+
+sub bestrational {
+  my($x, $dbound) = @_;
+  validate_integer_positive($dbound);
+  croak "bestrational: first argument must be numeric"
+    if !defined $x || (!ref($x) && !looks_like_number($x));
+  croak "bestrational: first argument must be a finite real number"
+    if !ref($x) && $x =~ /(?:inf|nan)/i;
+
+  # In case they gave us a bigint
+  if (ref($x) eq 'Math::BigFloat') {
+    $x = $x->copy;
+  } elsif (ref($x)) {
+    $x = $x <= INTMAX && $x >= INTMIN ? _bigint_to_int($x)
+                                      : _upgrade_to_float("$x");
+  }
+  # x is now a BigFloat or native or string.  Check dbound.
+
+  # This can overshoot a lot but better than not getting it right.
+  my $maxl = length("$dbound")>length("$x") ? length("$dbound") : length("$x");
+  my $prec = $maxl + 2;
+
+  $x = _upgrade_to_float("$x") if !ref($x) && $prec > 15;
+  if (ref($x)) {
+    my $acc = _find_big_acc($x);
+    $x->accuracy($prec) if $acc < $prec;
+  } else {
+    $x = 0.0 + $x;
+  }
+  croak "bestrational: first argument must be a finite real number"
+    unless $x*0 == 0;
+
+  my $neg = ($x < 0);
+  my $ax = $neg ? -$x : $x;
+
+  my($p0,$q0) = (1, 0);
+  my($p1,$q1) = (Mtoint($ax), 1);   # convergent_0 = floor(|x|)
+
+  my $rem = $ax - $p1;
+  # Threshold: loop until rem is negligible at working precision.
+  # The q2>dbound check (inside the loop) is the real termination condition.
+  # A dbound-based threshold is wrong: even when a>dbound we still need to
+  # run the semiconvergent check before breaking.
+  my $thresh = ref($x) ? Math::BigFloat->new("1e-" . ($prec - 2))
+                       : 1e-15;
+  while ($rem > $thresh) {
+    $rem  = ref($x) ? Math::BigFloat->bone->bdiv($rem) : 1.0/$rem;
+    my $a = Mtoint($rem);
+    $rem -= $a;
+
+    my($p2,$q2) = (Mmuladdint($a,$p1,$p0), Mmuladdint($a,$q1,$q0));
+
+    if ($q2 > $dbound) {
+      # Next convergent overshoots; check best semiconvergent
+      my $m = Mdivint(Msubint($dbound,$q0),$q1);
+      if ($m >= 1) {
+        my($ps,$qs)=(Mmuladdint($m,$p1,$p0),Mmuladdint($m,$q1,$q0));
+        # Is ps/qs closer than p1/q1?  Compare cross-multiplied absolute errors.
+        my($pserr,$p1err);
+        if (ref($ax)) {
+          $pserr = abs($ax*$qs - $ps) * $q1;
+          $p1err = abs($ax*$q1 - $p1) * $qs;
+        } else {
+          my($nps,$nqs,$np1,$nq1) =
+            map { 0.0 + "$_" } ($ps,$qs,$p1,$q1);
+          $pserr = abs($nps - $ax*$nqs) * $nq1;
+          $p1err = abs($np1 - $ax*$nq1) * $nqs;
+        }
+        if ($pserr < $p1err) {
+          ($p1,$q1) = ($ps,$qs);
+        }
+      }
+      last;
+    }
+
+    ($p0,$q0) = ($p1,$q1);
+    ($p1,$q1) = ($p2,$q2);
+  }
+
+  $p1 = Mnegint($p1) if $neg;
+  ($p1,$q1);
 }
 
 sub next_calkin_wilf {
   my($num,$den) = @_;
   validate_integer_positive($num);
   validate_integer_positive($den);
-  # Check gcd to ensure a valid CW entry?
-  ($den, Mvecprod(2,$den,Mdivint($num,$den)) + $den - $num);
+  croak "next_calkin_wilf: rational must be reduced" if Mgcd($num,$den) != 1;
+  my $prod = Mvecprod(2, $den, Mdivint($num,$den));
+  my $sum = Msubint(Maddint($prod, $den), $num);
+  (canonicalized_integer($den), $sum);
 }
 sub next_stern_brocot {
   my($num,$den) = @_;
   validate_integer_positive($num);
   validate_integer_positive($den);
+  croak "next_stern_brocot: rational must be reduced" if Mgcd($num,$den) != 1;
   # There should be a better solution
   nth_stern_brocot(Madd1int(stern_brocot_n($num,$den)));
 }
@@ -8377,6 +9268,7 @@ sub calkin_wilf_n {
 
   my @CF = _rational_cfrac($num,$den);
   # Note:  vecsum(@CF) gives the number of bits in the output
+  croak "calkin_wilf_n: too many bits in output" if Mvecsum(@CF) > SINTMAX;
 
   $CF[-1]--;
   my $bitstr = '1';
@@ -8388,6 +9280,7 @@ sub stern_brocot_n {
   validate_integer_positive($num);
   validate_integer_positive($den);
   my @CF = _rational_cfrac($num,$den);
+  croak "stern_brocot_n: too many bits in output" if Mvecsum(@CF) > SINTMAX;
   $CF[-1]--;
   my $bitstr = '1';
   $bitstr .= (1-($_%2)) x $CF[$_]  for 0 .. $#CF;
@@ -8430,10 +9323,14 @@ sub farey {
   if (defined $k) {
     validate_integer_nonneg($k);
     return undef if $k >= $len;
+    if ($k > Mdivint($len, 2)) {
+      ($p0, $q0, $p1, $q1) = (1, 1, Msub1int($n), $n);
+      $k = Msubint(Msub1int($len), $k);
+    }
     for (1 .. $k) {
-      $j = Mdivint(($q0 + $n), $q1);
-      $p2 = Mmulint($j, $p1) - $p0;
-      $q2 = Mmulint($j, $q1) - $q0;
+      $j = Mdivint(Maddint($q0, $n), $q1);
+      $p2 = Mmulsubint($j, $p1, $p0);
+      $q2 = Mmulsubint($j, $q1, $q0);
       ($p0, $q0, $p1, $q1) = ($p1, $q1, $p2, $q2);
     }
     return [$p0,$q0];
@@ -8444,9 +9341,9 @@ sub farey {
   my @V;
   for (1 .. $len) {
     push @V, [$p0, $q0];
-    $j = Mdivint(($q0 + $n), $q1);
-    $p2 = Mmulint($j, $p1) - $p0;
-    $q2 = Mmulint($j, $q1) - $q0;
+    $j = Mdivint(Maddint($q0, $n), $q1);
+    $p2 = Mmulsubint($j, $p1, $p0);
+    $q2 = Mmulsubint($j, $q1, $q0);
     ($p0, $q0, $p1, $q1) = ($p1, $q1, $p2, $q2);
   }
   @V;
@@ -8456,41 +9353,125 @@ sub farey {
 sub next_farey {
   my($n,$frac) = @_;
   validate_integer_positive($n);
-  croak "next_farey second argument not an array reference" unless ref($frac) eq 'ARRAY';
+  croak "next_farey second argument not an array reference"
+    unless _is_aref($frac);
+  croak "next_farey: expected 2-element array reference"
+    unless @$frac == 2;
   my($p,$q) = @$frac;
   validate_integer_nonneg($p);
   validate_integer_positive($q);
   return undef if $p >= $q;
-  my($u,$v,$g) = Mgcdext($p,$q);
+
+  my $g = Mgcd($p,$q);
   ($p,$q) = (Mdivint($p,$g),Mdivint($q,$g)) if $g != 1;
-  my $d = Mmulint(Mdivint(($n+$u),$q),$q) - $u;
-  my $c = Mdivint((Mmulint($d,$p)+1),$q);
+
+  # The single-step formula requires p/q to be an entry in F_n.  Otherwise
+  # use rank/select to find the first sequence entry greater than p/q.
+  return farey($n, farey_rank($n,[$p,$q])) if $q > $n;
+
+  my($u,$v) = Mgcdext($p,$q);
+  my $d = Mmulsubint(Mdivint(Maddint($n,$u),$q),$q,$u);
+  my $c = Mdivint(Mmuladdint($d,$p,1),$q);
   [$c,$d];
+}
+
+# Return sum_{i=0..n-1} floor((a*i + b) / m).
+# This is the standard Euclidean floor-sum reduction: peel off whole
+# multiples when a >= m or b >= m, then transpose the remaining lattice
+# count so the arguments shrink like the Euclidean algorithm.  It runs in
+# logarithmic time and uses constant memory.
+#
+# farey_rank calls this as _floor_sum(v, q, p, p-1), which equals:
+#   sum_{r=1..v} floor((p*r - 1) / q)
+sub _floor_sum {
+  my($n, $m, $a, $b) = @_;
+  my $sum = 0;
+
+  while ($n > 0) {
+    if ($a >= $m) {
+      my($q, $r) = Mdivrem($a, $m);
+      my $tri = Mdivint(Mmulint($n, Msub1int($n)), 2);
+      $sum = Maddint($sum, Mmulint($tri, $q));
+      $a = $r;
+    }
+    if ($b >= $m) {
+      my($q, $r) = Mdivrem($b, $m);
+      $sum = Maddint($sum, Mmulint($n, $q));
+      $b = $r;
+    }
+    my $y = Maddint(Mmulint($a, $n), $b);
+    last if $y < $m;
+    ($n, $b) = Mdivrem($y, $m);
+    ($m, $a) = ($a, $m);
+  }
+  $sum;
+}
+
+sub floor_sum {
+  my($n, $m, $a, $b) = @_;
+  validate_integer_nonneg($n);
+  validate_integer_positive($m);
+  validate_integer_nonneg($a);
+  validate_integer_nonneg($b);
+  canonicalized_integer(_floor_sum($n, $m, $a, $b));
 }
 
 sub farey_rank {
   my($n,$frac) = @_;
   validate_integer_positive($n);
-  croak "next_farey second argument not an array reference" unless ref($frac) eq 'ARRAY';
+  croak "farey_rank second argument not an array reference"
+    unless _is_aref($frac);
+  croak "farey_rank: expected 2-element array reference"
+    unless @$frac == 2;
   my($p,$q) = @$frac;
   validate_integer_nonneg($p);
   validate_integer_positive($q);
 
   return 0 if $p == 0;
+  if ($p >= $q) {
+    my $len = Madd1int(Math::Prime::Util::sumtotient($n));
+    return ($p == $q) ? Msub1int($len) : $len;
+  }
 
   my $g = Mgcd($p,$q);
   ($p,$q) = (Mdivint($p,$g),Mdivint($q,$g)) if $g != 1;
 
-  my @count = (0,0,map { Mdivint(Mmulint($p,$_)-1,$q); } 2..$n);
+  my $pm1 = Msub1int($p);
   my $sum = 1;
-  for my $i (2 .. $n) {
-    my $icount = $count[$i];
-    for (my $j = Mmulint($i,2); $j <= $n; $j = Maddint($j,$i)) {
-      $count[$j] -= $icount;
+
+  # Count reduced fractions below p/q using Mobius inversion:
+  #   1 + sum_{d=1..n} mu(d) * sum_{m=1..floor(n/d)} floor((p*m-1)/q)
+  # Group by floor(n/d), so we need only O(sqrt(n)) floor sums.
+  if ($n <= 1_000_000) {
+    my @mertens = (0);
+    push @mertens, $mertens[-1] + $_ for Mmoebius(1, $n);
+
+    for (my $lo = 1; $lo <= $n; ) {
+      my $v = Mdivint($n, $lo);
+      my $hi = Mdivint($n, $v);
+      my $mdelta = $mertens[0+$hi] - $mertens[0+Msub1int($lo)];
+      $sum = Maddint($sum, Mmulint($mdelta, Mfloor_sum($v, $q, $p, $pm1)))
+        if $mdelta != 0;
+      $lo = Madd1int($hi);
     }
-    $sum += $icount;
+  } else {
+    my %mcache = (0 => 0);
+    my $mertens = sub {
+      my $x = shift;
+      return $mcache{$x} if exists $mcache{$x};
+      $mcache{$x} = Mmertens($x);
+    };
+
+    for (my $lo = 1; $lo <= $n; ) {
+      my $v = Mdivint($n, $lo);
+      my $hi = Mdivint($n, $v);
+      my $mdelta = Msubint($mertens->($hi), $mertens->(Msub1int($lo)));
+      $sum = Maddint($sum, Mmulint($mdelta, Mfloor_sum($v, $q, $p, $pm1)))
+        if $mdelta != 0;
+      $lo = Madd1int($hi);
+    }
   }
-  $sum;
+  canonicalized_integer($sum);
 }
 
 # End of Rational maps
@@ -8522,9 +9503,6 @@ sub is_primitive_root {
   return 0+($a == $n-1) if $n <= 4;
   return 0 if $a <= 1;
 
-  return Math::Prime::Util::GMP::is_primitive_root($a,$n)
-    if $Math::Prime::Util::_GMPfunc{"is_primitive_root"};
-
   # my $order = Mznorder($a,$n);  return 0 unless defined $order;  return 0+($order == Mtotient($n));
 
   if (Mis_even($n)) {
@@ -8552,16 +9530,56 @@ sub is_primitive_root {
   1;
 }
 
+sub _znorder_prime_power {
+  my($a, $p, $e, $pe) = @_;
+  my $amod = Mmodint($a, $pe);
+  return 1 if $amod <= 1;
+
+  if ($p == 2) {
+    return 1 if $e <= 1;
+    return Mmodint($amod, 4) == 1 ? 1 : 2 if $e == 2;
+    if (Mmodint($amod, 4) == 1) {
+      my $s = Mvaluation(Msubint($amod, 1), 2);
+      return Mpowint(2, $e > $s ? $e - $s : 0);
+    } else {
+      my $s = Mvaluation(Maddint($amod, 1), 2);
+      return Mpowint(2, $e > $s ? $e - $s : 1);
+    }
+  }
+
+  # p is odd.  Compute ord_p(a) by starting with p-1 and removing unneeded factors.
+  my $phi = Msubint($p, 1);
+  my $ord = $phi;
+  for my $f (Mfactor_exp($phi)) {
+    my $q = $f->[0];
+    while (Mmodint($ord, $q) == 0) {
+      my $cand = Mdivint($ord, $q);
+      last if Mpowmod($amod, $cand, $p) != 1;
+      $ord = $cand;
+    }
+  }
+  if ($e > 1) {
+    # Lift ord_p(a) to ord_{p^e}(a) using LTE:
+    #   ord_{p^e}(a) = ord_p(a) * p^max(0, e - v_p(a^ord_p(a)-1)).
+    my $s = 1;
+    my $p_pow = Mmulint($p, $p);
+    while ($s < $e && Mpowmod($a, $ord, $p_pow) == 1) {
+      $s++;
+      $p_pow = Mmulint($p_pow, $p);
+    }
+    $ord = Mmulint($ord, Mpowint($p, $e - $s)) if $e > $s;
+  }
+  $ord;
+}
+
 sub znorder {
   my($a, $n) = @_;
+  validate_integer($a);
   validate_integer_abs($n);
   return (undef,1)[$n] if $n <= 1;
   $a = Mmodint($a, $n);
   return undef if $a <= 0;
   return 1 if $a == 1;
-
-  return reftyped($_[0], Math::Prime::Util::GMP::znorder($a,$n))
-    if $Math::Prime::Util::_GMPfunc{"znorder"};
 
   return undef if Mgcd($a, $n) > 1;
 
@@ -8571,38 +9589,7 @@ sub znorder {
   foreach my $fn (Mfactor_exp($n)) {
     my($p, $e) = @$fn;
     my $pe = ($e == 1) ? $p : Mpowint($p, $e);
-    my $amod = Mmodint($a, $pe);
-    next if $amod <= 1;
-    # phi(p^e) = (p-1) * p^(e-1)
-    my $pm1 = Msubint($p, 1);
-    my $phi = ($e == 1) ? $pm1 : Mmulint($pm1, Mpowint($p, $e-1));
-
-    # For small phi, enumerate sorted divisors directly.
-    if ($phi < 2 ** MPU_MAXBITS) {
-      my $found = 0;
-      foreach my $d (Mdivisors($phi)) {
-        if (Mpowmod($amod, $d, $pe) == 1) {
-          $order = Mlcm($order, $d);
-          $found = 1;
-          last;
-        }
-      }
-      return undef unless $found;
-      next;
-    }
-
-    # Algorithm 1.7 from A. Das applied to phi(p^e).
-    my $k = 1;
-    foreach my $f (Mfactor_exp($phi)) {
-      my($pi, $ei, $enum) = ($f->[0], $f->[1], 0);
-      my $phidiv = Mdivint($phi, Mpowint($pi, $ei));
-      my $b = Mpowmod($amod, $phidiv, $pe);
-      while ($b != 1) {
-        return undef if $enum++ >= $ei;
-        $b = Mpowmod($b, $pi, $pe);
-        $k = Mmulint($k, $pi);
-      }
-    }
+    my $k = _znorder_prime_power($a, $p, $e, $pe);
     $order = Mlcm($order, $k);
   }
   $order;
@@ -8618,23 +9605,24 @@ sub _dlp_trial {
       return $k if $t == $a;
       $t = Mmulmod($t, $g, $p);
     }
-    return 0;
+    return undef;
   }
 
   ($a, $g, $p, $limit) = map { tobigint($_) } ($a, $g, $p, $limit);
   my $t = tobigint($g);
-  for (my $k = tobigint(1); $k < $limit; $k++) {
+  for (my $k = tobigint(1); $k <= $limit; $k++) {
     return Maddint($k,0) if $t == $a;
     $t *= $g;
     $t %= $p;
   }
-  0;
+  return undef;
 }
 sub _dlp_bsgs {
-  my ($a,$g,$p,$_verbose) = @_;
+  my ($a,$g,$p,$gorder,$_verbose) = @_;
   my $invg = Minvmod($g, $p);
   return 0 unless defined $invg;
-  my $N = Madd1int(Msqrtint($p-1));
+  my $size = defined($gorder) ? $gorder : Msubint($p, 1);
+  my $N = Madd1int(Msqrtint($size));
   # Limit for time and space.
   my $b = $N > 4_000_000 ? 4_000_000 : $N;
 
@@ -8675,32 +9663,109 @@ sub _dlp_bsgs {
   0;
 }
 
+sub _znlog_prime_power {
+  my ($delta, $gamma, $n, $p, $e, $_verbose) = @_;
+  # Find k in [0, p^e) with gamma^k == delta (mod n), where gamma has order p^e.
+  # Uses Pohlig-Hellman digit extraction: e inner DLPs each of order p.
+  my $pe     = Mpowint($p, $e);
+  my $gamma0 = Mpowmod($gamma, Mpowint($p, $e-1), $n);  # has order p
+  my $k = 0;
+  for my $j (0 .. $e-1) {
+    # h = (delta * gamma^{-k})^{p^{e-1-j}} mod n
+    my $t = ($k == 0)
+      ? $delta
+      : Mmulmod($delta, Mpowmod($gamma, Msubint($pe, $k), $n), $n);
+    my $h = ($j == $e-1)
+      ? $t
+      : Mpowmod($t, Mpowint($p, $e-1-$j), $n);
+    # Solve gamma0^{xj} == h (mod n), xj in {0..p-1}
+    my $xj;
+    if ($h == 1) {
+      $xj = 0;
+    } else {
+      $xj = _znlog_solve($h, $gamma0, $n, $p, $_verbose);
+      return undef unless defined $xj;
+    }
+    $k = Mmuladdint($xj, Mpowint($p, $j), $k);
+  }
+  $k;
+}
+
+sub _znlog_solve {
+  my($a,$g,$n,$gorder,$_verbose) = @_;
+  ($a,$g,$n,$gorder) = map { tobigint($_) } ($a,$g,$n,$gorder);
+  my $x = _dlp_bsgs($a, $g, $n, $gorder, $_verbose);
+  return canonicalized_integer($x) if Mpowmod($g,$x,$n) == $a;
+  print "  BSGS giving up\n" if $x == 0 && $_verbose;
+  print "  BSGS incorrect answer $x\n" if $x > 0 && $_verbose > 1;
+  $x = _dlp_trial($a, $g, $n, Msub1int($gorder));
+  canonicalized_integer($x);
+}
+
 sub znlog {
   my($a, $g, $n) = @_;
   validate_integer($a);
   validate_integer($g);
   validate_integer_abs($n);
-  return (undef,0,1)[$n] if $n <= 1;
+  return (undef,0)[$n] if $n <= 1;
   $a = Mmodint($a, $n);
   $g = Mmodint($g, $n);
-  return 0 if $a == 1 || $g == 0 || $n < 2;
+  if ($g == 0) { return $a == 0 ? 1 : $a == 1 ? 0 : undef }
+  if ($g == 1) { return $a == 1 ? 0 : undef; }
+  return 0 if $a == 1;
 
   my $_verbose = getconfig()->{'verbose'};
 
-  # For large p, znorder can be very slow.  Do a small trial test first.
-  my $x = _dlp_trial($a, $g, $n, 200);
-
-  if ($x == 0) {
-    ($a,$g,$n) = map { tobigint($_) } ($a,$g,$n);
-    $x = _dlp_bsgs($a, $g, $n, $_verbose);
-    $x = _bigint_to_int($x) if ref($x) && $x <= INTMAX;
-    return $x if $x > 0 && Mpowmod($g,$x,$n) == $a;
-    print "  BSGS giving up\n" if $x == 0 && $_verbose;
-    print "  BSGS incorrect answer $x\n" if $x > 0 && $_verbose > 1;
-    $x = _dlp_trial($a,$g,$n);
+  if ($a == 0) {
+    return undef if Mis_prime($n);
+    my $radn = squarefree_kernel($n);
+    return undef if $g % $radn != 0;
+    my $k = 1;
+    for my $pe (Mfactor_exp($n)) {
+      my ($q, $e) = @$pe;
+      my $vg = Mvaluation($g, $q);
+      my $ki = Mcdivint($e,$vg);
+      $k = $ki if $ki > $k;
+    }
+    return $k;
   }
-  $x = _bigint_to_int($x) if ref($x) && $x <= INTMAX;
-  return ($x == 0) ? undef : $x;
+
+  { # Before factoring n in znorder, optimistically look for a small k.
+    my $k = _dlp_trial($a, $g, $n, 200);
+    return $k if defined $k || $n <= 200;;
+  }
+
+  my $gorder = Mznorder($g,$n);
+  if (!defined $gorder) {
+    # n is composite AND g is not coprime to n
+    print "  znlog gorder undefined, trial to $n\n" if $_verbose;
+    return _dlp_trial($a,$g,$n);
+  } else {
+    return undef if Mpowmod($a,$gorder,$n) != 1;
+  }
+
+  if (!Mis_prime($gorder)) {  # PH Silver-Pohlig-Hellman
+    my($k,@kmod);
+    foreach my $f (Mfactor_exp($gorder)) {
+      my ($p, $e) = @$f;
+      my $P = Mpowint($p, $e);
+      my $G = Mdivint($gorder, $P);
+      my $delta = Mpowmod($a, $G, $n);
+      if ($delta == 1) {
+        $k = 0;
+      } else {
+        return undef if Mpowmod($delta, $P, $n) != 1;
+        my $gamma = Mpowmod($g, $G, $n);
+        $k = _znlog_prime_power($delta, $gamma, $n, $p, $e, $_verbose);
+        return undef unless defined $k;
+      }
+      push @kmod, [$k, $P];
+    }
+    $k = Mchinese(@kmod);
+    return defined $k && Mpowmod($g, $k, $n) == $a  ?  $k  : undef;
+  }
+
+  _znlog_solve($a, $g, $n, $gorder, $_verbose);
 }
 
 sub znprimroot {
@@ -8718,7 +9783,7 @@ sub znprimroot {
   return 5 if $p == 3 && $iseven;
   my $ispow = ($k > 1);
 
-  my $phi = $p-1;
+  my $phi = Msub1int($p);
   my $psquared = $ispow ? Mmulint($p,$p) : 0;
 
   my @phidivfac = map  { Mdivint($phi, $_) }
@@ -8808,31 +9873,38 @@ sub _lucas_extrastrong_params {
 # returns U_k, V_k, Q_k all mod n
 sub lucas_sequence {
   my($n, $P, $Q, $k) = @_;
+  validate_integer_positive($n);
+  validate_integer($P);
+  validate_integer($Q);
+  validate_integer_nonneg($k);
 
-  croak "lucas_sequence: n must be > 0" if $n < 1;
-  croak "lucas_sequence: k must be >= 0" if $k < 0;
   return (0,0,0) if $n == 1;
 
-  if ($Math::Prime::Util::_GMPfunc{"lucas_sequence"} && $Math::Prime::Util::GMP::VERSION >= 0.30 && !ref($P) && !ref($Q)) {
-    return maybetobigintall(
-             Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $k)
-           );
-  }
+  return maybetobigintall(Math::Prime::Util::GMP::lucas_sequence($n,$P,$Q,$k))
+    if $Math::Prime::Util::_GMPfunc{"lucas_sequence"} &&
+       $Math::Prime::Util::GMP::VERSION >= 0.53 &&
+       !ref($P) && $P > INTMIN && $P <= SINTMAX &&
+       !ref($Q) && $Q > INTMIN && $Q <= SINTMAX;
+
+  return maybetobigintall(Math::Prime::Util::GMP::lucas_sequence($n,$P,$Q,$k))
+    if $Math::Prime::Util::_GMPfunc{"lucas_sequence"} &&
+       $Math::Prime::Util::GMP::VERSION >= 0.13 &&
+       !ref($P) && $P > INTMIN && $P <= SINTMAX &&
+       !ref($Q) && $Q > INTMIN && $Q <= SINTMAX &&
+       Mcmpint($n,Mabsint($P)) > 0 &&
+       Mcmpint($n,Mabsint($Q)) > 0 &&
+       Mcmpint(Mmulsubint($P,$P,Mmulint(4,$Q)),0) != 0;
 
   return (lucasuvmod($P,$Q,$k,$n), Mpowmod($Q,$k,$n));
 }
 
 sub lucasuv {
   my($P, $Q, $k) = @_;
+  validate_integer($P);
+  validate_integer($Q);
+  validate_integer_nonneg($k);
 
-  croak "lucasuv: k must be >= 0" if $k < 0;
   return (0,2) if $k == 0;
-
-  if ($Math::Prime::Util::_GMPfunc{"lucasuv"} && $Math::Prime::Util::GMP::VERSION >= 0.53) {
-    return maybetobigintall(
-             Math::Prime::Util::GMP::lucasuv($P, $Q, $k)
-           );
-  }
 
   # Do this very generic.  Optimize later if needed (D=0,Q=1,Q=-1,n odd).
 
@@ -8868,8 +9940,8 @@ sub lucasuv {
     $Vl = $Vl * $Vl - ($Ql+$Ql);
     $Ql *= $Ql;
   }
-  $Uh = _bigint_to_int($Uh) if $Uh <= INTMAX && $Uh >= INTMIN;
-  $Vl = _bigint_to_int($Vl) if $Vl <= INTMAX && $Vl >= INTMIN;
+  canonicalize_integers(\$Uh);
+  canonicalize_integers(\$Vl);
   ($Uh, $Vl);
 }
 
@@ -8882,12 +9954,6 @@ sub lucasuvmod {
   return if $n == 0;
   return (0,0) if $n == 1;
   return (0, Mmodint(2,$n)) if $k == 0;
-
-  if ($Math::Prime::Util::_GMPfunc{"lucasuvmod"} && $Math::Prime::Util::GMP::VERSION >= 0.53) {
-    return maybetobigintall(
-             Math::Prime::Util::GMP::lucasuvmod($P, $Q, $k, $n)
-           );
-  }
 
   $P = Mmodint($P,$n) if $P < 0 || $P >= $n;
   $Q = Mmodint($Q,$n) if $Q < 0 || $Q >= $n;
@@ -9008,31 +10074,65 @@ sub lucasuvmod {
   ($U,$V);
 }
 
+# For lucasu and lucasv, we call other functions.
+# We rely on them to do the validation.
+
 sub lucasu {
-  return maybetobigint( Math::Prime::Util::GMP::lucasu($_[0], $_[1], $_[2]) )
-    if $Math::Prime::Util::_GMPfunc{"lucasu"};
   (lucasuv(@_))[0];
 }
 sub lucasv {
-  return maybetobigint( Math::Prime::Util::GMP::lucasv($_[0], $_[1], $_[2]) )
-    if $Math::Prime::Util::_GMPfunc{"lucasv"};
   (lucasuv(@_))[1];
 }
 
+sub _fibnm {    # Returns (F(k), F(k+1))
+  my($k) = @_;
+  return ($k,1) if $k <= 1;
+
+  my($a,$b) = (1,1);
+  my @kbits = Mtodigits($k, 2);
+  shift @kbits;  # Remove leading 1
+  foreach my $bit (@kbits) {
+    ($a,$b) = map { tobigint($_) } ($a,$b) if !ref($b) && $b >= 11863283;
+    my($c,$d) = ($a * (2*$b-$a), $a*$a + $b*$b);
+    ($a,$b) = $bit ? ($d,$c+$d) : ($c,$d);
+  }
+  ($a,$b);
+}
+
+sub fibonacci {
+  my($k) = @_;
+  validate_integer($k);
+  if ($k < 0) {
+    $k = -$k;
+    return Mnegint(fibonacci($k)) if Mis_even($k);
+  }
+  return $k if $k <= 1;
+  my($a,$b) = _fibnm($k-1);
+  canonicalized_integer($b);
+}
+sub lucas_number {
+  my($k) = @_;
+  validate_integer($k);
+  if ($k < 0) {
+    $k = -$k;
+    return Mnegint(lucas_number($k)) if Mis_odd($k);
+  }
+  return 2-$k if $k <= 1;
+  my($a,$b) = _fibnm($k-1);
+  Mvecsum($a,$a,$b);
+}
+
 sub lucasumod {
-  return maybetobigint( Math::Prime::Util::GMP::lucasumod($_[0], $_[1], $_[2], $_[3]) )
-    if $Math::Prime::Util::_GMPfunc{"lucasumod"};
   (lucasuvmod(@_))[0];
 }
 sub lucasvmod {
   my($P, $Q, $k, $n) = @_;
-  return maybetobigint( Math::Prime::Util::GMP::lucasvmod($P, $Q, $k, $n) )
-    if $Math::Prime::Util::_GMPfunc{"lucasvmod"};
   validate_integer($P);
   validate_integer($Q);
   validate_integer_nonneg($k);
   validate_integer_abs($n);
   return if $n == 0;
+  return Mmodint(2,$n) if $k == 0;
 
   return (lucasuvmod($P, $Q, $k, $n))[1] if $Q != 1;
 
@@ -9096,13 +10196,14 @@ sub pisano_period {
 
 sub is_lucas_pseudoprime {
   my($n) = @_;
+  validate_integer($n);
 
   return 0+($n >= 2) if $n < 4;
   return 0 if ($n % 2) == 0 || _is_perfect_square($n);
 
   my ($P, $Q, $D) = _lucas_selfridge_params($n);
   return 0 if $D == 0;  # We found a divisor in the sequence
-  die "Lucas parameter error: $D, $P, $Q\n" if ($D != $P*$P - 4*$Q);
+  croak "is_lucas_pseudoprime: invalid P,Q,D: ($P,$Q,$D)" if $D != $P*$P - 4*$Q;
 
   my($U, $V) = lucasuvmod($P, $Q, $n+1, $n);
   return ($U == 0) ? 1 : 0;
@@ -9110,13 +10211,14 @@ sub is_lucas_pseudoprime {
 
 sub is_strong_lucas_pseudoprime {
   my($n) = @_;
+  validate_integer($n);
 
   return 0+($n >= 2) if $n < 4;
   return 0 if ($n % 2) == 0 || _is_perfect_square($n);
 
   my ($P, $Q, $D) = _lucas_selfridge_params($n);
   return 0 if $D == 0;  # We found a divisor in the sequence
-  die "Lucas parameter error: $D, $P, $Q\n" if ($D != $P*$P - 4*$Q);
+  croak "is_strong_lucas_pseudoprime: invalid P,Q,D: ($P,$Q,$D)" if $D != $P*$P - 4*$Q;
 
   my $m = $n+1;
   my($s, $k) = (0, $m);
@@ -9140,13 +10242,14 @@ sub is_strong_lucas_pseudoprime {
 
 sub is_extra_strong_lucas_pseudoprime {
   my($n) = @_;
+  validate_integer($n);
 
   return 0+($n >= 2) if $n < 4;
   return 0 if ($n % 2) == 0 || _is_perfect_square($n);
 
   my ($P, $Q, $D) = _lucas_extrastrong_params($n);
   return 0 if $D == 0;  # We found a divisor in the sequence
-  die "Lucas parameter error: $D, $P, $Q\n" if ($D != $P*$P - 4*$Q);
+  croak "is_extra_strong_lucas_pseudoprime: invalid P,Q,D: ($P,$Q,$D)" if $D != $P*$P - 4*$Q;
 
   # This would be a great place to use a factor remove function
   my($s, $k) = (0, Madd1int($n));
@@ -9165,20 +10268,28 @@ sub is_extra_strong_lucas_pseudoprime {
 }
 
 sub is_almost_extra_strong_lucas_pseudoprime {
+  croak "is_almost_extra_strong_lucas_pseudoprime: expected (n) or (n,incr)"
+    if @_ < 1 || @_ > 2;
   my($n, $incr) = @_;
-  if (defined $incr) {
-    validate_integer($incr);
-    croak "Invalid lucas parameter increment: $incr" if $incr<1 || $incr>256;
-  } else {
+  validate_integer($n);
+  if (@_ == 1) {
     $incr = 1;
+  } else {
+    validate_integer_nonneg($incr);
+    croak "is_almost_extra_strong_lucas_pseudoprime: invalid increment: $incr"
+      if $incr<1 || $incr>256;
   }
-
-  return 0+($n >= 2) if $n < 4;
+  return 0+($n == 2 || $n == 3 || $n == 5 || $n == 7 || $n == 11)
+    if $n < 13;
   return 0 if ($n % 2) == 0 || _is_perfect_square($n);
+
+  return 1
+    if (($incr >= 16 && $n <= 331) || ($incr > 148 && $n <= 631))
+       && is_prob_prime($n);
 
   my ($P, $Q, $D) = _lucas_extrastrong_params($n, $incr);
   return 0 if $D == 0;  # We found a divisor in the sequence
-  die "Lucas parameter error: $D, $P, $Q\n" if ($D != $P*$P - 4*$Q);
+  croak "is_almost_extra_strong_lucas_pseudoprime: invalid P,Q,D: ($P,$Q,$D)" if $D != $P*$P - 4*$Q;
 
   my($s, $k) = (0, Madd1int($n));
   while (Mis_even($k) && $k != 0) {
@@ -9207,6 +10318,7 @@ sub is_almost_extra_strong_lucas_pseudoprime {
 
 sub is_frobenius_khashin_pseudoprime {
   my($n) = @_;
+  validate_integer($n);
   return 0+($n >= 2) if $n < 4;
   return 0 unless $n % 2;
   return 0 if _is_perfect_square($n);
@@ -9217,10 +10329,12 @@ sub is_frobenius_khashin_pseudoprime {
   if    ($n % 4 == 3) { $c = $n-1; }
   elsif ($n % 8 == 5) { $c = 2; }
   else {
-    do {
+    $k = 1;
+    while ($k == 1) {
       $c += 2;
+      next if $c == 9 || ($c >= 15 && (!($c%3) || !($c%5) || !($c%7) || !($c%11) || !($c%13)));
       $k = Mkronecker($c, $n);
-    } while $k == 1;
+    }
   }
   return 0 if $k == 0 || ($k == 2 && !($n % 3));
 
@@ -9242,6 +10356,7 @@ sub is_frobenius_khashin_pseudoprime {
 
 sub is_frobenius_underwood_pseudoprime {
   my($n) = @_;
+  validate_integer($n);
   return 0+($n >= 2) if $n < 4;
   return 0 unless $n % 2;
 
@@ -9309,10 +10424,10 @@ sub _perrin_signature {
 }
 
 sub is_perrin_pseudoprime {
-  my($n, $restrict) = @_;
+  my($n, $restrict) = _parse_k_args("is_perrin_pseudoprime", 0, @_);
   validate_integer($n);
-  if (defined $restrict) { validate_integer_nonneg($restrict); }
-  else                   { $restrict = 0; }
+  croak "is_perrin_pseudoprime: restriction must be between 0 and 3"
+    if $restrict > 3;
   return 0+($n >= 2) if $n < 4;
   return 0 if $restrict > 2 && ($n % 2) == 0;
 
@@ -9357,11 +10472,12 @@ sub _catgamma {
 }
 sub _catvtest {
   my($n,$p) = @_;
-  while ($n = int($n/$p)) { return 1 if $n % 2; }
+  while ($n = Mdivint($n,$p)) { return 1 if $n % 2; }
   0;
 }
 sub is_catalan_pseudoprime {
   my($n) = @_;
+  validate_integer($n);
   return 0+($n >= 2) if $n < 4;
   return 0 unless $n & 1;
 
@@ -9374,7 +10490,7 @@ sub is_catalan_pseudoprime {
       return 0 unless _catgamma($q,$p) == 1 && _catgamma($p,$q) == 1;
     }
     if (is_prime($f[-1])) {  # fully factored
-      for my $F (vecuniq(@f)) {
+      for my $F (Mvecuniq(@f)) {
         return 0 if _catvtest($n-1,$F);
       }
     }
@@ -9384,41 +10500,52 @@ sub is_catalan_pseudoprime {
 
 sub is_frobenius_pseudoprime {
   my($n, $P, $Q) = @_;
-  ($P,$Q) = (0,0) unless defined $P && defined $Q;
-  return 0+($n >= 2) if $n < 4;
+  croak "is_frobenius_pseudoprime: expected 1 or 3 arguments"
+    unless @_ == 1 || @_ == 3;
+  validate_integer($n);
+  if (@_ >= 3) {
+    validate_integer($P);
+    validate_integer($Q);
+  }
 
-  $n = tobigint($n);
+  return 0+($n == 2 || $n == 3 || $n == 5 || $n == 7)
+    if @_ == 1 && $n < 11;
+  return 0+($n >= 2) if $n < 4;
   return 0 if Mis_even($n);
 
   my($k, $Vcomp, $D, $Du) = (0, 4);
-  if ($P == 0 && $Q == 0) {
+
+  if (@_ == 1) {
     ($P,$Q) = (-1,2);
     while ($k != -1) {
       $P += 2;
       $P = 5 if $P == 3;  # Skip 3
-      $D = $P*$P-4*$Q;
-      $Du = ($D >= 0) ? $D : -$D;
-      last if $P >= $n || $Du >= $n;   # TODO: remove?
+      $D = Mmulsubint($P,$P,Mmulint(4,$Q));
+      $Du = Mabsint($D);
       $k = Mkronecker($D, $n);
       return 0 if $k == 0;
       return 0 if $P == 10001 && _is_perfect_square($n);
     }
   } else {
-    $D = $P*$P-4*$Q;
-    $Du = ($D >= 0) ? $D : -$D;
-    croak "Frobenius invalid P,Q: ($P,$Q)" if _is_perfect_square($Du);
+    $D = Mmulsubint($P,$P,Mmulint(4,$Q));
+    $Du = Mabsint($D);
+    croak "is_frobenius_pseudoprime: invalid P,Q: ($P,$Q)"
+      if $D >= 0 && _is_perfect_square($Du);
   }
-  return (Mis_prime($n) ? 1 : 0) if $n <= $Du || $n <= abs($Q) || $n <= abs($P);
-  return 0 if Mgcd(abs($P*$Q*$D), $n) > 1;
+
+  for my $CMP (Mabsint($Q), $Du) {
+    my $t = Mgcd($n, $CMP);
+    return (is_prob_prime($n) ? 1 : 0) if $t == $n;
+    return 0 if $t > 1;
+  }
 
   if ($k == 0) {
     $k = Mkronecker($D, $n);
     return 0 if $k == 0;
-    my $Q2 = (2*abs($Q)) % $n;
-    $Vcomp = ($k == 1) ? 2 : ($Q >= 0) ? $Q2 : $n-$Q2;
+    $Vcomp = $k == 1 ? 2 : Mmulmod(2,$Q,$n);
   }
 
-  my($U, $V) = lucasuvmod($P, $Q, $n-$k, $n);
+  my($U, $V) = lucasuvmod($P, $Q, Msubint($n,$k), $n);
   return 1 if $U == 0 && $V == $Vcomp;
   0;
 }
@@ -9433,10 +10560,12 @@ undef @_mersenne_primes{2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281
 
 sub is_mersenne_prime {
   my($p) = @_;
+  validate_integer($p);
+  return 0 if $p < 0;
 
   # Use the known Mersenne primes
   return 1 if exists $_mersenne_primes{$p};
-  return 0 if $p < 79711549; # GIMPS has tested and verified all below
+  return 0 if $p < 81307409; # GIMPS has tested and verified all below
   # Past this we do a generic Mersenne prime test
 
   return 1 if $p == 2;
@@ -9445,7 +10574,7 @@ sub is_mersenne_prime {
   my $mp = Msub1int(Mlshiftint(1,$p));
 
   # Definitely faster than using Math::BigInt that doesn't have GMP.
-  return (0 == (Math::Prime::Util::GMP::lucasuvmod(4, 1, $mp+1, $mp))[0])
+  return (0 == (Math::Prime::Util::GMP::lucasuvmod(4,1,Madd1int($mp),$mp))[0])
     if $Math::Prime::Util::_GMPfunc{"lucasuvmod"};
 
   my $V = 4;
@@ -9532,7 +10661,7 @@ sub _log_gamma {
 }
 sub _log_binomial {
   my($n,$k) = @_;
-  return 0 if $n < $k;
+  return -1e300 if $n < $k;
   return _log_gamma($n+1) - _log_gamma($k+1) - _log_gamma($n-$k+1);
 }
 sub _log_bern41_binomial {
@@ -9551,7 +10680,8 @@ sub _bern41_acceptable {
   $d = $r-2 if $d > $r-2;
   $i = $d if $i > $d;
   $j = $r-2-$d if $j > ($r-2-$d);
-  return _log_bern41_binomial($r,$d,$i,$j,$s) >= $scmp;
+  # Bias approximation error toward selecting a larger, always-safe s.
+  return _log_bern41_binomial($r,$d,$i,$j,$s) >= $scmp + 1e-7;
 }
 
 sub is_aks_prime {
@@ -9578,8 +10708,9 @@ sub is_aks_prime {
   }
 
   {
-    my $bi = 1;
+    my $bi = int(0.475 * ($r-1));
     my $bj = $rmult * ($r-1);
+    $bi = 1 if $bi < 1;
     while ($bi < $bj) {
       $s = $bi + (($bj-$bi) >> 1);
       if (!_bern41_acceptable($n, $r, $s)) { $bi = $s+1; }
@@ -9600,14 +10731,10 @@ sub is_aks_prime {
   return 1 if Mmulint($slim,$slim) >= $n;
   # Check b^(n-1) = 1 mod n for b in [2..s]
   for my $a (2 .. $s) {
-    return 0 if Mpowmod($a, $n-1, $n) != 1;
+    return 0 if Mpowmod($a, Msub1int($n), $n) != 1;
   }
 
-  if ($n < (MPU_HALFWORD-1) ) {
-    $n = _bigint_to_int($n) if ref($n);
-  } else {
-    $n = tobigint($n);
-  }
+  $n = tobigint($n) if $n >= (MPU_HALFWORD-1);
 
   print "# aks r = $r  s = $s\n" if $_verbose;
   local $| = 1 if $_verbose > 1;
@@ -9650,10 +10777,6 @@ sub _basic_factor {
     }
   }
 
-  if ($_[0] > 1 && _is_prime7($_[0])) {
-    push @factors, $_[0];
-    $_[0] = 1;
-  }
   @factors;
 }
 
@@ -9678,18 +10801,19 @@ sub _remove_factor {
   #  push @$flist, map { $f } 1..$k;
   #}
 
-  $n = addint($n,0) if OLD_PERL_VERSION;
   $n;
 }
 sub trial_factor {
-  my($n, $limit) = @_;
-  validate_integer_nonneg($n);
-  validate_integer_nonneg($limit) if defined $limit;
+  my($n, $limit) = _parse_factor_args("trial_factor", 1, @_);
 
   return ($n==1) ? () : ($n)  if $n < 4;
-  return ($n) if defined $limit && $limit < 2;
 
-  if ($Math::Prime::Util::_GMPfunc{"trial_factor"} && $Math::Prime::Util::GMP::VERSION >= 0.22) {
+  if (defined $limit && $limit < 5) {
+    # 0 => factor all.  2,3,5 always pulled out.
+    $limit = $limit == 0 ? undef : 5;
+  }
+
+  if ($Math::Prime::Util::_GMPfunc{"trial_factor"} && $Math::Prime::Util::GMP::VERSION >= 0.22 && (!defined $limit || !ref($limit))) {
     # Not the same API -- other than 2/3/5, returns a single factor
     my @F = ();
     while (1) {
@@ -9703,7 +10827,7 @@ sub trial_factor {
       $n = pop(@f);
       push @F,@f;
     }
-    return ref($_[0]) ? maybetobigintall(@F) : @F;
+    return maybetobigintall(@F);
   }
 
   my @factors;
@@ -9779,11 +10903,12 @@ sub trial_factor {
     # Batch primes and use gcd to check.  If using Math::BigInt, 2-5x faster.
     while ($I+3 <= $#_primes_small && $_primes_small[$I+3] <= $limit && $I <= 1951956) {
       my($f1,$f2,$f3,$f4) = @_primes_small[$I .. $I+3];
+      $n = Math::BigInt->new("$n") if ref($n) ne 'Math::BigInt'; # possible
       my $g = $n->bgcd($f1<=5581 ? $f1*$f2*$f3*$f4 : Mmulint($f1*$f4,$f2*$f3));
       $I += 4;
       next if $g->is_one;
       my $G = _bigint_to_int($g);   # Native int (or larger)
-      $G = $g if $G >= INTMAX;      # Must use original if multiples found.
+      $G = $g if $G > (INTMAX-513); # Must use original if multiples found.
       $n = _remove_factor($n, $f1, \@factors) unless $G % $f1;
       $n = _remove_factor($n, $f2, \@factors) unless $G % $f2;
       $n = _remove_factor($n, $f3, \@factors) unless $G % $f3;
@@ -9872,82 +10997,89 @@ sub trial_factor {
   @factors;
 }
 
-my $_holf_r;
+sub _factor_ecm {
+  require Math::Prime::Util::ECM;
+  Math::Prime::Util::ECM::ecm_factor_pp(@_);
+}
+
+my $_holf_pos;
 my @_fsublist = (
-  [ "power",      sub { _power_factor (shift) } ],
-
-  [ "pbrent 8k",  sub { pbrent_factor (shift,    8*1024, 1, 1) } ],
-  [ "p-1 16k",    sub { pminus1_factor(shift,    16_384, 16_384, 1); } ],
-  [ "ECM 500",    sub { ecm_factor    (shift,       500, 10_000, 10) } ],
-  [ "ECM 4k",     sub { ecm_factor    (shift,     4_000, 20_000, 20) } ],
-
-  [ "pbrent 512k",sub { pbrent_factor (shift,  512*1024, 7, 1) } ],
-  [ "p-1 4M",     sub { pminus1_factor(shift, 4_000_000, undef, 1); } ],
-  [ "ECM 10k",    sub { ecm_factor    (shift,    10_000,  50_000, 10) } ],
-  [ "pbrent 512k",sub { pbrent_factor (shift,  512*1024, 11, 1) } ],
-  [ "HOLF 256k",  sub { holf_factor   (shift, 256*1024, $_holf_r); $_holf_r += 256*1024; } ],
-  [ "p-1 20M",    sub { pminus1_factor(shift,20_000_000); } ],
-  [ "ECM 100k",   sub { ecm_factor    (shift,   100_000, 800_000, 10) } ],
-  [ "HOLF 512k",  sub { holf_factor   (shift, 512*1024, $_holf_r); $_holf_r += 512*1024; } ],
-  [ "pbrent 2M",  sub { pbrent_factor (shift, 2048*1024, 13, 1) } ],
-  [ "HOLF 2M",    sub { holf_factor   (shift, 2048*1024, $_holf_r); $_holf_r += 2048*1024; } ],
-  [ "ECM 1M",     sub { ecm_factor    (shift, 1_000_000, 1_000_000, 10) } ],
-  [ "p-1 100M",   sub { pminus1_factor(shift, 100_000_000, 500_000_000); } ],
+  [ "power",       sub { _factor_power  (shift) } ],
+  [ "p-1 64k",     sub { _factor_pminus1(shift,     65536, 65536) } ],
+  [ "ECM 500",     sub { _factor_ecm    (shift,       500, 50* 500, 20,  0) } ],
+  [ "ECM 2k",      sub { _factor_ecm    (shift,      2000, 50*2000, 20, 20) } ],
+  [ "ECM 8k",      sub { _factor_ecm    (shift,      8000, 0,       20, 40) } ],
+  [ "HOLF 256k",   sub { my $r=256; my @f = _factor_holf(shift, $r*1024, $_holf_pos); $_holf_pos += $r*1024; @f; } ],
+  [ "ECM 40k",     sub { _factor_ecm    (shift,    40_000, 0,       10, 60) } ],
+  [ "ECM 80k",     sub { _factor_ecm    (shift,    80_000, 0,       10, 70) } ],
+  [ "ECM 160k",    sub { _factor_ecm    (shift,   160_000, 0,       10, 80) } ],
+  [ "pbrent 512k", sub { _factor_pbrent (shift,  512*1024, 7) } ],
+  [ "HOLF 1M",     sub { my $r=1024; my @f = _factor_holf(shift, $r*1024, $_holf_pos); $_holf_pos += $r*1024; @f; } ],
+  [ "ECM 320k",    sub { _factor_ecm    (shift,   320_000, 0, 20, 90) } ],
+  [ "ECM 1M",      sub { _factor_ecm    (shift, 1_000_000, 0, 20, 110) } ],
+  [ "HOLF 2M",     sub { my $r=2048; my @f = _factor_holf(shift, $r*1024, $_holf_pos); $_holf_pos += $r*1024; @f; } ],
 );
 
 sub factor {
-  my($n) = @_;
-  validate_integer_nonneg($n);
+  my($N) = @_;
+  validate_integer_nonneg($N);
+  canonicalize_integers(\$N);
 
   my @factors;
-  if ($n < 4) {
-    @factors = ($n == 1) ? () : ($n);
+  if ($N < 4) {
+    @factors = ($N == 1) ? () : ($N);
     return @factors;
   }
 
-  if ($Math::Prime::Util::_GMPfunc{"factor"}) {
-    my @factors = Math::Prime::Util::GMP::factor($n);
-    return ref($_[0]) ? maybetobigintall(@factors) : @factors;
-  }
+  return maybetobigintall(Math::Prime::Util::GMP::factor($N))
+    if $Math::Prime::Util::_GMPfunc{"factor"};
 
-  $n = Maddint($n,0) if ref($n);  # Ensure we have a copy
   my $lim = 4999;  # How much trial factoring to do
-
   # For native integers, we could save a little time by doing hardcoded trials
   # by 2-29 here.  Skipping it.
+  push @factors, Mtrial_factor($N, $lim);
+  my $lim_sq = $lim * $lim;
+  return @factors if $factors[-1] < $lim_sq;
 
-  push @factors, Mtrial_factor($n, $lim);
-  return @factors if $factors[-1] < $lim*$lim;
-  $n = pop(@factors);
+  my $verbose = getconfig()->{'verbose'};
+  my $xsbits = getconfig()->{'xs'} ? getconfig()->{'xs_factor_bits'} : 0;
+  my $xsmax = $xsbits == 0 ? 0 : Msub1int(Mlshiftint(1,$xsbits));
 
-  my @nstack = ($n);
+  my @nstack = (pop(@factors));
+  # @factors is all primes, @nstack has the numbers we need to factor
   while (@nstack) {
-    $n = pop @nstack;
-    # Don't use bignum on $n if it has gotten small enough.
+    my $n = pop @nstack;
     $n = _bigint_to_int($n) if ref($n) && $n <= INTMAX;
-    #print "Looking at $n with stack ", join(",",@nstack), "\n";
-    while ( ($n >= ($lim*$lim)) && !_is_prime7($n) ) {
-      my @ftry;
-      $_holf_r = 1;
-      foreach my $sub (@_fsublist) {
-        last if scalar @ftry >= 2;
-        print "  starting $sub->[0]\n" if getconfig()->{'verbose'} > 1;
-        @ftry = $sub->[1]->($n);
-      }
-      if (scalar @ftry > 1) {
-        #print "  split into ", join(",",@ftry), "\n";
-        $n = shift @ftry;
-        $n = _bigint_to_int($n) if ref($n) && $n <= INTMAX;
-        push @nstack, @ftry;
-      } else {
-        #warn "trial factor $n\n";
-        push @factors, Mtrial_factor($n);
-        #print "  trial into ", join(",",@factors), "\n";
-        $n = 1;
-        last;
-      }
+
+    # Obviously small factor left
+    if ($n < $lim_sq) { push @factors, $n if $n > 1; next; }
+
+    # If subfactor small enough for XS to handle, let it do everything
+    if ($n <= $xsmax && $n < $N) {
+      print "  PP factor calling XS for subfactor\n" if $verbose > 1;
+      push @factors, Math::Prime::Util::factor($n);
+      next;
     }
-    push @factors, $n  if $n != 1;
+
+    # Check primality and found a prime factor if so.
+    if (_is_prime7($n)) {
+      push @factors, $n;
+      next;
+    }
+
+    # The main factoring loop.  Go through our algorithm recipe.
+    my @ftry;
+    $_holf_pos = 1;
+    for my $sub (@_fsublist) {
+      print "  starting $sub->[0]\n" if $verbose > 1;
+      @ftry = $sub->[1]->($n);
+      last if @ftry >= 2;
+    }
+    if (@ftry >= 2) {
+      push @nstack, @ftry;
+    } else {
+      push @factors, Mtrial_factor($n);
+    }
   }
   Mvecsort(@factors);
 }
@@ -9969,12 +11101,23 @@ sub _found_factor {
 
 ################################################################################
 
-# TODO:
-sub squfof_factor { Mtrial_factor(@_) }
-sub lehman_factor { Mtrial_factor(@_) }
-sub pplus1_factor { pminus1_factor(@_) }
+sub _stub_factor {
+  my $name = shift;
+  my($n, $rounds) = _parse_factor_args($name, 1, @_);
+  my @f = _basic_factor($n);
+  return @f if $n < 4;
+  return (@f, $n) if _is_prime7($n);
 
-sub _power_factor {
+  my @nf = _factor_pbrent($n, $rounds);
+  return (@f, @nf);
+}
+
+# No implementations of these here, but make the calls still exist.
+sub squfof_factor { _stub_factor("squfof_factor", @_); }
+sub lehman_factor { _stub_factor("lehman_factor", @_); }
+sub pplus1_factor { _stub_factor("pplus1_factor", @_); }
+
+sub _factor_power {
   my $r;
   my $k = Mis_power($_[0],0,\$r);
   return ($_[0]) unless $k > 1;
@@ -9982,21 +11125,12 @@ sub _power_factor {
   map { $r } 1..$k;
 }
 
-sub prho_factor {
-  my($n, $rounds, $pa, $skipbasic) = @_;
-  validate_integer_nonneg($n);
-  if (defined $rounds) { validate_integer_nonneg($rounds); }
-  else                 { $rounds = 4*1024*1024; }
-  if (defined $pa)     { validate_integer_nonneg($pa); }
-  else                 { $pa = 3; }
+sub _factor_prho {
+  my($n, $rounds, $pa) = @_;
+  $rounds = 4*1024*1024 unless defined $rounds;
+  $pa = 3 unless defined $pa;
 
-  my @factors;
-  if (!$skipbasic) {
-    @factors = _basic_factor($n);
-    return @factors if $n < 4;
-  }
-
-  my($U,$V) = (7,7);
+  my($U,$V,$orounds) = (7,7,int($rounds/1024)."k");
 
   if (ref($n) || $n >= MPU_HALFWORD) {
 
@@ -10025,7 +11159,7 @@ sub prho_factor {
         }
         last if $f == 1 || $f == $n;
       }
-      return _found_factor($f, $n, "prho-bigint", @factors);
+      return _found_factor($f, $n, "prho-bigint $orounds");
     }
 
   } else {
@@ -10055,50 +11189,68 @@ sub prho_factor {
         }
         last if $f == 1 || $f == $n;
       }
-      return _found_factor($f, $n, "prho-32", @factors);
+      return _found_factor($f, $n, "prho-32 $orounds") if $f != 1 && $f != $n;
     }
 
   }
-  push @factors, $n;
-  @factors;
+  ($n);
 }
 
-sub pbrent_factor {
-  my($n, $rounds, $pa, $skipbasic) = @_;
-  validate_integer_nonneg($n);
-  if (defined $rounds) { validate_integer_nonneg($rounds); }
-  else                 { $rounds = 4*1024*1024; }
-  if (defined $pa)     { validate_integer_nonneg($pa); }
-  else                 { $pa = 3; }
+sub prho_factor {
+  my($n, $rounds, $pa) = _parse_factor_args("prho_factor", 2, @_);
+  my @f = _basic_factor($n);
+  return @f if $n < 4;
+  return (@f, $n) if _is_prime7($n);
+  (@f, _factor_prho($n, $rounds, $pa));
+}
 
-  my @factors;
-  if (!$skipbasic) {
-    @factors = _basic_factor($n);
-    return @factors if $n < 4;
-  }
+sub _factor_pbrent {
+  my($n, $rounds, $pa) = @_;
+  $rounds = 4*1024*1024 unless defined $rounds;
+  croak "pbrent_factor: rounds must fit in native signed integer" if $rounds > SINTMAX;
+  $pa = defined $pa ? Mmodint($pa,$n) : 1;
 
-  my($Xi,$Xm) = (2,2);
+  my($Xi,$Xm,$failsrem,$orounds) = (2,2,6,int($rounds/1024)."k");
+  my $refn = ref($n);
 
-  if (ref($n) || $n >= MPU_HALFWORD) {
+  if ($refn || $n >= MPU_HALFWORD) {
 
-    # Same code as the GMP version, but runs *much* slower.  Even with
-    # Math::BigInt::GMP it's >200x slower.  With the default Calc backend
-    # it's thousands of times slower.
-    my($inner,$r,$saveXi,$f) = (32,1);
+    # Brent's version of Pollard's Rho, with batched gcds.
+    # Performance depends heavily on bigint class and available accelerators.
+    # Direct use of the GMP backend is fastest.
+    # This PP code using Math::GMPz or Math::GMP is roughly an order of
+    # magnitude slower, while Math::BigInt (Calc) is slower yet.
+
+    my($inner,$r,$saveXi,$f) = (64,1);
+
+    my $direct_arith = $refn && ($refn ne 'Math::BigInt' ||
+                                 (!getconfig()->{'xs'}
+                                  && !$Math::Prime::Util::_GMPfunc{"muladdmod"}
+                                  && !$Math::Prime::Util::_GMPfunc{"mulmod"})   );
 
     while ($rounds > 0) {
       my $rleft = ($r > $rounds) ? $rounds : $r;
       while ($rleft > 0) {
         my $dorounds = ($rleft > $inner) ? $inner : $rleft;
-        my $m = 1;
-        $saveXi = Maddint($Xi,0);
-        foreach my $i (1 .. $dorounds) {
-          $Xi = Mmuladdmod($Xi, $Xi, $pa, $n);
-          if (OLD_PERL_VERSION) { $m=mulmod($m,subint($Xi,$Xm),$n); next; }
-          $m = Mmulmod($m, $Xi > $Xm ? $Xi-$Xm : $Xm-$Xi,$n);
-        }
-        $rleft -= $dorounds;
+        $saveXi = Maddint($Xi,0);  # Guarantee copy
+        $rleft  -= $dorounds;
         $rounds -= $dorounds;
+        my $m;
+        if ($direct_arith) {
+          $Xi = (($Xi*$Xi)+$pa) % $n;
+          $m = $Xm-$Xi;
+          while (--$dorounds > 0) {
+            $Xi = (($Xi*$Xi)+$pa) % $n;
+            $m = ($m * ($Xm-$Xi)) % $n;
+          }
+        } else {
+          $Xi = Mmuladdmod($Xi,$Xi,$pa,$n);
+          $m = Msubint($Xm,$Xi);
+          while (--$dorounds > 0) {
+            $Xi = Mmuladdmod($Xi,$Xi,$pa,$n);
+            $m = Mmulmod($m, Msubint($Xm, $Xi), $n);
+          }
+        }
         $f = Mgcd($m,$n);
         last unless $f == 1;
       }
@@ -10111,11 +11263,17 @@ sub pbrent_factor {
         $Xi = Maddint($saveXi,0);
         do {
           $Xi = Mmuladdmod($Xi, $Xi, $pa, $n);
-          $f = Mgcd($Xi > $Xm ? $Xi-$Xm : $Xm-$Xi, $n);
+          $f = Mgcd(Msubmod($Xi,$Xm,$n), $n);
         } while ($f == 1 && $r-- != 0);
-        last if $f == 1 || $f == $n;
+        if ($f == 0 || $f == $n) {
+          last if $failsrem-- <= 0;
+          $Xm = Maddmod($Xm, 11, $n);
+          $Xi = Maddint($Xm,0);
+          $pa = Madd1int($pa);
+          next;
+        }
       }
-      return _found_factor($f, $n, "pbrent", @factors);
+      return _found_factor($f, $n, "pbrent $orounds");
     }
 
   } else {
@@ -10126,28 +11284,26 @@ sub pbrent_factor {
       $Xi = ($Xi * $Xi) % $n;
       $Xi += $pa; $Xi -= $n if $Xi >= $n;
       my $f = _gcd_ui( ($Xi>$Xm) ? $Xi-$Xm : $Xm-$Xi, $n);
-      return _found_factor($f, $n, "pbrent-32",@factors) if $f != 1 && $f != $n;
+      return _found_factor($f, $n, "pbrent-32 $orounds") if $f != 1 && $f != $n;
       $Xm = $Xi if ($i & ($i-1)) == 0;  # i is a power of 2
     }
 
   }
-  push @factors, $n;
-  @factors;
+  ($n);
 }
 
-sub pminus1_factor {
-  my($n, $B1, $B2, $skipbasic) = @_;
-  validate_integer_nonneg($n);
-  validate_integer_nonneg($B1) if defined $B1;
-  validate_integer_nonneg($B2) if defined $B2;
+sub pbrent_factor {
+  my($n, $rounds, $pa) = _parse_factor_args("pbrent_factor", 2, @_);
+  my @f = _basic_factor($n);
+  return @f if $n < 4;
+  return (@f, $n) if _is_prime7($n);
+  (@f, _factor_pbrent($n, $rounds, $pa));
+}
 
-  my @factors;
-  if (!$skipbasic) {
-    @factors = _basic_factor($n);
-    return @factors if $n < 4;
-  }
+sub _factor_pminus1 {
+  my($n, $B1, $B2) = @_;
 
-  $n = tobigint($n) if OLD_PERL_VERSION && !ref($n) && $n > INTMAX;
+  return ($n) if defined $B1 && $B1 < 7;
 
   if (!ref($n)) {
     # Stage 1 only
@@ -10166,40 +11322,35 @@ sub pminus1_factor {
           while ($k <= $kmin) { $k *= $q; }
         }
         $pa = Mpowmod($pa, $k, $n);
-        if ($pa == 0) { push @factors, $n; return @factors; }
+        if ($pa == 0) { return ($n); }
         my $f = Mgcd($pa-1, $n);
-        return _found_factor($f, $n, "pminus1-64", @factors) if $f != 1;
+        return _found_factor($f, $n, "pminus1-64") if $f != 1;
       }
       last if $pc_end >= $B1;
       ($pc_beg, $pc_end) = ($pc_end+1, $pc_end+18000);
     }
-    push @factors, $n;
-    return @factors;
+    return ($n);
   }
 
   if (!defined $B1) {
     for my $mul (1, 100, 1000, 10_000, 100_000, 1_000_000) {
       $B1 = 1000 * $mul;
-      $B2 = 1*$B1;
-      #warn "Trying p-1 with $B1 / $B2\n";
-      my @nf = pminus1_factor($n, $B1, $B2);
-      if (scalar @nf > 1) {
-        push @factors, @nf;
-        return @factors;
-      }
+      $B2 = 1*$B1;   # Choose to not do stage 2 when doing this ramp up.
+      my @nf = _factor_pminus1($n, $B1, $B2);
+      return @nf if @nf > 1;
     }
-    push @factors, $n;
-    return @factors;
+    return ($n);
   }
-  $B2 = 1*$B1 unless defined $B2;
+  $B2 = 10*$B1 unless defined $B2;
 
   $n = tobigint($n) if !ref($n) || (defined $_BIGINT && $_BIGINT ne ref($n));
-  # bigints:  n, pa, t, savea, [stage2] b, bm
+  # bigints:  n, pa, savea, [stage2] bm
 
-  my ($j, $q, $saveq) = (32, 2, 2);
+  # savea is the state after saveq; recovery resumes at the next prime.
+  my ($j, $q, $saveq) = (32, 2, 1);
   my $pa = tobigint(2);
-  my $t  = tobigint(1);
-  my $savea = $pa+0;
+  my @kpowers;
+  my $savea = tobigint("$pa");
   my $f = 1;
   my($pc_beg, $pc_end) = (2, 2+100_000);
 
@@ -10209,47 +11360,51 @@ sub pminus1_factor {
     foreach my $q (@bprimes) {
       my($k, $kmin) = ($q, int($B1 / $q));
       while ($k <= $kmin) { $k *= $q; }
-      $t *= $k;                         # accumulate powers for a
+      push @kpowers, $k;  # accumulate powers for a
       if ( ($j++ % 64) == 0) {
         next if $pc_beg > 2 && ($j-1) % 256;
-        $pa = _bi_powmod($pa, $t, $n);
-        $t = tobigint(1);
-        if ($pa == 0) { push @factors, $n; return @factors; }
+        $pa = Mpowmod($pa, Mvecprod(@kpowers), $n);
+        @kpowers = ();
+        if ($pa == 0) { return ($n); }
         $f = Mgcd($pa-1, $n);
         last if $f == $n;
-        return _found_factor($f, $n, "pminus1-bigint $B1", @factors) unless $f == 1;
+        return _found_factor($f, $n, "pminus1-bigint $B1") unless $f == 1;
         $saveq = $q;
-        $savea = $pa+0;
+        $savea = tobigint("$pa");
       }
     }
     $q = $bprimes[-1];
     last if $f != 1 || $pc_end >= $B1;
     ($pc_beg, $pc_end) = (Madd1int($pc_end), Maddint($pc_end,500_000));
   }
-  $pa = _bi_powmod($pa, $t, $n);
-  if ($pa == 0) { push @factors, $n; return @factors; }
-  $f = Mgcd($pa-1, $n);
+  if (@kpowers) {
+    $pa = Mpowmod($pa, Mvecprod(@kpowers), $n);
+    @kpowers = ();
+    if ($pa == 0) { return ($n); }
+    $f = Mgcd($pa-1, $n);
+  }
   if ($f == $n) {
-    $q = $saveq;
-    $pa = $savea+0;
+    $q = Mnext_prime($saveq);
+    $pa = tobigint("$savea");
     while ($q <= $B1) {
       my ($k, $kmin) = ($q, int($B1 / $q));
       while ($k <= $kmin) { $k *= $q; }
-      $pa = _bi_powmod($pa, $k, $n);
+      $pa = Mpowmod($pa, $k, $n);
       $f = Mgcd($pa-1, $n);
-      if ($f == $n) { push @factors, $n; return @factors; }
+      if ($f == $n) { return ($n); }
       last if $f != 1;
       $q = Mnext_prime($q);
     }
   }
   # STAGE 2
   if ($f == 1 && $B2 > $B1) {
-    my $bm = $pa + 0;
-    my $b = tobigint(1);
+    my $bm = tobigint("$pa");
+    my @bfactors;
     my @precomp_bm;
-    $precomp_bm[0] = ($bm * $bm) % $n;
-    $precomp_bm[$_] = ($precomp_bm[$_-1] * $bm * $bm) % $n for 1..19;
-    $pa = _bi_powmod($pa, $q, $n);
+    my $bm2 = ($bm * $bm) % $n;
+    $precomp_bm[0] = $bm2;
+    $precomp_bm[$_] = ($precomp_bm[$_-1] * $bm2) % $n for 1..19;
+    $pa = tobigint(Mpowmod($pa, $q, $n));
 
     my $j = 1;
     $pc_beg = $q+1;
@@ -10261,36 +11416,35 @@ sub pminus1_factor {
         my $diff = $bprimes[$i] - $q;
         $q = $bprimes[$i];
         my $qdiff = ($diff >> 1) - 1;
-        $precomp_bm[$qdiff] = _bi_powmod($bm, $diff, $n)
+        $precomp_bm[$qdiff] = Mpowmod($bm, $diff, $n)
           unless defined $precomp_bm[$qdiff];
-        $pa = ($pa * $precomp_bm[$qdiff]) % $n;
-        if ($pa == 0) { push @factors, $n; return @factors; }
-        $b *= ($pa-1);
+        $pa = Mmulmod($pa, $precomp_bm[$qdiff], $n);
+        if ($pa == 0) { return ($n); }
+        push @bfactors, $pa-1;
         if (($j++ % 128) == 0) {
-          $b %= $n;
-          $f = Mgcd($b, $n);
+          $f = Mgcd(Mvecprod(@bfactors), $n);
+          @bfactors = ();
           last if $f != 1;
         }
       }
       last if $f != 1 || $pc_end >= $B2;
       ($pc_beg, $pc_end) = (Madd1int($pc_end), Maddint($pc_end,500_000));
     }
-    $f = Mgcd($b, $n);
+    $f = Mgcd(Mvecprod(@bfactors), $n) if @bfactors;
   }
-  return _found_factor($f, $n, "pminus1-bigint $B1/$B2", @factors);
+  return _found_factor($f, $n, "pminus1-bigint $B1/$B2");
 }
 
-sub cheb_factor {
-  my($n, $B1, $initx, $skipbasic) = @_;
-  validate_integer_nonneg($n);
-  validate_integer_nonneg($B1) if defined $B1;
-  validate_integer_nonneg($initx) if defined $initx;
+sub pminus1_factor {
+  my($n, $B1, $B2) = _parse_factor_args("pminus1_factor", 2, @_);
+  my @f = _basic_factor($n);
+  return @f if $n < 4;
+  return (@f, $n) if _is_prime7($n);
+  (@f, _factor_pminus1($n, $B1, $B2));
+}
 
-  my @factors;
-  if (!$skipbasic) {
-    @factors = _basic_factor($n);
-    return @factors if $n < 4;
-  }
+sub _factor_cheb {
+  my($n, $B1, $initx) = @_;
 
   my $x = (defined $initx && $initx > 0)  ?  $initx  :  72;  # Arbitrary
   my $B = (defined $B1 && $B1 > 0) ? $B1 : Mmulint(Mpowint(Mlogint($n,2),2),8);
@@ -10311,37 +11465,44 @@ sub cheb_factor {
     $f = Mgcd($x-1, $n);
     last if $f != 1;
   }
-  return _found_factor($f, $n, "cheb", @factors);
+  return _found_factor($f, $n, "cheb");
 }
 
-sub holf_factor {
-  my($n, $rounds, $startrounds) = @_;
-  validate_integer_nonneg($n);
-  if (defined $rounds) { validate_integer_nonneg($rounds); }
-  else                 { $rounds = 64*1024*1024; }
-  $startrounds = 1 if (!defined $startrounds) || ($startrounds < 1);
+sub cheb_factor {
+  my($n, $B1, $initx) = _parse_factor_args("cheb_factor", 2, @_);
+  my @f = _basic_factor($n);
+  return @f if $n < 4;
+  return (@f, $n) if _is_prime7($n);
+  (@f, _factor_cheb($n, $B1, $initx));
+}
 
-  my @factors = _basic_factor($n);
-  return @factors if $n < 4;
+sub _factor_holf {
+  my($n, $rounds, $startpos) = @_;
+  $startpos = 1 if !defined $startpos || $startpos < 1;
+  $rounds = 64*1024*1024 unless defined $rounds;
+  return ($n) if $rounds <= 0;
+  my $endpos = $startpos + $rounds - 1;
+  croak "holf_factor: startpos and endpos must fit in native signed integers"
+    if $startpos > SINTMAX || $endpos > SINTMAX;
 
   if (ref($n)) {
-    for my $i ($startrounds .. $rounds) {
+    for my $i ($startpos .. $endpos) {
       my $ni = Mmulint($n,$i);
       my $s = Msqrtint($ni);
       if (Mmulint($s,$s) == $ni) {
         # s^2 = n*i, so m = s^2 mod n = 0.  Hence f = GCD(n, s) = GCD(n, n*i)
         my $f = Mgcd($ni, $n);
-        return _found_factor($f, $n, "HOLF", @factors);
+        return _found_factor($f, $n, "HOLF i $i");
       }
       $s = Madd1int($s);
-      my $m = Msubint(Mmulint($s,$s),$ni);
+      my $m = Mmulsubint($s,$s,$ni);
       if (Mis_power($m, 2, \my $f)) {
         $f = Mgcd($n, $s > $f ? $s-$f : $f-$s);
-        return _found_factor($f, $n, "HOLF ($i rounds)", @factors);
+        return _found_factor($f, $n, "HOLF i $i");
       }
     }
   } else {
-    for my $i ($startrounds .. $rounds) {
+    for my $i ($startpos .. $endpos) {
       my $s = int(sqrt($n * $i));
       $s++ if ($s * $s) != ($n * $i);
       my $m = ($s < MPU_HALFWORD) ? ($s*$s) % $n : _mulmod($s, $s, $n);
@@ -10351,39 +11512,41 @@ sub holf_factor {
       my $f = int(sqrt($m));
       next unless $f*$f == $m;
       $f = _gcd_ui($s - $f,  $n);
-      return _found_factor($f, $n, "HOLF ($i rounds)", @factors);
+      return _found_factor($f, $n, "HOLF i $i");
     }
   }
-  push @factors, $n;
-  @factors;
+  ($n);
 }
 
-sub fermat_factor {
-  my($n, $rounds) = @_;
-  validate_integer_nonneg($n);
-  if (defined $rounds) { validate_integer_nonneg($rounds); }
-  else                 { $rounds = 64*1024*1024; }
+sub holf_factor {
+  my($n, $rounds, $startpos) = _parse_factor_args("holf_factor", 2, @_);
+  my @f = _basic_factor($n);
+  return @f if $n < 4;
+  return (@f, $n) if _is_prime7($n);
+  (@f, _factor_holf($n, $rounds, $startpos));
+}
 
-  my @factors = _basic_factor($n);
-  return @factors if $n < 4;
+sub _factor_fermat {
+  my($n, $rounds) = @_;
+  $rounds = 64*1024*1024 unless defined $rounds;
 
   if (ref($n)) {
     my $pa = Msqrtint($n);
-    return _found_factor($pa, $n, "Fermat", @factors) if Mmulint($pa,$pa) == $n;
+    return _found_factor($pa, $n, "Fermat") if Mmulint($pa,$pa) == $n;
     $pa = Madd1int($pa);
-    my $b2 = Msubint(Mmulint($pa,$pa),$n);
+    my $b2 = Mmulsubint($pa,$pa,$n);
     my $lasta = Maddint($pa,$rounds);
     while ($pa <= $lasta) {
       if (Mis_power($b2, 2, \my $s)) {
         my $i = Msubint($pa,($lasta-$rounds))+1;
-        return _found_factor(Msubint($pa,$s), $n, "Fermat ($i rounds)", @factors);
+        return _found_factor(Msubint($pa,$s), $n, "Fermat ($i rounds)");
       }
       $pa = Madd1int($pa);
-      $b2 = Msubint(Mmulint($pa,$pa),$n);
+      $b2 = Mmulsubint($pa,$pa,$n);
     }
   } else {
     my $pa = int(sqrt($n));
-    return _found_factor($pa, $n, "Fermat", @factors) if $pa*$pa == $n;
+    return _found_factor($pa, $n, "Fermat") if $pa*$pa == $n;
     $pa++;
     my $b2 = $pa*$pa - $n;
     my $lasta = $pa + $rounds;
@@ -10393,221 +11556,57 @@ sub fermat_factor {
         my $s = int(sqrt($b2));
         if ($s*$s == $b2) {
           my $i = $pa-($lasta-$rounds)+1;
-          return _found_factor($pa - $s, $n, "Fermat ($i rounds)", @factors);
+          return _found_factor($pa - $s, $n, "Fermat ($i rounds)");
         }
       }
       $pa++;
       $b2 = $pa*$pa-$n;
     }
   }
-  push @factors, $n;
-  @factors;
+  ($n);
+}
+
+sub fermat_factor {
+  my($n, $rounds) = _parse_factor_args("fermat_factor", 1, @_);
+  my @f = _basic_factor($n);
+  return @f if $n < 4;
+  return (@f, $n) if _is_prime7($n);
+  (@f, _factor_fermat($n, $rounds));
 }
 
 
 sub ecm_factor {
-  my($n, $B1, $B2, $ncurves) = @_;
-  validate_integer_nonneg($n);
+  my($n, $B1, $B2, $ncurves) = _parse_factor_args("ecm_factor", 3, @_);
+  my @f = _basic_factor($n);
+  return @f if $n < 4;
+  return (@f, $n) if _is_prime7($n);
 
-  my @factors = _basic_factor($n);
-  return @factors if $n < 4;
-
-  if ($Math::Prime::Util::_GMPfunc{"ecm_factor"}) {
+  if ($Math::Prime::Util::_GMPfunc{"ecm_factor"} && !ref($B1) && !ref($ncurves)) {
     $B1 = 0 if !defined $B1;
     $ncurves = 0 if !defined $ncurves;
     my @ef = Math::Prime::Util::GMP::ecm_factor($n, $B1, $ncurves);
+    # GMP could return:
+    #   1 item     (n).  No factor found, return it.
+    #   2 items    (p,q) where p*q=n.  Canonicalize the largest of the two.
+    #   >2 items.  (p,q,r,...) where vecprod(@ef)=n.  Use only the last one.
+    #              We could do a _found_factor on each one but this is unusual.
     if (@ef > 1) {
-      my $ecmfac = reftyped($n, $ef[-1]);
-      return _found_factor($ecmfac, $n, "ECM (GMP) B1=$B1 curves $ncurves", @factors);
+      my $ecmfac = maybetobigint($ef[-1]);
+      return (@f, _found_factor($ecmfac, $n, "ECM (GMP) B1=$B1 curves $ncurves"));
     }
-    push @factors, $n;
-    return @factors;
+    return (@f, $n);
   }
 
-  $n = tobigint($n) if OLD_PERL_VERSION && !ref($n) && $n > INTMAX;
-
-  $ncurves = 10 unless defined $ncurves;
-
-  if (!defined $B1) {
-    for my $mul (1, 10, 100, 1000, 10_000, 100_000, 1_000_000) {
-      $B1 = 100 * $mul;
-      $B2 = 10*$B1;
-      #warn "Trying ecm with $B1 / $B2\n";
-      my @nf = ecm_factor($n, $B1, $B2, $ncurves);
-      if (scalar @nf > 1) {
-        push @factors, @nf;
-        return @factors;
-      }
-    }
-    push @factors, $n;
-    return @factors;
-  }
-
-  $B2 = 10*$B1 unless defined $B2;
-  my $sqrt_b1 = int(sqrt($B1)+1);
-
-  # Affine code.  About 3x slower than the projective, and no stage 2.
-  #
-  #if (!defined $Math::Prime::Util::ECAffinePoint::VERSION) {
-  #  eval { require Math::Prime::Util::ECAffinePoint; 1; }
-  #  or do { croak "Cannot load Math::Prime::Util::ECAffinePoint"; };
-  #}
-  #my @bprimes = @{ primes(2, $B1) };
-  #my $irandf = Math::Prime::Util::_get_rand_func();
-  #foreach my $curve (1 .. $ncurves) {
-  #  my $a = $irandf->($n-1);
-  #  my $b = 1;
-  #  my $ECP = Math::Prime::Util::ECAffinePoint->new($a, $b, $n, 0, 1);
-  #  foreach my $q (@bprimes) {
-  #    my $k = $q;
-  #    if ($k < $sqrt_b1) {
-  #      my $kmin = int($B1 / $q);
-  #      while ($k <= $kmin) { $k *= $q; }
-  #    }
-  #    $ECP->mul($k);
-  #    my $f = $ECP->f;
-  #    if ($f != 1) {
-  #      last if $f == $n;
-  #      warn "ECM found factors with B1 = $B1 in curve $curve\n";
-  #      return _found_factor($f, $n, "ECM B1=$B1 curve $curve", @factors);
-  #    }
-  #    last if $ECP->is_infinity;
-  #  }
-  #}
-
-  require Math::Prime::Util::ECProjectivePoint;
-  require Math::Prime::Util::RandomPrimes;
-
-  # With multiple curves, it's better to get all the primes at once.
-  # The downside is this can kill memory with a very large B1.
-  my @bprimes = @{ Mprimes(3, $B1) };
-  foreach my $q (@bprimes) {
-    last if $q > $sqrt_b1;
-    my($k,$kmin) = ($q, int($B1/$q));
-    while ($k <= $kmin) { $k *= $q; }
-    $q = $k;
-  }
-  my @b2primes = ($B2 > $B1) ? @{Mprimes($B1+1, $B2)} : ();
-
-  foreach my $curve (1 .. $ncurves) {
-    my $sigma = tobigint(Murandomm($n-6)) + 6;
-
-    my ($u, $v) = ( ($sigma*$sigma - 5) % $n, (4 * $sigma) % $n );
-    my ($x, $z) = ( ($u*$u*$u) % $n,  ($v*$v*$v) % $n );
-    my $cb = (4 * $x * $v) % $n;
-    my $ca = ( (($v-$u)**3) * (3*$u + $v) ) % $n;
-
-    my $f = Mgcd( $cb, $n );
-    $f = Mgcd( $z, $n ) if $f == 1;
-    next if $f == $n;
-    return _found_factor($f,$n, "ECM B1=$B1 curve $curve", @factors) if $f != 1;
-    $u = Minvmod($cb,$n);
-    $ca = (($ca*$u) - 2) % $n;
-
-    my $ECP = Math::Prime::Util::ECProjectivePoint->new($ca, $n, $x, $z);
-    my $fm = $n-$n+1;
-    my $i = 15;
-
-    for (my $q = 2; $q < $B1; $q *= 2) { $ECP->double(); }
-    foreach my $k (@bprimes) {
-      $ECP->mul($k);
-      $fm = ($fm * $ECP->x() ) % $n;
-      if ($i++ % 32 == 0) {
-        $f = Mgcd($fm, $n);
-        last if $f != 1;
-      }
-    }
-    $f = Mgcd($fm, $n);
-    next if $f == $n;
-
-    if ($f == 1 && $B2 > $B1) { # BEGIN STAGE 2
-      my $D = Msqrtint($B2 >> 1);  $D++ if $D % 2;
-      my $one = $n - $n + 1;
-      my $g = $one;
-
-      my $S2P = $ECP->copy->normalize;
-      $f = $S2P->f;
-      if ($f != 1) {
-        next if $f == $n;
-        #warn "ECM S2 normalize f=$f\n" if $f != 1;
-        return _found_factor($f, $n, "ECM S2 B1=$B1 curve $curve");
-      }
-      my $S2x = $S2P->x;
-      my $S2d = $S2P->d;
-      my @nqx = ($n-$n, $S2x);
-
-      foreach my $i (2 .. 2*$D) {
-        my($x2, $z2);
-        if ($i % 2) {
-          ($x2, $z2) = Math::Prime::Util::ECProjectivePoint::_addx($nqx[($i-1)/2], $nqx[($i+1)/2], $S2x, $n);
-        } else {
-          ($x2, $z2) = Math::Prime::Util::ECProjectivePoint::_double($nqx[$i/2], $one, $n, $S2d);
-        }
-        $nqx[$i] = $x2;
-        #($f, $u, undef) = _extended_gcd($z2, $n);
-        $f = Mgcd( $z2, $n );
-        last if $f != 1;
-        $u = Minvmod($z2,$n);
-        $nqx[$i] = ($x2 * $u) % $n;
-      }
-      if ($f != 1) {
-        next if $f == $n;
-        #warn "ECM S2 1: B1 $B1 B2 $B2 curve $curve f=$f\n";
-        return _found_factor($f, $n, "ECM S2 B1=$B1 curve $curve", @factors);
-      }
-
-      $x = $nqx[2*$D-1];
-      my $m = 1;
-      while ($m < ($B2+$D)) {
-        if ($m != 1) {
-          my $oldx = $S2x;
-          my ($x1, $z1) = Math::Prime::Util::ECProjectivePoint::_addx($nqx[2*$D], $S2x, $x, $n);
-          $f = Mgcd( $z1, $n );
-          last if $f != 1;
-          $u = $z1->copy->bmodinv($n);
-          $S2x = ($x1 * $u) % $n;
-          $x = $oldx;
-          last if $f != 1;
-        }
-        if ($m+$D > $B1) {
-          my @p = grep { $_ >= $m-$D && $_ <= $m+$D } @b2primes;
-          foreach my $i (@p) {
-            last if $i >= $m;
-            $g = ($g * ($S2x - $nqx[$m+$D-$i])) % $n;
-          }
-          foreach my $i (@p) {
-            next unless $i > $m;
-            next if $i > ($m+$m) || is_prime($m+$m-$i);
-            $g = ($g * ($S2x - $nqx[$i-$m])) % $n;
-          }
-          $f = Mgcd($g, $n);
-          #warn "ECM S2 3: found $f in stage 2\n" if $f != 1;
-          last if $f != 1;
-        }
-        $m += 2*$D;
-      }
-    } # END STAGE 2
-
-    next if $f == $n;
-    if ($f != 1) {
-      #warn "ECM found factors with B1 = $B1 in curve $curve\n";
-      return _found_factor($f, $n, "ECM B1=$B1 curve $curve", @factors);
-    }
-    # end of curve loop
-  }
-  push @factors, $n;
-  @factors;
+  require Math::Prime::Util::ECM;
+  (@f, Math::Prime::Util::ECM::ecm_factor_pp($n, $B1, $B2, $ncurves));
 }
 
+
+
 sub divisors {
-  my($n,$k) = @_;
+  my($n, $k) = _parse_k_args("divisors", undef, @_);
   validate_integer_nonneg($n);
-  if (defined $k) {
-    validate_integer_nonneg($k);
-    $k = $n if $k > $n;
-  } else {
-    $k = $n;
-  }
+  $k = $n if !defined($k) || $k > $n;
 
   if (!wantarray) {
     # In scalar context, returns sigma_0(n).  Very fast.
@@ -10621,18 +11620,19 @@ sub divisors {
 
   my @d;
   if ($Math::Prime::Util::_GMPfunc{"divisors"}) {
-    # This trips an erroneous compile time error without the eval.
+    # This trips an erroneous compile time error without the string eval.
+    my $ok;
     if ($k < $n && $Math::Prime::Util::GMP::VERSION >= 0.53) {
-      eval "\@d = Math::Prime::Util::GMP::divisors(\"$n\",\"$k\"); ";  ## no critic qw(ProhibitStringyEval)
+      $ok = eval "\@d = Math::Prime::Util::GMP::divisors(\"$n\",\"$k\"); ";  ## no critic qw(ProhibitStringyEval)
     } else {
-      eval "\@d = Math::Prime::Util::GMP::divisors(\"$n\"); ";  ## no critic qw(ProhibitStringyEval)
-      @d = grep { $_ <= $k } @d  if $k < $n;
+      $ok = eval "\@d = Math::Prime::Util::GMP::divisors(\"$n\"); ";  ## no critic qw(ProhibitStringyEval)
+      @d = grep { $_ <= $k } @d if $ok && $k < $n;
     }
-    return maybetobigintall(@d);
+    return maybetobigintall(@d) if $ok;
   }
 
   my @pe = Mfactor_exp($n);
-  return (1,$n) if @pe == 1 && $pe[0]->[1] == 1 && $n <= $k;
+  return (1,$pe[0]->[0]) if @pe == 1 && $pe[0]->[1] == 1 && $n <= $k;
 
   @d = (1);
   for my $pe (@pe) {
@@ -10688,6 +11688,7 @@ sub chebyshev_psi {
 sub hclassno {
   my($n) = @_;
   validate_integer($n);
+  croak "hclassno: n must fit in native signed integer" if $n > SINTMAX;
 
   return -1 if $n == 0;
   return 0 if $n < 0 || ($n % 4) == 1 || ($n % 4) == 2;
@@ -10717,7 +11718,8 @@ sub hclassno {
     $b += 2;
     $b2 = ($n+$b*$b) >> 2;
   }
-  return (($b2*3 == $n) ? 2*(3*$h+1) : $square ? 3*(2*$h+1) : 6*$h) << 1;
+  my $corr = ($b2*3 == $n) ? 4 : $square ? 6 : 0;
+  Mmuladdint(12, $h, $corr);
 }
 
 # Ramanujan Tau using Cohen's method with Hurwitz class numbers.
@@ -10737,7 +11739,7 @@ sub _tauprime {
     my $T3;
     my $v4 = $v % 4;
     if ($v4 == 0) {
-      $T3 = Maddint(Mmulint(2,Mhclassno($v)), Mhclassno(Mmulint(4,$v)) );
+      $T3 = Mmuladdint(2, Mhclassno($v), Mhclassno(Mmulint(4,$v)));
     } elsif ($v4 == 3) {
       $T3 = Mmulint( $v%8 == 3 ? 6 : 4, Mhclassno($v) );
     } else {
@@ -10769,22 +11771,15 @@ sub _taupower {
 
   # Recurse -3
   my $F3 = Msubint(Mpowint($tp,3),Mvecprod(2,$tp,$p11));
-  my $F4 = Msubint(Mmulint($p11,$p11),Mvecprod($tp,$tp,$p11));
-  Maddint( Mmulint($F3,_taupower($p,$e-3,$tp)),
-           Mmulint($F4,_taupower($p,$e-4,$tp)) );
+  my $F4 = Mmulsubint($p11,$p11,Mvecprod($tp,$tp,$p11));
+  Mmuladdint($F3, _taupower($p,$e-3,$tp), Mmulint($F4,_taupower($p,$e-4,$tp)));
 }
 
 sub ramanujan_tau {
   my($n) = @_;
-  validate_integer_nonneg($n);
+  validate_integer($n);
   return 0 if $n <= 0;
 
-  # Use GMP if we have no XS or if size is small
-  if ($n < 100000 || !getconfig()->{'xs'}) {
-    if ($Math::Prime::Util::_GMPfunc{"ramanujan_tau"}) {
-      return reftyped($_[0], Math::Prime::Util::GMP::ramanujan_tau($n));
-    }
-  }
   Mvecprod(map { _taupower($_->[0],$_->[1]) } Mfactor_exp($n));
 }
 
@@ -10817,8 +11812,11 @@ sub ExponentialIntegral {
     my $r = _try_real_gmp_func(\&Math::Prime::Util::GMP::ei, $x<100?0.49:0.53, $x);
     return $r if defined $r;
   }
-  $x=_bigint_to_int($x) if ref($x)eq'Math::BigInt' && $x<=INTMAX && $x>=INTMIN;
-  $x=_upgrade_to_float($x) if ref($x) && ref($x) ne 'Math::BigFloat';
+
+  if (ref($x) && ref($x) ne 'Math::BigFloat') {
+    $x = $x <= INTMAX && $x >= INTMIN ? _bigint_to_int($x)
+                                      : _upgrade_to_float("$x");
+  }
 
   my $tol = 1e-16;
   my $sum = 0.0;
@@ -10885,7 +11883,8 @@ sub ExponentialIntegral {
         last;
       }
     }
-    $val = exp($x) * $invx * $sum;
+    $val = ($x < 700) ? exp($x) * $invx * $sum
+                      : exp($x-log($x)) * $sum;
   }
   $val;
 }
@@ -10895,10 +11894,11 @@ sub LogarithmicIntegral {
   return 0              if $x == 0;
   return - MPU_INFINITY if $x == 1;
   return MPU_INFINITY   if $x == MPU_INFINITY;
-  croak "Invalid input to LogarithmicIntegral:  x must be > 0" if $x <= 0;
+  croak "LogarithmicIntegral: x must be > 0" if $x <= 0;
 
   if ($Math::Prime::Util::_GMPfunc{"li"}) {
-    my $r = _try_real_gmp_func(\&Math::Prime::Util::GMP::li, 0.49, $x);
+    # Pre-0.53 can underflow its precision counter for large results.
+    my $r = _try_real_gmp_func(\&Math::Prime::Util::GMP::li, 0.53, $x);
     return $r if defined $r;
   }
 
@@ -10907,8 +11907,10 @@ sub LogarithmicIntegral {
     return $li2const;
   }
 
-  $x=_bigint_to_int($x) if ref($x)eq'Math::BigInt' && $x<=INTMAX && $x>=INTMIN;
-  $x=_upgrade_to_float($x) if ref($x) && ref($x) ne 'Math::BigFloat';
+  if (ref($x) && ref($x) ne 'Math::BigFloat') {
+    $x = $x <= INTMAX && $x >= INTMIN ? _bigint_to_int($x)
+                                      : _upgrade_to_float("$x");
+  }
 
   # Make sure we preserve whatever accuracy setting the input was using.
   $x->accuracy($_[0]->accuracy) if ref($x) && ref($_[0]) =~ /^Math::Big/ && $_[0]->accuracy;
@@ -11057,6 +12059,11 @@ my @_Riemann_Zeta_Table = (
 sub RiemannZeta {
   my($x) = @_;
 
+  return $x if $x != $x;
+  return 0 if $x == MPU_INFINITY;
+  return -1.5 if $x == 0;
+  return MPU_INFINITY if $x == 1;
+
   # Try our GMP code if possible.
   if ($Math::Prime::Util::_GMPfunc{"zeta"}) {
     my($wantbf,$xdigits) = _bfdigits($x);
@@ -11129,46 +12136,19 @@ sub RiemannZeta {
 sub RiemannR {
   my($x) = @_;
 
-  croak "Invalid input to RiemannR:  x must be > 0" if $x <= 0;
+  return $x           if $x != $x;
+  return MPU_INFINITY if $x == MPU_INFINITY;
+  croak "RiemannR: x must be > 0" if $x <= 0;
 
   if ($Math::Prime::Util::_GMPfunc{"riemannr"}) {
     my $r = _try_real_gmp_func(\&Math::Prime::Util::GMP::riemannr, 0.41, $x);
     return $r if defined $r;
   }
-  $x=_bigint_to_int($x) if ref($x)eq'Math::BigInt' && $x<=INTMAX && $x>=INTMIN;
-  $x=_upgrade_to_float($x) if ref($x) && ref($x) ne 'Math::BigFloat';
 
-
-# TODO: look into this as a generic solution
-if (0 && $Math::Prime::Util::_GMPfunc{"zeta"}) {
-  my($wantbf,$xdigits) = _bfdigits($x);
-  $x = _upgrade_to_float($x);
-
-  my $extra_acc = 4;
-  $xdigits += $extra_acc;
-  $x->accuracy($xdigits);
-
-  my $logx = log($x);
-  my $part_term = $x->copy->bone;
-  my $sum = $x->copy->bone;
-  my $tol = $x->copy->bone->brsft($xdigits-1, 10);
-  my $bigk = $x->copy->bone;
-  my $term;
-  for my $k (1 .. 10000) {
-    $part_term *= $logx / $bigk;
-    my $zarg = $bigk->copy->binc;
-    my $zeta = (RiemannZeta($zarg) * $bigk) + $bigk;
-    #my $strval = Math::Prime::Util::GMP::zeta($k+1, $xdigits + int(($k+1) / 3));
-    #my $zeta = Math::BigFloat->new($strval)->bdec->bmul($bigk)->badd($bigk);
-    $term = $part_term / $zeta;
-    $sum += $term;
-    last if $term < ($tol * $sum);
-    $bigk->binc;
+  if (ref($x) && ref($x) ne 'Math::BigFloat') {
+    $x = $x <= INTMAX && $x >= INTMIN ? _bigint_to_int($x)
+                                      : _upgrade_to_float("$x");
   }
-  $sum->bround($xdigits-$extra_acc);
-  my $strval = "$sum";
-  return ($wantbf)  ?  Math::BigFloat->new($strval,$wantbf)  :  0.0 + $strval;
-}
 
   if (ref($x) =~ /^Math::Big/) {
     require Math::Prime::Util::ZetaBigFloat;
@@ -11205,14 +12185,22 @@ if (0 && $Math::Prime::Util::_GMPfunc{"zeta"}) {
 
 sub LambertW {
   my($x) = @_;
-  croak "Invalid input to LambertW:  x must be >= -1/e" if $x < -0.36787944118;
+  return $x           if $x != $x;
+  return MPU_INFINITY if $x == MPU_INFINITY;
+  croak "LambertW: x must be >= -1/e"
+    if $x < '-0.36787944117145';
+  return -1.0
+    if $x <= '-0.3678794411714423215955237701614608674458111310317678';
 
   if ($Math::Prime::Util::_GMPfunc{"lambertw"}) {
     my $r = _try_real_gmp_func(\&Math::Prime::Util::GMP::lambertw, 0.42, $x);
     return $r if defined $r;
   }
-  $x=_bigint_to_int($x) if ref($x)eq'Math::BigInt' && $x<=INTMAX && $x>=INTMIN;
-  $x=_upgrade_to_float($x) if ref($x) && ref($x) ne 'Math::BigFloat';
+
+  if (ref($x) && ref($x) ne 'Math::BigFloat') {
+    $x = $x <= INTMAX && $x >= INTMIN ? _bigint_to_int($x)
+                                      : _upgrade_to_float("$x");
+  }
 
   my $xacc = ref($x) ? _find_big_acc($x) : 0;
   my $w;
@@ -11278,9 +12266,11 @@ sub LambertW {
 my $_Pi = "3.141592653589793238462643383279503";
 sub Pi {
   my($digits) = @_;
+  validate_integer_nonneg($digits) if @_ > 0;
   return 0.0+$_Pi unless $digits;
   return 0.0+sprintf("%.*lf", $digits-1, $_Pi) if $digits < 15;
   return _upgrade_to_float($_Pi, $digits) if $digits < 30;
+  croak "Pi: digits must fit in native signed integer" if $digits > SINTMAX;
 
   # Performance ranking:
   #   MPU::GMP         Uses AGM or Ramanujan/Chudnosky with binary splitting
@@ -11336,7 +12326,7 @@ sub Pi {
     }
     $an->badd($bn);
     $an->bmul($an,$digits)->bdiv(4*$tn, $digits-8);
-    return $an;
+    return _upgrade_to_float("$an");
   }
 
   # Spigot method in C.  Low overhead but not good growth rate.
@@ -11367,23 +12357,55 @@ sub Pi {
   #                                                  use this FIRST ---+
   # approx
   # growth  5.6x    7.6x   8.0x      2.7x    4.1x   4.7x      3.9x    2.0x
+  #
+  # M1 Pro (2021), tested in 2026, Math::BigInt/BigFloat version 2.005003.
+  # Faster machine, new Math::BigFloat is now similar to our AGM.
+  #
+  # 16000   0.16  ----   159.0       0.16   ----   166.8      0.53    0.0008
+  #128000   2.8                      2.8                     32.0     0.004
+  #
+  # Same ordering: (1) GMP backend, (2) AGM if Math::BigInt::GMP, (3) C spigot.
 
   print "  using BigFloat for Pi($digits)\n" if $_verbose;
   _upgrade_to_float(0);
-  return Math::BigFloat::bpi($digits+10)->round($digits);
+  return _upgrade_to_float(Math::BigFloat::bpi($digits+10)->round($digits));
 }
 
 ################################################################################
 
-sub forprimes {
-  my($sub, $beg, $end) = @_;
-  if (defined $end) { validate_integer_nonneg($beg); }
-  else              { ($beg,$end) = (2, $beg);        }
-  validate_integer_nonneg($end);
-  $beg = 2 if $beg < 2;
-
+sub _run_for_loop (&) {   ## no critic qw(ProhibitSubroutinePrototypes)
+  my($code) = @_;
   my $oldforexit = Math::Prime::Util::_start_for_loop();
+  my($ok, $err);
   {
+    local $@;
+    $ok = eval { $code->(); 1 };
+    $err = $@;
+  }
+  Math::Prime::Util::_end_for_loop($oldforexit);
+  die $err unless $ok;
+}
+
+sub _parse_forargs {
+  my $name = shift;
+  my $defbeg = shift;
+  croak "$name: expected sub and 1 or 2 integers" if @_ != 2 && @_ != 3;
+  my($sub, $beg, $end) = @_;
+  croak 'Not a subroutine reference' unless _is_cref($sub);
+  if (@_ == 2) {
+    ($beg,$end) = ($defbeg, $beg);
+  } else {
+    validate_integer_nonneg($beg);
+    $beg = $defbeg if $beg < $defbeg;
+  }
+  validate_integer_nonneg($end);
+  ($sub, $beg, $end);
+}
+
+sub forprimes (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  my($sub, $beg, $end) = _parse_forargs("forprimes", 2, @_);
+
+  _run_for_loop {
     my $pp;
     local *_ = \$pp;
     for (my $p = Mnext_prime($beg-1);  $p <= $end;  $p = Mnext_prime($p)) {
@@ -11391,28 +12413,24 @@ sub forprimes {
       $sub->();
       last if Math::Prime::Util::_get_forexit();
     }
-  }
-  Math::Prime::Util::_end_for_loop($oldforexit);
+  };
 }
-
 
 sub _forcomp_sub {
   my($what, $sub, $beg, $end) = @_;
-  if (defined $end) { validate_integer_nonneg($beg); }
-  else              { ($beg,$end) = (0, $beg);        }
-  validate_integer_nonneg($end);
 
   my $cinc = 1;
   if ($what eq 'oddcomposites') {
-    $beg = 9 if $beg < 9;
     $beg++ unless $beg % 2 == 1;
     $cinc = 2;
-  } else {
-    $beg = 4 if $beg < 4;
   }
-  $end = tobigint(~0) if $end == ~0 && !ref($end);
-  my $oldforexit = Math::Prime::Util::_start_for_loop();
-  {
+
+  if (ref($end)) { $end = canonicalized_integer($end); }
+  else           { $end = tobigint(~0) if $end == ~0;  }
+  if (ref($beg)) { $beg = canonicalized_integer($beg); }
+  else           { $beg = tobigint($beg) if ref($end); }
+
+  _run_for_loop {
     my $pp;
     local *_ = \$pp;
     for (my $p = Mnext_prime($beg-1);  $beg <= $end;  $p = Mnext_prime($p)) {
@@ -11424,28 +12442,24 @@ sub _forcomp_sub {
       $beg += $cinc;
       last if Math::Prime::Util::_get_forexit();
     }
-  }
-  Math::Prime::Util::_end_for_loop($oldforexit);
+  };
 }
-sub forcomposites {
-  _forcomp_sub('composites', @_);
+sub forcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  _forcomp_sub('composites',    _parse_forargs("forcomposites",4,@_));
 }
-sub foroddcomposites {
-  _forcomp_sub('oddcomposites', @_);
-}
-sub forsemiprimes {
-  foralmostprimes($_[0], 2, $_[1], $_[2]);
+sub foroddcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  _forcomp_sub('oddcomposites', _parse_forargs("foroddcomposites",9,@_));
 }
 
 sub _forfac_sub {
   my($sf, $sub, $beg, $end) = @_;
-  if (defined $end) { validate_integer_nonneg($beg); }
-  else              { ($beg,$end) = (1, $beg);        }
-  validate_integer_nonneg($end);
-  $beg = 1 if $beg < 1;
 
-  my $oldforexit = Math::Prime::Util::_start_for_loop();
-  {
+  if (ref($end)) { $end = canonicalized_integer($end); }
+  else           { $end = tobigint(~0) if $end == ~0;  }
+  if (ref($beg)) { $beg = canonicalized_integer($beg); }
+  else           { $beg = tobigint($beg) if ref($end); }
+
+  _run_for_loop {
     my $pp;
     local *_ = \$pp;
     while ($beg <= $end) {
@@ -11461,25 +12475,23 @@ sub _forfac_sub {
       }
       $beg++;
     }
-  }
-  Math::Prime::Util::_end_for_loop($oldforexit);
+  };
 }
-sub forfactored {
-  _forfac_sub(0, @_);
+sub forfactored(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  _forfac_sub(0, _parse_forargs("forfactored",1,@_));
 }
-sub forsquarefree {
-  _forfac_sub(1, @_);
+sub forsquarefree(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  _forfac_sub(1, _parse_forargs("forsquarefree",1,@_));
 }
-sub forsquarefreeint {
-  _forfac_sub(2, @_);
+sub forsquarefreeint(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  _forfac_sub(2, _parse_forargs("forsquarefreeint",1,@_));
 }
 
-sub fordivisors {
+sub fordivisors (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
   my($sub, $n) = @_;
   validate_integer_nonneg($n);
   my @divisors = Mdivisors($n);
-  my $oldforexit = Math::Prime::Util::_start_for_loop();
-  {
+  _run_for_loop {
     my $pp;
     local *_ = \$pp;
     foreach my $d (@divisors) {
@@ -11487,25 +12499,24 @@ sub fordivisors {
       $sub->();
       last if Math::Prime::Util::_get_forexit();
     }
-  }
-  Math::Prime::Util::_end_for_loop($oldforexit);
+  };
 }
 
-sub forpart {
-  my($sub, $n, $rhash) = @_;
-  _forcompositions(1, $sub, $n, $rhash);
+sub forpart (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  _forcompositions("forpart", @_);
 }
-sub forcomp {
-  my($sub, $n, $rhash) = @_;
-  _forcompositions(0, $sub, $n, $rhash);
+sub forcomp (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  _forcompositions("forcomp", @_);
 }
 sub _forcompositions {
-  my($ispart, $sub, $n, $rhash) = @_;
+  my($name, $sub, $n, $rhash) = @_;
+  croak "$name: expected (sub,n) or (sub,n,hashref)" if @_ < 3 || @_ > 4;
   validate_integer_nonneg($n);
+  croak "$name: n must fit in native signed integer" if $n > SINTMAX;
   my($mina, $maxa, $minn, $maxn, $primeq) = (1,$n,1,$n,-1);
-  if (defined $rhash) {
-    croak "forpart second argument must be a hash reference"
-      unless ref($rhash) eq 'HASH';
+  if (@_ == 4) {
+    croak "$name second argument must be a hash reference"
+      unless _is_href($rhash);
     if (defined $rhash->{amin}) {
       $mina = $rhash->{amin};
       validate_integer_nonneg($mina);
@@ -11530,143 +12541,175 @@ sub _forcompositions {
    $primeq = 2 if $primeq != -1 && $primeq != 0;
   }
 
-  $sub->() if $n == 0 && $minn <= 1;
-  return if $n < $minn || $minn > $maxn || $mina > $maxa || $maxn <= 0 || $maxa <= 0;
+  my $doloop0 = ($n == 0 && $minn <= 1);
+  my $doloopn = ($n >= $minn && $minn <= $maxn && $mina <= $maxa && $maxn > 0 && $maxa > 0);
 
-  my $oldforexit = Math::Prime::Util::_start_for_loop();
-  my ($x, $y, $r, $k);
-  my @a = (0) x ($n);
-  $k = 1;
-  $a[0] = $mina - 1;
-  $a[1] = $n - $mina + 1;
-  while ($k != 0) {
-    $x = $a[$k-1]+1;
-    $y = $a[$k]-1;
-    $k--;
-    $r = $ispart ? $x : 1;
-    while ($r <= $y) {
-      $a[$k] = $x;
-      $x = $r;
-      $y -= $x;
-      $k++;
-    }
-    $a[$k] = $x + $y;
-    # Restrict size
-    while ($k+1 > $maxn) {
-      $a[$k-1] += $a[$k];
-      $k--;
-    }
-    next if $k+1 < $minn;
-    # Restrict values
-    if ($mina > 1 || $maxa < $n) {
-      last if $a[0] > $maxa;
-      if ($ispart) {
-        next if $a[$k] > $maxa;
-      } else {
-        next if Mvecany(sub{ $_ < $mina || $_ > $maxa }, @a[0..$k]);
-      }
-    }
-    next if $primeq == 0 && Mvecany(sub{ Mis_prime($_) }, @a[0..$k]);
-    next if $primeq == 2 && Mvecany(sub{ !Mis_prime($_) }, @a[0..$k]);
-    last if Math::Prime::Util::_get_forexit();
-    $sub->(@a[0 .. $k]);
-  }
-  Math::Prime::Util::_end_for_loop($oldforexit);
-}
-sub forcomb {
-  my($sub, $n, $k) = @_;
-  validate_integer_nonneg($n);
+  return if !$doloop0 && !$doloopn;
 
-  my($begk, $endk);
-  if (defined $k) {
-    validate_integer_nonneg($k);
-    return if $k > $n;
-    $begk = $endk = $k;
-  } else {
-    $begk = 0;
-    $endk = $n;
-  }
+  _run_for_loop {
 
-  my $oldforexit = Math::Prime::Util::_start_for_loop();
-  for my $k ($begk .. $endk) {
-    if ($k == 0) {
-      $sub->();
-    } else {
-      my @c = 0 .. $k-1;
-      while (1) {
-        $sub->(@c);
+    $sub->() if $doloop0;
+
+    if ($doloopn && !Math::Prime::Util::_get_forexit()) {
+      my ($x, $y, $r, $k);
+      my @a = (0) x ($n);
+      $k = 1;
+      $a[0] = $mina - 1;
+      $a[1] = $n - $mina + 1;
+      while ($k != 0) {
+        $x = $a[$k-1]+1;
+        $y = $a[$k]-1;
+        $k--;
+        $r = $name eq 'forpart' ? $x : 1;
+        while ($r <= $y) {
+          $a[$k] = $x;
+          $x = $r;
+          $y -= $x;
+          $k++;
+        }
+        $a[$k] = $x + $y;
+        # Restrict size
+        while ($k+1 > $maxn) {
+          $a[$k-1] += $a[$k];
+          $k--;
+        }
+        next if $k+1 < $minn;
+        # Restrict values
+        if ($mina > 1 || $maxa < $n) {
+          last if $a[0] > $maxa;
+          if ($name eq 'forpart') {
+            next if $a[$k] > $maxa;
+          } else {
+            next if Mvecany(sub{ $_ < $mina || $_ > $maxa }, @a[0..$k]);
+          }
+        }
+        next if $primeq == 0 && Mvecany(sub{ Mis_prime($_) }, @a[0..$k]);
+        next if $primeq == 2 && Mvecany(sub{ !Mis_prime($_) }, @a[0..$k]);
         last if Math::Prime::Util::_get_forexit();
-        next if $c[-1]++ < $n-1;
-        my $i = $k-2;
-        $i-- while $i >= 0 && $c[$i] >= $n-($k-$i);
-        last if $i < 0;
-        $c[$i]++;
-        while (++$i < $k) { $c[$i] = $c[$i-1] + 1; }
+        $sub->(@a[0 .. $k]);
       }
     }
-    last if Math::Prime::Util::_get_forexit();
+  };
+}
+
+sub forcomb (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  my($sub, $n, $rk) = @_;
+  croak "forcomb: expected (sub,n) or (sub,n,k)" if @_ < 2 || @_ > 3;
+  croak 'Not a subroutine reference' unless _is_cref($sub);
+  validate_integer_nonneg($n);
+  croak "forcomb: n must fit in native signed integer" if $n > SINTMAX;
+  my($begk, $endk) = (0, $n);
+  if (@_ == 3) {
+    validate_integer_nonneg($rk);
+    return if $rk > $n;
+    $begk = $endk = $rk;
   }
-  Math::Prime::Util::_end_for_loop($oldforexit);
+
+  _run_for_loop {
+    for my $k ($begk .. $endk) {
+      if ($k == 0) {
+        $sub->();
+      } else {
+        my @c = 0 .. $k-1;
+        while (1) {
+          $sub->(@c);
+          last if Math::Prime::Util::_get_forexit();
+          next if $c[-1]++ < $n-1;
+          my $i = $k-2;
+          $i-- while $i >= 0 && $c[$i] >= $n-($k-$i);
+          last if $i < 0;
+          $c[$i]++;
+          while (++$i < $k) { $c[$i] = $c[$i-1] + 1; }
+        }
+      }
+      last if Math::Prime::Util::_get_forexit();
+    }
+  };
 }
 sub _forperm {
-  my($sub, $n, $all_perm) = @_;
+  my($name, $sub, $n) = @_;
+  croak 'Not a subroutine reference' unless _is_cref($sub);
+  validate_integer_nonneg($n);
+  croak "$name: n must fit in native signed integer" if $n > SINTMAX;
+
   if ($n <= 1) {
-    my $oldforexit = Math::Prime::Util::_start_for_loop();
-    if ($n == 0) { $sub->(); } else { $sub->(0); }
-    Math::Prime::Util::_end_for_loop($oldforexit);
+    return if $name eq 'forderange' && $n == 1;
+    _run_for_loop {
+      if ($n == 0) { $sub->(); } else { $sub->(0); }
+    };
     return;
   }
+  my $all_perm = $name eq 'forperm';
   my $k = $n;
   my @c = reverse 0 .. $k-1;
   my $inc = 0;
   my $send = 1;
-  my $oldforexit = Math::Prime::Util::_start_for_loop();
-  while (1) {
-    if (!$all_perm) {   # Derangements via simple filtering.
-      $send = 1;
-      for my $p (0 .. $#c) {
-        if ($c[$p] == $k-$p-1) {
-          $send = 0;
-          last;
+  _run_for_loop {
+    while (1) {
+      if (!$all_perm) {   # Derangements via simple filtering.
+        $send = 1;
+        for my $p (0 .. $#c) {
+          if ($c[$p] == $k-$p-1) {
+            $send = 0;
+            last;
+          }
         }
       }
+      if ($send) {
+        $sub->(reverse @c);
+        last if Math::Prime::Util::_get_forexit();
+      }
+      if (++$inc & 1) {
+        @c[0,1] = @c[1,0];
+        next;
+      }
+      my $j = 2;
+      $j++ while $j < $k && $c[$j] > $c[$j-1];
+      last if $j >= $k;
+      my $m = 0;
+      $m++ while $c[$j] > $c[$m];
+      @c[$j,$m] = @c[$m,$j];
+      @c[0..$j-1] = reverse @c[0..$j-1];
     }
-    if ($send) {
-      $sub->(reverse @c);
+  };
+}
+sub forperm (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  _forperm("forperm", @_);
+}
+sub forderange (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  _forperm("forderange", @_);
+}
+
+sub forsetproduct (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  my($sub, @v) = @_;
+  croak 'Not a subroutine reference' unless _is_cref($sub);
+  croak 'Not an array reference' if grep { !_is_aref($_) } @v;
+  # Exit if no arrays or any are empty.
+  return if scalar(@v) == 0 || grep { !@$_ } @v;
+
+  # We will have a local copy of the sets, so user sub changes don't impact us.
+  @v = map { [ @$_ ] } @v;
+
+  my @outv = map { $v[$_]->[0] } 0 .. $#v;
+  my @cnt = (0) x @v;
+
+  _run_for_loop {
+    my $i = 0;
+    while ($i >= 0) {
+      $sub->(@outv);
       last if Math::Prime::Util::_get_forexit();
+      for ($i = $#v; $i >= 0; $i--) {
+        if ($cnt[$i] >= $#{$v[$i]}) { $cnt[$i] = 0; $outv[$i] = $v[$i]->[0]; }
+        else { $outv[$i] = $v[$i]->[++$cnt[$i]]; last; }
+      }
     }
-    if (++$inc & 1) {
-      @c[0,1] = @c[1,0];
-      next;
-    }
-    my $j = 2;
-    $j++ while $j < $k && $c[$j] > $c[$j-1];
-    last if $j >= $k;
-    my $m = 0;
-    $m++ while $c[$j] > $c[$m];
-    @c[$j,$m] = @c[$m,$j];
-    @c[0..$j-1] = reverse @c[0..$j-1];
-  }
-  Math::Prime::Util::_end_for_loop($oldforexit);
-}
-sub forperm {
-  my($sub, $n, $k) = @_;
-  validate_integer_nonneg($n);
-  croak "Too many arguments for forperm" if defined $k;
-  _forperm($sub, $n, 1);
-}
-sub forderange {
-  my($sub, $n, $k) = @_;
-  validate_integer_nonneg($n);
-  croak "Too many arguments for forderange" if defined $k;
-  return if $n == 1;
-  _forperm($sub, $n, 0);
+  };
 }
 
 sub _multiset_permutations {
   my($sub, $prefix, $ar, $sum) = @_;
 
-  return if $sum == 0;
+  return $sub->(@$prefix) if $sum == 0;
 
   # Remove any values with 0 occurances
   my @n = grep { $_->[1] > 0 } @$ar;
@@ -11699,83 +12742,124 @@ sub _multiset_permutations {
   }
 }
 
+sub formultiperm {
+  my($sub, $iref) = @_;
+  croak("formultiperm first argument must be an array reference")
+    unless _is_aref($iref);
+
+  my($sum, %h, @n) = (0);
+  $h{$_}++ for @$iref;
+  @n = map { [$_, $h{$_}] } sort(keys(%h));
+  $sum += $_->[1] for @n;
+
+  _run_for_loop {
+    _multiset_permutations($sub, [], \@n, $sum);
+  };
+}
+
 sub numtoperm {
   my($n,$k) = @_;
   validate_integer_nonneg($n);
   validate_integer($k);
-  return () if $n == 0;
-  return (0) if $n == 1;
+  return wantarray ? () : 0 if $n == 0;
+  return wantarray ? (0) : 1 if $n == 1;
+  croak "numtoperm: n must fit in native signed integer" if $n > SINTMAX;
   my $f = Mfactorial($n-1);
-  $k %= Mmulint($f,$n) if $k < 0 || int($k/$f) >= $n;
+  $k = Mmodint($k,Mmulint($f,$n)) if $k < 0 || Mdivint($k,$f) >= $n;
   my @S = map { $_ } 0 .. $n-1;
   my @V;
   while ($n-- > 0) {
-    my $i = int($k/$f);
+    my $i = Mdivint($k,$f);
     push @V, splice(@S,$i,1);
     last if $n == 0;
-    $k -= $i*$f;
-    $f /= $n;
+    $k = Msubint($k, Mmulint($i,$f));
+    $f = Mdivint($f,$n);
   }
   @V;
 }
 
 sub permtonum {
   my($A) = @_;
-  croak "permtonum argument must be an array reference"
-    unless ref($A) eq 'ARRAY';
+  croak "permtonum argument must be an array reference" unless _is_aref($A);
   my $n = scalar(@$A);
   return 0 if $n == 0;
+  my @P = @$A;  # Copy so validate doesn't change their input
   {
     my %S;
-    for my $v (@$A) {
-      croak "permtonum invalid permutation array"
-        if !defined $v || $v < 0 || $v >= $n || $S{$v}++;
+    for my $v (@P) {
+      validate_integer_nonneg($v);
+      croak "permtonum: invalid permutation array" if $v >= $n || $S{$v}++;
     }
   }
-  my $f = factorial($n-1);
+  my $f = Mfactorial($n-1);
   my $rank = 0;
   for my $i (0 .. $n-2) {
     my $k = 0;
     for my $j ($i+1 .. $n-1) {
-      $k++ if $A->[$j] < $A->[$i];
+      $k++ if $P[$j] < $P[$i];
     }
-    $rank = Maddint($rank, Mmulint($k,$f));
-    $f /= $n-$i-1;
+    $rank = Mmuladdint($k,$f,$rank);
+    $f = Mdivint($f, $n-$i-1);
   }
   $rank;
 }
 
 sub randperm {
-  my($n,$k) = @_;
+  my($n, $k) = _parse_k_args("randperm", undef, @_);
   validate_integer_nonneg($n);
-  if (defined $k) {
-    validate_integer_nonneg($k);
-  }
   $k = $n if !defined($k) || $k > $n;
-  return () if $k == 0;
+  croak "randperm: k must fit in native signed integer" if $k > SINTMAX;
+
+  # If not in array context then return the count now.
+  return $k unless wantarray;
 
   my @S;
-  if ("$k"/"$n" <= 0.30) {
-    my %seen;
-    my $v;
-    for my $i (1 .. $k) {
-      do { $v = Murandomm($n); } while $seen{$v}++;
-      push @S,$v;
-    }
-  } else {
+
+  if ($k <= 1) {
+    push @S, Murandomm($n) if $k == 1;
+
+  } elsif ($k == $n) {  # k <= SINTMAX, so n is also in this case
     @S = (0..$n-1);
     for my $i (0 .. $n-2) {
-      last if $i >= $k;
-      my $j = Murandomm($n-$i);
-      @S[$i,$i+$j] = @S[$i+$j,$i];
+      my $j = $i + Murandomm($n-$i);
+      @S[$i,$j] = @S[$j,$i];
     }
-    $#S = $k-1;
+
+  } elsif ($k == 2) {  # Special case for performance
+    my $i = Murandomm($n);
+    my $j = Madd1int(Murandomm($n-1));
+    push @S, $i;
+    push @S, $j == $i ? 0 : $j;
+
+  } elsif (!ref($n)) {
+    my %V;
+    for my $i (0 .. $k-1) {
+      my $r = $i + Murandomm($n-$i);
+      my $out = exists $V{$r} ? $V{$r} : $r;
+      my $vi  = exists $V{$i} ? $V{$i} : $i;
+      push @S, $out;
+      $V{$r} = $vi if $r != $i;
+    }
+
+  } else {
+    my %V;
+    for my $i (0 .. $k-1) {
+      my $r = Saddint($i, Surandomm($n-$i));
+      my $rkey = "$r";
+      my $ikey = "$i";
+      my $out = exists $V{$rkey} ? $V{$rkey} : $r;
+      my $vi  = exists $V{$ikey} ? $V{$ikey} : $i;
+      push @S, $out;
+      $V{$rkey} = $vi if $rkey ne $ikey;
+    }
   }
-  return @S;
+
+  @S;
 }
 
 sub shuffle {
   my @S=@_;
+  return scalar(@S) unless wantarray;
   # Note: almost all the time is spent in urandomm.
   for (my $i = $#S; $i >= 1; $i--) {
     my $j = Murandomm($i+1);
@@ -11784,20 +12868,58 @@ sub shuffle {
   @S;
 }
 
-sub vecsample {
-  my $k = shift;
-  return () if $k == 0 || @_ == 0;
-  my $R = $_[0];
-  my $isarr = (@_ > 1 || !ref($R) || ref($R) ne 'ARRAY');
-  my $len = $isarr  ?  scalar(@_)  :  scalar(@$R);
+# randperm with the same algorithm as XS vecsample uses.
+# 1. Push the last item to the front.
+# 2. k rounds of Fisher-Yates selection, swapping the chosen entry into place.
+# Includes an optimization for small k.
+sub _randperm_rotated_fy {
+  my($len, $k) = @_;
 
+  return if $k <= 0;
+
+  if ($k == 1) {
+    my $j = Murandomm($len);
+    return ($j == 0 ? $len-1 : $j-1);
+  }
+
+  my(%m,@O,$j);
+  if ($k > 10000 || $k*25 > $len) {
+    # Construct full index and do k selections with swapping
+    my @I = ($len-1, 0 .. $len-2);
+    @O = map { $j = Murandomm(scalar(@I));    # random index from remaining
+               @I[0,$j] = @I[$j,0];           # move to front
+               shift @I;                      # take it off
+             } 1 .. $k;
+  } else {
+    # Don't construct the full index, track swap locations
+    my $init = sub { return $_[0] == 0 ? $len-1 : $_[0]-1; };
+    for my $i (0 .. $k-1) {
+      my $r = $i + Murandomm($len - $i);
+      my $out = exists $m{$r} ? $m{$r} : $init->($r);
+      my $vi  = exists $m{$i} ? $m{$i} : $init->($i);
+      push @O, $out;
+      $m{$r} = $vi if $r != $i;
+      delete $m{$i};
+    }
+  }
+  @O;
+}
+
+sub vecsample ($@) {   ## no critic qw(ProhibitSubroutinePrototypes)
+  my $k = shift;
+  validate_integer_nonneg($k);
+  return wantarray ? () : 0  if @_ == 0 || $k == 0;
+
+  my $R = $_[0];
+  my $isarr = @_ > 1 || !ref($R) || !_is_aref($R);
+  my $len = $isarr  ?  scalar(@_)  :  scalar(@$R);
   $k = $len if $k > $len;
-  my @I = ($len-1, 0 .. $len-2);
-  my $j;
-  my @O = map { $j = Murandomm(scalar(@I));    # random index from remaining
-                @I[0,$j] = @I[$j,0];           # move to front
-                shift @I;                      # take it off
-              } 1 .. $k;
+  return $k unless wantarray;
+  return () if $k == 0;
+
+  # Get the random permutation *exactly* as the XS selection is done.
+  # With the same random stream these produce IDENTICAL outputs.
+  my @O = _randperm_rotated_fy($len,$k);
   return $isarr  ?  @_[@O]  :  @$R[@O];
 }
 
@@ -11806,7 +12928,7 @@ sub vecsample {
 sub vecsort {
   my(@s) = @_;
   # If we have a single array reference, unpack it.
-  @s = @{$s[0]} if scalar(@s) == 1 && (ref($s[0]) || '') eq 'ARRAY';
+  @s = @{$s[0]} if scalar(@s) == 1 && _is_aref($s[0]);
 
   # Validate and convert everything into a native int or bigint
   validate_integer($_) for @s;
@@ -11823,23 +12945,37 @@ sub vecsort {
   }
   return @s;
 }
+sub vecrsort {
+  if (!wantarray) { my $s = vecsort(@_); return $s; }
+  reverse vecsort(@_);
+}
 
 # In-place sort.
 sub vecsorti {
   my($r) = @_;
-  croak 'Not an array reference' unless (ref($r) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($r);
   validate_integer($_) for @$r;
   if ($] < 5.026) { @$r = sort { 0+($a<=>$b) } @$r; }
   else            { @$r = sort {    $a<=>$b  } @$r; }
   return $r;
 }
+sub vecrsorti {
+  my($r) = @_;
+  croak 'Not an array reference' unless _is_aref($r);
+  validate_integer($_) for @$r;
+  if ($] < 5.026) { @$r = sort { 0+($b<=>$a) } @$r; }
+  else            { @$r = sort {    $b<=>$a  } @$r; }
+  return $r;
+}
 
 sub setbinop (&$;$) {   ## no critic qw(ProhibitSubroutinePrototypes)
   my($sub, $ra, $rb) = @_;
-  croak 'Not a subroutine reference' unless (ref($sub) || '') eq 'CODE';
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY';
-  if (defined $rb) {
-    croak 'Not an array reference' unless (ref($rb) || '') eq 'ARRAY';
+  croak 'Not a subroutine reference' unless _is_cref($sub);
+  croak 'Not an array reference' unless _is_aref($ra);
+  $ra = Mtoset(@$ra);  # local copy, validated, set-form
+  if (@_ >= 3) {
+    croak 'Not an array reference' unless _is_aref($rb);
+    $rb = Mtoset(@$rb);  # local copy, validated, set-form
   } else {
     $rb = $ra;
   }
@@ -11856,7 +12992,7 @@ sub setbinop (&$;$) {   ## no critic qw(ProhibitSubroutinePrototypes)
       # Set both here in case they modified $a in their function.
       $a = $ia;
       $b = $ib;
-      push @set, $sub->();
+      push @set, scalar $sub->();
     }
   }
   Mtoset(@set);
@@ -11864,9 +13000,9 @@ sub setbinop (&$;$) {   ## no critic qw(ProhibitSubroutinePrototypes)
 
 sub sumset {
   my($ra,$rb) = @_;
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY';
-  if (defined $rb) {
-    croak 'Not an array reference' unless (ref($rb) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($ra);
+  if (@_ >= 2) {
+    croak 'Not an array reference' unless _is_aref($rb);
   } else {
     $rb = $ra;
   }
@@ -11887,9 +13023,7 @@ sub sumset {
 sub vecuniq {
   my %seen = ();
   my $k;
-  # Validation means about 1.4x slower.
-  #my @T = @_; return grep { validate_integer($_) && not $seen{$k = $_}++; } @T;
-  # We have decided to skip validation and not support undefined values.
+  croak 'vecuniq: all values must be defined' if grep { !defined $_ } @_;
   return grep { not $seen{$k = $_}++; } @_;
 }
 
@@ -11914,6 +13048,29 @@ sub vecsingleton {
   return grep { (defined $_ ? $count{$k=$_} : $countundef) == 1 }
          grep { ! (defined $_ ? $count{$k = $_}++ : $countundef++) }
          @_;
+}
+
+sub vecwindow (&$$@) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  my($sub, $step, $size) = (shift, shift, shift);
+  croak 'Not a subroutine reference' unless _is_cref($sub);
+  validate_integer_positive($step);
+  validate_integer_positive($size);
+  if (!wantarray) {
+    my $count = 0;
+    for (my $i = 0; $i + $size <= @_; $i += $step) {
+      my @window = map { my $v = $_; $v } @_[$i .. $i+$size-1];
+      my @r = $sub->(@window);
+      $count += scalar(@r);
+    }
+    return $count;
+  } else {
+    my @result;
+    for (my $i = 0; $i + $size <= @_; $i += $step) {
+      my @window = map { my $v = $_; $v } @_[$i .. $i+$size-1];
+      push @result, $sub->(@window);
+    }
+    return @result;
+  }
 }
 
 # SET/VEC generic.
@@ -11946,16 +13103,14 @@ sub _merge_sets_inplace {
 }
 sub setunion {
   my($ra,$rb) = @_;
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY'
-                                     && (ref($rb) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($ra) && _is_aref($rb);
   # return toset(@$ra,@$rb);
   my(%seen,$k);
   Mtoset(grep { not $seen{$k = $_}++ } @$ra,@$rb);
 }
 sub setintersect {
   my($ra,$rb) = @_;
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY'
-                                     && (ref($rb) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($ra) && _is_aref($rb);
   ($ra,$rb) = ($rb,$ra) if scalar(@$ra) > scalar(@$rb);  # Performance
   return [] if scalar(@$ra) == 0;
   my %ina;
@@ -11964,19 +13119,17 @@ sub setintersect {
 }
 sub setminus {
   my($ra,$rb) = @_;
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY'
-                                     && (ref($rb) || '') eq 'ARRAY';
-  return $ra if scalar(@$rb) == 0;
+  croak 'Not an array reference' unless _is_aref($ra) && _is_aref($rb);
+  return Mtoset(@$ra) if scalar(@$rb) == 0;
   my %inb;
   undef @inb{@$rb};
   Mtoset(grep { !exists $inb{$_} } @$ra);
 }
 sub setdelta {
   my($ra,$rb) = @_;
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY'
-                                     && (ref($rb) || '') eq 'ARRAY';
-  return $ra if scalar(@$rb) == 0;
-  return $rb if scalar(@$ra) == 0;
+  croak 'Not an array reference' unless _is_aref($ra) && _is_aref($rb);
+  return Mtoset(@$ra) if scalar(@$rb) == 0;
+  return Mtoset(@$rb) if scalar(@$ra) == 0;
   my(%ina, %inb);
   undef @ina{@$ra};
   undef @inb{@$rb};
@@ -11988,7 +13141,7 @@ sub setdelta {
 # Can do setminus([$min..$max],\@L) albeit 2x slower
 sub _setcomplement {
   my($ra, $min, $max) = @_;
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($ra);
   validate_integer($min);
   validate_integer($max);
   my %ina;
@@ -12010,6 +13163,8 @@ sub _setcomplement {
 
 sub toset {
   my(@list) = @_;
+  croak "toset: expected integer list, not array reference"
+    if @list == 1 && _is_aref($list[0]);
   validate_integer($_) for @list;
   return \@list if scalar(@list) <= 1;
   my($k,%seen);
@@ -12020,8 +13175,9 @@ sub toset {
 # Is the second set a subset of the first set?
 sub setcontains {
   my $set = shift @_;
+  croak 'Not an array reference' unless _is_aref($set);
   my $iset;
-  if (@_ == 1 && ref($_[0]) eq 'ARRAY') {
+  if (@_ == 1 && _is_aref($_[0])) {
     $iset = $_[0];
   } else {
     $iset = Mtoset(@_);
@@ -12060,11 +13216,12 @@ sub setcontains {
 
 sub setcontainsany {
   my($set,@in) = @_;
+  croak 'Not an array reference' unless _is_aref($set);
   my $iset;
-  if (@in == 1 && ref($in[0]) eq 'ARRAY') {
+  if (@in == 1 && _is_aref($in[0])) {
     $iset = $in[0];
   } else {
-    $iset = \@in;
+    $iset = Mtoset(@in);
   }
   # For better performance, make iset the larger
   ($set,$iset) = ($iset,$set) if scalar(@$set) > scalar(@$iset);
@@ -12104,9 +13261,10 @@ sub _setinsert1 {       # UNUSED
 
 sub setinsert {
   my($set, @in) = @_;
+  croak 'Not an array reference' unless _is_aref($set);
   my $iset;
-  if (@in == 1 && ref($in[0]) eq 'ARRAY') {
-    $iset = $in[0];
+  if (@in == 1 && _is_aref($in[0])) {
+    $iset = [ @{$in[0]} ];
   } else {
     $iset = Mtoset(@in);
   }
@@ -12191,9 +13349,10 @@ sub _setremove1 {
 
 sub setremove {
   my $set = shift;
+  croak 'Not an array reference' unless _is_aref($set);
   my $iset;
-  if (@_ == 1 && ref($_[0]) eq 'ARRAY') {
-    $iset = $_[0];
+  if (@_ == 1 && _is_aref($_[0])) {
+    $iset = [ @{$_[0]} ];
   } else {
     $iset = Mtoset(@_);
   }
@@ -12246,10 +13405,11 @@ sub _setinvert1 {
 
 sub setinvert {
   my($set, @in) = @_;
+  croak 'Not an array reference' unless _is_aref($set);
   return 0 if @in == 0;
   my $iset;
-  if (@in == 1 && ref($in[0]) eq 'ARRAY') {
-    $iset = $in[0];
+  if (@in == 1 && _is_aref($in[0])) {
+    $iset = [ @{$in[0]} ];
   } else {
     $iset = Mtoset(@in);
   }
@@ -12280,46 +13440,58 @@ sub setinvert {
 
 # For these set_is_ functions, the inputs can be unordered but no duplicates.
 
-sub set_is_disjoint {
-  my($s,$t) = @_;
-  croak 'Not an array reference' unless (ref($s) || '') eq 'ARRAY'
-                                     && (ref($t) || '') eq 'ARRAY';
-  ($s,$t) = ($t,$s) if scalar(@$s) > scalar(@$t);
-  return 1 if @$s == 0 || @$t == 0;
-  my($k,%ins);
-  $ins{$k=$_}=undef for @$s;
-  for my $v (@$t) { return 0 if exists $ins{$k=$v} }
-  1;
-}
 sub set_is_equal {
   my($s,$t) = @_;
-  croak 'Not an array reference' unless (ref($s) || '') eq 'ARRAY'
-                                     && (ref($t) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($s) && _is_aref($t);
   return 0 unless @$s == @$t;
-  my %ins;
-  $ins{$_} = 0 for @$s;
-  for my $v (@$t) {
+  my($v,%ins);
+  for (@$s) {
+    validate_integer($v=$_);
+    $ins{$v} = 0;
+  }
+  for (@$t) {
+    validate_integer($v=$_);
     return 0 unless exists $ins{$v};
     $ins{$v}++;
   }
   for (values %ins) { return 0 unless $_ }
   1;
 }
+sub set_is_disjoint {
+  my($s,$t) = @_;
+  croak 'Not an array reference' unless _is_aref($s) && _is_aref($t);
+  ($s,$t) = ($t,$s) if scalar(@$s) > scalar(@$t);
+  return 1 if @$s == 0 || @$t == 0;  # Yes, this skips validation
+  my($v,%ins);
+  for (@$s) {
+    validate_integer($v=$_);
+    $ins{$v} = undef;
+  }
+  for (@$t) {
+    validate_integer($v=$_);
+    return 0 if exists $ins{$v};
+  }
+  1;
+}
 sub set_is_subset {
   my($s,$t) = @_;
-  croak 'Not an array reference' unless (ref($s) || '') eq 'ARRAY'
-                                     && (ref($t) || '') eq 'ARRAY';
-  return 1 if @$t == 0;
+  croak 'Not an array reference' unless _is_aref($s) && _is_aref($t);
+  return 1 if @$t == 0;  # Yes, this skips validation
   return 0 if @$s < @$t;
-  my %ins;
-  undef @ins{@$s};
-  for my $v (@$t) { return 0 unless exists $ins{$v} }
+  my($v,%ins);
+  for (@$s) {
+    validate_integer($v=$_);
+    $ins{$v} = undef;
+  }
+  for (@$t) {
+    validate_integer($v=$_);
+    return 0 unless exists $ins{$v};
+  }
   1;
 }
 sub set_is_proper_subset {
   my($s,$t) = @_;
-  croak 'Not an array reference' unless (ref($s) || '') eq 'ARRAY'
-                                     && (ref($t) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($s) && _is_aref($t);
   return 0 if @$s <= @$t;
   set_is_subset($s,$t);
 }
@@ -12331,16 +13503,24 @@ sub set_is_proper_superset {
 }
 sub set_is_proper_intersection {
   my($s,$t) = @_;
-  croak 'Not an array reference' unless (ref($s) || '') eq 'ARRAY'
-                                     && (ref($t) || '') eq 'ARRAY';
-  my $minsize = (scalar(@$s) < scalar(@$t)) ? scalar(@$s) : scalar(@$t);
-  my $intersize = scalar(@{Msetintersect($s,$t)});
+  croak 'Not an array reference' unless _is_aref($s) && _is_aref($t);
+  my($v,%ins);
+  for (@$s) {
+    validate_integer($v=$_);
+    $ins{$v} = undef;
+  }
+  my $intersize = 0;
+  for (@$t) {
+    validate_integer($v=$_);
+    $intersize++ if exists $ins{$v};
+  }
+  my $minsize = @$s < @$t ? scalar(@$s) : scalar(@$t);
   return ($intersize > 0 && $intersize < $minsize) ? 1 : 0;
 }
 
 sub is_sidon_set {
   my($ra) = @_;
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($ra);
 
   my %sums;
   my @S = @{Mtoset(@$ra)};  # Validated, sorted, deduped.
@@ -12358,7 +13538,7 @@ sub is_sidon_set {
 
 sub is_sumfree_set {
   my($ra) = @_;
-  croak 'Not an array reference' unless (ref($ra) || '') eq 'ARRAY';
+  croak 'Not an array reference' unless _is_aref($ra);
 
   my %ina;
   my @S = @{Mtoset(@$ra)};  # Validated, sorted, deduped.
@@ -12375,14 +13555,9 @@ sub is_sumfree_set {
 
 ###############################################################################
 
-sub foralmostprimes {
-  my($sub, $k, $lo, $hi) = @_;
-  validate_integer_nonneg($k);
-  return if $k == 0;
-  if (defined $hi) { validate_integer_nonneg($lo); }
-  else             { ($lo,$hi) = (1, $lo);         }
-  validate_integer_nonneg($hi);
-
+sub _foralmostprimes {
+  my($k, $sub, $lo, $hi) = @_;
+  return if $k == 0 || $k > Mlogint($hi, 2);
   $lo = Mvecmax($lo, Mpowint(2, $k));
   return if $lo > $hi;
 
@@ -12395,73 +13570,93 @@ sub foralmostprimes {
   if ($segsize < 5*1e6) { $segsize = 5e6; }
   # warn "  estcount $estcount   nsegs $nsegs   segsize $segsize\n";
 
-  my $oldforexit = Math::Prime::Util::_start_for_loop();
-  while ($lo <= $hi) {
-    my $seghi = Mvecmin($hi, Maddint($lo,$segsize)-1);
-    my $ap = Math::Prime::Util::almost_primes($k, $lo, $seghi);
-    #my $ap = [];  _genkap($lo, $seghi, $k, 1, 2, sub { push @$ap,$_[0]; });
-    # warn "  from $lo to $seghi found ",scalar(@$ap), " $k-almost-primes\n";
-    {
-      my $pp;
-      local *_ = \$pp;
-      for my $kap (@$ap) {
-        $pp = $kap;
-        $sub->();
-        last if Math::Prime::Util::_get_forexit();
+  _run_for_loop {
+    while ($lo <= $hi) {
+      my $seghi = Mvecmin($hi, Maddint($lo,$segsize)-1);
+      my $ap = Math::Prime::Util::almost_primes($k, $lo, $seghi);
+      #my $ap = [];  _genkap($lo, $seghi, $k, 1, 2, sub { push @$ap,$_[0]; });
+      # warn "  from $lo to $seghi found ",scalar(@$ap), " $k-almost-primes\n";
+      {
+        my $pp;
+        local *_ = \$pp;
+        for my $kap (@$ap) {
+          $pp = $kap;
+          $sub->();
+          last if Math::Prime::Util::_get_forexit();
+        }
       }
+      $lo = Madd1int($seghi);
+      last if Math::Prime::Util::_get_forexit();
     }
-    $lo = Madd1int($seghi);
-    last if Math::Prime::Util::_get_forexit();
-  }
-  Math::Prime::Util::_end_for_loop($oldforexit);
+  };
 }
 
+sub forsemiprimes(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  my($sub, $beg, $end) = _parse_forargs("forsemiprimes", 4, @_);
+  _foralmostprimes(2, $sub, $beg, $end);
+}
+sub foralmostprimes(&$$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  croak "foralmostprimes: expected sub, k, and 1 or 2 integers"
+    if @_ != 3 && @_ != 4;
+  my $k = splice(@_, 1, 1);
+  validate_integer_nonneg($k);
+  my ($sub, $beg, $end) = _parse_forargs("foralmostprimes", 1, @_);
+  _foralmostprimes($k, $sub, $beg, $end);
+}
 
 
 ###############################################################################
 #       Random numbers
 ###############################################################################
 
-# PPFE:  irand irand64 drand random_bytes csrand srand _is_csprng_well_seeded
+# PPFE:  irand irand32 irand64 drand random_bytes csrand srand _is_csprng_well_seeded
 sub urandomb {
   my($n) = @_;
+  validate_integer_nonneg($n);
+  croak "urandomb: bits must be between 0 and ",MAX_RANDOM_BITS if $n > MAX_RANDOM_BITS;
   return 0 if $n <= 0;
-  return ( Math::Prime::Util::irand() >> (32-$n) ) if $n <= 32;
-  return ( Math::Prime::Util::irand64() >> (64-$n) ) if MPU_MAXBITS >= 64 && $n <= 64;
-  my $bytes = Math::Prime::Util::random_bytes(($n+7)>>3);
-  return _frombinary( substr(unpack("B*",$bytes),0,$n) );
+  return ( Mirand32() >> (32-$n) ) if $n <= 32;
+  return ( Mirand64() >> (64-$n) ) if MPU_MAXBITS >= 64 && $n <= 64;
+  my $nbytes = ($n+7)>>3;
+  croak "urandomb: input too large" if $nbytes > 2147483646;
+  my $randstr = Math::Prime::Util::random_bytes($nbytes);
+  my $r = _frombytes($randstr);
+  $r >>= ($nbytes*8 - $n) if $n & 7;
+  return $r;
 }
 sub urandomm {
   my($n) = @_;
-  # validate_integer_nonneg($n);
-  return reftyped($_[0], Math::Prime::Util::GMP::urandomm($n))
-    if $Math::Prime::Util::_GMPfunc{"urandomm"};
+  validate_integer_positive($n);
   return 0 if $n <= 1;
   my $r;
   if ($n <= 4294967295) {
     my $rmin = (4294967295 - ($n-1)) % $n;
-    do { $r = Math::Prime::Util::irand(); } while $r < $rmin;
+    do { $r = Mirand32(); } while $r < $rmin;
   } elsif (!ref($n)) {
     my $rmin = (~0 - ($n-1)) % $n;
-    do { $r = Math::Prime::Util::irand64(); } while $r < $rmin;
+    do { $r = Mirand64(); } while $r < $rmin;
   } else {
-    # TODO: verify and try to optimize this
-    my $bytes = 1 + length(todigitstring($n,16));
-    my $rmax = Msub1int(Mpowint(2,$bytes*8));
+    my $nbytes   = (int(3.322*length("$n")) + 15) >> 3;
+    my $rmax     = Msub1int(Mpowint(2, $nbytes*8));
     my $overflow = $rmax - ($rmax % $n);
-    do { $r = Murandomb($bytes*8); } while $r >= $overflow;
+    do { $r = Murandomb($nbytes*8); } while $r >= $overflow;
   }
   return $r % $n;
 }
 
-sub random_prime {
-  my($low, $high) = @_;
-  if (scalar(@_) == 1) { ($low,$high) = (2,$low);       }
-  else                 { validate_integer_nonneg($low); }
-  validate_integer_nonneg($high);
+sub urandomr {
+  my($lo, $hi) = @_;
+  validate_integer($lo);
+  validate_integer($hi);
+  return undef if $lo > $hi;  ## no critic qw(ProhibitExplicitReturnUndef)
+  return canonicalized_integer($lo) if $lo == $hi;
+  Maddint($lo, Murandomm(Madd1int(Msubint($hi, $lo))));
+}
 
-  return reftyped($_[0], Math::Prime::Util::GMP::random_prime($low, $high))
-    if $Math::Prime::Util::_GMPfunc{"random_prime"};
+################################################################################
+
+sub random_prime {
+  my($low,$high) = _parse_range_args("random_prime",2,@_);
 
   require Math::Prime::Util::RandomPrimes;
   return Math::Prime::Util::RandomPrimes::random_prime($low,$high);
@@ -12470,51 +13665,127 @@ sub random_prime {
 sub random_ndigit_prime {
   my($digits) = @_;
   validate_integer_nonneg($digits);
-  croak "random_ndigit_prime digits must be >= 1" unless $digits >= 1;
-  return reftyped($_[0], Math::Prime::Util::GMP::random_ndigit_prime($digits))
-    if $Math::Prime::Util::_GMPfunc{"random_ndigit_prime"} && !getconfig()->{'nobigint'};
+  croak "random_ndigit_prime: digits must be between 1 and ",MAX_RANDOM_DIGITS if $digits < 1 || $digits > MAX_RANDOM_DIGITS;
+
+  return maybetobigint(Math::Prime::Util::GMP::random_ndigit_prime($digits))
+    if $Math::Prime::Util::_GMPfunc{"random_ndigit_prime"}
+    && $Math::Prime::Util::GMP::VERSION >= 0.54
+    && !getconfig()->{'nobigint'};
+
   require Math::Prime::Util::RandomPrimes;
   return Math::Prime::Util::RandomPrimes::random_ndigit_prime($digits);
 }
 sub random_nbit_prime {
   my($bits) = @_;
   validate_integer_nonneg($bits);
-  croak "random_nbit_prime bits must be >= 2" unless $bits >= 2;
-  return reftyped($_[0], Math::Prime::Util::GMP::random_nbit_prime($bits))
-    if $Math::Prime::Util::_GMPfunc{"random_nbit_prime"};
+  croak "random_nbit_prime: bits must be between 2 and ",MAX_RANDOM_BITS if $bits < 2 || $bits > MAX_RANDOM_BITS;
+
   require Math::Prime::Util::RandomPrimes;
   return Math::Prime::Util::RandomPrimes::random_nbit_prime($bits);
 }
 sub random_safe_prime {
   my($bits) = @_;
   validate_integer_nonneg($bits);
-  croak "random_safe_prime bits must be >= 3" unless $bits >= 3;
-  return reftyped($_[0], eval "Math::Prime::Util::GMP::random_safe_prime($bits)")  ## no critic qw(ProhibitStringyEval)
-    if $Math::Prime::Util::_GMPfunc{"random_safe_prime"};
+  croak "random_safe_prime: bits must be between 3 and ",MAX_RANDOM_BITS if $bits < 3 || $bits > MAX_RANDOM_BITS;
+
   require Math::Prime::Util::RandomPrimes;
   return Math::Prime::Util::RandomPrimes::random_safe_prime($bits);
 }
 sub random_strong_prime {
   my($bits) = @_;
   validate_integer_nonneg($bits);
-  croak "random_strong_prime bits must be >= 128" unless $bits >= 128;
-  return reftyped($_[0], eval "Math::Prime::Util::GMP::random_strong_prime($bits)")  ## no critic qw(ProhibitStringyEval)
-    if $Math::Prime::Util::_GMPfunc{"random_strong_prime"};
+  croak "random_strong_prime: bits must be between 128 and ",MAX_RANDOM_BITS if $bits < 128 || $bits > MAX_RANDOM_BITS;
+
   require Math::Prime::Util::RandomPrimes;
   return Math::Prime::Util::RandomPrimes::random_strong_prime($bits);
 }
 
+sub is_provable_prime {
+  my($n) = @_;
+  validate_integer($n);
+
+  return _is_bpsw_prime($n) ? 2 : 0
+    if Mcmpint($n,"18446744073709551615") <= 0;
+
+  my($is_prime, $cert) = Math::Prime::Util::is_provable_prime_with_cert($n);
+  $is_prime;
+}
+
+sub is_provable_prime_with_cert {
+  my($n) = @_;
+  validate_integer($n);
+  my $header = "[MPU - Primality Certificate]\nVersion 1.0\n\nProof for:\nN $n\n\n";
+
+  return _is_bpsw_prime($n) ? (2, $header . "Type Small\nN $n\n") : (0, '')
+    if Mcmpint($n,"18446744073709551615") <= 0;
+
+  return Math::Prime::Util::GMP::is_provable_prime_with_cert($n)
+    if $Math::Prime::Util::_GMPfunc{"is_provable_prime_with_cert"}
+       && $Math::Prime::Util::GMP::VERSION >= 0.14;
+
+  # Use extra-strong BPSW to reject composites before the proof step.
+  return (0, '') if Mis_prob_prime($n) == 0;
+
+  # Choice of methods for proof:
+  #   ECPP         needs a fair bit of programming work
+  #   APRCL        needs a lot of programming work
+  #   BLS75 combo  Corollary 11 of BLS75.  Trial factor n-1 and n+1 to B, find
+  #                factors F1 of n-1 and F2 of n+1.  Quit when:
+  #                B > (N/(F1*F1*(F2/2)))^1/3 or B > (N/((F1/2)*F2*F2))^1/3
+  #   BLS75 n+1    Requires factoring n+1 to (n/2)^1/3 (theorem 19)
+  #   BLS75 n-1    Requires factoring n-1 to (n/2)^1/3 (theorem 5 or 7)
+  #   Pocklington  Requires factoring n-1 to n^1/2 (BLS75 theorem 4)
+  #   Lucas        Easy, requires factoring of n-1 (BLS75 theorem 1)
+  #   AKS          horribly slow
+  # See http://primes.utm.edu/prove/merged.html or other sources.
+
+  require Math::Prime::Util::PrimalityProving;
+  return Math::Prime::Util::PrimalityProving::primality_proof_bls75($n);
+}
+
+
+# random_proven_prime* uses Maurer's method.  Policy decision.
+
 sub random_proven_prime {
   random_maurer_prime(@_);
+}
+sub random_proven_prime_with_cert {
+  random_maurer_prime_with_cert(@_);
+}
+
+
+sub random_maurer_prime_with_cert {
+  my($bits) = @_;
+  validate_integer_nonneg($bits);
+  croak "random_maurer_prime_with_cert: bits must be between 2 and ",MAX_RANDOM_BITS if $bits < 2 || $bits > MAX_RANDOM_BITS;
+
+  if ($Math::Prime::Util::_GMPfunc{"random_maurer_prime_with_cert"} && $bits > 32) {
+    my($n,$cert) = Math::Prime::Util::GMP::random_maurer_prime_with_cert($bits);
+    return (maybetobigint($n), $cert);
+  }
+
+  require Math::Prime::Util::RandomPrimes;
+  return Math::Prime::Util::RandomPrimes::random_maurer_prime_with_cert($bits);
+}
+
+sub random_shawe_taylor_prime_with_cert {
+  my($bits) = @_;
+  validate_integer_nonneg($bits);
+  croak "random_shawe_taylor_prime_with_cert: bits must be between 2 and ",MAX_RANDOM_BITS if $bits < 2 || $bits > MAX_RANDOM_BITS;
+
+  if ($Math::Prime::Util::_GMPfunc{"random_shawe_taylor_prime_with_cert"} && $bits > 32) {
+    my($n,$cert) = Math::Prime::Util::GMP::random_shawe_taylor_prime_with_cert($bits);
+    return (maybetobigint($n), $cert);
+  }
+
+  require Math::Prime::Util::RandomPrimes;
+  return Math::Prime::Util::RandomPrimes::random_shawe_taylor_prime_with_cert($bits);
 }
 
 sub random_maurer_prime {
   my($bits) = @_;
   validate_integer_nonneg($bits);
-  croak "random_maurer_prime bits must be >= 2" unless $bits >= 2;
-
-  return reftyped($_[0], Math::Prime::Util::GMP::random_maurer_prime($bits))
-    if $Math::Prime::Util::_GMPfunc{"random_maurer_prime"};
+  croak "random_maurer_prime: bits must be between 2 and ",MAX_RANDOM_BITS if $bits < 2 || $bits > MAX_RANDOM_BITS;
 
   require Math::Prime::Util::RandomPrimes;
   my ($n, $cert) = Math::Prime::Util::RandomPrimes::random_maurer_prime_with_cert($bits);
@@ -12527,10 +13798,7 @@ sub random_maurer_prime {
 sub random_shawe_taylor_prime {
   my($bits) = @_;
   validate_integer_nonneg($bits);
-  croak "random_shawe_taylor_prime bits must be >= 2" unless $bits >= 2;
-
-  return reftyped($_[0], Math::Prime::Util::GMP::random_shawe_taylor_prime($bits))
-    if $Math::Prime::Util::_GMPfunc{"random_shawe_taylor_prime"};
+  croak "random_shawe_taylor_prime: bits must be between 2 and ",MAX_RANDOM_BITS if $bits < 2 || $bits > MAX_RANDOM_BITS;
 
   require Math::Prime::Util::RandomPrimes;
   my ($n, $cert) = Math::Prime::Util::RandomPrimes::random_shawe_taylor_prime_with_cert($bits);
@@ -12540,45 +13808,14 @@ sub random_shawe_taylor_prime {
   return $n;
 }
 
-sub miller_rabin_random {
-  my($n, $k, $seed) = @_;
-  validate_integer($n);
-  if (scalar(@_) == 1 ) { $k = 1; } else { validate_integer_nonneg($k); }
-
-  return 0 if $n < 2;
-  return 1 if $k <= 0;
-
-  if ($Math::Prime::Util::_GMPfunc{"miller_rabin_random"}) {
-    return Math::Prime::Util::GMP::miller_rabin_random($n, $k, $seed) if defined $seed;
-    return Math::Prime::Util::GMP::miller_rabin_random($n, $k);
-  }
-
-  # getconfig()->{'assume_rh'})  ==>  2*log(n)^2
-  if ($k >= int(3*$n/4) ) {
-    for (2 .. int(3*$n/4)+2) {
-      return 0 unless Math::Prime::Util::is_strong_pseudoprime($n, $_);
-    }
-    return 1;
-  }
-  my $brange = $n-2;
-  return 0 unless Math::Prime::Util::is_strong_pseudoprime($n, Murandomm($brange)+2 );
-  $k--;
-  while ($k > 0) {
-    my $nbases = ($k >= 20) ? 20 : $k;
-    return 0 unless is_strong_pseudoprime($n, map { Murandomm($brange)+2 } 1 .. $nbases);
-    $k -= $nbases;
-  }
-  1;
-}
-
 sub random_semiprime {
   my($b) = @_;
   validate_integer_nonneg($b);
-  croak "random_semiprime bits must be >= 4" unless $b >= 4;
+  croak "random_semiprime: bits must be between 4 and ",MAX_RANDOM_BITS if $b < 4 || $b > MAX_RANDOM_BITS;
 
   my $n;
   my $min = Mpowint(2,$b-1);
-  my $max = $min + ($min - 1);
+  my $max = Maddint($min, $min - 1);
   my $L = $b >> 1;
   my $N = $b - $L;
   do {
@@ -12590,7 +13827,7 @@ sub random_semiprime {
 sub random_unrestricted_semiprime {
   my($b) = @_;
   validate_integer_nonneg($b);
-  croak "random_unrestricted_semiprime bits must be >= 3" unless $b >= 3;
+  croak "random_unrestricted_semiprime: bits must be between 3 and ",MAX_RANDOM_BITS if $b < 3 || $b > MAX_RANDOM_BITS;
 
   my $n;
   my $min = Mpowint(2,$b-1);
@@ -12636,7 +13873,7 @@ sub random_unrestricted_semiprime {
       127 => 0.0490620204315701,
     );
     my ($p,$r);
-    $r = Math::Prime::Util::drand();
+    $r = Mdrand();
     for my $prime (2..113,127) {
       next unless defined $M{$prime};
       my $PR = $M{$prime} / $b  +  0.19556 / $prime;
@@ -12658,7 +13895,7 @@ sub random_unrestricted_semiprime {
       my $weight = $M + log($b * log(2)/2);
       my $minr = log(log(131));
       do {
-        $r  = Math::Prime::Util::drand($weight) - $M;
+        $r  = Mdrand($weight) - $M;
       } while $r < $minr;
       my $a;
       if ($r <= 3.54) {
@@ -12698,16 +13935,45 @@ sub random_factored_integer {
     # first is n, last is 1
     @S = grep { Mis_prime($_) } @S[1 .. $#S-1];
     my $r = Mvecprod(@S);
-    return ($r, [@S]) if $r <= $n && (1+Murandomm($n)) <= $r;
+    return ($r, Mvecsorti(\@S)) if $r <= $n && (1+Murandomm($n)) <= $r;
   }
+}
+
+sub miller_rabin_random {
+  my($n, $k) = @_;
+  validate_integer($n);
+  if (scalar(@_) == 1 ) { $k = 1; } else { validate_integer_positive($k); }
+
+  return 0 if $n < 2;
+
+  # getconfig()->{'assume_rh'})  ==>  2*log(n)^2
+  my $maxk = Mdivint(Mmulint(3,$n),4);
+  if ($k >= $maxk) {
+    $maxk = Maddint($maxk,2);
+    for (my $b = 2; $b <= $maxk; $b = Madd1int($b)) {
+      return 0 unless Math::Prime::Util::is_strong_pseudoprime($n, $b);
+    }
+    return 1;
+  }
+  my $brange = $n-2;
+  return 0 unless Math::Prime::Util::is_strong_pseudoprime($n, Murandomm($brange)+2 );
+  $k--;
+  while ($k > 0) {
+    my $nbases = ($k >= 20) ? 20 : $k;
+    return 0 unless is_strong_pseudoprime($n, map { Murandomm($brange)+2 } 1 .. $nbases);
+    $k -= $nbases;
+  }
+  1;
 }
 
 ################################################################################
 
 sub prime_precalc {
   my($n) = @_;
-  croak "Parameter '$n' must be a non-negative integer" unless _is_nonneg_int($n);
+  validate_integer_nonneg($n);
+  croak "prime_precalc: n must fit in native unsigned integer" if $n > INTMAX;
   _expand_prime_cache($n);
+  return;
 }
 my @_free_subs;
 sub _register_free_sub {
@@ -12717,8 +13983,9 @@ sub prime_memfree {
   # Make the internal callbacks that reset cached data.
   $_->() for @_free_subs;
   # Call GMP's free if we have it
+  # Earlier versions do not guard repeated calls before module destruction.
   eval { Math::Prime::Util::GMP::_GMP_memfree(); }
-    if defined $Math::Prime::Util::GMP::VERSION && $Math::Prime::Util::GMP::VERSION >= 0.49;
+    if defined $Math::Prime::Util::GMP::VERSION && $Math::Prime::Util::GMP::VERSION >= 0.53;
 }
 sub _get_prime_cache_size { $_precalc_size }
 sub _prime_memfreeall { prime_memfree; }
@@ -12742,7 +14009,7 @@ Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 
 =head1 SYNOPSIS

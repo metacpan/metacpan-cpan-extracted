@@ -2,8 +2,7 @@
 use strict;
 use warnings;
 
-# If you're not using ancient perl 5.6.2 with super early releases of bigint,
-# then you can define bigint up here and not have to quote every number.
+# We could 'use bigint' up here and not have to quote every number.
 
 # Note: In 5.16.0 (and perhaps others?), using labels like "SKIP:" will create
 # a small memory leak.  So running the test suite through valgrind will show
@@ -11,7 +10,6 @@ use warnings;
 
 my $extra = 0+(defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING});
 my $use64 = ~0 > 4294967295;
-my $broken64 = (18446744073709550592 == ~0);
 
 use Test::More;
 
@@ -19,32 +17,28 @@ use Test::More;
 #   primality        very little we can do about it, we must test
 #   factoring        also must test though maybe can make faster?
 
-if ($broken64) {
-  # Perl from before 2002, built for 64-bit.  Not supported.
-  plan skip_all => "Broken 64-bit Perl, skipping all tests";
-} else {
-  plan tests =>  0
-               + 1   # basic int
-               + 1   # basic mod
-               + 1   # other mod
-               + 1   # gcd and lcm
-               + 1   # gcdext and chinese
-               + 1   # primality
-               + 1   # primes, twin primes, semiprimes, almost primes, etc.
-               + 1   # next/prev prime
-               + 1   # prime_iterator
-               + 1   # primecount and lower/upper/approx
-               + 1   # factoring
-               + 1   # znorder znprimroot znlog
-               + 1   # divisor_sum
-               + 5   # moebius, euler_phi, kronecker, valuation, etc.
-               + 1   # jordan_totient
-               + 1   # liouville
-               + 1   # ispower
-               + 1   # random primes
-               + 1   # vecequal
-               + 1;  # $_ didn't get changed
-}
+plan tests =>  0
+             + 1   # basic int
+             + 1   # basic mod
+             + 1   # other mod
+             + 1   # gcd and lcm
+             + 1   # gcdext and chinese
+             + 1   # primality
+             + 1   # primes, twin primes, semiprimes, almost primes, etc.
+             + 1   # next/prev prime
+             + 1   # prime_iterator
+             + 1   # primecount and lower/upper/approx
+             + 1   # factoring
+             + 1   # znorder znprimroot znlog
+             + 1   # divisor_sum
+             + 5   # moebius, euler_phi, kronecker, valuation, etc.
+             + 1   # jordan_totient
+             + 1   # liouville
+             + 1   # ispower
+             + 1   # random primes
+             + 1   # canonical bigint returns
+             + 1   # vecequal
+             + 1;  # $_ didn't get changed
 
 use Math::Prime::Util qw/
   prime_set_config
@@ -83,7 +77,14 @@ use Math::Prime::Util qw/
   gcdext
   chinese
   is_power
+  binomial
+  falling_factorial
+  multifactorial
   pn_primorial
+  vecsum
+  vecprod
+  vecmin
+  vecmax
   ExponentialIntegral
   LogarithmicIntegral
   RiemannR
@@ -105,6 +106,7 @@ use Math::Prime::Util qw/
   is_bpsw_prime
   valuation
   vecequal
+  toint
 /;
 # TODO:  ExponentialIntegral
 #        LogarithmicIntegral
@@ -360,11 +362,15 @@ subtest 'prime counts', sub {
 
   # test bounds for a number just outside of native size
   if ($use64) {
-    check_pcbounds(31415926535897932384, 716115441142294636, '2e-8', '2e-8');
+    # pi(24^14) = 483929161968458535
+    check_pcbounds(24**14, 483929162003980420, '2e-8', '2e-8');
   } else {
     check_pcbounds(12345678901, 556442213, '1e-5', '1e-5');
   }
   if ($extra) {
+    # pi(31415926535897932384) = 716115441142294636
+    check_pcbounds(31415926535897932384, 716115441142294636, '2e-8', '2e-8');
+    # pi(314159265358979323846) = 6803848951471218259
     check_pcbounds(314159265358979323846, 6803848951392700268, '5e-9', '5e-9');
     check_pcbounds(31415926535897932384626433, 544551456607147153724423, '3e-6', '3e-11');
     # pi(10^23) = 1925320391606803968923
@@ -388,6 +394,13 @@ subtest 'factoring', sub {
   ($n,@f) = (23489223467134234890234680, 2,2,2,5,4073,4283,33662485846146713);
   is_deeply([factor_exp($n)],[linear_to_exp(@f)],"factor_exp($n)");
 
+  $n = "36893488147419103258";  # 2 * 18446744073709551629
+  @f = (2, toint("18446744073709551629"));
+  my @got = factor($n);
+  is_deeply([map {"$_"} @got], [map {"$_"} @f], "factor($n)");
+  is(ref($got[1]), ref($f[1]), "factor($n) large factor is canonical");
+  is(scalar(factor($n)), 2, "scalar factor($n)");
+
   is_deeply([map {"$_"} divisors(23489223467134234890234680)],
             [qw/1 2 4 5 8 10 20 40 4073 4283 8146 8566 16292 17132 20365 21415 32584 34264 40730 42830 81460 85660 162920 171320 17444659 34889318 69778636 87223295 139557272 174446590 348893180 697786360 33662485846146713 67324971692293426 134649943384586852 168312429230733565 269299886769173704 336624858461467130 673249716922934260 1346499433845868520 137107304851355562049 144176426879046371779 274214609702711124098 288352853758092743558 548429219405422248196 576705707516185487116 685536524256777810245 720882134395231858895 1096858438810844496392 1153411415032370974232 1371073048513555620490 1441764268790463717790 2742146097027111240980 2883528537580927435580 5484292194054222481960 5767057075161854871160 587230586678355872255867 1174461173356711744511734 2348922346713423489023468 2936152933391779361279335 4697844693426846978046936 5872305866783558722558670 11744611733567117445117340 23489223467134234890234680/],
             "divisors(23489223467134234890234680)");
@@ -401,7 +414,7 @@ subtest 'znorder znprimroot znlog', sub {
   #    4360156780036190093445833597286118936800,
   #    "znorder" );
   is("".znorder(8267,927208363107752634625925),2838011904800209433220,"znorder(8267,927208363107752634625925)");
-  is(znorder(902,827208363107752634625947),undef,"znorder(902,827208363107752634625947");
+  is(znorder(902,827208363107752634625947),undef,"znorder(902,827208363107752634625947)");
 
   is( znprimroot(2985417419712080156311), 12, "znprimroot(2985417419712080156311)" );
 
@@ -439,12 +452,12 @@ subtest 'jordan totient', sub {
   my $n = 438200690176361625211;
   is( "".jordan_totient(3,$n), 84124269617190384716582485856111491726462952451043939343099904, "jordan_totient(3,$n)" );
   $n = 1876829427493875207697;
-  is( divisor_sum( $n, sub { my $d=shift; $d**5 * moebius($n/$d); }), 23287561853962265648116308453678279123352511321660254762457516668293390975559516726247126212641359652904000, "jordan totient using divisor_sum and moebius" );
+  is( "".divisor_sum( $n, sub { my $d=shift; powint($d,5) * moebius(divint($n,$d)); }), 23287561853962265648116308453678279123352511321660254762457516668293390975559516726247126212641359652904000, "jordan totient using divisor_sum and moebius" );
 
   if ($extra) {
     my $n = 48981631802481400359696467;
-    is( jordan_totient(5,$n), 281946200770875813001683560563488308767928594805846855593191749929654015729263525162226378019837608857421063724603387506651820000, "jordan_totient(5,$n)" );
-    is( divisor_sum( $n, sub { my $d=shift; $d**5 * moebius($n/$d); }), "281946200770875813001683560563488308767928594805846855593191749929654015729263525162226378019837608857421063724603387506651820000", "jordan totient using divisor_sum and moebius" );
+    is( "".jordan_totient(5,$n), 281946200770875813001683560563488308767928594805846855593191749929654015729263525162226378019837608857421063724603387506651820000, "jordan_totient(5,$n)" );
+    is( "".divisor_sum( $n, sub { my $d=shift; powint($d,5) * moebius(divint($n,$d)); }), "281946200770875813001683560563488308767928594805846855593191749929654015729263525162226378019837608857421063724603387506651820000", "jordan totient using divisor_sum and moebius" );
   }
 };
 
@@ -466,7 +479,7 @@ subtest 'is_power', sub {
     my $n = 7 ** $_;
     push @gotpow0, is_power("-$n");
     push @gotpow, is_power("-$n", int("0"), \$r);
-    push @gotroot, $r;
+    push @gotroot, defined $r ? "$r" : undef;
     my $p = $gotpow[-1];
     push @exproot, $p == 0 ? undef : -(7 ** int($_/$p));
   }
@@ -524,13 +537,53 @@ subtest 'random primes', sub {
   # Failure and shortcuts for MRR:
   ok(!eval { miller_rabin_random(undef,4); },   "MRR(undef,4)");
   ok(!eval { miller_rabin_random(10007,-4); },   "MRR(10007,-4)");
-  # Note use of 1-1 : bigint on perl 5.6 and 5.8 is totally borked
-  is(miller_rabin_random(10007, 1-1), 1, "MRR(n,0) = 1");
   is(miller_rabin_random(61, 17), 1, "MRR(61,17) = 1");
   is(miller_rabin_random(62, 17), 1-1, "MRR(62,17) = 0");
   is(miller_rabin_random(1009), 1, "MRR(1009) = 1");   # runs one random base
 
   } # ^^^ skipped without $extra
+};
+
+###############################################################################
+
+subtest 'canonical bigint returns', sub {
+  my $old_bigint = Math::Prime::Util::prime_get_config()->{bigintclass}
+                   || Math::Prime::Util::_load_bigint();
+
+  prime_set_config(trybigint => 'Math::GMPz,Math::GMP');
+  my $new_bigint = Math::Prime::Util::prime_get_config()->{bigintclass};
+
+  plan skip_all => "No alternate bigint class available"
+    if !defined($new_bigint) || $new_bigint eq 'Math::BigInt';
+
+  my $n = Math::BigInt->new("123456789012345678901234567890");
+  my $p2 = 2 * Math::BigInt->new("18446744073709551629");
+  my @tests = (
+    [ "toint leading zeros",       toint("000000000000000000000$n"), $n ],
+    [ "toint plus leading zeros",  toint("+000000000000000000000$n"), $n ],
+    [ "toint minus leading zeros", toint("-000000000000000000000$n"), "-$n" ],
+    [ "vecsum single",          vecsum($n),                   $n ],
+    [ "vecprod single",         vecprod($n),                  $n ],
+    [ "vecmin single",          vecmin($n),                   $n ],
+    [ "vecmax single",          vecmax($n),                   $n ],
+    [ "binomial n choose 1",    binomial($n,1),               $n ],
+    [ "falling_factorial n,1",  falling_factorial($n,1),      $n ],
+    [ "multifactorial k > n",   multifactorial($n,$n+1),      $n ],
+    [ "divisor_sum callback",   divisor_sum($p2, sub { $_[0] }),
+                                                             "55340232221128654890" ],
+  );
+
+  for my $t (@tests) {
+    my($name, $got, $expect) = @$t;
+    is("".ref($got).":$got","$new_bigint:$expect","$name returns canonical bigint");
+  }
+
+  my $bigint = $n->copy;
+  eval { modint($bigint, 0) };
+  like($@, qr/^modint: divide by zero/,
+       "modint traps zero before calling bigint overload");
+
+  prime_set_config(bigint => $old_bigint);
 };
 
 ###############################################################################

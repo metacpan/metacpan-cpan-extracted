@@ -4,6 +4,7 @@
 
 #define FUNC_isqrt 1
 #define FUNC_ipow 1
+#define FUNC_lcm_ui 1
 #include "ptypes.h"
 #include "sort.h"
 #include "totients.h"
@@ -53,8 +54,10 @@ UV totient(UV n) {
 UV* range_totient(UV lo, UV hi) {
   UV i, count = hi-lo+1, *totients;
 
-  if (hi < lo || count == 0 || count > (Size_t)((SSize_t)-1))
+  if (hi < lo)
     croak("range_totient error hi %"UVuf" < lo %"UVuf"\n", hi, lo);
+  if (count == 0 || count > (UV)(MAX_SIZET / sizeof(*totients)))
+    croak("range_totient range %"UVuf"..%"UVuf" is too large\n", lo, hi);
 
   if (hi < 16) {
     static const uint8_t small_totients[] = {0,1,1,2,2,4,2,6,4,6,4,10,4,12,6,8};
@@ -127,7 +130,6 @@ UV* range_totient(UV lo, UV hi) {
 /******************************************************************************/
 
 
-#define HAVE_SUMTOTIENT_128 (BITS_PER_WORD == 64 && HAVE_UINT128)
 #if BITS_PER_WORD == 64
 #  define MAX_TOTSUM UVCONST(7790208950)
 #else
@@ -266,17 +268,34 @@ UV sumtotient(UV n) {
 
 
 
-#if HAVE_SUMTOTIENT_128
+#if HAVE_SUMTOTIENT128
+static uint32_t isqrt64(uint64_t n)
+{
+  uint64_t r = sqrt((double)n);
+  while (((uint128_t)r+1) * (r+1) <= n) r++;
+  while ((uint128_t)r * r > n) r--;
+  return (uint32_t)r;
+}
+
+static uint32_t icbrt64(uint64_t n)
+{
+  uint64_t r = pow((double)n, 1.0/3.0);
+  while (((uint128_t)r+1) * (r+1) * (r+1) <= n) r++;
+  while ((uint128_t)r * r * r > n) r--;
+  return (uint32_t)r;
+}
+
 #define _CACHED_SUMT128(x) \
   (((x)<csize)  ?  (uint128_t)cdata[x]  :  _sumt128((x), cdata, csize, thash))
 typedef struct {
-  UV         hsize;
-  UV        *nhash;  /* n value */
+  UV        hsize;
+  uint64_t *nhash;  /* n value */
   uint128_t *shash;  /* sum for n */
 } sumt_hash_128_t;
-static uint128_t _sumt128(UV n, const UV *cdata, UV csize, sumt_hash_128_t thash) {
+static uint128_t _sumt128(uint64_t n, const uint64_t *cdata, UV csize, sumt_hash_128_t thash) {
   uint128_t sum;
-  UV s, k, lim, hn;
+  uint64_t s, k, lim;
+  UV hn;
   uint32_t const probes = 16;
   uint32_t const hinc = 1 + ((n >> 8) & 15);  /* mitigate clustering */
   uint32_t hashk;
@@ -290,7 +309,7 @@ static uint128_t _sumt128(UV n, const UV *cdata, UV csize, sumt_hash_128_t thash
     hn = (hn+hinc < thash.hsize) ? hn+hinc : hn+hinc-thash.hsize;
   }
 
-  s = isqrt(n);
+  s = isqrt64(n);
   lim = n/(s+1);
 
   sum = ((uint128_t)n+1)/2 * (n|1);    /* (n*(n+1))/2 */
@@ -314,51 +333,65 @@ static uint128_t _sumt128(UV n, const UV *cdata, UV csize, sumt_hash_128_t thash
   return sum;
 }
 
-int sumtotient128(UV n, UV *hi_sum, UV *lo_sum) {
-  UV i, cbrtn, csize, hsize, *sumcache;
+bool sumtotient128(uint64_t n, uint128_t *sumout) {
+  UV i, cbrtn, csize, hsize;
+  UV *totients;
+  uint64_t csize64, *sumcache;
   uint128_t sum;
   sumt_hash_128_t thash;
 
-  if (n <= 2)  { *hi_sum = 0;  *lo_sum = n; return 1; }
+  if (n < 4000) {
+    *sumout = _sumtotient_direct((UV)n);
+    return 1;
+  }
   /* sumtotient(2^64-1) < 2^128, so we can't overflow. */
 
-  cbrtn = icbrt(n);
-  csize = 0.6 * cbrtn * cbrtn;
+  /* I tried the algorithm from https://arxiv.org/abs/2506.07386v1.
+   * It uses less memory, but it came out 2 to 5 times slower.
+   * Probably still worth investigating later. */
+
+  cbrtn = icbrt64(n);
+  csize64 = (uint64_t)(0.6 * (double)cbrtn * (double)cbrtn);
   hsize = 8 * cbrtn;         /* 12.5% filled with csize = 1 * n^(2/3) */
 
-  if (csize > 400000000U) {  /* Limit to 3GB */
-    csize = 400000000;
-    hsize = isqrt(n);
+  if (csize64 > 400000000U) {  /* Limit to 3GB + hsize on 64-bit */
+    csize64 = 400000000;
+    hsize = 12 * cbrtn;
   }
+  if (csize64 > (uint64_t)MAX_SSIZET / sizeof(uint64_t))
+    csize64 = (uint64_t)MAX_SSIZET / sizeof(uint64_t);
+  csize = (UV)csize64;
 
-  sumcache = range_totient(0, csize-1);
+  totients = range_totient(0, csize-1);
+  New(0, sumcache, csize, uint64_t);
+  sumcache[0] = totients[0];
+  if (csize > 1)
+    sumcache[1] = totients[1];
   for (i = 2; i < csize; i++)
-    sumcache[i] += sumcache[i-1];
+    sumcache[i] = sumcache[i-1] + totients[i];
+  Safefree(totients);
 
   /* Arguably we should expand the hash as it fills. */
   thash.hsize = next_prime( 16 + hsize );
-  Newz(0, thash.nhash, thash.hsize, UV);
-  New( 0, thash.shash, thash.hsize, uint128_t);
+  Newz(0, thash.nhash, thash.hsize, uint64_t);
+  thash.shash = (uint128_t*)mpu_aligned_alloc(thash.hsize,
+                                               sizeof(uint128_t),
+                                               sizeof(uint128_t));
 
   sum = _sumt128(n, sumcache, csize, thash);
-  *hi_sum = (sum >> 64) & UV_MAX;
-  *lo_sum = (sum      ) & UV_MAX;
+  *sumout = sum;
 
   if (_XS_get_verbose() >= 2) {
     UV filled = 0;
     for (i = 0; i < thash.hsize; i++)
       filled += (thash.nhash[i] != 0);
-    printf("  128-bit totsum   phi %6.1lfMB  hash size %6.1lfMB, fill: %6.2lf%%\n", csize*sizeof(UV)/1048576.0, thash.hsize*3*sizeof(UV)/1048576.0, 100.0 * (double)filled / (double)thash.hsize);
+    printf("  128-bit totsum   phi %6.1lfMB  hash size %6.1lfMB, fill: %6.2lf%%\n", csize*(sizeof(UV)+sizeof(uint64_t))/1048576.0, thash.hsize*(sizeof(uint64_t)+sizeof(uint128_t))/1048576.0, 100.0 * (double)filled / (double)thash.hsize);
   }
 
   Safefree(thash.nhash);
-  Safefree(thash.shash);
+  mpu_aligned_free(thash.shash);
   Safefree(sumcache);
   return 1;
-}
-#else
-int sumtotient128(UV n, UV *hi_sum, UV *lo_sum) {
-  return 0;
 }
 #endif
 
@@ -379,7 +412,7 @@ UV jordan_totient(UV k, UV n) {
   UV totient;
 
   if (k == 0 || n <= 1) return (n == 1);
-  if (k > 6 || (k > 1 && n >= jordan_overflow[k-2])) return 0;
+  if (k > 6 || (k > 1 && n >= jordan_overflow[k-2])) return UV_MAX;
 
   totient = 1;
   /* Similar to Euler totient, shortcut even inputs */
@@ -398,6 +431,68 @@ UV jordan_totient(UV k, UV n) {
   return totient;
 }
 
+/******************************************************************************/
+
+UV carmichael_lambda(UV n) {
+  const unsigned char _totient[8] = {0,1,1,2,2,4,2,6};
+  uint32_t i;
+  UV lambda = 1;
+
+  if (n < 8) return _totient[n];
+  if ((n & (n-1)) == 0) return n >> 2;
+
+  i = ctz(n);
+  if (i > 0) {
+    n >>= i;
+    lambda <<= (i>2) ? i-2 : i-1;
+  }
+  {
+#if 1 /* This is very slightly faster */
+    UV fac[MPU_MAX_FACTORS+1];
+    uint32_t nfactors = factor(n, fac);
+    for (i = 0; i < nfactors; i++) {
+      UV p = fac[i], pk = p-1;
+      while (i+1 < nfactors && p == fac[i+1]) {
+        i++;
+        pk *= p;
+      }
+      lambda = lcm_ui(lambda, pk);
+    }
+#else
+    factored_t nf = factorint(n);
+    for (i = 0; i < nf.nfactors; i++) {
+      UV p = nf.f[i], pk = p-1, e = nf.e[i];
+      while (e-- > 1)
+        pk *= p;
+      lambda = lcm_ui(lambda, pk);
+    }
+#endif
+  }
+  return lambda;
+}
+
+/******************************************************************************/
+
+UV dedekind_psi(UV n) {
+  UV factors[MPU_MAX_FACTORS+1];
+  UV result = 1, lastf = 0;
+  uint32_t i, nfactors;
+
+  if (n < 4) return n + (n>1);
+  nfactors = factor(n, factors);
+  for (i = 0; i < nfactors; i++) {
+    UV f = factors[i];
+    if (f == lastf) {
+      if (result > UV_MAX/f) return 0;
+      result *= f;
+    } else {
+      if (result > UV_MAX/(f+1)) return 0;
+      result *= (f+1);
+      lastf = f;
+    }
+  }
+  return result;
+}
 
 /******************************************************************************/
 
@@ -491,6 +586,7 @@ UV* inverse_totient_list(UV *ntotients, UV n) {
   set_list_t setlist, divlist;
   UV i, ndivisors, *divs, *tlist;
   UV *totlist = 0;
+  Size_t nvals = 0;
 
   if (n == 1) {
     New(0, totlist, 2, UV);
@@ -522,7 +618,11 @@ UV* inverse_totient_list(UV *ntotients, UV n) {
    *                                1145325184 with <= 16 divisors
    * 64-bit overflow:  2459565884898017280 < n <= 2772864768682229760.
    */
-  if (n >= (BITS_PER_WORD == 64 ? UVCONST(2459565884898017280) : 716636160UL)) {
+#if BITS_PER_WORD == 64
+  if (n >= UVCONST(2459565884898017280)) {
+#else
+  if (n >= UVCONST(716636160)) {
+#endif
     *ntotients = UV_MAX;
     return totlist;
   }
@@ -540,7 +640,7 @@ UV* inverse_totient_list(UV *ntotients, UV n) {
       for (j = 0; j <= v; j++) {
         UV k, ndiv = n/dp;  /* Loop over divisors of n/dp */
         for (k = 0; k < ndivisors && divs[k] <= ndiv; k++) {
-          UV nvals, *vals, d2 = divs[k];
+          UV *vals, d2 = divs[k];
           if ((ndiv % d2) != 0) continue;
           /* For the last divisor [1], don't add intermediate values */
           if (d == 1 && d2*dp != n) continue;
@@ -557,11 +657,13 @@ UV* inverse_totient_list(UV *ntotients, UV n) {
   }
   Safefree(divs);
 
-  tlist = setlist_getlist(ntotients, setlist, n);
-  if (tlist != 0 && *ntotients > 0) {
-    New(0, totlist, *ntotients, UV);
-    memcpy(totlist, tlist, *ntotients * sizeof(UV));
-    sort_uv_array(totlist, *ntotients);
+  tlist = setlist_getlist(&nvals, setlist, n);
+  MPUassert(nvals <= UV_MAX, "inverse totient list is too large");
+  *ntotients = (UV)nvals;
+  if (tlist != 0 && nvals > 0) {
+    New(0, totlist, nvals, UV);
+    memcpy(totlist, tlist, nvals * sizeof(UV));
+    sort_uv_array(totlist, nvals);
   }
   free_setlist(&setlist);
   return totlist;

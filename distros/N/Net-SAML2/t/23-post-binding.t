@@ -40,8 +40,8 @@ lives_ok(sub {
     my $b = Net::SAML2::Binding::POST->new(insecure_trust_embedded_cert => 1);
     # decode_base64('') -> '' -> verify_xml('') will fail downstream,
     # but the trust-anchor check should pass. Trap downstream error.
-    my $override = Sub::Override->new(
-        'MIME::Base64::decode_base64' => sub :prototype($) { return '' }
+    my $override = Sub::Override->override(
+        'MIME::Base64::decode_base64' => sub ($) { return '' }
     );
     $override->override('Net::SAML2::Binding::POST::verify_xml' => sub { return 0 });
     $b->handle_response('');

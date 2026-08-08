@@ -104,7 +104,7 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
       );
     }
     elsif ($TYPE eq 'dancer2') {
-      test_needs('Dancer2::Core::Request');
+      test_needs({ 'Dancer2::Core::Request' => '2.1.0' });
       $req = Dancer2::Core::Request->new(env => $req->env);
     }
   }
@@ -160,7 +160,7 @@ sub response ($code, $headers = [], $body_content = undef) {
     $res->headers->push_header(@$_) foreach pairs @$headers;
   }
   elsif ($TYPE eq 'dancer2') {
-    test_needs('Dancer2::Core::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
+    test_needs({ 'Dancer2::Core::Response' => '2.1.0' }, 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
     die 'HTTP::Headers::Fast::XS is buggy and should not be used' if eval { HTTP::Headers::Fast::XS->VERSION };
 
     $res = Dancer2::Core::Response->new(

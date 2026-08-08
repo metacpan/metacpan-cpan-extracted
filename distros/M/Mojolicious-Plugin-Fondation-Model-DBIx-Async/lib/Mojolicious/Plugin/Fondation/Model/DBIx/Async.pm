@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Model::DBIx::Async;
-$Mojolicious::Plugin::Fondation::Model::DBIx::Async::VERSION = '0.05';
+$Mojolicious::Plugin::Fondation::Model::DBIx::Async::VERSION = '0.06';
 # ABSTRACT: Fondation plugin exposing DBIx::Class::Async natively
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -336,7 +336,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async - Fondation plugin exposing D
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

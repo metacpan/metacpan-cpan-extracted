@@ -22,7 +22,7 @@ use Data::Identifier::Generate v0.25;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.22;
+our $VERSION = v0.23;
 
 use parent 'Data::URIID::Base';
 
@@ -657,7 +657,7 @@ sub _own_well_known {
         foreach my $colour (@{$list}) {
             my ($name, $uuid, $displaycolour) = @{$colour};
             my $e = ($own_well_known{uuid}{$uuid} //= {})->{attributes} //= {};
-            my $colour_object = Data::URIID::Colour->new(rgb => $displaycolour, register => 1);
+            my $colour_object = Data::URIID::Colour->new(rgb => $displaycolour)->register;
 
             if (defined $name) {
                 $e->{displayname} //= {};
@@ -843,6 +843,7 @@ sub _extra_lookup_services {
         'ruthede'               => ['ruthede-comic-post-identifier'],
         'danbooru2chanjp'       => ['danbooru2chanjp-post-identifier'],
         'denkxweb-hessen'       => ['denkxweb-hessen-identifier'],
+        'ibbco'                 => ['ibbco-identifier'],
     }
 }
 
@@ -1609,6 +1610,19 @@ sub _online_lookup__denkxweb_hessen {
     return \%res;
 }
 
+sub _online_lookup__ibbco {
+    my ($self, $result, %opts) = @_;
+    my $html = $self->_get_html($result->url(service => 'ibbco', action => 'info')) // return undef;
+    my %attr;
+    my %res = (attributes => \%attr);
+
+    foreach my $node ($html->findnodes('/html/body//img[@alt and @width and @height]')) {
+        $attr{thumbnail} = {'*' => URI->new($node->attr('src'))};
+    }
+
+    return \%res;
+}
+
 # --- Overrides for Data::URIID::Base ---
 
 sub displayname {
@@ -1634,7 +1648,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.22
+version v0.23
 
 =head1 SYNOPSIS
 

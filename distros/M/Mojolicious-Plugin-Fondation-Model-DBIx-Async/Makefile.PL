@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Mojolicious::Plugin::Fondation" => "0.07",
     "SQL::Translator" => "0.11018"
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }

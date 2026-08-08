@@ -1,0 +1,7 @@
+{
+   "automated_actions" : "code_request",
+   "automated_contributions" : "code_request",
+   "code_generation" : "machine_generated",
+   "distribution" : "Catalyst-View-ChromePDF-v0.1.0",
+   "version" : 1
+}

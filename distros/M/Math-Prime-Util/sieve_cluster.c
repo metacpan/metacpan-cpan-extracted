@@ -7,14 +7,16 @@
 #include "ptypes.h"
 #include "util.h"
 #include "primality.h"
+#include "constants.h"
 
+/* sprimes is an array of primes 2 to 997. */
 #define NSMALLPRIMES 168
 #define MAXSMALLPRIME 997
-static const unsigned short sprimes[NSMALLPRIMES] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997};
+static const unsigned short *sprimes = primes_small+1;
 
 typedef struct {
-  uint32_t nmax;
-  uint32_t nsize;
+  size_t nmax;
+  size_t nsize;
   UV* list;
 } vlist;
 #define INIT_VLIST(v) \
@@ -23,8 +25,10 @@ typedef struct {
   New(0, v.list, v.nmax, UV);
 #define PUSH_VLIST(v, n) \
   do { \
-    if (v.nsize >= v.nmax) \
-      Renew(v.list, v.nmax += 100, UV); \
+    if (v.nsize >= v.nmax) { \
+      v.nmax += (v.nmax < 200 ? 100 : v.nmax < 600 ? 400 : 800); \
+      Renew(v.list, v.nmax, UV); \
+    } \
     v.list[v.nsize++] = n; \
   } while (0)
 
@@ -122,12 +126,13 @@ UV* sieve_cluster(UV low, UV high, uint32_t nc, const uint32_t* cl, UV* numret)
   uint32_t c, smallnc;
   char crem_0[43*47], crem_1[53*59], crem_2[61*67], **VPrem;
 
+  if (nc < 2 || low > high)
+    return sieve_cluster_simple(low, high, nc, cl, numret);
   if ((UV_MAX - cl[nc-1]) < high)  return 0;  /* Overflow */
 
   if (    ((high-low) < 10000)
        || (nc == 3 && ((high>>31) >> 16) == 0) /* sieving large vals is slow */
-       || (nc == 2 && ((high>>31) >> 27) == 0)
-       || (nc < 2) )
+       || (nc == 2 && ((high>>31) >> 27) == 0) )
     return sieve_cluster_simple(low, high, nc, cl, numret);
 
   if (!(low&1))    low++;
@@ -215,26 +220,32 @@ UV* sieve_cluster(UV low, UV high, uint32_t nc, const uint32_t* cl, UV* numret)
     memset(crem_1, 1, pp_1);
     memset(crem_2, 1, pp_2);
     /* Mark remainders that indicate a composite for this residue. */
-    for (i = 0; i < p1; i++) { crem_0[i*p1]=0; crem_0[i*p2]=0; }
-    for (     ; i < p2; i++) { crem_0[i*p1]=0;                }
-    for (i = 0; i < p3; i++) { crem_1[i*p3]=0; crem_1[i*p4]=0; }
-    for (     ; i < p4; i++) { crem_1[i*p3]=0;                }
-    for (i = 0; i < p5; i++) { crem_2[i*p5]=0; crem_2[i*p6]=0; }
-    for (     ; i < p6; i++) { crem_2[i*p5]=0;                }
+    for (i = 0; i < pp_0; i += p1) crem_0[i] = 0;
+    for (i = 0; i < pp_0; i += p2) crem_0[i] = 0;
+    for (i = 0; i < pp_1; i += p3) crem_1[i] = 0;
+    for (i = 0; i < pp_1; i += p4) crem_1[i] = 0;
+    for (i = 0; i < pp_2; i += p5) crem_2[i] = 0;
+    for (i = 0; i < pp_2; i += p6) crem_2[i] = 0;
     for (c = 1; c < nc; c++) {
       uint32_t c1=cl[c], c2=cl[c], c3=cl[c], c4=cl[c], c5=cl[c], c6=cl[c];
       if (c1 >= p1) c1 %= p1;
       if (c2 >= p2) c2 %= p2;
-      for (i = 1; i <= p1; i++) { crem_0[i*p1-c1]=0; crem_0[i*p2-c2]=0; }
-      for (     ; i <= p2; i++) { crem_0[i*p1-c1]=0;                   }
+      c1 = (c1 == 0) ? 0 : p1-c1;
+      c2 = (c2 == 0) ? 0 : p2-c2;
+      for (i = c1; i < pp_0; i += p1) crem_0[i] = 0;
+      for (i = c2; i < pp_0; i += p2) crem_0[i] = 0;
       if (c3 >= p3) c3 %= p3;
       if (c4 >= p4) c4 %= p4;
-      for (i = 1; i <= p3; i++) { crem_1[i*p3-c3]=0; crem_1[i*p4-c4]=0; }
-      for (     ; i <= p4; i++) { crem_1[i*p3-c3]=0;                   }
+      c3 = (c3 == 0) ? 0 : p3-c3;
+      c4 = (c4 == 0) ? 0 : p4-c4;
+      for (i = c3; i < pp_1; i += p3) crem_1[i] = 0;
+      for (i = c4; i < pp_1; i += p4) crem_1[i] = 0;
       if (c5 >= p5) c5 %= p5;
       if (c6 >= p6) c6 %= p6;
-      for (i = 1; i <= p5; i++) { crem_2[i*p5-c5]=0; crem_2[i*p6-c6]=0; }
-      for (     ; i <= p6; i++) { crem_2[i*p5-c5]=0;                   }
+      c5 = (c5 == 0) ? 0 : p5-c5;
+      c6 = (c6 == 0) ? 0 : p6-c6;
+      for (i = c5; i < pp_2; i += p5) crem_2[i] = 0;
+      for (i = c6; i < pp_2; i += p6) crem_2[i] = 0;
     }
     New(0, resmod_0, nres, uint32_t);
     New(0, resmod_1, nres, uint32_t);
@@ -247,8 +258,7 @@ UV* sieve_cluster(UV low, UV high, uint32_t nc, const uint32_t* cl, UV* numret)
   }
 
   /* Precalculate acceptable residues for more primes */
-  New(0, VPrem, maxpi, char*);
-  memset(VPrem, 0, maxpi);
+  Newz(0, VPrem, maxpi, char*);
   for (pi = startpi+6; pi < maxpi; pi++) {
     uint32_t p = sprimes[pi];
     New(0, VPrem[pi], p, char);
@@ -260,7 +270,10 @@ UV* sieve_cluster(UV low, UV high, uint32_t nc, const uint32_t* cl, UV* numret)
     prem[0] = 0;
     while (smallnc < nc && cl[smallnc] < p)   smallnc++;
     for (c = 1; c < smallnc; c++) prem[p-cl[c]] = 0;
-    for (     ; c <      nc; c++) prem[p-(cl[c]%p)] = 0;
+    for (     ; c <      nc; c++) {
+      uint32_t rem = cl[c] % p;
+      prem[(rem == 0) ? 0 : p-rem] = 0;
+    }
   }
 
   New(0, cres, nres, UV);
@@ -272,11 +285,12 @@ UV* sieve_cluster(UV low, UV high, uint32_t nc, const uint32_t* cl, UV* numret)
   /* Loop over their range in chunks of size 'ppr' */
   while (low <= high) {
     uint32_t r, nr, remr, ncres;
+    UV maxres = high-low;
 
     /* Reduce the allowed residues for this chunk using more primes */
 
     { /* Start making a list of this chunk's residues using three pairs */
-      for (r = 0, ncres = 0; r < nres; r++) {
+      for (r = 0, ncres = 0; r < nres && residues[r] <= maxres; r++) {
         addmodded(remr, rem_0, resmod_0[r], pp_0);
         if (crem_0[remr]) {
           addmodded(remr, rem_1, resmod_1[r], pp_1);
@@ -318,7 +332,6 @@ UV* sieve_cluster(UV low, UV high, uint32_t nc, const uint32_t* cl, UV* numret)
     /* Now check each of the remaining residues for inclusion */
     for (r = 0; r < ncres; r++) {
       UV p = low + cres[r];
-      if (p > high) break;
       /* PRP test.  Split to save time. */
       for (c = 0; c < nc; c++)
         if (num_mr++,!is_euler_plumb_pseudoprime(p+cl[c]))
@@ -330,6 +343,7 @@ UV* sieve_cluster(UV low, UV high, uint32_t nc, const uint32_t* cl, UV* numret)
       if (c < nc) continue;
       PUSH_VLIST(retlist, p);
     }
+
     low += ppr;
     if (low < ppr) low = UV_MAX;
   }

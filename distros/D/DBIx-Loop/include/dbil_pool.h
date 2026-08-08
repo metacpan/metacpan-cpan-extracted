@@ -16,10 +16,12 @@
 
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <sys/resource.h>
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #include "dbil_vt.h"   /* the pure-C loop seam (adapter vtable) */
 
@@ -158,6 +160,7 @@ typedef struct dbil_worker {
 } dbil_worker;
 
 typedef struct dbil_pool {
+    pid_t        pid;         /* the process that forked these workers */
     SV          *loop;        /* the loop adapter SV (+1)   */
     dbil_vt     *vt;          /* adapter's C vtable, or NULL (Perl seam) */
     SV          *cargs;       /* connect args arrayref (+1) */
@@ -169,9 +172,48 @@ typedef struct dbil_pool {
     AV          *acq;         /* futures waiting to acquire a slot (+1 each) */
 } dbil_pool;
 
+/* ---- fork ownership --------------------------------------------------------
+ *
+ * A pool belongs to the process that forked its workers, and to no other. If
+ * that process forks - which is exactly what a preforking server does - the
+ * child inherits `p`, the worker pids and, worst of all, the parent's ends of
+ * the socketpairs. Two processes then read() the same socket, so a response
+ * lands in whichever happens to read first and a request can be answered with
+ * ANOTHER request's rows. And on the child's exit, dbil_pool_free would
+ * kill(SIGTERM) workers the parent and every sibling are still using.
+ *
+ * So: every entry point checks the owning pid, and an inherited pool is
+ * disowned - its fds closed and its memory freed, its processes left alone -
+ * and rebuilt for this process. dbil_pool_owned() is the one predicate. */
+static int dbil_pool_owned(const dbil_pool *p) {
+    return p && p->pid == getpid();
+}
+
 static void dbil_worker_main(pTHX_ int fd, SV *cargs);   /* child; below */
 static void dbil_pool_dispatch(pTHX_ dbil_pool *p, int wi);
 static void dbil_pool_on_readable(pTHX_ dbil_pool *p, int wi);
+/* dbil_pool_send needs this: a failed write is a death notice, and the slot
+ * has to be taken out of service there and then. */
+static void dbil_pool_worker_died(pTHX_ dbil_pool *p, int wi);
+
+/* In a freshly forked worker: close every descriptor except stdio and `keep`.
+ * Called before any Perl runs in the child, so nothing here can be observed by
+ * a DESTROY or an END block. */
+static void dbil_close_inherited_fds(int keep) {
+    int max = -1;
+#ifdef RLIMIT_NOFILE
+    struct rlimit rl;
+    if (getrlimit(RLIMIT_NOFILE, &rl) == 0 && rl.rlim_cur != RLIM_INFINITY)
+        max = (int)rl.rlim_cur;
+#endif
+    if (max < 0) max = (int)sysconf(_SC_OPEN_MAX);
+    if (max < 0 || max > 4096) max = 4096;      /* bounded: this is a loop */
+    {
+        int fd;
+        for (fd = 3; fd < max; fd++)
+            if (fd != keep) (void)close(fd);
+    }
+}
 
 /* the C-vtable read-ready callback: ud is the worker itself, no Perl frame */
 static void dbil_pool_reader_c(pTHX_ int fd, int mask, void *ud) {
@@ -210,10 +252,23 @@ static int dbil_pool_spawn(pTHX_ dbil_pool *p, int wi) {
         close(sp[0]);
         for (j = 0; j < wi; j++)          /* drop siblings' parent fds so their */
             if (p->w[j].fd >= 0) close(p->w[j].fd);   /* EOF is seen when they die */
+        /* Drop everything else this process inherited. A DB worker needs one
+         * fd - its end of the socketpair - and nothing more. Without this it
+         * holds a duplicate of whatever the embedding program had open, and in
+         * a web server that includes the listening socket: the port then stays
+         * bound for the worker's whole life, long after the HTTP worker that
+         * started it has exited, and a graceful drain that waits for the last
+         * holder to close never completes. */
+        dbil_close_inherited_fds(sp[1]);
         dbil_worker_main(aTHX_ sp[1], p->cargs);   /* never returns */
         _exit(0);
     }
     close(sp[1]);
+    /* The parent's end must not survive an exec either. */
+    {
+        int fl = fcntl(sp[0], F_GETFD);
+        if (fl >= 0) (void)fcntl(sp[0], F_SETFD, fl | FD_CLOEXEC);
+    }
     w->pid    = pid;
     w->fd     = sp[0];
     w->busy   = 0;
@@ -304,16 +359,65 @@ static void dbil_worker_main(pTHX_ int fd, SV *cargs) {
 }
 
 /* send request bytes to worker wi and mark it busy with `future` (+1 taken) */
+/* Can anything still take general (non-transaction) work? */
+static int dbil_pool_has_live_worker(const dbil_pool *p) {
+    int wi;
+    for (wi = 0; wi < p->nw; wi++)
+        if (p->w[wi].fd >= 0 && !p->w[wi].reserved) return 1;
+    return 0;
+}
+
 static void dbil_pool_send(pTHX_ dbil_pool *p, int wi, SV *bytes, SV *future) {
     dbil_worker *w = &p->w[wi];
+    int reserved;
+
     w->busy   = 1;
     w->future = SvREFCNT_inc(future);
-    if (dbil_write_frame(aTHX_ w->fd, bytes) < 0) {
-        /* write failed: fail the future now */
-        w->busy = 0;
-        dbil_future_settle_fail(aTHX_ future,
-            sv_2mortal(newSVpvs("worker write failed")));
-        SvREFCNT_dec(w->future); w->future = NULL;
+    if (dbil_write_frame(aTHX_ w->fd, bytes) >= 0) return;
+
+    /* The write failed, so the frame did not arrive whole and the statement
+     * provably never ran: dbil_write_frame only returns < 0 having written
+     * less than all of it.
+     *
+     * What matters here is the SLOT, not this one request. A worker killed
+     * while idle is invisible until something is written to it - death is
+     * otherwise only ever noticed as EOF on the read side, and an idle
+     * worker's fd is not readable - so this is the first and only moment we
+     * learn about it. Leaving the slot alive meant dbil_pool_run kept
+     * choosing it, being the lowest-numbered idle worker with a live fd, and
+     * failed every future from then on while the healthy workers sat idle.
+     * Treat a failed write as the death notice it is. */
+    reserved = w->reserved;
+
+    if (!reserved) {
+        /* Nothing executed, so this is a retry and not a loss. Put it back at
+         * the head of the queue so it keeps its place, and let the respawn
+         * inside worker_died pick it up. */
+        SvREFCNT_dec(w->future);
+        w->future = NULL;
+        w->busy   = 0;
+        av_unshift(p->queue, 2);
+        av_store(p->queue, 0, newSVsv(bytes));
+        av_store(p->queue, 1, SvREFCNT_inc(future));
+    }
+    /* A reserved slot is a transaction pinned to that one connection. It
+     * cannot be moved, so leave the future in place for worker_died to fail
+     * alongside the rest of the transaction. */
+
+    dbil_pool_worker_died(aTHX_ p, wi);
+
+    /* Respawn is capped and can fail. If it did, and nothing is left to run
+     * on, fail what we just queued rather than leave callers waiting on a
+     * pool that can no longer answer. */
+    if (!reserved && !dbil_pool_has_live_worker(p)) {
+        while (av_len(p->queue) >= 1) {
+            SV *qb = av_shift(p->queue);
+            SV *qf = av_shift(p->queue);
+            SvREFCNT_dec(qb);
+            dbil_future_settle_fail(aTHX_ qf,
+                sv_2mortal(newSVpvs("pool has no live workers")));
+            SvREFCNT_dec(qf);
+        }
     }
 }
 
@@ -326,7 +430,7 @@ static SV *dbil_pool_run(pTHX_ dbil_pool *p, int is_query, SV *sql, AV *bind) {
         AV *req = newAV();
         av_push(req, newSViv(is_query));
         av_push(req, newSVsv(sql));
-        av_push(req, newRV_inc((SV *)(bind ? bind : newAV())));
+        av_push(req, dbil_bind_rv(aTHX_ bind));
         bytes = dbil_freeze(aTHX_ sv_2mortal(newRV_noinc((SV *)req)));
     }
     if (!bytes) {
@@ -536,6 +640,7 @@ static dbil_pool *dbil_pool_new(pTHX_ SV *loop, SV *cargs, int nworkers) {
     int i;
     dbil_storable_init(aTHX);
     Newxz(p, 1, dbil_pool);
+    p->pid   = getpid();                 /* the owner; see dbil_pool_owned */
     p->loop  = SvREFCNT_inc(loop);
     p->vt    = dbil_vt_of(aTHX_ loop);   /* C seam when the adapter has one */
     p->cargs = SvREFCNT_inc(cargs);
@@ -550,9 +655,54 @@ static dbil_pool *dbil_pool_new(pTHX_ SV *loop, SV *cargs, int nworkers) {
     return p;
 }
 
+/* Release an INHERITED pool: close the fds this process got by forking, free
+ * the memory, and leave the workers alone - they are not ours to signal, and
+ * the process that forked them is still using them. No futures are settled and
+ * no loop callbacks are removed, because none of that state belongs to us
+ * either; it is the parent's, and we are only holding copies of the pointers. */
+static void dbil_pool_disown(pTHX_ dbil_pool *p) {
+    int i;
+    if (!p) return;
+    for (i = 0; i < p->nw; i++) {
+        dbil_worker *w = &p->w[i];
+        if (w->fd >= 0) {
+            /* Unregister before closing. The loop object was copied by the
+             * fork, so this watcher list is OURS - the parent's is untouched -
+             * and a registration left behind here would still name this fd
+             * number after the close. The very next socketpair() hands that
+             * number straight back for the replacement pool, and the stale
+             * entry would then be pointing at this freed struct. */
+            if (!PL_dirty) {
+                if (p->vt) {
+                    p->vt->remove(aTHX_ p->vt->ctx, w->fd);
+                } else if (p->loop) {
+                    dSP;
+                    ENTER; SAVETMPS; PUSHMARK(SP);
+                    EXTEND(SP, 2); PUSHs(p->loop); mPUSHi(w->fd); PUTBACK;
+                    call_method("remove", G_VOID | G_DISCARD | G_EVAL);
+                    SPAGAIN; PUTBACK; FREETMPS; LEAVE;
+                }
+            }
+            close(w->fd);   /* our copy only; the parent keeps its own */
+        }
+        if (w->rbuf) SvREFCNT_dec(w->rbuf);
+        if (w->txq)  SvREFCNT_dec((SV *)w->txq);
+        if (w->future) SvREFCNT_dec(w->future);
+    }
+    Safefree(p->w);
+    if (p->acq)   SvREFCNT_dec((SV *)p->acq);
+    if (p->queue) SvREFCNT_dec((SV *)p->queue);
+    if (p->loop)  SvREFCNT_dec(p->loop);
+    if (p->cargs) SvREFCNT_dec(p->cargs);
+    Safefree(p);
+}
+
 static void dbil_pool_free(pTHX_ dbil_pool *p) {
     int i;
     if (!p) return;
+    /* Not ours: never signal another process's workers. This is the whole
+     * reason a child exiting used to take down the parent's pool. */
+    if (!dbil_pool_owned(p)) { dbil_pool_disown(aTHX_ p); return; }
     for (i = 0; i < p->nw; i++) {
         dbil_worker *w = &p->w[i];
         if (w->fd >= 0) {

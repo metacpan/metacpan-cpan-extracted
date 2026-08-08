@@ -6,18 +6,24 @@ use Test::More;
 use Math::Prime::Util qw/is_powerfree powerfree_count powerfree_sum
                          powerfree_part powerfree_part_sum nth_powerfree
                          squarefree_kernel is_square_free
-                         vecsum vecmax factor_exp/;
+                         vecsum vecmax factor_exp prime_get_config/;
 
 my @simple = (0 .. 16,
               758096738,434420340,870589313,695486396,602721315,418431087,
               752518565,723570005,506916483,617459403);
 
 my @neg = map { -$_ } (1..32);
+my $config = prime_get_config();
+my $usexs = $config->{'xs'};
+my $use64 = $config->{'maxbits'} > 32;
 
 plan tests => 3     # simple is square free
+            + 7     # negative n policy
+            + 6*2   # k validation
+            + 6*2   # oversized k validation
             + 11*2  # powerfree_count, powerfree_sum
             + 6+2   # ""
-            + 7     # nth_powerfree
+            + 9     # nth_powerfree
             + 2+8   # powerfree_part
             + 8*2   # powerfree_part_sum
             + 2;    # powerfree_part and squarefree_kernel
@@ -33,6 +39,42 @@ is_deeply( [map { is_powerfree($_)   } @simple, @neg],
 is_deeply( [map { is_powerfree($_,3) } @simple, @neg],
            [map { ipf($_,3)          } @simple, @neg],
            "is_powerfree(n,3) works for simple inputs" );
+
+##### negative n policy
+
+is(is_powerfree(-8,2), 0, "is_powerfree(-8,2) uses abs(n)");
+is(powerfree_count(-8,2), 0, "powerfree_count(-8,2) = 0");
+is(powerfree_sum(-8,2), 0, "powerfree_sum(-8,2) = 0");
+is(powerfree_part(-8,2), -2, "powerfree_part(-8,2) = -2");
+is(powerfree_part_sum(-8,2), 0, "powerfree_part_sum(-8,2) = 0");
+ok(!eval { nth_powerfree(-8,2); 1 }, "nth_powerfree rejects negative n");
+like($@, qr/non-negative integer/, "nth_powerfree negative n error");
+
+##### k validation
+
+for my $fname (qw/is_powerfree powerfree_count powerfree_sum
+                powerfree_part powerfree_part_sum nth_powerfree/) {
+  my $ok = eval {
+    no strict 'refs';
+    &{"Math::Prime::Util::$fname"}(8,-1);
+    1;
+  };
+  ok(!$ok, "$fname rejects negative k");
+  like($@, qr/non-negative integer/, "$fname negative k error");
+}
+
+##### oversized k validation
+
+for my $fname (qw/is_powerfree powerfree_count powerfree_sum
+                powerfree_part powerfree_part_sum nth_powerfree/) {
+  my $ok = eval {
+    no strict 'refs';
+    &{"Math::Prime::Util::$fname"}(8,"4294967296");
+    1;
+  };
+  ok(!$ok, "$fname rejects oversized k");
+  like($@, qr/k must be <= 4294967295/, "$fname oversized k error");
+}
 
 ##### powerfree_count and powerfree_sum
 
@@ -69,6 +111,16 @@ is(nth_powerfree("1000000",2), 1644918, "nth_powerfree(10^6,2) = 1644918");
 is(nth_powerfree("1000000",3), 1202057, "nth_powerfree(10^6,3) = 1202057");
 is(nth_powerfree("100000000",5), 103692775, "nth_powerfree(10^8,5) = 103692775");
 
+SKIP: {
+  skip "native nth_powerfree boundary tests", 2 unless $usexs;
+  my ($max_count, $max_uv, $k) = $use64
+    ? ("15345982395028449439", "18446744073709551615", 3)
+    : ("2611027094", "4294967295", 2);
+  is("".nth_powerfree($max_count,$k), $max_uv,
+     "nth_powerfree reaches the largest native value");
+  is("".nth_powerfree($max_uv,$config->{'maxbits'}), $max_uv,
+     "nth_powerfree handles a saturated initial estimate");
+}
 
 ##### powerfree_part
 

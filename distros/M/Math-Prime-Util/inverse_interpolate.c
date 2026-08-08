@@ -13,12 +13,9 @@ static const int _dbgprint = 0;
 
 
 /* Return x with v(x)=func(x,k) s.t. either of:
- *    1.  v(x) == n  and v(x-1-threshold) < n
+ *    1.  v(x) == n  and v(x-1-threshold) < n  [within supplied bounds]
  *    2.  v(x) < n   and v(x+1) > n
  */
-
-#define LINEAR_INTERP(n, lo, hi, rlo, rhi) \
-  (lo + (UV) (((double)(n-rlo) * (double)(hi-lo) / (double)(rhi-rlo))+0.5))
 
 #define MPU_CALLBACK(n)  ((funck) ? funck(n,k) : func(n))
 
@@ -27,11 +24,14 @@ static const int _dbgprint = 0;
   { \
     UV v = x; \
     UV rv = MPU_CALLBACK(v); \
-    /* printf("v  %lu    rv %lu   n %lu\n",v,rv,n); */\
+    /* printf("v  %"UVuf"    rv %"UVuf"   n %"UVuf"\n",v,rv,n); */\
     MPUassert( rv <= n, "BAD INTERP  v > n" ); \
     if (rv == n) { \
-      if (v > threshold) { \
-        /* printf("threshold %lu v %lu    func(%lu) = %lu\n", threshold, v, v-1-threshold, MPU_CALLBACK(v-1-threshold)); */\
+      /* Approximation callbacks may not be monotonic, so we must only    */ \
+      /* check inside the caller-supplied bounds.                         */ \
+      /* We lose the ability to detect lower bounds that were too high.   */ \
+      if (v > bound_lo && v-bound_lo > threshold) { \
+        /* printf("threshold %"UVuf" v %"UVuf"    func(%"UVuf") = %"UVuf"\n", threshold, v, v-1-threshold, MPU_CALLBACK(v-1-threshold)); */\
         MPUassert( MPU_CALLBACK(v-1-threshold) < n, "BAD INTERP  v-1-thresh >= n" ); \
       } \
     } else { \
@@ -43,17 +43,42 @@ static const int _dbgprint = 0;
   #define RETURNI(x) { return x; }
 #endif
 
-static UV _inverse_interpolate(UV lo, UV hi, UV n,
+/* Return a point strictly inside [lo,hi], interpolating the endpoint values
+ * [rlo,rhi].  Subtract before converting to double: large UVs that differ by
+ * only a few units can become the same double. */
+static UV _linear_interpolate(UV lo, UV hi, UV rlo, UV rhi, UV n)
+{
+  UV rdiff, rspan, xspan, move;
+  double dmove;
+
+  MPUassert(hi-lo > 1, "interpolation: no interior point");
+  MPUassert(rlo <= n && n <= rhi, "interpolation: target outside range");
+
+  if (n == rlo) return lo+1;
+  if (n == rhi) return hi-1;
+
+  rdiff = n-rlo;
+  rspan = rhi-rlo;
+  xspan = hi-lo;
+  dmove = (double)rdiff * (double)xspan / (double)rspan + 0.5;
+  move = (dmove >= (double)xspan) ? xspan : (UV)dmove;
+
+  if (move == 0)     return lo+1;
+  if (move >= xspan) return hi-1;
+  return lo+move;
+}
+
+static UV _inverse_interpolate(UV bound_lo, UV bound_hi, UV n,
                                UV k, UV (*funck)(UV mid, UV k),
                                UV (*func)(UV mid),
                                UV threshold) {
-  UV mid, rlo, rhi, rmid, iloopc;
+  UV mid, rlo, rhi, rmid, iloopc, lo = bound_lo, hi = bound_hi;
 
   if (hi != 0) {
     /* Given both lo and hi, halve the range on start. */
     mid = lo + ((hi-lo)>>1);
     rmid = MPU_CALLBACK(mid);
-    if(_dbgprint)printf("  01 lo %lu  mid %lu  hi %lu\n", lo, mid, hi);
+    if(_dbgprint)printf("  01 lo %"UVuf"  mid %"UVuf"  hi %"UVuf"\n", lo, mid, hi);
     if (rmid >= n) {
       hi = mid;  rhi = rmid;
       rlo = MPU_CALLBACK(lo);
@@ -66,18 +91,22 @@ static UV _inverse_interpolate(UV lo, UV hi, UV n,
     /* They don't know what hi might be, so estimate something. */
     rlo = MPU_CALLBACK(lo);
     if (rlo == n)  RETURNI(lo);  /* Possible bad limit */
-    rhi = UV_MAX; /* this should always be replaced below */
-    while (hi == 0) {
+    for (;;) {
       double estf = (double)n/(double)rlo - 0.004;
       if      (estf <= 1.004) estf = 1.004;
       else if (estf > 8.0)    estf = 8.0;
       mid =  ((double)UV_MAX/(double)lo <= estf)  ?  UV_MAX
           :  (UV) (estf * (double)lo + 1);
-      if(_dbgprint)printf("  0s lo %lu  mid %lu  hi %lu\n", lo, mid, hi);
+      if(_dbgprint)printf("  0s lo %"UVuf"  mid %"UVuf"  hi %"UVuf"\n", lo, mid, hi);
       rmid = MPU_CALLBACK(mid);
-      if (rmid >= n) {  hi = mid;  rhi = rmid;  }
-      else           {  lo = mid;  rlo = rmid;  }
-      if (lo == UV_MAX)  break;  /* Overflow */
+      if (rmid >= n) {
+        hi = mid;
+        rhi = rmid;
+        break;
+      }
+      lo = mid;
+      rlo = rmid;
+      if (lo == UV_MAX) return 0;  /* No representable upper bracket */
     }
   }
 
@@ -85,18 +114,17 @@ static UV _inverse_interpolate(UV lo, UV hi, UV n,
   if ((hi-lo) <= 1)   RETURNI( (rlo == n || (rlo < n && rhi > n)) ? lo : hi );
 
   /* Step 1.  Linear interpolation until rhi is correct. */
-  if(_dbgprint)printf("  1  lo %lu hi %lu\n", lo, hi);
+  if(_dbgprint)printf("  1  lo %"UVuf" hi %"UVuf"\n", lo, hi);
 
-  mid = (n == rhi)  ?  hi-1  :  LINEAR_INTERP(n,lo,hi,rlo,rhi);
-  if (mid == lo) mid++;  else if (mid == hi) mid--;
+  mid = _linear_interpolate(lo, hi, rlo, rhi, n);
 
   for (iloopc = 1;  (hi-lo) > 1 && rhi > n;  iloopc++) {
     MPUassert(lo < mid && mid < hi, "interpolation: assume 3 unique points");
     rmid = MPU_CALLBACK(mid);
     if (rmid >= n) { hi = mid;  rhi = rmid; }
     else           { lo = mid;  rlo = rmid; }
-    if (rhi == n) break;
-    mid += (IV)(((double)n-(double)rmid)*(double)(hi-lo) / (double)(rhi-rlo));
+    if (rhi == n || (hi-lo) <= 1) break;
+    mid = _linear_interpolate(lo, hi, rlo, rhi, n);
     /* Sometimes we get stuck getting closer and closer but not bracketing.
      * We could do Ridder's method of alternating bisection, or using a
      * multiplier on mid on alternate iterations to reflect about n.
@@ -114,7 +142,7 @@ static UV _inverse_interpolate(UV lo, UV hi, UV n,
      */
     if (mid <= lo) mid=lo+1;  else if (mid >= hi) mid=hi-1;
     MPUassert(lo <= mid && mid <= hi, "interpolation: range error");
-    if(_dbgprint)printf("  1s lo %lu  mid %lu  hi %lu  (%lu)\n", lo, mid, hi, rhi-n);
+    if(_dbgprint)printf("  1s lo %"UVuf"  mid %"UVuf"  hi %"UVuf"  (%"UVuf")\n", lo, mid, hi, rhi-n);
   }
 
   if (rlo == n)       RETURNI(lo);
@@ -125,18 +153,20 @@ static UV _inverse_interpolate(UV lo, UV hi, UV n,
   /* Step 2.  Ridder's method until we're very close. */
 
   MPUassert(rlo < n && rhi >= n, "interpolation: Ridder initial assumption");
-  if(_dbgprint)printf("  2  lo %lu  mid %lu  hi %lu\n", lo, mid, hi);
+  if(_dbgprint)printf("  2  lo %"UVuf"  mid %"UVuf"  hi %"UVuf"\n", lo, mid, hi);
 
   while ((hi-lo) > 8 && ((hi-lo) > threshold || rhi > n)) {
     UV x0 = lo,  x1 = lo + ((hi-lo)>>1);   /* x2 = hi */
     UV rx1 = MPU_CALLBACK(x1);
-    IV fx0 = rlo-n,  fx1 = rx1-n,  fx2=rhi-n+1;
+    double d0 = (double) (n-rlo);     /* > 0 */
+    double d1 = (double) (rx1 >= n ? rx1-n : n-rx1);
+    double d2 = (double) (rhi-n+1);   /* > 0 */
+    double den = d1*d1 + d0*d2;       /* f1^2 - f0*f2 */
+    double sgn = (rx1 >= n) ? 1.0L : -1.0L;
+    double pos = sgn * ((double)(x1 - x0) * d1) / sqrtl(den);
+    UV x3 = x1 - (IV)(pos + (pos >= 0 ? 0.5L : -0.5L));
 
-    double pos = ((double)(x1-x0) * (double)fx1)
-               / sqrtl((double)fx1 * (double)fx1 - (double)fx0 * (double)fx2);
-    UV x3 = x1 - (IV)(pos+0.5);
-
-    if(_dbgprint)printf("  2s lo %lu  mid %lu  hi %lu  (%lu)\n", lo, x1, hi, (rx1>n) ? rx1-n : n-rx1);
+    if(_dbgprint)printf("  2s lo %"UVuf"  mid %"UVuf"  hi %"UVuf"  (%"UVuf")\n", lo, x1, hi, (rx1>n) ? rx1-n : n-rx1);
 
     if (x3 >= hi || x3 <= lo || x3 == x1) {
       /* We got nothing from the new point.  Just use the bisection. */
@@ -144,9 +174,9 @@ static UV _inverse_interpolate(UV lo, UV hi, UV n,
       else          { lo = x1; rlo = rx1; }
     } else {
       UV rx3 = MPU_CALLBACK(x3);
-      if(_dbgprint)printf("  2S lo %lu  mid %lu  hi %lu  (%lu)\n", lo, x3, hi, (rx3>n) ? rx3-n : n-rx3);
+      if(_dbgprint)printf("  2S lo %"UVuf"  mid %"UVuf"  hi %"UVuf"  (%"UVuf")\n", lo, x3, hi, (rx3>n) ? rx3-n : n-rx3);
       /* Swap if needed to have:   [lo  x1  x3  hi]  */
-      if (rx1 > rx3) { UV t=x1; x1=x3; x3=t;  t=rx1; fx1=rx3; rx3=t; }
+      if (rx1 > rx3) { UV t=x1; x1=x3; x3=t;  t=rx1; rx1=rx3; rx3=t; }
       if      (rx1 >= n) {                      hi = x1; rhi = rx1; }
       else if (rx3 >= n) { lo = x1; rlo = rx1;  hi = x3; rhi = rx3; }
       else               { lo = x3; rlo = rx3; }
@@ -162,7 +192,7 @@ static UV _inverse_interpolate(UV lo, UV hi, UV n,
     if (MPU_CALLBACK(mid) < n) lo = mid;   /* Keeps invariant f(lo) < n */
     else                   hi = mid;
   }
-  if(_dbgprint)printf("final %lu - %lu threshold %lu\n", lo, hi, threshold);
+  if(_dbgprint)printf("final %"UVuf" - %"UVuf" threshold %"UVuf"\n", lo, hi, threshold);
   RETURNI(hi);
 }
 
@@ -188,24 +218,39 @@ UV interpolate_with_approx(UV n,
                           ) {
   UV approx_nth_n, guess, gn, count, ming = 0, maxg = UV_MAX;
 
+  MPUassert(tol > 0, "interpolate_with_approx: tolerance must be positive");
+
   approx_nth_n = guess = fnth(n);
   for (gn = 2; gn < 20; gn++) {
-    IV adjust;
+    UV adjust, approx_nth_count;
     MPUverbose(2, "  interp  %"UVuf"-th is around %"UVuf" ... ", n, guess);
     count = fcnt(guess);
-    MPUverbose(2, "(%"IVdf")\n", (IV)(n-count));
+    if (n >= count) { MPUverbose(2, "(%"UVuf")\n", n-count); }
+    else            { MPUverbose(2, "(-%"UVuf")\n", count-n); }
     /* Stop guessing if within our tolerance */
     if (n==count || (n>count && n-count < tol) || (n<count && count-n < tol)) break;
     /* Determine how far off we think we are */
-    adjust = (IV) (approx_nth_n - fnth(count));
+    approx_nth_count = fnth(count);
     /* When computing new guess, ensure we don't overshoot.  Rarely used. */
     if (count <= n && guess > ming) ming = guess;   /* Previous guesses */
     if (count >= n && guess < maxg) maxg = guess;
-    guess += adjust;
-    if (guess <= ming || guess >= maxg) MPUverbose(2, "  fix min/max for %"UVuf"\n",n);
-    if (guess <= ming) guess = ming + tol - 1;
-    if (guess >= maxg) guess = maxg - tol + 1;
-    /* TODO: if min/max dist is small, split the difference. */
+    if (approx_nth_n >= approx_nth_count) {
+      adjust = approx_nth_n - approx_nth_count;
+      guess = (adjust > UV_MAX-guess) ? UV_MAX : guess+adjust;
+    } else {
+      adjust = approx_nth_count - approx_nth_n;
+      guess = (adjust > guess) ? 0 : guess-adjust;
+    }
+    /* Pull an outlying estimate back inside the known bounds when possible. */
+    if (guess <= ming || guess >= maxg) {
+      UV span = maxg-ming;
+      UV step = (tol > 1) ? tol-1 : 1;
+      bool below = (guess <= ming);
+      MPUverbose(2, "  fix min/max for %"UVuf"\n",n);
+      if (span <= 1)      guess = below ? maxg : ming;
+      else if (step >= span) guess = ming + (span >> 1);
+      else                guess = below ? ming+step : maxg-step;
+    }
   }
   if (gn == 20) count = fcnt(guess);
 

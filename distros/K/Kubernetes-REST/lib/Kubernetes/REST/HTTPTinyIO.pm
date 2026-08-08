@@ -1,5 +1,5 @@
 package Kubernetes::REST::HTTPTinyIO;
-our $VERSION = '1.104';
+our $VERSION = '1.105';
 # ABSTRACT: HTTP client using HTTP::Tiny
 use Moo;
 use HTTP::Tiny;
@@ -108,7 +108,7 @@ Kubernetes::REST::HTTPTinyIO - HTTP client using HTTP::Tiny
 
 =head1 VERSION
 
-version 1.104
+version 1.105
 
 =head1 SYNOPSIS
 

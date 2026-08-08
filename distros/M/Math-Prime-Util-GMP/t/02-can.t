@@ -37,7 +37,9 @@ my @functions = qw(
                      is_gaussian_prime
                      lucas_sequence  lucasuv  lucasu  lucasv
                      lucasuvmod  lucasumod  lucasvmod
+                     fibonacci lucas_number catalan_number bell_number fubini
                      primes
+                     twin_primes
                      sieve_primes
                      sieve_twin_primes
                      sieve_prime_cluster
@@ -62,29 +64,35 @@ my @functions = qw(
                      chinese chinese2
                      moebius
                      prime_count prime_count_lower prime_count_upper
+                     legendre_phi
                      primorial
                      pn_primorial
                      factorial subfactorial multifactorial factorial_sum
                      falling_factorial rising_factorial
                      factorialmod binomialmod
                      consecutive_integer_lcm
-                     partitions bernfrac bernreal harmfrac harmreal stirling
+                     partitions partitionsq bernfrac bernreal harmfrac harmreal stirling
                      bernvec powersum faulhaber_sum
                      zeta li ei riemannr lambertw
                      addreal subreal mulreal divreal
                      logreal expreal powreal rootreal agmreal
                      gcd lcm kronecker valuation binomial gcdext hammingweight
+                     remove_factors remove_factors_exp
                      negmod invmod sqrtmod addmod submod mulmod divmod powmod
                      is_qr
                      muladdmod mulsubmod
-                     vecsum vecprod
+                     vecsum vecprod vecprefixsum
                      exp_mangoldt
                      liouville
                      totient
+                     euler_phi
                      jordan_totient
                      carmichael_lambda
+                     dedekind_psi aliquot_sum abundance
+                     sopf sopfr prime_signature
                      prime_omega prime_bigomega
                      sqrtint rootint logint powint mulint addint subint
+                     muladdint mulsubint addmulint submulint
                      divint modint cdivint divrem tdivrem fdivrem cdivrem
                      add1int sub1int
                      negint absint signint cmpint cmpabsint
@@ -93,6 +101,7 @@ my @functions = qw(
                      bitand bitor bitxor bitnot
                      is_divisible is_congruent
                      is_power is_prime_power is_semiprime is_almost_prime
+                     is_safe_prime
                      is_square is_smooth is_rough is_powerful is_practical
                      is_carmichael is_fundamental is_totient
                      is_primitive_root
@@ -105,6 +114,7 @@ my @functions = qw(
                      is_square_free is_powerfree next_powerfree prev_powerfree
                      powerfree_count nth_powerfree
                      znorder
+                     znlog
                      znprimroot
                      ramanujan_tau
                      Pi Euler

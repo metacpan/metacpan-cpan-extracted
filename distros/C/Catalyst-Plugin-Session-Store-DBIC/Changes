@@ -1,5 +1,14 @@
 Revision history for Catalyst-Plugin-Session-Store-DBIC
 
+0.15  Fri Aug 07 16:15:00 EDT 2026
+   - Release 0.14_9901 without changes.
+
+0.14_9901  Sun Jun 14 20:27:47 EDT 2026
+   - Fix $c->change_session_id causing "row not found" error (RT#112679).
+     Thanks to Cees Hek for the original report, violapiratejunky for the
+     patch, and MYSOCIETY for additional information in RT#178695.
+   - Fix typo in source. RT#87248
+
 0.14  Sat Jul 27 12:29:00 PST 2013
    - Fix repository metadaa. RT#87249
 

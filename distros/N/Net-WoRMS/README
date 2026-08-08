@@ -4,13 +4,15 @@ NAME
 
 VERSION
 
-    version 1.4
+    version 1.5
 
 SYNOPSIS
 
-    Net::WoRMS bundles WEB access, parsing and fomatting capabilities for
-    the tool query-worms. The the modul was built around the the module
-    SOAP::Lite and is implemented as a Moo object.
+    Net::WoRMS bundles WEB access, parsing and formatting capabilities for
+    the tool query-worms <https://metacpan.org>, to harvest information
+    form the "World Register of Marine Species" --
+    http://www.marinespecies.org. The module was built around the module
+    SOAP::Lite and is implemented by a Moo object.
 
 MODULE DEPENDENCIES
 
@@ -31,9 +33,9 @@ MODULE DEPENDENCIES
     SOAP::Lite
 
       is used for the WEB access and parsing capabilities to retrieve data
-      from www.marinespecies.org.
+      from http://www.marinespecies.org.
 
-    Syntax::Keyword::Match -- to end the switch case madness
+    Syntax::Keyword::Match, to end the switch-case/while-given madness
 
 GLOBAL VARIABLES and CONSTANTS
 
@@ -44,7 +46,7 @@ GLOBAL VARIABLES and CONSTANTS
 
     $APHIA_NS = 'http://aphia/v1.0'
 
-      Namespace and Namespace URI. In the development context these
+      Namespace and corresponding URI. In the development context these
       variables are considered as a constants. There are methods to change
       these values but never tested.
 
@@ -60,13 +62,13 @@ GLOBAL VARIABLES and CONSTANTS
 
       The array holds field names for TEXT and CSV related output.
 
-    %FORMATS = ( TEXT => 1, SQL => 2, CSV => 3);
+    %FORMATS = ( TEXT = 1, SQL => 2, CSV => 3)>
 
       The format hash mostly for validation.
 
     %ORDER_HASH
 
-      Dictionary to sort and translate the retieved field names from the
+      Dictionary to sort and translate the retrieved field names from the
       WoRMS database and bring them into a consistent form.
 
     @TYPE
@@ -82,7 +84,8 @@ FIELDS
 
     Format: STR
 
-      Field holds the current output format TEXT|SQL|CSV.
+      Field holds the current output format. The tags "TEXT|SQL|CSV" are
+      allowed.
 
     EndPoint: STR (URI)
 
@@ -90,7 +93,7 @@ FIELDS
 
     AphiaNS and AphiaURI: STR (URI)
 
-      The current namespace and namespace URI, defaulting to $APHIA_NS.
+      The current namespace and corresponding URI, defaulting to $APHIA_NS.
 
     Soap
 
@@ -102,11 +105,8 @@ METHODS
 
       Initializes the SOAP client.
 
-    NOTE1:
-
-      The function changeEndPoint($uli), changeAphiaURI($uri) and
-      changeAphiaNS($uri) as well as changeDebug($flag),
-      changeFormat($format) must be used before the initialization phase.
+      Note: All change*(...) functions must be used before the
+      initialization phase.
 
  CHANGE METHODS
 
@@ -138,18 +138,18 @@ METHODS
 
     checkSoap()
 
-      Check if the soap client is running. The function stops the program
-      (die ...) in case of an error.
+      Check if the soap client is running. The function stops the calling
+      program (die ...) in case of an error.
 
     checkError($soapResponse)
 
-      Checks the the SOAP query result. The function stops the program in
-      case of an communication error.
+      Checks the SOAP query result. The function stops the calling program
+      in case of an communication error.
 
     checkDebug($queryResult)
 
       Prints the query result (dictionary) via Data::Dumper to STDERR if
-      the debugging flag is set.
+      the debug flag is set.
 
     searchSpeciesID($name, $print)
 
@@ -163,8 +163,8 @@ METHODS
 
     getBlockChildrenByID($AphiaID, $offs)
 
-      Retrieve a set of taxon records under an given AphiaID for a devine
-      offset in the query ensemble .The offset addresses a paging pattern.
+      Retrieve a set of taxon records under an given AphiaID for a defined
+      offset in the query ensemble. The offset addresses a paging pattern.
 
     getChildrenByID($aphiaID)
 
@@ -174,8 +174,8 @@ METHODS
 
     printRecord($record, $first, $last, $spc)
 
-      Prints a record to SDTOUT and handles inentation by $spc as well as
-      header and trailing aspects by using the $first and $last flags.
+      Prints a record to STDOUT and handles indentation by $spc as well as
+      header and trailing aspects by using the flags $first and $last.
 
 AUTHOR
 

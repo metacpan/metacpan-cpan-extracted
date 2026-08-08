@@ -17,7 +17,7 @@ use Data::Identifier::Util;
 use Data::Displaycolour v0.07;
 use Data::IconText v0.06;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use parent qw(Data::Identifier::Interface::Known);
 
@@ -36,29 +36,43 @@ my @_wellknown = map {Lingua::famibeib::Word->new(from => $_)->register} (
 
 my %_concept = (
     # Colours:
-    fokiba  => 'c9ec3bea-558e-4992-9b76-91f128b6cf29',
-    fokibe  => '5c41829f-5062-4868-9c31-2ec98414c53d',
-    fokibi  => '2892c143-2ae7-48f1-95f4-279e059e7fc3',
+    fokiba      => 'c9ec3bea-558e-4992-9b76-91f128b6cf29',
+    fokibe      => '5c41829f-5062-4868-9c31-2ec98414c53d',
+    fokibi      => '2892c143-2ae7-48f1-95f4-279e059e7fc3',
 
-    fokifa  => 'c0e957d0-b5cf-4e53-8e8a-ff0f5f2f3f03',
+    fokifa      => 'c0e957d0-b5cf-4e53-8e8a-ff0f5f2f3f03',
     # fokife
-    fokifi  => 'abcbf48d-c302-4be1-8c5c-a8de4471bcbb',
+    fokifi      => 'abcbf48d-c302-4be1-8c5c-a8de4471bcbb',
 
-    fokika  => '3dcef9a3-2ecc-482d-a98b-afffbc2f64b9',
+    fokika      => '3dcef9a3-2ecc-482d-a98b-afffbc2f64b9',
     # fokike
     # fokiki
-    fokiko  => 'a30d070d-9909-40d4-a33a-474c89e5cd45',
+    fokiko      => 'a30d070d-9909-40d4-a33a-474c89e5cd45',
 
-    fokila  => 'f2e45f11-b1a8-421f-9c03-61a30bd23e78',
+    fokila      => 'f2e45f11-b1a8-421f-9c03-61a30bd23e78',
 
     # Animals:
-    febaba  => '571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1',
-    febabo  => '36297a27-0673-44ad-b2d8-0e4e97a9022d',
-    febasu  => '838eede5-3f93-46a9-8e10-75165d10caa1',
-    febebe  => '252314f9-1467-48bf-80fd-f8b74036189f',
-    febeba  => '5d006ca0-c27b-4529-b051-ac39c784d5ee',
-    febe    => '95f1b56e-c576-4f32-ac9b-bfdd397c36a6',
-    febeto  => 'dcf8f4f0-c15e-44bd-ad76-0d483079db16',
+    febaba      => '571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1',
+    febabo      => '36297a27-0673-44ad-b2d8-0e4e97a9022d',
+    febasu      => '838eede5-3f93-46a9-8e10-75165d10caa1',
+    febebe      => '252314f9-1467-48bf-80fd-f8b74036189f',
+    febeba      => '5d006ca0-c27b-4529-b051-ac39c784d5ee',
+    febe        => '95f1b56e-c576-4f32-ac9b-bfdd397c36a6',
+    febeto      => 'dcf8f4f0-c15e-44bd-ad76-0d483079db16',
+
+    # Relatives:
+    fababaam    => '3efce853-eae9-4429-9d5d-c4420f846005',
+    fababeam    => 'a3e1528a-5258-420d-92aa-401d973c43a8',
+    fababiam    => '2ef71908-a411-464d-9de2-53da0b3505ba',
+    fababoam    => '30cc2c34-4296-4f9a-8ca6-dd139247dd3c',
+    fababuam    => 'f4423fe9-b535-4f3b-8d7f-b0c863f6b525',
+
+    fabafaam    => 'e7c73208-81ea-4ac7-b937-87070bbb9126',
+    fabafeam    => 'cf65827f-bc2b-49fa-a270-16fee39993a1',
+    fabafiam    => 'b148ee3a-2547-4b0a-a7e2-a160024c4053',
+
+    #fabakaam    => '',
+    #fabakeam    => '',
 );
 
 foreach my Lingua::famibeib::Word $word (@_wellknown) {
@@ -113,7 +127,7 @@ Lingua::famibeib::Wellknown - database of famibeib words
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

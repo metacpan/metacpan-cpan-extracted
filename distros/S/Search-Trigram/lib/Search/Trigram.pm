@@ -3,7 +3,7 @@ package Search::Trigram;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Search::Trigram', $VERSION);
@@ -18,7 +18,7 @@ Search::Trigram - Trigram inverted index search with Dice coefficient scoring
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -90,6 +90,59 @@ Number of live (non-deleted) documents.
     my $n = $idx->trigram_count;
 
 Number of distinct trigrams in the index.
+
+=head1 C ABI
+
+An XS module can index and query without a Perl frame in between.
+F<include/sg_abi.h> declares a function-pointer table with five entries:
+
+=over 4
+
+=item * C<index_of> - the opaque index behind a blessed Search::Trigram
+object. Returns C<NULL> for anything that is not one rather than
+dereferencing whatever it was handed, so it is safe to probe with on a
+fall-back path.
+
+=item * C<add> - index a document, returning its id. The text is copied,
+so the caller may free or reuse its buffer immediately.
+
+=item * C<optimize> - compact the postings after a batch of adds.
+
+=item * C<doc_count>
+
+=item * C<search> - writes at most C<max_hits> C<sg_abi_hit> structs into
+an array the caller supplies, and returns how many it wrote. Passing a
+stack array is the expected use.
+
+=back
+
+The table is resolved at runtime through C<Search::Trigram::_abi_ptr> and
+gated on its C<abi_version>, so there is no link-time coupling and the two
+distributions upgrade independently; entries are only ever appended.
+Reach the header with L<ExtUtils::Depends>:
+
+    my $pkg = ExtUtils::Depends->new('My::Module', 'Search::Trigram');
+
+Two things about that table are deliberate and worth knowing.
+
+C<search> writes into your array rather than handing back the allocated
+result block L</search>'s own C layer pairs with a free function. Pairing
+a malloc in one shared object with a free in another is a good way to
+find out that each can carry its own heap, so both halves stay on the
+provider's side.
+
+There is no constructor or destructor. A consumer that allocated an index
+through the table would have to release it through the table too, with
+the same hazard; let the Perl object own the lifetime, since it already
+does that correctly. Hold a reference to the B<object> and call
+C<index_of> on it.
+
+Only C<index_of> takes C<pTHX_>. The rest never touches an SV, and
+threading the interpreter through calls that have no use for it would be
+cargo cult.
+
+The C<text> pointer on a hit is borrowed from the index and is
+invalidated by the next mutation of it. Copy it if you intend to keep it.
 
 =head1 AUTHOR
 

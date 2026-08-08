@@ -113,14 +113,15 @@ if ($extra) {
 
 plan tests =>   1    # factorial
               + 1    # factorialmod
-              + scalar(@facmods) + 1
+              + scalar(@facmods) + 8
               + 2    # primorial and pn_primorial
               + 2    # extra primorial tests
               + 1    # subfactorial
               + 1    # factorial_sum
-              + 4    # multifactorial
+              + 6    # multifactorial
               + 2    # falling_factorial
-              + 2;   # rising_factorial
+              + 2    # rising_factorial
+              + 2;   # Check rising/falling negative croaks
 
 {
   my @fact = map { factorial($_) }  0 .. $#factorials;
@@ -136,6 +137,16 @@ for my $d (@facmods) {
   is( factorialmod($n, $m), $expect, "factorialmod($n,$m) = $expect" );
 }
 is( factorialmod(37,0), undef, "factorialmod(37,0) = undef" );
+{
+  my $p = "216807359884357411648908138950271200947";
+  is( factorialmod("216807359884357411648908138950271200946", $p), "216807359884357411648908138950271200946", "factorialmod(p-1,p) with large p" );
+  is( factorialmod("216807359884357411648908138950271200945", $p), 1, "factorialmod(p-2,p) with large p" );
+  is( factorialmod("216807359884357411648908138950271200944", $p), "108403679942178705824454069475135600473", "factorialmod(p-3,p) with large p" );
+  is( factorialmod("36893488147432436565", "18446744073709551629"), 0, "factorialmod(n,m) with large n >= m" );
+  is( factorialmod("18446744073709551616", "1208925819614629174706176"), 0, "factorialmod huge n with composite m gives zero" );
+  ok( !eval { factorialmod(-1,101); 1 }, "factorialmod with negative n croaks" );
+  ok( !eval { factorialmod("1000000000001",$p); 1 }, "factorialmod with excessive work size croaks" );
+}
 
 {
   my @prim   = map { primorial(nth_prime($_)) }  0 .. $#pn_primorials;
@@ -160,10 +171,6 @@ is_deeply( [ map { factorial_sum($_) } 0..22 ],
            [qw/0 1 2 4 10 34 154 874 5914 46234 409114 4037914 43954714 522956314 6749977114 93928268314 1401602636314 22324392524314 378011820620314 6780385526348314 128425485935180314 2561327494111820314 53652269665821260314/],
            "factorial_sum(n) for 0..22" );
 
-is_deeply( [ map { multifactorial($_,0) } 0..22 ],
-           [ map { 1 } 0..22 ],
-           "multifactorial(n,0) for 0..22" );
-
 is_deeply( [ map { multifactorial($_,1) } 0..22 ],
            [ map { factorial($_) } 0..22 ],
            "multifactorial(n,1) for 0..22" );
@@ -175,6 +182,13 @@ is_deeply( [ map { multifactorial($_,2) } 0..26 ],
 is_deeply( [ map { multifactorial($_,3) } 0..29 ],
            [qw/1 1 2 3 4 10 18 28 80 162 280 880 1944 3640 12320 29160 58240 209440 524880 1106560 4188800 11022480 24344320 96342400 264539520 608608000 2504902400 7142567040 17041024000 72642169600/],
            "multifactorial(n,3) for 0..29" );
+
+{
+  my $n = "1000000000000000000000000";
+  is( multifactorial($n, "999999999999999999999998"), "2000000000000000000000000", "multifactorial with two large factors" );
+  is( multifactorial($n, "1000000000000000000000001"), $n, "multifactorial with large k > n" );
+  ok( !eval { multifactorial("18446744073709551617", 1); 1 }, "multifactorial with too many terms croaks" );
+}
 
 ###### falling_factorial
 {
@@ -199,3 +213,7 @@ is_deeply( [map { falling_factorial($_->[0],$_->[1]) } ([515,7],[516,7],[568,7],
 is_deeply( [map { rising_factorial($_->[0],$_->[1]) } ([509,7],[510,7],[562,7],[80,10],[103,101])],
            [qw/9222879462222182400 9349716704335257600 18378924259448108160 18452514066426316800 6760937240727169751346751449031021029092236987417146776093364751481076175432048515956305908925637116481562056123160956910787676051553407749205364947724300581490631820332063331242347041889126973440000000000000000000000000/],
            "rising_factorial selected values");
+
+# Check that we don't accept negative second arguments
+ok(!eval { falling_factorial(5,-2); 1 }, "falling_factorial negative k croaks");
+ok(!eval { rising_factorial(5,-2); 1 }, "rising_factorial negative k croaks");

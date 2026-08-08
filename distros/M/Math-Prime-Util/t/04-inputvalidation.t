@@ -3,11 +3,21 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/next_prime/;
+use Math::Prime::Util qw/toint next_prime is_square urandomm vecsum/;
 use Math::BigInt try=>"GMP,Pari";
 use Math::BigFloat;
 use Config;
 use Carp;
+
+{
+  package MPU::Test::IntegerObject;
+  use overload '""' => sub { ${$_[0]} }, fallback => 0;
+  sub new {
+    my($class, $value) = @_;
+    bless \$value, $class;
+  }
+}
+package main;
 
 my @incorrect = (
   -4,
@@ -39,11 +49,15 @@ my %correct = (
   Math::BigFloat->new("9") => 11,
 );
 
-plan tests =>   2                      # undefined and empty string
-              + scalar(@incorrect)     # values that should be rejected
-              + scalar(keys(%correct)) # values that should be accepted
-              + 2                      # infinity and nan
-              + 1;                     # long invalid string
+plan tests => 2                      # undefined and empty string
+            + scalar(@incorrect)     # values that should be rejected
+            + scalar(keys(%correct)) # values that should be accepted
+            + 2                      # infinity and nan
+            + 2                      # internal validators normalize scalar ints
+            + 1                      # internal validators reject coderefs
+            + 8                      # unknown object integer validation
+            + 7                      # internal canonicalization helper
+            + 1;                     # long invalid string
 
 my $qrnn = qr/ must be a (non-negative|positive) integer/;
 
@@ -54,13 +68,40 @@ eval { next_prime(""); };
 like($@, $qrnn, "Gives Error:  next_prime('')");
 
 foreach my $v (@incorrect) {
-  $v = "$v" if $] < 5.008 && ref($v) eq 'Math::BigFloat';
   eval { next_prime($v); };
   like($@, $qrnn, "Gives Error:  next_prime($v)");
 }
 
 while (my($v, $expect) = each (%correct)) {
   is("".next_prime($v), $expect, "Correct:      next_prime($v)");
+}
+
+{
+  my $class = 'MPU::Test::IntegerObject';
+  my $big = "10000000000000000000000012";
+  my $square = "765413284212226299051111674934086564882382225721";
+  my $plain = bless({}, "MPU::Test::PlainObject");
+  my $zero = $class->new(0);
+
+  is(next_prime($class->new(4)), 5,
+     "integer object converts to native input");
+  is("".next_prime($class->new($big)), "10000000000000000000000013",
+     "big integer object remains valid non-native input");
+  is("".vecsum($class->new($big), $class->new(1)),
+     "10000000000000000000000013",
+     "integer objects are validated for direct string processing");
+  is(is_square($class->new($square)), 1,
+     "integer object works in accelerated bigint path");
+
+  eval { next_prime($class->new(-4)); };
+  like($@, $qrnn, "negative integer object respects non-negative input");
+  eval { is_square($class->new("4.5")); };
+  like($@, qr/Parameter '4\.5' must be an integer/,
+       "temporary non-integer object is rejected after a validation croak");
+  eval { is_square($plain); };
+  like($@, qr/ must be an integer/, "plain object is rejected");
+  eval { urandomm($zero); };
+  like($@, qr/ must be a positive integer/, "zero object respects positive input");
 }
 
 # The next two tests really are not critical, but are nice to check.
@@ -85,9 +126,110 @@ SKIP: {
   like($@, $qrnn, "Gives Error:  next_prime( nan ) [nan = '$nan']");
 }
 
+{
+  my @vals = ("42", "+42", "007", "-0");
+  my @got;
+  for my $v (@vals) {
+    my $x = $v;
+    Math::Prime::Util::_validate_integer($x);
+    push @got, [ "$x", ref($x) ? ref($x) : "" ];
+  }
+  is_deeply(\@got,
+            [ ["42",""], ["42",""], ["7",""], ["0",""] ],
+            "_validate_integer normalizes in-range scalar integers");
+}
 
-SKIP: {
-  skip "Perl $], Carp $Carp::VERSION.  We need a minimum of 5.8 or Carp 1.17 to avoid segfaults.", 1 if $] < 5.008 && $Carp::VERSION < 1.17;
+{
+  my @vals = ("42", "+42", "007");
+  my @got;
+  for my $v (@vals) {
+    my $x = $v;
+    Math::Prime::Util::_validate_integer_nonneg($x);
+    push @got, [ "$x", ref($x) ? ref($x) : "" ];
+  }
+  is_deeply(\@got,
+            [ ["42",""], ["42",""], ["7",""] ],
+            "_validate_integer_nonneg normalizes in-range scalar integers");
+}
+
+{
+  my $ok = 0;
+  $ok++ if !defined eval { Math::Prime::Util::_validate_integer(sub { 123 }); 1 } &&
+            $@ =~ /must be an integer/;
+  $ok++ if !defined eval { Math::Prime::Util::_validate_integer_nonneg(sub { 123 }); 1 } &&
+            $@ =~ /must be a non-negative integer/;
+  is($ok, 2, "_validate_integer* reject coderefs");
+}
+
+################################################################################
+
+# How to find the default bigint class?
+# 1. assume Math::BigInt.  That is Wrong.
+# 2. ref(powint(2,80)).  Works but many things being tested here.
+# 3. ref(toint("1208925819614629174706176")).  Works, almost there.
+# 4. _load_bigint().  Very low level private function.  Works.
+#
+# In later tests we would want to use (3).  Here we'll use (4).
+#
+my $bigint_class = Math::Prime::Util::_load_bigint();
+#diag "Default bigint type: $bigint_class";
+
+{
+  my $x = Math::BigInt->new(123);
+  Math::Prime::Util::_canonicalize_integers(\$x);
+  is(ref($x), "", "_canonicalize_integers scalar ref down-converts small bigint");
+}
+
+{
+  my $x = Math::BigInt->new("123456789012345678901234567890");
+  Math::Prime::Util::_canonicalize_integers(\$x);
+  is("".ref($x).":$x", "$bigint_class:123456789012345678901234567890",
+     "_canonicalize_integers scalar ref keeps large bigint");
+}
+
+{
+  my $x = Math::BigInt->new(123);
+  my $r = Math::Prime::Util::_canonicalized_integer($x);
+  is_deeply([ref($r), "$r", ref($x), "$x"],
+            ["", "123", "Math::BigInt", "123"],
+            "_canonicalized_integer returns native without mutating source");
+}
+
+{
+  my $x = Math::BigInt->new("123456789012345678901234567890");
+  my $r = Math::Prime::Util::_canonicalized_integer($x);
+  is("".ref($r).":$r", "$bigint_class:123456789012345678901234567890",
+     "_canonicalized_integer returns canonical large bigint");
+}
+
+{
+  my @v = ("42", Math::BigInt->new(7),
+           Math::BigInt->new("123456789012345678901234567890"),
+           undef);
+  Math::Prime::Util::_canonicalize_integers(\@v);
+  is_deeply([map { defined($_) ? ((ref($_)||"").":$_") : "undef" } @v],
+            [":42", ":7", "$bigint_class:123456789012345678901234567890", "undef"],
+            "_canonicalize_integers array ref canonicalizes elements");
+}
+
+{
+  my @v;
+  $v[2] = Math::BigInt->new(5);
+  Math::Prime::Util::_canonicalize_integers(\@v);
+  ok(!exists($v[0]) && !exists($v[1]) && exists($v[2]) && !ref($v[2]) && $v[2] == 5,
+     "_canonicalize_integers array ref preserves holes");
+}
+
+{
+  my $ok = 0;
+  $ok++ if !eval { Math::Prime::Util::_canonicalize_integers(5); 1 };
+  my $x = "abc";
+  $ok++ if !eval { Math::Prime::Util::_canonicalize_integers(\$x); 1 };
+  is($ok, 2, "_canonicalize_integers rejects bad inputs");
+}
+
+
+{
   eval { next_prime("11111111111111111111111111111111111111111x"); };
   like($@, $qrnn, "Gives Error:  next_prime('111...111x')");
 }

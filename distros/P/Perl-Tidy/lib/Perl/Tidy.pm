@@ -135,7 +135,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20260705';
+    $VERSION = '20260808';
 } ## end BEGIN
 
 {
@@ -353,7 +353,7 @@ sub stream_slurp {
     # handle a reference
     if ($ref) {
         if ( $ref eq 'ARRAY' ) {
-            my $buf = join EMPTY_STRING, @{$filename};
+            my $buf = join( EMPTY_STRING, @{$filename} );
             $rinput_string = \$buf;
         }
         elsif ( $ref eq 'SCALAR' ) {
@@ -695,7 +695,7 @@ sub check_for_valid_words {
         $on_error = lc($on_error);
         if ( $on_error eq 'warn' || $on_error eq 'die' ) {
             my $num         = @non_words;
-            my $str         = join SPACE, @non_words;
+            my $str         = join( SPACE, @non_words );
             my $max_str_len = 120;
             if ( length($str) > $max_str_len - 1 ) {
                 $str = substr( $str, 0, $max_str_len - 4 ) . "...";
@@ -1186,8 +1186,8 @@ EOM
 
     # be sure we have a valid output format
     if ( !exists $default_file_extension{ $rOpts->{'format'} } ) {
-        my $formats = join SPACE,
-          sort map { "'" . $_ . "'" } keys %default_file_extension;
+        my $formats = join( SPACE,
+            sort map { "'" . $_ . "'" } keys %default_file_extension );
         my $fmt = $rOpts->{'format'};
         Die("-format='$fmt' but must be one of: $formats\n");
     }
@@ -1290,7 +1290,7 @@ EOM
         }
 
         # we'll stuff the source array into Arg_files
-        unshift( @Arg_files, $source_stream );
+        unshift @Arg_files, $source_stream;
 
         # No special treatment for source stream which is a filename.
         # This will enable checks for binary files and other bad stuff.
@@ -1299,7 +1299,7 @@ EOM
 
     # use stdin by default if no source array and no args
     elsif ( !@Arg_files ) {
-        unshift( @Arg_files, '-' );
+        unshift @Arg_files, '-';
     }
 
     # check file existence and expand any globs
@@ -1506,7 +1506,6 @@ sub check_in_place_modify {
                 Nag(
 "## warning: conflict of -st and -b in profile: -st has priority; use -nst to activate -b\n"
                 );
-
             }
             else {
                 ## keep quiet
@@ -2173,7 +2172,7 @@ sub get_line_separator_default {
         $line_separator_default = $endings{ lc($ole) };
 
         if ( !$line_separator_default ) {
-            my $str = join SPACE, keys %endings;
+            my $str = join( SPACE, keys %endings );
             Die(<<EOM);
 Unrecognized line ending '$ole'; expecting one of: $str
 EOM
@@ -2259,7 +2258,7 @@ sub set_line_separator {
                     if ( @lines > 1 ) {
 
                         # then make the change
-                        my $buf = join EMPTY_STRING, @lines;
+                        my $buf = join( EMPTY_STRING, @lines );
                         $rinput_string = \$buf;
                     }
                 }
@@ -2268,7 +2267,7 @@ sub set_line_separator {
             # convert CR-LF to LF
             elsif ( ( $input_line_separator eq $CRLF ) && ( "\n" eq $LF ) ) {
                 foreach my $line (@lines) { $line =~ s/$CRLF$/\n/ }
-                my $buf = join EMPTY_STRING, @lines;
+                my $buf = join( EMPTY_STRING, @lines );
                 $rinput_string = \$buf;
             }
 
@@ -2847,8 +2846,9 @@ EOM
                 if ( !defined($line_tidy_end) || $line_tidy_end > $num ) {
                     $line_tidy_end = $num;
                 }
-                my $input_string = join EMPTY_STRING,
-                  @input_lines[ $line_tidy_begin - 1 .. $line_tidy_end - 1 ];
+                my $input_string = join( EMPTY_STRING,
+                    @input_lines[ $line_tidy_begin - 1 .. $line_tidy_end - 1 ]
+                );
                 $rinput_string = \$input_string;
 
                 @input_lines_pre  = @input_lines[ 0 .. $line_tidy_begin - 2 ];
@@ -2940,8 +2940,8 @@ EOM
     # do --line-range-tidy line recombination
     #----------------------------------------
     if ( @input_lines_pre || @input_lines_post ) {
-        my $str_pre       = join EMPTY_STRING, @input_lines_pre;
-        my $str_post      = join EMPTY_STRING, @input_lines_post;
+        my $str_pre       = join( EMPTY_STRING, @input_lines_pre );
+        my $str_post      = join( EMPTY_STRING, @input_lines_post );
         my $output_string = $str_pre . ${$routput_string} . $str_post;
         $routput_string = \$output_string;
     }
@@ -2970,7 +2970,7 @@ EOM
                 $line .= $line_separator;
             }
         }
-        my $output_string = join EMPTY_STRING, @output_lines;
+        my $output_string = join( EMPTY_STRING, @output_lines );
         $routput_string = \$output_string;
     }
 
@@ -3364,7 +3364,7 @@ sub copy_buffer_to_external_ref {
 
     my $destination_buffer = EMPTY_STRING;
     if ( ref($routput) eq 'ARRAY' ) {
-        $destination_buffer = join EMPTY_STRING, @{$routput};
+        $destination_buffer = join( EMPTY_STRING, @{$routput} );
     }
     elsif ( ref($routput) eq 'SCALAR' ) {
         $destination_buffer = ${$routput};
@@ -3680,10 +3680,6 @@ sub generate_options {
     # message. This is because these are deprecated, experimental or debug
     # options and may or may not be retained in future versions:
 
-    # These undocumented flags are accepted but not used:
-    # --check-syntax
-    # --fuzzy-line-length
-    #
     # These undocumented flags are for debugging:
     # --recombine                           # used to debug line breaks
     # --short-concatenation-item-length     # used to break a '.' chain
@@ -3837,13 +3833,11 @@ sub generate_options {
     ########################################
     $category = 1;    # Basic formatting options
     ########################################
-    $add_option->( 'check-syntax',                 'syn',  '!' );
     $add_option->( 'entab-leading-whitespace',     'et',   '=i' );
     $add_option->( 'indent-columns',               'i',    '=i' );
     $add_option->( 'maximum-line-length',          'l',    '=i' );
     $add_option->( 'variable-maximum-line-length', 'vmll', '!' );
     $add_option->( 'whitespace-cycle',             'wc',   '=i' );
-    $add_option->( 'perl-syntax-check-flags',      'pscf', '=s' );
     $add_option->( 'preserve-line-endings',        'ple',  '!' );
     $add_option->( 'tabs',                         't',    '!' );
     $add_option->( 'default-tabsize',              'dt',   '=i' );
@@ -4172,7 +4166,6 @@ sub generate_options {
     $add_option->( 'dump-unique-keys',                'duk',   '!' );
     $add_option->( 'dump-want-left-space',            'dwls',  '!' );
     $add_option->( 'dump-want-right-space',           'dwrs',  '!' );
-    $add_option->( 'fuzzy-line-length',               'fll',   '!' );
     $add_option->( 'help',                            'h',     EMPTY_STRING );
     $add_option->( 'short-concatenation-item-length', 'scl',   '=i' );
     $add_option->( 'show-options',                    'opt',   '!' );
@@ -4245,7 +4238,6 @@ sub generate_options {
       break-at-old-ternary-breakpoints
       break-at-old-attribute-breakpoints
       break-at-old-keyword-breakpoints
-      nocheck-syntax
       character-encoding=guess
       closing-side-comments-balanced
       noextended-continuation-indentation
@@ -4258,7 +4250,6 @@ sub generate_options {
       encode-output-strings
       file-size-order
       function-paren-vertical-alignment
-      fuzzy-line-length
       hanging-side-comments
       indent-block-comments
       indent-leading-semicolon
@@ -4467,6 +4458,7 @@ sub generate_options {
     #-----------------------------------------------------------------------
     %expansion = (
         %expansion,
+
         'freeze-newlines'    => [qw(noadd-newlines nodelete-old-newlines)],
         'fnl'                => [qw(freeze-newlines)],
         'freeze-whitespace'  => [qw(noadd-whitespace nodelete-old-whitespace)],
@@ -4657,7 +4649,6 @@ sub generate_options {
               noblanks-before-blocks
               blank-lines-before-subs=0
               blank-lines-before-packages=0
-              nofuzzy-line-length
               notabs
               norecombine
             )
@@ -4679,6 +4670,24 @@ q(wbb=% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= 
         ],
 
         # Additional styles can be added here
+
+        #----------------------
+        # deprecated parameters
+        #----------------------
+
+        # These flags are accepted for backwards compatibility but ignored.
+        'check-syntax'            => [],
+        'nocheck-syntax'          => [],
+        'no-check-syntax'         => [],
+        'syn'                     => [],
+        'nsyn'                    => [],
+        'perl-syntax-check-flags' => [],
+        'pscf'                    => [],
+        'fuzzy-line-length'       => [],
+        'nofuzzy-line-length'     => [],
+        'no-fuzzy-line-length'    => [],
+        'fll'                     => [],
+        'nfll'                    => [],
     );
 
     Perl::Tidy::HtmlWriter->make_abbreviated_names( \%expansion );
@@ -5091,8 +5100,8 @@ sub make_grep_alias_string {
 
     # Defaults: list operators in List::Util
     # Possible future additions:  pairfirst pairgrep pairmap
-    my $default_string = join SPACE,
-      qw( all any first none notall reduce reductions );
+    my $default_string =
+      join( SPACE, qw( all any first none notall reduce reductions ) );
 
     # make a hash of any excluded words
     my %is_excluded_word;
@@ -5147,7 +5156,7 @@ sub make_grep_alias_string {
         }
     );
 
-    my $joined_words = join SPACE, @filtered_word_list;
+    my $joined_words = join( SPACE, @filtered_word_list );
     $rOpts->{$opt_name} = $joined_words;
 
     return;
@@ -5198,7 +5207,7 @@ sub cleanup_word_list {
             on_error    => 'die',
         }
     );
-    $rOpts->{$option_name} = join SPACE, @filtered_word_list;
+    $rOpts->{$option_name} = join( SPACE, @filtered_word_list );
     return \%seen;
 } ## end sub cleanup_word_list
 
@@ -5398,16 +5407,6 @@ EOM
         $rOpts->{'closing-paren-indentation'}          = $cti;
     }
 
-    # Syntax checking is no longer supported due to concerns about executing
-    # code in BEGIN blocks.  These flags are still accepted for backwards
-    # compatibility but ignored. They will be deleted in a future version.
-    foreach my $optname (qw( check-syntax perl-syntax-check-flags )) {
-        if ( $rOpts->{$optname} ) {
-            Nag("## NOTE: '--$optname' is deprecated and should be removed\n");
-            $rOpts->{$optname} = undef;
-        }
-    }
-
     my $MAX_BLANK_COUNT   = 100;
     my $check_blank_count = sub {
         my ( $key, $abbrev ) = @_;
@@ -5531,18 +5530,6 @@ EOM
 
     make_grep_alias_string($rOpts);
 
-    # Turn on fuzzy-line-length unless this is an extrude run, as determined
-    # by the -i and -ci settings. Otherwise blinkers can form (case b935).
-    # This is an undocumented parameter used only for stress-testing when
-    # --extrude is set.
-    if ( !$rOpts->{'fuzzy-line-length'} ) {
-        if (   $rOpts->{'maximum-line-length'} != 1
-            || $rOpts->{'continuation-indentation'} != 0 )
-        {
-            $rOpts->{'fuzzy-line-length'} = 1;
-        }
-    }
-
     # Large values of -scl can cause convergence problems, issue c167
     if ( $rOpts->{'short-concatenation-item-length'} > 12 ) {
         $rOpts->{'short-concatenation-item-length'} = 12;
@@ -5659,7 +5646,7 @@ sub expand_command_abbreviations {
 
                 # save the raw input for debug output in case of circular refs
                 if ( $pass_count == 0 ) {
-                    push( @{$rraw_options}, $word );
+                    push @{$rraw_options}, $word;
                 }
 
                 # recombine abbreviation and flag, if necessary,
@@ -5677,19 +5664,19 @@ sub expand_command_abbreviations {
                     # new arg list for the next pass
                     foreach my $abbrev ( @{ $rexpansion->{$abr} } ) {
                         next unless ($abbrev);    # for safety; shouldn't happen
-                        push( @new_argv, '--' . $abbrev . $flags );
+                        push @new_argv, '--' . $abbrev . $flags;
                     }
                 }
 
                 # not in expansion hash, must be actual long name
                 else {
-                    push( @new_argv, $word );
+                    push @new_argv, $word;
                 }
             }
 
             # not a dash item, so just save it for the next pass
             else {
-                push( @new_argv, $word );
+                push @new_argv, $word;
             }
         } ## end of this pass
 
@@ -6324,7 +6311,7 @@ EOM
                 push @{ $rexpansion->{$name} }, @{$rbody_parts};
             }
             else {
-                push( @config_list, @{$rbody_parts} );
+                push @config_list, @{$rbody_parts};
             }
         }
     }
@@ -6561,7 +6548,9 @@ sub dump_long_names {
 #--------------------------------------------------
 EOM
 
-    foreach my $name ( sort @names ) { print {*STDOUT} "$name\n" }
+    foreach my $name ( sort @names ) {
+        print {*STDOUT} "$name\n";
+    }
     return;
 } ## end sub dump_long_names
 

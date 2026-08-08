@@ -3,10 +3,10 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/irand irand64 drand urandomb urandomm
+use Math::Prime::Util qw/irand irand32 irand64 drand urandomb urandomm urandomr
                          random_bytes entropy_bytes
-                         srand csrand
-                         mulmod addmod vecmin vecmax vecall/;
+                         srand csrand powint
+                         mulmod addmod muladdint divrem vecmin vecmax vecall/;
 
 my $use64 = (~0 > 4294967295);
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
@@ -15,15 +15,24 @@ my $maxbits = $use64 ? 64 : 32;
 my $samples = $extra ? 100000 :  10000;
 
 plan tests => 1
+            + 5  # irand / irand32
+            + 3  # irand64
             + 2
-            + 2
-            + 2
-            + 5  # drand range
+            + 6  # drand range and zero scaling
+            + 1  # drand arity
             + 4  # identify rng and test srand/csrand
+            + 2  # srand UV coercion
+            + 1  # csrand(undef) entropy reseeding
+            + 4  # srand/csrand arity and csrand return
+            + 4  # GMP srand/csrand synchronization
             + 4  # 0 / undef arguments to urandom*
-            + 1  # urandomb
+            + 1  # urandomb native range
+            + 1  # urandomb bigint range
             + 3  # urandomm
-            + 4  # entropy_bytes
+            + 5  # urandomr
+            + 7  # random_bytes / entropy_bytes
+            + 2  # irand stream continuity across buffer boundaries
+            + 2  # PP timer entropy fallback
             + 0;
 
 ########
@@ -36,24 +45,39 @@ ok( Math::Prime::Util::_is_csprng_well_seeded(), "CSPRNG is being seeded properl
   my @s = map { irand } 1 .. $samples;
   is( scalar(grep { $_ > 4294967295 } @s), 0, "irand values are 32-bit" );
   is( scalar(grep { $_ != int($_) } @s), 0, "irand values are integers" );
+
+  my @s32 = map { irand32 } 1 .. $samples;
+  is( scalar(grep { $_ > 4294967295 } @s32), 0, "irand32 values are 32-bit" );
+  is( scalar(grep { $_ != int($_) } @s32), 0, "irand32 values are integers" );
 }
 
 ########
 
-SKIP: {
-  skip "Skipping irand64 on 32-bit Perl", 2 if !$use64;
-  my $bits_on  = 0;
-  my $bits_off = 0;
+{
+  # We could do this all with 64-bit masks, but our test would then depend on
+  # the bigint module's bit operations.  Instead we'll split the result into
+  # two 32-bit parts (hi,lo) and handle each one separately, all native.
+  my $wordbase = "4294967296";
+  my $wordmask = 4294967295;
+  my ($bits_on_hi,  $bits_on_lo)  = (0, 0);
+  my ($bits_off_hi, $bits_off_lo) = (0, 0);
   my $iter = 0;
+  # We expect about 9 iterations to meet both conditions.
+  # After 24 calls there is less than 0.001% chance we have not finished.
   for (1 .. 6400) {
     $iter++;
-    my $v = irand64;
-    $bits_on |= $v;
-    $bits_off |= (~$v);
-    last if ~$bits_on == 0 && ~$bits_off == 0;
+    my ($hi, $lo) = divrem(irand64, $wordbase);
+    $bits_on_hi  |= $hi;
+    $bits_on_lo  |= $lo;
+    $bits_off_hi |= $hi ^ $wordmask;
+    $bits_off_lo |= $lo ^ $wordmask;
+    last if $bits_on_hi  == $wordmask && $bits_on_lo  == $wordmask
+         && $bits_off_hi == $wordmask && $bits_off_lo == $wordmask;
   }
-  is( ~$bits_on,  0, "irand64 all bits on in $iter iterations" );
-  is( ~$bits_off, 0, "irand64 all bits off in $iter iterations" );
+  is_deeply([$bits_on_hi, $bits_on_lo], [$wordmask, $wordmask],
+            "irand64 all bits on in $iter iterations" );
+  is_deeply([$bits_off_hi, $bits_off_lo], [$wordmask, $wordmask],
+            "irand64 all bits off in $iter iterations" );
 }
 
 ########
@@ -90,7 +114,7 @@ sub check_float_range {
   if ($lo <= $hi) {
     ok( vecall(sub{ $_ >= $lo && $_ < $hi },@$v), "$name: all in range [$lo,$hi)" );
   } else {
-    ok( vecall(sub{ $_ >= $hi && $_ < $lo },@$v), "$name: all in range ($hi,$lo]" );
+    ok( vecall(sub{ $_ > $hi && $_ <= $lo },@$v), "$name: all in range ($hi,$lo]" );
   }
 }
 my $num = $extra ? 1000 : 100;
@@ -98,10 +122,23 @@ check_float_range('drand(10)',0,10,[map{ drand(10) } 1..$num]);
 check_float_range('drand()',0,1,[map{ drand() } 1..$num]);
 check_float_range('drand(-10)',0,-10,[map{ drand(-10) } 1..$num]);
 check_float_range('drand(0)',0,1,[map{ drand(0) } 1..$num]);
+my $drand_sub = \&drand;
+ok(!eval { $drand_sub->(1,2); 1 }, "drand rejects extra arguments");
 {
   # Skip warnings these give, worry about the behavior
   no warnings;
   check_float_range('drand(undef)',0,1,[map{ drand(undef) } 1..$num]);
+}
+{
+  srand(0x521974A3);
+  my $expected = drand();
+  my @got;
+  for my $zero (0, "0.0", "0E0") {
+    srand(0x521974A3);
+    push @got, drand($zero);
+  }
+  is_deeply(\@got, [($expected) x 3],
+            "drand treats every numeric zero limit as an omitted limit");
 }
 # We can't easily supress the warning here, but we'd like to check the
 # result.  Math::Random::Secure fails this, for instance.
@@ -148,6 +185,24 @@ sub try_16bit {
 
 ########
 
+# Match the UV coercion performed by the XS typemap.
+is(srand(1.75), 1, "srand truncates a fractional seed to UV");
+is("" . srand(-1), $use64 ? "18446744073709551615" : "4294967295",
+   "srand coerces a negative seed to UV");
+csrand(undef);
+ok(Math::Prime::Util::_is_csprng_well_seeded(),
+   "csrand(undef) reseeds from entropy");
+{
+  my $srand_sub = \&srand;
+  my $csrand_sub = \&csrand;
+  ok(!eval { $srand_sub->(1, 2); 1 }, "srand rejects extra arguments");
+  ok(!eval { $csrand_sub->("seed", 2); 1 }, "csrand rejects extra arguments");
+  is(scalar csrand("scalar return"), undef,
+     "csrand returns undef in scalar context");
+  my @ret = csrand("list return");
+  is(scalar @ret, 0, "csrand returns an empty list in list context");
+}
+
 # Quick check to identify the RNG being used.  Should be ChaCha20.
 srand(42);
 my $rb42 = irand();
@@ -187,13 +242,100 @@ SKIP: {
   }
 }
 
+{
+  srand(0x521974A3);
+  my @irand = map { irand } 1 .. 32;
+  srand(0x521974A3);
+  my @irand32 = map { irand32 } 1 .. 32;
+  is_deeply(\@irand32, \@irand, "irand32 and irand produce the same stream" );
+
+  srand(0x521974A3);
+  my $r64 = irand64;
+  srand(0x521974A3);
+  my ($hi, $lo) = (irand32, irand32);
+  is("$r64", "" . muladdint($hi, "4294967296", $lo),
+     "irand64 combines two irand32 results" );
+}
+
+SKIP: {
+  skip "buffer-boundary tests require ChaCha", 2
+    unless $csprng =~ /^ChaCha/;
+
+  my (@got32, @exp32);
+  for my $tail (1 .. 3) {
+    srand(0x521974A3);
+    random_bytes(1024-$tail);
+    push @got32, irand32;
+    srand(0x521974A3);
+    random_bytes(1024-$tail);
+    push @exp32, unpack("V", random_bytes(4));
+  }
+  is_deeply(\@got32, \@exp32,
+            "irand32 preserves partial buffered words");
+
+  my (@got64, @exp64);
+  for my $tail (1 .. 7) {
+    srand(0x521974A3);
+    random_bytes(1024-$tail);
+    push @got64, "" . irand64;
+    srand(0x521974A3);
+    random_bytes(1024-$tail);
+    my($hi,$lo) = unpack("V2", random_bytes(8));
+    push @exp64, "" . muladdint($hi, "4294967296", $lo);
+  }
+  is_deeply(\@got64, \@exp64,
+            "irand64 preserves partial buffered words");
+}
+
+SKIP: {
+  skip "GMP backend with seed_csprng is not available", 4
+    unless Math::Prime::Util::prime_get_config()->{'gmp'} >= 42;
+
+  srand(0x521974A3);
+  my $gmp_r = Math::Prime::Util::GMP::irand();
+  Math::Prime::Util::GMP::seed_csprng(4, pack("V", 0x521974A3));
+  is(Math::Prime::Util::GMP::irand(), $gmp_r,
+     "srand synchronizes a 32-bit seed with GMP");
+
+  my $seed = srand();
+  my $seedstr;
+  if ($seed <= 4294967295) {
+    $seedstr = pack("V", $seed);
+  } else {
+    my($hi,$lo) = divrem($seed, 4294967296);
+    $seedstr = pack("V2", $lo, $hi);
+  }
+  $gmp_r = Math::Prime::Util::GMP::irand();
+  Math::Prime::Util::GMP::seed_csprng(length($seedstr), $seedstr);
+  is(Math::Prime::Util::GMP::irand(), $gmp_r,
+     "srand without arguments synchronizes its generated seed with GMP");
+
+  my $csseed = "BLAKEGrostlJHKeccakSkein--RijndaelSerpentTwofishRC6MARS";
+  csrand($csseed);
+  $gmp_r = Math::Prime::Util::GMP::irand();
+  Math::Prime::Util::GMP::seed_csprng(length($csseed), $csseed);
+  is(Math::Prime::Util::GMP::irand(), $gmp_r,
+     "csrand synchronizes an explicit seed with GMP");
+
+  skip "64-bit srand seed requires 64-bit UV", 1 unless $use64;
+  my $seed64 = 4294967297;
+  srand($seed64);
+  $gmp_r = Math::Prime::Util::GMP::irand();
+  Math::Prime::Util::GMP::seed_csprng(8, pack("V2", 1, 1));
+  is(Math::Prime::Util::GMP::irand(), $gmp_r,
+     "srand synchronizes a 64-bit seed with GMP");
+}
+
 srand;
 
 #######
 
 is(random_bytes(0),'',"random_bytes(0) returns empty string");
+is(entropy_bytes(0),'',"entropy_bytes(0) returns empty string");
+ok(!eval { random_bytes("4foo"); }, "random_bytes rejects invalid input");
+ok(!eval { entropy_bytes("4foo"); }, "entropy_bytes rejects invalid input");
 is(urandomb(0),0,"urandomb(0) returns 0");
-is(urandomm(0),0,"urandomm(0) returns 0");
+ok(!eval { urandomm(0); }, "urandomm(0) is rejected");
 is(urandomm(1),0,"urandomm(1) returns 0");
 
 #######
@@ -206,6 +348,22 @@ is(urandomm(1),0,"urandomm(1) returns 0");
     push @failb, $bits unless !ref($r) && $r <= $lim;
   }
   is_deeply(\@failb, [], "urandomb returns native int within range for 1..$maxbits");
+}
+
+{
+  my $lim128   = powint(2, 128);
+  my $lim71    = powint(2, 71);
+  my $top_mask = $lim71 - powint(2, 64);  # bits 64..70
+  my @vals128  = map { urandomb(128) } 1..20;
+  my @vals71   = map { urandomb(71)  } 1..30;
+  my $or71  = 0;        $or71  |= $_ for @vals71;
+  my $and71 = $lim71-1; $and71 &= $_ for @vals71;
+  my @fail128  = grep { $_ < 0 || $_ >= $lim128 } @vals128;
+  my @fail71   = grep { $_ < 0 || $_ >= $lim71  } @vals71;
+  my $top_bits_vary =    ($or71 & $top_mask) == $top_mask
+                      && ($and71 & $top_mask) != $top_mask  ?  1 : 0;
+  is_deeply([\@fail128, \@fail71, $top_bits_vary],  [[], [], 1],
+            "urandomb(128) and urandomb(71): in range and top 7 bits exercised");
 }
 
 #######
@@ -230,6 +388,33 @@ is(urandomm(1),0,"urandomm(1) returns 0");
   ok( vecmin(@k) == 0 && vecmax(@k) == 9, "urandomm(10) values between 0 and 9 (@k)" );
 }
 
+#######  urandomr
+
+is( urandomr(7, 3), undef, "urandomr(7,3) returns undef when lo > hi" );
+is( urandomr(5, 5), 5,     "urandomr(5,5) returns 5" );
+
+{
+  my @failr;
+  for my $lo (-3 .. 3) {
+    for my $hi ($lo .. $lo+5) {
+      my $r = urandomr($lo, $hi);
+      push @failr, [$lo,$hi,$r] unless defined($r) && $r >= $lo && $r <= $hi;
+    }
+  }
+  is_deeply(\@failr, [], "urandomr(lo,hi) always in [lo,hi] for small signed range");
+}
+
+{
+  my %dv;
+  for my $t (1..10000) {
+    $dv{urandomr(3, 8)}++;
+    last if $t > 100 && scalar(keys(%dv)) >= 6;
+  }
+  my @k = sort { $a <=> $b } keys(%dv);
+  is(scalar(@k), 6, "urandomr(3,8) generated all 6 distinct values");
+  ok( $k[0] == 3 && $k[-1] == 8, "urandomr(3,8) values between 3 and 8 (@k)" );
+}
+
 #######
 
 # If the functions work, these tests fail with chance less than 2^-128.
@@ -242,3 +427,25 @@ $eb2 = unpack("H*",$eb2);
 isnt($eb1, '00' x $ebytes, "entropy_bytes didn't return all zeros once");
 isnt($eb2, '00' x $ebytes, "entropy_bytes didn't return all zeros twice");
 isnt($eb1, $eb2, "entropy_bytes returned two different binary strings");
+
+SKIP: {
+  skip "PP timer fallback test", 1
+    if Math::Prime::Util::prime_get_config()->{'xs'};
+  no warnings qw(redefine once);
+  local *Math::Prime::Util::Entropy::entropy_bytes = sub { undef };
+  local *Math::Prime::Util::Entropy::_timer_seed = sub { "T" x 64 };
+  is(length(entropy_bytes(17)), 17,
+     "PP entropy fallback seeds the CSPRNG and returns requested bytes");
+}
+
+SKIP: {
+  skip "timer entropy modules unavailable", 1
+    unless $extra && eval {
+      require Math::Prime::Util::Entropy;
+      require Time::HiRes;
+      require Digest::SHA;
+      1;
+    };
+  is(length(Math::Prime::Util::Entropy::_timer_seed()), 64,
+     "timer entropy fallback produces a 64-byte seed");
+}

@@ -68,6 +68,60 @@ void init_randstate(unsigned long seed) {
 }
 void clear_randstate(void) {  gmp_randclear(_randstate);  }
 
+static int _fromdigits_char_value(unsigned char c)
+{
+  if (c >= '0' && c <= '9') return c - '0';
+  if (c >= 'A' && c <= 'Z') return c - 'A' + 10;
+  if (c >= 'a' && c <= 'z') return c - 'a' + 10;
+  return -1;
+}
+
+int mpz_fromdigits_str(mpz_t n, const char* s, const mpz_t base)
+{
+  mpz_set_ui(n, 0);
+  while (*s == '0')
+    s++;
+  for (; *s != 0; s++) {
+    int d = _fromdigits_char_value((unsigned char)*s);
+    if (d < 0 || mpz_cmp_ui(base, d) <= 0)
+      return 0;
+    mpz_mul(n, n, base);
+    mpz_add_ui(n, n, d);
+  }
+  return 1;
+}
+
+void mpz_fromdigits(mpz_t n, mpz_t *d, size_t len, const mpz_t base)
+{
+  if (len == 0) {
+    mpz_set_ui(n, 0);
+  } else if (len == 1) {
+    mpz_set(n, d[0]);
+  } else {
+    mpz_t *l, b;
+    size_t i, k = len;
+    mpz_init_set(b, base);
+    New(0, l, len, mpz_t);
+    for (i = 0; i < len; i++)
+      mpz_init_set(l[i], d[i]);
+    while (k > 1) {
+      for (i = 0; i < k-1; i += 2) {
+        mpz_mul(l[i+1], l[i+1], b);
+        mpz_add(l[i>>1], l[i], l[i+1]);
+      }
+      if (k & 1)
+        mpz_set(l[k>>1], l[k-1]);
+      k = (k+1) >> 1;
+      mpz_mul(b, b, b);
+    }
+    mpz_set(n, l[0]);
+    for (i = 0; i < len; i++)
+      mpz_clear(l[i]);
+    Safefree(l);
+    mpz_clear(b);
+  }
+}
+
 UV irand64(int nbits)
 {
   if (nbits ==  0) return 0;
@@ -81,6 +135,7 @@ static NV _tonv_32 = -1.0;
 static NV _tonv_64;
 NV drand64(void)
 {
+  NV r;
   if (_tonv_32 < 0) {
     int i;
     NV t64, t32 = 1.0;
@@ -92,7 +147,10 @@ NV drand64(void)
     _tonv_64 = t64;
     _tonv_32 = t32;
   }
-  return isaac_rand32() * _tonv_32 + isaac_rand32() * _tonv_64;
+  do {
+    r = isaac_rand32() * _tonv_32 + isaac_rand32() * _tonv_64;
+  } while (r >= 1.0);
+  return r;
 }
 
 void mpz_isaac_urandomb(mpz_t rop, int nbits)
@@ -115,6 +173,15 @@ void mpz_isaac_urandomm(mpz_t rop, const mpz_t n)
 {
   int count = 80;
   unsigned long nbits = mpz_sizeinbase(n,2);
+
+  if (rop == n) {
+    mpz_t t;
+    mpz_init(t);
+    mpz_isaac_urandomm(t, n);
+    mpz_set(rop, t);
+    mpz_clear(t);
+    return;
+  }
 
   if (mpz_sgn(n) <= 0) {
     mpz_set_ui(rop,0);
@@ -148,73 +215,120 @@ void mpz_isaac_urandomm(mpz_t rop, const mpz_t n)
   }
 }
 
-int mpz_fits_uv_p(const mpz_t n)
-{
-  if (sizeof(UV) == sizeof(unsigned long int))
-    return mpz_fits_ulong_p(n);
-  else
-    return (mpz_sgn(n) >= 0 && mpz_sizeinbase(n,2) <= BITS_PER_WORD);
+/******************************************************************************/
+
+/* Note, we do not support:
+ *  - UV more than 64-bit.
+ *  - UV more than two 32-bit limbs
+ *  - unsigned long being widths like 16 or 128
+ *  - limbs other than 32-bit or 64-bit
+ */
+
+/* CMP_UVUI will be 0 if UV = unsigned long, -1 if smaller, 1 if bigger */
+#if (ULONG_MAX >> 31) == 1
+#define CMP_UVUI ((BITS_PER_WORD == 32) ? 0 : 1)
+#else
+#define CMP_UVUI ((BITS_PER_WORD == 32) ? -1 : 0)
+#endif
+
+#if CMP_UVUI == 0    /* UV and mpz's ui are the same */
+int mpz_fits_uv_p(const mpz_t n) { return mpz_fits_ulong_p(n); }
+int mpz_fits_iv_p(const mpz_t n) { return mpz_fits_slong_p(n); }
+#else
+int mpz_fits_uv_p(const mpz_t n) {
+  return (mpz_sgn(n) >= 0 && mpz_sizeinbase(n,2) <= BITS_PER_WORD);
 }
-int mpz_fits_iv_p(const mpz_t n)
-{
-  if (sizeof(IV) == sizeof(signed long int))
-    return mpz_fits_slong_p(n);
+int mpz_fits_iv_p(const mpz_t n) {
+  size_t bits = mpz_sizeinbase(n, 2);
+  if (mpz_sgn(n) >= 0)
+    return bits <= BITS_PER_WORD-1;
   else
-    return (mpz_sizeinbase(n,2) <= BITS_PER_WORD-1);
+    return bits < BITS_PER_WORD ||
+           (bits == BITS_PER_WORD && mpz_divisible_2exp_p(n, BITS_PER_WORD-1));
+}
+#endif
+
+#if CMP_UVUI <= 0    /* UV is the same or smaller than mpz's ui */
+UV mpz_get_uv(const mpz_t n) { return mpz_get_ui(n); }
+IV mpz_get_iv(const mpz_t n) { return mpz_get_si(n); }
+
+void mpz_set_uv(mpz_t n, UV v) { mpz_set_ui(n, v); }
+void mpz_set_iv(mpz_t n, IV v) { mpz_set_si(n, v); }
+
+void mpz_add_uv(mpz_t r, const mpz_t a, UV b) { mpz_add_ui(r,a,b); }
+void mpz_sub_uv(mpz_t r, const mpz_t a, UV b) { mpz_sub_ui(r,a,b); }
+#else
+/* Like mpz_get_ui, you need to use mpz_fits_uv_p first for correct results. */
+UV mpz_get_uv(const mpz_t n)
+{
+  UV v = mpz_getlimbn(n,0);
+  if (GMP_LIMB_BITS < 64 || sizeof(mp_limb_t) < sizeof(UV))
+    v |= ((UV)mpz_getlimbn(n,1)) << 32;
+  return v;
+}
+IV mpz_get_iv(const mpz_t n)
+{
+  UV ui = mpz_getlimbn(n,0);
+  if (GMP_LIMB_BITS < 64 || sizeof(mp_limb_t) < sizeof(UV))
+    ui |= ((UV)mpz_getlimbn(n,1)) << 32;
+  if (mpz_sgn(n) >= 0)
+    return (IV) ui;
+  else {
+    UV const ivmax = ((UV)1 << (BITS_PER_WORD-1)) - 1;
+    if (ui <= ivmax) return -(IV)ui;
+    else             return -(IV)ivmax - 1;
+  }
 }
 
 void mpz_set_uv(mpz_t n, UV v)
 {
-#if BITS_PER_WORD == 32
-  mpz_set_ui(n, v);
-#else
-  if (v <= 0xFFFFFFFFUL || sizeof(unsigned long int) >= sizeof(UV)) {
+  if (v <= 0xFFFFFFFFUL) {
     mpz_set_ui(n, v);
   } else {
     mpz_set_ui(n, (v >> 32));
     mpz_mul_2exp(n, n, 32);
     mpz_add_ui(n, n, v & 0xFFFFFFFFUL);
   }
-#endif
 }
 void mpz_set_iv(mpz_t n, IV v)
 {
-#if BITS_PER_WORD == 32
-    mpz_set_si(n, v);
-#else
-  if ((v <= 0x7FFFFFFFL && v >= -0x80000000L) || sizeof(unsigned long int) >= sizeof(UV)) {
+  if (v <= 0x7FFFFFFFL && v >= -(IV)0x7FFFFFFFL-1) {
     mpz_set_si(n, v);
   } else if (v >= 0) {
     mpz_set_uv(n, v);
   } else {
-    mpz_set_uv(n, -v);
+    mpz_set_uv(n, (UV)0 - (UV)v);
     mpz_neg(n, n);
   }
-#endif
-}
-UV mpz_get_uv(const mpz_t n)
-{
-#if BITS_PER_WORD == 32
-  return mpz_get_ui(n);
-#else
-  UV v = mpz_getlimbn(n,0);
-  if (GMP_LIMB_BITS < 64 || sizeof(mp_limb_t) < sizeof(UV))
-    v |= ((UV)mpz_getlimbn(n,1)) << 32;
-  return v;
-#endif
-}
-IV mpz_get_iv(const mpz_t n)
-{
-#if BITS_PER_WORD == 32
-  return mpz_get_si(n);
-#else
-  UV ui = mpz_getlimbn(n,0);
-  if (GMP_LIMB_BITS < 64 || sizeof(mp_limb_t) < sizeof(UV))
-    ui |= ((UV)mpz_getlimbn(n,1)) << 32;
-  return mpz_sgn(n) < 0 ? -(IV)ui : ui;
-#endif
 }
 
+void mpz_add_uv(mpz_t r, const mpz_t a, UV b)
+{
+  if (b <= 0xFFFFFFFFUL) {
+    mpz_add_ui(r, a, b);
+  } else {
+    mpz_t t;
+    mpz_init(t);
+    mpz_set_uv(t, b);
+    mpz_add(r, a, t);
+    mpz_clear(t);
+  }
+}
+void mpz_sub_uv(mpz_t r, const mpz_t a, UV b)
+{
+  if (b <= 0xFFFFFFFFUL) {
+    mpz_sub_ui(r, a, b);
+  } else {
+    mpz_t t;
+    mpz_init(t);
+    mpz_set_uv(t, b);
+    mpz_sub(r, a, t);
+    mpz_clear(t);
+  }
+}
+#endif
+
+/******************************************************************************/
 
 /* a=0, return power.  a>1, return bool if an a-th power */
 UV is_power(const mpz_t n, UV a)
@@ -457,6 +571,30 @@ int mpz_divmod(mpz_t r, const mpz_t a, const mpz_t b, const mpz_t n, mpz_t t)
   return 0;  /* Cannot invert */
 }
 
+int mpz_ediv_qr(mpz_t q, mpz_t r, const mpz_t a, const mpz_t b)
+{
+  if (mpz_sgn(b) == 0)
+    return 0;
+  if (mpz_sgn(a) >= 0) {
+    mpz_tdiv_qr(q, r, a, b);
+  } else {
+    mpz_t Q, R;
+    mpz_init(Q); mpz_init(R);
+    mpz_tdiv_qr(Q, R, a, b);  /* q is t-quotient, r is t-remainder */
+    if (mpz_sgn(R) < 0) {
+      if (mpz_sgn(b) > 0) {
+        mpz_sub_ui(Q, Q, 1);
+        mpz_add(R, R, b);
+      } else {
+        mpz_add_ui(Q, Q, 1);
+        mpz_sub(R, R, b);
+      }
+    }
+    mpz_set(q, Q); mpz_set(r, R);
+    mpz_clear(Q); mpz_clear(R);
+  }
+  return 1;
+}
 
 /* Smith-Cornacchia: Solve x,y for x^2 + |D|y^2 = p given prime p */
 /* See Cohen 1.5.2 */
@@ -846,6 +984,74 @@ UV logint(const mpz_t n, UV base) {
   mpz_clear(nt);
   /* res is largest res such that base^res <= n */
   return res;
+}
+
+void mpz_logint(mpz_t r, const mpz_t n, const mpz_t b)
+{
+  mpz_t p, e;
+  size_t nbits, bbits;
+  unsigned long e0;
+
+  if (mpz_cmp_ui(n,0) <= 0 || mpz_cmp_ui(b,1) <= 0)
+    croak("mpz_log: bad input\n");
+
+  if (mpz_cmp(n,b) < 0) {
+    mpz_set_ui(r,0);
+    return;
+  }
+
+  if (mpz_fits_uv_p(b)) {
+    mpz_set_uv(r, logint(n, mpz_get_uv(b)));
+    return;
+  }
+
+  /* Linear count, with simple bit-size initial value. */
+  nbits = mpz_sizeinbase(n,2);
+  bbits = mpz_sizeinbase(b,2);
+  e0 = (unsigned long)((nbits - 1) / bbits);
+
+  mpz_init_set_ui(e, e0);
+  mpz_init(p);
+  mpz_pow_ui(p, b, e0);
+
+  while (mpz_cmp(p, n) <= 0) {
+    mpz_add_ui(e, e, 1);
+    mpz_mul(p, p, b);
+  }
+  mpz_sub_ui(r, e, 1);
+  mpz_clear(p);
+  mpz_clear(e);
+}
+
+void mpz_rootint(mpz_t r, const mpz_t x, const mpz_t n)
+{
+  if (mpz_sgn(x) < 0 || mpz_sgn(n) <= 0)
+    croak("mpz_rootint: x must be non-negative, n must be positive");
+
+  if (mpz_sgn(x) == 0)
+    mpz_set_ui(r,0);
+  else if (mpz_cmp_ui(x,1) == 0)
+    mpz_set_ui(r,1);
+  else if (mpz_fits_ulong_p(n))
+    mpz_root(r, x, mpz_get_ui(n));
+  else {
+#if SIZE_MAX <= ULONG_MAX
+    mpz_set_ui(r,1);
+#elif SIZE_MAX == 0xFFFFFFFFFFFFFFFFULL && ULONG_MAX == 0xFFFFFFFFUL
+    size_t xbits = mpz_sizeinbase(x, 2);
+    mpz_t zbits;
+    mpz_init_set_ui(zbits, xbits >> 32);
+    mpz_mul_2exp(zbits, zbits, 32);
+    mpz_add_ui(zbits, zbits, xbits & 0xFFFFFFFFUL);
+    if (mpz_cmp(n, zbits) >= 0)
+      mpz_set_ui(r, 1);
+    else
+      croak("rootint: root too large");
+    mpz_clear(zbits);
+#else
+    croak("rootint: root too large");
+#endif
+  }
 }
 
 /******************************************************************************/

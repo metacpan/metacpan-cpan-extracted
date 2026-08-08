@@ -26,7 +26,9 @@ on, and generated SQL is prepared through C<prepare_cached> so each
 distinct statement is compiled once.
 
 It is selected by default; C<< database backend => 'Class' >> swaps it
-for any class honouring the same six methods.
+for any class honouring the same six methods. Every call blocks the worker
+for the whole database round trip - L<Punk::Model::DBIx::Loop> is the
+non-blocking alternative, at the cost of handlers written against futures.
 
 =head1 CONFIGURATION
 

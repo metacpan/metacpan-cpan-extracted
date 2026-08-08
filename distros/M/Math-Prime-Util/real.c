@@ -6,6 +6,8 @@
 #include "ptypes.h"
 #include "sieve.h"
 #include "util.h"
+#include "moebius.h"
+#include "constants.h"
 #include "real.h"
 #include "mathl.h"
 
@@ -78,15 +80,6 @@
     } while (0)
   #define SUM_FINAL(s)  (s + s ## _cs + s ## _ccs)
 #endif
-
-
-static const unsigned short primes_tiny[] =
-  {0,2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,
-   101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,
-   193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,
-   293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,
-   409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503};
-#define NPRIMES_TINY (sizeof(primes_tiny)/sizeof(primes_tiny[0]))
 
 
 /******************************************************************************/
@@ -181,7 +174,9 @@ static LNV _ei_chebyshev_pos24(const LNV x) {
   for (n = 0; n <= 8; n++)
     frac = Q2[n] / (P2[n] + x + frac);
   frac += P2[9];
-  return explnv(x) * (invx + invx*invx*frac);
+  if (x < LNVCONST(700.0))
+    return explnv(x) * (invx + invx*invx*frac);
+  return explnv(x-loglnv(x)) * (LNV_ONE + invx*frac);
 }
 #if 0
 /* Continued fraction, good for x < -1 */
@@ -260,10 +255,12 @@ static LNV _ei_series_divergent(LNV const x) {
   }
   SUM_ADD(sum, invx);
   SUM_ADD(sum, LNV_ONE);
-  return explnv(x) * SUM_FINAL(sum) * invx;
+  if (x < LNVCONST(700.0))
+    return explnv(x) * SUM_FINAL(sum) * invx;
+  return explnv(x-loglnv(x)) * SUM_FINAL(sum);
 }
 
-NV Ei(NV x) {
+static LNV _Ei(LNV x) {
   bool nv_is_quad = LNV_IS_QUAD;  /* make C2X happy */
   if (x == 0) croak("Invalid input to ExponentialIntegral:  x must be != 0");
   /* Protect against messed up rounding modes */
@@ -281,19 +278,27 @@ NV Ei(NV x) {
   }
 }
 
-NV Li(NV x) {
+NV Ei(NV x) {
+  return (NV) _Ei((LNV)x);
+}
+
+static LNV _Li(LNV x) {
   if (x == 0) return 0;
   if (x == 1) return -INFINITY;
   if (x == 2) return li2;
   if (x < 0) croak("Invalid input to LogarithmicIntegral:  x must be >= 0");
-  if (x >= NV_MAX) return INFINITY;
+
+  /* Ramanujan's series overflows for large x.  Ei(log(x)) uses a scaled
+   * asymptotic expansion that retains finite results near the type limit. */
+  if (x > LNVCONST(1e16)) return _Ei(loglnv(x));
 
   /* Calculate directly using Ramanujan's series. */
   if (x > 1) {
     const LNV logx = loglnv(x);
-    LNV sum = 0, inner_sum = 0, old_sum, factorial = 1, power2 = 1;
+    LNV sum = 0, old_sum, factorial = 1, power2 = 1;
     LNV q, p = -1;
     int k = 0, n = 0;
+    SUM_INIT(inner_sum);
 
     for (n = 1, k = 0; n < 200; n++) {
       factorial *= n;
@@ -301,29 +306,36 @@ NV Li(NV x) {
       q = factorial * power2;
       power2 *= 2;
       for (; k <= (n - 1) / 2; k++)
-        inner_sum += LNV_ONE / (2 * k + 1);
+        SUM_ADD(inner_sum, LNV_ONE / (2 * k + 1));
       old_sum = sum;
-      sum += (p / q) * inner_sum;
+      sum += (p / q) * SUM_FINAL(inner_sum);
       if (fabslnv(sum - old_sum) <= LNV_EPSILON) break;
     }
     return euler_mascheroni + loglnv(logx) + sqrtlnv(x) * sum;
   }
 
-  return Ei(loglnv(x));
+  return _Ei(loglnv(x));
 }
 
-long double ld_inverse_li(long double lx) {
+NV Li(NV x) {
+  return (NV) _Li((LNV)x);
+}
+
+long double ld_inverse_li(long double lx, UV *ierr) {
   int i;
   long double t, term, old_term = 0;
+  /* Initial estimate */
+  if (lx < 2.719) { t = 2 + (lx>=1.668);
+  } else          { long double L=logl(lx);  t = lx * (L+logl(L)); }
   /* Iterate Halley's method until error grows. */
-  t = (lx <= 2)  ?  2  :  lx * logl(lx);
   for (i = 0; i < 4; i++) {
-    long double dn = Li(t) - lx;
+    long double dn = _Li(t) - lx;
     term = dn*logl(t) / (1.0L + dn/(2*t));
-    if (i > 0 && fabsl(term) >= fabsl(old_term)) { t -= term/4; break; }
+    if (i > 0 && fabsl(term) >= fabsl(old_term)) break;
     old_term = term;
     t -= term;
   }
+  if (ierr != 0) *ierr = (UV) fabsl(old_term) + 2;
   return t;
 }
 
@@ -332,17 +344,16 @@ UV inverse_li(UV x) {
   long double lx = (long double) x;
 
   if (x <= 2) return x + (x > 0);
-  r = (UV) ceill( ld_inverse_li(lx) );
+  r = (UV) ceill( ld_inverse_li(lx,&i) ); /* 'i' set to about expected error */
   /* Meet our more stringent goal of an exact answer. */
-  i = (x > 4e16) ? 2048 : 128;
-  if (Li(r-1) >= lx) {
-    while (Li(r-i) >= lx) r -= i;
+  if (_Li((LNV)(r-1)) >= lx) {
+    while (_Li((LNV)(r-i)) >= lx) r -= i;
     for (i = i/2; i > 0; i /= 2)
-      if (Li(r-i) >= lx) r -= i;
-  } else if (Li(r) < lx) {
-    while (Li(r+i-1) < lx) r += i;
+      if (_Li((LNV)(r-i)) >= lx) r -= i;
+  } else if (_Li((LNV)r) < lx) {
+    while (_Li((LNV)(r+i-1)) < lx) r += i;
     for (i = i/2; i > 0; i /= 2)
-      if (Li(r+i-1) < lx) r += i;
+      if (_Li((LNV)(r+i-1)) < lx) r += i;
   }
   return r;
 }
@@ -359,7 +370,7 @@ static long double ld_inverse_R(long double lx) {
     if      (lx <   50) { t *= 1.2; }
     else if (lx < 1000) { t *= 1.15; }
     else {   /* use inverse Li (one iteration) for first inverse R approx */
-      dn = Li(t) - lx;
+      dn = _Li(t) - lx;
       term = dn * logl(t) / (1.0L + dn/(2*t));
       t -= term;
     }
@@ -386,8 +397,10 @@ static long double ld_inverse_R(long double lx) {
 }
 
 UV inverse_R(UV x) {
+  long double r;
   if (x < 2) return x + (x > 0);
-  return (UV) ceill( ld_inverse_R( (long double) x) );
+  r = ceill( ld_inverse_R( (long double) x) );
+  return (r >= (long double)UV_MAX) ? UV_MAX : (UV)r;
 }
 
 
@@ -475,11 +488,8 @@ long double ld_riemann_zeta(long double x) {
   if (x < 0)  croak("Invalid input to RiemannZeta:  x must be >= 0");
   if (x == 1) return INFINITY;
 
-  if (x == (unsigned int)x) {
-    int k = x - 2;
-    if ((k >= 0) && (k < (int)NPRECALC_ZETA))
-      return riemann_zeta_table[k];
-  }
+  if (x >= 2 && x < 2 + (long double)NPRECALC_ZETA && x == floorl(x))
+    return riemann_zeta_table[(size_t)x-2];
 
   /* Cody / Thacher rational Chebyshev approximation for small values */
   if (x >= 0.5 && x <= 5.0) {
@@ -586,13 +596,16 @@ long double RiemannR(long double x, long double eps) {
 
   if (x > 1e19) {
     const signed char* amob = range_moebius(0, 100);
-    SUM_ADD(sum, Li(x));
+    SUM_ADD(sum, _Li(x));
     for (k = 2; k <= 100; k++) {
       if (amob[k] == 0) continue;
       ki = 1.0L / (long double) k;
       part_term = powl(x,ki);
-      if (part_term > LDBL_MAX) return INFINITY;
-      term = amob[k] * ki * Li(part_term);
+      if (part_term > LDBL_MAX) {
+        Safefree(amob);
+        return INFINITY;
+      }
+      term = amob[k] * ki * _Li(part_term);
       old_sum = SUM_FINAL(sum);
       SUM_ADD(sum, term);
       if (fabslnv(SUM_FINAL(sum) - old_sum) <= eps) break;
@@ -675,18 +688,24 @@ static long double _lambertw_approx(long double x) {
     k1 = 1.0L / (1.0L + logl(1.0L + x));
     k2 = 1.0L / k1;
     k3 = logl(k2);
-    w = k2-1-k3+(1+k3+(-1/2+(1/2)*k3*k3 +(-1/6+(-1+(-1/2+
-        (1/3) * k3) * k3) * k3) * k1) * k1) * k1;
+    w = k2-1-k3+(1+k3+(-1.0L/2.0L+(1.0L/2.0L)*k3*k3 +
+        (-1.0L/6.0L+(-1.0L+(-1.0L/2.0L+(1.0L/3.0L)*k3)*k3)*k3) * k1) * k1) * k1;
   }
   return w;
 }
 
 NV lambertw(NV x) {
+  const NV branch_point = (NV)(-LNV_ONE / explnv(LNV_ONE));
+  const NV branch_limit = -(NV)LNVCONST(0.36787944117145);
   long double w;
   int i;
 
-  if (x < -0.36787944117145L)
+  if (isnan(x)) return x;
+  /* Match GMP and absorb small conversion errors around the branch point. */
+  if (x < branch_limit)
     croak("Invalid input to LambertW:  x must be >= -1/e");
+  if (x <= branch_point) return -1.0;
+  if (x == INFINITY) return x;
   if (x == 0.0L) return 0.0L;
 
   /* Estimate initial value */
@@ -717,7 +736,7 @@ NV lambertw(NV x) {
     long double en = (zn/w1) * (qn-zn)/(qn-2.0L*zn);
     /* w *= 1.0L + en;  if (fabsl(en) <= 16*LDBL_EPSILON) break; */
     long double wen = w * en;
-    if (isnan(wen)) return 0;
+    if (isnan(wen)) return (NV)wen;
     w += wen;
     if (fabsl(wen) <= 64*LDBL_EPSILON) break;
   }
@@ -753,9 +772,8 @@ NV chebyshev_psi(UV n)
   UV k;
   SUM_INIT(sum);
 
-  for (k = log2floor(n); k > 0; k--) {
+  for (k = log2floor(n); k > 0; k--)
     SUM_ADD(sum, chebyshev_theta(rootint(n,k)));
-  }
   return SUM_FINAL(sum);
 }
 
@@ -773,7 +791,7 @@ static const cheby_theta_t _cheby_theta[] = { /* >= quad math precision */
   { UVCONST(    1000000000),LNVCONST(   999968978.5775661447991262386023331863364793) },
   { UVCONST(    1073741824),LNVCONST(  1073716064.8860663337617909073555831842945484) },
   { UVCONST(    2147483648),LNVCONST(  2147432200.2475857676814950053003448716360822) },
-  { UVCONST(    4294967296),LNVCONST(  4294889489.1735446386752045191908417183337361) },
+  { UVCONST(    4294967296),LNVCONST(  4294889489.1735446386752045191908417183337360) },
   { UVCONST(    8589934592),LNVCONST(  8589863179.5654263491545135406516173629373070) },
   { UVCONST(   10000000000),LNVCONST(  9999939830.6577573841592219954033850595228736) },
   { UVCONST(   12884901888),LNVCONST( 12884796620.4324254952601520445848183460347362) },
@@ -829,7 +847,7 @@ static const cheby_theta_t _cheby_theta[] = { /* >= quad math precision */
   { UVCONST( 1924145348608),LNVCONST(1924143701943.02957992419280264060220278182021) },
   { UVCONST( 1992864825344),LNVCONST(1992863373568.84039296068619447120308124302086) },
   { UVCONST( 2061584302080),LNVCONST(2061583632335.91985095534685076604018573279204) },
-  { UVCONST( 2130303778816),LNVCONST(2113122935598.01727180199783433992649406589029) },
+  { UVCONST( 2130303778816),LNVCONST(2130302689187.98942222669372308202312951989559) },
   { UVCONST( 2199023255552),LNVCONST(2199021399611.18488312543276191461914978761981) },
   { UVCONST( 2267742732288),LNVCONST(2267740947106.05038218811506263712808318234921) },
   { UVCONST( 2336462209024),LNVCONST(2336460081480.34962633829077377680844065198307) },
@@ -855,18 +873,21 @@ static const cheby_theta_t _cheby_theta[] = { /* >= quad math precision */
   { UVCONST( 5772436045824),LNVCONST(5772433560746.27053256770924553245647027548204) },
   { UVCONST( 6047313952768),LNVCONST(6047310750621.24497633828761530843255989494448) },
   { UVCONST( 6322191859712),LNVCONST(6322189275338.39747421237532473168802646234745) },
-  { UVCONST( 6597069766656),LNVCONST(6579887620000.56226807898107616294821989189226) },
+  { UVCONST( 6597069766656),LNVCONST(6597067738119.01413317907499608668386316810764) },
   { UVCONST( 6871947673600),LNVCONST(6871945430474.61791600096091374271286154432006) },
   { UVCONST( 7146825580544),LNVCONST(7146823258390.34361980709600216319269118247416) },
   { UVCONST( 7421703487488),LNVCONST(7421700443390.35536080251964387835425662360121) },
   { UVCONST( 7696581394432),LNVCONST(7696578975137.73249441643024336954233783264803) },
   { UVCONST( 7971459301376),LNVCONST(7971457197928.90863708984184849978605273042512) },
   { UVCONST( 8246337208320),LNVCONST(8246333982863.77146812177727648999195989358960) },
-  { UVCONST( 8521215115264),LNVCONST(8529802085075.55635100929751669785228592926043) },
+  { UVCONST( 8521215115264),LNVCONST(8521211918388.35152642268180078699290717668582) },
   { UVCONST( 8796093022208),LNVCONST(8796089836425.34909684634625258535266362465034) },
-  { UVCONST( 9345848836096),LNVCONST(9345845828116.77456046925508587313) },
-  { UVCONST( 9895604649984),LNVCONST(9895601077915.26821447819584407150) },
-  { UVCONST(10000000000000),LNVCONST(9999996988293.03419965318214160284) },
+  { UVCONST( 9070970929152),LNVCONST(9070967770510.88594820767938657938561323289892) },
+  { UVCONST( 9345848836096),LNVCONST(9345845828116.77456046925508587313534817937977) },
+  { UVCONST( 9620726743040),LNVCONST(9620723272631.31334368819250451504680638108357) },
+  { UVCONST( 9895604649984),LNVCONST(9895601077915.26821447819584407149565820201587) },
+  { UVCONST(10000000000000),LNVCONST(9999996988293.03419965318214160283774190475659) },
+  /* 9999999999971 9999996988293.03419965318214160283774190475658702867609250211419678888826552534599232771110946314355362548356356703609504 */
   { UVCONST(15000000000000),LNVCONST(14999996482301.7098815115045166858) },
   { UVCONST(20000000000000),LNVCONST(19999995126082.2286880312461318496) },
   { UVCONST(25000000000000),LNVCONST(24999994219058.4086216020475916538) },
@@ -898,10 +919,16 @@ NV chebyshev_theta(UV n)
   LNV initial_sum, prod = LNV_ONE;
   SUM_INIT(sum);
 
-  if (n < 500) {
-    for (i = 1;  (tp = primes_tiny[i]) <= n; i++) {
-      SUM_ADD(sum, loglnv(tp));
+  if (n < primes_small[NPRIMES_SMALL-1]) {
+    for (i = 1;  (tp = primes_small[i]) <= n; i++) {
+      if (i % 4) {
+        prod *= (LNV) tp;
+      } else {
+        SUM_ADD(sum, loglnv(prod));
+        prod = (LNV) tp;
+      }
     }
+    if (prod > LNV_ONE) SUM_ADD(sum, loglnv(prod));
     return SUM_FINAL(sum);
   }
 
@@ -961,9 +988,10 @@ static long double dickman_rho(long double u) {
   if (u <= 2) return 1-logl(u);
 
   /* Also see:
-   *   Granville 2008  https://dms.umontreal.ca/~andrew/PDF/msrire.pdf
-   *   Gorodetsky 2022 https://arxiv.org/pdf/2212.01949.pdf
-   *   van Hoek 2019   https://studenttheses.uu.nl/bitstream/handle/20.500.12932/32867/Masterscriptie%20Bart%20van%20Hoek.pdf
+   *   Granville 2008   https://dms.umontreal.ca/~andrew/PDF/msrire.pdf
+   *   Gorodetsky 2022  https://arxiv.org/pdf/2212.01949.pdf
+   *   van Hoek 2019    https://studenttheses.uu.nl/bitstream/handle/20.500.12932/32867/Masterscriptie%20Bart%20van%20Hoek.pdf
+   *   Weingartner 2026 https://arxiv.org/pdf/2606.07785
    */
 
   /* Calculate zeta.  See Bach and Sorenson (2013) page 10 */
@@ -977,5 +1005,3 @@ static long double dickman_rho(long double u) {
   return expl(-u*zeta+Ei(zeta)) / (zeta * sqrtl(2*3.1415926535*u));
 }
 #endif
-
-

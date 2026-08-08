@@ -1,0 +1,41 @@
+Revision history for Kubernetes-REST-Deprecated
+
+1.105     2026-08-08 02:32:08Z
+
+    First release. Permanent home for CPAN redirect ("tombstone") stub
+    modules covering Kubernetes::REST modules that were genuinely removed
+    within the Kubernetes-REST distribution's own release history (PAUSE
+    indexes per module name, not per distribution, so an in-dist removal
+    orphans the old name exactly the same way a cross-distribution rename
+    does).
+
+    * Tombstones -- the old per-endpoint v0 API (1012 classes).
+      Kubernetes::REST's 1.000 "v1 rewrite" (2026-02-13) replaced one
+      generated Call::* class per API operation, across every API group and
+      version, plus 10 v0-only helper modules (CallContext, Apis, Logs,
+      Extensions, Result2Hash, ListToRequest, Result2Object, Settings,
+      Version, Auditregistration), with a single unified API on
+      Kubernetes::REST itself. Every one of the 1012 only ever emitted a
+      deprecation warning since 1.000 (never functional in the 1.x series).
+      Kubernetes-REST 1.104 was the last CPAN release to ship even that
+      warning stub -- all 1012 were then dropped from the distribution
+      outright. Full list: lib/Kubernetes/REST/Deprecated.pm POD (grouped
+      summary) or t/01-tombstones.t (exhaustive).
+
+    * Considered but not shipped -- the Kubernetes::REST::V0Group family
+      (V0Group itself plus 17 subclasses: Core, Apps, Batch, Networking,
+      RbacAuthorization, etc.) reads as deprecated in its own POD too, but
+      is a working AUTOLOAD-based compatibility shim still wired up as live
+      accessors on Kubernetes::REST ($api->Core, $api->Apps, ...). Not an
+      orphan -- still ships, still works. No tombstone. Recorded in
+      lib/Kubernetes/REST/Deprecated.pm's POD so a future audit doesn't
+      rediscover and mistakenly tombstone it.
+
+    * Mechanism
+        - Every file in this dist versions normally and uniformly with
+          dzil (no version_finder override), starting at 1.105 -- the
+          next version after Kubernetes-REST 1.104, the last CPAN release
+          that shipped these module names (as warning stubs) -- so PAUSE
+          indexes this dist as canonical for the old names and `cpanm
+          Old::Module::Name` installs the redirect instead of the stale
+          pre-removal code.

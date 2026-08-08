@@ -19,15 +19,15 @@ plan skip_all => "Test::Spellunker required for testing POD spelling" if $@;
 add_stopwords(qw/-th
                  bigint bigints bigfloat bigfloats bignum bignums
                  quadmath
-                 pseudoprime pseudoprimes
+                 pseudoprime pseudoprimes pseudoprimality
                  primorial primorials
                  semiprime semiprimes
                  precalculated premultiplier
-                 benchmarking hardcoded online
+                 benchmarking hardcoded online aliasing
                  unoptimized unusably orderings
                  coprime summatory
                  RiemannR LambertW
-                 csrand srand irand irand64 drand urandomb urandomm
+                 csrand srand irand irand32 irand64 drand urandomb urandomm urandomr
                  forprimes forcomposites foroddcomposites fordivisors
                  forpart forcomp forcomb forperm forderange formultiperm forsetproduct
                  forsemiprimes forfactored foralmostprimes
@@ -43,19 +43,23 @@ add_stopwords(qw/-th
                  bernfrac bernreal harmfrac harmreal stirling hclassno
                  vecsum vecprod vecmin vecmax vecreduce vecextract vecequal vecuniq
                  vecall vecany vecnone vecnotall vecfirst vecfirstidx vecmex vecpmex
-                 vecsample vecfreq vecsingleton vecslide
-                 vecsort vecsorti heapsort quicksort
-                 sqrtint logint rootint powint addint subint mulint divint cdivint modint negint absint divrem tdivrem fdivrem cdivrem
+                 vecsample vecfreq vecsingleton vecslide vecpairwise pairwise vecwindow vecprefixsum
+                 vecsort vecsorti vecrsort vecrsorti heapsort quicksort
+                 toint
+                 sqrtint logint rootint crootint powint addint subint mulint divint
+                 cdivint modint negint absint divrem tdivrem fdivrem cdivrem
+                 muladdint mulsubint
                  qnr cornacchia
-                 todigits todigitstring fromdigits sumdigits hammingweight
+                 todigits todigitstring fromdigits sumdigits reverse_digits hammingweight
                  tozeckendorf fromzeckendorf
                  lucasu lucasv lucasuv lucasumod lucasvmod lucasuvmod
                  lshiftint rshiftint rashiftint signint cmpint
                  biquadrate powerfree k-powerfree k-free workaround
-                 sumpowerful powersum
+                 sumpowerful powersum partitionsq
                  sumset setbinop setunion setintersect setminus setdelta toset
                  setcontains setcontainsany setinsert setremove setinvert
-                 contfrac farey
+                 contfrac farey convergents bestrational semiconvergent
+                 sopf sopfr min max
                  _uvsize _ivsize _nvsize _uvbits _nvmantbits _nvmantdigits
                  pp 100ns/);
 

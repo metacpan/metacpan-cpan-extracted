@@ -1,7 +1,11 @@
 Changes
+etc/AwayMode_Config.pm
 etc/initialdata
+html/Admin/Users/AwayMode.html
 html/Callbacks/RT-Extension-AwayMode/autohandler/Default
 html/Callbacks/RT-Extension-AwayMode/Elements/Header/PrivilegedMainNav
+html/Callbacks/RT-Extension-AwayMode/Elements/Tabs/Privileged
+html/Elements/AwayModeEditor
 html/Prefs/AwayMode.html
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
@@ -26,3 +30,4 @@ MANIFEST.SKIP
 META.yml
 README
 t/away_window.t
+t/transaction_types.t

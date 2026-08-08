@@ -4,7 +4,7 @@ Params::Get - Normalise subroutine arguments regardless of calling convention
 
 # VERSION
 
-Version 0.15
+Version 0.16
 
 # DESCRIPTION
 
@@ -126,20 +126,26 @@ because that almost always indicates a programming error.
     2.  Shift $default.  Validate: must be undef, a plain scalar, or an
         ARRAY ref.  Any other ref type croaks immediately.
 
-    3.  If $default is an ARRAY ref, map remaining @_ positionally to those
-        key names and return.  A single plain HASH ref is still passed
-        through unchanged.
+    3.  If $default_ref eq "ARRAY", map remaining @_ positionally to the key
+        names and return.  (Premise: an ARRAY ref is always truthy, so no
+        separate truthiness pre-check is needed -- $default_ref eq "ARRAY"
+        is sufficient.)
 
     4.  Detect the \@_ calling convention: if exactly one ARRAY ref argument
         remains, check the two-element (key => scalar-val) shorthand and
-        return immediately when it matches.  Otherwise unwrap and use the
-        array contents as the effective @args.
+        return immediately when it matches.  The shorthand guard uses
+        truthiness (not definedness) so that falsy $default strings ("0", "")
+        suppress it -- this is a documented invariant.  Otherwise unwrap and
+        use the array contents as the effective @args.
 
     5.  Dispatch on argument count:
         0 -- confess (with stack trace) if $default is defined;
              return undef otherwise.
-        1 -- if $default is defined, wrap the single arg under $default
-             (scalar, arrayref, scalarref->deref, coderef, blessed object).
+        1 -- if $default is defined, two arms cover all wrappable types:
+               SCALAR ref  -> deref then wrap (pulled left as fast guard).
+               plain scalar | ARRAY | CODE | blessed -> wrap as-is.
+             Unblessed HASH and exotic refs fall through to the no-default
+             path (see LIMITATIONS).
              Without $default: unwrap REF-of-REF, pass HASH ref through,
              return empty ARRAY ref as-is.  Anything else: croak.
         2 with HASH ref as arg[1]
@@ -203,6 +209,8 @@ or through [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Params-Get](http://rt
 - [Test Dashboard](https://nigelhorne.github.io/Params-Get/coverage/)
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 - MetaCPAN: [https://metacpan.org/dist/Params-Get](https://metacpan.org/dist/Params-Get)
 - RT: [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Get](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Get)

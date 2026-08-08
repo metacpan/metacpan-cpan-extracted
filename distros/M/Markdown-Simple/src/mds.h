@@ -47,6 +47,7 @@ extern mds_arena_profile mds_last_arena_profile;
 #define MDS_FLAG_NO_REFERENCES      (1u << 21)  /* `[id]: url` definitions */
 #define MDS_FLAG_FOOTNOTES          (1u << 23)  /* GFM `[^label]` footnotes */
 #define MDS_FLAG_HIGHLIGHT          (1u << 24)  /* syntax-highlight fenced code blocks via Eshu */
+#define MDS_FLAG_HEADING_IDS        (1u << 25)  /* emit id="slug" on headings */
 
 /* GFM-superset preset. NOTE: HARD_BREAKS is NOT part of GFM defaults
  * (CommonMark §6.8 keeps softbreaks as newlines). Callers can OR it in. */
@@ -80,5 +81,24 @@ int mds_render_html_to_sv_ex(pTHX_
                              SV*                output_sv,
                              mds_arena*         borrowed_arena,
                              mds_block_scratch* borrowed_scratch);
+
+/* The widest entry: as _ex, plus an optional table of contents.
+ *
+ * When `toc` is non-NULL the renderer pushes one { level, text, id } hashref
+ * onto it per heading, in document order, and emits heading ids whether or
+ * not MDS_FLAG_HEADING_IDS was set - asking for the list of anchors and not
+ * getting the anchors would be useless. The AV is caller-owned and only
+ * pushed to. `text` and `id` are raw bytes: the caller knows whether the
+ * input was UTF-8 and is the one who should set the flag.
+ *
+ * The other two entry points are wrappers that pass NULL. */
+int mds_render_html_to_sv_toc(pTHX_
+                              const char*        input,
+                              size_t             len,
+                              unsigned           flags,
+                              SV*                output_sv,
+                              mds_arena*         borrowed_arena,
+                              mds_block_scratch* borrowed_scratch,
+                              AV*                toc);
 
 #endif

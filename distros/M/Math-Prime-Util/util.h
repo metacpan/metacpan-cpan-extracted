@@ -7,12 +7,19 @@ extern int  _XS_get_verbose(void);
 extern void _XS_set_verbose(int v);
 extern int  _XS_get_callgmp(void);
 extern void _XS_set_callgmp(int v);
+extern int  _XS_get_nobigint(void);
+extern void _XS_set_nobigint(int v);
 /* Disable all manual seeding */
 extern bool  _XS_get_secure(void);
 extern void _XS_set_secure(void);
 
-extern unsigned long index_in_sorted_uv_array(UV v, UV* L, unsigned long len);
-extern unsigned long index_in_sorted_iv_array(IV v, IV* L, unsigned long len);
+#if HAVE_UINT128
+extern void* mpu_aligned_alloc(UV count, Size_t size, Size_t alignment);
+extern void  mpu_aligned_free(void* ptr);
+#endif
+
+extern size_t index_in_sorted_uv_array(UV v, const UV* L, size_t len);
+extern size_t index_in_sorted_iv_array(IV v, const IV* L, size_t len);
 #define is_in_sorted_uv_array(v,L,len) (index_in_sorted_uv_array(v,L,len) > 0)
 #define is_in_sorted_iv_array(v,L,len) (index_in_sorted_iv_array(v,L,len) > 0)
 
@@ -26,35 +33,30 @@ extern UV   prev_prime(UV x);
 /* Simple estimate for upper limit:  max_nprimes(n) >= prime_count(n) */
 extern UV   max_nprimes(UV n) ISCONSTFUNC;
 
-extern void print_primes(UV low, UV high, int fd);
+/* If failure is returned, errno should be set. */
+extern bool print_primes(UV low, UV high, int fd);
 
 /* Returns maximal k for c^k = n for k > 1, n > 1.  0 otherwise. */
 extern uint32_t powerof_ret(UV n, uint32_t *root);
 #define powerof(n) powerof_ret(n,0)
 
 /* Return true if n = r^k for the given k, sets root if given */
-extern bool is_power_ret(UV n, uint32_t k, uint32_t *root);
+extern bool is_power_ret(UV n, UV k, uint32_t *root);
 #define is_power(n,k) is_power_ret(n,k,0)
 
 extern uint32_t icbrt(UV n) ISCONSTFUNC;
-extern UV rootint(UV n, uint32_t k) ISCONSTFUNC;
+extern UV rootint(UV n, UV k) ISCONSTFUNC;
+extern UV crootint(UV n, UV k) ISCONSTFUNC;
 extern UV ipowsafe(UV n, UV k) ISCONSTFUNC;  /* returns UV_MAX if overflows */
 extern UV lcmsafe(UV x, UV u) ISCONSTFUNC;   /* returns 0 if overflows */
 extern UV valuation(UV n, UV k) ISCONSTFUNC;
 extern UV valuation_remainder(UV n, UV k, UV *r);
 extern UV logint(UV n, UV b) ISCONSTFUNC;
-extern UV mpu_popcount_string(const char* ptr, uint32_t len);
+extern UV mpu_popcount_string(const char* ptr, STRLEN len);
 
 extern unsigned char* range_issquarefree(UV lo, UV hi);
 
 extern UV powersum(UV n, UV k) ISCONSTFUNC;
-
-extern signed char* range_moebius(UV low, UV high);
-extern signed char* range_liouville(UV low, UV high);
-
-extern int liouville(UV n);
-extern IV  mertens(UV n);
-extern IV  sumliouville(UV n);
 
 extern int kronecker_uu(UV a, UV b) ISCONSTFUNC;
 extern int kronecker_su(IV a, UV b) ISCONSTFUNC;
@@ -64,8 +66,11 @@ extern UV pn_primorial(UV n) ISCONSTFUNC;
 extern UV primorial(UV n) ISCONSTFUNC;
 extern UV factorial(UV n) ISCONSTFUNC;
 extern UV subfactorial(UV n) ISCONSTFUNC;
+extern UV bell_number(UV n) ISCONSTFUNC;
 extern UV fubini(UV n) ISCONSTFUNC;
 extern UV binomial(UV n, UV k) ISCONSTFUNC;
+extern UV catalan_number(UV n) ISCONSTFUNC;
+extern UV multifactorial(UV n, UV k) ISCONSTFUNC;
 extern UV falling_factorial(UV n, UV m) ISCONSTFUNC;
 extern UV rising_factorial(UV n, UV m) ISCONSTFUNC;
 extern IV falling_factorial_s(IV n, UV m) ISCONSTFUNC;
@@ -75,7 +80,9 @@ extern UV modinverse(UV a, UV p) ISCONSTFUNC;  /* Returns 1/a mod p */
 extern UV divmod(UV a, UV b, UV n) ISCONSTFUNC;/* Returns a/b mod n */
 extern UV gcddivmod(UV a, UV b, UV n) ISCONSTFUNC; /* divmod(a/gcd,b/gcd,n) */
 
+/* UV_MAX overflow */
 extern UV pisano_period(UV n);
+extern UV floor_sum(UV n, UV m, UV a, UV b);
 
 /* 0 overflow, -1 no inverse, 1 ok */
 /* The a/n arrays will be sorted by descending n. */
@@ -91,18 +98,18 @@ extern IV cdivrem(IV *q, IV *r, IV D, IV d);   /* divrem ceiling */
 extern IV edivrem(IV *q, IV *r, IV D, IV d);   /* divrem Euclidian */
 extern UV ivmod(IV a, UV n) ISCONSTFUNC;       /* Returns a mod n (trunc) */
 
-extern UV   carmichael_lambda(UV n);
-extern int  moebius(UV n);
+extern bool muladd_uv_signmag(int *sign, UV *hi, UV *lo,
+                              UV a, UV b, UV c,
+                              int asign, int bsign, int csign);
+
 extern UV   exp_mangoldt(UV n);
 extern UV   znprimroot(UV n);
 extern UV   znorder(UV a, UV n);
 /* nprime says to assume n = p or n = 2p.  Skips power and primality tests. */
 extern bool is_primitive_root(UV a, UV n, bool nprime);
-extern UV   factorialmod(UV n, UV m);
-extern bool binomialmod(UV *res, UV n, UV k, UV m);
 
 extern bool is_square_free(UV n);
-extern bool is_perfect_number(UV n);
+extern bool is_perfect_number(UV n) ISCONSTFUNC;
 extern bool is_fundamental(UV n, bool neg);
 extern bool is_semiprime(UV n);
 extern bool is_almost_prime(UV k, UV n);
@@ -114,13 +121,14 @@ extern UV   qnr(UV n);
 extern bool is_qr(UV a, UV n);         /* kronecker that works for composites */
 extern bool is_practical(UV n);
 extern int  is_delicate_prime(UV n, uint32_t b);
+/* Returns -1 if an intermediate digit sum overflows. */
 extern int  happy_height(UV n, uint32_t base, uint32_t exponent) ISCONSTFUNC;
 
 extern bool is_smooth(UV n, UV k);
 extern bool is_rough(UV n, UV k);
 
 extern bool is_sum_of_two_squares(UV n);
-extern bool is_sum_of_three_squares(UV n);
+extern bool is_sum_of_three_squares(UV n) ISCONSTFUNC;
 extern bool cornacchia(UV *x, UV *y, UV d, UV p);
 
 extern UV debruijn_psi(UV x, UV y);
@@ -133,26 +141,22 @@ extern IV stirling1(UV n, UV m) ISCONSTFUNC;
 extern bool bernfrac(IV *num, UV *den, UV n);
 extern bool harmfrac(UV *num, UV *den, UV n);
 
-extern IV hclassno(UV n);
-extern IV ramanujan_tau(UV n);
+extern UV hclassno(UV n);
+extern IV ramanujan_tau(UV n) ISCONSTFUNC;
 
 extern char* pidigits(uint32_t digits);
 
-/* min defines if min or max.  Return of 0 means select a, 1 means select b. */
-extern bool strnum_minmax(bool min, const char* a, STRLEN alen, const char* b, STRLEN blen);
-extern int strnum_cmp(const char* a, STRLEN alen, const char* b, STRLEN blen);
 
-extern bool from_digit_string(UV* n, const char* s, int base);
-extern bool from_digit_to_UV(UV* rn, const UV* r, int len, int base);
-extern bool from_digit_to_str(char** rstr, const UV* r, int len, int base);
+extern bool from_digit_to_UV(UV* rn, const UV* r, size_t len, UV base);
 /* These return length */
-extern int  to_digit_array(int* bits, UV n, int base, int length);
-extern int  to_digit_string(char *s, UV n, int base, int length);
-extern int  to_string_128(char s[40], IV hi, UV lo);
+extern int  to_digit_array(UV* bits, UV n, UV base, int length);
+extern int  to_digit_string(char *s, UV n, UV base, int length);
+extern int  uv_uv_to_str(char s[41], UV hi, UV lo);
+extern int  iv_uv_to_str(char s[41], IV hi, UV lo);
 
 /* Returns 1 if good, 0 if bad, -1 if non canon, 2 ok but out of range */
-extern int validate_zeckendorf(const char* str);
-extern UV  from_zeckendorf(const char* str);
+extern int validate_zeckendorf(const char* str, size_t len);
+extern UV  from_zeckendorf(const char* str, size_t len);
 extern char* to_zeckendorf(UV n);
 
 extern bool is_catalan_pseudoprime(UV n);
@@ -160,6 +164,7 @@ extern bool is_catalan_pseudoprime(UV n);
 extern UV  polygonal_root(UV n, UV k, bool* overflow);
 
 extern UV  npartitions(UV n);
+extern UV  npartitionsq(UV n);
 extern UV  consecutive_integer_lcm(UV n);
 
 extern UV  frobenius_number(UV* A, uint32_t alen);
@@ -218,28 +223,30 @@ extern UV gcdz(UV x, UV y) ISCONSTFUNC;
 
  /* For MSC, we need to use _BitScanForward and _BitScanReverse.  The way to
   * get to them has changed, so we're going to only use them on new systems.
+  * The 64-bit intrinsics are unavailable on x86 even with a 64-bit UV.
   * The performance of these functions are not super critical.
   * What is:  popcnt, mulmod, and muladd.
   */
-#elif defined (_MSC_VER) && _MSC_VER >= 1400 && !defined(__clang__) && !defined(_WIN32_WCE)
+#elif defined(_MSC_VER) && _MSC_VER >= 1400 && !defined(__clang__) && \
+      !defined(_WIN32_WCE) && (BITS_PER_WORD == 32 || defined(_M_X64))
  #include <intrin.h>
  #ifdef FUNC_ctz
   static int ctz(UV n) {
-    UV tz = 0;
+   unsigned long tz = 0;
    #if BITS_PER_WORD == 64
-    if (_BitScanForward64(&tz, n)) return tz; else return 64;
+    if (_BitScanForward64(&tz, n)) return (int)tz; else return 64;
    #else
-    if (_BitScanForward(&tz, n))   return tz; else return 32;
+    if (_BitScanForward(&tz, n))   return (int)tz; else return 32;
    #endif
   }
  #endif
  #if defined(FUNC_clz) || defined(FUNC_log2floor)
   static int log2floor(UV n) {
-    UV lz = 0;
+   unsigned long lz = 0;
    #if BITS_PER_WORD == 64
-    if (_BitScanReverse64(&lz, n)) return lz; else return 0;
+    if (_BitScanReverse64(&lz, n)) return (int)lz; else return 0;
    #else
-    if (_BitScanReverse(&lz, n))   return lz; else return 0;
+    if (_BitScanReverse(&lz, n))   return (int)lz; else return 0;
    #endif
   }
  #endif
@@ -347,7 +354,8 @@ static UV gcd_ui(UV x, UV y) {
 
 #ifdef FUNC_lcm_ui
 static UV lcm_ui(UV x, UV y) {
-  /* Can overflow if lcm(x,y) > 2^64 (e.g. two primes each > 2^32) */
+  /* Can overflow if lcm(x,y) > UV_MAX. */
+  if (x == 0 || y == 0) return 0;
   return x * (y / gcd_ui(x,y));
 }
 #endif
@@ -358,9 +366,9 @@ static UV lcm_ui(UV x, UV y) {
 #include <math.h>
 static uint32_t isqrt(UV n) {
   /* The small addition means we only need to check for fixing downwards. */
-  IV r = sqrt((double)n) + 1e-6f;
+  IV r = (IV)(sqrt((double)n) + 1e-6f);
   IV diff = n - (UV)r*r;
-  return r - (diff < 0);
+  return (uint32_t)(r - (diff < 0));
 }
 #endif
 

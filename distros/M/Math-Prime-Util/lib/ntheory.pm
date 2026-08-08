@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $ntheory::AUTHORITY = 'cpan:DANAJ';
-  $ntheory::VERSION = '0.74';
+  $ntheory::VERSION = '0.75';
 }
 
 BEGIN {
@@ -37,7 +37,7 @@ See L<Math::Prime::Util> for complete documentation.
 
 Tags:
   :all         to import all functions (other than NON-EXPORTED below)
-  :rand        to import rand, srand, irand, irand64
+  :rand        to import rand, srand, irand, irand32, irand64
 
 =head2 PRIMALITY
 
@@ -64,7 +64,7 @@ Tags:
   is_extra_strong_lucas_pseudoprime(n)     extra strong Lucas test
   is_frobenius_pseudoprime(n, [a,b])       Frobenius quadratic test
   is_frobenius_underwood_pseudoprime(n)    combined PSP and Lucas
-  is_frobenius_khashin_pseudoprime(n)      Khashin's 2013 Frobenius test
+  is_frobenius_khashin_pseudoprime(n)      Khashin's 2018 Frobenius test
   is_perrin_pseudoprime(n [,r])            Perrin test
   is_catalan_pseudoprime(n)                Catalan test
   is_bpsw_prime(n)                         combined SPSP-2 and ES Lucas
@@ -147,6 +147,12 @@ Tags:
   divisor_sum(n)                      sum of divisors
   divisor_sum(n,k)                    sum of k-th power of divisors
   divisor_sum(n,sub{...})             sum of code run for each divisor
+  inverse_sigma0(k, [lo,] hi)         array ref of n where sigma0(n) = k
+  inverse_sigma0_count(k, [lo,] hi)   count of n where sigma0(n) = k
+  aliquot_sum(n)                      sum of proper divisors
+  prime_signature(n)                  reverse sorted list of factor exponents
+  sopfr(n)                            sum of prime factors
+  sopf(n)                             sum of distinct prime factors
 
 =head2 ITERATORS
 
@@ -173,12 +179,14 @@ Tags:
 =head2 RANDOM NUMBERS
 
   irand()                             random 32-bit integer
-  irand64()                           random UV-bit integer (64 or 32)
-  drand([limit])                      random NV in [0,1) or [0,limit)
+  irand32()                           random 32-bit integer
+  irand64()                           random 64-bit integer
+  drand([m])                          random NV in [0,1), scaled by non-zero m
   random_bytes(n)                     string with n random bytes
   entropy_bytes(n)                    string with n entropy-source bytes
   urandomb(n)                         random integer less than 2^n
   urandomm(n)                         random integer less than n
+  urandomr(lo,hi)                     random integer in [lo,hi] inclusive
   csrand(data)                        seed the CSPRNG with binary data
   srand([seed])                       simple seed (exported with :rand)
   rand([limit])                       alias for drand (exported with :rand)
@@ -211,8 +219,11 @@ Tags:
   vecfreq(@list)                      return hash of item => count from list
   vecsort(@list)                      numerically sort a list of integers
   vecsorti(\@list)                    in-place numeric sort a list ref
+  vecrsort(@list)                     numerically reverse sort an integer list
+  vecrsorti(\@list)                   in-place numeric reverse sort a list ref
   vecextract(\@list, mask)            select from list based on mask
   vecequal(\@list1, \@list2)          compare equality of two array refs
+  vecprefixsum(@list)                 prefix sum / cumulative sum of list
   vecreduce { ... } @list             reduce / left fold applied to list
   vecall { ... } @list                return true if all are true
   vecany { ... } @list                return true if any are true
@@ -224,6 +235,8 @@ Tags:
   vecpmex(@list)                      return least positive value not in list
   vecsample(k,@list)                  return k random elements of list
   vecslide { ... } @list              calls block for each pair in list
+  vecpairwise { ... } \@A,\@B         calls block for each pair in arrays
+  vecwindow { ... } $step,$size,@list calls block with windows of size objects
 
   toset(...)                          convert to int set (unique sorted aref)
   setinsert(\@A,$v)                   insert integer v into integer set A
@@ -254,11 +267,13 @@ Tags:
 
 =head2 MATH
 
+  toint(n)                            truncate value to integer (best form)
   todigits(n[,base[,len]])            convert n to digit array in base
   todigitstring(n[,base[,len]])       convert n to string in base
   fromdigits(\@d,[,base])             convert base digit vector to number
   fromdigits(str,[,base])             convert base digit string to number
   sumdigits(n)                        sum of digits, with optional base
+  reverse_digits(n[,base])            reverse digits of |n| in base b
   tozeckendorf(n)                     convert n to Zeckendorf/Fibbinary
   fromzeckendorf(str)                 convert Zeckendorf binary str to num
   is_odd(n)                           return 1 if n is odd, 0 otherwise
@@ -268,6 +283,7 @@ Tags:
   is_qr(a,n)                          return 1 if a is quadratic residue mod n
   is_square(n)                        return 1 if n is a perfect square
   is_power(n)                         return k if n = c^k for integer c
+  is_power(n,\$root)                  as above but also set $root to c
   is_power(n,k)                       return 1 if n = c^k for integer c, k
   is_power(n,k,\$root)                as above but also set $root to c
   is_perfect_power(n)                 return 1 if n = c^k for c != 0, k > 1
@@ -299,12 +315,17 @@ Tags:
   is_powerful(n[,k])                  is n a k-powerful number
   is_practical(n)                     is n a practical number
   is_delicate_prime(n)                is n a digitally delicate prime
+  is_safe_prime(n)                    are both n and (n-1)/2 prime
+  is_palindrom(n[,base])              is n a palindrome (default base 10)
+  is_harshad(n[,base])                is n a Harshad (Niven) number in base b
   powint(a,b)                         signed integer a^b
   mulint(a,b)                         signed integer a * b
   addint(a,b)                         signed integer a + b
   subint(a,b)                         signed integer a - b
   add1int(n)                          signed integer n + 1
   sub1int(n)                          signed integer n - 1
+  muladdint(n,m,a)                    signed integer n * m + a
+  mulsubint(n,m,a)                    signed integer n * m - a
   divint(a,b)                         signed integer a / b     (floor)
   modint(a,b)                         signed integer a % b     (floor)
   cdivint(a,b)                        signed integer a / b     (ceilint)
@@ -322,6 +343,7 @@ Tags:
   sqrtint(n)                          integer square root
   rootint(n,k)                        integer k-th root
   rootint(n,k,\$rk)                   as above but also set $rk to r^k
+  crootint(n,k)                       ceiling integer k-th root
   logint(n,b)                         integer logarithm
   logint(n,b,\$be)                    as above but also set $be to b^e
   gcd(@list)                          greatest common divisor
@@ -329,6 +351,7 @@ Tags:
   gcdext(x,y)                         return (u,v,d) where u*x+v*y=d
   chinese([a,mod1],[b,mod2],...)      CRT returning remainder
   chinese2([a,mod1],[b,mod2],...)     CRT returning (remainder,LCM)
+  floor_sum(n,m,a,b)                  sum floor((a*i+b)/m), i=0..n-1
   frobenius_number(@list)             Frobenius Number of a set
   primorial(n)                        product of primes below n
   pn_primorial(n)                     product of first n primes
@@ -337,10 +360,14 @@ Tags:
   subfactorial(n)                     count of derangements of n objects
   binomial(n,k)                       binomial coefficient
   binomialmod(n,k,m)                  binomial(n,k) mod m
+  multifactorial(n,k)                 k-step multifactorial of n
   falling_factorial(x,n)              falling factorial
   rising_factorial(x,n)               rising factorial
   partitions(n)                       number of integer partitions
+  partitionsq(n)                      number of partitions into distinct parts
   valuation(n,k)                      number of times n is divisible by k
+  remove_factors(n,k)                 returns r: n with factors of k removed
+  remove_factors_exp(n,k)             as above, returns (r,e) e = times removed
   hammingweight(n)                    population count (# of binary 1s)
   kronecker(a,b)                      Kronecker (Jacobi) symbol
   negmod(a,n)                         -a mod n
@@ -361,13 +388,14 @@ Tags:
   prime_omega(n)                      number of distinct prime factors
   moebius(n)                          Moebius function of n
   moebius(beg, end)                   list of Moebius in range
-  mertens(n)                          sum of Moebius for 1 to n
+  mertens([lo,]hi)                    sum of Moebius over the range
   euler_phi(n)                        Euler totient of n
   euler_phi(beg, end)                 Euler totient for a range
   inverse_totient(n)                  image of Euler totient
   jordan_totient(k,n)                 Jordan's totient
   sumtotient(n)                       sum of Euler totient for 1 to n
   carmichael_lambda(n)                Carmichael's Lambda function
+  dedekind_psi(n)                     Dedekind psi function
   ramanujan_sum(k,n)                  Ramanujan's sum
   exp_mangoldt(n)                     exponential of Mangoldt function
   liouville(n)                        Liouville function
@@ -386,15 +414,20 @@ Tags:
   lucasuv(P, Q, k)                    (U_k,V_k) for Lucas(P,Q)
   lucasumod(P, Q, k, n)               U_k for Lucas(P,Q) mod n
   lucasvmod(P, Q, k, n)               V_k for Lucas(P,Q) mod n
-  lucasuvmod(P, Q, k, n)              (U_k,V_k,Q^k) for Lucas(P,Q) mod n
+  lucasuvmod(P, Q, k, n)              (U_k,V_k) for Lucas(P,Q) mod n
   lucas_sequence(n,P,Q,k)             deprecated, use lucasuvmod instead
+  fibonacci(k)                        The k-th Fibonacci number
+  lucas_number(k)                     The k-th Lucas number
   pisano_period(n)                    The period of Fibonacci numbers mod n
   bernfrac(n)                         Bernoulli number as (num,den)
   bernreal(n)                         Bernoulli number as BigFloat
   harmfrac(n)                         Harmonic number as (num,den)
   harmreal(n)                         Harmonic number as BigFloat
   stirling(n,m,[type])                Stirling numbers of 1st or 2nd type
+  catalan_number(n)                   Catalan number
+  bell_number(n)                      Bell number, count of set partitions
   fubini(n)                           Fubini (Ordered Bell) number
+  integer_complexity(n)               minimum 1s to represent n using + and *
   numtoperm(n,k)                      kth lexico permutation of n elems
   permtonum([a,b,...])                permutation number of given perm
   randperm(n,[k])                     random permutation of n elems
@@ -437,11 +470,16 @@ Tags:
   powerfree_part_sum(n[,k])           sum of k-powerfree parts for 1 to n
   squarefree_kernel(n)                integer radical of |n|
   powersum(n,k)                       sum of kth powers from 1 to n
+  digital_root(n[,base])              iterated sum of digits (default base 10)
+  mult_digital_root(n[,base])         iterated product of digits
+  abundance(n)                        sigma(n)-2n, deficient/abundant/perfect
 
 =head2 RATIONALS
 
   contfrac(n,d)                       list of continued fraction for n/d
   from_contfrac(@A)                   return (p,q) rational from cfrac list
+  convergents(@A)                     list of convergents (p,q) for cfrac list
+  bestrational(x,dbound)              best rational (p,q) for x with q<=dbound
   next_calkin_wilf(n,d)               next breadth-first CW rational
   next_stern_brocot(n,d)              next breadth-first SB rational
   calkin_wilf_n(n,d)                  index of breadth-first CW rational

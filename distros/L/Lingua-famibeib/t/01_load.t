@@ -3,7 +3,7 @@
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 use_ok('Lingua::famibeib');
 use_ok('Lingua::famibeib::Word');
@@ -11,5 +11,7 @@ use_ok('Lingua::famibeib::Modifier');
 use_ok('Lingua::famibeib::Fragment');
 use_ok('Lingua::famibeib::Sentence');
 use_ok('Lingua::famibeib::Text');
+use_ok('Lingua::famibeib::Wellknown');
+use_ok('Lingua::famibeib::NameGenerator');
 
 exit 0;

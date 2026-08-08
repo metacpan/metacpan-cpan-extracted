@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::ChaCha::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::ChaCha::VERSION = '0.74';
+  $Math::Prime::Util::ChaCha::VERSION = '0.75';
 }
 
 ###############################################################################
@@ -211,7 +211,7 @@ sub _prng_new {
   }
   sub srand {
     my $seed = shift;
-    $seed = CORE::rand unless defined $seed;
+    $seed = int(CORE::rand(4294967296)) unless defined $seed;
     if ($seed <= 4294967295) { csrand(pack("V",$seed)); }
     else                     { csrand(pack("V2",$seed,$seed>>32)); }
     $seed;
@@ -220,17 +220,24 @@ sub _prng_new {
     $_str .= _keystream(BUFSZ,$_state) if length($_str) < 4;
     return unpack("V",substr($_str, 0, 4, ''));
   }
+  sub irand32 {
+    $_str .= _keystream(BUFSZ,$_state) if length($_str) < 4;
+    return unpack("V",substr($_str, 0, 4, ''));
+  }
   sub irand64 {
-    return irand() if ~0 == 4294967295;
+    croak "ChaCha irand64 called on 32-bit" if ~0 == 4294967295;
     $_str .= _keystream(BUFSZ,$_state) if length($_str) < 8;
     ($a,$b) = unpack("V2",substr($_str, 0, 8, ''));
     return ($a << 32) | $b;
   }
   sub random_bytes {
     my($bytes) = @_;
-    $bytes = (defined $bytes) ? int abs $bytes : 0;
-    $_str .= _keystream($bytes-length($_str),$_state) if length($_str) < $bytes;
-    return substr($_str, 0, $bytes, '');
+    my $n = defined $bytes ? "$bytes" : "";
+    croak "random_bytes: input must be an integer between 0 and 2147483646"
+      if $n !~ /^\+?\d+\z/ || 0+$n > 2147483646;
+    $n = 0+$n;
+    $_str .= _keystream($n-length($_str),$_state) if length($_str) < $n;
+    return substr($_str, 0, $n, '');
   }
 }
 
@@ -252,7 +259,7 @@ Math::Prime::Util::ChaCha - Pure Perl ChaCha20 CSPRNG
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 
 =head1 SYNOPSIS
@@ -279,9 +286,13 @@ With a single integer argument, seeds and returns the number.
 
 Returns a random 32-bit integer.
 
+=head2 irand32
+
+Returns a random 32-bit integer.
+
 =head2 irand64
 
-Returns a random 64-bit integer.
+Returns a random 64-bit integer as a UV on 64-bit.  Croaks on 32-bit.
 
 =head2 random_bytes
 

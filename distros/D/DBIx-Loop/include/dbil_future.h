@@ -78,6 +78,12 @@ static void dbil_then_run(pTHX_ SV *self, dbil_future *f, AV *k);
 #define DBIL_T_ROW_HASHREF  4
 #define DBIL_T_COL_ARRAYREF 5
 #define DBIL_T_ALL_HASHREF  6
+/* ALL_ROWHASH is DBI's selectall_arrayref($sql, { Slice => {} }): every row as
+ * a hashref, in the order the server returned them. ALL_HASHREF cannot stand
+ * in for it - keying by a column destroys the ordering, which breaks keyset
+ * pagination - so this is a genuinely missing member of the select* family
+ * rather than a convenience over one. */
+#define DBIL_T_ALL_ROWHASH  7
 
 /* settle done from a list of values (copied, so the caller keeps its own) */
 static void dbil_future_settle_done_av(pTHX_ SV *self, AV *vals) {
@@ -149,6 +155,22 @@ static void dbil_then_attach(pTHX_ SV *target, SV *next,
  * inside then's eval, so a bad key field produced a FAILED FUTURE rather than
  * a die at settle time. Croaking from here would escape through whatever
  * settled the query future, which is a different thing entirely. */
+/* one row (an AV of values) against the column names, as a fresh HV (+1) */
+static HV *dbil_row_to_hv(pTHX_ AV *ra, AV *cols) {
+    HV *h = newHV();
+    SSize_t j, ncol = cols ? av_len(cols) + 1 : 0;
+    for (j = 0; j < ncol; j++) {
+        SV **c = av_fetch(cols, j, 0);
+        SV **v = av_fetch(ra, j, 0);
+        STRLEN cl;
+        const char *cp;
+        if (!(c && *c)) continue;
+        cp = SvPV_const(*c, cl);
+        (void)hv_store(h, cp, (I32)cl, newSVsv(v && *v ? *v : &PL_sv_undef), 0);
+    }
+    return h;
+}
+
 static SV *dbil_then_builtin(pTHX_ IV op, SV *res, SV *arg, AV *out) {
     HV  *r;
     SV **e;
@@ -191,22 +213,23 @@ static SV *dbil_then_builtin(pTHX_ IV op, SV *res, SV *arg, AV *out) {
     case DBIL_T_ROW_HASHREF: {
         SV **row = rows ? av_fetch(rows, 0, 0) : NULL;
         if (!(row && *row && SvROK(*row) && cols)) { av_push(out, newSV(0)); break; }
-        {
-            AV *ra = (AV *)SvRV(*row);
-            HV *h  = newHV();
-            SSize_t i, n = av_len(cols) + 1;
-            for (i = 0; i < n; i++) {
-                SV **c = av_fetch(cols, i, 0);
-                SV **v = av_fetch(ra, i, 0);
-                STRLEN kl;
-                const char *kp;
-                if (!(c && *c)) continue;
-                kp = SvPV_const(*c, kl);
-                (void)hv_store(h, kp, (I32)kl,
-                               newSVsv(v && *v ? *v : &PL_sv_undef), 0);
-            }
-            av_push(out, newRV_noinc((SV *)h));
+        av_push(out, newRV_noinc(
+            (SV *)dbil_row_to_hv(aTHX_ (AV *)SvRV(*row), cols)));
+        break;
+    }
+
+    /* every row as a hashref, order preserved */
+    case DBIL_T_ALL_ROWHASH: {
+        AV *o = newAV();
+        SSize_t i, n = rows ? av_len(rows) + 1 : 0;
+        for (i = 0; i < n; i++) {
+            SV **row = av_fetch(rows, i, 0);
+            if (!(row && *row && SvROK(*row) && SvTYPE(SvRV(*row)) == SVt_PVAV))
+                continue;
+            av_push(o, newRV_noinc(
+                (SV *)dbil_row_to_hv(aTHX_ (AV *)SvRV(*row), cols)));
         }
+        av_push(out, newRV_noinc((SV *)o));
         break;
     }
 
@@ -259,17 +282,7 @@ static SV *dbil_then_builtin(pTHX_ IV op, SV *res, SV *arg, AV *out) {
             if (!(row && *row && SvROK(*row) && SvTYPE(SvRV(*row)) == SVt_PVAV))
                 continue;
             ra = (AV *)SvRV(*row);
-            h  = newHV();
-            for (j = 0; j < ncol; j++) {
-                SV **c = av_fetch(cols, j, 0);
-                SV **v = av_fetch(ra, j, 0);
-                STRLEN cl;
-                const char *cp;
-                if (!(c && *c)) continue;
-                cp = SvPV_const(*c, cl);
-                (void)hv_store(h, cp, (I32)cl,
-                               newSVsv(v && *v ? *v : &PL_sv_undef), 0);
-            }
+            h  = dbil_row_to_hv(aTHX_ ra, cols);
             kv = av_fetch(ra, ki, 0);
             if (kv && *kv) {
                 STRLEN kl2;

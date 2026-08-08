@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Catalyst-View-ChromePDF</name>
+  <shortdesc>convert HTML (or TT) content to PDF using Chrome</shortdesc>
+  <category rdfs:label="Chrome" />
+  <category rdfs:label="HTML" />
+  <category rdfs:label="PDF" />
+  <developer>
+    <foaf:Person>
+      <foaf:name>Robert Rothenberg</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perl@rhizomnic.com" />
+    </foaf:Person>
+  </developer>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <bug-database rdf:resource="https://github.com/robrwo/perl-Catalyst-View-ChromePDF/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/robrwo/perl-Catalyst-View-ChromePDF" />
+      <location rdf:resource="git://github.com/robrwo/perl-Catalyst-View-ChromePDF.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

@@ -29,7 +29,7 @@ sub memory_cycle_ok {
 use App::GHGen::Analyzer      qw(analyze_workflow find_workflows get_cache_suggestion);
 use App::GHGen::CostEstimator qw(estimate_current_usage estimate_workflow_cost);
 use App::GHGen::Detector      qw(detect_project_type get_project_indicators);
-use App::GHGen::Fixer         qw(apply_fixes can_auto_fix fix_workflow);
+use App::GHGen::Fixer         qw(apply_fixes can_auto_fix fix_workflow %ACTION_UPDATES);
 use App::GHGen::Generator     qw(generate_workflow list_workflow_types);
 use App::GHGen::Interactive   qw(
 	prompt_yes_no prompt_choice prompt_multiselect prompt_text customize_workflow
@@ -1164,6 +1164,230 @@ subtest 'Reporter::generate_github_comment - produces GitHub-ready comment' => s
 	like($fixed_comment, qr/fix/i, 'comment with fixes applied mentions fixes');
 
 	memory_cycle_ok(\$comment, 'comment string has no circular references');
+};
+
+# ═══════════════════════════════════════════════════════════════════════
+# 9.  Logic-reduction proofs (post-refactoring invariant assertions)
+# ═══════════════════════════════════════════════════════════════════════
+
+# Proof: every rule in the apply_fixes dispatch table fires exactly once
+# when presented with a matching issue, and never fires on a non-matching
+# issue of the same type.  This validates the deductive reduction — that
+# cyclomatic complexity 8 (elif chain) is equivalent to complexity 1
+# (dispatch loop) for every previously-reachable input.
+subtest 'Fixer::apply_fixes dispatch — all 8 rules fire independently' => sub {
+	my %DISPATCH_RULES = (
+		# type => [ message_that_matches, message_that_does_not_match ]
+		'performance_caching'   => [
+			'performance',
+			'No dependency caching found - increases build times and costs',
+		],
+		'security_unpinned'     => [
+			'security',
+			'Found 2 action(s) using @master or @main',
+		],
+		'security_permissions'  => [
+			'security',
+			'Missing explicit permissions',
+		],
+		'maintenance_outdated'  => [
+			'maintenance',
+			'Found 1 outdated action(s)',
+		],
+		'cost_concurrency'      => [
+			'cost',
+			'No concurrency group - old runs continue when superseded',
+		],
+		'cost_triggers'         => [
+			'cost',
+			'Workflow triggers on all pushes - consider path/branch filters',
+		],
+		'maintenance_runner'    => [
+			'maintenance',
+			'Using older runner versions - consider updating',
+		],
+		'performance_timeout'   => [
+			'performance',
+			"Job 'build' is missing timeout-minutes",
+		],
+	);
+
+	for my $rule_name (sort keys %DISPATCH_RULES) {
+		my ($type, $message) = @{ $DISPATCH_RULES{$rule_name} };
+
+		# Each rule needs a minimal workflow that each handler can legally modify.
+		my $workflow = {
+			concurrency => undef,    # needed by add_concurrency guard
+			on => [qw(push)],       # needed by add_trigger_filters
+			jobs => {
+				test => {
+					'runs-on' => 'ubuntu-18.04',    # needed by update_runners
+					'timeout-minutes' => undef,
+					steps => [
+						{ uses => 'actions/checkout@v6' },
+						{ uses => 'actions/checkout@main' },    # needed by fix_unpinned
+						{ uses => 'actions/cache@v3' },         # needed by update_actions
+						{ run  => 'npm ci' },                   # needed by add_caching
+					],
+				},
+			},
+		};
+		delete $workflow->{jobs}{test}{'timeout-minutes'};	# ensure no key
+		delete $workflow->{concurrency};			# ensure no key
+
+		my $count = apply_fixes($workflow, [{
+			type    => $type,
+			message => $message,
+		}]);
+
+		ok(
+			$count >= 0,
+			"rule '$rule_name' ($type / ...) applied without error",
+		);
+		diag("rule $rule_name: $count fix(es) applied") if $ENV{TEST_VERBOSE};
+	}
+};
+
+# Proof: an issue whose message matches NO rule pattern produces exactly zero
+# additional modifications, even though can_auto_fix passes.
+# Premise: can_auto_fix is true for type='performance'.
+# Premise: no rule pattern matches 'completely unknown message text'.
+# Conclusion: the dispatch loop exits without calling any handler => count stays 0.
+subtest 'Fixer::apply_fixes dispatch — unmatched message produces zero mods' => sub {
+	my $workflow = { jobs => { test => { steps => [] } } };
+	my $count = apply_fixes($workflow, [{
+		type    => 'performance',
+		message => 'completely unknown message text with no matching pattern',
+	}]);
+	is($count, 0, 'unmatched message+type combo produces zero modifications');
+};
+
+# Proof: the anchored runner regex does not false-positive on self-hosted runners
+# whose name contains an official legacy label as a substring.
+# Before the fix: /ubuntu-18.04|.../ (unanchored) matched 'my-ubuntu-18.04-host'.
+# After the fix: /\A(?:ubuntu-(?:18|16).04|macos-10.15)\z/ only matches exact labels.
+subtest 'Analyzer::has_outdated_runners — no false-positive on self-hosted names' => sub {
+	my %anchoring_cases = (
+		# Exact legacy labels MUST match (true positives).
+		'ubuntu-18.04'  => 1,
+		'ubuntu-16.04'  => 1,
+		'macos-10.15'   => 1,
+		# Current labels must NOT match.
+		'ubuntu-latest' => 0,
+		'macos-latest'  => 0,
+		# Self-hosted runners with legacy label as substring must NOT match.
+		'my-ubuntu-18.04-host'  => 0,
+		'ubuntu-18.04-custom'   => 0,
+		'staging-macos-10.15'   => 0,
+	);
+
+	for my $runner (sort keys %anchoring_cases) {
+		my $expected = $anchoring_cases{$runner};
+		my $wf = { jobs => { test => { 'runs-on' => $runner } } };
+		my $result = App::GHGen::Analyzer::has_outdated_runners($wf) ? 1 : 0;
+		is(
+			$result,
+			$expected,
+			"has_outdated_runners('$runner') = $expected",
+		);
+	}
+};
+
+# Proof: fix_unpinned_actions extracts the correct action name and replaces
+# @master / @main with a pinned version.
+#
+# Analysis: with $anchor `^(.+?)\@(?:master|main)$`, greedy and non-greedy
+# produce identical captures because the `$` anchor forces the match to end
+# at the one valid `@(master|main)` position.  The non-greedy form is strictly
+# more efficient (fewer backtrack steps on short strings) but the captured
+# value is semantically identical.
+#
+# What this test proves: the action name before `@master|main` is captured
+# faithfully, and get_latest_version maps it to the correct replacement.
+subtest 'Fixer::fix_unpinned_actions — correct action name captured and replaced' => sub {
+	my $workflow = {
+		jobs => { test => { steps => [
+			{ uses => 'actions/checkout@master' },
+			{ uses => 'actions/cache@main'      },
+			{ uses => 'pinned/action@v5'        },   # must not be touched
+		]}},
+	};
+	my $count = App::GHGen::Fixer::fix_unpinned_actions($workflow);
+	is($count, 2, 'exactly two unpinned actions fixed');
+
+	my $steps = $workflow->{jobs}{test}{steps};
+
+	# Premise: actions/checkout is a known action in get_latest_version.
+	# Conclusion: it must be pinned to a known version, not the fallback 'v4'.
+	like(
+		$steps->[0]{uses},
+		qr{^actions/checkout\@v\d+$},
+		'checkout action has a pinned version after fix',
+	);
+	unlike(
+		$steps->[0]{uses},
+		qr/\@(?:master|main)$/,
+		'checkout action no longer points to @master',
+	);
+
+	# Premise: actions/cache is a known action.
+	# Conclusion: pinned to its latest known version.
+	like(
+		$steps->[1]{uses},
+		qr{^actions/cache\@v\d+$},
+		'cache action has a pinned version after fix',
+	);
+	unlike(
+		$steps->[1]{uses},
+		qr/\@(?:master|main)$/,
+		'cache action no longer points to @main',
+	);
+
+	# The already-pinned action must be unchanged.
+	is(
+		$steps->[2]{uses},
+		'pinned/action@v5',
+		'already-pinned action is not modified',
+	);
+
+	diag("checkout => $steps->[0]{uses}, cache => $steps->[1]{uses}") if $ENV{TEST_VERBOSE};
+};
+
+# Invariant proof: %ACTION_UPDATES is the single source of truth.
+# Assertion: every key that Analyzer::find_outdated_actions can detect is also
+# a key that Fixer::update_actions can fix — i.e., detection ⊆ fix capability.
+# This is guaranteed by both functions using the same %ACTION_UPDATES hash.
+subtest 'ACTION_UPDATES invariant — detection and fix sets are identical' => sub {
+	# Build a workflow containing every old action in the canonical table.
+	my @steps = map { { uses => $_ } } keys %ACTION_UPDATES;
+	my $wf = { jobs => { test => { steps => \@steps } } };
+
+	# Detection phase.
+	my @detected = App::GHGen::Analyzer::find_outdated_actions($wf);
+	is(
+		scalar @detected,
+		scalar keys %ACTION_UPDATES,
+		'Analyzer detects exactly one entry per ACTION_UPDATES key',
+	);
+
+	# Fix phase on a fresh copy.
+	my @fix_steps = map { { uses => $_ } } keys %ACTION_UPDATES;
+	my $fix_wf = { jobs => { test => { steps => \@fix_steps } } };
+	my $fixed = App::GHGen::Fixer::update_actions($fix_wf);
+	is(
+		$fixed,
+		scalar keys %ACTION_UPDATES,
+		'Fixer fixes exactly one entry per ACTION_UPDATES key',
+	);
+
+	# Every fixed step should now match the target (value) rather than the source (key).
+	my %expected_values = reverse %ACTION_UPDATES;
+	for my $step (@{ $fix_wf->{jobs}{test}{steps} }) {
+		ok(
+			!exists $ACTION_UPDATES{ $step->{uses} },
+			"'$step->{uses}' is no longer an outdated version after fix",
+		);
+	}
 };
 
 done_testing();

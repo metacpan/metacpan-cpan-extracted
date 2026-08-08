@@ -13,8 +13,13 @@ Scrip action, meant to be paired with L<RT::Condition::OwnerAway>. Reassigns
 the ticket's owner to Nobody and leaves an internal comment explaining that
 the previous owner is away. Runs the actual mutation as C<RT-E<gt>SystemUser>
 so it succeeds regardless of the replying user's rights, and uses
-C<Comment> (not C<Correspond>) so the note stays internal and can't
-re-trigger the "On Correspond" condition that fired this scrip.
+C<Comment> (not C<Correspond>) so the note stays internal.
+
+The comment is added only after C<SetOwner> has succeeded, so by the time it
+creates its own transaction the ticket is owned by Nobody and
+L<RT::Condition::OwnerAway> no longer matches. That ordering is what keeps
+the scrip from looping now that comments can trigger it too, so don't
+reorder these two steps.
 
 =cut
 
@@ -30,16 +35,16 @@ sub Commit ($self) {
     my ( $ok, $msg ) = $ticket->Load( $self->TicketObj->Id );
     unless ($ok) {
         RT->Logger->error( "AwayMode: could not reload ticket "
-            . $self->TicketObj->Id
-            . ": $msg" );
+              . $self->TicketObj->Id
+              . ": $msg" );
         return 0;
     }
 
     my ( $set_ok, $set_msg ) = $ticket->SetOwner( RT->Nobody->Id, 'Set' );
     unless ($set_ok) {
         RT->Logger->error( "AwayMode: could not reassign ticket "
-            . $ticket->Id
-            . " to Nobody: $set_msg" );
+              . $ticket->Id
+              . " to Nobody: $set_msg" );
         return 0;
     }
 
@@ -51,8 +56,8 @@ sub Commit ($self) {
     my ( $comment_ok, $comment_msg ) = $ticket->Comment( Content => $comment );
     unless ($comment_ok) {
         RT->Logger->error( "AwayMode: could not add comment to ticket "
-            . $ticket->Id
-            . ": $comment_msg" );
+              . $ticket->Id
+              . ": $comment_msg" );
     }
 
     return 1;

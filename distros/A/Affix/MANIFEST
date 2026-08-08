@@ -118,6 +118,7 @@ t/082_own.t
 t/083_pin_conventions.t
 t/084_enum_aliases.t
 t/085_simd_m256.t
+t/086_wstring_struct.t
 t/090_cb_struct_byval.t
 t/091_cb_struct_member.t
 t/092_struct_signature_layout.t

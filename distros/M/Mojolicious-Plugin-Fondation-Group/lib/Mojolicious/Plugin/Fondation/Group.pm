@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Group;
-$Mojolicious::Plugin::Fondation::Group::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Group::VERSION = '0.03';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use DBIx::Class::Relationship::ManyToMany::Async;
 
@@ -70,7 +70,7 @@ Mojolicious::Plugin::Fondation::Group - Group management plugin for Fondation
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

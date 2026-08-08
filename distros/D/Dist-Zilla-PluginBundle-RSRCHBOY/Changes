@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-RSRCHBOY
 
+0.078     2026-08-07 18:20:40 CDT-0500
+	* Default to not tweeting or signing things
+
 0.077     2018-03-05 15:33:19 CST-0600
 	* Un-drop `MetaYML`, as it's apparently still useful
 

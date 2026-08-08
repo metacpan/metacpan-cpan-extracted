@@ -1453,7 +1453,7 @@ paths:
 YAML
 
   my $encoded  = encode_media_type('application/x-www-form-urlencoded',
-      \{ key1 => '1e+1', key2 => $::dumper->encode({ x => 1 }) })->$*;
+      \ { key1 => '1e+1', key2 => $::dumper->encode({ x => 1 }) })->$*;
   my $decoded = { key1 => 10, key2 => { x => 1 } };
 
   my $response = response(200, [ 'My-Header' => $encoded, 'Content-Type' => 'application/x-www-form-urlencoded' ], $encoded);

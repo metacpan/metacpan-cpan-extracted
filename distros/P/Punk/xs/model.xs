@@ -99,7 +99,9 @@ _instantiate(class, ...)
         if (!(m && pm_meta_finalize(aTHX_ m)))
             croak("Punk::Model: '%s' declares no table", SvPV_nolen(class));
 
-        {   /* backend => 'Class', defaulting to the shipped DBI one */
+        {   /* backend => 'Class', defaulting to the shipped DBI one.
+             * backend => 'Punk::Model::DBIx::Loop' selects the non-blocking
+             * backend, whose methods return futures instead of values. */
             SV *b = dbopts ? pm_get(aTHX_ dbopts, "backend") : NULL;
             backend_class = (b && SvOK(b)) ? sv_2mortal(newSVsv(b))
                           : sv_2mortal(newSVpvs("Punk::Model::DBI"));

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::POST;
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.89'; # VERSION
 
 use Moose;
 use Carp qw(croak);
@@ -111,7 +111,7 @@ Net::SAML2::Binding::POST - HTTP POST binding for SAML
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 SYNOPSIS
 

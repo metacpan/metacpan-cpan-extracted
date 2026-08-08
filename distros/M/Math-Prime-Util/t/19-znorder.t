@@ -3,13 +3,12 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/znorder/;
+use Math::Prime::Util qw/mulint powint znorder/;
 
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 my $usegmp= Math::Prime::Util::prime_get_config->{'gmp'};
 my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
-$use64 = 0 if $use64 && 18446744073709550592 == ~0;
 
 my @mult_orders = (
   [1, 35, 1],
@@ -38,6 +37,11 @@ my @mult_orders = (
 if ($use64) {
   push @mult_orders, [2, 2405286912458753, 1073741824];  # Pari #1031
 }
+push @mult_orders,
+  [10000019, powint(3,123), mulint(2,powint(3,122))],
+  ["314159265358979323", powint(2,123), powint(2,121)],
+  ["314159265358979323", powint(4,123), powint(2,244)],
+  ["314159265358979323", powint(5,123), mulint(4,powint(5,122))];
 
 plan tests => scalar(@mult_orders);
 
@@ -45,5 +49,6 @@ plan tests => scalar(@mult_orders);
 foreach my $moarg (@mult_orders) {
   my ($a, $n, $exp) = @$moarg;
   my $zn = znorder($a, $n);
-  is( $zn, $exp, "znorder($a, $n) = " . ((defined $exp) ? $exp : "<undef>") );
+  if (defined $exp) { is("$zn", "$exp", "znorder($a, $n) = $exp"); }
+  else              { is($zn, undef, "znorder($a, $n) = <undef>"); }
 }

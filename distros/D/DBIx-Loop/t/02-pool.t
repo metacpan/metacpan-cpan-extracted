@@ -78,9 +78,18 @@ sub await1 { my $f = shift; $ad->await($f); return ($f->get)[0] }
     my @pids = $db->_worker_pids;
     is(scalar @pids, 3, 'pool reports 3 worker pids');
 
-    # kill a worker while a query is in flight on it: with all three workers
-    # saturated, worker 0 is provably busy when we SIGKILL its pid.
-    my @f = map { $db->query("SELECT COUNT(*) FROM t") } 1 .. 3;
+    # Kill a worker while a query is genuinely in flight on it.
+    #
+    # `busy` is the parent's bookkeeping, not the child's state: writing the
+    # request frame says nothing about whether the child has already read,
+    # run and answered it. Against SELECT COUNT(*) over five rows the child
+    # routinely finished before the signal landed, and the whole block then
+    # exercised the idle-death path instead (which is worth testing, and is
+    # tested separately below). A statement slow enough to still be running
+    # is what makes this deterministic.
+    my $SLOW = 'WITH RECURSIVE c(x) AS (SELECT 1 UNION ALL '
+             . 'SELECT x+1 FROM c WHERE x < 3000000) SELECT COUNT(*) FROM c';
+    my @f = map { $db->query($SLOW) } 1 .. 3;
     kill 'KILL', $pids[0];
     $ad->await($_) for @f;
     my $failed = grep { $_->is_failed } @f;
@@ -97,6 +106,47 @@ sub await1 { my $f = shift; $ad->await($f); return ($f->get)[0] }
     $ad->await($_) for @g;
     is(scalar(grep { $_->is_done && ($_->get)[0]{rows}[0][0] == 5 } @g), 6,
         'pool serves 6 concurrent queries after the crash');
+}
+
+# ---- a worker killed while IDLE ---------------------------------------------
+#
+# The case the crash block above used to hit by accident. A worker that dies
+# with nothing in flight is invisible: death is otherwise only ever seen as
+# EOF on the read side, and an idle worker's fd is not readable, so the pool
+# does not learn about it until it writes to the corpse.
+#
+# It has to learn *there*, because dbil_pool_run picks the lowest-numbered
+# idle worker with a live fd. Failing the write without retiring the slot left
+# that same dead slot first in line for every subsequent request, so the pool
+# failed everything for ever while two healthy workers sat idle - and because
+# the failure was synchronous, await never turned the loop, so the EOF that
+# would have fixed it never got the chance to fire.
+{
+    my $db3 = DBIx::Loop->connect(
+        "dbi:SQLite:dbname=$file", '', '',
+        { RaiseError => 1, PrintError => 0 },
+        loop => $ad, workers => 3,
+    );
+    # settle the pool so every worker is idle and nothing is in flight
+    $ad->await($db3->query("SELECT COUNT(*) FROM t"));
+
+    my @p = $db3->_worker_pids;
+    kill 'KILL', $p[0];
+    waitpid($p[0], 0) if $p[0] > 0;   # let it actually be gone, not just signalled
+
+    # No loop turn between the kill and this: the pool has had no opportunity
+    # to notice by any route other than the failing write itself.
+    my @f = map { $db3->query("SELECT COUNT(*) FROM t") } 1 .. 6;
+    $ad->await($_) for @f;
+    is(scalar(grep { $_->is_done && ($_->get)[0]{rows}[0][0] == 5 } @f), 6,
+        'a worker killed while idle does not take the pool down with it')
+        or diag map { $_->is_failed ? "failed: " . $_->failure . "\n" : "done\n" } @f;
+
+    my @p2 = $db3->_worker_pids;
+    is(scalar(grep { $_ > 0 } @p2), 3, 'the idle-killed slot respawned');
+    isnt($p2[0], $p[0], 'and carries a new pid');
+
+    $db3->disconnect;
 }
 
 $db->disconnect;

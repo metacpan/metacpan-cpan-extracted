@@ -1,5 +1,16 @@
 Revision history for Search-Trigram
 
+0.02  2026-08-07
+  - Add a shared C ABI, include/sg_abi.h
+  - search writes into a caller-provided array rather than handing back
+    the malloc'd result block strigram_results_free pairs with, so both
+    halves of the allocation stay on this side of the boundary. There
+    are deliberately no constructor or destructor entries either: the
+    Perl object owns the index lifetime and already does it correctly.
+  - Only index_of takes pTHX_; the rest never touches an SV.
+  - Become an ExtUtils::Depends provider, so a consumer naming
+    Search::Trigram gets the include path automatically.
+  - Add t/06-abi.t.
+
 0.01  2026-07-12
   - Initial release
-

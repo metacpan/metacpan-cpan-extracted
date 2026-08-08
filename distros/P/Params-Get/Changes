@@ -1,5 +1,33 @@
 Revision history for Params-Get
 
+0.16	Fri Aug  7 09:51:33 AM EDT 2026
+	[ Bug fixes ]
+	- Don't rely on PVS (GitHub#5)
+	  I have not been able to reproduce this, so I do not know if this fix works
+
+	[ Enhancements ]
+	- Remove provably redundant "$default &&" pre-check in the positional-names
+	    guard: ref(X) eq "ARRAY" implies X is always truthy, so the conjunction's
+	    left operand can never flip the branch (deductive reduction R1)
+	- Collapse five one-arg dispatch arms to two via De Morgan boolean reduction:
+	    SCALAR (deref) pulled left as fast guard; plain scalar/ARRAY/CODE/blessed
+	    merged into one disjunction (reduction R2)
+	- Update PSEUDOCODE POD to document the formal premises behind both reductions
+	- Cache ref($default) in $default_ref to avoid 2-3 redundant ref() calls per
+	    invocation when $default is an ARRAY ref or a plain string
+	- Replace named intermediate hash (my %rc = ...; \%rc) with direct anonymous
+	    hashref ({ @{$args} }) in the even-length named-pairs path: ~9% faster
+
+	[ Tests ]
+	- Add t/lib/TestHelper.pm: shared $USAGE_RE and $DEFAULT_CROAK_RE constants,
+	    eliminating five identical per-file Readonly definitions
+	- Fix greedy qr/latitude.*must be/ to non-greedy with /x in t/integration.t
+	- Use \Q->\E instead of bare -> in regex literals in t/extended_tests.t
+	- Add t/cgi_security.t: 32-subtest penetration test suite covering command
+	    injection, path traversal, XSS, CRLF header injection, SQL injection
+	    passthrough, STDIN isolation, duplicate-key attack vector, hostile $default
+	    values, resource exhaustion, global-state integrity, and taint propagation
+
 0.15	Tue Jun 30 10:17:42 EDT 2026
 	[ Bug fixes ]
 	- Ensure Makefile.PL has the latest META_MERGE format

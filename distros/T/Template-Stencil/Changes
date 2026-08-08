@@ -1,5 +1,16 @@
 Revision history for Template-Stencil
 
+0.04    2026-08-08
+        - cpuid.h is now included only on gcc 4.3+ or clang; FreeBSD 9's
+          base gcc 4.2.1 defines __GNUC__ without shipping the header, so
+          the build died before the SIMD paths could fall back. Runtime
+          caps simply stay scalar on such compilers.
+        - Define MAX when no header supplied it. utf8.h on perl 5.41+
+          expands UTF8_MAXBYTES_CASE through MAX(), which perl.h reserves
+          for PERL_CORE/PERL_EXT
+        - The stat/fstat call sites now declare struct stat rather than
+          Stat_t. 
+
 0.03    Date/time
         - Windows fixes 
         - Path safety now treats '\' as a separator alongside '/' when

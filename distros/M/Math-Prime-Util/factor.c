@@ -3,13 +3,13 @@
 #include <string.h>
 #include <math.h>
 
-#define FUNC_ipow   1
 #define FUNC_isqrt  1
 #define FUNC_gcd_ui 1
 #define FUNC_is_perfect_square 1
 #define FUNC_clz 1
 #define FUNC_log2floor 1
 #include "ptypes.h"
+#include "constants.h"
 #include "factor.h"
 #include "sieve.h"
 #include "util.h"
@@ -32,27 +32,6 @@ static int holf32(uint32_t n, UV *factors, uint32_t rounds);
  * match the native integer type used inside our Perl, so just use those.
  */
 
-static const unsigned short primes_small[] =
-  {0,2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,
-   101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,
-   193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,
-   293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,
-   409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,
-   521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,
-   641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,
-   757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,
-   881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997,1009,
-   1013,1019,1021,1031,1033,1039,1049,1051,1061,1063,1069,1087,1091,1093,
-   1097,1103,1109,1117,1123,1129,1151,1153,1163,1171,1181,1187,1193,1201,
-   1213,1217,1223,1229,1231,1237,1249,1259,1277,1279,1283,1289,1291,1297,
-   1301,1303,1307,1319,1321,1327,1361,1367,1373,1381,1399,1409,1423,1427,
-   1429,1433,1439,1447,1451,1453,1459,1471,1481,1483,1487,1489,1493,1499,
-   1511,1523,1531,1543,1549,1553,1559,1567,1571,1579,1583,1597,1601,1607,
-   1609,1613,1619,1621,1627,1637,1657,1663,1667,1669,1693,1697,1699,1709,
-   1721,1723,1733,1741,1747,1753,1759,1777,1783,1787,1789,1801,1811,1823,
-   1831,1847,1861,1867,1871,1873,1877,1879,1889,1901,1907,1913,1931,1933,
-   1949,1951,1973,1979,1987,1993,1997,1999,2003,2011};
-#define NPRIMES_SMALL (sizeof(primes_small)/sizeof(primes_small[0]))
 
 /* For doing trial division loops over the small primes.
  * Returns either 1 or the new unfactored n.
@@ -144,7 +123,7 @@ static int _power_factor(UV n, UV *factors)
   int nfactors, i, j, k;
   if (n > 3 && (k = powerof_ret(n, &root))) {
     nfactors = factor(root, factors);
-    for (i = nfactors; i >= 0; i--)
+    for (i = nfactors-1; i >= 0; i--)
       for (j = 0; j < k; j++)
         factors[k*i+j] = factors[i];
     return k * nfactors;
@@ -215,20 +194,35 @@ int factor_one(UV n, UV *factors, bool primality, bool trial)
     nfactors = pbrent_factor(n, factors, 2*br_rounds, 3);
     if (nfactors > 1) return nfactors;
 #endif
-    /* Random 64-bit inputs at this point:
-     *   About 3.1% are small enough that we did with HOLF.
-     *   montmath:  96.89% pbrent,  0.01% pbrent2
-     *   fast:      73.43% pbrent, 21.97% squfof, 1.09% p-1, 0.49% prho, long
-     *   slow:      75.34% squfof, 19.47% pbrent, 0.20% p-1, 0.06% prho
-     */
-    /* SQUFOF with these parameters gets 99.9% of everything left */
+#if HAS_ECM64
+    /* SQUFOF is still good for smaller inputs, better to skip for larger */
+    if (nbits <= 48) {
+      nfactors = squfof_factor(n, factors, sq_rounds);
+      if (nfactors > 1) return nfactors;
+    }
+
+    nfactors = tinyecm64_factor(n, factors, 500, 5000, 20, 0);
+    if (nfactors > 1) return nfactors;
+    nfactors = tinyecm64_factor(n, factors, 1000, 10000, 20, 20);
+    if (nfactors > 1) return nfactors;
+    /* Essentially all 64-bit inputs have been found by this point. */
+    nfactors = tinyecm64_factor(n, factors, 2000, 20000, 40, 40);
+    if (nfactors > 1) return nfactors;
+    nfactors = tinyecm64_factor(n, factors, 4000, 40000, 20, 80);
+    if (nfactors > 1) return nfactors;
+    nfactors = tinyecm64_factor(n, factors, 8000, 80000, 10, 100);
+    if (nfactors > 1) return nfactors;
+#else
+    /* SQUFOF is useful in all cases before p-1 */
     if (nbits <= 62) {
       nfactors = squfof_factor(n, factors, sq_rounds);
       if (nfactors > 1) return nfactors;
     }
-    /* At this point we should only have 16+ digit semiprimes. */
+
     nfactors = pminus1_factor(n, factors, 8000, 120000);
     if (nfactors > 1) return nfactors;
+#endif
+
     /* Get the stragglers */
     nfactors = pbrent_factor(n, factors, 500000, 5);
     if (nfactors > 1) return nfactors;
@@ -323,7 +317,7 @@ void factorintp(factored_t *nf, UV n)
 void factoredp_validate(const factored_t *nf)
 {
   if (nf->n == 0) {
-    MPUassert(nf->nfactors == 1, "factored_t n=0  =>  nfactors = 0");
+    MPUassert(nf->nfactors == 1, "factored_t n=0  =>  nfactors = 1");
     MPUassert(nf->f[0] == 0 && nf->e[0] == 1, "factored_t n=0  =>  vecprod = n");
   } else if (nf->n == 1) {
     MPUassert(nf->nfactors == 0, "factored_t n=1  =>  nfactors = 0");
@@ -402,7 +396,7 @@ int trial_factor(UV n, UV *factors, UV f, UV last)
   int sp, nfactors = 0;
 
   if (f < 2) f = 2;
-  if (last == 0 || last*last > n) last = UV_MAX;
+  if (last == 0 || last > n/last) last = UV_MAX;
 
   if (n < 4 || last < f) {
     factors[0] = n;
@@ -411,11 +405,14 @@ int trial_factor(UV n, UV *factors, UV f, UV last)
 
   /* possibly do uint32_t specific code here */
 
-  if (f < primes_small[NPRIMES_SMALL-1]) {
-    while ( (n & 1) == 0 ) { factors[nfactors++] = 2; n >>= 1; }
-    if (3<=last) while ( (n % 3) == 0 ) { factors[nfactors++] = 3; n /= 3; }
-    if (5<=last) while ( (n % 5) == 0 ) { factors[nfactors++] = 5; n /= 5; }
-    for (sp = 4; sp < (int)NPRIMES_SMALL; sp++) {
+  if (f <= primes_small[NPRIMES_SMALL-1]) {
+    if (f <= 2) while ( (n & 1) == 0 ) { factors[nfactors++] = 2; n >>= 1; }
+    if (f <= 3 && 3 <= last)
+      while ( (n % 3) == 0 ) { factors[nfactors++] = 3; n /= 3; }
+    if (f <= 5 && 5 <= last)
+      while ( (n % 5) == 0 ) { factors[nfactors++] = 5; n /= 5; }
+    for (sp = 4; sp < (int)NPRIMES_SMALL && primes_small[sp] < f; sp++) { }
+    for (; sp < (int)NPRIMES_SMALL; sp++) {
       f = primes_small[sp];
       if (f*f > n || f > last) break;
       while ( (n%f) == 0 ) {
@@ -423,9 +420,13 @@ int trial_factor(UV n, UV *factors, UV f, UV last)
         n /= f;
       }
     }
+    if (sp == (int)NPRIMES_SMALL) f = 2017;
   }
+  if (f > primes_small[NPRIMES_SMALL-1] &&
+      distancewheel30[f % 30] <= UV_MAX-f)
+    f += distancewheel30[f % 30];
   /* Trial division using a mod-30 wheel for larger values */
-  if (f*f <= n && f <= last) {
+  if (f <= n/f && f <= last) {
     UV m, newlimit, limit = isqrt(n);
     if (limit > last) limit = last;
     m = f % 30;
@@ -560,6 +561,44 @@ UV divisor_sum(UV n, UV k)
 }
 
 
+UV aliquot_sum(UV n) {
+  factored_t nf;
+  UV product;
+  uint32_t i;
+
+  if (n <= 1) return 0;
+
+  nf = factorint(n);
+
+  /* Prime power: aliquot(p^e) = 1 + p + ... + p^(e-1), always < p^e = n */
+  if (nf.nfactors == 1) {
+    UV f = nf.f[0];
+    uint16_t e = nf.e[0];
+    UV pke = 1, fmult = 1;
+    while (e-- > 1) {
+      pke *= f;
+      fmult += pke;
+    }
+    return fmult;
+  }
+
+  /* Multiple prime factors: compute σ(n) with overflow detection, subtract n */
+  product = 1;
+  for (i = 0; i < nf.nfactors; i++) {
+    UV       f = nf.f[i];
+    uint16_t e = nf.e[i];
+    UV pke = f, fmult = 1 + f;
+    while (e-- > 1) {
+      pke *= f;
+      if (fmult > UV_MAX - pke) return 0;
+      fmult += pke;
+    }
+    if (product > UV_MAX / fmult) return 0;
+    product *= fmult;
+  }
+  return product - n;
+}
+
 
 /******************************************************************************/
 /******************************************************************************/
@@ -589,12 +628,13 @@ static int no_factor(UV n, UV* factors)
  */
 int fermat_factor(UV n, UV *factors, UV rounds)
 {
-  IV sqn, x, y, r;
+  UV sqn;
+  IV x, y, r;
   MPUassert( (n >= 3) && ((n%2) != 0) , "bad n in fermat_factor");
   sqn = isqrt(n);
-  x = 2 * sqn + 1;
+  x = (IV)(2 * sqn + 1);
   y = 1;
-  r = (sqn*sqn) - n;
+  r = -(IV)(n - sqn*sqn);
 
   while (r != 0) {
     if (rounds-- == 0) return no_factor(n,factors);
@@ -606,7 +646,7 @@ int fermat_factor(UV n, UV *factors, UV rounds)
     } while (r > 0);
   }
   r = (x-y)/2;
-  return found_factor(n, r, factors);
+  return found_factor(n, (UV)r, factors);
 }
 
 /* Hart's One Line Factorization. */
@@ -866,12 +906,517 @@ int prho_factor(UV n, UV *factors, UV rounds)
   return no_factor(n,factors);
 }
 
+
+/******************************************************************************/
+/* Tiny ECM -- elliptic curve factoring, 64-bit prototype                     */
+/******************************************************************************/
+
+#if HAS_ECM64
+
+static INLINE uint64_t tecm64_addmod(uint64_t a, uint64_t b, uint64_t n)
+{
+  uint64_t r = a + b;
+  if (r < a || r >= n) r -= n;
+  return r;
+}
+
+static INLINE uint64_t tecm64_submod(uint64_t a, uint64_t b, uint64_t n)
+{
+  return (a >= b) ? a - b : n - (b - a);
+}
+
+static INLINE uint64_t tecm64_halfmod(uint64_t a, uint64_t n)
+{
+  return (a & 1)  ?  (a >> 1) + (n >> 1) + 1  :  a >> 1;
+}
+
+static uint64_t tecm64_mulmod(uint64_t a, uint64_t b, uint64_t n)
+{
+#if HAVE_UINT128
+  return (uint64_t)(((uint128_t)a * b) % n);
+#else
+  uint64_t r = 0;
+  if (a >= n) a %= n;
+  if (b >= n) b %= n;
+  if (a < b) { uint64_t t = a; a = b; b = t; }
+  while (b) {
+    if (b & 1) r = tecm64_addmod(r, a, n);
+    b >>= 1;
+    if (b) a = tecm64_addmod(a, a, n);
+  }
+  return r;
+#endif
+}
+
+#define tecm64_sqrmod(a,n) tecm64_mulmod(a,a,n)
+
+static uint64_t tecm64_powmod(uint64_t a, UV k, uint64_t n)
+{
+  uint64_t r = 1;
+  if (a >= n) a %= n;
+  while (k) {
+    if (k & 1) r = tecm64_mulmod(r, a, n);
+    k >>= 1;
+    if (k) a = tecm64_sqrmod(a, n);
+  }
+  return r;
+}
+
+static uint64_t tecm64_gcd(uint64_t a, uint64_t b)
+{
+  while (b) { uint64_t t = b; b = a % b; a = t; }
+  return a;
+}
+
+/* Binary extended modular inverse for odd n.  Returns 0 if gcd(a,n) > 1. */
+static uint64_t tecm64_modinv(uint64_t a, uint64_t n)
+{
+  uint64_t u, v, x1, x2;
+  if (a == 0) return 0;
+  u = a % n;  v = n;
+  x1 = 1;     x2 = 0;
+  while (u != 1 && v != 1) {
+    while ((u & 1) == 0) {
+      u >>= 1;
+      x1 = (x1 & 1) ? tecm64_halfmod(x1, n) : x1 >> 1;
+    }
+    while ((v & 1) == 0) {
+      v >>= 1;
+      x2 = (x2 & 1) ? tecm64_halfmod(x2, n) : x2 >> 1;
+    }
+    if (u >= v) {
+      u -= v;
+      x1 = tecm64_submod(x1, x2, n);
+    } else {
+      v -= u;
+      x2 = tecm64_submod(x2, x1, n);
+    }
+    if (u == 0 || v == 0) return 0;
+  }
+  return (u == 1) ? x1 : x2;
+}
+
+typedef struct {
+  uint64_t n;
+#if HAVE_UINT128
+  uint64_t ninv, r2;
+#endif
+} mont64_t;
+
+static void tecm64_mont_setup(mont64_t *ctx, uint64_t n)
+{
+  ctx->n = n;
+#if HAVE_UINT128
+  {
+    uint64_t x = (3*n)^2;
+    x *= (uint64_t)2 - n * x;
+    x *= (uint64_t)2 - n * x;
+    x *= (uint64_t)2 - n * x;
+    x *= (uint64_t)2 - n * x;
+    ctx->ninv = (uint64_t)0 - x;
+    ctx->r2 = tecm64_powmod(2, 128, n);
+  }
+#endif
+}
+
+static INLINE uint64_t tecm64_mont_mulmod(uint64_t a, uint64_t b,
+                                          const mont64_t *ctx)
+{
+#if HAVE_UINT128
+  /* REDC needs the carry above 2^128 when n > 2^63. */
+  uint128_t ab = (uint128_t)a * b;
+  uint64_t lo = (uint64_t)ab;
+  uint64_t hi = (uint64_t)(ab >> 64);
+  uint64_t m = lo * ctx->ninv;
+  uint64_t mn_hi = (uint64_t)(((uint128_t)m * ctx->n) >> 64);
+  uint64_t u = hi + mn_hi;
+  int ov = (u < hi);
+  u += (lo != 0);
+  ov += (u < (uint64_t)(lo != 0));
+  if (ov || u >= ctx->n) u -= ctx->n;
+  return u;
+#else
+  return tecm64_mulmod(a, b, ctx->n);
+#endif
+}
+
+#define tecm64_mont_sqrmod(a,ctx) tecm64_mont_mulmod(a,a,ctx)
+
+static INLINE uint64_t tecm64_mont_enter(uint64_t a, const mont64_t *ctx)
+{
+#if HAVE_UINT128
+  return tecm64_mont_mulmod(a % ctx->n, ctx->r2, ctx);
+#else
+  return a % ctx->n;
+#endif
+}
+
+static INLINE uint64_t tecm64_mont_exit(uint64_t a, const mont64_t *ctx)
+{
+#if HAVE_UINT128
+  return tecm64_mont_mulmod(a, 1, ctx);
+#else
+  return a;
+#endif
+}
+
+typedef struct { uint64_t X, Z; } ecpt64_t;
+
+static INLINE void ecm_double64(ecpt64_t *R, const ecpt64_t *P,
+                                uint64_t A24, const mont64_t *ctx)
+{
+  uint64_t n = ctx->n;
+  uint64_t u = tecm64_mont_sqrmod(tecm64_submod(P->X, P->Z, n), ctx);
+  uint64_t v = tecm64_mont_sqrmod(tecm64_addmod(P->X, P->Z, n), ctx);
+  uint64_t w = tecm64_submod(v, u, n);
+  R->X = tecm64_mont_mulmod(u, v, ctx);
+  R->Z = tecm64_mont_mulmod(w, tecm64_addmod(u, tecm64_mont_mulmod(A24, w, ctx), n), ctx);
+}
+
+static INLINE void ecm_dadd64(ecpt64_t *R,
+                              const ecpt64_t *P, const ecpt64_t *Q,
+                              const ecpt64_t *Pm, const mont64_t *ctx)
+{
+  uint64_t n = ctx->n;
+  uint64_t u = tecm64_mont_mulmod(tecm64_submod(P->X, P->Z, n),
+                                  tecm64_addmod(Q->X, Q->Z, n), ctx);
+  uint64_t v = tecm64_mont_mulmod(tecm64_addmod(P->X, P->Z, n),
+                                  tecm64_submod(Q->X, Q->Z, n), ctx);
+  uint64_t s = tecm64_addmod(u, v, n);
+  uint64_t d = tecm64_submod(u, v, n);
+  R->X = tecm64_mont_mulmod(tecm64_mont_sqrmod(s, ctx), Pm->Z, ctx);
+  R->Z = tecm64_mont_mulmod(tecm64_mont_sqrmod(d, ctx), Pm->X, ctx);
+}
+
+static void ecm_mul64(ecpt64_t *R, const ecpt64_t *P, UV k,
+                      uint64_t A24, const mont64_t *ctx)
+{
+  ecpt64_t R0, R1;
+  UV bit;
+  if (k == 1) { *R = *P; return; }
+  R0 = *P;
+  ecm_double64(&R1, &R0, A24, ctx);
+  if (k == 2) { *R = R1; return; }
+  bit = (UV)1 << (8*sizeof(UV) - 1);
+  while (!(bit & k)) bit >>= 1;
+  for (bit >>= 1; bit; bit >>= 1) {
+    if (k & bit) {
+      ecm_dadd64(&R0, &R0, &R1, P, ctx);
+      ecm_double64(&R1, &R1, A24, ctx);
+    } else {
+      ecm_dadd64(&R1, &R0, &R1, P, ctx);
+      ecm_double64(&R0, &R0, A24, ctx);
+    }
+  }
+  *R = R0;
+}
+
+/* Same fixed Suyama sigma sequence as tinyecm128. */
+static const uint16_t ecm64_sigmas[] = {
+   11,   13,   17,   19,   23,   29,   31,   37,   41,   43,
+   47,   53,   59,   61,   67,   71,   73,   79,   83,   89,
+  103,  127,  139,  149,  151,  157,  163,  181,  191,  197,
+  199,  211,  223,  227,  233,  239,  257,  271,  293,  313,
+  331,  337,  347,  359,  379,  389,  397,  401,  409,  421,
+  443,  449,  457,  479,  487,  509,  521,  523,  547,  557,
+  587,  641,  653,  659,  673,  677,  683,  691,  719,  727,
+  739,  751,  769,  797,  809,  853,  919,  929,  941,  997,
+ 1049, 1051, 1063, 1091, 1093, 1109, 1117, 1129, 1153, 1201,
+ 1217, 1229, 1283, 1327, 1361, 1381, 1427, 1447, 1459, 1471,
+ 1481, 1489, 1543, 1549, 1571, 1621, 1709, 1723, 1753, 1759,
+ 1801, 1811, 1867, 1987, 2039, 2099, 2113, 2131, 2251, 2309,
+ 2347, 2381, 2399, 2447, 2473, 2551, 2557, 2663, 2677, 2689,
+ 2713, 2719, 2749, 2857, 2879, 2887, 2939, 3001, 3061, 3067,
+ 3121, 3137, 3187, 3251, 3259, 3271, 3307, 3359, 3371, 3373,
+ 3467, 3593, 3607, 3623, 3643, 3709, 3733, 3793, 3851, 3923,
+ 3989, 4019, 4049, 4129, 4231, 4253, 4283, 4339, 4349, 4441,
+ 4523, 4649, 4787, 4987, 4999, 5171, 5237, 5273, 5297, 5333,
+ 5387, 5471, 5479, 5647, 5749, 5791, 6101, 6163, 6257, 6299,
+ 6337, 6451, 6491, 6659, 6793, 6823, 6967, 7013, 7229, 7253,
+ 7333, 7369, 7477, 7621, 7793, 7817, 8059, 8167, 8209, 8263,
+ 8311, 8377, 8573, 8641, 8741, 8837, 8863, 8963, 9001, 9151,
+ 9203, 9433, 9697, 9743, 9781, 9883,10007,10069,10099,10139,
+10163,10193,10267,10429,10457,10487,10691,10837,10949,11087,
+11243,11321,11411,11681,11813,11903,12011,12263,12277,12401,
+12409,12437,12479,12569,12619,12739,12911,13331,13367,13537,
+13721,13789,13841,13873,14051,14149,14221,14419,14431,14827,
+14887,15077,15289,15467,15511,15649,15773,15797,15859,15901,
+16057,16141,16217,16529,16547,16553,16619,17299,17393,17419,
+17449,17737,17921,18049,18223,19073,19183,19477,20021,20323,
+20347,20759,20929,21023,21157,21587,21611,21613,21673,21751,
+21799,21821,22109,22469,22651,22943,23327,23459,23567,23767,
+23911,23957,24001,24197,24281,24407,24799,24851,25147,25183,
+25469,25679,25703,26561,26683,26701,26821,27073,27191,27271,
+27277,27427,27487,27539,27617,27647,27673,27749,27983,28319,
+28789,28843,29017,29123,29209,29669,29803,29921,30323,30809,
+30851,30911,30983,31397,31541,31963,32369,32561,32771,32969,
+33029,33083,33487,33637,33757,34057,34381,34513,34613,34807,
+35083,35171,35311,35381,36013,36251,36493,36529,36551,36913,
+36919,37363,37517,37699,37907,38047,38177,38273,38749,38903
+};
+#define NECM64_SIGMAS ((int)(sizeof(ecm64_sigmas)/sizeof(ecm64_sigmas[0])))
+
+static int ecm_batch_normalize_x64(uint64_t *xout, uint64_t *fout,
+                                   const ecpt64_t *P, UV npoints,
+                                   const mont64_t *ctx)
+{
+  uint64_t n = ctx->n, R = tecm64_mont_enter(1, ctx);
+  uint64_t acc = R, inv, g;
+  uint64_t *prefix;
+  UV i;
+
+  if (npoints == 0) { *fout = 0; return 1; }
+
+  New(0, prefix, npoints, uint64_t);
+
+  for (i = 0; i < npoints; i++) {
+    acc = tecm64_mont_mulmod(acc, P[i].Z, ctx);
+    prefix[i] = acc;
+  }
+
+  g = tecm64_gcd(acc, n);
+  if (g > 1) {
+    *fout = (g < n) ? g : 0;
+    /* Different coordinates can expose different factors whose product has
+     * gcd n.  Check them individually only on this uncommon failure path. */
+    if (g == n) {
+      for (i = 0; i < npoints; i++) {
+        g = tecm64_gcd(P[i].Z, n);
+        if (g > 1 && g < n) { *fout = g; break; }
+      }
+    }
+    Safefree(prefix);
+    return 0;
+  }
+
+  inv = tecm64_modinv(tecm64_mont_exit(acc, ctx), n);
+  if (inv == 0) {
+    *fout = 0;
+    Safefree(prefix);
+    return 0;
+  }
+  inv = tecm64_mont_enter(inv, ctx);
+
+  for (i = npoints; i > 0; i--) {
+    UV j = i - 1;
+    uint64_t prev = (j == 0) ? R : prefix[j-1];
+    uint64_t zinv = tecm64_mont_mulmod(inv, prev, ctx);
+    inv = tecm64_mont_mulmod(inv, P[j].Z, ctx);
+    xout[j] = tecm64_mont_mulmod(P[j].X, zinv, ctx);
+  }
+
+  *fout = 0;
+  Safefree(prefix);
+  return 1;
+}
+
+static uint64_t tinyecm64_stage2(const ecpt64_t *Q, uint64_t A24,
+                                 const mont64_t *ctx, UV B1, UV B2)
+{
+  uint64_t n = ctx->n, f, *nqx, *Sx;
+  ecpt64_t *nq, *S;
+  UV D, twoD, m, mend, nwindows, w, i;
+  uint64_t gprod;
+
+  if (B2 <= B1) return 0;
+  D = isqrt(B2 >> 1);
+  if (D & 1) D++;
+  if (D == 0 || D > (UV_MAX-1)/2) return 0;
+  twoD = 2*D;
+
+  mend = (B2 > UV_MAX-D) ? UV_MAX : B2 + D;
+  for (m = 1, nwindows = 0; m < mend; nwindows++) {
+    if (m > UV_MAX-twoD) break;
+    m += twoD;
+  }
+  if (nwindows == 0) return 0;
+
+  New(0, nq,  twoD+1, ecpt64_t);
+  New(0, nqx, D+1, uint64_t);
+
+  nq[1] = *Q;
+  for (i = 2; i <= twoD; i++) {
+    if (i & 1) {
+      ecm_dadd64(&nq[i], &nq[(i-1)/2], &nq[(i+1)/2], Q, ctx);
+    } else {
+      ecm_double64(&nq[i], &nq[i/2], A24, ctx);
+    }
+  }
+
+  nqx[0] = 0;
+  if (!ecm_batch_normalize_x64(nqx+1, &f, nq+1, D, ctx)) {
+    Safefree(nqx);
+    Safefree(nq);
+    return f;
+  }
+
+  New(0, S,  nwindows, ecpt64_t);
+  New(0, Sx, nwindows, uint64_t);
+
+  S[0] = *Q;
+  {
+    ecpt64_t Xm = nq[twoD-1];
+    for (w = 1; w < nwindows; w++) {
+      ecpt64_t oldS = S[w-1];
+      ecm_dadd64(&S[w], &nq[twoD], &S[w-1], &Xm, ctx);
+      Xm = oldS;
+    }
+  }
+
+  if (!ecm_batch_normalize_x64(Sx, &f, S, nwindows, ctx)) {
+    Safefree(Sx);
+    Safefree(S);
+    Safefree(nqx);
+    Safefree(nq);
+    return f;
+  }
+
+  gprod = tecm64_mont_enter(1, ctx);
+  m = 1;
+  for (w = 0; w < nwindows; w++) {
+    UV hi = (m > UV_MAX-D) ? UV_MAX : m + D;
+    UV lo = (m > D) ? m - D : 0;
+
+    if (hi > B2) hi = B2;
+    if (hi > B1) {
+      if (lo <= B1) lo = B1 + 1;
+      if (lo < 2) lo = 2;
+      if (lo <= hi) {
+        START_DO_FOR_EACH_PRIME(lo,hi) {
+          UV idx;
+          if (p < m) {
+            idx = m - p;
+          } else if (p > m) {
+            if (m <= UV_MAX/2) {
+              UV mm = 2*m;
+              if (p <= mm) {
+                UV mirror = mm - p;
+                if (mirror > B1 && mirror >= lo && is_prime(mirror))
+                  continue;
+              }
+            }
+            idx = p - m;
+          } else {
+            continue;
+          }
+          if (idx <= D) {
+            uint64_t diff = tecm64_submod(Sx[w], nqx[idx], n);
+            gprod = tecm64_mont_mulmod(gprod, diff, ctx);
+          }
+        } END_DO_FOR_EACH_PRIME
+        f = tecm64_gcd(tecm64_mont_exit(gprod, ctx), n);
+        if (f > 1) {
+          Safefree(Sx);
+          Safefree(S);
+          Safefree(nqx);
+          Safefree(nq);
+          return (f < n) ? f : 0;
+        }
+      }
+    }
+    if (m > UV_MAX-twoD) break;
+    m += twoD;
+  }
+
+  f = tecm64_gcd(tecm64_mont_exit(gprod, ctx), n);
+  Safefree(Sx);
+  Safefree(S);
+  Safefree(nqx);
+  Safefree(nq);
+  return (f > 1 && f < n) ? f : 0;
+}
+
+static uint64_t tinyecm64(uint64_t n, UV B1, UV B2,
+                          uint32_t ncurves, uint32_t sigma_offset)
+{
+  mont64_t ctx;
+  UV sqrtB1, j;
+  uint32_t ci;
+
+  if (n < 3 || (n & 1) == 0) return 0;
+  tecm64_mont_setup(&ctx, n);
+  sqrtB1 = (UV)sqrt((double)B1);
+
+  for (ci = 0; ci < ncurves && sigma_offset+ci < NECM64_SIGMAS; ci++) {
+    uint64_t sigma, ui, vi, umv, t3uv;
+    uint64_t u2, u3, v2, v3, umv2, umv3;
+    uint64_t abs_num_r, num, den_r, den_inv, A24;
+    ecpt64_t P;
+
+    sigma = ecm64_sigmas[sigma_offset+ci];
+    ui = sigma * sigma - 5;
+    vi = 4 * sigma;
+    umv = ui - vi;
+    t3uv = 3 * ui + vi;
+
+    u2 = tecm64_mulmod(ui % n, ui % n, n);
+    u3 = tecm64_mulmod(u2, ui % n, n);
+    v2 = tecm64_mulmod(vi % n, vi % n, n);
+    v3 = tecm64_mulmod(v2, vi % n, n);
+    umv2 = tecm64_mulmod(umv % n, umv % n, n);
+    umv3 = tecm64_mulmod(umv2, umv % n, n);
+
+    abs_num_r = tecm64_mulmod(umv3, t3uv % n, n);
+    num = abs_num_r ? n - abs_num_r : 0;
+    den_r = tecm64_mulmod(tecm64_mulmod(u3, vi % n, n), 16 % n, n);
+    den_inv = tecm64_modinv(den_r, n);
+    if (den_inv == 0) {
+      uint64_t g = tecm64_gcd(den_r, n);
+      if (g > 1 && g < n) return g;
+      continue;
+    }
+    A24 = tecm64_mont_mulmod(tecm64_mont_enter(num, &ctx),
+                             tecm64_mont_enter(den_inv, &ctx), &ctx);
+
+    P.X = tecm64_mont_enter(u3, &ctx);
+    P.Z = tecm64_mont_enter(v3, &ctx);
+
+    j = 0;
+    START_DO_FOR_EACH_PRIME(2,B1) {
+      UV k = p;
+      if (p <= sqrtB1) { UV pm = B1 / p; while (k <= pm) k *= p; }
+      ecm_mul64(&P, &P, k, A24, &ctx);
+      if ((j++ % 64) == 0) {
+        uint64_t g = tecm64_gcd(tecm64_mont_exit(P.Z, &ctx), n);
+        if (g > 1 && g < n) RETURN_FROM_EACH_PRIME(return g);
+        if (g == n)         RETURN_FROM_EACH_PRIME(goto next_curve);
+      }
+    } END_DO_FOR_EACH_PRIME
+    {
+      uint64_t g = tecm64_gcd(tecm64_mont_exit(P.Z, &ctx), n);
+      if (g > 1 && g < n) return g;
+    }
+
+    if (B2 > B1) {
+      uint64_t g = tinyecm64_stage2(&P, A24, &ctx, B1, B2);
+      if (g > 1 && g < n) return g;
+    }
+
+next_curve:;
+  }
+  return 0;
+}
+
+int tinyecm64_factor(UV n, UV *factors, UV B1, UV B2, UV ncurves, UV sigma_offset)
+{
+  uint64_t f;
+  if (B2 == 0) B2 = (B1 > UV_MAX/20) ? UV_MAX : 20*B1;
+  if (ncurves      > NECM64_SIGMAS) ncurves      = NECM64_SIGMAS;
+  if (sigma_offset > NECM64_SIGMAS) sigma_offset = NECM64_SIGMAS;
+  f = tinyecm64((uint64_t)n, B1, B2, ncurves, sigma_offset);
+  return (f > 1 && f < n) ? found_factor(n, (UV)f, factors)
+                          : no_factor(n, factors);
+}
+
+#endif  /* HAS_ECM64 */
+
+
 /* Pollard's P-1 */
 int pminus1_factor(UV n, UV *factors, UV B1, UV B2)
 {
   UV f, k, kmin;
   UV a     = 2, q     = 2;
-  UV savea = 2, saveq = 2;
+  UV savea = 2, saveq = 1;
   UV j = 1;
   UV sqrtB1 = isqrt(B1);
 #if USE_MONTMATH
@@ -924,16 +1469,16 @@ int pminus1_factor(UV n, UV *factors, UV B1, UV B2)
 
   /* If we found more than one factor in stage 1, backup and single step */
   if (f == n) {
+    /* savea is the state after saveq; resume at the following prime. */
     a = savea;
-    START_DO_FOR_EACH_PRIME(saveq, B1) {
-      k = p;  kmin = B1/p;
-      while (k <= kmin)  k *= p;
+    for (q = next_prime(saveq); q <= B1; q = next_prime(q)) {
+      k = q;  kmin = B1/q;
+      while (k <= kmin)  k *= q;
       a = powmod(a, k, n);
       f = gcd_ui(a-1, n);
-      q = p;
       if (f != 1)
         break;
-    } END_DO_FOR_EACH_PRIME
+    }
     /* If f == n again, we could do:
      * for (savea = 3; f == n && savea < 100; savea = next_prime(savea)) {
      *   a = savea;
@@ -1001,7 +1546,7 @@ static void pp1_pow(UV *cX, UV exp, UV n)
   UV X0 = *cX;
   UV X  = *cX;
   UV Y = mulsubmod(X, X, 2, n);
-  UV bit = UVCONST(1) << (clz(exp)-1);
+  UV bit = UVCONST(1) << (log2floor(exp)-1);
   while (bit) {
     UV T = mulsubmod(X, Y, X0, n);
     if ( exp & bit ) {
@@ -1238,21 +1783,12 @@ int squfof_factor(UV n, UV *factors, UV rounds)
   return no_factor(n,factors);
 }
 
-#define SQR_TAB_SIZE 512
-static int sqr_tab_init = 0;
-static double sqr_tab[SQR_TAB_SIZE];
-static void make_sqr_tab(void) {
-  int i;
-  for (i = 0; i < SQR_TAB_SIZE; i++)
-    sqr_tab[i] = sqrt((double)i);
-  sqr_tab_init = 1;
-}
-
 /* Lehman written and tuned by Warren D. Smith.
- * Revised by Ben Buhrow and Dana Jacobsen. */
+ * Revised by Ben Buhrow and Dana Jacobsen.
+ * Needs retuning against HOLF and with the newer isqrt/is_perfect_square. */
 int lehman_factor(UV n, UV *factors, bool do_trial) {
   const double Tune = ((n >> 31) >> 5) ? 3.5 : 5.0;
-  double x, sqrtn;
+  double x;
   UV a,c,kN,kN4,B2;
   uint32_t b,p,k,r,B,U,Bred,inc,ip=2;
 
@@ -1280,9 +1816,6 @@ int lehman_factor(UV n, UV *factors, bool do_trial) {
   B2 = B*B;
   kN = 0;
 
-  if (!sqr_tab_init) make_sqr_tab();
-  sqrtn = sqrt(n);
-
   for (k = 1; k <= Bred; k++) {
     if (k&1) { inc = 4; r = (k+n) % 4; }
     else     { inc = 2; r = 1; }
@@ -1292,7 +1825,7 @@ int lehman_factor(UV n, UV *factors, bool do_trial) {
 #endif
     kN4 = kN*4;
 
-    x = (k < SQR_TAB_SIZE) ? sqrtn * sqr_tab[k] : sqrt((double)kN);
+    x = sqrt((double)kN);
     a = x;
     if ((UV)a * (UV)a == kN)
       return found_factor(n, gcd_ui(a,n), factors);
@@ -1333,7 +1866,7 @@ int cheb_factor(UV n, UV *factors, UV B, UV initx)
   if (B > isqrt(n)) B = isqrt(n);
   sqrtB = isqrt(B);
   inv = modinverse(2,n);   /* multiplying by this will divide by two */
-  x = (initx == 0) ? 72 : initx;
+  x = (initx == 0) ? 72 : initx % n;
   f = 1;
 
   START_DO_FOR_EACH_PRIME(2, B) {
@@ -1349,7 +1882,7 @@ int cheb_factor(UV n, UV *factors, UV B, UV initx)
     } else {
       x = mulmod(lucasvmod(addmod(x,x,n), 1, p, n), inv, n);
     }
-    f = gcd_ui(x-1, n);  if (f > 1)  break;
+    f = gcd_ui(x > 0 ? x-1 : n-1, n);  if (f > 1)  break;
   } END_DO_FOR_EACH_PRIME
 
   if (f > 1 && f < n)
@@ -1357,6 +1890,9 @@ int cheb_factor(UV n, UV *factors, UV B, UV initx)
   return no_factor(n,factors);
 }
 
+
+/******************************************************************************/
+/******************************************************************************/
 
 
 static const uint32_t _fr_chunk = 256*1024;
@@ -1443,19 +1979,30 @@ static void _vec_factor(UV lo, UV hi, UV *nfactors, UV *farray, UV noffset, bool
 
 factor_range_context_t factor_range_init(UV lo, UV hi, bool square_free) {
   factor_range_context_t ctx;
+  UV span = hi-lo;
+
+  MPUassert(hi >= lo, "factor_range_init: hi < lo");
+
   ctx.lo = lo;
   ctx.hi = hi;
   ctx.n = lo-1;
   ctx.is_square_free = square_free;
-  if (hi-lo+1 > 100) {        /* Sieve in chunks */
-    if (square_free) ctx._noffset = (hi <= 42949672965UL) ? 10 : 15;
+
+  if (span >= 100) {          /* Sieve in chunks */
+    if (square_free) {
+#if BITS_PER_WORD == 64
+      ctx._noffset = (hi <= UVCONST(42949672965)) ? 10 : 15;
+#else
+      ctx._noffset = 10;
+#endif
+    }
     else             ctx._noffset = BITS_PER_WORD - clz(hi);
     ctx._coffset = _fr_chunk;
     New(0, ctx._nfactors, _fr_chunk, UV);
     New(0, ctx._farray, _fr_chunk * ctx._noffset, UV);
     { /* Prealloc all the sieving primes now. */
       UV t = isqrt(hi);
-      if (!_fr_full_sieve(t, hi-lo))  t = icbrt(hi);
+      if (!_fr_full_sieve(t, span))  t = icbrt(hi);
       get_prime_cache(t, 0);
     }
   } else {                    /* factor each number */
@@ -1504,26 +2051,30 @@ void factor_range_destroy(factor_range_context_t *ctx) {
   ctx->_farray = ctx->_nfactors = ctx->factors = 0;
 }
 
+
 /******************************************************************************/
 /* Find number of factors for all values in a range */
 /******************************************************************************/
 
 unsigned char* range_nfactor_sieve(UV lo, UV hi, bool with_multiplicity) {
   unsigned char* nf;
-  UV *N, i, range = hi-lo+1, sqrtn = isqrt(hi);
+  UV *N, i, range, sqrtn = isqrt(hi);
 
+  if (hi < lo || hi-lo == UV_MAX) croak("Invalid range in range_nfactor_sieve");
+  range = hi - lo + 1;
   Newz(0, nf, range, unsigned char);
   New(0, N, range, UV);
 
   /* We could set to 1 and sieve from 2, or do this initialization */
-  for (i = lo; i <= hi && i >= lo; i++) {
-    N[i-lo] = 1;
-    if (!(i&1) && i >= 2) {
-      UV k = i >> 1;
+  for (i = 0; i < range; i++) {
+    UV v = lo+i;
+    N[i] = 1;
+    if (!(v&1) && v >= 2) {
+      UV k = v >> 1;
       unsigned char nz = 1;
       while (!(k&1)) { nz++; k >>= 1; }
-      nf[i-lo] = (with_multiplicity) ? nz : 1;
-      N[i-lo] = UVCONST(1) << nz;
+      nf[i] = (with_multiplicity) ? nz : 1;
+      N[i] = UVCONST(1) << nz;
     }
   }
 
@@ -1547,442 +2098,37 @@ unsigned char* range_nfactor_sieve(UV lo, UV hi, bool with_multiplicity) {
 }
 
 
-/******************************************************************************/
-/* DLP */
-/******************************************************************************/
-
-static UV dlp_trial(UV a, UV g, UV p, UV maxrounds) {
-  UV k, t;
-  if (maxrounds > p) maxrounds = p;
-
-#if USE_MONTMATH
-  if (p&1) {
-    const uint64_t npi = mont_inverse(p),  mont1 = mont_get1(p);
-    g = mont_geta(g, p);
-    a = mont_geta(a, p);
-    for (t = g, k = 1; k < maxrounds; k++) {
-      if (t == a)
-        return k;
-      t = mont_mulmod(t, g, p);
-      if (t == g) break;   /* Stop at cycle */
-    }
-  } else
-#endif
-  {
-    for (t = g, k = 1; k < maxrounds; k++) {
-      if (t == a)
-        return k;
-      t = mulmod(t, g, p);
-      if (t == g) break;   /* Stop at cycle */
-    }
-  }
-  return 0;
-}
-
-/******************************************************************************/
-/* DLP - Pollard Rho */
-/******************************************************************************/
-
-/* Compare with Pomerance paper (dartmouth dtalk4):
- * Type I/II/III = our case 1, 0, 2.
- * x_i = u, a_i = v, b_i = w
- *
- * Also see Bai/Brent 2008 for many ideas to speed this up.
- * https://maths-people.anu.edu.au/~brent/pd/rpb231.pdf
- * E.g. Teske adding-walk, Brent's cycle algo, Teske modified cycle
- */
-#define pollard_rho_cycle(u,v,w,p,n,a,g) \
-    switch (u % 3) { \
-      case 0: u = mulmod(u,u,p);  v = mulmod(v,2,n);  w = mulmod(w,2,n); break;\
-      case 1: u = mulmod(u,a,p);  v = addmod(v,1,n);                     break;\
-      case 2: u = mulmod(u,g,p);                      w = addmod(w,1,n); break;\
-    }
-
-typedef struct prho_state_t {
-  UV u;
-  UV v;
-  UV w;
-  UV U;
-  UV V;
-  UV W;
-  UV round;
-  int failed;
-  int verbose;
-} prho_state_t;
-
-static UV dlp_prho_uvw(UV a, UV g, UV p, UV n, UV rounds, prho_state_t *s) {
-  UV i, k = 0;
-  UV u=s->u, v=s->v, w=s->w;
-  UV U=s->U, V=s->V, W=s->W;
-  int const verbose = s->verbose;
-
-  if (s->failed)  return 0;
-  if (s->round + rounds > n)  rounds = n - s->round;
-
-  for (i = 1; i <= rounds; i++) {
-    pollard_rho_cycle(u,v,w,p,n,a,g);   /* xi, ai, bi */
-    pollard_rho_cycle(U,V,W,p,n,a,g);
-    pollard_rho_cycle(U,V,W,p,n,a,g);   /* x2i, a2i, b2i */
-    if (verbose > 3) printf( "%3"UVuf"  %4"UVuf" %3"UVuf" %3"UVuf"  %4"UVuf" %3"UVuf" %3"UVuf"\n", i, u, v, w, U, V, W );
-    if (u == U) {
-      UV r1, r2, G, G2;
-      r1 = submod(v, V, n);
-      if (r1 == 0) {
-        if (verbose) printf("DLP Rho failure, r=0\n");
-        s->failed = 1;
-        k = 0;
-        break;
-      }
-      r2 = submod(W, w, n);
-
-      G = gcd_ui(r1,n);
-      G2 = gcd_ui(G,r2);
-      k = divmod(r2/G2, r1/G2, n/G2);
-      if (G > 1) {
-        if (powmod(g,k,p) == a) {
-          if (verbose > 2) printf("  common GCD %"UVuf"\n", G2);
-        } else {
-          UV m, l = divmod(r2, r1, n/G);
-          for (m = 0; m < G; m++) {
-            k = addmod(l, mulmod(m,(n/G),n), n);
-            if (powmod(g,k,p) == a) break;
-          }
-          if (m<G && verbose > 2) printf("  GCD %"UVuf", found with m=%"UVuf"\n", G, m);
-        }
-      }
-
-      if (powmod(g,k,p) != a) {
-        if (verbose > 2) printf("r1 = %"UVuf"  r2 = %"UVuf" k = %"UVuf"\n", r1, r2, k);
-        if (verbose) printf("Incorrect DLP Rho solution: %"UVuf"\n", k);
-        s->failed = 1;
-        k = 0;
-      }
-      break;
-    }
-  }
-  s->round += i-1;
-  if (verbose && k) printf("DLP Rho solution found after %"UVuf" steps\n", s->round + 1);
-  s->u = u; s->v = v; s->w = w; s->U = U; s->V = V; s->W = W;
-  return k;
-}
-
-#if 0
-static UV dlp_prho(UV a, UV g, UV p, UV n, UV maxrounds) {
-#ifdef DEBUG
-  int const verbose = _XS_get_verbose()
-#else
-  int const verbose = 0;
-#endif
-  prho_state_t s = {1, 0, 0, 1, 0, 0,   0, 0, verbose};
-  return dlp_prho_uvw(a, g, p, n, maxrounds, &s);
-}
-#endif
-
-
-/******************************************************************************/
-/* DLP - BSGS */
-/******************************************************************************/
-
-typedef struct bsgs_hash_t {
-  UV M;    /* The baby step index */
-  UV V;    /* The powmod value */
-  struct bsgs_hash_t* next;
-} bsgs_hash_t;
-
-/****************************************/
-/*  Simple and limited pool allocation  */
-#define BSGS_ENTRIES_PER_PAGE 8000
-typedef struct bsgs_page_top_t {
-  struct bsgs_page_t* first;
-  bsgs_hash_t** table;
-  UV  size;
-  int nused;
-  int npages;
-} bsgs_page_top_t;
-
-typedef struct bsgs_page_t {
-  bsgs_hash_t entries[BSGS_ENTRIES_PER_PAGE];
-  struct bsgs_page_t* next;
-} bsgs_page_t;
-
-static bsgs_hash_t* get_entry(bsgs_page_top_t* top) {
-  if (top->nused == 0 || top->nused >= BSGS_ENTRIES_PER_PAGE) {
-    bsgs_page_t* newpage;
-    Newz(0, newpage, 1, bsgs_page_t);
-    newpage->next = top->first;
-    top->first = newpage;
-    top->nused = 0;
-    top->npages++;
-  }
-  return top->first->entries + top->nused++;
-}
-static void destroy_pages(bsgs_page_top_t* top) {
-  bsgs_page_t* head = top->first;
-  while (head != 0) {
-    bsgs_page_t* next = head->next;
-    Safefree(head);
-    head = next;
-  }
-  top->first = 0;
-}
-/****************************************/
-
-static void bsgs_hash_put(bsgs_page_top_t* pagetop, UV v, UV i) {
-  UV idx = v % pagetop->size;
-  bsgs_hash_t** table = pagetop->table;
-  bsgs_hash_t* entry = table[idx];
-
-  while (entry && entry->V != v)
-    entry = entry->next;
-
-  if (!entry) {
-    entry = get_entry(pagetop);
-    entry->M = i;
-    entry->V = v;
-    entry->next = table[idx];
-    table[idx] = entry;
-  }
-}
-
-static UV bsgs_hash_get(bsgs_page_top_t* pagetop, UV v) {
-  bsgs_hash_t* entry = pagetop->table[v % pagetop->size];
-  while (entry && entry->V != v)
-    entry = entry->next;
-  return (entry) ? entry->M : 0;
-}
-
-static UV bsgs_hash_put_get(bsgs_page_top_t* pagetop, UV v, UV i) {
-  UV idx = v % pagetop->size;
-  bsgs_hash_t** table = pagetop->table;
-  bsgs_hash_t* entry = table[idx];
-
-  while (entry && entry->V != v)
-    entry = entry->next;
-
-  if (entry)
-    return entry->M;
-
-  entry = get_entry(pagetop);
-  entry->M = i;
-  entry->V = v;
-  entry->next = table[idx];
-  table[idx] = entry;
-  return 0;
-}
-
-static UV dlp_bsgs(UV a, UV g, UV p, UV n, UV maxent, bool race_rho) {
-  bsgs_page_top_t PAGES;
-  UV i, m, maxm, hashmap_count;
-  UV aa, S, gm, T, gs_i, bs_i;
-  UV result = 0;
-#ifdef DEBUG
-  int const verbose = _XS_get_verbose();
-#else
-  int const verbose = 0;
-#endif
-  prho_state_t rho_state = {1, 0, 0, 1, 0, 0,   0, 0, verbose};
-
-  if (n <= 2) return 0;   /* Shouldn't be here with gorder this low */
-
-  if (race_rho) {
-    result = dlp_prho_uvw(a, g, p, n, 10000, &rho_state);
-    if (result) {
-      if (verbose) printf("rho found solution in BSGS step 0\n");
-      return result;
-    }
-  }
-
-  if (a == 0) return 0;  /* We don't handle this case */
-
-  maxm = isqrt(n);
-  m = (maxent > maxm) ? maxm : maxent;
-
-  hashmap_count = (m < 65537) ? 65537 :
-                  (m > 40000000) ? 40000003 :
-                  next_prime(m);               /* Ave depth around 2 */
-
-  /* Create table.  Size: 8*hashmap_count bytes. */
-  PAGES.size = hashmap_count;
-  PAGES.first = 0;
-  PAGES.nused = 0;
-  PAGES.npages = 0;
-  Newz(0, PAGES.table, hashmap_count, bsgs_hash_t*);
-
-  aa = mulmod(a,a,p);
-  S = a;
-  gm = powmod(g, m, p);
-  T = gm;
-  gs_i = 0;
-  bs_i = 0;
-
-  bsgs_hash_put(&PAGES, S, 0);   /* First baby step */
-  S = mulmod(S, g, p);
-  /* Interleaved Baby Step Giant Step */
-  for (i = 1; i <= m; i++) {
-    gs_i = bsgs_hash_put_get(&PAGES, S, i);
-    if (gs_i) { bs_i = i; break; }
-    S = mulmod(S, g, p);
-    if (S == aa) {  /* We discovered the solution! */
-      if (verbose) printf("  dlp bsgs: solution at BS step %"UVuf"\n", i+1);
-      result = i+1;
-      break;
-    }
-    bs_i = bsgs_hash_put_get(&PAGES, T, i);
-    if (bs_i) { gs_i = i; break; }
-    T = mulmod(T, gm, p);
-    if (race_rho && (i % 2048) == 0) {
-      result = dlp_prho_uvw(a, g, p, n, 100000, &rho_state);
-      if (result) {
-        if (verbose) printf("rho found solution in BSGS step %"UVuf"\n", i);
-        break;
-      }
-    }
-  }
-
-  if (!result) {
-    /* Extend Giant Step search */
-    if (!(gs_i || bs_i)) {
-      UV b = (p+m-1)/m;
-      if (m < maxm && b > 8*m) b = 8*m;
-      for (i = m+1; i < b; i++) {
-        bs_i = bsgs_hash_get(&PAGES, T);
-        if (bs_i) { gs_i = i; break; }
-        T = mulmod(T, gm, p);
-        if (race_rho && (i % 2048) == 0) {
-          result = dlp_prho_uvw(a, g, p, n, 100000, &rho_state);
-          if (result) {
-            if (verbose) printf("rho found solution in BSGS step %"UVuf"\n", i);
-            break;
-          }
-        }
-      }
-    }
-
-    if (gs_i || bs_i) {
-      result = submod(mulmod(gs_i, m, p), bs_i, p);
-    }
-  }
-  if (verbose) printf("  dlp bsgs using %d pages (%.1fMB+%.1fMB) for hash\n", PAGES.npages, ((double)PAGES.npages * sizeof(bsgs_page_t)) / (1024*1024), ((double)hashmap_count * sizeof(bsgs_hash_t*)) / (1024*1024));
-
-  destroy_pages(&PAGES);
-  Safefree(PAGES.table);
-  if (result != 0 && powmod(g,result,p) != a) {
-    if (verbose) printf("Incorrect DLP BSGS solution: %"UVuf"\n", result);
-    result = 0;
-  }
-  if (race_rho && result == 0) {
-    result = dlp_prho_uvw(a, g, p, n, 2000000000U, &rho_state);
-  }
-  return result;
-}
-
-/* Find smallest k where a = g^k mod p */
-#define DLP_TRIAL_NUM  10000
-UV znlog_solve(UV a, UV g, UV p, UV n) {
-  UV k, sqrtn;
-  const int verbose = _XS_get_verbose();
-
-  if (a >= p) a %= p;
-  if (g >= p) g %= p;
-
-  if (a == 1 || g == 0 || p <= 2)
-    return 0;
-
-  if (verbose > 1 && n != p-1) printf("  g=%"UVuf" p=%"UVuf", order %"UVuf"\n", g, p, n);
-
-  /* printf(" solving znlog(%"UVuf",%"UVuf",%"UVuf") n=%"UVuf"\n", a, g, p, n); */
-
-  if (n == 0 || n <= DLP_TRIAL_NUM) {
-    k = dlp_trial(a, g, p, DLP_TRIAL_NUM);
-    if (verbose) printf("  dlp trial 10k %s\n", (k!=0 || p <= DLP_TRIAL_NUM) ? "success" : "failure");
-    if (k != 0 || (n > 0 && n <= DLP_TRIAL_NUM)) return k;
-  }
-
-  { /* Existence checks */
-    UV aorder, gorder = n;
-    if (gorder != 0 && powmod(a, gorder, p) != 1) return 0;
-    aorder = znorder(a,p);
-    if (aorder == 0 && gorder != 0) return 0;
-    if (aorder != 0 && gorder % aorder != 0) return 0;
-  }
-
-  /* This is confusing */
-  sqrtn = (n == 0) ? 0 : isqrt(n);
-  if (n == 0) n = p-1;
-
-  {
-    UV maxent = (sqrtn > 0) ? sqrtn+1 : 100000;
-    k = dlp_bsgs(a, g, p, n, maxent/2, /* race rho */ 1);
-    if (verbose) printf("  dlp bsgs %"UVuf"k %s\n", maxent/1000, k!=0 ? "success" : "failure");
-    if (k != 0) return k;
-    if (sqrtn > 0 && sqrtn < maxent) return 0;
-  }
-
-  if (verbose) printf("  dlp doing exhaustive trial\n");
-  k = dlp_trial(a, g, p, p);
-  return k;
-}
-
-/* Silver-Pohlig-Hellman */
-static UV znlog_ph(UV a, UV g, UV p, UV p1) {
-  factored_t pf;
-  UV x, sol[MPU_MAX_DFACTORS], mod[MPU_MAX_DFACTORS];
+UV sopfr(UV n)
+{
+  factored_t nf;
+  UV sum;
   uint32_t i;
 
-  if (p1 == 0) return 0;   /* TODO: Should we plow on with p1=p-1? */
-  pf = factorint(p1);
-  if (pf.nfactors == 1)
-    return znlog_solve(a, g, p, p1);
-  for (i = 0; i < pf.nfactors; i++) {
-    UV pi = ipow(pf.f[i],pf.e[i]);
-    UV delta = powmod(a,p1/pi,p);
-    UV gamma = powmod(g,p1/pi,p);
-    /* printf(" solving znlog(%"UVuf",%"UVuf",%"UVuf")\n", delta, gamma, p); */
-    sol[i] = znlog_solve( delta, gamma, p, znorder(gamma,p) );
-    mod[i] = pi;
-  }
-  if (chinese(&x, 0, sol, mod, pf.nfactors) == 1 && powmod(g, x, p) == a)
-    return x;
-  return 0;
+  if (n <= 5) return n - (n==1);
+
+  nf = factorint(n);
+  sum = 0;
+  for (i = 0; i < nf.nfactors; i++)
+    sum += (nf.f[i] * (UV)nf.e[i]);
+  return sum;
 }
 
-/* Find smallest k where a = g^k mod p */
-UV znlog(UV a, UV g, UV p) {
-  UV k, gorder, aorder;
-  const int verbose = _XS_get_verbose();
+UV sopf(UV n)
+{
+  factored_t nf;
+  UV sum;
+  uint32_t i;
 
-  if (a >= p) a %= p;
-  if (g >= p) g %= p;
+  if (n <= 3) return n - (n==1);
 
-  if (a == 1 || g == 0 || p <= 2)
-    return 0;
-
-  /* TODO: We call znorder with the same p many times.  We should have a
-   * method for znorder given {phi,nfactors,fac,exp} */
-
-  gorder = znorder(g,p);
-  if (gorder != 0 && powmod(a, gorder, p) != 1) return 0;
-  /* TODO: Can these tests every fail?  Do we need aorder? */
-  aorder = znorder(a,p);
-  if (aorder == 0 && gorder != 0) return 0;
-  if (aorder != 0 && gorder % aorder != 0) return 0;
-
-  /* TODO: Come up with a better solution for a=0 */
-  if (a == 0 || p < DLP_TRIAL_NUM || (gorder > 0 && gorder < DLP_TRIAL_NUM)) {
-    if (verbose > 1) printf("  dlp trial znlog(%"UVuf",%"UVuf",%"UVuf")\n",a,g,p);
-    k = dlp_trial(a, g, p, p);
-    return k;
-  }
-
-  if (!is_prob_prime(gorder)) {
-    k = znlog_ph(a, g, p, gorder);
-    if (verbose) printf("  dlp PH %s\n", k!=0 ? "success" : "failure");
-    if (k != 0) return k;
-  }
-
-  return znlog_solve(a, g, p, gorder);
+  nf = factorint(n);
+  sum = 0;
+  for (i = 0; i < nf.nfactors; i++)
+    sum += nf.f[i];
+  return sum;
 }
 
+/******************************************************************************/
 
 /* Compile with:
  *  gcc -O3 -fomit-frame-pointer -march=native -Wall -DSTANDALONE -DFACTOR_STANDALONE factor.c util.c primality.c cache.c sieve.c chacha.c csprng.c prime_counts.c prime_count_cache.c lmo.c legendre_phi.c real.c inverse_interpolate.c rootmod.c lucas_seq.c prime_powers.c sort.c -lm

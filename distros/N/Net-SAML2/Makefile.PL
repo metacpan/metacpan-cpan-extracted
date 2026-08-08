@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Crypt::OpenSSL::X509" => 0,
     "Crypt::PK::RSA" => 0,
     "DateTime" => 0,
-    "DateTime::Format::XSD" => 0,
+    "DateTime::Format::XSD" => "0.5",
     "DateTime::HiRes" => 0,
     "Digest::MD5" => 0,
     "Exporter" => 0,
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
     "XML::Generator" => "1.13",
     "XML::LibXML" => 0,
     "XML::LibXML::XPathContext" => 0,
-    "XML::Sig" => "0.67",
+    "XML::Sig" => "0.72",
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Pod::Coverage" => "1.04"
   },
-  "VERSION" => "0.88",
+  "VERSION" => "0.89",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t"
   }
@@ -87,7 +87,7 @@ my %FallbackPrereqs = (
   "Crypt::OpenSSL::X509" => 0,
   "Crypt::PK::RSA" => 0,
   "DateTime" => 0,
-  "DateTime::Format::XSD" => 0,
+  "DateTime::Format::XSD" => "0.5",
   "DateTime::HiRes" => 0,
   "Digest::MD5" => 0,
   "Exporter" => 0,
@@ -132,7 +132,7 @@ my %FallbackPrereqs = (
   "XML::Generator" => "1.13",
   "XML::LibXML" => 0,
   "XML::LibXML::XPathContext" => 0,
-  "XML::Sig" => "0.67",
+  "XML::Sig" => "0.72",
   "namespace::autoclean" => 0
 );
 

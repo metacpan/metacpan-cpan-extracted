@@ -14,6 +14,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "dbil_compat.h"   /* perl-version shims: must come first */
+
 #include "dbil_future.h"   /* DBIx::Loop::Future (C)             */
 #include "dbil_run.h"      /* run one DBI statement from C       */
 #include "dbil_vt.h"       /* pure-C loop seam (adapter vtable)  */
@@ -22,6 +24,8 @@
 #include "dbil_native.h"   /* Backend A: native fd async (Pg)    */
 #include "dbil_hm.h"       /* Hyperman adapter over its C ABI    */
 #include "dbil_loop.h"     /* driver-name, capability, dispatch  */
+#include "dbil_abi.h"      /* the public C ABI (installed header) */
+#include "dbil_abi_impl.h" /* ... and the provider side of it     */
 
 MODULE = DBIx::Loop        PACKAGE = DBIx::Loop
 
@@ -29,3 +33,4 @@ INCLUDE: xs/loop.xs
 INCLUDE: xs/future.xs
 INCLUDE: xs/txn.xs
 INCLUDE: xs/loop_hyperman.xs
+INCLUDE: xs/abi.xs

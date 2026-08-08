@@ -7,7 +7,7 @@ requires "Crypt::OpenSSL::Verify" => "0";
 requires "Crypt::OpenSSL::X509" => "0";
 requires "Crypt::PK::RSA" => "0";
 requires "DateTime" => "0";
-requires "DateTime::Format::XSD" => "0";
+requires "DateTime::Format::XSD" => "0.5";
 requires "DateTime::HiRes" => "0";
 requires "Digest::MD5" => "0";
 requires "Exporter" => "0";
@@ -37,7 +37,7 @@ requires "XML::Enc" => "0.13";
 requires "XML::Generator" => "1.13";
 requires "XML::LibXML" => "0";
 requires "XML::LibXML::XPathContext" => "0";
-requires "XML::Sig" => "0.67";
+requires "XML::Sig" => "0.72";
 requires "namespace::autoclean" => "0";
 requires "perl" => "5.014";
 

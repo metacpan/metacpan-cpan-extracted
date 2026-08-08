@@ -1,4 +1,27 @@
 Revision history for RT-Extension-AwayMode
 
+0.03  2026-08-07
+      - Hand tickets off on comments as well as replies. An rt-mailgate run
+        with --action comment records incoming mail as a Comment rather than
+        a Correspond transaction, so a Correspond-only condition never saw
+        those replies. See UPGRADING in the docs: existing installs need a
+        one-time database tweak to widen the installed scrip condition.
+      - New $AwayModeTransactionTypes option to narrow which transaction
+        types trigger the handoff (default: Correspond and Comment).
+      - New $AwayModeIgnorePrivilegedComments option (off by default) to
+        exempt comments written by privileged users, so a colleague's
+        internal note doesn't unassign the ticket.
+
+0.02  2026-08-07
+      - Let administrators set or clear away mode for other users, from
+        Admin -> Users -> (select a user) -> Settings -> Away Mode. Requires
+        the AdminUsers right and writes the same preference the self-service
+        page does.
+      - Don't hand off a ticket when the away owner is the one replying: if
+        they answer a ticket they own, they're evidently still working on it.
+      - Fix away dates being stored one day early for users in timezones east
+        of UTC. Dates were parsed in the user's timezone but rendered back to
+        ISO in UTC.
+
 0.01  2026-08-06
       - Initial release

@@ -13,7 +13,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.22;
+our $VERSION = v0.23;
 
 use parent 'Data::URIID::Base';
 
@@ -401,7 +401,7 @@ Data::URIID::Barcode - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.22
+version v0.23
 
 =head1 SYNOPSIS
 

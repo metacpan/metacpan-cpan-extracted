@@ -34,7 +34,7 @@ use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20260705';
+our $VERSION = '20260808';
 
 use Carp;
 
@@ -154,6 +154,7 @@ my (
     %is_zero_continuation_block_type,
     %is_keyword,
     %is_TERM_keyword,
+    %is_OPERATOR_keyword,
     %is_my_our_state,
     %is_package,
     %matching_end_token,
@@ -745,7 +746,7 @@ EOM
         # This will die if user's object does have a 'get_line' method
         my $line;
         while ( defined( $line = $line_source_object->get_line() ) ) {
-            push( @{$rinput_lines}, $line );
+            push @{$rinput_lines}, $line;
         }
         $source_string = join( EMPTY_STRING, @{$rinput_lines} );
     }
@@ -1252,7 +1253,7 @@ EOM
     }
 
     push @output_lines, "\n";
-    my $output_str = join EMPTY_STRING, @output_lines;
+    my $output_str = join( EMPTY_STRING, @output_lines );
 
     $self->interrupt_logfile();
     $self->warning($output_str);
@@ -2371,18 +2372,18 @@ sub prepare_for_a_new_file {
 
             # Splice in any digits
             if ($len_1) {
-                splice @{$rtoken_map},  $isplice, 0, $pos_1;
-                splice @{$rtokens},     $isplice, 0, $tok_1;
-                splice @{$rtoken_type}, $isplice, 0, $pre_type_1;
+                splice( @{$rtoken_map},  $isplice, 0, $pos_1 );
+                splice( @{$rtokens},     $isplice, 0, $tok_1 );
+                splice( @{$rtoken_type}, $isplice, 0, $pre_type_1 );
                 $max_token_index++;
                 $isplice++;
             }
 
             # Splice in any trailing word
             if ($len_2) {
-                splice @{$rtoken_map},  $isplice, 0, $pos_2;
-                splice @{$rtokens},     $isplice, 0, $tok_2;
-                splice @{$rtoken_type}, $isplice, 0, $pre_type_2;
+                splice( @{$rtoken_map},  $isplice, 0, $pos_2 );
+                splice( @{$rtokens},     $isplice, 0, $tok_2 );
+                splice( @{$rtoken_type}, $isplice, 0, $pre_type_2 );
                 $max_token_index++;
             }
 
@@ -4704,12 +4705,17 @@ EOM
             }
         }
 
-        # Catch some unexpected keyword errors; c517.
-        # Note that we only check keywords for OPERATOR expected, not TERM.
-        # This is because a large number of keywords which normally expect
-        # a TERM will also take an OPERATOR.
-        if ( $expecting == OPERATOR && $is_TERM_keyword{$tok} ) {
-            $self->error_if_expecting_OPERATOR();
+        # Catch unexpected keywords (c517, c613).
+        if ( $expecting == TERM ) {
+            $self->error_if_expecting_TERM()
+              if ( $is_OPERATOR_keyword{$tok} );
+        }
+        elsif ( $expecting == OPERATOR ) {
+            $self->error_if_expecting_OPERATOR()
+              if ( $is_TERM_keyword{$tok} );
+        }
+        else {
+            ## expecting == UNKNOWN
         }
 
         # recognize 'use' statements, which are special
@@ -5595,7 +5601,7 @@ EOM
 
         # initialize if continuation line
         if ( !@{$routput_token_list} ) {
-            push( @{$routput_token_list}, $i );
+            push @{$routput_token_list}, $i;
             $routput_token_type->[$i] = $type;
         }
 
@@ -6160,10 +6166,11 @@ EOM
         }
 
         $max_token_index = scalar( @{$rtokens} ) - 1;
-        push( @{$rtokens}, SPACE, SPACE, SPACE )
-          ;    # extra whitespace simplifies logic
-        push( @{$rtoken_map},  0,   0,   0 );     # shouldn't be referenced
-        push( @{$rtoken_type}, 'b', 'b', 'b' );
+
+        # add extra spaces to simplify logic - they shouldn't be referenced
+        push @{$rtokens}, ( SPACE, SPACE, SPACE );
+        push @{$rtoken_map},  qw( 0 0 0 );
+        push @{$rtoken_type}, qw( b b b );
 
         # initialize for main loop
         if (0) { #<<< this is not necessary
@@ -6288,7 +6295,7 @@ EOM
               );
 
             # this pre-token will start an output token
-            push( @{$routput_token_list}, $i_tok );
+            push @{$routput_token_list}, $i_tok;
 
             #---------------------------------------------------
             # The token search leads to one of 5 main END NODES:
@@ -6663,10 +6670,10 @@ EOM
                 #----------------------------------------------------
                 # Section 1.3. Store values for a non-sequenced token
                 #----------------------------------------------------
-                push( @output_levels,        $level_in_tokenizer );
-                push( @output_block_type,    EMPTY_STRING );
-                push( @output_type_sequence, EMPTY_STRING );
-                push( @output_token_type,    $type_i );
+                push @output_levels,        $level_in_tokenizer;
+                push @output_block_type,    EMPTY_STRING;
+                push @output_type_sequence, EMPTY_STRING;
+                push @output_token_type,    $type_i;
 
             }
 
@@ -6791,10 +6798,10 @@ EOM
                 }
 
                 # Store values for a sequenced token
-                push( @output_levels,        $level_i );
-                push( @output_block_type,    $routput_block_type->[$ii] );
-                push( @output_type_sequence, $routput_type_sequence->[$ii] );
-                push( @output_token_type,    $type_i );
+                push @output_levels,        $level_i;
+                push @output_block_type,    $routput_block_type->[$ii];
+                push @output_type_sequence, $routput_type_sequence->[$ii];
+                push @output_token_type,    $type_i;
 
             }
         }    ## End loop to over tokens
@@ -6812,7 +6819,7 @@ EOM
             my $offset = $rtoken_map->[$im];
             foreach my $ii ( @{$routput_token_list} ) {
                 my $numc = $rtoken_map->[$ii] - $offset;
-                push( @output_tokens, substr( $input_line, $offset, $numc ) );
+                push @output_tokens, substr( $input_line, $offset, $numc );
                 $offset += $numc;
 
                 # programming note: it seems most efficient to 'next' out of
@@ -6827,7 +6834,7 @@ EOM
 
             # Form and store the final token of this line
             my $numc = length($input_line) - $offset;
-            push( @output_tokens, substr( $input_line, $offset, $numc ) );
+            push @output_tokens, substr( $input_line, $offset, $numc );
 
             if (DEVEL_MODE) {
                 if ( $numc <= 0 ) {
@@ -6837,7 +6844,7 @@ EOM
                 }
 
                 # Make sure we didn't gain or lose any characters
-                my $test_line = join EMPTY_STRING, @output_tokens;
+                my $test_line = join( EMPTY_STRING, @output_tokens );
                 if ( $test_line ne $input_line ) {
                     my $len_input = length($input_line);
                     my $len_test  = length($test_line);
@@ -11928,10 +11935,10 @@ BEGIN {
       { } ( ) [ ] ; + - / * | % ! x ~ = ? : . < > ^ &
       #;
     push @valid_token_types, BACKSLASH;
-    push( @valid_token_types, @digraphs );
-    push( @valid_token_types, @trigraphs );
-    push( @valid_token_types, @tetragraphs );
-    push( @valid_token_types, ( '#', COMMA, 'CORE::' ) );
+    push @valid_token_types, @digraphs;
+    push @valid_token_types, @trigraphs;
+    push @valid_token_types, @tetragraphs;
+    push @valid_token_types, ( '#', COMMA, 'CORE::' );
     $is_valid_token_type{$_} = 1 for @valid_token_types;
 
     # a list of file test letters, as in -e (Table 3-4 of 'camel 3')
@@ -11945,13 +11952,84 @@ BEGIN {
     @q = qw( do eval );
     $is_block_operator{$_} = 1 for @q;
 
-    # these functions allow an identifier in the indirect object slot
+    # These functions allow an identifier in the indirect object slot:
     @q = qw( print printf sort exec system say );
     $is_indirect_object_taker{$_} = 1 for @q;
 
     # Keywords which definitely produce error if an OPERATOR is expected
-    @q = qw( my our state local use require );
+    # The following small list was used until version 20260705:
+    #    @q = qw( my our state local use require );
+    # This list was expanded to the list below to catch more errors (c613).
+    @q = qw(
+      AUTOLOAD       BEGIN            CHECK         DESTROY
+      END            INIT             UNITCHECK     abs
+      accept         alarm            atan2         bind
+      binmode        bless            break         caller
+      catch          chdir            chmod         chomp
+      chop           chown            chr           chroot
+      close          closedir         connect       continue
+      cos            crypt            dbmclose      dbmopen
+      default        defined          delete        die
+      do             dump             each          else
+      elsif          endgrent         endhostent    endnetent
+      endprotoent    endpwent         endservent    eof
+      eval           evalbytes        exec          exists
+      exit           exp              fc            fcntl
+      fileno         flock            fork          format
+      formline       getc             getgrent      getgrgid
+      getgrnam       gethostbyaddr    gethostbyname gethostent
+      getlogin       getnetbyaddr     getnetbyname  getnetent
+      getpeername    getpgrp          getppid       getpriority
+      getprotobyname getprotobynumber getprotoent   getpwent
+      getpwnam       getpwuid         getservbyname getservbyport
+      getservent     getsockname      getsockopt    given
+      glob           gmtime           goto          grep
+      hex            index            int           ioctl
+      join           keys             kill          last
+      lc             lcfirst          length        link
+      listen         local            localtime     lock
+      log            lstat            m             map
+      mkdir          msgctl           msgget        msgrcv
+      msgsnd         my               next          no
+      not            oct              open          opendir
+      ord            our              pack          package
+      pipe           pop              pos           print
+      printf         prototype        push          q
+      qq             qr               quotemeta     qw
+      qx             rand             read          readdir
+      readline       readlink         readpipe      recv
+      redo           ref              rename        require
+      reset          return           reverse       rewinddir
+      rindex         rmdir            s             say
+      scalar         seek             seekdir       select
+      semctl         semget           semop         send
+      setgrent       sethostent       setnetent     setpgrp
+      setpriority    setprotoent      setpwent      setservent
+      setsockopt     shift            shmctl        shmget
+      shmread        shmwrite         shutdown      sin
+      sleep          socket           socketpair    sort
+      splice         split            sprintf       sqrt
+      srand          stat             state         study
+      sub            substr           switch        symlink
+      syscall        sysopen          sysread       sysseek
+      system         syswrite         tell          telldir
+      tie            tied             time          times
+      tr             truncate         uc            ucfirst
+      umask          undef            unlink        unpack
+      unshift        untie            use           utime
+      values         vec              wait          waitpid
+      wantarray      warn             write         y
+    );
     $is_TERM_keyword{$_} = 1 for @q;
+
+    # Stable keyword infix operators which produce error if a TERM is expected
+    @q = qw( and or xor eq ne ge gt le lt );
+    $is_OPERATOR_keyword{$_} = 1 for @q;
+
+    # Keywords which are omitted from the above TERM or OPERATOR lists.
+    # Note that 'cmp' is here since it can be re-defined by File::Compare.
+    #   qw( isa err cmp if unless for foreach when while until case
+    #       EQ GE GT LE LT NE );
 
     # Note: 'field' will be added by sub check_options if --use-feature=class
     @q = qw( my our state );
@@ -12062,11 +12140,11 @@ BEGIN {
     # 'err' is a fairly safe addition.
     # Added 'default' for Switch::Plain. Note that we could also have
     # a separate set of keywords to include if we see 'use Switch::Plain'
-    push( @Keywords, @value_requestor );
+    push @Keywords, @value_requestor;
 
     # These are treated the same but are not keywords:
     my @extra_vr = qw( constant vars );
-    push( @value_requestor, @extra_vr );
+    push @value_requestor, @extra_vr;
 
     $expecting_term_token{$_} = 1 for @value_requestor;
 
@@ -12082,12 +12160,12 @@ BEGIN {
       wantarray
     );
 
-    push( @Keywords, @operator_requestor );
+    push @Keywords, @operator_requestor;
 
     # These are treated the same but are not considered keywords:
     my @extra_or = qw( STDERR STDIN STDOUT );
 
-    push( @operator_requestor, @extra_or );
+    push @operator_requestor, @extra_or;
 
     $expecting_operator_token{$_} = 1 for @operator_requestor;
 
@@ -12210,7 +12288,7 @@ BEGIN {
     # These keywords are handled specially in the tokenizer code:
     my @special_keywords =
       qw( do eval format m package q qq qr qw qx s sub tr y );
-    push( @Keywords, @special_keywords );
+    push @Keywords, @special_keywords;
 
     # Keywords after which list formatting may be used
     # WARNING: do not include |map|grep|eval or perl may die on

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000062';
+our $VERSION = '0.000063';
 
 use Errno qw/EEXIST/;
 use File::Path qw/remove_tree/;

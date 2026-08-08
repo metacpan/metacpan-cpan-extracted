@@ -26,7 +26,7 @@ my $probe = _rss();
 plan skip_all => 'cannot read RSS on this platform'
     unless defined $probe && $probe > 0;
 
-plan tests => 6;
+plan tests => 8;
 
 my %DOC = (
     'plain text'      => "Just a paragraph of text here.\n",
@@ -34,6 +34,20 @@ my %DOC = (
     'highlighted code'=> "```perl\nmy \$x = 1; # comment\n```\n\n",
     'footnotes'       => "Text with a ref[^a].\n\n[^a]: the note\n\n",
     'link references' => "See [the docs][d] here.\n\n[d]: http://example.com\n\n",
+);
+
+# The heading-id path grows two more buffers through the same stack blob: the
+# plain-text accumulator the slug is built from, and the document-scope table
+# that keeps slugs unique. Both hang off the same cleanup.
+my %HEADING_DOC = (
+    'heading ids' => sub {
+        my ($md, $doc) = @_;
+        $md->render($doc);
+    },
+    'render_with_toc' => sub {
+        my ($md, $doc) = @_;
+        my (undef, undef) = $md->render_with_toc($doc);
+    },
 );
 
 # 20000 renders of a 20-block document. Over this loop the fixed code holds
@@ -73,6 +87,21 @@ for my $name (sort keys %DOC) {
 
     cmp_ok $growth, '<', $ALLOWED_KB,
         "markdown_to_html: RSS grew ${growth}KB over $ITERATIONS renders";
+}
+
+for my $name (sort keys %HEADING_DOC) {
+    my $run = $HEADING_DOC{$name};
+    my $doc = join '', map { "## Heading Number $_\n\nSome text here.\n\n" } 1 .. 20;
+    my $md  = Markdown::Simple->new({ heading_ids => 1 });
+
+    $run->($md, $doc) for 1 .. 200;
+
+    my $before = _rss();
+    $run->($md, $doc) for 1 .. $ITERATIONS;
+    my $growth = _rss() - $before;
+
+    cmp_ok $growth, '<', $ALLOWED_KB,
+        "$name: RSS grew ${growth}KB over $ITERATIONS renders";
 }
 
 sub _rss {

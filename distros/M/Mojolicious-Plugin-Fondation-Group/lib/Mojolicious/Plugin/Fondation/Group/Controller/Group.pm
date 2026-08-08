@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Group::Controller::Group;
-$Mojolicious::Plugin::Fondation::Group::Controller::Group::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Group::Controller::Group::VERSION = '0.03';
 # ABSTRACT: REST controller for Group CRUD via DBIx::Class::Async
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -224,7 +224,7 @@ Mojolicious::Plugin::Fondation::Group::Controller::Group - REST controller for G
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

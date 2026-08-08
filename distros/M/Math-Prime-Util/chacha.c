@@ -30,9 +30,21 @@
 #include "ptypes.h"
 #include "chacha.h"
 
+#ifndef CHACHA_ROUNDS
 #define CHACHA_ROUNDS 20
+#endif
+#if CHACHA_ROUNDS != 8 && CHACHA_ROUNDS != 12 && CHACHA_ROUNDS != 20
+#error "CHACHA_ROUNDS must be 8, 12, or 20"
+#endif
 #define RUN_INTERNAL_TESTS 1
 #define RESEED_ON_REFILL 0
+
+/* Use volatile stores so the compiler cannot optimize away the wipe. */
+static void secure_bzero(void *v, size_t n)
+{
+  volatile unsigned char *p = (volatile unsigned char *)v;
+  while (n-- > 0) *p++ = 0;
+}
 
 /*****************************************************************************/
 /* Chacha routines: init, quarter round, core, keystream                     */
@@ -151,6 +163,7 @@ static uint32_t chacha_keystream(unsigned char* buf, uint32_t n, chacha_context_
     chacha_core(sbuf, ctx->state);
     increment_chacha_counter(ctx);
     memcpy(buf, sbuf, r);
+    secure_bzero(sbuf, sizeof(sbuf));
   }
   return n;
 }
@@ -174,6 +187,16 @@ static uint32_t  _refill_buffer(chacha_context_t *ctx) {
 /*   Test vectors                                                            */
 /*****************************************************************************/
 #if RUN_INTERNAL_TESTS
+static void _bytes_to_hex(char *out, const unsigned char *in, uint32_t len) {
+  static const char hex[] = "0123456789abcdef";
+  uint32_t i;
+  for (i = 0; i < len; i++) {
+    out[2*i  ] = hex[in[i] >> 4];
+    out[2*i+1] = hex[in[i] & 0x0f];
+  }
+  out[2*len] = '\0';
+}
+
 static bool _test_qr(void) {
   uint32_t i;
   uint32_t       tv1i[4] = {0x11111111, 0x01020304, 0x9b8d6f43, 0x01234567};
@@ -189,6 +212,50 @@ static bool _test_qr(void) {
   }
   return TRUE;
 }
+
+/* Test case 1, 256-bit key, from the Strombergson ChaCha test vectors. */
+static bool _test_reduced_rounds(void) {
+  static const char ebuf[2][257] = {
+   "3e00ef2f895f40d67f5bb8e81f09a5a1"
+   "2c840ec3ce9a7f3b181be188ef711a1e"
+   "984ce172b9216f419f445367456d5619"
+   "314a42a3da86b001387bfdb80e0cfe42"
+   "d2aefa0deaa5c151bf0adb6c01f2a5ad"
+   "c0fd581259f9a2aadcf20f8fd566a26b"
+   "5032ec38bbc5da98ee0c6f568b872a65"
+   "a08abf251deb21bb4b56e5d8821e68aa",
+   "9bf49a6a0755f953811fce125f2683d5"
+   "0429c3bb49e074147e0089a52eae155f"
+   "0564f879d27ae3c02ce82834acfa8c79"
+   "3a629f2ca0de6919610be82f411326be"
+   "0bd58841203e74fe86fc71338ce0173d"
+   "c628ebb719bdcbcc151585214cc089b4"
+   "42258dcda14cf111c602b8971b8cc843"
+   "e91e46ca905151c02744a6b017e69316",
+  };
+  unsigned char seed[40] = {0};
+  unsigned char kbuf[128];
+  char got[257];
+  const char* expout;
+  const uint32_t klen = (uint32_t) sizeof(kbuf);
+  chacha_context_t ctx;
+
+  if      (CHACHA_ROUNDS ==  8) expout = ebuf[0];
+  else if (CHACHA_ROUNDS == 12) expout = ebuf[1];
+  else                          return TRUE;
+
+  init_context(&ctx, seed, TRUE);
+  if (chacha_keystream(kbuf, klen, &ctx) != klen)
+    croak("short reduced-round keystream");
+  if (ctx.state[12] != 2 || ctx.state[13] != 0)
+    croak("reduced-round block counter failure");
+  _bytes_to_hex(got, kbuf, klen);
+  if (memcmp(got, expout, 2*klen))
+    croak("fail %u-round keystream test vector:\n  exp %s\n  got %s\n",
+          CHACHA_ROUNDS, expout, got);
+  return TRUE;
+}
+
 /* Test 5 is RFC7539 2.3.2 */
 static bool _test_core(void) {
   uint32_t test, i;
@@ -208,7 +275,6 @@ static bool _test_core(void) {
   for (i = 0; i < 32; i++) keys[5][i] = (unsigned char) i;
   keys[5][35] = 0x4a;
 
-  if (CHACHA_ROUNDS != 20) return FALSE;
   { /* Ensure the "have" variable is large enough to store a buffer */
     chacha_context_t ctx;
     if (BUFSZ >> (8*sizeof(ctx.have)) != 0)
@@ -228,9 +294,7 @@ static bool _test_core(void) {
         if (ctx.state[i] != 0)
           croak("core modified state");
     }
-    for (i = 0; i < 64; i++)
-      sprintf(got+2*i, "%02x", ctx.buf[i]);
-    got[128] = '\0';
+    _bytes_to_hex(got, ctx.buf, 64);
     if (memcmp(got, expout, 128))
       croak("fail core test vector %u:\n  exp %s\n  got %s\n",test,expout,got);
   }
@@ -247,8 +311,6 @@ static bool _test_keystream(void) {
   for (i = 0; i < 32; i++) keys[1][i] = (unsigned char) i;
   keys[1][35] = 0x4a;
 
-  if (CHACHA_ROUNDS != 20) return FALSE;
-
   for (test = 0; test < 2; test++) {
     unsigned char* key = keys[test];
     const char* expout = ebuf[test];
@@ -262,9 +324,7 @@ static bool _test_keystream(void) {
     gen = chacha_keystream(kbuf, len, &ctx);
     if (gen < len) croak("short keystream");
     /* Check state block counter */
-    for (i = 0; i < len; i++)
-      sprintf(got+2*i, "%02x", kbuf[i]);
-    got[2*len] = '\0';
+    _bytes_to_hex(got, kbuf, len);
     if (memcmp(got, expout, 2*len))
       croak("fail keystream test vector %u:\n  exp %s\n  got %s\n",test,expout,got);
   }
@@ -272,7 +332,10 @@ static bool _test_keystream(void) {
 }
 
 bool chacha_selftest(void) {
-  return _test_qr() && _test_core() && _test_keystream();
+  if (!_test_qr() || !_test_reduced_rounds()) return FALSE;
+  if (CHACHA_ROUNDS == 20)
+    return _test_core() && _test_keystream();
+  return TRUE;
 }
 #else
 bool chacha_selftest(void) { return TRUE; }
@@ -305,8 +368,13 @@ uint32_t chacha_irand32(chacha_context_t *cs)
 {
   uint32_t a;
   unsigned char* ptr;
-  if (cs->have < 4)
+  if (cs->have == 0) {
     _refill_buffer(cs);
+  } else if (cs->have < 4) {
+    unsigned char bytes[4];
+    chacha_rand_bytes(cs, 4, bytes);
+    return U8TO32_LE(bytes);
+  }
   ptr = cs->buf + BUFSZ - cs->have;
   cs->have -= 4;
   a = U8TO32_LE(ptr);

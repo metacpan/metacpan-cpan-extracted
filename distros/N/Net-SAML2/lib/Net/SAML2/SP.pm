@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.89'; # VERSION
 
 use Moose;
 
@@ -351,10 +351,14 @@ sub soap_binding {
 
 
 sub post_binding {
-    my ($self) = @_;
+    my ($self, %args) = @_;
 
     return Net::SAML2::Binding::POST->new(
-        $self->has_cacert ? (cacert => $self->cacert) : ()
+        $self->has_cacert ? (cacert => $self->cacert) : (),
+        $self->insecure_trust_embedded_cert ? (
+            insecure_trust_embedded_cert => $self->insecure_trust_embedded_cert
+        ) : (),
+        %args,
     );
 }
 
@@ -539,7 +543,7 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 SYNOPSIS
 
@@ -764,9 +768,15 @@ given URL and signing certificate.
 
 XXX UA
 
-=head2 post_binding( )
+=head2 post_binding( %args )
 
 Returns a POST binding object for this SP.
+
+Any arguments are passed through to L<Net::SAML2::Binding::POST/new> and
+override the SP's own defaults.  In particular C<cert_text> pins the IdP's
+signing certificate for response verification:
+
+    my $post = $sp->post_binding(cert_text => $idp->cert('signing')->[0]);
 
 =head2 generate_metadata( )
 

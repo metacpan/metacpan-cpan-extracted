@@ -23,6 +23,8 @@ extern void mpz_set_iv(mpz_t n, IV v);
 extern UV   mpz_get_uv(const mpz_t n);
 extern IV   mpz_get_iv(const mpz_t n);
 /* TODO: cmp_uv, cmp_iv, mul_iv, mul_uv, etc. */
+extern void mpz_add_uv(mpz_t r, const mpz_t a, UV b);
+extern void mpz_sub_uv(mpz_t r, const mpz_t a, UV b);
 
 extern UV   is_power(const mpz_t n, UV a);
 extern UV   prime_power(mpz_t prime, const mpz_t n);
@@ -35,6 +37,9 @@ extern int  is_qr(const mpz_t a, const mpz_t n);
 
 #undef mpz_divmod
 extern int mpz_divmod(mpz_t r, const mpz_t a, const mpz_t b, const mpz_t n, mpz_t t);
+
+/* Euclidean divrem */
+extern int mpz_ediv_qr(mpz_t q, mpz_t r, const mpz_t a, const mpz_t b);
 
 #if __GNU_MP_VERSION < 5
 /* Older versions left out a normalization step */
@@ -68,6 +73,10 @@ extern void mpf_root(mpf_t rootx, const mpf_t x, const mpf_t n);
 extern void mpf_agm(mpf_t r, mpf_t a, mpf_t b);
 
 extern UV logint(const mpz_t n, UV base);
+extern void mpz_logint(mpz_t r, const mpz_t n, const mpz_t b);
+extern void mpz_rootint(mpz_t r, const mpz_t x, const mpz_t n);
+extern void mpz_fromdigits(mpz_t n, mpz_t *d, size_t len, const mpz_t base);
+extern int  mpz_fromdigits_str(mpz_t n, const char* s, const mpz_t base);
 
 #ifdef FUNC_mpz_logn
 static double mpz_logn(const mpz_t n)

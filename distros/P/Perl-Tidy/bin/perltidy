@@ -986,6 +986,13 @@ file.  This means that minor name changes can produce significant file
 differences.  This can be annoying and does not occur with the default
 indentation method.
 
+=item *
+
+Sometimes new releases of Perl::Tidy can cause changes in the indentation of
+lists, especially for large lists formatted with the B<-xlp> style.  This is
+because small changes occasionally need to be made in the logic which checks
+line lengths in order to fix formatting issues.
+
 =back
 
 Some things that can be done to minimize these problems are:
@@ -5091,7 +5098,8 @@ this for certain operators which may be specified with the string B<s>. These
 are the concatenation operator B<s='.'> and the method call arrow
 B<s='-E<gt>'>.  When this parameter is selected for an operator, no special
 breaks are made, so there will be a minimal number of line breaks.
-For example, here is the default formatting for a method call chain:
+For example, here is the default formatting for a method call chain
+which requires multiple lines:
 
     # perltidy -l=60
     Data::Dumper->new( [ \%errors ] )
@@ -7440,7 +7448,41 @@ subs not explicitly listed.  So the compact expression
 means that calls to all user-defined subs in the file being processed
 should have their call arguments enclosed in parens.
 
-Perltidy does not have the ability to add or delete call parens because it is
+A less strict check for parens can be requested by placing the symbol B<+>
+after keyword or function name in the list following B<-wcp>.  This means that
+a warning should only be issued if that word is followed without parens around
+more than one comma-separated terms.  For example,
+
+   perltidy -wcp='return+'
+
+means that no warnings will be given for the following lines:
+
+  return;           # OK: 0 items, no parens needed
+  return $x;        # OK: 1 item, no parens needed
+  return ($x, $y);  # OK: 2 items, need parens
+
+Similarly, a less strict check for unwanted parens be requested by placing the
+symbol B<+> after keyword or function name in the list following B<-nwcp>.
+This means that a warning should only be issued if that word is followed
+by empty parens or parens around a single term.
+
+These less restrictive warnings may be used together. For example, the following
+
+   perltidy -wcp='for+' -nwcp='for+'
+
+means that parens should be around B<for> lists of more than one item,
+and otherwise not.  For example:
+
+   print "$_\n" for @list;    # OK: -nwcp is happy
+   print "$_\n" for ( 1, 2, 3, 5, 9 ); # OK: -wcp is happy
+
+When the same word occurs like this in both the B<-wcp> and B<-nwcp> lists, the
+B<+> signs may be omitted, since no other interpretation makes sense.  So the
+above could also be written as
+
+   perltidy -wcp='for' -nwcp='for'
+
+B<NOTE:> Perltidy does not have the ability to add or delete call parens because it is
 difficult to automate, so changes must be made manually.  When adding or
 removing parentheses, it is essential to pay attention to operator precedence
 issues.  For example, if the parens in the following statement are
@@ -8460,7 +8502,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20260705
+This man page documents perltidy version 20260808
 
 =head1 BUG REPORTS
 

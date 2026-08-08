@@ -3,7 +3,7 @@ package PAGI::FastAPI::Context;
 use v5.36;
 use version;
 
-our $VERSION   = qv('v0.0.5');
+our $VERSION   = qv('v0.0.6');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf-8
@@ -14,7 +14,7 @@ PAGI::FastAPI::Context - Request and Response Lifecycle Context for PAGI::FastAP
 
 =head1 VERSION
 
-Version v0.0.5
+Version v0.0.6
 
 =head1 SYNOPSIS
 

@@ -33,6 +33,13 @@ typedef struct hm_backend hm_backend;
 struct hm_backend {
     const char *name;
     void       *state;
+    /* Set when this backend was inherited across a fork: destroy() then
+     * releases its memory but closes NO descriptor, because none of them
+     * belong to this process. A kqueue does not even survive fork - the
+     * kernel invalidates the child's copy, so the number is free and the
+     * child's own kqueue() is handed it straight back; closing it there
+     * would shut the queue the child is actually using. */
+    int         foreign;
     int  (*add_io)    (hm_backend *, int fd, int mask, int oneshot);
     int  (*modify_io) (hm_backend *, int fd, int mask, int oneshot);
     int  (*remove_io) (hm_backend *, int fd, int mask);

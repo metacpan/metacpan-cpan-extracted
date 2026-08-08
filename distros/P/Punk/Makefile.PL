@@ -5,18 +5,14 @@ use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
 use Config;
 
-# Punk's XS tier consumes four C ABIs directly, none of them vendored: the
-# JSON fast path (frj_abi.h), the API dispatcher (oa_abi.h), the view tier
-# (st_abi.h) and the WebSocket connection (hm_abi.h). Every provider installs
-# its header through ExtUtils::Depends, so there is one copy of each contract
-# and it is the provider's - a consumer copy is a second source of truth that
-# only drifts. The sibling-directory fallback is for building the whole
-# Semantic tree from a checkout, before anything is installed.
 my @PROVIDERS = (
     [ 'File::Raw::JSON'   => '../File-Raw-JSON/include'     ],  # frj_abi.h
     [ 'Open::API'         => '../Open-API/include'          ],  # oa_abi.h
     [ 'Template::Stencil' => '../Template-Stencil/include'  ],  # st_abi.h
     [ 'Hyperman'          => '../Hyperman/include/hyperman' ],  # hm_abi.h
+    [ 'Markdown::Simple'  => '../Markdown-Simple/include'   ],  # mds_abi.h
+    [ 'Search::Trigram'   => '../Search-Trigram/include'    ],  # sg_abi.h
+    [ 'DBIx::Loop'        => '../DBIx-Loop/include'         ],  # dbil_abi.h
 );
 my $INC = '-Iinclude';
 {
@@ -86,9 +82,15 @@ my %WriteMakefileArgs = (
         'JSON::Schema::Fast'   => '0.05',   # schema field validation
         'YAML::XS'             => '0',      # Punk::Config; every scaffolded
                                             # app carries a config/punk.yml
-        'Hyperman'             => '0.11',   # the native server; hm_abi.h's
+        'Hyperman'             => '0.13',   # the native server; hm_abi.h's
                                             # detach ABI is what websocket
                                             # routes attach through
+        'Markdown::Simple'     => '0.20',   # the markdown mount; mds_abi.h,
+                                            # whose heading anchors and TOC
+                                            # the docs shell is built on
+        'Search::Trigram'      => '0.02',   # markdown search; sg_abi.h
+        'DBIx::Loop'           => '0.02',   # Punk::Model::DBIx::Loop, the
+                                            # async model backend; dbil_abi.h
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

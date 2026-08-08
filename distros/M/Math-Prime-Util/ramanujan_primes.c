@@ -5,6 +5,7 @@
 #define FUNC_log2floor 1
 #define FUNC_is_prime_in_sieve 1
 #include "ptypes.h"
+#include "constants.h"
 #include "sieve.h"
 #include "util.h"
 #include "prime_counts.h"
@@ -120,19 +121,28 @@ UV nth_ramanujan_prime_lower(UV n) {
 /* For Ramanujan prime count bounds, use binary searches on the inverses. */
 
 UV ramanujan_prime_count_lower(UV n) {
-  UV lo, hi;
+  UV lo, hi, rlo, rhi;
   FAST_SMALL_COUNT(n);
   /* We know we're between p_2n and p_3n, probably close to the former. */
   lo = prime_count_lower(n)/3;
   hi = prime_count_upper(n) >> 1;
+  rlo = nth_ramanujan_prime_upper(lo);
+  rhi = nth_ramanujan_prime_upper(hi);
+  /* Near UV_MAX, the nth-prime bounds may not bracket a native result. */
+  if (rlo > n || rhi < n) return lo;
   return inverse_interpolate(lo, hi, n, &nth_ramanujan_prime_upper, 0);
 }
 UV ramanujan_prime_count_upper(UV n) {
-  UV lo, hi;
+  UV lo, hi, rlo, rhi;
   FAST_SMALL_COUNT(n);
   /* We know we're between p_2n and p_3n, probably close to the former. */
   lo = prime_count_lower(n)/3;
   hi = prime_count_upper(n) >> 1;
+  rlo = nth_ramanujan_prime_lower(lo);
+  rhi = nth_ramanujan_prime_lower(hi);
+  /* Near UV_MAX, the nth-prime bounds may not bracket a native result. */
+  if (rlo > n) return lo;
+  if (rhi < n) return hi;
   return inverse_interpolate(lo, hi, n, &nth_ramanujan_prime_lower, 0);
 }
 
@@ -152,6 +162,7 @@ UV nth_ramanujan_prime_approx(UV n)
   /* Interpolating using ramanujan prime count approximation */
   lo = nth_ramanujan_prime_lower(n) - 1;
   hi = nth_ramanujan_prime_upper(n);
+  /* Note that ramanujan_prime_count_approx is not monotonic */
   return inverse_interpolate(lo, hi, n, &ramanujan_prime_count_approx, 0);
 }
 
@@ -189,6 +200,7 @@ UV* n_range_ramanujan_primes(UV nlo, UV nhi) {
 
   if (nlo == 0) nlo = 1;
   if (nhi == 0) nhi = 1;
+  if (nlo > nhi) return 0;
 
   /* If we're starting from 1, just do single monolithic sieve */
   if (nlo == 1)  return n_ramanujan_primes(nhi);
@@ -267,7 +279,12 @@ UV range_ramanujan_prime_sieve(UV** list, UV lo, UV hi)
 {
   UV first, last, *L;
   L = ramanujan_primes(&first, &last, lo, hi);
-  if (L == 0 || first > last) { *list = 0; return 0; }
+  if (L == 0) { *list = 0; return 0; }
+  if (first > last) {
+    Safefree(L);
+    *list = 0;
+    return 0;
+  }
   if (first > 0)
     memmove( L + 0,  L + first,  (last-first+1) * sizeof(UV) );
   *list = L;
@@ -297,6 +314,7 @@ static UV* _ramanujan_prime_window(UV n, UV* winsize, UV* npos) {
           break;
       if (i < wlen) break;
     }
+    Safefree(L);
     winmult *= 2;
     MPUverbose(1, "  %s increasing window\n", "ramanujan_prime_count");
   }
@@ -325,7 +343,9 @@ bool is_ramanujan_prime(UV n) {
 
   /* Pre-test: Check if Pi(n/2) increases before Pi(n) does. */
   if (is_prime(n/2+1)) return 0;
-  d = (next_prime(n) - n)/2;
+  /* Calculate d even if n >= max UV prime, using gaps to next_prime(UV_MAX). */
+  if (n < MPU_MAX_PRIME) d = (next_prime(n) - n)/2;
+  else                   d = (UV_MAX-n+(BITS_PER_WORD == 64 ? 14 : 16))/2;
   for (i = 2; i <= d; i++)
     if (is_prime(n/2+i)) return 0;
 

@@ -733,6 +733,10 @@ servers:
       foo#bar:
         default: foo
   - url: http://example.com/y/foo%2fbar   # valid
+  - url: http://example.com/name1         # valid
+    name: my server
+  - url: http://example.com/name2         # invalid
+    name: my server
 YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -809,6 +813,11 @@ YAML
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/10/url',
           error => 'invalid server url "http://example.com/^illegal"',
         },
+        {
+          keywordLocation => $_.'/servers/17/url',
+          absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/17/url',
+          error => 'server name "my server" is not unique',
+        },
       ), '/components/pathItems/path0/get', '/components/pathItems/path0', '',
     ],
     'all issues with server entries found',
@@ -826,6 +835,7 @@ YAML
 '/components/pathItems/path0/get/servers/7/url': invalid server url "http://example.com#bar"
 '/components/pathItems/path0/get/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
 '/components/pathItems/path0/get/servers/10/url': invalid server url "http://example.com/^illegal"
+'/components/pathItems/path0/get/servers/17/url': server name "my server" is not unique
 '/components/pathItems/path0/servers/0/variables/version/default': server default is not a member of enum
 '/components/pathItems/path0/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
 '/components/pathItems/path0/servers/1': "variables" property is required for templated server urls
@@ -837,6 +847,7 @@ YAML
 '/components/pathItems/path0/servers/7/url': invalid server url "http://example.com#bar"
 '/components/pathItems/path0/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
 '/components/pathItems/path0/servers/10/url': invalid server url "http://example.com/^illegal"
+'/components/pathItems/path0/servers/17/url': server name "my server" is not unique
 '/servers/0/variables/version/default': server default is not a member of enum
 '/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
 '/servers/1': "variables" property is required for templated server urls
@@ -848,6 +859,7 @@ YAML
 '/servers/7/url': invalid server url "http://example.com#bar"
 '/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
 '/servers/10/url': invalid server url "http://example.com/^illegal"
+'/servers/17/url': server name "my server" is not unique
 ERRORS
 
   memory_cycle_ok($doc, 'no leaks in the document object');

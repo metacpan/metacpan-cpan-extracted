@@ -1,0 +1,251 @@
+/* The shipped stylesheet for the markdown mount. Served from the mount's
+ * `assets` path, which defaults to /_punk. The .esh-* rules match the token
+ * classes Eshu emits through Markdown::Simple's highlighter. */
+
+:root {
+    --md-text: #24292f;
+    --md-muted: #57606a;
+    --md-border: #d0d7de;
+    --md-bg: #ffffff;
+    --md-code-bg: #f6f8fa;
+    --md-link: #0969da;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --md-text: #e6edf3;
+        --md-muted: #8b949e;
+        --md-border: #30363d;
+        --md-bg: #16181c;
+        --md-code-bg: #24272c;
+        --md-link: #58a6ff;
+    }
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--md-bg);
+    color: var(--md-text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* ---- chrome ---- */
+
+.punk-md-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--md-border);
+    position: sticky;
+    top: 0;
+    background: var(--md-bg);
+    z-index: 10;
+}
+.punk-md-brand {
+    font-weight: 600;
+    color: var(--md-text);
+    text-decoration: none;
+}
+.punk-md-searchlink {
+    margin-left: auto;
+    font-size: 14px;
+    color: var(--md-link);
+    text-decoration: none;
+}
+
+.punk-md-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) 200px;
+    gap: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+@media (max-width: 1000px) {
+    .punk-md-layout { grid-template-columns: 1fr; }
+    .punk-md-sidebar, .punk-md-aside { position: static; max-height: none; }
+}
+
+.punk-md-sidebar, .punk-md-aside {
+    position: sticky;
+    top: 70px;
+    align-self: start;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+    font-size: 14px;
+}
+
+.punk-md-main { min-width: 0; }
+
+.punk-md-footer {
+    border-top: 1px solid var(--md-border);
+    padding: 16px 24px;
+    color: var(--md-muted);
+    font-size: 14px;
+}
+
+/* ---- navigation ---- */
+
+.punk-md-nav, .punk-md-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.punk-md-nav a {
+    display: block;
+    padding: 4px 10px;
+    color: var(--md-muted);
+    text-decoration: none;
+    border-radius: 6px;
+}
+.punk-md-nav a:hover { background: var(--md-code-bg); color: var(--md-text); }
+.punk-md-nav a.current {
+    background: var(--md-code-bg);
+    color: var(--md-link);
+    font-weight: 600;
+}
+.punk-md-section > details > summary {
+    padding: 12px 10px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--md-muted);
+    cursor: pointer;
+    list-style: none;
+    outline: none;
+}
+.punk-md-section > details > summary::-webkit-details-marker { display: none; }
+.punk-md-section > details > ul > li > a { padding-left: 22px; }
+
+/* ---- table of contents ---- */
+
+.punk-md-aside-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--md-muted);
+    margin: 0 0 8px;
+}
+.punk-md-toc { list-style: none; margin: 0; padding: 0; }
+.punk-md-toc a {
+    display: block;
+    padding: 3px 0;
+    color: var(--md-muted);
+    text-decoration: none;
+}
+.punk-md-toc a:hover { color: var(--md-link); }
+.punk-md-toc .lvl3 a { padding-left: 14px; font-size: 13px; }
+
+/* ---- the document ---- */
+
+.punk-md-body { max-width: 860px; }
+.punk-md-body h1, .punk-md-body h2 {
+    border-bottom: 1px solid var(--md-border);
+    padding-bottom: .3em;
+}
+.punk-md-body h1 { font-size: 2em; margin: .4em 0 .67em; }
+.punk-md-body h2 { font-size: 1.5em; margin-top: 1.5em; }
+.punk-md-body h3 { font-size: 1.25em; }
+.punk-md-body a { color: var(--md-link); }
+.punk-md-body img { max-width: 100%; }
+.punk-md-body code {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: .85em;
+    background: var(--md-code-bg);
+    padding: .2em .4em;
+    border-radius: 3px;
+}
+.punk-md-body pre {
+    background: var(--md-code-bg);
+    border-radius: 6px;
+    padding: 16px;
+    overflow: auto;
+    line-height: 1.45;
+}
+.punk-md-body pre code { background: none; padding: 0; }
+.punk-md-body blockquote {
+    border-left: 4px solid var(--md-border);
+    color: var(--md-muted);
+    margin: 0;
+    padding: 0 1em;
+}
+.punk-md-body table { border-collapse: collapse; width: 100%; }
+.punk-md-body th, .punk-md-body td {
+    border: 1px solid var(--md-border);
+    padding: 6px 13px;
+}
+.punk-md-body tr:nth-child(even) { background: var(--md-code-bg); }
+.punk-md-body ul, .punk-md-body ol { padding-left: 2em; }
+
+/* ---- syntax highlighting (Eshu token classes) ---- */
+
+.esh-k { color: #cf222e; }
+.esh-s { color: #0a3069; }
+.esh-c { color: #6e7781; font-style: italic; }
+.esh-n { color: #0550ae; }
+.esh-p { color: #8250df; }
+.esh-r { color: #116329; }
+.esh-v { color: #953800; }
+.esh-h { color: #0a3069; }
+.esh-d { color: #6e7781; font-style: italic; }
+.esh-g { color: #116329; }
+.esh-a { color: #0550ae; }
+
+@media (prefers-color-scheme: dark) {
+    .esh-k { color: #ff7b72; }
+    .esh-s { color: #a5d6ff; }
+    .esh-c { color: #8b949e; }
+    .esh-n { color: #79c0ff; }
+    .esh-p { color: #d2a8ff; }
+    .esh-r { color: #7ee787; }
+    .esh-v { color: #ffa657; }
+    .esh-h { color: #a5d6ff; }
+    .esh-d { color: #8b949e; }
+    .esh-g { color: #7ee787; }
+    .esh-a { color: #79c0ff; }
+}
+
+/* ---- search ---- */
+
+.punk-md-search input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 15px;
+    border: 1px solid var(--md-border);
+    border-radius: 6px;
+    background: var(--md-bg);
+    color: var(--md-text);
+}
+.punk-md-search input:focus {
+    outline: none;
+    border-color: var(--md-link);
+    box-shadow: 0 0 0 3px rgba(9, 105, 218, .15);
+}
+.punk-md-results { list-style: none; margin: 24px 0 0; padding: 0; }
+.punk-md-results li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--md-border);
+}
+.punk-md-results a {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--md-link);
+    text-decoration: none;
+}
+.punk-md-snippet {
+    margin: 4px 0 0;
+    font-size: 13.5px;
+    color: var(--md-muted);
+}
+.punk-md-empty, .punk-md-hint {
+    color: var(--md-muted);
+    font-size: 14px;
+    padding: 24px 0;
+}

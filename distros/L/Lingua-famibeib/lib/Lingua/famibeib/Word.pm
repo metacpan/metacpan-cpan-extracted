@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
 
@@ -484,7 +484,7 @@ Lingua::famibeib::Word - module to interact with the famibeib words
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

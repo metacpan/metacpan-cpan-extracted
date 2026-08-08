@@ -120,6 +120,18 @@ like($@, qr/validation failed/, 'a missing required title croaks before the inse
     my $a = $author->create({ name => 'Gibson' });
     is($a->{id}, 1, 'the shared connection serves the second model too');
 
+    # The quoted-identifier and statement caches hang off the shared
+    # connection, so two models with the same key column must not read each
+    # other's statement - the table is part of the cache key.
+    is($author->get(id => 1)->{name}, 'Gibson',
+        'a second model on the shared connection gets its own row');
+    is($model->get(id => 1)->{title}, 'Neuromancer',
+        'and the first model still gets its own, not the second table\'s');
+    is($author->get(id => 99), undef, 'a miss is still a miss');
+    is($author->delete(id => 99), 0,
+        'delete on the shared connection is keyed by table too');
+    is($model->get(id => 1)->{title}, 'Neuromancer', 'and did not hit books');
+
     # a different dsn is a different pooled connection
     my $dir   = File::Temp->newdir;
     my $other = T::Model::Author->_instantiate(

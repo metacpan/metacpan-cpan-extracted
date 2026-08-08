@@ -57,10 +57,15 @@ extern int pplus1_factor(UV n, UV *factors, UV B);
 extern int squfof_factor(UV n, UV *factors, UV rounds);
 extern int lehman_factor(UV n, UV *factors, bool dotrial);
 extern int cheb_factor(UV n, UV *factors, UV B, UV initx);
+#define HAS_ECM64  (BITS_PER_WORD == 64 && HAVE_UINT64)
+#if HAS_ECM64
+extern int tinyecm64_factor(UV n, UV *factors, UV B1, UV B2, UV ncurves, UV sigma_offset);
+#endif
 
 extern UV* divisor_list(UV n, UV *num_divisors, UV maxd);
 
 extern UV  divisor_sum(UV n, UV k);
+extern UV  aliquot_sum(UV n);
 
 extern int prime_omega(UV n);     /* number of distinct prime factors */
 extern int prime_bigomega(UV n);  /* number of prime factors w/ multiplicity */
@@ -83,14 +88,7 @@ extern factor_range_context_t factor_range_init(UV lo, UV hi, bool square_free);
 extern int factor_range_next(factor_range_context_t *ctx);
 extern void factor_range_destroy(factor_range_context_t *ctx);
 
-/*
-extern UV dlp_trial(UV a, UV g, UV p, UV maxrounds);
-extern UV dlp_prho(UV a, UV g, UV p, UV n, UV maxrounds);
-extern UV dlp_bsgs(UV a, UV g, UV p, UV n, UV maxent);
-*/
-/* Generic znlog returns k that solves a = g^k mod p */
-extern UV znlog(UV a, UV g, UV p);
-/* znlog given prime gorder = znorder(g,p) */
-extern UV znlog_solve(UV a, UV g, UV p, UV gorder);
+extern UV sopfr(UV n);
+extern UV sopf(UV n);
 
 #endif

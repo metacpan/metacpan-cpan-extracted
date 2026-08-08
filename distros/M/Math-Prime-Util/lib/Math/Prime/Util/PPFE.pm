@@ -9,11 +9,39 @@ use Math::Prime::Util::Entropy;
 
 package Math::Prime::Util;
 use Carp qw/carp croak confess/;
+use Scalar::Util qw/reftype/;
 
 *_validate_integer = \&Math::Prime::Util::PP::_validate_integer;
 *_validate_integer_nonneg = \&Math::Prime::Util::PP::_validate_integer_nonneg;
 *_validate_integer_positive = \&Math::Prime::Util::PP::_validate_integer_positive;
 *_validate_integer_abs = \&Math::Prime::Util::PP::_validate_integer_abs;
+
+*_canonicalized_integer = \&Math::Prime::Util::PP::_canonicalized_integer;
+
+sub _canonicalize_integers {
+  my($r) = @_;
+  my $type = reftype($r);
+  if (defined $type && $type eq 'ARRAY') {
+
+    for my $i (0..$#$r) {
+      next unless exists $r->[$i] && defined $r->[$i];
+      _validate_integer($r->[$i]);
+      $r->[$i] = _to_bigint($r->[$i]) if ref($r->[$i]);
+    }
+
+  } elsif (defined $type && ($type eq 'SCALAR' || $type eq 'REF')) {
+
+    if (defined $$r) {
+      # Later we can optimize to do only what we need.
+      _validate_integer($$r);
+      $$r = _to_bigint($$r) if ref($$r);
+    }
+
+  } else {
+    croak "_canonicalize_integers: expected scalar or array reference";
+  }
+  return;  # Explicitly return nothing
+}
 
 *_prime_memfreeall = \&Math::Prime::Util::PP::_prime_memfreeall;
 *prime_memfree  = \&Math::Prime::Util::PP::prime_memfree;
@@ -25,40 +53,80 @@ use Math::Prime::Util::ChaCha;
 *_srand = \&Math::Prime::Util::ChaCha::srand;
 *random_bytes = \&Math::Prime::Util::ChaCha::random_bytes;
 *irand = \&Math::Prime::Util::ChaCha::irand;
-*irand64 = \&Math::Prime::Util::ChaCha::irand64;
+*irand32 = \&Math::Prime::Util::ChaCha::irand32;
+
+if (MPU_MAXBITS == 32) {
+  *irand64 = sub {
+    my ($hi, $lo) = unpack("V2", Math::Prime::Util::ChaCha::random_bytes(8));
+    return $lo unless $hi;  # Return native if possible
+    Math::Prime::Util::PP::_frombytes(pack("N2", $hi, $lo));
+  };
+} else {
+  *irand64 = \&Math::Prime::Util::ChaCha::irand64;
+}
 
 sub srand {
-  my($seed) = @_;
+  croak "srand: expected zero or one argument" if @_ > 1;
+  my $has_seed = @_ > 0;
+  my $seed = $has_seed ? $_[0] : undef;
   croak "secure option set, manual seeding disabled" if prime_get_config()->{'secure'};
-  if (!defined $seed) {
+  if (!$has_seed) {
     my $nbytes = (~0 == 4294967295) ? 4 : 8;
     $seed = entropy_bytes( $nbytes );
     $seed = unpack(($nbytes==4) ? "L" : "Q", $seed);
+  } else {
+    $seed = 0 if !defined $seed || (!ref($seed) && $seed eq '');
+    my $uvpack = MPU_MAXBITS == 32 ? "L" : "Q";
+    $seed = unpack($uvpack, pack($uvpack, $seed));
   }
-  Math::Prime::Util::GMP::seed_csprng(8,pack("LL",$seed))
-    if $Math::Prime::Util::_GMPfunc{"seed_csprng"};
-  Math::Prime::Util::_srand($seed);
+  my $seedstr;
+  if ($seed <= 4294967295) {
+    $seedstr = pack("V", $seed);
+  } else {
+    my($hi,$lo) = divrem($seed, 4294967296);
+    $seedstr = pack("V2", $lo, $hi);
+  }
+  if ($Math::Prime::Util::_GMPfunc{"seed_csprng"}) {
+    Math::Prime::Util::GMP::seed_csprng(length($seedstr), $seedstr);
+  }
+  Math::Prime::Util::_csrand($seedstr);
+  $seed;
 }
 sub csrand {
+  croak "csrand: expected zero or one argument" if @_ > 1;
   my($seed) = @_;
   croak "secure option set, manual seeding disabled" if defined $seed && prime_get_config()->{'secure'};
-  $seed = entropy_bytes( 64 ) unless defined $seed;
-  Math::Prime::Util::GMP::seed_csprng(length($seed),$seed)
-    if $Math::Prime::Util::_GMPfunc{"seed_csprng"};
+  if (defined $seed) {
+    Math::Prime::Util::GMP::seed_csprng(length($seed),$seed)
+      if $Math::Prime::Util::_GMPfunc{"seed_csprng"};
+  } else {
+    $seed = entropy_bytes(64);
+    if ($Math::Prime::Util::_GMPfunc{"seed_csprng"}) {
+      my $gmpseed = entropy_bytes(64);
+      Math::Prime::Util::GMP::seed_csprng(length($gmpseed),$gmpseed);
+    }
+  }
   Math::Prime::Util::_csrand($seed);
-  1; # Don't return the seed
+  return;
+}
+sub CLONE {
+  Math::Prime::Util::Entropy::_clear_method();
+  Math::Prime::Util::_csrand(entropy_bytes(64));
 }
 sub entropy_bytes {
   my($bytes) = @_;
-  croak "entropy_bytes: input must be integer bytes between 1 and 4294967295"
-    if !defined($bytes) || $bytes < 1 || $bytes > 4294967295 || $bytes != int($bytes);
-  my $data = Math::Prime::Util::Entropy::entropy_bytes($bytes);
+  my $n = defined $bytes ? "$bytes" : "";
+  croak "entropy_bytes: input must be an integer between 0 and 2147483646"
+      if $n !~ /^\+?\d+\z/ || 0+$n > 2147483646;
+  $n = 0+$n;
+  return '' if $n == 0;
+  my $data = Math::Prime::Util::Entropy::entropy_bytes($n);
   if (!defined $data) {
-    # We can't find any entropy source!  Highly unusual.
-    Math::Prime::Util::_srand();
-    $data = random_bytes($bytes);
+    my $seed = Math::Prime::Util::Entropy::_timer_seed();
+    Math::Prime::Util::_csrand($seed);
+    $data = random_bytes($n);
   }
-  croak "entropy_bytes internal got wrong amount!" unless length($data) == $bytes;
+  croak "entropy_bytes internal got wrong amount!" unless length($data) == $n;
   $data;
 }
 
@@ -81,19 +149,64 @@ sub entropy_bytes {
   my $_tonv_128 = $_tonv_96;  $_tonv_128/= 2.0 for 1..32;
   if ($uvbits == 64) {
     if ($nvbits <= 32) {
-      *drand = sub { my $d = irand() * $_tonv_32;  $d *= $_[0] if $_[0];  $d; };
+      *drand = sub {
+        croak "drand: expected zero or one argument" if @_ > 1;
+        my $d;
+        do { $d = irand() * $_tonv_32; } while $d >= 1.0;
+        $d *= $_[0] if defined($_[0]) && $_[0] != 0;
+        $d;
+      };
     } elsif ($nvbits <= 64) {
-      *drand = sub { my $d = irand64() * $_tonv_64;  $d *= $_[0] if $_[0];  $d; };
+      *drand = sub {
+        croak "drand: expected zero or one argument" if @_ > 1;
+        my $d;
+        do { $d = irand64() * $_tonv_64; } while $d >= 1.0;
+        $d *= $_[0] if defined($_[0]) && $_[0] != 0;
+        $d;
+      };
     } else {
-      *drand = sub { my $d = irand64() * $_tonv_64 + irand64() * $_tonv_128;  $d *= $_[0] if $_[0];  $d; };
+      *drand = sub {
+        croak "drand: expected zero or one argument" if @_ > 1;
+        my $d;
+        do {
+          $d = irand64() * $_tonv_64 + irand64() * $_tonv_128;
+        } while $d >= 1.0;
+        $d *= $_[0] if defined($_[0]) && $_[0] != 0;
+        $d;
+      };
     }
   } else {
     if ($nvbits <= 32) {
-      *drand = sub { my $d = irand() * $_tonv_32;  $d *= $_[0] if $_[0];  $d; };
+      *drand = sub {
+        croak "drand: expected zero or one argument" if @_ > 1;
+        my $d;
+        do { $d = irand() * $_tonv_32; } while $d >= 1.0;
+        $d *= $_[0] if defined($_[0]) && $_[0] != 0;
+        $d;
+      };
     } elsif ($nvbits <= 64) {
-      *drand = sub { my $d = ((irand() >> 5) * 67108864.0 + (irand() >> 6)) / 9007199254740992.0;  $d *= $_[0] if $_[0];  $d; };
+      *drand = sub {
+        croak "drand: expected zero or one argument" if @_ > 1;
+        my $d;
+        do {
+          my $a = irand();
+          my $b = irand();
+          $d = $a * $_tonv_32 + $b * $_tonv_64;
+        } while ($d >= 1.0);
+        $d *= $_[0] if defined($_[0]) && $_[0] != 0;
+        $d;
+      };
     } else {
-      *drand = sub { my $d = irand() * $_tonv_32 + irand() * $_tonv_64 + irand() * $_tonv_96 + irand() * $_tonv_128;  $d *= $_[0] if $_[0];  $d; };
+      *drand = sub {
+        croak "drand: expected zero or one argument" if @_ > 1;
+        my $d;
+        do {
+          $d = irand() * $_tonv_32 + irand() * $_tonv_64
+             + irand() * $_tonv_96 + irand() * $_tonv_128;
+        } while $d >= 1.0;
+        $d *= $_[0] if defined($_[0]) && $_[0] != 0;
+        $d;
+      };
     }
   }
   *rand = \&drand;
@@ -107,24 +220,13 @@ sub entropy_bytes {
 }
 
 
-# These functions all do input validation within the PP code.
-# Therefore we can send user input straight to them.
-
-# The advantage is simplicity and speed for a single user call.
-#
-# The disadvantage is that we're doing very expensive PP validation
-# for each function call within the PP code itself.
-
-# Rules of thumb:
-#   if a function is expensive, no harm in validation
-#   if a function is cheap and often called, consider validation here.
-
-# TODO: revisit decision for all of these
-
 *urandomb = \&Math::Prime::Util::PP::urandomb;
 *urandomm = \&Math::Prime::Util::PP::urandomm;
+*urandomr = \&Math::Prime::Util::PP::urandomr;
+*toint    = \&Math::Prime::Util::PP::toint;
 
 *sumdigits = \&Math::Prime::Util::PP::sumdigits;
+*reverse_digits = \&Math::Prime::Util::PP::reverse_digits;
 *todigits = \&Math::Prime::Util::PP::todigits;
 *todigitstring = \&Math::Prime::Util::PP::todigitstring;
 *fromdigits = \&Math::Prime::Util::PP::fromdigits;
@@ -149,15 +251,27 @@ sub entropy_bytes {
 *sum_primes = \&Math::Prime::Util::PP::sum_primes;
 *print_primes = \&Math::Prime::Util::PP::print_primes;
 
-*is_prime          = \&Math::Prime::Util::PP::is_prime;
-*is_prob_prime     = \&Math::Prime::Util::PP::is_prob_prime;
-*is_provable_prime = \&Math::Prime::Util::PP::is_provable_prime;
-*is_bpsw_prime     = \&Math::Prime::Util::PP::is_bpsw_prime;
-*is_pseudoprime    = \&Math::Prime::Util::PP::is_pseudoprime;
+*is_prime           = \&Math::Prime::Util::PP::is_prime;
+*is_prob_prime      = \&Math::Prime::Util::PP::is_prob_prime;
+*is_provable_prime  = \&Math::Prime::Util::PP::is_provable_prime;
+*is_bpsw_prime      = \&Math::Prime::Util::PP::is_bpsw_prime;
+*is_aks_prime       = \&Math::Prime::Util::PP::is_aks_prime;
+*is_mersenne_prime  = \&Math::Prime::Util::PP::is_mersenne_prime;
+*is_ramanujan_prime = \&Math::Prime::Util::PP::is_ramanujan_prime;
+
+*is_pseudoprime = \&Math::Prime::Util::PP::is_pseudoprime;
 *is_euler_pseudoprime = \&Math::Prime::Util::PP::is_euler_pseudoprime;
 *is_strong_pseudoprime = \&Math::Prime::Util::PP::is_strong_pseudoprime;
 *is_euler_plumb_pseudoprime = \&Math::Prime::Util::PP::is_euler_plumb_pseudoprime;
 *is_perrin_pseudoprime = \&Math::Prime::Util::PP::is_perrin_pseudoprime;
+*is_frobenius_pseudoprime = \&Math::Prime::Util::PP::is_frobenius_pseudoprime;
+*is_catalan_pseudoprime = \&Math::Prime::Util::PP::is_catalan_pseudoprime;
+*is_frobenius_underwood_pseudoprime = \&Math::Prime::Util::PP::is_frobenius_underwood_pseudoprime;
+*is_frobenius_khashin_pseudoprime = \&Math::Prime::Util::PP::is_frobenius_khashin_pseudoprime;
+*is_lucas_pseudoprime = \&Math::Prime::Util::PP::is_lucas_pseudoprime;
+*is_strong_lucas_pseudoprime = \&Math::Prime::Util::PP::is_strong_lucas_pseudoprime;
+*is_extra_strong_lucas_pseudoprime = \&Math::Prime::Util::PP::is_extra_strong_lucas_pseudoprime;
+*is_almost_extra_strong_lucas_pseudoprime = \&Math::Prime::Util::PP::is_almost_extra_strong_lucas_pseudoprime;
 
 *is_cyclic = \&Math::Prime::Util::PP::is_cyclic;
 *is_carmichael = \&Math::Prime::Util::PP::is_carmichael;
@@ -186,7 +300,10 @@ sub entropy_bytes {
 *is_congruent_number = \&Math::Prime::Util::PP::is_congruent_number;
 *is_perfect_number = \&Math::Prime::Util::PP::is_perfect_number;
 *is_delicate_prime = \&Math::Prime::Util::PP::is_delicate_prime;
+*is_safe_prime = \&Math::Prime::Util::PP::is_safe_prime;
 *is_happy = \&Math::Prime::Util::PP::is_happy;
+*is_harshad = \&Math::Prime::Util::PP::is_harshad;
+*is_palindrome = \&Math::Prime::Util::PP::is_palindrome;
 *powerful_count = \&Math::Prime::Util::PP::powerful_count;
 *nth_powerful = \&Math::Prime::Util::PP::nth_powerful;
 *sumpowerful = \&Math::Prime::Util::PP::sumpowerful;
@@ -237,12 +354,19 @@ sub entropy_bytes {
 *moebius = \&Math::Prime::Util::PP::moebius;
 *euler_phi = \&Math::Prime::Util::PP::euler_phi;
 *inverse_totient = \&Math::Prime::Util::PP::inverse_totient;
+*dedekind_psi = \&Math::Prime::Util::PP::dedekind_psi;
 *divisor_sum = \&Math::Prime::Util::PP::divisor_sum;
+*aliquot_sum = \&Math::Prime::Util::PP::aliquot_sum;
 *sumtotient = \&Math::Prime::Util::PP::sumtotient;
 *jordan_totient = \&Math::Prime::Util::PP::jordan_totient;
+*inverse_sigma0 = \&Math::Prime::Util::PP::inverse_sigma0;
+*inverse_sigma0_count = \&Math::Prime::Util::PP::inverse_sigma0_count;
 *ramanujan_sum = \&Math::Prime::Util::PP::ramanujan_sum;
 *mertens = \&Math::Prime::Util::PP::mertens;
 *valuation = \&Math::Prime::Util::PP::valuation;
+*remove_factors = \&Math::Prime::Util::PP::remove_factors;
+*remove_factors_exp = \&Math::Prime::Util::PP::remove_factors_exp;
+*floor_sum = \&Math::Prime::Util::PP::floor_sum;
 *hammingweight = \&Math::Prime::Util::PP::hammingweight;
 *chinese = \&Math::Prime::Util::PP::chinese;
 *chinese2 = \&Math::Prime::Util::PP::chinese2;
@@ -251,6 +375,7 @@ sub entropy_bytes {
 *pn_primorial = \&Math::Prime::Util::PP::pn_primorial;
 *divisors = \&Math::Prime::Util::PP::divisors;
 *partitions = \&Math::Prime::Util::PP::partitions;
+*partitionsq = \&Math::Prime::Util::PP::partitionsq;
 *consecutive_integer_lcm = \&Math::Prime::Util::PP::consecutive_integer_lcm;
 *carmichael_lambda = \&Math::Prime::Util::PP::carmichael_lambda;
 *exp_mangoldt = \&Math::Prime::Util::PP::exp_mangoldt;
@@ -258,10 +383,23 @@ sub entropy_bytes {
 *sumliouville = \&Math::Prime::Util::PP::sumliouville;
 *frobenius_number = \&Math::Prime::Util::PP::frobenius_number;
 *binomial = \&Math::Prime::Util::PP::binomial;
+*factorial = \&Math::Prime::Util::PP::factorial;
+*multifactorial = \&Math::Prime::Util::PP::multifactorial;
 *subfactorial = \&Math::Prime::Util::PP::subfactorial;
+*stirling = \&Math::Prime::Util::PP::stirling;
+*catalan_number = \&Math::Prime::Util::PP::catalan_number;
+*bell_number = \&Math::Prime::Util::PP::bell_number;
 *fubini = \&Math::Prime::Util::PP::fubini;
+*integer_complexity = \&Math::Prime::Util::PP::integer_complexity;
 *falling_factorial = \&Math::Prime::Util::PP::falling_factorial;
 *rising_factorial = \&Math::Prime::Util::PP::rising_factorial;
+
+*prime_signature = \&Math::Prime::Util::PP::prime_signature;
+*sopfr = \&Math::Prime::Util::PP::sopfr;
+*sopf = \&Math::Prime::Util::PP::sopf;
+*digital_root = \&Math::Prime::Util::PP::digital_root;
+*mult_digital_root = \&Math::Prime::Util::PP::mult_digital_root;
+*abundance = \&Math::Prime::Util::PP::abundance;
 
 *chebyshev_theta = \&Math::Prime::Util::PP::chebyshev_theta;
 *chebyshev_psi = \&Math::Prime::Util::PP::chebyshev_psi;
@@ -273,6 +411,8 @@ sub entropy_bytes {
 *harmfrac = \&Math::Prime::Util::PP::harmfrac;
 *contfrac = \&Math::Prime::Util::PP::contfrac;
 *from_contfrac = \&Math::Prime::Util::PP::from_contfrac;
+*convergents = \&Math::Prime::Util::PP::convergents;
+*bestrational = \&Math::Prime::Util::PP::bestrational;
 *next_calkin_wilf = \&Math::Prime::Util::PP::next_calkin_wilf;
 *next_stern_brocot = \&Math::Prime::Util::PP::next_stern_brocot;
 *calkin_wilf_n = \&Math::Prime::Util::PP::calkin_wilf_n;
@@ -285,78 +425,105 @@ sub entropy_bytes {
 *farey_rank = \&Math::Prime::Util::PP::farey_rank;
 
 
-*addint = \&Math::Prime::Util::PP::addint;
-*subint = \&Math::Prime::Util::PP::subint;
-*add1int = \&Math::Prime::Util::PP::add1int;
-*sub1int = \&Math::Prime::Util::PP::sub1int;
-*lshiftint = \&Math::Prime::Util::PP::lshiftint;
-*rshiftint = \&Math::Prime::Util::PP::rshiftint;
+*addint     = \&Math::Prime::Util::PP::addint;
+*subint     = \&Math::Prime::Util::PP::subint;
+*add1int    = \&Math::Prime::Util::PP::add1int;
+*sub1int    = \&Math::Prime::Util::PP::sub1int;
+*lshiftint  = \&Math::Prime::Util::PP::lshiftint;
+*rshiftint  = \&Math::Prime::Util::PP::rshiftint;
 *rashiftint = \&Math::Prime::Util::PP::rashiftint;
-*mulint = \&Math::Prime::Util::PP::mulint;
-*powint = \&Math::Prime::Util::PP::powint;
-*divint = \&Math::Prime::Util::PP::divint;
-*modint = \&Math::Prime::Util::PP::modint;
-*cdivint = \&Math::Prime::Util::PP::cdivint;
-*divrem = \&Math::Prime::Util::PP::divrem;
-*tdivrem = \&Math::Prime::Util::PP::tdivrem;
-*fdivrem = \&Math::Prime::Util::PP::fdivrem;
-*cdivrem = \&Math::Prime::Util::PP::cdivrem;
-*absint = \&Math::Prime::Util::PP::absint;
-*negint = \&Math::Prime::Util::PP::negint;
-*signint = \&Math::Prime::Util::PP::signint;
-*cmpint = \&Math::Prime::Util::PP::cmpint;
-*sqrtint = \&Math::Prime::Util::PP::sqrtint;
-*rootint = \&Math::Prime::Util::PP::rootint;
-*logint = \&Math::Prime::Util::PP::logint;
+*mulint     = \&Math::Prime::Util::PP::mulint;
+*powint     = \&Math::Prime::Util::PP::powint;
+*divint     = \&Math::Prime::Util::PP::divint;
+*modint     = \&Math::Prime::Util::PP::modint;
+*cdivint    = \&Math::Prime::Util::PP::cdivint;
+*divrem     = \&Math::Prime::Util::PP::divrem;
+*tdivrem    = \&Math::Prime::Util::PP::tdivrem;
+*fdivrem    = \&Math::Prime::Util::PP::fdivrem;
+*cdivrem    = \&Math::Prime::Util::PP::cdivrem;
+*muladdint  = \&Math::Prime::Util::PP::muladdint;
+*mulsubint  = \&Math::Prime::Util::PP::mulsubint;
+*absint     = \&Math::Prime::Util::PP::absint;
+*negint     = \&Math::Prime::Util::PP::negint;
+*signint    = \&Math::Prime::Util::PP::signint;
+*cmpint     = \&Math::Prime::Util::PP::cmpint;
+*sqrtint    = \&Math::Prime::Util::PP::sqrtint;
+*rootint    = \&Math::Prime::Util::PP::rootint;
+*crootint   = \&Math::Prime::Util::PP::crootint;
+*logint     = \&Math::Prime::Util::PP::logint;
 
-*negmod = \&Math::Prime::Util::PP::negmod;
-*sqrtmod = \&Math::Prime::Util::PP::sqrtmod;
+*addmod     = \&Math::Prime::Util::PP::addmod;
+*submod     = \&Math::Prime::Util::PP::submod;
+*mulmod     = \&Math::Prime::Util::PP::mulmod;
+*divmod     = \&Math::Prime::Util::PP::divmod;
+*powmod     = \&Math::Prime::Util::PP::powmod;
+*invmod     = \&Math::Prime::Util::PP::invmod;
+*muladdmod  = \&Math::Prime::Util::PP::muladdmod;
+*mulsubmod  = \&Math::Prime::Util::PP::mulsubmod;
+*negmod     = \&Math::Prime::Util::PP::negmod;
+*sqrtmod    = \&Math::Prime::Util::PP::sqrtmod;
 *allsqrtmod = \&Math::Prime::Util::PP::allsqrtmod;
-*rootmod = \&Math::Prime::Util::PP::rootmod;
+*rootmod    = \&Math::Prime::Util::PP::rootmod;
 *allrootmod = \&Math::Prime::Util::PP::allrootmod;
-*factorialmod = \&Math::Prime::Util::PP::factorialmod;
-*binomialmod = \&Math::Prime::Util::PP::binomialmod;
-*lucasumod = \&Math::Prime::Util::PP::lucasumod;
-*lucasvmod = \&Math::Prime::Util::PP::lucasvmod;
-*lucasuvmod = \&Math::Prime::Util::PP::lucasuvmod;
-*pisano_period = \&Math::Prime::Util::PP::pisano_period;
-*znlog = \&Math::Prime::Util::PP::znlog;
-*znorder = \&Math::Prime::Util::PP::znorder;
-*znprimroot = \&Math::Prime::Util::PP::znprimroot;
+
+*factorialmod   = \&Math::Prime::Util::PP::factorialmod;
+*binomialmod    = \&Math::Prime::Util::PP::binomialmod;
+*lucas_sequence = \&Math::Prime::Util::PP::lucas_sequence;
+*lucasu         = \&Math::Prime::Util::PP::lucasu;
+*lucasv         = \&Math::Prime::Util::PP::lucasv;
+*lucasuv        = \&Math::Prime::Util::PP::lucasuv;
+*lucasumod      = \&Math::Prime::Util::PP::lucasumod;
+*lucasvmod      = \&Math::Prime::Util::PP::lucasvmod;
+*lucasuvmod     = \&Math::Prime::Util::PP::lucasuvmod;
+*fibonacci      = \&Math::Prime::Util::PP::fibonacci;
+*lucas_number   = \&Math::Prime::Util::PP::lucas_number;
+*pisano_period  = \&Math::Prime::Util::PP::pisano_period;
+*znlog          = \&Math::Prime::Util::PP::znlog;
+*znorder        = \&Math::Prime::Util::PP::znorder;
+*znprimroot     = \&Math::Prime::Util::PP::znprimroot;
+*qnr            = \&Math::Prime::Util::PP::qnr;
+*is_qr          = \&Math::Prime::Util::PP::is_qr;
+*kronecker      = \&Math::Prime::Util::PP::kronecker;
 *is_primitive_root = \&Math::Prime::Util::PP::is_primitive_root;
-*qnr = \&Math::Prime::Util::PP::qnr;
-*is_qr = \&Math::Prime::Util::PP::is_qr;
 
+*vecequal       = \&Math::Prime::Util::PP::vecequal;
+*vecuniq        = \&Math::Prime::Util::PP::vecuniq;
+*vecfreq        = \&Math::Prime::Util::PP::vecfreq;
+*vecsingleton   = \&Math::Prime::Util::PP::vecsingleton;
+*vecprefixsum   = \&Math::Prime::Util::PP::vecprefixsum;
+*vecwindow      = \&Math::Prime::Util::PP::vecwindow;
+*vecsample      = \&Math::Prime::Util::PP::vecsample;
+*vecsort        = \&Math::Prime::Util::PP::vecsort;
+*vecsorti       = \&Math::Prime::Util::PP::vecsorti;
+*vecrsort       = \&Math::Prime::Util::PP::vecrsort;
+*vecrsorti      = \&Math::Prime::Util::PP::vecrsorti;
+*vecmex         = \&Math::Prime::Util::PP::vecmex;
+*vecpmex        = \&Math::Prime::Util::PP::vecpmex;
+*vecextract     = \&Math::Prime::Util::PP::vecextract;
 
-*vecequal = \&Math::Prime::Util::PP::vecequal;
-*vecuniq = \&Math::Prime::Util::PP::vecuniq;
-*vecfreq = \&Math::Prime::Util::PP::vecfreq;
-*vecsingleton = \&Math::Prime::Util::PP::vecsingleton;
-*vecsort = \&Math::Prime::Util::PP::vecsort;
-*vecsorti = \&Math::Prime::Util::PP::vecsorti;
-*setbinop = \&Math::Prime::Util::PP::setbinop;
-*sumset = \&Math::Prime::Util::PP::sumset;
-*setunion = \&Math::Prime::Util::PP::setunion;
-*setintersect = \&Math::Prime::Util::PP::setintersect;
-*setminus = \&Math::Prime::Util::PP::setminus;
-*setdelta = \&Math::Prime::Util::PP::setdelta;
-*setinsert = \&Math::Prime::Util::PP::setinsert;
-*setremove = \&Math::Prime::Util::PP::setremove;
-*setinvert = \&Math::Prime::Util::PP::setinvert;
-*setcontains = \&Math::Prime::Util::PP::setcontains;
+*setbinop       = \&Math::Prime::Util::PP::setbinop;
+*sumset         = \&Math::Prime::Util::PP::sumset;
+*setunion       = \&Math::Prime::Util::PP::setunion;
+*setintersect   = \&Math::Prime::Util::PP::setintersect;
+*setminus       = \&Math::Prime::Util::PP::setminus;
+*setdelta       = \&Math::Prime::Util::PP::setdelta;
+*setinsert      = \&Math::Prime::Util::PP::setinsert;
+*setremove      = \&Math::Prime::Util::PP::setremove;
+*setinvert      = \&Math::Prime::Util::PP::setinvert;
+*setcontains    = \&Math::Prime::Util::PP::setcontains;
 *setcontainsany = \&Math::Prime::Util::PP::setcontainsany;
-*toset = \&Math::Prime::Util::PP::toset;
-*is_sidon_set = \&Math::Prime::Util::PP::is_sidon_set;
+*toset          = \&Math::Prime::Util::PP::toset;
+*is_sidon_set   = \&Math::Prime::Util::PP::is_sidon_set;
 *is_sumfree_set = \&Math::Prime::Util::PP::is_sumfree_set;
-*set_is_disjoint = \&Math::Prime::Util::PP::set_is_disjoint;
-*set_is_equal = \&Math::Prime::Util::PP::set_is_equal;
-*set_is_subset = \&Math::Prime::Util::PP::set_is_subset;
-*set_is_proper_subset = \&Math::Prime::Util::PP::set_is_proper_subset;
-*set_is_superset = \&Math::Prime::Util::PP::set_is_superset;
-*set_is_proper_superset = \&Math::Prime::Util::PP::set_is_proper_superset;
+*set_is_disjoint= \&Math::Prime::Util::PP::set_is_disjoint;
+*set_is_equal   = \&Math::Prime::Util::PP::set_is_equal;
+*set_is_subset  = \&Math::Prime::Util::PP::set_is_subset;
+*set_is_proper_subset       = \&Math::Prime::Util::PP::set_is_proper_subset;
+*set_is_superset            = \&Math::Prime::Util::PP::set_is_superset;
+*set_is_proper_superset     = \&Math::Prime::Util::PP::set_is_proper_superset;
 *set_is_proper_intersection = \&Math::Prime::Util::PP::set_is_proper_intersection;
 
-*tozeckendorf = \&Math::Prime::Util::PP::tozeckendorf;
+*tozeckendorf   = \&Math::Prime::Util::PP::tozeckendorf;
 *fromzeckendorf = \&Math::Prime::Util::PP::fromzeckendorf;
 
 *goldbach_pairs = \&Math::Prime::Util::PP::goldbach_pairs;
@@ -392,15 +559,22 @@ sub entropy_bytes {
 *nth_lucky_lower = \&Math::Prime::Util::PP::nth_lucky_lower;
 *nth_lucky_upper = \&Math::Prime::Util::PP::nth_lucky_upper;
 
-*semiprime_count_approx = \&Math::Prime::Util::PP::semiprime_count_approx;
-*nth_semiprime_approx = \&Math::Prime::Util::PP::nth_semiprime_approx;
-*twin_prime_count_approx = \&Math::Prime::Util::PP::twin_prime_count_approx;
+*nth_twin_prime = \&Math::Prime::Util::PP::nth_twin_prime;
 *nth_twin_prime_approx = \&Math::Prime::Util::PP::nth_twin_prime_approx;
+*twin_prime_count_approx = \&Math::Prime::Util::PP::twin_prime_count_approx;
 *nth_semiprime = \&Math::Prime::Util::PP::nth_semiprime;
+*nth_semiprime_approx = \&Math::Prime::Util::PP::nth_semiprime_approx;
+*semiprime_count_approx = \&Math::Prime::Util::PP::semiprime_count_approx;
 
+*nth_almost_prime = \&Math::Prime::Util::PP::nth_almost_prime;
+*nth_almost_prime_approx = \&Math::Prime::Util::PP::nth_almost_prime_approx;
+*nth_almost_prime_lower = \&Math::Prime::Util::PP::nth_almost_prime_lower;
+*nth_almost_prime_upper = \&Math::Prime::Util::PP::nth_almost_prime_upper;
 *almost_prime_count_approx = \&Math::Prime::Util::PP::almost_prime_count_approx;
 *almost_prime_count_lower  = \&Math::Prime::Util::PP::almost_prime_count_lower;
 *almost_prime_count_upper  = \&Math::Prime::Util::PP::almost_prime_count_upper;
+
+*nth_omega_prime = \&Math::Prime::Util::PP::nth_omega_prime;
 
 *ramanujan_prime_count_approx= \&Math::Prime::Util::PP::ramanujan_prime_count_approx;
 *ramanujan_prime_count_lower = \&Math::Prime::Util::PP::ramanujan_prime_count_lower;
@@ -410,191 +584,32 @@ sub entropy_bytes {
 *nth_ramanujan_prime_upper =\&Math::Prime::Util::PP::nth_ramanujan_prime_upper;
 *nth_ramanujan_prime_approx=\&Math::Prime::Util::PP::nth_ramanujan_prime_approx;
 
-*factor = \&Math::Prime::Util::PP::factor;
-*factor_exp = \&Math::Prime::Util::PP::factor_exp;
-*trial_factor = \&Math::Prime::Util::PP::trial_factor;
-*prho_factor = \&Math::Prime::Util::PP::prho_factor;
-*pbrent_factor = \&Math::Prime::Util::PP::pbrent_factor;
-*ecm_factor = \&Math::Prime::Util::PP::ecm_factor;
-*fermat_factor = \&Math::Prime::Util::PP::fermat_factor;
-*holf_factor = \&Math::Prime::Util::PP::holf_factor;
-*squfof_factor = \&Math::Prime::Util::PP::squfof_factor;
-*lehman_factor = \&Math::Prime::Util::PP::lehman_factor;
+*factor         = \&Math::Prime::Util::PP::factor;
+*factor_exp     = \&Math::Prime::Util::PP::factor_exp;
+*trial_factor   = \&Math::Prime::Util::PP::trial_factor;
+*prho_factor    = \&Math::Prime::Util::PP::prho_factor;
+*pbrent_factor  = \&Math::Prime::Util::PP::pbrent_factor;
+*ecm_factor     = \&Math::Prime::Util::PP::ecm_factor;
+*fermat_factor  = \&Math::Prime::Util::PP::fermat_factor;
+*holf_factor    = \&Math::Prime::Util::PP::holf_factor;
+*squfof_factor  = \&Math::Prime::Util::PP::squfof_factor;
+*lehman_factor  = \&Math::Prime::Util::PP::lehman_factor;
 *pminus1_factor = \&Math::Prime::Util::PP::pminus1_factor;
-*pplus1_factor = \&Math::Prime::Util::PP::pplus1_factor;
-*cheb_factor = \&Math::Prime::Util::PP::cheb_factor;
+*pplus1_factor  = \&Math::Prime::Util::PP::pplus1_factor;
+*cheb_factor    = \&Math::Prime::Util::PP::cheb_factor;
 
-*primes = \&Math::Prime::Util::PP::primes;
-*prime_powers = \&Math::Prime::Util::PP::prime_powers;
-*twin_primes = \&Math::Prime::Util::PP::twin_primes;
-*semi_primes = \&Math::Prime::Util::PP::semi_primes;
+*primes           = \&Math::Prime::Util::PP::primes;
+*prime_powers     = \&Math::Prime::Util::PP::prime_powers;
+*twin_primes      = \&Math::Prime::Util::PP::twin_primes;
+*semi_primes      = \&Math::Prime::Util::PP::semi_primes;
 *ramanujan_primes = \&Math::Prime::Util::PP::ramanujan_primes;
-*almost_primes = \&Math::Prime::Util::PP::almost_primes;
-*omega_primes = \&Math::Prime::Util::PP::omega_primes;
+*almost_primes    = \&Math::Prime::Util::PP::almost_primes;
+*omega_primes     = \&Math::Prime::Util::PP::omega_primes;
+
+*Pi = \&Math::Prime::Util::PP::Pi;
 
 
 # We are doing the validation here so the PP code doesn't have to do it.
-
-sub nth_twin_prime {
-  my($n) = @_;
-  _validate_integer_nonneg($n);
-  return Math::Prime::Util::PP::nth_twin_prime($n);
-}
-sub nth_almost_prime {
-  my($k,$n) = @_;
-  _validate_integer_nonneg($k);
-  _validate_integer_nonneg($n);
-  return Math::Prime::Util::PP::nth_almost_prime($k,$n);
-}
-sub nth_almost_prime_approx {
-  my($k,$n) = @_;
-  _validate_integer_nonneg($k);
-  _validate_integer_nonneg($n);
-  return Math::Prime::Util::PP::nth_almost_prime_approx($k,$n);
-}
-sub nth_almost_prime_lower {
-  my($k,$n) = @_;
-  _validate_integer_nonneg($k);
-  _validate_integer_nonneg($n);
-  return Math::Prime::Util::PP::nth_almost_prime_lower($k,$n);
-}
-sub nth_almost_prime_upper {
-  my($k,$n) = @_;
-  _validate_integer_nonneg($k);
-  _validate_integer_nonneg($n);
-  return Math::Prime::Util::PP::nth_almost_prime_upper($k,$n);
-}
-sub nth_omega_prime {
-  my($k,$n) = @_;
-  _validate_integer_nonneg($k);
-  _validate_integer_nonneg($n);
-  return Math::Prime::Util::PP::nth_omega_prime($k,$n);
-}
-
-sub is_lucas_pseudoprime {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  return Math::Prime::Util::PP::is_lucas_pseudoprime($n);
-}
-sub is_strong_lucas_pseudoprime {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  return Math::Prime::Util::PP::is_strong_lucas_pseudoprime($n);
-}
-sub is_extra_strong_lucas_pseudoprime {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  return Math::Prime::Util::PP::is_extra_strong_lucas_pseudoprime($n);
-}
-sub is_almost_extra_strong_lucas_pseudoprime {
-  my($n, $increment) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  if (defined $increment) { _validate_integer_nonneg($increment); }
-  else                    { $increment = 1; }
-  croak "aes lucas pseudoprime parameter must be 1-256"
-    if $increment < 1 || $increment > 256;
-  return Math::Prime::Util::PP::is_almost_extra_strong_lucas_pseudoprime($n, $increment);
-}
-sub is_catalan_pseudoprime {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  return Math::Prime::Util::PP::is_catalan_pseudoprime($n);
-}
-sub is_frobenius_pseudoprime {
-  my($n, $P, $Q) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  # TODO: validate P & Q
-  return Math::Prime::Util::PP::is_frobenius_pseudoprime($n, $P, $Q);
-}
-sub is_frobenius_underwood_pseudoprime {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  return Math::Prime::Util::PP::is_frobenius_underwood_pseudoprime($n);
-}
-sub is_frobenius_khashin_pseudoprime {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  return Math::Prime::Util::PP::is_frobenius_khashin_pseudoprime($n);
-}
-sub is_aks_prime {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  return Math::Prime::Util::PP::is_aks_prime($n);
-}
-sub is_ramanujan_prime {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 0;
-  return Math::Prime::Util::PP::is_ramanujan_prime($n);
-}
-sub is_mersenne_prime {
-  my($p) = @_;
-  _validate_integer_nonneg($p);
-  return Math::Prime::Util::PP::is_mersenne_prime($p);
-}
-sub lucas_sequence {
-  my($n, $P, $Q, $k) = @_;
-  my ($vp, $vq) = ($P, $Q);
-  _validate_integer_positive($n);
-  _validate_integer($vp);
-  _validate_integer($vq);
-  _validate_integer_nonneg($k);
-  return Math::Prime::Util::PP::lucas_sequence(@_);
-}
-sub lucasu {
-  my($P, $Q, $k) = @_;
-  my ($vp, $vq) = ($P, $Q);
-  _validate_integer($vp);
-  _validate_integer($vq);
-  _validate_integer_nonneg($k);
-  return Math::Prime::Util::PP::lucasu($P,$Q,$k);
-}
-sub lucasv {
-  my($P, $Q, $k) = @_;
-  my ($vp, $vq) = ($P, $Q);
-  _validate_integer($vp);
-  _validate_integer($vq);
-  _validate_integer_nonneg($k);
-  return Math::Prime::Util::PP::lucasv($P,$Q,$k);
-}
-sub lucasuv {
-  my($P, $Q, $k) = @_;
-  _validate_integer($P);
-  _validate_integer($Q);
-  _validate_integer_nonneg($k);
-  return Math::Prime::Util::PP::lucasuv($P,$Q,$k);
-}
-
-sub kronecker {
-  my($a, $b) = @_;
-  my ($va, $vb) = ($a, $b);
-  _validate_integer($va);
-  _validate_integer($vb);
-  return Math::Prime::Util::PP::kronecker(@_);
-}
-
-sub factorial {
-  my($n) = @_;
-  _validate_integer_nonneg($n);
-  return Math::Prime::Util::PP::factorial($n);
-}
-
-sub stirling {
-  my($n, $k, $type) = @_;
-  _validate_integer_nonneg($n);
-  _validate_integer_nonneg($k);
-  _validate_integer_nonneg($type) if defined $type;
-  return Math::Prime::Util::PP::stirling($n, $k, $type);
-}
 
 sub gcd {
   my(@v) = @_;
@@ -621,142 +636,34 @@ sub vecmax {
   _validate_integer($_) for @v;
   return Math::Prime::Util::PP::vecmax(@v);
 }
-sub vecmex {
-  my(@v) = @_;
-  _validate_integer_nonneg($_) for @v;
-  return Math::Prime::Util::PP::vecmex(@v);
-}
-sub vecpmex {
-  my(@v) = @_;
-  for (@v) {
-    _validate_integer_nonneg($_);
-    croak "parameter must be a positive integer (x > 0)" if $_ <= 0;
-  }
-  return Math::Prime::Util::PP::vecpmex(@v);
-}
-sub invmod {
-  my ($a, $n) = @_;
-  _validate_integer($a);
-  _validate_integer($n);
-  return Math::Prime::Util::PP::invmod($a,$n);
-}
-sub addmod {
-  my ($a, $b, $n) = @_;
-  _validate_integer($a); _validate_integer($b); _validate_integer($n);
-  return Math::Prime::Util::PP::addmod($a,$b, $n);
-}
-sub submod {
-  my ($a, $b, $n) = @_;
-  _validate_integer($a); _validate_integer($b); _validate_integer($n);
-  return Math::Prime::Util::PP::submod($a,$b, $n);
-}
-sub mulmod {
-  my ($a, $b, $n) = @_;
-  _validate_integer($a); _validate_integer($b); _validate_integer($n);
-  return Math::Prime::Util::PP::mulmod($a,$b, $n);
-}
-sub divmod {
-  my ($a, $b, $n) = @_;
-  _validate_integer($a); _validate_integer($b); _validate_integer($n);
-  return Math::Prime::Util::PP::divmod($a,$b, $n);
-}
-sub powmod {
-  my ($a, $b, $n) = @_;
-  _validate_integer($a); _validate_integer($b); _validate_integer($n);
-  return Math::Prime::Util::PP::powmod($a,$b, $n);
-}
-sub muladdmod {
-  my ($a, $b, $c, $n) = @_;
-  _validate_integer($a); _validate_integer($b); _validate_integer($c); _validate_integer($n);
-  return Math::Prime::Util::PP::muladdmod($a,$b,$c, $n);
-}
-sub mulsubmod {
-  my ($a, $b, $c, $n) = @_;
-  _validate_integer($a); _validate_integer($b); _validate_integer($c); _validate_integer($n);
-  return Math::Prime::Util::PP::mulsubmod($a,$b,$c, $n);
-}
-
-
-sub Pi {
-  my($digits) = @_;
-  _validate_integer_nonneg($digits) if defined $digits;
-  return Math::Prime::Util::PP::Pi($digits);
-}
 
 #############################################################################
 
 my $_exitloop = 0;
-sub lastfor { $_exitloop = 1; }
+my $_forcount = 0;
+sub lastfor { croak "lastfor called outside a loop" if $_forcount == 0; $_exitloop = 1; }
 sub _get_forexit { $_exitloop; }
-sub _start_for_loop { my $old = $_exitloop; $_exitloop = 0; $old; }
-sub _end_for_loop { $_exitloop = shift; }
+sub _start_for_loop { $_forcount++; my $old = $_exitloop; $_exitloop = 0; $old; }
+sub _end_for_loop { $_forcount--; $_exitloop = shift; }
 
 no warnings 'prototype';
-sub forprimes (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forprimes(@_);
-}
-sub forcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forcomposites(@_);
-}
-sub foroddcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::foroddcomposites(@_);
-}
-sub forsemiprimes(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forsemiprimes(@_);
-}
-sub foralmostprimes(&$$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::foralmostprimes(@_);
-}
-sub forfactored(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forfactored(@_);
-}
-sub forsquarefree(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forsquarefree(@_);
-}
-sub forsquarefreeint(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forsquarefreeint(@_);
-}
-sub fordivisors (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::fordivisors(@_);
-}
-sub forpart (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forpart(@_);
-}
-sub forcomp (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forcomp(@_);
-}
-sub forcomb (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forcomb(@_);
-}
-sub forperm (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forperm(@_);
-}
-sub forderange (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  Math::Prime::Util::PP::forderange(@_);
-}
 
-sub forsetproduct (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  my($sub, @v) = @_;
-  croak 'Not a subroutine reference' unless (ref($sub) || '') eq 'CODE';
-  croak 'Not an array reference' if grep {(ref($_) || '') ne 'ARRAY'} @v;
-  # Exit if no arrays or any are empty.
-  return if scalar(@v) == 0 || grep { !@$_ } @v;
+*forprimes        = \&Math::Prime::Util::PP::forprimes;
+*forcomposites    = \&Math::Prime::Util::PP::forcomposites;
+*foroddcomposites = \&Math::Prime::Util::PP::foroddcomposites;
+*forsemiprimes    = \&Math::Prime::Util::PP::forsemiprimes;
+*foralmostprimes  = \&Math::Prime::Util::PP::foralmostprimes;
+*forfactored      = \&Math::Prime::Util::PP::forfactored;
+*forsquarefree    = \&Math::Prime::Util::PP::forsquarefree;
+*forsquarefreeint = \&Math::Prime::Util::PP::forsquarefreeint;
+*forsetproduct    = \&Math::Prime::Util::PP::forsetproduct;
 
-  my @outv = map { $v[$_]->[0] } 0 .. $#v;
-  my @cnt = (0) x @v;
-
-  my $oldforexit = _start_for_loop();
-  my $i = 0;
-  while ($i >= 0) {
-    $sub->(@outv);
-    last if $_exitloop;
-    for ($i = $#v; $i >= 0; $i--) {
-      if ($cnt[$i] >= $#{$v[$i]}) { $cnt[$i] = 0; $outv[$i] = $v[$i]->[0]; }
-      else { $outv[$i] = $v[$i]->[++$cnt[$i]]; last; }
-    }
-  }
-  _end_for_loop($oldforexit);
-}
+*fordivisors = \&Math::Prime::Util::PP::fordivisors;
+*forpart     = \&Math::Prime::Util::PP::forpart;
+*forcomp     = \&Math::Prime::Util::PP::forcomp;
+*forcomb     = \&Math::Prime::Util::PP::forcomb;
+*forperm     = \&Math::Prime::Util::PP::forperm;
+*forderange  = \&Math::Prime::Util::PP::forderange;
 
 sub vecreduce (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
   my($sub, @v) = @_;
@@ -780,7 +687,41 @@ sub vecslide (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
   no strict 'refs'; ## no critic(strict)
   local(*{$caller.'::a'}) = \my $a;
   local(*{$caller.'::b'}) = \my $b;
-  return map { $a = $v[$_-1];  $b = $v[$_];  $sub->(); } 1..$#v;
+  map { $a = $v[$_-1];  $b = $v[$_];  scalar $sub->(); } 1..$#v;
+}
+sub vecpairwise (&$$) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  my($sub, $ra, $rb) = @_;
+  croak 'Not a subroutine reference'
+    unless ref($sub) && (reftype($sub)||'') eq 'CODE';
+  croak 'vecpairwise: expected two array references'
+    unless ref($ra) && (reftype($ra)||'') eq 'ARRAY' &&
+           ref($rb) && (reftype($rb)||'') eq 'ARRAY';
+
+  my $n = (@$ra < @$rb) ? scalar(@$ra) : scalar(@$rb);
+  my $caller = caller();
+  no strict 'refs'; ## no critic(strict)
+  my($a, $b);
+  local(*{$caller.'::a'}) = \$a;
+  local(*{$caller.'::b'}) = \$b;
+
+  if (!wantarray) {
+    my $count = 0;
+    for my $i (0 .. $n-1) {
+      $a = exists $ra->[$i] ? $ra->[$i] : undef;
+      $b = exists $rb->[$i] ? $rb->[$i] : undef;
+      my @r = $sub->();
+      $count += scalar(@r);
+    }
+    return $count;
+  } else {
+    my @result;
+    for my $i (0 .. $n-1) {
+      $a = exists $ra->[$i] ? $ra->[$i] : undef;
+      $b = exists $rb->[$i] ? $rb->[$i] : undef;
+      push @result, $sub->();
+    }
+    return @result;
+  }
 }
 
 sub vecany (&@) {       ## no critic qw(ProhibitSubroutinePrototypes)
@@ -801,7 +742,7 @@ sub vecnone (&@) {      ## no critic qw(ProhibitSubroutinePrototypes)
 sub vecnotall (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
   my $sub = shift;
   $sub->() or return 1 foreach @_;
-  undef;
+  0;
 }
 
 sub vecfirst (&@) {     ## no critic qw(ProhibitSubroutinePrototypes)
@@ -815,18 +756,6 @@ sub vecfirstidx (&@) {     ## no critic qw(ProhibitSubroutinePrototypes)
   my $i = 0;
   ++$i and $sub->() and return $i-1 foreach @_;
   -1;
-}
-
-sub vecextract {
-  my($aref, $mask) = @_;
-  croak "vecextract first argument must be an array reference"
-    unless ref($aref) eq 'ARRAY';
-  return Math::Prime::Util::PP::vecextract(@_);
-}
-
-sub vecsample ($@) {       ## no critic qw(ProhibitSubroutinePrototypes)
-  _validate_integer_nonneg($_[0]);
-  Math::Prime::Util::PP::vecsample(@_);
 }
 
 1;

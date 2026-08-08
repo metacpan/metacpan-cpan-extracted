@@ -1,5 +1,41 @@
 Revision history for App-GHGen
 
+0.08	Fri Aug  7 01:31:57 PM EDT 2026
+	[ Enhancements ]
+	- Update to shogo82148/actions-setup-perl@v1.42.0
+
+	[ Bug Fixes ]
+	- Fixed false-positive in Analyzer::has_outdated_runners: the unanchored
+	  alternation /ubuntu-18.04|ubuntu-16.04|macos-10\.15/ matched any runner
+	  name that contained those strings as a substring (e.g. a self-hosted runner
+	  named "my-ubuntu-18.04-builder" was incorrectly flagged as outdated).
+	  Anchored with \A...\z so only exact GitHub-hosted runner labels are matched.
+	- Changed greedy (.+) to non-greedy (.+?) in Fixer::fix_unpinned_actions
+	  /^(.+?)\@(?:master|main)$/.  Both forms produce identical captures when
+	  @master or @main appears only once (the common case), because the `$`
+	  anchor forces both to find the same split point.  Non-greedy is preferred
+	  because it reaches a match with fewer backtrack steps on short strings.
+
+	[ Internal ]
+	- Replaced all unnecessary capturing groups with non-capturing (?:...) across
+	  Analyzer.pm, Fixer.pm, CostEstimator.pm, Detector.pm, Interactive.pm, and
+	  bin/ghgen.  Affected patterns: (master|main), (install|ci), (build|test),
+	  (node|python|go|ruby), (npm|pytest|cargo|go), (cpp|cc|cxx|hpp|hxx|h),
+	  y(es)?, n(o)?.  No behaviour change; removes pointless capture-register
+	  allocation on every match.
+	- Eliminated DRY violation in action-version knowledge: the %updates hash
+	  that was defined identically as a local my %updates in both
+	  Analyzer::find_outdated_actions and Fixer::update_actions is now a single
+	  our %ACTION_UPDATES declared in Fixer.pm and exported/imported by
+	  Analyzer.pm.  Detection and fix capability are now provably in sync: every
+	  action flagged by the Analyzer can be fixed by the Fixer, and vice versa.
+	- Replaced the 8-branch elsif chain in Fixer::apply_fixes with a file-scope
+	  dispatch table @_APPLY_RULES.  Each entry is a three-element array
+	  [type, compiled-pattern, handler].  Cyclomatic complexity drops from 8
+	  to 1; adding a new fix type requires appending a single row rather than
+	  editing a conditional chain.  Anonymous delegate wrappers (sub($wf){...})
+	  around each handler ensure symbol-table mocks work correctly in tests.
+
 0.07	Mon Jul 27 15:32:43 EDT 2026
 	[ Bug Fixes ]
 	- Added matrix exclusion for windows-latest + perl 5.40.  The

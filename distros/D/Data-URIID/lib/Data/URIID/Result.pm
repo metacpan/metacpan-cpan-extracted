@@ -34,7 +34,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.22;
+our $VERSION = v0.23;
 
 use parent 'Data::URIID::Base';
 
@@ -173,6 +173,7 @@ my %best_services = (
     'ruthede-comic-post-identifier' => 'ruthede',
     'danbooru2chanjp-post-identifier' => 'danbooru2chanjp',
     'denkxweb-hessen-identifier'    => 'denkxweb-hessen',
+    'ibbco-identifier'              => 'ibbco',
 );
 
 # Load extra services:
@@ -335,6 +336,9 @@ my %url_templates = (
     ],
     'denkxweb-hessen' => [
         ['denkxweb-hessen-identifier' => 'https://denkxweb.denkmalpflege-hessen.de/%u/', undef, [qw(info)]],
+    ],
+    'ibbco' => [
+        ['ibbco-identifier' => 'https://ibb.co/%s', undef, [qw(info render)]],
     ],
 );
 my %digest_url_templates = (
@@ -846,6 +850,14 @@ my %url_parser = (
             action => 'info',
             id => \1,
         },
+        {
+            host => 'ibb.co',
+            path => qr#^/([a-zA-Z0-9]+)\z#,
+            source => 'ibbco',
+            type => 'ibbco-identifier',
+            action => 'info',
+            id => \1,
+        },
     ],
 );
 
@@ -883,6 +895,7 @@ my %syntax = (
     'imgur-post-identifier'         => qr/^[0-9a-zA-Z]{7}$/,
     'fefe-blog-post-identifier'     => qr/^[0-9a-f]{8}$/,
     'danbooru2chanjp-tag'           => qr/./,
+    'ibbco-identifier'              => qr/^[a-zA-Z0-9]+\z/,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
     (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier sirtx-numerical-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier denkxweb-hessen-identifier)),
 );
@@ -1934,7 +1947,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.22
+version v0.23
 
 =head1 SYNOPSIS
 

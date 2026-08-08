@@ -19,6 +19,7 @@
 #16 here_indent.here_indent1
 #17 here_indent.here_indent2
 #18 here_indent.here_indent3
+#19 git211.def
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -278,6 +279,14 @@ sub baz {
 }
 ----------
 
+        'git211' => <<'----------',
+eval { @$list = map( { [ qr($_), $_, 0 ]; } @$list ); };
+eval {
+    @$list = map( { [ qr($_), $_, 0 ]; } @$list );
+};
+eval { @$list = map { [ qr($_), $_, 0 ]; } @$list; };
+----------
+
         'here_indent' => <<'----------',
 {
     my $name = "Sir or Madam";
@@ -295,6 +304,12 @@ STD1
 ====
 STD2
     print $text;
+
+    # backslash test
+    my $str = << "gobble'de'gook\"weird";
+Enjoy your prize!
+gobble'de'gook"weird
+    print "$str";
 }
 
 my %hash = (
@@ -661,6 +676,12 @@ STD1
 ====
 STD2
     print $text;
+
+    # backslash test
+    my $str = <<"gobble'de'gook\"weird";
+Enjoy your prize!
+gobble'de'gook"weird
+    print "$str";
 }
 
 my %hash = (
@@ -697,6 +718,12 @@ STD1
 ====
 STD2
     print $text;
+
+    # backslash test
+    my $str = <<"gobble'de'gook\"weird";
+Enjoy your prize!
+gobble'de'gook"weird
+    print "$str";
 }
 
 my %hash = (
@@ -733,6 +760,12 @@ STD3
     ====
     STD2
     print $text;
+
+    # backslash test
+    my $str = <<~"gobble'de'gook\"weird";
+    Enjoy your prize!
+    gobble'de'gook"weird
+    print "$str";
 }
 
 my %hash = (
@@ -769,6 +802,12 @@ IND1
 ====
 STD2
     print $text;
+
+    # backslash test
+    my $str = <<"gobble'de'gook\"weird";
+Enjoy your prize!
+gobble'de'gook"weird
+    print "$str";
 }
 
 my %hash = (
@@ -783,6 +822,22 @@ STD3 line 1
 STD3
 );
 #18...........
+        },
+
+        'git211.def' => {
+            source => "git211",
+            params => "def",
+            expect => <<'#19...........',
+eval {
+    @$list = map( { [ qr($_), $_, 0 ]; } @$list );
+};
+eval {
+    @$list = map( { [ qr($_), $_, 0 ]; } @$list );
+};
+eval {
+    @$list = map { [ qr($_), $_, 0 ]; } @$list;
+};
+#19...........
         },
     };
 

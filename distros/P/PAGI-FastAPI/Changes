@@ -1,5 +1,42 @@
 Revision history for PAGI::FastAPI
 
+0.0.6  2026-08-08
+       [ENHANCEMENTS]
+       - Full support for WebSocket routing has been added and is available
+         by creating a $app->websocket() endpoint. The implementation is
+         completed with async frame handling and parameter extraction
+         capabilities.
+       - A new class called PAGI::FastAPI::WebSocket has been introduced. It
+         allows for the non-blocking implementation of the handshake and
+         message methods: accept(), close(), receive_text(), receive_json(),
+         receive_bytes(), send_text(), send_json(), send_bytes().
+       - The mount() method has been implemented, allowing PAGI
+         sub-applications, static files, and routers to be mounted via
+         PAGI::App::URLMap.
+       - The add_middleware() method has been implemented for registering
+         custom async middleware.
+       - The WebSocket routes were excluded from the generated OpenAPI
+         documentation version 3.1.
+
+       [BUG FIXES & ERROR HANDLING]
+       - The unmatched WebSocket routes already reject the connections with
+         a close code 4004 before the acceptance of handshake.
+       - Unhandled exceptions in the WebSocket handlers lead to open
+         connections termination with a close code 1011 automatically.
+       - Dialing execution errors on the WebSocket endpoints lead to the
+         closure of the connections automatically with the status code 1008.
+
+       [DOCUMENTATION & EXAMPLE]
+       - Chat server application was added to showcase HTML/JavaScript
+         and WebSocket functionality.
+       - Updated module documentation and SYNOPSIS for PAGI::FastAPI and
+         PAGI::FastAPI::WebSocket.
+
+       [TESTING]
+       - Created t/11-websocket.t that includes handshakes, echo flows,
+         path parameters, JSON payload handling and status codes of close.
+       - Updated t/00-load.t to incorporate PAGI::FastAPI::WebSocket.
+
 0.0.5  2026-08-06
        [ENHANCEMENT]
        - The POST/PUT/PATCH request bodies can now be in the application/x-www-form-urlencoded

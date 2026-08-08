@@ -2,7 +2,7 @@
 
 [![CPAN version](https://badge.fury.io/pl/PAGI-FastAPI.svg)](https://metacpan.org/pod/PAGI::FastAPI)
 
-FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** protocol with **Type::Tiny** validation and automatic **OpenAPI 3.1** / **Swagger UI** documentation.
+FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** protocol with **Type::Tiny** validation, full **WebSocket** support, and automatic **OpenAPI 3.1** / **Swagger UI** documentation.
 
 ## SYNOPSIS
 
@@ -114,20 +114,28 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
 
     my $pagi_app = $app->to_app;
 
-    # 9. Authentication via the companion PAGI::FastAPI::Security distribution
-    #    (extraction only, you supply the verification logic)
+    # 9. Non-blocking WebSocket Endpoint
+    $app->websocket('/ws', handler => async sub ($ws, $deps) {
+        await $ws->accept;
+        while (my $msg = await $ws->receive_text) {
+            await $ws->send_text("Echo: $msg");
+        }
+    });
+
+    # 10. Authentication via the companion PAGI::FastAPI::Security distribution
+    #     (extraction only, you supply the verification logic)
     #
-    #    use PAGI::FastAPI::Security::HTTPBearer;
-    #    my $bearer = PAGI::FastAPI::Security::HTTPBearer->new;
-    #    $app->get('/secure',
-    #        dependencies => [ $bearer->depends(key => 'token') ],
-    #        handler      => async sub ($c) {
-    #            return { token => $c->stash->{token} };
-    #        }
-    #    );
+    #     use PAGI::FastAPI::Security::HTTPBearer;
+    #     my $bearer = PAGI::FastAPI::Security::HTTPBearer->new;
+    #     $app->get('/secure',
+    #         dependencies => [ $bearer->depends(key => 'token') ],
+    #         handler      => async sub ($c) {
+    #             return { token => $c->stash->{token} };
+    #         }
+    #     );
     #
-    #    See PAGI::FastAPI::Security for HTTP Basic, API Key
-    #    (header/query/cookie), and OAuth2 password-bearer schemes.
+    #     See PAGI::FastAPI::Security for HTTP Basic, API Key
+    #     (header/query/cookie), and OAuth2 password-bearer schemes.
 
 ## AUTHENTICATION AND SECURITY
 

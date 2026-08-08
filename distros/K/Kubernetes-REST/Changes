@@ -1,5 +1,19 @@
 Revision history for Kubernetes-REST
 
+1.105     2026-08-08 02:34:04Z
+
+ - Remove the old v0 API's per-endpoint Call::* classes (1002) and 10
+   v0-only helper modules (CallContext, Apis, Logs, Extensions,
+   Result2Hash, ListToRequest, Result2Object, Settings, Version,
+   Auditregistration). Since the 1.000 v1 rewrite these only ever emitted a
+   deprecation warning on load and had no other function; nothing in this
+   distribution referenced them anymore. Their old module names are now
+   tombstoned in Kubernetes-REST-Deprecated so PAUSE doesn't keep
+   resolving them to this dist's stale 1.104 release.
+ - Note: the Kubernetes::REST::V0Group family ($api->Core, $api->Apps,
+   etc.) is NOT affected -- it's a still-functional AUTOLOAD-based
+   compatibility layer, not a dead stub, and continues to ship as before.
+
 1.104     2026-04-14 16:41:31Z
  - Add ensure(), ensure_all(), ensure_only() for idempotent create-or-update.
    Handles 404/409 race conditions and server-side immutability for

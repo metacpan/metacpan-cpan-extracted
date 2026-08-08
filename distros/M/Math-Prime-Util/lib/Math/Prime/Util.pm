@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::VERSION = '0.74';
+  $Math::Prime::Util::VERSION = '0.75';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -35,11 +35,13 @@ our @EXPORT_OK =
       is_primitive_root is_carmichael is_quasi_carmichael is_cyclic
       is_fundamental is_totient is_gaussian_prime is_sum_of_squares
       is_smooth is_rough is_powerful is_practical is_lucky is_happy
-      sqrtint rootint logint lshiftint rshiftint rashiftint absint negint
-      signint cmpint addint subint add1int sub1int mulint powint
+      is_harshad is_palindrome is_safe_prime
+      sqrtint rootint crootint logint lshiftint rshiftint rashiftint toint
+      absint negint signint cmpint addint subint add1int sub1int
+      mulint muladdint mulsubint powint
       divint modint cdivint divrem fdivrem cdivrem tdivrem
       miller_rabin_random
-      lucas_sequence
+      lucas_sequence fibonacci lucas_number
       lucasu lucasv lucasuv lucasumod lucasvmod lucasuvmod pisano_period
       primes twin_primes semi_primes almost_primes omega_primes ramanujan_primes
       sieve_prime_cluster sieve_range prime_powers lucky_numbers
@@ -93,15 +95,17 @@ our @EXPORT_OK =
       random_semiprime random_unrestricted_semiprime
       random_factored_integer
       primorial pn_primorial consecutive_integer_lcm gcdext chinese chinese2
-      gcd lcm factor factor_exp divisors valuation hammingweight
+      gcd lcm factor factor_exp divisors valuation floor_sum hammingweight
+      remove_factors remove_factors_exp
       frobenius_number
-      todigits fromdigits todigitstring sumdigits
+      todigits fromdigits todigitstring sumdigits reverse_digits
       tozeckendorf fromzeckendorf
       sqrtmod allsqrtmod rootmod allrootmod cornacchia
       negmod invmod addmod submod mulmod divmod powmod muladdmod mulsubmod
-      vecsum vecmin vecmax vecprod vecreduce vecextract vecequal vecuniq
+      vecsum vecmin vecmax vecprod vecprefixsum vecreduce vecextract vecequal
       vecany vecall vecnotall vecnone vecfirst vecfirstidx vecmex vecpmex
-      vecsort vecsorti vecfreq vecsingleton vecslide
+      vecuniq vecsort vecsorti vecrsort vecrsorti vecfreq vecsingleton
+      vecslide vecpairwise vecwindow
       setbinop sumset toset
       setunion setintersect setminus setdelta
       setcontains setcontainsany setinsert setremove setinvert
@@ -109,33 +113,38 @@ our @EXPORT_OK =
       set_is_disjoint set_is_equal set_is_proper_intersection
       set_is_subset set_is_proper_subset set_is_superset set_is_proper_superset
       moebius mertens liouville sumliouville prime_omega prime_bigomega
-      euler_phi jordan_totient exp_mangoldt sumtotient
-      partitions bernfrac bernreal harmfrac harmreal
+      euler_phi jordan_totient exp_mangoldt sumtotient dedekind_psi
+      partitions partitionsq bernfrac bernreal harmfrac harmreal
       chebyshev_theta chebyshev_psi
-      divisor_sum carmichael_lambda hclassno inverse_totient
+      divisor_sum aliquot_sum carmichael_lambda hclassno inverse_totient
+      inverse_sigma0 inverse_sigma0_count
+      prime_signature sopf sopfr abundance
+      digital_root mult_digital_root
       kronecker is_qr qnr
       ramanujan_tau ramanujan_sum
-      stirling fubini znorder znprimroot znlog legendre_phi
+      stirling bell_number catalan_number fubini integer_complexity
       factorial factorialmod subfactorial binomial binomialmod
-      falling_factorial rising_factorial
-      contfrac from_contfrac
+      multifactorial falling_factorial rising_factorial
+      znorder znprimroot znlog legendre_phi
+      contfrac from_contfrac convergents bestrational
       next_calkin_wilf next_stern_brocot
       calkin_wilf_n stern_brocot_n
       nth_calkin_wilf nth_stern_brocot
       nth_stern_diatomic
       farey next_farey farey_rank
       ExponentialIntegral LogarithmicIntegral RiemannZeta RiemannR LambertW Pi
-      irand irand64 drand urandomb urandomm csrand random_bytes entropy_bytes
+      irand irand32 irand64 drand urandomb urandomm urandomr csrand
+      random_bytes entropy_bytes
   );
 our %EXPORT_TAGS = (all  => [ @EXPORT_OK ],
-                    rand => [qw/srand rand irand irand64/],
+                    rand => [qw/srand rand irand irand32 irand64/],
                    );
 
 # These are only exported if specifically asked for
 push @EXPORT_OK, (qw/trial_factor fermat_factor holf_factor lehman_factor squfof_factor prho_factor pbrent_factor pminus1_factor pplus1_factor cheb_factor ecm_factor rand srand/);
 
 my %_Config;
-my %_GMPfunc;  # Available MPU::GMP functions
+our %_GMPfunc;  # Available MPU::GMP functions
 
 # Similar to how boolean handles its option
 sub import {
@@ -150,7 +159,10 @@ sub import {
       $_Config{$opt} = 1 if @options != @_;
       @_ = @options;
     }
-    _XS_set_secure() if $_Config{'xs'} && $_Config{'secure'};
+    if ($_Config{'xs'}) {
+      _XS_set_secure()    if $_Config{'secure'};
+      _XS_set_nobigint(1) if $_Config{'nobigint'};
+    }
     goto &Exporter::import;
 }
 
@@ -161,7 +173,6 @@ BEGIN {
 
   # Separate lines to keep compatible with default from 5.6.2.
   # We could alternately use Config's $Config{uvsize} for MAXBITS
-  use constant OLD_PERL_VERSION=> $] < 5.008;
   use constant MPU_MAXBITS     => (~0 == 4294967295) ? 32 : 64;
   use constant MPU_32BIT       => MPU_MAXBITS == 32;
   use constant MPU_MAXPARAM    => MPU_32BIT ? 4294967295 : 18446744073709551615;
@@ -169,7 +180,7 @@ BEGIN {
   use constant MPU_MAXPRIME    => MPU_32BIT ? 4294967291 : 18446744073709551557;
   use constant MPU_MAXPRIMEIDX => MPU_32BIT ?  203280221 :   425656284035217743;
   use constant UVPACKLET       => MPU_32BIT ?        'L' : 'Q';
-  use constant INTMAX          => (!OLD_PERL_VERSION || MPU_32BIT) ? ~0 : 562949953421312;
+  use constant INTMAX          => ~0;
   use constant INTMIN          => -(INTMAX >> 1) - 1;
 
   eval {
@@ -177,8 +188,9 @@ BEGIN {
     require XSLoader;
     XSLoader::load(__PACKAGE__, $Math::Prime::Util::VERSION);
     prime_precalc(0);
-    $_Config{'maxbits'} = _XS_prime_maxbits();
     $_Config{'xs'} = 1;
+    $_Config{'maxbits'} = _XS_prime_maxbits();
+    $_Config{'xs_factor_bits'} = _XS_factor_bits();
     1;
   } or do {
     carp "Using Pure Perl implementation: $@"
@@ -186,6 +198,7 @@ BEGIN {
 
     $_Config{'xs'} = 0;
     $_Config{'maxbits'} = MPU_MAXBITS;
+    $_Config{'xs_factor_bits'} = 0;
 
     # Load PP front end code
     require Math::Prime::Util::PPFE;
@@ -259,8 +272,8 @@ sub prime_get_config {
   return \%config;
 }
 
-# Note: You can cause yourself pain if you turn on xs or gmp when they're not
-# loaded.  Your calls will probably die horribly.
+# Note: You can cause yourself pain if you turn on gmp when it isn't loaded.
+# Your calls will probably die horribly.
 sub prime_set_config {
   my %params = (@_);  # no defaults
   foreach my $param (keys %params) {
@@ -268,20 +281,25 @@ sub prime_set_config {
     $param = lc $param;
     # dispatch table should go here.
     if      ($param eq 'xs') {
-      $_Config{'xs'} = ($value) ? 1 : 0;
-      $_XS_MAXVAL = $_Config{'xs'}  ?  MPU_MAXPARAM  :  -1;
+      if (!!$value != $_Config{'xs'}) {
+        croak "prime_set_config: xs cannot be changed at runtime; " .
+              "XS selection is controlled by MPU_NO_XS at load time";
+      }
     } elsif ($param eq 'gmp') {
-      $_HAVE_GMP = ($value) ? int(100*$Math::Prime::Util::GMP::VERSION) : 0;
+      $_HAVE_GMP = ($value) ? int(100 * $Math::Prime::Util::GMP::VERSION + 1e-6)
+                            : 0;
       $_Config{'gmp'} = $_HAVE_GMP;
       $Math::Prime::Util::_GMPfunc{$_} = $_HAVE_GMP
         for keys %Math::Prime::Util::_GMPfunc;
       _XS_set_callgmp($_HAVE_GMP) if $_Config{'xs'};
     } elsif ($param eq 'nobigint') {
       $_Config{'nobigint'} = ($value) ? 1 : 0;
+      _XS_set_nobigint($_Config{'nobigint'}) if $_Config{'xs'};
     } elsif ($param eq 'bigint' || $param eq 'trybigint') {
       my $class = _load_bigint_class($value);
       if (defined $class) {
         $_BIGINT = $_Config{'bigintclass'} = $class;
+        Math::Prime::Util::_XS_set_bigint_class($_BIGINT) if $_Config{'xs'};
       } else {
         carp "ntheory could not load bigint class from '$value'"
           unless $param =~ /try/;
@@ -347,12 +365,43 @@ sub _load_bigint {
 
   do { require Math::BigInt;  Math::BigInt->import(try=>"GMP,GMPz,LTM,Pari"); } unless defined $Math::BigInt::VERSION;
   $_BIGINT = $_Config{'bigintclass'} = 'Math::BigInt';
+  _XS_set_bigint_class($_BIGINT) if $_Config{'xs'};
+  return $_BIGINT;
 }
 
 sub _bigint_to_int {
-  return (OLD_PERL_VERSION && $_[0] >= 0) ? unpack(UVPACKLET,pack(UVPACKLET,"$_[0]"))
-                            : int("$_[0]");
+  return int("$_[0]");
 }
+sub _int_from_float {
+  my $rs = "$_[0]";
+  my($r,$n);
+  if (ref($_[0]) eq 'Math::BigFloat') {
+    $r = $_[0]->copy;
+  } else {
+    if ($rs =~ /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/) {
+      my $rf = 0.0 + $rs;
+      # Use *very* conservative thresholds rather than 1 << _nvmantbits().
+      return int($rf)
+        if ($rf >= 0 && $rf < (MPU_32BIT ?  4294967295 :  70368744177664)) ||
+           ($rf <  0 && $rf > (MPU_32BIT ? -2147483648 : -35184372088832));
+    }
+    # Otherwise, load up the slow but reliable module
+    do { require Math::BigFloat; Math::BigFloat->import(); }
+      unless defined $Math::BigFloat::VERSION;
+    $r = Math::BigFloat->new($rs);
+  }
+  # Take the Math::BigFloat $r, truncate and make $n the integer string
+  # Previous to 1.99, as_int drops precision
+  if (Math::BigFloat->can('bint')) { $n = $r->bint->bstr; }
+  elsif ($r->{sign} eq '+')        { $n = $r->bfloor->bstr; }
+  else                             { $n = $r->bceil->bstr; }
+  $n =~ s/\.0*$//;
+  croak "toint: '$rs' is not a valid number" if $n =~ tr/-0-9//c;
+  # Turn $n into either a native int or proper-class bigint.
+  _validate_integer($n);
+  return $n;
+}
+
 sub _to_bigint {
   return undef unless defined($_[0]);
   _load_bigint() unless defined $_BIGINT;
@@ -368,7 +417,8 @@ sub _to_bigint {
     $n = Math::BigInt->new("$_[0]");
     $n = $_BIGINT->new("$n");
   } else {
-    $n = $_BIGINT->new("$_[0]");
+    (my $s = "$_[0]") =~ s/\A([+-]?)0+(?=\d+\z)/$1/;
+    $n = $_BIGINT->new($s);
   }
   croak "Parameter '$_[0]' must be an integer" unless $_BIGINT ne 'Math::BigInt' || $n->is_int();
   $n;
@@ -382,7 +432,8 @@ sub _to_bigint_nonneg {
   } elsif (ref($_[0]) eq 'Math::BigFloat' && !$_[0]->is_int()) {
     $n = Math::BigInt->bnan;
   } else {
-    $n = $_BIGINT->new("$_[0]");
+    (my $s = "$_[0]") =~ s/\A([+-]?)0+(?=\d+\z)/$1/;
+    $n = $_BIGINT->new($s);
   }
   croak "Parameter '$_[0]' must be a non-negative integer" unless ($_BIGINT ne 'Math::BigInt' || $n->is_int()) && $n >= 0;
   $n;
@@ -392,50 +443,45 @@ sub _to_bigint_abs {
   my $n = _to_bigint($_[0]);
   return ($n < 0) ? -$n : $n;
 }
-sub _to_bigint_if_needed {
+
+# v0.73 and earlier:
+#    The user could use a different bigint class.  All our functions would try
+#    to respect that and return results of the same class.  If the input was
+#    native and output was bigint, they'd get MBI.  Internal calcs were almost
+#    always in MBI except certain functions that tried to preserve it.
+# v0.74:
+#    The user can set the preferred bigint class.  We try to use this class.
+#    But if they pass in a bigint object, we convert to that class.  Usually.
+#    Still have the issue of multi-input functions having to choose one.
+# v0.75:
+#    Like v0.74, the user can set the bigint class (MBI if not set) at runtime.
+#    This is used for all calculations and output.  The input class(es) don't
+#    have any impact.  "reftyped" is gone.
+#
+# The XS code calls a "to canonical" process which ensures the result is
+# either undef, a native integer type (if fits), or a $_BIGINT object.
+
+# For both of these:
+# 1) we aren't checking the ref to make sure it eq $_BIGINT
+# 2) we aren't turning non-bigints into 0+"x".  Validate does that.
+
+sub _maybe_bigint {
+  _load_bigint() unless defined $_BIGINT;
   return $_[0] if !defined $_[0] || ref($_[0]);
-  if ($_[0] >= INTMAX || $_[0] <= INTMIN) {    # Probably a bigint
-    my $n = _to_bigint($_[0]);
-    return $n if $n > INTMAX || $n < INTMIN;   # Definitely a bigint
+  if ($_[0] >= INTMAX || $_[0] <= INTMIN) {
+    (my $s = "$_[0]") =~ s/\A([+-]?)0+(?=\d+\z)/$1/;
+    my $n = $_BIGINT->new($s);
+    return $_[0] = $n  if $n > INTMAX || $n < INTMIN;
   }
   $_[0];
 }
-sub _to_gmpz {
-  do { require Math::GMPz; } unless defined $Math::GMPz::VERSION;
-  return (ref($_[0]) eq 'Math::GMPz') ? $_[0] : Math::GMPz->new($_[0]);
-}
-sub _to_gmp {
-  do { require Math::GMP; } unless defined $Math::GMP::VERSION;
-  return (ref($_[0]) eq 'Math::GMP') ? $_[0] : Math::GMP->new($_[0]);
-}
-sub _reftyped {
-  return undef unless defined $_[1];
-  my $ref0 = ref($_[0]);
-  if (OLD_PERL_VERSION) {
-    # Perl 5.6 truncates arguments to doubles if you look at them funny
-    return "$_[1]" if "$_[1]" <= INTMAX && "$_[1]" >= INTMIN;
-  } elsif ($_[1] >= 0) {
-    return $_[1] if $_[1] < ~0;
-  } else {
-    return $_[1] if $_[1] > -(~0>>1);
-  }
-  my $bign;
-  if ($ref0) {
-    $bign = $ref0->new("$_[1]");
-  } else {
-    _load_bigint() unless defined $_BIGINT;
-    $bign = $_BIGINT->new("$_[1]");
-  }
-  return $bign if $bign > INTMAX || $bign < INTMIN;
-  0+"$_[1]";
-}
-
 sub _maybe_bigint_allargs {
   _load_bigint() unless defined $_BIGINT;
   for my $i (0..$#_) {
     next if !defined $_[$i] || ref($_[$i]);
     next if $_[$i] < INTMAX && $_[$i] > INTMIN;
-    my $n = $_BIGINT->new("$_[$i]");
+    (my $s = "$_[$i]") =~ s/\A([+-]?)0+(?=\d+\z)/$1/;
+    my $n = $_BIGINT->new($s);
     $_[$i] = $n if $n > INTMAX || $n < INTMIN;
   }
   @_;
@@ -443,88 +489,9 @@ sub _maybe_bigint_allargs {
 
 #############################################################################
 
-# These are called by the XS code to keep the GMP CSPRNG in sync with us.
-
-sub _srand_p {
-  my($seedval) = @_;
-  return unless $_Config{'gmp'} >= 42;
-  $seedval = unpack("L",entropy_bytes(4)) unless defined $seedval;
-  Math::Prime::Util::GMP::seed_csprng(4, pack("L",$seedval));
-  $seedval;
-}
-
-sub _csrand_p {
-  my($str) = @_;
-  return unless $_Config{'gmp'} >= 42;
-  $str = entropy_bytes(256) unless defined $str;
-  Math::Prime::Util::GMP::seed_csprng(length($str), $str);
-}
-
-#############################################################################
-
-
-#############################################################################
-# Random primes.  These are front end functions that do input validation,
-# load the RandomPrimes module, and call its function.
-
-sub random_maurer_prime_with_cert {
-  my($bits) = @_;
-  _validate_integer_nonneg($bits);
-  croak "random_maurer_prime bits must be >= 2" unless $bits >= 2;
-
-  if ($Math::Prime::Util::_GMPfunc{"random_maurer_prime_with_cert"}) {
-    my($n,$cert) = Math::Prime::Util::GMP::random_maurer_prime_with_cert($bits);
-    return (Math::Prime::Util::_reftyped($_[0],$n), $cert);
-  }
-
-  require Math::Prime::Util::RandomPrimes;
-  return Math::Prime::Util::RandomPrimes::random_maurer_prime_with_cert($bits);
-}
-
-sub random_shawe_taylor_prime_with_cert {
-  my($bits) = @_;
-  _validate_integer_nonneg($bits);
-  croak "random_shawe_taylor_prime bits must be >= 2" unless $bits >= 2;
-
-  if ($Math::Prime::Util::_GMPfunc{"random_shawe_taylor_prime_with_cert"}) {
-    my($n,$cert) =Math::Prime::Util::GMP::random_shawe_taylor_prime_with_cert($bits);
-    return (Math::Prime::Util::_reftyped($_[0],$n), $cert);
-  }
-
-  require Math::Prime::Util::RandomPrimes;
-  return Math::Prime::Util::RandomPrimes::random_shawe_taylor_prime_with_cert($bits);
-}
-
-sub random_proven_prime_with_cert {
-  my($bits) = @_;
-  _validate_integer_nonneg($bits);
-  croak "random_proven_prime bits must be >= 2" unless $bits >= 2;
-
-  # Go to Maurer with GMP
-  if ($Math::Prime::Util::_GMPfunc{"random_maurer_prime_with_cert"}) {
-    my($n,$cert) = Math::Prime::Util::GMP::random_maurer_prime_with_cert($bits);
-    return (Math::Prime::Util::_reftyped($_[0],$n), $cert);
-  }
-
-  require Math::Prime::Util::RandomPrimes;
-  return Math::Prime::Util::RandomPrimes::random_proven_prime_with_cert($bits);
-}
-
-#############################################################################
-
 sub formultiperm (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
-  my($sub, $iref) = @_;
-  croak("formultiperm first argument must be an array reference") unless ref($iref) eq 'ARRAY';
-
-  my($sum, %h, @n) = (0);
-  $h{$_}++ for @$iref;
-  @n = map { [$_, $h{$_}] } sort(keys(%h));
-  $sum += $_->[1] for @n;
-
   require Math::Prime::Util::PP;
-  my $oldforexit = Math::Prime::Util::_start_for_loop();
-  Math::Prime::Util::PP::_multiset_permutations( $sub, [], \@n, $sum );
-  Math::Prime::Util::_end_for_loop($oldforexit);
+  Math::Prime::Util::PP::formultiperm(@_);
 }
 
 #############################################################################
@@ -532,8 +499,7 @@ sub formultiperm (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
 
 sub prime_iterator {
   my($start) = @_;
-  $start = 0 unless defined $start;
-  _validate_integer_nonneg($start);
+  if (@_ == 0) { $start = 0; } else { _validate_integer_nonneg($start); }
   my $p = ($start > 0) ? $start-1 : 0;
   # This works fine:
   #   return sub { $p = next_prime($p); return $p; };
@@ -562,8 +528,10 @@ sub prime_iterator {
 }
 
 sub prime_iterator_object {
-  my($start) = @_;
   require Math::Prime::Util::PrimeIterator;
+  return Math::Prime::Util::PrimeIterator->new() if @_ == 0;
+  my($start) = @_;
+  _validate_integer_nonneg($start);
   return Math::Prime::Util::PrimeIterator->new($start);
 }
 
@@ -576,66 +544,26 @@ sub prime_iterator_object {
 
 #############################################################################
 
-# Return just the cert portion.
-sub prime_certificate {
-  my($n) = @_;
-  my ($is_prime, $cert) = is_provable_prime_with_cert($n);
-  return $cert;
+sub random_maurer_prime_with_cert {
+  require Math::Prime::Util::PP;
+  Math::Prime::Util::PP::random_maurer_prime_with_cert(@_);
 }
-
+sub random_shawe_taylor_prime_with_cert {
+  require Math::Prime::Util::PP;
+  Math::Prime::Util::PP::random_shawe_taylor_prime_with_cert(@_);
+}
+sub random_proven_prime_with_cert {
+  require Math::Prime::Util::PP;
+  Math::Prime::Util::PP::random_proven_prime_with_cert(@_);
+}
 
 sub is_provable_prime_with_cert {
-  my($n) = @_;
-  _validate_integer($n);
-  return 0 if $n < 2;
-  my $header = "[MPU - Primality Certificate]\nVersion 1.0\n\nProof for:\nN $n\n\n";
-
-  if ($n <= $_XS_MAXVAL) {
-    my $isp = is_prime($n);
-    return ($isp, '') unless $isp == 2;
-    return (2, $header . "Type Small\nN $n\n");
-  }
-
-  if ($_HAVE_GMP && defined &Math::Prime::Util::GMP::is_provable_prime_with_cert) {
-    my ($isp, $cert) = Math::Prime::Util::GMP::is_provable_prime_with_cert($n);
-    # New version that returns string format.
-    #return ($isp, $cert) if ref($cert) ne 'ARRAY';
-    if (ref($cert) ne 'ARRAY') {
-      # Fix silly 0.13 mistake (TODO: deprecate this)
-      $cert =~ s/^Type Small\n(\d+)/Type Small\nN $1/smg;
-      return ($isp, $cert);
-    }
-    # Old version.  Convert.
-    require Math::Prime::Util::PrimalityProving;
-    return ($isp, Math::Prime::Util::PrimalityProving::convert_array_cert_to_string($cert));
-  }
-
-  {
-    my $isp = is_prob_prime($n);
-    return ($isp, '') if $isp == 0;
-    return (2, $header . "Type Small\nN $n\n") if $isp == 2;
-  }
-
-  # Choice of methods for proof:
-  #   ECPP         needs a fair bit of programming work
-  #   APRCL        needs a lot of programming work
-  #   BLS75 combo  Corollary 11 of BLS75.  Trial factor n-1 and n+1 to B, find
-  #                factors F1 of n-1 and F2 of n+1.  Quit when:
-  #                B > (N/(F1*F1*(F2/2)))^1/3 or B > (N/((F1/2)*F2*F2))^1/3
-  #   BLS75 n+1    Requires factoring n+1 to (n/2)^1/3 (theorem 19)
-  #   BLS75 n-1    Requires factoring n-1 to (n/2)^1/3 (theorem 5 or 7)
-  #   Pocklington  Requires factoring n-1 to n^1/2 (BLS75 theorem 4)
-  #   Lucas        Easy, requires factoring of n-1 (BLS75 theorem 1)
-  #   AKS          horribly slow
-  # See http://primes.utm.edu/prove/merged.html or other sources.
-
-  require Math::Prime::Util::PrimalityProving;
-  #my ($isp, $pref) = Math::Prime::Util::PrimalityProving::primality_proof_lucas($n);
-  my ($isp, $pref) = Math::Prime::Util::PrimalityProving::primality_proof_bls75($n);
-  carp "proved $n is not prime\n" if !$isp;
-  return ($isp, $pref);
+  require Math::Prime::Util::PP;
+  Math::Prime::Util::PP::is_provable_prime_with_cert(@_);
 }
-
+sub prime_certificate {
+  return (is_provable_prime_with_cert($_[0]))[1];  # Just the certificate
+}
 
 sub verify_prime {
   require Math::Prime::Util::PrimalityProving;
@@ -646,8 +574,10 @@ sub verify_prime {
 
 sub RiemannZeta {
   my($n) = @_;
-  croak("Invalid input to RiemannZeta:  x must be > 0") if $n <= 0;
+  croak "Parameter must be defined" if !defined $n;
+  croak("Invalid input to RiemannZeta:  x must be >= 0") if $n < 0;
 
+  return 0 if $n == $_Infinity;
   return $n-$n if $n > 10_000_000;   # Over 3M leading zeros
 
   return _XS_RiemannZeta($n) if !ref($n) && $_Config{'xs'};
@@ -658,6 +588,7 @@ sub RiemannZeta {
 
 sub RiemannR {
   my($n) = @_;
+  croak "Parameter must be defined" if !defined $n;
   croak("Invalid input to RiemannR:  x must be > 0") if $n <= 0;
 
   return _XS_RiemannR($n) if !ref($n) && $_Config{'xs'};
@@ -668,6 +599,7 @@ sub RiemannR {
 
 sub ExponentialIntegral {
   my($n) = @_;
+  croak "Parameter must be defined" if !defined $n;
   return $_Neg_Infinity if $n == 0;
   return 0              if $n == $_Neg_Infinity;
   return $_Infinity     if $n == $_Infinity;
@@ -680,6 +612,7 @@ sub ExponentialIntegral {
 
 sub LogarithmicIntegral {
   my($n) = @_;
+  croak "Parameter must be defined" if !defined $n;
   return 0              if $n == 0;
   return $_Neg_Infinity if $n == 1;
   return $_Infinity     if $n == $_Infinity;
@@ -697,6 +630,7 @@ sub LogarithmicIntegral {
 
 sub LambertW {
   my($x) = @_;
+  croak "Parameter must be defined" if !defined $x;
 
   return _XS_LambertW($x) if !ref($x) && $_Config{'xs'};
 
@@ -706,10 +640,14 @@ sub LambertW {
 
 sub bernreal {
   my($n, $precision) = @_;
+  my $has_precision = @_ >= 2;
+  _validate_integer_nonneg($n);
+  _validate_integer_nonneg($precision) if $has_precision;
+
   do { require Math::BigFloat; Math::BigFloat->import(); } unless defined $Math::BigFloat::VERSION;
 
   if ($Math::Prime::Util::_GMPfunc{"bernreal"}) {
-    return Math::BigFloat->new(Math::Prime::Util::GMP::bernreal($n)) if !defined $precision;
+    return Math::BigFloat->new(Math::Prime::Util::GMP::bernreal($n)) unless $has_precision;
     return Math::BigFloat->new(Math::Prime::Util::GMP::bernreal($n,$precision),$precision);
   }
 
@@ -720,17 +658,20 @@ sub bernreal {
 
 sub harmreal {
   my($n, $precision) = @_;
+  my $has_precision = @_ >= 2;
   _validate_integer_nonneg($n);
+  _validate_integer_nonneg($precision) if $has_precision;
+
   do { require Math::BigFloat; Math::BigFloat->import(); } unless defined $Math::BigFloat::VERSION;
   return Math::BigFloat->bzero if $n <= 0;
 
   if ($Math::Prime::Util::_GMPfunc{"harmreal"}) {
-    return Math::BigFloat->new(Math::Prime::Util::GMP::harmreal($n)) if !defined $precision;
+    return Math::BigFloat->new(Math::Prime::Util::GMP::harmreal($n)) unless $has_precision;
     return Math::BigFloat->new(Math::Prime::Util::GMP::harmreal($n,$precision),$precision);
   }
 
   # If low enough precision, use native floating point.  Fast.
-  if (defined $precision && $precision <= 13) {
+  if ($has_precision && $precision <= 13) {
     return Math::BigFloat->new(
       ($n < 80) ? do { my $h = 0; $h += 1/$_ for 1..$n; $h; }
                 : log($n) + 0.57721566490153286060651209 + 1/(2*$n) - 1/(12*$n*$n) + 1/(120*$n*$n*$n*$n)
@@ -762,7 +703,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Möbius Deléglise Bézout uniqued k-tuples von SoE primesieve primegen libtommath pari yafu fonction qui compte le nombre nombres voor PhD superset sqrt(N) gcd(A^M k-th (10001st untruncated OpenPFGW gmpy2 Über Primzahl-Zählfunktion n-te und verallgemeinerte multiset compositeness GHz significand TestU01 subfactorial s-gonal XSLoader setwise
+=for stopwords Möbius Deléglise Bézout fibonacci uniqued k-tuples von SoE primesieve primegen libtommath pari yafu fonction qui compte le nombre nombres voor PhD superset sqrt(N) gcd(A^M k-th (10001st untruncated OpenPFGW gmpy2 Über Primzahl-Zählfunktion n-te und verallgemeinerte multiset compositeness GHz significand TestU01 subfactorial s-gonal XSLoader setwise whitespace
 
 =for test_synopsis use v5.14;  my($k,$x);
 
@@ -774,16 +715,19 @@ Math::Prime::Util - Utilities related to prime numbers, including fast sieves an
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 
 =head1 SYNOPSIS
 
-  # Nothing is exported by default.  List the functions, or use :all.
-  use Math::Prime::Util ':all';  # import all functions
+  # Nothing is exported by default; list any functions to import.
+  use Math::Prime::Util qw/is_prime next_prime/;
 
-  # The ':rand' tag replaces srand and rand (not done by default)
-  use Math::Prime::Util ':rand';  # import srand, rand, irand, irand64
+  # ':all' imports all standard functions.
+  use Math::Prime::Util ':all';
+
+  # ':rand' imports replacements for srand and rand.
+  use Math::Prime::Util ':rand';  # import srand, rand, irand, irand32, irand64
 
 
   # Get a big array reference of many primes
@@ -800,8 +744,9 @@ Version 0.74
   # Or for the composites in a range
   forcomposites { say if is_strong_pseudoprime($_,2) } 10000, 10**6;
 
-  # For non-bigints, is_prime and is_prob_prime will always be 0 or 2.
-  # They return 0 (composite), 2 (prime), or 1 (probably prime)
+  # is_prime and is_prob_prime return one of:
+  #   0 (composite)   1 (probably prime)   2 (definitely prime)
+  # Below 2^64, both tests are deterministic and return only 0 or 2.
   my $n = 1000003;  # for example
   say "$n is prime"  if is_prime($n);
   say "$n is ", (qw(composite maybe_prime? prime))[is_prob_prime($n)];
@@ -814,14 +759,14 @@ Version 0.74
   say "$n is a prime or slpsp"  if is_strong_lucas_pseudoprime($n);
   say "$n is a prime or eslpsp" if is_extra_strong_lucas_pseudoprime($n);
 
-  # step to the next prime (returns 0 if not using bigints and we'd overflow)
+  # step to the next prime (returns a bigint if needed)
   $n = next_prime($n);
 
-  # step back (returns undef if given input 2 or less)
+  # step back (returns undef for non-negative inputs of 2 or less)
   $n = prev_prime($n);
 
 
-  # Return Pi(n) -- the number of primes E<lt>= n.
+  # Return Pi(n) -- the number of primes <= n.
   my $primepi = prime_count( 1_000_000 );
   $primepi = prime_count( 10**14, 10**14+1000 );  # also does ranges
 
@@ -860,21 +805,26 @@ Version 0.74
   say jordan_totient(5, 1234);  # Jordan's totient
 
   # Moebius function used to calculate Mertens
-  $sum += moebius($_) for (1..200); say "Mertens(200) = $sum";
+  say "Mertens(200) = ", vecsum(moebius(1, 200));
   # Mertens function directly (more efficient for large values)
   say mertens(10_000_000);
+
   # Exponential of Mangoldt function
-  say "lamba(49) = ", log(exp_mangoldt(49));
+  say "lambda(49) = ", log(exp_mangoldt(49));
+
   # Some more number theoretical functions
   say liouville(4292384);
   say chebyshev_psi(234984);
   say chebyshev_theta(92384234);
   say partitions(1000);
+
   # Show all prime partitions of 25
   forpart { say "@_" unless scalar grep { !is_prime($_) } @_ } 25;
+
   # List all 3-way combinations of an array
   my @cdata = qw/apple bread curry donut eagle/;
   forcomb { say "@cdata[@_]" } @cdata, 3;
+
   # or all permutations
   forperm { say "@cdata[@_]" } @cdata;
 
@@ -885,12 +835,12 @@ Version 0.74
   my $sigmaf = divisor_sum( $n, sub { log($_[0]) } ); # arbitrary func
 
   # primorial n#, primorial p(n)#, and lcm
-  say "The product of primes below 47 is ",     primorial(47);
+  say "The product of primes up to 47 is ",     primorial(47);
   say "The product of the first 47 primes is ", pn_primorial(47);
   say "lcm(1..1000) is ", consecutive_integer_lcm(1000);
 
   # Ei, li, and Riemann R functions
-  my $ei   = ExponentialIntegral($x);   # $x a real: $x != 0
+  my $ei   = ExponentialIntegral($x);   # $x a real; returns -Inf at 0
   my $li   = LogarithmicIntegral($x);   # $x a real: $x >= 0
   my $R    = RiemannR($x);              # $x a real: $x > 0
   my $Zeta = RiemannZeta($x);           # $x a real: $x >= 0
@@ -899,7 +849,7 @@ Version 0.74
   # Precalculate a sieve, possibly speeding up later work.
   prime_precalc( 1_000_000_000 );
 
-  # Free any memory used by the module.
+  # Free cached memory used by the module.
   prime_memfree;
 
   # Alternate way to free.  When this leaves scope, memory is freed.
@@ -926,23 +876,20 @@ tests, primality proofs, integer factoring, counts / bounds / approximations
 for primes, nth primes, and twin primes, random prime generation,
 and much more.
 
-This module is the fastest on CPAN for almost all operations it supports.
-This includes
-L<Math::Prime::XS>, L<Math::Prime::FastSieve>, L<Math::Factor::XS>,
-L<Math::Prime::TiedArray>, L<Math::Big::Factors>, L<Math::Factoring>,
-and L<Math::Primality> (when the GMP module is available).
-For numbers in the 10-20 digit range, it is often orders of magnitude faster.
-Typically it is faster than L<Math::Pari> for 64-bit operations.
+The module is designed for high performance across the operations it
+supports.  Its XS implementation accelerates native-size operations, while
+L<Math::Prime::Util::GMP> provides much faster methods for many bigint
+operations.
 
-All operations support both Perl UV's (32-bit or 64-bit) and bignums.  If
-you want high performance with big numbers (larger than Perl's native 32-bit
-or 64-bit size), you should install L<Math::Prime::Util::GMP> and
-L<Math::BigInt::GMP>.  This will be a recurring theme throughout this
-documentation -- while all bignum operations are supported in pure Perl,
-most methods will be much slower than the C+GMP alternative.
+Most integer functions accept values beyond Perl's native 32-bit or 64-bit
+range, and integer results use the configured bigint class when needed.
+Individual functions document any native-size input limits.  Pure Perl
+implementations are available for most bigint operations, but are generally
+slower than the C and GMP alternatives.
 
-The module is thread-safe and allows concurrency between Perl threads while
-still sharing a prime cache.  It is not itself multi-threaded.  See the
+The module is thread-safe and allows concurrency between Perl threads.
+The XS implementation shares a prime cache between them.
+The functions themselves are not multi-threaded.  See the
 L<Limitations|/"LIMITATIONS"> section if you are using Win32 and threads in
 your program.  Also note that L<Math::Pari> is not thread-safe (and will
 crash as soon as it is loaded in threads), so if you use
@@ -969,27 +916,34 @@ bigint and expression inputs.
 
 =head1 ENVIRONMENT VARIABLES
 
-There are two environment variables that affect operation.  These are
+There are three environment variables that affect operation.  These are
 typically used for validation of the different methods or to simulate
 systems that have different support.
+All the environment variables are read once when Math::Prime::Util is loaded.
 
 =head2 MPU_NO_XS
 
-If set to C<1>, everything is run in pure Perl.  No C functions
-are loaded or used, as XSLoader is not even called.  All top-level
-XS functions are replaced by a pure Perl layer (the PPFE.pm module
-that supplies a "Pure Perl Front End").
+If set to C<1>, this module's XS implementation is not loaded or used, as
+XSLoader is not even called.  Top-level functions normally supplied by XS
+are replaced by a pure Perl layer (the PPFE.pm module that supplies a
+"Pure Perl Front End").
 
-Caveat: This does not change whether the GMP backend is used.
-For as much pure Perl as possible, you will need to set both variables.
+Caveat: This does not change whether the GMP backend, which also uses C, is
+loaded and used.
+For as much pure Perl as possible, you will need to set
+both MPU_NO_XS and MPU_NO_GMP.
 
 If this variable is not set or set to anything other than C<1>, the
 module operates normally.
 
+XS selection is fixed when Math::Prime::Util is loaded and cannot be
+changed later with L</prime_set_config>.
+
 =head2 MPU_NO_GMP
 
-If set to C<1>, the L<Math::Prime::Util::GMP> backend is not
-loaded, and operation will be exactly as if it was not installed.
+If set to C<1> before Math::Prime::Util is loaded, the
+L<Math::Prime::Util::GMP> backend will not be loaded, even if installed.
+This is primarily intended for testing, development, and debugging.
 
 If this variable is not set or set to anything other than C<1>, the
 module operates normally.
@@ -997,8 +951,9 @@ module operates normally.
 =head2 MPU_DEVNAMES
 
 If set to C<1>, the PP package will be loaded on startup rather than
-on demand, and the package aliases C<MPU>, C<PP>, C<GMP> will be used
-for the main, Perl, and GMP packages respectively.
+on demand, and the package aliases C<MPU>, C<PP>, and C<GMP> will be
+created for the main, Perl, and GMP packages respectively.
+The C<GMP> alias is created only when that backend is available.
 Normally you wouldn't want this both for aggressive namespace pollution
 and for performance (there is often no need to load the huge PP module).
 But it is convenient if one wants to call the different paths explicitly.
@@ -1012,23 +967,26 @@ or more time critical short applications will care.
 
 =head1 BIGNUM SUPPORT
 
-By default all functions support bigints.  For performance, you should
-install L<Math::Prime::Util::GMP> which will be automatically used as a
-backend.
+Most integer functions support bigint inputs, with individual size limits
+documented where applicable.  For performance, you should install
+L<Math::Prime::Util::GMP>, which will be automatically used as a backend.
 
 The default bigint class is L<Math::BigInt>, which is not particularly speedy
 but is available by default in all Perl distributions, and is well tested.
-If you want to try something different, you can install and use L<Math::GMPz>
-or L<Math::GMP> which will be B<much> faster.  You can have this module
-use and return them using, for example:
+You can install and use L<Math::GMPz> or L<Math::GMP> which will be
+B<much> faster.  You can have this module use and return them, for example:
 
   prime_set_config(bigint => Math::GMPz);
-  my $n = next_prime(~0);
+  my $n = next_prime("18446744073709551615");
   say "$n ",ref($n);
   # 18446744073709551629 Math::GMPz
 
-If you use Math::BigInt, I highly recommend also installing one of
-L<Math::BigInt::GMPz>, L<Math::BigInt::GMP>, or L<Math::BigInt::LTM>.
+If you want to use Math::BigInt, I highly recommend also installing
+L<Math::BigInt::GMPz> or L<Math::BigInt::GMP>.
+
+When a result does not fit in a native integer, it is returned using the
+configured bigint class.  This is canonical form output: the class of bigint
+input arguments does not affect the class of the returned bigint result.
 
 If you are using bigints, here are some performance suggestions:
 
@@ -1068,16 +1026,15 @@ This module provides three functions for general primality testing, as
 well as numerous specialized functions.  The three main functions are:
 L</is_prob_prime> and L</is_prime> for general use, and L</is_provable_prime>
 for proofs.  For inputs below C<2^64> the functions are identical and
-fast deterministic testing is performed.  That is, the results will always
-be correct and should take at most a few microseconds for any input.  This
-is hundreds to thousands of times faster than other CPAN modules.  For
-inputs larger than C<2^64>, an extra-strong
+fast deterministic testing is performed, so the results will always be
+correct.  For inputs larger than C<2^64>, an extra-strong
 L<BPSW test|http://en.wikipedia.org/wiki/Baillie-PSW_primality_test>
 is used.  See the L</PRIMALITY TESTING NOTES> section for more
 discussion.
 
-Following the semantics used by Pari/GP, all primality test functions
-allow a negative primary argument, but will return false.
+Following the semantics used by Pari/GP, functions that directly test an
+integer C<n> for primality or pseudoprimality allow a negative C<n>, but
+return false.
 All inputs must be integers or an error is raised.
 
 
@@ -1102,12 +1059,12 @@ tests, and the L</is_provable_prime> function which will construct a proof
 that the input is prime and returns 2 for almost all primes (at the
 expense of speed).
 
-For native precision numbers (anything smaller than C<2^64>, all three
-functions are identical and use a deterministic set of tests (selected
-Miller-Rabin bases or BPSW).  For larger inputs both L</is_prob_prime> and
-L</is_prime> return probable prime results using the extra-strong
-Baillie-PSW test, which has had no counterexample found since it was
-published in 1980.
+For inputs smaller than C<2^64>, all three functions return identical
+results and use a deterministic set of tests (selected Miller-Rabin bases
+or BPSW).  For larger inputs L</is_prob_prime> returns probable prime results
+using the extra-strong Baillie-PSW test, which has had no counterexample
+found since it was published in 1980.  L</is_prime> begins with the same
+test, but may perform additional tests and attempt a proof.
 
 For cryptographic key generation, you may want even more testing for probable
 primes (NIST recommends some additional M-R tests).  This can be done using
@@ -1157,8 +1114,8 @@ larger than C<18,446,744,073,709,551,557> in 64-bit).
   $n = prev_prime($n);
 
 Returns the prime preceding the input number (i.e. the largest prime that is
-strictly less than the input).  C<undef> is returned if the input is C<2>
-or lower.
+strictly less than the input).  C<undef> is returned for a non-negative input
+of C<2> or less.  Negative inputs are invalid.
 
 The behavior in various programs of the I<previous prime> function is varied.
 Pari/GP and L<Math::Pari> returns the input if it is prime, as does
@@ -1232,13 +1189,14 @@ numbers with exactly C<k> factors.  If C<k=1> these are the primes, if
 C<k=2> these are the semiprimes, if C<k=3> these are the integers in the
 range with exactly 3 prime factors, etc.
 
-This is functionally equivalent to:
+For C<k E<gt>= 1>, this is functionally equivalent to:
 
   for ($a .. $b) { if (is_almost_prime($k,$_)) { ... } }
   # or
   for ($a .. $b) { if (prime_bigomega($_) == $k) { ... } }
 
 though B<significantly> faster and avoids issues with large loop variables.
+For C<k=0>, no calls are made.
 
 =head2 forfactored
 
@@ -1317,7 +1275,8 @@ partitions.  This can be thought of as all orderings of partitions, or
 alternately partitions may be viewed as an ordered subset of compositions.
 The ordering is lexicographic.  All options from L</forpart> may be used.
 
-The number of unrestricted compositions of C<n> is C<2^(n-1)>.
+For C<n E<gt>= 1>, the number of unrestricted compositions is C<2^(n-1)>.
+For C<n=0>, there is one empty composition.
 
 =head2 forcomb
 
@@ -1349,7 +1308,7 @@ This corresponds to the Pari/GP 2.10 C<forsubset> function.
 =head2 forperm
 
 Given non-negative argument C<n>, the block is called with C<@_> set to
-the C<k> element array of values from C<0> to C<n-1> representing
+the C<n> element array of values from C<0> to C<n-1> representing
 permutations in lexicographical order.
 The total number of calls will be C<n!>.
 
@@ -1391,6 +1350,9 @@ sets.  This iterator will be much more efficient.
 There is no ordering requirement for the input array reference.  The results
 will be in lexicographic order.
 
+An empty input array has one empty multiset permutation, so the block is
+called once with no arguments.
+
 
 =head2 forsetproduct
 
@@ -1406,9 +1368,13 @@ While zero or one array references are valid, the result is not very
 interesting.  If any array reference is empty, the product is
 empty, so no subroutine calls are performed.
 
-The subroutine is given an array whose values are aliased to the
-inputs, and are I<not> set to read-only.  Hence modifying the array
-inside the subroutine will cause side-effects.
+At the start, we copy the input array references to avoid aliasing
+the user inputs.  This is done only once.
+Inside the sub, modifying the structure of the callback array C<@_>
+(e.g. using C<shift> or C<pop>) is safe.
+The callback array values are the copied input values, so explicitly
+changing a value (e.g. C<$_[0] = 9>) will affect remaining sub calls
+that use the same copy.
 
 As with other iterators, the C<lastfor> function will cause an early exit.
 
@@ -1777,10 +1743,11 @@ Though we have defined C<prime_omega(0) = 1>, it is not included.
 
 =head2 ramanujan_primes
 
-Returns the Ramanujan primes R_n between the upper and lower limits
+Returns the Ramanujan primes R_n between the lower and upper limits
 (inclusive), with a lower limit of C<2> if none is given.  This is
-L<OEIS A104272|http://oeis.org/A104272>.  These are the Rn such that if
-C<< x > Rn >> then L</prime_count>(n) - L</prime_count>(n/2) C<< >= n >>.
+L<OEIS A104272|http://oeis.org/A104272>.  The nth Ramanujan prime C<R_n>
+is the smallest integer such that, for every C<< x >= R_n >>,
+L</prime_count>(x) - L</prime_count>(x/2) C<< >= n >>.
 
 This has a similar API to the L</primes> and L</twin_primes> functions, and
 like them, returns an array reference.
@@ -1815,16 +1782,21 @@ A fast upper limit on the count of Ramanujan primes under C<n>.
 
   my @candidates = sieve_range(2**1000, 10000, 40000);
 
-Given a start value C<n>, and native unsigned integers C<width> and C<depth>,
-a sieve of maximum depth C<depth> is done for the C<width> consecutive
-numbers beginning with C<n>.  An array of offsets from the start is returned.
+Given a non-negative start value C<n>, and native unsigned integers C<width>
+and C<depth>, a sieve of maximum depth C<depth> is done for the C<width>
+consecutive numbers beginning with C<n>.  An array of offsets from the start
+is returned.  C<width> and C<depth> must fit in a native unsigned integer.
 
-The returned list contains those offsets in the range C<n> to C<n+width-1>
-where C<n + offset> has no prime factors smaller than itself and
-less than or equal to C<depth>.  Hence a depth of 2 will remove all even
+The returned list contains offsets from C<0> to C<width-1> for which
+the corresponding value C<n + offset> has no prime factors smaller than
+itself and less than or equal to C<depth>.  Hence a depth of 2 will remove all even
 numbers (other than 2 itself if it is in the range).
 A depth of 3 will remove all numbers divisible by 2 or 3 other than those
 primes themselves.
+Offsets for values 0 and 1 are never returned.  Hence with a depth of 0 or 1,
+no divisibility sieving is done, but values below 2 are still omitted.
+
+In scalar context, returns the number of offsets that would be returned.
 
 
 =head2 sieve_prime_cluster
@@ -1844,11 +1816,14 @@ This function returns an array rather than an array reference.
 Typically the number of returned values is much lower than for
 other primes functions, so this uses the more convenient array
 return.  This function has an identical signature to the function
-of the same name in L<Math::Prime::Util:GMP>.
+of the same name in L<Math::Prime::Util::GMP>.
+
+In scalar context, returns the number of values that would be returned.
 
 The cluster is described as offsets from 0, with the implicit prime
-at 0.  Hence an empty list is asking for all primes (the cluster
-C<p+0>).  A list with the single value C<2> will find all twin primes
+at 0.  An explicit leading 0 is accepted and ignored.  Hence an empty
+list is asking for all primes (the cluster C<p+0>).  A list with the
+single value C<2> will find all twin primes
 (the cluster where C<p+0> and C<p+2> are prime).  The list C<2,6,8>
 will find prime quadruplets.  Note that there is no requirement that
 the list denote a constellation (a cluster with minimal distance) --
@@ -1877,7 +1852,7 @@ faster.
 
 =head2 print_primes
 
-  print_primes(1_000_000);             # print the first 1 million primes
+  print_primes(1_000_000);             # print primes up to 1 million
   print_primes(1000, 2000);            # print primes in range
   print_primes(2,1000,fileno(STDERR))  # print to a different descriptor
 
@@ -1894,6 +1869,9 @@ The point of this function is just efficiency.  It is over 10x faster
 than using C<say>, C<print>, or C<printf>, though much more limited
 in functionality.  A later version may allow a file handle as the third
 argument.
+
+Normal SIGPIPE handling applies when writing to pipes or sockets.  Write
+errors croak when write returns an error.
 
 
 =head2 nth_prime
@@ -1940,7 +1918,7 @@ See L</nth_prime_lower> for details common to both functions.
 Returns a proven lower bound on the Nth prime.  No sieving is
 done, so these are fast even for large inputs.
 
-For tiny values of C<n>. exact answers are returned.  For small inputs, an
+For tiny values of C<n>, exact answers are returned.  For small inputs, an
 inverse of the opposite prime count bound is used.  For larger values, the
 Dusart (2010) and Axler (2013) bounds are used.
 
@@ -2023,8 +2001,8 @@ Given non-negative integers C<k> and C<n>, returns the
 C<n>-th C<k>-omega prime.
 This is the C<n>-th integer divisible by exactly C<k> different primes.
 
-The implementation does a binary search lookup with
-L</omega_prime_count> so is reasonably efficient for large values.
+The implementation does a search using L</omega_prime_count>
+so is reasonably efficient for large values.
 
 C<undef> is returned for C<n == 0> and for all C<k == 0>
 other than C<n == 1>.
@@ -2036,6 +2014,8 @@ Returns the Nth Ramanujan prime.  For reasonable size values of C<n>, e.g.
 under C<10^8> or so, this is relatively efficient for single calls.  If
 multiple calls are being made, it will be much more efficient to get the
 list once.
+
+Like the other C<nth_> functions, C<undef> is returned for C<n == 0>.
 
 =head2 nth_ramanujan_prime_approx
 
@@ -2053,21 +2033,22 @@ A fast upper limit on the Nth Ramanujan prime.
 
 =head2 is_pseudoprime
 
-Given an integer C<n> and zero or more positive bases,
+Given an integer C<n> and zero or more integer bases C<< base >= 2 >>,
 returns 1 if C<n> is positive and a probable prime to each base,
 and returns 0 otherwise.
 This is the simple Fermat primality test.
 Removing primes, given base 2 this produces the sequence L<OEIS A001567|http://oeis.org/A001567>.
 
 If no bases are given, base 2 is used.  All bases must be 2 or greater.
+The bases will be used modulo C<n>.  The bases are only validated when used.
 
 For practical use, L</is_strong_pseudoprime> is a much stronger test with
 similar or better performance.
 
 Note that there is a set of composites (the Carmichael numbers) that will
-pass this test for all bases.  This downside is not shared by the Euler
-and strong probable prime tests (also called the Solovay-Strassen
-and Miller-Rabin tests).
+pass this test for every base coprime to the number.  This downside is not
+shared by the Euler and strong probable prime tests (also called the
+Solovay-Strassen and Miller-Rabin tests).
 
 =head2 is_euler_pseudoprime
 
@@ -2078,6 +2059,7 @@ This is the Euler test, sometimes called the Euler-Jacobi test.
 Removing primes, given base 2 this produces the sequence L<OEIS A047713|http://oeis.org/A047713>.
 
 If no bases are given, base 2 is used.  All bases must be 2 or greater.
+The bases will be used modulo C<n>.  The bases are only validated when used.
 
 If 0 is returned, then the number really is a composite (for bases less than n).
 If 1 is returned, then it is either a prime or an Euler pseudoprime to all the given bases.
@@ -2100,6 +2082,7 @@ returns 1 if C<n> is positive and a strong probable prime to each base,
 and returns 0 otherwise.
 
 If no bases are given, base 2 is used.  All bases must be 2 or greater.
+The bases will be used modulo C<n>.  The bases are only validated when used.
 
 If 0 is returned, then the number really is a composite (for any base).
 If 1 is returned, then it is either a prime or a strong pseudoprime to all the given bases.
@@ -2211,6 +2194,8 @@ Adams/Shanks doubling method.  This is significantly more efficient than
 other known implementations.
 
 An optional second argument C<r> indicates whether to run additional tests.
+C<r> must be an integer between 0 and 3.
+With C<r=0>, the normal tests are done, same as no second argument.
 With C<r=1>, C<P(-n) = -1 mod n> is also verified,
 creating the "minimal restricted" test.
 With C<r=2>, the full signature is also tested using the Adams and Shanks (1982)
@@ -2226,7 +2211,7 @@ Given an integer C<n>, returns 1 if C<n> is positive and
 C<< (-1)^{(n-1)/2} * C_{(n-1)/2} >> is congruent to 2 mod C<n>,
 where C<C_n> is the nth Catalan number, and returns 0 otherwise.
 The nth Catalan number is equal to C<binomial(2n,n)/(n+1)>.
-All odd primes satisfy this condition, and only three known composites.
+All odd primes satisfy this condition, and only three composites are known.
 
 The pseudoprime sequence is L<OEIS A163209|http://oeis.org/A163209>.
 
@@ -2240,7 +2225,7 @@ other compositeness tests.
 
 =head2 is_frobenius_pseudoprime
 
-Given an integer C<n> and two optional integer parameters C<a> and C<b>,
+Given an integer C<n> and optionally a pair of integer parameters C<a> and C<b>,
 returns 1 if C<n> is positive and a Frobenius probable prime with respect
 to the polynomial C<x^2 - ax + b>, and returns 0 otherwise.
 Without the parameters, C<b = 2> and
@@ -2289,8 +2274,10 @@ Performance at 1e12 is about 60% slower than BPSW.
 Given an integer C<n>, returns 1 if C<n> is positive and
 passes the Frobenius test of Sergey Khashin, and returns 0 otherwise.
 The test verifies C<n> is not a perfect square,
-selects the parameter C<c> as the smallest odd prime such that C<(c|n)=-1>,
-then verifies that C<(1+D)^n = (1-D) mod n> where C<D = sqrt(c) mod n>.
+selects C<c> as the first value in C<-1, 2, 3, 4, ...> for which
+C<(c|n) != 1>, and returns 0 if the symbol is zero.  It then verifies
+C<(2+D)^n = (2-D) mod n> for C<c = -1> or C<c = 2>, and
+C<(1+D)^n = (1-D) mod n> otherwise, where C<D = sqrt(c) mod n>.
 
 There are no known pseudoprimes to this test and Khashin (2018) shows
 there are no counterexamples under C<2^64>.
@@ -2301,6 +2288,8 @@ Performance at 1e12 is about 40% slower than BPSW.
 Given an integer C<n> and a positive integer C<k>,
 returns 1 if C<n> is positive and passes C<k> Miller-Rabin tests
 using uniform random bases selected between C<2> and C<n-2>.
+For very large C<k> relative to C<n>, a deterministic test may be used
+instead of performing redundant random tests.
 
 This should not be used in place of L</is_prob_prime>, L</is_prime>,
 or L</is_provable_prime>.  Those functions will be faster and provide
@@ -2366,7 +2355,7 @@ larger polynomial set).
 
 The pure Perl implementation uses theorem 5 of BLS75 (Brillhart, Lehmer, and
 Selfridge's 1975 paper), an improvement on the Pocklington-Lehmer test.
-This requires C<n-1> to be factored to C<(n/2)^(1/3))>.  This is often fast,
+This requires C<n-1> to be factored to C<(n/2)^(1/3)>.  This is often fast,
 but as C<n> gets larger, it takes exponentially longer to find factors.
 
 L<Math::Prime::Util::GMP> implements both the BLS75 theorem 5 test as well
@@ -2414,8 +2403,7 @@ its elliptic curve computations.
 If the certificate is malformed, the routine will carp a warning in addition
 to returning 0.  If the C<verbose> option is set (see L</prime_set_config>)
 then if the validation fails, the reason for the failure is printed in
-addition to returning 0.  If the C<verbose> option is set to 2 or higher, then
-a message indicating success and the certificate type is also printed.
+addition to returning 0.
 
 A certificate may have arbitrary text before the beginning (the primality
 routines from this module will not have any extra text, but this way
@@ -2429,13 +2417,9 @@ and ignored, as are blank lines.  A version number may follow, such as:
 
   Version 1.0
 
-For all inputs, base 10 is the default, but at any point this may be
-changed with a line like:
-
-  Base 16
-
-where allowed bases are 10, 16, and 62.  This module will only use base 10,
-so its routines will not output Base commands.
+Certificate values are written in base 10.
+An optional Base 10 line is accepted; other bases are rejected.
+Certificates generated by this module do not include a Base line.
 
 Next, we look for (using "100003" as an example):
 
@@ -2473,7 +2457,9 @@ certificate contain the set in any order, and let the verifier do the
 work of constructing the tree.
 
 The blocks begin with the text "Type ..." where ... is the type.  One or
-more values follow.  The defined types are:
+more values follow.  The primary block types and their conditions are shown
+below.  The verifier also accepts the Primo-compatible C<ECPP3> and C<ECPP4>
+block types, but this module does not generate them.
 
 =over 4
 
@@ -2483,6 +2469,29 @@ more values follow.  The defined types are:
   N 5791
 
 N must be less than 2^64 and be prime (use BPSW or deterministic M-R).
+
+=item C<Lucas>
+
+  Type Lucas
+  N     100003
+  Q[1]  2
+  Q[2]  3
+  Q[3]  7
+  Q[4]  2381
+  A     2
+
+A Lucas/Pratt-style n-1 proof using a complete factorization of N-1.  The
+Q values contain its distinct prime factors.  This block verifies if:
+  a  A > 1
+  b  A < N
+  c  A^(N-1) mod N = 1
+  d  For each i:
+  d1   Q[i] > 1
+  d2   Q[i] < N-1
+  d3   Q[i] divides N-1
+  d4   A^((N-1)/Q[i]) mod N != 1
+  .  Let F be the product of each Q[i] to its full multiplicity in N-1
+  e  F = N-1
 
 =item C<BLS3>
 
@@ -2515,12 +2524,13 @@ and this module does not currently generate these blocks.
 This block verifies if:
   a  Q divides N-1
   .  Let M = (N-1)/Q
-  b  M > 0
-  c  M < Q
-  d  MQ+1 = N
-  e  A > 1
-  f  A^(N-1) mod N = 1
-  g  gcd(A^M - 1, N) = 1
+  b  M is even
+  c  M > 0
+  d  M < Q
+  e  MQ+1 = N
+  f  A > 1
+  g  A^(N-1) mod N = 1
+  h  gcd(A^M - 1, N) = 1
 
 =item C<BLS15>
 
@@ -2570,14 +2580,13 @@ multiple Q values to chain rather than a single one.  This block verifies if:
   c3   A[i] > 1
   c4   A[i] < N
   c5   Q[i] divides N-1
-  . Let F = N-1 divided by each Q[i] as many times as evenly possible
+  . Let F be the product of each Q[i] to its full multiplicity in N-1
   . Let R = (N-1)/F
   d  F is even
   e  gcd(F, R) = 1
-  . Let s = integer    part of R / 2F
-  . Let f = fractional part of R / 2F
+  . Let s and r be the quotient and remainder of R divided by 2F
   . Let P = (F+1) * (2*F*F + (r-1)*F + 1)
-  f  n < P
+  f  N < P
   g  s = 0  OR  r^2-8s is not a perfect square
   h  For each i (0 .. maxi):
   h1   A[i]^(N-1) mod N = 1
@@ -2642,11 +2651,6 @@ This module also has ECPP, and indeed it is much faster.
 This implementation uses theorem 4.1 from Bernstein (2003).  It runs
 substantially faster than the original, v6 revised paper with Lenstra
 improvements, or the late 2002 improvements of Voloch and Bornemann.
-The GMP implementation uses a binary segmentation method for modular
-polynomial multiplication (see Bernstein's 2007 Quartic paper), which
-reduces to a single scalar multiplication, at which GMP excels.
-Because of this, the GMP implementation is likely to be faster once
-the input is larger than C<2^33>.
 
 
 =head2 is_mersenne_prime
@@ -2656,9 +2660,9 @@ the input is larger than C<2^33>.
 Given an integer C<p>, returns 1 if C<p> is positive and
 the Mersenne number C<2^p-1> is prime, and returns 0 otherwise.
 Since an enormous effort has gone into testing these, a list of known
-Mersenne primes is used to accelerate this.  Beyond the highest sequential
-Mersenne prime (currently 37,156,667) this performs pretesting followed by
-the Lucas-Lehmer test.
+Mersenne primes is used to accelerate this.  Beyond the highest value
+double checked by the GIMPS project (currently about 80 million),
+this performs pretesting followed by the Lucas-Lehmer test.
 
 The Lucas-Lehmer test is a deterministic unconditional test that runs
 very fast compared to other primality methods for numbers of comparable
@@ -2666,7 +2670,7 @@ size, and vastly faster than any known general-form primality proof methods.
 While this test is fast, the GMP implementation is not nearly as fast as
 specialized programs such as C<prime95>.  Additionally, since we use the
 table for "small" numbers, testing via this function call will only occur
-for numbers with over 9.8 million digits.  At this size, tools such as
+for numbers with over 24 million digits.  At this size, tools such as
 C<prime95> are greatly preferred.
 
 
@@ -2762,29 +2766,37 @@ Given integer C<n>, returns 1 if C<n> is a positive integer that is the
 sum of its divisors excluding the number itself, or equivalently a number
 that is equal to its aliquot sum.
 
+Also see L</abundance>.
+
 =head2 is_power
 
   say "$n is a perfect square" if is_power($n, 2);
   say "$n is a perfect cube" if is_power($n, 3);
   say "$n is a ", is_power($n), "-th power";
+  if (my $pow = is_power($n, \my $root)) { say "$n = $root^$pow" }
 
 Given a single integer input C<n>, returns k if C<n = r^k> for
-some integer C<< r > 1, k > 1 >>, and 0 otherwise.  The k returned is
+some integers C<< |r| > 1, k > 1 >>, and 0 otherwise.  The k returned is
 the largest possible.  This can be used in a boolean statement to
 determine if C<n> is a perfect power.
 
-If given an integer C<n> and a non-negative integer C<k>,
-returns 1 if C<n> is a C<k-th> power, and 0 otherwise.
+An optional non-negative integer second argument C<k> may be given.
+When C<k> is a positive value, it returns 1 if C<n> is a C<k-th> power,
+and 0 otherwise.
 For example, if C<k=2> then this detects perfect squares.
-Setting C<k=0> gives behavior like the first case (the largest root is found
+When the second argument is present but is C<undef> or C<0> then
+it behaves like the first case (the largest exponent is found
 and its value is returned).
 
-If a third argument is given, it must be a scalar reference.  If C<n> is
-a k-th power, then this will be set to the k-th root of C<n>.  For example:
+If a scalar reference argument is given, then the root will be stored in it
+when C<n> is a perfect power.  For example:
 
   my $n = 222657534574035968;
-  if (my $pow = is_power($n, 0, \my $root)) { say "$n = $root^$pow" }
+  if (my $pow = is_power($n, \my $root)) { say "$n = $root^$pow" }
   # prints:  222657534574035968 = 2948^5
+
+The older C<is_power($n, undef, \my $root)> form is supported for
+compatibility, but the C<is_power($n, \my $root)> form is preferred.
 
 This corresponds to Pari/GP's C<ispower> function with integer arguments.
 
@@ -2798,11 +2810,13 @@ This corresponds to Pari/GP's C<issquare> function.
 
 =head2 is_sum_of_squares
 
-Given an integer C<n> and an optional positive integer number of squares C<k>,
-returns 1 if C<|n|> can be represented as the sum of exactly C<k> squares.
-C<k> defaults to 2.
-All positive integers can be represented by 4 or more squares, so
-only C<k == 2> and C<k == 3> are interesting cases.
+Given an integer C<n> and an optional non-negative integer number of squares
+C<k>, returns 1 if C<|n|> can be represented as the sum of exactly C<k>
+integer squares.  Zero is allowed as a square, and C<k> defaults to 2.
+For C<k == 0>, the result is 1 only when C<n == 0>.  For C<k == 1>,
+this is equivalent to L</is_square>.
+All non-negative integers can be represented by 4 or more squares, so
+only C<k == 2> and C<k == 3> are non-trivial cases.
 
 With C<k == 2> this produces the sequence
 L<OEIS A001481|http://oeis.org/A001481>.
@@ -2812,10 +2826,13 @@ L<OEIS A000378|http://oeis.org/A000378>.
 =head2 is_powerfree
 
 Given an integer C<n> and an optional non-negative integer C<k>, returns
-1 if C<|n|> has no divisor C<d^k>, and returns 0 otherwise.
+1 if C<|n|> has no divisor C<d^k> with C<d E<gt> 1>, and returns 0 otherwise.
 This determines if C<|n|> has any k-th (or higher) powers in the prime
 factorization.
 C<k> defaults to 2.
+For the powerfree functions, C<k> must be at most C<2^32-1>.
+For C<k E<lt> 2>, only C<|n| = 1> is considered k-powerfree.  Consequently,
+the count and sum functions return 1 for C<n E<gt>= 1> and 0 otherwise.
 
 With C<k == 2> this produces the sequence of square-free integers
 L<OEIS A005117|http://oeis.org/A005117>.
@@ -2828,6 +2845,7 @@ L<OEIS A046100|http://oeis.org/A046100>.
 
 Given an integer C<n> and an optional non-negative integer C<k>, returns
 the number of k-powerfree positive integers less than or equal to C<n>.
+Returns 0 if C<n E<lt> 1>.
 C<k> defaults to 2.
 
 With C<k == 2> this produces the sequence
@@ -2851,6 +2869,7 @@ L<OEIS A004709|http://oeis.org/A004709>.
 
 Given an integer C<n> and an optional non-negative integer C<k>, returns
 the sum of k-powerfree positive integers less than or equal to C<n>.
+Returns 0 if C<n E<lt> 1>.
 C<k> defaults to 2.
 
 With C<k == 2> this produces the sequence
@@ -2860,10 +2879,13 @@ L<OEIS A066779|http://oeis.org/A066779>.
 
 Given an integer C<n> and an optional non-negative integer C<k>, returns
 the k-powerfree part of C<n>.  This is done via removing "excess" powers,
-i.e. in the prime factorization of C<n>, we reduce any exponents C<E>
-from C<P^E> to C<P^(E % k)>.  Alternately we can say all k-th powers are
-divided out.
+i.e. for C<k E<gt>= 2>, in the prime factorization of C<n> we reduce any
+exponents C<E> from C<P^E> to C<P^(E % k)>.  Alternately we can say all
+k-th powers are divided out.
+For negative C<n>, the k-powerfree part of C<|n|> is computed and the
+original sign is restored.
 C<k> defaults to 2.
+For C<k E<lt> 2>, the result is C<n> when C<|n| = 1>, and 0 otherwise.
 
 When C<k == 2>, this is also sometimes called C<core(n)>.  It is the
 unique square-free integer C<d> such that C<n/d> is a square.
@@ -2885,6 +2907,8 @@ is equivalent to
     vecsum(map { powerfree_part($_,$k) } 1..$n)
 
 but substantially faster.
+Returns 0 if C<n E<lt> 1>.
+C<k> defaults to 2.
 
 With C<k == 2> this produces the sequence
 L<OEIS A069891|http://oeis.org/A069891>.
@@ -2896,13 +2920,14 @@ also known as the integer radical.  It is the largest square-free divisor
 of C<n>, which is also the product of the distinct primes dividing C<n>.
 
 We choose to accept negative inputs, with the result matching the input sign.
+For C<n = 0>, the result is 0.
 
 This is the L<OEIS series A007947|http://oeis.org/A007947>.
 
 =head2 sqrtint
 
-Given a non-negative integer input C<n>, returns the integer square root.
-For native integers, this is equal to C<int(sqrt(n))>.
+Given a non-negative integer input C<n>, returns the exact integer square root,
+C<floor(sqrt(n))>.
 
 This corresponds to Pari/GP's C<sqrtint> function.
 
@@ -2923,6 +2948,13 @@ behavior of Pari/GP and Math::BigInt and disallow negative C<n>.
 This corresponds to Pari/GP's C<sqrtnint> function.
 
 
+=head2 crootint
+
+Given a non-negative integer C<n> and positive exponent C<k>, return the
+ceiling integer k-th root of C<n>.  This is the smallest integer C<r> such
+that C<< r^k >= n >>.
+
+
 =head2 logint
 
   say "decimal digits: ", 1+logint($n, 10);
@@ -2930,7 +2962,7 @@ This corresponds to Pari/GP's C<sqrtnint> function.
   my $be; my $e = logint(1000, 2, \$be);
   say "largest power of 2 less than or equal to 1000:  2^$e = $be";
 
-Given a non-zero positive integer C<n> and an integer base C<b> greater
+Given a positive integer C<n> and an integer base C<b> greater
 than 1, returns the largest integer C<e> such that C<< b^e <= n >>.
 
 If a third argument is present, it must be a scalar reference.
@@ -2944,7 +2976,7 @@ This corresponds to Pari/GP's C<logint> function.
 Given an integer C<n> and an optional integer number of bits C<k>,
 perform a left shift of C<n> by C<k> bits.
 If the second argument is not provided, it is assumed to be 1.
-This is equivalent to multiplying by C<2^k>.
+For non-negative C<k>, this is equivalent to multiplying by C<2^k>.
 
 With negative C<n>, this behaves as described above.  This is similar to
 how Perl behaves with C<use integer> or C<use bigint>, but raw Perl
@@ -2999,7 +3031,7 @@ Given an integer C<n>, returns the sign of C<n>.
 Returns -1, 0, or 1 if C<n> is negative, zero, or positive respectively.
 
 This corresponds to Pari/GP's C<sign> function, GMP's C<mpz_sgn> function,
-Raku's C<sign> method, and Math::BigInt's C<sign> method.
+Raku's C<sign> method, and comparing a Math::BigInt against zero with C<bcmp>.
 Some of those extend to non-integers.
 
 =head2 cmpint
@@ -3034,8 +3066,7 @@ B<Perl native operations.>  This is fine with small numbers, but once
 large enough, values will be converted to floating point (NV).  This
 means incorrect results.  Values larger than 64-bit are completely
 unsupported.  One might expect C<2^53> to be the usual point for
-"large enough", but not only is the NV type platform dependent, but
-very old 64-bit Perl will aggressively convert values to NV starting
+"large enough", but some platforms and operations will convert to NV starting
 at C<2^49> even with NV being a IEEE-754 double.
 
 =item *
@@ -3056,9 +3087,9 @@ times slower as well as more memory.
 
 All these functions accept native integers (IV/UV), bigints, and string
 representations of integers.  Results will be in native types if possible,
-and as objects of the chosen bigint class otherwise.  Best performance
-will still be had by native operations within range, or by using fast
-classes like L<Math::GMPz> if most operations need it.
+and as objects of the chosen bigint class (via L</prime_set_config>) otherwise.
+Best performance will still be had by native operations within range, or by
+using fast classes like L<Math::GMPz> if most operations need it.
 We give correct behavior while only paying the performance penalty when
 needed, although there is still some overhead since we are not built
 into the language like Raku or Python.
@@ -3079,16 +3110,26 @@ Given integer C<n>, returns C<n - 1>.
 
 Given integers C<a> and C<b>, returns C<a * b>.
 
+=head2 muladdint
+
+Given integers C<n>, C<m>, and C<a>, returns C<n * m + a>.
+
+=head2 mulsubint
+
+Given integers C<n>, C<m>, and C<a>, returns C<n * m - a>.
+
 =head2 powint
 
 Given an integer C<a> and a non-negative integer C<b>,
 returns C<a^b>.  C<0^0> will return 1.
 
-The exponent C<b> is converted into an unsigned long.
+The exponent C<b> is not restricted to native integer size.
 
 =head2 divint
 
 Given integers C<a> and C<b>, returns the quotient C<a / b>.
+For this and all the integer division functions below, C<b> must be non-zero.
+A zero divisor raises an exception.
 
 Floor division is used, so q is rounded towards C<-inf> and
 the remainder has the same sign as the divisor C<b>.
@@ -3176,6 +3217,64 @@ Given integer C<n>, return C<|n|>, i.e. the absolute value of C<n>.
 
 Given integer C<n>, return C<-n>.
 
+=head2 toint
+
+  $n = toint(3.7);        # 3     (truncate toward zero, like int())
+  $n = toint(-3.7);       # -3
+  $n = toint("42");       # 42    (integer string)
+  $n = toint("3.7");      # 3     (float string)
+  $n = toint("0o777");    # 511   (octal integer string)
+  $n = toint($bigfloat);  # truncated, returned as native or bigint
+  $n = toint($bigint);    # native if it fits, else our bigint type
+
+Convert any numeric value to an integer by truncating toward zero.
+Returns a native integer if the result fits in a Perl native integer
+(UV or IV), otherwise returns the configured bigint type.
+
+Truncation toward zero is done, just like Perl's C<int(n)> or an integer
+cast in C.
+
+As special cases, C<undef> and the empty string return 0.
+
+Strings prefixed with C<0x>, C<0b>, or C<0o> are interpreted as hexadecimal,
+binary, or octal integers respectively.  A leading zero without one of these
+prefixes does not change the base, so C<toint("0777")> returns 777.
+Single underscores may separate digits for readability, following Perl's
+numeric literal convention.  Surrounding ASCII whitespace is ignored.
+
+
+=head2 fibonacci
+
+  say fibonacci($_) for 0..20; # 0,1,1,2,3,5,8,13,21,34,55,...
+
+Given an integer C<k>, returns C<F(k)>, the C<k>-th Fibonacci
+number.  The sequence begins C<F(0)=0>, C<F(1)=1>, with each subsequent
+term the sum of the two preceding terms.  The sequence can be run in
+reverse so negative C<k> is valid.
+
+This is equivalent to C<lucasu(1,-1,k)> but can be faster.
+
+This is L<OEIS A000045|http://oeis.org/A000045>.
+
+This corresponds to Mathematica's C<Fibonacci> function and
+Pari/GP's C<fibonacci> function.
+
+=head2 lucas_number
+
+  say lucas_number($_) for 0..10; # 2,1,3,4,7,11,18,29,47,76,123,...
+
+Given an integer C<k>, returns C<L(k)>, the C<k>-th Lucas
+number.  The sequence begins C<L(0)=2>, C<L(1)=1>, with each subsequent
+term the sum of the two preceding terms.  The sequence can be run in
+reverse so negative C<k> is valid.
+
+Lucas numbers satisfy C<L(k) = F(k-1) + F(k+1)> and are equivalent to
+C<lucasv(1,-1,k)>.
+
+This is L<OEIS A000032|http://oeis.org/A000032>.
+
+This corresponds to Mathematica's C<LucasL> function.
+
 
 =head2 lucasu
 
@@ -3185,6 +3284,10 @@ Given integers C<P>, C<Q>, and the non-negative integer C<k>,
 computes C<U_k> for the Lucas sequence defined by C<P>,C<Q>.  These include
 the Fibonacci numbers (C<1,-1>), the Pell numbers (C<2,-1>), the Jacobsthal
 numbers (C<1,-2>), the Mersenne numbers (C<3,2>), and more.
+
+We use C<U(0) = 0>, C<U(1) = 1>, and
+C<U(k) = P*U(k-1) - Q*U(k-2)> for C<k E<gt>= 2>.  The corresponding
+V sequence uses C<V(0) = 2>, C<V(1) = P>, and the same recurrence.
 
 Also see L</lucasumod> for fast computation mod n.
 
@@ -3198,6 +3301,7 @@ function.
 Given integers C<P>, C<Q>, and the non-negative integer C<k>,
 computes C<V_k> for the Lucas sequence defined by C<P>,C<Q>.  These include
 the Lucas numbers (C<1,-1>).
+The initial values and recurrence are defined under L</lucasu>.
 
 Also see L</lucasvmod> for fast computation mod n.
 
@@ -3211,7 +3315,8 @@ function.
 Given integers C<P>, C<Q>, and the non-negative integer C<k>,
 computes both C<U_k> and C<V_k> for the Lucas sequence defined
 by C<P>,C<Q>.
-Generating both values is typically not much more time than one.
+Computing both values typically takes little more time than computing one.
+The initial values and recurrence are defined under L</lucasu>.
 
 Also see L</lucasuvmod> for fast computation mod n.
 
@@ -3221,6 +3326,7 @@ Given a list of integers, returns the greatest common divisor.  This is
 often used to test for L<coprimality|https://oeis.org/wiki/Coprimality>.
 
 Each input C<n> is treated as C<|n|>.
+With no inputs, C<gcd()> returns 0.  As usual, C<gcd(0,n) = |n|>.
 
 =head2 lcm
 
@@ -3251,8 +3357,9 @@ solution exists, C<undef> is returned.  If a solution is returned, the
 modulus is equal to the lcm of all the given moduli (see L</lcm>).  In
 the standard case where all values of C<n> are coprime, this is just the
 product.
-The C<a> values must be integers, while the C<n> values must be
-non-zero integers.  Like other mod functions, we use C<abs(n)>.
+The C<a> and C<n> values must be integers.  If any modulus C<n> is zero,
+C<undef> is returned.  Otherwise, like other mod functions, we use C<abs(n)>.
+With no input pairs, C<chinese()> returns 0.
 
 Comparison to similar functions in other software:
 
@@ -3272,12 +3379,13 @@ Comparison to similar functions in other software:
 
 =head2 chinese2
 
-Functions like L</chinese> but returns two items: the remainder
+Like L</chinese>, this returns a solution, but as two items: the remainder
 and the modulus.
 If a solution exists, the second value (the final modulus) is equal to
 the lcm of the absolute values of all the given moduli.
 
 If no solution exists, both return values will be C<undef>.
+With no input pairs, C<chinese2()> returns C<(0,0)>.
 
 =head2 frobenius_number
 
@@ -3291,6 +3399,7 @@ This is sometimes called the "coin problem".
 
 This corresponds to Mathematica's C<FrobeniusNumber> function.  Matching
 their API, we return -1 if any set element is C<1>.
+With no inputs, or with a single input greater than 1, C<undef> is returned.
 
 =head2 vecsum
 
@@ -3303,7 +3412,27 @@ a double, which will mean incorrect results with large integers.  C<vecsum>
 sums (signed) integers and returns the untruncated result.
 
 Processing is done on native integers while possible, including using a
-128-bit running sum in the C code.
+double-width running sum in the C code (128 bits on 64-bit Perl and 64 bits
+on 32-bit Perl).
+
+=head2 vecprefixsum
+
+  my @cumulative = vecprefixsum(1..10);  # 1,3,6,10,15,21,28,36,45,55
+
+Returns the prefix sums (also called cumulative sums) of the integer
+arguments.  Given a list C<(a0, a1, a2, ...)>, returns
+C<(a0, a0+a1, a0+a1+a2, ...)>.  Each element of the result is the
+sum of the original elements up to that index.  An empty argument
+list returns an empty list.  Arguments may be negative, bigints, or
+integers stored as strings.
+
+Like C<vecsum>, all arithmetic is done on integers, returning exact results
+without converting to floating-point.
+
+The input can also be a single array reference, which will be slightly more
+efficient.  The output will still be a flat list.
+
+In scalar context, returns the number of prefix sums that would be returned.
 
 =head2 vecprod
 
@@ -3319,11 +3448,11 @@ results as integers and automatically switches to bigints if needed.
 
 Returns the minimum of all arguments, each of which must be an integer.
 This is similar to List::Util's L<List::Util/min> function, but has a very
-important difference.  List::Util turns all inputs into doubles and returns
-a double, which gives incorrect results with large integers.  C<vecmin>
-validates and compares all results as integers.  The validation step will
-make it a little slower than L<List::Util/min> but this prevents accidental
-and unintentional use of floats.
+important difference.  List::Util may compare large integers as floating
+point values, which can make it select the wrong input entry.  C<vecmin>
+validates and compares all values as integers.  The validation step will make
+it a little slower than L<List::Util/min> but prevents accidental and
+unintentional use of floats.
 
 =head2 vecmax
 
@@ -3331,11 +3460,11 @@ and unintentional use of floats.
 
 Returns the maximum of all arguments, each of which must be an integer.
 This is similar to List::Util's L<List::Util/max> function, but has a very
-important difference.  List::Util turns all inputs into doubles and returns
-a double, which gives incorrect results with large integers.  C<vecmax>
-validates and compares all results as integers.  The validation step will
-make it a little slower than L<List::Util/max> but this prevents accidental
-and unintentional use of floats.
+important difference.  List::Util may compare large integers as floating
+point values, which can make it select the wrong input entry.  C<vecmax>
+validates and compares all values as integers.  The validation step will make
+it a little slower than L<List::Util/max> but prevents accidental and
+unintentional use of floats.
 
 =head2 vecreduce
 
@@ -3343,16 +3472,18 @@ and unintentional use of floats.
   my $checksum = vecreduce { $a ^ $b } @{twin_primes(1000000)};
 
 Does a reduce operation via left fold.  Takes a block and a list as arguments.
-The block uses the special local variables C<a> and C<b> representing the
+The block uses the special local variables C<$a> and C<$b> representing the
 accumulation and next element respectively, with the result of the block being
 used for the new accumulation.  No initial element is used, so C<undef>
 will be returned with an empty list.
 
-The interface is exactly the same as L<List::Util/reduce>.  This was done to
-increase portability and minimize confusion.  See chapter 7 of Higher Order
-Perl (or many other references) for a discussion of reduce with empty or
-singular-element lists.  It is often a good idea to give an identity element
-as the first list argument.
+The call interface is the same as L<List::Util/reduce>, but values supplied to
+the block are not aliases of the input values; assigning to them will not
+modify the input.  See chapter 7 of Higher Order Perl (or many other
+references) for a discussion of reduce with empty or singular-element lists.
+It is often a good idea to give an identity element as the first list argument.
+The returned value is not an lvalue alias of an input value.  References are
+not deep-copied.
 
 While operations like L</vecmin>, L</vecmax>, L</vecsum>, L</vecprod>, etc.
 can be fairly easily done with this function, it will not be as efficient.
@@ -3385,6 +3516,9 @@ evaluation on list elements is done until either all list values have been
 evaluated or the result condition can be determined.  For instance, in the
 example of C<vecall> above, evaluation stops as soon as any value returns
 false.
+
+C<vecfirst> returns the first element for which the block returns true, or
+C<undef> if no element satisfies the block.
 
 The interface is exactly the same as the C<any>, C<all>, C<none>, C<notall>,
 and C<first> functions in L<List::Util>.  This was done to increase
@@ -3433,14 +3567,15 @@ These are equivalent:
 
   my @vec = vecuniq(1,2,3,2,-10,-100,1);  # returns (1,2,3,-10,-100)
 
-Given an array of integers, returns an array with all duplicate entries
+Given a list of defined values, returns a list with duplicate entries
 removed.  The original ordering is preserved.  All values B<must> be defined.
 
-This is similar to L<List::Util::uniqint> (the integer comparison version
-of L<List::Util::uniq>).
-Unlike the more generic L<List::Util::uniq> and L<List::MoreUtils::XS::uniq>,
-all inputs must be integers.
-With native integers, our function is 2-10x faster.
+Values are compared using Perl string/hash semantics, similar to
+L<List::Util::uniq> and L<List::MoreUtils::XS::uniq>.  For example,
+C<"2"> and C<"02"> are distinct values.
+Native integer inputs use a fast path that can be up to 10x faster.
+
+In scalar context, returns the number of unique values that would be returned.
 
 =head2 vecfreq
 
@@ -3458,6 +3593,8 @@ when given only native integers.
 This is very similar to the Pari/GP function C<matreduce> for vectors,
 and to Python's C<Counter>.
 
+In scalar context, returns the number of unique values.
+
 =head2 vecsingleton
 
   my @solo = vecsingleton(1,4,17,1,17,-8);  # (4,-8)
@@ -3470,6 +3607,9 @@ appear more than once in the list.  The original ordering is preserved.
 
 This is identical to L<List::MoreUtils::singleton>.  When given only native
 integers, it is typically 2 to 10x faster.
+
+In scalar context, returns the number of singleton values that would be
+returned.
 
 =head2 vecsort
 
@@ -3508,6 +3648,17 @@ This is almost always faster than Perl's built-in numerical sort:
 C<< @a = sort { $a <=> $b } @a >>.
 See the performance section for more information.
 
+=head2 vecrsort
+
+  my @sorted = vecrsort(1,2,3,2,-10,-100,1);   # returns (3,2,2,1,1,-10,-100)
+  my @sorted = vecrsort([1,2,3,2,-10,-100,1]); # same
+
+Numerically (descending) sort a list of integers.  The input is either a list
+or a single array reference which holds the list.
+
+This is the reverse-order equivalent of L</vecsort>.  The same input
+requirements and scalar-context behavior apply.
+
 =head2 vecsorti
 
   my @arr = map { irand } 1..100000;
@@ -3520,6 +3671,17 @@ The array reference is also returned for convenience.
 This is more efficient than L</vecsort>.  Perl's C<sort> has this
 optimization built-in when doing straightforward sorting on non-references.
 
+=head2 vecrsorti
+
+  my @arr = map { irand } 1..100000;
+  vecrsorti \@arr;
+
+Given an array reference of integers,
+numerically (descending) sorts the integers in-place.
+The array reference is also returned for convenience.
+
+This is the reverse-order equivalent of L</vecsorti>.
+
 =head2 vecequal
 
   my $is_equal = vecequal( [1,2,-3,[4,5,undef]], [1,2,-3,[4,5,undef]] );
@@ -3527,14 +3689,17 @@ optimization built-in when doing straightforward sorting on non-references.
 Compare two arrays for equality, including nested arrays.  The values inside
 the two input array references must be either an array reference, a scalar,
 or undef.  Simple integers are tested with integer comparison, while other
-scalars use string comparison.
+scalars use string comparison.  Sparse array holes are treated as undef.
 
 This is a vector comparison, not set comparison, so ordering is important.
 For the sake of wider applicability, non-integers are allowed.  Types other
 than integers and strings (e.g. floating point values) are not guaranteed
 to have consistent results.
 
-No circular reference detection is performed.
+Circular array references are supported.  If the same pair of array references
+is encountered again on the active comparison path, that branch is considered
+equal.  Comparison therefore follows recursively unfolded values rather than
+requiring identical reference topology.
 
 Performance with XS is 3x to 100x faster than perl looping or modules like
 Array::Compare, Data::Cmp, match::smart, List::Compare, and Algorithm::Diff.
@@ -3580,12 +3745,79 @@ C<vecpmex>(1,2,...,I<w>) = I<w>+1.
 
 Given a code block and a list, calls the code block for each pair
 in the list, setting the local C<$a> and C<$b> to the values in
-each pair.
+each pair.  Values supplied to the block are not aliases of the input
+values; assigning to them will not modify the input.  The block is called
+in scalar context, and one result is collected for each pair.
+In scalar context, returns the number of results.
+Returned values are not lvalue aliases of input values.  References are not
+deep-copied.
 
 There is no restriction of what the list contains, as seen in the
 second example.
 
-This is identical to L<List::MoreUtils::slide>.
+This is similar to L<List::MoreUtils::slide>.
+
+
+=head2 vecpairwise
+
+  @pairsum = vecpairwise {$a+$b} \@A, \@B;
+
+  vecpairwise { say $a if $b } \@values, \@flags;
+
+Given a code block and two array references, calls the code block for
+each corresponding pair of elements, setting the local C<$a> and C<$b>
+to the values in each pair.  Values supplied to the block are not aliases
+of the input values; assigning to them will not modify the input arrays.
+All return values from each block call are collected and returned as a
+flat list (like C<map>), so the block may return zero, one, or multiple
+values.  If one input array is longer, trailing unpaired elements are
+ignored.
+In scalar context, returns the number of results.
+Returned values are not lvalue aliases of input array elements.  References
+are not deep-copied.
+
+There is no restriction of what the arrays contain.
+
+This is similar to L<List::MoreUtils::pairwise>.
+
+
+=head2 vecwindow
+
+  # Consecutive differences
+  my @diffs = vecwindow { $_[1]-$_[0] } 1, 2, @primes;
+
+  # Non-overlapping chunks of 3, summed
+  my @sums = vecwindow { vecsum @_ } 3, 3, @data;
+
+  # Overlapping windows of 4 passed as array refs
+  my @wins = vecwindow { [@_] } 1, 4, @data;
+
+  # Like List::Util pairs (without the ->key/->value methods)
+  for my $pref (vecwindow { [@_] } 2,2,@L) { my($key,$val) = @$pref; ... }
+
+Given a code block, a step size, a window size, and a list, calls the
+code block once for each window of C<size> consecutive elements, advancing
+by C<step> between calls.  The window elements are passed as C<@_> to the
+block.  Values supplied to the block are not aliases of the input values;
+assigning to them will not modify the input.  All return values from each
+block call are collected and returned as a flat list (like C<map>).
+Incomplete trailing windows are silently dropped.
+In scalar context, returns the number of results.
+Returned values are not lvalue aliases of input values.  References are not
+deep-copied.
+
+Both C<step> and C<size> must be positive integers.
+When C<step E<gt> size> there are gaps between windows.
+
+The combination of selectable step and window size allows this to
+emulate many other window-type functions.
+It offers similar functionality as L<List::MoreUtils/slideatatime>,
+though in a list form rather than an iterator.
+With C<< step == size >> we get chunking like C<natatime> and C<pairs>.
+With C<< step == 1 >> we get sliding windows like C<slide>,
+calculating moving averages, n-grams, etc.
+With C<< step > size >> we can do things like pick the first of each
+group of three.
 
 
 =head2 toset
@@ -3731,6 +3963,12 @@ The result will be in set form (numerically sorted, no duplicates).
 The input sets are not aliased inside the block (modifying C<$a> and
 C<$b> has no effect outside the block).
 
+For performance and memory, C<setbinop> may evaluate one or more blocks
+using XS then restart using a more general path if the result set cannot
+be natively stored.  This is an unusual case where results are larger or
+smaller than an IV.  Because of this, the block should not rely on side
+effects.
+
 This corresponds to Pari's C<setbinop> function.
 Our function uses B<much> less memory, as of Pari 2.18.1.
 
@@ -3835,56 +4073,60 @@ to any element of the set.  That is, the set and its sumset are disjoint.
 
 =head2 set_is_disjoint
 
-Given two array references of integers, treats them as sets and
+The set relation functions below accept array references containing distinct
+integers.  The values need not be sorted, but duplicate values are not allowed.
+
+Given two such array references, treats them as sets and
 returns 1 if the sets have no elements in common, 0 otherwise.
 
 This corresponds to Mathematica's C<DisjointQ> function.
 
 =head2 set_is_equal
 
-Given two array references of integers in set form,
-returns 1 if the sets have all elements in common, 0 otherwise.
+Given two array references of distinct integers, returns 1 if the sets
+contain the same elements, 0 otherwise.
 
-This function works even if the inputs are not sorted.  If they are sorted
-(proper set form) then L</vecequal> can be used and is typically much faster.
+If the inputs are sorted (proper set form), then L</vecequal> can be used and
+is typically much faster.
 
 =head2 set_is_subset
 
-Given two array references of integers in set form,
+Given two array references of distinct integers,
 returns 1 if the first set also contains all elements of the second set,
 0 otherwise.
 
-The L</setcontains> function can be used equivalently, and
-does not require the second list to be in set form.
+If the first input is in set form, C<setcontains($first, @$second)> performs
+the equivalent test and allows the second list to be unordered or contain
+duplicates.
 
 This corresponds to Mathematica's C<SubsetQ> function (is B a subset of A).
 
 =head2 set_is_proper_subset
 
-Given two array references of integers in set form,
+Given two array references of distinct integers,
 returns 1 if the first set also contains all elements of the second set
-but are not equal, 0 otherwise.
+but the sets are not equal, 0 otherwise.
 The size of the first set must be strictly larger than the second.
 
 =head2 set_is_superset
 
-Given two array references of integers in set form,
+Given two array references of distinct integers,
 returns 1 if the second set also contains all elements of the first set,
 0 otherwise.
 
-The L</setcontains> function can be used equivalently
-(with reversed arguments).
+If the second input is in set form, C<setcontains($second, @$first)> performs
+the equivalent test.
 
 =head2 set_is_proper_superset
 
-Given two array references of integers in set form,
+Given two array references of distinct integers,
 returns 1 if the second set also contains all elements of the first set
-but are not equal, 0 otherwise.
+but the sets are not equal, 0 otherwise.
 The size of the second set must be strictly larger than the first.
 
 =head2 set_is_proper_intersection
 
-Given two array references of integers in set form,
+Given two array references of distinct integers,
 returns 1 if the two sets have at least one element in common,
 and each of the two sets have at least one element not present
 in the other set.  Returns 0 otherwise.
@@ -3898,12 +4140,15 @@ Given an integer C<n>, return an array of digits of C<|n|>.  An optional
 second integer argument specifies a base (default 10).  For example,
 given a base of 2, this returns an array of binary digits of C<n>.
 An optional third argument specifies a length for the returned array.
-The result will be either have upper digits truncated or have leading
+The result will either have upper digits truncated or have leading
 zeros added.  This is most often used with base 2, 8, or 16.
 
-The values returned may be read-only.  C<todigits(0)> returns an empty array.
-The base must be at least 2, and is limited to an int.  Length must be
-at least zero and is limited to an int.
+The values returned may be read-only.  Without an explicit length,
+C<todigits(0)> returns an empty array.  With a length, zero is padded to that
+many zero digits like any other input.  The base must be at least 2, and the
+length must be at least zero.
+
+In scalar context, returns the number of digits that would be returned.
 
 This corresponds to Pari's C<digits> and C<binary> functions, and
 Mathematica's C<IntegerDigits> function.
@@ -3919,14 +4164,17 @@ For bases E<lt>= 10, this is equivalent to joining the array returned
 by L</todigits>.
 
 The first argument C<n> is the input integer.  The sign is ignored.
-If no other arguments are given, this just returns the string of C<n>.
+If no other arguments are given, this returns the digit string of C<n>.
+As with C<todigits>, zero is represented by an empty string unless an explicit
+length is given.
 An optional second argument is the base C<base> which must be between 2 and 36.
 No prefix such as "0x" will be added, and all bases over 9 use lower case
 C<a> to C<z>.
 
-An optional third argument C<k> requires the result to be exactly C<k> digits.
-This truncates to the last C<k> digits if the result has C<k> or fewer digits,
-or zero extends if the result has more digits.
+An optional third argument C<k> specifies that the result should contain
+exactly C<k> digits.  If the full result has more than C<k> digits, only
+the last C<k> digits are returned; if it has fewer than C<k> digits,
+leading zeros will be added.
 
 This corresponds to Mathematica's C<IntegerString> function.
 
@@ -3938,10 +4186,15 @@ This corresponds to Mathematica's C<IntegerString> function.
 This takes either a string or array reference, and an optional base
 (default 10).  With a string, each character will be interpreted as a
 digit in the given base, with both upper and lower case denoting
-values 11 through 36.  With an array reference, the values indicate
+values 10 through 35.  With an array reference, the values indicate
 the entries in that location, and values larger than the base are
 allowed (results are carried).  The result is a number (either a
 native integer or a bigint).
+
+String input uses digit characters 0-9 plus a-z/A-Z, so only digits 0..35
+can be represented.  Bases larger than 36 are allowed, but string digits
+larger than 35 are not possible.  For larger bases, the array reference
+input is more useful.
 
 This corresponds to Pari's C<fromdigits> function and
 Mathematica's C<FromDigits> function.
@@ -4008,6 +4261,105 @@ then sums the digits.  This can be done with either
 C<vecsum(todigits($n, $base))> or C<sumdigits(todigitstring($n,$base))>.
 C<Math::BigInt> version 1.999818 has a similar C<digitsum> function.
 
+
+=head2 reverse_digits
+
+  say reverse_digits(12345);       #  54321
+  say reverse_digits(0b1101000,2); #  11 (0b1011)
+
+Given an integer C<n>, return the number made by reversing the digits of
+C<|n|>.  An optional second integer argument specifies a base (default 10).
+The base must be at least 2.
+Leading zeroes after reversal are not preserved, so C<reverse_digits(1200)>
+returns C<21>.
+
+This is equivalent to C<fromdigits([reverse todigits($n,$base)], $base)>.
+
+
+=head2 is_palindrome
+
+  say "$n is a palindrome" if is_palindrome($n);
+  say "$n is a binary palindrome" if is_palindrome($n, 2);
+
+Given a non-negative integer C<n>, returns 1 if C<n> is a palindrome
+in the given base (default 10), 0 otherwise.  A palindrome reads the
+same forwards and backwards in its digit representation.
+For example, 121, 1221, and 15951 are base-10 palindromes.
+
+An optional second argument specifies the base, which must be at least 2
+and defaults to 10.
+
+Single-digit numbers (including 0) are palindromes in any base
+(single digits in the given base).
+
+This is L<OEIS series A002113|http://oeis.org/A002113> (base 10), with
+some other bases such as A006995 (base 2), A014190 (base 3), A014192 (base 4).
+
+This corresponds to Mathematica's C<PalindromeQ> function (base 10 only).
+
+
+=head2 is_harshad
+
+  say "18 is a Harshad number" if is_harshad(18);
+  say "12 is Harshad in base 2" if is_harshad(12, 2);
+
+Given an integer C<n>, returns 1 if C<n> is a Harshad number in the
+given base (default 10), 0 otherwise.  A Harshad number (also called
+a Niven number) is a positive integer that is divisible by its digit
+sum.  For example, 18 is a Harshad number since 1+8=9 and 9 divides 18.
+Returns 0 for C<n E<lt>= 0>.
+
+An optional second argument specifies the base, which must be at least 2
+and defaults to 10.
+
+This is L<OEIS series A005349|http://oeis.org/A005349> (base 10).
+
+
+=head2 digital_root
+
+  say digital_root(493);         # 7  (4+9+3=16, 1+6=7)
+  say digital_root(255, 16);     # 15 (0xF)
+
+Given a non-negative integer C<n>, returns the additive digital root:
+the single-digit value obtained by repeatedly summing the digits until
+a single digit remains.  The optional second argument specifies the base
+(default 10), which must be at least 2.  The result is always between 0
+and C<base-1> inclusive.
+
+The digital root is computed directly by the formula C<1 + (n-1) % (base-1)>
+for C<n E<gt> 0>, and 0 for C<n = 0>.  This is equivalent to C<n mod (base-1)>
+except that a non-zero result is returned for exact multiples of C<base-1>
+(e.g., C<digital_root(9)> is 9, not 0).
+
+The value returned is likely to be a read-only constant.
+
+In base 10 this is L<OEIS A010888|http://oeis.org/A010888>.
+
+This corresponds to Mathematica's C<DigitalRoot> function.
+
+=head2 mult_digital_root
+
+  say mult_digital_root(77);     # 8  (7*7=49, 4*9=36, 3*6=18, 1*8=8)
+  say mult_digital_root(39);     # 4  (3*9=27, 2*7=14, 1*4=4)
+  say mult_digital_root(255,16); # 14 (F*F=E1, E*1=E => 14)
+
+Given a non-negative integer C<n>, returns the multiplicative digital root:
+the single-digit value obtained by repeatedly multiplying the digits until
+a single digit remains.  The optional second argument specifies the base
+(default 10), which must be at least 2.  The result is always between 0
+and C<base-1> inclusive.
+
+If any digit is 0, the result is 0 (since all subsequent products are 0).
+The number of iterations required (not returned by this function) is the
+multiplicative persistence of C<n>.
+
+The value returned is likely to be a read-only constant.
+
+In base 10 this is L<OEIS A031347|http://oeis.org/A031347>.
+
+This corresponds to Mathematica's C<MultiplicativeDigitalRoot> function.
+
+
 =head2 valuation
 
   say "$n is divisible by 2 ", valuation($n,2), " times.";
@@ -4021,6 +4373,35 @@ C<k> must be greater than 1.
 C<|n|> is used, C<|n| = 0> returns undef, and C<|n| = 1> returns zero.
 
 This corresponds to Pari and SAGE's C<valuation> function.
+
+=head2 remove_factors
+
+  say "$n with all factors of 10 removed is ", remove_factors($n,10);
+
+Given integer C<n> and integer C<k> greater than 1, returns C<n> with all
+repeated exact factors of C<k> removed.  Equivalently, the return value is
+C<r> such that C<n = r * k^e> and C<k> no longer divides C<r>.
+
+If C<n = 0>, returns undef.
+
+=head2 remove_factors_exp
+
+  my($r, $e) = remove_factors_exp($n,10);
+
+As L</remove_factors>, but returns C<(r,e)> where C<e> is the number of
+times C<k> was removed.  If C<n = 0>, returns C<(undef,undef)>.
+
+=head2 floor_sum
+
+  say floor_sum($n, $m, $a, $b);
+
+Returns the sum
+
+  sum_{i=0}^{n-1} floor((a*i + b) / m)
+
+The values C<n>, C<a>, and C<b> must be non-negative integers, and C<m>
+must be a positive integer.  The implementation uses the Euclidean floor-sum
+reduction, so it runs in logarithmic time.
 
 =head2 hammingweight
 
@@ -4039,8 +4420,9 @@ Given integer C<n>, returns 1 if C<|n|> has no repeated factor.
 
 Given integer C<n>, returns 1 if C<n> is positive and cyclic in the number
 theory sense, and returns 0 otherwise.
-A cyclic number C<n> has only one group of order C<n>.
-C<n> and C<φ(n)> are relatively prime.
+A cyclic number C<n> is one for which every group of order C<n> is cyclic.
+Equivalently, C<n> and C<φ(n)> are relatively prime.
+This function returns C<0> for all input C<< n <= 0 >>.
 
 This is the L<OEIS series A003277|http://oeis.org/A003277>.
 
@@ -4054,13 +4436,14 @@ These are composites that satisfy C<b^(n-1) ≡ 1 mod n> for all
 C<< 1 < b < n >> relatively prime to C<n>.
 Alternately Korselt's theorem says these are composites such that C<n> is
 square-free and C<p-1> divides C<n-1> for all prime divisors C<p> of C<n>.
+This function returns C<0> for all input C<< n <= 0 >>.
 
 For inputs larger than 50 digits after removing very small factors, this
-uses a probabilistic test since factoring the number could take unreasonably
-long.  The first 150 primes are used for testing.  Any that divide C<n> are
+uses a heuristic test since factoring the number could take unreasonably long.
+A fixed set of small primes is used for testing.  Any that divide C<n> are
 checked for square-free-ness and the Korselt condition, while those that do
-not divide C<n> are used as the pseudoprime base.  The chances of a
-non-Carmichael passing this test are less than C<2^-150>.
+not divide C<n> are used as pseudoprime bases.  This test is deterministic
+and may return a false positive for a specially constructed input.
 
 This is the L<OEIS series A002997|http://oeis.org/A002997>.
 
@@ -4088,7 +4471,7 @@ function performs shortcuts that can greatly speed up the operation.
   say is_almost_prime(6,2169229601);  # True if n has exactly 6 factors
 
 Given non-negative integers C<k> and C<n>, returns 1 if C<n> has
-exactly C<k> prime factors, and 0 otherwise.
+exactly C<k> prime factors (counted with multiplicity), and 0 otherwise.
 With C<k=1>, this is a standard primality test.
 With C<k=2>, this is the same as L</is_semiprime>.
 
@@ -4109,6 +4492,17 @@ Functionally identical but possibly faster than C<prime_omega(n) == k>.
 Given non-negative integer C<n> return 1 if C<n> is a Chen prime.  That is,
 if C<n> is prime and C<n+2> is either a prime or semi-prime.
 
+=head2 is_safe_prime
+
+Given a non-negative integer C<n>, returns 1 if C<n> is a safe prime,
+and 0 otherwise.  A safe prime is a prime with C<(n-1)/2> also prime.
+
+Safe primes arise in cryptography: the multiplicative group modulo a
+safe prime has a large prime-order subgroup, making discrete logarithm
+problems harder.  See also L</random_safe_prime>.
+
+This is L<OEIS A005385|http://oeis.org/A005385>.
+
 =head2 is_fundamental
 
 Given an integer C<d>, returns 1 if C<d> is a fundamental discriminant,
@@ -4121,8 +4515,8 @@ This corresponds to Pari's C<isfundamental> function.
 
 =head2 is_totient
 
-Given an integer C<n>, returns 1 if there exists an integer C<x> where
-C<euler_phi(x) == n>.
+Given an integer C<n>, returns 1 if there exists a positive integer C<x> such
+that C<euler_phi(x) == n>.
 
 This corresponds to Pari's C<istotient> function, though without the
 optional second argument to return an C<x>.  L<Math::NumSeq::Totient>
@@ -4159,23 +4553,25 @@ This corresponds to Pari's C<ispolygonal> function.
 Given a non-negative integer C<n>, returns 1 if C<n> is the area of a
 rational right triangle, and 0 otherwise.
 
-This function answers the B<congruent number problem> using Tunnell's theorem
-which relies on the Birch Swinnerton-Dyer conjecture.  It uses an extensive
-filter for known non-congruent families, including the works of
+This function answers the B<congruent number problem> using Tunnell's theorem.
+The theorem gives an unconditional necessary condition, while its converse,
+used for the general positive classification, assumes the Birch Swinnerton-Dyer
+conjecture.  The function uses an extensive filter for known non-congruent
+families, including the works of
 Bastien (1915), Lagrange (1974), Monsky (1990), Serf (1991),
 Iskra (1996), Feng (1996), Reinholz et al. (2013),
 Cheng and Guo (2018 and 2019), Das and Saikia (2020), and Evink (2021).
 
 =head2 cornacchia
 
-Given non-negative integers C<d> and C<n>, finds solutions C<(x,y)> to the
+Given non-negative integers C<d> and C<n>, finds a solution C<(x,y)> to the
 equation C<x^2 + d y^2 = n>.  C<undef> is returned if no solution exists.
 
 In the case of C<n> a prime, this is done using Cornacchia's algorithm.
 
 For non-prime C<n>, we use a combination of Cornacchia-Smith on all roots,
-as well as a loop to find solutions in the harder cases.  This means we
-will always return a solution.
+as well as a loop to find solutions in the harder cases.  The search is
+exhaustive, so a solution is returned whenever one exists.
 
 There will often be multiple solutions, but only one is returned.
 
@@ -4190,6 +4586,8 @@ Given an integer C<n> and a positive integer C<d>,
 returns a list with the simple continued fraction representation
 of the rational C<n / d>.
 
+In scalar context, returns the number of terms that would be returned.
+
 This corresponds to a subset of Pari's C<contfrac> function,
 Mathematica's C<ContinuedFraction[n/d]> function,
 and Sage's C<continued_fraction> function.
@@ -4198,15 +4596,55 @@ and Sage's C<continued_fraction> function.
 
   my($N,$D) = from_contfrac(4,2,6,7);  # N = 415, D = 93
 
-Given an array of integers representing the simple continued fraction,
-returns the rational C<n / d> as two integers.
+Given a list of integers representing a simple continued fraction, returns
+its value as a reduced numerator and positive denominator C<(n,d)>.
 
-The first input value represents the whole part, and may be zero or negative.
-All successive input values must be non-negative and non-zero.
+The initial coefficient C<a_0> may be any integer;
+all subsequent coefficients must be positive integers.
+With no terms, C<from_contfrac> returns C<(0,1)>.
 
 This corresponds to a subset of Pari's C<contfracpnqn> function,
 Mathematica's C<FromContinuedFraction[list]> function,
 and one value of Sage's C<convergent(n)> method.
+
+=head2 convergents
+
+  my @convs = convergents(4,2,6,7);
+  # ([4,1], [9,2], [58,13], [415,93])
+
+Given a list of integers representing a simple continued fraction
+(as returned by C<contfrac>), returns a list of array references
+C<[p, q]> where each C<p/q> is a convergent of the continued fraction.
+The k-th convergent is the rational obtained by truncating the
+continued fraction at term k.
+
+The convergents are computed via the standard recurrence:
+C<p_k = a_k * p_{k-1} + p_{k-2}>, and likewise for C<q_k>.
+
+The initial coefficient C<a_0> may be any integer;
+all subsequent coefficients must be positive integers.
+With no terms, C<convergents> returns an empty list.
+
+In scalar context, returns the number of convergents that would be returned.
+
+=head2 bestrational
+
+  my($p,$q) = bestrational(3.14159265358979, 1000);
+  # (355, 113)
+
+Given a finite real number C<x> and a positive integer C<dbound>, returns
+a reduced pair C<(p, q)>, with C<< 1 <= q <= dbound >>, that minimizes
+C<|p/q - x|>.  For negative C<x>, C<p> is negative and C<q> remains
+positive.
+
+If two candidates are equally close, the candidate with the smaller
+denominator is preferred; any remaining tie is resolved toward zero.
+
+The algorithm uses continued-fraction convergents, with a semiconvergent
+check at the final step.
+The value C<x> may be given as a native number, a numeric string
+(including decimal or exponential form), a bigint object, or a
+L<Math::BigFloat> object.
 
 =head2 next_calkin_wilf
 
@@ -4237,9 +4675,9 @@ traversal of the Stern-Brocot tree of rationals as a two-element list.
 The Stern-Brocot tree has an entry for all positive rationals in lowest
 form, with each one appearing only once.
 Read left-to-right on each row, the numbers appear in ascending order.
-It is a binary search tree over the positive rationals (this was exactly
-Brocot's motivation).
-It is not as efficient as L</next_calkin_wilf>.
+It can be seen as a binary search tree over the positive rationals
+(this was exactly Brocot's motivation).
+The implementation is not as efficient as L</next_calkin_wilf>.
 
 This produces L<OEIS series A007305|http://oeis.org/A007305> (numerators)
 and L<OEIS series A047679|http://oeis.org/A047679> (denominators).
@@ -4318,9 +4756,10 @@ In array context, returns a list with each rational as a 2-entry array
 reference.
 
 Given two values: a positive integer C<n> and a non-negative integer C<k>,
-returns the C<k-th> entry of the order C<n> Farey sequence.  The index
-starts at zero so it matches using the full list as an array.
-If C<k> is larger than the number of entries, undef is returned.
+returns the C<k-th> entry of the order C<n> Farey sequence.
+The index starts at zero, matching array indexing of the full returned list.
+Valid indices run from zero through one less than the sequence length;
+C<undef> is returned for any larger index.
 
 This corresponds to Mathematica's C<FareySequence> function (their
 two argument version is 1-based rather than 0-based).
@@ -4337,6 +4776,8 @@ Given a positive integer C<n> and a 2-element array reference containing
 a non-negative integer C<p> and a positive integer C<q>, returns the next
 rational appearing after C<p/q> in the order C<n> Farey sequence.
 Returns undef if C<p/q> is greater than or equal to one.
+The given fraction does not need to be an entry in the sequence, nor does
+it need to be in reduced form.
 
 =head2 farey_rank
 
@@ -4348,8 +4789,8 @@ of rationals less than C<p/q> in the order C<n> Farey sequence.
 The given fraction does not need to be an entry in the sequence, nor does
 it need to be in reduced form.
 
-A unit fraction will return the totient sum of C<n>.  Any fraction greater
-than one will return the length of the order C<n> sequence, as expected.
+C<1/1> will return the totient sum of C<n>.  Any fraction greater than
+one will return the length of the order C<n> sequence, as expected.
 
 Many OEIS sequences can be produced from this, including
 L<OEIS series A005728|http://oeis.org/A005728> (E<lt>= 1),
@@ -4364,7 +4805,7 @@ L<OEIS series A049805|http://oeis.org/A049805> (E<lt>= 1/k),
 
   say "$n has ", prime_bigomega($n), " total factors";
 
-Given a non-negative integer C<n>, returns Ω(|n|), the prime Omega function.
+Given an integer C<n>, returns Ω(|n|), the prime Omega function.
 This is the total number of prime factors of C<n> including multiplicities.
 The result is identical to C<scalar(factor($n))>.
 The return value is a read-only constant.
@@ -4376,13 +4817,44 @@ and Mathematica's C<PrimeOmega[n]> function.
 
   say "$n has ", prime_omega($n), " distinct factors";
 
-Given a non-negative integer C<n>, returns ω(|n|), the prime omega function.
+Given an integer C<n>, returns ω(|n|), the prime omega function.
 This is the number of distinct prime factors of C<n>.
 The result is identical to C<scalar(factor_exp($n))>.
 The return value is a read-only constant.
 
 This corresponds to Pari's C<omega> function
 and Mathematica's C<PrimeNu[n]> function.
+
+=head2 prime_signature
+
+  say join(",", prime_signature(360));   # 3,2,1  (360 = 2^3 * 3^2 * 5)
+  say join(",", prime_signature(12));    # 2,1    (12 = 2^2 * 3)
+  say join(",", prime_signature(1));     # (empty list)
+  my $sig = scalar prime_signature(18);  # 12  (same shape as 12 = 2^2 * 3)
+
+Given a non-negative integer C<n>, returns the prime signature of C<n>.
+This is the exponents of the prime factorization, sorted in descending order.
+
+The prime signature describes the multiplicative structure of C<n>
+independent of which primes appear.  Numbers with the same signature
+have the same number of divisors, the same value of the Möbius function,
+and so on.  For example, all numbers of signature C<(2,1)> are of the
+form C<p^2 * q> and have exactly 6 divisors.
+
+In scalar context, returns the smallest integer with this signature.
+For signature C<(a,b,c,...)> the integer is C<2^a * 3^b * 5^c * ...>.
+This allows scalar equality checks, as the integer value is a unique
+mapping to the exact signature.
+
+Many useful classifications can be made by looking at the
+prime signature S(n) and using simple operations such as min, max, gcd,
+sum, etc.
+E.g. If min(S(n)) >= 2, then n is a powerful number,
+if sum(S(n))=k then n is a k-almost-prime.
+
+C<prime_signature(1)> returns an empty list (zero in scalar context).
+C<prime_signature(0)> returns C<(1)> (C<2> in scalar context).
+
 
 =head2 moebius
 
@@ -4409,6 +4881,9 @@ algorithm 3.2.
 Negative ranges are possible, e.g. C<moebius(-30,-20)> will return
 C<moebius(|n|)> for -30, -29, -28, ..., -20.
 
+In scalar context with two arguments, returns the number of values that would
+be returned.
+
 The return values are read-only constants.  This should almost never come up,
 but it means trying to modify aliased return values will cause an
 exception (modifying the returned scalar or array is fine).
@@ -4417,34 +4892,40 @@ exception (modifying the returned scalar or array is fine).
 =head2 mertens
 
   say "Mertens(10M) = ", mertens(10_000_000);   # = 1037
+  say "Mertens(1M..10M) = ", mertens(1_000_000, 10_000_000); # = 825
 
-Given a non-negative integer C<n>, return M(n), the Mertens function.
-This function is defined as C<sum(moebius(1..n))>, but calculated more
-efficiently for large inputs.  For example, computing Mertens(100M) takes:
+Given a non-negative integer C<n>, return M(n), the Mertens function.  This is
+defined as C<sum(moebius(1..n))>, but calculated more efficiently for large
+inputs.
 
-   time    approx mem
-     0.01s     0.1MB   mertens(100_000_000)
-     1.3s    880MB     vecsum(moebius(1,100_000_000))
-    16s        0MB     $sum += moebius($_) for 1..100_000_000
+With two non-negative arguments, returns the sum of the Möbius function over
+the inclusive range C<lo> to C<hi>.  Equivalently, this is
+C<M(hi) - M(lo-1)>.  A lower bound of zero is treated as one, and an empty or
+descending range returns zero.
+
+For example, computing Mertens(100M) takes approximately:
+
+   time   extra mem
+   0.001s    0.6 MB    mertens(100_000_000)
+   0.9s      780 MB    vecsum(moebius(1,100_000_000))
+  16s          0 MB    $sum += moebius($_) for 1..100_000_000
 
 The summation of individual terms via factoring is quite expensive in time,
 though uses O(1) space.  Using the range version of moebius is much faster,
 but returns a 100M element array which, even though they are shared constants,
 is not good for memory at this size.
-In comparison, this function will generate the equivalent output
-via a sieving method that is relatively memory frugal and very fast.
-The current method is a simple C<n^1/2> version of Deléglise and Rivat (1996),
-which involves calculating all moebius values to C<n^1/2>, which in turn will
-require prime sieving to C<n^1/4>.
+In comparison, this function uses a recursive quotient-grouping method backed
+by a segmented Möbius sieve and a cache of previously calculated values.  The
+two-argument form prepares this shared state once for both endpoints.
 
 Various algorithms exist for this, using differing quantities of μ(n).  The
 simplest way is to efficiently sum all C<n> values.  Benito and Varona (2008)
 show a clever and simple method that only requires C<n/3> values.  Deléglise
-and Rivat (1996) describe a segmented method using only C<n^1/3> values.  The
-current implementation does a simple non-segmented C<n^1/2> version of their
-method.  Kuznetsov (2011) gives an alternate method that he indicates is even
-faster.  Helfgott and Thompson (2020) give a fast method based on advanced
-prime count algorithms.
+and Rivat (1996) describe a segmented method using only C<n^1/3> values.
+Kuznetsov (2011) gives an alternate method that he indicates is even faster.
+Helfgott and Thompson (2020) give a fast method based on advanced prime count
+algorithms.  Hurst (2026) gives more optimizations and shows a practical
+implementation for very large values.
 
 
 =head2 euler_phi
@@ -4465,6 +4946,9 @@ If called with two integer arguments C<low> and C<high>, they define
 an inclusive range.
 The function returns a list with the totient of every n from low to high
 inclusive.
+
+In scalar context with two arguments, returns the number of values that would
+be returned.
 
 =head2 inverse_totient
 
@@ -4491,7 +4975,29 @@ Jordan's totient is a generalization of Euler's totient, where
 This counts the number of k-tuples less than or equal to n that form a coprime
 tuple with n.  As with C<euler_phi>, 0 is returned for all C<< n < 1 >>.
 This function can be used to generate some other useful functions, such as
-the Dedekind psi function, where C<psi(n) = J(2,n) / J(1,n)>.
+L</dedekind_psi>, where C<psi(n) = J(2,n) / J(1,n)>.
+
+The exponent C<k> must fit in an unsigned native integer.
+
+=head2 dedekind_psi
+
+  say "psi(30) = ", dedekind_psi(30);   # 72
+
+Given an integer C<n>, returns the Dedekind psi function ψ(n).
+This is a multiplicative arithmetic function defined as:
+
+  psi(n) = n * product( 1 + 1/p )  for distinct primes p dividing n
+
+Equivalently, for each prime power p^k exactly dividing n, the contribution
+is p^(k-1) * (p+1).  Thus C<psi(p) = p+1> for prime p, and
+C<psi(p^k) = p^(k-1) * (p+1)> for k >= 1.
+
+It is related to other multiplicative functions by
+C<jordan_totient(2,n) == dedekind_psi(n) * euler_phi(n)>.
+
+As with C<euler_phi>, 0 is returned for all C<< n < 1 >>.
+
+This is L<OEIS series A001615|http://oeis.org/A001615>.
 
 =head2 sumtotient
 
@@ -4500,7 +5006,7 @@ returns the summatory Euler totient function.
 This function is defined as C<sum(euler_phi(1..n))>, but calculated
 much more efficiently.
 
-A sub-linear time recursion is implemented, using O(n^2/3) memory.
+A sub-linear time recursion is implemented, using O(n^{2/3}) memory.
 Memory use is restricted so growth becomes approximately linear above C<10^13>.
 
 This is L<OEIS series A002088|http://oeis.org/A002088>.
@@ -4509,13 +5015,16 @@ This is L<OEIS series A002088|http://oeis.org/A002088>.
 =head2 ramanujan_sum
 
 Given two non-negative integers C<k> and C<n>, returns Ramanujan's sum.
-This is the sum of the nth powers of the primitive k-th roots of unity.
+For positive C<k> and C<n>, this is the sum of the C<n>-th powers of the
+primitive C<k>-th roots of unity.  By convention, zero is returned if
+either argument is zero.
 
 Note this is not related to Ramanujan summation for divergent series.
 
 
 =head2 exp_mangoldt
 
+  sub lambda { my $p; is_prime_power(shift,\$p) ? log($p) : 0; }
   say "exp(lambda($_)) = ", exp_mangoldt($_) for 1 .. 100;
 
 Given a non-negative integer C<n>, returns EXP(Λ(n)), the exponential
@@ -4532,6 +5041,7 @@ Hence the return value for C<exp_mangoldt> is:
 
 Given a non-negative integer C<n>, returns λ(n), the Liouville function.
 This is -1 raised to Ω(n) (the total number of prime factors).
+By convention, C<liouville(0) = -1>.
 
 This corresponds to Mathematica's C<LiouvilleLambda[n]> function.
 It can be computed in Pari/GP as C<(-1)^bigomega(n)>.
@@ -4568,7 +5078,7 @@ but computed more efficiently and accurately.
 Given a non-negative integer C<n>, returns ψ(n),
 the second Chebyshev function.
 This is the sum of the logarithm of each prime power where C<< p^k <= n >>
-for an integer k.
+for a positive integer k.
 Effectively:
 
   my $s = 0;  for (1..$n) { $s += log(exp_mangoldt($_)) }  return $s;
@@ -4592,8 +5102,6 @@ the sum should use the C<k-th> powers of the divisors.
 This is known as the sigma function (see Hardy and Wright section 16.7).
 The API is identical to Pari/GP's C<sigma> function, and not dissimilar to
 Mathematica's C<DivisorSigma[k,n]> function.
-This function is useful for calculating things like aliquot sums, abundant
-numbers, perfect numbers, etc.
 
 With various C<k> values, the results are the OEIS sequences
 L<OEIS series A000005|http://oeis.org/A000005> (C<k=0>, number of divisors),
@@ -4617,11 +5125,85 @@ For numeric second arguments (sigma computations), the result will be a bigint
 if necessary.  For the code reference case, the user must take care to return
 bigints if overflow will be a concern.
 
+=head2 inverse_sigma0
+
+  my $values = inverse_sigma0(48, 1, 10000);
+  say inverse_sigma0_count(48, 1, 10000);   # 45
+
+Returns an array reference containing all positive integers C<n> in the range
+where C<divisor_sum(n,0) == k>.  This is the inverse image of the divisor-count
+function C<sigma0(n)>, also commonly called C<tau(n)>.
+
+With two arguments C<inverse_sigma0(k, hi)>, the range is C<1..hi>.
+With three arguments C<inverse_sigma0(k, lo, hi)>, the range is C<lo..hi>.
+
+=head2 inverse_sigma0_count
+
+  say inverse_sigma0_count(48, 1, 10000);   # 45
+
+Uses the same arguments as L</inverse_sigma0> but returns only the count.
+This is faster and uses less memory than generating the full list.
+
+
+=head2 aliquot_sum
+
+  say aliquot_sum(12);    # 16  (1+2+3+4+6)
+  say aliquot_sum(6);     # 6   (perfect number)
+
+Given a non-negative integer C<n>, returns the sum of the proper divisors
+of C<n>, that is, all divisors except C<n> itself.
+Returns 0 for C<n E<lt>= 1>.
+
+If the aliquot sum equals C<n>, C<n> is a perfect number.
+If it exceeds C<n>, C<n> is abundant; if less, C<n> is deficient.
+Two numbers are amicable if each is the aliquot sum of the other.
+
+Equivalent to C<divisor_sum(n,1) - n>.
+
+This is L<OEIS A001065|http://oeis.org/A001065>.
+
+=head2 abundance
+
+  say "$n is a deficient number" if abundance($n) < 0;
+
+Given a non-negative integer C<n>, returns C<sigma(n) - 2n> or equivalently
+C<aliquot_sum(n) - n>.
+
+A perfect number will have C<< abundance(n) = 0 >>,
+a deficient number will have C<< abundance(n) < 0 >>, and
+an abundant number will have C<< abundance(n) > 0 >>.
+
+This is L<OEIS A033880|http://oeis.org/A033880>.
+
+=head2 sopfr
+
+  say sopfr(12);    # 7   (2+2+3)
+  say sopfr(360);   # 14  (2+2+2+3+3+5)
+
+Given a non-negative integer C<n>, returns the sum of prime factors of
+C<n> with repetition.  C<sopfr(1) = 0>.
+
+Equivalent to C<vecsum(factor($n))>.
+
+This is L<OEIS A001414|http://oeis.org/A001414>.
+
+=head2 sopf
+
+  say sopf(12);     # 5   (2+3)
+  say sopf(360);    # 10  (2+3+5)
+
+Given a non-negative integer C<n>, returns the sum of the distinct prime
+factors of C<n>.  C<sopf(1) = 0>.
+
+Equivalent to C<vecsum(vecuniq(factor($n)))>.
+
+This is L<OEIS A008472|http://oeis.org/A008472>.
+
 
 =head2 ramanujan_tau
 
 Given an integer C<n>, returns the value of Ramanujan's tau function.
-The result is a signed integer.  Zero is returned for negative C<n>.
+The result is a signed integer.  Zero is returned for C<< n <= 0 >>.
 This corresponds to Pari v2.8's C<tauramanujan> function and
 Mathematica's C<RamanujanTau> function.
 
@@ -4639,12 +5221,10 @@ defined as the
 product of the prime numbers less than or equal to C<n>.  This is the
 L<OEIS series A034386|http://oeis.org/A034386>: primorial numbers second
 definition.
+The input C<n> must fit in a native signed integer.
 
   primorial(0)  == 1
   primorial($n) == pn_primorial( prime_count($n) )
-
-The result will be a L<Math::BigInt> object if it is larger than the native
-bit size.
 
 Be careful about which version (C<primorial> or C<pn_primorial>) matches the
 definition you want to use.  Not all sources agree on the terminology, though
@@ -4664,12 +5244,10 @@ the product of the first C<n> prime numbers (compare to the factorial, which
 is the product of the first C<n> natural numbers).  This is the
 L<OEIS series A002110|http://oeis.org/A002110>: primorial numbers first
 definition.
+The input C<n> must fit in a native signed integer.
 
   pn_primorial(0)  == 1
   pn_primorial($n) == primorial( nth_prime($n) )
-
-The result will be a L<Math::BigInt> object if it is larger than the native
-bit size.
 
 
 =head2 consecutive_integer_lcm
@@ -4680,24 +5258,26 @@ Given a non-negative integer C<n>, returns the least common multiple of all
 integers from 1 to C<n>.  This can be done by manipulation of the primes up
 to C<n>, resulting in much faster and memory-friendly results than using
 a factorial.
+The input C<n> must fit in a native signed integer.
 
 This is L<OEIS series A003418|http://oeis.org/A003418>.
 Matching that series, we define C<consecutive_integer_lcm(0) = 1>.
 
 =head2 partitions
 
-Given an integer C<n>, returns the partition function C<p(n)>.
-If C<n> is negative, 0 is returned.
+Given a non-negative integer C<n>, returns the partition function C<p(n)>.
 This is the number of ways of writing the integer C<n> as a sum of positive
 integers, without restrictions.
+The input C<n> must fit in a native signed integer.
 
 This corresponds to Pari's C<numbpart>
 function and Mathematica's C<PartitionsP> function.  The values produced
 in order are L<OEIS series A000041|http://oeis.org/A000041>.
 
-This uses a combinatorial calculation, which means it will not be very
-fast compared to Pari, Mathematica, or FLINT which use the Rademacher
-formula using multi-precision floating point.  In 10 seconds:
+This uses a combinatorial calculation, which is much slower than Pari,
+Mathematica, or FLINT implementations using the Rademacher formula with
+multi-precision floating point.  In one benchmark performed in 2018, the
+approximate largest C<n> completed in 10 seconds was:
 
             70    Integer::Partition
             90    MPU forpart { $n++ }
@@ -4709,6 +5289,20 @@ formula using multi-precision floating point.  In 10 seconds:
 
 If you want the enumerated partitions, see L</forpart>.
 
+=head2 partitionsq
+
+Given a non-negative integer C<n>, returns the number of partitions of C<n>
+into B<distinct> parts (no part repeated).
+The input C<n> must fit in a native signed integer.
+
+For example, C<partitionsq(6) = 4>: the partitions are {6}, {1,5}, {2,4},
+and {1,2,3}.
+
+By Euler's theorem, this equals the number of partitions of C<n> into
+B<odd> parts.
+
+This corresponds to Mathematica's C<PartitionsQ> function.
+The values produced in order are L<OEIS series A000009|http://oeis.org/A000009>.
 
 =head2 lucky_numbers
 
@@ -4757,14 +5351,15 @@ good estimate of the count of lucky numbers less than or equal to C<n>.
 =head2 lucky_count_lower
 
 Given a single non-negative integer C<n>, quickly returns a
-lower bound of the count of lucky numbers less than or equal to C<n>.
-The actual count will always be greater than or equal to the result.
+lower estimate of the count of lucky numbers less than or equal to C<n>.
 
 =head2 lucky_count_upper
 
 Given a single non-negative integer C<n>, quickly returns an
-upper bound of the count of lucky numbers less than or equal to C<n>.
-The actual count will always be less than or equal to the result.
+upper estimate of the count of lucky numbers less than or equal to C<n>.
+
+The lower and upper estimates have been verified as bounds through
+C<< n <= 10^9 >>, but are not proven for larger inputs.
 
 =head2 nth_lucky
 
@@ -4782,14 +5377,15 @@ good estimate of the C<n>-th lucky number.
 =head2 nth_lucky_lower
 
 Given a single non-negative integer C<n>, quickly returns a
-lower bound of the C<n>-th lucky number.
-The actual value will always be greater than or equal to the result.
+lower estimate of the C<n>-th lucky number.
 
 =head2 nth_lucky_upper
 
 Given a single non-negative integer C<n>, quickly returns an
-upper bound of the C<n>-th lucky number.
-The actual value will always be less than or equal to the result.
+upper estimate of the C<n>-th lucky number.
+
+The lower and upper estimates have been verified as bounds through
+C<< n <= 3 * 10^9 >>, but are not proven for larger inputs.
 
 
 =head2 minimal_goldbach_pair
@@ -4804,10 +5400,10 @@ less than C<4> and for all odd C<n> where C<n != 2+q> for a prime C<q>.
 The Goldbach Conjecture famously states that a C<p> exists for
 all even C<n> greater than C<2>.
 
-This function is reasonably fast even for larger values of C<n> as it can
-terminate after the first pair is found.  On Macbook M1, average time is
-under 1 microsecond for 32-bit even inputs, under 10 microseconds for 64-bit
-even inputs, and 1 millisecond for 105 bit even inputs.
+This function is usually fast even for large values of C<n>, since it
+terminates when the first pair is found.  Running time depends on the size
+of C<n> and on how many candidate primes C<p> must be tested before
+C<n-p> is prime.
 
 =head2 goldbach_pair_count
 
@@ -4821,6 +5417,8 @@ If no such pairs exist, C<0> is returned.
 Given a single non-negative integer C<n>, returns a list containing each C<p>
 for all prime pairs C<p> and C<q> where C<< p <= q >> and C<p + q = n>.
 The number of elements returned is the same as L</goldbach_pair_count>.
+
+In scalar context, returns the number of values that would be returned.
 
 If no such pairs exist, an empty list is returned.
 
@@ -4852,7 +5450,7 @@ The values themselves produce L<OEIS series A090425|http://oeis.org/A090425>.
 
   my $is_23_smooth = is_smooth($n, 23);
 
-Given two non-negative integer inputs C<n> and C<k>,
+Given an integer C<n> and a non-negative integer C<k>,
 returns C<1> if C<|n|> is C<k>-smooth, and C<0> otherwise.
 This uses the OEIS definition: Returns true if no prime factors
 of C<n> are larger than C<k>.
@@ -4872,7 +5470,7 @@ This corresponds to Mathematica's C<SmoothIntegerQ[n]> resource function.
 
   my $is_23_rough = is_rough($n, 23);
 
-Given two non-negative integer inputs C<n> and C<k>,
+Given an integer C<n> and a non-negative integer C<k>,
 returns C<1> if C<|n|> is C<k>-rough, and C<0> otherwise.
 This uses the OEIS definition: Returns true if no prime factors
 of C<n> are smaller than C<k>.
@@ -5001,9 +5599,8 @@ of perfect powers between C<lo> and C<hi> inclusive.
 
 By convention, numbers less than 1 are not counted.
 
-This can be calculated extremely quickly (less than 100ns per call
-for native size integers), so in most cases there is no need for the
-approximations or bounds.
+This can be calculated extremely quickly, so in most cases there is
+no need for the approximations or bounds.
 
 This is L<OEIS series A069623|http://oeis.org/A069623>.
 
@@ -5068,7 +5665,7 @@ Given non-negative integer inputs C<n> and C<k>, returns the number of
 integers between C<1> and C<n> inclusive, that have no prime factor larger
 than C<k>.
 
-For all C<n>, C<smooth_count(n,0) = smooth_count(n,1) = 1>.
+For positive C<n>, C<smooth_count(n,0) = smooth_count(n,1) = 1>.
 For all C<k>, C<smooth_count(0,k) = 0> and C<smooth_count(1,k) = 1>.
 
 This is equivalent to, but much faster than,
@@ -5092,6 +5689,8 @@ Given an integer C<n>, returns 1 if C<n> is a practical number,
 and returns 0 otherwise.
 A practical number is a positive integer C<n> such that all smaller
 positive integers can be represented as sums of distinct divisors of C<n>.
+This function returns C<0> for all input C<< n <= 0 >>.
+
 This is L<OEIS series A005153|http://oeis.org/A005153>.
 
 
@@ -5101,7 +5700,9 @@ Given a non-negative integer C<n>, returns the Carmichael function
 (also called the reduced totient function, or Carmichael λ(n)).
 This is the smallest
 positive integer C<m> such that C<a^m = 1 mod n> for every integer C<a>
-coprime to C<n>.  This is L<OEIS series A002322|http://oeis.org/A002322>.
+coprime to C<n>.
+By convention, C<carmichael_lambda(0) = 0>.
+This is L<OEIS series A002322|http://oeis.org/A002322>.
 
 This corresponds to Mathematica's C<CarmichaelLambda[n]> function.
 It can be computed in Pari/GP as C<lcm(znstar(n)[2])>.
@@ -5127,22 +5728,6 @@ If C<n> is not an odd prime, then the result does not necessarily
 indicate whether C<a> is a quadratic residue mod C<n>.  Using the function
 L</is_qr> will return correct results for any C<n>, though could be slower.
 
-=head2 factorial
-
-Given a non-negative integer C<n>, returns the factorial of C<n>,
-defined as the product of the integers 1 to C<n> with the special case
-of C<factorial(0) = 1>.  This corresponds to Pari's C<factorial(n)>
-and Mathematica's C<Factorial[n]> functions.
-
-=head2 subfactorial
-
-Given a non-negative integer C<n>, returns the subfactorial of C<n>,
-which is the number of derangements of C<n> objects.  This is the number
-of permutations of n items where each item is not allowed to stay in its
-starting position.
-
-This is L<OEIS series A000166|http://oeis.org/A000166>.
-This corresponds to Mathematica's C<Subfactorial[n]> function.
 
 =head2 binomial
 
@@ -5158,10 +5743,134 @@ case.  GMP's API does not allow negative C<k> but otherwise matches.
 C<Math::BigInt> version 1.999816 and later supports negative arguments
 with similar semantics.  Prior to this, C<< n < 0, k > 0 >> was undefined.
 
+=head2 catalan_number
+
+Given a non-negative integer C<n>, returns the Catalan number C<C_n>.
+This is given by C<binomial(2*n,n) / (n+1)>.
+The input C<n> must fit in a native signed integer.
+
+This corresponds to Mathematica's C<CatalanNumber[n]> function,
+Sage's C<catalan_number(n)> function, and SymPy's C<catalan(n)> function.
+
+This is the L<OEIS series A000108|http://oeis.org/A000108>.
+
+=head2 stirling
+
+  say "s(14,2) = ", stirling(14, 2);
+  say "S(14,2) = ", stirling(14, 2, 2);
+  say "L(14,2) = ", stirling(14, 2, 3);
+
+Given two 32-/64-bit non-negative integers C<n> and C<k>, plus an
+optional third argument C<kind> (1, 2, or 3, with the default being 1),
+returns the Stirling number of the given kind.
+The third kind are the unsigned Lah numbers.
+This corresponds to Pari's C<stirling(n,k,{type})>
+function and Mathematica's C<StirlingS1> / C<StirlingS2> functions.
+
+Stirling numbers of the first kind are C<(-1)^(n-k)> times the number of
+permutations of C<n> symbols with exactly C<k> cycles.  Stirling numbers
+of the second kind are the number of ways to partition a set of C<n>
+elements into C<k> non-empty subsets.  The Lah numbers are the number of
+ways to split a set of C<n> elements into C<k> non-empty lists.
+
+=head2 bell_number
+
+  say "B(32) = ",bell_number(32);  # 128064670049908713818925644
+
+Given a non-negative integer C<n>, returns the Bell number of C<n>,
+which counts the number of partitions of a set of size C<n>.
+The input C<n> must fit in a native signed integer.
+
+This corresponds to Mathematica's C<BellB[n]> function,
+Sage's C<bell_number(n)> function, and SymPy's C<bell(n)> function.
+
+This is the L<OEIS series A000110|http://oeis.org/A000110>.
+
+=head2 fubini
+
+Given a non-negative integer C<n>, returns the Fubini number of C<n>,
+also called the ordered Bell numbers, or the number of ordered partitions
+of C<n>.  It is the count of rankings of C<n> items allowing for ties.
+The input C<n> must fit in a native signed integer.
+
+This is the L<OEIS series A000670|http://oeis.org/A000670>.
+
+=head2 integer_complexity
+
+  # 6 = (1+1) * (1+1+1)
+  say integer_complexity(6);   # 5
+  # 100 = (1+1) * (1+1) * ((1+1)*(1+1)+1) * ((1+1)*(1+1)+1)
+  say integer_complexity(100); # 14
+
+Given a non-negative integer C<n>, returns the integer complexity of C<n>:
+the minimum number of 1s needed to represent C<n> using addition and
+multiplication only.  C<n=0> returns undef.
+
+The complexity satisfies C<f(2^k) = 2k> and C<f(3^k) = 3k>, for a positive
+integer C<k>, since powers of 2 and 3 have optimal factorization trees.
+In general, C<f(n) >= 3 * log(n) / log(3)>.
+
+Results are cached internally, so repeated calls are efficient.
+When computing C<integer_complexity(n)> for many values up to some
+maximum C<N>, performance is best if the first call uses the largest
+value (or if values are requested in decreasing order), as the cache is
+built incrementally.
+Calling C<integer_complexity(0)> will flush the cache.
+
+C<n> must fit in a signed native integer.  The implementation caches all
+values up to the requested index, so practical limits are usually much
+lower and depend on available memory.
+
+This is the L<OEIS series A005245|http://oeis.org/A005245>.
+
+=head2 factorial
+
+Given a non-negative integer C<n>, returns the factorial of C<n>,
+defined as the product of the integers 1 to C<n> with the special case
+of C<factorial(0) = 1>.  This corresponds to Pari's C<factorial(n)>
+and Mathematica's C<Factorial[n]> functions.
+
+The input C<n> must fit in an unsigned native integer.
+
+=head2 multifactorial
+
+  say multifactorial(9, 3);   # 9 * 6 * 3 = 162
+  say multifactorial(10, 2);  # 10!! = 10*8*6*4*2 = 3840
+
+Given a non-negative integer C<n> and a positive integer C<k>, returns
+the C<k>-step multifactorial of C<n>, defined as the product of the
+positive integers from C<n> stepping down by C<k>:
+
+  multifactorial(n, k) = n * (n-k) * (n-2k) * ... * r
+
+where C<r> is the last positive term (C<< r <= k >>).
+C<multifactorial(0, k) = 1> for all C<k>.
+
+With C<k=1> this is C<factorial(n)>.  With C<k=2> this is the double
+factorial (C<n!!>), with C<k=3> the triple factorial (C<n!!!>),
+and so on.
+The double factorial is L<OEIS A006882|http://oeis.org/A006882>.
+
+This corresponds to Mathematica's C<Multifactorial[n,k]> function,
+and Sage's C<n.multifactorial(k)> method.
+For the double factorial, Mathematica has C<Factorial2[n]>,
+SymPy has C<factorial2>, and Maple has C<doublefactorial(n)>.
+
+=head2 subfactorial
+
+Given a non-negative integer C<n>, returns the subfactorial of C<n>,
+which is the number of derangements of C<n> objects.  This is the number
+of permutations of n items where each item is not allowed to stay in its
+starting position.
+The input C<n> must fit in a native signed integer.
+
+This is L<OEIS series A000166|http://oeis.org/A000166>.
+This corresponds to Mathematica's C<Subfactorial[n]> function.
+
 =head2 falling_factorial
 
 Given two integers C<x> and C<n>, with C<n> non-negative, returns the
-falling factorial of C<n>.
+falling factorial of C<x>.
 
   falling_factorial(x,n) = x * (x-1) * (x-2) * ... * (x-(n-1))
 
@@ -5170,7 +5879,7 @@ This corresponds to Mathematica's C<FactorialPower[x,n]> function.
 =head2 rising_factorial
 
 Given two integers C<x> and C<n>, with C<n> non-negative, returns the
-rising factorial of C<n>.
+rising factorial of C<x>.
 
   rising_factorial(x,n) = x * (x+1) * (x+2) * ... * (x+(n-1))
 
@@ -5184,6 +5893,8 @@ This corresponds to Mathematica's C<Pochhammer[x,n]> function.
 
 Given two non-negative integers C<n> and C<k>, returns the sum of C<k>-th
 powers of the first C<n> positive integers.
+
+The exponent C<k> must fit in an unsigned native integer.
 
 With C<k=2> this is (L<OEIS A000330|http://oeis.org/A000330>).
 With C<k=3> this is (L<OEIS A000537|http://oeis.org/A000537>).
@@ -5200,6 +5911,8 @@ Given an integer C<n>, returns 12 times the
 Hurwitz-Kronecker class number.
 This will always be an integer due to the pre-multiplication by 12.
 The result is C<0> for negative C<n> and all C<n> congruent to 1 or 2 mod 4.
+Using the standard convention C<H(0) = -1/12>, C<hclassno(0) = -1>.
+C<n> must fit in a native signed integer.
 
 This is related to Pari's C<qfbhclassno(n)> where C<hclassno(n)> for positive
 C<n> equals C<12 * qfbhclassno(n)> in Pari/GP.
@@ -5210,7 +5923,7 @@ This is L<OEIS A259825|http://oeis.org/A259825>.
 
   my($num,$den) = bernfrac(12);  # returns (-691,2730)
 
-Returns the Bernoulli number C<B_n> for an integer argument C<n>, as a
+Returns the Bernoulli number C<B_n> for a non-negative integer C<n>, as a
 rational number represented by two integers.  B_1 is chosen as 1/2, which
 is the same as Pari's C<bernfrac(n)> and Mathematica's C<BernoulliB>
 functions.
@@ -5231,33 +5944,6 @@ as a L<Math::BigFloat> object using the default precision.  An optional
 second argument may be given specifying the precision to be used.
 
 This corresponds to Pari's C<bernreal> function.
-
-=head2 stirling
-
-  say "s(14,2) = ", stirling(14, 2);
-  say "S(14,2) = ", stirling(14, 2, 2);
-  say "L(14,2) = ", stirling(14, 2, 3);
-
-Given two 32-/64-bit non-negative integers C<n> and C<k>, plus an
-optional third argument C<kind> (1, 2, or 3, with the default being 1),
-returns the Stirling number of the given kind.
-The third kind are the unsigned Lah numbers.
-This corresponds to Pari's C<stirling(n,k,{type})>
-function and Mathematica's C<StirlingS1> / C<StirlingS2> functions.
-
-Stirling numbers of the first kind are C<-1^(n-k)> times the number of
-permutations of C<n> symbols with exactly C<k> cycles.  Stirling numbers
-of the second kind are the number of ways to partition a set of C<n>
-elements into C<k> non-empty subsets.  The Lah numbers are the number of
-ways to split a set of C<n> elements into C<k> non-empty lists.
-
-=head2 fubini
-
-Given a non-negative integer C<n>, returns the Fubini number of n,
-also called the ordered Bell numbers, or the number of ordered partitions
-of C<n>.  It is the count of rankings of C<n> items allowing for ties.
-
-This is the L<OEIS series A000670|http://oeis.org/A000670>.
 
 =head2 harmfrac
 
@@ -5298,25 +5984,23 @@ C<--phi n a> feature of C<primecount>.
 
   $approx_prime_count = inverse_li(1000000000);
 
-Given a non-negative integer C<n>, returns the least integer value C<k>
-such that C<< Li(k) >= n >>.  Since the logarithmic integral C<Li(n)> is
-a good approximation to the number of primes less than C<n>, this function
-is a good simple approximation to the nth prime.
+Given a non-negative integer C<n>, returns the least non-negative integer
+C<k> such that C<< li(k) >= n >>, where C<li> is the logarithmic
+integral.  For C<n = 0>, returns zero.  This provides an approximation
+to the C<n>-th prime.
 
 =head2 inverse_li_nv
 
   $faster_approx_prime_count = inverse_li_nv(1000000000);
 
-With input C<x> and output both in NV (floating point), computes the
-inverse of the logarithmic integral.  This should be very fast, as everything
-is done in native long double precision, no Perl bigints or bigfloats are
-involved, and the computed result is returned as an NV.
+Given a finite non-negative real value C<x>, returns an NV approximation
+to the unique value C<y > 1> satisfying C<li(y) = x>.  The calculation
+uses native floating-point arithmetic and is limited to native
+floating-point range and precision.
 
-The L</inverse_li> function uses this to start, then ensures the integer
-return value is the closest inverse of the integer result of the
-L</LogarithmicIntegral> function.  While this is a small amount of extra
-time for small inputs, once we have to go to Perl and use BigInt / BigFloat,
-the extra time can be significant.
+For integer C<n >= 1>, C<inverse_li(n)> is mathematically the ceiling
+of this value, but performs additional work to ensure the correct
+integer result.
 
 
 =head2 numtoperm
@@ -5326,8 +6010,12 @@ the extra time can be significant.
 Given a non-negative integer C<n> and integer C<k>, return the
 rank C<k> lexicographic permutation of C<n> elements.
 C<k> will be interpreted as mod C<n!>.
+C<n> must fit in a native signed integer.
 
 This will match iteration number C<k> (zero based) of L</forperm>.
+
+In scalar context, returns C<n>, the number of elements in the permutation
+that would be returned.
 
 This corresponds to Pari's C<numtoperm(n,k)> function (Pari 2.6 and
 later use the same lexicographic ordering).
@@ -5348,21 +6036,35 @@ later use the same lexicographic ordering).
 
 =head2 randperm
 
-  @p = randperm(100);   # returns shuffled 0..99
-  @p = randperm(100,4)  # returns 4 elements from shuffled 0..99
+  @p = randperm(100);                # returns shuffled 0..99
+  @p = randperm(100,4);              # returns 4 elements of shuffled 0..99
   @s = @data[randperm(1+$#data)];    # shuffle an array
   @p = @data[randperm(1+$#data,2)];  # pick 2 from an array
 
-Given a single non-negative integer C<n>, returns a random permutation
-of the integers from C<0> to C<n-1>.
+Takes a non-negative integer C<n> and an optional non-negative integer C<k>.
+If C<k> is not given or if C<< k >= n >> then C<k> is set equal to C<n>.
 
-Optionally takes a second non-negative integer argument C<k>.
-The returned list will then have only C<k> elements.
-This is more efficient than truncating the full shuffled list.
+When C<k> equals C<n>, returns a random permutation of the integers
+from C<0> to C<n-1>.
+Since C<n> values are returned, C<n> must fit in a native signed integer.
+
+When a C<k> is given that is less than C<n>,
+C<k> elements are randomly chosen from C<0> to C<n-1> without duplication.
+This is more efficient than truncating the full shuffled list,
+and is very time and space efficient with huge C<n> and small C<k>.
+Since C<k> values are returned, C<k> must fit in a native signed integer.
 
 The randomness comes from our CSPRNG.
+Results are produced by the Fisher-Yates-Knuth process,
+stopping after C<k> selections.  This is equivalent to shuffling
+C<0> through C<n-1> and returning the first C<k> values, without
+needing to perform the full shuffle.
 
-The slicing technique shown in the last example is similar to L</vecsample>.
+In scalar context, returns the number of elements that would be returned,
+without actually generating the permutation.
+
+The slicing techniques in the last two examples are similar to
+L</shuffle> and L</vecsample>.
 
 =head2 shuffle
 
@@ -5374,12 +6076,15 @@ Like randperm, the randomness comes from our CSPRNG.
 This function is functionally identical to the C<shuffle> function
 in L<List::Util>.  The only difference is the random source (Chacha20
 with better randomness, a larger period, and a larger state).  This
-does make it slower.
+does make it slightly slower.
 
 If the entire shuffled array is desired, this is faster than slicing
 with L</randperm> as shown in its example above.  If fewer elements
 are needed (a "pick" or "sample") then L</vecsample> or slicing with
 L</randperm> will be much more efficient.
+
+In scalar context, returns the number of input elements without shuffling or
+consuming any random data.
 
 =head2 vecsample
 
@@ -5387,19 +6092,25 @@ L</randperm> will be much more efficient.
   @twoof = vecsample(2,@data);  # Select two random values
 
 Takes a non-negative integer C<k> and a list, and returns C<k> randomly
-selected values from the list.  The randomness comes from our CSPRNG.
+selected elements from the list.  The randomness comes from our CSPRNG.
+A given list entry will never be returned more than once.  If the count
+C<k> is greater than or equal to the number of list elements, the entire
+list is returned in random order, similar to L</shuffle>.
 
 If the input is exactly two elements (C<k> and one other) and the second
 value is an array reference, then we will use it as the input list:
 
   $oneof = vecsample(1, $arrayref);
-  @twoof = vecsample(1, \@data);
+  @twoof = vecsample(2, \@data);
 
 This can be a large performance increase if the input list is large
 (e.g. 2x at 1000 elements, can be 10x with more).
 While there might be confusion when sampling a list with exactly
 one element, where that element is an array reference, this is
 assumed to be a rare case.
+
+In scalar context, returns the number of elements that would be selected
+without sampling or consuming any random data.
 
 This is similar to C<sample> from L<List::Util>, C<choose_multiple> from
 Rust rand, and Raku's C<pick>.
@@ -5419,9 +6130,11 @@ See L</"MODULAR FUNCTIONS"> for more functions that operate mod n.
 Semantics mostly follow Pari/GP, though in some cases they will indicate
 an error while we return undef.
 
+Unless documented otherwise (e.g. for functions returning lists):
+
   We use the absolute value of the modulus.
-  A modulus of zero returns undef.
-  A modulus of 1 will return 0.
+  For modulus 0, the result is undef.
+  For modulus 1, a modular-residue result is 0.
   If a modular result doesn't exist, we return undef.
 
 =head2 negmod
@@ -5433,9 +6146,9 @@ This is similar to C<submod(0,$a,$n)> or C<$n ? modint(-$a,absint($n)) : undef>.
 =head2 addmod
 
 Given three integers C<a>, C<b>, and C<n>, return C<(a+b) mod |n|>.
-This is particularly useful when dealing with numbers that are larger
-than a half-word but still native size.
-No bigint package is needed and this can be 10-200x faster than using one.
+This is particularly useful when the inputs fit native integers but their
+sum might not.  It avoids constructing bigint objects solely to handle the
+intermediate result.
 
 =head2 submod
 
@@ -5444,8 +6157,9 @@ Given three integers C<a>, C<b>, and C<n>, return C<(a-b) mod |n|>.
 =head2 mulmod
 
 Given three integers C<a>, C<b>, and C<n>, return C<(a*b) mod |n|>.
-This is particularly useful when C<n> fits in a native integer.
-No bigint package is needed and this can be 10-200x faster than using one.
+This is particularly useful when the inputs fit native integers but their
+product might not.  It avoids constructing bigint objects solely to handle
+the intermediate result.
 
 =head2 muladdmod
 
@@ -5477,7 +6191,7 @@ If no square root exists, undef is returned.  If defined, the return value
 C<r> will always satisfy C<r^2 = a mod |n|>.
 
 If the modulus is prime, the function will always return C<r>, the smaller
-of the two square roots (the other being C<-r mod |n|>.  If the modulus is
+of the two square roots (the other being C<-r mod |n|>).  If the modulus is
 composite, one of possibly many square roots will be returned, and it will
 not necessarily be the smallest.
 
@@ -5487,9 +6201,13 @@ Given two integers C<a> and C<n>, returns a sorted list of all modular
 square roots of C<a> mod C<|n|>. If no square root exists, an empty
 list is returned.
 
+For C<n = 0>, this returns an empty list.  For C<|n| = 1>, it returns C<(0)>.
+
 Some inputs will return very many roots.
 For example, C<a = p^4, n = 24 * p^4> for prime p, has many roots,
-and C<sqrtmod(89**8, 24*89**8)> has over 500 million.
+and C<allsqrtmod(89**8, 24*89**8)> has over 500 million.
+
+In scalar context, this returns the count of roots.
 
 =head2 rootmod
 
@@ -5503,14 +6221,26 @@ For some composites with large prime powers this may not be efficient.
 C<rootmod(a,-k,n)> is calculated as C<rootmod(invmod(a,n),k,n)>.
 If C<1/a mod |n|> does not exist, undef is returned.
 
+For C<k = 0>, a root exists exactly when C<a = 1 mod |n|>.  In that
+case the function returns C<1> when C<< |n| > 1 >>.  As with other modular
+functions, a modulus of C<1> returns C<0>.
+
 =head2 allrootmod
 
 Given three integers C<a>, C<k>, and C<n>, returns a sorted list of all
-modular C<k>-th root of C<a> modulo C<|n|>.
+modular C<k>-th roots of C<a> modulo C<|n|>.
 If no root exists, an empty list is returned.
+For C<n = 0>, this returns an empty list.  For C<|n| = 1>, it returns C<(0)>.
+
+C<allrootmod(a,-k,n)> finds the roots of C<invmod(a,n)>.  If the inverse
+does not exist, an empty list is returned.  For C<k = 0>, every residue
+modulo C<|n|> is returned when C<a = 1 mod |n|>; otherwise there are no
+roots.
 
 Similar to L</allsqrtmod>, some inputs have millions or billions of roots,
 so it might not be able to successfully return them all.
+
+In scalar context, this returns the count of roots.
 
 =head2 invmod
 
@@ -5533,11 +6263,12 @@ Given a non-negative integer C<n> and an integer C<m>, returns C<n! mod |m|>.
 This is much faster than computing the large C<factorial(n)> followed
 by a mod operation.
 
-While very efficient, this is not state of the art.  Currently,
-Fredrik Johansson's fast multi-point polynomial evaluation method as
-used in FLINT is the fastest known implementation.
-This becomes noticeable for C<< n > 10^8 >> or so,
-and the O(n^.5) versus O(n) complexity is very apparent with large C<n>.
+This implementation performs linear modular work.  For sufficiently large
+C<n>, asymptotically faster methods based on fast multi-point polynomial
+evaluation, such as the implementation in FLINT, can be faster.  The
+crossover depends on the platform and modulus.
+
+Like other mod functions, C<undef> is returned when C<m=0>.
 
 =head2 binomialmod
 
@@ -5546,8 +6277,9 @@ This is much faster than computing the large C<binomial(n,k)> followed
 by a mod operation.
 
 C<|m|> does not need to be prime.
-The result is extended to negative C<n>.
-Negative C<k> will return zero.
+Negative arguments follow the same Kronenburg extensions as L</binomial>.
+In particular, negative C<k> returns zero except when C<< n < 0, k <= n >>.
+Like other mod functions, C<undef> is returned when C<m=0>.
 
 This corresponds to Mathematica's C<BinomialMod[n,m,p]> function.  It has
 similar functionality to Max Alekseyev's C<binomod.gp> Pari routine.
@@ -5578,6 +6310,9 @@ Given integers C<P>, C<Q>, the non-negative integer C<k>, and the
 integer C<n>, efficiently compute the k-th value
 of C<U(P,Q) mod |n|> and C<V(P,Q) mod |n|>.
 
+For C<n = 0>, this returns an empty list.
+For C<|n| = 1>, it returns C<(0,0)>.
+
 This is similar to the L</lucas_sequence> function, but uses a more
 consistent argument order and does not return C<Q_k>.
 
@@ -5590,25 +6325,16 @@ B<lucas_sequence() is deprecated.  Use lucasuvmod() instead.>
 Computes C<U_k>, C<V_k>, and C<Q_k> for the Lucas sequence defined by
 C<P>,C<Q>, modulo C<|n|>.  The modular Lucas sequence is used in a
 number of primality tests and proofs.
-C<k> must be non-negative, and C<n> must be non-zero.
+C<k> must be non-negative, and C<n> must be positive.
 
-=head2 pisano_period
-
-Given a non-negative integer C<n>, returns the period of the Fibonacci
-sequence modulo C<n>.
-The modular Fibonacci numbers can be produced using C<lucasumod(1,-1,k,n)>.
-They are periodic for any integer C<n>, and the Pisano period is the
-length of the repeating sequence.
-
-This is the L<OEIS series A001175|http://oeis.org/A001175>.
 
 =head1 MODULAR FUNCTIONS
 
 =head2 OVERVIEW
 
-More functions are provided that operate mod n.  They use similar semantics
-with respect to the modulus: the absolute value is used, and a modulus of 0
-will return undef.  However the behavior with C<n = 1> is not always the same.
+More functions are provided that operate mod n.  They generally use the
+absolute value of the modulus and return undef for a modulus of 0.
+Exceptions and behavior for C<n = 1> are documented with each function.
 
 =head2 znlog
 
@@ -5616,27 +6342,34 @@ will return undef.  However the behavior with C<n = 1> is not always the same.
 
 Returns the integer C<k> that solves the equation C<a = g^k mod |p|>, or
 undef if no solution is found.  This is the discrete logarithm problem.
+The returned C<k> is non-negative, but is not guaranteed to be the smallest
+solution.
 
 The implementation for native integers first applies Silver-Pohlig-Hellman
 on the group order to possibly reduce the problem to a set of smaller
 problems.  The solutions are then performed using a mixture of trial,
 Shanks' BSGS, and Pollard's DLP Rho.
 
-The PP implementation is less sophisticated, with only a memory-heavy BSGS
-being used.
+We will solve even when C<p> is not prime.
+This is reasonable if C<g> and C<p> are coprime.
+If not, a reduction is attempted before falling back to the remaining
+discrete log problem.
+
+The PP implementation uses trial search and Silver-Pohlig-Hellman, with
+BSGS for subproblems and as a fallback.  It does not use Pollard's DLP Rho.
 
 =head2 znorder
 
   $order = znorder(2, next_prime(10**16)-6);
 
-Given two positive integers C<a> and C<n>, returns the multiplicative order
+Given two integers C<a> and C<n>, returns the multiplicative order
 of C<a> modulo C<|n|>.  This is the smallest positive integer C<k> such that
-C<a^k ≡ 1 mod |n|>.  Returns undef if C<n = 0>, C<a = 0>, or if
-C<a> and C<n> are not coprime, since no value can result in 1 mod n.
-Returns 1 if C<a = 1> or if C<n = 1>.
+C<a^k ≡ 1 mod |n|>.  Returns undef if C<n = 0>, or, when C<< |n| > 1 >>,
+if C<a> and C<n> are not coprime.  Returns C<1> if C<n = 1> or if
+C<a ≡ 1 mod |n|>.
 
-Note the latter differs from other mod functions, because the return value
-is a positive integer, not an integer mod n.
+The result for C<n = 1> differs from other mod functions because the
+return value is a positive integer, not an integer mod n.
 
 This corresponds to Pari's C<znorder(Mod(a,n))> function and Mathematica's
 C<MultiplicativeOrder[a,n]> function.
@@ -5651,6 +6384,7 @@ which will be true only if
 C<< n is one of {2, 4, p^k, 2p^k} >> for odd prime p.
 
 Like other modular functions, if C<n = 0> the function returns undef.
+By convention, C<znprimroot(1)> returns C<0>.
 
 L<OEIS A033948|http://oeis.org/A033948> is a sequence of integers where
 the primitive root exists, while L<OEIS A046145|http://oeis.org/A046145>
@@ -5664,6 +6398,7 @@ primitive root modulo C<|n|>, and C<0> if not.  If C<a> is a primitive root,
 then C<euler_phi(n)> is the smallest C<e> for which C<a^e = 1 mod n>.
 
 Like other modular functions, if C<n = 0> the function returns undef.
+By convention, every integer is considered a primitive root modulo C<1>.
 
 =head2 qnr
 
@@ -5672,6 +6407,7 @@ modulo C<|n|>.  This is the smallest integer C<a> where there does not
 exist an integer C<b> such that C<a = b^2 mod |n|>.
 
 Like other modular functions, if C<n = 0> the function returns undef.
+The values C<qnr(1) = 1> and C<qnr(2) = 2> are sequence conventions.
 
 This is L<OEIS A020649|http://oeis.org/A020649>.
 For primes it is L<OEIS A053760|http://oeis.org/A053760>.
@@ -5680,14 +6416,28 @@ For primes it is L<OEIS A053760|http://oeis.org/A053760>.
 
 Given two integers C<a> and C<n>, returns 1 if C<a> is a
 quadratic residue modulo C<|n|>, and 0 otherwise.
-A return value of 1 indicates there exists an C<x> where C<a = x^2 mod |n|>.
+A return value of 1 indicates there exists an integer C<x> where
+C<a = x^2 mod |n|>.
 
-For odd primes, this is similar to checking C<a==0 || kronecker(a,n) == 1>.
+For odd prime C<|n|>, this is equivalent to checking whether C<a> is
+divisible by C<n> or C<kronecker(a,absint(n)) == 1>.
 
-For all values, this will be equal to C<sqrtmod(a,n) != undef>, with
+For nonzero C<n> this will be equal to C<defined sqrtmod(a,n)>, with
 possibly better performance.
 
 Like other modular functions, if C<n = 0> the function returns undef.
+
+=head2 pisano_period
+
+Given a non-negative integer C<n>, returns the period of the Fibonacci
+sequence modulo C<n>.
+The modular Fibonacci numbers can be produced using C<lucasumod(1,-1,k,n)>.
+They are periodic for every positive integer C<n>, and the Pisano period is
+the length of the repeating sequence.  By convention, C<pisano_period(0)>
+returns C<0>; C<pisano_period(1)> returns C<1>.
+
+This is the L<OEIS series A001175|http://oeis.org/A001175>.
+
 
 =head1 RANDOM NUMBERS
 
@@ -5710,12 +6460,15 @@ Since we often deal with random primes for cryptographic purposes, we have
 additional requirements.  This module uses a CSPRNG for its random stream.
 In particular, ChaCha20, which is the same algorithm used by BSD's
 C<arc4random> and C</dev/urandom> on BSD and Linux 4.8+.
-Seeding is performed at startup using the Win32 Crypto API (on Windows),
-C</dev/urandom>, C</dev/random>, or L<Crypt::PRNG>, whichever is found first.
+Seeding is performed at startup.  The XS implementation obtains seed material
+from the Win32 Crypto API or C</dev/urandom> (falling back to
+C</dev/random>), with timer jitter as a last resort.  The pure-Perl
+implementation also tries L<Crypt::Random::Seed> and L<Crypt::PRNG> before
+using its timer-jitter fallback.
 
 We use the original ChaCha definition rather than RFC7539.  This means a
-64-bit counter, resulting in a period of 2^72 bytes or 2^68 calls to
-L</drand> or L</irand64>.
+64-bit counter, resulting in a period of 2^70 bytes or 2^67 calls to
+L</irand64> or double precision L</drand>.
 This compares favorably to the 2^48 period of Perl's C<drand48>.
 It has a 512-bit state which is significantly larger than the
 48-bit C<drand48> state.  When seeding, 320 bits (40 bytes) are used.
@@ -5733,8 +6486,8 @@ Carefully tuning that interface is critical for any module.
 For performance on large amounts of data, see the tables
 in L</random_bytes>.
 
-Each thread uses its own context, meaning seeding in one thread has no
-impact on other threads.  In addition to improved security, this is
+Each thread has its own independently seeded context, so reseeding one thread
+has no impact on other threads.  In addition to improved security, this is
 better for performance than a single context with locks.
 If explicit control of multiple independent streams is needed then using
 a more specific module is recommended.  I believe L<Crypt::PRNG>
@@ -5742,34 +6495,51 @@ a more specific module is recommended.  I believe L<Crypt::PRNG>
 
 Using the C<:rand> export option will define C<rand> and C<srand> as similar
 but improved versions of the system functions of the same name, as well as
-L</irand> and L</irand64>.
+L</irand>, L</irand32>, and L</irand64>.
 
 
 =head2 irand
 
-  $n32 = irand;     # random 32-bit integer
+  $n32 = irand;       # random 32-bit integer
+
+Returns a random 32-bit integer using the CSPRNG.
+
+A better API would be returning either 32- or 64-bit depending on C<uvsize>.
+But historically CPAN modules have made integer rand be 32-bit while a
+64-bit variant is added for 64-bit returns.  When we added this function
+in 2017 we chose to follow the precedent.
+
+=head2 irand32
+
+  $n32 = irand32;     # random 32-bit integer
 
 Returns a random 32-bit integer using the CSPRNG.
 
 =head2 irand64
 
-  $n64 = irand64;   # random 64-bit integer
+  $n64 = irand64;     # random 64-bit integer
 
-Returns a random 64-bit integer using the CSPRNG (on 64-bit Perl).
-On a 32-bit Perl, it returns the maximum UV bits, which will be only 32.
+Returns a random 64-bit integer using the CSPRNG.
+On 64-bit Perl this will be a native UV.
+On 32-bit Perl this will be a bigint if the result exceeds C<2^32-1>.
 
 =head2 drand
 
-  $f = drand;       # random floating point value in [0,1)
-  $r = drand(25.33);   # random floating point value in [0,25.33)
+  $f = drand;         # random floating point value in [0,1)
+  $r = drand(25.33);  # random floating point value in [0,25.33)
+  $r = drand(-10);    # random floating point value in (-10,0]
 
 Returns a random NV (Perl's native floating point) using the CSPRNG.  The
 API is similar to Perl's C<rand> but giving better results.
 
-The number of actual random bits will be equal to the number of mantissa
-bits in the NV type.  For IEEE-754 doubles, this means 53 bits, and can
-go to 64 or 113 bits with long double / quadmath support.
-The L</_nvmantbits> function allows seeing how many bits are used.
+With no argument or with an argument numerically equal to zero, the range
+is C<[0,1)>.  For a positive argument C<m>, the range is C<[0,m)>; for a
+negative argument C<m>, the range is C<(m,0]>.
+
+The number of actual random bits equals the significand precision of the
+NV type.  For IEEE-754 doubles this is 53 bits, and it can be 64 or 113
+bits with long double or quadmath support.  See L</_nvmantbits> for how
+Perl reports the mantissa width and implicit leading bit.
 
 This gives I<substantially> better quality random numbers than the default Perl
 C<rand> function.  Among other things, on modern Perl's, C<rand> uses drand48,
@@ -5784,8 +6554,9 @@ With the ":rand" tag, this function is additionally exported as C<rand>.
 
   $str = random_bytes(32);     # 32 random bytes
 
-Given an unsigned number C<n> of bytes, returns a string filled with random
-data from the CSPRNG.  Performance for large quantities:
+Given a non-negative integer number of bytes C<n>, returns a string filled
+with random data from the CSPRNG.
+The following historical rates were measured on one machine in 2017:
 
     Module/Method                  Rate   Type
     -------------             ---------   ----------------------
@@ -5809,15 +6580,24 @@ data from the CSPRNG.  Performance for large quantities:
     pack CORE::rand             25 MB/s   PRNG - drand48 (no XS)
     Bytes::Random                2.6 MB/s PRNG - drand48 (no XS)
 
+The input C<n> must be between 0 and 2147483646.
+
 =head2 entropy_bytes
 
-Similar to random_bytes, but directly using the entropy source.
+Similar to random_bytes, but normally reading directly from the entropy source.
 This is not normally recommended as it can consume shared system
 resources and is typically slow -- on the computer that produced
 the L</random_bytes> chart above, using C<dd> generated the same
 13 MB/s performance as our L</entropy_bytes> function.
 
+If no normal source is available, a last-resort timer-jitter fallback is
+used.  The pure-Perl fallback requires L<Time::HiRes> and L<Digest::SHA>,
+and will croak if they cannot be loaded.
+
 The actual performance will be highly system dependent.
+
+Similar to C<random_bytes>, the input must be between
+0 and 2,147,483,646 (C<2^31-2>).
 
 =head2 urandomb
 
@@ -5828,6 +6608,8 @@ Given a number of bits C<b>, returns a random unsigned integer
 less than C<2^b>.  The result will be uniformly distributed
 between C<0> and C<2^b-1> inclusive.
 
+The number of bits must be between C<0> and C<4,294,967,295>.
+
 =head2 urandomm
 
   $n = urandomm(100);    # random integer in [0,99]
@@ -5837,18 +6619,39 @@ Given a positive integer C<n>, returns a random unsigned integer
 less than C<n>.  The results will be uniformly distributed between
 C<0> and C<n-1> inclusive.  Care is taken to prevent modulo bias.
 
+=head2 urandomr
+
+  $n = urandomr(1, 6);      # roll a die: random integer in [1, 6]
+  $n = urandomr(-10, 10);   # random integer in [-10, 10]
+  $n = urandomr($lo, $hi);  # random integer in [$lo, $hi]
+
+Given integers C<lo> and C<hi>, returns a uniformly distributed
+random integer in the inclusive range C<[lo, hi]>.  Care is taken
+to prevent modulo bias.  Returns C<undef> if C<lo E<gt> hi>.
+
+Both C<lo> and C<hi> may be negative or bigints.  For native-range
+non-negative inputs the function runs entirely in C.
+
 =head2 csrand
 
 Takes a binary string C<data> as input and seeds the internal CSPRNG.
 This is not normally needed as system entropy is used as a seed on
 startup.  For best security this should be 16-128 bytes of good
-entropy.  No more than 1024 bytes will be used.
+entropy.  No more than 1024 bytes will be used (and usually less,
+for example the current ChaCha CSPRNG uses only the first 40 bytes).
+On success, returns no value.  Errors are reported by croaking.
 
-With no argument, reseeds using system entropy, which is preferred.
+With no argument or with C<undef>, reseeds using system entropy, which is
+preferred.  An empty string is treated as an explicit seed.
 
-If the C<secure> configuration has been set, then this will croak if
-given an argument.  This allows for control of reseeding with entropy
-the module gets itself, but not user supplied.
+When the GMP backend is enabled, an explicit seed is supplied to both
+CSPRNGs.  With no argument, each CSPRNG is seeded independently from system
+entropy.  The generators use different algorithms and do not produce the
+same output stream.
+
+If the C<secure> configuration has been set, then this will croak if given a
+defined argument.  This allows for control of reseeding with entropy the
+module gets itself, but not user supplied.
 
 =head2 srand
 
@@ -5860,8 +6663,12 @@ L</csrand> is recommended, or keep using the system entropy default seed.
 
 The API is nearly identical to the system function C<srand>.  It
 uses a UV which can be 64-bit rather than always 32-bit.  The
-behaviour for C<undef>, empty string, empty list, etc. is slightly
-different (we treat these as 0).
+behaviour for C<undef> and the empty string is slightly different
+(we treat these as 0).
+
+When the GMP backend is enabled, it is given the same UV seed.  This also
+applies to the generated seed returned by a call with no argument.  The two
+generators use different algorithms and do not produce the same output stream.
 
 This function is not exported with the ":all" tag, but is with ":rand".
 
@@ -5878,11 +6685,11 @@ An alias for L</drand>, not exported unless the ":rand" tag is used.
 
 Given a positive non-zero input C<n>, returns a uniform random integer
 in the range C<1> to C<n>, along with an array reference containing
-the factors.
+the numerically sorted factors.
 
-This uses Kalai's algorithm for generating random integers along with
-their factorization, and is much faster than the naive method of
-generating random integers followed by a factorization.
+For large enough values, this uses Kalai's algorithm for generating
+random integers along with their factorization, and is much faster than
+the naive method of generating random integers followed by a factorization.
 A later implementation may use Bach's more efficient algorithm.
 
 
@@ -5898,25 +6705,20 @@ to the lower limit and less than or equal to the upper limit.  If no lower
 limit is given, 2 is implied.  Returns undef if no primes exist within the
 range.
 
-The goal is to return a uniform distribution of the primes in the range,
-meaning for each prime in the range, the chances are equally likely that it
-will be seen.  This is removes from consideration such algorithms as
-C<PRIMEINC>, which although efficient, gives very non-random output.  This
-also implies that the numbers will not be evenly distributed, since the
-primes are not evenly distributed.  Stated differently, the random prime
-functions return a uniformly selected prime from the set of primes within
-the range.  Hence given C<random_prime(1000)>, the numbers 2, 3, 487, 631,
-and 997 all have the same probability of being returned.
+The goal is to select uniformly from the primes in the range, rather than use
+an algorithm such as C<PRIMEINC>, whose output is biased by the prime gaps.
+This does not imply that the returned numbers are evenly spaced, since the
+primes themselves are not evenly distributed.  For example, with
+C<random_prime(1000)>, each of 2, 3, 487, 631, and 997 has the same target
+probability of being returned.
 
-For small numbers, a random index selection is done, which gives ideal
-uniformity and is very efficient with small inputs.  For ranges larger than
-this ~16-bit threshold but within the native bit size, a Monte Carlo method
-is used.  This also
-gives ideal uniformity and can be very fast for reasonably sized ranges.
-For even larger numbers, we partition the range, choose a random partition,
-then select a random prime from the partition.  This gives some loss of
-uniformity but results in many fewer bits of randomness being consumed as
-well as being much faster.
+Native and GMP paths select uniformly, using rejection sampling over uniformly
+selected odd candidates or, for some small fixed ranges, a random prime index.
+For ranges too large for the Pure Perl path to select an offset directly, it
+partitions the range, chooses a random partition, and then selects a random
+prime within that partition.  This consumes many fewer random bits and is much
+faster, but is only approximately uniform because the partitions need not
+contain equal numbers of primes.
 
 
 =head2 random_ndigit_prime
@@ -5925,14 +6727,18 @@ well as being much faster.
 
 Selects a random n-digit prime, where the input is an integer number of
 digits.  One of the primes within that range (e.g. 1000 - 9999 for
-4-digits) will be uniformly selected.
+4 digits) will be selected.  Native and GMP paths select uniformly, using
+rejection sampling or random prime-index selection for small fixed ranges.
+When the Pure Perl path is used for very large values, the partitioning method
+described under L</random_prime> is used and is only approximately uniform.
+The number of digits must be between C<1> and C<4,294,967,295>.
 
-If the number of digits is greater than or equal to the maximum native type,
-then the result will be returned as a BigInt.  However, if the C<nobigint>
-configuration option is on, then output will be restricted to native size
-numbers, and requests for more digits than natively supported will result
-in an error.
-For better performance with large bit sizes, install L<Math::Prime::Util::GMP>.
+If the resulting prime is larger than the maximum native integer, then
+the result will be returned as a BigInt.  However, if the C<nobigint>
+configuration option is on, then output will be restricted to native-size
+numbers, and requests for digit counts that cannot produce a native-size
+prime will result in an error.
+For better performance with large digit counts, install L<Math::Prime::Util::GMP>.
 
 
 =head2 random_nbit_prime
@@ -5940,17 +6746,17 @@ For better performance with large bit sizes, install L<Math::Prime::Util::GMP>.
   my $bigprime = random_nbit_prime(512);
 
 Selects a random n-bit prime, where the input is an integer number of bits.
-A prime with the nth bit set will be uniformly selected.
+A prime with the nth bit set will be selected.
+The number of bits must be between C<2> and C<4,294,967,295>.
 
-For bit sizes of 64 and lower, L</random_prime> is used, which gives completely
-uniform results in this range.  For sizes larger than 64, Algorithm 1 of
-Fouque and Tibouchi (2011) is used, wherein we select a random odd number
-for the lower bits, then loop selecting random upper bits until the result
-is prime.  This allows a more uniform distribution than the general
-L</random_prime> case while running slightly faster (in contrast, for large
-bit sizes L</random_prime> selects a random upper partition then loops
-on the values within the partition, which very slightly skews the results
-towards smaller numbers).
+For bit sizes no larger than the native integer width, direct rejection
+sampling (or random prime-index selection for very small sizes) gives uniform
+results.  For larger sizes, Algorithm 1 of Fouque and Tibouchi (2011) is used:
+a random odd value supplies the lower bits, then random upper bits are selected
+until the result is prime.  This gives a distribution close to uniform while
+using fewer random bits than direct rejection sampling.  It is also more
+uniform than the Pure Perl partitioning method used by L</random_prime> for
+very large arbitrary ranges.
 
 The result will be a BigInt if the number of bits is greater than the native
 bit size.  For better performance with large bit sizes, install
@@ -5963,6 +6769,7 @@ L<Math::Prime::Util::GMP>.
 
 Produces an n-bit safe prime.  This is a prime C<p> where C<p = 2q+1> and
 C<q> is also prime.
+The number of bits must be between C<3> and C<4,294,967,295>.
 
 These types of primes are sometimes useful for discrete logarithm based
 cryptography, and can be generated more efficiently using
@@ -5973,8 +6780,9 @@ simultaneous sieving.
 
   my $bigprime = random_strong_prime(512);
 
-Constructs an n-bit strong prime using Gordon's algorithm.  We consider a
-strong prime I<p> to be one where
+Constructs an n-bit strong prime using Gordon's algorithm.
+The number of bits must be between C<128> and C<4,294,967,295>.
+We consider a strong prime I<p> to be one where
 
 =over
 
@@ -5988,14 +6796,13 @@ strong prime I<p> to be one where
 
 =back
 
-Using a strong prime in cryptography guards against easy factoring with
-algorithms like Pollard's Rho.  Rivest and Silverman (1999) present a case
-that using strong primes is unnecessary, and most modern cryptographic systems
-agree.  First, the smoothness does not affect more modern factoring methods
-such as ECM.  Second, modern factoring methods like GNFS are far faster than
-either method so makes the point moot.  Third, due to key size growth and
-advances in factoring and attacks, for practical purposes, using large random
-primes offers security equivalent to strong primes.
+Strong primes were historically intended to guard against special-purpose
+factoring algorithms such as Pollard's C<p-1> and Williams' C<p+1>.  Rivest
+and Silverman present a case that strong primes are unnecessary, and most
+modern cryptographic systems agree.  Their structure offers no protection
+against ECM, while general-purpose methods such as the number field sieve are
+more relevant for cryptographic-size inputs.  In practice, sufficiently large
+random primes offer security equivalent to strong primes.
 
 Similar to L</random_nbit_prime>, the result will be a BigInt if the
 number of bits is greater than the native bit size.  For better performance
@@ -6006,9 +6813,11 @@ with large bit sizes, install L<Math::Prime::Util::GMP>.
 
   my $bigprime = random_proven_prime(512);
 
-Constructs an n-bit random proven prime.  Internally this may use
-L</is_provable_prime>(L</random_nbit_prime>) or
-L</random_maurer_prime> depending on the platform and bit size.
+Constructs an n-bit random proven prime.
+The number of bits must be between C<2> and C<4,294,967,295>.
+Native-size values may be generated directly because primality can be decided
+deterministically in that range.  Larger values use L</random_maurer_prime>.
+The certificate-returning form uses L</random_maurer_prime_with_cert>.
 
 
 =head2 random_proven_prime_with_cert
@@ -6020,14 +6829,19 @@ the n-bit provable prime along with a primality certificate.  The certificate
 is the same as produced by L</prime_certificate> or
 L</is_provable_prime_with_cert>, and can be parsed by L</verify_prime> or
 any other software that understands MPU primality certificates.
+The number of bits must be between C<2> and C<4,294,967,295>.
 
 
 =head2 random_maurer_prime
 
   my $bigprime = random_maurer_prime(512);
 
-Construct an n-bit provable prime, using the FastPrime algorithm of
-Ueli Maurer (1995).  This is the same algorithm used by L<Crypt::Primes>.
+Construct an n-bit provable prime.  For values beyond the native integer
+range, this uses the FastPrime algorithm of Ueli Maurer (1995).  Native-size
+values may be generated directly because primality can be decided
+deterministically in that range.
+The number of bits must be between C<2> and C<4,294,967,295>.
+This is the same algorithm used by L<Crypt::Primes>.
 Similar to L</random_nbit_prime>, the result will be a BigInt if the
 number of bits is greater than the native bit size.
 
@@ -6037,10 +6851,11 @@ of times faster, so it is highly recommended.
 The differences between this function and that in L<Crypt::Primes> are
 described in the L</"SEE ALSO"> section.
 
-Internally this additionally runs the BPSW probable prime test on every
-partial result, and constructs a primality certificate for the final
-result, which is verified.  These provide additional checks that the resulting
-value has been properly constructed.
+Each recursively constructed result is additionally checked with BPSW.  The
+Pure Perl scalar path also constructs and verifies a certificate for the final
+result.  The direct GMP scalar path applies the proof test without materializing
+a certificate; use L</random_maurer_prime_with_cert> when the certificate is
+wanted.
 
 If you don't need absolutely proven results, then it is somewhat faster
 to use L</random_nbit_prime> either by itself or with some additional tests,
@@ -6056,29 +6871,41 @@ the n-bit provable prime along with a primality certificate.  The certificate
 is the same as produced by L</prime_certificate> or
 L</is_provable_prime_with_cert>, and can be parsed by L</verify_prime> or
 any other software that understands MPU primality certificates.
-The proof construction consists of a single chain of C<BLS3> types.
+The number of bits must be between C<2> and C<4,294,967,295>.
+The Pure Perl path uses a C<Small> certificate for values within the native
+integer range and a chain of C<BLS3> certificates above it.  The GMP backend
+uses C<Small> through 32 bits and a C<BLS3> chain for larger values.
 
 
 =head2 random_shawe_taylor_prime
 
   my $bigprime = random_shawe_taylor_prime(8192);
 
-Construct an n-bit provable prime, using the Shawe-Taylor algorithm in
-section C.6 of FIPS 186-4.  This uses 512 bits of randomness and SHA-256
-as the hash.  This is a slightly simpler and older (1986) method than
-Maurer's 1995 construction.  It is a bit faster than Maurer's method, and
-uses less system entropy for large sizes.  The primary reason to use this
-rather than Maurer's method is to use the FIPS 186-4 algorithm.
+Construct an n-bit provable prime using the recursive Shawe-Taylor
+construction.
+The number of bits must be between C<2> and C<4,294,967,295>.
+For values beyond the native integer range, both implementations use the
+recursive construction and Pocklington proofs.  The Pure Perl implementation
+follows section C.6 of FIPS 186-4, using a 512-bit initial seed and SHA-256 to
+derive its random values.  The GMP backend obtains the corresponding values
+directly from its CSPRNG instead.  This distinguishes the specific FIPS C.6
+instantiation from the GMP implementation, not the underlying Shawe-Taylor
+construction.  Native-size scalar calls may use direct random-prime generation
+because primality can be decided deterministically in that range.
+
+This is a slightly simpler and older (1986) construction than Maurer's 1995
+method.  It is often somewhat faster than Maurer's method.
 
 Similar to L</random_nbit_prime>, the result will be a BigInt if the
 number of bits is greater than the native bit size.  For better performance
 with large bit sizes, install L<Math::Prime::Util::GMP>.  Also see
 L</random_maurer_prime> and L</random_proven_prime>.
 
-Internally this additionally runs the BPSW probable prime test on every
-partial result, and constructs a primality certificate for the final
-result, which is verified.  These provide additional checks that the resulting
-value has been properly constructed.
+Each recursively constructed result is additionally checked with BPSW.  The
+Pure Perl scalar path also constructs and verifies a certificate for the final
+result.  The direct GMP scalar path applies the proof test without materializing
+a certificate; use L</random_shawe_taylor_prime_with_cert> when the certificate
+is wanted.
 
 
 =head2 random_shawe_taylor_prime_with_cert
@@ -6090,38 +6917,42 @@ containing the n-bit provable prime along with a primality certificate.
 The certificate is the same as produced by L</prime_certificate> or
 L</is_provable_prime_with_cert>, and can be parsed by L</verify_prime> or
 any other software that understands MPU primality certificates.
-The proof construction consists of a single chain of C<Pocklington> types.
+The number of bits must be between C<2> and C<4,294,967,295>.
+Values through 32 bits use a C<Small> certificate.  Larger values use a single
+chain of C<Pocklington> certificates.
 
 
 =head2 random_semiprime
 
 Takes a positive integer number of bits C<bits>, returns a
 random semiprime of exactly C<bits> bits.
+The number of bits must be between C<4> and C<4,294,967,295>.
 The result has exactly two prime factors (hence semiprime).
 
 The factors will be approximately equal size, which is typical
 for cryptographic use.  For example, a 64-bit semiprime of this
 type is the product of two 32-bit primes.
-C<bits> must be C<4> or greater.
 
-Some effort is taken to select uniformly from the universe of
-C<bits>-bit semiprimes.  This takes slightly longer than some
-methods that do not select uniformly.
+By "approximately equal size" we mean the two factors will be
+a C<floor(bits/2)>-bit prime and a C<ceil(bits/2)>-bit prime.
+Clearly if bits is even then the two factors are the same size.
+If odd, then the sizes will differ by one bit.
 
 =head2 random_unrestricted_semiprime
 
 Takes a positive integer number of bits C<bits>, returns a
 random semiprime of exactly C<bits> bits.
+The number of bits must be between C<3> and C<4,294,967,295>.
 The result has exactly two prime factors (hence semiprime).
-
-The factors are uniformly selected from the universe of all
-C<bits>-bit semiprimes.  This means semiprimes with one factor
-equal to C<2> will be most common, C<3> next most common, etc.
-C<bits> must be C<3> or greater.
 
 Some effort is taken to select uniformly from the universe of
 C<bits>-bit semiprimes.  This takes slightly longer than some
 methods that do not select uniformly.
+
+Because of this distribution, semiprimes with a small prime factor are more
+common than semiprimes whose factors are both large.  For example,
+semiprimes with one factor equal to C<2> are the most common, those with
+one factor equal to C<3> are next most common, and so on.
 
 
 =head1 UTILITY FUNCTIONS
@@ -6171,17 +7002,19 @@ Returns a reference to a hash of the current settings.  The hash is a copy of
 the configuration, so changing it has no effect.  The settings include:
 
   verbose         verbose level.  1 or more will result in extra output.
-  bigintclass     the bigint type name (default Math::BigInt)
+  bigintclass     selected bigint type, or undef until one is first needed
   precalc_to      primes up to this number are calculated
   maxbits         the maximum number of bits for native operations
   xs              0 or 1, indicating the XS code is available
-  gmp             0 or 1, indicating GMP code is available
+  gmp             0 if disabled/unavailable, otherwise 100 * GMP version
   maxparam        the largest value for most functions, without bigint
   maxdigits       the max digits in a number, without bigint
   maxprime        the largest representable prime, without bigint
   maxprimeidx     the index of maxprime, without bigint
   assume_rh       whether to assume the Riemann hypothesis (default 0)
   secure          disable ability to manually seed the CSPRNG
+  xs_factor_bits  factor() uses XS for this many bits (up to 128)
+  nobigint        whether random_ndigit_prime is non-bigint
 
 =head2 prime_set_config
 
@@ -6209,13 +7042,11 @@ Allows setting of some parameters.  Currently the only parameters are:
   trybigint    Exactly the same behavior as C<bigint> but no warning
                will be output if we couldn't load anything from the list.
 
-  xs           Allows turning off the XS code, forcing the Pure Perl
-               code to be used.  Set to 0 to disable XS, set to 1 to
-               re-enable.  You probably will never want to do this.
-
-  gmp          Allows turning off the use of L<Math::Prime::Util::GMP>,
-               which means using Pure Perl code for big numbers.  Set
-               to 0 to disable GMP, set to 1 to re-enable.
+  gmp          Allows turning off direct use of L<Math::Prime::Util::GMP>.
+               This does not disable XS or change the selected bigint class;
+               native and other XS paths remain available, as do bigint-backed
+               Pure Perl operations.  Set to 0 to disable GMP, set to 1 to
+               re-enable.
                You probably will never want to do this.
 
   assume_rh    Allows functions to assume the Riemann hypothesis is
@@ -6234,6 +7065,11 @@ Allows setting of some parameters.  Currently the only parameters are:
                to the caller.  The point of this option is to ensure that
                any called functions do not try to control the RNG.
 
+  nobigint     Legacy option.  This only affects L</random_ndigit_prime>,
+               where it restricts results to native-size integers and
+               rejects digit counts that cannot produce native-size results.
+               Most users should leave this off.
+
 
 =head1 FACTORING FUNCTIONS
 
@@ -6242,7 +7078,7 @@ Allows setting of some parameters.  Currently the only parameters are:
   my @factors = factor(3_369_738_766_071_892_021);
   # returns (204518747,16476429743)
 
-Produces the prime factors of a positive number input, in numerical order.
+Produces the prime factors of a non-negative integer input, in numerical order.
 The product of the returned factors will be equal to the input.  C<n = 1>
 will return an empty list, and C<n = 0> will return 0.  This matches Pari.
 
@@ -6253,18 +7089,19 @@ C<PrimeOmega[n]> function.
 This is the same result that we would get if we evaluated the resulting
 array in scalar context.
 
-The current algorithm does a little trial division, a check for perfect
-powers, followed by combinations of Pollard's Rho, SQUFOF, and Pollard's
-p-1.  The combination is applied to each non-prime factor found.
+The exact algorithm depends on the input size, platform, and available
+backend.  Implementations perform trial division and perfect-power checks,
+then use size-appropriate combinations of methods including HOLF, SQUFOF,
+Pollard rho and Brent variants, Pollard C<p-1>, and ECM.  The selected recipe
+is applied recursively to each composite factor found.
 
 Factoring bigints works with pure Perl, and can be very handy on 32-bit
 machines for numbers just over the 32-bit limit, but it can be B<very> slow
 for "hard" numbers.  Installing the L<Math::Prime::Util::GMP> module will
-speed up bigint factoring a B<lot>, and all future effort on large number
-factoring will be in that module.  If you do not have that module for
-some reason, use the GMP or Pari version of bigint if possible
-(e.g. C<< use bigint try => 'GMP,Pari' >>), which will run 2-3x faster
-(though still 100x slower than the real GMP code).
+usually speed up bigint factoring substantially.  If that module is not
+available, selecting a faster bigint implementation such as GMP or Pari
+(e.g. C<< use bigint try => 'GMP,Pari' >>) can also help.  The improvement
+depends heavily on the input and factoring method.
 
 
 =head2 factor_exp
@@ -6294,11 +7131,11 @@ Just the way the factors are arranged is different.
 
   my @divisors = divisors(30);   # returns (1, 2, 3, 5, 6, 10, 15, 30)
 
-Produces all the divisors of a positive number input, including 1 and
-the input number.  The divisors are a power set of multiplications of
-the prime factors, returned as a uniqued sorted list.  The result is
-identical to that of Pari's C<divisors> and Mathematica's C<Divisors[n]>
-functions.
+Produces all the divisors of a non-negative integer input, including 1 and
+the input number.  They are all products formed by choosing an exponent from
+zero through its multiplicity for each prime factor, returned as a unique
+sorted list.  The result is identical to that of Pari's C<divisors> and
+Mathematica's C<Divisors[n]> functions.
 
 In scalar context this returns the sigma0 function
 (see Hardy and Wright section 16.7).
@@ -6312,7 +7149,7 @@ Also see the L</fordivisors> function for looping over the divisors.
 
 When C<n=0> we return the empty set (zero in scalar context).
 
-An optional second positive integer argument C<k> indicates that the results
+An optional second non-negative integer argument C<k> indicates that the results
 should not include any value larger than C<k>.  This is especially useful
 when the number has thousands of divisors and we may only be interested in
 the small ones.
@@ -6334,15 +7171,21 @@ value in the list might be composite.
 Like all the specific-algorithm C<*_factor> routines, this is not exported
 unless explicitly requested.
 
+When XS is unavailable, C<squfof_factor>, C<lehman_factor>, and
+C<pplus1_factor> remain callable but use the Pure Perl C<pbrent_factor>
+fallback rather than the named algorithms.
+
 =head2 fermat_factor
 
   my @factors = fermat_factor($n);
+  my @factors = fermat_factor($n, 100_000);  # limit the number of rounds
 
 Produces factors, not necessarily prime, of the positive number input.  The
 particular algorithm is Knuth's algorithm C.  For small inputs this will be
 very fast, but it slows down quite rapidly as the number of digits increases.
 It is very fast for inputs with a factor close to the midpoint
 (e.g. a semiprime p*q where p and q are the same number of digits).
+An optional number of rounds can be given as a second parameter.
 
 =head2 holf_factor
 
@@ -6361,9 +7204,10 @@ same advantages and disadvantages as Fermat's method.
   my @factors = lehman_factor($n);
 
 Produces factors, not necessarily prime, of the positive number input.  An
-optional argument, defaulting to 0 (false), indicates whether to run trial
-division.  Without trial division, is possible the function will be unable
-to find a factor, in which case a single element, the input, is returned.
+optional argument, defaulting to 1 (true) in the XS implementation, indicates
+whether to run trial division.  Without trial division, it is possible the
+function will be unable to find a factor, in which case a single element, the
+input, is returned.
 
 This is Warren D. Smith's Lehman core with minor modifications.  It is
 limited to 42-bit inputs: C<< n < 8796393022208 >>.
@@ -6405,9 +7249,13 @@ finding small factors.
   my @factors = pminus1_factor($n, 1_000, 50_000);  # set B1 and B2
 
 Produces factors, not necessarily prime, of the positive number input.  This
-is Pollard's C<p-1> method, using two stages with default smoothness
-settings of 1_000_000 for B1, and C<10 * B1> for B2.  This method can rapidly
-find a factor C<p> of C<n> where C<p-1> is smooth (it has no large factors).
+is Pollard's C<p-1> method, using two stages.
+This method can rapidly find a factor C<p> of C<n> where C<p-1> is smooth
+(it has no large factors).
+
+Without the optional B1 and B2 arguments, the implementation decides on their
+values and might do a ramp-up method (trying successively larger B1/B2 values).
+
 
 =head2 pplus1_factor
 
@@ -6434,10 +7282,16 @@ L</pminus1_factor>.
 =head2 ecm_factor
 
   my @factors = ecm_factor($n);
-  my @factors = ecm_factor($n, 100, 400, 10);      # B1, B2, # of curves
+  my @factors = ecm_factor($n, 100);          # B1 hint
+  my @factors = ecm_factor($n, 100, 400);     # B1 and B2 hints
+  my @factors = ecm_factor($n, 100, 400, 10); # B1, B2, curve-count hints
 
 Produces factors, not necessarily prime, of the positive number input.  This
 is the elliptic curve method using two stages.
+
+The optional arguments are considered hints.
+In particular, B2 will often be calculated internally (a value of 0 for B2
+indicates to do this for all implementations).
 
 
 
@@ -6447,9 +7301,10 @@ is the elliptic curve method using two stages.
 
   my $Ei = ExponentialIntegral($x);
 
-Given a non-zero floating point input C<x>, this returns the real-valued
-exponential integral of C<x>, defined as the integral of C<e^t/t dt>
-from C<-infinity> to C<x>.
+Given a floating point input C<x>, this returns the real-valued exponential
+integral of C<x>, defined as the Cauchy principal value of the integral of
+C<e^t/t dt> from C<-infinity> to C<x>.  At C<x = 0> the function returns
+C<-infinity>.
 
 For non-BigFloat inputs, the result should be accurate to at least 14
 digits.
@@ -6469,17 +7324,16 @@ The accuracy() setting of the input is used to determine the output accuracy.
   my $li = LogarithmicIntegral($x);
 
 Given a non-negative floating point input, returns the floating point
-logarithmic integral of C<x>, defined as the integral of C<dt/ln t>
-from C<0> to C<x>.
+logarithmic integral of C<x>, defined using the Cauchy principal value of the
+integral of C<dt/ln t> from C<0> to C<x>.
 If given a negative input, the function will croak.
 The function returns 0 at C<x = 0>, and C<-infinity> at C<x = 1>.
 
-This is often known as C<li(x)>.  A related function is the offset logarithmic
-integral, sometimes known as C<Li(x)> which avoids the singularity at 1.  It
-may be defined as C<Li(x) = li(x) - li(2)>.  Crandall and Pomerance use the
-term C<li0> for this function, and define C<li(x) = Li0(x) - li0(2)>.  Due to
-this terminology confusion, it is important to check which exact definition is
-being used.
+This is often known as C<li(x)>.  For C<< x > 1 >>, a related offset logarithmic
+integral, sometimes known as C<Li(x)>, is normalized to zero at 2 and may be
+defined as C<Li(x) = li(x) - li(2)>, equivalently as the integral from 2 to
+C<x>.  Notation for these functions varies, so it is important to check which
+exact definition is being used.
 
 For non-BigFloat objects, the result should be accurate to at least 14
 digits.
@@ -6494,9 +7348,11 @@ The accuracy() setting of the input is used to determine the output accuracy.
 
 Given a non-negative floating point input C<s>, returns the floating
 point value of ζ(s)-1, where ζ(s) is the Riemann zeta function.  One is
-subtracted to ensure maximum precision for large values of C<s>.  The zeta
-function is the sum from k=1 to infinity of C<1 / k^s>.  This function only
-uses real arguments, so is more properly the Euler Zeta function.
+subtracted to ensure maximum precision for large values of C<s>.  For
+C<< s > 1 >>, the zeta function is the convergent sum from k=1 to infinity of
+C<1 / k^s>.  Values below 1 use its analytic continuation, and C<s = 1> is
+the pole.  This function only uses real arguments, so is more properly the
+Euler zeta function.
 
 For non-BigFloat objects, the result should be accurate to at least 14
 digits.  The XS code uses a rational Chebyshev approximation between 0.5 and 5,
@@ -6534,6 +7390,8 @@ Returns the principal branch of the Lambert W function of a real value.
 Given a value C<k> this solves for C<W> in the equation C<k = We^W>.  The
 input must not be less than C<-1/e>.  This corresponds to Pari's C<lambertw>
 function and Mathematica's C<ProductLog> / C<LambertW> function.
+Inputs just below C<-1/e> within a small floating-point rounding margin are
+treated as C<-1/e> and return C<-1>.
 
 This function handles all real value inputs with non-complex return values
 from the principal branch.
@@ -6541,14 +7399,15 @@ Pari/GP's C<lambertw> prior to 2.15 (2022) was a subset of this.
 Recent Pari/GP and Mathematica both have more complete functions with
 both branches, and support for complex arguments and results.
 
-Calculation will be done with C long doubles if the input is a standard
-scalar, but if the input is a BigFloat type, then
-extended precision results will be generated.
+For a standard scalar, the XS implementation calculates internally with C's
+C<long double> type, or C<__float128> in a quadmath build, while the Pure Perl
+path uses Perl's NV arithmetic.  If the input is a BigFloat type, extended
+precision results will be generated.
 The accuracy() setting of the input is used to determine the output accuracy.
 
-Speed of the native code is about half of the fastest native code
-(Veberic's C++), and about 10x faster than Pari/GP.  However the bignum
-calculation is slower than Pari/GP.
+The native implementation is intended for fast fixed-precision evaluation.
+Arbitrary-precision performance depends heavily on the bigint backend;
+Pari/GP may be faster for large requested precision.
 
 =head2 Pi
 
@@ -6556,10 +7415,10 @@ calculation is slower than Pari/GP.
   my $tau = 2 * Pi(40); # $tau = 6.283185307179586476925286766559005768394
 
 With no arguments, returns the value of Pi as an NV.  With a positive
-integer argument, returns the value of Pi with the requested number of
-digits (including the leading 3).  The return value will be an NV if the
-number of digits fits in an NV (typically 15 or less), or a L<Math::BigFloat>
-object otherwise.
+integer argument, returns the value of Pi rounded to the requested number of
+digits (including the leading 3).  Small requests handled at native precision
+return an NV; larger requests return a L<Math::BigFloat> object.  The exact
+cutoff depends on the implementation and native floating-point precision.
 
 For sizes over 10k digits, having either
 L<Math::Prime::Util::GMP> or L<Math::BigInt::GMP> installed will help
@@ -6577,7 +7436,8 @@ change or deletion in future revisions.
 =head2 _uvsize
 
 Returns the size of a UV in bytes (typically 4 or 8).
-The size of the basic integer type used in Perl and the C library.
+This is Perl's unsigned integer scalar type; it need not match C's
+C<unsigned long> type.
 
 =head2 _uvbits
 
@@ -6596,21 +7456,24 @@ configurations.  Usually we won't care about this directly.
 
 =head2 _nvmantbits
 
-Returns the size of the mantissa of Perl's NV floating point type, in bits.
-This can vary widely, with C<23, 52, 112> all possible from mainstream
-platforms and other numbers possible.
+Returns Perl's C<NVMANTBITS>: the number of mantissa bits in the NV floating
+point type, not including a possible implicit leading bit.  This can vary
+widely, with C<23>, C<52>, C<64>, and C<112> all possible on mainstream
+platforms and other values possible.
 
-This gives the actual mantissa bits, not counting the implicit 1.  The
-significand precision is therefore one higher than the value returned
-by this function.  A typical IEEE-754 double will report 52 here, which
-means integers up to C<2^53-1> are able to be accurately stored.
+For formats with an implicit leading bit, the significand precision is one
+higher than the value returned.  A typical IEEE-754 double therefore reports
+52 and can exactly store integers through C<2^53-1>.  Formats without an
+implicit bit do not add one; for example, x87 extended precision normally
+reports 64 and has 64 bits of significand precision.
 
 Perl prior to 5.23 did not configure this at build time.  We will guess
 based on the byte size of the NV on an IEEE-754 machine.
 
 =head2 _nvmantdigits
 
-How many full decimal integer digits able to be stored in an NV.
+Returns the number of full decimal integer digits that can be stored exactly
+in an NV.
 
 
 =head1 EXAMPLES
@@ -6713,7 +7576,7 @@ Project Euler, problem 41 (Pandigital prime), brute force command line:
 
   perl -MMath::Prime::Util=primes,vecfirst -E 'say vecfirst { /1/&&/2/&&/3/&&/4/&&/5/&&/6/&&/7/} reverse @{primes(1000000,9999999)};'
 
-Project Euler, problem 47 (Distinct primes factors):
+Project Euler, problem 47 (Distinct prime factors):
 
   use Math::Prime::Util qw/pn_primorial factor_exp/;
   my $n = pn_primorial(4);  # Start with the first 4-factor number
@@ -6785,7 +7648,7 @@ Compute L<OEIS A054903|http://oeis.org/A054903> just like CRG4s Pari example:
 
 Construct the table shown in L<OEIS A046147|http://oeis.org/A046147>:
 
-  use Math::Prime::Util qw/znorder euler_phi gcd/;
+  use Math::Prime::Util qw/znprimroot znorder euler_phi gcd/;
   foreach my $n (1..100) {
     if (!znprimroot($n)) {
       say "$n -";
@@ -6806,8 +7669,8 @@ Find the 7-digit palindromic primes in the first 20k digits of Pi:
   }
 
   # Or we could use the regex engine to find the palindromes:
-  while ($pi =~ /(([1379])(\d)(\d)\d\4\3\2)/g) {
-    say "$1 at ",pos($pi)-7 if is_prime($1)
+  while ($pi =~ /(?=(([1379])(\d)(\d)\d\4\3\2))/g) {
+    say "$1 at ", pos($pi) if is_prime($1);
   }
 
 The L<Bell numbers|https://en.wikipedia.org/wiki/Bell_number> B_n:
@@ -6848,7 +7711,7 @@ Compute subfactorial (number of derangements) using simple recursion:
 
   sub my_subfactorial { my $n = shift;
     use bigint;
-    ($n < 1)  ?  1  :  $n * subfactorial($n-1) + (-1)**$n;
+    ($n < 1)  ?  1  :  $n * my_subfactorial($n-1) + (-1)**$n;
   }
 
 Recognize Sidon and sum-free sets.  We have specific functions
@@ -6871,17 +7734,18 @@ L<BPSW test|http://en.wikipedia.org/wiki/Baillie-PSW_primality_test>
 which is fast (a little less than the time to perform 3 Miller-Rabin
 tests) and has no known counterexamples.  If you trust the primality
 testing done by Pari, Maple, SAGE, FLINT, etc., then this function
-should be appropriate for you.  L</is_prime> will do the same BPSW
-test as well as some additional testing, making it slightly more time
-consuming but less likely to produce a false result.  This is a little
-more stringent than Mathematica.  L</is_provable_prime> constructs a
-primality proof.  If a certificate is requested, then either BLS75
+should be appropriate for you.
+L</is_prime> will do the same BPSW test and may perform additional
+testing for numbers over 64 bits.  With the GMP backend installed,
+its testing is a little more stringent than Mathematica's.
+L</is_provable_prime> constructs a primality proof.
+If a certificate is requested, then either BLS75
 theorem 5 or ECPP is performed.  Without a certificate, the method
-is implementation specific (currently it is identical, but later
-releases may use APRCL).  With L<Math::Prime::Util::GMP> installed,
+is implementation specific.
+With L<Math::Prime::Util::GMP> installed,
 this is quite fast through 300 or so digits.
 
-Math systems 35 years ago typically used Miller-Rabin tests with C<k>
+Math systems in the 1990s typically used Miller-Rabin tests with C<k>
 bases (usually fixed bases, sometimes random) for primality
 testing, but these have generally been replaced by some form of BPSW
 as used in this module.  See Pinch's 1993 paper for examples of why
@@ -6921,14 +7785,6 @@ will I<still> be much faster.
 
 
 =head1 LIMITATIONS
-
-Perl versions earlier than 5.8.0 have problems doing exact integer math.
-Some operations will flip signs, and many operations will convert intermediate
-or output results to doubles, which loses precision on 64-bit systems.
-This causes numerous functions to not work properly.  The test suite will
-try to determine if your Perl is broken (this only applies to really old
-versions of Perl compiled for 64-bit when using numbers larger than
-C<~ 2^49>).  The best solution is updating to a more recent Perl.
 
 The module is thread-safe and should allow good concurrency on all platforms
 that support Perl threads except Win32.  With Win32, either don't use threads
@@ -7137,14 +7993,13 @@ certificate).
 
 L<Math::Primality> uses a strong BPSW test, which is the standard BPSW
 test based on the 1980 paper.  It has no known counterexamples (though
-like all these tests, we know some exist).  Pari 2.3.5 (and through at
-least 2.6.2) uses an almost-extra-strong BPSW test for its
-C<ispseudoprime> function.  This is deterministic for native integers,
-and should be excellent for bigints, with a slightly lower chance of
-counterexamples than the traditional strong test.
-L<Math::Prime::Util> uses the
-full extra-strong BPSW test, which has an even lower chance of
-counterexample.
+like all these tests, counterexamples are expected to exist).
+Pari/GP 2.3.5 (and through at least 2.18.1) uses an almost-extra-strong BPSW
+test for its C<ispseudoprime> function.  This is deterministic for native
+integers, and should be excellent for bigints, with a slightly lower chance
+of counterexamples than the traditional strong test.
+L<Math::Prime::Util> uses the full extra-strong BPSW test, which has an
+even lower chance of a counterexample.
 With L<Math::Prime::Util::GMP>, C<is_prime> adds an extra M-R test
 using a random base, which further reduces the probability of a composite
 being allowed to pass.
@@ -7192,7 +8047,7 @@ L</divisor_sum>.
 =item C<eulerphi>, C<moebius>
 
 Similar to MPU's L</euler_phi> and L</moebius>.  MPU is 2-20x faster for
-native integers.  MPU also supported range inputs, which can be much
+native integers.  MPU also supports range inputs, which can be much
 more efficient.  With bigint arguments, MPU is slightly faster than
 Math::Pari if the GMP backend is available, but very slow without.
 
@@ -7240,7 +8095,7 @@ function supports negative and complex inputs.
 
 Overall, L<Math::Pari> supports a huge variety of functionality and has a
 sophisticated and mature code base behind it (noting that the Pari library
-used is about 10 years old now).
+used is quite old).
 For native integers, typically Math::Pari will be slower than MPU.  For
 bigints, Math::Pari may be superior and it rarely has any performance
 surprises.  Some of the
@@ -7262,8 +8117,8 @@ First, for those looking for the state of the art non-Perl solutions:
 
 =item Primality testing
 
-For general numbers smaller than 2000 or so digits, MPU is the fastest
-solution I am aware of (it is faster than Pari 2.7, PFGW, and FLINT).
+For general numbers smaller than 2000 or so digits, MPU with its GMP backend
+is the fastest solution I am aware of (it is faster than Pari 2.7, PFGW, and FLINT).
 For very large inputs,
 L<PFGW|http://sourceforge.net/projects/openpfgw/> is the fastest primality
 testing software I'm aware of.  It has fast trial division, and is especially
@@ -7274,12 +8129,14 @@ A test such as the BPSW test in this module is then recommended.
 
 =item Primality proofs
 
-L<Primo|http://www.ellipsa.eu/> is the best method for open source primality
-proving for inputs over 1000 digits.  Primo also does well below that size,
-but other good alternatives are
+Available software for proofs include
+MPU's L<ECPP|https://metacpan.org/pod/Math::Prime::Util::GMP>
+(standalone or in Perl since 2013),
 David Cleaver's L<mpzaprcl|http://sourceforge.net/projects/mpzaprcl/>,
-the APRCL from the modern L<Pari|http://pari.math.u-bordeaux.fr/> package,
-or the standalone ECPP from this module with large polynomial set.
+the not-open-source but free ECPP executable L<Primo|http://www.ellipsa.eu/>,
+Pari's APRCL L<Pari|http://pari.math.u-bordeaux.fr/>,
+Pari's ECPP L<Pari|http://pari.math.u-bordeaux.fr/> (added in 2018),
+and Andreas Enge's L<CM|https://www.multiprecision.org/cm/> (added in 2022).
 
 =item Factoring
 
@@ -7291,7 +8148,7 @@ very limited compared to those.
 
 =item Primes
 
-L<primesieve|http://code.google.com/p/primesieve/> and
+L<primesieve|https://github.com/kimwalisch/primesieve> and
 L<yafu|http://sourceforge.net/projects/yafu/>
 are the fastest publicly available code I am aware of.  Primesieve
 will additionally take advantage of multiple cores with excellent
@@ -7497,13 +8354,13 @@ algorithm but provides less diversity (even fewer primes in the range are
 selected, though for typical cryptographic sizes this is not important).
 The Perl implementation uses a single large random seed followed by
 SHA-256 as specified by FIPS 186-4.  The GMP implementation uses the same
-FIPS 186-4 algorithm but uses its own CSPRNG which may not be SHA-256.
+recursive Shawe-Taylor construction but draws the corresponding random values
+from its own CSPRNG rather than deriving them with the FIPS hash sequence.
 
 L<Crypt::Primes/maurer> times are included for comparison.  It is reasonably
 fast for small sizes but gets slow as the size increases.  It is 10 to 500
-times slower than this module's GMP methods.  It does not
-perform any primality checks on the intermediate results or the final
-result (I highly recommended running a primality test on the output).
+times slower than this module's GMP methods.  It does not perform any
+primality checks on the intermediate results or the final result.
 Additionally important for servers, L<Crypt::Primes/maurer> uses excessive
 system entropy and can grind to a halt if C</dev/random> is exhausted
 (it can take B<days> to return).
@@ -7633,15 +8490,17 @@ However there is no option for unsigned (UV), only signed integers (IV).
 Sort::Key offers a variety of interfaces including unsigned and signed
 integers, as well as in-place versions.
 The following table compares sorting random 64-bit unsigned integers and
-is shown as speedup relative to Perl's sort (higher is faster, v5.43.7).
+is shown as speedup relative to Perl's sort (higher is faster, v5.42.0).
 
                               10    100   1000  10000 100000     1M
-  vecsort                   2.0x   2.3x   4.7x   6.2x   6.9x   9.7x
-  Sort::Key::Radix usort    1.4x   2.3x   3.4x   3.4x   4.7x   2.7x
-  Sort::XS::quick_sort      1.2x   1.5x   1.8x   1.9x   2.0x   2.7x
-  Sort::Key usort           1.2x   1.3x   1.3x   1.3x   1.3x   1.3x
+  vecsorti                  2.8x   2.7x   5.6x   7.9x   9.5x  14.2x
+  vecsort                   2.1x   2.3x   4.5x   5.9x   7.1x  10.8x
+  Sort::DJB::sort_uint64    1.9x   3.0x   3.3x   3.2x   3.0x   3.2x
+  Sort::Key::Radix usort    1.4x   1.8x   3.1x   2.7x   4.4x   3.3x
+  Sort::XS::quick_sort      1.1x   1.4x   1.8x   2.9x   2.1x   2.7x
+  Sort::Key usort           1.2x   1.3x   1.3x   1.4x   1.3x   1.3x
   sort                      1.0x   1.0x   1.0x   1.0x   1.0x   1.0x
-  List::MoreUtils::qsort    0.6x   0.5x   0.4x   0.4x   0.4x   0.3x
+  List::MoreUtils::qsort    0.7x   0.5x   0.4x   0.4x   0.4x   0.3x
 
 The implementation does not currently try to exploit patterns.
 Regarding the above timing, when given sorted or reverse sorted data,
@@ -7654,6 +8513,18 @@ sorting of integer lists, as mentioned in their documentation.
 In contrast, this is exactly (and only) what vecsort does, so it should
 not be a surprise that our function looks good on this benchmark.
 Different use cases would show things differently.
+
+
+=head2 CUSTOM OPS
+
+Some functions use custom ops, set up at compile time, to reduce Perl call
+overhead for fast functions.  Current functions:
+C<irand>, C<irand32>, C<irand64> (on 64-bit builds), C<drand>,
+C<addint>, C<subint>, C<add1int>, C<sub1int>, C<mulint>, C<divint>,
+C<modint>, C<cdivint>, C<powint>,
+C<signint>, C<is_odd>, C<is_even>, C<is_square>, C<cmpint>, C<kronecker>,
+C<_validate_integer>, C<_validate_integer_nonneg>,
+C<_validate_integer_positive>, C<_validate_integer_abs>.
 
 
 =head1 AUTHORS
@@ -7697,7 +8568,7 @@ Christian Bau, "The Extended Meissel-Lehmer Algorithm", 2003, preprint with exam
 
 =item *
 
-Manuel Benito and Juan L. Varona, "Recursive formulas related to the summation of the Möbius function", I<The Open Mathematics Journal>, v1, pp 25-34, 2007.  Among many other things, shows a simple formula for computing the Mertens functions with only n/3 Möbius values (not as fast as Deléglise and Rivat, but really simple).  L<http://www.unirioja.es/cu/jvarona/downloads/Benito-Varona-TOMATJ-Mertens.pdf>
+Manuel Benito and Juan L. Varona, "Recursive formulas related to the summation of the Möbius function", I<The Open Mathematics Journal>, v1, pp 25-34, 2008.  Among many other things, shows a simple formula for computing the Mertens functions with only n/3 Möbius values (not as fast as Deléglise and Rivat, but really simple).  L<http://www.unirioja.es/cu/jvarona/downloads/Benito-Varona-TOMATJ-Mertens.pdf>
 
 =item *
 
@@ -7721,7 +8592,7 @@ Henri Cohen, "A Course in Computational Algebraic Number Theory", Springer, 1996
 
 =item *
 
-Marc Deléglise and Joöl Rivat, "Computing the summation of the Möbius function", I<Experimental Mathematics>, v5, n4, pp 291-295, 1996.  Enhances the Möbius computation in Lioen/van de Lune, and gives a very efficient way to compute the Mertens function.  L<http://projecteuclid.org/euclid.em/1047565447>
+Marc Deléglise and Joël Rivat, "Computing the summation of the Möbius function", I<Experimental Mathematics>, v5, n4, pp 291-295, 1996.  Enhances the Möbius computation in Lioen/van de Lune, and gives a very efficient way to compute the Mertens function.  L<http://projecteuclid.org/euclid.em/1047565447>
 
 =item *
 
@@ -7765,7 +8636,7 @@ William H. Press et al., "Numerical Recipes", 3rd edition.
 
 =item *
 
-Hans Riesel, "Prime Numbers and Computer Methods for Factorization", Birkh?user, 2nd edition, 1994.  Lots of information, some code, easy to follow.
+Hans Riesel, "Prime Numbers and Computer Methods for Factorization", Birkhäuser, 2nd edition, 1994.  Lots of information, some code, easy to follow.
 
 =item *
 

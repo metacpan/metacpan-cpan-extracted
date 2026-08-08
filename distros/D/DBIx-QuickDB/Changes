@@ -1,3 +1,10 @@
+0.000063  2026-08-07 13:00:01-07:00 America/Los_Angeles
+
+    - Fixed t/watcher_inc_args.t on MSWin32, where Cwd::abs_path and
+      File::Temp spell the same path with different directory separators. The
+      test also restores @INC before assertions so older Perls can report a
+      failure without losing their diagnostic modules.
+
 0.000062  2026-08-06 15:35:35-07:00 America/Los_Angeles
 
     - Pool instance directory names now include the pid. Identically-seeded or

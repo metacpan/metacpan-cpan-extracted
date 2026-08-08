@@ -22,6 +22,14 @@
 
 #include <stdint.h>
 
+/* utf8.h on perl 5.41+ expands UTF8_MAXBYTES_CASE through MAX(), which
+ * perl.h defines only for PERL_CORE/PERL_EXT builds. Unix picks it up
+ * from <sys/param.h>; MinGW has no such fallback and the build fails at
+ * link time without this. */
+#ifndef MAX
+#  define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
 #define STENCIL_VERSION_MAJOR 0
 #define STENCIL_VERSION_MINOR 1
 #define STENCIL_VERSION_STRING "0.01"

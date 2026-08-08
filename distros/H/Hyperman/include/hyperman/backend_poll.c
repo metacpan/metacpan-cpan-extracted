@@ -240,7 +240,10 @@ static int pl_wait(hm_backend *be, hm_event *out, int max, double timeout) {
 static void pl_destroy(hm_backend *be) {
     hm_poll_state *st = (hm_poll_state *)be->state;
     if (st) {
-        if (st->sigpipe[0] >= 0) { close(st->sigpipe[0]); close(st->sigpipe[1]); }
+        /* be->foreign: inherited across a fork; the pipe is the parent's */
+        if (st->sigpipe[0] >= 0 && !be->foreign) {
+            close(st->sigpipe[0]); close(st->sigpipe[1]);
+        }
         if (hm_poll_pipe_w == st->sigpipe[1]) hm_poll_pipe_w = -1;
         free(st->pfds);
         free(st->timers);

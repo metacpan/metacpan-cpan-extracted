@@ -826,6 +826,10 @@ documented by the manufacturers.
 
 static void
 process_maker_note(i_img *im, imtiff *tiff, unsigned long offset, size_t size) {
+  (void)im;
+  (void)tiff;
+  (void)offset;
+  (void)size;
   /* this will be added in a future release */
   (void)im;
   (void)tiff;
@@ -957,7 +961,7 @@ tiff_load_ifd(imtiff *tiff, unsigned long offset) {
     entry->count = tiff_get32(tiff, base+4);
     if (entry->type >= 1 && entry->type <= ift_last) {
       entry->item_size = type_sizes[entry->type];
-      entry->size = entry->item_size * entry->count;
+      entry->size = (size_t)entry->item_size * entry->count;
       if (entry->size / entry->item_size != entry->count) {
 	myfree(entries);
 	mm_log((1, "Integer overflow calculating tag data size processing EXIF block\n"));
@@ -1043,7 +1047,7 @@ tiff_get_tag_double_array(imtiff *tiff, unsigned index, double *result,
     return 0;
   }
 
-  offset = entry->offset + array_index * entry->item_size;
+  offset = entry->offset + array_index * (size_t)entry->item_size;
 
   switch (entry->type) {
   case ift_short:
@@ -1140,7 +1144,7 @@ tiff_get_tag_int_array(imtiff *tiff, unsigned index, int *result, unsigned array
     return 0;
   }
 
-  offset = entry->offset + array_index * entry->item_size;
+  offset = entry->offset + array_index * (size_t)entry->item_size;
 
   switch (entry->type) {
   case ift_short:
@@ -1279,7 +1283,9 @@ copy_string_tags(i_img *im, imtiff *tiff, tag_map *map, unsigned map_count) {
        tag_index < tiff->ifd_size; ++tag_index, ++entry) {
     for (i = 0; i < map_count; ++i) {
       if (map[i].tag == entry->tag) {
-	int len = entry->type == ift_ascii ? entry->size - 1 : entry->size;
+	int len = entry->size;
+        if (entry->type == ift_ascii && len > 0)
+          --len;
 	i_tags_set(&im->tags, map[i].name,
 		   (char const *)(tiff->base + entry->offset), len);
 	break;
@@ -1317,7 +1323,7 @@ copy_num_array_tags(i_img *im, imtiff *tiff, tag_map *map, unsigned map_count) {
             *workstr = '\0';
             for (j = 0; j < entry->count; ++j) {
               if (!tiff_get_tag_double_array(tiff, tag_index, &value, j)) {
-                mm_log((3, "unexpected failure from tiff_get_tag_double_array(..., %d, ..., %d)\n", tag_index, j));
+                mm_log((3, "unexpected failure from tiff_get_tag_double_array(..., %u, ..., %u)\n", tag_index, j));
                 return;
               }
               if (len >= sizeof(workstr) - 1) {
@@ -1346,7 +1352,7 @@ copy_num_array_tags(i_img *im, imtiff *tiff, tag_map *map, unsigned map_count) {
             *workstr = '\0';
             for (j = 0; j < entry->count; ++j) {
               if (!tiff_get_tag_int_array(tiff, tag_index, &value, j)) {
-                mm_log((3, "unexpected failure from tiff_get_tag_int_array(..., %d, ..., %d)\n", tag_index, j));
+                mm_log((3, "unexpected failure from tiff_get_tag_int_array(..., %u, ..., %u)\n", tag_index, j));
                 return;
               }
               if (len >= sizeof(workstr) - 1) {

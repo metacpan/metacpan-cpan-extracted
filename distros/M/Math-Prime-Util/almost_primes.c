@@ -208,11 +208,11 @@ UV almost_prime_count(uint32_t k, UV n)
    * n/(1UL << (k+M)) has 0,1,2,7,15,37,84,187,... lookups for M=-2,-1,0,...
    * The number of non-cached counts performed follows OEIS A052130. */
 
-  csize = n / (1UL << (k-2));
+  csize = n / (UVCONST(1) << (k-2));
   if (csize < 32) csize = 32;
-  if (csize >       16UL*1024)  csize = n / (1UL << (k+2));  /*  15 */
-  if (csize >      128UL*1024)  csize = n / (1UL << (k+4));  /*  84 */
-  if (csize >   1UL*1024*1024)  csize = n / (1UL << (k+6));  /* 421 */
+  if (csize >       16UL*1024)  csize = n / (UVCONST(1) << (k+2));  /*  15 */
+  if (csize >      128UL*1024)  csize = n / (UVCONST(1) << (k+4));  /*  84 */
+  if (csize >   1UL*1024*1024)  csize = n / (UVCONST(1) << (k+6));  /* 421 */
   if (((csize >> 16) >> 16) >= 3)  csize >>= 1;
 
   cache = prime_count_cache_create( csize );
@@ -245,7 +245,7 @@ UV almost_prime_count_approx(uint32_t k, UV n) {
   if (n < 10*(UVCONST(1) << (k-2))) return 3;
 
   if (k == 3 && n < 102) {
-    unsigned char const sm3[19] = {27,28,30,42,44,45,50,52,63,66,68,70,75,76,78,92,98,99};
+    unsigned char const sm3[19] = {27,28,30,42,44,45,50,52,63,66,68,70,75,76,78,92,98,99,102};
     for (lo=0; lo < 19; lo++)
       if (n < sm3[lo])
         break;
@@ -336,11 +336,11 @@ UV nth_almost_prime_upper(uint32_t k, UV n) {
   if (n == 0) return 0;
   if (k == 0) return (n == 1) ? 1 : 0;
   if (k == 1) return nth_prime_upper(n);
-  if (n < 8) return _fast_small_nth_almost_prime(k, n);
 
   maxn = max_nth_almost_prime(k);
   maxc = max_almost_prime_count(k);
   if (n >= maxc) return n == maxc  ?  maxn  :  0;
+  if (n < 8) return _fast_small_nth_almost_prime(k, n);
 
   r = reduce_nth_factor(k,n);
   if (r > 0) {
@@ -363,10 +363,10 @@ UV nth_almost_prime_lower(uint32_t k, UV n) {
   if (n == 0) return 0;
   if (k == 0) return (n == 1) ? 1 : 0;
   if (k == 1) return nth_prime_lower(n);
-  if (n < 8) return _fast_small_nth_almost_prime(k, n);
 
   maxc = max_almost_prime_count(k);
   if (n >= maxc) return n == maxc  ?  max_nth_almost_prime(k)  :  0;
+  if (n < 8) return _fast_small_nth_almost_prime(k, n);
 
   r = reduce_nth_factor(k,n);
   if (r > 0)  return nth_almost_prime_lower(k-r, n) << r;
@@ -638,8 +638,8 @@ static void _almost_prime_count_bounds(UV *lower, UV *upper, uint32_t k, UV n) {
   boundl *= multl;
   boundu *= multu;
 
-  *lower = (boundl >= UV_MAX || (max > 0 && boundl > max)) ? max : (UV)boundl;
-  *upper = (boundu >= UV_MAX || (max > 0 && boundu > max)) ? max : (UV)(boundu+1.0);
+  *lower = (boundl >= (double)UV_MAX || (max > 0 && boundl > max)) ? max : (UV)boundl;
+  *upper = (boundu >= (double)UV_MAX || (max > 0 && boundu > max)) ? max : (UV)(boundu+1.0);
 }
 
 UV almost_prime_count_upper(uint32_t k, UV n) {
@@ -724,6 +724,7 @@ UV max_almost_prime_count(uint32_t k) {
  * I suspect there are far more efficient methods.
  */
 
+#if 0
 static void _tidy_list(UV **list, UV *Lsize, UV *count, bool minimal) {
   UV *L = *list;
 
@@ -757,7 +758,7 @@ UV range_construct_almost_prime(UV** list, uint32_t k, UV lo, UV hi) {
   if (k == 2) return range_semiprime_sieve(list, lo, hi);
   /* if (k <= 5) return range_almost_prime_sieve(list, k, lo, hi); */
 
-  minkap1 = 1 << (k-1);
+  minkap1 = UVCONST(1) << (k-1);
   lastprime = hi / minkap1;  /* lastprime = prev_prime(lastprime+1); */
 
   {
@@ -770,7 +771,9 @@ UV range_construct_almost_prime(UV** list, uint32_t k, UV lo, UV hi) {
 
     START_DO_FOR_EACH_PRIME(2, lastprime) {
       for (i = 0; i < nkap1; i++) {
-        UV prod = p * lkap1[i];
+        UV prod, lkapi = lkap1[i];
+        if (UV_MAX/lkapi < p) break;
+        prod = p * lkapi;
         if (prod < lo) continue;
         if (prod > hi) break;
         if (count >= Lsize)
@@ -784,10 +787,11 @@ UV range_construct_almost_prime(UV** list, uint32_t k, UV lo, UV hi) {
   *list = L;
   return count;
 }
+#endif
 
 UV range_almost_prime_sieve(UV** list, uint32_t k, UV slo, UV shi)
 {
-  UV *S, Ssize, i, j, count;
+  UV *S, Ssize, i, j, caplo, caphi, countest, count;
   const UV thresh_pred = 40;
 
   if (k == 0 || k >= BITS_PER_WORD) { *list = 0; return 0; }
@@ -797,7 +801,7 @@ UV range_almost_prime_sieve(UV** list, uint32_t k, UV slo, UV shi)
 
 #if 1
   if (shi-slo+1 < thresh_pred) {
-    Ssize = 3 + (thresh_pred >> 1);
+    Ssize = shi-slo+1;
     New(0, S, Ssize, UV);
     for (i = 0, j = 0; i < shi-slo+1; i++)
       if (is_almost_prime(k, slo+i))
@@ -828,7 +832,10 @@ UV range_almost_prime_sieve(UV** list, uint32_t k, UV slo, UV shi)
     }
   }
 
-  Ssize = (almost_prime_count_approx(k,shi) - almost_prime_count_approx(k,slo) + 1) * 1.2 + 100;
+  caphi = almost_prime_count_approx(k,shi);
+  caplo = almost_prime_count_approx(k,slo);       /* Instead of slo-1, */
+  countest = caphi >= caplo ? caphi-caplo+1 : 0;  /* add +1 here */
+  Ssize = countest * 1.2 + 100;
   if (Ssize > 10000000UL) Ssize = 10000000UL;
   New(0, S, Ssize, UV);
 
@@ -924,7 +931,7 @@ static void _genkap(UV lo, UV hi, uint32_t k, UV m, UV begp, UV **List, UV *Lpos
       if (L == 0) {
         pos += count;
       } else {
-        if ((pos + count - 1) >= size)  Renew(L, size += (count + 100000), UV);
+        if (count > size-pos)  Renew(L, size += (count + 100000), UV);
         for (i = 0; i < count; i++)
           L[pos++] = m * list[i];
       }
@@ -947,7 +954,7 @@ static void _genkap(UV lo, UV hi, uint32_t k, UV m, UV begp, UV **List, UV *Lpos
 }
 
 UV generate_almost_primes(UV** list, uint32_t k, UV lo, UV hi) {
-  UV *L, Lpos = 0, Lsize, countest;
+  UV *L, Lpos = 0, Lsize, countest, caplo, caphi;
 
   if (k >= BITS_PER_WORD) { *list = 0; return 0; }
   if ((lo >> k) == 0) lo = UVCONST(1) << k;
@@ -968,7 +975,11 @@ UV generate_almost_primes(UV** list, uint32_t k, UV lo, UV hi) {
   /* Optional:  we could try reduce_k_for_n() here. */
 
   prime_precalc(10000000U);
-  countest = almost_prime_count_approx(k,hi) - almost_prime_count_approx(k,lo-1);
+
+  /* approx count might not be monotone */
+  caphi = almost_prime_count_approx(k,hi);
+  caplo = almost_prime_count_approx(k,lo-1);
+  countest = caphi > caplo ? caphi - caplo : 0;
   Lsize = (countest > 10000000U) ? 10000000U : countest+1000;
 
   New(0, L, Lsize, UV);
@@ -997,7 +1008,7 @@ bool is_chen_prime(UV n) {
 }
 
 UV next_chen_prime(UV n) {
-  for ( n = next_prime(n);  n != 0 && n < MAX_CHEN_PRIME;  n = next_prime(n+2) )
+  for (n = next_prime(n);  n != 0 && n <= MAX_CHEN_PRIME;  n = next_prime(n+2))
     if (is_prime(n+2) || is_semiprime(n+2))
       return n;
   return 0;

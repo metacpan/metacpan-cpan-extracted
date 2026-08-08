@@ -113,7 +113,7 @@ match($do : == ) {
     # case($FIND_FUZ) {
     #  $WORMS->searchFuzzy($param, 0, $FUZZY);
     # }
-    
+
     # get-record
     case($GET_REC) {
       my $rec = $WORMS->getRecordByID($param);
@@ -210,15 +210,15 @@ query-worms - CLI tool to query the World Register of Marine Species
 
 =head1 DESCRIPTION
 
- The tool is Q&D solution to read and search datasets from the
- taxonomic database WoRMS.  WoRMS is a register for marine
- species. The aim of a World Register of Marine Species (WoRMS) is to
- provide an authoritative and comprehensive list of names of marine
- organisms, including information on synonymy. While highest priority
- goes to valid names, other names in use are included so that this
- register can serve as a guide to interpret taxonomic literature.
+The tool is Q&D solution to read and search datasets from the
+taxonomic database WoRMS.  WoRMS is a register for marine
+species. The aim of a World Register of Marine Species (WoRMS) is to
+provide an authoritative and comprehensive list of names of marine
+organisms, including information on synonymy. While highest priority
+goes to valid names, other names in use are included so that this
+register can serve as a guide to interpret taxonomic literature.
 
- http://www.marinespecies.org/
+  ..see also L<http://www.marinespecies.org/>
 
 =head1 TASKS
 
@@ -235,7 +235,7 @@ Find WoRMS taxon record by name.
 =item get-children ID
 
 Get sub sequent taxa of a certain level for a specific AphiaID.
-Please be careful, lists for some taxa could be be large.
+Please be careful, lists for some taxa could be large.
 
 =item get-record ID
 
@@ -253,12 +253,15 @@ A NAME addresses a scientific name for a taxon. You can use taxa
 expression of different ranks like 'Animalia', 'Annelida', 'Abra' or
 'Abra alba'.
 
+Example:
+     query-worms find-record 'Abra alba' | grep ' NAME'
 
 =item ID
 
 An ID is a numeric key in WoRMS called AphiaID. You can start an
 investigation on the top level using:
 
+Example:
      query-worms get-children 1 | grep ' NAME'
 
 =back
@@ -289,7 +292,7 @@ Output format
 
 =back
 
-=head1 Output formats
+=head1 OUTPUT FORMATS
 
 The tool gives you different output structures for each
 operation mode (get-record, find-record, etc...).
@@ -306,15 +309,15 @@ You will get the key (AphiaID) for the addressed taxon.
 
 =item FORMAT TEXT
 
-INT APHIA.ID 550560
+    INT APHIA.ID 550560
 
 =item FORMAT SQL
 
-APHIA_ID = 550560
+    APHIA_ID = 550560
 
 =item FORMAT CSV
 
-550560
+    550560
 
 =back
 
@@ -322,7 +325,7 @@ APHIA_ID = 550560
 
 =item find-record, get-record NAME
 
-  Record for species datasets
+Handle records for species datasets.
 
 =back
 
@@ -375,23 +378,22 @@ APHIA_ID = 550560
 
 =item get-children ID
 
-A list of secord for pattern search or species groups
+A list of record for pattern search or species groups
 
 =back
 
 =over 8
 
-=item FORMAT TEXT (Default config)
+=item FORMAT TEXT (Default configuration)
 
-WORMS.CHILDREN ID XXXXX
-
- WORMS ID 550560
-    STRING  VALID.NAME     'Pontoporeia affinis'
-    STRING  STATUS         'unaccepted'
-  ...
-  EOF
-  ...
-EOF
+    WORMS.CHILDREN ID XXXXX
+     WORMS ID 550560
+        STRING  VALID.NAME     'Pontoporeia affinis'
+        STRING  STATUS         'unaccepted'
+      ...
+      EOF
+      ...
+    EOF
 
 =item FORMAT SQL
 
@@ -423,7 +425,13 @@ EOF
 
 =back
 
-=head1 LICENSE
+=head1 AUTHOR
+
+Alexander Weidauer E<lt>alex.weidauer@huckfinn.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Alexander Weidauer
 
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

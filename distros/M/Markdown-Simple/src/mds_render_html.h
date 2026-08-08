@@ -7,8 +7,13 @@
 
 /* Populates *cb so it writes HTML into the supplied buffer.
  * `ud_storage` is opaque caller-provided state of size >= sizeof(void*)*4. */
+/* `toc`, when non-NULL, collects one { level, text, id } hashref per heading
+ * in document order and implies MDS_FLAG_HEADING_IDS. The AV is caller-owned;
+ * the renderer only pushes to it. `text` is the heading's plain text with
+ * inline markup stripped, as raw bytes: the caller knows whether the input
+ * was UTF-8 and is the one who should set the flag. */
 void mds_render_html_install(mds_callbacks* cb, void** ud_out, mds_buf* buf,
-                             unsigned flags);
+                             unsigned flags, AV* toc);
 
 /* Release the heap buffers the renderer grew during a parse: the alt-text
  * accumulator, the autolink coalescing buffer, the highlight accumulator and

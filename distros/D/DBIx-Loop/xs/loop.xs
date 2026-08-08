@@ -21,7 +21,6 @@ new(class, ...)
         SV *dsn = NULL, *user = NULL, *pass = NULL, *attr = NULL;
         int nworkers = 4;
         int max_queue = 0;
-        HV *self;
         int i;
         const char *cls = (SvROK(class) && SvOBJECT(SvRV(class)))
                         ? HvNAME(SvSTASH(SvRV(class))) : SvPV_nolen(class);
@@ -39,39 +38,8 @@ new(class, ...)
                 max_queue = SvIV(ST(i + 1)) > 0 ? (int)SvIV(ST(i + 1)) : 0;
             /* other options (backend, ...) reserved for later phases */
         }
-        if (!loop || !SvOK(loop))
-            croak("DBIx::Loop->new: a 'loop' is required - DBIx::Loop is not "
-                  "an event loop, it runs on one. Pass loop => $adapter.");
-        if (!dbh || !SvROK(dbh))
-            croak("DBIx::Loop->new: a 'dbh' is required (or use connect)");
-        self = newHV();
-        (void)hv_stores(self, "dbh",  newSVsv(dbh));
-        (void)hv_stores(self, "loop", newSVsv(loop));
-        (void)hv_stores(self, "workers", newSViv(nworkers));
-        (void)hv_stores(self, "max_queue", newSViv(max_queue));
-        {
-            SV *dn = dbil_driver_name(aTHX_ dbh);
-            const char *cap = dbil_capability(aTHX_ dn);
-            /* 'native' only when the driver's async surface is actually
-             * loaded (DBD::Pg's PG_ASYNC resolves); otherwise the pool
-             * backend serves it like any other driver */
-            if (strEQ(cap, "native")
-                && !(dn && SvOK(dn) && dbil_native_available(aTHX_ SvPV_nolen(dn))))
-                cap = "pool";
-            (void)hv_stores(self, "capability", newSVpv(cap, 0));
-        }
-        /* connect args let the pool's forked workers open their own handles
-         * (a live dbh cannot be shared across fork). Stored only when connect()
-         * supplied a dsn; a bare new(dbh => ...) leaves the pool without them. */
-        if (dsn && SvOK(dsn)) {
-            AV *ca = newAV();
-            av_push(ca, newSVsv(dsn));
-            av_push(ca, user && SvOK(user) ? newSVsv(user) : newSV(0));
-            av_push(ca, pass && SvOK(pass) ? newSVsv(pass) : newSV(0));
-            av_push(ca, attr && SvROK(attr) ? newSVsv(attr) : newSV(0));
-            (void)hv_stores(self, "connect_args", newRV_noinc((SV *)ca));
-        }
-        RETVAL = sv_bless(newRV_noinc((SV *)self), gv_stashpv(cls, GV_ADD));
+        RETVAL = dbil_new(aTHX_ cls, dbh, loop, dsn, user, pass, attr,
+                          nworkers, max_queue);
     }
     OUTPUT:
         RETVAL
@@ -121,6 +89,7 @@ selectall_arrayref(self, sql, ...)
         selectrow_hashref  = 4
         selectcol_arrayref = 5
         selectall_hashref  = 6
+        selectall_rowhash  = 7
     CODE:
     {
         AV *bind = (AV *)sv_2mortal((SV *)newAV());

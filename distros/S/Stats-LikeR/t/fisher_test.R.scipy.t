@@ -38,6 +38,20 @@ use Stats::LikeR 'fisher_test';
 
 my $INF = 9**9**9;
 
+# Four of the cases below are slow by construction: two walk a 2x2 support of
+# millions of tables, and three drive the r x c enumeration to or near its
+# 50e6-node ceiling.  The work is a fixed count of iterations, identical on
+# every platform, but the seconds are not: the inner loops call lgamma() per
+# step, which on a long-double or __float128 perl is lgammal/lgammaq and runs
+# one to two orders of magnitude slower than the double version.  Together
+# they are ~10s of this file's ~10.3s on a plain double build here, and a CPAN
+# smoker measured 60x that.  So they run only under EXTENDED_TESTING (or the
+# author/release variables); everything else -- the 84-case R corpus and all
+# the reference-suite regressions -- runs unconditionally, in about a third of
+# a second.
+my $EXTENDED = $ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING};
+my $SLOW_WHY = 'slow case; set EXTENDED_TESTING=1 to run it';
+
 # Tolerances.  On this build the 84 corpus cases agree with R to 5.2e-14 at
 # worst on the p-value, 1.6e-14 on the odds ratio and 1.0e-14 on either CI
 # bound, and the r x c p-values below to 1.0e-12; the limits here sit a couple
@@ -250,7 +264,8 @@ close_to(fisher_test([[17704,496],[1065,75]])->{p_value}, 5.5597665725900454e-11
 close_to(fisher_test([[17704,496],[1065,76]])->{p_value}, 2.6656847911317412e-11, 'C4 large numbers, n = 76');
 close_to(fisher_test([[17704,496],[1065,77]])->{p_value}, 1.3632030244794552e-11, 'C4 large numbers, n = 77');
 close_to(fisher_test([[18000,80000],[20000,90000]])->{p_value}, 0.27514817040628897, 'C4 large numbers, N = 208000');
-{
+SKIP: {                                  # ~5s here: the support runs to 5.7e6 tables
+	skip "C4 gh9231 (N = 23 million) $SLOW_WHY", 2 unless $EXTENDED;
 	my $r = fisher_test([[5829225,5692693],[5760959,5760959]]);
 	close_to($r->{p_value}, 6.1262127126238397e-178, 'C4 gh9231 p-value (N = 23 million)');
 	close_to($r->{estimate}{"odds ratio"}, 1.0239924983807678, 'C4 gh9231 odds ratio', $TOL_OR);
@@ -361,20 +376,37 @@ close_to(fisher_test([[1,2,1,0],[4,3,1,6],[2,6,3,5],[4,3,3,6]])->{p_value},
 #            well over 10 minutes with the node cap lifted), so fisher_test()
 #            declines rather than grinding.
 #
-# Both must fail the same way: promptly, and with a message that names the
+# Both must fail the same way: bounded, and with a message that names the
 # shape rather than leaking an internal error.
+#
+# "Bounded" is a count of enumeration nodes, not a wall clock: the walk stops
+# after a fixed 50e6 interior nodes, so how many seconds that takes is a
+# property of the machine and of the perl, not of this module.  The inner loop
+# calls lgamma() per node, which on a long-double or __float128 perl is
+# lgammal/lgammaq -- one to two orders of magnitude slower than the double
+# version -- and a CPAN smoker duly measured 99s and 119s for the two tables
+# below where a plain double build here takes 1-2s.  So the croak above is the
+# real regression guard (before the node counter existed, PR#4688 ran for over
+# five minutes without either finishing or stopping); the clock is reported for
+# the record, enforced tightly only where the hardware is known, and loosely
+# otherwise so that a genuine blow-up still fails the dist.
 # ---------------------------------------------------------------------------
+my $C8_BUDGET = ($ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING}) ? 60 : 900;
 for my $c ([ 'PR#4688 4x3', [[2121,4700,6234],[100,216,2461],[27,67,502],[0,0,14]], qr/4x3/ ],
 	   [ 'Mehta & Patel 5x7', [[1,2,2,1,1,0,1],[2,0,0,2,3,0,0],[0,1,1,1,2,7,3],
 				   [1,1,2,0,0,0,1],[0,1,1,1,1,0,0]], qr/5x7/ ]) {
 	my ($name, $t, $shape) = @$c;
-	my $started = time;
-	my $r = eval { fisher_test($t) };
-	my $took = time - $started;
-	ok(!defined $r, "C8 $name is refused, not answered wrongly");
-	like($@, qr/too large for exact enumeration/, "C8 $name croaks with a usable message");
-	like($@, $shape, "C8 $name names the table shape");
-	cmp_ok($took, '<', 60, "C8 $name gives up promptly (${took}s)");
+	SKIP: {                          # 1-2s each here: both run the cap out in full
+		skip "C8 $name $SLOW_WHY", 4 unless $EXTENDED;
+		my $started = time;
+		my $r = eval { fisher_test($t) };
+		my $took = time - $started;
+		ok(!defined $r, "C8 $name is refused, not answered wrongly");
+		like($@, qr/too large for exact enumeration/, "C8 $name croaks with a usable message");
+		like($@, $shape, "C8 $name names the table shape");
+		note("C8 $name hit the node cap after ${took}s");
+		cmp_ok($took, '<', $C8_BUDGET, "C8 $name gives up bounded (${took}s < ${C8_BUDGET}s)");
+	}
 }
 
 # PR#18336, the 6x6 "too full" table that segfaulted R <= 4.2.0 and that R
@@ -382,7 +414,8 @@ for my $c ([ 'PR#4688 4x3', [[2121,4700,6234],[100,216,2461],[27,67,502],[0,0,14
 # it: the answer below agrees with R's own Monte-Carlo fallback
 # (fisher.test(d, simulate.p.value = TRUE, B = 2e6) = 0.63224) to within its
 # sampling error, so this is a case where fisher_test() answers and R does not.
-{
+SKIP: {                                  # ~2s here: nearly the whole node budget
+	skip "C8 PR#18336 6x6 $SLOW_WHY", 2 unless $EXTENDED;
 	my $d = [[1,0,5,2,1,90],[2,1,0,2,3,89],[0,0,0,1,0,14],
 		 [0,0,0,0,0,5],[0,0,0,0,0,2],[0,0,0,0,0,2]];
 	my $p = fisher_test($d)->{p_value};

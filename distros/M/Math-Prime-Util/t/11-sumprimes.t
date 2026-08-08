@@ -7,6 +7,7 @@ use Math::Prime::Util qw/sum_primes vecsum primes/;
 
 my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
+my $use128 = (Math::Prime::Util::prime_get_config->{'xs_factor_bits'} || 0) >= 128;
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 
 my %sums = (
@@ -45,10 +46,10 @@ my @large = (
 );
 
 @large = grep { ($_->[0] <= 1000000) ||
-                ($extra && (($usexs && $use64) || $_->[0] <= 100000000))
+                ($extra && (($usexs && ($use64 || $use128)) || $_->[0] <= 100000000))
               } @large;
 
-plan tests => 1 + scalar(keys %sums) + scalar(@large);
+plan tests => 1 + scalar(keys %sums) + scalar(@large) + ($usexs && $use64 ? 2 : 0);
 
 {
   my @sum;
@@ -61,10 +62,18 @@ plan tests => 1 + scalar(keys %sums) + scalar(@large);
 }
 while (my($range, $expect) = each (%sums)) {
   my($low,$high) = $range =~ /(\d+) to (\d+)/;
-  is( sum_primes($low,$high), $expect, "sum primes from $low to $high" );
+  is( "".sum_primes($low,$high), $expect, "sum primes from $low to $high" );
 }
 
 foreach my $pair (@large) {
   my($n,$sum) = @$pair;
   is( "".sum_primes(0,$n), $sum, "sum_primes($n) = $sum" );
+}
+
+if ($usexs && $use64) {
+  my $maxprime = Math::Prime::Util::prime_get_config->{'maxprime'};
+  is( "".sum_primes($maxprime, "18446744073709551600"), "$maxprime",
+      "sum_primes clamps high to maxprime" );
+  is( sum_primes($maxprime+1, "18446744073709551615"), 0,
+      "sum_primes above maxprime is 0" );
 }

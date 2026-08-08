@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 	estimate_workflow_cost
 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -495,7 +495,7 @@ sub estimate_job_duration($job) {
             if ($uses =~ /checkout/) {
                 $duration += 0.5;
             }
-            elsif ($uses =~ /setup-(node|python|go|ruby)/) {
+            elsif ($uses =~ /setup-(?:node|python|go|ruby)/) {
                 $duration += 1;
             }
             elsif ($uses =~ /cache/) {
@@ -507,7 +507,7 @@ sub estimate_job_duration($job) {
             my $run = $step->{run};
 
             # Estimate based on command
-            if ($run =~ /npm (install|ci)/) {
+            if ($run =~ /npm (?:install|ci)/) {
                 $duration += 2;  # npm install takes time
             }
             elsif ($run =~ /pip install/) {
@@ -516,7 +516,7 @@ sub estimate_job_duration($job) {
             elsif ($run =~ /cargo build/) {
                 $duration += 5;  # Rust builds are slow
             }
-            elsif ($run =~ /(npm|pytest|cargo|go) test/) {
+            elsif ($run =~ /(?:npm|pytest|cargo|go) test/) {
                 $duration += 2;  # Test suites
             }
             else {

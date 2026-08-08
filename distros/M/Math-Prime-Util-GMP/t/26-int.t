@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util::GMP qw/powint mulint addint subint add1int sub1int divint modint cdivint divrem tdivrem fdivrem cdivrem absint negint lshiftint rshiftint rashiftint cmpint cmpabsint signint/;
+use Math::Prime::Util::GMP qw/powint mulint addint subint add1int sub1int divint modint cdivint divrem tdivrem fdivrem cdivrem absint negint lshiftint rshiftint rashiftint cmpint cmpabsint signint muladdint mulsubint addmulint submulint/;
 use Math::BigInt;  # Don't use GMP so we don't have to work around bug
 
 my $use64 = (~0 > 4294967296 && 18446744073709550592 != ~0);
@@ -12,6 +12,15 @@ my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 my @powints = (
  [5, 6, 15625],
  [2, 16, 65536],
+);
+my $powint_huge_even = "18446744073709551616";
+my $powint_huge_odd  = "18446744073709551617";
+my @powint_bad = (
+  [ 0, -1, qr/exponent must be non-negative/ ],
+  [ 1, -1, qr/exponent must be non-negative/ ],
+  [-1, -1, qr/exponent must be non-negative/ ],
+  [ 2, -1, qr/exponent must be non-negative/ ],
+  [ 2, $powint_huge_even, qr/ULONG_MAX/ ],
 );
 my @mulints = (
   ["13282407956253574712","14991082624209354397","199117675120653046511338473800925208664"],
@@ -38,6 +47,18 @@ my @quotients = (  # trunc, floor, ceil, euclidian
   ["L - -", "-39458349850349850394853049583049", "-85889",  "459410982202026457344398579",  "459410982202026457344398579",  "459410982202026457344398580",  "459410982202026457344398580"],
 );
 
+my @divrem_sign_cases = (
+  # n,  m,  divrem,    tdivrem,   fdivrem,   cdivrem
+  [ -5, -2, [  3, 1], [  2,-1], [  2,-1], [  3, 1] ],
+  [ -5,  2, [ -3, 1], [ -2,-1], [ -3, 1], [ -2,-1] ],
+  [ -4, -2, [  2, 0], [  2, 0], [  2, 0], [  2, 0] ],
+  [ -4,  2, [ -2, 0], [ -2, 0], [ -2, 0], [ -2, 0] ],
+  [  4, -2, [ -2, 0], [ -2, 0], [ -2, 0], [ -2, 0] ],
+  [  4,  2, [  2, 0], [  2, 0], [  2, 0], [  2, 0] ],
+  [  5, -2, [ -2, 1], [ -2, 1], [ -3,-1], [ -2, 1] ],
+  [  5,  2, [  2, 1], [  2, 1], [  2, 1], [  3,-1] ],
+);
+
 my @negshifts = (
   # n, k,  >>, >>arith
   [ 0, 1,  0, 0],
@@ -59,7 +80,7 @@ my @negshifts = (
 );
 
 plan tests => 0
-            + 7*4 + scalar(@powints) + 2     # powint
+            + 7*4 + scalar(@powints) + 2 + 4 + scalar(@powint_bad)  # powint
             + 1 + scalar(@mulints)           # mulint
             + 1 + scalar(@addints)           # addint
             + 1 + scalar(@subints)           # subint
@@ -72,6 +93,7 @@ plan tests => 0
             + 2                              # tdivrem
             + 2                              # fdivrem
             + 2                              # cdivrem
+            + 4                              # signed native divrem variants
             + 7 * scalar(@quotients)         # signed bigint division
             + 7 + 3*scalar(@negshifts)       # shiftint
             + 1                              # absint
@@ -79,6 +101,7 @@ plan tests => 0
             + 7                              # cmpint
             + 9                              # cmpabsint
             + 7                              # signint
+            + 4 + 4                          # muladdint mulsubint addmulint submulint
             + 0;
 
 ###### powint
@@ -94,6 +117,16 @@ foreach my $r (@powints) {
 }
 is(powint(powint(2,32),3),"79228162514264337593543950336","(2^32)^3");
 is(powint(3,powint(2,7)),"11790184577738583171520872861412518665678211592275841109096961","3^(2^7)");
+is(powint( 0, $powint_huge_even),  0, "powint(0,HUGE) = 0");
+is(powint( 1, $powint_huge_even),  1, "powint(1,HUGE) = 1");
+is(powint(-1, $powint_huge_even),  1, "powint(-1,HUGE even) = 1");
+is(powint(-1, $powint_huge_odd ), -1, "powint(-1,HUGE odd) = -1");
+foreach my $r (@powint_bad) {
+  my($a, $b, $err) = @$r;
+  my $ok = eval { powint($a, $b); 1 };
+  like($@, $err, "powint($a,$b) croaks") if !$ok;
+  fail("powint($a,$b) croaks") if $ok;
+}
 
 ###### mulint
 { my(@got,@exp);
@@ -198,6 +231,19 @@ ok(!eval { fdivrem(1,0); }, "fdivrem(1,0)");
 ok(!eval { cdivrem(0,0); }, "cdivrem(0,0)");
 ok(!eval { cdivrem(1,0); }, "cdivrem(1,0)");
 
+is_deeply( [map { [divrem( $_->[0], $_->[1])] } @divrem_sign_cases],
+           [map { $_->[2] } @divrem_sign_cases],
+           "divrem with all signs and exact divisions" );
+is_deeply( [map { [tdivrem($_->[0], $_->[1])] } @divrem_sign_cases],
+           [map { $_->[3] } @divrem_sign_cases],
+           "tdivrem with all signs and exact divisions" );
+is_deeply( [map { [fdivrem($_->[0], $_->[1])] } @divrem_sign_cases],
+           [map { $_->[4] } @divrem_sign_cases],
+           "fdivrem with all signs and exact divisions" );
+is_deeply( [map { [cdivrem($_->[0], $_->[1])] } @divrem_sign_cases],
+           [map { $_->[5] } @divrem_sign_cases],
+           "cdivrem with all signs and exact divisions" );
+
 ###### large values through divint, cdivint, modint,
 ######                      divrem, tdivrem, fdivrem, cdivrem
 for my $s (@quotients) {
@@ -268,3 +314,29 @@ is(signint("-18446744073709551615"), -1, "signint(-(2^64-1)) = -1");
 is(signint("-18446744073709551616"), -1, "signint(-2^64) = -1");
 is(signint("18446744073709551615"), 1, "signint(2^64-1) = 1");
 is(signint("18446744073709551616"), 1, "signint(2^64) = 1");
+
+###### muladdint / mulsubint / addmulint / submulint
+{ my @v = (-3..3);
+  my @triples = map { my $a=$_; map { my $b=$_; map { [$a,$b,$_] } @v } @v } @v;
+  is_deeply([map { muladdint($_->[0],$_->[1],$_->[2]) } @triples],
+            [map { $_->[0]*$_->[1]+$_->[2] } @triples],
+            "muladdint(-3..3,-3..3,-3..3)");
+  is_deeply([map { mulsubint($_->[0],$_->[1],$_->[2]) } @triples],
+            [map { $_->[0]*$_->[1]-$_->[2] } @triples],
+            "mulsubint(-3..3,-3..3,-3..3)");
+  is_deeply([map { addmulint($_->[0],$_->[1],$_->[2]) } @triples],
+            [map { $_->[0]+$_->[1]*$_->[2] } @triples],
+            "addmulint(-3..3,-3..3,-3..3)");
+  is_deeply([map { submulint($_->[0],$_->[1],$_->[2]) } @triples],
+            [map { $_->[0]-$_->[1]*$_->[2] } @triples],
+            "submulint(-3..3,-3..3,-3..3)");
+}
+
+my $p = "13282407956253574712";
+my $q = "14991082624209354397";
+my $pq = "199117675120653046511338473800925208664";  # p*q
+my $r = "999999999999999999";
+is( muladdint($p,$q,$r), "199117675120653046512338473800925208663", "muladdint(p,q,r)" );
+is( mulsubint($p,$q,$r), "199117675120653046510338473800925208665", "mulsubint(p,q,r)" );
+is( addmulint($r,$p,$q), "199117675120653046512338473800925208663", "addmulint(r,p,q)" );
+is( submulint($r,$p,$q), "-199117675120653046510338473800925208665", "submulint(r,p,q)" );

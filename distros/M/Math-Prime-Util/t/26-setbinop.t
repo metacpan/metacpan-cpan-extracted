@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Math::Prime::Util qw/setbinop/;
 
-plan tests => 9;
+plan tests => 10;
 
 ###### setbinop
 
@@ -45,4 +45,11 @@ is_deeply( setbinop(sub { $a ** $b },[2,3,5,7,11,13],[2,3,5]),
   my @s = grep { /^[124]{2}$/ } 1..99;
   my $S = setbinop { $a-$b } \@s;
   is(scalar(@$S), 7**2, "[124]{2} has 3^2 elements, A-A has 7^2 elements");
+}
+
+{
+  my @a = (1,2);
+  my @b = (10,20);
+  my $S1 = setbinop { @a = (); @b = (); $a+$b } \@a, \@b;
+  is_deeply($S1, [11,12,21,22], "setbinop snapshots input arrays");
 }

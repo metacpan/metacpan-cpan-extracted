@@ -1,0 +1,137 @@
+<%doc>
+Shared editor for the AwayMode user preference. Used by both the self-service
+page (/Prefs/AwayMode.html) and the admin page (/Admin/Users/AwayMode.html) so
+the two can't drift apart on the stored preference shape or the date handling.
+
+Both methods take the user being edited as $UserObj and adjust their wording
+depending on whether that's the current user or somebody else.
+
+Split into a value-returning "process" method and a rendering "show" method,
+modeled on RT core's /Widgets/SavedSearch (share/html/Widgets/SavedSearch),
+which uses the same two-method shape and is likewise called as
+"my @results = $m->comp('/Widgets/SavedSearch:process', ...)".
+</%doc>
+
+<%method process>
+<%INIT>
+my @results;
+
+# /Elements/SelectDate hands back whatever the user typed, so parse it with
+# Format => 'unknown' the way the rest of RT does. Set() parses in the current
+# user's timezone, so render it back in that same timezone -- ISO() otherwise
+# defaults to UTC, which shifts the stored day one back for any user east of
+# it.
+my $to_iso = sub {
+    my ($raw) = @_;
+    return '' unless defined $raw && length $raw;
+
+    my $date = RT::Date->new( $session{'CurrentUser'} );
+    $date->Set( Format => 'unknown', Value => $raw );
+    return '' unless $date->Unix > 0;
+    return $date->ISO( Time => 0, Timezone => 'user' );
+};
+
+my $start_iso = $to_iso->($StartDate);
+my $end_iso   = $to_iso->($EndDate);
+
+if ( $start_iso && $end_iso && $end_iso lt $start_iso ) {
+    push @results, loc("End date can't be before start date.");
+    return @results;
+}
+
+my ( $ok, $msg ) = $UserObj->SetPreferences(
+    'AwayMode',
+    {
+        Enabled   => ( $Enabled ? 1 : 0 ),
+        StartDate => $start_iso,
+        EndDate   => $end_iso,
+    }
+);
+
+if ( !$ok ) {
+    push @results, $msg;
+}
+elsif ( $UserObj->Id == $session{'CurrentUser'}->Id ) {
+    push @results, loc('Away Mode preferences updated.');
+}
+else {
+    push @results, loc( 'Away Mode preferences updated for [_1].', $UserObj->Name );
+}
+
+return @results;
+</%INIT>
+<%ARGS>
+$UserObj
+$Enabled => 0
+$StartDate => ''
+$EndDate => ''
+</%ARGS>
+</%method>
+
+<%method show>
+<&|/Widgets/TitleBox, title => loc('Away Mode') &>
+
+<p>
+<strong><% $status_msg %></strong>
+<% $effect_msg %>
+</p>
+
+<div class="form-check">
+  <input class="form-check-input checkbox" type="checkbox" id="Enabled" name="Enabled" value="1"
+% if ($pref->{'Enabled'}) {
+checked="checked"
+% }
+  />
+  <label class="form-check-label" for="Enabled"><% $checkbox_label %></label>
+</div>
+
+<div class="form-group">
+  <label for="StartDate"><&|/l&>Start date (optional)</&></label>
+  <& /Elements/SelectDate, Name => 'StartDate', Default => $pref->{'StartDate'} || '', ShowTime => 0, current => 0 &>
+</div>
+
+<div class="form-group">
+  <label for="EndDate"><&|/l&>End date (optional)</&></label>
+  <& /Elements/SelectDate, Name => 'EndDate', Default => $pref->{'EndDate'} || '', ShowTime => 0, current => 0 &>
+</div>
+
+<p class="text-muted">
+<% $date_hint %>
+<&|/l&>Dates are inclusive and are compared against RT's own local date.</&>
+</p>
+
+</&>
+<%INIT>
+use RT::Extension::AwayMode;
+
+my $pref    = $UserObj->Preferences( 'AwayMode', {} );
+my $is_away = RT::Extension::AwayMode->IsUserAway($UserObj);
+my $is_self = $UserObj->Id == $session{'CurrentUser'}->Id;
+
+my ( $status_msg, $effect_msg, $checkbox_label, $date_hint );
+
+if ($is_self) {
+    $status_msg = $is_away
+        ? loc('Away Mode is currently ACTIVE.')
+        : loc('Away Mode is currently not active.');
+    $effect_msg = $is_away
+        ? loc("New replies to tickets you own will be reassigned to Nobody, with a comment noting you're away.")
+        : '';
+    $checkbox_label = loc('I am away/on holiday');
+    $date_hint      = loc('Leave both dates blank to stay away for as long as the checkbox above is on, or set one or both to bound the away window.');
+}
+else {
+    $status_msg = $is_away
+        ? loc( 'Away Mode is currently ACTIVE for [_1].', $UserObj->Name )
+        : loc( 'Away Mode is currently not active for [_1].', $UserObj->Name );
+    $effect_msg = $is_away
+        ? loc( 'New replies to tickets [_1] owns will be reassigned to Nobody, with a comment noting they are away.', $UserObj->Name )
+        : '';
+    $checkbox_label = loc( '[_1] is away/on holiday', $UserObj->Name );
+    $date_hint      = loc('Leave both dates blank to keep this user away for as long as the checkbox above is on, or set one or both to bound the away window.');
+}
+</%INIT>
+<%ARGS>
+$UserObj
+</%ARGS>
+</%method>

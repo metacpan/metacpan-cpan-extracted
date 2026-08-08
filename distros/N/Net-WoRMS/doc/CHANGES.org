@@ -1,12 +1,19 @@
 * Overview
 
 |       WHEN | WHO | VER | WHAT                                            |
+| 2026-08-07 | I4W | 1.5 | POD Formatting and Typo's                       |
 | 2026-07-28 | I4W | 1.4 | Adding the Changelog                            |
 | 2026-07-27 | I4W | 1.3 | Sustantial CPAN depolyment corrections          |
 | 2026-07-27 | I4W | 1.2 | Technical CPAN depolyment corrections           |
 | 2026-07-27 | I4W | 1.1 | Refactoring towards PERL CPAN first Deployment  |
 | 2017-08-05 | I4W | 1.0 | Generate a published version for githup.com     |
 | 2012-03-12 | AWE | 0.1 | Initial script retrieve taxa for IfAÖ Bentos DB |
+
+* 1.5 -- 2026-08-07 POD Formatting and Typo's
+
+- add code and link formatting rules for WoRMS.pm and query-worms.
+- catch typo's ..spellchecker
+- try to understand the module application realation for POD links
 
 * 1.4 -- 2026-07-28 CPAN Deployment Changelog
 
@@ -30,7 +37,7 @@
 * 1.1 -- 2026-07-27 CPAN Deployment
 
 - renaming the tool to ~bin/query-worms~
-- pin minimal Perl version v5.20 
+- pin minimal Perl version v5.20
 - switch to modern Perl syntax (signatures) keyword (match-case)
 - moved away form pure github.com published repo towards Dist::Zilla
 - add the module Net::WoRMS for abstraction and maintainability
@@ -51,4 +58,4 @@
 Initial release to track an correct taxa for the Benthos database of the
 Institute for Applied Ecology (IfAÖ).
 
-#@ 2026-07-28 I4W
+#@ 2026-08-07 I4W

@@ -2,7 +2,45 @@
 A timeline of when each function was added.
 
 -------------------------------------------------------------------------------
-2026-03-20  v0.74
+2026-08-08  v0.75
+2026-07-21  irand32
+2026-07-09  reverse_digits(n[,base])
+2026-07-05  vecrsorti(\@L)
+2026-07-05  vecrsort(@L)
+2026-06-24  vecpairwise {...} \@A,\@B
+2026-06-14  crootint(n,k)
+2026-06-12  inverse_sigma0_count(k,lo,hi)
+2026-06-12  inverse_sigma0(k,lo,hi)
+2026-06-09  floor_sum(n,m,a,b)
+2026-06-08  remove_factors(n,k) remove_factors_exp(n,k)
+2026-04-07  integer_complexity(n)
+2026-03-31  vecwindow {...} $step,$size,@L
+2026-03-22  toint(n)
+2026-03-21  urandomr(lo,hi)
+2026-03-17  muladdint(n,m,a)
+2026-03-17  mulsubint(n,m,a)
+2026-03-17  is_harshad(n[,base])
+2026-03-17  bestrational(x,dbound)
+2026-03-17  convergents(...)
+2026-03-16  partitionsq(n)
+2026-03-15  dedekind_psi(n)
+2026-03-15  multifactorial(n,k)
+2026-03-15  vecprefixsum(@list)
+2026-03-15  catalan_number(n)
+2026-03-15  bell_number(n)
+2026-03-14  abundance(n)
+2026-03-13  is_safe_prime(n)
+2026-03-13  fibonacci(k)
+2026-03-13  lucas_number(k)
+2026-03-13  aliquot_sum(n)
+2026-03-13  prime_signature(n)
+2026-03-13  sopf(n)
+2026-03-13  sopfr(n)
+2026-03-13  digital_root(n[,base])
+2026-03-13  mult_digital_root(n[,base])
+2026-03-13  is_palindrome(n[,base])
+-------------------------------------------------------------------------------
+2026-03-13  v0.74
 2026-01-20  vecslide { ... } @list
 2026-01-18  vecsingleton(...)
 2025-12-20  minimal_goldbach_pair(n)
@@ -180,7 +218,6 @@ A timeline of when each function was added.
 2018-12-14  is_lucky(n)
 2018-12-14  nth_lucky(n)
 2018-12-12  lucky_numbers([start],] end)
-
 -------------------------------------------------------------------------------
 2018-11-15  v0.73
 2018-11-13  inverse_totient

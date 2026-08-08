@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.02';
+    $VERSION = '0.03';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -214,6 +214,15 @@ cannot promise a method the application does not serve. See L<Punk::CORS>.
     static '/static' => 'root/static';
 
 Serve files from a directory; see L<Punk::Static>.
+
+=head2 markdown
+
+    markdown '/docs' => 'docs', title => 'MyApp Guide';
+
+Serve a nested directory of markdown files as a documentation site, with
+navigation, per-page contents, syntax highlighting and search. The whole site
+is rendered at boot and frozen, so a request is a hash lookup; see
+L<Punk::Mount::Markdown>.
 
 =head2 mount
 

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% title %} - {% site_title %}</title>
+<link rel="stylesheet" href="{% prefix %}{% assets %}/app.css">
+</head>
+<body>
+<header class="punk-md-header">
+  <a class="punk-md-brand" href="{% prefix %}">{% site_title %}</a>
+  {% if search %}<a class="punk-md-searchlink" href="{% prefix %}{% search_path %}">Search</a>{% end %}
+</header>
+<div class="punk-md-layout">
+  <nav class="punk-md-sidebar">{% raw nav %}</nav>
+  <main class="punk-md-main">
+{% content %}
+  </main>
+  {% if kind eq 'page' %}{% if toc %}<aside class="punk-md-aside"><p class="punk-md-aside-title">On this page</p>{% raw toc %}</aside>{% end %}{% end %}
+</div>
+{% if footer %}<footer class="punk-md-footer">{% raw footer %}</footer>{% end %}
+</body>
+</html>

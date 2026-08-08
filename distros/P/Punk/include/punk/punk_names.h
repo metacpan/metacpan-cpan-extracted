@@ -21,6 +21,7 @@
 #define PK_VIEWS     "Punk::Views"
 #define PK_WEBSOCKET "Punk::WebSocket"
 #define PK_MOUNT_OA  "Punk::Mount::OpenAPI"
+#define PK_MOUNT_MD  "Punk::Mount::Markdown"
 #define PK_OA_UI     "Open::API::UI"
 
 /* the require of a fixed module, as one compile-time literal */
@@ -64,6 +65,7 @@
 #define K_LEN      "len"
 #define K_MOUNT    "mount"
 #define K_DIR      "dir"
+#define K_MD_DIR   "md_dir"
 #define K_APP      "app"
 #define K_PATH     "path"
 #define K_METHOD   "method"

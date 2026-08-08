@@ -70,6 +70,7 @@ my @files = (
     't/30-response-to-assertion-standalone.t',
     't/31-require-signed-assertion.t',
     't/32-xsw-defenses.t',
+    't/33-cert-text-anchor.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

@@ -613,7 +613,7 @@ int _GMP_is_lucas_pseudoprime(const mpz_t n, int strength)
  *
  * increment:  1 for Baillie OEIS, 2 for Pari.
  *
- * With increment = 1, these results will be a subset of the extra-strong
+ * With increment = 1, these results will be a superset of the extra-strong
  * Lucas pseudoprimes.  With increment = 2, we produce Pari's results (we've
  * added the necessary GCD with D so we produce somewhat fewer).
  */
@@ -623,12 +623,21 @@ int _GMP_is_almost_extra_strong_lucas_pseudoprime(const mpz_t n, UV increment)
   UV P, s;
   int rval;
 
-  {
-    int cmpr = mpz_cmp_ui(n, 2);
-    if (cmpr == 0)     return 1;  /* 2 is prime */
-    if (cmpr < 0)      return 0;  /* below 2 is not prime */
-    if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
-  }
+  if (increment < 1 || increment > 256)
+    croak("is_almost_extra_strong_lucas_pseudoprime: invalid increment: %"UVuf,
+          increment);
+
+  if (mpz_cmp_ui(n, 13) < 0)
+    return mpz_cmp_ui(n, 2) == 0 || mpz_cmp_ui(n, 3) == 0 ||
+           mpz_cmp_ui(n, 5) == 0 || mpz_cmp_ui(n, 7) == 0 ||
+           mpz_cmp_ui(n, 11) == 0;
+  if (mpz_even_p(n)) return 0;
+
+  /* Ensure small primes work with large parameter increments. */
+  if (((increment >= 16 && mpz_cmp_ui(n, 331) <= 0) ||
+       (increment > 148 && mpz_cmp_ui(n, 631) <= 0)) &&
+      primality_pretest(n) == 2)
+    return 1;
 
   mpz_init(t);
   {
@@ -836,82 +845,97 @@ DONE_PERRIN:
   return rval ? 1 : 0;
 }
 
-int is_frobenius_pseudoprime(const mpz_t n, IV P, IV Q)
+int is_frobenius_pseudoprime(const mpz_t n)
 {
-  mpz_t t, Vcomp, d, U, V, Qk;
-  IV D;
-  int k = 0;
-  int rval;
+  mpz_t Ps, Qs, D;
+  int k, rval;
 
-  {
-    int cmpr = mpz_cmp_ui(n, 2);
-    if (cmpr == 0)     return 1;  /* 2 is prime */
-    if (cmpr < 0)      return 0;  /* below 2 is not prime */
-    if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
-  }
+  if (mpz_cmp_ui(n, 7) < 0)
+    return (mpz_cmp_ui(n,2) == 0 || mpz_cmp_ui(n,3) == 0 || mpz_cmp_ui(n,5) == 0);
+  if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
+
+  mpz_init_set_si(Ps, -1);
+  mpz_init_set_ui(Qs, 2);
+  mpz_init(D);
+  if (mpz_cmp_ui(n, 7) == 0)
+    mpz_set_ui(Ps, 1);  /* So we don't test jacobi(-7,7) */
+
+  do {
+    mpz_add_ui(Ps, Ps, 2);
+    if (mpz_cmp_ui(Ps, 3) == 0)
+      mpz_set_ui(Ps, 5);  /* P=3,Q=2 -> D=9-8=1 => k=1, so skip */
+    mpz_mul(D, Ps, Ps);
+    mpz_submul_ui(D, Qs, 4);
+    k = mpz_jacobi(D, n);
+    if (mpz_cmp_ui(Ps, 10001) == 0 && mpz_perfect_square_p(n))
+      k = 0;
+  } while (k == 1);
+
+  if (k == 0)
+    rval = 0;
+  else
+    rval = is_frobenius_pseudoprime_pq(n, Ps, Qs);
+  mpz_clear(D);  mpz_clear(Qs);  mpz_clear(Ps);
+  return rval;
+}
+
+
+int is_frobenius_pseudoprime_pq(const mpz_t n, const mpz_t P, const mpz_t Q)
+{
+  mpz_t t, Vcomp, d, U, V, D, Pmod, Qmod;
+  int k, rval;
+
+  if (mpz_cmp_ui(n, 4) < 0)
+    return (mpz_cmp_ui(n,2) == 0 || mpz_cmp_ui(n,3) == 0);
+  if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
+
+  mpz_init(D);
+  mpz_init(Pmod);
+  mpz_init(Qmod);
   mpz_init(t);
-  if (P == 0 && Q == 0) {
-    P = 1;  Q = 2;
-    do {
-      P += 2;
-      if (P == 3) P = 5;  /* P=3,Q=2 -> D=9-8=1 => k=1, so skip */
-      if (P == 21 && mpz_perfect_square_p(n))
-        { mpz_clear(t); return 0; }
-      D = P*P-4*Q;
-      if (mpz_cmp_ui(n, P >= 0 ? P : -P) <= 0) break;
-      if (mpz_cmp_ui(n, D >= 0 ? D : -D) <= 0) break;
-      mpz_set_si(t, D);
-      k = mpz_jacobi(t, n);
-    } while (k == 1);
-  } else {
-    D = P*P-4*Q;
-    if (is_perfect_square( D >= 0 ? D : -D ))
-      croak("Frobenius invalid P,Q: (%"IVdf",%"IVdf")", P, Q);
-    mpz_set_si(t, D);
-    k = mpz_jacobi(t, n);
+
+  mpz_mul(D, P, P);
+  mpz_submul_ui(D, Q, 4);
+  if (mpz_sgn(D) >= 0 && mpz_perfect_square_p(D)) {
+    mpz_clear(t); mpz_clear(Qmod); mpz_clear(Pmod); mpz_clear(D);
+    croak("is_frobenius_pseudoprime: invalid P,Q");
   }
 
-  /* Check initial conditions */
-  {
-    UV Pu = P >= 0 ? P : -P;
-    UV Qu = Q >= 0 ? Q : -Q;
-    UV Du = D >= 0 ? D : -D;
+  mpz_mod(Pmod, P, n);
+  mpz_mod(Qmod, Q, n);
 
-    /* If abs(P) or abs(Q) or abs(D) >= n, exit early. */
-    if (mpz_cmp_ui(n, Pu) <= 0 || mpz_cmp_ui(n, Qu) <= 0 || mpz_cmp_ui(n, Du) <= 0) {
-      mpz_clear(t);
-      return _GMP_trial_factor(n, 2, Du+Pu+Qu) ? 0 : 1;
-    }
-    /* If k = 0, then D divides n */
-    if (k == 0) {
-      mpz_clear(t);
-      return 0;
-    }
-    /* If n is not coprime to P*Q*D then we found a factor */
-    if (mpz_gcd_ui(NULL, n, Du*Pu*Qu) > 1) {
-      mpz_clear(t);
-      return 0;
-    }
+  mpz_gcd(t, n, Qmod);
+  if (mpz_cmp_ui(t,1) == 0) mpz_gcd(t, n, D);
+  if (mpz_cmp_ui(t,1) != 0) {
+    rval = (mpz_cmp(t, n) == 0) ? (_GMP_is_prob_prime(n) > 0) : 0;
+    mpz_clear(t); mpz_clear(Qmod); mpz_clear(Pmod); mpz_clear(D);
+    return rval;
+  }
+
+  k = mpz_jacobi(D, n);
+  if (k == 0) {
+    mpz_clear(t); mpz_clear(Qmod); mpz_clear(Pmod); mpz_clear(D);
+    return 0;
   }
 
   mpz_init(Vcomp);
   if (k == 1) {
     mpz_set_si(Vcomp, 2);
   } else {
-    mpz_set_iv(Vcomp, Q);
-    mpz_mul_ui(Vcomp, Vcomp, 2);
+    mpz_mul_ui(Vcomp, Qmod, 2);
     mpz_mod(Vcomp, Vcomp, n);
   }
 
-  mpz_init(U);  mpz_init(V);  mpz_init(Qk);  mpz_init(d);
+  mpz_init(U);  mpz_init(V);  mpz_init(d);
   if (k == 1) mpz_sub_ui(d, n, 1);
   else        mpz_add_ui(d, n, 1);
 
-  lucas_seq(U, V, n, P, Q, d, Qk, t);
+  lucasuvmod(U, V, Pmod, Qmod, d, n, t);
   rval = ( mpz_sgn(U) == 0 && mpz_cmp(V, Vcomp) == 0 );
 
-  mpz_clear(d); mpz_clear(Qk); mpz_clear(V); mpz_clear(U);
-  mpz_clear(Vcomp); mpz_clear(t);
+  mpz_clear(d); mpz_clear(V); mpz_clear(U);
+  mpz_clear(Vcomp);
+  mpz_clear(t); mpz_clear(Qmod); mpz_clear(Pmod); mpz_clear(D);
 
   return rval;
 }
@@ -1085,8 +1109,9 @@ int _GMP_is_frobenius_underwood_pseudoprime(const mpz_t n)
 int _GMP_is_frobenius_khashin_pseudoprime(const mpz_t n)
 {
   mpz_t t, ta, tb, ra, rb, a, b, n_minus_1;
-  unsigned long c = 1;
-  int bit, len, k, rval = 0;
+  long c = 1;
+  unsigned long ea = 2;
+  int bit, len, k = -1, rval = 0;
 
   {
     int cmpr = mpz_cmp_ui(n, 2);
@@ -1097,21 +1122,32 @@ int _GMP_is_frobenius_khashin_pseudoprime(const mpz_t n)
   if (mpz_perfect_square_p(n)) return 0;
 
   mpz_init(t);
-  do {
-    c += 2;
-    mpz_set_ui(t, c);
-    k = mpz_jacobi(t, n);
-  } while (k == 1);
-  if (k == 0) {
+  mpz_init(n_minus_1);
+  mpz_sub_ui(n_minus_1, n, 1);
+
+  /* c = -1 and c = 2 use 2+sqrt(c); positive c uses 1+sqrt(c). */
+  if (mpz_fdiv_ui(n, 4) == 3) {
+    c = -1;
+  } else if (mpz_fdiv_ui(n, 8) == 5) {
+    c = 2;
+  } else {
+    ea = 1;
+    do {
+      c = (long) next_prime_ui((UV)c);
+      k = mpz_si_kronecker(c, n);
+    } while (k == 1);
+  }
+  if (k == 0 || (ea == 2 && mpz_divisible_ui_p(n, 3))) {
+    mpz_clear(n_minus_1);
     mpz_clear(t);
     return 0;
   }
 
-  mpz_init_set_ui(ra, 1);   mpz_init_set_ui(rb, 1);
-  mpz_init_set_ui(a, 1);    mpz_init_set_ui(b, 1);
+  mpz_init_set_ui(ra, ea);
+  mpz_init_set_ui(rb, 1);
+  mpz_init_set_ui(a, ea);
+  mpz_init_set_ui(b, 1);
   mpz_init(ta);   mpz_init(tb);
-  mpz_init(n_minus_1);
-  mpz_sub_ui(n_minus_1, n, 1);
 
   len = mpz_sizeinbase(n_minus_1, 2);
   for (bit = 0; bit < len; bit++) {
@@ -1124,13 +1160,13 @@ int _GMP_is_frobenius_khashin_pseudoprime(const mpz_t n)
       mpz_sub(rb, rb, ta);
       mpz_sub(rb, rb, tb);
       mpz_mod(rb, rb, n);
-      mpz_mul_ui(tb, tb, c);
+      mpz_mul_si(tb, tb, c);
       mpz_add(ra, ta, tb);
       mpz_mod(ra, ra, n);
     }
     if (bit < len-1) {
       mpz_mul(t, b, b);
-      mpz_mul_ui(t, t, c);
+      mpz_mul_si(t, t, c);
       mpz_mul(b, b, a);
       mpz_add(b, b, b);
       mpz_mod(b, b, n);
@@ -1139,7 +1175,8 @@ int _GMP_is_frobenius_khashin_pseudoprime(const mpz_t n)
       mpz_mod(a, a, n);
     }
   }
-  if ( (mpz_cmp_ui(ra,1) == 0) && (mpz_cmp(rb, n_minus_1) == 0) )
+  if ( (mpz_cmp_ui(ra, ea) == 0) &&
+       (mpz_cmp(rb, n_minus_1) == 0) )
     rval = 1;
 
   mpz_clear(n_minus_1);
@@ -1161,13 +1198,10 @@ int _GMP_BPSW(const mpz_t n)
   if (miller_rabin_ui(n, 2) == 0)   /* Miller Rabin with base 2 */
     return 0;
 
-  if (_GMP_is_lucas_pseudoprime(n, 2 /*extra strong*/) == 0)
-    return 0;
+  if (mpz_sizeinbase(n, 2) <= 64) /* BPSW is deterministic for 64-bit */
+    return _GMP_is_almost_extra_strong_lucas_pseudoprime(n, 1) ? 2 : 0;
 
-  if (mpz_sizeinbase(n, 2) <= 64)        /* BPSW is deterministic below 2^64 */
-    return 2;
-
-  return 1;
+  return _GMP_is_lucas_pseudoprime(n, 2 /*extra strong*/) ? 1 : 0;
 }
 
 /* Assume n is a BPSW PRP, return 1 (no result), 0 (composite), 2 (prime) */

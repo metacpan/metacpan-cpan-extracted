@@ -4,7 +4,7 @@
       "Steve Hancock <perltidy@perltidy.sourceforge.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -47,6 +47,6 @@
          "web" : "https://github.com/perltidy/perltidy"
       }
    },
-   "version" : "20260705",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "20260808",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

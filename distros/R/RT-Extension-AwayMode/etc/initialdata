@@ -1,7 +1,7 @@
 @ScripConditions = (
     {   Name                 => 'Owner Away',
-        Description          => 'Whenever correspondence arrives on a ticket whose owner has Away Mode active',
-        ApplicableTransTypes => 'Correspond',
+        Description          => 'Whenever a reply or comment arrives on a ticket whose owner has Away Mode active',
+        ApplicableTransTypes => 'Correspond,Comment',
         ExecModule           => 'OwnerAway',
     },
 );

@@ -1,5 +1,20 @@
 Revision history for Hyperman
 
+0.13    2026-08-07
+        - A loop inherited across a fork no longer closes descriptors that
+          are not its own. Every fd in a loop - the backend's own, the
+          connection sockets, the access log - belongs to the process that
+          created the loop, so a loop the child merely inherited is now
+          freed without closing any of them.
+        - Pre-size the PSGI env hash. A fresh HV starts with 8 buckets and
+          the env carries 25-odd keys before the app adds its own, so
+          every request paid two bucket split reallocs and their rehash
+          walks. under profile S_hsplit alone was 4% of a worker's
+          samples. hv_ksplit(64) at both env build sites (HTTP/1 and
+          HTTP/2) removes it outright.
+        - Store the common HTTP_* header keys through shared key SVs made
+          once at init.
+
 0.12    2026-08-06
         - io_uring: cancelling a timer could corrupt the heap. ur_del_timer
           freed the ur_timer immediately, but the timeout is already in flight

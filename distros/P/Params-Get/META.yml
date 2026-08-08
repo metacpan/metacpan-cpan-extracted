@@ -6,7 +6,6 @@ build_requires:
   Error: '0'
   ExtUtils::MakeMaker: '0'
   IPC::System::Simple: '0'
-  Params::Validate::Strict: '0'
   Test::DescribeMe: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0.08'
@@ -36,5 +35,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Get
   homepage: https://metacpan.org/pod/Params::Get
   repository: https://github.com/nigelhorne/Params-Get.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

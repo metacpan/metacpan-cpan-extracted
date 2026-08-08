@@ -15,7 +15,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.1';
 
 # ABSTRACT: no-frills file rotation
 
@@ -84,7 +84,7 @@ has touch => (
 
 has time => (
     is      => 'rw',
-    isa     => InstanceOf[qw/ Time::Piece Time::Moment DateTime /],
+    isa     => InstanceOf[qw/ Time::Piece Time::Moment DateTime DateTime::Lite DateTime::Tiny /],
     lazy    => 1,
     default => sub { require_module('Time::Piece'); Time::Piece::localtime() },
     handles => {
@@ -136,7 +136,7 @@ sub rotate {
             next;
         }
 
-        if ($age && $current->stat->mtime < $age) {
+        if ( $age && ( ( $current->exists || -l $current ) && $current->lstat->mtime < $age ) ) {
             $current->remove;
             next;
         }
@@ -161,10 +161,11 @@ sub _build_files_to_rotate {
     my $num = $self->start_num;
 
     my $file = $self->_rotated_name( $num );
-    if ($self->file->exists) {
+    my $orig = $self->file;
+    if ( $orig->exists || -l $orig ) {
 
-        $files{ $self->file } = {
-            current => $self->file,
+        $files{ $orig } = {
+            current => $orig,
             rotated => $file,
         };
 
@@ -175,13 +176,13 @@ sub _build_files_to_rotate {
     }
 
     my $max  = $self->max;
-    while ($file->exists || ($max && $num <= $max)) {
+    while ($file->exists || -l $file || ($max && $num <= $max)) {
 
         my $rotated = $self->_rotated_name( ++$num );
 
         last if $rotated eq $file;
 
-        if ($file->exists) {
+        if ( $file->exists || -l $file ) {
             $files{ $file } = {
                 current => $file,
                 rotated => (!$max || $num <= $max) ? $rotated : undef,
@@ -267,13 +268,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords backported compatability
+
 =head1 NAME
 
 File::Rotate::Simple - no-frills file rotation
 
 =head1 VERSION
 
-version v0.3.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -415,7 +418,7 @@ constructor, e.g.
         extension_format  => '.%Y%m%d',
     );
 
-L<Time::Moment> and L<DateTime> objects can also be given.
+L<Time::Moment>, L<DateTime>, L<DateTime::Lite> and L<DateTime::Tiny> objects can also be given.
 
 Unlike other attributes, L</time> is read-write, so that it can be
 updated between calls to L</rotate>:
@@ -507,12 +510,12 @@ The following modules have similar functionality:
 
 =back
 
-There are also several logging modueles that support log rotation.
+There are also several logging modules that support log rotation.
 
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/File-Rotate-Simple>
-and may be cloned from L<git://github.com/robrwo/File-Rotate-Simple.git>
+and may be cloned from L<https://github.com/robrwo/File-Rotate-Simple.git>
 
 =head1 BUGS
 
@@ -525,7 +528,7 @@ feature.
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 CONTRIBUTOR
 
@@ -535,7 +538,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2023 by Robert Rothenberg.
+This software is Copyright (c) 2015-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

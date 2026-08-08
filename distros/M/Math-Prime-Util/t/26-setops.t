@@ -77,7 +77,20 @@ use Math::Prime::Util qw/setunion setintersect setminus setdelta
                          powint addint subint negint/;
 use Math::BigInt;
 
+{
+  package Math::Prime::Util::TestMutatingSetInteger;
+  use overload q{""} => sub {
+    my($self) = @_;
+    if (!$self->{mutated}++) {
+      push @{$self->{array}}, @{$self->{append}};
+    }
+    $self->{value};
+  }, fallback => 1;
+}
+package main;
+
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
+my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 
 my $bi1 = Math::BigInt->new("59724578844314338843734830435499460367");
 my $bi2 = Math::BigInt->new("98198086365677506205371483123156488634");
@@ -126,6 +139,9 @@ my @set2 = (
 
 
 plan tests => 2        # specific tests
+            + 1        # empty-set non-aliasing
+            + 1        # set results do not share input values
+            + 1        # mutating set ops preserve second arg
             + 1        # toset
             + 4        # union etc. on sets and lists
             + 1 + 1    # sidon and sumfree
@@ -142,6 +158,66 @@ plan tests => 2        # specific tests
 
 is_deeply(setunion([1,2,3],[-11,-5,10]),[-11,-5,1,2,3,10],"setunion signed properly sorted");
 is_deeply(setdelta([7,1,3,5,1], [3,7,8,3,9]), [1,5,8,9], "setdelta with unsorted and dups works" );
+
+subtest 'empty-set ops return new refs', sub {
+  my $a = [1,2,3];
+  my $b = [];
+  my $c = [4,5];
+  my $d = [3,1,1];
+  my $e = [5,4,5];
+  my $r1 = setminus($a, $b);
+  my $r2 = setdelta($a, $b);
+  my $r3 = setdelta($b, $c);
+  my $r4 = setminus($d, $b);
+  my $r5 = setdelta($d, $b);
+  my $r6 = setdelta($b, $e);
+  is_deeply($r1, [1,2,3], 'setminus value');
+  is_deeply($r2, [1,2,3], 'setdelta right empty value');
+  is_deeply($r3, [4,5],   'setdelta left empty value');
+  is_deeply($r4, [1,3],   'setminus with empty right returns set form');
+  is_deeply($r5, [1,3],   'setdelta with empty right returns set form');
+  is_deeply($r6, [4,5],   'setdelta with empty left returns set form');
+  isnt($r1, $a, 'setminus does not alias input');
+  isnt($r2, $a, 'setdelta right empty does not alias input');
+  isnt($r3, $c, 'setdelta left empty does not alias input');
+  isnt($r4, $d, 'setminus normalized result does not alias input');
+  isnt($r5, $d, 'setdelta right empty normalized result does not alias input');
+  isnt($r6, $e, 'setdelta left empty normalized result does not alias input');
+};
+
+subtest 'set operation results do not share input values', sub {
+  my @cases = (
+    [setunion     => \&setunion,     [1,3],   [2,4]],
+    [setintersect => \&setintersect, [1,2,3], [2,3,4]],
+    [setminus     => \&setminus,     [1,2,3], [2]],
+    [setdelta     => \&setdelta,     [1,3],   [2,4]],
+  );
+  for my $case (@cases) {
+    my($name, $code, $a, $b) = @$case;
+    my @orig_a = @$a;
+    my @orig_b = @$b;
+    my $result = $code->($a,$b);
+    $_ += 100 for @$result;
+    is_deeply($a, \@orig_a, "$name result does not share first input values");
+    is_deeply($b, \@orig_b, "$name result does not share second input values");
+  }
+};
+
+subtest 'mutating set ops preserve second arg', sub {
+  my $b = [5,15,35];
+  my $a1 = [10,20,30];
+  my $a2 = [10,20,30];
+  setinsert($a1, $b);
+  is_deeply($b, [5,15,35], 'setinsert keeps second arg intact');
+  setremove($a2, $b);
+  is_deeply($b, [5,15,35], 'setremove keeps second arg intact');
+
+  my $c = [grep { $_ % 3 == 0 } 0..360];
+  my @origc = @$c;
+  my $a3 = [grep { $_ % 2 == 0 } 0..400];
+  setinvert($a3, $c);
+  is_deeply($c, \@origc, 'setinvert keeps second arg intact');
+};
 
 subtest 'toset', sub {
   is_deeply( toset(),[],"toset: empty list" );
@@ -233,6 +309,11 @@ subtest 'is_sidon_set', sub {
   );
   is_deeply( [map { is_sidon_set($_) } @sidons], [map { 1 } 0..$#sidons], "Sidon sets" );
   is_deeply( [map { is_sidon_set($_) } @nonsidons], [map { 0 } 0..$#nonsidons], "non-Sidon sets" );
+  {
+    my @sparse;
+    $sparse[2] = 3;
+    ok(!eval { is_sidon_set(\@sparse); 1 }, "Sidon sparse array rejected");
+  }
 };
 
 subtest 'is_sumfree_set', sub {
@@ -254,6 +335,11 @@ subtest 'is_sumfree_set', sub {
   );
   is_deeply( [map { is_sumfree_set($_) } @sf], [map { 1 } 0..$#sf], "sumfree sets" );
   is_deeply( [map { is_sumfree_set($_) } @nsf], [map { 0 } 0..$#nsf], "non-sumfree sets" );
+  {
+    my @sparse;
+    $sparse[2] = 3;
+    ok(!eval { is_sumfree_set(\@sparse); 1 }, "sumfree sparse array rejected");
+  }
 };
 
 ###### setcontains
@@ -323,9 +409,33 @@ subtest 'setcontains', sub {
     is( setcontains(\@odd,[2,4,8,16,32,64,128]), 0, "odds < 600 does not contain an even set");
     is( setcontains(\@odd,[1,3,7,15,31,63,127]), 1, "odds < 600 contains an odd set");
   }
+
+  SKIP: {
+    skip "XS set array cache refresh", 2 unless $usexs;
+    {
+      my @set;
+      my $object = bless {
+        array => \@set, append => [3..10_002], value => 1
+      }, "Math::Prime::Util::TestMutatingSetInteger";
+      @set = ($object, 2);
+      ok(setcontains(\@set, 2),
+         "setcontains handles endpoint validation changing array storage");
+    }
+    {
+      my @set;
+      my $object = bless {
+        array => \@set, append => [6..10_005], value => 3
+      }, "Math::Prime::Util::TestMutatingSetInteger";
+      @set = (1, 2, $object, 4, 5);
+      ok(setcontains(\@set, 3),
+         "setcontains handles midpoint validation changing array storage");
+    }
+  }
 };
 
 subtest 'setcontainsany', sub {
+  is( setcontainsany([]), 0, "empty set with no terms");
+  is( setcontainsany([1]), 0, "regular set with no terms");
   is( setcontainsany([],[]), 0, "empty set has no elements of empty set");
   is( setcontainsany([1],[]), 0, "regular set has no elements of empty set");
   is( setcontainsany([],[1]), 0, "empty set has no elements of other set");
@@ -338,6 +448,11 @@ subtest 'setcontainsany', sub {
 
   is( setcontainsany([-5..-1],[-3]),     1, "setcontainsany neg true");
   is( setcontainsany([-5..-1],[-65536]), 0, "setcontainsany neg false");
+
+  # We should act as if toset ran on scalar lists
+  ok( setcontainsany([1,2,3], "01"), 'scalar string as toset');
+  ok( setcontainsany([1,2,3], "04", "002"), 'scalar list as toset');
+  ok(!setcontainsany([1,2,3], "04", "005"), 'scalar string as toset (miss)');
 };
 
 

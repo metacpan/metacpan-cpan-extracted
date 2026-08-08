@@ -24,7 +24,7 @@ bool is_perfect_power_neg(UV n) {
 }
 bool is_perfect_power_iv(IV n) {
   if (n < -1) {
-    uint32_t k = powerof(-n);
+    uint32_t k = powerof((UV)0 - (UV)n);
     return (k > 2 && (k & (k-1)) != 0);
   }
   return (n <= 1 || powerof(n) > 1);
@@ -37,18 +37,16 @@ static UV _next_perfect_power(UV n, bool only_oddpowers) {
   if (n == 0) return 1;
   if (n == 1) return only_oddpowers ? 8 : 4;
   if (n >= MPU_MAX_PERFECT_POW) return 0; /* Overflow */
-  /* Should check for n >= max odd-power perfect power */
-
   log2n = log2floor(n);
   kinit = only_oddpowers ? 3 : 2;
   kinc  = only_oddpowers ? 2 : 1;
 
-  best = ipow( rootint(n,kinit)+1, kinit);
+  best = ipowsafe( rootint(n,kinit)+1, kinit);
   for (k = kinit+kinc; k <= 1+log2n; k += kinc) {
-    UV c = ipow( rootint(n,k)+1, k);
-    if (c < best && c > n) best = c;
+    UV c = ipowsafe( rootint(n,k)+1, k);
+    if (c != UV_MAX && c < best && c > n) best = c;
   }
-  return best;
+  return (best == UV_MAX) ? 0 : best;
 }
 static UV _prev_perfect_power(UV n, bool only_oddpowers) {
   uint32_t k, kinit, kinc, log2n;
@@ -130,7 +128,7 @@ UV nth_perfect_power_lower(UV n) {
   pp += -2*pow(n, 5./ 3.) - 2*pow(n, 7./ 5.) - 2*pow(n, 9./ 7.) + 2*pow(n,12./10.);
   pp += -2*pow(n,13./11.) - 2*pow(n,15./13.);
   pp += 5.5;
-  if (pp >= UV_MAX) return UV_MAX;
+  if (pp >= (double)UV_MAX) return UV_MAX;
   return (UV)pp;
 }
 UV nth_perfect_power_upper(UV n) {
@@ -142,7 +140,7 @@ UV nth_perfect_power_upper(UV n) {
   pp += -2*pow(n, 5./ 3.) - 2*pow(n, 7./ 5.) - 2*pow(n, 9./ 7.) + 2*pow(n,12./10.);
   pp += /* skip 11 and 13 */ 2*pow(n,16./14.);
   pp -= 3.5;
-  if (pp >= UV_MAX) return UV_MAX;
+  if (pp >= (double)UV_MAX) return UV_MAX;
   return (UV)pp;
 }
 UV nth_perfect_power_approx(UV n) {
@@ -165,7 +163,7 @@ UV nth_perfect_power_approx(UV n) {
   pp += -2*pow(n,13./11.) - 2*pow(n,15./13.) + 2*pow(n,16./14.) + 2*pow(n,17./15.);
   pp -= 0.48 * pow(n,19.0/17.0);
   pp -= 1.5;
-  if (pp >= UV_MAX) return UV_MAX;
+  if (pp >= (double)UV_MAX) return UV_MAX;
   return (UV)pp;
 }
 

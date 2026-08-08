@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Math::Prime::Util::GMP qw/primes sieve_twin_primes sieve_primes sieve_range/;
 
-plan tests => 12 + 12 + 1 + 19 + 1 + 1 + 13*1 + 7 + 3;
+plan tests => 12 + 3 + 12 + 1 + 22 + 1 + 1 + 13*1 + 10 + 3 + 4;
 
 ok(!eval { primes(undef); },   "primes(undef)");
 ok(!eval { primes("a"); },     "primes(a)");
@@ -19,6 +19,9 @@ ok(!eval { primes(-10,7); },   "primes(-10,7)");
 ok(!eval { primes(undef,undef); },  "primes(undef,undef)");
 ok(!eval { primes('x','x'); }, "primes(x,x)");
 ok(!eval { primes(-10,-4); },  "primes(-10,-4)");
+is_deeply( primes("-0", 2), [2], 'primes("-0",2)' );
+is_deeply( primes("-00", 2), [2], 'primes("-00",2)' );
+ok(!eval { primes("-01", 2) }, 'primes("-01",2)');
 
 my @small_primes = qw/
 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71
@@ -68,6 +71,9 @@ while (my($high, $expect) = each (%small_single)) {
 }
 
 my %small_range = (
+  "0 to 0" => [],
+  "0 to 1" => [],
+  "0 to 2" => [2],
   "3 to 9" => [3,5,7],
   "2 to 20" => [2,3,5,7,11,13,17,19],
   "30 to 70" => [31,37,41,43,47,53,59,61,67],
@@ -122,13 +128,39 @@ is( scalar @{primes(474973,538390)}, 44454 - 39617, "count primes within a range
 }
 
 is_deeply( [sieve_primes(1e6,1e6+100,100)], [qw/1000001 1000003 1000009 1000033 1000037 1000039 1000049 1000079 1000081 1000099/], "use sieve_primes to partial sieve a range" );
+is( scalar(sieve_primes(2,100)), 25, "sieve_primes scalar context returns count" );
+is( scalar(sieve_primes(100,2)), 0, "sieve_primes scalar context returns zero for empty range" );
 is_deeply( [sieve_range('6295609118348014841031009747805006052065816763110427',3204+1,3e6)], [qw/0 32 42 54 62 72 134 152 204 224 236 240 254 300 314 342 432 512 530 620 650 666 702 704 720 732 786 806 834 846 926 936 980 986 1014 1022 1034 1050 1080 1112 1122 1142 1170 1194 1206 1230 1274 1292 1296 1334 1374 1376 1422 1470 1476 1506 1530 1544 1574 1586 1632 1674 1686 1752 1772 1836 1842 1890 1902 1932 1946 1976 1986 1994 2030 2042 2060 2064 2100 2102 2136 2172 2244 2246 2276 2312 2346 2360 2370 2396 2424 2462 2490 2504 2532 2552 2610 2640 2700 2702 2760 2772 2790 2832 2886 2930 2942 2982 2996 3026 3042 3060 3092 3164 3204/], "use sieve_range to sieve a large range" );
 is_deeply( [sieve_range(0,4,2)], [2,3], "sieve_range starting at zero" );
 is_deeply( [sieve_range(1,4,2)], [1,2], "sieve_range starting at one" );
 is_deeply( [sieve_range(2,4,2)], [0,1,3], "sieve_range starting at two" );
 is_deeply( [sieve_range(5,30,4)], [0,2,6,8,12,14,18,20,24,26], "sieve_range shallow small range" );
+is_deeply( [sieve_range(0,4,0)], [2,3], "sieve_range depth 0 starting at zero" );
+is_deeply( [sieve_range(0,4,1)], [2,3], "sieve_range depth 1 starting at zero" );
 is_deeply( [sieve_range(6,12,1)], [0..11], "sieve_range depth 1" );
+{
+  my @primes = (2,3,5,7,11,13,17);
+  my @got = map { [sieve_range(109485, 100, $_)] } 0..17;
+  my @expect;
+  for my $depth (0..17) {
+    my @list;
+    OFFSET: for my $offset (0..99) {
+      my $n = 109485 + $offset;
+      if ($depth >= 2) {
+        for my $p (@primes) {
+          last if $p > $depth;
+          next OFFSET if $n % $p == 0;
+        }
+      }
+      push @list, $offset;
+    }
+    push @expect, \@list;
+  }
+  is_deeply( \@got, \@expect, "sieve_range depths 0 to 17" );
+}
 
 is_deeply( [sieve_twin_primes("1000000000000000000000000000000","1000000000000000000000000020000")], [qw/1000000000000000000000000001681 1000000000000000000000000004831 1000000000000000000000000018739 1000000000000000000000000019171/], "Sieve twin primes 10^30 10^30+20000");
 is_deeply( [sieve_twin_primes("1000000000000000000000000004832","1000000000000000000000000018738")], [], "Sieve twin primes 10^30+4832 10^20+18738 should be empty");
 is_deeply( [sieve_twin_primes(3,8)], [3,5], "sieve_twin_primes(3,8) correctly returns [3,5]" );
+is( scalar(sieve_twin_primes(2,100)), 8, "sieve_twin_primes scalar context returns count" );
+is( scalar(sieve_twin_primes(100,2)), 0, "sieve_twin_primes scalar context returns zero for empty range" );

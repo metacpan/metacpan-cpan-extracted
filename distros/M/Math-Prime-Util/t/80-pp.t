@@ -22,7 +22,7 @@ BEGIN {
   $ENV{MPU_NO_GMP} = 1;
 }
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
-my $use64 = ~0 > 4294967295 && ~0 != 18446744073709550592;
+my $use64 = ~0 > 4294967295;
 use Test::More;
 
 my @small_primes = qw/
@@ -82,6 +82,7 @@ plan tests => 2 +  # require_ok
               1 +  # primality proofs
               1 +  # misc ntheory
               1 +  # more misc ntheory
+              1 +  # functions v0.75
               1 +  # Lucky numbers
               1 +  # perfect powers
               1 +  # powerful
@@ -91,6 +92,8 @@ plan tests => 2 +  # require_ok
               1 +  # rationals
               1 +  # Goldbach
               1 +  # config
+              1 +  # random
+              1 +  # large input guards
               1;   # $_ is ok
 
 use Math::Prime::Util qw/:all/;
@@ -130,6 +133,7 @@ subtest 'arithmetic ops', sub {
 
   is(sqrtint(677),26,"sqrtint");
   is(rootint(677,3),8,"rootint");
+  is(crootint(677,3),9,"crootint");
   is(logint(677,2),9,"logint");
 
   is(negmod(24,9),3,"negmod");
@@ -153,6 +157,30 @@ subtest 'arithmetic ops', sub {
   is(rootmod(2,11,4725),3623,"rootmod(2,11,4725) = 3623");
   is(rootmod(2,-11,4725),4412,"rootmod with neg k = invmod of pos k");
   is(rootmod(577,3,137),95,"rootmod");
+
+  is("".toint("12345678901234567890.987654321e25"),
+     "123456789012345678909876543210000000000000000",
+     "toint large scientific string truncates exactly (PP)");
+  is("".toint("716115441142294636.4004"),
+     "716115441142294636",
+     "toint old-MBF precision regression string truncates exactly (PP)");
+  is("".toint(Math::BigFloat->new("-1234567890123456789012345678901234567890.99999999999999999999999")),
+     "-1234567890123456789012345678901234567890",
+     "toint huge negative BigFloat truncates exactly (PP)");
+  is("".toint(Math::BigFloat->new("716115441142294636.4004")),
+     "716115441142294636",
+     "toint old-MBF precision regression BigFloat truncates exactly (PP)");
+  is("".toint(Math::BigFloat->new("-0.0000000000000000000000000000001")),
+     "0",
+     "toint tiny negative BigFloat truncates to zero (PP)");
+  is_deeply(
+    [map { "".toint($_) } qw/0xFF -0X10 0b1011 -0B1011 0o777 -0O10
+                               1_000 0xF_F 0o7_77
+                               0x100000000000000000000/],
+    [qw/255 -16 11 -11 511 -8 1000 255 511
+        1208925819614629174706176/],
+    "toint radix strings (PP)");
+  is(toint(" \t-42\r\n"), -42, "toint surrounding whitespace (PP)");
 
   is_deeply([allsqrtmod(4,13791)],[2,4595,9196,13789],"allsqrtmod");
   is_deeply([allrootmod(581,5,151)],[34,42,43,62,121],"allrootmod");
@@ -367,6 +395,15 @@ subtest 'pseudoprime tests', sub {
   is( is_strong_pseudoprime(1, 2), 0, "MR with 0 shortcut composite");
   is( is_strong_pseudoprime(2, 2), 1, "MR with 2 shortcut prime");
   is( is_strong_pseudoprime(3, 2), 1, "MR with 3 shortcut prime");
+  is( is_pseudoprime(3, 3), 0, "Fermat with base 0 mod n");
+  is( is_euler_pseudoprime(3, 3), 0, "Euler with base 0 mod n");
+  is( is_strong_pseudoprime(3, 3), 1, "MR with base 0 mod n");
+  ok(!eval { is_pseudoprime(3,1); 1 } && $@ =~ /invalid base: 1/,
+     "Fermat n=3 validates base");
+  ok(!eval { is_euler_pseudoprime(3,1); 1 } && $@ =~ /invalid base: 1/,
+     "Euler n=3 validates base");
+  ok(!eval { is_strong_pseudoprime(3,1); 1 } && $@ =~ /invalid base: 1/,
+     "MR n=3 validates base");
 
   my @psp = ([2,341],[2,561],[2,29341],[2,4259905],
              [3, 91],[3,121],[3,44287],[3,4252381]);
@@ -413,12 +450,10 @@ subtest 'pseudoprime tests', sub {
   is(is_perrin_pseudoprime(517697641), 1, "517697641 is a Perrin pseudoprime");
   is(is_perrin_pseudoprime(102690901,3), 1, "102690901 is a Perrin pseudoprime (Grantham)");
   is(is_frobenius_pseudoprime(517697641), 0, "517697641 is not a Frobenius pseudoprime");
+  is(is_frobenius_pseudoprime(4181,4182,-1),1,"PP Frobenius parameters may exceed n");
+  is(is_frobenius_khashin_pseudoprime(1009),1,"PP Frobenius-Khashin parameter search skips composite c");
   is(is_frobenius_khashin_pseudoprime(517697659),1,"517697659 is prime via Frobenius-Khashin test");
-  SKIP: {
-    # TODO: 2026 does this still happen?
-    skip "Old Perl+bigint segfaults in F-U code", 1 if $] < 5.008;
-    ok(is_frobenius_underwood_pseudoprime(517697659), "517697659 is prime via Frobenius-Underwood test" );
-  }
+  ok(is_frobenius_underwood_pseudoprime(517697659), "517697659 is prime via Frobenius-Underwood test" );
 
   is(is_euler_pseudoprime(703, 3), 1, "703 is a base 3 Euler pseudoprime");
   is(is_euler_plumb_pseudoprime(3277), 1, "3277 is a Euler-Plumb pseudoprime");
@@ -764,6 +799,7 @@ subtest 'factoring', sub {
 
   is(join(" ",divisors(252)),"1 2 3 4 6 7 9 12 14 18 21 28 36 42 63 84 126 252","divisors");
   is(divisor_sum(252),728,"divisor_sum(252)");
+  is_deeply(inverse_sigma0(4,10),[6,8,10],"inverse_sigma0");
   is(join(" ",map{divisor_sum(1254,$_)}(0..7)),"16 2880 2208200 2302655040 2659995565256 3210983462174400 3954705863524605800 4916556716966553418560","divisor_sum(1254, {0..7})");
   is(znlog(5678, 5, 10007), 8620, "znlog(5678, 5, 10007)");
 
@@ -793,6 +829,10 @@ subtest 'factoring', sub {
   is_deeply( [ sort {$a<=>$b} Math::Prime::Util::PP::pminus1_factor(403) ],
              [ 13, 31 ],
              "pminus1(403)" );
+  is_deeply( [ sort {$a<=>$b} Math::Prime::Util::PP::_factor_pminus1(
+                         Math::BigInt->new(166213), 1000, 1000) ],
+             [ 347, 479 ],
+             "pminus1 bigint stage 1 recovery" );
   is_deeply( [ sort {$a<=>$b} Math::Prime::Util::PP::prho_factor(851981) ],
              [ 13, 65537 ],
              "prho(851981)" );
@@ -811,6 +851,26 @@ subtest 'factoring', sub {
     is_deeply( [ sort {$a<=>$b} Math::Prime::Util::PP::ecm_factor(101303039, 5, 100000,100) ],
                [ 1013, 100003 ],
                "ecm(101303039)" );
+  }
+  {
+    require Math::Prime::Util::ECM;
+    my($ok, $out) = Math::Prime::Util::ECM::_tiny_batch_normalize_x(
+      [map { Math::BigInt->new($_) } (10,18)],
+      [map { Math::BigInt->new($_) } (3,5)], Math::BigInt->new(77));
+    is($ok, 1, "ECM batch normalization succeeds");
+    is_deeply([map { "$_" } @$out], [29,19],
+              "ECM batch normalization returns affine x coordinates");
+
+    ($ok, $out) = Math::Prime::Util::ECM::_tiny_batch_normalize_x(
+      [1,1], [2,5], Math::BigInt->new(35));
+    is_deeply([$ok,"$out"], [0,5], "ECM batch normalization finds a factor");
+    ($ok, $out) = Math::Prime::Util::ECM::_tiny_batch_normalize_x(
+      [1,1], [5,7], Math::BigInt->new(35));
+    is_deeply([$ok,"$out"], [0,5],
+              "ECM batch normalization isolates combined factors");
+    ($ok, $out) = Math::Prime::Util::ECM::_tiny_batch_normalize_x(
+      [1], [35], Math::BigInt->new(35));
+    is_deeply([$ok,$out], [0,0], "ECM batch normalization rejects null Z");
   }
   my $n64 = $use64 ? 55834573561 : Math::BigInt->new("55834573561");
   is_deeply( [ sort {$a<=>$b} Math::Prime::Util::PP::prho_factor($n64) ],
@@ -949,13 +1009,17 @@ subtest 'other is * prime', sub {
   is_deeply([map{is_prob_prime($_)}@ipp_2], [map{2}@ipp_2], "is_prob_prime(p)");
   is_deeply([map{is_prob_prime($_)}@ipp_0], [map{0}@ipp_0], "is_prob_prime(c)");
 
+  is_deeply([map { is_safe_prime(2*$_+1) } 0..30],
+            [0,0,1,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0],
+            "is_safe_prime(n) for 1,3,5,7,...,61");
+
 };
 
 subtest 'primality proofs', sub {
   is_deeply( [Math::Prime::Util::PrimalityProving::primality_proof_lucas(100003)],
              [2, "[MPU - Primality Certificate]\nVersion 1.0\n\nProof for:\nN 100003\n\nType Lucas\nN 100003\nQ[1] 2\nQ[2] 3\nQ[3] 7\nQ[4] 2381\nA 2\n"],
              "primality_proof_lucas(100003)" );
-  # Had to reduce these to make borked up Perl 5.6.2 work.
+  # We used to have this example, but reduced it to the ones below
   #is_deeply( [Math::Prime::Util::PP::primality_proof_bls75("210596120454733723")],
   #           [2, ["210596120454733723", "n-1", [2, 3, 82651, "47185492693"], [2, 2, 2, 2]]],
   #           "primality_proof_bls75(210596120454733723)" );
@@ -982,6 +1046,7 @@ subtest 'misc number theory functions', sub {
 
   is( mertens(219), 4, "mertens(219)" );
   is( mertens(24219), -67, "mertens(24219)" );
+  is( mertens(1000,24219), -69, "mertens(1000,24219)" );
 
   is_deeply( [euler_phi(1513,1537)],
              [qw/1408 756 800 756 1440 440 1260 576 936 760 1522 504 1200 648 1016 760 1380 384 1530 764 864 696 1224 512 1456/],
@@ -989,6 +1054,7 @@ subtest 'misc number theory functions', sub {
   is( euler_phi(324234), 108072, "euler_phi(324234)" );
   is( "".jordan_totient(4, 899), "653187225600", "jordan_totient(4, 899)" );
   is( carmichael_lambda(324234), 18012, "carmichael_lambda(324234)" );
+  is( dedekind_psi(866500497), 1155334104, "dedekind_psi(866500497)" );
 
   is( exp_mangoldt(16), 2, "exp_mangoldt of power of 2 = 2" );
   is( exp_mangoldt(14), 1, "exp_mangoldt of even = 1" );
@@ -1003,7 +1069,11 @@ subtest 'misc number theory functions', sub {
   is(znorder(2,35), 12, "znorder(2,35) = 12");
   is(znorder(7,35), undef, "znorder(7,35) = undef");
   is(znorder(67,999999749), 30612237, "znorder(67,999999749) = 30612237");
-  is("".znorder(5,"1180591620717411303462"), "92595421232738141424", "znorder(2,1180591620717411303462) = 92595421232738141424");
+  is("".znorder(5,"1180591620717411303462"), "92595421232738141424", "znorder(5,1180591620717411303462) = 92595421232738141424");
+  is("".znorder("1000000007","25852016738884976640000"), "1931334451200", "znorder(10^9+7,23!) = 1931334451200");
+  is("".znorder("44800","10301051460877537453973547267843"), "3433683820292512484657849089281", "znorder(44800,3^65) = 3433683820292512484657849089281");
+  is("".znorder("1000000007","295232799039604140847618609643520000000"), "24533977990733129318400000", "znorder(10^9+7,34!) = 24533977990733129318400000");
+  is("".znorder("1000000007","10301051460877537453973547267843"), "2289122546861674989771899392854", "znorder(10^9+7,3^65) = 2289122546861674989771899392854");
 
   is(binomial(35,16), 4059928950, "binomial(35,16)");
   is("".binomial(228,12), "30689926618143230620", "binomial(228,12)");
@@ -1012,7 +1082,15 @@ subtest 'misc number theory functions', sub {
   is(stirling(12,4,2), '611501', "S(12,4)" );
   is(stirling(12,4,1), '105258076', "s(12,4)" );
 
+  is(join(" ",map{catalan_number($_)}0..6,18),"1 1 2 5 14 42 132 477638700","catalan_number(n) for n in {0..6,18}");
+
+  is(join(" ",map{bell_number($_)}0..6,18),"1 1 2 5 15 52 203 682076806159","bell_number(n) for n in {0..6,18}");
+
   is(join(" ",map{fubini($_)}0..6,18),"1 1 3 13 75 541 4683 3385534663256845323","fubini(n) for n in {0..6,18}");
+
+  is_deeply([map{integer_complexity($_)}0..22],
+            [undef,1,2,3,4,5,5,6,6,6,7,8,7,8,8,8,8,9,8,9,9,9,10],
+            "integer_complexity(0..22)");
 
   is_deeply([numtoperm(11,33967658)],[9,3,6,4,7,1,10,0,5,2,8],"numtoperm");
   is(permtonum([9,3,6,4,7,1,10,0,5,2,8]),33967658,"permtonum");
@@ -1042,9 +1120,12 @@ subtest 'misc number theory functions', sub {
   cmp_closeto(harmreal(18),3.49510807819631349,1e-5,"harmreal");
 
   is_deeply( [gcdext(23948236,3498248)], [2263, -15492, 52], "gcdext(23948236,3498248)" );
+  is( floor_sum(5,7,3,4), 5, "floor_sum(5,7,3,4)");
 
   is( valuation(1879048192,2), 28, "valuation(1879048192,2)");
   is( valuation(96552,6), 3, "valuation(96552,6)");
+  is( remove_factors(72,6), 2, "remove_factors(72,6)");
+  is_deeply( [remove_factors_exp(72,6)], [2,2], "remove_factors_exp(72,6)");
 
   cmp_closeto( chebyshev_theta(7001), 6929.27483821865062, 0.006929, "chebyshev_theta(7001) =~ 6929.2748");
   cmp_closeto( chebyshev_psi(6588), 6597.07452996633704, 0.006597, "chebyshev_psi(6588) =~ 6597.07453");
@@ -1056,10 +1137,17 @@ subtest 'misc number theory functions', sub {
   is( "".primorial(118), "31610054640417607788145206291543662493274686990", "primorial(118)" );
   is( pn_primorial(7), 510510, "pn_primorial(7)" );
   is( partitions(74), 7089500, "partitions(74)" );
+  is( partitionsq(74), 44046, "partitionsq(74)" );
 
   is(legendre_phi(54321,5),11287,"legendre_phi(54321,5) = 11287");
   is(inverse_li(13579),146261,"inverse_li");
+  cmp_closeto(inverse_li_nv(0),1.45136923488338,1e-10,"inverse_li_nv(0)");
   cmp_closeto(inverse_li_nv(135790),1808203.25662372,1e-4,"inverse_li_nv");
+  for my $x (-1, "NaN", "Inf") {
+    ok(!eval { inverse_li_nv($x); 1 } &&
+       $@ =~ /finite non-negative real number/,
+       "inverse_li_nv rejects $x");
+  }
 
   { my @t;
     forprimes(sub {push @t,$_}, 2387234,2387303);
@@ -1118,8 +1206,8 @@ subtest 'misc number theory functions', sub {
   is( lcm(11926,78001,2211), 2790719778, "lcm(11926,78001,2211) = 2790719778" );
 
   is(sum_primes(14400),11297213,"sum_primes(14400)");
-  is(sum_primes(2100000),"156999759090","sum_primes(2100000)") if $extra;
-  is(sum_primes(2440000,2500000),"10099224219","sum_primes(2440000,2500000)") if $extra;
+  is("".sum_primes(2100000),"156999759090","sum_primes(2100000)") if $extra;
+  is("".sum_primes(2440000,2500000),"10099224219","sum_primes(2440000,2500000)") if $extra;
 
   is(mertens(5443),9,"mertens(5443)");
   is(sumtotient(5443),9008408,"sumtotient(5443)");
@@ -1138,8 +1226,8 @@ subtest 'misc number theory functions', sub {
   is(hclassno(320),168,"hclassno");
   is_deeply([ramanujan_tau(81),ramanujan_tau(41),ramanujan_tau(44)],[1665188361,308120442,-786948864],"ramanujan_tau");
 
-  is(lucasu(6,1,14),9228778026,"lucasu");
-  is(lucasv(6,1,14),52205852194,"lucasv");
+  is("".lucasu(6,1,14),9228778026,"lucasu");
+  is("".lucasv(6,1,14),52205852194,"lucasv");
   is(lucasumod(1,-1,281,17779),5050,"lucasumod");
   is(lucasvmod(1,-1,281,17779),8665,"lucasvmod");
   is_deeply([lucasuvmod(1,-1,2811,17779)],[6323,16441],"lucasuvmod");
@@ -1159,6 +1247,8 @@ subtest 'more misc ntheory functions', sub {
   ok( is_quasi_carmichael(1517), "1517 is quasi-Carmichael");
   ok( is_quasi_carmichael(10001), "10001 is quasi-Carmichael");
   ok( is_quasi_carmichael(10373), "10373 is quasi-Carmichael");
+  is( is_quasi_carmichael("17293822569102705135"), 0,
+      "large non-Quasi-Carmichael avoids floating-point arithmetic");
 
   ok(!is_cyclic(1521), "1521 is not cyclic");
   ok( is_cyclic(10001), "10001 is cyclic");
@@ -1234,12 +1324,14 @@ subtest 'more misc ntheory functions', sub {
   is(factorialmod(53,177),30,"factorialmod(53,177)");
   is(factorialmod(830,1777),1771,"factorialmod(830,1777)")  if $extra;
 
-  is(subfactorial(15),481066515734,"subfactorial(15)");
+  is("".subfactorial(15),481066515734,"subfactorial(15)");
 
   is(binomialmod(53,7,177),152,"binomialmod");
 
   is(falling_factorial(17,5),742560,"falling_factorial");
   is(rising_factorial(17,5),2441880,"rising_factorial");
+
+  is(multifactorial(15,3),29160,"multifactorial");
 
   # "A k-rough number, as defined by Finch in 2001 and 2003, is a positive
   #  integer whose prime factors are all greater than or equal to k."
@@ -1255,6 +1347,35 @@ subtest 'more misc ntheory functions', sub {
   is(rough_count(1291677,43),187389,"rough_count");
 };
 
+subtest 'functions from v0.75', sub {
+  is(is_palindrome(121),   1, "is_palindrome(121) = 1");
+  is(is_palindrome(123),   0, "is_palindrome(123) = 0");
+
+  is(is_harshad(12345696),    1, "is_harshad(12345696)");
+  is(is_harshad(12345696,16), 1, "is_harshad(12345696,16)");
+
+  is(digital_root(493),       7, "digital_root(493) = 7");
+  is(mult_digital_root(77),   8, "mult_digital_root(77) = 8");
+  is(reverse_digits(1200),   21, "reverse_digits(1200) = 21");
+  is("".reverse_digits("123456789012345678901234567890"),
+     "98765432109876543210987654321",
+     "reverse_digits bigint decimal");
+
+  is(fibonacci(10),     55,  "fibonacci(10) = 55");
+  is(lucas_number(10), 123,  "lucas_number(10) = 123");
+
+  is(aliquot_sum(57792), 121024, "aliquot_sum(57792) = 121024");
+
+  is(sopf(57792),  55, "sopf(57792) = 55");
+  is(sopfr(57792), 65, "sopfr(57792) = 65");
+
+  is_deeply([prime_signature(3428740)],[2,1,1,1,1],"ARRAY  prime_signature(3428740) = (2,1,1,1,1)");
+  is(scalar prime_signature(3428740),4620,"SCALAR prime_signature(3428740) = 4620");
+
+  is(abundance(234848889), -84975858, "abundance(234848889) = -84975858");
+};
+
+###############################################################################
 
 subtest 'Lucky numbers', sub {
   ok(!is_lucky(1772),"1772 is not a lucky number");
@@ -1304,7 +1425,7 @@ subtest 'perfect powers', sub {
   cmp_closeto(perfect_power_count_approx("9999999999900000000000000"),3162493192548,1000,"perfect_power_count_approx");
 
   #is("".nth_perfect_power(1234567890),"1521310467887050801","nth_perfect_power");
-  is(nth_perfect_power(1234567),1495530880561,"nth_perfect_power");
+  is("".nth_perfect_power(1234567),1495530880561,"nth_perfect_power");
   ok(nth_perfect_power_lower(1234567) <= 1495530880561,"nth_perfect_power_lower");
   ok(nth_perfect_power_upper(1234567) >= 1495530880561,"nth_perfect_power_lower");
   cmp_closeto(nth_perfect_power_approx(1234567),1495530880561,10000000,"nth_perfect_power_approx");
@@ -1340,11 +1461,11 @@ subtest 'powerfree', sub {
   is_deeply([map {powerfree_sum(5443,$_)} 1..8],[1,8999622,12322494,13687065,14286122,14561514,14693701,14756710],"powerfree_sum");
   is(powerfree_part_sum(100040),3292589515,"powerfree_part_sum(100040)");
   is(powerfree_part_sum(100040,3),4234954627,"powerfree_part_sum(100040,3)");
-  is(powerfree_part_sum(100040,4),4642253940,"powerfree_part_sum(100040,4)");
+  is("".powerfree_part_sum(100040,4),4642253940,"powerfree_part_sum(100040,4)");
 
   is(powerfree_count(27000000,3),22461494,"powerfree_count(27000000,3)");
   is(powerfree_count(400040001,2),243195224,"powerfree_count(400040001,2)");
-  is(powerfree_count("10000000000",6),9829525925,"powerfree_count(10000000000,6)");
+  is("".powerfree_count("10000000000",6),9829525925,"powerfree_count(10000000000,6)");
   #is("".powerfree_count("27000000000000",3),"22461499059723","powerfree_count(30000^3,3)");
   is("".powerfree_count("100000000000000000000",15),"99996941269930456119","powerfree_count(10^20,15)");
 };
@@ -1441,6 +1562,8 @@ subtest 'set functions', sub {
 subtest 'vector (list) functions', sub {
   is(vecsum(15, 30, 45), 90, "vecsum(15,30,45)");
   is("".vecsum(4294966296,4294965296,4294964296), "12884895888", "vecsum(2^32-1000,2^32-2000,2^32-3000)");
+  is_deeply([vecprefixsum(15,30,45)],[15,45,90],"vecprefixsum(15,30,45)");
+  is_deeply([vecprefixsum([-15,30,-45])],[-15,15,-30],"vecprefixsum([-15,30,-45])");
   is(vecprod(15, 30, 45), 20250, "vecprod(15,30,45)");
   is("".vecprod(4294966296,4294965296,4294964296), "79228051833847139970490254336", "vecprod(2^32-1000,2^32-2000,2^32-3000)");
   is(vecmin(4294966296,4294965296,4294964296), 4294964296, "vecmin(2^32-1000,2^32-2000,2^32-3000)");
@@ -1460,9 +1583,14 @@ subtest 'vector (list) functions', sub {
   ok(  (vecnone { $_ == 1 } 2, 3, 4), 'vecnone true' );
 
   is_deeply([vecsort(3,-1,3,0,1,3,-5,4,1,-3)],[-5,-3,-1,0,1,1,3,3,3,4],"vecsort");
+  is_deeply([vecrsort(3,-1,3,0,1,3,-5,4,1,-3)],[4,3,3,3,1,1,0,-1,-3,-5],"vecrsort");
   { my @L=(0,-4,3,4,-1,-4,4,-2,2,3);
     vecsorti(\@L);
     is_deeply(\@L,[-4,-4,-2,-1,0,2,3,3,4,4],"vecsorti");
+  }
+  { my @L=(0,-4,3,4,-1,-4,4,-2,2,3);
+    vecrsorti(\@L);
+    is_deeply(\@L,[4,4,3,3,2,0,-1,-2,-4,-4],"vecrsorti");
   }
 
   is(vecfirst(sub{$_>6},(3,6,-7,17,7,8,9)),17,"vecfirst");
@@ -1488,6 +1616,10 @@ subtest 'vector (list) functions', sub {
   is(scalar @{[vecsample(4,[8..11])]}, 4, "vecsample returns all items with exact k");
 
   is_deeply([vecslide {$a+$b} 1..5],[3,5,7,9],"vecslide {\$a+\$b} 1..5");
+
+  is_deeply([vecpairwise {$a+$b} [1,2], [10,20]],[11,22],"vecpairwise {\$a+\$b} [1,2], [10,20]");
+
+  is_deeply([vecwindow {reverse @_} 4,3,(14,7,1,9,13,4,-6,17,15,2)],[1,7,14,-6,4,13],"vecwindow {reverse} 4,3,\@L");
 };
 
 ###############################################################################
@@ -1513,9 +1645,13 @@ subtest 'rationals', sub {
 
   is_deeply([farey(6)],[[0,1],[1,6],[1,5],[1,4],[1,3],[2,5],[1,2],[3,5],[2,3],[3,4],[4,5],[5,6],[1,1]],"farey(6)");
   is_deeply(farey(144,146),[3,125],"farey(144,146)");
+  is_deeply(farey(1000,304182),[990,991],"farey walks backward near the end");
   is(scalar farey(1445), 635141, "scalar farey(1445) = 635141");
   is_deeply(next_farey(188,[3,5]),[113,188],"next_farey");
   is_deeply([farey_rank(188,[3,5]),farey_rank(188,[113,188])],[6478,6479],"farey_rank");
+
+  is_deeply([convergents(3,7,15)], [[3,1],[22,7],[333,106]],"convergents");
+  is_deeply([bestrational(2.645751311,1000)], [2024,765],"bestrational");
 };
 
 ###############################################################################
@@ -1541,6 +1677,68 @@ subtest 'config', sub {
   is(prime_get_config->{'assume_rh'}, 1, "We are now assuming it");
 };
 
+subtest 'random', sub {
+  my $r;
+
+  $r = urandomr(3, 7);
+  ok( defined($r) && $r >= 3 && $r <= 7, "urandomr(3,7) in range" );
+
+  #  irand
+  #  irand32
+  #  irand64
+  #  drand
+  #  random_bytes
+  #  entropy_bytes
+  #  urandomb
+  #  urandomm
+  #  csrand
+  #  rand
+  #  random_factored_integer
+  #
+  #  random_prime
+  #  random_ndigit_prime
+  #  random_nbit_prime
+  #  random_safe_prime
+  #  random_strong_prime
+  #  random_proven_prime
+  #  random_maurer_prime
+  #  random_shawe_taylor_prime
+  #  random_unrestricted_semiprime
+  #  random_semiprime
+};
+
+subtest 'large input guards', sub {
+  my $huge = Math::BigInt->new("100000000000000000000");
+  my $err;
+
+  eval { calkin_wilf_n($huge, 1); 1 } or $err = $@;
+  like($err, qr/calkin_wilf_n: too many bits in output/, "calkin_wilf_n guards huge output");
+
+  undef $err;
+  eval { stern_brocot_n($huge, 1); 1 } or $err = $@;
+  like($err, qr/stern_brocot_n: too many bits in output/, "stern_brocot_n guards huge output");
+
+  my $calls = 0;
+  foralmostprimes { $calls++ } $huge, 1, 10;
+  is($calls, 0, "foralmostprimes skips impossible huge k without callback");
+
+  undef $err;
+  eval { random_ndigit_prime($huge); 1 } or $err = $@;
+  like($err, qr/random_ndigit_prime: digits must/, "random_ndigit_prime guards huge digits");
+
+  undef $err;
+  eval { random_nbit_prime($huge); 1 } or $err = $@;
+  like($err, qr/random_nbit_prime: bits must/, "random_nbit_prime guards huge bits");
+
+  undef $err;
+  eval { Pi($huge); 1 } or $err = $@;
+  like($err, qr/Pi: digits must fit in native signed integer/, "Pi guards huge digits");
+
+  undef $err;
+  eval { hclassno($huge); 1 } or $err = $@;
+  like($err, qr/hclassno: n must fit in native signed integer/, "hclassno guards huge n");
+};
+
 # Not here:
 #  is_provable_prime
 #  is_provable_prime_with_cert
@@ -1548,28 +1746,6 @@ subtest 'config', sub {
 #  verify_prime
 #
 #  print_primes
-#
-#  irand
-#  irand64
-#  drand
-#  random_bytes
-#  entropy_bytes
-#  urandomb
-#  urandomm
-#  csrand
-#  rand
-#  random_factored_integer
-#
-#  random_prime
-#  random_ndigit_prime
-#  random_nbit_prime
-#  random_safe_prime
-#  random_strong_prime
-#  random_proven_prime
-#  random_maurer_prime
-#  random_shawe_taylor_prime
-#  random_unrestricted_semiprime
-#  random_semiprime
 
 
 # foralmostprimes {...} k,[beg,],end  loop over k-almost-primes in range

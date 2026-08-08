@@ -9,7 +9,6 @@ my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 my $usegmp= Math::Prime::Util::prime_get_config->{'gmp'};
 my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
-$use64 = 0 if $use64 && 18446744073709550592 == ~0;
 
 my %mertens = (
         1 =>    1,
@@ -83,7 +82,7 @@ if (!$usexs) {
                  keys %big_mertens;
 }
 
-plan tests => 1 + 5 + 2 + 2 + 3 + scalar(keys %big_mertens);
+plan tests => 1 + 5 + 2 + 2 + 3 + 12 + scalar(keys %big_mertens);
 
 ok(!eval { moebius(0); }, "moebius(0)");
 
@@ -103,6 +102,10 @@ is_deeply( [moebius(-14,-9)],
 is_deeply( [moebius(-7,5)],
            [-1,1,-1,0,-1,-1,1,0,1,-1,-1,0,-1],
            "moebius -7 .. 5 (range)" );
+is( scalar moebius(1,20), 20, "moebius range returns count in scalar context" );
+is( scalar moebius(-7,5), 13, "moebius negative range returns count in scalar context" );
+is( scalar moebius(1,0), 0, "moebius empty range returns count 0 in scalar context" );
+is( scalar moebius(100,90), 0, "moebius descending range returns count 0 in scalar context" );
 
 is( moebius(3*5*7*11*13), -1, "moebius(3*5*7*11*13) = -1" );
 is( moebius("20364840299624512075310661735"), 1, "moebius(73#/2) = 1" );
@@ -137,6 +140,23 @@ SKIP: {
   is_deeply( \@mert_sum1, \@expect, "sum(moebius(k) for k=1..n)   small n" );
   is_deeply( \@mert_sum2, \@expect, "sum(moebius(1,n))   small n" );
   is_deeply( \@mertens, \@expect, "mertens(n)   small n" );
+}
+ok(!eval { &mertens() }, "mertens requires an argument");
+ok(!eval { &mertens(1,2,3) }, "mertens accepts at most two arguments");
+ok(!eval { mertens(-1,5) }, "mertens rejects a negative lower bound");
+ok(!eval { mertens(1,-5) }, "mertens rejects a negative upper bound");
+is_deeply([map { &mertens(@$_) }
+             ([0,0], [0,10], [1,10], [5,10], [10,5], [12345,12345],
+              [4294967293,4294967295])],
+          [0, -1, -1, 0, 0, -1, 1],
+          "mertens(lo,hi) edge cases");
+is(mertens(12345,444444), -53, "mertens(lo,hi) larger range");
+is(mertens(995001,1000000), mertens(1000000)-mertens(995000),
+   "mertens(lo,hi) segmented range");
+{
+  my $sum = 0;
+  $sum += $_ for moebius(10000,50000);
+  is($sum, 46, "segmented moebius range");
 }
 while (my($n, $mertens) = each (%big_mertens)) {
   is( mertens($n), $mertens, "mertens($n)" );

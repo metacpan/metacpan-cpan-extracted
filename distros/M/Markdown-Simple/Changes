@@ -1,5 +1,18 @@
 Revision history for Markdown-Simple
 
+0.20    2026-08-07
+        - Add heading_ids => 1: headings get a GitHub-style anchor, as
+          <h2 id="the-slug">. 
+        - Add render_with_toc, returning ($html, \@headings) where each
+          heading is { level, text, id } in document order, carrying the
+          ids actually emitted so a table of contents can link straight
+          into the document. Implies heading_ids for that render.
+        - Add mds_render_html_to_sv_toc as the widest C entry point; the
+          two existing ones are now wrappers passing NULL.
+        - Add a shared C ABI, include/mds_abi.h
+        - Add mds_buf_insert, and src/mds_slug.h.
+        - Add t/53-heading-ids.t, t/54-toc.t, t/55-abi.t.
+
 0.19    2026-08-07
         - Fix a memory leak on every render.
         - Fix a second leak in the block scanner.

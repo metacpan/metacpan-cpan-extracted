@@ -174,7 +174,7 @@ static int final_seg_has_dot(const char *n, size_t len)
     return 0;
 }
 
-static int try_stat(const char *path, Stat_t *st)
+static int try_stat(const char *path, struct stat *st)
 {
     stencil_stat_stats++;
     return stat(path, st) == 0 && S_ISREG(st->st_mode);
@@ -190,7 +190,7 @@ static int try_stat(const char *path, Stat_t *st)
  * store is a no-op. */
 static int resolve_file(const stencil_engine *e, const char *name,
                         size_t nlen, char *out, size_t outsz,
-                        Stat_t *st)
+                        struct stat *st)
 {
     int has_dot = final_seg_has_dot(name, nlen);
     if (name_unsafe(name, nlen))
@@ -226,7 +226,7 @@ static int resolve_file(const stencil_engine *e, const char *name,
 static char *slurp(pTHX_ const char *path, STRLEN *lenp, time_t *mtime,
                    Off_t *fsize, SV **err)
 {
-    Stat_t st;
+    struct stat st;
     char       *buf = NULL;
     SSize_t     got;
     size_t      have = 0;
@@ -470,7 +470,7 @@ static stencil_cache_ent *get_file_ent(pTHX_ stencil_engine *e,
                                        int *notfound, SV **err)
 {
     char               path[STENCIL_PATH_MAX];
-    Stat_t        st;
+    struct stat   st;
     uint64_t           h;
     stencil_cache_ent *ent;
     char              *src;
@@ -665,7 +665,7 @@ static stencil_cache_ent *get_page_ent(pTHX_ stencil_engine *e,
 
     if (!looks_like_source(p, len)) {
         char        path[STENCIL_PATH_MAX];
-        Stat_t st;
+        struct stat st;
         if (resolve_file(e, p, len, path, sizeof path, &st)) {
             int notfound = 0;
             stencil_cache_ent *file =
@@ -690,7 +690,7 @@ static stencil_cache_ent *get_page_ent(pTHX_ stencil_engine *e,
 static int revalidate_ent(pTHX_ stencil_engine *e, stencil_cache_ent *ent,
                           SV **err)
 {
-    Stat_t st;
+    struct stat st;
     time_t      now;
     if (!ent->abs_path || e->stat_ttl < 0)
         return 1;

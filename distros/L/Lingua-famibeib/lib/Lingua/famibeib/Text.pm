@@ -18,7 +18,7 @@ use Lingua::famibeib::Word;
 use Lingua::famibeib::Fragment;
 use Lingua::famibeib::Sentence;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use parent 'Data::Identifier::Interface::Subobjects';
 
@@ -132,7 +132,7 @@ Lingua::famibeib::Text - module to interact with the famibeib texts
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

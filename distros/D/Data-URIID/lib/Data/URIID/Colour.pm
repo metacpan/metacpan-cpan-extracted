@@ -14,7 +14,7 @@ use overload '""' => \&rgb;
 use Carp;
 use Scalar::Util qw(weaken blessed);
 
-our $VERSION = v0.22;
+our $VERSION = v0.23;
 
 use parent qw(Data::URIID::Base Data::Identifier::Interface::Known);
 
@@ -59,11 +59,6 @@ sub new {
     weaken($opts{extractor});
 
     $self = bless \%opts, $pkg;
-
-    if (delete $opts{register}) { # not (yet) part of public API
-        $_registered{$self->ise} //= $opts{rgb};
-        Data::Identifier::Generate->colour($opts{rgb})->register;
-    }
 
     return $self;
 }
@@ -115,6 +110,21 @@ sub displaycolour {
     return $self;
 }
 
+# Private for now.
+sub register {
+    my ($self) = @_;
+    my $rgb = $self->rgb;
+    my $id;
+
+    require Data::Identifier::Generate;
+
+    $id = Data::Identifier::Generate->colour($rgb)->register;
+    $self->{ise} //= $id->ise;
+    $_registered{$self->{ise}} //= $rgb;
+
+    return $self;
+}
+
 1;
 
 __END__
@@ -129,7 +139,7 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.22
+version v0.23
 
 =head1 SYNOPSIS
 
@@ -139,7 +149,9 @@ version v0.22
 
 This module represents a single colour.
 
-This package inherits from L<Data::URIID::Base>, and L<Data::Identifier::Interface::Known> (experimental).
+This package inherits from
+L<Data::URIID::Base> (since v0.10),
+and L<Data::Identifier::Interface::Known> (since v0.17).
 
 =head1 METHODS
 

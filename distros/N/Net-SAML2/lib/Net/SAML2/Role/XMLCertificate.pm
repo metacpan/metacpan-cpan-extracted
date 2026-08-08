@@ -1,7 +1,7 @@
 package Net::SAML2::Role::XMLCertificate;
 use Moose::Role;
 
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.89'; # VERSION
 
 # ABSTRACT: Common behaviour for Certificates in XML
 
@@ -45,7 +45,7 @@ Net::SAML2::Role::XMLCertificate - Common behaviour for Certificates in XML
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head2 B<get_pem_from_keynode>
 

@@ -123,9 +123,8 @@ void lucasuvmod(UV* Uret, UV* Vret, UV P, UV Q, UV k, UV n)
   { UV v = k; b = 0; while (v >>= 1) b++; }
   U = 1;
   V = P;
-  invD = modinverse(D, n);
 
-  if (Q == 1 && invD != 0) { /* Inverting D: 2 mulmods/bit instead of 2-5 */
+  if (Q == 1 && (invD = modinverse(D, n)) != 0) {  /* Only 2 mulmods/bit */
     U = mulsubmod(P,P,2,n);
     while (b--) {
       UV T = mulsubmod(U, V, P, n);
@@ -186,7 +185,7 @@ UV lucasvmod(UV P, UV Q, UV k, UV n)
 {
   UV D, b, U, V, Qk;
 
-  MPUassert(n > 0, "lucas_sequence:  modulus n must be > 0");
+  MPUassert(n > 0, "lucasvmod:  modulus n must be > 0");
   if (n == 1) return 0;
   if (k == 0) return 2 % n;
   if (P >= n) P = P % n;
@@ -250,7 +249,9 @@ UV lucasumod(UV P, UV Q, UV k, UV n)
 
 
 
-#define OVERHALF(v)  ( (UV)((v>=0)?v:-v) > (UVCONST(1) << (BITS_PER_WORD/2-1)) )
+#define OVERHALF(v) \
+  ( ((v) >= 0 ? (UV)(v) : (UV)0 - (UV)(v)) >= \
+    (UVCONST(1) << (BITS_PER_WORD/2-1)) )
 bool lucasuv(IV* U, IV *V, IV P, IV Q, UV k)
 {
   IV Uh, Vl, Vh, Ql, Qh;
@@ -262,6 +263,8 @@ bool lucasuv(IV* U, IV *V, IV P, IV Q, UV k)
     return 1;
   }
 
+  if (OVERHALF(P) || OVERHALF(Q)) return 0;
+
   Uh = 1;  Vl = 2;  Vh = P;  Ql = 1;  Qh = 1;
   s = 0; n = 0;
   { UV v = k; while (!(v & 1)) { v >>= 1; s++; } }
@@ -270,8 +273,10 @@ bool lucasuv(IV* U, IV *V, IV P, IV Q, UV k)
   for (j = n; j > s; j--) {
     if (OVERHALF(Uh) || OVERHALF(Vh) || OVERHALF(Vl) || OVERHALF(Ql) || OVERHALF(Qh)) return 0;
     Ql *= Qh;
+    if (OVERHALF(Ql)) return 0;
     if ( (k >> j) & UVCONST(1) ) {
       Qh = Ql * Q;
+      if (OVERHALF(Qh)) return 0;
       Uh = Uh * Vh;
       Vl = Vh * Vl - P * Ql;
       Vh = Vh * Vh - 2 * Qh;
@@ -284,6 +289,7 @@ bool lucasuv(IV* U, IV *V, IV P, IV Q, UV k)
   }
   if (OVERHALF(Ql) || OVERHALF(Qh)) return 0;
   Ql = Ql * Qh;
+  if (OVERHALF(Ql)) return 0;
   Qh = Ql * Q;
   if (OVERHALF(Uh) || OVERHALF(Vh) || OVERHALF(Vl) || OVERHALF(Ql) || OVERHALF(Qh)) return 0;
   Uh = Uh * Vl - Ql;
@@ -298,4 +304,50 @@ bool lucasuv(IV* U, IV *V, IV P, IV Q, UV k)
   if (U) *U = Uh;
   if (V) *V = Vl;
   return 1;
+}
+#undef OVERHALF
+
+
+/* Returns false on overflow of A or B.
+ * Returns A = F(k), B = F(k+1) */
+static bool _calc_fib(UV* A, UV *B, UV k)
+{
+  UV a, b, c, d;
+  int j;
+
+  if (k >= (BITS_PER_WORD == 64 ? 93 : 47)) return 0;
+  if (k <= 1) { *A=k; *B=1; return 1; }
+
+  a = 1;  b = 1;  /* Start with (F(1), F(2)) = (1, 1), MSB already consumed */
+  j = 0;
+  { UV v = k; while (v >>= 1) j++; }
+
+  for (j--; j >= 0; j--) {
+    /* Double: (F(m), F(m+1)) -> (F(2m), F(2m+1)) */
+    c = a * (2*b - a);                    /* F(2m) */
+    d = a*a + b*b;                        /* F(2m+1) */
+    if ( (k >> j) & 1 ) {                 /* F(2m+2) = F(2m) + F(2m+1) */
+      a=d;  b=c+d;
+    } else {
+      a=c;  b=d;
+    }
+  }
+  *A = a;  *B = b;
+  return 1;
+}
+
+UV fibonacci_number(UV k)
+{
+  UV A, B;
+  if (k <= 1) return k;
+  if (!_calc_fib(&A, &B, k-1)) return 0;
+  return B;
+}
+UV lucas_number(UV k)
+{
+  UV A, B;
+  if (k <= 1) return 2 - k;
+  if (!_calc_fib(&A, &B, k-1)) return 0;
+  if (UV_MAX-A < B || UV_MAX-A < (A+B)) return 0;
+  return A + (A+B);  /* L(k) = F(k-1) + F(k+1) */
 }

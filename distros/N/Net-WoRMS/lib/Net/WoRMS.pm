@@ -5,19 +5,21 @@ package Net::WoRMS;
 # ======================================================================
 # ABSTRACT: Bundles functionalities for the tool query-worms.
 
-=head1 NAME 
+=head1 NAME
 
 Net::WoRMS bundles functionalities for the tool query-worms.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 
-Net::WoRMS bundles WEB access, parsing and fomatting capabilities for
-the tool C<query-worms>. The the modul was built around the the module
-C<SOAP::Lite> and is implemented as a C<Moo> object.
+Net::WoRMS bundles WEB access, parsing and formatting capabilities for
+the tool L<query-worms|https://metacpan.org>, to harvest information
+form the "World Register of Marine Species" --
+L<http://www.marinespecies.org>. The module was built around the module
+L<SOAP::Lite> and is implemented by a L<Moo> object.
 
 =cut
 
@@ -28,7 +30,7 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 
-our $VERSION = 1.4;
+our $VERSION = 1.5;
 
 =head1 MODULE DEPENDENCIES
 
@@ -36,24 +38,24 @@ The module uses the packages:
 
 =over
 
-=item Data::Dumper
+=item L<Data::Dumper>
 
 Debugging purposes
 
-=item Moo
+=item L<Moo>
 
 Object oriented extension for the module
 
-=item MooX::Types::MooseLike::Base
+=item L<MooX::Types::MooseLike::Base>
 
-Minimal type system for  C<Moo>
+Minimal type system for  L<Moo>
 
-=item SOAP::Lite
+=item L<SOAP::Lite>
 
 is used for the WEB access and parsing capabilities to retrieve data
-from L<www.marinespecies.org>.
+from L<http://www.marinespecies.org>.
 
-=item Syntax::Keyword::Match -- to end the switch case madness
+=item L<Syntax::Keyword::Match>, to end the switch-case/while-given madness
 
 =back
 
@@ -82,35 +84,35 @@ The access point to retrieve data via the Simple Object Access Protocol.
 
 =item  $APHIA_NS = 'http://aphia/v1.0'
 
-Namespace and Namespace URI. In the development context these variables
-are considered as a constants. There are methods to change these values
-but never tested.
+Namespace and corresponding URI. In the development context these
+variables are considered as a constants. There are methods to change
+these values but never tested.
 
-=item $FORMAT ='TEXT'
+=item C<$FORMAT ='TEXT'>
 
 FORMAT defines the default output format.
 
-=item @ORDER_SCORE = qw/APHIA_ID ... /
+=item C<@ORDER_SCORE = qw/APHIA_ID ... />
 
 The array holds field names for SQL related output.
 
-=item @ORDER_DOT = qw/APHIA.ID ... /
+=item C<@ORDER_DOT = qw/APHIA.ID ... />
 
 The array holds field names for TEXT and CSV related output.
 
-=item %FORMATS = ( TEXT => 1, SQL  => 2,  CSV  => 3);
+=item C<%FORMATS = ( TEXT => 1, SQL  => 2,  CSV  => 3)>
 
 The format hash mostly for validation.
 
-=item %ORDER_HASH
+=item C<%ORDER_HASH>
 
-Dictionary to sort and translate the retieved field names from the
+Dictionary to sort and translate the retrieved field names from the
 WoRMS database and bring them into a consistent form.
 
-=item @TYPE
+=item C<@TYPE>
 
-Type array corresponding to @ORDER_SCORE/@ORDER_DOT and the %ORDER_HASH
-to handle quotes and NULL values.
+Type array corresponding to C<@ORDER_SCORE/@ORDER_DOT> and the
+C<%ORDER_HASH> to handle quotes and C<NULL> values.
 
 =back
 
@@ -160,19 +162,20 @@ Flag to switch to the debugging mode.
 
 =item Format: STR
 
-Field holds the current output format TEXT|SQL|CSV.
+Field holds the current output format. The tags "TEXT|SQL|CSV" are
+allowed.
 
 =item EndPoint: STR (URI)
 
-The current SOAP endpoint defaults to $END_POINT.
+The current SOAP endpoint defaults to C<$END_POINT>.
 
 =item AphiaNS and AphiaURI: STR (URI)
 
-The current namespace and namespace URI, defaulting to $APHIA_NS.
+The current namespace and corresponding URI, defaulting to $APHIA_NS.
 
 =item Soap
 
-The SOAP access client instance generate by SOAP::Lite.
+The SOAP access client instance generate by L<SOAP::Lite>.
 
 =back
 
@@ -198,11 +201,8 @@ has Soap => (
 
 Initializes the SOAP client.
 
-=item NOTE1:
-
-The function changeEndPoint($uli), changeAphiaURI($uri) and
-changeAphiaNS($uri) as well as changeDebug($flag), changeFormat($format)
-must be used before the initialization phase.
+Note: All C<change*(...)> functions must be used before the
+initialization phase.
 
 =back
 
@@ -285,46 +285,46 @@ sub getFormats($self) { return \%FORMATS; }
 
 =over
 
-=item checkSoap()
+=item C<checkSoap()>
 
-Check if the soap client is running. The function stops the program (die
-...) in case of an error.
+Check if the soap client is running. The function stops the calling
+program C<(die ...)> in case of an error.
 
-=item checkError($soapResponse)
+=item C<checkError($soapResponse)>
 
-Checks the the SOAP query result. The function stops the program in case
-of an communication error.
+Checks the SOAP query result. The function stops the calling program in
+case of an communication error.
 
-=item checkDebug($queryResult)
+=item C<checkDebug($queryResult)>
 
-Prints the query result (dictionary) via Data::Dumper to STDERR if the
-debugging flag is set.
+Prints the query result (dictionary) via L<Data::Dumper> to C<STDERR> if
+the debug flag is set.
 
-=item searchSpeciesID($name, $print)
+=item C<searchSpeciesID($name, $print)>
 
-Function to find a species by a certain name. The if the flag $print is
-set. The result will be written to STDOUT on the given format.
+Function to find a species by a certain name. The if the flag C<$print>
+is set. The result will be written to C<STDOUT> on the given format.
 
-=item getRecordByID($aphiaID)
+=item C<getRecordByID($aphiaID)>
 
 Retrieves a record for a given AphiaID and returns a dictionary or
 'dies' with an error.
 
-=item getBlockChildrenByID($AphiaID, $offs)
+=item C<getBlockChildrenByID($AphiaID, $offs)>
 
-Retrieve a set of taxon records under an given AphiaID for a devine
-offset in the query ensemble .The offset addresses a paging pattern.
+Retrieve a set of taxon records under an given AphiaID for a defined
+offset in the query ensemble. The offset addresses a paging pattern.
 
-=item getChildrenByID($aphiaID)
+=item C<getChildrenByID($aphiaID)>
 
 Retrieves all children under a given AphiaID using the method
-getBlockChildrenID(...) and prints the result to STDOUT using the method
-printRecord(...).
+C<getBlockChildrenID(...)> and prints the result to C<STDOUT> using the
+method C<printRecord(...)>.
 
-=item printRecord($record, $first, $last, $spc)
+=item C<printRecord($record, $first, $last, $spc)>
 
-Prints a record to SDTOUT and handles inentation by $spc as well as
-header and trailing aspects by using the $first and $last flags.
+Prints a record to C<STDOUT> and handles indentation by C<$spc> as well
+as header and trailing aspects by using the flags C<$first> and C<$last>.
 
 =back
 
@@ -558,4 +558,3 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 1;
 
 # EOF ==================================================================
-

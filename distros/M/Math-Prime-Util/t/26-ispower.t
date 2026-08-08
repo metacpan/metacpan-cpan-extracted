@@ -8,7 +8,6 @@ use Math::Prime::Util qw/is_power is_prime_power is_square is_sum_of_squares
 
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
-$use64 = 0 if $use64 && 18446744073709550592 == ~0;
 
 my @pow1  = (0,0,0,0,2,0,0,0,3,2,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,2,0,3,0,0,0,0,5);
 my @ppow1 = (0,0,1,1,2,1,0,1,3,2,0,1,0,1,0,0,4,1,0,1,0,0,0,1,0,2,0,3,0,1,0,1,5);
@@ -73,8 +72,10 @@ plan tests => 0
             + scalar(keys(%bppow))
             + 5  # is_power
             + 2*scalar(keys %powers) + scalar(@negpowers)
+            + 5  # large explicit exponent
             + 13  # tests for 3,5,7 power
-            + 3  # is_square
+            + 15 # is_power/is_prime_power interface
+            + 4  # is_square
             + 7  # is_sum_of_squares
             + 0;
 
@@ -132,6 +133,18 @@ foreach my $e (0 .. $#negpowers) {
   is( is_power(-7 ** $e), $negpowers[$e], "is_power(-7^$e ) = $negpowers[$e]" );
 }
 is( is_power(-1,5), 1, "-1 is a 5th power" );
+
+{
+  my $huge_even = "1000000000000000000000000000000";
+  my $huge_odd  = "1000000000000000000000000000001";
+  my $wide_native_k = "4294967297";
+  is( is_power(16, $wide_native_k), 0, "16 is not a (2^32+1)-th power" );
+  is( is_power(16, $huge_even), 0, "16 is not a huge-th power" );
+  is( is_power(1,  $huge_even), 1, "1 is a huge-th power" );
+  is( is_power(-1, $huge_odd),  1, "-1 is an odd huge-th power" );
+  is( is_power(-1, $huge_even), 0, "-1 is not an even huge-th power" );
+}
+
 {
   my($ispow, $root);
   $ispow = is_power(24, 2, \$root);
@@ -143,6 +156,53 @@ is( is_power(-1,5), 1, "-1 is a 5th power" );
   $ispow = is_power( 36**5 , 0, \$root);
   is( $ispow, 10, "36^5 is a 10th power...");
   is( $root, 6, "...and the root is 6");
+}
+
+{
+  my $root;
+  is_deeply( [is_power(16, \$root), $root],
+             [4, 2], "scalar reference requests largest power root return" );
+  $root = undef;
+  is_deeply( [is_power(-8, \$root), $root],
+             [3, -2], "scalar reference root return works for negative powers" );
+  $root = undef;
+  is_deeply( [is_power(17, \$root), $root],
+             [0, undef], "scalar reference root return leaves non-powers alone" );
+
+  is( is_power(16, undef), 4, "undef exponent requests largest power" );
+  is_deeply( [is_power(16, undef, \$root), $root],
+             [4, 2], "undef exponent supports root return" );
+
+  eval { is_power(16, -2); 1 };
+  like($@, qr/non-negative integer/, "is_power rejects negative exponent");
+
+  eval { is_power(16, 2, undef); 1 };
+  like($@, qr/scalar reference/i, "is_power rejects undef root reference for true result");
+
+  eval { is_power(17, 2, undef); 1 };
+  like($@, qr/scalar reference/i, "is_power rejects undef root reference for false result");
+
+  eval { is_power(16, 2, []); 1 };
+  like($@, qr/scalar reference/i, "is_power rejects array root reference for true result");
+
+  eval { is_power(17, 2, []); 1 };
+  like($@, qr/scalar reference/i, "is_power rejects array root reference for false result");
+
+  my $str = "abc";
+  eval { is_power(16, 2, \substr($str,0,1)); 1 };
+  like($@, qr/scalar reference/i, "is_power rejects lvalue root reference");
+
+  eval { is_power(16, 2, \*STDOUT); 1 };
+  like($@, qr/scalar reference/i, "is_power rejects glob root reference");
+
+  eval { is_prime_power(10, undef); 1 };
+  like($@, qr/scalar reference/i, "is_prime_power rejects undef root reference");
+
+  eval { is_prime_power(10, []); 1 };
+  like($@, qr/scalar reference/i, "is_prime_power rejects array root reference");
+
+  eval { is_prime_power(16, \substr($str,0,1)); 1 };
+  like($@, qr/scalar reference/i, "is_prime_power rejects lvalue root reference");
 }
 
 is( is_power(56129,3), 0, "56129 is not a 3rd power" );
@@ -160,6 +220,18 @@ is_deeply(
 );
 is(is_square(603729), 1, "603729 is a square");
 is(is_square("765413284212226299051111674934086564882382225721"), 1, "is_square(<square of 80-bit prime>) = 1");
+is_deeply(
+  [map { is_square($_) } qw/
+    -340282366920938463426481119284349108225
+     340282366920938463426481119284349108224
+     340282366920938463426481119284349108225
+     340282366920938463426481119284349108226
+     340282366920938463463374607431768211455
+     340282366920938463463374607431768211456
+  /],
+  [0, 0, 1, 0, 0, 1],
+  "is_square at the 128-bit boundary"
+);
 
 ###### is_sum_of_squares
 is_deeply(

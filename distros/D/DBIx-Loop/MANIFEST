@@ -7,6 +7,9 @@ bench/adapters.pl
 bench/overlap.pl
 examples/ioasync.pl
 examples/mojo.pl
+include/dbil_abi.h
+include/dbil_abi_impl.h
+include/dbil_compat.h
 include/dbil_future.h
 include/dbil_hm.h
 include/dbil_loop.h
@@ -39,9 +42,13 @@ t/13-parity-pool.t
 t/14-dbi-compat.t
 t/lib/AdapterConformance.pm
 t/lib/BackendParity.pm
+t/15-fork.t
+t/16-abi.t
+t/17-rowhash.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xs/abi.xs
 xs/future.xs
 xs/loop.xs
 xs/loop_hyperman.xs

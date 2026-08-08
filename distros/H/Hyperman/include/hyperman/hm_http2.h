@@ -52,6 +52,11 @@ static void hm_h2_env_init(pTHX_ hm_h2_sess *s, HV *env) {
     hm_loop *loop = s->conn->loop;
     hm_listener *lst = s->conn->lst;
     AV *ver = newAV();
+    /* the shared header-key table lives in hm_core.h and is filled by
+     * hm_env_init; a process that only ever speaks HTTP/2 has to fill it
+     * from here or hm_hdrk_lookup never engages (it would fall back
+     * safely, just without the point of it) */
+    hm_env_init(aTHX);
     av_push(ver, newSViv(1)); av_push(ver, newSViv(1));
     hv_stores(env, "SCRIPT_NAME",       newSVpvs(""));
     hv_stores(env, "SERVER_PROTOCOL",   newSVpvs("HTTP/2"));
@@ -113,9 +118,20 @@ static void hm_h2_add_header(pTHX_ hm_h2_stream *st,
             else if (ch == '-') ch = '_';
             keybuf[5 + i] = (char)ch;
         }
-        old = hv_fetch(env, keybuf, (I32)(nl + 5), 0);
-        if (old) { sv_catpvs(*old, ", "); sv_catpvn(*old, vl, vlen); }
-        else     hv_store(env, keybuf, (I32)(nl + 5), newSVpvn(vl, vlen), 0);
+        {   /* common headers store through the process-lifetime shared key
+             * SVs (hm_core.h), skipping the per-request hash + HEK churn */
+            SV *ksv = hm_hdrk_lookup(keybuf, nl + 5);
+            if (ksv) {
+                HE *he = hv_fetch_ent(env, ksv, 0, 0);
+                if (he) { sv_catpvs(HeVAL(he), ", ");
+                          sv_catpvn(HeVAL(he), vl, vlen); }
+                else (void)hv_store_ent(env, ksv, newSVpvn(vl, vlen), 0);
+            } else {
+                old = hv_fetch(env, keybuf, (I32)(nl + 5), 0);
+                if (old) { sv_catpvs(*old, ", "); sv_catpvn(*old, vl, vlen); }
+                else hv_store(env, keybuf, (I32)(nl + 5), newSVpvn(vl, vlen), 0);
+            }
+        }
     }
 }
 
@@ -485,6 +501,9 @@ static int hm_h2_cb_begin_headers(nghttp2_session *ses,
     st = (hm_h2_stream *)hm_xcalloc(1, sizeof(hm_h2_stream));
     st->id = frame->hd.stream_id;
     st->env = newHV();
+    /* pre-size past the ~25 fixed keys plus typical request headers, so no
+     * request pays the 8 -> 16 -> 32 bucket splits (see hm_build_env) */
+    hv_ksplit(st->env, 64);
     hm_h2_env_init(aTHX_ s, st->env);
     st->next = s->streams;
     s->streams = st;

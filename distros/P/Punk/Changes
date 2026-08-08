@@ -1,5 +1,35 @@
 Revision history for Punk
 
+0.03    2026-08-07
+        - Punk::Model::DBIx::Loop, a non-blocking model backend. The same
+          six-method contract, the same SQL and the same result shapes as
+          Punk::Model::DBI, but every method returns a Punk::Future and the
+          statement runs on DBIx::Loop over the worker's own event loop.
+        - It runs on DBIx::Loop's C ABI (dbil_abi.h, via ExtUtils::Depends)
+        - Fixed Punk::Model's delegation returning the caller's own
+          arguments alongside the backend's result.
+        - Punk::Model::DBI is ~40% faster per statement: quote_identifier
+          and the fixed-shape get/delete SQL are memoised on the pooled
+          connection instead of rebuilt every call. A get is 2.05us against
+          3.61us. The table is part of the statement cache key - the cache
+          is shared by every model on a dsn.
+        - Add the `markdown` mount/keyword: point it at a nested directory of .md
+          files and get a documentation site. Navigation reflecting the
+          tree, a per-page table of contents from the headings, syntax
+          highlighting, ranked search, and the images sitting alongside
+          the markdown served as static files.
+        - The site is built at boot. The tree is walked, every page is
+          rendered through Markdown::Simple and wrapped by
+          Template::Stencil, the search index is filled, and the finished
+          bytes are frozen. A request is then a hash lookup and a triplet,
+          with no markdown parse, no template render and no Perl frame.
+          `reload => 1` re-renders a page whose source has changed, for
+          the edit loop under `punk dev`.
+        - Refactor the stat / conditional-request / sendfile half of
+          punk_static.h out as ps_serve_file, so the markdown mount serves
+          the assets in its tree through the same code rather than a
+          second implementation that would drift from it.
+
 0.02    2026-08-06
         - $c->ua: an outbound HTTP agent on the context
         - The agent is one per worker, not one per request: it owns a

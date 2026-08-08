@@ -1,7 +1,7 @@
 #
 # This file is part of Dist-Zilla-PluginBundle-RSRCHBOY
 #
-# This software is Copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by Chris Weyl.
+# This software is Copyright (c) 2026 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 package Dist::Zilla::PluginBundle::RSRCHBOY;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.076-1-gc984c68
-$Dist::Zilla::PluginBundle::RSRCHBOY::VERSION = '0.077';
+# git description: 0.077-3-g12514dc
+$Dist::Zilla::PluginBundle::RSRCHBOY::VERSION = '0.078';
 
 # ABSTRACT: Zilla your distributions like RSRCHBOY!
 
@@ -46,19 +46,37 @@ has is_private => (is => 'lazy', isa => 'Bool');
 sub _build_is_app     { $_[0]->payload->{cat_app} || $_[0]->payload->{app} }
 sub _build_is_private { $_[0]->payload->{private}                          }
 
-{
-    my $_builder_for = sub { my $key = shift; sub { shift->payload->{$key} // 1 } };
+has sign => (
+    traits  => ['Bool'],
+    is      => 'lazy',
+    isa     => 'Bool',
+    builder => sub { shift->payload->{sign} // 0 },
+    handles => { "no_sign" => 'not' },
+);
 
-    has $_ => (
-        traits  => ['Bool'],
-        is      => 'lazy',
-        isa     => 'Bool',
-        builder => $_builder_for->($_),
-        handles => { "no_$_" => 'not' },
-    )
-    for qw{ sign tweet github install_on_release }
-    ;
-}
+has tweet => (
+    traits  => ['Bool'],
+    is      => 'lazy',
+    isa     => 'Bool',
+    builder => sub { shift->payload->{tweet} // 0 },
+    handles => { "no_tweet" => 'not' },
+);
+
+has github => (
+    traits  => ['Bool'],
+    is      => 'lazy',
+    isa     => 'Bool',
+    builder => sub { shift->payload->{github} // 1 },
+    handles => { "no_github" => 'not' },
+);
+
+has install_on_release => (
+    traits  => ['Bool'],
+    is      => 'lazy',
+    isa     => 'Bool',
+    builder => sub { shift->payload->{install_on_release} // 1 },
+    handles => { "no_install_on_release" => 'not' },
+);
 
 has is_task => (
     traits  => ['Bool'],
@@ -360,7 +378,7 @@ Dist::Zilla::PluginBundle::RSRCHBOY - Zilla your distributions like RSRCHBOY!
 
 =head1 VERSION
 
-This document describes version 0.077 of Dist::Zilla::PluginBundle::RSRCHBOY - released March 05, 2018 as part of Dist-Zilla-PluginBundle-RSRCHBOY.
+This document describes version 0.078 of Dist::Zilla::PluginBundle::RSRCHBOY - released August 07, 2026 as part of Dist-Zilla-PluginBundle-RSRCHBOY.
 
 =head1 SYNOPSIS
 
@@ -494,7 +512,7 @@ Sergey Romanov <complefor@rambler.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by Chris Weyl.
+This software is Copyright (c) 2026 by Chris Weyl.
 
 This is free software, licensed under:
 

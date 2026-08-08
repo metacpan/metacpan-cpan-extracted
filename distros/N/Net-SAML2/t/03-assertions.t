@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::Lib;
 use Test::Net::SAML2;
+use File::Slurper qw/read_text/;
 use MIME::Base64 qw/decode_base64/;
 
 use Net::SAML2::Protocol::Assertion;
@@ -313,5 +314,90 @@ is($assertion->subjectlocality_dnsname,
 is($assertion->contextclass_authncontextclassref,
     'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
     "AuthnContext AuthnContextClassRef is ok");
+
+my $unsigned_xml = <<UNSIGNED_XML;
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s29e656961dc650775c103fddadba836256cc3eb7d" InResponseTo="N3k95Hg41WCHdwc9mqXynLPhB" Version="2.0" IssueInstant="2010-10-12T14:49:27Z" Destination="http://ct.local/saml/consumer-post">
+  <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://sso.dev.venda.com/opensso</saml:Issuer>
+  <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+    <samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="s241001b6007d1700109a3e3bc4350ae5528ba9824" IssueInstant="2010-10-12T14:49:27Z" Version="2.0">
+    <saml:Issuer>http://sso.dev.venda.com/opensso</saml:Issuer>
+    <saml:Subject>
+      <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="http://sso.dev.venda.com/opensso">nKdwzcgBYGt42xovLuctZ60tyafv</saml:NameID>
+      <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <saml:SubjectConfirmationData InResponseTo="N3k95Hg41WCHdwc9mqXynLPhB" NotOnOrAfter="2010-10-12T14:59:27Z" Recipient="http://ct.local/saml/consumer-post"/>
+      </saml:SubjectConfirmation>
+    </saml:Subject>
+    <saml:Conditions NotBefore="2010-10-12T14:39:27Z" NotOnOrAfter="2010-10-12T14:59:27Z">
+      <saml:AudienceRestriction>
+        <saml:Audience>http://ct.local</saml:Audience>
+      </saml:AudienceRestriction>
+    </saml:Conditions>
+    <saml:AuthnStatement AuthnInstant="2010-10-12T12:58:34Z" SessionIndex="s2b087bdce06dbbf9cd4662af82b8b853d4d285c01">
+      <saml:AuthnContext>
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+      </saml:AuthnContext>
+    </saml:AuthnStatement>
+    <saml:AttributeStatement>
+      <saml:Attribute Name="Phone2">
+        <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">123456</saml:AttributeValue>
+        <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">234567</saml:AttributeValue>
+        <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">345678</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="EmailAddress">
+        <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">demo&#64;sso.venda.com</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>
+UNSIGNED_XML
+
+use Net::SAML2::XML::Sig;
+my $signer = Net::SAML2::XML::Sig->new({
+        key => 't/net-saml2-key.pem',
+        cert => 't/net-saml2-cert.pem',
+        x509 => 1,
+    });
+
+# create a signature
+my $signed = $signer->sign($unsigned_xml);
+
+my $ca_cert_text = read_text('t/net-saml2-cacert.pem');
+
+my $cert_text = read_text('t/net-saml2-cert.pem');
+
+throws_ok(sub { Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml => $signed,
+                );},
+                qr/'cacert' or 'cert_text' is required to verify assertion signatures/,
+                'No trust anchor fails'
+        );
+
+my $cert_text_assertion;
+lives_ok(sub { $cert_text_assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml         => $signed,
+                    cert_text   => $cert_text,
+                );},
+                'cert_text only trust anchor succeeds'
+        );
+
+is($cert_text_assertion->nameid, 'nKdwzcgBYGt42xovLuctZ60tyafv', "Finds the name_id");
+
+throws_ok(sub { Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml         => $signed,
+                    cert_text   => $ca_cert_text,
+                );},
+                qr/XML signature verification failed in new_from_xml/,
+                'CA based cert_text fails to verify'
+        );
+
+lives_ok(sub { Net::SAML2::Protocol::Assertion->new_from_xml(
+                    xml     => $signed,
+                    cacert  => 't/net-saml2-cacert.pem',
+                );},
+                'CA based cacert anchor succeeds verification'
+        );
 
 done_testing;

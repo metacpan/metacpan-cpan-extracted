@@ -9,7 +9,8 @@ use Math::Prime::Util qw/is_powerful powerful_count nth_powerful sumpowerful
 
 my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
-my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
+my $uvbits= Math::Prime::Util::_uvbits;
+my $use64 = $uvbits > 32;
 
 plan tests => 1    # is_powerful
             + 1    # powerful_count
@@ -29,6 +30,15 @@ subtest 'is_powerful', sub {
   ok( vecnone(sub { is_powerful(0,$_) }, 0..10), "is_powerful(0,n) = 0");
   ok( vecall(sub { is_powerful($_,0) }, 1..32), "is_powerful(n,0) = 1 for positive n");
   ok( vecall(sub { is_powerful($_,1) }, 1..32), "is_powerful(n,1) = 1 for positive n");
+  is( is_powerful(2, $uvbits), 0, "is_powerful(2,UVBITS) = 0");
+  is( is_powerful(4, $uvbits+1), 0, "is_powerful(4,UVBITS+1) = 0");
+  if ($use64) {
+    is( is_powerful("2199023255552", 41), 1, "is_powerful(2^41,41) = 1");
+    is( is_powerful("2199023255552", 42), 0, "is_powerful(2^41,42) = 0");
+  } else {
+    is( is_powerful(2097152, 21), 1, "is_powerful(2^21,21) = 1");
+    is( is_powerful(2097152, 22), 0, "is_powerful(2^21,22) = 0");
+  }
 
   for my $k (3 .. 12) {
     my @nums = (227411960,105218838,79368063,58308379,210322300,44982156,67831696,165946352,243118692,128757041,150085583);
@@ -92,10 +102,11 @@ subtest 'powerful_count', sub {
   }
   if ($extra) {
     my @exp = (1, 1, 4, 10, 16, 26, 46, 77, 129, 204, 318, 495, 761, 1172, 1799, 2740, 4128, 6200, 9224, 13671, 20205, 29764);
-    if (!$use64) { pop @exp; pop @exp; pop @exp; pop @exp; }
     my $fin = scalar @exp;
+    $fin = 18 if !$use64 && $fin > 18;
+    $fin = 16 if !$usexs && $fin > 16;
     my @got = map { powerful_count("1".("0"x$_),7) } 1..$fin;
-    is_deeply(\@got, \@exp, "7-powerful_count 10^1, 10^2, ..., 10^$fin");
+    is_deeply(\@got, [@exp[0..$fin-1]], "7-powerful_count 10^1, 10^2, ..., 10^$fin");
   }
 };
 
@@ -104,9 +115,16 @@ subtest 'nth_powerful', sub {
   is(nth_powerful(0), undef, "nth_powerful(0) returns undef");
   is(nth_powerful(100),3136,"3136 is the 100th powerful number");
   SKIP: {
-    skip "Skipping nth_powerful for k>2 in PP", 2 unless $usexs;
+    skip "nth_powerful for k>2 in PP", 2 unless $usexs;
     is(nth_powerful(100,6),43046721,"43046721 is the 100th 6-powerful number");
     is(nth_powerful(12,15),16777216,"16777216 is the 12th 15-powerful number");
+  }
+  SKIP: {
+    skip "64-bit native nth_powerful upper boundary", 2 unless $usexs && $use64;
+    is("".nth_powerful(10999963,3), "14457985928257375288",
+       "nth_powerful handles the first failed k=3 upper estimate");
+    is("".nth_powerful(11938035,3), "18446743506341057373",
+       "nth_powerful reaches the largest native 3-powerful number");
   }
 };
 
@@ -125,26 +143,30 @@ subtest 'sumpowerful', sub {
 
   is( "".sumpowerful("1234567890123456",1), "762078937661941480719405753696", "sumpowerful(1234567890123456,1) = (n*(n+1))/2" );
   SKIP: {
-    skip "Skipping sumpowerful(1234567890,2)",1 unless $extra;
+    skip "sumpowerful(1234567890,2)",1 unless $extra;
     is( "".sumpowerful("1234567890",2), "30929622318668", "sumpowerful(1234567890,2)" );
   }
   SKIP: {
-    skip "Skipping sumpowerful(1234567890123456,2)",1 unless $extra && $use64;
+    skip "sumpowerful(1234567890123456,2)",1 unless $extra && $use64;
     is( "".sumpowerful("1234567890123456",2), "31374760178828970927228", "sumpowerful(1234567890123456,2)" );
   }
 
   SKIP: {
-    skip "Skip sumpowerful 2147516495,k) for k=1..33", 1 unless $extra || ($usexs && $use64);
+    skip "sumpowerful(2147516495,k) for k=1..33", 1 unless $extra || $usexs;
     is_deeply( [map { "".sumpowerful(2147516495,$_) } 1..33],
                [qw/2305913549222300760 71073461134258 2727672189281 542650082891 192623487712 91172645015 57240053947 37822907405 26438551880 19617088953 13157238054 7502933431 7258257269 6035951629 6031152276 6016770601 5973658344 5844387109 5456704476 4293918721 4292870145 4290772993 4286578689 4278190081 4261412865 4227858433 4160749569 4026531841 3758096385 3221225473 2147483649 1 1/],
               "sumpowerful(2147516495,k) for 1 <= k <= 33" );
   }
 
   SKIP: {
-     skip "Skip sumpowerful(1234567890123456,k) for k=3..32", 1 unless $extra || ($usexs && $use64);
-    is_deeply( [map { "".sumpowerful("1234567890123456",$_) } 3..32],
-               [qw/146043398655792412070 10996713169431264132 2301916287502408997 793628382930863389 358072984365696929 184880296279236241 108043541271736385 72290570743670714 53667950830214223 40306694671659861 28363055737738077 22793155018675414 18357777378614938 13885855208881771 11386819588192744 8343600537655001 5597666622659511 3750512753514143 3655141834040541 3178294213387061 3178262828133148 3178168676565713 3177886230252016 3177038908088141 3174496975150948 3166871243448233 3143994182557816 3075363268322021 2869471062485548 2251795518717953/],
-               "sumpowerful(1234567890123456,k) for 3 <= k <= 32" );
+    skip "sumpowerful(1234567890123456,k) for k=3..32", 1 unless $extra;
+    if (!$usexs && !$use64) {
+      is("".sumpowerful("1234567890123456",7), "358072984365696929", "sumpowerful(1234567890123456,7)");
+    } else {
+      is_deeply([map { "".sumpowerful("1234567890123456",$_) } 3..32],
+                [qw/146043398655792412070 10996713169431264132 2301916287502408997 793628382930863389 358072984365696929 184880296279236241 108043541271736385 72290570743670714 53667950830214223 40306694671659861 28363055737738077 22793155018675414 18357777378614938 13885855208881771 11386819588192744 8343600537655001 5597666622659511 3750512753514143 3655141834040541 3178294213387061 3178262828133148 3178168676565713 3177886230252016 3177038908088141 3174496975150948 3166871243448233 3143994182557816 3075363268322021 2869471062485548 2251795518717953/],
+                "sumpowerful(1234567890123456,k) for 3 <= k <= 32");
+    }
   }
 };
 
@@ -162,6 +184,18 @@ subtest 'powerful_numbers', sub {
   is_deeply( [map{"$_"}@{powerful_numbers(1000000000000, 1010000000000,5)}],
              [qw/1000000000000 1004193907488 1007769600000 1008394404608/],
              "powerful_numbers(1e12,1e12+1e10,5)");
+  is_deeply( [map{"$_"} @{powerful_numbers(~0, ~0, 1)}], [~0],
+             "powerful_numbers(UV_MAX,UV_MAX,1)");
+  my $largek = $use64 ? "9223372036854775809" : "2147483649";
+  is_deeply( powerful_numbers(1,121,$largek), [1],
+             "powerful_numbers handles very large native k");
+  is_deeply( powerful_numbers(2,121,$largek), [],
+             "large-k powerful_numbers range excludes 1");
+  is_deeply( powerful_numbers(0,3,1), [1,2,3],
+             "powerful_numbers ignores 0 for k <= 1");
+  ok(!eval { powerful_numbers(1,121,-1); 1 },
+     "powerful_numbers rejects negative k");
+  like($@, qr/non-negative integer/, "negative k error");
 };
 
 

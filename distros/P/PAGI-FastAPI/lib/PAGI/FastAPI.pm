@@ -4,12 +4,14 @@ use v5.36;
 use experimental qw/try for_list/;
 use version;
 
-our $VERSION   = qv('v0.0.5');
+our $VERSION   = qv('v0.0.6');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
 use JSON::PP qw(encode_json decode_json);
 use Scalar::Util qw(blessed);
+use PAGI::App::URLMap;
+use PAGI::FastAPI::WebSocket;
 use PAGI::FastAPI::Context;
 use PAGI::FastAPI::Depends qw(Depends);
 
@@ -21,7 +23,7 @@ PAGI::FastAPI - Asynchronous, Type-Safe Micro-Framework with Dependency Injectio
 
 =head1 VERSION
 
-Version v0.0.5
+Version v0.0.6
 
 =head1 SYNOPSIS
 
@@ -131,20 +133,28 @@ Version v0.0.5
         }
     );
 
-    # 9. Authentication via the companion PAGI::FastAPI::Security distribution
-    #    (extraction only, you supply the verification logic)
+    # 9. Non-blocking WebSocket Endpoint
+    $app->websocket('/ws', handler => async sub ($ws, $deps) {
+        await $ws->accept;
+        while (my $msg = await $ws->receive_text) {
+            await $ws->send_text("Echo: $msg");
+        }
+    });
+
+    # 10. Authentication via the companion PAGI::FastAPI::Security distribution
+    #     (extraction only, you supply the verification logic)
     #
-    #    use PAGI::FastAPI::Security::HTTPBearer;
-    #    my $bearer = PAGI::FastAPI::Security::HTTPBearer->new;
-    #    $app->get('/secure',
-    #        dependencies => [ $bearer->depends(key => 'token') ],
-    #        handler      => async sub ($c) {
-    #            return { token => $c->stash->{token} };
-    #        }
-    #    );
+    #     use PAGI::FastAPI::Security::HTTPBearer;
+    #     my $bearer = PAGI::FastAPI::Security::HTTPBearer->new;
+    #     $app->get('/secure',
+    #         dependencies => [ $bearer->depends(key => 'token') ],
+    #         handler      => async sub ($c) {
+    #             return { token => $c->stash->{token} };
+    #         }
+    #     );
     #
-    #    See L<PAGI::FastAPI::Security> for HTTP Basic, API Key
-    #    (header/query/cookie), and OAuth2 password-bearer schemes.
+    #     See L<PAGI::FastAPI::Security> for HTTP Basic, API Key
+    #     (header/query/cookie), and OAuth2 password-bearer schemes.
 
     my $pagi_app = $app->to_app;
 
@@ -163,6 +173,10 @@ documentation generation.
 =over 4
 
 =item * B<PAGI Protocol Engine:> Asynchronous and non-blocking natively, built for scalable web applications.
+
+=item * B<Sub-App & Static Mounting:> Mount external PAGI applications, file drivers, or sub-routers using L</mount>.
+
+=item * B<WebSocket Support:> Full non-blocking WebSocket handshake and frame streaming via L<PAGI::FastAPI::WebSocket>.
 
 =item * B<Automatic Type Validation:> Request query parameters and JSON payloads are checked against L<Type::Tiny> constraints before reaching route handlers.
 
@@ -225,6 +239,7 @@ sub new ($class, %args) {
         version        => $args{version} // $VERSION,
         routes         => [],
         middlewares    => [],
+        mounts         => [],
         event_handlers => {
             startup  => [],
             shutdown => [],
@@ -238,6 +253,28 @@ sub new ($class, %args) {
             paths => {},
         }
     }, $class;
+}
+
+=head2 C<mount($path_prefix, $pagi_app)>
+
+    $app->mount('/css', PAGI::App::File->new(root => './public/css')->to_app);
+    $app->mount('/api/v2', $v2_sub_app);
+
+Mounts a standalone PAGI application closure or sub-application under the given path prefix.
+Under the hood, C<to_app()> composes mounted applications using L<PAGI::App::URLMap>.
+
+=cut
+
+sub mount ($self, $path, $app) {
+    $path = "/$path" unless $path =~ m{^/};
+    $path =~ s{/$}{} unless $path eq '/';
+
+    push @{ $self->{mounts} }, {
+        prefix => $path,
+        app    => $app,
+    };
+
+    return $self;
 }
 
 sub get    ($self, $path, %opts) { $self->_register_route('GET',    $path, \%opts) }
@@ -278,6 +315,12 @@ Registers an asynchronous middleware with the application. Signature:
         return $res;
     });
 
+=cut
+
+sub add_middleware ($self, $code_ref) {
+    push @{$self->{middlewares}}, $code_ref;
+}
+
 =head2 C<add_cors(%options)>
 
 Enables Cross-Origin Resource Sharing (CORS) with automatic handling of
@@ -298,10 +341,6 @@ C<OPTIONS> preflight requests. Options include:
 =back
 
 =cut
-
-sub add_middleware ($self, $code_ref) {
-    push @{$self->{middlewares}}, $code_ref;
-}
 
 sub add_cors ($self, %opts) {
     my $allow_origins     = $opts{allow_origins}     // ['*'];
@@ -336,21 +375,76 @@ sub add_cors ($self, %opts) {
     });
 }
 
+=head2 C<websocket($path, %options)>
+
+    $app->websocket('/ws/{room}',
+        handler => async sub ($ws, $deps) {
+            await $ws->accept;
+            while (defined(my $msg = await $ws->receive_text)) {
+                await $ws->send_text("Room $ws->path_params->{room}: $msg");
+            }
+        }
+    );
+
+Registers a WebSocket endpoint at C<$path>. The C<handler> receives a L<PAGI::FastAPI::WebSocket> instance
+and an optional HashRef of resolved dependencies.
+
+=cut
+
+sub websocket {
+    my ($self, $path, %args) = @_;
+
+    my $handler = delete $args{handler};
+    my $deps    = delete $args{dependencies} // [];
+
+    die "Route 'WEBSOCKET $path' requires a 'handler' async coderef"
+        unless ref $handler eq 'CODE';
+
+    # Package arguments into a single options HashRef
+    my %opts = (
+        dependencies => $deps,
+        handler      => $handler,
+        %args,
+    );
+
+    # Pass 4 positional arguments to match _register_route ($self, $method, $path, $opts)
+    $self->_register_route('WEBSOCKET', $path, \%opts);
+
+    return $self;
+}
+
 =head2 C<to_app()>
 
     my $pagi_closure = $app->to_app;
 
 Generates and returns an asynchronous code reference conforming to the PAGI
-protocol specification: C<sub ($scope, $receive, $send)>. This closure can
-be served directly via C<pagi-server>.
+protocol specification. If sub-applications were registered via L</mount>,
+C<to_app()> automatically wraps the routes using L<PAGI::App::URLMap>.
 
 =cut
 
 sub to_app ($self) {
-    return async sub ($scope, $receive, $send) {
+    my $fastapi_app = $self->_build_pagi_app;
 
+    return $fastapi_app unless @{ $self->{mounts} };
+
+    my $urlmap = PAGI::App::URLMap->new;
+
+    for my $m (@{ $self->{mounts} }) {
+        $urlmap->mount($m->{prefix} => $m->{app});
+    }
+
+    $urlmap->mount('/' => $fastapi_app);
+
+    return $urlmap->to_app;
+}
+
+sub _build_pagi_app ($self) {
+    return async sub ($scope, $receive, $send) {
+        if ($scope->{type} eq 'websocket') {
+            return await $self->_handle_websocket($scope, $receive, $send);
         # Handle PAGI Lifespan Protocol (startup & shutdown)
-        if ($scope->{type} eq 'lifespan') {
+        } elsif ($scope->{type} eq 'lifespan') {
             while (1) {
                 my $event = await $receive->();
                 if ($event->{type} eq 'lifespan.startup') {
@@ -581,6 +675,89 @@ sub _uri_unescape ($str) {
     return $str;
 }
 
+async sub _handle_websocket ($self, $scope, $receive, $send) {
+    my $raw_path = $scope->{path} // '/';
+    my ($route, $path_params) = $self->_match_route('WEBSOCKET', $raw_path);
+
+    # Route Not Found -> Reject with 404 close code before accepting handshake
+    unless ($route) {
+        my $ws = PAGI::FastAPI::WebSocket->new(
+            scope        => $scope,
+            receive      => $receive,
+            send         => $send,
+            path_params  => {},
+            query_params => {},
+        );
+        await $ws->close(4004, "Not Found");
+        return;
+    }
+
+    my $query_params = $self->_parse_query_string($scope->{query_string} // '');
+
+    my $ws = PAGI::FastAPI::WebSocket->new(
+        scope        => $scope,
+        receive      => $receive,
+        send         => $send,
+        path_params  => $path_params  // {},
+        query_params => $query_params // {},
+    );
+
+    # Resolve dependencies only if defined and non-empty
+    my $resolved_deps = {};
+    if ($route->{dependencies} && @{$route->{dependencies}}) {
+        try {
+            # Execute route dependencies
+            for my $dep (@{$route->{dependencies}}) {
+                my $res = await $dep->{code}->($ws);
+                if (defined $dep->{key}) {
+                    $resolved_deps->{$dep->{key}} = $res;
+                }
+            }
+        }
+        catch ($err) {
+            await $ws->close(1008, "Unauthorized: $err");
+            return;
+        }
+    }
+
+    # Execute endpoint handler
+    my $handler = $route->{handler};
+    try {
+        await $handler->($ws, $resolved_deps);
+    }
+    catch ($err) {
+        if (!$ws->is_closed) {
+            await $ws->close(1011, "Internal Server Error");
+        }
+    }
+}
+
+sub _match_route ($self, $method, $path) {
+    for my $route (@{$self->{routes}}) {
+        next unless $route->{method} eq $method;
+
+        if (my @captures = ($path =~ $route->{regex})) {
+            my %path_params;
+            for my $i (0 .. $#{$route->{path_params}}) {
+                $path_params{$route->{path_params}[$i]} = _uri_unescape($captures[$i]);
+            }
+            return ($route, \%path_params);
+        }
+    }
+    return (undef, {});
+}
+
+sub _parse_query_string ($self, $query_string) {
+    my %query_params;
+    if (defined $query_string && length $query_string) {
+        for my $pair (split '&', $query_string) {
+            my ($k, $v) = split '=', $pair, 2;
+            $query_params{_uri_unescape($k)} = _uri_unescape($v // '');
+        }
+    }
+    return \%query_params;
+}
+
 sub _register_route ($self, $method, $path, $opts) {
     my $query_types = $opts->{query}   // {};
     my $body_spec   = $opts->{body};
@@ -628,51 +805,56 @@ sub _register_route ($self, $method, $path, $opts) {
     $regex_path .= quotemeta(substr($path, $last_pos));
     $regex_path = "^$regex_path\$";
 
-    my @parameters;
-    for my $param (@path_params) {
-        push @parameters, { name => $param, in => 'path', required => \1, schema => { type => 'string' } };
-    }
-    for my ($param, $type) (%$query_types) {
-        my $t_name = eval { $type->name } // '';
-        push @parameters, {
-            name     => $param,
-            in       => 'query',
-            required => \1,
-            schema   => { type => ($t_name eq 'Int' ? 'integer' : 'string') }
-        };
-    }
-
-    my $route_doc = {
-        summary    => "$method $path",
-        parameters => \@parameters,
-        responses  => {
-            200 => { description => "Successful Response" },
-            422 => { description => "Validation Error" },
+    # WebSocket routes have no place in an OpenAPI 3.1 document (valid path
+    # operations are get/put/post/delete/options/head/patch/trace), so skip
+    # the schema bookkeeping below entirely for them.
+    if ($method ne 'WEBSOCKET') {
+        my @parameters;
+        for my $param (@path_params) {
+            push @parameters, { name => $param, in => 'path', required => \1, schema => { type => 'string' } };
         }
-    };
+        for my ($param, $type) (%$query_types) {
+            my $t_name = eval { $type->name } // '';
+            push @parameters, {
+                name     => $param,
+                in       => 'query',
+                required => \1,
+                schema   => { type => ($t_name eq 'Int' ? 'integer' : 'string') }
+            };
+        }
 
-    if ($body_spec) {
-        my $properties = {};
-        if (ref $body_spec eq 'HASH') {
-            for my ($k, $t) (%$body_spec) {
-                my $t_name = eval { $t->name } // '';
-                $properties->{$k} = { type => ($t_name eq 'Int' ? 'integer' : 'string') };
+        my $route_doc = {
+            summary    => "$method $path",
+            parameters => \@parameters,
+            responses  => {
+                200 => { description => "Successful Response" },
+                422 => { description => "Validation Error" },
             }
-        }
-        $route_doc->{requestBody} = {
-            required => \1,
-            content  => {
-                'application/json' => {
-                    schema => {
-                        type       => 'object',
-                        properties => $properties,
-                    }
+        };
+
+        if ($body_spec) {
+            my $properties = {};
+            if (ref $body_spec eq 'HASH') {
+                for my ($k, $t) (%$body_spec) {
+                    my $t_name = eval { $t->name } // '';
+                    $properties->{$k} = { type => ($t_name eq 'Int' ? 'integer' : 'string') };
                 }
             }
-        };
-    }
+            $route_doc->{requestBody} = {
+                required => \1,
+                content  => {
+                    'application/json' => {
+                        schema => {
+                            type       => 'object',
+                            properties => $properties,
+                        }
+                    }
+                }
+            };
+        }
 
-    $self->{openapi}{paths}{$path}{lc($method)} = $route_doc;
+        $self->{openapi}{paths}{$path}{lc($method)} = $route_doc;
+    }
 
     push @{$self->{routes}}, {
         method       => $method,
@@ -822,6 +1004,10 @@ the full documentation and an end-to-end JWT-verification example.
 =over 4
 
 =item * L<PAGI> - Perl Asynchronous Gateway Interface specification.
+
+=item * L<PAGI::App::URLMap> - Routing middleware for prefix-matching PAGI applications.
+
+=item * L<PAGI::FastAPI::WebSocket> - Asynchronous WebSocket object for PAGI::FastAPI.
 
 =item * L<PAGI::FastAPI::Context> - Context object passed to route handlers.
 

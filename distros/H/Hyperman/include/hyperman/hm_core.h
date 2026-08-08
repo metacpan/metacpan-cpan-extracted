@@ -95,6 +95,7 @@ typedef struct {
 typedef struct { int fd; UV id; } hm_again;
 
 struct hm_loop {
+    pid_t       pid;                /* the process that created this loop */
     hm_backend *be;
     hm_conn   **conns;              /* [HM_MAXFD] */
     hm_iow     *io_r, *io_w;        /* [HM_MAXFD] app io watchers */
@@ -627,6 +628,52 @@ static SV *hm_env_zero, *hm_env_one;   /* read-only 0/1 flag values      */
 static SV *hm_env_version;             /* read-only [1,1]                */
 static SV *hm_env_errors;              /* read-only \*STDERR             */
 
+/* The HTTP_* keys for the headers real traffic actually sends, as shared
+ * key SVs made once. Storing with a plain char* key makes hv_common hash
+ * the string and cut a fresh HEK against the shared string table on every
+ * request, then release it again at env teardown; storing through a shared
+ * SV reuses the precomputed hash and the one HEK for the process's life.
+ * A browser request carries a dozen of these, so it pays per header, per
+ * request. Anything not in this table just takes the char* path it always
+ * took. Grouped by key length so the lookup is a couple of memcmps. */
+static const char *const hm_hdrk_name[] = {
+    "HTTP_TE",                                                     /*  7 */
+    "HTTP_DNT",                                                    /*  8 */
+    "HTTP_HOST",                                                   /*  9 */
+    "HTTP_RANGE",                                                  /* 10 */
+    "HTTP_ACCEPT", "HTTP_COOKIE", "HTTP_ORIGIN", "HTTP_PRAGMA",    /* 11 */
+    "HTTP_REFERER", "HTTP_UPGRADE",                                /* 12 */
+    "HTTP_USER_AGENT", "HTTP_CONNECTION",                          /* 15 */
+    "HTTP_AUTHORIZATION", "HTTP_CACHE_CONTROL",
+    "HTTP_IF_NONE_MATCH",                                          /* 18 */
+    "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE",
+    "HTTP_X_FORWARDED_FOR",                                        /* 20 */
+    "HTTP_X_REQUESTED_WITH",                                       /* 21 */
+    "HTTP_IF_MODIFIED_SINCE", "HTTP_X_FORWARDED_PROTO",
+    "HTTP_SEC_WEBSOCKET_KEY",                                      /* 22 */
+    "HTTP_SEC_WEBSOCKET_VERSION",                                  /* 26 */
+    NULL
+};
+#define HM_HDRK_MAXLEN 26
+#define HM_HDRK_PERLEN 5
+static SV *hm_hdrk_sv[sizeof(hm_hdrk_name) / sizeof(char *)];
+/* index+1 of each candidate, per key length; 0 ends the row */
+static unsigned char hm_hdrk_by_len[HM_HDRK_MAXLEN + 1][HM_HDRK_PERLEN];
+
+/* the cached key SV for keybuf/klen, or NULL for the char* fallback */
+static SV *hm_hdrk_lookup(const char *keybuf, size_t klen) {
+    const unsigned char *row;
+    int i;
+    if (klen > HM_HDRK_MAXLEN) return NULL;
+    row = hm_hdrk_by_len[klen];
+    for (i = 0; i < HM_HDRK_PERLEN && row[i]; i++) {
+        int idx = row[i] - 1;
+        if (memcmp(keybuf, hm_hdrk_name[idx], klen) == 0)
+            return hm_hdrk_sv[idx];
+    }
+    return NULL;
+}
+
 static void hm_env_init(pTHX) {
     int i;
     AV *ver;
@@ -641,6 +688,18 @@ static void hm_env_init(pTHX) {
     SvREADONLY_on((SV *)ver);
     hm_env_version = newRV_noinc((SV *)ver); SvREADONLY_on(hm_env_version);
     hm_env_errors  = newRV_inc((SV *)PL_stderrgv); SvREADONLY_on(hm_env_errors);
+
+    for (i = 0; hm_hdrk_name[i]; i++) {
+        size_t l = strlen(hm_hdrk_name[i]);
+        int j;
+        hm_hdrk_sv[i] = newSVpvn_share(hm_hdrk_name[i], (I32)l, 0);
+        for (j = 0; j < HM_HDRK_PERLEN; j++) {
+            if (!hm_hdrk_by_len[l][j]) {
+                hm_hdrk_by_len[l][j] = (unsigned char)(i + 1);
+                break;
+            }
+        }
+    }
 }
 
 #define hm_env_store(env, k, val) \
@@ -654,6 +713,14 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
                         const hm_hline *idx, int nlines) {
     HV *env = newHV();
     hm_env_init(aTHX);
+
+    /* A fresh HV starts with 8 buckets and this function stores 25-odd keys
+     * before the app adds its own, so left alone every request pays two
+     * bucket-split reallocs (8 -> 16 -> 32) plus the rehash walk each one
+     * does. Ask for the final size up front. 64 rather than 32: a typical
+     * browser request carries a dozen HTTP_* headers on top of ours, and
+     * middleware adds more. */
+    hv_ksplit(env, 64);
 
     /* request line */
     char *line_end = (char *)memchr(head, '\r', headlen);
@@ -762,12 +829,25 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
             }
             {
                 /* repeated header: join values with ", " (PSGI) */
-                SV **old = hv_fetch(env, keybuf, (I32)(nk + 5), 0);
-                if (old) {
-                    sv_catpvs(*old, ", ");
-                    sv_catpvn(*old, vp, nv);
+                SV *ksv = hm_hdrk_lookup(keybuf, nk + 5);
+                if (ksv) {
+                    /* a common header: the shared key SV carries its hash
+                     * and its HEK, so no hashing and no HEK churn */
+                    HE *he = hv_fetch_ent(env, ksv, 0, 0);
+                    if (he) {
+                        sv_catpvs(HeVAL(he), ", ");
+                        sv_catpvn(HeVAL(he), vp, nv);
+                    } else {
+                        (void)hv_store_ent(env, ksv, newSVpvn(vp, nv), 0);
+                    }
                 } else {
-                    hv_store(env, keybuf, (I32)(nk + 5), newSVpvn(vp, nv), 0);
+                    SV **old = hv_fetch(env, keybuf, (I32)(nk + 5), 0);
+                    if (old) {
+                        sv_catpvs(*old, ", ");
+                        sv_catpvn(*old, vp, nv);
+                    } else {
+                        hv_store(env, keybuf, (I32)(nk + 5), newSVpvn(vp, nv), 0);
+                    }
                 }
             }
             if (nk == 10 && strncasecmp(p, "Connection", 10) == 0) {
@@ -2023,6 +2103,7 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
         backend_name = getenv("HYPERMAN_BACKEND");
     loop->be = hm_backend_create(backend_name);
     if (!loop->be) { free(loop); return NULL; }
+    loop->pid = getpid();
     loop->conns = (hm_conn **)hm_xcalloc(HM_MAXFD, sizeof(hm_conn *));
     loop->io_r  = (hm_iow *)hm_xcalloc(HM_MAXFD, sizeof(hm_iow));
     loop->io_w  = (hm_iow *)hm_xcalloc(HM_MAXFD, sizeof(hm_iow));
@@ -2037,13 +2118,30 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
     return loop;
 }
 
+/* Free a loop.
+ *
+ * A loop belongs to the process that created it, and every DESCRIPTOR in it -
+ * the backend's own (kqueue/epoll), the connection sockets, the log file -
+ * belongs to that process too. A loop inherited across a fork is therefore
+ * freed WITHOUT closing anything: the memory is ours to release, the fds are
+ * not.
+ *
+ * Closing them is not merely untidy, it is destructive. kqueue descriptors do
+ * not survive fork(2) at all - the kernel invalidates the child's copy, so the
+ * number is free, and the very next kqueue() in the child is handed it back.
+ * Closing the inherited loop then shuts the CHILD'S OWN queue and nothing it
+ * watches ever fires again. The epoll and connection fds are less spectacular
+ * but no better: they are the parent's, still live, and closing our duplicates
+ * frees numbers that the child immediately reuses. */
 static void hm_loop_free(pTHX_ hm_loop *loop) {
     int i;
+    int owned;
     if (!loop) return;
+    owned = (loop->pid == getpid());
     for (i = 0; i < HM_MAXFD; i++) {
         if (loop->conns[i]) {
             hm_conn *c = loop->conns[i];
-            close(c->fd);
+            if (owned) close(c->fd);
             if (c->h2)     hm_h2_free(aTHX_ c->h2);
             if (c->io_sv)  SvREFCNT_dec(c->io_sv);
             if (c->resp_f) SvREFCNT_dec(c->resp_f);
@@ -2068,7 +2166,7 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
         if (c->rbuf) free(c->rbuf);
         free(c);
     }
-    if (loop->log_fd >= 0) { hm_log_flush(loop); close(loop->log_fd); }
+    if (loop->log_fd >= 0 && owned) { hm_log_flush(loop); close(loop->log_fd); }
     if (loop->log_buf) free(loop->log_buf);
     for (i = 0; i < loop->nlisteners; i++)
         if (loop->listeners[i].host) free(loop->listeners[i].host);
@@ -2081,6 +2179,9 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
     if (loop->hidx) free(loop->hidx);
     if (loop->sweep_tw) free(loop->sweep_tw);
     if (loop->hardstop_tw) free(loop->hardstop_tw);
+    /* destroy() releases the backend's memory either way; `foreign` is what
+     * stops it closing descriptors that are not ours - see the note above */
+    if (!owned) loop->be->foreign = 1;
     loop->be->destroy(loop->be);
     free(loop->conns);
     free(loop->io_r);

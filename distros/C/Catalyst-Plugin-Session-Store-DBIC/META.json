@@ -1,33 +1,33 @@
 {
    "abstract" : "Store your sessions via DBIx::Class",
    "author" : [
-      "Daniel Westermann-Clark <danieltwc@cpan.org>"
+      "Andrew Rodland <andrew@cleverdomain.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.131560",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Catalyst-Plugin-Session-Store-DBIC",
    "no_index" : {
       "directory" : [
-         "t",
-         "inc"
+         "t"
       ]
    },
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+      "develop" : {
+         "recommends" : {
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
          }
       },
       "runtime" : {
@@ -38,21 +38,42 @@
             "Catalyst::Plugin::Session::Store::Delegate" : "0.05",
             "Class::Accessor::Fast" : "0",
             "DBIx::Class" : "0.07000",
-            "FindBin" : "0",
             "MIME::Base64" : "0",
             "MRO::Compat" : "0",
             "Scalar::Util" : "0",
-            "Storable" : "0",
+            "Storable" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
             "Test::More" : "0",
             "Test::Warn" : "0.20"
+         },
+         "suggests" : {
+            "Catalyst::Model::DBIC::Schema" : "0",
+            "Catalyst::Plugin::Session::State::Cookie" : "0",
+            "Test::WWW::Mechanize::Catalyst" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Session-Store-DBIC"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
-         "url" : "http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Plugin-Session-Store-DBIC/"
+         "type" : "git",
+         "url" : "https://github.com/perl-catalyst/Catalyst-Plugin-Session-Store-DBIC.git",
+         "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Session-Store-DBIC"
       }
    },
-   "version" : "0.14"
+   "version" : "0.15",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

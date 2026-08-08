@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Group::Schema::Result::UserGroup;
-$Mojolicious::Plugin::Fondation::Group::Schema::Result::UserGroup::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Group::Schema::Result::UserGroup::VERSION = '0.03';
 # ABSTRACT: DBIx::Class Result class for user_group pivot table
 
 use strict;
@@ -41,7 +41,7 @@ Mojolicious::Plugin::Fondation::Group::Schema::Result::UserGroup - DBIx::Class R
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

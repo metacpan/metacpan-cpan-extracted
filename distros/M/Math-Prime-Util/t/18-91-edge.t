@@ -4,10 +4,12 @@ use warnings;
 
 use Test::More;
 use Math::Prime::Util qw/
-  addint subint mulint negint absint cmpint
+  addint subint add1int sub1int mulint negint absint cmpint
   divint modint cdivint divrem fdivrem cdivrem tdivrem
   powint
   addmod submod mulmod powmod divmod muladdmod mulsubmod
+  kronecker gcdext falling_factorial rising_factorial
+  lucasu lucasv lucas_sequence
 /;
 
 my $use64 = (~0 > 4294967295);
@@ -18,12 +20,14 @@ my $ivmin = $use64 ? "-9223372036854775808" : "-2147483648";
 # just past UV boundary
 my $uvmax1 = $use64 ? "18446744073709551616" : "4294967296";
 my $ivmax1 = $use64 ? "9223372036854775808" : "2147483648";
+my $ivmin1 = $use64 ? "-9223372036854775809" : "-2147483649";
 
 plan tests =>
             + 1                # addint associativity
             + 1                # subint(IV_MIN, 1) crosses to bigint
             + 1                # addint(UV_MAX, 1) crosses to bigint
             + 1                # addint(IV_MIN, -1) crosses to bigint
+            + 1                # add1int/sub1int boundary crossings
             + 1                # subint(0, UV_MAX) = -UV_MAX
             + 1                # subint(IV_MIN, IV_MAX) extreme spread
             + 1                # mulint near-boundary products
@@ -39,6 +43,12 @@ plan tests =>
             + 1                # divint exact division
             + 1                # divint small / large
             + 1                # divrem invariant on boundary values
+            + 1                # absint at IV_MIN
+            + 1                # kronecker at IV_MIN
+            + 1                # negative IV_MIN exponent
+            + 1                # signed factorials at IV_MIN
+            + 1                # Lucas functions at IV_MIN
+            + 1                # gcdext at IV_MIN
             + 1                # modops: addmod algebraic identity
             + 1                # modops: mulmod algebraic identity
             + 1                # modops: powmod(a,0,m) == 1 mod m
@@ -75,6 +85,14 @@ is("".addint($uvmax, 1), $uvmax1, "addint(UV_MAX, 1) crosses into bigint");
   my $expect_below_ivmin = subint($ivmin, 1);
   # IV_MIN - 1 should be one less
   is("".addint($expect_below_ivmin, 1), $ivmin, "addint(IV_MIN-1, 1) returns to IV_MIN");
+}
+
+{
+  my $below_ivmin = sub1int($ivmin);
+  my $above_uvmax = add1int($uvmax);
+  is_deeply(["$below_ivmin", 0+!!ref($below_ivmin), "$above_uvmax", 0+!!ref($above_uvmax)],
+            [$ivmin1, 1, $uvmax1, 1],
+            "add1int/sub1int cross native boundaries exactly");
 }
 
 ##### subint: extreme negation and spread
@@ -168,10 +186,9 @@ is("".subint(0, $uvmax), "-$uvmax", "subint(0, UV_MAX) = -UV_MAX");
       my $cmp = cmpint($a, $b);
       # Verify: cmpint agrees with subint sign
       my $diff = subint($a, $b);
-      my $expected = ($diff eq "0") ? 0 : (substr("$diff",0,1) eq '-') ? -1 : 1;
-      if ($cmp != $expected) {
-        $ok = 0;
-      }
+      if ($a eq $b)    { $ok = 0 unless $cmp == 0 && $diff == 0; }
+      elsif ($cmp < 0) { $ok = 0 unless $diff < 0; }
+      else             { $ok = 0 unless $diff > 0; }
     }
   }
   ok($ok, "cmpint agrees with sign(subint(a,b)) for boundary values");
@@ -277,6 +294,7 @@ is("".subint(0, $uvmax), "-$uvmax", "subint(0, UV_MAX) = -UV_MAX");
   my @pairs = (
     [$uvmax, 2], [$uvmax, 3], [$uvmax, $ivmax],
     ["$ivmin", 3], ["$ivmin", -3], ["$ivmin", $ivmax],
+    ["$ivmin", -1], ["$ivmin", "$ivmin"], [7, "$ivmin"],
     [$uvmax1, 7], ["-$uvmax1", 7],
     ["340282366920938463463374607431768211456", $uvmax],
   );
@@ -290,6 +308,44 @@ is("".subint(0, $uvmax), "-$uvmax", "subint(0, UV_MAX) = -UV_MAX");
     }
   }
   ok($ok, "a == b*q + r for all division modes on boundary values");
+}
+
+##### Other IV_MIN signed arithmetic boundaries
+is("".absint($ivmin), $ivmax1, "absint(IV_MIN) = IV_MAX+1");
+
+is(join(" ", kronecker($ivmin,3), kronecker(3,$ivmin)), "1 -1",
+   "kronecker handles IV_MIN in either argument");
+
+is("".powmod(3,$ivmin,101), $use64 ? "25" : "92",
+   "powmod handles an IV_MIN exponent");
+
+is(join(" ", map { "$_" }
+                 falling_factorial($ivmin,0), falling_factorial($ivmin,1),
+                 rising_factorial($ivmin,0),  rising_factorial($ivmin,1)),
+   "1 $ivmin 1 $ivmin", "signed factorials handle IV_MIN");
+
+{
+  my @got = (lucas_sequence(101,$ivmin,1,2),
+             lucasu($ivmin,1,1), lucasv($ivmin,1,1));
+  my $modseq = $use64 ? "11 18 1" : "67 43 1";
+  is(join(" ", map { "$_" } @got), "$modseq 1 $ivmin",
+     "Lucas functions handle IV_MIN parameters");
+}
+
+{
+  my @cases = (
+    [$ivmin, 0,      $ivmax1],
+    [$ivmin, $ivmin, $ivmax1],
+    [$ivmin, -1,     1],
+  );
+  my $ok = 1;
+  for my $c (@cases) {
+    my($a,$b,$expect) = @$c;
+    my($u,$v,$d) = gcdext($a,$b);
+    $ok = 0 if "$d" ne "$expect";
+    $ok = 0 if "".addint(mulint($a,$u),mulint($b,$v)) ne "$d";
+  }
+  ok($ok, "gcdext handles IV_MIN inputs");
 }
 
 

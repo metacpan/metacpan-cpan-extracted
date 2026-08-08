@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet;
-$Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet::VERSION = '0.05';
+$Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet::VERSION = '0.06';
 # ABSTRACT: Fondation ResultSet — with() for fluent prefetch (many_to_many + has_many)
 
 use strict;
@@ -158,7 +158,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet - Fondation Result
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

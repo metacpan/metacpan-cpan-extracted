@@ -574,72 +574,145 @@ void _GMP_primorial(mpz_t prim, UV n)
 
 /*****************************************************************************/
 
-void stirling(mpz_t r, unsigned long n, unsigned long m, UV type)
+static void _stirling2_ui(mpz_t r, unsigned long n, unsigned long m);
+
+static void _stirling1_ui(mpz_t r, unsigned long n, unsigned long m)
 {
   mpz_t t, t2;
   unsigned long j;
-  if (type < 1 || type > 3) croak("stirling type must be 1, 2, or 3");
   if (n == m) {
     mpz_set_ui(r, 1);
   } else if (n == 0 || m == 0 || m > n) {
     mpz_set_ui(r,0);
   } else if (m == 1) {
-    switch (type) {
-      case 1:  mpz_fac_ui(r, n-1);  if (!(n&1)) mpz_neg(r, r); break;
-      case 2:  mpz_set_ui(r, 1); break;
-      case 3:
-      default: mpz_fac_ui(r, n); break;
-    }
+    mpz_fac_ui(r, n-1);
+    if (!(n&1)) mpz_neg(r, r);
   } else {
     mpz_init(t);  mpz_init(t2);
     mpz_set_ui(r,0);
-    if (type == 3) { /* Lah: binomial(n k) * binomial(n-1 k-1) * (n-k)!*/
-      mpz_bin_uiui(t, n, m);
-      mpz_bin_uiui(t2, n-1, m-1);
-      mpz_mul(r, t, t2);
-      mpz_fac_ui(t2, n-m);
-      mpz_mul(r, r, t2);
-    } else if (type == 2) {
-      mpz_t binom;
-      mpz_init_set_ui(binom, m);
-      mpz_ui_pow_ui(r, m, n);
-      /* Use symmetry to halve the number of loops */
-      for (j = 1; j <= ((m-1)>>1); j++) {
-        mpz_ui_pow_ui(t, j, n);
-        mpz_ui_pow_ui(t2, m-j, n);
-        if (m&1) mpz_sub(t, t2, t);
-        else     mpz_add(t, t2, t);
-        mpz_mul(t, t, binom);
-        if (j&1) mpz_sub(r, r, t);
-        else     mpz_add(r, r, t);
-        mpz_mul_ui(binom, binom, m-j);
-        mpz_divexact_ui(binom, binom, j+1);
-      }
-      if (!(m&1)) {
-        mpz_ui_pow_ui(t, j, n);
-        mpz_mul(t, t, binom);
-        if (j&1) mpz_sub(r, r, t);
-        else     mpz_add(r, r, t);
-      }
-      mpz_clear(binom);
-      mpz_fac_ui(t, m);
-      mpz_divexact(r, r, t);
-    } else {
-      mpz_bin_uiui(t,  n-1+1, n-m+1);
-      mpz_bin_uiui(t2, n-m+n, n-m-1);
-      mpz_mul(t2, t2, t);
-      for (j = 1; j <= n-m; j++) {
-        stirling(t, n-m+j, j, 2);
-        mpz_mul(t, t, t2);
-        if (j & 1)      mpz_sub(r, r, t);
-        else            mpz_add(r, r, t);
-        mpz_mul_ui(t2, t2, n+j);
-        mpz_divexact_ui(t2, t2, n-m+j+1);
-        mpz_mul_ui(t2, t2, n-m-j);
-        mpz_divexact_ui(t2, t2, n+j+1);
-      }
+    mpz_bin_uiui(t,  n-1+1, n-m+1);
+    mpz_bin_uiui(t2, n-m+n, n-m-1);
+    mpz_mul(t2, t2, t);
+    for (j = 1; j <= n-m; j++) {
+      _stirling2_ui(t, n-m+j, j);
+      mpz_mul(t, t, t2);
+      if (j & 1)      mpz_sub(r, r, t);
+      else            mpz_add(r, r, t);
+      mpz_mul_ui(t2, t2, n+j);
+      mpz_divexact_ui(t2, t2, n-m+j+1);
+      mpz_mul_ui(t2, t2, n-m-j);
+      mpz_divexact_ui(t2, t2, n+j+1);
     }
     mpz_clear(t2);  mpz_clear(t);
+  }
+}
+
+static void _stirling2_ui(mpz_t r, unsigned long n, unsigned long m)
+{
+  mpz_t t, t2;
+  unsigned long j;
+  if (n == m) {
+    mpz_set_ui(r, 1);
+  } else if (n == 0 || m == 0 || m > n) {
+    mpz_set_ui(r,0);
+  } else if (m == 1) {
+    mpz_set_ui(r, 1);
+  } else {
+    mpz_t binom;
+    mpz_init(t);  mpz_init(t2);
+    mpz_init_set_ui(binom, m);
+    mpz_ui_pow_ui(r, m, n);
+    /* Use symmetry to halve the number of loops */
+    for (j = 1; j <= ((m-1)>>1); j++) {
+      mpz_ui_pow_ui(t, j, n);
+      mpz_ui_pow_ui(t2, m-j, n);
+      if (m&1) mpz_sub(t, t2, t);
+      else     mpz_add(t, t2, t);
+      mpz_mul(t, t, binom);
+      if (j&1) mpz_sub(r, r, t);
+      else     mpz_add(r, r, t);
+      mpz_mul_ui(binom, binom, m-j);
+      mpz_divexact_ui(binom, binom, j+1);
+    }
+    if (!(m&1)) {
+      mpz_ui_pow_ui(t, j, n);
+      mpz_mul(t, t, binom);
+      if (j&1) mpz_sub(r, r, t);
+      else     mpz_add(r, r, t);
+    }
+    mpz_clear(binom);
+    mpz_fac_ui(t, m);
+    mpz_divexact(r, r, t);
+    mpz_clear(t2);  mpz_clear(t);
+  }
+}
+
+static void _stirling3_ui(mpz_t r, unsigned long n, unsigned long m)
+{
+  mpz_t t, t2;
+  if (n == m) {
+    mpz_set_ui(r, 1);
+  } else if (n == 0 || m == 0 || m > n) {
+    mpz_set_ui(r,0);
+  } else if (m == 1) {
+    mpz_fac_ui(r, n);
+  } else {
+    mpz_init(t);  mpz_init(t2);
+    /* Lah: binomial(n k) * binomial(n-1 k-1) * (n-k)! */
+    mpz_bin_uiui(t, n, m);
+    mpz_bin_uiui(t2, n-1, m-1);
+    mpz_mul(r, t, t2);
+    mpz_fac_ui(t2, n-m);
+    mpz_mul(r, r, t2);
+    mpz_clear(t2);  mpz_clear(t);
+  }
+}
+
+static int _stirling_special(mpz_t r, const mpz_t n, const mpz_t m, int type)
+{
+  if (mpz_sgn(n) < 0 || mpz_sgn(m) < 0)
+    croak("stirling: arguments must be non-negative");
+
+  if (mpz_cmp(n, m) == 0) {
+    mpz_set_ui(r, 1);
+  } else if (mpz_sgn(n) == 0 || mpz_sgn(m) == 0 || mpz_cmp(m, n) > 0) {
+    mpz_set_ui(r, 0);
+  } else if (type == 2 && mpz_cmp_ui(m, 1) == 0) {
+    mpz_set_ui(r, 1);
+  } else {
+    mpz_t nm1, t;
+    int is_adjacent;
+    mpz_init(nm1);
+    mpz_sub_ui(nm1, n, 1);
+    is_adjacent = (mpz_cmp(m, nm1) == 0);
+    mpz_clear(nm1);
+    if (!is_adjacent)
+      return 0;
+    mpz_init(t);
+    mpz_sub_ui(t, n, 1);
+    mpz_mul(r, n, t);
+    mpz_clear(t);
+    if (type != 3) mpz_tdiv_q_2exp(r, r, 1);
+    if (type == 1) mpz_neg(r, r);
+  }
+  return 1;
+}
+
+void mpz_stirling(mpz_t r, const mpz_t n, const mpz_t m, int type)
+{
+  if (type < 1 || type > 3)
+    croak("stirling: type must be 1, 2, or 3");
+
+  if (_stirling_special(r, n, m, type))
+    return;
+
+  if (!mpz_fits_ulong_p(n) || !mpz_fits_ulong_p(m))
+      croak("stirling: arguments too large");
+
+  switch (type) {
+    case 1: _stirling1_ui(r, mpz_get_ui(n), mpz_get_ui(m)); break;
+    case 2: _stirling2_ui(r, mpz_get_ui(n), mpz_get_ui(m)); break;
+    case 3: _stirling3_ui(r, mpz_get_ui(n), mpz_get_ui(m)); break;
   }
 }
 
@@ -697,7 +770,7 @@ void binomial(mpz_t r, UV n, UV k)
   Safefree(mprimes);
 }
 
-void multifactorial(mpz_t r, unsigned long n, unsigned long k)
+static void multifactorial(mpz_t r, unsigned long n, unsigned long k)
 {
   if (k == 0) {  mpz_set_ui(r, 1); return;  }
   if (k == 1) {  mpz_fac_ui(r, n); return;  }
@@ -712,6 +785,40 @@ void multifactorial(mpz_t r, unsigned long n, unsigned long k)
     mpz_mul_ui(r, r, n);
   }
 #endif
+}
+
+void mpz_mfac(mpz_t r, const mpz_t n, const mpz_t k)
+{
+  mpz_t t;
+  unsigned long Q, i;
+
+  if (mpz_sgn(n) < 0 || mpz_sgn(k) < 0)
+    croak("mpz_mfac: inputs must be non-negative");
+  if (mpz_cmp_ui(n,1) <= 0 || mpz_sgn(k) == 0)
+    { mpz_set_ui(r, 1); return; }
+  if (mpz_fits_ulong_p(n) && mpz_fits_ulong_p(k))
+    { multifactorial(r, mpz_get_ui(n), mpz_get_ui(k)); return; }
+
+  if (mpz_cmp(k, n) >= 0)
+    { mpz_set(r, n); return; }
+
+  /* We will iterate i from 0 to q */
+  mpz_init(t);
+  mpz_sub_ui(t, n, 1);
+  mpz_fdiv_q(t, t, k);
+  if (!mpz_fits_ulong_p(t)) {
+    mpz_clear(t);
+    croak("mpz_mfac: arguments too large");
+  }
+  Q = mpz_get_ui(t);
+
+  mpz_set(t, n);
+  mpz_set(r, t);
+  for (i = 0; i < Q; i++) {  /* loop 1 .. Q */
+    mpz_sub(t, t, k);
+    mpz_mul(r, r, t);
+  }
+  mpz_clear(t);
 }
 
 void factorial_sum(mpz_t r, unsigned long n)
@@ -768,103 +875,58 @@ void rising_factorial(mpz_t r, mpz_t x, mpz_t n) {
 }
 
 
-void factorialmod(mpz_t r, UV N, const mpz_t m)
+void bell_number(mpz_t r, unsigned long n)
 {
-  int m_is_prime;
-  mpz_t t, t2;
-  UV D = N, i, p;
+  unsigned long i, j;
+  mpz_t *cur, *nxt, *tmp;
 
-  if (mpz_cmp_ui(m,N) <= 0 || mpz_cmp_ui(m,1) <= 0) {
-    mpz_set_ui(r,0);
-    return;
+  if (n <= 1) { mpz_set_ui(r, 1); return; }
+
+  New(0, cur, n+1, mpz_t);
+  New(0, nxt, n+1, mpz_t);
+  for (i = 0; i <= n; i++) { mpz_init(cur[i]); mpz_init(nxt[i]); }
+
+  mpz_set_ui(cur[0], 1);
+
+  for (i = 1; i <= n; i++) {
+    mpz_set(nxt[0], cur[i-1]);           /* new row starts with last of old */
+    for (j = 0; j < i; j++)
+      mpz_add(nxt[j+1], nxt[j], cur[j]); /* running prefix sum */
+    tmp = cur; cur = nxt; nxt = tmp;     /* swap row pointers */
   }
 
-  m_is_prime = _GMP_is_prime(m);
-  mpz_init(t);
-  mpz_tdiv_q_2exp(t, m, 1);
-  if (mpz_cmp_ui(t, N) < 0 && m_is_prime)
-    D = mpz_get_ui(m) - N - 1;
+  mpz_set(r, cur[0]);
+  for (i = 0; i <= n; i++) { mpz_clear(cur[i]); mpz_clear(nxt[i]); }
+  Safefree(cur); Safefree(nxt);
+}
 
-  if (D < 2 && N > D) {
-    if (D == 0) mpz_sub_ui(r, m, 1);
-    else        mpz_set_ui(r, 1);
-    mpz_clear(t);
-    return;
-  }
+void fubini(mpz_t r, unsigned long n)
+{
+  unsigned long i, k;
+  mpz_t *row;
 
-  if (D > 500 && !m_is_prime) {
-    mpz_t *factors;
-    int j, nfactors, *exponents, reszero;
-    nfactors = factor(m, &factors, &exponents);
-    /* Find max factor */
-    mpz_set_ui(t, 0);
-    for (j = 0; j < nfactors; j++) {
-      if (exponents[j] > 1)
-        mpz_mul_ui(factors[j], factors[j], exponents[j]);
-      if (mpz_cmp(factors[j], t) > 0)
-        mpz_set(t, factors[j]);
+  if (n == 0) { mpz_set_ui(r, 1); return; }
+
+  New(0, row, n+1, mpz_t);
+  for (i = 0; i <= n; i++)
+    mpz_init(row[i]);
+
+  mpz_set_ui(row[0], 1);
+  for (i = 1; i <= n; i++) {
+    for (k = i; k > 0; k--) {
+      mpz_add(row[k], row[k], row[k-1]);
+      mpz_mul_ui(row[k], row[k], k);
     }
-    /* for m=p^k * p^k ..., t is max(p*k,p*k,...).  This is >= S(m), where
-     * S(m) is the smallest value where m divides S(m)!.  Hence, every
-     * n! mod m will be zero at that value or higher.  We could calculate
-     * the exact value of S(m), then we would know there are no zero results
-     * for the larger case. */
-    reszero = (mpz_cmp_ui(t, N) <= 0);
-    clear_factors(nfactors, &factors, &exponents);
-    if (reszero) { mpz_clear(t); mpz_set_ui(r,0); return; }
+    mpz_set_ui(row[0], 0);
   }
 
-  /* Accumulate into t, then mod into r at the end. */
-  mpz_set_ui(t,1);
+  mpz_set_ui(r, 0);
+  for (k = 1; k <= n; k++)
+    mpz_add(r, r, row[k]);
 
-  /* For small D, naive method. */
-  if (D <= 1000) {
-    for (i = 2; i <= D && mpz_sgn(t); i++) {
-      mpz_mul_ui(t, t, i);
-      if ((i & 15) == 0) mpz_mod(t, t, m);
-    }
-  } else {
-    UV j, sd = isqrt(D);
-    PRIME_ITERATOR(iter);
-
-    mpz_init(t2);
-    mpz_set_ui(t,1);
-    /* Group into powers of primes */
-    for (p = 2, i = 0; p <= D/sd; p = prime_iterator_next(&iter)) {
-      UV td = D/p,  e = td;
-      do { td /= p; e += td; } while (td > 0);
-      mpz_set_ui(t2, p);
-      mpz_powm_ui(t2, t2, e, m);
-      mpz_mul(t, t, t2);
-      if ((i++ & 15) == 0) {
-        mpz_mod(t, t, m);
-        if (!mpz_sgn(t)) break;
-      }
-    }
-    /* Further group by primes with the same power. */
-    for (j = sd-1; j >= 1 && mpz_sgn(t); j--) {
-      UV lo = D / (j+1)+1,  hi = D / j;
-      MPUassert(p >= lo, "factorialmod prime loop p should be in range");
-      /* while (p < lo) p = prime_iterator_next(&iter); */
-      for (mpz_set_ui(t2,1), i=0;  p <= hi;  p = prime_iterator_next(&iter)) {
-        mpz_mul_ui(t2, t2, p);
-        if ((i++ & 15) == 0) mpz_mod(t2, t2, m);
-      }
-      mpz_powm_ui(t2, t2, j, m);
-      mpz_mul(t, t, t2);
-      if ((j & 15) == 0) mpz_mod(t, t, m);
-    }
-    mpz_clear(t2);
-    prime_iterator_destroy(&iter);
-  }
-  mpz_mod(r, t, m);
-  mpz_clear(t);
-
-  /* If we used Wilson's theorem, turn the result for D! into N! */
-  if (D != N && mpz_sgn(r)) {
-    if (!(D&1)) mpz_sub(r, m, r);
-    mpz_invert(r, r, m);
-  }
+  for (i = 0; i <= n; i++)
+    mpz_clear(row[i]);
+  Safefree(row);
 }
 
 void partitions(mpz_t npart, UV n)
@@ -892,6 +954,51 @@ void partitions(mpz_t npart, UV n)
     for (k = 1; pent[k] <= j; k++) {
       if ((k+1) & 2) mpz_add(psum, psum, part[ j - pent[k] ]);
       else           mpz_sub(psum, psum, part[ j - pent[k] ]);
+    }
+    mpz_init_set(part[j], psum);
+  }
+
+  mpz_set(npart, part[n]);
+
+  mpz_clear(psum);
+  for (i = 0; i <= n; i++)
+    mpz_clear(part[i]);
+  Safefree(part);
+  Safefree(pent);
+}
+
+void partitionsq(mpz_t npart, UV n)
+{
+  mpz_t psum, *part;
+  UV *pent, i, j, k, d = (UV) sqrt(n+1);
+
+  if (n <= 3) {
+    mpz_set_ui(npart, 1 + (n == 3));
+    return;
+  }
+
+  New(0, pent, 2*d+2, UV);
+  pent[0] = 0;
+  pent[1] = 1;
+  for (i = 1; i <= d; i++) {
+    pent[2*i  ] = ( i   *(3*i+1)) / 2;
+    pent[2*i+1] = ((i+1)*(3*i+2)) / 2;
+  }
+  New(0, part, n+1, mpz_t);
+  mpz_init_set_ui(part[0], 1);
+  mpz_init(psum);
+  for (j = 1; j <= n; j++) {
+    mpz_set_ui(psum, 0);
+    for (k = 1; pent[k] <= j; k++) {
+      int positive = (k+1) & 2;
+      if (positive) mpz_add(psum, psum, part[j-pent[k]]);
+      else          mpz_sub(psum, psum, part[j-pent[k]]);
+
+      /* E(x^2) contributes at twice the generalized pentagonal numbers. */
+      if (!(j & 1) && pent[k] == (j >> 1)) {
+        if (positive) mpz_sub_ui(psum, psum, 1);
+        else          mpz_add_ui(psum, psum, 1);
+      }
     }
     mpz_init_set(part[j], psum);
   }
@@ -1279,7 +1386,7 @@ void consecutive_integer_lcm(mpz_t m, unsigned long B)
 
 void exp_mangoldt(mpz_t res, const mpz_t n)
 {
-  if (prime_power(res, n) < 1)
+  if (mpz_sgn(n) <= 0 || prime_power(res, n) < 1)
     mpz_set_ui(res, 1);
 }
 

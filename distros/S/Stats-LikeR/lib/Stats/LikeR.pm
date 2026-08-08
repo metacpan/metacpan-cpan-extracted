@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.293;
+our $VERSION = 0.294;
 require XSLoader;
 use autodie ':default';
 use warnings FATAL => 'all';
@@ -4994,7 +4994,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.293
+version 0.294
 
 =head1 Synopsis
 
@@ -13311,6 +13311,44 @@ C<f.sf> / C<norm.sf> and statsmodels' C<anova_oneway>; see
 C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
 
 =head1 Changes
+
+=head2 0.294 2026-08-07 CDT
+
+bug fixes: https://www.cpantesters.org/cpan/report/368ca238-73ee-1014-a03f-97f1b88bf904
+
+C<binom_test> was cross-validated against R 4.6.1 C<stats::binom.test> and SciPy
+1.17.1 C<scipy.stats.binomtest> using their own test suites rather than cases
+invented here: SciPy's C<TestBinomTest>, R's C<binom.test(c(800,10))> from
+C<tests/reg-tests-2.R>, the C<?binom.test> example, and an R-generated corpus of
+383 p-values and 1560 Clopper-Pearson bounds. They are in
+C<t/binom_test.R.scipy.t>. Two fixes came out of it, both in the incomplete beta
+that every tail and confidence bound goes through:
+
+=over
+
+=item * Its continued fraction stopped after a flat 500 terms, but it needs about
+0.25 sqrt(a+b) of them once the shape parameters are large, so it was quietly
+cut short at big C<n>: C<< binom_test(10079990, 21000000, p =E<gt> 0.48) >> returned
+0.996781946606 where R and SciPy both give 0.9966892187965, i.e. wrong in the
+fourth decimal of a printed p-value. The cap now scales with sqrt(a+b), and
+the front factor moved off differenced C<lgamma> onto the same saddle-point
+form C<dbinom> already used here. Agreement with R over these cases went from
+9.3e-5 to 3.3e-13 relative.
+
+=item * The Clopper-Pearson bounds are found by bisection, which stopped at an
+absolute width of 1e-15, so a bound far below 1 came back with only four
+correct digits: C<< binom\_test(1, 1000000000, alternative =E<gt> 'greater',
+conf\_level =E<gt> 0.999) >> gave 1.00053299e-12 against R's 1.00050033e-12. The
+stopping rule is now relative to where the bracket sits, and such bounds now
+hold about 1e-15.
+
+=back
+
+Both fixes also help C<t_test>, C<var_test> and C<cor_test>, which use the same
+function. One limit remains, pinned by the tests rather than left to chance: the
+upper bound for a handful of successes in a billion trials still carries about
+1e-9 of relative error, because the complement branch of the incomplete beta
+cannot resolve a tiny C<x> past the spacing of C<1-x>.
 
 =head2 0.293 2026-08-06 CDT
 

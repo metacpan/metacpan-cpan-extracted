@@ -1,4 +1,36 @@
 Revision history for DBIx-Loop
 
+0.02    2026-08-07
+        - Fix a pool worker dying while idle taking the whole pool down
+          with it. Worker death was only ever noticed as EOF on the read
+          side, and an idle worker's fd is not readable, so the first
+          thing that learned about it was the write of the next request -
+          which failed the future and left the slot alive with a valid
+          fd. 
+        - A public C ABI. include/dbil_abi.h declares a versioned function-
+          pointer table.
+        - selectall_rowhash: every row as a hashref, in the order the server
+          returned them - DBI's selectall_arrayref($sql, { Slice => {} }).
+          selectall_hashref cannot stand in for it, because keying rows by a
+          column destroys the ordering that keyset pagination depends on.
+          t/17-rowhash.t.
+        - Fork safety. A pool belongs to the process that forked its workers.
+          Without that, a program that forked after its first statement (any
+          preforking server) left every child reading the same socketpair, so
+          a request could be answered with another request's rows!!
+        - Pool worker children close every inherited descriptor except their
+          own socketpair end, and the parent's ends are FD_CLOEXEC. A worker
+          used to hold a duplicate of whatever the embedding program had
+          open - in a web server, the listening socket - keeping the port
+          bound for the worker's whole life.
+        - Fixed a crash in the native (Pg) backend on perl before 5.30.
+          SvTRUE is a multi-evaluating macro there, so SvTRUE(POPs) popped
+          the stack once per expansion and walked SP below its base: a
+          segfault on 5.20 and wrong readiness answers on 5.14. Found by
+          running the test suite on the older perls in the docker matrix.
+        - t/15-fork.t runs on whichever loop adapter is installed rather than
+          requiring IO::Async, which needs perl 5.14 and so could never have
+          covered the oldest perls the dist supports.
+
 0.01    2026-08-07
         First version

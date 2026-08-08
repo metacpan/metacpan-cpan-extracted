@@ -15,7 +15,7 @@ use Carp;
 
 use Lingua::famibeib::Word;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use parent 'Data::Identifier::Interface::Subobjects';
 
@@ -74,7 +74,7 @@ Lingua::famibeib::Fragment - module to interact with the famibeib fragments
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

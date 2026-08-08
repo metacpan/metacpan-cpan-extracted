@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/randperm shuffle vecsample csrand/;
+use Math::Prime::Util qw/randperm shuffle vecsample csrand irand/;
 
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 my $usexs  = Math::Prime::Util::prime_get_config->{'xs'};
@@ -17,7 +17,21 @@ subtest 'randperm', sub {
   is(@{[randperm(4,0)]},0,"randperm(4,0) returns 0 elements");
   is(@{[randperm(4,1)]},1,"randperm(4,1) returns 1 element");
   is(@{[randperm(4,8)]},4,"randperm(4,8) returns 4 elements");
+  is(@{[randperm(4,"100000000000000000000")]},4,"randperm(4,large k) returns 4 elements");
   is(@{[randperm(100,4)]},4,"randperm(100,4) returns 4 elements");
+  is(scalar randperm(0),0,"scalar randperm(0) returns 0");
+  is(scalar randperm(4,0),0,"scalar randperm(4,0) returns 0");
+  is(scalar randperm(4),4,"scalar randperm(4) returns 4");
+  is(scalar randperm(100,4),4,"scalar randperm(100,4) returns 4");
+  is(scalar randperm(4,"100000000000000000000"),4,"scalar randperm(4,large k) returns 4");
+  is(scalar randperm("9223372036854775808",1),1,"scalar randperm(large n,1) returns 1");
+
+  csrand(12345);
+  my @p50k7 = randperm(50,7);
+  csrand(12345);
+  my @p50 = randperm(50);
+  $#p50 = 6;
+  is("@p50k7", "@p50", "randperm(n,k) matches full permutation prefix");
 
   my @p128 = randperm(128);
   isnt("@p128", join(" ",0..127), "randperm(128) shuffles");
@@ -41,11 +55,14 @@ subtest 'randperm', sub {
 subtest 'shuffle', sub {
   is_deeply([shuffle()], [], "shuffle() = ()");
   is_deeply([shuffle(-277)], [-277], "shuffle(x) = (x)");
+  is(scalar shuffle(), 0, "scalar shuffle() returns 0");
+  is(scalar shuffle(-277), 1, "scalar shuffle(x) returns 1");
 
   my @d128 = (1..128);
   my @s128 = shuffle(@d128);
   my @t128 = sort { $a<=>$b } @s128;
   is(scalar @s128, scalar @d128, "shuffle n items returns n items");
+  is(scalar shuffle(@d128), scalar @d128, "scalar shuffle n items returns n");
   isnt("@s128","@d128", "shuffled 128-element array isn't identical");
   is("@t128","@d128", "outputs are the same elements as input");
 
@@ -71,11 +88,21 @@ subtest 'vecsample', sub {
   is_deeply([map {[vecsample($_)]} 0,1,1000], [[],[],[]], "vecsample(k) = ()");
   is_deeply([map {[vecsample($_,())]} 0,1,999],[[],[],[]], "vecsample(k,()) = ()");
   is_deeply([map {[vecsample($_,[])]} 0,1,999],[[],[],[]], "vecsample(k,[]) = ()");
+  is(scalar vecsample(2), 0, "scalar vecsample(k) returns 0");
+  is(scalar vecsample(2,()), 0, "scalar vecsample(k,()) returns 0");
+  is(scalar vecsample(2,[]), 0, "scalar vecsample(k,[]) returns 0");
+  is(scalar vecsample(0,8,9,10), 0, "scalar vecsample(0,L) returns 0");
+  ok(!eval { vecsample("2foo",1,2,3); }, "vecsample invalid k");
   is_deeply([map {[vecsample(1,($_))]} 0,1,999],[[0],[1],[999]], "vecsample(1,(n)) = (n)");
   is_deeply([map {[vecsample(1,[$_])]} 0,1,999],[[0],[1],[999]], "vecsample(1,(n)) = (n)");
+  is(scalar vecsample(2,80..100), 2, "scalar vecsample returns k items with a large list");
+  is(scalar vecsample(45,8,9,10), 3, "scalar vecsample returns all list items with large k");
   is(scalar @{[vecsample(2,[80..100])]}, 2, "returns k items with a large list");
+  is(scalar vecsample(2,[80..100]), 2, "scalar vecsample returns k items with a large array reference");
   is(scalar @{[vecsample(45,[8,9,10])]}, 3, "returns all items with large k");
+  is(scalar vecsample(45,[8,9,10]), 3, "scalar vecsample returns all array reference items with large k");
   is(scalar @{[vecsample(4,[8..11])]}, 4, "returns all items with exact k");
+  is(scalar vecsample(4,[8..11]), 4, "scalar vecsample returns all array reference items with exact k");
   is_deeply([sort {$a<=>$b} vecsample(5,[177,888,15,4,-2])],
             [-2,4,15,177,888], "returns all items");
   ok(is_one_of(vecsample(1,500..600), 500..600), "vecsample(1,L) returns something from L");
@@ -110,6 +137,23 @@ subtest 'using csrand', sub {
   }
   ok($x[0] eq $x[1] && $x[0] eq $x[2] && $x[0] eq $x[3],
      "shuffles are repeatable with csrand");
+
+  for my $case (
+    [ "scalar randperm",       sub { scalar randperm(100,4) } ],
+    [ "scalar randperm empty", sub { scalar randperm(0) } ],
+    [ "scalar shuffle",        sub { scalar shuffle(1..100) } ],
+    [ "scalar shuffle empty",  sub { scalar shuffle() } ],
+    [ "scalar vecsample list", sub { scalar vecsample(2,10..20) } ],
+    [ "scalar vecsample aref", sub { scalar vecsample(2,[10..20]) } ],
+    [ "scalar vecsample zero", sub { scalar vecsample(0,10..20) } ],
+  ) {
+    csrand(123456);
+    my $expect = irand();
+    csrand(123456);
+    $case->[1]->();
+    is(irand(), $expect, "$case->[0] does not use random state");
+  }
+
   # Entropy seed the RNG for further tests
   csrand();
 };

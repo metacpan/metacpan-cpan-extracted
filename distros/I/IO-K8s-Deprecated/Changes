@@ -1,0 +1,55 @@
+Revision history for IO-K8s-Deprecated
+
+1.105     2026-08-08 03:21:30Z
+
+    First release. Permanent home for CPAN redirect ("tombstone") stub
+    modules covering IO::K8s modules that were genuinely removed within the
+    IO-K8s distribution's own release history (PAUSE indexes per module
+    name, not per distribution, so an in-dist removal orphans the old name
+    exactly the same way a cross-distribution rename does).
+
+    * Tombstones -- consolidated into the generic IO::K8s::List (76
+      classes). IO-K8s replaced every per-resource *List class (PodList,
+      ServiceList, DeploymentList, etc.) with a single generic
+      IO::K8s::List back in its 1.00 Moose-to-Moo rewrite; each of the 76
+      only ever emitted a deprecation warning after that (never a real
+      class in the 1.x series). IO-K8s 1.100 was the last CPAN release to
+      ship even that warning stub -- all 76 were then dropped from the
+      distribution outright. Full list: lib/IO/K8s/Deprecated.pm POD or
+      t/01-tombstones.t.
+
+    * Tombstones -- removed, no successor: classic DRA
+      control-plane-controller allocation (4 classes). IO-K8s's
+      resource.k8s.io/v1alpha3 shipped an alpha-only (never GA)
+      WaitForFirstConsumer allocation flow coordinated via
+      PodSchedulingContext (+ its Spec/Status) and
+      ResourceClaimSchedulingStatus. When Dynamic Resource Allocation
+      graduated to GA with an architecturally different
+      structured-parameters model at resource.k8s.io/v1, that mechanism
+      was dropped outright, with no 1:1 successor class. IO-K8s 1.100 was
+      the last CPAN release to ship these names. Full list:
+      lib/IO/K8s/Deprecated.pm POD or t/01-tombstones.t.
+
+    * Considered but not shipped -- 8 Cilium v2alpha1 classes dropped in
+      IO-K8s 1.100's Cilium v1.19.2 upgrade were drafted as tombstones
+      first, then reverted: IO-K8s restored them instead, for backward
+      compatibility, matching its own convention of keeping multiple API
+      versions of a resource side by side (e.g. Apps
+      V1beta1/V1beta2/V1). No tombstone needed once the classes are
+      shipping again under their original names. A later v1.31 -> v1.36
+      IO-K8s upstream sync repeated the same false start for the older
+      served-but-GA'd admissionregistration.k8s.io ValidatingAdmissionPolicy
+      v1alpha1/v1beta1, authentication.k8s.io SelfSubjectReview
+      v1alpha1/v1beta1, and flowcontrol.apiserver.k8s.io v1beta3 tracks --
+      same fix, restored rather than tombstoned. Both recorded in
+      lib/IO/K8s/Deprecated.pm's POD so a future audit doesn't rediscover
+      and re-tombstone the same names.
+
+    * Mechanism
+        - Every file in this dist versions normally and uniformly with
+          dzil (no version_finder override), starting at 1.105 -- safely
+          past IO-K8s 1.100, the last CPAN release that shipped these
+          module names (as warning stubs, or in the DRA case as real
+          classes) -- so PAUSE indexes this dist as canonical for the old
+          names and `cpanm Old::Module::Name` installs the redirect
+          instead of the stale pre-removal code.

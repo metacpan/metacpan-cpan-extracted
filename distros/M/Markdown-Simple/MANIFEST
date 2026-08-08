@@ -1,5 +1,7 @@
 Changes
 ignore.txt
+include/mds_abi.h
+include/mds_abi_impl.h
 lib/Markdown/Simple.pm
 lib/Markdown/Simple.xs
 Makefile.PL
@@ -30,6 +32,7 @@ src/mds_linkref.c
 src/mds_linkref.h
 src/mds_render_html.c
 src/mds_render_html.h
+src/mds_slug.h
 src/simd/mds_bitmap.h
 src/simd/mds_classifier_lut.h
 src/simd/mds_dispatch.c
@@ -78,6 +81,9 @@ t/50-render-options.t
 t/50-strip-markdown-inlines.t
 t/51-disable-syntax.t
 t/52-highlight.t
+t/53-heading-ids.t
+t/54-toc.t
+t/55-abi.t
 t/56-render-leak.t
 t/90-session.t
 t/90-simd-equivalence.t

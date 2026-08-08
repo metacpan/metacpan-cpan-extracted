@@ -19,7 +19,7 @@
 
 static int jacobi_iu(IV in, UV m) {
   int j = 1;
-  UV n = (in < 0) ? -in : in;
+  UV n = (in < 0) ? (UV)0 - (UV)in : in;
 
   if (m <= 0 || (m%2) == 0) return 0;
   if (in < 0 && (m%4) == 3) j = -j;
@@ -35,7 +35,7 @@ static int jacobi_iu(IV in, UV m) {
   return (m == 1) ? j : 0;
 }
 
-static UV select_extra_strong_parameters(UV n, UV increment) {
+static bool select_extra_strong_parameters(UV *Pout, UV n, UV increment) {
   int j;
   UV D, P = 3;
   while (1) {
@@ -48,8 +48,8 @@ static UV select_extra_strong_parameters(UV n, UV increment) {
     if (P > 65535)
       croak("lucas_extrastrong_params: P exceeded 65535");
   }
-  if (P >= n)  P %= n;   /* Never happens with increment < 4 */
-  return P;
+  *Pout = P % n;
+  return 1;
 }
 
 /* Fermat pseudoprime */
@@ -57,7 +57,7 @@ bool is_pseudoprime(UV const n, UV a)
 {
   if (n < 3) return (n == 2);
   if (!(n&1) && !(a&1)) return 0;
-  if (a < 2) croak("Base %"UVuf" is invalid", a);
+  if (a < 2) croak("is_pseudoprime: invalid base: %"UVuf, a);
   if (a >= n) {
     a %= n;
     if (a <= 1)    return (a == 1);
@@ -79,7 +79,7 @@ bool is_euler_pseudoprime(UV const n, UV a)
 {
   if (n < 3) return (n == 2);
   if (!(n&1)) return 0;
-  if (a < 2) croak("Base %"UVuf" is invalid", a);
+  if (a < 2) croak("is_euler_pseudoprime: invalid base: %"UVuf, a);
   if (a > 2) {
     if (a >= n) {
       a %= n;
@@ -145,7 +145,7 @@ bool is_strong_pseudoprime(UV const n, UV a)
   int r, s = 0;
   if (n < 3) return (n == 2);
   if (!(n&1)) return 0;
-  if (a < 2) croak("Base %"UVuf" is invalid", a);
+  if (a < 2) croak("is_strong_pseudoprime: invalid base: %"UVuf, a);
   if (a >= n)  a %= n;
   if (a <= 1 || a == n-1) return 1;
 
@@ -190,9 +190,9 @@ bool is_strong_pseudoprime(UV const n, UV a)
  * Returns 1 if probably prime relative to the bases, 0 if composite.
  * Bases must be between 2 and n-2
  */
-bool miller_rabin(UV const n, const UV *bases, int nbases)
+bool miller_rabin(UV const n, const UV *bases, size_t nbases)
 {
-  int i;
+  size_t i;
   /* For best performance, especially with montmath, we would do as much
    * as possible up front, then do the per-base loop.  This code used to
    * do that, but we never actually used it with more than one base. */
@@ -233,8 +233,7 @@ bool BPSW(UV const n)
         return 0;
     }
     /* AES Lucas test */
-    P = select_extra_strong_parameters(n, 1);
-    if (P == 0) return 0;
+    if (!select_extra_strong_parameters(&P, n, 1))  return 0;
 
     d = n+1;
     s = 0;
@@ -291,6 +290,7 @@ bool is_lucas_pseudoprime(UV n, int strength)
   IV P, Q, D;
   UV U, V, Pu, Qu, Qk, d, s;
 
+  MPUassert(strength >= 0 && strength <= 3, "is_lucas_pseudoprime: strength must be one of 0, 1, 2, 3");
   if (n < 5) return (n == 2 || n == 3);
   if ((n % 2) == 0 || n == UV_MAX) return 0;
 
@@ -299,11 +299,12 @@ bool is_lucas_pseudoprime(UV n, int strength)
     IV sign = 1;
     int j;
     while (1) {
-      D = Du * sign;
+      D = (sign > 0) ? (IV)Du : -(IV)Du;
       j = jacobi_iu(D, n);
       if (j != 1 && Du != n) break;
       if (Du == 21 && is_perfect_square(n)) return 0;
       Du += 2;
+      if (Du > 1000000) croak("is_lucas_pseudoprime: D exceeded 1e6");
       sign = -sign;
     }
     if (j != -1) return 0;
@@ -311,11 +312,11 @@ bool is_lucas_pseudoprime(UV n, int strength)
     Q = (1 - D) / 4;
     if (strength == 2 && Q == -1) P=Q=D=5;  /* Method A* */
     /* Check gcd(n,2QD). gcd(n,2D) already done. */
-    Qk = (Q >= 0)  ?  Q % n  :  n-(((UV)(-Q)) % n);
+    Qk = ivmod(Q,n);
     if (gcd_ui(Qk,n) != 1) return 0;
   } else {
-    P = select_extra_strong_parameters(n, 1);
-    if (P == 0) return 0;
+    if (!select_extra_strong_parameters(&Pu, n, 1))  return 0;
+    P = Pu;
     Q = 1;
     D = P*P - 4;
   }
@@ -448,7 +449,7 @@ return is_euler_pseudoprime(n,Qk);
     if (U == 0)
       return 1;
     /* Now check to see if V_{d*2^r} == 0 for any 0 <= r < s */
-    Qk = powmod(Qu, d, n);
+    Qk = (Q == -1) ? n-1 : powmod(Qu, d, n);
     while (s--) {
       if (V == 0)
         return 1;
@@ -462,7 +463,7 @@ return is_euler_pseudoprime(n,Qk);
     int qjacobi, is_slpsp = 0;
     if (U == 0)
       is_slpsp = 1;
-    Qk = powmod(Qu, d, n);
+    Qk = (Q == -1) ? n-1 : powmod(Qu, d, n);
     while (s--) {
       if (V == 0)
         is_slpsp = 1;
@@ -503,24 +504,24 @@ return is_euler_pseudoprime(n,Qk);
  *
  * increment:  1 for Baillie OEIS, 2 for Pari.
  *
- * With increment = 1, these results will be a subset of the extra-strong
+ * With increment = 1, these results will be a superset of the extra-strong
  * Lucas pseudoprimes.  With increment = 2, we produce Pari's results.
  */
 bool is_almost_extra_strong_lucas_pseudoprime(UV n, UV increment)
 {
   UV P, V, W, d, s, b;
 
+  if (increment < 1 || increment > 256)
+    croak("is_almost_extra_strong_lucas_pseudoprime: invalid increment: %"UVuf, increment);
   if (n < 13) return (n == 2 || n == 3 || n == 5 || n == 7 || n == 11);
   if ((n % 2) == 0 || n == UV_MAX) return 0;
-  if (increment < 1 || increment > 256)
-    croak("Invalid lucas parameter increment: %"UVuf"\n", increment);
 
   /* Ensure small primes work with large increments. */
   if ( (increment >= 16 && n <= 331) || (increment > 148 && n <= 631) )
-    return is_prob_prime(n);
+    if (is_prob_prime(n))
+      return 1;
 
-  P = select_extra_strong_parameters(n, increment);
-  if (P == 0) return 0;
+  if (!select_extra_strong_parameters(&P, n, increment))  return 0;
 
   d = n+1;
   s = 0;
@@ -758,50 +759,59 @@ bool is_perrin_pseudoprime(UV n, uint32_t restricted)
   return 0;
 }
 
-bool is_frobenius_pseudoprime(UV n, IV P, IV Q)
-{
-  UV U, V, t, Vcomp;
-  int k = 0;
-  IV D;
-  UV Du, Pu, Qu;
+static void _frob_params_to_d(IV P, IV Q, IV *D, UV *Du) {
+  const IV maxparam = (BITS_PER_WORD == 64)  ?  UVCONST(3037000497)  :  46338L;
 
-  if (n < 7) return (n == 2 || n == 3 || n == 5);
+  if (P > maxparam || P < -maxparam || Q > maxparam || Q < -maxparam)
+    croak("is_frobenius_pseudoprime: P,Q out of range");
+
+  *D = P * P - 4 * Q;
+  *Du = *D >= 0  ?  (UV)*D :  (UV)(-*D);
+}
+
+bool is_frobenius_pseudoprime(UV n)
+{
+  UV Du;
+  IV D, P = -1, Q = 2;
+  int k;
+
+  if (n < 11) return (n == 2 || n == 3 || n == 5 || n == 7);
   if ((n % 2) == 0 || n == UV_MAX) return 0;
 
-  if (P == 0 && Q == 0) {
-    P = -1; Q = 2;
-    if (n == 7) P = 1;  /* So we don't test kronecker(-7,7) */
-    do {
-      P += 2;
-      if (P == 3) P = 5;  /* P=3,Q=2 -> D=9-8=1 => k=1, so skip */
-      D = P*P-4*Q;
-      Du = D >= 0 ? D : -D;
-      k = kronecker_su(D, n);
-      if (P == 10001 && is_perfect_square(n)) return 0;
-    } while (k == 1);
-    if (k == 0) return 0;
-    /* D=P^2-8 will not be a perfect square */
-    MPUverbose(1, "%"UVuf" Frobenius (%"IVdf",%"IVdf") : x^2 - %"IVdf"x + %"IVdf"\n", n, P, Q, P, Q);
-    Vcomp = 4;
-  } else {
-    D = P*P-4*Q;
-    Du = D >= 0 ? D : -D;
-    if (D != 5 && is_perfect_square(Du))
-      croak("Frobenius invalid P,Q: (%"IVdf",%"IVdf")", P, Q);
-  }
+  do {
+    P += 2;
+    if (P == 3) P = 5;  /* P=3,Q=2 -> D=9-8=1 => k=1, so skip */
+    _frob_params_to_d(P, Q, &D, &Du);
+    k = kronecker_su(D, n);
+    if (P == 10001 && is_perfect_square(n)) return 0;
+  } while (k == 1);
+  if (k == 0) return 0;
+  /* D=P^2-8 will not be a perfect square */
+  MPUverbose(1, "%"UVuf" Frobenius (%"IVdf",%"IVdf") : x^2 - %"IVdf"x + %"IVdf"\n", n, P, Q, P, Q);
+  return is_frobenius_pseudoprime_pq(n, P, Q);
+}
+
+bool is_frobenius_pseudoprime_pq(UV n, IV P, IV Q)
+{
+  UV U, V, t, Du, Pu, Qu, Vcomp;
+  IV D;
+  int k;
+
+  if (n < 4) return (n == 2 || n == 3);
+  if ((n % 2) == 0 || n == UV_MAX) return 0;
+
+  _frob_params_to_d(P, Q, &D, &Du);
+  if (D >= 0 && is_perfect_square(Du))
+    croak("is_frobenius_pseudoprime: invalid P,Q: (%"IVdf",%"IVdf")", P, Q);
   Pu = ivmod(P,n);
   Qu = ivmod(Q,n);
 
-  t = gcd_ui(n, Pu*Qu*Du);
-  if (t != 1) {
-    if (t == n) return is_prob_prime(n);
-    return 0;
-  }
-  if (k == 0) {
-    k = kronecker_su(D, n);
-    if (k == 0) return 0;
-    Vcomp = (k == 1)  ?  2  :  addmod(Qu,Qu,n);
-  }
+  t = gcd_ui(n, Qu);  if (t != 1) { return (t == n) ? is_prob_prime(n) : 0; }
+  t = gcd_ui(n, Du);  if (t != 1) { return (t == n) ? is_prob_prime(n) : 0; }
+
+  k = kronecker_su(D, n);
+  if (k == 0) return 0;
+  Vcomp = (k == 1)  ?  2  :  addmod(Qu,Qu,n);
 
   lucasuvmod(&U, &V, Pu, Qu, n-k, n);
   /* MPUverbose(1, "%"UVuf" Frobenius U = %"UVuf" V = %"UVuf"\n", n, U, V); */
@@ -908,19 +918,23 @@ bool is_frobenius_underwood_pseudoprime(UV n)
   if (n < 7) return (n == 2 || n == 3 || n == 5);
   if ((n % 2) == 0 || n == UV_MAX) return 0;
 
-  for (x = 0; x < 1000000; x++) {
+  for (x = 0; x <= 2000000; x++) {
     if (x==2 || x==4 || x==7 || x==8 || x==10 || x==14 || x==16 || x==18)
       continue;
+    if (x > 999999 || x > (BITS_PER_WORD == 64 ? UVCONST(3037000499) : 46340))
+      croak("FU test failure, unable to find suitable a");
     t = (IV)(x*x) - 4;
     j = jacobi_iu(t, n);
     if (j == -1) break;
     if (j == 0 || (x == 20 && is_perfect_square(n)))
       return 0;
   }
-  if (x >= 1000000) croak("FU test failure, unable to find suitable a");
-  t1 = gcd_ui(n, (x+4)*(2*x+5));
-  if (t1 != 1 && t1 != n)
-    return 0;
+
+  a = x+4;
+  b = 2*x+5;
+  t1 = gcd_ui(n, mulmod(a % n, b % n, n));
+  if (t1 != 1 && t1 != n) return 0;
+
   np1 = n+1;
   { UV v = np1; len = 1;  while (v >>= 1) len++; }
 
@@ -1007,7 +1021,7 @@ bool is_frobenius_underwood_pseudoprime(UV n)
  * instead we'll use a table. */
 #define NUM_KNOWN_MERSENNE_PRIMES 52
 static const uint32_t _mersenne_primes[NUM_KNOWN_MERSENNE_PRIMES] = {2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423,9689,9941,11213,19937,21701,23209,44497,86243,110503,132049,216091,756839,859433,1257787,1398269,2976221,3021377,6972593,13466917,20996011,24036583,25964951,30402457,32582657,37156667,42643801,43112609,57885161,74207281,77232917,82589933,136279841};
-#define LAST_CHECKED_MERSENNE 79711549
+#define LAST_CHECKED_MERSENNE 81307409
 int is_mersenne_prime(UV p)
 {
   int i;
@@ -1029,6 +1043,16 @@ bool lucas_lehmer(UV p)
     V = mulsubmod(V, V, 2, mp);
   }
   return (V == 0);
+}
+
+/******************************************************************************/
+
+bool is_safe_prime(UV n)
+{
+  if (n < 23) return (n == 5 || n == 7 || n == 11);
+  if (n % 6 != 5) return 0;
+  if (n % 5 == 0 || n % 7 == 0 || n % 10 == 1 || n % 14 == 1) return 0;
+  return is_prime(n>>1) && is_prime(n);
 }
 
 /******************************************************************************/

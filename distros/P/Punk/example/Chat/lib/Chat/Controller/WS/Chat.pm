@@ -27,15 +27,21 @@ sub join_room {
         my ($ws) = @_;
         $bus->join($ws);
 
-        # backlog to this socket only
-        $ws->send(Chat::Bus::encode({
-            type     => 'welcome',
-            room     => $room,
-            nick     => $nick,
-            protocol => $ws->protocol,
-            messages => [ map Chat::Bus::message_event($_),
-                          @{ $model->recent($room, 50) } ],
-        }));
+        # The model is non-blocking, so the backlog arrives in a callback.
+        # Nothing awaits this future - there is no request left to answer -
+        # but it stays alive until it settles, so the send just happens
+        # later. The socket is not blocked meanwhile.
+        my $proto = $ws->protocol;
+        $model->recent($room, 50)->then(sub {
+            my ($rows) = @_;
+            $ws->send(Chat::Bus::encode({
+                type     => 'welcome',
+                room     => $room,
+                nick     => $nick,
+                protocol => $proto,
+                messages => [ map Chat::Bus::message_event($_), @$rows ],
+            }));
+        });
 
         Chat::Bus::publish($room, {
             type      => 'presence',
@@ -62,13 +68,21 @@ sub join_room {
         # Straight through the model: validated against the field schema,
         # stored, then fanned out to every socket in the room - including
         # this one, so the sender sees the id and timestamp the row got.
-        my $row = eval {
+        #
+        # Validation croaks at the call site (it is a programming error, not
+        # a query failure), so the eval still matters; a database failure
+        # arrives at the ->else instead.
+        my $f = eval {
             $model->create({ room => $room, nick => $nick, body => $body,
                              created => Chat::Bus::now() });
         };
-        return _oops($ws, 'the message was rejected') if $@ || !$row;
+        return _oops($ws, 'the message was rejected') if $@ || !$f;
 
-        Chat::Bus::publish($room, Chat::Bus::message_event($row));
+        $f->then(sub {
+            my ($row) = @_;
+            return _oops($ws, 'the message was rejected') unless $row;
+            Chat::Bus::publish($room, Chat::Bus::message_event($row));
+        })->else(sub { _oops($ws, 'the message was rejected') });
     });
 
     $ws->on(close => sub {

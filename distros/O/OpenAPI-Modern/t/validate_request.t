@@ -2413,13 +2413,13 @@ YAML
         },
       ],
     },
-    'Content-Type not allowed by the schema',
+    'Content-Type not allowed by the operation description',
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=us-ascii' ], 'ascii plain text');
   is_equal(
     ($result = $openapi->validate_request($request))->TO_JSON,
-    {
+    my $result_data = {
       valid => false,
       errors => [
         {
@@ -2435,8 +2435,21 @@ YAML
   is_equal(
     $result->data,
     { request => { body => { content => 'ascii plain text' } } },
-    'body data was correctly parsed',
+    'body data was correctly parsed from us-ascii',
   );
+
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=Shift_JIS' ], Encode::encode('Shift_JIS', 'やった'));
+  is_equal(
+    ($result = $openapi->validate_request($request))->TO_JSON,
+    $result_data,
+    'Shift_JIS text can be decoded and matched',
+  );
+  is_equal(
+    $result->data,
+    { request => { body => { content => 'やった' } } },
+    'body data was correctly parsed from Shift_JIS',
+  );
+
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'blOOp/HTML' ], 'html text (bloop style)');
   is_equal(

@@ -20,10 +20,13 @@ t/03-relations.t
 t/03-shutdown.t
 t/04-source-name.t
 t/05-with.t
+t/06-broken-result.t
 t/lib/DBIxTestHelper.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxAsync.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxAsync/Schema/Result/Article.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxAsync/Schema/Result/User.pm
+t/lib/Mojolicious/Plugin/Fondation/TestDBIxBroken.pm
+t/lib/Mojolicious/Plugin/Fondation/TestDBIxBroken/Schema/Result/Broken.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxRelation.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxRelation/Schema/Result/Group.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxRelation/Schema/Result/User.pm

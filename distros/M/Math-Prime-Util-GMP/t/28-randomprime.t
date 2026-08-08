@@ -72,11 +72,20 @@ plan tests => 0
               + (2 * scalar @random_safe_tests)
               + (1 * scalar @random_strong_tests)
               + (2 * scalar @random_nbit_tests)   # proven primes
-              + 6
+              + 10
               + 0;
 
 my $infinity = 20**20**20;
 my $nrandom_range_samples = $extra ? 1000 : 50;
+
+{
+  my $lo = "10000000000000000000000000000000000000000000000000000000000000000000000000000050";
+  my $empty_hi = "10000000000000000000000000000000000000000000000000000000000000000000000000000246";
+  my $one_hi = "10000000000000000000000000000000000000000000000000000000000000000000000000000560";
+  my $one_prime = "10000000000000000000000000000000000000000000000000000000000000000000000000000247";
+  is(random_prime($lo, $empty_hi), undef, "large narrow range with no primes");
+  is(random_prime($lo, $one_hi), $one_prime, "large narrow range with one prime");
+}
 
 while (my($range, $expect) = each (%range_edge_empty)) {
   my($low,$high) = $range =~ /(\d+) to (\d+)/;
@@ -207,4 +216,18 @@ N 482980495961
 Q 1061869
 A 178206865367
 ", "random Shawe-Taylor prime certificate" );
+}
+
+{
+  my($n,$cert) = random_maurer_prime_with_cert(32);
+  like( $cert,
+        qr/\A\[MPU - Primality Certificate\]\nVersion 1\.0\n\nProof for:\nN \Q$n\E\n\nType Small\nN \Q$n\E\n\z/,
+        "random 32-bit Maurer prime certificate" );
+}
+
+{
+  my($n,$cert) = random_shawe_taylor_prime_with_cert(32);
+  like( $cert,
+        qr/\A\[MPU - Primality Certificate\]\nVersion 1\.0\n\nProof for:\nN \Q$n\E\n\nType Small\nN \Q$n\E\n\z/,
+        "random 32-bit Shawe-Taylor prime certificate" );
 }

@@ -42,7 +42,6 @@
          "requires" : {
             "Error" : "0",
             "IPC::System::Simple" : "0",
-            "Params::Validate::Strict" : "0",
             "Test::DescribeMe" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0.08",
@@ -67,6 +66,6 @@
          "web" : "https://github.com/nigelhorne/Params-Get"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

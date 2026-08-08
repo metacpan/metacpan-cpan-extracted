@@ -1,0 +1,641 @@
+#define PERL_NO_GET_CONTEXT 1
+
+#include <stdlib.h>
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#define NEED_sv_2pv_flags
+#define NEED_HvNAME_get
+#include "ppport.h"
+
+#include "ptypes.h"
+#include "sort.h"
+#include "xs_internal.h"
+
+/* Given 'a' and astatus (-1 means 'a' is an IV), properly mod with n */
+void _mod_with(UV *a, int astatus, UV n) {
+  if (n == 0) return;
+  if (astatus != -1) {
+    *a %= n;
+  } else {
+    UV r = neg_iv(*a) % n;
+    *a = (r == 0) ? 0 : n-r;
+  }
+}
+
+int _sv_is_bigint(pTHX_ SV* n) {
+  if (SvROK(n) && SvOBJECT(SvRV(n))) {
+    const char *hvname = HvNAME_get(SvSTASH(SvRV(n)));
+    if (hvname != 0 &&
+        (strEQ(hvname, "Math::BigInt") || /* BigFloat not here, force to PP */
+         strEQ(hvname, "Math::GMPz")   || strEQ(hvname, "Math::GMP") ||
+         strEQ(hvname, "Math::GMPq")   || strEQ(hvname, "Math::AnyNum") ||
+         strEQ(hvname, "Math::Pari")   || strEQ(hvname, "Math::BigInt::Lite")))
+      return 1;
+  }
+  return 0;
+}
+
+int _sv_is_bigint_fast(pTHX_ SV* n) {
+  if (SvROK(n) && SvOBJECT(SvRV(n))) {
+    const char *hvname = HvNAME_get(SvSTASH(SvRV(n)));
+    if (hvname != 0 &&
+        (strEQ(hvname, "Math::GMPz")   || strEQ(hvname, "Math::GMP")))
+      return 1;
+  }
+  return 0;
+}
+
+/* Intentionally broad, so covers all our known big number objects, modules
+ * like Math::Int64, and future integer modules.
+ * The downside is that Math::* objects that don't represent an integer,
+ * such as Math::Random::PCG32, will pass this test and go to string parsing.
+ * That will catch them, but the resulting error isn't clear. */
+int _sv_is_math_object(pTHX_ SV* n) {
+  if (SvROK(n) && SvOBJECT(SvRV(n))) {
+    const char *hvname = HvNAME_get(SvSTASH(SvRV(n)));
+    if (hvname != 0 && strnEQ(hvname, "Math::", 6))
+      return 1;
+  }
+  return 0;
+}
+
+#if BITS_PER_WORD == 32
+  static const unsigned int uvmax_maxlen = 10;
+  static const unsigned int ivmax_maxlen = 10;
+  static const char uvmax_str[] = "4294967295";
+  /* static const char ivmax_str[] = "2147483648"; */
+  static const char ivmin_str[] = "2147483648";
+#else
+  static const unsigned int uvmax_maxlen = 20;
+  static const unsigned int ivmax_maxlen = 19;
+  static const char uvmax_str[] = "18446744073709551615";
+  /* static const char ivmax_str[] =  "9223372036854775808"; */
+  static const char ivmin_str[] =  "9223372036854775808";
+#endif
+
+/* Parse any numeric string.  Returns:
+ *   SNUMFLAG_UNKNOWN          syntax not recognized by this parser
+ *   SNUMFLAG_NATIVE [|NEG]    integer fits in native UV or IV
+ *   SNUMFLAG_BIGINT [|NEG]    integer too large for native word
+ *   SNUMFLAG_FP    [|NEG]     valid floating-point (non-integer) number
+ *   SNUMFLAG_RADIX [|NEG]     prefixed 0x/0X/0b/0B/0o/0O integer string
+ *   SNUMFLAG_INVALID [|...]   not a valid number
+ *
+ * There is a good argument that we should be using Perl's numeric.c functions.
+ */
+uint32_t _parse_strnum(const char* s, STRLEN len)
+{
+  STRLEN i = 0, sig_start;
+  STRLEN maxlen;
+  const char* maxstr;
+  uint32_t flag = 0;
+  int had_zeros = 0;
+
+  if (s == 0 || len == 0) return SNUMFLAG_NATIVE;  /* null/empty -> 0 */
+
+  /* Sign */
+  if      (s[i] == '-') { flag |= SNUMFLAG_NEG; i++; }
+  else if (s[i] == '+') { i++; }
+  if (i > 0 && i == len) return SNUMFLAG_INVALID;  /* lone sign character */
+
+  if (i + 1 < len && s[i] == '0' && (s[i+1] == 'x' || s[i+1] == 'X')) {
+    i += 2;
+    if (i == len) return SNUMFLAG_INVALID;  /* empty hex body */
+    for ( ; i < len; i++)
+      if (!isXDIGIT(s[i])) return SNUMFLAG_INVALID;
+    return flag | SNUMFLAG_RADIX | SNUMFLAG_HEXSTR;
+  }
+  if (i + 1 < len && s[i] == '0' && (s[i+1] == 'b' || s[i+1] == 'B')) {
+    i += 2;
+    if (i == len) return SNUMFLAG_INVALID;  /* empty binary body */
+    for ( ; i < len; i++)
+      if (s[i] != '0' && s[i] != '1') return SNUMFLAG_INVALID;
+    return flag | SNUMFLAG_RADIX | SNUMFLAG_BINSTR;
+  }
+  if (i + 1 < len && s[i] == '0' && (s[i+1] == 'o' || s[i+1] == 'O')) {
+    i += 2;
+    if (i == len) return SNUMFLAG_INVALID;  /* empty octal body */
+    for ( ; i < len; i++)
+      if (!isOCTAL(s[i])) return SNUMFLAG_INVALID;
+    return flag | SNUMFLAG_RADIX | SNUMFLAG_OCTSTR;
+  }
+
+  /* Strip leading zeros, noting if any existed */
+  while (i < len && s[i] == '0') { i++; had_zeros = 1; }
+  if (i == len) return SNUMFLAG_NATIVE;  /* zero */
+  sig_start = i;
+
+  /* Scan integer digits */
+  while (i < len && isDIGIT(s[i])) i++;
+
+  if (i == len) {
+    /* Pure integer: range check */
+    STRLEN sig_len = i - sig_start;
+    if (flag & SNUMFLAG_NEG) { maxlen = ivmax_maxlen; maxstr = ivmin_str; }
+    else                     { maxlen = uvmax_maxlen; maxstr = uvmax_str; }
+    if (sig_len > maxlen) return flag | SNUMFLAG_BIGINT;
+    if (sig_len == maxlen) {
+      STRLEN j;
+      for (j = 0; j < maxlen; j++)
+        if (s[sig_start + j] != maxstr[j]) break;
+      if (j < maxlen && s[sig_start + j] > maxstr[j])
+        return flag | SNUMFLAG_BIGINT;
+    }
+    return flag | SNUMFLAG_NATIVE;
+  }
+
+  /* Not a pure integer - try to parse as float */
+  /*   [+-]? digit* (. digit*)? ([eE] [+-]? digit+)? */
+  {
+    int has_dot  = 0;
+    int has_frac = 0;
+    int has_int  = (i > sig_start || had_zeros);  /* had any integer digits? */
+
+    if (i < len && s[i] == '.') {
+      has_dot = 1;
+      i++;
+      while (i < len && isDIGIT(s[i])) { i++; has_frac = 1; }
+    }
+
+    if (!has_int && !has_frac)
+      return has_dot ? SNUMFLAG_INVALID : SNUMFLAG_UNKNOWN;
+
+    if (i < len && (s[i] == 'e' || s[i] == 'E')) {
+      i++;
+      if (i < len && (s[i] == '+' || s[i] == '-')) i++;
+      if (i >= len || !isDIGIT(s[i])) return SNUMFLAG_INVALID;
+      while (i < len && isDIGIT(s[i])) i++;
+    }
+
+    if (i == len) return flag | SNUMFLAG_FP;
+  }
+  return SNUMFLAG_INVALID;
+}
+
+static bool _toint_base_digit(unsigned char c, unsigned int base)
+{
+  if (base == 16) return isXDIGIT(c);
+  if (base == 8)  return isOCTAL(c);
+  if (base == 2)  return c == '0' || c == '1';
+  return isDIGIT(c);
+}
+
+/* Normalize formatting accepted only by toint, not general integer inputs.
+ * The returned SV is either svn or a mortal whose PV is stored in sp/lenp. */
+SV* _normalize_toint_string(pTHX_ SV* svn, const char **sp, STRLEN *lenp)
+{
+  const char *s = *sp;
+  STRLEN len = *lenp, start = 0, end = len, i, j, p;
+  unsigned int base = 10;
+  bool has_underscore = FALSE;
+  SV *tmp;
+  char *d;
+
+  if (SvROK(svn) || len == 0 ||
+      (!isSPACE((unsigned char)s[0]) &&
+       !isSPACE((unsigned char)s[len-1]) &&
+       memchr(s, '_', len) == 0))
+    return svn;
+
+  while (start < end && isSPACE((unsigned char)s[start])) start++;
+  while (end > start && isSPACE((unsigned char)s[end-1])) end--;
+  if (start == end)
+    croak("toint: '%" SVf "' is not a valid number", svn);
+
+  p = start;
+  if (s[p] == '+' || s[p] == '-') p++;
+  if (p + 1 < end && s[p] == '0') {
+    if      (s[p+1] == 'x' || s[p+1] == 'X') base = 16;
+    else if (s[p+1] == 'o' || s[p+1] == 'O') base = 8;
+    else if (s[p+1] == 'b' || s[p+1] == 'B') base = 2;
+  }
+
+  for (i = start; i < end; i++) {
+    if (s[i] == '_') {
+      has_underscore = TRUE;
+      if (i == start || i + 1 >= end ||
+          !_toint_base_digit((unsigned char)s[i-1], base) ||
+          !_toint_base_digit((unsigned char)s[i+1], base))
+        croak("toint: '%" SVf "' is not a valid number", svn);
+    }
+  }
+
+  if (start == 0 && end == len && !has_underscore)
+    return svn;
+
+  tmp = sv_2mortal(newSVpvn(s + start, end - start));
+  d = SvPVX(tmp);
+  if (has_underscore) {
+    for (i = j = 0; i < end - start; i++)
+      if (d[i] != '_') d[j++] = d[i];
+    d[j] = '\0';
+    SvCUR_set(tmp, j);
+  }
+  *sp = d;
+  *lenp = SvCUR(tmp);
+  return tmp;
+}
+
+/* Copy an unknown object's string representation into a plain scalar.  This
+ * lets validation and native conversion use the same overloaded value. */
+static SV* _stringify_unknown_integer_object(pTHX_ SV* n)
+{
+  if (sv_isobject(n) && !_sv_is_bigint(aTHX_ n)) {
+    STRLEN len;
+    const char *s = SvPV(n, len);
+    return sv_2mortal(newSVpvn(s, len));
+  }
+  return n;
+}
+
+/* Is this a pedantically valid integer?
+ * Croaks if undefined or invalid.
+ * Returns 0 for a validated integer that is not safe to process natively.
+ * Returns 1/-1 if it is good to process by XS.
+ * TODO: it would be useful to know the sign even if returning 0 for bigint.
+ */
+int _validate_int(pTHX_ SV* n, int negok)
+{
+  const char* mustbe = (negok) ? "must be an integer" : "must be a non-negative integer";
+  const char* sptr;
+  STRLEN len;
+  uint32_t stype, isbignum = 0, isunknown = 0;
+
+  /* TODO: magic, grok_number, etc. */
+  if (SVNUMTEST(n)) { /* If defined as number, use it */
+    if (SvIsUV(n) || SvIVX(n) >= 0)  return 1; /* The normal case */
+    if (negok)  return -1;
+    else croak("Parameter '%" SVf "' %s", n, mustbe);
+  }
+  if (sv_isobject(n)) {
+    isbignum = _sv_is_bigint(aTHX_ n);
+    isunknown = !isbignum;
+  }
+  if (!SvOK(n))  croak("Parameter must be defined");
+  if (isunknown || (SvGAMAGIC(n) && !isbignum)) sptr = SvPV(n, len);
+  else                                          sptr = SvPV_nomg(n, len);
+  if (len == 0 || sptr == 0)  croak("Parameter %s", mustbe);
+  stype = _parse_strnum(sptr, len);
+  if (!(stype & SNUMFLAG_NEG) || negok) {
+    switch (stype) {
+      case SNUMFLAG_NATIVE:                return isunknown ? 0 : 1;
+      case (SNUMFLAG_NEG|SNUMFLAG_NATIVE): return isunknown ? 0 : -1;
+      case SNUMFLAG_BIGINT:
+      case (SNUMFLAG_NEG|SNUMFLAG_BIGINT): return 0;
+      default:                             break;
+    }
+  }
+  croak("Parameter '%" SVf "' %s", n, mustbe);
+}
+
+int _validate_and_set(UV* val, pTHX_ SV* svn, uint32_t mask) {
+  int status;
+
+  if (svn == 0) croak("Parameter must be defined");
+
+  /* Streamline the typical path of input being a native integer. */
+  if (SVNUMTEST(svn)) {
+    IV n = SvIVX(svn);
+    if (n >= 0) {
+      if (n == 0 && (mask & IFLAG_POS))
+        croak("Parameter '%" SVf "' must be a positive integer", svn);
+      *val = (UV)n;
+      return 1;
+    }
+    if (SvIsUV(svn)) {
+      if (mask & IFLAG_IV)
+        return 0;
+      *val = (UV)n;
+      return 1;
+    }
+    if (mask & IFLAG_ABS)    { *val = neg_iv((UV)n); return 1; }
+    if (mask & IFLAG_POS)    croak("Parameter '%" SVf "' must be a positive integer", svn);
+    if (mask & IFLAG_NONNEG) croak("Parameter '%" SVf "' must be a non-negative integer", svn);
+    *val = n;
+    return -1;
+  }
+
+  svn = _stringify_unknown_integer_object(aTHX_ svn);
+  status = _validate_int( aTHX_ svn, !(mask & (IFLAG_NONNEG|IFLAG_POS)) );
+  if (status == 1) {
+    UV n = my_svuv(svn);
+    if (n == 0 && (mask & IFLAG_POS))
+      croak("Parameter '%" SVf "' must be a positive integer", svn);
+    if (n > (UV)IV_MAX && (mask & IFLAG_IV))
+      return 0;
+    *val = n;
+  } else if (status == -1) {
+    IV n = my_sviv(svn);
+    if (mask & IFLAG_ABS) { *val = neg_iv((UV)n); status = 1; }
+    else                  { *val = (UV)n; }
+  }
+  return status;
+}
+
+SV* _fetch_arref(pTHX_ AV* av, SV** svarr, size_t i) {
+  if (svarr == 0) {
+    SV **svp = av_fetch(av, i, 0);
+    return svp ? *svp : &PL_sv_undef;
+  }
+#ifdef DEBUGGING
+  MPUassert(svarr == AvARRAY(av), "_fetch_arref has stale AvARRAY");
+  MPUassert(i < av_count(av), "_fetch_arref index exceeds array");
+#endif
+  return svarr[i] ? svarr[i] : &PL_sv_undef;
+}
+
+#define READ_UV_IARR(dst, src, itype) \
+  { \
+    UV n; \
+    int istatus = _validate_and_set(&n, aTHX_ src, IFLAG_ANY); \
+    if      (istatus == -1)                  itype |= IARR_TYPE_NEG; \
+    else if (istatus == 1 && n > (UV)IV_MAX) itype |= IARR_TYPE_POS; \
+    if (istatus == 0 || itype == IARR_TYPE_BAD) break; \
+    dst = n; \
+  }
+
+int arrayref_to_int_array(pTHX_ size_t *retlen, UV** ret, bool want_sort, SV* sva, const char* fstr)
+{
+  Size_t len, i;
+  int itype = IARR_TYPE_ANY;
+  UV  *r;
+  DECL_ARREF(avp);
+
+  USE_ARREF(avp, sva, fstr, AR_READ);
+  len = len_avp;
+  *retlen = len;
+  if (len == 0) {
+    *ret = 0;
+    return itype;
+  }
+  New(0, r, len, UV);
+  for (i = 0; i < len; i++) {
+    SV *iv = FETCH_ARREF(avp,i);
+    if (iv != 0 && SVNUMTEST(iv)) {
+      IV n = SvIVX(iv);
+      if (n < 0) {
+        if (SvIsUV(iv))  itype |= IARR_TYPE_POS;
+        else             itype |= IARR_TYPE_NEG;
+        if (itype == IARR_TYPE_BAD) break;
+      }
+      r[i] = (UV)n;
+    } else {
+      READ_UV_IARR(r[i], iv, itype);
+      /* After the validate, it's possible that an overload has caused
+       * arbitrary Perl to run, meaning we need to protect against
+       * pathological cases where the array reference is modified. */
+      REFRESH_ARREF(avp);
+    }
+  }
+  if (i < len) {
+    Safefree(r);
+    *ret = 0;
+    return IARR_TYPE_BAD;
+  }
+  *ret = r;
+  if (want_sort) {
+    if (itype == IARR_TYPE_NEG) {
+      for (i = 1; i < len; i++)
+        if ( (IV)r[i] <= (IV)r[i-1] )
+          break;
+    } else {
+      for (i = 1; i < len; i++)
+        if (r[i] <= r[i-1])
+          break;
+    }
+    if (i < len)
+      sort_dedup_uv_array(r, itype == IARR_TYPE_NEG, retlen);
+  }
+  return itype;
+}
+
+/* Check whether an SV is a non-magical arrayref whose elements are all native
+ * non-negative integers in strictly increasing order (i.e. sorted and unique).
+ * On success returns the AvARRAY pointer and sets *lenp; otherwise NULL.
+ * Used by the set-op fast path to skip intermediate UV array allocation. */
+SV** _check_sorted_nonneg_arrayref(pTHX_ SV *sv, size_t *lenp)
+{
+  AV *av;
+  SV **arr;
+  size_t len, i;
+  if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVAV) return NULL;
+  av = (AV*)SvRV(sv);
+  if (SvMAGICAL(av)) return NULL;
+  arr = AvARRAY(av);
+  len = av_count(av);
+  for (i = 0; i < len; i++) {
+    SV *elem = arr[i];
+    if (!elem || !SVNUMTEST(elem))                return NULL;
+    if (!SvIsUV(elem) && SvIVX(elem) < 0)         return NULL;
+    if (i > 0 && SvUVX(elem) <= SvUVX(arr[i-1]))  return NULL;
+  }
+  *lenp = len;
+  return arr;
+}
+
+int array_to_int_array(pTHX_ size_t *retlen, UV** ret, bool want_sort, SV** svbase, size_t len)
+{
+  size_t i;
+  int itype = IARR_TYPE_ANY;
+  UV  *r;
+  SV **source = svbase, **snapshot = 0;
+  *retlen = len;
+  if (len == 0) {
+    *ret = 0;
+    return itype;
+  }
+  New(0, r, len, UV);
+  for (i = 0; i < len; i++) {
+    SV *iv = source[i];
+    if (SVNUMTEST(iv)) {
+      IV n = SvIVX(iv);
+      if (n < 0) {
+        if (SvIsUV(iv))  itype |= IARR_TYPE_POS;
+        else             itype |= IARR_TYPE_NEG;
+        if (itype == IARR_TYPE_BAD) break;
+      }
+      r[i] = (UV)n;
+    } else {
+      /* Validation can invoke Perl and relocate its value stack.  Copy the
+       * original stack entries before the first validation that might do so.
+       * The current implementation only requires this for SvROK(iv) or
+       * SvGMAGICAL(iv), but stay conservative rather than rely on that detail.
+       */
+      if (snapshot == 0) {
+        New(0, snapshot, len, SV*);
+        Copy(svbase, snapshot, len, SV*);
+        source = snapshot;
+        iv = source[i];
+      }
+      READ_UV_IARR(r[i], iv, itype);
+    }
+  }
+  if (snapshot != 0) Safefree(snapshot);
+  if (i < len) {
+    Safefree(r);
+    *ret = 0;
+    return IARR_TYPE_BAD;
+  }
+  *ret = r;
+  if (want_sort) {
+    if (itype == IARR_TYPE_NEG) {
+      for (i = 1; i < len; i++)
+        if ( (IV)r[i] <= (IV)r[i-1] )
+          break;
+    } else {
+      for (i = 1; i < len; i++)
+        if (r[i] <= r[i-1])
+          break;
+    }
+    if (i < len)
+      sort_dedup_uv_array(r, itype == IARR_TYPE_NEG, retlen);
+  }
+  return itype;
+}
+
+#undef READ_UV_IARR
+
+bool arrayref_to_digit_array(pTHX_ size_t *retlen, UV** ret, SV* sva, UV base)
+{
+  size_t len, i, j;
+  int itype;
+  UV *r = 0, carry = 0;
+
+  *ret = 0;
+
+  itype = arrayref_to_int_array(aTHX_ &len, &r, 0, sva, "fromdigits");
+
+  if (itype == IARR_TYPE_BAD || itype == IARR_TYPE_NEG) {
+    Safefree(r);
+    return 0;
+  }
+
+  for (i = len; i > 0; i--) {
+    j = i - 1;
+    if (carry != 0) {
+      if (r[j] > UV_MAX - carry) {
+        Safefree(r);
+        return 0;
+      }
+      r[j] += carry;
+    }
+    if (r[j] >= base && j > 0) {
+      carry = r[j] / base;
+      r[j] -= carry * base;
+    } else {
+      carry = 0;
+    }
+  }
+  *ret = r;
+  *retlen = len;
+  return 1;
+}
+
+typedef struct aref_cmp_path {
+  const AV *a;
+  const AV *b;
+  const struct aref_cmp_path *parent;
+} aref_cmp_path;
+
+static int _compare_array_refs_recurse(pTHX_ SV* a, SV* b,
+                                       const aref_cmp_path *path)
+{
+  AV *ava, *avb;
+  const aref_cmp_path *p;
+  aref_cmp_path current;
+  Size_t i, alen, blen;
+  if ( ((!SvROK(a)) || (SvTYPE(SvRV(a)) != SVt_PVAV)) ||
+       ((!SvROK(b)) || (SvTYPE(SvRV(b)) != SVt_PVAV)) )
+    return AREF_CMP_INVALID;
+  ava = (AV*) SvRV(a);
+  avb = (AV*) SvRV(b);
+  /* Tied array fetches return magical proxies that cannot safely be held
+   * across another fetch.  Let PP handle all magical array semantics. */
+  if (SvMAGICAL(ava) || SvMAGICAL(avb))
+    return AREF_CMP_DISPATCH;
+  /* A repeated active pair has already had its shape checked by an outer
+   * frame.  Treat that branch as equal and let the outer frame continue. */
+  for (p = path; p != NULL; p = p->parent)
+    if (p->a == ava && p->b == avb)
+      return 1;
+  current.a = ava;
+  current.b = avb;
+  current.parent = path;
+  alen = av_count(ava);
+  blen = av_count(avb);
+  if (alen != blen)
+    return 0;
+  for (i = 0; i < alen; i++) {
+    SV** iva = av_fetch(ava, (SSize_t)i, 0);
+    SV** ivb = av_fetch(avb, (SSize_t)i, 0);
+    SV *sva, *svb;
+    int res;
+
+    sva = (iva && *iva) ? *iva : &PL_sv_undef;
+    svb = (ivb && *ivb) ? *ivb : &PL_sv_undef;
+
+    if (!SvOK(sva) && !SvOK(svb))  /* Two undefs are fine. */
+      continue;
+    if (!SvOK(sva) || !SvOK(svb))  /* One undef isn't ok. */
+      return 0;
+    /* Hashes, I/O, etc. are not ok. */
+    if (SvTYPE(sva) >= SVt_PVAV || SvTYPE(svb) >= SVt_PVAV)
+      return AREF_CMP_INVALID;
+
+    {
+      int a_is_ref = SvROK(sva), b_is_ref = SvROK(svb);
+      int a_is_array = a_is_ref && SvTYPE(SvRV(sva)) == SVt_PVAV;
+      int b_is_array = b_is_ref && SvTYPE(SvRV(svb)) == SVt_PVAV;
+
+      if (a_is_array || b_is_array) {
+        if (a_is_array && b_is_array) {
+          res = _compare_array_refs_recurse(aTHX_ sva, svb, &current);
+          if (res == 1) continue;
+          return res;
+        }
+        /* An array and scalar differ; an array and other reference is invalid. */
+        return (!a_is_ref || !b_is_ref) ? 0 : AREF_CMP_INVALID;
+      }
+      /* Non-object references other than arrays are invalid. */
+      if ( (a_is_ref && !sv_isobject(sva)) ||
+           (b_is_ref && !sv_isobject(svb)) )
+        return AREF_CMP_INVALID;
+    }
+
+    /* Common case: two simple integers */
+    if (    SVNUMTEST(sva) && SVNUMTEST(svb)
+         && (SvTYPE(sva) == SVt_IV || SvTYPE(sva) == SVt_PVIV)
+         && (SvTYPE(svb) == SVt_IV || SvTYPE(svb) == SVt_PVIV) ) {
+      if (SvIsUV(sva)) {
+        if (SvIsUV(svb)) {
+          if (SvUVX(sva) != SvUVX(svb)) return 0;
+        } else {
+          IV vb = SvIVX(svb);
+          if (vb < 0 || SvUVX(sva) != (UV)vb) return 0;
+        }
+      } else if (SvIsUV(svb)) {
+        IV va = SvIVX(sva);
+        if (va < 0 || (UV)va != SvUVX(svb)) return 0;
+      } else if (SvIVX(sva) != SvIVX(svb)) {
+        return 0;
+      }
+      continue;
+    }
+
+    /* This function is more useful if we allow more than strictly integers */
+    if (!sv_eq(sva, svb))  /* Compare using Perl string semantics. */
+      return 0;
+  }
+  return 1;
+}
+
+int _compare_array_refs(pTHX_ SV* a, SV* b)
+{
+  return _compare_array_refs_recurse(aTHX_ a, b, NULL);
+}
+
+bool xs_is_sv_scalar_ref(SV *sv)
+{
+  return sv && SvOK(sv) && SvROK(sv) && SvTYPE(SvRV(sv)) <= SVt_PVMG;
+}

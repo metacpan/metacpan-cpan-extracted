@@ -23,7 +23,9 @@
  *    1.48 ns/word  Xoroshiro128+
  *    1.16 ns/word  SplitMix64
  *
- * These functions do locking, the underlying library does not.
+ * The functions here do not use locking, but use an opaque context.
+ * Threads can use their own contexts to keep things separate.
+ * Sharing a single context between threads would require the caller to lock.
  */
 
 #include <stdio.h>
@@ -39,6 +41,13 @@
 #define CIRAND32(ctx)               chacha_irand32((chacha_context_t*)ctx)
 #define CIRAND64(ctx)               chacha_irand64((chacha_context_t*)ctx)
 #define CSELFTEST()                 chacha_selftest()
+
+/* Use volatile stores so the compiler cannot optimize away the wipe. */
+static void secure_bzero(void *v, size_t n)
+{
+  volatile unsigned char *p = (volatile unsigned char *)v;
+  while (n-- > 0) *p++ = 0;
+}
 
 /* Helper macros, similar to ChaCha, so we're consistent. */
 #if !defined(__x86_64__)
@@ -66,6 +75,7 @@
 
 /* We put a simple 32-bit non-CS PRNG here to help fill small seeds. */
 #if 0
+#define PRNG_STATE_WORDS 4
 /* XOSHIRO128**  32-bit output, 32-bit types, 128-bit state */
 static INLINE uint32_t rotl(const uint32_t x, int k) {
   return (x << k) | (x >> (32 - k));
@@ -89,6 +99,7 @@ void* prng_new(uint32_t a, uint32_t b, uint32_t c, uint32_t d) {
   return (void*) state;
 }
 #else
+#define PRNG_STATE_WORDS 2
 /* PCG RXS M XS 32.  32-bit output, 32-bit state and types. */
 uint32_t prng_next(void* ctx) {
   uint32_t *rng = (uint32_t*) ctx;
@@ -119,6 +130,13 @@ uint32_t csprng_context_size(void)
 {
   return sizeof(chacha_context_t);
 }
+
+void csprng_clear(void *ctx)
+{
+  if (ctx != 0)
+    secure_bzero(ctx, csprng_context_size());
+}
+
 static char _has_selftest_run = 0;
 
 void csprng_seed(void *ctx, uint32_t bytes, const unsigned char* data)
@@ -140,6 +158,7 @@ void csprng_seed(void *ctx, uint32_t bytes, const unsigned char* data)
     rng = prng_new(a,b,c,d);
     for (i = 4*((bytes+3)/4); i < SEED_BYTES; i += 4)
       U32TO8_LE(seed + i, prng_next(rng));
+    secure_bzero(rng, PRNG_STATE_WORDS * sizeof(uint32_t));
     Safefree(rng);
 #if 0
     printf("got %u bytes in expanded to %u\n", bytes, SEED_BYTES);
@@ -149,29 +168,31 @@ void csprng_seed(void *ctx, uint32_t bytes, const unsigned char* data)
   }
 
   if (!_has_selftest_run) {
+    if (!CSELFTEST())
+      croak("CSPRNG self-test failed");
     _has_selftest_run = 1;
-    CSELFTEST();
   }
   CSEED(ctx, SEED_BYTES, seed, (bytes >= 16));
+  secure_bzero(seed, sizeof(seed));
 }
 
-extern void csprng_srand(void* ctx, UV insecure_seed)
+extern uint32_t csprng_srand(void* ctx, UV insecure_seed,
+                             unsigned char seed[8])
 {
+  uint32_t bytes = 4;
 #if BITS_PER_WORD == 32
-  unsigned char seed[4] = {0};
   U32TO8_LE(seed, insecure_seed);
-  csprng_seed(ctx, 4, seed);
 #else
-  unsigned char seed[8] = {0};
   if (insecure_seed <= UVCONST(4294967295)) {
     U32TO8_LE(seed, insecure_seed);
-    csprng_seed(ctx, 4, seed);
   } else {
     U32TO8_LE(seed, insecure_seed);
     U32TO8_LE(seed + 4, (insecure_seed >> 32));
-    csprng_seed(ctx, 8, seed);
+    bytes = 8;
   }
 #endif
+  csprng_seed(ctx, bytes, seed);
+  return bytes;
 }
 
 void csprng_rand_bytes(void* ctx, uint32_t bytes, unsigned char* data)
@@ -239,28 +260,45 @@ bool is_csprng_well_seeded(void *ctx)
  * the constants at runtime to ensure a dodgy compiler won't munge them.
  *
  * As of C99 or MSVC 15.6, we could better write these as e.g. 0x1.0p-64.
+ * E.g.  (CIRAND64(ctx) >> 11) * 0x1.0p-53
  */
-#define TO_NV_32    2.3283064365386962890625000000000000000E-10L
-#define TO_NV_64    5.4210108624275221700372640043497085571E-20L
-#define TO_NV_96    1.2621774483536188886587657044524579675E-29L
-#define TO_NV_128   2.9387358770557187699218413430556141945E-39L
-
-#define DRAND_32_32  (CIRAND32(ctx) * TO_NV_32)
-#define DRAND_64_32  (((CIRAND32(ctx)>>5) * 67108864.0 + (CIRAND32(ctx)>>6)) / 9007199254740992.0)
-#define DRAND_64_64  (CIRAND64(ctx) * TO_NV_64)
-#define DRAND_128_32 (CIRAND32(ctx) * TO_NV_32 + CIRAND32(ctx) * TO_NV_64 + CIRAND32(ctx) * TO_NV_96 + CIRAND32(ctx) * TO_NV_128)
-#define DRAND_128_64 (CIRAND64(ctx) * TO_NV_64 + CIRAND64(ctx) * TO_NV_128)
+#define TO_NV_32    ((NV)LNVCONST(2.3283064365386962890625000000000000000E-10))
+#define TO_NV_64    ((NV)LNVCONST(5.4210108624275221700372640043497085571E-20))
+#define TO_NV_96    ((NV)LNVCONST(1.2621774483536188886587657044524579675E-29))
+#define TO_NV_128   ((NV)LNVCONST(2.9387358770557187699218413430556141945E-39))
 
 NV drand64(void* ctx)
 {
   NV r;
+
+  do {
 #if NVMANTBITS <= 32
-  r = DRAND_32_32;
-#elif NVMANTBITS <= 64
-  r = (BITS_PER_WORD <= 32)  ?  DRAND_64_32  :  DRAND_64_64;
+    uint32_t a = CIRAND32(ctx);
+    r = (NV)a * TO_NV_32;
+#elif BITS_PER_WORD <= 32
+  #if NVMANTBITS <= 64
+    uint32_t a = CIRAND32(ctx);
+    uint32_t b = CIRAND32(ctx);
+    r = (NV)a * TO_NV_32 + (NV)b * TO_NV_64;
+  #else
+    uint32_t a = CIRAND32(ctx);
+    uint32_t b = CIRAND32(ctx);
+    uint32_t c = CIRAND32(ctx);
+    uint32_t d = CIRAND32(ctx);
+    r = (NV)a * TO_NV_32  +  (NV)b * TO_NV_64
+      + (NV)c * TO_NV_96  +  (NV)d * TO_NV_128;
+  #endif
 #else
-  r = (BITS_PER_WORD <= 32)  ?  DRAND_128_32 :  DRAND_128_64;
+  #if NVMANTBITS <= 64
+    UV a = CIRAND64(ctx);
+    r = (NV)a * TO_NV_64;
+  #else
+    UV a = CIRAND64(ctx);
+    UV b = CIRAND64(ctx);
+    r = (NV)a * TO_NV_64 + (NV)b * TO_NV_128;
+  #endif
 #endif
+  } while (r >= 1.0);
   return r;
 }
 
@@ -376,7 +414,7 @@ UV urandomm64(void* ctx, UV n)
 #endif
 
 
-UV urandomb(void* ctx, int nbits)
+UV urandomb(void* ctx, uint32_t nbits)
 {
   if (nbits == 0) {
     return 0;

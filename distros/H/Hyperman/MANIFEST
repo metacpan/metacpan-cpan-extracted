@@ -40,6 +40,7 @@ t/19-access-log.t
 t/20-listen.t
 t/21-smuggling.t
 t/22-abi.t
+t/24-loop-fork.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

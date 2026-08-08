@@ -86,9 +86,11 @@ sub routes {
         push @rows, {
             method => 'ANY',
             path   => ($m->{prefix} // '') . '/*',
-            target => ($m->{dir} ? "static $m->{dir}" : 'mounted psgi app'),
+            target => $m->{dir}    ? "static $m->{dir}"
+                    : $m->{md_dir} ? "markdown $m->{md_dir}"
+                    :                'mounted psgi app',
             guards => 0,
-            kind   => 'mount',
+            kind   => $m->{md_dir} ? 'markdown' : 'mount',
         };
     }
 
@@ -717,6 +719,28 @@ sub _abi_report {
         { name => 'File::Raw::JSON (frj_abi)',
           detail => $p ? 'resolved' : 'not resolved',
           state  => $p ? 'ok' : 'NOT RESOLVED' };
+    };
+
+    # The markdown mount's two. Both are optional in the sense that an app
+    # without a markdown keyword never touches them, so a missing one is
+    # reported rather than treated as a fault.
+    push @out, do {
+        my $ok = eval { Punk::_mds_available() };
+        my $v  = eval { Punk::_mds_abi_version() };
+        { name   => 'Markdown::Simple (mds_abi)',
+          detail => $ok ? "v$v, resolved"
+                  : defined $v ? "v$v wanted, not resolved" : 'not available',
+          state  => $ok ? 'ok' : 'not resolved (only needed by `markdown`)' };
+    };
+
+    push @out, do {
+        my $ok = eval { Punk::_sg_available() };
+        my $v  = eval { Punk::_sg_abi_version() };
+        { name   => 'Search::Trigram (sg_abi)',
+          detail => $ok ? "v$v, resolved"
+                  : defined $v ? "v$v wanted, not resolved" : 'not available',
+          state  => $ok ? 'ok'
+                        : 'not resolved (only needed by `markdown` search)' };
     };
 
     return @out;

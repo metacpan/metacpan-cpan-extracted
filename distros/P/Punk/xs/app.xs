@@ -478,6 +478,40 @@ static(self, prefix, dir)
     OUTPUT:
         RETVAL
 
+# markdown($prefix, $dir, %opts): serve a directory of markdown as a
+# documentation site. Rides the same mount table static does, so prefix
+# dispatch and longest-prefix ordering come free; compile turns the record
+# into a Punk::Mount::Markdown app. Chains.
+SV *
+markdown(self, prefix, dir, ...)
+        SV *self
+        SV *prefix
+        SV *dir
+    CODE:
+    {
+        HV *h = app_hv(aTHX_ self);
+        HV *rec = newHV();
+        SV *pf = app_strip_slash(aTHX_ prefix);
+        HV *opts = newHV();
+        int i;
+        if ((items - 3) % 2)
+            croak("Punk: markdown takes a prefix, a directory and "
+                  "an even-sized option list");
+        for (i = 3; i + 1 < items; i += 2) {
+            STRLEN kl;
+            const char *kp = SvPV_const(ST(i), kl);
+            (void)hv_store(opts, kp, (I32)kl, newSVsv(ST(i + 1)), 0);
+        }
+        (void)hv_stores(rec, K_PREFIX, pf);
+        (void)hv_stores(rec, K_LEN,    newSViv((IV)SvCUR(pf)));
+        (void)hv_stores(rec, K_MD_DIR, newSVsv(dir));
+        (void)hv_stores(rec, K_OPTS,   newRV_noinc((SV *)opts));
+        av_push(app_av(aTHX_ h, K_MOUNTS), newRV_noinc((SV *)rec));
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
 # mount($prefix, $psgi_app): mount a PSGI coderef. Chains.
 SV *
 mount(self, prefix, app)

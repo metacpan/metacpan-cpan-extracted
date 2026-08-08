@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Perm - Permission management plugin for Fondatio
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # AUTHOR
 

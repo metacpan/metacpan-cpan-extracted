@@ -3,11 +3,14 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util::GMP qw/gcd lcm kronecker valuation hammingweight invmod
-                              is_qr
-                              is_power is_prime_power is_square
-                              binomial binomialmod gcdext vecsum vecprod/;
+use Math::Prime::Util::GMP qw/gcd lcm kronecker valuation hammingweight
+                              remove_factors remove_factors_exp
+                              is_power is_prime_power is_square is_qr
+                              binomial binomialmod gcdext
+                              vecsum vecprod vecprefixsum/;
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
+my $author = defined $ENV{AUTHOR_TESTING} && $ENV{AUTHOR_TESTING};
+my $deep_testing = $extra || $author;
 
 my @gcds = (
   [ [], 0],
@@ -107,6 +110,18 @@ my @valuations = (
   [96552,6, 3],
   [1879048192,2, 28],
 );
+my @remove_factors = (
+  [ 72,  6,  2,  2],
+  [ 72, 12,  6,  1],
+  [ 72,  8,  9,  1],
+  [  5,  6,  5,  0],
+  [-72,  6, -2,  2],
+  [-12,  3, -4,  1],
+  ["184467440737095516160", 10, "18446744073709551616", 1],
+  ["-184467440737095516160", 10, "-18446744073709551616", 1],
+  [ 0, 6, undef, undef],
+);
+
 my @binomials = (
  [ 0,0, 1 ],
  [ 0,1, 0 ],
@@ -183,14 +198,16 @@ plan tests => 1      # gcd
             + 1      # lcm
             + 1      # kronecker
             + 1      # valuation
+            + 3      # remove_factors
             + 1      # hammingweight
             + 1      # binomial
             + 6      # ... more binomial
-            + 4      # binomialmod
+            + 8 + ($deep_testing ? 3 : 0)      # binomialmod
             + 1      # gcdext
             + 1      # vecsum
             + 1      # vecprod
-            + 5 + 4 + 3 + 3 + 2;
+            + 6      # vecprefixsum
+            + 7 + 4 + 7 + 3 + 3 + 2;
 
 is_deeply( [map { gcd(@{$_->[0]}) } @gcds],
            [map { $_->[1]         } @gcds], "gcd(...)");
@@ -203,6 +220,14 @@ is_deeply( [map { kronecker($_->[0],$_->[1]) } @kroneckers],
 
 is_deeply( [map { valuation($_->[0],$_->[1]) } @valuations],
            [map { $_->[2]                    } @valuations], "valuation(n,k)");
+
+is_deeply(
+  [ map { my($n,$k) = @$_; [ remove_factors($n,$k), remove_factors_exp($n,$k) ] } @remove_factors ],
+  [ map { [ $_->[2], $_->[2], $_->[3] ] } @remove_factors ],
+  "remove_factors(n,k)"
+);
+ok(!eval { remove_factors(10,1); 1 }, "remove_factors rejects k=1");
+ok(!eval { remove_factors_exp(10,0); 1 }, "remove_factors_exp rejects k=0");
 
 is_deeply( [map { hammingweight($_) } @hamming], \@popcnt, "hammingweight" );
 
@@ -235,6 +260,16 @@ is_deeply([binomialmod(400,343,1777),
            binomialmod(-400,-343,1777),
            binomialmod(-14,-343,1777)],
           [977, 251, 421, 0, 0, 647], "binomialmod with negative");
+is(binomialmod(126001, 251, 63001), 501, "binomialmod with prime-square modulus");
+is(binomialmod(2060601, 101, 1030301), 20401, "binomialmod with prime-cube modulus");
+is(binomialmod(208120801, 101, 104060401), 2060601, "binomialmod with prime-fourth-power modulus");
+is(binomialmod(100, 2, 16875), 4950, "binomialmod with composite prime-power modulus");
+
+if ($deep_testing) {
+  is(binomialmod(2*4514260853041-1, 4514260853041-1, 4514260853041), 1, "binomialmod with large prime-square modulus");
+  is(binomialmod(567373297, 283686649, 4778134229107), 1, "binomialmod with large prime-cube modulus");
+  is(binomialmod(8589935272, 429496, 97656250000000000), 57900778336640000, "binomialmod with large composite prime-power modulus");
+}
 
 
 is_deeply( [map { [gcdext($_->[0],$_->[1])] } @gcdexts],
@@ -246,17 +281,67 @@ is_deeply( [map { vecsum(@{$_->[1]}) } @vecsums],
 is_deeply( [map { vecprod(@{$_->[1]}) } @vecprods],
            [map { $_->[0]            } @vecprods], "vecprod(...)");
 
+{
+  my @cases = (
+    [ [], [] ],
+    [ [5], [5] ],
+    [ [1,2,3,4,5], [1,3,6,10,15] ],
+    [ [-3,2,-1,5], [-3,-1,-2,3] ],
+    [ ["9000000000000000000","9000000000000000000",-1],
+      ["9000000000000000000","18000000000000000000","17999999999999999999"] ],
+    [ ["-9223372036854775808",-1,"9223372036854775810"],
+      ["-9223372036854775808","-9223372036854775809",1] ],
+  );
+  my (@list_result, @aref_result);
+  for my $case (@cases) {
+    my $in = $case->[0];
+    push @list_result, [map { "$_" } vecprefixsum(@$in)];
+    push @aref_result, [map { "$_" } vecprefixsum($in)];
+  }
+  is_deeply(\@list_result, [map { $_->[1] } @cases],
+            "vecprefixsum integer lists");
+  is_deeply(\@aref_result, [map { $_->[1] } @cases],
+            "vecprefixsum array references");
+  is_deeply([scalar(vecprefixsum()), scalar(vecprefixsum([])),
+             scalar(vecprefixsum(1,2,3)), scalar(vecprefixsum([1,2,3]))],
+            [0,0,3,3], "vecprefixsum scalar context");
+  ok(!eval { my @v = vecprefixsum(1,"not an integer"); 1 },
+     "vecprefixsum rejects non-integers");
+  my @sparse;
+  $sparse[2] = 3;
+  ok(!eval { my @v = vecprefixsum(\@sparse); 1 },
+     "vecprefixsum rejects sparse arrays");
+  ok(!eval { my @v = vecprefixsum([1,2],3); 1 },
+     "vecprefixsum rejects an array reference mixed with list arguments");
+}
+
 
 is( is_power("18475335773296164196"), "0", "is_power(18475335773296164196) == 0" );
 is( is_power("1415842012524355766113858481287417543594447475938337587864641453047142843853822559252126433860162253504357722982805134804808530350591698526668732807053601"), "18", "is_power(322396049^18) == 18" );
 is( is_power("195820481042341245090221890868767224469265867337457650976172728836917821923718632978263135461761"), "16", "is_power(903111^16) == 16" );
 ok( is_power("195820481042341245090221890868767224469265867337457650976172728836917821923718632978263135461761",4), "is_power(903111^16,4) is true" );
 is( is_power("894311843364148115560351871258324837202590615410044436950984649"), "2", "is_power(29905047121918201644964877983907^2) == 2" );
+is( is_power(Math::Prime::Util::GMP::powint(101,101)), 101, "is_power(101^101) == 101" );
+is( is_power(Math::Prime::Util::GMP::powint(202,101)), 101, "is_power(202^101) == 101" );
 
 is( is_power(-27), 3, "-27 is found to be a third power" );
 is( is_power(-8, 3), 1, "-8 is a third power" );
 is( is_power(-8, 4), 0, "-8 is not a fourth power" );
 is( is_power(-16,4), 0, "-16 is not a fourth power" );
+
+{
+  my $huge_even_k = "1000000000000000000000000000000";
+  my $huge_odd_k  = "1000000000000000000000000000001";
+
+  is( is_power(16, undef), 4, "is_power(n,undef) requests largest power" );
+  is( is_power(16, $huge_even_k), 0, "is_power(n,huge k) returns exact false" );
+  is( is_power(1, $huge_even_k), 1, "is_power(1,huge k) returns exact true" );
+  is( is_power(-1, $huge_odd_k), 1, "is_power(-1,huge odd k) returns exact true" );
+  is( is_power(-1, $huge_even_k), 0, "is_power(-1,huge even k) returns exact false" );
+  is( is_power(-8, $huge_odd_k), 0, "is_power(-8,huge odd k) returns exact false" );
+  eval { is_power(16, ""); 1 };
+  like($@, qr/empty string/, "is_power rejects empty k");
+}
 
 is( is_prime_power("18475335773296164196"), "0", "is_prime_power(18475335773296164196) == 0" );
 is( is_prime_power("894311843364148115560351871258324837202590615410044436950984649"), 0, "is_prime_power(29905047121918201644964877983907^2) == 0" );

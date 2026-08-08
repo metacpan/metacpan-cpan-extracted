@@ -2,10 +2,6 @@
 
 File::Rotate::Simple - no-frills file rotation
 
-# VERSION
-
-version v0.3.0
-
 # SYNOPSIS
 
 ```perl
@@ -60,167 +56,67 @@ are deleted.
 
 Note that files with the extension `0` are ignored.
 
-# ATTRIBUTES
+# RECENT CHANGES
 
-## `age`
+Changes for version v0.4.1 (2026-08-07)
 
-The maximum age of files (in days), relative to the ["time"](#time)
-attribute.  Older files will be deleted.
+- Bug Fixs
+    - Fixed bug when older rotated files are dangling symlinks.
+    - Fixed bug when rotating dandling symlinks and age > 0.
 
-A value `0` (default) means there is no maximum age.
+See the `Changes` file for more details.
 
-## `max`
+# REQUIREMENTS
 
-The maximum number of files to keep.  Numbered files larger than this
-will be deleted.
+This module lists the following modules as runtime dependencies:
 
-A value of `0` (default) means that there is no maximum number.
+- [Exporter](https://metacpan.org/pod/Exporter)
+- [Graph](https://metacpan.org/pod/Graph)
+- [List::Util](https://metacpan.org/pod/List%3A%3AUtil) version 1.43 or later
+- [Module::Runtime](https://metacpan.org/pod/Module%3A%3ARuntime)
+- [Moo](https://metacpan.org/pod/Moo) version 1.001000 or later
+- [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) version 0.018 or later
+- [Ref::Util](https://metacpan.org/pod/Ref%3A%3AUtil)
+- [Time::Seconds](https://metacpan.org/pod/Time%3A%3ASeconds)
+- [Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard)
+- [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean)
+- [perl](https://metacpan.org/pod/perl) version v5.14.0 or later
+- [warnings](https://metacpan.org/pod/warnings)
 
-Note that it does not track whether intermediate files are missing.
+See the `cpanfile` file for the full list of prerequisites.
 
-## `file`
+# INSTALLATION
 
-The file to rotate. This can be a string or [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) object.
+The latest version of this module (along with any dependencies) can be installed from [CPAN](https://www.cpan.org) with the `cpan` tool that is included with Perl:
 
-## `files`
-
-When ["rotate"](#rotate) is called as a constructor, you can specify an array
-reference of files to rotate:
-
-```perl
-File::Rotate::Simple->rotate(
-   files => \@files,
-   ...
-);
+```
+cpan File::Rotate::Simple
 ```
 
-## `start_num`
+You can also extract the distribution archive and install this module (along with any dependencies):
 
-The starting number to use when rotating files. Defaults to `1`.
-
-Added in v0.2.0.
-
-## `extension_format`
-
-The extension to add when rotating. This is a string that is passed to
-["strftime" in Time::Piece](https://metacpan.org/pod/Time%3A%3APiece#strftime) with the following addition of the `%#` code,
-which corresponds to the rotation number of the file.
-
-Added in v0.2.0.
-
-## `replace_extension`
-
-If defined, it replaces the extension with the one specified by
-["extension\_format"](#extension_format) rather than appending it.  Use this when you want
-to preserve the existing extension in a rotated backup, e.g.
-
-```perl
-my $r = File::Rotate::Simple->new(
-    file              => 'myapp.log',
-    extension_format  => '.%#.log',
-    replace_extension => '.log',
-);
+```
+cpan .
 ```
 
-will rotate the log as `myapp.1.log`.
+You can also install this module manually using the following commands:
 
-Added in v0.2.0.
-
-## `if_missing`
-
-When true, rotate the files even when ["file"](#file) is missing. True by
-default, for backwards compatability.
-
-Added in v0.2.0.
-
-## `touch`
-
-Touch ["file"](#file) after rotating.
-
-## `time`
-
-A time object corresponding to the time used for generating
-timestamped extensions in ["extension\_format"](#extension_format).  It defaults to a
-[Time::Piece](https://metacpan.org/pod/Time%3A%3APiece) object with the current local time.
-
-You can specify an alternative time (including time zone) in the
-constructor, e.g.
-
-```perl
-use Time::Piece;
-
-my $r = File::Rotate::Simple->new(
-    file              => 'myapp.log',
-    time              => gmtime(),
-    extension_format  => '.%Y%m%d',
-);
+```
+perl Makefile.PL
+make
+make test
+make install
 ```
 
-[Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment) and [DateTime](https://metacpan.org/pod/DateTime) objects can also be given.
+If you are working with the source repository, then it may not have a `Makefile.PL` file.  But you can use the [Dist::Zilla](https://dzil.org/) tool in anger to build and install this module:
 
-Unlike other attributes, ["time"](#time) is read-write, so that it can be
-updated between calls to ["rotate"](#rotate):
-
-```perl
-use Time::Piece;
-
-$r->time( localtime );
-$r->rotate;
+```
+dzil build
+dzil test
+dzil install --install-command="cpan ."
 ```
 
-Added in v0.2.0.
-
-# METHODS
-
-## `rotate`
-
-Rotates the files.
-
-This can be called as a constructor.
-
-# EXPORTS
-
-None by default. All exports must be made manually.
-
-## `rotate_files`
-
-This is an optionally exported function for rotating files.
-
-```perl
-use File::Rotate::Simple qw/ rotate_files /;
-
-rotate_files(
-    file => '/foo/bar/backup.tar.gz',
-    age  => 7,
-    max  => 30,
-);
-```
-
-Added in v0.2.0.
-
-# SUPPORT FOR OLDER PERL VERSIONS
-
-Since v0.3.0, the this module requires Perl v5.14 or later.
-
-Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.8, please use one of the v0.2.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
-
-# SEE ALSO
-
-The following modules have similar functionality:
-
-- [File::Rotate::Backup](https://metacpan.org/pod/File%3A%3ARotate%3A%3ABackup)
-- [File::Write::Rotate](https://metacpan.org/pod/File%3A%3AWrite%3A%3ARotate)
-
-There are also several logging modueles that support log rotation.
-
-# SOURCE
-
-The development version is on github at [https://github.com/robrwo/File-Rotate-Simple](https://github.com/robrwo/File-Rotate-Simple)
-and may be cloned from [git://github.com/robrwo/File-Rotate-Simple.git](git://github.com/robrwo/File-Rotate-Simple.git)
+For more information, see [How to install CPAN modules](https://www.cpan.org/modules/INSTALL.html).
 
 # BUGS
 
@@ -231,9 +127,14 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/File-Rotate-Simple](https://github.com/robrwo/File-Rotate-Simple)
+and may be cloned from [https://github.com/robrwo/File-Rotate-Simple.git](https://github.com/robrwo/File-Rotate-Simple.git)
+
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 # CONTRIBUTOR
 
@@ -241,10 +142,19 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2023 by Robert Rothenberg.
+This software is Copyright (c) 2015-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
+
+# SEE ALSO
+
+The following modules have similar functionality:
+
+- [File::Rotate::Backup](https://metacpan.org/pod/File%3A%3ARotate%3A%3ABackup)
+- [File::Write::Rotate](https://metacpan.org/pod/File%3A%3AWrite%3A%3ARotate)
+
+There are also several logging modules that support log rotation.

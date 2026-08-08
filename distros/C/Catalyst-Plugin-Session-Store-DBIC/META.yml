@@ -1,36 +1,39 @@
 ---
 abstract: 'Store your sessions via DBIx::Class'
 author:
-  - 'Daniel Westermann-Clark <danieltwc@cpan.org>'
+  - 'Andrew Rodland <andrew@cleverdomain.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  FindBin: '0'
+  Test::More: '0'
+  Test::Warn: '0.20'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.131560'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Catalyst-Plugin-Session-Store-DBIC
 no_index:
   directory:
     - t
-    - inc
 requires:
-  Carp: 0
-  Catalyst: 5.65
-  Catalyst::Exception: 0
-  Catalyst::Plugin::Session::Store::Delegate: 0.05
-  Class::Accessor::Fast: 0
-  DBIx::Class: 0.07000
-  FindBin: 0
-  MIME::Base64: 0
-  MRO::Compat: 0
-  Scalar::Util: 0
-  Storable: 0
-  Test::More: 0
-  Test::Warn: 0.20
+  Carp: '0'
+  Catalyst: '5.65'
+  Catalyst::Exception: '0'
+  Catalyst::Plugin::Session::Store::Delegate: '0.05'
+  Class::Accessor::Fast: '0'
+  DBIx::Class: '0.07000'
+  MIME::Base64: '0'
+  MRO::Compat: '0'
+  Scalar::Util: '0'
+  Storable: '0'
 resources:
-  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Plugin-Session-Store-DBIC/
-version: 0.14
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Session-Store-DBIC
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/perl-catalyst/Catalyst-Plugin-Session-Store-DBIC.git
+version: '0.15'
+x_generated_by_perl: v5.42.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

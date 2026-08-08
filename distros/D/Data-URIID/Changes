@@ -1,3 +1,9 @@
+v0.23  2026-08-08Z
+    - Improved documentation
+    - Added basic ibb.co support
+    - Let Data::URIID::Base inherit from Data::Identifier::Interface::Userdata
+    - Deprecated $base->isa() with as/online
+
 v0.22  2026-06-29Z
     - Improved documentation
     - Replaced own ISBN logic with Business::ISBN

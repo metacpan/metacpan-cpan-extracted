@@ -356,12 +356,29 @@ compile(self)
             HV *src = (HV *)SvRV(*av_fetch(mount_src, i, 0));
             HV *m = newHVhv(src);
             SV **dir = hv_fetchs(m, K_DIR, 0);
+            SV **mdir = hv_fetchs(m, K_MD_DIR, 0);
             if (dir && *dir && SvOK(*dir)) {
                 SV *argv[1], *sapp;
                 argv[0] = *dir;
                 sapp = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_STATIC)),
                                      K_APP, argv, 1, 1);
                 (void)hv_stores(m, K_APP, sapp ? sapp : newSV(0));
+            }
+            else if (mdir && *mdir && SvOK(*mdir)) {
+                /* The whole documentation site is built here, at boot: the
+                 * tree is walked, every page rendered and frozen, and the
+                 * search index filled. A bad template or an unreadable
+                 * directory is a configuration error and fails with the rest
+                 * of the configuration rather than on the first request. */
+                SV *argv[3], *mapp;
+                SV **op = hv_fetchs(m, K_OPTS, 0);
+                argv[0] = *mdir;
+                argv[1] = (op && *op) ? *op
+                        : sv_2mortal(newRV_noinc((SV *)newHV()));
+                argv[2] = *hv_fetchs(m, K_PREFIX, 0);
+                mapp = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_MOUNT_MD)),
+                                     K_APP, argv, 3, 1);
+                (void)hv_stores(m, K_APP, mapp ? mapp : newSV(0));
             }
             av_push(mounts_out, newRV_noinc((SV *)m));
         }

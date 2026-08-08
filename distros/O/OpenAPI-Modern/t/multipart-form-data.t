@@ -15,7 +15,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use lib 't/lib';
 use Helper;
-use Test2::Warnings qw(allow_patterns disallow_patterns);
+use Test2::Warnings qw(:no_end_test allow_patterns disallow_patterns had_no_warnings);
 use JSON::Schema::Modern::Utilities qw(jsonp add_media_type);
 use OpenAPI::Modern::Utilities 'elem';
 use Mojo::UserAgent::Transactor;
@@ -2269,4 +2269,5 @@ if (++$type_index < @::TYPES) {
   goto START;
 }
 
+had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;

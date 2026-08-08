@@ -1,0 +1,900 @@
+{
+   "abstract" : "Registry of CPAN redirect stubs for renamed/retired IO::K8s modules",
+   "author" : [
+      "Torsten Raudssus <torsten@raudssus.de>",
+      "Jose Luis Martinez Torres <jlmartin@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IO-K8s-Deprecated",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
+         },
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "IO::K8s::Api::Admissionregistration::V1alpha1::InitializerConfigurationList" : {
+         "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/InitializerConfigurationList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Admissionregistration::V1beta1::MutatingWebhookConfigurationList" : {
+         "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/MutatingWebhookConfigurationList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Admissionregistration::V1beta1::ValidatingWebhookConfigurationList" : {
+         "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ValidatingWebhookConfigurationList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1::ControllerRevisionList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1/ControllerRevisionList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1::DaemonSetList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1/DaemonSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1::DeploymentList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1/DeploymentList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1::ReplicaSetList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1/ReplicaSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1::StatefulSetList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1/StatefulSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1beta1::ControllerRevisionList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1beta1/ControllerRevisionList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1beta1::DeploymentList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1beta1/DeploymentList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1beta1::StatefulSetList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1beta1/StatefulSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1beta2::ControllerRevisionList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1beta2/ControllerRevisionList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1beta2::DaemonSetList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1beta2/DaemonSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1beta2::DeploymentList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1beta2/DeploymentList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1beta2::ReplicaSetList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1beta2/ReplicaSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Apps::V1beta2::StatefulSetList" : {
+         "file" : "lib/IO/K8s/Api/Apps/V1beta2/StatefulSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Auditregistration::V1alpha1::AuditSinkList" : {
+         "file" : "lib/IO/K8s/Api/Auditregistration/V1alpha1/AuditSinkList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Autoscaling::V1::HorizontalPodAutoscalerList" : {
+         "file" : "lib/IO/K8s/Api/Autoscaling/V1/HorizontalPodAutoscalerList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Autoscaling::V2beta1::HorizontalPodAutoscalerList" : {
+         "file" : "lib/IO/K8s/Api/Autoscaling/V2beta1/HorizontalPodAutoscalerList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Autoscaling::V2beta2::HorizontalPodAutoscalerList" : {
+         "file" : "lib/IO/K8s/Api/Autoscaling/V2beta2/HorizontalPodAutoscalerList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Batch::V1::JobList" : {
+         "file" : "lib/IO/K8s/Api/Batch/V1/JobList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Batch::V1beta1::CronJobList" : {
+         "file" : "lib/IO/K8s/Api/Batch/V1beta1/CronJobList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Batch::V2alpha1::CronJobList" : {
+         "file" : "lib/IO/K8s/Api/Batch/V2alpha1/CronJobList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Certificates::V1beta1::CertificateSigningRequestList" : {
+         "file" : "lib/IO/K8s/Api/Certificates/V1beta1/CertificateSigningRequestList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Coordination::V1beta1::LeaseList" : {
+         "file" : "lib/IO/K8s/Api/Coordination/V1beta1/LeaseList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::ComponentStatusList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/ComponentStatusList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::ConfigMapList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/ConfigMapList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::EndpointsList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/EndpointsList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::EventList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/EventList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::LimitRangeList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/LimitRangeList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::NamespaceList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/NamespaceList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::NodeList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/NodeList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::PersistentVolumeClaimList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeClaimList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::PersistentVolumeList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::PodList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/PodList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::PodTemplateList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/PodTemplateList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::ReplicationControllerList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/ReplicationControllerList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::ResourceQuotaList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/ResourceQuotaList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::SecretList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/SecretList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::ServiceAccountList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/ServiceAccountList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Core::V1::ServiceList" : {
+         "file" : "lib/IO/K8s/Api/Core/V1/ServiceList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Events::V1beta1::EventList" : {
+         "file" : "lib/IO/K8s/Api/Events/V1beta1/EventList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Extensions::V1beta1::DaemonSetList" : {
+         "file" : "lib/IO/K8s/Api/Extensions/V1beta1/DaemonSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Extensions::V1beta1::DeploymentList" : {
+         "file" : "lib/IO/K8s/Api/Extensions/V1beta1/DeploymentList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Extensions::V1beta1::IngressList" : {
+         "file" : "lib/IO/K8s/Api/Extensions/V1beta1/IngressList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Extensions::V1beta1::NetworkPolicyList" : {
+         "file" : "lib/IO/K8s/Api/Extensions/V1beta1/NetworkPolicyList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Extensions::V1beta1::PodSecurityPolicyList" : {
+         "file" : "lib/IO/K8s/Api/Extensions/V1beta1/PodSecurityPolicyList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Extensions::V1beta1::ReplicaSetList" : {
+         "file" : "lib/IO/K8s/Api/Extensions/V1beta1/ReplicaSetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Networking::V1::NetworkPolicyList" : {
+         "file" : "lib/IO/K8s/Api/Networking/V1/NetworkPolicyList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Policy::V1beta1::PodDisruptionBudgetList" : {
+         "file" : "lib/IO/K8s/Api/Policy/V1beta1/PodDisruptionBudgetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Policy::V1beta1::PodSecurityPolicyList" : {
+         "file" : "lib/IO/K8s/Api/Policy/V1beta1/PodSecurityPolicyList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1::ClusterRoleBindingList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1/ClusterRoleBindingList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1::ClusterRoleList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1/ClusterRoleList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1::RoleBindingList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1/RoleBindingList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1::RoleList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1/RoleList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1alpha1::ClusterRoleBindingList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1alpha1/ClusterRoleBindingList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1alpha1::ClusterRoleList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1alpha1/ClusterRoleList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1alpha1::RoleBindingList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1alpha1/RoleBindingList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1alpha1::RoleList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1alpha1/RoleList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1beta1::ClusterRoleBindingList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1beta1/ClusterRoleBindingList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1beta1::ClusterRoleList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1beta1/ClusterRoleList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1beta1::RoleBindingList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1beta1/RoleBindingList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Rbac::V1beta1::RoleList" : {
+         "file" : "lib/IO/K8s/Api/Rbac/V1beta1/RoleList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Resource::V1alpha3::PodSchedulingContext" : {
+         "file" : "lib/IO/K8s/Api/Resource/V1alpha3/PodSchedulingContext.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Resource::V1alpha3::PodSchedulingContextSpec" : {
+         "file" : "lib/IO/K8s/Api/Resource/V1alpha3/PodSchedulingContextSpec.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Resource::V1alpha3::PodSchedulingContextStatus" : {
+         "file" : "lib/IO/K8s/Api/Resource/V1alpha3/PodSchedulingContextStatus.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Resource::V1alpha3::ResourceClaimSchedulingStatus" : {
+         "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceClaimSchedulingStatus.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Scheduling::V1alpha1::PriorityClassList" : {
+         "file" : "lib/IO/K8s/Api/Scheduling/V1alpha1/PriorityClassList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Scheduling::V1beta1::PriorityClassList" : {
+         "file" : "lib/IO/K8s/Api/Scheduling/V1beta1/PriorityClassList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Settings::V1alpha1::PodPresetList" : {
+         "file" : "lib/IO/K8s/Api/Settings/V1alpha1/PodPresetList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Storage::V1::StorageClassList" : {
+         "file" : "lib/IO/K8s/Api/Storage/V1/StorageClassList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Storage::V1::VolumeAttachmentList" : {
+         "file" : "lib/IO/K8s/Api/Storage/V1/VolumeAttachmentList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Storage::V1alpha1::VolumeAttachmentList" : {
+         "file" : "lib/IO/K8s/Api/Storage/V1alpha1/VolumeAttachmentList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Storage::V1beta1::StorageClassList" : {
+         "file" : "lib/IO/K8s/Api/Storage/V1beta1/StorageClassList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Api::Storage::V1beta1::VolumeAttachmentList" : {
+         "file" : "lib/IO/K8s/Api/Storage/V1beta1/VolumeAttachmentList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceDefinitionList" : {
+         "file" : "lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceDefinitionList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList" : {
+         "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/APIGroupList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList" : {
+         "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/APIResourceList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::Deprecated" : {
+         "file" : "lib/IO/K8s/Deprecated.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceList" : {
+         "file" : "lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1/APIServiceList.pm",
+         "version" : "1.105"
+      },
+      "IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::APIServiceList" : {
+         "file" : "lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIServiceList.pm",
+         "version" : "1.105"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Getty/io-k8s-p5-deprecated/issues"
+      },
+      "homepage" : "https://github.com/Getty/io-k8s-p5-deprecated",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Getty/io-k8s-p5-deprecated.git",
+         "web" : "https://github.com/Getty/io-k8s-p5-deprecated"
+      },
+      "x_IRC" : "irc://irc.perl.org/#kubernetes",
+      "x_IRC_user" : "Getty"
+   },
+   "version" : "1.105",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.036000"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Git::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [
+                     "README.md"
+                  ],
+                  "exclude_match" : [],
+                  "include_dotfiles" : 1,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               },
+               "Dist::Zilla::Plugin::Git::GatherDir" : {
+                  "include_untracked" : 0
+               }
+            },
+            "name" : "@Author::GETTY/Git::GatherDir",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Author::GETTY/@Filter/ManifestSkip",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Author::GETTY/@Filter/MetaYAML",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Author::GETTY/@Filter/License",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@Author::GETTY/@Filter/Readme",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@Author::GETTY/@Filter/ExtraTests",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Author::GETTY/@Filter/ExecDir",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Author::GETTY/@Filter/ShareDir",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Author::GETTY/@Filter/MakeMaker",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Author::GETTY/@Filter/Manifest",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Author::GETTY/@Filter/TestRelease",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Author::GETTY/@Filter/ConfirmRelease",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Author::GETTY/@Filter/UploadToCPAN",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Author::GETTY/MetaConfig",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@Author::GETTY/MetaJSON",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@Author::GETTY/PodSyntaxTests",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
+            "name" : "@Author::GETTY/Test::ChangesHasContent",
+            "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.037"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::GETTY/MetaProvides::Package",
+            "version" : "2.004003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "@Author::GETTY/GithubMeta",
+            "version" : "0.58"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@Author::GETTY/MetaResources",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallRelease",
+            "name" : "@Author::GETTY/InstallRelease",
+            "version" : "0.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@Author::GETTY/Authority",
+            "version" : "1.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
+            "config" : {
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.39.5",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Author::GETTY/Git::CheckFor::CorrectBranch",
+            "version" : "0.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
+            "name" : "@Author::GETTY/Prereqs::FromCPANfile",
+            "version" : "0.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "config_plugins" : [
+                     "@Author::GETTY"
+                  ],
+                  "finder" : [
+                     ":InstallModules",
+                     ":PerlExecFiles"
+                  ],
+                  "plugins" : [
+                     {
+                        "class" : "Pod::Weaver::Plugin::EnsurePod5",
+                        "name" : "@CorePrep/EnsurePod5",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::H1Nester",
+                        "name" : "@CorePrep/H1Nester",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@GETTY/SingleEncoding",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Name",
+                        "name" : "@GETTY/Name",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Version",
+                        "name" : "@GETTY/Version",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@GETTY/Prelude",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@GETTY/Synopsis",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@GETTY/Description",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@GETTY/Overview",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@GETTY/Stability",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Leftovers",
+                        "name" : "@GETTY/Leftovers",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@GETTY/postlude",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "@GETTY/Support",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "@GETTY/Contributing",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@GETTY/Authors",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@GETTY/Legal",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@GETTY/List",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@GETTY/GETTY",
+                        "version" : "4.020"
+                     }
+                  ]
+               }
+            },
+            "name" : "@Author::GETTY/PodWeaver",
+            "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "@Author::GETTY/@Git::VersionManager/pluginbundle version",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
+            "config" : {
+               "Dist::Zilla::Plugin::RewriteVersion" : {
+                  "add_tarball_name" : 0,
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "skip_version_provider" : 0
+               },
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
+            },
+            "name" : "@Author::GETTY/@Git::VersionManager/RewriteVersion::Transitional",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Update",
+            "name" : "@Author::GETTY/@Git::VersionManager/MetaProvides::Update",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::CopyFilesFromRelease" : {
+                  "filename" : [
+                     "Changes"
+                  ],
+                  "match" : []
+               }
+            },
+            "name" : "@Author::GETTY/@Git::VersionManager/CopyFilesFromRelease",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "v%V%n%n%c",
+                  "signoff" : 0
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.39.5",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@Author::GETTY/@Git::VersionManager/release snapshot",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "changelog" : "Changes",
+                  "signed" : 0,
+                  "tag" : "1.105",
+                  "tag_format" : "%v",
+                  "tag_message" : "v%V"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.39.5",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@Author::GETTY/@Git::VersionManager/Git::Tag",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional",
+            "config" : {
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "munge_makefile_pl" : 1
+               },
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : {}
+            },
+            "name" : "@Author::GETTY/@Git::VersionManager/BumpVersionAfterRelease::Transitional",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@Author::GETTY/@Git::VersionManager/NextRelease",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "increment $VERSION after %v release",
+                  "signoff" : 0
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Build.PL",
+                     "Changes",
+                     "Makefile.PL"
+                  ],
+                  "allow_dirty_match" : [
+                     "(?^:^lib/.*\\.pm$)"
+                  ],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.39.5",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@Author::GETTY/@Git::VersionManager/post-release commit",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.39.5",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Author::GETTY/Git::Push",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
+            "name" : "@Author::GETTY/GitHub::CreateRelease",
+            "version" : null
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.037"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "6.037"
+      }
+   },
+   "x_authority" : "cpan:cpan:JLMARTIN",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Apache-2.0"
+}
+

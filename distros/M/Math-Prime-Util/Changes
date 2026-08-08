@@ -1,5 +1,290 @@
 Revision history for Perl module Math::Prime::Util
 
+0.75 2026-08-08
+
+    - Requires Perl 5.8.1 or later.  Dropping Perl 5.6 support has been
+      considered for years.  Supporting very old Perl builds with broken
+      64-bit integer handling was increasingly time-consuming, especially
+      as modern compiler and testing infrastructure no longer supports
+      such old Perl versions.
+
+    [API Changes]
+
+    - prime_set_config does not allow changing the xs option.  Set MPU_NO_XS=1
+      before loading the module to select the Pure Perl implementation.
+
+    - When a function returns an integer result larger than native type size,
+      it will use the user configured bigint class (default Math::BigInt).
+      We no longer try to preserve the input bigint class.
+
+    - random_bytes and entropy_bytes accept inputs 0 to 2^31-2 (max portable
+      size for a Perl string).  The previously documented values were
+      ambiguous (unsigned).  This makes them concrete.
+
+    - urandomb and functions that produce n-bit random primes or semiprimes
+      are limited to 2^32-1 bits.
+
+    - irand64 always returns a random integer in [0 .. 2^64-1].  On 32-bit this
+      means it will likely return a bigint.
+
+    - random_ndigit_prime is limited to 2^32-1 digits.
+
+    - jordan_totient(k,n) and powersum(n,k) now require exponent k to fit
+      in an unsigned native integer.
+
+    - factorial, subfactorial, bell_number, fubini, primorial, pn_primorial,
+      catalan_number, partitions, partitionsq, and consecutive_integer_lcm
+      will reject inputs that exceed implementation limits (input limited to
+      unsigned native for XS and GMP, signed native for PP).
+
+    - is_power($n,\$root) is now the preferred form for returning the maximal
+      exponent and root.  No need for a dummy second argument.
+
+    [ADDED]
+
+    - is_safe_prime(n)                returns 1 if odd pos n and (n-1)/2 prime
+    - fibonacci(k)                    Fibonacci number, same as lucasu(1,-1,k)
+    - lucas_number(k)                 Lucas number, same as lucasv(1,-1,k)
+    - aliquot_sum                     sum of proper divisors
+    - prime_signature(n)              reverse sorted list of factor exponents
+    - sopfr(n)                        sum of prime factors
+    - sopf(n)                         sum of distinct prime factors
+    - digital_root(n[,base])          iterated sum of digits (default base 10)
+    - mult_digital_root(n[,base])     iterated product of digits
+    - is_palindrome(n[,base])         is n a palindrome (default base 10)
+    - is_harshad(n[,base])            is n a Harshad (Niven) number in base b
+    - abundance(n)                    sigma(n)-2n => deficient/abundant/perfect
+    - bell_number(n)                  Bell number, count of set partitions
+    - catalan_number(n)               Catalan number
+    - integer_complexity(n)           minimum 1s to represent n using + and *
+    - multifactorial(n,k)             k-step multifactorial of n
+    - dedekind_psi(n)                 Dedekind psi function, n*prod(1+1/p)
+    - partitionsq(n)                  number of partitions into distinct parts
+    - convergents(@A)                 list of convergents (p,q) for cfrac list
+    - bestrational(x,dbound)          best rational (p,q) for x with q<=dbound
+    - muladdint(n,m,a)                signed integer n*m + a
+    - mulsubint(n,m,a)                signed integer n*m - a
+    - toint(n)                        truncate input to integer (best form)
+    - urandomr(lo,hi)                 random integer in [lo,hi] inclusive
+    - vecprefixsum(@list)             prefix sum / cumulative sum of list
+    - vecwindow { } $step,$size,@list calls block with windows of size objects
+    - vecpairwise { } \@A,\@B         calls block for each pair from arrays
+    - vecrsort(@L)                    numerically reverse sort integer list
+    - vecrsorti(\@L)                  in-place numeric reverse sort a list ref
+    - remove_factors(n,k)             returns r: n with all factors of k removed
+    - remove_factors_exp(n,k)         as above, returns (r,e) e = times removed
+    - floor_sum(n,m,a,b)              sum floor((a*i+b)/m) for i=0..n-1
+    - inverse_sigma0(k,[lo,]hi)       array ref of n where sigma0(n) = k
+    - inverse_sigma0_count(k,[lo,]hi) count of n where sigma0(n) = k
+    - crootint(n,k)                   ceiling integer k-th root
+    - reverse_digits(n[,base])        reverse digits of |n| in base b
+    - irand32()                       random 32-bit integer (like irand)
+
+    [FIXES]
+
+    - drand now always returns below 1 before scaling in both XS and PP.
+
+    - PP drand, srand, and csrand reject extra arguments, and csrand returns
+      no value in both XS and PP.
+
+    - PP uses timer and scheduler jitter if no normal entropy source is
+      available, rather than deterministically seeding the CSPRNG with zero.
+
+    - PP threads independently reseed their CSPRNG after interpreter cloning.
+
+    - LambertW consistently handles floating-point rounding just below -1/e.
+
+    - Fix rare nth_prime hangs and native overflow near the 64-bit limit.
+
+    - XS setbinop and vec callbacks preserve lexical return values.  Sparse
+      arrays passed to set functions are rejected safely.
+
+    - Do not send bigint Lucas parameters to GMP versions before 0.53.
+
+    - chebyshev_theta and chebyshev_psi had tables corrected for 3 ranges.
+
+    - Fix overflow handling in Farey functions on 32-bit builds.
+
+    - Fix native IV_MIN edge cases in several integer functions, including
+      divrem.  Fix tdivrem with negative inputs on some Windows builds.
+
+    - signint correctly handles positive bigint strings with leading zeroes.
+
+    - trial_factor always removes factors 2, 3, and 5 with bigint inputs,
+      including when given a smaller factor limit.  Match existing docs.
+
+    - lastfor handles die/croak inside loops much better.
+
+    - random_factored_integer dropped the array return for bigints.
+
+    - srand synchronizes its complete, endian-independent UV seed with the
+      GMP backend, including when called without an argument.
+
+    - urandomm(n) accepted n=0 even though documented as positive.  Now rejects.
+
+    - all divisors for large n are properly converted to bigint if needed.
+
+    - Better input validation for many PP and XS paths, especially for
+      random funcs, digit/base conversion, combinatorial counts, iterator
+      arguments, and large size limits.
+
+    - PP/XS/GMP consistency fixes.  Better returning of canonical bigint class.
+
+    - miller_rabin_random requires nbases > 0, and no longer accepts a third
+      argument.  Neither of these were documented.
+
+    - prime_count_approx without GMP preserves more high-precision digits for
+      very large inputs and avoids some old Math::BigFloat non-finite results.
+
+    - The legacy nobigint option is now mirrored into XS.
+      random_ndigit_prime honors it even when GMP dispatch is available.
+
+    - Better GMP dispatch with big inputs.  is_power, lucas_sequence,
+      is_almost_prime, and multifactorial, logint, and rootint avoid older
+      GMP paths that could truncate or reject large arguments, while using
+      GMP 0.54+ where it supports the larger API.
+
+    - powint handles 0, 1, and -1 with very large exponents correctly.
+      Only calls older GMP backends with native-sized exponents.
+
+    - Work around older GMP backends returning empty certificates for 32-bit
+      and smaller random Maurer/Shawe-Taylor primes.
+
+    - sieve_range width and depth are validated as native unsigned integers,
+      and the depth 0/1 behavior of omitting 0 and 1 is now documented.
+
+    - vecuniq now accepts generic defined inputs using List::Util-like
+      string/hash semantics, while retaining a fast native-integer path.
+
+    - allsqrtmod and allrootmod now consistently return the count in scalar
+      context.  Documentation and tests added.
+
+    - More list-returning functions consistently return the number of values
+      in scalar context.  Documentation and tests added.
+
+    - todigitstring with negative bigint in base 10 included the sign.  Fixed.
+
+    - Powerfree functions now consistently validate k (limited to 2^32-1)
+      and document negative-n behavior for count/sum/part variants.
+
+    - Fix nth_powerfree near UV_MAX and keep refinement counts synchronized.
+
+    - rootmod no longer misses some roots modulo prime powers.
+
+    - vecreduce, vecslide, and vecwindow block values are no longer aliases
+      of input values in XS, matching the PP implementations and vecpairwise.
+
+    - random_ndigit_prime(3) was undersampling 101 (since v0.62).
+
+    - random_prime and random_ndigit_prime require GMP 0.54+ for direct GMP
+      dispatch, preserving uniform selection after the initial random trials.
+
+    - omega_prime_count no longer misses some large 7- and 8-omega primes.
+      omega_primes uses bounded memory for large non-prefix ranges.
+
+    - binomialmod avoids native overflow with negative n and very large k,
+      and is much faster for small k with large prime-power moduli.
+
+    - Frobenius (P,Q) uses gcd(n,2QD) and checks disc a square, not |disc|.
+
+    - Fix PP Frobenius-Khashin parameter selection, document 2018 algorithm.
+
+    - Real functions avoid intermediate overflow for large finite inputs,
+      handle special values correctly, and preserve exact inverse_li results.
+
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - Some functions now have custom op support.  This means in Perl 5.14+
+      they are resolved at Perl's compile time, skipping function overhead.
+      Functions like addint, mulint, irand64, etc. are 10-50% faster.
+
+    - Native integer sorting with vecsort/vecsorti detects ordered input and
+      skips unnecessary radix passes, especially useful for narrow signed values.
+
+    - vecequal handles circular array references without unbounded recursion.
+
+    - On platforms with support for 128-bit integers, but without the GMP
+      backend, we factor 128-bit integers in C.
+      This includes 32-bit Perl with modern compilers.
+      This can be 100 to 1000 times faster than factoring in Perl.
+      In turn this can speed up some other functions that require factoring.
+      Installing the GMP backend is preferred.
+
+    - Added native C 64-bit and 128-bit ECM (tinyecm), for much faster
+      non-GMP factoring.  PP ECM now uses a deterministic two-stage
+      tinyecm-based implementation.
+
+    - PP factoring has improved ECM, p-1, and pbrent implementations.
+      General factoring removes the initial pbrent stage, starts with a
+      deeper p-1 stage, uses an ECM ladder, and correctly uses HOLF.
+
+    - mertens accepts an optional lower bound.  Native Mertens uses segmented
+      Möbius generation and shares calculation state between range endpoints,
+      reducing memory and runtime.
+
+    - is_prob_prime, is_bpsw_prime, and is_prime can use native 128-bit
+      primality tests on 64-bit builds with uint128_t support.
+
+    - 32-bit XS builds with 128-bit compiler support now use C for sumtotient
+      and sum_primes.  Big speedups on large inputs.
+
+    - urandomm is up to 5x faster without GMP.
+
+    - sieve_range in XS uses a partial sieve.  It can be 10x or more faster
+      for large native ranges and moderate depths.
+
+    - Tightened prime count bounds (upper/lower) using Dusart 2018 and
+      Axler 2022.  Thanks to Pierre Dusart for sending me a copy of his paper.
+
+    - Use amagic calls from XS to perform some integer ops directly using the
+      bigint objects rather than calling into Perl.  Streamlined conversion
+      of output to canonical form.  1.5 to 3x faster for some examples.
+
+    - simple add/sub/mul/div/pow operations directly on the string input.
+      Mostly bypassed if we see Math::GMPz or Math::GMP, but with other classes
+      this can be a 2-8x speedup.
+
+    - string bigint accelerations of logint, rootint, and sqrtint
+      for 5x to 100x speedup.  absint and negint, can be 5x faster.
+
+    - lshiftint, rshiftint, rashiftint similar, for small shift amounts.
+
+    - vecsum and vecprod 100x faster if GMP not available (vs Calc).
+
+    - znlog faster, especially PP, native prime-power subgroups, and
+      large-order rho cases.
+
+    - forsetproduct no longer aliases the input arrays.
+
+    - randperm consistently uses a Fisher-Yates-Knuth shuffle in all cases,
+      both in XS and PP.  randperm(n,k) returns the first k values of the
+      same process as randperm(n).  A shuffle map is used so the full range
+      doesn't always have to be allocated.
+
+    - randperm, shuffle, and vecsample all return the count of results when
+      called in scalar context, without consuming random state.
+
+    - Removed many direct PP-to-GMP fallback calls.  Dispatch to the GMP
+      backend is done directly from XS in most cases.  This does impact the
+      no-XS-but-with-GMP configuration which should only be seen for testing.
+
+    - znorder(a, p^e) is much faster for large prime powers p^e.
+
+    - primes() and twin_primes() can directly dispatch from XS to GMP with
+      the GMP 0.54 back end.  This can give a modest speedup.
+
+    - sopf, sopfr, prime_signature, dedekind_psi, aliquot_sum, abundance,
+      and is_safe_prime can directly dispatch from XS to GMP with GMP 0.54.
+
+    - binomialmod can directly dispatch to the GMP 0.54 back end, avoiding
+      construction of huge intermediate binomial values in more cases.
+
+    - We have a new strint binomial, so large binomials can be computed
+      entirely in standard C.  We still prefer the GMP backend.  This is
+      much faster than default Math::BigInt.
+
+
 0.74 2026-03-13
 
     [API Changes]

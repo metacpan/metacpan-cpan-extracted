@@ -104,7 +104,10 @@ static int kq_wait(hm_backend *be, hm_event *out, int max, double timeout) {
 
 static void kq_destroy(hm_backend *be) {
     hm_kq_state *st = (hm_kq_state *)be->state;
-    if (st) { if (st->kq >= 0) close(st->kq); free(st); }
+    /* be->foreign: inherited across a fork, so nothing here is ours to
+     * close. A kqueue does not survive fork at all, and the child's own
+     * kqueue() has almost certainly been handed this very number. */
+    if (st) { if (st->kq >= 0 && !be->foreign) close(st->kq); free(st); }
     free(be);
 }
 

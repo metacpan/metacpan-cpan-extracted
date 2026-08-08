@@ -89,6 +89,28 @@ MDS_COLD void mds_buf_reserve(pTHX_ mds_buf* b, size_t need) {
     b->end  = b->base + SvLEN(b->sv) - 1;
 }
 
+/* Splice `len` bytes into the middle of what has already been written.
+ *
+ * The heading renderer needs this: a heading's open tag carries an id slugged
+ * from the heading's own text, which is not known until the inline content
+ * has been rendered. Rather than divert the heading into a side buffer and
+ * lose every inline construct's interaction with the main one, the renderer
+ * notes the offset where the tag belongs, renders the content normally, and
+ * splices the finished tag back in here.
+ *
+ * `at` is a byte offset from the start of the buffer, not a pointer: reserve
+ * can realloc the SV out from under any pointer the caller was holding. */
+void mds_buf_insert(pTHX_ mds_buf* b, size_t at, const char* src, size_t len) {
+    size_t used;
+    if (len == 0) return;
+    used = (size_t)(b->cur - b->base);
+    if (at > used) return;                    /* nothing sensible to do */
+    mds_buf_reserve(aTHX_ b, len);            /* may move base */
+    memmove(b->base + at + len, b->base + at, used - at);
+    memcpy(b->base + at, src, len);
+    b->cur += len;
+}
+
 void mds_buf_finalize(pTHX_ mds_buf* b) {
     size_t used = (size_t)(b->cur - b->base);
     SvCUR_set(b->sv, used);

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Group::Schema::Result::Group;
-$Mojolicious::Plugin::Fondation::Group::Schema::Result::Group::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Group::Schema::Result::Group::VERSION = '0.03';
 # ABSTRACT: DBIx::Class Result class for groups table
 
 use strict;
@@ -66,7 +66,7 @@ Mojolicious::Plugin::Fondation::Group::Schema::Result::Group - DBIx::Class Resul
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

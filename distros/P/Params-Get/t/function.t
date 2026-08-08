@@ -15,15 +15,16 @@ use Test::Most;
 use Test::Mockingbird 0.08;
 use Test::Returns;
 use Test::Memory::Cycle;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
 use Readonly;
 use Scalar::Util ();
 
 use Params::Get qw(get_params);
+use TestHelper qw($USAGE_RE $DEFAULT_CROAK_RE);
 
 # Named constants so no magic strings appear in assertions.
-Readonly::Scalar my $PKG            => 'Params::Get';
-Readonly::Scalar my $USAGE_RE       => qr/Usage/;
-Readonly::Scalar my $DEFAULT_ERR_RE => qr/\$default must be a scalar or arrayref/;
+Readonly::Scalar my $PKG => 'Params::Get';
 
 # =========================================================================
 # SECTION 1: Fast path
@@ -67,7 +68,7 @@ subtest '$default CODE ref: croaks before inspecting args' => sub {
 
 	throws_ok(
 		sub { get_params(sub { }, 'any_arg') },
-		$DEFAULT_ERR_RE,
+		$DEFAULT_CROAK_RE,
 		'CODE ref as $default throws',
 	);
 
@@ -75,7 +76,7 @@ subtest '$default CODE ref: croaks before inspecting args' => sub {
 	ok(@calls >= 1, 'Carp::croak was called');
 	like(
 		join('', grep { defined } @{$calls[0]}[1 .. $#{$calls[0]}]),
-		$DEFAULT_ERR_RE,
+		$DEFAULT_CROAK_RE,
 		'croak message references $default',
 	);
 
@@ -86,7 +87,7 @@ subtest '$default CODE ref: croaks before inspecting args' => sub {
 subtest '$default SCALAR ref: croaks immediately' => sub {
 	throws_ok(
 		sub { get_params(\'text', 'arg') },
-		$DEFAULT_ERR_RE,
+		$DEFAULT_CROAK_RE,
 		'SCALAR ref as $default throws',
 	);
 };
@@ -95,7 +96,7 @@ subtest '$default HASH ref: croaks immediately' => sub {
 	# A non-ARRAY hashref as $default is an API misuse.
 	throws_ok(
 		sub { get_params({}, 'arg') },
-		$DEFAULT_ERR_RE,
+		$DEFAULT_CROAK_RE,
 		'HASH ref as $default throws',
 	);
 };

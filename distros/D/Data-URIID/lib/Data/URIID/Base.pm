@@ -14,7 +14,9 @@ use Carp;
 
 use Data::Identifier v0.25;
 
-our $VERSION = v0.22;
+use parent 'Data::Identifier::Interface::Userdata';
+
+our $VERSION = v0.23;
 
 
 
@@ -120,7 +122,7 @@ Data::URIID::Base - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.22
+version v0.23
 
 =head1 SYNOPSIS
 
@@ -134,6 +136,9 @@ Common methods are defined in here.
 B<Note:>
 Functionality marked with B<Experimental> may or may not work as expected
 (e.g. may contain bugs or may change behaviour in future versions without warning).
+
+This package inherits from
+L<Data::Identifier::Interface::Userdata> (since v0.23).
 
 =head1 METHODS
 
@@ -168,6 +173,8 @@ The following options are defined:
 
 =item C<as>
 
+(deprecated since v0.23)
+
 Return the value as the given type.
 This is the package name of the type, C<ise> for pain ISE perl string.
 If the given type is not supported or cannot be constructed the method C<die>s.
@@ -176,6 +183,9 @@ At least the following types are supported:
 L<Data::URIID::Result>,
 L<Data::URIID::Service>,
 L<Data::Identifier>.
+
+B<Note:>
+This option is deprecated as part of migration to L<Data::Identifier::Interface::Simple>.
 
 =item C<default>
 
@@ -189,8 +199,13 @@ If set to true this will avoid calculating identifiers from others if C<as> does
 
 =item C<online>
 
+(deprecated since v0.23)
+
 Overrides the L<Data::URIID/"online"> flag used for the lookup if C<as> is set to L<Data::URIID::Result>.
 This is very useful to prevent network traffic for auxiliary lookups.
+
+B<Note:>
+See also C<as> for deprecation details.
 
 =back
 

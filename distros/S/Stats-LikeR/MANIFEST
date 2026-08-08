@@ -27,6 +27,7 @@ t/bedroc.python.py
 t/bedroc.python.t
 t/bedroc.t
 t/better.coverage.t
+t/binom_test.R.scipy.t
 t/binom_test.t
 t/bodyfat.csv
 t/cfilter.t

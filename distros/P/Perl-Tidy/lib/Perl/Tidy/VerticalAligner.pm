@@ -5,7 +5,7 @@ use Carp;
 
 { #<<< A non-indenting brace to contain all lexical variables
 
-our $VERSION = '20260705';
+our $VERSION = '20260808';
 use English qw( -no_match_vars );
 use Scalar::Util 'refaddr';    # perl 5.8.1 and later
 use Perl::Tidy::VerticalAligner::Alignment;
@@ -1278,8 +1278,8 @@ sub fix_terminal_ternary {
             return if ( $patterns[0] !~ s/^\:/?/ );
 
             # install leading tokens and patterns of existing line
-            unshift( @tokens,   @{$rtokens_old}[ 0 .. $jquestion ] );
-            unshift( @patterns, @{$rpatterns_old}[ 0 .. $jquestion ] );
+            unshift @tokens,   @{$rtokens_old}[ 0 .. $jquestion ];
+            unshift @patterns, @{$rpatterns_old}[ 0 .. $jquestion ];
 
             # insert appropriate number of empty fields
             splice( @fields,        1, 0, (EMPTY_STRING) x $jadd ) if ($jadd);
@@ -1319,8 +1319,8 @@ sub fix_terminal_ternary {
 
         # install leading tokens and patterns of existing line
         $patterns[0] = '?' . 'b' . $patterns[0];
-        unshift( @tokens,   @{$rtokens_old}[ 0 .. $jquestion ] );
-        unshift( @patterns, @{$rpatterns_old}[ 0 .. $jquestion ] );
+        unshift @tokens,   @{$rtokens_old}[ 0 .. $jquestion ];
+        unshift @patterns, @{$rpatterns_old}[ 0 .. $jquestion ];
 
         # insert appropriate number of empty fields
         $jadd             = $jquestion + 1;
@@ -5070,7 +5070,7 @@ sub end_signed_number_column {
     if ( $signed + $unsigned != $nlines ) {
         my $line    = $rgroup_lines->[$ix_last];
         my $rfields = $line->{'rfields'};
-        my $text    = join EMPTY_STRING, @{$rfields};
+        my $text    = join( EMPTY_STRING, @{$rfields} );
         DEVEL_MODE && Fault(<<EOM);
 We seem to have miscounted lines, please check:
 signed=$signed
@@ -5905,7 +5905,7 @@ sub end_wide_equals_column {
     if ( $num != $nlines ) {
         my $line    = $rgroup_lines->[$ix_last];
         my $rfields = $line->{'rfields'};
-        my $text    = join EMPTY_STRING, @{$rfields};
+        my $text    = join( EMPTY_STRING, @{$rfields} );
         DEVEL_MODE && Fault(<<EOM);
 We seem to have miscounted lines, please check:
 nlines=$nlines

@@ -13,9 +13,11 @@ use Chat::Bus ();
 
 sub listRooms {
     my ($c) = @_;
-    my $rooms = $c->model('Message')->rooms;
-    $_->{connected} = Chat::Bus::connected($_->{room}) for @$rooms;
-    return { rooms => $rooms };
+    return $c->model('Message')->rooms->then(sub {
+        my ($rooms) = @_;
+        $_->{connected} = Chat::Bus::connected($_->{room}) for @$rooms;
+        { rooms => $rooms };
+    });
 }
 
 sub getPresence {
@@ -28,17 +30,19 @@ sub listMessages {
     my ($c) = @_;
     my $room = Chat::Bus::room_name($c->param('room'));
     my $next = $c->param('next');
-    my $page = $c->model('Message')->search({ room => $room }, {
+    return $c->model('Message')->search({ room => $room }, {
         limit => $c->param('limit') || 20,
         (defined $next && length $next ? (after => $next) : ()),
+    })->then(sub {
+        my ($page) = @_;
+        {
+            room          => $room,
+            messages      => [ map Chat::Bus::message_event($_),
+                               @{ $page->{rows} } ],
+            has_more_data => $page->{has_more_data} ? \1 : \0,
+            next          => $page->{next},
+        };
     });
-    return {
-        room          => $room,
-        messages      => [ map Chat::Bus::message_event($_),
-                           @{ $page->{rows} } ],
-        has_more_data => $page->{has_more_data} ? \1 : \0,
-        next          => $page->{next},
-    };
 }
 
 # The operation that ties the two halves together: it stores the message
@@ -49,18 +53,18 @@ sub postMessage {
     my $room = Chat::Bus::room_name($c->param('room'));
     my $body = $c->openapi->{body};
 
-    my $row = $c->model('Message')->create({
+    $c->status(201);
+    return $c->model('Message')->create({
         room    => $room,
         nick    => Chat::Bus::nick($body->{nick}),
         body    => $body->{text},
         created => Chat::Bus::now(),
+    })->then(sub {
+        my ($row) = @_;
+        my $event = Chat::Bus::message_event($row);
+        Chat::Bus::publish($room, $event);
+        $event;
     });
-
-    my $event = Chat::Bus::message_event($row);
-    Chat::Bus::publish($room, $event);
-
-    $c->status(201);
-    return $event;
 }
 
 # Reached only when the spec's adminToken scheme passed - the generated
@@ -68,17 +72,19 @@ sub postMessage {
 sub clearRoom {
     my ($c) = @_;
     my $room = Chat::Bus::room_name($c->param('room'));
-    my $n    = $c->model('Message')->purge($room);
+    my $by   = $c->stash->{auth}{adminToken}{name};
 
-    Chat::Bus::publish($room, {
-        type    => 'cleared',
-        room    => $room,
-        deleted => $n,
-        by      => $c->stash->{auth}{adminToken}{name},
-        created => Chat::Bus::now(),
+    return $c->model('Message')->purge($room)->then(sub {
+        my ($n) = @_;
+        Chat::Bus::publish($room, {
+            type    => 'cleared',
+            room    => $room,
+            deleted => $n,
+            by      => $by,
+            created => Chat::Bus::now(),
+        });
+        { room => $room, deleted => $n };
     });
-
-    return { room => $room, deleted => $n };
 }
 
 1;

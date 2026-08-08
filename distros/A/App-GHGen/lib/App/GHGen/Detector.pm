@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
 	get_project_indicators
 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -429,7 +429,7 @@ sub _detect_cpp() {
 	$score += 3  if path('.clang-format')->exists;
 
 	# Check for C++ files
-	my @cpp_files = path('.')->children(qr/\.(cpp|cc|cxx|hpp|hxx|h)$/);
+	my @cpp_files = path('.')->children(qr/\.(?:cpp|cc|cxx|hpp|hxx|h)$/);
 	$score += 3 if @cpp_files > 0;
 	$score += 2 if @cpp_files > 5;
 

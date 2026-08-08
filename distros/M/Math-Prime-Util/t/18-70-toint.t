@@ -1,0 +1,402 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Test::More;
+use Math::Prime::Util qw/toint powint addint/;
+use Math::BigInt;
+use Math::BigFloat;
+
+my $use64 = (~0 > 4294967295);
+
+sub is_native { !ref($_[0]) }
+sub is_bigint {  ref($_[0]) }
+
+plan tests => 1  # native ints
+            + 1  # small floats
+            + 1  # integer strings
+            + 1  # radix strings
+            + 1  # float strings
+            + 1  # scientific notation strings
+            + 1  # bigints
+            + 1  # bigfloat
+            + 1  # high-precision float regressions
+            + 1  # undef and empty strings
+            + 1  # invalid
+            + 1  # check return types
+            + 1  # canonical bigint class regardless of prior state
+            + 1  # optional alternate bigint class canonicalization
+            ;
+
+###############################################################################
+
+subtest 'native integers pass through unchanged' => sub {
+  is(toint(0),   0,   "zero");
+  is(toint(1),   1,   "one");
+  is(toint(-1), -1,   "negative one");
+  is(toint(42),  42,  "small positive");
+  is(toint(-42), -42, "small negative");
+  is(toint(4294967295), 4294967295, "UV32_MAX");
+  is("".toint(4294967296), 4294967296, "UV32_MAX + 1");
+  SKIP: {
+    skip "64-bit only", 2 unless $use64;
+    is(toint(9223372036854775807),  9223372036854775807,  "IV64_MAX");
+    is(toint(18446744073709551615), 18446744073709551615, "UV64_MAX");
+  }
+  ok( is_native(toint(42)),  "native int result is not a ref");
+  ok( is_native(toint(-42)), "native neg result is not a ref");
+};
+
+###############################################################################
+
+subtest 'NV floats truncate toward zero (not floor)' => sub {
+  is(toint(3.9),    3,  "3.9 → 3");
+  is(toint(-3.9),  -3,  "-3.9 → -3");
+  is(toint(0.9),    0,  "0.9 → 0");
+  is(toint(-0.9),   0,  "-0.9 → 0  (truncate not floor; floor would be -1)");
+  is(toint(1.0),    1,  "1.0 → 1");
+  is(toint(-1.0),  -1,  "-1.0 → -1");
+  is(toint(0.0),    0,  "0.0 → 0");
+  is(toint(0.5),    0,  "0.5 → 0");
+  is(toint(-0.5),   0,  "-0.5 → 0  (truncate not floor; floor would be -1)");
+  is(toint(99.99), 99,  "99.99 → 99");
+  ok( is_native(toint(3.9)), "float result is native");
+};
+
+###############################################################################
+
+subtest 'integer strings' => sub {
+  is(toint("0"),     0,   "'0'");
+  is(toint("42"),   42,   "'42'");
+  is(toint("-42"), -42,   "'-42'");
+  is(toint("+42"),  42,   "'+42' explicit plus");
+  is(toint("007"),   7,   "'007' leading zeros stripped");
+  is(toint("-007"), -7,   "'-007' leading zeros stripped");
+  is(toint("00"),    0,   "'00' is zero");
+  is(toint("1_000_000"), 1_000_000, "underscores between decimal digits");
+  is(toint(" \t-42\r\n"), -42, "surrounding ASCII whitespace");
+  ok( is_native(toint("42")),  "string int → native");
+  ok( is_native(toint("-42")), "string neg int → native");
+  # 20-digit integer > UV64_MAX → bigint
+  { my $r = toint("99999999999999999999");
+    ok( is_bigint($r), "20-digit integer string → bigint");
+    is("$r", "99999999999999999999", "20-digit value correct");
+  }
+  {
+    my $big = "18446744073709551616";
+    is("".toint("000000000000000000000$big"), $big,
+       "large integer strips leading zeros");
+    is("".toint("+000000000000000000000$big"), $big,
+       "large positive integer strips leading zeros");
+    is("".toint("-000000000000000000000$big"), "-$big",
+       "large negative integer strips leading zeros");
+  }
+};
+
+###############################################################################
+
+subtest 'radix strings' => sub {
+  is(toint("0xFF"),    255, "hex string");
+  is(toint("-0xFF"),  -255, "negative hex string");
+  is(toint("+0X10"),    16, "uppercase hex prefix with explicit plus");
+  is(toint("0b1011"),   11, "binary string");
+  is(toint("-0B1011"), -11, "negative uppercase binary prefix");
+  is(toint("0o777"),   511, "octal string");
+  is(toint("-0O10"),    -8, "negative uppercase octal prefix");
+  is(toint(" 0xF_F_F "), 4095, "hex digit separators and whitespace");
+  is(toint("0b1010_0110"), 166, "binary digit separators");
+  is(toint("0o7_77"), 511, "octal digit separators");
+  is(toint("0x00000100"), 256, "hex leading zeros");
+  is(toint("0b00010000"), 16, "binary leading zeros");
+  is(toint("0o00000100"), 64, "octal leading zeros");
+  ok(is_native(toint("0xFF")), "small hex string returns native");
+  ok(is_native(toint("0b1011")), "small binary string returns native");
+  ok(is_native(toint("0o777")), "small octal string returns native");
+
+  {
+    my $hex = "0x100000000000000000000";
+    my $exp = "1208925819614629174706176";
+    is("".toint($hex), $exp, "large hex string");
+    is("".toint("-$hex"), "-$exp", "large negative hex string");
+    ok(is_bigint(toint($hex)), "large hex string returns bigint");
+  }
+  {
+    my $bin = "0b1" . ("0" x 80);
+    my $exp = "1208925819614629174706176";
+    is("".toint($bin), $exp, "large binary string");
+    ok(is_bigint(toint($bin)), "large binary string returns bigint");
+  }
+  {
+    my $oct = "0o4" . ("0" x 26);
+    my $exp = "1208925819614629174706176";
+    is("".toint($oct), $exp, "large octal string");
+    ok(is_bigint(toint($oct)), "large octal string returns bigint");
+  }
+};
+
+###############################################################################
+
+subtest 'float strings — truncate toward zero' => sub {
+  is(toint("3.14"),    3,  "'3.14' → 3");
+  is(toint("-3.14"),  -3,  "'-3.14' → -3");
+  is(toint("3.9"),     3,  "'3.9' → 3");
+  is(toint("-3.9"),   -3,  "'-3.9' → -3");
+  is(toint("3."),      3,  "'3.' trailing dot → 3");
+  is(toint("-3."),    -3,  "'-3.' trailing dot → -3");
+  is(toint(".5"),      0,  "'.5' no leading digit → 0");
+  is(toint("-.5"),     0,  "'-.5' → 0  (truncate not floor; floor would be -1)");
+  is(toint("+.5"),     0,  "'+.5' → 0");
+  is(toint("0.9"),     0,  "'0.9' → 0");
+  is(toint("-0.9"),    0,  "'-0.9' → 0  (truncate not floor)");
+  is(toint("0.0"),     0,  "'0.0' → 0");
+  is(toint("99.99"), 99,   "'99.99' → 99");
+  is(toint("1.5_0"),   1,  "underscore in fractional digits");
+};
+
+###############################################################################
+
+subtest 'scientific notation strings' => sub {
+  is(toint("1e3"),      1000,  "'1e3'");
+  is(toint("1E3"),      1000,  "'1E3' uppercase E");
+  is(toint("1.5e2"),    150,   "'1.5e2'");
+  is(toint("1.5e+2"),   150,   "'1.5e+2' explicit positive exponent");
+  is(toint("3e0"),        3,   "'3e0'");
+  is(toint("0e5"),        0,   "'0e5' = 0");
+  is(toint("1.5e-1"),     0,   "'1.5e-1' = 0.15 → 0 (truncate)");
+  is(toint("-1.5e-1"),    0,   "'-1.5e-1' = -0.15 → 0 (truncate, not -1)");
+  SKIP: { skip "64-bit only", 2 unless $use64;
+    is(toint("1e10"),  10000000000, "'1e10'");
+    is(toint("1e1_0"), 10000000000, "underscore in exponent digits");
+  }
+  # large sci notation → bigint
+  { my $r = toint("1e50");
+    ok( is_bigint($r), "'1e50' → bigint");
+    is( length("$r"), 51, "'1e50': 51 chars (1 followed by 50 zeros)");
+    is( substr("$r",0,1), "1", "'1e50': starts with 1");
+  }
+};
+
+###############################################################################
+
+subtest 'BigInt objects' => sub {
+  is(toint(Math::BigInt->new(0)),    0,    "BigInt(0)");
+  is(toint(Math::BigInt->new(42)),  42,    "BigInt(42)");
+  is(toint(Math::BigInt->new(-42)), -42,   "BigInt(-42)");
+  ok( is_native(toint(Math::BigInt->new(99))),  "BigInt in native range → native");
+  ok( is_native(toint(Math::BigInt->new(-99))), "negative BigInt in native range → native");
+
+  {
+    my $big = powint(2, 64);
+    my $r = toint($big);
+    ok( is_bigint($r), "2^64 → bigint");
+    is("$r", "18446744073709551616", "2^64 value correct");
+
+    my $neg = Math::BigInt->new("-9223372036854775809");
+    my $rn = toint($neg);
+    ok( is_bigint($rn), "-(2^63+1) → bigint");
+    is("$rn", "-9223372036854775809", "-(2^63+1) value correct");
+  }
+
+  # Already an integer — no truncation needed even for large values
+  { my $big = powint(2, 128);
+    my $r = toint($big);
+    ok( is_bigint($r), "BigInt(2^128) result is a ref");
+    is("$r", "340282366920938463463374607431768211456", "BigInt(2^128) value correct");
+  }
+  { my $r = toint(Math::BigInt->new("123456789012345678901234567890"));
+    is("$r", "123456789012345678901234567890", "large BigInt preserved exactly");
+  }
+};
+
+###############################################################################
+
+subtest 'BigFloat objects — truncate toward zero' => sub {
+  is(toint(Math::BigFloat->new("3.14")),    3,  "BigFloat(3.14) → 3");
+  is(toint(Math::BigFloat->new("-3.14")),  -3,  "BigFloat(-3.14) → -3");
+  is(toint(Math::BigFloat->new("0.9")),     0,  "BigFloat(0.9) → 0");
+  is(toint(Math::BigFloat->new("-0.9")),    0,  "BigFloat(-0.9) → 0 (truncate not floor)");
+  is(toint(Math::BigFloat->new("3.0")),     3,  "BigFloat(3.0)");
+  is(toint(Math::BigFloat->new("0")),       0,  "BigFloat(0)");
+  ok( is_native(toint(Math::BigFloat->new("42"))),  "BigFloat(42) → native");
+  ok( is_native(toint(Math::BigFloat->new("-42"))), "BigFloat(-42) → native");
+  # Large BigFloat — truncate and return bigint
+  { my $r = toint(Math::BigFloat->new("1.5e30"));
+    ok( is_bigint($r), "BigFloat(1.5e30) → bigint");
+    is("$r", "1500000000000000000000000000000", "BigFloat(1.5e30) truncated correctly");
+  }
+};
+
+###############################################################################
+
+subtest 'high-precision float inputs keep exact truncated digits' => sub {
+  my @cases = (
+    ["716115441142294636.4004",
+     "716115441142294636",
+     "string old-MBF precision regression value truncates exactly"],
+    [Math::BigFloat->new("716115441142294636.4004"),
+     "716115441142294636",
+     "BigFloat old-MBF precision regression value truncates exactly"],
+    ["1234567890123456789012345678901234567890.99999999999999999999999",
+     "1234567890123456789012345678901234567890",
+     "string huge decimal truncates exactly"],
+    ["-1234567890123456789012345678901234567890.99999999999999999999999",
+     "-1234567890123456789012345678901234567890",
+     "string huge negative truncates exactly"],
+    ["12345678901234567890.987654321e25",
+     "123456789012345678909876543210000000000000000",
+     "string huge scientific truncates exactly"],
+    ["-12345678901234567890.987654321e25",
+     "-123456789012345678909876543210000000000000000",
+     "string huge negative scientific truncates exactly"],
+    [Math::BigFloat->new("1234567890123456789012345678901234567890.99999999999999999999999"),
+     "1234567890123456789012345678901234567890",
+     "BigFloat huge decimal truncates exactly"],
+    [Math::BigFloat->new("-1234567890123456789012345678901234567890.99999999999999999999999"),
+     "-1234567890123456789012345678901234567890",
+     "BigFloat huge negative truncates exactly"],
+    [Math::BigFloat->new("12345678901234567890.987654321e25"),
+     "123456789012345678909876543210000000000000000",
+     "BigFloat huge scientific truncates exactly"],
+    [Math::BigFloat->new("-12345678901234567890.987654321e25"),
+     "-123456789012345678909876543210000000000000000",
+     "BigFloat huge negative scientific truncates exactly"],
+    ["9999999999999999999999999999999999999999.0000000000000000000001",
+     "9999999999999999999999999999999999999999",
+     "string huge with tiny fractional residue truncates exactly"],
+    [Math::BigFloat->new("-0.0000000000000000000000000000001"),
+     "0",
+     "BigFloat tiny negative truncates to zero"],
+  );
+  for my $case (@cases) {
+    my($in, $exp, $label) = @$case;
+    my $r = toint($in);
+    is("$r", $exp, $label);
+    ok(is_bigint($r), "$label returns bigint")
+      if $exp =~ /^-?\d{20,}$/;
+  }
+};
+
+###############################################################################
+
+subtest 'undef and empty string return 0' => sub {
+  is(toint(undef), 0, "toint(undef) = 0");
+  is(toint(""),    0, "toint('') = 0");
+  ok( is_native(toint(undef)), "undef result is native");
+  ok( is_native(toint("")),    "empty string result is native");
+};
+
+###############################################################################
+
+subtest 'invalid inputs croak' => sub {
+  my @bad = (
+    "abc",       # pure alphabetic
+    "hello",     # pure alphabetic
+    "3..14",     # double decimal point
+    "e5",        # exponent without mantissa
+    #"3e",        # incomplete exponent (old MBF accepts this)
+    "3f",        # not an exponent spcifier
+    ".",         # lone decimal point
+    "+-3",       # double sign
+    "1 2",       # embedded space
+    " ",         # whitespace only
+    "_1000",     # leading underscore
+    "1000_",     # trailing underscore
+    "1__000",    # repeated underscore
+    "1_.5",      # underscore before decimal point
+    "1._5",      # underscore after decimal point
+    "1e_10",     # underscore after exponent marker
+    "0x",         # empty hex
+    "0b",         # empty binary
+    "0o",         # empty octal
+    "0x_FF",      # underscore after radix prefix
+    "0xFF_",      # trailing radix underscore
+    "0xF__F",     # repeated radix underscore
+    "0x1g",       # invalid hex digit
+    "0b102",      # invalid binary digit
+    "0o128",      # invalid octal digit
+    "inf",       # infinity string
+    "Inf",
+    "nan",       # not-a-number string
+    "NaN",
+  );
+  for my $bad (@bad) {
+    local $@;
+    eval { toint($bad) };
+    ok($@, "toint('$bad') croaks") or diag "  toint('$bad') returned without error";
+  }
+};
+
+###############################################################################
+
+# Error at compile time
+#subtest 'toint() with no arguments croaks' => sub {
+#  local $@;
+#  eval { toint() };
+#  ok($@, "toint() no args croaks");
+#};
+
+###############################################################################
+
+subtest 'return type: native when fits, bigint when large' => sub {
+  my @native_cases = (
+    [0,                         "zero NV"],
+    [42,                        "native int"],
+    [-42,                       "native neg int"],
+    [3.9,                       "float NV"],
+    ["99",                      "integer string"],
+    ["3.7",                     "float string"],
+    [Math::BigInt->new(42),     "BigInt in range"],
+    [Math::BigFloat->new("3.14"), "BigFloat in range"],
+  );
+  for my $case (@native_cases) {
+    my($v, $label) = @$case;
+    ok( is_native(toint($v)), "toint($label) is native");
+  }
+  ok( is_native(toint(undef)), "toint(undef) is native");
+
+  my @bigint_cases = (
+    [powint(2,128),                              "2^128"],
+    [Math::BigInt->new("99999999999999999999999"), "large BigInt"],
+    [Math::BigFloat->new("1.5e30"),              "large BigFloat"],
+  );
+  for my $case (@bigint_cases) {
+    my($v, $label) = @$case;
+    ok( is_bigint(toint($v)), "toint($label) is bigint");
+  }
+};
+
+###############################################################################
+
+subtest 'canonical bigint class is stable' => sub {
+  my $big = "18446744073709551616";
+  my $r1 = toint($big);
+  ok(is_bigint($r1), "large integer string returns bigint");
+  my $class = ref($r1);
+
+  my $r2 = toint(Math::BigInt->new($big));
+  is(ref($r2), $class, "BigInt input returns canonical bigint class");
+
+  my $dummy = addint(~0, 0);  # force bigint setup for stateful-path regression
+  my $r3 = toint(Math::BigInt->new($big));
+  is(ref($r3), $class, "canonical bigint class unchanged after prior bigint load");
+};
+
+SKIP: {
+  skip "alternate bigint class check requires EXTENDED_TESTING", 1
+    unless defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
+
+  my $class;
+  if (eval { require Math::GMPz; 1 }) {
+    $class = 'Math::GMPz';
+  } elsif (eval { require Math::GMP; 1 }) {
+    $class = 'Math::GMP';
+  } else {
+    skip "no alternate bigint class available", 1;
+  }
+
+  my $big = "18446744073709551616";
+  my $canonical = ref(toint($big));
+  my $alt = $class->new($big);
+  my $r = toint($alt);
+  is(ref($r), $canonical, "alternate bigint class input canonicalized to configured class");
+}

@@ -26,14 +26,15 @@ use warnings;
 use Test::Most;
 use Test::Returns;
 use Test::Mockingbird 0.08;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
 use Readonly;
 use Scalar::Util ();
 use POSIX ();
 use Params::Get qw(get_params);
+use TestHelper qw($USAGE_RE $DEFAULT_CROAK_RE);
 
-Readonly::Scalar my $PKG              => 'Params::Get';
-Readonly::Scalar my $USAGE_RE         => qr/Usage:/;
-Readonly::Scalar my $DEFAULT_CROAK_RE => qr/\$default must be a scalar or arrayref/;
+Readonly::Scalar my $PKG => 'Params::Get';
 
 # =========================================================================
 # SECTION 1: Close the line-285 condition gap
@@ -315,7 +316,7 @@ subtest 'confess message: contains "Usage:", $default key name, and "->" separat
 
 	like($msg, $USAGE_RE,                         'message contains "Usage:"');
 	like($msg, qr/\Q$PKG\E/,                      'message contains package name');
-	like($msg, qr/->/,                             'message contains "->" separator');
+	like($msg, qr/\Q->\E/,                        'message contains "->" separator');
 	like($msg, qr/\Q$KEY_NAME\E/,                 'message contains $default key name');
 	like($msg, qr/\Q$KEY_NAME\E\s*=>/,            'message contains "key => $val" hint');
 
@@ -331,8 +332,8 @@ subtest 'croak message: contains "Usage:" and "()" suffix' => sub {
 
 	like($msg, $USAGE_RE,        'croak message contains "Usage:"');
 	like($msg, qr/\Q$PKG\E/,    'croak message contains package name');
-	like($msg, qr/->/,           'croak message contains "->"');
-	like($msg, qr/\(\)/,         'croak message ends with "()"');
+	like($msg, qr/\Q->\E/,      'croak message contains "->"');
+	like($msg, qr/\(\)/,        'croak message ends with "()"');
 
 	diag "croak format: $msg" if $ENV{TEST_VERBOSE};
 };

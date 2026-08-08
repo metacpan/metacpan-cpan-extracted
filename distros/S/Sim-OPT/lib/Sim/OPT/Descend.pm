@@ -1,6 +1,6 @@
 package Sim::OPT::Descend;
 # This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations, distributed under a dual licence, open-source (GPL v3) and proprietary.
-# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 use Math::Trig;
 use Math::Round;
@@ -60,7 +60,7 @@ no warnings;
 
 our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
-$VERSION = '0.181'; # our $VERSION = '';
+$VERSION = '0.182'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -88,6 +88,23 @@ sub fundamentality_indices
   my $ordinary_file = $args{ordinary_sensitivity_file}
                    || $args{sensitivity_file}
                    || $args{ordinary_file};
+  my $strict_matched = exists($args{strict_matched_sensitivity})
+                     ? $args{strict_matched_sensitivity}
+                     : 1;
+
+  if ( $strict_matched )
+  {
+    die "Missing argument: ordinary_sensitivity_file. Ordinary sensitivity must come from a separate matched sample; it cannot be computed from fundamentality rows.\n"
+      unless defined($ordinary_file) && $ordinary_file ne "";
+
+    die "Ordinary sensitivity file not found: $ordinary_file\n"
+      unless -e $ordinary_file;
+
+    die "Missing or invalid argument: fundamentalitynum. Matched sensitivity requires fundamentalitynum to compute expected row counts.\n"
+      unless defined($fundnum) && $fundnum ne "" && fund_is_number($fundnum) && $fundnum > 0;
+
+    $fundnum = 0 + $fundnum;
+  }
 
   my ( $fund_rows_r, $vars_r, $fund_skipped ) = fund_read_totres_rows(
     $file,
@@ -134,12 +151,16 @@ sub fundamentality_indices
   }
   elsif ( defined($ordinary_file) && $ordinary_file ne "" )
   {
+    die "Ordinary sensitivity file was requested but not found: $ordinary_file\n"
+      if $strict_matched;
     warn "Ordinary sensitivity file was requested but not found: $ordinary_file\n"
       unless $quiet;
   }
   else
   {
-    warn "No ordinary_sensitivity_file supplied. sensitivities.csv and relfund.csv will not contain ordinary sensitivities.\n"
+    die "No ordinary_sensitivity_file supplied. Ordinary sensitivity must not be computed from fundamentality rows.\n"
+      if $strict_matched;
+    warn "No ordinary_sensitivity_file supplied. sensitivities.csv, relfund.csv, and summary.csv will not contain ordinary sensitivities.\n"
       unless $quiet;
   }
 
@@ -162,6 +183,11 @@ sub fundamentality_indices
                             ? scalar(@levels) * $fundnum
                             : "";
 
+    if ( $strict_matched )
+    {
+      fund_validate_level_counts( "absolute fundamentality", $v, \@subrows, \@levels, $fundnum );
+    }
+
     if ( !@subrows )
     {
       $absolute{$v} = undef;
@@ -181,6 +207,11 @@ sub fundamentality_indices
       $sens_rows_used{$v} = scalar @sens_subrows;
       $sens_rows_requested{$v} = $abs_rows_requested{$v};
 
+      if ( $strict_matched )
+      {
+        fund_validate_level_counts( "ordinary sensitivity", $v, \@sens_subrows, \@levels, $fundnum );
+      }
+
       if ( @sens_subrows )
       {
         my $sens_r = fund_onevar_sensitivity( \@sens_subrows, $v );
@@ -193,6 +224,8 @@ sub fundamentality_indices
     }
     else
     {
+      die "No ordinary sensitivity rows were read from $ordinary_file. Cannot compute matched sensitivity.\n"
+        if $strict_matched;
       $sens_rows_used{$v} = 0;
       $sens_rows_requested{$v} = $abs_rows_requested{$v};
       $ordinary{$v}{sensitivity} = undef;
@@ -202,6 +235,7 @@ sub fundamentality_indices
   my $abs_file  = "$outdir/absfund.csv";
   my $sens_file = "$outdir/sensitivities.csv";
   my $rel_file  = "$outdir/relfund.csv";
+  my $summary_file = "$outdir/summary.csv";
 
   open my $ABS, ">", $abs_file or die "Cannot write $abs_file: $!\n";
   print $ABS "Variable,Absolute_fundamentality,Rows_used_first_position,Rows_requested\n";
@@ -226,40 +260,617 @@ sub fundamentality_indices
   }
   close $SENS;
 
-  open my $REL, ">", $rel_file or die "Cannot write $rel_file: $!\n";
-  print $REL "Variable,Absolute_fundamentality,Ordinary_sensitivity,Relative_fundamentality,Rows_used_first_position,Rows_used_ordinary_sample\n";
+  my %relative;
+
   for my $v ( @vars )
   {
     my $a = $absolute{$v};
     my $s = $ordinary{$v}{sensitivity};
 
-    my $rel = "";
-
     if ( defined($a) && defined($s) && fund_is_number($a) && fund_is_number($s) && $s != 0 )
     {
-      $rel = ( $a - $s ) / $s;
+      $relative{$v} = ( $a - $s ) / $s;
     }
+    else
+    {
+      $relative{$v} = undef;
+    }
+  }
 
-    $a = "" unless defined $a;
-    $s = "" unless defined $s;
-
+  open my $REL, ">", $rel_file or die "Cannot write $rel_file: $!\n";
+  print $REL "Variable,Relative_fundamentality,Rows_used_first_position,Rows_used_ordinary_sample\n";
+  for my $v ( @vars )
+  {
+    my $rel = defined($relative{$v}) ? $relative{$v} : "";
     my $an = $abs_rows_used{$v} || 0;
     my $sn = $sens_rows_used{$v} || 0;
 
-    print $REL "X$v,$a,$s,$rel,$an,$sn\n";
+    print $REL "X$v,$rel,$an,$sn\n";
   }
   close $REL;
+
+  open my $SUM, ">", $summary_file or die "Cannot write $summary_file: $!\n";
+  print $SUM "Variable,Absolute_fundamentality,Ordinary_sensitivity,Relative_fundamentality,Rows_used_first_position,Rows_used_ordinary_sample,Rows_requested,Ordinary_sample_file\n";
+  for my $v ( @vars )
+  {
+    my $a = defined($absolute{$v}) ? $absolute{$v} : "";
+    my $s = defined($ordinary{$v}{sensitivity}) ? $ordinary{$v}{sensitivity} : "";
+    my $rel = defined($relative{$v}) ? $relative{$v} : "";
+    my $an = $abs_rows_used{$v} || 0;
+    my $sn = $sens_rows_used{$v} || 0;
+    my $q = defined($abs_rows_requested{$v}) ? $abs_rows_requested{$v} : "";
+    my $of = defined($ordinary_file) ? $ordinary_file : "";
+
+    print $SUM "X$v,$a,$s,$rel,$an,$sn,$q,$of\n";
+  }
+  close $SUM;
 
   return({
     absfund_file       => $abs_file,
     sensitivities_file => $sens_file,
     relfund_file       => $rel_file,
+    summary_file       => $summary_file,
     ordinary_sensitivity_file => $ordinary_file,
     rows_used          => scalar(@rows),
     ordinary_rows_used => scalar(@sens_rows),
     rows_skipped       => $n_skipped,
     fundamentality_rows_skipped => $fund_skipped,
     ordinary_rows_skipped => $sens_rows_skipped,
+    variables          => \@vars,
+  });
+}
+
+
+
+sub fundamentality_absfund_only
+{
+  my ($args_r) = @_;
+  my %args = %$args_r;
+
+  my $file      = $args{file}      or die "Missing argument: file\n";
+  my $outdir    = $args{outdir}    || ".";
+  my $instcol   = $args{instcol}   || 1;
+  my $ycol      = $args{ycol}      || 3;
+  my $metric    = $args{metric};
+  my $metriccol = $args{metriccol} || 2;
+  my $sep       = defined($args{sep}) ? $args{sep} : ",";
+  my $header    = $args{header}    || 0;
+  my $quiet     = $args{quiet}     || 0;
+  my $fundnum   = $args{fundamentalitynum};
+  my $strict_counts = exists($args{strict_counts}) ? $args{strict_counts} : 1;
+
+  die "Missing or invalid argument: fundamentalitynum. Absfund postprocessing requires it to check expected row counts.\n"
+    if $strict_counts && !( defined($fundnum) && $fundnum ne "" && fund_is_number($fundnum) && $fundnum > 0 );
+
+  $fundnum = 0 + $fundnum if defined($fundnum) && $fundnum ne "";
+
+  my ( $fund_rows_r, $vars_r, $fund_skipped ) = fund_read_totres_rows(
+    $file,
+    {
+      instcol   => $instcol,
+      ycol      => $ycol,
+      metric    => $metric,
+      metriccol => $metriccol,
+      sep       => $sep,
+      header    => $header,
+      quiet     => $quiet,
+    }
+  );
+
+  my @rows = @$fund_rows_r;
+  my @vars = @$vars_r;
+  die "No complete fundamentality rows found in $file\n" unless @rows;
+
+  my %absolute;
+  my %abs_rows_used;
+  my %abs_rows_requested;
+
+  for my $v ( @vars )
+  {
+    my @subrows = grep {
+      defined($_->{order}[0]) && $_->{order}[0] == $v
+    } @rows;
+
+    $abs_rows_used{$v} = scalar @subrows;
+    my @levels = fund_levels_for_var( \@rows, $v );
+    $abs_rows_requested{$v} = ( defined($fundnum) && $fundnum ne "" )
+                            ? scalar(@levels) * $fundnum
+                            : "";
+
+    if ( $strict_counts )
+    {
+      fund_validate_level_counts( "absolute fundamentality", $v, \@subrows, \@levels, $fundnum );
+    }
+
+    if ( !@subrows )
+    {
+      $absolute{$v} = undef;
+    }
+    else
+    {
+      my $abs_r = fund_onevar_sensitivity( \@subrows, $v );
+      $absolute{$v} = $abs_r->{sensitivity};
+    }
+  }
+
+  my $abs_file  = "$outdir/absfund.csv";
+  open my $ABS, ">", $abs_file or die "Cannot write $abs_file: $!\n";
+  print $ABS "Variable,Absolute_fundamentality,Rows_used_first_position,Rows_requested\n";
+  for my $v ( @vars )
+  {
+    my $a = defined($absolute{$v}) ? $absolute{$v} : "";
+    my $n = $abs_rows_used{$v} || 0;
+    my $q = defined($abs_rows_requested{$v}) ? $abs_rows_requested{$v} : "";
+    print $ABS "X$v,$a,$n,$q\n";
+  }
+  close $ABS;
+
+  return({
+    absfund_file => $abs_file,
+    rows_used    => scalar(@rows),
+    rows_skipped => $fund_skipped,
+    variables    => \@vars,
+  });
+}
+
+
+sub fund_group_gcd_int
+{
+  my ( $a, $b ) = @_;
+  $a = abs( int($a || 0) );
+  $b = abs( int($b || 0) );
+  while ( $b )
+  {
+    my $t = $a % $b;
+    $a = $b;
+    $b = $t;
+  }
+  return $a || 1;
+}
+
+
+sub fund_group_lcm_int
+{
+  my ( $a, $b ) = @_;
+  return 0 unless $a && $b;
+  return int( $a / fund_group_gcd_int( $a, $b ) ) * $b;
+}
+
+
+sub fund_group_expected_rows
+{
+  my ( $group_r, $rows_r, $fundnum ) = @_;
+  my @group = @$group_r;
+  my @rows = @$rows_r;
+  my $maxlev = 0;
+  my $multiple = 1;
+
+  for my $v ( @group )
+  {
+    my @levels = fund_levels_for_var( \@rows, $v );
+    my $nlev = scalar @levels;
+    die "GROUP FUND ERROR: X$v has fewer than two observed levels.\n" unless $nlev >= 2;
+    $maxlev = $nlev if $nlev > $maxlev;
+    $multiple = fund_group_lcm_int( $multiple, $nlev );
+  }
+
+  my $target = $fundnum * $maxlev;
+  return int( ( $target + $multiple - 1 ) / $multiple ) * $multiple;
+}
+
+
+sub fund_anova_group_effect
+{
+  my ( $rows_r, $vars_r, $group_r ) = @_;
+  my @rows = @$rows_r;
+  my @vars = @$vars_r;
+  my @group = @$group_r;
+  my %ingroup = map { $_ => 1 } @group;
+  my @y = map { $_->{y} } @rows;
+  my %level_seen;
+
+  for my $r ( @rows )
+  {
+    for my $v ( @vars )
+    {
+      $level_seen{$v}{ $r->{x}{$v} } = 1;
+    }
+  }
+
+  my @levels;
+  for my $j ( 0 .. $#vars )
+  {
+    my $v = $vars[$j];
+    my @lev = fund_sort_levels( keys %{ $level_seen{$v} || {} } );
+    die "GROUP FUND ERROR: X$v has no observed levels in group subset.\n" unless @lev;
+    $levels[$j] = \@lev;
+  }
+
+  my @col_var_index = ( undef );
+  my @X;
+  for my $j ( 0 .. $#vars )
+  {
+    my @lev = @{ $levels[$j] };
+    for my $m ( 1 .. $#lev )
+    {
+      push @col_var_index, $j;
+    }
+  }
+
+  for my $r ( @rows )
+  {
+    my @xr = ( 1.0 );
+    for my $j ( 0 .. $#vars )
+    {
+      my $v = $vars[$j];
+      my @lev = @{ $levels[$j] };
+      for my $m ( 1 .. $#lev )
+      {
+        push @xr, ( $r->{x}{$v} eq $lev[$m] ) ? 1.0 : 0.0;
+      }
+    }
+    push @X, \@xr;
+  }
+
+  my $mean_y = fund_mean( \@y );
+  my $sst = 0.0;
+  $sst += ( $_ - $mean_y ) ** 2 for @y;
+  return({ sensitivity => "NA", partial_eta2 => "NA", ss => 0, sst => 0,
+           df => 0, residual_df => scalar(@rows) - 1, fstat => "NA" })
+    if $sst <= 0;
+
+  my @all_cols = ( 0 .. $#col_var_index );
+  my ( $sse_full, $rank_full ) = fund_sse_for_cols( \@X, \@y, \@all_cols );
+  my @reduced_cols = grep {
+    !defined( $col_var_index[$_] ) || !$ingroup{ $vars[ $col_var_index[$_] ] }
+  } @all_cols;
+  my ( $sse_reduced, $rank_reduced ) = fund_sse_for_cols( \@X, \@y, \@reduced_cols );
+
+  my $df = $rank_full - $rank_reduced;
+  my $residual_df = scalar(@rows) - $rank_full;
+  my $ss = $sse_reduced - $sse_full;
+  $ss = 0 if $ss < 0 && abs($ss) < 1e-7;
+
+  my $sensitivity = $sst > 0 ? $ss / $sst : "NA";
+  my $partial_eta2 = ( $ss + $sse_full ) > 0 ? $ss / ( $ss + $sse_full ) : 0;
+  my $fstat = "NA";
+  if ( $df > 0 && $residual_df > 0 )
+  {
+    my $mse = $sse_full / $residual_df;
+    $fstat = $mse > 0 ? ( $ss / $df ) / $mse : 0;
+  }
+
+  return({
+    sensitivity => $sensitivity,
+    partial_eta2 => $partial_eta2,
+    ss => $ss,
+    sst => $sst,
+    df => $df,
+    residual_df => $residual_df,
+    fstat => $fstat,
+    rank_full => $rank_full,
+  });
+}
+
+
+sub fundamentality_groupfund_only
+{
+  my ($args_r) = @_;
+  my %args = %$args_r;
+  my $file = $args{group_fundamentality_file}
+          || $args{groupfundamentalityfile}
+          || $args{file}
+          or die "Missing argument: group_fundamentality_file\n";
+  my $outdir = $args{outdir} || ".";
+  my $fundnum = $args{fundamentalitynum};
+  my $strict_counts = exists($args{strict_counts}) ? $args{strict_counts} : 1;
+
+  die "Group fundamentality file not found: $file\n" unless -e $file;
+  die "Missing or invalid argument: fundamentalitynum. Group fundamentality requires it for count verification.\n"
+    if $strict_counts && !( defined($fundnum) && fund_is_number($fundnum) && $fundnum > 0 );
+  $fundnum = 0 + $fundnum;
+
+  my ( $rows_r, $vars_r, $skipped ) = fund_read_totres_rows(
+    $file,
+    {
+      instcol => $args{instcol} || 1,
+      ycol => $args{ycol} || 3,
+      metric => $args{metric},
+      metriccol => $args{metriccol} || 2,
+      sep => defined($args{sep}) ? $args{sep} : ",",
+      header => $args{header} || 0,
+      quiet => $args{quiet} || 0,
+      require_fundgroup => 1,
+    }
+  );
+
+  my @rows = @$rows_r;
+  my @vars = @$vars_r;
+  my %by_group;
+  push @{ $by_group{ $_->{fundgroup} } }, $_ for @rows;
+  my @gids = sort { $a <=> $b } keys %by_group;
+  die "No group-fundamentality rows found in $file\n" unless @gids;
+
+  my %result;
+  for my $gid ( @gids )
+  {
+    my @subrows = @{ $by_group{$gid} };
+    my %group_text = map { ( $_->{fundgroupvars} || "" ) => 1 } @subrows;
+    die "GROUP FUND ERROR: G$gid has inconsistent fundgroupvars tags.\n"
+      unless keys(%group_text) == 1;
+    my ($text) = keys %group_text;
+    my @group = grep { /^\d+$/ } split /\|/, $text;
+    die "GROUP FUND ERROR: G$gid has no valid group variables.\n" unless @group;
+
+    my $expected = fund_group_expected_rows( \@group, \@subrows, $fundnum );
+    if ( $strict_counts )
+    {
+      die "GROUP FUND ERROR: G$gid expected $expected rows, got " . scalar(@subrows) . ".\n"
+        unless scalar(@subrows) == $expected;
+
+      for my $r ( @subrows )
+      {
+        my $k = scalar @group;
+        die "GROUP FUND ERROR: G$gid row $r->{line} is shorter than its focal group.\n"
+          if @{ $r->{order} } < $k;
+        my @prefix = sort { $a <=> $b } @{ $r->{order} }[ 0 .. $k - 1 ];
+        my @wanted = sort { $a <=> $b } @group;
+        die "GROUP FUND ERROR: G$gid row $r->{line} does not place the whole group first.\n"
+          unless join( "|", @prefix ) eq join( "|", @wanted );
+      }
+
+      for my $v ( @group )
+      {
+        my @levels = fund_levels_for_var( \@subrows, $v );
+        die "GROUP FUND ERROR: G$gid X$v has no observed levels.\n" unless @levels;
+        die "GROUP FUND ERROR: G$gid row count $expected is not divisible by the " . scalar(@levels) . " levels of X$v.\n"
+          if $expected % scalar(@levels);
+        my $per_level = $expected / scalar(@levels);
+        my %count;
+        $count{ $_->{x}{$v} }++ for @subrows;
+        for my $lev ( @levels )
+        {
+          die "GROUP FUND ERROR: G$gid X$v level $lev expected $per_level rows, got " . ( $count{$lev} || 0 ) . ".\n"
+            unless ( $count{$lev} || 0 ) == $per_level;
+        }
+      }
+    }
+
+    my $effect = fund_anova_group_effect( \@subrows, \@vars, \@group );
+    $result{$gid} = {
+      vars => \@group,
+      rows_used => scalar(@subrows),
+      rows_requested => $expected,
+      %$effect,
+    };
+  }
+
+  my $out = "$outdir/groupfund.csv";
+  open my $GF, ">", $out or die "Cannot write $out: $!\n";
+  print $GF "Group,Group_fundamentality,Variables,Rows_used_focal_group,Rows_requested,Residual_df,Group_df,Partial_eta2,F_statistic,Raw_sample_file\n";
+  for my $gid ( @gids )
+  {
+    my $r = $result{$gid};
+    my $vars = join( "|", map { "X$_" } @{ $r->{vars} } );
+    print $GF join( ",",
+      "G$gid", $r->{sensitivity}, $vars, $r->{rows_used}, $r->{rows_requested},
+      $r->{residual_df}, $r->{df}, $r->{partial_eta2}, $r->{fstat}, $file
+    ) . "\n";
+  }
+  close $GF;
+
+  return({
+    groupfund_file => $out,
+    raw_file => $file,
+    groups => \@gids,
+    rows_used => scalar(@rows),
+    rows_skipped => $skipped,
+  });
+}
+
+
+sub fundamentality_groupsens_only
+{
+  my ($args_r) = @_;
+  my %args = %$args_r;
+  my $file = $args{group_sensitivity_file}
+          || $args{groupsensitivityfile}
+          || $args{file}
+          or die "Missing argument: group_sensitivity_file\n";
+  my $outdir = $args{outdir} || ".";
+  my $fundnum = $args{fundamentalitynum};
+  my $strict_counts = exists($args{strict_counts}) ? $args{strict_counts} : 1;
+
+  die "Group sensitivity file not found: $file\n" unless -e $file;
+  die "Missing or invalid argument: fundamentalitynum. Group sensitivity requires it for count verification.\n"
+    if $strict_counts && !( defined($fundnum) && fund_is_number($fundnum) && $fundnum > 0 );
+  $fundnum = 0 + $fundnum;
+
+  my ( $rows_r, $vars_r, $skipped ) = fund_read_totres_rows(
+    $file,
+    {
+      instcol => $args{instcol} || 1,
+      ycol => $args{ycol} || 3,
+      metric => $args{metric},
+      metriccol => $args{metriccol} || 2,
+      sep => defined($args{sep}) ? $args{sep} : ",",
+      header => $args{header} || 0,
+      quiet => $args{quiet} || 0,
+      require_sensgroup => 1,
+    }
+  );
+
+  my @rows = @$rows_r;
+  my @vars = @$vars_r;
+  my %by_group;
+  push @{ $by_group{ $_->{sensgroup} } }, $_ for @rows;
+  my @gids = sort { $a <=> $b } keys %by_group;
+  die "No group-sensitivity rows found in $file\n" unless @gids;
+
+  my %result;
+  for my $gid ( @gids )
+  {
+    my @subrows = @{ $by_group{$gid} };
+    my %group_text = map { ( $_->{sensgroupvars} || "" ) => 1 } @subrows;
+    die "GROUP SENS ERROR: G$gid has inconsistent sensgroupvars tags.\n"
+      unless keys(%group_text) == 1;
+    my ($text) = keys %group_text;
+    my @group = grep { /^\d+$/ } split /\|/, $text;
+    die "GROUP SENS ERROR: G$gid has no valid group variables.\n" unless @group;
+
+    my $expected = fund_group_expected_rows( \@group, \@subrows, $fundnum );
+    if ( $strict_counts )
+    {
+      die "GROUP SENS ERROR: G$gid expected $expected rows, got " . scalar(@subrows) . ".\n"
+        unless scalar(@subrows) == $expected;
+
+      for my $v ( @group )
+      {
+        my @levels = fund_levels_for_var( \@subrows, $v );
+        die "GROUP SENS ERROR: G$gid X$v has no observed levels.\n" unless @levels;
+        die "GROUP SENS ERROR: G$gid row count $expected is not divisible by the " . scalar(@levels) . " levels of X$v.\n"
+          if $expected % scalar(@levels);
+        my $per_level = $expected / scalar(@levels);
+        my %count;
+        $count{ $_->{x}{$v} }++ for @subrows;
+        for my $lev ( @levels )
+        {
+          die "GROUP SENS ERROR: G$gid X$v level $lev expected $per_level rows, got " . ( $count{$lev} || 0 ) . ".\n"
+            unless ( $count{$lev} || 0 ) == $per_level;
+        }
+      }
+    }
+
+    my $effect = fund_anova_group_effect( \@subrows, \@vars, \@group );
+    $result{$gid} = {
+      vars => \@group,
+      rows_used => scalar(@subrows),
+      rows_requested => $expected,
+      %$effect,
+    };
+  }
+
+  my $out = "$outdir/groupsens.csv";
+  open my $GS, ">", $out or die "Cannot write $out: $!\n";
+  print $GS "Group,Group_sensitivity,Variables,Rows_used_ordinary_group,Rows_requested,Residual_df,Group_df,Partial_eta2,F_statistic,Raw_sample_file\n";
+  for my $gid ( @gids )
+  {
+    my $r = $result{$gid};
+    my $vars = join( "|", map { "X$_" } @{ $r->{vars} } );
+    print $GS join( ",",
+      "G$gid", $r->{sensitivity}, $vars, $r->{rows_used}, $r->{rows_requested},
+      $r->{residual_df}, $r->{df}, $r->{partial_eta2}, $r->{fstat}, $file
+    ) . "\n";
+  }
+  close $GS;
+
+  return({
+    groupsens_file => $out,
+    raw_file => $file,
+    groups => \@gids,
+    rows_used => scalar(@rows),
+    rows_skipped => $skipped,
+  });
+}
+
+sub fundamentality_sensitivities_only
+{
+  my ($args_r) = @_;
+  my %args = %$args_r;
+
+  my $ordinary_file = $args{ordinary_sensitivity_file}
+                   || $args{ordinarysensitivityfile}
+                   || $args{sensitivity_file}
+                   || $args{ordinary_file}
+                   or die "Missing argument: ordinary_sensitivity_file\n";
+  my $outdir    = $args{outdir}    || ".";
+  my $instcol   = $args{instcol}   || 1;
+  my $ycol      = $args{ycol}      || 3;
+  my $metric    = $args{metric};
+  my $metriccol = $args{metriccol} || 2;
+  my $sep       = defined($args{sep}) ? $args{sep} : ",";
+  my $header    = $args{header}    || 0;
+  my $quiet     = $args{quiet}     || 0;
+  my $fundnum   = $args{fundamentalitynum};
+  my $strict_counts = exists($args{strict_counts}) ? $args{strict_counts} : 1;
+
+  die "Ordinary sensitivity file not found: $ordinary_file\n"
+    unless -e $ordinary_file;
+
+  die "Missing or invalid argument: fundamentalitynum. Sensitivity postprocessing requires it to check expected row counts.\n"
+    if $strict_counts && !( defined($fundnum) && $fundnum ne "" && fund_is_number($fundnum) && $fundnum > 0 );
+
+  $fundnum = 0 + $fundnum if defined($fundnum) && $fundnum ne "";
+
+  my ( $sens_rows_r, $vars_r, $sens_skipped ) = fund_read_totres_rows(
+    $ordinary_file,
+    {
+      instcol         => $instcol,
+      ycol            => $ycol,
+      metric          => $metric,
+      metriccol       => $metriccol,
+      sep             => $sep,
+      header          => $header,
+      quiet           => $quiet,
+      require_sensvar => 1,
+    }
+  );
+
+  my @sens_rows = @$sens_rows_r;
+  my @vars = @$vars_r;
+  die "No ordinary sensitivity rows found in $ordinary_file\n" unless @sens_rows;
+
+  my %ordinary;
+  my %sens_rows_used;
+  my %sens_rows_requested;
+
+  for my $v ( @vars )
+  {
+    my @sens_subrows = grep {
+      defined($_->{sensvar}) && $_->{sensvar} == $v
+    } @sens_rows;
+
+    my @levels = fund_levels_for_var( \@sens_subrows, $v );
+    $sens_rows_used{$v} = scalar @sens_subrows;
+    $sens_rows_requested{$v} = ( defined($fundnum) && $fundnum ne "" )
+                             ? scalar(@levels) * $fundnum
+                             : "";
+
+    if ( $strict_counts )
+    {
+      die "Matched-sample error for X$v (ordinary sensitivity): no rows tagged sensvar,$v.\n"
+        unless @sens_subrows;
+      fund_validate_level_counts( "ordinary sensitivity", $v, \@sens_subrows, \@levels, $fundnum );
+    }
+
+    if ( @sens_subrows )
+    {
+      my $sens_r = fund_onevar_sensitivity( \@sens_subrows, $v );
+      $ordinary{$v}{sensitivity} = $sens_r->{sensitivity};
+    }
+    else
+    {
+      $ordinary{$v}{sensitivity} = undef;
+    }
+  }
+
+  my $sens_file = "$outdir/sensitivities.csv";
+  open my $SENS, ">", $sens_file or die "Cannot write $sens_file: $!\n";
+  print $SENS "Variable,Sensitivity,Rows_used_ordinary_sample,Rows_requested,Ordinary_sample_file\n";
+  for my $v ( @vars )
+  {
+    my $s = defined($ordinary{$v}{sensitivity}) ? $ordinary{$v}{sensitivity} : "";
+    my $n = $sens_rows_used{$v} || 0;
+    my $q = defined($sens_rows_requested{$v}) ? $sens_rows_requested{$v} : "";
+    print $SENS "X$v,$s,$n,$q,$ordinary_file\n";
+  }
+  close $SENS;
+
+  return({
+    sensitivities_file => $sens_file,
+    ordinary_sensitivity_file => $ordinary_file,
+    ordinary_rows_used => scalar(@sens_rows),
+    rows_skipped       => $sens_skipped,
     variables          => \@vars,
   });
 }
@@ -279,6 +890,8 @@ sub fund_read_totres_rows
   my $quiet     = $opts{quiet}     || 0;
   my @required_vars = @{ $opts{required_vars} || [] };
   my $require_sensvar = $opts{require_sensvar} || 0;
+  my $require_fundgroup = $opts{require_fundgroup} || 0;
+  my $require_sensgroup = $opts{require_sensgroup} || 0;
 
   open my $fh, "<", $file or die "Cannot open $file: $!\n";
 
@@ -331,19 +944,76 @@ sub fund_read_totres_rows
       next;
     }
 
-    my $sensvar;
+    my ( $sensvar, $fundgroup, $fundgroupvars, $sensgroup, $sensgroupvars, $grouprows );
     for ( my $i = 0; $i < $#f; $i++ )
     {
-      if ( defined($f[$i]) && $f[$i] eq "sensvar" )
+      my $tag = $f[$i];
+      if ( defined($tag) )
+      {
+        $tag =~ s/^\s+//;
+        $tag =~ s/\s+\z//;
+      }
+      if ( defined($tag) && lc($tag) eq "sensvar" )
       {
         $sensvar = $f[$i + 1];
-        last;
+        $sensvar =~ s/^\s+// if defined($sensvar);
+        $sensvar =~ s/\s+\z// if defined($sensvar);
+      }
+      elsif ( defined($tag) && lc($tag) eq "fundgroup" )
+      {
+        $fundgroup = $f[$i + 1];
+        $fundgroup =~ s/^\s+// if defined($fundgroup);
+        $fundgroup =~ s/\s+\z// if defined($fundgroup);
+      }
+      elsif ( defined($tag) && lc($tag) eq "fundgroupvars" )
+      {
+        $fundgroupvars = $f[$i + 1];
+        $fundgroupvars =~ s/^\s+// if defined($fundgroupvars);
+        $fundgroupvars =~ s/\s+\z// if defined($fundgroupvars);
+      }
+      elsif ( defined($tag) && lc($tag) eq "sensgroup" )
+      {
+        $sensgroup = $f[$i + 1];
+        $sensgroup =~ s/^\s+// if defined($sensgroup);
+        $sensgroup =~ s/\s+\z// if defined($sensgroup);
+      }
+      elsif ( defined($tag) && lc($tag) eq "sensgroupvars" )
+      {
+        $sensgroupvars = $f[$i + 1];
+        $sensgroupvars =~ s/^\s+// if defined($sensgroupvars);
+        $sensgroupvars =~ s/\s+\z// if defined($sensgroupvars);
+      }
+      elsif ( defined($tag) && lc($tag) eq "grouprows" )
+      {
+        $grouprows = $f[$i + 1];
+        $grouprows =~ s/^\s+// if defined($grouprows);
+        $grouprows =~ s/\s+\z// if defined($grouprows);
       }
     }
 
     if ( $require_sensvar && ( !defined($sensvar) || !fund_is_number($sensvar) ) )
     {
       warn "Skipping line $line_no in $file: ordinary sensitivity row lacks sensvar tag\n"
+        unless $quiet;
+      $n_skipped++;
+      next;
+    }
+
+    if ( $require_fundgroup
+      && ( !defined($fundgroup) || !fund_is_number($fundgroup)
+        || !defined($fundgroupvars) || $fundgroupvars eq "" ) )
+    {
+      warn "Skipping line $line_no in $file: group-fundamentality row lacks fundgroup/fundgroupvars tags\n"
+        unless $quiet;
+      $n_skipped++;
+      next;
+    }
+
+    if ( $require_sensgroup
+      && ( !defined($sensgroup) || !fund_is_number($sensgroup)
+        || !defined($sensgroupvars) || $sensgroupvars eq "" ) )
+    {
+      warn "Skipping line $line_no in $file: group-sensitivity row lacks sensgroup/sensgroupvars tags\n"
         unless $quiet;
       $n_skipped++;
       next;
@@ -360,6 +1030,11 @@ sub fund_read_totres_rows
       order    => \@order,
       y        => 0 + $y,
       sensvar  => defined($sensvar) ? 0 + $sensvar : undef,
+      fundgroup => defined($fundgroup) ? 0 + $fundgroup : undef,
+      fundgroupvars => $fundgroupvars,
+      sensgroup => defined($sensgroup) ? 0 + $sensgroup : undef,
+      sensgroupvars => $sensgroupvars,
+      grouprows => defined($grouprows) && fund_is_number($grouprows) ? 0 + $grouprows : undef,
       line     => $line_no,
     };
   }
@@ -405,6 +1080,46 @@ sub fund_levels_for_var
   }
 
   return fund_sort_levels( keys %seen );
+}
+
+
+sub fund_validate_level_counts
+{
+  my ( $kind, $var, $rows_r, $levels_r, $fundnum ) = @_;
+
+  die "Cannot validate $kind for X$var: invalid fundamentalitynum '$fundnum'\n"
+    unless defined($fundnum) && fund_is_number($fundnum) && $fundnum > 0;
+
+  my @rows = @$rows_r;
+  my @levels = @$levels_r;
+  my %wanted = map { $_ => 1 } @levels;
+  my %count;
+
+  for my $r ( @rows )
+  {
+    next unless exists $r->{x}{$var};
+    $count{ $r->{x}{$var} }++;
+  }
+
+  my $expected_total = scalar(@levels) * $fundnum;
+
+  die "Matched-sample error for X$var ($kind): expected $expected_total rows, got " . scalar(@rows) . " rows.\n"
+    unless scalar(@rows) == $expected_total;
+
+  for my $lev ( @levels )
+  {
+    my $n = $count{$lev} || 0;
+    die "Matched-sample error for X$var ($kind): expected $fundnum rows at level $lev, got $n.\n"
+      unless $n == $fundnum;
+  }
+
+  for my $lev ( keys %count )
+  {
+    die "Matched-sample error for X$var ($kind): unexpected level $lev was found.\n"
+      unless $wanted{$lev};
+  }
+
+  return 1;
 }
 
 
@@ -1016,23 +1731,38 @@ sub descend
   
   
   
-  	my $fundamentality_run = "n";
+  	my $fundamentality_mode = $dt{fundamentalitymode}
+	                      || $dt{fundamentality_mode}
+	                      || $dowhat{fundamentalitymode}
+	                      || $dowhat{fundamentality_mode}
+	                      || $dirfiles{fundamentalitymode}
+	                      || $dirfiles{fundamentality_mode}
+	                      || "";
 
-	if ( ( $dt{fundamentality_run} || "" ) eq "y" )
+	$fundamentality_mode =~ s/^\s+//;
+	$fundamentality_mode =~ s/\s+\z//;
+	$fundamentality_mode = lc($fundamentality_mode);
+
+	my $fundamentality_run = "n";
+
+	if ( $fundamentality_mode eq "fundonly" || $fundamentality_mode eq "sensonly" || $fundamentality_mode eq "groupfundonly" || $fundamentality_mode eq "groupsensonly" )
+	{
+	  $fundamentality_run = "n";
+	}
+	elsif ( ( $dt{fundamentality_run} || "" ) eq "y" )
 	{
 	  $fundamentality_run = "y";
 	}
-	elsif ( ( $dirfiles{fundamentality} || "" ) eq "y" )
+	elsif ( $fundamentality_mode eq "complete" && ( $dirfiles{fundamentality} || "" ) eq "y" )
 	{
 	  $fundamentality_run = "y";
 	}
-	elsif ( ref( $d{dirfiles} ) eq "HASH"
-		&& ( $d{dirfiles}{fundamentality} || "" ) eq "y" )
+	elsif ( $fundamentality_mode eq "" && ( $dirfiles{fundamentality} || "" ) eq "y" )
 	{
 	  $fundamentality_run = "y";
 	}
 
-	say "THSTHS DESCEND fundamentality_run=$fundamentality_run";
+	say "THSTHS DESCEND fundamentality_mode=$fundamentality_mode fundamentality_run=$fundamentality_run";
 
 
 
@@ -2513,25 +3243,102 @@ for ( my $i = 0 ; $i < $max ; $i++ )
   
   
         say "##DDD## dirfiles fundamentality: $dirfiles{fundamentality}";
-	if ( $fundamentality_run eq "y" )
+	if ( $fundamentality_run eq "y" || $fundamentality_mode eq "fundonly" || $fundamentality_mode eq "sensonly" || $fundamentality_mode eq "groupfundonly" || $fundamentality_mode eq "groupsensonly" )
 	{
-	  my $totres = $dirfiles{totres};
+	  my $totres = $dt{fundamentality_file}
+	            || $dt{fundamentalityfile}
+	            || $dowhat{fundamentality_file}
+	            || $dowhat{fundamentalityfile}
+	            || $dirfiles{fundamentality_file}
+	            || $dirfiles{fundamentalityfile}
+	            || $dirfiles{totres};
 
 	  if ( !defined($totres) || $totres eq "" )
 	  {
-	    $totres = "$dowhat{mypath}/$dowhat{file}-$countcase" . "_totres.csv";
+	    $totres = "$mypath/$file-$countcase" . "_totres.csv";
+	  }
+
+	  my $fundoutdir = $dt{fundamentality_outdir}
+	                || $dt{fundamentalityoutdir}
+	                || $dowhat{fundamentality_outdir}
+	                || $dowhat{fundamentalityoutdir}
+	                || $dirfiles{fundamentality_outdir}
+	                || $dirfiles{fundamentalityoutdir}
+	                || $mypath
+	                || ".";
+
+	  my $ordinary_file = $dt{ordinary_sensitivity_file}
+	                    || $dt{ordinarysensitivityfile}
+	                    || $dowhat{ordinary_sensitivity_file}
+	                    || $dowhat{ordinarysensitivityfile}
+	                    || $dirfiles{ordinary_sensitivity_file}
+	                    || $dirfiles{ordinarysensitivityfile};
+
+	  if ( ( !defined($ordinary_file) || $ordinary_file eq "" )
+	    && defined($mypath) && $mypath ne ""
+	    && defined($file) && $file ne ""
+	    && defined($countcase) && $countcase ne "" )
+	  {
+	    my $candidate_ordinary_file = "$mypath/$file" . "_" . "$countcase" . "_ordinary_sensitivity.csv";
+	    if ( -e $candidate_ordinary_file )
+	    {
+	      $ordinary_file = $candidate_ordinary_file;
+	    }
 	  }
 
 	  say "FUND POSTPROCESS in Descend.pm";
+	  say "FUND POSTPROCESS mode=" . ( $fundamentality_mode || "complete" );
 	  say "FUND POSTPROCESS totres=$totres";
+	  say "FUND POSTPROCESS outdir=$fundoutdir";
 	  say "FUND POSTPROCESS exists=" . ( -e $totres ? "yes" : "no" );
+	  say "FUND POSTPROCESS ordinary_sensitivity_file=" . ( ( defined($ordinary_file) && $ordinary_file ne "" ) ? $ordinary_file : "undef" );
 
-	  if ( -e $totres )
+	  if ( $fundamentality_mode eq "groupfundonly" )
 	  {
-	    my $fund_r = fundamentality_indices(
+	    my $group_file = "$mypath/$file" . "_" . "$countcase" . "_group_fundamentality.csv";
+	    my $group_r = fundamentality_groupfund_only(
 	      {
-		file      => $totres,
-		outdir    => $dowhat{mypath},
+		group_fundamentality_file => $group_file,
+		outdir => $fundoutdir,
+		instcol => 1,
+		metriccol => 2,
+		ycol => 3,
+		metric => "totdhs",
+		sep => ",",
+		header => 0,
+		quiet => 0,
+		fundamentalitynum => $dt{fundamentalitynum} || $dirfiles{fundamentalitynum},
+		strict_counts => 1,
+	      });
+	    say "Group fundamentality indices written:";
+	    say "  $group_r->{groupfund_file}";
+	  }
+	  elsif ( $fundamentality_mode eq "groupsensonly" )
+	  {
+	    my $group_file = "$mypath/$file" . "_" . "$countcase" . "_group_sensitivity.csv";
+	    my $group_r = fundamentality_groupsens_only(
+	      {
+		group_sensitivity_file => $group_file,
+		outdir => $fundoutdir,
+		instcol => 1,
+		metriccol => 2,
+		ycol => 3,
+		metric => "totdhs",
+		sep => ",",
+		header => 0,
+		quiet => 0,
+		fundamentalitynum => $dt{fundamentalitynum} || $dirfiles{fundamentalitynum},
+		strict_counts => 1,
+	      });
+	    say "Group sensitivity indices written:";
+	    say "  $group_r->{groupsens_file}";
+	  }
+	  elsif ( $fundamentality_mode eq "sensonly" )
+	  {
+	    my $sens_r = fundamentality_sensitivities_only(
+	      {
+		ordinary_sensitivity_file => $ordinary_file,
+		outdir    => $fundoutdir,
 		instcol   => 1,
 		metriccol => 2,
 		ycol      => 3,
@@ -2539,14 +3346,57 @@ for ( my $i = 0 ; $i < $max ; $i++ )
 		sep       => ",",
 		header    => 0,
 		quiet     => 0,
-		ordinary_sensitivity_file => $dt{ordinary_sensitivity_file} || $dirfiles{ordinary_sensitivity_file},
 		fundamentalitynum => $dt{fundamentalitynum} || $dirfiles{fundamentalitynum},
+		strict_counts => 1,
 	      });
+	    say "Sensitivity indices written:";
+	    say "  $sens_r->{sensitivities_file}";
+	  }
+	  elsif ( -e $totres )
+	  {
+	    if ( $fundamentality_mode eq "fundonly" )
+	    {
+	      my $abs_r = fundamentality_absfund_only(
+	        {
+		  file      => $totres,
+		  outdir    => $fundoutdir,
+		  instcol   => 1,
+		  metriccol => 2,
+		  ycol      => 3,
+		  metric    => "totdhs",
+		  sep       => ",",
+		  header    => 0,
+		  quiet     => 0,
+		  fundamentalitynum => $dt{fundamentalitynum} || $dirfiles{fundamentalitynum},
+		  strict_counts => 1,
+	        });
+	      say "Absolute fundamentality indices written:";
+	      say "  $abs_r->{absfund_file}";
+	    }
+	    else
+	    {
+	      my $fund_r = fundamentality_indices(
+	        {
+		  file      => $totres,
+		  outdir    => $fundoutdir,
+		  instcol   => 1,
+		  metriccol => 2,
+		  ycol      => 3,
+		  metric    => "totdhs",
+		  sep       => ",",
+		  header    => 0,
+		  quiet     => 0,
+		  ordinary_sensitivity_file => $ordinary_file,
+		  fundamentalitynum => $dt{fundamentalitynum} || $dirfiles{fundamentalitynum},
+		  strict_matched_sensitivity => 1,
+	        });
 
-	    say "Fundamentality indices written:";
-	    say "  $fund_r->{absfund_file}";
-	    say "  $fund_r->{sensitivities_file}";
-	    say "  $fund_r->{relfund_file}";
+	      say "Fundamentality indices written:";
+	      say "  $fund_r->{absfund_file}";
+	      say "  $fund_r->{sensitivities_file}";
+	      say "  $fund_r->{relfund_file}";
+	      say "  $fund_r->{summary_file}";
+	    }
 	  }
 	  else
 	  {
@@ -3552,7 +4402,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

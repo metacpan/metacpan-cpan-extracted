@@ -178,18 +178,22 @@ plan tests => 0 + 8
                 + 2*scalar(keys %lucas_sequences)
                 + 7  # lucasuv
                 + 7  # lucasu lucasv
-                + 8  # lucasumod lucasvmod lucasuvmod
+                + 9  # lucasumod lucasvmod lucasuvmod lucas_sequence
+                + 2  # is_frobenius_pseudoprime with large P,Q
               # skipping these:
               # + $num_large_pseudoprime_tests
                 + 18*$extra  # Large Carmichael numbers
                 + 2 # M-R-random
                 + 5 * scalar(@primes128)  # strong probable prime tests
                 + 5 * scalar(@comp128)    # strong probable prime tests
+                + 2   # BPSW return values around 2^64
                 + 15  # Check Frobenius for small primes
+                + 12  # Frobenius parameter and Khashin selection cases
                 + 3   # mrr with seed and neg bases
                 + 4  *scalar(@perrint)    # Perrin pseudoprime types
                 + 2   # Test for unusual single digit pseudoprimes
                 + 3   # Implicit base 2
+                + 6   # AES parameter edge cases
                 + 0;
 
 # no base is no implicit 2
@@ -198,17 +202,17 @@ plan tests => 0 + 8
 eval { no warnings; is_strong_pseudoprime(2047, undef); };
 like($@, qr/(defined|empty)/i, "is_strong_pseudoprime with base undef fails");
 eval { is_strong_pseudoprime(2047, ''); };
-like($@, qr/(positive|empty)/i, "is_strong_pseudoprime with base '' fails");
+like($@, qr/(non-negative|positive|empty)/i, "is_strong_pseudoprime with base '' fails");
 eval { is_strong_pseudoprime(2047,0); };
 like($@, qr/invalid/i, "is_strong_pseudoprime with base 0 fails");
 eval { is_strong_pseudoprime(2047,1); };
 like($@, qr/invalid/i, "is_strong_pseudoprime with base 1 fails");
 eval { is_strong_pseudoprime(2047,-7); };
-like($@, qr/positive/i, "is_strong_pseudoprime with base -7 fails");
+like($@, qr/non-negative|positive/i, "is_strong_pseudoprime with base -7 fails");
 eval { no warnings; is_strong_pseudoprime(undef, 2); };
 like($@, qr/(defined|empty)/i, "is_strong_pseudoprime(undef,2) is invalid");
 eval { is_strong_pseudoprime('', 2); };
-like($@, qr/(positive|empty)/i, "is_strong_pseudoprime('',2) is invalid");
+like($@, qr/(non-negative|positive|empty)/i, "is_strong_pseudoprime('',2) is invalid");
 is(is_strong_pseudoprime(-7), 0, "is_strong_pseudoprime(-7) returns 0");
 
 eval { no warnings; is_strong_lucas_pseudoprime(undef); };
@@ -224,6 +228,19 @@ is( is_strong_pseudoprime(2, 2), 1, "spsp(2, 2) shortcut prime");
 is( is_strong_pseudoprime(3, 2), 1, "spsp(2, 2) shortcut prime");
 is( is_strong_lucas_pseudoprime(1), 0, "slpsp(1) shortcut composite");
 is( is_strong_lucas_pseudoprime(3), 1, "slpsp(3) shortcut prime");
+is( is_almost_extra_strong_lucas_pseudoprime(5, 5), 1,
+    "AES accepts a small prime with an unusable parameter progression");
+is( is_almost_extra_strong_lucas_pseudoprime(31, 28), 1,
+    "AES large-increment prime shortcut");
+is( is_almost_extra_strong_lucas_pseudoprime(319, 148), 1,
+    "AES large-increment composite follows the requested test");
+is( is_almost_extra_strong_lucas_pseudoprime(259, 256), 1,
+    "AES largest-increment composite follows the requested test");
+
+eval { is_almost_extra_strong_lucas_pseudoprime(2, 0) };
+like($@, qr/invalid increment: 0/, "AES validates increment before small n");
+eval { is_almost_extra_strong_lucas_pseudoprime(4, 257) };
+like($@, qr/invalid increment: 257/, "AES validates increment before even n");
 
 # Check that each strong pseudoprime base b makes it through MR with that base
 while (my($base, $ppref) = each (%pseudoprimes)) {
@@ -353,10 +370,12 @@ is_deeply([lucasuv(1,-1,27)], [qw/196418 439204/], "lucasuv(1,-1,27)");
   my $n = '93284902384902384902389999977';
   my $expU = '25334869115319721344893191735';
   my $expV = '69387036616346396045108433732';
+  my $expQk = '29855628541538459829687890237';
 
   is(lucasumod($P, $Q, $k, $n), $expU, 'lucasumod with large P and Q');
   is(lucasvmod($P, $Q, $k, $n), $expV, 'lucasvmod with large P and Q');
   is_deeply([lucasuvmod($P, $Q, $k, $n)], [$expU,$expV], 'lucasuvmod with large P and Q');
+  is_deeply([lucas_sequence($n, $P, $Q, $k)], [$expU,$expV,$expQk], 'lucas_sequence with large P and Q');
 
   # If we use modint(value,$n) on these, we get $expU and $expV.
   is(lucasu($P, $Q, $k), '638982808433522085545526796419139574565194569084879688961370201789461273036864463739989850080992114905246599468477822532880603380773729456663882472537224263398682230515459999540010010351118370161596871', "lucasu for large P and Q");
@@ -437,10 +456,46 @@ for my $p (@comp128) {
   is( is_frobenius_underwood_pseudoprime($p), 0, "composite $p fails Frobenius Underwood primality test");
   is( is_bpsw_prime($p), 0, "composite $p fails BPSW primality test");
 }
+is( is_bpsw_prime("18446744073709551557"), 2,
+    "64-bit prime has a deterministic BPSW result" );
+is( is_bpsw_prime("18446744073709551629"), 1,
+    "prime above 64 bits has a probable-prime BPSW result" );
 
 # Frobenius has some issues.  Test
 for my $p (2,3,5,7,11,13,17,19,23,29,31,37,41,43,47) {
   is( is_frobenius_pseudoprime($p,37,-13), 1, "prime $p is a Frobenius (37,-13) pseudoprime" );
+}
+is( is_frobenius_pseudoprime(101,2,2), 1,
+    "negative discriminant with square absolute value is valid" );
+is( is_frobenius_pseudoprime(91,2,2), 0,
+    "negative discriminant parameters reject a composite" );
+is( is_frobenius_pseudoprime(561,0,2), 1,
+    "P need not be coprime to n" );
+is( is_frobenius_pseudoprime(4181,4182,-1), 1,
+    "large P is reduced modulo n" );
+is( is_frobenius_pseudoprime(4181,1,4180), 1,
+    "large Q is reduced modulo n" );
+ok( !eval { is_frobenius_pseudoprime(5,3,2); 1 },
+    "small prime validates Frobenius parameters" );
+
+is( is_frobenius_khashin_pseudoprime(19), 1,
+    "Khashin test with c = -1" );
+is( is_frobenius_khashin_pseudoprime(13), 1,
+    "Khashin test with c = 2" );
+is( is_frobenius_khashin_pseudoprime(17), 1,
+    "Khashin test with a positive c" );
+is( is_frobenius_khashin_pseudoprime(15), 0,
+    "Khashin c = -1 branch rejects a multiple of 3" );
+is( is_frobenius_khashin_pseudoprime(21), 0,
+    "Khashin c = 2 branch rejects a multiple of 3" );
+is( is_frobenius_khashin_pseudoprime(33), 0,
+    "Khashin positive c branch rejects a zero symbol" );
+
+{
+  my $prime = $primes128[0];
+  my $comp = $comp128[0];
+  is( is_frobenius_pseudoprime($prime, $prime . "37", "-" . $prime . "13"), 1, "prime passes Frobenius test with large P and Q" );
+  is( is_frobenius_pseudoprime($comp, $comp . "37", "-" . $comp . "13"), 0, "composite fails Frobenius test with large P and Q" );
 }
 
 # Test miller_rabin_random with a passed in seed value

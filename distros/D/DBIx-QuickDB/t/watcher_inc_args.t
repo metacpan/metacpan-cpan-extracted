@@ -43,15 +43,20 @@ my $tmp  = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 my $root = "$tmp/fakeroot";
 make_path("$root/DBIx/QuickDB");
 
+my $abs_root = abs_path($root) or die "Could not resolve '$root': $!";
+$root = $abs_root;
+
 open(my $fh, '>', "$root/DBIx/QuickDB/Watcher.pm") or die "Could not write decoy: $!";
 print $fh "1;\n";
 close($fh);
 
+# Restore @INC before Test2 renders failure diagnostics on older Perls.
 subtest loaded_from_dir_comes_first => sub {
-    local %INC = (%INC, 'DBIx/QuickDB/Watcher.pm' => "$root/DBIx/QuickDB/Watcher.pm");
-    local @INC = ('/nonexistent-alpha', '/nonexistent-beta');
-
-    my @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    my @args;
+    {
+        local @INC = ('/nonexistent-alpha', '/nonexistent-beta');
+        @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    }
 
     is($args[0], "-I$root", "Directory the module was really loaded from is passed first");
     is(
@@ -62,10 +67,11 @@ subtest loaded_from_dir_comes_first => sub {
 };
 
 subtest no_hardcoded_relative_lib => sub {
-    local %INC = (%INC, 'DBIx/QuickDB/Watcher.pm' => "$root/DBIx/QuickDB/Watcher.pm");
-    local @INC = ('/nonexistent-alpha');
-
-    my @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    my @args;
+    {
+        local @INC = ('/nonexistent-alpha');
+        @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    }
 
     # -Ilib must never be synthesized; it may only appear when the parent
     # genuinely had it in @INC.
@@ -73,10 +79,11 @@ subtest no_hardcoded_relative_lib => sub {
 };
 
 subtest relative_entries_are_absolutized => sub {
-    local %INC = (%INC, 'DBIx/QuickDB/Watcher.pm' => "$root/DBIx/QuickDB/Watcher.pm");
-    local @INC = ('lib', '/nonexistent-alpha');
-
-    my @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    my @args;
+    {
+        local @INC = ('lib', '/nonexistent-alpha');
+        @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    }
 
     # Hygiene, not a guarantee: the watcher shares the caller's cwd, so a
     # relative entry would resolve the same forwarded verbatim. What pins the
@@ -91,10 +98,11 @@ subtest relative_entries_are_absolutized => sub {
 };
 
 subtest non_string_inc_entries_are_dropped => sub {
-    local %INC = (%INC, 'DBIx/QuickDB/Watcher.pm' => "$root/DBIx/QuickDB/Watcher.pm");
-    local @INC = (sub { }, ['array', 'hook'], bless({}, 'Some::Hook'), '/nonexistent-alpha');
-
-    my @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    my @args;
+    {
+        local @INC = (sub { }, ['array', 'hook'], bless({}, 'Some::Hook'), '/nonexistent-alpha');
+        @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    }
 
     # Stringifying a hook would hand the child -ICODE(0x...).
     is(
@@ -105,10 +113,11 @@ subtest non_string_inc_entries_are_dropped => sub {
 };
 
 subtest deduplicates_the_derived_root => sub {
-    local %INC = (%INC, 'DBIx/QuickDB/Watcher.pm' => "$root/DBIx/QuickDB/Watcher.pm");
-    local @INC = ($root, '/nonexistent-alpha', $root);
-
-    my @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    my @args;
+    {
+        local @INC = ($root, '/nonexistent-alpha', $root);
+        @args = DBIx::QuickDB::Watcher::_watcher_inc_args($root);
+    }
 
     is(
         scalar(grep { $_ eq "-I$root" } @args),
@@ -120,9 +129,11 @@ subtest deduplicates_the_derived_root => sub {
 subtest falls_back_when_no_directory_can_be_derived => sub {
     # A module loaded through an @INC hook has no real directory behind it, so
     # the load-time capture comes out undef.
-    local @INC = ('/nonexistent-alpha', '/nonexistent-beta');
-
-    my @args = DBIx::QuickDB::Watcher::_watcher_inc_args(undef);
+    my @args;
+    {
+        local @INC = ('/nonexistent-alpha', '/nonexistent-beta');
+        @args = DBIx::QuickDB::Watcher::_watcher_inc_args(undef);
+    }
 
     is(
         \@args,

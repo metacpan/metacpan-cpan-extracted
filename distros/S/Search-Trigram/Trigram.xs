@@ -6,6 +6,9 @@
 
 #define STRIGRAM_FROM_SV(sv) INT2PTR(strigram_t *, SvIV(SvRV(sv)))
 
+/* The shared C ABI. Must come after strigram.h and STRIGRAM_FROM_SV. */
+#include "sg_abi_impl.h"
+
 /* ======================================================
    Custom op descriptors
    ====================================================== */
@@ -363,6 +366,117 @@ DESTROY(self)
     SV *self
     CODE:
         strigram_free(STRIGRAM_FROM_SV(self));
+
+# ---- shared C ABI ---------------------------------------------------------
+
+# Address of Search::Trigram's own C ABI table (sg_abi.h). A consumer XS
+# module fetches this once at boot, INT2PTRs it to a `const sg_abi *`, and
+# checks ->abi_version before using it. Not part of the public Perl API.
+IV
+_abi_ptr()
+    CODE:
+        RETVAL = PTR2IV(&SG_ABI);
+    OUTPUT:
+        RETVAL
+
+# The ABI version this build compiled against, for a consumer's diagnostics.
+IV
+_abi_version()
+    CODE:
+        RETVAL = SG_ABI_VERSION;
+    OUTPUT:
+        RETVAL
+
+# Exercise the whole sg_abi table the way a C consumer would: resolve it from
+# the IV _abi_ptr hands back, gate on abi_version, then drive index_of ->
+# search through the function pointers rather than calling the C directly.
+# This is how the ABI gets tested without a second distribution.
+#
+# Returns a list of { doc_id, score, text } hashrefs; an empty list when the
+# gate rejects the table or the invocant is not an index, which is where a
+# consumer would fall back to the search method.
+void
+_abi_selftest(self, query, limit = 10)
+    SV  *self
+    SV  *query
+    UV   limit
+    PPCODE:
+    {
+        const sg_abi *abi = NULL;
+        void         *idx;
+        sg_abi_hit    hits[64];
+        uint32_t      n, i;
+        STRLEN        qlen;
+        const char   *q;
+        {
+            dSP;
+            IV  ptr = 0;
+            int count;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            PUTBACK;
+            count = call_pv("Search::Trigram::_abi_ptr", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (count > 0) {
+                /* Pop into a local first: before 5.30 SvIV was a macro that
+                 * evaluated its argument twice, so SvIV(POPs) popped twice
+                 * and read the IV off whatever sat one slot lower. */
+                SV *rv = POPs;
+                if (!SvTRUE(ERRSV)) ptr = SvIV(rv);
+            }
+            PUTBACK; FREETMPS; LEAVE;
+            if (ptr) abi = INT2PTR(const sg_abi *, ptr);
+        }
+        if (!abi || abi->abi_version < SG_ABI_VERSION) XSRETURN_EMPTY;
+
+        idx = abi->index_of(aTHX_ self);
+        if (!idx) XSRETURN_EMPTY;
+
+        q = SvPVutf8(query, qlen);
+        n = abi->search(idx, q, (uint32_t)qlen, (uint32_t)limit,
+                        hits, (uint32_t)(sizeof hits / sizeof hits[0]));
+
+        EXTEND(SP, (SSize_t)n);
+        for (i = 0; i < n; i++) {
+            HV *h = newHV();
+            (void)hv_stores(h, "doc_id", newSVuv(hits[i].doc_id));
+            (void)hv_stores(h, "score",  newSVnv(hits[i].score));
+            (void)hv_stores(h, "text",
+                newSVpvn_flags(hits[i].text, hits[i].text_len, SVf_UTF8));
+            mPUSHs(newRV_noinc((SV *)h));
+        }
+        XSRETURN((I32)n);
+    }
+
+# add / optimize / doc_count driven through the table, so a mis-ordered entry
+# shows up as a wrong answer rather than passing unnoticed.
+UV
+_abi_selftest_add(self, text)
+    SV *self
+    SV *text
+    CODE:
+    {
+        const sg_abi *abi = INT2PTR(const sg_abi *, PTR2IV(&SG_ABI));
+        void *idx = abi->index_of(aTHX_ self);
+        STRLEN len;
+        const char *s = SvPVutf8(text, len);
+        RETVAL = idx ? (UV)abi->add(idx, s, (uint32_t)len) : 0;
+        if (idx) abi->optimize(idx);
+    }
+    OUTPUT:
+        RETVAL
+
+UV
+_abi_selftest_doc_count(self)
+    SV *self
+    CODE:
+    {
+        const sg_abi *abi = INT2PTR(const sg_abi *, PTR2IV(&SG_ABI));
+        void *idx = abi->index_of(aTHX_ self);
+        RETVAL = idx ? (UV)abi->doc_count(idx) : 0;
+    }
+    OUTPUT:
+        RETVAL
 
 BOOT:
 {

@@ -1,0 +1,7 @@
+{
+   "automated_actions" : "code_request",
+   "automated_contributions" : "code_request",
+   "code_generation" : "machine_generated",
+   "distribution" : "File-Rotate-Simple-v0.4.1",
+   "version" : 1
+}

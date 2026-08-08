@@ -50,6 +50,12 @@ MDS_ALWAYS_INLINE static void mds_buf_putc(pTHX_ mds_buf* b, char c) {
 /* Write a compile-time literal. */
 #define MDS_BUF_LIT(b, lit) mds_buf_write(aTHX_ (b), "" lit, sizeof(lit) - 1)
 
+/* Splice bytes into already-written output at byte offset `at`, shifting the
+ * tail right. Used by the heading renderer, whose open tag carries an id that
+ * is only known once the heading's inline content has been rendered. `at` is
+ * an offset rather than a pointer because reserve can realloc the SV. */
+void mds_buf_insert(pTHX_ mds_buf* b, size_t at, const char* src, size_t len);
+
 /* Commit cursor to SvCUR, NUL-terminate. */
 void mds_buf_finalize(pTHX_ mds_buf* b);
 

@@ -7,11 +7,15 @@
 
 extern uint32_t csprng_context_size(void);
 
+/* Clear all sensitive state.  The caller still owns the context memory. */
+extern void csprng_clear(void *ctx);
+
 /* Seed and init if needed */
 extern void csprng_seed(void *ctx, uint32_t bytes, const unsigned char* data);
 
-/* Simple seed */
-extern void csprng_srand(void *ctx, UV insecure_seed);
+/* Simple seed.  Returns the number of bytes written to seed[8]. */
+extern uint32_t csprng_srand(void *ctx, UV insecure_seed,
+                            unsigned char seed[8]);
 
 /* Fill buffer with this many bytes of random data */
 extern void csprng_rand_bytes(void *ctx, uint32_t bytes, unsigned char* data);
@@ -27,7 +31,7 @@ extern NV drand64(void *ctx);
 
 extern uint32_t urandomm32(void* ctx, uint32_t n);   /* integer less than n */
 extern UV       urandomm64(void* ctx, UV n);
-extern UV       urandomb(void* ctx, int nbits);      /* integer with n bits */
+extern UV       urandomb(void* ctx, uint32_t nbits); /* integer with n bits */
 
 /*****************************************************************************/
 

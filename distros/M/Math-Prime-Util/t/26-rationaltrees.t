@@ -35,6 +35,8 @@ subtest 'Calkin-Wilf tree' => sub {
   my @s=([1,1]);
   push @s, [next_calkin_wilf($s[-1]->[0],$s[-1]->[1])] for 1..99;
   is_deeply( \@s, \@CW, "next_calkin_wilf first 100 terms" );
+  ok( !eval { next_calkin_wilf(2,4); 1 } && $@ =~ /rational must be reduced/,
+      "next_calkin_wilf requires reduced input" );
 
   # calkin_wilf_n: index of first 100 terms
   my @idx;
@@ -73,6 +75,11 @@ subtest 'Stern-Brocot tree' => sub {
   my @s=([1,1]);
   push @s, [next_stern_brocot($s[-1]->[0],$s[-1]->[1])] for 1..99;
   is_deeply( \@s, \@SB, "next_stern_brocot first 100 terms" );
+  is_deeply(
+    [map { "$_" } next_stern_brocot("228909276746","645603216423")],
+    [qw/246711520031 695811690661/],
+    "next_stern_brocot dispatches when the index exceeds a UV"
+  );
 
   # stern_brocot_n: index of first 100 terms
   my @idx;
@@ -186,7 +193,22 @@ subtest 'Farey sequences' => sub {
   is_deeply( [farey(1)], [[0,1],[1,1]], "farey(1)" );
   is( farey_rank(5,[0,1]), 0, "farey_rank(5,[0,1]) = 0" );
   is( farey_rank(5,[1,1]), 10, "farey_rank(5,[1,1]) = last" );
+  is( farey_rank(5,[2,1]), 11, "farey_rank(5,[2,1]) = length" );
+  ok( !defined(farey(5,"10000000000")),
+      "farey returns undef for oversized native index" );
   ok( !defined(next_farey(5,[1,1])), "next_farey(5,[1,1]) = undef" );
+  is_deeply( next_farey(1,[1,3]), [1,1],
+             "next_farey handles non-entry fraction in F_1" );
+  is_deeply( next_farey(5,[1,8]), [1,5],
+             "next_farey handles small non-entry fraction" );
+  is_deeply( next_farey(5,[5,12]), [1,2],
+             "next_farey handles interior non-entry fraction" );
+  is_deeply( next_farey(5,[2,4]), [3,5],
+             "next_farey handles unreduced entry fraction" );
+  ok( !eval { next_farey(5,[1]); 1 } && $@ =~ /expected 2-element array reference/,
+      "next_farey rejects short fraction array" );
+  ok( !eval { farey_rank(5,[1,2,3]); 1 } && $@ =~ /expected 2-element array reference/,
+      "farey_rank rejects long fraction array" );
 };
 
 if ($extended) {
@@ -204,6 +226,16 @@ if ($extended) {
       my($n, $expcount) = @$t;
       is( farey($n), $expcount, "scalar farey($n) = $expcount" );
     }
+
+    is( "".farey(120_000), "4377098667",
+        "scalar farey dispatches on native length overflow" );
+
+    is( "".farey_rank(100_000,[50_000,50_001]), "3039600754",
+        "farey_rank dispatches when native multiplication would overflow" );
+
+    is_deeply( [map { "$_" } @{next_farey("4294967295",[1,2])}],
+               ["2147483648","4294967295"],
+               "next_farey avoids 32-bit intermediate overflow" );
 
     # next_farey iteration count for larger order
     {

@@ -284,13 +284,18 @@ static SV *pm_slot(pTHX_ SV *self, const char *k) {
 }
 
 /* Forward @_ to the backend's method of the same name, returning whatever
- * it returns. The instance is replaced by the backend on the stack, so
- * nothing is copied. */
+ * it returns. The results land above the caller's own arguments, so they
+ * are copied down over them before the caller returns - without that, list
+ * context handed back ($self, @args, @results), which scalar context
+ * masked by taking the last value. */
 static void pm_delegate(pTHX_ SV **sp_base, I32 items, const char *method,
                         I32 gimme) {
     dSP;
     SV *self = sp_base[0];
     SV *backend = pm_slot(aTHX_ self, "backend");
+    /* the callee can grow (and so move) the stack, so remember where the
+     * caller's frame starts as an offset, never as a pointer */
+    SSize_t base = sp_base - PL_stack_base;
     I32 i;
     if (!backend) croak("Punk::Model: this model has no backend");
     PUSHMARK(SP);
@@ -300,6 +305,18 @@ static void pm_delegate(pTHX_ SV **sp_base, I32 items, const char *method,
     PUTBACK;
     call_method(method, gimme);
     SPAGAIN;
+    {   /* results sit above the caller's own arguments; slide them down over
+         * them so list context returns @results, not ($self, @args,
+         * @results) - which scalar context masked by taking the last value.
+         * They are call_method's mortals, and dest stays below source, so an
+         * ascending alias copy is safe. */
+        SV **b = PL_stack_base + base;
+        SSize_t count = SP - (b + items - 1);
+        SSize_t j;
+        if (count < 0) count = 0;
+        for (j = 0; j < count; j++) b[j] = b[items + j];
+        SP = b + count - 1;
+    }
     PUTBACK;
 }
 

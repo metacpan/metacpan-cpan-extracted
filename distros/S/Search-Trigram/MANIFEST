@@ -2,6 +2,8 @@ Changes
 MANIFEST
 Makefile.PL
 README
+include/sg_abi.h
+include/sg_abi_impl.h
 include/strigram.h
 include/strigram_compat.h
 include/xop_compat.h
@@ -14,6 +16,7 @@ t/02-search.t
 t/03-score.t
 t/04-unicode.t
 t/05-edge.t
+t/06-abi.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

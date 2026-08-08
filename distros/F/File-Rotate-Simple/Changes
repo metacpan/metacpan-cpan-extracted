@@ -1,5 +1,42 @@
 Revision history for File::Rotate::Simple
 
+v0.4.1    2026-08-07 17:18:51+01:00 Europe/London
+
+  [Bug Fixs]
+  - Fixed bug when older rotated files are dangling symlinks.
+
+  - Fixed bug when rotating dandling symlinks and age > 0.
+
+v0.4.0    2026-08-07 15:40:41+01:00 Europe/London
+  [Enhancements]
+  - DateTime::Lite and DateTime::Tiny objects can be given for the time attribute.
+
+  [Security]
+  - If the log file is a dangling link, then it will be rotated without touching the destination (CVE-2026-17435).
+
+  [Documentation]
+  - Updated author email address.
+
+  - Update copyright year.
+
+  - Fixed link in SOURCE.
+
+  - Fixed spelling error.
+
+  - Generate README with the UsefulReadme plugin.
+
+  - Add a security policy.
+
+  [Tests]
+  - Added more author tests.
+
+  - Moved author tests to xt.
+
+  [Toolchain]
+  - Use SigStore instead of Module::Signature.
+
+  - Update Dist::Zilla configuration.
+
 v0.3.0    2023-05-26 16:02:36+01:00 Europe/London
   [Incompatible Changes]
   - Bump minimum version of Perl to v5.14.

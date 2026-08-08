@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/addint subint add1int sub1int/;
+use Math::Prime::Util qw/addint subint add1int sub1int mulint vecall/;
 
 my @vals = (
   [qw/-123456789 -987654321 -1111111110/],
@@ -42,6 +42,7 @@ plan tests =>
             + 1  # addint/subint on test array
             + 2  # add1int and sub1int
             + 1  # add/sub 0
+            + 1  # vecall nested addint/mulint regression
             ;
 
 ###### addint
@@ -74,6 +75,20 @@ subtest 'selected test values', sub {
   is_deeply( [map { "".addint($_->[0],$_->[1])} @vals],
              [map { "".addint($_->[1],$_->[0])} @vals],
              "addint is commutative" );
+
+  my $add  = \&Math::Prime::Util::addint;
+  my $add1 = \&Math::Prime::Util::add1int;
+  my $n = "7899999999999959999999996";
+  is_deeply([map { "".$add->($n,$_) } 0..4],
+            [qw/7899999999999959999999996
+                7899999999999959999999997
+                7899999999999959999999998
+                7899999999999959999999999
+                7899999999999960000000000/],
+            "addint function reference retains nested bigint return shape");
+  is_deeply([map { "".$add1->($_) } @{$vals[19]}[0,1]],
+            [qw/1178630961471601951655863 827639478068904540013/],
+            "add1int function reference retains nested bigint return shape");
 };
 
 ###### add1int / sub1int
@@ -98,3 +113,12 @@ subtest 'add and subtract 0 on large values', sub {
     is_deeply([map{"".subint(0,$_)} @big],
               [map{"-$_"} @big],                     "subint(0,n) == -n for large n");
 };
+
+{
+  # Perl XS custom ops were introduced in 5.14.  In 5.18.x (only) there is a
+  # regression when used with a $_ argument.  We protect against this in the
+  # code.  Check.
+  my $n = "7899999999999959999999996";
+  my $pass = vecall { mulint(2,addint($n,$_)) } 0..5;
+  is($pass, 1, "vecall nested mulint(addint(\$n,\$_))");
+}

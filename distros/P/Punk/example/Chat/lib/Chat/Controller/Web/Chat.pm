@@ -9,11 +9,16 @@ use Chat::Bus ();
 
 sub index {
     my ($c) = @_;
-    my $rooms = $c->model('Message')->rooms;
-    $_->{connected} = Chat::Bus::connected($_->{room}) for @$rooms;
-    return $c->render('index', {
-        title => 'Punk Chat',
-        rooms => $rooms,
+    # The model is non-blocking (Chat asks for Punk::Model::DBIx::Loop), so
+    # it hands back a future and the handler hands back the chain: the worker
+    # goes on serving other requests while the query runs.
+    return $c->model('Message')->rooms->then(sub {
+        my ($rooms) = @_;
+        $_->{connected} = Chat::Bus::connected($_->{room}) for @$rooms;
+        $c->render('index', {
+            title => 'Punk Chat',
+            rooms => $rooms,
+        });
     });
 }
 

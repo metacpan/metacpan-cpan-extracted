@@ -16,15 +16,17 @@ BEGIN {
 
 my $extra = 0+(defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING});
 my $use64 = ~0 > 4294967295;
-my $broken64 = (18446744073709550592 == ~0);
-# Do some tests only if:
-#   EXTENDED_TESTING is on OR we have the GMP backend
-# Note that with Calc, these things are incredibly slow.
+# Do some tests only if EXTENDED_TESTING is on, or if Math::BigInt has a
+# fast backend.  These are incredibly slow on 32-bit with Calc.
 use Math::BigInt try=>"GMP,GMPz,Pari";
-my $doexpensive = 0 + ($extra || ( (!$use64 || !$broken64) && Math::BigInt->config()->{lib} =~ /^Math::BigInt::GMP/ ));
+my $fast_bigint = Math::BigInt->config()->{lib} =~ /^Math::BigInt::GMP/;
+my $doexpensive = $extra ? 1 : 0;
+$doexpensive = 0 unless $use64;
+$doexpensive = 1 if $fast_bigint;
+my $doextra_proof = $extra && $doexpensive;
 
 my @plist = qw/20907001 809120722675364249 65635624165761929287/;
-if ($extra || $use64) {
+if ($doexpensive || $use64) {
   push @plist, "1162566711635022452267983";
 }
 # The standard Perl code will only create BLS5 certificates, so there really
@@ -51,11 +53,10 @@ plan tests => 0
             + 6 * scalar(@plist)
                                    #  hand-done proofs
             + 1*$doexpensive       #  n-1 for 2^521-1
-            + 1*$extra             #  n-1 for 2^607-1
-            #+ (($doexpensive && !$broken64) ? 1 : 0)  # n-1 proof
+            + 1*$doextra_proof     #  n-1 for 2^607-1
             + (($doexpensive) ? 1 : 0)  # n-1 proof
             + 2                    #  Pratt and ECPP
-            + 28 # borked up certificates generate warnings
+            + 32 # borked up certificates generate warnings
             + 6  # verification failures (tiny/BPSW)
             + 8  # verification failures (Lucas/Pratt)
             + 8  # verification failures (n-1)
@@ -67,27 +68,22 @@ is( is_provable_prime(871139809), 0, "871139809 is composite" );
 is( is_provable_prime(1490266103), 2, "1490266103 is provably prime" );
 
 foreach my $p (@plist) {
-
-  SKIP: {
-    skip "Broken 64-bit causes trial factor to barf", 6
-      if $broken64 && $p > 2**60;
-    ok( is_prime($p), "$p is prime" );
-    my($isp, $cert) = is_provable_prime_with_cert($p);
-    is( $isp, 2, "   is_provable_prime_with_cert returns 2" );
-    ok( defined($cert) && $cert =~ /^Type/m,
-        "   certificate is non-null" );
-    prime_set_config(verbose=>1);
-    ok( verify_prime($cert), "   verification of certificate for $p done" );
-    prime_set_config(verbose=>0);
-    # Note, in some cases the certs could be non-equal (but both must be valid!)
-    my $cert2 = prime_certificate($p);
-    ok( defined($cert2) && $cert2 =~ /^Type/m,
-        "   prime_certificate is also non-null" );
-    if ($cert2 eq $cert) {
-      ok(1, "   certificate is identical to first");
-    } else {
-      ok( verify_prime($cert2), "   different cert, verified" );
-    }
+  ok( is_prime($p), "$p is prime" );
+  my($isp, $cert) = is_provable_prime_with_cert($p);
+  is( $isp, 2, "   is_provable_prime_with_cert returns 2" );
+  ok( defined($cert) && $cert =~ /^Type/m,
+      "   certificate is non-null" );
+  prime_set_config(verbose=>1);
+  ok( verify_prime($cert), "   verification of certificate for $p done" );
+  prime_set_config(verbose=>0);
+  # Note, in some cases the certs could be non-equal (but both must be valid!)
+  my $cert2 = prime_certificate($p);
+  ok( defined($cert2) && $cert2 =~ /^Type/m,
+      "   prime_certificate is also non-null" );
+  if ($cert2 eq $cert) {
+    ok(1, "   certificate is identical to first");
+  } else {
+    ok( verify_prime($cert2), "   different cert, verified" );
   }
 }
 
@@ -132,7 +128,7 @@ A[13]  3
 EOPROOF
   ok( verify_prime($proof), "2**521-1 primality proof verified" );
 }
-if ($extra) {
+if ($doextra_proof) {
   my $proof = <<EOPROOF;
 [MPU - Primality Certificate]
 Version 1.0
@@ -216,7 +212,7 @@ EOPROOF
 
 # First, let's get the borked up formats, which is should warn about.
 SKIP: {
-  skip "No Test::Warn", 28 unless $use_test_warn;
+  skip "No Test::Warn", 32 unless $use_test_warn;
   my $result;
   warning_like { $result = verify_prime([1490266103, 'INVALID', 1, 2, 3]) }
                { carped => qr/^verify_prime: / },
@@ -276,6 +272,33 @@ SKIP: {
   warning_like { $result = verify_prime([1490266103, 'ECPP', [1490266103, 1442956066, 1025050760, 1490277784, 2780369, [531078754, 0, 195830554]]]) }
                { carped => qr/^verify_prime: / },
                "warning for invalid ECPP (block point wrong format)";
+  is( $result, 0, "   ...and returns 0" );
+
+  my $unknown_type = <<'CERT';
+[MPU - Primality Certificate]
+Version 1.0
+
+Proof for:
+N 17
+
+Type UNKNOWN
+CERT
+  warning_like { $result = verify_prime($unknown_type) }
+               { carped => qr/^verify_prime: Unknown type: UNKNOWN/ },
+               "warning for unknown text certificate proof type";
+  is( $result, 0, "   ...and returns 0" );
+
+  my $missing_n = <<'CERT';
+[MPU - Primality Certificate]
+Version 1.0
+
+Proof for:
+Type Small
+N 17
+CERT
+  warning_like { $result = verify_prime($missing_n) }
+               { carped => qr/^verify_prime: Still missing values in type Proof for/ },
+               "warning for missing certificate N";
   is( $result, 0, "   ...and returns 0" );
 }
 

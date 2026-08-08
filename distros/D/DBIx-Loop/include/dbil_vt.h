@@ -1,6 +1,13 @@
 #ifndef DBIL_VT_H
 #define DBIL_VT_H
 
+/* An RV to the bind list, for a bind AV that may be absent. newRV_inc on a
+ * freshly made AV would leave it at two references and leak it, so the two
+ * cases need different constructors. */
+static SV *dbil_bind_rv(pTHX_ AV *bind) {
+    return bind ? newRV_inc((SV *)bind) : newRV_noinc((SV *)newAV());
+}
+
 /* The pure-C loop seam. A loop adapter that can dispatch entirely in C (the
  * Hyperman adapter, via Hyperman's hm_abi table) stores a dbil_vt pointer in
  * its "_vt" hash slot; backends check dbil_vt_of() and, when present, call

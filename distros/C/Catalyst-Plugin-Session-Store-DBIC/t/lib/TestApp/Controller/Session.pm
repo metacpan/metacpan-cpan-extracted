@@ -36,4 +36,20 @@ sub delete_expired : Local {
     $c->res->body('ok');
 }
 
+sub change : Local {
+    my ($self, $c) = @_;
+
+    my $oldsid = $c->sessionid;
+    $c->change_session_id;
+    my $newsid = $c->sessionid;
+
+    $c->res->body(($oldsid ne $newsid) ? 'ok' : 'not ok');
+}
+
+sub sessionid : Local {
+    my ($self, $c) = @_;
+
+    $c->res->body($c->sessionid);
+}
+
 1;

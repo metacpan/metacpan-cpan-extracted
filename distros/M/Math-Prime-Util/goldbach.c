@@ -80,27 +80,24 @@ static UV sieve_pairs(UV* L, UV n) {
     UV seg_base, seg_low, seg_high;
     void* ctx = start_segment_primes(n/2, n-11, &segment);
     while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
-      size_t qbeg  = n-seg_high,  qend  = n-seg_low;
-      UV     qdbeg = qbeg/30,     qdend = (qend+29)/30;
+      UV qbeg  = n-seg_high,  qend  = n-seg_low;
+      UV qdbeg = qbeg/30,     qdend = (qend+29)/30;
       unsigned char* lowsieve;
       New(0, lowsieve, qdend-qdbeg+1, unsigned char);
       sieve_segment(lowsieve, qdbeg, qdend);
       START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
         UV q = n-p;
-        if (L) {
-          if (is_prime_in_sieve(lowsieve, q-qdbeg*30))
-            L[s++] = q;
-        } else {
-          if (is_prime_in_sieve(lowsieve, q-qdbeg*30))
-            s++;
+        if (is_prime_in_sieve(lowsieve, q-qdbeg*30)) {
+          if (L) L[s] = q;
+          s++;
         }
       END_DO_FOR_EACH_SIEVE_PRIME
       Safefree(lowsieve);
     }
     end_segment_primes(ctx);
-    if (L && s > 1) { /* Reverse the list */
-      size_t i = 0, j = s-1;
-      while (i < j) { UV t=L[i]; L[i]=L[j]; L[j]=t; i++; j--; }
+    if (L && s > 1) {
+      UV *R = L+s;
+      while (--R > L) { UV t = *R; *R = *L; *L++ = t; }   /* Reverse list */
     }
   }
   return s;

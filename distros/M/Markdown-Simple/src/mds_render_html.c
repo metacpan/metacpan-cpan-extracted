@@ -13,6 +13,7 @@
 #include "mds_ir.h"
 #include "mds.h"
 #include "mds_entity.h"
+#include "mds_slug.h"
 #include "eshu_hl.h"
 
 #include "EXTERN.h"
@@ -107,6 +108,25 @@ typedef struct {
     size_t      hl_cap;
     char        hl_lang[64];
     int         in_fenced_hl;
+    /* Heading anchors (MDS_FLAG_HEADING_IDS). The renderer is a streaming
+     * emitter, so a heading's open tag is due before its inline content -
+     * and therefore before the text the id is slugged from - exists. We
+     * write no open tag at enter, note where it belongs, let the inlines
+     * render into the main buffer as usual, and splice the finished
+     * <hN id="..."> in at hd_mark on leave. That keeps every inline
+     * construct working against the real buffer, which diverting the
+     * heading into a side buffer would not.
+     *
+     * hd_text accumulates the *plain* text in parallel, because the slug
+     * for `## The **bold** bit` comes from "The bold bit" and not from the
+     * markup the buffer received. */
+    int         in_heading;       /* 1 between heading enter and leave */
+    size_t      hd_mark;          /* buffer offset the open tag belongs at */
+    char*       hd_text;          /* plain-text accumulator for the slug */
+    size_t      hd_len;
+    size_t      hd_cap;
+    mds_slug_table hd_slugs;      /* document-scope uniqueness table */
+    AV*         toc;              /* caller's heading list, or NULL */
 } render_state;
 
 /* Forward decls for helpers defined later but used by early callbacks. */
@@ -135,6 +155,24 @@ typedef struct {
 } img_info;
 static img_info g_img_stack[IMG_STACK_MAX];
 static int      g_img_stack_top = 0;
+
+/* Accumulate a heading's plain text for slugging. Mirrors alt_append: an
+ * OOM here costs the heading its id, which is a degraded anchor rather than
+ * a broken document, so it fails quietly. */
+static void hd_append(render_state* st, const char* s, size_t n) {
+    if (n == 0) return;
+    if (st->hd_len + n + 1 > st->hd_cap) {
+        size_t nc = st->hd_cap ? st->hd_cap * 2 : 128;
+        char* np;
+        while (nc < st->hd_len + n + 1) nc *= 2;
+        np = (char*)realloc(st->hd_text, nc);
+        if (!np) return;
+        st->hd_text = np;
+        st->hd_cap  = nc;
+    }
+    memcpy(st->hd_text + st->hd_len, s, n);
+    st->hd_len += n;
+}
 
 static void alt_append(render_state* st, const char* s, size_t n) {
     if (n == 0) return;
@@ -426,12 +464,20 @@ static void cb_enter_block(void* ud, mds_block_type t, const mds_block_detail* d
         char open[5];
         lvl = d->u.heading.level;
         if (lvl < 1) lvl = 1; else if (lvl > 6) lvl = 6;
-        open[0] = '<';
-        open[1] = 'h';
-        open[2] = (char)('0' + lvl);
-        open[3] = '>';
-        open[4] = 0;
-        mds_buf_write(aTHX_ b, open, 4);
+        if ((st->flags & MDS_FLAG_HEADING_IDS) || st->toc) {
+            /* Defer the open tag: cb_leave_block splices it in once the
+             * heading text exists to slug from. */
+            st->in_heading = 1;
+            st->hd_mark    = (size_t)(b->cur - b->base);
+            st->hd_len     = 0;
+        } else {
+            open[0] = '<';
+            open[1] = 'h';
+            open[2] = (char)('0' + lvl);
+            open[3] = '>';
+            open[4] = 0;
+            mds_buf_write(aTHX_ b, open, 4);
+        }
         push_close(st, (close_kind)(CLOSE_H1 + (lvl - 1)));
         break;
     }
@@ -581,6 +627,65 @@ static void cb_enter_block(void* ud, mds_block_type t, const mds_block_detail* d
     }
 }
 
+/* Close a heading, splicing in the deferred open tag when ids are on.
+ *
+ * The slug can only contain [a-z0-9_-] and bytes >= 0x80, so it needs no
+ * attribute escaping: mds_slugify drops every byte that would need it. */
+static void heading_close(pTHX_ render_state* st, int lvl) {
+    mds_buf* b = st->buf;
+    char close_tag[6];
+
+    if (st->in_heading) {
+        char slug[MDS_SLUG_MAX + 16];
+        char open[MDS_SLUG_MAX + 32];
+        size_t sl, ol = 0;
+        const char* txt = st->hd_text ? st->hd_text : "";
+
+        st->in_heading = 0;
+        sl = mds_slugify(txt, st->hd_len, slug);
+        if (sl == 0) {
+            /* A heading of pure punctuation or emoji has nothing to slug.
+             * Give it a positional stem so the anchor still exists and stays
+             * stable, and let the uniqueness pass number it. */
+            memcpy(slug, "section", 7);
+            sl = 7;
+            slug[sl] = '\0';
+        }
+        sl = mds_slug_uniq(&st->hd_slugs, slug, sl);
+
+        open[ol++] = '<';
+        open[ol++] = 'h';
+        open[ol++] = (char)('0' + lvl);
+        memcpy(open + ol, " id=\"", 5); ol += 5;
+        memcpy(open + ol, slug, sl);    ol += sl;
+        open[ol++] = '"';
+        open[ol++] = '>';
+        mds_buf_insert(aTHX_ b, st->hd_mark, open, ol);
+
+        if (st->toc) {
+            /* Trim the plain text: a heading's trailing newline and any
+             * padding around setext underlines are not part of its title. */
+            size_t s0 = 0, s1 = st->hd_len;
+            HV* h;
+            while (s0 < s1 && (txt[s0] == ' ' || txt[s0] == '\t' ||
+                               txt[s0] == '\n' || txt[s0] == '\r')) s0++;
+            while (s1 > s0 && (txt[s1 - 1] == ' ' || txt[s1 - 1] == '\t' ||
+                               txt[s1 - 1] == '\n' || txt[s1 - 1] == '\r')) s1--;
+            h = newHV();
+            (void)hv_stores(h, "level", newSViv(lvl));
+            (void)hv_stores(h, "text",  newSVpvn(txt + s0, s1 - s0));
+            (void)hv_stores(h, "id",    newSVpvn(slug, sl));
+            av_push(st->toc, newRV_noinc((SV*)h));
+        }
+        st->hd_len = 0;
+    }
+
+    close_tag[0] = '<'; close_tag[1] = '/'; close_tag[2] = 'h';
+    close_tag[3] = (char)('0' + lvl);
+    close_tag[4] = '>'; close_tag[5] = '\n';
+    mds_buf_write(aTHX_ b, close_tag, 6);
+}
+
 static void cb_leave_block(void* ud, mds_block_type t) {
     render_state* st = (render_state*)ud;
     dTHXa(st->my_perl);
@@ -607,12 +712,10 @@ static void cb_leave_block(void* ud, mds_block_type t) {
     case CLOSE_NOOP:
         break;
     case CLOSE_P:           MDS_BUF_LIT(b, "</p>\n"); break;
-    case CLOSE_H1:          MDS_BUF_LIT(b, "</h1>\n"); break;
-    case CLOSE_H2:          MDS_BUF_LIT(b, "</h2>\n"); break;
-    case CLOSE_H3:          MDS_BUF_LIT(b, "</h3>\n"); break;
-    case CLOSE_H4:          MDS_BUF_LIT(b, "</h4>\n"); break;
-    case CLOSE_H5:          MDS_BUF_LIT(b, "</h5>\n"); break;
-    case CLOSE_H6:          MDS_BUF_LIT(b, "</h6>\n"); break;
+    case CLOSE_H1: case CLOSE_H2: case CLOSE_H3:
+    case CLOSE_H4: case CLOSE_H5: case CLOSE_H6:
+        heading_close(aTHX_ st, (int)(k - CLOSE_H1) + 1);
+        break;
     case CLOSE_CODE_FENCED: MDS_BUF_LIT(b, "</code></pre>\n"); break;
     case CLOSE_CODE_INDENTED: MDS_BUF_LIT(b, "</code></pre>\n"); break;
     case CLOSE_CODE_FENCED_HL: {
@@ -1140,6 +1243,12 @@ static void cb_text(void* ud, const char* s, size_t n) {
             }
         }
     }
+    /* Capture the heading's plain text before any of the branches below can
+     * divert or return. Placed after the task-list check so a `[ ] ` marker
+     * never reaches the slug, and before the image branch so alt text does,
+     * which is what GitHub slugs for a heading that is just an image. */
+    if (st->in_heading) hd_append(st, s, n);
+
     if (st->image_depth > 0) {
         /* For alt: append raw bytes (no HTML escape — done later when
          * emitting alt="..." attribute via html_escape on accumulated). */
@@ -1479,7 +1588,7 @@ static void cb_leave_inline(void* ud, mds_inline_type t) {
  * ud_storage. We initialise its `buf` field, capture the current aTHX,
  * and wire up the callbacks. ud_out is set to point at the state. */
 void mds_render_html_install(mds_callbacks* cb, void** ud_out, mds_buf* buf,
-                             unsigned flags) {
+                             unsigned flags, AV* toc) {
     dTHX;
     render_state* st = (render_state*)*ud_out;
 #ifdef MULTIPLICITY
@@ -1513,6 +1622,15 @@ void mds_render_html_install(mds_callbacks* cb, void** ud_out, mds_buf* buf,
     st->hl_cap = 0;
     st->hl_lang[0] = '\0';
     st->in_fenced_hl = 0;
+    st->in_heading = 0;
+    st->hd_mark = 0;
+    st->hd_text = NULL;
+    st->hd_len = 0;
+    st->hd_cap = 0;
+    st->hd_slugs.slugs = NULL;
+    st->hd_slugs.len = 0;
+    st->hd_slugs.cap = 0;
+    st->toc = toc;
     g_img_stack_top = 0;
 
     cb->enter_block  = cb_enter_block;
@@ -1536,6 +1654,9 @@ void mds_render_html_cleanup(void* ud) {
     free(st->fn_label_lens); st->fn_label_lens = NULL;
     free(st->fn_uses);       st->fn_uses = NULL;
     st->fn_count = st->fn_cap = 0;
+    free(st->hd_text);       st->hd_text = NULL;
+    st->hd_len = st->hd_cap = 0;
+    mds_slug_table_free(&st->hd_slugs);
 }
 
 int mds_render_html_used_footnote(void* ud, size_t i,

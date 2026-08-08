@@ -6,14 +6,29 @@ DESCRIPTION
     This extension lets any user flag themselves as "away" (on holiday, out
     of office, ...) on their own Preferences page, optionally scoped to a
     start and/or end date. While a user's away flag is active, any new reply
-    (Correspond transaction) on a ticket they own causes the ticket to be
-    reassigned to Nobody, with an internal comment explaining why. Because
-    unowned tickets are visible to the whole queue/team, this ensures
-    tickets aren't silently stuck waiting on someone who is on holiday.
+    ("Correspond" transaction) or comment ("Comment" transaction) from
+    someone else on a ticket they own causes the ticket to be reassigned to
+    Nobody, with an internal comment explaining why. Because unowned tickets
+    are visible to the whole queue/team, this ensures tickets aren't
+    silently stuck waiting on someone who is on holiday.
+
+    Comments count because rt-mailgate can be run with "--action comment",
+    in which case incoming mail is recorded as a comment rather than as
+    correspondence. Which transaction types trigger a handoff, and whether
+    comments written by privileged users are exempt, is configurable; see
+    "CONFIGURATION".
+
+    Replies written by the away owner themselves don't trigger the handoff:
+    if they are answering the ticket, they are clearly still working on it,
+    so it stays assigned to them.
 
     While their away flag is active, the user also sees a prominent warning
     banner on every page of RT, reminding them (and anyone looking over
     their shoulder) that Away Mode is on.
+
+    Users who left on holiday without setting the flag themselves aren't
+    stuck: an administrator can set (or clear) away mode on anyone's behalf
+    from that user's admin page.
 
 RT VERSION
     Works with RT 6.0.3.
@@ -39,12 +54,72 @@ INSTALLATION
 
     Restart your webserver
 
+UPGRADING
+    Upgrading from a version before 0.03 needs one manual database change:
+    the scrip condition installed by "make initdb" was registered for
+    "Correspond" transactions only, and RT filters on that column before the
+    condition code ever runs, so a code-only upgrade would never see
+    comments. Re-running "make initdb" is not the way to fix this: it would
+    install a second copy of the scrip. Instead, widen the existing
+    condition once:
+
+        perl -I /opt/rt6/local/lib -I /opt/rt6/lib -e '
+            use RT; RT::LoadConfig(); RT::Init();
+            my $cond = RT::ScripCondition->new( RT->SystemUser );
+            $cond->Load("Owner Away");
+            die "no such scrip condition\n" unless $cond->Id;
+            my ($ok, $msg) = $cond->SetApplicableTransTypes("Correspond,Comment");
+            die "$msg\n" unless $ok;
+        '
+
+    Fresh installs need nothing extra; "make initdb" already registers both
+    transaction types.
+
 CONFIGURATION
     Users manage their own away status from Settings -> Away Mode
     (/Prefs/AwayMode.html): a checkbox to enable away mode, and optional
     start/end dates. With no dates set, away mode applies for as long as the
     checkbox stays on. With dates set, away mode is only active while today
     falls within the (inclusive) start/end range.
+
+    Administrators can do the same for any other user from Admin -> Users ->
+    (select a user) -> Settings -> Away Mode (/Admin/Users/AwayMode.html),
+    which is useful when somebody leaves without setting the flag
+    themselves. That page requires the "AdminUsers" right (on top of the
+    "ShowConfigTab" right RT already requires for the whole /Admin/ area)
+    and writes exactly the same preference the self-service page does, so
+    the two stay interchangeable.
+
+    Two site options control which transactions hand a ticket off. Their
+    defaults live in etc/AwayMode_Config.pm; to change one, copy it into
+    your RT_SiteConfig.pm and edit it there.
+
+    $AwayModeTransactionTypes
+            Set( $AwayModeTransactionTypes, ['Correspond'] );
+
+        Arrayref of transaction types that trigger the handoff. Defaults to
+        "['Correspond', 'Comment']". Set it to "['Correspond']" to get the
+        pre-0.03 behaviour of ignoring comments entirely.
+
+        This can only narrow the "Correspond,Comment" set the scrip
+        condition is registered for in etc/initialdata; naming any other
+        transaction type here has no effect, because RT filters on the
+        registered types before the condition runs.
+
+    $AwayModeIgnorePrivilegedComments
+            Set( $AwayModeIgnorePrivilegedComments, 1 );
+
+        Off by default. When on, "Comment" transactions created by a
+        privileged user (i.e. a colleague leaving an internal note, rather
+        than a requestor whose mail arrived through an rt-mailgate running
+        "--action comment") never hand the ticket off. "Correspond"
+        transactions are unaffected.
+
+        Turn this on if your rt-mailgate records incoming mail as
+        correspondence and you only want comment handling for the rare
+        unprivileged commenter. Leave it off if rt-mailgate runs with
+        "--action comment" and your requestors may themselves be privileged
+        users, since then their incoming mail would be exempted too.
 
 METHODS
   IsAwayForPrefs
@@ -62,6 +137,20 @@ METHODS
     Takes an "RT::User" object, loads its "AwayMode" preference, and returns
     whether away mode is currently active for that user. Thin wrapper around
     "IsAwayForPrefs".
+
+  IsHandledTransactionType
+    Pure logic, independent of RT, so it can be unit tested without an RT
+    installation. Takes a transaction type ("Correspond", "Comment", ...)
+    and optionally the configured list of handled types, either as an
+    arrayref or as a single string; when omitted, @DEFAULT_TRANSACTION_TYPES
+    is used. Returns true if that type should hand an away owner's ticket
+    off. Type comparison is case insensitive.
+
+  IsHandledTransaction
+    Takes an "RT::Transaction" object and returns whether it should hand an
+    away owner's ticket off, honouring the $AwayModeTransactionTypes and
+    $AwayModeIgnorePrivilegedComments config options (see "CONFIGURATION").
+    Thin wrapper around "IsHandledTransactionType".
 
 AUTHOR
     Christian Mehlmauer

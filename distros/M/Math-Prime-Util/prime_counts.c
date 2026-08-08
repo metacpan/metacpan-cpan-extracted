@@ -47,15 +47,6 @@ static const unsigned char prime_sieve30[] =
    0x3c,0xda,0xf5,0xcf};
 #define NPRIME_SIEVE30 (sizeof(prime_sieve30)/sizeof(prime_sieve30[0]))
 
-static const unsigned short primes_small[] =
-  {0,2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,
-   101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,
-   193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,
-   293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,
-   409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499};
-#define NPRIMES_SMALL (sizeof(primes_small)/sizeof(primes_small[0]))
-
-
 static const unsigned char byte_zeros[256] =
   {8,7,7,6,7,6,6,5,7,6,6,5,6,5,5,4,7,6,6,5,6,5,5,4,6,5,5,4,5,4,4,3,
    7,6,6,5,6,5,5,4,6,5,5,4,5,4,4,3,6,5,5,4,5,4,4,3,5,4,4,3,4,3,3,2,
@@ -143,6 +134,26 @@ static UV count_segment_maxcount(const unsigned char* sieve, UV base, UV nbytes,
   return 0;
 }
 
+static UV count_in_one_sieve_byte(const unsigned char* sieve, UV lowp, UV highp)
+{
+  UV count = 0, d = lowp/30;
+  unsigned char bit, s;
+
+  /* Count unmarked candidates in [lowp,highp].
+   * Both bounds must lie in the same wheel-30 sieve byte. */
+  MPUassert(d == highp/30, "count_in_one_sieve_byte must not span bytes");
+  s = sieve[d] | clearprev30[lowp-d*30];
+  while (s != 0xFF) {
+    UV p;
+    bit = nextzero30[s];
+    s |= 1 << bit;
+    p = d*30 + wheel30[bit];
+    if (p > highp) break;
+    count++;
+  }
+  return count;
+}
+
 /* Given a sieve of size nbytes, counting zeros (primes) but excluding the
  * areas outside lowp and highp.
  */
@@ -177,9 +188,7 @@ static UV count_segment_ranged(const unsigned char* sieve, UV nbytes, UV lowp, U
   /* Count first fragment */
   if (lo_m > 1) {
     UV upper = (highp <= (lo_d*30+29)) ? highp : (lo_d*30+29);
-    START_DO_FOR_EACH_SIEVE_PRIME(sieve, 0, lowp, upper)
-      count++;
-    END_DO_FOR_EACH_SIEVE_PRIME;
+    count += count_in_one_sieve_byte(sieve, lowp, upper);
     lowp = upper+2;
     lo_d = lowp/30;
   }
@@ -198,10 +207,8 @@ static UV count_segment_ranged(const unsigned char* sieve, UV nbytes, UV lowp, U
   if (highp < lowp)
     return count;
 
-  /* Count last fragment */
-  START_DO_FOR_EACH_SIEVE_PRIME(sieve, 0, lowp, highp)
-    count++;
-  END_DO_FOR_EACH_SIEVE_PRIME;
+  /* Count the final partial byte without reading a complete UV past it. */
+  count += count_in_one_sieve_byte(sieve, lowp, highp);
 
   return count;
 }
@@ -331,7 +338,7 @@ UV prime_count_range(UV lo, UV hi)
 
   { /* Rough empirical threshold for when segment faster than LMO */
     UV range_threshold = hi / (isqrt(hi)/200);
-    if ( (hi-lo+1) < range_threshold )
+    if ((hi-lo) < range_threshold)  /* avoid the +1 so we don't overflow */
       return segment_prime_count(lo, hi);
   }
   return LMO_prime_count(hi) - ((lo < 2) ? 0 : LMO_prime_count(lo-1));
@@ -388,10 +395,8 @@ UV prime_count_lower(UV n)
       : (n <  38100000) ? -29.0L
       :                   -84.0L;
     lower = Li(fn) - (sqrtl(fn)/fl1) * (1.94L + 2.50L/fl1 + a/fl2);
-  } else if (fn < 1e19) {          /* Büthe 2015 1.9      1511.02032v1.pdf */
-    lower = Li(fn) - (sqrtl(fn)/fl1) * (1.94L + 3.88L/fl1 + 27.57L/fl2);
-  } else {                         /* Büthe 2014 v3 7.2   1410.7015v3.pdf */
-    lower = Li(fn) - fl1*sqrtl(fn)/25.132741228718345907701147L;
+  } else {                         /* Dusart 2018 Lemma 2.2 */
+    lower = Li(fn) - 2*sqrtl(fn)/fl1;
   }
   return (UV) ceill(lower);
 }
@@ -439,10 +444,14 @@ UV prime_count_upper(UV n)
 
   /* Axler 2014: https://arxiv.org/abs/1409.1780  (v7 2016), Cor 3.5
    *
-   * upper = fn/(fl1-1.0L-1.0L/fl1-3.35L/fl2-12.65L/(fl2*fl1)-89.6L/(fl2*fl2));
+   * upper = fn/(fl1-1.0L-1.0L/fl1-3.35L/fl2-12.65L/fl3-89.6L/fl4);
    * return (UV) floorl(upper);
    *
-   * Axler 2022: https://arxiv.org/pdf/2203.05917.pdf (v4 2022) improves this.
+   * Axler 2022: https://arxiv.org/pdf/2203.05917.pdf (v4 2022): Cor 4.4
+   *  Cor 4.4: fl2 3.024334L fl3 12.975666 fl4 71.048668 fl5 533.594
+   *  Thm 1.3: fl2,fl3,fl4 as above   fl5 461.364417856444 fl6 4331.1
+   *
+   * These do not improve on the bound of Li(x) which covers all 64-bit n.
    */
 
   if (BITS_PER_WORD == 32 || fn <= 821800000.0) {  /* Dusart 2010, page 2 */
@@ -451,14 +460,17 @@ UV prime_count_upper(UV n)
         break;
     a = (i < (int)NUPPER_THRESH)  ?  _upper_thresh[i].aval  :  2.334L;
     upper = fn/fl1 * (1.0L + 1.0L/fl1 + a/fl2);
-  } else if (fn < 1e19) {        /* Büthe 2015 1.10 Skewes number lower limit */
+  } else if (fn < 101260000000.0) {
+    /* For some smaller inputs we further tighten */
     a = (fn <   1100000000.0) ? 0.032    /* Empirical */
       : (fn <  10010000000.0) ? 0.027    /* Empirical */
       : (fn < 101260000000.0) ? 0.021    /* Empirical */
                               : 0.0;
     upper = Li(fn) - a * fl1*sqrtl(fn)/25.132741228718345907701147L;
-  } else {                       /* Büthe 2014 7.4 */
-    upper = Li(fn) + fl1*sqrtl(fn)/25.132741228718345907701147L;
+  } else {
+    /* Büthe  2015 1.10      : Pi(x) <= Li(x) for x <= 10^19 */
+    /* Dusart 2018 Lemma 2.2 : Pi(x) <= Li(x) for x <= 10^20 */
+    upper = Li(fn);
   }
   return (UV) floorl(upper);
 }
@@ -495,6 +507,26 @@ UV nth_prime_upper(UV n)
     }
     return lo;
   }
+
+  /* Under RH, we could use Dusart 2018, Theorem 3.1.
+   * It is better than the below starting at 230779190522.
+   *
+   * long double klogk = fn*flogn, logklogk = logl(klogk);
+   * long double E = sqrt(klogk)*logklogk*logklogk/25.132741228718345907701147L;
+   * return inverse_li(n) + floorl(E);
+   *
+   * Empirically, x > 46254833, return inverse_li(n) + floorl(E * 2.0/flogn);
+   * e.g. 1e16 we get 1375558510 vs 1507803850527  3 orders better
+   * about 10x slower though.
+   * verified for x <= 1000000000 (1e9)
+   */
+#if 0
+  if (n > 46254833) {
+    long double klogk = fn*flogn, logklogk = logl(klogk);
+    long double E = sqrt(klogk)*logklogk*logklogk/25.132741228718345907701147L;
+    return inverse_li(n) + floorl( E * 2.0/flogn );
+  }
+#endif
 
   /* See: Axler 2013, Dusart 2010 */
   /*      Axler 2017: http://arxiv.org/pdf/1706.03651.pdf */
@@ -612,12 +644,16 @@ UV nth_prime(UV n)
      * being higher (requiring going backwards) or biased and then far too
      * low.  Using the inverse Li is easier and more consistent. */
     UV lower_limit = inverse_li(n);
+    UV correction = inverse_li(isqrt(n))/4;
     /* For even better performance, add in half the usual correction, which
      * will get us even closer, so even less sieving required.  However, it
      * is now possible to get a result higher than the value, so we'll need
      * to handle that case.  It still ends up being a better deal than R,
      * given that we don't have a fast backward sieve. */
-    lower_limit += inverse_li(isqrt(n))/4;
+    if (lower_limit >= upper_limit || correction > upper_limit-lower_limit)
+      lower_limit = upper_limit;
+    else
+      lower_limit += correction;
     segment_size = lower_limit / 30;
     lower_limit = 30 * segment_size - 1;
     count = prime_count(lower_limit);
@@ -626,7 +662,10 @@ UV nth_prime(UV n)
     /* printf("Our limit %lu %s a prime\n", lower_limit, is_prime(lower_limit) ? "is" : "is not"); */
 
     if (count >= n) { /* Too far.  Walk backwards */
-      if (is_prime(lower_limit)) count--;
+      if (is_prime(lower_limit)) {
+        if (count == n) return lower_limit;
+        count--;
+      }
       for (p = 0; p <= (count-n); p++)
         lower_limit = prev_prime(lower_limit);
       return lower_limit;
@@ -646,8 +685,10 @@ UV nth_prime(UV n)
 
   while (count < target) {
     /* Limit the segment size if we know the answer comes earlier */
-    if ( (30*(segbase+segment_size)+29) > upper_limit )
-      segment_size = (upper_limit - segbase*30 + 30) / 30;
+    UV upperd = upper_limit / 30;
+    if (segbase > upperd) break;  /* Something is very wrong.  Assert later. */
+    if (segment_size > (upperd - segbase + 1))
+      segment_size = upperd - segbase + 1;
 
     /* Do the actual sieving in the range */
     sieve_segment(segment, segbase, segbase + segment_size-1);

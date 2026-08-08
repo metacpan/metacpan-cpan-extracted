@@ -1,30 +1,28 @@
+use 5.008001;
 use ExtUtils::MakeMaker;
 use lib 'inc'; # load our bundled version of Devel::CheckLib
 use Devel::CheckLib;
+
+my $broken64 = (18446744073709550592 == ~0);
+if ($broken64) {
+  die <<EOW;
+
+Your Perl, version $], has a broken 64-bit implementation.
+Perl's arithmetic operations on numbers larger than 2^53 are wrong.
+
+This should not happen with Perl 5.8 or later.
+
+EOW
+}
 
 my %require_mpugmp;
 my $have_gmp = check_lib(lib => 'gmp', header => 'gmp.h');
 if ($have_gmp) {
   warn "\n   It looks like you have the GMP C library.\n";
   warn "   Adding Math::Prime::Util::GMP to dep list.\n\n";
-  $require_mpugmp{'Math::Prime::Util::GMP'} = '0.50';
+  $require_mpugmp{'Math::Prime::Util::GMP'} = '0.53';
 } else {
   warn "\n  It looks like you don't have the GMP library.  Sad face.\n";
-}
-
-my $broken64 = (18446744073709550592 == ~0);
-if ($broken64) {
-  warn <<EOW;
-
-Your Perl, version $], has a broken 64-bit implementation.
-Perl's arithmetic operations on numbers larger than 2^53 are wrong.
-
-Much core functionality will work, and we try to work around this in
-our functions, but there are still exceptions.
-
-I highly recommend upgrading to a newer version of Perl.
-
-EOW
 }
 
 WriteMakefile1(
@@ -34,45 +32,55 @@ WriteMakefile1(
     LICENSE      => 'perl',
     AUTHOR       => 'Dana A Jacobsen <dana@acm.org>',
 
-    OBJECT       => 'cache.o '        .
+    OBJECT       => 'XS.o '           .
+                    'util.o '         .
+                    'factor128.o '    .
                     'factor.o '       .
+                    'rootmod.o '      .
+                    'strops.o '       .
                     'primality.o '    .
+                    'congruent_numbers.o ' .
+                    'totients.o '     .
+                    'sieve_cluster.o '.
+                    'sieve.o '        .
+                    'znlog.o '        .
+                    'inverse_sigma0.o ' .
+                    'lucky_numbers.o '.
+                    'factmod.o '      .
+                    'lmo.o '          .
+                    'almost_primes.o '.
+                    'prime_counts.o ' .
+                    'legendre_phi.o ' .
                     'lucas_seq.o '    .
                     'aks.o '          .
-                    'legendre_phi.o ' .
-                    'lehmer.o '       .
-                    'lmo.o '          .
-                    'random_prime.o ' .
-                    'sieve.o '        .
-                    'sieve_cluster.o '.
-                    'ramanujan_primes.o ' .
+                    'ds_iset.o '      .
+                    'moebius.o '      .
                     'semi_primes.o '  .
-                    'almost_primes.o '.
                     'twin_primes.o '  .
-                    'omega_primes.o ' .
-                    'prime_count_cache.o ' .
-                    'prime_counts.o ' .
+                    'ramanujan_primes.o ' .
+                    'powerful.o '     .
+                    'powerfree.o '    .
+                    'real.o '         .
+                    'sort.o '         .
+                    'chacha.o '       .
+                    'xs_internal.o '  .
+                    'xs_set.o '       .
+                    'rational.o '     .
                     'prime_sums.o '   .
                     'prime_powers.o ' .
-                    'lucky_numbers.o '.
-                    'goldbach.o '     .
                     'perfect_powers.o ' .
-                    'congruent_numbers.o ' .
-                    'powerfree.o '    .
-                    'powerful.o '    .
-                    'rational.o '      .
-                    'real.o '         .
-                    'rootmod.o '      .
-                    'sort.o '         .
-                    'totients.o '     .
-                    'util.o '         .
+                    'prime_count_cache.o ' .
+                    'lehmer.o '       .
+                    'omega_primes.o ' .
                     'inverse_interpolate.o ' .
-                    'entropy.o '      .
+                    'intcomplexity.o '.
+                    'goldbach.o '     .
+                    'cache.o '        .
                     'csprng.o '       .
-                    'chacha.o '       .
-                    'ds_iset.o '      .
-                    'XS.o',
+                    'random_prime.o ' .
+                    'entropy.o',
     LIBS         => ['-lm'],
+    depend       => { 'XS.o' => 'xs_xop.inc' },
 
     EXE_FILES    => ['bin/primes.pl', 'bin/factor.pl'],
 
@@ -84,7 +92,8 @@ WriteMakefile1(
     PREREQ_PM    => {
                       'Exporter'         => '5.57',
                       'XSLoader'         => '0.01',
-                      'Carp'             => ($] < 5.008) ? '1.17' : 0,
+                      'Carp'             => 0,
+                      'Scalar::Util'     => '1.09',
                       'Tie::Array'       => 0,
                       'base'             => 0,
                       'constant'         => 0,
@@ -110,36 +119,36 @@ WriteMakefile1(
                },
                provides => {
                  'ntheory' => {
-                    version => '0.74', file => 'lib/ntheory.pm',
+                    version => '0.75', file => 'lib/ntheory.pm',
                  },
                  'Math::Prime::Util' => {
-                    version => '0.74', file => 'lib/Math/Prime/Util.pm',
+                    version => '0.75', file => 'lib/Math/Prime/Util.pm',
                  },
                  'Math::Prime::Util::MemFree' => {
-                    version => '0.74', file => 'lib/Math/Prime/Util/MemFree.pm',
+                    version => '0.75', file => 'lib/Math/Prime/Util/MemFree.pm',
                  },
                  'Math::Prime::Util::PP' => {
-                    version => '0.74', file => 'lib/Math/Prime/Util/PP.pm',
+                    version => '0.75', file => 'lib/Math/Prime/Util/PP.pm',
                  },
                  'Math::Prime::Util::PrimeArray' => {
-                    version => '0.74', file => 'lib/Math/Prime/Util/PrimeArray.pm',
+                    version => '0.75', file => 'lib/Math/Prime/Util/PrimeArray.pm',
                  },
                  'Math::Prime::Util::PrimeIterator' => {
-                    version => '0.74', file => 'lib/Math/Prime/Util/PrimeIterator.pm',
+                    version => '0.75', file => 'lib/Math/Prime/Util/PrimeIterator.pm',
                  },
                  'Math::Prime::Util::Entropy' => {
-                    version => '0.74', file => 'lib/Math/Prime/Util/Entropy.pm',
+                    version => '0.75', file => 'lib/Math/Prime/Util/Entropy.pm',
                  },
                  'Math::Prime::Util::ChaCha' => {
-                    version => '0.74', file => 'lib/Math/Prime/Util/ChaCha.pm',
+                    version => '0.75', file => 'lib/Math/Prime/Util/ChaCha.pm',
                  },
                  # Skip: PPFE, PrimalityProving, RandomPrimes, ZetaBigFloat,
-                 #       ECAffinePoint, ECProjectivePoint
+                 #       ECAffinePoint, ECProjectivePoint, ECM
                },
                prereqs => {
                  runtime => {
                    recommends => {
-                     'Math::Prime::Util::GMP' => 0.53,
+                     'Math::Prime::Util::GMP' => 0.54,
                      'Math::BigInt::GMP'      => 0,
                      'Math::GMPz'             => 0.68,
                      'Digest::SHA'            => 5.87,
@@ -153,7 +162,7 @@ WriteMakefile1(
                },
              },
 
-    MIN_PERL_VERSION => 5.006002,
+    MIN_PERL_VERSION => 5.008001,
 );
 
 sub WriteMakefile1 {   # Cribbed from eumm-upgrade by Alexandr Ciornii

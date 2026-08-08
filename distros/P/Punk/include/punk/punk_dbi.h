@@ -102,9 +102,9 @@ static int pdbi_detect_returning(pTHX_ SV *dbh) {
     return 0;
 }
 
-/* The live handle for this backend's dsn, connected on first use in this
+/* The pool slot for this backend's dsn, connected on first use in this
  * process and shared with every other backend on the same one. Borrowed. */
-static SV *pdbi_dbh(pTHX_ SV *self) {
+static HV *pdbi_slot_for(pTHX_ SV *self) {
     HV *h    = pdbi_hv(aTHX_ self);
     SV *opts = pdbi_get(aTHX_ h, "opts");
     HV *o    = (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
@@ -162,6 +162,12 @@ static SV *pdbi_dbh(pTHX_ SV *self) {
         (void)hv_stores(slot, "pid", newSViv((IV)PerlProc_getpid()));
         (void)hv_stores(slot, "returning",
                         newSViv(pdbi_detect_returning(aTHX_ conn)));
+        /* Both caches belong to the connection: the quoted identifiers
+         * because quoting is the driver's, and the assembled statements
+         * because they have those identifiers baked into them. A reconnect
+         * (or a fork) starts fresh ones. */
+        (void)hv_delete(slot, "qi",   2, G_DISCARD);
+        (void)hv_delete(slot, "sqlc", 4, G_DISCARD);
         dbh = conn;
     }
 
@@ -171,16 +177,60 @@ static SV *pdbi_dbh(pTHX_ SV *self) {
         SV *r = pdbi_get(aTHX_ slot, "returning");
         (void)hv_stores(h, "returning", newSViv(r ? SvIV(r) : 0));
     }
-    return dbh;
+    PERL_UNUSED_VAR(dbh);
+    return slot;
 }
 
-/* $self->dbh->quote_identifier($name). Mortal. */
-static SV *pdbi_qi(pTHX_ SV *self, SV *name) {
-    SV *dbh = pdbi_dbh(aTHX_ self);
+/* The live handle for this backend's dsn. Borrowed. */
+static SV *pdbi_dbh(pTHX_ SV *self) {
+    SV *dbh = pdbi_get(aTHX_ pdbi_slot_for(aTHX_ self), "dbh");
+    return dbh ? dbh : &PL_sv_undef;
+}
+
+/* $dbh->quote_identifier($name), on a handle the caller already holds - the
+ * DBIx::Loop backend quotes against its parent handle, which is not in this
+ * pool. Mortal. */
+static SV *pdbi_qi_dbh(pTHX_ SV *dbh, SV *name) {
     SV *argv[1], *q;
     argv[0] = name;
     q = pcx_call_meth(aTHX_ dbh, "quote_identifier", argv, 1, 1);
     return q ? sv_2mortal(q) : sv_2mortal(newSVsv(name));
+}
+
+/* quote_identifier, memoised on the pool slot.
+ *
+ * It is a Perl method call into DBI, and on a small statement it dominates:
+ * a get quotes the table and one key column, and those two calls were 1.5us
+ * of a 3.6us round trip - more than the query itself. The answer depends only
+ * on the driver and the name, and a model's identifiers are a fixed, tiny set
+ * (its table and its columns), so the first call per name pays for the rest.
+ *
+ * The cache lives on the SLOT rather than the instance because quoting is a
+ * property of the connection: every model on one dsn shares it, and a
+ * reconnect drops it (see pdbi_slot_for). The returned SV is borrowed from
+ * the cache - callers concatenate it into the SQL immediately. */
+static SV *pdbi_qi_slot(pTHX_ HV *slot, SV *dbh, SV *name) {
+    SV **e = hv_fetchs(slot, "qi", 0);
+    HV *cache;
+    HE *he;
+    if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)
+        cache = (HV *)SvRV(*e);
+    else {
+        cache = newHV();
+        (void)hv_stores(slot, "qi", newRV_noinc((SV *)cache));
+    }
+    he = hv_fetch_ent(cache, name, 0, 0);
+    if (he && HeVAL(he) && SvOK(HeVAL(he))) return HeVAL(he);
+    he = hv_store_ent(cache, name,
+                      newSVsv(pdbi_qi_dbh(aTHX_ dbh, name)), 0);
+    return (he && HeVAL(he)) ? HeVAL(he) : name;
+}
+
+/* $self->dbh->quote_identifier($name), memoised. Borrowed. */
+static SV *pdbi_qi(pTHX_ SV *self, SV *name) {
+    HV *slot = pdbi_slot_for(aTHX_ self);
+    SV *dbh  = pdbi_get(aTHX_ slot, "dbh");
+    return pdbi_qi_slot(aTHX_ slot, dbh ? dbh : &PL_sv_undef, name);
 }
 
 static SV *pdbi_qi_pv(pTHX_ SV *self, const char *name) {
@@ -190,8 +240,7 @@ static SV *pdbi_qi_pv(pTHX_ SV *self, const char *name) {
 /* prepare_cached: one statement handle per distinct SQL string on the
  * connection, which is what keeps repeated queries off the parser (and what
  * t/12 checks through $dbh->{CachedKids}). Mortal. */
-static SV *pdbi_sth(pTHX_ SV *self, SV *sql) {
-    SV *dbh = pdbi_dbh(aTHX_ self);
+static SV *pdbi_sth_dbh(pTHX_ SV *dbh, SV *sql) {
     SV *argv[3], *sth;
     argv[0] = sql;
     argv[1] = &PL_sv_undef;
@@ -199,6 +248,10 @@ static SV *pdbi_sth(pTHX_ SV *self, SV *sql) {
     sth = pcx_call_meth(aTHX_ dbh, "prepare_cached", argv, 3, 1);
     if (!sth) croak("Punk::Model::DBI: prepare_cached returned nothing");
     return sv_2mortal(sth);
+}
+
+static SV *pdbi_sth(pTHX_ SV *self, SV *sql) {
+    return pdbi_sth_dbh(aTHX_ pdbi_dbh(aTHX_ self), sql);
 }
 
 /* $sth->execute(@bind) */
@@ -315,13 +368,17 @@ static SV *pdbi_encode_token(pTHX_ SV *val) {
     return tok;
 }
 
-static SV *pdbi_decode_token(pTHX_ SV *tok) {
+/* `cls` names the backend in the croak, so a bad token on the async backend
+ * does not blame the DBI one. A shared codec is a correctness requirement,
+ * not DRY: a `next` token minted by one backend must decode in the other, or
+ * switching backends breaks every paginated URL in flight. */
+static SV *pdbi_decode_token(pTHX_ SV *tok, const char *cls) {
     STRLEN tl;
     const char *tp = SvOK(tok) ? SvPV_const(tok, tl) : "";
     SV *json, *doc, *out = NULL;
     if (!SvOK(tok)) tl = 0;
     json = pdbi_b64u_decode(aTHX_ tp, tl);
-    if (!json) croak("Punk::Model::DBI: invalid pagination token");
+    if (!json) croak("%s: invalid pagination token", cls);
     sv_2mortal(json);
 
     /* The decode dies on malformed JSON, and a bad token is a client error
@@ -345,29 +402,30 @@ static SV *pdbi_decode_token(pTHX_ SV *tok) {
         if (SvTRUE(ERRSV)) { SvREFCNT_dec(doc); doc = NULL; }
         PERL_UNUSED_VAR(argv);
     }
-    if (!doc) croak("Punk::Model::DBI: invalid pagination token");
+    if (!doc) croak("%s: invalid pagination token", cls);
 
     if (SvROK(doc) && SvTYPE(SvRV(doc)) == SVt_PVHV) {
         SV *k = pdbi_get(aTHX_ (HV *)SvRV(doc), "k");
         if (k) out = newSVsv(k);
     }
     SvREFCNT_dec(doc);
-    if (!out) croak("Punk::Model::DBI: invalid pagination token");
+    if (!out) croak("%s: invalid pagination token", cls);
     return out;
 }
 
 /* ---- shared SQL shapes ----------------------------------------------------- */
 
 /* '<qi(a)> = ? AND <qi(b)> = ?' for the sorted keys, pushing each key's value
- * onto @bind in the same order. Mortal. */
-static SV *pdbi_where_eq(pTHX_ SV *self, HV *src, AV *keys, AV *bind) {
+ * onto @bind in the same order, quoting through the slot's cache. Mortal. */
+static SV *pdbi_where_eq_slot(pTHX_ HV *slot, SV *dbh, HV *src,
+                              AV *keys, AV *bind) {
     SV *where = sv_2mortal(newSVpvs(""));
     SSize_t i, n = av_len(keys) + 1;
     for (i = 0; i < n; i++) {
         SV *k = *av_fetch(keys, i, 0);
         HE *he;
         if (i) sv_catpvs(where, " AND ");
-        sv_catsv(where, pdbi_qi(aTHX_ self, k));
+        sv_catsv(where, pdbi_qi_slot(aTHX_ slot, dbh, k));
         sv_catpvs(where, " = ?");
         he = hv_fetch_ent(src, k, 0, 0);
         av_push(bind, newSVsv(he ? HeVAL(he) : &PL_sv_undef));
@@ -375,20 +433,128 @@ static SV *pdbi_where_eq(pTHX_ SV *self, HV *src, AV *keys, AV *bind) {
     return where;
 }
 
-/* The %key of get/delete, as sorted keys; croaks when empty. */
-static AV *pdbi_key_args(pTHX_ SV **st, I32 items, HV **out, const char *what) {
+/* The bind half of pdbi_where_eq_slot on its own, in the same (sorted) order -
+ * what the cached-SQL path still has to do per call. */
+static void pdbi_bind_keys(pTHX_ HV *src, AV *keys, AV *bind) {
+    SSize_t i, n = av_len(keys) + 1;
+    for (i = 0; i < n; i++) {
+        SV *k  = *av_fetch(keys, i, 0);
+        HE *he = hv_fetch_ent(src, k, 0, 0);
+        av_push(bind, newSVsv(he ? HeVAL(he) : &PL_sv_undef));
+    }
+}
+
+static SV *pdbi_where_eq(pTHX_ SV *self, HV *src, AV *keys, AV *bind) {
+    HV *slot = pdbi_slot_for(aTHX_ self);
+    SV *dbh  = pdbi_get(aTHX_ slot, "dbh");
+    return pdbi_where_eq_slot(aTHX_ slot, dbh ? dbh : &PL_sv_undef,
+                              src, keys, bind);
+}
+
+/* A memoised statement, for the fixed-shape operations.
+ *
+ * get and delete generate one SQL string per set of key columns, and a model
+ * is asked for the same set over and over - almost always the primary key. So
+ * the string is built once and looked up thereafter, which also skips the
+ * identifier quoting and the concatenation behind it. `sig` identifies the
+ * shape (the operation plus its sorted key names); the cache lives on the
+ * slot beside the quoting cache, and dies with the connection for the same
+ * reason. Returns the SQL, borrowed. */
+static SV *pdbi_sql_cached(pTHX_ HV *slot, SV *sig, SV *sql) {
+    SV **e = hv_fetchs(slot, "sqlc", 0);
+    HV *cache;
+    HE *he;
+    if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)
+        cache = (HV *)SvRV(*e);
+    else {
+        cache = newHV();
+        (void)hv_stores(slot, "sqlc", newRV_noinc((SV *)cache));
+    }
+    if (!sql) {
+        he = hv_fetch_ent(cache, sig, 0, 0);
+        return (he && HeVAL(he) && SvOK(HeVAL(he))) ? HeVAL(he) : NULL;
+    }
+    he = hv_store_ent(cache, sig, newSVsv(sql), 0);
+    return (he && HeVAL(he)) ? HeVAL(he) : sql;
+}
+
+/* 'op\0table\0k1\0k2' - the shape of a fixed-form statement. The TABLE is in
+ * the signature because the cache hangs off the connection, which every model
+ * on that dsn shares: without it, two models with the same key columns would
+ * read each other's statement. Mortal. */
+static SV *pdbi_sig(pTHX_ const char *op, SV *table, AV *keys) {
+    SV *sig = sv_2mortal(newSVpv(op, 0));
+    SSize_t i, n = keys ? av_len(keys) + 1 : 0;
+    sv_catpvn(sig, "\0", 1);
+    if (table && SvOK(table)) sv_catsv(sig, table);
+    for (i = 0; i < n; i++) {
+        SV **k = av_fetch(keys, i, 0);
+        sv_catpvn(sig, "\0", 1);
+        if (k && *k) sv_catsv(sig, *k);
+    }
+    return sig;
+}
+
+/* The %key of get/delete, as sorted keys; croaks (naming the calling backend)
+ * when empty. */
+static AV *pdbi_key_args(pTHX_ SV **st, I32 items, HV **out,
+                         const char *what, const char *cls) {
     HV *key = newHV();
     I32 i;
     if (items < 3 || !((items - 1) % 2 == 0))
-        croak("Punk::Model::DBI: %s needs a key", what);
+        croak("%s: %s needs a key", cls, what);
     for (i = 1; i + 1 < items; i += 2)
         (void)hv_store_ent(key, st[i], newSVsv(st[i + 1]), 0);
     if (!HvUSEDKEYS(key)) {
         SvREFCNT_dec((SV *)key);
-        croak("Punk::Model::DBI: %s needs a key", what);
+        croak("%s: %s needs a key", cls, what);
     }
     *out = (HV *)sv_2mortal((SV *)key);
     return pdbi_sorted_keys(aTHX_ key);
+}
+
+/* The backend object both shipped backends bless: the same slots the Perl
+ * used (opts/table/primary/columns/col/returning), parsed from the
+ * database/table/primary/columns pairs _instantiate passes. Shared so a
+ * second backend cannot drift from the shape t/12 reaches through. */
+static SV *pdbi_build_self(pTHX_ SV *class, SV **st, I32 items,
+                           const char *cls) {
+    HV *h = newHV();
+    HV *col = newHV();
+    SV *table = NULL, *primary = NULL, *columns = NULL, *database = NULL;
+    I32 i;
+    for (i = 1; i + 1 < items; i += 2) {
+        STRLEN kl; const char *k = SvPV_const(st[i], kl);
+        if      (kl == 5 && memEQ(k, "table",    5)) table    = st[i + 1];
+        else if (kl == 7 && memEQ(k, "primary",  7)) primary  = st[i + 1];
+        else if (kl == 7 && memEQ(k, "columns",  7)) columns  = st[i + 1];
+        else if (kl == 8 && memEQ(k, "database", 8)) database = st[i + 1];
+    }
+    if (!(table && SvOK(table) && SvTRUE(table))) {
+        SvREFCNT_dec((SV *)h); SvREFCNT_dec((SV *)col);
+        croak("%s: a model with no table", cls);
+    }
+    /* the column set, for the create/update filters */
+    if (columns && SvROK(columns) && SvTYPE(SvRV(columns)) == SVt_PVAV) {
+        AV *c = (AV *)SvRV(columns);
+        SSize_t n = av_len(c) + 1, j;
+        for (j = 0; j < n; j++) {
+            SV **e = av_fetch(c, j, 0);
+            if (e && *e) (void)hv_store_ent(col, *e, newSViv(1), 0);
+        }
+    }
+    (void)hv_stores(h, "opts",
+        (database && SvROK(database) && SvTYPE(SvRV(database)) == SVt_PVHV)
+            ? newSVsv(database) : newRV_noinc((SV *)newHV()));
+    (void)hv_stores(h, "table",   newSVsv(table));
+    (void)hv_stores(h, "primary",
+        (primary && SvOK(primary)) ? newSVsv(primary) : newSV(0));
+    (void)hv_stores(h, "columns",
+        (columns && SvROK(columns) && SvTYPE(SvRV(columns)) == SVt_PVAV)
+            ? newSVsv(columns) : newRV_noinc((SV *)newAV()));
+    (void)hv_stores(h, "col", newRV_noinc((SV *)col));
+    (void)hv_stores(h, "returning", newSViv(0));
+    return sv_bless(newRV_noinc((SV *)h), gv_stashsv(class, GV_ADD));
 }
 
 #endif /* PUNK_DBI_H */

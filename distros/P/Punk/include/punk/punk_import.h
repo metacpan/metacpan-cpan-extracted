@@ -136,6 +136,7 @@ static const pki_kw PKI_KEYWORDS[] = {
     { "logging",    "logging",     PKW_FWD    },
     { "docs",       "docs",        PKW_FWD    },
     { "static",     "static",      PKW_FWD    },
+    { "markdown",   "markdown",    PKW_FWD    },
     { "mount",      "mount",       PKW_FWD    },
     { "views",      "views",       PKW_FWD    },
     { "config",     "config",      PKW_FWD    },

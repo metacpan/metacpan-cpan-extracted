@@ -53,6 +53,7 @@ static int dbil_native_available(pTHX_ const char *drv) {
 /* ---- native connection state ------------------------------------------------ */
 
 typedef struct dbil_native {
+    pid_t pid;        /* the process that owns this libpq connection */
     SV  *dbh;         /* the (parent-held) connection (+1)         */
     SV  *loop;        /* loop adapter (+1)                         */
     dbil_vt *vt;      /* C seam when the adapter has one           */
@@ -175,8 +176,13 @@ static void dbil_native_on_readable(pTHX_ dbil_native *nc) {
         EXTEND(SP, 1); PUSHs(nc->dbh); PUTBACK;
         n = call_method("pg_ready", G_SCALAR | G_EVAL);
         SPAGAIN;
-        if (!SvTRUE(ERRSV) && n > 0) ready = SvTRUE(POPs) ? 1 : 0;
-        else if (n > 0) (void)POPs;
+        /* SvTRUE is a multi-evaluating macro before 5.30, so SvTRUE(POPs)
+         * pops once per expansion and walks SP below the stack base. Pop
+         * into a variable and test that. */
+        if (n > 0) {
+            SV *r = POPs;
+            if (!SvTRUE(ERRSV)) ready = SvTRUE(r) ? 1 : 0;
+        }
         PUTBACK; FREETMPS; LEAVE;
     }
     if (ready) dbil_native_complete(aTHX_ nc);
@@ -319,21 +325,29 @@ static SV *dbil_native_run(pTHX_ dbil_native *nc, int is_query, SV *sql, AV *bin
         /* one in-flight per connection (libpq): queue */
         av_push(nc->queue, newSViv(is_query));
         av_push(nc->queue, newSVsv(sql));
-        av_push(nc->queue, newRV_inc((SV *)(bind ? bind : newAV())));
+        av_push(nc->queue, dbil_bind_rv(aTHX_ bind));
         av_push(nc->queue, SvREFCNT_inc(future));
         return future;
     }
     dbil_native_fire(aTHX_ nc, is_query, sql,
-                     sv_2mortal(newRV_inc((SV *)(bind ? bind : newAV()))),
+                     sv_2mortal(dbil_bind_rv(aTHX_ bind)),
                      SvREFCNT_inc(future));
     return future;
 }
 
 /* ---- lifecycle --------------------------------------------------------------- */
 
+/* A libpq connection cannot be shared across a fork: two processes writing the
+ * same socket interleave protocol messages and neither can recover. So the
+ * owning pid is recorded and an inherited state is dropped rather than used. */
+static int dbil_native_owned(const dbil_native *nc) {
+    return nc && nc->pid == getpid();
+}
+
 static dbil_native *dbil_native_new(pTHX_ SV *dbh, SV *loop) {
     dbil_native *nc;
     Newxz(nc, 1, dbil_native);
+    nc->pid   = getpid();
     nc->dbh   = SvREFCNT_inc(dbh);
     nc->loop  = SvREFCNT_inc(loop);
     nc->vt    = dbil_vt_of(aTHX_ loop);
@@ -342,8 +356,22 @@ static dbil_native *dbil_native_new(pTHX_ SV *dbh, SV *loop) {
     return nc;
 }
 
+/* Release inherited native state: drop our references and free the struct,
+ * touching neither the loop (the registration is the parent's) nor the socket
+ * (closing it would tear down the parent's connection). */
+static void dbil_native_disown(pTHX_ dbil_native *nc) {
+    if (!nc) return;
+    if (nc->inflight) SvREFCNT_dec(nc->inflight);
+    if (nc->sth)      SvREFCNT_dec(nc->sth);
+    if (nc->queue)    SvREFCNT_dec((SV *)nc->queue);
+    if (nc->dbh)      SvREFCNT_dec(nc->dbh);
+    if (nc->loop)     SvREFCNT_dec(nc->loop);
+    Safefree(nc);
+}
+
 static void dbil_native_free(pTHX_ dbil_native *nc) {
     if (!nc) return;
+    if (!dbil_native_owned(nc)) { dbil_native_disown(aTHX_ nc); return; }
     if (nc->fd >= 0 && !PL_dirty) {
         if (nc->vt) nc->vt->remove(aTHX_ nc->vt->ctx, nc->fd);
         else {

@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $Math::Prime::Util::PrimeIterator::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PrimeIterator::VERSION = '0.74';
+  $Math::Prime::Util::PrimeIterator::VERSION = '0.75';
 }
 
 use base qw( Exporter );
@@ -21,7 +21,7 @@ sub new {
   my ($class, $start) = @_;
   my $p = 2;
   my $self = bless \$p, $class;
-  $self->rewind($start) if defined $start;
+  $self->rewind($start) if @_ > 1;
   return $self;
 }
 
@@ -128,7 +128,7 @@ Math::Prime::Util::PrimeIterator - An object iterator for primes
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 
 =head1 SYNOPSIS

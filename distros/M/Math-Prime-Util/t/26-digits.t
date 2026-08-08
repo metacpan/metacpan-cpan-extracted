@@ -3,91 +3,267 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util
-   qw/todigits fromdigits todigitstring sumdigits vecsum factorial/;
+use Math::BigInt;
+use Math::BigFloat;
+use Math::Prime::Util qw/todigits fromdigits todigitstring sumdigits reverse_digits
+                         is_palindrome is_harshad digital_root mult_digital_root
+                         vecsum factorial powint/;
 
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
-#my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
-#my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
-#my $usegmp= Math::Prime::Util::prime_get_config->{'gmp'};
-#$use64 = 0 if $use64 && 18446744073709550592 == ~0;
 
-plan tests => 0 + 7 + 3 + 2 + 1    # fromdigits
-                + 6 + 4 + 1 + 1    # todigits
-                + 4 + 2*$extra + 1 # sumdigits
-                + 3 + 2            # todigitstring
-                + 12;
+plan tests => 1    # fromdigits
+            + 1    # todigits
+            + 1    # sumdigits
+            + 1    # reverse_digits
+            + 1    # todigitstring
+            + 1    # is_palindrome
+            + 1    # is_harshad
+            + 1    # digital_root
+            + 1    # mult_digital_root
+            + 1;   # examples from Wolfram docs
 
-###### fromdigits
-is(fromdigits([0,1,1,0,1],2), 13, "fromdigits binary with leading 0");
-is(fromdigits([1,1,0,1],2), 13, "fromdigits binary");
-is(fromdigits([0,1,1,0,1]), 1101, "fromdigits decimal");
-is(fromdigits([0,1,1,0,1],3), 37, "fromdigits base 3");
-is(fromdigits([0,1,1,0,1],16), 4353, "fromdigits base 16");
-is(fromdigits([0,1,1,0,2216],16), 6568, "fromdigits base 16 with overflow");
 
-is(fromdigits([7,999,44],5), 7*5**2 + 999*5 + 44*1, "fromdigits base 5 with carry");
-is(fromdigits([7,999,44],3), 7*3**2 + 999*3 + 44*1, "fromdigits base 3 with carry");
-is(fromdigits([7,999,44],2), 7*2**2 + 999*2 + 44*1, "fromdigits base 2 with carry");
-is("".fromdigits([1..15,1..15,1..15],16), "108977460683796539709587792812439445667270661579197935", "fromdigits base 16 with many digits");
+subtest 'fromdigits', sub {
+  is(fromdigits([0,1,1,0,1],2), 13, "fromdigits binary with leading 0");
+  is(fromdigits([1,1,0,1],2), 13, "fromdigits binary");
+  is(fromdigits([0,1,1,0,1]), 1101, "fromdigits decimal");
+  is(fromdigits([0,1,1,0,1],3), 37, "fromdigits base 3");
+  is(fromdigits([0,1,1,0,1],16), 4353, "fromdigits base 16");
+  is(fromdigits([0,1,1,0,2216],16), 6568, "fromdigits base 16 with overflow");
+  is(fromdigits([7,999,44],5), 7*5**2 + 999*5 + 44*1, "fromdigits base 5 with carry");
+  is(fromdigits([7,999,44],3), 7*3**2 + 999*3 + 44*1, "fromdigits base 3 with carry");
+  is(fromdigits([7,999,44],2), 7*2**2 + 999*2 + 44*1, "fromdigits base 2 with carry");
+  is("".fromdigits([1..15,1..15,1..15],16), "108977460683796539709587792812439445667270661579197935", "fromdigits base 16 with many digits");
 
-is(fromdigits("1f",16), 31, "fromdigits hex string");
-is(fromdigits("24"), 24, "fromdigits decimal");
+  is(fromdigits("1f",16), 31, "fromdigits hex string");
+  is(fromdigits("24"), 24, "fromdigits decimal");
 
-is("".fromdigits("zzzyzzzyzzzyzzzy",36), "7958656371562241451187966", "fromdigits with Large base 36 number");
+  is("".fromdigits("zzzyzzzyzzzyzzzy",36), "7958656371562241451187966", "fromdigits with Large base 36 number");
+  ok(!eval { fromdigits([1,2,3],0); 1 } && $@ =~ /invalid base/i, "fromdigits arrayref invalid base");
+  ok(!eval { fromdigits("123",0); 1 } && $@ =~ /invalid base/i, "fromdigits string invalid base");
+  ok(!eval { fromdigits("-1c8",16); 1 } && $@ =~ /invalid digit/i, "fromdigits string rejects leading minus");
+  ok(!eval { fromdigits("+1c8",16); 1 } && $@ =~ /invalid digit/i, "fromdigits string rejects leading plus");
+  is("".fromdigits("10","4294967296"), "4294967296", "fromdigits string with base larger than 32-bit");
+  is("".fromdigits("10","1000000000000"), "1000000000000", "fromdigits string with large base");
+  is("".fromdigits([1,0],"4294967296"), "4294967296", "fromdigits arrayref with base larger than 32-bit");
+  is("".fromdigits([1,4294967296],"4294967296"), "8589934592", "fromdigits arrayref large base with carry");
+  is("".fromdigits(Math::BigInt->new("123"),16), "291", "fromdigits accepts bigint object as string");
+  is("".fromdigits(Math::BigFloat->new("123"),16), "291", "fromdigits accepts math object as string");
+  ok(!eval { fromdigits(Math::BigFloat->new("123.5"),16); 1 } && $@ =~ /invalid digit/i, "fromdigits rejects invalid math object string");
+  {
+    my @sparse;
+    $sparse[2] = 2;
+    ok(!eval { fromdigits(\@sparse,10); 1 } && $@ =~ /defined/, "fromdigits rejects sparse arrayref");
+  }
+  {
+    my $n = powint(3,10);
+    $n =~ /(\d+)/;
+    is(fromdigits($1,16), 364617, "match variable string");
+  }
+  {
+    my $n = powint(3,99);
+    $n =~ /(\d+)/;
+    is("".fromdigits($1,16), "566216063983779498285321989320009873549781493721285789287", "large match variable string");
+  }
+};
 
-###### todigits
-is_deeply([todigits(0)], [], "todigits 0");
-is_deeply([todigits(1)], [1], "todigits 1");
-is_deeply([todigits(77)], [7,7], "todigits 77");
-is_deeply([todigits(77,2)], [1,0,0,1,1,0,1], "todigits 77 base 2");
-is_deeply([todigits(77,3)], [2,2,1,2], "todigits 77 base 3");
-is_deeply([todigits(77,21)], [3,14], "todigits 77 base 21");
+subtest 'todigits', sub {
+  is_deeply([todigits(0)], [], "todigits 0");
+  is_deeply([todigits(0,10,3)], [0,0,0], "todigits 0 with explicit length");
+  is(scalar todigits(0,10,3), 3, "scalar todigits 0 with explicit length");
+  is_deeply([todigits(1)], [1], "todigits 1");
+  is_deeply([todigits(77)], [7,7], "todigits 77");
+  is_deeply([todigits(77,2)], [1,0,0,1,1,0,1], "todigits 77 base 2");
+  is_deeply([todigits(77,3)], [2,2,1,2], "todigits 77 base 3");
+  is_deeply([todigits(77,21)], [3,14], "todigits 77 base 21");
+  is_deeply([todigits("18446744073709551617", "4294967296")], [1,0,1],
+            "todigits bigint in base larger than 32-bit");
+  is_deeply([todigits("340282366920938463463374607431768211457",
+                      "18446744073709551616")], [1,0,1],
+            "todigits bigint in base larger than native UV");
 
-is_deeply([todigits(900,2)], [1,1,1,0,0,0,0,1,0,0], "todigits 900 base 2");
-is_deeply([todigits(900,2,0)], [], "todigits 900 base 2 len 0");
-is_deeply([todigits(900,2,3)], [1,0,0], "todigits 900 base 2 len 3");
-is_deeply([todigits(900,2,32)], [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,0,0], "todigits 900 base 2 len 32");
+  is_deeply([todigits(900,2)], [1,1,1,0,0,0,0,1,0,0], "todigits 900 base 2");
+  is_deeply([todigits(900,2,0)], [], "todigits 900 base 2 len 0");
+  is(scalar todigits(900,2,0), 0, "scalar todigits 900 base 2 len 0");
+  is_deeply([todigits(900,2,3)], [1,0,0], "todigits 900 base 2 len 3");
+  is(scalar todigits(900,2,3), 3, "scalar todigits 900 base 2 len 3");
+  is_deeply([todigits(900,2,32)], [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,0,0], "todigits 900 base 2 len 32");
+  is(scalar todigits(900,2), 10, "scalar todigits 900 base 2");
 
-is(vecsum(todigits("293852387239761276234029385230912847923872323")), 201, "vecsum of todigits of bigint");
+  is(vecsum(todigits("293852387239761276234029385230912847923872323")), 201, "vecsum of todigits of bigint");
 
-is_deeply([todigits(-143)], [1,4,3], "todigits ignores negative sign");
+  is_deeply([todigits(-143)], [1,4,3], "todigits ignores negative sign");
+  my $big = "18446744073709551616";
+  my @bigdigits = map { 0+$_ } split(//,$big);
+  is_deeply([todigits("-$big")], \@bigdigits, "todigits ignores negative sign for bigint string");
+  is_deeply([todigits("+$big")], \@bigdigits, "todigits ignores positive sign for bigint string");
+  is_deeply([todigits("000000000000000000000$big")], \@bigdigits, "todigits ignores leading zeroes for bigint string");
+};
 
-###### sumdigits
-is(sumdigits("-45.36"), 4+5+3+6, "sumdigits(-45.36)");
-{
-  my @sumd   = map { sumdigits($_) } 0 .. 1000;
-  my @splitd = map { vecsum(split(//,$_)) } 0 .. 1000;
-  is_deeply( \@sumd, \@splitd, "sumdigits 0 to 1000");
-}
-is(sumdigits("0x3290f8E"), 51, "sumdigits hex");
-is(sumdigits("293852387239761276234029385230912847923872323"), 201, "sumdigits bigint");
-if ($extra) {
-  is(sumdigits(factorial(1000)), 10539, "sumdigits 1000!");
-  is(sumdigits(factorial(10000)), 149346, "sumdigits 10000!");
-}
+subtest 'sumdigits', sub {
+  is(sumdigits("-45.36"), 4+5+3+6, "sumdigits(-45.36)");
+  {
+    my @sumd   = map { sumdigits($_) } 0 .. 1000;
+    my @splitd = map { vecsum(split(//,$_)) } 0 .. 1000;
+    is_deeply( \@sumd, \@splitd, "sumdigits 0 to 1000");
+  }
+  is(sumdigits("0x3290f8E"), 51, "sumdigits hex");
+  is(sumdigits("293852387239761276234029385230912847923872323"), 201, "sumdigits bigint");
+  if ($extra) {
+    is(sumdigits(factorial(1000)), 10539, "sumdigits 1000!");
+    is(sumdigits(factorial(5000)), 67698, "sumdigits 5000!");
+  }
 
-is(sumdigits(-143), 8, "sumdigits ignores negative sign");
+  is(sumdigits(-143), 8, "sumdigits ignores negative sign");
+};
 
-####### some longer todigitstring examples
-is(todigitstring("3" x 21, 3), "10001020211011120202011020201202220201012100", "todigitstring base 3");
-is(todigitstring("7" x 26, 9), "1303055203367717374834745502", "todigitstring base 9");
-is(todigitstring("9" x 27, 11), "92586630a001888a8112250349", "todigitstring base 11");
+subtest 'reverse_digits', sub {
+  is(reverse_digits(0), 0, "reverse_digits 0");
+  is(reverse_digits(123456), 654321, "reverse_digits decimal");
+  is(reverse_digits(1200), 21, "reverse_digits drops leading zeroes after reversal");
+  is(reverse_digits(-143), 341, "reverse_digits ignores negative sign");
+  is(reverse_digits(0b1101000, 2), 0b1011, "reverse_digits base 2");
+  is(reverse_digits(0x1234, 16), 0x4321, "reverse_digits base 16");
+  is(reverse_digits(123456, 8), fromdigits([reverse todigits(123456,8)],8),
+     "reverse_digits matches reverse todigits in base 8");
+  is("".reverse_digits("1000000000000000000000000000000000000000000000000010"),
+     "100000000000000000000000000000000000000000000000001",
+     "reverse_digits bigint decimal");
+  is("".reverse_digits("123456789012345678901234567890", 36),
+     "".fromdigits([reverse todigits("123456789012345678901234567890",36)],36),
+     "reverse_digits bigint base 36");
+  ok(!eval { reverse_digits(17, 1); 1 } && $@ =~ /reverse_digits: .*invalid base: 1/i,
+     "reverse_digits invalid base croak");
+};
 
-is(todigitstring(-143,16), "8f", "todigitstring ignores negative sign");
+subtest 'todigitstring', sub {
+  is(todigitstring(0), "", "todigitstring 0");
+  is(todigitstring(0,10,3), "000", "todigitstring 0 with explicit length");
+  is(todigitstring("3" x 21, 3), "10001020211011120202011020201202220201012100", "todigitstring base 3");
+  is(todigitstring("7" x 26, 9), "1303055203367717374834745502", "todigitstring base 9");
+  is(todigitstring("9" x 27, 11), "92586630a001888a8112250349", "todigitstring base 11");
+  is(todigitstring(-143,16), "8f", "todigitstring ignores negative sign");
+  is(todigitstring(12345,8,10), "0000030071", "todigitstring will 0 pad");
+  my $big = "18446744073709551616";
+  is(todigitstring("-$big"), $big, "todigitstring ignores negative sign for bigint string");
+  is(todigitstring("+$big"), $big, "todigitstring ignores positive sign for bigint string");
+  is(todigitstring("000000000000000000000$big"), $big, "todigitstring ignores leading zeroes for bigint string");
+};
 
-is(todigitstring(12345,8,10), "0000030071", "todigitstring will 0 pad");
+subtest 'is_palindrome', sub {
+  is_deeply([map {is_palindrome($_)} 0..9,11,22,33,121,959,12321],
+            [map { 1 }               0..9,11,22,33,121,959,12321],
+            "palindromes");
+  is_deeply([map {is_palindrome($_)} 10,12,19,34,98,12322],
+            [map { 0 }               10,12,19,34,98,12322],
+            "not palindromes");
 
-###### examples from Wolfram docs
-is_deeply([todigits(1234135634,16)], [4,9,8,15,6,10,5,2], "todigits 1234135634 base 16");
-is_deeply([todigits(56,2,8)], [0,0,1,1,1,0,0,0], "todigits 56 base 2 len 8");
-is(fromdigits([todigits(56,2,8)],2), 56, "fromdigits of previous");
-is(todigitstring(56,2), "111000", "56 as binary string");
-is(fromdigits(todigitstring(56,2),2), 56, "fromdigits of previous");
-is(todigitstring(37,2), "100101", "todigitstring 37");
-is(fromdigits([5,1,2,8]), 5128, "fromdigits 5128 base 10");
-is(fromdigits([1,0,1,1,0,1,1],2), 91, "fromdigits 91 base 2");
-is(fromdigits("1923"), 1923, "fromdigits 1923 base 10");
-is(fromdigits("1011011",2), 91, "fromdigits 91 base 2");
-is(fromdigits([7,11,0,0,0,122]), 810122, "fromdigits with carry");
-is_deeply([todigits(6345354, 10, 4)], [5,3,5,4], "only last 4 digits");
+  is(is_palindrome(9,2),1,"9 is a base-2 palindrome");
+  is(is_palindrome(10,2),0,"10 is not a base-2 palindrome");
+  is(is_palindrome(130,3),1,"130 is a base-3 palindrome");
+  is(is_palindrome(130,4),1,"130 is a base-4 palindrome");
+  is(is_palindrome(10,"4294967296"),1,"single digit in base larger than 32-bit");
+  is(is_palindrome("18446744073709551617", "4294967296"),1,
+     "multi-digit palindrome in base larger than 32-bit");
+  is(is_palindrome("340282366920938463463374607431768211457",
+                   "18446744073709551616"),1,
+     "multi-digit palindrome in base larger than native UV");
+
+  my $m = 719848917;
+  ok(is_palindrome($m) && is_palindrome($m,2) && is_palindrome($m,8),"$m is a palindrome in bases 2, 8, and 10");
+  my $k = 532900;
+  ok(is_palindrome($k,3) && is_palindrome($k,7),"$k is a palindrome in bases 3 and 7");
+};
+
+subtest 'is_harshad' => sub {
+  # OEIS A005349: 1..9 all Harshad; then 10, 12, 18, 20, 21, ...
+  my @yes10 = (1..9, 10, 12, 18, 20, 21, 24, 27, 30, 36, 40, 42, 45, 48,
+               50, 54, 60, 63, 70, 72, 80, 81, 84, 90, 100);
+  my @no10  = (11, 13, 14, 15, 16, 17, 19, 22, 23, 25, 26, 28, 29, 31);
+  is_deeply([map { is_harshad($_) } @yes10], [(1) x @yes10], "base-10 Harshad");
+  is_deeply([map { is_harshad($_) } @no10],  [(0) x @no10],  "base-10 non-Harshad");
+
+  # n <= 0 returns 0
+  is(is_harshad(0),   0, "is_harshad(0)=0");
+  is(is_harshad(-1),  0, "is_harshad(-1)=0");
+  is(is_harshad(-18), 0, "is_harshad(-18)=0");
+
+  # base 16: digit sum uses hex digit values
+  is(is_harshad(12345696, 16), 1, "12345696=0xBC6160: digitsum=11+12+6+1+6+0=36, 36|12345696");
+  is(is_harshad(12345697, 16), 0, "12345697=0xBC6161: digitsum=37 does not divide 12345697");
+
+  # base 2: Harshad iff n divisible by popcount(n); OEIS A049445
+  my @yes2 = (1, 2, 4, 6, 8, 10, 12, 16, 18, 20, 24);
+  my @no2  = (3, 5, 7, 9, 11, 13, 14, 15, 17, 19);
+  is_deeply([map { is_harshad($_, 2) } @yes2], [(1) x @yes2], "base-2 Harshad");
+  is_deeply([map { is_harshad($_, 2) } @no2],  [(0) x @no2],  "base-2 non-Harshad");
+
+  # spot checks
+  is(is_harshad(2016), 1, "2016: 2+0+1+6=9, 9|2016");
+  is(is_harshad(2017), 0, "2017: 2+0+1+7=10, 10 does not divide 2017");
+  is(is_harshad(10, "4294967296"), 1, "single digit Harshad in base larger than 32-bit");
+  is(is_harshad("18446744073709551618", "4294967296"), 1,
+     "multi-digit Harshad in base larger than 32-bit");
+  is(is_harshad("340282366920938463463374607431768211458",
+                "18446744073709551616"), 1,
+     "multi-digit Harshad in base larger than native UV");
+
+  # bigint
+  is(is_harshad("200000000000000000000"), 1, "2*10^20: digitsum=2, even");
+  is(is_harshad("200000000000000000002"), 0, "2*10^20+2: digitsum=4, not divisible");
+};
+
+subtest 'digital_root' => sub {
+  is_deeply( [map { digital_root($_) } 0..19],
+             [0,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1],
+             "digital_root 0..19" );
+  is( digital_root(123456789),    9, "digital_root(123456789)" );
+  is( digital_root(1000000000),   1, "digital_root(10^9)" );
+  is( digital_root(999999998),    8, "digital_root(999999998)" );
+  is_deeply( [map { digital_root($_, 16) } 0..16],
+             [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1],
+             "digital_root 0..16 base 16" );
+  is( digital_root(49,  6),  4, "digital_root(49, 6)" );
+  is( digital_root(255, 16), 15, "digital_root(255, 16)" );
+  is( digital_root("99999999999999999999"),  9, "digital_root bigint (20 nines)" );
+  is( digital_root("10000000000000000000"),  1, "digital_root bigint (10^19)" );
+  is( digital_root(10, "4294967296"), 10, "digital_root large base" );
+  is( digital_root(10, "100000000000000000000000000000000000000"), 10,
+      "digital_root huge base" );
+};
+
+subtest 'mult_digital_root' => sub {
+  is_deeply( [map { mult_digital_root($_) } 0..9],
+             [0,1,2,3,4,5,6,7,8,9],
+             "mult_digital_root 0..9" );
+  is( mult_digital_root(23),  6, "23 -> 6" );         # 2*3=6
+  is( mult_digital_root(39),  4, "39 -> 4" );         # 27->14->4
+  is( mult_digital_root(77),  8, "77 -> 8" );         # 49->36->18->8
+  is( mult_digital_root(679), 6, "679 -> 6" );        # 378->168->48->32->6
+  is( mult_digital_root(999), 2, "999 -> 2" );        # 729->126->12->2
+  is( mult_digital_root(13311), 9, "13311 -> 9" );    # 13311->9
+  is( mult_digital_root(531537), 5, "531537 -> 5" );  # 531537,1575,175,35,15,5
+  is( mult_digital_root(6,  6),   0, "mdr(6,  6)=0" );   # "10"_6 -> 0
+  is( mult_digital_root(7,  6),   1, "mdr(7,  6)=1" );   # "11"_6 -> 1
+  is( mult_digital_root(14, 6),   4, "mdr(14, 6)=4" );   # "22"_6 -> 4
+  is( mult_digital_root(255, 16), 14, "mdr(255,16)=14" ); # FF->225->E1->14
+  is( mult_digital_root("1" x 50), 1, "mdr('1'x50)=1" );
+  ok(!eval { mult_digital_root(17, 1); 1 } && $@ =~ /mult_digital_root: .*invalid base: 1/i,
+     "mult_digital_root invalid base croak");
+  is( mult_digital_root(10, "4294967296"), 10, "mult_digital_root large base" );
+};
+
+subtest 'Wolfram examples', sub {
+  is_deeply([todigits(1234135634,16)], [4,9,8,15,6,10,5,2], "todigits 1234135634 base 16");
+  is_deeply([todigits(56,2,8)], [0,0,1,1,1,0,0,0], "todigits 56 base 2 len 8");
+  is(fromdigits([todigits(56,2,8)],2), 56, "fromdigits of previous");
+  is(todigitstring(56,2), "111000", "56 as binary string");
+  is(fromdigits(todigitstring(56,2),2), 56, "fromdigits of previous");
+  is(todigitstring(37,2), "100101", "todigitstring 37");
+  is(fromdigits([5,1,2,8]), 5128, "fromdigits 5128 base 10");
+  is(fromdigits([1,0,1,1,0,1,1],2), 91, "fromdigits 91 base 2");
+  is(fromdigits("1923"), 1923, "fromdigits 1923 base 10");
+  is(fromdigits("1011011",2), 91, "fromdigits 91 base 2");
+  is(fromdigits([7,11,0,0,0,122]), 810122, "fromdigits with carry");
+  is_deeply([todigits(6345354, 10, 4)], [5,3,5,4], "only last 4 digits");
+};

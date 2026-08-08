@@ -39,8 +39,36 @@ plan tests => 1    # invalid inputs
             + 1;   # Frobenius pseudoprimes
 
 subtest 'invalid inputs should croak', sub {
-  ok(!eval { is_strong_pseudoprime(2047,0); }, "MR base 0 fails");
-  ok(!eval { is_strong_pseudoprime(2047,1); }, "MR base 1 fails");
+  ok(!eval { is_pseudoprime(2047,0); 1 } && $@ =~ /is_pseudoprime: invalid base: 0/,
+     "Fermat base 0 croak");
+  ok(!eval { is_pseudoprime(3,1); 1 } && $@ =~ /is_pseudoprime: invalid base: 1/,
+     "Fermat n=3 validates base");
+  ok(!eval { is_euler_pseudoprime(703,1); 1 } && $@ =~ /is_euler_pseudoprime: invalid base: 1/,
+     "Euler base 1 croak");
+  ok(!eval { is_euler_pseudoprime(3,1); 1 } && $@ =~ /is_euler_pseudoprime: invalid base: 1/,
+     "Euler n=3 validates base");
+  ok(!eval { is_strong_pseudoprime(2047,0); 1 } && $@ =~ /is_strong_pseudoprime: invalid base: 0/,
+     "MR base 0 croak");
+  ok(!eval { is_strong_pseudoprime(2047,1); 1 } && $@ =~ /is_strong_pseudoprime: invalid base: 1/,
+     "MR base 1 croak");
+  ok(!eval { is_strong_pseudoprime(3,1); 1 } && $@ =~ /is_strong_pseudoprime: invalid base: 1/,
+     "MR n=3 validates base");
+  ok(!eval { is_almost_extra_strong_lucas_pseudoprime(5777,0); 1 } && $@ =~ /is_almost_extra_strong_lucas_pseudoprime: invalid increment: 0/,
+     "AES Lucas increment 0 croak");
+  ok(!eval { is_almost_extra_strong_lucas_pseudoprime(2,0); 1 } && $@ =~ /is_almost_extra_strong_lucas_pseudoprime: invalid increment: 0/,
+     "AES Lucas validates increment before small n");
+  ok(!eval { is_almost_extra_strong_lucas_pseudoprime(4,257); 1 } && $@ =~ /is_almost_extra_strong_lucas_pseudoprime: invalid increment: 257/,
+     "AES Lucas validates increment before even n");
+  ok(!eval { is_perrin_pseudoprime(271441,-1); 1 } && $@ =~ /non-negative integer/,
+     "Perrin restriction -1 croak");
+  ok(!eval { is_perrin_pseudoprime(271441,4); 1 } && $@ =~ /restriction must be between 0 and 3/,
+     "Perrin restriction 4 croak");
+  ok(!eval { is_perrin_pseudoprime(271441,"4294967296"); 1 } && $@ =~ /restriction must be between 0 and 3/,
+     "Perrin restriction 2^32 croak");
+  ok(!eval { is_frobenius_pseudoprime(91,3,2); 1 } && $@ =~ /is_frobenius_pseudoprime: invalid P,Q: \(3,2\)/,
+     "Frobenius invalid P,Q croak");
+  ok(!eval { is_frobenius_pseudoprime(5,3,2); 1 } && $@ =~ /is_frobenius_pseudoprime: invalid P,Q: \(3,2\)/,
+     "Small prime validates Frobenius parameters");
 };
 
 subtest 'basic functionality', sub {
@@ -48,6 +76,16 @@ subtest 'basic functionality', sub {
   is( is_strong_pseudoprime(1, 2), 0, "MR with 0 shortcut composite");
   is( is_strong_pseudoprime(2, 2), 1, "MR with 2 shortcut prime");
   is( is_strong_pseudoprime(3, 2), 1, "MR with 3 shortcut prime");
+  is( is_pseudoprime(3, 3), 0, "Fermat with base 0 mod n");
+  is( is_euler_pseudoprime(3, 3), 0, "Euler with base 0 mod n");
+  is(is_almost_extra_strong_lucas_pseudoprime(5,5), 1,
+     "AES accepts a small prime with an unusable parameter progression");
+  is(is_almost_extra_strong_lucas_pseudoprime(31,28), 1,
+     "AES large-increment prime shortcut");
+  is(is_almost_extra_strong_lucas_pseudoprime(319,148), 1,
+     "AES large-increment composite follows the requested test");
+  is(is_almost_extra_strong_lucas_pseudoprime(259,256), 1,
+     "AES largest-increment composite follows the requested test");
 
   is_deeply([map{is_pseudoprime($_)} 162193,452051],[1,1],"is_pseudoprime(n) = is_pseudoprime(n,2)");
   my @b235 = (2,3,5);
@@ -290,6 +328,34 @@ subtest 'Frobenius type pseudoprimes', sub {
 
   @P = qw/13333 44801 486157 1615681 3125281 4219129 9006401 12589081 13404751 15576571 16719781/;
   is_deeply([grep{ !is_frobenius_pseudoprime($_,3,-5)} @P],[],"Small Frobenius(3,-5)");
+  is( is_frobenius_pseudoprime(101, 2, 2), 1, "Frobenius allows negative D with square absolute value");
+  is( is_frobenius_pseudoprime(91,  2, 2), 0, "Composite fails Frobenius with negative discriminant");
+  is( is_frobenius_pseudoprime(561, 0, 2), 1, "Frobenius allows P=0");
+  is( is_frobenius_pseudoprime(4181, 4182, -1), 1, "Frobenius parameters may exceed n");
+  ok(!eval { is_frobenius_pseudoprime(91, 3); 1; } && $@ =~ /is_frobenius_pseudoprime: expected 1 or 3 arguments/,
+     "Two-argument Frobenius call rejected");
+  ok(!eval { is_frobenius_pseudoprime(91, undef, 2); 1; }, "Undefined P rejected");
+
+  ok(!eval { is_frobenius_pseudoprime(91, 0, 0); 1; }, "Explicit zero P,Q rejected");
+  ok(!eval { is_frobenius_pseudoprime(91, 3, 2); 1; }, "Square discriminant P,Q rejected");
+  is( is_frobenius_pseudoprime(-5, 0, 0), 0, "Negative n with explicit P,Q returns false");
+
+  for my $case (
+    [101,  46339,  1, 1],
+    [101, -46339,  1, 1],
+    [101,  1,  46339, 1],
+    [101,  1, -46339, 1],
+    [101,  3037000498,  1, 1],
+    [101, -3037000498,  1, 1],
+    [101,  1,  3037000498, 1],
+    [101,  1, -3037000498, 1],
+    [101,  3037000497,  3037000497, 1],
+    [101, -3037000497, -3037000497, 1],
+    [101,  3037000498,  3037000496, 1],
+  ) {
+    my($n, $P, $Q, $exp) = @$case;
+    is(is_frobenius_pseudoprime($n, $P, $Q), $exp, "Large Frobenius parameter ($P,$Q)");
+  }
 
   # These have no known counterexamples
   {

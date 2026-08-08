@@ -1,0 +1,48 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form method="post" action="AwayMode.html" name="ModifyAwayMode">
+<input type="hidden" name="id" value="<% $UserObj->Id %>" />
+<& /Elements/AwayModeEditor:show, UserObj => $UserObj &>
+<& /Elements/Submit, Name => 'Update', Label => loc('Save Changes') &>
+</form>
+<%INIT>
+# /Admin/autohandler already gates this whole tree on ShowConfigTab, but that
+# right is coarser than what editing someone else's away status warrants, so
+# check AdminUsers explicitly the way RT::Extension::RightsInspector does for
+# its own admin page. SetPreferences() enforces the same right server-side.
+unless ( $session{'CurrentUser'}->HasRight( Right => 'AdminUsers', Object => RT->System ) ) {
+    Abort( loc('You do not have permission to modify other users.') );
+}
+
+my @results;
+
+my $UserObj = RT::User->new( $session{'CurrentUser'} );
+$UserObj->Load($id) || Abort( loc( "Couldn't load user '[_1]'", $id // '' ) );
+
+my $title = loc( 'Away Mode for the user [_1]', $UserObj->Name );
+
+if ($Update) {
+    @results = $m->comp(
+        '/Elements/AwayModeEditor:process',
+        UserObj   => $UserObj,
+        Enabled   => $Enabled,
+        StartDate => $StartDate,
+        EndDate   => $EndDate,
+    );
+
+    MaybeRedirectForResults(
+        Actions   => \@results,
+        Path      => '/Admin/Users/AwayMode.html',
+        Arguments => { id => $UserObj->Id },
+    );
+}
+</%INIT>
+<%ARGS>
+$id => undef
+$Enabled => 0
+$StartDate => ''
+$EndDate => ''
+$Update => 0
+</%ARGS>

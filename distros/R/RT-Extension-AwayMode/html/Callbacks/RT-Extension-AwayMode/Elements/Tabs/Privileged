@@ -1,0 +1,28 @@
+<%INIT>
+# RT core builds the per-user admin tabs in _BuildAdminPageMenu
+# (lib/RT/Interface/Web/MenuBuilder.pm) but, unlike the sibling queue block,
+# fires no dedicated callback there. The generic 'Privileged' callback at the
+# end of BuildPageNav is the hook we get: it runs after _BuildAdminPageMenu,
+# so the 'settings' submenu we hang off already exists by now.
+#
+# The path test and the id/rights checks mirror the conditions core itself
+# uses to build that block, so this tab appears exactly where the rest of the
+# per-user tabs do and nowhere else.
+return unless $Path =~ m{^(/Admin/Users|/User/(Summary|History|SavedSearches|Dashboards)\.html)};
+
+my $id = $DECODED_ARGS->{'id'};
+return unless $id && $id =~ /^\d+$/;
+
+return unless $session{'CurrentUser'}->HasRight( Right => 'AdminUsers', Object => RT->System );
+
+my $settings = PageMenu()->child('settings');
+return unless $settings;
+
+$settings->child(
+    away_mode => title => loc('Away Mode'),
+    path      => '/Admin/Users/AwayMode.html?id=' . $id,
+);
+</%INIT>
+<%ARGS>
+$Path => ''
+</%ARGS>

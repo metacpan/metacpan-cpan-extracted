@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::SOAP;
 use Moose;
 
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.89'; # VERSION
 
 use Carp qw(croak);
 use HTTP::Request::Common;
@@ -236,7 +236,7 @@ Net::SAML2::Binding::SOAP - SOAP binding for SAML
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 SYNOPSIS
 

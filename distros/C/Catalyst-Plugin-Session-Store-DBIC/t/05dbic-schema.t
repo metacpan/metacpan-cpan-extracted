@@ -21,7 +21,7 @@ BEGIN {
     eval { require Catalyst::Model::DBIC::Schema }
         or plan skip_all => "Catalyst::Model::DBIC::Schema is required for this test";
 
-    plan tests => 14;
+    plan tests => 21;
 
     $TestApp::DB_FILE = "$FindBin::Bin/session.db";
 
@@ -61,6 +61,16 @@ $mech->get_ok("http://localhost/flash/output?key=$key", 'request to get flash va
 $mech->content_is($value, 'got session value back');
 
 # Check session
+$mech->get_ok("http://localhost/session/output?key=$key", 'request to get session value');
+$mech->content_is($value, 'got session value back');
+
+# Check change_session_id
+$mech->get_ok("http://localhost/session/sessionid", 'request current session ID');
+my $sid = $mech->content;
+$mech->get_ok("http://localhost/session/change", 'request to change session ID');
+$mech->content_is('ok', 'successful');
+$mech->get_ok("http://localhost/session/sessionid", 'request current session ID');
+ok($mech->content ne $sid, 'session ID changed');
 $mech->get_ok("http://localhost/session/output?key=$key", 'request to get session value');
 $mech->content_is($value, 'got session value back');
 

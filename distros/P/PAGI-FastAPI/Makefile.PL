@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
+use v5.36;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -21,6 +20,7 @@ WriteMakefile(
         'Future::AsyncAwait' => '0.60',
         'Type::Tiny'         => '2.000000',
         'JSON::PP'           => '4.00',
+        'JSON::MaybeXS'      => '1.004',
     },
 
     TEST_REQUIRES => {
@@ -41,6 +41,10 @@ WriteMakefile(
             'PAGI::FastAPI::Depends' => {
                 file    => 'lib/PAGI/FastAPI/Depends.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Depends.pm'),
+            },
+            'PAGI::FastAPI::WebSocket' => {
+                file    => 'lib/PAGI/FastAPI/WebSocket.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/WebSocket.pm'),
             },
         },
         resources   => {

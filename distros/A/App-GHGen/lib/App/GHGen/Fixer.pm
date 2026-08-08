@@ -11,9 +11,40 @@ our @EXPORT_OK = qw(
 	apply_fixes
 	can_auto_fix
 	fix_workflow
+	%ACTION_UPDATES
 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+=head1 PACKAGE DATA
+
+=head2 %ACTION_UPDATES
+
+Canonical mapping of outdated action strings to their current replacements.
+
+    'old/action@vN' => 'old/action@vM'
+
+This hash is the B<single source of truth> for action version knowledge.
+Both C<find_outdated_actions> (detection) and C<update_actions> (mutation)
+consume it so that detecting an outdated action always implies the ability
+to fix it — and vice versa.
+
+Premise 1: the Analyzer reports every key in this hash as "outdated".
+Premise 2: the Fixer replaces every key with its value.
+Conclusion: no detected issue is unfixable, and no fix targets an undetected issue.
+
+=cut
+
+our %ACTION_UPDATES = (
+	'actions/cache@v4'        => 'actions/cache@v5',
+	'actions/cache@v3'        => 'actions/cache@v5',
+	'actions/checkout@v5'     => 'actions/checkout@v6',
+	'actions/checkout@v4'     => 'actions/checkout@v6',
+	'actions/checkout@v3'     => 'actions/checkout@v6',
+	'actions/setup-node@v3'   => 'actions/setup-node@v4',
+	'actions/setup-python@v4' => 'actions/setup-python@v5',
+	'actions/setup-go@v4'     => 'actions/setup-go@v5',
+);
 
 =head1 NAME
 
@@ -153,36 +184,39 @@ Modifies C<$workflow> in place.
 
 =cut
 
+# File-scoped dispatch table for apply_fixes.
+# Premise: can_auto_fix guarantees type ∈ {performance,security,cost,maintenance}.
+# Conclusion: we only need to match on (type, message pattern) — no further type
+# validation is required inside the loop.
+# Each rule: [ type_string, compiled_pattern, handler_sub ].
+# Using anonymous delegates (not direct coderefs) so symbol-table mocks work.
+my @_APPLY_RULES = (
+	[ 'performance', qr/caching/,                sub($wf) { add_caching($wf)          } ],
+	[ 'security',    qr/unpinned/,               sub($wf) { fix_unpinned_actions($wf)  } ],
+	[ 'security',    qr/permissions/,            sub($wf) { add_permissions($wf)       } ],
+	[ 'maintenance', qr/outdated action/,        sub($wf) { update_actions($wf)        } ],
+	[ 'cost',        qr/concurrency/,            sub($wf) { add_concurrency($wf)       } ],
+	[ 'cost',        qr/triggers/,               sub($wf) { add_trigger_filters($wf)   } ],
+	[ 'maintenance', qr/runner/,                 sub($wf) { update_runners($wf)        } ],
+	[ 'performance', qr/missing timeout-minutes/, sub($wf) { add_missing_timeout($wf)  } ],
+);
+
 sub apply_fixes($workflow, $issues) {
 	my $modified = 0;
 
 	for my $issue (@$issues) {
+		# Guard: can_auto_fix is a complete predicate — if it returns false the
+		# type is guaranteed not in the dispatch table, so skip immediately.
 		next unless can_auto_fix($issue);
 
-        if ($issue->{type} eq 'performance' && $issue->{message} =~ /caching/) {
-            $modified += add_caching($workflow);
-        }
-        elsif ($issue->{type} eq 'security' && $issue->{message} =~ /unpinned/) {
-            $modified += fix_unpinned_actions($workflow);
-        }
-        elsif ($issue->{type} eq 'security' && $issue->{message} =~ /permissions/) {
-            $modified += add_permissions($workflow);
-        }
-        elsif ($issue->{type} eq 'maintenance' && $issue->{message} =~ /outdated action/) {
-            $modified += update_actions($workflow);
-        }
-        elsif ($issue->{type} eq 'cost' && $issue->{message} =~ /concurrency/) {
-            $modified += add_concurrency($workflow);
-        }
-        elsif ($issue->{type} eq 'cost' && $issue->{message} =~ /triggers/) {
-            $modified += add_trigger_filters($workflow);
-        }
-        elsif ($issue->{type} eq 'maintenance' && $issue->{message} =~ /runner/) {
-            $modified += update_runners($workflow);
-        } elsif ($issue->{type} eq 'performance' && $issue->{message} =~ /missing timeout-minutes/) {
-		$modified += add_missing_timeout($workflow);
+		for my $rule (@_APPLY_RULES) {
+			my ($type, $pattern, $handler) = @$rule;
+			if ($issue->{type} eq $type && $issue->{message} =~ $pattern) {
+				$modified += $handler->($workflow);
+				last;	# first-match-wins; one issue maps to exactly one fix
+			}
+		}
 	}
-    }
 
 	return $modified;
 }
@@ -300,7 +334,7 @@ sub detect_and_create_cache_step($steps) {
         my $run = $step->{run} // '';
 
         # Node.js
-        if ($run =~ /npm (install|ci)/ || ($step->{uses} && $step->{uses} =~ /setup-node/)) {
+        if ($run =~ /npm (?:install|ci)/ || ($step->{uses} && $step->{uses} =~ /setup-node/)) {
             return {
                 name => 'Cache dependencies',
                 uses => 'actions/cache@v5',
@@ -326,7 +360,7 @@ sub detect_and_create_cache_step($steps) {
         }
 
         # Rust
-        if ($run =~ /cargo (build|test)/) {
+        if ($run =~ /cargo (?:build|test)/) {
             return {
                 name => 'Cache cargo',
                 uses => 'actions/cache@v5',
@@ -338,7 +372,7 @@ sub detect_and_create_cache_step($steps) {
         }
 
         # Go
-        if ($run =~ /go (build|test)/ || ($step->{uses} && $step->{uses} =~ /setup-go/)) {
+        if ($run =~ /go (?:build|test)/ || ($step->{uses} && $step->{uses} =~ /setup-go/)) {
             return {
                 name => 'Cache Go modules',
                 uses => 'actions/cache@v5',
@@ -363,7 +397,7 @@ sub fix_unpinned_actions($workflow) {
         for my $step (@$steps) {
             next unless $step->{uses};
 
-            if ($step->{uses} =~ /^(.+)\@(master|main)$/) {
+            if ($step->{uses} =~ /^(.+?)\@(?:master|main)$/) {
                 my $action = $1;
                 # Map to appropriate version
                 my $version = get_latest_version($action);
@@ -387,32 +421,22 @@ sub update_actions($workflow) {
 	my $jobs = $workflow->{jobs} or return 0;
 	my $modified = 0;
 
-    my %updates = (
-        'actions/cache@v4' => 'actions/cache@v5',
-        'actions/cache@v3' => 'actions/cache@v5',
-        'actions/checkout@v5' => 'actions/checkout@v6',
-        'actions/checkout@v4' => 'actions/checkout@v6',
-        'actions/checkout@v3' => 'actions/checkout@v6',
-        'actions/setup-node@v3' => 'actions/setup-node@v4',
-        'actions/setup-python@v4' => 'actions/setup-python@v5',
-        'actions/setup-go@v4' => 'actions/setup-go@v5',
-    );
+	# Premise: %ACTION_UPDATES is the canonical version table (defined above).
+	# Conclusion: this function and find_outdated_actions (Analyzer) are always in sync.
+	for my $job (values %$jobs) {
+		my $steps = $job->{steps} or next;
+		for my $step (@$steps) {
+			next unless $step->{uses};
+			for my $old (keys %ACTION_UPDATES) {
+				if ($step->{uses} =~ /^\Q$old\E/) {
+					$step->{uses} = $ACTION_UPDATES{$old};
+					$modified++;
+				}
+			}
+		}
+	}
 
-    for my $job (values %$jobs) {
-        my $steps = $job->{steps} or next;
-        for my $step (@$steps) {
-            next unless $step->{uses};
-
-            for my $old (keys %updates) {
-                if ($step->{uses} =~ /^\Q$old\E/) {
-                    $step->{uses} = $updates{$old};
-                    $modified++;
-                }
-            }
-        }
-    }
-
-    return $modified;
+	return $modified;
 }
 
 sub add_concurrency($workflow) {

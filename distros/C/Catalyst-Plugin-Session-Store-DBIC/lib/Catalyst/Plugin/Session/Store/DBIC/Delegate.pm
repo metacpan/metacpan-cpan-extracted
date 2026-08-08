@@ -6,6 +6,8 @@ use base qw/Class::Accessor::Fast/;
 use Carp qw/carp/;
 use Scalar::Util qw/blessed/;
 
+our $VERSION = '0.15'; # VERSION
+
 __PACKAGE__->mk_accessors(qw/model id_field data_field _session_row _flash_row/);
 
 =head1 NAME
@@ -113,7 +115,7 @@ sub flush {
         my $row = $self->$_;
         next unless $row;
 
-        # Check the size if available to avoid silent trucation on e.g. MySQL
+        # Check the size if available to avoid silent truncation on e.g. MySQL
         my $data_field = $self->data_field;
         if (my $size = $row->result_source->column_info($data_field)->{size}) {
             my $total_size = length($row->$data_field);
@@ -142,13 +144,39 @@ sub _clear_instance_data {
     $self->_flash_row(undef);
 }
 
+=head2 clear_session
+
+Deletes the session row for this delegate, forcing a re-fetch on the next access.
+
+=cut
+
+sub clear_session {
+    my ($self) = @_;
+
+    $self->_session_row(undef);
+}
+
+=head2 clear_flash
+
+Deletes the flash row for this delegate, forcing a re-fetch on the next access.
+
+=cut
+
+sub clear_flash {
+    my ($self) = @_;
+
+    $self->_flash_row(undef);
+}
+
 =head1 AUTHOR
 
 Daniel Westermann-Clark E<lt>danieltwc@cpan.orgE<gt>
 
+Andrew Rodland E<lt>andrew@cleverdomain.orgE<gt>
+
 =head1 COPYRIGHT
 
-Copyright 2006-2008 Daniel Westermann-Clark, all rights reserved.
+Copyright 2006-2008 the L</AUTHORS> as listed above.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

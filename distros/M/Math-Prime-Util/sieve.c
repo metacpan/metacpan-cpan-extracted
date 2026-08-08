@@ -12,6 +12,7 @@
 #include "primality.h"
 #include "montmath.h"
 #include "prime_counts.h"
+#include "legendre_phi.h"
 
 /* Is it better to do a partial sieve + primality tests vs. full sieve? */
 static bool do_partial_sieve(UV startp, UV endp) {
@@ -154,6 +155,16 @@ static UV sieve_prefill(unsigned char* mem, UV startd, UV endd)
   return vnext_prime;
 }
 
+/* This preps the sieve but doesn't pre-sieve anything */
+static UV sieve_clrfill(unsigned char* mem, UV startd, UV endd)
+{
+  UV nbytes = endd - startd + 1;
+  memset(mem, 0, nbytes);
+  if (startd == 0) mem[0] = 0x01; /* remove 1 */
+  return 7;
+}
+
+
 /* Marking primes is done the same way we used to do with tables, but
  * now uses heavily unrolled code based on Kim Walisch's mod-30 sieve.
  */
@@ -164,33 +175,46 @@ static const unsigned char qinit30[30] =
     {0,0,1,1,1,1,1,1,2,2,2,2,3,3,4,4,4,4,5,5,6,6,6,6,7,7,7,7,7,7};
 
 typedef struct {
-  uint32_t prime;
   UV       offset;
+  uint32_t prime;
   uint8_t  index;
 } wheel_t;
 
+#define CROSS_CASE(v, bit, bset, mult, iadd) \
+  case (v + bit): if (pos >= bytes) { w->index = v + bit; break;} \
+                  set_bit(s + pos, bset); \
+                  pos += (UV)r * mult + iadd
+
 #define CROSS_INDEX(v, b0,b1,b2,b3,b4,b5,b6,b7,  i0,i1,i2,i3,i4,i5,i6,i7, it) \
   while (1) { \
-    case (v+0): if(s>=send){w->index=v+0;break;} set_bit(s,b0); s += r*6+i0; \
-    case (v+1): if(s>=send){w->index=v+1;break;} set_bit(s,b1); s += r*4+i1; \
-    case (v+2): if(s>=send){w->index=v+2;break;} set_bit(s,b2); s += r*2+i2; \
-    case (v+3): if(s>=send){w->index=v+3;break;} set_bit(s,b3); s += r*4+i3; \
-    case (v+4): if(s>=send){w->index=v+4;break;} set_bit(s,b4); s += r*2+i4; \
-    case (v+5): if(s>=send){w->index=v+5;break;} set_bit(s,b5); s += r*4+i5; \
-    case (v+6): if(s>=send){w->index=v+6;break;} set_bit(s,b6); s += r*6+i6; \
-    case (v+7): if(s>=send){w->index=v+7;break;} set_bit(s,b7); s += r*2+i7; \
-    while (s + r*28 + it-1 < send) { \
-      set_bit(s + r *  0 +  0, b0); \
-      set_bit(s + r *  6 + i0, b1); \
-      set_bit(s + r * 10 + i0+i1, b2); \
-      set_bit(s + r * 12 + i0+i1+i2, b3); \
-      set_bit(s + r * 16 + i0+i1+i2+i3, b4); \
-      set_bit(s + r * 18 + i0+i1+i2+i3+i4, b5); \
-      set_bit(s + r * 22 + i0+i1+i2+i3+i4+i5, b6); \
-      set_bit(s + r * 28 + i0+i1+i2+i3+i4+i5+i6, b7); \
-      s += r*30 + it; \
+    CROSS_CASE(v, 0, b0, 6, i0); \
+    CROSS_CASE(v, 1, b1, 4, i1); \
+    CROSS_CASE(v, 2, b2, 2, i2); \
+    CROSS_CASE(v, 3, b3, 4, i3); \
+    CROSS_CASE(v, 4, b4, 2, i4); \
+    CROSS_CASE(v, 5, b5, 4, i5); \
+    CROSS_CASE(v, 6, b6, 6, i6); \
+    CROSS_CASE(v, 7, b7, 2, i7); \
+    { \
+      UV span = (UV)r*28 + it; \
+      if (span <= bytes) { \
+        UV lastpos = bytes - span; \
+        while (pos <= lastpos) { \
+          unsigned char* m = s + pos; \
+          set_bit(m + r *  0 +  0, b0); \
+          set_bit(m + r *  6 + i0, b1); \
+          set_bit(m + r * 10 + i0+i1, b2); \
+          set_bit(m + r * 12 + i0+i1+i2, b3); \
+          set_bit(m + r * 16 + i0+i1+i2+i3, b4); \
+          set_bit(m + r * 18 + i0+i1+i2+i3+i4, b5); \
+          set_bit(m + r * 22 + i0+i1+i2+i3+i4+i5, b6); \
+          set_bit(m + r * 28 + i0+i1+i2+i3+i4+i5+i6, b7); \
+          pos += (UV)r*30 + it; \
+        } \
+      } \
     } \
   }
+
 static wheel_t create_wheel(UV startp, uint32_t prime)
 {
   wheel_t w;
@@ -198,7 +222,7 @@ static wheel_t create_wheel(UV startp, uint32_t prime)
   UV p2 = q*q;
 
   if (startp == 0) {
-    wheel_t ws = { prime, p2/30, qinit30[q % 30]  +  8*masknum30[prime % 30] };
+    wheel_t ws = { p2/30, prime, qinit30[q % 30]  +  8*masknum30[prime % 30] };
     return ws;
   }
 
@@ -218,12 +242,11 @@ static wheel_t create_wheel(UV startp, uint32_t prime)
 
 static void mark_primes(unsigned char* s, UV bytes, wheel_t* w)
 {
-  if (w->offset >= bytes) {
-    w->offset -= bytes;
+  UV pos = w->offset;
+  if (pos >= bytes) {
+    w->offset = pos - bytes;
   } else {
-    const unsigned char* send = s + bytes;
     uint32_t r = w->prime / 30;
-    s += w->offset;
     switch (w->index) {
       CROSS_INDEX( 0, 0,1,2,3,4,5,6,7, 0,0,0,0,0,0,0,1,  1); break;
       CROSS_INDEX( 8, 1,5,4,0,7,3,2,6, 1,1,1,0,1,1,1,1,  7); break;
@@ -234,7 +257,7 @@ static void mark_primes(unsigned char* s, UV bytes, wheel_t* w)
       CROSS_INDEX(48, 6,2,3,7,0,4,5,1, 5,3,1,4,1,3,5,1, 23); break;
       CROSS_INDEX(56, 7,6,5,4,3,2,1,0, 6,4,2,4,2,4,6,1, 29); break;
     }
-    w->offset = s - send;
+    w->offset = pos - bytes;
   }
 }
 
@@ -266,29 +289,32 @@ static void _primality_test_sieve(unsigned char* mem, UV startp, UV endp) {
       mem[p/30] |= masktab30[p%30];  /* mark the sieve location.       */
   } END_DO_FOR_EACH_SIEVE_PRIME;
 }
+
 static void _sieve_range(unsigned char* mem, const unsigned char* sieve, UV startd, UV endd, UV limit) {
   UV startp = 30*startd;
-  UV start_base_prime = sieve_prefill(mem, startd, endd);
-  START_DO_FOR_EACH_SIEVE_PRIME(sieve, 0, start_base_prime, limit) { /* Sieve */
-    wheel_t w = create_wheel(startp, p);
-    mark_primes(mem, endd-startd+1, &w);
-  } END_DO_FOR_EACH_SIEVE_PRIME;
+  UV start_base_prime = limit >= 13 ? sieve_prefill(mem, startd, endd)
+                                    : sieve_clrfill(mem, startd, endd);
+  if (start_base_prime <= limit) {
+    START_DO_FOR_EACH_SIEVE_PRIME(sieve, 0, start_base_prime, limit) {
+      wheel_t w = create_wheel(startp, p);
+      mark_primes(mem, endd-startd+1, &w);
+    } END_DO_FOR_EACH_SIEVE_PRIME;
+  }
 }
 
-bool sieve_segment_partial(unsigned char* mem, UV startd, UV endd, UV depth)
+static void _sieve_partial(unsigned char* mem, UV startd, UV endd, UV depth)
 {
   const unsigned char* sieve;
   UV startp = 30*startd,  endp = (endd >= (UV_MAX/30)) ? UV_MAX-2 : 30*endd+29;
   UV limit = isqrt(endp);
-  MPUassert(mem != 0 && endd >= startd && endp >= startp && depth >= 13,
-            "sieve_segment_partial bad arguments");
+  MPUassert(mem != 0 && endd >= startd && endp >= startp && depth >= 5,
+            "_sieve_partial bad arguments");
   /* limit = min( sqrt(end), max-64-bit-prime, requested depth ) */
   if (limit > max_sieve_prime)  limit = max_sieve_prime;
   if (limit > depth)  limit = depth;
-  get_prime_cache(limit, &sieve);                      /* Get sieving primes  */
+  get_prime_cache(limit, &sieve);                /* Get sieving primes  */
   _sieve_range(mem, sieve, startd, endd, limit);
   release_prime_cache(sieve);
-  return 1;
 }
 
 /* Segmented mod-30 wheel sieve */
@@ -297,50 +323,41 @@ bool sieve_segment(unsigned char* mem, UV startd, UV endd)
   const unsigned char* sieve;
   UV startp = 30*startd,  endp = (endd >= (UV_MAX/30)) ? UV_MAX-2 : 30*endd+29;
   UV sieve_size,  limit = isqrt(endp);
-  int do_partial = do_partial_sieve(startp, endp);
+
   MPUassert(mem != 0 && endd >= startd && endp >= startp,
             "sieve_segment bad arguments");
 
-  sieve_size = get_prime_cache(0, &sieve);
+  sieve_size = get_prime_cache(0, 0);          /* Quick primary size probe */
 
   if (sieve_size >= endp) {
 
-    /* We can just use the primary cache */
-    memcpy(mem, sieve+startd, endd-startd+1);
-    release_prime_cache(sieve);
+    get_prime_cache(endp, &sieve);             /* Get the actual cache */
+    memcpy(mem, sieve+startd, endd-startd+1);  /* Fast copy */
+    release_prime_cache(sieve);                /* Release the cache */
 
-  } else if (!do_partial && sieve_size >= limit) {
+  } else if (do_partial_sieve(startp, endp)) {
 
-    /* Full sieve and we have all sieving primes in hand */
-    _sieve_range(mem, sieve, startd, endd, limit);
-    release_prime_cache(sieve);
+    limit >>= ((startp < (UV)1e16) ? 8 : 10);  /* Reduce size */
+    _sieve_partial(mem, startd, endd, limit);  /* Partial sieve */
+    _primality_test_sieve(mem, startp, endp);  /* BPSW each candidate */
 
   } else {
 
-    release_prime_cache(sieve);
-    if (do_partial)
-      limit >>= ((startp < (UV)1e16) ? 8 : 10);
-
-    /* sieve_segment_partial(mem, startd, endd, limit); */
-    get_prime_cache(limit, &sieve);
-    _sieve_range(mem, sieve, startd, endd, limit);
-    release_prime_cache(sieve);
-
-    if (do_partial)
-      _primality_test_sieve(mem, startp, endp);
+    _sieve_partial(mem, startd, endd, limit);  /* Sieve to full depth */
 
   }
   return 1;
 }
 
-bool sieve_segment_wheel(unsigned char* mem, UV startd, UV endd, wheel_t *warray, uint32_t wsize)
+static bool sieve_segment_wheel(unsigned char* mem, UV startd, UV endd, wheel_t *warray, uint32_t wsize)
 {
-  uint32_t i = 0, limit, start_base_prime;
-  uint32_t segsize = endd - startd + 1;
+  uint32_t i = 0, limit, start_base_prime, segsize;
   UV startp = 30*startd;
   UV endp = (endd >= (UV_MAX/30))  ?  UV_MAX-2  :  30*endd+29;
-  MPUassert(mem != 0 && endd >= startd && endp >= startp,
-            "sieve_segment bad arguments");
+  MPUassert(mem != 0 && wsize > 0 &&
+            endd >= startd && endp >= startp && endd-startd < UINT32_MAX,
+            "sieve_segment_wheel bad arguments");
+  segsize = (uint32_t)(endd - startd + 1);
 
   /* possibly use primary cache directly */
 
@@ -419,13 +436,14 @@ void* start_segment_primes(UV low, UV high, unsigned char** segmentmem)
     /* Evenly split the range into segments */
     div = (range+size-1)/size;
     size = (div <= 1)  ?  range  :  (range+div-1)/div;
+    size = ((size + sizeof(UV)-1) / sizeof(UV)) * sizeof(UV);
     ctx->segment_size = size;
     New(0, ctx->segment, size, unsigned char);
   } else
 #endif
   ctx->segment = get_prime_segment( &(ctx->segment_size) );
   *segmentmem = ctx->segment;
-  nsegments = (((high-low+29)/30)+ctx->segment_size-1) / ctx->segment_size;
+  nsegments = ((ctx->hid - ctx->lod + 1) + ctx->segment_size - 1) / ctx->segment_size;
 
   MPUverbose(3, "segment sieve: byte range %lu split into %lu segments of size %lu\n", (unsigned long)range, (unsigned long)nsegments, (unsigned long)ctx->segment_size);
 
@@ -452,7 +470,7 @@ void* start_segment_primes(UV low, UV high, unsigned char** segmentmem)
       MPUverbose(4, "segment sieve %lu - %lu, primes to %lu (max %lu)\n", (unsigned long)low, (unsigned long)high, (unsigned long)limit, (unsigned long)nprimes);
       New(0, warray, nprimes, wheel_t);
       START_DO_FOR_EACH_PRIME(0,limit) {
-        if (wsize >= nprimes) croak("segment bad upper count");
+        MPUassert(wsize < nprimes, "start_segment_primes bad max_nprimes");
         w.prime = p;
         warray[wsize++] = w;
       } END_DO_FOR_EACH_PRIME;
@@ -487,6 +505,10 @@ bool next_segment_primes(void* vctx, UV* base, UV* low, UV* high)
     sieve_segment_wheel(ctx->segment, ctx->lod, seghigh_d, ctx->warray, ctx->wsize);
   else
     sieve_segment(ctx->segment, ctx->lod, seghigh_d);
+
+  /* Prime extraction reads whole UV words.  Mark final padding composite. */
+  if (range_d % sizeof(UV))
+    memset(ctx->segment + range_d, 0xFF, sizeof(UV) - range_d % sizeof(UV));
 
   ctx->lod += range_d;
   ctx->low = *high + 2;
@@ -539,10 +561,15 @@ UV range_prime_sieve(UV**list, UV lo, UV hi)
 
 uint32_t range_prime_sieve_32(uint32_t** list, uint32_t n, uint32_t offset)
 {
-  uint32_t *P, i = offset;
+  uint32_t *P, np, i = offset;
+  Size_t maxoffset = MAX_SIZET / sizeof(uint32_t);  /* Max allocation */
 
   if (n < 2) { *list = 0; return 0; }
-  New(0, P, max_nprimes(n) + offset + 3, uint32_t);         /* Allocate list */
+  np = max_nprimes(n);
+  maxoffset = (maxoffset > UINT32_MAX ? UINT32_MAX : maxoffset) - np - 3;
+  MPUassert( offset <= maxoffset,
+             "range_prime_sieve_32 cannot fit primes with large offset");
+  New(0, P, np + offset + 3, uint32_t);                     /* Allocate list */
   if (offset > 0)  memset(P, 0, offset * sizeof(uint32_t)); /* Zero to offset */
   P[i++] = 2;  P[i++] = 3;  P[i++] = 5;                     /* Fill in 2/3/5 */
 
@@ -560,4 +587,54 @@ uint32_t range_prime_sieve_32(uint32_t** list, uint32_t n, uint32_t offset)
   while (P[i-1] > n)  i--;  /* Truncate the count if necesssary. */
   *list = P;
   return i-offset;          /* Returns number of primes, excluding offset */
+}
+void free_prime_sieve_32(uint32_t* list)
+{
+  Safefree(list);
+}
+
+UV range_partial_sieve(UV** list, UV lo, UV hi, UV depth)
+{
+  UV *P, i = 0, j, n, count, dlo, dhi, base, k;
+  unsigned char *mem;
+
+  if (hi < lo || hi < 2) { *list = 0; return 0; }
+  if (lo < 2) lo = 2;
+
+  /* At this depth, all surviving candidates are primes. */
+  if (depth >= isqrt(hi) || depth >= max_sieve_prime)
+    return range_prime_sieve(list, lo, hi);
+
+  k = prime_count(depth > 47 ? 47 : depth);
+  count = legendre_phi(hi,k) - legendre_phi(lo-1,k) + k;
+  New(0, P, count, UV);
+
+  if (depth >= 2 && lo <= 2 && hi >= 2) { P[i++] = 2; lo = 3; }
+  if (depth >= 3 && lo <= 3 && hi >= 3) { P[i++] = 3; lo = 5; }
+  if (depth >= 5 && lo <= 5 && hi >= 5) { P[i++] = 5; lo = 7; }
+
+  if (depth < 2) {
+    for (j = 0; j <= hi-lo; j++)
+      P[i++] = lo+j;
+  } else if (depth < 5) {
+    for (n = lo | 1; n <= hi; n += 2) {
+      if (depth == 2 || (n % 3))  P[i++] = n;
+      if (hi-n < 2) break;
+    }
+  } else {
+    dlo = lo / 30;
+    dhi = hi / 30;
+    base = 30 * dlo;
+    /* Make sure the last word is zeroed.  Overkill here. */
+    Newz(0, mem, dhi - dlo + 1 + sizeof(UV), unsigned char);
+
+    _sieve_partial(mem, dlo, dhi, depth);
+    START_DO_FOR_EACH_SIEVE_PRIME(mem, base, lo, hi)
+      P[i++] = p;
+    END_DO_FOR_EACH_SIEVE_PRIME
+    Safefree(mem);
+  }
+
+  *list = P;
+  return i;
 }

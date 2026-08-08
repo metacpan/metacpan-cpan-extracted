@@ -145,6 +145,76 @@ static int ps_path_unsafe(const char *p, STRLEN len) {
     return 0;
 }
 
+/* ---- serving one file ------------------------------------------------------
+ * The stat / conditional-request / header / body half of a static response,
+ * split out so the markdown mount can serve the images and other assets
+ * sitting alongside its documents with exactly this behaviour rather than a
+ * second implementation that drifts from it.
+ *
+ * Returns the finished triplet (+1 owned), or NULL when `file` is not a
+ * regular file or cannot be opened - the caller decides what its own 404
+ * looks like. The path is used as given: the traversal guard belongs to
+ * whoever built it out of untrusted input. */
+
+static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
+                         int is_head) {
+    Stat_t st;
+    char date[64];
+    SV **e;
+
+    if (PerlLIO_stat(file, &st) < 0 || !S_ISREG(st.st_mode)) return NULL;
+    ps_http_date(date, sizeof date, (time_t)st.st_mtime);
+
+    /* If-Modified-Since: an exact match is all a static file needs - the
+     * date we would send is the date they were given. */
+    e = env ? hv_fetchs(env, "HTTP_IF_MODIFIED_SINCE", 0) : NULL;
+    if (e && *e && SvOK(*e) && strEQ(SvPV_nolen(*e), date)) {
+        AV *resp = newAV(), *headers = newAV(), *body = newAV();
+        av_push(headers, newSVpvs("Last-Modified"));
+        av_push(headers, newSVpv(date, 0));
+        av_push(body, newSVpvs(""));
+        av_push(resp, newSViv(304));
+        av_push(resp, newRV_noinc((SV *)headers));
+        av_push(resp, newRV_noinc((SV *)body));
+        return newRV_noinc((SV *)resp);
+    }
+
+    {
+        AV *resp = newAV(), *headers = newAV();
+        av_push(headers, newSVpvs("Content-Type"));
+        av_push(headers, newSVpv(ps_content_type(file, flen), 0));
+        av_push(headers, newSVpvs("Content-Length"));
+        av_push(headers, newSViv((IV)st.st_size));
+        av_push(headers, newSVpvs("Last-Modified"));
+        av_push(headers, newSVpv(date, 0));
+        av_push(resp, newSViv(200));
+        av_push(resp, newRV_noinc((SV *)headers));
+
+        if (is_head) {                        /* the headers, no body */
+            AV *body = newAV();
+            av_push(body, newSVpvs(""));
+            av_push(resp, newRV_noinc((SV *)body));
+        }
+        else {
+            /* a real filehandle: the server streams or sendfiles it rather
+             * than us slurping the file into memory */
+            PerlIO *fp = PerlIO_open(file, "rb");
+            GV *gv;
+            IO *io;
+            if (!fp) {
+                SvREFCNT_dec((SV *)resp);
+                return NULL;
+            }
+            gv = newGVgen("Punk::Static");
+            io = GvIOn(gv);
+            IoIFP(io)  = fp;
+            IoTYPE(io) = IoTYPE_RDONLY;
+            av_push(resp, newRV_inc((SV *)gv));
+        }
+        return newRV_noinc((SV *)resp);
+    }
+}
+
 /* ---- the app ---------------------------------------------------------------
  * The PSGI coderef's body: a magic CV whose capture is [ $dir ]. Everything
  * a request needs happens here, with no Perl frame at all. */
@@ -159,8 +229,7 @@ XS_INTERNAL(punk_static_cb) {
     const char *dir, *path, *method;
     STRLEN dlen, plen, mlen = 3;
     char file[MAXPATHLEN + 1];
-    Stat_t st;
-    char date[64];
+    SV *resp;
     int is_head = 0;
 
     if (!cap || items < 1) XSRETURN_EMPTY;
@@ -192,64 +261,10 @@ XS_INTERNAL(punk_static_cb) {
     memcpy(file + dlen, path, plen);
     file[dlen + plen] = '\0';
 
-    if (PerlLIO_stat(file, &st) < 0 || !S_ISREG(st.st_mode)) {
-        ST(0) = sv_2mortal(ps_plain(aTHX_ 404, "Not Found", NULL, NULL));
-        XSRETURN(1);
-    }
-    ps_http_date(date, sizeof date, (time_t)st.st_mtime);
-
-    /* If-Modified-Since: an exact match is all a static file needs - the
-     * date we would send is the date they were given. */
-    e = hv_fetchs(env, "HTTP_IF_MODIFIED_SINCE", 0);
-    if (e && *e && SvOK(*e) && strEQ(SvPV_nolen(*e), date)) {
-        AV *resp = newAV(), *headers = newAV(), *body = newAV();
-        av_push(headers, newSVpvs("Last-Modified"));
-        av_push(headers, newSVpv(date, 0));
-        av_push(body, newSVpvs(""));
-        av_push(resp, newSViv(304));
-        av_push(resp, newRV_noinc((SV *)headers));
-        av_push(resp, newRV_noinc((SV *)body));
-        ST(0) = sv_2mortal(newRV_noinc((SV *)resp));
-        XSRETURN(1);
-    }
-
-    {
-        AV *resp = newAV(), *headers = newAV();
-        av_push(headers, newSVpvs("Content-Type"));
-        av_push(headers, newSVpv(ps_content_type(file, dlen + plen), 0));
-        av_push(headers, newSVpvs("Content-Length"));
-        av_push(headers, newSViv((IV)st.st_size));
-        av_push(headers, newSVpvs("Last-Modified"));
-        av_push(headers, newSVpv(date, 0));
-        av_push(resp, newSViv(200));
-        av_push(resp, newRV_noinc((SV *)headers));
-
-        if (is_head) {                        /* the headers, no body */
-            AV *body = newAV();
-            av_push(body, newSVpvs(""));
-            av_push(resp, newRV_noinc((SV *)body));
-        }
-        else {
-            /* a real filehandle: the server streams or sendfiles it rather
-             * than us slurping the file into memory */
-            PerlIO *fp = PerlIO_open(file, "rb");
-            GV *gv;
-            IO *io;
-            if (!fp) {
-                SvREFCNT_dec((SV *)resp);
-                ST(0) = sv_2mortal(ps_plain(aTHX_ 404, "Not Found",
-                                            NULL, NULL));
-                XSRETURN(1);
-            }
-            gv = newGVgen("Punk::Static");
-            io = GvIOn(gv);
-            IoIFP(io)  = fp;
-            IoTYPE(io) = IoTYPE_RDONLY;
-            av_push(resp, newRV_inc((SV *)gv));
-        }
-        ST(0) = sv_2mortal(newRV_noinc((SV *)resp));
-        XSRETURN(1);
-    }
+    resp = ps_serve_file(aTHX_ env, file, dlen + plen, is_head);
+    if (!resp) resp = ps_plain(aTHX_ 404, "Not Found", NULL, NULL);
+    ST(0) = sv_2mortal(resp);
+    XSRETURN(1);
 }
 
 #endif /* PUNK_STATIC_H */

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000062';
+our $VERSION = '0.000063';
 
 use Carp qw/croak/;
 use Cwd qw/abs_path/;

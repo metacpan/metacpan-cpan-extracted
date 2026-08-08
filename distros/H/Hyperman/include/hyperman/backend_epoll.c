@@ -201,11 +201,16 @@ static int ep_wait(hm_backend *be, hm_event *out, int max, double timeout) {
 static void ep_destroy(hm_backend *be) {
     hm_ep_state *st = (hm_ep_state *)be->state;
     if (st) {
-        int fd;
-        for (fd = 0; fd < HM_MAXFD; fd++)
-            if (st->kind[fd] == EP_TIMER) close(fd);
-        if (st->sfd >= 0) close(st->sfd);
-        if (st->ep >= 0) close(st->ep);
+        /* be->foreign: inherited across a fork - these descriptors are the
+         * parent's, and closing our duplicates only frees numbers the child
+         * has already reused */
+        if (!be->foreign) {
+            int fd;
+            for (fd = 0; fd < HM_MAXFD; fd++)
+                if (st->kind[fd] == EP_TIMER) close(fd);
+            if (st->sfd >= 0) close(st->sfd);
+            if (st->ep >= 0) close(st->ep);
+        }
         free(st);
     }
     free(be);

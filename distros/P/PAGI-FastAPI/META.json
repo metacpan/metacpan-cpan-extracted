@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Future::AsyncAwait" : "0.60",
+            "JSON::MaybeXS" : "1.004",
             "JSON::PP" : "4.00",
             "PAGI" : "0.002001",
             "Type::Tiny" : "2.000000",
@@ -48,15 +49,19 @@
    "provides" : {
       "PAGI::FastAPI" : {
          "file" : "lib/PAGI/FastAPI.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       },
       "PAGI::FastAPI::Context" : {
          "file" : "lib/PAGI/FastAPI/Context.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       },
       "PAGI::FastAPI::Depends" : {
          "file" : "lib/PAGI/FastAPI/Depends.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
+      },
+      "PAGI::FastAPI::WebSocket" : {
+         "file" : "lib/PAGI/FastAPI/WebSocket.pm",
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
@@ -70,6 +75,6 @@
          "web" : "https://github.com/manwar/PAGI-FastAPI"
       }
    },
-   "version" : "v0.0.5",
+   "version" : "v0.0.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

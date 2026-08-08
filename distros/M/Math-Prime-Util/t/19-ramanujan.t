@@ -9,7 +9,6 @@ use Math::Prime::Util qw/ ramanujan_sum hclassno ramanujan_tau /;
 #my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
 #my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 #my $usegmp= Math::Prime::Util::prime_get_config->{'gmp'};
-#$use64 = 0 if $use64 && 18446744073709550592 == ~0;
 
 my %hclassno = (
       -3 => 0,
@@ -40,6 +39,7 @@ my %hclassno = (
 );
 
 my %rtau = (
+      -5 => 0,
        0 => 0,
        1 => 1,
        2 => -24,

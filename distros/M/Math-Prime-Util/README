@@ -1,4 +1,4 @@
-Math::Prime::Util version 0.74
+Math::Prime::Util version 0.75
 
 A comprehensive number theory module for Perl, also available as "ntheory".
 It provides over 370 functions covering:
@@ -82,7 +82,7 @@ running on a 64-bit machine will result in a 32-bit library.
 
 DEPENDENCIES
 
-Perl 5.6.2 or later (5.8 or later is preferred).
+Perl 5.8.1 or later.
 
 C89 compiler, 32-bit or 64-bit.
 

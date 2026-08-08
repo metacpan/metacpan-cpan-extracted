@@ -859,10 +859,41 @@ int get_ptr(pTHX_ SV * sv, MAGIC * mg) {
             const infix_type * pointee =
                 (res->category == INFIX_TYPE_POINTER) ? res->meta.pointer_info.pointee_type : res;
 
-            /* Unwrap terminal string/void protections for the inner pin if needed */
-            const infix_type * pin_type = _unwrap_pin_type(pointee);
+            /* WString (wchar_t*): convert the wide string to a Perl UTF-8 string.
+               Only uint16/uint32 pointers whose width matches wchar_t are treated
+               as WString, mirroring the marshaling in get_opcode_for_type. */
+            if (pointee->category == INFIX_TYPE_PRIMITIVE && pointee->size == sizeof(wchar_t) &&
+                (pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT16 ||
+                 pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT32)) {
+                size_t el_sz = pointee->size;
+                wchar_t * ws = (wchar_t *)addr;
+                size_t act = 0;
+                while (el_sz == 2 ? ((uint16_t *)ws)[act] : ((uint32_t *)ws)[act])
+                    act++;
+                U8 * buf = (U8 *)safemalloc(act * UTF8_MAXBYTES + 1);
+                U8 * d = buf;
+                for (size_t i = 0; i < act; i++) {
+                    UV cp = (el_sz == 2) ? ((uint16_t *)ws)[i] : ((uint32_t *)ws)[i];
+                    if (el_sz == 2 && cp >= 0xD800 && cp <= 0xDBFF && i + 1 < act) {
+                        uint16_t low = ((uint16_t *)ws)[i + 1];
+                        if (low >= 0xDC00 && low <= 0xDFFF) {
+                            cp = 0x10000 + (((cp - 0xD800) << 10) | (low - 0xDC00));
+                            i++;
+                        }
+                    }
+                    d = uvchr_to_utf8(d, cp);
+                }
+                *d = '\0';
+                sv_setpvn(sv, (char *)buf, d - buf);
+                SvUTF8_on(sv);
+                safefree(buf);
+            }
+            else {
+                /* Unwrap terminal string/void protections for the inner pin if needed */
+                const infix_type * pin_type = _unwrap_pin_type(pointee);
 
-            pull_pointer_as_pin(aTHX_ nullptr, sv, pin_type, &addr, im->readonly);
+                pull_pointer_as_pin(aTHX_ nullptr, sv, pin_type, &addr, im->readonly);
+            }
         }
     }
 
@@ -963,6 +994,33 @@ int set_ptr(pTHX_ SV * sv, MAGIC * mg) {
                 (pointee->meta.primitive_id == INFIX_PRIMITIVE_SINT8 ||
                  pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT8)) {
                 new_addr = (void *)SvPV_nolen(sv);
+            }
+            else if (pointee->category == INFIX_TYPE_PRIMITIVE && pointee->size == sizeof(wchar_t) &&
+                     (pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT16 ||
+                      pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT32)) {
+                /* WString (wchar_t*): convert the Perl UTF-8 string to UTF-16/32.
+                   Mirror CASE_OP_PUSH_PTR_WCHAR. Buffer lifetime matches the pin's
+                   arena (struct liveness) when available, mirroring StringList. */
+                STRLEN wlen;
+                U8 * s = (U8 *)SvPVutf8(sv, wlen);
+                U8 * e = s + wlen;
+                size_t el_sz = pointee->size;
+                wchar_t * wbuf = (wchar_t *)(im->arena ? infix_arena_alloc(im->arena, (wlen + 1) * el_sz, el_sz)
+                                                       : safemalloc((wlen + 1) * el_sz));
+                wchar_t * d = wbuf;
+                while (s < e) {
+                    UV uv = utf8_to_uvchr_buf(s, e, nullptr);
+                    if (el_sz == 2 && uv > 0xFFFF) {
+                        uv -= 0x10000;
+                        *d++ = (wchar_t)((uv >> 10) + 0xD800);
+                        *d++ = (wchar_t)((uv & 0x3FF) + 0xDC00);
+                    }
+                    else
+                        *d++ = (wchar_t)uv;
+                    s += UTF8SKIP(s);
+                }
+                *d = 0;
+                new_addr = wbuf;
             }
             else {
                 new_addr = INT2PTR(void *, SvUV(sv));

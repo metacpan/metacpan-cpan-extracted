@@ -12,14 +12,14 @@ use Math::Prime::Util qw/ prime_get_config
                           urandomb urandomm random_bytes
                           addint subint add1int sub1int logint modint cmpint
                           mulint divint powint modint lshiftint rshiftint
-                          sqrtint cdivint
+                          muladdint mulsubint sqrtint cdivint
                           powmod invmod
                           vecsum vecprod gcd is_odd fromdigits
                         /;
 
 BEGIN {
   $Math::Prime::Util::RandomPrimes::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::RandomPrimes::VERSION = '0.74';
+  $Math::Prime::Util::RandomPrimes::VERSION = '0.75';
 }
 
 BEGIN {
@@ -27,7 +27,6 @@ BEGIN {
   do { require Math::BigInt;  Math::BigInt->import(try=>"GMP,GMPz,LTM,Pari"); }
     unless defined $Math::BigInt::VERSION;
 
-  use constant OLD_PERL_VERSION=> $] < 5.008;
   use constant MPU_MAXBITS     => (~0 == 4294967295) ? 32 : 64;
   use constant MPU_64BIT       => MPU_MAXBITS == 64;
   use constant MPU_32BIT       => MPU_MAXBITS == 32;
@@ -186,9 +185,6 @@ my $_random_prime = sub {
 
     # We're going to look at the odd numbers only.
     my $oddrange = (($high - $low) >> 1) + 1;
-
-    croak "Large random primes not supported on old Perl"
-      if OLD_PERL_VERSION && MPU_64BIT && $oddrange > 4294967295;
 
     # If $low is large (e.g. >10 digits) and $range is small (say ~10k), it
     # would be fastest to call primes in the range and randomly pick one.  I'm
@@ -449,9 +445,6 @@ sub random_nbit_prime {
     return _random_xscount_prime($bits,$_d_bits);
   }
 
-  croak "Mid-size random primes not supported on broken old Perl"
-    if OLD_PERL_VERSION && MPU_64BIT && $bits > 49 && $bits <= 64;
-
   # Fouque and Tibouchi (2011) Algorithm 1 (basic)
   # Modified to make sure the nth bit is always set.
   #
@@ -471,7 +464,6 @@ sub random_nbit_prime {
   #
   if (1 && $bits > MPU_MAXBITS) {
     my $l = (MPU_64BIT && $bits > 79)  ?  63  :  31;
-    $l = 49 if $l == 63 && OLD_PERL_VERSION;  # Fix for broken Perl 5.6
     $l = $bits-2 if $bits-2 < $l;
     my $lbits = $bits - $l - 1;
 
@@ -577,7 +569,7 @@ sub random_maurer_prime {
   croak "random_maurer_prime, bits must be >= 2" unless $k >= 2;
   $k = int("$k");
 
-  return random_nbit_prime($k)  if $k <= MPU_MAXBITS && !OLD_PERL_VERSION;
+  return random_nbit_prime($k)  if $k <= MPU_MAXBITS;
 
   my ($n, $cert) = random_maurer_prime_with_cert($k);
   croak "maurer prime $n failed certificate verification!"
@@ -595,7 +587,6 @@ sub random_maurer_prime_with_cert {
 
   # Results for random_nbit_prime are proven for all native bit sizes.
   my $p0 = MPU_MAXBITS;
-  $p0 = 49 if OLD_PERL_VERSION && MPU_MAXBITS > 49;
 
   if ($k <= $p0) {
     my $n = random_nbit_prime($k);
@@ -780,10 +771,10 @@ sub _ST_Random_prime {  # From FIPS 186-4
   my $t = cdivint($x, $c02);
   _make_big_gcds() if $_big_gcd_use < 0;
   while (1) {
-    my $c = add1int(mulint($t,$c02));
+    my $c = muladdint($t,$c02,1);
     if ($c > 2*$k2) {
       $t = cdivint($k2, $c02);
-      $c = add1int(mulint($t,$c02));
+      $c = muladdint($t,$c02,1);
     }
     $prime_gen_counter++;
 
@@ -853,7 +844,7 @@ sub random_safe_prime {
     my $qm = modint($q, 1155);  # a nice native int
     next if ($qm % 3) != 2
          || ($qm % 5) == 2 || ($qm % 7) == 3 || ($qm % 11) == 5;
-    $p = mulint(2, $q) + 1;
+    $p = muladdint(2, $q, 1);
     # This is sufficient, but we'll do the full test including pre-tests.
     #last if is_pseudoprime($p,2);  # p is prime if q is prime
     last if is_prob_prime($p);
@@ -943,9 +934,6 @@ sub random_strong_prime {
   croak "random_strong_prime, bits must be >= 128" unless $t >= 128;
   $t = int("$t");
 
-  croak "Random strong primes must be >= 173 bits on old Perl"
-    if OLD_PERL_VERSION && MPU_64BIT && $t < 173;
-
   my $l   = (($t+1) >> 1) - 2;
   my $lp  = ($t >> 1) - 20;
   my $lpp = $l - 20;
@@ -958,15 +946,15 @@ sub random_strong_prime {
     my $iu = divint(subint(lshiftint(2,$l),2),$qpp2);
     my $istart = addint($il, urandomm($iu - $il + 1));
     for (my $i = $istart; $i <= $iu; $i=add1int($i)) {  # Search for q
-      my $q = add1int(mulint($i,$qpp2));
+      my $q = muladdint($i,$qpp2,1);
       next unless is_prob_prime($q);
       my $qqp2 = mulint($q,$qp2);
-      my $pp = sub1int(mulint($qp2, powmod($qp, $q-2, $q)));
+      my $pp = mulsubint($qp2, powmod($qp, $q-2, $q), 1);
       my $jl = cdivint(subint(lshiftint(1,$t-1),$pp), $qqp2);
       my $ju = divint(subint(lshiftint(1,$t),$pp+1), $qqp2);
       my $jstart = addint($jl, urandomm($ju - $jl + 1));
       for (my $j = $jstart; $j <= $ju; $j=add1int($j)) {  # Search for p
-        my $p = addint($pp, mulint($j,$qqp2));
+        my $p = muladdint($j,$qqp2,$pp);
         return $p if is_prob_prime($p);
       }
     }
@@ -1011,7 +999,7 @@ Math::Prime::Util::RandomPrimes - Generate random primes
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 
 =head1 SYNOPSIS

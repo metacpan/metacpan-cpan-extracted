@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $Math::Prime::Util::ZetaBigFloat::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::ZetaBigFloat::VERSION = '0.74';
+  $Math::Prime::Util::ZetaBigFloat::VERSION = '0.75';
 }
 
 BEGIN {
@@ -433,7 +433,7 @@ sub RiemannR {
   Math::BigFloat->accuracy($xdigits);
   $x->accuracy($xdigits);
   my $tol = $x->copy->bone->brsft($xdigits-1, 10);
-  my $sum = $x->copy->bone;
+  my $sum = $x->copy->bzero;
 
   if ($xdigits <= length($x->copy->as_int->bstr())) {
 
@@ -457,6 +457,8 @@ sub RiemannR {
       @_Riemann_Zeta_Premult = ();
       $_Riemann_Zeta_premult_accuracy = $xdigits;
     }
+
+    $sum += 1;
 
     for my $k (1 .. 10000) {
       my $zeta_term = $_Riemann_Zeta_Premult[$k-1];
@@ -513,7 +515,7 @@ Math::Prime::Util::ZetaBigFloat - Perl Big Float versions of Riemann Zeta and R 
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 
 =head1 SYNOPSIS

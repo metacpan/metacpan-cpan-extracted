@@ -1,10 +1,13 @@
 #include <stdio.h>
+#include <math.h>
 
 #include "ptypes.h"
 #include "rational.h"
 #define FUNC_gcd_ui 1
 #include "util.h"
 #include "totients.h"
+#undef B0
+#undef B1
 
 
 int contfrac(UV** cfrac, UV *rem, UV num, UV den)
@@ -22,6 +25,39 @@ int contfrac(UV** cfrac, UV *rem, UV num, UV den)
   *rem = num;
   *cfrac = cf;
   return steps;
+}
+
+bool convergents(UV** P, UV** Q, UV* cfrac, size_t len)
+{
+  size_t i;
+  UV A0, A1, B0, B1, An, Bn, *ps, *qs;
+
+  if (len < 1 || len > 2 * BITS_PER_WORD || cfrac == 0)
+    return 0;
+  New(0, ps, len, UV);
+  New(0, qs, len, UV);
+
+  A0 = 1;  A1 = cfrac[0];
+  B0 = 0;  B1 = 1;
+  ps[0] = A1;  qs[0] = B1;
+  for (i = 1; i < len; i++) {
+    UV a = cfrac[i];
+    if (a == 0 || UV_MAX/a < A1 || UV_MAX/a < B1) break;
+    An = a * A1;  Bn = a * B1;
+    if (UV_MAX - An < A0 || UV_MAX - Bn < B0) break;
+    An += A0;  Bn += B0;
+    A0 = A1;  A1 = An;
+    B0 = B1;  B1 = Bn;
+    ps[i] = A1;  qs[i] = B1;
+  }
+  if (i < len) {
+    Safefree(ps);
+    Safefree(qs);
+    return 0;
+  }
+  *P = ps;
+  *Q = qs;
+  return 1;
 }
 
 bool next_calkin_wilf(UV* num, UV* den)
@@ -49,7 +85,7 @@ bool next_calkin_wilf(UV* num, UV* den)
 }
 bool next_stern_brocot(UV* num, UV* den)
 {
-  UV n, d;
+  UV n, d, index;
   if (num == 0 || den == 0) return 0;
   n = *num;
   d = *den;
@@ -71,7 +107,9 @@ bool next_stern_brocot(UV* num, UV* den)
    * then back down.  That is, from the right, invert all L/R from the end
    * to and including the right L.  This really isn't a huge savings over
    * doing the full process.  Doing nth(n(F)+1) is clean. */
-  return nth_stern_brocot(num, den, 1+stern_brocot_n(*num, *den));
+  index = stern_brocot_n(*num, *den);
+  if (index == 0 || index == UV_MAX) return 0;
+  return nth_stern_brocot(num, den, index+1);
 }
 
 
@@ -98,8 +136,14 @@ UV calkin_wilf_n(UV num, UV den)
   uint32_t bit, d = 1, shift = 0;
   int i, steps = contfrac(&cf, &rem, num, den);
 
-  if (rem != 1)   croak("Rational must be reduced");
-  if (steps == 0) return 0;
+  if (rem != 1) {
+    Safefree(cf);
+    croak("Rational must be reduced");
+  }
+  if (steps == 0) {
+    Safefree(cf);
+    return 0;
+  }
 
   cf[steps-1]--;
   for (i = 0; i < steps; i++) {
@@ -169,24 +213,42 @@ UV nth_stern_diatomic(UV n)
 UV farey_length(uint32_t n)
 {
   UV t = sumtotient(n);
-  return (t == 0)  ?  0  :  1 + sumtotient(n);
+  return (t == 0)  ?  0  :  1 + t;
 }
 
 bool next_farey(uint32_t n, uint32_t* p, uint32_t* q)
 {
-  IV ivu, ivg;
-  UV u, uvp, uvq;
+  IV ivu, ivv;
+  UV g, uvp, uvq, r, tail, h, np, nq;
 
   if (n == 0 || p == 0 || q == 0 || *p >= *q) return 0;
 
-  ivg = gcdext( (IV)*p, (IV)*q, &ivu, 0, 0, 0);
+  uvp = *p;  uvq = *q;
+  g = gcd_ui(uvp, uvq);
+  if (g > 1) { uvp /= g;  uvq /= g; }
 
-  u = ivu;
-  uvp = *p / ivg;
-  uvq = *q / ivg;
+  if (uvq > n || uvq > (UV)IV_MAX) return 0;
 
-  *q = ((n+u) / uvq) * uvq - u;
-  *p = (*q * uvp + 1) / uvq;
+  if (gcdext((IV)uvp, (IV)uvq, &ivu, &ivv, 0, 0) != 1)
+    croak("next_farey: internal gcd / gcdext error");
+
+  if (ivu <= 0) {
+    r = (UV)0 - (UV)ivu;
+    tail = (UV)ivv;
+  } else {
+    UV vabs = (UV)0 - (UV)ivv;
+    r = uvq - (UV)ivu;
+    if (vabs > uvp) return 0;
+    tail = uvp - vabs;
+  }
+
+  h = (n - r) / uvq;
+  nq = h * uvq + r;
+  np = h * uvp + tail;
+  if (np > nq || nq > n) return 0;
+
+  *p = (uint32_t)np;
+  *q = (uint32_t)nq;
   return 1;
 }
 
@@ -197,6 +259,8 @@ UV farey_array(uint32_t n, uint32_t **rnum, uint32_t **rden)
   UV len = farey_length(n);
 
   if (n < 1 || len < 2 || len >= UVCONST(4294967295))
+    return 0;
+  if (len > MAX_SIZET / sizeof(*num))
     return 0;
 
   New(0, num, len, uint32_t);
@@ -238,14 +302,19 @@ UV farey_array(uint32_t n, uint32_t **rnum, uint32_t **rden)
 UV farey_rank(uint32_t n, uint32_t p, uint32_t q)
 {
   uint32_t *count, i, g;
+  Size_t count_len;
   UV sum;
 
   if (n == 0 || q == 0 || p == 0) return 0;
+  if (n == UINT32_MAX) return UV_MAX;
 
   g = gcd_ui(p,q);
   if (g != 1) { p /= g;  q /= g; }
+  if ((UV)n > UV_MAX / (UV)p) return UV_MAX;
 
-  New(0, count, n+1, uint32_t);
+  count_len = (Size_t)n + 1;
+  if (count_len > MAX_SIZET / sizeof(*count)) return UV_MAX;
+  New(0, count, count_len, uint32_t);
 
   for (i = 2; i <= n; i++)
     count[i] = ((UV)i * p - 1) / q;
@@ -254,6 +323,10 @@ UV farey_rank(uint32_t n, uint32_t p, uint32_t q)
     uint32_t j, icount = count[i];
     for (j = i; j <= n-i; j += i)
       count[j+i] -= icount;
+    if ((UV)icount >= UV_MAX - sum) {
+      Safefree(count);
+      return UV_MAX;
+    }
     sum += icount;
   }
   Safefree(count);
@@ -285,36 +358,51 @@ int kth_farey(uint32_t n, UV k, uint32_t* p, uint32_t* q)
   return 1;
 }
 #else
-static bool _walk_to_k(uint32_t a, uint32_t n, uint32_t k, uint32_t* p, uint32_t* q)
+static int _walk_to_k(uint32_t a, uint32_t n, UV k, uint32_t* p, uint32_t* q)
 {
-  uint32_t g, j, p0, q0, p1, q1, p2, q2;
+  uint32_t g, up1, uq1;
+  UV j, p0, q0, p1, q1, p2, q2;
 
   g = gcd_ui(a,n);
   p0 = a/g;
   q0 = n/g;
 
-  if (k == 0) { *p = p0;  *q = q0;  return 1; }
+  if (k == 0) {
+    *p = (uint32_t)p0;
+    *q = (uint32_t)q0;
+    return 1;
+  }
 
   /* From the single point, use extgcd to get the exact next fraction */
-  p1 = p0; q1 = q0;
-  next_farey(n, &p1, &q1);
+  up1 = (uint32_t)p0;
+  uq1 = (uint32_t)q0;
+  if (!next_farey(n, &up1, &uq1)) return -1;
+  p1 = up1;
+  q1 = uq1;
 
   /* Now we have two fractions, so quick step through */
   while (--k) {
+    if (q0 > UV_MAX - (UV)n) return -1;
     j = (q0 + n) / q1;
-    p2 = j * p1 - p0;
-    q2 = j * q1 - q0;
+    if (j == 0 || p1 > UV_MAX/j || q1 > UV_MAX/j) return -1;
+    p2 = j * p1;
+    q2 = j * q1;
+    if (p2 < p0 || q2 < q0) return -1;
+    p2 -= p0;
+    q2 -= q0;
     p0 = p1; p1 = p2;  q0 = q1; q1 = q2;
   }
-  *p = p1;
-  *q = q1;
+  if (p1 > UINT32_MAX || q1 > UINT32_MAX) return -1;
+  *p = (uint32_t)p1;
+  *q = (uint32_t)q1;
   return 1;
 }
-bool kth_farey(uint32_t n, UV k, uint32_t* p, uint32_t* q)
+int kth_farey(uint32_t n, UV k, uint32_t* p, uint32_t* q)
 {
   uint32_t lo = 1, hi = n;
   UV cnt = 1;
 
+  if (n == 0) return 0;
   if (k < 2) {
     if (k == 0) { *p = 0;  *q = 1; }
     else        { *p = 1;  *q = n; }
@@ -332,12 +420,16 @@ bool kth_farey(uint32_t n, UV k, uint32_t* p, uint32_t* q)
   if (n >= 5) {
     uint32_t const ginc = ((UV)n+8191)>>13;
     double   const dlen  = 1 + (0.304*(double)n*n + .29*(double)n + 0.95);
-    uint32_t guess = k * ((double)n/dlen);
+    double   const dguess = (double)k * ((double)n/dlen);
+    uint32_t guess;
     UV gcnt = 0;
-    if (guess <= lo) guess = lo+1; else if (guess >= hi) guess = hi-1;
+    if (dguess <= (double)lo)      guess = lo+1;
+    else if (dguess >= (double)hi) guess = hi-1;
+    else                           guess = (uint32_t)dguess;
 
     if (lo < hi) {
       gcnt = farey_rank(n, guess, n);
+      if (gcnt == UV_MAX) return -1;
       if (gcnt <= k) { lo = guess; cnt = gcnt; } else { hi = guess-1; }
     }
 
@@ -349,6 +441,7 @@ bool kth_farey(uint32_t n, UV k, uint32_t* p, uint32_t* q)
 
     if (lo < hi && guess > lo && guess < hi) {
       gcnt = farey_rank(n,guess,n);
+      if (gcnt == UV_MAX) return -1;
       if (gcnt <= k) { lo = guess; cnt = gcnt; } else { hi = guess-1; }
     }
   }
@@ -358,6 +451,7 @@ bool kth_farey(uint32_t n, UV k, uint32_t* p, uint32_t* q)
   while (lo < hi) {
     uint32_t mid = lo + ((hi-lo+1)>>1);
     UV midcnt = farey_rank(n, mid, n);
+    if (midcnt == UV_MAX) return -1;
     if (midcnt <= k)  { lo = mid;  cnt = midcnt; }
     else              { hi = mid-1; }
   }
@@ -369,3 +463,56 @@ bool kth_farey(uint32_t n, UV k, uint32_t* p, uint32_t* q)
   return _walk_to_k(lo, n, k-cnt, p, q);
 }
 #endif
+
+
+bool bestrational(UV* n, UV* d, NV x, UV dbound)
+{
+  UV a, p0, q0, p1, q1, p2, q2, qlimit, ps, qs;
+  NV xabs, rem, invrem, pserr, p1err;
+  xabs = x < 0.0 ? -x : x;
+  if (dbound == 0 || !(xabs < (NV)UV_MAX))
+    return 0;
+  p0 = 1;  q0 = 0;
+  p1 = (UV)xabs;  q1 = 1;
+  rem = xabs - (NV)p1;
+  while (rem > 0.0) {
+    invrem = 1.0 / rem;
+    /* Converting a floating value outside the UV range is undefined. */
+    if (!(invrem < (NV)UV_MAX)) return 0;
+    a      = (UV)invrem;
+    rem    = invrem - (NV)a;
+    if (a == 0) return 0;
+    /* qlimit = largest multiplier m s.t. m*q1+q0 <= dbound.
+     * Safe (no overflow): dbound >= q0 is a loop invariant, q1 >= 1.
+     * If a > qlimit then q2 > dbound (covers UV overflow of a*q1 too). */
+    qlimit = (dbound - q0) / q1;
+    if (a > qlimit) {
+      /* q2 > dbound: check best semiconvergent */
+      if (qlimit >= 1) {
+        if (p1 != 0 && qlimit > (UV_MAX - p0) / p1) return 0;
+        ps = qlimit * p1 + p0;
+        qs = qlimit * q1 + q0;
+        pserr = (NV)ps - xabs*(NV)qs;
+        p1err = (NV)p1 - xabs*(NV)q1;
+        if (pserr < 0.0) pserr = -pserr;
+        if (p1err < 0.0) p1err = -p1err;
+        if (pserr * (NV)q1 < p1err * (NV)qs) {
+          p1 = ps;  q1 = qs;
+        }
+      }
+      break;
+    }
+    /* a <= qlimit guarantees q2 = a*q1+q0 <= dbound <= UV_MAX: no overflow */
+    q2 = a * q1 + q0;
+    /* Check numerator overflow; if p2 doesn't fit in UV, fall back to PP */
+    if (UV_MAX/a < p1) return 0;
+    p2 = a * p1;
+    if (UV_MAX - p2 < p0) return 0;
+    p2 += p0;
+    p0 = p1;  q0 = q1;
+    p1 = p2;  q1 = q2;
+  }
+  *n = p1;
+  *d = q1;
+  return 1;
+}

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Perm;
-$Mojolicious::Plugin::Fondation::Perm::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Perm::VERSION = '0.04';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use DBIx::Class::Relationship::ManyToMany::Async;
 
@@ -70,7 +70,7 @@ Mojolicious::Plugin::Fondation::Perm - Permission management plugin for Fondatio
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

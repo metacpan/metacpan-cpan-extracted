@@ -6,6 +6,7 @@ use strict;
 
 use YAML::XS qw(LoadFile);
 use Path::Tiny;
+use App::GHGen::Fixer qw(%ACTION_UPDATES);
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -14,7 +15,7 @@ our @EXPORT_OK = qw(
 	get_cache_suggestion
 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -398,7 +399,7 @@ sub find_unpinned_actions($workflow) {
         my $steps = $job->{steps} or next;
         for my $step (@$steps) {
             next unless $step->{uses};
-            if ($step->{uses} =~ /\@(master|main)$/) {
+            if ($step->{uses} =~ /\@(?:master|main)$/) {
                 push @unpinned, $step->{uses};
             }
         }
@@ -429,7 +430,7 @@ sub has_outdated_runners($workflow) {
 
     for my $job (values %$jobs) {
         my $runs_on = $job->{'runs-on'} or next;
-        return 1 if $runs_on =~ /ubuntu-18\.04|ubuntu-16\.04|macos-10\.15/;
+        return 1 if $runs_on =~ /\A(?:ubuntu-(?:18|16)\.04|macos-10\.15)\z/;
     }
     return 0;
 }
@@ -443,9 +444,9 @@ sub detect_project_type($workflow) {
         my $steps = $job->{steps} or next;
         for my $step (@$steps) {
             my $run = $step->{run} // '';
-            return 'npm' if $run =~ /npm (install|ci)/;
+            return 'npm' if $run =~ /npm (?:install|ci)/;
             return 'pip' if $run =~ /pip install/;
-            return 'cargo' if $run =~ /cargo (build|test)/;
+            return 'cargo' if $run =~ /cargo (?:build|test)/;
             return 'bundler' if $run =~ /bundle install/;
         }
     }
@@ -456,37 +457,68 @@ sub min($a, $b) {
     return $a < $b ? $a : $b;
 }
 
+=head2 find_outdated_actions($workflow)
+
+Return a list of human-readable upgrade notices for any action whose version
+string is a key in C<App::GHGen::Fixer::ACTION_UPDATES>.
+
+=head3 Purpose
+
+Detect C<uses:> entries that reference a known-outdated action version.
+The detection set is derived directly from C<%ACTION_UPDATES> in
+C<App::GHGen::Fixer>, so it is always in sync with what C<update_actions>
+can fix: every action flagged here can be auto-fixed, and every action the
+Fixer knows about is flagged here.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$workflow> (HashRef, required)
+
+A parsed workflow hash.
+
+=back
+
+=head3 Returns
+
+A list of strings of the form C<"old/action\@vN E<rarr> new/action\@vM">,
+one per outdated step found.  Returns an empty list when none are detected.
+
+=head3 Side Effects
+
+None.  Pure function.
+
+=head3 FORMAL SPECIFICATION
+
+    find_outdated_actions : Workflow → seq ℤ*
+
+    outdated ≔ { "$old → $new" ∣ job ∈ w.jobs, step ∈ job.steps,
+                  old ∈ dom(%ACTION_UPDATES), step.uses =~ /^\Qold\E/ }
+    result ≔ seq(outdated)
+
+=cut
+
 sub find_outdated_actions($workflow) {
 	my @outdated;
 	my $jobs = $workflow->{jobs} or return @outdated;
 
-    # Known outdated versions
-    my %updates = (
-        'actions/cache@v4' => 'actions/cache@v5',
-        'actions/cache@v3' => 'actions/cache@v5',
-        'actions/checkout@v5' => 'actions/checkout@v6',
-        'actions/checkout@v4' => 'actions/checkout@v6',
-        'actions/checkout@v3' => 'actions/checkout@v6',
-        'actions/setup-node@v3' => 'actions/setup-node@v4',
-        'actions/setup-python@v4' => 'actions/setup-python@v5',
-        'actions/setup-go@v4' => 'actions/setup-go@v5',
-    );
+	# Premise: %ACTION_UPDATES (from Fixer) is the single source of truth.
+	# Conclusion: every action this function flags can also be fixed by update_actions.
+	for my $job (values %$jobs) {
+		my $steps = $job->{steps} or next;
+		for my $step (@$steps) {
+			next unless $step->{uses};
+			my $uses = $step->{uses};
+			for my $old (keys %ACTION_UPDATES) {
+				if ($uses =~ /^\Q$old\E/) {
+					push @outdated, "$old → $ACTION_UPDATES{$old}";
+				}
+			}
+		}
+	}
 
-    for my $job (values %$jobs) {
-        my $steps = $job->{steps} or next;
-        for my $step (@$steps) {
-            next unless $step->{uses};
-            my $uses = $step->{uses};
-
-            for my $old (keys %updates) {
-                if ($uses =~ /^\Q$old\E/) {
-                    push @outdated, "$old → $updates{$old}";
-                }
-            }
-        }
-    }
-
-    return @outdated;
+	return @outdated;
 }
 
 sub has_deployment_steps($workflow) {

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('DBIx::Loop', $VERSION);
@@ -19,7 +19,7 @@ DBIx::Loop - non-blocking DBI on your event loop
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -208,6 +208,13 @@ result shapes, wrapped in a future:
     $db->selectrow_hashref($sql, @bind)    # -> { col => val } or undef
     $db->selectcol_arrayref($sql, @bind)   # -> [ first column... ]
     $db->selectall_hashref($sql, $key, @bind)  # -> { key_val => {row} }
+    $db->selectall_rowhash($sql, @bind)        # -> [ { col => val }, ... ]
+
+C<selectall_rowhash> is DBI's
+C<< selectall_arrayref($sql, { Slice => {} }) >>: every row as a hashref, in
+the order the server returned them. C<selectall_hashref> cannot stand in for
+it - keying rows by a column destroys the ordering, which is exactly what
+keyset pagination depends on.
 
 Unlike DBI these take C<@bind> directly (no C<\%attr> slot). There is
 deliberately no C<prepare>/C<execute>/C<fetchrow_*> statement-handle surface:
@@ -234,6 +241,60 @@ that ecosystem (IO::Async C<Future>, C<Mojo::Promise>, AnyEvent condvar). One
 conformance suite (t/lib/AdapterConformance.pm) proves every adapter behaves
 identically. Adapters with a C-side loop (Hyperman) can install a C vtable so
 readiness dispatches with no Perl call frame.
+
+=head1 C ABI
+
+An XS module can run statements and consume the resulting futures without a
+Perl frame in between. F<include/dbil_abi.h> declares a versioned
+function-pointer table:
+
+=over 4
+
+=item * C<connect> - C<< DBI->connect >> plus the constructor, as one call.
+Returns C<NULL> and sets an error SV rather than croaking, so a consumer can
+fall back instead of dying at boot.
+
+=item * C<hyperman_adapter> - the Hyperman loop adapter, built on a loop the
+caller names. Always name the loop: an adapter left to choose for itself when
+no loop is running constructs one that nothing will ever run, and its futures
+never settle.
+
+=item * C<exec> - C<query>/C<do> with the binds already in an AV.
+
+=item * C<exec_shaped> - C<exec> plus one C<select*> reshape as a single
+call, so the intermediate future of query-then-reshape is never built.
+
+=item * C<is_future> / C<future_state> / C<future_values> / C<future_error> -
+settle-path reads. C<is_future> answers for any SV at all, returning false
+for anything that is not one rather than dereferencing whatever it was
+handed, so it is safe to probe with. C<future_values> writes borrowed SVs
+into an array the caller supplies; a stack array is the expected use.
+
+=item * C<future_on_ready> - a C continuation: no closure is compiled and no
+Perl frame runs when the result lands. This is the entry that matters most.
+
+=item * C<future_new> / C<future_done1> / C<future_fail> - for bridging into
+another future type.
+
+=item * C<reshape> - the C<select*> transforms over a result you already
+hold. Returns an error SV instead of croaking, because on the chaining path
+it runs inside a settle and must produce a failed future, not a die.
+
+=back
+
+The table is resolved at runtime through C<DBIx::Loop::_abi_ptr> and gated on
+its C<abi_version>, so there is no link-time coupling and the two
+distributions upgrade independently; entries are only ever appended. Reach
+the header with L<ExtUtils::Depends>:
+
+    my $pkg = ExtUtils::Depends->new('My::Module', 'DBIx::Loop');
+
+Two things about the table are deliberate. Nothing in it allocates a block
+the caller must free - pairing a malloc in one shared object with a free in
+another is a good way to discover that each can carry its own heap. And there
+is no destructor for a connection or a future: both are Perl objects that
+already own their lifetime correctly, so hold a reference and let refcounting
+do it. What the table hands back C<+1>, you C<SvREFCNT_dec>.
 
 =head1 AUTHOR
 

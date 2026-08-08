@@ -405,9 +405,9 @@ sub auto_detect_with_prompt() {
 	print "Generate " . colored(['bold'], uc($top->{type})) . " workflow? [Y/n]: ";
 	chomp(my $response = <STDIN>);
 
-	if ($response =~ /^(y|yes|)$/i) {
+	if ($response =~ /^(?:y(?:es)?)?$/i) {
 		return $top->{type};
-	} elsif ($response =~ /^(n|no)$/i) {
+	} elsif ($response =~ /^n(?:o)?$/i) {
 		say '';
 		say "Cancelled. Use " . colored(['cyan'], "--interactive") .  " to choose manually.";
 		return undef;

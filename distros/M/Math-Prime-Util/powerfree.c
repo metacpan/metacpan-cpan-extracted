@@ -10,6 +10,7 @@
 #include "powerfree.h"
 #include "util.h"
 #include "factor.h"
+#include "moebius.h"
 #include "real.h"
 
 static INLINE UV T(UV n) {
@@ -59,28 +60,31 @@ bool is_powerfree(UV n, uint32_t k)
 static UV squarefree_count(UV n)
 {
   signed char* mu;
-  IV *M, *Mx, Mxisum, mert;
-  UV I, D, i, j, S1 = 0, S2 = 0;
+  void* mctx;
+  int16_t *M;
+  IV *Mx, Mxisum, mert;
+  UV I, D, i, j, lo, hi, S1 = 0, S2 = 0;
 
   if (n < 4) return n;
 
   I = rootint(n, 5);   /* times loglogn ^ (4/5) */
   D = isqrt(n / I);
-  mu = range_moebius(0, D);
 
   S1 += n;
-  New(0, M, D+1, IV);
-  M[0] = 0;
-  M[1] = 1;
-  mert = 1;
-  for (i = 2; i <= D; i++) {
-    if (mu[i] != 0) {
-      S1 += mu[i] * (n/(i*i));
-      mert += mu[i];
+  /* D <= 50,860,970 for native n, where all Mertens values fit int16_t. */
+  New(0, M, D+1, int16_t);
+  mert = 0;
+  mctx = start_segment_moebius(0, D, &mu);
+  while (next_segment_moebius(mctx, &lo, &hi)) {
+    for (i = lo; i <= hi; i++) {
+      signed char mui = mu[i-lo];
+      if (i >= 2 && mui != 0)
+        S1 += mui * (n/(i*i));
+      mert += mui;
+      M[i] = mert;
     }
-    M[i] = mert;
   }
-  Safefree(mu);
+  end_segment_moebius(mctx);
 
   Newz(0, Mx, I+1, IV);
   Mxisum = 0;
@@ -120,11 +124,16 @@ UV powerfree_count(UV n, uint32_t k)
         count += m * (n / ipow(i, k));
     }
   } else {
-    signed char* mu = range_moebius(0, nk);
-    for (i = 2; i <= nk; i++)
-      if (mu[i] != 0)
-        count += mu[i] * (n/ipow(i,k));
-    Safefree(mu);
+    signed char* mu;
+    void* mctx;
+    UV lo, hi;
+    mctx = start_segment_moebius(2, nk, &mu);
+    while (next_segment_moebius(mctx, &lo, &hi)) {
+      for (i = lo; i <= hi; i++)
+        if (mu[i-lo] != 0)
+          count += mu[i-lo] * (n/ipow(i,k));
+    }
+    end_segment_moebius(mctx);
   }
   return count;
 }
@@ -226,8 +235,8 @@ UV powerfree_part_sum(UV n, uint32_t k)
 
 UV nth_powerfree(UV n, uint32_t k)
 {
-  long double zm;
-  UV qk, count, diff, thresh, i;
+  long double zm, estimate;
+  UV qk, count, diff, delta, thresh, i;
 
   if (k < 2) return 0;
   if (n < 4) return n;
@@ -242,7 +251,8 @@ UV nth_powerfree(UV n, uint32_t k)
 
   /* Step 1:  Density ZM and expected value QK. */
   zm = 1.0 + ld_riemann_zeta(k);
-  qk = (UV)(zm * (long double) n + 0.5);
+  estimate = zm * (long double) n + 0.5L;
+  qk = (estimate >= (long double)UV_MAX) ? UV_MAX : (UV)estimate;
   thresh = (k <= 2) ? 200 : (k == 3) ? 60 : (k == 4) ? 2 : 1;
 
   for (i = 0; i < 10; i++) {
@@ -250,9 +260,11 @@ UV nth_powerfree(UV n, uint32_t k)
     count = powerfree_count(qk, k);
     diff = (count >= n) ? count-n : n-count;
     /* Step 3: Update estimate using expected density. */
-    if (diff <= thresh) break;
-    if (count > n)  qk -= (UV)((long double)diff * zm);
-    else            qk += (UV)((long double)diff * zm);
+    if (diff <= thresh || i == 9) break;
+    estimate = (long double)diff * zm;
+    delta = (estimate >= (long double)UV_MAX) ? UV_MAX : (UV)estimate;
+    if (count > n)  qk = (delta < qk) ? qk-delta : 1;
+    else            qk = (delta <= UV_MAX-qk) ? qk+delta : UV_MAX;
   }
 
   /* Step 4: Get ourselves onto a powerfree number */

@@ -222,7 +222,7 @@ new(class, ...)
             SV         *v = *av_fetch(pairs, i + 1, 0);
             if (klen == 12 && memEQ(k, "template_dir", 12)) {
                 if (SvOK(v)) {
-                    Stat_t st;
+                    struct stat st;
                     if (stat(SvPV_nolen(v), &st) != 0
                         || !S_ISDIR(st.st_mode))
                         croak("Template::Stencil->new: template_dir "
