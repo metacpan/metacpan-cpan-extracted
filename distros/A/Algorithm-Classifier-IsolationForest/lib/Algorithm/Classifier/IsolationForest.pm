@@ -2,14 +2,15 @@ package Algorithm::Classifier::IsolationForest;
 
 use strict;
 use warnings;
-use Carp        qw(croak);
-use Config      ();
-use List::Util  qw(min);
-use POSIX       qw(ceil);
-use JSON::PP    ();
-use File::Slurp qw(read_file write_file);
+use Carp         qw(croak);
+use Config       ();
+use List::Util   qw(min);
+use Scalar::Util qw(looks_like_number);
+use POSIX        qw(ceil);
+use JSON::PP     ();
+use File::Slurp  qw(read_file write_file);
 
-our $VERSION = '0.6.0';
+our $VERSION = '0.7.0';
 
 use constant EULER => 0.5772156649015329;
 
@@ -44,6 +45,16 @@ use constant _NV_IS_DOUBLE => $Config::Config{nvsize} == 8;
 
 # Round an NV to C double precision.  Only ever reached on wide-NV
 # perls -- see _NV_IS_DOUBLE.
+#
+# Args:
+#   $nv :: any number.  On a -Duselongdouble / -Dusequadmath perl it may
+#          carry more precision than a C double can hold.
+#
+# Returns: the same number rounded to the nearest IEEE 754 double.  A no-op
+# for a value that is already double-exact.
+#
+# Example:
+#   _to_double( $lo + rand() * ( $hi - $lo ) );   # what the C builder stores
 sub _to_double { unpack 'd', pack 'd', $_[0] }
 
 # ---------------------------------------------------------------------------
@@ -212,6 +223,55 @@ void pack_input_xs(SV* data_sv, SV* out_sv, int n_pts, int n_feats,
                 } else {
                     dst[k] = (miss_mode == 1) ? fill[k] : missval;
                 }
+            }
+        }
+    }
+}
+
+/* first_missing_xs(data_sv, n_pts, n_feats, out_rv)
+ *
+ * C replacement for _prepare_fit_data's missing => 'die' scan, which is a
+ * pure-Perl double loop over every cell of the training set and, being the
+ * default strategy, the single largest fixed cost of a fit on wide or long
+ * data.  Walks the same arrayref-of-arrayrefs pack_input_xs walks, in the
+ * same row-major order, and stops at the first cell that is undef or
+ * absent, pushing (row, col) into out_rv.  Leaves out_rv empty when every
+ * cell is present.
+ *
+ * A row that is not an arrayref counts as missing at column 0 -- the same
+ * reading pack_input_xs gives it (it fills such a row entirely from the
+ * missing branch), so the two agree on what "present" means. */
+void first_missing_xs(SV* data_sv, int n_pts, int n_feats, SV* out_rv){
+    dTHX;
+    AV *outer, *out;
+    int i, k;
+
+    if (!SvROK(data_sv) || SvTYPE(SvRV(data_sv)) != SVt_PVAV) {
+        croak("first_missing_xs: data must be an arrayref");
+    }
+    if (!SvROK(out_rv) || SvTYPE(SvRV(out_rv)) != SVt_PVAV) {
+        croak("first_missing_xs: out must be an arrayref");
+    }
+    outer = (AV*)SvRV(data_sv);
+    out   = (AV*)SvRV(out_rv);
+    av_clear(out);
+
+    for (i = 0; i < n_pts; i++) {
+        SV** row_pp = av_fetch(outer, i, 0);
+        AV* row;
+        if (!row_pp || !*row_pp || !SvROK(*row_pp) ||
+            SvTYPE(SvRV(*row_pp)) != SVt_PVAV) {
+            av_push(out, newSViv(i));
+            av_push(out, newSViv(0));
+            return;
+        }
+        row = (AV*)SvRV(*row_pp);
+        for (k = 0; k < n_feats; k++) {
+            SV** v = av_fetch(row, k, 0);
+            if (!v || !*v || !SvOK(*v)) {
+                av_push(out, newSViv(i));
+                av_push(out, newSViv(k));
+                return;
             }
         }
     }
@@ -1321,6 +1381,175 @@ void build_forest_openmp_xs(SV* x_sv, int n_pts, int n_feats, int n_trees,
 }
 
 /* ---------------------------------------------------------------------
+ * pack_tree_xs(root_rv, n_features, nodes_sv, idx_sv, val_sv)
+ *
+ * C image of _pack_tree: flattens one tree into the three packed buffers
+ * the scorer walks.  _rebuild_c_trees runs it once per tree at the end of
+ * every fit() and every from_json(), and in Perl each node costs a
+ * recursive closure call, an arrayref and six SVs, plus a trailing map
+ * that pushes every one of those SVs back onto the stack for pack() --
+ * which made it the largest single phase of an axis-mode fit.  This is
+ * the same walk done in C, appending into the TreeBuf above and handing
+ * the three buffers back as plain strings.
+ *
+ * The layout is unchanged: nodes are numbered DFS pre-order (a node's
+ * record is reserved before its children recurse, so the root is 0 and
+ * every child index sits above its parent's -- unlike the post-order
+ * _build_node_packed above), oblique coefficients dense-pack in feature
+ * order when a node uses every feature, and a leaf's slot 2 carries
+ * c(size).  Output is byte-identical to the Perl path.
+ *
+ * The Perl side only calls this on nvsize == 8 perls: c(size) is computed
+ * here in C doubles, and a wide-NV perl's _c() keeps extra low bits, so
+ * the stored leaf adjustment would otherwise differ in the last ulp
+ * between backends -- the same parity concern _NV_IS_DOUBLE guards
+ * everywhere else.
+ * ------------------------------------------------------------------ */
+
+/* Scratch reused across every node of a tree, so packing a node
+ * allocates nothing.  Grown on demand rather than sized once from
+ * n_features: a model saved before n_features was persisted packs with
+ * n_features == -1, which leaves no up-front bound on an oblique node's
+ * coefficient count. */
+typedef struct {
+    double *dense;    /* coefficients by feature index, for the dense pack */
+    int    *order;    /* 0..cap-1 -- the dense pack's index array */
+    int    *ix;       /* sparse pack scratch */
+    double *cv;
+    int     cap;
+} PackScratch;
+
+static void ps_init(PackScratch *s) {
+    s->dense = NULL; s->order = NULL; s->ix = NULL; s->cv = NULL; s->cap = 0;
+}
+
+static void ps_free(PackScratch *s) {
+    free(s->dense); free(s->order); free(s->ix); free(s->cv);
+}
+
+static void ps_reserve(PackScratch *s, int n) {
+    int k;
+    if (n <= s->cap) return;
+    s->dense = (double*)realloc(s->dense, (size_t)n * sizeof(double));
+    s->order = (int*)   realloc(s->order, (size_t)n * sizeof(int));
+    s->ix    = (int*)   realloc(s->ix,    (size_t)n * sizeof(int));
+    s->cv    = (double*)realloc(s->cv,    (size_t)n * sizeof(double));
+    for (k = s->cap; k < n; k++) s->order[k] = k;
+    s->cap = n;
+}
+
+/* c(n) -- the expression _c() evaluates, operation for operation. */
+static double _pt_c(double n) {
+    double harmonic;
+    if (n <= 1.0) return 0.0;
+    if (n == 2.0) return 1.0;
+    harmonic = log(n - 1.0) + 0.5772156649015329;
+    return 2.0 * harmonic - (2.0 * (n - 1.0) / n);
+}
+
+/* Appends the subtree rooted at node_rv to buf; returns its node index. */
+static int _pack_node_xs(pTHX_ SV* node_rv, int n_features, TreeBuf* b,
+                          PackScratch* s) {
+    AV* node;
+    SV** slots;
+    int type, my_idx;
+    double* rec;
+
+    if (!SvROK(node_rv) || SvTYPE(SvRV(node_rv)) != SVt_PVAV) {
+        croak("pack_tree_xs: tree node is not an arrayref");
+    }
+    node  = (AV*)SvRV(node_rv);
+    slots = AvARRAY(node);
+    type  = (int)SvIV(slots[0]);
+
+    /* Reserved before recursing so children are numbered above us. */
+    my_idx = tb_push_node(b, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+    if (type == 0) {
+        double size = SvNV(slots[1]);
+        rec = b->nodes + (size_t)my_idx * IF_NZ;
+        rec[1] = size;
+        rec[2] = _pt_c(size);    /* the rest of the record stays zero */
+    } else if (type == 1) {
+        double attr  = SvNV(slots[1]);
+        double split = SvNV(slots[2]);
+        int li = _pack_node_xs(aTHX_ slots[3], n_features, b, s);
+        int ri = _pack_node_xs(aTHX_ slots[4], n_features, b, s);
+        /* tb_push_node reallocs, so the record's address is only valid
+         * once the children are back. */
+        rec = b->nodes + (size_t)my_idx * IF_NZ;
+        rec[0] = 1.0; rec[1] = attr; rec[2] = split;
+        rec[3] = (double)li; rec[4] = (double)ri;
+    } else {
+        AV *iav, *cav;
+        double bcoef;
+        int num, coff, li, ri, k, dense_ok;
+
+        if (!SvROK(slots[1]) || SvTYPE(SvRV(slots[1])) != SVt_PVAV ||
+            !SvROK(slots[2]) || SvTYPE(SvRV(slots[2])) != SVt_PVAV) {
+            croak("pack_tree_xs: oblique node needs idx/coef arrayrefs");
+        }
+        iav   = (AV*)SvRV(slots[1]);
+        cav   = (AV*)SvRV(slots[2]);
+        bcoef = SvNV(slots[3]);
+        num   = (int)AvFILLp(iav) + 1;
+        ps_reserve(s, num > n_features ? num : n_features);
+
+        for (k = 0; k < num; k++) {
+            s->ix[k] = (int)SvIV(AvARRAY(iav)[k]);
+            s->cv[k] = SvNV(AvARRAY(cav)[k]);
+        }
+
+        /* Dense pack when the node uses every feature, so val[k] is the
+         * coefficient for feature k and score_all_xs can take its
+         * no-gather inner loop.  For any tree this module builds the
+         * indices are a permutation of 0..n_features-1; the range check
+         * only stops a hand-edited model from walking off the scratch,
+         * and the zero-fill covers a repeated index leaving a hole. */
+        dense_ok = (n_features > 0 && num == n_features);
+        for (k = 0; dense_ok && k < num; k++) {
+            if (s->ix[k] < 0 || s->ix[k] >= n_features) dense_ok = 0;
+        }
+        if (dense_ok) {
+            memset(s->dense, 0, (size_t)n_features * sizeof(double));
+            for (k = 0; k < num; k++) s->dense[s->ix[k]] = s->cv[k];
+            coff = tb_push_coef(b, s->order, s->dense, n_features);
+        } else {
+            coff = tb_push_coef(b, s->ix, s->cv, num);
+        }
+
+        li = _pack_node_xs(aTHX_ slots[4], n_features, b, s);
+        ri = _pack_node_xs(aTHX_ slots[5], n_features, b, s);
+        rec = b->nodes + (size_t)my_idx * IF_NZ;
+        rec[0] = 2.0; rec[1] = (double)coff; rec[2] = (double)num;
+        rec[3] = (double)li; rec[4] = (double)ri; rec[5] = bcoef;
+    }
+    return my_idx;
+}
+
+/* n_features may be -1 ("unknown"), which just disables the dense pack.
+ * The three output SVs are overwritten with the packed bytes. */
+void pack_tree_xs(SV* root_rv, int n_features, SV* nodes_sv, SV* idx_sv,
+                   SV* val_sv) {
+    dTHX;
+    TreeBuf b;
+    PackScratch s;
+
+    tb_init(&b);
+    ps_init(&s);
+    _pack_node_xs(aTHX_ root_rv, n_features, &b, &s);
+    ps_free(&s);
+
+    /* An axis-only tree never calls tb_push_coef, so idx/val stay NULL --
+     * pass "" so the Perl side always receives a defined string, matching
+     * what build_forest_openmp_xs hands back. */
+    sv_setpvn(nodes_sv, (char*)b.nodes, b.n_nodes * IF_NZ * sizeof(double));
+    sv_setpvn(idx_sv, b.n_idx ? (char*)b.idx : "", b.n_idx * sizeof(int));
+    sv_setpvn(val_sv, b.n_val ? (char*)b.val : "", b.n_val * sizeof(double));
+    tb_free(&b);
+}
+
+/* ---------------------------------------------------------------------
  * impute_fill_xs(data_sv, n_pts, n_feats, how, out_rv)
  *
  * C replacement for _compute_impute_fill's Perl loop: walks the raw
@@ -2308,15 +2537,12 @@ For data that arrives as a stream and may drift over time, the companion
 class L<Algorithm::Classifier::IsolationForest::Online> implements Online
 Isolation Forest (Leveni et al. 2024): no C<fit()>, instead points are
 learned as they arrive and forgotten once they age out of a sliding
-window.  Models saved by either class can be loaded through L</load>,
+window.  Models saved by either class can be loaded through L<load|/load($path)>,
 which dispatches on the stored format tag.
 
-psi referenced below is ψ or the pitchfork math symbol referenced in the paper,
-Liu, Fei Tony & Ting, Kai & Zhou, Zhi-Hua. (2008). Isolation Forest. 413 - 422. 10.1109/ICDM.2008.17.
-
-... or max samples.
-
-L<https://www.researchgate.net/publication/224384174_Isolation_Forest>
+Throughout these docs, B<psi> is the paper's ψ: the number of points each
+tree is built from, which C<sample_size> sets and which other
+implementations often call I<max samples>.  See L</REFERENCES>.
 
 =head1 NATIVE ACCELERATION (Inline::C and OpenMP)
 
@@ -2572,164 +2798,165 @@ Inits the object.
   - sample_size :: sub-sample size used to build each tree... max samples
       default :: 256
 
-   - max_depth :: per-tree height limit... if not defined is set to ceil(log2(psi))
-       default :: undef
+  - max_depth :: per-tree height limit... if not defined is set to ceil(log2(psi))
+      default :: undef
 
-   - seed :: optional integer to seed srand with for reproducible trees...
-           see perldoc -f srand for more info. This number is processed via abs(int()).
-       default :: undef
+  - seed :: optional integer to seed srand with for reproducible trees...
+          see perldoc -f srand for more info. This number is processed via abs(int()).
+      default :: undef
 
-   - mode :: if it should be IF or EIF
-        axis :: classic axis-parallel splits (IF)
-        extended :: oblique hyperplane splits (EIF)
+  - mode :: if it should be IF or EIF
+       axis :: classic axis-parallel splits (IF)
+       extended :: oblique hyperplane splits (EIF)
       default :: axis
 
-   - extension_level :: extended mode only... how many features take partin each
-           split. 0 behaves like a single-feature (axis) cut; the
-           maximum (n_features - 1) uses every varying feature. undef
-           => maximum. Clamped to [0, n_features - 1] at fit time.
+  - extension_level :: extended mode only... how many features take partin each
+          split. 0 behaves like a single-feature (axis) cut; the
+          maximum (n_features - 1) uses every varying feature. undef
+          => maximum. Clamped to [0, n_features - 1] at fit time.
 
-    - contamination :: expected fraction of anomalies, in (0, 0.5]. When given,
-          fit() learns a score threshold that flags this fraction of
-          the training set, and predict() uses it by default. undef
-          => no learned threshold (predict() falls back to 0.5).
-        default :: undef
+  - contamination :: expected fraction of anomalies, in (0, 0.5]. When given,
+        fit() learns a score threshold that flags this fraction of
+        the training set, and predict() uses it by default. undef
+        => no learned threshold (predict() falls back to 0.5).
+      default :: undef
 
-    - missing :: how fit() treats undef (missing) feature cells. Scoring always
-          tolerates undef regardless of this setting; it governs fit().
-            die    :: croak from fit() if the training data contains any
-                      undef cell. Scoring still maps undef to 0 (the
-                      long-standing behaviour), so a model fitted on clean
-                      data can still score rows with missing features.
-            zero   :: treat a missing cell as the value 0, at fit and score.
-            impute :: replace a missing cell with the per-feature mean (or
-                      median, see impute_with) learned from the present
-                      values at fit time. The fill vector is stored on the
-                      model and reused for scoring and persistence.
-            nan    :: build feature ranges from present values only and route
-                      a point missing the split feature to the right child,
-                      consistently at fit and score time. Missingness is
-                      preserved as signal rather than filled.
-        default :: die
+  - missing :: how fit() treats undef (missing) feature cells. Scoring always
+        tolerates undef regardless of this setting; it governs fit().
+          die    :: croak from fit() if the training data contains any
+                    undef cell. Scoring still maps undef to 0 (the
+                    long-standing behaviour), so a model fitted on clean
+                    data can still score rows with missing features.
+          zero   :: treat a missing cell as the value 0, at fit and score.
+          impute :: replace a missing cell with the per-feature mean (or
+                    median, see impute_with) learned from the present
+                    values at fit time. The fill vector is stored on the
+                    model and reused for scoring and persistence.
+          nan    :: build feature ranges from present values only and route
+                    a point missing the split feature to the right child,
+                    consistently at fit and score time. Missingness is
+                    preserved as signal rather than filled.
+      default :: die
 
-    - impute_with :: 'mean' or 'median'; the statistic used to compute the
-          per-feature fill under missing => 'impute'. Ignored otherwise.
-        default :: mean
+  - impute_with :: 'mean' or 'median'; the statistic used to compute the
+        per-feature fill under missing => 'impute'. Ignored otherwise.
+      default :: mean
 
-    - voting :: how the per-tree results are aggregated at scoring time.
-          Trees are built identically in both settings -- only aggregation
-          changes -- so the knob composes with either mode (axis or
-          extended) and an existing model may switch it after the fact with
-          set_voting() (which relearns a contamination threshold for the
-          new mode).
-            mean     :: classic Isolation Forest: a sample's path lengths
-                        across all trees are averaged and normalised into
-                        one anomaly score; predict() thresholds that score.
-            majority :: Majority Voting Isolation Forest (MVIForest;
-                        Chabchoub, Togbe, Boly & Chiky 2022 -- see
-                        REFERENCES). Each tree scores the sample on its own
-                        (s_i = 2**(-h_i / c(psi))) and votes it anomalous
-                        when s_i >= the decision threshold; predict() flags
-                        the sample when more than half of the trees
-                        (int(n_trees/2) + 1) vote anomalous, and stops
-                        walking trees per sample as soon as the outcome is
-                        decided. The threshold argument/default of the
-                        predict methods is therefore the PER-TREE cutoff
-                        here, not a forest-level score cutoff.
-                        score_samples() returns the fraction of trees
-                        voting anomalous -- still in [0, 1], but discrete
-                        in steps of 1/n_trees. contamination composes: fit()
-                        learns the per-tree cutoff that flags the requested
-                        fraction of the training set.
-        default :: mean
+  - voting :: how the per-tree results are aggregated at scoring time.
+        Trees are built identically in both settings -- only aggregation
+        changes -- so the knob composes with either mode (axis or
+        extended) and an existing model may switch it after the fact with
+        set_voting() (which relearns a contamination threshold for the
+        new mode).
+          mean     :: classic Isolation Forest: a sample's path lengths
+                      across all trees are averaged and normalised into
+                      one anomaly score; predict() thresholds that score.
+          majority :: Majority Voting Isolation Forest (MVIForest;
+                      Chabchoub, Togbe, Boly & Chiky 2022 -- see
+                      REFERENCES). Each tree scores the sample on its own
+                      (s_i = 2**(-h_i / c(psi))) and votes it anomalous
+                      when s_i >= the decision threshold; predict() flags
+                      the sample when more than half of the trees
+                      (int(n_trees/2) + 1) vote anomalous, and stops
+                      walking trees per sample as soon as the outcome is
+                      decided. The threshold argument/default of the
+                      predict methods is therefore the PER-TREE cutoff
+                      here, not a forest-level score cutoff.
+                      score_samples() returns the fraction of trees
+                      voting anomalous -- still in [0, 1], but discrete
+                      in steps of 1/n_trees. contamination composes: fit()
+                      learns the per-tree cutoff that flags the requested
+                      fraction of the training set.
+      default :: mean
 
-    - parallel_fit :: positive integer N => build the trees across N forked
-          worker processes during fit(). Each worker gets a derived seed
-          (parent seed + worker_id * 1009) so the parallel fit is
-          reproducible across runs at fixed worker count -- but the trees
-          produced are NOT bit-identical to a serial fit with the same
-          seed, because the RNG draws happen in a different order.
-          Inference is unaffected. Falls back silently to serial on
-          platforms without a real fork() (e.g. Windows without Cygwin).
-        default :: undef (serial)
+  - parallel_fit :: positive integer N => build the trees across N forked
+        worker processes during fit(). Each worker gets a derived seed
+        (parent seed + worker_id * 1009) so the parallel fit is
+        reproducible across runs at fixed worker count -- but the trees
+        produced are NOT bit-identical to a serial fit with the same
+        seed, because the RNG draws happen in a different order.
+        Inference is unaffected. Falls back silently to serial on
+        platforms without a real fork() (e.g. Windows without Cygwin).
+      default :: undef (serial)
 
-    - use_c :: boolean, override whether the Inline::C backend is used for
-          both scoring and fit()'s tree builder.  When false the instance
-          falls back to pure Perl for both even if the C backend compiled
-          successfully.  When true (or unset) the C backend is used if
-          available ($HAS_C).  fit() with use_c on produces bit-identical
-          trees to use_c off for the same seed -- only build speed differs.
-        default :: $HAS_C
+  - use_c :: boolean, override whether the Inline::C backend is used for
+        both scoring and fit()'s tree builder.  When false the instance
+        falls back to pure Perl for both even if the C backend compiled
+        successfully.  When true (or unset) the C backend is used if
+        available ($HAS_C).  fit() with use_c on produces bit-identical
+        trees to use_c off for the same seed -- only build speed differs.
+      default :: $HAS_C
 
-    - use_openmp :: boolean, override whether OpenMP parallel scoring is
-          used inside score_all_xs().  When false the C tree walk runs
-          single-threaded even if OpenMP was linked in.  Ignored when
-          use_c is false (pure Perl has no OpenMP path).
-        default :: $HAS_OPENMP
+  - use_openmp :: boolean, override whether OpenMP parallel scoring is
+        used inside score_all_xs().  When false the C tree walk runs
+        single-threaded even if OpenMP was linked in.  Ignored when
+        use_c is false (pure Perl has no OpenMP path).
+      default :: $HAS_OPENMP
 
-    - use_openmp_fit :: boolean, build fit()'s trees across OpenMP threads
-          (one tree per thread) instead of the single-threaded C builder.
-          Opt-in and off by default: unlike use_c/use_openmp, this changes
-          which trees get built. Perl's RNG isn't safe to call from
-          multiple OS threads sharing one interpreter, so this path seeds
-          an independent PRNG per tree from the tree index rather than
-          Drand01() -- trees differ from the use_c (single-threaded)
-          and pure-Perl paths even with the same seed, though a fixed
-          seed and n_trees still reproduce the same trees regardless of
-          OMP_NUM_THREADS or scheduling. Does NOT compose with
-          parallel_fit: a forked child starting its own OpenMP region
-          after the parent process has used OpenMP for anything can
-          hang (a general fork()+libgomp limitation), so parallel_fit's
-          workers always use the single-threaded C builder regardless
-          of this setting -- setting both just means parallel_fit wins.
-          Ignored (clamped to 0) when use_c is false or OpenMP isn't
-          linked in.
-        default :: 0
+  - use_openmp_fit :: boolean, build fit()'s trees across OpenMP threads
+        (one tree per thread) instead of the single-threaded C builder.
+        Opt-in and off by default: unlike use_c/use_openmp, this changes
+        which trees get built. Perl's RNG isn't safe to call from
+        multiple OS threads sharing one interpreter, so this path seeds
+        an independent PRNG per tree from the tree index rather than
+        Drand01() -- trees differ from the use_c (single-threaded)
+        and pure-Perl paths even with the same seed, though a fixed
+        seed and n_trees still reproduce the same trees regardless of
+        OMP_NUM_THREADS or scheduling. Does NOT compose with
+        parallel_fit: a forked child starting its own OpenMP region
+        after the parent process has used OpenMP for anything can
+        hang (a general fork()+libgomp limitation), so parallel_fit's
+        workers always use the single-threaded C builder regardless
+        of this setting -- setting both just means parallel_fit wins.
+        Ignored (clamped to 0) when use_c is false or OpenMP isn't
+        linked in.
+      default :: 0
 
-    - feature_names :: optional arrayref of per-feature labels enabling the
-          *_tagged methods (and required by mungers below).
-        default :: undef
+  - feature_names :: optional arrayref of per-feature labels enabling the
+        *_tagged methods (and required by mungers below).
+      default :: undef
 
-    - mungers :: optional hashref of declarative L<Algorithm::ToNumberMunger>
-          specs, keyed as that module's compile() expects (scalar mungers by
-          their output tag, expanding mungers by any label with an 'into'
-          list, combining mungers by their output tag with a 'from' list).
-          When set, every tagged row -- the *_tagged methods, fit_tagged,
-          and tagged_row_to_array -- is munged from raw values (strings,
-          timestamps, status codes, ...) into numbers through the compiled
-          plan, and munge_rows() applies the scalar mungers to positional
-          rows.  Requires feature_names; the plan compiles against them, so
-          any spec error croaks here in new().  Algorithm::ToNumberMunger is
-          an optional dependency, required only when a spec is given (or a
-          loaded model carrying one is used with tagged data).  The spec is
-          saved with the model, so a loaded model munges scoring input
-          exactly as it did training input.  See L</MUNGERS> for details
-          and caveats.
-        default :: undef
+  - mungers :: optional hashref of declarative L<Algorithm::ToNumberMunger>
+        specs, keyed as that module's compile() expects (scalar mungers by
+        their output tag, expanding mungers by any label with an 'into'
+        list, combining mungers by their output tag with a 'from' list).
+        When set, every tagged row -- the *_tagged methods, fit_tagged,
+        and tagged_row_to_array -- is munged from raw values (strings,
+        timestamps, status codes, ...) into numbers through the compiled
+        plan, and munge_rows() applies the scalar mungers to positional
+        rows.  Requires feature_names; the plan compiles against them, so
+        any spec error croaks here in new().  Algorithm::ToNumberMunger is
+        an optional dependency, required only when a spec is given (or a
+        loaded model carrying one is used with tagged data).  The spec is
+        saved with the model, so a loaded model munges scoring input
+        exactly as it did training input.  See L</MUNGERS> for details
+        and caveats.
+      default :: undef
 
-    - schema_version :: optional opaque string identifying the revision of
-          the variable schema this model was built against.  Never parsed
-          or compared numerically; saved with the model and shown by
-          `iforest info`.  Usually set from a prototype (see
-          L</PROTOTYPES>) rather than passed directly.
-        default :: undef
+  - schema_version :: optional opaque string identifying the revision of
+        the variable schema this model was built against.  Never parsed
+        or compared numerically; saved with the model and shown by
+        `iforest info`.  Usually set from a prototype (see
+        L</PROTOTYPES>) rather than passed directly.
+      default :: undef
 
-    - schema_description :: optional opaque free-text description of what
-          the variable schema is.  Same handling as schema_version.
-        default :: undef
+  - schema_description :: optional opaque free-text description of what
+        the variable schema is.  Same handling as schema_version.
+      default :: undef
 
-    - feature_descriptions :: optional hashref of 'feature name => free
-          text' describing individual features.  Requires feature_names;
-          every key must name an entry there (a description for a feature
-          that does not exist croaks -- it is either a typo or a stale
-          leftover from a schema change).  Partial coverage is fine.
-          Saved with the model and shown beside each tag by
-          `iforest info`.
-        default :: undef
+  - feature_descriptions :: optional hashref of 'feature name => free
+        text' describing individual features.  Requires feature_names;
+        every key must name an entry there (a description for a feature
+        that does not exist croaks -- it is either a typo or a stale
+        leftover from a schema change).  Partial coverage is fine.
+        Saved with the model and shown beside each tag by
+        `iforest info`.
+      default :: undef
 
 Note: log2 under Perl is as below...
 
     log($psi) / log(2)
+
 
 =cut
 
@@ -2807,6 +3034,9 @@ sub new {
 		impute_with          => $impute_with,                  # mean|median (impute mode only)
 		voting               => $voting,                       # mean|majority (scoring-time aggregation)
 		missing_fill         => undef,                         # per-feature fill, learned in fit() if impute
+		feature_baselines    => undef,                         # per-feature medians, learned in fit();
+															   # the "typical row" ablation explanations
+															   # substitute against -- see explain_samples
 		_use_c               => $use_c,
 		_use_openmp          => $use_openmp,
 		_use_openmp_fit      => $use_openmp_fit,
@@ -3038,35 +3268,19 @@ sub fit {
 	# trains on $train, never the raw $data.
 	my $train = $self->_prepare_fit_data($data);
 
+	# Per-feature medians of the raw training data, stored for ablation
+	# explanations (explain_samples).  From $data, not $train: the pure-
+	# Perl path's densified $train would bake fill values into the
+	# medians while the C path's raw pass-through would not, and the
+	# baselines must not depend on use_c.
+	$self->{feature_baselines} = $self->_compute_feature_baselines($data);
+
 	my $n = scalar @$train;
 
-	# The sub-sample cannot be larger than the data set itself.
-	my $psi = min( $self->{sample_size}, $n );
-	$self->{c_psi}    = _c($psi);
-	$self->{psi_used} = $psi;
-
-	# Resolve the extension level against the data's dimensionality.
-	if ( $self->{mode} eq 'extended' ) {
-		my $max_ext = $n_features - 1;
-		my $ext
-			= defined $self->{extension_level}
-			? $self->{extension_level}
-			: $max_ext;
-		$ext                          = 0        if $ext < 0;
-		$ext                          = $max_ext if $ext > $max_ext;
-		$self->{extension_level_used} = $ext;
-	} else {
-		$self->{extension_level_used} = undef;
-	}
-
-	# Height limit: the average tree height ceil(log2(psi)). Past this depth the
-	# remaining points are scored using the c(size) adjustment instead.
-	my $limit
-		= defined $self->{max_depth}
-		? $self->{max_depth}
-		: ceil( log($psi) / log(2) );
-	$limit = 1 if $limit < 1;
-	$self->{max_depth_used} = $limit;
+	# Resolve sub-sample size, extension level and height limit against the
+	# data's shape.  Shared with fit_from_csv(), which learns n from a census
+	# pass before it ever holds the rows in RAM.
+	my ( $psi, $limit ) = $self->_resolve_geometry( $n, $n_features );
 
 	srand( $self->{seed} ) if defined $self->{seed};
 
@@ -3123,10 +3337,10 @@ sub fit {
 
 Trains the model on an arrayref of hashrefs of named feature values --
 the tagged counterpart of L</fit>.  Each row goes through
-L</tagged_row_to_array> (and therefore through the munger plan when
-C<mungers> is configured, which is the point: training data and scoring
-data are munged by the identical plan), then the positional rows are
-handed to C<fit>.
+L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)> (and
+therefore through the munger plan when C<mungers> is configured, which is
+the point: training data and scoring data are munged by the identical
+plan), then the positional rows are handed to C<fit>.
 
     $iforest->fit_tagged([
         { cpu => 0.9, mem => 0.4, disk => 0.1 },
@@ -3135,7 +3349,7 @@ handed to C<fit>.
     ]);
 
 Requires stored C<feature_names>.  Croaks under the same conditions as
-L</tagged_row_to_array>, naming the offending row by index.
+L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)>, naming the offending row by index.
 
 =cut
 
@@ -3149,6 +3363,221 @@ sub fit_tagged {
 	}
 	return $self->fit( \@rows );
 } ## end sub fit_tagged
+
+=head2 fit_from_csv($path, %opts)
+
+Trains the model directly from a CSV file B<without loading it into RAM>,
+for datasets too large to slurp.  An Isolation Forest never trains on more
+than C<n_trees * sample_size> rows -- each tree uses one independent
+sub-sample of C<sample_size> points -- so the working set is bounded by the
+model's parameters, not the file size.
+
+The file is read in two (or three) passes:
+
+=over 4
+
+=item 1.
+
+B<Census> -- count the rows (this is the true C<n> that fixes C<psi =
+min(sample_size, n)>) and pin the feature width.  By default this is an
+I<index> pass (see C<index> below): a fast block-scan that also records each
+data row's byte offset.
+
+=item 2.
+
+B<Gather> -- retain only the rows the trees actually sampled (chosen in
+bounded memory via Floyd's algorithm), then build each tree from its
+sub-sample exactly as L</fit> would.  With the offset table from pass 1 this
+B<seeks straight to the sampled rows> instead of re-scanning the file.
+
+=item 3.
+
+B<Threshold> (only when C<contamination> is set) -- score every row against
+the built forest and place the cut at the contamination boundary.  The cut
+is B<exact>, not estimated: a single min-heap of the C<k+1> largest scores
+(C<k = round(contamination * n)>) captures everything
+L</decision_threshold> selection needs, with a rare extra pass to resolve a
+tie block straddling the boundary.  Under C<< use_c => 1 >> (the default when
+the C backend is present) this pass runs through the C scorer, so it stays
+fast even over millions of rows.
+
+=back
+
+Neither census variant parses cells into numbers or checks for missing
+values: only the rows that actually train (via gather) or are scored (the
+threshold pass) are validated, so a malformed or missing cell in a
+never-used row is not reported.  In particular, under C<< missing => 'die' >>
+a missing cell is rejected exactly when it appears in a sampled training row.
+
+Because rows are addressed by their position across passes, C<$path> must be
+a stable, re-readable file (not a pipe or C<STDIN>).
+
+The first line is skipped as a header when it holds any non-numeric text (a
+feature-name row) or exactly matches the model's stored C<feature_names> --
+data rows contain only numbers and empty cells.  Pass C<< header => 1 >> to
+force the first line to be skipped even when it is all-numeric.
+
+Options:
+
+=over 4
+
+=item * C<< header => 1 >> -- always skip the first line as a column header
+(otherwise a header is auto-detected as described above).
+
+=item * C<< index => 0 >> -- disable the offset-index pass and use the
+streaming two-pass reader instead.  The index is on by default: it makes
+gather a random-access read of just the sampled rows rather than a second
+full scan, but costs an C<8 * n>-byte offset table.  When that table would
+exceed C<index_max> it is dropped automatically and the fit falls back to
+streaming.  (In index mode a blank line is one that is empty or contains only
+whitespace, judged cheaply; pass C<< index => 0 >> for files where that
+matters.)
+
+=item * C<< index_max => bytes >> -- ceiling on the offset table (default
+256 MiB).  Above it, the index is abandoned mid-scan and gather streams.
+
+=item * C<< c_scan => 0 >> -- validate each scored cell with
+C<looks_like_number> in the threshold pass instead of letting the C packer
+coerce it.  C<c_scan> is on by default and takes effect only on the C
+mean-voting scoring path, where it is a large saving over millions of rows;
+it produces the identical result on valid data, but coerces a non-numeric
+scored cell to C<0.0> (nudging the threshold) rather than dying on it.
+
+=back
+
+Every column is a feature; an empty cell is treated as a missing value and
+handled by the model's C<missing> strategy.  The resulting model is
+identical in shape to one built by L</fit> and is fully deterministic given
+the same file, C<seed>, and parameters (though not bit-identical to
+L</fit>, whose RNG stream interleaves sampling and tree-building
+differently).
+
+Current limitations: C<mungers> and tagged/named columns are not supported
+(load such data through L<fit_tagged|/fit_tagged(\@rows)>), and the trees are always built
+serially in pure Perl -- C<parallel_fit>/C<use_openmp_fit> are ignored for
+the build, though scoring is still accelerated when C<use_c> is on.
+
+    my $iforest = Algorithm::Classifier::IsolationForest->new(
+        n_trees       => 100,
+        sample_size   => 256,
+        contamination => 0.01,
+        seed          => 42,
+    );
+    $iforest->fit_from_csv('huge.csv', header => 1);
+
+=cut
+
+sub fit_from_csv {
+	my ( $self, $path, %opt ) = @_;
+
+	croak "fit_from_csv() requires a path to a CSV file"
+		unless defined $path && length $path;
+	croak "fit_from_csv(): '$path' is not a readable file"
+		unless -f $path && -r _;
+	croak "fit_from_csv() does not support munger models; " . "load the data through fit_tagged/fit instead"
+		if _plan($self);
+
+	# Decide once whether the first line is a header, so every pass skips the
+	# same line and row indices stay aligned.  header => 1 forces it; otherwise
+	# a first line carrying any non-numeric text (or matching stored
+	# feature_names) is a header -- data rows hold only numbers and blanks.
+	my $skip_first = $self->_detect_header( $path, $opt{header} );
+
+	# ---- Pass 1: census.  Establish the true row count (which fixes psi) and
+	# pin the feature width.  Neither census variant parses cells into numbers
+	# or checks for missing values -- only the rows that actually train
+	# (_numify_row, in gather) or get scored (the threshold pass) are validated,
+	# so a malformed or missing cell in a never-sampled row is not seen.
+	#
+	# By default the census is an "index" pass: a block-scan that also records
+	# each data row's byte offset, letting Pass 2 seek straight to the sampled
+	# rows instead of re-scanning the whole file.  The offset table costs 8*n
+	# bytes; when that would top index_max (or index => 0 was passed) it is not
+	# built and both passes fall back to the streaming reader.
+	my $use_index = exists $opt{index}      ? $opt{index}     : 1;
+	my $index_max = defined $opt{index_max} ? $opt{index_max} : ( 256 * 1024 * 1024 );
+
+	my ( $n, $n_features, $offsets );
+	if ($use_index) {
+		( $n, $n_features, $offsets ) = $self->_index_pass( $path, $skip_first, $index_max );
+	} else {
+		( $n, $n_features ) = $self->_census_stream( $path, $skip_first );
+	}
+	croak "fit_from_csv(): no data rows in '$path'" unless $n;
+
+	# A stored feature_names schema fixes the expected column count.
+	if ( ref $self->{feature_names} eq 'ARRAY' && @{ $self->{feature_names} } ) {
+		my $want = scalar @{ $self->{feature_names} };
+		croak "fit_from_csv(): $want feature_names but CSV has $n_features columns"
+			unless $want == $n_features;
+	}
+
+	$self->{n_features} = $n_features;
+	my ( $psi, $limit ) = $self->_resolve_geometry( $n, $n_features );
+
+	# ---- Choose which row indices each tree trains on: an independent,
+	# uniform psi-subset drawn without replacement.  Floyd's algorithm draws
+	# each subset in O(psi) memory, never materialising the 0..n-1 index
+	# vector _subsample() uses -- for an out-of-core n that vector would not
+	# fit either.  %want maps each needed row index to the (tree, slot) pairs
+	# awaiting it, so a row several trees picked is gathered once and shared.
+	srand( $self->{seed} ) if defined $self->{seed};
+	my @tree_idx;    # tree => [ chosen row indices ]
+	my %want;        # row index => [ [tree, slot], ... ]
+	for my $t ( 0 .. $self->{n_trees} - 1 ) {
+		my @idx = _sample_indices_distinct( $n, $psi );
+		$tree_idx[$t] = \@idx;
+		push @{ $want{ $idx[$_] } }, [ $t, $_ ] for 0 .. $#idx;
+	}
+
+	# ---- Pass 2: gather the sampled rows (validated + coerced by _numify_row).
+	# With an offset table this seeks straight to them; otherwise it re-scans.
+	my $pool
+		= $offsets
+		? $self->_gather_indexed( $path, $offsets, \%want )
+		: $self->_gather_stream( $path, $skip_first, \%want );
+
+	# Baselines for ablation explanations, learned from the gathered
+	# sub-sample -- like the impute fill below, the only rows bounded-
+	# memory fitting ever holds.  Before _apply_missing_to_pool, which
+	# densifies the pool in place (the medians must come from present
+	# values only, matching fit()).  Median is an exact order statistic,
+	# so the hash-order values() walk cannot change the result.
+	$self->{feature_baselines} = $self->_compute_feature_baselines( [ values %$pool ] );
+
+	# Apply the missing-value strategy to the retained rows (see fit()'s
+	# _prepare_fit_data; the impute fill is learned from this training
+	# sub-sample, the only value bounded-memory fitting can compute).
+	$self->_apply_missing_to_pool($pool);
+
+	# ---- Build. Each tree trains on its gathered sub-sample -- structurally
+	# identical to fit()'s per-tree _build_tree(_subsample(...)).
+	my @trees;
+	for my $t ( 0 .. $self->{n_trees} - 1 ) {
+		my $sample = [ @{$pool}{ @{ $tree_idx[$t] } } ];
+		push @trees, $self->_build_tree( $sample, 0, $limit );
+	}
+	$self->{trees} = \@trees;
+
+	# Repack the just-built trees for the C scorer up front.  fit() scores its
+	# learned threshold pure-Perl because its training set is small; the
+	# streaming contamination pass here may score millions of rows, so paying
+	# one repack now lets that pass run through the C path instead (bit-
+	# identical result, minutes -> seconds).  The delete first clears any stale
+	# buffers from a prior fit so the repack reflects the new forest.
+	delete @$self{qw(_c_nodes _c_coef_idx _c_coef_val)};
+	$self->_rebuild_c_trees() if $self->{_use_c};
+
+	# c_scan (default on): let the C scorer's packer coerce raw cells via SvNV
+	# in the contamination pass instead of validating each with looks_like_number
+	# in Perl -- a large saving over millions of rows.  It only takes effect on
+	# the C mean-voting path; see _stream_scores.
+	my $c_scan = exists $opt{c_scan} ? $opt{c_scan} : 1;
+	$self->_learn_contamination_threshold_streaming( $path, $skip_first, $n, $c_scan )
+		if defined $self->{contamination};
+
+	return $self;
+} ## end sub fit_from_csv
 
 =head2 pack_data(\@data)
 
@@ -3428,7 +3857,7 @@ as the CLI can pass every dataset through unconditionally.
 
 Croaks if the munger set contains expanding or combining mungers --
 their inputs are named source fields that positional rows cannot
-express; use the tagged methods (or L</fit_tagged>) for those.
+express; use the tagged methods (or L<fit_tagged|/fit_tagged(\@rows)>) for those.
 
     my $numeric = $iforest->munge_rows(\@raw_rows);
 
@@ -3572,6 +4001,132 @@ sub score_sample_tagged {
 	my $vec    = $self->tagged_row_to_array( $row, 'score_sample_tagged' );
 	my $result = $self->score_samples( [$vec] );
 	return $result->[0];
+}
+
+=head2 explain_samples(\@data, %opts)
+
+Explains, per sample, which features drove its anomaly score -- the
+"why" to go with C<score_samples>' "how much".  Returns an arrayref
+with one hashref per sample:
+
+    my $explanations = $forest->explain_samples(\@data);
+
+    for my $e (@$explanations) {
+        my $top = $e->{features}[0];
+        printf "score %.3f, mostly because of feature %s (weight %.2f)\n",
+            $e->{score}, $top->{name} // $top->{index}, $top->{weight};
+    }
+
+Each hashref is
+
+    {
+        score    => 0.91,          # same value score_samples returns
+        method   => 'ablation',    # which attribution method produced this
+        features => [              # every feature, most responsible first
+            { index => 1, name => 'bytes_log', weight => 0.62, value => 9.3,
+              delta => 0.31, baseline => 4.1 },
+            { index => 0, name => 'method',    weight => 0.21, value => 2.0,
+              delta => 0.10, baseline => 1.0 },
+            ...
+        ],
+    }
+
+C<name> is taken from the model's stored C<feature_names> and is undef
+when none were recorded.  C<weight> is each feature's normalised share
+of the responsibility, in [0, 1] and summing to 1 (all weights are 0
+in the degenerate case where no attribution information exists).
+C<value> is the feature value the model actually scored.
+
+Options:
+
+  - method :: how per-feature responsibility is computed
+        ablation :: (default) counterfactual substitution.  Each
+            feature in turn is replaced by its baseline (the
+            per-feature training-data median learned at fit time) and
+            the sample is re-scored; the drop in anomaly score is that
+            feature's C<delta>, and weights are the positive deltas
+            normalised.  Features whose substitution does not
+            de-anomalise the sample get 0.  Each feature entry
+            additionally carries C<delta> (may be negative:
+            substituting a correlated feature can make the sample MORE
+            anomalous) and C<baseline> (the value swapped in).  Costs
+            n_samples * (n_features + 1) rows through the ordinary
+            scorer -- C-accelerated when available.
+        path :: split attribution (local DIFFI; Carletti, Terzi &
+            Susto -- see REFERENCES).  The sample walks every tree;
+            each split node crossed credits its feature(s) with
+            1/h_t - 1/h_max, where h_t is that tree's path length for
+            the sample and h_max the longest across the forest -- so
+            the trees that isolated the sample quickly speak loudest
+            and trees that treated it as normal say nothing.  An
+            oblique (extended-mode) split spreads its credit across
+            its features in proportion to |coefficient * value|.
+            Needs nothing stored beyond the trees (so it works on
+            models saved before baseline support) and runs pure Perl
+            over the tree walks.
+
+Why ablation is the default: it directly answers "would this sample
+still be an outlier with feature j at a normal value?", and that
+question has an answer for ANY scored sample.  C<path> can only
+apportion the splits the forest actually built, so it attributes well
+for samples that were IN the training data (post-fit forensics of
+flagged training rows) but degrades for unseen samples in the tails --
+an out-of-range sample walks through boundary regions whose splits
+mostly test OTHER features, and the attribution dilutes or even
+misleads.  Prefer C<ablation> whenever the model has baselines;
+C<path> is the fallback for old saved models and a second opinion on
+training-set outliers.  Neither method untangles strongly correlated
+features -- a sample anomalous only in the JOINT distribution of two
+features may show weak attributions on both.
+
+Under C<< voting => 'majority' >> the score (and ablation's deltas) are
+in vote-fraction space, matching C<score_samples>' semantics in that
+mode; the C<path> method is aggregation-independent and unchanged.
+
+C<ablation> requires stored baselines: models fitted before explanation
+support have none and croak (models with C<< missing => 'impute' >>
+fall back to their stored fill vector); refitting stores them.
+
+=cut
+
+sub explain_samples {
+	my ( $self, $data, %opts ) = @_;
+	$self->_check_fitted;
+
+	my $method = delete $opts{method} // 'ablation';
+	croak "explain_samples: method must be 'path' or 'ablation'"
+		unless $method =~ /\A(?:path|ablation)\z/;
+	croak "explain_samples: unknown option(s): " . join( ', ', sort keys %opts )
+		if %opts;
+
+	my $rows = $self->_to_arrayref($data);
+	croak "explain_samples() expects a non-empty arrayref of samples"
+		unless @$rows;
+
+	return $method eq 'ablation'
+		? $self->_explain_ablation($rows)
+		: $self->_explain_path($rows);
+} ## end sub explain_samples
+
+=head2 explain_sample_tagged(\%row, %opts)
+
+Explains a single sample supplied as a hashref of named feature values
+-- the tagged counterpart of
+L<explain_samples|/explain_samples(\@data, %opts)>, taking the same
+C<method> option and returning the single explanation hashref (with
+C<name> filled from the stored feature names).
+
+    my $e = $forest->explain_sample_tagged({ cpu => 0.9, mem => 0.4 });
+    print "worst feature: $e->{features}[0]{name}\n";
+
+Croaks under the same conditions as L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)>.
+
+=cut
+
+sub explain_sample_tagged {
+	my ( $self, $row, %opts ) = @_;
+	my $vec = $self->tagged_row_to_array( $row, 'explain_sample_tagged' );
+	return $self->explain_samples( [$vec], %opts )->[0];
 }
 
 =head2 score_predict_samples
@@ -3821,7 +4376,7 @@ upstream preprocessing step.  Points worth knowing:
 =over 4
 
 =item * Only tagged input is munged.  Positional rows passed to C<fit>
-or the scoring methods are taken as already numeric; L</munge_rows>
+or the scoring methods are taken as already numeric; L<munge_rows|/munge_rows(\@rows)>
 applies the scalar mungers to positional rows for callers (like the
 CLI) that want the same transformation there.  Packed datasets
 (L</pack_data(\@data)>) are never munged.
@@ -3887,6 +4442,7 @@ sub to_json {
 			missing               => $self->{missing},
 			impute_with           => $self->{impute_with},
 			missing_fill          => $self->{missing_fill},
+			feature_baselines     => $self->{feature_baselines},
 			feature_names         => $self->{feature_names},
 			voting                => $self->{voting},
 			mungers               => $self->{mungers},
@@ -3951,10 +4507,14 @@ sub from_json {
 		max_depth_used       => $p->{max_depth_used},
 		# Models saved before missing-value support lack these keys; default
 		# to 'zero', which reproduces the old undef -> 0 scoring behaviour.
-		missing       => $p->{missing}     // 'zero',
-		impute_with   => $p->{impute_with} // 'mean',
-		missing_fill  => $p->{missing_fill},
-		feature_names => $p->{feature_names},
+		missing      => $p->{missing}     // 'zero',
+		impute_with  => $p->{impute_with} // 'mean',
+		missing_fill => $p->{missing_fill},
+		# Absent in models saved before explanation support; ablation
+		# explanations then fall back to missing_fill or croak with a
+		# refit hint -- see _ablation_baselines.
+		feature_baselines => $p->{feature_baselines},
+		feature_names     => $p->{feature_names},
 		# The munger plan is recompiled lazily on first tagged use, so a
 		# munger-bearing model still loads (and scores positional data)
 		# where Algorithm::ToNumberMunger is not installed.
@@ -4339,6 +4899,12 @@ Yousra Chabchoub, Maurras Ulbricht Togbe, Aliou Boly, Raja Chiky (2022). An In-D
 
 L<https://ieeexplore.ieee.org/document/9684896>
 
+Mattia Carletti, Matteo Terzi, Gian Antonio Susto (2023). Interpretable Anomaly Detection with DIFFI: Depth-based feature importance of Isolation Forest. Engineering Applications of Artificial Intelligence, vol. 119. 10.1016/j.engappai.2022.105730 (the depth-weighted split attribution of C<explain_samples>' C<path> method is inspired by local DIFFI)
+
+L<https://arxiv.org/abs/2007.11117>
+
+L<https://www.sciencedirect.com/science/article/pii/S0952197622007205>
+
 Filippo Leveni, Guilherme Weigert Cassales, Bernhard Pfahringer, Albert Bifet, Giacomo Boracchi (2024). Online Isolation Forest. (the streaming variant implemented by L<Algorithm::Classifier::IsolationForest::Online>)
 
 L<https://arxiv.org/abs/2505.09593>
@@ -4346,6 +4912,23 @@ L<https://arxiv.org/abs/2505.09593>
 L<https://github.com/ineveLoppiliF/Online-Isolation-Forest>
 
 L<https://proceedings.mlr.press/v235/leveni24a.html>
+
+=head1 AUTHOR
+
+Zane C. Bowers-Hadley, C<< <vvelox at vvelox.net> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2026 Zane C. Bowers-Hadley.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License version 2.1 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+General Public License for more details.
 
 =cut
 
@@ -4360,6 +4943,18 @@ L<https://proceedings.mlr.press/v235/leveni24a.html>
 # tree of n nodes. Isolation Forest uses it (a) to adjust the path length when a
 # leaf still holds more than one point (depth limit reached), and (b) to
 # normalise the average path length into a 0..1 anomaly score.
+#
+# Args:
+#   $n :: a point count, non-negative integer.  Either a leaf's size or the
+#         per-tree sub-sample size psi.
+#
+# Returns: the expected path length, a float.  0.0 for n <= 1 (nothing is
+# left to search) and 1.0 for n == 2, both special-cased because the
+# harmonic approximation is only accurate for larger n.
+#
+# Example:
+#   _c(1);     # 0.0
+#   _c(256);   # ~10.24 -- the normaliser for a default sample_size fit
 #-------------------------------------------------------------------------------
 sub _c {
 	my ($n) = @_;
@@ -4386,6 +4981,18 @@ sub _c {
 # per-tree score (all in (0, 1]), so +inf lets every tree vote; c <= 0 only
 # happens for psi <= 1 forests, whose score convention is a flat 0.5 (see
 # score_samples), so all trees vote iff theta is at or below that pivot.
+#
+# Args:
+#   $theta :: the per-tree score cutoff, normally in (0, 1].  Degenerate
+#             values are handled rather than rejected.
+#   $c :: c(psi) for this forest, i.e. $self->{c_psi}.  Only <= 0 for a
+#         psi <= 1 forest.
+#
+# Returns: the path length at or below which a tree votes anomalous, a
+# float.  +inf when every tree should vote, -1.0 when none should.
+#
+# Example:
+#   _depth_cut( 0.6, 10.24 );   # ~7.55: isolate in <= 7.55 edges and vote
 sub _depth_cut {
 	my ( $theta, $c ) = @_;
 	return ( $theta <= 0.5 ? 9**9**9 : -1.0 ) if $c <= 0;
@@ -4396,6 +5003,15 @@ sub _depth_cut {
 # Smallest number of per-tree anomaly votes that constitutes a majority:
 # int(t/2) + 1, i.e. strictly more than half the trees for both odd and
 # even tree counts (the paper's "t/2 + 1").
+#
+# Args:
+#   $n_trees :: the forest's tree count, an integer >= 1.
+#
+# Returns: the required vote count, an integer in [1, $n_trees].
+#
+# Example:
+#   _min_votes(100);   # 51
+#   _min_votes(101);   # 51
 sub _min_votes { return int( $_[0] / 2 ) + 1 }
 
 #-------------------------------------------------------------------------------
@@ -4414,6 +5030,20 @@ sub _min_votes { return int( $_[0] / 2 ) + 1 }
 # real slack around the cutoff rather than exact-equality behaviour.  The
 # whole tie block therefore goes to whichever side lands the flag count
 # closest to k, preferring the flagging side on a dead heat.
+#
+# Args:
+#   $desc :: arrayref of the per-point statistic sorted DESCENDING -- the
+#            mean-mode anomaly scores, or the majority pivots under
+#            voting => 'majority'.  Must be non-empty.
+#   $k :: how many points the contamination rate wants flagged, an integer
+#         in [1, scalar @$desc].
+#
+# Returns: the cutoff, a float positioned so that `statistic >= cutoff`
+# selects the intended points.  Never equal to a value in $desc.
+#
+# Example:
+#   _threshold_from_ranked( [ 0.71, 0.68, 0.52, 0.50 ], 2 );   # 0.60
+#   _threshold_from_ranked( [ 0.71, 0.68, 0.68, 0.50 ], 2 );   # 0.59, tie
 #-------------------------------------------------------------------------------
 sub _threshold_from_ranked {
 	my ( $desc, $k ) = @_;
@@ -4443,6 +5073,18 @@ sub _threshold_from_ranked {
 # length at or under the depth cut.  Tree-outer / sample-inner for cache
 # locality, mirroring the mean-mode fallback loops.  $data must already
 # be through _prepare_perl_input.
+#
+# Args:
+#   $data :: arrayref of rows already through _prepare_perl_input -- dense
+#            under impute, raw undef preserved under nan.
+#   $cut :: the depth cut from _depth_cut.
+#
+# Returns: arrayref of per-point vote counts, integers in [0, n_trees],
+# positionally matching $data.
+#
+# Example:
+#   my $cut   = _depth_cut( 0.6, $self->{c_psi} );
+#   my $votes = $self->_vote_counts_perl( $rows, $cut );   # [ 3, 97, 12, ... ]
 sub _vote_counts_perl {
 	my ( $self, $data, $cut ) = @_;
 	my $trees = $self->{trees};
@@ -4456,21 +5098,6 @@ sub _vote_counts_perl {
 	return \@votes;
 } ## end sub _vote_counts_perl
 
-#-------------------------------------------------------------------------------
-# Contamination support for majority voting: each training point's majority
-# pivot -- the per-tree score threshold at which the point loses its
-# majority.  A point is flagged at cutoff theta iff at least min_votes of
-# its per-tree path lengths h satisfy h <= -c*log2(theta), which holds iff
-# its min_votes-th SMALLEST path length h_(maj) does, i.e. iff
-# 2**(-h_(maj)/c) >= theta.  So the pivot m = 2**(-h_(maj)/c) relates to
-# the majority-mode threshold exactly as the mean-mode score relates to
-# its threshold, and fit()'s midpoint selection works on either unchanged.
-#
-# Pure Perl by necessity: the per-tree path lengths never cross the C
-# boundary individually (score_all_xs/vote_all_xs only return per-point
-# aggregates), and fit() has already dropped any stale packed buffers when
-# this runs -- the same situation as mean mode's training-set scoring pass.
-#-------------------------------------------------------------------------------
 # Learn the contamination cutoff for the CURRENT voting mode from a training
 # set.  Ranks the per-point quantity the active aggregation thresholds against
 # -- the mean-mode anomaly score, or the majority pivot under
@@ -4484,6 +5111,17 @@ sub _vote_counts_perl {
 # set_voting() (which passes the caller-supplied training set against the
 # live, fully packed forest); $data may hold raw undef cells either way, since
 # the scorers below densify from missing_fill.
+#
+# Args:
+#   $data :: the training set, an arrayref of feature-value arrayrefs.  Raw
+#            undef cells are fine.
+#
+# Returns: nothing.  Sets $self->{threshold} as its whole purpose.
+#
+# Example:
+#   $self->{contamination} = 0.05;
+#   $self->_learn_contamination_threshold( \@training_rows );
+#   $self->decision_threshold;   # the cutoff flagging ~5% of the training set
 sub _learn_contamination_threshold {
 	my ( $self, $data ) = @_;
 	my $scores
@@ -4499,6 +5137,33 @@ sub _learn_contamination_threshold {
 	return;
 } ## end sub _learn_contamination_threshold
 
+#-------------------------------------------------------------------------------
+# Contamination support for majority voting: each training point's majority
+# pivot -- the per-tree score threshold at which the point loses its
+# majority.  A point is flagged at cutoff theta iff at least min_votes of
+# its per-tree path lengths h satisfy h <= -c*log2(theta), which holds iff
+# its min_votes-th SMALLEST path length h_(maj) does, i.e. iff
+# 2**(-h_(maj)/c) >= theta.  So the pivot m = 2**(-h_(maj)/c) relates to
+# the majority-mode threshold exactly as the mean-mode score relates to
+# its threshold, and fit()'s midpoint selection works on either unchanged.
+#
+# Pure Perl by necessity: the per-tree path lengths never cross the C
+# boundary individually (score_all_xs/vote_all_xs only return per-point
+# aggregates), and fit() has already dropped any stale packed buffers when
+# this runs -- the same situation as mean mode's training-set scoring pass.
+#
+# Args:
+#   $data :: arrayref of feature-value arrayrefs, raw or prepared -- it goes
+#            through _prepare_perl_input here either way.
+#
+# Returns: arrayref of per-point pivots, each a float in (0, 1],
+# positionally matching $data.
+#
+# Example:
+#   my $pivots = $self->_majority_pivot_scores( \@training_rows );
+#   # row i is flagged at per-tree cutoff theta exactly when
+#   # $pivots->[$i] >= theta
+#-------------------------------------------------------------------------------
 sub _majority_pivot_scores {
 	my ( $self, $data ) = @_;
 	my $trees = $self->{trees};
@@ -4523,6 +5188,16 @@ sub _majority_pivot_scores {
 
 # One draw from the standard normal N(0,1) via Box-Muller. Used to pick the
 # random hyperplane orientations in Extended Isolation Forest mode.
+#
+# Args: none.  Draws two uniforms from Perl's rand(), so the caller controls
+# reproducibility through srand().
+#
+# Returns: one float from N(0,1), typically within +/-4.  Consumes exactly
+# two rand() draws, which is what keeps the Perl and C builders in step.
+#
+# Example:
+#   srand(42);
+#   my $coef = _randn();   # a hyperplane coefficient for one feature
 sub _randn {
 	my $u1 = rand() || 1e-12;
 	my $u2 = rand();
@@ -4538,8 +5213,663 @@ sub _randn {
 } ## end sub _randn
 
 #-------------------------------------------------------------------------------
+# Resolve the derived per-fit geometry from the sample count and feature width,
+# storing it on the object and returning ($psi, $limit) for the build loop.
+# Factored out of fit() so fit_from_csv() -- which learns n from a streaming
+# census rather than an in-RAM array -- produces byte-identical psi/extension/
+# depth values.  Pure arithmetic: consumes no randomness.
+#
+# Args:
+#   $n :: total training rows available, a positive integer.  From
+#         scalar @$data in fit(), or the census count in fit_from_csv().
+#   $n_features :: the feature width, a positive integer.
+#
+# Returns: the two-element list ($psi, $limit) -- the per-tree sub-sample
+# size and the tree height limit.  Also sets c_psi, psi_used,
+# extension_level_used (undef outside extended mode) and max_depth_used on
+# the object.
+#
+# Example:
+#   my ( $psi, $limit ) = $self->_resolve_geometry( 10_000, 4 );
+#   # ( 256, 8 ) at the default sample_size, since ceil(log2(256)) == 8
+#-------------------------------------------------------------------------------
+sub _resolve_geometry {
+	my ( $self, $n, $n_features ) = @_;
+
+	# The sub-sample cannot be larger than the data set itself.
+	my $psi = min( $self->{sample_size}, $n );
+	$self->{c_psi}    = _c($psi);
+	$self->{psi_used} = $psi;
+
+	# Resolve the extension level against the data's dimensionality.
+	if ( $self->{mode} eq 'extended' ) {
+		my $max_ext = $n_features - 1;
+		my $ext
+			= defined $self->{extension_level}
+			? $self->{extension_level}
+			: $max_ext;
+		$ext                          = 0        if $ext < 0;
+		$ext                          = $max_ext if $ext > $max_ext;
+		$self->{extension_level_used} = $ext;
+	} else {
+		$self->{extension_level_used} = undef;
+	}
+
+	# Height limit: the average tree height ceil(log2(psi)). Past this depth the
+	# remaining points are scored using the c(size) adjustment instead.
+	my $limit
+		= defined $self->{max_depth}
+		? $self->{max_depth}
+		: ceil( log($psi) / log(2) );
+	$limit = 1 if $limit < 1;
+	$self->{max_depth_used} = $limit;
+
+	return ( $psi, $limit );
+} ## end sub _resolve_geometry
+
+#-------------------------------------------------------------------------------
+# fit_from_csv() machinery.
+#-------------------------------------------------------------------------------
+
+# Inspect the first non-blank line and report whether it is a header to skip
+# rather than train on.  $forced (the header => option) makes it unconditional;
+# otherwise a line is a header when it carries any non-numeric text -- data rows
+# hold only numbers and empty cells -- or exactly matches stored feature_names.
+#
+# Args:
+#   $path :: path to the CSV file, which must be readable.
+#   $forced :: the caller's header => option.  True skips detection and
+#              answers yes; undef or false runs the heuristic.
+#
+# Returns: 1 when the first non-blank line is a header to skip, 0 otherwise.
+# An empty file answers 0 and lets the census report the real problem.
+#
+# Example:
+#   $self->_detect_header( 'train.csv', undef );   # 1 for "cpu,mem,disk"
+#   $self->_detect_header( 'train.csv', undef );   # 0 for "0.9,0.4,0.1"
+sub _detect_header {
+	my ( $self, $path, $forced ) = @_;
+	open my $fh, '<', $path
+		or croak "fit_from_csv(): cannot open '$path': $!";
+	my $first;
+	while ( defined( my $line = <$fh> ) ) {
+		$line =~ s/\r?\n\z//;
+		next if $line =~ /^\s*$/;
+		$first = $line;
+		last;
+	}
+	close $fh;
+	return 0 unless defined $first;    # empty file; the census will report it
+	return 1 if $forced;
+
+	my @f = split /,/, $first, -1;
+	for my $x (@f) {
+		next if !length $x;                       # empty cell: fine in data
+		return 1 unless looks_like_number($x);    # text: it is a header
+	}
+
+	# All-numeric first line: only a header if it reproduces feature_names.
+	my $names = $self->{feature_names};
+	if ( ref $names eq 'ARRAY' && @$names == @f ) {
+		my $match = grep { $f[$_] eq $names->[$_] } 0 .. $#f;
+		return 1 if $match == @f;
+	}
+	return 0;
+} ## end sub _detect_header
+
+# Return a closure that yields ($row, $line_number) per non-blank CSV line and
+# an empty list at EOF.  An empty cell becomes undef (the missing-value marker).
+# With $parse true each non-empty cell is validated and coerced to a number (a
+# non-numeric cell dies); with $parse false the cells are left as raw strings --
+# the cheap mode the census uses, which needs only the column count and empties.
+# When $skip_first is set the first non-blank line (a header) is dropped.  Blank
+# lines are skipped, so a row's index is its position among the non-blank data
+# lines -- stable across passes as long as the file does not change under us.
+#
+# Args:
+#   $path :: path to the CSV file, which must be readable.
+#   $skip_first :: true to drop the first non-blank line as a header.
+#   $parse :: true to validate and numify each non-empty cell (croaking on a
+#             non-numeric one), false to hand back raw strings.
+#
+# Returns: a closure.  Each call returns the two-element list
+# (\@fields, $line_number) for the next data line, or the empty list at EOF
+# (where it also closes the handle).  @fields holds numbers under
+# $parse, strings otherwise, with undef for an empty cell.
+#
+# Example:
+#   my $reader = $self->_csv_reader( 'train.csv', 1, 1 );
+#   while ( my ( $row, $line ) = $reader->() ) {
+#       # $row = [ 0.9, undef, 0.1 ] for "0.9,,0.1" on line $line
+#   }
+sub _csv_reader {
+	my ( $self, $path, $skip_first, $parse ) = @_;
+	open my $fh, '<', $path
+		or croak "fit_from_csv(): cannot open '$path': $!";
+	my $line_no = 0;
+	my $skipped = 0;
+	return sub {
+		while ( defined( my $line = <$fh> ) ) {
+			$line_no++;
+			$line =~ s/\r?\n\z//;
+			next if $line =~ /^\s*$/;
+			if ( $skip_first && !$skipped ) { $skipped = 1; next; }
+			my @fields = split /,/, $line, -1;
+			for my $f (@fields) {
+				if ( !length $f ) { $f = undef; next; }
+				next unless $parse;
+				croak "fit_from_csv(): line $line_no value '$f' is not a number"
+					unless looks_like_number($f);
+				$f += 0;
+			}
+			return ( \@fields, $line_no );
+		} ## end while ( defined( my $line = <$fh> ) )
+		close $fh;
+		return;
+	}; ## end sub
+} ## end sub _csv_reader
+
+# Validate and coerce a raw row (from a parse => 0 reader) into numbers in
+# place: defined cells must look like numbers.  An undef cell (empty CSV marker)
+# passes through for zero/impute/nan, but croaks under the 'die' strategy -- so
+# 'die' rejects a missing value exactly when it lands in a sampled training row.
+# $where names the row for error messages.  Only the rows a fit keeps are run
+# through here, which is why a bad cell elsewhere is never reported.
+#
+# Args:
+#   $row :: arrayref of raw cells from a parse => 0 reader -- strings, with
+#           undef for the empty cells.  Modified in place.
+#   $where :: a phrase naming the row for croak messages, e.g. "line 42" or
+#             "sampled row 17".
+#
+# Returns: nothing.  $row's defined cells come back as numbers; undef cells
+# stay undef unless missing => 'die', which croaks instead.
+#
+# Example:
+#   my $row = [ '0.9', undef, '0.1' ];
+#   $self->_numify_row( $row, 'line 42' );   # [ 0.9, undef, 0.1 ]
+sub _numify_row {
+	my ( $self, $row, $where ) = @_;
+	my $die = $self->{missing} eq 'die';
+	for my $f (@$row) {
+		if ( !defined $f ) {
+			croak "fit_from_csv(): missing value in $where; construct with "
+				. "missing => 'zero', 'impute', or 'nan' to train on data "
+				. "with missing values"
+				if $die;
+			next;
+		}
+		croak "fit_from_csv(): $where value '$f' is not a number"
+			unless looks_like_number($f);
+		$f += 0;
+	} ## end for my $f (@$row)
+	return;
+} ## end sub _numify_row
+
+# Streaming census (index => 0 or offset table over budget): count the data
+# rows and pin the feature width via the cheap parse => 0 reader.  No cell
+# validation -- that is deferred to the rows that train or get scored.
+#
+# Args:
+#   $path :: path to the CSV file, which must be readable.
+#   $skip_first :: true to drop the first non-blank line as a header.
+#
+# Returns: the two-element list ($n, $nf) -- the data row count and the
+# feature width taken from the first data row.  Both undef-free, though $n
+# is 0 and $nf undef for a file with no data rows.  Croaks on a row whose
+# column count disagrees with the first row's.
+#
+# Example:
+#   my ( $n, $nf ) = $self->_census_stream( 'train.csv', 1 );   # ( 1_000_000, 4 )
+sub _census_stream {
+	my ( $self, $path, $skip_first ) = @_;
+	my $reader = $self->_csv_reader( $path, $skip_first, 0 );
+	my ( $n, $nf ) = ( 0, undef );
+	while ( my ( $row, $line ) = $reader->() ) {
+		$nf //= scalar @$row;
+		croak "fit_from_csv(): line $line of '$path' has " . scalar(@$row) . " columns but expected $nf"
+			unless @$row == $nf;
+		$n++;
+	}
+	return ( $n, $nf );
+} ## end sub _census_stream
+
+# Streaming gather (no offset table): re-scan the file, numifying only the
+# sampled rows.  Companion to _census_stream.
+#
+# Args:
+#   $path :: path to the CSV file, which must be readable.
+#   $skip_first :: true to drop the first non-blank line as a header.
+#   $want :: hashref used as a set -- its keys are the data row indices to
+#            keep, counting from 0 over the non-blank data lines.
+#
+# Returns: hashref keyed by the same indices, each value the numified row as
+# an arrayref.  Indices absent from the file simply do not appear.
+#
+# Example:
+#   my $pool = $self->_gather_stream( 'train.csv', 1, { 0 => 1, 7 => 1 } );
+#   # { 0 => [ 0.9, 0.4 ], 7 => [ 1.2, 0.3 ] }
+sub _gather_stream {
+	my ( $self, $path, $skip_first, $want ) = @_;
+	my $reader = $self->_csv_reader( $path, $skip_first, 0 );
+	my %pool;
+	my $i = 0;
+	while ( my ( $row, $line ) = $reader->() ) {
+		if ( exists $want->{$i} ) {
+			$self->_numify_row( $row, "line $line" );
+			$pool{$i} = $row;
+		}
+		$i++;
+	}
+	return \%pool;
+} ## end sub _gather_stream
+
+# Index census: one block-scan that counts the data rows, pins the feature
+# width, AND records each data row's byte offset so gather can seek straight to
+# the sampled rows.  Blank lines are skipped and the header dropped exactly as
+# the reader does, so offset i is the i-th data row.  The offset table costs
+# 8*n bytes; once it would exceed $max_off it is dropped (returning undef) and
+# only the count survives, so the caller falls back to the streaming gather.
+#
+# Args:
+#   $path :: path to the CSV file, which must be readable.
+#   $skip_first :: true to drop the first non-blank line as a header.
+#   $max_off :: byte ceiling for the offset table.  0 disables the table
+#               outright, making this a pure counting pass.
+#
+# Returns: the three-element list ($n, $nf, $offsets) -- the data row count,
+# the feature width, and either an arrayref of per-row byte offsets (element
+# i is data row i's start) or undef when the table was disabled or went over
+# budget.
+#
+# Example:
+#   my ( $n, $nf, $off ) = $self->_index_pass( 'train.csv', 1, 64 * 1024 * 1024 );
+#   # ( 1_000_000, 4, [ 12, 31, 49, ... ] ), or $off undef past 8 MB of table
+sub _index_pass {
+	my ( $self, $path, $skip_first, $max_off ) = @_;
+	open my $fh, '<', $path
+		or croak "fit_from_csv(): cannot open '$path': $!";
+	binmode $fh;
+
+	my @off;
+	my $store   = $max_off > 0 ? 1 : 0;
+	my $cap     = int( $max_off / 8 );
+	my $n       = 0;
+	my $skipped = 0;
+	my $nf;
+
+	# Consider the line at ($$sref, $off .. $off+$len).  To stay fast we avoid
+	# copying the line: a zero-length line is empty, and any line whose first
+	# byte is a digit/sign/dot (>= '!') is non-blank without further checks --
+	# only a line starting with whitespace (< '!') is materialised to apply the
+	# reader's /^\s*$/ blank test.  $abs is its absolute byte offset.
+	my $feed = sub {
+		my ( $abs, $sref, $off, $len ) = @_;
+		return if $len == 0;
+		if ( substr( $$sref, $off, 1 ) lt '!' ) {    # leading whitespace: maybe blank
+			return if substr( $$sref, $off, $len ) !~ /\S/;
+		}
+		if ( $skip_first && !$skipped ) { $skipped = 1; return; }
+		$nf //= scalar( () = split /,/, substr( $$sref, $off, $len ), -1 );    # width from row 1
+		$n++;
+		return unless $store;
+		push @off, $abs;
+		if ( @off > $cap ) { $store = 0; @off = () }                           # over budget: abandon the table
+	}; ## end $feed = sub
+
+	my ( $carry, $file_pos ) = ( '', 0 );                                      # $file_pos = abs offset of $carry's start
+	my $buf;
+	while ( my $got = read( $fh, $buf, 1 << 20 ) ) {
+		my $s = $carry . $buf;
+		my $p = 0;
+		my $nl;
+		while ( ( $nl = index( $s, "\n", $p ) ) >= 0 ) {
+			my $len = $nl - $p;
+			$len-- if $len && substr( $s, $nl - 1, 1 ) eq "\r";    # exclude a CRLF's CR
+			$feed->( $file_pos + $p, \$s, $p, $len );
+			$p = $nl + 1;
+		}
+		$carry = substr( $s, $p );
+		$file_pos += $p;
+	} ## end while ( my $got = read( $fh, $buf, 1 << 20 ) )
+	close $fh;
+	$feed->( $file_pos, \$carry, 0, length $carry ) if length $carry;    # final unterminated line
+
+	return ( $n, $nf, $store ? \@off : undef );
+} ## end sub _index_pass
+
+# Random-access gather: seek to each sampled row's recorded offset and numify
+# it.  Indices are visited in order for sequential-ish disk access.
+#
+# Args:
+#   $path :: path to the CSV file, which must be readable.
+#   $offsets :: the arrayref of per-row byte offsets from _index_pass.
+#   $want :: hashref used as a set -- its keys are the data row indices to
+#            keep.
+#
+# Returns: hashref keyed by the same indices, each value the numified row as
+# an arrayref.  Croaks on a short read or a row whose column count
+# disagrees with the model's n_features, which is how a file changing
+# underneath the passes gets caught.
+#
+# Example:
+#   my $pool = $self->_gather_indexed( 'train.csv', $offsets, { 0 => 1, 7 => 1 } );
+#   # { 0 => [ 0.9, 0.4 ], 7 => [ 1.2, 0.3 ] }
+sub _gather_indexed {
+	my ( $self, $path, $offsets, $want ) = @_;
+	open my $fh, '<', $path
+		or croak "fit_from_csv(): cannot open '$path': $!";
+	my $nf = $self->{n_features};
+	my %pool;
+	for my $i ( sort { $a <=> $b } keys %$want ) {
+		seek( $fh, $offsets->[$i], 0 )
+			or croak "fit_from_csv(): seek failed for row $i: $!";
+		my $line = <$fh>;
+		croak "fit_from_csv(): row $i is past the end of '$path'" unless defined $line;
+		$line =~ s/\r?\n\z//;
+		my @f = split /,/, $line, -1;
+		croak "fit_from_csv(): sampled row $i has " . scalar(@f) . " columns but expected $nf"
+			unless @f == $nf;
+		for my $x (@f) { $x = undef if !length $x }
+		$self->_numify_row( \@f, "sampled row $i" );
+		$pool{$i} = \@f;
+	} ## end for my $i ( sort { $a <=> $b } keys %$want )
+	close $fh;
+	return \%pool;
+} ## end sub _gather_indexed
+
+# Draw $k distinct indices uniformly from [0, $n) via Floyd's algorithm --
+# O($k) time and memory, so it never allocates the 0..n-1 vector _subsample()
+# builds (the whole point: n may not fit in RAM).  Returns them sorted, which
+# makes the per-tree sample order deterministic (independent of hash-key
+# randomisation) even though tree structure does not depend on row order.
+#
+# Args:
+#   $n :: the population size, a non-negative integer.
+#   $k :: how many distinct indices to draw.  $k >= $n yields everything.
+#
+# Returns: the drawn indices as a sorted list (not a reference), each in
+# [0, $n).
+#
+# Example:
+#   srand(42);
+#   my @idx = _sample_indices_distinct( 1_000_000, 256 );   # 256 sorted rows
+sub _sample_indices_distinct {
+	my ( $n, $k ) = @_;
+	return ( 0 .. $n - 1 ) if $k >= $n;
+	my %seen;
+	for my $j ( $n - $k .. $n - 1 ) {
+		my $t = int( rand( $j + 1 ) );    # uniform in [0, $j]
+		$seen{ exists $seen{$t} ? $j : $t } = 1;
+	}
+	my @idx = sort { $a <=> $b } keys %seen;
+	return @idx;
+} ## end sub _sample_indices_distinct
+
+# Apply the missing-value strategy to the gathered pool (hashref index => row),
+# densifying in place so the pure-Perl _build_tree sees defined cells.  Mirrors
+# _prepare_fit_data, except impute learns its fill from the training sub-sample
+# rather than the full file -- the only fill bounded-memory fitting can form.
+#
+# Args:
+#   $pool :: hashref of row index => arrayref of cells, as returned by
+#            _gather_stream or _gather_indexed.  Rewritten in place.
+#
+# Returns: nothing.  Under zero/impute every row in $pool comes back dense;
+# under impute the learned fill is also stored in $self->{missing_fill}.
+# die and nan return untouched (die data is already dense, nan wants its
+# undefs kept).
+#
+# Example:
+#   my $pool = $self->_gather_indexed( $path, $offsets, $want );
+#   $self->_apply_missing_to_pool($pool);   # undef cells now carry the fill
+sub _apply_missing_to_pool {
+	my ( $self, $pool ) = @_;
+	my $m = $self->{missing};
+	return if $m eq 'die' || $m eq 'nan';    # die: already dense; nan: keep undef
+
+	my $nf = $self->{n_features};
+	my $fill;
+	if ( $m eq 'impute' ) {
+		$fill = $self->_compute_impute_fill( [ values %$pool ] );
+		$self->{missing_fill} = $fill;
+		delete $self->{_fill_packed};
+	} else {                                 # zero
+		$fill = [ (0) x $nf ];
+	}
+	for my $i ( keys %$pool ) {
+		my $r = $pool->{$i};
+		$pool->{$i} = [ map { defined $r->[$_] ? $r->[$_] : $fill->[$_] } 0 .. $nf - 1 ];
+	}
+	return;
+} ## end sub _apply_missing_to_pool
+
+# Streaming counterpart of _learn_contamination_threshold: learn the exact
+# score cutoff for the contamination rate without holding every score.  k+1
+# largest scores are enough for _threshold_from_ranked's boundary logic; a
+# min-heap keeps them in one scoring pass, and (only under a boundary tie) one
+# extra pass resolves the tie block's edges.
+#
+# Args:
+#   $path :: path to the CSV file the model was just fitted from.
+#   $skip_first :: true to drop the first non-blank line as a header.
+#   $n :: the census row count, which fixes how many rows k stands for.
+#   $c_scan :: true to let the C packer coerce cells, skipping the Perl
+#              numeric validation on the scoring passes.  See _stream_scores.
+#
+# Returns: nothing.  Sets $self->{threshold} to the same value the in-RAM
+# _learn_contamination_threshold would have produced for this data.
+#
+# Example:
+#   $self->_learn_contamination_threshold_streaming( 'train.csv', 1, 1_000_000, 1 );
+sub _learn_contamination_threshold_streaming {
+	my ( $self, $path, $skip_first, $n, $c_scan ) = @_;
+
+	my $k = int( $self->{contamination} * $n + 0.5 );
+	$k = 1  if $k < 1;
+	$k = $n if $k > $n;
+
+	# Whole set flagged: sit the cut just below the global minimum score.
+	if ( $k >= $n ) {
+		my $min;
+		$self->_stream_scores( $path, $skip_first, sub { $min = $_[0] if !defined $min || $_[0] < $min }, $c_scan );
+		$self->{threshold} = $min - 1e-9;
+		return;
+	}
+
+	# One scoring pass keeps the k+1 largest scores (a min-heap rooted at the
+	# smallest kept).  contamination <= 0.5 bounds k at n/2, so this tail is
+	# always the smaller side of the split.
+	my @heap;
+	my $cap = $k + 1;
+	$self->_stream_scores(
+		$path,
+		$skip_first,
+		sub {
+			my $s = $_[0];
+			if    ( @heap < $cap )  { _heap_push( \@heap, $s ) }
+			elsif ( $s > $heap[0] ) { _heap_replace_root( \@heap, $s ) }
+		},
+		$c_scan
+	);
+
+	my @desc = sort { $b <=> $a } @heap;    # k+1 largest, descending
+	my $v    = $desc[ $k - 1 ];             # k-th largest
+	my $lo   = $desc[$k];                   # (k+1)-th largest
+
+	# Clean gap at the boundary: cut midway, exactly as _threshold_from_ranked.
+	if ( $lo < $v ) {
+		$self->{threshold} = ( $v + $lo ) / 2.0;
+		return;
+	}
+
+	# A tie block of value $v straddles rank k.  Reproduce _threshold_from_ranked's
+	# tie branch: locate the block's edges (i = first index at $v, j = first
+	# index below it) and the neighbouring scores with one more pass.
+	my ( $cnt_gt, $cnt_eq, $above, $below ) = ( 0, 0, undef, undef );
+	$self->_stream_scores(
+		$path,
+		$skip_first,
+		sub {
+			my $s = $_[0];
+			if ( $s > $v ) {
+				$cnt_gt++;
+				$above = $s if !defined $above || $s < $above;    # smallest > $v
+			} elsif ( $s == $v ) {
+				$cnt_eq++;
+			} else {
+				$below = $s if !defined $below || $s > $below;    # largest < $v
+			}
+		},
+		$c_scan
+	);
+
+	my $i = $cnt_gt;              # first rank holding $v
+	my $j = $cnt_gt + $cnt_eq;    # first rank below $v
+	if ( $i > 0 && ( $k - $i ) < ( $j - $k ) ) {
+		$self->{threshold} = ( $above + $v ) / 2.0;    # exclude the block
+	} elsif ( $j < $n ) {
+		$self->{threshold} = ( $v + $below ) / 2.0;    # include the block
+	} else {
+		$self->{threshold} = $v - 1e-9;                # block runs to the end
+	}
+	return;
+} ## end sub _learn_contamination_threshold_streaming
+
+# Stream the CSV, score rows in flat batches (through the same mean/majority
+# path score_samples/predict use), and invoke $cb->($score) for each row.
+# c_scan fast path: when scoring runs through the C packer (mean voting, use_c,
+# trees packed) the packer coerces each cell via SvNV, so the reader can run
+# raw (parse => 0) and skip the Perl looks_like_number validation.  Every other
+# path parses (parse => 1) so its Perl scorer sees real numbers.
+#
+# Args:
+#   $path :: path to the CSV file, which must be readable.
+#   $skip_first :: true to drop the first non-blank line as a header.
+#   $cb :: coderef invoked once per data row as $cb->($score), in file order.
+#          The score is the mean-mode anomaly score, or the majority pivot
+#          under voting => 'majority'.
+#   $c_scan :: true to allow the raw-cell fast path described above.
+#
+# Returns: nothing; everything is delivered through $cb.
+#
+# Example:
+#   my $max;
+#   $self->_stream_scores( 'train.csv', 1,
+#       sub { $max = $_[0] if !defined $max || $_[0] > $max }, 1 );
+sub _stream_scores {
+	my ( $self, $path, $skip_first, $cb, $c_scan ) = @_;
+	my $majority = $self->{voting} eq 'majority' ? 1 : 0;
+	my $c_coerce = $c_scan && $self->{_use_c} && $self->{_c_nodes} && !$majority;
+	my $reader   = $self->_csv_reader( $path, $skip_first, $c_coerce ? 0 : 1 );
+
+	# The c_coerce path lets the C packer turn any non-numeric cell into 0.0 via
+	# SvNV; silence the per-cell "isn't numeric" warnings that intentional
+	# coercion raises (clean data produces none).  Other warnings pass through.
+	local $SIG{__WARN__};
+	$SIG{__WARN__} = sub { $_[0] =~ /isn't numeric/ or warn $_[0] }
+		if $c_coerce;
+
+	my @batch;
+	my $flush = sub {
+		return unless @batch;
+		my $scores
+			= $majority
+			? $self->_majority_pivot_scores( \@batch )
+			: $self->score_samples( \@batch );
+		$cb->($_) for @$scores;
+		@batch = ();
+	};
+	while ( my ($row) = $reader->() ) {
+		push @batch, $row;
+		$flush->() if @batch >= 8192;
+	}
+	$flush->();
+	return;
+} ## end sub _stream_scores
+
+# Minimal binary min-heap over a plain arrayref (root = smallest).  Paired
+# with _heap_replace_root to keep the k+1 largest scores of a stream in
+# bounded memory -- push until full, then replace the root whenever a
+# bigger value turns up.
+#
+# Append a value and sift it up into place.
+#
+# Args:
+#   $h :: the heap, an arrayref maintained by these two functions alone.
+#         Modified in place.
+#   $x :: the number to insert.
+#
+# Returns: nothing.  $h->[0] is the smallest value held afterwards.
+#
+# Example:
+#   my @heap;
+#   _heap_push( \@heap, $_ ) for 0.7, 0.2, 0.5;
+#   $heap[0];   # 0.2
+sub _heap_push {
+	my ( $h, $x ) = @_;
+	push @$h, $x;
+	my $i = $#$h;
+	while ( $i > 0 ) {
+		my $p = ( $i - 1 ) >> 1;
+		last if $h->[$p] <= $h->[$i];
+		@{$h}[ $p, $i ] = @{$h}[ $i, $p ];
+		$i = $p;
+	}
+	return;
+} ## end sub _heap_push
+
+# Overwrite the smallest value held and sift the replacement down.  Keeps
+# the heap at a fixed size, which is how the scoring pass retains only the
+# largest k+1 scores it has seen.
+#
+# Args:
+#   $h :: the heap, a non-empty arrayref built by _heap_push.  Modified in
+#         place.
+#   $x :: the number to put in the root's place.  Callers only do this when
+#         $x is larger than the current root, so the heap keeps the biggest
+#         values.
+#
+# Returns: nothing.  $h->[0] is the smallest of the retained values
+# afterwards.
+#
+# Example:
+#   _heap_replace_root( \@heap, 0.9 ) if $score > $heap[0];
+sub _heap_replace_root {
+	my ( $h, $x ) = @_;
+	$h->[0] = $x;
+	my $n = scalar @$h;
+	my $i = 0;
+	while (1) {
+		my $l = 2 * $i + 1;
+		my $r = 2 * $i + 2;
+		my $s = $i;
+		$s = $l if $l < $n && $h->[$l] < $h->[$s];
+		$s = $r if $r < $n && $h->[$r] < $h->[$s];
+		last if $s == $i;
+		@{$h}[ $s, $i ] = @{$h}[ $i, $s ];
+		$i = $s;
+	} ## end while (1)
+	return;
+} ## end sub _heap_replace_root
+
+#-------------------------------------------------------------------------------
 # Draw $k samples without replacement via a partial Fisher-Yates shuffle of the
-# index array. Returns an arrayref of (shared, read-only) sample refs.
+# index array.
+#
+# Args:
+#   $data :: the training set, an arrayref of feature-value arrayrefs.
+#            Never modified.
+#   $k :: how many samples to draw, an integer in [1, scalar @$data].
+#
+# Returns: an arrayref of $k row references.  The rows are SHARED with
+# $data, not copied, so nothing downstream may mutate them -- _build_tree
+# only ever reads.
+#
+# Example:
+#   srand(42);
+#   my $sample = _subsample( \@training_rows, 256 );
+#   my $tree   = $self->_build_tree( $sample, 0, 8 );
 #-------------------------------------------------------------------------------
 sub _subsample {
 	my ( $data, $k ) = @_;
@@ -4564,6 +5894,21 @@ sub _subsample {
 # In both split styles the choice is restricted to features that actually vary
 # across the points reaching the node: this avoids wasted levels on constant
 # columns and lets a node leaf out exactly when its points are indistinguishable.
+#
+# Args:
+#   $X :: the points reaching this node, an arrayref of feature-value
+#         arrayrefs.  Read-only; undef cells only appear under
+#         missing => 'nan'.
+#   $depth :: this node's depth, 0 at the root.
+#   $limit :: the height limit from _resolve_geometry.  At or past it the
+#             node leafs out and c(size) covers the rest.
+#
+# Returns: the node as an arrayref in the layout above, with children
+# already recursed into -- so calling it on the root returns the whole tree.
+#
+# Example:
+#   my $tree = $self->_build_tree( _subsample( \@rows, 256 ), 0, 8 );
+#   # [ 1, 2, 0.37, [ ... ], [ ... ] ] -- an axis split on feature 2
 #-------------------------------------------------------------------------------
 sub _build_tree {
 	my ( $self, $X, $depth, $limit ) = @_;
@@ -4626,8 +5971,25 @@ sub _build_tree {
 } ## end sub _build_tree
 
 # Axis-parallel cut: random varying feature, random threshold in its range.
-# Returns [_NODE_AXIS, attr, split, \@left_pts, \@right_pts].
-# _build_tree overwrites slots 3 and 4 with the recursed subtrees.
+#
+# Args:
+#   $X :: the points reaching this node, an arrayref of feature-value
+#         arrayrefs.
+#   $varying :: arrayref of the feature indices that actually vary here --
+#               the only ones worth cutting on.  Must be non-empty.
+#   $lo, $hi :: arrayrefs of per-feature minimum and maximum over $X,
+#               indexed by feature number.  Entries for features that are
+#               absent throughout are undef and never consulted.
+#   $nan :: true under missing => 'nan', which routes a point missing the
+#           split feature right.
+#
+# Returns: [ _NODE_AXIS, $attr, $split, \@left_pts, \@right_pts ].  Slots 3
+# and 4 hold raw point arrays, which _build_tree overwrites with the
+# recursed subtrees.
+#
+# Example:
+#   my $node = _axis_split( $X, [ 0, 2 ], \@lo, \@hi, 0 );
+#   # [ 1, 2, 0.37, [ ...pts < 0.37... ], [ ...pts >= 0.37... ] ]
 sub _axis_split {
 	my ( $X, $varying, $lo, $hi, $nan ) = @_;
 
@@ -4667,8 +6029,25 @@ sub _axis_split {
 # (extension_level + 1) of the varying features, give each a Gaussian
 # coefficient, and place the plane through a random point in the bounding box.
 # A point goes left when coef . x <= b, where b = coef . p.
-# Returns [_NODE_OBLIQUE, \@idx, \@coef, $b, \@left_pts, \@right_pts].
-# _build_tree overwrites slots 4 and 5 with the recursed subtrees.
+#
+# Args:
+#   $X :: the points reaching this node, an arrayref of feature-value
+#         arrayrefs.
+#   $varying :: arrayref of the feature indices that actually vary here.
+#               The active set is drawn from these.  Must be non-empty.
+#   $lo, $hi :: arrayrefs of per-feature minimum and maximum over $X,
+#               indexed by feature number.
+#   $nan :: true under missing => 'nan', which routes a point missing any
+#           feature on the hyperplane right.
+#
+# Returns: [ _NODE_OBLIQUE, \@idx, \@coef, $b, \@left_pts, \@right_pts ],
+# where @idx names the participating features and @coef holds their
+# coefficients one-for-one.  Slots 4 and 5 hold raw point arrays, which
+# _build_tree overwrites with the recursed subtrees.
+#
+# Example:
+#   my $node = $self->_oblique_split( $X, [ 0, 1, 2 ], \@lo, \@hi, 0 );
+#   # [ 2, [ 0, 2 ], [ 0.81, -1.32 ], 0.44, [ ... ], [ ... ] ]
 sub _oblique_split {
 	my ( $self, $X, $varying, $lo, $hi, $nan ) = @_;
 
@@ -4748,6 +6127,21 @@ sub _oblique_split {
 # the NaN comparison is false).  Without it, undef is coerced to 0 -- the
 # behaviour the die/zero/impute strategies rely on (their data is dense by
 # the time it reaches here, so the "// 0" is normally a no-op).
+#
+# Args:
+#   $x :: one sample, an arrayref of feature values.  undef cells are
+#         allowed and handled per $nan.
+#   $node :: the node to start walking from, normally a tree root.
+#   $depth :: the depth credited to $node, 0 for a root.  Callers only pass
+#             anything else to resume a partial walk.
+#   $nan :: true to use the nan-strategy routing described above; false or
+#           omitted to coerce undef to 0.
+#
+# Returns: the path length, a float -- edges walked plus c(leaf size), so
+# it is not an integer whenever the walk ends in a multi-point leaf.
+#
+# Example:
+#   _path_length( [ 0.9, 0.4 ], $tree, 0, 0 );   # e.g. 3.51
 sub _path_length {
 	my ( $x, $node, $depth, $nan ) = @_;
 	while ( $node->[0] ) {    # false only for leaf (type 0)
@@ -4780,8 +6174,330 @@ sub _path_length {
 	return $depth + _c( $node->[1] );    # leaf size at slot 1
 } ## end sub _path_length
 
+#-------------------------------------------------------------------------------
+# Explanation (explain_samples) internals.
+#-------------------------------------------------------------------------------
+
+# Instrumented twin of _path_length: routes $x through one tree with
+# EXACTLY _path_length's split logic while recording which feature(s)
+# each crossed node tested.  Returns (path_length, \@pairs) where
+# path_length carries the usual c(leaf size) adjustment and each pair
+# is [feature_index, share] -- an axis node contributes one pair with
+# share 1, an oblique node one pair per participating feature with
+# shares proportional to |coef_k * x_k| (each feature's part of the
+# dot product), falling back to an even split when every term is 0.
+#
+# The caller (_explain_path) turns these walks into local-DIFFI credit
+# (Carletti, Terzi & Susto, see REFERENCES): every node of a tree's
+# walk is credited w_t = 1/h_t - 1/h_max, where h_t is this tree's
+# (adjusted) path length and h_max the longest walk any tree gave the
+# same sample -- so trees that isolated the sample quickly speak
+# loudest, trees that treated it as normal say nothing, and the credit
+# is a cross-TREE statistic.  Within-tree positional weightings were
+# tried and rejected: root-anchored credit (1/(depth+1)) mostly
+# rediscovers the RNG (the root split's feature is drawn uniformly at
+# random regardless of the sample), and leaf-anchored credit
+# (1/(h-depth)) is diluted by the trees that never isolated the sample
+# at all.
+#
+# Args:
+#   $x :: one sample, an arrayref of feature values.  undef cells are
+#         allowed and handled per $nan.
+#   $node :: the node to start walking from, normally a tree root.
+#   $nan :: true to use the nan-strategy routing, matching _path_length.
+#
+# Returns: the two-element list ($path_length, $pairs).  $path_length is
+# the same float _path_length would return for this sample and tree.
+# $pairs is an arrayref of [ feature_index, share ] entries, one per axis
+# node crossed and one per participating feature at each oblique node, with
+# the shares at any one node summing to 1.
+#
+# Example:
+#   my ( $h, $pairs ) = _path_length_explain( [ 0.9, 0.4 ], $tree, 0 );
+#   # ( 3.51, [ [ 1, 1 ], [ 0, 1 ], [ 1, 1 ] ] ) for an axis-mode tree
+sub _path_length_explain {
+	my ( $x, $node, $nan ) = @_;
+	my $depth = 0;
+	my @pairs;                # [feature, share] for every crossed node
+	while ( $node->[0] ) {    # false only for leaf (type 0)
+		if ( $node->[0] == _NODE_AXIS ) {    # [1, attr, split, left, right]
+			push @pairs, [ $node->[1], 1 ];
+			if ($nan) {
+				my $v = $x->[ $node->[1] ];
+				$node = ( defined($v) && $v < $node->[2] ) ? $node->[3] : $node->[4];
+			} else {
+				$node = ( $x->[ $node->[1] ] // 0 ) < $node->[2] ? $node->[3] : $node->[4];
+			}
+		} else {                             # [2, \@idx, \@coef, b, left, right]
+			my ( $idx, $coef, $b ) = ( $node->[1], $node->[2], $node->[3] );
+
+			my @parts      = map { abs( $coef->[$_] * ( $x->[ $idx->[$_] ] // 0 ) ) } 0 .. $#$idx;
+			my $part_total = 0;
+			$part_total += $_ for @parts;
+			push @pairs, $part_total > 0
+				? ( map { [ $idx->[$_], $parts[$_] / $part_total ] } 0 .. $#$idx )
+				: ( map { [ $idx->[$_], 1 / scalar @$idx ] } 0 .. $#$idx );
+
+			if ($nan) {
+				my $dot     = 0.0;
+				my $missing = 0;
+				for ( 0 .. $#$idx ) {
+					my $v = $x->[ $idx->[$_] ];
+					if ( !defined $v ) { $missing = 1; last }
+					$dot += $coef->[$_] * $v;
+				}
+				$node = ( !$missing && $dot <= $b ) ? $node->[4] : $node->[5];
+			} else {
+				my $dot = 0.0;
+				$dot += $coef->[$_] * ( $x->[ $idx->[$_] ] // 0 ) for 0 .. $#$idx;
+				$node = $dot <= $b ? $node->[4] : $node->[5];
+			}
+		} ## end else [ if ( $node->[0] == _NODE_AXIS ) ]
+		$depth++;
+	} ## end while ( $node->[0] )
+	return ( $depth + _c( $node->[1] ), \@pairs );    # leaf size at slot 1
+} ## end sub _path_length_explain
+
+# Turn one sample's per-tree walks into local-DIFFI feature credit --
+# see _path_length_explain's comment for the weighting and what was
+# tried instead.  A plain function so the Online class can reuse it on
+# its own walks.
+#
+# Args:
+#   $walks :: arrayref of one [ $path_length, $pairs ] per tree, exactly as
+#             _path_length_explain returns them.  Trees that contributed no
+#             walk are simply absent.
+#   $nf :: the model's feature count, which fixes the returned width.
+#
+# Returns: arrayref of $nf raw credit totals, indexed by feature.  These
+# are unnormalised -- _credit_to_features turns them into shares.  All
+# zeroes when no tree isolated the sample faster than the slowest one.
+#
+# Example:
+#   my @walks  = map { [ _path_length_explain( $x, $_, 0 ) ] } @$trees;
+#   my $credit = _walks_to_credit( \@walks, 2 );   # [ 0.51, 0.09 ]
+sub _walks_to_credit {
+	my ( $walks, $nf ) = @_;
+	my $hmax = 0;
+	for (@$walks) { $hmax = $_->[0] if $_->[0] > $hmax }
+	my $credit = [ (0) x $nf ];
+	for my $walk (@$walks) {
+		my ( $h, $pairs ) = @$walk;
+		next unless @$pairs && $h > 0 && $hmax > 0;
+		my $w = 1.0 / $h - 1.0 / $hmax;
+		next if $w <= 0;
+		$credit->[ $_->[0] ] += $w * $_->[1] for @$pairs;
+	}
+	return $credit;
+} ## end sub _walks_to_credit
+
+# Turn one sample's accumulated per-feature path credit into the sorted
+# features list explain_samples returns.  Weights are the credit shares
+# (summing to 1); a sample that never crossed a split node (all-leaf
+# trees) carries no information, so every weight stays 0 rather than
+# inventing a uniform split.  A plain function, not a method: the
+# Online class shapes its explanations through this too.
+#
+# Args:
+#   $names :: the model's feature_names arrayref, or undef when the model
+#             has none -- then every name comes back undef.
+#   $credit :: the raw per-feature credit from _walks_to_credit.  Its
+#              length fixes how many features are reported.
+#   $row :: the sample being explained, an arrayref, so each feature can
+#           report the value it actually had.
+#
+# Returns: arrayref of hashrefs, one per feature, sorted by descending
+# weight with the feature index breaking ties.  Each holds index, name,
+# weight (a share in [0, 1], summing to 1 unless every credit was 0) and
+# value.
+#
+# Example:
+#   _credit_to_features( [ 'cpu', 'mem' ], [ 0.51, 0.09 ], [ 0.9, 0.4 ] );
+#   # [ { index => 0, name => 'cpu', weight => 0.85, value => 0.9 },
+#   #   { index => 1, name => 'mem', weight => 0.15, value => 0.4 } ]
+sub _credit_to_features {
+	my ( $names, $credit, $row ) = @_;
+	my $total = 0;
+	$total += $_ for @$credit;
+	my @features = map {
+		{
+			index  => $_,
+			name   => $names     ? $names->[$_]           : undef,
+			weight => $total > 0 ? $credit->[$_] / $total : 0,
+			value  => $row->[$_],
+		}
+	} 0 .. $#$credit;
+	return [ sort { $b->{weight} <=> $a->{weight} || $a->{index} <=> $b->{index} } @features ];
+} ## end sub _credit_to_features
+
+# Ablation counterpart of _credit_to_features: deltas are score drops
+# (score(original) - score(feature substituted with its baseline));
+# weight is each positive delta's share of the positive total, keeping
+# weights in [0, 1] like the path method's.  A negative delta -- the
+# substitution made the sample MORE anomalous, possible with correlated
+# features -- keeps its sign in delta but contributes weight 0.
+#
+# Args:
+#   $names :: the model's feature_names arrayref, or undef when the model
+#             has none -- then every name comes back undef.
+#   $deltas :: arrayref of per-feature score drops.  Its length fixes how
+#              many features are reported.
+#   $row :: the sample being explained, an arrayref, so each feature can
+#           report the value it actually had.
+#   $baselines :: the per-feature substitution values the deltas were
+#                 measured against, reported alongside them.
+#
+# Returns: arrayref of hashrefs, one per feature, sorted by descending
+# weight with the feature index breaking ties.  Each holds index, name,
+# delta (signed), weight (a share in [0, 1]), value and baseline.
+#
+# Example:
+#   _deltas_to_features( [ 'cpu', 'mem' ], [ 0.21, -0.02 ],
+#                        [ 0.9, 0.4 ], [ 0.5, 0.5 ] );
+#   # cpu first with weight 1; mem keeps delta -0.02 but weight 0
+sub _deltas_to_features {
+	my ( $names, $deltas, $row, $baselines ) = @_;
+	my $pos_total = 0;
+	for (@$deltas) { $pos_total += $_ if $_ > 0 }
+	my @features = map {
+		{
+			index    => $_,
+			name     => $names ? $names->[$_] : undef,
+			delta    => $deltas->[$_],
+			weight   => ( $pos_total > 0 && $deltas->[$_] > 0 ) ? $deltas->[$_] / $pos_total : 0,
+			value    => $row->[$_],
+			baseline => $baselines->[$_],
+		}
+	} 0 .. $#$deltas;
+	return [ sort { $b->{weight} <=> $a->{weight} || $a->{index} <=> $b->{index} } @features ];
+} ## end sub _deltas_to_features
+
+# The path-credit explanation: one pure-Perl instrumented walk per tree
+# per sample.  The reported score still comes from score_samples so it
+# is bit-identical to what the user saw when the sample got flagged
+# (and carries the right semantics under voting => 'majority').
+#
+# Args:
+#   $rows :: the samples to explain, an arrayref of feature-value
+#            arrayrefs.  Raw undef cells are fine.
+#
+# Returns: arrayref of one hashref per row, in input order, each holding
+# score, method (always 'path') and features -- the sorted per-feature
+# list _credit_to_features builds.
+#
+# Example:
+#   my $out = $self->_explain_path( [ [ 8.1, 0.2 ] ] );
+#   $out->[0]{features}[0]{name};   # the feature most responsible
+sub _explain_path {
+	my ( $self, $rows ) = @_;
+	my $scores   = $self->score_samples($rows);
+	my $prepared = $self->_prepare_perl_input($rows);
+	my $nan      = $self->{missing} eq 'nan' ? 1 : 0;
+	my $nf       = $self->{n_features};
+	my $names    = $self->{feature_names};
+	my $trees    = $self->{trees};
+
+	my @out;
+	for my $i ( 0 .. $#$prepared ) {
+		my @walks = map { [ _path_length_explain( $prepared->[$i], $_, $nan ) ] } @$trees;
+		push @out,
+			{
+				score    => $scores->[$i],
+				method   => 'path',
+				features => _credit_to_features( $names, _walks_to_credit( \@walks, $nf ), $prepared->[$i] ),
+			};
+	}
+	return \@out;
+} ## end sub _explain_path
+
+# The counterfactual explanation: every row followed by its n_features
+# single-feature baseline substitutions, all scored as ONE batch so the
+# whole thing runs through score_samples once (C-accelerated when
+# available) instead of n_features+1 separate scoring calls.
+#
+# Args:
+#   $rows :: the samples to explain, an arrayref of feature-value
+#            arrayrefs.  Raw undef cells are fine.
+#
+# Returns: arrayref of one hashref per row, in input order, each holding
+# score, method (always 'ablation') and features -- the sorted per-feature
+# list _deltas_to_features builds.  Croaks by way of _ablation_baselines
+# when the model has no stored baselines.
+#
+# Example:
+#   my $out = $self->_explain_ablation( [ [ 8.1, 0.2 ] ] );
+#   $out->[0]{features}[0]{delta};   # score drop from neutralising it
+sub _explain_ablation {
+	my ( $self, $rows ) = @_;
+	my $nf        = $self->{n_features};
+	my $names     = $self->{feature_names};
+	my $baselines = $self->_ablation_baselines;
+
+	my @batch;
+	for my $row (@$rows) {
+		push @batch, $row;
+		for my $f ( 0 .. $nf - 1 ) {
+			my @variant = @$row;
+			$variant[$f] = $baselines->[$f];
+			push @batch, \@variant;
+		}
+	}
+	my $scores = $self->score_samples( \@batch );
+
+	my @out;
+	for my $i ( 0 .. $#$rows ) {
+		my $base   = $i * ( $nf + 1 );
+		my $score  = $scores->[$base];
+		my @deltas = map { $score - $scores->[ $base + 1 + $_ ] } 0 .. $nf - 1;
+		push @out,
+			{
+				score    => $score,
+				method   => 'ablation',
+				features => _deltas_to_features( $names, \@deltas, $rows->[$i], $baselines ),
+			};
+	} ## end for my $i ( 0 .. $#$rows )
+	return \@out;
+} ## end sub _explain_ablation
+
+# The per-feature substitution values ablation uses: the training-data
+# medians fit() stores, falling back to the impute fill for models
+# saved before baseline support (better than refusing outright -- the
+# fill IS a typical value, just impute_with's statistic rather than
+# always-median).
+#
+# Args: none beyond the model itself.
+#
+# Returns: an arrayref of n_features baseline values.  Croaks when neither
+# the stored baselines nor an impute fill of the right width is available,
+# pointing the caller at method => 'path' or a refit.
+#
+# Example:
+#   my $baselines = $self->_ablation_baselines;   # [ 0.5, 0.5, 1.0 ]
+sub _ablation_baselines {
+	my ($self) = @_;
+	my $nf = $self->{n_features};
+	for my $candidate ( $self->{feature_baselines}, $self->{missing_fill} ) {
+		return $candidate if ref $candidate eq 'ARRAY' && @$candidate == $nf;
+	}
+	croak "explain_samples: this model has no stored feature baselines "
+		. "(saved by a version before ablation explanation support?); "
+		. "refit to enable method => 'ablation', or explain with "
+		. "method => 'path'";
+} ## end sub _ablation_baselines
+
 # Recursively convert a version-0 hash-based tree node to the version-1
 # array format.  Called by from_json when loading an old saved model.
+#
+# Args:
+#   $node :: a version-0 node hashref.  A leaf carries leaf and size; an
+#            axis node attr, split, left and right; an oblique node idx,
+#            coef, b, left and right.
+#
+# Returns: the same subtree in the version-1 arrayref layout -- [0, size],
+# [1, attr, split, left, right] or [2, \@idx, \@coef, b, left, right].
+#
+# Example:
+#   _hash_node_to_array( { leaf => 1, size => 3 } );   # [ 0, 3 ]
 sub _hash_node_to_array {
 	my ($node) = @_;
 	if ( $node->{leaf} ) {
@@ -4817,9 +6533,38 @@ sub _hash_node_to_array {
 #
 # Nodes are numbered in DFS pre-order: the root is always index 0 and
 # children always get indices larger than their parent's.
+#
+# The C backend does this walk in pack_tree_xs, which is what actually
+# runs whenever it is available -- the Perl body below is the fallback
+# (no C backend, or a wide-NV perl, where the two would disagree on
+# c(size) in the last ulp; see _NV_IS_DOUBLE).  Both produce byte-
+# identical buffers on an nvsize == 8 perl.
+#
+# Args:
+#   $root :: the tree's root node, in the nested arrayref layout
+#            _build_tree produces.
+#   $n_features :: the model's feature count, or undef.  Only used to spot
+#                  the dense-pack opportunity described above; passing
+#                  undef just skips that optimisation.
+#
+# Returns: the three-element list ($nodes_packed, $idx_packed,
+# $val_packed) -- a 'd*' string of 6 doubles per node, an 'l*' string of
+# int32 feature indices, and a 'd*' string of the matching coefficients.
+# The latter two are empty strings for an axis-mode tree.
+#
+# Example:
+#   my ( $np, $ip, $vp ) = _pack_tree( $self->{trees}[0], $self->{n_features} );
+#   length($np) / ( 6 * 8 );   # node count
 # ---------------------------------------------------------------------------
 sub _pack_tree {
 	my ( $root, $n_features ) = @_;
+
+	if ( $HAS_C && _NV_IS_DOUBLE ) {
+		my ( $nodes_packed, $idx_packed, $val_packed ) = ( '', '', '' );
+		pack_tree_xs( $root, $n_features // -1, $nodes_packed, $idx_packed, $val_packed );
+		return ( $nodes_packed, $idx_packed, $val_packed );
+	}
+
 	my ( @node_data, @coef_idx, @coef_val );
 
 	my $assign;
@@ -4891,6 +6636,16 @@ sub _pack_tree {
 # $self->{_c_nodes}, $self->{_c_coef_idx}, $self->{_c_coef_val}.
 # Called after fit() and from_json() when _use_c is true.  n_features is
 # threaded through so _pack_tree can spot the dense-pack opportunity.
+#
+# Args: none beyond the model itself, which must already hold its trees.
+#
+# Returns: nothing.  Leaves _c_nodes, _c_coef_idx and _c_coef_val holding
+# one packed string per tree, in tree order -- the form score_all_xs and
+# friends expect.
+#
+# Example:
+#   $self->{trees} = $self->_build_forest_c( $train, $psi, $limit, 100 );
+#   $self->_rebuild_c_trees;   # scoring can now take the C path
 sub _rebuild_c_trees {
 	my ($self) = @_;
 	my ( @c_nodes, @c_coef_idx, @c_coef_val );
@@ -4905,6 +6660,17 @@ sub _rebuild_c_trees {
 	$self->{_c_coef_val} = \@c_coef_val;
 } ## end sub _rebuild_c_trees
 
+# Guard for every method that needs a forest to work with.  Called at the
+# top of the scoring and packing entry points so an unfitted model fails
+# with one clear message instead of an obscure error deeper in.
+#
+# Args: none beyond the model itself.
+#
+# Returns: nothing on success.  Croaks when the model holds no trees --
+# either never fitted, or constructed but not yet loaded from JSON.
+#
+# Example:
+#   $self->_check_fitted;   # croaks with "model is not fitted yet"
 sub _check_fitted {
 	my ($self) = @_;
 	croak "model is not fitted yet; call fit() first"
@@ -4924,6 +6690,20 @@ sub _check_fitted {
 # description must be a plain string.  Partial coverage is fine.  A plain
 # function, like the munger helpers, so both classes and the prototype
 # validator can call it.
+#
+# Args:
+#   $tags :: the model's feature_names, an arrayref of strings.  Must be
+#            non-empty -- there is nothing to validate against otherwise.
+#   $fd :: the feature_descriptions hashref, keyed by feature name with
+#          plain strings as values.
+#
+# Returns: 1 when the descriptions are usable.  Croaks naming the offending
+# key when one is not a known feature, when a value is a reference, or when
+# either argument is the wrong shape.
+#
+# Example:
+#   _validate_feature_descriptions( [ 'cpu', 'mem' ],
+#       { cpu => 'load average over 1m' } );   # 1; partial coverage is fine
 sub _validate_feature_descriptions {
 	my ( $tags, $fd ) = @_;
 	croak "feature_descriptions must be a hashref of 'feature name => description'"
@@ -4943,6 +6723,20 @@ sub _validate_feature_descriptions {
 # Compile a munger spec against the model's feature names.  Requires
 # Algorithm::ToNumberMunger on demand -- it is an optional dependency --
 # and lets its compile() croak on any spec problem.
+#
+# Args:
+#   $tags :: the model's feature_names, an arrayref of strings in column
+#            order.  Must be non-empty.
+#   $mungers :: the munger spec hashref, shaped as
+#               Algorithm::ToNumberMunger->compile expects it.
+#
+# Returns: the compiled plan object.  Croaks when feature_names are
+# missing, when the module cannot be loaded, or when compile() rejects the
+# spec.
+#
+# Example:
+#   my $plan = _compile_mungers( [ 'method', 'path_len' ],
+#       { method => { munger => 'http_method_enum', default => -1 } } );
 sub _compile_mungers {
 	my ( $tags, $mungers ) = @_;
 	croak "this model has mungers but no feature_names to compile them against"
@@ -4962,6 +6756,20 @@ sub _compile_mungers {
 # does not need Algorithm::ToNumberMunger installed unless tagged data
 # is actually used; new() populates the slot eagerly instead, surfacing
 # spec errors at construction.
+#
+# A plain function rather than a method, like the two helpers above, so the
+# Online class can hand it its own $self.
+#
+# Args: none beyond the model, which is passed positionally.
+#
+# Returns: the compiled Algorithm::ToNumberMunger plan, or undef when the
+# model carries no munger spec.  The plan is memoised in _munger_plan, so
+# the compile happens at most once per model.
+#
+# Example:
+#   if ( my $plan = _plan($self) ) {
+#       my $vec = $plan->apply_named( { method => 'GET', host => 'h' } );
+#   }
 sub _plan {
 	my ($self) = @_;
 	return undef unless $self->{mungers};
@@ -4970,7 +6778,17 @@ sub _plan {
 }
 
 # Memoised "does this perl have a real fork()?".  False on Windows
-# without Cygwin; true on every Unix-like platform.
+# without Cygwin; true on every Unix-like platform.  fit() consults it
+# before honouring parallel_fit, which is how that option degrades to a
+# serial fit instead of failing.
+#
+# Args: none.
+#
+# Returns: 1 when Config's d_fork is defined, 0 otherwise.  Config is
+# loaded on the first call only and the answer cached for the process.
+#
+# Example:
+#   $self->_fit_trees_parallel(...) if $workers > 1 && _fork_supported();
 {
 	my $cached;
 
@@ -4994,6 +6812,23 @@ sub _plan {
 # The trees that come back differ from a serial fit with the same seed
 # because the RNG draws happen in a different order -- this is documented
 # as part of the parallel_fit contract.
+#
+# Args:
+#   $data :: the prepared training set, an arrayref of feature-value
+#            arrayrefs.  Each worker inherits it through the fork, so it is
+#            never serialised.
+#   $psi :: the per-tree sub-sample size from _resolve_geometry.
+#   $limit :: the tree height limit from _resolve_geometry.
+#   $workers :: how many children to fork.  Clamped down to n_trees, since
+#               a worker with no trees to build is pure overhead.
+#
+# Returns: an arrayref of all n_trees trees in worker order -- worker 0's
+# share first, then worker 1's, and so on, which is what makes the forest
+# reproducible.  Croaks when a fork or pipe fails, when a worker exits
+# non-zero, or when its trees come back unreadable.
+#
+# Example:
+#   $self->{trees} = $self->_fit_trees_parallel( $train, 256, 8, 4 );
 #-------------------------------------------------------------------------------
 sub _fit_trees_parallel {
 	my ( $self, $data, $psi, $limit, $workers ) = @_;
@@ -5096,6 +6931,21 @@ sub _fit_trees_parallel {
 # trees are bit-identical to what the pure-Perl path would build from
 # the same RNG state.  That's what lets fit() switch backends on the
 # existing `use_c` knob instead of a new one.
+#
+# Args:
+#   $data :: the prepared training set, an arrayref of feature-value
+#            arrayrefs.  Packed into a flat double buffer here, so undef
+#            cells are resolved through _pack_args.
+#   $psi :: the per-tree sub-sample size from _resolve_geometry.
+#   $limit :: the tree height limit from _resolve_geometry.
+#   $n_trees :: how many trees to build.  A forked worker passes its own
+#               share rather than the model's full n_trees.
+#
+# Returns: an arrayref of $n_trees trees in the nested arrayref layout
+# _build_tree produces, so callers cannot tell which backend built them.
+#
+# Example:
+#   $self->{trees} = $self->_build_forest_c( $train, 256, 8, 100 );
 #-------------------------------------------------------------------------------
 sub _build_forest_c {
 	my ( $self, $data, $psi, $limit, $n_trees ) = @_;
@@ -5137,6 +6987,21 @@ sub _build_forest_c {
 # parallel region.  _unpack_forest converts them back into the ordinary
 # nested-arrayref tree shape so to_json/from_json/_rebuild_c_trees don't
 # need to know this path exists.
+#
+# Args:
+#   $data :: the prepared training set, an arrayref of feature-value
+#            arrayrefs.  Packed into a flat double buffer here, so undef
+#            cells are resolved through _pack_args.
+#   $psi :: the per-tree sub-sample size from _resolve_geometry.
+#   $limit :: the tree height limit from _resolve_geometry.
+#   $n_trees :: how many trees to build.
+#
+# Returns: an arrayref of $n_trees trees in the same nested arrayref layout
+# _build_forest_c returns -- identical in shape, though not in content, to
+# what the other backends would have built for this seed.
+#
+# Example:
+#   $self->{trees} = $self->_build_forest_openmp( $train, 256, 8, 100 );
 #-------------------------------------------------------------------------------
 sub _build_forest_openmp {
 	my ( $self, $data, $psi, $limit, $n_trees ) = @_;
@@ -5165,6 +7030,21 @@ sub _build_forest_openmp {
 # 0), but build_forest_openmp_xs appends nodes post-order (children
 # before parent), putting the root LAST -- the caller must pass the
 # right root index for the buffer's origin.
+#
+# Args:
+#   $nodes :: arrayref of the tree's node doubles, already unpacked, 6 per
+#             node.
+#   $idx :: arrayref of the unpacked int32 coefficient feature indices.
+#   $val :: arrayref of the unpacked coefficient values, matching $idx
+#           one-for-one.
+#   $node_i :: which node record to treat as this subtree's root, counting
+#              in nodes not doubles.
+#
+# Returns: the subtree as a nested arrayref in _build_tree's layout.
+#
+# Example:
+#   my $root = @nodes / 6 - 1;   # post-order buffer: root is last
+#   my $tree = _unpack_node( \@nodes, \@idx, \@val, $root );
 sub _unpack_node {
 	my ( $nodes, $idx, $val, $node_i ) = @_;
 	my $off  = $node_i * 6;
@@ -5200,6 +7080,20 @@ sub _unpack_node {
 # The C builder pushes nodes post-order (a node is recorded after both
 # of its children), so each tree's root is the LAST node record, not
 # index 0 as in _pack_tree's pre-order layout.
+#
+# Args:
+#   $nodes_list :: arrayref of one packed 'd*' node buffer per tree.
+#   $idx_list :: arrayref of one packed 'l*' coefficient index buffer per
+#                tree, positionally matching $nodes_list.
+#   $val_list :: arrayref of one packed 'd*' coefficient value buffer per
+#                tree, positionally matching $nodes_list.
+#
+# Returns: an arrayref of trees in the nested arrayref layout, in the same
+# order as the input buffers.
+#
+# Example:
+#   build_forest_openmp_xs( ..., \@nodes, \@idx, \@val, 1 );
+#   my $trees = _unpack_forest( \@nodes, \@idx, \@val );
 sub _unpack_forest {
 	my ( $nodes_list, $idx_list, $val_list ) = @_;
 	my @trees;
@@ -5243,8 +7137,22 @@ sub pack_data {
 } ## end sub pack_data
 
 # Internal helper: given $data that may be a raw arrayref OR a PackedData
-# instance, return the (n_pts, n_feats, x_packed) triple ready for
-# score_all_xs.  Called from every scoring fast path.
+# instance, return the triple ready for score_all_xs.  Called from every
+# scoring fast path, which is what lets those methods accept either shape
+# without each of them knowing about packing.
+#
+# Args:
+#   $data :: either an arrayref of feature-value arrayrefs (packed here,
+#            undef cells resolved through _pack_args) or a PackedData
+#            instance from pack_data (used as-is, no repacking).
+#
+# Returns: the three-element list ($n_pts, $n_feats, $x_packed) -- the row
+# count, the feature width and the row-major 'd*' buffer.  Croaks when a
+# PackedData's width disagrees with the model's.
+#
+# Example:
+#   my ( $n_pts, $nf, $x ) = $self->_resolve_input($data);
+#   score_all_xs( $self->{_c_nodes}, ..., $x, $sums, $n_pts, $nf, ... );
 sub _resolve_input {
 	my ( $self, $data ) = @_;
 	if ( ref $data eq 'Algorithm::Classifier::IsolationForest::PackedData' ) {
@@ -5264,6 +7172,19 @@ sub _resolve_input {
 # to an arrayref-of-arrayrefs.  Slow on PackedData -- the whole point of
 # packing is to keep things in C -- but lets the fallback path be
 # uniformly arrayref-driven.
+#
+# Args:
+#   $data :: either an arrayref of feature-value arrayrefs (returned
+#            unchanged, not copied) or a PackedData instance (unpacked into
+#            fresh rows).
+#
+# Returns: an arrayref of feature-value arrayrefs.  Rows unpacked from
+# PackedData hold plain doubles, so a NaN packed for a missing cell comes
+# back as NaN rather than undef.  Croaks on anything else.
+#
+# Example:
+#   my $rows = $self->_to_arrayref($data);
+#   _path_length( $rows->[0], $tree, 0, 0 );
 sub _to_arrayref {
 	my ( $self, $data ) = @_;
 	return $data if ref $data eq 'ARRAY';
@@ -5298,23 +7219,54 @@ sub _to_arrayref {
 # ---------------------------------------------------------------------------
 
 # Returns the training data to actually build trees on, after applying the
-# missing-value strategy.  May croak (die), return a dense filled copy
-# (zero/impute), or pass $data through unchanged (nan).
+# missing-value strategy.
+#
+# Args:
+#   $data :: the caller's raw training set, an arrayref of feature-value
+#            arrayrefs.  Never modified -- zero/impute build a copy rather
+#            than densifying in place.
+#
+# Returns: the arrayref of rows to build trees from.  That is $data itself
+# under die (already dense) and nan (undef is meaningful there), and a
+# dense copy under zero/impute -- except on the C tree-building path, which
+# fills from missing_fill itself and so also gets $data through unchanged.
+# Under die it croaks instead, naming the first missing cell's row and
+# column.  Under impute it also sets $self->{missing_fill}.
+#
+# Example:
+#   my $train = $self->_prepare_fit_data($data);
+#   my $tree  = $self->_build_tree( _subsample( $train, $psi ), 0, $limit );
 sub _prepare_fit_data {
 	my ( $self, $data ) = @_;
 	my $m  = $self->{missing};
 	my $nf = $self->{n_features};
 
 	if ( $m eq 'die' ) {
-		for my $i ( 0 .. $#$data ) {
-			my $row = $data->[$i];
-			for my $f ( 0 .. $nf - 1 ) {
-				next if defined $row->[$f];
-				croak "fit(): undef feature value at sample $i, column $f; "
-					. "construct with missing => 'zero', 'impute', or 'nan' "
-					. "to train on data with missing values";
+
+		# Locate the first missing cell, then report it.  The scan is over
+		# every cell of the training set, so with the C backend on it goes
+		# through first_missing_xs -- same row-major order, same cell
+		# reported, without the per-cell Perl loop overhead.  Both paths
+		# read a row that is not an arrayref as missing at column 0, which
+		# is how pack_input_xs treats one downstream.
+		my $where = [];
+		if ( $self->{_use_c} ) {
+			first_missing_xs( $data, scalar @$data, $nf, $where );
+		} else {
+			my $i = 0;
+			for my $row (@$data) {
+				if ( ref $row ne 'ARRAY' ) { $where = [ $i, 0 ]; last }
+				my $f = 0;
+				$f++ while $f < $nf && defined $row->[$f];
+				if ( $f < $nf ) { $where = [ $i, $f ]; last }
+				$i++;
 			}
-		}
+		} ## end else [ if ( $self->{_use_c} ) ]
+		croak "fit(): undef feature value at sample $where->[0], column $where->[1]; "
+			. "construct with missing => 'zero', 'impute', or 'nan' "
+			. "to train on data with missing values"
+			if @$where;
+
 		return $data;
 	} ## end if ( $m eq 'die' )
 
@@ -5351,11 +7303,27 @@ sub _prepare_fit_data {
 } ## end sub _prepare_fit_data
 
 # Per-feature fill value (mean or median of the present values) for impute
-# mode.  Croaks if a feature has no present value to learn from.
+# mode.  Croaks if a feature has no present value to learn from.  The
+# optional $how_override selects the statistic independently of the
+# model's impute_with knob (used by _compute_feature_baselines, which
+# always wants the median).
+#
+# Args:
+#   $data :: the rows to learn from, an arrayref of feature-value
+#            arrayrefs.  undef cells are skipped rather than counted.
+#   $how_override :: 'mean' or 'median' to force the statistic, or undef to
+#                    follow the model's impute_with.
+#
+# Returns: an arrayref of n_features fill values.  Croaks naming the column
+# when a feature has no present value anywhere in $data.
+#
+# Example:
+#   $self->_compute_impute_fill( \@rows );              # per impute_with
+#   $self->_compute_impute_fill( \@rows, 'median' );    # forced median
 sub _compute_impute_fill {
-	my ( $self, $data ) = @_;
+	my ( $self, $data, $how_override ) = @_;
 	my $nf  = $self->{n_features};
-	my $how = $self->{impute_with};
+	my $how = $how_override // $self->{impute_with};
 
 	# C fast path: walks the raw data directly and finds the median via
 	# quickselect (O(n) average) instead of the Perl fallback's full sort
@@ -5402,8 +7370,69 @@ sub _compute_impute_fill {
 	return \@fill;
 } ## end sub _compute_impute_fill
 
+# Per-feature median of the present values of the training data -- the
+# "typical row" that ablation explanations (explain_samples with
+# method => 'ablation') substitute against, one feature at a time.
+# Always the median (not impute_with's statistic): a baseline should be
+# a robustly central value, and outliers in the training data drag a
+# mean around far more than a median.
+#
+# Computed from the RAW rows, never a densified copy, so the stored
+# baselines are identical whether use_c is on or off (the pure-Perl fit
+# path densifies $train before the trees are built; the C path does
+# not).  A column with no present value at all -- legal under
+# missing => 'zero'/'nan' -- cannot yield a median, so the fast path's
+# croak falls back to a tolerant pure-Perl pass that gives such columns
+# the fill value scoring maps their undefs to anyway (0).
+#
+# Args:
+#   $data :: the raw training rows, an arrayref of feature-value
+#            arrayrefs.  Must be the caller's data, never a densified copy.
+#
+# Returns: an arrayref of n_features medians.  A column with no present
+# value at all gets 0 rather than causing a croak.
+#
+# Example:
+#   $self->{feature_baselines} = $self->_compute_feature_baselines($data);
+#   # later: explain_samples( \@rows, method => 'ablation' )
+sub _compute_feature_baselines {
+	my ( $self, $data ) = @_;
+	my $baselines = eval { $self->_compute_impute_fill( $data, 'median' ) };
+	return $baselines if ref $baselines eq 'ARRAY';
+
+	my $nf = $self->{n_features};
+	my @fallback;
+	for my $f ( 0 .. $nf - 1 ) {
+		my @vals = sort { $a <=> $b } grep { defined } map { $_->[$f] } @$data;
+		my $k    = scalar @vals;
+		if ( $k == 0 ) {
+			$fallback[$f] = 0;
+			next;
+		}
+		$fallback[$f]
+			= $k % 2
+			? $vals[ int( $k / 2 ) ]
+			: ( $vals[ $k / 2 - 1 ] + $vals[ $k / 2 ] ) / 2.0;
+		$fallback[$f] = _to_double( $fallback[$f] ) unless _NV_IS_DOUBLE;
+	} ## end for my $f ( 0 .. $nf - 1 )
+	return \@fallback;
+} ## end sub _compute_feature_baselines
+
 # Return a dense copy of $data with every undef cell replaced by the
 # matching per-feature fill value.  Leaves present cells untouched.
+#
+# Args:
+#   $data :: the rows to densify, an arrayref of feature-value arrayrefs.
+#            Never modified.
+#   $fill :: the per-feature fill values, an arrayref.  Its length fixes
+#            the output width, so a row longer than $fill is truncated and
+#            a shorter one padded.
+#
+# Returns: a fresh arrayref of fresh rows -- nothing is shared with $data,
+# so the caller may mutate either independently.
+#
+# Example:
+#   _densify( [ [ 0.9, undef ] ], [ 0, 0.5 ] );   # [ [ 0.9, 0.5 ] ]
 sub _densify {
 	my ( $data, $fill ) = @_;
 	my $nf = scalar @$fill;
@@ -5418,6 +7447,18 @@ sub _densify {
 # (miss_mode, fill_packed) pair for pack_input_xs, per the active strategy.
 # die/zero -> 0 (undef becomes 0.0); impute -> 1 (undef becomes fill[k]);
 # nan -> 2 (undef becomes NaN, which the C scorer routes right).
+#
+# Args: none beyond the model itself.
+#
+# Returns: the two-element list ($miss_mode, $fill_packed) -- the mode flag
+# above, and a 'd*' string of the per-feature fills under impute or the
+# empty string otherwise.  The packed fill is memoised in _fill_packed, so
+# repeated scoring calls pack it once.  Croaks when an impute model has
+# lost its fill vector.
+#
+# Example:
+#   my ( $mode, $fill ) = $self->_pack_args;
+#   pack_input_xs( $data, $x_packed, $n_pts, $nf, $mode, $fill );
 sub _pack_args {
 	my ($self) = @_;
 	my $m = $self->{missing};
@@ -5434,8 +7475,22 @@ sub _pack_args {
 
 # Pure-Perl fallback input prep: arrayref-ify, then fill for impute so the
 # tree walk sees dense rows.  zero/die rely on _path_length's "// 0"; nan
-# keeps undef in place for _path_length to route.  Returns the rows; the
-# caller passes the nan flag to _path_length separately.
+# keeps undef in place for _path_length to route.
+#
+# Args:
+#   $data :: either an arrayref of feature-value arrayrefs or a PackedData
+#            instance -- _to_arrayref normalises it either way.
+#
+# Returns: an arrayref of rows ready for _path_length.  Under impute these
+# are a fresh dense copy; otherwise the rows are handed back as they came,
+# so the caller must not mutate them.  The nan flag is NOT part of this --
+# callers pass it to _path_length themselves.  Croaks when an impute model
+# has lost its fill vector.
+#
+# Example:
+#   my $rows = $self->_prepare_perl_input($data);
+#   my $nan  = $self->{missing} eq 'nan' ? 1 : 0;
+#   _path_length( $rows->[0], $tree, 0, $nan );
 sub _prepare_perl_input {
 	my ( $self, $data ) = @_;
 	my $rows = $self->_to_arrayref($data);
@@ -5447,12 +7502,35 @@ sub _prepare_perl_input {
 	return $rows;
 } ## end sub _prepare_perl_input
 
-# Minimal PackedData package: opaque token returned by pack_data().
-# Exposes n_pts and n_feats accessors for users who want to introspect.
+# Minimal PackedData package: opaque token returned by pack_data().  The
+# scoring methods recognise it and hand its buffer straight to the C
+# scorer; the two accessors exist so callers holding one can still ask
+# what is in it without unpacking.
 {
 
 	package Algorithm::Classifier::IsolationForest::PackedData;
-	sub n_pts   { $_[0]->{n_pts} }
+
+	# How many samples the buffer holds.
+	#
+	# Args: none.
+	#
+	# Returns: the row count as an integer, fixed when pack_data built the
+	# object.
+	#
+	# Example:
+	#   my $packed = $iforest->pack_data(\@data);
+	#   $packed->n_pts;     # scalar @data
+	sub n_pts { $_[0]->{n_pts} }
+
+	# How wide each packed sample is.
+	#
+	# Args: none.
+	#
+	# Returns: the feature count as an integer, always the n_features of
+	# the model that packed the data.
+	#
+	# Example:
+	#   $packed->n_feats;   # 2 for two-feature rows
 	sub n_feats { $_[0]->{n_feats} }
 }
 

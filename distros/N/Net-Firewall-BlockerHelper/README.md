@@ -11,6 +11,8 @@ ipfw...
 - iptables (also supports tarpit/delude targets via xtables-addons)
 - nftables
 - npf
+- openwrt (OpenWrt fw4, configured via UCI, locally or remotely over ubus JSON-RPC...
+  both modes tested against OpenWrt 25.12.5 / firewall4)
 - pf
 - linux_ip_route (null/blackhole routes via iproute2)
 - shorewall (dynamic blacklist via shorewall/shorewall6)
@@ -113,6 +115,10 @@ And the following example/testing backends are available.
 
     # get a list of banned CIDR ranges
     my @banned_cidrs = $fw_helper->list_cidr;
+
+    # write out state the backend holds back from persistent storage
+    # (only openwrt implements this; others raise commitNotSupported)
+    $fw_helper->commit;
 
     # teardown the backend, re-init, and re-ban everything
     $fw_helper->re_init;

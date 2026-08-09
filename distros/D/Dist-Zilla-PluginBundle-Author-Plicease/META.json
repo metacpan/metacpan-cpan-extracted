@@ -25,7 +25,7 @@
             "ExtUtils::MakeMaker" : "6.64",
             "File::ShareDir::Install" : "0.06",
             "File::Which" : "0",
-            "perl" : "5.020"
+            "perl" : "5.022"
          }
       },
       "develop" : {
@@ -162,7 +162,7 @@
             "URI::Escape" : "0",
             "YAML" : "1.15",
             "namespace::autoclean" : "0",
-            "perl" : "5.020",
+            "perl" : "5.022",
             "stable" : "0",
             "true" : "0"
          }
@@ -171,7 +171,7 @@
          "requires" : {
             "Test2::V0" : "0.000121",
             "Test::Script" : "1.10",
-            "perl" : "5.020"
+            "perl" : "5.022"
          }
       }
    },
@@ -187,7 +187,7 @@
          "web" : "https://github.com/uperl/Dist-Zilla-PluginBundle-Author-Plicease"
       }
    },
-   "version" : "2.79",
+   "version" : "2.80",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

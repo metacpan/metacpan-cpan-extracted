@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Status;
 # ABSTRACT: Status is a return value for calls that don't return other objects.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -41,7 +41,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Status - Status is a return value fo
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 apiVersion
 

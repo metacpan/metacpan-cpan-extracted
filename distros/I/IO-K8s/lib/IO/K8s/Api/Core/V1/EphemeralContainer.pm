@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EphemeralContainer;
 # ABSTRACT: An EphemeralContainer is a temporary container that you may add to an existing Pod for user-initiated activities such as debugging. Ephemeral containers have no resource or scheduling guarantees, and they will not be restarted when they exit or when a Pod is removed or restarted. The kubelet may evict a Pod if an ephemeral container causes the Pod to exceed its resource allocation. To add an ephemeral container, use the ephemeralcontainers subresource of an existing Pod. Ephemeral containers may not be removed or restarted.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s args => [Str];
@@ -43,6 +43,9 @@ k8s resources => 'Core::V1::ResourceRequirements';
 
 
 k8s restartPolicy => Str;
+
+
+k8s restartPolicyRules => ['Core::V1::ContainerRestartRule'];
 
 
 k8s securityContext => 'Core::V1::SecurityContext';
@@ -92,7 +95,7 @@ IO::K8s::Api::Core::V1::EphemeralContainer - An EphemeralContainer is a temporar
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 args
 
@@ -149,6 +152,10 @@ Resources are not allowed for ephemeral containers. Ephemeral containers use spa
 =head2 restartPolicy
 
 Restart policy for the container to manage the restart behavior of each container within a pod. This may only be set for init containers. You cannot set this field on ephemeral containers.
+
+=head2 restartPolicyRules
+
+Represents a list of rules to be checked to determine if the container should be restarted on exit. The rules are evaluated in order. Once a rule matches a container exit condition, the remaining rules are ignored. If no rule matches the container exit condition, the Container-level restart policy determines the whether the container is restarted or not. Constraints on the rules: - At most 20 rules are allowed. - Rules can have the same action. - Identical rules are not forbidden in validations. When rules are specified, container MUST set RestartPolicy explicitly even it if matches the Pod's RestartPolicy.
 
 =head2 securityContext
 

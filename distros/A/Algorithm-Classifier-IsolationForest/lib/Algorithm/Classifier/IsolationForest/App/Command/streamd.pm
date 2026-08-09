@@ -468,6 +468,22 @@ sub execute {
 # startup helpers
 #-------------------------------------------------------------------------------
 
+# Make sure a directory the daemon needs exists and is writable, creating
+# it when it does not.  Run before daemonizing so a permissions problem is
+# reported to the terminal that started the daemon rather than buried in a
+# log the user has not found yet.
+#
+# Args:
+#   $dir :: the directory to create or check.
+#   $flag :: the option that asked for it, e.g. '--model-dir'.  Only used
+#            to name the fix in the error message.
+#
+# Returns: 1 when the directory exists and is writable.  Dies otherwise,
+# telling the user to create it, fix its permissions, or point $flag
+# somewhere else.
+#
+# Example:
+#   _ensure_dir( $OPT{'model_dir'}, '--model-dir' );
 sub _ensure_dir {
 	my ( $dir, $flag ) = @_;
 	if ( !-d $dir ) {
@@ -489,7 +505,20 @@ sub _ensure_dir {
 } ## end sub _ensure_dir
 
 # Classic double-fork daemonization.  The parents leave via POSIX::_exit
-# so no END blocks (Inline's, App::Cmd's) run twice.
+# so no END blocks (Inline's, App::Cmd's) run twice.  The second fork is
+# what guarantees the daemon can never reacquire a controlling terminal.
+#
+# Args: none.  Reads nothing and takes nothing -- the caller decides
+# whether to daemonize at all (-f keeps the process in the foreground).
+#
+# Returns: 1, in the grandchild only.  The two parents never return: they
+# _exit(0) immediately, so the caller either continues as the daemon or
+# does not continue.  Dies on a failed fork, setsid, chdir or STDIN
+# reopen.
+#
+# Example:
+#   _daemonize() unless $OPT{'f'};
+#   # from here on we are the daemon
 sub _daemonize {
 	defined( my $pid = fork() ) or die( 'fork failed: ' . $! . "\n" );
 	POSIX::_exit(0) if $pid;
@@ -501,6 +530,20 @@ sub _daemonize {
 	return 1;
 } ## end sub _daemonize
 
+# Point the daemon's logging at wherever --log said, falling back to
+# STDERR.  When daemonized, STDOUT and STDERR are reopened onto the log
+# too, so a warn from anywhere in the process still lands somewhere the
+# operator can read.  Everything is unbuffered: a daemon's log is useless
+# if the interesting line is still sitting in a buffer when it wedges.
+#
+# Args: none.  Reads $OPT{'log'} and $OPT{'f'}.
+#
+# Returns: 1.  Sets the package's $LOG_FH as its whole purpose.  Dies when
+# the log file cannot be opened.
+#
+# Example:
+#   _open_log();
+#   _log('listening');
 sub _open_log {
 	if ( defined $OPT{'log'} ) {
 		open( my $fh, '>>', $OPT{'log'} ) or die( 'failed to open log "' . $OPT{'log'} . '": ' . $! . "\n" );
@@ -518,6 +561,17 @@ sub _open_log {
 	return 1;
 } ## end sub _open_log
 
+# Write one timestamped, pid-stamped line to the log.  The pid matters
+# because several named instances (--set) can share one log file.
+#
+# Args:
+#   $msg :: the message, without a trailing newline -- one is added.
+#
+# Returns: 1.
+#
+# Example:
+#   _log( 'saved ' . $name . ' (' . $why . ')' );
+#   # 2026-08-08T14:02:11 [4821] saved oiforest-20260808-140211.json (interval)
 sub _log {
 	my ($msg) = @_;
 	print {$LOG_FH} strftime( '%Y-%m-%dT%H:%M:%S', localtime ) . ' [' . $$ . '] ' . $msg . "\n";
@@ -528,9 +582,20 @@ sub _log {
 # model persistence
 #-------------------------------------------------------------------------------
 
-# Timestamped save + atomic symlink flip.  Returns the file name saved
-# to (relative to model-dir, which is also what the symlink stores so
-# the directory stays relocatable).
+# Timestamped save + atomic symlink flip.  The symlink stores a relative
+# name, so the whole model directory can be moved without breaking it.
+#
+# Args:
+#   $why :: a short reason recorded in the log line, e.g. 'interval',
+#           'command', 'SIGUSR1' or 'shutdown'.
+#
+# Returns: the file name written, relative to --model-dir.  Also clears
+# the dirty flag, repoints latest.json, and prunes old models when --keep
+# is set.  Dies if the write fails; a failed symlink or rename only warns
+# to the log, since the model itself is already safely on disk.
+#
+# Example:
+#   my $name = _save_model('interval');   # 'oiforest-20260808-140211.json'
 sub _save_model {
 	my ($why) = @_;
 
@@ -562,6 +627,20 @@ sub _save_model {
 	return $name;
 } ## end sub _save_model
 
+# Keep only the newest --keep timestamped models, deleting the rest
+# oldest-first.  Ordered by mtime rather than by the name's timestamp so
+# a clock stepping backwards cannot strand a file forever.  latest.json is
+# a symlink, not a match for the model pattern, so it is never a
+# candidate.
+#
+# Args: none.  Reads $OPT{'model_dir'} and $OPT{'keep'}, and is only
+# called when --keep is set.
+#
+# Returns: 1, or an empty return when the model directory cannot be
+# opened -- pruning is housekeeping, so it never takes the daemon down.
+#
+# Example:
+#   _prune_models() if defined $OPT{'keep'};
 sub _prune_models {
 	opendir( my $dh, $OPT{'model_dir'} ) or return;
 	my @models = sort { ( stat($a) )[9] <=> ( stat($b) )[9] }
@@ -579,6 +658,20 @@ sub _prune_models {
 # connection handling
 #-------------------------------------------------------------------------------
 
+# Close one client connection and forget everything about it.  The single
+# teardown path, so a connection can never be left in a selector after its
+# socket is gone.
+#
+# Args:
+#   $s :: the client socket.
+#   $rsel :: the read IO::Select set it may be registered in.
+#   $wsel :: the write IO::Select set it may be registered in.
+#
+# Returns: 1.  Callers return its value directly, which is why the read
+# and write loops read as "return _drop(...)".
+#
+# Example:
+#   return _drop( $s, $rsel, $wsel ) if $got == 0;   # client closed
 sub _drop {
 	my ( $s, $rsel, $wsel ) = @_;
 	$rsel->remove($s);
@@ -588,6 +681,27 @@ sub _drop {
 	return 1;
 }
 
+# Read whatever is available from one client, dispatch every complete
+# line in it, and push the replies back out.  Partial lines stay in the
+# connection's input buffer for the next readable event, which is what
+# lets one non-blocking loop serve many clients.
+#
+# A client that sends an unterminated line past MAX_INBUF, or backs up
+# past MAX_OUTBUF of unread replies, is dropped: neither is recoverable,
+# and both would otherwise let one client exhaust the daemon's memory.
+#
+# Args:
+#   $s :: the readable client socket.
+#   $rsel :: the read IO::Select set.
+#   $wsel :: the write IO::Select set, which gains $s when a reply cannot
+#            be written in full.
+#
+# Returns: 1 after servicing the client, or the result of _drop when the
+# connection ended or misbehaved.  An empty return on EAGAIN/EINTR, or for
+# a socket with no connection record, leaves the client untouched.
+#
+# Example:
+#   _read_from( $_, $rsel, $wsel ) for $rsel->can_read($timeout);
 sub _read_from {
 	my ( $s, $rsel, $wsel ) = @_;
 	my $c = $CONN{ fileno($s) } or return;
@@ -615,6 +729,23 @@ sub _read_from {
 	return 1;
 } ## end sub _read_from
 
+# Push as much of a connection's pending output as the socket will take.
+# A client that cannot keep up leaves the remainder buffered and the
+# socket registered for write-readiness, so the daemon never blocks on a
+# slow reader.
+#
+# Args:
+#   $s :: the client socket.
+#   $rsel :: the read IO::Select set, needed only to hand to _drop.
+#   $wsel :: the write IO::Select set.  $s is added while output remains
+#            and removed once it has all gone out.
+#
+# Returns: 1 when the buffer drained completely, the result of _drop on a
+# write error, or an empty return when the socket would block with output
+# still pending.
+#
+# Example:
+#   _flush( $s, $rsel, $wsel ) if length $c->{outbuf};
 sub _flush {
 	my ( $s, $rsel, $wsel ) = @_;
 	my $c = $CONN{ fileno($s) } or return;
@@ -640,6 +771,21 @@ sub _flush {
 # One request line -> one reply line, appended to the connection's
 # output buffer.  Any croak from the model becomes an {"error": ...}
 # reply on this message alone; the connection and daemon live on.
+#
+# Args:
+#   $c :: the connection record hashref, holding inbuf, outbuf and the
+#         connection's default mode.
+#   $line :: one request line, without its newline.  Must be a JSON object
+#            carrying exactly one of row, rows or cmd, optionally with mode
+#            and tag.
+#
+# Returns: whatever _reply returns (1).  Every path replies, including
+# every error path, so a client is never left waiting.  A "tag" in the
+# request is echoed on the reply, errors included.
+#
+# Example:
+#   _handle_line( $c, '{"row":[0.2,0.7],"tag":"req-1"}' );
+#   # queues {"score":0.41,"label":0,"tag":"req-1"}
 sub _handle_line {
 	my ( $c, $line ) = @_;
 
@@ -697,6 +843,32 @@ sub _handle_line {
 	return _reply( $c, { scores => \@pairs, @tag } );
 } ## end sub _handle_line
 
+# The control half of the protocol: everything that inspects or steers
+# the daemon rather than feeding it data.  Split out of _handle_line so
+# the data path stays readable.
+#
+# Recognised commands:
+#   - ping :: liveness check, replies "pong".
+#   - mode :: set this connection's default mode for later messages.
+#   - stats :: counters, window fill, effective threshold, connection
+#              count and the instance's --set name.
+#   - save :: save the model now, replying with the file name written.
+#   - relearn-threshold :: recompute the contamination cutoff from the
+#                          current window, replying with the new value.
+#
+# Args:
+#   $c :: the connection record hashref.  The mode command mutates its
+#         default mode.
+#   $msg :: the decoded request hashref.
+#   $tag :: arrayref of the (tag => value) pair to echo, or empty when the
+#           request carried no tag.  Flattened into every reply.
+#
+# Returns: whatever _reply returns (1).  An unknown command gets an error
+# reply naming it rather than closing the connection.
+#
+# Example:
+#   _handle_cmd( $c, { cmd => 'stats' }, [] );
+#   # queues {"ok":{"seen":48210,"window":2048,...}}
 sub _handle_cmd {
 	my ( $c, $msg, $tag ) = @_;
 	my $cmd = $msg->{cmd};
@@ -750,6 +922,19 @@ sub _handle_cmd {
 	return _reply( $c, { error => 'unknown cmd "' . $cmd . '"', @$tag } );
 } ## end sub _handle_cmd
 
+# Queue one reply on a connection.  Encoding and the trailing newline
+# live here alone, so every reply the daemon emits is one JSON document
+# per line no matter which handler produced it.
+#
+# Args:
+#   $c :: the connection record hashref.  Its outbuf grows.
+#   $reply :: the reply as a hashref, ready to encode.
+#
+# Returns: 1.  The bytes are not written here -- _read_from's _flush call
+# does that once the current batch of lines has been handled.
+#
+# Example:
+#   _reply( $c, { ok => 'pong' } );
 sub _reply {
 	my ( $c, $reply ) = @_;
 	$c->{outbuf} .= $JSON->encode($reply) . "\n";
@@ -758,6 +943,14 @@ sub _reply {
 
 # The effective label cutoff, resolved per message so relearns and the
 # contamination refresh at save time take effect immediately.
+#
+# Args: none.  Reads $OPT{'threshold'} and the model's own learned cutoff.
+#
+# Returns: the cutoff as a float -- --threshold when given, else the
+# model's contamination-learned decision_threshold, else 0.5.
+#
+# Example:
+#   my $label = $score >= _threshold() ? 1 : 0;
 sub _threshold {
 	return
 		  defined $OPT{'threshold'}        ? $OPT{'threshold'}
@@ -771,7 +964,23 @@ sub _threshold {
 # is validated numeric before it touches the model -- JSON delivers
 # typed values, so anything non-numeric left after munging is a caller
 # bug worth an explicit error rather than Perl's silent string-to-0.
-# Returns the score, or undef in learn mode.  Croaks on any problem.
+#
+# Args:
+#   $row :: one row, either a hashref of tagged raw values or an arrayref
+#           of positional ones.  undef cells are left alone and defer to
+#           the model's missing policy.
+#   $mode :: 'learn', 'score' or 'prequential' -- learn only, score
+#            without learning, or score then learn.
+#
+# Returns: the anomaly score as a float, or undef in learn mode.  Sets the
+# dirty flag whenever the model actually learned, which is what makes the
+# interval save skip a quiet period.  Dies on a row that is neither shape,
+# on a cell left non-numeric after munging, or on anything the model
+# itself croaks about.
+#
+# Example:
+#   _apply_row( { method => 'GET', host => 'h' }, 'prequential' );   # 0.41
+#   _apply_row( [ 0.2, 0.7 ], 'learn' );                             # undef
 sub _apply_row {
 	my ( $row, $mode ) = @_;
 
@@ -805,5 +1014,80 @@ sub _apply_row {
 	$DIRTY = 1;
 	return $score;
 } ## end sub _apply_row
+
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::streamd - Run an Online Isolation Forest scoring daemon on a Unix socket, speaking JSON lines
+
+=head1 DESCRIPTION
+
+Wraps the prequential loop of C<iforest stream> in a daemon: it listens
+on a Unix domain socket, serves many concurrent connections from one
+shared model, and exchanges one JSON document per line.  Because values
+travel as JSON rather than positionally, raw input headed for mungers may
+safely contain commas, newlines or any unicode, and object rows run the
+full munger plan -- expanding and combining mungers included, which
+positional CSV cannot express.
+
+An optional C<"tag"> on a request is echoed back verbatim.  Errors are
+always per-message: a bad row gets an C<{"error": ...}> reply and the
+connection lives on.
+
+Models are saved to C<--model-dir> as timestamped files every
+C<--save-interval> seconds when learning has happened, plus on the C<save>
+command, on SIGUSR1, and at shutdown.  The C<latest.json> symlink is
+repointed atomically at each save and resumed from at the next startup, so
+a crash loses at most one interval of learning.
+
+Several named instances can run side by side: C<--set> gives each its own
+socket, pid file, model subdirectory and resume state.
+
+C<iforest streamc> is the matching client.
+
+Run it as C<iforest streamd>; C<iforest help streamd> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help streamd> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Checks that C<--set> is a usable instance name, that C<--save-interval>,
+C<--keep>, C<--threshold>, C<--growth> and C<--socket-mode> hold sane
+values, and that a C<--mungers> spec is readable and accompanied by the
+feature tags (C<-t>) it compiles against.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Prepares the runtime and model directories, daemonizes unless C<-f> was
+given, and runs the accept/serve loop until it is asked to stop.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
 
 return 1;

@@ -1,5 +1,122 @@
 Revision history for IO-K8s
 
+1.105     2026-08-08 18:51:44Z
+
+  - Removed the 76 individual *List classes (PodList, ServiceList,
+    DeploymentList, etc.) that have emitted "use IO::K8s::List instead"
+    deprecation warnings since the 1.00 Moose-to-Moo rewrite. They were
+    never real classes in the 1.x series and this release drops them from
+    the distribution entirely. Code that still references one of these
+    names (e.g. via cpanfile or `use`) will now fail to install instead of
+    silently warning; install IO::K8s::Deprecated for a clear redirect
+    message pointing at IO::K8s::List. This also removes four namespaces
+    that held nothing but a List stub and are now gone entirely --
+    IO::K8s::ApiExtensionsApiServer, IO::K8s::Api::Auditregistration,
+    IO::K8s::Api::Extensions, IO::K8s::Api::Settings -- plus several
+    now-empty single-version subdirectories under Apps, Autoscaling, Batch,
+    Certificates, Coordination, Events, KubeAggregator, Policy, Rbac, and
+    Scheduling. Full old-name list: IO::K8s::Deprecated's POD.
+  - Restored the 8 Cilium v2alpha1/v2 classes dropped in 1.100's Cilium
+    v1.19.2 upgrade (CiliumBGPAdvertisement, CiliumBGPClusterConfig,
+    CiliumBGPNodeConfig, CiliumBGPNodeConfigOverride, CiliumBGPPeerConfig,
+    CiliumCIDRGroup under Cilium::V2alpha1; CiliumBGPPeeringPolicy under
+    Cilium::V2alpha1; CiliumExternalWorkload under Cilium::V2). These now
+    ship alongside their current-API-version siblings for backward
+    compatibility with clusters still running older Cilium releases,
+    matching this dist's existing convention of keeping multiple API
+    versions of a resource side by side (e.g. Apps V1beta1/V1beta2/V1).
+  - Synced all API surfaces to their current upstream releases (previous
+    target: Kubernetes v1.31 and CRD providers pinned months/years back).
+    Kubernetes core moved v1.31 -> v1.36; CRD providers moved
+    Cilium v1.19.2 -> v1.20.0, K3s v1.35.1+k3s1 -> v1.36.3+k3s1,
+    Traefik v3.0.0 -> v3.7.10 (CRD set unchanged across v3.x),
+    cert-manager v1.19.3 -> v1.21.1 (no CRD/field changes),
+    Gateway API v1.1.0 -> v1.6.1, Agent Sandbox v0.2.1 -> v0.5.4.
+    * Cilium: added CiliumDatapathPlugin (cilium.io/v2alpha1, new in
+      v1.20.0's Extensible Datapath feature).
+    * Gateway API: added BackendTLSPolicy, ListenerSet, TLSRoute,
+      TCPRoute, UDPRoute (all gateway.networking.k8s.io/v1), and a
+      gateway.networking.k8s.io/v1 ReferenceGrant alongside the existing
+      v1beta1 (still the short-name/storage version); TLSRoute joins
+      HTTPRoute/GRPCRoute in consuming IO::K8s::Role::Routable.
+    * Agent Sandbox: all four CRDs gained a v1beta1 track (now the
+      storage version) with real schema changes -- Sandbox drops
+      spec/status.replicas for spec.operatingMode + spec.service +
+      status.nodeName/podIPs; SandboxClaim drops spec.sandboxTemplateRef
+      for a required spec.warmPoolRef and gains
+      spec.additionalPodMetadata, spec.env, spec.lifecycle,
+      a typed spec.volumeClaimTemplates list, and
+      status.sandbox.name (was status.sandbox.Name); SandboxTemplate
+      gains spec.envVarsInjectionPolicy, spec.service,
+      spec.volumeClaimTemplates, spec.volumeClaimTemplatesPolicy;
+      SandboxWarmPool gains spec.updateStrategy.type. v1alpha1 survives
+      as served-but-deprecated on all four.
+    * K3s and cert-manager: version bump only, no CRD/field-level changes
+      upstream.
+    * Traefik: version bump only; CRD set confirmed unchanged across the
+      whole v3.x line.
+    * Core Kubernetes -- workloads: added container restart rules
+      (Container/EphemeralContainer restartPolicyRules), pod-level
+      resources (PodSpec.resources, PodStatus.allocatedResources/
+      resources), PodSpec.hostnameOverride and .schedulingGroup (gang
+      scheduling), PodStatus.observedGeneration and DRA-related extended
+      resource claim status fields, HorizontalPodAutoscaler per-direction
+      scaling tolerance, DeploymentStatus/ReplicaSetStatus
+      .terminatingReplicas, NodeStatus.declaredFeatures.
+    * Core Kubernetes -- networking: added networking.k8s.io/v1
+      ServiceCIDR and IPAddress (stable since v1.33; deprecated v1beta1
+      kept alongside), made NetworkPolicySpec.podSelector optional
+      (upstream now defaults it), added discovery.k8s.io/v1 EndpointHints
+      .forNodes / ForNode for PreferSameNode topology routing.
+    * Core Kubernetes -- security/admission: added
+      MutatingAdmissionPolicy/MutatingAdmissionPolicyBinding (GA in v1),
+      PodCertificateRequest (certificates.k8s.io/v1beta1), and
+      ClusterTrustBundle at v1beta1 alongside the existing v1alpha1.
+      The older v1alpha1/v1beta1 ValidatingAdmissionPolicy and
+      authentication.k8s.io/{v1alpha1,v1beta1} SelfSubjectReview tracks,
+      and flowcontrol.apiserver.k8s.io/v1beta3, were evaluated for
+      removal (no longer served by a v1.36 apiserver) but kept in this
+      release rather than deleted, matching this dist's Cilium-precedent
+      of preferring backward compatibility over deletion for classes that
+      already shipped in a prior CPAN release -- deleting a
+      previously-released module name without a tombstone would orphan
+      it on PAUSE. Left as a maintainer decision for a future release.
+    * Core Kubernetes -- storage/DRA: added resource.k8s.io/v1 (GA)
+      Dynamic Resource Allocation -- DeviceClass, ResourceClaim,
+      ResourceClaimTemplate, ResourceSlice and their full nested type
+      graph -- replacing the old v1alpha3-only control-plane-controller
+      allocation mode (DRA graduated to GA in Kubernetes v1.34).
+      Also added resource.k8s.io/v1beta2 DeviceTaintRule,
+      resource.k8s.io/v1alpha3 ResourcePoolStatusRequest,
+      scheduling.k8s.io/v1alpha2 PodGroup/Workload (gang scheduling),
+      storage.k8s.io/v1 VolumeAttributesClass (GA),
+      coordination.k8s.io/v1beta1 LeaseCandidate, and new CSIDriverSpec
+      fields (nodeAllocatableUpdatePeriodSeconds,
+      preventPodSchedulingIfMissing, serviceAccountTokenInSecrets).
+      Fixed a pre-existing bug found while verifying the new DRA classes:
+      the api_version group map in IO::K8s::Role::APIObject was missing
+      an entry for "resource", so every Api::Resource::* class (both the
+      pre-existing v1alpha3 ones and the new ones added here) rendered
+      apiVersion as "resource/vX" instead of the correct
+      "resource.k8s.io/vX" -- would have produced manifests rejected by
+      any real cluster. Fixed by adding resource => 'resource.k8s.io' to
+      the map.
+      Removed four resource.k8s.io/v1alpha3 classes --
+      PodSchedulingContext, PodSchedulingContextSpec,
+      PodSchedulingContextStatus, ResourceClaimSchedulingStatus --
+      confirmed removed from the live v1.36 API (the "classic DRA"
+      control-plane-controller allocation flow they supported was fully
+      superseded by the new v1 structured-parameters model). Unlike the
+      admission/auth/flowcontrol classes noted above, these had no
+      lingering old-cluster back-compat rationale to keep them (DRA
+      itself was alpha-only when these shipped, never GA, so there is no
+      "still-supported old cluster" using them the way there is for a
+      long-GA API's deprecated beta track) -- maintainer confirmed
+      removal. Since these names already shipped in IO-K8s 1.100, PAUSE
+      redirect tombstones for all four were added to the companion
+      IO::K8s::Deprecated distribution rather than left to silently
+      orphan.
+
 1.100     2026-03-25 19:17:28Z
   - Added IO::K8s::AgentSandbox with 4 CRD classes for agent-sandbox (v0.2.1):
     Sandbox (agents.x-k8s.io/v1alpha1), SandboxClaim, SandboxTemplate,

@@ -10,7 +10,8 @@ use Test::More;
 use Test::Fatal;
 use Test::Moose::More 0.004;
 
-require 't/funcs.pm' unless eval { require funcs };
+use lib 't';
+require funcs;
 
 use Dist::Zilla::Plugin::Git::CheckFor::Fixups;
 

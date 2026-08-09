@@ -4,6 +4,7 @@ package Test::Kubernetes::Mock;
 use strict;
 use warnings;
 use JSON::MaybeXS;
+use Encode ();
 use Path::Tiny qw(path);
 use Exporter 'import';
 
@@ -11,6 +12,9 @@ our @EXPORT_OK = qw(mock_api live_api is_live record_response);
 
 my $MOCK_DIR = path(__FILE__)->parent->parent->parent->parent->child('mock');
 my $json = JSON::MaybeXS->new->pretty->canonical;
+
+# Real IO backends hand back response bodies as bytes - so must the mock.
+my $wire_json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 
 # Keep kubeconfig object alive so temp cert files aren't deleted
 my $_kubeconfig;
@@ -109,7 +113,7 @@ sub call {
     if (my $lines = $self->log_lines->{$clean_path}) {
         return Test::Kubernetes::Mock::Response->new(
             status => 200,
-            content => join("\n", @$lines) . "\n",
+            content => Encode::encode('UTF-8', join("\n", @$lines) . "\n"),
         );
     }
 
@@ -126,7 +130,7 @@ sub call {
     if ($data) {
         return Test::Kubernetes::Mock::Response->new(
             status => 200,
-            content => JSON::MaybeXS->new->encode($data),
+            content => $wire_json->encode($data),
         );
     }
 
@@ -158,7 +162,7 @@ sub call_streaming {
     # Check for log lines first (log paths end with /log)
     if (my $lines = $self->log_lines->{$path}) {
         for my $line (@$lines) {
-            $callback->($line . "\n", undef);
+            $callback->(Encode::encode('UTF-8', $line . "\n"), undef);
         }
         return Test::Kubernetes::Mock::Response->new(
             status => 200,
@@ -175,9 +179,8 @@ sub call_streaming {
         );
     }
 
-    my $json = JSON::MaybeXS->new;
     for my $event (@$events) {
-        my $line = $json->encode($event) . "\n";
+        my $line = $wire_json->encode($event) . "\n";
         $callback->($line, undef);
     }
 

@@ -1,0 +1,189 @@
+NAME
+
+    Tie::Google::Sheets - Tie perl variables to Google Sheets
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+     use Tie::Google::Sheets;
+    
+     tie my %doc, 'Tie::Google::Sheets',
+         spreadsheet_id  => '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+         service_account => '/path/to/service-account-key.json';
+    
+     # read and write individual cells
+     my $name = $doc{Employees}{A1};
+     $doc{Employees}{A2} = 'Grace Hopper';
+    
+     # create a new worksheet, optionally pre-populated
+     tied(%doc)->add_worksheet('Report', { A1 => 'Total', B1 => 42 });
+    
+     # iterate over worksheet tabs
+     for my $title (keys %doc) {
+         print "$title\n";
+     }
+    
+     # remove a worksheet
+     delete $doc{Report};
+
+DESCRIPTION
+
+    This module ties a Perl hash to a Google Sheets spreadsheet document.
+    The outer hash is keyed by worksheet (tab) title; each value is itself
+    a hash (implemented by Tie::Google::Sheets::Worksheet) keyed by cell
+    reference in A1 notation (A1, B12, and so on), so that a spreadsheet
+    can be read and written using ordinary Perl hash syntax:
+
+     $doc{'Sheet1'}{'A1'} = 'hello';
+     print $doc{'Sheet1'}{'A1'};
+
+    Authentication is via a Google service account. Remember to share the
+    spreadsheet (or its containing folder) with the service account's
+    client_email address, the same way you would share it with any other
+    Google account, otherwise API calls will fail with a permission error.
+
+CONSTRUCTOR
+
+     tie my %doc, 'Tie::Google::Sheets', %options;
+
+    %options may contain:
+
+    spreadsheet_id
+
+      The id of the spreadsheet, taken from its URL
+      (https://docs.google.com/spreadsheets/d/<id>/edit). Required unless
+      "spreadsheet_url" is given instead.
+
+    spreadsheet_url
+
+      The full URL of the spreadsheet, from which the spreadsheet id will
+      be extracted. Ignored if "spreadsheet_id" is also given.
+
+    service_account
+
+      Either a hash reference containing the decoded contents of a Google
+      service account JSON key file, or a path to the key file itself.
+      Required unless "access_token" is given instead.
+
+    access_token
+
+      An OAuth2 bearer token (or a code reference which returns one) to use
+      instead of authenticating with a service account. Useful when the
+      caller already has its own way of obtaining and refreshing tokens
+      (or, in tests, for supplying a fake token).
+
+    ua
+
+      A user agent object (for example an HTTP::Tiny or LWP::UserAgent
+      instance) to be wrapped in an HTTP::AnyUA. Defaults to a plain
+      HTTP::Tiny instance.
+
+    any_ua
+
+      An already constructed HTTP::AnyUA compatible object (that is,
+      anything providing a request($method, $url, \%options) method with
+      the same contract as HTTP::Tiny). Used as-is instead of wrapping
+      "ua". Mutually exclusive with "ua".
+
+TIE METHODS
+
+    This class implements the standard perltie TIEHASH protocol; see
+    perltie for the full semantics of each method.
+
+ TIEHASH
+
+    Constructor, called via tie; see "CONSTRUCTOR" above.
+
+ FETCH
+
+    Returns the worksheet named by the given key, as a hashref implemented
+    by Tie::Google::Sheets::Worksheet. The worksheet does not need to
+    already exist on the server; accessing cells on one that doesn't will
+    fail.
+
+ STORE
+
+    Creates a new worksheet. The key is the new worksheet's title; the
+    value must be undef or a hashref of cell reference / value pairs to
+    populate it with. Croaks if a worksheet with that title already exists.
+
+ DELETE
+
+    Deletes a worksheet.
+
+ EXISTS
+
+    Returns true if a worksheet with the given title exists.
+
+ CLEAR
+
+    Always croaks: a spreadsheet must keep at least one worksheet, so the
+    tied hash cannot be emptied wholesale.
+
+ FIRSTKEY, NEXTKEY
+
+    Together implement iteration (keys, values, each) over the
+    spreadsheet's worksheet titles.
+
+METHODS
+
+    These are ordinary (non-tie) methods available on the underlying object
+    via tied %doc.
+
+ add_worksheet
+
+     tied(%doc)->add_worksheet($title);
+     tied(%doc)->add_worksheet($title, \%cells);
+
+    Creates a new worksheet named $title. If \%cells is given, its
+    key/value pairs are written into the new worksheet as cell reference /
+    value pairs. Returns the new worksheet hashref, the same as
+    $doc{$title}.
+
+    This is equivalent to $doc{$title} = \%cells.
+
+ delete_worksheet
+
+     tied(%doc)->delete_worksheet($title);
+
+    Deletes the worksheet named $title. Equivalent to delete $doc{$title}.
+
+ worksheet_titles
+
+     my @titles = tied(%doc)->worksheet_titles;
+
+    Returns the titles of all worksheets in the spreadsheet, in the order
+    Google Sheets returns them. Equivalent to keys %doc.
+
+CAVEATS
+
+      * Every cell access is a separate Google Sheets API call; there is no
+      local caching or batching. Be mindful of Google's API quotas
+      <https://developers.google.com/sheets/api/limits> if you access many
+      cells.
+
+      * A spreadsheet must always have at least one worksheet, so %doc
+      cannot be emptied with %doc = (); delete worksheets individually
+      instead.
+
+      * Only cell values are read and written; formatting, formulas results
+      vs formula text, and other cell metadata are not exposed.
+
+SEE ALSO
+
+    Tie::Google::Sheets::Worksheet
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2026 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

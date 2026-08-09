@@ -21,25 +21,22 @@ no_index:
 provides:
   PAGI::FastAPI:
     file: lib/PAGI/FastAPI.pm
-    version: v0.0.6
+    version: v0.0.9
   PAGI::FastAPI::Context:
     file: lib/PAGI/FastAPI/Context.pm
-    version: v0.0.6
+    version: v0.0.9
   PAGI::FastAPI::Depends:
     file: lib/PAGI/FastAPI/Depends.pm
-    version: v0.0.6
-  PAGI::FastAPI::WebSocket:
-    file: lib/PAGI/FastAPI/WebSocket.pm
-    version: v0.0.6
+    version: v0.0.9
 requires:
   Future::AsyncAwait: '0.60'
-  JSON::MaybeXS: '1.004'
   JSON::PP: '4.00'
   PAGI: '0.002001'
+  PAGI::WebSocket: '0.002002'
   Type::Tiny: '2.000000'
   perl: '5.036'
 resources:
   bugtracker: https://github.com/manwar/PAGI-FastAPI/issues
   repository: https://github.com/manwar/PAGI-FastAPI.git
-version: v0.0.6
+version: v0.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

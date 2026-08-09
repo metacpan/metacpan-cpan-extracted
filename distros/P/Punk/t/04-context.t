@@ -82,6 +82,36 @@ is(file_json_decode(hit($app, path => '/stash')->[2][0])->{x}, 5, 'stash');
     is($d->{v}, 'query', 'query wins over form in param');
 }
 
+# ---- params(@keys) -----------------------------------------------------------
+# The keyed form resolves each name exactly as param does - capture first,
+# then query, then form - and is the one call the filter-hash idiom needs.
+{
+    package Many;
+    use Punk;
+    post '/many/:state' => sub {
+        my ($c) = @_;
+        my @slice = $c->params(qw(state queue nope));
+        return {
+            slice  => \@slice,
+            filter => { %{ $c->params(qw(state queue task nope)) } },
+            all    => $c->params,
+        };
+    };
+    package main;
+    my $d = file_json_decode(hit(Many->to_app,
+        method => 'POST', path => '/many/active', query => 'queue=default',
+        body => 'task=send&state=body-loses',
+        type => 'application/x-www-form-urlencoded')->[2][0]);
+    is_deeply($d->{slice}, [ 'active', 'default', undef ],
+        'params(@keys) slices in capture-then-query order, undef for missing');
+    is_deeply($d->{filter},
+        { state => 'active', queue => 'default', task => 'send' },
+        'the hashref form drops the name no layer has');
+    is_deeply($d->{all},
+        { state => 'active', queue => 'default', task => 'send' },
+        'params with no names merges every layer, the capture winning');
+}
+
 # ---- slot layout -------------------------------------------------------------
 # The accessors (xs/context.xs) and the PCX_* enum (punk_context.h) are the two
 # halves of one contract: the accessor XSUB maps its ALIAS index straight into

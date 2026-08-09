@@ -5,16 +5,16 @@ use warnings;
 
 use Catalyst::Authentication::Credential::Password ();
 
-## BACKWARDS COMPATIBILITY - all subs below here are deprecated 
-## They are here for compatibility with older modules that use / inherit from C::P::A::Password 
+## BACKWARDS COMPATIBILITY - all subs below here are deprecated
+## They are here for compatibility with older modules that use / inherit from C::P::A::Password
 ## login()'s existance relies rather heavily on the fact that only Credential::Password
-## is being used as a credential.  This may not be the case.  This is only here 
+## is being used as a credential.  This may not be the case.  This is only here
 ## for backward compatibility.  It will go away in a future version
 ## login should not be used in new applications.
 
 sub login {
     my ( $c, $user, $password, @rest ) = @_;
-    
+
     unless (
         defined($user)
             or
@@ -24,7 +24,7 @@ sub login {
     ) {
         $c->log->debug(
             "Can't login a user without a user object or user ID param")
-              if $c->debug;
+          if $c->debug;
         return;
     }
 
@@ -36,10 +36,10 @@ sub login {
                  || $c->request->param("pass")
     ) {
         $c->log->debug("Can't login a user without a password")
-          if $c->debug;
+            if $c->debug;
         return;
     }
-    
+
     unless ( Scalar::Util::blessed($user)
         and $user->isa("Catalyst::Authentication::User") )
     {
@@ -48,7 +48,7 @@ sub login {
         }
         else {
             $c->log->debug("User '$user' doesn't exist in the default store")
-              if $c->debug;
+                if $c->debug;
             return;
         }
     }
@@ -65,13 +65,13 @@ sub login {
           if $c->debug;
         return;
     }
-    
+
 }
 
 ## also deprecated.  Here for compatibility with older credentials which do not inherit from C::P::A::Password
 sub _check_password {
     my ( $c, $user, $password ) = @_;
-    
+
     if ( $user->supports(qw/password clear/) ) {
         return $user->password eq $password;
     }
@@ -100,7 +100,7 @@ sub _check_password {
         require Crypt::SaltedHash;
 
         my $salt_len =
-          $user->can("password_salt_len") ? $user->password_salt_len : 0;
+            $user->can("password_salt_len") ? $user->password_salt_len : 0;
 
         return Crypt::SaltedHash->validate( $user->hashed_password, $password,
             $salt_len );
@@ -131,7 +131,7 @@ Catalyst::Plugin::Authentication::Credential::Password - Compatibility shim
 =head1 DESCRIPTION
 
 THIS IS A COMPATIBILITY SHIM.  It allows old configurations of Catalyst
-Authentication to work without code changes.  
+Authentication to work without code changes.
 
 B<DO NOT USE IT IN ANY NEW CODE!>
 

@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::abuseipdb;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::abuseipdb - Report banned IPs to AbuseIP
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -255,33 +255,87 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the base URL of the AbuseIPDB v2 API.
+# Internal helper. Returns the base URL of the AbuseIPDB v2 API, which the
+# other URLs in this backend are built on.
+#
+# It is a constant rather than an option, since AbuseIPDB is a single hosted
+# service with one endpoint; there is no self hosted or per account variant to
+# point at.
+#
+# Takes no arguments.
+#
+# Returns the base URL as a string, with no trailing slash.
+#
+#     $self->_api_base;    # https://api.abuseipdb.com/api/v2
 sub _api_base {
 	my ($self) = @_;
 
 	return 'https://api.abuseipdb.com/api/v2';
 }
 
-# Internal helper. Returns the URL used by init and check to verify the API
-# key and reachability, a minimal check call.
+# Internal helper. Returns the URL of a harmless read only call, used by init
+# and check to confirm the service is reachable and the API key works.
+#
+# This backend is report only: it never blocks anything and creates nothing
+# remotely, so there is no setup whose presence could be verified. What can be
+# checked is that the API answers and the key is accepted, which is what this
+# is for. Nothing parses the response; only success matters.
+#
+# The address queried is 127.0.0.2, deliberately chosen: it is a loopback
+# address that cannot be a real reporter or target, so the probe cannot be
+# mistaken for interest in a genuine host. The one day window keeps the
+# response small.
+#
+# Note this consumes a request against the account's daily check quota each
+# time it runs, which matters on an instance whose self healing check fires
+# often.
+#
+# Takes no arguments.
+#
+# Returns the URL as a string, for a GET whose result is only inspected for
+# success.
+#
+#     $self->_check_url;
+#     #   https://api.abuseipdb.com/api/v2/check?ipAddress=127.0.0.2&maxAgeInDays=1
 sub _check_url {
 	my ($self) = @_;
 
 	return $self->_api_base . '/check?ipAddress=127.0.0.2&maxAgeInDays=1';
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Returns the form encoded body for reporting the passed IP,
-# with '%%%BAN%%%' in the comment replaced by the IP. A blank comment is left
-# out entirely.
+# Internal helper. Builds the form encoded body that reports one address to
+# AbuseIPDB.
+#
+# The categories are sent as the configured value, which is normalized to a
+# comma separated list at new whether it was given as an arrayref or a string.
+# They are what tell AbuseIPDB what kind of abuse is being reported.
+#
+# The comment is optional and is left out entirely when unset or empty, rather
+# than being sent blank. Every occurrence of the %%%BAN%%% placeholder in it
+# is replaced with the address, so a configured comment can name what was
+# blocked.
+#
+# One thing worth keeping in mind when setting that comment: it is published
+# on AbuseIPDB and visible to anyone, so it must not carry hostnames,
+# usernames, log fragments, or anything else internal.
+#
+# Args:
+#
+#     ip - The address to report, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address. Percent encoded into
+#          the body, and also substituted into the comment where the
+#          placeholder appears.
+#
+# Returns the body as a form urlencoded string, ready to POST to the report
+# endpoint.
+#
+#     # with categories 18 and 22 and a comment
+#     $self->_report_body('10.0.0.1');
+#     #   ip=10.0.0.1&categories=18%2C22&comment=banned%2010.0.0.1%20by%20fail2ban
+#
+#     # with no comment configured
+#     $self->_report_body('10.0.0.1');
+#     #   ip=10.0.0.1&categories=18%2C22
 sub _report_body {
 	my ( $self, $ip ) = @_;
 
@@ -296,10 +350,57 @@ sub _report_body {
 	return $body;
 } ## end sub _report_body
 
-# Internal helper. Performs a HTTP request via LWP::UserAgent with the API key
-# header, dying with an explanation on any HTTP level failure. Status codes
-# listed in the passed tolerate hash ref are returned as undef rather than
-# died on. Never called in testing mode.
+# Internal helper. Performs one HTTP request against the AbuseIPDB API. Every
+# call this backend makes goes through here.
+#
+# What makes this different from the other HTTP helpers in the dist is the
+# tolerate argument. AbuseIPDB rate limits reports, and a report rejected for
+# exceeding the daily quota is a normal operating condition rather than a
+# failure: the ban itself has already been applied by whatever blocking
+# backend is paired with this one, and failing the ban because the reporting
+# service was busy would be the wrong call. So the report path tolerates 429
+# and carries on.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend.
+#
+# Authentication is the API key in a Key header.
+#
+# Any untolerated HTTP failure dies rather than setting an error. The callers
+# wrap this in eval and turn the exception into the appropriate error code.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method   - The HTTP method, as a plain string: 'GET' for the check
+#                probe, 'POST' for a report.
+#
+#     url      - The full URL to request, as a plain string, built on
+#                _api_base.
+#
+#     body     - Optional request body, as a form urlencoded string from
+#                _report_body. undef for the check probe.
+#
+#     tolerate - Optional hashref of HTTP status codes to treat as
+#                non fatal, keyed by the numeric code with any true value,
+#                such as { 429 => 1 }. A response with one of those codes
+#                returns undef instead of dying. Omitted by callers that want
+#                every failure to be fatal.
+#
+# Returns the decoded response body on success, or undef when the status was
+# one of the tolerated ones. Dies on any other non success status.
+#
+#     # the check probe, where any failure is fatal
+#     $self->_request( 'GET', $self->_check_url );
+#
+#     # a report, tolerating the rate limit
+#     $self->_request( 'POST', $url, $body, { 429 => 1 } );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'GET', $self->_check_url ); 1; } or do { ... };
 sub _request {
 	my ( $self, $method, $url, $body, $tolerate ) = @_;
 
@@ -592,13 +693,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here for parity with the other backends, even
 	# though for this backend it can not fail

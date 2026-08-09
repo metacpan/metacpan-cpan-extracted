@@ -6,18 +6,11 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
-use File::ShareDir::Install;
-$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
-install_share dist => "share";
-
-
 my %WriteMakefileArgs = (
   "ABSTRACT" => "BeLike::GETTY when you build your dists",
   "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-GETTY",
   "LICENSE" => "perl",
@@ -55,7 +48,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "1.302219"
   },
-  "VERSION" => "0.317",
+  "VERSION" => "0.318",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -105,9 +98,3 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
-
-{
-package
-MY;
-use File::ShareDir::Install qw(postamble);
-}

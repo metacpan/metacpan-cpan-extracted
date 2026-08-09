@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::fastly;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::fastly - Fastly Edge ACL backend for Net
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -248,7 +248,22 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the ACL entries endpoint.
+# Internal helper. Returns the URL of the ACL's entries collection.
+#
+# This is the read side of the API: a GET here answers with every entry in the
+# ACL, which is how both unban paths find the entry they need to delete. Note
+# it is a different path from the single entry endpoint, 'entries' rather than
+# 'entry', which is easy to misread.
+#
+# The ACL is expected to already exist and be referenced by a service
+# configuration; this backend does not create it.
+#
+# Takes no arguments; the service and ACL ids come from the options.
+#
+# Returns the URL as a string.
+#
+#     $self->_entries_url;
+#     #   https://api.fastly.com/service/<service>/acl/<acl>/entries
 sub _entries_url {
 	my ($self) = @_;
 
@@ -260,8 +275,31 @@ sub _entries_url {
 		. '/entries';
 }
 
-# Internal helper. Returns the ACL entry endpoint, optionally suffixed with an
-# entry ID.
+# Internal helper. Returns the URL of the single entry endpoint, either the
+# collection it is created through or one specific entry.
+#
+# The optional id is what makes this serve both halves of the lifecycle. With
+# no id it is where a new entry is POSTed; with one it addresses an existing
+# entry for deletion. Keeping them in one helper is reasonable because Fastly
+# uses the same 'entry' stem for both, unlike the plural 'entries' used for
+# reading the whole ACL.
+#
+# Args:
+#
+#     id - Optional entry id, as a plain string, from a previous lookup
+#          against _entries_url. When omitted or undef the collection URL is
+#          returned instead. Appended as is, so it is expected to be an id
+#          Fastly issued rather than anything needing encoding.
+#
+# Returns the URL as a string.
+#
+#     # for creating an entry
+#     $self->_entry_url;
+#     #   https://api.fastly.com/service/<service>/acl/<acl>/entry
+#
+#     # for deleting a specific one
+#     $self->_entry_url('7i6HN3TK9wS159v2xAZOSj');
+#     #   https://api.fastly.com/service/<service>/acl/<acl>/entry/7i6HN3TK9wS159v2xAZOSj
 sub _entry_url {
 	my ( $self, $id ) = @_;
 
@@ -279,26 +317,48 @@ sub _entry_url {
 	return $url;
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Performs a HTTP request via LWP::UserAgent, returning the
-# decoded JSON body (or undef for an empty body) and dying with a explanation on
-# any HTTP level failure. Never called in testing mode.
+# Internal helper. Performs one HTTP request against the Fastly API. Every
+# call this backend makes goes through here.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend.
+#
+# Authentication is the API token in a Fastly-Key header rather than basic
+# auth or a bearer token.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# A body that fails to decode as JSON is not fatal; the decode runs inside its
+# own eval and leaves the result undef.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string: 'GET' to read the entries,
+#              'POST' to create one, 'DELETE' to remove one.
+#
+#     url    - The full URL to request, as a plain string, from _entries_url
+#              or _entry_url.
+#
+#     body   - Optional request body, as an already encoded JSON string. undef
+#              for the reads and deletes.
+#
+# Returns the decoded response body as whatever structure the JSON held. Note
+# that a GET of the entries collection yields an arrayref rather than a
+# hashref, which is why the callers check the reference type. undef when the
+# body was empty or did not parse. Dies on any non success HTTP status.
+#
+#     my $decoded = $self->_request( 'GET', $self->_entries_url );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'POST', $self->_entry_url, $body ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -447,9 +507,41 @@ sub ban {
 	$self->{banned}{ $opts{ban} } = 1;
 } ## end sub ban
 
-# Internal helper. Looks up the ACL entry for the IP and deletes it by its ID.
-# An entry that can not be found is treated as already unbanned. Dies on
-# failure. Never called in testing mode.
+# Internal helper. Performs the full two step unban of one address: find its
+# ACL entry, then delete it by id.
+#
+# Fastly entries are addressed by an opaque id rather than by their contents,
+# so the id has to be found before anything can be deleted. Unlike the
+# cloudflare and routeros_api backends there is no server side filter for
+# this: the whole entries collection is fetched and walked locally looking for
+# a matching ip field. That means the cost of an unban grows with the size of
+# the ACL rather than staying constant.
+#
+# Matching is on the ip field alone, since a single address entry carries no
+# subnet. The search stops at the first match.
+#
+# An entry that is not found is treated as success rather than as an error.
+# The entry having already gone means the address is not banned, which is what
+# the caller wanted; erroring would make an unban fail for having already
+# achieved its goal.
+#
+# Never called in testing mode; that path records the request instead.
+#
+# Args:
+#
+#     ip - The address to unban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, matched exactly
+#          against the stored entry, so it must be spelled the same way it was
+#          when banned.
+#
+# Returns nothing. Dies if either request fails, which the caller catches and
+# turns into unbanFailed.
+#
+#     $self->_unban_ip('10.0.0.1');
+#
+#     # the usual shape at the call site
+#     eval { $self->_unban_ip( $opts{ban} ); };
+#     if ($@) { ... raise unbanFailed ... }
 sub _unban_ip {
 	my ( $self, $ip ) = @_;
 
@@ -566,24 +658,6 @@ sub list {
 	return keys( %{ $self->{banned} } );
 }
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by creating an ACL entry for it. The range is split into its
@@ -656,9 +730,33 @@ sub ban_cidr {
 	$self->{banned_cidr}{ $opts{ban} } = 1;
 } ## end sub ban_cidr
 
-# Internal helper. Looks up the ACL entry for the CIDR range and deletes it by
-# its ID. An entry that can not be found is treated as already unbanned. Dies on
-# failure. Never called in testing mode.
+# Internal helper. Performs the full two step unban of one CIDR range, the
+# range counterpart of _unban_ip.
+#
+# The shape is the same, fetch the entries collection and walk it for a match,
+# and a missing entry is treated as success for the same reason.
+#
+# The difference is what a match means. Fastly stores a range as two separate
+# fields, the network address in ip and the prefix length in subnet, so the
+# range is split at the slash and both halves must match. Comparing against
+# the ip field alone would match the single address entry for the same network
+# address, and deleting that would unban the wrong thing.
+#
+# Never called in testing mode; that path records the request instead.
+#
+# Args:
+#
+#     cidr - The range to unban, as a plain string. Expected to be an already
+#            validated and lowercased CIDR range such as "10.0.0.0/8". Split
+#            on the first slash, so the address goes to ip and everything
+#            after to subnet. Both halves are compared as strings, so the
+#            spelling must match what was stored at ban time.
+#
+# Returns nothing. Dies if either request fails, which the caller catches and
+# turns into unbanCidrFailed.
+#
+#     $self->_unban_cidr_range('10.0.0.0/8');
+#     #   looks for an entry with ip '10.0.0.0' and subnet '8'
 sub _unban_cidr_range {
 	my ( $self, $cidr ) = @_;
 
@@ -797,13 +895,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants

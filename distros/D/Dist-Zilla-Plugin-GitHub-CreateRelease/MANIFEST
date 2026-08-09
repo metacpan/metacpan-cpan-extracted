@@ -21,3 +21,4 @@ t/author-pod-syntax.t
 t/extract-changes.t
 t/release-trailing-space.t
 t/repo-name-from-url.t
+t/repo-owner-from-url.t

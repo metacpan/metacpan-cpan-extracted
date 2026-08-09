@@ -1,5 +1,5 @@
 package Kubernetes::REST::Admissionregistration;
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 # ABSTRACT: DEPRECATED - v0 API group for Admission Registration resources
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::Admissionregistration - DEPRECATED - v0 API group for Admissio
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 

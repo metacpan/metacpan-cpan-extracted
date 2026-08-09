@@ -1,0 +1,296 @@
+#!perl
+
+=head1 NAME
+
+kur - Firewall ban manager worker for Ereshkigal.
+
+=head1 SYNOPSIS
+
+kur B<--name>=<name> B<--backend>=<backend> [B<--ports>=<ports>]
+[B<--protocols>=<protocols>] [B<--prefix>=<prefix>] [B<--option> <key>=<value>]
+[B<--interfaces>=<interfaces>] [B<--self-heal> <0/1>]
+[B<--ban-time>=<seconds>] [B<--checkpoint>=<seconds>]
+[B<--enable-cidr> <0/1>] [B<--cidr-silent-drop> <0/1>]
+[B<--cache>=<cache dir>] [B<--run>=<run dir>] [B<-f>|B<--foreground>]
+
+kur -v|--version
+
+kur -h|--help
+
+=head1 DESCRIPTION
+
+Runs a single L<Net::Firewall::BlockerHelper> instance via L<Ereshkigal::Kur>,
+serving it up on a unix socket speaking the newline delimited JSON protocol of
+L<POE::Component::Server::JSONUnix>.
+
+The socket and PID file go under C<$run_dir/kur/>, named for the instance...
+C<< <name>.sock >> and C<< <name>.pid >>.
+
+Normally spawned and supervised by C<ereshkigal>, but usable standalone.
+
+=head1 FLAGS
+
+=head2 -v|--version
+
+Show version info.
+
+=head2 -h|--help
+
+Show help info.
+
+=head2 --name=<name>
+
+The name to use for this instance. Must match /^[a-zA-Z0-9\-]+$/.
+
+This must be specified.
+
+=head2 --backend=<backend>
+
+The Net::Firewall::BlockerHelper backend to use.
+
+This must be specified.
+
+=head2 --ports=<ports>
+
+A comma separated list of ports to block. Each must be a positive integer
+or a name resolvable via getservbyname.
+
+If not specified, all are blocked.
+
+=head2 --protocols=<protocols>
+
+A comma separated list of protocols to block. Each is checked against
+/etc/protocols via the function getprotobyname.
+
+If not specified, all are blocked.
+
+=head2 --prefix=<prefix>
+
+The prefix to use. Must match /^[a-zA-Z0-9]+$/.
+
+Default is kur.
+
+=head2 --option <key>=<value>
+
+A backend specific option. May be specified multiple times.
+
+=head2 --interfaces=<interfaces>
+
+A comma separated list of interfaces, handed to the backend as the
+C<interfaces> option as an array. Wanted by backends taking an array of
+interfaces there, such as xdp.
+
+=head2 --self-heal <0/1>
+
+If the firewall setup should be verified and re-inited if needed before each
+ban or unban.
+
+Default is 1.
+
+=head2 --ban-time <seconds>
+
+How long bans should last in seconds. 0 means bans never time out. May be
+overridden per ban request.
+
+Default is 600.
+
+=head2 --checkpoint <seconds>
+
+Seconds between periodic rewrites of the ban state CSV under the cache dir.
+0 disables the periodic rewrite... ban/unban, stop, and on demand
+checkpoints still happen.
+
+Default is 60.
+
+=head2 --enable-cidr <0/1>
+
+Whether CIDR banning is enabled. Even when set, CIDR commands only work if
+the backend supports CIDR bans.
+
+Default is 0.
+
+=head2 --cidr-silent-drop <0/1>
+
+When set, CIDR commands are silently dropped rather than erroring when CIDR
+banning is not available for this instance.
+
+Default is 0.
+
+=head2 --run=<run dir>
+
+The base dir for run files.
+
+Default is /var/run/ereshkigal
+
+=head2 --cache=<cache dir>
+
+The base dir for cache files.
+
+Default is /var/cache/ereshkigal
+
+=head2 -f|--foreground
+
+Do not daemonize. This is used by ereshkigal when spawning kur instances so
+they can be supervised.
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Net::Server::Daemonize qw(daemonize);
+use Ereshkigal::Kur;
+
+# Prints the version and exits. Named and placed in main:: because that is
+# where Getopt::Long looks for it, so a --version it handles itself finds it,
+# but the option handling below also calls it outright rather than relying on
+# that, which is why both spellings of the flag work the same.
+#
+# Takes no args. Getopt::Long passes a getopt object when it is the caller,
+# and it is deliberately ignored... there is nothing here worth varying on
+# it.
+#
+# Returns nothing, ever, as it exits 255 rather than returning. 255 is used
+# throughout this bin for "asked and answered, did not run", the same code
+# pod2usage is given below.
+#
+#     main::VERSION_MESSAGE;    # prints "kur v. 0.0.1" and exits 255
+sub main::VERSION_MESSAGE {
+	print 'kur v. ' . $Ereshkigal::Kur::VERSION . "\n";
+	exit 255;
+}
+
+# Prints the full help, that being this bin's own POD rendered by pod2usage,
+# and exits. In main:: for the same reason VERSION_MESSAGE is... Getopt::Long
+# looks there, and the option handling below calls it outright as well.
+#
+# Takes no args, ignoring anything Getopt::Long hands it.
+#
+# Returns nothing, ever. pod2usage is given -exitval 255 so it exits rather
+# than returning, and -verbose 2 so the whole POD is shown rather than just
+# the usage line. It goes to STDOUT rather than STDERR, help having been
+# asked for rather than provoked by a mistake.
+#
+#     main::HELP_MESSAGE;    # prints the POD to stdout and exits 255
+sub main::HELP_MESSAGE {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+}
+
+my $name;
+my $backend;
+my $prefix;
+my $ports;
+my $protocols;
+my @options;
+my $interfaces;
+my $self_heal;
+my $ban_time;
+my $checkpoint;
+my $enable_cidr;
+my $cidr_silent_drop;
+my $cache_dir = '/var/cache/ereshkigal';
+my $run_dir   = '/var/run/ereshkigal';
+my $foreground;
+my $version;
+my $help;
+GetOptions(
+	'version|v'          => \$version,
+	'help|h'             => \$help,
+	'name=s'             => \$name,
+	'backend=s'          => \$backend,
+	'ports=s'            => \$ports,
+	'protocols=s'        => \$protocols,
+	'prefix=s'           => \$prefix,
+	'option=s'           => \@options,
+	'interfaces=s'       => \$interfaces,
+	'self-heal=i'        => \$self_heal,
+	'ban-time=s'         => \$ban_time,
+	'checkpoint=s'       => \$checkpoint,
+	'enable-cidr=s'      => \$enable_cidr,
+	'cidr-silent-drop=s' => \$cidr_silent_drop,
+	'cache=s'            => \$cache_dir,
+	'run=s'              => \$run_dir,
+	'foreground|f'       => \$foreground,
+) || pod2usage( -exitval => 255, -verbose => 1, -output => \*STDERR, );
+
+# print version or help if requested
+if ($help) {
+	main::HELP_MESSAGE;
+}
+if ($version) {
+	main::VERSION_MESSAGE;
+}
+
+# both are documented as required, so bounce their absence as a usage error
+# here rather than as internal errors from the layers below
+if ( !defined($name) ) {
+	pod2usage( -exitval => 255, -verbose => 1, -output => \*STDERR, -message => 'kur: --name is required' );
+}
+if ( !defined($backend) ) {
+	pod2usage( -exitval => 255, -verbose => 1, -output => \*STDERR, -message => 'kur: --backend is required' );
+}
+
+my %backend_options;
+foreach my $key_value (@options) {
+	my ( $key, $value ) = split( /=/, $key_value, 2 );
+	if ( !defined($value) ) {
+		die( '--option "' . $key_value . '" is not in the form key=value' );
+	}
+	$backend_options{$key} = $value;
+}
+# interfaces is array valued, so it rides its own flag rather than --option
+if ( defined($interfaces) ) {
+	$backend_options{interfaces} = [ split( /\s*,\s*/, $interfaces ) ];
+}
+
+my $kur = Ereshkigal::Kur->new(
+	'name'      => $name,
+	'backend'   => $backend,
+	'ports'     => defined($ports)     ? [ split( /\s*,\s*/, $ports ) ]     : [],
+	'protocols' => defined($protocols) ? [ split( /\s*,\s*/, $protocols ) ] : [],
+	defined($prefix)           ? ( 'prefix'           => $prefix )           : (),
+	%backend_options           ? ( 'options'          => \%backend_options ) : (),
+	defined($self_heal)        ? ( 'self_heal'        => $self_heal )        : (),
+	defined($ban_time)         ? ( 'ban_time'         => $ban_time )         : (),
+	defined($checkpoint)       ? ( 'checkpoint'       => $checkpoint )       : (),
+	defined($enable_cidr)      ? ( 'enable_cidr'      => $enable_cidr )      : (),
+	defined($cidr_silent_drop) ? ( 'cidr_silent_drop' => $cidr_silent_drop ) : (),
+	'run_base_dir'   => $run_dir,
+	'cache_base_dir' => $cache_dir,
+);
+
+if ($foreground) {
+	# supervised by ereshkigal or ran by hand, so the PID file is ours to
+	# write... the daemonize branch gets that plus a liveness check from
+	# daemonize() itself, so do the same check here rather than clobbering
+	# the PID file of a live kur and unlinking it again on the way out
+	if ( -e $kur->pid_path && open( my $old_pid_fh, '<', $kur->pid_path ) ) {
+		my $old_pid = <$old_pid_fh>;
+		close($old_pid_fh);
+		if ( defined($old_pid) && $old_pid =~ /^\s*([0-9]+)\s*$/ ) {
+			$old_pid = $1;
+			# kill 0 is true while the process exists, and EPERM means it
+			# exists but is not ours to signal
+			if ( kill( 0, $old_pid ) || $!{EPERM} ) {
+				die(      'A kur named "'
+						. $name
+						. '" already appears to be running with PID '
+						. $old_pid
+						. ' per the PID file "'
+						. $kur->pid_path
+						. '"' );
+			}
+		} ## end if ( defined($old_pid) && $old_pid =~ /^\s*([0-9]+)\s*$/)
+	} ## end if ( -e $kur->pid_path && open( my $old_pid_fh...))
+
+	open( my $pid_fh, '>', $kur->pid_path ) || die( 'Failed to open the PID file "' . $kur->pid_path . '"... ' . $! );
+	print $pid_fh $$;
+	close($pid_fh);
+} else {
+	daemonize( $>, ( split( /\s+/, $) ) )[0], $kur->pid_path );
+}
+
+$kur->start_server;
+
+unlink( $kur->pid_path ) if -e $kur->pid_path;

@@ -10,6 +10,9 @@ use File::Temp qw/ tempfile /;
 use File::Which qw/ which /;
 use HTTP::Request::Common;
 use HTTP::Status qw/ :constants /;
+use WWW::Mechanize::Chrome;
+
+plan skip_all => "Cannot find a chrome executable" unless WWW::Mechanize::Chrome->find_executable;
 
 use lib 't/lib';
 use Catalyst::Test 'App';

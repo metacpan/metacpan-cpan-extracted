@@ -691,6 +691,57 @@ helper(self, name, code, owner = &PL_sv_undef)
     OUTPUT:
         RETVAL
 
+# install_kw($name, $code, $owner?): install a declaration keyword into the
+# application class - the supported way for a plugin to add to the DSL, so
+# nothing has to assign to a glob. Chains.
+#
+# The keyword is a magic CV forwarding to $code in the caller's context
+# (punk_import.h). Installing the same name from the same owner twice is a
+# no-op - a plugin that installs from both its import and its register is
+# doing the ordinary thing - and two owners claiming one name croak, naming
+# both, exactly as helper does.
+SV *
+install_kw(self, name, code, owner = &PL_sv_undef)
+        SV *self
+        SV *name
+        SV *code
+        SV *owner
+    CODE:
+    {
+        HV *h = app_hv(aTHX_ self);
+        HV *kws = app_hash(aTHX_ h, K_KEYWORDS);
+        SV *caller = app_get(aTHX_ h, K_CALLER);
+        STRLEN nl; const char *n = SvPV_const(name, nl);
+        SV *own = SvOK(owner) ? owner
+                : sv_2mortal(newSVpv(CopSTASHPV(PL_curcop), 0));
+        SV **have; HV *rec; int done = 0;
+
+        if (!caller || !SvOK(caller))
+            croak("Punk: install_kw('%s') needs an application class", n);
+        if (!nl || !SvROK(code) || SvTYPE(SvRV(code)) != SVt_PVCV)
+            croak("Punk: install_kw needs a name and a code reference");
+        if (pki_is_dsl(n))
+            croak("Punk: keyword '%s' is part of the Punk DSL", n);
+
+        have = hv_fetch(kws, n, (I32)nl, 0);
+        if (have && *have && SvROK(*have)) {
+            SV **o = hv_fetchs((HV *)SvRV(*have), K_OWNER, 0);
+            if (o && *o && sv_eq(*o, own)) done = 1;      /* the same owner */
+            else croak("Punk: keyword '%s' is installed by both %s and %s", n,
+                       (o && *o) ? SvPV_nolen(*o) : "?", SvPV_nolen(own));
+        }
+        if (!done) {
+            rec = newHV();
+            (void)hv_stores(rec, K_CODE,  newSVsv(code));
+            (void)hv_stores(rec, K_OWNER, newSVsv(own));
+            (void)hv_store(kws, n, (I32)nl, newRV_noinc((SV *)rec), 0);
+            pki_install_kw(aTHX_ caller, name, code);
+        }
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
 # plugin($name, $opts?): load and register a plugin. Chains.
 SV *
 plugin(self, name, opts = &PL_sv_undef)

@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::nsupdate - Dynamic DNS blocklist backend
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -288,8 +288,32 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the record name for the passed IPv4 IP, the octets
-# reversed under the domain.
+# Internal helper. Returns the DNS name that the blocklist record for the
+# passed IP lives at, which is the address written backwards under the
+# configured domain.
+#
+# This is the DNSBL naming convention: the octets are reversed so that the
+# name reads from most specific to least specific the way DNS names do, then
+# placed under the zone. A consumer checking whether an address is listed
+# builds the same name and looks it up.
+#
+# Only IPv4 is handled. This backend rejects IPv6 at ban and unban with
+# ipv6NotSupported, matching the fail2ban action it mirrors, so nothing ever
+# reaches here with an IPv6 address. Passing one anyway would not error, it
+# would just split on dots that are not there and produce a single label,
+# giving a nonsense name.
+#
+# Args:
+#
+#     ip - The address to encode, as a plain string. Expected to be an already
+#          validated IPv4 address such as "10.0.0.1". Nothing here validates
+#          it.
+#
+# Returns the fully qualified record name as a string, with no trailing dot.
+#
+#     # with the domain option set to rbl.foo.bar
+#     $self->_record_name('10.0.0.1');    # 1.0.0.10.rbl.foo.bar
+#     $self->_record_name('192.0.2.5');   # 5.2.0.192.rbl.foo.bar
 sub _record_name {
 	my ( $self, $ip ) = @_;
 
@@ -298,8 +322,46 @@ sub _record_name {
 	return join( '.', reverse(@octets) ) . '.' . $self->{options}{domain};
 }
 
-# Internal helper. Returns the shell command piping the passed update
-# statements into nsupdate.
+# Internal helper. Wraps a list of nsupdate statements into the complete shell
+# command that feeds them to nsupdate. Every change this backend makes to the
+# zone goes out through here.
+#
+# nsupdate reads its statements from stdin rather than from arguments, so they
+# are printed into a pipe. Note the statements are joined with a literal
+# backslash-n inside a single quoted printf format, so it is printf that turns
+# them into real newlines, not perl.
+#
+# Unlike the same named helper in the dns_rpz backend, this one adds nothing
+# of its own. There is no server line and no zone line, so nsupdate works out
+# the zone from the record name and the server from its SOA, and crucially the
+# trailing send is not appended either. Callers pass the complete statement
+# list including their own 'send'; leaving it off would build a command that
+# connects and then exits without transmitting anything.
+#
+# Args:
+#
+#     @statements - The complete list of nsupdate statement lines, as plain
+#                   strings with no trailing newline, in the order they should
+#                   be fed in, and including the final 'send'. Callers
+#                   typically pass either a prereq, an update add, and a send
+#                   for a ban, or an update delete and a send for an unban.
+#
+# Returns the command as a single string ready to hand to the runner, of the
+# shape "printf '<statements>\n' | <nsupdate> -k '<keyfile>'". The nsupdate
+# binary and the keyfile come from the options, and the keyfile is single
+# quoted so a path holding spaces survives.
+#
+#     # a ban: only add the record if it is not already there
+#     $self->_nsupdate_command(
+#         'prereq nxrrset 1.0.0.10.rbl.foo.bar TXT',
+#         'update add 1.0.0.10.rbl.foo.bar 60 IN TXT "blocked"',
+#         'send'
+#     );
+#     #   printf 'prereq nxrrset 1.0.0.10.rbl.foo.bar TXT\nupdate add 1.0.0.10.rbl.foo.bar 60 IN TXT "blocked"\nsend\n' | nsupdate -k '/etc/nsupdate.key'
+#
+#     # an unban
+#     $self->_nsupdate_command( 'update delete 1.0.0.10.rbl.foo.bar TXT', 'send' );
+#     #   printf 'update delete 1.0.0.10.rbl.foo.bar TXT\nsend\n' | nsupdate -k '/etc/nsupdate.key'
 sub _nsupdate_command {
 	my ( $self, @statements ) = @_;
 
@@ -588,13 +650,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants

@@ -28,6 +28,24 @@ typedef struct oa_scheme  { SV *name; int type; int loc; SV *pname; } oa_scheme;
 typedef struct oa_secitem { int scheme; SV *scopes; } oa_secitem;   /* scopes AV rv or NULL */
 typedef struct oa_secalt  { oa_secitem *items; int n; } oa_secalt;
 
+/* Response-validation coverage, per operation. Every response either is
+ * checked or is skipped for exactly one named reason, so what was not
+ * looked at is a reported number rather than a silent gap. `seen` is the
+ * sampling counter: deterministic 1-in-N, which is cheaper than a random
+ * draw and gives a stable denominator. */
+typedef struct oa_rvstat {
+    unsigned long total;        /* responses reaching the check          */
+    unsigned long seen;         /* the sampling counter                  */
+    unsigned long sampled;      /* passed the sampling gate              */
+    unsigned long checked;      /* decoded and validated                 */
+    unsigned long violations;   /* validated and did not conform         */
+    unsigned long skip_ctype;   /* not a declared JSON content type      */
+    unsigned long skip_size;    /* Content-Length absent or over max_body */
+    unsigned long skip_body;    /* body not a plain scalar (fh/stream)   */
+    unsigned long skip_schema;  /* the status declares no schema         */
+    unsigned long skip_decode;  /* the body is not decodable JSON        */
+} oa_rvstat;
+
 typedef struct oa_op {
     SV *op_id, *method, *path;         /* method stored lowercase */
     oa_seg   *segs;  int nsegs;
@@ -36,6 +54,7 @@ typedef struct oa_op {
     oa_resp  *resps;  int nresps;
     oa_secalt *sec;  int nsec;         /* requirement alternatives (OR) */
     int own_sec;                       /* 1 = op-level copy, 0 = shares rootsec */
+    oa_rvstat rv;                      /* response-validation coverage */
 } oa_op;
 
 typedef struct oa_ops {

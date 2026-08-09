@@ -279,72 +279,52 @@ param(self, name)
         SV *name
     CODE:
     {
-        AV *req = punk_req_av(aTHX_ self);
-        HE *he  = NULL;
-        SV **c  = av_fetch(req, PQ_QUERY, 0);
-        SV *table;
-        dSP;
-        if (!(c && *c && SvROK(*c))) {
-            /* build the query cache through our own accessor */
-            PUSHMARK(SP); XPUSHs(self); PUTBACK;
-            call_method("query", G_SCALAR);
-            SPAGAIN; (void)POPs; PUTBACK;
-            c = av_fetch(req, PQ_QUERY, 0);
-        }
-        table = c && *c ? *c : NULL;
-        if (table && SvROK(table))
-            he = hv_fetch_ent((HV *)SvRV(table), name, 0, 0);
-        if (!he) {
-            c = av_fetch(req, PQ_FORM, 0);
-            if (!(c && *c && SvROK(*c))) {
-                PUSHMARK(SP); XPUSHs(self); PUTBACK;
-                call_method("form", G_SCALAR);
-                SPAGAIN; (void)POPs; PUTBACK;
-                c = av_fetch(req, PQ_FORM, 0);
-            }
-            table = c && *c ? *c : NULL;
-            if (table && SvROK(table))
-                he = hv_fetch_ent((HV *)SvRV(table), name, 0, 0);
-        }
-        RETVAL = he ? newSVsv(HeVAL(he)) : newSV(0);
+        SV *v = pq_param_get(aTHX_ self, punk_req_av(aTHX_ self), name);
+        RETVAL = v ? newSVsv(v) : newSV(0);
     }
     OUTPUT:
         RETVAL
 
-SV *
-params(self)
+# params      -> every parameter merged, query winning over form
+# params(@k)  -> just those, as a list of values in list context (undef
+#                for a name neither table has) or a hashref of the ones
+#                that are there in scalar context.
+#
+# The results are written back over the argument slots, one behind the
+# name being read, so no key is overwritten before it has been looked up.
+void
+params(self, ...)
         SV *self
-    CODE:
+    PPCODE:
     {
-        HV *merged = newHV();
-        HV *src;
-        HE *he;
-        SV *table;
         AV *req = punk_req_av(aTHX_ self);
-        SV **c;
-        int pass;
-        dSP;
-        /* make both caches exist */
-        PUSHMARK(SP); XPUSHs(self); PUTBACK;
-        call_method("form", G_SCALAR);
-        SPAGAIN; (void)POPs; PUTBACK;
-        PUSHMARK(SP); XPUSHs(self); PUTBACK;
-        call_method("query", G_SCALAR);
-        SPAGAIN; (void)POPs; PUTBACK;
-        for (pass = 0; pass < 2; pass++) {
-            c = av_fetch(req, pass == 0 ? PQ_FORM : PQ_QUERY, 0);
-            table = c && *c ? *c : NULL;
-            if (!(table && SvROK(table))) continue;
-            src = (HV *)SvRV(table);
-            hv_iterinit(src);
-            while ((he = hv_iternext(src)))
-                (void)hv_store_ent(merged, HeSVKEY_force(he),
-                                   newSVsv(HeVAL(he)), 0);
+        int i;
+        if (items < 2) {
+            HV *merged = newHV();
+            pq_overlay_hv(aTHX_ merged,
+                          pq_table(aTHX_ self, req, PQ_FORM, "form"));
+            pq_overlay_hv(aTHX_ merged,
+                          pq_table(aTHX_ self, req, PQ_QUERY, "query"));
+            ST(0) = sv_2mortal(newRV_noinc((SV *)merged));
+            XSRETURN(1);
         }
-        RETVAL = newRV_noinc((SV *)merged);
+        if (GIMME_V == G_ARRAY) {
+            for (i = 1; i < items; i++) {
+                SV *v = pq_param_get(aTHX_ self, req, ST(i));
+                ST(i - 1) = sv_2mortal(v ? newSVsv(v) : newSV(0));
+            }
+            XSRETURN(items - 1);
+        }
+        else {
+            HV *out = newHV();
+            for (i = 1; i < items; i++) {
+                SV *v = pq_param_get(aTHX_ self, req, ST(i));
+                if (v) (void)hv_store_ent(out, ST(i), newSVsv(v), 0);
+            }
+            ST(0) = sv_2mortal(newRV_noinc((SV *)out));
+            XSRETURN(1);
+        }
     }
-    OUTPUT:
-        RETVAL
 
 SV *
 cookies(self)

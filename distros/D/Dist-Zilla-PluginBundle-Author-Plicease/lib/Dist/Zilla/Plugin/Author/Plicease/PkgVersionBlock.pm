@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::PkgVersionBlock 2.79 {
+package Dist::Zilla::Plugin::Author::Plicease::PkgVersionBlock 2.80 {
 
   use Moose;
   extends 'Dist::Zilla::Plugin::PkgVersion::Block';
@@ -41,7 +41,7 @@ Dist::Zilla::Plugin::Author::Plicease::PkgVersionBlock
 
 =head1 VERSION
 
-version 2.79
+version 2.80
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2022 by Graham Ollis.
+This software is copyright (c) 2012-2024 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

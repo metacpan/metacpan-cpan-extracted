@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodAntiAffinity;
 # ABSTRACT: Pod anti affinity is a group of inter pod anti affinity scheduling rules.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s preferredDuringSchedulingIgnoredDuringExecution => ['Core::V1::WeightedPodAffinityTerm'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::PodAntiAffinity - Pod anti affinity is a group of inter 
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 preferredDuringSchedulingIgnoredDuringExecution
 

@@ -51,6 +51,35 @@ ok(
   'version_finder is declared as a multi-value argument',
 );
 
+# no_cpan implies :MainModule -- a dist that never reaches CPAN needs no
+# per-package version, so the main module carries the only $VERSION.
+{
+  my $bundle = Dist::Zilla::PluginBundle::Author::GETTY->new(
+    name    => '@Author::GETTY',
+    payload => { no_cpan => 1 },
+  );
+
+  is_deeply(
+    $bundle->version_finder,
+    [':MainModule'],
+    'version_finder defaults to :MainModule when no_cpan is set',
+  );
+}
+
+# ... but an explicit version_finder still wins over the no_cpan default
+{
+  my $bundle = Dist::Zilla::PluginBundle::Author::GETTY->new(
+    name    => '@Author::GETTY',
+    payload => { no_cpan => 1, version_finder => [':InstallModules'] },
+  );
+
+  is_deeply(
+    $bundle->version_finder,
+    [':InstallModules'],
+    'explicit version_finder overrides the no_cpan default',
+  );
+}
+
 # Default path (no task, no manual_version): version_finder must be forwarded
 # to @Git::VersionManager as RewriteVersion::Transitional.finder and
 # BumpVersionAfterRelease.finder.
@@ -115,6 +144,40 @@ ok(
   my ($pkg_version) = grep { $_->[1] eq 'Dist::Zilla::Plugin::PkgVersion' } @{ $bundle->plugins };
   ok($pkg_version, 'PkgVersion was added on manual_version path');
   ok(!exists $pkg_version->[2]{finder}, 'PkgVersion has no finder override when version_finder is unset');
+}
+
+# no_cpan without an explicit version_finder: the :MainModule default reaches
+# the version plugins, on both the @Git::VersionManager and the PkgVersion path.
+{
+  my $bundle = Dist::Zilla::PluginBundle::Author::GETTY->new(
+    name    => '@Author::GETTY',
+    payload => { no_cpan => 1 },
+  );
+  $bundle->configure;
+
+  my ($rewrite_version) = grep { $_->[1] eq 'Dist::Zilla::Plugin::RewriteVersion::Transitional' } @{ $bundle->plugins };
+  ok($rewrite_version, 'RewriteVersion::Transitional was added on the no_cpan default path');
+  is_deeply(
+    $rewrite_version->[2]{finder},
+    [':MainModule'],
+    'RewriteVersion::Transitional.finder receives the no_cpan default',
+  );
+}
+
+{
+  my $bundle = Dist::Zilla::PluginBundle::Author::GETTY->new(
+    name    => '@Author::GETTY',
+    payload => { no_cpan => 1, manual_version => 1 },
+  );
+  $bundle->configure;
+
+  my ($pkg_version) = grep { $_->[1] eq 'Dist::Zilla::Plugin::PkgVersion' } @{ $bundle->plugins };
+  ok($pkg_version, 'PkgVersion was added on the no_cpan + manual_version path');
+  is_deeply(
+    $pkg_version->[2]{finder},
+    [':MainModule'],
+    'PkgVersion.finder receives the no_cpan default',
+  );
 }
 
 done_testing;

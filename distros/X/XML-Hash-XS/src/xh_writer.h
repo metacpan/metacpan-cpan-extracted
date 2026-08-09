@@ -47,7 +47,7 @@ xh_writer_write_to_perl_cb(xh_perl_buffer_t *buf, SV *perl_cb, xh_bool_t utf8)
         ENTER;
         SAVETMPS;
 
-        chunk = sv_2mortal(newSVpvn(XH_CHAR_CAST buf->start, len));
+        chunk = sv_2mortal(newSVpvn((const char *) buf->start, len));
         if (utf8)
             SvUTF8_on(chunk);
 

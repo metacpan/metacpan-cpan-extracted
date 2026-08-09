@@ -3,11 +3,16 @@ use warnings;
 
 use FindBin qw/$Bin/;
 use lib "$Bin/lib";
-use QDB::Installs qw/skip_remaining_on_resource_error is_resource_unavailable/;
+use QDB::Installs qw{
+    skip_remaining_on_resource_error is_resource_unavailable
+    resource_unavailable_reason subtest_or_resource_skip
+};
 
 use Test2::V0;
 use Test2::Tools::QuickDB qw/get_db skipall_on_resource_error/;
 use Test2::API qw/context intercept/;
+use File::Temp qw/tempdir/;
+use Capture::Tiny qw/capture/;
 
 # get_db()/Pool builds turn a host that has run out of System V IPC (semaphore
 # or shared-memory table exhaustion) into a skip_all rather than a failure --
@@ -114,20 +119,20 @@ subtest get_db_skips_on_resource_error => sub {
     like($plan->facet_data->{plan}{details}, qr/semaphore/i, "skip reason names semaphores");
 };
 
-subtest partial_pool_body_records_skip_and_sentinel => sub {
+subtest partial_pool_body_records_skip => sub {
     my $caught;
     my $events = intercept {
         my $ctx = context();
         $ctx->pass('Pool assertions completed before resource exhaustion');
         $ctx->release;
 
-        eval { skip_remaining_on_resource_error($sem_err); 1 };
-        $caught = $@;
-        die "resource helper did not throw its sentinel\n"
+        capture { eval { skip_remaining_on_resource_error($sem_err); 1 }; $caught = $@ };
+        die "resource helper did not throw\n"
             unless is_resource_unavailable($caught);
     };
 
-    ok(is_resource_unavailable($caught), 'threw the dedicated resource-unavailable sentinel');
+    ok(is_resource_unavailable($caught), 'threw a recognizable resource skip');
+    like(resource_unavailable_reason($caught), qr/semaphore/i, 'the reason rides along');
 
     my ($skip) = grep { $_->isa('Test2::Event::Skip') } @$events;
     ok($skip, 'emitted one ordinary skip after an earlier assertion');
@@ -135,6 +140,88 @@ subtest partial_pool_body_records_skip_and_sentinel => sub {
         'skip makes the unavailable remainder visible');
     ok(!(grep { $_->isa('Test2::Event::Plan') } @$events),
         'did not emit an invalid mid-test skip-all plan');
+};
+
+subtest survives_a_require_boundary => sub {
+    # How the Pool bodies are really loaded, and perl rewrites an exception
+    # thrown while a file is being required.
+    my $dir  = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
+    my $file = "$dir/ResourceBoom.pm";
+
+    (my $quoted = $sem_err) =~ s/([\\'])/\\$1/g;
+    open(my $fh, '>', $file) or die "Could not write '$file': $!";
+    print $fh "QDB::Installs::skip_remaining_on_resource_error('$quoted');\n1;\n";
+    close($fh);
+
+    my ($ok, $err);
+    my (undef, $stderr) = capture {
+        intercept { $ok = eval { require $file; 1 }; $err = $@ };
+    };
+
+    ok(!$ok, 'the require failed');
+    like($err, qr/Compilation failed in require/, 'perl rewrote the exception on the way out')
+        or diag("got: $err");
+
+    ok(is_resource_unavailable($err), 'still recognized as a resource skip');
+    like(resource_unavailable_reason($err), qr/semaphore/i, 'the reason is kept');
+    like($stderr, qr/Skipping the remaining Pool checks:.*semaphore/i,
+        'and reaches stderr, where a smoker report shows it');
+};
+
+subtest survives_a_subtest_boundary => sub {
+    # subtest fails itself on an exception rather than rethrowing, so a skip
+    # raised inside one would read as a fault and the body would keep going.
+    my ($ok, $err);
+    my $events;
+    capture {
+        $events = intercept {
+            $ok = eval {
+                subtest_or_resource_skip(allocating => sub {
+                    ok(1, 'assertion before exhaustion');
+                    skip_remaining_on_resource_error($sem_err);
+                });
+                1;
+            };
+            $err = $@;
+        };
+    };
+
+    ok(!$ok, 'the body unwinds past the subtest');
+    ok(is_resource_unavailable($err), 'carrying the resource signal');
+
+    my ($st) = grep { $_->isa('Test2::Event::Subtest') } @$events;
+    ok($st, 'the subtest completed');
+    ok($st && $st->pass, 'and passed rather than failing on the skip');
+};
+
+subtest failures_report_at_the_call_site => sub {
+    # Without a context of its own the wrapper would put every Pool subtest at
+    # one line inside QDB::Installs, and a report could not tell them apart.
+    my $events = intercept {
+        subtest_or_resource_skip(located => sub { ok(0, 'deliberate failure') });
+    };
+
+    my ($st) = grep { $_->isa('Test2::Event::Subtest') } @$events;
+    ok($st, 'the subtest ran');
+    is($st && $st->trace->frame->[1], __FILE__, 'and reports against the caller, not the wrapper');
+};
+
+subtest ordinary_exceptions_still_fail_their_subtest => sub {
+    my ($ok, $err);
+    my $events = intercept {
+        $ok = eval {
+            # An assertion first: an empty subtest fails on its own, which
+            # would hide whether the exception was rethrown.
+            subtest_or_resource_skip(ordinary => sub { ok(1, 'ran'); die "deliberate failure\n" });
+            1;
+        };
+        $err = $@;
+    };
+
+    ok($ok, 'the body continues, as it always did for a failing subtest');
+
+    my ($st) = grep { $_->isa('Test2::Event::Subtest') } @$events;
+    ok($st && !$st->pass, 'the subtest failed');
 };
 
 done_testing;

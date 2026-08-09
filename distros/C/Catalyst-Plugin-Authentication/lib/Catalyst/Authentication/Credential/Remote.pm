@@ -28,7 +28,7 @@ sub new {
         try { $self->deny_re( qr/$config->{deny_regexp}/ ) }
         catch {
             Catalyst::Exception->throw( "Invalid regular expression in ".
-                 "'deny_regexp' configuration parameter");
+                "'deny_regexp' configuration parameter");
         };
     }
     if (defined($config->{cutname_regexp}) && ($config->{cutname_regexp} ne "")) {
@@ -48,10 +48,10 @@ sub authenticate {
     my ( $self, $c, $realm, $authinfo ) = @_;
 
     my $remuser;
-    if ($self->source eq "REMOTE_USER") {    
+    if ($self->source eq "REMOTE_USER") {
         if ($c->req->can('remote_user')) {
-            # $c->req->remote_users was introduced in 5.80005; if not evailable we are
-            # gonna use $c->req->user that is deprecated but more or less works as well 
+            # $c->req->remote_user was introduced in 5.80005; if not evailable we are
+            # gonna use $c->req->user that is deprecated but more or less works as well
             $remuser = $c->req->remote_user;
         }
         # compatibility hack:
@@ -60,19 +60,19 @@ sub authenticate {
             $remuser = $c->engine->env->{REMOTE_USER};
         }
         elsif ($c->req->can('user')) {
-            # maybe show warning that we are gonna use DEPRECATED $req->user            
+            # maybe show warning that we are gonna use DEPRECATED $req->user
             if (ref($c->req->user)) {
                 # I do not know exactly when this happens but it happens
-            Catalyst::Exception->throw( "Cannot get remote user from ".
-        "\$c->req->user as it seems to be a reference not a string" );
+                Catalyst::Exception->throw( "Cannot get remote user from ".
+            "\$c->req->user as it seems to be a reference not a string" );
+            }
+            else {
+                $remuser = $c->req->user;
+            }
         }
-        else {
-            $remuser = $c->req->user;
-        }
-        }
-    }    
-    elsif ($self->source =~ /^(SSL_CLIENT_.*|CERT_*|AUTH_USER)$/) {
-        # if you are using 'exotic' webserver or if the user is 
+    }
+    elsif ($self->source =~ /^(SSL_CLIENT_.*|CERT_.*|AUTH_USER)$/) {
+        # if you are using 'exotic' webserver or if the user is
         # authenticated e.g via SSL certificate his name could be avaliable
         # in different variables
         # BEWARE: $c->engine->env was broken prior 5.80005
@@ -96,16 +96,16 @@ sub authenticate {
     return if ($remuser eq "");
 
     # $authinfo hash can contain item username (it is optional) - if it is so
-    # this username has to be equal to remote_user 
-    my $authuser = $authinfo->{username};             
+    # this username has to be equal to remote_user
+    my $authuser = $authinfo->{username};
     return if (defined($authuser) && ($authuser ne $remuser));
 
-    # handle deny / allow checks 
+    # handle deny / allow checks
     return if (defined($self->deny_re)  && ($remuser =~ $self->deny_re));
     return if (defined($self->allow_re) && ($remuser !~ $self->allow_re));
 
     # if param cutname_regexp is specified we try to cut the final usename as a
-    # substring from remote_user 
+    # substring from remote_user
     my $usr = $remuser;
     if (defined($self->cutname_re)) {
         if (($remuser =~ $self->cutname_re) && ($1 ne "")) {
@@ -152,20 +152,20 @@ authenticate Catalyst application users
                 },
             },
         },
-        
+
     );
-    
+
     # in your Controller/Root.pm you can implement "auto-login" in this way
     sub begin : Private {
-        my ( $self, $c ) = @_;        
+        my ( $self, $c ) = @_;
         unless ($c->user_exists) {
             # authenticate() for this module does not need any user info
             # as the username is taken from $c->req->remote_user and
-            # password is not needed     
+            # password is not needed
             unless ($c->authenticate( {} )) {
-              # return 403 forbidden or kick out the user in other way
+                # return 403 forbidden or kick out the user in other way
             };
-        }   
+        }
     }
 
     # or you can implement in any controller an ordinary login action like this
@@ -177,33 +177,33 @@ authenticate Catalyst application users
 =head1 DESCRIPTION
 
 This module allows you to authenticate the users of your Catalyst application
-on underlaying webserver. The complete list of authentication method available 
+on underlaying webserver. The complete list of authentication method available
 via this module depends just on what your webserver (e.g. Apache, IIS, Lighttpd)
 is able to handle.
 
 Besides the common methods like HTTP Basic and Digest authentication you can
 also use sophisticated ones like so called "integrated authentication" via
 NTLM or Kerberos (popular in corporate intranet applications running in Windows
-Active Directory environment) or even the SSL authentication when users 
-authenticate themself using their client SSL certificates.   
+Active Directory environment) or even the SSL authentication when users
+authenticate themself using their client SSL certificates.
 
 The main idea of this module is based on a fact that webserver passes the name
-of authenticated user into Catalyst application as REMOTE_USER variable (or in 
+of authenticated user into Catalyst application as REMOTE_USER variable (or in
 case of SSL client authentication in other variables like SSL_CLIENT_S_DN on
-Apache + mod_ssl) - from this point referenced as WEBUSER. 
+Apache + mod_ssl) - from this point referenced as WEBUSER.
 This module simply takes this value - perfoms some optional checks (see
-below) - and if everything is OK the WEBUSER is declared as authenticated on 
-Catalyst level. In fact this module does not perform any check for password or 
-other credential; it simply believes the webserver that user was properly 
+below) - and if everything is OK the WEBUSER is declared as authenticated on
+Catalyst level. In fact this module does not perform any check for password or
+other credential; it simply believes the webserver that user was properly
 authenticated.
 
 =head1 CONFIG
 
 =head2 class
 
-This config item is B<REQUIRED>. 
+This config item is B<REQUIRED>.
 
-B<class> is part of the core L<Catalyst::Plugin::Authentication> module, it 
+B<class> is part of the core L<Catalyst::Plugin::Authentication> module, it
 contains the class name of the store to be used.
 
 The classname used for Credential. This is part of L<Catalyst::Plugin::Authentication>
@@ -215,17 +215,17 @@ to 'Remote'.
 
 This config item is B<OPTIONAL> - default is REMOTE_USER.
 
-B<source> contains a name of a variable passed from webserver that contains the 
+B<source> contains a name of a variable passed from webserver that contains the
 user identification.
 
 Supported values: REMOTE_USER, SSL_CLIENT_*, CERT_*, AUTH_USER
 
-B<BEWARE:> Support for using different variables than REMOTE_USER does not work 
-properly with Catalyst 5.8004 and before (if you want details see source code). 
+B<BEWARE:> Support for using different variables than REMOTE_USER does not work
+properly with Catalyst 5.8004 and before (if you want details see source code).
 
-Note1: Apache + mod_ssl uses SSL_CLIENT_S_DN, SSL_CLIENT_S_DN_* etc. (has to be 
-enabled by 'SSLOption +StdEnvVars') or you can also let Apache make a copy of 
-this value into REMOTE_USER (Apache option 'SSLUserName SSL_CLIENT_S_DN'). 
+Note1: Apache + mod_ssl uses SSL_CLIENT_S_DN, SSL_CLIENT_S_DN_* etc. (has to be
+enabled by 'SSLOption +StdEnvVars') or you can also let Apache make a copy of
+this value into REMOTE_USER (Apache option 'SSLUserName SSL_CLIENT_S_DN').
 
 Note2: Microsoft IIS uses CERT_SUBJECT, CERT_SERIALNUMBER etc. for storing info
 about client authenticated via SSL certificate. AUTH_USER on IIS seems to have
@@ -236,7 +236,7 @@ aware of).
 
 This config item is B<OPTIONAL> - no default value.
 
-B<deny_regexp> contains a regular expression used for check against WEBUSER 
+B<deny_regexp> contains a regular expression used for check against WEBUSER
 (see details below)
 
 =head2 allow_regexp
@@ -247,12 +247,12 @@ B<deny_regexp> contains a regular expression used for check against WEBUSER.
 
 Allow/deny checking of WEBUSER values goes in this way:
 
-1) If B<deny_regexp> is defined and WEBUSER matches deny_regexp then 
-authentication FAILS otherwise continues with next step. If deny_regexp is not 
-defined or is an empty string we skip this step.  
+1) If B<deny_regexp> is defined and WEBUSER matches deny_regexp then
+authentication FAILS otherwise continues with next step. If deny_regexp is not
+defined or is an empty string we skip this step.
 
-2) If B<allow_regexp> is defined and WEBUSER matches allow_regexp then 
-authentication PASSES otherwise FAILS. If allow_regexp is not 
+2) If B<allow_regexp> is defined and WEBUSER matches allow_regexp then
+authentication PASSES otherwise FAILS. If allow_regexp is not
 defined or is an empty string we skip this step.
 
 The order deny-allow is fixed.
@@ -262,8 +262,8 @@ The order deny-allow is fixed.
 This config item is B<OPTIONAL> - no default value.
 
 If param B<cutname_regexp> is specified we try to cut the final usename passed to
-Catalyst application as a substring from WEBUSER. This is useful for 
-example in case of SSL authentication when WEBUSER looks like this 
+Catalyst application as a substring from WEBUSER. This is useful for
+example in case of SSL authentication when WEBUSER looks like this
 'CN=john, OU=Unit Name, O=Company, C=CZ' - from this format we can simply cut
 pure usename by cutname_regexp set to 'CN=(.*), OU=Unit Name, O=Company, C=CZ'.
 
@@ -284,15 +284,15 @@ for the username.  The username is additionally mapped onto the I<id> key.
 =head2 new ( $config, $app, $realm )
 
 Instantiate a new Catalyst::Authentication::Credential::Remote object using the
-configuration hash provided in $config. In case of invalid value of any 
+configuration hash provided in $config. In case of invalid value of any
 configuration parameter (e.g. invalid regular expression) throws an exception.
 
 =cut
 
 =head2 authenticate ( $realm, $authinfo )
 
-Takes the username form WEBUSER set by webserver, performs additional 
-checks using optional allow_regexp/deny_regexp configuration params, optionaly 
+Takes the username form WEBUSER set by webserver, performs additional
+checks using optional allow_regexp/deny_regexp configuration params, optionaly
 takes substring from WEBUSER and the sets the resulting value as
 a Catalyst username.
 
@@ -301,7 +301,7 @@ a Catalyst username.
 =head1 COMPATIBILITY
 
 It is B<strongly recommended> to use this module with Catalyst 5.80005 and above
-as previous versions have some bugs related to $c->engine->env and do not 
+as previous versions have some bugs related to $c->engine->env and do not
 support $c->req->remote_user.
 
 This module tries some workarounds when it detects an older version and should
@@ -317,51 +317,51 @@ configuration to map the header back to the WEBUSER variable.
 
 For example, in Apache you would add the configuration
 
-  RequestHeader unset X-Forwarded-User
-  RewriteEngine On
-  RewriteCond %{LA-U:REMOTE_USER} (.+)
-  RewriteRule . - [E=RU:%1]
-  RequestHeader set X-Forwarded-User %{RU}e
+    RequestHeader unset X-Forwarded-User
+    RewriteEngine On
+    RewriteCond %{LA-U:REMOTE_USER} (.+)
+    RewriteRule . - [E=RU:%1]
+    RequestHeader set X-Forwarded-User %{RU}e
 
 You then need to create a Plack::Middleware module to map the
 header back to the WEBUSER:
 
-  package Plack::Middleware::MyRemote;
+    package Plack::Middleware::MyRemote;
 
-  use parent qw( Plack::Middleware );
+    use parent qw( Plack::Middleware );
 
-  use Plack::Util;
+    use Plack::Util;
 
-  sub call {
-      my ($self, $env) = @_;
+    sub call {
+        my ($self, $env) = @_;
 
-      my $user = $env->{HTTP_X_FORWARDED_USER} // "";
+        my $user = $env->{HTTP_X_FORWARDED_USER} // "";
 
-      $env->{REMOTE_USER} = $user
-        if ($user && ($user ne '(null)'));
+        $env->{REMOTE_USER} = $user
+            if ($user && ($user ne '(null)'));
 
-      my $res = $self->app->($env);
+        my $res = $self->app->($env);
 
-      return $res;
-  }
+        return $res;
+    }
 
-  1;
+    1;
 
 Finally, you need to modify F<myapp.psgi> to use the custom middleware:
 
-  use strict;
-  use warnings;
+    use strict;
+    use warnings;
 
-  use MyApp;
+    use MyApp;
 
-  use Plack::Builder;
+    use Plack::Builder;
 
-  my $app = Drain->apply_default_middlewares(Drain->psgi_app);
+    my $app = Drain->apply_default_middlewares(Drain->psgi_app);
 
-  builder {
-     enable "Plack::Middleware::MyRemote";
-     $app;
-  };
+    builder {
+        enable "Plack::Middleware::MyRemote";
+        $app;
+    };
 
 
 =cut

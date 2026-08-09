@@ -2,7 +2,7 @@ package RemoteTestApp1;
 use strict;
 use warnings;
 use Catalyst qw/
-   Authentication
+    Authentication
 /;
 
 use Moose;

@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::f5_bigip;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::f5_bigip - F5 BIG-IP backend using the i
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -246,25 +246,26 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Returns the iControl REST URL for the managed address-list
-# object, identified by ~<partition>~<name>, url-escaped.
+# Internal helper. Returns the iControl REST URL of the address-list this
+# instance manages.
+#
+# BIG-IP identifies configuration objects by a partition qualified path, which
+# in iControl REST is written with tildes in place of slashes:
+# ~<partition>~<name>. The whole identifier is then percent encoded so the
+# tildes and any awkward characters in the name survive being placed in the
+# URL path.
+#
+# This backend does not create the address-list. It is expected to already
+# exist and be referenced by a firewall policy; all this does is rewrite its
+# contents.
+#
+# Takes no arguments; the host, partition, and name come from the options.
+#
+# Returns the URL as a string, used for both the read and the replace.
+#
+#     # partition Common, name blocklist
+#     $self->_obj_url;
+#     #   https://f5.example.org/mgmt/tm/security/firewall/address-list/~Common~blocklist
 sub _obj_url {
 	my ($self) = @_;
 
@@ -277,8 +278,32 @@ sub _obj_url {
 		. $self->_uri_escape($id);
 } ## end sub _obj_url
 
-# Internal helper. Builds the JSON body describing the full desired membership
-# of the address-list, one address entry per currently banned IP, sorted.
+# Internal helper. Renders the complete desired contents of the address-list
+# from the current bans, which is what gets pushed to replace it.
+#
+# The address-list is replace-in-full: there is no add or remove one entry
+# call, so every ban and unban rewrites the whole membership from the internal
+# state.
+#
+# Each entry is an object with a name key rather than a bare string, which is
+# the shape iControl REST expects. Single addresses and CIDR ranges are held
+# in two separate internal lists but go into the same list, merged and sorted
+# together into one run, since BIG-IP accepts both as address entries and does
+# not distinguish them.
+#
+# Takes no arguments; the bans come from the object's banned and banned_cidr
+# hashes.
+#
+# Returns the body as a JSON string, ready to be the content of the replace
+# request. With nothing banned the addresses array is empty, which is how
+# teardown and flush clear the list.
+#
+#     # with 10.0.0.1 and 10.0.0.0/8 banned
+#     $self->_render;
+#     #   {"addresses":[{"name":"10.0.0.0/8"},{"name":"10.0.0.1"}]}
+#
+#     # with nothing banned
+#     #   {"addresses":[]}
 sub _render {
 	my ($self) = @_;
 
@@ -289,9 +314,49 @@ sub _render {
 	return $self->_json->encode( { addresses => \@addresses } );
 } ## end sub _render
 
-# Internal helper. Performs a HTTP request via LWP::UserAgent using HTTP basic
-# auth, returning the decoded JSON body (or undef for an empty body) and dying
-# with an explanation on any HTTP level failure. Never called in testing mode.
+# Internal helper. Performs one HTTP request against the BIG-IP iControl REST
+# API. Every call this backend makes to the appliance goes through here.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend. The
+# insecure option turns off certificate verification, which is there because a
+# BIG-IP commonly presents a self signed certificate.
+#
+# Authentication is HTTP basic, encoded per request; there is no session or
+# token to establish. MIME::Base64 is required at call time for the same
+# reason LWP is. Note the second argument to encode_base64 is an empty string,
+# which suppresses the line wrapping it would otherwise insert and which would
+# corrupt the header.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code.
+#
+# A body that fails to decode as JSON is not fatal; the decode runs inside its
+# own eval and leaves the result undef.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string, such as 'GET' or 'PATCH'.
+#
+#     url    - The full URL to request, as a plain string, normally
+#              _obj_url.
+#
+#     body   - Optional request body, as an already encoded JSON string,
+#              normally from _render. undef for methods that carry no body.
+#
+# Returns the decoded response body as whatever structure the JSON held,
+# normally a hashref, or undef when the response body was empty or did not
+# parse. Dies on any non success HTTP status.
+#
+#     $self->_request( 'GET', $self->_obj_url );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'PATCH', $self->_obj_url, $self->_render ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -511,24 +576,6 @@ sub unban {
 	}
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by adding it to the internal list and pushing the full
@@ -717,13 +764,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from

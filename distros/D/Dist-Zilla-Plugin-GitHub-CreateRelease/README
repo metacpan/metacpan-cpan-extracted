@@ -2,13 +2,14 @@ NAME
     Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 VERSION
-    version 0.0009
+    version 0.0010
 
 SYNOPSIS
     In your dist.ini:
 
      [GitHub::CreateRelease]
      repo = github_repo_name         ; optional
+     repo_owner = github_owner_name  ; optional
      branch = main                   ; default = main
      notes_as_code = 1               ; default = 1 (true)
      notes_from = SignReleaseNotes   ; default = SignReleaseNotes
@@ -94,6 +95,21 @@ ATTRIBUTES
         A string value that specifies the name of the github repository. The
         module determines the name based on the remote url but this setting
         can override the name that is detected.
+
+    repo_owner
+        A string value that specifies the owner (user or organization) of
+        the github repository. The module determines the owner based on the
+        remote url (the same url used to detect "repo") but this setting can
+        override the owner that is detected.
+
+        If the owner cannot be determined from the remote url, the "login"
+        from the identity file (see GITHUB API AUTHENTICATION) is used
+        instead, which was the only behaviour before this attribute existed.
+        That fallback only works when the identity's login is also the
+        repository owner, so repositories owned by an account other than the
+        one in the identity file (e.g. a repository you are a collaborator
+        on) need either this attribute or a matching "org_id" identity to
+        create a release successfully.
 
     remote_name
         A string value that specifies the name of the git remote URL. This

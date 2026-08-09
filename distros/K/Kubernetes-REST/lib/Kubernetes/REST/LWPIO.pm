@@ -1,5 +1,5 @@
 package Kubernetes::REST::LWPIO;
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 # ABSTRACT: HTTP client using LWP::UserAgent
 use Moo;
 use LWP::UserAgent;
@@ -71,10 +71,7 @@ sub call {
 
     my $res = $self->ua->request($http_req);
 
-    return Kubernetes::REST::HTTPResponse->new(
-       status => $res->code,
-       (length $res->decoded_content) ? ( content => $res->decoded_content ) : (),
-    );
+    return $self->_response($res);
   }
 
 sub call_streaming {
@@ -92,11 +89,23 @@ sub call_streaming {
       $data_callback->($chunk);
     });
 
+    return $self->_response($res);
+  }
+
+# charset => 'none' undoes Content-Encoding (gzip et al) but leaves the charset
+# alone, so the body stays bytes - which is what Kubernetes::REST and IO::K8s
+# expect, and what HTTPTinyIO hands back. Plain decoded_content() would decode
+# UTF-8 here and IO::K8s would then decode the characters a second time.
+sub _response {
+    my ($self, $res) = @_;
+
+    my $content = $res->decoded_content(charset => 'none');
+
     return Kubernetes::REST::HTTPResponse->new(
        status => $res->code,
-       (length $res->decoded_content) ? ( content => $res->decoded_content ) : (),
+       (defined $content && length $content) ? ( content => $content ) : (),
     );
-  }
+}
 
 1;
 
@@ -112,7 +121,7 @@ Kubernetes::REST::LWPIO - HTTP client using LWP::UserAgent
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 
@@ -132,6 +141,8 @@ version 1.105
 HTTP client implementation using L<LWP::UserAgent> for making Kubernetes API requests. This is the default IO backend for L<Kubernetes::REST>.
 
 The C<ua> attribute is exposed so that debugging tools like L<LWP::ConsoleLogger> can be attached to inspect HTTP traffic.
+
+Response bodies are returned as bytes, via C<< decoded_content(charset => 'none') >>: C<Content-Encoding> is undone, the charset is left to L<Kubernetes::REST>. See L<Kubernetes::REST::Role::IO/Encoding contract>.
 
 =head2 ssl_verify_server
 

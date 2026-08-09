@@ -370,4 +370,78 @@ sub execute {
 	return 1;
 } ## end sub execute
 
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::stream - Stream CSV rows through an Online Isolation Forest model, scoring and learning as it goes
+
+=head1 DESCRIPTION
+
+Streams the input rows, in order, through an
+L<Algorithm::Classifier::IsolationForest::Online> model.
+
+The default is prequential: each row is scored against the model as it
+stood before that row was learned, then learned, and the model state --
+sliding window included -- is saved back to C<-m>, so the next invocation
+resumes the stream where this one left off.  C<--learn-only> skips the
+scoring, which is what a warm-up wants; C<--score-only> skips the
+learning.
+
+When C<-m> does not exist yet the creation knobs build a new model; when
+it does exist they are ignored.  With C<--prototype> the schema and its
+version and description come from the prototype file, its params supply
+the knob defaults, and the other creation switches override those params.
+
+Input matches C<iforest fit>: CSV, every column a numeric feature, one
+sample per row.  Output is one line per input row:
+
+  $score,$label
+
+With C<-d> the input feature columns are prepended.
+
+Run it as C<iforest stream>; C<iforest help stream> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help stream> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Checks that C<-i> names a readable CSV, that C<-m> is usable, that
+C<--learn-only> and C<--score-only> are not combined, that the numeric
+knobs parse, and that a C<--mungers> spec is readable and accompanied by
+the feature tags (C<-t>) it compiles against.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Creates or resumes the model, runs the stream, prints the result lines,
+and saves the updated model back to C<-m>.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
+
 return 1;

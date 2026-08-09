@@ -9,8 +9,8 @@ sub default : Local {
     my ( $self, $c ) = @_;
     if ($c->authenticate()) {
         $c->res->body(
-              'my_user_name:'
-              . $c->user->{my_user_name}
+            'my_user_name:'
+            . $c->user->{my_user_name}
         );
     }
     else {

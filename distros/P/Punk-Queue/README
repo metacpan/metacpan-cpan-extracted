@@ -1,0 +1,66 @@
+Punk-Queue
+
+A durable, multi-process job queue for Perl, with a C core.
+
+What Minion is for Mojolicious. Jobs are rows in a database, claimed
+atomically by workers, run once, and recorded with their result. The
+backend contract is Perl-visible but the implementations are C: SQL
+assembly, bind vectors, positional row decode, the JSON codec (through
+File::Raw::JSON's C ABI) and the claim state machine all live in the XS
+tier, and DBI is reached from C.
+
+    use Punk::Queue;
+
+    my $q = Punk::Queue->new(dsn => 'dbi:SQLite:dbname=queue.db');
+    $q->migrate;
+
+    $q->task(add => sub { my ($job, $a, $b) = @_; $a + $b });
+
+    my $id  = $q->enqueue(add => [2, 3], priority => 5);
+    my $job = $q->dequeue;
+    $q->perform($job);
+
+    print $q->job_info($id)->{result}, "\n";   # 5
+
+EVERY TASK MUST BE IDEMPOTENT
+
+A job can run more than once. A worker can be killed between finishing the
+work and recording it, and a crashed worker's job is requeued. This is the
+guarantee an at-least-once queue can actually keep; write tasks that can
+run twice without harm.
+
+STATUS
+
+Under construction, against the phased plan in ../plan_punk_queue.
+Phase 1 (schema, migrations, the SQLite backend, enqueue/dequeue/perform)
+is complete. PostgreSQL, the worker pool and CLI, job dependencies and
+retries, the Punk plugin and cron follow in later phases. (No C ABI
+ships: the once-planned pq_abi.h was dropped for having no out-of-dist
+consumer - Punk::Plugin::Queue lives in this dist and needs no table.)
+There is no CPAN release until phase 10.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+REQUIREMENTS
+
+File::Raw::JSON is required. DBI plus a driver is required at runtime for
+the shipped backends: DBD::SQLite now, DBD::Pg from phase 2. Hyperman
+becomes an optional dependency in phase 3 - the worker has a complete
+poll(2) path without it.
+
+SUPPORT AND DOCUMENTATION
+
+    perldoc Punk::Queue
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

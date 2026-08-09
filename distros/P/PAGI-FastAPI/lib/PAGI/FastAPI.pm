@@ -4,14 +4,14 @@ use v5.36;
 use experimental qw/try for_list/;
 use version;
 
-our $VERSION   = qv('v0.0.6');
+our $VERSION   = qv('v0.0.9');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
 use JSON::PP qw(encode_json decode_json);
 use Scalar::Util qw(blessed);
 use PAGI::App::URLMap;
-use PAGI::FastAPI::WebSocket;
+use PAGI::WebSocket;
 use PAGI::FastAPI::Context;
 use PAGI::FastAPI::Depends qw(Depends);
 
@@ -23,7 +23,7 @@ PAGI::FastAPI - Asynchronous, Type-Safe Micro-Framework with Dependency Injectio
 
 =head1 VERSION
 
-Version v0.0.6
+Version v0.0.9
 
 =head1 SYNOPSIS
 
@@ -134,11 +134,20 @@ Version v0.0.6
     );
 
     # 9. Non-blocking WebSocket Endpoint
+    # $ws is a PAGI::WebSocket (from PAGI::Tools), so on_close/each_json/
+    # try_send_json/keepalive and more are all built in.
     $app->websocket('/ws', handler => async sub ($ws, $deps) {
         await $ws->accept;
-        while (my $msg = await $ws->receive_text) {
-            await $ws->send_text("Echo: $msg");
-        }
+
+        $ws->on_close(async sub {
+            my ($code, $reason) = @_;
+            # runs on every disconnect path, not just a clean loop exit
+        });
+
+        await $ws->each_json(async sub {
+            my ($data) = @_;
+            await $ws->send_json({ echo => $data });
+        });
     });
 
     # 10. Authentication via the companion PAGI::FastAPI::Security distribution
@@ -176,7 +185,7 @@ documentation generation.
 
 =item * B<Sub-App & Static Mounting:> Mount external PAGI applications, file drivers, or sub-routers using L</mount>.
 
-=item * B<WebSocket Support:> Full non-blocking WebSocket handshake and frame streaming via L<PAGI::FastAPI::WebSocket>.
+=item * B<WebSocket Support:> Full non-blocking WebSocket handshake and frame streaming via L<PAGI::WebSocket>.
 
 =item * B<Automatic Type Validation:> Request query parameters and JSON payloads are checked against L<Type::Tiny> constraints before reaching route handlers.
 
@@ -386,8 +395,9 @@ sub add_cors ($self, %opts) {
         }
     );
 
-Registers a WebSocket endpoint at C<$path>. The C<handler> receives a L<PAGI::FastAPI::WebSocket> instance
-and an optional HashRef of resolved dependencies.
+Registers a WebSocket endpoint at C<$path>. The C<handler> receives a L<PAGI::WebSocket> instance
+(from L<PAGI::Tools>, the reference WebSocket wrapper for the PAGI spec) and an optional HashRef of
+resolved dependencies.
 
 =cut
 
@@ -681,26 +691,14 @@ async sub _handle_websocket ($self, $scope, $receive, $send) {
 
     # Route Not Found -> Reject with 404 close code before accepting handshake
     unless ($route) {
-        my $ws = PAGI::FastAPI::WebSocket->new(
-            scope        => $scope,
-            receive      => $receive,
-            send         => $send,
-            path_params  => {},
-            query_params => {},
-        );
+        $scope->{path_params} = {};
+        my $ws = PAGI::WebSocket->new($scope, $receive, $send);
         await $ws->close(4004, "Not Found");
         return;
     }
 
-    my $query_params = $self->_parse_query_string($scope->{query_string} // '');
-
-    my $ws = PAGI::FastAPI::WebSocket->new(
-        scope        => $scope,
-        receive      => $receive,
-        send         => $send,
-        path_params  => $path_params  // {},
-        query_params => $query_params // {},
-    );
+    $scope->{path_params} = $path_params // {};
+    my $ws = PAGI::WebSocket->new($scope, $receive, $send);
 
     # Resolve dependencies only if defined and non-empty
     my $resolved_deps = {};
@@ -745,17 +743,6 @@ sub _match_route ($self, $method, $path) {
         }
     }
     return (undef, {});
-}
-
-sub _parse_query_string ($self, $query_string) {
-    my %query_params;
-    if (defined $query_string && length $query_string) {
-        for my $pair (split '&', $query_string) {
-            my ($k, $v) = split '=', $pair, 2;
-            $query_params{_uri_unescape($k)} = _uri_unescape($v // '');
-        }
-    }
-    return \%query_params;
 }
 
 sub _register_route ($self, $method, $path, $opts) {
@@ -911,6 +898,65 @@ with a JSON body:
 
 Unmatched routes return C<HTTP 404 Not Found> with C<{"detail": "Not Found"}>.
 
+=head1 MIXING WITH OTHER EVENT LOOPS
+
+C<PAGI::FastAPI> operates completely on L<IO::Async>. If your handlers are
+also dependent on a library built over a I<different> event loop, most
+commonly either L<Mojo::Pg> or other modules built on top of L<Mojo::IOLoop>,
+calling that library's non-blocking/callback API will do nothing:
+L<IO::Async::Loop> and L<Mojo::IOLoop> are separate reactors by default and
+running one does not provide service to the other one. The observation that
+would arise from that is a request or C<on_startup> / C<on_shutdown> handler
+that hangs (and, under L<PAGI::Server>, eventually fails with a
+lifespan-timeout error) even though the call you're C<await>ing seems to be
+correct.
+
+On the other hand, utilising that library in blocking mode (such as plain
+C<< $pg->db->query(...) >> with no callback) results in it triggering
+immediately, whereas the entire operation of the process gets halted, all
+concurrent requests and WebSocket connections are paused for the time that
+the function call lasts, as it is a genuine blocking call without any
+cooperative aspect. At the same time, this is something that can easily
+happen by mistake; blocking mode is just the default and easiest way of
+calling most libraries, and it happens to work without any flaws when tried
+manually with one client prior to failing under concurrent load.
+
+The solution however stays the same in both situations. It is to make use of
+L<IO::Async> and also to arrange both loops to utilise the I<same> underlying
+reactor:
+
+=over 4
+
+=item 1.
+
+To make L<IO::Async> work with the reactor, one must install the
+L<IO::Async::Loop::EV> because it is the one used when one installs L<EV>,
+which is done by L<Mojo::IOLoop> automatically. Note that installing plain
+L<EV> will not work: the constructor used for L<IO::Async::Loop> will not
+automatically prefer C<EV> even if it has been installed.
+
+=item 2.
+
+Establish the C<IO_ASYNC_LOOP=EV> variable for the entire process prior to
+starting the loop. This is necessary even when the L<IO::Async::Loop> is
+created by someone else’s code, for instance, C<pagi-server>.
+
+    IO_ASYNC_LOOP=EV pagi-server your_app.pl
+
+=item 3.
+
+Throughout the whole task, utilise the callback/non-blocking variant of the
+API from another library (for example, the command C<< $pg->db->query($sql, @binds, $cb) >>),
+using a C<Future> to wrap up every call so that it can be executed using
+C<await>-ed like any other command. Consult the information available in the
+L<Future::AsyncAwait> regarding the routine C<< Future->new >>/C<< $f->done >>/C<< $f->fail >>
+for more information.
+
+=back
+
+Without both (1) and (2), the two reactors remain separate no matter how
+correctly you use C<await> on your side.
+
 =head1 AUTHENTICATION AND SECURITY
 
 C<PAGI::FastAPI> has no authentication built in by design, auth needs vary
@@ -1007,7 +1053,7 @@ the full documentation and an end-to-end JWT-verification example.
 
 =item * L<PAGI::App::URLMap> - Routing middleware for prefix-matching PAGI applications.
 
-=item * L<PAGI::FastAPI::WebSocket> - Asynchronous WebSocket object for PAGI::FastAPI.
+=item * L<PAGI::WebSocket> - Asynchronous WebSocket connection object (from PAGI::Tools) used by C<websocket()> handlers.
 
 =item * L<PAGI::FastAPI::Context> - Context object passed to route handlers.
 

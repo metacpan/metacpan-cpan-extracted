@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::juniper_srx;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::juniper_srx - Juniper SRX backend via th
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -239,16 +239,56 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the Junos REST API RPC endpoint.
+# Internal helper. Returns the Junos REST API endpoint every request is posted
+# to.
+#
+# There is only one URL. Unlike the REST APIs that expose a resource tree,
+# Junos takes an RPC: what to do is carried entirely in the XML body posted
+# here, not in the path. That is why this takes no arguments and why nothing
+# in this backend ever builds a URL per operation.
+#
+# The scheme is fixed at https rather than configurable, since the Junos REST
+# service is expected to be run over TLS.
+#
+# Takes no arguments; the host comes from the options.
+#
+# Returns the endpoint as a string.
+#
+#     $self->_url;    # https://srx.example.org/rpc
 sub _url {
 	my ($self) = @_;
 
 	return 'https://' . $self->{options}{host} . '/rpc';
 }
 
-# Internal helper. Returns the address book object name used for the passed IP
-# or CIDR, built as <prefix>_<name>_<ip> with dots, colons, and slashes
-# replaced by '-' so it is a valid Junos identifier.
+# Internal helper. Returns the name of the Junos address book object
+# representing one banned address or range.
+#
+# Junos has no set type that simply holds addresses. Each ban becomes a named
+# address object in the global address book, which is then added to an
+# address-set that a security policy references. So every ban needs a name.
+#
+# The name is derived from the prefix, the instance name, and the target
+# rather than stored, so ban and unban independently arrive at the same name
+# without local bookkeeping, and two instances on the same SRX do not collide.
+# Dots, colons, and slashes are replaced with hyphens because none of them are
+# valid in a Junos identifier.
+#
+# Unlike the fortigate backend, one sub serves both single addresses and
+# ranges, since the mangling already covers the slash a range carries.
+#
+# Args:
+#
+#     ip - The address or CIDR range to name an object for, as a plain string.
+#          Expected to be already validated and lowercased. Both
+#          "10.0.0.1" and "10.0.0.0/8" are fine.
+#
+# Returns the object name as a plain string, valid as a Junos identifier.
+#
+#     # with prefix "kur" and name "ssh"
+#     $self->_obj_name('10.0.0.1');       # kur_ssh_10-0-0-1
+#     $self->_obj_name('2001:db8::1');    # kur_ssh_2001-db8--1
+#     $self->_obj_name('10.0.0.0/8');     # kur_ssh_10-0-0-0-8
 sub _obj_name {
 	my ( $self, $ip ) = @_;
 
@@ -258,8 +298,33 @@ sub _obj_name {
 	return $obj;
 }
 
-# Internal helper. Wraps the passed set command lines (an arrayref) in a
-# load-configuration RPC in set/text format.
+# Internal helper. Wraps a batch of Junos set commands into the
+# load-configuration RPC that applies them.
+#
+# Junos configuration changes go in as an RPC rather than as REST calls
+# against a resource tree. Using set/text format means the payload is the same
+# set commands an operator would type at the CLI, which is far easier to
+# generate and to read back in test_data than the equivalent XML
+# configuration tree would be.
+#
+# The lines are newline joined into one configuration-set element, so a batch
+# loads as a single change. That matters for the ban path, which creates the
+# address object and adds it to the address-set together.
+#
+# Note this only loads the change into the candidate configuration. Nothing
+# takes effect until a separate commit, which is what _commit_body is for.
+#
+# Args:
+#
+#     setlines - An arrayref of Junos set command lines, as plain strings with
+#                no trailing newline, such as those from _ban_setlines. May
+#                hold a single line. Emitted in the order given.
+#
+# Returns the RPC as an XML string, ready to be the body of a post to _url.
+#
+#     $self->_load_body( $self->_ban_setlines('10.0.0.1') );
+#     #   <load-configuration action="set" format="text"><configuration-set>set security address-book global address kur_ssh_10-0-0-1 10.0.0.1/32
+#     #   set security address-book global address-set blocklist address kur_ssh_10-0-0-1</configuration-set></load-configuration>
 sub _load_body {
 	my ( $self, $setlines ) = @_;
 
@@ -269,15 +334,62 @@ sub _load_body {
 		. '</configuration-set></load-configuration>';
 }
 
-# Internal helper. Returns the commit-configuration RPC.
+# Internal helper. Returns the RPC that commits the candidate configuration.
+#
+# Junos is a two phase configuration system: a load only stages changes into
+# the candidate configuration, and nothing takes effect until it is committed.
+# Every path that loads something therefore posts this immediately afterwards;
+# skipping it would leave the ban staged and inert, and would also leave the
+# candidate dirty for whoever logs in next.
+#
+# It is a bare RPC with no arguments and no options, so it is a constant
+# rather than something built.
+#
+# Takes no arguments.
+#
+# Returns the RPC as an XML string, ready to be the body of a post to _url.
+#
+#     $self->_commit_body;    # <commit-configuration/>
+#
+#     # the usual shape: load then commit
+#     $self->_request( $self->_load_body($setlines) );
+#     $self->_request( $self->_commit_body );
 sub _commit_body {
 	my ($self) = @_;
 
 	return '<commit-configuration/>';
 }
 
-# Internal helper. Returns the set command lines (arrayref) that add the passed
-# IP to the global address book and address-set.
+# Internal helper. Returns the Junos set commands that ban one address.
+#
+# Two lines are needed, and they belong together: the address book object has
+# to be created before it can be referenced by the address-set. Both go into a
+# single load, so the change is applied as one unit.
+#
+# The address is written with an explicit host prefix, /32 or /128 by family,
+# because a Junos address book entry is always a prefix; there is no bare host
+# form.
+#
+# Args:
+#
+#     ip - The address to ban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address. The family is
+#          decided by matching against $IPv4_re and only selects the mask.
+#
+# Returns an arrayref of set command lines, in the order they must be applied,
+# ready to hand to _load_body.
+#
+#     $self->_ban_setlines('10.0.0.1');
+#     #   [
+#     #     'set security address-book global address kur_ssh_10-0-0-1 10.0.0.1/32',
+#     #     'set security address-book global address-set blocklist address kur_ssh_10-0-0-1',
+#     #   ]
+#
+#     $self->_ban_setlines('2001:db8::1');
+#     #   [
+#     #     'set security address-book global address kur_ssh_2001-db8--1 2001:db8::1/128',
+#     #     'set security address-book global address-set blocklist address kur_ssh_2001-db8--1',
+#     #   ]
 sub _ban_setlines {
 	my ( $self, $ip ) = @_;
 
@@ -290,18 +402,73 @@ sub _ban_setlines {
 	];
 } ## end sub _ban_setlines
 
-# Internal helper. Returns the set command lines (arrayref) that delete the
-# passed IP's address book object. Deleting the address also removes it from the
-# address-set.
+# Internal helper. Returns the Junos set commands that unban one address.
+#
+# Only one line is needed, unlike the two the ban takes. Deleting an address
+# book object also removes it from any address-set referencing it, so an
+# explicit membership removal would be redundant. This is the opposite of the
+# fortigate backend, where the membership has to be dropped first.
+#
+# Args:
+#
+#     ip - The address to unban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, and to produce the
+#          same object name it did when banned. Note the family is not
+#          consulted at all here, since the object name is all that is needed.
+#
+# Returns an arrayref holding the single delete command, ready to hand to
+# _load_body.
+#
+#     $self->_unban_setlines('10.0.0.1');
+#     #   [ 'delete security address-book global address kur_ssh_10-0-0-1' ]
 sub _unban_setlines {
 	my ( $self, $ip ) = @_;
 
 	return [ 'delete security address-book global address ' . $self->_obj_name($ip) ];
 }
 
-# Internal helper. POSTs the passed XML RPC body to the Junos REST API using
-# HTTP basic auth, returning the raw response body on success and dying
-# otherwise. Never called in testing mode.
+# Internal helper. Posts one XML RPC to the Junos REST API. Every call this
+# backend makes to the appliance goes through here.
+#
+# Because Junos takes an RPC rather than exposing a resource tree, this needs
+# no method or URL argument: it is always a POST to the one endpoint, and what
+# happens is decided entirely by the body.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent rather than building a new one each time.
+# LWP::UserAgent is loaded with require at that point rather than at compile
+# time, since only the HTTP backends need it; failing to load it dies with an
+# explanation naming this backend. The insecure option turns off certificate
+# verification, which is there because an SRX commonly presents a self signed
+# certificate.
+#
+# Authentication is HTTP basic, encoded per request. MIME::Base64 is required
+# at call time for the same reason LWP is. Note the second argument to
+# encode_base64 is an empty string, which suppresses the line wrapping it
+# would otherwise insert and which would corrupt the header.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# Never called in testing mode; those paths record the bodies instead.
+#
+# Args:
+#
+#     body - The complete XML RPC to post, as a plain string, normally from
+#            _load_body or _commit_body.
+#
+# Returns the raw response body as a string. Note it is not parsed, unlike the
+# JSON backends: callers that care inspect the XML themselves.
+#
+#     # load a change, then commit it
+#     $self->_request( $self->_load_body( $self->_ban_setlines($ip) ) );
+#     $self->_request( $self->_commit_body );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( $self->_commit_body ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $body ) = @_;
 
@@ -529,28 +696,34 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
-# Internal helper. Returns the set command lines (arrayref) that add the passed
-# CIDR range to the global address book and address-set. The CIDR is used
-# verbatim as the address prefix, so the address object already carries its own
-# prefix length rather than a per-host /32 or /128 mask.
+# Internal helper. Returns the Junos set commands that ban one CIDR range, the
+# range counterpart of _ban_setlines.
+#
+# The two line shape and its ordering are the same: the address book object
+# has to exist before the address-set can reference it.
+#
+# The one difference is that no mask is appended. A range already carries its
+# own prefix length, which is exactly what a Junos address book entry holds,
+# so it goes in as it stands rather than being given a host /32 or /128.
+#
+# There is no matching _unban_cidr_setlines, because _unban_setlines already
+# covers ranges: it only needs the object name, and _obj_name handles ranges
+# as well as addresses.
+#
+# Args:
+#
+#     cidr - The range to ban, as a plain string. Expected to be an already
+#            validated and lowercased CIDR range such as "10.0.0.0/8" or
+#            "2001:db8::/32".
+#
+# Returns an arrayref of set command lines, in the order they must be applied,
+# ready to hand to _load_body.
+#
+#     $self->_ban_cidr_setlines('10.0.0.0/8');
+#     #   [
+#     #     'set security address-book global address kur_ssh_10-0-0-0-8 10.0.0.0/8',
+#     #     'set security address-book global address-set blocklist address kur_ssh_10-0-0-0-8',
+#     #   ]
 sub _ban_cidr_setlines {
 	my ( $self, $cidr ) = @_;
 
@@ -768,13 +941,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from

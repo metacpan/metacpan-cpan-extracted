@@ -9,7 +9,7 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(qw/_user/);
 
-our $VERSION = '0.10026';
+our $VERSION = '0.10028';
 
 sub set_authenticated {
     my ( $c, $user, $realmname ) = @_;
@@ -812,7 +812,13 @@ However, even if use_session is disabled, if any code touches $c->session, a ses
 object will be auto-vivified and session Cookies will be sent in the headers. To
 prevent accidental session creation, check if a session already exists with
 if ($c->sessionid) { ... }. If the session doesn't exist, then don't place
-anything in the session to prevent an unecessary session from being created.
+anything in the session to prevent an unnecessary session from being created.
+
+=item rotate_session_id
+
+Whether or not to rotate the session ID when authenticating as a new user. This
+mitigates session-fixation attacks (L<CWE-384|https://cwe.mitre.org/data/definitions/384.html>).
+This requires L<Catalyst::Plugin::Session> version 0.25. This value is set to true by default.
 
 =item default_realm
 
@@ -1122,9 +1128,7 @@ Yuval Kogman, C<nothingmuch@woobling.org> - original author
 
 Jay Kuri, C<jayk@cpan.org> - Large rewrite
 
-=head1 PRIMARY MAINTAINER
-
-Tomas Doran (t0m), C<bobtfish@bobtfish.net>
+Tomas Doran (t0m), C<bobtfish@bobtfish.net> - Previous primary maintainer
 
 =head1 ADDITIONAL CONTRIBUTORS
 
@@ -1146,17 +1150,17 @@ Tomas Doran (t0m), C<bobtfish@bobtfish.net>
 
 =item John Napiorkowski (jnap) C<jjnapiork@cpan.org>
 
+=item Graham Knop (haarg) C<haarg@haarg.org>
+
 =back
 
 =head1 COPYRIGHT & LICENSE
 
 Copyright (c) 2005 - 2012
-the Catalyst::Plugin::Authentication L</AUTHORS>,
-L</PRIMARY MAINTAINER> and L</ADDITIONAL CONTRIBUTORS>
+the Catalyst::Plugin::Authentication L</AUTHORS> and L</ADDITIONAL CONTRIBUTORS>
 as listed above.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
 =cut
-

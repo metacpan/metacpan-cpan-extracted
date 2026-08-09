@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft
+# Copyright (c) 2024-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -6,15 +6,15 @@
 
 package File::ValueFile;
 
-use v5.10;
+use v5.20;
 use strict;
 use warnings;
 
 use Carp;
-use Data::Identifier v0.08;
+use Data::Identifier v0.34;
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 my @wellknown = (
     Data::Identifier->new(uuid => '54bf8af4-b1d7-44da-af48-5278d11e8f32', displayname => 'ValueFile'),
@@ -84,7 +84,7 @@ File::ValueFile - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

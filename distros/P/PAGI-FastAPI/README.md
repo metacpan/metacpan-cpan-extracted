@@ -115,11 +115,20 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
     my $pagi_app = $app->to_app;
 
     # 9. Non-blocking WebSocket Endpoint
+    # $ws is a PAGI::WebSocket (from PAGI::Tools), so on_close/each_json/
+    # on_close/each_json/try_send_json/keepalive and more are all built in.
     $app->websocket('/ws', handler => async sub ($ws, $deps) {
         await $ws->accept;
-        while (my $msg = await $ws->receive_text) {
-            await $ws->send_text("Echo: $msg");
-        }
+
+        $ws->on_close(async sub {
+            my ($code, $reason) = @_;
+            # runs on every disconnect path, not just a clean loop exit
+        });
+
+        await $ws->each_json(async sub {
+            my ($data) = @_;
+            await $ws->send_json({ echo => $data });
+        });
     });
 
     # 10. Authentication via the companion PAGI::FastAPI::Security distribution

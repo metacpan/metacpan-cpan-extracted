@@ -72,11 +72,13 @@ BEGIN {
 		'ipfw re_init re-adds every banned IP to the table'
 	);
 
+	# the rule has to go first; ipfw will not destroy a table a rule still
+	# references
 	$fw->teardown;
 	is_deeply(
 		$fw->{test_data},
-		[ 'ipfw table derp_ssh destroy', 'ipfw delete 150' ],
-		'ipfw teardown destroys the table and deletes the rule'
+		[ 'ipfw delete 150', 'ipfw table derp_ssh destroy' ],
+		'ipfw teardown deletes the rule before destroying the table'
 	);
 }
 

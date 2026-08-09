@@ -26,7 +26,7 @@ BEGIN {
 }
 
 use Test2::V0 -target => 'DBIx::QuickDB::Pool';
-use QDB::Installs qw/skip_remaining_on_resource_error/;
+use QDB::Installs qw/skip_remaining_on_resource_error subtest_or_resource_skip/;
 use File::Spec;
 use File::Temp qw/tempdir/;
 use Time::HiRes qw/time/;
@@ -173,7 +173,6 @@ sub diag_connect {
 
 ok($driver, "Got a driver ($driver)") or die "Cannot continue without a driver";
 
-use Test2::Tools::QuickDB qw/skipall_on_resource_error/;
 use DBIx::QuickDB::Pool cache_dir => pool_tempdir(), verbose => 0;
 
 # db() that builds/clones a new server can fail on a host out of System V IPC at
@@ -186,12 +185,7 @@ sub db_or_skip {
     return wantarray ? @out : $out[0] if $ok;
     my $err = $@;
 
-    # A new server can expose an IPC allocation failure in the middle of the
-    # Pool body. A skip-all plan is invalid after prior assertions; emit one
-    # normal skip and let the per-driver wrapper catch the dedicated sentinel.
     skip_remaining_on_resource_error($err);
-
-    skipall_on_resource_error($err);
     die $err;
 }
 is(\@Test::Pool::EXPORT_OK, ['db'], "Added db to export_ok");
@@ -345,7 +339,7 @@ my $bar = db_or_skip('bar');
 $total = time() - $start;
 note(sprintf("Initialized 'bar' from 'foo' in %.6f seconds", $total));
 
-subtest resync => sub {
+subtest_or_resource_skip resync => sub {
     my $bar = db_or_skip('bar');
 
     my $dbh = $bar->connect;
@@ -368,7 +362,7 @@ subtest resync => sub {
     check_rows($all, ['base', 'foo', 'bar'], "Inserted row is gone");
 };
 
-subtest checksum_change_update => sub {
+subtest_or_resource_skip checksum_change_update => sub {
     QDB_POOL->set_update_checksums(1);
 
     my $c = $called + 1;
@@ -391,7 +385,7 @@ subtest checksum_change_update => sub {
     isnt(QDB_POOL->{databases}->{bar}->{db}, $cached->{bar}, "bar was rebuilt");
 };
 
-subtest checksum_change_no_update => sub {
+subtest_or_resource_skip checksum_change_no_update => sub {
     QDB_POOL->set_update_checksums(0);
 
     my $c = $called;
@@ -414,7 +408,7 @@ subtest checksum_change_no_update => sub {
 
 # This test removes all instances of the databases, even the root copies, they
 # should spin back up super fast using the cached directories
-subtest reclaim => sub {
+subtest_or_resource_skip reclaim => sub {
     $base   = undef;
     $sth_f1 = undef;
     $sth_f2 = undef;
@@ -437,7 +431,7 @@ subtest reclaim => sub {
 
 };
 
-subtest init => sub {
+subtest_or_resource_skip init => sub {
     like(
         dies { $CLASS->new() },
         qr/'cache_dir' is a required_attribute/,
@@ -465,7 +459,7 @@ subtest init => sub {
     );
 };
 
-subtest export => sub {
+subtest_or_resource_skip export => sub {
     my $one = $CLASS->new(cache_dir => pool_tempdir(), library => 'Fake::Export::Lib');
     $one->export;
     {
@@ -478,7 +472,7 @@ subtest export => sub {
     is(\@Fake::Export::Lib::EXPORT_OK, ['db'], "Can re-export db()");
 };
 
-subtest throw => sub {
+subtest_or_resource_skip throw => sub {
     my $one = $CLASS->new(cache_dir => pool_tempdir());
 
     my $line;
@@ -496,7 +490,7 @@ subtest throw => sub {
     );
 };
 
-subtest alert => sub {
+subtest_or_resource_skip alert => sub {
     my $one = $CLASS->new(cache_dir => pool_tempdir());
 
     my $line;
@@ -514,7 +508,7 @@ subtest alert => sub {
     );
 };
 
-subtest diag => sub {
+subtest_or_resource_skip diag => sub {
     my $one = $CLASS->new(cache_dir => pool_tempdir());
 
     like(
@@ -545,7 +539,7 @@ subtest diag => sub {
     );
 };
 
-subtest instance_dir => sub {
+subtest_or_resource_skip instance_dir => sub {
     my $instdir = pool_tempdir();
     my $one     = $CLASS->new(cache_dir => pool_tempdir(), instance_dir => $instdir);
 
@@ -577,7 +571,6 @@ subtest instance_dir => sub {
     unless ($ok) {
         my $err = $@;
         skip_remaining_on_resource_error($err);
-        skipall_on_resource_error($err);
         die $err;
     }
     opendir(my $dh, $instdir) or die "Could not open dir: $!";

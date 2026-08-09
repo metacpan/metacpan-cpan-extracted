@@ -176,6 +176,10 @@ static const char *ssl_error(pTHX) {
   ERR_print_errors(bio);
   sv = extractBioString(aTHX_ bio);
   ERR_clear_error();
+
+  if (!sv || !SvOK(sv)) {
+    return ""; // Return an empty C string if no actual error messages were found
+  }
   return SvPV(sv, l);
 }
 
@@ -662,9 +666,23 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
     if (length < 0 || length > (INT_MAX - 1))
       croak("BMPSTRING attribute length out of range (got %d)", length);
     value = OPENSSL_uni2asc(av->value.bmpstring->data, length);
+    /* Defensive: OPENSSL_uni2asc returns NULL on allocation failure, and on
+       an odd-length BMPSTRING. Guard before either branch dereferences it:
+       the else branch below passes value to BIO_printf. */
+    if (value == NULL)
+      croak("BMPSTRING attribute could not be decoded");
     if(*attribute != NULL) {
-      Renew(*attribute, length, char);
-      strncpy(*attribute, value, length);
+      /* uni2asc returns a NUL-terminated C string whose length can be shorter
+         than `length` (each UTF-16 unit -> one ASCII byte), and is 0 for an
+         empty BMPSTRING. Size the buffer on strlen(value) + 1 and write an
+         explicit terminator. Sizing on `length` degenerated for an empty
+         BMPSTRING: Renew(*attribute, 0, char) frees the buffer and returns
+         NULL, and downstream callers run strlen()/newSVpvn() on it -> NULL
+         pointer dereference. */
+      size_t vlen = strlen(value);
+      Renew(*attribute, vlen + 1, char);
+      memcpy(*attribute, value, vlen);
+      (*attribute)[vlen] = '\0';
     } else {
       BIO_printf(out, "%s\n", value);
     }

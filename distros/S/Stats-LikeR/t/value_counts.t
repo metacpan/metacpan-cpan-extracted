@@ -214,4 +214,30 @@ if ($n == 0) {
 } else {
 	fail("value_counts: hash of array has $n incorrect hash keys");
 }
+#--------
+# Numeric values.  increment_count() renders plain integers and doubles itself
+# rather than through SvPV (nk_num_pv in LikeR.xs), so the counts have to come
+# out keyed exactly as a plain Perl string hash would key them.
+#--------
+{
+	srand(4321);
+	my $bad = 0;
+	for my $round (1 .. 20) {
+		my @v = grep { $_ == $_ && abs($_) != 9**9**9 }
+		        map {
+			my $k = $_ % 4;
+			  $k == 0 ? int rand 1e6
+			: $k == 1 ? rand() * 10 ** (int(rand 60) - 30)
+			: $k == 2 ? int(rand 1e6) / 1000
+			:           unpack 'd', pack 'Q', (int(rand 2**32) << 32) | int(rand 2**32)
+		} 1 .. 2000;
+		my %want;
+		$want{"$_"}++ for @v;
+		my $got = value_counts({ c => [ @v ] }, 'c');
+		$bad++, next unless keys %want == keys %$got;
+		$bad++ if grep { !defined $got->{$_} || $got->{$_} != $want{$_} } keys %want;
+	}
+	is($bad, 0, 'numeric values count under the same keys perl would use');
+}
+
 done_testing();

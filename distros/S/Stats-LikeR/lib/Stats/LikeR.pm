@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.294;
+our $VERSION = 0.295;
 require XSLoader;
 use autodie ':default';
 use warnings FATAL => 'all';
@@ -2134,9 +2134,10 @@ sub dropna {
 #           'last' the latest, 0 (or 'none') drops every row that has a dup.
 #
 # Row order is preserved (first-seen positions for the survivors).  Returns a
-# NEW top-level frame of the same family; the original is never modified.  For
-# AoA/AoH the surviving row refs are reused (cells shared, not deep-copied);
-# for HoA the columns are rebuilt with the surviving cells copied.
+# NEW top-level frame of the same family; the original is never modified.  What
+# survives is shared, not deep-copied: AoA/AoH reuse the surviving row refs,
+# HoA builds new column arrays over the same cell SVs.  Assigning through a
+# survivor therefore reaches the input's cell.
 sub drop_duplicates {
 	my $df = shift;
 	die "drop_duplicates: undefined data in first position\n" unless defined $df;
@@ -4994,7 +4995,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.294
+version 0.295
 
 =head1 Synopsis
 
@@ -7703,10 +7704,13 @@ positions.
 
 =over
 
-=item * B<Returns a new data frame; the original is never modified.> For HoA the
-columns are rebuilt (cell values copied); for AoA and AoH the surviving row
-references are reused, not deep-copied. Clone the result if you need full
-independence.
+=item * B<Returns a new data frame; the original is never modified.> What survives
+is shared, not deep-copied: for AoA and AoH the surviving row references are
+reused, and for HoA the column arrays are new but hold the same cell SVs. So
+the frame, and an HoA's column arrays, can be reshaped without touching the
+input — but assigning I<through> a survivor (C<< $out-E<gt>{col}[0] = ... >>, or
+C<< $out-E<gt>[0]{col} = ... >> for AoA/AoH) writes to the input's cell as well.
+Clone the result if you need full independence.
 
 =item * B<It dies> on: undefined or non-ref data; an HoH frame; an unknown argument;
 an empty or duplicated C<subset>; an invalid C<keep>; an AoA position that is
@@ -13311,6 +13315,119 @@ C<f.sf> / C<norm.sf> and statsmodels' C<anova_oneway>; see
 C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
 
 =head1 Changes
+
+=head2 0.295 2026-08
+
+bug fix https://www.cpantesters.org/cpan/report/0f13fed6-92f5-11f1-b043-dc326e8775ea
+
+Removed C<restrict> where it made no difference, or was potentially dangerous
+
+=head3 drop_duplicates, merge, value_counts
+
+These three decide what counts as the same row, the same join key, or the same
+value by a cell's Perl stringification, and on numeric columns that one
+conversion was most of the work they did.
+
+C<sv_2pv_flags()> renders an NV with C<snprintf("%.*g", NV_DIG, x)>, about 140 ns
+a cell, and — unlike the IV case, where C<SvPOK_or_cached_IV> lets the C<SvPV>
+macros hand back the string perl cached on the SV — it never reuses that PV, so
+every pass over a column of doubles paid the conversion again. It does leave the
+buffer behind, which is why keying a frame used to grow the caller's own numeric
+columns by about 64 bytes a cell, permanently: reading a frame ought to be a
+read.
+
+C<nk_num_pv()> now renders bare integers and bare doubles into the caller's own
+scratch buffer instead, and leaves the SV untouched. Its double path is C<%.15g>
+about four times faster than the C library's, and taken only where the answer is
+provably the same: the magnitude is scaled into C<[1e14, 1e15)> in C<long double> —
+64 mantissa bits against the double's 53 — which bounds the scaled value's error
+under 2e-4, so a fractional part further than 2e-3 from one half rounds exactly
+as the true value would. About one cell in 300 lands nearer than that and goes
+back through C<SvPV>, as do zero, the non-finite values, C<use locale>, an x87
+control word left at double precision, and any build whose NV is not an IEEE
+double. It agreed with the C library's own C<%.15g> over 90 million random bit
+patterns; C<t/drop_duplicates.t>, C<t/merge.t> and C<t/value_counts.t> now group
+tens of thousands of doubles both ways and require the two answers to match.
+
+Two further changes in C<drop_duplicates> alone:
+
+=over
+
+=item * Its interning table started at 64 slots and doubled, so a pass over 10,000
+distinct rows rehashed nine times, each one a scattered walk over a table too
+big for L2. The row count is known before the pass starts and bounds the group
+count, so it is now used as the hint — capped, so a large frame of few distinct
+rows does not pay for a slot per row.
+
+=item * An HoA result copied every surviving cell, while AoA and AoH already shared the
+whole surviving row. It now shares the cells too. B<This is a behaviour
+change.> The frame, and an HoA's column arrays, are still new, so they can be
+reshaped without touching the input; but assigning I<through> a survivor —
+C<< $out-E<gt>{col}[0] = ... >> — now writes to the input's cell, exactly as
+C<< $out-E<gt>[0]{col} = ... >> always did for AoA and AoH. Clone the result if you need
+full independence.
+
+=back
+
+Measured on the 10,000-row frame C<benchmark.pl> uses (five columns: two doubles,
+one integer, two strings), on one machine, with only these paths toggled. Time is
+the median of 25 calls in one process; RAM is C<benchmark.pl>'s own figure, the
+C<VmRSS> delta of a forked child running the call once, median of nine. The string
+row is there to show where the win is not: it is confined to numeric cells.
+
+=for html <table>
+<thead>
+<tr>
+  <th>Call</th>
+  <th>Time before</th>
+  <th>Time after</th>
+  <th>RAM before</th>
+  <th>RAM after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>drop_duplicates($hoa)</code></td>
+  <td>5.45 ms</td>
+  <td>1.88 ms (2.9x)</td>
+  <td>5.36 MB</td>
+  <td>1.45 MB (3.7x)</td>
+</tr>
+<tr>
+  <td><code>merge</code>, inner join on an integer key</td>
+  <td>7.78 ms</td>
+  <td>5.62 ms (1.4x)</td>
+  <td>7.41 MB</td>
+  <td>6.41 MB (1.2x)</td>
+</tr>
+<tr>
+  <td><code>merge</code>, inner join on a double key</td>
+  <td>10.28 ms</td>
+  <td>5.91 ms (1.7x)</td>
+  <td>7.12 MB</td>
+  <td>6.42 MB (1.1x)</td>
+</tr>
+<tr>
+  <td><code>value_counts</code> on a double column</td>
+  <td>2.98 ms</td>
+  <td>1.66 ms (1.8x)</td>
+  <td>1.98 MB</td>
+  <td>1.55 MB (1.3x)</td>
+</tr>
+<tr>
+  <td><code>value_counts</code> on a string column</td>
+  <td>0.215 ms</td>
+  <td>0.220 ms</td>
+  <td>0.69 MB</td>
+  <td>0.71 MB</td>
+</tr>
+</tbody>
+</table>
+
+C<group_by> and C<pivot_table> were left alone: C<group_by> hands the cell SV
+straight to C<hv_fetch_ent>, so perl does the stringification internally and
+reaching it means byte-level C<hv_*> calls and a change to how UTF-8 keys are
+handled, and C<pivot_table> is pure Perl.
 
 =head2 0.294 2026-08-07 CDT
 

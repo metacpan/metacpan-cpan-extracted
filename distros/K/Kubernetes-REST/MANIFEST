@@ -28,6 +28,10 @@ lib/Kubernetes/REST/Authorization.pm
 lib/Kubernetes/REST/Autoscaling.pm
 lib/Kubernetes/REST/Batch.pm
 lib/Kubernetes/REST/CLI.pm
+lib/Kubernetes/REST/CLI/Cmd/Create.pm
+lib/Kubernetes/REST/CLI/Cmd/Delete.pm
+lib/Kubernetes/REST/CLI/Cmd/Get.pm
+lib/Kubernetes/REST/CLI/Cmd/Raw.pm
 lib/Kubernetes/REST/CLI/Role/Connection.pm
 lib/Kubernetes/REST/CLI/Watch.pm
 lib/Kubernetes/REST/Certificates.pm
@@ -45,6 +49,7 @@ lib/Kubernetes/REST/LogEvent.pm
 lib/Kubernetes/REST/Networking.pm
 lib/Kubernetes/REST/Policy.pm
 lib/Kubernetes/REST/RbacAuthorization.pm
+lib/Kubernetes/REST/RemoteError.pm
 lib/Kubernetes/REST/Role/IO.pm
 lib/Kubernetes/REST/Scheduling.pm
 lib/Kubernetes/REST/Server.pm
@@ -72,6 +77,8 @@ t/20_log.t
 t/21_port_forward.t
 t/22_exec.t
 t/23_attach.t
+t/24_encoding.t
+t/25_one_package_per_file.t
 t/author-pod-syntax.t
 t/fixtures/staticwebsite-crd.yaml
 t/lib/My/StaticWebSite.pm

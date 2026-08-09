@@ -1,6 +1,6 @@
 package IO::K8s::Role::APIObject;
 # ABSTRACT: Role for top-level Kubernetes API objects
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use Moo::Role;
 use Types::Standard qw( InstanceOf Maybe );
 use Scalar::Util qw(blessed);
@@ -26,6 +26,7 @@ my %API_GROUP_MAP = (
     node                  => 'node.k8s.io',
     discovery             => 'discovery.k8s.io',
     flowcontrol           => 'flowcontrol.apiserver.k8s.io',
+    resource              => 'resource.k8s.io',
 );
 
 # Derive apiVersion from class name
@@ -344,7 +345,7 @@ IO::K8s::Role::APIObject - Role for top-level Kubernetes API objects
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 metadata
 

@@ -1,7 +1,7 @@
 #
 # This file is part of Dist-Zilla-PluginBundle-Git-CheckFor
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2026 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 package Dist::Zilla::PluginBundle::Git::CheckFor;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.013-5-geacb394
-$Dist::Zilla::PluginBundle::Git::CheckFor::VERSION = '0.014';
+# git description: 0.014-7-g12c18cc
+$Dist::Zilla::PluginBundle::Git::CheckFor::VERSION = '0.015';
 
 # ABSTRACT: All Git::CheckFor plugins at once
 
@@ -45,15 +45,13 @@ __END__
 
 =for :stopwords Chris Weyl Christian Doherty Etheridge Karen Mengué Mike Olivier Walde
 
-=for :stopwords Wishlist flattr flattr'ed gittip gittip'ed
-
 =head1 NAME
 
 Dist::Zilla::PluginBundle::Git::CheckFor - All Git::CheckFor plugins at once
 
 =head1 VERSION
 
-This document describes version 0.014 of Dist::Zilla::PluginBundle::Git::CheckFor - released October 10, 2016 as part of Dist-Zilla-PluginBundle-Git-CheckFor.
+This document describes version 0.015 of Dist::Zilla::PluginBundle::Git::CheckFor - released August 08, 2026 as part of Dist-Zilla-PluginBundle-Git-CheckFor.
 
 =head1 SYNOPSIS
 
@@ -97,7 +95,7 @@ L<Dist::Zilla::PluginBundle::Git>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/RsrchBoy/dist-zilla-pluginbundle-git-checkfor/issues>
+L<https://github.com/rsrchboy/dist-zilla-pluginbundle-git-checkfor/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -106,25 +104,6 @@ feature.
 =head1 AUTHOR
 
 Chris Weyl <cweyl@alumni.drew.edu>
-
-=head2 I'm a material boy in a material world
-
-=begin html
-
-<a href="https://gratipay.com/RsrchBoy/"><img src="http://img.shields.io/gratipay/RsrchBoy.svg" /></a>
-<a href="http://bit.ly/rsrchboys-wishlist"><img src="http://wps.io/wp-content/uploads/2014/05/amazon_wishlist.resized.png" /></a>
-<a href="https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-pluginbundle-git-checkfor&title=RsrchBoy's%20CPAN%20Dist-Zilla-PluginBundle-Git-CheckFor&tags=%22RsrchBoy's%20Dist-Zilla-PluginBundle-Git-CheckFor%20in%20the%20CPAN%22"><img src="http://api.flattr.com/button/flattr-badge-large.png" /></a>
-
-=end html
-
-Please note B<I do not expect to be gittip'ed or flattr'ed for this work>,
-rather B<it is simply a very pleasant surprise>. I largely create and release
-works like this because I need them or I find it enjoyable; however, don't let
-that stop you if you feel like it ;)
-
-L<Flattr|https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-pluginbundle-git-checkfor&title=RsrchBoy's%20CPAN%20Dist-Zilla-PluginBundle-Git-CheckFor&tags=%22RsrchBoy's%20Dist-Zilla-PluginBundle-Git-CheckFor%20in%20the%20CPAN%22>,
-L<Gratipay|https://gratipay.com/RsrchBoy/>, or indulge my
-L<Amazon Wishlist|http://bit.ly/rsrchboys-wishlist>...  If and *only* if you so desire.
 
 =head1 CONTRIBUTORS
 
@@ -152,7 +131,7 @@ Olivier Mengué <dolmen@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Chris Weyl.
+This software is Copyright (c) 2026 by Chris Weyl.
 
 This is free software, licensed under:
 

@@ -1,20 +1,29 @@
 package IO::K8s::GatewayAPI;
 # ABSTRACT: Gateway API CRD resource map provider for IO::K8s
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use Moo;
 with 'IO::K8s::Role::ResourceMap';
 
-sub upstream_version { 'v1.1.0' }  # kubernetes-sigs/gateway-api (GA types only)
+sub upstream_version { 'v1.6.1' }  # kubernetes-sigs/gateway-api (GA/Standard channel only)
 
 sub resource_map {
     return {
         # gateway.networking.k8s.io/v1
-        GatewayClass   => 'GatewayAPI::V1::GatewayClass',
-        Gateway        => 'GatewayAPI::V1::Gateway',
-        HTTPRoute      => 'GatewayAPI::V1::HTTPRoute',
-        GRPCRoute      => 'GatewayAPI::V1::GRPCRoute',
+        GatewayClass     => 'GatewayAPI::V1::GatewayClass',
+        Gateway          => 'GatewayAPI::V1::Gateway',
+        HTTPRoute        => 'GatewayAPI::V1::HTTPRoute',
+        GRPCRoute        => 'GatewayAPI::V1::GRPCRoute',
+        BackendTLSPolicy => 'GatewayAPI::V1::BackendTLSPolicy',
+        ListenerSet      => 'GatewayAPI::V1::ListenerSet',
+        TLSRoute         => 'GatewayAPI::V1::TLSRoute',
+        TCPRoute         => 'GatewayAPI::V1::TCPRoute',
+        UDPRoute         => 'GatewayAPI::V1::UDPRoute',
+        # ReferenceGrant is served at both v1 and v1beta1 as of v1.5.0; v1beta1
+        # remains the storage version as of v1.6.1, so it keeps the short name.
+        # The v1 class is reachable via its domain-qualified key below.
+        'gateway.networking.k8s.io/v1/ReferenceGrant' => 'GatewayAPI::V1::ReferenceGrant',
         # gateway.networking.k8s.io/v1beta1
-        ReferenceGrant => 'GatewayAPI::V1beta1::ReferenceGrant',
+        ReferenceGrant   => 'GatewayAPI::V1beta1::ReferenceGrant',
     };
 }
 
@@ -32,7 +41,7 @@ IO::K8s::GatewayAPI - Gateway API CRD resource map provider for IO::K8s
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head1 SYNOPSIS
 
@@ -51,9 +60,10 @@ version 1.100
 =head1 DESCRIPTION
 
 Resource map provider for the L<Kubernetes Gateway API|https://gateway-api.sigs.k8s.io/>
-Custom Resource Definitions. Registers 5 CRD classes covering
-C<gateway.networking.k8s.io/v1> (GA) and C<gateway.networking.k8s.io/v1beta1>
-(beta).
+Custom Resource Definitions. Registers 11 CRD classes covering
+C<gateway.networking.k8s.io/v1> (GA/Standard channel) and
+C<gateway.networking.k8s.io/v1beta1> (still the storage version for
+ReferenceGrant).
 
 The Gateway API is an official Kubernetes SIG-Network project that provides
 expressive, extensible, and role-oriented interfaces for service networking.
@@ -64,11 +74,16 @@ L<IO::K8s> or by calling C<< $k8s->add('IO::K8s::GatewayAPI') >> at runtime.
 =head2 Included CRDs (gateway.networking.k8s.io/v1)
 
 GatewayClass (cluster-scoped), Gateway (namespaced), HTTPRoute (namespaced),
-GRPCRoute (namespaced)
+GRPCRoute (namespaced), BackendTLSPolicy (namespaced), ListenerSet
+(namespaced), TLSRoute (namespaced), TCPRoute (namespaced), UDPRoute
+(namespaced), ReferenceGrant (namespaced; reachable only via the
+domain-qualified name C<gateway.networking.k8s.io/v1/ReferenceGrant> since
+the short name C<ReferenceGrant> resolves to the v1beta1 storage version)
 
 =head2 Included CRDs (gateway.networking.k8s.io/v1beta1)
 
-ReferenceGrant (namespaced)
+ReferenceGrant (namespaced) - the storage version; the short name
+C<ReferenceGrant> resolves here
 
 =head1 SEE ALSO
 
@@ -81,6 +96,16 @@ L<Gateway API reference|https://gateway-api.sigs.k8s.io/reference/spec/>
 L<GatewayClass|https://gateway-api.sigs.k8s.io/api-types/gatewayclass/>
 
 L<HTTPRoute|https://gateway-api.sigs.k8s.io/api-types/httproute/>
+
+L<BackendTLSPolicy|https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/>
+
+L<ListenerSet|https://gateway-api.sigs.k8s.io/api-types/listenerset/>
+
+L<TLSRoute|https://gateway-api.sigs.k8s.io/api-types/tlsroute/>
+
+L<TCPRoute|https://gateway-api.sigs.k8s.io/api-types/tcproute/>
+
+L<UDPRoute|https://gateway-api.sigs.k8s.io/api-types/udproute/>
 
 =head1 SUPPORT
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::VolumeMountStatus;
 # ABSTRACT: VolumeMountStatus shows status of volume mounts.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s mountPath => Str, 'required';
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::VolumeMountStatus - VolumeMountStatus shows status of vo
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 mountPath
 

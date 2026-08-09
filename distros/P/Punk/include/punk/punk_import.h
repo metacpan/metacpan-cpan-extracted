@@ -154,6 +154,83 @@ static const pki_kw PKI_KEYWORDS[] = {
     { NULL, NULL, 0 }
 };
 
+/* ---- plugin keywords ------------------------------------------------------
+ *
+ * A plugin that wants its own declaration keyword (`task`, `queue`, `cron`...)
+ * calls $app->install_kw($name => $code) rather than assigning to a glob in the
+ * application class. The keyword it gets is the same shape as the ones above -
+ * a magic CV, named for the class it lands in, installed from C - so a plugin
+ * never needs `no strict 'refs'` and every keyword in an application arrived
+ * through one door.
+ *
+ * They are ordinary CVs, not calls lifted into the BEGIN phase: lifting wants
+ * Devel::CallParser and perl 5.14, and Punk claims 5.10. A CV installed at
+ * import time is compile-time-visible to every later line on every perl, which
+ * is what a declaration keyword needs. */
+
+/* forward @_ to the plugin's code and return what it returns, in the caller's
+ * context - `my $q = queue();` is a keyword call too */
+XS_INTERNAL(pki_pkw_cb);
+XS_INTERNAL(pki_pkw_cb) {
+    dXSARGS;
+    AV *cap = punk_clos_cap(aTHX_ cv);
+    SV **code = cap ? av_fetch(cap, 0, 0) : NULL;
+    I32 want = GIMME_V;
+    int count, i;
+
+    if (!code) XSRETURN_EMPTY;
+
+    PUSHMARK(SP);
+    EXTEND(SP, items);
+    for (i = 0; i < items; i++) PUSHs(ST(i));
+    PUTBACK;
+    count = call_sv(*code, want == G_VOID ? G_VOID : want);
+    SPAGAIN;
+    if (want == G_VOID) XSRETURN_EMPTY;
+
+    /* the results sit above the arguments; copy them down to ax through a
+     * scratch vector, since the two regions can overlap (see pki_kw_cb) */
+    if (count > 0) {
+        SV **tmp;
+        int j;
+        Newx(tmp, count, SV *);
+        for (j = 0; j < count; j++) tmp[j] = sv_2mortal(newSVsv(SP[j - count + 1]));
+        for (j = 0; j < count; j++) ST(j) = tmp[j];
+        Safefree(tmp);
+    }
+    XSRETURN(count);
+}
+
+/* is this name part of the core DSL? installing over `get` or `plugin` would
+ * break the application in a way no error message would explain */
+static int pki_is_dsl(const char *name) {
+    int i;
+    for (i = 0; PKI_KEYWORDS[i].kw; i++)
+        if (strEQ(name, PKI_KEYWORDS[i].kw)) return 1;
+    return 0;
+}
+
+/* Install one plugin keyword into an application class. Idempotent by CV
+ * identity: a keyword already carrying this same code is left alone, which is
+ * what a plugin installing from both its import and its register does. */
+static void pki_install_kw(pTHX_ SV *caller, SV *name, SV *code) {
+    STRLEN cl, nl;
+    const char *cs = SvPV_const(caller, cl);
+    const char *ns = SvPV_const(name, nl);
+    const char *full = form("%.*s::%.*s", (int)cl, cs, (int)nl, ns);
+    CV *old = get_cv(full, 0);
+    AV *cap;
+
+    if (old) {
+        AV *ocap = punk_clos_cap(aTHX_ old);
+        SV **oc = ocap ? av_fetch(ocap, 0, 0) : NULL;
+        if (oc && SvROK(*oc) && SvROK(code) && SvRV(*oc) == SvRV(code)) return;
+    }
+    cap = newAV();
+    av_push(cap, newSVsv(code));
+    (void)punk_closure_named(aTHX_ full, pki_pkw_cb, cap);
+}
+
 /* One application registrar per class, cached in %Punk::APPS the way the Perl
  * import did - a second `use Punk` in the same package must not start a second
  * application. */

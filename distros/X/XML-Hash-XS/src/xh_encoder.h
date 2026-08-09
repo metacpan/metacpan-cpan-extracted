@@ -11,6 +11,16 @@
 #define LIBICONV_STATIC
 #endif
 #include <iconv.h>
+/* POSIX declares the input buffer of iconv() as "char **", but Solaris and
+ * illumos declare it as "const char **".  A direct cast to either type is
+ * rejected by the other platform, so the cast goes through void *, which
+ * implicitly converts to whichever pointer type is expected.
+ *
+ * Do not replace this with a platform test such as #ifdef __sun: which
+ * prototype applies depends on the header that is actually included, not on
+ * the operating system.  GNU libiconv, which uses "char **", is commonly
+ * installed on Solaris and illumos alongside the iconv in libc. */
+#define XH_ICONV_INBUF_CAST (void *)
 #endif
 #ifdef XH_HAVE_ICU
 #include <unicode/utypes.h>

@@ -1,0 +1,25 @@
+0.004   2026-04-17  Released-By: PERLANCAR; Urgency: medium
+
+        - [func list_xwm_windows] Add filter arguments: kde_activity_name,
+          current_kde_activity.
+
+
+0.003   2026-04-15  Released-By: PERLANCAR; Urgency: medium
+
+        - list_xwm_windows: Allow returning multiple KDE activity names as array.
+
+        - move_windows_to_kde_activity: Support moving windows to multiple KDE
+          activities.
+
+
+0.002   2026-04-15  Released-By: PERLANCAR; Urgency: medium
+
+        - list_xwm_windows: add argument 'id' to filter by ID.
+
+        - Add routine: move_windows_to_kde_activity from
+          App-KDEActivityUtils.
+
+
+0.001   2026-04-15  Released-By: PERLANCAR
+
+        - Split from App-XWindowManagerUtils.

@@ -1,0 +1,36 @@
+/* admin => { css => 'root/queue.css' }
+ *
+ * Appended to the served /queue/assets/funky.css, after Funky and after
+ * punk-queue.css - which is what makes it an override rather than a
+ * competing sheet: the cascade takes the last declaration.
+ *
+ * The bundle is assembled once, at registration, so this file is read at
+ * boot and never again; its bytes go into the bundle's ETag, so a browser
+ * holding the un-overridden version is told to refetch.
+ */
+
+.pq-brand {
+  color: #6f4bd8;
+  letter-spacing: 0.02em;
+}
+
+.pq-brand::after {
+  content: " · mailer";
+  color: #8890a8;
+  font-weight: 400;
+}
+
+/* The example's own accent, applied to the UI's primary actions. */
+.pq-shell .btn-primary {
+  background: #6f4bd8;
+  border-color: #6f4bd8;
+}
+
+.pq-nav {
+  border-bottom: 2px solid #6f4bd8;
+}
+
+/* the panel the overridden overview.tmpl adds */
+.pq-mailer-note {
+  border-left: 3px solid #6f4bd8;
+}

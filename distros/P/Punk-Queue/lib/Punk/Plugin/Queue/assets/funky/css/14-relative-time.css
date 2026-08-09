@@ -1,0 +1,51 @@
+/**
+ * RelativeTime Styles
+ * Optional styling for <time data-relative> elements
+ */
+
+/* Basic styling - subtle indication it's interactive */
+time[data-relative] {
+    cursor: help;
+    border-bottom: 1px dotted var(--pro-text-muted);
+    transition: border-color 0.15s ease;
+}
+
+time[data-relative]:hover {
+    border-bottom-style: solid;
+    border-color: var(--pro-accent-primary);
+}
+
+/* Focus state for accessibility */
+time[data-relative]:focus-visible {
+    outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+    box-shadow: var(--focus-ring-shadow);
+}
+
+/* In tables - no border */
+.table time[data-relative],
+.dataTables_wrapper time[data-relative] {
+    border-bottom: none;
+}
+
+/* Badge variant */
+time[data-relative].badge {
+    border-bottom: none;
+    cursor: default;
+}
+
+/* Loading state */
+time[data-relative].loading {
+    color: var(--pro-text-muted);
+    font-style: italic;
+}
+
+/* Recently updated animation */
+time[data-relative].just-updated {
+    animation: relative-time-flash 0.5s ease;
+}
+
+@keyframes relative-time-flash {
+    0% { background-color: var(--pro-accent-primary-muted); }
+    100% { background-color: transparent; }
+}

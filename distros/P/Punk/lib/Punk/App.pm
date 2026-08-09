@@ -31,7 +31,8 @@ boot; the returned closure is the only code on the request path.
 Plugins receive this object; each method mirrors a DSL keyword:
 C<route>, C<under>, C<api>, C<docs>, C<static>, C<mount>, C<websocket>,
 C<sse>, C<session>, C<logging>, C<views>, C<database>, C<model_class>, C<hook>,
-C<middleware>, C<on_error>, C<helper>, C<plugin>, C<config>, C<secret>. C<model_auto>
+C<middleware>, C<on_error>, C<helper>, C<plugin>, C<config>, C<secret>.
+C<install_kw> gives a plugin a keyword of its own. C<model_auto>
 toggles auto-discovery of C<MyApp::Model::*> (on unless models are named
 explicitly). C<caller_class> and C<config_object> give a plugin the
 app's controller namespace and its L<Punk::Config>; C<new> and the
@@ -45,6 +46,21 @@ called by the framework, not apps.
 Installed as a real method on the application's context subclass at
 compile time. Collisions with core context methods or another helper
 croak, naming both owners.
+
+=head2 install_kw
+
+    $app->install_kw(task => sub { my ($name, $target) = @_; ... },
+                     __PACKAGE__);
+
+Installs a declaration keyword into the application class - how a plugin
+adds to the DSL without assigning to a glob. The keyword is a magic CV
+named for the class it lands in; it forwards its arguments to the code
+and returns what the code returns, in the caller's context.
+
+Installing over a core keyword croaks. Two owners claiming one name croak,
+naming both, as helpers do; the same owner installing twice is a no-op,
+which is what a plugin that installs from both C<import> and C<register>
+needs. Chains. See L<Punk::Plugin/KEYWORDS OF YOUR OWN>.
 
 =head2 log
 

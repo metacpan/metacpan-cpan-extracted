@@ -9,10 +9,10 @@ build_requires:
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.94'
-  perl: v5.18.0
+  perl: v5.38.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: v5.18.0
+  perl: v5.38.0
 dynamic_config: '0'
 generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: lgpl
@@ -27,28 +27,28 @@ no_index:
 provides:
   Dist::Zilla::PluginBundle::RSRCHBOY:
     file: lib/Dist/Zilla/PluginBundle/RSRCHBOY.pm
-    version: '0.078'
+    version: '0.079'
   Pod::Weaver::PluginBundle::RSRCHBOY:
     file: lib/Pod/Weaver/PluginBundle/RSRCHBOY.pm
-    version: '0.078'
+    version: '0.079'
   Pod::Weaver::Section::RSRCHBOY::Authors:
     file: lib/Pod/Weaver/Section/RSRCHBOY/Authors.pm
-    version: '0.078'
+    version: '0.079'
   Pod::Weaver::Section::RSRCHBOY::GeneratedAttributes:
     file: lib/Pod/Weaver/Section/RSRCHBOY/GeneratedAttributes.pm
-    version: '0.078'
+    version: '0.079'
   Pod::Weaver::Section::RSRCHBOY::LazyAttributes:
     file: lib/Pod/Weaver/Section/RSRCHBOY/LazyAttributes.pm
-    version: '0.078'
+    version: '0.079'
   Pod::Weaver::Section::RSRCHBOY::RequiredAttributes:
     file: lib/Pod/Weaver/Section/RSRCHBOY/RequiredAttributes.pm
-    version: '0.078'
+    version: '0.079'
   Pod::Weaver::Section::RSRCHBOY::RoleParameters:
     file: lib/Pod/Weaver/Section/RSRCHBOY/RoleParameters.pm
-    version: '0.078'
+    version: '0.079'
   Pod::Weaver::SectionBase::CollectWithIntro:
     file: lib/Pod/Weaver/SectionBase/CollectWithIntro.pm
-    version: '0.078'
+    version: '0.079'
 requires:
   Archive::Tar::Wrapper: '0'
   Config::MVP::Slicer: '0.302'
@@ -141,7 +141,7 @@ requires:
   autodie: '0.20'
   constant: '0'
   namespace::autoclean: '0'
-  perl: v5.18.0
+  perl: v5.38.0
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -149,7 +149,7 @@ resources:
   bugtracker: https://github.com/rsrchboy/dist-zilla-pluginbundle-rsrchboy/issues
   homepage: https://github.com/rsrchboy/dist-zilla-pluginbundle-rsrchboy
   repository: https://github.com/rsrchboy/dist-zilla-pluginbundle-rsrchboy.git
-version: '0.078'
+version: '0.079'
 x_BuiltWith:
   modules:
     Archive::Tar::Wrapper: '0.42'
@@ -212,7 +212,7 @@ x_BuiltWith:
     Dist::Zilla::Plugin::Twitter: '0.026'
     Dist::Zilla::Plugin::UploadToCPAN: '6.037'
     Dist::Zilla::PluginBundle::Git: '2.052'
-    Dist::Zilla::PluginBundle::Git::CheckFor: '0.014'
+    Dist::Zilla::PluginBundle::Git::CheckFor: '0.015'
     Dist::Zilla::Role::PluginBundle::Config::Slicer: '0.202'
     Dist::Zilla::Role::PluginBundle::Easy: '6.037'
     Dist::Zilla::Role::PluginBundle::PluginRemover: '0.105'
@@ -313,7 +313,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::Fixups
       config:
@@ -321,7 +321,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::Fixups'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -329,7 +329,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::MergeConflicts'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -685,7 +685,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '0'
-          tag: '0.078'
+          tag: '0.079'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -859,15 +859,15 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::RSRCHBOY::RoleParameters
               name: 'ROLE PARAMETERS'
-              version: '0.077'
+              version: '0.078'
             -
               class: Pod::Weaver::Section::RSRCHBOY::RequiredAttributes
               name: 'REQUIRED ATTRIBUTES'
-              version: '0.077'
+              version: '0.078'
             -
               class: Pod::Weaver::Section::RSRCHBOY::LazyAttributes
               name: 'LAZY ATTRIBUTES'
-              version: '0.077'
+              version: '0.078'
             -
               class: Pod::Weaver::Section::Collect
               name: 'REQUIRED METHODS'
@@ -927,7 +927,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::RSRCHBOY::Authors
               name: RSRCHBOY::Authors
-              version: '0.077'
+              version: '0.078'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@RSRCHBOY/Contributors'

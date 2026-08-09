@@ -8,10 +8,16 @@ use Open::API;
 use Open::API::Plack;
 use File::Raw::JSON qw(file_json_decode);
 
-plan skip_all => 'Template::Stencil 0.02+ and Markdown::Simple not available'
+# Same guard as t/23: the versions, not just the module names, and the
+# perl the UI needs rather than the one the distribution promises.
+plan skip_all => 'the docs UI needs perl 5.010'
+    if $] < 5.010;
+plan skip_all => 'Template::Stencil 0.02+ and Markdown::Simple 0.18+ '
+              . 'are not available'
     unless eval { require Template::Stencil;
                   Template::Stencil->VERSION('0.02');
-                  require Markdown::Simple; 1 };
+                  require Markdown::Simple;
+                  Markdown::Simple->VERSION('0.18'); 1 };
 
 my $SPEC = "$FindBin::Bin/spec/petstore.json";
 

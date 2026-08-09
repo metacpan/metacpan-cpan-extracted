@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft
+# Copyright (c) 2024-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -6,17 +6,20 @@
 
 package File::ValueFile::Simple::Writer;
 
-use v5.10;
+use v5.20;
 use strict;
 use warnings;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects);
 
 use Carp;
+use Encode;
 use URI::Escape qw(uri_escape uri_escape_utf8);
-use Data::Identifier v0.03;
+use Data::Identifier v0.34;
 
 use File::ValueFile;
+
+use constant UTF_8 => Encode::find_encoding('UTF-8');
 
 use constant {
     FORMAT_ISE     => '54bf8af4-b1d7-44da-af48-5278d11e8f32',
@@ -60,7 +63,7 @@ my %_old_style_relation = (
     'd926eb95-6984-415f-8892-233c13491931' => 'tag-links',
 );
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 
 
@@ -195,7 +198,7 @@ sub write {
         return;
     }
 
-    @line = map {ref($_) ? $_->ise : $_} @line;
+    @line = map {ref($_) ? $_->ise : $_} map {ref($_) ? Data::Identifier::null_to_undef($_) : $_} @line;
 
     if ($self->{dot_repreat}) {
         my $line = [@line];
@@ -253,6 +256,8 @@ sub write_with_comment {
     my $comment = pop(@line);
     my $valid_comment = defined($comment) && length($comment);
 
+    $comment = UTF_8->encode($comment) if $valid_comment;
+
     croak 'Unsupported comment: Bad characters' if $valid_comment && $comment =~ /[\x00-\x1F]/;
 
     if (scalar(@line)) {
@@ -276,7 +281,7 @@ sub write_blank {
 sub write_comment {
     my ($self, @comment) = @_;
 
-    foreach my $comment_line (map {split /[\r\n]/} grep {defined} @comment) {
+    foreach my $comment_line (map {split /[\r\n]/} map {UTF_8->encode($_)} grep {defined} @comment) {
         croak 'Unsupported comment: Bad characters' if $comment_line =~ /[\x00-\x1F]/;
         $self->{fh}->say('# ', $comment_line);
     }
@@ -553,9 +558,13 @@ sub write_tag_generator_hint {
 
 
 sub write_tagname {
-    my ($self, $tag, $tagname) = @_;
+    my ($self, $tag, @tagnames) = @_;
 
-    return unless defined($tagname) && length($tagname);
+    $tag = Data::Identifier::null_to_undef($tag) or return;
+
+    if (scalar(@tagnames) == 0) {
+        @tagnames = Data::Identifier->new(from => $tag)->tagname(list => 1, default => [], no_defaults => 1);
+    }
 
     if (
         defined($self->{features}{F_M_L_ISE()}) ||  # tagpool-source-format-modern-limited
@@ -564,10 +573,15 @@ sub write_tagname {
         state $wk_asi       = Data::Identifier->new(uuid => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633')->register;
         state $wk_tagname   = Data::Identifier->new(uuid => 'bfae7574-3dae-425d-89b1-9c087c140c23')->register;
 
-
-        $self->write_tag_metadata($tag, $wk_asi, $wk_tagname, undef, $tagname);
+        foreach my $tagname (@tagnames) {
+            next unless defined($tagname) && length($tagname);
+            $self->write_tag_metadata($tag, $wk_asi, $wk_tagname, undef, $tagname);
+        }
     } else {
-        $self->write('tag', $tag, $tagname);
+        foreach my $tagname (@tagnames) {
+            next unless defined($tagname) && length($tagname);
+            $self->write('tag', $tag, $tagname);
+        }
     }
 }
 
@@ -585,7 +599,7 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -801,9 +815,9 @@ The method will write a most compatible line with a comment if the provided data
     # or:
     $writer->write_tag_relation($tag, $relation, $related, $context, $filter);
     # or:
-    $writer->write_tag_relation(tag => $tag, relation => $relation, related => $related [, context => $context ] [, filter => ]);
+    $writer->write_tag_relation(tag => $tag, relation => $relation, related => $related [, context => $context ] [, filter => $filter ]);
     # or:
-    $writer->write_tag_relation({tag => $tag, relation => $relation, related => $related [, context => $context ] [, filter => ]});
+    $writer->write_tag_relation({tag => $tag, relation => $relation, related => $related [, context => $context ] [, filter => $filter ]});
     # or:
     $writer->write_tag_relation($link);
 
@@ -860,15 +874,24 @@ This method automatically selects the best command to write depending on the for
 
 =head2 write_tagname
 
-    $writer->write_tagname($tag, $tagname);
+    $writer->write_tagname($tag, @tagnames);
 
-Writes the given tagname for the given tag. If C<$tagname> is C<undef> or an empty string this method will
-silently return without error.
+Writes the given tagname(s) for the given tag. If elements of C<@tagnames> are C<undef> or an empty string this method will
+silently skip those without error.
+
+If no tagnames are given (C<@tagnames> being an empty list) tagnames from the passed identifier are used (if any).
+This can be suppressed by adding at least one undef value so C<@tagnames> is never an empty list.
+(since v0.11)
+
+If C<$tag> is undef or a null value this method silently does nothing.
 
 This method automatically selects the best command to write depending on the format and features.
 
 B<Note:>
 The tagname to be written is subject to normal character set rules. Therefore it should be a perl unicode string (not UTF-8 encoded).
+
+B<Note:>
+Before v0.11 only a single tagname was supported.
 
 =head1 AUTHOR
 
@@ -876,7 +899,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

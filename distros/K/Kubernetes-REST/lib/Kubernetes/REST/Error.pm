@@ -1,5 +1,5 @@
 package Kubernetes::REST::Error;
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 # ABSTRACT: DEPRECATED - v0 error classes
   use Moo;
   use Types::Standard qw/Str/;
@@ -27,23 +27,6 @@ our $VERSION = '1.105';
   }
 
 
-package Kubernetes::REST::RemoteError;
-our $VERSION = '1.003';
-# ABSTRACT: DEPRECATED - v0 remote error class
-  use Moo;
-  use Types::Standard qw/Int/;
-  extends 'Kubernetes::REST::Error';
-
-  has '+type' => (default => sub { 'Remote' });
-  has status => (is => 'ro', isa => Int, required => 1);
-
-
-  around header => sub {
-    my ($orig, $self) = @_;
-    my $orig_message = $self->$orig;
-    sprintf "%s with HTTP status %d", $orig_message, $self->status;
-  };
-
 
 1;
 
@@ -59,13 +42,19 @@ Kubernetes::REST::Error - DEPRECATED - v0 error classes
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
 B<These error classes are DEPRECATED>. The new v1 API uses C<croak> for errors instead of throwing structured exceptions.
 
 See L<Kubernetes::REST/"UPGRADING FROM 0.02"> for migration guide.
+
+L<Kubernetes::REST::RemoteError> used to live in this file and now has one of
+its own. Loading it from here is not possible - it inherits from this class, so
+this file has to finish first - which means code that throws a C<RemoteError>
+has to C<use Kubernetes::REST::RemoteError> itself. Code that only catches one
+is unaffected.
 
 =head2 type
 
@@ -83,9 +72,13 @@ Returns the error header string.
 
 Returns the full error message as a string, including detail if available.
 
-=head2 status
+=head1 SEE ALSO
 
-HTTP status code.
+=over
+
+=item * L<Kubernetes::REST::RemoteError> - Subclass carrying the HTTP status
+
+=back
 
 =head1 SUPPORT
 

@@ -390,20 +390,20 @@ sub learn {
 	return $self;
 }
 
-=head2 learn_tagged(\%row)
-
-=head2 learn_tagged(\@rows)
+=head2 learn_tagged(\%row or \@rows)
 
 Learns one sample supplied as a hashref of named feature values, or a
 whole batch supplied as an arrayref of such hashrefs, in stream order.
 The model must have C<feature_names> set.  Rows go through
-L</tagged_row_to_array> (and therefore through the munger plan when
-C<mungers> is configured).  Returns C<$self>.
+L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)> (and
+therefore through the munger plan when C<mungers> is configured).
+Returns C<$self>.
 
     $oif->learn_tagged({ cpu => 0.9, mem => 0.4, disk => 0.1 });
     $oif->learn_tagged(\@hashref_rows);
 
-Croaks under the same conditions as L</tagged_row_to_array>, naming the
+Croaks under the same conditions as
+L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)>, naming the
 offending row by index in the batch form.
 
 =cut
@@ -456,7 +456,7 @@ before it was learned.
 
     my $score = $oif->score_learn_tagged({ cpu => 0.9, mem => 0.4 });
 
-Croaks under the same conditions as L</tagged_row_to_array>.
+Croaks under the same conditions as L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)>.
 
 =cut
 
@@ -508,7 +508,7 @@ without learning it.  Returns a scalar anomaly score in (0, 1].
 
     my $score = $oif->score_sample_tagged({ cpu => 0.9, mem => 0.4 });
 
-Croaks under the same conditions as L</tagged_row_to_array>.
+Croaks under the same conditions as L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)>.
 
 =cut
 
@@ -517,6 +517,74 @@ sub score_sample_tagged {
 	my $vec    = $self->tagged_row_to_array( $row, 'score_sample_tagged' );
 	my $result = $self->score_samples( [$vec] );
 	return $result->[0];
+}
+
+=head2 explain_samples(\@data, %opts)
+
+Explains, per sample, which features drove its anomaly score, without
+learning anything -- the streaming counterpart of the parent class's
+method of the same name, returning the identical structure (see
+C<explain_samples> in L<Algorithm::Classifier::IsolationForest> for the
+full description of the output shape and the C<method> option):
+
+    my $explanations = $oif->explain_samples(\@data);
+    my $top          = $explanations->[0]{features}[0];
+
+Differences from the batch class:
+
+The default C<ablation> method substitutes per-feature medians of the
+currently retained window (there is no fit() to store baselines at;
+the window IS the model's view of normal, and it tracks drift for
+free).  It therefore requires C<< window_size > 0 >> with learned
+points and croaks otherwise -- use C<path> on a windowless model.
+
+The C<path> method carries an extra caveat on top of the batch class's
+(see the parent POD): online trees are shallow by construction (the
+depth budget is C<log(n/max_leaf_samples)/log(4)>) and most of a
+sample's anomalousness lives in the per-leaf count adjustment rather
+than in which splits it crossed, so path attributions here are coarse.
+Treat them as a rough second opinion; prefer C<ablation> whenever a
+window exists.
+
+A model that has not yet accumulated tree structure (fewer than
+C<max_leaf_samples> points seen) scores everything 1.0 and has no
+splits to attribute; every weight comes back 0.
+
+=cut
+
+sub explain_samples {
+	my ( $self, $data, %opts ) = @_;
+	$self->_check_learned;
+	croak "explain_samples() expects a non-empty arrayref of samples"
+		unless ref $data eq 'ARRAY' && @$data;
+
+	my $method = delete $opts{method} // 'ablation';
+	croak "explain_samples: method must be 'path' or 'ablation'"
+		unless $method =~ /\A(?:path|ablation)\z/;
+	croak "explain_samples: unknown option(s): " . join( ', ', sort keys %opts )
+		if %opts;
+
+	return $method eq 'ablation'
+		? $self->_explain_ablation($data)
+		: $self->_explain_path($data);
+} ## end sub explain_samples
+
+=head2 explain_sample_tagged(\%row, %opts)
+
+Explains a single sample supplied as a hashref of named feature values,
+without learning it.  Takes the same C<method> option as
+L<explain_samples|/explain_samples(\@data, %opts)> and returns the single explanation hashref.
+
+    my $e = $oif->explain_sample_tagged({ cpu => 0.9, mem => 0.4 });
+
+Croaks under the same conditions as L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)>.
+
+=cut
+
+sub explain_sample_tagged {
+	my ( $self, $row, %opts ) = @_;
+	my $vec = $self->tagged_row_to_array( $row, 'explain_sample_tagged' );
+	return $self->explain_samples( [$vec], %opts )->[0];
 }
 
 =head2 path_lengths(\@data)
@@ -560,7 +628,7 @@ learning it.
 
 If C<$threshold> is not given, the contamination-learned cutoff is used
 when available (learned from the current window on first use -- see
-C<contamination> in L</new>), otherwise 0.5.
+C<contamination> in L<new|/new(%args)>), otherwise 0.5.
 
 Note that absolute score levels depend on C<window_size> and
 C<max_leaf_samples> (shallower depth budgets compress scores downward),
@@ -606,11 +674,11 @@ sub predict {
 
 Predicts whether a single sample, supplied as a hashref of named feature
 values, is an anomaly.  Returns a scalar 1 (anomaly) or 0 (normal).
-C<$threshold> defaults the same way as in L</predict>.
+C<$threshold> defaults the same way as in L<predict|/predict(\@data, $threshold)>.
 
     my $label = $oif->predict_tagged({ cpu => 0.9, mem => 0.4 });
 
-Croaks under the same conditions as L</tagged_row_to_array>.
+Croaks under the same conditions as L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)>.
 
 =cut
 
@@ -624,7 +692,7 @@ sub predict_tagged {
 =head2 score_predict_samples(\@data, $threshold)
 
 Returns an arrayref of C<[$score, $label]> pairs, one per sample, without
-learning.  C<$threshold> defaults the same way as in L</predict>.
+learning.  C<$threshold> defaults the same way as in L<predict|/predict(\@data, $threshold)>.
 
     my $results = $oif->score_predict_samples(\@data);
 
@@ -664,11 +732,11 @@ sub score_predict_samples {
 
 Scores and classifies a single sample supplied as a hashref of named
 feature values.  Returns a two-element arrayref C<[$score, $label]>.
-C<$threshold> defaults the same way as in L</predict>.
+C<$threshold> defaults the same way as in L<predict|/predict(\@data, $threshold)>.
 
     my $pair = $oif->score_predict_sample_tagged({ cpu => 0.9, mem => 0.4 });
 
-Croaks under the same conditions as L</tagged_row_to_array>.
+Croaks under the same conditions as L<tagged_row_to_array|/tagged_row_to_array(\%row, $caller)>.
 
 =cut
 
@@ -681,7 +749,9 @@ sub score_predict_sample_tagged {
 
 =head2 score_predict_split(\@data, $threshold)
 
-Same values as L</score_predict_samples> but returned as two flat
+Same values as
+L<score_predict_samples|/score_predict_samples(\@data, $threshold)>
+but returned as two flat
 arrayrefs.  In list context returns C<($scores_aref, $labels_aref)>.
 
     my ($scores, $labels) = $oif->score_predict_split(\@data);
@@ -760,7 +830,7 @@ sub relearn_threshold {
 
 The score cutoff the predict methods use by default; undef unless
 C<contamination> was set and a predict-family method or
-L</relearn_threshold> has run.
+L<relearn_threshold|/relearn_threshold(\@data)> has run.
 
 =cut
 
@@ -1051,6 +1121,17 @@ L<https://proceedings.mlr.press/v235/leveni24a.html>
 ###
 ###
 
+# Guard for every method that needs a model with something in it.  The
+# online counterpart of the parent's _check_fitted: there is no fit() here,
+# so "usable" means at least one point has been learned.
+#
+# Args: none beyond the model itself.
+#
+# Returns: nothing on success.  Croaks when the model has seen no points --
+# a fresh model that has not been fed anything yet.
+#
+# Example:
+#   $self->_check_learned;   # croaks with "model has not learned any data yet"
 sub _check_learned {
 	my ($self) = @_;
 	croak "model has not learned any data yet; call learn() first"
@@ -1060,6 +1141,20 @@ sub _check_learned {
 # Validate one incoming sample, apply the missing-value strategy, and
 # return a fresh dense copy (the window owns its rows; the caller may
 # reuse or mutate the original).  Locks in n_features on first contact.
+#
+# Args:
+#   $row :: one sample, a non-empty arrayref of feature values.  undef
+#           cells are allowed only under missing => 'zero'.
+#   $caller :: the public method's name, used to prefix croak messages so
+#             the error names what the user actually called.
+#
+# Returns: a fresh dense arrayref, safe for the window to keep.  Croaks
+# when $row is not a non-empty arrayref, when its width disagrees with the
+# width the first row established, or when it holds an undef cell under
+# missing => 'die'.
+#
+# Example:
+#   my $r = $self->_prep_row( [ 0.9, undef ], 'learn' );   # [ 0.9, 0 ]
 sub _prep_row {
 	my ( $self, $row, $caller ) = @_;
 	croak "$caller: each sample must be an arrayref of features"
@@ -1088,6 +1183,17 @@ sub _prep_row {
 # (learn) or expected (scoring normalisation, per-leaf adjustment) to
 # go.  log base 4 = log(2 * branching_factor) with binary trees.  Under
 # max_leaf_samples points there is nothing to isolate: 0.
+#
+# Args:
+#   $n :: a point count, non-negative.  A tree's count when budgeting its
+#         depth, a leaf's count when adjusting a path length.
+#
+# Returns: the depth budget as a float, 0 for n below max_leaf_samples and
+# growing logarithmically past it.
+#
+# Example:
+#   $self->_rpl(32);    # 0 at the default max_leaf_samples of 32
+#   $self->_rpl(2048);  # ~3.0
 sub _rpl {
 	my ( $self, $n ) = @_;
 	my $eta = $self->{max_leaf_samples};
@@ -1096,14 +1202,36 @@ sub _rpl {
 }
 
 # How many points a node at $depth needs before it may split (or below
-# which, on forgetting, it collapses back into a leaf).
+# which, on forgetting, it collapses back into a leaf).  Learning and
+# forgetting both go through it, which is what keeps a tree's shape a
+# function of its current contents rather than of the order it saw them.
+#
+# Args:
+#   $depth :: the node's depth, 0 at the root.
+#
+# Returns: the required point count.  A flat max_leaf_samples under
+# growth => 'fixed'; doubling per level under 'adaptive', so deep nodes
+# need proportionally more evidence before splitting.
+#
+# Example:
+#   $self->_split_threshold(0);   # 32 at the default max_leaf_samples
+#   $self->_split_threshold(3);   # 256 under growth => 'adaptive'
 sub _split_threshold {
 	my ( $self, $depth ) = @_;
 	return $self->{max_leaf_samples} * ( $self->{growth} eq 'adaptive' ? 2**$depth : 1 );
 }
 
 # Number of points the model currently reflects: the window fill, or the
-# whole stream when forgetting is disabled.
+# whole stream when forgetting is disabled.  This is the population the
+# score normaliser is computed against, so it moves as the stream does.
+#
+# Args: none beyond the model itself.
+#
+# Returns: the point count as an integer -- the retained window's length,
+# or the lifetime seen count under window_size 0.
+#
+# Example:
+#   $self->_data_size;   # 2048 once a default window has filled
 sub _data_size {
 	my ($self) = @_;
 	return $self->{window_size} ? scalar @{ $self->{window} } : $self->{seen};
@@ -1113,6 +1241,16 @@ sub _data_size {
 # anomaly score: 2**(-(sum/t)/norm) == exp(-sum * log(2)/(t*norm)).
 # _EPS keeps a zero normaliser (fewer than max_leaf_samples points seen)
 # well-defined; every depth is 0 then, so everything scores 1.0.
+#
+# Args: none beyond the model itself.  The value tracks the current window
+# fill, so it has to be recomputed whenever the stream has moved.
+#
+# Returns: the multiplier as a float.  Feed it a depth sum and exp() turns
+# the product into the anomaly score.
+#
+# Example:
+#   my $inv   = $self->_score_inv;
+#   my $score = exp( -$depth_sum * $inv );   # in (0, 1]
 sub _score_inv {
 	my ($self) = @_;
 	my $norm = $self->_rpl( $self->_data_size * $self->{subsample} );
@@ -1135,6 +1273,18 @@ sub _score_inv {
 # draws go through the same generator in the same order, so the trees
 # built are bit-identical either way (on nvsize == 8 perls) -- use_c
 # only changes speed, matching fit()'s guarantee.
+#
+# Args:
+#   $r :: one sample, already through _prep_row -- dense, width-checked,
+#         and owned by the model, since the window keeps this very
+#         reference rather than a copy.
+#
+# Returns: nothing.  Advances seen, mutates the trees, appends to the
+# window and evicts the oldest point once the window is over size.
+#
+# Example:
+#   $self->_learn_row( $self->_prep_row( [ 0.9, 0.4 ], 'learn' ) );
+#   $self->seen;   # one higher than before
 sub _learn_row {
 	my ( $self, $r ) = @_;
 	my $sub = $self->{subsample};
@@ -1176,6 +1326,23 @@ sub _learn_row {
 	return;
 } ## end sub _learn_row
 
+# Teach one tree a single point: bump its count, refresh its depth budget
+# from that count, and route the point down from the root.  A tree that has
+# never seen anything is given a one-point leaf instead, which is how a
+# root comes into being.
+#
+# Args:
+#   $tree :: one tree record, a hashref of root, count and depth_limit.
+#            Mutated in place.
+#   $x :: one prepped sample, an arrayref of feature values.  Copied into
+#         any leaf box it initialises, never retained by reference.
+#
+# Returns: nothing.  The tree's root may be replaced (a leaf that reached
+# its split requirement becomes a subtree), which is why the recursion
+# hands the node back rather than mutating it blindly.
+#
+# Example:
+#   $self->_tree_learn( $self->{trees}[0], [ 0.9, 0.4 ] );
 sub _tree_learn {
 	my ( $self, $tree, $x ) = @_;
 	$tree->{count}++;
@@ -1193,6 +1360,20 @@ sub _tree_learn {
 # depth budget) is replaced by a subtree built from synthetic points
 # sampled inside its box -- the return value replaces the node in the
 # parent, which is how leaves turn into subtrees in place.
+#
+# Args:
+#   $node :: the node the point has reached, in the layout at the top of
+#            this file.  Mutated in place.
+#   $x :: one prepped sample, an arrayref of feature values.
+#   $depth :: this node's depth, 0 at the root.
+#   $limit :: the tree's current depth budget, from _rpl of its count.
+#
+# Returns: the node that should occupy this slot afterwards -- usually
+# $node itself, but a freshly built subtree when a leaf just split.  The
+# caller MUST store it back, which is why every call site assigns.
+#
+# Example:
+#   $tree->{root} = $self->_node_learn( $tree->{root}, $x, 0, $tree->{depth_limit} );
 sub _node_learn {
 	my ( $self, $node, $x, $depth, $limit ) = @_;
 
@@ -1227,6 +1408,19 @@ sub _node_learn {
 
 # $n synthetic points drawn uniformly inside the box -- the stand-in for
 # the real points the tree never stored.
+#
+# Args:
+#   $lo, $hi :: the box corners, arrayrefs of per-feature minimum and
+#               maximum.  Both must be defined and the same width; a
+#               feature with zero width contributes its single value.
+#   $n :: how many points to draw, normally the splitting leaf's count so
+#         the subtree is built from as much evidence as the leaf held.
+#
+# Returns: an arrayref of $n fresh arrayrefs, each a point inside the box.
+#
+# Example:
+#   my $pts = $self->_sample_box( [ 0, 0 ], [ 1, 4 ], 32 );
+#   # 32 points with feature 0 in [0, 1] and feature 1 in [0, 4]
 sub _sample_box {
 	my ( $self, $lo, $hi, $n ) = @_;
 	my @pts;
@@ -1239,6 +1433,21 @@ sub _sample_box {
 # Recursively build a subtree over (synthetic) points: random feature,
 # uniform split value within the points' range on it, recurse on the
 # partitions.  Leaves keep the partition's count and box.
+#
+# Args:
+#   $pts :: the points this subtree covers, an arrayref of arrayrefs --
+#           normally the synthetic set from _sample_box.  May be empty,
+#           which yields a count-0 leaf with an undef box.
+#   $depth :: this subtree's root depth, so the split requirement scales
+#             correctly under growth => 'adaptive'.
+#   $limit :: the tree's current depth budget.
+#
+# Returns: the subtree's root node in the layout at the top of this file --
+# a leaf when the points are too few or the budget is spent, otherwise an
+# axis node with both children already built.
+#
+# Example:
+#   my $sub = $self->_build_from_points( $pts, $depth, $limit );
 sub _build_from_points {
 	my ( $self, $pts, $depth, $limit ) = @_;
 	my $n = scalar @$pts;
@@ -1271,6 +1480,24 @@ sub _build_from_points {
 # Forgetting.
 #-------------------------------------------------------------------------------
 
+# Make one tree forget a single point: drop its count, refresh its depth
+# budget from that count, and route the point down from the root undoing
+# the bookkeeping as it goes.  The mirror image of _tree_learn, and the
+# reason a tree's shape reflects its current contents rather than its
+# history.
+#
+# Args:
+#   $tree :: one tree record, a hashref of root, count and depth_limit.
+#            Mutated in place.
+#   $x :: the point being evicted, an arrayref of feature values.  Must be
+#         a point this tree actually learned, otherwise the counts it
+#         decrements are not the ones it incremented.
+#
+# Returns: nothing.  A tree that never grew a root is left alone.
+#
+# Example:
+#   my $old = shift @{ $self->{window} };
+#   $self->_tree_unlearn( $self->{trees}[0], $old );
 sub _tree_unlearn {
 	my ( $self, $tree, $x ) = @_;
 	$tree->{count}--;
@@ -1284,6 +1511,19 @@ sub _tree_unlearn {
 # An internal node whose count no longer justifies its split collapses
 # back into a leaf; otherwise its box is refreshed to the union of its
 # children's, which is how boxes shrink as old extremes age out.
+#
+# Args:
+#   $node :: the node the point has reached, in the layout at the top of
+#            this file.  Mutated in place.
+#   $x :: the point being evicted, an arrayref of feature values.
+#   $depth :: this node's depth, 0 at the root.
+#
+# Returns: the node that should occupy this slot afterwards -- $node
+# itself, or the leaf it just collapsed into.  The caller MUST store it
+# back, exactly as with _node_learn.
+#
+# Example:
+#   $tree->{root} = $self->_node_unlearn( $tree->{root}, $old, 0 );
 sub _node_unlearn {
 	my ( $self, $node, $x, $depth ) = @_;
 
@@ -1304,6 +1544,18 @@ sub _node_unlearn {
 
 # Aggregate a subtree back into a single leaf holding the subtree's
 # (already decremented) count and the union of its descendants' boxes.
+#
+# Args:
+#   $node :: the subtree root to fold up, in the layout at the top of this
+#            file.  Its count must already reflect the eviction that
+#            triggered the collapse.
+#
+# Returns: a fresh leaf node carrying $node's count and a box covering
+# everything below it.  A node that is already a leaf comes back
+# untouched.
+#
+# Example:
+#   return _collapse($node) if $node->[_N_COUNT] < $self->_split_threshold($depth);
 sub _collapse {
 	my ($node) = @_;
 	return $node if $node->[_N_TYPE] == _NT_LEAF;
@@ -1322,6 +1574,17 @@ sub _collapse {
 # boxes grow in place, so they must never alias a child's).  Nodes with
 # no box yet (empty leaves) are skipped; (undef, undef) if neither has
 # one.
+#
+# Args:
+#   $a, $b :: two nodes, in the layout at the top of this file.  Either may
+#             be an empty leaf whose box slots are still undef.
+#
+# Returns: the two-element list ($lo, $hi) of fresh arrayrefs covering both
+# nodes, or (undef, undef) when neither has a box yet.
+#
+# Example:
+#   my ( $lo, $hi ) = _box_union( $node->[_N_LEFT], $node->[_N_RIGHT] );
+#   if ( defined $lo ) { $node->[_N_LO] = $lo; $node->[_N_HI] = $hi }
 sub _box_union {
 	my ( $a, $b ) = @_;
 	my @boxed = grep { defined $_->[_N_LO] } ( $a, $b );
@@ -1339,6 +1602,16 @@ sub _box_union {
 } ## end sub _box_union
 
 # (lo, hi) bounding box of a point set; (undef, undef) when empty.
+#
+# Args:
+#   $pts :: the points to bound, an arrayref of arrayrefs.  May be empty.
+#
+# Returns: the two-element list ($lo, $hi) of fresh arrayrefs holding the
+# per-feature minimum and maximum, or (undef, undef) for an empty set.
+#
+# Example:
+#   my ( $lo, $hi ) = _box_of( [ [ 0.9, 0.4 ], [ 0.2, 0.7 ] ] );
+#   # ( [ 0.2, 0.4 ], [ 0.9, 0.7 ] )
 sub _box_of {
 	my ($pts) = @_;
 	return ( undef, undef ) unless @$pts;
@@ -1360,6 +1633,18 @@ sub _box_of {
 # Depth of the leaf $x lands in, plus the leaf's own depth budget -- the
 # streaming analogue of the batch scorer's c(leaf size) adjustment.
 # Scoring tolerates undef cells (mapped to 0), matching the parent class.
+#
+# Args:
+#   $x :: one sample, an arrayref of feature values.  undef cells are
+#         allowed and count as 0.
+#   $node :: the node to start walking from, normally a tree's root.  Must
+#            be defined -- callers skip trees that have not grown one.
+#
+# Returns: the path length as a float: edges walked plus the leaf's
+# _rpl(count), so it is rarely a whole number.
+#
+# Example:
+#   $self->_depth_of( [ 0.9, 0.4 ], $self->{trees}[0]{root} );   # e.g. 2.8
 sub _depth_of {
 	my ( $self, $x, $node ) = @_;
 	my $depth = 0;
@@ -1372,6 +1657,20 @@ sub _depth_of {
 
 # Per-sample depth sums across all trees (tree-outer, sample-inner for
 # cache locality, mirroring the parent's pure-Perl loops).
+#
+# Args:
+#   $data :: the samples to walk, an arrayref of feature-value arrayrefs
+#            already through _prep_row or otherwise known dense-ish (undef
+#            cells count as 0).
+#
+# Returns: arrayref of per-sample depth sums, positionally matching $data.
+# Trees with no root contribute nothing, so a brand-new model yields all
+# zeroes.
+#
+# Example:
+#   my $sums   = $self->_depth_sums( \@rows );
+#   my $inv    = $self->_score_inv;
+#   my @scores = map { exp( -$_ * $inv ) } @$sums;
 sub _depth_sums {
 	my ( $self, $data ) = @_;
 	my @sums = (0) x @$data;
@@ -1388,6 +1687,17 @@ sub _depth_sums {
 # Single-row score against the current model state; used by the
 # prequential score_learn loop, where the normaliser moves as points are
 # learned and so must be recomputed per row.
+#
+# Args:
+#   $r :: one sample, already through _prep_row.
+#
+# Returns: the anomaly score as a float in (0, 1] -- near 1 for an
+# anomaly, well under 0.5 for a normal point.
+#
+# Example:
+#   my $r     = $self->_prep_row( $row, 'score_learn' );
+#   my $score = $self->_score_row($r);
+#   $self->_learn_row($r);            # prequential: score, then learn
 sub _score_row {
 	my ( $self, $r ) = @_;
 	if ( _HAS_ONLINE_XS && $self->{_use_c} ) {
@@ -1405,6 +1715,152 @@ sub _score_row {
 	}
 	return exp( -$sum * $self->_score_inv );
 } ## end sub _score_row
+
+#-------------------------------------------------------------------------------
+# Explanation (explain_samples) internals.  The output shaping is shared
+# with the parent class (_credit_to_features / _deltas_to_features) so
+# both classes return the identical structure; only the walks and the
+# baseline source differ.
+#-------------------------------------------------------------------------------
+
+# Path-credit explanation: _depth_of's exact routing recorded as
+# (path length, crossed features) walks, turned into local-DIFFI
+# credit by the parent's _walks_to_credit (see _path_length_explain
+# there for the weighting and its rationale).  Path lengths carry the
+# per-leaf _rpl(count) adjustment, exactly as scoring's do -- with the
+# shallow trees online models build, most of the between-tree contrast
+# lives in that adjustment, not the raw depth.  Online trees are
+# axis-only, so each node credits exactly one feature (share 1).
+#
+# Args:
+#   $data :: the samples to explain, an arrayref of feature-value
+#            arrayrefs, already prepped by the caller.
+#
+# Returns: arrayref of one hashref per row, in input order, each holding
+# score, method (always 'path') and features -- the same sorted structure
+# the parent class returns, so callers cannot tell the two apart.
+#
+# Example:
+#   my $out = $self->_explain_path( [ [ 8.1, 0.2 ] ] );
+#   $out->[0]{features}[0]{name};   # the feature most responsible
+sub _explain_path {
+	my ( $self, $data ) = @_;
+	my $scores = $self->score_samples($data);
+	my $nf     = $self->{n_features};
+	my $names  = $self->{feature_names};
+
+	my @out;
+	for my $i ( 0 .. $#$data ) {
+		my $x = $data->[$i];
+		my @walks;
+		for my $tree ( @{ $self->{trees} } ) {
+			my $node = $tree->{root};
+			next unless defined $node;
+			my @pairs;
+			while ( $node->[_N_TYPE] ) {
+				push @pairs, [ $node->[_N_ATTR], 1 ];
+				$node = ( $x->[ $node->[_N_ATTR] ] // 0 ) < $node->[_N_SPLIT] ? $node->[_N_LEFT] : $node->[_N_RIGHT];
+			}
+			push @walks, [ scalar(@pairs) + $self->_rpl( $node->[_N_COUNT] ), \@pairs ];
+		} ## end for my $tree ( @{ $self->{trees} } )
+		my $credit = Algorithm::Classifier::IsolationForest::_walks_to_credit( \@walks, $nf );
+		push @out,
+			{
+				score    => $scores->[$i],
+				method   => 'path',
+				features => Algorithm::Classifier::IsolationForest::_credit_to_features( $names, $credit, $x ),
+			};
+	} ## end for my $i ( 0 .. $#$data )
+	return \@out;
+} ## end sub _explain_path
+
+# Counterfactual explanation: every row followed by its n_features
+# single-feature baseline substitutions, scored as one batch (which
+# rides the packed-snapshot C scorer when available).  Mirrors the
+# parent's _explain_ablation with the window medians as baselines.
+#
+# Args:
+#   $data :: the samples to explain, an arrayref of feature-value
+#            arrayrefs, already prepped by the caller.
+#
+# Returns: arrayref of one hashref per row, in input order, each holding
+# score, method (always 'ablation') and features.  Croaks by way of
+# _window_baselines when the model has no retained window to take medians
+# from.
+#
+# Example:
+#   my $out = $self->_explain_ablation( [ [ 8.1, 0.2 ] ] );
+#   $out->[0]{features}[0]{delta};   # score drop from neutralising it
+sub _explain_ablation {
+	my ( $self, $data ) = @_;
+	my $nf        = $self->{n_features};
+	my $names     = $self->{feature_names};
+	my $baselines = $self->_window_baselines;
+
+	my @batch;
+	for my $row (@$data) {
+		push @batch, $row;
+		for my $f ( 0 .. $nf - 1 ) {
+			my @variant = @$row;
+			$variant[$f] = $baselines->[$f];
+			push @batch, \@variant;
+		}
+	}
+	my $scores = $self->score_samples( \@batch );
+
+	my @out;
+	for my $i ( 0 .. $#$data ) {
+		my $base   = $i * ( $nf + 1 );
+		my $score  = $scores->[$base];
+		my @deltas = map { $score - $scores->[ $base + 1 + $_ ] } 0 .. $nf - 1;
+		push @out,
+			{
+				score    => $score,
+				method   => 'ablation',
+				features => Algorithm::Classifier::IsolationForest::_deltas_to_features(
+					$names, \@deltas, $data->[$i], $baselines
+				),
+			};
+	} ## end for my $i ( 0 .. $#$data )
+	return \@out;
+} ## end sub _explain_ablation
+
+# Per-feature medians of the retained window -- the streaming
+# equivalent of the batch class's fit-time baselines, and better in one
+# way: they track drift for free because the window does.  Recomputed
+# per explanation call (the window moves with the stream); a sort per
+# feature over at most window_size values, dwarfed by the scoring batch
+# it feeds.  Window rows are always dense (missing => die/zero), so no
+# undef handling is needed.  Without a retained window there is nothing
+# to take a median of.
+#
+# Args: none beyond the model itself.
+#
+# Returns: an arrayref of n_features medians taken over the retained
+# window.  Croaks when the window is empty or absent (window_size 0, or
+# nothing learned yet), pointing the caller at method => 'path'.
+#
+# Example:
+#   my $baselines = $self->_window_baselines;   # [ 0.5, 0.5 ]
+sub _window_baselines {
+	my ($self) = @_;
+	my $win = $self->{window};
+	croak "explain_samples: ablation explanations need retained window data "
+		. "(window_size > 0 and learned points); use method => 'path' instead"
+		unless ref $win eq 'ARRAY' && @$win;
+
+	my $nf = $self->{n_features};
+	my @baselines;
+	for my $f ( 0 .. $nf - 1 ) {
+		my @vals = sort { $a <=> $b } map { $_->[$f] } @$win;
+		my $k    = scalar @vals;
+		$baselines[$f]
+			= $k % 2
+			? $vals[ int( $k / 2 ) ]
+			: ( $vals[ $k / 2 - 1 ] + $vals[ $k / 2 ] ) / 2.0;
+	}
+	return \@baselines;
+} ## end sub _window_baselines
 
 #-------------------------------------------------------------------------------
 # C-accelerated scoring.
@@ -1435,14 +1891,36 @@ sub _score_row {
 # repacking per point would cost more than the walks it replaces.
 #-------------------------------------------------------------------------------
 
-# Drop the packed snapshot; called on every mutation.
+# Drop the packed snapshot; called on every mutation.  _learn_row is the
+# single choke point every tree mutation flows through, so one call there
+# is enough to keep the snapshot from ever going stale.
+#
+# Args: none beyond the model itself.
+#
+# Returns: nothing.  Removes _c_nodes, _c_coef_idx and _c_coef_val, which
+# is what makes the next _ensure_c_trees rebuild rather than reuse.
+#
+# Example:
+#   $self->_invalidate_c_trees;   # next scoring call repacks
 sub _invalidate_c_trees {
 	delete @{ $_[0] }{qw(_c_nodes _c_coef_idx _c_coef_val)};
 	return;
 }
 
-# Build (or reuse) the packed snapshot.  Returns true when the C scoring
-# path may be taken, false when the caller must use the pure-Perl walk.
+# Build (or reuse) the packed snapshot of the live trees.
+#
+# Args: none beyond the model itself.
+#
+# Returns: 1 when the C scoring path may be taken -- the snapshot is
+# present and current afterwards -- and 0 when the caller must fall back to
+# the pure-Perl walk because use_c is off.  Repacking only happens on the
+# first call after a mutation; later calls just confirm the snapshot.
+#
+# Example:
+#   if ( $self->_ensure_c_trees ) {
+#       my ( $n_pts, $x ) = $self->_pack_input($data);
+#       # ... score through the parent's score_all_xs
+#   }
 sub _ensure_c_trees {
 	my ($self) = @_;
 	return 0 unless $self->{_use_c};
@@ -1464,6 +1942,18 @@ sub _ensure_c_trees {
 
 # Flatten one live tree into the parent's packed node buffer (DFS
 # pre-order, root at index 0 -- the origin score_all_xs walks from).
+#
+# Args:
+#   $root :: the tree's root node, or undef for a tree that has not learned
+#            anything yet.
+#
+# Returns: a packed 'd*' string of 6 doubles per node, in the parent's node
+# layout.  An undef root yields the single zeroed leaf record described
+# above, which walks as depth 0 with no adjustment.
+#
+# Example:
+#   my $buf = $self->_pack_online_tree( $tree->{root} );
+#   length($buf) / ( 6 * 8 );   # node count
 sub _pack_online_tree {
 	my ( $self, $root ) = @_;
 
@@ -1495,6 +1985,18 @@ sub _pack_online_tree {
 # Pack the query rows into the row-major double buffer score_all_xs
 # reads, via the parent's C row walker.  miss_mode 0 maps an undef cell
 # to 0.0, matching the pure-Perl walk's "// 0".
+#
+# Args:
+#   $data :: the samples to pack, an arrayref of feature-value arrayrefs.
+#            Each must be n_features wide.
+#
+# Returns: the two-element list ($n_pts, $x_packed) -- the row count and
+# the row-major 'd*' buffer.  There is no online counterpart to the
+# parent's PackedData: the snapshot goes stale on every learn, so buffers
+# are built per call.
+#
+# Example:
+#   my ( $n_pts, $x ) = $self->_pack_input( \@rows );
 sub _pack_input {
 	my ( $self, $data ) = @_;
 	my $n_pts    = scalar @$data;
@@ -1508,6 +2010,16 @@ sub _pack_input {
 # first time a predict-family method needs it.  A model with no retained
 # window (window_size 0) stays on the 0.5 fallback until the caller runs
 # relearn_threshold with data.
+#
+# Args: none beyond the model itself.
+#
+# Returns: nothing.  Sets $self->{threshold} on the first call that finds a
+# contamination rate, no threshold yet, and a non-empty window; every other
+# call is a no-op, so predict-family methods can call it unconditionally.
+#
+# Example:
+#   $self->_ensure_threshold;
+#   my $cut = $self->{threshold} // 0.5;
 sub _ensure_threshold {
 	my ($self) = @_;
 	return

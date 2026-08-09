@@ -1,5 +1,6 @@
 Changes
 lib/Net/Firewall/BlockerHelper.pm
+lib/Net/Firewall/BlockerHelper/Util.pm
 lib/Net/Firewall/BlockerHelper/backends/abuseipdb.pm
 lib/Net/Firewall/BlockerHelper/backends/akamai.pm
 lib/Net/Firewall/BlockerHelper/backends/aws_wafv2.pm
@@ -24,6 +25,7 @@ lib/Net/Firewall/BlockerHelper/backends/netscaler.pm
 lib/Net/Firewall/BlockerHelper/backends/nftables.pm
 lib/Net/Firewall/BlockerHelper/backends/npf.pm
 lib/Net/Firewall/BlockerHelper/backends/nsupdate.pm
+lib/Net/Firewall/BlockerHelper/backends/openwrt.pm
 lib/Net/Firewall/BlockerHelper/backends/opnsense.pm
 lib/Net/Firewall/BlockerHelper/backends/panos.pm
 lib/Net/Firewall/BlockerHelper/backends/pf.pm
@@ -80,6 +82,7 @@ t/new.t
 t/nftables.t
 t/npf.t
 t/nsupdate.t
+t/openwrt.t
 t/opnsense.t
 t/panos.t
 t/pf.t
@@ -96,6 +99,7 @@ t/pod-coverage.t
 t/pod.t
 t/self_heal.t
 t/teardown_reinit.t
+t/reinit_after_stop.t
 t/shell.t
 t/shell_exec.t
 t/shell_new.t

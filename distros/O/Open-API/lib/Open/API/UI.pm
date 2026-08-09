@@ -1,14 +1,25 @@
 package Open::API::UI;
 
-use 5.016;
+# 5.010 for defined-or, which this file uses throughout - and NOT the 5.016
+# that used to be here, which nothing in it needs and which made every perl
+# between the distribution's floor and 5.16 fail to compile the file at all.
+# The rest of Open::API is 5.008003; the docs UI is the one part that is not,
+# so its tests skip below 5.010 rather than the distribution raising its
+# floor for an optional feature.
+use 5.010;
 use strict;
 use warnings;
 use Carp ();
 use Scalar::Util ();
 use File::Raw::JSON ();
 use Open::API;
-use Template::Stencil;
-use Markdown::Simple ();
+# Versions at the point of use: both are `recommends`, and a recommendation
+# cannot upgrade a machine that already has an older copy. Without them the
+# first symptom is "Can't locate object method new via package
+# Markdown::Simple" from line 115 - Markdown::Simple grew its OO interface
+# in 0.18 - which says nothing about what to do.
+use Template::Stencil 0.02;
+use Markdown::Simple 0.18 ();
 
 our $VERSION = '0.04';
 

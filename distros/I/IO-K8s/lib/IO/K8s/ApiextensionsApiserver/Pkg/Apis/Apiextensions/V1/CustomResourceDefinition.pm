@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinition;
 # ABSTRACT: CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::APIObject;
 
 
@@ -24,7 +24,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDef
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head1 DESCRIPTION
 

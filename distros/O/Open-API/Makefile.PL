@@ -68,7 +68,16 @@ my %WriteMakefileArgs = (
         'meta-spec' => { version => 2 },
         prereqs => {
             runtime => {
-                # only the docs UI (Open::API::UI) needs these
+                # Only the docs UI (Open::API::UI) needs these, and it
+                # names the same minimums itself with `use MODULE VERSION`
+                # - a recommendation is not installed on every machine and
+                # cannot upgrade one that already has an older copy, so it
+                # is a hint to the client, not a guarantee to the code.
+                # Markdown::Simple 0.18 is where its OO interface arrives.
+                # The UI also wants perl 5.010 (defined-or), above this
+                # distribution's own 5.008003 floor; its tests skip below
+                # that rather than the whole distribution moving up for an
+                # optional feature.
                 recommends => {
                     'Template::Stencil' => '0.02',
                     'Markdown::Simple'  => '0.18',

@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
+use Config;
+use File::Basename qw(dirname);
 use File::Spec;
 use Command::Run::Tmpfile;
 
@@ -11,8 +13,13 @@ my $sdif      = "$script/sdif";
 my $cdif      = "$script/cdif";
 my $watchdiff = "$script/watchdiff";
 
-$ENV{PATH} .= ":$script";
-$ENV{PERL5LIB} .= ":$lib";
+# Prepend, not append.  These scripts execute each other by name
+# (sdif and watchdiff invoke cdif), and their `#!/usr/bin/env perl'
+# line makes the interpreter be looked up in PATH again.  Appending
+# would let an installed copy, or an unrelated perl, win over the one
+# under test.
+$ENV{PATH}     = join ':', $script, dirname($Config{perlpath}), $ENV{PATH};
+$ENV{PERL5LIB} = join ':', $lib, $ENV{PERL5LIB} // ();
 
 # Skip on systems where /dev/fd/N (N>2) is unavailable, e.g. FreeBSD
 # without fdescfs mounted.

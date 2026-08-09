@@ -156,49 +156,48 @@ param(self, name)
         SV *name
     CODE:
     {
-        AV *av = pcx_av(aTHX_ self);
-        STRLEN nl;
-        const char *n = SvPV_const(name, nl);
-        SV *op = pcx_get(aTHX_ av, PCX_OPENAPI);
-        SV *m  = pcx_get(aTHX_ av, PCX_MATCH);
-        SV *found = NULL;
-        if (op && SvROK(op) && SvTYPE(SvRV(op)) == SVt_PVHV) {
-            HV *oph = (HV *)SvRV(op);
-            static const char *loc[2] = { "path", "query" };
-            int i;
-            for (i = 0; i < 2 && !found; i++) {
-                SV **lv = hv_fetch(oph, loc[i], (I32)strlen(loc[i]), 0);
-                if (lv && *lv && SvROK(*lv) && SvTYPE(SvRV(*lv)) == SVt_PVHV) {
-                    SV **v = hv_fetch((HV *)SvRV(*lv), n, (I32)nl, 0);
-                    if (v) found = *v ? *v : &PL_sv_undef;
-                }
-            }
-        }
-        if (!found && m && SvROK(m) && SvTYPE(SvRV(m)) == SVt_PVHV) {
-            SV **cap = hv_fetchs((HV *)SvRV(m), "captures", 0);
-            if (cap && *cap && SvROK(*cap) && SvTYPE(SvRV(*cap)) == SVt_PVHV) {
-                SV **v = hv_fetch((HV *)SvRV(*cap), n, (I32)nl, 0);
-                if (v) found = *v ? *v : &PL_sv_undef;
-            }
-        }
-        if (found) {
-            RETVAL = newSVsv(found);
-        }
-        else {
-            /* $self->req->param($name) */
-            SV *req = pcx_force(aTHX_ av, PCX_REQ, "Punk::Request",
-                                pcx_get(aTHX_ av, PCX_ENV));
-            dSP; int count;
-            ENTER; SAVETMPS;
-            PUSHMARK(SP); EXTEND(SP, 2); PUSHs(req); PUSHs(name); PUTBACK;
-            count = call_method("param", G_SCALAR);
-            SPAGAIN;
-            RETVAL = count > 0 ? newSVsv(POPs) : &PL_sv_undef;
-            PUTBACK; FREETMPS; LEAVE;
-        }
+        SV *v = pcx_param(aTHX_ pcx_av(aTHX_ self), name);
+        RETVAL = v ? v : newSV(0);
     }
     OUTPUT:
         RETVAL
+
+# params      -> all of them merged, in that same precedence
+# params(@k)  -> just those, as a list of values in list context (undef
+#                for a name no layer has) or a hashref of the ones that
+#                are there in scalar context, which is the filter-hash
+#                shape: my %f = %{ $c->params(qw(state queue)) };
+#
+# Results are written back over the argument slots, one behind the name
+# being read, so no key is overwritten before it has been looked up.
+void
+params(self, ...)
+        SV *self
+    PPCODE:
+    {
+        AV *av = pcx_av(aTHX_ self);
+        int i;
+        if (items < 2) {
+            ST(0) = sv_2mortal(newRV_noinc((SV *)pcx_params_merged(aTHX_ av)));
+            XSRETURN(1);
+        }
+        if (GIMME_V == G_ARRAY) {
+            for (i = 1; i < items; i++) {
+                SV *v = pcx_param(aTHX_ av, ST(i));
+                ST(i - 1) = sv_2mortal(v ? v : newSV(0));
+            }
+            XSRETURN(items - 1);
+        }
+        else {
+            HV *out = newHV();
+            for (i = 1; i < items; i++) {
+                SV *v = pcx_param(aTHX_ av, ST(i));
+                if (v) (void)hv_store_ent(out, ST(i), v, 0);
+            }
+            ST(0) = sv_2mortal(newRV_noinc((SV *)out));
+            XSRETURN(1);
+        }
+    }
 
 SV *
 model(self, name)

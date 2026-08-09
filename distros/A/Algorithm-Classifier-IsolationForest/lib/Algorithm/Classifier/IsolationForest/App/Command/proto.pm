@@ -126,4 +126,72 @@ sub execute {
 	return 1;
 } ## end sub execute
 
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::proto - Extract a prototype from a saved model, or validate a prototype file
+
+=head1 DESCRIPTION
+
+Works with model prototypes: small JSON documents holding the variable
+schema -- feature names, per-feature descriptions, munger specs, missing
+policy -- a user-owned C<schema_version> and C<schema_description>, and
+optionally the tuning knobs.  C<iforest fit --prototype> and
+C<iforest stream --prototype> create models from one.
+
+C<--from-model> extracts a prototype from a saved model, which closes the
+loop: pull the schema and knobs out of a model that works, edit the
+metadata, and mint fresh models from it.  A model with no recorded schema
+version or description gets placeholders to fill in.
+
+C<--check> validates a prototype and summarises what it describes,
+exiting non-zero when the file is not a valid prototype.
+
+See PROTOTYPES in L<Algorithm::Classifier::IsolationForest> for the file
+format.
+
+Run it as C<iforest proto>; C<iforest help proto> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help proto> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Requires exactly one of C<--from-model> or C<--check>, checks that the
+named file is readable, and allows C<-o> only with C<--from-model> (and
+only over an existing file when C<-w> is given).
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Extracts or validates as asked, writing the prototype to C<-o> or the
+summary to STDOUT.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
+
 return 1;

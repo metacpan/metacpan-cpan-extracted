@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::dns_rpz;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::dns_rpz - DNS RPZ blocklist backend via 
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -252,8 +252,45 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the RPZ owner name for the passed IP: the reversed
-# address in RPZ IP format under the configured trigger and zone.
+# Internal helper. Returns the DNS owner name that the RPZ record for the
+# passed IP has to be created under. This is the name the ban and unban
+# nsupdate statements operate on, so getting it wrong means writing a record
+# that the resolver never consults.
+#
+# RPZ encodes an address into a domain name by writing a prefix length first
+# and then the address backwards, label by label, since DNS names go from most
+# specific to least specific while addresses read the other way. A single host
+# is a full length prefix, so IPv4 uses 32 and IPv6 uses 128. The result is
+# placed under the rpz-<trigger> label inside the policy zone.
+#
+# For IPv6 the address is first expanded to all eight groups, then reversed,
+# then the longest run of zero groups is collapsed to the literal "zz". That
+# "zz" is the RPZ spelling of the "::" shorthand. Only the longest run may be
+# collapsed, which is why the run is searched for explicitly rather than
+# replacing the first run found; collapsing a shorter run would produce a
+# different, non canonical name and the record would not be found.
+#
+# Args:
+#
+#     ip - The address to encode, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address. The family is
+#          decided by matching against $IPv4_re, so anything that is not a
+#          valid IPv4 address is encoded as IPv6.
+#
+# Returns the fully qualified owner name as a string, with no trailing dot.
+# The trigger and zone come from the options, so the same IP produces a
+# different name under a client-ip instance than under an ip instance.
+#
+#     # trigger 'client-ip', zone 'rpz.example.org'
+#     $self->_owner('10.0.0.1');
+#     #   32.1.0.0.10.rpz-client-ip.rpz.example.org
+#
+#     $self->_owner('2001:db8::1');
+#     #   128.1.zz.db8.2001.rpz-client-ip.rpz.example.org
+#
+#     # trigger 'ip', so answers containing the IP are rewritten instead
+#     $self->_owner('10.0.0.1');
+#     #   32.1.0.0.10.rpz-ip.rpz.example.org
 sub _owner {
 	my ( $self, $ip ) = @_;
 
@@ -301,8 +338,47 @@ sub _owner {
 	return $rpz_ip . '.rpz-' . $self->{options}{trigger} . '.' . $self->{options}{zone};
 } ## end sub _owner
 
-# Internal helper. Expands an IPv6 IP to its eight groups, each hex with leading
-# zeros stripped ('0' for a zero group).
+# Internal helper. Expands a possibly abbreviated IPv6 address into its eight
+# groups, normalized so that two spellings of the same address always come out
+# identical.
+#
+# This exists because _owner has to reverse the groups and find the longest
+# run of zeros, and neither is possible while the address still holds a "::"
+# standing in for an unknown number of groups. Normalizing here also means
+# "2001:0db8::0001" and "2001:db8::1" produce the same owner name, so a ban
+# and a later unban of the same host cannot end up touching two different
+# records.
+#
+# The "::" is expanded by splitting on it and filling the gap with as many
+# zero groups as are needed to reach eight. Each group is then lowercased and
+# has its leading zeros stripped, with an all zero group left as a single "0"
+# rather than an empty string.
+#
+# Args:
+#
+#     ip - The IPv6 address to expand, as a plain string. May be in any of the
+#          usual spellings: fully written out, abbreviated with "::" anywhere
+#          in it including at either end, and in any case. Expected to be a
+#          valid address; nothing here checks that, and an IPv4 address or a
+#          malformed string will simply produce a nonsense group list rather
+#          than an error.
+#
+# Returns the eight groups as a list of strings, in address order, each a
+# lowercase hex string with no leading zeros. Note the groups are returned in
+# the order they appear in the address, not reversed; reversing is the
+# caller's job.
+#
+#     $self->_v6_groups('2001:db8::1');
+#     #   ( '2001', 'db8', '0', '0', '0', '0', '0', '1' )
+#
+#     $self->_v6_groups('2001:0DB8:0000:0000:0000:0000:0000:0001');
+#     #   ( '2001', 'db8', '0', '0', '0', '0', '0', '1' )   -- same as above
+#
+#     $self->_v6_groups('::1');
+#     #   ( '0', '0', '0', '0', '0', '0', '0', '1' )
+#
+#     $self->_v6_groups('fe80::');
+#     #   ( 'fe80', '0', '0', '0', '0', '0', '0', '0' )
 sub _v6_groups {
 	my ( $self, $ip ) = @_;
 
@@ -327,8 +403,47 @@ sub _v6_groups {
 	return @groups;
 } ## end sub _v6_groups
 
-# Internal helper. Returns the shell command piping the given update statements
-# into nsupdate, wrapped with the optional server line, zone, and send.
+# Internal helper. Wraps one or more update statements into the complete shell
+# command that feeds them to nsupdate. Every change this backend makes to the
+# policy zone goes out through here.
+#
+# nsupdate reads its statements from stdin rather than from arguments, so the
+# statements are printed into a pipe. They are assembled in the order nsupdate
+# needs: an optional server line, then the zone, then the caller's updates,
+# then send. The server line is only emitted when the server option is set to
+# something non empty, since leaving it out is what makes nsupdate fall back
+# to the SOA MNAME for the zone. The trailing send is what actually transmits
+# the update; without it nsupdate would exit having done nothing.
+#
+# Note the statements are joined with a literal backslash-n inside a single
+# quoted printf format, so it is printf that turns them into real newlines,
+# not perl.
+#
+# Args:
+#
+#     @updates - One or more nsupdate statement lines, as plain strings with
+#                no trailing newline, such as
+#                'update add 32.1.0.0.10.rpz-client-ip.rpz.example.org 3600 IN CNAME .'
+#                They are emitted in the order given, between the zone line
+#                and the send. Passing none is not an error and produces a
+#                command that connects and sends an empty update.
+#
+# Returns the command as a single string ready to hand to the runner, of the
+# shape "printf '<statements>\n' | <nsupdate> -k '<keyfile>'". The nsupdate
+# binary and the keyfile come from the options, and the keyfile is single
+# quoted so a path holding spaces survives.
+#
+#     $self->_nsupdate_command(
+#         'update add 32.1.0.0.10.rpz-client-ip.rpz.example.org 3600 IN CNAME .' );
+#
+#     # with no server option set:
+#     #   printf 'zone rpz.example.org\nupdate add 32.1.0.0.10.rpz-client-ip.rpz.example.org 3600 IN CNAME .\nsend\n' | nsupdate -k '/etc/rpz.key'
+#
+#     # with the server option set to ns1.example.org, a server line leads:
+#     #   printf 'server ns1.example.org\nzone rpz.example.org\n...\nsend\n' | nsupdate -k '/etc/rpz.key'
+#
+#     # several statements go out as one update, so they apply atomically
+#     $self->_nsupdate_command( @add_statements );
 sub _nsupdate_command {
 	my ( $self, @updates ) = @_;
 
@@ -348,8 +463,31 @@ sub _nsupdate_command {
 		. $self->{options}{keyfile} . "'";
 } ## end sub _nsupdate_command
 
-# Internal helpers. Return the nsupdate command that adds/removes the RPZ record
-# for the IP.
+# Internal helper. Returns the complete shell command that bans the passed IP
+# by adding its RPZ record to the policy zone.
+#
+# The record added is a CNAME pointing at the root, ".", which is how RPZ
+# spells the NXDOMAIN action: a resolver consulting the zone answers as though
+# the name did not exist. Under the default client-ip trigger that means the
+# banned host gets NXDOMAIN for everything it looks up; under the ip trigger
+# it means answers containing the banned address are rewritten.
+#
+# The record is created with the configured ttl, 60 seconds by default. That
+# ttl bounds how long a resolver may keep serving the ban after it has been
+# lifted, so it is the main reason an unban does not always take effect
+# immediately.
+#
+# Args:
+#
+#     ip - The address to ban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address. It is turned into an
+#          owner name by _owner, so the encoding rules there apply.
+#
+# Returns the full shell command as a single string, ready for the runner, as
+# built by _nsupdate_command.
+#
+#     $self->_ban_command('10.0.0.1');
+#     #   printf 'zone rpz.example.org\nupdate add 32.1.0.0.10.rpz-client-ip.rpz.example.org 60 IN CNAME .\nsend\n' | nsupdate -k '/etc/rpz.key'
 sub _ban_command {
 	my ( $self, $ip ) = @_;
 
@@ -357,6 +495,30 @@ sub _ban_command {
 		'update add ' . $self->_owner($ip) . ' ' . $self->{options}{ttl} . ' IN CNAME .' );
 }
 
+# Internal helper. Returns the complete shell command that unbans the passed IP
+# by deleting its RPZ record from the policy zone.
+#
+# This is the exact inverse of _ban_command and deletes the same CNAME record
+# it created, matched by owner name, type, and rdata. No ttl appears, as
+# nsupdate delete statements do not take one.
+#
+# Deleting a record that is not there is not an error for nsupdate, so
+# unbanning an IP that was never banned succeeds quietly. Note that resolvers
+# may keep answering from cache until the record's ttl expires.
+#
+# Args:
+#
+#     ip - The address to unban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, and to be spelled
+#          the same way it was when banned. _owner normalizes IPv6 spellings,
+#          so an abbreviated and a fully written out form of the same address
+#          both resolve to the same record.
+#
+# Returns the full shell command as a single string, ready for the runner, as
+# built by _nsupdate_command.
+#
+#     $self->_unban_command('10.0.0.1');
+#     #   printf 'zone rpz.example.org\nupdate delete 32.1.0.0.10.rpz-client-ip.rpz.example.org IN CNAME .\nsend\n' | nsupdate -k '/etc/rpz.key'
 sub _unban_command {
 	my ( $self, $ip ) = @_;
 
@@ -548,24 +710,6 @@ sub list {
 	return keys( %{ $self->{banned} } );
 }
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 CIDR bans are not supported by this backend; this always sets the
@@ -637,13 +781,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	{
 		local $@;

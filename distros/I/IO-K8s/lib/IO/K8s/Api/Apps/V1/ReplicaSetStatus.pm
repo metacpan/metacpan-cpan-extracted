@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::ReplicaSetStatus;
 # ABSTRACT: ReplicaSetStatus represents the current status of a ReplicaSet.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s availableReplicas => Int;
@@ -21,6 +21,9 @@ k8s readyReplicas => Int;
 k8s replicas => Int, 'required';
 
 
+k8s terminatingReplicas => Int;
+
+
 1;
 
 __END__
@@ -35,7 +38,7 @@ IO::K8s::Api::Apps::V1::ReplicaSetStatus - ReplicaSetStatus represents the curre
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 availableReplicas
 
@@ -60,6 +63,12 @@ readyReplicas is the number of pods targeted by this ReplicaSet with a Ready Con
 =head2 replicas
 
 Replicas is the most recently observed number of replicas. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller
+
+=head2 terminatingReplicas
+
+Total number of terminating pods targeted by this replica set. Terminating pods have a non-null .metadata.deletionTimestamp and have not yet reached the Failed or Succeeded .status.phase.
+
+This is a beta field. It is only populated by servers that enable the DeploymentReplicaSetTerminatingReplicas feature gate.
 
 =head1 SUPPORT
 

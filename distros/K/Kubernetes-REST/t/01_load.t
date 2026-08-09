@@ -12,6 +12,7 @@ use_ok('Kubernetes::REST::Kubeconfig');
 
 # Internal modules
 use_ok('Kubernetes::REST::Error');
+use_ok('Kubernetes::REST::RemoteError');
 use_ok('Kubernetes::REST::LWPIO');
 use_ok('Kubernetes::REST::HTTPTinyIO');
 use_ok('Kubernetes::REST::HTTPRequest');

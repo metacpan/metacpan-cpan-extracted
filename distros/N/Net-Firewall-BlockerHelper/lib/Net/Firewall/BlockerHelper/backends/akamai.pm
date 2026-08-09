@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::akamai;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::akamai - Akamai Network Lists backend fo
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -269,55 +269,149 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the base URL for the Akamai API host.
+# Internal helper. Returns the scheme and host of the Akamai API endpoint,
+# which every URL is built on.
+#
+# The host is the per account API hostname from an EdgeGrid credential set,
+# something of the akab-....luna.akamaiapis.net form, not a shared endpoint.
+# The scheme is fixed at https, which EdgeGrid requires and which the request
+# signing also assumes.
+#
+# Takes no arguments; the host comes from the options.
+#
+# Returns the base URL as a string, with no trailing slash.
+#
+#     $self->_base_url;    # https://akab-xxx.luna.akamaiapis.net
 sub _base_url {
 	my ($self) = @_;
 
 	return 'https://' . $self->{options}{host};
 }
 
-# Internal helper. Returns the network list URL used for GETing the list.
+# Internal helper. Returns the URL of the network list this instance manages.
+#
+# This is the object every ban and unban acts on. It is addressed by the
+# network list id, which is Akamai's own identifier rather than a name the
+# caller chose, and the list is expected to already exist and be referenced by
+# a security configuration; this backend does not create it.
+#
+# As well as being used directly for reading the list, this is the stem the
+# append and element URLs are built on.
+#
+# Takes no arguments; the network list id comes from the options.
+#
+# Returns the URL as a string, with no trailing slash.
+#
+#     $self->_list_url;
+#     #   https://akab-xxx.luna.akamaiapis.net/network-list/v2/network-lists/12345_BLOCKLIST
 sub _list_url {
 	my ($self) = @_;
 
 	return $self->_base_url . '/network-list/v2/network-lists/' . $self->{options}{network_list_id};
 }
 
-# Internal helper. Returns the URL used to append elements to the list.
+# Internal helper. Returns the URL that adds elements to the network list.
+#
+# Akamai's network list API is incremental rather than replace-in-full, which
+# is what makes this backend cheaper than the ones that rewrite an entire
+# object per ban: appending adds to whatever is already there without needing
+# to know the current contents.
+#
+# Takes no arguments.
+#
+# Returns the URL as a string, for a POST whose body carries the elements to
+# add.
+#
+#     $self->_append_url;
+#     #   https://akab-xxx.luna.akamaiapis.net/network-list/v2/network-lists/12345_BLOCKLIST/append
 sub _append_url {
 	my ($self) = @_;
 
 	return $self->_list_url . '/append';
 }
 
-# Internal helper. Returns the URL used to remove a single element from the
+# Internal helper. Returns the URL that removes one element from the network
 # list.
+#
+# The counterpart of _append_url, and incremental in the same way: the element
+# to drop is named in the query string, so nothing needs to be read back or
+# rewritten. Unlike the routeros_api backend there is no id to look up first,
+# since Akamai addresses elements by their value.
+#
+# The element is percent encoded, which matters for IPv6, whose colons would
+# otherwise sit raw in the query string, and for ranges, whose slash would.
+#
+# Args:
+#
+#     ip - The element to remove, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, or a CIDR range;
+#          Akamai network lists hold both and this treats them the same.
+#
+# Returns the URL as a string, for a DELETE that carries no body.
+#
+#     $self->_element_url('10.0.0.1');
+#     #   https://akab-xxx.luna.akamaiapis.net/network-list/v2/network-lists/12345_BLOCKLIST/elements?element=10.0.0.1
+#
+#     $self->_element_url('2001:db8::1');
+#     #   .../elements?element=2001%3Adb8%3A%3A1
 sub _element_url {
 	my ( $self, $ip ) = @_;
 
 	return $self->_list_url . '/elements?element=' . $self->_uri_escape($ip);
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Builds and returns the EdgeGrid EG1-HMAC-SHA256
-# Authorization header value for the given request. Never called in testing
-# mode.
+# Internal helper. Builds the EdgeGrid Authorization header for one request.
+# This is the most intricate piece of this backend and the reason it cannot
+# just use HTTP basic auth like the other API backends.
+#
+# Akamai signs each request rather than sending a standing credential. The
+# scheme is EG1-HMAC-SHA256 and works in two stages: a signing key is derived
+# by HMACing the timestamp with the client secret, and the request itself is
+# then HMACed with that derived key. Signing the timestamp rather than the
+# request with the long lived secret is what limits how long any one derived
+# key is useful for.
+#
+# The data to sign is a tab separated canonical form of the request: method,
+# scheme, host, path with query, an always empty canonicalized headers field
+# since none are signed here, the content hash, and the partial Authorization
+# header itself. Getting any field or separator wrong produces a signature the
+# API rejects with no useful diagnosis, so the ordering here is not
+# rearrangeable.
+#
+# Two details are easy to get wrong and worth knowing about. Digest::SHA
+# returns base64 without the trailing '=' padding, which EdgeGrid requires, so
+# every digest is passed through a local padding closure. And the content hash
+# is only included for POST requests with a non empty body; sending it for a
+# GET or DELETE would change the signed string and fail.
+#
+# The timestamp is UTC in EdgeGrid's own format, and the nonce is four
+# concatenated random 32 bit values, which is enough to keep replay detection
+# from tripping on repeated requests.
+#
+# Never called in testing mode, since nothing is signed when nothing is sent.
+#
+# Args:
+#
+#     method - The HTTP method the request will use, as a plain string. Upper
+#               cased before signing, and compared against POST to decide
+#               whether a content hash is included.
+#
+#     url    - The full URL the request will go to, as a plain string. The
+#              scheme and host are stripped off to leave the path and query,
+#              which is what gets signed; an empty remainder becomes '/'.
+#
+#     body   - The request body, as a plain string, or undef for requests that
+#              carry none. Only used for POST, where its SHA-256 becomes the
+#              content hash.
+#
+# Returns the complete Authorization header value as a string, of the form
+# 'EG1-HMAC-SHA256 client_token=..;access_token=..;timestamp=..;nonce=..;signature=..'.
+# Note the value is single use: it embeds a timestamp and nonce, so it must be
+# rebuilt for every request rather than cached.
+#
+#     my $auth = $self->_edgegrid_auth( 'GET', $self->_list_url );
+#
+#     my $auth = $self->_edgegrid_auth( 'POST', $self->_append_url, $body );
 sub _edgegrid_auth {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -385,10 +479,52 @@ sub _edgegrid_auth {
 	return $auth_header_without_sig . 'signature=' . $signature;
 } ## end sub _edgegrid_auth
 
-# Internal helper. Performs a HTTP request via LWP::UserAgent, signing it with
-# an EdgeGrid Authorization header, returning the decoded JSON body (or undef
-# for an empty body) and dying with an explanation on any HTTP level failure.
-# Never called in testing mode.
+# Internal helper. Performs one HTTP request against the Akamai network list
+# API. Every call this backend makes goes through here.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend.
+#
+# Authentication is an EdgeGrid signature built per request by
+# _edgegrid_auth. Unlike the backends using basic auth or a session token,
+# nothing here can be cached: the header embeds a timestamp and nonce and
+# covers the method, URL, and body, so it has to be recomputed even for a
+# repeat of the same call.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# A body that fails to decode as JSON is not fatal; the decode runs inside its
+# own eval and leaves the result undef.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string: 'GET' to read the list,
+#              'POST' to append elements, 'DELETE' to remove one.
+#
+#     url    - The full URL to request, as a plain string, from _list_url,
+#              _append_url, or _element_url.
+#
+#     body   - Optional request body, as an already encoded JSON string. undef
+#              for the reads and deletes, which carry everything in the URL.
+#              Note this is also what gets hashed into the signature for a
+#              POST, so it must be the exact bytes sent.
+#
+# Returns the decoded response body as whatever structure the JSON held,
+# normally a hashref, or undef when the response body was empty or did not
+# parse. Dies on any non success HTTP status.
+#
+#     my $decoded = $self->_request( 'GET', $self->_list_url );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'POST', $self->_append_url, $body ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -608,24 +744,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range. The value of ban is validated as being a IPv4 or IPv6
@@ -817,13 +935,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants

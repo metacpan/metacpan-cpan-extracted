@@ -186,8 +186,11 @@ sub extra_config {
     $summary_config{$_} = join(' ', @{ $summary_config{$_} }) for keys %summary_config;
 
     # CCFLAGS
+    # The debug build is gnu11 rather than c99 because -pedantic is also
+    # applied to the perl headers, and config.h of a modern perl uses
+    # _Thread_local, which C99 does not have.
     $summary_config{CCFLAGS}  = ( $Config{ccflags} || '' ) . ( $IS_VC ? ' /Fosrc/' : ' -o $@' );
-    $summary_config{CCFLAGS} .= ' -g -Wall -Werror -Wextra -pedantic -Wno-clobbered -std=c99 -DPERL_GCC_PEDANTIC -DWITH_DEBUG -O0'
+    $summary_config{CCFLAGS} .= ' -g -Wall -Werror -Wextra -pedantic -Wno-clobbered -std=gnu11 -DPERL_GCC_PEDANTIC -DWITH_DEBUG -O0'
         if $PARAMS{DEBUG};
     $summary_config{CCFLAGS} .= ' -DWITH_TRACE'
         if $PARAMS{DEBUG} && $PARAMS{TRACE};

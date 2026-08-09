@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::Issuer;
 # ABSTRACT: cert-manager namespace-scoped certificate issuer
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::APIObject
     api_version     => 'cert-manager.io/v1',
     resource_plural => 'issuers';
@@ -23,7 +23,7 @@ IO::K8s::CertManager::V1::Issuer - cert-manager namespace-scoped certificate iss
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head1 DESCRIPTION
 

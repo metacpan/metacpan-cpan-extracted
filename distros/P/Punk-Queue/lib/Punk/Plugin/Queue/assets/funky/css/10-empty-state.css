@@ -1,0 +1,321 @@
+/* ==========================================================================
+   Funky Empty State Component
+   Theme-aware, density-aware empty state placeholders
+   ========================================================================== */
+
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
+
+.funky-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--empty-state-padding, 2rem);
+  min-height: var(--empty-state-min-height, 200px);
+}
+
+.funky-empty-state-icon {
+  font-size: var(--empty-state-icon-size, 2.5rem);
+  color: var(--pro-text-muted, #6e7681);
+  margin-bottom: var(--pro-spacing-md, 1rem);
+  opacity: 0.6;
+}
+
+/* Image icon support */
+.funky-empty-state-icon img {
+  width: var(--empty-state-icon-size, 2.5rem);
+  height: var(--empty-state-icon-size, 2.5rem);
+  object-fit: contain;
+  opacity: 0.6;
+}
+
+.funky-empty-state-title {
+  font-size: var(--empty-state-title-size, 1.125rem);
+  font-weight: 600;
+  color: var(--pro-text-primary, #e6edf3);
+  margin: 0 0 var(--pro-spacing-xs, 0.5rem) 0;
+}
+
+.funky-empty-state-message {
+  font-size: var(--empty-state-message-size, 0.875rem);
+  color: var(--pro-text-secondary, #8b949e);
+  margin: 0 0 var(--pro-spacing-lg, 1.5rem) 0;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+/* Hide message margin when no actions */
+.funky-empty-state-message:last-child {
+  margin-bottom: 0;
+}
+
+.funky-empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pro-spacing-sm, 0.75rem);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Secondary action as link */
+.funky-empty-state-secondary {
+  color: var(--pro-accent-primary, #2f81f7);
+  text-decoration: none;
+  font-size: var(--empty-state-message-size, 0.875rem);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.funky-empty-state-secondary:hover {
+  color: var(--pro-accent-primary-hover, #388bfd);
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   SIZE VARIANTS
+   ========================================================================== */
+
+/* Small - inline, compact containers */
+.funky-empty-state-sm {
+  --empty-state-padding: 1rem;
+  --empty-state-min-height: 120px;
+  --empty-state-icon-size: 1.5rem;
+  --empty-state-title-size: 0.875rem;
+  --empty-state-message-size: 0.75rem;
+}
+
+.funky-empty-state-sm .funky-empty-state-icon {
+  margin-bottom: var(--pro-spacing-sm, 0.5rem);
+}
+
+.funky-empty-state-sm .funky-empty-state-message {
+  max-width: 240px;
+}
+
+/* Medium - default */
+.funky-empty-state-md {
+  --empty-state-padding: 2rem;
+  --empty-state-min-height: 200px;
+  --empty-state-icon-size: 2.5rem;
+  --empty-state-title-size: 1.125rem;
+  --empty-state-message-size: 0.875rem;
+}
+
+/* Large - full page */
+.funky-empty-state-lg {
+  --empty-state-padding: 3rem;
+  --empty-state-min-height: 300px;
+  --empty-state-icon-size: 4rem;
+  --empty-state-title-size: 1.5rem;
+  --empty-state-message-size: 1rem;
+}
+
+.funky-empty-state-lg .funky-empty-state-message {
+  max-width: 400px;
+}
+
+/* ==========================================================================
+   DENSITY OVERRIDES
+   ========================================================================== */
+
+[data-density="compact"] .funky-empty-state {
+  --empty-state-padding: calc(var(--empty-state-padding, 2rem) * 0.75);
+  --empty-state-min-height: calc(var(--empty-state-min-height, 200px) * 0.8);
+}
+
+[data-density="spacious"] .funky-empty-state {
+  --empty-state-padding: calc(var(--empty-state-padding, 2rem) * 1.25);
+  --empty-state-min-height: calc(var(--empty-state-min-height, 200px) * 1.2);
+}
+
+/* ==========================================================================
+   VARIANT COLORS (for icon tinting)
+   ========================================================================== */
+
+.funky-empty-state-variant-primary .funky-empty-state-icon {
+  color: var(--pro-accent-primary, #2f81f7);
+  opacity: 0.7;
+}
+
+.funky-empty-state-variant-success .funky-empty-state-icon {
+  color: var(--pro-accent-success, #3fb950);
+  opacity: 0.7;
+}
+
+.funky-empty-state-variant-warning .funky-empty-state-icon {
+  color: var(--pro-accent-warning, #d29922);
+  opacity: 0.7;
+}
+
+.funky-empty-state-variant-danger .funky-empty-state-icon {
+  color: var(--pro-accent-danger, #f85149);
+  opacity: 0.7;
+}
+
+.funky-empty-state-variant-info .funky-empty-state-icon {
+  color: var(--pro-accent-info, #58a6ff);
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   ANIMATION
+   ========================================================================== */
+
+.funky-empty-state.animate-in {
+  animation: emptyStateFadeIn 0.3s ease-out;
+}
+
+@keyframes emptyStateFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .funky-empty-state.animate-in {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   EVEN FUNKYER THEME OVERRIDES
+   ========================================================================== */
+
+.even-funkyer .funky-empty-state-icon {
+  color: var(--pro-accent-primary, #ff00ff);
+  text-shadow: 0 0 10px currentColor;
+}
+
+.even-funkyer .funky-empty-state-title {
+  background: linear-gradient(135deg, var(--pro-accent-primary), var(--pro-accent-secondary, #00ffff));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==========================================================================
+   HIGH CONTRAST MODE
+   ========================================================================== */
+
+@media (prefers-contrast: high) {
+  .funky-empty-state-icon {
+    opacity: 1;
+  }
+
+  .funky-empty-state-title {
+    font-weight: 700;
+  }
+
+  .funky-empty-state-secondary {
+    text-decoration: underline;
+  }
+
+  .funky-empty-state-secondary:focus-visible {
+    outline: 3px solid;
+    outline-offset: 2px;
+  }
+
+  /* Disable animations */
+  @keyframes emptyStateFadeIn {
+    from { opacity: 1; transform: none; }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+/* ==========================================================================
+   EMPTY STATE DEMO STYLES
+   Playground demo-specific styling
+   ========================================================================== */
+
+.empty-state-demo__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.empty-state-demo__sizes {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.empty-state-demo__size-item {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty-state-demo__size-item > small {
+  text-align: center;
+}
+
+.empty-state-demo__button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state-demo__toggle-container {
+  min-height: 200px;
+  background: var(--pro-bg-tertiary);
+  border: 1px solid var(--pro-border);
+  border-radius: 4px;
+}
+
+.empty-state-demo__log {
+  background: var(--pro-bg-tertiary);
+  color: var(--pro-text-muted);
+  padding: 1rem;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  border: 1px solid var(--pro-border);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .empty-state-demo__grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .empty-state-demo__sizes {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .empty-state-demo__size-item {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .empty-state-demo__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .empty-state-demo__button-grid {
+    flex-direction: column;
+  }
+
+  .empty-state-demo__button-grid .btn {
+    width: 100%;
+  }
+}

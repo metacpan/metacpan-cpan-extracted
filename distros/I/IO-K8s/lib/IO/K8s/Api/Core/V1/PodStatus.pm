@@ -1,7 +1,10 @@
 package IO::K8s::Api::Core::V1::PodStatus;
 # ABSTRACT: PodStatus represents information about the status of a pod. Status may trail the actual state of a system, especially if the node that hosts the pod cannot contact the control plane.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
+
+k8s allocatedResources => { Str => 1 };
+
 
 k8s conditions => ['Core::V1::PodCondition'];
 
@@ -10,6 +13,9 @@ k8s containerStatuses => ['Core::V1::ContainerStatus'];
 
 
 k8s ephemeralContainerStatuses => ['Core::V1::ContainerStatus'];
+
+
+k8s extendedResourceClaimStatus => 'Core::V1::PodExtendedResourceClaimStatus';
 
 
 k8s hostIP => Str;
@@ -24,7 +30,13 @@ k8s initContainerStatuses => ['Core::V1::ContainerStatus'];
 k8s message => Str;
 
 
+k8s nodeAllocatableResourceClaimStatuses => ['Core::V1::NodeAllocatableResourceClaimStatus'];
+
+
 k8s nominatedNodeName => Str;
+
+
+k8s observedGeneration => Int;
 
 
 k8s phase => Str;
@@ -48,6 +60,9 @@ k8s resize => Str;
 k8s resourceClaimStatuses => ['Core::V1::PodResourceClaimStatus'];
 
 
+k8s resources => 'Core::V1::ResourceRequirements';
+
+
 k8s startTime => Time;
 
 
@@ -65,7 +80,11 @@ IO::K8s::Api::Core::V1::PodStatus - PodStatus represents information about the s
 
 =head1 VERSION
 
-version 1.100
+version 1.105
+
+=head2 allocatedResources
+
+AllocatedResources is the total amount of CPU and Memory resources allocated to the pod's containers by the node. It supports specifying Requests and Limits for "cpu" and "memory" resource names only. Kubelet sets this value to the pod-level resources.requests upon successful pod admission and after successfully admitting desired pod-level resource resize.
 
 =head2 conditions
 
@@ -78,6 +97,10 @@ The list has one entry per container in the manifest. More info: https://kuberne
 =head2 ephemeralContainerStatuses
 
 Status for any ephemeral containers that have run in this pod.
+
+=head2 extendedResourceClaimStatus
+
+Status of extended resource claims.
 
 =head2 hostIP
 
@@ -95,9 +118,17 @@ The list has one entry per init container in the manifest. The most recent succe
 
 A human readable message indicating details about why the pod is in this condition.
 
+=head2 nodeAllocatableResourceClaimStatuses
+
+Status of node-allocatable resources backed by DRA resource claims.
+
 =head2 nominatedNodeName
 
 nominatedNodeName is set only when this pod preempts other pods on the node, but it cannot be scheduled right away as preemption victims receive their graceful termination periods. This field does not guarantee that the pod will be scheduled on this node. Scheduler may decide to place the pod elsewhere if other nodes become available sooner. Scheduler may also decide to give the resources on this node to a higher priority pod that is created after preemption. As a result, this field may be different than PodSpec.nodeName when the pod is scheduled.
+
+=head2 observedGeneration
+
+If set, this represents the .metadata.generation that the pod status was set based upon. This is an alpha field. Enable PodObservedGenerationTracking to be able to use this field.
 
 =head2 phase
 
@@ -125,11 +156,17 @@ A brief CamelCase message indicating details about why the pod is in this state.
 
 =head2 resize
 
-Status of resources resize desired for pod's containers. It is empty if no resources resize is pending. Any changes to container resources will automatically set this to "Proposed"
+Status of resources resize desired for pod's containers. It is empty if no resources resize is pending. Any changes to container resources will automatically set this to "Proposed" Deprecated: Resize status is moved to two pod conditions PodResizePending and PodResizeInProgress. PodResizePending will track states where the container requests do not match pod status. PodResizeInProgress will track in-progress resizes, and populate its reason field when it is unable to complete the resize.
 
 =head2 resourceClaimStatuses
 
 Status of resource claims.
+
+=head2 resources
+
+Resources is the total amount of CPU and Memory resources allocated to the pod's containers by the node's kubelet. It supports specifying Requests and Limits for "cpu" and "memory" resource names only. ResourceClaims are not supported.
+
+This value is only set when PodLevelResources feature gate is enabled and the total container resource requests do not exceed pod-level resource requests, or if the resource requests are equal.
 
 =head2 startTime
 

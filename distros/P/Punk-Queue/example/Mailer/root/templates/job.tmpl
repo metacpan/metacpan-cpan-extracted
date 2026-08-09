@@ -1,0 +1,29 @@
+<h1>Job #{% job.id %}</h1>
+
+<p class="lede">
+  This page is the whole reason enqueueing is not the same as forgetting:
+  the job is a row, and the row can be looked at.
+</p>
+
+<dl class="stats wide">
+  <dt>task</dt><dd>{% job.task %}</dd>
+  <dt>queue</dt><dd>{% job.queue %}</dd>
+  <dt>state</dt><dd class="state state-{% job.state %}">{% job.state %}</dd>
+  <dt>attempt</dt><dd>{% attempt %} of {% job.attempts %}</dd>
+  <dt>priority</dt><dd>{% job.priority %}</dd>
+  <dt>worker</dt><dd>{% job.worker | default('-') %}</dd>
+</dl>
+
+{% if done %}
+  <h2>Result</h2>
+  <pre class="result">{% result | default('(none)') %}</pre>
+{% else %}
+  <p class="warn">
+    Still waiting. It will move when a worker claims it -
+    <code>punk-queue worker --app bin/queue.pl -q default,mail,reports</code>
+  </p>
+  <p><a href="/jobs/{% job.id %}">reload</a></p>
+{% end %}
+
+<p><a href="/queue/jobs/{% job.id %}">Open it in the queue admin UI</a></p>
+<p><a href="/">Back</a></p>

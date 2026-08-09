@@ -1,0 +1,39 @@
+{%# admin => { templates => 'root/queue' }
+
+     This directory is a template root searched BEFORE the bundled one,
+     one name at a time - so it holds exactly the template it changes
+     (this one), and overview/jobs/workers/locks/crons/layout all keep
+     coming from the dist. Upgrade Punk::Queue and the six you did not
+     touch move with it.
+
+     Which root serves which name is decided at registration, so a
+     misspelled filename here is a boot croak, not a page that silently
+     stays ours.
+
+     Every template renders with: prefix, title, page, version, live,
+     csrf_cookie, nav, styles, scripts (and id, on the job page). The
+     layout also gets `content`.
+%}
+<h1 class="page-title">Overview</h1>
+
+<div class="pq-panel pq-mailer-note">
+  <strong>Punk Mailer</strong> - this UI is mounted inside the application
+  at <code>{% prefix %}</code>, behind the same guard stack as the rest of
+  it. <a href="/">Back to the app</a>.
+</div>
+
+<div class="pq-panel">
+  <div id="pqStats" class="stats-bar stats-bar-stretch"></div>
+</div>
+<div class="pq-panel">
+  <h2>Last 24 hours</h2>
+  <div id="pqHistory"></div>
+</div>
+<div class="pq-panel pq-detail">
+  <dl>
+    <dt>Schema version</dt><dd id="pqSchema">-</dd>
+    <dt>Workers alive</dt><dd id="pqWorkersAlive">-</dd>
+    <dt>Lifetime enqueued</dt><dd id="pqEnqueued">-</dd>
+    <dt>punk-queue</dt><dd>{% version %}</dd>
+  </dl>
+</div>

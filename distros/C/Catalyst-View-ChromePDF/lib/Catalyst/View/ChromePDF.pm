@@ -21,7 +21,7 @@ use namespace::autoclean;
 
 use experimental qw( signatures try );
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 Log::Log4perl->easy_init($WARN);
 
@@ -216,7 +216,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords PDFs TT compatability html mech pdf tmpdir wkhtmltopdf
+=for stopwords PDFs TT html mech pdf tmpdir wkhtmltopdf
 
 =head1 NAME
 
@@ -224,7 +224,7 @@ Catalyst::View::ChromePDF - convert HTML (or TT) content to PDF using Chrome
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
 
 =head1 SYNOPSIS
 
@@ -295,7 +295,7 @@ This is the template view. It defaults to "TT" for L<Catalyst::View::TT>.
 
 It defaults to "pdf".
 
-Note: for L<Catalyst::View::Wkhtmltopdf> compatability, use "wk".
+Note: for L<Catalyst::View::Wkhtmltopdf> compatibility, use "wk".
 
 =head2 chrome_args
 
@@ -309,7 +309,7 @@ This is the paper format. It defaults to C<undef>.
 
 =head2 page_size
 
-This is an alias for L</format>, for compatability with L<Catalyst::View::Wkhtmltopdf>.
+This is an alias for L</format>, for compatibility with L<Catalyst::View::Wkhtmltopdf>.
 
 =head2 orientation
 
@@ -359,7 +359,7 @@ This is the format or paper size.
 
 =head2 page_size
 
-This is the same as C<format>, but is added for compatability with L<Catalyst::View::Wkhtmltopodf>.
+This is the same as C<format>, but is added for compatibility with L<Catalyst::View::Wkhtmltopodf>.
 
 =head2 paper_width
 
@@ -371,7 +371,7 @@ These are in inches, as that is what L<WWW::Mechanize::Chrome> uses.
 
 =head2 orientation
 
-=head1 COMPATABILITY
+=head1 COMPATIBILITY
 
 =head2 Differences from Catalyst::View::Wkhtmltopdf
 
@@ -408,6 +408,13 @@ Some of these options may be added in the future.
 =back
 
 =head1 SECURITY CONSIDERATIONS
+
+=head2 HTML
+
+It is assumed that the content of the rendered HTML that as saved as a PDF is controlled and trusted by the developer.
+
+The default configuration of L</mech> does not block C<file:> URLs.
+That is a feature, not a bug or oversight.
 
 =head2 Temporary Files
 

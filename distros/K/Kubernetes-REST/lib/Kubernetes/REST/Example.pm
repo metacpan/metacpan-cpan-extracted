@@ -1,6 +1,6 @@
 package Kubernetes::REST::Example;
 # ABSTRACT: Working examples for Kubernetes::REST with Minikube, K3s, and other clusters
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 1;
 
 __END__
@@ -15,7 +15,7 @@ Kubernetes::REST::Example - Working examples for Kubernetes::REST with Minikube,
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 

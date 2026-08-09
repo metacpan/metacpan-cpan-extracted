@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.03';
+    $VERSION = '0.04';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -357,6 +357,10 @@ Load and register a plugin; see L<Punk::Plugin>.
     helper uid => sub { my ($c) = @_; $c->stash->{uid} };
 
 Install a context helper method (usually done from plugins).
+
+Plugins add keywords of their own with
+C<< $app->install_kw(name => sub {...}) >>; see L<Punk::Plugin/KEYWORDS OF
+YOUR OWN>. They behave exactly like the ones above.
 
 =head2 to_app
 

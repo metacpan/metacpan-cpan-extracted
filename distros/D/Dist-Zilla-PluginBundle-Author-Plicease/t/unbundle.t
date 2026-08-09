@@ -1,5 +1,5 @@
 use Test2::V0 -no_srand => 1;
-use 5.020;
+use 5.022;
 use Test::Script;
 
 script_compiles 'example/unbundle.pl';

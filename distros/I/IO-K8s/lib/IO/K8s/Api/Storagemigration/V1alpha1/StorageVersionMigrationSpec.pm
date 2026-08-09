@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storagemigration::V1alpha1::StorageVersionMigrationSpec;
 # ABSTRACT: Spec of the storage version migration.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s continueToken => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Storagemigration::V1alpha1::StorageVersionMigrationSpec - Spec of 
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 continueToken
 

@@ -1,5 +1,19 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.4801 2026-08-09T02:25:06Z
+
+    - Fix tests to exercise the scripts under test, and run them with
+      the perl running the test, rather than an installed copy or an
+      unrelated interpreter found earlier in PATH (issue #8)
+
+4.48 2026-08-03T11:43:56Z
+
+    - watchdiff: fix regression introduced in 4.42 which made the
+      command never executed at all, showing only the date header
+    - watchdiff: restore multiple --exec support documented in
+      SYNOPSIS (watchdiff -e uptime -e iostat -e df)
+    - Add tests to verify watchdiff actually executes commands
+
 4.4701 2026-06-19T04:59:32Z
 
     - Skip mecab test when mecab has no usable dictionary

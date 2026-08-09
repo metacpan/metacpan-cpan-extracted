@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::cisco_fmc;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::cisco_fmc - Cisco Firepower Management C
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -261,22 +261,44 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Returns the token generation endpoint URL.
+# Internal helper. Returns the URL of the FMC authentication endpoint that
+# issues API tokens.
+#
+# FMC does not accept credentials on the calls that do the work. A short lived
+# token has to be obtained first and then sent on every following request, so
+# this endpoint is hit once at init and again whenever a token needs
+# refreshing. Note it lives under the fmc_platform API rather than the
+# fmc_config one the object calls use.
+#
+# Takes no arguments; the host comes from the options.
+#
+# Returns the endpoint as a string.
+#
+#     $self->_token_url;
+#     #   https://fmc.example.org/api/fmc_platform/v1/auth/generatetoken
 sub _token_url {
 	my ($self) = @_;
 
 	return 'https://' . $self->{options}{host} . '/api/fmc_platform/v1/auth/generatetoken';
 }
 
-# Internal helper. Returns the Network Group object URL.
+# Internal helper. Returns the URL of the FMC Network Group object this
+# instance manages.
+#
+# This is the single object every ban and unban rewrites; the backend does not
+# create it, and it is expected to already exist and be referenced by an
+# access control policy. The URL is built from the domain UUID and the group's
+# own UUID rather than from names, since that is how the fmc_config API
+# addresses objects.
+#
+# Takes no arguments; the host, domain, and group id all come from the
+# options.
+#
+# Returns the URL as a string, used for both the GET that reads the object and
+# the PUT that replaces it.
+#
+#     $self->_group_url;
+#     #   https://fmc.example.org/api/fmc_config/v1/domain/e276abec-.../object/networkgroups/0050568A-...
 sub _group_url {
 	my ($self) = @_;
 
@@ -289,8 +311,34 @@ sub _group_url {
 		. $self->{options}{group_id};
 } ## end sub _group_url
 
-# Internal helper. Renders the full Network Group object body from the current
-# set of banned IPs, sorted, each as a Host literal. Returns the JSON string.
+# Internal helper. Renders the complete Network Group object body from the
+# current bans, which is what gets PUT back to replace it.
+#
+# FMC offers no incremental add or remove for group literals, so every ban and
+# unban rewrites the whole object. The name and id have to be included in the
+# body as well as in the URL, since a PUT replaces the object outright and
+# omitting them would blank them.
+#
+# Single addresses and ranges both become literals but with different types,
+# Host for an address and Network for a range, which is why the two internal
+# lists are walked separately. They are emitted as two sorted runs rather than
+# one merged sorted list, so the hosts come first and the networks after. That
+# is stable, which is what matters for the test_data comparisons, just not
+# globally sorted.
+#
+# Takes no arguments; the bans come from the object's banned and banned_cidr
+# hashes.
+#
+# Returns the object body as a JSON string, ready to be the content of a PUT
+# to _group_url. With nothing banned the literals array is empty, which is how
+# teardown and flush clear the group.
+#
+#     # with 10.0.0.1 and 10.0.0.0/8 banned
+#     $self->_render;
+#     #   {"id":"0050568A-...","literals":[{"type":"Host","value":"10.0.0.1"},{"type":"Network","value":"10.0.0.0/8"}],"name":"blocklist"}
+#
+#     # with nothing banned
+#     #   {"id":"0050568A-...","literals":[],"name":"blocklist"}
 sub _render {
 	my ($self) = @_;
 
@@ -311,10 +359,57 @@ sub _render {
 	);
 } ## end sub _render
 
-# Internal helper. Performs a HTTP request via LWP::UserAgent, sending the
-# X-auth-access-token header, returning the decoded JSON body (or undef for an
-# empty body) and dying with an explanation on any HTTP level failure. Never
-# called in testing mode.
+# Internal helper. Performs one HTTP request against the FMC configuration
+# API. Every call this backend makes other than the token fetch itself goes
+# through here.
+#
+# Authentication is the token obtained by _generate_token, sent in the
+# X-auth-access-token header. The header is only added when a token is
+# actually set, so a request made before authentication simply goes out
+# unauthenticated and fails at the server rather than dying on an undef here.
+#
+# Note there is no automatic token refresh. FMC tokens expire, and when one
+# does the next call fails like any other error rather than being retried, so
+# a long lived process relies on the self heal path to re-init and
+# reauthenticate.
+#
+# The user agent is normally already built and cached on the object by
+# _generate_token, since that runs first; it is built here on first use if
+# not. LWP::UserAgent is loaded with require rather than at compile time,
+# since only the HTTP backends need it. The insecure option turns off
+# certificate verification, which is there because an FMC commonly presents a
+# self signed certificate.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# A body that fails to decode as JSON is not fatal; the decode runs inside its
+# own eval and leaves the result undef.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string: 'GET' to read the Network
+#              Group, 'PUT' to replace it.
+#
+#     url    - The full URL to request, as a plain string, normally
+#              _group_url.
+#
+#     body   - Optional request body, as an already encoded JSON string,
+#              normally from _render. undef for a GET.
+#
+# Returns the decoded response body as whatever structure the JSON held,
+# normally a hashref, or undef when the response body was empty or did not
+# parse. Dies on any non success HTTP status.
+#
+#     my $decoded = $self->_request( 'GET', $self->_group_url );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'PUT', $self->_group_url, $self->_render ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -360,9 +455,43 @@ sub _request {
 	return $decoded;
 } ## end sub _request
 
-# Internal helper. POSTs the credentials to the token generation endpoint via
-# HTTP Basic auth and stores the returned X-auth-access-token header. Dies on
-# failure. Never called in testing mode.
+# Internal helper. Authenticates against FMC and stores the resulting API
+# token on the object for the following requests to use.
+#
+# FMC's authentication is unusual in two ways worth knowing. The credentials
+# go up as HTTP basic auth, but only to this one endpoint, and the token comes
+# back in a response header rather than in the body, so there is nothing to
+# parse: the X-auth-access-token header is the whole answer.
+#
+# The user agent is built here on first use and cached on the object, since
+# this normally runs before any other request. LWP::UserAgent is loaded with
+# require at that point rather than at compile time, since only the HTTP
+# backends need it; failing to load it dies with an explanation naming this
+# backend. The insecure option turns off certificate verification, which is
+# there because an FMC commonly presents a self signed certificate.
+#
+# MIME::Base64 is required at call time for the same reason. Note the second
+# argument to encode_base64 is an empty string, which suppresses the line
+# wrapping it would otherwise insert and which would corrupt the header.
+#
+# A response that succeeds but carries no token is treated as a failure rather
+# than being allowed through, since storing an empty token would turn one
+# clear error here into an authentication failure on every following call.
+#
+# Dies on any failure rather than setting an error; the callers wrap it in
+# eval. Never called in testing mode.
+#
+# Takes no arguments; the credentials come from the options.
+#
+# Returns nothing. The result is the side effect of setting the token
+# attribute on the object, which _request then sends as X-auth-access-token.
+#
+#     $self->_generate_token;
+#     # $self->{token} is now set
+#
+#     # the usual shape at the call sites
+#     eval { $self->_generate_token; };
+#     if ($@) { ... raise backendInitError ... }
 sub _generate_token {
 	my ($self) = @_;
 
@@ -583,24 +712,6 @@ sub unban {
 	}
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range. The value of ban is validated as being a IPv4 or IPv6 CIDR
@@ -794,13 +905,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from

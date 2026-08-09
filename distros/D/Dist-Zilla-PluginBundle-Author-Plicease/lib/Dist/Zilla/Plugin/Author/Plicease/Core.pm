@@ -1,10 +1,11 @@
-package Dist::Zilla::Plugin::Author::Plicease::Core 2.79 {
+package Dist::Zilla::Plugin::Author::Plicease::Core 2.80 {
 
-  use 5.020;
+  use 5.022;
   use Moose;
   use Module::CoreList ();
   use version ();
-  use experimental qw( postderef );
+  use experimental qw( signatures postderef );
+  use true;
 
   # ABSTRACT: Handle core prereqs
   # VERSION
@@ -27,10 +28,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Core 2.79 {
     default => sub { { } },
   );
 
-  sub register_prereqs
+  sub register_prereqs ( $self )
   {
-    my($self) = @_;
-
     my $prereqs = $self->zilla->prereqs->as_string_hash;
 
     foreach my $phase (keys %$prereqs)
@@ -60,9 +59,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Core 2.79 {
     }
   }
 
-  sub setup_installer
+  sub setup_installer ( $self )
   {
-    my($self) = @_;
     foreach my $file (grep { $_->name =~ /^(Makefile\.PL|Build\.PL)$/ } $self->zilla->files->@*)
     {
       my $content = $file->content;
@@ -103,10 +101,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Core 2.79 {
 
   }
 
-
 }
-
-1;
 
 __END__
 
@@ -120,7 +115,7 @@ Dist::Zilla::Plugin::Author::Plicease::Core - Handle core prereqs
 
 =head1 VERSION
 
-version 2.79
+version 2.80
 
 =head1 AUTHOR
 
@@ -128,7 +123,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2022 by Graham Ollis.
+This software is copyright (c) 2012-2024 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

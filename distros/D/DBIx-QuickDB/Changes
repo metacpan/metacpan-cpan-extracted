@@ -1,3 +1,18 @@
+0.000064  2026-08-08 17:32:34-07:00 America/Los_Angeles
+
+    - Test machinery only, no runtime change: a host that runs out of System V
+      IPC partway through a Pool test now skips the rest as intended. The
+      signal could not survive the two boundaries it had to cross -- require
+      stringifies an exception thrown from the file it is loading, and subtest
+      turns one into a failure without rethrowing -- so the Pool wrappers never
+      recognized it and failed instead. FreeBSD smokers hit this on every
+      0.000063 run.
+
+    - Test machinery only, no runtime change: when an isolated per-install
+      child dies without leaving TAP, the parent now reports how it died, the
+      phase it had reached, and the last Test2 context it recorded. Before,
+      the harness could only say "Tests: 0 / No plan found in TAP output".
+
 0.000063  2026-08-07 13:00:01-07:00 America/Los_Angeles
 
     - Fixed t/watcher_inc_args.t on MSWin32, where Cwd::abs_path and

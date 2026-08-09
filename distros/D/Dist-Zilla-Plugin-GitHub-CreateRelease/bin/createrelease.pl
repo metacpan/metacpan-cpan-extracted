@@ -108,10 +108,10 @@ class GitHub::Release {
         $trial = $setting ? JSON::MaybeXS::true : JSON::MaybeXS::false;
     }
 
-    method get_identity($org = '') {
+    method get_identity($org_id = '') {
         my @fields = ("login", "token");
-        my %identity = Config::Identity->load_check($org, \@fields);
-        die "Unable to load github token from ~/.$org-identity or ~/.$org"
+        my %identity = Config::Identity->load_check($org_id, \@fields);
+        die "Unable to load github token from ~/.$org_id-identity or ~/.$org_id"
             if (! defined $identity{token});
         return %identity;
     }
@@ -140,11 +140,18 @@ class GitHub::Release {
     }
 
     method get_repo_name {
-        my $setting = "remote." . $remote_name . ".url";
-        $self->log("Release will be created using $setting\n");
         my $git = Git::Wrapper->new('./');
         my @url;
         use Try::Tiny;
+        try {
+            @url = $git->RUN('config', '--get', 'branch.main.remote');
+            $remote_name = $url[0];
+        }
+        catch {
+            $self->log("Unable to find git \'branch.main.remote\' using git config --get branch.main.remote\n");
+        };
+        my $setting = "remote." . $remote_name . ".url";
+        $self->log("Release will be created using $setting\n");
         try {
             @url = $git->RUN('config', '--get', $setting);
         }
@@ -172,7 +179,7 @@ class GitHub::Release {
 
         #FIXME there must be a better way...
         my $basename = URI::Escape::uri_unescape( File::Basename::basename(URI->new( $url[0])->path));
-        $basename =~ s/.git//;
+        $basename =~ s/\.git$//;
         $self->log("Release will be created using $basename");
 
         return $basename;
@@ -360,7 +367,7 @@ class GitHub::Release {
         };
 
         my $changes = CPAN::Changes->load($notes_file);
-        my $notes = $changes->release($tags[0])->serialize();
+        my $notes = $changes->find_release($tags[0])->serialize();
         return $self->_as_code($notes) if (! $add_checksum);
 
         $notes .= "\n" . $self->get_checksum($filename);
@@ -446,11 +453,6 @@ $release->set_trial($prod ? 0 : $prod);
 $release->set_draft($draft);
 $release->set_version($version);
 $release->set_config_filename($configfile ? $configfile : '');
-
-print "Trial: " . $release->get_trial() . "\n";
-print "Draft: " . $release->get_draft() . "\n";
-print "Version: " . $release->get_version() . "\n";
-
 print "Dist-Name: ", $release->get_dist_filename($version), "\n";
 print "File name: " , $release->get_config_filename($configfile) ,"\n" if $configfile;
 $release->set_filename($release->get_dist_filename($release->get_version()));
@@ -468,7 +470,7 @@ create_release.pl - Helper script to create a GitHub Release
 
 =head1 VERSION
 
-version 0.0009
+version 0.0010
 
 =head1 AUTHOR
 

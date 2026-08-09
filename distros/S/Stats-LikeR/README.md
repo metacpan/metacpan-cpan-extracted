@@ -2068,10 +2068,13 @@ positions.
 
 ### Good to know
 
-- **Returns a new data frame; the original is never modified.** For HoA the
-  columns are rebuilt (cell values copied); for AoA and AoH the surviving row
-  references are reused, not deep-copied. Clone the result if you need full
-  independence.
+- **Returns a new data frame; the original is never modified.** What survives
+  is shared, not deep-copied: for AoA and AoH the surviving row references are
+  reused, and for HoA the column arrays are new but hold the same cell SVs. So
+  the frame, and an HoA's column arrays, can be reshaped without touching the
+  input — but assigning *through* a survivor (`$out->{col}[0] = ...`, or
+  `$out->[0]{col} = ...` for AoA/AoH) writes to the input's cell as well.
+  Clone the result if you need full independence.
 - **It dies** on: undefined or non-ref data; an HoH frame; an unknown argument;
   an empty or duplicated `subset`; an invalid `keep`; an AoA position that is
   not a non-negative integer or is out of range; or a `subset` name absent from
@@ -5958,6 +5961,73 @@ Verified against R 4.6.1 (`oneway.test`, `anova(aov())`, `anova(lm())`,
 `t/model_pvalue_tails.t` and `t/oneway_test.R.scipy.t`.
 
 # Changes
+
+## 0.295 2026-08
+
+bug fix https://www.cpantesters.org/cpan/report/0f13fed6-92f5-11f1-b043-dc326e8775ea
+
+Removed `restrict` where it made no difference, or was potentially dangerous
+
+### drop_duplicates, merge, value_counts
+
+These three decide what counts as the same row, the same join key, or the same
+value by a cell's Perl stringification, and on numeric columns that one
+conversion was most of the work they did.
+
+`sv_2pv_flags()` renders an NV with `snprintf("%.*g", NV_DIG, x)`, about 140 ns
+a cell, and — unlike the IV case, where `SvPOK_or_cached_IV` lets the `SvPV`
+macros hand back the string perl cached on the SV — it never reuses that PV, so
+every pass over a column of doubles paid the conversion again. It does leave the
+buffer behind, which is why keying a frame used to grow the caller's own numeric
+columns by about 64 bytes a cell, permanently: reading a frame ought to be a
+read.
+
+`nk_num_pv()` now renders bare integers and bare doubles into the caller's own
+scratch buffer instead, and leaves the SV untouched. Its double path is `%.15g`
+about four times faster than the C library's, and taken only where the answer is
+provably the same: the magnitude is scaled into `[1e14, 1e15)` in `long double` —
+64 mantissa bits against the double's 53 — which bounds the scaled value's error
+under 2e-4, so a fractional part further than 2e-3 from one half rounds exactly
+as the true value would. About one cell in 300 lands nearer than that and goes
+back through `SvPV`, as do zero, the non-finite values, `use locale`, an x87
+control word left at double precision, and any build whose NV is not an IEEE
+double. It agreed with the C library's own `%.15g` over 90 million random bit
+patterns; `t/drop_duplicates.t`, `t/merge.t` and `t/value_counts.t` now group
+tens of thousands of doubles both ways and require the two answers to match.
+
+Two further changes in `drop_duplicates` alone:
+
+- Its interning table started at 64 slots and doubled, so a pass over 10,000
+  distinct rows rehashed nine times, each one a scattered walk over a table too
+  big for L2. The row count is known before the pass starts and bounds the group
+  count, so it is now used as the hint — capped, so a large frame of few distinct
+  rows does not pay for a slot per row.
+- An HoA result copied every surviving cell, while AoA and AoH already shared the
+  whole surviving row. It now shares the cells too. **This is a behaviour
+  change.** The frame, and an HoA's column arrays, are still new, so they can be
+  reshaped without touching the input; but assigning *through* a survivor —
+  `$out->{col}[0] = ...` — now writes to the input's cell, exactly as
+  `$out->[0]{col} = ...` always did for AoA and AoH. Clone the result if you need
+  full independence.
+
+Measured on the 10,000-row frame `benchmark.pl` uses (five columns: two doubles,
+one integer, two strings), on one machine, with only these paths toggled. Time is
+the median of 25 calls in one process; RAM is `benchmark.pl`'s own figure, the
+`VmRSS` delta of a forked child running the call once, median of nine. The string
+row is there to show where the win is not: it is confined to numeric cells.
+
+| Call | Time before | Time after | RAM before | RAM after |
+|---|---|---|---|---|
+| `drop_duplicates($hoa)` | 5.45 ms | 1.88 ms (2.9x) | 5.36 MB | 1.45 MB (3.7x) |
+| `merge`, inner join on an integer key | 7.78 ms | 5.62 ms (1.4x) | 7.41 MB | 6.41 MB (1.2x) |
+| `merge`, inner join on a double key | 10.28 ms | 5.91 ms (1.7x) | 7.12 MB | 6.42 MB (1.1x) |
+| `value_counts` on a double column | 2.98 ms | 1.66 ms (1.8x) | 1.98 MB | 1.55 MB (1.3x) |
+| `value_counts` on a string column | 0.215 ms | 0.220 ms | 0.69 MB | 0.71 MB |
+
+`group_by` and `pivot_table` were left alone: `group_by` hands the cell SV
+straight to `hv_fetch_ent`, so perl does the stringification internally and
+reaching it means byte-level `hv_*` calls and a change to how UTF-8 keys are
+handled, and `pivot_table` is pure Perl.
 
 ## 0.294 2026-08-07 CDT
 

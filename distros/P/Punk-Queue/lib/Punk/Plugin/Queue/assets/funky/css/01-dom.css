@@ -1,0 +1,339 @@
+/* ==========================================================================
+   Dom vs VDom Demo Styles
+   ========================================================================== */
+
+.dom-demo {
+  width: 100%;
+}
+
+.dom-demo__wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dom-demo__description {
+  color: var(--pro-text-secondary);
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem;
+}
+
+/* Panels Grid */
+.dom-demo__panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .dom-demo__panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Individual Panel */
+.dom-demo__panel {
+  background: var(--pro-bg-secondary);
+  border: 1px solid var(--pro-border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dom-demo__panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dom-demo__panel-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--pro-text-primary);
+}
+
+.dom-demo__panel-subtitle {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--pro-text-secondary);
+}
+
+.dom-demo__panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Badge */
+.dom-demo__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.dom-demo__badge--winner {
+  background: var(--pro-success-bg, rgba(16, 185, 129, 0.1));
+  color: var(--pro-success, #10b981);
+}
+
+/* Result Scroll Area */
+.dom-demo__result-scroll {
+  max-height: 150px;
+  overflow: auto;
+  border: 1px solid var(--pro-border-color);
+  border-radius: 4px;
+  background: var(--pro-bg-primary);
+}
+
+/* Timing Display */
+.dom-demo__timing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  padding-top: 0.5rem;
+}
+
+.dom-demo__timing-label {
+  color: var(--pro-text-secondary);
+}
+
+.dom-demo__timing-value {
+  color: var(--pro-text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Actions */
+.dom-demo__actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+/* Cards (benchmark items) */
+.dom-demo__card {
+  padding: 0.75rem;
+  background: var(--pro-bg-primary);
+  border: 1px solid var(--pro-border-color);
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+}
+
+.dom-demo__card h5 {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pro-text-primary);
+}
+
+.dom-demo__card p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--pro-text-secondary);
+}
+
+/* List Items */
+.dom-demo__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dom-demo__list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--pro-bg-primary);
+  border-bottom: 1px solid var(--pro-border-color);
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.dom-demo__list-item:last-child {
+  border-bottom: none;
+}
+
+.dom-demo__list-item--updated {
+  background: var(--pro-warning-bg, rgba(245, 158, 11, 0.15));
+}
+
+.dom-demo__list-num {
+  color: var(--pro-primary);
+  font-weight: 600;
+  min-width: 3rem;
+}
+
+.dom-demo__list-text {
+  flex: 1;
+  color: var(--pro-text-primary);
+}
+
+.dom-demo__list-badge {
+  font-size: 0.625rem;
+}
+
+/* Update Button */
+.dom-demo__update-btn {
+  margin-top: 0.5rem;
+}
+
+/* Button Group */
+.dom-demo__btn-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+/* Target Box (manipulate demo) */
+.dom-demo__target-box {
+  padding: 2rem;
+  background: var(--pro-bg-primary);
+  border: 2px solid var(--pro-border-color);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--pro-text-secondary);
+  transition: all 0.3s ease;
+}
+
+.dom-demo__target-box--active {
+  background: var(--pro-primary);
+  border-color: var(--pro-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Explanation (VDom panel in manipulate) */
+.dom-demo__explanation {
+  padding: 1rem;
+  background: var(--pro-bg-primary);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--pro-text-secondary);
+  line-height: 1.6;
+}
+
+.dom-demo__explanation p {
+  margin: 0 0 0.75rem;
+}
+
+.dom-demo__explanation p:last-child {
+  margin-bottom: 0;
+}
+
+.dom-demo__explanation ol {
+  margin: 0.5rem 0 0.75rem 1.25rem;
+  padding: 0;
+}
+
+.dom-demo__explanation li {
+  margin-bottom: 0.25rem;
+}
+
+/* Insight Box */
+.dom-demo__insight {
+  padding: 0.75rem 1rem;
+  background: var(--pro-bg-secondary);
+  border-left: 3px solid var(--pro-primary);
+  border-radius: 0 4px 4px 0;
+  font-size: 0.875rem;
+  color: var(--pro-text-secondary);
+}
+
+.dom-demo__insight strong {
+  color: var(--pro-text-primary);
+}
+
+/* Guide Table */
+.dom-demo__guide-table {
+  overflow-x: auto;
+}
+
+.dom-demo__guide-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.dom-demo__guide-table thead tr {
+  border-bottom: 2px solid var(--pro-border-color);
+}
+
+.dom-demo__guide-table th {
+  text-align: left;
+  padding: 0.75rem;
+  color: var(--pro-text-primary);
+  font-weight: 600;
+}
+
+.dom-demo__guide-table th:nth-child(2),
+.dom-demo__guide-table th:nth-child(3) {
+  text-align: center;
+}
+
+.dom-demo__guide-table tbody tr {
+  border-bottom: 1px solid var(--pro-border-color);
+}
+
+.dom-demo__guide-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.dom-demo__guide-table td {
+  padding: 0.75rem;
+  color: var(--pro-text-secondary);
+}
+
+.dom-demo__guide-table td:nth-child(2),
+.dom-demo__guide-table td:nth-child(3) {
+  text-align: center;
+}
+
+.dom-demo__guide-table .dom-demo__winner {
+  color: var(--pro-success, #10b981);
+  font-weight: 600;
+}
+
+/* Summary */
+.dom-demo__summary {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--pro-bg-secondary);
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.dom-demo__summary strong {
+  color: var(--pro-text-primary);
+}
+
+.dom-demo__summary ul {
+  margin: 0.5rem 0 0 1.25rem;
+  padding: 0;
+  color: var(--pro-text-secondary);
+}
+
+.dom-demo__summary li {
+  margin-bottom: 0.25rem;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .dom-demo__target-box,
+  .dom-demo__list-item {
+    transition: none;
+  }
+}

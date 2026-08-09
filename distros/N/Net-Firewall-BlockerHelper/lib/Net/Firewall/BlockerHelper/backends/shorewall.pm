@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::shorewall;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::shorewall - Shorewall backend for Net::F
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -239,9 +239,32 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the shorewall command to use for the passed IP,
-# picking shorewall_cmd for IPv4 addresses and shorewall6_cmd for IPv6
-# addresses.
+# Internal helper. Picks which of the two shorewall binaries to run for the
+# passed IP.
+#
+# Shorewall splits IPv4 and IPv6 across two separate programs with separate
+# configuration and separate dynamic blacklists, so unlike the backends that
+# pass a family flag to a single binary, here the family decides which command
+# is invoked. Handing an IPv6 address to shorewall rather than shorewall6
+# would be rejected, so this choice has to be made for every ban and unban.
+#
+# Args:
+#
+#     ip - The address the command will act on, as a plain string. Expected to
+#          be an already validated and lowercased IPv4 or IPv6 address. The
+#          family is decided by matching against $IPv4_re, so anything that is
+#          not valid IPv4 is treated as IPv6.
+#
+# Returns the command as a plain string, from either the shorewall_cmd option,
+# 'shorewall' by default, or the shorewall6_cmd option, 'shorewall6' by
+# default. Only the program is returned; the subcommand and the address are
+# appended by the caller.
+#
+#     $self->_cmd_for('10.0.0.1');      # shorewall
+#     $self->_cmd_for('2001:db8::1');   # shorewall6
+#
+#     # as used when building a ban
+#     my $command = $self->_cmd_for($ip) . ' drop ' . $ip;
 sub _cmd_for {
 	my ( $self, $ip ) = @_;
 
@@ -435,24 +458,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range. Shorewall's dynamic blacklisting accepts a network prefix
@@ -596,9 +601,31 @@ sub unban_cidr {
 	delete( $self->{banned_cidr}{ $opts{ban} } );
 } ## end sub unban_cidr
 
-# Internal helper. Like _cmd_for but for a CIDR range, picking
-# shorewall_cmd for IPv4 ranges and shorewall6_cmd for IPv6 ranges based
-# on the address portion of the range.
+# Internal helper. The CIDR counterpart of _cmd_for: picks which of the two
+# shorewall binaries to run for the passed range.
+#
+# A separate sub rather than a wider _cmd_for because the family has to be
+# read off the address portion of the range, not off the whole string. A range
+# always holds a "/" and a prefix length, which would never match the IPv4
+# regexp, so passing a range straight to _cmd_for would silently select
+# shorewall6 for every range including IPv4 ones.
+#
+# Args:
+#
+#     cidr - The range the command will act on, as a plain string. Expected to
+#            be an already validated CIDR range such as "10.0.0.0/8" or
+#            "2001:db8::/32". The address is split off at the "/" and matched
+#            against $IPv4_re; anything that does not parse as a range with an
+#            IPv4 address, including a bare address with no prefix, is treated
+#            as IPv6.
+#
+# Returns the command as a plain string, from either the shorewall_cmd option,
+# 'shorewall' by default, or the shorewall6_cmd option, 'shorewall6' by
+# default. Only the program is returned; the subcommand and the range are
+# appended by the caller.
+#
+#     $self->_cmd_for_cidr('10.0.0.0/8');      # shorewall
+#     $self->_cmd_for_cidr('2001:db8::/32');   # shorewall6
 sub _cmd_for_cidr {
 	my ( $self, $cidr ) = @_;
 
@@ -665,13 +692,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants

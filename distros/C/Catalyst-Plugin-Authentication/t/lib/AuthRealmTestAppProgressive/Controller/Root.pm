@@ -15,7 +15,7 @@ sub progressive : Local {
             my $ok = eval {
                 $c->authenticate(
                     { username => $user, password => $info->{password} },
-                ); 
+                );
             };
             ok( !$@, "authentication passed." );
             ok( $ok, "user authenticated" );

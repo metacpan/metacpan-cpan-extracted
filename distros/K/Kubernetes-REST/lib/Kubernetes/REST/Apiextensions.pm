@@ -1,5 +1,5 @@
 package Kubernetes::REST::Apiextensions;
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 # ABSTRACT: DEPRECATED - v0 API group for API Extensions resources
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::Apiextensions - DEPRECATED - v0 API group for API Extensions r
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 

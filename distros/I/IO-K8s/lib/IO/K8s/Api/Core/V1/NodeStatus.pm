@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeStatus;
 # ABSTRACT: NodeStatus is information about the current status of a node.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s addresses => ['Core::V1::NodeAddress'];
@@ -19,6 +19,9 @@ k8s config => 'Core::V1::NodeConfigStatus';
 
 
 k8s daemonEndpoints => 'Core::V1::NodeDaemonEndpoints';
+
+
+k8s declaredFeatures => [Str];
 
 
 k8s features => 'Core::V1::NodeFeatures';
@@ -56,7 +59,7 @@ IO::K8s::Api::Core::V1::NodeStatus - NodeStatus is information about the current
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 addresses
 
@@ -81,6 +84,10 @@ Status of the config assigned to the node via the dynamic Kubelet config feature
 =head2 daemonEndpoints
 
 Endpoints of daemons running on the Node.
+
+=head2 declaredFeatures
+
+DeclaredFeatures is the list of feature names that a Node has declared support for. This field is populated by the kubelet and reflects the features it is capable of, regardless of whether the corresponding feature gates are enabled on the API server.
 
 =head2 features
 

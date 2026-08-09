@@ -1,5 +1,49 @@
 Revision history for Kubernetes-REST
 
+1.106     2026-08-08 19:03:58Z
+
+ - Fix "HTTP::Message content must be bytes" on any request body containing
+   a non-ASCII character. The internal JSON encoder now uses utf8 => 1 (plus
+   canonical and convert_blessed), so request bodies leave as UTF-8 bytes.
+   Applying manifests with e.g. a section sign or an en dash in a
+   description -- the upstream cert-manager CRDs, among others -- died
+   before ever reaching the cluster.
+ - Fix silent mojibake on non-ASCII response values under the default LWP
+   backend. LWPIO used decoded_content(), handing back characters that
+   IO::K8s then decoded a second time; it now uses
+   decoded_content(charset => 'none'), matching HTTPTinyIO. Both backends
+   now inflate identical objects from identical bytes, which t/24_encoding.t
+   pins.
+ - Response bodies and streaming chunks are bytes across every IO backend --
+   documented in Kubernetes::REST::Role::IO as the encoding contract that
+   custom backends must honour, and in a new ENCODING section in
+   Kubernetes::REST. Objects handed to and returned by the API carry
+   characters; log() output stays bytes, as container output is not
+   guaranteed to be text.
+ - API error messages are now UTF-8 decoded before being croaked, so a
+   non-ASCII error body from the cluster is readable instead of garbled.
+ - The CLI's JSON output encoder now sets utf8, so non-ASCII values print
+   as correct UTF-8 instead of triggering "Wide character in print".
+ - Require IO::K8s 1.105 (was 1.008). IO::K8s has decoded with utf8 => 1
+   since 1.000, so the encoding fix above works on the old minimum too --
+   the bump just tracks the current release.
+ - Move the five packages that shared a file with another package into files
+   of their own: Kubernetes::REST::RemoteError (was in Error.pm) and the
+   four Kubernetes::REST::CLI::Cmd::* command classes (were in CLI.pm). All
+   five reported $VERSION 1.003, the version they were written in, because
+   RewriteVersion and BumpVersionAfterRelease only ever rewrite the first
+   "our $VERSION" per file -- while the metadata reported the release
+   version, so 1.105 shipped a CLI::Cmd::Get saying 1.003 in the code and
+   1.105 in META. One package per file removes the whole class of problem;
+   t/25_one_package_per_file.t keeps it removed.
+ - Kubernetes::REST::RemoteError has to be loaded explicitly now. Loading
+   Kubernetes::REST::Error no longer brings it along -- RemoteError inherits
+   from it, so the parent file has to finish loading first, which a circular
+   use cannot do. Code catching these deprecated exceptions is unaffected;
+   code throwing one needs "use Kubernetes::REST::RemoteError".
+ - Give bin/kube_client and bin/kube_watch a $VERSION of their own; they
+   were the only files in the distribution without one.
+
 1.105     2026-08-08 02:34:04Z
 
  - Remove the old v0 API's per-endpoint Call::* classes (1002) and 10

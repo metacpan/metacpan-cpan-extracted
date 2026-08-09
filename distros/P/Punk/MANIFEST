@@ -158,6 +158,7 @@ t/35-mount.t
 t/38-markdown.t
 t/39-markdown-search.t
 t/40-markdown-abi.t
+t/41-install-kw.t
 t/test/docs/guide/advanced.md
 t/test/docs/guide/diagram.png
 t/test/docs/guide/hidden.md

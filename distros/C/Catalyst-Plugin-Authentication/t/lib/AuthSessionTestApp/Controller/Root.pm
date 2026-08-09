@@ -72,5 +72,18 @@ sub butterfly : Local {
     ok( !$c->user, "no user object either" );
 }
 
-1;
+sub octopus : Local {
+    my ( $self, $c ) = @_;
 
+    my $session_id = $c->sessionid;
+    ok($session_id, "have session id");
+    ok(!$c->user_exists, "no user exists");
+    ok(!$c->user, "no user yet");
+    ok($c->login( "bar", "s3cr3t" ), "can login with clear");
+    is( $c->user, $AuthSessionTestApp::users->{bar}, "user object is in proper place");
+    my $new_session_id = $c->sessionid;
+    ok($new_session_id, "have session id");
+    isnt($new_session_id, $session_id, "session id has changed");
+}
+
+1;

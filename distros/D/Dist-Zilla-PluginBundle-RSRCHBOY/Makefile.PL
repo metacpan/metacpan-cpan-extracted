@@ -11,7 +11,7 @@
 use strict;
 use warnings;
 
-use 5.018000;
+use 5.038000;
 
 use ExtUtils::MakeMaker;
 
@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-RSRCHBOY",
   "LICENSE" => "lgpl",
-  "MIN_PERL_VERSION" => "5.018000",
+  "MIN_PERL_VERSION" => "5.038000",
   "NAME" => "Dist::Zilla::PluginBundle::RSRCHBOY",
   "PREREQ_PM" => {
     "Archive::Tar::Wrapper" => 0,
@@ -129,7 +129,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.078",
+  "VERSION" => "0.079",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::aws_wafv2;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::aws_wafv2 - AWS WAFv2 IP set backend via
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -178,7 +178,31 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the trailing --region argument when configured.
+# Internal helper. Returns the --region argument to append to every aws
+# invocation, or nothing when no region is configured.
+#
+# Emitting the flag only when the option is set is deliberate rather than
+# defaulting to a region here. With it left off, the aws CLI falls back to its
+# own resolution order, the AWS_REGION environment variable and then the
+# profile's configured region, which is what an instance running inside an
+# already configured environment wants. Hardcoding a default would silently
+# override that.
+#
+# Note the CLOUDFRONT scope is only served out of us-east-1, so an instance
+# using that scope needs either the region option or an environment already
+# pointing there.
+#
+# Takes no arguments.
+#
+# Returns the argument as a string with a leading space, ready to be
+# concatenated onto a command, or the empty string when the region option is
+# unset or empty. Never returns undef.
+#
+#     # with the region option set to us-west-2
+#     $self->_region_suffix;    # ' --region us-west-2'
+#
+#     # with no region configured
+#     $self->_region_suffix;    # ''
 sub _region_suffix {
 	my ($self) = @_;
 
@@ -189,8 +213,33 @@ sub _region_suffix {
 }
 
 
-# Internal helper. Returns the (name, id) pair for family 4 or 6, either of
-# which may be undef when not configured.
+# Internal helper. Returns the configured WAFv2 IP set name and id for one
+# address family.
+#
+# A WAFv2 IP set is single family, created as either IPV4 or IPV6, so blocking
+# both means two separate sets on the AWS side. Both a name and an id are
+# needed to address one: the aws CLI requires both on every call, as the name
+# alone is not unique.
+#
+# Either family may be left unconfigured, which is how an instance is told to
+# handle only IPv4 or only IPv6. That is why this returns whatever is there
+# rather than erroring, and why callers go through _family_configured before
+# using the result.
+#
+# Args:
+#
+#     fam - The address family, as the number 4 or 6. Anything other than 4 is
+#           treated as 6, so this is really a two way branch rather than a
+#           validated argument.
+#
+# Returns a two element list of the name and the id, in that order. Either or
+# both may be undef, or set but empty, when that family is not configured.
+#
+#     my ( $name, $id ) = $self->_conf_for_family(4);
+#     #   the name4 and id4 options
+#
+#     my ( $name, $id ) = $self->_conf_for_family(6);
+#     #   the name6 and id6 options, both undef if v6 is not configured
 sub _conf_for_family {
 	my ( $self, $fam ) = @_;
 
@@ -200,7 +249,31 @@ sub _conf_for_family {
 	return ( $self->{options}{name6}, $self->{options}{id6} );
 }
 
-# Internal helper. True if the given family (4 or 6) has both a name and id.
+# Internal helper. Says whether one address family has a usable IP set
+# configured, meaning both a name and an id are present and non empty.
+#
+# Both are required because the aws CLI needs both to address a set; having
+# only one is as useless as having neither and is treated the same way. This
+# is the guard every code path goes through before touching a family, so a
+# half configured family is skipped rather than producing a command with an
+# empty --name or --id that AWS would reject.
+#
+# Args:
+#
+#     fam - The address family, as the number 4 or 6. Anything other than 4 is
+#           treated as 6.
+#
+# Returns 1 when that family has both a name and an id set to something non
+# empty, 0 otherwise. Always one of those two values, never undef.
+#
+#     # with name4 and id4 both set
+#     $self->_family_configured(4);    # 1
+#
+#     # with neither name6 nor id6 set
+#     $self->_family_configured(6);    # 0
+#
+#     # with name6 set but id6 missing: still not usable
+#     $self->_family_configured(6);    # 0
 sub _family_configured {
 	my ( $self, $fam ) = @_;
 
@@ -208,7 +281,31 @@ sub _family_configured {
 	return ( defined($name) && $name ne '' && defined($id) && $id ne '' ) ? 1 : 0;
 }
 
-# Internal helper. Returns the list of configured families (4 and/or 6).
+# Internal helper. Returns which address families this instance actually has
+# IP sets for, which is what every operation loops over.
+#
+# Because a WAFv2 IP set is single family and either family may be left
+# unconfigured, there is no fixed set of things to act on: an instance may
+# manage one set or two. Rather than have init, ban, unban, teardown, and the
+# rest each work that out, they all iterate over this.
+#
+# Takes no arguments.
+#
+# Returns the families as a list of the numbers 4 and 6, in that order,
+# containing only those that are fully configured. May be a single element,
+# and may be empty if neither family is configured, though new rejects that
+# case so it should not arise in practice.
+#
+#     # with both families configured
+#     my @families = $self->_configured_families;    # ( 4, 6 )
+#
+#     # with only IPv4 configured
+#     my @families = $self->_configured_families;    # ( 4 )
+#
+#     # the usual shape at the call sites
+#     foreach my $fam ( $self->_configured_families ) {
+#         $self->_apply_family( $fam, 13, \@commands );
+#     }
 sub _configured_families {
 	my ($self) = @_;
 
@@ -218,9 +315,44 @@ sub _configured_families {
 	return @families;
 }
 
-# Internal helper. Returns the banned IPs and CIDR ranges of the given family,
-# sorted, each as a CIDR, space joined. Single IPs are rendered with an explicit
-# /32 or /128; banned CIDR ranges are already CIDRs and are emitted as is.
+# Internal helper. Renders the current bans belonging to one address family
+# into the address list that update-ip-set takes.
+#
+# WAFv2 IP sets are replace-in-full rather than incremental: there is no add
+# or remove one address call, so every ban and unban rewrites the entire set
+# from the internal state. That is what this produces.
+#
+# Everything is emitted as CIDR, since that is the only form WAFv2 accepts. A
+# single address therefore gets an explicit host prefix appended, /32 or /128
+# by family. Banned ranges already carry a prefix and go out as they are.
+#
+# Single addresses and ranges are pulled from two separate internal lists but
+# land in the same set, since AWS does not distinguish them. The two are
+# emitted as two sorted runs rather than one merged sorted list, so the
+# addresses come first and the ranges after. That is stable, which is what
+# matters for the test_data comparisons, just not globally sorted.
+#
+# The family of a range is decided from the address portion before the prefix,
+# because a range always holds a "/" that would never match the IPv4 regexp.
+#
+# Args:
+#
+#     fam - The address family to render, as the number 4 or 6. Entries of the
+#           other family are skipped. Anything other than 4 behaves as 6.
+#
+# Returns the addresses as a single space joined string, ready to follow
+# --addresses on the command line. Returns the empty string when nothing of
+# that family is banned, which is the correct way to empty a WAFv2 IP set and
+# is what teardown and flush rely on.
+#
+#     # with 10.0.0.1 and 10.0.0.0/8 banned
+#     $self->_render_family(4);      # '10.0.0.1/32 10.0.0.0/8'
+#
+#     # the same instance, asked for v6
+#     $self->_render_family(6);      # ''
+#
+#     # with 2001:db8::1 banned
+#     $self->_render_family(6);      # '2001:db8::1/128'
 sub _render_family {
 	my ( $self, $fam ) = @_;
 
@@ -246,23 +378,98 @@ sub _render_family {
 } ## end sub _render_family
 
 
-# Internal helper. Returns the shared --scope/--name/--id (and --region)
-# arguments identifying an IP set.
+# Internal helper. Returns the arguments that identify one WAFv2 IP set,
+# shared by every command that addresses one.
+#
+# The aws CLI needs all three of scope, name, and id to locate an IP set on
+# each call, plus the region when one is configured. Since both get-ip-set and
+# update-ip-set take exactly the same identifying arguments, they are built
+# once here so the two cannot drift and end up addressing different sets.
+#
+# Args:
+#
+#     name - The IP set's name, as a plain string, from the name4 or name6
+#            option. Expected to be non empty; callers go through
+#            _family_configured first.
+#
+#     id   - The IP set's id, as a plain string, from the id4 or id6 option.
+#            This is the AWS assigned identifier, not something derived from
+#            the name. Also expected to be non empty.
+#
+# Returns the arguments as a single string with a leading space, ready to be
+# concatenated onto a command. The scope comes from the scope option, which is
+# 'REGIONAL' by default and may also be 'CLOUDFRONT'.
+#
+#     $self->_set_suffix( 'blocklist-v4', 'a1b2c3d4-...' );
+#     #   ' --scope REGIONAL --name blocklist-v4 --id a1b2c3d4-...'
+#
+#     # with the region option set, it is appended
+#     #   ' --scope REGIONAL --name blocklist-v4 --id a1b2c3d4-... --region us-west-2'
 sub _set_suffix {
 	my ( $self, $name, $id ) = @_;
 
 	return ' --scope ' . $self->{options}{scope} . ' --name ' . $name . ' --id ' . $id . $self->_region_suffix;
 }
 
-# Internal helper. Returns the get-ip-set command for an IP set.
+# Internal helper. Returns the get-ip-set command for one IP set.
+#
+# This is used for two different things. init runs it to confirm each
+# configured set actually exists and is reachable before declaring the backend
+# ready, and _apply_family runs it immediately before every write to pick up
+# the current lock token, which update-ip-set will not proceed without.
+#
+# Args:
+#
+#     name - The IP set's name, as a plain string, from the name4 or name6
+#            option.
+#
+#     id   - The IP set's AWS assigned id, as a plain string, from the id4 or
+#            id6 option.
+#
+# Returns the command as a single string ready to hand to the runner. The aws
+# binary comes from the aws_cmd option, 'aws' by default.
+#
+#     $self->_get_command( 'blocklist-v4', 'a1b2c3d4-...' );
+#     #   aws wafv2 get-ip-set --scope REGIONAL --name blocklist-v4 --id a1b2c3d4-...
 sub _get_command {
 	my ( $self, $name, $id ) = @_;
 
 	return $self->{options}{aws_cmd} . ' wafv2 get-ip-set' . $self->_set_suffix( $name, $id );
 }
 
-# Internal helper. Returns the update-ip-set command for an IP set with the
-# given rendered addresses and lock token.
+# Internal helper. Returns the update-ip-set command that writes a rendered
+# address list into one IP set.
+#
+# WAFv2 has no incremental add or remove, so this always replaces the set's
+# entire contents. The lock token is AWS's optimistic concurrency control: it
+# comes back from get-ip-set, must be passed on the write, and is rejected if
+# anything else has modified the set in between. That is what stops two
+# processes from each writing back a list based on a stale read.
+#
+# Args:
+#
+#     name      - The IP set's name, as a plain string, from the name4 or
+#                 name6 option.
+#
+#     id        - The IP set's AWS assigned id, as a plain string.
+#
+#     addresses - The complete new contents of the set, as the space joined
+#                 CIDR string produced by _render_family. May be the empty
+#                 string, which empties the set.
+#
+#     token     - The lock token from the immediately preceding get-ip-set, as
+#                 a plain string. In testing mode callers pass the literal
+#                 placeholder '<lock-token>' instead, since no get is run.
+#
+# Returns the command as a single string ready to hand to the runner.
+#
+#     $self->_update_command( 'blocklist-v4', 'a1b2c3d4-...',
+#         '10.0.0.1/32 10.0.0.0/8', 'abc123' );
+#     #   aws wafv2 update-ip-set --scope REGIONAL --name blocklist-v4 --id a1b2c3d4-... --addresses 10.0.0.1/32 10.0.0.0/8 --lock-token abc123
+#
+#     # emptying the set, as teardown and flush do
+#     $self->_update_command( 'blocklist-v4', 'a1b2c3d4-...', '', 'abc123' );
+#     #   aws wafv2 update-ip-set --scope REGIONAL --name blocklist-v4 --id a1b2c3d4-... --addresses  --lock-token abc123
 sub _update_command {
 	my ( $self, $name, $id, $addresses, $token ) = @_;
 
@@ -276,11 +483,56 @@ sub _update_command {
 		. $token;
 } ## end sub _update_command
 
-# Internal helper. Applies the current banned state for one family by running a
-# get-ip-set then an update-ip-set. In testing it appends the two commands (with
-# a <lock-token> placeholder) to the passed accumulator; in real mode it runs the
-# get, extracts the LockToken, and runs the update, raising the error flag on
-# failure.
+# Internal helper. Pushes the current bans for one address family out to its
+# WAFv2 IP set. This is the only place the AWS side is written, so ban, unban,
+# ban_cidr, unban_cidr, re_init, teardown, and flush all funnel through it,
+# once per configured family.
+#
+# Because WAFv2 replaces the set in full and guards writes with a lock token,
+# every write is unavoidably two round trips: a get-ip-set to obtain the
+# current token, then an update-ip-set carrying it. They have to stay paired,
+# which is why this is one helper rather than the callers sequencing them.
+#
+# The token is scraped out of the get's JSON with a regexp rather than by
+# decoding it. A token that cannot be found falls back to the empty string,
+# which AWS will reject, so a parse failure surfaces as the update failing
+# rather than as a silent write of the wrong thing.
+#
+# Nothing here dies. A failure of either command sets the error to the passed
+# code, sets errorString with the command and its output, and warns.
+#
+# Args:
+#
+#     fam        - The address family to apply, as the number 4 or 6. Expected
+#                  to be one that _configured_families returned.
+#
+#     error_flag - The numeric error code to raise on failure, so the error
+#                  reads as the operation that triggered the write. Callers
+#                  pass the code matching themselves: 13 from ban and re_init,
+#                  14 from unban, 31 and 32 from the CIDR paths, 17 from
+#                  teardown, and 25 from flush.
+#
+#     acc        - An arrayref used only in testing mode, to which the two
+#                  commands that would have been run are appended. Callers
+#                  pass one they later hand to test_data. Ignored entirely
+#                  outside testing mode, but still expected to be a valid
+#                  arrayref.
+#
+# Returns nothing, on success and on failure alike. The caller checks the
+# error state rather than a return value.
+#
+#     # from ban, so a failure reads as banFailed
+#     my @commands;
+#     foreach my $fam ( $self->_configured_families ) {
+#         $self->_apply_family( $fam, 13, \@commands );
+#     }
+#
+# In testing mode nothing is run. The two commands are appended to the
+# accumulator with the token replaced by the literal placeholder
+# '<lock-token>', since there is no get to take a real one from:
+#
+#     aws wafv2 get-ip-set --scope REGIONAL --name blocklist-v4 --id a1b2c3d4-...
+#     aws wafv2 update-ip-set --scope REGIONAL --name blocklist-v4 --id a1b2c3d4-... --addresses 10.0.0.1/32 --lock-token <lock-token>
 sub _apply_family {
 	my ( $self, $fam, $error_flag, $acc ) = @_;
 
@@ -492,24 +744,6 @@ sub unban {
 	}
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by adding it to the IP set for its family. WAFv2 IP sets
@@ -697,13 +931,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	{
 		local $@;

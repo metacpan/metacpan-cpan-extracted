@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::fortigate;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::fortigate - Fortinet FortiGate backend v
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -243,16 +243,63 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. True if the IP is IPv4.
+# Internal helper. Says whether an address is IPv4, which is the branch nearly
+# every other helper in this backend turns on.
+#
+# FortiOS keeps IPv4 and IPv6 in entirely separate parts of its configuration
+# tree, with different object menus and different body fields, so almost
+# nothing here can be written family agnostically. Rather than repeat the
+# match, it lives in one place.
+#
+# Args:
+#
+#     ip - The address to test, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address. Matched against
+#          $IPv4_re anchored, so anything that is not valid IPv4, including a
+#          CIDR range, comes back false. Ranges have their own _cidr_is_v4.
+#
+# Returns 1 for an IPv4 address and 0 for anything else. Always one of those
+# two values, never undef.
+#
+#     $self->_is_v4('10.0.0.1');      # 1
+#     $self->_is_v4('2001:db8::1');   # 0
 sub _is_v4 {
 	my ( $self, $ip ) = @_;
 
 	return ( $ip =~ /\A$IPv4_re\z/ ) ? 1 : 0;
 }
 
-# Internal helper. Returns the firewall address object name for the IP, a
-# deterministic mangling of the prefix, name, and IP that avoids characters
-# FortiOS disallows in object names.
+# Internal helper. Returns the name of the FortiOS firewall address object
+# that represents one banned address.
+#
+# FortiOS has no set or list type that simply holds addresses. Each banned
+# address has to become a named address object, which is then made a member of
+# an address group that the policy references. So every ban creates an object,
+# and it needs a name.
+#
+# The name is derived from the prefix, the instance name, and the address
+# rather than stored, so ban and unban independently arrive at the same name
+# without any local bookkeeping, and two instances on the same FortiGate do
+# not collide. Dots and colons are replaced with hyphens because FortiOS
+# rejects them in object names, which is what makes the mangling necessary
+# rather than just cosmetic.
+#
+# Note the substitution is not reversible: 10.0.0.1 and 10-0-0-1 would produce
+# the same object name. Nothing in this dist ever bans the latter, so it does
+# not arise in practice.
+#
+# Args:
+#
+#     ip - The address to name an object for, as a plain string. Expected to
+#          be an already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the object name as a plain string, safe to use in a FortiOS
+# configuration. Still needs percent encoding before going into a URL, which
+# the callers do.
+#
+#     # with prefix "kur" and name "ssh"
+#     $self->_addr_name('10.0.0.1');      # kur_ssh_10-0-0-1
+#     $self->_addr_name('2001:db8::1');   # kur_ssh_2001-db8--1
 sub _addr_name {
 	my ( $self, $ip ) = @_;
 
@@ -263,15 +310,61 @@ sub _addr_name {
 	return $name;
 } ## end sub _addr_name
 
-# Internal helper. Returns the address group name for the IP's family.
+# Internal helper. Returns which of the two configured address groups an
+# address belongs in.
+#
+# A FortiOS address group is single family, so blocking both means two groups
+# on the appliance side, and the caller has to pick the right one for every
+# membership change. Both groups are expected to already exist and to be
+# referenced by a policy; this backend adds and removes members but does not
+# create the groups.
+#
+# Args:
+#
+#     ip - The address whose group is wanted, as a plain string. Expected to
+#          be an already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the group name as a plain string, from either the group4 or the
+# group6 option. Returns undef if the relevant option was never set, though
+# new rejects that so it should not arise.
+#
+#     # with group4 'blocklist4' and group6 'blocklist6'
+#     $self->_group_name('10.0.0.1');      # blocklist4
+#     $self->_group_name('2001:db8::1');   # blocklist6
 sub _group_name {
 	my ( $self, $ip ) = @_;
 
 	return $self->_is_v4($ip) ? $self->{options}{group4} : $self->{options}{group6};
 }
 
-# Internal helper. Builds a cmdb REST URL for the passed path, appending the
-# vdom query parameter when configured.
+# Internal helper. Builds the full URL for a FortiOS cmdb REST endpoint. Every
+# request this backend makes goes through here.
+#
+# The cmdb tree is FortiOS's configuration API, so all the object and group
+# manipulation lives under /api/v2/cmdb/. The vdom query parameter is appended
+# only when the option is set; on an appliance with virtual domains enabled,
+# leaving it off means the request lands in whichever vdom the token's account
+# defaults to, which may not be the intended one.
+#
+# The vdom is percent encoded, as it is a configured name rather than
+# something derived.
+#
+# Args:
+#
+#     path - The cmdb path below /api/v2/cmdb/, as a plain string, such as
+#            'firewall/address' or
+#            'firewall/addrgrp/blocklist4/member/kur_ssh_10-0-0-1'. Appended
+#            as is, so any object names embedded in it are expected to have
+#            been percent encoded by the caller already.
+#
+# Returns the complete URL as a string. The scheme and host come from the
+# options.
+#
+#     $self->_cmdb_url('firewall/address');
+#     #   https://fw.example.org/api/v2/cmdb/firewall/address
+#
+#     # with the vdom option set to root
+#     #   https://fw.example.org/api/v2/cmdb/firewall/address?vdom=root
 sub _cmdb_url {
 	my ( $self, $path ) = @_;
 
@@ -284,39 +377,77 @@ sub _cmdb_url {
 	return $url;
 } ## end sub _cmdb_url
 
-# Internal helper. Returns the firewall address menu for the IP's family.
+# Internal helper. Returns the cmdb path of the address object menu for an
+# address's family.
+#
+# FortiOS keeps IPv4 and IPv6 address objects in two separate menus rather
+# than in one menu with a family field, so the path itself differs. Creating
+# an IPv6 object under the IPv4 menu is rejected.
+#
+# Args:
+#
+#     ip - The address whose menu is wanted, as a plain string. Expected to be
+#          an already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the path as a plain string, relative to the cmdb root, ready to be
+# handed to _cmdb_url.
+#
+#     $self->_address_path('10.0.0.1');      # firewall/address
+#     $self->_address_path('2001:db8::1');   # firewall/address6
 sub _address_path {
 	my ( $self, $ip ) = @_;
 
 	return $self->_is_v4($ip) ? 'firewall/address' : 'firewall/address6';
 }
 
-# Internal helper. Returns the firewall address group menu for the IP's family.
+# Internal helper. Returns the cmdb path of the address group menu for an
+# address's family.
+#
+# The group menus are split by family for the same reason the address object
+# menus are, and an IPv6 group cannot be reached through the IPv4 menu.
+#
+# Args:
+#
+#     ip - The address whose group menu is wanted, as a plain string. Expected
+#          to be an already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the path as a plain string, relative to the cmdb root. Callers
+# append the group name and the member path to it before handing it to
+# _cmdb_url.
+#
+#     $self->_addrgrp_path('10.0.0.1');      # firewall/addrgrp
+#     $self->_addrgrp_path('2001:db8::1');   # firewall/addrgrp6
 sub _addrgrp_path {
 	my ( $self, $ip ) = @_;
 
 	return $self->_is_v4($ip) ? 'firewall/addrgrp' : 'firewall/addrgrp6';
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Builds the JSON body creating the firewall address object
-# for the IP, a single host in the family appropriate field.
+# Internal helper. Builds the JSON body that creates the FortiOS address
+# object for one banned address.
+#
+# The address is written as a host prefix, /32 or /128, because a FortiOS
+# address object of this kind is always a subnet; there is no single host
+# type. The field it goes in differs by family, subnet for IPv4 and ip6 for
+# IPv6, which is why this cannot be written once.
+#
+# Note the JSON comes back with its keys sorted, since the encoder is
+# canonical, so the ip6 form has its fields in the opposite order to what the
+# code reads.
+#
+# Args:
+#
+#     ip - The address to build the body for, as a plain string. Expected to
+#          be an already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the body as a JSON string, ready to be the content of a POST to the
+# family's address menu.
+#
+#     $self->_address_body('10.0.0.1');
+#     #   {"name":"kur_ssh_10-0-0-1","subnet":"10.0.0.1/32"}
+#
+#     $self->_address_body('2001:db8::1');
+#     #   {"ip6":"2001:db8::1/128","name":"kur_ssh_2001-db8--1"}
 sub _address_body {
 	my ( $self, $ip ) = @_;
 
@@ -327,9 +458,59 @@ sub _address_body {
 	return $self->_json->encode( { name => $self->_addr_name($ip), ip6 => $ip . '/128' } );
 } ## end sub _address_body
 
-# Internal helper. Performs a HTTP request via LWP::UserAgent using bearer token
-# auth, returning the decoded JSON body (or undef for an empty body) and dying
-# with an explanation on any HTTP level failure. Never called in testing mode.
+# Internal helper. Performs one HTTP request against the FortiOS REST API.
+# Every call this backend makes to the appliance goes through here.
+#
+# The user agent is built on first use and then cached on the object, so a run
+# of requests shares one agent and its connection rather than building a new
+# one each time. LWP::UserAgent is loaded with require at that point rather
+# than at compile time, since only the HTTP backends need it and it is a
+# recommends rather than a hard prereq; failing to load it dies with an
+# explanation naming this backend.
+#
+# The insecure option turns off certificate verification, which is there
+# because FortiGates very commonly present a self signed certificate.
+#
+# Authentication is a bearer token on every request; there is no session to
+# establish, unlike the checkpoint and cisco_fmc backends.
+#
+# Any HTTP level failure dies rather than setting an error, with the method,
+# URL, status line, and response body in the message. The callers wrap this in
+# eval and turn the exception into the appropriate error code, which is what
+# lets one helper serve paths that need to report ban, unban, and teardown
+# failures differently.
+#
+# A body that fails to decode as JSON is not fatal. The decode runs inside its
+# own eval and leaves the result undef, because several FortiOS endpoints
+# answer with an empty body on success and there is nothing to parse.
+#
+# Never called in testing mode; those paths record the request descriptors
+# instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string, such as 'GET', 'POST', or
+#              'DELETE'.
+#
+#     url    - The full URL to request, as a plain string, normally from
+#              _cmdb_url.
+#
+#     body   - Optional request body, as an already encoded JSON string.
+#              Passed straight to HTTP::Request, so undef is fine for methods
+#              that carry no body.
+#
+# Returns the decoded response body as whatever structure the JSON held,
+# normally a hashref, or undef when the response body was empty or did not
+# parse. Dies on any non success HTTP status.
+#
+#     my $decoded = $self->_request( 'GET', $self->_cmdb_url('firewall/addrgrp') );
+#
+#     $self->_request( 'POST', $self->_cmdb_url('firewall/address'),
+#         $self->_address_body($ip) );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( $r->{method}, $r->{url}, $r->{content} ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -375,8 +556,41 @@ sub _request {
 	return $decoded;
 } ## end sub _request
 
-# Internal helper. Returns the two request descriptors used to ban an IP:
-# create the address object, then add it to the group.
+# Internal helper. Returns the pair of requests that ban one address.
+#
+# Banning takes two calls because FortiOS separates the address object from
+# group membership: the object has to exist before it can be made a member, so
+# the order matters and the two are returned together rather than being
+# sequenced by the caller.
+#
+# Returning descriptors rather than performing the requests is what lets the
+# testing paths record exactly what would have been sent without a FortiGate
+# being present.
+#
+# Args:
+#
+#     ip - The address to ban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address. The family selects
+#          the menus and the group.
+#
+# Returns a two element list of hashrefs, in the order they must be performed,
+# each of the form:
+#
+#     {
+#         method  => 'POST',
+#         url     => 'https://fw.example.org/api/v2/cmdb/firewall/address',
+#         content => '{"name":"kur_ssh_10-0-0-1","subnet":"10.0.0.1/32"}',
+#     }
+#
+#     my @requests = $self->_ban_requests('10.0.0.1');
+#
+#     # first, create the address object
+#     #   POST https://fw.example.org/api/v2/cmdb/firewall/address
+#     #     {"name":"kur_ssh_10-0-0-1","subnet":"10.0.0.1/32"}
+#
+#     # then, add it to the group
+#     #   POST https://fw.example.org/api/v2/cmdb/firewall/addrgrp/blocklist4/member
+#     #     {"name":"kur_ssh_10-0-0-1"}
 sub _ban_requests {
 	my ( $self, $ip ) = @_;
 
@@ -392,8 +606,33 @@ sub _ban_requests {
 	);
 } ## end sub _ban_requests
 
-# Internal helper. Returns the two request descriptors used to unban an IP:
-# remove it from the group, then delete the address object.
+# Internal helper. Returns the pair of requests that unban one address, the
+# inverse of _ban_requests.
+#
+# The order is reversed from the ban: membership is removed first, then the
+# object is deleted. FortiOS refuses to delete an address object that is still
+# a member of a group, so deleting first would simply fail.
+#
+# Neither request carries a body, since both identify what to act on entirely
+# through the URL. The object and group names are percent encoded going into
+# the path.
+#
+# Args:
+#
+#     ip - The address to unban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, and to produce the
+#          same object name it did when banned.
+#
+# Returns a two element list of hashrefs, in the order they must be performed,
+# each with a method and a url key and no content key.
+#
+#     my @requests = $self->_unban_requests('10.0.0.1');
+#
+#     # first, drop the group membership
+#     #   DELETE https://fw.example.org/api/v2/cmdb/firewall/addrgrp/blocklist4/member/kur_ssh_10-0-0-1
+#
+#     # then, delete the address object
+#     #   DELETE https://fw.example.org/api/v2/cmdb/firewall/address/kur_ssh_10-0-0-1
 sub _unban_requests {
 	my ( $self, $ip ) = @_;
 
@@ -411,7 +650,26 @@ sub _unban_requests {
 	);
 } ## end sub _unban_requests
 
-# Internal helper. True if the CIDR's address part is IPv4.
+# Internal helper. Says whether a CIDR range is IPv4, the range counterpart of
+# _is_v4.
+#
+# A separate sub is needed rather than passing a range to _is_v4 because a
+# range always carries a "/" and a prefix length, which would never match the
+# anchored IPv4 regexp, so every range would come back as IPv6. The prefix is
+# stripped off first and only the address is matched.
+#
+# Args:
+#
+#     cidr - The range to test, as a plain string. Expected to be an already
+#            validated CIDR range such as "10.0.0.0/8" or "2001:db8::/32". A
+#            bare address with no prefix also works, since the strip is a no
+#            op then.
+#
+# Returns 1 for a range whose address is IPv4 and 0 for anything else. Always
+# one of those two values, never undef.
+#
+#     $self->_cidr_is_v4('10.0.0.0/8');      # 1
+#     $self->_cidr_is_v4('2001:db8::/32');   # 0
 sub _cidr_is_v4 {
 	my ( $self, $cidr ) = @_;
 
@@ -421,30 +679,97 @@ sub _cidr_is_v4 {
 	return ( $addr =~ /\A$IPv4_re\z/ ) ? 1 : 0;
 } ## end sub _cidr_is_v4
 
-# Internal helper. Returns the address group name for the CIDR's family.
+# Internal helper. Returns which of the two configured address groups a CIDR
+# range belongs in, the range counterpart of _group_name.
+#
+# Ranges go into the same two groups the single addresses do; FortiOS does not
+# distinguish a host object from a subnet object at the group level.
+#
+# Args:
+#
+#     cidr - The range whose group is wanted, as a plain string. Expected to
+#            be an already validated CIDR range.
+#
+# Returns the group name as a plain string, from either the group4 or the
+# group6 option.
+#
+#     # with group4 'blocklist4' and group6 'blocklist6'
+#     $self->_cidr_group_name('10.0.0.0/8');      # blocklist4
+#     $self->_cidr_group_name('2001:db8::/32');   # blocklist6
 sub _cidr_group_name {
 	my ( $self, $cidr ) = @_;
 
 	return $self->_cidr_is_v4($cidr) ? $self->{options}{group4} : $self->{options}{group6};
 }
 
-# Internal helper. Returns the firewall address menu for the CIDR's family.
+# Internal helper. Returns the cmdb path of the address object menu for a CIDR
+# range's family, the range counterpart of _address_path.
+#
+# The menus are the same ones single addresses use; only the way the family is
+# determined differs.
+#
+# Args:
+#
+#     cidr - The range whose menu is wanted, as a plain string. Expected to be
+#            an already validated CIDR range.
+#
+# Returns the path as a plain string, relative to the cmdb root, ready to be
+# handed to _cmdb_url.
+#
+#     $self->_cidr_address_path('10.0.0.0/8');      # firewall/address
+#     $self->_cidr_address_path('2001:db8::/32');   # firewall/address6
 sub _cidr_address_path {
 	my ( $self, $cidr ) = @_;
 
 	return $self->_cidr_is_v4($cidr) ? 'firewall/address' : 'firewall/address6';
 }
 
-# Internal helper. Returns the firewall address group menu for the CIDR's family.
+# Internal helper. Returns the cmdb path of the address group menu for a CIDR
+# range's family, the range counterpart of _addrgrp_path.
+#
+# Args:
+#
+#     cidr - The range whose group menu is wanted, as a plain string. Expected
+#            to be an already validated CIDR range.
+#
+# Returns the path as a plain string, relative to the cmdb root. Callers
+# append the group name and the member path to it.
+#
+#     $self->_cidr_addrgrp_path('10.0.0.0/8');      # firewall/addrgrp
+#     $self->_cidr_addrgrp_path('2001:db8::/32');   # firewall/addrgrp6
 sub _cidr_addrgrp_path {
 	my ( $self, $cidr ) = @_;
 
 	return $self->_cidr_is_v4($cidr) ? 'firewall/addrgrp' : 'firewall/addrgrp6';
 }
 
-# Internal helper. Returns the firewall address object name for the CIDR, a
-# deterministic mangling of the prefix, name, and CIDR that avoids characters
-# FortiOS disallows in object names.
+# Internal helper. Returns the name of the FortiOS address object representing
+# one banned CIDR range, the range counterpart of _addr_name.
+#
+# Same reasoning as for single addresses: each banned range becomes a named
+# object that is then made a group member, and the name is derived rather than
+# stored so ban and unban independently agree on it.
+#
+# The mangling has to cover one more character than _addr_name does. As well
+# as dots and colons, the slash separating the address from the prefix length
+# is replaced with a hyphen, since FortiOS rejects it in an object name too.
+#
+# Note this makes the name ambiguous in a way worth being aware of: the range
+# 10.0.0.0/8 and a hypothetical address 10.0.0.0.8 would both mangle to the
+# same object name. Ranges and addresses are validated separately upstream, so
+# nothing in this dist produces such a collision.
+#
+# Args:
+#
+#     cidr - The range to name an object for, as a plain string. Expected to
+#            be an already validated CIDR range.
+#
+# Returns the object name as a plain string, safe to use in a FortiOS
+# configuration. Still needs percent encoding before going into a URL.
+#
+#     # with prefix "kur" and name "ssh"
+#     $self->_cidr_addr_name('10.0.0.0/8');      # kur_ssh_10-0-0-0-8
+#     $self->_cidr_addr_name('2001:db8::/32');   # kur_ssh_2001-db8---32
 sub _cidr_addr_name {
 	my ( $self, $cidr ) = @_;
 
@@ -455,8 +780,31 @@ sub _cidr_addr_name {
 	return $name;
 } ## end sub _cidr_addr_name
 
-# Internal helper. Builds the JSON body creating the firewall address object for
-# the CIDR, a subnet in the family appropriate field.
+# Internal helper. Builds the JSON body that creates the FortiOS address
+# object for one banned CIDR range, the range counterpart of _address_body.
+#
+# The difference from the single address version is that no prefix has to be
+# appended: a range already is a subnet, which is exactly what a FortiOS
+# address object of this kind holds, so it goes in as it stands. The field
+# still differs by family, subnet for IPv4 and ip6 for IPv6.
+#
+# Note the JSON comes back with its keys sorted, since the encoder is
+# canonical, so the ip6 form has its fields in the opposite order to what the
+# code reads.
+#
+# Args:
+#
+#     cidr - The range to build the body for, as a plain string. Expected to
+#            be an already validated CIDR range.
+#
+# Returns the body as a JSON string, ready to be the content of a POST to the
+# family's address menu.
+#
+#     $self->_cidr_address_body('10.0.0.0/8');
+#     #   {"name":"kur_ssh_10-0-0-0-8","subnet":"10.0.0.0/8"}
+#
+#     $self->_cidr_address_body('2001:db8::/32');
+#     #   {"ip6":"2001:db8::/32","name":"kur_ssh_2001-db8---32"}
 sub _cidr_address_body {
 	my ( $self, $cidr ) = @_;
 
@@ -467,8 +815,29 @@ sub _cidr_address_body {
 	return $self->_json->encode( { name => $self->_cidr_addr_name($cidr), ip6 => $cidr } );
 } ## end sub _cidr_address_body
 
-# Internal helper. Returns the two request descriptors used to ban a CIDR:
-# create the address object, then add it to the group.
+# Internal helper. Returns the pair of requests that ban one CIDR range, the
+# range counterpart of _ban_requests.
+#
+# The two step shape and its ordering are the same: the address object has to
+# exist before it can be added to the group.
+#
+# Args:
+#
+#     cidr - The range to ban, as a plain string. Expected to be an already
+#            validated CIDR range. The family selects the menus and the group.
+#
+# Returns a two element list of hashrefs, in the order they must be performed,
+# each with method, url, and content keys.
+#
+#     my @requests = $self->_ban_cidr_requests('10.0.0.0/8');
+#
+#     # first, create the address object
+#     #   POST https://fw.example.org/api/v2/cmdb/firewall/address
+#     #     {"name":"kur_ssh_10-0-0-0-8","subnet":"10.0.0.0/8"}
+#
+#     # then, add it to the group
+#     #   POST https://fw.example.org/api/v2/cmdb/firewall/addrgrp/blocklist4/member
+#     #     {"name":"kur_ssh_10-0-0-0-8"}
 sub _ban_cidr_requests {
 	my ( $self, $cidr ) = @_;
 
@@ -490,8 +859,32 @@ sub _ban_cidr_requests {
 	);
 } ## end sub _ban_cidr_requests
 
-# Internal helper. Returns the two request descriptors used to unban a CIDR:
-# remove it from the group, then delete the address object.
+# Internal helper. Returns the pair of requests that unban one CIDR range, the
+# range counterpart of _unban_requests.
+#
+# As with single addresses the order is reversed from the ban, membership
+# first and then the object, because FortiOS will not delete an address object
+# that is still a group member.
+#
+# Neither request carries a body. The object and group names are percent
+# encoded going into the path.
+#
+# Args:
+#
+#     cidr - The range to unban, as a plain string. Expected to be an already
+#            validated CIDR range, and to produce the same object name it did
+#            when banned.
+#
+# Returns a two element list of hashrefs, in the order they must be performed,
+# each with a method and a url key and no content key.
+#
+#     my @requests = $self->_unban_cidr_requests('10.0.0.0/8');
+#
+#     # first, drop the group membership
+#     #   DELETE https://fw.example.org/api/v2/cmdb/firewall/addrgrp/blocklist4/member/kur_ssh_10-0-0-0-8
+#
+#     # then, delete the address object
+#     #   DELETE https://fw.example.org/api/v2/cmdb/firewall/address/kur_ssh_10-0-0-0-8
 sub _unban_cidr_requests {
 	my ( $self, $cidr ) = @_;
 
@@ -700,24 +1093,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range. The value of ban is validated as being a IPv4 or IPv6
@@ -922,13 +1297,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from

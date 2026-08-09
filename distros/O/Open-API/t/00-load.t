@@ -14,13 +14,18 @@ BEGIN {
 # croaks otherwise); assert it explicitly too.
 ok( Open::API::_abi_ok(), 'JSON::Schema::Fast C ABI resolved' );
 
-# Open::API::UI needs perl 5.16 plus Template::Stencil and
-# Markdown::Simple (recommends, not prereqs).
+# Open::API::UI needs perl 5.010 (defined-or) plus Template::Stencil 0.02
+# and Markdown::Simple 0.18 - recommends, not prereqs, so neither is
+# guaranteed to be there and neither is guaranteed to be new enough: a
+# recommendation cannot upgrade a machine that already has an older copy.
+# The versions are part of the guard for that reason.
 SKIP: {
-    skip 'Open::API::UI needs perl 5.16', 1 if $] < 5.016;
-    skip 'Template::Stencil and Markdown::Simple not available', 1
+    skip 'Open::API::UI needs perl 5.010', 1 if $] < 5.010;
+    skip 'Template::Stencil 0.02+ and Markdown::Simple 0.18+ not available', 1
         unless eval { require Template::Stencil;
-                      require Markdown::Simple; 1 };
+                      Template::Stencil->VERSION('0.02');
+                      require Markdown::Simple;
+                      Markdown::Simple->VERSION('0.18'); 1 };
     require_ok( 'Open::API::UI' );
 }
 

@@ -1,0 +1,407 @@
+/* ==========================================================================
+   FUNKY SKELETON COMPONENT
+   Animated loading placeholders for perceived performance
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   CSS CUSTOM PROPERTIES
+   -------------------------------------------------------------------------- */
+
+:root {
+  --skeleton-base: var(--pro-bg-subtle, #e9ecef);
+  --skeleton-highlight: var(--pro-bg-primary, #f8f9fa);
+  --skeleton-radius: 0.25rem;
+  --skeleton-duration: 1.5s;
+}
+
+[data-theme="dark"] {
+  --skeleton-base: var(--pro-bg-subtle, #2d3238);
+  --skeleton-highlight: var(--pro-bg-secondary, #3d4248);
+}
+
+/* --------------------------------------------------------------------------
+   BASE SKELETON ELEMENT
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton {
+  background: var(--skeleton-base);
+  background-image: linear-gradient(
+    90deg,
+    var(--skeleton-base) 0%,
+    var(--skeleton-highlight) 50%,
+    var(--skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  animation: funky-skeleton-shimmer var(--skeleton-duration) ease-in-out infinite;
+  border-radius: var(--skeleton-radius);
+}
+
+/* Shimmer animation */
+@keyframes funky-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SKELETON CONTAINER
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton-container {
+  position: relative;
+}
+
+.funky-skeleton-container.loading .funky-skeleton-content {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.funky-skeleton-container .funky-skeleton-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.funky-skeleton-container.loading .funky-skeleton-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --------------------------------------------------------------------------
+   SKELETON TEXT
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+}
+
+.funky-skeleton-text:last-child {
+  width: 70%;
+}
+
+.funky-skeleton-text.short {
+  width: 40%;
+}
+
+.funky-skeleton-text.medium {
+  width: 70%;
+}
+
+.funky-skeleton-text.long {
+  width: 90%;
+}
+
+/* --------------------------------------------------------------------------
+   SKELETON AVATAR
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton-avatar {
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.funky-skeleton-avatar.sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.funky-skeleton-avatar.md {
+  width: 3rem;
+  height: 3rem;
+}
+
+.funky-skeleton-avatar.lg {
+  width: 4rem;
+  height: 4rem;
+}
+
+/* --------------------------------------------------------------------------
+   SKELETON TABLE
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.funky-skeleton-table th,
+.funky-skeleton-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--pro-border-color, #dee2e6);
+}
+
+.funky-skeleton-table th .funky-skeleton {
+  height: 0.875rem;
+  width: 60%;
+}
+
+.funky-skeleton-table td .funky-skeleton {
+  height: 1rem;
+}
+
+/* Vary widths for natural look */
+.funky-skeleton-table td:nth-child(1) .funky-skeleton { width: 30%; }
+.funky-skeleton-table td:nth-child(2) .funky-skeleton { width: 50%; }
+.funky-skeleton-table td:nth-child(3) .funky-skeleton { width: 40%; }
+.funky-skeleton-table td:nth-child(4) .funky-skeleton { width: 60%; }
+.funky-skeleton-table td:nth-child(5) .funky-skeleton { width: 35%; }
+
+/* --------------------------------------------------------------------------
+   SKELETON CARD
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton-card {
+  background: var(--pro-bg-elevated, #fff);
+  border: 1px solid var(--pro-border-color, #dee2e6);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.funky-skeleton-card-image {
+  height: 150px;
+  background: var(--skeleton-base);
+}
+
+.funky-skeleton-card-body {
+  padding: 1rem;
+}
+
+.funky-skeleton-card-title {
+  height: 1.25rem;
+  width: 70%;
+  margin-bottom: 0.75rem;
+}
+
+.funky-skeleton-card-text {
+  height: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.funky-skeleton-card-text:last-child {
+  width: 50%;
+}
+
+/* Card grid */
+.funky-skeleton-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   SKELETON LIST
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton-list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--pro-border-color, #dee2e6);
+}
+
+.funky-skeleton-list-item:last-child {
+  border-bottom: none;
+}
+
+.funky-skeleton-list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.funky-skeleton-list-title {
+  height: 1rem;
+  width: 60%;
+  margin-bottom: 0.5rem;
+}
+
+.funky-skeleton-list-subtitle {
+  height: 0.75rem;
+  width: 40%;
+}
+
+/* --------------------------------------------------------------------------
+   SKELETON IMAGE
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.funky-skeleton-image.square {
+  aspect-ratio: 1;
+}
+
+.funky-skeleton-image.portrait {
+  aspect-ratio: 3 / 4;
+}
+
+/* --------------------------------------------------------------------------
+   DENSITY SUPPORT
+   -------------------------------------------------------------------------- */
+
+[data-density="compact"] .funky-skeleton-table th,
+[data-density="compact"] .funky-skeleton-table td {
+  padding: 0.5rem;
+}
+
+[data-density="compact"] .funky-skeleton-list-item {
+  padding: 0.5rem 0;
+  gap: 0.75rem;
+}
+
+[data-density="compact"] .funky-skeleton-card-body {
+  padding: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   TRANSITIONS
+   -------------------------------------------------------------------------- */
+
+.funky-skeleton-fade-out {
+  animation: funky-skeleton-fade-out 0.2s ease forwards;
+}
+
+@keyframes funky-skeleton-fade-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ACCESSIBILITY - REDUCED MOTION
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .funky-skeleton {
+    animation: none;
+    background-image: none;
+    opacity: 0.7;
+  }
+
+  .funky-skeleton-fade-out {
+    animation: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   HIGH CONTRAST MODE
+   -------------------------------------------------------------------------- */
+
+@media (prefers-contrast: high) {
+  .funky-skeleton {
+    animation: none;
+    background-image: none;
+    background: var(--pro-border-color, #dee2e6);
+    border: 2px dashed currentColor;
+  }
+
+  .funky-skeleton-table th,
+  .funky-skeleton-table td {
+    border-width: 2px;
+  }
+
+  .funky-skeleton-card {
+    border-width: 2px;
+  }
+
+  .funky-skeleton-list-item {
+    border-bottom-width: 2px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SKELETON DEMO STYLES
+   Playground demo-specific styling
+   -------------------------------------------------------------------------- */
+
+.demo-subsection {
+  margin-bottom: 1.5rem;
+}
+
+.demo-subsection:last-child {
+  margin-bottom: 0;
+}
+
+.skeleton-demo__cards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.skeleton-demo__card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.skeleton-demo__avatars {
+  display: flex;
+  gap: 1rem;
+}
+
+.skeleton-demo__avatar-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.skeleton-demo__button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skeleton-demo__async-container {
+  min-height: 100px;
+  padding: 1rem;
+  background: var(--pro-bg-tertiary);
+  border: 1px solid var(--pro-border);
+  border-radius: 4px;
+}
+
+.skeleton-demo__log {
+  background: var(--pro-bg-tertiary);
+  color: var(--pro-text-muted);
+  padding: 1rem;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  border: 1px solid var(--pro-border);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .skeleton-demo__cards {
+    flex-direction: column;
+  }
+
+  .skeleton-demo__button-grid {
+    flex-direction: column;
+  }
+
+  .skeleton-demo__button-grid .btn {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   BOOTSTRAP PLACEHOLDER THEME OVERRIDES
+   Using --pro-* variables for theme consistency
+   ============================================ */
+
+.placeholder {
+  background-color: var(--pro-bg-tertiary);
+}

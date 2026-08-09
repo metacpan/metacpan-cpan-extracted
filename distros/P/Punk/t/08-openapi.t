@@ -64,8 +64,11 @@ sub petstore {
     api main::petstore() => { handlers => {
         listPets  => sub {
             my ($c) = @_;
+            my ($sliced) = $c->params('limit');
             return { limit => $c->openapi->{query}{limit},
-                     via_param => $c->param('limit') };
+                     via_param  => $c->param('limit'),
+                     via_params => $sliced,
+                     merged     => $c->params };
         },
         getPet    => sub { { id => $_[0]->param('petId') } },
         createPet => sub {
@@ -82,6 +85,9 @@ sub petstore {
         query => 'limit=5')->[2][0]);
     is($d->{limit}, 5, 'validated query param, coerced');
     is($d->{via_param}, 5, '$c->param reads openapi params first');
+    is($d->{via_params}, 5, '$c->params(@keys) reads them first too');
+    is_deeply($d->{merged}, { limit => 5 },
+        '$c->params merges the validated params over the raw query');
 
     $d = file_json_decode(hit($app, path => '/pets')->[2][0]);
     is($d->{limit}, undef,

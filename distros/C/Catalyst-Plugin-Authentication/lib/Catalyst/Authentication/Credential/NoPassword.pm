@@ -35,8 +35,8 @@ without a password.
 =head1 SYNOPSIS
 
     use Catalyst qw/
-      Authentication
-      /;
+        Authentication
+    /;
 
     package MyApp::Controller::Auth;
 
@@ -50,7 +50,7 @@ without a password.
 
 =head1 DESCRIPTION
 
-This authentication credential checker takes authentication information 
+This authentication credential checker takes authentication information
 (most often a username) and retrieves the user from the store. No validation
 of any credentials is done. This is intended for administrative backdoors,
 SAML logins and so on when you have identified the new user by other means.

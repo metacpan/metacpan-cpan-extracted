@@ -27,11 +27,12 @@ use warnings;
 # it skips the whole file and never forks.
 
 use Test2::IPC;    # Load before Test2::V0 and before any fork, so child events reach the harness.
-use Test2::API qw/context/;
+use Test2::API qw/context test2_add_callback_context_release/;
 use Test2::Tools::Subtest qw/subtest_buffered subtest_streamed/;
 use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
 use Carp qw/confess/;
+use File::Temp qw/tempfile/;
 use POSIX qw/WNOHANG/;
 use Time::HiRes qw/sleep/;
 
@@ -39,22 +40,17 @@ use Importer Importer => 'import';
 our @EXPORT = qw{
     run_per_install qdb_installs contaminate_env
     skip_remaining_on_resource_error is_resource_unavailable
+    resource_unavailable_reason subtest_or_resource_skip
 };
 
-{
-    package QDB::Installs::ResourceUnavailable;
-
-    sub reason { shift->{reason} }
-    sub error  { shift->{error} }
-}
+# Carried in the message: the Pool bodies are loaded with require, and perl
+# rewrites an exception thrown from a file it is loading but keeps its text.
+my $RESOURCE_PREFIX = 'QDB-RESOURCE-UNAVAILABLE: ';
 
 # A skip-all plan is invalid after a test body has already emitted assertions.
 # Pool tests can exhaust host IPC resources partway through, so record one
-# ordinary skip for the unavailable remainder and throw a dedicated sentinel.
-# The per-driver wrapper catches only that sentinel; every other exception
-# still fails the buffered install subtest.  Loading the DBIx test helper is
-# deliberately deferred until this function runs in an install child (see the
-# parent-process loading warning above).
+# ordinary skip for the unavailable remainder and throw. The DBIx test helper
+# loads here rather than at file scope: only an install child may load it.
 sub skip_remaining_on_resource_error {
     my ($err) = @_;
 
@@ -66,12 +62,55 @@ sub skip_remaining_on_resource_error {
     $ctx->skip('remaining Pool checks unavailable', ucfirst($reason));
     $ctx->release;
 
-    die bless {reason => $reason, error => $err}, 'QDB::Installs::ResourceUnavailable';
+    # STDERR because the skip above sits in a buffered subtest that goes on to
+    # pass, so nothing would print it and a smoker report would not say why.
+    print STDERR "Skipping the remaining Pool checks: $reason\n";
+
+    die "$RESOURCE_PREFIX$reason\n";
 }
 
 sub is_resource_unavailable {
     my ($err) = @_;
-    return ref($err) eq 'QDB::Installs::ResourceUnavailable';
+    return defined(resource_unavailable_reason($err)) ? 1 : 0;
+}
+
+sub resource_unavailable_reason {
+    my ($err) = @_;
+    return undef unless defined($err) && !ref($err);
+
+    my ($reason) = $err =~ m/^\Q$RESOURCE_PREFIX\E(.*)$/m;
+    return $reason;
+}
+
+# subtest reports an exception as a failure of that subtest and does not
+# rethrow, which would leave a resource skip looking like a fault and let the
+# rest of the body run. Re-raise it once the subtest has closed.
+#
+# Agent Note: this unwinds one level. A resource skip raised inside a plain
+# nested subtest is swallowed by that subtest; nest with this instead.
+sub subtest_or_resource_skip {
+    my ($name, $code) = @_;
+
+    # Without a context of our own every subtest here reports at this line
+    # rather than at its own call site.
+    my $ctx = context();
+
+    my $unavailable;
+    subtest_buffered(
+        $name => sub {
+            my $ok = eval { $code->(); 1 };
+            return if $ok;
+
+            $unavailable = $@;
+            die $unavailable unless is_resource_unavailable($unavailable);
+        }
+    );
+
+    $ctx->release;
+
+    die $unavailable if defined $unavailable && is_resource_unavailable($unavailable);
+
+    return;
 }
 
 my %MYSQL_FORK = (
@@ -244,6 +283,70 @@ my $MAX_PAR = ($ENV{QDB_INSTALL_JOBS} && $ENV{QDB_INSTALL_JOBS} =~ /^\d+$/ && $E
 my $CHILD_FLAVOR_ENV = 'QDB_INSTALL_EXTERNAL_FLAVOR';
 my $CHILD_NAME_ENV   = 'QDB_INSTALL_EXTERNAL_NAME';
 my $CHILD_BIN_ENV    = 'QDB_INSTALL_EXTERNAL_BIN_DIR';
+my $CHILD_TRACE_ENV  = 'QDB_INSTALL_EXTERNAL_TRACE';
+
+# A child dying before its first result leaves the harness only "Tests: 0 /
+# No plan found". Returns a coderef that sets the phase, undef if unusable.
+sub _trace_child_progress {
+    # The same test the parent applies, so the two cannot disagree.
+    my $file = $ENV{$CHILD_TRACE_ENV};
+    return undef unless defined($file) && length($file);
+
+    open(my $fh, '>', $file) or return undef;
+
+    # Autoflush without IO::Handle: nothing ever closes this handle.
+    { my $old = select($fh); $| = 1; select($old) }
+
+    my $phase = 'child started, body has not run yet';
+    my $where = '';
+
+    # Rewritten in place, truncated after the write: an empty file would read
+    # as nothing having been recorded.
+    my $write = sub {
+        seek($fh, 0, 0) or return;
+        print $fh "phase: $phase\n";
+        print $fh "$where\n" if length $where;
+        truncate($fh, tell($fh));
+        return;
+    };
+
+    $write->();
+
+    # Context release, not a hub listener: a streamed subtest has its own hub.
+    test2_add_callback_context_release(sub {
+        my ($ctx) = @_;
+        my $frame = eval { $ctx->trace->frame } or return;
+        $where = "last Test2 context at $frame->[1] line $frame->[2]";
+        $write->();
+    });
+
+    return sub { $phase = $_[0]; $write->() };
+}
+
+# STDERR, not TAP: the child owns that stream and may already have planned.
+# STDERR also survives POSIX::_exit; buffered STDOUT does not.
+sub _diag_external_child {
+    my ($flavor, $inst, $note, $trace_file) = @_;
+
+    my $label = "install '$inst->{name}'";
+    print STDERR "$label: isolated $flavor process $note\n";
+
+    my @progress;
+    if (defined($trace_file) && length($trace_file) && open(my $fh, '<', $trace_file)) {
+        chomp(@progress = <$fh>);
+        @progress = grep { defined($_) && length($_) } @progress;
+    }
+
+    # Silence here would be indistinguishable from the reporting itself failing.
+    unless (@progress) {
+        print STDERR "$label: no progress was recorded by the child\n";
+        return;
+    }
+
+    print STDERR "$label: child got as far as: $_\n" for @progress;
+
+    return;
+}
 
 sub _external_child_command {
     my @inc = map { "-I$_" } grep { defined($_) && length($_) && !ref($_) } @INC;
@@ -267,15 +370,52 @@ sub _run_single_external_install {
     my ($flavor, $inst) = @_;
     my @cmd = _external_child_command();
 
+    # A caller-set path is the caller's to keep; it is how the tests inspect this.
+    my $trace_file = $ENV{$CHILD_TRACE_ENV};
+    my $own_trace  = !(defined($trace_file) && length($trace_file));
+
+    if ($own_trace) {
+        # Unlinked by hand: POSIX::_exit skips END, so File::Temp never does.
+        # DB-QUICK prefix so a debris sweep finds one a killed parent left.
+        (my $trace_fh, $trace_file) = tempfile("DB-QUICK-TRACE-$$-XXXXXX", TMPDIR => 1, UNLINK => 0);
+        close($trace_fh);
+    }
+    else {
+        # Emptied first, dropped if that fails: an earlier run's content must
+        # not be reported as this one's.
+        my $trace_fh;
+        unless (open($trace_fh, '>', $trace_file)) {
+            warn "Could not empty the trace file '$trace_file': $!\n";
+            undef $trace_file;
+        }
+        close($trace_fh) if $trace_fh;
+    }
+
+    # Empty, not undef: an undef assignment would warn.
+    local $ENV{$CHILD_TRACE_ENV} = defined($trace_file) ? $trace_file : '';
+
     _with_external_child_env($flavor, $inst, sub {
         system(@cmd);
         my $status = $?;
+
         if ($status == -1) {
-            print STDERR "Could not launch isolated $flavor test process: $!\n";
+            _diag_external_child($flavor, $inst, "could not be launched: $!", $trace_file);
+            unlink($trace_file) if $own_trace;
             POSIX::_exit(255);
         }
+
         my $signal = $status & 127;
-        POSIX::_exit($signal ? 128 + $signal : $status >> 8);
+        my $exit   = $signal ? 128 + $signal : $status >> 8;
+
+        # A signalled child never exited 128+n; say what actually happened.
+        my $note = $signal
+            ? "was killed by signal $signal (status $status)"
+            : "exited $exit (status $status)";
+
+        _diag_external_child($flavor, $inst, $note, $trace_file) if $status;
+
+        unlink($trace_file) if $own_trace;
+        POSIX::_exit($exit);
     });
 }
 
@@ -288,6 +428,10 @@ sub _run_external_install {
     my ($flavor, $inst) = @_;
     my @cmd = _external_child_command();
     my ($stdout, $stderr, $status, $launch_error);
+
+    # This path captures its children instead; one shared path would clobber.
+    local $ENV{$CHILD_TRACE_ENV};
+    delete $ENV{$CHILD_TRACE_ENV};
 
     _with_external_child_env($flavor, $inst, sub {
         ($stdout, $stderr) = capture {
@@ -349,7 +493,21 @@ sub run_per_install {
         }
 
         my $inst = {name => $ENV{$CHILD_NAME_ENV}, bin_dir => $bin_dir};
-        subtest_streamed("$flavor install: $inst->{name}" => sub { $body->($inst) });
+
+        # No location is recorded before the body's first Test2 op.
+        my $trace    = _trace_child_progress();
+        my $returned = 0;
+        subtest_streamed("$flavor install: $inst->{name}" => sub {
+            $trace->('running the install body') if $trace;
+            $body->($inst);
+            $trace->('install body returned') if $trace;
+            $returned = 1;
+        });
+
+        # subtest_streamed catches the exception and returns while the location
+        # keeps advancing; skip_all lands here too, hence the wording.
+        $trace->('install body did not return normally') if $trace && !$returned;
+
         return;
     }
 

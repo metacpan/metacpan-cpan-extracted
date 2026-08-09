@@ -184,6 +184,43 @@ SKIP: {
 	};
 } ## end SKIP:
 
+# --- explain ------------------------------------------------------------
+subtest 'explain reports per-feature attributions' => sub {
+	my $out = `$^X -Ilib $bin explain -m $model -i $query_csv 2>&1`;
+	is( $?, 0, 'explain exits 0' );
+	my @lines = grep { length } split /\n/, $out;
+	is( scalar @lines, 7 * 3, 'one line per (row, feature) pair' );
+	my @first = split /,/, $lines[0], -1;
+	is( scalar @first, 8, 'ablation output has 8 columns' );
+	is( $first[0],     1, 'row numbers are 1-based' );
+	is( $first[2],     1, 'first line per row is rank 1' );
+}; ## end 'explain reports per-feature attributions' => sub
+
+subtest 'explain -t explains only flagged rows, -n limits features' => sub {
+
+	# The two planted outliers score ~0.64-0.69 in this fixture, the
+	# inliers stay at or below ~0.50 -- 0.6 splits them cleanly.
+	my $out = `$^X -Ilib $bin explain -m $model -i $query_csv -t 0.6 -n 1 2>&1`;
+	is( $?, 0, 'explain -t exits 0' );
+	my @lines = grep { length } split /\n/, $out;
+	is( scalar @lines, 2, 'only the two outliers explained, one feature each' );
+	like( $lines[0], qr/^6,/, 'row numbers reference the input rows' );
+	like( $lines[1], qr/^7,/, 'second flagged row keeps its input row number' );
+}; ## end 'explain -t explains only flagged rows, -n limits features' => sub
+
+subtest 'explain --method path works' => sub {
+	my $out = `$^X -Ilib $bin explain -m $model -i $query_csv --method path -n 1 2>&1`;
+	is( $?, 0, 'explain --method path exits 0' );
+	my @lines = grep { length } split /\n/, $out;
+	is( scalar @lines, 7, 'one line per row with -n 1' );
+	my $cols = () = split /,/, $lines[0], -1;
+	is( $cols, 6, 'path output has 6 columns (no delta/baseline)' );
+
+	my $bad = `$^X -Ilib $bin explain -m $model -i $query_csv --method voodoo 2>&1`;
+	isnt( $?, 0, 'unknown --method exits non-zero' );
+	like( $bad, qr/must be either 'path' or 'ablation'/, 'and names the valid methods' );
+}; ## end 'explain --method path works' => sub
+
 # --- online model workflow: stream + info -------------------------------
 {
 	my $stream_csv = "$tmp/stream.csv";

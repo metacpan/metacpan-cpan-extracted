@@ -1,0 +1,223 @@
+/* ============================================
+   TOASTS.CSS - Toast Notifications
+   Native Funky toast styling using Bootstrap CSS classes
+   ============================================ */
+
+/* Toast container */
+#funky-toast-container {
+  z-index: 9999;
+}
+
+/* 
+ * Toast transition states - used by Funky.Toast
+ * Bootstrap provides .fade and .show, we add .showing and .hiding
+ */
+.toast.showing {
+  /* Entering animation in progress */
+}
+
+.toast.hiding {
+  opacity: 0;
+}
+
+/* Base toast styling */
+.funky-toast {
+  min-width: 300px;
+  max-width: 400px;
+  border: 1px solid var(--pro-border-muted, rgba(255, 255, 255, 0.1));
+  box-shadow: var(--pro-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.funky-toast .toast-header {
+  border-bottom: 1px solid var(--pro-border-muted, rgba(255, 255, 255, 0.1));
+  font-weight: 600;
+}
+
+.funky-toast .toast-header i {
+  font-size: 1.1em;
+}
+
+.funky-toast .toast-body {
+  font-size: 0.95em;
+}
+
+/* Success toast */
+.funky-toast-success {
+  background-color: var(--pro-accent-success-bg, #1e4d2b);
+  color: var(--pro-accent-success-text, #d4edda);
+}
+
+.funky-toast-success .toast-header {
+  background-color: var(--pro-accent-success, #3fb950);
+  color: var(--pro-text-inverse);
+}
+
+.funky-toast-success .toast-header i {
+  color: var(--pro-accent-success-text, #d4edda);
+}
+
+.funky-toast-success .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+/* Error toast */
+.funky-toast-error {
+  background-color: var(--pro-accent-danger-bg, #5c1f1f);
+  color: var(--pro-accent-danger-text, #f8d7da);
+}
+
+.funky-toast-error .toast-header {
+  background-color: var(--pro-accent-danger, #f85149);
+  color: var(--pro-text-inverse);
+}
+
+.funky-toast-error .toast-header i {
+  color: var(--pro-accent-danger-text, #f8d7da);
+}
+
+.funky-toast-error .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+/* Warning toast */
+.funky-toast-warning {
+  background-color: var(--pro-accent-warning-bg, #664d03);
+  color: var(--pro-accent-warning-text, #fff3cd);
+}
+
+.funky-toast-warning .toast-header {
+  background-color: var(--pro-accent-warning, #d29922);
+  color: var(--pro-text-inverse);
+}
+
+.funky-toast-warning .toast-header i {
+  color: var(--pro-text-inverse);
+}
+
+.funky-toast-warning .btn-close {
+  filter: brightness(0);
+}
+
+/* Info toast */
+.funky-toast-info {
+  background-color: var(--pro-accent-info-bg, #0c4a6e);
+  color: var(--pro-accent-info-text, #cfe2ff);
+}
+
+.funky-toast-info .toast-header {
+  background-color: var(--pro-accent-info, #58a6ff);
+  color: var(--pro-text-inverse);
+}
+
+.funky-toast-info .toast-header i {
+  color: var(--pro-text-inverse);
+}
+
+.funky-toast-info .btn-close {
+  filter: brightness(0);
+}
+
+/* Confirmation toast */
+.funky-toast-confirm {
+  background-color: var(--pro-accent-warning-alt-bg, #3d2a1f);
+  color: var(--pro-accent-warning-text, #fff3cd);
+  min-width: 350px;
+}
+
+.funky-toast-confirm .toast-header {
+  background-color: var(--pro-accent-warning-alt, #fd7e14);
+  color: var(--pro-text-inverse);
+}
+
+.funky-toast-confirm .toast-header i {
+  color: var(--pro-text-inverse);
+}
+
+.funky-toast-confirm .btn-close {
+  filter: brightness(0);
+}
+
+.funky-toast-confirm .toast-body {
+  padding: 1rem;
+}
+
+.funky-toast-confirm .toast-body .btn {
+  font-weight: 500;
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  .funky-toast {
+    border-width: 2px !important;
+    box-shadow: none !important;
+  }
+
+  .funky-toast-success {
+    border-color: var(--pro-accent-success) !important;
+  }
+
+  .funky-toast-error {
+    border-color: var(--pro-accent-danger) !important;
+  }
+
+  .funky-toast-warning {
+    border-color: var(--pro-accent-warning) !important;
+  }
+
+  .funky-toast-info {
+    border-color: var(--pro-accent-info) !important;
+  }
+
+  .funky-toast-action {
+    border: 2px solid currentColor;
+    text-decoration: underline;
+  }
+
+  .funky-toast-close:focus-visible {
+    outline: 2px solid;
+  }
+}
+
+@media (forced-colors: active) {
+  .funky-toast {
+    border: 2px solid CanvasText;
+  }
+}
+
+/* ============================================
+   TOAST DEMO STYLES
+   Playground demo-specific styling
+   ============================================ */
+
+.toast-demo__button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.toast-demo__log {
+  background: var(--pro-bg-tertiary);
+  color: var(--pro-text-muted);
+  padding: 1rem;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  border: 1px solid var(--pro-border);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .toast-demo__button-grid {
+    flex-direction: column;
+  }
+
+  .toast-demo__button-grid .btn {
+    width: 100%;
+  }
+}

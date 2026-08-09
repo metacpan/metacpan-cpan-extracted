@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storagemigration::V1alpha1::GroupVersionResource;
 # ABSTRACT: The names of the group, the version, and the resource.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s group => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Storagemigration::V1alpha1::GroupVersionResource - The names of th
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 group
 

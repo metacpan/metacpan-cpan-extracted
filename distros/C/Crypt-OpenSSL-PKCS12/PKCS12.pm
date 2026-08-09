@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.97';
+our $VERSION = '1.98';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -40,14 +40,15 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
   print $pkcs12->private_key($pass);
 
   if ($pkcs12->mac_ok($pass)) {
-  ...
+    # MAC verification passed
+  }
 
   # Creating a file
   $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', 'friendly name');
 
 
   # Creating a string
-  my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
+  my $pkcs12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
 
   # Reproducing OpenSSL's info
   my $info = $pkcs12->info($pass);
@@ -57,7 +58,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 =head1 VERSION
 
-This documentation describes version 1.95 of Crypt::OpenSSL::PKCS12
+This documentation describes version 1.97 of Crypt::OpenSSL::PKCS12
 
 =head1 DESCRIPTION
 
@@ -71,53 +72,80 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 
 =item * new( )
 
+Create an empty Crypt::OpenSSL::PKCS12 object. Use C<new_from_string()> or
+C<new_from_file()> to load an existing PKCS12 structure.
+
 =item * legacy_support ( )
 
-Check whether the openssl version installed supports the legacy provider.
+Returns true if the legacy provider has been successfully loaded by a prior
+constructor call (C<new_from_string()> or C<new_from_file()>). Always returns
+true on OpenSSL 1.x (where the legacy provider concept does not apply). On
+OpenSSL 3.x, returns true only if the legacy provider was loaded during the
+most recent constructor call; calling C<legacy_support()> before constructing
+an object may return false even if the provider is loadable.
 
 =item * new_from_string( C<$string> )
 
 =item * new_from_file( C<$filename> )
 
-Create a new Crypt::OpenSSL::PKCS12 instance.
+Create a new Crypt::OpenSSL::PKCS12 instance from a binary PKCS12 string or
+from a file path respectively. Both forms croak on error (invalid format,
+unreadable file, OpenSSL parse failure). The binary string passed to
+C<new_from_string()> must not carry Perl's UTF-8 flag; use
+C<Encode::encode('octets', $str)> if needed.
 
 =item * certificate( [C<$pass>] )
 
-Get the Base64 representation of the certificate.
+Returns the end-entity certificate as a PEM-encoded string (Base64 with
+C<-----BEGIN CERTIFICATE-----> / C<-----END CERTIFICATE-----> headers).
+C<$pass> is required when the PKCS12 file is password-protected. Returns an
+empty string if the password is wrong or no client certificate is present.
 
 =item * ca_certificate( [C<$pass>] )
 
-Get the Base64 representation of the CA certificate chain.
+Returns any CA certificates in the chain as a concatenated PEM string.
+Returns an empty string if no CA certificates are present. C<$pass> is
+required when the PKCS12 file is password-protected.
 
 =item * private_key( [C<$pass>] )
 
-Get the Base64 representation of the private key.
+Returns the private key as a PEM-encoded string. C<$pass> is required when
+the PKCS12 file is password-protected. Returns an empty string if no private
+key is present or if decryption fails (wrong password).
 
-=item * as_string( [C<$pass>] )
+=item * as_string( )
 
-Get the binary represenation as a string.
+Returns the PKCS12 structure as a raw binary DER string. Useful for writing
+to a file or transmitting over a network without touching the filesystem.
+The in-memory structure is serialized as-is; no password is needed or accepted.
 
 =item * mac_ok( [C<$pass>] )
 
-Verifiy the certificates Message Authentication Code
+Verifies the Message Authentication Code (MAC) of the PKCS12 structure using
+C<$pass>. Returns true if the MAC is valid. Croaks on failure (wrong
+password, corrupted file, or OpenSSL error).
 
 =item * changepass( C<$old>, C<$new> )
 
-Change a certificate's password.
+Re-encrypts the PKCS12 structure with a new password. C<$old> is the current
+password; C<$new> is the replacement. Returns false on failure.
+
+B<Note:> Changing the PKCS12 password is not reliably supported on OpenSSL
+3.x; C<changepass()> may return false or fail silently. Consider
+re-creating the PKCS12 structure with C<create()> instead.
 
 =item * create( C<$cert>, C<$key>, C<$pass>, C<$output_file>, C<$friendly_name> )
 
-Create a new PKCS12 certificate. $cert & $key may either be strings or filenames.
-
-C<$friendly_name> is optional.
+Creates a new PKCS12 file at C<$output_file>. C<$cert> and C<$key> may each be
+either a PEM string (detected by a C<"-----"> prefix) or a filesystem path.
+C<$pass> is used to encrypt the private key. C<$friendly_name> is optional and
+sets the C<friendlyName> bag attribute. Croaks on any OpenSSL error.
 
 =item * create_as_string( C<$cert>, C<$key>, C<$pass>, C<$friendly_name> )
 
-Create a new PKCS12 certificate string. $cert & $key may either be strings or filenames.
-
-C<$friendly_name> is optional.
-
-Returns a string holding the PKCS12 certicate.
+Same as C<create()> but returns the PKCS12 structure as a raw binary DER string
+instead of writing to a file. C<$cert> and C<$key> may each be a PEM string or
+a filesystem path. C<$friendly_name> is optional. Croaks on any OpenSSL error.
 
 =item * info( C<$pass> )
 
@@ -162,7 +190,7 @@ Each bag has a type and the following are available:
                     [0] {
                             bag_attributes   {
                                 friendlyName   "...",
-                                localKeyID     "..." (dualvar: 54)
+                                localKeyID     "54"
                             },
                             key              "...",
                             key_attributes   {
@@ -183,7 +211,7 @@ Each bag has a type and the following are available:
                             bags   [
                                 [0] {
                                         bag_attributes   {
-                                            localKeyID   "01" (dualvar: 1)
+                                            localKeyID   "01"
                                             friendlyName   "",
                                         },
                                         cert             "...".
@@ -200,7 +228,7 @@ Each bag has a type and the following are available:
                 bags   [
                     [0] {
                             bag_attributes   {
-                                localKeyID   "02" (dualvar: 2)
+                                localKeyID   "02"
                             },
                             cert             "...",
                             issuer           "...",
@@ -226,7 +254,7 @@ Each bag has a type and the following are available:
                     [1] {
                             bag_attributes   {
                                 friendlyName   "...",
-                                localKeyID     "..." (dualvar: 54)
+                                localKeyID     "54"
                             },
                             cert             "...",
                             issuer           "...",
@@ -243,6 +271,9 @@ Each bag has a type and the following are available:
     ]
 }
 
+Attributes such as C<localKeyID> are stored as plain hex strings (e.g.
+C<"54">, C<"01">). Always treat these values as strings in code.
+
 =back
 
 =head1 EXPORTS
@@ -255,19 +286,42 @@ On request:
 
 =item * C<NOKEYS>
 
+Flag: suppress output of private keys.
+
 =item * C<NOCERTS>
+
+Flag: suppress output of certificates.
 
 =item * C<INFO>
 
+Flag: enable structural info output (used internally by C<info()> and
+C<info_as_hash()>; output is returned as a string or hash, not printed).
+
 =item * C<CLCERTS>
+
+Flag: output only client (end-entity) certificates.
 
 =item * C<CACERTS>
 
+Flag: output only CA certificates.
+
 =back
+
+These flags mirror the corresponding C<-nokeys>, C<-nocerts>, C<-info>,
+C<-clcerts>, and C<-cacerts> options of the C<openssl pkcs12> command.
 
 =head1 DIAGNOSTICS
 
-No diagnostics are documented at this time
+=over 4
+
+=item * B<"OpenSSL error: ..."> — an OpenSSL call failed. The trailing
+message is taken from C<ERR_reason_error_string()> and identifies the
+specific failure (e.g. C<"bad decrypt"> for a wrong password).
+
+=item * B<"Error opening ..."> — C<create()> could not open the specified
+output file path for writing.
+
+=back
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -281,7 +335,7 @@ This distribution has the following dependencies
 
 =item * An installation of OpenSSL, either version 1.X.X or version 3.X.X
 
-=item * Perl 5.8
+=item * Perl 5.14
 
 =back
 
@@ -289,7 +343,7 @@ This distribution has the following dependencies
 
 =over
 
-=item * OpenSSL(1) (L<HTTP version with OpenSSL.org|https://www.openssl.org/docs/man1.1.1/man1/openssl.html>)
+=item * OpenSSL(1) (L<HTTP version with OpenSSL.org|https://www.openssl.org/docs/manmaster/man1/openssl.html>)
 
 =item * L<Crypt::OpenSSL::X509|https://metacpan.org/pod/Crypt::OpenSSL::X509>
 

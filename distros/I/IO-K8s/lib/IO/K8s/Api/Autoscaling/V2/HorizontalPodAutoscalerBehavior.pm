@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerBehavior;
 # ABSTRACT: HorizontalPodAutoscalerBehavior configures the scaling behavior of the target in both Up and Down directions (scaleUp and scaleDown fields respectively).
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s scaleDown => 'Autoscaling::V2::HPAScalingRules';
@@ -23,7 +23,7 @@ IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerBehavior - HorizontalPodAu
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 scaleDown
 

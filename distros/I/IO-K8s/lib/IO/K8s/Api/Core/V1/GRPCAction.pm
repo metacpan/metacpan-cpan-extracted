@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::GRPCAction;
 # ABSTRACT: 
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s port => Int, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::GRPCAction -
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 port
 

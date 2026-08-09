@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::nftables;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::nftables - nftables backend for Net::Fir
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -301,8 +301,35 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the table/chain name, IPv4 set name, and IPv6 set
-# name for this instance.
+# Internal helper. Returns the three nftables object names this instance owns:
+# its table, which is also the name of the chain inside it, and its two sets.
+#
+# All three are derived from the prefix and the name rather than stored, so
+# every part of the backend agrees on what to create, reference, and tear down
+# without threading the names around. The prefix and name pair is unique per
+# instance, so two instances can share a host without colliding.
+#
+# The table and the chain deliberately share one name. nftables scopes chain
+# names to their table, so there is no collision, and having the instance own
+# a whole inet table means teardown can delete the table and take the chain,
+# both sets, and every rule with it in one command.
+#
+# There are still two sets despite the table being inet and therefore holding
+# both families, because an nftables set is typed: one is ipv4_addr and the
+# other ipv6_addr, and neither will hold the other's addresses.
+#
+# Takes no arguments.
+#
+# Returns a three element list of the table name, the IPv4 set name, and the
+# IPv6 set name, in that order. Note this differs from the iptables backend's
+# _set_names, which returns the sets first and the chain last.
+#
+#     my ( $table, $set4, $set6 ) = $self->_names;
+#
+#     # with prefix "kur" and name "ssh"
+#     #   $table is 'kur_ssh'   -- and the chain inside it is also 'kur_ssh'
+#     #   $set4  is 'kur_ssh_4'
+#     #   $set6  is 'kur_ssh_6'
 sub _names {
 	my ($self) = @_;
 
@@ -310,9 +337,54 @@ sub _names {
 	return ( $table, $table . '_4', $table . '_6' );
 }
 
-# Internal helper. Returns the list of rule statements that populate the
-# chain, based on the configured protocols and ports, followed by a hash ref
-# of which sets the rules reference (used by check).
+# Internal helper. Works out the full cross product of family, protocol, and
+# ports this instance needs to block and returns it as nftables rule
+# statements, along with a record of which sets those statements actually
+# mention. Essentially all of the backend's rule logic lives here.
+#
+# The second return value exists for check. Verifying the setup is still
+# intact means confirming the sets the rules depend on are present, and which
+# sets those are is not always both of them: a configuration whose protocols
+# are all one family, say icmp only, produces rules referencing just the IPv4
+# set, and demanding the IPv6 set exist would then report a healthy setup as
+# broken. Rather than have check re-derive that, it is recorded here where the
+# decision is actually made.
+#
+# Protocols belonging to the wrong family are skipped, so icmp never lands in
+# an ip6 rule and the various spellings of IPv6 ICMP never land in an ip one.
+# Ports are only attached to protocols that have them; anything else is
+# matched with meta l4proto, which is how nftables matches a protocol it has
+# no dedicated keyword for.
+#
+# Unlike the iptables backend there is no tarpit or delude here, so the target
+# is just drop or reject and does not vary by family.
+#
+# Takes no arguments; family, protocols, ports, and type all come from the
+# object.
+#
+# Returns a two element list:
+#
+#     - an arrayref of rule statement strings, each the complete body of one
+#       nft rule, ready to have "nft add rule inet <table> <chain> " put in
+#       front of it
+#     - a hashref keyed by the set names those statements reference, values
+#       all 1, for check to confirm
+#
+#     my ( $specs, $referenced ) = $self->_rule_specs;
+#
+#     # no protocols and no ports, type drop
+#     #   $specs is [ 'ip saddr @kur_ssh_4 drop', 'ip6 saddr @kur_ssh_6 drop' ]
+#     #   $referenced is { kur_ssh_4 => 1, kur_ssh_6 => 1 }
+#
+#     # ports 22 with no protocols: defaults to tcp and udp per family
+#     #   'tcp dport { 22 } ip saddr @kur_ssh_4 drop'
+#     #   'udp dport { 22 } ip saddr @kur_ssh_4 drop'
+#     #   'tcp dport { 22 } ip6 saddr @kur_ssh_6 drop'
+#     #   'udp dport { 22 } ip6 saddr @kur_ssh_6 drop'
+#
+#     # protocols gre, which takes no ports
+#     #   'meta l4proto gre ip saddr @kur_ssh_4 drop'
+#     #   'meta l4proto gre ip6 saddr @kur_ssh_6 drop'
 sub _rule_specs {
 	my ($self) = @_;
 
@@ -371,59 +443,6 @@ sub _rule_specs {
 
 	return ( \@specs, \%referenced );
 } ## end sub _rule_specs
-
-# Internal helper. Returns the conntrack commands used to drop existing
-# connection tracking entries for the passed IP. When protocols are
-# configured, the kill is scoped to them via -p so protocols that are not
-# being blocked are left alone; otherwise every entry for the IP is dropped.
-sub _kill_commands {
-	my ( $self, $ip ) = @_;
-
-	# conntrack defaults to IPv4, so IPv6 IPs need the family specified
-	my $is_v4  = ( $ip =~ /\A$IPv4_re\z/ ) ? 1 : 0;
-	my $family = $is_v4 ? '' : '-f ipv6 ';
-
-	my @protos = @{ $self->{protocols} };
-	if ( !@protos && defined( $self->{ports}[0] ) ) {
-		# ports without protocols means tcp and udp are being blocked
-		@protos = ( 'tcp', 'udp' );
-	}
-
-	# nothing configured means everything is being blocked, so drop every
-	# entry for the IP
-	if ( !@protos ) {
-		return ( 'conntrack ' . $family . '-D -s ' . $ip );
-	}
-
-	# scope the kill to the blocked protocols; ones conntrack can not filter
-	# by are skipped as are the icmps of the wrong family
-	my %conntrack_protos = (
-		tcp         => 'tcp',
-		udp         => 'udp',
-		udplite     => 'udplite',
-		sctp        => 'sctp',
-		dccp        => 'dccp',
-		gre         => 'gre',
-		icmp        => 'icmp',
-		icmpv6      => 'icmpv6',
-		icmp6       => 'icmpv6',
-		'ipv6-icmp' => 'icmpv6',
-	);
-
-	my @commands;
-	my %seen;
-	foreach my $proto (@protos) {
-		my $conntrack_proto = $conntrack_protos{$proto};
-		next if ( !defined($conntrack_proto) );
-		next if ( $conntrack_proto eq 'icmp'   && !$is_v4 );
-		next if ( $conntrack_proto eq 'icmpv6' && $is_v4 );
-		next if ( $seen{$conntrack_proto} );
-		$seen{$conntrack_proto} = 1;
-		push( @commands, 'conntrack ' . $family . '-D -p ' . $conntrack_proto . ' -s ' . $ip );
-	}
-
-	return @commands;
-} ## end sub _kill_commands
 
 =head2 init
 
@@ -694,13 +713,6 @@ sub re_init {
 
 	$self->errorblank;
 
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
-
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants
 	{
@@ -875,24 +887,6 @@ sub flush {
 
 	$self->{banned} = {};
 } ## end sub flush
-
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
 
 =head2 ban_cidr
 

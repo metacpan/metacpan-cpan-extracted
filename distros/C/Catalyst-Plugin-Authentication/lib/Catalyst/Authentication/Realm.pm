@@ -26,7 +26,27 @@ sub new {
         }
     }
 
+    if (!exists($self->config->{'rotate_session_id'})) {
+        if (exists($app->config->{'Plugin::Authentication'}{'rotate_session_id'})) {
+            $self->config->{'rotate_session_id'} = $app->config->{'Plugin::Authentication'}{'rotate_session_id'};
+        } else {
+            $self->config->{'rotate_session_id'} = 1;
+        }
+    }
+
     $app->log->debug("Setting up auth realm $realmname") if $app->debug;
+
+    $self->setup_store($app);
+    $self->setup_credential($app);
+
+    return $self;
+}
+
+sub setup_store {
+    my ($self, $app) = @_;
+
+    my $config = $self->config;
+    my $realmname = $self->name;
 
     # use the Null store as a default - Don't complain if the realm class is being overridden,
     # as the new realm may behave differently.
@@ -44,6 +64,55 @@ sub new {
         '' => 'Catalyst::Authentication::Store::',
         '+' => '',
     }, $storeclass);
+
+    try {
+        Catalyst::Utils::ensure_class_loaded( $storeclass );
+    }
+    catch {
+        # If the file is missing, then try the old-style fallback,
+        # but re-throw anything else for the user to deal with.
+        die $_ unless /^Can't locate/;
+        $app->log->warn( qq(Store class "$storeclass" not found, trying deprecated ::Plugin:: style naming. ) );
+        my $origstoreclass = $storeclass;
+        $storeclass =~ s/Catalyst::Authentication/Catalyst::Plugin::Authentication/;
+        try { Catalyst::Utils::ensure_class_loaded( $storeclass ); }
+        catch {
+            # Likewise this croak is useful if the second exception is also "not found",
+            # but would be confusing if it's anything else.
+            die $_ unless /^Can't locate/;
+            Carp::croak "Unable to load store class, " . $origstoreclass . " OR " . $storeclass .
+                        " in realm " . $self->name;
+        };
+    };
+
+    # BACKWARDS COMPATIBILITY - if the store class does not define find_user, we define it in terms
+    # of get_user and add it to the class.  this is because the auth routines use find_user,
+    # and rely on it being present. (this avoids per-call checks)
+    if (!$storeclass->can('find_user')) {
+        no strict 'refs';
+        *{"${storeclass}::find_user"} = sub {
+            my ($self, $info) = @_;
+            my @rest = @{$info->{rest}} if exists($info->{rest});
+            $self->get_user($info->{id}, @rest);
+        };
+    }
+
+    ## a little cruft to stay compatible with some poorly written stores / credentials
+    ## we'll remove this soon.
+    if ($storeclass->can('new')) {
+        $self->store($storeclass->new($config->{'store'}, $app, $self));
+    }
+    else {
+        $app->log->error("THIS IS DEPRECATED: $storeclass has no new() method - Attempting to use uninstantiated");
+        $self->store($storeclass);
+    }
+    return;
+}
+
+sub setup_credential {
+    my ($self, $app) = @_;
+
+    my $config = $self->config;
 
     # a little niceness - since most systems seem to use the password credential class,
     # if no credential class is specified we use password.
@@ -87,47 +156,6 @@ sub new {
         };
     };
 
-    try {
-        Catalyst::Utils::ensure_class_loaded( $storeclass );
-    }
-    catch {
-        # If the file is missing, then try the old-style fallback,
-        # but re-throw anything else for the user to deal with.
-        die $_ unless /^Can't locate/;
-        $app->log->warn( qq(Store class "$storeclass" not found, trying deprecated ::Plugin:: style naming. ) );
-        my $origstoreclass = $storeclass;
-        $storeclass =~ s/Catalyst::Authentication/Catalyst::Plugin::Authentication/;
-        try { Catalyst::Utils::ensure_class_loaded( $storeclass ); }
-        catch {
-            # Likewise this croak is useful if the second exception is also "not found",
-            # but would be confusing if it's anything else.
-            die $_ unless /^Can't locate/;
-            Carp::croak "Unable to load store class, " . $origstoreclass . " OR " . $storeclass .
-                        " in realm " . $self->name;
-        };
-    };
-
-    # BACKWARDS COMPATIBILITY - if the store class does not define find_user, we define it in terms
-    # of get_user and add it to the class.  this is because the auth routines use find_user,
-    # and rely on it being present. (this avoids per-call checks)
-    if (!$storeclass->can('find_user')) {
-        no strict 'refs';
-        *{"${storeclass}::find_user"} = sub {
-                                                my ($self, $info) = @_;
-                                                my @rest = @{$info->{rest}} if exists($info->{rest});
-                                                $self->get_user($info->{id}, @rest);
-                                            };
-    }
-
-    ## a little cruft to stay compatible with some poorly written stores / credentials
-    ## we'll remove this soon.
-    if ($storeclass->can('new')) {
-        $self->store($storeclass->new($config->{'store'}, $app, $self));
-    }
-    else {
-        $app->log->error("THIS IS DEPRECATED: $storeclass has no new() method - Attempting to use uninstantiated");
-        $self->store($storeclass);
-    }
     if ($credentialclass->can('new')) {
         $self->credential($credentialclass->new($config->{'credential'}, $app, $self));
     }
@@ -136,7 +164,7 @@ sub new {
         $self->credential($credentialclass);
     }
 
-    return $self;
+    return;
 }
 
 sub find_user {
@@ -145,9 +173,9 @@ sub find_user {
     my $res = $self->store->find_user($authinfo, $c);
 
     if (!$res) {
-      if ($self->config->{'auto_create_user'} && $self->store->can('auto_create_user') ) {
-          $res = $self->store->auto_create_user($authinfo, $c);
-      }
+        if ($self->config->{'auto_create_user'} && $self->store->can('auto_create_user') ) {
+            $res = $self->store->auto_create_user($authinfo, $c);
+        }
     } elsif ($self->config->{'auto_update_user'} && $self->store->can('auto_update_user')) {
         $res = $self->store->auto_update_user($authinfo, $c, $res);
     }
@@ -156,15 +184,15 @@ sub find_user {
 }
 
 sub authenticate {
-     my ($self, $c, $authinfo) = @_;
+    my ($self, $c, $authinfo) = @_;
 
-     my $user = $self->credential->authenticate($c, $self, $authinfo);
-     if (ref($user)) {
-         $c->set_authenticated($user, $self->name);
-         return $user;
-     } else {
-         return undef;
-     }
+    my $user = $self->credential->authenticate($c, $self, $authinfo);
+    if (ref($user)) {
+        $c->set_authenticated($user, $self->name);
+        return $user;
+    } else {
+        return undef;
+    }
 }
 
 sub user_is_restorable {
@@ -218,6 +246,13 @@ sub persist_user {
         and $self->config->{'use_session'}
         and $user->supports("session")
     ) {
+        if (
+            $self->config->{rotate_session_id}
+            and $c->session_is_valid
+        ) {
+            $c->change_session_id;
+        }
+
         $c->session->{__user_realm} = $self->name;
 
         # we want to ask the store for a user prepared for the session.
@@ -264,6 +299,8 @@ __PACKAGE__;
 __END__
 
 =pod
+
+=for Pod::Coverage setup_credential setup_store
 
 =head1 NAME
 

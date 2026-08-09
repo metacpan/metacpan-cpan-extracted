@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::bgp_rtbh;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::bgp_rtbh - BGP Remote Triggered Black Ho
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -232,10 +232,77 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Builds the announce/withdraw command for the given verb
-# ('announce' or 'withdraw') and IP, in the syntax of the configured driver
-# (exabgp via exabgpcli or gobgp), picking the family-appropriate next
-# hop and prefix length and attaching the blackhole community.
+# Internal helper. Builds the command that announces or withdraws the
+# blackhole route for a single address, in whichever of the three drivers'
+# syntaxes is configured. This and its CIDR counterpart are where every ban
+# and unban this backend performs is expressed.
+#
+# There is no shared command shape across the drivers, which is why this is
+# one long branch rather than a template. Each does something structurally
+# different:
+#
+#   - frr does not speak BGP here at all. It installs a local blackhole static
+#     route through vtysh, and it is a redistribute-static route-map on the
+#     router that turns that into a tagged BGP announcement. Withdrawal is the
+#     same line prefixed with "no". Because the community is applied by the
+#     router's own configuration, neither the community nor the next hop
+#     option is used on this path.
+#   - gobgp manipulates the RIB directly. A withdrawal matches on the prefix
+#     alone, so the next hop and community are only attached when adding;
+#     sending them on a delete would not match.
+#   - exabgp goes through exabgpcli and takes the whole announcement as one
+#     quoted argument.
+#
+# The address is turned into a prefix by appending the configured host mask
+# for its family, 32 and 128 by default, since what is being blackholed is one
+# host.
+#
+# The exabgp commands are single quoted for two separate reasons worth not
+# undoing: the flowspec syntax is full of braces and semicolons that the shell
+# would otherwise treat as its own, and the community is written in square
+# brackets, which the shell would try to glob against the working directory.
+#
+# Args:
+#
+#     verb - What to do, as a plain string: 'announce' to install the
+#            blackhole or 'withdraw' to remove it. Each driver maps it onto
+#            its own spelling, so gobgp sees add and del and frr sees a line
+#            with or without a leading "no". Anything else is not checked for
+#            and would produce an invalid command.
+#
+#     ip   - The address to blackhole, as a plain string. Expected to be an
+#            already validated and lowercased IPv4 or IPv6 address. The family
+#            is decided by matching against $IPv4_re and selects the mask, the
+#            next hop, and the address family argument.
+#
+# Returns the command as a single string ready to hand to the runner. What it
+# looks like depends entirely on the driver and on whether announce_type is
+# the default 'rtbh' or 'flowspec'.
+#
+#     # driver exabgp, announce_type rtbh, community 65535:666
+#     $self->_route_command( 'announce', '10.0.0.1' );
+#     #   exabgpcli 'announce route 10.0.0.1/32 next-hop 192.0.2.1 community [65535:666]'
+#
+#     # the withdrawal is symmetric
+#     $self->_route_command( 'withdraw', '10.0.0.1' );
+#     #   exabgpcli 'withdraw route 10.0.0.1/32 next-hop 192.0.2.1 community [65535:666]'
+#
+#     # driver exabgp, announce_type flowspec
+#     #   exabgpcli 'announce flow route { match { source 10.0.0.1/32; } then { discard; } }'
+#
+#     # driver gobgp: attributes on add
+#     #   gobgp global rib add 10.0.0.1/32 nexthop 192.0.2.1 community 65535:666 -a ipv4
+#     # and prefix only on del
+#     #   gobgp global rib del 10.0.0.1/32 -a ipv4
+#
+#     # driver frr, which installs a static route instead
+#     #   vtysh -c 'configure terminal' -c 'ip route 10.0.0.1/32 blackhole'
+#     #   vtysh -c 'configure terminal' -c 'no ip route 10.0.0.1/32 blackhole'
+#
+# The extra option, when set, is appended to the exabgp and gobgp add forms so
+# further BGP attributes can be carried. It is not applied to withdrawals,
+# which match on the prefix, nor to the frr path, which has no BGP attributes
+# of its own.
 sub _route_command {
 	my ( $self, $verb, $ip ) = @_;
 
@@ -311,10 +378,47 @@ sub _route_command {
 	return $self->{options}{exabgpcli_cmd} . " '" . $route . "'";
 } ## end sub _route_command
 
-# Internal helper. Like _route_command but for a CIDR range. The passed
-# value is already an address/prefix, so it is announced/withdrawn verbatim
-# rather than having a host mask appended, with the family determined from the
-# address portion of the range.
+# Internal helper. The CIDR counterpart of _route_command: builds the command
+# that announces or withdraws the blackhole route for a whole range.
+#
+# Blackholing a range is the operation BGP RTBH is actually built for, so this
+# is the more natural of the two paths even though the single address one sees
+# more use. The driver handling is identical to _route_command and the same
+# notes about frr, gobgp, and the exabgp quoting apply.
+#
+# There are two differences from _route_command, both following from the
+# argument already being a prefix. No mask is appended, since the range
+# carries its own prefix length, and the family has to be read off the address
+# portion rather than the whole string, because a range always holds a "/"
+# that would never match the IPv4 regexp. A value with no "/" at all is used
+# as is and matched for family directly, so passing a bare address here
+# degrades to announcing it without a prefix length rather than failing.
+#
+# Args:
+#
+#     verb - What to do, as a plain string: 'announce' to install the
+#            blackhole or 'withdraw' to remove it. Mapped onto each driver's
+#            own spelling exactly as in _route_command.
+#
+#     cidr - The range to blackhole, as a plain string. Expected to be an
+#            already validated CIDR range such as "10.0.0.0/8" or
+#            "2001:db8::/32". Announced verbatim, so the prefix length given
+#            is the one that goes out.
+#
+# Returns the command as a single string ready to hand to the runner.
+#
+#     # driver exabgp, announce_type rtbh
+#     $self->_route_command_cidr( 'announce', '10.0.0.0/8' );
+#     #   exabgpcli 'announce route 10.0.0.0/8 next-hop 192.0.2.1 community [65535:666]'
+#
+#     # driver exabgp, announce_type flowspec
+#     #   exabgpcli 'announce flow route { match { source 10.0.0.0/8; } then { discard; } }'
+#
+#     # driver gobgp
+#     #   gobgp global rib add 10.0.0.0/8 nexthop 192.0.2.1 community 65535:666 -a ipv4
+#
+#     # driver frr, IPv6 range
+#     #   vtysh -c 'configure terminal' -c 'ipv6 route 2001:db8::/32 blackhole'
 sub _route_command_cidr {
 	my ( $self, $verb, $cidr ) = @_;
 
@@ -390,8 +494,35 @@ sub _route_command_cidr {
 	return $self->{options}{exabgpcli_cmd} . " '" . $route . "'";
 } ## end sub _route_command_cidr
 
-# Internal helper. Returns the driver-appropriate command used by check to
-# confirm the BGP daemon is reachable.
+# Internal helper. Returns the command check uses to confirm the BGP daemon is
+# still reachable, in whichever driver's syntax is configured.
+#
+# Unlike the packet filter backends there is nothing of this instance's own to
+# look for. The BGP session belongs to the running daemon, which this backend
+# only talks to, and announcements live in that daemon's RIB rather than in
+# any object created at init. What can actually go wrong is the daemon being
+# restarted or going away, taking every announcement with it, so reachability
+# is the meaningful health check and is what triggers a re_init and
+# re-announcement of the current bans.
+#
+# All three commands are read only queries chosen because they fail cleanly
+# when the daemon is not there, rather than because their output is
+# interesting. Only the exit status is looked at; nothing parses what comes
+# back.
+#
+# Takes no arguments; the driver and the command paths come from the options.
+#
+# Returns the command as a single string ready to hand to the runner, whose
+# exit status is 0 when the daemon answers.
+#
+#     # driver exabgp, the default
+#     $self->_check_command;    # exabgpcli show neighbor summary
+#
+#     # driver gobgp
+#     $self->_check_command;    # gobgp neighbor
+#
+#     # driver frr
+#     $self->_check_command;    # vtysh -c 'show ip bgp summary'
 sub _check_command {
 	my ($self) = @_;
 
@@ -572,24 +703,6 @@ sub unban {
 
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
-
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
 
 =head2 ban_cidr
 
@@ -783,13 +896,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort; a session that already dropped the routes is
 	# exactly what re_init is meant to recover from

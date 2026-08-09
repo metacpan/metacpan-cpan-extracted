@@ -1,0 +1,47 @@
+<h1>Sign up</h1>
+
+<p class="lede">
+  The signup handler enqueues a welcome mail and answers immediately. The
+  mail is delivered by a worker process, later, from the same database.
+</p>
+
+{% if error %}<p class="error">{% error %}</p>{% end %}
+
+<form method="post" action="/signup" class="card">
+  {% raw csrf %}
+  <label for="email">Email address</label>
+  <input id="email" name="email" type="email" placeholder="you@example.com" required>
+  <button type="submit">Sign up</button>
+</form>
+
+<form method="post" action="/ping" class="card thin">
+  {% raw csrf %}
+  <label for="note">...or enqueue the coderef task</label>
+  <input id="note" name="note" value="hello">
+  <button type="submit">Enqueue ping</button>
+</form>
+
+{% if recent %}
+<h2>Jobs you enqueued</h2>
+<ul class="jobs">
+{% for r in recent %}
+  <li><a href="/jobs/{% r.id %}">#{% r.id %}</a> {% r.email %}</li>
+{% end %}
+</ul>
+{% end %}
+
+<h2>The queue right now</h2>
+<dl class="stats">
+  <dt>inactive</dt><dd>{% stats.inactive_jobs %}</dd>
+  <dt>active</dt><dd>{% stats.active_jobs %}</dd>
+  <dt>finished</dt><dd>{% stats.finished_jobs %}</dd>
+  <dt>failed</dt><dd>{% stats.failed_jobs %}</dd>
+  <dt>workers</dt><dd>{% stats.active_workers %}</dd>
+</dl>
+
+{% if stats.active_workers == 0 %}
+<p class="warn">
+  No workers are running, so nothing will be delivered. Start one:<br>
+  <code>punk-queue worker --app bin/queue.pl -q default,mail,reports -j 2</code>
+</p>
+{% end %}

@@ -168,7 +168,6 @@ static HV *pdbi_slot_for(pTHX_ SV *self) {
          * (or a fork) starts fresh ones. */
         (void)hv_delete(slot, "qi",   2, G_DISCARD);
         (void)hv_delete(slot, "sqlc", 4, G_DISCARD);
-        dbh = conn;
     }
 
     /* create/update read this off the instance; keep it in step with the
@@ -177,7 +176,6 @@ static HV *pdbi_slot_for(pTHX_ SV *self) {
         SV *r = pdbi_get(aTHX_ slot, "returning");
         (void)hv_stores(h, "returning", newSViv(r ? SvIV(r) : 0));
     }
-    PERL_UNUSED_VAR(dbh);
     return slot;
 }
 

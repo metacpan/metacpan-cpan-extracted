@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::NetworkPolicySpec;
 # ABSTRACT: NetworkPolicySpec provides the specification of a NetworkPolicy
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s egress => ['Networking::V1::NetworkPolicyEgressRule'];
@@ -9,7 +9,7 @@ k8s egress => ['Networking::V1::NetworkPolicyEgressRule'];
 k8s ingress => ['Networking::V1::NetworkPolicyIngressRule'];
 
 
-k8s podSelector => 'Meta::V1::LabelSelector', 'required';
+k8s podSelector => 'Meta::V1::LabelSelector';
 
 
 k8s policyTypes => [Str];
@@ -29,7 +29,7 @@ IO::K8s::Api::Networking::V1::NetworkPolicySpec - NetworkPolicySpec provides the
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 egress
 
@@ -41,7 +41,7 @@ ingress is a list of ingress rules to be applied to the selected pods. Traffic i
 
 =head2 podSelector
 
-podSelector selects the pods to which this NetworkPolicy object applies. The array of ingress rules is applied to any pods selected by this field. Multiple network policies can select the same set of pods. In this case, the ingress rules for each are combined additively. This field is NOT optional and follows standard label selector semantics. An empty podSelector matches all pods in this namespace.
+podSelector selects the pods to which this NetworkPolicy object applies. The array of ingress rules is applied to any pods selected by this field. Multiple network policies can select the same set of pods. In this case, the ingress rules for each are combined additively. This field is optional. If it is not specified, it defaults to an empty selector, which matches all pods in this namespace.
 
 =head2 policyTypes
 

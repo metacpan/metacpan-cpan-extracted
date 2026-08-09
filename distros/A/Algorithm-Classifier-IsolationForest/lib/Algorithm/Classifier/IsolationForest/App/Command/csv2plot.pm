@@ -166,4 +166,65 @@ splot "' . $opt->{'i'} . '" using 1:2:(1) with pm3d, \
 
 } ## end sub execute
 
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::csv2plot - Plot the CSV data used with iforest via gnuplot
+
+=head1 DESCRIPTION
+
+Renders a CSV through gnuplot.  The plot types are
+
+  - auto :: 2heat for two columns, 3range for four or more
+  - 2heat :: columns 1 and 2 as a scatter plot over a heat map
+  - 3range :: columns 1 and 2 for x/y, the second-to-last column for the
+    score gradient
+  - 3binary :: columns 1 and 2 for x/y, the last column for the
+    normal/abnormal split
+
+C<3range> and C<3binary> expect the output of C<iforest predict -d>.  For
+data with more than two features, columns 1 and 2 are always the axes.
+
+Run it as C<iforest csv2plot>; C<iforest help csv2plot> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help csv2plot> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Checks that C<-i> is a readable file, that C<-o> does not already exist
+unless C<-w> was given, and that C<-p> names one of the plot types above.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Writes the gnuplot input and runs it, leaving the image at C<-o>.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
+
 return 1;

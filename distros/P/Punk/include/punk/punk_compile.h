@@ -559,4 +559,126 @@ XS_INTERNAL(pc_ff_fail_cb) {
     XSRETURN(1);
 }
 
+/* ---- the streaming variant: a Future behind a psgi.streaming responder ----
+ *
+ * A raw Future handed back as the PSGI response is a shape only Hyperman
+ * understands, and anything standing between Punk and the server - the Lint
+ * and AccessLog middleware plackup adds in its development default, or this
+ * application's own `middleware` - dies on it. When the server advertises
+ * psgi.streaming, the future rides inside the standard delayed response
+ * instead: a coderef every middleware passes through, resolving to the same
+ * triplet through the same deliver path. */
+
+/* Hand `resp` to the responder - or, when the future resolved to a streaming
+ * coderef of its own (an SSE body, say), hand the responder to it. */
+static void pc_respond(pTHX_ SV *responder, SV *resp) {
+    dSP;
+    int stream = SvROK(resp) && SvTYPE(SvRV(resp)) == SVt_PVCV;
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(stream ? responder : resp);
+    PUTBACK;
+    call_sv(stream ? resp : responder, G_VOID | G_DISCARD | G_EVAL);
+    if (SvTRUE(ERRSV))
+        warn("Punk: responder failed: %" SVf, SVfARG(ERRSV));
+    FREETMPS; LEAVE;
+}
+
+/* cap: [c, on_error, method, after, responder] - the pc_ff_* layout plus the
+ * responder the server handed the delayed response. */
+XS_INTERNAL(pc_ffs_done_cb);
+XS_INTERNAL(pc_ffs_done_cb) {
+    dXSARGS;
+    AV *cap = punk_clos_cap(aTHX_ cv);
+    SV *c   = *av_fetch(cap, 0, 0);
+    int hd  = pc_is_head(aTHX_ *av_fetch(cap, 2, 0));
+    AV *aft = pc_after_of(aTHX_ *av_fetch(cap, 3, 0));
+    SV *rsp = *av_fetch(cap, 4, 0);
+    SV *val = items > 0 ? ST(0) : &PL_sv_undef;
+    SV *trip = punk_deliver(aTHX_ c, val, hd, aft);
+    pc_respond(aTHX_ rsp, trip);
+    SvREFCNT_dec(trip);
+    XSRETURN(0);
+}
+
+XS_INTERNAL(pc_ffs_fail_cb);
+XS_INTERNAL(pc_ffs_fail_cb) {
+    dXSARGS;
+    AV *cap = punk_clos_cap(aTHX_ cv);
+    SV *c   = *av_fetch(cap, 0, 0);
+    SV *oe  = *av_fetch(cap, 1, 0);
+    int hd  = pc_is_head(aTHX_ *av_fetch(cap, 2, 0));
+    AV *aft = pc_after_of(aTHX_ *av_fetch(cap, 3, 0));
+    SV *rsp = *av_fetch(cap, 4, 0);
+    SV *err = (items > 0 && SvOK(ST(0))) ? ST(0) : sv_2mortal(newSVpvs("failed"));
+    SV *resp = punk_handle_error(aTHX_ c, err, SvOK(oe) ? oe : NULL);
+    SV *trip = punk_deliver(aTHX_ c, resp, hd, aft);
+    pc_respond(aTHX_ rsp, trip);
+    SvREFCNT_dec(trip);
+    SvREFCNT_dec(resp);
+    XSRETURN(0);
+}
+
+/* The delayed response itself. cap: [c, ret, on_error, method, after];
+ * called by the server (or the innermost middleware) with the responder.
+ *
+ * On a live Hyperman worker loop the then-chain is enough - the loop is what
+ * resolves the future, and the responder fires when it does. Without one
+ * (a foreign nonblocking server, a synthetic test env) nothing would ever
+ * drive a pending future, so it is awaited inline - the same semantics the
+ * blocking branch has always had, delivered through the responder. */
+XS_INTERNAL(pc_ffs_cb);
+XS_INTERNAL(pc_ffs_cb) {
+    dXSARGS;
+    AV *cap = punk_clos_cap(aTHX_ cv);
+    SV *c   = *av_fetch(cap, 0, 0);
+    SV *ret = *av_fetch(cap, 1, 0);
+    SV *responder = items > 0 ? ST(0) : &PL_sv_undef;
+    const hm_abi *A = punk_hm(aTHX);
+    if (A && A->cur_loop(aTHX)) {
+        SV *done, *fail, *argv[2], *chained;
+        AV *caps[2];
+        int j;
+        for (j = 0; j < 2; j++) {
+            AV *icap = caps[j] = newAV();
+            SV **oe = av_fetch(cap, 2, 0), **af = av_fetch(cap, 4, 0);
+            av_push(icap, newSVsv(c));
+            av_push(icap, (oe && SvOK(*oe)) ? newSVsv(*oe) : newSV(0));
+            av_push(icap, newSVsv(*av_fetch(cap, 3, 0)));
+            av_push(icap, (af && SvOK(*af)) ? newSVsv(*af)
+                                            : newRV_noinc((SV *)newAV()));
+            av_push(icap, newSVsv(responder));
+        }
+        done = sv_2mortal(punk_closure(aTHX_ pc_ffs_done_cb, caps[0]));
+        fail = sv_2mortal(punk_closure(aTHX_ pc_ffs_fail_cb, caps[1]));
+        argv[0] = done; argv[1] = fail;
+        chained = pcx_call_meth(aTHX_ ret, "then", argv, 2, 1);
+        /* the pending chain is held by what will resolve it */
+        if (chained) SvREFCNT_dec(chained);
+    }
+    else {
+        dSP; int count, died, hd;
+        SV *got, *resp, *trip;
+        SV **oe = av_fetch(cap, 2, 0);
+        AV *aft = pc_after_of(aTHX_ *av_fetch(cap, 4, 0));
+        ENTER; SAVETMPS;
+        PUSHMARK(SP); EXTEND(SP, 1); PUSHs(ret); PUTBACK;
+        count = call_method("get", G_SCALAR | G_EVAL);
+        SPAGAIN;
+        got = count > 0 ? SvREFCNT_inc(POPs) : &PL_sv_undef;
+        PUTBACK; FREETMPS; LEAVE;
+        died = SvTRUE(ERRSV) ? 1 : 0;
+        hd = pc_is_head(aTHX_ *av_fetch(cap, 3, 0));
+        resp = died ? punk_handle_error(aTHX_ c, ERRSV,
+                          (oe && SvOK(*oe)) ? *oe : NULL)
+                    : punk_coerce(aTHX_ c, got);
+        trip = punk_deliver(aTHX_ c, resp, hd, aft);
+        pc_respond(aTHX_ responder, trip);
+        SvREFCNT_dec(trip);
+        SvREFCNT_dec(resp);
+        if (got != &PL_sv_undef) SvREFCNT_dec(got);
+    }
+    XSRETURN(0);
+}
+
 #endif /* PUNK_COMPILE_H */

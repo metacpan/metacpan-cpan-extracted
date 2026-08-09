@@ -44,6 +44,7 @@
 #define K_AFTER_D    "after_dispatch"
 #define K_MIDDLEWARE "middleware"
 #define K_HELPERS    "helpers"
+#define K_KEYWORDS   "keywords"    /* plugin-installed DSL keywords */
 #define K_ON_ERROR   "on_error"
 #define K_COMPILED   "compiled"
 #define K_CONFIG     "config"

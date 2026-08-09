@@ -1,5 +1,5 @@
 package Kubernetes::REST::RbacAuthorization;
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 # ABSTRACT: DEPRECATED - v0 API group for RBAC resources
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::RbacAuthorization - DEPRECATED - v0 API group for RBAC resourc
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 

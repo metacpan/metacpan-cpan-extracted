@@ -1,5 +1,5 @@
 package Kubernetes::REST::Role::IO;
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 # ABSTRACT: Interface role for HTTP backends
 use Moo::Role;
 
@@ -30,7 +30,7 @@ Kubernetes::REST::Role::IO - Interface role for HTTP backends
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 
@@ -62,19 +62,33 @@ This role defines the interface that HTTP backends must implement. L<Kubernetes:
 
 The default backend is L<Kubernetes::REST::LWPIO> (using L<LWP::UserAgent>). An alternative L<Kubernetes::REST::HTTPTinyIO> (using L<HTTP::Tiny>) is provided. To use an async event loop, implement this role with e.g. L<Net::Async::HTTP>.
 
+=head2 Encoding contract
+
+Request and response bodies are B<bytes>, never character strings.
+
+A backend receives C<< $req->content >> already UTF-8 encoded and must put it on
+the wire unchanged. It must hand back C<< $res->content >> - and every streaming
+chunk - as the bytes it received, undoing C<Content-Encoding> (gzip) but B<not>
+the charset. L<Kubernetes::REST> decodes UTF-8 itself, together with L<IO::K8s>,
+so a backend that decodes on its own causes silent double decoding (mojibake) on
+any non-ASCII value.
+
+With L<LWP::UserAgent> that means C<< $res->decoded_content(charset => 'none') >>
+rather than C<< $res->decoded_content >>.
+
 =head2 call
 
     my $response = $io->call($req);
 
 Required. Execute an HTTP request. Receives a L<Kubernetes::REST::HTTPRequest> with C<method>, C<url>, C<headers>, and optionally C<content> already set.
 
-Must return a L<Kubernetes::REST::HTTPResponse> with C<status> and C<content>.
+Must return a L<Kubernetes::REST::HTTPResponse> with C<status> and C<content>, the latter as bytes - see L</Encoding contract>.
 
 =head2 call_streaming
 
     my $response = $io->call_streaming($req, $data_callback);
 
-Required. Execute an HTTP request with streaming response. The C<$data_callback> is called with each chunk of data as it arrives: C<< $data_callback->($chunk) >>.
+Required. Execute an HTTP request with streaming response. The C<$data_callback> is called with each chunk of data as it arrives: C<< $data_callback->($chunk) >>. Chunks are bytes - see L</Encoding contract>.
 
 Must return a L<Kubernetes::REST::HTTPResponse> when the stream ends.
 

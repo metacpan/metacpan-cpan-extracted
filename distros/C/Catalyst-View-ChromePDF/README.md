@@ -59,6 +59,18 @@ This is a [Catalyst](https://metacpan.org/pod/Catalyst) view for rendering web p
 
 It is intended as a successor to [Catalyst::View::Wkhtmltopdf](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3AWkhtmltopdf).
 
+# RECENT CHANGES
+
+Changes for version v0.1.1 (2026-08-08)
+
+- Documentation
+    - Updated SECURITY CONSIDERATIONS to emphasise that the content of the rendered is assumed to be trusted by the developer.
+    - Fixed typos.
+- Tests
+    - Skip tests if no chrome executable can be found.
+
+See the `Changes` file for more details.
+
 # REQUIREMENTS
 
 This module lists the following modules as runtime dependencies:
@@ -113,6 +125,13 @@ dzil install --install-command="cpan ."
 For more information, see [How to install CPAN modules](https://www.cpan.org/modules/INSTALL.html).
 
 # SECURITY CONSIDERATIONS
+
+## HTML
+
+It is assumed that the content of the rendered HTML that as saved as a PDF is controlled and trusted by the developer.
+
+The default configuration of ["mech"](#mech) does not block `file:` URLs.
+That is a feature, not a bug or oversight.
 
 ## Temporary Files
 

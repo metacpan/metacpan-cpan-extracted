@@ -1,0 +1,19 @@
+# systemd unit for the Ereshkigal firewall ban manager
+#
+#   cp rc/systemd/ereshkigal.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now ereshkigal
+
+[Unit]
+Description=Ereshkigal firewall ban manager
+Documentation=man:ereshkigal(1)
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/ereshkigal/pid
+ExecStart=/usr/local/bin/ereshkigal start
+ExecStop=/usr/local/bin/ereshkigal stop
+
+[Install]
+WantedBy=multi-user.target

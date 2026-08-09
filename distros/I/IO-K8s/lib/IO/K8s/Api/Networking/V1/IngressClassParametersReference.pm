@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::IngressClassParametersReference;
 # ABSTRACT: IngressClassParametersReference identifies an API object. This can be used to specify a cluster or namespace-scoped resource.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s apiGroup => Str;
@@ -32,7 +32,7 @@ IO::K8s::Api::Networking::V1::IngressClassParametersReference - IngressClassPara
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 apiGroup
 

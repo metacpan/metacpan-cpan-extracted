@@ -86,9 +86,6 @@ Catalyst::Authentication::Store::Minimal - Minimal authentication store
 
 =head1 SYNOPSIS
 
-    # you probably just want Store::Minimal under most cases,
-    # but if you insist you can instantiate your own store:
-
     use Catalyst::Authentication::Store::Minimal;
 
     use Catalyst qw/

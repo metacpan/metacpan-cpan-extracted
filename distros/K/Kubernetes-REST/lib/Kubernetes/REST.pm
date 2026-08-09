@@ -1,11 +1,12 @@
 package Kubernetes::REST;
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 # ABSTRACT: A Perl REST Client for the Kubernetes API
 use Moo;
 use Carp qw(croak carp);
 use Scalar::Util qw(blessed);
 use Module::Runtime qw(require_module);
 use JSON::MaybeXS ();
+use Encode ();
 use Kubernetes::REST::Server;
 use Kubernetes::REST::AuthToken;
 use Kubernetes::REST::LWPIO;
@@ -57,7 +58,15 @@ has io => (
 );
 
 
-has _json => (is => 'ro', default => sub { JSON::MaybeXS->new });
+# utf8 => 1 makes encode() return UTF-8 bytes and decode() expect them, which is
+# what HTTP::Request->content requires and what IO::K8s already assumes. See the
+# ENCODING section below.
+has _json => (
+    is => 'ro',
+    default => sub {
+        JSON::MaybeXS->new(utf8 => 1, canonical => 1, convert_blessed => 1);
+    },
+);
 
 # IO::K8s instance - configured with same resource_map
 has k8s => (
@@ -372,8 +381,12 @@ sub _prepare_request {
 sub _check_response {
     my ($self, $response, $context) = @_;
     if ($response->status >= 400) {
+        # Response bodies are bytes; the error message is read by humans, so
+        # decode it (leniently - a truncated or non-UTF-8 body must not turn a
+        # useful API error into an encoding croak).
+        my $body = Encode::decode('UTF-8', $response->content // '', Encode::FB_DEFAULT);
         croak "Kubernetes API error ($context): "
-            . $response->status . " " . ($response->content // '');
+            . $response->status . " " . $body;
     }
     return $response;
 }
@@ -1136,7 +1149,7 @@ Kubernetes::REST - A Perl REST Client for the Kubernetes API
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 
@@ -1545,6 +1558,10 @@ Retrieve logs from a pod. Supports two modes:
 B<One-shot> (without C<on_line>): Returns the full log text as a string.
 
 B<Streaming> (with C<on_line>): Calls the callback for each log line with a L<Kubernetes::REST::LogEvent> object. Blocks until the stream ends (or the server closes the connection).
+
+Log output is returned as raw bytes in both modes - container output is not
+guaranteed to be UTF-8, or even text. Decode it yourself when you know it is:
+C<< Encode::decode('UTF-8', $text) >>. See L</ENCODING>.
 
 The streaming mode is designed for event-based systems like L<IO::Async> — see L<Net::Async::Kubernetes> for async integration.
 
@@ -2161,6 +2178,50 @@ To implement a custom IO backend, consume L<Kubernetes::REST::Role::IO>
 and implement C<call($req)> and C<call_streaming($req, $callback)>.
 See L<Kubernetes::REST::LWPIO> and L<Kubernetes::REST::HTTPTinyIO> for
 reference implementations.
+
+=head1 ENCODING
+
+On the wire everything is bytes; in your program everything is characters.
+The boundary sits in this module, and you do not have to do anything for it:
+
+=over
+
+=item *
+
+Objects you pass to C<create>, C<update>, C<patch> and friends hold ordinary
+Perl character strings. They are UTF-8 encoded on the way into the request
+body, so C<< data => { note => "Caf\x{e9} \x{a7}" } >> is applied to the
+cluster unchanged.
+
+=item *
+
+Objects you get back from C<get>, C<list>, C<watch> and friends hold decoded
+characters, so C<length> counts characters and regexes match as expected.
+
+=item *
+
+Exception messages from failed API calls are decoded too.
+
+=back
+
+Two things stay bytes on purpose:
+
+=over
+
+=item *
+
+C<log> - container output is an arbitrary byte stream, not necessarily UTF-8,
+and decoding it would corrupt anything binary. Decode it yourself if you know
+it is text: C<< Encode::decode('UTF-8', $api->log('Pod', $name)) >>. The same
+applies to C<< $event->line >> in streaming mode.
+
+=item *
+
+The C<content> of L<Kubernetes::REST::HTTPRequest> and
+L<Kubernetes::REST::HTTPResponse> - these are the raw HTTP layer. Custom IO
+backends must honour that; see L<Kubernetes::REST::Role::IO/Encoding contract>.
+
+=back
 
 =head1 SEE ALSO
 

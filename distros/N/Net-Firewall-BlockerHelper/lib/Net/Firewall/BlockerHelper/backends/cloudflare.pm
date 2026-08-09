@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::cloudflare;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::cloudflare - Cloudflare IP access rules 
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -281,8 +281,31 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the access rules endpoint, zone level if the zone
-# option is set and user level otherwise.
+# Internal helper. Returns the access rules endpoint this instance operates
+# on, which is either zone scoped or account wide depending on configuration.
+#
+# Cloudflare exposes the same access rules API at two levels. A zone level
+# rule applies only to that one zone, while a user level rule applies across
+# every zone on the account. Which one an instance uses is decided entirely by
+# whether the zone option was set, and it changes the blast radius of every
+# ban, so it is worth being deliberate about.
+#
+# Note the test is on the option being defined rather than being non empty, so
+# a zone explicitly set to the empty string would still take the zone branch
+# and produce a malformed URL.
+#
+# Takes no arguments.
+#
+# Returns the endpoint as a string, with no trailing slash. Every other URL in
+# this backend is built on it.
+#
+#     # with the zone option set
+#     $self->_endpoint;
+#     #   https://api.cloudflare.com/client/v4/zones/<zone>/firewall/access_rules/rules
+#
+#     # with no zone, so account wide
+#     $self->_endpoint;
+#     #   https://api.cloudflare.com/client/v4/user/firewall/access_rules/rules
 sub _endpoint {
 	my ($self) = @_;
 
@@ -292,26 +315,49 @@ sub _endpoint {
 	return 'https://api.cloudflare.com/client/v4/user/firewall/access_rules/rules';
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Performs a HTTP request via LWP::UserAgent, returning the
-# decoded JSON on success and dying with a explanation on any HTTP or API
-# level failure. Never called in testing mode.
+# Internal helper. Performs one HTTP request against the Cloudflare API. Every
+# call this backend makes goes through here.
+#
+# Like the panos backend and unlike the other JSON ones, this cannot trust the
+# HTTP status alone. Cloudflare reports application level problems in a
+# success key inside the response body, so a rejected token or a malformed
+# rule can arrive as an HTTP 200 whose body says it failed. Both are therefore
+# checked, and either being bad is an error; without the body check a ban
+# could report success while blocking nothing.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend.
+#
+# Any failure, HTTP level or API level, dies rather than setting an error. The
+# callers wrap this in eval and turn the exception into the appropriate error
+# code, which is what lets one helper serve paths that report ban, unban, and
+# teardown failures differently.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string: 'GET' for the rule
+#              lookups, 'POST' to create a rule, 'DELETE' to remove one.
+#
+#     url    - The full URL to request, as a plain string, built on
+#              _endpoint.
+#
+#     body   - Optional request body, as an already encoded JSON string. undef
+#              for the lookups and deletes, which carry everything in the URL.
+#
+# Returns the decoded response body as a hashref. The interesting parts are
+# the result key, which holds the rule or an array of them, and the success
+# key that was already checked. Dies on any failure.
+#
+#     my $decoded = $self->_request( 'GET', $self->_unban_lookup_url($ip) );
+#     my $id      = $decoded->{result}[0]{id};
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'POST', $self->_endpoint, $body ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -476,8 +522,36 @@ sub ban {
 	$self->{banned}{ $opts{ban} } = 1;
 } ## end sub ban
 
-# Internal helper. Returns the lookup URL used to find the rule ID for the
-# passed IP.
+# Internal helper. Returns the URL that finds the access rule for one address.
+#
+# This exists because Cloudflare rules are addressed by an opaque id rather
+# than by their contents. There is no way to delete "the rule for 10.0.0.1";
+# the id has to be looked up first and then deleted, which is why unbanning
+# takes two round trips while banning takes one.
+#
+# The query filters on four things, not just the address: the mode and notes
+# as well as the target and value. Matching on the configured notes is what
+# keeps an instance from deleting a rule some other tool or another instance
+# created for the same address, since the notes are what identify a rule as
+# this instance's.
+#
+# The target is the family, spelled 'ip' or 'ip6', which Cloudflare requires
+# alongside the value.
+#
+# Args:
+#
+#     ip - The address whose rule is wanted, as a plain string. Expected to be
+#          an already validated and lowercased IPv4 or IPv6 address. The
+#          family is decided by matching against $IPv4_re.
+#
+# Returns the URL as a string, for a GET whose result key holds an array of
+# matching rules.
+#
+#     $self->_unban_lookup_url('10.0.0.1');
+#     #   <endpoint>?mode=block&notes=<notes>&configuration.target=ip&configuration.value=10.0.0.1
+#
+#     $self->_unban_lookup_url('2001:db8::1');
+#     #   <endpoint>?mode=block&notes=<notes>&configuration.target=ip6&configuration.value=2001%3Adb8%3A%3A1
 sub _unban_lookup_url {
 	my ( $self, $ip ) = @_;
 
@@ -495,9 +569,38 @@ sub _unban_lookup_url {
 		. $self->_uri_escape($ip);
 } ## end sub _unban_lookup_url
 
-# Internal helper. Looks the rule for the IP up and deletes it. Dies on
-# failure. A rule that can not be found is treated as already unbanned.
-# Never called in testing mode.
+# Internal helper. Performs the full two step unban of one address: find its
+# access rule, then delete it by id.
+#
+# The two steps are wrapped together because neither is useful alone and the
+# id from the first is the only way to address the second.
+#
+# A lookup that matches nothing is treated as success rather than as an error.
+# The rule having already gone, whether removed through the dashboard or by
+# another process, means the address is not banned, which is exactly what the
+# caller wanted. Erroring there would make an unban fail for having already
+# achieved its goal.
+#
+# Only the first match is acted on. Given the notes and value filter there
+# should not be more than one, and any extra would be picked up by a later
+# unban rather than being silently wrong.
+#
+# Never called in testing mode; that path records the request instead.
+#
+# Args:
+#
+#     ip - The address to unban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, spelled the same way
+#          it was when banned.
+#
+# Returns nothing. Dies if either request fails, which the caller catches and
+# turns into unbanFailed.
+#
+#     $self->_unban_ip('10.0.0.1');
+#
+#     # the usual shape at the call site
+#     eval { $self->_unban_ip( $opts{ban} ); };
+#     if ($@) { ... raise unbanFailed ... }
 sub _unban_ip {
 	my ( $self, $ip ) = @_;
 
@@ -589,24 +692,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by creating an access rule for it. Cloudflare access rules
@@ -682,8 +767,28 @@ sub ban_cidr {
 	$self->{banned_cidr}{ $opts{ban} } = 1;
 } ## end sub ban_cidr
 
-# Internal helper. Returns the lookup URL used to find the rule ID for the
-# passed CIDR range.
+# Internal helper. Returns the URL that finds the access rule for one CIDR
+# range, the range counterpart of _unban_lookup_url.
+#
+# The query is built the same way and filters on the same four things. The one
+# difference is how the family is decided: the match is anchored against
+# $IPv4_re followed by a literal slash, rather than against the whole string,
+# because a range never matches the plain anchored address pattern.
+#
+# The range goes into the value as it stands, since that is what Cloudflare
+# stored when it was banned.
+#
+# Args:
+#
+#     cidr - The range whose rule is wanted, as a plain string. Expected to be
+#            an already validated and lowercased CIDR range such as
+#            "10.0.0.0/8" or "2001:db8::/32".
+#
+# Returns the URL as a string, for a GET whose result key holds an array of
+# matching rules.
+#
+#     $self->_unban_cidr_lookup_url('10.0.0.0/8');
+#     #   <endpoint>?mode=block&notes=<notes>&configuration.target=ip&configuration.value=10.0.0.0%2F8
 sub _unban_cidr_lookup_url {
 	my ( $self, $cidr ) = @_;
 
@@ -838,13 +943,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants

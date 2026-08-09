@@ -8,6 +8,7 @@ lib/Algorithm/Classifier/IsolationForest/App/Command.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/gblob.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/fit.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/predict.pm
+lib/Algorithm/Classifier/IsolationForest/App/Command/explain.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/proto.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/csv2plot.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/accel.pm
@@ -27,6 +28,7 @@ t/pod-coverage.t
 t/40-anomaly-detection.t
 t/10-constructor.t
 t/20-fit.t
+t/21-fit-from-csv.t
 t/30-scoring.t
 t/50-contamination.t
 t/60-extended-mode.t
@@ -45,6 +47,7 @@ t/38-online-basic.t
 t/39-online-stream.t
 t/41-mungers.t
 t/42-prototype.t
+t/43-explain.t
 t/91-streamd.t
 t/92-streamc.t
 t/01-accel-flags.t
@@ -53,6 +56,22 @@ t/02-accel-selection.t
 t/03-fit-determinism.t
 t/04-accel-tuning.t
 t/05-prebuilt-env.t
+t/81-sklearn-real-data.t
+t/data/README
+t/data/regenerate.pl
+t/data/sklearn-reference.py
+t/data/glass.csv
+t/data/glass.labels
+t/data/glass.sklearn
+t/data/ionosphere.csv
+t/data/ionosphere.labels
+t/data/ionosphere.sklearn
+t/data/seeds.csv
+t/data/seeds.labels
+t/data/seeds.sklearn
+t/data/wdbc.csv
+t/data/wdbc.labels
+t/data/wdbc.sklearn
 examples/README.md
 examples/basic-anomaly-detection.pl
 examples/axis-vs-extended.pl

@@ -1,0 +1,687 @@
+/* ================================
+   Funky Animation Keyframes
+   ================================ */
+
+/* Hide elements waiting to animate */
+[data-animate-trigger="in-view"]:not(.animating):not(.animated) {
+  opacity: 0;
+}
+
+/* Hide stagger children initially and during delay */
+[data-animate-stagger] > [data-animate] {
+  opacity: 0;
+  animation: fade-in 400ms ease-out both;
+}
+
+/* Calculate stagger delay based on child index */
+[data-animate-stagger] > [data-animate]:nth-child(1) { animation-delay: 0ms; }
+[data-animate-stagger] > [data-animate]:nth-child(2) { animation-delay: 80ms; }
+[data-animate-stagger] > [data-animate]:nth-child(3) { animation-delay: 160ms; }
+[data-animate-stagger] > [data-animate]:nth-child(4) { animation-delay: 240ms; }
+[data-animate-stagger] > [data-animate]:nth-child(5) { animation-delay: 320ms; }
+[data-animate-stagger] > [data-animate]:nth-child(6) { animation-delay: 400ms; }
+[data-animate-stagger] > [data-animate]:nth-child(7) { animation-delay: 480ms; }
+[data-animate-stagger] > [data-animate]:nth-child(8) { animation-delay: 560ms; }
+[data-animate-stagger] > [data-animate]:nth-child(9) { animation-delay: 640ms; }
+[data-animate-stagger] > [data-animate]:nth-child(10) { animation-delay: 720ms; }
+[data-animate-stagger] > [data-animate]:nth-child(11) { animation-delay: 800ms; }
+[data-animate-stagger] > [data-animate]:nth-child(12) { animation-delay: 880ms; }
+[data-animate-stagger] > [data-animate]:nth-child(13) { animation-delay: 960ms; }
+[data-animate-stagger] > [data-animate]:nth-child(14) { animation-delay: 1040ms; }
+[data-animate-stagger] > [data-animate]:nth-child(15) { animation-delay: 1120ms; }
+[data-animate-stagger] > [data-animate]:nth-child(16) { animation-delay: 1200ms; }
+[data-animate-stagger] > [data-animate]:nth-child(17) { animation-delay: 1280ms; }
+[data-animate-stagger] > [data-animate]:nth-child(18) { animation-delay: 1360ms; }
+[data-animate-stagger] > [data-animate]:nth-child(19) { animation-delay: 1440ms; }
+[data-animate-stagger] > [data-animate]:nth-child(20) { animation-delay: 1520ms; }
+
+/* Fade animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-out-up {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes fade-out-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+/* Slide animations */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+/* Scale animations */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes scale-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Attention seekers */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px) rotate(-2deg); }
+  20%, 40%, 60%, 80% { transform: translateX(8px) rotate(2deg); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-15px); }
+  60% { transform: translateY(-7px); }
+}
+
+/* Rotate animations */
+@keyframes rotate-in {
+  from {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+
+@keyframes rotate-out {
+  from {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.5);
+  }
+}
+
+/* ================================
+   Animation Utility Classes
+   ================================ */
+
+/* Fade classes */
+.fade-in { animation: fade-in 300ms ease-out both; }
+.fade-out { animation: fade-out 200ms ease-in both; }
+.fade-in-up { animation: fade-in-up 400ms ease-out both; }
+.fade-in-down { animation: fade-in-down 400ms ease-out both; }
+.fade-out-up { animation: fade-out-up 300ms ease-in both; }
+.fade-out-down { animation: fade-out-down 300ms ease-in both; }
+
+/* Slide classes */
+.slide-in-right { animation: slide-in-right 400ms ease-out both; }
+.slide-in-left { animation: slide-in-left 400ms ease-out both; }
+.slide-in-top { animation: slide-in-top 400ms ease-out both; }
+.slide-in-bottom { animation: slide-in-bottom 400ms ease-out both; }
+.slide-out-right { animation: slide-out-right 300ms ease-in both; }
+.slide-out-left { animation: slide-out-left 300ms ease-in both; }
+
+/* Scale classes */
+.scale-in { animation: scale-in 300ms ease-out both; }
+.scale-out { animation: scale-out 200ms ease-in both; }
+.scale-fade-in { animation: scale-fade-in 400ms ease-out both; }
+.scale-fade-out { animation: scale-fade-out 300ms ease-in both; }
+
+/* Attention seeker classes */
+.shake { animation: shake 500ms ease-in-out; }
+.pulse { animation: pulse 500ms ease-in-out; }
+.bounce { animation: bounce 1s ease-in-out; }
+
+/* Rotate classes */
+.rotate-in { animation: rotate-in 600ms ease-out forwards; }
+.rotate-out { animation: rotate-out 600ms ease-in forwards; }
+
+/* ================================
+   Duration Modifiers
+   ================================ */
+
+.animate-fast { animation-duration: 150ms !important; }
+.animate-normal { animation-duration: 300ms !important; }
+.animate-slow { animation-duration: 600ms !important; }
+
+/* ================================
+   Delay Modifiers
+   ================================ */
+
+.animate-delay-100 { animation-delay: 100ms !important; }
+.animate-delay-200 { animation-delay: 200ms !important; }
+.animate-delay-300 { animation-delay: 300ms !important; }
+.animate-delay-500 { animation-delay: 500ms !important; }
+
+/* ================================
+   Easing Modifiers
+   ================================ */
+
+.animate-ease-in { animation-timing-function: ease-in !important; }
+.animate-ease-out { animation-timing-function: ease-out !important; }
+.animate-ease-in-out { animation-timing-function: ease-in-out !important; }
+.animate-linear { animation-timing-function: linear !important; }
+
+/* ================================
+   Accessibility
+   ================================ */
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Respect global animations toggle */
+[data-animations="off"] * {
+  animation-duration: 0ms !important;
+  transition-duration: 0ms !important;
+}
+
+/* ==========================================================================
+   HIGH CONTRAST MODE
+   ========================================================================== */
+
+@media (prefers-contrast: high) {
+  /* Disable all animations in high contrast mode */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Elements waiting to animate should be visible immediately */
+  [data-animate-trigger="in-view"]:not(.animating):not(.animated) {
+    opacity: 1;
+  }
+
+  /* Stagger children visible immediately */
+  [data-animate-stagger] > [data-animate] {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Playground Demo Styles
+   ========================================================================== */
+
+.animate-demo__interactive {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.animate-demo__target-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.animate-demo__target {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--pro-primary, #4361ee);
+  color: var(--pro-primary-contrast, #ffffff);
+  border-radius: var(--pro-border-radius-lg, 0.5rem);
+  font-size: 1.5rem;
+}
+
+.animate-demo__label {
+  font-size: var(--pro-font-size-sm, 0.875rem);
+  color: var(--pro-text-muted, #6c757d);
+}
+
+/* Config Display */
+.animate-demo__config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--pro-bg-tertiary);
+  border-radius: var(--pro-border-radius);
+  margin-bottom: 0.5rem;
+}
+
+.animate-demo__config-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.animate-demo__config-label {
+  font-size: var(--pro-font-size-sm, 0.875rem);
+  font-weight: var(--pro-font-weight-medium, 500);
+  color: var(--pro-text-muted);
+}
+
+.animate-demo__config-value {
+  font-size: var(--pro-font-size-sm, 0.875rem);
+  font-family: var(--pro-font-mono, monospace);
+  color: var(--pro-text);
+  background-color: var(--pro-bg-secondary);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--pro-border-radius-sm, 0.25rem);
+}
+
+/* Transform Grid */
+.animate-demo__transform-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.animate-demo__transform-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.animate-demo__transform-target {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--pro-bg-tertiary, #f8f9fa);
+  border: 1px solid var(--pro-border, #dee2e6);
+  border-radius: var(--pro-border-radius, 0.375rem);
+  font-size: 1.25rem;
+  color: var(--pro-text);
+}
+
+.animate-demo__transform-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+/* Stagger Section */
+.animate-demo__stagger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.animate-demo__stagger-items {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.animate-demo__stagger-item {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--pro-bg-tertiary, #f8f9fa);
+  border: 1px solid var(--pro-border, #dee2e6);
+  border-radius: var(--pro-border-radius, 0.375rem);
+  font-weight: var(--pro-font-weight-bold, 600);
+  color: var(--pro-text);
+}
+
+/* Composition Section */
+.animate-demo__composition {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.animate-demo__composition-targets {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.animate-demo__composition-target {
+  width: 80px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--pro-bg-tertiary, #f8f9fa);
+  border: 1px solid var(--pro-border, #dee2e6);
+  border-radius: var(--pro-border-radius, 0.375rem);
+  font-size: var(--pro-font-size-sm, 0.875rem);
+  font-weight: var(--pro-font-weight-medium, 500);
+  color: var(--pro-text);
+}
+
+.animate-demo__composition-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Accessibility Section */
+.animate-demo__a11y {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.animate-demo__a11y-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.animate-demo__a11y-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--pro-bg-tertiary, #f8f9fa);
+  border-radius: var(--pro-border-radius, 0.375rem);
+}
+
+.animate-demo__a11y-label {
+  font-weight: var(--pro-font-weight-medium, 500);
+  color: var(--pro-text-muted, #6c757d);
+}
+
+.animate-demo__a11y-value {
+  font-family: var(--pro-font-mono, monospace);
+  color: var(--pro-text);
+}
+
+.animate-demo__a11y-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* API Grid */
+.animate-demo__api-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+/* Scroll Section */
+.animate-demo__scroll-info {
+  text-align: center;
+}
+
+.animate-demo__scroll-example {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--pro-bg-tertiary, #f8f9fa);
+  border-radius: var(--pro-border-radius, 0.375rem);
+}
+
+.animate-demo__scroll-example code {
+  font-size: var(--pro-font-size-sm, 0.875rem);
+  color: var(--pro-text);
+}
+
+/* State Display */
+.animate-demo__state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.animate-demo__state-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--pro-bg-tertiary, #f8f9fa);
+  border-radius: var(--pro-border-radius, 0.375rem);
+}
+
+.animate-demo__state-label {
+  font-weight: var(--pro-font-weight-medium, 500);
+  color: var(--pro-text-muted, #6c757d);
+}
+
+.animate-demo__state-value {
+  font-family: var(--pro-font-mono, monospace);
+  color: var(--pro-text);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .animate-demo__transform-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .animate-demo__api-grid {
+    flex-direction: column;
+  }
+
+  .animate-demo__api-grid .btn {
+    width: 100%;
+  }
+
+  .animate-demo__a11y-controls {
+    flex-direction: column;
+  }
+
+  .animate-demo__a11y-controls .btn {
+    width: 100%;
+  }
+
+  .animate-demo__composition-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .animate-demo__composition-buttons .btn {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   MOBILE ANIMATION OPTIMIZATIONS
+   Disable scroll-triggered animations on mobile to prevent flickering
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Completely disable all in-view/scroll-triggered animations on mobile
+     Mobile devices don't handle IntersectionObserver animations well - they flicker */
+  [data-animate-trigger="in-view"],
+  [data-animate-trigger="in-view"][data-animate],
+  [data-animate-children] p,
+  [data-animate-children] h1,
+  [data-animate-children] h2,
+  [data-animate-children] h3,
+  [data-animate-children] h4,
+  [data-animate-children] h5,
+  [data-animate-children] h6,
+  [data-animate-children] li,
+  [data-animate-children] blockquote {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+    animation-delay: 0s !important;
+  }
+
+  /* Also disable stagger animations in containers with auto-animate children */
+  [data-animate-stagger] > [data-animate] {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+    animation-delay: 0s !important;
+  }
+
+  /* Keep explicit page-level animations working (enter/exit transitions)
+     These are controlled directly, not via IntersectionObserver */
+  .page-transition-enter,
+  .page-transition-exit {
+    animation: unset;
+  }
+}

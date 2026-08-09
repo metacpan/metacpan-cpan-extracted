@@ -1,0 +1,1515 @@
+/* ============================================
+   BUTTONS.CSS - Funky Button System
+   Unified button system with proper cascade order
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES - Button Theming
+   ============================================ */
+:root {
+  /* Button Font Sizes (rem for user font-scale support) */
+  --btn-font-xs: 0.6875rem; /* 11px at 1x scale */
+  --btn-font-sm: 0.75rem;   /* 12px at 1x scale */
+  --btn-font-md: 0.8125rem; /* 13px at 1x scale */
+  --btn-font-lg: 0.875rem;  /* 14px at 1x scale */
+
+  /* Button Border Radius */
+  --btn-radius: 6px;
+  --btn-radius-sm: 4px;
+  --btn-radius-lg: 8px;
+  --btn-radius-round: 9999px;
+
+  /* Default button sizing (comfortable density fallbacks) */
+  --btn-height-xs: 24px;
+  --btn-height-sm: 28px;
+  --btn-height-md: 36px;
+  --btn-height-lg: 44px;
+  --btn-padding-xs: 4px 8px;
+  --btn-padding-sm: 6px 12px;
+  --btn-padding-md: 8px 16px;
+  --btn-padding-lg: 12px 24px;
+  /* Individual padding values for calc() operations */
+  --btn-padding-y-xs: 4px;
+  --btn-padding-x-xs: 8px;
+  --btn-padding-y-sm: 6px;
+  --btn-padding-x-sm: 12px;
+  --btn-padding-y-md: 8px;
+  --btn-padding-x-md: 16px;
+  --btn-padding-y-lg: 12px;
+  --btn-padding-x-lg: 24px;
+
+  /* Primary button uses user accent when set */
+  --btn-primary-bg: var(--user-accent, var(--pro-accent-primary));
+  --btn-primary-hover: var(--user-accent-hover, var(--pro-accent-primary-hover));
+}
+
+/* ============================================
+   1. BASE BUTTON STYLES
+   All buttons start here - this MUST come first
+   ============================================ */
+.btn,
+.btn-funky,
+.btn-funky-primary,
+.btn-funky-secondary,
+.btn-funky-outline,
+.btn-funky-outline-primary,
+.btn-funky-outline-secondary,
+.btn-funky-outline-danger,
+.btn-funky-warning,
+.btn-funky-danger,
+.btn-funky-success,
+.btn-icon {
+  /* Reset */
+  margin: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  box-sizing: border-box;
+
+  /* Flexbox alignment */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  gap: 6px;
+
+  /* Typography */
+  font-weight: 500;
+  font-size: var(--btn-font-md);
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+
+  /* Interaction */
+  cursor: pointer;
+  user-select: none;
+
+  /* Transitions */
+  transition: background-color 0.15s ease-in-out,
+              border-color 0.15s ease-in-out,
+              box-shadow 0.15s ease-in-out,
+              color 0.15s ease-in-out;
+
+  /* Default sizing (medium) */
+  height: var(--btn-height-md);
+  padding: var(--btn-padding-md);
+  border-radius: var(--btn-radius);
+}
+
+/* ============================================
+   2. SIZE VARIANTS
+   These MUST come after base styles to override
+   ============================================ */
+.btn-xs,
+.btn.btn-xs {
+  height: var(--btn-height-xs);
+  padding: var(--btn-padding-xs);
+  font-size: var(--btn-font-xs);
+  border-radius: var(--btn-radius-sm);
+  gap: 4px;
+}
+
+.btn-sm,
+.btn.btn-sm {
+  height: var(--btn-height-sm);
+  padding: var(--btn-padding-sm);
+  font-size: var(--btn-font-sm);
+  border-radius: var(--btn-radius-sm);
+  gap: 4px;
+}
+
+.btn-md,
+.btn.btn-md {
+  height: var(--btn-height-md);
+  padding: var(--btn-padding-md);
+  font-size: var(--btn-font-md);
+  border-radius: var(--btn-radius);
+}
+
+.btn-lg,
+.btn.btn-lg {
+  height: var(--btn-height-lg);
+  padding: var(--btn-padding-lg);
+  font-size: var(--btn-font-lg);
+  border-radius: var(--btn-radius-lg);
+  font-weight: 600;
+  gap: 8px;
+}
+
+/* ============================================
+   3. COLOR VARIANTS - Bootstrap-style
+   .btn-primary, .btn-secondary, etc.
+   ============================================ */
+
+/* Primary */
+.btn-primary,
+.btn.btn-primary {
+  color: var(--pro-text-inverse, #fff);
+  background-color: var(--pro-accent-primary, #2f81f7);
+  border: 1px solid var(--pro-accent-primary, #2f81f7);
+}
+
+.btn-primary:hover,
+.btn.btn-primary:hover {
+  background-color: var(--pro-accent-primary-hover, #388bfd);
+  border-color: var(--pro-accent-primary-hover, #388bfd);
+  color: var(--pro-text-inverse, #fff);
+}
+
+/* Secondary */
+.btn-secondary,
+.btn.btn-secondary {
+  color: var(--pro-text-primary, #e6edf3);
+  background-color: var(--pro-bg-tertiary, #21262d);
+  border: 1px solid var(--pro-border-color, #30363d);
+}
+
+.btn-secondary:hover,
+.btn.btn-secondary:hover {
+  color: var(--pro-text-primary, #e6edf3);
+  background-color: var(--pro-bg-elevated, #2d333b);
+  border-color: var(--pro-border-emphasis, #484f58);
+}
+
+/* Success */
+.btn-success,
+.btn.btn-success {
+  color: var(--pro-text-inverse, #fff);
+  background-color: var(--pro-accent-success, #3fb950);
+  border: 1px solid var(--pro-accent-success, #3fb950);
+}
+
+.btn-success:hover,
+.btn.btn-success:hover {
+  background-color: var(--pro-accent-success-text, #2ea043);
+  border-color: var(--pro-accent-success-text, #2ea043);
+  color: var(--pro-text-inverse, #fff);
+}
+
+/* Warning */
+.btn-warning,
+.btn.btn-warning {
+  color: var(--pro-text-inverse, #000);
+  background-color: var(--pro-accent-warning, #d29922);
+  border: 1px solid var(--pro-accent-warning, #d29922);
+}
+
+.btn-warning:hover,
+.btn.btn-warning:hover {
+  background-color: var(--pro-accent-warning-alt, #bf8700);
+  border-color: var(--pro-accent-warning-alt, #bf8700);
+  color: var(--pro-text-inverse, #000);
+}
+
+/* Danger */
+.btn-danger,
+.btn.btn-danger {
+  color: var(--pro-text-inverse, #fff);
+  background-color: var(--pro-accent-danger, #f85149);
+  border: 1px solid var(--pro-accent-danger, #f85149);
+}
+
+.btn-danger:hover,
+.btn.btn-danger:hover {
+  background-color: var(--pro-accent-danger-text, #da3633);
+  border-color: var(--pro-accent-danger-text, #da3633);
+  color: var(--pro-text-inverse, #fff);
+}
+
+/* Info */
+.btn-info,
+.btn.btn-info {
+  color: var(--pro-text-inverse, #fff);
+  background-color: var(--pro-accent-info, #58a6ff);
+  border: 1px solid var(--pro-accent-info, #58a6ff);
+}
+
+.btn-info:hover,
+.btn.btn-info:hover {
+  background-color: var(--pro-text-link-hover, #79b8ff);
+  border-color: var(--pro-text-link-hover, #79b8ff);
+  color: var(--pro-text-inverse, #fff);
+}
+
+/* ============================================
+   4. OUTLINE VARIANTS
+   ============================================ */
+.btn-outline-primary,
+.btn.btn-outline-primary {
+  color: var(--pro-accent-primary, #2f81f7);
+  background-color: transparent;
+  border: 1px solid var(--pro-accent-primary, #2f81f7);
+}
+
+.btn-outline-primary:hover,
+.btn.btn-outline-primary:hover {
+  color: var(--pro-text-inverse, #fff);
+  background-color: var(--pro-accent-primary, #2f81f7);
+}
+
+.btn-outline-secondary,
+.btn.btn-outline-secondary {
+  color: var(--pro-text-secondary, #8b949e);
+  background-color: transparent;
+  border: 1px solid var(--pro-border-color, #30363d);
+}
+
+.btn-outline-secondary:hover,
+.btn.btn-outline-secondary:hover {
+  color: var(--pro-text-primary, #e6edf3);
+  background-color: var(--pro-bg-tertiary, #21262d);
+  border-color: var(--pro-border-emphasis, #484f58);
+}
+
+.btn-outline-success,
+.btn.btn-outline-success {
+  color: var(--pro-accent-success, #3fb950);
+  background-color: transparent;
+  border: 1px solid var(--pro-accent-success, #3fb950);
+}
+
+.btn-outline-success:hover,
+.btn.btn-outline-success:hover {
+  color: var(--pro-text-inverse, #fff);
+  background-color: var(--pro-accent-success, #3fb950);
+}
+
+.btn-outline-warning,
+.btn.btn-outline-warning {
+  color: var(--pro-accent-warning, #d29922);
+  background-color: transparent;
+  border: 1px solid var(--pro-accent-warning, #d29922);
+}
+
+.btn-outline-warning:hover,
+.btn.btn-outline-warning:hover {
+  color: var(--pro-text-inverse, #000);
+  background-color: var(--pro-accent-warning, #d29922);
+}
+
+.btn-outline-danger,
+.btn.btn-outline-danger {
+  color: var(--pro-accent-danger, #f85149);
+  background-color: transparent;
+  border: 1px solid var(--pro-accent-danger, #f85149);
+}
+
+.btn-outline-danger:hover,
+.btn.btn-outline-danger:hover {
+  color: var(--pro-text-inverse, #fff);
+  background-color: var(--pro-accent-danger, #f85149);
+}
+
+.btn-outline-info,
+.btn.btn-outline-info {
+  color: var(--pro-accent-info, #58a6ff);
+  background-color: transparent;
+  border: 1px solid var(--pro-accent-info, #58a6ff);
+}
+
+.btn-outline-info:hover,
+.btn.btn-outline-info:hover {
+  color: var(--pro-text-inverse, #fff);
+  background-color: var(--pro-accent-info, #58a6ff);
+}
+
+/* ============================================
+   5. FUNKY BUTTON VARIANTS (Legacy support)
+   ============================================ */
+.btn-funky,
+.btn-funky-primary {
+  background: var(--user-accent, var(--pro-accent-primary, #2f81f7));
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-funky:hover,
+.btn-funky-primary:hover {
+  background: var(--user-accent-hover, var(--pro-accent-primary-hover, #58a6ff));
+  box-shadow: 0 2px 8px rgba(var(--user-accent-rgb, 47, 129, 247), 0.3);
+  color: white;
+}
+
+.btn-funky:active,
+.btn-funky-primary:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.btn-funky-secondary {
+  background: var(--pro-bg-tertiary, #21262d);
+  color: var(--pro-text-primary, #e6edf3);
+  border: 1px solid var(--pro-border-color, #30363d);
+}
+
+.btn-funky-secondary:hover {
+  background: var(--pro-bg-hover, #30363d);
+  border-color: var(--user-accent, var(--pro-accent-primary, #2f81f7));
+  color: var(--pro-text-primary, #e6edf3);
+}
+
+.btn-funky-outline,
+.btn-funky-outline-primary {
+  background: transparent;
+  color: var(--user-accent, var(--pro-accent-primary, #2f81f7));
+  border: 1px solid var(--user-accent, var(--pro-accent-primary, #2f81f7));
+}
+
+.btn-funky-outline:hover,
+.btn-funky-outline-primary:hover {
+  background: var(--user-accent, var(--pro-accent-primary, #2f81f7));
+  color: white;
+}
+
+.btn-funky-outline-secondary {
+  background: transparent;
+  color: var(--pro-text-secondary, #8b949e);
+  border: 1px solid var(--pro-border-color, #30363d);
+}
+
+.btn-funky-outline-secondary:hover {
+  background: var(--pro-bg-tertiary, #21262d);
+  color: var(--pro-text-primary, #e6edf3);
+  border-color: var(--pro-border-emphasis, #484f58);
+}
+
+.btn-funky-outline-danger {
+  background: transparent;
+  color: var(--pro-accent-danger, #f85149);
+  border: 1px solid var(--pro-accent-danger, #f85149);
+}
+
+.btn-funky-outline-danger:hover {
+  background: var(--pro-accent-danger, #f85149);
+  color: white;
+}
+
+.btn-funky-success {
+  background: var(--pro-accent-success, #3fb950);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-funky-success:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 2px 8px var(--pro-accent-success-muted, rgba(63, 185, 80, 0.3));
+}
+
+.btn-funky-warning {
+  background: var(--pro-accent-warning, #d29922);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-funky-warning:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 2px 8px var(--pro-accent-warning-muted, rgba(210, 153, 34, 0.3));
+}
+
+.btn-funky-danger {
+  background: var(--pro-accent-danger, #f85149);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-funky-danger:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 2px 8px var(--pro-accent-danger-muted, rgba(248, 81, 73, 0.3));
+}
+
+.btn-funky-info {
+  background: var(--pro-accent-info, #0ea5e9);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-funky-info:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 2px 8px var(--pro-accent-info-muted, rgba(14, 165, 233, 0.3));
+}
+
+.btn-funky-purple {
+  background: var(--pro-accent-purple, #8b5cf6);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-funky-purple:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 2px 8px var(--pro-accent-purple-muted, rgba(139, 92, 246, 0.3));
+}
+
+/* ============================================
+   6. ICON BUTTON (Square action buttons)
+   ============================================ */
+.btn-icon {
+  width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+  padding: 0;
+  border-radius: var(--btn-radius-sm);
+  font-size: 14px;
+  background: var(--pro-bg-tertiary, #21262d);
+  color: var(--pro-text-secondary, #8b949e);
+  border: 1px solid var(--pro-border-color, #30363d);
+}
+
+.btn-icon:hover {
+  color: var(--pro-text-primary, #e6edf3);
+  border-color: var(--pro-text-secondary, #8b949e);
+}
+
+/* ============================================
+   7. ACTION BUTTON VARIANTS (View, Edit, Delete)
+   ============================================ */
+.btn-view {
+  background: var(--pro-accent-info-muted, rgba(88, 166, 255, 0.15));
+  color: var(--pro-accent-info, #58a6ff);
+  border-color: transparent;
+}
+
+.btn-view:hover {
+  background: var(--pro-accent-info-muted-hover, rgba(88, 166, 255, 0.3));
+  color: var(--pro-accent-info, #58a6ff);
+}
+
+.btn-edit {
+  background: var(--pro-accent-purple-muted);
+  color: var(--pro-accent-purple);
+  border-color: transparent;
+}
+
+.btn-edit:hover {
+  background: var(--pro-accent-purple-muted-hover, rgba(139, 92, 246, 0.3));
+  color: var(--pro-accent-purple);
+}
+
+.btn-delete {
+  background: var(--pro-accent-danger-muted, rgba(248, 81, 73, 0.15));
+  color: var(--pro-accent-danger, #f85149);
+  border-color: transparent;
+}
+
+.btn-delete:hover {
+  background: var(--pro-accent-danger-muted-hover, rgba(248, 81, 73, 0.3));
+  color: var(--pro-accent-danger, #f85149);
+}
+
+.btn-clone {
+  background: var(--pro-accent-success-muted, rgba(63, 185, 80, 0.15));
+  color: var(--pro-accent-success, #3fb950);
+  border-color: transparent;
+}
+
+.btn-clone:hover {
+  background: var(--pro-accent-success-muted-hover, rgba(63, 185, 80, 0.3));
+  color: var(--pro-accent-success, #3fb950);
+}
+
+.btn-history {
+  background: var(--pro-accent-purple-muted);
+  color: var(--pro-accent-purple);
+  border-color: transparent;
+  text-decoration: none;
+}
+
+.btn-history:hover {
+  background: rgba(139, 92, 246, 0.3);
+  color: var(--pro-accent-purple);
+}
+
+/* ============================================
+   8. BUTTON STATES
+   ============================================ */
+
+/* Focus States (Accessibility) - MUST be visible for all buttons */
+.btn:focus-visible,
+.btn-funky:focus-visible,
+.btn-funky-primary:focus-visible,
+.btn-funky-secondary:focus-visible,
+.btn-funky-outline:focus-visible,
+.btn-funky-outline-primary:focus-visible,
+.btn-funky-outline-secondary:focus-visible,
+.btn-funky-outline-danger:focus-visible,
+.btn-funky-warning:focus-visible,
+.btn-funky-danger:focus-visible,
+.btn-funky-success:focus-visible,
+.btn-funky-info:focus-visible,
+.btn-funky-purple:focus-visible,
+.btn-icon:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-success:focus-visible,
+.btn-danger:focus-visible,
+.btn-warning:focus-visible,
+.btn-info:focus-visible,
+.btn-outline-primary:focus-visible,
+.btn-outline-secondary:focus-visible,
+.btn-outline-success:focus-visible,
+.btn-outline-danger:focus-visible,
+.btn-outline-warning:focus-visible,
+.btn-outline-info:focus-visible,
+.btn-sm:focus-visible,
+.btn-lg:focus-visible {
+  outline: var(--focus-ring-width, 2px) var(--focus-ring-style, solid) var(--focus-ring-color, #2f81f7) !important;
+  outline-offset: var(--focus-ring-offset, 2px) !important;
+  box-shadow: var(--focus-ring-shadow, none) !important;
+}
+
+/* Programmatic focus - same visual as :focus-visible for accessibility */
+.btn.focus-programmatic,
+.btn-funky.focus-programmatic,
+.btn-funky-primary.focus-programmatic,
+.btn-funky-secondary.focus-programmatic,
+.btn-funky-outline.focus-programmatic,
+.btn-funky-outline-primary.focus-programmatic,
+.btn-funky-outline-secondary.focus-programmatic,
+.btn-funky-outline-danger.focus-programmatic,
+.btn-funky-warning.focus-programmatic,
+.btn-funky-danger.focus-programmatic,
+.btn-funky-success.focus-programmatic,
+.btn-funky-info.focus-programmatic,
+.btn-funky-purple.focus-programmatic,
+.btn-icon.focus-programmatic,
+.btn-primary.focus-programmatic,
+.btn-secondary.focus-programmatic,
+.btn-success.focus-programmatic,
+.btn-danger.focus-programmatic,
+.btn-warning.focus-programmatic,
+.btn-info.focus-programmatic,
+.btn-outline-primary.focus-programmatic,
+.btn-outline-secondary.focus-programmatic,
+.btn-outline-success.focus-programmatic,
+.btn-outline-danger.focus-programmatic,
+.btn-outline-warning.focus-programmatic,
+.btn-outline-info.focus-programmatic,
+.btn-sm.focus-programmatic,
+.btn-lg.focus-programmatic,
+input.focus-programmatic,
+.form-control.focus-programmatic,
+[tabindex].focus-programmatic {
+  outline: var(--focus-ring-width, 2px) var(--focus-ring-style, solid) var(--focus-ring-color, #2f81f7) !important;
+  outline-offset: var(--focus-ring-offset, 2px) !important;
+  box-shadow: var(--focus-ring-shadow, none) !important;
+}
+
+/* Only remove outline on non-visible focus (mouse click) */
+.btn:focus:not(:focus-visible):not(.focus-programmatic),
+.btn-funky:focus:not(:focus-visible):not(.focus-programmatic),
+.btn-icon:focus:not(:focus-visible):not(.focus-programmatic) {
+  outline: none;
+}
+
+/* Disabled State */
+.btn:disabled,
+.btn.disabled,
+.btn-funky:disabled,
+.btn-funky-primary:disabled,
+.btn-funky-secondary:disabled,
+.btn-funky-outline:disabled,
+.btn-funky-outline-primary:disabled,
+.btn-funky-outline-secondary:disabled,
+.btn-funky-outline-danger:disabled,
+.btn-funky-warning:disabled,
+.btn-funky-danger:disabled,
+.btn-funky-success:disabled,
+.btn-icon:disabled,
+.btn-funky.disabled,
+.btn-funky-outline-primary.disabled,
+.btn-funky-outline-secondary.disabled,
+.btn-funky-outline-danger.disabled,
+.btn-icon.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading State */
+.btn.loading,
+.btn-funky.loading,
+.btn-icon.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.btn.loading::after,
+.btn-funky.loading::after,
+.btn-icon.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   9. BUTTON GROUPS
+   ============================================ */
+.btn-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* On mobile, add gap when wrapped */
+@media (max-width: 575px) {
+  .btn-group {
+    gap: var(--pro-space-1, 4px);
+  }
+
+  .btn-group > * {
+    border-radius: var(--btn-radius) !important;
+  }
+}
+
+.btn-group > .btn,
+.btn-group > .btn-funky,
+.btn-group > .btn-funky-primary,
+.btn-group > .btn-funky-secondary,
+.btn-group > .btn-icon,
+.btn-group > button {
+  border-radius: 0;
+  margin: 0;
+}
+
+.btn-group > :first-child {
+  border-radius: var(--btn-radius) 0 0 var(--btn-radius);
+}
+
+.btn-group > :last-child {
+  border-radius: 0 var(--btn-radius) var(--btn-radius) 0;
+}
+
+.btn-group > :only-child {
+  border-radius: var(--btn-radius);
+}
+
+/* Spaced button group */
+.btn-group-spaced {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-group-spaced > * {
+  border-radius: var(--btn-radius) !important;
+}
+
+/* Wrapping button group */
+.btn-group-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pro-space-2, 8px);
+}
+
+.btn-group-wrap > * {
+  border-radius: var(--btn-radius) !important;
+}
+
+/* Action buttons group (in tables) */
+.action-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================
+   10. DROPDOWN TOGGLE
+   ============================================ */
+.btn.dropdown-toggle,
+.btn-funky.dropdown-toggle,
+.btn-funky-primary.dropdown-toggle,
+.btn-funky-secondary.dropdown-toggle,
+.btn-funky-outline.dropdown-toggle,
+.btn-funky-warning.dropdown-toggle,
+.btn-funky-danger.dropdown-toggle,
+.btn-funky-success.dropdown-toggle,
+.btn-funky-info.dropdown-toggle,
+.btn-funky-purple.dropdown-toggle {
+  padding-right: calc(var(--btn-padding-x-md) + 0.75rem);
+}
+
+/* Small dropdown toggle */
+.btn-sm.dropdown-toggle {
+  padding-right: calc(var(--btn-padding-x-sm) + 0.6rem);
+}
+
+/* Large dropdown toggle */
+.btn-lg.dropdown-toggle {
+  padding-right: calc(var(--btn-padding-x-lg) + 0.9rem);
+}
+
+/* Dropdown caret styling */
+.btn.dropdown-toggle::after,
+.btn-funky.dropdown-toggle::after,
+.btn-funky-primary.dropdown-toggle::after,
+.btn-funky-secondary.dropdown-toggle::after,
+.btn-funky-outline.dropdown-toggle::after,
+.btn-funky-warning.dropdown-toggle::after,
+.btn-funky-danger.dropdown-toggle::after,
+.btn-funky-success.dropdown-toggle::after {
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+/* ============================================
+   11. ICON ANIMATIONS
+   ============================================ */
+.btn-icon .fa-sync-alt:hover,
+.btn-funky .fa-sync-alt:hover,
+.btn .fa-sync-alt:hover,
+.btn-icon:hover .fa-sync-alt,
+.btn-funky:hover .fa-sync-alt,
+.btn:hover .fa-sync-alt {
+  animation: spin-once 0.5s ease;
+}
+
+@keyframes spin-once {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   12. TOUCH TARGET SIZING (Mobile)
+   ============================================ */
+@media (pointer: coarse) {
+  .btn-icon {
+    min-width: var(--btn-height-md, 44px);
+    min-height: var(--btn-height-md, 44px);
+    width: var(--btn-height-md, 44px);
+    height: var(--btn-height-md, 44px);
+    font-size: 16px;
+  }
+
+  .btn,
+  .btn-funky,
+  .btn-funky-primary,
+  .btn-funky-secondary {
+    min-height: var(--btn-height-md, 44px);
+  }
+}
+
+/* ============================================
+   13. SPECIAL BUTTON CONTEXTS
+   ============================================ */
+
+/* Toolbar buttons (smaller, inline) */
+.toolbar .btn,
+.toolbar .btn-funky,
+.toolbar .btn-icon {
+  height: var(--btn-height-sm);
+  padding: var(--btn-padding-sm);
+  font-size: var(--btn-font-sm);
+}
+
+/* Modal footer buttons */
+.modal-footer .btn,
+.modal-footer .btn-funky,
+.modal-footer .btn-funky-primary,
+.modal-footer .btn-funky-secondary {
+  min-width: 80px;
+}
+
+/* Card action buttons */
+.card-actions .btn-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+
+/* Header buttons */
+.header-actions .btn,
+.header-actions .btn-funky {
+  height: var(--btn-height-sm);
+  padding: var(--btn-padding-sm);
+}
+
+/* Table action column buttons */
+td .btn-icon,
+.dataTables_wrapper .btn-icon {
+  width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+}
+
+/* ============================================
+   14. FORMAT RULES BUTTON
+   ============================================ */
+.btn-format-rules {
+  height: var(--btn-height-md);
+  padding: var(--btn-padding-md);
+  font-size: var(--btn-font-md);
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid var(--pro-border-color, #30363d);
+  border-radius: var(--btn-radius);
+  color: var(--pro-text-secondary, #8b949e);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+.btn-format-rules:hover {
+  background: var(--pro-bg-tertiary, #21262d);
+  border-color: var(--pro-border-emphasis, #484f58);
+  color: var(--pro-text-primary, #e6edf3);
+}
+
+.btn-format-rules.has-rules {
+  border-color: var(--user-accent, var(--pro-accent-primary, #2f81f7));
+  color: var(--user-accent, var(--pro-accent-primary, #2f81f7));
+}
+
+.btn-format-rules .rule-count {
+  background: var(--user-accent, var(--pro-accent-primary, #2f81f7));
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.125rem 0.375rem;
+  border-radius: 10px;
+  min-width: 1rem;
+  text-align: center;
+}
+
+/* ============================================
+   15. BUTTON ROW / HEADER ACTIONS
+   ============================================ */
+.btn-row,
+.button-row,
+.btn-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Funky Header Actions - Primary responsive layout */
+.funky-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.funky-header-actions > * {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+/* Search box takes remaining space on larger screens */
+.funky-header-actions .funky-search-box {
+  flex: 1 1 200px;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+/* Filter dropdowns have consistent sizing */
+.funky-header-actions .funky-date-filter,
+.funky-header-actions .funky-client-filter,
+.funky-header-actions .funky-date-range {
+  flex: 0 1 auto;
+  min-width: 140px;
+}
+
+/* Select2 in header actions */
+.funky-header-actions .select2-container {
+  height: var(--btn-height-md);
+}
+
+.funky-header-actions .select2-container .select2-selection {
+  height: var(--btn-height-md) !important;
+  min-height: var(--btn-height-md) !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.funky-header-actions .select2-container .select2-selection__rendered {
+  line-height: 1 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.funky-header-actions .select2-container .select2-selection__arrow {
+  height: var(--btn-height-md) !important;
+  top: 0 !important;
+}
+
+/* Form controls in header actions */
+.funky-header-actions .form-control,
+.funky-header-actions .form-select {
+  height: var(--btn-height-md);
+}
+
+/* DataTables buttons container */
+.funky-header-actions .dt-buttons,
+.funky-header-actions .dataTables_wrapper .dt-buttons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px;
+}
+
+.funky-header-actions .dt-buttons .btn,
+.funky-header-actions .dt-buttons .btn-funky,
+.funky-header-actions .dt-buttons .dt-button {
+  height: var(--btn-height-md) !important;
+  align-self: center !important;
+}
+
+/* ============================================
+   16. RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Large screens (1200px+) */
+@media (min-width: 1200px) {
+  .funky-header-actions {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .funky-header-actions .funky-search-box {
+    max-width: 500px;
+  }
+}
+
+/* Medium screens (992px - 1199px) */
+@media (max-width: 1199px) {
+  .funky-header-actions {
+    gap: 10px;
+  }
+
+  .funky-header-actions .funky-search-box {
+    flex: 1 1 250px;
+    max-width: 350px;
+  }
+}
+
+/* Tablet (768px - 991px) */
+@media (max-width: 991px) {
+  .funky-header-actions {
+    gap: 8px;
+  }
+
+  .funky-header-actions .funky-search-box {
+    flex: 1 1 100%;
+    max-width: 100%;
+    order: -1;
+  }
+
+  .funky-header-actions .funky-date-filter,
+  .funky-header-actions .funky-client-filter,
+  .funky-header-actions .funky-date-range {
+    flex: 1 1 calc(33.33% - 6px);
+    min-width: 120px;
+  }
+}
+
+/* Mobile landscape (576px - 767px) */
+@media (max-width: 767px) {
+  .funky-header-actions {
+    gap: 8px;
+  }
+
+  .funky-header-actions .funky-search-box {
+    flex: 1 1 100%;
+    max-width: 100%;
+    order: -1;
+  }
+
+  .funky-header-actions .funky-date-filter,
+  .funky-header-actions .funky-client-filter,
+  .funky-header-actions .funky-date-range {
+    flex: 1 1 auto;
+    min-width: 120px;
+  }
+}
+
+/* Mobile portrait (< 576px) */
+@media (max-width: 575px) {
+  .funky-header-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .funky-header-actions .funky-search-box {
+    flex: 1 1 100%;
+    max-width: 100%;
+    order: -1;
+  }
+
+  .funky-header-actions .funky-date-filter,
+  .funky-header-actions .funky-client-filter,
+  .funky-header-actions .funky-date-range {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  /* Smaller font/padding on mobile */
+  .funky-header-actions .btn,
+  .funky-header-actions .btn-funky,
+  .funky-header-actions .btn-funky-primary,
+  .funky-header-actions .btn-funky-secondary,
+  .funky-header-actions .btn-funky-warning,
+  .funky-header-actions .btn-funky-danger,
+  .funky-header-actions .btn-funky-success,
+  .funky-header-actions .btn-format-rules,
+  .funky-header-actions > button {
+    height: var(--btn-height-md, 36px);
+    min-height: var(--btn-height-md, 36px);
+    font-size: var(--btn-font-sm, 0.75rem);
+    padding: 0 var(--pro-spacing-sm, 0.75rem);
+  }
+}
+
+/* Touch devices - larger touch targets */
+@media (pointer: coarse) {
+  .funky-header-actions .btn,
+  .funky-header-actions .btn-funky,
+  .funky-header-actions .btn-funky-primary,
+  .funky-header-actions .btn-funky-secondary,
+  .funky-header-actions .btn-funky-warning,
+  .funky-header-actions .btn-funky-danger,
+  .funky-header-actions .btn-funky-success,
+  .funky-header-actions .btn-format-rules,
+  .funky-header-actions > button {
+    min-height: var(--btn-height-md, 36px);
+  }
+}
+
+/* ============================================
+   17. USER ACCENT COLOR OVERRIDES
+   ============================================ */
+.btn-funky.use-accent,
+.btn-funky-primary.use-accent,
+.btn-user-accent,
+.btn.use-accent {
+  background: var(--user-accent, var(--pro-accent-primary));
+  border-color: var(--user-accent, var(--pro-accent-primary));
+}
+
+.btn-funky.use-accent:hover,
+.btn-funky-primary.use-accent:hover,
+.btn-user-accent:hover,
+.btn.use-accent:hover {
+  background: var(--user-accent-hover, var(--pro-accent-primary-hover));
+  border-color: var(--user-accent-hover, var(--pro-accent-primary-hover));
+  box-shadow: 0 2px 8px rgba(var(--user-accent-rgb, 47, 129, 247), 0.3);
+}
+
+/* Links with user accent */
+a.use-accent,
+.link-accent {
+  color: var(--user-accent, var(--pro-accent-primary));
+}
+
+a.use-accent:hover,
+.link-accent:hover {
+  color: var(--user-accent-hover, var(--pro-accent-primary-hover));
+}
+
+/* Progress bars with user accent */
+.progress-bar.use-accent {
+  background-color: var(--user-accent, var(--pro-accent-primary));
+}
+
+/* Nav items with user accent */
+.nav-link.active.use-accent,
+.nav-tabs .nav-link.active.use-accent {
+  border-bottom-color: var(--user-accent, var(--pro-accent-primary));
+  color: var(--user-accent, var(--pro-accent-primary));
+}
+
+/* Sidebar active item with user accent */
+.sidebar-item.active.use-accent {
+  border-left-color: var(--user-accent, var(--pro-accent-primary));
+  background: rgba(var(--user-accent-rgb, 47, 129, 247), 0.1);
+}
+
+/* Focus rings with user accent */
+.use-accent:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
+/* ============================================
+   18. LIGHT THEME OVERRIDES
+   ============================================ */
+[data-theme="light"] .btn-funky,
+[data-theme="light"] .btn-funky-primary {
+  background: var(--user-accent, #0969da);
+  color: white;
+  border-color: var(--user-accent, #0969da);
+}
+
+[data-theme="light"] .btn-funky:hover,
+[data-theme="light"] .btn-funky-primary:hover {
+  background: var(--user-accent-hover, #0550ae);
+  box-shadow: 0 2px 8px rgba(var(--user-accent-rgb, 9, 105, 218), 0.3);
+}
+
+[data-theme="light"] .btn-funky-secondary {
+  background: var(--pro-bg-secondary);
+  color: var(--pro-text-primary);
+  border-color: var(--pro-border-color);
+}
+
+[data-theme="light"] .btn-funky-secondary:hover {
+  background: var(--pro-bg-tertiary);
+  border-color: var(--pro-accent-primary);
+}
+
+[data-theme="light"] .btn-funky-outline,
+[data-theme="light"] .btn-funky-outline-primary {
+  color: var(--pro-accent-primary);
+  border-color: var(--pro-accent-primary);
+  background: transparent;
+}
+
+[data-theme="light"] .btn-funky-outline:hover,
+[data-theme="light"] .btn-funky-outline-primary:hover {
+  background: var(--pro-accent-primary);
+  color: var(--pro-text-inverse);
+}
+
+[data-theme="light"] .btn-funky-outline-secondary {
+  color: var(--pro-text-secondary);
+  border-color: var(--pro-border-color);
+  background: transparent;
+}
+
+[data-theme="light"] .btn-funky-outline-secondary:hover {
+  background: var(--pro-bg-secondary);
+  color: var(--pro-text-primary);
+  border-color: var(--pro-border-emphasis);
+}
+
+[data-theme="light"] .btn-funky-outline-danger {
+  color: var(--pro-accent-danger);
+  border-color: var(--pro-accent-danger);
+  background: transparent;
+}
+
+[data-theme="light"] .btn-funky-outline-danger:hover {
+  background: var(--pro-accent-danger);
+  color: var(--pro-text-inverse);
+}
+
+[data-theme="light"] .btn-funky-success {
+  background: var(--pro-accent-success);
+}
+
+[data-theme="light"] .btn-funky-success:hover {
+  background: var(--pro-accent-success-text);
+  box-shadow: 0 2px 8px var(--pro-accent-success-muted);
+}
+
+[data-theme="light"] .btn-funky-warning {
+  background: var(--pro-accent-warning);
+}
+
+[data-theme="light"] .btn-funky-warning:hover {
+  background: var(--pro-accent-warning-text);
+  box-shadow: 0 2px 8px var(--pro-accent-warning-muted);
+}
+
+[data-theme="light"] .btn-funky-danger {
+  background: var(--pro-accent-danger);
+}
+
+[data-theme="light"] .btn-funky-danger:hover {
+  background: var(--pro-accent-danger-text);
+  box-shadow: 0 2px 8px var(--pro-accent-danger-muted);
+}
+
+[data-theme="light"] .btn-icon {
+  background: var(--pro-bg-secondary);
+  color: var(--pro-text-secondary);
+  border-color: var(--pro-border-color);
+}
+
+[data-theme="light"] .btn-icon:hover {
+  background: var(--pro-bg-tertiary);
+  color: var(--pro-text-primary);
+  border-color: var(--pro-border-emphasis);
+}
+
+[data-theme="light"] .btn-view {
+  background: var(--pro-accent-info-muted);
+  color: var(--pro-accent-info);
+}
+
+[data-theme="light"] .btn-view:hover {
+  background: var(--pro-accent-info-bg);
+  color: var(--pro-accent-info-text);
+}
+
+[data-theme="light"] .btn-edit {
+  background: var(--pro-accent-purple-muted);
+  color: var(--pro-accent-purple);
+}
+
+[data-theme="light"] .btn-edit:hover {
+  background: var(--pro-accent-purple-bg);
+  color: var(--pro-accent-purple-text);
+}
+
+[data-theme="light"] .btn-delete {
+  background: var(--pro-accent-danger-muted);
+  color: var(--pro-accent-danger);
+}
+
+[data-theme="light"] .btn-delete:hover {
+  background: var(--pro-accent-danger-bg);
+  color: var(--pro-accent-danger-text);
+}
+
+[data-theme="light"] .btn-clone {
+  background: var(--pro-accent-success-muted);
+  color: var(--pro-accent-success);
+}
+
+[data-theme="light"] .btn-clone:hover {
+  background: var(--pro-accent-success-bg);
+  color: var(--pro-accent-success-text);
+}
+
+[data-theme="light"] .btn-history {
+  background: var(--pro-accent-purple-muted);
+  color: var(--pro-accent-purple);
+}
+
+[data-theme="light"] .btn-history:hover {
+  background: var(--pro-accent-purple-bg);
+  color: var(--pro-accent-purple-text);
+}
+
+[data-theme="light"] .btn-secondary {
+  color: var(--pro-text-primary, #1f2328);
+  background-color: var(--pro-bg-primary, #ffffff);
+  border-color: var(--pro-border-color, #d0d7de);
+}
+
+[data-theme="light"] .btn-secondary:hover {
+  background-color: var(--pro-bg-secondary, #f6f8fa);
+  border-color: var(--pro-border-emphasis, #8c959f);
+}
+
+[data-theme="light"] .btn-outline-secondary {
+  color: var(--pro-text-secondary, #656d76);
+}
+
+[data-theme="light"] .btn-outline-secondary:hover {
+  color: var(--pro-text-primary, #1f2328);
+  background-color: var(--pro-bg-secondary, #f6f8fa);
+}
+
+[data-theme="light"] .btn-format-rules.has-rules {
+  border-color: var(--pro-accent-primary);
+  color: var(--pro-accent-primary);
+}
+
+/* ============================================
+   19. EVEN-FUNKYER THEME OVERRIDES
+   ============================================ */
+[data-theme="even-funkyer"] .btn,
+[data-theme="even-funkier"] .btn {
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.3s;
+}
+
+[data-theme="even-funkyer"] .btn:hover,
+[data-theme="even-funkier"] .btn:hover {
+  box-shadow: 0 0 8px var(--pro-accent-primary-muted);
+}
+
+[data-theme="even-funkyer"] .btn-primary,
+[data-theme="even-funkier"] .btn-primary {
+  box-shadow: 0 0 10px var(--pro-accent-primary-muted);
+}
+
+[data-theme="even-funkyer"] .btn-primary:hover,
+[data-theme="even-funkier"] .btn-primary:hover {
+  box-shadow: 0 0 20px var(--pro-accent-primary);
+}
+
+[data-theme="even-funkyer"] .btn-funky,
+[data-theme="even-funkyer"] .btn-funky-primary {
+  background: linear-gradient(135deg, var(--user-accent, #ff00ff), #00ffff);
+  color: white;
+  border: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="even-funkyer"] .btn-funky:hover,
+[data-theme="even-funkyer"] .btn-funky-primary:hover {
+  box-shadow:
+    0 0 20px rgba(var(--user-accent-rgb, 255, 0, 255), 0.5),
+    0 0 40px rgba(0, 255, 255, 0.3);
+  filter: brightness(1.1);
+}
+
+[data-theme="even-funkyer"] .btn-funky-secondary {
+  background: var(--pro-accent-primary-muted);
+  border: 1px solid rgba(255, 0, 255, 0.4);
+  color: var(--pro-accent-primary);
+}
+
+[data-theme="even-funkyer"] .btn-funky-secondary:hover {
+  background: rgba(255, 0, 255, 0.2);
+  border-color: var(--pro-accent-primary);
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+}
+
+[data-theme="even-funkyer"] .btn-funky-outline,
+[data-theme="even-funkyer"] .btn-funky-outline-primary {
+  border-color: var(--pro-accent-primary);
+  color: var(--pro-accent-primary);
+}
+
+[data-theme="even-funkyer"] .btn-funky-outline:hover,
+[data-theme="even-funkyer"] .btn-funky-outline-primary:hover {
+  background: linear-gradient(135deg, #ff00ff, #00ffff);
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+}
+
+[data-theme="even-funkyer"] .btn-funky-outline-secondary {
+  border-color: rgba(255, 0, 255, 0.4);
+  color: var(--pro-text-secondary);
+}
+
+[data-theme="even-funkyer"] .btn-funky-outline-secondary:hover {
+  background: rgba(255, 0, 255, 0.2);
+  color: var(--pro-accent-primary);
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+}
+
+[data-theme="even-funkyer"] .btn-funky-outline-danger {
+  border-color: var(--pro-accent-danger);
+  color: var(--pro-accent-danger);
+}
+
+[data-theme="even-funkyer"] .btn-funky-outline-danger:hover {
+  background: var(--pro-accent-danger);
+  color: white;
+  box-shadow: 0 0 15px var(--pro-accent-danger-muted);
+}
+
+[data-theme="even-funkyer"] .btn-icon {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  color: var(--pro-accent-secondary);
+}
+
+[data-theme="even-funkyer"] .btn-icon:hover {
+  background: var(--pro-accent-primary-muted);
+  border-color: var(--pro-accent-primary);
+  color: var(--pro-accent-primary);
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.4);
+}
+
+[data-theme="even-funkyer"] .btn-view {
+  background: var(--pro-accent-secondary-muted);
+  color: var(--pro-accent-secondary);
+}
+
+[data-theme="even-funkyer"] .btn-view:hover {
+  background: rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+[data-theme="even-funkyer"] .btn-edit {
+  background: var(--pro-accent-primary-muted);
+  color: var(--pro-accent-primary);
+}
+
+[data-theme="even-funkyer"] .btn-edit:hover {
+  background: rgba(255, 0, 255, 0.3);
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.4);
+}
+
+[data-theme="even-funkyer"] .btn-delete {
+  background: var(--pro-accent-danger-muted);
+  color: var(--pro-accent-danger);
+}
+
+[data-theme="even-funkyer"] .btn-delete:hover {
+  background: rgba(255, 0, 102, 0.3);
+  box-shadow: 0 0 10px var(--pro-accent-danger-muted);
+}
+
+[data-theme="even-funkyer"] .btn-clone {
+  background: var(--pro-accent-success-muted);
+  color: var(--pro-accent-success);
+}
+
+[data-theme="even-funkyer"] .btn-clone:hover {
+  background: rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 10px var(--pro-accent-success-muted);
+}
+
+[data-theme="even-funkyer"] .btn-history {
+  background: var(--pro-accent-purple-muted);
+  color: var(--pro-accent-purple);
+}
+
+[data-theme="even-funkyer"] .btn-history:hover {
+  background: var(--pro-accent-purple-bg);
+  box-shadow: 0 0 10px var(--pro-accent-purple-muted);
+}
+
+[data-theme="even-funkyer"] .btn-format-rules.has-rules {
+  border-color: var(--funkier-neon-pink, #ff00ff);
+  color: var(--funkier-neon-pink, #ff00ff);
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+}
+
+/* ============================================
+   20. HIGH CONTRAST MODE
+   ============================================ */
+@media (prefers-contrast: high) {
+  .btn {
+    border-width: 2px !important;
+  }
+
+  .btn:focus-visible {
+    outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+    box-shadow: var(--focus-ring-shadow);
+  }
+
+  .btn:hover {
+    text-decoration: underline;
+  }
+
+  .btn:disabled,
+  .btn.disabled {
+    border-style: dashed;
+  }
+
+  .btn-link {
+    text-decoration: underline;
+  }
+
+  /* Remove gradient backgrounds */
+  .btn-primary,
+  .btn-secondary,
+  .btn-success,
+  .btn-danger,
+  .btn-warning,
+  .btn-info {
+    background-image: none !important;
+  }
+}

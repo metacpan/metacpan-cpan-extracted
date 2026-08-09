@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::file_reload;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::file_reload - Render banned IPs to a fil
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -204,8 +204,44 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Builds the full file contents from the current ban list,
-# sorted so the output is stable, wrapped in the configured header/footer.
+# Internal helper. Builds the entire contents of the ban list file from the
+# current bans. Unlike the backends that own a marked region of a shared file,
+# this one owns the whole file, so what comes back here is written out
+# verbatim and replaces whatever was there.
+#
+# Single IPs and CIDR ranges are drawn from two separate internal lists but
+# are rendered identically and interleaved into one sorted run. Nothing
+# downstream distinguishes them, so a consumer reading the file sees a single
+# flat list of ban targets.
+#
+# The entries are sorted so that the same set of bans always renders to the
+# same bytes. That keeps the file from being rewritten with reshuffled lines
+# on unrelated operations, which matters here because every write is followed
+# by the reload hook. Note the sort is a plain string sort, so the order is
+# lexical rather than numeric or address aware.
+#
+# The header and footer are only emitted when set to something non empty, so
+# the default of an empty string for both produces a bare list.
+#
+# Takes no arguments; the bans come from the object's banned and banned_cidr
+# hashes.
+#
+# Returns the complete file contents as a single string, always ending in a
+# newline. With nothing banned and no header or footer the result is just a
+# lone newline, not the empty string, since the join always has a newline
+# appended.
+#
+#     # default format, no header or footer, 10.0.0.1 and 10.0.0.0/8 banned
+#     my $content = $self->_render;
+#     #   "10.0.0.0/8\n10.0.0.1\n"
+#
+#     # with format '  deny %%%BAN%%%;', header 'block {', footer '}'
+#     #   "block {\n  deny 10.0.0.0/8;\n  deny 10.0.0.1;\n}\n"
+#
+# The format option is applied per entry with every occurrence of the
+# %%%BAN%%% placeholder replaced by the entry, so a format may mention the
+# target more than once. It defaults to a bare %%%BAN%%%, which renders one
+# plain address or range per line.
 sub _render {
 	my ($self) = @_;
 
@@ -225,10 +261,62 @@ sub _render {
 	return join( "\n", @lines ) . "\n";
 } ## end sub _render
 
-# Internal helper. Renders the file and runs the reload hook. In testing mode
-# it records what would happen in test_data instead of touching the disk. The
-# $error_flag is the error code to raise on a write/reload failure so the
-# caller's context (ban vs unban vs ...) is preserved.
+# Internal helper. Writes the rendered ban list out to the configured file and
+# then runs the reload hook. This is the only place the file is written or the
+# hook is run, so init, ban, unban, ban_cidr, unban_cidr, re_init, teardown,
+# and flush all funnel through it.
+#
+# The file is opened for truncation and rewritten in full, since this backend
+# owns the whole file rather than a region of it. There is no locking and no
+# atomic rename here, unlike hosts_deny: the file is assumed to belong to this
+# instance alone, and a consumer only reads it when told to by the reload
+# hook, which runs after the write has completed.
+#
+# The reload hook is skipped when the reload option is unset or empty, which
+# is how a caller renders a file that something else is watching. Otherwise it
+# is run through the shell with stderr folded into stdout, and a non zero exit
+# is an error.
+#
+# The blank_reload_error option, on by default, additionally treats a hook
+# that succeeds but prints nothing at all as a failure. That guards against a
+# hook that is silently not doing anything, such as a mistyped command name
+# swallowed by a wrapper, which would otherwise look like a working reload
+# forever.
+#
+# A failure to open the file for writing always raises 31, fileWriteFailed,
+# rather than the passed code, since that is a problem with the file itself
+# and not with the operation that triggered it. Only reload failures use the
+# passed code. Nothing here dies; the error is set and warned and the caller
+# checks the error state.
+#
+# Args:
+#
+#     error_flag - The numeric error code to raise if the reload hook fails,
+#                  so the error reads as the operation that triggered it.
+#                  Callers pass the code matching themselves: 12
+#                  backendInitError from init, 13 banFailed from ban, 14
+#                  unbanFailed from unban, 32 banCidrFailed from ban_cidr, 33
+#                  unbanCidrFailed from unban_cidr, 16 reInitFailed from
+#                  re_init, 17 teardownFailed from teardown, and 25
+#                  flushFailed from flush. Not optional in practice; every
+#                  caller passes one.
+#
+# Returns nothing, on success and on failure alike.
+#
+#     # from ban, so a reload failure reads as banFailed
+#     $self->_apply(13);
+#
+#     # from flush
+#     $self->_apply(25);
+#
+# In testing mode nothing is written and no hook is run. What would have
+# happened is recorded on the frontend's test_data as a hashref instead:
+#
+#     {
+#         file    => '/etc/blocklist.txt',   # the path that would be written
+#         content => "10.0.0.1\n",           # the rendered contents
+#         reload  => '/usr/local/bin/reload-blocklist',   # undef if unset
+#     }
 sub _apply {
 	my ( $self, $error_flag ) = @_;
 
@@ -410,24 +498,6 @@ sub unban {
 	$self->_apply(14);
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by rendering it into the file the same way a single IP is.
@@ -583,13 +653,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# render the current ban list back out; the file is authored purely from
 	# state so this restores everything in one write

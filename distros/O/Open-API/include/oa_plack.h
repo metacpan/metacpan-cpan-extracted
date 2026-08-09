@@ -193,47 +193,230 @@ static SV *oa_map_result(pTHX_ SV *res) {
     return oa_json_response(aTHX_ 200, res);
 }
 
-/* ---- response validation (dev tool, validate_responses => 1) ------------------- */
+/* ---- response validation ------------------------------------------------------- *
+ *
+ * Two modes over one code path:
+ *
+ *   OA_RV_REPLACE (validate_responses => 1) - the dev tool. A mismatch
+ *       *replaces* the response with a 500 describing it. Unchanged from
+ *       0.06, defaults included: somebody's dev server depends on it.
+ *   OA_RV_REPORT  (validate_responses => 'report') - the product. The
+ *       errors go to a coderef and NULL comes back, so the triplet the
+ *       client receives is the one the handler built, byte for byte.
+ *
+ * Before any of that, a sampling gate: a per-operation counter, so an
+ * unsampled response costs one increment and one comparison and never
+ * touches the body. Then the skip rules, in order, each with its own
+ * counter - coverage is a reported number, not a silent gap. */
 
-/* NULL = fine; else a 500 triplet describing the mismatch (+1) */
-static SV *oa_check_response(pTHX_ oa_op *o, SV *trip) {
-    AV *tv, *ba, *errs;
-    SV **st, **bd, **b0;
-    SV *handle = NULL, *data;
+#define OA_RV_OFF     0
+#define OA_RV_REPLACE 1
+#define OA_RV_REPORT  2
+
+/* defined below, with the rest of the response-finalization helpers */
+static AV *oa_resp_headers(pTHX_ SV *resp);
+
+/* case-insensitive equality (the response-finalization section has the same
+ * comparison as oa_ci_eq; this one is needed before it) */
+static int oa_ci_eq_fwd(const char *a, STRLEN al, const char *b, STRLEN bl) {
+    STRLEN i;
+    if (al != bl) return 0;
+    for (i = 0; i < al; i++)
+        if (toLOWER((U8)a[i]) != toLOWER((U8)b[i])) return 0;
+    return 1;
+}
+
+typedef struct oa_rvcfg {
+    int  mode;         /* OA_RV_*                                        */
+    SV  *report;       /* coderef for report mode (borrowed), or NULL    */
+    IV   sample;       /* validate 1 response in N; 0/1 = all of them     */
+    IV   max_body;     /* skip bodies over this many bytes; 0 = no cap    */
+} oa_rvcfg;
+
+/* the value of a response header, or NULL (borrowed) */
+static SV *oa_hdr_get(pTHX_ AV *ha, const char *name, STRLEN nl) {
+    SSize_t i, n = ha ? av_len(ha) + 1 : 0;
+    for (i = 0; i + 1 < n; i += 2) {
+        SV **k = av_fetch(ha, i, 0);
+        if (k && *k) {
+            STRLEN kl; const char *kp = SvPV_const(*k, kl);
+            if (oa_ci_eq_fwd(kp, kl, name, nl)) {
+                SV **v = av_fetch(ha, i + 1, 0);
+                return (v && *v && SvOK(*v)) ? *v : NULL;
+            }
+        }
+    }
+    return NULL;
+}
+
+/* the declared schema for this status (exact, then `default`), or NULL.
+ * `ctype_ok` reports whether the operation declares a JSON body for it,
+ * which is a different question from whether one was compiled. */
+static SV *oa_resp_handle(pTHX_ oa_op *o, int status) {
     char sbuf[8];
     STRLEN sl;
     int i;
-    SSize_t j;
-    if (!o->nresps || !oa_is_triplet(aTHX_ trip)) return NULL;
-    tv = (AV *)SvRV(trip);
-    st = av_fetch(tv, 0, 0);
-    sl = (STRLEN)my_snprintf(sbuf, sizeof sbuf, "%d", (int)SvIV(*st));
+    sl = (STRLEN)my_snprintf(sbuf, sizeof sbuf, "%d", status);
     for (i = 0; i < o->nresps; i++) {
         STRLEN rl; const char *rp = SvPV_const(o->resps[i].status, rl);
-        if (rl == sl && memEQ(rp, sbuf, sl)) { handle = o->resps[i].handle; break; }
+        if (rl == sl && memEQ(rp, sbuf, sl)) return o->resps[i].handle;
     }
-    if (!handle) {
-        for (i = 0; i < o->nresps; i++) {
-            STRLEN rl; const char *rp = SvPV_const(o->resps[i].status, rl);
-            if (rl == 7 && memEQ(rp, "default", 7)) { handle = o->resps[i].handle; break; }
+    for (i = 0; i < o->nresps; i++) {
+        STRLEN rl; const char *rp = SvPV_const(o->resps[i].status, rl);
+        if (rl == 7 && memEQ(rp, "default", 7)) return o->resps[i].handle;
+    }
+    return NULL;
+}
+
+/* $report->($op_id, $status, \@errors, $env) - never allowed to break the
+ * response, so it runs under G_EVAL and a die is swallowed after a warn. */
+static void oa_rv_report(pTHX_ SV *cb, SV *op_id, int status, AV *errs, SV *env_rv) {
+    dSP;
+    if (!cb || !SvOK(cb)) return;
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    EXTEND(SP, 4);
+    PUSHs(op_id ? op_id : &PL_sv_undef);
+    PUSHs(sv_2mortal(newSViv(status)));
+    PUSHs(sv_2mortal(newRV_inc((SV *)errs)));
+    PUSHs(env_rv ? env_rv : &PL_sv_undef);
+    PUTBACK;
+    (void)call_sv(cb, G_VOID | G_DISCARD | G_EVAL);
+    if (SvTRUE(ERRSV))
+        warn("Open::API: response report callback died: %" SVf, SVfARG(ERRSV));
+    FREETMPS; LEAVE;
+}
+
+/* The check itself. Returns NULL when there is nothing to answer with -
+ * which is every case in report mode, and the conforming case in replace
+ * mode - or a 500 triplet (+1) for a replace-mode mismatch.
+ *
+ * `out_errs`, when given, receives the error AV (borrowed, mortal) so a
+ * direct caller can have the findings without a callback. */
+static SV *oa_check_response_cfg(pTHX_ oa_op *o, SV *trip, const oa_rvcfg *rv,
+                                 SV *env_rv, AV **out_errs) {
+    AV *tv, *ba, *errs, *ha;
+    SV **st, **bd, **b0;
+    SV *handle, *data, *cl;
+    int status;
+    SSize_t j;
+    if (out_errs) *out_errs = NULL;
+    if (!o || rv->mode == OA_RV_OFF || !oa_is_triplet(aTHX_ trip)) return NULL;
+
+    o->rv.total++;
+
+    /* the sampling gate, before anything touches the body */
+    o->rv.seen++;
+    if (rv->sample > 1 && (o->rv.seen % (unsigned long)rv->sample) != 0)
+        return NULL;
+    o->rv.sampled++;
+
+    tv = (AV *)SvRV(trip);
+    st = av_fetch(tv, 0, 0);
+    status = (int)SvIV(*st);
+    ha = oa_resp_headers(aTHX_ trip);
+
+    /* 1. not a declared JSON content type */
+    {
+        SV *ct = oa_hdr_get(aTHX_ ha, "content-type", 12);
+        STRLEN ctl; const char *ctp;
+        if (!ct) { o->rv.skip_ctype++; return NULL; }
+        ctp = SvPV_const(ct, ctl);
+        if (!oa_ctype_is_json(ctp, ctl)) { o->rv.skip_ctype++; return NULL; }
+    }
+
+    /* 2. Content-Length absent or over the cap. Only with a cap set: without
+     *    one there is nothing to be over, and demanding the header would stop
+     *    validating the handlers that never set it. */
+    if (rv->max_body > 0) {
+        cl = oa_hdr_get(aTHX_ ha, "content-length", 14);
+        if (!cl || !looks_like_number(cl) || SvIV(cl) > rv->max_body) {
+            o->rv.skip_size++;
+            return NULL;
         }
     }
-    if (!handle) return NULL;
+
+    /* 3. the body is not a plain scalar: a filehandle, a streaming coderef,
+     *    an SSE writer. Never buffered, never measured, forwarded as it is. */
     bd = av_fetch(tv, 2, 0);
-    if (!bd || !*bd || !SvROK(*bd) || SvTYPE(SvRV(*bd)) != SVt_PVAV) return NULL;
+    if (!bd || !*bd || !SvROK(*bd) || SvTYPE(SvRV(*bd)) != SVt_PVAV) {
+        o->rv.skip_body++;
+        return NULL;
+    }
     ba = (AV *)SvRV(*bd);
     b0 = av_fetch(ba, 0, 0);
-    if (!b0 || !*b0 || !SvOK(*b0) || SvROK(*b0)) return NULL;
+    if (!b0 || !*b0 || !SvOK(*b0) || SvROK(*b0)) {
+        o->rv.skip_body++;
+        return NULL;
+    }
+
+    /* 4. the status declares no schema */
+    handle = oa_resp_handle(aTHX_ o, status);
+    if (!handle) { o->rv.skip_schema++; return NULL; }
+
     data = oa_body_decode(aTHX_ *b0);
-    if (!data) return NULL;
+    if (!data) { o->rv.skip_decode++; return NULL; }
+
     errs = (AV *)sv_2mortal((SV *)newAV());
+    o->rv.checked++;
     if (JSF->validate(aTHX_ handle, data, errs)) return NULL;
+
+    o->rv.violations++;
     for (j = 0; j <= av_len(errs); j++) {
         SV **e = av_fetch(errs, j, 0);
         HV *h = (e && *e && SvROK(*e)) ? (HV *)SvRV(*e) : NULL;
         if (h) (void)hv_stores(h, "in", newSVpvs("response"));
     }
+    if (out_errs) *out_errs = errs;
+
+    if (rv->mode == OA_RV_REPORT) {
+        oa_rv_report(aTHX_ rv->report, o->op_id, status, errs, env_rv);
+        return NULL;              /* the client's bytes are not ours to edit */
+    }
     return oa_error_response(aTHX_ 500, errs);
+}
+
+/* The coverage counters as a hash (+1 owned by the caller). */
+static HV *oa_rv_hv(pTHX_ const oa_rvstat *s) {
+    HV *h = newHV();
+    (void)hv_stores(h, "total",       newSVuv(s->total));
+    (void)hv_stores(h, "sampled",     newSVuv(s->sampled));
+    (void)hv_stores(h, "checked",     newSVuv(s->checked));
+    (void)hv_stores(h, "violations",  newSVuv(s->violations));
+    (void)hv_stores(h, "skip_ctype",  newSVuv(s->skip_ctype));
+    (void)hv_stores(h, "skip_size",   newSVuv(s->skip_size));
+    (void)hv_stores(h, "skip_body",   newSVuv(s->skip_body));
+    (void)hv_stores(h, "skip_schema", newSVuv(s->skip_schema));
+    (void)hv_stores(h, "skip_decode", newSVuv(s->skip_decode));
+    (void)hv_stores(h, "unsampled",   newSVuv(s->total - s->sampled));
+    return h;
+}
+
+/* The request path's version: the mode comes from its own capture slot, the
+ * report callback and the sampling settings from the options HV. */
+static void oa_rvcfg_from(pTHX_ int vresp, HV *opts, oa_rvcfg *rv) {
+    SV **v;
+    rv->mode = vresp; rv->report = NULL; rv->sample = 1; rv->max_body = 0;
+    if (!opts) return;
+    if ((v = hv_fetchs(opts, "response_report", 0)) && *v && SvOK(*v))
+        rv->report = *v;
+    if ((v = hv_fetchs(opts, "response_sample", 0)) && *v && SvOK(*v))
+        rv->sample = SvIV(*v);
+    if ((v = hv_fetchs(opts, "response_max_body", 0)) && *v && SvOK(*v))
+        rv->max_body = SvIV(*v);
+}
+
+/* Check with the configured mode. NULL unless replace mode found a
+ * mismatch, in which case the 500 that replaces the response (+1). */
+static SV *oa_check_response_opts(pTHX_ oa_op *o, SV *trip, int vresp,
+                                  HV *opts, SV *env_rv) {
+    oa_rvcfg rv;
+    /* deliberately no `!o->nresps` shortcut: an operation whose declared
+     * statuses carry no schema still counts its responses and attributes
+     * them to skip_schema. Silence there would read as coverage. */
+    if (!o || !vresp) return NULL;
+    oa_rvcfg_from(aTHX_ vresp, opts, &rv);
+    return oa_check_response_cfg(aTHX_ o, trip, &rv, env_rv, NULL);
 }
 
 /* ---- response finalization (security headers, CORS, problem+json) ----------------- */
@@ -968,7 +1151,8 @@ XS_INTERNAL(oa_then_done_cb) {
     optsv  = *av_fetch(cap, 6, 0);
     resp   = oa_map_result(aTHX_ items > 0 ? ST(0) : &PL_sv_undef);
     if (vresp) {
-        SV *bad = oa_check_response(aTHX_ o, resp);
+        SV *bad = oa_check_response_opts(aTHX_ o, resp, vresp,
+            SvROK(optsv) ? (HV *)SvRV(optsv) : NULL, env_rv);
         if (bad) { SvREFCNT_dec(resp); resp = bad; }
     }
     oa_run_after(aTHX_ &resp, after, env_rv, opid);
@@ -1231,7 +1415,7 @@ static SV *oa_serve_psgi(pTHX_ SV *self_sv, HV *handlers, SV *env_rv,
         resp = oa_map_result(aTHX_ res);
         SvREFCNT_dec(res);
         if (vresp) {
-            SV *bad = oa_check_response(aTHX_ o, resp);
+            SV *bad = oa_check_response_opts(aTHX_ o, resp, vresp, opts, env_rv);
             if (bad) { SvREFCNT_dec(resp); resp = bad; }
         }
         oa_run_after(aTHX_ &resp, after, env_rv, o->op_id);

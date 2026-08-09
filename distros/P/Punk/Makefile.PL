@@ -67,9 +67,23 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Punk.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.010000',
+    # Every provider above is needed HERE, at configure time: this file
+    # asks ExtUtils::Depends for their installed headers before it can
+    # write a Makefile. A client installs configure_requires before
+    # running Makefile.PL and PREREQ_PM only after, so listing them below
+    # alone is too late - a clean machine dies in the block above with
+    # "Punk needs ... installed", which is not even a test failure, just
+    # a configure that never produced a Makefile.
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
+        'File::Raw::JSON'     => '0.05',   # provides frj_abi.h
+        'Open::API'           => '0.04',   # provides oa_abi.h
+        'Template::Stencil'   => '0.02',   # provides st_abi.h
+        'Hyperman'            => '0.13',   # provides hm_abi.h
+        'Markdown::Simple'    => '0.20',   # provides mds_abi.h
+        'Search::Trigram'     => '0.02',   # provides sg_abi.h
+        'DBIx::Loop'          => '0.02',   # provides dbil_abi.h
     },
     TEST_REQUIRES => {
         'Test::More' => '0',

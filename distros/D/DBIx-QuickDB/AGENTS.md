@@ -147,6 +147,18 @@ routine suite command:
 
     timeout 600 env AUTHOR_TESTING=1 QDB_INSTALL_NO_FORK=1 prove -Ilib -r t -j16
 
+A child that dies on that path can leave no TAP at all, so it records the phase
+it reached in a scratch file the parent prints on a non-zero exit. Only when a
+flavor resolves to exactly ONE install — always SQLite and DuckDB, otherwise
+when the system install and `~/dbs` yield a single match between them. With two
+or more, each child's output is captured instead and no trace is written.
+
+Set the test-only `QDB_INSTALL_EXTERNAL_TRACE` to keep that file under a name
+you choose; the parent then neither renames nor deletes it. One command and one
+test file at a time, never globally — each run empties the path first, so
+concurrent files blank it under each other's children and mix up whose
+breadcrumbs are whose.
+
 ## Editing the per-install test machinery
 
 The parent process of a per-install test file must NEVER load `DBIx::QuickDB`,

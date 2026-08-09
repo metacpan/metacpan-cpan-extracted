@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::checkpoint;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::checkpoint - Check Point Management (web
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -254,16 +254,52 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the base management server URL.
+# Internal helper. Returns the scheme and host of the Check Point management
+# server, which every web_api endpoint is built on.
+#
+# The Check Point web_api is a flat set of POST endpoints under /web_api/
+# rather than a resource tree, so the callers append the specific command
+# themselves rather than there being a URL builder per operation.
+#
+# The scheme is fixed at https rather than configurable, since the management
+# API is expected to be run over TLS.
+#
+# Takes no arguments; the host comes from the options.
+#
+# Returns the base URL as a string, with no trailing slash.
+#
+#     $self->_base_url;                          # https://mgmt.example.org
+#     $self->_base_url . '/web_api/add-host';    # the usual shape
 sub _base_url {
 	my ($self) = @_;
 
 	return 'https://' . $self->{options}{host};
 }
 
-# Internal helper. Returns the host object name for the IP, a deterministic
-# mangling of the prefix, name, and IP that avoids characters disallowed in
-# object names.
+# Internal helper. Returns the name of the Check Point host object
+# representing one banned address.
+#
+# Check Point has no set type that simply holds addresses. Each ban becomes a
+# named host object that is made a member of a group the policy references, so
+# every ban needs a name.
+#
+# The name is derived from the prefix, the instance name, and the address
+# rather than stored, so ban and unban independently arrive at the same name
+# without local bookkeeping, and two instances against the same management
+# server do not collide. Dots and colons are replaced with hyphens because
+# Check Point rejects them in object names.
+#
+# Args:
+#
+#     ip - The address to name an object for, as a plain string. Expected to
+#          be an already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the object name as a plain string, valid as a Check Point object
+# name.
+#
+#     # with prefix "kur" and name "ssh"
+#     $self->_obj_name('10.0.0.1');      # kur_ssh_10-0-0-1
+#     $self->_obj_name('2001:db8::1');   # kur_ssh_2001-db8--1
 sub _obj_name {
 	my ( $self, $ip ) = @_;
 
@@ -274,18 +310,55 @@ sub _obj_name {
 	return $name;
 } ## end sub _obj_name
 
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Performs a POST via LWP::UserAgent, sending the session id in
-# the X-chkp-sid header when one is set, returning the decoded JSON body (or
-# undef for an empty body) and dying with an explanation on any HTTP level
-# failure. Never called in testing mode.
+# Internal helper. Performs one HTTP request against the Check Point web_api.
+# Every call this backend makes to the management server goes through here.
+#
+# Authentication is by session rather than by credential or standing token.
+# init POSTs to /web_api/login and stores the session id, which this then
+# sends in the X-chkp-sid header on every following call. The header is only
+# added when a session id is set, which is what lets the login request itself
+# go through this same helper before there is one.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend. The
+# insecure option turns off certificate verification, which is there because a
+# management server commonly presents a self signed certificate.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# A body that fails to decode as JSON is not fatal; the decode runs inside its
+# own eval and leaves the result undef.
+#
+# Never called in testing mode; those paths record the request descriptors
+# instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string. In practice always 'POST',
+#              since the web_api exposes everything as POST endpoints.
+#
+#     url    - The full URL to request, as a plain string, normally
+#              _base_url with a /web_api/ command appended.
+#
+#     body   - The request body, as an already encoded JSON string. Note the
+#              web_api expects a JSON object even where there is nothing to
+#              say, so callers pass the literal '{}' rather than undef for
+#              those.
+#
+# Returns the decoded response body as whatever structure the JSON held,
+# normally a hashref, or undef when the response body was empty or did not
+# parse. Dies on any non success HTTP status.
+#
+#     $self->_request( 'POST', $self->_base_url . '/web_api/publish', '{}' );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( $r->{method}, $r->{url}, $r->{content} ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -331,8 +404,40 @@ sub _request {
 	return $decoded;
 } ## end sub _request
 
-# Internal helper. Returns the two request descriptors used to ban an IP: create
-# the host object and add it to the group, then publish.
+# Internal helper. Returns the pair of requests that ban one address.
+#
+# Unlike the fortigate backend, creating the object and putting it in the
+# group is a single call here: add-host takes a groups list, so the membership
+# comes along with the creation.
+#
+# The second call is the one that is easy to overlook. Check Point changes
+# land in a private session and have no effect until published, so a ban
+# without the publish would appear to succeed while blocking nothing. That is
+# why the two are returned together rather than being sequenced by the caller.
+#
+# Returning descriptors rather than performing the requests is what lets the
+# testing paths record exactly what would have been sent without a management
+# server being present.
+#
+# Args:
+#
+#     ip - The address to ban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address. Note the address
+#          goes into the ip-address field for both families; Check Point does
+#          not split hosts by family the way FortiOS does.
+#
+# Returns a two element list of hashrefs, in the order they must be performed,
+# each with method, url, and content keys.
+#
+#     my @requests = $self->_ban_requests('10.0.0.1');
+#
+#     # first, create the host and put it in the group
+#     #   POST https://mgmt.example.org/web_api/add-host
+#     #     {"groups":["blocklist"],"ip-address":"10.0.0.1","name":"kur_ssh_10-0-0-1"}
+#
+#     # then, publish so it takes effect
+#     #   POST https://mgmt.example.org/web_api/publish
+#     #     {}
 sub _ban_requests {
 	my ( $self, $ip ) = @_;
 
@@ -350,8 +455,36 @@ sub _ban_requests {
 	);
 } ## end sub _ban_requests
 
-# Internal helper. Returns the two request descriptors used to unban an IP: delete
-# the host object, then publish.
+# Internal helper. Returns the pair of requests that unban one address, the
+# inverse of _ban_requests.
+#
+# Deleting the host object also removes it from the group, so there is no
+# separate membership call, mirroring the way the ban created both at once.
+# The publish is required here for exactly the same reason it is on the ban:
+# without it the deletion stays in the private session and the address remains
+# blocked.
+#
+# The delete identifies the object by name alone, which is why the object name
+# has to be derivable rather than stored.
+#
+# Args:
+#
+#     ip - The address to unban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, and to produce the
+#          same object name it did when banned.
+#
+# Returns a two element list of hashrefs, in the order they must be performed,
+# each with method, url, and content keys.
+#
+#     my @requests = $self->_unban_requests('10.0.0.1');
+#
+#     # first, delete the host object
+#     #   POST https://mgmt.example.org/web_api/delete-host
+#     #     {"name":"kur_ssh_10-0-0-1"}
+#
+#     # then, publish so it takes effect
+#     #   POST https://mgmt.example.org/web_api/publish
+#     #     {}
 sub _unban_requests {
 	my ( $self, $ip ) = @_;
 
@@ -564,24 +697,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range. The value of ban is validated as being a IPv4 or IPv6 CIDR
@@ -783,13 +898,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from

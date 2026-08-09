@@ -101,6 +101,81 @@ static SV *pcx_call_meth(pTHX_ SV *obj, const char *meth,
     return r;
 }
 
+/* The context's own parameter layers, in precedence order: the validated
+ * OpenAPI params (path, then query), then the route captures. Borrowed,
+ * NULL when neither carries the name - the request is the caller's
+ * fallback, because reaching it forces Punk::Request into being. */
+static SV *pcx_param_local(pTHX_ AV *av, SV *name) {
+    STRLEN nl;
+    const char *n = SvPV_const(name, nl);
+    SV *op = pcx_get(aTHX_ av, PCX_OPENAPI);
+    SV *m  = pcx_get(aTHX_ av, PCX_MATCH);
+    if (op && SvROK(op) && SvTYPE(SvRV(op)) == SVt_PVHV) {
+        HV *oph = (HV *)SvRV(op);
+        static const char *loc[2] = { "path", "query" };
+        int i;
+        for (i = 0; i < 2; i++) {
+            SV **lv = hv_fetch(oph, loc[i], (I32)strlen(loc[i]), 0);
+            if (lv && *lv && SvROK(*lv) && SvTYPE(SvRV(*lv)) == SVt_PVHV) {
+                SV **v = hv_fetch((HV *)SvRV(*lv), n, (I32)nl, 0);
+                if (v) return *v ? *v : &PL_sv_undef;
+            }
+        }
+    }
+    if (m && SvROK(m) && SvTYPE(SvRV(m)) == SVt_PVHV) {
+        SV **cap = hv_fetchs((HV *)SvRV(m), "captures", 0);
+        if (cap && *cap && SvROK(*cap) && SvTYPE(SvRV(*cap)) == SVt_PVHV) {
+            SV **v = hv_fetch((HV *)SvRV(*cap), n, (I32)nl, 0);
+            if (v) return *v ? *v : &PL_sv_undef;
+        }
+    }
+    return NULL;
+}
+
+/* The lazy Punk::Request for this context, borrowed. */
+static SV *pcx_req(pTHX_ AV *av) {
+    return pcx_force(aTHX_ av, PCX_REQ, "Punk::Request",
+                     pcx_get(aTHX_ av, PCX_ENV));
+}
+
+/* $c->param($name): the layers above, else the request (query, then form
+ * body). Owned (+1), NULL when nothing carries the name. */
+static SV *pcx_param(pTHX_ AV *av, SV *name) {
+    SV *found = pcx_param_local(aTHX_ av, name);
+    SV *argv[1];
+    SV *r;
+    if (found) return newSVsv(found);
+    argv[0] = name;
+    r = pcx_call_meth(aTHX_ pcx_req(aTHX_ av), "param", argv, 1, 1);
+    if (r && SvOK(r)) return r;
+    if (r) SvREFCNT_dec(r);
+    return NULL;
+}
+
+/* Every parameter the context can see, stacked in the same precedence
+ * pcx_param resolves one by: the request's merged table underneath, then
+ * the route captures, then the validated OpenAPI query and path. +1. */
+static HV *pcx_params_merged(pTHX_ AV *av) {
+    HV *out = newHV();
+    SV *rp  = pcx_call_meth(aTHX_ pcx_req(aTHX_ av), "params", NULL, 0, 1);
+    SV *m   = pcx_get(aTHX_ av, PCX_MATCH);
+    SV *op  = pcx_get(aTHX_ av, PCX_OPENAPI);
+    pq_overlay(aTHX_ out, rp);
+    if (rp) SvREFCNT_dec(rp);
+    if (m && SvROK(m) && SvTYPE(SvRV(m)) == SVt_PVHV) {
+        SV **cap = hv_fetchs((HV *)SvRV(m), "captures", 0);
+        if (cap) pq_overlay(aTHX_ out, *cap);
+    }
+    if (op && SvROK(op) && SvTYPE(SvRV(op)) == SVt_PVHV) {
+        HV *oph  = (HV *)SvRV(op);
+        SV **qry = hv_fetchs(oph, "query", 0);
+        SV **pth = hv_fetchs(oph, "path", 0);
+        if (qry) pq_overlay(aTHX_ out, *qry);
+        if (pth) pq_overlay(aTHX_ out, *pth);
+    }
+    return out;
+}
+
 /* does the blessed ref have method $meth? (a ->can without the call) */
 static int pcx_can(pTHX_ SV *obj, const char *meth) {
     HV *stash = (SvROK(obj) && SvOBJECT(SvRV(obj))) ? SvSTASH(SvRV(obj)) : NULL;

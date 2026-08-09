@@ -1,0 +1,37 @@
+---
+abstract: 'Tie perl variables to Google Sheets'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Crypt::PK::RSA: '0'
+  Test2::V0: '0.000121'
+  perl: v5.42.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.42.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Google-Sheets
+recommends:
+  Cpanel::JSON::XS: '0'
+requires:
+  Class::Tiny: '0'
+  Crypt::JWT: '0'
+  HTTP::AnyUA: '0'
+  JSON::MaybeXS: '0'
+  URI: '0'
+  URI::Escape: '0'
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/uperl/Tie-Google-Sheets/issues
+  homepage: https://metacpan.org/pod/Tie::Google::Sheets
+  repository: git://github.com/uperl/Tie-Google-Sheets.git
+version: '0.01'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

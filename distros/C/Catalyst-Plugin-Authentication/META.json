@@ -28,13 +28,13 @@
       },
       "develop" : {
          "requires" : {
-            "Catalyst::Plugin::Session" : "0.10",
+            "Catalyst::Plugin::Session" : "0.25",
             "Catalyst::Plugin::Session::State::Cookie" : "0",
             "Digest::SHA" : "0",
             "Test::EOL" : "0",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.14",
-            "Test::Pod::Coverage" : "1.04"
+            "Test::Pod::Coverage::TrustMe" : "0"
          }
       },
       "runtime" : {
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Authentication"
       }
    },
-   "version" : "0.10026",
+   "version" : "0.10028",
    "x_authority" : "cpan:BOBTFISH",
    "x_serialization_backend" : "JSON::MaybeXS version 1.004008"
 }

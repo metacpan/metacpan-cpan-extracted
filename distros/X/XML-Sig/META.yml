@@ -9,6 +9,7 @@ build_requires:
   File::Temp: '0'
   File::Which: '0'
   Import::Into: '0'
+  Path::Tiny: '0'
   Test::Exception: '0'
   Test::Lib: '0'
   Test::More: '0'
@@ -25,7 +26,7 @@ name: XML-Sig
 provides:
   XML::Sig:
     file: lib/XML/Sig.pm
-    version: '0.72'
+    version: '0.73'
 recommends:
   Crypt::OpenSSL::DSA: '0.20'
 requires:
@@ -52,7 +53,7 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-XML-Sig/issues
   repository: git://github.com/perl-net-saml2/perl-XML-Sig.git
-version: '0.72'
+version: '0.73'
 x_contributors:
   - 'Byrne Reese <byrne@cpan.org>'
   - 'Chris Andrews <chris@nodnol.org>'

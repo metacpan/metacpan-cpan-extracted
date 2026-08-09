@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Git-CheckFor
 
+0.015     2026-08-08 19:27:16 CDT-0500
+        * fix issue #26: . is no longer in @INC
+        * remove dependency on MooseX::AttributeShortcuts, to work around
+          installation issues on blead
+
 0.014     2016-10-10 10:27:02 CDT-0500
 	* Drop dependency on List::MoreUtils (thanks, @karenetheridge!)
 

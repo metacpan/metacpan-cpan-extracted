@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Container;
 # ABSTRACT: A single application container that you want to run within a pod.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s args => [Str];
@@ -43,6 +43,9 @@ k8s resources => 'Core::V1::ResourceRequirements';
 
 
 k8s restartPolicy => Str;
+
+
+k8s restartPolicyRules => ['Core::V1::ContainerRestartRule'];
 
 
 k8s securityContext => 'Core::V1::SecurityContext';
@@ -89,7 +92,7 @@ IO::K8s::Api::Core::V1::Container - A single application container that you want
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 args
 
@@ -146,6 +149,10 @@ Compute Resources required by this container. Cannot be updated. More info: http
 =head2 restartPolicy
 
 RestartPolicy defines the restart behavior of individual containers in a pod. This field may only be set for init containers, and the only allowed value is "Always". For non-init containers or when this field is not specified, the restart behavior is defined by the Pod's restart policy and the container type. Setting the RestartPolicy as "Always" for the init container will have the following effect: this init container will be continually restarted on exit until all regular containers have terminated. Once all regular containers have completed, all init containers with restartPolicy "Always" will be shut down. This lifecycle differs from normal init containers and is often referred to as a "sidecar" container. Although this init container still starts in the init container sequence, it does not wait for the container to complete before proceeding to the next init container. Instead, the next init container starts immediately after this init container is started, or after any startupProbe has successfully completed.
+
+=head2 restartPolicyRules
+
+Represents a list of rules to be checked to determine if the container should be restarted on exit. The rules are evaluated in order. Once a rule matches a container exit condition, the remaining rules are ignored. If no rule matches the container exit condition, the Container-level restart policy determines the whether the container is restarted or not. Constraints on the rules: - At most 20 rules are allowed. - Rules can have the same action. - Identical rules are not forbidden in validations. When rules are specified, container MUST set RestartPolicy explicitly even it if matches the Pod's RestartPolicy.
 
 =head2 securityContext
 

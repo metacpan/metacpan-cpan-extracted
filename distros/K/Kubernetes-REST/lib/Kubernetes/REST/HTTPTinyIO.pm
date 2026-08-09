@@ -1,5 +1,5 @@
 package Kubernetes::REST::HTTPTinyIO;
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 # ABSTRACT: HTTP client using HTTP::Tiny
 use Moo;
 use HTTP::Tiny;
@@ -108,7 +108,7 @@ Kubernetes::REST::HTTPTinyIO - HTTP client using HTTP::Tiny
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 
@@ -122,6 +122,8 @@ version 1.105
 =head1 DESCRIPTION
 
 HTTP client implementation using L<HTTP::Tiny> for making Kubernetes API requests. Lighter alternative to L<Kubernetes::REST::LWPIO>.
+
+Response bodies are returned as bytes - L<HTTP::Tiny> hands back the body unmodified and never decodes a charset. See L<Kubernetes::REST::Role::IO/Encoding contract>.
 
 =head2 ssl_verify_server
 

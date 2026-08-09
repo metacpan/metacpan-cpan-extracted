@@ -1,6 +1,6 @@
 package IO::K8s::Api::Certificates::V1::CertificateSigningRequest;
 # ABSTRACT: CertificateSigningRequest objects provide a mechanism to obtain x509 certificates by submitting a certificate signing request, and having it asynchronously approved and issued.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Certificates::V1::CertificateSigningRequest - CertificateSigningRe
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head1 DESCRIPTION
 

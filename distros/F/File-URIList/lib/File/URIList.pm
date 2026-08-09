@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -20,7 +20,7 @@ use constant {
     CRLF => "\015\012",
 };
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my %_check_defaults = (
     blank_lines => 'die',
@@ -237,6 +237,28 @@ sub clear {
     $fh->truncate(0);
 }
 
+
+sub media_subtype {
+    my ($pkg, $as, @opts) = @_;
+
+    croak 'Stray options passed' if scalar keys @opts;
+
+    if (defined $as) {
+        require Data::Identifier;
+        state $id = Data::Identifier->new(
+            uuid => 'ceecde0d-4fbe-595f-92a5-b792692d341f',
+            tagname => 'text/uri-list',
+            generator => Data::Identifier->new(uuid => 'a649d48d-35b0-4454-81af-c5fd2eb40373')->register,
+            request => 'text/uri-list',
+        )->register;
+
+        return $id if eval {$id->isa($as)};
+        return $id->as($as);
+    }
+
+    return 'text/uri-list';
+}
+
 1;
 
 __END__
@@ -251,7 +273,7 @@ File::URIList - module for reading and writing RFC 2483 URI lists
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -439,13 +461,26 @@ Clears the list. This will delete all entries from the list.
 B<Note:>
 All limitation of L</rewind> apply. In addition the filehande (or file) passed to L</new> also needs to support changes in size.
 
+=head2 media_subtype
+
+    my $media_subtype = File::URIList->media_subtype( [ $as ] );
+    # or:
+    my $media_subtype = $list->media_subtype( [ $as ] );
+
+(since v0.05)
+
+Returns the media subtype for the list.
+
+If C<$as> is not given the media subtype is returned as a string.
+If C<$as> is given, it is returned as per L<Data::Identifier/as>.
+
 =head1 AUTHOR
 
 Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -65,7 +65,28 @@ yields an arrayref.
 
 =head2 params
 
-One merged hashref, query winning over form.
+=head2 params(@names)
+
+With no names, one merged hashref, query winning over form.
+
+With names, only those, looked up the way L</param> looks one up. The
+return follows context: a list of values in the order asked for, C<undef>
+for a name neither table has -
+
+    my ($page, $size) = $req->params(qw(page size));
+
+or, in scalar context, a hashref holding only the names that were there,
+which is the shape to build a filter from -
+
+    my %filter = %{ $req->params(qw(state queue task)) };
+
+A dereference block puts what it wraps in scalar context, so the C<%{ }>
+above gets the hashref. Somewhere already in list context - an argument
+list, a hash constructor - it takes the slice instead, so ask for the
+hashref explicitly there with C<scalar>.
+
+Passing a list that happens to be empty is passing no names at all, and
+so gives everything: guard the call where the names are built at runtime.
 
 =head2 query
 

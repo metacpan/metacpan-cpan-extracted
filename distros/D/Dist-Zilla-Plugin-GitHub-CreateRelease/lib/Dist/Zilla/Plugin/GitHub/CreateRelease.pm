@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::GitHub::CreateRelease;
-our $VERSION = '0.0009'; # VERSION
+our $VERSION = '0.0010'; # VERSION
 
 # ABSTRACT: Create a GitHub Release
 
@@ -16,12 +16,14 @@ use File::Slurper qw/read_text read_binary/;
 use Exporter qw(import);
 use Moose;
 use Try::Tiny;
+use CPAN::Changes;
 with 'Dist::Zilla::Role::AfterRelease';
 
 use namespace::autoclean;
 
 has hash_alg => (is => 'ro', default => 'sha256');
 has repo => (is => 'ro');
+has repo_owner => (is => 'ro');
 has branch => (is => 'ro', default => 'main');
 has remote_name => (is => 'ro', default => 'origin');
 has title_template => (is => 'ro', default => 'Version RELEASE - TRIAL CPAN release');
@@ -49,7 +51,7 @@ sub _create_release {
   die "Unable to load github token from ~/.$org-identity or ~/.$org" if (! defined $identity{token});
 
   my $releases = Pithub::Repos::Releases->new(
-    user  => $identity{login} || $self->{username},
+    user  => $self->{repo_owner} || $self->_get_repo_owner() || $identity{login} || $self->{username},
     repo  => $self->{repo} || $self->_get_repo_name(),
     token => $identity{token},
   );
@@ -66,8 +68,14 @@ sub _create_release {
       generate_release_notes => $self->{github_notes} ? \1 : \0,
     }
   );
-  die "Discussion category name is invalid" if  ($release->response eq '404');
-  die "Validation failed, or the endpoint has been spammed." if  ($release->response eq '422');
+  # ->response is the underlying HTTP::Response object, not a status code
+  # string, so comparing it with `eq '404'`/`eq '422'` never matches and
+  # these two checks never fired; every failure fell through to the
+  # generic "Unable to create GitHub release" below. ->code (as already
+  # used for the 403 check two lines down) delegates to the response's
+  # numeric status and is what these comparisons need.
+  die "Discussion category name is invalid" if  ($release->code eq '404');
+  die "Validation failed, or the endpoint has been spammed." if  ($release->code eq '422');
   die "login ($identity{login}) or token invalid for the specified repository ($releases->{repo})\n"
       if  ($release->code eq '403');
 
@@ -166,6 +174,42 @@ sub _repo_name_from_url {
   return $basename;
 }
 
+# The remote url's path holds both the owner and the repo name
+# (e.g. "pplu/kubernetes-rest.git"), but _repo_name_from_url only ever
+# kept the last segment. That silently discarded the owner, so a release
+# was always attempted under the github-identity login instead of the
+# repository's actual owner -- which fails whenever they differ, e.g. for
+# a repo that isn't owned by the account named in ~/.github-identity.
+sub _get_repo_owner {
+  my $self = shift;
+
+  my $setting = "remote." . $self->{remote_name} . ".url";
+  my $git = Git::Wrapper->new('./');
+  my @url;
+  try {
+    @url = $git->RUN('config', '--get', $setting);
+  }
+  catch {
+    return;
+  };
+
+  return $self->_repo_owner_from_url($url[0]);
+}
+
+sub _repo_owner_from_url {
+  my $self = shift;
+  my $url  = shift;
+
+  my $path = URI->new($url)->path;
+  $path =~ s{^/+}{};
+  my @parts = split m{/}, $path;
+  pop @parts;
+
+  return unless @parts;
+
+  return uri_unescape( join('/', @parts) );
+}
+
 sub _generate_release_notes {
   my $self      = shift;
   my $filename  = shift;
@@ -196,8 +240,8 @@ sub _get_notes_from_changes {
   my $vers = $tags[0];
   my $prev = $tags[1];
 
-  my $file = read_text($self->{notes_file});
-  my $notes = $self->_extract_changes($file, $vers, $prev);
+  my $changes = CPAN::Changes->load($self->{notes_file});
+  my $notes = $changes->find_release($tags[0])->serialize();
 
   return $self->_as_code($notes) if (! $self->{add_checksum});
 
@@ -360,7 +404,7 @@ Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 =head1 VERSION
 
-version 0.0009
+version 0.0010
 
 =head1 SYNOPSIS
 
@@ -368,6 +412,7 @@ In your F<dist.ini>:
 
  [GitHub::CreateRelease]
  repo = github_repo_name         ; optional
+ repo_owner = github_owner_name  ; optional
  branch = main                   ; default = main
  notes_as_code = 1               ; default = 1 (true)
  notes_from = SignReleaseNotes   ; default = SignReleaseNotes
@@ -456,6 +501,19 @@ cpan upload file.
 
 A string value that specifies the name of the github repository.  The module determines the
 name based on the remote url but this setting can override the name that is detected.
+
+=item repo_owner
+
+A string value that specifies the owner (user or organization) of the github repository.
+The module determines the owner based on the remote url (the same url used to detect
+C<repo>) but this setting can override the owner that is detected.
+
+If the owner cannot be determined from the remote url, the C<login> from the identity
+file (see B<GITHUB API AUTHENTICATION>) is used instead, which was the only behaviour
+before this attribute existed. That fallback only works when the identity's login is
+also the repository owner, so repositories owned by an account other than the one in
+the identity file (e.g. a repository you are a collaborator on) need either this
+attribute or a matching C<org_id> identity to create a release successfully.
 
 =item remote_name
 

@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "apache",
   "NAME" => "Kubernetes::REST",
   "PREREQ_PM" => {
-    "IO::K8s" => "1.008",
+    "IO::K8s" => "1.105",
     "IO::Socket::SSL" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.105",
+  "VERSION" => "1.106",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "IO::K8s" => "1.008",
+  "IO::K8s" => "1.105",
   "IO::Socket::SSL" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,

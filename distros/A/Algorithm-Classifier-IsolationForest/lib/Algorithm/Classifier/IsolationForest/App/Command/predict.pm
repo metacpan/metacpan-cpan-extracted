@@ -204,4 +204,67 @@ sub execute {
 	write_file( $opt->{'o'}, { 'atomic' => 1 }, $results_string );
 } ## end sub execute
 
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::predict - Processes the data using the score_predict_samples using the specified model
+
+=head1 DESCRIPTION
+
+Scores every input row and labels it, printing one line per row:
+
+  $score,$predict
+
+With C<-d> the input feature columns are prepended, which is the form
+C<iforest csv2plot> expects:
+
+  $feat1,...,$featN,$score,$predict
+
+Input may be a CSV or a C<.iforest-packed> binary from C<iforest pack>,
+detected by its magic bytes; with a packed input the C<-d> columns come
+from unpacking the stored doubles.
+
+Run it as C<iforest predict>; C<iforest help predict> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help predict> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Checks that C<-i> and C<-m> name readable files, that C<-o> may be
+written, and that C<-t> lies in (0, 1).
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Loads the model, scores the input, and writes the result lines to STDOUT
+or to C<-o>.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
+
 return 1;

@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft
+# Copyright (c) 2024-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -6,7 +6,7 @@
 
 package File::ValueFile::Simple::Reader;
 
-use v5.10;
+use v5.20;
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ use Fcntl qw(SEEK_SET);
 use URI::Escape qw(uri_unescape);
 use Encode ();
 
-use Data::Identifier v0.06;
+use Data::Identifier v0.34;
 use File::ValueFile;
 
 use constant {
@@ -29,7 +29,7 @@ use constant {
     DOT_REPEAT_ISE => '2ec67bbe-4698-4a0c-921d-1f0951923ee6',
 };
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 
 
@@ -408,7 +408,7 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -547,7 +547,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

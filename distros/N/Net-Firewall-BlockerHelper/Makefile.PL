@@ -27,12 +27,17 @@ my %WriteMakefileArgs = (
 		"meta-spec" => { version => 2 },
 		prereqs     => {
 			runtime => {
-				# only needed by the HTTP API backends (abuseipdb, cloudflare,
-				# fortigate, netscaler, panos, and routeros_api),
-				# which load it at run time
 				recommends => {
+					# only needed by the HTTP API backends (abuseipdb, cloudflare,
+					# fortigate, netscaler, panos, and routeros_api),
+					# which load it at run time
 					'LWP::UserAgent'       => '0',
 					'LWP::Protocol::https' => '0',
+					# only needed by the JSON REST backends (akamai, checkpoint,
+					# cisco_fmc, cloudflare, f5_bigip, fastly, fortigate, opnsense,
+					# pfsense, routeros_api, and vyos), which load it at run time.
+					# JSON is used over JSON::PP so JSON::XS is picked up when present
+					'JSON' => '0',
 				},
 			},
 		},

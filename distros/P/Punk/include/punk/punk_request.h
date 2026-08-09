@@ -186,6 +186,52 @@ static SV *pq_cached(pTHX_ AV *req, I32 slot, HV *built) {
     return rv;
 }
 
+/* The query or form table, built through the accessor of that name on
+ * first use so the parse lands in the slot exactly once. Borrowed, or
+ * NULL when the accessor gave back something that is not a hashref. */
+static HV *pq_table(pTHX_ SV *self, AV *req, I32 slot, const char *meth) {
+    SV **c = av_fetch(req, slot, 0);
+    if (!(c && *c && SvROK(*c))) {
+        dSP;
+        PUSHMARK(SP); XPUSHs(self); PUTBACK;
+        call_method(meth, G_SCALAR);
+        SPAGAIN; (void)POPs; PUTBACK;
+        c = av_fetch(req, slot, 0);
+    }
+    return (c && *c && SvROK(*c) && SvTYPE(SvRV(*c)) == SVt_PVHV)
+        ? (HV *)SvRV(*c) : NULL;
+}
+
+/* One parameter: query first, then form body. Borrowed, NULL when the
+ * name is in neither - which the callers keep distinct from a present
+ * undef, so params(@keys) can leave an absent key out of its hash. */
+static SV *pq_param_get(pTHX_ SV *self, AV *req, SV *name) {
+    HV *t  = pq_table(aTHX_ self, req, PQ_QUERY, "query");
+    HE *he = t ? hv_fetch_ent(t, name, 0, 0) : NULL;
+    if (!he) {
+        t  = pq_table(aTHX_ self, req, PQ_FORM, "form");
+        he = t ? hv_fetch_ent(t, name, 0, 0) : NULL;
+    }
+    return he ? HeVAL(he) : NULL;
+}
+
+/* Copy every pair of `src` over `out`, so a caller can stack tables in
+ * precedence order. NULL sources are skipped. */
+static void pq_overlay_hv(pTHX_ HV *out, HV *src) {
+    HE *he;
+    if (!src) return;
+    hv_iterinit(src);
+    while ((he = hv_iternext(src)))
+        (void)hv_store_ent(out, HeSVKEY_force(he), newSVsv(HeVAL(he)), 0);
+}
+
+/* The same, taking whatever an accessor returned: anything that is not a
+ * hashref overlays nothing. */
+static void pq_overlay(pTHX_ HV *out, SV *src) {
+    if (src && SvROK(src) && SvTYPE(SvRV(src)) == SVt_PVHV)
+        pq_overlay_hv(aTHX_ out, (HV *)SvRV(src));
+}
+
 /* The raw request body: read CONTENT_LENGTH bytes from psgi.input via
  * PerlIO on first call (then rewind, matching the Perl semantics),
  * cache in the BODY slot. Returns the cached SV (borrowed) - undef SV

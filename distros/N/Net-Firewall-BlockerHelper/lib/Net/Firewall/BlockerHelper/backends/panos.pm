@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::panos;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::panos - Palo Alto Networks PAN-OS backen
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -240,24 +240,52 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the PAN-OS API endpoint.
+# Internal helper. Returns the URL of the PAN-OS XML API.
+#
+# There is a single endpoint. What happens is decided by the type and cmd form
+# parameters in the posted body rather than by the path, so unlike the REST
+# backends there is no URL to build per operation.
+#
+# Takes no arguments; the scheme and host come from the options.
+#
+# Returns the URL as a string, with its trailing slash, which PAN-OS expects.
+#
+#     $self->_url;    # https://pan.example.org/api/
 sub _url {
 	my ($self) = @_;
 
 	return $self->{options}{scheme} . '://' . $self->{options}{host} . '/api/';
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Builds an x-www-form-urlencoded body from the passed
-# parameters, in a fixed key order so the output is stable.
+# Internal helper. Assembles a form encoded request body from named
+# parameters, used to build every request this backend sends.
+#
+# The keys are emitted in a fixed order rather than in hash order, so the same
+# parameters always produce the same bytes. Without that the body recorded in
+# test_data would vary run to run and could not be compared against a fixed
+# expected string.
+#
+# Parameters that are undef are skipped rather than emitted empty, which is
+# how the optional vsys is left out on an appliance that does not use virtual
+# systems. Note that only the five known keys are ever emitted; anything else
+# passed in is silently ignored, since the ordering list is what drives the
+# output.
+#
+# Every value is percent encoded, which matters for cmd in particular since it
+# carries XML.
+#
+# Args:
+#
+#     %params - The parameters to encode. Recognized keys, emitted in this
+#               order, are: type, the API call type such as 'op' or 'user-id';
+#               action; key, the API key; cmd, the XML command; and vsys, the
+#               virtual system. Any may be omitted or undef, in which case it
+#               is left out.
+#
+# Returns the body as a form urlencoded string, ready to POST to _url.
+#
+#     $self->_form_body( type => 'op', key => 'secret', cmd => '<show/>' );
+#     #   type=op&key=secret&cmd=%3Cshow%2F%3E
 sub _form_body {
 	my ( $self, %params ) = @_;
 
@@ -270,8 +298,39 @@ sub _form_body {
 	return join( '&', @pairs );
 } ## end sub _form_body
 
-# Internal helper. Builds the User-ID uid-message XML for the given action
-# ('register' or 'unregister') and IP, tagging it with the configured tag.
+# Internal helper. Builds the User-ID uid-message XML that tags or untags one
+# address.
+#
+# This backend does not write firewall rules or manage an address group.
+# PAN-OS Dynamic Address Groups are defined by a tag match, so blocking works
+# by attaching the configured tag to an address through the User-ID API; the
+# DAG then picks it up and whatever policy references that group applies. That
+# indirection is why a ban here touches no rule and no group directly.
+#
+# The XML is assembled by string concatenation rather than through an XML
+# writer, so nothing escapes the values. That is safe for the addresses and
+# configured tag names that actually reach it, but a tag holding an angle
+# bracket or a quote would produce malformed XML.
+#
+# Args:
+#
+#     action - What to do, as a plain string: 'register' to attach the tag or
+#              'unregister' to remove it. Used as the element name, so
+#              anything else would produce XML PAN-OS rejects.
+#
+#     ip     - The address to tag, as a plain string. Expected to be an
+#              already validated and lowercased IPv4 or IPv6 address. Both
+#              families go through the same path; PAN-OS does not split tags
+#              by family.
+#
+# Returns the uid-message as an XML string, ready to become the cmd parameter
+# of a user-id request.
+#
+#     $self->_uid_message( 'register', '10.0.0.1' );
+#     #   <uid-message><version>2.0</version><type>update</type><payload><register><entry ip="10.0.0.1"><tag><member>blocklist</member></tag></entry></register></payload></uid-message>
+#
+#     $self->_uid_message( 'unregister', '10.0.0.1' );
+#     #   the same with <unregister> in place of <register>
 sub _uid_message {
 	my ( $self, $action, $ip ) = @_;
 
@@ -287,7 +346,29 @@ sub _uid_message {
 		. '></payload></uid-message>';
 } ## end sub _uid_message
 
-# Internal helper. Builds the form body for registering/unregistering an IP.
+# Internal helper. Builds the complete request body that tags or untags one
+# address, which is what every ban and unban posts.
+#
+# This is just the uid-message wrapped up as a user-id API call with the key
+# attached. The vsys parameter is only included when the option is set, since
+# an appliance without virtual systems does not want it.
+#
+# Note the API key is part of the body here, so unlike the vyos backend there
+# is no separation between a secret free operation and a credentialed one; the
+# testing paths in this backend record what they record with that in mind.
+#
+# Args:
+#
+#     action - What to do, as a plain string, 'register' or 'unregister'.
+#              Passed straight to _uid_message.
+#
+#     ip     - The address to tag, as a plain string. Expected to be an
+#              already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the body as a form urlencoded string, ready to POST to _url.
+#
+#     $self->_register_body( 'register', '10.0.0.1' );
+#     #   type=user-id&key=secret&cmd=%3Cuid-message%3E...%3C%2Fuid-message%3E
 sub _register_body {
 	my ( $self, $action, $ip ) = @_;
 
@@ -299,8 +380,24 @@ sub _register_body {
 	);
 } ## end sub _register_body
 
-# Internal helper. Builds the form body for a lightweight op command used to
-# verify the key and connectivity.
+# Internal helper. Builds the request body for a harmless read only call, used
+# by init and check to confirm the appliance is reachable and the key works.
+#
+# Since this backend creates nothing on the appliance, there is no setup whose
+# presence could be verified. What can be checked is that the API answers and
+# the key is still valid, so a show system info is issued purely for its
+# status: nothing parses what comes back.
+#
+# It is deliberately the cheapest call that still exercises authentication.
+# The vsys parameter is included when set, so the probe goes through the same
+# virtual system the real calls will.
+#
+# Takes no arguments; the key and vsys come from the options.
+#
+# Returns the body as a form urlencoded string, ready to POST to _url.
+#
+#     $self->_probe_body;
+#     #   type=op&key=secret&cmd=%3Cshow%3E%3Csystem%3E%3Cinfo%3E%3C%2Finfo%3E%3C%2Fsystem%3E%3C%2Fshow%3E
 sub _probe_body {
 	my ($self) = @_;
 
@@ -312,10 +409,46 @@ sub _probe_body {
 	);
 } ## end sub _probe_body
 
-# Internal helper. POSTs the form body to the PAN-OS API via LWP::UserAgent,
-# returning the response body on success and dying otherwise. PAN-OS answers
-# with XML; a top level status="success" is treated as success. Never
-# called in testing mode.
+# Internal helper. Performs one HTTP request against the PAN-OS XML API. Every
+# call this backend makes to the appliance goes through here.
+#
+# There is one subtlety that makes this different from the JSON backends:
+# PAN-OS reports application level failures with an HTTP 200. A rejected key
+# or a malformed command comes back as a perfectly successful HTTP response
+# whose XML carries status="error", so checking the HTTP status alone would
+# treat those as successes and a ban would silently do nothing. The response
+# body is therefore also checked for a top level status="success", and
+# anything else is a failure regardless of the HTTP code.
+#
+# The user agent is built on first use and cached on the object. LWP::UserAgent
+# is loaded with require at that point rather than at compile time, since only
+# the HTTP backends need it; failing to load it dies with an explanation
+# naming this backend. The insecure option turns off certificate verification,
+# which is there because a PAN-OS appliance commonly presents a self signed
+# certificate.
+#
+# There is no method or URL argument, since every call is a POST to the one
+# endpoint. Authentication is the key inside the body rather than a header.
+#
+# Any failure, HTTP level or XML level, dies rather than setting an error. The
+# callers wrap this in eval and turn the exception into the appropriate error
+# code.
+#
+# Never called in testing mode; those paths record the bodies instead.
+#
+# Args:
+#
+#     body - The complete form urlencoded body to post, as a plain string,
+#            normally from _register_body or _probe_body. Carries the API key.
+#
+# Returns the raw XML response body as a string. Note it is not parsed beyond
+# the status check; callers that care inspect it themselves.
+#
+#     $self->_request( $self->_register_body( 'register', $ip ) );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( $self->_probe_body ); };
+#     if ($@) { ... raise backendInitError ... }
 sub _request {
 	my ( $self, $body ) = @_;
 
@@ -522,24 +655,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by registering it with the tag via a User-ID C<register>
@@ -728,13 +843,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from

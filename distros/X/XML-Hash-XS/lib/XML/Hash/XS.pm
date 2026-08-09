@@ -14,7 +14,7 @@ sub XML_HASH_XS_CONTINUE () { 'XML_HASH_XS_CONTINUE' }
 sub XML_HASH_XS_STOP     () { 'XML_HASH_XS_STOP' }
 sub XML_HASH_XS_SKIP     () { 'XML_HASH_XS_SKIP' }
 
-$VERSION = '0.65';
+$VERSION = '0.66';
 
 require XSLoader;
 XSLoader::load('XML::Hash::XS', $VERSION);

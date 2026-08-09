@@ -34,7 +34,7 @@
             "LWP::ConsoleLogger" : "0"
          },
          "requires" : {
-            "IO::K8s" : "1.008",
+            "IO::K8s" : "1.105",
             "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::UserAgent" : "0",
@@ -59,159 +59,159 @@
    "provides" : {
       "Kubernetes::REST" : {
          "file" : "lib/Kubernetes/REST.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Admissionregistration" : {
          "file" : "lib/Kubernetes/REST/Admissionregistration.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Apiextensions" : {
          "file" : "lib/Kubernetes/REST/Apiextensions.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Apiregistration" : {
          "file" : "lib/Kubernetes/REST/Apiregistration.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Apps" : {
          "file" : "lib/Kubernetes/REST/Apps.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::AuthToken" : {
          "file" : "lib/Kubernetes/REST/AuthToken.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Authentication" : {
          "file" : "lib/Kubernetes/REST/Authentication.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Authorization" : {
          "file" : "lib/Kubernetes/REST/Authorization.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Autoscaling" : {
          "file" : "lib/Kubernetes/REST/Autoscaling.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Batch" : {
          "file" : "lib/Kubernetes/REST/Batch.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::CLI" : {
          "file" : "lib/Kubernetes/REST/CLI.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::CLI::Cmd::Create" : {
-         "file" : "lib/Kubernetes/REST/CLI.pm",
-         "version" : "1.105"
+         "file" : "lib/Kubernetes/REST/CLI/Cmd/Create.pm",
+         "version" : "1.106"
       },
       "Kubernetes::REST::CLI::Cmd::Delete" : {
-         "file" : "lib/Kubernetes/REST/CLI.pm",
-         "version" : "1.105"
+         "file" : "lib/Kubernetes/REST/CLI/Cmd/Delete.pm",
+         "version" : "1.106"
       },
       "Kubernetes::REST::CLI::Cmd::Get" : {
-         "file" : "lib/Kubernetes/REST/CLI.pm",
-         "version" : "1.105"
+         "file" : "lib/Kubernetes/REST/CLI/Cmd/Get.pm",
+         "version" : "1.106"
       },
       "Kubernetes::REST::CLI::Cmd::Raw" : {
-         "file" : "lib/Kubernetes/REST/CLI.pm",
-         "version" : "1.105"
+         "file" : "lib/Kubernetes/REST/CLI/Cmd/Raw.pm",
+         "version" : "1.106"
       },
       "Kubernetes::REST::CLI::Role::Connection" : {
          "file" : "lib/Kubernetes/REST/CLI/Role/Connection.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::CLI::Watch" : {
          "file" : "lib/Kubernetes/REST/CLI/Watch.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Certificates" : {
          "file" : "lib/Kubernetes/REST/Certificates.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Coordination" : {
          "file" : "lib/Kubernetes/REST/Coordination.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Core" : {
          "file" : "lib/Kubernetes/REST/Core.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Error" : {
          "file" : "lib/Kubernetes/REST/Error.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Events" : {
          "file" : "lib/Kubernetes/REST/Events.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Example" : {
          "file" : "lib/Kubernetes/REST/Example.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::HTTPRequest" : {
          "file" : "lib/Kubernetes/REST/HTTPRequest.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::HTTPResponse" : {
          "file" : "lib/Kubernetes/REST/HTTPResponse.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::HTTPTinyIO" : {
          "file" : "lib/Kubernetes/REST/HTTPTinyIO.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Kubeconfig" : {
          "file" : "lib/Kubernetes/REST/Kubeconfig.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::LWPIO" : {
          "file" : "lib/Kubernetes/REST/LWPIO.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::LogEvent" : {
          "file" : "lib/Kubernetes/REST/LogEvent.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Networking" : {
          "file" : "lib/Kubernetes/REST/Networking.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Policy" : {
          "file" : "lib/Kubernetes/REST/Policy.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::RbacAuthorization" : {
          "file" : "lib/Kubernetes/REST/RbacAuthorization.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::RemoteError" : {
-         "file" : "lib/Kubernetes/REST/Error.pm",
-         "version" : "1.105"
+         "file" : "lib/Kubernetes/REST/RemoteError.pm",
+         "version" : "1.106"
       },
       "Kubernetes::REST::Role::IO" : {
          "file" : "lib/Kubernetes/REST/Role/IO.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Scheduling" : {
          "file" : "lib/Kubernetes/REST/Scheduling.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Server" : {
          "file" : "lib/Kubernetes/REST/Server.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::Storage" : {
          "file" : "lib/Kubernetes/REST/Storage.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::V0Group" : {
          "file" : "lib/Kubernetes/REST/V0Group.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       },
       "Kubernetes::REST::WatchEvent" : {
          "file" : "lib/Kubernetes/REST/WatchEvent.pm",
-         "version" : "1.105"
+         "version" : "1.106"
       }
    },
    "release_status" : "stable",
@@ -228,7 +228,7 @@
       "x_IRC" : "irc://irc.perl.org/#kubernetes",
       "x_IRC_user" : "Getty"
    },
-   "version" : "1.105",
+   "version" : "1.106",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -589,7 +589,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.105",
+                  "tag" : "1.106",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -675,7 +675,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
             "name" : "@Author::GETTY/GitHub::CreateRelease",
-            "version" : "0.0009"
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

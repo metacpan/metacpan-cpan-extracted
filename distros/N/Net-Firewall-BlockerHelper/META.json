@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "JSON" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0"
          },
@@ -56,6 +57,6 @@
          "web" : "https://github.com/LilithSec/Net-Firewall-BlockerHelper"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

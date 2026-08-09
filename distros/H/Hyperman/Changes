@@ -1,5 +1,14 @@
 Revision history for Hyperman
 
+0.14    Unreleased
+        - An inherited loop's kernel objects are now off-limits to the io
+          and timer watch paths, not just to free. On Linux an epoll
+          instance is a SHARED kernel object across fork - the fd is
+          duplicated but both processes' epoll_ctl calls edit the same
+          interest list - so a forked child that "cleaned up" watchers on
+          a loop it merely inherited was silently deregistering its
+          PARENT's fds.
+
 0.13    2026-08-07
         - A loop inherited across a fork no longer closes descriptors that
           are not its own. Every fd in a loop - the backend's own, the
@@ -14,6 +23,14 @@ Revision history for Hyperman
           HTTP/2) removes it outright.
         - Store the common HTTP_* header keys through shared key SVs made
           once at init.
+        - Fold header names to their canonical HTTP_ form before matching,
+          so the Content-Length / Content-Type / Transfer-Encoding and
+          Connection tests are plain memcmp on known-case bytes instead of
+          case-blind scans of the wire bytes, per header, per request. The
+          fold maps '-' to '_', so the special names also check the wire
+          byte at the hyphen position - a literal "Content_Length" header
+          stays HTTP_CONTENT_LENGTH rather than aliasing the real one,
+          exactly as before.
 
 0.12    2026-08-06
         - io_uring: cancelling a timer could corrupt the heap. ur_del_timer

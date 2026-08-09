@@ -15,7 +15,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 # ABSTRACT: no-frills file rotation
 
@@ -268,7 +268,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords backported compatability
+=for stopwords backported
 
 =head1 NAME
 
@@ -276,7 +276,7 @@ File::Rotate::Simple - no-frills file rotation
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =head1 SYNOPSIS
 
@@ -393,7 +393,7 @@ Added in v0.2.0.
 =head2 C<if_missing>
 
 When true, rotate the files even when L</file> is missing. True by
-default, for backwards compatability.
+default, for backwards compatibility.
 
 Added in v0.2.0.
 

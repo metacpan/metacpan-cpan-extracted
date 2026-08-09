@@ -1,0 +1,1647 @@
+/* ============================================
+   THEMES.CSS - Professional Theme System
+   Three themes: Dark (default), Light, Even Funkier
+   ============================================ */
+
+/* ============================================
+   TYPOGRAPHY VARIABLES
+   ============================================ */
+:root {
+  /* Font Families */
+  --pro-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --pro-font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', Consolas, monospace;
+  
+  /* Font Sizes - Typographic Scale */
+  --pro-font-size-xs: 0.75rem;    /* 12px */
+  --pro-font-size-sm: 0.875rem;   /* 14px */
+  --pro-font-size-base: 1rem;     /* 16px */
+  --pro-font-size-lg: 1.125rem;   /* 18px */
+  --pro-font-size-xl: 1.25rem;    /* 20px */
+  --pro-font-size-2xl: 1.5rem;    /* 24px */
+  --pro-font-size-3xl: 1.875rem;  /* 30px */
+  --pro-font-size-4xl: 2.25rem;   /* 36px */
+  
+  /* Font Weights */
+  --pro-font-weight-light: 300;
+  --pro-font-weight-normal: 400;
+  --pro-font-weight-medium: 500;
+  --pro-font-weight-semibold: 600;
+  --pro-font-weight-bold: 700;
+  
+  /* Line Heights */
+  --pro-line-height-tight: 1.25;
+  --pro-line-height-normal: 1.5;
+  --pro-line-height-relaxed: 1.75;
+  
+  /* Letter Spacing */
+  --pro-tracking-tight: -0.025em;
+  --pro-tracking-normal: 0;
+  --pro-tracking-wide: 0.025em;
+}
+
+/* ============================================
+   DARK THEME (Default) - Bloomberg/GitHub Dark Style
+   ============================================ */
+:root,
+[data-theme="dark"],
+[data-theme="funky"] {
+  /* Background Colors - User overrides take precedence */
+  --pro-bg-primary: var(--user-bg-primary, #0d1117);
+  --pro-bg-secondary: var(--user-bg-secondary, #161b22);
+  --pro-bg-tertiary: var(--user-bg-tertiary, #21262d);
+  --pro-bg-elevated: var(--user-bg-elevated, #2d333b);
+  --pro-bg-subtle: #1c2128;
+  --pro-bg-overlay: rgba(0, 0, 0, 0.5);
+  --pro-tooltip-bg: rgba(0, 0, 0, 0.9);
+  
+  /* Font scale - User override */
+  font-size: calc(16px * var(--user-font-scale, 1));
+  
+  /* Border Colors - User overrides take precedence */
+  --pro-border-color: var(--user-border-color, #30363d);
+  --pro-border: var(--pro-border-color); /* Alias for legacy compatibility */
+  --pro-border-muted: var(--user-border-muted, #21262d);
+  --pro-border-emphasis: var(--user-border-emphasis, #484f58);
+  
+  /* Text Colors - with user override support */
+  --pro-text-primary: var(--user-text-primary, #e6edf3);
+  --pro-text-secondary: var(--user-text-secondary, #8b949e);
+  --pro-text-muted: #6e7681;
+  --pro-text-link: var(--user-link-color, #58a6ff);
+  --pro-text-link-hover: var(--user-link-hover, #79b8ff);
+  --pro-text-inverse: #0d1117;
+  
+  /* Accent Colors - Professional Blue (Bloomberg style) - User accent overrides */
+  --pro-accent-primary: var(--user-accent, #2f81f7);
+  --pro-accent-primary-hover: var(--user-accent-hover, #388bfd);
+  --pro-accent-primary-muted: rgba(47, 129, 247, 0.15);
+  
+  /* Semantic Colors */
+  --pro-accent-success: #3fb950;
+  --pro-accent-success-muted: rgba(63, 185, 80, 0.15);
+  --pro-accent-success-bg: #1e4d2b;
+  --pro-accent-success-text: #d4edda;
+  --pro-accent-warning: #d29922;
+  --pro-accent-warning-muted: rgba(210, 153, 34, 0.15);
+  --pro-accent-warning-bg: #664d03;
+  --pro-accent-warning-text: #fff3cd;
+  --pro-accent-warning-alt: #fd7e14;
+  --pro-accent-warning-alt-bg: #3d2a1f;
+  --pro-accent-danger: #f85149;
+  --pro-accent-danger-muted: rgba(248, 81, 73, 0.15);
+  --pro-accent-danger-bg: #5c1f1f;
+  --pro-accent-danger-text: #f8d7da;
+  --pro-accent-info: #58a6ff;
+  --pro-accent-info-muted: rgba(88, 166, 255, 0.15);
+  --pro-accent-info-bg: #0c4a6e;
+  --pro-accent-info-text: #cfe2ff;
+  --pro-accent-purple: #a78bfa;
+  --pro-accent-purple-muted: rgba(139, 92, 246, 0.15);
+  --pro-accent-purple-bg: #4c1d95;
+  --pro-accent-purple-text: #c4b5fd;
+  
+  /* Legacy Variable Mappings (for backwards compatibility) */
+  --dark-bg: var(--pro-bg-primary);
+  --darker-bg: var(--pro-bg-secondary);
+  --card-bg: var(--pro-bg-tertiary);
+  --border-color: var(--pro-border-color);
+  --text-primary: var(--pro-text-primary);
+  --text-secondary: var(--pro-text-secondary);
+  
+  /* Shadow Colors */
+  --pro-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --pro-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --pro-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --pro-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+  
+  /* Focus Ring */
+  --pro-focus-ring: 0 0 0 3px rgba(47, 129, 247, 0.4);
+  
+  /* Table Colors */
+  --pro-table-row-even: var(--pro-bg-secondary);
+  --pro-table-row-odd: var(--pro-bg-primary);
+  --pro-table-row-hover: var(--pro-bg-tertiary);
+  --pro-table-header-bg: var(--pro-bg-tertiary);
+
+  /* Bootstrap Table Variable Overrides - Theme Aware */
+  --bs-table-color: var(--pro-text-primary);
+  --bs-table-bg: var(--pro-bg-primary);
+  --bs-table-border-color: var(--pro-border-color);
+  --bs-table-striped-bg: var(--pro-bg-secondary);
+  --bs-table-striped-color: var(--pro-text-primary);
+  --bs-table-hover-bg: var(--pro-bg-tertiary);
+  --bs-table-hover-color: var(--pro-text-primary);
+  --bs-table-active-bg: var(--pro-accent-primary-muted);
+  --bs-table-active-color: var(--pro-text-primary);
+}
+
+/* ============================================
+   Focus Ring System - Outline First (Accessibility)
+   Native outline for WCAG compliance & Windows High Contrast
+   IMPORTANT: Defined in :root ONLY so focus style prefs can override
+   ============================================ */
+:root {
+  --focus-ring-color: var(--pro-accent-primary, #2f81f7);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-offset-inset: -2px;
+  --focus-ring-style: solid;
+  /* Optional box-shadow for double-ring effect only */
+  --focus-ring-shadow: none;
+  --focus-ring-shadow-inset: none;
+
+  /* Border Radius Scale */
+  --pro-radius-xs: 2px;
+  --pro-radius-sm: 4px;
+  --pro-radius-md: 6px;
+  --pro-radius-lg: 8px;
+  --pro-radius-xl: 12px;
+  --pro-radius-full: 9999px;
+}
+
+/* ============================================
+   LIGHT THEME - Clean Professional Style
+   ============================================ */
+[data-theme="light"] {
+  /* Background Colors - User overrides take precedence */
+  --pro-bg-primary: var(--user-bg-primary, #ffffff);
+  --pro-bg-secondary: var(--user-bg-secondary, #f6f8fa);
+  --pro-bg-tertiary: var(--user-bg-tertiary, #eaeef2);
+  --pro-bg-elevated: var(--user-bg-elevated, #ffffff);
+  --pro-bg-subtle: #f8f9fa;
+  --pro-bg-overlay: rgba(0, 0, 0, 0.3);
+  --pro-tooltip-bg: rgba(0, 0, 0, 0.9);
+
+  /* Border Colors - User overrides take precedence */
+  --pro-border-color: var(--user-border-color, #d0d7de);
+  --pro-border: var(--pro-border-color); /* Alias for legacy compatibility */
+  --pro-border-muted: var(--user-border-muted, #e6e8eb);
+  --pro-border-emphasis: var(--user-border-emphasis, #8c959f);
+
+  /* Text Colors - with user override support */
+  --pro-text-primary: var(--user-text-primary, #1f2328);
+  --pro-text-secondary: var(--user-text-secondary, #4d5560);
+  --pro-text-muted: #656d76;
+  --pro-text-link: var(--user-link-color, #0969da);
+  --pro-text-link-hover: var(--user-link-hover, #0550ae);
+  --pro-text-inverse: #ffffff;
+  
+  /* Accent Colors - Professional Blue - User accent overrides */
+  --pro-accent-primary: var(--user-accent, #0969da);
+  --pro-accent-primary-hover: var(--user-accent-hover, #0550ae);
+  --pro-accent-primary-muted: rgba(9, 105, 218, 0.1);
+  
+  /* Semantic Colors */
+  --pro-accent-success: #1a7f37;
+  --pro-accent-success-muted: rgba(26, 127, 55, 0.1);
+  --pro-accent-success-bg: #dafbe1;
+  --pro-accent-success-text: #116329;
+  --pro-accent-warning: #9a6700;
+  --pro-accent-warning-muted: rgba(154, 103, 0, 0.1);
+  --pro-accent-warning-bg: #fff8c5;
+  --pro-accent-warning-text: #4d2d00;
+  --pro-accent-warning-alt: #bf8700;
+  --pro-accent-warning-alt-bg: #fff1d2;
+  --pro-accent-danger: #cf222e;
+  --pro-accent-danger-muted: rgba(207, 34, 46, 0.1);
+  --pro-accent-danger-bg: #ffebe9;
+  --pro-accent-danger-text: #82071e;
+  --pro-accent-info: #0969da;
+  --pro-accent-info-muted: rgba(9, 105, 218, 0.1);
+  --pro-accent-info-bg: #ddf4ff;
+  --pro-accent-info-text: #0550ae;
+  --pro-accent-purple: #8250df;
+  --pro-accent-purple-muted: rgba(130, 80, 223, 0.1);
+  --pro-accent-purple-bg: #fbefff;
+  --pro-accent-purple-text: #6639ba;
+  
+  /* Legacy Variable Mappings */
+  --dark-bg: var(--pro-bg-primary);
+  --darker-bg: var(--pro-bg-secondary);
+  --card-bg: var(--pro-bg-tertiary);
+  --border-color: var(--pro-border-color);
+  --text-primary: var(--pro-text-primary);
+  --text-secondary: var(--pro-text-secondary);
+  
+  /* Shadow Colors */
+  --pro-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --pro-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --pro-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --pro-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+  
+  /* Focus Ring */
+  --pro-focus-ring: 0 0 0 3px rgba(9, 105, 218, 0.3);
+  
+  /* Table Colors */
+  --pro-table-row-even: var(--pro-bg-secondary);
+  --pro-table-row-odd: var(--pro-bg-primary);
+  --pro-table-row-hover: var(--pro-bg-tertiary);
+  --pro-table-header-bg: var(--pro-bg-tertiary);
+
+  /* Bootstrap Table Variable Overrides - Theme Aware */
+  --bs-table-color: var(--pro-text-primary);
+  --bs-table-bg: var(--pro-bg-primary);
+  --bs-table-border-color: var(--pro-border-color);
+  --bs-table-striped-bg: var(--pro-bg-secondary);
+  --bs-table-striped-color: var(--pro-text-primary);
+  --bs-table-hover-bg: var(--pro-bg-tertiary);
+  --bs-table-hover-color: var(--pro-text-primary);
+  --bs-table-active-bg: var(--pro-accent-primary-muted);
+  --bs-table-active-color: var(--pro-text-primary);
+}
+
+/* Light Theme Overrides for Gradient Elements */
+[data-theme="light"] .sidebar-header {
+  background: linear-gradient(135deg, var(--user-accent, var(--pro-accent-primary)), var(--user-accent-hover, var(--pro-accent-primary-hover)));
+}
+
+[data-theme="light"] .page-title {
+  background: linear-gradient(135deg, var(--user-accent, var(--pro-accent-primary)), var(--user-accent-hover, var(--pro-accent-primary-hover)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   EVEN FUNKIER THEME - Variable Aliases
+   The full theme is in even-funkyer.css, these are
+   compatibility mappings for new --pro-* variables
+   ============================================ */
+[data-theme="even-funkyer"] {
+  /* Map --pro-* variables to Even Funkier equivalents - User overrides take precedence */
+  --pro-bg-primary: var(--user-bg-primary, var(--bg-color, #0a0015));
+  --pro-bg-secondary: var(--user-bg-secondary, #1a0033);
+  --pro-bg-tertiary: var(--user-bg-tertiary, #150026);
+  --pro-bg-elevated: var(--user-bg-elevated, #200040);
+  --pro-bg-subtle: #12001f;
+  --pro-bg-overlay: rgba(10, 0, 21, 0.8);
+  
+  /* Border Colors - User overrides take precedence */
+  --pro-border-color: var(--user-border-color, var(--border-color, #ff00ff));
+  --pro-border: var(--pro-border-color); /* Alias for legacy compatibility */
+  --pro-border-muted: var(--user-border-muted, rgba(255, 0, 255, 0.3));
+  --pro-border-emphasis: var(--user-border-emphasis, #ff33ff);
+
+  /* Text Colors - with user override support */
+  --pro-text-primary: var(--user-text-primary, var(--text-color, #ffffff));
+  --pro-text-secondary: var(--user-text-secondary, var(--text-muted, #cc99ff));
+  --pro-text-muted: var(--text-secondary, #99ccff);
+  --pro-text-link: var(--user-link-color, #00ffff);
+  --pro-text-link-hover: var(--user-link-hover, #33ffff);
+  --pro-text-inverse: #0a0015;
+  
+  /* Accent Colors - User accent blends with neon theme */
+  --pro-accent-primary: var(--user-accent, var(--primary-color, #ff00ff));
+  --pro-accent-primary-hover: var(--user-accent-hover, var(--primary-hover, #ff33ff));
+  --pro-accent-primary-muted: rgba(255, 0, 255, 0.2);
+  
+  /* Secondary accent (cyan) for active/selected states */
+  --pro-accent-secondary: var(--secondary-color, #00ffff);
+  --pro-accent-secondary-hover: #33ffff;
+  --pro-accent-secondary-muted: rgba(0, 255, 255, 0.15);
+  
+  --pro-accent-success: var(--success-color, #00ff00);
+  --pro-accent-success-muted: rgba(0, 255, 0, 0.2);
+  --pro-accent-success-bg: rgba(0, 255, 0, 0.15);
+  --pro-accent-success-text: #66ff66;
+  --pro-accent-warning: var(--warning-color, #ffaa00);
+  --pro-accent-warning-muted: rgba(255, 170, 0, 0.2);
+  --pro-accent-warning-bg: rgba(255, 170, 0, 0.15);
+  --pro-accent-warning-text: #ffcc66;
+  --pro-accent-warning-alt: #ff6600;
+  --pro-accent-warning-alt-bg: rgba(255, 102, 0, 0.15);
+  --pro-accent-danger: var(--danger-color, #ff0066);
+  --pro-accent-danger-muted: rgba(255, 0, 102, 0.2);
+  --pro-accent-danger-bg: rgba(255, 0, 102, 0.15);
+  --pro-accent-danger-text: #ff6699;
+  --pro-accent-info: var(--info-color, #00ccff);
+  --pro-accent-info-muted: rgba(0, 204, 255, 0.2);
+  --pro-accent-info-bg: rgba(0, 204, 255, 0.15);
+  --pro-accent-info-text: #66ddff;
+  --pro-accent-purple: #8800ff;
+  --pro-accent-purple-muted: rgba(136, 0, 255, 0.2);
+  --pro-accent-purple-bg: rgba(136, 0, 255, 0.15);
+  --pro-accent-purple-text: #bb66ff;
+  
+  --pro-shadow-sm: 0 0 10px rgba(255, 0, 255, 0.2);
+  --pro-shadow-md: 0 0 20px rgba(255, 0, 255, 0.3);
+  --pro-shadow-lg: 0 0 30px rgba(255, 0, 255, 0.4), 0 0 60px rgba(0, 255, 255, 0.2);
+  --pro-shadow-xl: 0 0 40px rgba(255, 0, 255, 0.5), 0 0 80px rgba(0, 255, 255, 0.3);
+  
+  --pro-focus-ring: 0 0 0 3px rgba(255, 0, 255, 0.5), 0 0 15px rgba(0, 255, 255, 0.3);
+  
+  --pro-table-row-even: rgba(26, 0, 51, 0.8);
+  --pro-table-row-odd: rgba(10, 0, 21, 0.8);
+  --pro-table-row-hover: rgba(255, 0, 255, 0.1);
+  --pro-table-header-bg: rgba(32, 0, 64, 0.9);
+}
+
+/* Show funky-card accent bar only in even-funkyer theme */
+[data-theme="even-funkyer"] .funky-card::before {
+  display: block;
+  background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+  background-size: 200% 100%;
+  animation: funky-gradient 3s ease infinite;
+}
+
+/* ============================================
+   HIGH CONTRAST THEME - Maximum Accessibility
+   WCAG AAA compliant with maximum contrast ratios
+   ============================================ */
+[data-theme="high-contrast"] {
+  /* Maximum contrast backgrounds - pure black base */
+  --pro-bg-primary: #000000;
+  --pro-bg-secondary: #0a0a0a;
+  --pro-bg-tertiary: #1a1a1a;
+  --pro-bg-elevated: #2a2a2a;
+  --pro-bg-subtle: #111111;
+  --pro-bg-overlay: rgba(0, 0, 0, 0.9);
+
+  /* Pure white text for maximum contrast */
+  --pro-text-primary: #ffffff;
+  --pro-text-secondary: #e0e0e0;
+  --pro-text-muted: #c0c0c0;
+  --pro-text-link: #ffff00;
+  --pro-text-link-hover: #ffff99;
+  --pro-text-inverse: #000000;
+
+  /* High visibility accent - use user choice or default to bright yellow */
+  --pro-accent-primary: var(--user-accent, #ffff00);
+  --pro-accent-primary-hover: var(--user-accent-hover, #ffff66);
+  --pro-accent-primary-muted: var(--user-accent-muted, rgba(255, 255, 0, 0.3));
+
+  /* Thick, visible borders - white for maximum contrast */
+  --pro-border-color: #ffffff;
+  --pro-border: var(--pro-border-color); /* Alias for legacy compatibility */
+  --pro-border-muted: #c0c0c0;
+  --pro-border-emphasis: #ffffff;
+
+  /* Semantic colors - maximum saturation for visibility */
+  --pro-accent-success: #00ff00;
+  --pro-accent-success-muted: rgba(0, 255, 0, 0.3);
+  --pro-accent-success-bg: #003300;
+  --pro-accent-success-text: #00ff00;
+
+  --pro-accent-warning: #ffaa00;
+  --pro-accent-warning-muted: rgba(255, 170, 0, 0.3);
+  --pro-accent-warning-bg: #332200;
+  --pro-accent-warning-text: #ffaa00;
+
+  --pro-accent-danger: #ff0000;
+  --pro-accent-danger-muted: rgba(255, 0, 0, 0.3);
+  --pro-accent-danger-bg: #330000;
+  --pro-accent-danger-text: #ff0000;
+
+  --pro-accent-info: #00ffff;
+  --pro-accent-info-muted: rgba(0, 255, 255, 0.3);
+  --pro-accent-info-bg: #003333;
+  --pro-accent-info-text: #00ffff;
+
+  --pro-accent-purple: #ff00ff;
+  --pro-accent-purple-muted: rgba(255, 0, 255, 0.3);
+  --pro-accent-purple-bg: #330033;
+  --pro-accent-purple-text: #ff00ff;
+
+  /* Strong focus ring - bright yellow, thick */
+  --pro-focus-ring: 0 0 0 3px #ffff00;
+
+  /* No shadows - flat design for clarity */
+  --pro-shadow-sm: none;
+  --pro-shadow-md: none;
+  --pro-shadow-lg: none;
+  --pro-shadow-xl: none;
+
+  /* Table colors */
+  --pro-table-row-even: #0a0a0a;
+  --pro-table-row-odd: #000000;
+  --pro-table-row-hover: #1a1a1a;
+  --pro-table-header-bg: #1a1a1a;
+}
+
+/* High contrast specific overrides */
+[data-theme="high-contrast"] a {
+  text-decoration: underline;
+}
+
+[data-theme="high-contrast"] button,
+[data-theme="high-contrast"] .btn {
+  border-width: 2px;
+}
+
+/* High contrast focus is handled via focus ring variables now */
+[data-theme="high-contrast"] :focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
+/* Hide animated background in high contrast theme */
+[data-theme="high-contrast"] body::before,
+html[data-theme="high-contrast"] body::before {
+  opacity: 0 !important;
+  display: none;
+}
+
+/* ============================================
+   FOCUS STYLE PREFERENCES
+   User-selectable focus ring styles
+   ============================================ */
+
+/* Double Ring - White inner + dark outer (works on any background) */
+/* Use [data-theme] to ensure higher specificity than theme rules */
+html[data-focus-style="double-ring"],
+:root[data-focus-style="double-ring"],
+[data-theme][data-focus-style="double-ring"] {
+  --focus-ring-color: #ffffff;
+  --focus-ring-shadow: 0 0 0 4px rgba(0, 0, 0, 0.6);
+  --focus-ring-shadow-inset: inset 0 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Double Ring - Light theme adjustment */
+[data-theme="light"][data-focus-style="double-ring"] {
+  --focus-ring-shadow: 0 0 0 4px rgba(0, 0, 0, 0.4);
+  --focus-ring-shadow-inset: inset 0 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/* High Contrast - Bright yellow for maximum visibility */
+/* Use [data-theme] to ensure higher specificity than theme rules */
+html[data-focus-style="high-contrast"],
+:root[data-focus-style="high-contrast"],
+[data-theme][data-focus-style="high-contrast"] {
+  --focus-ring-color: #ffff00;
+  --focus-ring-width: 3px;
+  --focus-ring-shadow: none;
+  --focus-ring-shadow-inset: none;
+}
+
+/* White Offset - Clean white ring with larger offset */
+/* Use [data-theme] to ensure higher specificity than theme rules */
+html[data-focus-style="white-offset"],
+:root[data-focus-style="white-offset"],
+[data-theme][data-focus-style="white-offset"] {
+  --focus-ring-color: #ffffff;
+  --focus-ring-offset: 3px;
+}
+
+/* White Offset - Light theme uses dark color instead */
+[data-theme="light"][data-focus-style="white-offset"] {
+  --focus-ring-color: #1a1a1a;
+}
+
+/* High Contrast theme defaults to yellow focus */
+[data-theme="high-contrast"] {
+  --focus-ring-color: #ffff00;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --focus-ring-offset-inset: -2px;
+  --focus-ring-shadow: none;
+  --focus-ring-shadow-inset: none;
+}
+
+/* High Contrast theme + Double Ring style */
+[data-theme="high-contrast"][data-focus-style="double-ring"] {
+  --focus-ring-color: #ffffff;
+  --focus-ring-shadow: 0 0 0 5px #000000;
+  --focus-ring-shadow-inset: inset 0 0 0 5px #000000;
+}
+
+/* High Contrast theme + White Offset style */
+[data-theme="high-contrast"][data-focus-style="white-offset"] {
+  --focus-ring-color: #ffffff;
+  --focus-ring-offset: 4px;
+}
+
+@keyframes funky-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================
+   THEME SWITCHER
+   ============================================ */
+.theme-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 0 15px;
+  background: linear-gradient(135deg, var(--user-accent, var(--pro-accent-primary)), var(--primary-dark));
+  border: 2px solid var(--user-accent, var(--pro-accent-primary));
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(255, 110, 30, 0.3);
+}
+
+.theme-switcher:hover {
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 4px 16px rgba(255, 110, 30, 0.5);
+}
+
+.theme-switcher:active {
+  transform: scale(0.95);
+}
+
+.theme-icon {
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.theme-switcher:hover .theme-icon {
+  transform: rotate(180deg);
+}
+
+button#themeSwitcher {
+  margin: 0;
+}
+
+/* Animated record for Even Funkyer mode */
+[data-theme="even-funkyer"] .theme-switcher {
+  animation: recordSpin 2s linear infinite, recordColorFlash 1s ease-in-out infinite;
+  background: linear-gradient(135deg, #ff00ff, #00ffff, #ffff00);
+  background-size: 300% 300%;
+  border-color: #ff00ff;
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.6), 0 0 40px rgba(0, 255, 255, 0.4);
+}
+
+[data-theme="even-funkyer"] .theme-switcher:hover {
+  animation: recordSpin 0.5s linear infinite, recordColorFlash 0.5s ease-in-out infinite;
+  transform: scale(1.2);
+}
+
+@keyframes recordSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes recordColorFlash {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(180deg) brightness(1.3);
+  }
+}
+
+/* Theme transition animation */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* ============================================
+   ACCESSIBILITY - Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY - Focus Visible Styles
+   Uses outline-first approach for WCAG compliance
+   ============================================ */
+:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
+/* Remove default focus outline when using focus-visible */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ============================================
+   BASE TYPOGRAPHY STYLES
+   ============================================ */
+body {
+  font-family: var(--pro-font-family);
+  font-size: var(--pro-font-size-base);
+  font-weight: var(--pro-font-weight-normal);
+  line-height: var(--pro-line-height-normal);
+  color: var(--pro-text-primary);
+  background-color: var(--pro-bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility class for monospace/tabular numbers */
+.font-mono,
+.tabular-nums {
+  font-family: var(--pro-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--pro-font-family);
+  font-weight: var(--pro-font-weight-semibold);
+  line-height: var(--pro-line-height-tight);
+  color: var(--pro-text-primary);
+  letter-spacing: var(--pro-tracking-tight);
+}
+
+h1 { font-size: var(--pro-font-size-4xl); }
+h2 { font-size: var(--pro-font-size-3xl); }
+h3 { font-size: var(--pro-font-size-2xl); }
+h4 { font-size: var(--pro-font-size-xl); }
+h5 { font-size: var(--pro-font-size-lg); }
+h6 { font-size: var(--pro-font-size-base); }
+
+/* ============================================
+   CSS RESET & BASE
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* ============================================
+   ANIMATED BACKGROUND - Dark Theme (Subtle)
+   ============================================ */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(47, 129, 247, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(88, 166, 255, 0.05) 0%, transparent 50%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Hide animated background in light theme */
+[data-theme="light"] body::before,
+html[data-theme="light"] body::before {
+  opacity: 0 !important;
+  display: none;
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--pro-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pro-border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--user-accent, var(--pro-accent-primary));
+}
+
+/* ============================================
+   NAV TABS - Theme-aware Tab Styling
+   ============================================ */
+.nav-tabs {
+  border-bottom: 1px solid var(--pro-border-color);
+  gap: 4px;
+}
+
+.nav-tabs .nav-item {
+  margin-bottom: -1px;
+}
+
+.nav-tabs .nav-link {
+  color: var(--pro-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px 6px 0 0;
+  padding: 10px 16px;
+  font-weight: 500;
+  font-size: var(--pro-font-size-sm);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-tabs .nav-link i {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--pro-text-primary);
+  background: var(--pro-bg-tertiary);
+  border-color: var(--pro-border-muted) var(--pro-border-muted) transparent;
+}
+
+.nav-tabs .nav-link:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--user-accent, var(--pro-accent-primary));
+  background: var(--pro-bg-primary);
+  border-color: var(--pro-border-color) var(--pro-border-color) var(--pro-bg-primary);
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link.active i {
+  opacity: 1;
+}
+
+/* Dark Theme Specific */
+[data-theme="dark"] .nav-tabs .nav-link.active,
+:root .nav-tabs .nav-link.active {
+  background: var(--pro-bg-secondary);
+  border-color: var(--pro-border-color) var(--pro-border-color) var(--pro-bg-secondary);
+}
+
+/* Light Theme Specific */
+[data-theme="light"] .nav-tabs {
+  border-bottom-color: var(--pro-border-color);
+}
+
+[data-theme="light"] .nav-tabs .nav-link {
+  color: var(--pro-text-secondary);
+}
+
+[data-theme="light"] .nav-tabs .nav-link:hover {
+  color: var(--pro-text-primary);
+  background: var(--pro-bg-tertiary);
+}
+
+[data-theme="light"] .nav-tabs .nav-link.active {
+  color: var(--user-accent, var(--pro-accent-primary));
+  background: var(--pro-bg-primary);
+  border-color: var(--pro-border-color) var(--pro-border-color) var(--pro-bg-primary);
+}
+
+/* Even Funkyer Theme - Neon Glow Tabs */
+[data-theme="even-funkyer"] .nav-tabs {
+  border-bottom-color: rgba(255, 0, 255, 0.3);
+}
+
+[data-theme="even-funkyer"] .nav-tabs .nav-link {
+  color: var(--pro-text-secondary);
+  border-color: transparent;
+}
+
+[data-theme="even-funkyer"] .nav-tabs .nav-link:hover {
+  color: #00ffff;
+  background: rgba(255, 0, 255, 0.1);
+  border-color: rgba(255, 0, 255, 0.3) rgba(255, 0, 255, 0.3) transparent;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+[data-theme="even-funkyer"] .nav-tabs .nav-link.active {
+  color: #ff00ff;
+  background: var(--pro-bg-secondary);
+  border-color: rgba(255, 0, 255, 0.5) rgba(255, 0, 255, 0.5) var(--pro-bg-secondary);
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+  box-shadow: 0 -2px 10px rgba(255, 0, 255, 0.3);
+}
+
+[data-theme="even-funkyer"] .nav-tabs .nav-link.active i {
+  text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+  color: #00ffff;
+}
+
+/* ============================================
+   LOADING SPINNER (Global)
+   ============================================ */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--user-accent-muted, var(--pro-accent-primary-muted));
+  border-top-color: var(--user-accent, var(--pro-accent-primary));
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   DENSITY SETTINGS
+   Adjusts spacing, button heights, and padding
+   ============================================ */
+
+/* Compact: Tighter spacing for data-heavy views */
+[data-density="compact"] {
+  --btn-height-xs: 20px;
+  --btn-height-sm: 24px;
+  --btn-height-md: 30px;
+  --btn-height-lg: 38px;
+  --btn-padding-xs: 2px 6px;
+  --btn-padding-sm: 4px 8px;
+  --btn-padding-md: 6px 12px;
+  --btn-padding-lg: 8px 16px;
+  /* Individual padding values for calc() operations */
+  --btn-padding-y-sm: 4px;
+  --btn-padding-x-sm: 8px;
+  --btn-padding-y-md: 6px;
+  --btn-padding-x-md: 12px;
+  --btn-padding-y-lg: 8px;
+  --btn-padding-x-lg: 16px;
+  --btn-font-xs: 0.625rem;  /* 10px at 1x scale */
+  --btn-font-sm: 0.6875rem; /* 11px at 1x scale */
+  --btn-font-md: 0.75rem;   /* 12px at 1x scale */
+  --btn-font-lg: 0.8125rem; /* 13px at 1x scale */
+  --pro-spacing-xs: 4px;
+  --pro-spacing-sm: 8px;
+  --pro-spacing-md: 12px;
+  --pro-spacing-lg: 16px;
+  --form-control-height: 30px;
+  --form-control-padding: 4px 8px;
+  --table-cell-padding: 6px 8px;
+  --nav-item-padding: 6px 10px;
+  --card-padding: 12px;
+}
+
+/* Comfortable: Default balanced spacing */
+[data-density="comfortable"] {
+  --btn-height-xs: 24px;
+  --btn-height-sm: 28px;
+  --btn-height-md: 36px;
+  --btn-height-lg: 44px;
+  --btn-padding-xs: 4px 8px;
+  --btn-padding-sm: 6px 12px;
+  --btn-padding-md: 8px 16px;
+  --btn-padding-lg: 12px 24px;
+  /* Individual padding values for calc() operations */
+  --btn-padding-y-sm: 6px;
+  --btn-padding-x-sm: 12px;
+  --btn-padding-y-md: 8px;
+  --btn-padding-x-md: 16px;
+  --btn-padding-y-lg: 12px;
+  --btn-padding-x-lg: 24px;
+  --btn-font-xs: 0.6875rem; /* 11px at 1x scale */
+  --btn-font-sm: 0.75rem;   /* 12px at 1x scale */
+  --btn-font-md: 0.8125rem; /* 13px at 1x scale */
+  --btn-font-lg: 0.875rem;  /* 14px at 1x scale */
+  --pro-spacing-xs: 6px;
+  --pro-spacing-sm: 12px;
+  --pro-spacing-md: 16px;
+  --pro-spacing-lg: 24px;
+  --form-control-height: 38px;
+  --form-control-padding: 8px 12px;
+  --table-cell-padding: 10px 12px;
+  --nav-item-padding: 10px 14px;
+  --card-padding: 16px;
+}
+
+/* Spacious: More room for accessibility */
+[data-density="spacious"] {
+  --btn-height-xs: 28px;
+  --btn-height-sm: 34px;
+  --btn-height-md: 42px;
+  --btn-height-lg: 52px;
+  --btn-padding-xs: 6px 10px;
+  --btn-padding-sm: 8px 14px;
+  --btn-padding-md: 10px 20px;
+  --btn-padding-lg: 14px 28px;
+  /* Individual padding values for calc() operations */
+  --btn-padding-y-sm: 8px;
+  --btn-padding-x-sm: 14px;
+  --btn-padding-y-md: 10px;
+  --btn-padding-x-md: 20px;
+  --btn-padding-y-lg: 14px;
+  --btn-padding-x-lg: 28px;
+  --btn-font-xs: 0.75rem;   /* 12px at 1x scale */
+  --btn-font-sm: 0.8125rem; /* 13px at 1x scale */
+  --btn-font-md: 0.875rem;  /* 14px at 1x scale */
+  --btn-font-lg: 1rem;      /* 16px at 1x scale */
+  --pro-spacing-xs: 8px;
+  --pro-spacing-sm: 16px;
+  --pro-spacing-md: 24px;
+  --pro-spacing-lg: 32px;
+  --form-control-height: 46px;
+  --form-control-padding: 12px 16px;
+  --table-cell-padding: 14px 16px;
+  --nav-item-padding: 14px 18px;
+  --card-padding: 24px;
+}
+
+/* ============================================
+   DENSITY COMPONENT OVERRIDES
+   Direct styles for components affected by density
+   ============================================ */
+
+/* Form Controls */
+[data-density] .form-control,
+[data-density] .form-select {
+  height: var(--form-control-height);
+  padding: var(--form-control-padding);
+}
+
+[data-density] textarea.form-control {
+  height: auto;
+  min-height: calc(var(--form-control-height) * 2);
+}
+
+/* Buttons - ensure they use the density variables */
+[data-density] .btn {
+  height: var(--btn-height-md);
+  padding: var(--btn-padding-md);
+}
+
+[data-density] .btn-sm {
+  height: var(--btn-height-sm);
+  padding: var(--btn-padding-sm);
+}
+
+[data-density] .btn-lg {
+  height: var(--btn-height-lg);
+  padding: var(--btn-padding-lg);
+}
+
+/* ================================
+   Tables
+   ================================ */
+
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: var(--pro-text-primary);
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--table-cell-padding, 0.75rem);
+  vertical-align: top;
+  border-bottom: 1px solid var(--pro-border-color);
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid var(--pro-border-color);
+  font-weight: 600;
+  color: var(--pro-text-primary);
+}
+
+.table tbody + tbody {
+  border-top: 2px solid var(--pro-border-color);
+}
+
+/* Table variants */
+.table-sm th,
+.table-sm td {
+  padding: 0.5rem;
+}
+
+.table-bordered {
+  border: 1px solid var(--pro-border-color);
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid var(--pro-border-color);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--pro-bg-tertiary);
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--pro-bg-tertiary);
+}
+
+/* Code in tables */
+.table code {
+  background-color: var(--pro-bg-tertiary);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 87.5%;
+  color: var(--pro-accent-primary);
+}
+
+/* Text utilities in tables */
+.table .text-muted {
+  color: var(--pro-text-tertiary);
+}
+
+/* Table Cells (density) */
+[data-density] .table td,
+[data-density] .table th {
+  padding: var(--table-cell-padding);
+}
+
+/* DataTables */
+[data-density] table.dataTable td,
+[data-density] table.dataTable th {
+  padding: var(--table-cell-padding);
+}
+
+/* Navigation Items */
+[data-density] .nav-link {
+  padding: var(--nav-item-padding);
+}
+
+[data-density] .nav-group-items .nav-link {
+  padding: var(--nav-item-padding);
+}
+
+/* Cards */
+[data-density] .card-body {
+  padding: var(--card-padding);
+}
+
+[data-density] .card-header,
+[data-density] .card-footer {
+  padding: calc(var(--card-padding) * 0.75) var(--card-padding);
+}
+
+/* Dropdowns */
+[data-density] .dropdown-item {
+  padding: var(--nav-item-padding);
+}
+
+/* List Groups */
+[data-density] .list-group-item {
+  padding: var(--nav-item-padding);
+}
+
+/* Funky Buttons - ensure they use density variables */
+[data-density] .btn-funky,
+[data-density] .btn-funky-primary,
+[data-density] .btn-funky-secondary,
+[data-density] .btn-funky-warning,
+[data-density] .btn-funky-danger,
+[data-density] .btn-funky-success,
+[data-density] .btn-funky-outline,
+[data-density] .btn-format-rules {
+  height: var(--btn-height-md);
+  padding: var(--btn-padding-md);
+  font-size: var(--btn-font-md, 0.8125rem);
+}
+
+[data-density] .btn-funky.btn-sm,
+[data-density] .btn-funky-primary.btn-sm,
+[data-density] .btn-funky-secondary.btn-sm,
+[data-density] .btn-funky-warning.btn-sm,
+[data-density] .btn-funky-danger.btn-sm,
+[data-density] .btn-funky-success.btn-sm {
+  height: var(--btn-height-sm);
+  padding: var(--btn-padding-sm);
+  font-size: var(--btn-font-sm, 0.75rem);
+}
+
+[data-density] .btn-funky.btn-lg,
+[data-density] .btn-funky-primary.btn-lg,
+[data-density] .btn-funky-secondary.btn-lg,
+[data-density] .btn-funky-warning.btn-lg,
+[data-density] .btn-funky-danger.btn-lg,
+[data-density] .btn-funky-success.btn-lg {
+  height: var(--btn-height-lg);
+  padding: var(--btn-padding-lg);
+  font-size: var(--btn-font-lg, 0.875rem);
+}
+
+/* Header Actions with density */
+[data-density] .funky-header-actions {
+  gap: var(--pro-spacing-sm);
+  margin-bottom: var(--pro-spacing-md);
+}
+
+[data-density] .funky-header-actions .funky-search-box input,
+[data-density] .funky-header-actions .form-control,
+[data-density] .funky-header-actions .form-select {
+  height: var(--btn-height-md);
+}
+
+[data-density] .funky-header-actions .select2-container .select2-selection {
+  height: var(--btn-height-md) !important;
+  min-height: var(--btn-height-md) !important;
+}
+
+/* ============================================
+   MODAL DENSITY STYLES
+   Adjust modal spacing based on density setting
+   ============================================ */
+
+/* Modal Header */
+[data-density] .modal-header {
+  padding: var(--pro-spacing-sm) var(--pro-spacing-md);
+}
+
+[data-density="compact"] .modal-header {
+  padding: 12px 16px;
+}
+
+[data-density="spacious"] .modal-header {
+  padding: 20px 28px;
+}
+
+/* Modal Body */
+[data-density] .modal-body {
+  padding: var(--pro-spacing-md);
+}
+
+[data-density="compact"] .modal-body {
+  padding: 12px 16px;
+}
+
+[data-density="spacious"] .modal-body {
+  padding: 28px 32px;
+}
+
+/* Modal Footer */
+[data-density] .modal-footer {
+  padding: var(--pro-spacing-sm) var(--pro-spacing-md);
+  gap: var(--pro-spacing-xs);
+}
+
+[data-density="compact"] .modal-footer {
+  padding: 10px 16px;
+  gap: 6px;
+}
+
+[data-density="spacious"] .modal-footer {
+  padding: 18px 28px;
+  gap: 12px;
+}
+
+/* Modal Title */
+[data-density] .modal-title {
+  font-size: var(--btn-font-lg);
+}
+
+[data-density="compact"] .modal-title {
+  font-size: 14px;
+}
+
+[data-density="spacious"] .modal-title {
+  font-size: 18px;
+}
+
+/* Form Labels in Modals */
+[data-density] .modal .form-label {
+  font-size: var(--btn-font-sm);
+  margin-bottom: calc(var(--pro-spacing-xs) * 0.5);
+}
+
+[data-density="compact"] .modal .form-label {
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+[data-density="spacious"] .modal .form-label {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Form Groups in Modals */
+[data-density] .modal .mb-3,
+[data-density] .modal .mb-4 {
+  margin-bottom: var(--pro-spacing-sm) !important;
+}
+
+[data-density="compact"] .modal .mb-3,
+[data-density="compact"] .modal .mb-4 {
+  margin-bottom: 10px !important;
+}
+
+[data-density="spacious"] .modal .mb-3,
+[data-density="spacious"] .modal .mb-4 {
+  margin-bottom: 20px !important;
+}
+
+/* Slide Panel specific density */
+[data-density] .modal-slide-panel .modal-dialog {
+  max-width: var(--slide-panel-width, 450px);
+}
+
+[data-density="compact"] .modal-slide-panel .modal-dialog {
+  max-width: 400px;
+}
+
+[data-density="spacious"] .modal-slide-panel .modal-dialog {
+  max-width: 520px;
+}
+
+/* Select2 in Modals with density */
+[data-density] .modal .select2-container .select2-selection {
+  height: var(--form-control-height) !important;
+  min-height: var(--form-control-height) !important;
+}
+
+[data-density] .modal .select2-container .select2-selection--multiple {
+  min-height: var(--form-control-height) !important;
+  padding: calc(var(--form-control-padding) / 2);
+}
+
+/* Alert spacing in modals */
+[data-density] .modal .alert {
+  padding: var(--pro-spacing-sm);
+  margin-bottom: var(--pro-spacing-sm);
+}
+
+[data-density="compact"] .modal .alert {
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+[data-density="spacious"] .modal .alert {
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* ============================================
+   ACCESSIBILITY - Skip Links
+   ============================================ */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--pro-accent-primary);
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  z-index: 9999;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ============================================
+   ACCESSIBILITY - Visually Hidden
+   ============================================ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ============================================
+   EVEN FUNKIER DROPDOWN THEME STYLES
+   (Base dropdown styles moved to context-menu.css)
+   ============================================ */
+[data-theme="even-funkyer"] .dropdown-menu {
+  background: rgba(var(--funkier-bg-rgb, 26, 26, 46), 0.95);
+  border-color: var(--funkier-neon-blue, #00d4ff);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3),
+              0 0 30px rgba(255, 0, 255, 0.15);
+}
+
+[data-theme="even-funkyer"] .dropdown-item:hover,
+[data-theme="even-funkyer"] .dropdown-item:focus {
+  background: rgba(0, 212, 255, 0.2);
+  color: var(--funkier-neon-blue, #00d4ff);
+  text-shadow: 0 0 5px var(--funkier-neon-blue, #00d4ff);
+}
+
+[data-theme="even-funkyer"] .dropdown-item:active,
+[data-theme="even-funkyer"] .dropdown-item.active {
+  background: var(--funkier-neon-pink, #ff00ff);
+  color: var(--funkier-bg, #1a1a2e);
+  text-shadow: none;
+}
+
+[data-theme="even-funkyer"] .dropdown-divider {
+  border-top-color: rgba(0, 212, 255, 0.3);
+}
+
+/* ============================================
+   BOOTSTRAP UTILITY CLASS OVERRIDES
+   Fix contrast issues with Bootstrap's default colors
+   ============================================ */
+
+/* .bg-info - Bootstrap's cyan (#0dcaf0) has poor contrast with white text */
+.bg-info {
+  background-color: var(--pro-accent-info-bg) !important;
+  color: var(--pro-accent-info-text) !important;
+}
+
+.bg-info.text-white,
+.bg-info .text-white {
+  color: var(--pro-accent-info-text) !important;
+}
+
+/* Ensure badges and alerts also get proper theming */
+.badge.bg-info,
+.alert-info {
+  background-color: var(--pro-accent-info-bg) !important;
+  color: var(--pro-accent-info-text) !important;
+  border-color: var(--pro-accent-info) !important;
+}
+
+/* ============================================
+   THEME-AWARE BOOTSTRAP UTILITIES
+   Override Bootstrap utilities to use CSS variables
+   ============================================ */
+
+/* Text utilities */
+.text-muted {
+  color: var(--pro-text-secondary) !important;
+}
+
+.text-body {
+  color: var(--pro-text-primary) !important;
+}
+
+.text-body-secondary {
+  color: var(--pro-text-secondary) !important;
+}
+
+.text-primary {
+  color: var(--pro-primary) !important;
+}
+
+.text-secondary {
+  color: var(--pro-text-secondary) !important;
+}
+
+.text-success {
+  color: var(--pro-accent-success) !important;
+}
+
+.text-danger {
+  color: var(--pro-accent-danger) !important;
+}
+
+.text-warning {
+  color: var(--pro-accent-warning) !important;
+}
+
+.text-info {
+  color: var(--pro-accent-info) !important;
+}
+
+.text-light {
+  color: var(--pro-text-secondary) !important;
+}
+
+.text-dark {
+  color: var(--pro-text-primary) !important;
+}
+
+/* Background utilities */
+.bg-body {
+  background-color: var(--pro-bg-primary) !important;
+}
+
+.bg-body-secondary {
+  background-color: var(--pro-bg-secondary) !important;
+}
+
+.bg-body-tertiary {
+  background-color: var(--pro-bg-tertiary) !important;
+}
+
+.bg-primary {
+  background-color: var(--pro-accent-primary) !important;
+}
+
+.bg-secondary {
+  background-color: var(--pro-bg-secondary) !important;
+}
+
+.bg-success {
+  background-color: var(--pro-accent-success) !important;
+}
+
+.bg-danger {
+  background-color: var(--pro-accent-danger) !important;
+}
+
+.bg-warning {
+  background-color: var(--pro-accent-warning) !important;
+}
+
+.bg-info {
+  background-color: var(--pro-accent-info) !important;
+}
+
+.bg-light {
+  background-color: var(--pro-bg-secondary) !important;
+}
+
+.bg-dark {
+  background-color: var(--pro-bg-tertiary) !important;
+}
+
+.bg-transparent {
+  background-color: transparent !important;
+}
+
+/* Border utilities */
+.border {
+  border-color: var(--pro-border) !important;
+}
+
+.border-top,
+.border-bottom,
+.border-start,
+.border-end {
+  border-color: var(--pro-border) !important;
+}
+
+.border-primary {
+  border-color: var(--pro-primary) !important;
+}
+
+.border-secondary {
+  border-color: var(--pro-border) !important;
+}
+
+.border-success {
+  border-color: var(--pro-accent-success) !important;
+}
+
+.border-danger {
+  border-color: var(--pro-accent-danger) !important;
+}
+
+.border-warning {
+  border-color: var(--pro-accent-warning) !important;
+}
+
+.border-info {
+  border-color: var(--pro-accent-info) !important;
+}
+
+.border-light {
+  border-color: var(--pro-border-light) !important;
+}
+
+.border-dark {
+  border-color: var(--pro-border) !important;
+}
+
+/* Link utilities */
+.link-primary {
+  color: var(--pro-primary) !important;
+}
+
+.link-primary:hover,
+.link-primary:focus {
+  color: var(--pro-primary-hover) !important;
+}
+
+.link-secondary {
+  color: var(--pro-text-secondary) !important;
+}
+
+.link-success {
+  color: var(--pro-accent-success) !important;
+}
+
+.link-danger {
+  color: var(--pro-accent-danger) !important;
+}
+
+.link-warning {
+  color: var(--pro-accent-warning) !important;
+}
+
+.link-info {
+  color: var(--pro-accent-info) !important;
+}
+
+.link-body-emphasis {
+  color: var(--pro-text-primary) !important;
+}
+
+/* ============================================
+   TYPOGRAPHY THEME OVERRIDES
+   (Kept here as no dedicated typography.css)
+   ============================================ */
+
+/* Horizontal rule */
+hr {
+  border-color: var(--pro-border);
+  opacity: 1;
+}
+
+/* Blockquote */
+.blockquote-footer {
+  color: var(--pro-text-secondary);
+}
+
+/* Figure */
+.figure-caption {
+  color: var(--pro-text-secondary);
+}
+
+/* Lead text */
+.lead {
+  color: var(--pro-text-secondary);
+}
+
+/* Small text */
+small,
+.small {
+  color: inherit;
+}
+
+/* ============================================
+   IDLE STATE - Resource Optimization
+   Pauses animations when user is idle or away
+   ============================================ */
+
+/* Pause all animations when user is idle */
+.user-idle *,
+.user-idle *::before,
+.user-idle *::after {
+  animation-play-state: paused !important;
+}
+
+/* Also pause transitions for away state (tab hidden) */
+.user-away *,
+.user-away *::before,
+.user-away *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+/* Specific component pauses */
+.user-idle .loading-spinner,
+.user-away .loading-spinner {
+  animation-play-state: paused !important;
+}
+
+.user-idle .carousel-item,
+.user-away .carousel-item {
+  animation-play-state: paused !important;
+}
+
+.user-idle .skeleton,
+.user-away .skeleton {
+  animation-play-state: paused !important;
+}
+
+/* Optional: visual indicator for dev/debug */
+.user-idle::after {
+  /* Uncomment for debugging:
+  content: 'IDLE';
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: var(--pro-accent-warning);
+  color: var(--pro-text-inverse);
+  padding: 2px 8px;
+  font-size: 10px;
+  z-index: 9999;
+  */
+}
+
+.user-away::after {
+  /* Uncomment for debugging:
+  content: 'AWAY';
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: var(--pro-accent-danger);
+  color: white;
+  padding: 2px 8px;
+  font-size: 10px;
+  z-index: 9999;
+  */
+}

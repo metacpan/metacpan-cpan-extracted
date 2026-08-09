@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::opnsense;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::opnsense - OPNsense firewall alias backe
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -279,28 +279,71 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Returns the URL for the passed method path, appended to
-# <scheme>://<host>/api/firewall/.
+# Internal helper. Builds the full URL for an OPNsense firewall API endpoint.
+# Every request this backend makes goes through here.
 #
-#     my $url = $self->_url( 'alias_util/list/' . $alias );
+# Everything this backend needs lives under the firewall module of the API, so
+# that much of the path is baked in and callers supply only the part below it.
+#
+# Args:
+#
+#     method_path - The path below /api/firewall/, as a plain string, such as
+#                   'alias_util/list/blocklist' or
+#                   'alias_util/add/blocklist'. Appended as is, so any values
+#                   embedded in it are expected to have been percent encoded
+#                   by the caller already.
+#
+# Returns the complete URL as a string. The scheme and host come from the
+# options.
+#
+#     $self->_url( 'alias_util/list/' . $alias );
+#     #   https://opn.example.org/api/firewall/alias_util/list/blocklist
+#
+#     $self->_url( 'alias_util/add/' . $alias );
+#     #   https://opn.example.org/api/firewall/alias_util/add/blocklist
 sub _url {
 	my ( $self, $method_path ) = @_;
 
 	return $self->{options}{scheme} . '://' . $self->{options}{host} . '/api/firewall/' . $method_path;
 }
 
-# Internal helper. Performs a HTTP request via LWP::UserAgent, authenticated
-# via basic auth with the key/secret, returning the decoded JSON on success
-# and dying with a explanation on any HTTP level failure. Never called in
-# testing mode.
+# Internal helper. Performs one HTTP request against the OPNsense API. Every
+# call this backend makes to the box goes through here.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend. The
+# insecure option turns off certificate verification, which is there because
+# an OPNsense box commonly presents a self signed certificate.
+#
+# Authentication is HTTP basic, but with the API key and secret standing in
+# for a username and password, which is how OPNsense issues API credentials.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string, such as 'GET' or 'POST'.
+#
+#     url    - The full URL to request, as a plain string, from _url.
+#
+#     body   - Optional request body, as an already encoded JSON string. undef
+#              for methods that carry no body.
+#
+# Returns the decoded response body as whatever structure the JSON held,
+# normally a hashref. Dies on any non success HTTP status.
+#
+#     $self->_request( 'GET', $self->_url( 'alias_util/list/' . $alias ) );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'POST', $url, $body ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -518,24 +561,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by adding it to the alias via the C<alias_util/add> API
@@ -729,13 +754,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants

@@ -6,7 +6,7 @@ Catalyst::Authentication::Store - All about authentication stores
 =head1 MULTIPLE BACKENDS
 
 B<NOTE> This is documentation for the old store system used in versions of
-L<Catalyst::Plugin::Authentication> prior to 0.10.  This is NOT how the 
+L<Catalyst::Plugin::Authentication> prior to 0.10.  This is NOT how the
 new realm-based stores work. This is here for reference only.
 
 See L<Catalyst::Plugin::Authentication::Internals> instead.

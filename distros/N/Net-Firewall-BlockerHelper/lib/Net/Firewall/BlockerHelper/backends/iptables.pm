@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::iptables;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::iptables - iptables/ip6tables backend fo
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -407,8 +407,38 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the IPv4 ipset name, IPv6 ipset name, and chain
-# name for this instance.
+# Internal helper. Returns the three kernel object names this instance owns:
+# its IPv4 ipset, its IPv6 ipset, and its chain.
+#
+# All three are derived from the prefix and the name rather than stored, so
+# every part of the backend agrees on what to create, match against, and tear
+# down without threading the names around. The prefix and name pair is unique
+# per instance, so two instances can share a host without colliding.
+#
+# There are two ipsets because an ipset is single family: a hash:ip set is
+# created either family inet or family inet6 and will not hold addresses of
+# the other. The chain name has no suffix and is reused across tables, which
+# is safe because iptables chain names are scoped per table, so the filter
+# chain and the raw chain created for tarpit and delude do not collide.
+#
+# Note the length of these names is checked at new against the kernel's
+# limits, so nothing here has to worry about truncation.
+#
+# Takes no arguments.
+#
+# Returns a three element list of the IPv4 set name, the IPv6 set name, and
+# the chain name, in that order. Callers that only want the chain conventially
+# discard the first two with undef.
+#
+#     my ( $set4, $set6, $chain ) = $self->_set_names;
+#
+#     # with prefix "kur" and name "ssh"
+#     #   $set4  is 'kur_ssh_4'
+#     #   $set6  is 'kur_ssh_6'
+#     #   $chain is 'kur_ssh'
+#
+#     # when only the chain is wanted
+#     my ( undef, undef, $chain ) = $self->_set_names;
 sub _set_names {
 	my ($self) = @_;
 
@@ -416,9 +446,30 @@ sub _set_names {
 	return ( $chain . '_4', $chain . '_6', $chain );
 }
 
-# Internal helper. True when the configured type is one of the xtables-addons
-# TCP targets (tarpit/delude) that require the matching traffic to be exempted
-# from connection tracking. See _notrack_commands.
+# Internal helper. Says whether the configured ban type is one of the
+# xtables-addons reply crafting targets, which is what decides both whether
+# the raw table machinery is set up at all and whether rules are restricted to
+# TCP.
+#
+# The two are the same question because only tarpit and delude craft replies,
+# and crafting replies is both what makes conntrack a problem, see
+# _notrack_commands, and what limits them to TCP, since neither target has
+# anything to say about UDP or ICMP.
+#
+# Takes no arguments; the type comes from the options.
+#
+# Returns 1 when the type is 'tarpit' or 'delude', 0 otherwise, which in
+# practice means 0 for the plain 'drop' and 'reject' types. Always one of
+# those two values, never undef.
+#
+#     # type 'tarpit' or 'delude'
+#     $self->_needs_notrack;    # 1
+#
+#     # type 'drop' or 'reject'
+#     $self->_needs_notrack;    # 0
+#
+#     # the usual guard shape, on helpers that are a no-op for plain types
+#     return () if ( !$self->_needs_notrack );
 sub _needs_notrack {
 	my ($self) = @_;
 
@@ -426,14 +477,68 @@ sub _needs_notrack {
 	return ( $type eq 'tarpit' || $type eq 'delude' ) ? 1 : 0;
 }
 
-# Internal helper. Returns the list of per-rule specs the block rules are built
-# from, as hashrefs of { fam => \%family, match => $match } where
-# match is the portion of the rule between src and -j (eg
-# ' -p tcp -m multiport --dports 22', or '' for match-everything).
+# Internal helper. Works out the full cross product of family, protocol, and
+# ports that this instance needs to block, and returns it as a list of specs.
+# This is where essentially all of the backend's rule logic lives; the command
+# building helpers downstream are near mechanical.
 #
-# Both _rule_commands (the filter table block rules) and
-# _notrack_commands (the raw table conntrack exemptions) are generated from
-# these specs so the two always match exactly the same traffic.
+# It exists as a separate step because two different sets of rules have to
+# match exactly the same traffic: the filter table block rules from
+# _rule_commands and the raw table conntrack exemptions from
+# _notrack_commands. Generating both from one spec list is what guarantees
+# they cannot drift apart, which would leave tarpitted traffic partly tracked
+# and the trick half broken.
+#
+# The target is chosen per family, not just per type, because the families do
+# not offer the same targets. reject needs a different ICMP type for each.
+# delude has no IPv6 implementation in xtables-addons at all, so IPv6 falls
+# back to a plain DROP; banned IPv6 addresses are still blocked, they are just
+# not deluded. tarpit honors the tarpit_mode option, leaving the default mode
+# implicit rather than spelling it out so that older xtables-addons builds
+# that predate the flag still accept the rule.
+#
+# Three filters are applied while walking the protocols. Protocols belonging
+# to the wrong family are skipped, so icmp never lands in an ip6tables rule
+# and the various spellings of IPv6 ICMP never land in an iptables one.
+# Protocols other than TCP are skipped entirely when the type is tarpit or
+# delude, rather than being emitted with a target the kernel would reject.
+# Ports are only attached to protocols that actually have them, so a port list
+# alongside gre does not produce a nonsense rule.
+#
+# Takes no arguments; family, protocols, ports, and type all come from the
+# object.
+#
+# Returns a list of hashrefs, one per rule to be created, each of the form:
+#
+#     {
+#         fam => {
+#             cmd    => 'iptables',    # or 'ip6tables'
+#             set    => 'kur_ssh_4',   # the ipset for this family
+#             tgt    => 'DROP',        # the -j target, family specific
+#             family => 4,             # 4 or 6
+#         },
+#         match => ' -p tcp -m multiport --dports 22',
+#     }
+#
+# The match is the middle portion of the rule, everything between the source
+# set match and the -j, already carrying its own leading space so it can be
+# concatenated directly. It is the empty string for a match everything rule.
+# The list is empty only if every protocol was filtered out.
+#
+#     # no protocols and no ports, type drop: block everything from the set
+#     my @specs = $self->_rule_specs;
+#     #   two specs, one per family, both with match => ''
+#
+#     # ports 22 with no protocols: defaults to tcp and udp per family
+#     #   four specs, match => ' -p tcp -m multiport --dports 22'
+#     #                    and ' -p udp -m multiport --dports 22'
+#
+#     # ports 22, no protocols, type tarpit: udp is dropped from the default
+#     #   two specs, both ' -p tcp -m multiport --dports 22'
+#
+#     # protocols tcp and icmp, no ports
+#     #   three specs: iptables ' -p tcp', iptables ' -p icmp',
+#     #   and ip6tables ' -p tcp'   -- icmp is skipped for v6
 sub _rule_specs {
 	my ($self) = @_;
 
@@ -521,8 +626,35 @@ sub _rule_specs {
 	return @specs;
 } ## end sub _rule_specs
 
-# Internal helper. Returns the list of commands that populate the filter chain
-# with the block rules, based on the configured protocols and ports.
+# Internal helper. Turns the specs from _rule_specs into the actual filter
+# table commands that fill this instance's chain with its block rules. Run by
+# init and re_init after the chain has been created.
+#
+# Each rule matches its family's ipset as the source and applies that family's
+# target, so the rules are static: banning and unbanning an address only adds
+# or removes it from the set and never touches the rules themselves. That is
+# the whole reason the backend is built on ipset rather than one rule per
+# address.
+#
+# Note the rules are appended with -A, so they land in the order the specs
+# come back in, and the chain is expected to be empty when this runs.
+#
+# Takes no arguments.
+#
+# Returns the commands as a list of strings, one per rule, ready to hand to
+# the runner. The list has one entry per spec, so its length depends on how
+# many family, protocol, and port combinations apply. Never empty in practice,
+# since a configuration with no applicable rules would have been rejected
+# earlier.
+#
+#     # type drop, no protocols or ports, chain kur_ssh
+#     my @commands = $self->_rule_commands;
+#     #   iptables -A kur_ssh -m set --match-set kur_ssh_4 src -j DROP
+#     #   ip6tables -A kur_ssh -m set --match-set kur_ssh_6 src -j DROP
+#
+#     # type reject, protocols tcp, ports 22
+#     #   iptables -A kur_ssh -m set --match-set kur_ssh_4 src -p tcp -m multiport --dports 22 -j REJECT --reject-with icmp-port-unreachable
+#     #   ip6tables -A kur_ssh -m set --match-set kur_ssh_6 src -p tcp -m multiport --dports 22 -j REJECT --reject-with icmp6-port-unreachable
 sub _rule_commands {
 	my ($self) = @_;
 
@@ -544,18 +676,48 @@ sub _rule_commands {
 	return @commands;
 } ## end sub _rule_commands
 
-# Internal helper. Returns the raw table rules that exempt the tarpitted or
-# deluded traffic from connection tracking, or an empty list for the plain
-# drop/reject types that do not need it.
+# Internal helper. Returns the raw table rules that exempt tarpitted or
+# deluded traffic from connection tracking.
 #
-# TARPIT and DELUDE craft their own TCP replies (a zero-window ACK stream and a
-# SYN/ACK-then-RST respectively) with no local socket. If conntrack tracks that
-# traffic the kernel's own stack also processes it, which both undoes the trick
-# and pins an INVALID conntrack entry per attacker packet. Adding a
-# -j CT --notrack rule in raw/PREROUTING that matches exactly the same
-# source set, protocol, and ports as the block rule keeps conntrack out of the
-# way. These populate a same-named chain in the raw table (chain names are
-# per-table, so it does not collide with the filter chain).
+# TARPIT and DELUDE craft their own TCP replies, a zero window ACK stream and
+# a SYN/ACK-then-RST respectively, with no local socket behind them. If
+# conntrack tracks that traffic the kernel's own stack processes it as well,
+# which both undoes the trick and pins an INVALID conntrack entry for every
+# attacker packet, so a busy tarpit fills the conntrack table. Matching the
+# same traffic in raw/PREROUTING with -j CT --notrack keeps conntrack out of
+# the way entirely.
+#
+# The match has to be exactly the same source set, protocol, and ports as the
+# block rule, which is why these are generated from the same _rule_specs the
+# filter rules are. A narrower notrack rule would leave some tarpitted traffic
+# tracked; a wider one would exempt traffic that is not being tarpitted at
+# all.
+#
+# Specs whose target is not a reply crafting one are skipped. In practice that
+# is delude's IPv6 fallback, which is a plain DROP: dropped traffic never gets
+# a reply, so there is nothing for conntrack to interfere with and no reason
+# to exempt it.
+#
+# Takes no arguments.
+#
+# Returns the commands as a list of strings, one per exempted spec, ready to
+# hand to the runner. Returns an empty list for the plain drop and reject
+# types, which need none of this, so callers can splice the result in
+# unconditionally.
+#
+#     # type tarpit, ports 22, chain kur_ssh
+#     my @commands = $self->_notrack_commands;
+#     #   iptables -t raw -A kur_ssh -m set --match-set kur_ssh_4 src -p tcp -m multiport --dports 22 -j CT --notrack
+#     #   ip6tables -t raw -A kur_ssh -m set --match-set kur_ssh_6 src -p tcp -m multiport --dports 22 -j CT --notrack
+#
+#     # type delude: only the v4 rule, as v6 falls back to DROP
+#     #   iptables -t raw -A kur_ssh -m set --match-set kur_ssh_4 src -p tcp -j CT --notrack
+#
+#     # type drop or reject
+#     my @commands = $self->_notrack_commands;    # ()
+#
+# These populate a chain in the raw table that shares the filter chain's name.
+# That is safe because iptables chain names are scoped per table.
 sub _notrack_commands {
 	my ($self) = @_;
 
@@ -584,9 +746,40 @@ sub _notrack_commands {
 	return @commands;
 } ## end sub _notrack_commands
 
-# Internal helper. Returns the commands that create the raw table chain, fill
-# it with the _notrack_commands, and jump to it from raw/PREROUTING. Empty
-# unless the type needs notrack.
+# Internal helper. Returns the complete set of commands that stand up the raw
+# table side of a tarpit or delude instance: create the chain for both
+# families, fill it with the conntrack exemptions, and hook it into
+# PREROUTING.
+#
+# The order matters and is why this is one helper rather than three. The chain
+# has to exist before rules can be added to it, and the jump from PREROUTING
+# is added last so the chain is never reachable while still half filled.
+#
+# The jump is appended to PREROUTING with -A rather than inserted at the top.
+#
+# Takes no arguments.
+#
+# Returns the commands as a list of strings in the order they must be run,
+# ready to hand to the runner. Returns an empty list for the plain drop and
+# reject types, which have no raw table component at all, so init can splice
+# the result in unconditionally.
+#
+#     # type tarpit, no ports, chain kur_ssh
+#     my @commands = $self->_raw_setup_commands;
+#     #   iptables -t raw -N kur_ssh
+#     #   ip6tables -t raw -N kur_ssh
+#     #   iptables -t raw -A kur_ssh -m set --match-set kur_ssh_4 src -p tcp -j CT --notrack
+#     #   ip6tables -t raw -A kur_ssh -m set --match-set kur_ssh_6 src -p tcp -j CT --notrack
+#     #   iptables -t raw -A PREROUTING -j kur_ssh
+#     #   ip6tables -t raw -A PREROUTING -j kur_ssh
+#
+#     # type drop
+#     my @commands = $self->_raw_setup_commands;    # ()
+#
+# Note the chain is created for both families unconditionally, even for delude
+# where the IPv6 chain ends up empty because the v6 fallback is a plain DROP.
+# That keeps the teardown symmetric, since it can then remove both without
+# having to know which were populated.
 sub _raw_setup_commands {
 	my ($self) = @_;
 
@@ -603,8 +796,35 @@ sub _raw_setup_commands {
 	);
 } ## end sub _raw_setup_commands
 
-# Internal helper. Returns the commands that remove the raw table chain and its
-# jump from raw/PREROUTING. Empty unless the type needs notrack.
+# Internal helper. Returns the commands that dismantle the raw table side of a
+# tarpit or delude instance, the exact inverse of _raw_setup_commands.
+#
+# The order is the reverse of setup and is the reason this is one helper. The
+# jump from PREROUTING goes first so nothing can reach the chain while it is
+# being emptied, then the chain is flushed, then deleted. iptables refuses to
+# delete a chain that is still referenced or still holds rules, so skipping
+# either of the first two steps makes the last one fail.
+#
+# Takes no arguments.
+#
+# Returns the commands as a list of strings in the order they must be run,
+# ready to hand to the runner. Returns an empty list for the plain drop and
+# reject types, so teardown can splice the result in unconditionally.
+#
+# Callers run these best effort and let them fail, since a partially set up or
+# already removed instance is the normal case during cleanup.
+#
+#     # type tarpit, chain kur_ssh
+#     my @commands = $self->_raw_teardown_commands;
+#     #   iptables -t raw -D PREROUTING -j kur_ssh
+#     #   ip6tables -t raw -D PREROUTING -j kur_ssh
+#     #   iptables -t raw -F kur_ssh
+#     #   ip6tables -t raw -F kur_ssh
+#     #   iptables -t raw -X kur_ssh
+#     #   ip6tables -t raw -X kur_ssh
+#
+#     # type drop
+#     my @commands = $self->_raw_teardown_commands;    # ()
 sub _raw_teardown_commands {
 	my ($self) = @_;
 
@@ -621,59 +841,6 @@ sub _raw_teardown_commands {
 		'ip6tables -t raw -X ' . $chain,
 	);
 } ## end sub _raw_teardown_commands
-
-# Internal helper. Returns the conntrack commands used to drop existing
-# connection tracking entries for the passed IP. When protocols are
-# configured, the kill is scoped to them via -p so protocols that are not
-# being blocked are left alone; otherwise every entry for the IP is dropped.
-sub _kill_commands {
-	my ( $self, $ip ) = @_;
-
-	# conntrack defaults to IPv4, so IPv6 IPs need the family specified
-	my $is_v4  = ( $ip =~ /\A$IPv4_re\z/ ) ? 1 : 0;
-	my $family = $is_v4 ? '' : '-f ipv6 ';
-
-	my @protos = @{ $self->{protocols} };
-	if ( !@protos && defined( $self->{ports}[0] ) ) {
-		# ports without protocols means tcp and udp are being blocked
-		@protos = ( 'tcp', 'udp' );
-	}
-
-	# nothing configured means everything is being blocked, so drop every
-	# entry for the IP
-	if ( !@protos ) {
-		return ( 'conntrack ' . $family . '-D -s ' . $ip );
-	}
-
-	# scope the kill to the blocked protocols; ones conntrack can not filter
-	# by are skipped as are the icmps of the wrong family
-	my %conntrack_protos = (
-		tcp         => 'tcp',
-		udp         => 'udp',
-		udplite     => 'udplite',
-		sctp        => 'sctp',
-		dccp        => 'dccp',
-		gre         => 'gre',
-		icmp        => 'icmp',
-		icmpv6      => 'icmpv6',
-		icmp6       => 'icmpv6',
-		'ipv6-icmp' => 'icmpv6',
-	);
-
-	my @commands;
-	my %seen;
-	foreach my $proto (@protos) {
-		my $conntrack_proto = $conntrack_protos{$proto};
-		next if ( !defined($conntrack_proto) );
-		next if ( $conntrack_proto eq 'icmp'   && !$is_v4 );
-		next if ( $conntrack_proto eq 'icmpv6' && $is_v4 );
-		next if ( $seen{$conntrack_proto} );
-		$seen{$conntrack_proto} = 1;
-		push( @commands, 'conntrack ' . $family . '-D -p ' . $conntrack_proto . ' -s ' . $ip );
-	}
-
-	return @commands;
-} ## end sub _kill_commands
 
 =head2 init
 
@@ -975,13 +1142,6 @@ sub re_init {
 
 	$self->errorblank;
 
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
-
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants
 	{
@@ -1189,24 +1349,6 @@ sub flush {
 
 	$self->{banned} = {};
 } ## end sub flush
-
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
 
 =head2 ban_cidr
 

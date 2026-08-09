@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% title | default('Punk Mailer') %}</title>
+<link rel="stylesheet" href="/static/mailer.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/">punk<span>mailer</span></a>
+  <nav>
+    <a href="/">Sign up</a>
+    <a href="/queue">Queue admin</a>
+  </nav>
+</header>
+
+<main>
+{% content %}
+</main>
+
+<footer class="bar foot">
+  <span>Punk::Queue - the handler enqueues and answers; a worker does the work.</span>
+</footer>
+</body>
+</html>

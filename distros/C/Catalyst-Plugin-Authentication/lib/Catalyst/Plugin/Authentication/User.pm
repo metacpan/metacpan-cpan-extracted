@@ -18,7 +18,7 @@ Catalyst::Plugin::Authentication::User - Compatibility shim
 =head1 DESCRIPTION
 
 THIS IS A COMPATIBILITY SHIM.  It allows old configurations of Catalyst
-Authentication to work without code changes.  
+Authentication to work without code changes.
 
 B<DO NOT USE IT IN ANY NEW CODE!>
 

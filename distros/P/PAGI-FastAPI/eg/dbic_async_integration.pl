@@ -16,6 +16,7 @@
 #
 #       curl -X POST http://127.0.0.1:5000/users \
 #            -H "Authorization: Bearer $TOKEN" \
+#            -H "Content-Type: application/json" \
 #            -d '{"name":"Grace Hopper","email":"grace@example.com"}'
 #
 #       curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:5000/users/1

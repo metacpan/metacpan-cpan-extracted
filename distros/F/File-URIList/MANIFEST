@@ -10,4 +10,5 @@ cpanfile
 dist.ini
 lib/File/URIList.pm
 t/01_load.t
+t/02_misc.t
 xt/author/pod-syntax.t

@@ -1,0 +1,314 @@
+/* ============================================
+   SPA.CSS - Single Page Application Styles
+   Loading indicators, transitions, skeletons
+   ============================================ */
+
+/* ============================================
+   SPA LOADING INDICATOR
+   ============================================ */
+
+/* Top progress bar - spans full viewport width */
+.spa-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.spa-progress-bar.active {
+  opacity: 1;
+}
+
+.spa-progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--user-accent, var(--pro-accent-primary)), var(--pro-accent-info));
+  border-radius: 0 2px 2px 0;
+  transition: width 0.2s ease;
+}
+
+.spa-progress-bar.active::before {
+  animation: spa-progress 2s ease-in-out forwards;
+}
+
+.spa-progress-bar.complete::before {
+  width: 100%;
+  transition: width 0.1s ease;
+}
+
+@keyframes spa-progress {
+  0% { width: 0%; }
+  20% { width: 30%; }
+  50% { width: 60%; }
+  80% { width: 80%; }
+  100% { width: 90%; }
+}
+
+/* Pulsing glow effect on progress bar */
+.spa-progress-bar.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--pro-shimmer-color, rgba(255, 255, 255, 0.3)), transparent);
+  animation: spa-progress-glow 1s ease-in-out infinite;
+}
+
+@keyframes spa-progress-glow {
+  0%, 100% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Full overlay - used for longer loads */
+.spa-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--pro-overlay-bg, rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.spa-loading-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Initial load overlay - solid background to hide layout flash */
+.spa-loading-overlay.initial-load {
+  background: var(--pro-bg-primary, #1a1a2e);
+  backdrop-filter: none;
+}
+
+.spa-loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.spinner-ring {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--pro-border-color);
+  border-top-color: var(--user-accent, var(--pro-accent-primary));
+  border-radius: 50%;
+  animation: spa-spin 0.8s linear infinite;
+}
+
+.spinner-text {
+  color: var(--pro-text-primary);
+  font-size: var(--pro-font-size-sm);
+  font-weight: 500;
+}
+
+@keyframes spa-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* SPA loading state - disable interactions */
+body.spa-loading {
+  pointer-events: none;
+}
+
+body.spa-loading .main-wrapper {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+/* Content area loading spinner - overlays only the content, not navigation */
+.spa-content-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 300px;
+  background: var(--pro-bg-primary, #1a1a2e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.spa-content-loading.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .spa-content-loading {
+    transition: none;
+  }
+  .spa-content-loading .spinner-ring {
+    animation: none;
+    border-top-color: var(--user-accent, var(--pro-accent-primary));
+  }
+}
+
+/* ============================================
+   SPA PAGE TRANSITIONS
+   Smooth animations when navigating between pages
+   ============================================ */
+
+/* Content container transitions */
+#spaContent {
+  position: relative;
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+
+/* Fade out state - applied before content swap */
+#spaContent.spa-transitioning-out {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Fade in state - applied after content swap */
+#spaContent.spa-transitioning-in {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Animate to visible state */
+#spaContent.spa-content-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Skeleton loading placeholders for content */
+.spa-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--pro-bg-tertiary) 25%,
+    var(--pro-bg-elevated) 50%,
+    var(--pro-bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: spa-skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.spa-skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+  width: 100%;
+}
+
+.spa-skeleton-text:last-child {
+  width: 70%;
+}
+
+.spa-skeleton-title {
+  height: 1.5em;
+  width: 40%;
+  margin-bottom: 1em;
+}
+
+.spa-skeleton-card {
+  height: 120px;
+  margin-bottom: 1em;
+}
+
+.spa-skeleton-table {
+  height: 300px;
+}
+
+@keyframes spa-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Stagger animation for child elements */
+#spaContent.spa-content-visible > .card,
+#spaContent.spa-content-visible > .row > .col > .card,
+#spaContent.spa-content-visible > .row > [class*="col-"] > .card,
+#spaContent.spa-content-visible > .container > .card,
+#spaContent.spa-content-visible > .container-fluid > .card {
+  animation: spa-fade-in-up 0.25s ease-out backwards;
+}
+
+#spaContent.spa-content-visible > .card:nth-child(1),
+#spaContent.spa-content-visible > .row > .col:nth-child(1) > .card,
+#spaContent.spa-content-visible > .row > [class*="col-"]:nth-child(1) > .card {
+  animation-delay: 0s;
+}
+
+#spaContent.spa-content-visible > .card:nth-child(2),
+#spaContent.spa-content-visible > .row > .col:nth-child(2) > .card,
+#spaContent.spa-content-visible > .row > [class*="col-"]:nth-child(2) > .card {
+  animation-delay: 0.05s;
+}
+
+#spaContent.spa-content-visible > .card:nth-child(3),
+#spaContent.spa-content-visible > .row > .col:nth-child(3) > .card,
+#spaContent.spa-content-visible > .row > [class*="col-"]:nth-child(3) > .card {
+  animation-delay: 0.1s;
+}
+
+#spaContent.spa-content-visible > .card:nth-child(4),
+#spaContent.spa-content-visible > .row > .col:nth-child(4) > .card,
+#spaContent.spa-content-visible > .row > [class*="col-"]:nth-child(4) > .card {
+  animation-delay: 0.15s;
+}
+
+@keyframes spa-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  #spaContent,
+  #spaContent.spa-transitioning-out,
+  #spaContent.spa-transitioning-in,
+  #spaContent.spa-content-visible {
+    transition: none;
+    transform: none;
+    animation: none;
+  }
+  
+  #spaContent.spa-content-visible > .card,
+  #spaContent.spa-content-visible > .row > .col > .card,
+  #spaContent.spa-content-visible > .row > [class*="col-"] > .card {
+    animation: none;
+  }
+  
+  .spa-skeleton {
+    animation: none;
+  }
+}

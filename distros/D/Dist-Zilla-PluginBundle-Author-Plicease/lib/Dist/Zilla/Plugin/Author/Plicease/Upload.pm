@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::Upload 2.79 {
+package Dist::Zilla::Plugin::Author::Plicease::Upload 2.80 {
 
-  use 5.020;
+  use 5.022;
   use Moose;
   use Path::Tiny ();
 
@@ -95,7 +95,7 @@ Dist::Zilla::Plugin::Author::Plicease::Upload - Upload a dist to CPAN
 
 =head1 VERSION
 
-version 2.79
+version 2.80
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2022 by Graham Ollis.
+This software is copyright (c) 2012-2024 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

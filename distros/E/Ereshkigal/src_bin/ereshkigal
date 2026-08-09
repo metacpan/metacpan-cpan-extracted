@@ -1,0 +1,72 @@
+#!perl
+
+=head1 NAME
+
+ereshkigal - Firewall ban manager.
+
+=head1 SYNOPSIS
+
+ereshkigal [B<-s> <socket>] <command> [<args>]
+
+ereshkigal start [B<--config>=<config>] [B<-f>|B<--foreground>]
+
+ereshkigal stop
+
+ereshkigal status [B<--all>] [<kur>]
+
+ereshkigal banned
+
+ereshkigal ban [B<--kur>=<kur>] [B<--ban-time>=<seconds>] <IP> [<IP> ...]
+
+ereshkigal unban B<--all>|<IP>
+
+ereshkigal cidr-ban [B<--kur>=<kur>] [B<--ban-time>=<seconds>] <CIDR> [<CIDR> ...]
+
+ereshkigal cidr-unban <CIDR>
+
+ereshkigal checkpoint [<kur>]
+
+ereshkigal re-init [<kur>]
+
+ereshkigal clear-retries [B<--ip>=<IP>|B<--cidr>=<CIDR>] [<kur>]
+
+ereshkigal add <kur> B<--backend>=<backend>|B<--fan-out>=<kurs>
+[B<--ports>=<ports>] [B<--protocols>=<protocols>] [B<--prefix>=<prefix>]
+[B<--option> <key>=<value>] [B<--interfaces>=<interfaces>]
+[B<--self-heal> <0/1>] [B<--ban-time>=<seconds>]
+[B<--checkpoint>=<seconds>] [B<--enable-cidr> <0/1>]
+[B<--cidr-silent-drop> <0/1>]
+
+ereshkigal remove <kur>
+
+=head1 DESCRIPTION
+
+Manages kur instances, each of which is a single
+L<Net::Firewall::BlockerHelper> instance served up over a unix socket.
+
+C<ereshkigal start> reads the config, by default
+C</usr/local/etc/ereshkigal.toml>, daemonizes, and spawns and supervises a
+kur process for each hash under C<kur> in the config. The other commands talk
+to the running manager over its unix socket, by default
+C</var/run/ereshkigal/socket>.
+
+Every subcommand takes B<--help> (or B<-h>), which covers what it does,
+what it will do to the firewall, and its options. C<< ereshkigal help
+<command> >> prints the same thing.
+
+See L<Ereshkigal> for the config file format.
+
+=head1 EXIT CODES
+
+    0 - clean success
+    1 - transport or server error, printed to STDERR
+    2 - the command completed, but the result carries per-kur,
+        per-IP, or per-CIDR failures
+
+=cut
+
+use strict;
+use warnings;
+use Ereshkigal::App;
+
+Ereshkigal::App->run;

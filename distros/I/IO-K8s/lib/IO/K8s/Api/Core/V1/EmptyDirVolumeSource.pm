@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EmptyDirVolumeSource;
 # ABSTRACT: Represents an empty directory for a pod. Empty directory volumes support ownership management and SELinux relabeling.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s medium => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::EmptyDirVolumeSource - Represents an empty directory for
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 medium
 

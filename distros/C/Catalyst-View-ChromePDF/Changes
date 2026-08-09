@@ -1,4 +1,13 @@
 Revision history for Catalyst-View-ChromePDF:
 
+v0.1.1    2026-08-08 12:23:52+01:00 Europe/London
+  [Documentation]
+  - Updated SECURITY CONSIDERATIONS to emphasise that the content of the rendered is assumed to be trusted by the developer.
+
+  - Fixed typos.
+
+  [Tests]
+  - Skip tests if no chrome executable can be found.
+
 v0.1.0    2026-08-07 12:21:28+01:00 Europe/London
   - Initial version released.

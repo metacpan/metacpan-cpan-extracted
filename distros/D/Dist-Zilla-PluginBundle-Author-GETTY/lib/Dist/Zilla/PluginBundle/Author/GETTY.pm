@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.317';
+our $VERSION = '0.318';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -327,7 +327,14 @@ has version_finder => (
   is      => 'ro',
   isa     => 'ArrayRef[Str]',
   lazy    => 1,
-  default => sub { defined $_[0]->payload->{version_finder} ? $_[0]->payload->{version_finder} : [] },
+  default => sub {
+    my ( $self ) = @_;
+    return $self->payload->{version_finder}
+      if defined $self->payload->{version_finder};
+    # A dist that never reaches CPAN has no per-package indexing to satisfy,
+    # so one $VERSION in the main module is all it needs.
+    return $self->no_cpan ? [':MainModule'] : [];
+  },
 );
 
 
@@ -695,7 +702,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.317
+version 0.318
 
 =head1 SYNOPSIS
 
@@ -859,7 +866,11 @@ Override this when a release tag needs to satisfy another ecosystem's tooling, e
 Go module published from the same tag, which requires strict C<vMAJOR.MINOR.PATCH>:
 
   [@Author::GETTY]
-  tag_format = v%v
+  tag_format = v%v.0
+
+Perl's decimal C<$VERSION> only has two parts (major.minor as one decimal number, e.g.
+C<0.317>), so the trailing C<.0> supplies the third, patch, part SemVer requires,
+yielding a tag like C<v0.317.0>.
 
 Note that C<%v> is still whatever C<$VERSION> is (Perl's own decimal versioning); this
 option only changes the tag's formatting, not the version scheme itself.
@@ -917,6 +928,8 @@ identity files).
 
 If set to 1, this attribute will disable L<Dist::Zilla::Plugin::UploadToCPAN>.
 By default a dzil release would release to L<CPAN|http://www.cpan.org/>.
+
+It also makes B<version_finder> default to C<:MainModule>.
 
 =head2 no_changes
 
@@ -1061,36 +1074,28 @@ name is derived from the Alien module name (the last component after C<::>).
 
 =head2 version_finder
 
-Restrict which files get a C<$VERSION> rewrite. Multi-value; accepts any
-file finder name understood by the underlying version plugins (e.g.
-C<:MainModule>, C<:InstallModules>, C<:ExecFiles>, or a custom
-L<FileFinder|Dist::Zilla::Role::FileFinderUser/default_finders>).
-
-By default this is unset and the version plugins use their own defaults
-(C<:InstallModules> and C<:ExecFiles>). When you set it, the value is
-forwarded to:
+Multi-value; forwarded verbatim as the C<finder> option of the plugins that
+do the C<$VERSION> rewrite — see those for what a finder selects:
 
 =over 4
 
 =item *
 
-L<Dist::Zilla::Plugin::PkgVersion> (used when B<task> or B<manual_version>
-is set)
-
-=item *
-
 L<Dist::Zilla::Plugin::RewriteVersion::Transitional> and
-L<Dist::Zilla::Plugin::BumpVersionAfterRelease> (used via
+L<Dist::Zilla::Plugin::BumpVersionAfterRelease> (via
 L<@Git::VersionManager|Dist::Zilla::PluginBundle::Git::VersionManager> on
 the default release path)
 
+=item *
+
+L<Dist::Zilla::Plugin::PkgVersion> (when B<task> or B<manual_version> is
+set)
+
 =back
 
-Typical use is restricting the rewrite to the main module so sibling
-F<.pm> files in F<lib/> are not touched:
-
-  [@Author::GETTY]
-  version_finder = :MainModule
+Unset by default, leaving those plugins at their own defaults — except
+with B<no_cpan>, where it defaults to C<:MainModule>. Setting it
+explicitly always wins.
 
 =head1 CONTINUOUS INTEGRATION
 

@@ -112,7 +112,7 @@
    "provides" : {
       "File::Rotate::Simple" : {
          "file" : "lib/File/Rotate/Simple.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.4.2"
       }
    },
    "release_status" : "stable",
@@ -126,7 +126,7 @@
          "web" : "https://github.com/robrwo/File-Rotate-Simple"
       }
    },
-   "version" : "v0.4.1",
+   "version" : "v0.4.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

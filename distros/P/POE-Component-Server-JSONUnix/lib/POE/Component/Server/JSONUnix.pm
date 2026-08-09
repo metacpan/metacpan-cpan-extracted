@@ -19,7 +19,7 @@ use POE qw(
 	Driver::SysRW
 );
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.2.1';
 
 =head1 NAME
 
@@ -516,7 +516,7 @@ sub _read_peer_cred {
 		# struct ucred { pid_t pid; uid_t uid; gid_t gid; } -- three 32-bit ints.
 		my $packed = getsockopt( $socket, SOL_SOCKET, 17 )    # SO_PEERCRED
 			or return;
-		my ( $pid, $uid, $gid ) = unpack( 'l!l!l!', $packed );
+		my ( $pid, $uid, $gid ) = unpack( 'l L L', $packed );
 		return unless defined $uid;
 		return ( $uid, $gid );
 	}
@@ -539,7 +539,7 @@ sub _read_peer_cred {
 		# Level 0, option LOCAL_PEERCRED (1).
 		my $packed = getsockopt( $socket, 0, 1 )
 			or return;
-		my ( $pid, $uid, $gid ) = unpack( 'l!l!l!', $packed );
+		my ( $pid, $uid, $gid ) = unpack( 'l L L', $packed );
 		return unless defined $uid;
 		return ( $uid, $gid );
 	}

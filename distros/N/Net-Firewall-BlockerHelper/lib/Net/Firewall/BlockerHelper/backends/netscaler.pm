@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::netscaler;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::netscaler - Citrix NetScaler/ADC backend
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -281,24 +281,64 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the NITRO config API base URL.
+# Internal helper. Returns the base URL of the NITRO configuration API, which
+# every request is built on.
+#
+# NITRO splits its API into config and stat trees; everything this backend
+# does is configuration, so the config half is baked in here rather than being
+# a per call decision.
+#
+# Takes no arguments; the scheme and host come from the options.
+#
+# Returns the base URL as a string, with no trailing slash.
+#
+#     $self->_base_url;    # https://ns.example.org/nitro/v1/config
 sub _base_url {
 	my ($self) = @_;
 
 	return $self->{options}{scheme} . '://' . $self->{options}{host} . '/nitro/v1/config';
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Performs a HTTP request via LWP::UserAgent, dying with a
-# explanation on any HTTP level failure. Never called in testing mode.
+# Internal helper. Performs one HTTP request against the NITRO API. Every call
+# this backend makes to the appliance goes through here.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend.
+#
+# Note the certificate verification switch here is the ssl_verify option and
+# is the inverse of the insecure option the other HTTP backends use:
+# verification is turned off when ssl_verify is false, rather than when
+# insecure is true.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string, such as 'POST' for adding a
+#              binding or 'DELETE' for removing one.
+#
+#     url    - The full URL to request, as a plain string, built on
+#              _base_url.
+#
+#     body   - Optional request body, as an already encoded JSON string. undef
+#              for methods that carry no body, such as the unban DELETE, which
+#              identifies its target entirely through the URL.
+#
+# Returns nothing useful; it is called for its success or failure rather than
+# its result. Dies on any non success HTTP status.
+#
+#     $self->_request( 'DELETE', $self->_unban_url($ip) );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'POST', $url, $body ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -456,8 +496,32 @@ sub ban {
 	$self->{banned}{ $opts{ban} } = 1;
 } ## end sub ban
 
-# Internal helper. Returns the URL used to remove the binding for the passed
-# IP.
+# Internal helper. Returns the URL that removes one address's binding from the
+# policy dataset.
+#
+# NITRO models dataset membership as a binding object rather than as a field
+# on the dataset, so removing an address means deleting a binding rather than
+# rewriting a list. That makes this backend incremental, unlike the
+# replace-in-full ones, and it is why an unban needs a URL of its own while a
+# ban does not: the ban POSTs a body, the unban carries everything in the URL.
+#
+# Which binding to delete is given through the args query parameter, NITRO's
+# way of identifying a specific binding. The address is percent encoded, which
+# matters for IPv6, whose colons would otherwise sit raw in the query string.
+#
+# Args:
+#
+#     ip - The address whose binding should be removed, as a plain string.
+#          Expected to be an already validated and lowercased IPv4 or IPv6
+#          address, spelled the same way it was when banned.
+#
+# Returns the URL as a string, for a DELETE that carries no body.
+#
+#     $self->_unban_url('10.0.0.1');
+#     #   https://ns.example.org/nitro/v1/config/policydataset_value_binding/blocklist?args=value:10.0.0.1
+#
+#     $self->_unban_url('2001:db8::1');
+#     #   https://ns.example.org/nitro/v1/config/policydataset_value_binding/blocklist?args=value:2001%3Adb8%3A%3A1
 sub _unban_url {
 	my ( $self, $ip ) = @_;
 
@@ -634,13 +698,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants

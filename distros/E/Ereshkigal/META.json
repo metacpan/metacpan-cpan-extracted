@@ -1,0 +1,65 @@
+{
+   "abstract" : "Handle firewall or similar bans.",
+   "author" : [
+      "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Ereshkigal",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0",
+            "Error::Helper" : "0",
+            "JSON::MaybeXS" : "0",
+            "Net::Firewall::BlockerHelper" : "v0.2.0",
+            "Net::Server::Daemonize" : "0",
+            "POE" : "0",
+            "POE::Component::Server::JSONUnix" : "v0.2.1",
+            "Regexp::IPv4" : "0",
+            "Regexp::IPv6" : "0",
+            "TOML::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LilithSec/Ereshkigal.git",
+         "web" : "https://github.com/LilithSec/Ereshkigal"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

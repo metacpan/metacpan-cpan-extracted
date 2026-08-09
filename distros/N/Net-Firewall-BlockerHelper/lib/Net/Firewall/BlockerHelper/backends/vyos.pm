@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::vyos;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::vyos - VyOS backend using the HTTP API.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -233,9 +233,32 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the config path arrayref for the passed IP's family
-# and operation. IPv4 uses the address-group node and IPv6 the
-# ipv6-address-group node.
+# Internal helper. Returns the VyOS configuration path identifying one
+# address's membership in the firewall group.
+#
+# The VyOS API addresses configuration by path, an ordered list of nodes
+# walking down the configuration tree, rather than by URL. Setting or deleting
+# that path is what adds or removes the address, so this one path serves both
+# operations.
+#
+# The node differs by family, since VyOS keeps IPv4 and IPv6 in separate group
+# types. Note the family test here matches against $IPv6_re and treats
+# everything else as IPv4, the opposite way round to most of the dist, which
+# tests for IPv4 and falls back to IPv6.
+#
+# Args:
+#
+#     ip - The address whose path is wanted, as a plain string. Expected to be
+#          an already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the path as an arrayref of node strings, ready to be the path value
+# of an operation. The group name comes from the group option.
+#
+#     $self->_group_path('10.0.0.1');
+#     #   [ 'firewall', 'group', 'address-group', 'kur_ssh', 'address', '10.0.0.1' ]
+#
+#     $self->_group_path('2001:db8::1');
+#     #   [ 'firewall', 'group', 'ipv6-address-group', 'kur_ssh', 'address', '2001:db8::1' ]
 sub _group_path {
 	my ( $self, $ip ) = @_;
 
@@ -244,36 +267,62 @@ sub _group_path {
 	return [ 'firewall', 'group', $node, $self->{options}{group}, 'address', $ip ];
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Returns the JSON string for a configuration operation on the
-# passed IP. $op is either 'set' or 'delete'. This is the "data" value the
-# VyOS API expects and, in testing mode, exactly what is recorded so the API key
-# is never leaked.
+# Internal helper. Builds the JSON operation describing a configuration change
+# for one address, which is what the VyOS API's data parameter carries.
+#
+# Splitting this out from _form_body is what keeps the API key out of
+# test_data. This half holds everything about the operation and nothing
+# secret, so the testing paths record it directly; the key is only added by
+# _form_body, which testing mode never calls. A test can therefore assert on
+# exactly what would be configured without the recorded data carrying a
+# credential.
+#
+# Args:
+#
+#     op - The operation, as a plain string: 'set' to add the address to the
+#          group or 'delete' to remove it. Passed through to the API as is, so
+#          anything else would be rejected there rather than here.
+#
+#     ip - The address to operate on, as a plain string. Expected to be an
+#          already validated and lowercased IPv4 or IPv6 address. The family
+#          selects the group node via _group_path.
+#
+# Returns the operation as a JSON string, ready to become the data value.
+#
+#     $self->_op_json( 'set', '10.0.0.1' );
+#     #   {"op":"set","path":["firewall","group","address-group","kur_ssh","address","10.0.0.1"]}
+#
+#     $self->_op_json( 'delete', '10.0.0.1' );
+#     #   {"op":"delete","path":["firewall","group","address-group","kur_ssh","address","10.0.0.1"]}
 sub _op_json {
 	my ( $self, $op, $ip ) = @_;
 
 	return $self->_json->encode( { op => $op, path => $self->_group_path($ip) } );
 }
 
-# Internal helper. Returns the full data=<url-escaped JSON>&key=<apikey>
-# form body for a configuration operation on the passed IP. Only used in real
-# mode, never in testing mode, so the key is not recorded.
+# Internal helper. Builds the complete form encoded request body for a
+# configuration change, the JSON operation plus the API key.
+#
+# The VyOS API takes both as form fields rather than the key going in a
+# header, so the credential is part of the body. That is precisely why this is
+# separate from _op_json and why testing mode never calls it: keeping the key
+# confined to this sub is what stops it reaching test_data.
+#
+# Both values are percent encoded, which matters for the JSON in particular
+# since it is full of braces, quotes, and colons.
+#
+# Args:
+#
+#     op - The operation, as a plain string, 'set' or 'delete'. Passed
+#          straight to _op_json.
+#
+#     ip - The address to operate on, as a plain string. Expected to be an
+#          already validated and lowercased IPv4 or IPv6 address.
+#
+# Returns the body as a form urlencoded string, ready to POST to _base_url.
+#
+#     $self->_form_body( 'set', '10.0.0.1' );
+#     #   data=%7B%22op%22%3A%22set%22%2C%22path%22%3A%5B...%5D%7D&key=secret
 sub _form_body {
 	my ( $self, $op, $ip ) = @_;
 
@@ -284,16 +333,51 @@ sub _form_body {
 		. $self->_uri_escape( $self->{options}{key} );
 } ## end sub _form_body
 
-# Internal helper. Returns the base URL for the VyOS host.
+# Internal helper. Returns the URL of the VyOS HTTP API.
+#
+# There is a single endpoint. Everything the API does is decided by the
+# operation in the posted body rather than by the path, so unlike the REST
+# backends there is no URL to build per operation.
+#
+# The scheme is fixed at https rather than configurable, since the VyOS API is
+# expected to be run over TLS.
+#
+# Takes no arguments; the host comes from the options.
+#
+# Returns the URL as a string, with no trailing slash.
+#
+#     $self->_base_url;    # https://vyos.example.org
 sub _base_url {
 	my ($self) = @_;
 
 	return 'https://' . $self->{options}{host};
 }
 
-# Internal helper. Returns the JSON string used to retrieve the address-group
-# config, used by init and check. In testing mode this is exactly what is
-# recorded so the API key is never leaked.
+# Internal helper. Builds the JSON operation that reads back the firewall
+# group's configuration, used by init and check.
+#
+# Since this backend creates nothing, the group existing is the whole of its
+# setup, and a group deleted out from under a running process is what this
+# detects. init runs it so a misconfigured group name fails immediately rather
+# than at the first ban, and check runs it to decide whether the self heal
+# path should re-push the current bans.
+#
+# The path stops at the group rather than descending to an address, and the op
+# is showConfig rather than set or delete, so nothing is modified.
+#
+# Note the path is hardcoded to the IPv4 address-group node. An instance
+# banning only IPv6 addresses would still have its health checked against the
+# IPv4 group.
+#
+# As with _op_json, this holds nothing secret and is what the testing paths
+# record; the key is only added by _retrieve_form_body.
+#
+# Takes no arguments; the group name comes from the options.
+#
+# Returns the operation as a JSON string, ready to become the data value.
+#
+#     $self->_retrieve_body;
+#     #   {"op":"showConfig","path":["firewall","group","address-group","kur_ssh"]}
 sub _retrieve_body {
 	my ($self) = @_;
 
@@ -301,9 +385,19 @@ sub _retrieve_body {
 		{ op => 'showConfig', path => [ 'firewall', 'group', 'address-group', $self->{options}{group} ] } );
 }
 
-# Internal helper. Returns the full data=<url-escaped JSON>&key=<apikey>
-# form body used by init and check. Only used in real mode, never in testing
-# mode, so the key is not recorded.
+# Internal helper. Builds the complete form encoded request body for the
+# configuration read, the retrieve operation plus the API key.
+#
+# This is to _retrieve_body what _form_body is to _op_json, and exists for the
+# same reason: it is the only place the key is attached to a read, so testing
+# mode can record the operation without the credential.
+#
+# Takes no arguments.
+#
+# Returns the body as a form urlencoded string, ready to POST to _base_url.
+#
+#     $self->_retrieve_form_body;
+#     #   data=%7B%22op%22%3A%22showConfig%22%2C%22path%22%3A%5B...%5D%7D&key=secret
 sub _retrieve_form_body {
 	my ($self) = @_;
 
@@ -314,9 +408,48 @@ sub _retrieve_form_body {
 		. $self->_uri_escape( $self->{options}{key} );
 } ## end sub _retrieve_form_body
 
-# Internal helper. Performs a HTTP POST via LWP::UserAgent, POSTing the passed
-# form-urlencoded body and dying with an explanation on any HTTP level failure.
-# Never called in testing mode.
+# Internal helper. Performs one HTTP request against the VyOS API. Every call
+# this backend makes to the router goes through here.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend. The
+# insecure option turns off certificate verification, which is there because a
+# VyOS router commonly presents a self signed certificate.
+#
+# There is no authentication handling here. The API key travels in the form
+# body rather than in a header, so it is already part of what the caller
+# passes.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# Never called in testing mode; those paths record the operation JSON instead,
+# which is what keeps the API key out of test_data.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string. In practice always 'POST',
+#              since the VyOS API exposes everything as a POST to one
+#              endpoint.
+#
+#     url    - The full URL to request, as a plain string, normally
+#              _base_url with the API path appended.
+#
+#     body   - The form urlencoded request body, as a plain string, from
+#              _form_body or _retrieve_form_body. Carries the API key.
+#
+# Returns the raw response body as a string. Dies on any non success HTTP
+# status.
+#
+#     $self->_request( 'POST', $url, $self->_form_body( 'set', $ip ) );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'POST', $url, $body ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -538,24 +671,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by POSTing a C<set> operation for it to C<< /configure >>,
@@ -749,13 +864,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from

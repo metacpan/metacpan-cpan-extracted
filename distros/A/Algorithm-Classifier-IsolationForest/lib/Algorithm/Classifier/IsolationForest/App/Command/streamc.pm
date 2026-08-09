@@ -203,6 +203,21 @@ sub execute {
 # wire helpers
 #-------------------------------------------------------------------------------
 
+# Send one request and wait for its reply.  The protocol is strictly one
+# reply per request on a single connection, so this can block on the
+# answer instead of correlating tags.
+#
+# Args:
+#   $msg :: the request as a hashref, ready to encode -- a row/rows
+#           message or a cmd message.
+#
+# Returns: the hashref _read_reply returns, holding the raw reply line and
+# its decoded form.  Dies when the daemon says nothing within --timeout
+# seconds or closes the connection first.
+#
+# Example:
+#   my $got = _request( { cmd => 'stats' } );
+#   $got->{reply}{ok}{seen};
 sub _request {
 	my ($msg) = @_;
 	print {$SOCK} $JSON->encode($msg) . "\n";
@@ -212,6 +227,21 @@ sub _request {
 	return $reply;
 }
 
+# Read one newline-terminated reply, waiting no longer than --timeout in
+# total.  Whatever arrives past the newline stays in the module's read
+# buffer for the next call, so a reply split across reads -- or two
+# arriving in one -- both work.
+#
+# Args: none.  Reads the module's $SOCK, $READ_BUF and $TIMEOUT.
+#
+# Returns: a hashref of raw (the reply line as it came, for --json
+# passthrough) and reply (the decoded hashref), or undef when the deadline
+# passes or the daemon closes the connection.  Dies when a line arrives
+# but does not parse as JSON.
+#
+# Example:
+#   my $got = _read_reply();
+#   print $got->{raw} . "\n" if $opt->{'json'};
 sub _read_reply {
 	my $deadline = time + $TIMEOUT;
 	my $sel      = IO::Select->new($SOCK);
@@ -233,6 +263,24 @@ sub _read_reply {
 # command mode
 #-------------------------------------------------------------------------------
 
+# The one-shot control path: send the single command the user asked for,
+# print its answer, and exit.  execute dispatches here instead of _stream
+# when any of --ping/--stats/--save/--relearn-threshold is present.
+#
+# Args:
+#   $opt :: the parsed command options hashref.  Exactly one of ping,
+#           stats, save or relearn_threshold is set; validate has already
+#           enforced that.
+#
+# Returns: 1.  Prints the raw reply line under --json, a two-column table
+# for a hash answer, and the bare value otherwise.  Dies naming the
+# daemon's message when it replies with an error, which is what gives
+# --ping its usable exit code.
+#
+# Example:
+#   $self->_command($opt);
+#   #   seen                  48210
+#   #   window                2048
 sub _command {
 	my ( $self, $opt ) = @_;
 
@@ -263,6 +311,29 @@ sub _command {
 # stream mode
 #-------------------------------------------------------------------------------
 
+# The data path: read rows from -i, send them to the daemon in batches of
+# --batch, and emit what comes back.  Errors from either side are reported
+# against the input line that caused them, which is why the batch's
+# starting line number travels along as the message tag.
+#
+# Input is positional CSV by default -- numeric-looking fields become JSON
+# numbers, everything else stays a string for the daemon's munger plan --
+# or one JSON row per line under --jsonl, which is what unlocks tagged
+# rows and the full munger plan from a shell pipeline.
+#
+# Args:
+#   $opt :: the parsed command options hashref.  i (a path or '-' for
+#           stdin), mode, batch, jsonl, d, json and o all steer this.
+#
+# Returns: 1.  Output goes to stdout as it arrives, or accumulates and is
+# written atomically to -o at the end -- so -o is unsuitable for an
+# endless stdin.  Nothing is printed in learn mode.  Dies naming the input
+# line on a ragged CSV row, an unparseable JSON row, or a daemon error.
+#
+# Example:
+#   $self->_stream($opt);
+#   # 0.41,0
+#   # 0.12,0
 sub _stream {
 	my ( $self, $opt ) = @_;
 
@@ -363,5 +434,73 @@ sub _stream {
 	}
 	return 1;
 } ## end sub _stream
+
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::streamc - Client for iforest streamd: stream rows through it or send it commands
+
+=head1 DESCRIPTION
+
+The client half of C<iforest streamd>, so neither hand-rolled JSON nor a
+socket tool is needed to talk to a daemon.
+
+In stream mode it reads rows from C<-i> and sends them in batches of
+C<--batch>, printing C<$score,$label> lines as replies arrive.  Input is
+positional CSV by default -- numeric-looking fields travel as JSON
+numbers, everything else as strings for the daemon's munger plan -- or
+one JSON row per line under C<--jsonl>, which is what unlocks tagged rows
+and the full munger plan from a shell pipeline.
+
+In command mode -- C<--ping>, C<--stats>, C<--save> or
+C<--relearn-threshold> -- it sends the one command and prints the answer.
+C<--ping> is driven by its exit code, so it works as a health check.
+
+Errors from either side name the input line that caused them.
+
+Run it as C<iforest streamc>; C<iforest help streamc> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help streamc> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Checks that C<--set> is a usable instance name, that C<-i> is not
+combined with a command switch, that C<-i> and C<-o> are usable, that
+C<--mode> names a valid mode, that C<-d> and C<--json> are only used
+where they apply, and that C<--batch> and C<--timeout> are positive.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Connects to the daemon's socket and runs either the command or the
+stream, depending on which switches were given.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
 
 return 1;

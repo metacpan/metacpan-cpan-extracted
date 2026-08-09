@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EndpointPort;
 # ABSTRACT: EndpointPort is a tuple that describes a single port.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s appProtocol => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::EndpointPort - EndpointPort is a tuple that describes a 
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 appProtocol
 

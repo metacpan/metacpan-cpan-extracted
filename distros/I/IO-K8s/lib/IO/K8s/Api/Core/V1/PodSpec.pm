@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodSpec;
 # ABSTRACT: PodSpec is a description of a pod.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s activeDeadlineSeconds => Int;
@@ -45,6 +45,9 @@ k8s hostUsers => Bool;
 k8s hostname => Str;
 
 
+k8s hostnameOverride => Str;
+
+
 k8s imagePullSecrets => ['Core::V1::LocalObjectReference'];
 
 
@@ -78,6 +81,9 @@ k8s readinessGates => ['Core::V1::PodReadinessGate'];
 k8s resourceClaims => ['Core::V1::PodResourceClaim'];
 
 
+k8s resources => 'Core::V1::ResourceRequirements';
+
+
 k8s restartPolicy => Str;
 
 
@@ -88,6 +94,9 @@ k8s schedulerName => Str;
 
 
 k8s schedulingGates => ['Core::V1::PodSchedulingGate'];
+
+
+k8s schedulingGroup => 'Core::V1::PodSchedulingGroup';
 
 
 k8s securityContext => 'Core::V1::PodSecurityContext';
@@ -134,7 +143,7 @@ IO::K8s::Api::Core::V1::PodSpec - PodSpec is a description of a pod.
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 activeDeadlineSeconds
 
@@ -192,6 +201,12 @@ Use the host's user namespace. Optional: Default to true. If set to true or not 
 
 Specifies the hostname of the Pod If not specified, the pod's hostname will be set to a system-defined value.
 
+=head2 hostnameOverride
+
+HostnameOverride specifies an explicit override for the pod's hostname as perceived by the pod. This field only specifies the pod's hostname and does not affect its DNS records. When this field is set to a non-empty string: - It takes precedence over the values set in `hostname` and `subdomain`. - The Pod's hostname will be set to this value. - `setHostnameAsFQDN` must be nil or set to false. - `hostNetwork` must be set to false.
+
+This field must be a valid DNS subdomain as defined in RFC 1123 and contain at most 64 characters. Requires the HostnameOverride feature gate to be enabled.
+
 =head2 imagePullSecrets
 
 ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
@@ -244,6 +259,14 @@ This is an alpha field and requires enabling the DynamicResourceAllocation featu
 
 This field is immutable.
 
+=head2 resources
+
+Resources is the total amount of CPU and Memory resources required by all containers in the pod. It supports specifying Requests and Limits for "cpu" and "memory" resource names only. ResourceClaims are not supported.
+
+This field enables fine-grained control over resource allocation for the entire pod, allowing resource sharing among containers in a pod.
+
+This is an alpha field and requires enabling the PodLevelResources feature gate.
+
 =head2 restartPolicy
 
 Restart policy for all containers within the pod. One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
@@ -261,6 +284,12 @@ If specified, the pod will be dispatched by specified scheduler. If not specifie
 SchedulingGates is an opaque list of values that if specified will block scheduling the pod. If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the scheduler will not attempt to schedule the pod.
 
 SchedulingGates can only be set at pod creation time, and be removed only afterwards.
+
+=head2 schedulingGroup
+
+SchedulingGroup references a runtime instance of PodGroup used for gang-scheduling this Pod together with other Pods that belong to the same group.
+
+This is an alpha field and requires enabling a gang-scheduling feature gate.
 
 =head2 securityContext
 

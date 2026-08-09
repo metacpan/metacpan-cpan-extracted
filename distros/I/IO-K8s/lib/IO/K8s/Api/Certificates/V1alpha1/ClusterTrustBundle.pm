@@ -1,6 +1,6 @@
 package IO::K8s::Api::Certificates::V1alpha1::ClusterTrustBundle;
 # ABSTRACT: ClusterTrustBundle is a cluster-scoped container for X.509 trust anchors (root certificates).
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Certificates::V1alpha1::ClusterTrustBundle - ClusterTrustBundle is
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head1 DESCRIPTION
 

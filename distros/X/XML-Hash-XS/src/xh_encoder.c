@@ -111,7 +111,7 @@ xh_encoder_encode_perl_buffer(xh_encoder_t *encoder, xh_perl_buffer_t *main_buf,
         size_t in_left  = main_buf->cur - main_buf->start;
         size_t out_left = enc_buf->end - enc_buf->cur;
 
-        size_t converted = iconv(encoder->iconv, (char **) &src, &in_left, (char **) &enc_buf->cur, &out_left);
+        size_t converted = iconv(encoder->iconv, XH_ICONV_INBUF_CAST &src, &in_left, (char **) &enc_buf->cur, &out_left);
         if (converted == (size_t) -1) {
             croak("Encoding error");
         }
@@ -136,7 +136,7 @@ xh_encoder_encode_string(xh_encoder_t *encoder, xh_char_t **src, size_t *src_lef
 {
 #ifdef XH_HAVE_ICONV
     if (encoder->type == XH_ENC_ICONV) {
-        size_t converted = iconv(encoder->iconv, (char **) src, src_left, (char **) dst, dst_left);
+        size_t converted = iconv(encoder->iconv, XH_ICONV_INBUF_CAST src, src_left, (char **) dst, dst_left);
         if (converted == (size_t) -1) {
             switch (errno) {
                 case EILSEQ:

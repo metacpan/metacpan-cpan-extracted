@@ -58,11 +58,12 @@ Note that files with the extension `0` are ignored.
 
 # RECENT CHANGES
 
-Changes for version v0.4.1 (2026-08-07)
+Changes for version v0.4.2 (2026-08-08)
 
-- Bug Fixs
-    - Fixed bug when older rotated files are dangling symlinks.
-    - Fixed bug when rotating dandling symlinks and age > 0.
+- Documentation
+    - Fixed typos.
+- Tests
+    - Updated the tests to skip symlink tests where symlink support is unavailable.
 
 See the `Changes` file for more details.
 

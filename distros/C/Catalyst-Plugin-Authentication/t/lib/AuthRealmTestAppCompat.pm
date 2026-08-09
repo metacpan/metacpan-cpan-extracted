@@ -22,17 +22,17 @@ our $members = {
 
 __PACKAGE__->config('Plugin::Authentication' => {
     default_realm => 'members',
-        members => {
-            credential => {
-                class => 'Password',
-                password_field => 'password',
-                password_type => 'clear'
-            },
-            store => {
-                class => 'Minimal',
-                users => $members,
-            }
+    members => {
+        credential => {
+            class => 'Password',
+            password_field => 'password',
+            password_type => 'clear'
         },
+        store => {
+            class => 'Minimal',
+            users => $members,
+        }
+    },
 });
 
 __PACKAGE__->setup;

@@ -156,4 +156,68 @@ sub execute {
 	write_file( defined( $opt->{'o'} ) ? $opt->{'o'} : $opt->{'m'}, { 'atomic' => 1 }, $model );
 } ## end sub execute
 
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::set_voting - Switch a saved model between mean and majority voting
+
+=head1 DESCRIPTION
+
+Switches a saved model's scoring-time aggregation between C<mean> and
+C<majority> and writes it back -- in place over C<-m> by default, or to
+C<-o>.
+
+The forest itself is aggregation-independent, so no tree is rebuilt.  The
+one thing that does not carry over is a contamination-learned decision
+threshold: it is a quantile of whichever per-point quantity the mode
+thresholds against -- the averaged anomaly score under C<mean>, the
+per-tree majority pivot under C<majority> -- so switching relearns it for
+the target mode.  That recalibration needs the original training data,
+supplied as a CSV via C<-i>.  A model fit without contamination carries no
+threshold and switches without C<-i>.
+
+Run it as C<iforest set_voting>; C<iforest help set_voting> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help set_voting> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Checks that C<-m> names a readable model, that C<--voting> is C<mean> or
+C<majority>, that C<-i> (when given) is readable, and that C<-o> does not
+already exist unless C<-w> was given.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Loads the model, switches its aggregation, recalibrating the threshold
+from C<-i> when the model needs it, and writes the model back.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
+
 return 1;

@@ -139,6 +139,7 @@ ok(Punk::Future->fail_future("x\n")->is_failed, 'fail_future');
     package FApp;
     use Punk;
     get '/done'  => sub { Punk::Future->done_future({ ok => 1 }) };
+    get '/dies'  => sub { Punk::Future->fail_future('boom') };
     get '/timer' => sub { my $c = shift;
         $c->timer(0.05)->then(sub { $c->json({ waited => 1 }) }) };
     package main;
@@ -158,6 +159,54 @@ ok(Punk::Future->fail_future("x\n")->is_failed, 'fail_future');
     ok(Scalar::Util::blessed($f) && $f->can('get'),
         'nonblocking: a future is returned');
     is($f->get->[0], 200, 'that resolves to the finished triplet');
+
+    # nonblocking AND streaming: the future rides inside the standard delayed
+    # response instead - plain CODE, so Lint and friends pass it through
+    my $cr = hit($app, path => '/done',
+        env => { 'psgi.nonblocking' => 1, 'psgi.streaming' => 1 });
+    is(ref $cr, 'CODE', 'nonblocking+streaming: a delayed response coderef');
+    my @sent;
+    $cr->(sub { push @sent, $_[0] });
+    is(scalar @sent, 1, 'the responder was called once');
+    is($sent[0][0], 200, '...with the finished triplet');
+    is(file_json_decode($sent[0][2][0])->{ok}, 1, '...carrying the body');
+
+    # and a failing future goes through on_error to the responder too
+    my @err;
+    hit($app, path => '/dies',
+        env => { 'psgi.nonblocking' => 1, 'psgi.streaming' => 1 }
+    )->(sub { push @err, $_[0] });
+    is($err[0][0], 500, 'a failed future answers 500 through the responder');
+}
+
+# ---- through Plack::Middleware::Lint (what plackup -E development wraps) -----
+SKIP: {
+    eval { require Plack::Middleware::Lint; 1 }
+        or skip 'Plack::Middleware::Lint required', 2;
+
+    package LintApp;
+    use Punk;
+    get '/f' => sub { Punk::Future->done_future({ lint => 'clean' }) };
+    package main;
+
+    my $lint = Plack::Middleware::Lint->wrap(LintApp->to_app);
+    my $body = '';
+    open my $in, '<', \$body or die $!;
+    my $env = {
+        REQUEST_METHOD => 'GET', PATH_INFO => '/f', QUERY_STRING => '',
+        SCRIPT_NAME => '', SERVER_NAME => 'localhost', SERVER_PORT => 80,
+        SERVER_PROTOCOL => 'HTTP/1.1', HTTP_HOST => 'localhost',
+        'psgi.version' => [1, 1], 'psgi.url_scheme' => 'http',
+        'psgi.input' => $in, 'psgi.errors' => \*STDERR,
+        'psgi.multithread' => 0, 'psgi.multiprocess' => 0,
+        'psgi.run_once' => 0, 'psgi.streaming' => 1, 'psgi.nonblocking' => 1,
+    };
+    my $res = eval { $lint->($env) };
+    is($@, '', 'an async response survives Lint');
+    my @got;
+    $res->(sub { push @got, $_[0]; return }) if ref $res eq 'CODE';
+    is(file_json_decode($got[0][2][0])->{lint}, 'clean',
+        '...and delivers the resolved body through the responder');
 }
 
 # ---- on a real Hyperman worker: non-blocking ---------------------------------

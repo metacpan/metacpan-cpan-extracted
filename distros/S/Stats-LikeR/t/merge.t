@@ -309,4 +309,27 @@ SKIP: {
 	} 'merge does not leak across all join types';
 }
 
+#--------
+# Numeric join keys.  mg_key() renders plain integers and doubles itself
+# rather than through SvPV (nk_num_pv in LikeR.xs), so a numeric-keyed join
+# has to match exactly the join a plain Perl string hash would produce.
+#--------
+{
+	srand(1234);
+	my $bad = 0;
+	for my $round (1 .. 20) {
+		my @id  = map { $_ % 3 == 0 ? int rand 500 : rand() * 1000 } 1 .. 300;
+		my @rid = map { $id[ int rand @id ] } 1 .. 300;
+		my $L = { id => [ @id  ], v => [ 1 .. scalar @id  ] };
+		my $R = { id => [ @rid ], w => [ 1 .. scalar @rid ] };
+		my %ridx;
+		push @{ $ridx{"$rid[$_]"} }, $_ for 0 .. $#rid;
+		my $want = 0;
+		$want += @{ $ridx{"$_"} || [] } for @id;
+		my $got = merge($L, $R, how => 'inner', on => 'id');
+		$bad++ unless @{ $got->{id} } == $want;
+	}
+	is($bad, 0, 'numeric join keys match a string-keyed join');
+}
+
 done_testing();

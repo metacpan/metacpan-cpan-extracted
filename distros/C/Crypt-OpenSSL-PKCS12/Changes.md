@@ -1,5 +1,17 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.98 2026-08-08, security release, update recommended
+
+- Security: fix NULL pointer dereference in `print_attribute()`'s `V_ASN1_BMPSTRING` branch. An empty (zero-length) BMPSTRING bag
+  attribute caused `Renew(*attribute, 0, char)` to free the buffer and leave `*attribute` NULL (Perl's `safesysrealloc` treats a
+  zero size as free-and-return-NULL); downstream callers then dereferenced NULL inside `strlen()`, causing a deterministic crash.
+  Reachable from a crafted PKCS12 via `info_as_hash()`. Fixed by sizing the buffer on `strlen(value) + 1` instead of the raw ASN.1
+  length, and adding a NULL check on `OPENSSL_uni2asc()`'s return. Reported and fixed by Timothy Legge.
+
+- Fix: `ssl_error()` returned an uninitialized/undef value (triggering a "Use of uninitialized value" warning) when the OpenSSL
+  error stack was empty, e.g. on a MAC verification failure with no underlying library error. Now returns an empty string in
+  that case. Fixed by Timothy Legge.
+
 # 1.97 2026-06-24, update recommended
 
 - Fix [#63](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/63): `get_hex()` did not NUL-terminate its output; zero-length

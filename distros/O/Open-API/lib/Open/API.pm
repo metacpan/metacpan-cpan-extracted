@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Open::API', $VERSION);
@@ -138,6 +138,72 @@ be lowercased by the caller; cookies are parsed from the C<cookie> header when
 the operation declares cookie parameters. For framework adapters - together
 with L</match> this is the complete integration surface, everything heavy
 stays in C.
+
+=head2 check_response
+
+    my $errors = $api->check_response($opId, $triplet, \%opts);
+
+Weigh a PSGI response against the schema the document declares for its
+status. Returns the error list for a mismatch and C<undef> for everything
+else - a conforming response, an unsampled one, or one skipped by a rule
+below. B<The triplet is never modified>, whatever the verdict: a gateway
+that edits what the upstream sent is not a gateway.
+
+Options: C<sample> validates one response in N for this operation, and
+C<max_body> skips bodies over that many bytes.
+
+A response is checked only if it passes the sampling gate and then every
+skip rule, in this order:
+
+=over 4
+
+=item * B<content type> - the C<Content-Type> is not one the document
+declares a JSON schema under (C<skip_ctype>).
+
+=item * B<size> - with C<max_body> set, C<Content-Length> is absent or
+over it (C<skip_size>). An unmeasured body is not buffered to find out.
+
+=item * B<body shape> - the body is not a plain scalar: a filehandle, a
+streaming coderef, an SSE writer (C<skip_body>). Never read.
+
+=item * B<schema> - the status declares no schema, so there is nothing to
+weigh it against (C<skip_schema>).
+
+=item * B<decode> - the body does not decode as JSON (C<skip_decode>).
+
+=back
+
+The gate comes first so an unsampled response costs one increment and one
+comparison. It is a per-operation counter rather than a random draw:
+cheaper, and a stable denominator.
+
+=head2 response_coverage
+
+    my $cov = $api->response_coverage('getPet');
+    my $all = $api->response_coverage;
+
+The counters behind that, for one operation or for every operation that
+has seen a response: C<total>, C<sampled>, C<unsampled>, C<checked>,
+C<violations>, and C<skip_ctype>, C<skip_size>, C<skip_body>,
+C<skip_schema>, C<skip_decode>.
+
+Every response is either checked or skipped for exactly one named reason,
+which is the point: what was not looked at is a number you can report, not
+a gap you have to assume away.
+
+=head2 operation_info
+
+    my $info = $api->operation_info('getPet');
+
+The compiled contract for an operation - what will actually be checked,
+after C<$ref> resolution: C<operationId>, C<method>, C<path>,
+C<parameters> (each with C<name>, C<in>, C<required>, C<schema>), C<body>
+and C<body_required>, C<responses> (each with C<status>, C<content_type>
+and whether it is C<validated>), and C<secured>.
+
+This is the compiled table, not the document: a status the document
+declares without a schema does not appear, because nothing will be
+checked for it.
 
 =head1 ERRORS
 

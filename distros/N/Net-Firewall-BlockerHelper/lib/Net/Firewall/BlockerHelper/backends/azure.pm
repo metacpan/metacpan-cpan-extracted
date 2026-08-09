@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::azure;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::azure - Azure NSG backend via the az CLI
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -188,8 +188,27 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the trailing --subscription argument when configured,
-# or an empty string.
+# Internal helper. Returns the --subscription argument to append to every az
+# invocation, or nothing when no subscription is configured.
+#
+# Emitting the flag only when the option is set is deliberate rather than
+# defaulting to one here. With it left off, az uses whichever subscription the
+# logged in account has set as its default, which is what an instance running
+# in an already configured environment wants. It only needs specifying on a
+# host whose account can see several subscriptions and whose default is not
+# the right one.
+#
+# Takes no arguments.
+#
+# Returns the argument as a string with a leading space, ready to be
+# concatenated onto a command, or the empty string when the subscription
+# option is unset or empty. Never returns undef.
+#
+#     # with the subscription option set
+#     $self->_suffix;    # ' --subscription sub-123'
+#
+#     # with no subscription configured
+#     $self->_suffix;    # ''
 sub _suffix {
 	my ($self) = @_;
 
@@ -200,8 +219,28 @@ sub _suffix {
 }
 
 
-# Internal helper. Returns the shared --resource-group/--nsg-name/--name
-# arguments identifying the rule.
+# Internal helper. Returns the arguments that identify the NSG security rule
+# this instance manages, shared by every command that touches it.
+#
+# Azure addresses a rule by the three levels it is nested in: the resource
+# group holding the network security group, the NSG itself, and the rule
+# within it. All three are needed on every call. Since the show and update
+# commands take exactly the same identifying arguments, they are built once
+# here so the two cannot drift and end up addressing different rules.
+#
+# Note this backend does not create the rule. The NSG and the rule are
+# expected to already exist and to be wired into the NSG's rule ordering by
+# whoever set them up; all this backend does is rewrite the rule's source
+# prefixes.
+#
+# Takes no arguments; all three names come from the options.
+#
+# Returns the arguments as a single string with a leading space, ready to be
+# concatenated onto a command. The subscription is not included; that comes
+# from _suffix and goes at the end.
+#
+#     $self->_base;
+#     #   ' --resource-group my-rg --nsg-name my-nsg --name blocklist'
 sub _base {
 	my ($self) = @_;
 
@@ -214,9 +253,37 @@ sub _base {
 		. $self->{options}{rule};
 } ## end sub _base
 
-# Internal helper. Returns the current banned IPs and CIDR ranges, sorted,
-# joined with single spaces. Single IPs are rendered as a CIDR (/32 for IPv4,
-# /128 for IPv6); CIDR ranges already carry a prefix and are used as is.
+# Internal helper. Renders the current bans into the source prefix list that
+# the NSG rule update takes.
+#
+# An NSG rule's source prefixes are replace-in-full: there is no add or remove
+# one prefix call, so every ban and unban rewrites the whole list from the
+# internal state. That is what this produces.
+#
+# Everything is emitted as CIDR, so a single address gets an explicit host
+# prefix appended, /32 or /128 by family. Banned ranges already carry a prefix
+# and go out as they are. Both families go into the same rule, unlike the AWS
+# backend where the two are separate objects.
+#
+# Single addresses and ranges are pulled from two separate internal lists and
+# emitted as two sorted runs rather than one merged sorted list, so the
+# addresses come first and the ranges after. That is stable, which is what
+# matters for the test_data comparisons, just not globally sorted.
+#
+# Takes no arguments; the bans come from the object's banned and banned_cidr
+# hashes.
+#
+# Returns the prefixes as a single space joined string, ready to follow
+# --source-address-prefixes on the command line. Returns the empty string when
+# nothing is banned, which is what teardown and flush push out to empty the
+# rule.
+#
+#     # with 10.0.0.1, 2001:db8::1, and 10.0.0.0/8 banned
+#     $self->_prefixes;
+#     #   '10.0.0.1/32 2001:db8::1/128 10.0.0.0/8'
+#
+#     # with nothing banned
+#     $self->_prefixes;    # ''
 sub _prefixes {
 	my ($self) = @_;
 
@@ -232,8 +299,24 @@ sub _prefixes {
 	return join( ' ', @prefixes );
 } ## end sub _prefixes
 
-# Internal helper. Returns the az command that sets the rule's source prefixes
-# to the currently banned set.
+# Internal helper. Returns the az command that writes the current bans into
+# the NSG rule's source prefixes. This is the command every ban, unban,
+# re_init, teardown, and flush ultimately runs.
+#
+# The rule is rewritten in full each time, since Azure offers no incremental
+# prefix add or remove. Note there is no concurrency guard here, unlike the
+# AWS backend's lock token: two processes updating the same rule at once will
+# each write back a list based on their own state and the last one wins.
+#
+# Takes no arguments; the rule identity, the prefixes, and the subscription
+# are all assembled from the object.
+#
+# Returns the command as a single string ready to hand to the runner. The az
+# binary comes from the az_cmd option, 'az' by default.
+#
+#     # with 10.0.0.1, 2001:db8::1, and 10.0.0.0/8 banned
+#     $self->_update_command;
+#     #   az network nsg rule update --resource-group my-rg --nsg-name my-nsg --name blocklist --source-address-prefixes 10.0.0.1/32 2001:db8::1/128 10.0.0.0/8
 sub _update_command {
 	my ($self) = @_;
 
@@ -246,15 +329,69 @@ sub _update_command {
 		. $self->_suffix;
 } ## end sub _update_command
 
-# Internal helper. Returns the az command used to verify the rule exists.
+# Internal helper. Returns the az command that confirms the NSG rule exists,
+# used by init and by check.
+#
+# Since this backend creates nothing, the rule existing is the whole of its
+# setup, and a rule deleted out from under a running process is the failure
+# this detects. init runs it so a misconfigured resource group, NSG, or rule
+# name fails immediately rather than at the first ban, and check runs it to
+# decide whether the self heal path should re-push the current bans.
+#
+# Only the exit status is looked at; nothing parses the rule definition that
+# comes back.
+#
+# Takes no arguments.
+#
+# Returns the command as a single string ready to hand to the runner, whose
+# exit status is 0 when the rule is there.
+#
+#     $self->_show_command;
+#     #   az network nsg rule show --resource-group my-rg --nsg-name my-nsg --name blocklist
+#
+#     # with the subscription option set, it is appended
+#     #   az network nsg rule show --resource-group my-rg --nsg-name my-nsg --name blocklist --subscription sub-123
 sub _show_command {
 	my ($self) = @_;
 
 	return $self->{options}{az_cmd} . ' network nsg rule show' . $self->_base . $self->_suffix;
 }
 
-# Internal helper. Runs a command unless testing, raising the passed error flag
-# on a non-zero exit.
+# Internal helper. Runs one az command and turns a non zero exit into an
+# error, so the callers do not each repeat the same capture-and-check.
+#
+# stderr is folded into stdout so that whatever az complained about ends up in
+# the errorString rather than being lost to the terminal. The output is only
+# used for that; nothing parses it.
+#
+# Nothing here dies. A failure sets the error to the passed code, sets
+# errorString with the command and its output, and warns, leaving the caller
+# to check the error state.
+#
+# Note this does not itself check testing mode despite what the callers'
+# structure might suggest. Callers decide whether to run or to record, and
+# only call this when actually running.
+#
+# Args:
+#
+#     command    - The complete shell command to run, as a plain string,
+#                  normally from _update_command or _show_command. Run through
+#                  the shell, so it is expected to be already quoted as
+#                  needed.
+#
+#     error_flag - The numeric error code to raise on a non zero exit, so the
+#                  error reads as the operation that triggered it rather than
+#                  as a generic command failure. Callers pass the code
+#                  matching themselves, such as 13 from ban or 17 from
+#                  teardown.
+#
+# Returns nothing, on success and on failure alike.
+#
+#     # from ban, so a failure reads as banFailed
+#     $self->_run( $self->_update_command, 13 );
+#
+#     # from init, verifying the rule is there
+#     $self->_run( $self->_show_command, 12 );
 sub _run {
 	my ( $self, $command, $error_flag ) = @_;
 
@@ -422,24 +559,6 @@ sub unban {
 		$self->_run( $command, 14 );
 	}
 } ## end sub unban
-
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
 
 =head2 ban_cidr
 
@@ -614,13 +733,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	{
 		local $@;

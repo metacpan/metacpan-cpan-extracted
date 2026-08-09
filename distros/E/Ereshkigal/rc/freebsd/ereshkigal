@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# PROVIDE: ereshkigal
+# REQUIRE: NETWORKING pf
+# KEYWORD: shutdown
+#
+# Add the following to /etc/rc.conf[.local] to enable ereshkigal...
+#
+#   ereshkigal_enable="YES"
+#
+# Optionally...
+#
+#   ereshkigal_config="/usr/local/etc/ereshkigal.toml"
+
+export PATH=$PATH:/usr/local/bin:/usr/local/sbin
+
+. /etc/rc.subr
+
+name="ereshkigal"
+rcvar="ereshkigal_enable"
+
+load_rc_config $name
+
+: ${ereshkigal_enable:="NO"}
+: ${ereshkigal_config:="/usr/local/etc/ereshkigal.toml"}
+
+pidfile="/var/run/ereshkigal/pid"
+start_cmd="/usr/local/bin/ereshkigal start --config ${ereshkigal_config}"
+stop_cmd="/usr/local/bin/ereshkigal stop"
+status_cmd="/usr/local/bin/ereshkigal status"
+
+run_rc_command "$1"

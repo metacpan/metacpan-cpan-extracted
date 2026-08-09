@@ -1,0 +1,114 @@
+Real-world test data
+====================
+
+Four datasets from the UCI Machine Learning Repository, used by
+t/81-sklearn-real-data.t to check this module against scikit-learn on
+data with the overlapping classes, differing scales and correlated
+columns that synthetic blobs do not have.  All four appear in the
+Isolation Forest literature.
+
+Every file here is derived from an upstream UCI file by t/data/regenerate.pl,
+which records how.  Nothing in the test suite touches the network.
+
+
+Licensing
+---------
+
+All four datasets are licensed by UCI under a Creative Commons
+Attribution 4.0 International licence (CC BY 4.0), which permits
+redistribution provided attribution is given.  The citations below are
+that attribution.  The licence covers the data only; it is not the
+licence of this distribution.
+
+    https://creativecommons.org/licenses/by/4.0/
+
+
+Datasets
+--------
+
+- glass :: Glass Identification (B. German, 1987).  214 samples, 9
+  features -- refractive index and the weight percent of eight oxides.
+  UCI id 42, DOI 10.24432/C5WW2P.
+  https://archive.ics.uci.edu/dataset/42/glass+identification
+
+  Label 1 marks the 9 tableware samples (class 6, 4.2%), the one
+  genuinely rare class in this directory.
+
+- ionosphere :: Ionosphere (V. Sigillito, S. Wing, L. Hutton and
+  K. Baker, 1989).  351 samples, 34 features -- radar returns from the
+  ionosphere, processed into 17 pulse pairs of two attributes each.
+  UCI id 52, DOI 10.24432/C5W01B.
+  https://archive.ics.uci.edu/dataset/52/ionosphere
+
+  Label 1 marks the 126 "bad" returns (35.9%).  Note that feature a2 is
+  constant at zero throughout, which is useful in its own right: it
+  exercises the tree builder's "no spread on this feature" path on real
+  data.
+
+- seeds :: Seeds (M. Charytanowicz, J. Niewczas, P. Kulczycki,
+  P. Kowalski, S. Lukasik and S. Zak, 2010).  210 samples, 7 features --
+  geometric measurements of wheat kernels from X-ray images.
+  UCI id 236, DOI 10.24432/C5H30K.
+  https://archive.ics.uci.edu/dataset/236/seeds
+
+  Label 1 marks the 70 Canadian-variety kernels (33.3%).
+
+- wdbc :: Breast Cancer Wisconsin, Diagnostic (W. Wolberg,
+  O. Mangasarian, N. Street and W. Street, 1993).  569 samples, 30
+  features -- the mean, standard error and worst of ten cell-nucleus
+  measurements.  UCI id 17, DOI 10.24432/C5DW2B.
+  https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic
+
+  Label 1 marks the 212 malignant samples (37.3%).
+
+The three datasets with a 33-37% positive class are class splits, not
+anomaly rates.  They are here to exercise scoring on real data, not as
+ground truth for what an unsupervised model ought to flag; only glass
+carries a rare class the test treats that way.
+
+
+Files
+-----
+
+- <name>.csv :: the features, one sample per row, with a header naming
+  the columns.  Numeric throughout and directly usable by fit_from_csv,
+  which detects the header.  The CLI commands do not skip headers, so
+  strip the first line before feeding one of these to `iforest fit`.
+
+- <name>.labels :: one 0/1 per line, aligned with the CSV's data rows,
+  as described per dataset above.  Held separately so the CSV stays pure
+  features -- this module treats every column as one.
+
+- <name>.sklearn :: scikit-learn's IsolationForest.score_samples output
+  for that CSV, checked in so the comparison runs without Python.  Note
+  the sign: sklearn returns the NEGATED anomaly score, so lower means
+  more anomalous, the opposite of this module.  The header comments
+  record the sklearn version and parameters used.
+
+
+Regenerating
+------------
+
+Neither script is needed to run the test suite; both need network or
+Python that the suite does not.
+
+    perl t/data/regenerate.pl        # refetch from UCI, rebuild .csv/.labels
+    python3 t/data/sklearn-reference.py   # rebuild the .sklearn references
+
+regenerate.pl prints the SHA-256 of each upstream file it downloads.  As
+fetched on 2026-08-08:
+
+    ionosphere.data     46d52186b84e20be52918adb93e8fb9926b34795ff7504c24350ae0616a04bbd
+    wdbc.data           d606af411f3e5be8a317a5a8b652b425aaf0ff38ca683d5327ffff94c3695f4a
+    glass.data          dd67373f4baf2807345df02cbfef2093d342e61ad0d82a4fb79af43ef8ce449d
+    seeds_dataset.txt   1f3f83c0d8485ae9148061389d19628607e3f5660e3d6f40ec9102fb398bb12f
+
+and of the derived CSVs:
+
+    glass.csv           b79cce13fb0f63a89cf05d3455e66b569ac5bd314c9ed3e829baa7ca697e1da2
+    ionosphere.csv      0617fa3454c96455e10f63b8f33bee6d68c4061d126671148c642fe55b31725f
+    seeds.csv           9e179a953639a49adedb72cff7a1203b10b02ed5d92255e8c66539ab3d6bb5cf
+    wdbc.csv            2a9d0a8dd94cfc406290de1b47dc9ca2adb6e9a5df29d813a4808002d2a9bb82
+
+Regenerating the CSVs invalidates the .sklearn files, since those record
+the CSV hash they were produced from.  Run both scripts.

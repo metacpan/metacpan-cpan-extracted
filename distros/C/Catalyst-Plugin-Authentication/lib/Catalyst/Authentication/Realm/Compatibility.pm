@@ -8,23 +8,16 @@ use base qw/Catalyst::Authentication::Realm/;
 ## very funky - the problem here is that we can't do real realm initialization
 ## but we need a real realm object to function.  So - we kinda fake it - we
 ## create an empty object -
-sub new {
-    my ($class, $realmname, $config, $app) = @_;
-
-    my $self = { config => $config };
-    bless $self, $class;
-
-    $self->config->{'use_session'} = $app->config->{'Plugin::Authentication'}{'use_session'} || '1';
-    $self->name($realmname);
-
-    return $self;
-}
+sub setup_store {}
+sub setup_credential {}
 
 __PACKAGE__;
 
 __END__
 
 =pod
+
+=for Pod::Coverage setup_credential setup_store
 
 =head1 NAME
 

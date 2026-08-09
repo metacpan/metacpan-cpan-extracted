@@ -1,3 +1,15 @@
+0.318     2026-08-08 23:59:18Z
+
+  - "no_cpan" now defaults "version_finder" to ":MainModule", so a
+    distribution that never reaches CPAN keeps its $VERSION in the main
+    module only. Setting "version_finder" explicitly still wins.
+
+  - Remove the share/claude-skill.yaml ShareDir. It was an outdated copy of
+    the Claude skill (last touched in March, still under the old
+    "dzil-author-getty" name) that nothing ever read; the skill is
+    distributed via .claude/skills instead. This also drops the
+    File::ShareDir::Install configure requirement.
+
 0.317     2026-08-04 22:16:54Z
 
   - Add "tag_format" bundle option, forwarded to Git::Tag.tag_format (or the

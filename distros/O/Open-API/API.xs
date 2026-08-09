@@ -613,6 +613,192 @@ validate_request(self, op_id, raw)
         }
     }
 
+# Validate straight from a PSGI environment.
+#
+# validate_request wants a lowercased header hash, and a caller in Perl
+# can only build one by walking the whole environment - which measured at
+# 3.3us per request in Maat, four times the cost of the routing and
+# validation it was feeding. This does it in C, and only for the headers
+# THIS operation declares (plus content-type and cookie), so a document
+# that declares no header parameters costs two hash fetches rather than
+# a loop over twenty environment keys.
+#
+# \%caps is the capture hash from match(); $body is the raw request body
+# the caller has already read (it usually needs those bytes itself, so
+# reading psgi.input here would only take them away).
+void
+validate_env(self, op_id, env, caps = NULL, body = NULL)
+        SV *self
+        SV *op_id
+        SV *env
+        SV *caps
+        SV *body
+    PPCODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        oa_op *o = oa_op_by_id(aTHX_ a, op_id);
+        HV *envhv, *headers, *rawpath;
+        SV *query;
+        AV *errs;
+        HV *params = NULL;
+        int ok;
+        if (!o) croak("Open::API: unknown operationId '%s'", SvPV_nolen(op_id));
+        envhv = oa_hv_of(env);
+        if (!envhv)
+            croak("Open::API: validate_env needs the PSGI environment hashref");
+
+        /* fresh, and ours: oa_validate_op copies whatever it keeps */
+        headers = oa_headers_for(aTHX_ o, envhv);
+        sv_2mortal((SV *)headers);
+
+        rawpath = caps ? oa_hv_of(caps) : NULL;
+        query   = oa_env_get(aTHX_ envhv, "QUERY_STRING");
+        errs    = (AV *)sv_2mortal((SV *)newAV());
+        ok = oa_validate_op(aTHX_ a, o, rawpath, query, headers,
+                            (body && SvOK(body)) ? body : NULL, &params, errs);
+        if (ok) {
+            mXPUSHs(newSViv(1));
+            mXPUSHs(newRV_noinc((SV *)params));
+        } else {
+            mXPUSHs(newSViv(0));
+            mXPUSHs(newRV_inc((SV *)errs));
+        }
+    }
+
+# Weigh a response against the schema the document declares for its status.
+# $trip is a PSGI triplet; it is never modified, whatever the verdict.
+# \%opts: sample => 1-in-N (per operation, deterministic), max_body => bytes.
+# Returns \@errors for a mismatch, undef for anything else - conforming,
+# unsampled, or skipped. Which of those it was is in response_coverage.
+SV *
+check_response(self, op_id, trip, opts = NULL)
+        SV *self
+        SV *op_id
+        SV *trip
+        SV *opts
+    CODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        oa_op *o = oa_op_by_id(aTHX_ a, op_id);
+        oa_rvcfg rv;
+        AV *errs = NULL;
+        SV *bad;
+        if (!o) croak("Open::API: unknown operationId '%s'", SvPV_nolen(op_id));
+        rv.mode = OA_RV_REPORT; rv.report = NULL; rv.sample = 1; rv.max_body = 0;
+        if (opts && SvOK(opts)) {
+            HV *oh = oa_hv_of(opts);
+            SV **v;
+            if (!oh) croak("Open::API: check_response options must be a hashref");
+            if ((v = hv_fetchs(oh, "sample", 0)) && *v && SvOK(*v))
+                rv.sample = SvIV(*v);
+            if ((v = hv_fetchs(oh, "max_body", 0)) && *v && SvOK(*v))
+                rv.max_body = SvIV(*v);
+        }
+        bad = oa_check_response_cfg(aTHX_ o, trip, &rv, NULL, &errs);
+        if (bad) SvREFCNT_dec(bad);       /* report mode never builds one */
+        RETVAL = errs ? newRV_inc((SV *)errs) : newSV(0);
+    }
+    OUTPUT:
+        RETVAL
+
+# Response-validation coverage. With an operationId, that operation's
+# counters; without one, a hashref of every operation that has seen a
+# response. Every response is either checked or skipped for exactly one
+# named reason, so what was not looked at is a number, not a silent gap.
+SV *
+response_coverage(self, op_id = NULL)
+        SV *self
+        SV *op_id
+    CODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        oa_ops *t = (oa_ops *)a->ops;
+        if (op_id && SvOK(op_id)) {
+            oa_op *o = oa_op_by_id(aTHX_ a, op_id);
+            if (!o) croak("Open::API: unknown operationId '%s'",
+                          SvPV_nolen(op_id));
+            RETVAL = newRV_noinc((SV *)oa_rv_hv(aTHX_ &o->rv));
+        } else {
+            HV *out = newHV();
+            int i;
+            for (i = 0; t && i < t->n; i++) {
+                oa_op *o = &t->ops[i];
+                STRLEN kl; const char *kp;
+                if (!o->rv.total) continue;
+                kp = SvPV_const(o->op_id, kl);
+                (void)hv_store(out, kp, (I32)kl,
+                               newRV_noinc((SV *)oa_rv_hv(aTHX_ &o->rv)), 0);
+            }
+            RETVAL = newRV_noinc((SV *)out);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+# The resolved contract for one operation: what will actually be checked,
+# after $ref resolution and compilation. `maat explain` prints this.
+SV *
+operation_info(self, op_id)
+        SV *self
+        SV *op_id
+    CODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        oa_op *o = oa_op_by_id(aTHX_ a, op_id);
+        HV *out;
+        AV *av;
+        int i, loc;
+        static const char *const locname[OA_IN_N] = {
+            "path", "query", "header", "cookie"
+        };
+        if (!o) croak("Open::API: unknown operationId '%s'", SvPV_nolen(op_id));
+        out = newHV();
+        (void)hv_stores(out, "operationId", newSVsv(o->op_id));
+        (void)hv_stores(out, "method", newSVsv(o->method));
+        (void)hv_stores(out, "path", newSVsv(o->path));
+
+        av = newAV();
+        for (loc = 0; loc < OA_IN_N; loc++) {
+            for (i = 0; i < o->nparams[loc]; i++) {
+                HV *p = newHV();
+                (void)hv_stores(p, "name", newSVsv(o->params[loc][i].name));
+                (void)hv_stores(p, "in", newSVpv(locname[loc], 0));
+                (void)hv_stores(p, "required",
+                                newSViv(o->params[loc][i].required));
+                (void)hv_stores(p, "schema",
+                                newSViv(o->params[loc][i].handle ? 1 : 0));
+                av_push(av, newRV_noinc((SV *)p));
+            }
+        }
+        (void)hv_stores(out, "parameters", newRV_noinc((SV *)av));
+
+        av = newAV();
+        for (i = 0; i < o->nbodies; i++) {
+            HV *b = newHV();
+            (void)hv_stores(b, "content_type", newSVsv(o->bodies[i].ctype));
+            (void)hv_stores(b, "validated",
+                            newSViv(o->bodies[i].handle ? 1 : 0));
+            av_push(av, newRV_noinc((SV *)b));
+        }
+        (void)hv_stores(out, "body", newRV_noinc((SV *)av));
+        (void)hv_stores(out, "body_required", newSViv(o->body_required));
+
+        av = newAV();
+        for (i = 0; i < o->nresps; i++) {
+            HV *r = newHV();
+            (void)hv_stores(r, "status", newSVsv(o->resps[i].status));
+            (void)hv_stores(r, "content_type", newSVsv(o->resps[i].ctype));
+            (void)hv_stores(r, "validated",
+                            newSViv(o->resps[i].handle ? 1 : 0));
+            av_push(av, newRV_noinc((SV *)r));
+        }
+        (void)hv_stores(out, "responses", newRV_noinc((SV *)av));
+        (void)hv_stores(out, "secured", newSViv(o->nsec ? 1 : 0));
+        RETVAL = newRV_noinc((SV *)out);
+    }
+    OUTPUT:
+        RETVAL
+
 MODULE = Open::API        PACKAGE = Open::API::Plack
 
 # Open::API::Plack->new(api => $api | spec => ..., handlers => {...},
@@ -726,6 +912,8 @@ to_app(self)
         SV *headers_opt = NULL, *cors_opt = NULL, *errfmt_opt = NULL;
         IV maxbody = 0;
         int negotiate = 0, vresp = 0;
+        SV *rv_report = NULL;
+        IV rv_sample = 0, rv_maxbody = 0;
         AV *cap;
         oa_api *a;
         SV **e;
@@ -743,8 +931,49 @@ to_app(self)
             maxbody = SvIV(*e);
         if ((e = hv_fetchs(cfg, "negotiate", 0)) && *e)
             negotiate = SvTRUE(*e) ? 1 : 0;
-        if ((e = hv_fetchs(cfg, "validate_responses", 0)) && *e)
-            vresp = SvTRUE(*e) ? 1 : 0;
+        /* validate_responses: 0 | 1 (replace with a 500 - the dev tool) |
+         * 'report' | a hashref { mode, report, sample, max_body }. The
+         * scalar forms are unchanged from 0.06. */
+        if ((e = hv_fetchs(cfg, "validate_responses", 0)) && *e && SvOK(*e)) {
+            SV *v = *e;
+            HV *rh = (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV)
+                   ? (HV *)SvRV(v) : NULL;
+            SV *modesv = v;
+            SV **x;
+            if (rh) {
+                modesv = (x = hv_fetchs(rh, "mode", 0)) && *x && SvOK(*x)
+                       ? *x : NULL;
+                if ((x = hv_fetchs(rh, "report", 0)) && *x && SvOK(*x)) {
+                    rv_report = oa_cv_or_name(aTHX_ *x,
+                        "validate_responses 'report' callback");
+                    /* a report callback means report mode unless told
+                     * otherwise - nobody passes one to get a 500 */
+                    if (!modesv) vresp = 2;
+                }
+                if ((x = hv_fetchs(rh, "sample", 0)) && *x && SvOK(*x))
+                    rv_sample = SvIV(*x);
+                if ((x = hv_fetchs(rh, "max_body", 0)) && *x && SvOK(*x))
+                    rv_maxbody = SvIV(*x);
+            }
+            if (modesv) {
+                if (SvPOK(modesv) && !looks_like_number(modesv)) {
+                    STRLEN sl; const char *sp = SvPV_const(modesv, sl);
+                    if (sl == 6 && memEQ(sp, "report", 6))       vresp = 2;
+                    else if (sl == 7 && memEQ(sp, "replace", 7)) vresp = 1;
+                    else if (sl == 3 && memEQ(sp, "off", 3))     vresp = 0;
+                    else croak("Open::API::Plack->to_app: validate_responses "
+                               "must be 0, 1, 'replace', 'report' or a hashref "
+                               "- not '%.*s'", (int)sl, sp);
+                } else {
+                    vresp = SvTRUE(modesv) ? 1 : 0;
+                }
+            }
+            if (vresp == 2 && !rv_report)
+                croak("Open::API::Plack->to_app: validate_responses => 'report' "
+                      "needs somewhere to report to - pass "
+                      "validate_responses => { mode => 'report', "
+                      "report => sub {...} }");
+        }
         if (!api)
             croak("Open::API::Plack->to_app: give 'api' or 'spec'");
         a = oa_api_of(aTHX_ api);
@@ -908,6 +1137,15 @@ to_app(self)
                 (void)hv_stores(o_opts, "max_body_size", newSViv(maxbody));
             if (negotiate)
                 (void)hv_stores(o_opts, "negotiate", newSViv(1));
+
+            /* response validation: the mode rides in its own capture slot,
+             * the rest here, where the request path already reads options */
+            if (rv_report)
+                (void)hv_stores(o_opts, "response_report", rv_report);
+            if (rv_sample > 1)
+                (void)hv_stores(o_opts, "response_sample", newSViv(rv_sample));
+            if (rv_maxbody > 0)
+                (void)hv_stores(o_opts, "response_max_body", newSViv(rv_maxbody));
             if (errfmt_opt && SvOK(errfmt_opt)) {
                 STRLEN l; const char *p = SvPV_const(errfmt_opt, l);
                 if (l == 7 && memEQ(p, "problem", 7))

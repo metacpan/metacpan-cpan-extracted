@@ -80,6 +80,26 @@ controller.
 Validated OpenAPI parameters first (path, then query), then web route
 captures, then the request (query, then form body).
 
+=head2 params
+
+=head2 params(@names)
+
+The same layers, several names at a time. With no names, all of them
+merged into one hashref, stacked in that precedence.
+
+With names, only those: a list of values in the order asked for (C<undef>
+for a name no layer has) in list context, and in scalar context a hashref
+of just the names that were there, so a set of optional filters is one
+call rather than a loop -
+
+    my %filter = %{ $c->params(qw(state queue task worker)) };
+
+Note that C<%{ }> is scalar context, but an argument list is not: reach
+for C<scalar> where the call sits somewhere already in list context. A
+list of names that happens to be empty is the same call as no names, and
+so gives everything. See L<Punk::Request/params>, which this defers to
+for the last layer.
+
 =head2 openapi
 
 The validated parameter hash from L<Open::API/validate_request> on API

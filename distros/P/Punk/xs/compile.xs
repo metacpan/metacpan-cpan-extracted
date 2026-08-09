@@ -158,11 +158,26 @@ _finish_future(self, c, ret, on_error = &PL_sv_undef, method = &PL_sv_undef, aft
         SV *envsv = pcx_get(aTHX_ cav, PCX_ENV);
         HV *env = (envsv && SvROK(envsv)) ? (HV *)SvRV(envsv) : NULL;
         SV **nb = env ? hv_fetchs(env, "psgi.nonblocking", 0) : NULL;
+        SV **st = env ? hv_fetchs(env, "psgi.streaming", 0) : NULL;
         int nonblocking = (nb && *nb && SvTRUE(*nb));
+        int streaming   = (st && *st && SvTRUE(*st));
         int can_then = (SvROK(ret) && SvOBJECT(SvRV(ret))
                         && pcx_can(aTHX_ ret, "then"));
         PERL_UNUSED_VAR(self);
-        if (nonblocking && can_then) {
+        if (nonblocking && can_then && streaming) {
+            /* the standard delayed response: middleware between Punk and the
+             * server (plackup's Lint, this app's own `middleware`) passes a
+             * coderef through where a raw Future would kill the request */
+            AV *cap = newAV();
+            av_push(cap, newSVsv(c));
+            av_push(cap, newSVsv(ret));
+            av_push(cap, SvOK(on_error) ? newSVsv(on_error) : newSV(0));
+            av_push(cap, newSVsv(method));
+            av_push(cap, SvOK(after) ? newSVsv(after)
+                                     : newRV_noinc((SV *)newAV()));
+            RETVAL = punk_closure(aTHX_ pc_ffs_cb, cap);
+        }
+        else if (nonblocking && can_then) {
             AV *cd = newAV(), *cf = newAV();
             SV *done, *fail, *argv[2];
             int j;

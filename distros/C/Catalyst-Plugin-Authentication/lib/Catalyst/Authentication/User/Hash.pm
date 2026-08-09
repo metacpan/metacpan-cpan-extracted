@@ -19,7 +19,18 @@ sub AUTOLOAD {
 }
 
 # this class effectively handles any method calls
-sub can { 1 }
+sub can {
+    my $self = shift;
+    my $coderef = $self->SUPER::can(@_);
+    return defined $coderef
+        if $coderef;
+
+    my $method = shift;
+    return sub {
+        my $self = shift;
+        $self->_accessor(@_);
+    };
+}
 
 sub id {
     my $self = shift;
@@ -43,8 +54,8 @@ sub _accessor {
 
     my $data = $self->{$key};
     ( $self->{__hash_obj_key_is_array}{$key} || $key =~ /roles/ )
-      ? @{ $data || [] }
-      : $data;
+        ? @{ $data || [] }
+        : $data;
 }
 
 ## password portion of this is no longer necessary, but here for backwards compatibility.
@@ -89,7 +100,7 @@ sub supports {
 
 sub for_session {
     my $self = shift;
-    
+
     return $self; # we serialize the whole user
 }
 
@@ -112,7 +123,7 @@ object based on hashes.
 =head1 SYNOPSIS
 
     use Catalyst::Authentication::User::Hash;
-    
+
     Catalyst::Authentication::User::Hash->new(
         password => "s3cr3t",
     );

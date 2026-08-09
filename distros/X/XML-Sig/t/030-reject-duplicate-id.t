@@ -5,12 +5,25 @@ use Test::Exception;
 use File::Temp qw(tempdir);
 use XML::Sig;
 use XML::LibXML;
+use Crypt::OpenSSL::Guess qw/find_openssl_prefix/;
+use Path::Tiny;
+use Config;
 
 my $dir = tempdir(CLEANUP => 1);
 my $key = "$dir/k";
 my $crt = "$dir/c";
-system("openssl genrsa -out $key 2048 2>/dev/null") == 0 or die;
-system("openssl req -new -x509 -key $key -out $crt -days 30 -subj '/CN=T' 2>/dev/null") == 0 or die;
+my $dev_null = '> /dev/null';
+if($Config{osname} =~ /MSWin/i) {
+    $dev_null = '2>nul';
+}
+system("openssl genrsa -out $key 2048 $dev_null");
+my @args = ("req", "-new", "-x509","-key", $key, "-out", $crt, "-days", "30", "-subj", "/CN=T");
+
+if ($Config{myuname} =~ /strawberry/i) {
+    my $openssl_config = path(find_openssl_prefix(), 'etc', 'openssl.cfg');
+    push (@args, ('-config', $openssl_config));
+}
+system("openssl", @args);
 
 # Create a signed element (ID=dup) whose content is "legit"
 my $legit = q{<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">

@@ -308,7 +308,7 @@ should experience no problems.
 =item id( )
 
 The C<id()> method should return a unique id (scalar) that can be used to
-retreive this user from the store.  Often this will be provided to the store's
+retrieve this user from the store.  Often this will be provided to the store's
 C<find_user()> routine as C<id =E<gt> $user-E<gt>id> so you should ensure that your
 store's C<find_user()> can cope with that.
 

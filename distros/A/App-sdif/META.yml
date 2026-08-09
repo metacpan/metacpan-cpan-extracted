@@ -40,7 +40,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: '4.4701'
+    version: '4.4801'
   App::sdif::LabelStack:
     file: lib/App/sdif/LabelStack.pm
   App::sdif::Util:
@@ -52,6 +52,8 @@ provides:
   App::sdif::default:
     file: lib/App/sdif/default.pm
   App::watchdiff:
+    file: lib/App/watchdiff.pm
+  App::watchdiff::Command:
     file: lib/App/watchdiff.pm
 requires:
   Command::Run: '1.00'
@@ -70,7 +72,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: https://github.com/kaz-utashiro/sdif-tools.git
-version: '4.4701'
+version: '4.4801'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

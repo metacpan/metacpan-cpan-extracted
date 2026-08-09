@@ -1,5 +1,16 @@
 Revision history for Punk
 
+0.04    2026-08-08
+        - Fixed the configure-time dependency declaration, which is why
+          0.03 could not be installed from CPAN at all.
+        - $app->install_kw($name => $code, $owner?): a plugin can install a
+          declaration keyword of its own into the application class instead
+          of assigning to a glob there. 
+        - params now takes names: `$c->params(@names)` and
+          `$req->params(@names)` return just those, as a list of values in
+          the order asked for, or - in scalar context - a hashref of only
+          the names that were passed.
+
 0.03    2026-08-07
         - Punk::Model::DBIx::Loop, a non-blocking model backend. The same
           six-method contract, the same SQL and the same result shapes as

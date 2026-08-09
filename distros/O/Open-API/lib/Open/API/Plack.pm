@@ -215,6 +215,36 @@ the operation's response schema for that status and turns a mismatch into a
 development-mode tool, off by default. It applies to Future returns too (the
 check runs when the future resolves).
 
+=head2 RESPONSE VALIDATION IN FRONT OF PRODUCTION
+
+Replacing a response with a 500 is right in a dev server and wrong
+everywhere else. Report mode weighs the response the same way and then
+leaves it alone:
+
+    validate_responses => {
+        mode     => 'report',
+        report   => sub {
+            my ($op_id, $status, $errors, $env) = @_;
+            # record it; the client already has the real response
+        },
+        sample   => 100,           # validate 1 response in N, per operation
+        max_body => 1_048_576,     # skip bodies over this
+    }
+
+The callback is told which operation, which status, the errors (marked
+C<< in => 'response' >>) and the request environment. What the client
+receives is what the handler built, byte for byte - status, headers and
+body. A callback that dies is warned about and the response is delivered
+regardless: a broken reporter loses the sample, never the response.
+
+C<mode> may also be C<'replace'> (the C<1> behaviour) or C<'off'>.
+Configuration mistakes croak at C<to_app>: C<'report'> without a callback,
+or a mode that is not one of these.
+
+Sampling and the skip rules, and the coverage counters that account for
+every response either checked or skipped, are described in
+L<Open::API/check_response> and L<Open::API/response_coverage>.
+
 =head1 HOOKS
 
 The optional C<before> and C<after> hooks are each a coderef or a fully
@@ -232,7 +262,11 @@ use is auth:
     });
     $plack->after(sub {
         my ($resp, $env, $operationId) = @_;
-        push @{ $resp->[1] }, 'X-Request-Id' => $env->{'openapi.rid'} // '-';
+        # not defined-or: this file claims 5.008003, where // is a syntax
+        # error, so the whole module would fail to compile there
+        my $rid = $env->{'openapi.rid'};
+        push @{ $resp->[1] },
+            'X-Request-Id' => defined $rid ? $rid : '-';
         return;
     });
 

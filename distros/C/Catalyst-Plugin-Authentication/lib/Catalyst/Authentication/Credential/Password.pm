@@ -59,16 +59,18 @@ sub check_password {
     if ($self->_config->{'password_type'} eq 'self_check') {
         return $user->check_password($authinfo->{$self->_config->{'password_field'}});
     } else {
-        return 1
+        return !!1
             if $self->_config->{'password_type'} eq 'none';
 
         my $password = $authinfo->{$self->_config->{'password_field'}};
         my $storedpassword = $user->get($self->_config->{'password_field'});
 
+        # FIXME - Should we warn in the $storedpassword undef case,
+        #         as the user probably fluffed the config?
+        return !!0
+            unless defined $storedpassword;
+
         if ($self->_config->{'password_type'} eq 'clear') {
-            # FIXME - Should we warn in the $storedpassword undef case,
-            #         as the user probably fluffed the config?
-            return unless defined $storedpassword;
             return _secure_compare($password, $storedpassword);
         } elsif ($self->_config->{'password_type'} eq 'crypted') {
             return _secure_compare(crypt($password, $storedpassword), $storedpassword);
@@ -79,17 +81,17 @@ sub check_password {
                 $salt_len );
         } elsif ($self->_config->{'password_type'} eq 'hashed') {
 
-             my $d = Digest->new( $self->_config->{'password_hash_type'} );
-             $d->add( $self->_config->{'password_pre_salt'} || '' );
-             $d->add($password);
-             $d->add( $self->_config->{'password_post_salt'} || '' );
+            my $d = Digest->new( $self->_config->{'password_hash_type'} );
+            $d->add( $self->_config->{'password_pre_salt'} || '' );
+            $d->add($password);
+            $d->add( $self->_config->{'password_post_salt'} || '' );
 
-             my $computed    = $d->clone()->digest;
-             my $b64computed = $d->clone()->b64digest;
-             return ( ( _secure_compare($computed, $storedpassword) )
-                   || ( _secure_compare(unpack("H*", $computed), $storedpassword) )
-                   || ( _secure_compare($b64computed, $storedpassword) )
-                   || ( _secure_compare($b64computed.'=', $storedpassword)) );
+            my $computed    = $d->clone()->digest;
+            my $b64computed = $d->clone()->b64digest;
+            return ( ( _secure_compare($computed, $storedpassword) )
+                  || ( _secure_compare(unpack("H*", $computed), $storedpassword) )
+                  || ( _secure_compare($b64computed, $storedpassword) )
+                  || ( _secure_compare($b64computed.'=', $storedpassword)) );
         }
     }
 }
@@ -99,11 +101,11 @@ sub check_password {
 # the length of the string.
 # (lifted shamelessly from Mojo::Util 9.45)
 sub _secure_compare {
-  my ($one, $two) = @_;
-  my $r = length $one != length $two;
-  $two = $one if $r;
-  $r |= ord(substr $one, $_) ^ ord(substr $two, $_) for 0 .. length($one) - 1;
-  return $r == 0;
+    my ($one, $two) = @_;
+    my $r = length $one != length $two;
+    $two = $one if $r;
+    $r |= ord(substr $one, $_) ^ ord(substr $two, $_) for 0 .. length($one) - 1;
+    return $r == 0;
 }
 
 __PACKAGE__;
@@ -120,8 +122,8 @@ with a password.
 =head1 SYNOPSIS
 
     use Catalyst qw/
-      Authentication
-      /;
+        Authentication
+    /;
 
     package MyApp::Controller::Auth;
 
@@ -188,8 +190,18 @@ be sure to use that same field name when calling $c->authenticate().
 
 This sets the password type.  Often passwords are stored in crypted or hashed
 formats.  In order for the password module to verify the plaintext password
-passed in, it must be told what format the password will be in when it is retreived
-from the user object. The supported options are:
+passed in, it must be told what format the password will be in when it is
+retrieved from the user object.
+
+B<< Any password type aside from C<self_check> is highly discouraged. >>
+None of the built in password types are considered secure, and should only
+be used for compatibility with legacy systems. Instead, the password checking
+should be implemented in the user object's B<check_password> method. It is
+recommended to implement it using L<Crypt::Passphrase> and one of its
+recommended encoders and validators. L<Crypt::Passphrase> can also assist
+with updating hashed passwords to a new algorithm.
+
+The supported options are:
 
 =over 8
 
@@ -231,11 +243,15 @@ The hash type used, passed directly to L<Digest/new>.
 
 =item password_pre_salt
 
-Any pre-salt data to be passed to L<Digest/add> before processing the password.
+Any data to be passed to L<Digest/add> before processing the password. This is
+conventionally called a "pepper" value, but is named C<salt> here for backwards
+compatibility.
 
 =item password_post_salt
 
-Any post-salt data to be passed to L<Digest/add> after processing the password.
+Any data to be passed to L<Digest/add> after processing the password. This is
+conventionally called a "pepper" value, but is named C<salt> here for backwards
+compatibility.
 
 =back
 

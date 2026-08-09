@@ -153,6 +153,25 @@ use Punk;
         'cookies: first value wins, value decoded, spaces eaten');
     is($req->cookie('sid'), 'a b', 'cookie accessor');
     is($req->query, $req->query, 'query cache returns the same hashref');
+
+    # params(@keys): a slice in list context, a hashref of what is there
+    # in scalar context - both by the precedence param() resolves with.
+    my @vals = $req->params(qw(plus name nope));
+    is_deeply(\@vals, [ 'a b', 'rex', undef ],
+        'params(@keys) in list context is a slice, undef for a missing name');
+    is_deeply(scalar $req->params(qw(plus name nope)),
+        { plus => 'a b', name => 'rex' },
+        'params(@keys) in scalar context leaves the missing name out');
+    is_deeply({ %{ $req->params(qw(name nope)) } }, { name => 'rex' },
+        'a deref block is scalar context, so %{ } is the filter hash');
+    my @one = $req->params('name');
+    is(scalar @one, 1, 'one value back per name asked for');
+    is_deeply(scalar $req->params('q'), { q => [ 'x/y', 2 ] },
+        'a repeated parameter keeps its arrayref through params(@keys)');
+    is_deeply($req->params, {
+        q => [ 'x/y', 2 ], plus => 'a b', name => 'rex',
+        tags => [ 'a', 'b c' ], empty => '', flag => '' },
+        'params with no names is still the whole merged hash');
 }
 
 # ---- leak gate ---------------------------------------------------------------

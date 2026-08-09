@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::cloud_armor;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::cloud_armor - Google Cloud Armor backend
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -170,8 +170,27 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the trailing --project argument when configured, or
-# an empty string.
+# Internal helper. Returns the --project argument to append to every gcloud
+# invocation, or nothing when no project is configured.
+#
+# Emitting the flag only when the option is set is deliberate rather than
+# defaulting to one here. With it left off, gcloud uses whichever project is
+# set in the active configuration, which is what an instance running in an
+# already configured environment wants. It only needs specifying on a host
+# whose account can see several projects and whose default is not the right
+# one.
+#
+# Takes no arguments.
+#
+# Returns the argument as a string with a leading space, ready to be
+# concatenated onto a command, or the empty string when the project option is
+# unset or empty. Never returns undef.
+#
+#     # with the project option set
+#     $self->_suffix;    # ' --project my-project'
+#
+#     # with no project configured
+#     $self->_suffix;    # ''
 sub _suffix {
 	my ($self) = @_;
 
@@ -181,8 +200,39 @@ sub _suffix {
 	return '';
 } ## end sub _suffix
 
-# Internal helper. Returns the current banned IPs, sorted, each as a CIDR
-# (/32 for IPv4, /128 for IPv6), joined with commas.
+# Internal helper. Renders the current bans into the source range list that
+# the Cloud Armor rule update takes.
+#
+# A Cloud Armor rule's source ranges are replace-in-full: there is no add or
+# remove one range call, so every ban and unban rewrites the whole list from
+# the internal state. That is what this produces.
+#
+# Everything is emitted as CIDR, so a single address gets an explicit host
+# prefix appended, /32 or /128 by family. Banned ranges already carry a prefix
+# and go out as they are. Both families go into the same rule.
+#
+# Note the separator is a comma rather than a space, unlike the AWS and Azure
+# backends. That is what --src-ip-ranges expects, and it means the whole list
+# is one shell word, so no quoting is needed around it.
+#
+# Single addresses and ranges are pulled from two separate internal lists and
+# emitted as two sorted runs rather than one merged sorted list, so the
+# addresses come first and the ranges after. That is stable, which is what
+# matters for the test_data comparisons, just not globally sorted.
+#
+# Takes no arguments; the bans come from the object's banned and banned_cidr
+# hashes.
+#
+# Returns the ranges as a single comma joined string, ready to follow
+# --src-ip-ranges on the command line. Returns the empty string when nothing
+# is banned.
+#
+#     # with 10.0.0.1, 2001:db8::1, and 10.0.0.0/8 banned
+#     $self->_ranges;
+#     #   '10.0.0.1/32,2001:db8::1/128,10.0.0.0/8'
+#
+#     # with nothing banned
+#     $self->_ranges;    # ''
 sub _ranges {
 	my ($self) = @_;
 
@@ -199,8 +249,25 @@ sub _ranges {
 	return join( ',', @ranges );
 } ## end sub _ranges
 
-# Internal helper. Returns the gcloud command that sets the rule's source
-# ranges to the currently banned set.
+# Internal helper. Returns the gcloud command that writes the current bans
+# into the Cloud Armor rule's source ranges. This is the command every ban,
+# unban, re_init, teardown, and flush ultimately runs.
+#
+# The rule is addressed by its priority within the policy rather than by a
+# name, since that is how Cloud Armor identifies rules. It is rewritten in
+# full each time, as gcloud offers no incremental range add or remove, and
+# there is no concurrency guard: two processes updating the same rule at once
+# will each write back a list based on their own state and the last one wins.
+#
+# Takes no arguments; the policy, priority, ranges, and project are all
+# assembled from the object.
+#
+# Returns the command as a single string ready to hand to the runner. The
+# gcloud binary comes from the gcloud_cmd option, 'gcloud' by default.
+#
+#     # policy my-policy at priority 1000, with 10.0.0.1 and 10.0.0.0/8 banned
+#     $self->_update_command;
+#     #   gcloud compute security-policies rules update 1000 --security-policy my-policy --src-ip-ranges 10.0.0.1/32,10.0.0.0/8
 sub _update_command {
 	my ($self) = @_;
 
@@ -215,7 +282,29 @@ sub _update_command {
 		. $self->_suffix;
 } ## end sub _update_command
 
-# Internal helper. Returns the gcloud command used to verify the rule exists.
+# Internal helper. Returns the gcloud command that confirms the Cloud Armor
+# rule exists, used by init and by check.
+#
+# Since this backend creates nothing, the rule existing at the configured
+# priority is the whole of its setup, and a rule deleted out from under a
+# running process is the failure this detects. init runs it so a misconfigured
+# policy or priority fails immediately rather than at the first ban, and check
+# runs it to decide whether the self heal path should re-push the current
+# bans.
+#
+# Only the exit status is looked at; nothing parses the rule definition that
+# comes back.
+#
+# Takes no arguments.
+#
+# Returns the command as a single string ready to hand to the runner, whose
+# exit status is 0 when the rule is there.
+#
+#     $self->_describe_command;
+#     #   gcloud compute security-policies rules describe 1000 --security-policy my-policy
+#
+#     # with the project option set, it is appended
+#     #   gcloud compute security-policies rules describe 1000 --security-policy my-policy --project my-project
 sub _describe_command {
 	my ($self) = @_;
 
@@ -228,8 +317,52 @@ sub _describe_command {
 		. $self->_suffix;
 } ## end sub _describe_command
 
-# Internal helper. Runs a command unless testing, raising the passed error flag
-# on a non-zero exit.
+# Internal helper. Runs one gcloud command, turns a non zero exit into an
+# error, and optionally undoes a speculative state change first.
+#
+# The rollback exists because of the order the ban path works in. The address
+# is added to the internal ban list before the command runs, since the command
+# is built from that list, so a failed push would otherwise leave the object
+# believing an address is banned when nothing was written. Handing in a
+# closure that removes it again keeps the internal state honest.
+#
+# It has to run before warn rather than after, because errors in this dist are
+# fatal by default: warn may not return, and anything after it would never
+# execute.
+#
+# Only the paths that add something pass a rollback. Unbanning removes from
+# the list before the command too, but leaving an address out of the list
+# after a failed unban is the safer of the two wrong answers, so those callers
+# pass nothing.
+#
+# stderr is folded into stdout so that whatever gcloud complained about ends
+# up in the errorString. The output is only used for that; nothing parses it.
+#
+# Args:
+#
+#     command    - The complete shell command to run, as a plain string,
+#                  normally from _update_command or _describe_command. Run
+#                  through the shell, so it is expected to be already quoted
+#                  as needed.
+#
+#     error_flag - The numeric error code to raise on a non zero exit, so the
+#                  error reads as the operation that triggered it. Callers
+#                  pass the code matching themselves: 12 from init, 13 from
+#                  ban, 14 from unban, 31 and 32 from the CIDR paths.
+#
+#     rollback   - Optional coderef, called with no arguments if and only if
+#                  the command fails, before the error is raised. Expected to
+#                  undo whatever internal state change was made in
+#                  anticipation of the command succeeding. Omitted by callers
+#                  that have nothing to undo.
+#
+# Returns nothing, on success and on failure alike.
+#
+#     # from init, just verifying the rule is there
+#     $self->_run( $self->_describe_command, 12 );
+#
+#     # from ban, undoing the speculative add if the push fails
+#     $self->_run( $command, 13, sub { delete( $self->{banned}{ $opts{ban} } ) } );
 sub _run {
 	my ( $self, $command, $error_flag, $rollback ) = @_;
 
@@ -398,24 +531,6 @@ sub unban {
 		$self->_run( $command, 14 );
 	}
 } ## end sub unban
-
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
 
 =head2 ban_cidr
 
@@ -590,13 +705,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	{
 		local $@;

@@ -62,6 +62,7 @@ t/clone_dir_rsync.t
 t/clone_sequence.t
 t/driver_destroy_wait.t
 t/fast_destroy.t
+t/install_child_diag.t
 t/instance_dir_user.t
 t/lib/QDB/DriverBody.pm
 t/lib/QDB/FakeDriver.pm

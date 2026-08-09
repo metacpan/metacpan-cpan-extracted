@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.80      2026-08-08 20:51:23 -0600
+  - bump gh action templates to v6
+  - Drop support for Perl 5.20 (new min: 5.22)
+  - New template starter for v5.42
+
 2.79      2024-12-22 09:20:54 -0700
   - Update linux workflow to test back to 5.20 by default
   - Add .vscode/settings.json to minted dist

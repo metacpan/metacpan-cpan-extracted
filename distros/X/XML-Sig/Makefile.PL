@@ -44,12 +44,13 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "File::Which" => 0,
     "Import::Into" => 0,
+    "Path::Tiny" => 0,
     "Test::Exception" => 0,
     "Test::Lib" => 0,
     "Test::More" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.72",
+  "VERSION" => "0.73",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +75,7 @@ my %FallbackPrereqs = (
   "File::Which" => 0,
   "Import::Into" => 0,
   "MIME::Base64" => 0,
+  "Path::Tiny" => 0,
   "Test::Exception" => 0,
   "Test::Lib" => 0,
   "Test::More" => 0,

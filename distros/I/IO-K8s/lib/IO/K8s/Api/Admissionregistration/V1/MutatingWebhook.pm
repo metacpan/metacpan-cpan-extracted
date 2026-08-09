@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::MutatingWebhook;
 # ABSTRACT: MutatingWebhook describes an admission webhook and the resources and operations it applies to.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s admissionReviewVersions => [Str], 'required';
@@ -53,7 +53,7 @@ IO::K8s::Api::Admissionregistration::V1::MutatingWebhook - MutatingWebhook descr
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 admissionReviewVersions
 

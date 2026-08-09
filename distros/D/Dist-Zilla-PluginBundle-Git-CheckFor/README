@@ -5,8 +5,8 @@ NAME
 
 VERSION
 
-    This document describes version 0.014 of
-    Dist::Zilla::PluginBundle::Git::CheckFor - released October 10, 2016 as
+    This document describes version 0.015 of
+    Dist::Zilla::PluginBundle::Git::CheckFor - released August 08, 2026 as
     part of Dist-Zilla-PluginBundle-Git-CheckFor.
 
 SYNOPSIS
@@ -36,7 +36,7 @@ SEE ALSO
 BUGS
 
     Please report any bugs or feature requests on the bugtracker website
-    https://github.com/RsrchBoy/dist-zilla-pluginbundle-git-checkfor/issues
+    https://github.com/rsrchboy/dist-zilla-pluginbundle-git-checkfor/issues
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -44,19 +44,6 @@ BUGS
 AUTHOR
 
     Chris Weyl <cweyl@alumni.drew.edu>
-
- I'm a material boy in a material world
-
-    Please note I do not expect to be gittip'ed or flattr'ed for this work,
-    rather it is simply a very pleasant surprise. I largely create and
-    release works like this because I need them or I find it enjoyable;
-    however, don't let that stop you if you feel like it ;)
-
-    Flattr
-    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-pluginbundle-git-checkfor&title=RsrchBoy's%20CPAN%20Dist-Zilla-PluginBundle-Git-CheckFor&tags=%22RsrchBoy's%20Dist-Zilla-PluginBundle-Git-CheckFor%20in%20the%20CPAN%22>,
-    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
-    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
-    desire.
 
 CONTRIBUTORS
 
@@ -70,7 +57,7 @@ CONTRIBUTORS
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2012 by Chris Weyl.
+    This software is Copyright (c) 2026 by Chris Weyl.
 
     This is free software, licensed under:
 

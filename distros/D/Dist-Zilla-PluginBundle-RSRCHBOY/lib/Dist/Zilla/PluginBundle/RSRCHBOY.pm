@@ -9,13 +9,13 @@
 #
 package Dist::Zilla::PluginBundle::RSRCHBOY;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.077-3-g12514dc
-$Dist::Zilla::PluginBundle::RSRCHBOY::VERSION = '0.078';
+# git description: 0.078-3-gd1e63e8
+$Dist::Zilla::PluginBundle::RSRCHBOY::VERSION = '0.079';
 
 # ABSTRACT: Zilla your distributions like RSRCHBOY!
 
 use utf8;
-use v5.18;
+use v5.38;
 
 use Moose;
 use namespace::autoclean;
@@ -147,7 +147,7 @@ sub release_plugins {
 
         [ 'Git::Tag' => { tag_format  => '%v', signed => $self->sign } ],
 
-        $ENV{TRAVIS} ? () : (
+        $ENV{CI} ? () : (
             [ 'Git::CommitBuild' => 'Git::CommitBuild::Build' => { } ],
             [ 'Git::CommitBuild' => 'Git::CommitBuild::Release' => {
                 release_branch       => 'release/cpan',
@@ -378,7 +378,7 @@ Dist::Zilla::PluginBundle::RSRCHBOY - Zilla your distributions like RSRCHBOY!
 
 =head1 VERSION
 
-This document describes version 0.078 of Dist::Zilla::PluginBundle::RSRCHBOY - released August 07, 2026 as part of Dist-Zilla-PluginBundle-RSRCHBOY.
+This document describes version 0.079 of Dist::Zilla::PluginBundle::RSRCHBOY - released August 08, 2026 as part of Dist-Zilla-PluginBundle-RSRCHBOY.
 
 =head1 SYNOPSIS
 

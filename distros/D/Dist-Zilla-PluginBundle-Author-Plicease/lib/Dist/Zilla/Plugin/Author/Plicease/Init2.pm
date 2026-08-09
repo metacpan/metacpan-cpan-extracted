@@ -1,8 +1,9 @@
-use 5.020;
+use 5.022;
 use stable qw( postderef );
+use experimental qw( signatures );
 use true;
 
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.80 {
 
   use Moose;
   use Dist::Zilla::File::InMemory;
@@ -150,10 +151,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
     },
   );
 
-  sub make_module
+  sub make_module ( $self, $arg )
   {
-    my($self, $arg) = @_;
-
     my $template_name;
 
     if($self->type_dzil)
@@ -167,6 +166,10 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
     elsif($self->type_app)
     {
       $template_name = 'App.pm';
+    }
+    elsif($self->perl_version >= 5.042)
+    {
+      $template_name = 'P5042.pm';
     }
     elsif($self->perl_version >= 5.020)
     {
@@ -191,10 +194,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
     }
   }
 
-  sub experimental
+  sub experimental ( $self )
   {
-    my($self) = @_;
-
     my %x;
 
     if($self->perl_version >= 5.020)
@@ -224,10 +225,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
     return join(' ', sort keys %x);
   }
 
-  sub gather_files
+  sub gather_files ( $self, $arg = undef )
   {
-    my($self, $arg) = @_;
-
     $self->gather_file_dist_ini($arg);
 
     $self->gather_file_simple  ('.gitattributes');
@@ -246,9 +245,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
     }
   }
 
-  sub gather_file_simple
+  sub gather_file_simple ( $self, $filename )
   {
-    my($self, $filename) = @_;
     my $content = $self->section_data("dist/$filename")->$*;
     $content =~ s/\s*\z/"\n"/e;
     $self->log_fatal("no bundled file dist/$filename") unless $content;
@@ -259,9 +257,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
     $self->add_file($file);
   }
 
-  sub gather_file_template
+  sub gather_file_template ( $self, $template_name, $filename = undef )
   {
-    my($self, $template_name, $filename) = @_;
     $filename //= $template_name;
     my $template = $self->section_data("template/$template_name")->$*;
     $template =~ s/\s*\z/"\n"/e;
@@ -279,10 +276,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
     $self->add_file($file);
   }
 
-  sub gather_file_dist_ini
+  sub gather_file_dist_ini ( $self, $arg )
   {
-    my($self, $arg) = @_;
-
     my $zilla = $self->zilla;
 
     my $template = $self->section_data("template/dist.ini");
@@ -371,10 +366,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
     },
   );
 
-  sub after_mint
+  sub after_mint ( $self, $opts )
   {
-    my($self, $opts) = @_;
-
     unless(eval { require Git::Wrapper })
     {
       $self->zilla->log("no Git::Wrapper, can't create repository");
@@ -460,7 +453,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.79
+version 2.80
 
 =head1 DESCRIPTION
 
@@ -472,7 +465,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2022 by Graham Ollis.
+This software is copyright (c) 2012-2024 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -733,6 +726,14 @@ package {{ $name =~ s/-/::/gr }} {
     # ABSTRACT: {{ $abstract }}
 }
 
+@@ template/P5042.pm
+use warnings;
+use v{{ $perl_version =~ s/^5.0/5./r }};
+
+package {{ $name =~ s/-/::/gr }} {
+
+    # ABSTRACT: {{ $abstract }}
+}
 
 @@ template/bin.pl
 use warnings;
@@ -824,7 +825,7 @@ jobs:
       CIP_TAG: static
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Bootstrap CIP
         run: |
@@ -872,7 +873,7 @@ jobs:
       CIP_TAG: ${{ matrix.cip_tag }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Bootstrap CIP
         run: |
@@ -885,7 +886,7 @@ jobs:
           cip cache-key
 
       - name: Cache CPAN modules
-        uses: actions/cache@v2
+        uses: actions/cache@v6
         with:
           path: ~/.cip
           key: ${{ runner.os }}-build-${{ steps.cache-key.outputs.key }}
@@ -945,7 +946,7 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Set up Perl
         run: |
@@ -960,7 +961,7 @@ jobs:
           perl -V > perlversion.txt
 
       - name: Cache CPAN modules
-        uses: actions/cache@v1
+        uses: actions/cache@v6
         env:
           cache-name: cache-cpan-modules
         with:
@@ -1011,7 +1012,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Set up Perl
         run: |
@@ -1028,7 +1029,7 @@ jobs:
           ls -l perlversion.txt
 
       - name: Cache CPAN modules
-        uses: actions/cache@v1
+        uses: actions/cache@v6
         with:
           path: ~/perl5
           key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
@@ -1091,7 +1092,7 @@ jobs:
           git config --global core.eol lf
         shell: powershell
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Set up Cygwin
         uses: egor-tensin/setup-cygwin@v3
@@ -1111,7 +1112,7 @@ jobs:
           ls perlversion.txt
 
       - name: Cache CPAN modules
-        uses: actions/cache@v1
+        uses: actions/cache@v6
         with:
           path: c:\cx
           key: ${{ runner.os }}-build-cygwin-${{ hashFiles('perlversion.txt') }}
@@ -1183,7 +1184,7 @@ jobs:
           git config --global core.eol lf
         shell: powershell
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Set up Perl
         uses: msys2/setup-msys2@v2
@@ -1204,7 +1205,7 @@ jobs:
           ls perlversion.txt
 
       - name: Cache CPAN modules
-        uses: actions/cache@v1
+        uses: actions/cache@v6
         with:
           path: c:\cx
           key: ${{ runner.os }}-build-msys2-${{ hashFiles('perlversion.txt') }}

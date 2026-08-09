@@ -7,7 +7,7 @@ use Test::Exception;
 use IO::K8s;
 use IO::K8s::Cilium;
 
-# --- All Cilium CRD classes (matching upstream Cilium v1.19.2) ---
+# --- All Cilium CRD classes (matching upstream Cilium v1.20.0) ---
 
 my %v2_classes = (
     CiliumNetworkPolicy            => { plural => 'ciliumnetworkpolicies',            namespaced => 1 },
@@ -34,9 +34,10 @@ my %v2alpha1_classes = (
     CiliumL2AnnouncementPolicy => { plural => 'ciliuml2announcementpolicies', namespaced => 0 },
     CiliumGatewayClassConfig   => { plural => 'ciliumgatewayclassconfigs',    namespaced => 1 },
     CiliumPodIPPool            => { plural => 'ciliumpodippools',             namespaced => 0 },
+    CiliumDatapathPlugin       => { plural => 'ciliumdatapathplugins',        namespaced => 0 },
 );
 
-# --- Load all 21 classes ---
+# --- Load all 22 classes ---
 
 subtest 'load all Cilium classes' => sub {
     for my $kind (sort keys %v2_classes) {
@@ -90,7 +91,7 @@ subtest 'IO::K8s::Cilium resource_map' => sub {
     ok($provider->does('IO::K8s::Role::ResourceMap'), 'consumes ResourceMap role');
 
     my $map = $provider->resource_map;
-    is(scalar keys %$map, 21, 'resource_map has 21 entries');
+    is(scalar keys %$map, 22, 'resource_map has 22 entries');
 
     for my $kind (sort keys %v2_classes) {
         ok(exists $map->{$kind}, "$kind in resource_map");
@@ -199,6 +200,19 @@ subtest 'new_object and inflate round-trip' => sub {
     isa_ok($gw, 'IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfig');
     is($gw->api_version, 'cilium.io/v2alpha1', 'GatewayClassConfig api_version');
     ok($gw->does('IO::K8s::Role::Namespaced'), 'CiliumGatewayClassConfig is namespaced');
+
+    # New in v1.20.0: CiliumDatapathPlugin (Extensible Datapath)
+    my $cddp = $k8s->new_object('CiliumDatapathPlugin',
+        metadata => { name => 'my-plugin' },
+        spec => { attachmentPolicy => 'BestEffort', version => '1.0.0' },
+    );
+    isa_ok($cddp, 'IO::K8s::Cilium::V2alpha1::CiliumDatapathPlugin');
+    is($cddp->kind, 'CiliumDatapathPlugin', 'CiliumDatapathPlugin kind');
+    is($cddp->api_version, 'cilium.io/v2alpha1', 'CiliumDatapathPlugin api_version');
+    ok(!$cddp->does('IO::K8s::Role::Namespaced'), 'CiliumDatapathPlugin is cluster-scoped');
+    my $cddp_re = $k8s->inflate($k8s->object_to_json($cddp));
+    isa_ok($cddp_re, 'IO::K8s::Cilium::V2alpha1::CiliumDatapathPlugin');
+    is($cddp_re->metadata->name, 'my-plugin', 'CiliumDatapathPlugin round-trip');
 };
 
 # --- to_yaml output ---

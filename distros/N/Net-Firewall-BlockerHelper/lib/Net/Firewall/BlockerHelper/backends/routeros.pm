@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::routeros;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::routeros - MikroTik RouterOS backend for
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -255,9 +255,30 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the SSH command prefix string built from the
-# ssh_cmd, ssh_port, identity, user, and host options, e.g.
-# "ssh -p 22 -i /key admin@host".
+# Internal helper. Assembles the SSH invocation used to reach the router,
+# everything up to but not including the RouterOS command itself.
+#
+# The port and identity are only emitted when their options are set to
+# something non empty, so an instance relying on the SSH client's own
+# configuration, a ~/.ssh/config Host block or the default port and key,
+# produces a short command rather than one with empty flags in it. The user
+# and host are always emitted, as there is no sensible fallback for either.
+#
+# Note there is no authentication handling here beyond pointing at an identity
+# file. Key based authentication is assumed; a router that prompts for a
+# password would hang rather than fail, so the key has to be in place before
+# this backend is usable.
+#
+# Takes no arguments; everything comes from the options.
+#
+# Returns the SSH prefix as a single string with no trailing space, ready for
+# _remote to append a quoted RouterOS command to.
+#
+#     # with only user and host set, user defaulting to admin
+#     $self->_ssh;                  # ssh admin@10.0.0.1
+#
+#     # with ssh_port 2222 and an identity file
+#     $self->_ssh;                  # ssh -p 2222 -i /etc/routeros.key admin@10.0.0.1
 sub _ssh {
 	my ($self) = @_;
 
@@ -280,8 +301,32 @@ sub _ssh {
 	return $ssh;
 } ## end sub _ssh
 
-# Internal helper. Given a RouterOS CLI line, returns the full command to
-# run it over SSH, e.g. <_ssh> '<routeros_cli>'.
+# Internal helper. Wraps a RouterOS CLI line into the full shell command that
+# runs it on the router over SSH. Every command this backend issues goes out
+# through here.
+#
+# The RouterOS side is wrapped in single quotes so that the local shell hands
+# it to ssh as one argument rather than splitting it on the spaces that
+# RouterOS syntax is full of. Note that this means a CLI line containing a
+# single quote of its own would break the quoting; nothing here escapes them,
+# and no caller passes one, since the values that reach this are addresses and
+# list names.
+#
+# Args:
+#
+#     routeros_cli - The RouterOS CLI line to run, as a plain string, such as
+#                    '/ip firewall address-list add list=kur_ssh address=10.0.0.1'.
+#                    Passed through as is apart from being quoted.
+#
+# Returns the full local shell command as a single string, ready to hand to
+# the runner, of the shape "<ssh prefix> '<cli line>'".
+#
+#     $self->_remote('/ip firewall address-list print');
+#     #   ssh admin@10.0.0.1 '/ip firewall address-list print'
+#
+#     $self->_remote(
+#         '/ip firewall address-list add list=kur_ssh address=10.0.0.1' );
+#     #   ssh admin@10.0.0.1 '/ip firewall address-list add list=kur_ssh address=10.0.0.1'
 sub _remote {
 	my ( $self, $routeros_cli ) = @_;
 
@@ -501,24 +546,6 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
 =head2 ban_cidr
 
 Bans a CIDR range by adding it to the relevant address-list. RouterOS
@@ -728,13 +755,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants

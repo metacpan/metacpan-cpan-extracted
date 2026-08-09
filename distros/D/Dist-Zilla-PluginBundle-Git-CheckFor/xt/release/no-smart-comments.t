@@ -2,7 +2,7 @@
 #
 # This file is part of Dist-Zilla-PluginBundle-Git-CheckFor
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2026 by Chris Weyl.
 #
 # This is free software, licensed under:
 #

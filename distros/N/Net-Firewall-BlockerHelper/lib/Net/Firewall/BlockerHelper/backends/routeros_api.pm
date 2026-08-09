@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::routeros_api;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::routeros_api - MikroTik RouterOS backend
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -260,15 +260,64 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the address-list name for the passed IP's family.
+# Internal helper. Returns which configured address-list an address belongs
+# in.
+#
+# RouterOS keeps IPv4 and IPv6 address-lists under separate menus, so a name
+# is looked up per family. Note the two default to the same value, prefix and
+# name joined, since the menus already keep them apart; they only differ if
+# the list4 and list6 options are set explicitly.
+#
+# Args:
+#
+#     ip - The address whose list is wanted, as a plain string. Expected to be
+#          an already validated and lowercased IPv4 or IPv6 address. Matched
+#          against $IPv4_re, so anything that is not valid IPv4 selects the
+#          IPv6 list. Ranges must have their address extracted with
+#          _cidr_addr first.
+#
+# Returns the list name as a plain string, from either the list4 or the list6
+# option.
+#
+#     # with both defaulting from prefix "kur" and name "ssh"
+#     $self->_list_name('10.0.0.1');      # kur_ssh
+#     $self->_list_name('2001:db8::1');   # kur_ssh
 sub _list_name {
 	my ( $self, $ip ) = @_;
 
 	return ( $ip =~ /\A$IPv4_re\z/ ) ? $self->{options}{list4} : $self->{options}{list6};
 }
 
-# Internal helper. Returns the address-list REST endpoint for the passed IP's
-# family (or IPv4 if no IP is given).
+# Internal helper. Returns the REST endpoint of the address-list menu for an
+# address's family.
+#
+# RouterOS exposes IPv4 and IPv6 firewall configuration under different menus,
+# ip and ipv6, so the family is part of the path rather than a parameter.
+#
+# Note the family test here matches against $IPv6_re and falls back to IPv4,
+# which is the opposite way round to _list_name in the same file. That is what
+# makes the argument optional: called with no address at all it yields the
+# IPv4 endpoint, which is what the paths that just need somewhere to talk to
+# use.
+#
+# Args:
+#
+#     ip - Optional address whose family selects the menu, as a plain string.
+#          Expected to be an already validated and lowercased IPv4 or IPv6
+#          address. When omitted or undef, the IPv4 menu is used.
+#
+# Returns the endpoint as a string, with no trailing slash. Callers append a
+# query string for lookups or an entry id for deletes.
+#
+#     $self->_list_url('10.0.0.1');
+#     #   https://router.example.org/rest/ip/firewall/address-list
+#
+#     $self->_list_url('2001:db8::1');
+#     #   https://router.example.org/rest/ipv6/firewall/address-list
+#
+#     # with no address, defaulting to IPv4
+#     $self->_list_url;
+#     #   https://router.example.org/rest/ip/firewall/address-list
 sub _list_url {
 	my ( $self, $ip ) = @_;
 
@@ -277,26 +326,51 @@ sub _list_url {
 	return $self->{options}{scheme} . '://' . $self->{options}{host} . '/rest/' . $menu . '/firewall/address-list';
 }
 
-# Internal helper. Minimal percent encoder so URI::Escape is not needed.
-sub _uri_escape {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
-
-	return $string;
-}
-
-# Internal helper. Returns a canonical JSON::PP encoder/decoder.
-sub _json {
-	my ($self) = @_;
-
-	require JSON::PP;
-	return JSON::PP->new->canonical->utf8;
-}
-
-# Internal helper. Performs a HTTP request via LWP::UserAgent using HTTP basic
-# auth, returning the decoded JSON body (or undef for an empty body) and dying
-# with an explanation on any HTTP level failure. Never called in testing mode.
+# Internal helper. Performs one HTTP request against the RouterOS REST API.
+# Every call this backend makes to the router goes through here.
+#
+# The user agent is built on first use and cached on the object, so a run of
+# requests shares one agent. LWP::UserAgent is loaded with require at that
+# point rather than at compile time, since only the HTTP backends need it;
+# failing to load it dies with an explanation naming this backend. The
+# insecure option turns off certificate verification, which is there because a
+# RouterOS device commonly presents a self signed certificate.
+#
+# Authentication is HTTP basic, encoded per request; there is no session to
+# establish.
+#
+# Any HTTP level failure dies rather than setting an error. The callers wrap
+# this in eval and turn the exception into the appropriate error code, which
+# is what lets one helper serve paths that report ban, unban, and teardown
+# failures differently.
+#
+# A body that fails to decode as JSON is not fatal; the decode runs inside its
+# own eval and leaves the result undef.
+#
+# Never called in testing mode; those paths record the request instead.
+#
+# Args:
+#
+#     method - The HTTP method, as a plain string: 'GET' for the entry
+#              lookups, 'PUT' to add an entry, 'DELETE' to remove one.
+#
+#     url    - The full URL to request, as a plain string, built on
+#              _list_url.
+#
+#     body   - Optional request body, as an already encoded JSON string. undef
+#              for the lookups and deletes, which carry everything in the URL.
+#
+# Returns the decoded response body as whatever structure the JSON held. Note
+# that for the lookups this is an arrayref of matching entries rather than a
+# hashref, which is why the callers check the reference type. undef when the
+# response body was empty or did not parse. Dies on any non success HTTP
+# status.
+#
+#     my $decoded = $self->_request( 'GET', $self->_unban_lookup_url($ip) );
+#
+#     # the usual shape at the call sites
+#     eval { $self->_request( 'PUT', $self->_list_url($ip), $body ); };
+#     if ($@) { ... raise banFailed ... }
 sub _request {
 	my ( $self, $method, $url, $body ) = @_;
 
@@ -449,8 +523,31 @@ sub ban {
 	$self->{banned}{ $opts{ban} } = 1;
 } ## end sub ban
 
-# Internal helper. Returns the lookup URL used to find the address-list entry
-# ID for the passed IP.
+# Internal helper. Returns the URL that finds the address-list entry for one
+# address.
+#
+# This exists because RouterOS entries are addressed by an opaque internal id
+# rather than by their contents. There is no way to delete "the entry for
+# 10.0.0.1"; the id has to be looked up first and then deleted. That is why
+# unbanning here takes two round trips while banning takes one.
+#
+# The query filters on both the list name and the address, so an entry
+# belonging to another instance's list on the same router is not matched.
+#
+# Args:
+#
+#     ip - The address whose entry is wanted, as a plain string. Expected to
+#          be an already validated and lowercased IPv4 or IPv6 address. The
+#          family selects both the menu and the list name.
+#
+# Returns the URL as a string, for a GET that answers with an array of
+# matching entries.
+#
+#     $self->_unban_lookup_url('10.0.0.1');
+#     #   https://router.example.org/rest/ip/firewall/address-list?list=kur_ssh&address=10.0.0.1
+#
+#     $self->_unban_lookup_url('2001:db8::1');
+#     #   https://router.example.org/rest/ipv6/firewall/address-list?list=kur_ssh&address=2001%3Adb8%3A%3A1
 sub _unban_lookup_url {
 	my ( $self, $ip ) = @_;
 
@@ -462,9 +559,38 @@ sub _unban_lookup_url {
 		. $self->_uri_escape($ip);
 } ## end sub _unban_lookup_url
 
-# Internal helper. Looks up the address-list entry for the IP and deletes it by
-# its ".id". An entry that can not be found is treated as already unbanned.
-# Dies on failure. Never called in testing mode.
+# Internal helper. Performs the full two step unban of one address: find its
+# address-list entry, then delete it by id.
+#
+# The two steps are wrapped together because neither is useful alone and the
+# id from the first is the only way to address the second.
+#
+# A lookup that matches nothing is treated as success rather than as an error.
+# The entry having already gone, whether removed by hand or by another
+# process, means the address is not banned, which is exactly what the caller
+# wanted. Erroring there would make an unban fail for having already achieved
+# its goal.
+#
+# Only the first match is acted on. Duplicates should not exist given the list
+# and address filter, and leaving any extras would be visible on the next
+# unban rather than silently wrong.
+#
+# Never called in testing mode; that path records the request instead.
+#
+# Args:
+#
+#     ip - The address to unban, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, spelled the same way
+#          it was when banned.
+#
+# Returns nothing. Dies if either request fails at the HTTP level, which the
+# caller catches and turns into unbanFailed.
+#
+#     $self->_unban_ip('10.0.0.1');
+#
+#     # the usual shape at the call site
+#     eval { $self->_unban_ip( $opts{ban} ); };
+#     if ($@) { ... raise unbanFailed ... }
 sub _unban_ip {
 	my ( $self, $ip ) = @_;
 
@@ -555,26 +681,26 @@ sub unban {
 	delete( $self->{banned}{ $opts{ban} } );
 } ## end sub unban
 
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
-
-# Internal helper. Returns the address portion of a CIDR range so its family can
-# be determined via the same helpers used for single IPs.
+# Internal helper. Strips the prefix length off a CIDR range, leaving just the
+# address.
+#
+# This is what lets the CIDR paths reuse _list_name and _list_url unchanged. A
+# range always carries a "/", which would never match either of those helpers'
+# family regexps, so every range would be misfiled as IPv6. Passing the
+# address portion instead gets the family right without needing CIDR aware
+# copies of both helpers.
+#
+# Args:
+#
+#     cidr - The range to strip, as a plain string. Expected to be an already
+#            validated CIDR range such as "10.0.0.0/8". A value with no prefix
+#            is returned unchanged, so this is safe to call on a bare address.
+#
+# Returns the address portion as a plain string.
+#
+#     $self->_cidr_addr('10.0.0.0/8');      # 10.0.0.0
+#     $self->_cidr_addr('2001:db8::/32');   # 2001:db8::
+#     $self->_cidr_addr('10.0.0.1');        # 10.0.0.1, unchanged
 sub _cidr_addr {
 	my ( $self, $cidr ) = @_;
 
@@ -724,9 +850,32 @@ sub unban_cidr {
 	delete( $self->{banned_cidr}{ $opts{ban} } );
 } ## end sub unban_cidr
 
-# Internal helper. Looks up the address-list entry for the CIDR range and deletes
-# it by its ".id". An entry that can not be found is treated as already
-# unbanned. Dies on failure. Never called in testing mode.
+# Internal helper. Performs the full two step unban of one CIDR range, the
+# range counterpart of _unban_ip.
+#
+# The shape is identical, a lookup for the entry id followed by a delete, and
+# a lookup matching nothing is treated as success for the same reason.
+#
+# The one difference is which value is used where. The family is worked out
+# from the address portion, via _cidr_addr, so the right menu and list name
+# are chosen, but the address filter in the query is the full range, since
+# that is what the entry actually holds. Building the URL inline rather than
+# calling _unban_lookup_url is what allows that split.
+#
+# Never called in testing mode; that path records the request instead.
+#
+# Args:
+#
+#     cidr - The range to unban, as a plain string. Expected to be an already
+#            validated and lowercased CIDR range, spelled the same way it was
+#            when banned.
+#
+# Returns nothing. Dies if either request fails at the HTTP level, which the
+# caller catches and turns into unbanCidrFailed.
+#
+#     $self->_unban_cidr_entry('10.0.0.0/8');
+#     #   GET  https://router.example.org/rest/ip/firewall/address-list?list=kur_ssh&address=10.0.0.0%2F8
+#     #   then DELETE https://router.example.org/rest/ip/firewall/address-list/<id>
 sub _unban_cidr_entry {
 	my ( $self, $cidr ) = @_;
 
@@ -813,13 +962,6 @@ sub re_init {
 	my ( $self, %opts ) = @_;
 
 	$self->errorblank;
-
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
 
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from

@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "BarefootJS" : "v0.31.2",
+            "BarefootJS" : "v0.31.4",
             "Text::Xslate" : "v3.4.0",
             "perl" : "5.020"
          }
@@ -46,7 +46,7 @@
    "provides" : {
       "BarefootJS::Backend::Xslate" : {
          "file" : "lib/BarefootJS/Backend/Xslate.pm",
-         "version" : "v0.31.2"
+         "version" : "v0.31.4"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/piconic-ai/barefootjs"
       }
    },
-   "version" : "v0.31.2",
+   "version" : "v0.31.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

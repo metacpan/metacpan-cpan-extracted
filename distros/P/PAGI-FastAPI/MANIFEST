@@ -8,7 +8,6 @@ eg/lib/MyApp/Schema/Result/User.pm
 lib/PAGI/FastAPI.pm
 lib/PAGI/FastAPI/Context.pm
 lib/PAGI/FastAPI/Depends.pm
-lib/PAGI/FastAPI/WebSocket.pm
 LICENSE
 Makefile.PL
 MANIFEST

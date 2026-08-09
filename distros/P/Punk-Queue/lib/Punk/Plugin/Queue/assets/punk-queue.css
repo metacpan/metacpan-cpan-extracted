@@ -1,0 +1,356 @@
+/* punk-queue.css - the override layer, served after the vendored Funky
+ * css (themes.css included). Three jobs:
+ *
+ *   1. The icon-font checkpoint: FontAwesome is NOT vendored. i.fas is
+ *      neutralised into a plain inline element and the classes this UI
+ *      actually renders get unicode glyphs via ::before. No font files.
+ *   2. The Bootstrap checkpoint: Bootstrap is NOT vendored. Funky's
+ *      modal/toast/buttons emit Bootstrap structural class names; this
+ *      file implements exactly the classes these pages render, on the
+ *      --pro-* tokens so light/dark follow themes.css.
+ *   3. The queue's own layout: nav, panels, state colours.
+ */
+
+/* ---- 1. FontAwesome neutralisation ------------------------------------- */
+
+i.fas, i.far {
+    font-style: normal;
+    display: inline-block;
+    min-width: 1em;
+    text-align: center;
+    line-height: 1;
+}
+i.fas::before { content: "\2022"; }              /* fallback: bullet */
+
+.fa-check-circle::before        { content: "\2713"; }   /* check */
+.fa-exclamation-circle::before  { content: "\0021"; }   /* ! */
+.fa-exclamation-triangle::before{ content: "\26A0"; }   /* warning */
+.fa-info-circle::before         { content: "\2139"; }   /* info */
+.fa-question-circle::before     { content: "\003F"; }   /* ? */
+.fa-times::before               { content: "\00D7"; }   /* multiply */
+.fa-times-circle::before        { content: "\2297"; }
+.fa-search::before              { content: "\2315"; }   /* magnifier */
+.fa-columns::before             { content: "\25EB"; }
+.fa-file-csv::before,
+.fa-file-excel::before,
+.fa-file-upload::before         { content: "\2913"; }
+.fa-inbox::before               { content: "\2205"; }   /* empty set */
+.fa-filter::before              { content: "\25BD"; }
+.fa-save::before                { content: "\2193"; }
+.fa-check::before               { content: "\2713"; }
+.fa-mouse-pointer::before       { content: "\2196"; }
+.fa-spinner::before             { content: "\27F3"; }
+.fa-redo::before                { content: "\21BB"; }   /* retry */
+.fa-trash::before               { content: "\2326"; }   /* remove */
+.fa-clock::before               { content: "\23F1"; }
+.fa-play-circle::before         { content: "\25B6"; }
+.fa-list::before                { content: "\2261"; }
+.fa-chart-bar::before           { content: "\2593"; }
+.fa-users::before, .fa-user::before { content: "\263A"; }
+.fa-lock::before                { content: "\1F512"; }
+.fa-calendar::before            { content: "\1F4C5"; }
+.fa-spin { animation: pq-spin 1s linear infinite; }
+@keyframes pq-spin { to { transform: rotate(360deg); } }
+
+/* ---- 2. Bootstrap structural classes ------------------------------------ */
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0; border: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.d-flex { display: flex; }
+.gap-2  { gap: .5rem; }
+.me-2   { margin-right: .5rem; }
+.ms-2   { margin-left: .5rem; }
+.p-3    { padding: 1rem; }
+.position-fixed { position: fixed; }
+.top-0  { top: 0; }
+.end-0  { right: 0; }
+
+.text-success { color: var(--pro-accent-success, #3fb950); }
+.text-danger  { color: var(--pro-accent-danger,  #f85149); }
+.text-warning { color: var(--pro-accent-warning, #d29922); }
+.text-info    { color: var(--pro-accent-info,  #58a6ff); }
+.text-muted   { color: var(--pro-text-secondary, #8b949e); }
+
+.btn {
+    display: inline-block;
+    padding: .375rem .75rem;
+    font-size: .9rem;
+    border-radius: .3rem;
+    border: 1px solid var(--pro-border-color, #30363d);
+    background: var(--pro-bg-secondary, #161b22);
+    color: var(--pro-text-primary, #e6edf3);
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.4;
+}
+.btn:hover { filter: brightness(1.15); }
+.btn:focus-visible { outline: 2px solid var(--pro-accent-primary, #2f81f7); outline-offset: 1px; }
+.btn-sm { padding: .2rem .5rem; font-size: .8rem; }
+.btn-primary { background: var(--pro-accent-primary, #2f81f7); border-color: var(--pro-accent-primary, #2f81f7); color: #fff; }
+.btn-danger  { background: var(--pro-accent-danger, #f85149); border-color: var(--pro-accent-danger, #f85149); color: #fff; }
+.btn-secondary, .btn-outline-secondary { background: transparent; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-close {
+    border: 0; background: transparent; color: inherit;
+    font-size: 1.1rem; cursor: pointer; padding: .25rem .5rem;
+}
+.btn-close::before { content: "\00D7"; }
+
+/* modal: Funky's modal.js replaces the Bootstrap JS but keeps the
+ * markup; these are the classes it toggles */
+.modal {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 1050;
+    overflow-y: auto;
+}
+.modal.show { display: block; }
+.modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 1040;
+}
+.modal-dialog {
+    position: relative;
+    max-width: 480px;
+    margin: 8vh auto;
+    z-index: 1055;
+}
+.modal-dialog-centered { display: flex; align-items: center; min-height: 84vh; }
+.modal-content {
+    width: 100%;
+    background: var(--pro-bg-secondary, #161b22);
+    color: var(--pro-text-primary, #e6edf3);
+    border: 1px solid var(--pro-border-color, #30363d);
+    border-radius: .4rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,.4);
+}
+.modal-header, .modal-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1rem;
+    border-bottom: 1px solid var(--pro-border-color, #30363d);
+}
+.modal-footer { border-bottom: 0; border-top: 1px solid var(--pro-border-color, #30363d); justify-content: flex-end; gap: .5rem; }
+.modal-title { margin: 0; font-size: 1.05rem; }
+.modal-body { padding: 1rem; }
+
+/* toast */
+.toast-container { z-index: 1080; display: flex; flex-direction: column; gap: .5rem; }
+.toast {
+    min-width: 260px; max-width: 380px;
+    background: var(--pro-bg-secondary, #161b22);
+    color: var(--pro-text-primary, #e6edf3);
+    border: 1px solid var(--pro-border-color, #30363d);
+    border-radius: .35rem;
+    box-shadow: 0 6px 24px rgba(0,0,0,.35);
+    opacity: 0; transition: opacity .15s ease;
+}
+.toast.show, .toast.showing { opacity: 1; }
+.toast-header {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .4rem .75rem;
+    border-bottom: 1px solid var(--pro-border-color, #30363d);
+    font-weight: 600;
+}
+.toast-header .btn-close { margin-left: auto; }
+.toast-body { padding: .6rem .75rem; }
+
+/* The bulk action bar. Funky's bulk-actions.js emits `bulk-action-bar`
+ * (singular) and no sheet in the vendored subset styles it - it creates the
+ * bar hidden, then clears the inline display and lets CSS take over, so
+ * without these rules the selection has buttons that look like nothing.
+ * The inner classes are Bootstrap's, like the rest of section 2. */
+.bulk-action-bar {
+    display: none;
+    padding: .5rem .75rem;
+    margin: .5rem 0;
+    background: var(--pro-bg-secondary, #161b22);
+    border: 1px solid var(--pro-border-color, #30363d);
+    border-radius: .35rem;
+}
+.bulk-action-bar.show { display: block; }
+.bulk-action-bar-inner { display: flex; align-items: center; gap: .75rem; }
+.bulk-action-bar .selected-count { margin-right: auto; }
+.bulk-actions-buttons { display: flex; gap: .5rem; }
+
+.badge {
+    display: inline-block;
+    padding: .2rem .55rem;
+    border-radius: 1rem;
+    font-size: .8rem;
+    line-height: 1.4;
+    background: var(--pro-bg-tertiary, #21262d);
+    color: var(--pro-text-primary, #e6edf3);
+}
+.bg-primary { background: var(--pro-accent-primary, #2f81f7); color: #fff; }
+.bg-secondary { background: var(--pro-bg-tertiary, #21262d); }
+
+.align-items-center { align-items: center; }
+.gap-3 { gap: .75rem; }
+
+/* ---- 2b. form controls ---------------------------------------------------
+ * Funky's forms.css themes `.form-control` / `.form-select` and nothing
+ * else, so a bare <input> or <select> keeps the browser's default white
+ * chrome on a dark page. The filter toolbar is bare on purpose - Funky's
+ * .form-control is `width: 100% !important`, which a row of inline filters
+ * does not want - so it is themed here instead. */
+.pq-shell input:not([type="checkbox"]):not([type="radio"]),
+.pq-shell select,
+.pq-shell textarea {
+    background: var(--pro-bg-primary, #0d1117);
+    color: var(--pro-text-primary, #e6edf3);
+    border: 1px solid var(--pro-border-color, #30363d);
+    border-radius: .3rem;
+    padding: .3rem .5rem;
+    font: inherit;
+    font-size: .9rem;
+}
+.pq-shell input:focus, .pq-shell select:focus, .pq-shell textarea:focus {
+    outline: 2px solid var(--pro-accent-primary, #2f81f7);
+    outline-offset: 0;
+    border-color: var(--pro-accent-primary, #2f81f7);
+}
+.pq-shell select option { background: var(--pro-bg-secondary, #161b22); }
+.pq-shell input[type="checkbox"] { accent-color: var(--pro-accent-primary, #2f81f7); }
+
+/* the jobs filter bar: label above control, controls on one row */
+.pq-filters { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; }
+.pq-filters label {
+    display: flex; flex-direction: column; gap: .2rem;
+    font-size: .75rem; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--pro-text-secondary, #8b949e);
+}
+
+/* ---- 3. punk-queue's own layout ----------------------------------------- */
+
+.pq-shell { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+.pq-nav {
+    display: flex; gap: 1rem; align-items: baseline;
+    padding: .5rem 0; margin-bottom: 1rem;
+    border-bottom: 1px solid var(--pro-border-color, #30363d);
+}
+.pq-nav a { color: var(--pro-text-primary, #e6edf3); text-decoration: none; padding: .25rem .5rem; border-radius: .25rem; }
+.pq-nav a:hover { background: var(--pro-bg-tertiary, #21262d); }
+.pq-nav a[aria-current="page"] { background: var(--pro-accent-primary, #2f81f7); color: #fff; }
+.pq-nav .pq-brand { font-weight: 700; margin-right: .5rem; }
+.pq-nav .pq-live { margin-left: auto; font-size: .8rem; color: var(--pro-text-secondary, #8b949e); }
+.pq-nav .pq-live[data-live="on"] { color: var(--pro-accent-success, #3fb950); }
+
+.pq-panel { margin-bottom: 1.25rem; }
+
+/* the overview's by-queue / by-task pair: side by side when it fits */
+.pq-breakdown-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem;
+}
+@media (max-width: 900px) {
+    .pq-breakdown-grid { grid-template-columns: 1fr; }
+}
+/* The name column is the identifying one and must never be elided:
+ * `mail.welc...` is useless among fifty tasks that share a prefix, and it
+ * is worse than useless because it looks like a name. Funky's .funky-table
+ * ellipses every cell (overflow:hidden + max-width:0, which is how it
+ * shares width under table-layout:fixed), so the name cell opts out and
+ * the counts - never more than a few digits - shrink to their content
+ * instead. A name too long for the panel scrolls it sideways; nothing is
+ * hidden and nothing is guessed at. */
+.pq-breakdown-scroll { overflow-x: auto; }
+.pq-breakdown { table-layout: auto; width: 100%; }
+.pq-breakdown th:first-child,
+.pq-breakdown td:first-child {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+    width: auto;
+}
+.pq-breakdown th:not(:first-child),
+.pq-breakdown td:not(:first-child) {
+    text-align: right;
+    width: 1%;                 /* shrink-to-fit: the digits, and no more */
+    max-width: none;
+    white-space: nowrap;
+}
+.pq-breakdown td a { color: inherit; text-decoration: none; }
+.pq-breakdown td a:hover { color: var(--pro-accent-primary, #2f81f7); }
+
+/* navigation links in table rows and the detail panel (the jobs table's
+ * id, a job's parents): the accent says "this goes somewhere", the
+ * hover underline confirms it - unlike the breakdown names above, which
+ * are labels first and links second */
+.funky-table a[data-action="view"],
+.pq-detail dd a {
+    color: var(--pro-accent-primary, #2f81f7);
+    text-decoration: none;
+    font-weight: 600;
+}
+.funky-table a[data-action="view"]:hover,
+.pq-detail dd a:hover { text-decoration: underline; }
+.funky-table a[data-action="view"]:focus-visible,
+.pq-detail dd a:focus-visible {
+    outline: 2px solid var(--pro-accent-primary, #2f81f7);
+    outline-offset: 1px; border-radius: .15rem;
+}
+.pq-breakdown-bad { color: var(--pro-accent-danger, #f85149); font-weight: 600; }
+.pq-breakdown-empty { color: var(--pro-text-secondary, #8b949e); }
+
+/* fifty tasks should not push the rest of the overview off the page */
+.pq-breakdown-scroll { max-height: 22rem; overflow-y: auto; }
+.pq-breakdown thead th { position: sticky; top: 0; z-index: 1; }
+.pq-detail dl { display: grid; grid-template-columns: max-content 1fr; gap: .3rem 1rem; }
+.pq-detail dt { color: var(--pro-text-secondary, #8b949e); }
+.pq-detail pre {
+    background: var(--pro-bg-secondary, #161b22);
+    border: 1px solid var(--pro-border-color, #30363d);
+    border-radius: .3rem; padding: .6rem; overflow-x: auto;
+}
+
+.pq-state { padding: .1rem .5rem; border-radius: 1rem; font-size: .8rem; }
+.pq-state-inactive { background: var(--pro-bg-tertiary, #21262d); }
+.pq-state-active   { background: var(--pro-accent-primary, #2f81f7); color: #fff; }
+.pq-state-finished { background: var(--pro-accent-success, #3fb950); color: #fff; }
+.pq-state-failed   { background: var(--pro-accent-danger, #f85149); color: #fff; }
+
+.pq-stale { color: var(--pro-accent-danger, #f85149); font-weight: 600; }
+
+/* the job page's log table */
+.pq-joblog td { vertical-align: top; }
+.pq-joblog-time { white-space: nowrap; color: var(--pro-text-secondary, #8b949e); }
+.pq-joblog-msg {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85rem; white-space: pre-wrap; word-break: break-word;
+    /* same opt-out as the breakdown's name column: .funky-table td is
+     * overflow:hidden + max-width:0, which squeezes and clips a message
+     * however carefully it is set to wrap */
+    max-width: none; overflow: visible; text-overflow: clip;
+}
+.pq-loglevel { padding: .05rem .45rem; border-radius: 1rem; font-size: .75rem; }
+.pq-loglevel-debug { background: var(--pro-bg-tertiary, #21262d); }
+.pq-loglevel-info  { background: var(--pro-bg-tertiary, #21262d); }
+.pq-loglevel-warn  { background: var(--pro-accent-warning, #d29922); color: #fff; }
+.pq-loglevel-error { background: var(--pro-accent-danger, #f85149); color: #fff; }
+
+/* Search-match highlight. The vendored rule reads --pro-warning and
+ * --pro-text-on-warning, which no vendored sheet DEFINES (themes.css
+ * only has --pro-accent-warning) - the background drops and the #000
+ * fallback paints black-on-dark. Re-anchor it to tokens that exist. */
+.funky-table-highlight {
+    background: var(--pro-accent-warning, #d29922);
+    color: #1c2128;
+}
+
+th.funky-table-th.funky-table-select-cell {
+    text-align: center;
+}
+
+td.funky-table-cell.funky-table-select-cell {
+    text-align: center;
+}
+
+[data-theme="dark"] .funky-table-highlight {
+    color: white;
+}

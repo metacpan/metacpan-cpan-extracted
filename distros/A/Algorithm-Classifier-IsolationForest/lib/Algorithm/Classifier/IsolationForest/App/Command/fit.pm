@@ -290,4 +290,74 @@ sub execute {
 	write_file( $opt->{'o'}, { 'atomic' => 1 }, $model );
 } ## end sub execute
 
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::fit - Fits the model using the specified data and save it
+
+=head1 DESCRIPTION
+
+Trains a model from a CSV and saves it as JSON.  Every column is a
+feature and every row one sample, so all rows need the same column count
+and every value must be numeric.
+
+The tuning switches map onto the constructor arguments:
+
+  - -n :: n_trees
+  - -s :: seed
+  - -m :: sample_size
+  - -e :: extension_level
+  - -c :: contamination
+  - --voting :: voting
+
+With C<--prototype> the schema -- feature names, descriptions, mungers
+and missing policy -- along with C<schema_version> and
+C<schema_description> come from the prototype file, its params supply the
+knob defaults, and the switches above override those params.  See
+PROTOTYPES in L<Algorithm::Classifier::IsolationForest> for the format.
+
+Run it as C<iforest fit>; C<iforest help fit> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help fit> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Checks that C<-i> names a readable CSV, that the numeric knobs parse,
+that C<-e> is only used with C<--extended>, that C<--voting> is C<mean>
+or C<majority>, and that a C<--mungers> spec is readable and accompanied
+by the feature tags (C<-t>) it compiles against.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Builds the model from the CSV and writes it to C<-o>.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
+
 return 1;

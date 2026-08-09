@@ -3,7 +3,7 @@ NAME
     Signatures
 
 VERSION
-    version 0.72
+    version 0.73
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';

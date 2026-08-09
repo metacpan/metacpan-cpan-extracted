@@ -1,0 +1,217 @@
+=head1 NAME
+
+Punk Mailer - the Punk::Queue example application
+
+=head1 SYNOPSIS
+
+    cd example/Mailer
+
+    plackup -p 5000 app.psgi                                    # the web tier
+    punk-queue worker --app bin/queue.pl -q default,mail,reports -j 2   # the workers
+
+    open http://localhost:5000/
+    open http://localhost:5000/queue?token=punk-queue-admin     # the admin UI
+
+=head1 DESCRIPTION
+
+A signup form that hands the slow part to a queue.
+
+The whole example exists to show one shape and its consequences. A request
+handler B<enqueues and answers>; a separate worker process runs the body
+later, out of the same database. Nothing in the web tier waits for a task,
+and every task body runs identically whether it was enqueued by the form,
+by the cron scheduler or by hand from the CLI.
+
+What is in here:
+
+=over 4
+
+=item * B<Three task targets> written as C<'Class#method'>, resolved at
+C<to_app> exactly like route targets - so a typo is a boot croak, not a job
+that fails at 3am. Plus one written as a coderef, because small ones do not
+deserve a file.
+
+=item * B<Queue-level defaults> (C<<< queue 'mail' => { attempts => 5 } >>>) and
+B<task-level defaults>, so the enqueue call carries only what is specific
+to that call.
+
+=item * B<Two crons>: one naming a task already registered, one naming a
+C<'Class#method'> of its own.
+
+=item * B<The admin UI> mounted at C</queue> inside the same application,
+behind the same guard stack, with its overview page and its stylesheet
+overridden from this directory.
+
+=item * B<In-server mode>, off by default, behind C<MAILER_IN_SERVER=1>.
+
+=back
+
+=head1 RUNNING IT
+
+=head2 The web tier
+
+    plackup -p 5000 app.psgi
+
+Any PSGI server serves the pages, the API and the admin UI. On Hyperman
+the admin UI also gets live mode:
+
+    plackup -s Hyperman -p 5000 app.psgi
+
+Live mode needs Hyperman's detach path; anywhere else the plugin warns once
+at boot and stays on the 5-second polling it is designed to fall back to.
+
+The first boot migrates the schema and creates F<queue.db> beside this
+file. Point C<MAILER_QUEUE_DSN> at PostgreSQL to use that instead:
+
+    MAILER_QUEUE_DSN='dbi:Pg:dbname=mailer' plackup -p 5000 app.psgi
+
+=head2 The workers
+
+    punk-queue worker --app bin/queue.pl -q default,mail,reports -j 2
+
+Nothing is delivered until this is running - the index page says so when it
+sees no live workers, which is the failure everyone has once.
+
+C<--app bin/queue.pl> rather than C<--app Mailer> on purpose. Loading the
+class is enough to reach the queue, but task and cron I<targets> are
+resolved at C<to_app> - that is what makes a typo a boot croak - so a
+worker that never called C<to_app> would hold a queue with no bodies in it.
+F<bin/queue.pl> compiles the app and hands back its queue; read-only
+commands need none of that and take a plain C<--dsn>.
+
+The worker pool also runs the cron scheduler unless told C<--no-scheduler>.
+
+=head2 The admin UI
+
+    http://localhost:5000/queue?token=punk-queue-admin
+
+Guarded by C<Web::Auth#admin> (a shared token, swapped for whatever your app
+already does). The plugin B<refuses to mount without a guard>, because that
+UI retries and removes jobs, stops workers and runs crons: unguarded it is
+an unauthenticated control plane.
+
+=head2 Poking at it from the CLI
+
+    punk-queue stats    --dsn dbi:SQLite:dbname=queue.db
+    punk-queue jobs     --dsn dbi:SQLite:dbname=queue.db --state failed
+    punk-queue job 1    --dsn dbi:SQLite:dbname=queue.db --json
+    punk-queue crons    --app bin/queue.pl
+    punk-queue cron run daily-digest --app bin/queue.pl
+    punk-queue enqueue  --app bin/queue.pl mail.welcome you@example.com
+
+=head2 Requirements
+
+L<Punk> 0.04 (for C<install_kw>, which is how the C<queue>/C<task>/C<cron>
+keywords get into the app class), L<Punk::Queue>, L<Template::Stencil> for
+the pages, C<DBD::SQLite> or C<DBD::Pg>, and any PSGI server. Running from
+a built-but-uninstalled checkout works: F<app.psgi> and F<bin/queue.pl>
+both put the dist's F<blib> on C<@INC> when they find one.
+
+=head1 LAYOUT
+
+    app.psgi                  the web tier's entry point
+    bin/queue.pl              the worker pool's entry point (--app target)
+    lib/Mailer.pm             the app class: keywords, plugin, routes
+    lib/Mailer/Controller/
+      Web/Home.pm             pages: enqueue and answer, then watch
+      Web/Auth.pm             the admin guard
+      Job/Mail.pm             task bodies - welcome mail, digest fan-out
+      Job/Report.pm           task body - the recurring report, with a lock
+    root/templates/           the app's own Stencil templates
+    root/static/mailer.css    the app's own stylesheet
+    root/queue/overview.tmpl  ONE overridden admin template
+    root/queue.css            appended to the admin UI's stylesheet bundle
+
+=head1 THINGS TO NOTICE
+
+=head2 The keywords are compile-time
+
+C<use Punk::Plugin::Queue> installs C<queue>, C<task> and C<cron> into the
+app class through Punk's own installer, C<< $app->install_kw >> - they are
+magic CVs sitting beside C<get> and C<helper>, and no glob is assigned
+anywhere. That is what makes the bare syntax on later lines parse:
+
+    task 'mail.welcome' => 'Job::Mail#welcome';
+
+Putting C<plugin 'Queue'> first works too, but only for parenthesised calls
+(C<task(...)>), because C<plugin> runs at runtime. The order in
+F<lib/Mailer.pm> is the one to copy.
+
+=head2 A task body is a body, not a method
+
+C<'Job::Mail#welcome'> resolves to the sub, and the queue calls it with the
+job first and the enqueued arguments after. There is no invocant and no
+C<$c> - a task has no request. F<Job/Mail.pm> says so at the top, next to
+the two rules the queue cannot enforce for you: B<be idempotent>, because a
+worker killed past its timeout may have done half the work, and B<die
+loudly>, because a body that swallows an error is a job that succeeded.
+
+=head2 Enqueue, then have somewhere to look
+
+C</jobs/:id> exists because "fire and forget" is only half a design. The
+job is a row: state, attempt count, worker, result. The same row is what
+the admin UI shows, and C<< $c->job($id) >> is the helper the plugin
+installed for reading it.
+
+=head2 unique, delay, priority
+
+The signup handler passes C<unique>, so a double-submitted form gets the
+first job's id back instead of sending two welcome mails. The dedupe key
+obeys the same name rule as tasks and queues (1-64 characters of
+C<[A-Za-z0-9_.:-]>), which is why the address is folded into it rather than
+pasted in - the rule is narrow so that PostgreSQL C<LISTEN> identifiers are
+safe by construction.
+
+=head2 The digest fans out into jobs, not a loop
+
+C<Job::Mail::digest> enqueues one job per recipient rather than sending in
+a loop. One failure then retries alone, on its own backoff, instead of
+taking the batch down with it.
+
+=head2 The report takes a lock
+
+C<Job::Report::signups> holds a named lock for the duration. Locks live in
+the database with the jobs, so it holds across every worker on every host,
+and taking it with a duration means a crashed holder releases itself.
+
+=head2 The admin UI is yours to restyle
+
+F<root/queue/> is a template root searched before the bundled one, one name
+at a time - it holds exactly the one template this app changes, and the
+other six keep coming from the dist across upgrades. F<root/queue.css> is
+appended to the served bundle, after Funky and after C<punk-queue.css>, so
+the cascade takes it. Both are read once, at registration: a template edit
+needs a restart, like everything else in a Punk app.
+
+Which root serves which template is decided at registration too, so an
+override you meant to make but misspelled is a boot croak rather than a
+page that silently stays ours.
+
+=head2 In-server mode is a shortcut, and knows it
+
+    MAILER_IN_SERVER=1 plackup -s Hyperman -p 5000 app.psgi
+
+Runs C<mail.welcome> on the web workers' own event loops - no worker pool
+at all. It is railed: an explicit task allowlist, one job in flight per web
+worker, claims only from a timer, a wall-clock cap, and two breaches
+disable it in that process. Fine for this example. Run a real worker pool
+for anything with volume.
+
+=head1 SEE ALSO
+
+L<Punk::Queue>, L<Punk::Plugin::Queue>, L<Punk>, L<Punk::Plugin>,
+L<Template::Stencil>.
+
+=head1 AUTHOR
+
+LNATION <email@lnation.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

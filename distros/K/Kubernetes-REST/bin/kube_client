@@ -7,6 +7,8 @@ use warnings;
 
 use Kubernetes::REST::CLI;
 
+our $VERSION = '1.106';
+
 Kubernetes::REST::CLI->new_with_cmd;
 
 __END__
@@ -21,7 +23,7 @@ kube_client - Kubernetes CLI client using Kubernetes::REST
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 

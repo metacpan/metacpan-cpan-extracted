@@ -1,20 +1,19 @@
-package Dist::Zilla::MintingProfile::Author::Plicease 2.79 {
+package Dist::Zilla::MintingProfile::Author::Plicease 2.80 {
 
-  use 5.020;
+  use 5.022;
   use Moose;
   with qw( Dist::Zilla::Role::MintingProfile );
   use namespace::autoclean;
   use File::ShareDir::Dist ();
   use Path::Tiny ();
   use Carp ();
+  use experimental qw( signatures );
+  use true;
 
   # ABSTRACT: Minting profile for Plicease
 
 
-  sub profile_dir
-  {
-    my($self, $profile_name) = @_;
-
+  sub profile_dir ( $self, $profile_name ) {
     # use a dist share instead of a class share
 
     require Dist::Zilla::Plugin::Author::Plicease;
@@ -32,8 +31,6 @@ package Dist::Zilla::MintingProfile::Author::Plicease 2.79 {
   __PACKAGE__->meta->make_immutable;
 }
 
-1;
-
 __END__
 
 =pod
@@ -46,7 +43,7 @@ Dist::Zilla::MintingProfile::Author::Plicease - Minting profile for Plicease
 
 =head1 VERSION
 
-version 2.79
+version 2.80
 
 =head1 SYNOPSIS
 
@@ -62,7 +59,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2022 by Graham Ollis.
+This software is copyright (c) 2012-2024 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

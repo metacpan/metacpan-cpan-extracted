@@ -810,15 +810,16 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
         const char *vp = head + idx[li].voff;
         size_t nv = idx[li].vlen;
 
-        if (nk == 14 && strncasecmp(p, "Content-Length", 14) == 0) {
-            hm_env_store(env, HMK_CONTENT_LENGTH, newSVpvn(vp, nv));
-            have_cl = 1;
-        } else if (nk == 12 && strncasecmp(p, "Content-Type", 12) == 0) {
-            hm_env_store(env, HMK_CONTENT_TYPE, newSVpvn(vp, nv));
-        } else if (nk == 17 && strncasecmp(p, "Transfer-Encoding", 17) == 0) {
-            /* consumed by framing (already dechunked); not exposed to the
-             * app, whose psgi.input is the decoded body with CONTENT_LENGTH */
-        } else if (nk + 5 < sizeof(keybuf)) {
+        if (nk + 5 >= sizeof(keybuf)) continue;   /* absurd name: not a header
+                                                     we would have stored before
+                                                     either */
+        /* Fold to the canonical HTTP_ form first, then every name test below
+         * is a memcmp on known-case bytes rather than a strncasecmp on the
+         * wire bytes - three case-blind scans per header gone. The fold maps
+         * '-' to '_', which would let a literal "Content_Length" alias the
+         * real thing, so the special names also check the wire byte at the
+         * hyphen position, exactly as the old raw-name compare required. */
+        {
             size_t i;
             memcpy(keybuf, "HTTP_", 5);
             for (i = 0; i < nk; i++) {
@@ -827,6 +828,18 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
                 else if (ch == '-') ch = '_';
                 keybuf[5 + i] = (char)ch;
             }
+        }
+        if (nk == 14 && p[7] == '-' && memEQ(keybuf + 5, "CONTENT_LENGTH", 14)) {
+            hm_env_store(env, HMK_CONTENT_LENGTH, newSVpvn(vp, nv));
+            have_cl = 1;
+        } else if (nk == 12 && p[7] == '-'
+                   && memEQ(keybuf + 5, "CONTENT_TYPE", 12)) {
+            hm_env_store(env, HMK_CONTENT_TYPE, newSVpvn(vp, nv));
+        } else if (nk == 17 && p[8] == '-'
+                   && memEQ(keybuf + 5, "TRANSFER_ENCODING", 17)) {
+            /* consumed by framing (already dechunked); not exposed to the
+             * app, whose psgi.input is the decoded body with CONTENT_LENGTH */
+        } else {
             {
                 /* repeated header: join values with ", " (PSGI) */
                 SV *ksv = hm_hdrk_lookup(keybuf, nk + 5);
@@ -850,7 +863,8 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
                     }
                 }
             }
-            if (nk == 10 && strncasecmp(p, "Connection", 10) == 0) {
+            /* the name is already canonical; only the value keeps wire case */
+            if (nk == 10 && memEQ(keybuf + 5, "CONNECTION", 10)) {
                 if (nv >= 5 && strncasecmp(vp, "close", 5) == 0) c->keepalive = 0;
                 else if (nv >= 10 && strncasecmp(vp, "keep-alive", 10) == 0) c->keepalive = 1;
             }
@@ -1146,8 +1160,12 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
             STRLEN kl, vl;
             const char *ks = SvPV(*k, kl);
             const char *vs = SvPV(*v, vl);
-            if (kl == 14 && strncasecmp(ks, "Content-Length", 14) == 0) has_len = 1;
-            if (kl == 10 && strncasecmp(ks, "Connection", 10) == 0)     has_conn = 1;
+            /* both interesting names start with 'c', so one folded-byte test
+             * skips the case-blind scans for every other header */
+            if ((ks[0] | 32) == 'c') {
+                if (kl == 14 && strncasecmp(ks, "Content-Length", 14) == 0) has_len = 1;
+                if (kl == 10 && strncasecmp(ks, "Connection", 10) == 0)     has_conn = 1;
+            }
             hm_wb_put(c, ks, kl);
             hm_wb_put(c, ": ", 2);
             hm_wb_put(c, vs, vl);
@@ -2133,6 +2151,16 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
  * watches ever fires again. The epoll and connection fds are less spectacular
  * but no better: they are the parent's, still live, and closing our duplicates
  * frees numbers that the child immediately reuses. */
+/* A loop inherited across a fork must never reach its backend. On Linux an
+ * epoll INSTANCE is a shared kernel object: fork duplicates the fd but both
+ * processes' epoll_ctl calls edit the SAME interest list, so a child
+ * "cleaning up" inherited watchers silently deregisters the PARENT's fds -
+ * the parent then waits on an empty set forever (the DBIx::Loop
+ * disown-in-a-forked-child hang, Punk t/39). kqueue merely hands the child
+ * a dead descriptor, which is why macOS never showed it. The copied
+ * user-space tables are ours to update; the kernel object is not. */
+#define HM_LOOP_INHERITED(loop) ((loop)->pid != getpid())
+
 static void hm_loop_free(pTHX_ hm_loop *loop) {
     int i;
     int owned;
@@ -2216,7 +2244,8 @@ static void hm_add_timer_watch(pTHX_ hm_loop *loop, double secs, SV *sv, int kin
     tw->kind = kind;
     tw->sv   = SvREFCNT_inc(sv);
     tw->loop = loop;
-    loop->be->add_timer(loop->be, secs, 1, tw);
+    if (!HM_LOOP_INHERITED(loop))
+        loop->be->add_timer(loop->be, secs, 1, tw);
 }
 
 static void hm_add_io_watch(pTHX_ hm_loop *loop, int fd, const char *mode,
@@ -2231,7 +2260,8 @@ static void hm_add_io_watch(pTHX_ hm_loop *loop, int fd, const char *mode,
     slot->is_cb = (unsigned char)is_cb;
     slot->c_cb  = NULL;
     slot->c_ud  = NULL;
-    loop->be->add_io(loop->be, fd, mask, is_cb ? 0 : 1);
+    if (!HM_LOOP_INHERITED(loop))
+        loop->be->add_io(loop->be, fd, mask, is_cb ? 0 : 1);
 }
 
 /* ABI: persistent C watcher, replacing whatever held the slot. */
@@ -2244,8 +2274,9 @@ static void hm_add_io_watch_c(pTHX_ hm_loop *loop, int fd, int mask,
     slot->is_cb = 0;
     slot->c_cb  = cb;
     slot->c_ud  = ud;
-    loop->be->add_io(loop->be, fd,
-                     (mask & HM_EV_WRITE) ? HM_EV_WRITE : HM_EV_READ, 0);
+    if (!HM_LOOP_INHERITED(loop))
+        loop->be->add_io(loop->be, fd,
+                         (mask & HM_EV_WRITE) ? HM_EV_WRITE : HM_EV_READ, 0);
 }
 
 /* Drop one direction's watcher (any kind); idempotent. */
@@ -2254,8 +2285,9 @@ static void hm_del_io_watch(pTHX_ hm_loop *loop, int fd, int mask) {
     if (fd < 0 || fd >= HM_MAXFD) return;
     slot = (mask & HM_EV_WRITE) ? &loop->io_w[fd] : &loop->io_r[fd];
     if (!slot->sv && !slot->c_cb) return;
-    loop->be->remove_io(loop->be, fd,
-                        (mask & HM_EV_WRITE) ? HM_EV_WRITE : HM_EV_READ);
+    if (!HM_LOOP_INHERITED(loop))
+        loop->be->remove_io(loop->be, fd,
+                            (mask & HM_EV_WRITE) ? HM_EV_WRITE : HM_EV_READ);
     if (slot->sv) SvREFCNT_dec(slot->sv);
     slot->sv    = NULL;
     slot->is_cb = 0;
@@ -2278,7 +2310,8 @@ static hm_tw *hm_add_timer_watch_c(hm_loop *loop, double secs,
 
 static void hm_del_timer_watch(pTHX_ hm_loop *loop, hm_tw *tw) {
     if (!tw) return;
-    loop->be->del_timer(loop->be, tw);
+    if (!HM_LOOP_INHERITED(loop))
+        loop->be->del_timer(loop->be, tw);
     if (tw->sv) SvREFCNT_dec(tw->sv);
     free(tw);
 }

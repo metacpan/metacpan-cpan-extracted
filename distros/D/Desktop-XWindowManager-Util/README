@@ -1,0 +1,225 @@
+NAME
+    Desktop::XWindowManager::Util - Utilities related to X Window Manager
+
+VERSION
+    This document describes version 0.004 of Desktop::XWindowManager::Util
+    (from Perl distribution Desktop-XWindowManager-Util), released on
+    2026-04-17.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes routines related to "X Window Manager".
+
+    Under the hood, it's currently a wrapper to tools like "wmctrl", etc.
+
+    "wmctrl" works on EWMH-compliant X11 window managers. This means
+    mainstream desktop environments like KWin, Xfwm, Mutter (GNOME). It
+    works partially or doesn't work with minimalist window managers like
+    dwm, suckless. It partially works with Wayland where there is an X
+    compatibility layer, e.g. GNOME Wayland, KDE Plasma Wayland.
+
+FUNCTIONS
+  get_xwm_window_kde_activity
+    Usage:
+
+     get_xwm_window_kde_activity(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get the KDE activity GUID(s) of a specific window.
+
+    A window can be displayed in more than one KDE activities, so this
+    utility can return a comma-separated list of GUIDs.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   id* => *str*
+
+        Window ID, specified in hex form with 0x prefix, e.g. 0x05a0000e.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  list_xwm_windows
+    Usage:
+
+     list_xwm_windows(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List all Windows.
+
+    This utility is currently a wrapper for wmctrl.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   current_kde_activity => *bool*
+
+        Only list window shown in the current KDE activity.
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   id => *str*
+
+        Only list window with the specified ID.
+
+    *   kde_activity_name => *array[kdeactivity::name]*
+
+        Only list window shown in one the specified KDE activity names.
+
+    *   query => *array[str]*
+
+        Queries are matched against window titles, IDs, and KDE activity
+        names & GUIDs (if KDE activity names & GUIDs are requested).
+
+    *   with_kde_activity => *bool*
+
+        Show KDE activity GUID for each window (old name for
+        with_kde_activity_guid).
+
+    *   with_kde_activity_guid => *bool*
+
+        Show KDE activity GUID for each window.
+
+    *   with_kde_activity_name => *bool*
+
+        Show KDE activity name for each window.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  move_windows_to_kde_activity
+    Usage:
+
+     move_windows_to_kde_activity(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Move matching window(s) to a specified KDE activity.
+
+    Moving means the window will not be shown in any other KDE activity
+    aside from the specified ones.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   activity_name* => *array[kdeactivity::name]*
+
+        (No description)
+
+    *   current_kde_activity => *bool*
+
+        Only list window shown in the current KDE activity.
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   id => *str*
+
+        Only list window with the specified ID.
+
+    *   kde_activity_name => *array[kdeactivity::name]*
+
+        Only list window shown in one the specified KDE activity names.
+
+    *   query => *array[str]*
+
+        Queries are matched against window titles, IDs, and KDE activity
+        names & GUIDs (if KDE activity names & GUIDs are requested).
+
+    *   with_kde_activity => *bool*
+
+        Show KDE activity GUID for each window (old name for
+        with_kde_activity_guid).
+
+    *   with_kde_activity_guid => *bool*
+
+        Show KDE activity GUID for each window.
+
+    *   with_kde_activity_name => *bool*
+
+        Show KDE activity name for each window.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Desktop-XWindowManager-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Desktop-XWindowManager-Util>.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Desktop-XWindowManage
+    r-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumL2AnnouncementPolicy;
 # ABSTRACT: Cilium L2 announcement policy
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliuml2announcementpolicies';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2alpha1::CiliumL2AnnouncementPolicy - Cilium L2 announcement p
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head1 DESCRIPTION
 

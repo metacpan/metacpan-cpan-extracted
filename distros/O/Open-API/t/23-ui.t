@@ -10,10 +10,21 @@ use File::Raw::JSON qw(file_json_decode);
 # The Open::API::UI object on its own: rendered page, spec JSON, assets,
 # headers and the framework routes contract.
 
-plan skip_all => 'Template::Stencil 0.02+ and Markdown::Simple not available'
+# The docs UI is optional and its dependencies are recommendations, and a
+# recommendation cannot upgrade a machine that already has an older copy -
+# so the versions are checked here, not just the module names.
+# Markdown::Simple grew the OO interface UI.pm calls in 0.18; without the
+# version check this skip waves an 0.17 through to "Can't locate object
+# method new". UI.pm itself wants 5.010 for defined-or, which this
+# distribution's floor (5.008003) does not promise.
+plan skip_all => 'the docs UI needs perl 5.010'
+    if $] < 5.010;
+plan skip_all => 'Template::Stencil 0.02+ and Markdown::Simple 0.18+ '
+              . 'are not available'
     unless eval { require Template::Stencil;
                   Template::Stencil->VERSION('0.02');
-                  require Markdown::Simple; 1 };
+                  require Markdown::Simple;
+                  Markdown::Simple->VERSION('0.18'); 1 };
 
 require Open::API::UI;
 

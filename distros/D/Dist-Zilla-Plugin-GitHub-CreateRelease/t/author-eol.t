@@ -27,7 +27,8 @@ my @files = (
     't/author-pod-syntax.t',
     't/extract-changes.t',
     't/release-trailing-space.t',
-    't/repo-name-from-url.t'
+    't/repo-name-from-url.t',
+    't/repo-owner-from-url.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

@@ -5,10 +5,10 @@ use Test::More;
 
 BEGIN {
     eval {
-      require Catalyst::Plugin::Session;
-      require Catalyst::Plugin::Session::State::Cookie;
+        require Catalyst::Plugin::Session;
+        require Catalyst::Plugin::Session::State::Cookie;
     } or do {
-      plan skip_all => "This test needs Catalyst::Plugin::Session and Catalyst::Plugin::Session::State::Cookie installed";
+        plan skip_all => "This test needs Catalyst::Plugin::Session and Catalyst::Plugin::Session::State::Cookie installed";
     }
 }
 
@@ -39,7 +39,7 @@ ok +$res->is_success, 'get ok';
 $res = _request('/yak');
 ok !$res->is_success, 'Not ok, user unable to be resotred == nasal demons';
 
-foreach my $type (qw/ goat fluffy_bunny possum butterfly /) {
+foreach my $type (qw/ goat fluffy_bunny possum butterfly octopus/) {
     $res = _request("/$type");
     ok +$res->is_success, "get $type ok";
 }

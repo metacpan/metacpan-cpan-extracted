@@ -30,6 +30,6 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Authentication
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl-catalyst/Catalyst-Plugin-Authentication.git
-version: '0.10026'
+version: '0.10028'
 x_authority: cpan:BOBTFISH
-x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -23,7 +23,7 @@ plan skip_all => "Cannot locate the distribution's lib/ directory to scan"
 plan skip_all => "Cannot locate the distribution's t/ directory to scan"
     unless $tdir;
 
-my %expected = ($libdir => 4, $tdir => 41);
+my %expected = ($libdir => 4, $tdir => 44);
 
 my @files;
 for my $dir ($libdir, $tdir) {

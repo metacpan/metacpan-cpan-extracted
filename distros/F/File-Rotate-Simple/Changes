@@ -1,8 +1,14 @@
 Revision history for File::Rotate::Simple
 
-v0.4.1    2026-08-07 17:18:51+01:00 Europe/London
+v0.4.2    2026-08-08 12:09:27+01:00 Europe/London
+  [Documentation]
+  - Fixed typos.
 
-  [Bug Fixs]
+  [Tests]
+  - Updated the tests to skip symlink tests where symlink support is unavailable.
+
+v0.4.1    2026-08-07 17:18:51+01:00 Europe/London
+  [Bug Fixes]
   - Fixed bug when older rotated files are dangling symlinks.
 
   - Fixed bug when rotating dandling symlinks and age > 0.
@@ -89,7 +95,7 @@ v0.2.2    2017-12-10 22:39:20+00:00 Europe/London
   - Updated copyright year in POD.
 
 v0.2.1    2017-12-08 17:24:48+00:00 Europe/London
-  - Fixed broken prerequisit declarations.
+  - Fixed broken prerequisite declarations.
 
 v0.2.0    2017-12-04 17:35:19+00:00 Europe/London
   [Documentation]
@@ -101,7 +107,7 @@ v0.2.0    2017-12-04 17:35:19+00:00 Europe/London
   - Added "start_num" attribute for specifying the starting number.
 
   - Added the "if_missing" attribute to rotate if the file is missing.
-    (Enabled by default for backwards compatability.)
+    (Enabled by default for backwards compatibility.)
 
   - Added "touch" attribute to touch the file after rotating.
 
@@ -112,7 +118,7 @@ v0.2.0    2017-12-04 17:35:19+00:00 Europe/London
     (e.g. "foo.2" is renamed to "foo.3" before "foo.1" is renamed to
     "foo.2"), so as to allow more kinds of file rotation schemes.
 
-  [Incompatable Changes]
+  [Incompatible Changes]
   - Rotation numbers above the maximum may not be deleted if there are gaps.
 
   [Other Changes]

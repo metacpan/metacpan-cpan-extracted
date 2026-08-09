@@ -38,7 +38,7 @@ name: Catalyst-View-ChromePDF
 provides:
   Catalyst::View::ChromePDF:
     file: lib/Catalyst/View/ChromePDF.pm
-    version: v0.1.0
+    version: v0.1.1
 recommends:
   Catalyst::View::TT: '0'
   Type::Tiny::XS: '0'
@@ -60,7 +60,7 @@ resources:
   Authority: cpan:RRWO
   bugtracker: https://github.com/robrwo/perl-Catalyst-View-ChromePDF/issues
   repository: git://github.com/robrwo/perl-Catalyst-View-ChromePDF.git
-version: v0.1.0
+version: v0.1.1
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,5 +1,31 @@
 Revision history for Net-Firewall-BlockerHelper
 
+0.2.0   2026-08-08/17:30
+        - Add the openwrt backend, driving OpenWrt fw4 via UCI, either
+          locally or on a remote router over ubus JSON-RPC. Supports CIDR
+          bans.
+        - Add commit, for backends holding state back from persistent
+          storage. openwrt is currently the only one that implements it.
+        - Add Net::Firewall::BlockerHelper::Util, a mixin of shared internal
+          helpers inherited by the frontend and all backends. _valid_cidr,
+          _uri_escape, _json, and _kill_commands now live there instead of
+          being duplicated in each.
+        - JSON backends now use JSON instead of JSON::PP, picking up JSON::XS
+          when it is installed. Added as a runtime recommends.
+        - Fix re_init erroring with notInited after a teardown or stop. Both
+          clear the inited flag while keeping the ban list, and the frontend
+          has no init of its own, so there was no way to bring the setup back.
+          re_init no longer requires the backend to be inited.
+        - ipfw: delete the rule before destroying the table in both init's
+          cleanup and teardown. ipfw will not destroy a table a rule still
+          references, so the old order left the table behind and the next
+          create failed with "File exists", making re_init fail every other
+          run.
+        - ipfw: teardown now attempts both of its commands before raising, so
+          an already removed rule no longer stops the table being destroyed.
+        - Document every internal method to the same standard as the public
+          API: purpose, arguments, return format, and examples.
+
 0.1.0   2026-08-05/00:00
         - Add CIDR ban support via new ban_cidr, unban_cidr, and list_cidr
           methods, for backends advertising cidr_supported.

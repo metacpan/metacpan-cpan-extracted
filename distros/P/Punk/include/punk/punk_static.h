@@ -33,6 +33,20 @@ static SV *punk_closure(pTHX_ XSUBADDR_t body, AV *cap) {
     return newRV_noinc((SV *)cv);
 }
 
+/* The same, but installed into a named glob rather than handed back as a
+ * coderef: for keywords, where a croak or a stack trace should name the
+ * keyword and the class it landed in rather than __ANON__. */
+static CV *punk_closure_named(pTHX_ const char *name, XSUBADDR_t body, AV *cap)
+    PERL_UNUSED_DECL;
+static CV *punk_closure_named(pTHX_ const char *name, XSUBADDR_t body, AV *cap) {
+    CV *cv = newXS((char *)name, body, (char *)__FILE__);
+    punk_clos *c;
+    Newxz(c, 1, punk_clos);
+    c->cap = cap;                                   /* takes ownership */
+    sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &punk_clos_vtbl, (char *)c, 0);
+    return cv;
+}
+
 static AV *punk_clos_cap(pTHX_ CV *cv) {
     MAGIC *mg = mg_findext((SV *)cv, PERL_MAGIC_ext, &punk_clos_vtbl);
     return mg ? ((punk_clos *)mg->mg_ptr)->cap : NULL;

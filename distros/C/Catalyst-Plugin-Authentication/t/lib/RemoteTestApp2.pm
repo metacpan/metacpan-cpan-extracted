@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Catalyst qw/
-   Authentication
+    Authentication
 /;
 use Moose;
 extends 'Catalyst';

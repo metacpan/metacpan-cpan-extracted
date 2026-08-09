@@ -1,0 +1,51 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "punk-queue admin API",
+    "version": "0.01",
+    "description": "The admin REST surface Punk::Plugin::Queue registers under its guarded prefix. List endpoints speak Funky.Table's server-side protocol: request draw/page/limit/search/sort (sort is a JSON-encoded [{column,dir}]) plus the filter vocabulary; response { data, total, draw }. Every write is CSRF-protected when the app configures csrf. Bulk is selection-only: explicit ids, capped at 500, filter payloads rejected."
+  },
+  "paths": {
+    "/api/stats": { "get": { "operationId": "stats", "responses": { "200": { "description": "per-state and per-queue counts, worker counts, enqueued_jobs, schema_version" } } } },
+    "/api/history": { "get": { "operationId": "history", "responses": { "200": { "description": "{ hourly: [{epoch,finished,failed}], daily: [...] }" } } } },
+    "/api/jobs": {
+      "get": {
+        "operationId": "listJobs",
+        "parameters": [
+          { "name": "draw", "in": "query", "schema": { "type": "integer" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 } },
+          { "name": "sort", "in": "query", "description": "JSON [{column,dir}]; sortable: id state queue task worker priority created", "schema": { "type": "string" } },
+          { "name": "state", "in": "query", "schema": { "enum": ["inactive", "active", "finished", "failed"] } },
+          { "name": "queue", "in": "query", "schema": { "type": "string" } },
+          { "name": "task", "in": "query", "schema": { "type": "string" } },
+          { "name": "worker", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "{ data: [job...], total, draw }" }, "400": { "description": "unknown sort column" } }
+      }
+    },
+    "/api/jobs/{id}": { "get": { "operationId": "job", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "the job, args/notes/result decoded, parents included" }, "404": { "description": "no such job" } } } },
+    "/api/jobs/{id}/retry": { "post": { "operationId": "retryJob", "responses": { "200": { "description": "{ok:1}" }, "404": {"description": "no such job"}, "409": { "description": "the job changed underneath (optimistic guard)" } } } },
+    "/api/jobs/{id}/remove": { "post": { "operationId": "removeJob", "responses": { "200": { "description": "{ok:1}" }, "409": { "description": "an active job is refused; retry it first" } } } },
+    "/api/jobs/bulk": {
+      "post": {
+        "operationId": "bulkJobs",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": {
+          "type": "object", "required": ["action", "ids"],
+          "properties": {
+            "action": { "enum": ["retry", "remove"] },
+            "ids": { "type": "array", "items": { "type": "integer" }, "minItems": 1, "maxItems": 500 }
+          },
+          "additionalProperties": false
+        } } } },
+        "responses": { "200": { "description": "{ succeeded, failed, results: {id: ok|skipped} }" }, "400": { "description": "filter payloads rejected / cap exceeded / bad action" } }
+      }
+    },
+    "/api/workers": { "get": { "operationId": "listWorkers", "responses": { "200": { "description": "{ data, total, draw }" } } } },
+    "/api/workers/{id}/stop": { "post": { "operationId": "stopWorker", "responses": { "200": { "description": "stop broadcast to the worker's inbox" }, "404": { "description": "no such worker" } } } },
+    "/api/locks": { "get": { "operationId": "listLocks", "responses": { "200": { "description": "{ data, total, draw }" } } } },
+    "/api/crons": { "get": { "operationId": "listCrons", "responses": { "200": { "description": "the app's cron declarations" } } } },
+    "/api/crons/{name}/run": { "post": { "operationId": "runCron", "responses": { "200": { "description": "{ok:1, id} - enqueued now, schedule untouched" }, "404": { "description": "no such cron" } } } },
+    "/api/crons/{name}/enable": { "post": { "operationId": "enableCron", "responses": { "400": { "description": "cron scheduling storage arrives in a later release" } } } }
+  }
+}

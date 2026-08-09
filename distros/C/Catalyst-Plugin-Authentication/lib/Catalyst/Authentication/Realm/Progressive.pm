@@ -6,6 +6,8 @@ use strict;
 
 use base 'Catalyst::Authentication::Realm';
 
+=for Pod::Coverage setup_credential setup_store
+
 =head1 NAME
 
 Catalyst::Authentication::Realm::Progressive - Authenticate against multiple realms
@@ -31,58 +33,58 @@ password realm and a normal realm, you can configure the progressive realm as
 the default, and configure it to iteratively call the temporary realm and then
 the normal realm.
 
- __PACKAGE__->config(
-    'Plugin::Authentication' => {
-        default_realm => 'progressive',
-        realms => {
-            progressive => {
-                class => 'Progressive',
-                realms => [ 'temp', 'normal' ],
-                # Modify the authinfo passed into authenticate by merging
-                # these hashes into the realm's authenticate call:
-                authinfo_munge => {
-                    normal => { 'type' => 'normal' },
-                    temp   => { 'type' => 'temporary' },
-                }
-            },
-            normal => {
-                credential => {
-                    class => 'Password',
-                    password_field => 'secret',
-                    password_type  => 'hashed',
-                    password_hash_type => 'SHA-1',
+    __PACKAGE__->config(
+        'Plugin::Authentication' => {
+            default_realm => 'progressive',
+            realms => {
+                progressive => {
+                    class => 'Progressive',
+                    realms => [ 'temp', 'normal' ],
+                    # Modify the authinfo passed into authenticate by merging
+                    # these hashes into the realm's authenticate call:
+                    authinfo_munge => {
+                        normal => { 'type' => 'normal' },
+                        temp   => { 'type' => 'temporary' },
+                    }
                 },
-                store => {
-                    class      => 'DBIx::Class',
-                    user_model => 'Schema::Person::Identity',
-                    id_field   => 'id',
-                }
-            },
-            temp => {
-                credential => {
-                    class => 'Password',
-                    password_field => 'secret',
-                    password_type  => 'hashed',
-                    password_hash_type => 'SHA-1',
+                normal => {
+                    credential => {
+                        class => 'Password',
+                        password_field => 'secret',
+                        password_type  => 'hashed',
+                        password_hash_type => 'SHA-1',
+                    },
+                    store => {
+                        class      => 'DBIx::Class',
+                        user_model => 'Schema::Person::Identity',
+                        id_field   => 'id',
+                    }
                 },
-                store => {
-                    class    => 'DBIx::Class',
-                    user_model => 'Schema::Person::Identity',
-                    id_field   => 'id',
-                }
-            },
+                temp => {
+                    credential => {
+                        class => 'Password',
+                        password_field => 'secret',
+                        password_type  => 'hashed',
+                        password_hash_type => 'SHA-1',
+                    },
+                    store => {
+                        class    => 'DBIx::Class',
+                        user_model => 'Schema::Person::Identity',
+                        id_field   => 'id',
+                    }
+                },
+            }
         }
-    }
- );
+    );
 
 Then, in your controller code, to attempt authentication against both realms
 you just have to do a simple authenticate call:
 
- if ( $c->authenticate({ id => $username, password => $password }) ) {
-     if ( $c->user->type eq 'temporary' ) {
-         # Force user to change password
-     }
- }
+    if ( $c->authenticate({ id => $username, password => $password }) ) {
+        if ( $c->user->type eq 'temporary' ) {
+            # Force user to change password
+        }
+    }
 
 =head1 CONFIGURATION
 
@@ -143,20 +145,9 @@ sub authenticate {
     return;
 }
 
-## we can not rely on inheriting new() because in this case we do not
-## load a credential or store, which is what new() sets up in the
-## standard realm.  So we have to create our realm object, set our name
-## and return $self in order to avoid nasty warnings.
-
-sub new {
-    my ($class, $realmname, $config, $app) = @_;
-
-    my $self = { config => $config };
-    bless $self, $class;
-
-    $self->name($realmname);
-    return $self;
-}
+## we don't want our own store or credential, so avoid setting them up
+sub setup_store {}
+sub setup_credential {}
 
 =head1 AUTHORS
 

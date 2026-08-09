@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper - Helps with managing firewalls for banning IPs.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -159,6 +159,8 @@ sub new {
 				28 => 'cidrItemNotCidr',
 				29 => 'cidrNotSupported',
 				30 => 'listCidrFailed',
+				31 => 'commitFailed',
+				32 => 'commitNotSupported',
 			},
 			fatal_flags      => {},
 			perror_not_fatal => 0,
@@ -361,13 +363,44 @@ sub init_backend {
 	$self->{backend_obj} = $backend_obj;
 } ## end sub init_backend
 
-# Internal helper. If self healing is enabled and the backend is inited, ask
-# the backend to check that its firewall setup is still present and re_init it
-# if it is not. This is the fail2ban actioncheck-before-action behavior. Both
-# the check and re_init are best effort; any failure is left for the following
-# ban/unban to surface.
+# Internal helper. If self healing is enabled and the backend is inited, asks
+# the backend to check that its firewall setup is still present and re_inits it
+# if it is not. This is the fail2ban actioncheck-before-action behavior: the
+# setup can be torn down out from under a long lived process by a firewall
+# restart or by someone flushing the rules by hand, and without this the
+# following ban would appear to succeed while adding nothing.
 #
-# Honors a per-call self_heal override passed via %opts.
+# Called at the top of ban, unban, ban_cidr, and unban_cidr, which pass their
+# own %opts straight through. Nothing happens at all if self healing is off,
+# if no backend has been inited yet, or if the backend's inited flag is false.
+#
+# Both the check and the re_init are best effort and run inside eval. A check
+# that dies is treated as "do not heal" rather than as unhealthy, so a backend
+# whose check is broken does not trigger a rebuild on every call. A re_init
+# that dies is swallowed here and left for the ban or unban that follows to
+# surface, which keeps the error the caller sees tied to the operation they
+# actually asked for.
+#
+# Args:
+#
+#     %opts - The option hash the calling method received, passed through
+#             verbatim. Only the self_heal key is looked at, and only if it
+#             exists; it is a per-call override of the object's self_heal
+#             setting and is taken as a boolean, so 0 disables healing for
+#             this call and 1 forces it on. Every other key is ignored.
+#
+# Returns nothing. Whether the setup was checked, found unhealthy, or rebuilt
+# is deliberately not reported; callers proceed with their ban or unban either
+# way.
+#
+#     # honor the object's self_heal setting
+#     $self->_self_heal;
+#
+#     # inside ban, passing the caller's options through
+#     $self->_self_heal(%opts);
+#
+#     # skip healing for this one call
+#     $self->_self_heal( self_heal => 0 );
 sub _self_heal {
 	my ( $self, %opts ) = @_;
 
@@ -388,24 +421,6 @@ sub _self_heal {
 
 	return;
 } ## end sub _self_heal
-
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
 
 =head2 ban
 
@@ -721,6 +736,15 @@ Tells the backend to re-init itself, rebuilding its firewall setup and
 re-applying the current ban list. A backend failure is caught and re-raised
 as reInitFailed.
 
+The backend does not need to be inited for this to work, so as well as
+recovering a setup that was removed externally, this is what brings one back
+after a L</teardown> or L</stop>. The ban list is held on the backend object
+and survives both, so the bans are re-applied rather than lost.
+
+    $fw_helper->re_init;
+
+    # resuming after a stop
+    $fw_helper->stop;
     $fw_helper->re_init;
 
 =cut
@@ -867,6 +891,59 @@ sub flush {
 	}
 } ## end sub flush
 
+=head2 commit
+
+Tells the backend to write out any state it has been holding back from
+persistent storage.
+
+Most backends have nothing to hold back, as the firewall they drive is the
+only copy of the state, and those do not implement this at all; calling it
+for one of them sets the commitNotSupported error.
+L<Net::Firewall::BlockerHelper::backends::openwrt> is currently the only
+backend that does implement it, where bans are applied to the live nftables
+sets straight away but only reach the UCI config, and so the router's flash,
+when this is called.
+
+Where a backend does implement it, it is safe to call as often as wanted and
+is a noop when there is nothing outstanding. How often it is worth calling is
+a trade off between how much of the ban list can be lost and, for a backend
+writing to flash, how much wear is acceptable.
+
+    $fw_helper->ban(ban => '1.2.3.4');
+    $fw_helper->ban(ban => '5.6.7.8');
+    $fw_helper->commit;
+
+=cut
+
+sub commit {
+	my ( $self, %opts ) = @_;
+
+	$self->errorblank;
+	$self->{test_data} = undef;
+
+	if ( !defined( $self->{backend_obj} ) ) {
+		$self->{error}       = 31;
+		$self->{errorString} = 'No backend object present... init_backend has not been called';
+		$self->warn;
+		return;
+	}
+
+	if ( !$self->{backend_obj}->can('commit') ) {
+		$self->{error}       = 32;
+		$self->{errorString} = 'the "' . $self->{backend} . '" backend does not implement commit';
+		$self->warn;
+		return;
+	}
+
+	eval { $self->{backend_obj}->commit; };
+	if ($@) {
+		$self->{error}       = 31;
+		$self->{errorString} = 'backend commit failed... ' . $@;
+		$self->warn;
+		return;
+	}
+} ## end sub commit
+
 =head1 ERROR CODES / FLAGS
 
 Error handling is provided by L<Error::Helper>. All
@@ -970,6 +1047,15 @@ The selected backend does not support CIDR bans.
 =head2 30, listCidrFailed
 
 Failed to get a list of CIDR bans.
+
+=head2 31, commitFailed
+
+Failed to commit the backend's outstanding state.
+
+=head2 32, commitNotSupported
+
+The selected backend does not implement commit, having no state that is held
+back from persistent storage.
 
 =head1 AUTHOR
 

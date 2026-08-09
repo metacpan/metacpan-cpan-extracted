@@ -1,5 +1,21 @@
 Revision history for Open-API
 
+0.07    2026-08-09
+        - validate_responses gains a report mode, A mismatch calls the coderef and the 
+	  response continues to the client untouched - status, headers and body byte for byte.
+
+0.06    2026-08-08
+        - Open::API::UI said `use 5.016`, which nothing in it needs. Every
+          perl between this distribution's floor (5.008003) and 5.16 failed
+          to compile the file, so t/23 and t/24 died and CPAN Testers
+          graded 0.05 NA on 5.12.5. 
+        - Open::API::UI now names the versions it needs at the point of use
+          - Template::Stencil 0.02, Markdown::Simple 0.18.
+        - t/23-ui.t and t/24-plack-ui.t check those versions, not just that
+          the modules load, so an old Markdown::Simple skips the docs UI
+          tests instead of failing them.
+        - remove Open::API::Plack use of defined-or
+
 0.05    2026-08-06
         - The PSGI app segfaulted on perl below 5.20. The closure capture
           pushed &PL_sv_undef for an absent csrf config, and perl before 5.20

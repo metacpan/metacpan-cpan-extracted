@@ -1,5 +1,9 @@
 Revision history for perl module XML::Hash::XS
 
+0.66    2026-08-08
+    - Fix build on Solaris and illumos, where iconv() declares the input
+      buffer as "const char **".
+
 0.65    2026-08-05
     - Add incremental XML parsing with Parser->feed/finish.
     - Add callback STOP/SKIP controls and event callback mode.

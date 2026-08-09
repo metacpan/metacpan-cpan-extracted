@@ -142,4 +142,62 @@ sub execute {
 	return 1;
 } ## end sub execute
 
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::accel - Report which (if any) native acceleration backend is active
+
+=head1 DESCRIPTION
+
+Fits and scores a tiny synthetic dataset in both axis and extended mode,
+then reports which of Inline::C, OpenMP and SIMD are actually wired up.
+Both modes are exercised on purpose: the oblique split is the only path
+the SIMD reduction affects, so an axis-only probe would not prove it.
+
+Fitting and scoring, rather than merely checking that the backend
+compiled, is what makes this a usable answer to "did this build pick up
+the optional dependencies on this machine?".
+
+Run it as C<iforest accel>; C<iforest help accel> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help accel> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+C<accel> takes no options, so there is nothing to check.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Runs the probe fits and prints the backend report, including the build
+flags baked into the object, to STDOUT.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=cut
+
 return 1;

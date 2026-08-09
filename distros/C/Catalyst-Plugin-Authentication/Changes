@@ -1,5 +1,17 @@
 Revision history for Perl extension Catalyst::Plugin::Authentication
 
+0.10028 - 2026-08-08
+    - fix warnings when authenticating and no password is stored
+    - fix return value from Catalyst::Authentication::User::Hash->can
+    - update password_type documentation do discourage non-secure options
+    - fix use of CERT_ values in Credential::Remote source
+    - documentation spelling fixes
+    - fix develop prereq on Test::Pod::Coverage::TrustMe
+
+0.10_027 - 2026-06-07
+    - When used with Catalyst::Plugin::Session, rotate the session id after a
+      successful login to avoid session fixation attacks (CVE-2009-10007).
+
 0.10026 - 2026-05-21
     - no changes since 0.10_025
 

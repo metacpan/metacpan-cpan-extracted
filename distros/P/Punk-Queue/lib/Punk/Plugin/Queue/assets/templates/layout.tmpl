@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% title %} - punk-queue</title>
+{% for href in styles %}<link rel="stylesheet" href="{% href %}">
+{% end %}</head>
+<body data-theme="dark">
+
+<div id="spa-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+<div class="pq-shell">
+<nav class="pq-nav" data-no-spa-exempt>
+  <span class="pq-brand">punk-queue</span>
+{% for item in nav %}  <a href="{% item.href %}">{% item.label %}</a>
+{% end %}  <span class="pq-live" id="pqLive" data-live="off">polling</span>
+</nav>
+
+<main id="spaContent" data-page="{% page %}" data-breadcrumb-title="{% title %}">
+{% raw content %}
+</main>
+</div>
+
+<div id="funky-toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<script>
+/* The CSRF bridge. Funky.Api hardcodes cookie `csrf_token` + header
+   X-CSRF-Token, and the registry lock forbids patching Funky.Api after
+   load - so the app's actual csrf cookie (name injected server-side) is
+   mirrored into `csrf_token`. Punk's csrf cookie is script-readable by
+   design (double-submit), so the mirror leaks nothing. Runs before any
+   Funky script and again after every SPA navigation (token rotation). */
+(function () {
+  var NAME = "{% csrf_cookie %}";
+  function mirror() {
+    if (!NAME) return;
+    var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + NAME + '=([^;]*)'));
+    if (m) document.cookie = 'csrf_token=' + m[1] + '; path=/; SameSite=Lax';
+  }
+  mirror();
+  document.addEventListener('funky.spa.pageload', mirror);
+  document.addEventListener('funky.content-updated', mirror);
+  window.__pqCsrfMirror = mirror;
+})();
+window.__PQ = {
+  prefix: "{% prefix %}",
+  live: {% live %},
+  version: "{% version %}"
+};
+</script>
+{% for src in scripts %}<script src="{% src %}"></script>
+{% end %}</body>
+</html>

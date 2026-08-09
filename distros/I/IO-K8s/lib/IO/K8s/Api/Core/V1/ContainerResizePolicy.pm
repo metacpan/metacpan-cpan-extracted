@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ContainerResizePolicy;
 # ABSTRACT: ContainerResizePolicy represents resource resize policy for the container.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s resourceName => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::ContainerResizePolicy - ContainerResizePolicy represents
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 resourceName
 

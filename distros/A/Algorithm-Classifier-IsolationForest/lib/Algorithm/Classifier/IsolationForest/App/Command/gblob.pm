@@ -65,6 +65,9 @@ sub validate {
 	return 1;
 } ## end sub validate
 
+# Box-Muller; see the POD below.  Self-contained on purpose: this command
+# generates test data, so it has no business reaching into the module's
+# internals for _randn.
 sub gaussian {
 	my ( $mu, $sigma ) = @_;
 	my $u1 = rand() || 1e-12;
@@ -108,5 +111,71 @@ sub execute {
 	write_file( $opt->{'o'}, $data );
 
 } ## end sub execute
+
+=head1 NAME
+
+Algorithm::Classifier::IsolationForest::App::Command::gblob - Generates a gaussian blob of points.
+
+=head1 DESCRIPTION
+
+Generates a synthetic dataset: a Gaussian cluster of normal points plus a
+handful of outliers placed away from it, as CSV.  Useful for exercising
+the other commands without needing real data, and for the examples in the
+documentation.
+
+Seeding with C<-s> makes a blob reproducible.
+
+Run it as C<iforest gblob>; C<iforest help gblob> lists every option.
+
+=head1 METHODS
+
+L<App::Cmd> calls these while dispatching the subcommand.  Nothing else
+should.
+
+=head2 opt_spec
+
+Returns this command's option specifications, as the list of arrayrefs
+L<Getopt::Long::Descriptive> expects.
+
+=head2 abstract
+
+Returns the one-line summary C<iforest commands> prints beside the
+command name.
+
+=head2 description
+
+Returns the long help text C<iforest help gblob> prints under the option
+list.
+
+=head2 validate
+
+Checks the parsed options before anything is read or written, so a
+mistake costs nothing.
+
+Checks that C<-s>, C<-n> and C<-D> are sane numbers.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments.  Calls C<usage_error>, which prints the usage and exits, on
+the first problem it finds, and returns 1 when everything checks out.
+
+=head2 execute
+
+Writes the generated CSV to C<-o>, or to STDOUT.
+
+Takes the parsed options hashref and the arrayref of remaining
+arguments, and returns 1.
+
+=head2 gaussian
+
+One draw from a normal distribution, via Box-Muller.
+
+Takes the distribution's mean and standard deviation, and returns a
+single value -- typically within four standard deviations of the mean.
+It consumes two C<rand()> draws, so seeding once with C<-s> makes a whole
+blob reproducible.
+
+    my $v = gaussian( 0, 1 );
+
+=cut
 
 return 1;

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ResourceClaim;
 # ABSTRACT: ResourceClaim references one entry in PodSpec.ResourceClaims.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::ResourceClaim - ResourceClaim references one entry in Po
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 name
 

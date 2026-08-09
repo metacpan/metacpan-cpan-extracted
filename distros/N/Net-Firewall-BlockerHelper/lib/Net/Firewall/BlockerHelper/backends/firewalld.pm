@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::firewalld;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 
@@ -13,11 +13,11 @@ Net::Firewall::BlockerHelper::backends::firewalld - firewalld backend for Net::F
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -321,8 +321,32 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the IPv4 ipset name and IPv6 ipset name for this
-# instance.
+# Internal helper. Returns the names of the two ipsets this instance owns.
+#
+# Both are derived from the prefix and the name rather than stored, so every
+# part of the backend agrees on what to create, match against, and tear down
+# without threading the names around. The prefix and name pair is unique per
+# instance, so two instances can share a host without colliding.
+#
+# There are two sets because an ipset is single family: a hash:ip set is
+# created either family inet or family inet6 and will not hold addresses of
+# the other. Note firewalld manages the sets itself, via firewall-cmd
+# --new-ipset, rather than the ipset command being called directly.
+#
+# Unlike the iptables backend there is no chain name here. This backend adds
+# its rules through firewalld's direct interface rather than owning a chain of
+# its own, so there is nothing else to name.
+#
+# Takes no arguments.
+#
+# Returns a two element list of the IPv4 set name and the IPv6 set name, in
+# that order.
+#
+#     my ( $set4, $set6 ) = $self->_set_names;
+#
+#     # with prefix "kur" and name "ssh"
+#     #   $set4 is 'kur_ssh_4'
+#     #   $set6 is 'kur_ssh_6'
 sub _set_names {
 	my ($self) = @_;
 
@@ -330,8 +354,47 @@ sub _set_names {
 	return ( $base . '_4', $base . '_6' );
 }
 
-# Internal helper. Returns a list of hashes, each with the direct interface
-# family (ipv4/ipv6) and the iptables argument string for one block rule.
+# Internal helper. Works out the full cross product of family, protocol, and
+# ports this instance needs to block, and returns it as the argument strings
+# for firewalld's direct interface. Essentially all of the backend's rule
+# logic lives here.
+#
+# The rules go in through firewall-cmd --direct --add-rule, which takes a
+# family and then passes the rest through to iptables more or less verbatim.
+# That is why the argument strings are iptables syntax rather than anything
+# firewalld specific, and why the family has to be handed over separately as
+# 'ipv4' or 'ipv6' instead of being implied by which binary is invoked.
+#
+# The target is chosen per family because reject needs a different ICMP type
+# for each. Protocols belonging to the wrong family are skipped, so icmp never
+# lands in an ipv6 rule and the various spellings of IPv6 ICMP never land in
+# an ipv4 one. Ports are only attached to protocols that actually have them.
+#
+# Unlike the iptables backend there is no tarpit or delude here, so there is
+# no TCP only restriction and no conntrack exemption to generate.
+#
+# Takes no arguments; family, protocols, ports, and type all come from the
+# object.
+#
+# Returns a list of hashrefs, one per rule to be created, each of the form:
+#
+#     {
+#         fam  => 'ipv4',    # or 'ipv6', for the --direct family argument
+#         args => '-m set --match-set kur_ssh_4 src -j DROP',
+#     }
+#
+# The args are the complete rule body after the chain, ready to be appended to
+# a --direct --add-rule invocation. The list is empty only if every protocol
+# was filtered out.
+#
+#     # no protocols and no ports, type drop
+#     my @rules = $self->_rule_args;
+#     #   { fam => 'ipv4', args => '-m set --match-set kur_ssh_4 src -j DROP' }
+#     #   { fam => 'ipv6', args => '-m set --match-set kur_ssh_6 src -j DROP' }
+#
+#     # type reject, protocols tcp, ports 22
+#     #   { fam => 'ipv4', args => '-m set --match-set kur_ssh_4 src -p tcp -m multiport --dports 22 -j REJECT --reject-with icmp-port-unreachable' }
+#     #   { fam => 'ipv6', args => '-m set --match-set kur_ssh_6 src -p tcp -m multiport --dports 22 -j REJECT --reject-with icmp6-port-unreachable' }
 sub _rule_args {
 	my ($self) = @_;
 
@@ -399,59 +462,6 @@ sub _rule_args {
 
 	return @rules;
 } ## end sub _rule_args
-
-# Internal helper. Returns the conntrack commands used to drop existing
-# connection tracking entries for the passed IP. When protocols are
-# configured, the kill is scoped to them via -p so protocols that are not
-# being blocked are left alone; otherwise every entry for the IP is dropped.
-sub _kill_commands {
-	my ( $self, $ip ) = @_;
-
-	# conntrack defaults to IPv4, so IPv6 IPs need the family specified
-	my $is_v4  = ( $ip =~ /\A$IPv4_re\z/ ) ? 1 : 0;
-	my $family = $is_v4 ? '' : '-f ipv6 ';
-
-	my @protos = @{ $self->{protocols} };
-	if ( !@protos && defined( $self->{ports}[0] ) ) {
-		# ports without protocols means tcp and udp are being blocked
-		@protos = ( 'tcp', 'udp' );
-	}
-
-	# nothing configured means everything is being blocked, so drop every
-	# entry for the IP
-	if ( !@protos ) {
-		return ( 'conntrack ' . $family . '-D -s ' . $ip );
-	}
-
-	# scope the kill to the blocked protocols; ones conntrack can not filter
-	# by are skipped as are the icmps of the wrong family
-	my %conntrack_protos = (
-		tcp         => 'tcp',
-		udp         => 'udp',
-		udplite     => 'udplite',
-		sctp        => 'sctp',
-		dccp        => 'dccp',
-		gre         => 'gre',
-		icmp        => 'icmp',
-		icmpv6      => 'icmpv6',
-		icmp6       => 'icmpv6',
-		'ipv6-icmp' => 'icmpv6',
-	);
-
-	my @commands;
-	my %seen;
-	foreach my $proto (@protos) {
-		my $conntrack_proto = $conntrack_protos{$proto};
-		next if ( !defined($conntrack_proto) );
-		next if ( $conntrack_proto eq 'icmp'   && !$is_v4 );
-		next if ( $conntrack_proto eq 'icmpv6' && $is_v4 );
-		next if ( $seen{$conntrack_proto} );
-		$seen{$conntrack_proto} = 1;
-		push( @commands, 'conntrack ' . $family . '-D -p ' . $conntrack_proto . ' -s ' . $ip );
-	}
-
-	return @commands;
-} ## end sub _kill_commands
 
 =head2 init
 
@@ -717,13 +727,6 @@ sub re_init {
 
 	$self->errorblank;
 
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
-
 	# teardown is best effort here as a partially or fully wiped setup is
 	# exactly what re_init needs to recover from; init cleans up any remnants
 	{
@@ -902,24 +905,6 @@ sub flush {
 
 	$self->{banned} = {};
 } ## end sub flush
-
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
 
 =head2 ban_cidr
 

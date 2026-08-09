@@ -19,11 +19,13 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Crypt-OpenSSL-PKCS12
+requires:
+  perl: '5.014000'
 resources:
   bugtracker: https://github.com/dsully/perl-crypt-openssl-pkcs12/issues
   homepage: https://github.com/dsully/perl-crypt-openssl-pkcs12
   repository: https://github.com/dsully/perl-crypt-openssl-pkcs12.git
-version: '1.97'
+version: '1.98'
 x_contributors:
   - '@mmuehlenhoff'
   - '@sectokia'

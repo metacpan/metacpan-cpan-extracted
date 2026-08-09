@@ -21,4 +21,17 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
 	if $@;
 
-all_pod_coverage_ok();
+# Symbols that live in a package's symbol table but are not part of any
+# public interface, so there is nothing for a user to read about them:
+#
+#   - ALL_CAPS :: `use constant` values -- compile-time implementation
+#     detail (MAGIC, HEADER_LEN, MAX_INBUF, EULER, ...)
+#   - *_xs :: the Inline::C / XS entry points, documented as a group in
+#     the NATIVE ACCELERATION section and never called by user code
+#   - bootstrap :: installed by XSLoader when the prebuilt object loads
+all_pod_coverage_ok(
+	{
+		also_private => [ qr/\A[A-Z][A-Z0-9_]*\z/, qr/_xs\z/, qr/\Abootstrap\z/, ],
+	},
+	'POD coverage'
+);

@@ -8,7 +8,7 @@ use JSON::MaybeXS;
 use Scalar::Util ();
 use namespace::clean;
 
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -46,12 +46,20 @@ my %DEFAULT_RESOURCE_MAP = (
     Ingress => 'Api::Networking::V1::Ingress',
     IngressClass => 'Api::Networking::V1::IngressClass',
     NetworkPolicy => 'Api::Networking::V1::NetworkPolicy',
+    ServiceCIDR => 'Api::Networking::V1::ServiceCIDR',
+    IPAddress => 'Api::Networking::V1::IPAddress',
     # Storage
     CSIDriver => 'Api::Storage::V1::CSIDriver',
     CSINode => 'Api::Storage::V1::CSINode',
     CSIStorageCapacity => 'Api::Storage::V1::CSIStorageCapacity',
     StorageClass => 'Api::Storage::V1::StorageClass',
     VolumeAttachment => 'Api::Storage::V1::VolumeAttachment',
+    VolumeAttributesClass => 'Api::Storage::V1::VolumeAttributesClass',
+    # Resource (Dynamic Resource Allocation, GA in v1.34)
+    DeviceClass => 'Api::Resource::V1::DeviceClass',
+    ResourceClaim => 'Api::Resource::V1::ResourceClaim',
+    ResourceClaimTemplate => 'Api::Resource::V1::ResourceClaimTemplate',
+    ResourceSlice => 'Api::Resource::V1::ResourceSlice',
     # Authorization
     LocalSubjectAccessReview => 'Api::Authorization::V1::LocalSubjectAccessReview',
     SelfSubjectAccessReview => 'Api::Authorization::V1::SelfSubjectAccessReview',
@@ -87,9 +95,13 @@ my %DEFAULT_RESOURCE_MAP = (
     PriorityLevelConfiguration => 'Api::Flowcontrol::V1::PriorityLevelConfiguration',
     # Admissionregistration
     MutatingWebhookConfiguration => 'Api::Admissionregistration::V1::MutatingWebhookConfiguration',
+    MutatingAdmissionPolicy => 'Api::Admissionregistration::V1::MutatingAdmissionPolicy',
+    MutatingAdmissionPolicyBinding => 'Api::Admissionregistration::V1::MutatingAdmissionPolicyBinding',
     ValidatingAdmissionPolicy => 'Api::Admissionregistration::V1::ValidatingAdmissionPolicy',
     ValidatingAdmissionPolicyBinding => 'Api::Admissionregistration::V1::ValidatingAdmissionPolicyBinding',
     ValidatingWebhookConfiguration => 'Api::Admissionregistration::V1::ValidatingWebhookConfiguration',
+    # Certificates (beta)
+    PodCertificateRequest => 'Api::Certificates::V1beta1::PodCertificateRequest',
     # Extension APIs (different base paths)
     CustomResourceDefinition => 'ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinition',
     APIService => 'KubeAggregator::Pkg::Apis::Apiregistration::V1::APIService',
@@ -580,7 +592,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head1 SYNOPSIS
 
@@ -638,7 +650,7 @@ version 1.100
 =head1 DESCRIPTION
 
 This module provides objects and serialization / deserialization methods that represent
-the structures found in the Kubernetes API L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/>
+the structures found in the Kubernetes API L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/>
 
 Kubernetes API is strict about input types. When a value is expected to be an integer,
 sending it as a string will cause rejection. This module ensures correct value types
@@ -1133,12 +1145,15 @@ are no longer available.
 =item * B<List classes removed>
 
 Individual C<*List> classes (e.g., C<IO::K8s::Api::Core::V1::PodList>) have been
-replaced with the unified L<IO::K8s::List> class. The old class names still exist
-as deprecation stubs that emit warnings.
+replaced with the unified L<IO::K8s::List> class. The old class names emitted
+deprecation warnings for a while; as of this release they have been dropped
+from this distribution entirely. If you need the old name to fail loudly
+instead of silently resolving to a stale prior release, install
+L<IO::K8s::Deprecated>, which ships CPAN redirect stubs for all 76 of them.
 
-=item * B<Updated to Kubernetes v1.31 API>
+=item * B<Updated to Kubernetes v1.36 API>
 
-API objects have been updated from v1.14 to v1.31. Some fields may have changed,
+API objects have been updated from v1.14 to v1.36. Some fields may have changed,
 been added, or removed according to upstream Kubernetes API changes.
 
 =item * B<New Role for namespaced resources>
@@ -1153,9 +1168,11 @@ namespace-scoped.
 
 L<Kubernetes::REST> - REST client for the Kubernetes API, uses IO::K8s for typed request/response objects
 
+L<IO::K8s::Deprecated> - CPAN redirect stubs for IO::K8s module names that were renamed or removed
+
 L<Kubernetes::REST::Example> - Comprehensive examples for using Kubernetes::REST with IO::K8s against a real cluster (Minikube, K3s, etc.)
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/>
 
 =head1 BUGS and SOURCE
 

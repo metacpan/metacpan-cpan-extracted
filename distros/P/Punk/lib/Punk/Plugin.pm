@@ -57,6 +57,33 @@ at boot, naming both owners.
 C<plugin 'Name'> resolves to C<Punk::Plugin::Name>; C<'+Full::Class'>
 uses the class as written.
 
+=head2 KEYWORDS OF YOUR OWN
+
+A plugin that wants a declaration keyword - C<task>, C<queue>, C<cron> -
+installs it with C<< $app->install_kw >> rather than assigning to a glob
+in the application class:
+
+    $app->install_kw(task => sub {
+        my ($name, $target) = @_;
+        push @TASKS, [$name, $target];
+        return;
+    }, __PACKAGE__);
+
+Punk installs it as a magic CV named for the class it lands in, beside
+the DSL's own keywords, and keeps it in the same registry: two plugins
+claiming one name croak naming both owners, and a core keyword cannot be
+installed over. Installing the same name twice from the same owner is a
+no-op, so a plugin with both an C<import> and a C<register> can install
+from both without remembering which ran.
+
+A keyword must be installed before the line that uses it is compiled, or
+the bareword form (C<<< task 'x' => ... >>>) will not parse - which means from
+the plugin's C<import>, i.e. C<use My::Plugin> in the app class.
+C<register> runs at runtime, so a keyword installed there is only usable
+in its parenthesised form (C<task(...)>) on later lines. These are
+ordinary compile-time-visible subs, not calls lifted into the C<BEGIN>
+phase: an argument is evaluated when the line runs, as usual.
+
 =head1 METHODS
 
 =head2 new

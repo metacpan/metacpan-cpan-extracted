@@ -5,6 +5,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Kubernetes::REST::Error;
+use Kubernetes::REST::RemoteError;
 
 throws_ok(sub {
   Kubernetes::REST::Error->throw(type => 'ErrorType', message => 'mymessage');

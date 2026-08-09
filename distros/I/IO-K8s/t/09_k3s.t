@@ -58,6 +58,13 @@ subtest 'IO::K8s::K3s resource_map' => sub {
     }
 };
 
+# --- upstream_version ---
+
+subtest 'IO::K8s::K3s upstream_version' => sub {
+    my $provider = IO::K8s::K3s->new;
+    is($provider->upstream_version, 'v1.36.3+k3s1', 'upstream_version reports latest tracked k3s release');
+};
+
 # --- new(with => ['IO::K8s::K3s']) integration ---
 
 subtest 'with constructor parameter' => sub {

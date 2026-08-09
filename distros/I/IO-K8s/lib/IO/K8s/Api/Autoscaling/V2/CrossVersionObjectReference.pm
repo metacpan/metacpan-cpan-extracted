@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::CrossVersionObjectReference;
 # ABSTRACT: CrossVersionObjectReference contains enough information to let you identify the referred resource.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Autoscaling::V2::CrossVersionObjectReference - CrossVersionObjectR
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 apiVersion
 

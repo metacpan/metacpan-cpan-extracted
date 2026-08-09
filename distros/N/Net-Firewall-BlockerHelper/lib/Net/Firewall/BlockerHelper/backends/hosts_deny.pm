@@ -3,7 +3,7 @@ package Net::Firewall::BlockerHelper::backends::hosts_deny;
 use 5.006;
 use strict;
 use warnings;
-use base 'Error::Helper';
+use base         qw( Error::Helper Net::Firewall::BlockerHelper::Util );
 use Regexp::IPv4 qw($IPv4_re);
 use Regexp::IPv6 qw($IPv6_re);
 use Fcntl qw(:flock);
@@ -14,11 +14,11 @@ Net::Firewall::BlockerHelper::backends::hosts_deny - TCP wrappers hosts.deny bac
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -171,7 +171,27 @@ sub new {
 	return $self;
 } ## end sub new
 
-# Internal helper. Returns the begin and end marker lines for this instance.
+# Internal helper. Returns the pair of comment lines that fence off this
+# instance's region of the hosts.deny file.
+#
+# The file is shared with whatever else the admin has put in it and possibly
+# with other instances of this backend, so each instance only ever owns the
+# span between its own markers. The tag embeds the prefix and the name, which
+# together are unique per instance, so two instances writing to the same file
+# do not see or disturb each other's entries.
+#
+# Takes no arguments.
+#
+# Returns a two element list of the begin line and the end line, in that
+# order, neither with a trailing newline. Both are ordinary hosts.deny
+# comments, so a region left behind by a crashed process is inert rather than
+# something libwrap tries to parse.
+#
+#     my ( $begin, $end ) = $self->_markers;
+#
+#     # with prefix "kur" and name "ssh"
+#     #   $begin is '# BEGIN Net::Firewall::BlockerHelper kur_ssh'
+#     #   $end   is '# END Net::Firewall::BlockerHelper kur_ssh'
 sub _markers {
 	my ($self) = @_;
 
@@ -179,9 +199,31 @@ sub _markers {
 	return ( '# BEGIN ' . $tag, '# END ' . $tag );
 }
 
-# Internal helper. Renders the hosts.deny line for the passed IP. IPv6
-# addresses are bracketed as libwrap only matches the [ip] form for those;
-# bare IPv6 patterns are silently never matched.
+# Internal helper. Renders the single hosts.deny rule line that blocks the
+# passed IP for the configured daemon.
+#
+# IPv6 addresses are wrapped in square brackets. libwrap only recognizes the
+# [address] form for IPv6, and a bare IPv6 client pattern is not an error, it
+# simply never matches anything, so an unbracketed address would look like a
+# working ban while blocking nothing at all.
+#
+# Args:
+#
+#     ip - The address to block, as a plain string. Expected to be an already
+#          validated and lowercased IPv4 or IPv6 address, such as "10.0.0.1"
+#          or "2001:db8::1". The family is decided by looking for a colon, so
+#          anything holding one is treated as IPv6.
+#
+# Returns the rule line as a string with no trailing newline, in the
+# "<daemon> : <client>" form that hosts.deny expects. The daemon side comes
+# from the daemon option and is emitted as configured, which is "ALL" by
+# default.
+#
+#     $self->_render_entry('10.0.0.1');     # 'ALL : 10.0.0.1'
+#     $self->_render_entry('2001:db8::1');  # 'ALL : [2001:db8::1]'
+#
+#     # with the daemon option set to 'sshd'
+#     $self->_render_entry('10.0.0.1');     # 'sshd : 10.0.0.1'
 sub _render_entry {
 	my ( $self, $ip ) = @_;
 
@@ -189,9 +231,33 @@ sub _render_entry {
 	return $self->{options}{daemon} . ' : ' . $addr;
 }
 
-# Internal helper. Builds this instance's marked region from the current ban
-# list. Returns an empty string when there is nothing banned so no stray
-# markers are left in the file.
+# Internal helper. Builds this instance's entire marked region, the begin
+# marker, one rule line per banned IP, and the end marker, from the current
+# contents of the internal ban list.
+#
+# The IPs are sorted so that the same set of bans always renders to the same
+# bytes. Without that the order would follow the hash order and the file would
+# be rewritten on unrelated operations, and the region recorded in test_data
+# could not be compared against a fixed expected string.
+#
+# Takes no arguments; the bans come from the object's banned hash.
+#
+# Returns the region as a single string ending in a newline, ready to be
+# concatenated onto the preserved part of the file. When nothing is banned it
+# returns the empty string rather than an empty pair of markers, so a file
+# that has had everything unbanned is left with no trace of this instance in
+# it at all.
+#
+#     # with 10.0.0.1 and 2001:db8::1 banned and the daemon option at "ALL"
+#     my $block = $self->_render_block;
+#
+#     #   # BEGIN Net::Firewall::BlockerHelper kur_ssh
+#     #   ALL : 10.0.0.1
+#     #   ALL : [2001:db8::1]
+#     #   # END Net::Firewall::BlockerHelper kur_ssh
+#
+#     # with nothing banned
+#     my $block = $self->_render_block;    # ''
 sub _render_block {
 	my ($self) = @_;
 
@@ -208,8 +274,40 @@ sub _render_block {
 	return join( "\n", @lines ) . "\n";
 } ## end sub _render_block
 
-# Internal helper. Given the full file contents, returns them with this
-# instance's marked region (and only this instance's) removed.
+# Internal helper. Given the full contents of the hosts.deny file, returns
+# them with this instance's marked region cut out and everything else left
+# exactly as it was.
+#
+# This is the half of the read-modify-write that preserves the admin's own
+# rules and any other instance's region. Only the span from this instance's
+# begin marker through its end marker is removed, matched non greedily so that
+# two regions in the same file cannot be swallowed as one. The markers are
+# escaped with \Q..\E because the tag holds :: and . characters that would
+# otherwise be read as regex metacharacters.
+#
+# Args:
+#
+#     content - The full file contents as a single string, normally straight
+#               from _read. May be the empty string, may hold no region for
+#               this instance, and may hold regions belonging to other
+#               instances; none of those are errors.
+#
+# Returns the contents with the region removed, as a string. When there is no
+# region for this instance the input comes back unchanged, so this is safe to
+# call unconditionally. The argument itself is not modified; the copy taken
+# off @_ is what gets edited.
+#
+#     # a file holding this instance's region plus an admin rule
+#     my $outside = $self->_strip_block($content);
+#
+#     #   in:   "sshd : 192.0.2.5\n"
+#     #       . "# BEGIN Net::Firewall::BlockerHelper kur_ssh\n"
+#     #       . "ALL : 10.0.0.1\n"
+#     #       . "# END Net::Firewall::BlockerHelper kur_ssh\n"
+#     #   out:  "sshd : 192.0.2.5\n"
+#
+#     # nothing of ours in the file, so nothing changes
+#     $self->_strip_block("sshd : 192.0.2.5\n");   # "sshd : 192.0.2.5\n"
 sub _strip_block {
 	my ( $self, $content ) = @_;
 
@@ -220,8 +318,31 @@ sub _strip_block {
 	return $content;
 } ## end sub _strip_block
 
-# Internal helper. Returns the current file contents, or the simulated outside
-# content when testing, or '' when the file is absent.
+# Internal helper. Slurps the hosts.deny file and returns its contents.
+#
+# Every failure mode collapses to the empty string rather than an error: the
+# file not existing, not being openable, and being empty are all treated the
+# same. That is deliberate. A missing hosts.deny is the normal state on a host
+# that has never had one, and the caller's next step is to write the file out
+# in full anyway, so there is nothing an error here would let it do
+# differently. A file that exists but cannot be read will fail loudly at the
+# write instead, with an error code that names the operation that triggered
+# it.
+#
+# In testing mode nothing is touched on disk and the test_outside attribute is
+# returned instead, which is how a test stands in a hosts.deny that already
+# has other content in it.
+#
+# Takes no arguments.
+#
+# Returns the file contents as a single string, or the empty string. Never
+# returns undef, so the result can go straight into _strip_block or a string
+# comparison without a defined check.
+#
+#     my $current = $self->_read;
+#
+#     # the usual read-modify-write shape
+#     my $outside = $self->_strip_block( $self->_read );
 sub _read {
 	my ($self) = @_;
 
@@ -240,14 +361,63 @@ sub _read {
 	return defined($content) ? $content : '';
 } ## end sub _read
 
-# Internal helper. Rewrites the file with this instance's region refreshed from
-# the current ban list, preserving all other content. An exclusive lock on
-# <file>.lock is held across the read-modify-write so concurrent processes
-# serialize rather than losing each others changes, and the new contents are
-# written to a temp file that is renamed into place so a partial file can
-# never be seen. Failures are raised using the passed error code, so they
-# surface as the operation that triggered the write, such as banFailed. In
-# testing mode it records the rendered file in test_data instead.
+# Internal helper. Pushes the current ban list out to the hosts.deny file,
+# refreshing this instance's region and preserving everything else in the
+# file byte for byte. This is the only place the file is written, so init,
+# ban, unban, re_init, teardown, and flush all funnel through it.
+#
+# The whole read-modify-write runs under an exclusive flock on a sidecar
+# <file>.lock, taken before the read so that the modify is based on what is
+# actually current. Two processes banning at the same time therefore serialize
+# instead of each writing back a copy based on a stale read and losing the
+# other's entry. The lock is on a separate file rather than on hosts.deny
+# itself because hosts.deny gets replaced by rename, which would drop a lock
+# held on the old inode.
+#
+# The new contents go to a temp file in the same directory that is then
+# renamed into place. Rename within a filesystem is atomic, so a reader never
+# sees a half written hosts.deny and a crash mid write leaves the original
+# intact rather than a truncated file that would silently stop blocking
+# anything. The mode of the file being replaced is carried over to the temp
+# file first, so an admin's tightened permissions survive the swap.
+#
+# If the rendered contents match what is already there the file is left alone
+# entirely, which keeps the mtime stable and avoids pointless rewrites when a
+# ban is re-applied.
+#
+# Failures do not die. They set the error to the passed code, set errorString,
+# and warn, so the problem surfaces named after whatever the caller was doing
+# rather than as a generic write failure.
+#
+# Args:
+#
+#     error_flag - The numeric error code to raise on failure, so the error
+#                  reads as the operation that triggered the write. Callers
+#                  pass the code matching themselves: 12 backendInitError from
+#                  init, 13 banFailed from ban, 14 unbanFailed from unban, 16
+#                  reInitFailed from re_init, 17 teardownFailed from teardown,
+#                  and 25 flushFailed from flush. Optional; defaults to 31,
+#                  fileWriteFailed, which no current caller relies on since
+#                  they all pass a code.
+#
+# Returns nothing, on success and on failure alike. The caller checks the
+# error state rather than a return value.
+#
+#     # from ban, so a write failure reads as banFailed
+#     $self->_apply(13);
+#
+#     # from teardown
+#     $self->_apply(17);
+#
+# In testing mode nothing is locked, written, or renamed. The rendered result
+# is recorded on the frontend's test_data as a hashref instead, letting a test
+# assert on the exact file that would have been written:
+#
+#     {
+#         file    => '/etc/hosts.deny',    # the path that would be written
+#         block   => "# BEGIN ...\nALL : 10.0.0.1\n# END ...\n",
+#         content => "sshd : 192.0.2.5\n# BEGIN ...\n",   # preserved + block
+#     }
 sub _apply {
 	my ( $self, $error_flag ) = @_;
 
@@ -510,17 +680,10 @@ sub re_init {
 
 	$self->errorblank;
 
-	if ( !$self->{inited} ) {
-		$self->{error}       = 1;
-		$self->{errorString} = 'backend has not been inited';
-		$self->warn;
-		return;
-	}
-
 	$self->_apply(16);
 
 	$self->{inited} = 1;
-} ## end sub re_init
+}
 
 =head2 teardown
 
@@ -608,24 +771,6 @@ sub flush {
 	$self->{banned} = {};
 	$self->_apply(25);
 } ## end sub flush
-
-# Internal helper. Returns a true value if the passed scalar is a valid IPv4 or
-# IPv6 CIDR range, that is an address followed by "/" and a prefix length that
-# is within the range valid for its family (0 to 32 for IPv4, 0 to 128 for
-# IPv6). Returns false otherwise.
-sub _valid_cidr {
-	my ( $self, $cidr ) = @_;
-
-	return 0 if ( !defined($cidr) || ref($cidr) ne '' );
-
-	if ( $cidr =~ m!\A(.+)/([0-9]{1,3})\z! ) {
-		my ( $addr, $prefix ) = ( $1, $2 );
-		return 1 if ( $addr =~ /\A$IPv4_re\z/ && $prefix <= 32 );
-		return 1 if ( $addr =~ /\A$IPv6_re\z/ && $prefix <= 128 );
-	}
-
-	return 0;
-} ## end sub _valid_cidr
 
 =head2 ban_cidr
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -12,7 +12,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 
 
@@ -187,7 +187,7 @@ String::Super - Compactor for superstrings
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -232,8 +232,8 @@ The following options (all optional) are supported:
 
 (experimental since v0.02)
 
-Adds a blob (as per L</add_blob>) which is included and will alaways have an offset of C<0> (even if this means inefficient packing).
-This can be used to include data to which the offsets neet to be kept constant.
+Adds a blob (as per L</add_blob>) which is included and will always have an offset of C<0> (even if this means inefficient packing).
+This can be used to include data to which the offsets need to be kept constant.
 
 B<Note:>
 Using this option may result in inefficient packing and/or some packing algorithms being disabled.
@@ -310,7 +310,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

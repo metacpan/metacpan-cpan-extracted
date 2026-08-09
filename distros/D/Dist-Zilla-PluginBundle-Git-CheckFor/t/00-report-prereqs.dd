@@ -9,7 +9,10 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Test::ConsistentVersion' => '0',
                                       'Test::EOL' => '0',
+                                      'Test::HasVersion' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0.88',
                                       'Test::NoSmartComments' => '0',
                                       'Test::NoTabs' => '0',
@@ -29,7 +32,6 @@ do { my $x = {
                                       'List::Util' => '1.33',
                                       'Moose' => '0',
                                       'Moose::Role' => '0',
-                                      'MooseX::AttributeShortcuts' => '0',
                                       'Try::Tiny' => '0',
                                       'autodie' => '0',
                                       'namespace::autoclean' => '0',
@@ -56,7 +58,7 @@ do { my $x = {
                                    'Test::Moose::More' => '0.008',
                                    'Test::More' => '0.94',
                                    'Test::TempDir::Tiny' => '0',
-                                   'blib' => '1.01',
+                                   'lib' => '0',
                                    'perl' => '5.006'
                                  }
                  }

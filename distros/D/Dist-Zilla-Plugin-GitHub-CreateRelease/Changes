@@ -1,8 +1,24 @@
 Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
 
+0.0010 -- Sun Aug 09 00:55:09 ADT 2026
+
+    [Significant Changes from 0.0009]
+    - Bug fixes from @Getty for repo-owner-from-remote-url and use response->code
+    - Use CPAN::Changes to extract Release notes from ChangeLog file (Changes)
+
+    [Detailed Change Log]
+    - 2c0d5ac use CPAN::Changes to get the notes from the Changes file Use find_release() to locate the correct release
+    - 3cc552c Update repo version
+    - 002942c Update README
+    - 725f27a Quiet perlcritic use bare return not undef
+    - 75f8e60 update the script to fix some issues
+    - e03adcb Fix 404/422 detection comparing HTTP::Response object to a string
+    - 76b94c2 Detect repository owner from the remote url, not just the repo name
+    - c849e46 v0.0009
+
 0.0009 -- Thu May 28 19:00:27 ADT 2026
 
-    [Significant Changes from 0.0007]
+    [Significant Changes from 0.0008]
     - Bug fixes from @Getty for repo-name detection and uninitialized $prev" warning
     - Fix smoker issue
 

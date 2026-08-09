@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use Punk::Queue::Command ();
+
+# A dispatcher and nothing else - the work lives in Punk::Queue::Command,
+# so it is testable without spawning a process.
+
+exit Punk::Queue::Command::main(@ARGV);

@@ -125,4 +125,49 @@ for my $fmt (sort keys %by_format) {
 	is($out, '', 'a write that croaks announces nothing');
 }
 
+# ---------------------------------------------------------------------------
+# The announcement is flushed as it is made.
+#
+# PerlIO_stdout() has its own buffer. When fd 1 is a pipe that buffer is block
+# buffered, so an unflushed announcement waits there until exit -- and its
+# eventual flush lands wherever the program happens to be, in the middle of
+# another writer's line if that writer holds a separate handle on fd 1.
+# Test::More is exactly such a writer: it prints TAP through a dup of STDOUT
+# with autoflush on. That is how a smoker saw write_table.t emit spliced,
+# out-of-sequence TAP while every assertion in it passed.
+#
+# Each check below runs in a child whose stdout is a pipe, and prints its
+# markers through a dup with autoflush on, mirroring Test::More. The dup is
+# unbuffered through select and $|, not $fh->autoflush: IO::Handle is not
+# autoloaded for handle method calls before 5.14.
+# ---------------------------------------------------------------------------
+{
+	my $file = "$dir/flushed.csv";
+	my $out  = child_stdout(
+		  q{open my $d, '>&', \*STDOUT or die; my $o = select $d; $| = 1; select $o;}
+		. qq{print \$d "BEFORE\\n";}
+		. qq{write_table([{ a => 1 }], '$file');}
+		. q{print $d "AFTER\n";}
+	);
+	is($out, "BEFORE\n" . announcement($file) . "AFTER\n",
+		'the announcement is flushed where it is made, not held until exit');
+}
+
+{
+	# Many announcements: unflushed, these overrun the buffer and the flush
+	# cuts one in half around another handle's line. Every line must arrive
+	# whole, and the two streams must stay in step.
+	my @files = map { "$dir/interleave_$_.csv" } 1 .. 40;
+	my $writes = join '', map {
+		qq{write_table([{ a => 1 }], '$files[$_]'); print \$d "MARK $_\\n";}
+	} 0 .. $#files;
+	my $out = child_stdout(
+		q{open my $d, '>&', \*STDOUT or die; my $o = select $d; $| = 1; select $o;} . $writes);
+	my $expected = join '', map {
+		announcement($files[$_]) . "MARK $_\n"
+	} 0 .. $#files;
+	is($out, $expected,
+		'40 announcements stay whole and in step with a second handle on fd 1');
+}
+
 done_testing();

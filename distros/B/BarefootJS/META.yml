@@ -21,19 +21,19 @@ no_index:
 provides:
   BarefootJS:
     file: lib/BarefootJS.pm
-    version: v0.31.2
+    version: v0.31.4
   BarefootJS::Date:
     file: lib/BarefootJS.pm
-    version: v0.31.2
+    version: v0.31.4
   BarefootJS::DevReload:
     file: lib/BarefootJS/DevReload.pm
-    version: v0.31.2
+    version: v0.31.4
   BarefootJS::Evaluator:
     file: lib/BarefootJS/Evaluator.pm
-    version: v0.31.2
+    version: v0.31.4
   BarefootJS::SearchParams:
     file: lib/BarefootJS/SearchParams.pm
-    version: v0.31.2
+    version: v0.31.4
 requires:
   DateTime: '0'
   DateTime::TimeZone: '0'
@@ -42,5 +42,5 @@ resources:
   bugtracker: https://github.com/piconic-ai/barefootjs/issues
   homepage: https://barefootjs.dev
   repository: https://github.com/piconic-ai/barefootjs.git
-version: v0.31.2
+version: v0.31.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

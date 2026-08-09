@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ListMeta;
 # ABSTRACT: ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
-our $VERSION = '1.100';
+our $VERSION = '1.105';
 use IO::K8s::Resource;
 
 k8s continue => Str;
@@ -29,7 +29,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ListMeta - ListMeta describes metada
 
 =head1 VERSION
 
-version 1.100
+version 1.105
 
 =head2 continue
 
