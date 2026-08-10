@@ -68,7 +68,7 @@ Git::Native::Tree - A libgit2 tree object
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

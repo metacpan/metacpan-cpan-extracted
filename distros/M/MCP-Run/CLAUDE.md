@@ -155,3 +155,40 @@ MCP_RUN_DOCKER_BUILD_ARGS='--platform linux/amd64,linux/arm64' dzil release
 - `transform_command` (Co-Authored-By) und `compress()` (Output-Filtering) sind verwandt aber unterschiedlich
 - `mcp-run-bash` compression default ist AN (bin/mcp-run-bash), Modul-Attribut ist AUS (lib/MCP/Run.pm)
 - `format_result($tool, $result, $compress, $command)` — bei Override in Subclasses muss der `$command` für command-spezifische Filter durchgereicht werden
+
+## Weitere Runner-Ideen
+
+`MCP::Run::Bash` ist heute die einzige `execute()`-Implementierung. Die
+Architektur erlaubt es, weitere Runner als `MCP::Run`-Subklassen
+hinzuzufügen — jede implementiert `execute($command, $wd, $timeout)`
+und liefert denselben Hashref (`exit_code`, `stdout`, `stderr`,
+optional `error`).
+
+| Idee | Zweck | Aufwand |
+|---|---|---|
+| `MCP::Run::Shell` | Beliebige Shell (zsh, fish, dash) statt bash wählbar | klein — fast 1:1 von Bash.pm kopieren, nur das Binary wechselt |
+| `MCP::Run::Python` | `python -c $command` als Alternative, mit gleichem Compression-Setup | klein — Subklasse, die statt `bash -c` Python aufruft |
+| `MCP::Run::REPL` | Hält einen länger laufenden Interpreter-Process (bash / python / node), Antworten auf einzelne Snippets — kein Neustart pro Tool-Call | mittel — bidirektionale Pipes, Historie, Restart-Strategie |
+| `MCP::Run::SSH` | `ssh user@host $command` mit key-basierter Auth | mittel — Auth-Setup, `known_hosts`-Handling, hop-by-hop-Timeout |
+| `MCP::Run::Docker` | `docker exec <container> $command` — bereits ähnlich zum Docker-Rewrite im Compress-Hook, aber als eigener MCP-Tool | mittel — Container-Lifecycle, Image-Pinning, no-nework-Flag |
+| `MCP::Run::kubectl` | `kubectl exec <pod> -- $command` für Cluster-Debugging | mittel — Pod-Auswahl, Container-Spec, Token-Refresh |
+| `MCP::Run::Local` | Sandboxed Variante (kein bash -c, sondern allowlist von Binaries + Argumenten) | gross — echte Sandbox, nicht first-word-match |
+
+Jede Subklasse bekommt gratis: Compression-Pipeline, Co-Authored-By-Override
+(bei git commands), `allowed_commands`/`validator`, `format_result`.
+Kompression muss nur aktiv sein, wenn der Runner selbst Output produziert;
+für SSH/kubectl bleibt der Filter gleich, weil `command` weitergegeben wird.
+
+## Delegation
+
+Delegate behavior-relevant code to the right agent instead of touching it yourself —
+principle and lane are in `.claude/rules/mcp-run-rules.md`.
+
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug behavior-relevant code | `mcp-run-worker` (default) |
+| Pre-release audit | `mcp-run-release-checker` |
+
+The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
+agent delegates rather than loading them. Skill sources live under `.claude/skills/`.
+The karr board (`refs/karr/*`) is the internal coordination channel.

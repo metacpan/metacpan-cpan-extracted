@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use List::Util qw(any);
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 use parent 'Lingua::famibeib::Fragment';
 
@@ -135,7 +135,7 @@ Lingua::famibeib::Sentence - module to interact with the famibeib sentences
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

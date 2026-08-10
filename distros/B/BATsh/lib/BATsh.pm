@@ -22,7 +22,7 @@ use File::Spec ();
 BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 $VERSION = $VERSION;
 
 require BATsh::MB;
@@ -608,7 +608,17 @@ sub _exec_sh_section {
     for my $line (@lines) {
         (my $s = $line) =~ s/\r?\n\z//;
         $s =~ s/\A\s+//;
-        if ($s =~ /\A(?:source|\.)\s+(\S+\.batsh)/) {
+        # Fast path: a PLAIN literal ".batsh" operand is sourced here, so
+        # that the sourced file is seen as a bilingual script rather than
+        # as a batch of SH lines.  The operand must be anchored and free
+        # of quotes, $ and backticks: a quoted or expandable operand --
+        #     source "$dir/init.batsh"      . 'my script.batsh'
+        # -- has to reach BATsh::SH::_cmd_source() instead, which is the
+        # only place where expansion and dequoting have happened.  Before
+        # 0.11 the pattern was unanchored, so a quoted operand matched
+        # here with its opening quote still attached and source_file()
+        # was handed a name that could not exist.
+        if ($s =~ /\A(?:source|\.)\s+(\S+\.batsh)\s*\z/ && $1 !~ /["'\$`]/) {
             my $bfile = $1;
             _flush_sh(\@batch) if @batch; @batch = ();
             eval { source_file('', $bfile) };
@@ -744,7 +754,12 @@ sub repl {
     print "BATsh $VERSION - Bilingual Shell\n";
     print "Uppercase => CMD mode, lowercase => SH mode. EXIT/exit to quit.\n\n";
 
-    my (@buf, $depth, $cur_mode) = ((), 0, '');
+    # One statement per variable: in a "my" list an array is greedy and
+    # swallows the whole right-hand side, so "my (@buf, $depth, $cur_mode)
+    # = ((), 0, '')" would leave @buf = (0, '') and both scalars undef.
+    my @buf      = ();
+    my $depth    = 0;
+    my $cur_mode = '';
     my ($hd_delim, $hd_dash, $pending_hd_delim, $pending_hd_dash)
         = (undef, 0, undef, 0);
     while (1) {
@@ -826,12 +841,14 @@ sub main {
     }
     if (@argv && ($argv[0] eq '--help' || $argv[0] eq '-h')) {
         print <<"END_OF_USAGE";
-usage: batsh [--encoding=ENC] script.batsh [args...]
-       batsh [--encoding=ENC] -            (read the script from STDIN)
-       batsh [--encoding=ENC] -e 'source'  (run inline source)
-       batsh                               (interactive REPL)
-       batsh --version | --help
+usage: batsh.pl [--encoding=ENC] script.batsh [args...]
+       batsh.pl [--encoding=ENC] -            (read the script from STDIN)
+       batsh.pl [--encoding=ENC] -e 'source'  (run inline source)
+       batsh.pl                               (interactive REPL)
+       batsh.pl --version | --help
 
+The installed name is batsh.pl; on Windows MakeMaker's pl2bat also
+provides batsh.
 ENC: cp932 sjis gbk uhc big5 utf8 none auto (default: auto)
 The process exit code is the script's exit code (exit N / EXIT [/B] N,
 or the status of the last command).
@@ -870,7 +887,7 @@ BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
@@ -882,12 +899,12 @@ Version 0.10
   BATsh->run('myscript.batsh', args => ['arg1', 'arg2']);
   print BATsh->last_status;    # same value, queried later
 
-  # From the command line (bin/batsh.pl is installed as "batsh" on
-  # Windows, "batsh.pl" elsewhere):
-  #   batsh script.batsh arg1 arg2      exit code = script status
-  #   batsh -e 'echo hi'                run inline source
-  #   ... | batsh - arg1                read the script from STDIN
-  #   batsh --help / --version
+  # From the command line (bin/batsh.pl installs as "batsh.pl";
+  # on Windows MakeMaker's pl2bat also provides "batsh"):
+  #   batsh.pl script.batsh arg1 arg2   exit code = script status
+  #   batsh.pl -e 'echo hi'             run inline source
+  #   ... | batsh.pl - arg1             read the script from STDIN
+  #   batsh.pl --help / --version
 
   # CP932 (Shift_JIS) scripts on Japanese Windows: auto-detected,
   # or select the encoding explicitly
@@ -982,6 +999,9 @@ line. CMD sections are executed by BATsh::CMD, which implements:
   SHIFT, SHIFT /N
   SETLOCAL [ENABLEDELAYEDEXPANSION|DISABLEDELAYEDEXPANSION], ENDLOCAL
   CD, DIR, COPY, DEL, MOVE, MKDIR, RMDIR, REN, TYPE
+  CHDIR, MD, RD, ERASE, RENAME  (cmd.exe spellings of CD, MKDIR,
+    RMDIR, DEL, REN)
+  REM comment, :: comment
   PAUSE, EXIT [/B] [code], CLS, TITLE, VER, PUSHD, POPD
   cmd1 | cmd2  (pipeline via temporary file)
   &, &&, ||  (sequential, conditional-and, conditional-or)
@@ -1064,8 +1084,21 @@ SH sections are executed by BATsh::SH, which implements:
     (|-patterns, * ? [abc] [a-z] [!abc] globs, ;& and ;;& fall-through)
   test / [ ... ]  (file, string, and integer comparisons)
   cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
+  break [N], continue [N], return [N]
   eval  (quote removal + re-execution with a second expansion)
+  let EXPR [EXPR ...]  (arithmetic evaluation; status 1 if last is zero)
+  type [-t|-p] NAME ...  (report how NAME resolves)
+  command [-v|-V] NAME [ARG ...]  (run bypassing functions; look up NAME)
+  umask [-S] [MODE]  (print/set the file-creation mask; octal or
+    symbolic u=rwx,g=rx,o=rx)
+  hash [-r] [NAME ...]  (PATH lookup; no-op cache maintenance)
+  readonly [-p] [NAME[=VALUE] ...]  (mark a variable read-only)
+  mapfile / readarray [-t] [-d D] [-n N] [-O O] [-s S] [ARRAY]
+    (read stdin lines into an indexed array)
+  declare -i NAME[=EXPR]  (integer attribute: assignments evaluate as
+    arithmetic); declare -r NAME  (readonly attribute)
   set -e / -u / -x, set +e/+u/+x, set -o errexit|nounset|xtrace
+  set -- [ARG ...] / set ARG ...  (replace $1..$9 / $@ / $#)
   trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]  (EXIT + %SIG)
   $(( arithmetic )) -- full C-style operator set:
     + - * / % **  (** right-assoc; / % truncate toward zero)
@@ -1094,6 +1127,15 @@ SH sections are executed by BATsh::SH, which implements:
   ${arr[@]}, ${arr[*]}, ${#arr[@]}, ${#arr[i]}, ${!arr[@]}
   unset arr, unset arr[i]
   source / . file
+  {a,b,c}, {1..5}, {a..e}[..step]  -- brace expansion
+  shopt -s/-u extglob; ?(),*(),+(),@(),!()  -- extended pattern
+    matching in case patterns and ${VAR%pat}-family patterns
+  cmd <<< word  -- here-string
+  <(cmd), >(cmd)  -- process substitution via temp file
+  select VAR in list; do ... done  -- menu loop
+  alias name=value, alias, unalias
+  exec cmd, exec > file ...
+  ( cmd1; cmd2 )  -- subshell command group, isolated scope
 
 =head1 ENCODING (CP932 / Shift_JIS SUPPORT)
 
@@ -1138,9 +1180,13 @@ is visible as C<$?> in the following SH section.
 
 C<BATsh-E<gt>main(@ARGV)> implements the command-line interface used by
 the modulino (C<perl lib/BATsh.pm ...>) and by F<bin/batsh.pl> (installed
-as C<batsh>): C<--help>, C<--version>, C<-e 'source'>, a script filename,
-or C<-> to read the script from STDIN; remaining arguments become
-C<%1>..C<%9> / C<$1>..C<$9>.  The modulino calls
+as C<batsh.pl>; on Windows MakeMaker's F<pl2bat> also provides
+C<batsh>): C<--help>, C<--version>, C<-e 'source'>, a script filename,
+or C<-> to read the script from STDIN.  With a script filename or with
+C<->, the remaining arguments become C<%1>..C<%9> / C<$1>..C<$9>.  With
+C<-e> they do B<not>: every remaining argument is joined with newlines
+onto the inline source, so C<-e 'echo one' 'echo two'> runs a two-line
+script.  The modulino calls
 C<exit(BATsh-E<gt>main(@ARGV))>, so the OS-level exit code of the process
 is the script's own status.  In the REPL, C<exit N> / C<EXIT N> ends the
 session.
@@ -1197,6 +1243,15 @@ C<PATH=~/a:~/b> (bash expands each colon-separated tilde in
 C<PATH>/C<CDPATH>/C<MAILPATH> specifically); such values pass through
 unexpanded.
 
+The result of an expansion is B<literal data> as of version 0.09: a
+backslash arriving from a variable, from a command substitution or from
+a tilde expansion is no longer re-read as a shell escape by the
+quote-removal stage, so a Windows pathname held in a variable stays
+intact (C<d="C:\Users\x"; cd $d>), while a backslash written in the
+script itself still quotes the character after it. A tilde expansion is
+also protected against field splitting, so a home directory whose name
+contains a space stays one word.
+
 Brace expansion C<{a,b,c}> and C<{1..5}>/C<{a..e}[..step]>, extended
 pattern matching (C<shopt -s extglob>; C<?()>, C<*()>, C<+()>, C<@()>,
 C<!()> in case patterns and in C<${VAR%pat}>-family patterns),
@@ -1222,6 +1277,55 @@ first completes with the empty expansion before the script stops with
 status 1.  The options are reset at the start of each top-level
 C<run>/C<run_string>/C<run_lines>, so C<set -e> does not leak into a
 later run in the same process.
+
+C<set> also takes B<operands> as of version 0.09: C<set -- ARG ...>
+replaces the positional parameters (and C<set --> clears them), and so
+does a first operand that is not an option, as in C<set a b c>.  The
+parameters are the ones a function call and C<shift> use, so C<$1>..C<$9>,
+C<$@>, C<$*>, C<$#>, C<shift> and C<getopts> all see them, which makes the
+usual
+
+    set -- -f value extra
+    while getopts f: opt; do ... done
+    shift $((OPTIND - 1))
+
+idiom work; before 0.09 every operand was ignored and that loop never ran.
+C<set> leaves C<OPTIND> alone, as bash does.  At most nine positional
+parameters are addressable.
+
+Filename patterns (C<*>, C<?>, C<[abc]>, C<[a-z]>, C<[!abc]>) are matched
+by BATsh itself as of version 0.09, not by Perl's C<glob()>, which reads a
+backslash as an escape character and so destroyed an ordinary Windows
+pattern (C<C:\dir\*.txt> was searched for as C<C:dir*.txt> and came back
+with its backslashes deleted).  The separator is C</> everywhere and C<\>
+as well on Windows, where a path is written that way; on Unix a backslash
+stays an ordinary filename character.  A leading C<.> is matched only by a
+pattern that starts with C<.>, every segment but the last has to be a
+directory, C<[!abc]> negates, matches are sorted, case is ignored on
+Windows, and a pattern that matches nothing is left exactly as written.
+CMD-mode wildcards (C<FOR %f IN (...)>, C<DEL>) use the same matcher.
+
+How a Windows pattern is written differs between the two modes.  A
+CMD-mode line has no escape character, so it is written as it looks
+(C<FOR %f IN (C:\dir\*.txt)>, C<DEL C:\dir\*.tmp>).  An SH-mode line
+follows bash, where a backslash quotes the next character, so a bare
+C<echo C:\dir\*.txt> means C<C:dir*.txt> there (in bash as well); keep the
+path in a variable, as a script does anyway, and the backslashes are data
+and stay separators:
+
+    d='C:\dir\'
+    for f in $d*.txt; do echo "$f"; done
+
+The builtins C<let>, C<type> and C<command> B<are supported> as of version
+0.08, evaluated internally in pure Perl (previously they fell through to an
+external shell and failed where none existed).  C<let EXPR ...> evaluates
+each argument as shell arithmetic, reusing the C<$(( ))> evaluator, with
+exit status 0 when the last expression is non-zero and 1 when it is zero.
+C<type [-t|-p] NAME ...> reports how each NAME resolves (alias, keyword,
+function, builtin, or a file on C<PATH>).  C<command [-v|-V] NAME [ARG ...]>
+runs NAME bypassing a same-named shell function; C<-v> prints how NAME
+would be invoked (the portable C<command -v foo> feature test) and C<-V>
+prints a verbose, C<type>-style description.
 
 The builtin C<eval> B<is supported> as of version 0.07: one level of
 quote removal, concatenation, and re-execution with a second round of
@@ -1262,11 +1366,48 @@ assignments/control words ignore it, there is no job control
 background jobs. In CMD mode C<&> keeps its cmd.exe meaning as a
 sequential separator.
 
+A control structure written entirely on one physical line may be
+followed by C<;>, C<&&>, C<||> or C<|> and more commands
+(C<if ...; fi; echo done>, C<for ...; done | sort>) as of version 0.11;
+before that release everything after the closing C<fi>/C<done>/C<esac>
+was silently discarded and the block collector went on to swallow the
+following lines.  The same now holds for a one-line function definition
+and a parenthesised group (C<f(){ ...; }; f>, C<( ... ) && echo ok>).
+A redirection still binds to the structure itself, as in bash.
+
+The reserved word C<time> is B<not> implemented; C<time cmd> is looked
+up as an external program and fails when none is installed.
+
 Section boundary detection is token-based (uppercase vs. lowercase first
 token). Mixed-case first tokens are treated as SH.
 
-Please report bugs via the issue tracker:
-L<https://github.com/ina-cpan/BATsh/issues>
+Please report bugs to the author at E<lt>ina.cpan@gmail.comE<gt>,
+quoting the fingerprint that F<t/0000-environment.t> prints at the top
+of the test output.
+
+=head1 EXAMPLES
+
+The F<eg/> directory contains runnable example scripts:
+
+  eg/00_hello.pl                Minimal Perl driver calling BATsh->run
+  eg/01_hello.batsh             Hello world in both modes
+  eg/02_env_bridge.batsh        Environment-variable bridge (CMD <-> SH)
+  eg/03_cmd_features.batsh      CMD-mode features and parameter modifiers
+  eg/04_sh_features.batsh       SH-mode features and expansions
+  eg/05_cmd_comprehensive.batsh Comprehensive CMD-mode tour
+  eg/06_sh_comprehensive.batsh  Comprehensive SH-mode tour
+  eg/07_mixed_comprehensive.batsh  Mixed CMD/SH comprehensive tour
+  eg/08_sh_arrays.batsh         SH indexed and associative arrays
+  eg/09_cmd_subroutines.batsh   CMD subroutines: CALL args, %~N, SHIFT
+  eg/10_sh_case.batsh           SH case..esac pattern branching
+  eg/11_sh_trap.batsh           SH trap / signal handling
+  eg/12_cmd_vs_sh.batsh         cmd and sh side by side (for students)
+  eg/13_cp932_demo.pl           CP932 (Shift_JIS) Japanese script demo
+  eg/14_sh_getopts.batsh        SH getopts option parsing (v0.07)
+
+Run a .batsh example with:
+
+  perl -Ilib -MBATsh -e "BATsh->run(shift)" eg/01_hello.batsh
 
 =head1 SEE ALSO
 

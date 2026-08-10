@@ -264,7 +264,7 @@ subtest scale_pivot_chord_keys => sub {
         use_scales => 1,
     );
     $got = $obj->pivot_chord_keys;
-    $expect = 0;
+    $expect = 8;
     is scalar(@$got), $expect, 'pivot_chord_keys';
 
     $obj = Music::ModalFunction->new(

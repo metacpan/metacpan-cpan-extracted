@@ -2,9 +2,9 @@ NAME
     Desktop::XWindowManager::Util - Utilities related to X Window Manager
 
 VERSION
-    This document describes version 0.004 of Desktop::XWindowManager::Util
+    This document describes version 0.005 of Desktop::XWindowManager::Util
     (from Perl distribution Desktop-XWindowManager-Util), released on
-    2026-04-17.
+    2026-05-18.
 
 SYNOPSIS
 DESCRIPTION
@@ -122,13 +122,21 @@ FUNCTIONS
     Moving means the window will not be shown in any other KDE activity
     aside from the specified ones.
 
+    By default, windows that are currently showing to all KDE activities are
+    excluded. To include them, set the "include_all_activities_windows"
+    option.
+
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
-    *   activity_name* => *array[kdeactivity::name]*
+    *   activity_name => *array[kdeactivity::name]*
 
         (No description)
+
+    *   all_activities => *bool*
+
+        Show window in all KDE activities instead of specific one(s).
 
     *   current_kde_activity => *bool*
 
@@ -141,6 +149,86 @@ FUNCTIONS
     *   id => *str*
 
         Only list window with the specified ID.
+
+    *   include_all_activities_windows => *bool*
+
+        Also move windows that are currently shown to all KDE activities
+        (which are excluded by default).
+
+    *   kde_activity_name => *array[kdeactivity::name]*
+
+        Only list window shown in one the specified KDE activity names.
+
+    *   query => *array[str]*
+
+        Queries are matched against window titles, IDs, and KDE activity
+        names & GUIDs (if KDE activity names & GUIDs are requested).
+
+    *   with_kde_activity => *bool*
+
+        Show KDE activity GUID for each window (old name for
+        with_kde_activity_guid).
+
+    *   with_kde_activity_guid => *bool*
+
+        Show KDE activity GUID for each window.
+
+    *   with_kde_activity_name => *bool*
+
+        Show KDE activity name for each window.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  move_windows_to_this_kde_activity
+    Usage:
+
+     move_windows_to_this_kde_activity(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Move matching window(s) to the current KDE activity.
+
+    A simple wrapper for "move_windows_to_kde_activity", where windows will
+    be moved to the current KDE activity.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   activity_name => *array[kdeactivity::name]*
+
+        (No description)
+
+    *   all_activities => *bool*
+
+        Show window in all KDE activities instead of specific one(s).
+
+    *   current_kde_activity => *bool*
+
+        Only list window shown in the current KDE activity.
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   id => *str*
+
+        Only list window with the specified ID.
+
+    *   include_all_activities_windows => *bool*
+
+        Also move windows that are currently shown to all KDE activities
+        (which are excluded by default).
 
     *   kde_activity_name => *array[kdeactivity::name]*
 

@@ -49,7 +49,10 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use File::Spec ();
+use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
+
+use BATsh_TestOS qw(posix_file_semantics);
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 
@@ -70,7 +73,7 @@ my $CANARY = File::Spec->catfile($TMPDIR, "batsh_canary_$$.tmp");
 # with developer mode) otherwise reported a FAIL for a difference in OS
 # semantics, not in BATsh.  The 0600 mode checks below are skipped there
 # for the same kind of reason.
-my $POSIX_SEMANTICS = ($^O =~ /^(?:MSWin32|dos|os2)$/) ? 0 : 1;
+my $POSIX_SEMANTICS = posix_file_semantics();
 
 my $HAVE_SYMLINK = $POSIX_SEMANTICS && eval {
     my $target = File::Spec->catfile($TMPDIR, "batsh_symtest_${$}_t.tmp");
@@ -144,7 +147,7 @@ my @tests = (
     # observe it mid-flight from outside the process, so we call the
     # internal helper directly and check the mode of what it created.
     sub {
-        if ($^O =~ /^(?:MSWin32|dos|os2)$/) {
+        if (!$POSIX_SEMANTICS) {
             _ok(1, "TS02: skipped (POSIX mode bits not meaningful on $^O)");
             return;
         }
@@ -193,7 +196,7 @@ my @tests = (
     ##################################################################
 
     sub {
-        if ($^O =~ /^(?:MSWin32|dos|os2)$/) {
+        if (!$POSIX_SEMANTICS) {
             _ok(1, "TS04: skipped (POSIX mode bits not meaningful on $^O)");
             return;
         }

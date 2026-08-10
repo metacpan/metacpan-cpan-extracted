@@ -57,28 +57,34 @@ my %WriteMakefileArgs = (
     "Crypt::JWT"    => 0,
     "HTTP::AnyUA"   => 0,
     "JSON::MaybeXS" => 0,
+    "Path::Tiny"    => "0.130",
+    "Ref::Util"     => 0,
     "URI"           => 0,
     "URI::Escape"   => 0
   },
   "TEST_REQUIRES" => {
-    "Crypt::PK::RSA" => 0,
-    "Test2::V0"      => "0.000121"
+    "Crypt::PK::RSA"         => 0,
+    "Test2::Require::EnvVar" => "0.000121",
+    "Test2::V0"              => "0.000121"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Class::Tiny"    => 0,
-  "Crypt::JWT"     => 0,
-  "Crypt::PK::RSA" => 0,
-  "HTTP::AnyUA"    => 0,
-  "JSON::MaybeXS"  => 0,
-  "Test2::V0"      => "0.000121",
-  "URI"            => 0,
-  "URI::Escape"    => 0
+  "Class::Tiny"            => 0,
+  "Crypt::JWT"             => 0,
+  "Crypt::PK::RSA"         => 0,
+  "HTTP::AnyUA"            => 0,
+  "JSON::MaybeXS"          => 0,
+  "Path::Tiny"             => "0.130",
+  "Ref::Util"              => 0,
+  "Test2::Require::EnvVar" => "0.000121",
+  "Test2::V0"              => "0.000121",
+  "URI"                    => 0,
+  "URI::Escape"            => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

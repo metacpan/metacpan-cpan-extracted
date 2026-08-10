@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "punk-queue admin API",
-    "version": "0.01",
+    "version": "0.02",
     "description": "The admin REST surface Punk::Plugin::Queue registers under its guarded prefix. List endpoints speak Funky.Table's server-side protocol: request draw/page/limit/search/sort (sort is a JSON-encoded [{column,dir}]) plus the filter vocabulary; response { data, total, draw }. Every write is CSRF-protected when the app configures csrf. Bulk is selection-only: explicit ids, capped at 500, filter payloads rejected."
   },
   "paths": {

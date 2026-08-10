@@ -4,28 +4,28 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
      use Tie::Google::Sheets;
-    
+     
      tie my %doc, 'Tie::Google::Sheets',
          spreadsheet_id  => '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
          service_account => '/path/to/service-account-key.json';
-    
+     
      # read and write individual cells
      my $name = $doc{Employees}{A1};
      $doc{Employees}{A2} = 'Grace Hopper';
-    
+     
      # create a new worksheet, optionally pre-populated
      tied(%doc)->add_worksheet('Report', { A1 => 'Total', B1 => 42 });
-    
+     
      # iterate over worksheet tabs
      for my $title (keys %doc) {
          print "$title\n";
      }
-    
+     
      # remove a worksheet
      delete $doc{Report};
 
@@ -88,6 +88,28 @@ CONSTRUCTOR
       the same contract as HTTP::Tiny). Used as-is instead of wrapping
       "ua". Mutually exclusive with "ua".
 
+    batch_size
+
+      Enables write batching. When set to a positive integer, cell writes
+      (that is, $doc{$title}{$cell} = $value) are queued instead of being
+      sent immediately, and are combined into a single API call once the
+      queue reaches batch_size pending writes. Defaults to undef, meaning
+      every write is sent immediately as its own API call.
+
+      Regardless of batch_size, queued writes are always flushed before
+      they could otherwise be observed out of order: immediately before any
+      read, before any worksheet is added or deleted, and when %doc (or the
+      last reference to it) goes out of scope. Queued writes can also be
+      flushed explicitly at any time; see "flush".
+
+    backoff_retry
+
+      Enables automatic retry when Google rate limits a request (HTTP
+      status 429). When set to a positive integer, a rate limited API call
+      is retried that many times, with exponential backoff (1, 2, 4, ...
+      seconds) between attempts, before giving up and croaking. Defaults to
+      undef, meaning a rate limited request fails immediately.
+
 TIE METHODS
 
     This class implements the standard perltie TIEHASH protocol; see
@@ -100,9 +122,8 @@ TIE METHODS
  FETCH
 
     Returns the worksheet named by the given key, as a hashref implemented
-    by Tie::Google::Sheets::Worksheet. The worksheet does not need to
-    already exist on the server; accessing cells on one that doesn't will
-    fail.
+    by Tie::Google::Sheets::Worksheet, or undef if no worksheet with that
+    title exists on the server.
 
  STORE
 
@@ -151,6 +172,16 @@ METHODS
 
     Deletes the worksheet named $title. Equivalent to delete $doc{$title}.
 
+ copy_worksheet
+
+     tied(%doc)->copy_worksheet($from_title, $to_title);
+
+    Copies the worksheet named $from_title to a new worksheet named
+    $to_title, including its formatting, data validation, and other
+    properties, not just its cell values. Croaks if $from_title doesn't
+    exist, or if $to_title already exists. Returns the new worksheet
+    hashref, the same as $doc{$to_title}.
+
  worksheet_titles
 
      my @titles = tied(%doc)->worksheet_titles;
@@ -158,10 +189,19 @@ METHODS
     Returns the titles of all worksheets in the spreadsheet, in the order
     Google Sheets returns them. Equivalent to keys %doc.
 
+ flush
+
+     tied(%doc)->flush;
+
+    Sends any cell writes queued by the "batch_size" constructor option as
+    a single API call. A no-op if batch_size wasn't given, or if there is
+    nothing queued. See "batch_size" for when this happens automatically.
+
 CAVEATS
 
       * Every cell access is a separate Google Sheets API call; there is no
-      local caching or batching. Be mindful of Google's API quotas
+      local caching, and writes are not batched unless "batch_size" is
+      given. Be mindful of Google's API quotas
       <https://developers.google.com/sheets/api/limits> if you access many
       cells.
 
@@ -171,6 +211,13 @@ CAVEATS
 
       * Only cell values are read and written; formatting, formulas results
       vs formula text, and other cell metadata are not exposed.
+
+      * Because of how Perl autovivifies nested data structures, reading or
+      writing a cell of a worksheet that doesn't yet exist (for example
+      $doc{NewSheet}{A1}) creates that worksheet as a side effect, the same
+      way $doc{NewSheet} = undef would. To check whether a worksheet exists
+      without creating it, use exists $doc{$title} or "worksheet_titles",
+      not a truth test on $doc{$title}.
 
 SEE ALSO
 

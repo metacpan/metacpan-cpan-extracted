@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Open::API', $VERSION);
@@ -25,7 +25,7 @@ Open::API - OpenAPI 3.1 server and client
 
 =head1 VERSION
 
-Version 0.05
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -190,6 +190,82 @@ C<skip_schema>, C<skip_decode>.
 Every response is either checked or skipped for exactly one named reason,
 which is the point: what was not looked at is a number you can report, not
 a gap you have to assume away.
+
+=head2 synthesize
+
+    my $trip = $api->synthesize('getPet');
+    my $trip = $api->synthesize('getPet', { code => 404 });
+    my $trip = $api->synthesize('getPet', { prefer => $env->{HTTP_PREFER} });
+
+A response for an operation, from the document alone, as a PSGI triplet -
+this is what serves a mock. The body is, in order of precedence: the
+media type's C<example>; a named C<examples> entry when
+C<< example => 'name' >> (or a C<Prefer: example=name> token) asked for
+one, the lexicographically first entry otherwise; the schema's
+C<default>; a value generated from the schema (types, C<enum> first
+member, C<const>, C<format>-aware strings, objects with C<required>
+members only, C<allOf>/C<oneOf>/C<anyOf>).
+
+B<Deterministic.> The same arguments give byte-identical bodies: nothing
+below draws a random value, and the body is encoded canonically (sorted
+keys), so not even hash order leaks in - the property holds across
+processes, not merely within one.
+
+=head3 Arrays
+
+An array is generated with five elements. Not zero, which is what an
+absent C<minItems> literally means and which is a correct answer to the
+wrong question - a list endpoint that mocks as C<[]> validates perfectly
+and shows the caller nothing about the shape of what they will get. Not
+one either: a single-element list is a shape nobody can build a table, a
+pagination control or an empty state against.
+
+C<minItems> raises that and C<maxItems> caps it, C<maxItems: 0>
+included - there the document has said it means empty and it is
+believed.
+
+Integer members whose names identify a thing - C<id>, C<petId>,
+C<order_id> - get the element's index added, so five rows are five rows
+rather than the same row five times. It stays deterministic, because the
+index is a position and not a counter, and it stays valid, because a
+value that would pass C<maximum> is left alone.
+
+=head3 The request
+
+    $api->synthesize('showPet', { path => { petId => 42 } });
+    # { "id": 42, "name": "string" }
+
+Given the request's path captures, a response property the request has
+already answered is answered with what the request said. C<GET /pets/42>
+replying with C<id> 0 is a mock nobody can develop a client against.
+
+A capture matches a property by the same name, the same name in any
+case, and then the convention every REST document uses - a path
+templated C<{petId}> naming the resource whose schema calls the field
+C<id>. That last rule applies only when exactly one capture ends in
+C<id>: C</pets/{petId}/toys/{toyId}> has two and there is no honest way
+to say which one a nested C<id> means, so it generates rather than
+guesses.
+
+B<The guarantee outranks the convenience.> A captured value is used only
+when it fits the property's schema - the declared type (numeric strings
+are coerced), C<enum>, C<const>, the numeric bounds and the length
+bounds. Anything that does not fit falls back to generation, and a
+schema carrying a C<pattern> falls back too, because a regex this does
+not evaluate is a rule it cannot honour. The mock still cannot produce
+something its own validator would reject.
+
+Status selection: C<< code => N >> (or a C<Prefer: code=N> token) picks a
+declared status; without one the lowest declared 2xx wins, then
+C<default> (answered as 200), then the lowest declared status. A
+preferred status the document does not declare is still answered - with
+the C<default> response's body when one is declared, empty otherwise -
+because C<Prefer> exists to exercise error handling. A response that
+declares no JSON content (a C<204>, a bare error) answers with an empty
+body and no content type.
+
+Explicit C<code>/C<example> keys win over the C<prefer> string. Croaks on
+an unknown operationId.
 
 =head2 operation_info
 

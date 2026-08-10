@@ -11,9 +11,9 @@ use List::Util qw(any);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-17'; # DATE
+our $DATE = '2026-05-18'; # DATE
 our $DIST = 'Desktop-XWindowManager-Util'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our @EXPORT_OK = qw(
                        list_xwm_windows
@@ -293,12 +293,23 @@ gen_modified_sub(
 Moving means the window will not be shown in any other KDE activity aside from
 the specified ones.
 
+By default, windows that are currently showing to all KDE activities are
+excluded. To include them, set the `include_all_activities_windows` option.
+
 MARKDOWN
     add_args => {
         activity_name => {
             schema => ['array*', of=> 'kdeactivity::name*'],
-            req => 1,
             cmdline_aliases => {a=>{}},
+        },
+        all_activities => {
+            summary => 'Show window in all KDE activities instead of specific one(s)',
+            schema => 'bool*',
+        },
+        include_all_activities_windows => {
+            summary => 'Also move windows that are currently shown to all KDE activities (which are excluded by default)',
+            schema => 'bool*',
+            cmdline_aliases => {A=>{}},
         },
     },
     wrap_code => sub {
@@ -306,7 +317,9 @@ MARKDOWN
         my %args = @_;
 
         my $activity_names = delete $args{activity_name};
-        $activity_names = [$activity_names] unless ref $activity_names eq 'ARRAY';
+        if (defined $activity_names) {
+            $activity_names = [$activity_names] unless ref $activity_names eq 'ARRAY';
+        }
 
         require Desktop::KDEActivity::Util;
         my $res_list_act = Desktop::KDEActivity::Util::list_kde_activities(detail => 1);
@@ -314,25 +327,67 @@ MARKDOWN
             unless $res_list_act->[0] == 200;
 
         my @guids;
-        for my $row (@{ $res_list_act->[2] }) {
-            if (grep { $_ eq $row->{name} } @$activity_names) {
-                push @guids, $row->{guid};
+        if (defined $activity_names) {
+            for my $row (@{ $res_list_act->[2] }) {
+                if (grep { $_ eq $row->{name} } @$activity_names) {
+                    push @guids, $row->{guid};
+                }
             }
+            return [404, "Can't find KDE activities named ".join(", ", @$activity_names)]
+                unless @guids;
         }
-        return [404, "Can't find KDE activities named ".join(", ", @$activity_names)]
-            unless @guids;
 
-        my $res_list_win = $orig->(%args, detail=>1);
+        my $res_list_win = $orig->(
+            %args,
+            detail=>1,
+            with_kde_activity_name => 1,
+        );
         return [500, "Can't list windows: $res_list_win->[0] - $res_list_win->[1]"]
             unless $res_list_win->[0] == 200;
 
         return [404, "Can't find any matching windows"] unless @{ $res_list_win->[2] };
         for my $win (@{ $res_list_win->[2] }) {
+            unless ($args{include_all_activities_windows}) {
+                if (($win->{kde_activity_name} // '') eq '') {
+                    # skip this window because it is displayed to all KDE activities
+                    next;
+                }
+            }
             system "xprop", "-f", "_KDE_NET_WM_ACTIVITIES", "8s", "-id", $win->{id},
-                "-set", "_KDE_NET_WM_ACTIVITIES", join(",",@guids);
+                "-set", "_KDE_NET_WM_ACTIVITIES",
+                ($args{all_activities} ? "" : join(",",@guids));
         }
 
         [200];
+    },
+);
+
+gen_modified_sub(
+    output_name => 'move_windows_to_this_kde_activity',
+    base_name => 'move_windows_to_kde_activity',
+    die => 1,
+    summary => 'Move matching window(s) to the current KDE activity',
+    description => <<'MARKDOWN',
+
+A simple wrapper for `move_windows_to_kde_activity`, where windows will be moved
+to the current KDE activity.
+
+MARKDOWN
+    delete_args => [
+        'activity_name',
+        'all_activities',
+    ],
+    wrap_code => sub {
+        my $orig = shift;
+        my %args = @_;
+
+        require Desktop::KDEActivity::Util;
+        my $res = Desktop::KDEActivity::Util::get_current_kde_activity();
+        return [500, "Can't get current KDE activity: $res->[0] - $res->[1]"]
+            unless $res->[0] == 200;
+        my $activity_name = $res->[2];
+
+        $orig->(%args, activity_name => $activity_name);
     },
 );
 
@@ -351,7 +406,7 @@ Desktop::XWindowManager::Util - Utilities related to X Window Manager
 
 =head1 VERSION
 
-This document describes version 0.004 of Desktop::XWindowManager::Util (from Perl distribution Desktop-XWindowManager-Util), released on 2026-04-17.
+This document describes version 0.005 of Desktop::XWindowManager::Util (from Perl distribution Desktop-XWindowManager-Util), released on 2026-05-18.
 
 =head1 SYNOPSIS
 
@@ -483,15 +538,22 @@ Move matching window(s) to a specified KDE activity.
 Moving means the window will not be shown in any other KDE activity aside from
 the specified ones.
 
+By default, windows that are currently showing to all KDE activities are
+excluded. To include them, set the C<include_all_activities_windows> option.
+
 This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<activity_name>* => I<array[kdeactivity::name]>
+=item * B<activity_name> => I<array[kdeactivity::name]>
 
 (No description)
+
+=item * B<all_activities> => I<bool>
+
+Show window in all KDE activities instead of specific one(s).
 
 =item * B<current_kde_activity> => I<bool>
 
@@ -504,6 +566,88 @@ Only list window shown in the current KDE activity.
 =item * B<id> => I<str>
 
 Only list window with the specified ID.
+
+=item * B<include_all_activities_windows> => I<bool>
+
+Also move windows that are currently shown to all KDE activities (which are excluded by default).
+
+=item * B<kde_activity_name> => I<array[kdeactivity::name]>
+
+Only list window shown in one the specified KDE activity names.
+
+=item * B<query> => I<array[str]>
+
+Queries are matched against window titles, IDs, and KDE activity names & GUIDs
+(if KDE activity names & GUIDs are requested).
+
+=item * B<with_kde_activity> => I<bool>
+
+Show KDE activity GUID for each window (old name for with_kde_activity_guid).
+
+=item * B<with_kde_activity_guid> => I<bool>
+
+Show KDE activity GUID for each window.
+
+=item * B<with_kde_activity_name> => I<bool>
+
+Show KDE activity name for each window.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 move_windows_to_this_kde_activity
+
+Usage:
+
+ move_windows_to_this_kde_activity(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Move matching window(s) to the current KDE activity.
+
+A simple wrapper for C<move_windows_to_kde_activity>, where windows will be moved
+to the current KDE activity.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<activity_name> => I<array[kdeactivity::name]>
+
+(No description)
+
+=item * B<all_activities> => I<bool>
+
+Show window in all KDE activities instead of specific one(s).
+
+=item * B<current_kde_activity> => I<bool>
+
+Only list window shown in the current KDE activity.
+
+=item * B<detail> => I<bool>
+
+(No description)
+
+=item * B<id> => I<str>
+
+Only list window with the specified ID.
+
+=item * B<include_all_activities_windows> => I<bool>
+
+Also move windows that are currently shown to all KDE activities (which are excluded by default).
 
 =item * B<kde_activity_name> => I<array[kdeactivity::name]>
 

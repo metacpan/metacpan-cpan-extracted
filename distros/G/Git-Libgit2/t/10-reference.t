@@ -1,6 +1,8 @@
 use Test2::V0;
 use Path::Tiny;
-use Git::Libgit2 qw( init_lib shutdown_lib check_rc oid_to_hex );
+use Git::Libgit2 qw(
+  GIT_EMODIFIED init_lib shutdown_lib check_rc oid_to_hex
+);
 use Git::Libgit2::FFI ();
 use FFI::Platypus::Buffer qw( scalar_to_buffer );
 
@@ -67,12 +69,48 @@ like( Git::Libgit2::FFI::git_reference_type($head), qr/\A[0-9]+\z/, 'type is a p
 Git::Libgit2::FFI::git_reference_free($head);
 
 # --- git_reference_create ---
-my $ref_oid_buf = "\0" x 20;
-my $rc_create = Git::Libgit2::FFI::git_reference_create(
-  $ref_oid_buf, $repo, 'refs/heads/test-branch', $commit_oid_ptr, 0, 'test commit',
+my $created_ref;
+check_rc Git::Libgit2::FFI::git_reference_create(
+  \$created_ref, $repo, 'refs/heads/test-branch', $commit_oid_ptr, 0, 'test commit',
 );
-is( $rc_create, 0, 'git_reference_create returns 0' );
-like( oid_to_hex(\$ref_oid_buf), qr/\A[0-9a-f]{40}\z/, 'reference_create wrote an OID' );
+is(
+  oid_to_hex( Git::Libgit2::FFI::git_reference_target($created_ref) ),
+  $commit_hex,
+  'reference_create returns a reference pointing at the requested OID',
+);
+Git::Libgit2::FFI::git_reference_free($created_ref);
+
+# --- git_reference_create_matching ---
+my $matched_ref;
+check_rc Git::Libgit2::FFI::git_reference_create_matching(
+  \$matched_ref, $repo, 'refs/heads/test-branch', $blob_oid_ptr, 1,
+  $commit_oid_ptr, 'matching update',
+);
+is(
+  oid_to_hex( Git::Libgit2::FFI::git_reference_target($matched_ref) ),
+  oid_to_hex($blob_oid_ptr),
+  'reference_create_matching updates when the expected OID matches',
+);
+Git::Libgit2::FFI::git_reference_free($matched_ref);
+
+my $mismatched_ref;
+my $mismatch_rc = Git::Libgit2::FFI::git_reference_create_matching(
+  \$mismatched_ref, $repo, 'refs/heads/test-branch', $commit_oid_ptr, 1,
+  $commit_oid_ptr, 'stale matching update',
+);
+is( $mismatch_rc, GIT_EMODIFIED, 'stale expected OID returns GIT_EMODIFIED' );
+ok( !$mismatched_ref, 'failed matching update does not return a reference handle' );
+
+my $matched_lookup;
+check_rc Git::Libgit2::FFI::git_reference_lookup(
+  \$matched_lookup, $repo, 'refs/heads/test-branch',
+);
+is(
+  oid_to_hex( Git::Libgit2::FFI::git_reference_target($matched_lookup) ),
+  oid_to_hex($blob_oid_ptr),
+  'failed matching update leaves the reference unchanged',
+);
+Git::Libgit2::FFI::git_reference_free($matched_lookup);
 
 # --- git_reference_delete ---
 my $branch_ref;

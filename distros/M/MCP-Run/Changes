@@ -1,5 +1,30 @@
 Revision history for MCP-Run
 
+0.104     2026-08-09 18:57:54Z
+  - Fix "Use of uninitialized value in join or string" warning from
+    MCP::Run::Compress::compress/process when a transform coderef
+    returns undef (e.g. git diff --stat's summary-line drop). undef
+    values are now filtered out before join, so dropping a line via
+    `return undef` no longer warns.
+  - Normalize undef $stdout/$stderr inputs to empty strings at the
+    top of compress()/process() so a caller passing undef for an
+    empty stream no longer trips warnings through the filter
+    pipeline.
+  - Fix filter resolution: when both a parsed_command filter and a
+    legacy regex filter match the same command, the parsed_command
+    filter now wins (it is strictly more specific). Previously hash
+    iteration order decided, which meant `git diff --stat` could
+    land on the bare `^git\s+diff\b` filter and skip the
+    "N+M- filename" transform rewrite entirely.
+  - Add t/30-no-warnings.t and t/40-compress-bin.t covering the
+    regression and the previously untested bin/mcp-run-compress
+    modes (--hook, --b64, --filter-files, --install-claude).
+  - Fix t/20-integration.t: pass MCP::Server::Context instances to
+    $server->handle() instead of raw hashes. MCP::Server's
+    _handle_tools_list calls $context->has_scope, which crashes
+    on an unblessed reference. The test was the bug, not the
+    server.
+
 0.103     2026-05-07 13:28:39Z
   - Fix MCP::Run::Compress->transform_command injecting Co-Authored-By
     *outside* the closing quote when the original git commit had no

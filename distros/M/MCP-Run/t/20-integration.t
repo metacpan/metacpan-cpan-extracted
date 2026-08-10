@@ -3,8 +3,14 @@ use warnings;
 use Test::More;
 
 use MCP::Run::Bash;
+use MCP::Server::Context ();
 
 my $server = MCP::Run::Bash->new(name => 'RunServer', version => '0.001');
+
+# MCP::Server::handle() requires a blessed context — passing a raw
+# hash triggers "Can't call method has_scope on unblessed reference"
+# inside _handle_tools_list.
+sub ctx { MCP::Server::Context->new }
 
 subtest 'initialize' => sub {
   my $response = $server->handle({
@@ -12,7 +18,7 @@ subtest 'initialize' => sub {
     id      => 1,
     method  => 'initialize',
     params  => { protocolVersion => '2025-11-25', capabilities => {}, clientInfo => { name => 'test' } },
-  }, {});
+  }, ctx());
 
   is $response->{jsonrpc}, '2.0', 'jsonrpc version';
   is $response->{id}, 1, 'response id';
@@ -26,7 +32,7 @@ subtest 'tools/list' => sub {
     jsonrpc => '2.0',
     id      => 2,
     method  => 'tools/list',
-  }, {});
+  }, ctx());
 
   is $response->{id}, 2, 'response id';
   my $tools = $response->{result}{tools};
@@ -44,7 +50,7 @@ subtest 'tools/call' => sub {
       name      => 'run',
       arguments => { command => 'echo hello world' },
     },
-  }, {});
+  }, ctx());
 
   is $response->{id}, 3, 'response id';
   my $content = $response->{result}{content}[0]{text};
@@ -58,7 +64,7 @@ subtest 'tools/call unknown tool' => sub {
     id      => 4,
     method  => 'tools/call',
     params  => { name => 'nonexistent', arguments => {} },
-  }, {});
+  }, ctx());
 
   ok exists $response->{error}, 'error returned';
   like $response->{error}{message}, qr/not found/i, 'error message';

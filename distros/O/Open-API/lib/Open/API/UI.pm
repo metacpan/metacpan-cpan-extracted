@@ -21,7 +21,7 @@ use Open::API;
 use Template::Stencil 0.02;
 use Markdown::Simple 0.18 ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 
 my @HEADERS = (
     'Content-Security-Policy' =>
@@ -219,6 +219,28 @@ sub _render {
 }
 
 sub index_html { $_[0]{html} }
+
+# The same page as a fragment, for a host page that already has a
+# <head> of its own - a product page showing the docs for a spec
+# somebody just pasted, rather than a documentation site.
+#
+# It carries the config block, because app.js reads its settings from
+# there and a fragment without it is inert. It does not carry the
+# stylesheet or script tags: the host is serving those assets from
+# wherever it serves assets, and only the host knows where that is.
+sub embed_html {
+    my ($self) = @_;
+    return $self->{embed} if defined $self->{embed};
+    my $data = $self->_build_data;
+    my $stencil = Template::Stencil->new(
+        template_dir => _base_dir() . '/templates',
+    );
+    return $self->{embed} =
+          qq{<script type="application/json" id="oa-config">}
+        . $data->{config_json}
+        . qq{</script>\n}
+        . $stencil->render('index', $data);
+}
 
 sub spec_json {
     my ($self) = @_;
@@ -423,6 +445,29 @@ accessors hand out bytes.
     my $bytes = $ui->index_html;
 
 The complete documentation page as UTF-8 bytes.
+
+=head2 embed_html
+
+    my $html = $ui->embed_html;
+
+The same page as a fragment, for a host page that already has a C<head>
+of its own - a product page showing the documentation for a spec
+somebody has just pasted, rather than a documentation site.
+
+It carries the C<oa-config> block, because F<app.js> reads its settings
+from there and a fragment without it is inert. It does not carry the
+stylesheet or script tags: the host is serving those assets from
+wherever it serves assets, and only the host knows where that is.
+
+    <link rel="stylesheet" href="/static/openapi-ui.css">
+    <script src="/static/openapi-ui.js" defer></script>
+    ...
+    <div class="oa-embed">[% ui_html %]</div>
+
+The host's own Content-Security-Policy applies, so it needs to allow the
+script and stylesheet it is serving, and C<connect-src> wide enough to
+reach whatever the spec's C<servers> point at. Setting C<servers> to a
+path on the host itself keeps try-it same-origin and needs neither.
 
 =head2 spec_json
 

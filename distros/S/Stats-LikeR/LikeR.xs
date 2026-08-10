@@ -637,7 +637,7 @@ static NV exact_p_value(long a, long b, long c, long d, const char *alt) {
 }
 
 static void calculate_exact_stats(long a, long b, long c, long d, NV conf,
-								  const char *alt, NV *orp, NV *lop, NV *hip) {
+								  const char *restrict alt, NV *orp, NV *lop, NV *hip) {
 	ft_support S;
 	if (!ft_init(&S, a, b, c, d)) { *orp = NAN; *lop = NAN; *hip = NAN; return; }
 	NV *sc; Newx(sc, S.ns, NV);
@@ -692,16 +692,16 @@ The (two-sided) p-value is the sum of P(T) over all such T whose
 probability is <= P(observed).  Only two-sided is defined for R x C, so
 'alternative' is ignored for larger tables (matching R's fisher.test).*/
 typedef struct {
-	int nrow, ncol;
-	const long *restrict R;   //fixed row totals
-	long *restrict C_rem;     //remaining column totals (mutated)
-	const NV *restrict lgR;   //lgR[i]  = sum_{k>=i} lgamma(R_k+1)
-	const NV *restrict jenR;  //jenR[i] = sum_{k>=i} cheapest split of R_k
-	NV const_term;            //sum lgamma(R_i+1)+lgamma(C_j+1)-lgamma(N+1)
-	NV log_p_obs_tol;         //log P(observed) + log1p(relErr)
-	NV p_total;               //accumulated p-value
-	long long nodes, cap;     //work counter + runaway guard
-	int aborted;              //set once cap is exceeded
+	unsigned nrow, ncol;
+	const long *restrict R;  //fixed row totals
+	long *restrict C_rem;    //remaining column totals (mutated)
+	const NV *restrict lgR;  //lgR[i]  = sum_{k>=i} lgamma(R_k+1)
+	const NV *restrict jenR; //jenR[i] = sum_{k>=i} cheapest split of R_k
+	NV const_term;           //sum lgamma(R_i+1)+lgamma(C_j+1)-lgamma(N+1)
+	NV log_p_obs_tol;        //log P(observed) + log1p(relErr)
+	NV p_total;              //accumulated p-value
+	long long nodes, cap;    //work counter + runaway guard
+	short int aborted;       //set once cap is exceeded
 } ft_rxc_ctx;
 
 static void ft_rxc_row(ft_rxc_ctx *restrict X, int row, int col, long row_rem, NV cur_lc);
@@ -901,6 +901,51 @@ static long ft_cell(pTHX_ SV *sv, const char *what) {
 	IV v = SvIV(sv);
 	if (v < 0) croak("fisher_test: %s must be nonnegative (got %" IVdf ")", what, v);
 	return (long)v;
+}
+
+/* R accumulates every sum inside chisq.test() -- sum(), rowSums(), colSums()
+ -- in an LDOUBLE, i.e. a long double, and only rounds back to a double when
+ the result is stored.  Doing the same here is what makes the statistic agree
+ with R in its last bits rather than a couple of ulp away; a plain NV
+ accumulator drifts on any table with more than a handful of cells.  On a
+ __float128 perl the NV is already wider than a long double, so it stays the
+ accumulator.*/
+#ifdef USE_QUADMATH
+typedef NV ct_acc_t;
+#else
+typedef long double ct_acc_t;
+#endif
+
+/* av_fetch() returns NULL for a hole in a sparse array (@a = (1,2,3) after
+ delete $a[1]), so the SV** it hands back cannot be dereferenced blind.
+ The chisq_test readers below treat a hole as the undef it prints as.*/
+static SV *ct_av_get(pTHX_ AV *av, SSize_t i) {
+	SV **p = av_fetch(av, i, 0);
+	return p ? *p : NULL;
+}
+
+/* chisq_test cell reader.  R's chisq.test() refuses to coerce: every entry of
+ 'x' has to be a nonnegative finite number ("all entries of 'x' must be
+ nonnegative and finite"), and an undef or a string is an error rather than a
+ silent zero.  Kept in one place so the array, hash and collapsed-matrix paths
+ cannot drift apart.  Counts are read as NV, not IV, because R accepts
+ non-integer weights here too.*/
+static NV ct_cell(pTHX_ SV *sv, const char *what) {
+	if (!sv || !SvOK(sv)) croak("chisq_test: %s is undef", what);
+	if (!looks_like_number(sv)) croak("chisq_test: %s is not a number", what);
+	NV v = SvNV(sv);
+	if (!isfinite(v) || v < 0.0)
+		croak("chisq_test: all entries of 'x' must be nonnegative and finite (%s)", what);
+	return v;
+}
+
+// chisq_test 'p' reader: a probability, so nonnegative and finite (R: "probabilities must be non-negative.")
+static NV ct_prob(pTHX_ SV *sv, const char *what) {
+	if (!sv || !SvOK(sv)) croak("chisq_test: %s is undef", what);
+	if (!looks_like_number(sv)) croak("chisq_test: %s is not a number", what);
+	NV v = SvNV(sv);
+	if (!isfinite(v) || v < 0.0) croak("chisq_test: probabilities must be non-negative");
+	return v;
 }
 
 /*Helpers for lm Linear Regression: OLS Matrix Math & Formula Parsing
@@ -10988,10 +11033,29 @@ CODE:
 OUTPUT:
 	RETVAL
 
-SV* chisq_test(data_ref)
-	SV* data_ref;
+SV* chisq_test(...)
 CODE:
 {
+	if (items < 1) croak("chisq_test requires at least a data reference");
+	SV *data_ref = ST(0);
+/* Named options, mirroring R's chisq.test(x, correct =, p =, rescale.p =).
+  'correct' defaults on, as in R, but only ever applies to a 2x2 table.
+  'p' supplies the null probabilities of the goodness-of-fit test -- without
+  it the test is against a uniform distribution, which is what "Chi-squared
+  test for given probabilities" has always meant here.*/
+	bool correct   = TRUE;
+	SV  *p_sv      = NULL;
+	bool rescale_p = FALSE;
+	for (unsigned int i = 1; i < (unsigned int)items; i += 2) {
+		if (i + 1 >= (unsigned int)items) croak("chisq_test: odd number of named arguments");
+		const char *key = SvPV_nolen(ST(i));
+		SV *val = ST(i + 1);
+		if (strEQ(key, "correct")) correct = SvTRUE(val) ? TRUE : FALSE;
+		else if (strEQ(key, "p")) p_sv = SvOK(val) ? val : NULL;
+		else if (strEQ(key, "rescale.p") || strEQ(key, "rescale_p")) rescale_p = SvTRUE(val) ? TRUE : FALSE;
+		else croak("chisq_test: unknown argument '%s'", key);
+	}
+
 	if (!SvROK(data_ref)) {// 1. Input Validation & Data Matrix Construction
 		croak("Input must be a reference");
 	}
@@ -10999,224 +11063,284 @@ CODE:
 	if (input_type != SVt_PVAV && input_type != SVt_PVHV) {
 		croak("Input must be an array reference or a hash reference");
 	}
-	NV **obs_matrix = NULL;
-	NV *obs_array = NULL;
-	AV*row_keys = NULL;
-	AV*col_keys = NULL;
+/* The table is read into one flat row-major r x c buffer, whatever the input
+  shape: a 1D input is simply r == 1.  is_2d records the *nesting* of the
+  input, and is used only to give 'expected' the same shape the caller passed
+  in; it does not decide which test runs (see 'gof' below).
+  Everything allocated here is handed to SAVEFREEPV so that a croak from
+  deep inside the parse -- a ragged row, a negative count -- unwinds without
+  leaking; the AVs of keys are mortal for the same reason.*/
+	NV *restrict obs = NULL;
+	AV *row_keys = NULL;
+	AV *col_keys = NULL;
 	unsigned int r = 0, c = 0;
 	bool is_2d = 0;
 	if (input_type == SVt_PVAV) {
-		AV*obs_av = (AV*)SvRV(data_ref);
-		r = av_top_index(obs_av) + 1;
-		if (r > 0) {
-			SV**first_elem = av_fetch(obs_av, 0, 0);
-			if (first_elem && SvROK(*first_elem) && SvTYPE(SvRV(*first_elem)) == SVt_PVAV) {
-				is_2d = 1;
-				c = av_top_index((AV*)SvRV(*first_elem)) + 1;
-				obs_matrix = (NV**)safemalloc(r * sizeof(NV*));
-				for (unsigned int i = 0; i < r; i++) {
-					obs_matrix[i] = (NV*)safecalloc(c, sizeof(NV));
-					SV**row_sv = av_fetch(obs_av, i, 0);
-					if (row_sv && SvROK(*row_sv)) {
-						AV*row_av = (AV*)SvRV(*row_sv);
-						for (unsigned int j = 0; j < c; j++) {
-							SV**val_sv = av_fetch(row_av, j, 0);
-							if (val_sv) obs_matrix[i][j] = SvNV(*val_sv);
-						}
-					}
-				}
-			} else {
-				c = r;
-				r = 1;
-				obs_array = (NV*)safemalloc(c * sizeof(NV));
-				for (unsigned int j = 0; j < c; j++) {
-					SV**val_sv = av_fetch(obs_av, j, 0);
-					if (val_sv) obs_array[j] = SvNV(*val_sv);
-				}
-			}
-		}
-	} else if (input_type == SVt_PVHV) {
-		HV*obs_hv = (HV*)SvRV(data_ref);
-		row_keys = newAV();
-		col_keys = newAV();
-
-		HE*first_entry;
-		hv_iterinit(obs_hv);
-		first_entry = hv_iternext(obs_hv);
-
-		if (first_entry) {
-			SV*first_val = hv_iterval(obs_hv, first_entry);
-			if (SvROK(first_val) && SvTYPE(SvRV(first_val)) == SVt_PVHV) {
-				is_2d = 1;
-				HV*col_idx_map = newHV();
-				hv_iterinit(obs_hv);
-				HE*row_entry;
-				while ((row_entry = hv_iternext(obs_hv))) {
-					av_push(row_keys, newSVsv(hv_iterkeysv(row_entry)));
-					r++;
-					SV*inner_sv = hv_iterval(obs_hv, row_entry);
-					if (SvROK(inner_sv) && SvTYPE(SvRV(inner_sv)) == SVt_PVHV) {
-						HV*inner_hv = (HV*)SvRV(inner_sv);
-						HE*col_entry;
-						hv_iterinit(inner_hv);
-						while ((col_entry = hv_iternext(inner_hv))) {
-							SV*col_key = hv_iterkeysv(col_entry);
-							if (!hv_exists_ent(col_idx_map, col_key, 0)) {
-								hv_store_ent(col_idx_map, col_key, newSViv(c), 0);
-								av_push(col_keys, newSVsv(col_key));
-								c++;
-							}
-						}
-					}
-				}
-				obs_matrix = (NV**)safemalloc(r * sizeof(NV*));
-				for (unsigned int i = 0; i < r; i++) {
-					obs_matrix[i] = (NV*)safecalloc(c, sizeof(NV));
-					SV**row_key_sv = av_fetch(row_keys, i, 0);
-					
-					HE*inner_he = hv_fetch_ent(obs_hv, *row_key_sv, 0, 0);
-					if (inner_he) {
-						SV*inner_sv = HeVAL(inner_he);
-						if (SvROK(inner_sv)) {
-							HV*inner_hv = (HV*)SvRV(inner_sv);
-							for (unsigned int j = 0; j < c; j++) {
-								SV**col_key_sv = av_fetch(col_keys, j, 0);
-								HE*val_he = hv_fetch_ent(inner_hv, *col_key_sv, 0, 0);
-								if (val_he) {
-									obs_matrix[i][j] = SvNV(HeVAL(val_he));
-								}
-							}
-						}
-					}
-				}
-				SvREFCNT_dec(col_idx_map);
-			} else {
-				// 1D Hash Handling
-				hv_iterinit(obs_hv);
-				HE*row_entry;
-				while ((row_entry = hv_iternext(obs_hv))) {
-					av_push(col_keys, newSVsv(hv_iterkeysv(row_entry)));
-					c++;
-				}
-				obs_array = (NV*)safemalloc(c * sizeof(NV));
-				for (unsigned int j = 0; j < c; j++) {
-					SV**col_key_sv = av_fetch(col_keys, j, 0);
-					// FIX 3: Extract HE* instead of SV**
-					HE*val_he = hv_fetch_ent(obs_hv, *col_key_sv, 0, 0);
-					if (val_he) {
-						obs_array[j] = SvNV(HeVAL(val_he));
-					}
-				}
-			}
-		}
-	}
-
-	if ((is_2d && (r == 0 || c == 0)) || (!is_2d && c == 0)) {
-		croak("Empty data structure");
-	}
-
-	NV stat = 0.0, grand_total = 0.0;
-	unsigned int df = 0;
-	bool yates = (is_2d && r == 2 && c == 2) ? 1 : 0;
-	SV*expected_ref = NULL;
-
-	if (is_2d) {
-		NV *row_sum = (NV*)safemalloc(r * sizeof(NV));
-		NV *col_sum = (NV*)safemalloc(c * sizeof(NV));
-		for(unsigned int i=0; i<r; i++) row_sum[i] = 0.0;
-		for(unsigned int j=0; j<c; j++) col_sum[j] = 0.0;
-
-		for (unsigned int i = 0; i < r; i++) {
-			for (unsigned int j = 0; j < c; j++) {
-				NV val = obs_matrix[i][j];
-				row_sum[i] += val;
-				col_sum[j] += val;
-				grand_total += val;
-			}
-		}
-
-		if (input_type == SVt_PVAV) {
-			AV*expected_av = newAV();
+		AV *obs_av = (AV *)SvRV(data_ref);
+		unsigned int n0 = (unsigned int)(av_top_index(obs_av) + 1);
+		if (n0 == 0) croak("Empty data structure");
+		SV **first_elem = av_fetch(obs_av, 0, 0);
+		if (first_elem && SvROK(*first_elem) && SvTYPE(SvRV(*first_elem)) == SVt_PVAV) {
+			is_2d = 1;
+			r = n0;
+			c = (unsigned int)(av_top_index((AV *)SvRV(*first_elem)) + 1);
+			if (c == 0) croak("Empty data structure");
+			obs = (NV *)safemalloc((size_t)r * c * sizeof(NV));
+			SAVEFREEPV(obs);
 			for (unsigned int i = 0; i < r; i++) {
-				AV*exp_row = newAV();
-				for (unsigned int j = 0; j < c; j++) {
-					NV E = (row_sum[i] * col_sum[j]) / grand_total;
-					NV O = obs_matrix[i][j];
-					av_push(exp_row, newSVnv(E));
-					if (yates) {
-						NV abs_diff = fabs(O - E);
-						NV y_corr = (abs_diff > 0.5) ? 0.5 : abs_diff;
-						NV diff = abs_diff - y_corr;
-						stat += (diff * diff) / E;
-					} else {
-						stat += ((O - E) * (O - E)) / E;
-					}
-				}
-				av_push(expected_av, newRV_noinc((SV*)exp_row));
+				SV **row_sv = av_fetch(obs_av, i, 0);
+				if (!row_sv || !SvROK(*row_sv) || SvTYPE(SvRV(*row_sv)) != SVt_PVAV)
+					croak("chisq_test: row %u is not an array reference", i + 1);
+				AV *row_av = (AV *)SvRV(*row_sv);
+				if ((unsigned int)(av_top_index(row_av) + 1) != c)
+					croak("chisq_test: all rows must have the same number of columns (row 1 has %u, row %u has %u)",
+						c, i + 1, (unsigned int)(av_top_index(row_av) + 1));
+				for (unsigned int j = 0; j < c; j++)
+					obs[i * c + j] = ct_cell(aTHX_ ct_av_get(aTHX_ row_av, j),
+						SvPV_nolen(sv_2mortal(newSVpvf("cell [%u][%u]", i, j))));
 			}
-			expected_ref = newRV_noinc((SV*)expected_av);
-		} else { // SVt_PVHV
-			HV*expected_hv = newHV();
-			for (unsigned int i = 0; i < r; i++) {
-				HV*exp_row = newHV();
-				for (unsigned int j = 0; j < c; j++) {
-					NV E = (row_sum[i] * col_sum[j]) / grand_total;
-					NV O = obs_matrix[i][j];
-					SV**col_key_sv = av_fetch(col_keys, j, 0);
-					hv_store_ent(exp_row, *col_key_sv, newSVnv(E), 0);
-
-					if (yates) {
-						NV abs_diff = fabs(O - E);
-						NV y_corr = (abs_diff > 0.5) ? 0.5 : abs_diff;
-						NV diff = abs_diff - y_corr;
-						stat += (diff * diff) / E;
-					} else {
-						stat += ((O - E) * (O - E)) / E;
-					}
-				}
-				SV**row_key_sv = av_fetch(row_keys, i, 0);
-				hv_store_ent(expected_hv, *row_key_sv, newRV_noinc((SV*)exp_row), 0);
-			}
-			expected_ref = newRV_noinc((SV*)expected_hv);
+		} else {
+			r = 1;
+			c = n0;
+			obs = (NV *)safemalloc((size_t)c * sizeof(NV));
+			SAVEFREEPV(obs);
+			for (unsigned int j = 0; j < c; j++)
+				obs[j] = ct_cell(aTHX_ ct_av_get(aTHX_ obs_av, j),
+					SvPV_nolen(sv_2mortal(newSVpvf("element [%u]", j))));
 		}
-		safefree(row_sum); safefree(col_sum);
-		df = (r - 1) * (c - 1);
 	} else {
-		for (unsigned int j = 0; j < c; j++) {
-			grand_total += obs_array[j];
+		HV *obs_hv = (HV *)SvRV(data_ref);
+		if (HvUSEDKEYS(obs_hv) == 0) croak("Empty data structure");
+		row_keys = (AV *)sv_2mortal((SV *)newAV());
+		col_keys = (AV *)sv_2mortal((SV *)newAV());
+/* Keys are laid out in sorted order, as fisher_test does, so the table --
+  the nesting it is read as, the cell it complains about, everything -- is
+  the same on every run regardless of Perl's hash randomization.  Reading
+  any of that off whichever key hv_iternext() happened to hand back first
+  made the diagnosis of a malformed hash a coin toss.*/
+		HE *entry;
+		hv_iterinit(obs_hv);
+		while ((entry = hv_iternext(obs_hv))) {
+			av_push(row_keys, newSVsv(hv_iterkeysv(entry)));
+			r++;
 		}
-		NV E = grand_total / (NV)c;
+		sortsv(AvARRAY(row_keys), (size_t)r, Perl_sv_cmp);
+		HE *first_he = hv_fetch_ent(obs_hv, *av_fetch(row_keys, 0, 0), 0, 0);
+		SV *first_val = first_he ? HeVAL(first_he) : NULL;
 
-		if (input_type == SVt_PVAV) {
-			AV*expected_av = newAV();
-			for (unsigned int j = 0; j < c; j++) {
-				NV O = obs_array[j];
-				av_push(expected_av, newSVnv(E));
-				stat += ((O - E) * (O - E)) / E;
+		if (SvROK(first_val) && SvTYPE(SvRV(first_val)) == SVt_PVHV) {
+			is_2d = 1;
+/* The column set is taken from the first row and every other row must
+  carry exactly it.  Filling a missing key with an implicit zero (as this
+  used to) turns a typo into a silently different table.*/
+			HV *first_inner = (HV *)SvRV(first_val);
+			HE *col_entry;
+			hv_iterinit(first_inner);
+			while ((col_entry = hv_iternext(first_inner))) {
+				av_push(col_keys, newSVsv(hv_iterkeysv(col_entry)));
+				c++;
 			}
-			expected_ref = newRV_noinc((SV*)expected_av);
-		} else { // SVt_PVHV
-			HV*expected_hv = newHV();
-			for (unsigned int j = 0; j < c; j++) {
-				NV O = obs_array[j];
-				SV**col_key_sv = av_fetch(col_keys, j, 0);
-				hv_store_ent(expected_hv, *col_key_sv, newSVnv(E), 0);
-				stat += ((O - E) * (O - E)) / E;
+			if (c == 0) croak("Empty data structure");
+			sortsv(AvARRAY(col_keys), (size_t)c, Perl_sv_cmp);
+
+			obs = (NV *)safemalloc((size_t)r * c * sizeof(NV));
+			SAVEFREEPV(obs);
+			for (unsigned int i = 0; i < r; i++) {
+				SV **row_key_sv = av_fetch(row_keys, i, 0);
+				HE *inner_he = hv_fetch_ent(obs_hv, *row_key_sv, 0, 0);
+				SV *inner_sv = inner_he ? HeVAL(inner_he) : NULL;
+				if (!inner_sv || !SvROK(inner_sv) || SvTYPE(SvRV(inner_sv)) != SVt_PVHV)
+					croak("chisq_test: row '%s' is not a hash reference", SvPV_nolen(*row_key_sv));
+				HV *inner_hv = (HV *)SvRV(inner_sv);
+				if ((unsigned int)HvUSEDKEYS(inner_hv) != c)
+					croak("chisq_test: every row must have the same %u column key(s); row '%s' has %u",
+						c, SvPV_nolen(*row_key_sv), (unsigned int)HvUSEDKEYS(inner_hv));
+				for (unsigned int j = 0; j < c; j++) {
+					SV **col_key_sv = av_fetch(col_keys, j, 0);
+					HE *val_he = hv_fetch_ent(inner_hv, *col_key_sv, 0, 0);
+					if (!val_he)
+						croak("chisq_test: row '%s' has no column '%s'",
+							SvPV_nolen(*row_key_sv), SvPV_nolen(*col_key_sv));
+					obs[i * c + j] = ct_cell(aTHX_ HeVAL(val_he),
+						SvPV_nolen(sv_2mortal(newSVpvf("cell {%s}{%s}",
+							SvPV_nolen(*row_key_sv), SvPV_nolen(*col_key_sv)))));
+				}
 			}
-			expected_ref = newRV_noinc((SV*)expected_hv);
+		} else {
+			// 1D Hash Handling: the keys already collected are the cells
+			col_keys = row_keys;
+			c = r;
+			r = 1;
+			obs = (NV *)safemalloc((size_t)c * sizeof(NV));
+			SAVEFREEPV(obs);
+			for (unsigned int j = 0; j < c; j++) {
+				SV **col_key_sv = av_fetch(col_keys, j, 0);
+				HE *val_he = hv_fetch_ent(obs_hv, *col_key_sv, 0, 0);
+				obs[j] = ct_cell(aTHX_ val_he ? HeVAL(val_he) : NULL,
+					SvPV_nolen(sv_2mortal(newSVpvf("element {%s}", SvPV_nolen(*col_key_sv)))));
+			}
 		}
-		df = c - 1;
 	}
-	if (obs_matrix) {// Memory Cleanup for Matrices/Arrays
+	if (r == 0 || c == 0) croak("Empty data structure");
+/* A table with a single row or a single column is not a contingency table:
+  R drops it to a vector ("if (min(dim(x)) == 1L) x <- as.vector(x)") and
+  runs the goodness-of-fit test, and so does this.  Treating it as r x c
+  instead gives df == 0 and the vacuous p-value 1.*/
+	bool gof = (!is_2d || r == 1 || c == 1);
+	unsigned int k = r * c;
+
+	ct_acc_t total_acc = 0.0;
+	for (unsigned int idx = 0; idx < k; idx++) total_acc += obs[idx];
+	NV grand_total = (NV)total_acc;
+	if (grand_total == 0.0) croak("chisq_test: at least one entry of 'x' must be positive");
+	if (gof && k < 2) croak("chisq_test: 'x' must at least have 2 elements");
+/* Null probabilities for the goodness-of-fit test.  They are matched to the
+  data by position for an array and by key for a hash, so the caller never
+  has to know the order Perl happens to hand back the keys in.*/
+	NV *restrict probs = NULL;
+	if (p_sv) {
+		if (!gof)
+			croak("chisq_test: 'p' applies to the goodness-of-fit test only, not to an %ux%u contingency table", r, c);
+		if (!SvROK(p_sv)) croak("chisq_test: 'p' must be an array reference or a hash reference");
+		probs = (NV *)safemalloc((size_t)k * sizeof(NV));
+		SAVEFREEPV(probs);
+		svtype p_type = SvTYPE(SvRV(p_sv));
+		if (p_type == SVt_PVAV) {
+			if (input_type == SVt_PVHV)
+				croak("chisq_test: 'p' must be a hash reference keyed like 'x' when 'x' is a hash reference");
+			AV *p_av = (AV *)SvRV(p_sv);
+			if ((unsigned int)(av_top_index(p_av) + 1) != k)
+				croak("chisq_test: 'x' and 'p' must have the same number of elements");
+			for (unsigned int j = 0; j < k; j++)
+				probs[j] = ct_prob(aTHX_ ct_av_get(aTHX_ p_av, j),
+					SvPV_nolen(sv_2mortal(newSVpvf("p[%u]", j))));
+		} else if (p_type == SVt_PVHV) {
+			if (input_type != SVt_PVHV)
+				croak("chisq_test: 'p' must be an array reference when 'x' is an array reference");
+			// for a collapsed 1 x k or k x 1 hash the cells are named by whichever axis is not 1
+			AV *key_av = (is_2d && c == 1) ? row_keys : col_keys;
+			HV *p_hv = (HV *)SvRV(p_sv);
+			if ((unsigned int)HvUSEDKEYS(p_hv) != k)
+				croak("chisq_test: 'x' and 'p' must have the same number of elements");
+			for (unsigned int j = 0; j < k; j++) {
+				SV **key_sv = av_fetch(key_av, j, 0);
+				HE *p_he = hv_fetch_ent(p_hv, *key_sv, 0, 0);
+				if (!p_he) croak("chisq_test: 'p' has no entry for '%s'", SvPV_nolen(*key_sv));
+				probs[j] = ct_prob(aTHX_ HeVAL(p_he),
+					SvPV_nolen(sv_2mortal(newSVpvf("p{%s}", SvPV_nolen(*key_sv)))));
+			}
+		} else {
+			croak("chisq_test: 'p' must be an array reference or a hash reference");
+		}
+		NV p_sum = 0.0;
+		for (unsigned int j = 0; j < k; j++) p_sum += probs[j];
+/* R's tolerance on the sum is sqrt(.Machine$double.eps), and it is a
+  double there whatever the NV width is here.*/
+		if (fabs(p_sum - 1.0) > sqrt((NV)DBL_EPSILON)) {
+			if (!rescale_p) croak("chisq_test: probabilities must sum to 1");
+			if (p_sum <= 0.0) croak("chisq_test: probabilities must sum to a positive value to be rescaled");
+			for (unsigned int j = 0; j < k; j++) probs[j] /= p_sum;
+		}
+	}
+	NV *restrict expect = (NV *)safemalloc((size_t)k * sizeof(NV));
+	SAVEFREEPV(expect);
+	ct_acc_t stat_acc = 0.0;
+	unsigned int df = 0;
+	bool yates = 0;
+
+	if (gof) {
+/* R's default p is rep(1/k, k) and its E is n * p, so the uniform
+  expectation is n * (1/k) and not n / k: the two differ by an ulp for
+  most k, and that ulp is visible in the statistic.*/
+		NV unif = 1.0 / (NV)k;
+		for (unsigned int idx = 0; idx < k; idx++) {
+			NV E = probs ? grand_total * probs[idx] : grand_total * unif;
+			NV d = obs[idx] - E;
+			expect[idx] = E;
+			stat_acc += (d * d) / E;
+		}
+		df = k - 1;
+	} else {
+		NV *restrict row_sum = (NV *)safemalloc(r * sizeof(NV));
+		SAVEFREEPV(row_sum);
+		NV *restrict col_sum = (NV *)safemalloc(c * sizeof(NV));
+		SAVEFREEPV(col_sum);
+		// one accumulator per margin, as R's rowSums()/colSums() do
 		for (unsigned int i = 0; i < r; i++) {
-			safefree(obs_matrix[i]);
+			ct_acc_t acc = 0.0;
+			for (unsigned int j = 0; j < c; j++) acc += obs[i * c + j];
+			row_sum[i] = (NV)acc;
 		}
-		safefree(obs_matrix);
+		for (unsigned int j = 0; j < c; j++) {
+			ct_acc_t acc = 0.0;
+			for (unsigned int i = 0; i < r; i++) acc += obs[i * c + j];
+			col_sum[j] = (NV)acc;
+		}
+		for (unsigned int i = 0; i < r; i++)
+			for (unsigned int j = 0; j < c; j++)
+				expect[i * c + j] = (row_sum[i] * col_sum[j]) / grand_total;
+/* Yates' correction is one number for the whole table -- R's
+  min(0.5, abs(x - E)) minimises over every cell before subtracting --
+  not a per-cell min.  On an exact 2x2 the four |O - E| are equal in
+  theory, but not always in the last bits, so taking the minimum first
+  is what reproduces R.  A table that already sits exactly on its
+  expectation gives a correction of 0, and R reports that as a plain
+  Pearson test rather than a corrected one ("if (YATES > 0)"), so the
+  method string follows the correction actually applied, not the request.*/
+		NV y_corr = 0.0;
+		if (correct && r == 2 && c == 2) {
+			y_corr = 0.5;
+			for (unsigned int idx = 0; idx < k; idx++) {
+				NV a = fabs(obs[idx] - expect[idx]);
+				if (a < y_corr) y_corr = a;
+			}
+			yates = (y_corr > 0.0) ? 1 : 0;
+		}
+		for (unsigned int idx = 0; idx < k; idx++) {
+			NV d = fabs(obs[idx] - expect[idx]) - y_corr;
+			stat_acc += (d * d) / expect[idx];
+		}
+		df = (r - 1) * (c - 1);
 	}
-	if (obs_array) safefree(obs_array);
-	if (row_keys) SvREFCNT_dec(row_keys);
-	if (col_keys) SvREFCNT_dec(col_keys);
+	/* R warns whenever any expected count is below 5, the usual rule of thumb
+	 for the chi-squared approximation being trustworthy.*/
+	for (unsigned int idx = 0; idx < k; idx++) {
+		if (expect[idx] < 5.0) {
+			warn("chisq_test: Chi-squared approximation may be incorrect");
+			break;
+		}
+	}
+	// 'expected' is rebuilt in whatever shape the caller passed in
+	SV *expected_ref = NULL;
+	if (input_type == SVt_PVAV) {
+		AV *expected_av = newAV();
+		if (is_2d) {
+			for (unsigned int i = 0; i < r; i++) {
+				AV *exp_row = newAV();
+				for (unsigned int j = 0; j < c; j++) av_push(exp_row, newSVnv(expect[i * c + j]));
+				av_push(expected_av, newRV_noinc((SV *)exp_row));
+			}
+		} else {
+			for (unsigned int j = 0; j < c; j++) av_push(expected_av, newSVnv(expect[j]));
+		}
+		expected_ref = newRV_noinc((SV *)expected_av);
+	} else {
+		HV *expected_hv = newHV();
+		if (is_2d) {
+			for (unsigned int i = 0; i < r; i++) {
+				HV *exp_row = newHV();
+				for (unsigned int j = 0; j < c; j++)
+					hv_store_ent(exp_row, *av_fetch(col_keys, j, 0), newSVnv(expect[i * c + j]), 0);
+				hv_store_ent(expected_hv, *av_fetch(row_keys, i, 0), newRV_noinc((SV *)exp_row), 0);
+			}
+		} else {
+			for (unsigned int j = 0; j < c; j++)
+				hv_store_ent(expected_hv, *av_fetch(col_keys, j, 0), newSVnv(expect[j]), 0);
+		}
+		expected_ref = newRV_noinc((SV *)expected_hv);
+	}
 
+	NV stat = (NV)stat_acc;
 	NV p_val = get_p_value(stat, df);
 
 	// 3. Build the top-level results Hash (mimicking R's htest structure)
@@ -11240,7 +11364,7 @@ CODE:
 		hv_store(results, "data.name", 9, newSVpv("Perl HashRef", 0), 0);
 	}
 
-	if (is_2d) {
+	if (!gof) {
 		if (yates) {
 			hv_store(results, "method", 6, newSVpv("Pearson's Chi-squared test with Yates' continuity correction", 0), 0);
 		} else {

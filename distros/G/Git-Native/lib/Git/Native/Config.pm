@@ -2,20 +2,38 @@
 
 package Git::Native::Config;
 use Moo;
-use Git::Libgit2 qw( check_rc );
 use Git::Libgit2::FFI ();
+use Git::Libgit2 qw( GIT_ENOTFOUND );
+use Git::Native::Error qw( check_rc );
 
 has _handle => ( is => 'ro', required => 1 );
 has _owner  => ( is => 'ro' );   # Repository (when repo-derived) - keeps it alive
 
-# get_string($key): the value, or undef when the key is unset.
+# get_string($key): the value, or undef when the key is unset. Only
+# GIT_ENOTFOUND maps to undef; any other libgit2 failure throws via check_rc
+# (matching get_bool) - we don't silently swallow real errors as "unset".
 # libgit2 only guarantees git_config_get_string on a *snapshot* config;
 # use Repository->config_snapshot / config_string for reads.
 sub get_string {
   my ( $self, $key ) = @_;
   my $rc = Git::Libgit2::FFI::git_config_get_string( \my $out, $self->_handle, $key );
-  return undef if $rc < 0;   # GIT_ENOTFOUND etc. - treat as "unset"
+  return undef if $rc == GIT_ENOTFOUND;   # unset
+  check_rc $rc;
   return $out;
+}
+
+# get_bool($key): 1 / 0 for a git-style boolean, or undef when the key is
+# unset. libgit2 does the parsing via git_config_get_bool (true/yes/on/1,
+# false/no/off/0, integers by non-zero) - we don't reimplement git's bool
+# rules in Perl. A present-but-non-boolean value (e.g. "banana") makes
+# libgit2 return an error, which check_rc turns into a Git::Native::Error;
+# only GIT_ENOTFOUND maps to undef.
+sub get_bool {
+  my ( $self, $key ) = @_;
+  my $rc = Git::Libgit2::FFI::git_config_get_bool( \my $out, $self->_handle, $key );
+  return undef if $rc == GIT_ENOTFOUND;   # unset
+  check_rc $rc;                           # other negatives (e.g. non-boolean) throw
+  return $out ? 1 : 0;
 }
 
 # set_string($key, $value): only valid on a live (non-snapshot) config.
@@ -51,7 +69,7 @@ Git::Native::Config - A libgit2 configuration handle
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

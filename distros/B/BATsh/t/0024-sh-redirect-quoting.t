@@ -40,6 +40,16 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/lib";
+use BATsh_TestOS qw(shell_safe_path);
+
+# Rule R8 (t/lib/BATsh_TestOS.pm): the build directory was named by the
+# tester, not by this distribution.  Cases that interpolate it into shell
+# or cmd.exe source quote it; where the spelling carries a character that
+# quoting cannot survive, they skip with a reason instead of accusing
+# BATsh of a defect that lives in the test.
+my $PATH_OK = shell_safe_path($FindBin::Bin);
+my $PATH_WHY = "build path is not usable in shell source: $FindBin::Bin";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 
@@ -117,6 +127,7 @@ my @tests = (
 
 # RQ01: a double-quoted output target must be written without the quotes.
 sub {
+    return ok_is(1, 1, "RQ01 skipped ($PATH_WHY)") unless $PATH_OK;
     my $p = "$DIR/_rq_dq_$$.txt";
     unlink $p, "\"$p\"";
     _run_capture("echo hi > \"$p\"\n");
@@ -127,6 +138,7 @@ sub {
 
 # RQ02: a single-quoted output target must be written without the quotes.
 sub {
+    return ok_is(1, 1, "RQ02 skipped ($PATH_WHY)") unless $PATH_OK;
     my $p = "$DIR/_rq_sq_$$.txt";
     unlink $p, "'$p'";
     _run_capture("echo hi > '$p'\n");
@@ -137,6 +149,7 @@ sub {
 
 # RQ03: a quoted target containing a space is ONE filename (space kept).
 sub {
+    return ok_is(1, 1, "RQ03 skipped ($PATH_WHY)") unless $PATH_OK;
     my $p = "$DIR/_rq sp_$$.txt";
     unlink $p;
     _run_capture("echo hi > \"$p\"\n");
@@ -149,6 +162,7 @@ sub {
 # and read entirely with BATsh builtins (echo out, read in) so the check
 # mirrors the passing output tests and depends on no external command.
 sub {
+    return ok_is(1, 1, "RQ04 skipped ($PATH_WHY)") unless $PATH_OK;
     my $p = "$DIR/_rq_in_$$.txt";
     unlink $p, "\"$p\"";
     my (undef, $out) =
@@ -159,6 +173,7 @@ sub {
 
 # RQ05: append (>>) to a quoted target appends without the quotes.
 sub {
+    return ok_is(1, 1, "RQ05 skipped ($PATH_WHY)") unless $PATH_OK;
     my $p = "$DIR/_rq_ap_$$.txt";
     unlink $p, "\"$p\"";
     _run_capture("echo a > \"$p\"\necho b >> \"$p\"\n");
@@ -183,11 +198,12 @@ sub {
 # stripped).  We verify that stray file "name" is never created.  Run in
 # a private temp dir so the ">"-prefixed name is a plain basename.
 sub {
+    return ok_is(1, 1, "RQ07 skipped ($PATH_WHY)") unless $PATH_OK;
     my $sub = "$DIR/_rq7_$$";
     mkdir $sub, 0777;
     my $stray  = "$sub/gtname.txt";     # the wrong file the bug would make
     my $target = ">gtname.txt";         # basename beginning with '>'
-    _run_capture("cd $sub\necho hi > \"$target\"\n");
+    _run_capture("cd \"$sub\"\necho hi > \"$target\"\n");
     my $leaked = (-e $stray) ? 1 : 0;
     # Clean up whatever was produced.
     unlink $stray, "$sub/>gtname.txt";
@@ -204,6 +220,7 @@ sub {
 # RQ08: a subshell "( ... ) > TARGET" honours a quoted target that
 # contains a space (parsed through the same quote-aware code path).
 sub {
+    return ok_is(1, 1, "RQ08 skipped ($PATH_WHY)") unless $PATH_OK;
     my $p = "$DIR/_rq8 sp_$$.txt";
     unlink $p;
     _run_capture("( echo one; echo two ) > \"$p\"\n");
@@ -216,6 +233,7 @@ sub {
 # the quotes stripped (exercises the append flag through the same
 # quote-aware path).  Portable: no special characters in the name.
 sub {
+    return ok_is(1, 1, "RQ09 skipped ($PATH_WHY)") unless $PATH_OK;
     my $p = "$DIR/_rq9_$$.txt";
     unlink $p, "\"$p\"";
     _run_capture("( echo a ) > \"$p\"\n( echo b ) >> \"$p\"\n");

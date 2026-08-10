@@ -1,5 +1,5 @@
 This archive contains the distribution Git-Native,
-version 0.003:
+version 0.004:
 
   Native Git for Perl via libgit2 (FFI, no fork/exec)
 

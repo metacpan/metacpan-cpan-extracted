@@ -10,9 +10,16 @@ use PQTest;
 # the inline app packages `use Punk` at compile time, so this guard
 # must run during compilation too - a runtime skip_all would be too late
 BEGIN {
-    unless (eval { require Punk; 1 }) {
+    # The VERSION check is the load-bearing half. install_kw arrived in
+    # Punk 0.04 and is how the queue/task/cron keywords reach an app
+    # class; against an older Punk this file compiles far enough to call
+    # it and then dies mid-BEGIN, which a smoker reports as a FAIL of
+    # this dist rather than as the missing dependency it is. Punk is a
+    # recommends, not a requires - the queue works standalone - so an
+    # old one is a normal thing to meet.
+    unless (eval { require Punk; Punk->VERSION('0.04'); 1 }) {
         require Test::More;
-        Test::More::plan(skip_all => 'Punk required');
+        Test::More::plan(skip_all => 'Punk 0.04 required for the plugin');
     }
 }
 plan skip_all => 'DBI and DBD::SQLite required' unless has_dbd();

@@ -14,7 +14,9 @@ SECURITY.md
 Makefile.PL
 META.yml
 META.json
+t/lib/BATsh_TestOS.pm
 t/lib/INA_CPAN_Check.pm
+t/0000-environment.t
 t/0001-classify.t
 t/0002-sh-interpreter.t
 t/0003-cmd-interpreter.t
@@ -47,6 +49,8 @@ t/0029-sh-attrs-mapfile.t
 t/0030-expansion-literals.t
 t/0031-set-positional.t
 t/0032-glob-paths.t
+t/0033-cli-and-repl.t
+t/0034-inventory-and-tails.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t
@@ -93,3 +97,5 @@ doc/batsh_cheatsheet.UR.txt
 doc/batsh_cheatsheet.UZ.txt
 doc/batsh_cheatsheet.VI.txt
 doc/batsh_cheatsheet.ZH.txt
+xt/doc_parity.pl
+xt/win32_matrix.pl

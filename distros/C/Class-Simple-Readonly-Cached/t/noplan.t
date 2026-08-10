@@ -6,7 +6,7 @@ use warnings;
 use Test::DescribeMe qw(author);
 use Test::Most;
 
-eval 'use Test::NoPlan qw / all_plans_ok /';
+eval { require Test::NoPlan; Test::NoPlan->import('all_plans_ok') };
 
 if($@) {
 	plan(skip_all => 'Test::NoPlan required for test verification');

@@ -90,4 +90,20 @@ my $names_after = $bare->reference_names( glob => 'refs/karr/*' );
 is scalar(@$names_after), 1, 'bare has one ref after prune push';
 is $names_after->[0], 'refs/karr/test/data', 'pruned ref remained';
 
+# --- fetch --prune: a mirror ref that vanished upstream is dropped locally.
+# Re-add a second ref upstream, mirror it into B, then delete it upstream and
+# fetch with prune — B must lose its stale copy but keep the live one.
+$a->reference_create( 'refs/karr/extra/data', $commit2, force => 1 );
+$remote_a->push( refspecs => ['+refs/karr/*:refs/karr/*'] );
+$remote_b->fetch( refspecs => ['+refs/karr/*:refs/karr/*'] );
+ok $b->reference_exists('refs/karr/extra/data'), 'B mirrored the re-added ref';
+
+$a->reference_delete('refs/karr/extra/data');
+$remote_a->push( refspecs => ['+refs/karr/*:refs/karr/*'], prune => 1 );
+$remote_b->fetch( refspecs => ['+refs/karr/*:refs/karr/*'], prune => 1 );
+ok !$b->reference_exists('refs/karr/extra/data'),
+  'fetch --prune dropped the stale mirror ref';
+ok $b->reference_exists('refs/karr/test/data'),
+  'fetch --prune kept the still-present ref';
+
 done_testing;

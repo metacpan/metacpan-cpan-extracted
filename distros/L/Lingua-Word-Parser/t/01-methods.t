@@ -25,18 +25,26 @@ is @$power, 215, 'power';
 
 my $score = $p->score_parts( '[', ']' );
 my $mask = '1111111111';
-my $x = $score->{$mask}[0];
 is @{ $score->{$mask} }, 2, 'score N';
-is_deeply $x->{score},
+
+# Two distinct combos both fully cover the word: one segments "bio" as a
+# single 3-char part (5 parts total), the other splits it into "bi" + "o"
+# (6 parts total)
+my ($five_part) = grep { $_->{score}{knowns} == 5 } @{ $score->{$mask} };
+my ($six_part)  = grep { $_->{score}{knowns} == 6 } @{ $score->{$mask} };
+ok $five_part, 'found the 5-part (bio as one part) combo';
+ok $six_part,  'found the 6-part (bi + o split) combo';
+
+is_deeply $five_part->{score},
     {
         knownc   => 10,
         unknownc => 40,
         knowns   => 5,
         unknowns => 8
     },
-    'score';
-is_deeply $x->{familiarity}, [1,1], 'familiarity';
-is_deeply $x->{partition},
+    'score (5-part combo)';
+is_deeply $five_part->{familiarity}, [1,1], 'familiarity (5-part combo)';
+is_deeply $five_part->{partition},
     [qw/
         [a]bioticaly
         a[bio]ticaly
@@ -44,8 +52,8 @@ is_deeply $x->{partition},
         abiotic[a]ly
         abiotica[ly]
     /],
-    'partition';
-is_deeply $x->{definition},
+    'partition (5-part combo)';
+is_deeply $five_part->{definition},
     [qw/
         opposite
         life
@@ -53,11 +61,11 @@ is_deeply $x->{definition},
         opposite
         like
     /],
-    'definition';
+    'definition (5-part combo)';
 
 $score = $p->score;
-$x = $score->{$mask}[-1];
-is $x->{score}, '6:10 chunks / 10:50 chars', 'score';
+my ($x) = grep { $_->{score} eq '6:10 chunks / 10:50 chars' && $_->{partition} =~ /</ } @{ $score->{$mask} };
+ok $x, 'found the 6-part combo in stringified score() output';
 is $x->{familiarity}, '1.00 chunks / 1.00 chars', 'familiarity';
 is $x->{partition},
     '<a>bioticaly, a<bi>oticaly, abi<o>ticaly, abio<tic>aly, abiotic<a>ly, abiotica<ly>',

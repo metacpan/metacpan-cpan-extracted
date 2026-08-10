@@ -1,5 +1,15 @@
 Revision history for WebDyne
 
+3.012 2026-08-10
+
+    * Disabled the redundant webdyne.apache ulimit probe, avoiding noisy
+      stderr on restricted CPAN smoke hosts where raising the core-file
+      ulimit is not permitted.
+
+    * Guarded developer-only doc/example scans in the generated Makefile so
+      CPAN install and smoke-test runs remain quiet when the documentation
+      source tree is not shipped in the distribution tarball.
+
 3.011 2026-08-07
 
     * Extended wdrender --quiet/--silent to suppress advisory warnings about

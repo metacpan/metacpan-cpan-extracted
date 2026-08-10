@@ -13,6 +13,19 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MCP-Run
+provides:
+  MCP::Run:
+    file: lib/MCP/Run.pm
+    version: '0.104'
+  MCP::Run::Bash:
+    file: lib/MCP/Run/Bash.pm
+    version: '0.104'
+  MCP::Run::Compress:
+    file: lib/MCP/Run/Compress.pm
+    version: '0.104'
+  MCP::Run::Compress::Filters:
+    file: lib/MCP/Run/Compress/Filters.pm
+    version: '0.104'
 requires:
   JSON::MaybeXS: '0'
   MCP: '0'
@@ -22,7 +35,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-mcp-run/issues
   homepage: https://github.com/Getty/p5-mcp-run
   repository: https://github.com/Getty/p5-mcp-run.git
-version: '0.103'
+version: '0.104'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -101,9 +114,9 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - '%x %o/maint/release-after.pl --archive %a --dir %d --version %v'
-          version: '0.049'
+          version: '0.050'
       name: '@Author::GETTY/Run::AfterRelease'
-      version: '0.049'
+      version: '0.050'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
@@ -116,6 +129,30 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
       version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@Author::GETTY/Test::ChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.037'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::GETTY/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -284,7 +321,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.103'
+          tag: '0.104'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -345,6 +382,10 @@ x_Dist_Zilla:
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
     -
+      class: Dist::Zilla::Plugin::GitHub::CreateRelease
+      name: '@Author::GETTY/GitHub::CreateRelease'
+      version: '0.0009'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.037'
@@ -383,6 +424,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
       version: '6.037'
   zilla:
     class: Dist::Zilla::Dist::Builder

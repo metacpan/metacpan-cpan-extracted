@@ -3,8 +3,9 @@
 package Git::Native::Credential;
 use Moo;
 use Carp ();
-use Git::Libgit2 qw( check_rc init_lib );
+use Git::Libgit2 qw( init_lib );
 use Git::Libgit2::FFI ();
+use Git::Native::Error qw( check_rc );
 
 # Ensure libgit2 FFI is initialised before first use of this module.
 init_lib();
@@ -89,7 +90,7 @@ Git::Native::Credential - A libgit2 credential (passed back from acquire callbac
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

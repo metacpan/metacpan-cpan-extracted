@@ -35,6 +35,18 @@ sub is_approx {
 # Tests
 # ----------------------------------------------------------------------
 
+# Collect chisq_test's warnings rather than letting them reach the harness;
+# several sections below are about the warning itself.
+sub warnings_from (&) {
+	my ($code) = @_;
+	my @w;
+	{
+		local $SIG{__WARN__} = sub { push @w, $_[0] };
+		$code->();
+	}
+	return @w;
+}
+
 dies_ok { chisq_test() } 'Croaks with no arguments';
 dies_ok { chisq_test(123) } 'Croaks with non-reference (scalar)';
 dies_ok { chisq_test(\"string") } 'Croaks with scalar reference';
@@ -167,5 +179,197 @@ no_leaks_ok {
 	};
 	chisq_test($data);
 } 'No leaks with successful 2D Hash processing' unless $INC{'Devel/Cover.pm'};
+
+# ======================================================================
+# Input validation.  R's chisq.test() refuses to coerce: every entry must be
+# a nonnegative finite number and at least one of them must be positive.
+# ======================================================================
+throws_ok { chisq_test([10, -5, 30]) } qr/nonnegative and finite/,
+	'Croaks on a negative count';
+throws_ok { chisq_test([[10, -5], [30, 1]]) } qr/nonnegative and finite/,
+	'Croaks on a negative count in a 2D array';
+throws_ok { chisq_test({ A => 10, B => -5 }) } qr/nonnegative and finite/,
+	'Croaks on a negative count in a hash';
+throws_ok { chisq_test([10, 9**9**9, 30]) } qr/nonnegative and finite/,
+	'Croaks on an infinite count';
+throws_ok { chisq_test(['a', 'b', 'c']) } qr/is not a number/,
+	'Croaks on a non-numeric entry';
+throws_ok { chisq_test([10, undef, 30]) } qr/is undef/,
+	'Croaks on an undefined entry';
+throws_ok { chisq_test([0, 0, 0]) } qr/at least one entry of 'x' must be positive/,
+	'Croaks when everything is zero';
+throws_ok { chisq_test([5]) } qr/'x' must at least have 2 elements/,
+	'Croaks on a single element';
+throws_ok { chisq_test([[5]]) } qr/'x' must at least have 2 elements/,
+	'Croaks on a 1x1 table';
+throws_ok { chisq_test({ A => 5 }) } qr/'x' must at least have 2 elements/,
+	'Croaks on a single-key hash';
+throws_ok { chisq_test([[1, 2, 3], [4, 5]]) } qr/same number of columns/,
+	'Croaks on a ragged 2D array';
+
+# A hole in a sparse array is not the same as a stored undef: av_fetch()
+# returns NULL for it, which must not be dereferenced.
+{
+	my @flat = (10, 20, 30);
+	delete $flat[1];
+	throws_ok { chisq_test(\@flat) } qr/element \[1\] is undef/,
+		'Croaks on a hole in a sparse 1D array';
+	my @row = (10, 20, 30);
+	delete $row[1];
+	throws_ok { chisq_test([\@row, [4, 5, 6]]) } qr/cell \[0\]\[1\] is undef/,
+		'Croaks on a hole in a sparse table row';
+	my @p = (0.2, 0.3, 0.5);
+	delete $p[1];
+	throws_ok { chisq_test([10, 20, 30], p => \@p) } qr/p\[1\] is undef/,
+		'Croaks on a hole in a sparse p';
+}
+throws_ok { chisq_test([[1, 2], 3]) } qr/row 2 is not an array reference/,
+	'Croaks when a row is not an array ref';
+throws_ok { chisq_test({ a => { x => 1, y => 2 }, b => 3 }) } qr/is not a hash reference/,
+	'Croaks when a hash row is not a hash ref';
+throws_ok { chisq_test({ a => { x => 1, y => 2 }, b => { x => 3 } }) }
+	qr/same 2 column key\(s\)/, 'Croaks when a hash row is missing a column';
+throws_ok { chisq_test({ a => { x => 1, y => 2 }, b => { x => 3, z => 4 } }) }
+	qr/has no column/, 'Croaks when a hash row has a different column key';
+# Hash rows and columns are read in sorted key order, so which row a
+# malformed hash is blamed on does not depend on Perl's hash randomization.
+{
+	my %msg;
+	for (1 .. 50) {
+		my %h = (alpha => { x => 1, y => 2 }, beta => { x => 3 }, gamma => { x => 1, y => 1 });
+		eval { chisq_test(\%h) };
+		my $e = $@;
+		$e =~ s/ at .*//s;
+		$msg{$e}++;
+	}
+	is(scalar keys %msg, 1, 'The croak from a malformed hash is the same every time');
+	like((keys %msg)[0], qr/row 'beta' has 1/, '... and names the offending row');
+}
+
+throws_ok { chisq_test([10, 20, 30], 'correct') } qr/odd number of named arguments/,
+	'Croaks on an odd number of named arguments';
+throws_ok { chisq_test([10, 20, 30], banana => 1) } qr/unknown argument 'banana'/,
+	'Croaks on an unknown named argument';
+
+# ======================================================================
+# correct => 0 turns off Yates' continuity correction, as in R.
+# ======================================================================
+{
+	my $res = chisq_test([[10, 15], [20, 5]], correct => 0);
+	is($res->{method}, "Pearson's Chi-squared test", 'correct => 0 drops Yates');
+	is_approx($res->{statistic}{'X-squared'}, 8.3333333333333339,
+		'correct => 0 gives the uncorrected statistic', 1e-12);
+	is(chisq_test([[10, 15], [20, 5]], correct => 1)->{method},
+		"Pearson's Chi-squared test with Yates' continuity correction",
+		'correct => 1 is the default');
+	# a correction of exactly 0 is reported as a plain Pearson test, as R does
+	is(chisq_test([[10, 20], [20, 40]])->{method}, "Pearson's Chi-squared test",
+		'A zero correction is not called a correction');
+}
+
+# ======================================================================
+# p => ... runs the goodness-of-fit test against given probabilities, which
+# is what the method string has always claimed.
+# ======================================================================
+{
+	my $res = chisq_test([10, 20, 30], p => [0.2, 0.3, 0.5]);
+	is($res->{method}, 'Chi-squared test for given probabilities', 'p => gives a GOF test');
+	is_approx($res->{statistic}{'X-squared'}, 0.55555555555555558, 'p => statistic', 1e-13);
+	is_deeply($res->{expected}, [12, 18, 30], 'p => expected frequencies');
+
+	# unnormalised weights need rescale.p, exactly as in R
+	throws_ok { chisq_test([10, 20, 30], p => [2, 3, 5]) }
+		qr/probabilities must sum to 1/, 'Croaks when p does not sum to 1';
+	my $r2 = chisq_test([10, 20, 30], p => [2, 3, 5], 'rescale.p' => 1);
+	is_approx($r2->{statistic}{'X-squared'}, 0.55555555555555558, 'rescale.p rescales', 1e-13);
+	is_approx(chisq_test([10, 20, 30], p => [2, 3, 5], rescale_p => 1)
+			->{statistic}{'X-squared'},
+		0.55555555555555558, 'rescale_p is an alias', 1e-13);
+
+	throws_ok { chisq_test([10, 20, 30], p => [0.5, 0.5]) }
+		qr/same number of elements/, 'Croaks when p is the wrong length';
+	throws_ok { chisq_test([10, 20, 30], p => [-0.5, 1.0, 0.5]) }
+		qr/probabilities must be non-negative/, 'Croaks on a negative probability';
+	throws_ok { chisq_test([10, 20, 30], p => [0, 0, 0], 'rescale.p' => 1) }
+		qr/positive value to be rescaled/, 'Croaks when p sums to zero';
+	throws_ok { chisq_test([[10, 15], [20, 5]], p => [0.25, 0.25, 0.25, 0.25]) }
+		qr/goodness-of-fit test only/, 'Croaks when p is given for a contingency table';
+	throws_ok { chisq_test([10, 20, 30], p => 0.5) }
+		qr/'p' must be an array reference or a hash reference/, 'Croaks when p is not a reference';
+
+	# a hash of counts takes a hash of probabilities, so the caller never has
+	# to guess the order the keys came back in
+	my $h = chisq_test({ A => 10, B => 20, C => 30 }, p => { A => 0.2, B => 0.3, C => 0.5 });
+	is_approx($h->{statistic}{'X-squared'}, 0.55555555555555558, 'keyed p statistic', 1e-13);
+	is_deeply($h->{expected}, { A => 12, B => 18, C => 30 }, 'keyed p expected frequencies');
+	throws_ok { chisq_test({ A => 10, B => 20 }, p => [0.5, 0.5]) }
+		qr/must be a hash reference keyed like 'x'/, 'Croaks on an array p for a hash x';
+	throws_ok { chisq_test([10, 20], p => { A => 0.5, B => 0.5 }) }
+		qr/must be an array reference when 'x' is an array reference/,
+		'Croaks on a hash p for an array x';
+	throws_ok { chisq_test({ A => 10, B => 20 }, p => { A => 0.5, Z => 0.5 }) }
+		qr/'p' has no entry for/, 'Croaks when keyed p is missing a key';
+}
+
+# ======================================================================
+# A 1 x k or k x 1 table is a goodness-of-fit test, as in R, not a
+# contingency table with df 0.
+# ======================================================================
+{
+	for my $case ([[10, 20, 30]], [[10], [20], [30]]) {
+		my $res = chisq_test($case);
+		is($res->{method}, 'Chi-squared test for given probabilities',
+			'Single-row/column table collapses to a GOF test');
+		is($res->{parameter}{df}, 2, '... with df = k - 1, not 0');
+		is_approx($res->{statistic}{'X-squared'}, 10, '... and the GOF statistic', 1e-13);
+	}
+	is_deeply(chisq_test([[10, 20, 30]])->{expected}, [[20, 20, 20]],
+		'... while expected keeps the shape it was given');
+}
+
+# ======================================================================
+# R warns when any expected count falls below 5.
+# ======================================================================
+{
+	my @w = warnings_from { chisq_test([[3, 1], [1, 3]]) };
+	is(scalar @w, 1, 'One warning for a table with small expected counts');
+	like($w[0], qr/Chi-squared approximation may be incorrect/,
+		'... which is the message R gives');
+	is(scalar(warnings_from { chisq_test([[100, 150], [200, 50]]) }), 0,
+		'No warning when every expected count is at least 5');
+	is(scalar(warnings_from { chisq_test([10, 20, 30]) }), 0,
+		'No warning for a comfortable goodness-of-fit test');
+}
+
+# ======================================================================
+# Leak checks for the paths added above
+# ======================================================================
+no_leaks_ok {
+	eval { chisq_test([[1, 2, 3], [4, 5]]) };  # croak from mid-parse
+} 'No leaks when a ragged array croaks' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	eval { chisq_test({ a => { x => 1, y => 2 }, b => { x => 3 } }) };
+} 'No leaks when a hash row croaks' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	eval { chisq_test([10, 20, 30], p => [0.5, 0.5]) };
+} 'No leaks when p validation croaks' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	chisq_test([10, 20, 30], p => [0.2, 0.3, 0.5]);
+} 'No leaks with given probabilities' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	chisq_test({ A => 10, B => 20, C => 30 }, p => { A => 0.2, B => 0.3, C => 0.5 });
+} 'No leaks with keyed probabilities' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	chisq_test([[10, 15], [20, 5]], correct => 0);
+} 'No leaks with correct => 0' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	chisq_test([[10, 20, 30]]);
+} 'No leaks when a 1 x k table collapses' unless $INC{'Devel/Cover.pm'};
 
 done_testing();

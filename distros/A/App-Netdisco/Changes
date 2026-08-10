@@ -1,3 +1,24 @@
+2.102000 - 2026-08-10
+
+  [NEW FEATURES]
+
+  * #1582 {discover,macsuck,arpnip}_min_age settings are used when selecting *walk targets
+  * #1584 make GET /api/v1/object/device batch ready with field selection
+  * #1591 new option expire_nodeip_orphans to keep node_ip entries without node
+
+  [ENHANCEMENTS]
+
+  * update Python dependencies and GitHub Actions versions
+  * use canonical URLs for upstream-sources raw files
+
+  [BUG FIXES]
+
+  * #1583 port lookup in API: uri_unescape and trim captured port name
+  * #1585 uninitialized value warning when daterange param is absent
+  * #1586 /api/ endpoints returning HTML when Accept header is missing
+  * #1607 Refuse to empty snmp_object when the MIB reports parse to nothing
+  * #1609 netdisco-deploy: report loadmibs failure instead of done
+
 2.101000 - 2026-07-02
 
   [NEW FEATURES]
@@ -20,7 +41,7 @@
   [NEW FEATURES]
 
   * #1549 discover subaction having JSON becomes per-job additional settings
-  * #1550 add permanent API tokens and (dummy) Bearer auth support
+  * #1550 add permanent API tokens and (dummy) Bearer auth support (allow_permanent_tokens)
   * #1561 new API endpoint GET /api/v1/queue/status
   * add queue_neighbors bool setting to allow neighbor discovery without queueing
   * add device_auth_tag_hint discover param to select specific device_auth stanza

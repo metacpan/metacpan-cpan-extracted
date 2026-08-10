@@ -1,0 +1,139 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Mock corpus", "version": "1.0.0" },
+  "paths": {
+    "/example": {
+      "get": {
+        "operationId": "withExample",
+        "responses": {
+          "200": {
+            "description": "media-level example wins over everything",
+            "content": {
+              "application/json": {
+                "example": { "id": 42, "name": "example-wins" },
+                "examples": { "aaa": { "value": { "id": 1, "name": "not-me" } } },
+                "schema": { "$ref": "#/components/schemas/Thing" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/named": {
+      "get": {
+        "operationId": "withNamed",
+        "responses": {
+          "200": {
+            "description": "no example: the first examples entry, by name",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "beta":  { "value": { "id": 2, "name": "beta" } },
+                  "alpha": { "value": { "id": 1, "name": "alpha" } }
+                },
+                "schema": { "$ref": "#/components/schemas/Thing" }
+              }
+            }
+          },
+          "404": {
+            "description": "declared error, with its own example",
+            "content": {
+              "application/json": {
+                "example": { "error": "no such thing" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/defaulted": {
+      "get": {
+        "operationId": "withDefault",
+        "responses": {
+          "200": {
+            "description": "no examples: the schema default",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "default": { "id": 7, "name": "from-default" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generated": {
+      "get": {
+        "operationId": "generated",
+        "responses": {
+          "201": {
+            "description": "everything below is generated from the schema",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Everything" }
+              }
+            }
+          },
+          "default": {
+            "description": "fallback for undeclared preferred codes",
+            "content": {
+              "application/json": {
+                "example": { "error": "synthesized from default" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/no-content": {
+      "delete": {
+        "operationId": "noContent",
+        "responses": {
+          "204": { "description": "nothing to say" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Thing": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id":   { "type": "integer" },
+          "name": { "type": "string" }
+        }
+      },
+      "Everything": {
+        "type": "object",
+        "required": [
+          "state", "constant", "count", "ratio", "flag", "tags",
+          "when", "ident", "nested", "either", "combined", "maybe"
+        ],
+        "properties": {
+          "state":    { "type": "string", "enum": ["open", "closed"] },
+          "constant": { "const": "fixed" },
+          "count":    { "type": "integer", "minimum": 3, "multipleOf": 5 },
+          "ratio":    { "type": "number", "exclusiveMinimum": 0.5 },
+          "flag":     { "type": "boolean" },
+          "tags":     { "type": "array", "minItems": 2,
+                        "items": { "type": "string", "minLength": 3 } },
+          "when":     { "type": "string", "format": "date-time" },
+          "ident":    { "type": "string", "format": "uuid" },
+          "nested":   { "$ref": "#/components/schemas/Thing" },
+          "either":   { "oneOf": [ { "type": "integer", "minimum": 9 },
+                                   { "type": "string" } ] },
+          "combined": { "allOf": [
+                          { "type": "object", "required": ["a"],
+                            "properties": { "a": { "type": "integer" } } },
+                          { "type": "object", "required": ["b"],
+                            "properties": { "b": { "type": "string",
+                                                   "minLength": 2 } } } ] },
+          "maybe":    { "type": ["null", "string"], "minLength": 4 }
+        }
+      }
+    }
+  }
+}

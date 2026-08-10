@@ -30,7 +30,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Git::Libgit2" : "0.004",
+            "Git::Libgit2" : "0.005",
             "Moo" : "2.000000",
             "Path::Tiny" : "0",
             "Throwable::Error" : "0",
@@ -47,67 +47,71 @@
    "provides" : {
       "Git::Native" : {
          "file" : "lib/Git/Native.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Blob" : {
          "file" : "lib/Git/Native/Blob.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Branch" : {
          "file" : "lib/Git/Native/Branch.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Commit" : {
          "file" : "lib/Git/Native/Commit.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Config" : {
          "file" : "lib/Git/Native/Config.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Credential" : {
          "file" : "lib/Git/Native/Credential.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Error" : {
          "file" : "lib/Git/Native/Error.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Oid" : {
          "file" : "lib/Git/Native/Oid.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Reference" : {
          "file" : "lib/Git/Native/Reference.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Remote" : {
          "file" : "lib/Git/Native/Remote.pm",
-         "version" : "0.003"
+         "version" : "0.004"
+      },
+      "Git::Native::Remote::Result" : {
+         "file" : "lib/Git/Native/Remote/Result.pm",
+         "version" : "0.004"
       },
       "Git::Native::Repository" : {
          "file" : "lib/Git/Native/Repository.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Revwalker" : {
          "file" : "lib/Git/Native/Revwalker.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Signature" : {
          "file" : "lib/Git/Native/Signature.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Tag" : {
          "file" : "lib/Git/Native/Tag.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::Tree" : {
          "file" : "lib/Git/Native/Tree.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Git::Native::TreeBuilder" : {
          "file" : "lib/Git/Native/TreeBuilder.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -122,7 +126,7 @@
          "web" : "https://github.com/Getty/p5-git-native"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -477,7 +481,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003",
+                  "tag" : "0.004",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -562,7 +566,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
             "name" : "@Author::GETTY/GitHub::CreateRelease",
-            "version" : "0.0008"
+            "version" : "0.0009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

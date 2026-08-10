@@ -54,4 +54,36 @@ my $partial = $w2->all;
 is scalar(@$partial), 1, 'hide cuts off ancestors';
 is $partial->[0]->hex, $oids[2]->hex, 'only tip remains';
 
+# push_head: with HEAD pointing at main, push_head walks the same 3 commits.
+$repo->set_head('refs/heads/main');
+my $wh = $repo->revwalker;
+$wh->push_head;
+is scalar(@{ $wh->all }), 3, 'push_head walks HEAD branch';
+
+# push_glob: a ref glob seeds every matching ref.
+my $wg = $repo->revwalker;
+$wg->push_glob('refs/heads/*');
+is scalar(@{ $wg->all }), 3, 'push_glob seeds matching refs';
+
+# push_range("A..B"): exclusive of A, inclusive of B - here C1..C3 = {C2, C3}.
+my $wr = $repo->revwalker;
+$wr->push_range( $oids[0]->hex . '..' . $oids[2]->hex );
+my $range = $wr->all;
+is scalar(@$range), 2, 'push_range excludes the start commit';
+my %in_range = map { $_->hex => 1 } @$range;
+ok $in_range{ $oids[2]->hex }, 'range includes the tip';
+ok !$in_range{ $oids[0]->hex }, 'range excludes the root';
+
+# hide_ref: hiding main from main's own walk yields nothing.
+my $whide = $repo->revwalker;
+$whide->push_ref('refs/heads/main');
+$whide->hide_ref('refs/heads/main');
+is scalar(@{ $whide->all }), 0, 'hide_ref of the pushed ref empties the walk';
+
+# GIT_SORT_TIME is accepted and still returns the full set.
+my $wt = $repo->revwalker;
+$wt->sorting( Git::Native::Revwalker::GIT_SORT_TIME );
+$wt->push_ref('refs/heads/main');
+is scalar(@{ $wt->all }), 3, 'GIT_SORT_TIME walks all commits';
+
 done_testing;

@@ -7,6 +7,7 @@ pod_spelling_system:
   # intentionally
   stopwords:
     - A1
+    - backoff
     - FIRSTKEY
     - NEXTKEY
     - TIEHASH
@@ -19,4 +20,7 @@ pod_coverage:
   # format is "Class#method" or "Class",regex allowed
   # for either Class or method.
   private:
+    - 'Tie::Google::Sheets#BUILDARGS'
     - 'Tie::Google::Sheets::Client#BUILDARGS'
+    - 'Tie::Google::Sheets::Client#DEMOLISH'
+    - 'Tie::Google::Sheets::Worksheet#BUILDARGS'

@@ -61,13 +61,10 @@ It is intended as a successor to [Catalyst::View::Wkhtmltopdf](https://metacpan.
 
 # RECENT CHANGES
 
-Changes for version v0.1.1 (2026-08-08)
+Changes for version v0.1.2 (2026-08-10)
 
-- Documentation
-    - Updated SECURITY CONSIDERATIONS to emphasise that the content of the rendered is assumed to be trusted by the developer.
-    - Fixed typos.
-- Tests
-    - Skip tests if no chrome executable can be found.
+- Bug Fixes
+    - Use Try::Tiny for Perls without the try feature.
 
 See the `Changes` file for more details.
 
@@ -83,6 +80,7 @@ This module lists the following modules as runtime dependencies:
 - [MooseX::Aliases](https://metacpan.org/pod/MooseX%3A%3AAliases)
 - [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny)
 - [Scalar::Util](https://metacpan.org/pod/Scalar%3A%3AUtil)
+- [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny)
 - [Types::Common](https://metacpan.org/pod/Types%3A%3ACommon)
 - [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)
 - [experimental](https://metacpan.org/pod/experimental)

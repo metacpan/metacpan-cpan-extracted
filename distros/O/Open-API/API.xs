@@ -25,6 +25,7 @@ static const frj_abi *oa_frj(pTHX);   /* defined below; used by the headers */
 #include "oa_route.h"
 #include "oa_validate.h"
 #include "oa_plack.h"
+#include "oa_mock.h"      /* response synthesis (needs oa_json_encode above) */
 #include "oa_client.h"
 #include "oa_abi_impl.h"  /* the OA_ABI table (needs route/validate/compile) */
 
@@ -735,6 +736,47 @@ response_coverage(self, op_id = NULL)
     OUTPUT:
         RETVAL
 
+# Run the operation's spec-declared security requirement against a PSGI
+# environment, driving a caller-supplied { scheme-name => checker } map.
+#
+# This is the SAME compiled guards and the SAME checker-calling convention
+# the Plack dispatch uses (oa_security_check), exposed so a request path
+# that does its own routing - Maat's - enforces auth because the SPEC says
+# so, rather than inventing a parallel check. The checker is called
+# exactly as under to_app: ($credential, $env, $op_id, $scopes), the
+# credential already extracted per the scheme's type/location.
+#
+# Returns undef when the request may proceed - INCLUDING an operation with
+# no security requirement, which is the off-by-default case - or a PSGI
+# response arrayref (401 unauthorized, or 500 for a checker die) when it
+# is denied. On success the matched checker results are left in
+# $env->{'openapi.auth'}, exactly as the Plack path leaves them.
+SV *
+check_op_security(self, op_id, env, checkers)
+        SV *self
+        SV *op_id
+        SV *env
+        SV *checkers
+    CODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        oa_op *o = oa_op_by_id(aTHX_ a, op_id);
+        if (!o) croak("Open::API: unknown operationId '%s'", SvPV_nolen(op_id));
+        if (!SvROK(env) || SvTYPE(SvRV(env)) != SVt_PVHV)
+            croak("Open::API: check_op_security needs the PSGI environment hashref");
+        if (!SvROK(checkers) || SvTYPE(SvRV(checkers)) != SVt_PVHV)
+            croak("Open::API: check_op_security needs a { scheme => checker } hashref");
+        if (o->nsec <= 0) {
+            RETVAL = &PL_sv_undef;      /* no requirement: proceed */
+        } else {
+            SV *denied = oa_security_check(aTHX_ a, o, env,
+                                           (HV *)SvRV(checkers));
+            RETVAL = denied ? denied : &PL_sv_undef;
+        }
+    }
+    OUTPUT:
+        RETVAL
+
 # The resolved contract for one operation: what will actually be checked,
 # after $ref resolution and compilation. `maat explain` prints this.
 SV *
@@ -795,6 +837,59 @@ operation_info(self, op_id)
         (void)hv_stores(out, "responses", newRV_noinc((SV *)av));
         (void)hv_stores(out, "secured", newSViv(o->nsec ? 1 : 0));
         RETVAL = newRV_noinc((SV *)out);
+    }
+    OUTPUT:
+        RETVAL
+
+# Synthesize a response for an operation from the document alone: a PSGI
+# triplet whose body follows the precedence in oa_mock.h (media example,
+# named/first examples entry, schema default, generated from the schema).
+# Deterministic - the same arguments give byte-identical bodies.
+#
+# \%opts:
+#   code    => 404          select a status ('default' body when undeclared)
+#   example => 'name'       select a named example
+#   prefer  => $header      a raw Prefer header; code=/example= tokens are
+#                           honoured where the explicit keys are absent
+SV *
+synthesize(self, op_id, opts = NULL)
+        SV *self
+        SV *op_id
+        SV *opts
+    CODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        oa_op *o = oa_op_by_id(aTHX_ a, op_id);
+        int want_code = 0;
+        SV *want_name = NULL;
+        HV *caps = NULL;
+        if (!o) croak("Open::API: unknown operationId '%s'", SvPV_nolen(op_id));
+        if (opts && SvOK(opts)) {
+            HV *oh = oa_hv_of(opts);
+            SV **v;
+            if (!oh) croak("Open::API: synthesize options must be a hashref");
+            if ((v = hv_fetchs(oh, "code", 0)) && *v && SvOK(*v))
+                want_code = (int)SvIV(*v);
+            if ((v = hv_fetchs(oh, "example", 0)) && *v && SvOK(*v))
+                want_name = *v;
+            if ((v = hv_fetchs(oh, "prefer", 0)) && *v && SvOK(*v)) {
+                if (!want_code) {
+                    SV *t = oa_prefer_token(aTHX_ *v, "code", 4);
+                    if (t && looks_like_number(t)) want_code = (int)SvIV(t);
+                }
+                if (!want_name)
+                    want_name = oa_prefer_token(aTHX_ *v, "example", 7);
+            }
+            /* The request's path captures. A property the response schema
+             * names, and the request has already answered, is answered
+             * with what the request said - see oa_gen_echo. */
+            if ((v = hv_fetchs(oh, "path", 0)) && *v && SvROK(*v)
+                && SvTYPE(SvRV(*v)) == SVt_PVHV)
+                caps = (HV *)SvRV(*v);
+            if (want_code && (want_code < 100 || want_code > 599))
+                want_code = 0;             /* junk in Prefer: ignore it */
+        }
+        RETVAL = oa_synthesize(aTHX_ a, o, want_code, want_name, caps);
     }
     OUTPUT:
         RETVAL

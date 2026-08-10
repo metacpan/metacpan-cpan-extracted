@@ -19,8 +19,25 @@
  * the 5-year walk cap doubles as the detector - so the failure is a boot
  * croak naming the spec, not a cron that silently never fires. */
 
+/* The minute field needs sixty bits, so it needs a real 64-bit type.
+ *
+ * Not perl's U64: handy.h only typedefs it under QUADKIND, and perls
+ * around 5.20/5.22 do not expose it to an extension at all - which is a
+ * hard compile error ("unknown type name 'U64'") on a smoker running
+ * one, even on a 64-bit box. This dist declares MIN_PERL_VERSION
+ * 5.010000, so that is a portability break rather than an old-perl
+ * technicality. Reported by CPAN Testers against 0.01 on 5.20.0,
+ * 5.22.2, 5.22.3 and 5.22.4.
+ *
+ * Not UV either: UV is 32 bits on a 32-bit perl built without
+ * use64bitint, and a 32-bit minute mask is silently wrong rather than
+ * loudly broken. uint64_t is C99, is what the type actually has to be,
+ * and says so. */
+#include <stdint.h>
+typedef uint64_t pq_u64;
+
 typedef struct pq_cron {
-    U64 minute;              /* bits 0-59                                */
+    pq_u64 minute;           /* bits 0-59                                */
     U32 hour;                /* bits 0-23                                */
     U32 dom;                 /* bits 1-31                                */
     U16 mon;                 /* bits 1-12                                */
@@ -30,7 +47,7 @@ typedef struct pq_cron {
     IV  every;               /* @every interval seconds; 0 = field mode  */
 } pq_cron;
 
-#define PQ_CRON_ALL_MIN  ((U64)0xFFFFFFFFFFFFFFFULL)   /* 60 bits */
+#define PQ_CRON_ALL_MIN  ((pq_u64)0xFFFFFFFFFFFFFFFULL)   /* 60 bits */
 #define PQ_CRON_ALL_HOUR ((U32)0x00FFFFFF)             /* 24 bits */
 #define PQ_CRON_ALL_DOM  ((U32)0xFFFFFFFE)             /* bits 1-31 */
 #define PQ_CRON_ALL_MON  ((U16)0x1FFE)                 /* bits 1-12 */
@@ -76,8 +93,8 @@ static int pq_cron_atom(pTHX_ const char **pp, const char *end,
 static int pq_cron_field(pTHX_ const char *s, const char *end,
                          int lo, int hi,
                          const char *const *names, int nnames,
-                         U64 *mask, const char **errp) {
-    U64 out = 0;
+                         pq_u64 *mask, const char **errp) {
+    pq_u64 out = 0;
     const char *p = s;
 
     while (p < end) {
@@ -109,13 +126,13 @@ static int pq_cron_field(pTHX_ const char *s, const char *end,
 
         if (a <= b) {
             int v;
-            for (v = a; v <= b; v += step) out |= ((U64)1) << v;
+            for (v = a; v <= b; v += step) out |= ((pq_u64)1) << v;
         }
         else {
             /* a wrapped range (fri-mon): both arcs */
             int v;
-            for (v = a; v <= hi; v += step) out |= ((U64)1) << v;
-            for (v = lo; v <= b; v += step) out |= ((U64)1) << v;
+            for (v = a; v <= hi; v += step) out |= ((pq_u64)1) << v;
+            for (v = lo; v <= b; v += step) out |= ((pq_u64)1) << v;
         }
 
         if (p < end && *p == ',') { p++; continue; }
@@ -204,7 +221,7 @@ static void pq_cron_parse(pTHX_ const char *expr, STRLEN len, pq_cron *c) {
 
     {
         const char *err = NULL;
-        U64 m;
+        pq_u64 m;
         if (pq_cron_field(aTHX_ fs[0], fe[0], 0, 59, NULL, 0, &m, &err))
             croak("Punk::Queue: bad cron minute field near '%.8s'", err);
         c->minute = m & PQ_CRON_ALL_MIN;

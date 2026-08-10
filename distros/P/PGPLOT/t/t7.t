@@ -36,7 +36,9 @@ PGPLOT::pgsci(5);
 my @xvals = (1..128);
 my @work = (1..128);
 
+PGPLOT::pgbbuf();   # buffer so giza does not flush to screen per primitive
 PGPLOT::pghi2d(\@image, 128, 128, 1,128,1,128, \@xvals, 1, 200, 1, \@work);
+PGPLOT::pgebuf();
 
 PGPLOT::pgend();
 

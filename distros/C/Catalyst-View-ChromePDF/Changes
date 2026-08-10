@@ -1,5 +1,9 @@
 Revision history for Catalyst-View-ChromePDF:
 
+v0.1.2    2026-08-10 08:44:25+01:00 Europe/London
+  [Bug Fixes]
+  - Use Try::Tiny for Perls without the try feature.
+
 v0.1.1    2026-08-08 12:23:52+01:00 Europe/London
   [Documentation]
   - Updated SECURITY CONSIDERATIONS to emphasise that the content of the rendered is assumed to be trusted by the developer.

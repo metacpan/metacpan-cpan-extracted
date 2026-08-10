@@ -39,7 +39,12 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use Cwd ();
+use File::Spec ();
+use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
+
+use BATsh_TestOS qw(dir_marker in_marked_dir drop_marker
+                     existing_entry have_getpwnam tap_diag);
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 
@@ -89,29 +94,63 @@ sub _capture {
     return $out;
 }
 
+# _diag: everything a maintainer needs to tell a real "cd" failure apart
+# from a mere difference in how the two sides spell the same directory.
+# Called only when a case has already failed -- see rule R3 in
+# t/lib/BATsh_TestOS.pm.
+sub _diag {
+    my ($tag, $home, $want, $got, $mark) = @_;
+    tap_diag($tag, "HOME=$home", "want=$want", "got=$got", "marker=$mark",
+                   ($CAPTURED_STDERR ne '') ? "stderr=$CAPTURED_STDERR" : ());
+    return 1;
+}
+
 my @tests = (
 
     ##################################################################
     # 1. cd expansion
     ##################################################################
 
-    # The reference value for "where should we have landed?" is obtained by
-    # letting perl itself chdir() there and asking Cwd::cwd().  Comparing
-    # against Cwd::realpath()/abs_path() instead is not portable: on Win32
-    # the two disagree about separator direction, drive-letter case and 8.3
-    # short names on some perls, which produced a spurious FAIL on a
-    # Windows/5.18.4 smoker even though the tilde expansion was correct.
+    # "Did we land in the right directory?" is answered by looking for a
+    # MARKER that is known to live in that directory, not by comparing two
+    # spellings of its pathname.  No spelling is authoritative on Win32:
+    # Cwd::cwd(), Cwd::realpath() and the string handed to chdir() can
+    # disagree about separator direction, drive-letter case and 8.3 short
+    # names, and each such disagreement has already produced a spurious
+    # FAIL (realpath in 0.09 on 5.18.4, cwd in 0.10 on 5.8.9).  A relative
+    # -d/-e probe made from the new working directory has no spelling at
+    # all, so it cannot disagree with anything.
+    #
+    # $want and $got are still collected, but only to be printed when the
+    # case fails: an assertion that reports "not ok" and nothing else
+    # cannot be acted on from a CPAN Testers report.
     sub {
         return _ok(1, 'TE01: skipped (HOME not set)') if $HOME eq '';
+        return _ok(1, 'TE01: skipped (HOME is not a directory)')
+            unless -d $HOME;
+
+        # An entry that already exists in $HOME is the marker, so this
+        # case needs no write permission there.  existing_entry() also
+        # refuses any name that is reachable from where we are standing
+        # now: such a name would be found by the relative probe whether
+        # the shell moved or not, and a case that passes without having
+        # moved is worse than one that skips.  That is a real shape --
+        # a smoker with $HOME set to the build directory produces it.
+        my $mark = existing_entry($HOME);
+        return _ok(1, 'TE01: skipped (no entry in HOME that is not also here)')
+            if $mark eq '';
+
         my $save = Cwd::cwd();
         my $want = chdir($HOME) ? Cwd::cwd() : '';
         chdir($save);
         return _ok(1, 'TE01: skipped (HOME is not reachable)') if $want eq '';
         BATsh::Env::init();
         _capture(sub { BATsh->run_string('cd ~') });
-        my $got = Cwd::cwd();
+        my $landed = in_marked_dir($mark);
+        my $got    = Cwd::cwd();
         chdir($save);
-        _ok(($got eq $want) ? 1 : 0, 'TE01: cd ~ goes to $HOME');
+        _diag('TE01', $HOME, $want, $got, $mark) unless $landed;
+        _ok($landed, 'TE01: cd ~ goes to $HOME');
     },
 
     sub {
@@ -120,54 +159,80 @@ my @tests = (
         if (-d $HOME && opendir(TE02_DH, $HOME)) {
             $_te02_readable = 1; closedir(TE02_DH);
         }
-        return _ok(1, 'TE02: skipped (no subdir under HOME)')
+        return _ok(1, 'TE02: skipped (HOME is not a readable directory)')
             unless $_te02_readable;
         BATsh::Env::init();
         my $save = Cwd::cwd();
 
-        # A private subdirectory under $HOME, made without File::Temp:
-        # that module is core only from 5.6.1, and this distribution
-        # supports 5.005_03, where "require File::Temp" would fail and
-        # leave this case silently passing instead of testing anything.
-        # mkdir() is itself the atomic claim, exactly as the rest of
-        # BATsh uses sysopen(O_CREAT|O_EXCL) rather than a temp-file
-        # module.
-        my $leaf = '';
-        for my $try (0 .. 99) {
-            my $cand = "batsh_te02_${$}_$try";
-            if (mkdir(File::Spec->catdir($HOME, $cand), 0700)) {
-                $leaf = $cand;
-                last;
-            }
-        }
+        # A private scratch directory under $HOME, claimed with mkdir()
+        # -- the atomic claim this distribution uses everywhere in place
+        # of File::Temp, which is core only from 5.6.1 while this
+        # distribution supports 5.005_03.
+        my $leaf = dir_marker($HOME, 'te02');
         return _ok(1, 'TE02: skipped ($HOME is not writable)') if $leaf eq '';
 
-        my $dir  = File::Spec->catdir($HOME, $leaf);
+        my $dir = File::Spec->catdir($HOME, $leaf);
+
+        # ... and a marker inside it, so that landing can be proved with
+        # a relative probe (rule R1).
+        my $mark = dir_marker($dir, 'te02mark');
+        if ($mark eq '') {
+            rmdir($dir);
+            return _ok(1, 'TE02: skipped (scratch dir cannot be marked)');
+        }
+
         my $want = chdir($dir) ? Cwd::cwd() : '';
         chdir($save);
         if ($want eq '') {
+            drop_marker($dir, $mark);
             rmdir($dir);
             return _ok(1, 'TE02: skipped (temp dir under $HOME unreachable)');
         }
         _capture(sub { BATsh->run_string("cd ~/$leaf") });
-        my $got = Cwd::cwd();
+        my $landed = in_marked_dir($mark);
+        my $got    = Cwd::cwd();
+        my $still  = (-d $dir) ? 1 : 0;
         chdir($save);
+        drop_marker($dir, $mark);
         rmdir($dir);
-        _ok(($got eq $want) ? 1 : 0, 'TE02: cd ~/subdir expands under $HOME');
+        unless ($landed) {
+            _diag('TE02', $HOME, $want, $got, $mark);
+            print "# TE02 target=$dir exists=$still\n";
+        }
+        _ok($landed, 'TE02: cd ~/subdir expands under $HOME');
     },
 
+    # An unresolvable ~user is left literal, so cd cannot find it and
+    # fails.  "Failed" is read from the EXIT STATUS, not from the text of
+    # the diagnostic.  The text happens to be BATsh's own literal rather
+    # than the operating system's, so matching it was not a breach of
+    # rule R2 -- but it is indistinguishable from one at a glance, and it
+    # ties the case to a wording that is documentation, not interface: a
+    # translated or reworded "cd:" message would turn this green case red
+    # without anything having broken.  The status is the interface.
+    #
+    # getpwnam() is no longer required here.  BATsh calls it inside an
+    # eval and treats an unresolvable ~user as literal either way, so the
+    # case now exercises the same behaviour on a native Windows perl,
+    # where getpwnam() is unimplemented, as it does on Unix.  Which of
+    # the two paths ran is printed when the case fails.
     sub {
         BATsh::Env::init();
         my $save = Cwd::cwd();
+        my $rc = 0;
         my $out = _capture(sub {
-            BATsh->run_string('cd ~batsh_no_such_user_xyz123');
+            $rc = BATsh->run_string('cd ~batsh_no_such_user_xyz123');
         });
         chdir($save);
-        # Unresolvable ~user is left literal, so cd fails (no such directory).
-        # The diagnostic goes to STDERR, so look at both streams.
-        my $both = $out . $CAPTURED_STDERR;
-        _ok(($both =~ /No such file or directory/) ? 1 : 0,
-            'TE03: cd ~nonexistentuser fails (word left literal)');
+        my $status = BATsh->last_status;
+        $rc = 0 unless defined $rc;
+        my $failed = ($rc != 0 || $status != 0) ? 1 : 0;
+        unless ($failed) {
+            tap_diag('TE03', "rc=$rc", "last_status=$status",
+                             'getpwnam=' . (have_getpwnam() ? 'yes' : 'no'),
+                             "stdout=$out", "stderr=$CAPTURED_STDERR");
+        }
+        _ok($failed, 'TE03: cd ~nonexistentuser fails (word left literal)');
     },
 
     ##################################################################

@@ -40,7 +40,9 @@ my @cont = (-1,1000,2000,3000,4000,5000);
 
 PGPLOT::pgsci(5);
 
+PGPLOT::pgbbuf();   # buffer so giza does not flush to screen per primitive
 PGPLOT::pgconx(\@image, 128, 128, 1,128,1,128, \@cont, 6, "squashplot");
+PGPLOT::pgebuf();
 PGPLOT::pgwnad(0,1000,0,1000);
 
 PGPLOT::pgend();

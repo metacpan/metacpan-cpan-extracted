@@ -2,7 +2,7 @@ NAME
     BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 VERSION
-    Version 0.10
+    Version 0.11
 
 SYNOPSIS
       use BATsh;
@@ -13,11 +13,12 @@ SYNOPSIS
       BATsh->run('myscript.batsh', args => ['arg1', 'arg2']);
       print BATsh->last_status;    # same value, queried later
 
-      # From the command line (bin/batsh.pl is installed as "batsh"):
-      #   batsh script.batsh arg1 arg2      exit code = script status
-      #   batsh -e 'echo hi'                run inline source
-      #   ... | batsh - arg1                read the script from STDIN
-      #   batsh --help / --version
+      # From the command line (bin/batsh.pl installs as "batsh.pl";
+      # on Windows MakeMaker's pl2bat also provides "batsh"):
+      #   batsh.pl script.batsh arg1 arg2   exit code = script status
+      #   batsh.pl -e 'echo hi'             run inline source
+      #   ... | batsh.pl - arg1             read the script from STDIN
+      #   batsh.pl --help / --version
 
       # CP932 (Shift_JIS) scripts on Japanese Windows: auto-detected,
       # or select the encoding explicitly
@@ -109,6 +110,9 @@ CMD MODE
       SHIFT, SHIFT /N
       SETLOCAL [ENABLEDELAYEDEXPANSION|DISABLEDELAYEDEXPANSION], ENDLOCAL
       CD, DIR, COPY, DEL, MOVE, MKDIR, RMDIR, REN, TYPE
+      CHDIR, MD, RD, ERASE, RENAME  (cmd.exe spellings of CD, MKDIR,
+        RMDIR, DEL, REN)
+      REM comment, :: comment
       PAUSE, EXIT [/B] [code], CLS, TITLE, VER, PUSHD, POPD
       cmd1 | cmd2  (pipeline via temporary file)
       &, &&, ||  (sequential, conditional-and, conditional-or)
@@ -187,6 +191,7 @@ SH MODE
         (|-patterns, * ? [abc] [a-z] [!abc] globs, ;& and ;;& fall-through)
       test / [ ... ]  (file, string, and integer comparisons)
       cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
+      break [N], continue [N], return [N]
       eval  (quote removal + re-execution with a second expansion)
       let EXPR [EXPR ...]  (arithmetic evaluation; status 1 if last is zero)
       type [-t|-p] NAME ...  (report how NAME resolves)
@@ -280,11 +285,15 @@ EXIT STATUS
 
     "BATsh->main(@ARGV)" implements the command-line interface used by the
     modulino ("perl lib/BATsh.pm ...") and by bin/batsh.pl (installed as
-    "batsh"): "--help", "--version", "-e 'source'", a script filename, or
-    "-" to read the script from STDIN; remaining arguments become %1..%9 /
-    $1..$9. The modulino calls "exit(BATsh->main(@ARGV))", so the OS-level
-    exit code of the process is the script's own status. In the REPL, "exit
-    N" / "EXIT N" ends the session.
+    "batsh.pl"; on Windows MakeMaker's pl2bat also provides "batsh"):
+    "--help", "--version", "-e 'source'", a script filename, or "-" to read
+    the script from STDIN. With a script filename or with "-", the remaining
+    arguments become %1..%9 / $1..$9. With "-e" they do not: every remaining
+    argument is joined with newlines onto the inline source, so "-e 'echo
+    one' 'echo two'" runs a two-line script. The modulino calls
+    "exit(BATsh->main(@ARGV))", so the OS-level exit code of the process is
+    the script's own status. In the REPL, "exit N" / "EXIT N" ends the
+    session.
 
 REQUIREMENTS
     Perl 5.005_03 or later. Core modules only. No external shell required.
@@ -325,23 +334,35 @@ BUGS AND LIMITATIONS
     word-splitting (external command arguments, "echo", "eval"), in
     "test"/"[" file-test operands, and in the right-hand side of a plain
     "VAR=value" or prefix "VAR=value command" assignment. "~user" resolves
-    via getpwnam and is therefore Unix-like only (a no-op on Win32).
+    via "getpwnam" and is therefore Unix-like only (a no-op on Win32, where
+    the word is left literal, matching bash's behaviour for an unresolvable
+    login name). Not implemented: tilde expansion after ":" in colon-list
+    assignments such as "PATH=~/a:~/b" (bash expands each colon-separated
+    tilde in "PATH"/"CDPATH"/"MAILPATH" specifically); such values pass
+    through unexpanded.
 
     The result of an expansion is literal data as of version 0.09: a
-    backslash arriving from a variable, from a command substitution or
-    from a tilde expansion is no longer re-read as a shell escape by the
+    backslash arriving from a variable, from a command substitution or from
+    a tilde expansion is no longer re-read as a shell escape by the
     quote-removal stage, so a Windows pathname held in a variable stays
-    intact ("d=\"C:\\Users\\x\"; cd $d"), while a backslash written in
-    the script itself still quotes the character after it. A tilde
-    expansion is also protected against field splitting, so a home
-    directory whose name contains a space stays one word.
+    intact ("d="C:\Users\x"; cd $d"), while a backslash written in the
+    script itself still quotes the character after it. A tilde expansion is
+    also protected against field splitting, so a home directory whose name
+    contains a space stays one word.
 
     Brace expansion "{a,b,c}" and "{1..5}"/"{a..e}[..step]", extended
-    pattern matching ("shopt -s extglob"; "?()", "*()", "+()", "@()",
-    "!()" in case patterns and in "${VAR%pat}"-family patterns),
-    here-strings ("<<< word"), process substitution ("<(cmd)", ">(cmd)"),
-    and the "getopts", "select", "alias"/"unalias", and "exec" builtins are
-    now supported as of version 0.07 (see BATsh::SH).
+    pattern matching ("shopt -s extglob"; "?()", "*()", "+()", "@()", "!()"
+    in case patterns and in "${VAR%pat}"-family patterns), here-strings
+    ("<<< word"), process substitution ("<(cmd)", ">(cmd)"), and the
+    "select", "alias"/"unalias", and "exec" builtins are now supported as of
+    version 0.07 (see BATsh::SH).
+
+    The builtin "getopts" is supported as of version 0.07: it parses
+    single-character options with the usual "OPTIND"/"OPTARG" protocol,
+    clustered flags ("-abc"), attached ("-oVALUE") and separate ("-o VALUE")
+    option arguments, the "--" end-of-options marker, and both the default
+    (diagnostic on STDERR) and silent (leading ":" in the optstring)
+    error-reporting modes. See "getopts" in BATsh::SH.
 
     The shell options "set -e" (errexit), "set -u" (nounset) and "set -x"
     (xtrace) are supported as of version 0.07, including the long forms "set
@@ -354,47 +375,43 @@ BUGS AND LIMITATIONS
     "run"/"run_string"/"run_lines", so "set -e" does not leak into a later
     run in the same process.
 
-    "set" also takes operands as of version 0.09: "set -- ARG ..."
-    replaces the positional parameters (and "set --" clears them), and so
-    does a first operand that is not an option, as in "set a b c". The
-    parameters are the ones a function call and "shift" use, so $1..$9,
-    "$@", "$*", $# , shift and getopts all see them, which makes the usual
+    "set" also takes operands as of version 0.09: "set -- ARG ..." replaces
+    the positional parameters (and "set --" clears them), and so does a
+    first operand that is not an option, as in "set a b c". The parameters
+    are the ones a function call and "shift" use, so $1..$9, $@, $*, $#,
+    "shift" and "getopts" all see them, which makes the usual
 
         set -- -f value extra
         while getopts f: opt; do ... done
         shift $((OPTIND - 1))
 
     idiom work; before 0.09 every operand was ignored and that loop never
-    ran. "set" leaves OPTIND alone, as bash does. At most nine positional
+    ran. "set" leaves "OPTIND" alone, as bash does. At most nine positional
     parameters are addressable.
 
-    Filename patterns ("*", "?", "[abc]", "[a-z]", "[!abc]") are matched
-    by BATsh itself as of version 0.09, not by Perl's "glob()", which
-    reads a backslash as an escape character and so destroyed an ordinary
-    Windows pattern ("C:\dir\*.txt" was searched for as "C:dir*.txt" and
-    came back with its backslashes deleted). The separator is "/"
-    everywhere and "\" as well on Windows, where a path is written that
-    way; on Unix a backslash stays an ordinary filename character. A
-    leading "." is matched only by a pattern that starts with ".", every
-    segment but the last has to be a directory, "[!abc]" negates, matches
-    are sorted, case is ignored on Windows, and a pattern that matches
-    nothing is left exactly as written. CMD-mode wildcards ("FOR %f IN
-    (...)", "DEL") use the same matcher.
+    Filename patterns ("*", "?", "[abc]", "[a-z]", "[!abc]") are matched by
+    BATsh itself as of version 0.09, not by Perl's glob(), which reads a
+    backslash as an escape character and so destroyed an ordinary Windows
+    pattern ("C:\dir\*.txt" was searched for as "C:dir*.txt" and came back
+    with its backslashes deleted). The separator is "/" everywhere and "\"
+    as well on Windows, where a path is written that way; on Unix a
+    backslash stays an ordinary filename character. A leading "." is matched
+    only by a pattern that starts with ".", every segment but the last has
+    to be a directory, "[!abc]" negates, matches are sorted, case is ignored
+    on Windows, and a pattern that matches nothing is left exactly as
+    written. CMD-mode wildcards ("FOR %f IN (...)", "DEL") use the same
+    matcher.
 
     How a Windows pattern is written differs between the two modes. A
     CMD-mode line has no escape character, so it is written as it looks
     ("FOR %f IN (C:\dir\*.txt)", "DEL C:\dir\*.tmp"). An SH-mode line
     follows bash, where a backslash quotes the next character, so a bare
-    "echo C:\dir\*.txt" means "C:dir*.txt" there (in bash as well); keep
-    the path in a variable, as a script does anyway, and the backslashes
-    are data and stay separators:
+    "echo C:\dir\*.txt" means "C:dir*.txt" there (in bash as well); keep the
+    path in a variable, as a script does anyway, and the backslashes are
+    data and stay separators:
 
         d='C:\dir\'
         for f in $d*.txt; do echo "$f"; done
-
-    The builtin "eval" is supported as of version 0.07: one level of quote
-    removal, concatenation, and re-execution with a second round of
-    expansion (POSIX semantics).
 
     The builtins "let", "type" and "command" are supported as of version
     0.08, evaluated internally in pure Perl (previously they fell through to
@@ -402,10 +419,14 @@ BUGS AND LIMITATIONS
     evaluates each argument as shell arithmetic, reusing the "$(( ))"
     evaluator, with exit status 0 when the last expression is non-zero and 1
     when it is zero. "type [-t|-p] NAME ..." reports how each NAME resolves
-    (alias, keyword, function, builtin, or a file on PATH). "command [-v|-V]
-    NAME [ARG ...]" runs NAME bypassing a same-named shell function; "-v"
-    prints how NAME would be invoked (the portable "command -v foo" feature
-    test) and "-V" prints a verbose, "type"-style description.
+    (alias, keyword, function, builtin, or a file on "PATH"). "command
+    [-v|-V] NAME [ARG ...]" runs NAME bypassing a same-named shell function;
+    "-v" prints how NAME would be invoked (the portable "command -v foo"
+    feature test) and "-V" prints a verbose, "type"-style description.
+
+    The builtin "eval" is supported as of version 0.07: one level of quote
+    removal, concatenation, and re-execution with a second round of
+    expansion (POSIX semantics).
 
     "trap" is supported in SH mode: "trap 'cmd' SIGSPEC..." registers a
     handler, "trap - SIGSPEC" resets to default, "trap '' SIGSPEC" ignores,
@@ -417,10 +438,11 @@ BUGS AND LIMITATIONS
     In SH mode, a parenthesised group "( ... )" is a subshell command group
     as of version 0.07: variable, array, function, and alias changes, and
     "cd", made inside it do not affect the calling shell (approximated by
-    snapshot/restore around the body, since this interpreter never forks).
-    In CMD mode, "( ... )" is only recognised as an IF/FOR block delimiter
-    (as in cmd.exe); it is not a general-purpose command group and has no
-    associated variable-scope isolation.
+    snapshot/restore around the body, since this interpreter never forks --
+    see "Subshell Command Groups" in BATsh::SH). In CMD mode, "( ... )" is
+    only recognised as an "IF"/"FOR" block delimiter (as in cmd.exe); it is
+    not a general-purpose command group and has no associated variable-scope
+    isolation.
 
     Pipeline ("|"), I/O redirection (">" ">>" "<" "2>" "2>>" "2>&1"),
     compound commands ("&&" "||" ";"), and function definitions are
@@ -428,8 +450,8 @@ BUGS AND LIMITATIONS
 
     Here-documents ("<<EOF", "<<'EOF'", "<<-EOF") are supported in SH mode,
     with the limitations described in BATsh::SH: one here-document per
-    command line, and best-effort behaviour when combined with a pipeline
-    or compound operator on the same line. Here-strings ("<<< word") are a
+    command line, and best-effort behaviour when combined with a pipeline or
+    compound operator on the same line. Here-strings ("<<< word") are a
     separate feature (also supported as of version 0.07; see above).
 
     Background execution (a trailing "&") is supported in SH mode for
@@ -440,11 +462,24 @@ BUGS AND LIMITATIONS
     jobs. In CMD mode "&" keeps its cmd.exe meaning as a sequential
     separator.
 
+    A control structure written entirely on one physical line may be
+    followed by ";", "&&", "||" or "|" and more commands ("if ...; fi; echo
+    done", "for ...; done | sort") as of version 0.11; before that release
+    everything after the closing "fi"/"done"/"esac" was silently discarded
+    and the block collector went on to swallow the following lines. The same
+    now holds for a one-line function definition and a parenthesised group
+    ("f(){ ...; }; f", "( ... ) && echo ok"). A redirection still binds to
+    the structure itself, as in bash.
+
+    The reserved word "time" is not implemented; "time cmd" is looked up as
+    an external program and fails when none is installed.
+
     Section boundary detection is token-based (uppercase vs. lowercase first
     token). Mixed-case first tokens are treated as SH.
 
-    Please report bugs via the issue tracker:
-    <https://github.com/ina-cpan/BATsh/issues>
+    Please report bugs to the author at <ina.cpan@gmail.com>, quoting the
+    fingerprint that t/0000-environment.t prints at the top of the test
+    output.
 
 EXAMPLES
     The eg/ directory contains runnable example scripts:

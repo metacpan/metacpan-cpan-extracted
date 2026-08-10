@@ -31,6 +31,7 @@ t/binom_test.R.scipy.t
 t/binom_test.t
 t/bodyfat.csv
 t/cfilter.t
+t/chisq_test.R.scipy.t
 t/chisq_test.t
 t/chunk.t
 t/col2col.t

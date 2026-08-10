@@ -12,8 +12,16 @@ $ENV{PGPLOT_XW_WIDTH}=0.3;
 note "Testing some new PGPLOT 5.2.0 routines";
 
 PGPLOT::pgqinf("VERSION", my $val, my $len);
-$val =~ s/\.//g; $val =~ s/v//;
-plan skip_all => "PGPLOT version must be > 5.2.0 for this test $val\n" if $val<520;
+# Accept real PGPLOT >= 5.2.0, or giza >= 1.3 (pgaxis/pgtick added in 1.3.1);
+# giza reports a version string like "giza-1.5.0" which is not numeric.
+my $new_enough;
+if ($val =~ /^giza-?v?(\d+)\.(\d+)/i) {
+  $new_enough = ($1 > 1 || ($1 == 1 && $2 >= 3));
+} else {
+  (my $numver = $val) =~ s/\.//g; $numver =~ s/v//;
+  $new_enough = ($numver =~ /^\d+$/ && $numver >= 520);
+}
+plan skip_all => "PGPLOT version must be > 5.2.0 (or giza >= 1.3) for this test: $val\n" unless $new_enough;
 
 # Read in image (int*2)
 

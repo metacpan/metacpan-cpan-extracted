@@ -1,5 +1,24 @@
 Revision history for Open-API
 
+0.08    2026-08-09
+        - Response synthesis: $api->synthesize
+          builds a PSGI triplet for an operation from the document alone,
+          which is what serves a mock. The body is the media type's
+          example, a named or lexicographically first examples entry, the
+          schema's default, then a value generated from the schema, and it
+          validates against the schema it came from - t/27-synthesize.t
+          asserts that as a property over whole specs.
+        - Deterministic and bounded: nothing draws a random value, bodies
+          are encoded canonically through the File::Raw::JSON ABI so they
+          are byte-identical across processes, and generated strings,
+          arrays and $ref cycles are capped so a pasted spec cannot ask a
+          mock for a gigabyte of 'a'.
+        - Open::API::UI->embed_html: the documentation page as a fragment,
+          carrying the config block app.js reads, for a host page that
+          already has a head of its own.
+        - check_op_security($op_id, $env, \%checkers) exposes the compiled
+          per-operation security guard to callers that do their own routing
+
 0.07    2026-08-09
         - validate_responses gains a report mode, A mismatch calls the coderef and the 
 	  response continues to the client untouched - status, headers and body byte for byte.

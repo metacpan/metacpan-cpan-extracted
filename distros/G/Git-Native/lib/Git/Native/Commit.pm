@@ -2,8 +2,8 @@
 
 package Git::Native::Commit;
 use Moo;
-use Git::Libgit2 qw( check_rc );
 use Git::Libgit2::FFI ();
+use Git::Native::Error qw( check_rc );
 use Git::Native::Oid ();
 use Git::Native::Tree ();
 
@@ -83,7 +83,7 @@ Git::Native::Commit - A libgit2 commit object
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

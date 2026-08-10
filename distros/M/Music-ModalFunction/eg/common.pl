@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 
+# use Data::Dumper::Compact qw(ddc);
 use List::Util qw(uniq);
 use Music::Chord::Note ();
 use Music::ModalFunction ();
@@ -32,8 +33,9 @@ my @notes;
 
 print "Chords in common between $pitch1 $scale1 and $pitch2 $scale2:\n";
 for my $result (@$results) {
+    # print ddc $result;
     my $flavor = $result->{chord} eq 'maj' ? '' : $result->{chord} eq 'min' ? 'm' : $result->{chord};
-    my $chord = uc($result->{chord_note}) . $flavor;
+    my $chord = ucfirst($result->{chord_note}) . $flavor;
     my @pitches = $cn->chord($chord);
     push @notes, @pitches;
     print "\t$chord = [@pitches]\n";

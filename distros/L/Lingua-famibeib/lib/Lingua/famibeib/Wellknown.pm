@@ -13,11 +13,12 @@ use warnings;
 
 use Carp;
 use Lingua::famibeib::Word;
+use Lingua::famibeib::Prefix; # This will also load some prefixes
 use Data::Identifier::Util;
 use Data::Displaycolour v0.07;
 use Data::IconText v0.06;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 use parent qw(Data::Identifier::Interface::Known);
 
@@ -26,7 +27,7 @@ my @_wellknown = map {Lingua::famibeib::Word->new(from => $_)->register} (
     (map {Lingua::famibeib::Word->new(number => $_)} -1 .. 32), # Numbers
     (qw(fokiba fokibe fokibi  fokifa fokife fokifi  fokika fokike fokiki fokiko  fokila)), # Colours
     (qw(febaba febabo  febasu febebe  febeba febe  febeto)), # Animals
-    (map {'to'.$_, 'to'.$_.'al'} qw(ba be bi bo  ma me mi  sa se si so su  ta te ti to tu)), # Structure I
+    (map {'tu'.$_, 'tu'.$_.'al'} qw(ba be bi bo  ma me mi  sa se si so su  ta te ti to tu)), # Structure I
     (map {     $_,      $_.'al'} qw(tusifa tusife tusifi tusifo)), # Structure II
     (map {     $_,      $_.'ol'} qw(faba fabe fabi fabo fabu  fafa fafe fafi fafo fafu  faka fake faki fako faku  fala fale fali falo falu
                                     fama fame fami famo famu  fasa fase fasi faso fasu  fata fate fati fato fatu)), # Common Verbs
@@ -93,6 +94,8 @@ foreach my Lingua::famibeib::Word $word (@_wellknown) {
     }
 }
 
+Lingua::famibeib::Word->natural_language; # force load
+
 Data::Identifier::Util->register_generator(
     'e2afa39e-fd57-45f8-89fd-8662b275cc68',
     namespace   => '10ce38bf-6238-4ed7-96ef-98ea9642a4c6',
@@ -127,7 +130,7 @@ Lingua::famibeib::Wellknown - database of famibeib words
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

@@ -51,7 +51,7 @@ batsh.pl - run a bilingual cmd.exe / bash .batsh script
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 

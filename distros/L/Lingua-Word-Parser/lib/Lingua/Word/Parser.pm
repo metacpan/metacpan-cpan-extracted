@@ -6,22 +6,15 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0809';
+our $VERSION = '0.0900';
 
 use Bit::Vector ();
 use DBI ();
-use List::PowerSet qw(powerset_lazy);
 use IO::File ();
 
 use Memoize qw(memoize);
-memoize('_does_not_overlap');
-memoize('power');
-memoize('_reconstruct');
 memoize('_grouping');
-memoize('score');
-memoize('score_parts');
 memoize('_rle');
-memoize('_or_together');
 
 
 
@@ -69,7 +62,7 @@ sub _fetch_lex {
 
     # Open the given file for reading...
     my $fh = IO::File->new;
-    $fh->open( "< $self->{file}" ) or die "Can't read file: '$self->{file}'";
+    $fh->open($self->{file}, '<') or die "Can't read file: '$self->{file}'";
     for ( <$fh> ) {
         $i++;
         # Split space-separated entries.
@@ -127,9 +120,11 @@ sub knowns {
             # Get matched word-part.
             my $part = substr $self->{word}, $m, $n - $m;
 
+            next if $n == $m;   # skip zero-width matches instead of padding the mask
+
             # Create the part-of-word bitmask.
             my $mask = 0 x $m;                      # Before known
-            $mask   .= 1 x (($n - $m) || 1);        # Known part
+            $mask   .= 1 x ($n - $m);               # Known part
             $mask   .= 0 x ($self->{wlen} - $n);    # After known
 
             # Output our progress.
@@ -163,46 +158,29 @@ sub knowns {
 sub power {
     my $self = shift;
 
-    # Get a new powerset generator.
-    my $power = powerset_lazy(sort keys %{ $self->{masks} });
-
-    # Consider each member of the powerset.. to save or skip?
-    while (my $collection = $power->()) {
-#        warn "C: @$collection\n";
-
-        # Save this collection if it has only one item.
-        if (1 == @$collection) {
-#            warn "\t\tE: only 1 mask\n";
-            push @{ $self->{combos} }, $collection;
-            next;
-        }
-
-        # Compare each mask against the others.
-        LOOP: for my $i (0 .. @$collection - 1) {
-
-            # Set the comparison mask.
-            my $compare = $collection->[$i];
-
-            for my $j ($i + 1 .. @$collection - 1) {
-
-                # Set the current mask.
-                my $mask = $collection->[$j];
-#                warn "\tP:$compare v $mask\n";
-
-                # Skip this collection if an overlap is found.
-                if (not $self->_does_not_overlap($compare, $mask)) {
-#                    warn "\t\tO:$compare v $mask\n";
-                    last LOOP;
-                }
-
-                # Save this collection if we made it to the last pair.
-                if ($i == @$collection - 2 && $j == @$collection - 1) {
-#                    warn "\t\tE:$compare v $mask\n";
-                    push @{ $self->{combos} }, $collection;
-                }
-            }
-        }
+    # Precompute each mask's [start, end) span once
+    my @spans;
+    for my $mask (keys %{ $self->{masks} }) {
+        $mask =~ /^(0*)(1+)/;
+        push @spans, { start => length($1), end => length($1) + length($2), mask => $mask };
     }
+    @spans = sort { $a->{start} <=> $b->{start} } @spans;
+
+    # Recursively extend only with spans that don't overlap what's already chosen
+    my @combos;
+    my $extend;
+    $extend = sub {
+        my ($from_idx, $chosen) = @_;
+        push @combos, [ map { $_->{mask} } @$chosen ] if @$chosen;
+        for my $idx ($from_idx .. $#spans) {
+            my $span = $spans[$idx];
+            next if @$chosen && $span->{start} < $chosen->[-1]{end};
+            $extend->($idx + 1, [ @$chosen, $span ]);
+        }
+    };
+    $extend->(0, []);
+
+    $self->{combos} = \@combos;
 
     # Hand back the "non-overlapping powerset."
     return $self->{combos};
@@ -291,11 +269,11 @@ sub score_parts {
         my ( $s, $m ) = _reconstruct( $self->{word}, $c, $open_separator, $close_separator );
 
         my $defn = [];
-        for my $i ( @$m )
+        for my $k ( @$m )
         {
             for my $j ( keys %{ $self->{known} } )
             {
-                push @$defn, $self->{known}{$j}{defn} if $self->{known}{$j}{mask} eq $i;
+                push @$defn, $self->{known}{$j}{defn} if $self->{known}{$j}{mask} eq $k;
             }
         }
 
@@ -426,7 +404,7 @@ Lingua::Word::Parser - Parse a word into scored known and unknown parts
 
 =head1 VERSION
 
-version 0.0809
+version 0.0900
 
 =head1 SYNOPSIS
 
@@ -547,11 +525,11 @@ The F<t/*> and F<eg/*> files in this distribution!
 
 =head1 AUTHOR
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2024 by Gene Boggs.
+This software is copyright (c) 2014-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

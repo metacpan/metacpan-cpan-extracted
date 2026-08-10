@@ -2,8 +2,9 @@
 use v5.20;
 use Feature::Compat::Class;
 use feature 'signatures';
-
-# PODNAME: create_release.pl - Helper script to create a GitHub Release
+our $VERSION = '0.0011'; # VERSION
+# PODNAME: createrelease.pl
+# ABSTRACT: Helper script to create a GitHub Release
 use Config::INI::Reader;
 use Pithub::Repos::Releases;
 use Config::Identity;
@@ -302,10 +303,11 @@ class GitHub::Release {
     method set_version ($ver){
         return if not defined $ver;
         $version = $ver;
-        print "Version: ", $version, "\n";
     }
 
     method get_version {
+        return $version if defined $version;
+
         my $git = Git::Wrapper->new('./');
 
         my @tags;
@@ -425,19 +427,18 @@ class GitHub::Release {
 }
 
 use Getopt::Long;
-my $prod    = 0;
-my $trial  = 0;
-my $draft   = 1;
-my $configfile='dist.ini';
+my $trial      = 0;
+my $nodraft    = 0;
+my $configfile ='dist.ini';
 my $version;
 
-GetOptions ("draft"     => \$draft,
-            "prod"      => \$prod,
-            "trial"   => \$trial,
+GetOptions ("no-draft"      => \$nodraft,
+            "trial"         => \$trial,
             "configfile=s"  => \$configfile,
-            "version=s"   => \$version)
-or die("Error in command line arguments --draft or --prod are supported\n");
+            "version=s"     => \$version)
+or die("Error in command line arguments --configfile, --no-draft, --trial or --version are supported\n");
 
+my $draft = $nodraft ? 0 : 1;
 # Load the Dist::Zilla file
 my $config      = Config::INI::Reader->read_file($configfile);
 # Obtain the GitHub::CreateRelease attributes
@@ -445,11 +446,11 @@ my $attributes  = $config->{'GitHub::CreateRelease'};
 
 my $release     = GitHub::Release->new(%{$attributes});
 
-print "Trial: $prod\n";
+print "Trial: $trial\n";
 print "Draft: $draft\n";
 print "Config: $configfile\n";
 print "Version: $version\n" if defined $version;
-$release->set_trial($prod ? 0 : $prod);
+$release->set_trial($trial);
 $release->set_draft($draft);
 $release->set_version($version);
 $release->set_config_filename($configfile ? $configfile : '');
@@ -466,11 +467,234 @@ __END__
 
 =head1 NAME
 
-create_release.pl - Helper script to create a GitHub Release
+createrelease.pl - Helper script to create a GitHub Release
 
 =head1 VERSION
 
-version 0.0010
+version 0.0011
+
+=head1 SYNOPSIS
+
+This script can be run from the root directory of your distribution, after
+C<dzil release> has tagged and pushed the release:
+
+It will allow you to create a "GitHub Release" for a version you specify
+which is helpful if the Dist::Zilla plugin failed for some reason.
+
+ createrelease.pl [options]
+
+ Options:
+   --no-draft             publish the release immediately (default: draft)
+   --trial                mark the release as a trial (pre-)release
+   --configfile FILE      configuration file to read (default: dist.ini)
+   --version VERSION      version of the release
+
+Examples:
+
+ # Create a draft release for the most recent git tag
+ createrelease.pl
+
+ # Create a published release for a trial upload
+ createrelease.pl --no-draft --trial
+
+ # Create the release using a standalone configuration file
+ createrelease.pl --configfile .githubcreaterelease --no-draft
+
+ # Create the release for a specific version rather than the latest tag
+ createrelease.pl --version 2.08
+
+ # The same, for a trial release: --trial adds the -TRIAL suffix itself
+ createrelease.pl --trial --version 2.08
+
+=head1 DESCRIPTION
+
+C<createrelease.pl> performs the same task as
+L<Dist::Zilla::Plugin::GitHub::CreateRelease>, but as a standalone script
+rather than as part of a C<dzil release> run.
+
+It is intended to be run from the root directory of a distribution B<after>
+the release has been built, tagged and pushed to GitHub.  It:
+
+=over
+
+=item 1
+
+Reads the C<[GitHub::CreateRelease]> section of the configuration file
+(F<dist.ini> by default) to obtain its settings.
+
+=item 2
+
+Determines the version of the release from the most recent git tag, unless
+a version is given with C<--version>.
+
+=item 3
+
+Determines the GitHub repository from the URL of the git remote associated
+with the current branch.  If the remote cannot be determined a menu of the
+configured remotes is presented.
+
+=item 4
+
+Creates the GitHub Release using the GitHub API, with release notes obtained
+according to the C<notes_from> setting.
+
+=item 5
+
+Attaches the CPAN release archive to the GitHub Release.  If the archive is
+not present in the current directory it is downloaded from MetaCPAN.
+
+=back
+
+This is useful when the release was uploaded to CPAN but the GitHub Release
+was not created - for example when the plugin was not yet configured, or when
+the plugin failed after the distribution was uploaded.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--no-draft>
+
+Publish the release immediately rather than creating it as a draft.
+
+The release is created as a draft unless this option is given.  A draft
+release is not visible until it is published via the GitHub web page.  Note
+that the draft state is decided entirely by this option: the C<draft> setting
+in the configuration file has no effect on this script.
+
+In effect B<--draft> is the default option but it is not an option.
+
+=item B<--trial>
+
+Mark the release as a trial release.  The release is created as a GitHub
+pre-release, C<TRIAL> in the C<title_template> is replaced with "Trial"
+rather than "Official", and the archive that is attached to the release is
+the C<-TRIAL> variant, for example F<Some-Dist-0.0010-TRIAL.tar.gz>.
+
+=item B<--configfile> FILE
+
+The configuration file to read the C<[GitHub::CreateRelease]> settings from.
+It defaults to F<dist.ini>.  Note that F<dist.ini> is always read as well, in
+order to obtain the name of the distribution.
+
+=item B<--version> VERSION
+
+The version of the release.  If it is not specified the most recently created
+git tag is used instead.
+
+The value is used everywhere the version of the release is needed: as the tag
+the release points at, in the title of the release, in the name of the notes
+file, and in the name of the CPAN archive that is attached.  It must therefore
+match an existing tag in the repository.
+
+Give the version on its own even for a trial release - C<--trial> appends the
+C<-TRIAL> suffix to the name of the archive itself.
+
+=back
+
+=head1 CONFIGURATION
+
+The script reads its settings from the C<[GitHub::CreateRelease]> section of
+the configuration file, in the same format used by the plugin:
+
+ name    = This-Distribution
+
+ [GitHub::CreateRelease]
+ branch = main                   ; default = main
+ notes_as_code = 1               ; default = 1 (true)
+ notes_from = ChangeLog          ; default = SignReleaseNotes
+ notes_file = Changes            ; default = Release-VERSION
+ github_notes = 0                ; default = 0 (false)
+ hash_alg = sha256               ; default = sha256
+ add_checksum = 1                ; default = 1 (true)
+ org_id = some_id_identifier     ; default = github
+ title_template = Version RELEASE - TRIAL CPAN release      ; this is the default
+
+The settings have the same meaning as the attributes of the same name
+documented in L<Dist::Zilla::Plugin::GitHub::CreateRelease>.  Only the
+settings listed above, plus C<repo>, C<remote_name>, C<draft>, C<trial> and
+C<sign>, are recognised by this script; any other setting in the section
+causes it to fail on startup.
+
+The C<draft> and C<trial> settings are always overridden by the command line
+- use C<--no-draft> and C<--trial> to control them.
+
+If a file named F<.githubcreaterelease> exists in the current directory it is
+used as the configuration file in preference to the file given by
+C<--configfile>.  This allows the settings to be kept separate from
+F<dist.ini> - for example for a distribution that is not built with
+Dist::Zilla.
+
+=head1 RELEASE NOTES
+
+The C<notes_from> setting determines where the body of the GitHub Release
+comes from:
+
+=over
+
+=item SignReleaseNotes
+
+Read from the file named by C<notes_file>, with C<VERSION> in the name
+replaced by the version of the release.  The file is used as-is, since the
+notes generated by L<Dist::Zilla::Plugin::SignReleaseNotes> already contain
+the checksum of the archive.
+
+=item FromFile
+
+As above, but the checksum of the CPAN archive is appended when
+C<add_checksum> is true.
+
+=item ChangeLog
+
+Read the entry for the release from the change log named by C<notes_file>
+using L<CPAN::Changes>.  The checksum of the CPAN archive is appended when
+C<add_checksum> is true.
+
+=item GitHub::CreateRelease
+
+Use only the checksum of the CPAN archive as the notes.
+
+=back
+
+When C<notes_as_code> is true the notes are wrapped in a GitHub markdown
+code fence.
+
+=head1 GITHUB API AUTHENTICATION
+
+The script uses L<Config::Identity::GitHub> to obtain the GitHub API
+credentials, and requires a file in your home directory named
+F<.github-identity> containing:
+
+ login github_username OR github_organization
+ token github_....
+
+The token must be a Personal Access Token with at least "Write" access to
+"Contents" for the repository.  The C<org_id> setting selects a different
+identity file, so that C<org_id = project> reads F<~/.project-identity> or
+F<~/.project> instead.
+
+An encrypted (F<.github-identity.asc>) identity file is supported and
+recommended.  See L<Dist::Zilla::Plugin::GitHub::CreateRelease/"GITHUB API
+AUTHENTICATION"> for the full details.
+
+=head1 CAVEATS
+
+Unless C<--version> is given, the version is taken from the git tag sorted by
+tag date, so the tag for the release being published must be the most recently
+created tag in the repository.  Use C<--version> to publish a release for any
+older tag.
+
+The owner of the repository is taken from the C<login> of the identity file,
+so a repository owned by another user or organization needs an C<org_id>
+identity whose login is that owner.
+
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::GitHub::CreateRelease>
+
+L<Dist::Zilla::Plugin::SignReleaseNotes>
+
+L<Config::Identity::GitHub>
 
 =head1 AUTHOR
 

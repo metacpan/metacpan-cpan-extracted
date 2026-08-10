@@ -51,4 +51,11 @@ ok !$repo->has_branch('feature'), 'old name gone';
 $renamed->delete;
 ok !$repo->has_branch('trunk'), 'deleted';
 
+# is_head: only the branch HEAD points at reports is_head.
+my $mainline = $repo->branch_create( 'mainline', $commit );
+my $sidebr   = $repo->branch_create( 'sidebr',   $commit );
+$repo->set_head('refs/heads/mainline');
+ok $repo->branch('mainline')->is_head, 'is_head true for the checked-out branch';
+ok !$repo->branch('sidebr')->is_head,  'is_head false for another branch';
+
 done_testing;

@@ -1,5 +1,61 @@
 Revision history for Git-Native
 
+0.004     2026-08-09 20:34:42Z
+  - Repository: add compare-and-swap direct reference updates.
+    reference_create(..., expected_old => $oid) uses
+    git_reference_create_matching, and reference_set_target($name, $new_oid,
+    expected_old => $old_oid) uses lookup plus git_reference_set_target.
+    Stale expected OIDs throw Git::Native::Error with is_not_matched true.
+    expected_old => undef atomically requires an absent ref when creating.
+    The create path needs Git::Libgit2 to bind
+    git_reference_create_matching; until that parallel binding lands it
+    throws a clear function-not-bound error. libgit2 has no
+    git_reference_set_target_matching function: git_reference_set_target
+    already performs the atomic write by calling git_reference_create_matching
+    with the looked-up ref's OID.
+  - Remote: fetch and push now return a Git::Native::Remote::Result that
+    carries per-ref outcomes. libgit2 returns 0 even when individual refs
+    were skipped (non-fast-forward on fetch) or rejected (pre-receive
+    hook, protected branch, server-side non-ff on push) — the only way to
+    see those outcomes was through the per-ref callbacks. Git::Native now
+    installs them and surfaces the verdicts:
+      $r = $remote->fetch(refspecs => [...]);
+      for my $u (@{$r->updated})  { ... }   # accepted moves, {ref, from, to}
+      for my $r2 (@{$r->rejected}) { ... }  # push rejections, {ref, reason}
+    `from` is undef for refs that did not exist locally before; `reason`
+    is the libgit2 / server message ("" on a clean success).
+  - Remote: install a certificate_check callback so SSH remotes work on
+    libgit2 < 1.7 (which has no built-in known_hosts checking). Without it
+    every git+ssh fetch/push/list_refs failed with GIT_ECERTIFICATE (-17)
+    "invalid or unknown remote ssh hostkey". The hostkey is verified
+    against ~/.ssh/known_hosts (hashed, plain, [host]:port and wildcard
+    entries) by SHA256/SHA1 fingerprint, mirroring the git CLI. Set
+    GIT_NATIVE_SSH_INSECURE=1 to accept any hostkey. HTTPS remotes keep
+    libgit2's own TLS validation.
+  - Oid: fix the `eq` overload so an Oid compares equal to its hex string
+    (e.g. `$ref->target eq $known_sha`). It previously compared the 20 raw
+    bytes against the right-hand side verbatim, so Oid-vs-hex-string never
+    matched. Oid-vs-Oid is unaffected.
+  - Error: libgit2 failures now surface as a Throwable Git::Native::Error
+    (with code/klass/message) as documented, instead of leaking the
+    low-level Git::Libgit2::Error. check_rc is re-homed in Git::Native::Error
+    and used by every wrapper. klass now carries a real decoded category
+    (Git::Libgit2 0.005), no longer always 0.
+  - Error: predicates over the libgit2 code - is_not_found, is_exists,
+    is_auth, is_certificate, is_conflict, is_not_fast_forward,
+    is_unborn_branch, is_invalid_spec. The long tail is reachable via
+    ->code and the GIT_E* constants now exported by Git::Libgit2.
+  - Repository: new object($oid) - look up an object of unknown kind and
+    return the matching typed wrapper (Blob / Tree / Commit / Tag).
+  - Config: new get_bool($key) - read a git-style boolean via libgit2's
+    git_config_get_bool (true/yes/on/1, false/no/off/0, integers by
+    non-zero); undef when unset, Git::Native::Error on a non-boolean value.
+    Repository->config_bool($key) is the snapshot-backed convenience, like
+    config_string. Requires Git::Libgit2 0.005.
+  - Config: get_string no longer swallows every error as undef - only
+    GIT_ENOTFOUND maps to undef now, other failures throw (matching
+    get_bool).
+
 0.003     2026-05-27 18:55:00Z
   - New Git::Native::Config class - get_string / set_string / snapshot
   - Repository: config (live), config_snapshot (read-only), and a

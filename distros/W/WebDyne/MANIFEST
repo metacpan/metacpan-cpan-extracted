@@ -20,6 +20,7 @@ Changes
 Changes.md
 cpanfile
 cpanfile.snapshot                        
+SECURITY.md
 doc/webdyne.md
 examples/api.psp                         
 examples/block_toggle1.psp               

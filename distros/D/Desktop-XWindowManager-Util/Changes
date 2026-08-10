@@ -1,3 +1,19 @@
+0.005   2026-05-18  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        [NEW FEATURES]
+
+        - Add function: move_windows_to_this_kde_activity.
+
+        [function move_xwm_windows_to_kde_activity]
+
+        - [incompatible change] By default exclude windows that are currently
+          shown to all KDE activities, but add option
+          include_all_activities_windows to include them.
+
+        - Add argument all_activities to allow making window(s) shown to all KDE
+          activities instead.
+
+
 0.004   2026-04-17  Released-By: PERLANCAR; Urgency: medium
 
         - [func list_xwm_windows] Add filter arguments: kde_activity_name,

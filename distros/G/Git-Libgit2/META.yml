@@ -16,13 +16,13 @@ name: Git-Libgit2
 provides:
   Git::Libgit2:
     file: lib/Git/Libgit2.pm
-    version: '0.004'
+    version: '0.005'
   Git::Libgit2::Error:
     file: lib/Git/Libgit2/Error.pm
-    version: '0.004'
+    version: '0.005'
   Git::Libgit2::FFI:
     file: lib/Git/Libgit2/FFI.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Alien::Libgit2: '0.001'
   Carp: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-git-libgit2/issues
   homepage: https://github.com/Getty/p5-git-libgit2
   repository: https://github.com/Getty/p5-git-libgit2.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -262,7 +262,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':MainModule'
+            - ':ExecFiles'
+            - ':InstallModules'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -307,7 +308,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.005'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -322,7 +323,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':MainModule'
+            - ':ExecFiles'
+            - ':InstallModules'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
@@ -369,7 +371,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::CreateRelease
       name: '@Author::GETTY/GitHub::CreateRelease'
-      version: '0.0008'
+      version: '0.0009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

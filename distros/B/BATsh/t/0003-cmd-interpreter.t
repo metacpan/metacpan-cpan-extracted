@@ -16,6 +16,16 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use File::Spec ();
 use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/lib";
+use BATsh_TestOS qw(shell_safe_path);
+
+# Rule R8 (t/lib/BATsh_TestOS.pm): the build directory was named by the
+# tester, not by this distribution.  Cases that interpolate it into shell
+# or cmd.exe source quote it; where the spelling carries a character that
+# quoting cannot survive, they skip with a reason instead of accusing
+# BATsh of a defect that lives in the test.
+my $PATH_OK = shell_safe_path($FindBin::Bin);
+my $PATH_WHY = "build path is not usable in shell source: $FindBin::Bin";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 BATsh::Env::init();
@@ -185,12 +195,19 @@ my @tests = (
 
     # CMD15: IF EXIST (file that exists)
     sub {
+        return _ok(1, "CMD15: skipped ($PATH_WHY)") unless $PATH_OK;
         delete $BATsh::Env::STORE{'CMD_T15'};
         # Use this test file itself -- always present when tests run
         my $me = $FindBin::Bin . '/0003-cmd-interpreter.t';
         # Normalise slashes for cmd.exe compatibility
         (my $safe = $me) =~ s/\\/\//g;
-        BATsh->run_string("IF EXIST $safe SET CMD_T15=exist_ok");
+        # The path is QUOTED because it comes from the build directory,
+        # which the tester chose and which may contain a space -- on
+        # Windows that is the common case ("C:\Users\John Doe\...").  An
+        # unquoted operand would be split into two words there and the
+        # case would report a BATsh defect that is really a defect in
+        # this line.  See rule R8 in t/lib/BATsh_TestOS.pm.
+        BATsh->run_string("IF EXIST \"$safe\" SET CMD_T15=exist_ok");
         _ok((-f $me) ? (( defined( $BATsh::Env::STORE{'CMD_T15'} ) ? $BATsh::Env::STORE{'CMD_T15'} : '' ) eq 'exist_ok') : 1,
             'CMD15: IF EXIST finds an existing file');
     },

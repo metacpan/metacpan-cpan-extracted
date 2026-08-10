@@ -1,5 +1,15 @@
 Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
 
+0.0011 -- Sun Aug 09 19:31:30 ADT 2026
+
+    [Significant Changes from 0.0009]
+    Fix some issues in and document bin/createrelease.pl
+
+    [Detailed Change Log]
+    - 0e4b2e7 Document the bin\createrelease.pl script
+    - a6025b3 Fix bin/createrelease.pl
+    - e66deb9 v0.0010
+
 0.0010 -- Sun Aug 09 00:55:09 ADT 2026
 
     [Significant Changes from 0.0009]

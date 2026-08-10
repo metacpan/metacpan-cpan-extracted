@@ -27,7 +27,10 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use File::Spec ();
+use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
+
+use BATsh_TestOS qw(fs_can_hold_name);
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 BATsh::Env::init();
@@ -175,17 +178,11 @@ my @tests = (
         my $fname = $SO . "_$$.tmp";
         # Not every environment can even hold such a name: a perl whose
         # Win32 ANSI code page is UTF-8 rejects the raw CP932 byte pair
-        # with ENOENT before BATsh is involved.  Probe with plain perl
-        # first and skip (rather than fail) when the name is unusable,
-        # otherwise this reports a platform limitation as a BATsh bug.
-        my $usable = 0;
-        local *PROBE;
-        if (open(PROBE, "> $fname")) {
-            close(PROBE);
-            $usable = (-f $fname) ? 1 : 0;
-            unlink($fname);
-        }
-        if (!$usable) {
+        # with ENOENT before BATsh is involved.  Ask the file system
+        # (rule R4) and skip -- rather than fail -- when the answer is
+        # no, so that a platform limitation is not reported as a BATsh
+        # bug.
+        if (!fs_can_hold_name($TMPDIR, $fname)) {
             chdir($orig) if defined $orig;
             return _ok(1,
                 'CP12: skipped (this filesystem cannot hold a CP932 file name)');

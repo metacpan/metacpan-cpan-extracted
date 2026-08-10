@@ -43,7 +43,7 @@ mcp-run-bash - MCP server that executes shell commands via bash over stdio
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 SYNOPSIS
 

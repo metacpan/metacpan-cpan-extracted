@@ -40,7 +40,7 @@ use File::Copy ();
 use File::Path ();
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 $VERSION = $VERSION;
 
 require BATsh::Env;
@@ -1655,7 +1655,7 @@ BATsh::CMD - Pure Perl cmd.exe interpreter for BATsh
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 

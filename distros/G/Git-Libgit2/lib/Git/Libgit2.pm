@@ -1,7 +1,7 @@
 # ABSTRACT: Low-level FFI bindings to libgit2
 
 package Git::Libgit2;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 use Carp ();
@@ -26,6 +26,39 @@ our @EXPORT_OK = qw(
   GIT_OBJECT_TAG
 
   GIT_REPOSITORY_INIT_BARE
+
+  GIT_OK
+  GIT_ERROR
+  GIT_ENOTFOUND
+  GIT_EEXISTS
+  GIT_EAMBIGUOUS
+  GIT_EBUFS
+  GIT_EUSER
+  GIT_EBAREREPO
+  GIT_EUNBORNBRANCH
+  GIT_EUNMERGED
+  GIT_ENONFASTFORWARD
+  GIT_EINVALIDSPEC
+  GIT_ECONFLICT
+  GIT_ELOCKED
+  GIT_EMODIFIED
+  GIT_EAUTH
+  GIT_ECERTIFICATE
+  GIT_EAPPLIED
+  GIT_EPEEL
+  GIT_EEOF
+  GIT_EINVALID
+  GIT_EUNCOMMITTED
+  GIT_EDIRECTORY
+  GIT_EMERGECONFLICT
+  GIT_PASSTHROUGH
+  GIT_ITEROVER
+  GIT_RETRY
+  GIT_EMISMATCH
+  GIT_EINDEXDIRTY
+  GIT_EAPPLYFAIL
+  GIT_EOWNER
+  GIT_TIMEOUT
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -41,6 +74,42 @@ use constant {
 
   GIT_OID_RAWSZ   => 20,
   GIT_OID_HEXSZ   => 40,
+
+  # git_error_code enum (include/git2/errors.h). Stable values across
+  # libgit2 1.x. GIT_PASSTHROUGH / GIT_ITEROVER are control codes, not
+  # failures, but live in the same enum.
+  GIT_OK              =>   0,
+  GIT_ERROR           =>  -1,
+  GIT_ENOTFOUND       =>  -3,
+  GIT_EEXISTS         =>  -4,
+  GIT_EAMBIGUOUS      =>  -5,
+  GIT_EBUFS           =>  -6,
+  GIT_EUSER           =>  -7,
+  GIT_EBAREREPO       =>  -8,
+  GIT_EUNBORNBRANCH   =>  -9,
+  GIT_EUNMERGED       => -10,
+  GIT_ENONFASTFORWARD => -11,
+  GIT_EINVALIDSPEC    => -12,
+  GIT_ECONFLICT       => -13,
+  GIT_ELOCKED         => -14,
+  GIT_EMODIFIED       => -15,
+  GIT_EAUTH           => -16,
+  GIT_ECERTIFICATE    => -17,
+  GIT_EAPPLIED        => -18,
+  GIT_EPEEL           => -19,
+  GIT_EEOF            => -20,
+  GIT_EINVALID        => -21,
+  GIT_EUNCOMMITTED    => -22,
+  GIT_EDIRECTORY      => -23,
+  GIT_EMERGECONFLICT  => -24,
+  GIT_PASSTHROUGH     => -30,
+  GIT_ITEROVER        => -31,
+  GIT_RETRY           => -32,
+  GIT_EMISMATCH       => -33,
+  GIT_EINDEXDIRTY     => -34,
+  GIT_EAPPLYFAIL      => -35,
+  GIT_EOWNER          => -36,
+  GIT_TIMEOUT         => -37,
 };
 
 my $initialised = 0;
@@ -118,7 +187,7 @@ Git::Libgit2 - Low-level FFI bindings to libgit2
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

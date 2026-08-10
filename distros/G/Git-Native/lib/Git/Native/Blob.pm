@@ -50,7 +50,7 @@ Git::Native::Blob - A libgit2 blob object
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

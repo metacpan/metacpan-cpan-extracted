@@ -59,6 +59,7 @@ do { my $x = {
                                       'MooseX::Aliases' => '0',
                                       'Path::Tiny' => '0',
                                       'Scalar::Util' => '0',
+                                      'Try::Tiny' => '0',
                                       'Types::Common' => '0',
                                       'WWW::Mechanize::Chrome' => '0',
                                       'experimental' => '0',

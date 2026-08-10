@@ -71,7 +71,7 @@ use File::Spec ();
 use Carp qw(croak);
 use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_EXCL O_TRUNC O_APPEND);
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 $VERSION = $VERSION;
 
 require BATsh::MB;
@@ -287,6 +287,58 @@ sub _run_lines {
         ($first) = ($stripped =~ /\A(\S+)/);
         $first = lc(defined($first) ? $first : '');
 
+        # A control structure written entirely on this physical line and
+        # followed by more commands -- "if ...; fi; echo B", "for ...; done
+        # && echo ok", "case ...; esac || echo no".  Run the structure by
+        # itself, then put what follows back into this slot and reprocess
+        # it, so a multi-line opener in the tail still works.  For '&&' and
+        # '||' the structure's status is carried into the tail by a leading
+        # "true"/"false", which keeps a longer chain (a && b || c) working.
+        if (   $first eq 'if'    || $first eq 'for'  || $first eq 'while'
+            || $first eq 'until' || $first eq 'case' || $first eq 'select') {
+            # "for ...; done > file" / "if ...; fi 2> log".  A redirection
+            # written after the terminator applies to the whole structure,
+            # as in bash.  The block parsers anchor their terminator at
+            # end-of-line, so before 0.11 the redirection was left in place,
+            # "done > file" was run as a command, and the output went to the
+            # terminal instead of the file.  Input redirection is left to
+            # the existing "while read x; do ...; done < file" handling.
+            my $term = ($first eq 'if')   ? 'fi'
+                     : ($first eq 'case') ? 'esac'
+                     :                      'done';
+            my ($clean, $rd) = _sh_strip_redirects($line);
+            if (@{$rd} && _inline_has_terminator($clean, $term)) {
+                my @out_rd = grep { $_->[0] != 0 } @{$rd};
+                if (scalar(@out_rd) == scalar(@{$rd})) {
+                    $status = _run_inline_control_redir($class, $clean, $rd,
+                                                        $opts_ref);
+                    last if defined $_EXIT_CODE || $_BREAK || $_RETURN;
+                    next;
+                }
+            }
+
+            my ($head, $op, $tail) = _split_inline_control_tail($line);
+            if (defined $tail && $op eq '|') {
+                $status = _run_inline_control_pipe($class, $head, $tail,
+                                                   $opts_ref);
+                last if defined $_EXIT_CODE || $_BREAK || $_RETURN;
+                next;
+            }
+            if (defined $tail) {
+                $status = _run_lines($class, [$head], $opts_ref);
+                last if defined $_EXIT_CODE || $_BREAK || $_RETURN;
+                if ($op eq '&&' || $op eq '||') {
+                    $lines[$i - 1] = (($status == 0) ? 'true' : 'false')
+                                   . " $op $tail";
+                }
+                else {
+                    $lines[$i - 1] = $tail;
+                }
+                $i--;
+                next;
+            }
+        }
+
         if ($first eq 'if') {
             ($status, $i) = _parse_if($class, \@lines, $i - 1, $opts_ref);
             next;
@@ -313,12 +365,38 @@ sub _run_lines {
         # left alone (standalone "((...))" arithmetic commands are not
         # implemented; only "$((...))" as an expansion is).
         if ($stripped =~ /\A\(/ && $stripped !~ /\A\(\(/) {
+            my ($h, $o, $t) = _split_inline_brace_tail($line, '(', ')');
+            if (defined $t) {
+                $status = _run_lines($class, [$h], $opts_ref);
+                last if defined $_EXIT_CODE || $_BREAK || $_RETURN;
+                $lines[$i - 1] = ($o eq ';')
+                    ? $t
+                    : (($status == 0) ? 'true' : 'false') . " $o $t";
+                $i--;
+                next;
+            }
             ($status, $i) = _parse_subshell($class, \@lines, $i - 1, $opts_ref);
             next;
         }
 
         # Function definition: "name() {" or "function name {"
         if ($stripped =~ /\A(?:function\s+[A-Za-z_]|[A-Za-z_][A-Za-z0-9_]*\s*\(\s*\))/) {
+            # "f(){ ...; }; more" -- the brace group closes on this line and
+            # is followed by further commands.  Define the function first,
+            # then reprocess the tail.  Without this the closing-brace test
+            # in _parse_function (which anchors '}' at end of line) failed,
+            # the body collector went hunting for '}' on the FOLLOWING lines,
+            # and the rest of the script was swallowed.
+            my ($h, $o, $t) = _split_inline_brace_tail($line, '{', '}');
+            if (defined $t) {
+                $status = _run_lines($class, [$h], $opts_ref);
+                last if defined $_EXIT_CODE || $_BREAK || $_RETURN;
+                $lines[$i - 1] = ($o eq ';')
+                    ? $t
+                    : (($status == 0) ? 'true' : 'false') . " $o $t";
+                $i--;
+                next;
+            }
             ($status, $i) = _parse_function($class, \@lines, $i - 1, $opts_ref);
             next;
         }
@@ -3097,6 +3175,17 @@ sub _cmd_source {
     my ($class, $rest, $opts_ref) = @_;
     $rest =~ s/\A\s+//;
     $rest =~ s/\s+\z//;
+    # Strip quotes exactly as _cmd_cd does, so that
+    #     source "$dir/init.batsh"      . 'my script.batsh'
+    # reach source_file() as plain paths.  Before 0.11 the operand was
+    # passed through with its quote characters still attached and the
+    # open failed with them embedded in the name -- which made the two
+    # builtins disagree: cd accepted a quoted operand and source did
+    # not, so the obvious way to write a path containing a space was
+    # correct for one and wrong for the other.  An UNQUOTED operand
+    # keeps working as before, spaces and all: this dequotes, it does
+    # not word-split.
+    $rest = _arr_dequote($rest);
     if (defined $opts_ref->{'_batsh'}) {
         eval { $opts_ref->{'_batsh'}->source_file($rest) };
         if ($@) { print STDERR "source: $rest: $@\n"; return 1 }
@@ -4673,9 +4762,212 @@ sub _find_control_split {
     return undef;
 }
 
+# _run_inline_control_redir: run a one-line control structure with the
+# output redirections that were written after its terminator.  STDOUT and
+# STDERR are repointed at the Perl level for the duration of the structure
+# and restored afterwards, including when the body dies.
+sub _run_inline_control_redir {
+    my ($class, $head, $redirs_ref, $opts_ref) = @_;
+
+    my ($out_file, $out_app, $err_file, $err_app);
+    my $err_to_stdout = 0;
+    for my $r (@{$redirs_ref}) {
+        my ($fd, $append, $file) = @{$r};
+        $file = BATsh::MB::dec($file) unless $file =~ /\A&[12]\z/;
+        if ($fd == 1) { $out_file = $file; $out_app = $append }
+        elsif ($fd == 2) {
+            if ($file eq '&1') { $err_to_stdout = 1 }
+            else               { $err_file = $file; $err_app = $append }
+        }
+    }
+
+    my ($sv_out, $sv_err) = (0, 0);
+    if (defined $out_file) {
+        $sv_out = 1 if open(_CTLRD_SAVE_OUT, '>&STDOUT');
+        my $mode = $out_app ? ">>$out_file" : ">$out_file";
+        if (!open(STDOUT, $mode)) {
+            if ($sv_out) { open(STDOUT, '>&_CTLRD_SAVE_OUT');
+                           close(_CTLRD_SAVE_OUT) }
+            warn "sh: $out_file: cannot open\n";
+            $LAST_STATUS = 1;
+            return 1;
+        }
+    }
+    if (defined $err_file || $err_to_stdout) {
+        $sv_err = 1 if open(_CTLRD_SAVE_ERR, '>&STDERR');
+        my $ok;
+        if ($err_to_stdout) { $ok = open(STDERR, '>&STDOUT') }
+        else { $ok = open(STDERR, ($err_app ? ">>$err_file" : ">$err_file")) }
+        if (!$ok) {
+            if ($sv_err) { open(STDERR, '>&_CTLRD_SAVE_ERR');
+                           close(_CTLRD_SAVE_ERR) }
+            $sv_err = 0;
+        }
+    }
+
+    my $st = 0;
+    eval { $st = _run_lines($class, [$head], $opts_ref); 1 };
+    my $err = $@;
+
+    if (defined $out_file) {
+        close(STDOUT);
+        if ($sv_out) { open(STDOUT, '>&_CTLRD_SAVE_OUT');
+                       close(_CTLRD_SAVE_OUT) }
+        select(STDOUT); $| = 1;
+    }
+    if ($sv_err) {
+        close(STDERR);
+        open(STDERR, '>&_CTLRD_SAVE_ERR');
+        close(_CTLRD_SAVE_ERR);
+    }
+    die $err if $err;
+
+    $LAST_STATUS = $st;
+    return $st;
+}
+
+# _run_inline_control_pipe: run "CONTROL-STRUCTURE | REST" -- for example
+# "for i in 1 2; do echo $i; done | sort".  This interpreter never forks, so
+# the two halves are joined through a temp file, the same way an ordinary
+# pipeline is: the structure runs with STDOUT pointed at the file, then REST
+# runs with STDIN taken from it.  Returns REST's exit status, as a pipeline
+# does.  STDOUT is restored even when the structure dies.
+sub _run_inline_control_pipe {
+    my ($class, $head, $tail, $opts_ref) = @_;
+
+    my $tmp = _hd_tempfile('');
+    if (!defined $tmp) { $LAST_STATUS = 2; return 2 }
+
+    my $saved = 0;
+    if (open(_CTLPIPE_SAVE, '>&STDOUT')) { $saved = 1 }
+    if (!open(STDOUT, ">$tmp")) {
+        close(_CTLPIPE_SAVE) if $saved;
+        unlink $tmp;
+        @_HD_TMPFILES = grep { $_ ne $tmp } @_HD_TMPFILES;
+        warn "sh: cannot create pipe temporary file\n";
+        $LAST_STATUS = 2;
+        return 2;
+    }
+
+    eval { _run_lines($class, [$head], $opts_ref); 1 };
+    my $err = $@;
+
+    close(STDOUT);
+    if ($saved) { open(STDOUT, '>&_CTLPIPE_SAVE'); close(_CTLPIPE_SAVE) }
+    select(STDOUT); $| = 1;
+    die $err if $err;
+
+    my @redir = ( [0, 0, $tmp] );   # fd=0 (stdin), append=0, source=tmp
+    my $rc = _sh_exec_with_redirs($class, $tail, \@redir, $opts_ref);
+
+    unlink $tmp;
+    @_HD_TMPFILES = grep { $_ ne $tmp } @_HD_TMPFILES;
+
+    $LAST_STATUS = $rc;
+    return $rc;
+}
+
+# _split_inline_control_tail: for a physical line whose first word opens a
+# control structure, return (HEAD, OP, TAIL) when the structure is written
+# entirely on this line and is followed by more commands -- e.g.
+#
+#   if true; then echo A; fi; echo B      -> ("if ... fi", ";",  "echo B")
+#   while true; do break; done && echo x  -> ("while ... done", "&&", "echo x")
+#
+# and the empty list when there is no such tail.  _split_sh_compound() does
+# the actual scanning: it tracks control-structure depth, so a ';' inside an
+# unfinished compound is not a separator and the line is only split once the
+# structure has closed.  Before 0.11 nothing peeled this tail off, and every
+# command written after the closing 'fi'/'done'/'esac' on the same line was
+# silently discarded (the block collector then went looking for a terminator
+# on the FOLLOWING lines and swallowed them too).
+sub _split_inline_control_tail {
+    my ($line) = @_;
+    my @parts = _split_sh_compound($line, 1);
+    return () if scalar(@parts) <= 1;
+
+    my $head = '';
+    my $k    = 0;
+    while ($k <= $#parts && $parts[$k]->{op} eq '') {
+        $head .= $parts[$k]->{cmd};
+        $k++;
+    }
+    return () if $k > $#parts;
+
+    my $op = $parts[$k]->{op};
+    $k++;
+
+    my $tail = '';
+    for my $j ($k .. $#parts) {
+        $tail .= ' ' . $parts[$j]->{op} . ' ' if $parts[$j]->{op} ne '';
+        $tail .= $parts[$j]->{cmd};
+    }
+
+    $head =~ s/\A\s+//; $head =~ s/\s+\z//;
+    $tail =~ s/\A\s+//; $tail =~ s/\s+\z//;
+    return () if $head eq '' || $tail eq '';
+    return ($head, $op, $tail);
+}
+
+# _split_inline_brace_tail: for a physical line that opens a brace group
+# (a one-line function body) or a parenthesised subshell group, return
+# (HEAD, OP, TAIL) when the group closes on this line and is followed by
+# ';', '&&' or '||' and more commands:
+#
+#   f(){ echo F; }; echo G   -> ("f(){ echo F; }", ";",  "echo G")
+#   ( echo A ) && echo B     -> ("( echo A )",     "&&", "echo B")
+#
+# Returns the empty list otherwise -- in particular when the group is
+# followed by a redirection or a pipe, which belong to the group itself.
+# _split_sh_compound() cannot be used here because it does not track brace
+# or parenthesis nesting, so it would split on a ';' inside the body.
+sub _split_inline_brace_tail {
+    my ($line, $open, $close) = @_;
+    return () unless defined $line;
+
+    my @c    = split //, $line;
+    my $n    = scalar @c;
+    my $sq   = 0;
+    my $dq   = 0;
+    my $esc  = 0;
+    my $dep  = 0;
+    my $seen = 0;   # the group has been opened at least once
+    my $end;        # offset just past the matching closer
+
+    for (my $p = 0; $p < $n; $p++) {
+        my $ch = $c[$p];
+        if ($esc)               { $esc = 0; next }
+        if ($ch eq '\\' && !$sq) { $esc = 1; next }
+        if ($sq) { $sq = 0 if $ch eq "'"; next }
+        if ($dq) { $dq = 0 if $ch eq '"'; next }
+        if ($ch eq "'") { $sq = 1; next }
+        if ($ch eq '"') { $dq = 1; next }
+        if ($ch eq $open)  { $dep++; $seen = 1; next }
+        if ($ch eq $close) {
+            $dep--;
+            if ($seen && $dep <= 0) { $end = $p + 1; last }
+            next;
+        }
+    }
+    return () unless defined $end;
+
+    my $head = substr($line, 0, $end);
+    my $rest = substr($line, $end);
+    return () unless $rest =~ /\A\s*(;|&&|\|\|)\s*(\S.*)\z/s;
+    my ($op, $tail) = ($1, $2);
+    $tail =~ s/\s+\z//;
+    return () if $tail eq '';
+    return ($head, $op, $tail);
+}
+
 # ----------------------------------------------------------------
 sub _split_sh_compound {
-    my ($line) = @_;
+    # $want_pipe is opt-in: when true, a single '|' that appears AFTER a
+    # control structure has closed is reported as an operator, so that
+    # _run_lines() can run "for ...; done | sort" as a pipeline instead of
+    # hunting for a 'done' on the following lines.  Every other caller
+    # leaves it false and sees the previous behaviour exactly.
+    my ($line, $want_pipe) = @_;
     my @parts;
     my $cur   = '';
     my $in_sq = 0;
@@ -4687,6 +4979,7 @@ sub _split_sh_compound {
                      # top-level separator (so  cmd | while x; do y; done
                      # and  a && for i in ..; do ..; done  stay intact).
     my $cmdpos = 1;  # true when the next word is in command position
+    my $ctl_closed = 0;  # a control structure has opened and closed again
     my @chars = split //, $line;
     my $n     = scalar @chars;
     my $i     = 0;
@@ -4768,7 +5061,14 @@ sub _split_sh_compound {
 
         # Single | (pipe): not a compound separator here, but the word that
         # follows it is in command position (so  x | while ...  is tracked).
-        if ($ch eq '|') { $cur .= $ch; $i++; $cmdpos = 1; next }
+        if ($ch eq '|') {
+            if ($want_pipe && $ctl == 0 && $ctl_closed) {
+                push @parts, { op => '', cmd => $cur };
+                push @parts, { op => '|', cmd => '' };
+                $cur = ''; $i++; $cmdpos = 1; next;
+            }
+            $cur .= $ch; $i++; $cmdpos = 1; next;
+        }
 
         # '(' opens a group; the next word is in command position.
         if ($ch eq '(') { $cur .= $ch; $i++; $cmdpos = 1; next }
@@ -4790,7 +5090,7 @@ sub _split_sh_compound {
                     $ctl++;
                 }
                 elsif ($lw eq 'fi' || $lw eq 'done' || $lw eq 'esac') {
-                    $ctl-- if $ctl > 0;
+                    if ($ctl > 0) { $ctl--; $ctl_closed = 1 if $ctl == 0 }
                 }
                 $cur .= $w;
                 $i = $j;
@@ -5771,9 +6071,14 @@ sub _sh_name_kind {
     return ('alias', $_SH_ALIAS{$name}) if exists $_SH_ALIAS{$name};
 
     my $lc = lc($name);
+    # "time" is deliberately absent: bash has it as a reserved word, but this
+    # interpreter does not implement it, so reporting it as a keyword made
+    # "type -t time" say "keyword" while "time echo hi" failed with
+    # "Can't exec time".  Leaving it out lets it resolve as an external
+    # program (or as "not found"), which is what actually happens.
     my %kw = map { ($_ => 1) } qw(
         if then else elif fi for while until do done
-        case esac function in select time
+        case esac function in select
     );
     return ('keyword', undef) if $kw{$lc};
 
@@ -6301,28 +6606,30 @@ sub _sh_word_is_foreground {
     # test bracket and no-op
     return 1 if $w eq '[' || $w eq ':' || $w eq '.';
 
-    my $lc = lc($w);
+    # Everything else is classified by _sh_name_kind(), which is the single
+    # authoritative table of aliases, keywords, functions and builtins in
+    # this module (it is also what "type" and "command -v" report).  This
+    # used to be a second, hand-maintained copy of that table, and the copy
+    # had fallen behind: "declare", "shopt", "alias", "unalias", "exec",
+    # "trap", "getopts", "eval" and "typeset" were missing from it, so
+    # "declare -i n=1 &" was treated as an external command and handed to a
+    # real /bin/sh -- which fails outright on a machine that has no external
+    # shell, the very situation this interpreter exists to cover.  Deriving
+    # the answer from one table instead of two removes that failure mode.
+    my ($kind) = _sh_name_kind($w);
+    return 1 if $kind eq 'alias'
+             || $kind eq 'keyword'
+             || $kind eq 'function'
+             || $kind eq 'builtin';
 
-    my %builtin = (
-        export => 1, unset => 1, echo => 1, printf => 1, cd => 1,
-        pwd => 1, exit => 1, 'true' => 1, 'false' => 1, read => 1,
-        test => 1, source => 1, 'return' => 1, 'break' => 1,
-        'continue' => 1, shift => 1, local => 1, set => 1,
-        let => 1, type => 1, command => 1,
-        umask => 1, hash => 1, readonly => 1, mapfile => 1, readarray => 1,
-    );
-    return 1 if $builtin{$lc};
-
-    # Control keywords (defensive; these are normally handled in _run_lines)
+    # A few block-structure words are not names and so are not reported by
+    # _sh_name_kind(); they are listed here for defensiveness only (they are
+    # normally consumed by the block parsers in _run_lines).
     my %kw = (
-        'if' => 1, then => 1, 'else' => 1, elif => 1, fi => 1,
-        'for' => 1, 'while' => 1, until => 1, 'do' => 1, done => 1,
-        case => 1, esac => 1, function => 1, in => 1,
+        then => 1, 'else' => 1, elif => 1, fi => 1,
+        'do' => 1, done => 1, esac => 1,
     );
-    return 1 if $kw{$lc};
-
-    # Defined SH function (case-sensitive, as in _exec_line dispatch)
-    return 1 if exists $_SH_FUNCTIONS{$w};
+    return 1 if $kw{lc($w)};
 
     return 0;
 }
@@ -7142,7 +7449,7 @@ BATsh::SH - Pure Perl bash/sh interpreter for BATsh
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use warnings;
 use Getopt::Long ();
 use Punk::Queue ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # The subcommands behind `punk-queue`. Each returns an exit code - 0 fine,
 # 1 the thing you asked about is wrong (job not found, schema behind), 2

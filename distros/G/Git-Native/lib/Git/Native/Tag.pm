@@ -2,8 +2,8 @@
 
 package Git::Native::Tag;
 use Moo;
-use Git::Libgit2 qw( check_rc );
 use Git::Libgit2::FFI ();
+use Git::Native::Error qw( check_rc );
 use Git::Native::Oid ();
 
 has _handle => ( is => 'ro', required => 1 );  # git_tag*
@@ -37,7 +37,7 @@ Git::Native::Tag - A libgit2 annotated tag
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

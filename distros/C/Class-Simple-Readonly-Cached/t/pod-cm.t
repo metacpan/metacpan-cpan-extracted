@@ -5,7 +5,7 @@ use warnings;
 
 use Test::Most;
 
-eval 'use Test::Pod::Spelling::CommonMistakes';
+eval { require Test::Pod::Spelling::CommonMistakes; Test::Pod::Spelling::CommonMistakes->import() };
 if($@) {
 	plan skip_all => 'Test::Pod::Spelling::CommonMistakes required for testing POD spelling';
 } else {

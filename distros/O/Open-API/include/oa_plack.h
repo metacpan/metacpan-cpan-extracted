@@ -955,6 +955,12 @@ static SV *oa_security_check(pTHX_ oa_api *a, oa_op *o, SV *env_rv,
             if (!cred) { ok = 0; break; }
             np  = SvPV_const(s->name, nl);
             cbp = hv_fetch(checkers, np, (I32)nl, 0);
+            /* No checker for a scheme this alternative names: the
+             * alternative cannot be satisfied. The Plack path validates
+             * coverage at to_app time so this never fires there; it keeps
+             * a caller that supplies an incomplete map (check_op_security)
+             * from dereferencing NULL. */
+            if (!cbp || !*cbp) { ok = 0; break; }
             {
                 dSP; int n; SV *ret = NULL;
                 ENTER; SAVETMPS; PUSHMARK(SP);

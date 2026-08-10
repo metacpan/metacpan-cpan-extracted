@@ -19,6 +19,9 @@ $modules{$_} = $_ for qw(
   JSON::MaybeXS
   JSON::PP
   JSON::XS
+  Path::Tiny
+  Ref::Util
+  Test2::Require::EnvVar
   Test2::V0
   URI
   URI::Escape

@@ -1163,6 +1163,14 @@ The `chisq_test` function performs chi-squared contingency table tests and goodn
 
 For 2x2 matrices, Yates' Continuity Correction is applied automatically.
 
+### Signature
+
+    my $res = chisq_test($data);
+    my $res = chisq_test($data, correct     => 0);          # 2x2: no Yates' correction
+    my $res = chisq_test($data, p           => $probs);     # goodness of fit against $probs
+    my $res = chisq_test($data, p           => $weights,
+                                'rescale.p' => 1);          # ... rescaled to sum to 1
+
 ### Accepted Inputs
 
 | Input Type | Data Structure | Applied Test |
@@ -1171,6 +1179,33 @@ For 2x2 matrices, Yates' Continuity Correction is applied automatically.
 | **2D Array** | `[ [ $v1, $v2 ], [ $v3, $v4 ] ]` | Pearson's Chi-squared test (Yates' correction if 2x2) |
 | **1D Hash** | `{ key1 => $v1, key2 => $v2 }` | Chi-squared test for given probabilities |
 | **2D Hash** | `{ row1 => { c1 => $v1, c2 => $v2 } }` | Pearson's Chi-squared test (Yates' correction if 2x2) |
+
+Every entry must be a nonnegative, finite number, and at least one of them must be positive; anything else — an `undef`, a string, a negative count, an infinity — is a fatal error rather than a silent zero, exactly as in R. A 2D array must not be ragged, and every row of a 2D hash must carry the same column keys.
+
+A table with only one row or only one column is not a contingency table: as in R, it collapses to its cells and the goodness-of-fit test is run on them. So `[[10, 20, 30]]` and `[10, 20, 30]` give the same test, with `df = 2` — not the vacuous `df = 0`.
+
+As in R, a warning is issued when any expected count falls below 5, the usual rule of thumb for the chi-squared approximation being trustworthy. Use [`fisher_test`](#fisher_test) for a small table.
+
+### Named Options
+
+| Option | Default | Description |
+| --- | --- | --- |
+| **correct** | `1` | Apply Yates' continuity correction. Only ever affects a 2x2 table, and is R's `correct`. Set to `0` for the uncorrected Pearson statistic. |
+| **p** | uniform | Null probabilities for the goodness-of-fit test. An array ref, in the order of the data, when the data is an array ref; a hash ref keyed the same as the data when the data is a hash ref. They must sum to 1 unless `rescale.p` says otherwise, and it is an error to pass them with a contingency table. |
+| **rescale.p** | `0` | Divide `p` by its own sum first, so counts, weights or percentages can be passed instead of probabilities. Also spelled `rescale_p`. |
+
+    # goodness of fit against a non-uniform null
+    my $res = chisq_test([89, 37, 30, 28, 2],
+                         p => [0.40, 0.20, 0.20, 0.19, 0.01]);
+    # $res->{statistic}{'X-squared'} == 5.79470854555744, df 4, p == 0.215013095920786
+
+    # the same, from unnormalised weights
+    my $res = chisq_test([89, 37, 30, 28, 2],
+                         p => [40, 20, 20, 19, 1], 'rescale.p' => 1);
+
+    # keyed data takes keyed probabilities
+    my $res = chisq_test({ A => 10, B => 20, C => 30 },
+                         p => { A => 0.2, B => 0.3, C => 0.5 });
 
 ### Output Object Structure
 
@@ -5962,7 +5997,27 @@ Verified against R 4.6.1 (`oneway.test`, `anova(aov())`, `anova(lm())`,
 
 # Changes
 
-## 0.295 2026-08
+## 0.296 2026-08-09 CDT
+
+fixed CPAN bug: https://www.cpantesters.org/cpan/report/fcf32c68-75a5-1014-bc87-8fe0d10910fe
+
+write_table.announce.t ran its child perl through -e, which cannot carry double quotes or shell metacharacters on Windows; the child program now goes in a file
+
+chisq_test now matches R 4.6.1 bit-for-bit on the statistic across 170 randomized cross-check cases, and the full suite (116 files, 18,546 tests) passes.
+
+Bugs found and fixed in LikeR.xs
+
+1. A 1×k or k×1 table returned df = 0, p = 1 — no test at all. R collapses a single-row/column matrix to a vector and runs goodness-of-fit (if (min(dim(x)) == 1L) x <- as.vector(x)); now so does this. [[10,20,30]] went from X²=0, df=0, p=1 to X²=10, df=2, p=0.006738.
+2. Yates' label was attached even when the correction was zero. R only says "with Yates' continuity correction" when min(0.5, |O−E|) > 0. A table sitting exactly on its expectation, and every zero-margin table, were mislabelled.
+3. Yates was computed per cell instead of as R's single whole-table min(0.5, abs(x-E)) — equal in theory on a 2×2, not always in the last bits.
+4. No input validation. Negatives, infinities, NaN, strings and undef were silently coerced to 0 and produced garbage or NaN; all-zero data returned NaN; a single element returned df = 0. All now croak with R's wording. Ragged array rows and 2D hash rows with mismatched column keys were silently zero-filled — now fatal.
+5. Uniform expectation used n/k instead of R's n * (1/k), and sums were accumulated in a plain NV where R uses a long double. Together these put the statistic 1–2 ulp off R on most inputs; both fixed (ct_acc_t).
+6. Hash input was read in Perl's randomized key order, so which row a malformed hash got blamed on was a coin toss. Rows and columns are now sorted, as fisher_test already does.
+7. Segfault on sparse arrays (av_fetch returns NULL for a hole) — this one I introduced during the rewrite and caught before finishing; guarded by ct_av_get
+
+Three of those cross-checks compared the statistic to R's printed value relatively, and on the tables in question R's value is not a statistic. Where a 2×2 has all four |O−E| equal, Yates' min(0.5, |O−E|) cancels every corrected residual, so the exact statistic is 0 and the exact p is 1; what R prints there — 1.4515367733818938e-24 for [[1573,3],[4,0]], 2.9347503914472165e-32 for [[1,2],[3,4]], 7.1842689582627857e-32 for [[1.5,2.5],[3.5,4.5]] — is the leftover of forming E in floating point, the four |O−E| differing in their last bits so that the minimum comes out a hair below the rest. Its size is a property of the NV rather than of the test: a double build reproduces R's digits, and a __float128 build cancels the whole way to 0. Comparing that relatively can only pass on the width R happened to use, and it failed with rel diff = 1 on the quadmath perl and on 5.12.5. Those three cases in t/chisq_test.R.scipy.t now check the statistic against 0 and the p-value against 1 with absolute tolerances of 1e-20 and 1e-11, R's numbers staying in the file as provenance. LikeR.xs is unchanged — the wide-NV answer was the more accurate one. The suite passes on perl 5.10.1, 5.12.5, 5.42.3-thr, 5.44.0 and 5.44.0-quadmath.
+
+## 0.295 2026-08-08 CDT
 
 bug fix https://www.cpantesters.org/cpan/report/0f13fed6-92f5-11f1-b043-dc326e8775ea
 

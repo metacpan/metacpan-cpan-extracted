@@ -36,4 +36,14 @@ is $r2->reference('HEAD')->symbolic_target, 'refs/heads/main',
   'init(initial_branch) points HEAD at refs/heads/main';
 ok $r2->head_unborn, 'main is unborn until first commit';
 
+# ---- detached HEAD: write a raw oid into .git/HEAD, reopen, observe ----
+# We have no set_head_detached binding, so detach the way git does on disk.
+path( $repo->gitdir )->child('HEAD')->spew( $c1->hex . "\n" );
+my $det = Git::Native->open("$tmp");
+ok $det->head_detached, 'raw oid in HEAD -> head_detached';
+ok !$det->head_unborn,  'detached HEAD is not unborn';
+my $dh = $det->head;
+isa_ok $dh, 'Git::Native::Reference', 'head() returns a Reference while detached';
+is $dh->target->hex, $c1->hex, 'detached head() resolves to the commit';
+
 done_testing;

@@ -1,18 +1,26 @@
 {
     "name" : "BATsh",
-    "version" : "0.10",
+    "version" : "0.11",
     "abstract" : "Bilingual Shell for cmd.exe and bash in one script",
     "author" : [
         "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat version 0.46",
+    "generated_by" : "pmake.bat version 0.49",
     "license" : [
         "perl_5"
     ],
     "meta-spec" : {
         "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
         "version" : 2
+    },
+    "no_index" : {
+        "directory" : [
+            "t",
+            "xt",
+            "eg",
+            "doc"
+        ]
     },
     "release_status" : "stable",
     "resources" : {
@@ -55,8 +63,12 @@
         "test" : {
             "requires" : {
                 "Carp" : "0",
+                "Cwd" : "0",
+                "Exporter" : "0",
                 "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
+                "File::Find" : "0",
                 "File::Path" : "1.0401",
                 "File::Spec" : "0",
                 "FindBin" : "1.42",
@@ -67,23 +79,23 @@
     "provides" : {
         "BATsh" : {
             "file" : "lib/BATsh.pm",
-            "version" : "0.10"
+            "version" : "0.11"
         },
         "BATsh::CMD" : {
             "file" : "lib/BATsh/CMD.pm",
-            "version" : "0.10"
+            "version" : "0.11"
         },
         "BATsh::Env" : {
             "file" : "lib/BATsh/Env.pm",
-            "version" : "0.10"
+            "version" : "0.11"
         },
         "BATsh::MB" : {
             "file" : "lib/BATsh/MB.pm",
-            "version" : "0.10"
+            "version" : "0.11"
         },
         "BATsh::SH" : {
             "file" : "lib/BATsh/SH.pm",
-            "version" : "0.10"
+            "version" : "0.11"
         }
     }
 }

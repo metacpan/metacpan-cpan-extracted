@@ -33,6 +33,16 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/lib";
+use BATsh_TestOS qw(shell_safe_path);
+
+# Rule R8 (t/lib/BATsh_TestOS.pm): the build directory was named by the
+# tester, not by this distribution.  Cases that interpolate it into shell
+# or cmd.exe source quote it; where the spelling carries a character that
+# quoting cannot survive, they skip with a reason instead of accusing
+# BATsh of a defect that lives in the test.
+my $PATH_OK = shell_safe_path($FindBin::Bin);
+my $PATH_WHY = "build path is not usable in shell source: $FindBin::Bin";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 
@@ -90,6 +100,7 @@ my @tests = (
 
 # CD01: a double-quoted directory path is entered (quotes stripped).
 sub {
+    return ok_is(1, 1, "CD01 skipped ($PATH_WHY)") unless $PATH_OK;
     my $d = "$DIR/_cd01_$$";
     mkdir $d, 0777;
     my $out = _run_out("cd \"$d\"\npwd\n");
@@ -101,6 +112,7 @@ sub {
 
 # CD02: a single-quoted directory path is entered.
 sub {
+    return ok_is(1, 1, "CD02 skipped ($PATH_WHY)") unless $PATH_OK;
     my $d = "$DIR/_cd02_$$";
     mkdir $d, 0777;
     my $out = _run_out("cd '$d'\npwd\n");
@@ -112,6 +124,7 @@ sub {
 
 # CD03: a quoted path containing a space is one argument.
 sub {
+    return ok_is(1, 1, "CD03 skipped ($PATH_WHY)") unless $PATH_OK;
     my $d = "$DIR/_cd 03_$$";
     mkdir $d, 0777;
     my $out = _run_out("cd \"$d\"\npwd\n");
@@ -126,6 +139,7 @@ sub {
 # and the status is non-zero.  (This also proves the body never reaches a
 # blocking stdin read.)
 sub {
+    return ok_is(1, 1, "RF01 skipped ($PATH_WHY)") unless $PATH_OK;
     my $missing = "$DIR/_rf_missing_$$";   # guaranteed absent
     my $marker  = "$DIR/_rf_marker_$$";
     unlink $missing, $marker;
@@ -141,6 +155,7 @@ sub {
 # RF02: a subshell with a WORKING input redirect still reads the file
 # (guard against the abort path firing on success).
 sub {
+    return ok_is(1, 1, "RF02 skipped ($PATH_WHY)") unless $PATH_OK;
     my $f = "$DIR/_rf_ok_$$.txt";
     my $out1 = _run_out("echo payload > \"$f\"\n");   # create via builtin
     my $out  = _run_out("( read L; echo \"got=\$L\" ) < \"$f\"\n");

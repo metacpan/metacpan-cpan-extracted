@@ -11,6 +11,7 @@
 # ES14       "batsh -" reads the script from STDIN with arguments
 # ES15       exit inside a sourced file terminates the outer script
 # ES16       EXIT with no code keeps the current ERRORLEVEL
+# ES17       source/. dequotes its operand (0.11)
 #
 # COMPATIBILITY: Perl 5.005_03 and later
 #
@@ -23,6 +24,16 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use File::Spec ();
 use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/lib";
+use BATsh_TestOS qw(shell_safe_path);
+
+# Rule R8 (t/lib/BATsh_TestOS.pm): the build directory was named by the
+# tester, not by this distribution.  Cases that interpolate it into shell
+# or cmd.exe source quote it; where the spelling carries a character that
+# quoting cannot survive, they skip with a reason instead of accusing
+# BATsh of a defect that lives in the test.
+my $PATH_OK = shell_safe_path($FindBin::Bin);
+my $PATH_WHY = "build path is not usable in shell source: $FindBin::Bin";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 
@@ -222,22 +233,53 @@ sub {
 
 # ES15: exit inside a sourced file terminates the outer script
 sub {
+    return ok_is(1, 1, "ES15 skipped ($PATH_WHY)") unless $PATH_OK;
     my $inner = "$FindBin::Bin/_es_inner_$$.batsh";
     local *PF;
     open(PF, "> $inner") or die "cannot write $inner: $!";
     print PF "exit 9\n";
     close(PF);
+    # Quoted, per rule R8: the build directory is the tester's and on
+    # Windows commonly contains a space.  Until 0.11 "source" was the one
+    # builtin that could not take a quoted operand -- cd dequoted, source
+    # did not -- so this line would have failed with the quotes embedded
+    # in the file name.  It now dequotes exactly as cd does.
     my ($rc, $out) = _run_capture(
-        "echo outer-start\nsource $inner\necho outer-after\n");
+        "echo outer-start\nsource \"$inner\"\necho outer-after\n");
     unlink($inner);
     ok_is((($rc == 9) && ($out !~ /outer-after/)) ? 1 : 0, 1,
           'ES15 exit in sourced file terminates outer (rc=9)');
 },
 
+
 # ES16: EXIT with no code keeps the current ERRORLEVEL
 sub {
     my ($rc, $out) = _run_capture("false\nEXIT /B\n");
     ok_is($rc, 1, 'ES16 bare EXIT /B keeps current ERRORLEVEL');
+},
+
+# ES17: the source/. operand is dequoted (0.11).  Single quotes as well
+# as double, and the "." spelling as well as "source": all four routes
+# reach the same file.  An UNQUOTED operand keeps working unchanged --
+# this dequotes, it does not word-split -- and that is checked too,
+# because the fix must not have turned a plain path into two words.
+sub {
+    return ok_is(1, 1, "ES17 skipped ($PATH_WHY)") unless $PATH_OK;
+    my $inner = "$FindBin::Bin/_es_dq_$$.batsh";
+    local *QF;
+    open(QF, "> $inner") or die "cannot write $inner: $!";
+    print QF "exit 7\n";
+    close(QF);
+    my @form = ("source $inner", "source \"$inner\"", "source '$inner'",
+                ". \"$inner\"");
+    my $bad = '';
+    for my $f (@form) {
+        my ($rc) = _run_capture("$f\necho reached-the-end\n");
+        $bad .= "[$f rc=" . (defined $rc ? $rc : 'undef') . ']'
+            unless defined($rc) && $rc == 7;
+    }
+    unlink($inner);
+    ok_is($bad, '', 'ES17 source/. accepts a quoted operand (all four forms)');
 },
 
 );

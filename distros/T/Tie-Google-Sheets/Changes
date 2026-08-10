@@ -1,4 +1,17 @@
 Revision history for Tie-Google-Sheets
 
+0.02      2026-08-09 20:35:49 -0600
+  - Added support for batching: (gh#2)
+    - add method ->flush to Tie::Google::Sheets and Tie::Google::Client
+    - add batch_size property to Tie::Google::Sheets and Tie::Google::Client
+  - Added support for duplicating a worksheet (gh#3)
+    - add method ->copy_worksheet to Tie::Google::Sheets, and Tie::Google::Client
+  - Add support for backoff/retry (gh#4)
+    - add backoff_retry property to Tie::Google::Sheets, and Tie::Google::Client
+  - Fix bug where non-existent worksheets could be returned from a fetch (gh#5)
+  - Added support for reading formula instead of values (gh#5)
+    - add methods ->get_formula and ->get_all_formulas to Tie::Google::Client
+    - add method ->fetch_mode to Tie::Google::Sheets::Worksheet
+
 0.01      2026-08-08 11:14:03 -0600
   - initial version

@@ -1,5 +1,511 @@
 Revision history for BATsh
 
+0.11  2026-08-10 JST (Japan Standard Time)
+
+    [SH] A control structure written entirely on ONE physical line may
+    now be followed by more commands.  Until this release everything
+    after the closing "fi"/"done"/"esac" was silently thrown away, and
+    the block collector then went looking for a terminator on the
+    FOLLOWING lines and swallowed those too, so
+
+        if true; then echo A; fi; echo B     printed only A
+        while true; do break; done; echo x   printed nothing at all
+        f(){ echo F; }; f                    printed nothing at all
+        ( echo A ); echo B                   printed only A
+
+    All four now behave as they do in bash.  ";", "&&", "||" and "|" are
+    supported after the terminator; for "&&"/"||" the structure's exit
+    status is carried into the tail, so a longer chain keeps working, and
+    for "|" the structure's output is fed to the rest of the pipeline
+    through a temp file (this interpreter never forks).  The same now
+    holds after a one-line function body and after a parenthesised
+    subshell group.  Implemented by _split_inline_control_tail() and
+    _split_inline_brace_tail() in BATsh::SH; a redirection still binds to
+    the structure itself, as in bash.
+
+    [SH] Output redirection written after the terminator now applies to
+    the whole structure: "for i in 1 2; do echo $i; done > out.txt"
+    previously ran "done > out.txt" as a command, printed the loop's
+    output to the terminal and left out.txt empty.  Input redirection
+    ("while read x; do ...; done < file") is unchanged.
+
+    [SH] A backgrounded builtin no longer escapes to an external shell.
+    _sh_word_is_foreground() kept a second, hand-maintained copy of the
+    builtin table and the copy had fallen behind: "declare", "shopt",
+    "alias", "unalias", "exec", "trap", "getopts", "eval" and "typeset"
+    were missing from it, so "declare -i n=1 &" was classified as an
+    external command and handed to /bin/sh -- which fails outright on a
+    machine that has no external shell, the very situation this
+    interpreter exists to cover.  The function now asks
+    _sh_name_kind(), which is the single authoritative table.
+
+    [SH] "time" is no longer reported as a shell keyword.  It is not
+    implemented, so "type -t time" answered "keyword" while "time echo
+    hi" failed with "Can't exec time".  It now resolves as an external
+    program, which is what actually happens, and the gap is recorded
+    under BUGS AND LIMITATIONS.
+
+    [DOC] The POD in lib/BATsh.pm and the README had drifted apart in
+    BOTH directions.  Feature documentation added in 0.07-0.09 had
+    reached only the README -- let, type, command, umask, hash, readonly,
+    mapfile/readarray, declare -i and -r, set --, break/continue/return,
+    brace expansion, extglob, here-strings, process substitution, select,
+    alias/unalias, exec, subshell groups, the 0.09 "an expansion is
+    literal data" rule, the 0.09 filename-matching rules, and the whole
+    EXAMPLES section -- so metacpan, which shows the POD, understated
+    what the module does.  Corrections made in 0.11 had reached only the
+    POD.  The POD is now the superset and the single place to edit, and
+    README is regenerated from it mechanically
+    ("pod2text --width=76 lib/BATsh.pm > README").
+
+    [DOC] The CMD-mode command list now names REM and the cmd.exe
+    spellings CHDIR, MD, RD, ERASE and RENAME.  All six have always been
+    implemented and none of them appeared in any documentation.
+
+    [DOC] The description of BATsh->main() said that the remaining
+    arguments become %1..%9 / $1..$9.  That is true for a script filename
+    and for "-", but not for "-e": every remaining argument is joined
+    with newlines onto the inline source.  Corrected rather than changed,
+    since the behaviour is what a released version already does.
+
+    [TEST] New t/0034-inventory-and-tails.t (73 cases): asserts that
+    "type -t" and the backgrounding path agree about every builtin and
+    keyword, that a backgrounded builtin stays internal, and that a
+    trailing command list after fi/done/esac, after a one-line function
+    body and after a subshell group runs -- with ";", "&&", "||", "|"
+    and a trailing redirection.
+
+    [TEST] Two cases in that file were themselves defective and were
+    caught by the Windows run, not by the Linux one -- both are now
+    fixed, and both have been turned into a rule in t/lib/BATsh_TestOS.pm
+    so they cannot come back in another file:
+
+      * TAIL10 piped a compound into "cat".  There is no "cat" on a
+        plain Windows installation, so the case drew a FAIL for a program
+        that was never there and cmd.exe printed its own "'cat' is not
+        recognized" into the middle of a test run.  New rule R10 and new
+        predicate have_external(): probe, then skip with a reason.  The
+        pipeline cases now use "sort" (present on both platforms) and
+        skip when even that is absent.  t/0000 reports which filters were
+        found, so a green run says what it was green on (rule R7).
+
+      * TAIL18 interpolated a path from $FindBin::Bin into shell source
+        unquoted.  On Windows that path is spelled with backslashes, and
+        SH mode reads a backslash as an escape exactly as bash does, so
+        "done > t\_0034_redir_1.tmp" redirected into
+        "t_0034_redir_1.tmp"; the case then read an empty file and
+        accused the interpreter.  Rule R8 already covered this and the
+        case simply did not follow it.  The operand is now written with
+        '/' separators (which BATsh accepts on Windows), double-quoted
+        against a path containing a space, and skipped via
+        shell_safe_path() where the spelling cannot be quoted at all.
+
+    [TEST] t/9070 no longer sends program text to a child process
+    through argv.  It ran the examples with
+
+        system($^X, (map { "-I$_" } @INC), '-MBATsh',
+               '-e', 'BATsh->run($ARGV[0])', $path);
+
+    and the Windows matrix failed it in 30 of its 90 cells -- every cell
+    whose BUILD PATH contained a space or parentheses, while all 30 cells
+    built at a plain path passed.  The cause is not @INC and not the
+    pathname: the "-e" operand contains '>', a cmd.exe redirection
+    character, and once another argument on that command line has to be
+    quoted -- which a build path with a space guarantees -- Windows can
+    route the whole line through cmd.exe, which then reads the '>' and
+    cuts the program text in half.  The child perl reported a syntax
+    error and printed nothing, so even eg/01_hello.batsh was recorded as
+    producing 0 lines: a FAIL with nothing wrong in lib/.  The file now
+    runs bin/batsh.pl, the distribution's own entry point, which carries
+    no metacharacter -- the same invocation shape as t/0033, which passed
+    in the very cells where t/9070 failed.  Rule R9 gains the corollary
+    (a pathname in argv needs quoting and is fine; program text needs
+    shell escaping and is not), and xt/doc_parity.pl gains a check that
+    fails on any test file passing '-e' to system().
+
+    [TEST] t/lib/BATsh_TestOS.pm 0.03 -> 0.04: adds have_external() and
+    rule R10.  R10 is deliberately distinct from R2 -- R2 forbids
+    inspecting the TEXT an external command prints, R10 forbids assuming
+    the command EXISTS.
+
+    [TOOL] New xt/doc_parity.pl (maintainer only, not run by "make
+    test"): fails unless README is exactly the rendered POD, unless every
+    builtin, keyword and CMD command found in the code is named in the
+    POD, unless BATsh::SH holds only one builtin table, and unless the
+    version string agrees in all thirteen places.  Four pre-release
+    reviews in a row each found "one more thing", and each finding came
+    from an axis no earlier review had looked at; this script turns those
+    axes into a gate so they cannot silently reopen.
+
+    [TOOL] pmake.bat 0.48 -> 0.49: the build tool violated its own K1
+    style rule (a comma has to be followed by whitespace) on six lines of
+    its own source, so "perl -x pmake.bat selfcheck" exited 1 on every
+    distribution even when the distribution was clean.  "pmake dist"
+    excluded pmake.bat from that scan and so never reported it.  Fixed;
+    the standalone selfcheck is now green.  Shared file -- copy this
+    version into the other distributions.
+
+    This release began as a test-side release but is no longer one: the
+    lib changes are listed below, and they include real interpreter
+    fixes.  Commands written after a control structure that closes on the
+    same physical line are no longer discarded, output redirection after
+    "done"/"fi"/"esac" now reaches the file, backgrounded builtins no
+    longer leak to an external shell, the REPL no longer prepends junk to
+    the first line typed at the prompt, and source and . now dequote
+    their operand.  BATsh-0.10 drew a FAIL from
+    a Windows smoker (MSWin32-x86-multi-thread, Strawberry perl 5.8.9,
+    Win7) in t/0020-tilde-expansion.t case 2, and the case was written in
+    a way that made the report impossible to act on: it compared two
+    SPELLINGS of one pathname and, when they differed, printed nothing at
+    all.  On Win32 no spelling is authoritative -- Cwd::cwd(),
+    Cwd::realpath() and the string handed to chdir() may disagree about
+    separator direction, drive-letter case and 8.3 short names -- so a
+    correct shell and a broken one produce the same bare "not ok 2".
+    This is the third spurious-looking FAIL of that same shape (0.09 on
+    5.18.4 used realpath, 0.10 on 5.8.9 used cwd), so the comparison
+    itself is retired rather than adjusted once more.
+
+  - BUG FIX (BATsh::repl): the first line typed at the interactive
+    prompt was executed with two junk lines in front of it, so every
+    session opened with "Can't exec \"0\": No such file or directory",
+    and a first line in CMD mode left the process exit code at 255.  The
+    REPL also printed four "Use of uninitialized value" warnings under
+    -w before reading any input.  The cause was a single statement,
+    "my (@buf, $depth, $cur_mode) = ((), 0, '')": in a "my" list an
+    array is greedy and takes the whole right-hand side, so @buf became
+    (0, '') and both scalars stayed undef.  The three variables are now
+    initialised one per statement.  run_lines() already had the correct
+    form; the defect was confined to repl().
+
+  - NEW FILE t/0033-cli-and-repl.t: until now nothing under t/ ran
+    bin/batsh.pl or BATsh->repl(), which is why the defect above
+    survived 2117 passing tests.  CL01-CL07 cover the command line
+    (--version, --help, -e, a script file with arguments, "-" for
+    STDIN, a missing script, an unknown --encoding); CL08-CL12 cover
+    the REPL (first SH line, first CMD line and its exit code, mode
+    switching, "exit N", and a silent start-up); CL13 covers -e with a
+    source that contains a space.  The child perl's STDIN, STDOUT and
+    STDERR are reopened at the Perl level rather than redirected by a
+    shell, and every case prints the captured streams as TAP comments
+    when it fails.
+
+  - TEST FIX (t/0033-cli-and-repl.t, t/lib/BATsh_TestOS.pm,
+    t/0000-environment.t): the first draft of the case above handed
+    "-e" a source containing a space, and on a Windows smoker the child
+    perl received it as TWO arguments, so BATsh ran "echo" and then the
+    bare operand as an external command and the case failed.  Win32 has
+    no argv: perl joins the LIST form of system() back into one command
+    line and the child takes it apart again, so an argument carrying a
+    space depends on two independent quoting implementations agreeing.
+    This says nothing about BATsh -- a user typing the same line at a
+    cmd.exe prompt has cmd.exe do the quoting, and it works.  The case
+    that must run everywhere now uses a space-free source; the space
+    form moved to CL13 and is gated on a new predicate,
+    BATsh_TestOS::argv_space_safe(), which asks a child perl how many
+    arguments it received rather than guessing from $^O.  Where the
+    answer is no, CL13 skips with a printed reason (rule R4) and
+    t/0000-environment.t reports it in the fingerprint (rule R7).  The
+    reasoning is recorded as rule R9 in t/lib/BATsh_TestOS.pm.
+    Reported for the 0.11 candidate on MSWin32.
+
+  - TEST FIX (t/0020-tilde-expansion.t): TE01 and TE02 no longer compare
+    pathname strings.  Each now looks for a MARKER that is known to live
+    in the target directory and probes it with a RELATIVE -e / -d from
+    the working directory the shell moved to.  A relative probe has no
+    spelling, so it cannot disagree with anything, and it is true if and
+    only if the shell really arrived.  TE01 uses an entry that already
+    exists in $HOME, so it still needs no write permission there; TE02
+    marks the scratch directory it creates anyway with one subdirectory,
+    and removes both afterwards.  Reported for BATsh-0.10 on MSWin32 with
+    perl 5.8.9.
+
+  - TEST FIX (t/0020-tilde-expansion.t): a failing TE01 or TE02 now
+    prints $HOME, the reference path, the reached path, the marker, the
+    shell diagnostic captured on STDERR, and (TE02) whether the target
+    directory still existed, as TAP comments.  A "not ok" that says
+    nothing else cannot be diagnosed from a CPAN Testers report, which is
+    why the 0.10 FAIL could not be resolved without another release.
+
+  - TEST FIX (t/0030-expansion-literals.t): EL16 carried the same
+    pathname-string comparison, against Cwd::realpath() -- the exact form
+    that had already failed once on Win32 -- and had simply not been
+    reached by a smoker yet.  It now uses the marker probe as well.  No
+    call to Cwd::realpath() is left in the suite.
+
+  - TEST FIX (t/0020-tilde-expansion.t): the file used File::Spec without
+    loading it, relying on FindBin to pull it in.  It is now imported
+    explicitly.
+
+  - NEW FILE t/lib/BATsh_TestOS.pm: the platform predicates the suite
+    needs, named once and reviewed once, instead of re-derived inline in
+    each .t file.  BATsh is a cmd.exe emulator, so its main platform is
+    the one the author cannot smoke locally, and every Windows FAIL this
+    distribution has received so far has been a test defect of exactly
+    that shape: an assumption about Win32 written into a single case and
+    never looked at again.  The module carries posix_file_semantics()
+    (Win32 keeps neither the O_CREAT|O_EXCL-does-not-follow-a-symlink
+    promise nor the mode bits), have_getpwnam(), fs_can_hold_name()
+    (asks the file system whether a byte sequence can be a name at all,
+    rather than assuming), dir_marker() / in_marked_dir() /
+    drop_marker() / existing_entry() (the marker probe described above),
+    tap_diag(), and is_windows() -- from which cygwin is deliberately
+    absent, since it does keep the POSIX guarantees.
+
+  - The file also states, as its header, the five rules those failures
+    produced: R1 never compare pathnames as strings; R2 never assert on
+    text the operating system produced (Windows error strings are
+    localised -- assert on exit status); R3 never write an assertion
+    that prints nothing when it fails; R4 skip with a printed reason
+    where the platform cannot support the premise, and probe rather than
+    test $^O at the call site; R5 a newly enabled case has never run on
+    Windows.  They are in the test tree rather than in CONTRIBUTING
+    because CONTRIBUTING is generated by pmake and would be overwritten,
+    and because the place to find them is next to the code they govern.
+
+  - t/0015, t/0019, t/0020 and t/0030 now use those predicates.  This is
+    a consolidation, not a change of behaviour: t/0019 keeps the same
+    skips through posix_file_semantics(), t/0015 CP12 replaces its
+    hand-rolled probe with fs_can_hold_name(), t/0020 and t/0030 take
+    the marker helpers and tap_diag().  One real gap closes with it --
+    t/0020 TE03 resolves ~user and therefore needs getpwnam(), which
+    native Windows perl does not implement; it now skips there with a
+    reason instead of relying on the shell to fail for the right reason.
+
+  - NEW FILE xt/win32_matrix.pl: a maintainer tool that runs the suite
+    from one Windows box over the environments the smokers actually
+    differ in -- five shapes of $HOME (backslash, forward slash,
+    trailing separator, embedded space, and not set at all), a working
+    directory on the same drive as $HOME and on another one (Windows
+    keeps a current directory per drive), ANSI code page 932 and 65001,
+    and any number of perls given with --perl=.  Each of the Windows
+    FAILs this distribution has received would have been visible here
+    before upload.  It is not part of "make test" and no installer or
+    smoker runs it.
+
+  - DOC FIX (lib/BATsh.pm, README): the SYNOPSIS and the description of
+    BATsh->main() both stated that bin/batsh.pl "is installed as batsh".
+    That holds only on Windows, where MakeMaker runs pl2bat over the
+    installed script; EXE_FILES keeps the basename otherwise, so a Unix
+    install puts it in the path as batsh.pl.  Confirmed with a DESTDIR
+    install.  Both places now read "installed as batsh.pl; on Windows
+    MakeMaker's pl2bat also provides batsh", and the command-line
+    examples in the SYNOPSIS use the name that actually exists.
+
+  - NEW FILE t/0000-environment.t: a report, not an assertion.  It has
+    one case, that case always passes, and all it does is print what
+    the machine actually is -- perl, archname, the spelling of $HOME
+    and of the working directory and whether they share a volume,
+    which of the environment variables that decide behaviour are set,
+    whether STDIN and STDOUT are a console, whether getpwnam() and
+    symlink() work, whether the file system folds case, whether it
+    will accept a name carrying a CP932 trail byte of 0x5C -- as TAP
+    comments, which every harness carries into the CPAN Testers
+    report.  It is numbered 0000 so the fingerprint stands above
+    whatever failed below it.  Four Windows FAILs have now arrived
+    without any of this, and each cost a release to guess at; from
+    here a report says what it was run on.  Nothing in this file
+    should ever be turned into a check: a fingerprint that can fail is
+    one more thing to diagnose rather than the means of diagnosing.
+
+  - TEST FIX (t/0020-tilde-expansion.t): TE03 reads the EXIT STATUS of
+    the failed "cd" instead of matching the text of its diagnostic.
+    The text was BATsh's own literal and not the operating system's, so
+    matching it did not breach rule R2 -- but it is indistinguishable
+    from a breach at a glance, and it tied a passing case to a wording
+    that is documentation rather than interface.  The getpwnam() skip
+    goes with it: BATsh resolves ~user inside an eval and leaves an
+    unresolvable one literal either way, so the case now exercises the
+    same behaviour on a native Windows perl as on Unix instead of
+    skipping there.
+
+  - TEST FIX (t/lib/BATsh_TestOS.pm): existing_entry() now refuses any
+    name that is also reachable from the current directory.  Such a
+    name would be found by the relative probe whether the shell had
+    moved or not, so t/0020 TE01 could pass without having tested
+    anything -- and that is a real configuration, not a hypothesis: a
+    smoker that sets $HOME to the build directory produces it.  Where
+    no distinguishing entry exists the case now skips with a reason.
+    A vacuous pass hides a case forever; a skip hides it for one run.
+
+  - Two more rules in t/lib/BATsh_TestOS.pm, both drawn from the same
+    four failures.  R6: "it passed on my Windows box" is not evidence,
+    because every one of those FAILs passed a local run first -- the
+    author's console has PERL5LIB, PERL5OPT, an interactive STDIN and
+    a $HOME he chose, and a smoker has none of them.  R7: a green
+    report must still say what it was green on.
+
+  - NEW PREDICATES (t/lib/BATsh_TestOS.pm): have_symlink() (asks
+    whether a link can actually be made in a given directory, since
+    Win32 perl has had the function since 5.16 but fails without the
+    privilege), writable_dir() (-w reports the read-only attribute on
+    Win32 and says nothing about the ACL that decides), and
+    path_shape() (names the properties of a pathname that have changed
+    behaviour, for the fingerprint).
+
+  - xt/win32_matrix.pl gains the environment axis, and it is now the
+    DEFAULT: every cell runs with PERL5LIB, PERL5OPT, PERLIO,
+    PERL_UNICODE, the HARNESS_ variables and the locale variables
+    removed, with AUTOMATED_TESTING, NONINTERACTIVE_TESTING and
+    PERL_MM_USE_DEFAULT set, and with standard input taken from the
+    null device.  A cell that inherits the author's environment
+    reproduces the one machine already known to pass; reproducing the
+    smoker is the point.  --env=inherited or --env=both widens it back
+    when the question is whether something works interactively.
+
+  - BUILD (pmake.bat 0.47 -> 0.48): test-phase prerequisites are now
+    collected from t/*.t, t/lib/*.pm and test.pl and reported under
+    build_requires in META.yml and under the test phase in META.json.
+    The scan had walked only what the distribution installs, which is
+    right for the runtime phase and wrong for the test phase: a module
+    that only the suite loads was reported nowhere, so META claimed a
+    test could run against a perl that could not run it.  An eval'd
+    require in a test is deliberately not collected -- there it means
+    "skip this case when the module is absent", which is the opposite
+    of a prerequisite.  Nothing found by this scan goes near provides,
+    so PAUSE still sees only lib/.  pmake.bat is shared, so this
+    affects every distribution built with it.
+
+  - BUILD (pmake.bat 0.46 -> 0.47): META.yml and META.json now carry a
+    no_index key naming the directories PAUSE must not index -- of t,
+    xt, eg, doc, examples, inc and share, whichever the distribution
+    actually has.  Nothing was being mis-indexed: the explicit provides
+    key already told PAUSE what to take.  But t/lib now holds two
+    packages that are not part of the interface (BATsh_TestOS and
+    INA_CPAN_Check), and the next one added would have been protected by
+    that implication alone.  no_index states the boundary instead of
+    leaving it inferred.  pmake.bat is shared, so this affects every
+    distribution built with it.
+
+  - TEST TOOL (xt/win32_matrix.pl): the runner printed nothing between
+    the header and the end of a cell, and did not set $|, so a full
+    Windows matrix -- 30 cells, or 60 when a second drive is found,
+    every one of them starting all 43 test files in a fresh child perl
+    -- looked like a hang for the first several minutes.  It now runs
+    unbuffered and prints one character per test file as it happens ("."
+    for a pass, "F" for a failed file, "x" for a cell that could not be
+    entered), an elapsed time per cell, and an estimate for the whole
+    matrix once the first cell is done.  A tool that cannot be told
+    apart from a stuck one is the R3 defect in another costume.
+
+  - TEST TOOL (xt/win32_matrix.pl): three ways to cut the matrix down,
+    since a release check that takes an hour will not be run: --cp=NNN
+    and --home=NAME select single axes (both repeatable), and
+    --no-other-drive skips the second working drive together with the
+    D:..Z: probe that looks for one.  That probe runs before any output
+    and is the one place here that can genuinely block -- an empty
+    optical drive or a mapped drive whose server has gone can hang -d,
+    or raise a dialog behind the console window.  --help now prints the
+    options, and the header reports the child perl run count so the size
+    of the job is visible before it starts.
+
+    A pre-release check of the 0.11 tarball found a whole class of
+    failure that none of the work above would have caught, because every
+    axis exercised so far varies something OUTSIDE the distribution --
+    $HOME, the working drive, the code page, the environment -- while
+    the directory the distribution itself is unpacked into was only ever
+    the author's.  Unpack it somewhere else and seven cases fail:
+
+        t/0003 CMD15, t/0021 EF20, t/0029 MF01-MF05
+            7/2116 subtests, from a build path containing a SPACE
+
+    That is not an exotic spelling.  On Windows it is the ordinary one:
+    "C:\Users\John Doe\...", "C:\Documents and Settings\...".  Each of
+    those cases interpolated a path derived from $FindBin::Bin into
+    shell or cmd.exe source WITHOUT QUOTING it, so BATsh word-split it
+    exactly as bash would, and the case then reported a defect in the
+    shell that was really a defect in the test.  lib/ was innocent in
+    all seven.
+
+    The operands are now quoted, as a user would have to quote them.
+    Where a build path carries a character that quoting cannot survive
+    at all -- a quote, a backtick, $ % & ; # | < > -- the affected cases
+    skip with a printed reason rather than fail; a space and parentheses
+    are deliberately NOT in that set, because "C:\Program Files (x86)"
+    has to keep working.  The predicate is BATsh_TestOS::shell_safe_path
+    and the reasoning is rule R8, added to t/lib/BATsh_TestOS.pm beside
+    the others.  t/0000-environment.t reports whether the build path is
+    usable in shell source, so that a report showing those skips says
+    why.  xt/win32_matrix.pl gains a build-path axis: it copies the tree
+    into directories named "with space" and "paren (x86)" and runs the
+    suite from the copies (--no-build-paths turns that off).
+
+    LIB CHANGE (the first since 0.08): source and . now dequote their
+    operand.
+
+        source "$dir/init.batsh"        # 0.10: file not found: "...
+        . 'my script.batsh'             # 0.10: file not found: '...
+
+    cd has dequoted its argument since 0.08, and source did not, so the
+    obvious way to write a path containing a space was correct for one
+    builtin and wrong for the other.  Two places were involved:
+    BATsh::SH::_cmd_source() now calls _arr_dequote() exactly as
+    _cmd_cd() does, and BATsh::_exec_sh_section()'s fast path for a
+    literal ".batsh" operand -- which is what actually runs for the
+    common case -- had an UNANCHORED pattern, so a quoted operand
+    matched it with the opening quote still attached.  That pattern is
+    now anchored and rejects an operand containing a quote, $ or a
+    backtick, which sends it to _cmd_source() where expansion and
+    dequoting have already happened.  An unquoted operand is unaffected
+    in either path: this dequotes, it does not word-split, so
+    "source /home/John Doe/x.batsh" keeps working as before.
+
+    t/0016 gains ES17, which sources one file through all four spellings
+    (bare, double-quoted, single-quoted, and the "." form) and requires
+    the same exit status from each.  The suite is 43 files and 2117
+    tests, and it passes from build paths spelled with a space, with
+    parentheses, with an apostrophe, with an ampersand, with $ % ; #,
+    and with non-ASCII characters.
+
+    Also in t/lib/BATsh_TestOS.pm: have_symlink() now removes its probe
+    with rmdir() when unlink() will not take it.  symlink('.', ...)
+    names a directory, and on Win32 that makes a DIRECTORY symlink,
+    which unlink() cannot always delete -- a probe that litters the tree
+    it is probing is its own kind of defect.
+
+    A last read of the built tarball turned up five statements in it
+    that were no longer true.  None of them changes what the software
+    does; all five are the kind of thing a reader has to be told twice
+    about, which is the reason they are listed rather than folded
+    silently into the entries above.
+
+  - DOC FIX (lib/BATsh.pm, README): "batsh --help" printed a usage
+    block naming the command "batsh".  That is the name this release
+    went to some trouble to correct everywhere else: EXE_FILES keeps
+    the basename, so a Unix install answers to batsh.pl and only
+    Windows also answers to batsh.  The POD in bin/batsh.pl already
+    said batsh.pl, so the distribution contradicted itself in the one
+    place a user reads first.  The usage block now uses batsh.pl and
+    states where the short name comes from.
+
+  - DOC FIX (lib/BATsh.pm, README): bug reports were directed to
+    <https://github.com/ina-cpan/BATsh/issues>, which does not resolve
+    -- the account exists, the repository is not public.  Reports now
+    go to the author's address, with a request for the fingerprint
+    t/0000-environment.t prints, since that is what the last four
+    Windows failures each lacked.
+
+  - TEST TOOL (xt/win32_matrix.pl): the --help text was wrong in two
+    ways.  The second line of the --no-other-drive description had been
+    stranded below --no-build-paths when that option was inserted
+    between them, so it read as part of the wrong option; and the size
+    estimate still said 15 or 30 cells, from before the build-path axis
+    tripled it.  A full Windows matrix is 30 cells, or 60 when a second
+    drive is found.  --help now points at --list, which counts the
+    matrix for the machine in hand instead of quoting a number that
+    goes stale every time an axis is added.  The same two numbers were
+    stale in the entry above, and are corrected there.
+
+  - TEST TOOL (xt/win32_matrix.pl): the comment over the HOME shapes
+    said four spellings where Windows builds five, since only Windows
+    can spell one directory with either separator.
+
+  - TEST FIX (t/0020-tilde-expansion.t): TE02 skipped with the reason
+    "no subdir under HOME" when what it had actually found was that
+    $HOME is not a readable directory.  A skip earns its place by
+    saying what stopped it (rule R7); this one named a different
+    condition than the one it tested.
+
+
 0.10  2026-08-01 JST (Japan Standard Time)
 
     No behaviour of the shell changes in this release: apart from the

@@ -1,55 +1,66 @@
 use warnings;
 use v5.42;
 
-package Tie::Google::Sheets 0.01 {
+package Tie::Google::Sheets 0.02 {
 
     # ABSTRACT: Tie perl variables to Google Sheets
 
     use Carp qw( croak );
     use List::Util qw( any );
+    use Ref::Util qw( is_plain_hashref );
     use Tie::Google::Sheets::Client;
     use Tie::Google::Sheets::Worksheet;
 
+    our @CARP_NOT = qw( Tie::Google::Sheets::Client Tie::Google::Sheets::Worksheet Class::Tiny::Object );
+
+    use Class::Tiny qw( _client ), {
+        _worksheets => sub { {} },
+    };
+
+    sub BUILDARGS ($class, %args) {
+        return {
+            _client => Tie::Google::Sheets::Client->new(%args),
+        };
+    }
+
     sub TIEHASH ($class, %args) {
-        return bless {
-            client     => Tie::Google::Sheets::Client->new(%args),
-            worksheets => {},
-        }, $class;
+        return $class->new(%args);
     }
 
     sub FETCH ($self, $title) {
-        return $self->{worksheets}{$title} //= do {
-            my %worksheet;
-            tie %worksheet, 'Tie::Google::Sheets::Worksheet', client => $self->{client}, title => $title;
-            \%worksheet;
-        };
+        return $self->_worksheets->{$title} if exists $self->_worksheets->{$title};
+        return undef unless $self->EXISTS($title);
+
+        my %worksheet;
+        tie %worksheet, 'Tie::Google::Sheets::Worksheet', client => $self->_client, title => $title;
+        return $self->_worksheets->{$title} = \%worksheet;
     }
 
     sub STORE ($self, $title, $value) {
         croak "worksheet '$title' already exists; assign individual cells instead, e.g. \$doc{$title}{A1} = ..."
             if $self->EXISTS($title);
         croak 'a new worksheet may only be assigned undef, or a hashref of cell => value pairs'
-            if defined($value) && ref($value) ne 'HASH';
+            if defined($value) && !is_plain_hashref($value);
 
-        $self->{client}->add_sheet($title);
-        delete $self->{worksheets}{$title};
+        $self->_client->add_sheet($title);
+        delete $self->_worksheets->{$title};
 
-        if(ref $value eq 'HASH') {
+        if(is_plain_hashref($value)) {
             my $worksheet = $self->FETCH($title);
-            $worksheet->{$_} = $value->{$_} for keys %$value;
+            $worksheet->{$_} = $value->{$_} for keys $value->%*;
         }
 
         return $value;
     }
 
     sub DELETE ($self, $title) {
-        $self->{client}->delete_sheet($title);
-        delete $self->{worksheets}{$title};
+        $self->_client->delete_sheet($title);
+        delete $self->_worksheets->{$title};
         return undef;
     }
 
     sub EXISTS ($self, $title) {
-        return !!any { $_ eq $title } @{ $self->{client}->sheet_titles };
+        return !!any { $_ eq $title } $self->_client->sheet_titles->@*;
     }
 
     sub CLEAR ($self) {
@@ -58,7 +69,7 @@ package Tie::Google::Sheets 0.01 {
     }
 
     sub FIRSTKEY ($self) {
-        $self->{_iter}     = $self->{client}->sheet_titles;
+        $self->{_iter}     = $self->_client->sheet_titles;
         $self->{_iter_pos} = 0;
         return $self->NEXTKEY;
     }
@@ -78,8 +89,23 @@ package Tie::Google::Sheets 0.01 {
         return $self->DELETE($title);
     }
 
+    sub copy_worksheet ($self, $from_title, $to_title) {
+        croak "worksheet '$to_title' already exists; delete it first, or choose a different name"
+            if $self->EXISTS($to_title);
+
+        $self->_client->copy_worksheet($from_title, $to_title);
+        delete $self->_worksheets->{$to_title};
+
+        return $self->FETCH($to_title);
+    }
+
     sub worksheet_titles ($self) {
-        return @{ $self->{client}->sheet_titles };
+        return $self->_client->sheet_titles->@*;
+    }
+
+    sub flush ($self) {
+        $self->_client->flush;
+        return;
     }
 
 }
@@ -96,28 +122,28 @@ Tie::Google::Sheets - Tie perl variables to Google Sheets
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
  use Tie::Google::Sheets;
-
+ 
  tie my %doc, 'Tie::Google::Sheets',
      spreadsheet_id  => '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
      service_account => '/path/to/service-account-key.json';
-
+ 
  # read and write individual cells
  my $name = $doc{Employees}{A1};
  $doc{Employees}{A2} = 'Grace Hopper';
-
+ 
  # create a new worksheet, optionally pre-populated
  tied(%doc)->add_worksheet('Report', { A1 => 'Total', B1 => 42 });
-
+ 
  # iterate over worksheet tabs
  for my $title (keys %doc) {
      print "$title\n";
  }
-
+ 
  # remove a worksheet
  delete $doc{Report};
 
@@ -182,6 +208,28 @@ providing a C<request($method, $url, \%options)> method with the same
 contract as L<HTTP::Tiny>). Used as-is instead of wrapping L</ua>. Mutually
 exclusive with L</ua>.
 
+=item batch_size
+
+Enables write batching. When set to a positive integer, cell writes (that
+is, C<< $doc{$title}{$cell} = $value >>) are queued instead of being sent
+immediately, and are combined into a single API call once the queue reaches
+C<batch_size> pending writes. Defaults to C<undef>, meaning every write is
+sent immediately as its own API call.
+
+Regardless of C<batch_size>, queued writes are always flushed before they
+could otherwise be observed out of order: immediately before any read,
+before any worksheet is added or deleted, and when C<%doc> (or the last
+reference to it) goes out of scope. Queued writes can also be flushed
+explicitly at any time; see L</flush>.
+
+=item backoff_retry
+
+Enables automatic retry when Google rate limits a request (HTTP status
+429). When set to a positive integer, a rate limited API call is retried
+that many times, with exponential backoff (1, 2, 4, ... seconds) between
+attempts, before giving up and croaking. Defaults to C<undef>, meaning a
+rate limited request fails immediately.
+
 =back
 
 =head1 TIE METHODS
@@ -196,8 +244,8 @@ Constructor, called via C<tie>; see L</CONSTRUCTOR> above.
 =head2 FETCH
 
 Returns the worksheet named by the given key, as a hashref implemented by
-L<Tie::Google::Sheets::Worksheet>. The worksheet does not need to already
-exist on the server; accessing cells on one that doesn't will fail.
+L<Tie::Google::Sheets::Worksheet>, or C<undef> if no worksheet with that
+title exists on the server.
 
 =head2 STORE
 
@@ -245,12 +293,30 @@ This is equivalent to C<< $doc{$title} = \%cells >>.
 
 Deletes the worksheet named C<$title>. Equivalent to C<< delete $doc{$title} >>.
 
+=head2 copy_worksheet
+
+ tied(%doc)->copy_worksheet($from_title, $to_title);
+
+Copies the worksheet named C<$from_title> to a new worksheet named
+C<$to_title>, including its formatting, data validation, and other
+properties, not just its cell values. Croaks if C<$from_title> doesn't
+exist, or if C<$to_title> already exists. Returns the new worksheet
+hashref, the same as C<$doc{$to_title}>.
+
 =head2 worksheet_titles
 
  my @titles = tied(%doc)->worksheet_titles;
 
 Returns the titles of all worksheets in the spreadsheet, in the order
 Google Sheets returns them. Equivalent to C<< keys %doc >>.
+
+=head2 flush
+
+ tied(%doc)->flush;
+
+Sends any cell writes queued by the L</batch_size> constructor option as a
+single API call. A no-op if C<batch_size> wasn't given, or if there is
+nothing queued. See L</batch_size> for when this happens automatically.
 
 =head1 CAVEATS
 
@@ -259,7 +325,8 @@ Google Sheets returns them. Equivalent to C<< keys %doc >>.
 =item *
 
 Every cell access is a separate Google Sheets API call; there is no local
-caching or batching. Be mindful of
+caching, and writes are not batched unless L</batch_size> is given. Be
+mindful of
 L<Google's API quotas|https://developers.google.com/sheets/api/limits> if
 you access many cells.
 
@@ -272,6 +339,15 @@ emptied with C<%doc = ()>; delete worksheets individually instead.
 
 Only cell values are read and written; formatting, formulas results vs
 formula text, and other cell metadata are not exposed.
+
+=item *
+
+Because of how Perl autovivifies nested data structures, reading or writing
+a cell of a worksheet that doesn't yet exist (for example
+C<< $doc{NewSheet}{A1} >>) creates that worksheet as a side effect, the same
+way C<< $doc{NewSheet} = undef >> would. To check whether a worksheet
+exists without creating it, use C<exists $doc{$title}> or
+L</worksheet_titles>, not a truth test on C<$doc{$title}>.
 
 =back
 

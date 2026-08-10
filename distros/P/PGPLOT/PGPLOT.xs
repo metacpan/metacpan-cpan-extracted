@@ -118,8 +118,8 @@ pgband(mode,posn,xref,yref,x,y,ch)
   int	posn
   float	xref
   float	yref
-  float	x = NO_INIT
-  float	y = NO_INIT
+  float	x
+  float	y
   char	ch = NO_INIT
   CODE:
     DEBUG_PRINT(pgband);
@@ -306,7 +306,7 @@ pgconx(a,idim,jdim,i1,i2,j1,j2,c,nc,plot)
   CODE:
     DEBUG_PRINT(pgconx);
     pgfunname[0] = plot;
-    cpgconx(a,idim,jdim,i1,i2,j1,j2,c,nc,pgfunplot);
+    cpgconx(a,idim,jdim,i1,i2,j1,j2,c,nc,(void(*)(void))pgfunplot);
 
 
 void
@@ -325,8 +325,8 @@ pgctab(l,r,g,b,nc,contra,bright)
 
 int
 pgcurs(x,y,ch)
-  float	x = NO_INIT
-  float	y = NO_INIT
+  float	x
+  float	y
   char	ch = NO_INIT
   CODE:
     DEBUG_PRINT(pgcurs);
@@ -340,8 +340,8 @@ pgcurs(x,y,ch)
 
 int
 pgcurse(x,y,ch)
-  float	x = NO_INIT
-  float	y = NO_INIT
+  float	x
+  float	y
   char	ch = NO_INIT
   CODE:
     DEBUG_PRINT(pgcurse);
@@ -462,7 +462,7 @@ pgfunt(fx,fy,n,tmin,tmax,pgflag)
     DEBUG_PRINT(pgfunt);
     pgfunname[0] = fx;
     pgfunname[1] = fy;
-    cpgfunt(pgfun1,pgfun2,n,tmin,tmax,pgflag);
+    cpgfunt((float(*)(void))pgfun1,(float(*)(void))pgfun2,n,tmin,tmax,pgflag);
 
 
 void
@@ -475,7 +475,7 @@ pgfunx(fy,n,xmin,xmax,pgflag)
   CODE:
     DEBUG_PRINT(pgfunx);
     pgfunname[0] = fy;
-    cpgfunx(pgfun1,n,xmin,xmax,pgflag);
+    cpgfunx((float(*)(void))pgfun1,n,xmin,xmax,pgflag);
 
 
 void
@@ -488,7 +488,7 @@ pgfuny(fx,n,ymin,ymax,pgflag)
   CODE:
     DEBUG_PRINT(pgfuny);
     pgfunname[0] = fx;
-    cpgfuny(pgfun1,n,ymin,ymax,pgflag);
+    cpgfuny((float(*)(void))pgfun1,n,ymin,ymax,pgflag);
 
 
 void
@@ -587,7 +587,7 @@ pglabel(xlbl,ylbl,toplbl)
 void
 pglcur(maxpt,npt,x,y)
   int	maxpt
-  int	npt = NO_INIT
+  int	npt
   float *	x = NO_INIT
   float *	y = NO_INIT
   CODE:
@@ -670,7 +670,7 @@ pgmtext(side,disp,coord,fjust,text)
 void
 pgncur(maxpt,npt,x,y,symbol)
   int	maxpt
-  int	npt = NO_INIT
+  int	npt
   float *	x = NO_INIT
   float *	y = NO_INIT
   int	symbol
@@ -690,7 +690,7 @@ pgncur(maxpt,npt,x,y,symbol)
 void
 pgncurse(maxpt,npt,x,y,symbol)
   int	maxpt
-  int	npt = NO_INIT
+  int	npt
   float *	x = NO_INIT
   float *	y = NO_INIT
   int	symbol
@@ -727,7 +727,7 @@ pgnumb(mm,pp,form,string,nc)
 void
 pgolin(maxpt,npt,x,y,symbol)
   int	maxpt
-  int	npt = NO_INIT
+  int	npt
   float *	x = NO_INIT
   float *	y = NO_INIT
   int	symbol

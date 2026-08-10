@@ -2,8 +2,8 @@
 
 package Git::Native::TreeBuilder;
 use Moo;
-use Git::Libgit2 qw( check_rc );
 use Git::Libgit2::FFI ();
+use Git::Native::Error qw( check_rc );
 use Git::Native::Oid ();
 use FFI::Platypus::Buffer qw( scalar_to_buffer );
 
@@ -58,7 +58,7 @@ Git::Native::TreeBuilder - Build a libgit2 tree object entry by entry
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

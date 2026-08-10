@@ -11,6 +11,7 @@ use Log::Log4perl ':easy';
 use MooseX::Aliases;
 use Path::Tiny qw( path );
 use Scalar::Util qw( blessed );
+use Try::Tiny;
 use Types::Common qw( Enum HashRef InstanceOf NonEmptySimpleStr StrMatch );
 use WWW::Mechanize::Chrome;
 
@@ -19,9 +20,9 @@ use WWW::Mechanize::Chrome;
 
 use namespace::autoclean;
 
-use experimental qw( signatures try );
+use experimental qw( signatures );
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 Log::Log4perl->easy_init($WARN);
 
@@ -144,7 +145,7 @@ sub render( $self, $c, $args ) {
         $self->chrome_args->%*
     );
 
-    try {
+    return try {
         my $res = $mech->get_local( $file->stringify );
 
         if ( $res->is_success ) {
@@ -178,14 +179,15 @@ sub render( $self, $c, $args ) {
         }
 
     }
-    catch ($e) {
+    catch {
 
-        $c->log->error("$e");
-        $c->error("$e");
+        my $e = "$_";
+        $c->log->error($e);
+        $c->error($e);
 
-    }
+        return 0;
+    };
 
-    return 0;
 }
 
 
@@ -224,7 +226,7 @@ Catalyst::View::ChromePDF - convert HTML (or TT) content to PDF using Chrome
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 

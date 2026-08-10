@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+use autodie qw(:all);
+
 use Class::Simple;
 use Class::Simple::Readonly::Cached;
 use CHI;
@@ -11,27 +13,38 @@ use Test::Needs 'Test::Carp';
 CARP: {
 	Test::Carp->import();
 
-	does_croak_that_matches(sub {
-		Class::Simple::Readonly::Cached->new()
-	}, qr/^Usage:\s/);
+	# Calling new() with no args causes Params::Get to Carp::confess (not croak),
+	# so we use throws_ok from Test::Exception (bundled in Test::Most) which
+	# catches any die/croak/confess.
+	throws_ok { Class::Simple::Readonly::Cached->new() } qr/Usage:/,
+		'new() without args dies with usage message';
 
 	does_croak_that_matches(sub {
 		Class::Simple::Readonly::Cached->new({ foo => 'bar' })
-	}, qr/Cache must be ref to HASH or object$/);
+	}, qr/Cache must be ref to HASH or object\z/);
 
 	does_croak_that_matches(sub {
 		Class::Simple::Readonly::Cached->new(\'foo');
-	}, qr/Cache must be ref to HASH or object$/);
+	}, qr/Cache must be ref to HASH or object\z/);
+
+	# Partition: non-HASH unblessed ref (ARRAY ref) as cache.
+	# Premise:   ref([]) = 'ARRAY', blessed([]) = undef.
+	# Conclusion: the cache-validation guard croaks at the same boundary
+	#             as the scalar-ref test above, but proves the ref-type
+	#             check covers all non-HASH refs, not just SCALAR.
+	does_croak_that_matches(sub {
+		Class::Simple::Readonly::Cached->new(cache => [], object => Class::Simple->new());
+	}, qr/Cache must be ref to HASH or object\z/);
 
 	does_carp_that_matches(sub {
 		Class::Simple::Readonly::Cached->new(object => 'tulip', cache => {});
-	}, qr/is a scalar/);
+	}, qr/must be a reference, not a scalar/);
 
 	my $object = new_ok('Class::Simple::Readonly::Cached' => [ cache => {} ]);
 
 	does_carp_that_matches(sub {
 		Class::Simple::Readonly::Cached->new({ object => $object, cache => {} });
-	}, qr/is a cached object/);
+	}, qr/is already a cached object/);
 
 	my $l = new_ok('Class::Simple' => [ cache => {} ]);
 	$object = new_ok('Class::Simple::Readonly::Cached' => [ cache => {}, object => $l ]);
@@ -40,12 +53,15 @@ CARP: {
 		$object2 = new_ok('Class::Simple::Readonly::Cached' => [ cache => {}, object => $l ]);
 	}, qr/is already cached at /);
 
-	cmp_ok($object, 'eq', $object2, 'attempt to cache a previously cached object returns the same cache');
+	cmp_ok($object, 'eq', $object2,
+		'attempting to cache an already-cached object returns the existing wrapper');
 
-	# TODO "does_not_carp" when that is added to Test::Carp
-	$object2 = new_ok('Class::Simple::Readonly::Cached' => [ cache => {}, object => $l, quiet => 1 ]);
+	# TODO: add does_not_carp once Test::Carp supports it
+	$object2 = new_ok('Class::Simple::Readonly::Cached' =>
+		[ cache => {}, object => $l, quiet => 1 ]);
 
-	cmp_ok($object, 'eq', $object2, 'attempt to cache a previously cached object returns the same cache');
+	cmp_ok($object, 'eq', $object2,
+		'quiet => 1 suppresses the warning and still returns the existing wrapper');
 
 	done_testing();
 }

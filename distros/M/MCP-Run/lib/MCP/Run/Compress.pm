@@ -1,5 +1,5 @@
 package MCP::Run::Compress;
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 use Mojo::Base -base;
 
 # ABSTRACT: Output compression for LLMs
@@ -834,6 +834,10 @@ sub new {
 sub compress {
   my ($self, $command, $stdout, $stderr) = @_;
 
+  # Normalize so downstream split/join/grep can't trip on undef inputs.
+  $stdout //= '';
+  $stderr //= '';
+
   my $matched_filter;
   my $parsed = $self->_parse_command($command);
 
@@ -862,8 +866,20 @@ sub compress {
       }
     }
 
-    $matched_filter = $filter;
-    last;  # Found matching filter
+    # parsed_command filters win over legacy regex filters when both
+    # match — the parsed form is more specific (program + subcommand +
+    # flags) and is what users reach for when they want transform-style
+    # rewrites like `git diff --stat -> "5+2-file"`. Without this
+    # guard, hash iteration order decides the winner and `git diff
+    # --stat` would land on the bare `^git\s+diff\b` filter, which
+    # doesn't have the transform.
+    if (!$matched_filter) {
+      $matched_filter = $filter;
+    }
+    elsif ($filter->{parsed_command} && !$matched_filter->{parsed_command}) {
+      $matched_filter = $filter;
+    }
+    last if $matched_filter->{parsed_command};
   }
 
   # Apply command_transform if any filter has it and env var allows it
@@ -896,9 +912,11 @@ sub compress {
     }
   }
 
-  # Stage 3: Transform lines (if transform coderef provided)
+  # Stage 3: Transform lines (if transform coderef provided).
+  # A transform may return undef to drop a line (e.g. git diff --stat's
+  # summary line) — filter those out so join() doesn't warn.
   if ($matched_filter->{transform}) {
-    $out = join("\n", map { $matched_filter->{transform}->($_) } split(/\n/, $out));
+    $out = join("\n", grep { defined } map { $matched_filter->{transform}->($_) } split(/\n/, $out));
   }
 
   # Stage 4: Strip lines matching
@@ -977,6 +995,10 @@ sub compress {
 sub process {
   my ($self, $command, $stdout, $stderr) = @_;
 
+  # Normalize so downstream split/join/grep can't trip on undef inputs.
+  $stdout //= '';
+  $stderr //= '';
+
   my $matched_filter;
   my $parsed = $self->_parse_command($command);
 
@@ -1002,8 +1024,15 @@ sub process {
       }
     }
 
-    $matched_filter = $filter;
-    last;
+    # parsed_command wins over legacy regex when both match — see the
+    # matching comment in compress().
+    if (!$matched_filter) {
+      $matched_filter = $filter;
+    }
+    elsif ($filter->{parsed_command} && !$matched_filter->{parsed_command}) {
+      $matched_filter = $filter;
+    }
+    last if $matched_filter->{parsed_command};
   }
 
   my ($out, $err) = ($stdout, $stderr // '');
@@ -1033,7 +1062,9 @@ sub process {
   }
 
   if ($matched_filter->{transform}) {
-    $out = join("\n", map { $matched_filter->{transform}->($_) } split(/\n/, $out));
+    # A transform may return undef to drop a line — filter those out so
+    # join() doesn't warn on undefined values.
+    $out = join("\n", grep { defined } map { $matched_filter->{transform}->($_) } split(/\n/, $out));
   }
 
   if (@{$matched_filter->{strip_lines_matching} // []}) {
@@ -1146,7 +1177,7 @@ MCP::Run::Compress - Output compression for LLMs
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 SYNOPSIS
 

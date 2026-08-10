@@ -1,4 +1,8 @@
 
+9.49  2026-08-10
+  - Added EXPERIMENTAL support for partitioned cookies. (rawleyfowler)
+  - Added EXPERIMENTAL partitioned attributes to Mojo::Cookie::Response and Mojolicious::Sessions.
+
 9.48  2026-07-14
   - Fixed a security issue where CSRF tokens were vulnerable to BREACH attacks. Tokens are now masked with a fresh
     random value on every request, instead of being reused for the whole lifetime of a session.

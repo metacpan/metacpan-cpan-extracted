@@ -29,6 +29,16 @@ use FindBin ();
 use File::Spec ();
 use Cwd ();
 use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/lib";
+use BATsh_TestOS qw(shell_safe_path);
+
+# Rule R8 (t/lib/BATsh_TestOS.pm): the build directory was named by the
+# tester, not by this distribution.  Cases that interpolate it into shell
+# or cmd.exe source quote it; where the spelling carries a character that
+# quoting cannot survive, they skip with a reason instead of accusing
+# BATsh of a defect that lives in the test.
+my $PATH_OK = shell_safe_path($FindBin::Bin);
+my $PATH_WHY = "build path is not usable in shell source: $FindBin::Bin";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 
@@ -234,9 +244,12 @@ sub {
 
 # EF20: exec > file redirects the rest of the script permanently
 sub {
+    return ok_is(1, 1, "EF20 skipped ($PATH_WHY)") unless $PATH_OK;
     my $tmp = "$FindBin::Bin/_ef_exec_$$.tmp";
     unlink $tmp;
-    _run_capture("exec > $tmp\necho redirected\n");
+    # Quoted: $FindBin::Bin is the tester's build directory and may
+    # contain a space (rule R8 in t/lib/BATsh_TestOS.pm).
+    _run_capture("exec > \"$tmp\"\necho redirected\n");
     local *RF;
     my $content = '';
     if (open(RF, $tmp)) { local $/; $content = <RF>; close(RF) }

@@ -1,12 +1,12 @@
 {
    "abstract" : "cache messages to an object",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -35,7 +35,11 @@
             "Carp" : "0",
             "Class::Simple" : "0",
             "Data::Reuse" : "0",
-            "Params::Get" : "0",
+            "List::Util" : "1.33",
+            "Params::Get" : "0.15",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Private" : "0.05",
             "perl" : "5.006002"
          }
       },
@@ -44,10 +48,12 @@
             "CHI" : "0",
             "Test::Carp" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
-            "Test::Requires" : "0"
+            "Test::Returns" : "0"
          }
       }
    },
@@ -55,16 +61,16 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Class-Simple-Readonly-Cached@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues",
-         "x_url" : "https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Simple-Readonly-Cached",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Simple-Readonly-Cached"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/nigelhorne/Class-Simple-Readonly-Cached.git",
+         "url" : "https://github.com/nigelhorne/Class-Simple-Readonly-Cached.git",
          "web" : "https://github.com/nigelhorne/Class-Simple-Readonly-Cached",
          "x_repository" : "https://github.com/nigelhorne/Class-Simple-Readonly-Cached"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

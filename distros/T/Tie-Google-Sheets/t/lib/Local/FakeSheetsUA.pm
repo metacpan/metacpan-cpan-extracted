@@ -7,11 +7,12 @@ package Local::FakeSheetsUA {
 
     use JSON::MaybeXS qw( decode_json encode_json );
     use URI::Escape qw( uri_unescape );
+    use URI;
 
     sub new ($class, %args) {
         return bless {
             id      => $args{spreadsheet_id} // 'test-spreadsheet',
-            sheets  => { Sheet1 => { id => 0, cells => {} } },
+            sheets  => { Sheet1 => { id => 0, cells => {}, formulas => {} } },
             order   => ['Sheet1'],
             next_id => 1,
             calls   => [],
@@ -21,15 +22,16 @@ package Local::FakeSheetsUA {
 
     sub calls ($self) { return @{ $self->{calls} } }
 
-    sub fail_next ($self, $status, $message) {
-        $self->{fail} = { status => $status, message => $message };
+    sub fail_next ($self, $status, $message, $times = 1) {
+        $self->{fail} = { status => $status, message => $message, times => $times };
         return;
     }
 
     sub request ($self, $method, $url, $opts = undef) {
         push @{ $self->{calls} }, { method => $method, url => $url, opts => $opts // {} };
 
-        if(my $fail = delete $self->{fail}) {
+        if(my $fail = $self->{fail}) {
+            delete $self->{fail} if --$fail->{times} <= 0;
             return $self->_json_response($fail->{status}, 0, { error => { message => $fail->{message} } });
         }
 
@@ -42,12 +44,19 @@ package Local::FakeSheetsUA {
         if($path =~ /\A([^:\/]+):batchUpdate\z/) {
             return $self->_batch_update($opts);
         }
+        elsif($path =~ m{\A[^/]+/values:batchUpdate\z}) {
+            return $self->_values_batch_update($opts);
+        }
         elsif($path =~ m{\A[^/]+/values/(.+):clear\z}) {
             return $self->_clear($1);
         }
         elsif($path =~ m{\A[^/]+/values/(.+)\z}) {
             my $range_enc = $1;
-            return $method eq 'GET' ? $self->_get_values($range_enc) : $self->_update_values($range_enc, $opts);
+            if($method eq 'GET') {
+                my %query = URI->new($url)->query_form;
+                return $self->_get_values($range_enc, $query{valueRenderOption} // 'FORMATTED_VALUE');
+            }
+            return $self->_update_values($range_enc, $opts);
         }
         elsif($path =~ m{\A[^/]+\z}) {
             return $self->_metadata;
@@ -73,15 +82,17 @@ package Local::FakeSheetsUA {
         return ($title, $a1);
     }
 
-    sub _get_values ($self, $range_enc) {
+    sub _get_values ($self, $range_enc, $value_render_option) {
         my($title, $a1) = _parse_range($range_enc);
         return $self->_json_response(400, 0, { error => { message => "Unable to parse range: no such sheet $title" } })
             unless exists $self->{sheets}{$title};
 
-        my $cells = $self->{sheets}{$title}{cells};
+        my $cells    = $self->{sheets}{$title}{cells};
+        my $formulas = $self->{sheets}{$title}{formulas};
+        my $source   = $value_render_option eq 'FORMULA' ? { %$cells, %$formulas } : $cells;
 
         if(defined $a1) {
-            my $val = $cells->{ uc $a1 };
+            my $val = $source->{ uc $a1 };
             return $self->_json_response(200, 1, defined($val) ? { values => [[$val]] } : {});
         }
 
@@ -93,7 +104,7 @@ package Local::FakeSheetsUA {
         }
         my @grid;
         for my $r (1 .. $max_r) {
-            push @grid, [ map { $cells->{ _rc_to_a1($_, $r) } // '' } 1 .. $max_c ];
+            push @grid, [ map { $source->{ _rc_to_a1($_, $r) } // '' } 1 .. $max_c ];
         }
         return $self->_json_response(200, 1, @grid ? { values => \@grid } : {});
     }
@@ -110,6 +121,19 @@ package Local::FakeSheetsUA {
         return $self->_json_response(200, 1, { spreadsheetId => $self->{id}, updatedRange => $range_enc });
     }
 
+    sub _values_batch_update ($self, $opts) {
+        my $body = decode_json($opts->{content});
+
+        for my $value_range (@{ $body->{data} // [] }) {
+            my($title, $a1) = _parse_range($value_range->{range});
+            return $self->_json_response(400, 0, { error => { message => "Unable to parse range: no such sheet $title" } })
+                unless exists $self->{sheets}{$title};
+            $self->{sheets}{$title}{cells}{ uc $a1 } = $value_range->{values}[0][0];
+        }
+
+        return $self->_json_response(200, 1, { spreadsheetId => $self->{id}, totalUpdatedCells => scalar @{ $body->{data} // [] } });
+    }
+
     sub _clear ($self, $range_enc) {
         my($title, $a1) = _parse_range($range_enc);
         return $self->_json_response(400, 0, { error => { message => "Unable to parse range: no such sheet $title" } })
@@ -117,9 +141,11 @@ package Local::FakeSheetsUA {
 
         if(defined $a1) {
             delete $self->{sheets}{$title}{cells}{ uc $a1 };
+            delete $self->{sheets}{$title}{formulas}{ uc $a1 };
         }
         else {
-            $self->{sheets}{$title}{cells} = {};
+            $self->{sheets}{$title}{cells}    = {};
+            $self->{sheets}{$title}{formulas} = {};
         }
 
         return $self->_json_response(200, 1, { spreadsheetId => $self->{id}, clearedRange => $range_enc });
@@ -133,7 +159,7 @@ package Local::FakeSheetsUA {
                 my $title = $add->{properties}{title};
                 return $self->_json_response(400, 0, { error => { message => "sheet already exists: $title" } })
                     if exists $self->{sheets}{$title};
-                $self->{sheets}{$title} = { id => $self->{next_id}++, cells => {} };
+                $self->{sheets}{$title} = { id => $self->{next_id}++, cells => {}, formulas => {} };
                 push @{ $self->{order} }, $title;
             }
             elsif(my $del = $req->{deleteSheet}) {
@@ -143,6 +169,21 @@ package Local::FakeSheetsUA {
                     unless defined $title;
                 delete $self->{sheets}{$title};
                 $self->{order} = [ grep { $_ ne $title } @{ $self->{order} } ];
+            }
+            elsif(my $dup = $req->{duplicateSheet}) {
+                my $sheet_id = $dup->{sourceSheetId};
+                my($from_title) = grep { $self->{sheets}{$_}{id} == $sheet_id } @{ $self->{order} };
+                return $self->_json_response(400, 0, { error => { message => "no such sheetId: $sheet_id" } })
+                    unless defined $from_title;
+                my $to_title = $dup->{newSheetName};
+                return $self->_json_response(400, 0, { error => { message => "sheet already exists: $to_title" } })
+                    if exists $self->{sheets}{$to_title};
+                $self->{sheets}{$to_title} = {
+                    id       => $self->{next_id}++,
+                    cells    => { %{ $self->{sheets}{$from_title}{cells} } },
+                    formulas => { %{ $self->{sheets}{$from_title}{formulas} } },
+                };
+                push @{ $self->{order} }, $to_title;
             }
         }
 

@@ -1,15 +1,16 @@
-# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json
 # Ignore: local overrides, credentials, session data
 
 # Tracked: shared config & extensibility
 !/.claude/
 .claude/*
 !.claude/settings.json
-!.claude/settings.local.json
 !.claude/agents/
 !.claude/agents/**
 !.claude/skills/
 !.claude/skills/**
+!.claude/rules/
+!.claude/rules/**
 !.claude/hooks/
 !.claude/hooks/**
 
@@ -64,6 +65,11 @@ blib/
 # Environment
 .env
 .envrc
+
+# Debian source packages (e.g. `apt-get source libgit2` for struct-offset reference)
+*.orig.tar.xz
+*.debian.tar.xz
+*.dsc
 Git-Native-*/
 Git-Native-*.tar.gz
 AGENTS.md

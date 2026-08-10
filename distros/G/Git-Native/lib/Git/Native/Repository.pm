@@ -3,9 +3,13 @@
 package Git::Native::Repository;
 use Moo;
 use Carp ();
-use Git::Libgit2 qw( check_rc GIT_OBJECT_BLOB GIT_OBJECT_TREE GIT_OBJECT_COMMIT );
+use Git::Libgit2 qw(
+  GIT_EMODIFIED GIT_OBJECT_ANY GIT_OBJECT_BLOB GIT_OBJECT_TREE
+  GIT_OBJECT_COMMIT GIT_OBJECT_TAG
+);
 use Git::Libgit2::FFI ();
 use FFI::Platypus::Buffer qw( scalar_to_buffer );
+use Git::Native::Error qw( check_rc );
 use Git::Native::Reference ();
 use Git::Native::Blob ();
 use Git::Native::Tree ();
@@ -37,12 +41,55 @@ sub reference {
 sub reference_create {
   my ( $self, $name, $oid, %opts ) = @_;
   $oid = Git::Native::Oid->from_hex($oid) if !ref $oid;
-  check_rc Git::Libgit2::FFI::git_reference_create(
-    \my $ref, $self->_handle, $name, $oid->ptr,
-    $opts{force} ? 1 : 0,
-    $opts{message} // '',
-  );
+
+  my $ref;
+  if ( exists $opts{expected_old} ) {
+    Carp::croak 'Git::Libgit2 function git_reference_create_matching is not '
+      . 'bound; compare-and-swap reference creation is unavailable'
+      unless Git::Libgit2::FFI->can('git_reference_create_matching');
+    my $expected = defined $opts{expected_old}
+      ? $opts{expected_old}
+      : Git::Native::Oid->from_raw( "\0" x 20 );
+    $expected = Git::Native::Oid->from_hex($expected) if !ref $expected;
+    # expected_old is the overwrite guard, so force must be true: force false
+    # returns GIT_EEXISTS before libgit2 can compare the expected OID.
+    check_rc Git::Libgit2::FFI::git_reference_create_matching(
+      \$ref, $self->_handle, $name, $oid->ptr,
+      1,
+      $expected->ptr,
+      $opts{message} // '',
+    );
+  }
+  else {
+    check_rc Git::Libgit2::FFI::git_reference_create(
+      \$ref, $self->_handle, $name, $oid->ptr,
+      $opts{force} ? 1 : 0,
+      $opts{message} // '',
+    );
+  }
   return Git::Native::Reference->new( _handle => $ref, _owner => $self );
+}
+
+sub reference_set_target {
+  my ( $self, $name, $oid, %opts ) = @_;
+  Carp::croak 'reference_set_target requires expected_old'
+    unless exists $opts{expected_old} && defined $opts{expected_old};
+  $oid = Git::Native::Oid->from_hex($oid) if !ref $oid;
+  my $expected = $opts{expected_old};
+  $expected = Git::Native::Oid->from_hex($expected) if !ref $expected;
+
+  my $current = $self->reference($name);
+  my $actual  = $current->target;
+  Carp::croak "reference_set_target requires a direct reference: $name"
+    unless $actual;
+  if ( $actual->hex ne $expected->hex ) {
+    Git::Native::Error->throw(
+      code    => GIT_EMODIFIED,
+      message => "reference '$name' does not match expected old OID",
+    );
+  }
+
+  return $current->set_target( $oid, message => $opts{message} // '' );
 }
 
 sub reference_delete {
@@ -164,6 +211,33 @@ sub commit {
   return Git::Native::Commit->new( _handle => $c, _owner => $self );
 }
 
+# object($oid): look up an object of unknown kind and return the matching
+# typed wrapper (Blob / Tree / Commit / Tag). git_blob_free/git_commit_free/
+# git_tree_free/git_tag_free are all thin wrappers that call git_object_free
+# (stable across libgit2 1.x), so it's safe to hold the git_object* handle in
+# a typed wrapper whose DEMOLISH calls the type-specific free.
+my %_OBJECT_WRAPPER = (
+  GIT_OBJECT_BLOB()   => 'Git::Native::Blob',
+  GIT_OBJECT_TREE()   => 'Git::Native::Tree',
+  GIT_OBJECT_COMMIT() => 'Git::Native::Commit',
+  GIT_OBJECT_TAG()    => 'Git::Native::Tag',
+);
+
+sub object {
+  my ( $self, $oid ) = @_;
+  $oid = Git::Native::Oid->from_hex($oid) if !ref $oid;
+  check_rc Git::Libgit2::FFI::git_object_lookup(
+    \my $obj, $self->_handle, $oid->ptr, GIT_OBJECT_ANY,
+  );
+  my $type  = Git::Libgit2::FFI::git_object_type($obj);
+  my $class = $_OBJECT_WRAPPER{$type};
+  unless ($class) {
+    Git::Libgit2::FFI::git_object_free($obj);
+    Carp::croak "object: unexpected git object type $type for $oid";
+  }
+  return $class->new( _handle => $obj, _owner => $self );
+}
+
 # commit_create(%args): tree => Oid|hex, parents => [Oid|hex, ...],
 # message => str, update_ref => 'HEAD', author => Signature, committer => Signature
 sub commit_create {
@@ -194,7 +268,8 @@ sub commit_create {
 
   # Build a parents-array pointer if non-empty.
   # FFI::Platypus 2: we declared parents as 'opaque' — accepting NULL or a pointer.
-  # To pass an array we need a temporary buffer of pointers. For MVP, support 0..1 parent.
+  # The non-empty branch packs ALL parent handles into a pointer array, so
+  # any parent count works (0 roots, 1 normal, 2+ merge commits — see t/48).
   if ( @parent_handles == 0 ) {
     check_rc Git::Libgit2::FFI::git_commit_create(
       $oid_p, $self->_handle, $args{update_ref},
@@ -275,6 +350,13 @@ sub config_snapshot {
 sub config_string {
   my ( $self, $key ) = @_;
   return $self->config_snapshot->get_string($key);
+}
+
+# Convenience: read one key as a git-style boolean off a fresh snapshot.
+# undef when unset; Git::Native::Error on a non-boolean value.
+sub config_bool {
+  my ( $self, $key ) = @_;
+  return $self->config_snapshot->get_bool($key);
 }
 
 # ---------- revwalk ----------
@@ -484,7 +566,7 @@ Git::Native::Repository - A libgit2 repository handle
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -507,6 +589,41 @@ version 0.003
 
 The main entry point for working with a Git repository through
 L<Git::Native>. Wraps C<git_repository*>; freed automatically.
+
+=head2 reference_create
+
+  my $ref = $repo->reference_create(
+    'refs/heads/main', $new_oid,
+    expected_old => $old_oid,
+  );
+
+Create or update a direct reference. C<force> and C<message> retain their
+usual meaning for unconditional calls. Supplying C<expected_old> makes the
+update compare-and-swap: the write succeeds only while the reference points
+to that OID, otherwise it throws a L<Git::Native::Error> for which
+C<is_not_matched> is true. An explicit C<expected_old =E<gt> undef> requires
+the reference to be absent and creates it atomically.
+
+This path requires L<Git::Libgit2> to bind
+C<git_reference_create_matching>. If it does not, the method throws an
+actionable function-not-bound error instead of attempting an unavailable FFI
+call.
+
+=head2 reference_set_target
+
+  my $ref = $repo->reference_set_target(
+    'refs/heads/main', $new_oid,
+    expected_old => $old_oid,
+  );
+
+Atomically update an existing direct reference by name. C<expected_old> is
+required. A stale expected OID throws a L<Git::Native::Error> for which
+C<is_not_matched> is true and leaves the reference unchanged.
+
+libgit2 does not provide a C<git_reference_set_target_matching> function.
+This method looks up the reference, checks the caller's expected OID, then
+uses C<git_reference_set_target>, which atomically guards its write against
+the OID in that looked-up reference.
 
 =head1 SUPPORT
 

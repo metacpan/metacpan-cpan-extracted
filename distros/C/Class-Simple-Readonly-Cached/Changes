@@ -1,5 +1,140 @@
 Revision history for Class::Simple::Readonly::Cached
 
+0.13 Sun Aug  9 07:57:25 PM EDT 2026
+	[ Bug Fixes ]
+	- Bump minimum Params::Get
+	  Fixes https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues/12
+	- @ISA is now intentionally empty; was ('Class::Simple'), which caused
+	  Class::Simple's AUTOLOAD to install permanent method globs that bypassed
+	  the caching AUTOLOAD, silently breaking caching for any accessor that had
+	  previously been called on a bare Class::Simple instance
+	- Use Carp::croak()/Carp::carp() fully-qualified (not imported aliases) so
+	  that Test::Carp's runtime glob overrides intercept them correctly
+	- Fix DESTROY to delete $cached{$self->{object}} on wrapper teardown,
+	  preventing a reference leak in long-running processes; also escape the
+	  class name with \Q\E in the hash-key grep pattern
+	- Fix can() and isa() to guard against freed inner object during global
+	  destruction ($self->{object} may no longer be a ref)
+	- Resolve FIXME in new(): strip 'cache' and 'quiet' from %inner before
+	  passing remaining params to Class::Simple->new(), preventing those
+	  wrapper-only keys from leaking into the inner object's attribute hash
+	[ Enhancements ]
+	- Added test dashboard
+	- Extract _cache_get, _cache_set, and _can_fixate as Sub::Private private
+	  helpers; removes all bare die $key calls from AUTOLOAD
+	- Add Readonly constants $UNDEF_SENTINEL and $CHI_NEVER to replace magic
+	  strings scattered through the code
+	- Add t/locales.t: geographic tests via Locale::Country::Multilingual
+	  (concurrent instances, case-sensitive key storage, French lookups) and
+	  POSIX locale tests verifying croak messages are locale-independent
+	- Full POD for all public methods: API SPECIFICATION, MESSAGES, FORMAL
+	  SPECIFICATION, PSEUDOCODE (new), and EXAMPLE sections; add LIMITATIONS
+	- Add runtime dependencies: List::Util >= 1.33, Readonly, Scalar::Util,
+	  Sub::Private
+	- Replace _cache_get/_cache_set private subs with _build_cache_accessors:
+	  backend-specific _get/_set coderefs are now created once at construction
+	  time, eliminating a Sub::Private caller() stack check plus a ref($cache)
+	  call on every AUTOLOAD dispatch (significant for the HASH backend)
+	- Pre-compute _class = ref($self) in new(); key construction in AUTOLOAD
+	  no longer calls ref($self) on every dispatch
+	- Gate grep+join in key construction behind "if @_"; zero-argument getter
+	  calls (the most common pattern) now skip the temporary-list allocation
+	  entirely
+	- Hoist wantarray to $wantlist at AUTOLOAD entry; was called 3-4 times
+	  per miss path
+	- Replace map/grep/keys loop for %inner filtering in new() with a hash
+	  copy plus delete-slice: one allocation, two O(1) deletes
+	- Use destructuring assignment for caller(0) in new(); avoids constructing
+	  a 10-element @caller array when only fields 1 and 2 are needed
+	- Refactor can() from a nested ternary chain to explicit guard clauses with
+	  syllogistic premise/conclusion comments
+	- Refactor isa() to guard-clause style; document that $class eq ref($self)
+	  is an intentional O(1) fast path, not dead code redundant with SUPER::isa
+	- Add premise/conclusion comments to all three AUTOLOAD cache-hit exits and
+	  both miss-path branches to make the mutual-exclusion invariant explicit
+	- Extend new() FORMAL SPECIFICATION with post-construction invariants:
+	  W._class, W._cache_is_hash, W._get, W._set; add clone corollary
+	- Update AUTOLOAD POD to document the three mutually exclusive cached-value
+	  forms (ARRAY ref / UNDEF_SENTINEL / plain scalar) and the scalar-then-list
+	  fall-through behaviour
+	- t/carp.t: add cache=>[] (ARRAY ref) equivalence-partition test; proves the
+	  cache-validation guard rejects all non-HASH refs, not only scalar refs
+	- t/lcm.t: load Class::Simple::Readonly::Cached at compile time to prevent
+	  Sub::Private's CHECK block from firing too late under prove
+	- Add t/unit.t: 28-subtest black-box unit suite driven strictly by the POD
+	  API; uses Test::Mockingbird (spy/mock), Test::Returns (returns_is), and a
+	  ledger hash that tracks every documented message and return state, asserting
+	  the ledger is empty at the end; inline UnitTest::Inner, UnitTest::BadCacheObj,
+	  and UnitTest::ChiLike packages give full control over inner-object and
+	  cache-backend behaviour; spy on UnitTest::Inner::scalar_val verifies inner
+	  method is called exactly once on miss and zero additional times on hit;
+	  spy on UnitTest::ChiLike::purge verifies purge() is called on CHI DESTROY
+	- Add t/function.t: 29-subtest white-box suite for internal helpers and
+	  data-structure invariants; directly calls _can_fixate (all 6 equivalence
+	  partitions: empty/plain/unblessed-ref/blessed/GLOB/$_ preservation) and
+	  _build_cache_accessors (hash and CHI backends: field types, read/write
+	  correctness, 'never' expiry); uses Test::Memory::Cycle to confirm closures
+	  capture $c not $self (no circular reference); verifies exact cache key byte
+	  format for all arg combinations; tests DESTROY prefix filtering and
+	  undef-cache guard; tests state() live-ref semantics; uses spy on
+	  Data::Reuse::fixate to verify fixate is called for safe lists and skipped
+	  for lists containing blessed objects
+	- Add t/integration.t: 24-subtest black-box end-to-end suite; covers
+	  multi-instance hash isolation, shared-backend key-collision documentation,
+	  state tracking, argument-differentiated keys, scalar/list context mismatch,
+	  undef sentinel, stale-cache limitation, DESTROY lifecycle (local %cached
+	  inside inner scope ensures GC fires synchronously), DESTROY with shared hash
+	  (all class-prefix keys cleared), clone semantics (shared vs. overridden
+	  cache), object() bypass, can()/isa() delegation through inner class
+	  hierarchy, double-wrap quiet/warning, duck-typed CHI backend, CHI DESTROY
+	  purge(), no-object auto-creation, Data::Reuse::fixate spy on miss vs. hit,
+	  CHI-independence proof via @INC blocker, and real CHI::Memory lifecycle
+	- Add t/extended_tests.t: 19-subtest suite targeting previously uncovered
+	  execution paths to maximise LCSAJ/TER3 branch coverage; covers: can()
+	  !ref($self->{object}) freed-inner fallback; class-level can() for state/
+	  can/isa; isa() class-level !!() short-circuit; isa() freed-inner !!()
+	  path; DESTROY skip-registry-delete guard; DESTROY stats preservation;
+	  new() extra-kwarg forwarding and cache/quiet filtering; list-(undef) hash
+	  backend stored as [undef] vs SENTINEL; scalar-context ARRAY hit returning
+	  [-1]; miss count = 2 after scalar-then-list fallthrough; ARRAY overwrite
+	  of scalar entry; post-DESTROY re-usability; no-arg clone // {} fallback;
+	  non-cache clone param skips _build_cache_accessors; empty-list SENTINEL
+	  storage; can()/isa() multi-level hierarchy delegation
+	- Add t/mutant_killers.t: 6-subtest mutation-test suite killing all 4 MEDIUM
+	  and 3 LOW survivors from xt/mutant_20260809_032457.t; covers COND_INV_214_3
+	  (clone cache-override writes to new cache, not old), BOOL_NEGATE_243_4 /
+	  RETURN_UNDEF_243_4 (double-wrap returns original wrapper, not !ref or undef),
+	  BOOL_NEGATE_397_2 / RETURN_UNDEF_397_2 (can("new") returns exact CODE ref),
+	  BOOL_NEGATE_500_2 / RETURN_UNDEF_500_2 (_can_fixate truthy for safe lists,
+	  falsy for blessed/GLOB, and integration spy confirms fixate is called)
+	- Add t/edge_cases.t: 32-subtest destructive/boundary/security suite; covers
+	  coderef/GLOB/partial-CHI cache rejection, circular-reference inner object
+	  acceptance, empty-string arg key collision (documented limitation), "0" arg
+	  key distinctness, 64 KiB arg handling, overloaded-stringify arg in cache
+	  key, string/hash-ref/blessed exception propagation through AUTOLOAD,
+	  no-cache-on-exception invariant, $_ regression guard (scalar/list/hit-path),
+	  falsy-but-defined returns (0/""/0), CHI get()/set() die propagation,
+	  can(undef)/isa(undef)/isa("UNIVERSAL") hostile args, void-context dispatch,
+	  UNDEF_SENTINEL spoofing (TODO: known bug), 1000-entry cache-flooding stress
+	  test, and blessed-object-in-list skips fixate (RT#100461)
+	[ Security ]
+	- Replace all string eval() with block eval{} in test files (t/noplan.t,
+	  t/pod-cm.t, t/pod-spelling.t, t/noopentickets.t): string eval runs the
+	  full Perl parser and becomes a code-injection vector if a variable is ever
+	  interpolated; block eval is strictly equivalent for fixed module loads
+	- Replace hardcoded /tmp/my-cache path in new() POD EXAMPLE with
+	  File::Temp::tempdir(CLEANUP=>1): predictable /tmp paths are vulnerable to
+	  symlink attacks and world-readable by default; File::Temp generates a
+	  mode-0700 directory with a random suffix
+	- Add t/cgi_security.t: 18-subtest CGI penetration suite simulating hostile
+	  HTTP inputs (XSS, CRLF injection, shell metacharacters, null bytes, path
+	  traversal, cache flooding, oversized args, invalid constructor params);
+	  confirms CSRC is transparent/safe for vectors it doesn't own and documents
+	  two undocumented bugs as TODO: UNDEF_SENTINEL spoofing (inner object
+	  returning the sentinel string is silently coerced to undef on cache hit)
+	  and clone stats bleed (_hits/_misses are shallow-copied so concurrent
+	  request-scoped clones share stat hashes under mod_perl/Plack)
+
 0.12	Fri Jun 27 07:23:32 EDT 2025
 	Use Data::Reuse, but note RT#100461
 	Cache routines that return undef

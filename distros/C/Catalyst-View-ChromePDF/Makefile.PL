@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "MooseX::Aliases" => 0,
     "Path::Tiny" => 0,
     "Scalar::Util" => 0,
+    "Try::Tiny" => 0,
     "Types::Common" => 0,
     "WWW::Mechanize::Chrome" => 0,
     "experimental" => 0,
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -82,6 +83,7 @@ my %FallbackPrereqs = (
   "Test::Deep" => 0,
   "Test::Log::Dispatch" => 0,
   "Test::More" => 0,
+  "Try::Tiny" => 0,
   "Types::Common" => 0,
   "WWW::Mechanize::Chrome" => 0,
   "experimental" => 0,

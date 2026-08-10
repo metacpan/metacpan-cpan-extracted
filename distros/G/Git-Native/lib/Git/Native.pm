@@ -1,11 +1,12 @@
 # ABSTRACT: Native Git for Perl via libgit2 (FFI, no fork/exec)
 
 package Git::Native;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use Carp ();
-use Git::Libgit2 qw( init_lib check_rc GIT_REPOSITORY_INIT_BARE );
+use Git::Libgit2 qw( init_lib GIT_REPOSITORY_INIT_BARE );
 use Git::Libgit2::FFI ();
+use Git::Native::Error qw( check_rc );
 use Git::Native::Repository ();
 use FFI::Platypus::Buffer qw( scalar_to_buffer );
 
@@ -109,7 +110,7 @@ Git::Native - Native Git for Perl via libgit2 (FFI, no fork/exec)
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

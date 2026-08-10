@@ -21,10 +21,22 @@ my $dir = tempdir(CLEANUP => 1);
 
 # Run $code in a child perl that has this build of Stats::LikeR loaded, and
 # return everything it printed to fd 1.
+#
+# The program goes in a file rather than in -e. Windows has no argv: the list
+# form of open flattens to a single command line, and perl's quoting there
+# neither escapes embedded double quotes nor protects | & > from the shell.
+# Snippets below need all of those, and on -e they arrive at the child torn
+# apart at the spaces. A file name survives quoting intact.
+my $child_no = 0;
 sub child_stdout {
 	my ($code) = @_;
+	my $script = "$dir/child_" . ++$child_no . ".pl";
+	open my $fh, '>', $script or die "cannot write $script: $!";
+	print {$fh} "use Stats::LikeR;\n", $code, "\n";
+	close $fh or die "cannot write $script: $!";
+
 	my @inc = map { "-I$_" } grep { !ref $_ } @INC;
-	open my $ph, '-|', $^X, @inc, '-MStats::LikeR', '-e', $code
+	open my $ph, '-|', $^X, @inc, $script
 		or die "cannot run a child perl: $!";
 	my $out = do { local $/; <$ph> };
 	close $ph;

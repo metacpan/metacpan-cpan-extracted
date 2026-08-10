@@ -15,7 +15,7 @@ use Carp;
 use Digest::SHA3;
 use Lingua::famibeib::Word;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my @_word_mora = qw(
     ba be bi bo bu
@@ -184,7 +184,7 @@ Lingua::famibeib::NameGenerator - module to generate proper famibeib names
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

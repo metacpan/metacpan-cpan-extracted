@@ -3,12 +3,12 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: BATsh
-version: 0.10
+version: 0.11
 abstract: Bilingual Shell for cmd.exe and bash in one script
 author:
   - ina <ina.cpan@gmail.com>
 license: perl
-generated_by: pmake.bat version 0.46
+generated_by: pmake.bat version 0.49
 configure_requires:
   ExtUtils::MakeMaker: 5.4302
 requires:
@@ -19,25 +19,36 @@ requires:
   File::Spec: 0
   FindBin: 1.42
   perl: 5.00503
+build_requires:
+  Cwd: 0
+  Exporter: 0
+  File::Basename: 2.6
+  File::Find: 0
 recommends:
   Cwd: 0
   POSIX: 0
 minimum_perl_version: 5.00503
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - doc
 provides:
   BATsh:
     file: lib/BATsh.pm
-    version: 0.10
+    version: 0.11
   BATsh::CMD:
     file: lib/BATsh/CMD.pm
-    version: 0.10
+    version: 0.11
   BATsh::Env:
     file: lib/BATsh/Env.pm
-    version: 0.10
+    version: 0.11
   BATsh::MB:
     file: lib/BATsh/MB.pm
-    version: 0.10
+    version: 0.11
   BATsh::SH:
     file: lib/BATsh/SH.pm
-    version: 0.10
+    version: 0.11
 resources:
   license: http://dev.perl.org/licenses/

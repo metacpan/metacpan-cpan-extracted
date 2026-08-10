@@ -67,12 +67,15 @@ PGPLOT::pgsci(7);
 PGPLOT::pgptxt(12125,12100,45,0.5,'PGPLOT...');
 
 PGPLOT::pgqinf("CURSOR",my $ans,my $l);
+# x/y are input/output for pgband: they set the initial cursor position,
+# so initialise them (and let the position carry over between modes)
+my ($x,$y,$ch) = (12500,12500,'');
 if ($ans eq "YES") { for(my $mode=0; $mode<8; $mode++){
 
    note "Entering interactive PGBAND test MODE=$mode, hit any key, Q to exit early...";
 
    PGPLOT::pgsci($mode+1);
-   PGPLOT::pgband($mode,0,12500,12500,my $x,my $y,my $ch);
+   PGPLOT::pgband($mode,0,12500,12500,$x,$y,$ch);
    last if $ch eq "q" || $ch eq "Q";
    PGPLOT::pgqtxt($x,$y,45,0.5,'PGPLOT...',\@xbox,\@ybox);
    PGPLOT::pgpoly(4,\@xbox, \@ybox);

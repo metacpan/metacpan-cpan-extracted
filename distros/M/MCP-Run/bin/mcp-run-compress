@@ -341,7 +341,7 @@ mcp-run-compress - Wrap a shell command through MCP::Run::Compress for LLM-frien
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 SYNOPSIS
 

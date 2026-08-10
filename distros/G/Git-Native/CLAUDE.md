@@ -14,7 +14,8 @@ consumers see. Name contrasts deliberately with `Git::Wrapper` and
 Git::Native               ->open / ->init($path, bare =>?, initial_branch =>?) / ->clone($url, $path)
 
 Git::Native::Repository   workdir, gitdir, is_bare
-                          ->config, ->reference($name), ->reference_names(glob =>)
+                          ->config / ->config_snapshot / ->config_string($k) / ->config_bool($k)
+                          ->reference($name), ->reference_names(glob =>)
                           ->reference_create / ->reference_delete / ->reference_exists
                           ->reference_symbolic_create($name, $target, force =>?, message =>?)
                           ->head -> Reference|undef / ->head_unborn / ->head_detached
@@ -64,6 +65,9 @@ Git::Native::Tag          ->name / ->message / ->target_id   (annotated only)
 Git::Native::Signature    name, email, when
 Git::Native::Oid          stringify hex, ->raw (20B), ->short(7)
 Git::Native::Error        isa Throwable::Error; code, klass, message
+                          is_not_found / is_exists / is_auth / is_certificate /
+                          is_conflict / is_not_fast_forward / is_unborn_branch / is_invalid_spec
+                          check_rc (exported) wraps Git::Libgit2::Error
 ```
 
 ## Memory Ownership
@@ -75,10 +79,19 @@ outlives the child - no use-after-free.
 
 ## Error Handling
 
-Every FFI call with an `int` return code goes through `_check($rc)` in
-`Git::Libgit2`. On negative rc, the C error string is fetched via
-`Git::Libgit2::Error->last`, then re-thrown as a `Git::Native::Error`
-(Throwable). No raw libgit2 codes leak above this layer.
+Every FFI call with an `int` return code goes through `check_rc($rc)`,
+which lives in **`Git::Native::Error`** (every wrapper imports it from there,
+NOT from `Git::Libgit2`). On negative rc it pulls libgit2's thread-local
+error via `Git::Libgit2::Error->last` and re-throws it as a Throwable
+`Git::Native::Error` (`code` / `klass` / `message`). No low-level
+`Git::Libgit2::Error` leaks above this layer - `t/46-error-paths.t` asserts
+exactly that on real lookups and a symbolic-ref mutator.
+
+For branching on the failure kind, `code` is the discriminator: use the
+curated `is_*` predicates (`is_not_found`, `is_auth`, `is_certificate`, ...)
+or compare `->code` against the `GIT_E*` constants exported by `Git::Libgit2`.
+`klass` (the `git_error_t` category) is decoded by `Git::Libgit2 0.005`
+and is a secondary signal, not the primary discriminator.
 
 ## Phase 4 - Network + Auth
 
@@ -134,6 +147,23 @@ is set. CI sets the HTTPS URL to a public repo so every push exercises
 the real TLS + ref-listing path. SSH and token-auth need operator-set
 env vars locally.
 
+Pure-logic helpers that reimplement git semantics in Perl get their own
+network-free unit tests, so a regression shows up without a live remote:
+`t/43-known-hosts.t` (known_hosts host-field matching), `t/44-push-refspec-expand.t`
+(`Remote::_expand_push_refspecs` — libgit2 doesn't expand push wildcards,
+we do). `t/45-oid.t` pins the `Git::Native::Oid` value contract (hex<->raw,
+`short`, and the `""`/`eq` overloads — `eq` must match an Oid's hex string).
+
+`t/46-error-paths.t` is the contract test for Error Handling above: it
+catches REAL libgit2 failures (missing ref/oid lookups, set_target on a
+symbolic ref) and asserts they arrive as a Throwable `Git::Native::Error`
+with a negative code, never a leaked `Git::Libgit2::Error`. `t/47-object.t`
+covers `Repository->object` dispatch to each typed wrapper;
+`t/48-merge-commit.t` builds a real 2-parent merge (the `commit_create`
+N-parent path). Status (`t/33`), revwalk (`t/30`), branch `is_head` (`t/31`),
+detached HEAD (`t/37`) and fetch `--prune` (`t/20`) were widened from a
+single happy path toward error and edge cases.
+
 ## Phase 5 - General-purpose Surface
 
 Past karr's MVP. Quirks:
@@ -153,3 +183,20 @@ Past karr's MVP. Quirks:
   `git_diff_file` layout, which grew an extra field in 1.7.
 - **`tag_names()` walks a `git_strarray` via `unpack`** (16 bytes:
   pointer + count). Stable layout since 1.0.
+
+## Delegation
+
+Delegate behavior-relevant code to the right agent instead of touching it yourself —
+principle and lane are in `.claude/rules/git-native-rules.md`.
+
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug general local-repo wrappers | `git-native-worker` (default) |
+| Remote / Credential / clone / fetch / push / FFI struct margins / live network | `git-native-network-worker` |
+| clone / status / tag / tag_names / refname / head / branch (Phase 5 surface) | `git-native-phase5-worker` |
+| Write / extend tests | `git-native-test-writer` |
+| Pre-release audit (CPAN) | `git-native-release-checker` |
+
+The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
+agent delegates rather than loading them. Skill sources live under `.claude/skills/`,
+shared skills are hardlinked from `~/dev/perl/shared-skills/` and `~/dev/shared-skills/`.

@@ -14,6 +14,8 @@ lib/Tie/Google/Sheets/Client.pm
 lib/Tie/Google/Sheets/Worksheet.pm
 perlcriticrc
 t/00_diag.t
+t/errors.t
+t/integration.t
 t/lib/Local/FakeSheetsUA.pm
 t/service_account_auth.t
 t/tie_google_sheets.t

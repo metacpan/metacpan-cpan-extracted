@@ -32,6 +32,15 @@ my $rc_get = Git::Libgit2::FFI::git_config_get_string( $name_out, $config, 'user
 # rc < 0 means error; a segfault here means the library is unstable for this pattern
 ok( $rc_get < 0 || $rc_get == 0, 'git_config_get_string returned (rc=' . $rc_get . ')' );
 
+# --- git_config_get_bool (read off a snapshot, the safe read path) ---
+check_rc Git::Libgit2::FFI::git_config_set_string( $config, 'core.flag', 'true' );
+my $snap;
+check_rc Git::Libgit2::FFI::git_config_snapshot( \$snap, $config );
+my $rc_bool = Git::Libgit2::FFI::git_config_get_bool( \my $bool, $snap, 'core.flag' );
+is( $rc_bool, 0, 'git_config_get_bool succeeded (rc=' . $rc_bool . ')' );
+ok( $bool, "git_config_get_bool parsed 'true' as truthy" );
+Git::Libgit2::FFI::git_config_free($snap);
+
 # --- git_config_free ---
 Git::Libgit2::FFI::git_config_free($config);
 

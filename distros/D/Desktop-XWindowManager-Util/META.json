@@ -57,7 +57,7 @@
    "provides" : {
       "Desktop::XWindowManager::Util" : {
          "file" : "lib/Desktop/XWindowManager/Util.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-Desktop-XWindowManager-Util"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

@@ -3,7 +3,9 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Query for modal and scalar musical functions
 
-our $VERSION = '0.0504';
+our $VERSION = '0.0600';
+
+use feature 'state';
 
 use strictures 2;
 use AI::Prolog ();
@@ -26,22 +28,26 @@ has [qw(verbose use_scales hash_results)] => (
 );
 
 has _chord_key => (
-    is      => 'ro',
-    default => sub { [qw(method chord_note chord key_note key key_function key_roman)] },
+    is       => 'ro',
+    init_arg => undef,
+    default  => sub { [qw(method chord_note chord key_note key key_function key_roman)] },
 );
 
 has _pivot_chord_keys => (
-    is      => 'ro',
-    default => sub { [qw(method chord_note chord mode_note mode mode_function mode_roman key_note key key_function key_roman)] },
+    is       => 'ro',
+    init_arg => undef,
+    default  => sub { [qw(method chord_note chord mode_note mode mode_function mode_roman key_note key key_function key_roman)] },
 );
 
 has _roman_key => (
-    is      => 'ro',
-    default => sub { [qw(method mode mode_roman key key_roman)] },
+    is       => 'ro',
+    init_arg => undef,
+    default  => sub { [qw(method mode mode_roman key key_roman)] },
 );
 
-has [qw(_modes _scales _database _prolog)] => (
-    is => 'lazy',
+has [qw(_modes _scales _database)] => (
+    is       => 'lazy',
+    init_arg => undef,
 );
 
 sub _build__modes {
@@ -177,6 +183,13 @@ sub _build__scales {
 
 sub _build__database {
     my ($self) = @_;
+    state %cache;
+    my $key = ref($self) . ':' . ($self->use_scales ? 'scales' : 'modes');
+    return $cache{$key} //= $self->_generate_database;
+}
+
+sub _generate_database {
+    my ($self) = @_;
 
     # consider every note
     my @chromatic = get_scale_notes('c', 'chromatic', 0, 'b');
@@ -186,7 +199,7 @@ sub _build__database {
 
     # build a prolog fact for each base note
     for my $base (@chromatic) {
-        my ($mode_base) = map { lc } midi_format($base);
+        my ($mode_base) = map { lc } midi_format(0, $base);
 
         # consider each mode or scale properties
         for my $item (sort keys %$list) {
@@ -200,7 +213,7 @@ sub _build__database {
             for my $note (@notes) {
                 my $n = Music::Note->new($note, 'isobase');
                 $n->en_eq('flat') if $note =~ /#/;
-                push @pitches, map { lc } midi_format($n->format('isobase'));
+                push @pitches, map { lc } midi_format(0, $n->format('isobase'));
             }
 
             my $i = 0; # increment
@@ -245,11 +258,6 @@ RULES
 #    warn "Database: $database\n" if $self->verbose;
 
     return $database;
-}
-
-sub _build__prolog {
-    my ($self) = @_;
-    return AI::Prolog->new($self->_database);
 }
 
 
@@ -298,13 +306,16 @@ sub _querydb {
 
     warn "$method query: $query\n" if $self->verbose;
 
-    $self->_prolog->query($query);
+    # A fresh engine per query avoids relying on AI::Prolog to fully reset
+    # its internal state between unrelated queries on a shared engine
+    my $prolog = AI::Prolog->new($self->_database);
+    $prolog->query($query);
 
     my $attr = '_' . $method;
 
     my @return;
 
-    while (my $result = $self->_prolog->results) {
+    while (my $result = $prolog->results) {
 #warn __PACKAGE__,' L',__LINE__,' ',,"R: @$result\n";
         if ($self->hash_results) {
             my %result;
@@ -333,7 +344,7 @@ Music::ModalFunction - Query for modal and scalar musical functions
 
 =head1 VERSION
 
-version 0.0504
+version 0.0600
 
 =head1 SYNOPSIS
 
@@ -541,11 +552,11 @@ is the write-up about using this module
 
 =head1 AUTHOR
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Gene Boggs.
+This software is Copyright (c) 2023-2026 by Gene Boggs.
 
 This is free software, licensed under:
 

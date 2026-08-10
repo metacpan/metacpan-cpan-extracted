@@ -48,7 +48,7 @@ use WebDyne::Util qw(:all);
 
 #  Version information
 #
-$VERSION='3.011';
+$VERSION='3.012';
 
 
 #  Check for supporting modules
@@ -236,18 +236,19 @@ sub request_mod_perl_postamble {
 
 
     
-    #  Might as well keep for reference
+    #  Kept for reference, but disabled for now.  WebDyne::Util::apache_startup()
+    #  already sets APACHE_TEST_ULIMIT_SET before Apache::TestRunPerl is loaded,
+    #  and this shell probe emits noisy stderr on restricted CPAN smoke hosts
+    #  where raising the core-file ulimit is not permitted.
     #
-    # Use the POSIX shell available on Alpine and other minimal systems;
-    # Bash is not required by WebDyne or Apache.
-    if (my $out = qx{sh -c 'ulimit -c unlimited 2>&1'}) {
-        my $rc  = $? >> 8;
-        if ($rc != 0) {
-            print STDERR "unable alter ulimit, stubbing Apache::TestRun::ulimit\n";
-            no warnings qw(once redefine);
-            *Apache::TestRun::set_ulimit=sub {};
-        }
-    }
+    # if (my $out = qx{sh -c 'ulimit -c unlimited 2>&1'}) {
+    #     my $rc  = $? >> 8;
+    #     if ($rc != 0) {
+    #         print STDERR "unable alter ulimit, stubbing Apache::TestRun::ulimit\n";
+    #         no warnings qw(once redefine);
+    #         *Apache::TestRun::set_ulimit=sub {};
+    #     }
+    # }
     
     
     #  Running on Mac ? Need to load mod_rewrite manually.

@@ -220,7 +220,9 @@ sub MM::postamble {
 SRC_DIR := doc
 TMP_DIR := $(SRC_DIR)/build
 PSP_DIR := $(SRC_DIR)/example
-PSP_FILES := $(shell find $(PSP_DIR) -type f -name '*.psp')
+# doc/example is intentionally developer-only and is not shipped in CPAN
+# tarballs, so guard the scan to keep install/smoke-test make invocations quiet.
+PSP_FILES := $(shell test -d $(PSP_DIR) && find $(PSP_DIR) -type f -name '*.psp')
 BIN_DOC_FILES := $(wildcard bin/*.md)
 LIB_DOC_FILES := $(shell find lib -type f -name '*.md' ! -name '._*' | sort)
 

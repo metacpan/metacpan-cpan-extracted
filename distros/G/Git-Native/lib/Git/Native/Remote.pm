@@ -3,11 +3,38 @@
 package Git::Native::Remote;
 use Moo;
 use Carp ();
-use Git::Libgit2 qw( check_rc );
 use Git::Libgit2::FFI ();
+use Git::Libgit2 qw( oid_to_hex );
+use Git::Native::Error qw( check_rc );
 use FFI::Platypus::Buffer qw( scalar_to_buffer );
 use FFI::Platypus::Memory qw( memcpy malloc free );
 use Git::Native::Credential ();
+use Git::Native::Remote::Result ();
+use MIME::Base64 qw( encode_base64 decode_base64 );
+use Digest::SHA qw( sha1 sha256 hmac_sha1 );
+
+# Register the per-ref callback types on the shared FFI instance. The types
+# libgit2 ships (git_credential_acquire_cb, git_transport_certificate_check_cb)
+# are declared in Git::Libgit2::FFI at module load; these two are new and only
+# used here, so we register them locally. `->type` errors on duplicate names —
+# guard with eval so re-entry (test isolation, re-require) is safe.
+{
+  my $ffi = Git::Libgit2::FFI::ffi();
+  # git_remote_callbacks.update_tips:
+  #   int (*)(const char *refname, const git_oid *a, const git_oid *b, void *data)
+  eval {
+    $ffi->type(
+      '(string, opaque, opaque, opaque)->int' => 'git_remote_update_tips_cb',
+    );
+  };
+  # git_remote_callbacks.push_update_reference:
+  #   int (*)(const char *refname, const char *status, void *data)
+  eval {
+    $ffi->type(
+      '(string, string, opaque)->int' => 'git_push_update_reference_cb',
+    );
+  };
+}
 
 # libgit2 1.5.x struct layouts (probed). 1.9.x add fields at the end of
 # git_remote_callbacks but the offsets up through `payload` are stable.
@@ -21,8 +48,28 @@ use constant {
   FETCH_OPTIONS_SIZE  => 384,   # actual 1.5: 208
   PUSH_OPTIONS_SIZE   => 384,   # actual 1.5: 192
 
-  CALLBACKS_CRED_OFFSET    => 24,   # credentials cb pointer
-  CALLBACKS_PAYLOAD_OFFSET => 104,  # payload void*
+  # git_remote_callbacks field offsets (1.5.x layout, probed). Fields are
+  # 8-byte fn pointers; the only non-pointer field is `version` (uint32 at
+  # offset 0, padded 4 bytes to align the pointers at offset 8). `update_tips`
+  # and `push_update_reference` are at offsets 48 and 72 respectively; both
+  # sit well before payload (104) so the 256-byte allocation has plenty of
+  # headroom for newer libgit2 that adds more fields after payload.
+  CALLBACKS_CRED_OFFSET              => 24,   # credentials cb pointer
+  CALLBACKS_CERTCHECK_OFFSET         => 32,   # certificate_check cb pointer
+  CALLBACKS_UPDATE_TIPS_OFFSET       => 48,   # update_tips cb pointer
+  CALLBACKS_PUSH_UPDATE_REF_OFFSET   => 72,   # push_update_reference cb pointer
+  CALLBACKS_PAYLOAD_OFFSET           => 104,  # payload void*
+
+  # git_cert_t (cert.cert_type @ offset 0)
+  GIT_CERT_X509            => 1,
+  GIT_CERT_HOSTKEY_LIBSSH2 => 2,
+
+  # git_cert_hostkey field offsets + git_cert_ssh_t bits (1.5.x layout)
+  CERT_HOSTKEY_TYPE_OFFSET   => 4,    # git_cert_ssh_t bitmask (which hashes set)
+  CERT_HOSTKEY_SHA1_OFFSET   => 24,   # hash_sha1[20]
+  CERT_HOSTKEY_SHA256_OFFSET => 44,   # hash_sha256[32]
+  GIT_CERT_SSH_SHA1   => 2,
+  GIT_CERT_SSH_SHA256 => 4,
 
   FETCH_OPTS_CALLBACKS_OFFSET => 8,    # callbacks struct (embedded)
   FETCH_OPTS_PRUNE_OFFSET     => 128,  # int (8 + 120)
@@ -49,23 +96,39 @@ sub name { Git::Libgit2::FFI::git_remote_name( $_[0]->_handle ) }
 
 # fetch(refspecs => [...], credentials => sub { ... }, prune => 0|1,
 #       reflog_message => '...')
+#
+# Returns a Git::Native::Remote::Result describing the per-ref outcomes.
+# libgit2 returns 0 even when refs were skipped as non-fast-forward — the
+# only way to learn about it is via the update_tips callback we install.
 sub fetch {
   my ( $self, %args ) = @_;
   my $refspecs_ref = $args{refspecs};
+
+  # The update_tips callback records each accepted local ref update.
+  my @updated;
+  my ( $tips_thunk, $tips_keep ) = _make_update_tips_thunk( \@updated );
+
   my ( $sa_ptr, $sa_keep ) = _build_strarray( $refspecs_ref );
 
-  my ( $opts_ptr, $opts_keep )
-    = _build_fetch_options( $args{credentials}, $args{prune} );
+  my ( $opts_ptr, $opts_keep ) = _build_fetch_options(
+    $args{credentials}, $args{prune}, $tips_thunk,
+  );
 
   my $rc = Git::Libgit2::FFI::git_remote_fetch(
     $self->_handle, $sa_ptr, $opts_ptr,
     $args{reflog_message} // 'fetch',
   );
   check_rc $rc;
-  return $self;
+
+  return Git::Native::Remote::Result->new( updated => \@updated );
 }
 
 # push(refspecs => [...], credentials => sub { ... }, prune => 0|1)
+#
+# Returns a Git::Native::Remote::Result. libgit2 returns 0 even when the
+# server rejected refs (pre-receive hook, protected ref, non-ff on a
+# non-forced refspec); the push_update_reference callback carries the
+# per-ref status the server sent.
 sub push {
   my ( $self, %args ) = @_;
   my $original_refspecs = $args{refspecs} // [];
@@ -82,16 +145,30 @@ sub push {
     CORE::push @$refspecs_ref, @delete;
   }
 
+  # Per-ref outcomes from push_update_reference. status == NULL is success,
+  # status == "" is server-reported success with no message, status != ""
+  # is a rejection message.
+  my @rejected;
+  my @updated;
+  my ( $push_thunk, $push_keep ) = _make_push_update_thunk(
+    \@rejected, \@updated,
+  );
+
   my ( $sa_ptr, $sa_keep ) = _build_strarray( $refspecs_ref );
 
-  my ( $opts_ptr, $opts_keep )
-    = _build_push_options( $args{credentials} );
+  my ( $opts_ptr, $opts_keep ) = _build_push_options(
+    $args{credentials}, $push_thunk,
+  );
 
   my $rc = Git::Libgit2::FFI::git_remote_push(
     $self->_handle, $sa_ptr, $opts_ptr,
   );
   check_rc $rc;
-  return $self;
+
+  return Git::Native::Remote::Result->new(
+    updated  => \@updated,
+    rejected => \@rejected,
+  );
 }
 
 # List the remote-side refs (requires connecting first). Returns an
@@ -143,6 +220,7 @@ sub _connect {
     memcpy( $cb_ptr + CALLBACKS_CRED_OFFSET, $pkt_p, 8 );
     CORE::push @keep, \$pkt;
   }
+  _install_certcheck( $cb_ptr, 0, \@keep );
   check_rc Git::Libgit2::FFI::git_remote_connect(
     $self->_handle, $direction, $cb_ptr, 0, 0,
   );
@@ -254,7 +332,7 @@ sub _build_strarray {
 }
 
 sub _build_fetch_options {
-  my ( $cred_cb, $prune ) = @_;
+  my ( $cred_cb, $prune, $update_tips_thunk ) = @_;
 
   my $opts = "\0" x FETCH_OPTIONS_SIZE;
   my ($opts_ptr) = scalar_to_buffer($opts);
@@ -279,6 +357,19 @@ sub _build_fetch_options {
     CORE::push @keep, \$cb_buf;
   }
 
+  _install_certcheck( $opts_ptr, FETCH_OPTS_CALLBACKS_OFFSET, \@keep );
+
+  if ($update_tips_thunk) {
+    my $ptr_val = Git::Libgit2::FFI::ffi->cast(
+      'git_remote_update_tips_cb' => 'opaque', $update_tips_thunk,
+    );
+    my $buf = pack 'J', $ptr_val;
+    my ($bp) = scalar_to_buffer($buf);
+    memcpy( $opts_ptr + FETCH_OPTS_CALLBACKS_OFFSET
+            + CALLBACKS_UPDATE_TIPS_OFFSET, $bp, 8 );
+    CORE::push @keep, \$buf;
+  }
+
   if ( defined $prune ) {
     my $val = $prune ? 1 : 2;   # 1 = PRUNE, 2 = NO_PRUNE
     my $pb  = pack 'l', $val;
@@ -291,7 +382,7 @@ sub _build_fetch_options {
 }
 
 sub _build_push_options {
-  my ($cred_cb) = @_;
+  my ( $cred_cb, $push_update_thunk ) = @_;
 
   my $opts = "\0" x PUSH_OPTIONS_SIZE;
   my ($opts_ptr) = scalar_to_buffer($opts);
@@ -313,6 +404,19 @@ sub _build_push_options {
     memcpy( $opts_ptr + PUSH_OPTS_CALLBACKS_OFFSET + CALLBACKS_CRED_OFFSET,
             $cb_buf_ptr, 8 );
     CORE::push @keep, \$cb_buf;
+  }
+
+  _install_certcheck( $opts_ptr, PUSH_OPTS_CALLBACKS_OFFSET, \@keep );
+
+  if ($push_update_thunk) {
+    my $ptr_val = Git::Libgit2::FFI::ffi->cast(
+      'git_push_update_reference_cb' => 'opaque', $push_update_thunk,
+    );
+    my $buf = pack 'J', $ptr_val;
+    my ($bp) = scalar_to_buffer($buf);
+    memcpy( $opts_ptr + PUSH_OPTS_CALLBACKS_OFFSET
+            + CALLBACKS_PUSH_UPDATE_REF_OFFSET, $bp, 8 );
+    CORE::push @keep, \$buf;
   }
 
   return ( $opts_ptr, \@keep );
@@ -359,6 +463,229 @@ sub _make_credential_thunk {
   return ( $closure, [ \$closure ] );
 }
 
+# Build the update_tips closure (git_remote_callbacks.update_tips).
+# Records each accepted ref update into the caller's $updated arrayref.
+#
+#   int cb(const char *refname, const git_oid *a, const git_oid *b, void *data)
+#
+# a is the old local tip; libgit2 passes a non-NULL pointer even when the
+# ref didn't exist locally (the bytes are zero-filled — a zero SHA-1).
+# We translate the all-zero "no previous ref" case to from => undef so
+# callers can tell new-ref from same-oid updates without a magic constant.
+# b is always the new local tip. Always returns 0 — returning non-zero
+# would abort the fetch.
+sub _make_update_tips_thunk {
+  my ($updated) = @_;
+  my $ffi = Git::Libgit2::FFI::ffi();
+  my $closure = $ffi->closure(sub {
+    my ( $refname, $a_ptr, $b_ptr, $payload ) = @_;
+
+    my $from = $a_ptr ? _oid_hex_if_nonzero($a_ptr) : undef;
+    my $to   = $b_ptr ? _oid_hex($b_ptr) : die
+      "update_tips callback got NULL b oid for ref '$refname'";
+    CORE::push @$updated, {
+      ref  => $refname,
+      from => $from,
+      to   => $to,
+    };
+    return 0;
+  });
+  return ( $closure, [ \$closure ] );
+}
+
+# Like _oid_hex, but returns undef when the 20 raw bytes are all zero
+# (libgit2's "no previous ref" sentinel for update_tips).
+sub _oid_hex_if_nonzero {
+  my ($ptr) = @_;
+  my $raw = _peek_bytes($ptr, 20);
+  return undef if $raw eq "\0" x 20;
+  return oid_to_hex($ptr);
+}
+
+# Build the push_update_reference closure (git_remote_callbacks.push_update_reference).
+# Records each ref the server accepted (status NULL or "") into $updated and
+# each rejected ref (status != NULL) into $rejected. status is the literal
+# message from the server (e.g. "non-fast-forward", "pre-receive hook declined").
+#
+#   int cb(const char *refname, const char *status, void *data)
+sub _make_push_update_thunk {
+  my ( $rejected, $updated ) = @_;
+  my $ffi = Git::Libgit2::FFI::ffi();
+  my $closure = $ffi->closure(sub {
+    my ( $refname, $status, $payload ) = @_;
+    if ( !defined $status ) {
+      # libgit2 normalises "no rejection" to NULL on the way in.
+      CORE::push @$updated, { ref => $refname, reason => '' };
+    }
+    elsif ( $status eq '' ) {
+      CORE::push @$updated, { ref => $refname, reason => '' };
+    }
+    else {
+      CORE::push @$rejected, { ref => $refname, reason => $status };
+    }
+    return 0;
+  });
+  return ( $closure, [ \$closure ] );
+}
+
+# Read a 20-byte git_oid out of a raw pointer and return its hex form.
+sub _oid_hex {
+  my ($ptr) = @_;
+  return oid_to_hex($ptr);
+}
+
+# ---------- host-key verification (certificate_check callback) ----------
+
+# Write a certificate_check closure into a callbacks struct. $cb_base is the
+# offset of the embedded git_remote_callbacks within $struct_ptr (0 for a
+# bare callbacks struct, 8 for fetch/push options). Pushes keepalives.
+#
+# libgit2 1.5.x + libssh2 has NO built-in known_hosts checking (that landed in
+# 1.7). Without a certificate_check callback the ssh transport rejects every
+# host with GIT_ECERTIFICATE (-17) "invalid or unknown remote ssh hostkey".
+# So we always install one and verify the hostkey against ~/.ssh/known_hosts
+# ourselves, mirroring what the `git` CLI does via OpenSSH.
+sub _install_certcheck {
+  my ( $struct_ptr, $cb_base, $keep ) = @_;
+  my ( $thunk, $thunk_keep ) = _make_certcheck_thunk();
+  CORE::push @$keep, @$thunk_keep;
+  my $ptr_val = Git::Libgit2::FFI::ffi->cast(
+    'git_transport_certificate_check_cb' => 'opaque', $thunk,
+  );
+  my $buf = pack 'J', $ptr_val;
+  my ($bp) = scalar_to_buffer($buf);
+  memcpy( $struct_ptr + $cb_base + CALLBACKS_CERTCHECK_OFFSET, $bp, 8 );
+  CORE::push @$keep, \$buf;
+  return;
+}
+
+# Build the certificate_check closure. Returns ($closure, $keepalive).
+#
+#   int cb(git_cert *cert, int valid, const char *host, void *payload)
+#
+# Return 0 to accept, <0 to reject (libgit2 aborts the connection with that
+# code). For TLS (git_cert_x509) we honour libgit2's own `valid` flag so HTTPS
+# remotes keep their normal CA validation. For SSH (git_cert_hostkey) we verify
+# against known_hosts unless GIT_NATIVE_SSH_INSECURE is set (accept-all).
+sub _make_certcheck_thunk {
+  my $ffi = Git::Libgit2::FFI::ffi();
+  my $closure = $ffi->closure(sub {
+    my ( $cert_ptr, $valid, $host, $payload ) = @_;
+    my $ok = eval {
+      my $cert_type = unpack 'l', _peek_bytes( $cert_ptr, 4 );
+      return $valid ? 1 : 0 if $cert_type == GIT_CERT_X509;
+      if ( $cert_type == GIT_CERT_HOSTKEY_LIBSSH2 ) {
+        return 1 if $ENV{GIT_NATIVE_SSH_INSECURE};
+        return _verify_known_host( $cert_ptr, $host );
+      }
+      # Unknown cert kind — fall back to libgit2's own verdict.
+      return $valid ? 1 : 0;
+    };
+    if ($@) {
+      warn "Git::Native certificate check died: $@";
+      return -1;
+    }
+    return $ok ? 0 : -1;
+  });
+  return ( $closure, [ \$closure ] );
+}
+
+# Verify an ssh hostkey against known_hosts using the SHA256 (preferred) or
+# SHA1 fingerprint libssh2 computed for the negotiated key. Returns 1 on a
+# match, 0 otherwise (with an actionable warning).
+sub _verify_known_host {
+  my ( $cert_ptr, $host ) = @_;
+  my $bits = unpack 'l', _peek_bytes( $cert_ptr + CERT_HOSTKEY_TYPE_OFFSET, 4 );
+
+  my ( $digest, $want );
+  if ( $bits & GIT_CERT_SSH_SHA256 ) {
+    $digest = 'sha256';
+    $want   = _peek_bytes( $cert_ptr + CERT_HOSTKEY_SHA256_OFFSET, 32 );
+  }
+  elsif ( $bits & GIT_CERT_SSH_SHA1 ) {
+    $digest = 'sha1';
+    $want   = _peek_bytes( $cert_ptr + CERT_HOSTKEY_SHA1_OFFSET, 20 );
+  }
+  else {
+    warn "Git::Native: ssh hostkey for '$host' offers no SHA1/SHA256 "
+       . "fingerprint to verify; rejecting\n";
+    return 0;
+  }
+
+  my ( $matched, $host_seen ) = _known_hosts_match( $host, $digest, $want );
+  return 1 if $matched;
+
+  if ($host_seen) {
+    warn "Git::Native: ssh hostkey for '$host' did NOT match the "
+       . "$host_seen known_hosts entr" . ( $host_seen == 1 ? 'y' : 'ies' )
+       . " for it — server offered a key type you have not cached, or the "
+       . "key changed. Run `ssh-keyscan $host >> ~/.ssh/known_hosts`, or set "
+       . "GIT_NATIVE_SSH_INSECURE=1 to bypass.\n";
+  }
+  else {
+    warn "Git::Native: ssh host '$host' is not in known_hosts. Run "
+       . "`ssh-keyscan $host >> ~/.ssh/known_hosts`, or set "
+       . "GIT_NATIVE_SSH_INSECURE=1 to bypass.\n";
+  }
+  return 0;
+}
+
+# Scan the known_hosts files for $host and compare the cached key's digest to
+# $want. Returns (matched, host_line_count): host_line_count distinguishes
+# "host unknown" from "host known but key mismatch".
+sub _known_hosts_match {
+  my ( $host, $digest, $want ) = @_;
+  my $host_seen = 0;
+  for my $file (
+    "$ENV{HOME}/.ssh/known_hosts",
+    "$ENV{HOME}/.ssh/known_hosts2",
+    '/etc/ssh/ssh_known_hosts',
+  ) {
+    next unless -r $file;
+    open my $fh, '<', $file or next;
+    while ( my $line = <$fh> ) {
+      $line =~ s/\A\s+//;
+      next if $line eq '' || $line =~ /\A[#\r\n]/;
+      my @parts = split ' ', $line;
+      my $marker = ( @parts && $parts[0] =~ /\A\@/ ) ? shift @parts : '';
+      next if @parts < 3;
+      next if $marker eq '@cert-authority' || $marker eq '@revoked';
+      my ( $hosts, undef, $key64 ) = @parts;
+      next unless _host_in_field( $host, $hosts );
+      $host_seen++;
+      my $blob = decode_base64($key64);
+      next unless length $blob;
+      my $got = $digest eq 'sha256' ? sha256($blob) : sha1($blob);
+      return ( 1, $host_seen ) if $got eq $want;
+    }
+    close $fh;
+  }
+  return ( 0, $host_seen );
+}
+
+# Does $host match a known_hosts host field? Handles hashed (|1|salt|hash via
+# HMAC-SHA1), plain comma lists, [host]:port, and * / ? wildcards.
+sub _host_in_field {
+  my ( $host, $field ) = @_;
+  if ( $field =~ /\A\|1\|([^|]+)\|(.+)\z/ ) {
+    my ( $salt64, $hash64 ) = ( $1, $2 );
+    my $got = encode_base64( hmac_sha1( $host, decode_base64($salt64) ), '' );
+    return $got eq $hash64;
+  }
+  for my $pat ( split /,/, $field ) {
+    next if $pat eq '';
+    $pat = $1 if $pat =~ /\A\[([^\]]+)\](?::\d+)?\z/;
+    return 1 if lc $pat eq lc $host;
+    if ( $pat =~ /[*?]/ ) {
+      my $re = quotemeta $pat;
+      $re =~ s/\\\*/.*/g;
+      $re =~ s/\\\?/./g;
+      return 1 if $host =~ /\A$re\z/i;
+    }
+  }
+  return 0;
+}
+
 sub DEMOLISH {
   my $self = shift;
   if ( my $h = $self->{_handle} ) {
@@ -380,7 +707,7 @@ Git::Native::Remote - A libgit2 remote (fetch / push)
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

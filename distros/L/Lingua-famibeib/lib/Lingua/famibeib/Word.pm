@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
 
@@ -78,6 +78,9 @@ sub new {
             if ($value->isa(__PACKAGE__)) {
                 # TODO: handle this when @opts are non-empty
                 return $value;
+            } elsif ($value->isa('Lingua::TokiPona::Word')) {
+                $type = 'string';
+                $value = 'to'.$value->as_string;
             } elsif ($value->isa('Data::Identifier') || $value->isa('Data::Identifier::Interface::Simple') || $value->isa('Data::URIID::Base')) {
                 my $id = $value->as('Data::Identifier');
                 my $generator = eval {$id->generator};
@@ -93,7 +96,7 @@ sub new {
                     if (defined(my $o = $_registered_by_uuid{$id->uuid})) {
                         if (scalar @opts) {
                             $type = 'string';
-                            $value = $o>as_string;
+                            $value = $o->as_string;
                             $self = $o;
                         } else {
                             return $o;
@@ -137,9 +140,18 @@ sub new {
     }
 
     if ($type eq 'string') {
+        if ($value =~ /[\s\.,\!\?]/) {
+            croak 'Multi word string passed. Consider using Lingua::famibeib::Text if this is what you wanted';
+        }
+
+        if ($value =~ /^to./i) {
+            require Lingua::famibeib::ForeignWord;
+            return Lingua::famibeib::ForeignWord->new(string => $value, @opts);
+        }
+
         $value = lc($value);
 
-        $value =~ s/^([bfklmst][aeiou])$/to$1al/;
+        $value =~ s/^([bfklmst][aeiou])$/tu$1al/;
 
         if ($value =~ /^[bfklmst][aeiou](?:[bfklmst][aeiou]|[aeiou][bfklmst])+\z/m) {
             my ($stem, $modifiers) = $value =~ /^((?:[bfklmst][aeiou])+)([aeiou][bfklmst].*)?\z/;
@@ -441,6 +453,33 @@ sub register {
     return $self;
 }
 
+
+sub natural_language {
+    my ($self) = @_;
+    return state $natural_language = Data::Identifier->new(uuid => '1d668738-8aef-4cb4-a4ed-9368e872a93f', tagname => 'famibeib')->register;
+}
+
+
+#@returns Lingua::famibeib::Prefix
+sub prefix {
+    my ($self, $size) = @_;
+    my $string = $self->as_string;
+    my $strlen = length($string) / 2;
+    my $prefix;
+
+    $size //= 1;
+
+    if ($size < 1) {
+        $size = $strlen + $size;
+        croak 'Bad length' unless $size > 0;
+    }
+
+    croak 'Bad length' if $size > $strlen;
+
+    require Lingua::famibeib::Prefix;
+    return Lingua::famibeib::Prefix->new(string => substr($string, 0, 2*$size));
+}
+
 # ---- Private helpers ----
 
 sub as {
@@ -467,6 +506,12 @@ sub as {
 sub displayname {
     my ($self, @opts) = @_;
     return $self->as_string if scalar(@opts) == 0;
+    { # work around us not always having a Data::Identifier (see Lingua::famibeib::ForeignWord)
+        my %x = @opts;
+        delete $x{default};
+        delete $x{no_defaults};
+        return $self->as_string if scalar(keys %x) == 0;
+    }
     return $self->as('Data::Identifier')->displayname(@opts);
 }
 
@@ -484,7 +529,7 @@ Lingua::famibeib::Word - module to interact with the famibeib words
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -729,6 +774,32 @@ If this word is not a stem itself it's stem is also registered.
 B<Note:>
 It is undefined (since v0.01) whether or not this will also register
 the corresponding L<Data::Identifier>.
+
+=head2 natural_language
+
+    my Data::Identifier $natural_language = $word->natural_language;
+
+(since v0.06)
+
+Returns the natural language this word is in.
+
+For famibeib words it will always return famibeib.
+However this method might be useful together with other modules from the C<Lingua> namespace.
+
+=head2 prefix
+
+    my Lingua::famibeib::Prefix $prefix = $word->prefix( [ $size ] );
+
+(since v0.06)
+
+Returns the L<Lingua::famibeib::Prefix> of the word.
+
+If C<$size> is given and positive it is the number of mora to include.
+If C<$size> is given and negative or zero it is how many less mora to include.
+
+If C<$size> is not given it defaults to one.
+
+All values but one are experimental (as of v0.06).
 
 =head1 AUTHOR
 

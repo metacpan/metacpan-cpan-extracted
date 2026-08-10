@@ -46,7 +46,10 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use Cwd ();
+use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
+
+use BATsh_TestOS qw(dir_marker in_marked_dir drop_marker tap_diag);
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 
@@ -183,15 +186,26 @@ my @tests = (
             'EL15: echo ~ yields the whole home directory in one word');
     },
 
+    # Landing is proved by a marker inside the test home, not by comparing
+    # two spellings of its pathname: cwd(), realpath() and the string given
+    # to chdir() need not agree on Win32 (separator direction, drive-letter
+    # case, 8.3 short names), and that comparison has already produced
+    # spurious FAILs elsewhere in this distribution.  See t/0020.
     sub {
         return _ok(1, 'EL16: skipped (cannot create the test home)')
             unless $HAVE_SPACEHOME;
+        my $mark = dir_marker($SPACEHOME, 'el16');
+        return _ok(1, 'EL16: skipped (test home cannot be marked)')
+            if $mark eq '';
         local $ENV{'HOME'} = $SPACEHOME;
         my $save = Cwd::cwd();
         _run('cd ~');
+        my $ok   = in_marked_dir($mark);
         my $here = Cwd::cwd();
-        my $ok = ($here eq $SPACEHOME) || ($here eq Cwd::realpath($SPACEHOME));
         chdir($save);
+        drop_marker($SPACEHOME, $mark);
+        tap_diag('EL16', "home=$SPACEHOME", "got=$here", "marker=$mark")
+            unless $ok;
         _ok($ok, 'EL16: cd ~ enters a home directory containing a space');
     },
 

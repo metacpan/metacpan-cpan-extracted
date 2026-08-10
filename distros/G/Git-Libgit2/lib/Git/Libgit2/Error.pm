@@ -1,7 +1,7 @@
 # ABSTRACT: Wraps git_error_last() into a Perl structure
 
 package Git::Libgit2::Error;
-our $VERSION = '0.002';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 use FFI::Platypus 2.00;
@@ -25,8 +25,12 @@ sub _decode {
   my $msg_ref  = $_decode_ffi->cast( 'opaque', 'opaque*', $err_ptr );
   my $msg_ptr  = ref $msg_ref ? $$msg_ref : $msg_ref;
   my $msg      = $msg_ptr ? $_decode_ffi->cast( 'opaque', 'string', $msg_ptr ) : '';
-  # klass field follows at sizeof(ptr); skipping for MVP — message is all we use.
-  return ( $msg, 0 );
+  # `int klass` follows the pointer at offset sizeof(void*) = 8 on the LP64
+  # platforms this distribution targets (the rest of the bindings assume 8
+  # too). Read the int living at that address.
+  my $klass_ref = $_decode_ffi->cast( 'opaque', 'int*', $err_ptr + 8 );
+  my $klass     = ref $klass_ref ? $$klass_ref : $klass_ref;
+  return ( $msg, $klass // 0 );
 }
 
 
@@ -77,7 +81,7 @@ Git::Libgit2::Error - Wraps git_error_last() into a Perl structure
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -111,8 +115,8 @@ The libgit2 return code that triggered this error.
 
     my $klass = $error->klass;
 
-The libgit2 error class (C<git_error_t> category). Currently always C<0> — the
-C<klass> field is not yet decoded from the C<git_error> struct.
+The libgit2 error class (C<git_error_t> category, e.g. config / reference /
+net), decoded from the C<int klass> field of the C<git_error> struct.
 
 =head2 message
 

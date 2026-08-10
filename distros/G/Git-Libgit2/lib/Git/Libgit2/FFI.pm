@@ -1,7 +1,7 @@
 # ABSTRACT: Internal FFI::Platypus instance for Git::Libgit2
 
 package Git::Libgit2::FFI;
-our $VERSION = '0.002';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 use FFI::Platypus 2.00;
@@ -47,6 +47,12 @@ sub ffi {
   # as a plain `opaque` (the pointer value). The Perl closure pokes the
   # allocated credential pointer into that address itself.
   $ffi->type( '(opaque, string, string, uint, opaque)->int' => 'git_credential_acquire_cb' );
+
+  # git_transport_certificate_check_cb signature.
+  # libgit2: int (*)(git_cert *cert, int valid, const char *host, void *payload)
+  # `cert` is passed as a plain `opaque` (pointer value); the Perl closure
+  # peeks the git_cert / git_cert_hostkey fields out of it directly.
+  $ffi->type( '(opaque, int, string, opaque)->int' => 'git_transport_certificate_check_cb' );
 
   # git_oid is a 20-byte struct, but for our MVP we pass it as opaque
   # buffer (string of 20 bytes) or as hex via _fromstr/_tostr.
@@ -106,6 +112,7 @@ sub _attach_all {
   _attach git_config_open_default => [ 'opaque*' ]                                 => 'int';
   _attach git_config_snapshot     => [ 'opaque*', 'git_config' ]                   => 'int';
   _attach git_config_get_string   => [ 'string*', 'git_config', 'string' ]         => 'int';
+  _attach git_config_get_bool     => [ 'int*', 'git_config', 'string' ]            => 'int';
   _attach git_config_set_string   => [ 'git_config', 'string', 'string' ]          => 'int';
   _attach git_config_free         => [ 'git_config' ]                              => 'void';
 
@@ -121,10 +128,11 @@ sub _attach_all {
   # Reference
   # ========================
 
-  _attach git_reference_lookup      => [ 'opaque*', 'git_repository', 'string' ]                                  => 'int';
-  _attach git_reference_name_to_id   => [ 'opaque', 'git_repository', 'string' ]                                => 'int';
-  _attach git_reference_create      => [ 'opaque*', 'git_repository', 'string', 'opaque', 'int', 'string' ]       => 'int';
-  _attach git_reference_delete      => [ 'git_reference' ]                                                        => 'int';
+  _attach git_reference_lookup          => [ 'opaque*', 'git_repository', 'string' ]                                           => 'int';
+  _attach git_reference_name_to_id      => [ 'opaque', 'git_repository', 'string' ]                                            => 'int';
+  _attach git_reference_create          => [ 'opaque*', 'git_repository', 'string', 'opaque', 'int', 'string' ]                  => 'int';
+  _attach git_reference_create_matching => [ 'opaque*', 'git_repository', 'string', 'opaque', 'int', 'opaque', 'string' ]        => 'int';
+  _attach git_reference_delete          => [ 'git_reference' ]                                                                 => 'int';
   _attach git_reference_remove      => [ 'git_repository', 'string' ]                                             => 'int';
   _attach git_reference_target      => [ 'git_reference' ]                                                        => 'opaque';
   _attach git_reference_name        => [ 'git_reference' ]                                                        => 'string';
@@ -479,7 +487,7 @@ Git::Libgit2::FFI - Internal FFI::Platypus instance for Git::Libgit2
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -662,6 +670,13 @@ Create a snapshot of a config. Free with C<git_config_free>.
 
 Read a string config value.
 
+=head2 git_config_get_bool
+
+    Git::Libgit2::FFI::git_config_get_bool(\my $bool, $config, $key);
+
+Read a config value as a boolean, parsed with libgit2's own rules
+(true/yes/on/1, false/no/off/0). C<$bool> is set to 1 or 0.
+
 =head2 git_config_set_string
 
     Git::Libgit2::FFI::git_config_set_string($config, $key, $value);
@@ -713,6 +728,14 @@ Resolve a reference name to an OID.
     Git::Libgit2::FFI::git_reference_create(\my $ref, $repo, 'refs/heads/main', $oid_ptr, $force, $log_message);
 
 Create or update a direct reference. Free with C<git_reference_free>.
+
+=head2 git_reference_create_matching
+
+    Git::Libgit2::FFI::git_reference_create_matching(\my $ref, $repo, 'refs/heads/main', $oid_ptr, $force, $current_oid_ptr, $log_message);
+
+Conditionally create or update a direct reference only when its current target
+matches C<$current_oid_ptr>. Returns C<GIT_EMODIFIED> on a mismatch. Free the
+result with C<git_reference_free>.
 
 =head2 git_reference_delete
 

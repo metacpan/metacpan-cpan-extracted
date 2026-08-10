@@ -14,9 +14,20 @@ use FindBin ();
 use lib "$FindBin::Bin/lib";
 use File::Spec ();
 use INA_CPAN_Check;
+use BATsh_TestOS qw(shell_safe_path);
 
 my $ROOT = File::Spec->rel2abs(
     File::Spec->catdir($FindBin::RealBin, File::Spec->updir));
+
+# Rule R8 (t/lib/BATsh_TestOS.pm).  The examples print their own script
+# path (%0, %~dp0 and friends), and BATsh re-reads the result of an
+# expansion exactly as cmd.exe and bash do.  When the tester's build
+# directory is spelled with a shell metacharacter -- "C:\Foo & Bar\" --
+# that re-reading splits the expanded path and the example emits a
+# diagnostic through no fault of its own.  E4 is about the example, not
+# about the directory it happens to sit in, so report the spelling and
+# skip rather than fail.  E1-E3 read the file directly and are unaffected.
+my $ROOT_OK = shell_safe_path($ROOT);
 
 my @manifest  = _manifest_files($ROOT);
 my @eg_files  = sort grep { m{^eg/.*\.batsh$} && -f "$ROOT/$_" } @manifest;
@@ -46,11 +57,16 @@ for my $rel (@eg_files) {
     # E4: run the example through BATsh in a child process and guard
     # against (a) runaway loops (bounded stdout) and (b) broken escape
     # handling that would make piped 'perl -e' choke with a syntax error.
-    my($out_lines, $err_text) = _run_example($ROOT, $path);
-    my $ok_run = ($out_lines <= $MAX_OUT_LINES)
-              && ($err_text !~ /syntax error/i)
-              && ($err_text !~ /aborted/i);
-    ok($ok_run, "E4: $rel runs cleanly ($out_lines lines)");
+    if (!$ROOT_OK) {
+        ok(1, "E4: $rel skipped (build path not usable in shell source: $ROOT)");
+    }
+    else {
+        my($out_lines, $err_text) = _run_example($ROOT, $path);
+        my $ok_run = ($out_lines <= $MAX_OUT_LINES)
+                  && ($err_text !~ /syntax error/i)
+                  && ($err_text !~ /aborted/i);
+        ok($ok_run, "E4: $rel runs cleanly ($out_lines lines)");
+    }
 }
 
 # Run an eg/*.batsh file via the same perl, capturing child STDOUT/STDERR
@@ -61,7 +77,31 @@ sub _run_example {
     my $tmp     = File::Spec->tmpdir;
     my $out     = File::Spec->catfile($tmp, "batsh_o_$$.txt");
     my $err     = File::Spec->catfile($tmp, "batsh_e_$$.txt");
-    my @inc     = map { "-I$_" } @INC;
+
+    # Rule R9.  This used to run
+    #
+    #     system($^X, (map { "-I$_" } @INC), '-MBATsh',
+    #            '-e', 'BATsh->run($ARGV[0])', $path);
+    #
+    # and it failed on MSWin32 in every matrix cell whose BUILD PATH
+    # contained a space or parentheses -- 30 of 90 cells -- while passing
+    # in all 30 cells built at a plain path.  The reason is not @INC and
+    # not the pathname: it is the "-e" operand.  It contains '>', which
+    # is a cmd.exe redirection character, and once another argument on
+    # that command line has to be quoted, Windows can route the whole
+    # line through cmd.exe, which then reads the '>' and cuts the program
+    # text in half.  The child perl reported a syntax error and printed
+    # nothing, so even eg/01_hello.batsh was recorded as producing 0
+    # lines -- a FAIL with nothing whatever wrong in lib/.
+    #
+    # The cure is to stop sending program text through argv at all.
+    # bin/batsh.pl is the distribution's own entry point, does exactly
+    # what the -e code did, and carries no metacharacter; this is the
+    # same invocation shape as t/0033, which passed in the very cells
+    # where this file failed.  '-I' still carries the build path, and
+    # that is fine: a pathname needs quoting, not shell escaping.
+    my $lib = File::Spec->catdir($root, 'lib');
+    my $bin = File::Spec->catfile($root, 'bin', 'batsh.pl');
 
     # Examples document their helper interpreter as the bareword "perl"
     # (correct for an end user), and some shell out to it -- e.g. a
@@ -86,7 +126,7 @@ sub _run_example {
     open(STDOUT, "> $out")     or do { close(SAVE_OUT); close(SAVE_ERR); return (0, '') };
     open(STDERR, "> $err")     or do { open(STDOUT, ">&SAVE_OUT"); close(SAVE_OUT); close(SAVE_ERR); return (0, '') };
 
-    system($^X, @inc, '-MBATsh', '-e', 'BATsh->run($ARGV[0])', $path);
+    system($^X, "-I$lib", $bin, $path);
 
     open(STDOUT, ">&SAVE_OUT"); close(SAVE_OUT);
     open(STDERR, ">&SAVE_ERR"); close(SAVE_ERR);

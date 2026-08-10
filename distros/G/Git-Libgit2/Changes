@@ -1,5 +1,22 @@
 Revision history for Git-Libgit2
 
+0.005     2026-08-09 20:03:21Z
+  - Bind git_reference_create_matching for compare-and-swap direct reference
+    updates that reject stale expected OIDs with GIT_EMODIFIED.
+  - Fix the git_reference_create test to treat its out-param as an owned
+    git_reference handle and free it, rather than misreading pointer bytes as
+    an OID.
+  - New closure type git_transport_certificate_check_cb, so callers can
+    install a host-key / TLS certificate verification callback on remote
+    fetch/push/connect.
+  - Bind git_config_get_bool, so callers can read booleans with libgit2's
+    own parsing rules instead of reimplementing them.
+  - Git::Libgit2::Error now decodes the `klass` field of git_error (the
+    git_error_t category) instead of always reporting 0.
+  - Export the git_error_code constants (GIT_OK, GIT_ERROR, GIT_ENOTFOUND,
+    GIT_EEXISTS, GIT_EAUTH, GIT_ECERTIFICATE, GIT_ENONFASTFORWARD, ... up
+    to GIT_TIMEOUT) so callers can compare $err->code symbolically.
+
 0.004     2026-05-27 17:06:23Z
   - Fix git_tag_create binding: the oid out-param is a caller-allocated
     git_oid buffer, so it must be declared 'opaque' (not 'opaque*') like

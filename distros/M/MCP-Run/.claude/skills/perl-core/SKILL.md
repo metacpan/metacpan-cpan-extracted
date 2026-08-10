@@ -68,7 +68,10 @@ Why: bare subs hide what the call needs (`$gm` passed manually each time), can't
 
 ## JSON
 
-- **`JSON::MaybeXS`** always. When encoding, set `canonical => 1, convert_blessed => 1` on the encoder object.
+- **`JSON::MaybeXS`** always. Never `JSON::PP`, `JSON::XS` or `Cpanel::JSON::XS` directly. When encoding, set `canonical => 1, convert_blessed => 1` on the encoder object.
+- **Booleans: `JSON->true` / `JSON->false`.** `JSON` is the backend-name constant `JSON::MaybeXS` exports, and every backend answers `->true`/`->false` with the same `JSON::PP::Boolean` singleton. So `use JSON::MaybeXS;` on its own covers both the codec and the booleans.
+- **Never `JSON::PP::true` / `JSON::PP::false`.** Those are barewords, so they must resolve at compile time and need their own `use JSON::PP ();` — and `JSON::MaybeXS` does NOT pull `JSON::PP` in when `Cpanel::JSON::XS` is installed. Such code compiles only as long as something else happened to load `JSON::PP` first, and dies the day that stops being true. A `require JSON::PP;` inside the sub does not save it: that loads at runtime, the bareword is parsed at compile time.
+- `JSON->true` is an ordinary runtime method call and has no such ordering trap. It also serialises correctly under `$YAML::XS::Boolean = 'JSON::PP'` — that string is one of YAML::XS's fixed mode names, not a module choice, so leave it alone.
 
 ## DBIC-ish result classes
 
@@ -83,7 +86,28 @@ Why: bare subs hide what the call needs (`$gm` passed manually each time), can't
 - ❌ `default => sub { ... }` for a non-trivial Moose attribute default (use `lazy_build`)
 - ❌ 4-space indent in new Perl files
 - ❌ `File::Spec` in new code
+- ❌ `JSON::PP::true` / `JSON::PP::false` as barewords (use `JSON->true` / `JSON->false`)
 - ❌ `Data::Dumper` in shipped code (use `DDP` / `Data::Printer` for debug, strip before commit)
+
+## Changelog (the Changes file)
+
+Every Getty distribution ships a `Changes` file with a `{{$NEXT}}` token at
+the top (Dist::Zilla's `[NextRelease]` replaces it with the version number
+and timestamp at release time).
+
+- **Add a bullet under `{{$NEXT}}` in the SAME commit as any user-facing
+  change** — new bindings/functions, behaviour changes, bug fixes,
+  deprecations. If a `dzil`-built CPAN consumer would notice it, it belongs
+  in Changes. Don't leave it for "later"; later never comes and the release
+  ships an empty changelog.
+- **Match the existing entry style:** two-space indent, `  - ` bullets,
+  wrap around 78 columns, present-tense imperative ("New binding X",
+  "Fix Y on macOS").
+- **Skip pure dev-tooling noise** — skill hardlinks, editor config, internal
+  CI refactors that don't change install/test behaviour for users. (A CI fix
+  that *unbreaks* the build for everyone IS worth a line.)
+- **Never hand-edit the version line or its timestamp** — `[@Author::GETTY]`
+  / `[NextRelease]` own those. You only ever touch the `{{$NEXT}}` block.
 
 ## When in doubt
 

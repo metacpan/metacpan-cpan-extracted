@@ -19,7 +19,7 @@ name: Desktop-XWindowManager-Util
 provides:
   Desktop::XWindowManager::Util:
     file: lib/Desktop/XWindowManager/Util.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Desktop::KDEActivity::Util: '0.002'
   Exporter: '5.57'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Desktop-XWindowManager-Util
   homepage: https://metacpan.org/release/Desktop-XWindowManager-Util
   repository: git://github.com/perlancar/perl-Desktop-XWindowManager-Util.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

@@ -17,7 +17,8 @@ use Test::EOL;
 my @files = (
     'lib/Music/ModalFunction.pm',
     't/00-compile.t',
-    't/01-methods.t'
+    't/01-methods.t',
+    't/02-note-spelling.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

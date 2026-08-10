@@ -1,3 +1,9 @@
+v0.06  2026-08-09Z
+    - Corrected prefix handling for to- and tu-
+    - Added improved support for foreign words via new Lingua::famibeib::ForeignWord
+    - Added $word->natural_language
+    - Added basic support to query prefixes via new Lingua::famibeib::Prefix
+
 v0.05  2026-08-07Z
     - Updated dependencies
     - Added a few more concepts to Lingua::famibeib::Wellknown

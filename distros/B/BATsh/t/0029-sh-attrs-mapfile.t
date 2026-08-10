@@ -41,6 +41,16 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/lib";
+use BATsh_TestOS qw(shell_safe_path);
+
+# Rule R8 (t/lib/BATsh_TestOS.pm): the build directory was named by the
+# tester, not by this distribution.  Cases that interpolate it into shell
+# or cmd.exe source quote it; where the spelling carries a character that
+# quoting cannot survive, they skip with a reason instead of accusing
+# BATsh of a defect that lives in the test.
+my $PATH_OK = shell_safe_path($FindBin::Bin);
+my $PATH_WHY = "build path is not usable in shell source: $FindBin::Bin";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 
@@ -197,32 +207,45 @@ sub {
 },
 
 # ---- mapfile / readarray ------------------------------------------
+#
+# $DATA is QUOTED in every redirect below.  It is built from
+# $FindBin::Bin, which is the tester's build directory and not this
+# distribution's to choose: on Windows a path with a space in it is the
+# common case ("C:\Users\John Doe\...", "C:\Documents and Settings\...").
+# An unquoted "< $DATA" is word-split there exactly as bash would split
+# it, so the case would fail and accuse mapfile of a defect that lives
+# in the test.  See rule R8 in t/lib/BATsh_TestOS.pm.
 
 sub {
+    return ok_is(1, 1, "MF01 skipped ($PATH_WHY)") unless $PATH_OK;
     my (undef, $out) =
-        _run_capture("mapfile -t arr < $DATA\necho \${#arr[\@]}\n");
+        _run_capture("mapfile -t arr < \"$DATA\"\necho \${#arr[\@]}\n");
     ok_is($out, "3\n", 'MF01 mapfile -t reads all lines');
 },
 sub {
+    return ok_is(1, 1, "MF02 skipped ($PATH_WHY)") unless $PATH_OK;
     my (undef, $out) =
-        _run_capture("mapfile -t arr < $DATA\n"
+        _run_capture("mapfile -t arr < \"$DATA\"\n"
                    . "echo \${arr[0]}-\${arr[2]}\n");
     ok_is($out, "alpha-gamma\n", 'MF02 mapfile element values');
 },
 sub {
+    return ok_is(1, 1, "MF03 skipped ($PATH_WHY)") unless $PATH_OK;
     my (undef, $out) =
-        _run_capture("readarray -t arr < $DATA\necho \${arr[1]}\n");
+        _run_capture("readarray -t arr < \"$DATA\"\necho \${arr[1]}\n");
     ok_is($out, "beta\n", 'MF03 readarray alias');
 },
 sub {
+    return ok_is(1, 1, "MF04 skipped ($PATH_WHY)") unless $PATH_OK;
     my (undef, $out) =
-        _run_capture("mapfile -t -s 1 -n 1 arr < $DATA\n"
+        _run_capture("mapfile -t -s 1 -n 1 arr < \"$DATA\"\n"
                    . "echo \${arr[0]}\n");
     ok_is($out, "beta\n", 'MF04 mapfile -s SKIP -n COUNT slice');
 },
 sub {
+    return ok_is(1, 1, "MF05 skipped ($PATH_WHY)") unless $PATH_OK;
     my (undef, $out) =
-        _run_capture("mapfile -t -O 5 arr < $DATA\necho \${arr[5]}\n");
+        _run_capture("mapfile -t -O 5 arr < \"$DATA\"\necho \${arr[5]}\n");
     ok_is($out, "alpha\n", 'MF05 mapfile -O origin offset');
 },
 

@@ -19,19 +19,26 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 AfterBuild
+ChangeLog
 CreateRelease
 Dist
 FromFile
 GitHub
 Legge
+MetaCPAN
 Plugin
 SignReleaseNotes
 Timothy
 Zilla
 api
 bin
+configfile
 createrelease
+dzil
+githubcreaterelease
 gpg
 lib
 plaintext
+prod
+sha256
 webpage

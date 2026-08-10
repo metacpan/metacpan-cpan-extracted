@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+use autodie qw(:all);
+
 use Class::Simple;
 use Test::Most tests => 51;
 use Test::NoWarnings;
@@ -11,123 +13,110 @@ BEGIN {
 }
 
 HASH: {
-	my $cache = {};
-	my $cached = new_ok('Class::Simple::Readonly::Cached' => [ cache => $cache, object => x->new() ]);
+	my $cache  = {};
+	my $cached = new_ok('Class::Simple::Readonly::Cached' =>
+		[ cache => $cache, object => x->new() ]);
 
-	ok($cached->can('object'));
-	ok($cached->can('barney'));
-	ok($cached->can('abc'));
-	ok(!$cached->can('xyz'));
-	ok($cached->isa('Class::Simple::Readonly::Cached'));
+	ok($cached->can('object'),  'can() finds "object"');
+	ok($cached->can('barney'),  'can() finds delegated "barney"');
+	ok($cached->can('abc'),     'can() finds delegated "abc"');
+	ok(!$cached->can('xyz'),    'can() correctly returns false for unknown method');
+	ok($cached->isa('Class::Simple::Readonly::Cached'), 'isa() self check');
 
-	ok($cached->barney('betty') eq 'betty');
-	ok($cached->barney() eq 'betty');
-	ok($cached->barney() eq 'betty');
+	ok($cached->barney('betty') eq 'betty', 'barney with arg');
+	ok($cached->barney()        eq 'betty', 'barney cached first call');
+	ok($cached->barney()        eq 'betty', 'barney cached second call');
+
 	my @abc = $cached->abc();
-	ok(scalar(@abc) == 3);
-	ok($abc[0] eq 'a');
-	ok($abc[1] eq 'b');
-	ok($abc[2] eq 'c');
+	is(scalar(@abc), 3, 'abc returns 3 elements');
+	is($abc[0], 'a', 'abc[0]');
+	is($abc[1], 'b', 'abc[1]');
+	is($abc[2], 'c', 'abc[2]');
+
 	@abc = $cached->abc();
-	ok(scalar(@abc) == 3);
-	ok($abc[0] eq 'a');
-	ok($abc[1] eq 'b');
-	ok($abc[2] eq 'c');
+	is(scalar(@abc), 3, 'abc still returns 3 elements on second call (cached)');
+	is($abc[0], 'a', 'abc[0] cached');
+	is($abc[1], 'b', 'abc[1] cached');
+	is($abc[2], 'c', 'abc[2] cached');
 
 	my $uncached = x->new();
 
-	# Check reading scalar after reading array
-	my $abc = $cached->abc();
+	# Scalar context on a method that returns a list: should return last element.
+	my $abc  = $cached->abc();
 	my $abc2 = $uncached->abc();
-	cmp_ok($abc, 'eq', $abc2, 'test reading scalar after reading array');
+	cmp_ok($abc, 'eq', $abc2, 'scalar context on list method matches uncached result');
 
-	# Check reading array after reading scalar
-	my $def = $cached->def();
-	ok($def eq 'f');
+	# Array context on a method previously called in scalar context.
+	my $def  = $cached->def();
+	is($def, 'f', 'def in scalar context returns last element');
 	my $def2 = $uncached->def();
-	ok($def eq $def2);
+	is($def, $def2, 'def scalar matches uncached');
 	my @def = $cached->def();
-	ok(scalar(@def) == 3);
+	is(scalar(@def), 3, 'def in list context after scalar context returns full list');
 
 	my @a = $cached->a();
-	ok(scalar(@a) == 1);
-	ok($a[0] eq 'a');
+	is(scalar(@a), 1, 'a returns 1 element');
+	is($a[0], 'a', 'a[0]');
 	@a = $cached->a();
-	ok(scalar(@a) == 1);
-	ok($a[0] eq 'a');
+	is(scalar(@a), 1, 'a cached: still 1 element');
+	is($a[0], 'a', 'a[0] cached');
 
-	ok($cached->echo('foo') eq 'foo');
-	ok($cached->echo('foo') eq 'foo');
-	ok($cached->echo('bar') eq 'bar');
-	ok($cached->echo('bar') eq 'bar');
-	ok($cached->echo('foo') eq 'foo');
+	ok($cached->echo('foo') eq 'foo', 'echo foo');
+	ok($cached->echo('foo') eq 'foo', 'echo foo cached');
+	ok($cached->echo('bar') eq 'bar', 'echo bar');
+	ok($cached->echo('bar') eq 'bar', 'echo bar cached');
+	ok($cached->echo('foo') eq 'foo', 'echo foo again (cross-arg cache isolation)');
 
 	my @empty = $cached->empty();
-	ok(scalar(@empty) == 0);
+	is(scalar(@empty), 0, 'empty method returns empty list');
+	ok(!defined($cached->empty()),  'empty method returns undef in scalar context');
+	ok(!defined($cached->empty()),  'empty method returns undef on second call');
 
-	ok(!defined($cached->empty()));
-	ok(!defined($cached->empty()));
+	# White-box: verify exact cache key format and stored values.
+	is($cache->{'Class::Simple::Readonly::Cached::barney::'},      'betty', 'cache key: barney no-arg');
+	is($cache->{'Class::Simple::Readonly::Cached::barney::betty'}, 'betty', 'cache key: barney with arg');
+	is($cache->{'Class::Simple::Readonly::Cached::echo::foo'},     'foo',   'cache key: echo foo');
+	is($cache->{'Class::Simple::Readonly::Cached::echo::bar'},     'bar',   'cache key: echo bar');
+	is(ref($cache->{'Class::Simple::Readonly::Cached::a::'}),   'ARRAY', 'list result stored as arrayref');
+	is(ref($cache->{'Class::Simple::Readonly::Cached::abc::'}), 'ARRAY', 'abc result stored as arrayref');
 
-	# White box test the cache
-	ok($cache->{'Class::Simple::Readonly::Cached::barney::'} eq 'betty');
-	ok($cache->{'Class::Simple::Readonly::Cached::barney::betty'} eq 'betty');
-	ok($cache->{'Class::Simple::Readonly::Cached::echo::foo'} eq 'foo');
-	ok($cache->{'Class::Simple::Readonly::Cached::echo::bar'} eq 'bar');
-	my $a = $cache->{'Class::Simple::Readonly::Cached::a::'};
-	ok(ref($a) eq 'ARRAY');
-	$abc = $cache->{'Class::Simple::Readonly::Cached::abc::'};
-	ok(ref($abc) eq 'ARRAY');
+	is(ref($cached->object()), 'x', 'object() returns the inner object');
 
-	ok(ref($cached->object()) eq 'x');
+	my $hits = $cached->state()->{hits};
+	my $hit_count = 0;
+	$hit_count += $_ for values %{$hits // {}};
+	is($hit_count, 9, 'total cache hits');
 
-	# foreach my $key(sort keys %{$cache}) {
-		# diag($key);
-	# }
+	my $misses = $cached->state()->{misses};
+	my $miss_count = 0;
+	$miss_count += $_ for values %{$misses // {}};
+	is($miss_count, 9, 'total cache misses');
 
-	# diag(Data::Dumper->new([$cached->state()])->Dump());
-	my $hits = $cached->state()->{'hits'};
-	my $count;
-	while(my($k, $v) = each %{$hits}) {
-		$count += $v;
-	}
-	ok($count == 9);
-	my $misses = $cached->state()->{'misses'};
-	$count = 0;
-	while(my($k, $v) = each %{$misses}) {
-		$count += $v;
-	}
-	ok($count == 9);
-
-	# Test caching objects that return objects
+	# Caching objects that return objects: the inner object's method should
+	# be callable on the returned (uncached) object reference.
 	my $simple = new_ok('Class::Simple');
-	my $one = new_ok('Class::Simple');
+	my $one    = new_ok('Class::Simple');
 	$one->one('1');
 	$simple->one($one);
 	my $two = new_ok('Class::Simple');
 	$two->two('2');
 	$two->two($two);
 
-	$cached = new_ok('Class::Simple::Readonly::Cached' => [ cache => $cache, object => $simple ]);
-	cmp_ok($one->one(), '==', 1);
-	cmp_ok($cached->one()->one(), '==', 1);
-	cmp_ok($cached->one()->one(), '==', 1);
-
+	$cached = new_ok('Class::Simple::Readonly::Cached' =>
+		[ cache => $cache, object => $simple ]);
+	cmp_ok($one->one(),            '==', 1, 'inner object method works directly');
+	cmp_ok($cached->one()->one(),  '==', 1, 'cached->one()->one() first call');
+	cmp_ok($cached->one()->one(),  '==', 1, 'cached->one()->one() second call (cache hit)');
 }
 
 package x;
 
 sub new {
 	my $proto = shift;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
+	return bless {}, ref($proto) || $proto;
 }
 
 sub barney {
-	my $self = shift;
-	my $param = shift;
-
 	return 'betty';
 }
 
@@ -148,12 +137,7 @@ sub empty {
 
 sub echo {
 	my $self = shift;
-
-	if(wantarray) {
-		return @_;
-	}
-
-	return $_[0];
+	return wantarray ? @_ : $_[0];
 }
 
 1;

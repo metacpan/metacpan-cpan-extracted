@@ -1,3 +1,15 @@
+2.36 2026-08-09
+- remove NO_INIT from the in/out NPT argument of pglcur, pgncur, pgncurse
+  and pgolin so the documented "should be zero on first call" input value
+  is honoured again (#20) - regression introduced in 2.28
+- likewise remove NO_INIT from the in/out X and Y arguments of pgcurs,
+  pgcurse and pgband (initial cursor position); t/t9.t now initialises
+  them, which is the correct fix for the warnings that motivated #11
+- t/t12.t: parse giza's non-numeric version string ("giza-1.5.0") so the
+  PGPLOT-5.2 routines test runs under giza >= 1.3 instead of skipping
+  with a numeric-comparison warning
+- update C code to C23 compatibility (#18) - thanks @emollier
+
 2.35 2024-12-20
 - be more careful with datatypes (https://github.com/PDLPorters/pdl/issues/511)
 

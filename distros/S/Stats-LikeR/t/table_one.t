@@ -46,7 +46,14 @@ is_approx($age->{p_value}, t_test(\@ageA,\@ageB)->{p_value}, 'age p-value matche
 my $sex_hdr = row_for($t1, 'sex', '');
 is($sex_hdr->{type}, 'categorical', 'sex classified categorical');
 is($sex_hdr->{test}, 'chi-squared', 'sex uses chi-squared');
-is_approx($sex_hdr->{p_value}, chisq_test([[2,4],[3,2]])->{'p.value'}, 'sex p-value matches chisq_test');
+# this table's expected counts are all under 5, so chisq_test warns about the
+# approximation exactly as R does; table_one keeps that warning to itself
+{
+	local $SIG{__WARN__} = sub {
+		warn @_ unless $_[0] =~ /Chi-squared approximation may be incorrect/;
+	};
+	is_approx($sex_hdr->{p_value}, chisq_test([[2,4],[3,2]])->{'p.value'}, 'sex p-value matches chisq_test');
+}
 
 my $sexM = row_for($t1, 'sex', 'M');
 my $sexF = row_for($t1, 'sex', 'F');
