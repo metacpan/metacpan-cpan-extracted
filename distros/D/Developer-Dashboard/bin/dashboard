@@ -514,6 +514,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard stop
   dashboard restart [--host HOST] [--port PORT] [--workers N]
   dashboard shell [bash|zsh|sh|ps|powershell|pwsh]
+  dashboard upgrade [--dry-run]
   dashboard version
   dashboard <custom-subcommand> [args...]
 

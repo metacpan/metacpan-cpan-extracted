@@ -56,7 +56,7 @@ for my $doc (@doc_files) {
 
     # S2: consecutive section numbers
     local *FHS2;
-    open FHS2, "< $path" or do { ok(0, "S2 - cannot open: $doc"); ok(1,""); next };
+    open FHS2, "< $path" or do { ok(0, "S2 - cannot open: $doc"); ok(1, ""); next };
     my $doc_text = do { local $/; <FHS2> }; close FHS2;
     my @nums = ($doc_text =~ /^\[ (\d+)\./mg);
     my $s2 = 1;

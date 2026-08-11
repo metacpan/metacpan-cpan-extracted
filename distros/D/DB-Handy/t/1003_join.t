@@ -18,9 +18,9 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok      { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is      { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
-sub rows_ok { my($r,$c,$n)=@_; $T++; (ref($r) eq 'ARRAY')&&(@$r==$c) ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got=".(ref($r) eq 'ARRAY'?scalar@$r:'undef').", exp=$c)\n") }
+sub ok      { my($c, $n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is      { my($g, $e, $n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
+sub rows_ok { my($r, $c, $n)=@_; $T++; (ref($r) eq 'ARRAY')&&(@$r==$c) ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got=".(ref($r) eq 'ARRAY'?scalar@$r:'undef').", exp=$c)\n") }
 
 use File::Path ();
 use File::Spec ();

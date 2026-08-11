@@ -1,7 +1,7 @@
 # ABSTRACT: Internal FFI::Platypus instance for Git::Libgit2
 
 package Git::Libgit2::FFI;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use strict;
 use warnings;
 use FFI::Platypus 2.00;
@@ -77,6 +77,18 @@ sub _attach_all {
   _attach git_libgit2_init     => []                          => 'int';
   _attach git_libgit2_shutdown => []                          => 'int';
   _attach git_libgit2_version  => [ 'int*', 'int*', 'int*' ]  => 'int';
+
+  # git_libgit2_opts is variadic (int option, ...). FFI::Platypus requires the
+  # variable-argument types to be fixed at attach time, so this single function
+  # object serves exactly the two-vararg (int, string) form — i.e. only
+  # GIT_OPT_SET_SEARCH_PATH. Every option with a different vararg signature
+  # needs its own function object via $ffi->function(...) at the call site;
+  # that explicitly includes the one-string options such as
+  # GIT_OPT_SET_TEMPLATE_PATH, not just obviously different ones like
+  # SET_MWINDOW_SIZE (size_t). A mismatched argument list is not reported as
+  # a return code — libgit2 va_arg's whatever is on the stack. Not wrapped via
+  # _attach because the helper takes one args array, not a fixed/var split.
+  $ffi->attach( 'git_libgit2_opts' => [ 'int' ] => [ 'int', 'string' ] => 'int' );
 
   # ========================
   # Error
@@ -159,10 +171,11 @@ sub _attach_all {
   # Object
   # ========================
 
-  _attach git_object_lookup   => [ 'opaque*', 'git_repository', 'opaque', 'int' ]                           => 'int';
-  _attach git_object_id       => [ 'git_object' ]                                                           => 'opaque';
-  _attach git_object_type     => [ 'git_object' ]                                                           => 'int';
-  _attach git_object_free     => [ 'git_object' ]                                                           => 'void';
+  _attach git_object_lookup        => [ 'opaque*', 'git_repository', 'opaque', 'int' ]                                    => 'int';
+  _attach git_object_lookup_prefix => [ 'opaque*', 'git_repository', 'opaque', 'size_t', 'int' ]                          => 'int';
+  _attach git_object_id            => [ 'git_object' ]                                                                    => 'opaque';
+  _attach git_object_type          => [ 'git_object' ]                                                                    => 'int';
+  _attach git_object_free          => [ 'git_object' ]                                                                    => 'void';
 
   # ========================
   # Blob
@@ -364,6 +377,7 @@ sub _attach_all {
   _attach git_index_entrycount   => [ 'git_index' ]                                                            => 'size_t';
   _attach git_index_get_byindex  => [ 'git_index', 'size_t' ]                                                  => 'opaque';
   _attach git_index_find         => [ 'size_t*', 'git_index', 'string' ]                                       => 'int';
+  _attach git_index_find_prefix  => [ 'size_t*', 'git_index', 'string' ]                                       => 'int';
   _attach git_index_free         => [ 'git_index' ]                                                            => 'void';
 
   # ========================
@@ -487,7 +501,7 @@ Git::Libgit2::FFI - Internal FFI::Platypus instance for Git::Libgit2
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -535,6 +549,31 @@ Decrement the libgit2 reference count. Returns the remaining count.
     Git::Libgit2::FFI::git_libgit2_version(\my $maj, \my $min, \my $rev);
 
 Store the library version into the three Integer references.
+
+=head2 git_libgit2_opts
+
+    Git::Libgit2::FFI::git_libgit2_opts(GIT_OPT_SET_SEARCH_PATH, GIT_CONFIG_LEVEL_SYSTEM, "");
+
+Set a libgit2 runtime option. The C function is variadic (C<int option, ...>);
+FFI::Platypus requires the variable-argument types to be fixed at attach time,
+so this binding serves exactly one vararg shape — the two-argument
+C<(int, string)> form — and therefore exactly one option,
+C<GIT_OPT_SET_SEARCH_PATH>. The use case is redirecting config search paths
+away from the user's F</etc/gitconfig> / F<~/.gitconfig> for test isolation:
+
+    git_libgit2_opts(GIT_OPT_SET_SEARCH_PATH, GIT_CONFIG_LEVEL_SYSTEM, "");
+
+Pass an empty string (C<"">) to blank a search path; passing C<undef> would
+reset it to the compiled-in default.
+
+Every option whose varargs differ needs its own variadic function object.
+That includes the single-string options such as
+C<GIT_OPT_SET_TEMPLATE_PATH> — declared
+C<opts(GIT_OPT_SET_TEMPLATE_PATH, const char *path)>, one vararg, not two —
+as much as the obviously different ones like C<SET_MWINDOW_SIZE> (a
+C<size_t>). A mismatched argument list is B<not> reported back as an error
+code: libgit2 C<va_arg>s whatever sits on the stack, so a surplus leading
+C<int> would be consumed as the C<const char *> and dereferenced.
 
 =head2 Error
 
@@ -881,6 +920,17 @@ Return true if the reference lives under C<refs/tags/>.
     Git::Libgit2::FFI::git_object_lookup(\my $obj, $repo, $oid_ptr, $type);
 
 Look up any object by OID. Free with C<git_object_free>.
+
+=head2 git_object_lookup_prefix
+
+    Git::Libgit2::FFI::git_object_lookup_prefix(\my $obj, $repo, $oid_ptr, $len, $type);
+
+Look up an object by an abbreviated OID prefix. C<$oid_ptr> is the full
+20-byte C<git_oid> buffer (as for C<git_object_lookup>); C<$len> is the number
+of hex characters (nibbles) to match — NOT the byte count. Minimum is
+C<GIT_OID_MINPREFIXLEN> (4). Returns C<0> on success, C<GIT_EAMBIGUOUS> (-5)
+when the prefix matches more than one object, or another negative error code.
+Free the returned object with C<git_object_free>.
 
 =head2 git_object_id
 
@@ -1649,9 +1699,52 @@ Return the entry at the given index.
 
 =head2 git_index_find
 
-    Git::Libgit2::FFI::git_index_find(\my $pos, $index, $path);
+    my $rc = Git::Libgit2::FFI::git_index_find(\my $pos, $index, $path);
 
-Find the position of an entry by path. Returns C<UINT_MAX> if not found.
+Find the position of the index entry for an exact path. Returns C<0> and
+writes that position into C<$pos> on a hit, or C<GIT_ENOTFOUND> when the
+index holds no entry for the path. The return value is an error code, never
+a position.
+
+C<$pos> is only meaningful when the return code is C<0>. On a miss libgit2
+leaves the out-param alone, so an unset C<my $pos> comes back as C<0> — a
+perfectly valid entry position. Always check the return code, never the
+position.
+
+The out-param is optional: pass C<undef> for it and FFI::Platypus hands a
+NULL pointer to libgit2, which is the supported way to ask whether a path is
+tracked without caring where.
+
+    my $tracked = Git::Libgit2::FFI::git_index_find(undef, $index, $path) == 0;
+
+To ask about a whole directory rather than one path, use
+C<git_index_find_prefix>.
+
+=head2 git_index_find_prefix
+
+    my $rc = Git::Libgit2::FFI::git_index_find_prefix(\my $pos, $index, 'tasks/');
+
+Find the position of the first index entry whose path carries the given
+prefix. Returns C<0> and writes that position into C<$pos> on a hit, or
+C<GIT_ENOTFOUND> when no entry carries the prefix. This is the way to ask
+"is anything under this path tracked?" without walking the whole index.
+
+C<$pos> is only meaningful when the return code is C<0>. On a miss libgit2
+leaves the out-param alone, so an unset C<my $pos> comes back as C<0> — a
+perfectly valid entry position. Always check the return code, never the
+position.
+
+The out-param is optional: pass C<undef> for it and FFI::Platypus hands a
+NULL pointer to libgit2, which is the supported way to get the yes/no
+answer without allocating a position.
+
+    my $tracked = Git::Libgit2::FFI::git_index_find_prefix(undef, $index, 'tasks/') == 0;
+
+The match is a B<string> prefix, not a path prefix. C<'tasks'> also matches
+C<'tasksfoo.txt'>; only C<'tasks/'> restricts the answer to entries inside
+the C<tasks> directory, so a caller asking about a directory must supply the
+trailing slash itself. A caller asking about one specific file wants
+C<git_index_find> instead.
 
 =head2 git_index_free
 
@@ -1933,13 +2026,27 @@ Return the onto OID.
 
     Git::Libgit2::FFI::git_cherrypick($repo, $commit, $opts);
 
-Prepare to cherry-pick a commit.
+Cherry-pick a commit onto C<HEAD>, writing the result to the index and the
+working directory and leaving the repository in cherry-pick state. It does
+not create a commit — that is the caller's next step. Because it checks out,
+the working directory has to match C<HEAD> first; on a freshly initialised
+repository that has never been checked out, the safe checkout reports
+C<GIT_ECONFLICT> against the missing files.
 
 =head2 git_cherrypick_commit
 
-    Git::Libgit2::FFI::git_cherrypick_commit(\my $oid, $repo, $cherrypick, $our_commit, $parent_count, $opts);
+    Git::Libgit2::FFI::git_cherrypick_commit(\my $index, $repo, $cherrypick, $our_commit, $mainline, $opts);
 
-Create the actual cherry-pick commit.
+Compute the index that results from applying C<$cherrypick> onto
+C<$our_commit>, without touching C<HEAD>, the repository index, or the
+working directory. Despite the name it creates no commit.
+
+The out-param is a C<git_index> handle owned by the caller — release it with
+C<git_index_free>.
+
+C<$mainline> selects which parent of C<$cherrypick> to diff against and must
+be C<0> unless that commit is a merge; passing C<1> for an ordinary commit
+fails with "mainline branch specified but ... is not a merge commit".
 
 =head2 git_cherrypick_options_init
 
@@ -1953,13 +2060,23 @@ Initialize cherry-pick options struct.
 
     Git::Libgit2::FFI::git_revert($repo, $commit, $opts);
 
-Prepare to revert a commit.
+Revert a commit against C<HEAD>, writing the result to the index and the
+working directory and leaving the repository in revert state. It does not
+create a commit. The same checkout caveat as C<git_cherrypick> applies.
 
 =head2 git_revert_commit
 
-    Git::Libgit2::FFI::git_revert_commit(\my $oid, $repo, $revert, $our_commit, $parent_count, $opts);
+    Git::Libgit2::FFI::git_revert_commit(\my $index, $repo, $revert, $our_commit, $mainline, $opts);
 
-Create the actual revert commit.
+Compute the index that results from reverting C<$revert> against
+C<$our_commit>, without touching C<HEAD>, the repository index, or the
+working directory. Despite the name it creates no commit.
+
+The out-param is a C<git_index> handle owned by the caller — release it with
+C<git_index_free>.
+
+C<$mainline> works as it does for C<git_cherrypick_commit>: C<0> for an
+ordinary commit, the parent index for a merge.
 
 =head2 git_revert_options_init
 

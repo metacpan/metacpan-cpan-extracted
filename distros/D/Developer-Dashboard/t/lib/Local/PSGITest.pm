@@ -7,6 +7,7 @@ use HTTP::Headers;
 use HTTP::Response;
 use IO::Handle;
 use URI;
+use URI::Escape ();
 
 sub test_psgi {
     my ( $app, $callback ) = @_;
@@ -44,11 +45,20 @@ sub _env_from_request {
     my $port = $uri->port;
     my $scheme = $uri->scheme || 'http';
 
+    # Real servers obey the PSGI spec here: Starman's HTTP::Parser::XS and
+    # HTTP::Message::PSGI both hand the application a percent-DECODED
+    # PATH_INFO exactly once, while REQUEST_URI keeps the raw request target
+    # and QUERY_STRING stays raw. Forwarding the encoded path unchanged would
+    # make this harness disagree with every production deployment.
+    my $raw_path  = $uri->path || '/';
+    my $raw_query = defined $uri->query ? $uri->query : q{};
+
     my %env = (
         REQUEST_METHOD  => $request->method,
         SCRIPT_NAME     => q{},
-        PATH_INFO       => $uri->path || '/',
-        QUERY_STRING    => defined $uri->query ? $uri->query : q{},
+        PATH_INFO       => URI::Escape::uri_unescape($raw_path),
+        REQUEST_URI     => $raw_path . ( $raw_query ne q{} ? '?' . $raw_query : q{} ),
+        QUERY_STRING    => $raw_query,
         SERVER_NAME     => defined $host ? $host : '127.0.0.1',
         SERVER_PORT     => defined $port ? $port : ( $scheme eq 'https' ? 443 : 80 ),
         SERVER_PROTOCOL => 'HTTP/1.1',
@@ -209,6 +219,13 @@ This test-only helper provides a tiny PSGI request runner for repository tests
 that need to exercise PSGI apps without depending on C<Plack::Test>. It
 exists so release metadata does not force end-user installers to pull the
 C<Test::SharedFork> dependency chain on platforms such as Windows.
+
+The environment it builds follows the PSGI specification the way production
+servers do: C<PATH_INFO> is handed to the application percent-decoded exactly
+once, C<REQUEST_URI> carries the raw request target, and C<QUERY_STRING>
+stays raw. This matches Starman's C<HTTP::Parser::XS> request parsing and
+C<HTTP::Message::PSGI>, so URL-encoding behaviour observed under this harness
+matches a real deployment.
 
 =head1 WHAT IT IS
 

@@ -1,3 +1,0 @@
-<actions>
-   <action name="RUN" class="Workflow::Action::Null"/>
-</actions>

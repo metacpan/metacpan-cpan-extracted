@@ -16,16 +16,16 @@ name: MCP-Run
 provides:
   MCP::Run:
     file: lib/MCP/Run.pm
-    version: '0.104'
+    version: '0.105'
   MCP::Run::Bash:
     file: lib/MCP/Run/Bash.pm
-    version: '0.104'
+    version: '0.105'
   MCP::Run::Compress:
     file: lib/MCP/Run/Compress.pm
-    version: '0.104'
+    version: '0.105'
   MCP::Run::Compress::Filters:
     file: lib/MCP/Run/Compress/Filters.pm
-    version: '0.104'
+    version: '0.105'
 requires:
   JSON::MaybeXS: '0'
   MCP: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-mcp-run/issues
   homepage: https://github.com/Getty/p5-mcp-run
   repository: https://github.com/Getty/p5-mcp-run.git
-version: '0.104'
+version: '0.105'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -106,17 +106,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
       version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::Run::AfterRelease
-      config:
-        Dist::Zilla::Plugin::Run::Role::Runner:
-          fatal_errors: 1
-          quiet: 0
-          run:
-            - '%x %o/maint/release-after.pl --archive %a --dir %d --version %v'
-          version: '0.050'
-      name: '@Author::GETTY/Run::AfterRelease'
-      version: '0.050'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
@@ -321,7 +310,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.104'
+          tag: '0.105'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -385,6 +374,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GitHub::CreateRelease
       name: '@Author::GETTY/GitHub::CreateRelease'
       version: '0.0009'
+    -
+      class: Dist::Zilla::Plugin::Docker::API
+      name: compress/Docker::API
+      version: '0.103'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

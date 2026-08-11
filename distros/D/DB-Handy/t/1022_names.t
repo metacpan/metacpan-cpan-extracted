@@ -10,6 +10,8 @@
 #   N6  every other table-taking method is covered through _load_schema
 #   N7  ordinary \w+ names, including digits and underscores, still work
 #   N8  the SQL layer is unaffected (it already restricted names to \w+)
+#   N9  the Windows device names (con, prn, aux, nul, comN, lptN) are
+#       rejected, in any letter case, on every platform
 #
 # N1 is the reason the check exists: before it, a name coming from
 # outside the program could be walked up out of base_dir and handed to
@@ -275,6 +277,58 @@ my @tests = (
         my $res = $db->execute('INSERT INTO ok_1 (id) VALUES (7)');
         is($res->{type}, 'ok', 'N8 and can still be written to');
     },
+
+    # -------------------------------------------------------------------
+    # N9 -- Windows device names.  On MSWin32 "nul.sch" is the bit bucket,
+    # so a table called nul would appear to be created, swallow every
+    # write and read back as empty.  Rejected on every platform, so that a
+    # data directory built on one system stays usable on another.
+    # -------------------------------------------------------------------
+    sub {
+        $db->use_database('names');
+        $DB::Handy::errstr = '';   # so the next case cannot read a stale message
+        ok(!$db->create_table('nul', [['id', 'INT']]),
+           'N9 create_table rejects the device name nul');
+    },
+    sub {
+        like_invalid($DB::Handy::errstr, 'table',
+                     'N9 the rejection is an Invalid table name');
+    },
+    sub {
+        ok(!-f File::Spec->catfile($BASE, 'names', 'nul.sch'),
+           'N9 no schema file was left behind');
+    },
+    sub {
+        ok(!$db->create_table('NUL', [['id', 'INT']]),
+           'N9 the check is case-insensitive');
+    },
+    sub {
+        my $bad = 0;
+        my $dev;
+        for $dev (qw(con prn aux com1 com9 lpt1 lpt9)) {
+            $bad++ if $db->create_table($dev, [['id', 'INT']]);
+        }
+        is($bad, 0, 'N9 con, prn, aux, comN and lptN are rejected too');
+    },
+    sub {
+        ok(!$db->create_database('nul'),
+           'N9 create_database rejects a device name as well');
+    },
+    sub {
+        ok(!$db->create_index('nul', 'ok_1', 'id'),
+           'N9 create_index rejects a device name as well');
+    },
+    sub {
+        my $res = $db->execute('CREATE TABLE nul (id INT)');
+        is($res->{type}, 'error', 'N9 the SQL layer rejects it too');
+    },
+    sub {
+        ok($db->create_table('nul1', [['id', 'INT']]),
+           'N9 a name that merely starts with a device name is accepted');
+    },
+    sub {
+        ok($db->drop_table('nul1'), 'N9 and behaves like any other table');
+    },
 );
 
 # Assert that $errstr is one of the three validation messages and that it
@@ -282,7 +336,12 @@ my @tests = (
 sub like_invalid {
     my($got, $kind, $name) = @_;
     my $str = defined($got) ? $got : 'undef';
-    ok($str =~ /^Invalid \Q$kind\E name '/, $name . " (errstr='$str')");
+    # The match must be forced to scalar context.  ok() takes a list, and a
+    # failing list-context match yields the empty list, so ok() would have
+    # received the description as its condition and undef as its name --
+    # every failure here reported itself as a nameless pass.
+    my $hit = ($str =~ /^Invalid \Q$kind\E name '/) ? 1 : 0;
+    ok($hit, $name . " (errstr='$str')");
 }
 
 ###############################################################################

@@ -1,6 +1,10 @@
 Revision history for Hyperman
 
-0.14    Unreleased
+0.15    2026-08-10
+        - Hyperman->tls_reload(\%sni): replace a worker's TLS
+          certificates without replacing the process. 
+
+0.14    2026-08-08
         - An inherited loop's kernel objects are now off-limits to the io
           and timer watch paths, not just to free. On Linux an epoll
           instance is a SHARED kernel object across fork - the fd is

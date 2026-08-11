@@ -197,6 +197,17 @@ my ( $root_code, $root_type, $root_body ) = @{ $app->handle( path => '/', query 
 is( $root_code, 200, 'root route responds with success' );
 like( $root_body, qr/<textarea[^>]*name="instruction"/, 'root route renders free-form instruction editor' );
 
+{
+    # Regression: behind the SSL front-proxy every backend connection arrives
+    # from the proxy loopback socket, so the SAME loopback request that is admin
+    # above must NOT be auto-granted admin -- otherwise a remote HTTPS client
+    # sending Host: 127.0.0.1 would get unauthenticated admin.
+    local $ENV{DEVELOPER_DASHBOARD_SSL_PROXIED} = 1;
+    my ( $ssl_proxied_code, undef, $ssl_proxied_body ) = @{ $app->handle( path => '/', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
+    isnt( $ssl_proxied_code, 200, 'SSL-proxied loopback request is not auto-admin, closing the remote loopback-admin bypass' );
+    unlike( $ssl_proxied_body || '', qr/<textarea[^>]*name="instruction"/, 'SSL-proxied loopback request does not receive the admin instruction editor' );
+}
+
 my ( $runtime_alias_code, undef, $runtime_alias_body ) = @{ $app->handle( path => '/java', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
 is( $runtime_alias_code, 200, 'runtime config custom app route serves a saved bookmark with a dotted filename id' );
 like( $runtime_alias_body, qr/learn ai body/, 'runtime config custom app route renders the same saved bookmark body as /app/learn\.ai' );

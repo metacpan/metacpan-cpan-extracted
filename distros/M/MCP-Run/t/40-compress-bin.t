@@ -95,7 +95,10 @@ subtest 'b64: failing command returns non-zero exit' => sub {
 };
 
 subtest 'b64: ls -la output runs through ls filter (no permission columns)' => sub {
-  my ($stdout, $stderr, $rc) = run_b64($bin, 'ls -la /tmp');
+  my $tmp = tempdir(CLEANUP => 1);
+  $tmp->child('.build')->mkpath;
+  $tmp->child('README.md')->spew_utf8('example');
+  my ($stdout, $stderr, $rc) = run_b64($bin, "ls -la $tmp");
   is $rc, 0, 'ls exit 0';
   if ($stdout =~ /\A[d-]/m) {
     unlike $stdout, qr/drwxr-xr-x/, 'permissions stripped by ls filter';

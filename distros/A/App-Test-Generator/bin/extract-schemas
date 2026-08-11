@@ -25,6 +25,7 @@ extract-schemas - Extract test schemas from Perl modules
       --output-dir DIR    Output directory for schema files (default: schemas/)
       --strict-pod=off|warn|fatal
       --verbose           Show detailed analysis
+      --version           Show the version of App::Test::Generator::SchemaExtractor
       --fuzz              Run coverage-guided fuzzing on extracted schemas
       --fuzz-iters N      Iterations per method when fuzzing (default: 100)
                           (no short form, to avoid conflict with --fuzz/-f)
@@ -133,9 +134,10 @@ my %cli_opts = (
 );
 
 my %extractor_opts = (
-    output_dir => 'schemas',
-    strict_pod => 'warn',
-    verbose    => 0,
+	output_dir => 'schemas',
+	strict_pod => 'warn',
+	verbose    => 0,
+	version    => 0,
 );
 
 my $fuzz            = 0;
@@ -144,10 +146,13 @@ my $fuzz_iters      = 100;
 my $minimize_corpus = 0;
 my $corpus_dir;   # default set after output_dir is known
 
+Getopt::Long::Configure('bundling');
+
 GetOptions(
 	'output-dir|o=s'   => \$extractor_opts{output_dir},
 	'strict-pod|s=s'   => \$extractor_opts{strict_pod},
 	'verbose|v'        => \$extractor_opts{verbose},
+	'version|V'        => \$extractor_opts{version},
 	'fuzz|f'           => \$fuzz,
 	'fuzz-all'         => \$fuzz_all,
 	'fuzz-iters=i'     => \$fuzz_iters,
@@ -159,6 +164,11 @@ GetOptions(
 
 pod2usage(-exitval => 0, -verbose => 1) if $cli_opts{help};
 pod2usage(-exitval => 0, -verbose => 2) if $cli_opts{man};
+
+if($extractor_opts{version}) {
+	print $App::Test::Generator::SchemaExtractor::VERSION, "\n";
+	exit 0;
+}
 
 if ($extractor_opts{strict_pod} !~ /^(off|warn|fatal)$/) {
 	die "Invalid --strict-pod value '$extractor_opts{strict_pod}'. Expected off, warn, or fatal";
@@ -362,14 +372,14 @@ print "Schema files written to: $extractor_opts{output_dir}/\n";
 # ---------------------------------------------------------------------------
 
 sub _load_target_module {
-    my ($input_file, $schemas) = @_;
+	my ($input_file, $schemas) = @_;
 
-    # Derive the package name from the first schema entry that has 'module' set
-    my ($package) = map  { $schemas->{$_}{module} }
-                    grep { $schemas->{$_}{module} }
-                    keys %$schemas;
+	# Derive the package name from the first schema entry that has 'module' set
+	my ($package) = map  { $schemas->{$_}{module} }
+		    grep { $schemas->{$_}{module} }
+		    keys %$schemas;
 
-    die 'Could not determine package name from extracted schemas' unless $package;
+	die 'Could not determine package name from extracted schemas' unless $package;
 
     # Reject anything that is not a syntactically valid Perl package name
     # before it is used to build a require path — guards against this

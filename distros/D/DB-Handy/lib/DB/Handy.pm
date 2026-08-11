@@ -45,7 +45,7 @@ use File::Spec;
 use POSIX ();
 
 use vars qw($VERSION $errstr);
-$VERSION = '1.09';
+$VERSION = '1.10';
 $VERSION = $VERSION;
 $errstr  = '';
 
@@ -68,6 +68,25 @@ my %TYPE_SIZE = (
     VARCHAR => undef,
     DATE    => 10,
 );
+
+# Names that Windows resolves to a character device rather than to a file,
+# whatever extension follows them: "nul.sch" is the bit bucket, "con.dat"
+# is the console.  A database, table or index so named would appear to be
+# created, silently discard every write and read back as empty.  They are
+# refused on every platform, not only on MSWin32, so that a data directory
+# built on one system stays usable on another.
+my %DEVICE_NAME = ();
+{
+    my $dev;
+    for $dev (qw(con prn aux nul)) {
+        $DEVICE_NAME{$dev} = 1;
+    }
+    my $n;
+    for $n (0 .. 9) {
+        $DEVICE_NAME{"com$n"} = 1;
+        $DEVICE_NAME{"lpt$n"} = 1;
+    }
+}
 
 ###############################################################################
 # Constructor
@@ -3183,6 +3202,7 @@ sub _valid_name {
     my($name) = @_;
     return 0 unless defined $name;
     return 0 unless $name =~ /^\w+\z/;
+    return 0 if $DEVICE_NAME{lc($name)};
     return 1;
 }
 
@@ -5332,7 +5352,7 @@ sub update {
 ###############################################################################
 package DB::Handy::Connection;
 use vars qw($VERSION);
-$VERSION = '1.09';   # keep in step with $DB::Handy::VERSION (literal so
+$VERSION = '1.10';   # keep in step with $DB::Handy::VERSION (literal so
 $VERSION = $VERSION; # that PAUSE and Module::Metadata can parse it)
 
 use vars qw($errstr);
@@ -5574,7 +5594,7 @@ sub _set_err {
 ###############################################################################
 package DB::Handy::Statement;
 use vars qw($VERSION);
-$VERSION = '1.09';   # keep in step with $DB::Handy::VERSION (literal so
+$VERSION = '1.10';   # keep in step with $DB::Handy::VERSION (literal so
 $VERSION = $VERSION; # that PAUSE and Module::Metadata can parse it)
 
 use vars qw($errstr);
@@ -5981,7 +6001,7 @@ DB::Handy - Pure-Perl flat-file relational database with DBI-like interface
 
 =head1 VERSION
 
-Version 1.09
+Version 1.10
 
 =head1 SYNOPSIS
 
@@ -6866,6 +6886,14 @@ turned into a path.  This matters when a name comes from outside the
 program: without the check, C<< $db->drop_database($cgi_param) >> could be
 made to delete a directory tree outside C<base_dir>.  The SQL layer has
 always applied the same C<\w+> rule, so SQL statements are unaffected.
+
+B<Reserved device names.>  Windows resolves C<con>, C<prn>, C<aux>,
+C<nul>, C<com0> to C<com9> and C<lpt0> to C<lpt9> to a character device
+whatever extension follows them, so C<nul.sch> is the bit bucket rather
+than a file.  A table so named would appear to be created, discard every
+write and read back as empty.  These names are therefore rejected, in any
+letter case, on every platform and not only on C<MSWin32>, so that a data
+directory built on one system stays usable on another.
 
 =head2 new( base_dir =E<gt> $dir [, db_name =E<gt> $name] )
 
@@ -7813,7 +7841,10 @@ The SQL string does not match any known pattern.
 A database name was passed to C<new>, C<create_database>, C<use_database>
 or C<drop_database> that is not a plain identifier.  Names are restricted
 to word characters (C<[A-Za-z0-9_]>) because they are used directly as
-directory names; C<..>, C</> and C<\\> are therefore rejected.
+directory names; C<..>, C</> and C<\\> are therefore rejected.  The
+Windows device names C<con>, C<prn>, C<aux>, C<nul>, C<com0> to C<com9>
+and C<lpt0> to C<lpt9> are rejected as well, in any letter case, on every
+platform.
 
 =item C<Invalid table name 'E<lt>nameE<gt>'>
 
@@ -8118,6 +8149,19 @@ so a C<.sch> file written by DB::Handy 1.08 or earlier still accepts
 duplicate keys.  The data files are otherwise unchanged and are read and
 written normally; add C<CREATE UNIQUE INDEX> to an older table if the
 constraint is wanted there too.
+
+=item *
+
+B<A database, table or index named after a Windows device is unreachable
+from 1.10.>  C<con>, C<prn>, C<aux>, C<nul>, C<com0> to C<com9> and
+C<lpt0> to C<lpt9> are rejected in any letter case on every platform, as
+described under L</METHODS - Low-level API>.  Windows could never hold
+such a name in the first place, but a system that could -- a Unix host,
+say -- may carry one created by 1.09 or earlier.  From 1.10 that name is
+refused by every method that takes one, C<drop_database> and
+C<drop_table> included, so there is no way to reach or remove it through
+the API.  Rename the directory or file outside DB::Handy, or delete it
+with the tools of the operating system.
 
 =item *
 

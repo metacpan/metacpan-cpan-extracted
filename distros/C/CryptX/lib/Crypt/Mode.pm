@@ -2,7 +2,7 @@ package Crypt::Mode;
 
 use strict;
 use warnings;
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 ### not used
 
@@ -26,7 +26,7 @@ Use a concrete block-mode module instead.
 
 =item * L<CryptX>
 
-=item * L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::ECB>, L<Crypt::Mode::OFB>
+=item * L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::ECB>, L<Crypt::Mode::OFB>, L<Crypt::Mode::XTS>
 
 =item * L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::GCM>
 

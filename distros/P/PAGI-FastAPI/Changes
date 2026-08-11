@@ -1,5 +1,43 @@
 Revision history for PAGI::FastAPI
 
+0.1.0  2026-08-10
+       [BREAKING]
+       - The add_cors function now utilizes PAGI::Middleware::CORS instead
+         of implementing its own version, based on the recommendation of the
+         author of the PAGI specifications. The reason to make this switch
+         is the established use of PAGI::Tools in other components of the
+         package. The previous names of the options have been changed, as
+         follows: allow_origins and allow_methods were replaced with origins
+         and methods, respectively, while the new default value for max_age
+         changed from 600 to 86,400. The value of max_age is the default one
+         used by PAGI::Middleware::CORS. There is also a new value called
+         expose_headers.
+       - CORS is added as the outermost level in to_app() and will be
+         applied after mount()-ed sub-applications and static files are
+         created. Thus, CORS will be applied throughout the application and
+         not only to get/post/other functions like before.
+
+       - New requirement: PAGI::Middleware::CORS >= 0.002002 (comes with the
+         same PAGI::Tools package as PAGI::WebSocket, already in the list of
+         prerequisites. Also, presented here explicitly as being directly
+         utilised).
+
+       [DOCUMENTATION]
+       - The previous event-loop section has been revised (renamed from
+         "MIXING WITH OTHER EVENT LOOPS" to "EVENT LOOPS: FUTURE::IO IS THE
+         GOAL, IO::ASYNC IS AN IMPLEMENTATION DETAIL"), at the request of
+         the author of the PAGI specification: previously, it stated that
+         "PAGI::FastAPI works entirely on IO::Async," although this makes it
+         sound like a load-bearing requirement instead of simply an
+         implementation detail. It now insists on Future::IO being the
+         recommended way of writing your own event-driven code (timers,
+         delays) and provides a working example following the heartbeat
+         pattern presented in the chat-server example. The
+         IO::Async::Loop::EV/IO_ASYNC_LOOP=EV technology has been preserved,
+         but it is defined as simply a backup solution used in very specific
+         cases involving the use of Mojo::IOLoop-based libraries that
+         appeared prior to Future::IO.
+
 0.0.9  2026-08-08
        [BREAKING]
        - Removed PAGI::FastAPI::WebSocket entirely.

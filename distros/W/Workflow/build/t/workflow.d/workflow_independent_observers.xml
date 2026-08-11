@@ -1,4 +1,0 @@
-<observers>
-  <observer type="Ticket" class="SomeObserver" />
-  <observer type="Ticket" sub="SomeObserver::other_sub" />
-</observers>

@@ -344,7 +344,7 @@ subtest 'Initialization and Validation Errors' => sub {
   like(
     $@,
     qr/carries security violation|Failed to retrieve subject token from URL/,
-    'make_creds does not bypass security violation on attacker-supplied universe_domain'
+'make_creds does not bypass security violation on attacker-supplied universe_domain'
   );
 };
 

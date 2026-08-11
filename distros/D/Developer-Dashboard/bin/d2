@@ -1,0 +1,104 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Spec;
+use FindBin qw($Bin);
+
+# d2 is the first-class short entrypoint for the dashboard CLI. It is a real,
+# installed command (shipped in the same bin directory as `dashboard`), not a
+# shell alias, so it works in scripts and fresh shells without loading the shell
+# bootstrap. It re-execs its sibling `dashboard` entrypoint with the same
+# arguments so the two commands behave identically.
+my $dashboard = File::Spec->catfile( $Bin, 'dashboard' );
+exec { $^X } $^X, $dashboard, @ARGV;
+die "Unable to exec dashboard entrypoint at $dashboard from d2: $!\n";
+
+__END__
+
+=head1 NAME
+
+d2 - first-class short entrypoint for the Developer Dashboard CLI
+
+=head1 SYNOPSIS
+
+  d2 version
+  d2 doctor
+  d2 upgrade [--dry-run]
+  d2 collector status housekeeper
+  d2 ask "How do I list collectors?"
+
+=head1 DESCRIPTION
+
+C<d2> is a real, installed command that runs the same dashboard CLI as the
+longer C<dashboard> command. It re-execs its sibling C<dashboard> entrypoint in
+the same C<bin> directory with the same arguments, so anything you can do with
+C<dashboard> you can do with C<d2>.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+This entrypoint gives operators a short, real command name for the dashboard CLI
+that behaves exactly like C<dashboard>, so C<d2 version> or C<d2 collector
+status> work the same as their C<dashboard> equivalents without typing the full
+command name.
+
+=head1 WHY IT EXISTS
+
+It exists so C<d2> is a genuine installed command rather than only a shell
+function defined by the shell bootstrap. As a real entrypoint in the same
+C<bin> directory as C<dashboard>, C<d2> is available in non-interactive scripts,
+cron jobs, and fresh shells that never sourced the dashboard shell integration,
+which a shell-only alias could not guarantee.
+
+=head1 WHEN TO USE
+
+Use this file when changing how the short C<d2> command locates and re-enters
+the main C<dashboard> entrypoint, or when adjusting how C<d2> is packaged as an
+installed executable.
+
+=head1 HOW TO USE
+
+Run C<d2> followed by any dashboard subcommand and arguments, exactly as you
+would run C<dashboard>. The script resolves its sibling C<dashboard> file from
+its own install directory and re-execs it under the same Perl interpreter, so
+the full command surface, hooks, and shell bootstrap output are identical.
+
+=head1 WHAT USES IT
+
+It is used by operators who prefer the short command name, by shell bootstrap
+tab-completion that also completes C<d2>, and by CLI smoke tests that exercise
+the short entrypoint.
+
+=head1 EXAMPLES
+
+Example 1:
+
+  d2 version
+
+Print the dashboard version through the short real command.
+
+Example 2:
+
+  d2 ask --codex "Explain this stack trace"
+
+Run any dashboard subcommand through C<d2> exactly as through C<dashboard>.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/40-install-bootstrap.t
+
+Rerun the focused CLI-smoke and install-bootstrap tests after changing the short
+entrypoint.
+
+Example 4:
+
+  prove -lr t
+
+Verify the short entrypoint inside the complete repository suite.
+
+=for comment FULL-POD-DOC END
+
+=cut

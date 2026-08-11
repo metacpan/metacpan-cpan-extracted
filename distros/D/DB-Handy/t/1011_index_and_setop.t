@@ -26,10 +26,10 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok  { my($c,$n)=@_; $T++;
+sub ok  { my($c, $n)=@_; $T++;
           $c ? ($PASS++, push @OUT, "ok $T - $n\n")
              : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is  { my($g,$e,$n)=@_; $T++;
+sub is  { my($g, $e, $n)=@_; $T++;
           defined($g) && ("$g" eq "$e")
             ? ($PASS++, push @OUT, "ok $T - $n\n")
             : ($FAIL++, push @OUT, "not ok $T - $n"
@@ -160,8 +160,8 @@ is(join(',', @ids10), '1,6,7', "AND non-indexed col: correct ids");
 # Setup: two simple integer sets
 $db->execute("CREATE TABLE s1 (x INT)");
 $db->execute("CREATE TABLE s2 (x INT)");
-for my $v (1,2,3,4,5)   { $db->execute("INSERT INTO s1 (x) VALUES ($v)") }
-for my $v (3,4,5,6,7)   { $db->execute("INSERT INTO s2 (x) VALUES ($v)") }
+for my $v (1, 2, 3, 4, 5)   { $db->execute("INSERT INTO s1 (x) VALUES ($v)") }
+for my $v (3, 4, 5, 6, 7)   { $db->execute("INSERT INTO s2 (x) VALUES ($v)") }
 
 # -- 2.1: INTERSECT (deduplicates, keeps common rows) --
 $r = $db->execute("SELECT x FROM s1 INTERSECT SELECT x FROM s2");
@@ -190,8 +190,8 @@ is(join(',', @ex2), '6,7', "EXCEPT reversed: correct (6,7)");
 # -- 2.4: INTERSECT with no common rows --
 $db->execute("CREATE TABLE s3 (x INT)");
 $db->execute("CREATE TABLE s4 (x INT)");
-for my $v (1,2) { $db->execute("INSERT INTO s3 (x) VALUES ($v)") }
-for my $v (8,9) { $db->execute("INSERT INTO s4 (x) VALUES ($v)") }
+for my $v (1, 2) { $db->execute("INSERT INTO s3 (x) VALUES ($v)") }
+for my $v (8, 9) { $db->execute("INSERT INTO s4 (x) VALUES ($v)") }
 $r = $db->execute("SELECT x FROM s3 INTERSECT SELECT x FROM s4");
 # ok 26
 is(scalar @{$r->{data}}, 0, "INTERSECT: no common rows -> 0 rows");
@@ -204,8 +204,8 @@ is(scalar @{$r->{data}}, 0, "EXCEPT: left is subset of right -> 0 rows");
 # -- 2.6: INTERSECT ALL (preserves duplicates from left) --
 $db->execute("CREATE TABLE m1 (x INT)");
 $db->execute("CREATE TABLE m2 (x INT)");
-for my $v (1,2,2,3,3,3) { $db->execute("INSERT INTO m1 (x) VALUES ($v)") }
-for my $v (2,3,3,4)     { $db->execute("INSERT INTO m2 (x) VALUES ($v)") }
+for my $v (1, 2, 2, 3, 3, 3) { $db->execute("INSERT INTO m1 (x) VALUES ($v)") }
+for my $v (2, 3, 3, 4)     { $db->execute("INSERT INTO m2 (x) VALUES ($v)") }
 
 $r = $db->execute("SELECT x FROM m1 INTERSECT ALL SELECT x FROM m2");
 my @ia = sort { $a <=> $b } map { $_->{x}+0 } @{$r->{data}};
@@ -253,9 +253,9 @@ is(join(',', @ab), join(',', @ba), "INTERSECT is commutative");
 $db->execute("CREATE TABLE t3a (v INT)");
 $db->execute("CREATE TABLE t3b (v INT)");
 $db->execute("CREATE TABLE t3c (v INT)");
-for my $v (1,2,3,4,5) { $db->execute("INSERT INTO t3a (v) VALUES ($v)") }
-for my $v (2,3,4,5,6) { $db->execute("INSERT INTO t3b (v) VALUES ($v)") }
-for my $v (3,4,5,6,7) { $db->execute("INSERT INTO t3c (v) VALUES ($v)") }
+for my $v (1, 2, 3, 4, 5) { $db->execute("INSERT INTO t3a (v) VALUES ($v)") }
+for my $v (2, 3, 4, 5, 6) { $db->execute("INSERT INTO t3b (v) VALUES ($v)") }
+for my $v (3, 4, 5, 6, 7) { $db->execute("INSERT INTO t3c (v) VALUES ($v)") }
 $r = $db->execute(
     "SELECT v FROM t3a INTERSECT SELECT v FROM t3b INTERSECT SELECT v FROM t3c");
 my @tri = sort { $a <=> $b } map { $_->{v}+0 } @{$r->{data}};
@@ -266,7 +266,7 @@ is(join(',', @tri), '3,4,5', "3-way INTERSECT: correct (3,4,5)");
 
 # -- 2.12: EXCEPT deduplicates the left side --
 $db->execute("CREATE TABLE dup (x INT)");
-for my $v (1,1,2,2,3) { $db->execute("INSERT INTO dup (x) VALUES ($v)") }
+for my $v (1, 1, 2, 2, 3) { $db->execute("INSERT INTO dup (x) VALUES ($v)") }
 $r = $db->execute("SELECT x FROM dup EXCEPT SELECT x FROM s4");
 my @dedup = sort { $a <=> $b } map { $_->{x}+0 } @{$r->{data}};
 # ok 40

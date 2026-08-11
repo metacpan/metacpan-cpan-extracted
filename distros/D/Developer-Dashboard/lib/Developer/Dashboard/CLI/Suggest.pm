@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Suggest;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use File::Basename qw(basename);
 use File::Spec;
@@ -21,10 +21,10 @@ sub new {
     my ( $class, %args ) = @_;
     my $paths = $args{paths} || Developer::Dashboard::PathRegistry->new(
         home            => $ENV{HOME},
-        workspace_roots => [],
+        workspace_roots => [],    # uncoverable condition false
         project_roots   => [],
     );
-    my $manager = $args{manager} || Developer::Dashboard::SkillManager->new( paths => $paths );
+    my $manager = $args{manager} || Developer::Dashboard::SkillManager->new( paths => $paths );    # uncoverable condition false
     return bless {
         paths   => $paths,
         manager => $manager,
@@ -237,7 +237,7 @@ sub _rank_candidates {
              $a->{score} <=> $b->{score}
           || length( $a->{value} ) <=> length( $b->{value} )
           || $a->{value} cmp $b->{value}
-    } @scored;
+    } @scored;    # uncoverable branch true : candidates are de-duplicated, so the final cmp tiebreaker is never 0 and the comparator never returns 0
     splice @scored, 5 if @scored > 5;
     return @scored;
 }

@@ -11,8 +11,16 @@ use File::Spec;
 use File::Temp qw(tempdir tempfile);
 use Socket qw(AF_INET6 inet_pton pack_sockaddr_in6);
 use Test::More;
+# Perl's builtin sleep takes an integer, so every sub-second sleep in this file
+# silently became sleep(0) and the poll loops below spun with no delay at all.
+# That is what actually made the live-singleton pid probe flake under load, not
+# an insufficient iteration count.
+use Time::HiRes qw(sleep);
 
 use lib 'lib';
+use lib 't/lib';
+
+use Local::CollectorFixture qw(wait_for_managed_loop);
 
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::Collector;
@@ -149,7 +157,13 @@ is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'config', 'a
 {
     local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT};
     local $ENV{XDG_RUNTIME_DIR} = tempdir( CLEANUP => 1 );
-    my $state_user = $ENV{DD_STATE_ROOT_USER} || $ENV{USER} || $ENV{LOGNAME} || ( getpwuid($<) || 'user' );
+    my $state_user =
+         $ENV{DD_STATE_ROOT_USER}
+      || $ENV{USER}
+      || $ENV{LOGNAME}
+      || $ENV{USERNAME}
+      || Developer::Dashboard::Platform::passwd_user_name($<)
+      || 'user';
     $state_user =~ s{[^A-Za-z0-9._-]}{_}g;
     my $fallback_paths = Developer::Dashboard::PathRegistry->new(
         home            => $home,
@@ -943,7 +957,7 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
 }
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::PathRegistry::cwd = sub { return undef; };
+    local *Developer::Dashboard::PathRegistry::getcwd = sub { return undef; };
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, @_ };
     my $paths_without_cwd = Developer::Dashboard::PathRegistry->new( home => $home );
@@ -956,7 +970,7 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
 }
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::PathRegistry::cwd = sub { die "cwd should not be called when the registry was constructed with one\n"; };
+    local *Developer::Dashboard::PathRegistry::getcwd = sub { die "cwd should not be called when the registry was constructed with one\n"; };
     my $precomputed_cwd_paths = Developer::Dashboard::PathRegistry->new(
         home => $home,
         cwd  => $local_repo,
@@ -978,7 +992,7 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
 {
     my $outside_no_repo = tempdir( CLEANUP => 1 );
     no warnings 'redefine';
-    local *Developer::Dashboard::PathRegistry::cwd = sub { return $outside_no_repo; };
+    local *Developer::Dashboard::PathRegistry::getcwd = sub { return $outside_no_repo; };
     local *Developer::Dashboard::PathRegistry::current_project_root = sub { return undef; };
     is_same_paths(
         [ Developer::Dashboard::PathRegistry->new( home => $home )->runtime_layers ],
@@ -997,7 +1011,7 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
         make_path( File::Spec->catdir( $real_home, 'dd-oop-layers', 'parent', 'leaf', '.developer-dashboard' ) );
         my $real_leaf = File::Spec->catdir( $real_home, 'dd-oop-layers', 'parent', 'leaf' );
         no warnings 'redefine';
-        local *Developer::Dashboard::PathRegistry::cwd = sub { return $real_leaf; };
+        local *Developer::Dashboard::PathRegistry::getcwd = sub { return $real_leaf; };
         local *Developer::Dashboard::PathRegistry::current_project_root = sub { return undef; };
         my $alias_paths = Developer::Dashboard::PathRegistry->new( home => $alias_home );
         is_same_paths(
@@ -1016,7 +1030,7 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
     my $layer_leaf = File::Spec->catdir( $layer_parent, 'leaf' );
     make_path( File::Spec->catdir( $layer_leaf, '.developer-dashboard' ) );
     no warnings 'redefine';
-    local *Developer::Dashboard::PathRegistry::cwd = sub { return $layer_leaf; };
+    local *Developer::Dashboard::PathRegistry::getcwd = sub { return $layer_leaf; };
     local *Developer::Dashboard::PathRegistry::dirname = sub { return $_[0] };
     is_same_paths(
         [ Developer::Dashboard::PathRegistry->new( home => $home )->runtime_layers ],
@@ -1035,7 +1049,7 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
         File::Spec->catdir( $home, 'dd-oop-layers', 'parent', 'leaf', '.developer-dashboard' ),
     );
     no warnings 'redefine';
-    local *Developer::Dashboard::PathRegistry::cwd = sub { return undef; };
+    local *Developer::Dashboard::PathRegistry::getcwd = sub { return undef; };
     is_same_paths(
         [ Developer::Dashboard::PathRegistry->new( home => $home )->runtime_layers ],
         [
@@ -3331,6 +3345,8 @@ chdir $original_cwd or die $!;
     is( $auth->trust_tier( remote_addr => '::1', host => '[::1]:7890' ), 'admin', 'auth trusts exact IPv6 loopback host headers as admin traffic' );
     is( $auth->trust_tier( remote_addr => '127.0.0.1', host => 'localhost:7890' ), 'admin', 'auth trusts localhost hostnames that resolve only to loopback' );
     is( $auth->trust_tier( remote_addr => '127.0.0.999', host => '127.0.0.1:7890' ), 'helper', 'auth keeps loopback-looking remote addresses with invalid octets out of the admin tier' );
+    is( $auth->trust_tier( remote_addr => '127.0.0.1', host => '127.0.0.1:7890', ssl_proxied => 1 ), 'helper', 'auth does NOT grant loopback admin behind the SSL front-proxy, where remote_addr is always the proxy loopback socket' );
+    is( $auth->trust_tier( remote_addr => '127.0.0.1', host => '127.0.0.1:7890', ssl_proxied => 0 ), 'admin', 'auth still trusts genuine loopback admin traffic when not behind the SSL proxy' );
     ok( !$auth->_ip_is_loopback('127.0.0.999'), '_ip_is_loopback rejects final octets above 255' );
     ok( !$auth->_ip_is_loopback('127.999.0.1'), '_ip_is_loopback rejects middle octets above 255' );
     ok( !$auth->_ip_is_loopback('127.0.0.256'), '_ip_is_loopback rejects the first invalid octet boundary value' );
@@ -3347,10 +3363,12 @@ chdir $original_cwd or die $!;
                 },
             );
         };
+        # DNS-rebinding fix: hostnames that resolve only to loopback are NOT
+        # trusted as admin -- only literal loopback IPs and localhost aliases.
         is(
             $auth->trust_tier( remote_addr => '::1', host => 'v6-loopback.local:7890' ),
-            'admin',
-            'auth trusts hostnames that resolve only to IPv6 loopback addresses',
+            'helper',
+            'auth does NOT trust arbitrary hostnames that resolve only to IPv6 loopback (DNS-rebinding protection)',
         );
     }
     is( $auth->trust_tier( remote_addr => '127.0.0.1', host => 'dashboard-ssl-alias.local:7890' ), 'helper', 'auth keeps non-loopback-resolving alias hosts in helper mode by default' );
@@ -3384,15 +3402,15 @@ chdir $original_cwd or die $!;
     my $parent_state_root;
     my $leaf_state_root;
     {
-        local *Developer::Dashboard::PathRegistry::cwd = sub { return $layer_root; };
+        local *Developer::Dashboard::PathRegistry::getcwd = sub { return $layer_root; };
         $home_state_root = $state_paths->state_root;
     }
     {
-        local *Developer::Dashboard::PathRegistry::cwd = sub { return $layer_parent; };
+        local *Developer::Dashboard::PathRegistry::getcwd = sub { return $layer_parent; };
         $parent_state_root = $state_paths->state_root;
     }
     {
-        local *Developer::Dashboard::PathRegistry::cwd = sub { return $layer_leaf; };
+        local *Developer::Dashboard::PathRegistry::getcwd = sub { return $layer_leaf; };
         $leaf_state_root = $state_paths->state_root;
     }
 
@@ -3480,7 +3498,7 @@ chdir $original_cwd or die $!;
     );
 
     {
-        local *Developer::Dashboard::PathRegistry::cwd = sub { return $owning_parent; };
+        local *Developer::Dashboard::PathRegistry::getcwd = sub { return $owning_parent; };
         my $owning_parent_paths = Developer::Dashboard::PathRegistry->new( home => $owning_home );
         my $owning_parent_store = Developer::Dashboard::IndicatorStore->new( paths => $owning_parent_paths );
         $owning_parent_store->set_indicator(
@@ -4327,6 +4345,18 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     open my $manual_pid, '>', $pidfile or die $!;
     print {$manual_pid} "$child\n";
     close $manual_pid;
+    # This pidfile carries no loop state, so the child's process title is the
+    # only evidence that it is a managed loop, and it adopts that title after the
+    # fork. Probing stop_loop first makes it take the unmanaged branch: the child
+    # is never signalled, so waitpid below reports 0 ("still there") instead of
+    # -1. Wait for the runner's own predicate to agree before asking it to stop
+    # the loop. Production is not exposed to this - start_loop writes loop state
+    # beside the pidfile and the state fallback confirms the loop regardless of
+    # the title.
+    ok(
+        wait_for_managed_loop( $runner, $child, 'manual' ),
+        'manual collector child becomes identifiable as a managed loop before shutdown',
+    );
     is( $runner->stop_loop('manual'), $child, 'stop_loop terminates manual pidfile processes' );
     is( waitpid( $child, 1 ), -1, 'stop_loop reaps manual collector children after shutdown' );
 }
@@ -4344,7 +4374,12 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     ok( $loop_pid, 'start_loop launches a live singleton collector loop for a long-running command' );
 
     my ( $worker_pid, $command_pid );
-    for ( 1 .. 60 ) {
+    # Budget 15s: the command child is started through the owned-subtree
+    # launcher (DD-388), so its pidfile appears only after two interpreter
+    # startups. This is only a real budget now that Time::HiRes::sleep is
+    # imported above; previously each iteration slept zero seconds, so the loop
+    # gave the child no grace whatsoever regardless of the iteration count.
+    for ( 1 .. 150 ) {
         my $state = $runner->loop_state('singleton-live') || {};
         if ( ref( $state->{active_worker_pids} ) eq 'ARRAY' && @{ $state->{active_worker_pids} } ) {
             $worker_pid = $state->{active_worker_pids}[0];
@@ -4744,7 +4779,20 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     my ( $stdout, $stderr, $exit_code, $timed_out ) = $runner->_run_command(
         source     => q{printf collector-command},
         cwd        => $paths->home,
-        timeout_ms => 1_000,
+        # 30s, and the number is measured rather than picked (DD-489). These three
+        # assertions test what the command RETURNS - stdout, exit code, and that a
+        # successful command is not flagged as timed out - and say nothing about
+        # timing, so the budget only has to be comfortably more than the work
+        # needs. Measured: this command takes a median of 14ms on an idle host and
+        # up to 4.0s inside a 20%-of-one-core cgroup with eight competing spinners.
+        # The old budget was 1_000ms, which is also the smallest non-zero budget
+        # the implementation can express, because it rounds to whole seconds for
+        # alarm() - so it had no headroom at all and failed on any starved host,
+        # which is the shape of every CI runner.
+        #
+        # The genuine timeout assertion above keeps its 200ms budget on purpose: it
+        # runs `sleep 2`, so it still times out however slow the host is.
+        timeout_ms => 30_000,
     );
     is( $stdout, 'collector-command', '_run_command captures stdout from a successful shell command' );
     is( $stderr, '', '_run_command leaves stderr empty for a successful shell command' );
@@ -4757,7 +4805,7 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     my ( $stdout, $stderr, $exit_code, $timed_out ) = $runner->_run_command(
         source     => q{perl -e 'print $^X'},
         cwd        => $paths->home,
-        timeout_ms => 1_000,
+        timeout_ms => 30_000,    # see the measurement note above (DD-489)
     );
     is( $stdout, $^X, '_run_command keeps the current Perl interpreter available to child commands even when PATH would otherwise miss perl' );
     is( $stderr, '', '_run_command does not emit stderr when it repairs PATH for Perl child commands' );
@@ -4769,7 +4817,7 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     my ( $stdout, $stderr, $exit_code, $timed_out ) = $runner->_run_code(
         source     => q{ die "collector code boom\n"; },
         cwd        => $paths->home,
-        timeout_ms => 1_000,
+        timeout_ms => 30_000,    # see the measurement note above (DD-489)
     );
     is( $stdout, '', '_run_code does not emit stdout for a dying code collector' );
     like( $stderr, qr/collector code boom/, '_run_code writes code evaluation errors to stderr explicitly' );
@@ -5588,6 +5636,14 @@ is_deeply(
                         days => 1,
                     },
                 },
+                {
+                    name     => 'combo.rotator',
+                    cwd      => 'home',
+                    rotation => {
+                        lines => 6,
+                        days  => 1,
+                    },
+                },
             ],
         }
     );
@@ -5610,6 +5666,19 @@ is_deeply(
         exit_code   => 0,
         stdout      => "fresh-entry\n",
     );
+
+    # Three five-line entries, all inside the one-day window, against a
+    # six-line budget: the line cut lands inside the middle entry, which is the
+    # combination that used to persist a headerless transcript and then kill
+    # every later housekeeper pass.
+    for my $hour ( 9, 10, 11 ) {
+        $rotation_collector->append_log_entry(
+            'combo.rotator',
+            happened_at => sprintf( '2026-04-17T%02d:00:00Z', $hour ),
+            exit_code   => 0,
+            stdout      => "combo-$hour-line-a\ncombo-$hour-line-b\n",
+        );
+    }
 
     my $rotation_housekeeper = Developer::Dashboard::Housekeeper->new( paths => $rotation_paths );
     my $rotation_result = $rotation_housekeeper->run(
@@ -5646,6 +5715,19 @@ is_deeply(
         ),
         'housekeeper reports collector log age rotation explicitly',
     );
+
+    my $combo_log = $rotation_collector->read_log('combo.rotator');
+    like( $combo_log, qr/\A=== collector combo\.rotator \|/, 'housekeeper combined line and age rotation leaves a log that still starts at an entry header' );
+    like( $combo_log, qr/combo-11-line-b/, 'housekeeper combined rotation keeps the newest whole collector log entry' );
+    unlike( $combo_log, qr/combo-9-line-a/, 'housekeeper combined rotation drops the entries outside the line budget' );
+
+    my $second_result = $rotation_housekeeper->run(
+        min_age_seconds => 0,
+        now_epoch       => 1_776_441_600,
+    );
+    ok( $second_result->{ok}, 'a second housekeeper pass survives a combined line and age collector log rotation' );
+    ok( defined $second_result->{scanned}{expired_sessions}, 'a second housekeeper pass still reaches the expired-session sweep' );
+    is( $rotation_collector->read_log('combo.rotator'), $combo_log, 'a second housekeeper pass leaves the entry-aligned collector log untouched' );
 }
 
 dies_like(

@@ -1210,7 +1210,42 @@ ok( !grep { $_ eq 'alpha-skill' } @remaining_skills, 'uninstall removes the targ
 ok( grep { $_ eq 'home-only-skill' } @remaining_skills, 'uninstall preserves inherited home-only layered skills' );
 ok( grep { $_ eq 'shared-skill' } @remaining_skills, 'uninstall preserves shared layered skills from other DD-OOP-LAYERS' );
 
+# ---------------------------------------------------------------------------
+# DD-426: a ddfile.local line whose repo name resolves to '..' must not be able
+# to delete the project checkout that owns the manifest. install_from_ddfiles
+# targets <project>/skills, so the traversal target is the project root itself.
+# ---------------------------------------------------------------------------
+{
+    my $project = tempdir( CLEANUP => 1 );
+    make_path( File::Spec->catdir( $project, '.git' ) );
+    make_path( File::Spec->catdir( $project, 'src' ) );
+    _write_file_at( File::Spec->catfile( $project, 'README' ), "project readme\n", 0644 );
+    _write_file_at( File::Spec->catfile( $project, 'src', 'main.pl' ), "print 1;\n", 0644 );
+    _write_file_at( File::Spec->catfile( $project, 'ddfile.local' ), "some-owner/..\n", 0644 );
+
+    my $manifest_result = $manager->install_from_ddfiles($project);
+    like(
+        $manifest_result->{error},
+        qr/\ARefusing to install skill outside skills root/,
+        'a ddfile.local traversal source is refused with an explicit containment error',
+    );
+    ok( -d File::Spec->catdir( $project, '.git' ), 'the project .git directory survives a ddfile.local traversal source' );
+    ok( -f File::Spec->catfile( $project, 'README' ), 'the project README survives a ddfile.local traversal source' );
+    ok( -f File::Spec->catfile( $project, 'src', 'main.pl' ), 'the project sources survive a ddfile.local traversal source' );
+    ok( -f File::Spec->catfile( $project, 'ddfile.local' ), 'the ddfile.local manifest itself survives its own traversal source' );
+}
+
 done_testing();
+
+# _write_file_at($path, $body, $mode): writes one file at an absolute path.
+sub _write_file_at {
+    my ( $path, $body, $mode ) = @_;
+    open my $fh, '>', $path or die "Unable to write $path: $!";
+    print {$fh} $body;
+    close $fh or die "Unable to close $path: $!";
+    chmod $mode, $path if defined $mode;
+    return $path;
+}
 
 sub _create_skill_repo {
     my ( $name, %args ) = @_;

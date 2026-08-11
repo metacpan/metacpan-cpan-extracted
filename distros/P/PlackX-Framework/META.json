@@ -4,9 +4,9 @@
       "Dondi Michael Stroma, <dstroma@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.26",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -72,7 +72,7 @@
       },
       "PlackX::Framework" : {
          "file" : "lib/PlackX/Framework.pm",
-         "version" : "0.28"
+         "version" : "0.29"
       },
       "PlackX::Framework::Config" : {
          "file" : "lib/PlackX/Framework/Config.pm"
@@ -117,7 +117,7 @@
          "web" : "https://github.com/dstroma/PlackX-Framework"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

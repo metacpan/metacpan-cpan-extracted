@@ -29,9 +29,13 @@ sh(qq{openssl req -newkey rsa:2048 -nodes -keyout $dir/cli.key -out $dir/cli.csr
 sh(qq{openssl x509 -req -in $dir/cli.csr -CA $dir/ca.pem -CAkey $dir/ca.key -CAcreateserial -out $dir/cli.pem -days 1});
 # a second server cert for SNI host "example.test"
 sh(qq{openssl req -x509 -newkey rsa:2048 -nodes -keyout $dir/ex.key -out $dir/ex.pem -days 1 -subj "/CN=example.test"});
+# a third, for a host that is NOT in the map at boot - the certificate
+# that arrives while the process is already serving
+sh(qq{openssl req -x509 -newkey rsa:2048 -nodes -keyout $dir/late.key -out $dir/late.pem -days 1 -subj "/CN=late.test"});
 
 my $mtls_port = 24000 + ($$ % 500);
 my $sni_port  = 24500 + ($$ % 500);
+my $rel_port  = 25000 + ($$ % 500);
 
 # ---- server 1: require client certs ----
 my $mpid = fork // die;
@@ -65,7 +69,44 @@ if ($spid == 0) {
     exit 0;
 }
 
-for my $p ($mtls_port, $sni_port) {
+# ---- server 3: tls_reload, driven from inside the worker ----
+#
+# The context a listener serves is built in the parent before the fork,
+# so a certificate issued afterwards is not served until the process is
+# replaced. This is the way out of that, and the app is the trigger
+# because the app is the only code that reliably runs IN a worker.
+#
+#   GET /reload      add late.test, keeping example.test
+#   GET /reload-bad  a key that does not exist - must change nothing
+my $rpid = fork // die;
+if ($rpid == 0) {
+    open STDERR, '>', '/dev/null';
+    Hyperman->run(
+        app => sub {
+            my $env = shift;
+            my $n = 0;
+            if ($env->{PATH_INFO} eq '/reload') {
+                $n = Hyperman->tls_reload({
+                    'example.test' => { cert => "$dir/ex.pem",   key => "$dir/ex.key" },
+                    'late.test'    => { cert => "$dir/late.pem", key => "$dir/late.key" },
+                });
+            }
+            elsif ($env->{PATH_INFO} eq '/reload-bad') {
+                $n = Hyperman->tls_reload({
+                    'late.test' => { cert => "$dir/late.pem",
+                                     key  => "$dir/nonexistent.key" },
+                });
+            }
+            return [ 200, [ 'Content-Type' => 'text/plain' ], [ "reloaded=$n" ] ];
+        },
+        host => '127.0.0.1', port => $rel_port, workers => 1,
+        tls_cert => "$dir/srv.pem", tls_key => "$dir/srv.key",
+        tls_sni => { 'example.test' => { cert => "$dir/ex.pem", key => "$dir/ex.key" } },
+    );
+    exit 0;
+}
+
+for my $p ($mtls_port, $sni_port, $rel_port) {
     for (1 .. 50) {
         my $s = IO::Socket::INET->new(PeerAddr => "127.0.0.1:$p");
         last if $s;
@@ -100,7 +141,44 @@ for my $p ($mtls_port, $sni_port) {
     like($ex, qr/sni-ok/, 'SNI: request still served');
 }
 
-kill 'TERM', $mpid, $spid;
+# ---- tls_reload ----
+{
+    my $cn = sub {
+        my ($host) = @_;
+        my $out = `curl -sk -v --resolve $host:$rel_port:127.0.0.1 https://$host:$rel_port/ 2>&1`;
+        my ($cn) = $out =~ /subject:.*?CN=([^\s;,]+)/;
+        return $cn // '';
+    };
+
+    # Before: late.test is in no map, so it falls back to the default.
+    is $cn->('late.test'), 'localhost',
+        'reload: a host with no certificate falls back to the default';
+    is $cn->('example.test'), 'example.test',
+        'reload: the boot-time SNI host serves its own';
+
+    my $said = `curl -sk --resolve late.test:$rel_port:127.0.0.1 https://late.test:$rel_port/reload 2>/dev/null`;
+    like $said, qr/reloaded=1/, 'reload: one listener was rebuilt';
+
+    # After, on a NEW connection: the certificate that arrived while the
+    # process was running is served, and the one that was already there
+    # still is. Same process throughout - nothing was restarted.
+    is $cn->('late.test'), 'late.test',
+        'reload: a certificate added at runtime is served';
+    is $cn->('example.test'), 'example.test',
+        'reload: and the one already in the map is not lost';
+    ok kill(0, $rpid), 'reload: the server was never replaced';
+
+    # The failure case, which is the one that could take a fleet's TLS
+    # down: an unbuildable map must leave the running certificates alone.
+    $said = `curl -sk --resolve late.test:$rel_port:127.0.0.1 https://late.test:$rel_port/reload-bad 2>/dev/null`;
+    like $said, qr/reloaded=0/, 'reload: an unbuildable map rebuilds nothing';
+    is $cn->('late.test'), 'late.test',
+        '...and what was being served still is';
+    is $cn->('example.test'), 'example.test', '...for every host';
+}
+
+kill 'TERM', $mpid, $spid, $rpid;
 waitpid $mpid, 0;
 waitpid $spid, 0;
+waitpid $rpid, 0;
 done_testing;

@@ -96,8 +96,13 @@ eval {
         ],
         label => 'Chromium trusted SSL dashboard check',
     );
-    like( $trusted->{stdout}, qr{<title>Developer Dashboard</title>}, 'real browser reaches the dashboard page once certificate trust is bypassed locally' );
-    like( $trusted->{stdout}, qr{id="share-url"}, 'real browser renders the dashboard HTML over HTTPS after the certificate warning is accepted' );
+    # Security: over the SSL front-proxy every backend connection arrives from the
+    # proxy's loopback socket, so the loopback-admin shortcut is disabled and an
+    # unauthenticated browser must NOT be auto-granted the admin dashboard (this is
+    # what closes the remote HTTPS + `Host: 127.0.0.1` admin bypass). SSL access now
+    # requires a helper login.
+    unlike( $trusted->{stdout}, qr{id="share-url"}, 'SSL front-proxy does not auto-serve the admin dashboard to an unauthenticated browser (loopback-admin bypass closed)' );
+    unlike( $trusted->{stdout}, qr{<textarea[^>]*name="instruction"}, 'SSL front-proxy does not expose the admin instruction editor without a helper login' );
 
     my $alias_trusted = _run_command(
         command => [
@@ -110,8 +115,8 @@ eval {
         ],
         label => 'Chromium trusted alias-host SSL dashboard check',
     );
-    like( $alias_trusted->{stdout}, qr{<title>Developer Dashboard</title>}, 'real browser reaches the dashboard page through one configured alias hostname once local trust is bypassed' );
-    like( $alias_trusted->{stdout}, qr{id="share-url"}, 'real browser renders the dashboard HTML through the configured alias hostname after the certificate warning is accepted' );
+    unlike( $alias_trusted->{stdout}, qr{id="share-url"}, 'SSL front-proxy does not auto-serve the admin dashboard through a configured alias hostname without a helper login either' );
+    unlike( $alias_trusted->{stdout}, qr{<textarea[^>]*name="instruction"}, 'SSL front-proxy denies the admin editor through the alias hostname without authentication' );
 
     1;
 } or do {

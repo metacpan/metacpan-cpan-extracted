@@ -36,8 +36,8 @@ my $app = PAGI::FastAPI->new(
     version => '1.0.0',
 );
 
-# 1. Enable CORS
-$app->add_cors(allow_origins => ['*']);
+# 1. Enable CORS (delegates to PAGI::Middleware::CORS)
+$app->add_cors(origins => ['*']);
 
 # 2. Asynchronous Dependencies
 #    NOTE: this hand-rolled 'eq' comparison against a hardcoded token is

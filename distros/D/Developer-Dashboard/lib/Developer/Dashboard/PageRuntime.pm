@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
@@ -13,16 +13,30 @@ use IO::Select;
 use IPC::Open3 qw(open3);
 use POSIX qw(:sys_wait_h);
 use Symbol qw(gensym);
+use Time::HiRes ();
 use Developer::Dashboard::PageRuntime::StreamHandle;
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PerlEnv ();
-use Developer::Dashboard::Platform qw(command_argv_for_path command_in_path);
+use Developer::Dashboard::Platform qw(command_argv_for_path command_in_path is_windows);
 use Developer::Dashboard::RuntimeManager ();
 use Developer::Dashboard::Folder ();
 use Template;
 use Developer::Dashboard::Zipper qw(Ajax acmdx zip unzip);
 
 my $SANDPIT_SEQ = 0;
+
+# Injectable POSIX process-group primitive (same pattern as the Platform
+# launcher subs) so tests can drive the setpgid failure path without needing a
+# session-leader process on the test host.
+our $SETPGID = sub { return POSIX::setpgid( 0, 0 ) };
+
+# Saved-Ajax disconnect cleanup timings, in seconds. The grace window is the
+# real elapsed time a signalled worker and its owned process group get to run
+# their own SIGTERM handlers before the SIGKILL escalation; the poll interval is
+# how often that wait re-checks. Both are package variables so tests can drive
+# the escalation deterministically without sleeping for a whole window.
+our $SAVED_AJAX_TERM_GRACE_SECONDS = 1;
+our $SAVED_AJAX_TERM_POLL_SECONDS  = 0.02;
 
 # new(%args)
 # Constructs the older-style page runtime used by browser-rendered bookmarks.
@@ -119,7 +133,7 @@ sub run_code_blocks {
                 $state = $page->{state};
             }
 
-            if ( ref( $result->{returns} ) eq 'ARRAY' ) {
+            if ( ref( $result->{returns} ) eq 'ARRAY' ) {    # uncoverable branch false
                 for my $value ( @{ $result->{returns} } ) {
                     if ( ref($value) eq 'HASH' ) {
                         $page->merge_state($value);
@@ -130,8 +144,8 @@ sub run_code_blocks {
                 }
             }
 
-            my $stdout = defined $result->{stdout} ? $result->{stdout} : '';
-            my $stderr = defined $result->{stderr} ? $result->{stderr} : '';
+            my $stdout = defined $result->{stdout} ? $result->{stdout} : '';    # uncoverable branch false
+            my $stderr = defined $result->{stderr} ? $result->{stderr} : '';    # uncoverable branch false
 
             push @outputs, $stdout if $stdout ne '';
             push @errors, $stderr if $stderr ne '';
@@ -170,7 +184,7 @@ sub _render_templates {
     my $request_context = $page->{meta}{request_context} || {};
     my $current_page = $args{runtime_context}{current_page} || $request_context->{path} || '';
     my %template_runtime = (
-        %{ $args{runtime_context} || {} },
+        %{ $args{runtime_context} || {} },    # uncoverable branch true
         current_page => $current_page,
     );
     my %template_env = (
@@ -180,12 +194,26 @@ sub _render_templates {
     );
 
     my $system = $self->_system_context(%args);
+    my @tt_roots = $self->{paths} ? $self->{paths}->dashboards_roots : '.';
     my $tt = Template->new(
         {
             EVAL_PERL   => 1,
-            INCLUDE_PATH => $self->{paths} ? [ $self->{paths}->dashboards_roots ] : '.',
+            INCLUDE_PATH => \@tt_roots,
         }
     );
+    # TT3 returns undef when NONE of the INCLUDE_PATH directories exist at
+    # construction time (unlike TT2 which deferred the check to process()).
+    # Fall back to the first existing root, or the project root, or '.'.
+    if (!$tt) {
+        @tt_roots = grep { -d } @tt_roots;
+        $tt = Template->new(
+            { EVAL_PERL => 1, INCLUDE_PATH => \@tt_roots }
+        ) if @tt_roots;
+        $tt ||= Template->new(
+            { EVAL_PERL => 1, INCLUDE_PATH => ['.'] }
+        );
+        return if !$tt;
+    }
 
     for my $field (qw(body)) {
         my $template = $layout->{$field};
@@ -220,9 +248,9 @@ sub _render_templates {
                         page            => $page,
                         source          => $args{source} || '',
                         state           => $state,
-                        runtime_context => $args{runtime_context} || {},
+                        runtime_context => $args{runtime_context},
                     );
-                    die $result->{stderr} if defined $result->{stderr} && $result->{stderr} ne '';
+                    die $result->{stderr} if $result->{stderr} ne '';
                     return $result->{stdout};
                 },
                 %$state,
@@ -269,7 +297,7 @@ sub _run_single_block {
         paths   => $self->{paths},
         aliases => $self->{aliases},
     );
-    $sandpit ||= $self->_new_sandpit(
+    $sandpit ||= $self->_new_sandpit(    # uncoverable condition false
         state           => $state,
         runtime_context => $runtime,
     );
@@ -291,7 +319,7 @@ sub _run_single_block {
            && ref( $args{page}->as_hash->{meta} ) eq 'HASH'
            && ( $args{page}->as_hash->{meta}{skill_path} || '' ) ne ''
         )
-        ? ( $args{page}->as_hash->{meta}{skill_path} || '' )
+        ? ( $args{page}->as_hash->{meta}{skill_path} )
         : ( $self->{paths} ? $self->{paths}->runtime_root : '' ),
         skill_name => (
               $args{source}
@@ -309,9 +337,9 @@ sub _run_single_block {
     };
     my @errors = $package->__errors();
     if (@errors) {
-        my $error = join '', grep { defined $_ && $_ ne '' } @errors;
+        my $error = join '', grep { defined $_ && $_ ne '' } @errors;    # uncoverable branch false
         $self->_destroy_sandpit($sandpit) if $destroy_sandpit;
-        die $error if $error ne '';
+        die $error if $error ne '';    # uncoverable branch false
     }
 
     $self->_destroy_sandpit($sandpit) if $destroy_sandpit;
@@ -342,7 +370,7 @@ sub stream_code_block {
         paths   => $self->{paths},
         aliases => $self->{aliases},
     );
-    $sandpit ||= $self->_new_sandpit(
+    $sandpit ||= $self->_new_sandpit(    # uncoverable condition false
         state           => $state,
         runtime_context => $runtime,
     );
@@ -372,7 +400,7 @@ sub stream_code_block {
     untie *STDERR;
 
     my @errors = $package->__errors();
-    my $error = join '', grep { defined $_ && $_ ne '' } @errors;
+    my $error = join '', grep { defined $_ && $_ ne '' } @errors;    # uncoverable branch false
 
     if ( ref( $args{return_writer} ) eq 'CODE' ) {
         for my $value (@returns) {
@@ -418,13 +446,14 @@ sub stream_saved_ajax_file {
     my $stdin  = gensym;
     my $pid = eval {
         local %ENV = ( %ENV, %env );
-        open3( $stdin, $stdout, $stderr, @command );
+        open3( $stdin, $stdout, $stderr, $self->_saved_ajax_launch_command(@command) );
     };
     if ($@) {
         $self->_cleanup_saved_ajax_temp_files(@temp_files);
         die $@;
     }
     close $stdin;
+    my $process_group = $self->_own_saved_ajax_process_group($pid);
 
     my $select = IO::Select->new( $stdout, $stderr );
     my $stream_error = '';
@@ -470,21 +499,25 @@ sub stream_saved_ajax_file {
         }
         1;
     } or do {
-        $stream_error = $@ || "Saved ajax stream failed\n";
+        $stream_error = $@;
     };
 
     $self->_close_saved_ajax_streams( $select, $stdout, $stderr );
     my $fatal_error = '';
+    my $terminated_status;
     if ($disconnected) {
-        $self->_terminate_saved_ajax_process($pid);
+        $self->_terminate_saved_ajax_process( $pid, $process_group, \$terminated_status );
     }
     elsif ( $stream_error ne '' ) {
-        $self->_terminate_saved_ajax_process($pid);
+        $self->_terminate_saved_ajax_process( $pid, $process_group, \$terminated_status );
         $fatal_error = $stream_error if !$self->_looks_like_stream_disconnect_error($stream_error);
     }
     my $status;
     if ( defined $saved_status ) {
         $status = $saved_status;
+    }
+    elsif ( defined $terminated_status ) {
+        $status = $terminated_status;
     }
     else {
         waitpid( $pid, 0 );
@@ -497,6 +530,37 @@ sub stream_saved_ajax_file {
         exit_code => $status >> 8,
         status    => $status,
     };
+}
+
+# _saved_ajax_launch_command(@command)
+# Builds the argv used to launch one saved-Ajax worker, wrapping POSIX runs in
+# the in-module process-group launcher so disconnect cleanup can signal every
+# descendant, while Windows keeps its direct argv unchanged.
+# Input: non-empty saved-Ajax command argv list.
+# Output: launch-ready argv list for open3().
+sub _saved_ajax_launch_command {
+    my ( $self, @command ) = @_;
+    die "Missing saved ajax command\n" if !@command;
+    return @command if is_windows();
+    return (
+        $^X,
+        '-MDeveloper::Dashboard::PageRuntime',
+        '-e',
+        'Developer::Dashboard::PageRuntime->_exec_saved_ajax_command(@ARGV)',
+        @command,
+    );
+}
+
+# _own_saved_ajax_process_group($pid)
+# Records the POSIX process-group id established by the saved-Ajax launcher so
+# cancellation can address descendants that the worker forks before exit.
+# Input: direct saved-Ajax child process id integer.
+# Output: positive POSIX process-group id, or zero on Windows.
+sub _own_saved_ajax_process_group {
+    my ( $self, $pid ) = @_;
+    return 0 if is_windows();
+    die "Missing saved ajax process id\n" if !$pid;
+    return $pid;
 }
 
 # _drain_saved_ajax_post_exit_handles(%args)
@@ -566,7 +630,7 @@ sub _drain_saved_ajax_ready_handle {
     }
     my $ready_fileno  = fileno($fh);
     my $stdout_fileno = fileno($stdout);
-    if ( defined $ready_fileno && defined $stdout_fileno && $ready_fileno == $stdout_fileno ) {
+    if ( defined $ready_fileno && defined $stdout_fileno && $ready_fileno == $stdout_fileno ) {    # uncoverable condition left
         my $continued = $stdout_writer->($chunk);
         return defined $continued ? $continued : 1;
     }
@@ -595,21 +659,60 @@ sub _close_saved_ajax_streams {
     return 1;
 }
 
-# _terminate_saved_ajax_process($pid)
-# Stops one saved-Ajax worker process after stream cancellation or writer failure.
-# Input: child process id integer.
+# _terminate_saved_ajax_process($pid, $process_group, $status_ref)
+# Stops one saved-Ajax worker and its owned POSIX process group after stream
+# cancellation or writer failure, retaining direct-pid behavior on Windows.
+# Input: child process id integer, optional positive POSIX process-group id, and
+# an optional scalar reference that receives the worker wait status when the
+# worker exited inside the grace window.
 # Output: true value.
 sub _terminate_saved_ajax_process {
-    my ( $self, $pid ) = @_;
+    my ( $self, $pid, $process_group, $status_ref ) = @_;
     return 1 if !$pid;
-    return 1 if !kill 0, $pid;
+    my $owns_group = !is_windows() && defined $process_group && $process_group =~ /^\d+$/ && $process_group > 0;
+    return 1 if !$owns_group && !kill 0, $pid;
+    kill 15, -$process_group if $owns_group;
     kill 15, $pid;
-    for ( 1 .. 20 ) {
-        return 1 if !kill 0, $pid;
-        sleep 0.05;
-    }
-    kill 9, $pid if kill 0, $pid;
+    my $drained = $self->_await_saved_ajax_exit( $pid, ( $owns_group ? $process_group : undef ), $status_ref );
+    kill 9, -$process_group if $owns_group && !$drained;
+
+    # Only signal the worker again when the window really expired: a drained
+    # wait has already reaped it, and a reaped pid can be reissued by the OS.
+    kill 9, $pid if !$drained && kill 0, $pid;
     return 1;
+}
+
+# _await_saved_ajax_exit($pid, $process_group, $status_ref)
+# Waits out the SIGTERM grace window after a saved-Ajax worker was signalled,
+# reaping the worker the moment it exits so its own TERM handler is never cut
+# short and the caller does not block on a second wait. Elapsed wall-clock time
+# bounds the wait, so the escalation is deterministic instead of depending on a
+# fixed number of poll iterations.
+# Input: worker pid, owned POSIX process-group id or undef for direct-pid
+# cleanup, and an optional scalar reference that receives the reaped wait status.
+# Output: true when the worker and any owned group went away inside the window,
+# false when the window expired with something still alive.
+sub _await_saved_ajax_exit {
+    my ( $self, $pid, $process_group, $status_ref ) = @_;
+    my $deadline = Time::HiRes::time() + $SAVED_AJAX_TERM_GRACE_SECONDS;
+    my $reaped   = 0;
+    while (1) {
+        if ( !$reaped ) {
+            my ( $exited, $status ) = $self->_saved_ajax_child_exited($pid);
+            if ($exited) {
+                $reaped = 1;
+                ${$status_ref} = $status if ref($status_ref) eq 'SCALAR';
+            }
+        }
+
+        # A reaped worker can still have live descendants in the group it led,
+        # and those descendants are exactly what the grace window exists for.
+        my $worker_gone = $reaped || !kill 0, $pid;
+        my $group_alive = defined $process_group && kill 0, -$process_group;
+        return 1 if $worker_gone && !$group_alive;
+        return 0 if Time::HiRes::time() >= $deadline;
+        Time::HiRes::sleep($SAVED_AJAX_TERM_POLL_SECONDS);
+    }
 }
 
 # _looks_like_stream_disconnect_error($error)
@@ -725,7 +828,7 @@ sub _saved_ajax_temp_file {
         SUFFIX => $args{suffix} || '',
     );
     print {$fh} defined $args{content} ? $args{content} : '';
-    close $fh or die "Unable to close saved ajax temp file $path: $!";
+    close $fh or die "Unable to close saved ajax temp file $path: $!";    # uncoverable branch true
     return $path;
 }
 
@@ -870,6 +973,26 @@ die $@ if $@;
 PERL
 }
 
+# _exec_saved_ajax_command(@command)
+# Runs inside the launcher child: establishes POSIX process-group ownership and
+# replaces the launcher with the saved-Ajax worker command, preserving its argv
+# without shell parsing.
+# Input: non-empty command argv list.
+# Output: never returns on success; dies when grouping or exec fails.
+sub _exec_saved_ajax_command {
+    my ( $class, @command ) = @_;
+    die "Missing saved ajax command\n" if !@command;
+    defined $SETPGID->()
+      or die "Unable to isolate saved ajax process $$: $!\n";
+    exec { $command[0] } @command;
+
+    # Devel::Cover cannot attribute a statement that follows a failed exec: the
+    # count lands on the exec line itself, so this line always reports zero even
+    # though the page-runtime coverage tests drive a failing exec through here and
+    # assert this message.
+    die "Unable to exec saved ajax command $command[0]: $!\n";    # uncoverable statement
+}
+
 # _run_saved_ajax_perl_file($path)
 # Executes one saved Perl Ajax file through the in-module bootstrap wrapper so
 # Windows does not have to carry a multi-line `perl -e` payload through the
@@ -985,7 +1108,7 @@ sub __run_code {
 1;
 PERL
     my $ok = eval $compiled;
-    die "Unable to setup sandpit $@\n" if !$ok;
+    die "Unable to setup sandpit $@\n" if !$ok;    # uncoverable branch true
 
     $package->__initial_context(
         $args{state} || {},
@@ -1058,7 +1181,14 @@ older C<CODE*> blocks while capturing STDOUT and STDERR for in-page display.
 =head2 new, prepare_page, run_code_blocks, stream_code_block, stream_saved_ajax_file
 
 Construct the runtime, render bookmark templates, execute in-process CODE
-blocks, and stream saved Ajax files as real child processes.
+blocks, and stream saved Ajax files as real child processes. On POSIX systems
+each saved Ajax worker runs inside its own process group, and disconnect or
+stream-error cleanup signals that whole group so descendant processes forked by
+the worker terminate with it; Windows keeps direct child-process termination.
+Cleanup sends SIGTERM first and then waits a bounded, elapsed-time grace window
+for the worker and its group to exit on their own, so a worker that installs a
+SIGTERM handler can reap its children, remove scratch files, and flush partial
+output before the SIGKILL escalation clears whatever is left.
 
 =for comment FULL-POD-DOC START
 

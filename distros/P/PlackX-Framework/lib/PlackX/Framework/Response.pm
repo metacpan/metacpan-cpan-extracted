@@ -154,6 +154,8 @@ subroutine.
 
 =head1 OBJECT METHODS
 
+Note: All render and redirect methods return $self (the response object).
+
 =over 4
 
 =item charset(), charset($newval)
@@ -221,6 +223,13 @@ Like Plack::Response->redirect, except the default http status is 303 See Other
 instead of 302 Found. This matches the more common type of redirect in a web
 app, which is directing the user to another page after a prevous request was
 processed (such as a log in form).
+
+Note URLs are passed along unaltered, you may want to prefix them in your app,
+for example with request->base:
+
+    $response->redirect($request->base . '/' . $dest);
+
+See Plack::Response->redirect for more caveats.
 
 =item render($key => @values)
 

@@ -208,6 +208,31 @@ has_tls(...)
     OUTPUT:
         RETVAL
 
+# Hyperman->tls_reload(\%sni) - replace this worker's TLS certificates
+# without replacing the process.
+#
+# The context a listener serves is built once, in the parent, before the
+# fork - so a certificate that arrives afterwards is not served until the
+# process is restarted, and SIGHUP does not help because it re-forks from
+# that same parent. This is the way to pick one up: called from inside a
+# worker, it rebuilds that worker's contexts from the map given, on that
+# worker's own loop, without unbinding anything.
+#
+# The map is the same shape `run` takes: { host => { cert => ..., key =>
+# ... } }, paths not PEM bytes. Returns the number of listeners rebuilt -
+# 0 outside a worker, 0 on a plain-only server, and 0 if the default
+# certificate would not load, in which case what was being served still
+# is.
+int
+tls_reload(class, sni = &PL_sv_undef)
+    SV *class
+    SV *sni
+    CODE:
+        PERL_UNUSED_VAR(class);
+        RETVAL = hm_cur_loop ? hm_tls_reload(aTHX_ hm_cur_loop, sni) : 0;
+    OUTPUT:
+        RETVAL
+
 # The current worker's loop, or undef outside a running loop.
 SV *
 loop(...)

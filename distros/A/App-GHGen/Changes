@@ -1,5 +1,34 @@
 Revision history for App-GHGen
 
+0.09	Mon Aug 10 08:26:23 PM EDT 2026
+	[ Bug Fixes ]
+	- Fixed Detector::detect_project_type returning (undef) — a one-element list
+	  — in list context when no project type is detected.  `return undef unless
+	  @detections` returns the scalar undef in list context, which Perl wraps in a
+	  list.  Changed to `return unless @detections` (bare return), which correctly
+	  returns () in list context and undef in scalar context, matching the POD spec.
+
+	[ Enhancements ]
+	- Update to shogo82148/actions-setup-perl@v1.43.1
+	- Added t/mutant_killers.t: 25 subtests that kill all surviving mutants from
+	  xt/mutant_20260810_160920.t.  Covers CostEstimator (estimate_savings
+	  total_minutes > 0 boundary; estimate_duration sequential-vs-parallel branch
+	  and max-accumulation comparison), Detector (file-count > 0 boundary for all
+	  8 language detectors: perl pm, perl t, python, go, ruby, php, java, cpp),
+	  Fixer::add_caching (checkout-detection condition), Interactive::prompt_choice
+	  (marker == default; answer >= 1 and <= @choices bounds), and Reporter
+	  (generate_markdown_report and generate_github_comment savings-cost > 0).
+	  Documents the >= variant of the estimate_duration max-accumulation mutant as
+	  a semantically equivalent mutant (not distinguishable by semantic tests).
+	- Added t/path.t: 34 path-coverage subtests targeting execution paths not
+	  covered by existing test files.  Covers Analyzer (broad-trigger scalar
+	  push, falsy push, paths-only filter, unpinned/outdated cap), Fixer
+	  (setup-node/python via uses, add_caching insertion at position 0,
+	  unrecognised project type, no-runs-on guard, trigger-filter HASH paths),
+	  CostEstimator (zero-saving branches, proportional percentage, free-tier
+	  boundary, matrix scalar value), and Detector (scalar/list context empty
+	  result, get_project_indicators all three branches).
+
 0.08	Fri Aug  7 01:31:57 PM EDT 2026
 	[ Enhancements ]
 	- Update to shogo82148/actions-setup-perl@v1.42.0

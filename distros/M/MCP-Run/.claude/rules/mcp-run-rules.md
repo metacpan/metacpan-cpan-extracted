@@ -39,12 +39,7 @@ This rule depends on whether the Agent/Task tool is available to you.
   plan, review diffs, run tests, manage git, edit non-behavioral docs. When in doubt,
   delegate. Why: only the `mcp-run-*` agents get their skills force-loaded via
   `briefing.skills`; you get no briefing and would touch internals with too little
-  context. Specialist lanes:
-
-  | Task | Agent |
-  |---|---|
-  | Implement / refactor / debug behavior-relevant code | `mcp-run-worker` (default) |
-  | Pre-release audit | `mcp-run-release-checker` |
+  context.
 
 - **You cannot spawn subagents** (you ARE `mcp-run-worker` or similar): The delegation
   lock does not apply to you — implement, refactor, debug, and test per these rules.

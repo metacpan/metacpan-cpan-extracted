@@ -1,0 +1,611 @@
+#!/usr/bin/env perl
+
+# IMPORTANT: the whole point of this script is that it is ONE process. The
+# coverage chain is three commands - drop the database, run the instrumented
+# suite, read the report back - and each is a separate interpreter with its own
+# @INC. Devel::Cover::DB::IO picks its on-disk serialization format at BEGIN
+# from whatever @INC makes visible and records that choice nowhere, so a chain
+# typed as three shell lines can set the library path on one of them and omit it
+# from the next, leaving the reader unable to parse what the writer just wrote.
+# Running the three as children of one process makes that split impossible: they
+# inherit one environment because there is only one to inherit. Do not
+# reintroduce per-command environment overrides here.
+
+use strict;
+use warnings;
+
+use Capture::Tiny qw(capture);
+use Digest::SHA qw(sha256_hex);
+use Fcntl qw(:flock);
+use File::Find ();
+use File::Basename qw(dirname);
+use File::Spec;
+use Getopt::Long qw(GetOptions);
+
+use constant EXIT_CLEAN    => 0;
+use constant EXIT_UNUSABLE => 2;
+use constant EXIT_BUSY     => 4;
+use constant EXIT_MOVED    => 5;
+
+# The lock lives beside the database rather than inside it, because the gate's
+# first act is to delete the database and a lock stored in there would be
+# removed by the very run it is meant to protect. It is a dotfile so that
+# Dist::Zilla's gatherer, which skips dotfiles, cannot ship it.
+#
+# It is named AFTER the database instead of being one fixed path, because what
+# must not be shared is the database, not the script. A single repository-wide
+# lock also refuses runs that were never in conflict - a gate given its own
+# --database contends for nothing - and that is not a theoretical tidiness: the
+# suite's own tests drive this script, so a fixed lock meant the gate could never
+# pass the suite it was running. It held the lock for the whole run and then
+# refused its own tests (DD-526).
+sub _gate_lock_path {
+    my ($database) = @_;
+
+    my ( $volume, $directories, $file ) = File::Spec->splitpath( File::Spec->rel2abs($database) );
+
+    return File::Spec->catpath( $volume, $directories, ".$file.lock" );
+}
+
+# The name this lock used to have, before it was named after its database. A gate
+# started from the older script guards THIS path, so a gate started from the newer
+# one must guard it too or the two do not exclude each other at all - which is not
+# hypothetical: four gates ran against one cover_db while this was being written,
+# in two groups that were each internally exclusive and mutually invisible.
+#
+# The general rule, which outlives this particular rename: a lock is only a mutex
+# if every contender agrees on its name, so renaming one is never a pure refactor.
+# The changeover has to hold BOTH names for one release, after which this can go.
+#
+# A second and nastier property was found the same afternoon and is worth writing
+# down here, where the next person to touch this will see it: an flock's identity
+# is an INODE, not a path. Deleting a lock file does not fail and does not warn -
+# it silently revokes exclusion for every process still holding it, because the
+# next arrival creates a fresh file at the same path and locks that instead. Do
+# not unlink these, ever, and do not let a cleanup rule match them.
+use constant LEGACY_GATE_LOCK => '.coverage-gate.lock';
+
+# Purpose: list every lock path this run must hold to be sure it is alone with its
+#          database - which during a rename means the new name and the old one.
+# Input: the database this run intends to own.
+# Output: the lock paths, most specific first.
+sub _gate_lock_paths {
+    my ($database) = @_;
+
+    my @paths = ( _gate_lock_path($database) );
+
+    # Only the default database ever had the legacy lock. A run with its own
+    # --database never contended for it, so demanding it here would refuse runs
+    # that conflict with nothing - the exact fault DD-526 was fixed to avoid.
+    push @paths, File::Spec->rel2abs(LEGACY_GATE_LOCK)
+        if File::Spec->rel2abs($database) eq File::Spec->rel2abs('cover_db');
+
+    return @paths;
+}
+
+exit main(@ARGV);
+
+# Purpose: run the four-metric coverage gate end to end inside one environment.
+# Input: the raw @ARGV list - optional --database, --dry-run and --help, plus
+#        optional test paths which default to the whole t/ tree.
+# Output: an exit code - 0 every metric at 100.0, 1 a genuine shortfall, 2 the
+#         gate could not run or could not read its report, 3 the coverage
+#         instrument could not read its own database, 4 another gate already
+#         holds the database and this run refused rather than corrupt it, 5 the
+#         tree moved while the suite ran so the number describes no single state
+#         of it.
+sub main {
+    my @argv = @_;
+
+    my $database = 'cover_db';
+    my ( $dry_run, $help ) = ( 0, 0 );
+
+    local @ARGV = @argv;
+    GetOptions(
+        'database=s' => \$database,
+        'dry-run'    => \$dry_run,
+        'help'       => \$help,
+    ) or return _usage('unrecognized option');
+
+    if ($help) {
+        print _usage_text();
+        return EXIT_CLEAN;
+    }
+
+    my @tests = @ARGV ? @ARGV : ('t');
+
+    my $script_directory = dirname( File::Spec->rel2abs(__FILE__) );
+    my $repository       = File::Spec->catdir( $script_directory, File::Spec->updir );
+    my $checker          = File::Spec->catfile( $script_directory, 'check-all-metric-coverage' );
+    return _unusable("the coverage checker is missing: $checker") if !-f $checker;
+
+    chdir $repository or return _unusable("cannot enter the repository root $repository: $!");
+
+    my $instrument = _instrument_module();
+    return _unusable(
+        'Devel::Cover::DB::IO could not be loaded, so this chain could neither write nor read a '
+            . 'coverage database; install Devel::Cover or put it on PERL5LIB before running the gate'
+    ) if !defined $instrument;
+
+    # The launch boundary. Everything above proves what THIS process loaded; the
+    # suite and the report run as CHILDREN, and they resolve Devel::Cover
+    # independently. On a host with two installs those resolutions can differ:
+    # running the gate directly with PERL5LIB set picks ~/perl5, while running the
+    # identical command through a login shell - which rebuilds PERL5LIB and PATH
+    # from the profile - picks /usr/local. Same command, same directory, same perl,
+    # two different serializers.
+    #
+    # That is not a cosmetic difference. One install writes the database and the
+    # other reads it, the formats disagree, and the gate reports a coverage failure
+    # that has nothing to do with the code. The card that produced this fix exists
+    # because two rounds were spent chasing exactly that ghost.
+    #
+    # So ask a child the same question and refuse if the answers differ.
+    my $child_instrument = _child_instrument_module();
+    if ( !defined $child_instrument ) {
+        return _unusable(
+            'a child process could not load Devel::Cover::DB::IO at all, though this process can. '
+                . 'The suite and the report run as children, so the chain would write or read nothing usable'
+        );
+    }
+    if ( $child_instrument ne $instrument ) {
+        return _unusable(
+            "this process and its children resolve different Devel::Cover installs, so the suite would "
+                . "write a database the report cannot read:\n"
+                . "  this process : $instrument\n"
+                . "  its children : $child_instrument"
+        );
+    }
+
+    # The database is what actually crosses the launch boundary. Within a single
+    # run the writer and the reader always agree, because they share one
+    # environment - which is why the existing checks pass and the failure still
+    # happened. What they cannot see is the PREVIOUS run: cover_db persists, and a
+    # gate launched through a login shell resolves /usr/local while the same gate
+    # launched with PERL5LIB set resolves ~/perl5. One writes the database, the
+    # other reads it, the formats disagree, and the resulting failure is
+    # indistinguishable from a real one.
+    #
+    # So the database carries a stamp of who wrote it, and a run that would read a
+    # database written by a different serializer refuses and says so, naming both.
+    my $stamp_failure = _check_database_stamp( $database, $instrument );
+    return $stamp_failure if defined $stamp_failure;
+
+    my @delete = ( 'cover', $database, '-delete' );
+    my @suite  = ( 'prove', '-lr', @tests );
+    my @report = (
+        'cover', $database, '-report', 'text', '-select_re', '^lib/',
+        '-coverage', 'statement',
+        '-coverage', 'branch',
+        '-coverage', 'condition',
+        '-coverage', 'subroutine',
+    );
+
+    _announce( $instrument, $database, \@delete, \@suite, \@report );
+    return EXIT_CLEAN if $dry_run;
+
+    # Taken after the dry run returns, so describing the chain never blocks on a
+    # run in flight, and held in a lexical for the rest of main: the handle must
+    # outlive the suite, because closing it releases the lock.
+    my $locks = _hold_gate_locks($database);
+    return EXIT_BUSY if !defined $locks;
+
+    my $dropped = _run( 'coverage database drop', @delete );
+    return $dropped if $dropped != EXIT_CLEAN;
+
+    my $before = _grading_identity();
+
+    local $ENV{HARNESS_PERL_SWITCHES} = "-MDevel::Cover=-db,$database,-blib,0";
+    my $ran = _run( 'instrumented suite', @suite );
+
+    my $after = _grading_identity();
+    if ( $before ne $after ) {
+        print "coverage gate: refusing to report - the code being graded changed while the suite ran\n";
+        print "coverage gate: t/ or lib/ is not what it was at the start, so this run describes no single "
+            . "state of the tree and its number would be unsafe to trust\n";
+        print "coverage gate: rerun it on a tree nobody is moving\n";
+        return EXIT_MOVED;
+    }
+
+    return $ran if $ran != EXIT_CLEAN;
+
+    my ( $stdout, $stderr, $status ) = capture {
+        system(@report);
+    };
+
+    _warn( sprintf 'the report command exited %d; its output is being judged anyway', $status >> 8 )
+        if $status != 0;
+
+    return _judge( $checker, $database, $stdout . $stderr );
+}
+
+sub _grading_identity {
+    my @facts;
+    File::Find::find(
+        {
+            no_chdir => 1,
+            wanted   => sub {
+                my $path = $File::Find::name;
+                return if !-f $path;
+                my @stat = stat $path;
+                push @facts, join '|', $path, $stat[7], $stat[9];
+            },
+        },
+        grep { -d } qw(t lib)
+    );
+    @facts = sort @facts;
+    return sha256_hex( join "\n", @facts );
+}
+
+# Purpose: take an exclusive, non-blocking lock so that only one gate at a time
+#          owns the coverage database. Two gates sharing one database is not a
+#          slow build, it is a false number: each one's first act is to delete
+#          the database, so a second start wipes the first's accumulated data
+#          mid-suite and both then report on whatever survived. A run that
+#          cannot own the database must refuse rather than produce a figure.
+# Input: the database this run intends to own; the lock is named after it, so
+#        two gates conflict exactly when they would share a database and not
+#        merely when they run at the same time.
+# Output: the open handle on success - the caller must keep it, since closing it
+#         releases the lock - or undef, having explained who holds it.
+sub _hold_gate_locks {
+    my ($database) = @_;
+
+    my @held;
+    for my $path ( _gate_lock_paths($database) ) {
+        my $handle = _hold_gate_lock($path);
+
+        # All or nothing. Holding one of two names is worse than holding neither,
+        # because it looks like exclusion and is not: the run would proceed while
+        # a gate guarding the other name proceeded alongside it.
+        return undef if !defined $handle;
+
+        push @held, $handle;
+    }
+
+    return \@held;
+}
+
+# Purpose: take one named lock, reporting who holds it if it cannot be had.
+# Input: the lock path.
+# Output: the open handle, or undef having explained itself.
+sub _hold_gate_lock {
+    my ($path) = @_;
+
+    my $handle;
+    if ( !open $handle, '+>>', $path ) {
+        _warn("the gate lock $path could not be opened: $!");
+        return undef;
+    }
+
+    if ( flock $handle, LOCK_EX | LOCK_NB ) {
+        # Record who holds it, for the benefit of whoever is refused next. The
+        # truncate matters: the file is opened for append so a shorter pid would
+        # otherwise leave the tail of a longer one behind it.
+        truncate $handle, 0;
+        seek $handle, 0, 0;
+        print {$handle} "$$\n";
+        $handle->flush if $handle->can('flush');
+        return $handle;
+    }
+
+    my $holder = _lock_holder($path);
+    print "coverage gate: refusing to run - another gate holds $path"
+        . ( defined $holder ? " (pid $holder)" : '' ) . "\n";
+    print "coverage gate: two gates on one database delete each other's data, "
+        . "so this run would report a number that means nothing\n";
+    close $handle;
+    return undef;
+}
+
+# Purpose: read the pid recorded by whichever gate currently holds the lock, so
+#          a refusal can name it instead of leaving the operator to hunt.
+# Input: the lock path.
+# Output: the recorded pid, or undef when it cannot be read.
+sub _lock_holder {
+    my ($path) = @_;
+
+    open my $handle, '<', $path or return undef;
+    my $line = <$handle>;
+    close $handle;
+
+    return undef if !defined $line;
+    chomp $line;
+    return $line =~ /\A([0-9]+)\z/ ? $1 : undef;
+}
+
+# Purpose: resolve the Devel::Cover serializer module this chain will use, so an
+#          unusable instrument is reported before a host-exclusive suite slot is
+#          spent rather than after.
+# Input: none.
+# Output: the resolved module path, or undef when it cannot be loaded.
+sub _instrument_module {
+    return undef if !eval { require Devel::Cover::DB::IO; 1 };
+    my $loaded = $INC{ File::Spec->catfile(qw(Devel Cover DB IO.pm)) };
+    return defined $loaded ? $loaded : $INC{'Devel/Cover/DB/IO.pm'};
+}
+
+# Purpose: ask a child process which Devel::Cover serializer IT resolves, because
+#          the suite and the report are children and resolve it independently of
+#          this process.
+# Input:   none
+# Output:  the child's resolved path, or undef when the child cannot load it.
+sub _child_instrument_module {
+    my $path = qx{$^X -MDevel::Cover::DB::IO -e 'print \$INC{"Devel/Cover/DB/IO.pm"}' 2>/dev/null};
+    return undef if $? != 0 || !defined $path;
+    chomp $path;
+    return length $path ? $path : undef;
+}
+
+# Purpose: refuse to grade a database written by a different Devel::Cover than the
+#          one that will read it, and stamp the database for the next run.
+# Input:   the database directory and this run's resolved serializer path.
+# Output:  EXIT_UNUSABLE when the stamps disagree, undef when it is safe to go on.
+sub _check_database_stamp {
+    my ( $database, $instrument ) = @_;
+
+    my $stamp_file = File::Spec->catfile( $database, 'gate-serializer' );
+
+    if ( -d $database && -f $stamp_file ) {
+        my $previous = _slurp_stamp($stamp_file);
+        if ( defined $previous && $previous ne $instrument ) {
+            return _unusable(
+                "this database was written by a different Devel::Cover than the one that would read it "
+                    . "now, so any number it produced would be meaningless:\n"
+                    . "  written by : $previous\n"
+                    . "  reading as : $instrument\n"
+                    . 'This is the launch boundary: a login shell rebuilds PERL5LIB from the profile and '
+                    . 'selects the other install. Delete cover_db and run the whole chain in one environment'
+            );
+        }
+    }
+
+    # Stamp for whoever comes next. A failure to write it is not fatal - the run
+    # itself is still sound - but it is announced rather than hidden, because a
+    # missing stamp means the next run cannot make this check.
+    if ( -d $database ) {
+        if ( open my $fh, '>', $stamp_file ) {
+            print {$fh} "$instrument\n";
+            close $fh;
+        }
+        else {
+            _warn("could not stamp the coverage database at $stamp_file: $!");
+        }
+    }
+
+    return undef;
+}
+
+# Purpose: read a serializer stamp, tolerating an unreadable or empty file.
+# Input:   the stamp file path.
+# Output:  the recorded path, or undef.
+sub _slurp_stamp {
+    my ($path) = @_;
+    open my $fh, '<', $path or return undef;
+    my $line = <$fh>;
+    close $fh;
+    return undef if !defined $line;
+    chomp $line;
+    return length $line ? $line : undef;
+}
+
+# Purpose: print the one environment and the three commands, so the operator can
+#          see what is about to run and confirm writer and reader agree.
+# Input: the resolved instrument path, the database, and the three command lists.
+# Output: nothing; writes to standard output.
+sub _announce {
+    my ( $instrument, $database, $delete, $suite, $report ) = @_;
+
+    print "coverage gate: one environment for the whole chain\n";
+    printf "coverage gate:   perl        : %s\n",       $^X;
+    printf "coverage gate:   PERL5LIB    : %s\n",       defined $ENV{PERL5LIB} ? $ENV{PERL5LIB} : '(unset)';
+    printf "coverage gate:   serializer  : %s\n",       $instrument;
+    printf "coverage gate:   database    : %s\n",       $database;
+    printf "coverage gate:   drop        : %s\n", join ' ', @{$delete};
+    printf "coverage gate:   suite       : %s\n", join ' ', @{$suite};
+    printf "coverage gate:   report      : %s\n", join ' ', @{$report};
+
+    return;
+}
+
+# Purpose: run one step of the chain with its output streamed, so a long suite
+#          never looks like a stalled one.
+# Input: a human name for the step, then the command and its arguments.
+# Output: EXIT_CLEAN when the step succeeded, EXIT_UNUSABLE otherwise.
+sub _run {
+    my ( $step, @command ) = @_;
+
+    my $status = system @command;
+    return EXIT_CLEAN if $status == 0;
+
+    return _unusable( sprintf 'the %s step failed (%s): %s', $step, _describe_status($status), join ' ', @command );
+}
+
+# Purpose: turn a wait status into a phrase that says which of the three
+#          different failures it was.
+# Input: the raw value returned by system().
+# Output: a short description.
+sub _describe_status {
+    my ($status) = @_;
+
+    return "could not be executed: $!" if $status == -1;
+    return sprintf 'killed by signal %d', $status & 127 if $status & 127;
+    return sprintf 'exit status %d', $status >> 8;
+}
+
+# Purpose: hand the collected report to the enforcing checker and adopt its
+#          verdict, so there is exactly one place that decides what a report
+#          means.
+# Input: the checker path, the coverage database, and the collected report text
+#        with the report command's diagnostics appended.
+# Output: the checker's exit status, or EXIT_UNUSABLE when it could not be run.
+sub _judge {
+    my ( $checker, $database, $report ) = @_;
+
+    open my $input, '|-', $^X, $checker, '--database', $database
+        or return _unusable("cannot run the coverage checker $checker: $!");
+    print {$input} $report;
+    close $input;
+    my $status = $?;
+
+    return _unusable( sprintf 'the coverage checker %s', _describe_status($status) )
+        if $status == -1 || ( $status & 127 );
+
+    return $status >> 8;
+}
+
+# Purpose: report a condition that stops the gate from reaching any verdict.
+# Input: the reason, without a trailing newline.
+# Output: EXIT_UNUSABLE, after writing the reason to standard error.
+sub _unusable {
+    my ($reason) = @_;
+    _warn($reason);
+    return EXIT_UNUSABLE;
+}
+
+# Purpose: write one diagnostic line in the gate's own voice.
+# Input: the message, without a trailing newline.
+# Output: nothing; writes to standard error.
+sub _warn {
+    my ($message) = @_;
+    print {*STDERR} "coverage gate: $message\n";
+    return;
+}
+
+# Purpose: refuse an invocation the gate does not understand, rather than
+#          running a several-minute chain on a guess about what was meant.
+# Input: the reason, without a trailing newline.
+# Output: EXIT_UNUSABLE, after writing the reason and the usage to standard
+#         error.
+sub _usage {
+    my ($reason) = @_;
+    _warn($reason);
+    print {*STDERR} _usage_text();
+    return EXIT_UNUSABLE;
+}
+
+# Purpose: describe the gate for a reader at the terminal.
+# Input: none.
+# Output: the usage text as one string.
+sub _usage_text {
+    return <<'USAGE';
+usage: perl script/coverage-gate [--database DIR] [--dry-run] [--help] [TEST_PATH...]
+
+Runs the whole four-metric coverage gate as one process, so every command in the
+chain inherits one environment:
+
+  1. drop the coverage database
+  2. run the instrumented suite (default: the whole t/ tree)
+  3. collect the lib/ report for statement, branch, condition and subroutine
+  4. enforce 100.0 on all four through script/check-all-metric-coverage
+
+  --database DIR  use DIR as the coverage database (default: cover_db)
+  --dry-run       print the resolved environment and the three commands, run none
+  --help          print this text
+
+Exit status: 0 all four metrics at 100.0, 1 a genuine shortfall, 2 the gate could
+not run or could not read its report, 3 the coverage instrument could not read
+its own database.
+USAGE
+}
+
+__END__
+
+=head1 NAME
+
+coverage-gate - run the whole four-metric coverage gate inside one environment
+
+=head1 WHAT IT IS
+
+The canonical entrypoint for the repository coverage gate. It drops the coverage
+database, runs the instrumented test suite, collects the C<lib/> report for
+statement, branch, condition and subroutine coverage, and enforces 100.0 on all
+four through C<script/check-all-metric-coverage>.
+
+=head1 WHAT IT IS FOR
+
+It is the one command a developer, an automated round, or a continuous
+integration job runs to answer "does C<lib/> still measure 100.0 on every
+metric?". The documented gate and the executed gate are the same thing because
+there is only one of them.
+
+=head1 WHY IT EXISTS
+
+The gate used to be three shell lines. Each is its own interpreter with its own
+C<@INC>, so the library path had to be repeated on all three, and
+C<Devel::Cover::DB::IO> chooses its on-disk serialization format at C<BEGIN>
+from whatever C<@INC> makes visible - Sereal, then JSON, then Storable - without
+recording the choice beside the data.
+
+On a host carrying two C<Devel::Cover> installations whose available serializers
+differ, omitting the library path from one line of the chain leaves the reader
+unable to parse what the writer produced moments earlier. It surfaces as C<File
+is not a perl storable> or C<Bad Sereal header>: both read as a corrupt
+database, and the obvious response - delete it and run again - fails
+identically, spending another host-exclusive multi-minute suite slot every time.
+Two automated rounds paid that cost inside two hours, and the second did not
+recognise the first.
+
+Documentation had already been written telling readers to repeat the library
+path, and it did not prevent the recurrence. Running the three commands as
+children of one process removes the hazard instead of warning about it: they
+inherit one environment because there is only one to inherit.
+
+=head1 WHEN TO USE
+
+Before claiming any change complete, and as the coverage step of every
+continuous integration workflow. Only one coverage run may be in flight on a
+host at a time, because instrumented timing-sensitive tests misread under
+contention.
+
+=head1 HOW TO USE
+
+Run it from anywhere; it enters the repository root itself. Give it test paths
+to narrow the instrumented run, C<--database> to keep the database somewhere
+other than C<cover_db>, and C<--dry-run> to see the resolved environment and the
+exact commands before spending a suite slot.
+
+Exit statuses are the interface:
+
+=over 4
+
+=item * B<0> - statement, branch, condition and subroutine are all 100.0.
+
+=item * B<1> - a genuine shortfall; the failing metrics are named.
+
+=item * B<2> - the gate could not run, or could not read its report.
+
+=item * B<3> - the coverage instrument could not read its own database.
+
+=back
+
+=head1 WHAT USES IT
+
+The C<test>, C<release-cpan> and C<release-github> workflows, the contributor
+testing guide, and C<t/148-coverage-gate-entrypoint.t>, which is its acceptance
+contract.
+
+=head1 EXAMPLES
+
+Example 1:
+
+  perl script/coverage-gate
+
+Run the full gate over the whole suite.
+
+Example 2:
+
+  perl script/coverage-gate --dry-run
+
+Print the resolved interpreter, library path, serializer module and the three
+commands, and run none of them. Use this to confirm the instrument before
+committing a host-exclusive slot to it.
+
+Example 3:
+
+  perl script/coverage-gate --database /tmp/scratch-db t/107-all-metric-coverage-gate.t
+
+Collect coverage for a focused set of tests into a scratch database, leaving the
+repository's own C<cover_db> untouched.
+
+=cut

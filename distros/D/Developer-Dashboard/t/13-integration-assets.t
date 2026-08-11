@@ -8,7 +8,10 @@ use Test::More;
 my $has_source_tree_docs = -f 'dist.ini';
 my $has_integration_assets = -d 'integration';
 
-if ( $has_source_tree_docs && -d '.git' ) {
+# -e, not -d: a linked git worktree carries .git as a regular file holding a
+# "gitdir:" pointer, and a directory test silently dropped these tracking
+# assertions in every per-ticket worktree.
+if ( $has_source_tree_docs && -e '.git' ) {
     ok( _path_is_git_tracked('doc/integration-test-plan.md'), 'integration test plan document is tracked by git' );
     ok( _path_is_git_tracked('doc/testing.md'), 'testing workflow document is tracked by git' );
     ok( _path_is_git_tracked('doc/windows-testing.md'), 'Windows verification document is tracked by git' );
@@ -31,9 +34,12 @@ ok( -f 'doc/windows-testing.md', 'Windows verification document exists' ) if $ha
 ok( -f 'integration/windows/run-strawberry-smoke.ps1', 'Windows Strawberry Perl smoke script exists' ) if $has_integration_assets;
 ok( -f 'integration/windows/run-qemu-windows-smoke.sh', 'Windows QEMU smoke launcher exists' ) if $has_integration_assets;
 ok( -f 'integration/windows/run-host-windows-smoke.sh', 'Windows host rerun helper exists' ) if $has_integration_assets;
+ok( -f 'integration/windows/run-collector-timeout-e2e.ps1', 'Windows collector timeout E2E script exists' ) if $has_integration_assets;
+ok( -f 'integration/windows/run-dockur-collector-timeout-e2e.sh', 'host-side Dockur collector timeout E2E driver exists' ) if $has_integration_assets;
 ok( -f 't/29-windows-qemu-smoke.t', 'Windows QEMU smoke test exists under t/' );
 ok( -x 'integration/windows/run-qemu-windows-smoke.sh', 'Windows QEMU smoke launcher is executable' ) if $has_integration_assets;
 ok( -x 'integration/windows/run-host-windows-smoke.sh', 'Windows host rerun helper is executable' ) if $has_integration_assets;
+ok( -x 'integration/windows/run-dockur-collector-timeout-e2e.sh', 'host-side Dockur collector timeout E2E driver is executable' ) if $has_integration_assets;
 
 if ($has_source_tree_docs) {
     open my $plan_fh, '<', 'doc/integration-test-plan.md' or die $!;
@@ -88,6 +94,8 @@ if ($has_source_tree_docs) {
     like( $windows_doc, qr/Strawberry Perl/, 'Windows verification doc targets Strawberry Perl explicitly' );
     like( $windows_doc, qr/install\.ps/, 'Windows verification doc references the repo-root install.ps1 bootstrap entrypoint' );
     like( $windows_doc, qr/run-strawberry-smoke\.ps1/, 'Windows verification doc references the host-side Strawberry smoke script' );
+    like( $windows_doc, qr/run-collector-timeout-e2e\.ps1/, 'Windows verification doc references the collector timeout E2E script' );
+    like( $windows_doc, qr/run-dockur-collector-timeout-e2e\.sh/, 'Windows verification doc references the repeatable host-side Dockur timeout E2E driver' );
     like( $windows_doc, qr/run-qemu-windows-smoke\.sh/, 'Windows verification doc references the QEMU smoke launcher' );
     like( $windows_doc, qr/run-host-windows-smoke\.sh/, 'Windows verification doc references the one-command host rerun helper' );
     like( $windows_doc, qr/qemu-system-x86_64/, 'Windows verification doc documents the QEMU dependency' );
@@ -189,6 +197,8 @@ if ($has_integration_assets) {
     like( $windows_smoke, qr/\& powershell\.exe \@\(\s*'-NoLogo',\s*'-File',\s*\$freshSessionScriptPath/s, 'Windows Strawberry smoke script re-enters a normal profile-loaded PowerShell session through a direct powershell.exe invocation without piping its stdout through an outer capture' );
     like( $windows_smoke, qr/DD_FRESH_SESSION_LOG/, 'Windows Strawberry smoke script passes a dedicated fresh-session marker log path into the child PowerShell process' );
     like( $windows_smoke, qr/Add-Content -Path \$env:DD_FRESH_SESSION_LOG -Value \$Line/, 'Windows Strawberry smoke script records fresh-session progress markers through a dedicated child-side log file instead of outer stdout capture' );
+    like( $windows_smoke, qr/Stopwatch\]::StartNew\(\).*?TotalMilliseconds.*?500/s, 'Windows Strawberry smoke script enforces the 500 ms fresh profile-load budget' );
+    like( $windows_smoke, qr/Win32_ProcessStartTrace.*?perl(?:\.exe)?/si, 'Windows Strawberry smoke script observes process-start events and rejects Perl launches during fresh profile loading' );
     like( $windows_smoke, qr/DASHBOARD_LOGS_START/, 'Windows Strawberry smoke script prints an explicit dashboard logs marker during the fresh PowerShell bootstrap proof' );
     like( $windows_smoke, qr/Get-Command dashboard -ErrorAction Stop/, 'Windows Strawberry smoke script requires a fresh PowerShell session to resolve dashboard through normal command discovery' );
     like( $windows_smoke, qr/DASHBOARD_RESTART_START/, 'Windows Strawberry smoke script prints an explicit dashboard restart marker during the fresh PowerShell bootstrap proof' );
@@ -226,6 +236,11 @@ if ($has_integration_assets) {
     like( $windows_smoke, qr/\$ErrorActionPreference = 'Continue'/, 'Windows Strawberry smoke script avoids PowerShell terminating on native stderr before exit-code checks' );
     like( $windows_smoke, qr/dashboard shell ps/, 'Windows Strawberry smoke script verifies PowerShell shell bootstrap output' );
     like( $windows_smoke, qr/dashboard collector run/, 'Windows Strawberry smoke script exercises collector command execution' );
+    like( $windows_smoke, qr/windows\.timeout\.collector/, 'Windows Strawberry smoke script exercises the native collector timeout path' );
+    like( $windows_smoke, qr/exit_code=124/, 'Windows Strawberry smoke script requires the timed-out collector to return exit code 124' );
+    like( $windows_smoke, qr/timed_out=1/, 'Windows Strawberry smoke script requires the timed-out collector flag' );
+    like( $windows_smoke, qr/Get-CimInstance Win32_Process/, 'Windows Strawberry smoke script verifies the unique timed-out process marker is absent afterward' );
+    like( $windows_smoke, qr/elapsed_ms/, 'Windows Strawberry smoke script records bounded timeout elapsed time' );
     like( $windows_smoke, qr/Invoke-WebRequest/, 'Windows Strawberry smoke script verifies browser-facing HTTP routes with PowerShell web requests' );
     like( $windows_smoke, qr/saved Ajax route:/, 'Windows Strawberry smoke script prints the resolved saved Ajax route during the guest smoke for route-shape diagnostics' );
     like( $windows_smoke, qr/\/ajax\/hello\.pl\?type=text/, 'Windows Strawberry smoke script replays the deterministic saved Ajax route defined by the Windows smoke fixture' );
@@ -298,6 +313,54 @@ if ($has_integration_assets) {
     like( $windows_host, qr/Developer-Dashboard-\*\.tar\.gz|\*\.tar\.gz/, 'Windows host rerun helper uses version-agnostic tarball discovery' );
     like( $windows_host, qr/__END__/, 'Windows host rerun helper carries POD trailer' );
     unlike( $windows_host, qr/Developer-Dashboard-1\.\d+\.tar\.gz/, 'Windows host rerun helper POD avoids hard-coded release tarball versions' );
+
+    open my $timeout_e2e_fh, '<', 'integration/windows/run-collector-timeout-e2e.ps1' or die $!;
+    my $timeout_e2e = do { local $/; <$timeout_e2e_fh> };
+    close $timeout_e2e_fh;
+    like( $timeout_e2e, qr/\[guid\]::NewGuid/, 'Windows timeout E2E script generates a unique per-run marker so persistent-guest reruns cannot collide' );
+    like( $timeout_e2e, qr/dd-timeout-e2e-/, 'Windows timeout E2E script namespaces its marker so stray-process matching stays scoped to this harness' );
+    like( $timeout_e2e, qr/Stop-StrayDashboardProcesses/, 'Windows timeout E2E script applies the clean-slate rule and kills stray dashboard processes before the run' );
+    like( $timeout_e2e, qr/Get-CimInstance Win32_Process/, 'Windows timeout E2E script observes real guest process state through CIM instead of trusting exit codes' );
+    like( $timeout_e2e, qr/Where-Object/, 'Windows timeout E2E script filters process rows with Where-Object' );
+    unlike( $timeout_e2e, qr/Get-CimInstance[^\r\n]*-Filter/, 'Windows timeout E2E script avoids WQL -Filter string quoting pitfalls when matching processes' );
+    like( $timeout_e2e, qr/\$env:USERPROFILE = \$homeRoot/, 'Windows timeout E2E script isolates the run under a hermetic temporary Windows home' );
+    like( $timeout_e2e, qr/\$env:DD_STATE_ROOT_USER/, 'Windows timeout E2E script pins the state-root user seam so a non-interactive Windows session never reaches the unimplemented getpwuid fallback' );
+    like( $timeout_e2e, qr/timeout\s*=\s*\$TimeoutSeconds/, 'Windows timeout E2E script configures the collector with an explicit short timeout' );
+    like( $timeout_e2e, qr/system\( 1, \$\^X/, 'Windows timeout E2E blocker spawns an asynchronous descendant so subtree termination is really exercised' );
+    like( $timeout_e2e, qr/descendant-/, 'Windows timeout E2E blocker tags its descendant command line with the run marker' );
+    like( $timeout_e2e, qr/sleep 1 for 1 \.\. 3600/, 'Windows timeout E2E blocker blocks far longer than the configured timeout so an interrupt is the only passing path' );
+    like( $timeout_e2e, qr/collector", "run"/, 'Windows timeout E2E script triggers the blocking collector through dashboard collector run' );
+    like( $timeout_e2e, qr/ConvertFrom-Json/, 'Windows timeout E2E script parses the structured collector run result' );
+    like( $timeout_e2e, qr/timed_out/, 'Windows timeout E2E script asserts the timed_out flag on the collector result' );
+    like( $timeout_e2e, qr/\b124\b/, 'Windows timeout E2E script asserts the canonical timeout exit code 124' );
+    like( $timeout_e2e, qr/collector", "status"/, 'Windows timeout E2E script verifies the cached collector status after the timeout' );
+    like( $timeout_e2e, qr/last_exit_code/, 'Windows timeout E2E script asserts the persisted last_exit_code reflects the timeout' );
+    like( $timeout_e2e, qr/\[System\.Diagnostics\.Stopwatch\]::StartNew/, 'Windows timeout E2E script measures elapsed wall-clock time to prove the blocking command was interrupted' );
+    like( $timeout_e2e, qr/Assert-MarkerProcessesGone/, 'Windows timeout E2E script asserts the blocker and its descendant are both really gone after the timeout' );
+    like( $timeout_e2e, qr/\@\(\s*Get-ProcessesMatching/, 'Windows timeout E2E script forces array semantics on process queries so the zero-survivor success path cannot trip strict mode' );
+    unlike( $timeout_e2e, qr/\$survivors\s*=\s*Get-ProcessesMatching/, 'Windows timeout E2E script never assigns a process query straight to a variable it then counts' );
+    like( $timeout_e2e, qr/agent-alive-ok/, 'Windows timeout E2E script proves the collector agent survives the timeout by running a healthy collector afterwards' );
+    like( $timeout_e2e, qr/__END__/, 'Windows timeout E2E script carries POD trailer' );
+    unlike( $timeout_e2e, qr/Developer-Dashboard-\d+\.\d+\.tar\.gz/, 'Windows timeout E2E script avoids hard-coded release tarball versions' );
+
+    open my $dockur_fh, '<', 'integration/windows/run-dockur-collector-timeout-e2e.sh' or die $!;
+    my $dockur = do { local $/; <$dockur_fh> };
+    close $dockur_fh;
+    like( $dockur, qr/^#!/, 'Dockur timeout E2E driver carries a shebang' );
+    like( $dockur, qr/set -euo pipefail/, 'Dockur timeout E2E driver fails fast instead of continuing past a broken step' );
+    like( $dockur, qr/run-collector-timeout-e2e\.ps1/, 'Dockur timeout E2E driver ships the in-guest harness into the guest' );
+    like( $dockur, qr/ddagent-alive\.txt/, 'Dockur timeout E2E driver verifies the in-guest job agent is alive before submitting work' );
+    like( $dockur, qr/ddjob-/, 'Dockur timeout E2E driver submits work through the shared-folder job protocol' );
+    like( $dockur, qr/Developer-Dashboard-\*\.tar\.gz|\*\.tar\.gz/, 'Dockur timeout E2E driver uses version-agnostic tarball discovery' );
+    like( $dockur, qr/cpanm/, 'Dockur timeout E2E driver installs the built tarball in the guest before running the E2E' );
+    like( $dockur, qr/_await_windows_command|DD_E2E_REQUIRE_SYMBOL|require_symbol/, 'Dockur timeout E2E driver proves the installed guest product carries the Windows timeout implementation' );
+    like( $dockur, qr/DD_STATE_ROOT_USER|HOME/, 'Dockur timeout E2E driver gives the guest install the environment a non-interactive Windows session lacks' );
+    like( $dockur, qr/exit:/, 'Dockur timeout E2E driver reads the job status file the guest agent writes' );
+    like( $dockur, qr/tr -d/, 'Dockur timeout E2E driver strips the guest CRLF from the status file before reading the exit code' );
+    like( $dockur, qr/git-common-dir/, 'Dockur timeout E2E driver finds the shared folder in the main checkout when it runs from a ticket worktree' );
+    like( $dockur, qr/\[A-Za-z0-9\._-\]\+/, 'Dockur timeout E2E driver validates the job namespace before interpolating it into the generated guest script' );
+    like( $dockur, qr/__END__/, 'Dockur timeout E2E driver carries POD trailer' );
+    unlike( $dockur, qr/Developer-Dashboard-\d+\.\d+\.tar\.gz/, 'Dockur timeout E2E driver avoids hard-coded release tarball versions' );
 }
 else {
     ok( -d 'integration', 'release tarball keeps integration assets for shipped install-time verification' );
@@ -313,7 +376,7 @@ if ( -f 'dist.ini' ) {
     unlike( $dist, qr/exclude_filename = Makefile\.PL/, 'dist.ini keeps the checked-in Makefile.PL so dzil ships the checkout install hooks' );
     unlike( $dist, qr/^\[MakeMaker\]$/m, 'dist.ini does not regenerate Makefile.PL over the checked-in checkout install hooks' );
     like( $dist, qr/\[AutoPrereqs\]/, 'dist.ini includes AutoPrereqs for built distribution dependencies' );
-    like( $dist, qr/^JSON::XS = 0$/m, 'dist.ini pins JSON::XS explicitly for built distribution runtime metadata' );
+    like( $dist, qr/^JSON::XS = 4\.04$/m, 'dist.ini pins JSON::XS at its secure minimum for built distribution runtime metadata' );
 }
 else {
     ok( !-f 'dist.ini', 'release tarball excludes dist.ini from shipped assets' );

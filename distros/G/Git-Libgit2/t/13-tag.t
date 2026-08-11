@@ -68,12 +68,16 @@ my $c1_hex = oid_to_hex($c1_buf);
 my $c2_hex = oid_to_hex($c2_buf);
 
 # --- git_reference_create (lightweight tag) ---
-my $tag1_buf_raw = "\0" x 20;
-my ($tag1_buf) = scalar_to_buffer($tag1_buf_raw);
+my $tag1_created;
 check_rc Git::Libgit2::FFI::git_reference_create(
-  $tag1_buf, $repo, 'refs/tags/v1.0-lightweight', $c1_buf, 0, 'lightweight tag',
+  \$tag1_created, $repo, 'refs/tags/v1.0-lightweight', $c1_buf, 0, 'lightweight tag',
 );
-like( oid_to_hex($tag1_buf), qr/\A[0-9a-f]{40}\z/, 'lightweight tag created via reference_create' );
+is(
+  oid_to_hex( Git::Libgit2::FFI::git_reference_target($tag1_created) ),
+  $c1_hex,
+  'lightweight tag created via reference_create points at the first commit',
+);
+Git::Libgit2::FFI::git_reference_free($tag1_created);
 
 # --- git_tag_lookup (lightweight tags are refs, not ODB objects — look up by ref) ---
 my $tag1_ref;

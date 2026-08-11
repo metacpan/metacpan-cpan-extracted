@@ -192,7 +192,7 @@ for my $pm_file (sort @pm_files) {
 			for my $test_file (@test_files) {
 				diag("  perl -c $test_file") if $VERBOSE;
 				my (undef, $syntax_err) = capture {
-					system('perl', '-Ilib', '-c', $test_file);
+					system($^X, '-Ilib', '-c', $test_file);
 				};
 				if ($?) {
 					fail("syntax error in generated $test_file");

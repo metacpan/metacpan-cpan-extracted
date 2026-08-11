@@ -324,7 +324,7 @@ struct ssh_pka {
    int (*decode)(const unsigned char*, unsigned long*, ltc_pka_key*, enum pem_flags);
 };
 
-struct ssh_pka ssh_pkas[] = {
+static struct ssh_pka ssh_pkas[] = {
 #ifdef LTC_CURVE25519
                              { SET_CSTR(.name, "ssh-ed25519"),
                                LTC_PKA_ED25519,
@@ -541,11 +541,15 @@ static int s_parse_line(char *line, unsigned long *len, ltc_pka_key *key, char *
 static int s_read_authorized_keys(const void *buf, unsigned long len, ssh_authorized_key_cb cb, void *ctx)
 {
    char *s;
-   int err;
+   int err = CRYPT_OK;
    unsigned long clen = len;
-   ltc_pka_key *key = XCALLOC(1, sizeof(*key));
+   ltc_pka_key *key = NULL;
    char *comment = NULL;
-   void *cpy = XMALLOC(len);
+   void *cpy = NULL;
+   if (clen == 0)
+      return CRYPT_OK;
+   key = XCALLOC(1, sizeof(*key));
+   cpy = XMALLOC(len);
    if (key == NULL || cpy == NULL) {
       if (cpy)
          XFREE(cpy);
@@ -555,6 +559,7 @@ static int s_read_authorized_keys(const void *buf, unsigned long len, ssh_author
    }
    XMEMCPY(cpy, buf, len);
    s = cpy;
+   err = CRYPT_ERROR;
    while (clen && (err = s_parse_line(s, &clen, key, &comment)) == CRYPT_OK) {
       if (cb(key, comment, ctx)) {
          break;
@@ -834,9 +839,10 @@ int ssh_read_authorized_keys_filehandle(FILE *f, ssh_authorized_key_cb cb, void 
 
 int pem_decode_openssh(const void *buf, unsigned long len, ltc_pka_key *k, const password_ctx *pw_ctx)
 {
-   LTC_ARGCHK(buf != NULL);
-   LTC_ARGCHK(len != 0);
+   LTC_ARGCHK(buf != NULL || len == 0);
    LTC_ARGCHK(k != NULL);
+   if (len == 0)
+      return CRYPT_OK;
    {
       struct get_char g = pem_get_char_init(buf, len);
       return s_decode_openssh(&g, k, pw_ctx);
@@ -845,9 +851,10 @@ int pem_decode_openssh(const void *buf, unsigned long len, ltc_pka_key *k, const
 
 int ssh_read_authorized_keys(const void *buf, unsigned long len, ssh_authorized_key_cb cb, void *ctx)
 {
-   LTC_ARGCHK(buf != NULL);
-   LTC_ARGCHK(len != 0);
+   LTC_ARGCHK(buf != NULL || len == 0);
    LTC_ARGCHK(cb != NULL);
+   if (len == 0)
+      return CRYPT_OK;
 
    return s_read_authorized_keys(buf, len, cb, ctx);
 }

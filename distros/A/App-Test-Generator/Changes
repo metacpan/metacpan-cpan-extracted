@@ -1,5 +1,126 @@
 Revision history for App-Test-Generator
 
+0.45	Mon Aug 10 11:17:51 AM EDT 2026
+	[Enhancements]
+	- Added --version option to bin/extract_schemas
+	- Changed close_stdin default from off to on
+	- Arrayref testing - add an undef entry in the middle of the array
+	- Hashref testing - added undef in a nested hash
+	- Add t/path.t: explicit CFG path-coverage tests for Model::Method,
+	  BenchmarkGenerator, Analyzer::Complexity, Analyzer::SideEffect, and
+	  Planner::Isolation. Each subtest exercises one uniquely identifiable
+	  branch not covered by the module-specific unit tests. Paths added:
+	  resolve_return_type() signal branches (legacy_type×4 including the
+	  value='object'/'self'/other/undef sub-paths, context_aware,
+	  error_pattern) and tie-break cases (all-zero→constant, object=property
+	  tie→object); resolve_confidence() at all four threshold boundary
+	  points (19→low, 20→medium, 39→medium, 40→high); add_evidence()
+	  weight=0 stored as 0 not default 1; _representative_value() all 15
+	  branches (float/integer with no/min-only/max-only/both constraints,
+	  boolean/arrayref/hashref/unknown types, undef spec); _quote_value()
+	  all 4 paths; _build_call() all 5 call-syntax combinations;
+	  generate() missing-key croaks, has_new+builtin skips constructor,
+	  empty new_spec hashref→no-arg constructor, empty transforms→default
+	  variant; Complexity::analyze() given/when branch tokens, keyword
+	  inside dquoted strings stripped, escaped dquote handled, unmatched
+	  brace depth clamp, early_returns boundaries at 1 and 2 returns;
+	  SideEffect::analyze() read/write IO keywords, self+globals→impure
+	  purity path, false-positive guards for $self->{field}= inside strings
+	  and comments; Planner::Isolation::plan() scalar-falsy time/network
+	  values omit flags, hashref-truthy env propagates.
+	  Dead code flagged: Model::Method::resolve_return_type() line 552 —
+	  the `|| 'unknown'` fallback is unreachable because %score is always
+	  initialised with 3 keys so $winner is always a non-empty string.
+	[Bug fixes]
+	- Fix SchemaExtractor::_detect_accessor_methods injecting the property
+	  name as a spurious extra input parameter when a getter/setter's
+	  argument is named differently from the stored property (e.g. sub
+	  logdir { my $dir = shift; ... $self->{logdir} = $dir } generated
+	  both 'dir' and 'logdir' as position-0 parameters). The position
+	  assignment now targets the existing input key rather than creating a
+	  new key named after the property.
+	- Fix t/type_params.t dying with "Your vendor has not defined
+	  BSD::Resource macro RLIMIT_AS" on platforms where BSD::Resource is
+	  installed but does not export RLIMIT_AS (e.g. some BSDs and macOS
+	  builds). The RLIMIT_AS() call is now wrapped in eval; if it croaks,
+	  the test is skipped with an explanatory message instead of aborting.
+	  Also fix "Bad plan. You planned 0 tests but ran 1" on the same
+	  platform: the BEGIN { use_ok(...) } block fired test #1 before the
+	  plan(skip_all => ...) call declared 0 tests. Replaced with a plain
+	  use so no test runs before the skip checks.
+	- Fix _compile_signature_isolated() calling decode_json() on empty or
+	  non-JSON output when the child subprocess is killed by the kernel
+	  OOM killer (SIGKILL) before it can write to stdout or stderr: the
+	  caller now guards for empty stdout and wraps decode_json() in eval,
+	  so a silent child crash degrades gracefully (return undef → fall
+	  back to heuristics) rather than croaking with "malformed JSON
+	  string" and propagating through the Test::Builder subtest boundary
+	  to kill the test process with exit 255.
+	- Fix test-generator-index coverage trend chart always ending one commit
+	  behind the current run: the coverage snapshot is written to the archive
+	  AFTER the HTML is generated, so the current commit's point was never in
+	  the trend data — the last visible point was the previous commit's
+	  (which could show anomalously low coverage, e.g. a partial Devel::Cover
+	  run, making the trend appear to crash at the right-hand edge). The
+	  current run is now appended as the final trend point using the same
+	  arithmetic mean of per-file percentages as the archive-based points,
+	  guarded by a SHA check to avoid duplication if the snapshot was somehow
+	  already committed before HTML generation.
+	- Fix test-generator-index delta column showing the wrong value for
+	  blib/-instrumented modules (the common case under 'cover -test').
+	  %deltas was keyed by the normalised lib/ path ($display_file) but
+	  the lookup used the raw Devel::Cover blib/ key ($file), so the
+	  exists() check always failed and the code silently fell through to
+	  a sparkline-based fallback. The fallback computes delta from the
+	  last two sparkline points; when the most-recent archive entry
+	  contained a 0.0 (from an older undef-percentage snapshot), the
+	  fallback computed 0.0 - 95.6 = -95.6%, displaying "▼ 95.6%" — the
+	  same number as the actual coverage. Fixed by: (1) using $display_file
+	  (already normalised to lib/) for both the %deltas lookup and the
+	  $prev_data lookup; (2) fixing the sparkline key-resolution order to
+	  avoid prepending "blib/" to a key already starting with "blib/"
+	  (which produced a double-prefix "blib/blib/..." path that never
+	  matched anything in historical snapshots).
+	- Fix t/fuzz.t invoking bin/fuzz-harness-generator via the shebang
+	  (#!/usr/bin/env perl) rather than $^X: on CPAN smokers where $PATH
+	  resolves to a different system perl, the wrong interpreter was used,
+	  causing @INC to contain only system paths and missing declared PREREQ_PM
+	  dependencies. t/fuzz.t now calls [$^X, '...fuzz-harness-generator'].
+	  bin/fuzz-harness-generator similarly derives the prove path from $^X
+	  so the generated harness is always run under the same perl installation.
+	  Fixes GitHub#8
+	- Fix t/cli-test-generator-mutate.t failing on systems with git older
+	  than 1.8.5: replaced all 'git -C <dir>' invocations (which require
+	  git >= 1.8.5) with a portable chdir-based helper.
+	- Fix _compile_signature_isolated() calling setrlimit(RLIMIT_AS) on
+	  the parent process before open3(): the parent's address space was
+	  capped at 50 MB, causing the test framework to OOM during teardown
+	  inside a subtest, which manifested as "A context appears to have
+	  been destroyed without first calling release()" from Test::Builder
+	  and an "Out of memory" crash. The memory limit is now applied only
+	  in the child subprocess (via an env var passed through local %ENV),
+	  leaving the parent's address space unrestricted.
+	- Fix t/type_params.t 'signature_for' and 'documented example' subtests
+	  failing when _compile_signature_isolated() falls back to heuristics
+	  (e.g. because the 50 MB RLIMIT_AS is insufficient for Type::Params +
+	  Types::Common on some machines). The heuristics extract real parameter
+	  names ('first', 'second', 'child') while the payload hardcoded 'arg0',
+	  'arg1' — causing a key-name mismatch. Fix: (1) update the payload to
+	  use $p->name when Type::Params 2.x provides it, falling back to 'argN'
+	  only when the attribute is absent or empty; (2) rewrite the test
+	  assertions to sort parameters by position and check type/optionality
+	  rather than specific hash key names, so they pass regardless of which
+	  extraction path was used; (3) accept either 'object' or 'string' for
+	  the Types::Standard Object parameter in the 'documented example' subtest
+	  — the heuristic cannot infer 'object' without the subprocess (the body
+	  has no ref/blessed/isa checks), so both results are valid.
+	- Fix Makefile.PL declaring Data::Random, Data::Random::String,
+	  Data::Random::String::Matches 0.02, Data::Random::Structure, and
+	  Unicode::GCString in TEST_REQUIRES when all five are compile-time
+	  `use` statements in lib/App/Test/Generator/Template.pm. Any
+	  `cpanm --notest` install omits test-only deps, causing Template.pm
+	  to fail to load at first use. All five moved to PREREQ_PM.
+
 0.44	Tue Jul 21 20:28:19 EDT 2026
 	[Bug fixes]
 	- Fix fuzz harness leaving stray files in the current directory when

@@ -141,7 +141,7 @@ subtest 'Pluggable credentials WIF Logging' => sub {
       executable => {
         command =>
           sprintf(
-            '"%s" -e print+qq({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"id_token\":\"mock_pluggable_token\"})',
+'"%s" -e print+qq({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"id_token\":\"mock_pluggable_token\"})',
           $^X),
       },
     },

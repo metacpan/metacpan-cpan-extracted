@@ -26,8 +26,10 @@ WriteMakefile(
 		'Term::ANSIColor'=> 0,
 		'Getopt::Long' => 0,
 	}, TEST_REQUIRES => {
+		'Capture::Tiny' => 0,
 		'IPC::Run3' => 0,
 		'IPC::System::Simple' => 0,
+		'Readonly' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Exception' => 0,
 		'Test::Mockingbird' => 0,

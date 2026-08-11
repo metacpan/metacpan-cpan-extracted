@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Encode qw(encode);
 use File::Basename qw(basename dirname);
@@ -21,7 +21,7 @@ my %CHANNEL_FILE_PATH;
 # Output: hash reference keyed by hook filename.
 sub current {
     my $json = _channel_json( 'RESULT', 'RESULT_FILE' );
-    return {} if !defined $json || $json eq '';
+    return {} if !defined $json || $json eq '';    # uncoverable condition left
     my $data = decode_json($json);
     die 'RESULT must decode to a hash' if ref($data) ne 'HASH';
     return $data;
@@ -55,7 +55,7 @@ sub clear_current {
 sub last_result {
     shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;
     my $json = _channel_json( 'LAST_RESULT', 'LAST_RESULT_FILE' );
-    return if !defined $json || $json eq '';
+    return if !defined $json || $json eq '';    # uncoverable condition left
     my $data = decode_json($json);
     die 'LAST_RESULT must decode to a hash' if ref($data) ne 'HASH';
     return $data;
@@ -188,7 +188,7 @@ sub last_entry {
 # Input: optional command name override.
 # Output: UTF-8 encoded formatted multi-line report string.
 sub report {
-    shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;
+    shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;    # uncoverable condition right
     my (%args) = @_;
     my @names = names();
     return '' if !@names;
@@ -247,12 +247,12 @@ sub _open_channel_file {
     binmode $fh, ':raw';
 
     my $flags = fcntl( $fh, F_GETFD, 0 );
-    die "Unable to inspect RESULT file descriptor flags: $!" if !defined $flags;
-    fcntl( $fh, F_SETFD, $flags & ~FD_CLOEXEC )
+    die "Unable to inspect RESULT file descriptor flags: $!" if !defined $flags;    # uncoverable branch true
+    fcntl( $fh, F_SETFD, $flags & ~FD_CLOEXEC )    # uncoverable branch true
       or die "Unable to clear close-on-exec for RESULT file descriptor: $!";
 
     my $fd = fileno($fh);
-    my $fd_path = -e "/dev/fd/$fd" ? "/dev/fd/$fd" : "/proc/self/fd/$fd";
+    my $fd_path = -e "/dev/fd/$fd" ? "/dev/fd/$fd" : "/proc/self/fd/$fd";    # uncoverable branch false
     return ( $fh, $fd_path );
 }
 
@@ -270,8 +270,8 @@ sub _channel_json {
     open my $fh, '<:raw', $path or die "Unable to read $env_name file $path: $!";
     local $/;
     my $file_json = <$fh>;
-    close $fh or die "Unable to close $env_name file $path: $!";
-    return defined $file_json ? $file_json : '';
+    close $fh or die "Unable to close $env_name file $path: $!";    # uncoverable branch true
+    return defined $file_json ? $file_json : '';    # uncoverable branch false
 }
 
 # _set_channel($env_name, $file_env_name, $data, %args)
@@ -290,8 +290,8 @@ sub _set_channel {
 
     my ( $fh, $path ) = _open_channel_file();
     print {$fh} $json;
-    truncate( $fh, tell($fh) ) or die "Unable to truncate $env_name file $path: $!";
-    seek( $fh, 0, SEEK_SET ) or die "Unable to rewind $env_name file $path: $!";
+    truncate( $fh, tell($fh) ) or die "Unable to truncate $env_name file $path: $!";    # uncoverable branch true
+    seek( $fh, 0, SEEK_SET ) or die "Unable to rewind $env_name file $path: $!";    # uncoverable branch true
 
     _clear_channel_file($file_env_name);
     $CHANNEL_FILE_HANDLE{$file_env_name} = $fh;
@@ -320,7 +320,7 @@ sub _clear_channel {
 sub _clear_channel_file {
     my ($file_env_name) = @_;
     return if !$CHANNEL_FILE_HANDLE{$file_env_name};
-    close $CHANNEL_FILE_HANDLE{$file_env_name}
+    close $CHANNEL_FILE_HANDLE{$file_env_name}    # uncoverable branch true
       or die "Unable to close result file handle for $CHANNEL_FILE_PATH{$file_env_name}: $!";
     delete $CHANNEL_FILE_HANDLE{$file_env_name};
     delete $CHANNEL_FILE_PATH{$file_env_name};
@@ -345,11 +345,16 @@ sub _command_name {
     $normalized =~ s{[\\/]+\z}{} if $normalized !~ m{\A(?:[\\/]|[A-Za-z]:[\\/]?)\z};
     return 'dashboard' if $normalized eq '' || $normalized eq '/' || $normalized eq '\\' || $normalized =~ m{\A[A-Za-z]:[\\/]?\z};
 
+    # $normalized is a non-root path here (line above returns for empty/root/drive
+    # forms), so basename always yields a non-empty, non-separator component; the
+    # only meaningful case left is the directory-backed 'run' wrapper.
     my $base = basename($normalized);
-    return $base if $base ne '' && $base ne '/' && $base ne '\\' && $base ne 'run';
+    return $base if $base ne 'run';
 
+    # dirname can still resolve to a root, so basename here may be a bare
+    # separator ('/', '\\') or, on Windows drive roots, empty.
     my $parent = basename( dirname($normalized) );
-    return $parent if $parent ne '' && $parent ne '/' && $parent ne '\\';
+    return $parent if $parent ne '' && $parent ne '/' && $parent ne '\\';    # uncoverable condition left
 
     my $name = $ENV{DEVELOPER_DASHBOARD_COMMAND} || '';
     return $name if $name ne '';

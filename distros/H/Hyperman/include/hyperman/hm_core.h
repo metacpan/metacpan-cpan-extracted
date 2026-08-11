@@ -28,6 +28,16 @@ typedef struct {
     void *tls_ctx;        /* SSL_CTX*; NULL = plain                   */
     int   http2;          /* per-listener h2 (h2c / ALPN)             */
     int   redirect_https; /* 0 = off; else target https port for 301  */
+
+    /* What the context above was built from, kept so a worker can build
+     * another one. The spec these are copied from lives in the parent's
+     * cfg, which a worker does not hold - and without them tls_reload
+     * would have nothing to rebuild with. Owned copies: the spec's
+     * strings belong to the parent's config and outlive nothing here. */
+    char *tls_cert;       /* NULL on a plain listener                 */
+    char *tls_key;
+    char *tls_ca;         /* NULL unless client certs are verified    */
+    int   tls_verify;
 } hm_listener;
 
 struct hm_conn {
@@ -2453,8 +2463,72 @@ static int hm_worker_listeners(hm_loop *loop, const hm_worker_cfg *cfg,
         l->tls_ctx = s->tls_ctx;
         l->http2 = s->http2;
         l->redirect_https = s->redirect_https;
+        /* Copied, not borrowed: hm_tls_reload frees the context it
+         * replaces, and a rebuild has to name the same cert and key. */
+        l->tls_cert   = s->tls_cert ? strdup(s->tls_cert) : NULL;
+        l->tls_key    = s->tls_key  ? strdup(s->tls_key)  : NULL;
+        l->tls_ca     = s->tls_ca   ? strdup(s->tls_ca)   : NULL;
+        l->tls_verify = s->tls_verify;
     }
     return 0;
+}
+
+/* Rebuild this worker's TLS contexts from a fresh SNI map.
+ *
+ * The listener array is the WORKER'S: hm_worker_listeners above ran after
+ * the fork and copied the parent's tls_ctx pointer into it, so swapping
+ * that pointer changes this process and nothing else. The listening fd is
+ * not touched, so nothing is unbound and no connection is refused;
+ * connections already handshook keep the SSL they hold, and the next one
+ * this worker accepts uses the new context.
+ *
+ * NOTHING IS INSTALLED THAT SERVES LESS THAN WHAT IS RUNNING. Two ways a
+ * rebuild can come back worse, and both keep the old context:
+ *
+ *   - the default certificate will not load. It is the one every
+ *     hostname falls back to, so a fleet keeps serving the stale one
+ *     rather than none.
+ *   - a per-host certificate will not load. hm_tls_ctx_build skips it
+ *     with a message and still returns a usable default, which is right
+ *     at boot but silently drops that domain to the fallback here. So
+ *     the built registry is counted against what was asked for, and a
+ *     context carrying fewer hosts is thrown away.
+ *
+ * The cost of the second rule is that one customer's corrupt PEM defers
+ * everybody's update to the next poll. The alternative is installing a
+ * context that has quietly stopped serving somebody's domain, which is
+ * the outage this whole feature exists to prevent.
+ *
+ * Returns the number of listeners rebuilt. */
+static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
+    int i, done = 0, want = -1;
+    if (!loop) return 0;
+
+    if (sni && SvROK(sni) && SvTYPE(SvRV(sni)) == SVt_PVHV)
+        want = (int)HvUSEDKEYS((HV *)SvRV(sni));
+
+    for (i = 0; i < loop->nlisteners; i++) {
+        hm_listener *l = &loop->listeners[i];
+        void *fresh;
+        if (!l->tls_ctx || !l->tls_cert || !l->tls_key) continue;  /* plain */
+
+        fresh = hm_tls_ctx_build(aTHX_ l->tls_cert, l->tls_key, l->tls_ca,
+                                 l->tls_verify, sni, l->http2);
+        if (!fresh) continue;                   /* keep what we are serving */
+
+        if (want > 0 && hm_tls_sni_count(fresh) < want) {
+            fprintf(stderr, "Hyperman TLS: reload built %d of %d SNI hosts; "
+                            "keeping the running certificates\n",
+                    hm_tls_sni_count(fresh), want);
+            hm_tls_ctx_free(fresh);
+            continue;
+        }
+
+        hm_tls_ctx_free(l->tls_ctx);
+        l->tls_ctx = fresh;
+        done++;
+    }
+    return done;
 }
 
 static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {

@@ -58,7 +58,7 @@ Git::Native::TreeBuilder - Build a libgit2 tree object entry by entry
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -70,6 +70,41 @@ version 0.004
 
 In-memory tree assembler. C<insert>/C<remove> mutate the builder;
 C<write> persists it as a tree object and returns its OID.
+
+Get one from L<Git::Native::Repository/tree_builder>. It always starts
+empty — to amend an existing tree, insert its entries yourself from
+L<Git::Native::Tree/entries>. Nothing reaches the object database until
+C<write>.
+
+=head2 insert
+
+  $tb->insert( name => 'hello.txt', oid => $blob_oid, mode => 0100644 );
+  $tb->insert( name => 'lib',       oid => $tree_oid, mode => 040000  );
+
+Add an entry, or replace the one already under that C<name>. C<oid> is a
+L<Git::Native::Oid> or a 40-character hex string, C<name> is a single path
+component (subdirectories are separate trees, inserted by their own OID),
+and C<mode> is the numeric git filemode — C<0100644> regular (the
+default), C<0100755> executable, C<0120000> symlink, C<040000> subtree.
+Returns the builder, so calls chain.
+
+=head2 remove
+
+  $tb->remove('hello.txt');
+
+Drop the entry with that name from the builder. Returns the builder.
+
+=head2 write
+
+  my $tree_oid = $tb->write;
+
+Write the accumulated entries into the repository as a tree object and
+return its L<Git::Native::Oid>. The builder stays usable afterwards; the
+result is the input for L<Git::Native::Repository/commit_create>.
+
+=head1 SEE ALSO
+
+L<Git::Native::Tree>, L<Git::Native::Repository>
 
 =head1 SUPPORT
 

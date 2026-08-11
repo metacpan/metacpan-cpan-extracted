@@ -2,7 +2,7 @@
 use v5.20;
 use Feature::Compat::Class;
 use feature 'signatures';
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0012'; # VERSION
 # PODNAME: createrelease.pl
 # ABSTRACT: Helper script to create a GitHub Release
 use Config::INI::Reader;
@@ -68,7 +68,7 @@ class GitHub::Release {
     method get_dist_filename ($version) {
         return if ! defined $version;
         my $config      = Config::INI::Reader->read_file($self->get_config_filename());
-        if ($self->get_config_filename() ne 'dist.ini'){
+        if ($self->get_config_filename() ne 'dist.ini'  && ! defined $config->{'_'}{name}){
             my $dist = Config::INI::Reader->read_file('dist.ini');
             $config->{'_'}{name} = $dist->{'_'}{name};
         }
@@ -316,7 +316,7 @@ class GitHub::Release {
             @tags = $git->RUN(
                                 'for-each-ref',
                                 'refs/tags/*',
-                                '--sort=-taggerdate',
+                                '--sort=-version:refname',
                                 '--count=1',
                                 '--format=%(refname:short)'
                             );
@@ -359,7 +359,7 @@ class GitHub::Release {
         my $git = Git::Wrapper->new('./');
         my @tags;
         try {
-               @tags = $git->RUN('for-each-ref', 'refs/tags/*', '--sort=-taggerdate', '--count=2', '--format=%(refname:short)');
+               @tags = $git->RUN('for-each-ref', 'refs/tags/*', '--sort=-version:refname', '--count=1', '--format=%(refname:short)');
         }
         catch {
             $self->log("Unable to get the last two tags from git");
@@ -471,7 +471,7 @@ createrelease.pl - Helper script to create a GitHub Release
 
 =head1 VERSION
 
-version 0.0011
+version 0.0012
 
 =head1 SYNOPSIS
 

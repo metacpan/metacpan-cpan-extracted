@@ -14,7 +14,19 @@ use namespace::clean;
 #   for my $u (@{$result->updated})  { say "$u->{ref}: $u->{from} -> $u->{to}" }
 #   for my $r (@{$result->rejected}) { say "$r->{ref}: $r->{reason}" }
 #
-# updated entries: { ref => $name, from => $from_oid_hex_or_undef, to => $to_oid_hex }
+# updated entries always carry the SAME four keys, whichever operation
+# produced them — { ref, from, to, reason } — so a caller can read any of
+# them without knowing where the Result came from, and a missing value is an
+# explicit undef rather than an absent key:
+#
+#   fetch: { ref => $local_name,  from => $oid_hex|undef, to => $oid_hex|undef, reason => '' }
+#   push:  { ref => $remote_name, from => undef,          to => $oid_hex|undef, reason => '' }
+#
+#   from is undef on push: push_update_reference reports a per-ref verdict,
+#     not the oid range, and the previous remote-side oid would cost an extra
+#     git_remote_ls round trip. to is recovered from the local source ref.
+#   to is undef when the ref was deleted (fetch prune, push delete refspec).
+#   reason is '' on both — a non-empty reason means rejected, see below.
 # rejected entries: { ref => $name, reason => $status_str }
 #   - On push: reason is the libgit2 status string the server sent (e.g.
 #     "non-fast-forward", "pre-receive hook declined"). reason is "" (empty
@@ -47,7 +59,7 @@ Git::Native::Remote::Result - Per-ref outcomes from a Remote fetch or push
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -56,7 +68,8 @@ version 0.004
   );
   if ( !$r->ok ) {
     for my $u ( @{ $r->updated } ) {
-      warn "updated $u->{ref}: $u->{from} // $u->{to}\n";
+      warn sprintf "updated %s: %s -> %s\n", $u->{ref},
+        $u->{from} // '(new)', $u->{to} // '(deleted)';
     }
     for my $u ( @{ $r->rejected } ) {
       warn "rejected $u->{ref}: $u->{reason}\n";
@@ -66,31 +79,78 @@ version 0.004
 =head1 DESCRIPTION
 
 Structured return value from L<Git::Native::Remote>'s C<fetch> and C<push>.
-See L</updated>, L</rejected>, and L</ok>.
+It exists because libgit2 returns 0 from C<git_remote_fetch> /
+C<git_remote_push> even when individual refs were skipped or refused; the
+per-ref outcome is only visible through the callbacks C<Remote> installs
+(C<update_tips> on fetch, C<push_update_reference> on push). See
+L</updated>, L</rejected>, and L</ok>.
 
 =head2 updated
 
-  Arrayref of hashrefs, one per ref that was actually moved.
-  Each entry: C<< { ref => $str, from => $oid_hex|undef, to => $oid_hex } >>.
-  C<from> is C<undef> for refs that didn't exist on the local side before the
-  operation (a brand-new branch fetched or pushed). On a push, C<from> is
-  always the local tip the ref was moving from (i.e. C<undef> when pushing
-  a brand-new ref that the remote didn't have).
+  for my $u ( @{ $result->updated } ) {
+    say $u->{ref}, defined $u->{to} ? " -> $u->{to}" : ' (deleted)';
+  }
+
+Arrayref of hashrefs, one per ref that actually moved on the receiving
+side. Every entry carries the same four keys, C<ref> / C<from> / C<to> /
+C<reason>, whether it came from a fetch or a push, so code that reads a
+Result does not have to know which operation produced it. A value the
+operation cannot supply is present as an explicit C<undef> rather than as
+a missing key.
+
+  # fetch
+  { ref => 'refs/karr/x', from => undef, to => 'b8f9ae41...', reason => '' }
+  # push
+  { ref => 'refs/karr/x', from => undef, to => 'b8f9ae41...', reason => '' }
+
+C<ref> is the name of the ref on the side that changed, and that side
+differs by operation: a fetch names the B<local> destination the refspec
+mapped to, a push names the ref as the B<remote> calls it. That asymmetry
+is the semantics of the underlying libgit2 callbacks (C<update_tips> fires
+after the local ref is written, C<push_update_reference> relays the
+server's own report) and is deliberately left alone.
+
+C<to> is the OID the ref now points at, or C<undef> when the ref was
+B<deleted> rather than moved — a stale mirror ref dropped by a
+C<< prune => 1 >> fetch, or a delete refspec on a push. On a push it is
+read off the local source side of the refspec, not from the server, and is
+therefore also C<undef> for a source that is not a resolvable local
+reference.
+
+C<from> is the OID the ref pointed at before. It is C<undef> when the ref
+did not exist on the receiving side yet, and always C<undef> on a push:
+the previous remote-side OID would take a ref listing before the push, and
+L<Git::Native::Remote/push> does not spend an extra network round trip on
+it. Call L<Git::Native::Remote/list_refs> first if you need that snapshot.
+
+C<reason> is the empty string on every C<updated> entry — a non-empty
+reason means the ref was refused, and refused refs are in L</rejected>
+instead. Refs that were already up to date are not reported at all.
 
 =head2 rejected
 
-  Arrayref of hashrefs, one per ref that the server refused to accept.
-  Each entry: C<< { ref => $str, reason => $str } >>. C<reason> is the
-  libgit2 / server message; C<""> (empty) when the server reported a
-  rejection with no specific text. On a successful push, C<rejected> is
-  empty (the successful refs are in C<updated>).
+  die "push refused: $_->{ref}: $_->{reason}" for @{ $result->rejected };
+
+Arrayref of C<< { ref => $name, reason => $message } >>, one per ref the
+server refused, with C<reason> the status string it sent (C<non-fast-forward>,
+C<pre-receive hook declined>, ...). Refused refs never carry an empty
+reason — an empty status is libgit2's "accepted, nothing to say" and lands
+in L</updated>.
+
+Only a push can populate this. A fetch leaves it empty even when libgit2
+skipped a non-fast-forward ref, because that path does not reach the
+C<update_tips> callback; on a fetch, a skipped ref shows up as a missing
+entry in L</updated>.
 
 =head2 ok
 
-  True iff both C<updated> and C<rejected> are empty. Note that a
-  fully-successful push still reports its refs in C<updated> (so C<ok>
-  is false) — the typical "did anything go wrong" check is
-  C<< !$r->rejected >>.
+  $result->ok    # 1 when nothing at all happened
+
+True iff both C<updated> and C<rejected> are empty, i.e. the operation
+moved no ref and no ref was refused. A fully successful push of N refs
+reports all N in C<updated> and is therefore B<not> C<ok> — the check for
+"did anything go wrong" is C<< @{ $result->rejected } >>, and C<ok> answers
+the different question "was this a no-op?".
 
 =head1 SUPPORT
 

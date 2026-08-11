@@ -30,7 +30,7 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 		if(-f $filepath) {	# Check if it's a regular file
 			diag($filepath) if ($ENV{'TEST_VERBOSE'});
 			my ($stdout, $stderr);
-			run3 ["$Bin/../bin/fuzz-harness-generator", '-r', $filepath], undef, \$stdout, \$stderr;
+			run3 [$^X, "$Bin/../bin/fuzz-harness-generator", '-r', $filepath], undef, \$stdout, \$stderr;
 
 			ok($? == 0, 'Generated test script exits successfully');
 

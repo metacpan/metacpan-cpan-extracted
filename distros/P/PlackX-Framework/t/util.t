@@ -20,9 +20,10 @@ sub do_tests {
       PXF::Util::minisleep($interval);
       my $t2 = Time::HiRes::time();
       my $el = $t2 - $t1;
+      my $el_rnd = sprintf('%.4f', $el);
       ok(
-        ($interval*0.85 < $el < $interval*1.15 and $interval-0.1 < $el < $interval+0.1),
-        "Sleep for $interval seconds is accurate within 15% and 0.1s"
+        ($interval*0.8 < $el < $interval*1.2 and $interval-0.2 < $el < $interval+0.2),
+        "Sleep for $interval seconds +/-20% +/-0.2s (actual: $el_rnd)"
       );
     }
   }

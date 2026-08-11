@@ -103,6 +103,9 @@ t/05-base.t          # Basis-Klasse
 t/10-bash.t          # bash -c, allowlist, validator, timeout, format_result
 t/20-integration.t   # MCP lifecycle (initialize, tools/list, tools/call)
 t/compress.t         # Compression
+t/30-no-warnings.t   # Regression: Compress.pm warnings (transform undef, undef inputs)
+t/40-compress-bin.t  # bin/mcp-run-compress: --hook, --install-claude, --filter-files,
+                     # end-to-end MCP compression mit echtem command context
 ```
 
 **`prove -l t/` ist non-recursive** und überspringt nichts in Subdirs — alle
@@ -113,17 +116,18 @@ gefiltered wurden.
 
 ## Release
 
-`dist.ini` nutzt `[@Author::GETTY]` mit `run_after_release` (GitHub Release +
-Docker Hub push).
+`dist.ini` nutzt `[@Author::GETTY]` für das komplette Release: `GitHub::CreateRelease`
+legt das GitHub-Release an (CPAN-Tarball als Asset, ChangeLog-Notes), und der
+`[@Author::GETTY::Docker / compress]` Subsection baut+pusht das Docker-Image
+(`raudssus/mcp-run-compress`, `target=compress`, `build_arg=MCP_RUN_VERSION=%v`).
 
 ```bash
 dzil release
-# mit multi-arch Docker:
-MCP_RUN_DOCKER_BUILD_ARGS='--platform linux/amd64,linux/arm64' dzil release
 ```
 
-`run_after_release` ist im Bundle konfiguriert — `maint/release-after.pl` macht
-den Rest. GH_BIN/DOCKER_BIN überschreibbar.
+Kein `maint/release-after.pl` mehr — die Bundle-Plugins machen alles. Braucht
+`~/.github-identity` und `docker login`. Multi-Arch ist nicht wired (`Docker::API`
+baut single-arch).
 
 ## Conventions
 

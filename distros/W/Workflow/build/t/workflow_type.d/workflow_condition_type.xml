@@ -1,5 +1,0 @@
-<conditions>
-<type>Type2</type>
-   <condition name="HasUser"
-              class="TestApp::Condition::HasUserType"/>
-</conditions>

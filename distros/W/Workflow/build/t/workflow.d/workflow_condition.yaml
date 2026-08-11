@@ -1,3 +1,0 @@
-condition:
-  - class: Workflow::Condition::HasUser
-    name: HasUser

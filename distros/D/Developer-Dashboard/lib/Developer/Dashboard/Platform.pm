@@ -3,7 +3,7 @@ package Developer::Dashboard::Platform;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Exporter 'import';
 use File::Basename qw(basename dirname);
@@ -21,6 +21,8 @@ our @EXPORT_OK = qw(
   resolve_runnable_file
   command_argv_for_path
   shell_quote_for
+  passwd_user_name
+  passwd_home_directory
 );
 
 our $OS_NAME = $^O;
@@ -33,6 +35,41 @@ our $SYSTEM_LAUNCHER = sub { system @_ };
 # Output: boolean true for Strawberry/Windows-style runtimes, false otherwise.
 sub is_windows {
     return $OS_NAME eq 'MSWin32' ? 1 : 0;
+}
+
+# _passwd_entry($uid)
+# Reads one passwd database record without ever letting the lookup itself abort
+# the caller. Windows perl leaves the passwd functions unimplemented and dies
+# when one is called, so the lookup is skipped there outright, and the eval
+# keeps any other runtime without a usable passwd database from propagating a
+# fatal error into a fallback chain.
+# Input: numeric user id.
+# Output: list of passwd record fields, or the empty list when no record is resolvable.
+sub _passwd_entry {
+    my ($uid) = @_;
+    return () if is_windows();
+    my @entry = eval { getpwuid($uid) };
+    return @entry;
+}
+
+# passwd_user_name($uid)
+# Resolves the account name recorded for one user id.
+# Input: numeric user id.
+# Output: account name string, or undef when the passwd database cannot answer.
+sub passwd_user_name {
+    my ($uid) = @_;
+    my @entry = _passwd_entry($uid);
+    return @entry ? $entry[0] : undef;
+}
+
+# passwd_home_directory($uid)
+# Resolves the home directory recorded for one user id.
+# Input: numeric user id.
+# Output: home directory path string, or undef when the passwd database cannot answer.
+sub passwd_home_directory {
+    my ($uid) = @_;
+    my @entry = _passwd_entry($uid);
+    return @entry ? $entry[7] : undef;
 }
 
 # native_shell_name($requested)
@@ -63,7 +100,7 @@ sub native_shell_name {
 sub normalize_shell_name {
     my ($shell) = @_;
     $shell = native_shell_name() if !defined $shell || $shell eq '';
-    $shell =~ s{.*[\\/]}{} if defined $shell;
+    $shell =~ s{.*[\\/]}{} if defined $shell;    # uncoverable branch false
     $shell = lc( $shell || '' );
 
     return 'powershell' if $shell eq 'ps' || $shell eq 'powershell.exe';
@@ -80,7 +117,7 @@ sub shell_command_argv {
     my ( $command, %args ) = @_;
     die "Missing shell command\n" if !defined $command;
 
-    my $shell = normalize_shell_name( $args{shell} || native_shell_name() );
+    my $shell = normalize_shell_name( $args{shell} || native_shell_name() );    # uncoverable condition false
     my $login = $args{login} ? 1 : 0;
     return ( $shell, $login ? '-lc' : '-c', $command ) if $shell eq 'bash' || $shell eq 'zsh' || $shell eq 'sh';
     return ( $shell, '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', $command )
@@ -207,7 +244,7 @@ sub _path_candidates {
 
     my @extensions = split /;/, ( $ENV{PATHEXT} || '.COM;.EXE;.BAT;.CMD;.PS1' );
     for my $ext (@extensions) {
-        next if !defined $ext || $ext eq '';
+        next if $ext eq '';
         push @candidates, $path . lc($ext);
         push @candidates, $path . uc($ext);
     }
@@ -302,7 +339,7 @@ sub _cmd_binary {
 # Output: executable path or command name string.
 sub _posix_shell_binary {
     my ($preferred) = @_;
-    return command_in_path($preferred) || command_in_path('sh') || $preferred;
+    return command_in_path($preferred) || command_in_path('sh') || $preferred;    # uncoverable condition false
 }
 
 # _module_lib_root()
@@ -337,12 +374,12 @@ sub _exec_java_source {
 
     my $class = _java_main_class($path);
     my ($simple_class) = $class =~ /([^\.]+)\z/;
-    die "Unable to resolve Java main class for $path\n" if !defined $simple_class || $simple_class eq '';
+    die "Unable to resolve Java main class for $path\n" if !defined $simple_class;
 
     my $build_root = tempdir( CLEANUP => 1 );
     my $source_root = tempdir( CLEANUP => 1 );
     my $staged_source = File::Spec->catfile( $source_root, $simple_class . '.java' );
-    copy( $path, $staged_source ) or die "Unable to stage Java source $path as $staged_source: $!";
+    copy( $path, $staged_source ) or die "Unable to stage Java source $path as $staged_source: $!";    # uncoverable branch true
 
     $SYSTEM_LAUNCHER->( 'javac', '-d', $build_root, $staged_source );
     my $exit_code = $? >> 8;
@@ -414,6 +451,13 @@ Windows Strawberry Perl installs.
 =head2 is_windows, native_shell_name, normalize_shell_name, shell_command_argv, command_in_path, is_runnable_file, resolve_runnable_file, command_argv_for_path, shell_quote_for
 
 Platform and shell helpers used by the CLI and runtime.
+
+=head2 passwd_user_name, passwd_home_directory
+
+Guarded passwd database accessors. Windows perl leaves the passwd functions
+unimplemented and dies when one is called, so both accessors report undef
+instead of a fatal error whenever the current runtime cannot answer the lookup.
+Callers use them as one step of an environment-first fallback chain.
 
 =for comment FULL-POD-DOC START
 

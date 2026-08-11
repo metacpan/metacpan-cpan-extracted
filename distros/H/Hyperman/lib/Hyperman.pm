@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -159,7 +159,8 @@ C<SSL_CLIENT_S_DN>, C<SSL_CLIENT_I_DN>, plus C<SSL_PROTOCOL>/C<SSL_CIPHER>.
 
 B<SNI (multiple certificates).> C<tls_sni> maps hostnames to their own
 C<cert>/C<key>; the certificate is chosen from the TLS ServerName, falling
-back to C<tls_cert>/C<tls_key>.
+back to C<tls_cert>/C<tls_key>. See L</tls_reload> for replacing that map
+while the server is running.
 
 B<h2c Upgrade.> With C<< http2 => 1 >> over cleartext, an HTTP/1.1 request
 carrying C<Upgrade: h2c> is answered with C<101 Switching Protocols> and the
@@ -181,6 +182,40 @@ runs in the calling process, no supervisor.
 
 Both require a running worker loop. C<< Hyperman->loop >> returns the current
 worker's L<Hyperman::Loop> (or undef outside one).
+
+=head2 tls_reload
+
+    my $n = Hyperman->tls_reload(\%sni);   # listeners rebuilt
+
+Replace this worker's TLS certificates without replacing the process.
+
+A listener's C<SSL_CTX> is built once, in the parent, before the fork -
+so a certificate issued while the server is running is not served, and
+C<SIGHUP> does not help because it re-forks from that same parent. This
+is the way to pick one up. C<%sni> is the same shape C<run> takes,
+C<< { host => { cert => $path, key => $path } } >>, and replaces the map
+entirely rather than merging into it.
+
+Call it B<from inside a worker> - from the app, or from a timer on
+C<< Hyperman->loop >>. Each worker holds its own context pointer (the
+fork copied it), so a reload changes that worker and no other; a pool
+picks the new certificate up as each worker calls it. The listening
+socket is never touched, so nothing is unbound and no connection is
+refused, and connections already handshook keep the one they have. The
+next connection B<that worker> accepts uses the new certificate.
+
+Returns the number of listeners rebuilt: 0 outside a worker, 0 on a
+plain-only server, and 0 when the rebuild would have served less than
+what is already running - either because the default certificate would
+not load, or because a per-host one would not and that host would have
+silently dropped to the fallback. In every one of those cases the
+running certificates are left exactly as they were, and the reason is
+printed to C<STDERR>.
+
+A worker respawned after a crash, or recycled by C<SIGHUP>, inherits the
+parent's boot-time context again and needs its own C<tls_reload>. That
+is a feature of where the context is built, not a bug here: whatever
+drives the reload should drive it per worker rather than once.
 
 =head2 stats
 

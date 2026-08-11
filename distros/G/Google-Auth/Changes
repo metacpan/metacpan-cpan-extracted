@@ -1,9 +1,19 @@
 Revision history for Google-Auth
 
+0.11    Thu Aug 6 2026
+    - Implemented UserAuthorizer, WebUserAuthorizer, and FileTokenStore for full parity with standard OAuth2 flows.
+    - Added the `gcloud-auth` CLI dispatcher (mirroring standard `gcloud auth` hierarchy).
+    - Hardened filesystem I/O operations by enforcing strict checked `close()` calls to prevent silent descriptor leaks.
+    - Enabled advanced security policies for enhanced randomness verification and regex safety.
+    - Aligned Dockerfile testing pipelines to enforce stricter auditing policies.
+
+    - Eliminated OpenSSL 3.0 deprecation warnings in XS by separating conditioned implementations of load_rsa_pubkey and load_ec_pubkey.
+    - Fixed xsubpp parsing issues on older toolchains by ensuring proper spacing around preprocessor directives.
+
 0.10    Tue Aug 4 2026
     - Call env_proxy by default on internal LWP::UserAgent instances to respect standard proxy environment variables (HTTPS_PROXY, NO_PROXY, etc.).
-    - Hardened Pluggable credential execution against command injection (CWE-78, CWE-77, CWE-88) and untrusted search paths (CWE-426) by using Text::ParseWords and indirect system execution.
-    - Removed insecure blind de-tainting in Pluggable credentials (CWE-184).
+    - Hardened Pluggable credential execution against command injection and untrusted search paths by using Text::ParseWords and indirect system execution.
+    - Removed insecure blind de-tainting in Pluggable credentials.
 
 0.09    Mon Aug 3 2026
     - Hardened ServiceAccountCredentials against SSRF by validating token_uri domain.

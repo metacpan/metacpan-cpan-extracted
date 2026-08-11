@@ -1,5 +1,5 @@
 requires 'perl'              => '5.020';
-requires 'Git::Libgit2'      => '0.005';
+requires 'Git::Libgit2'      => '0.006';
 requires 'Moo'               => '2.000000';
 requires 'Throwable::Error'  => 0;
 requires 'namespace::clean'  => 0;

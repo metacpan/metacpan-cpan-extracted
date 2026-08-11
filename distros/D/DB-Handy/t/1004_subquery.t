@@ -18,8 +18,8 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub is      { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
-sub rows_ok { my($r,$c,$n)=@_; $T++; (ref($r) eq 'ARRAY')&&(@$r==$c) ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got=".(ref($r) eq 'ARRAY'?scalar@$r:'undef').", exp=$c)\n") }
+sub is      { my($g, $e, $n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
+sub rows_ok { my($r, $c, $n)=@_; $T++; (ref($r) eq 'ARRAY')&&(@$r==$c) ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got=".(ref($r) eq 'ARRAY'?scalar@$r:'undef').", exp=$c)\n") }
 
 use File::Path ();
 use File::Spec ();
@@ -80,11 +80,11 @@ my $res = $db->execute(
 # Only Engineering(10): Alice,Charlie,Eve,Hank
 
 # ok 1
-rows_ok($res->{data},, 4, "IN subquery: 4 Engineering employees");
+rows_ok($res->{data}, 4, "IN subquery: 4 Engineering employees");
 my @names = sort map { $_->{name} } @{$res->{data}};
 
 # ok 2
-is(join(',',@names), 'Alice,Charlie,Eve,Hank', "IN subquery: correct names");
+is(join(',', @names), 'Alice,Charlie,Eve,Hank', "IN subquery: correct names");
 
 ###############################################################################
 # WHERE col NOT IN (SELECT ...)
@@ -95,11 +95,11 @@ $res = $db->execute(
 # Non-engineering: Bob,Diana,Frank,Grace
 
 # ok 3
-rows_ok($res->{data},, 4, "NOT IN subquery: 4 non-Engineering employees");
+rows_ok($res->{data}, 4, "NOT IN subquery: 4 non-Engineering employees");
 @names = sort map { $_->{name} } @{$res->{data}};
 
 # ok 4
-is(join(',',@names), 'Bob,Diana,Frank,Grace', "NOT IN subquery: correct names");
+is(join(',', @names), 'Bob,Diana,Frank,Grace', "NOT IN subquery: correct names");
 
 ###############################################################################
 # IN with empty subquery result -> 0 rows
@@ -109,7 +109,7 @@ $res = $db->execute(
 );
 
 # ok 5
-rows_ok($res->{data},, 0, "IN empty subquery -> 0 rows");
+rows_ok($res->{data}, 0, "IN empty subquery -> 0 rows");
 
 ###############################################################################
 # NOT IN with empty subquery result -> all rows
@@ -119,7 +119,7 @@ $res = $db->execute(
 );
 
 # ok 6
-rows_ok($res->{data},, 8, "NOT IN empty subquery -> all 8 rows");
+rows_ok($res->{data}, 8, "NOT IN empty subquery -> all 8 rows");
 
 ###############################################################################
 # IN with multi-value subquery
@@ -130,7 +130,7 @@ $res = $db->execute(
 # high_value has dept 10 and 20 -> Engineering + Sales = Alice,Bob,Charlie,Eve,Frank,Hank
 
 # ok 7
-rows_ok($res->{data},, 6, "IN multi-value: 6 employees in high-value depts");
+rows_ok($res->{data}, 6, "IN multi-value: 6 employees in high-value depts");
 
 ###############################################################################
 # WHERE col = (SELECT scalar)
@@ -141,7 +141,7 @@ $res = $db->execute(
 # HR dept id = 30 -> Diana
 
 # ok 8
-rows_ok($res->{data},, 1, "scalar = subquery: 1 row");
+rows_ok($res->{data}, 1, "scalar = subquery: 1 row");
 
 # ok 9
 is($res->{data}[0]{name}, 'Diana', "scalar = subquery: got Diana");
@@ -155,7 +155,7 @@ $res = $db->execute(
 # Alice salary=90000; only Eve(95000) is higher
 
 # ok 10
-rows_ok($res->{data},, 1, "scalar > subquery: 1 row");
+rows_ok($res->{data}, 1, "scalar > subquery: 1 row");
 
 # ok 11
 is($res->{data}[0]{name}, 'Eve', "scalar > subquery: got Eve");
@@ -169,7 +169,7 @@ $res = $db->execute(
 # Bob=55000; Frank(48000) only
 
 # ok 12
-rows_ok($res->{data},, 1, "scalar < subquery: 1 row");
+rows_ok($res->{data}, 1, "scalar < subquery: 1 row");
 
 # ok 13
 is($res->{data}[0]{name}, 'Frank', "scalar < subquery: got Frank");
@@ -183,7 +183,7 @@ $res = $db->execute(
 # Eve=95000; only Eve herself
 
 # ok 14
-rows_ok($res->{data},, 1, "scalar >= subquery: 1 row (Eve)");
+rows_ok($res->{data}, 1, "scalar >= subquery: 1 row (Eve)");
 
 ###############################################################################
 # WHERE col != (SELECT scalar)
@@ -194,7 +194,7 @@ $res = $db->execute(
 # dept_id != 10 -> Bob,Diana,Frank,Grace
 
 # ok 15
-rows_ok($res->{data},, 4, "scalar != subquery: 4 non-Engineering employees");
+rows_ok($res->{data}, 4, "scalar != subquery: 4 non-Engineering employees");
 
 ###############################################################################
 # Scalar subquery returning 0 rows -> no match
@@ -204,7 +204,7 @@ $res = $db->execute(
 );
 
 # ok 16
-rows_ok($res->{data},, 0, "scalar subquery 0 rows -> no match");
+rows_ok($res->{data}, 0, "scalar subquery 0 rows -> no match");
 
 ###############################################################################
 # WHERE EXISTS (SELECT ...)
@@ -215,7 +215,7 @@ $res = $db->execute(
 # departments has id=10 -> EXISTS is TRUE -> all employees returned
 
 # ok 17
-rows_ok($res->{data},, 8, "EXISTS (non-correlated, always true) -> 8 rows");
+rows_ok($res->{data}, 8, "EXISTS (non-correlated, always true) -> 8 rows");
 
 ###############################################################################
 # WHERE NOT EXISTS (SELECT ...)
@@ -226,14 +226,14 @@ $res = $db->execute(
 # No dept with id=9999 -> NOT EXISTS is TRUE -> all employees returned
 
 # ok 18
-rows_ok($res->{data},, 8, "NOT EXISTS (always true) -> 8 rows");
+rows_ok($res->{data}, 8, "NOT EXISTS (always true) -> 8 rows");
 
 $res = $db->execute(
     "SELECT name FROM employees WHERE EXISTS (SELECT id FROM departments WHERE id = 9999)"
 );
 
 # ok 19
-rows_ok($res->{data},, 0, "EXISTS (always false) -> 0 rows");
+rows_ok($res->{data}, 0, "EXISTS (always false) -> 0 rows");
 
 ###############################################################################
 # Correlated EXISTS (outer col referenced in inner WHERE)
@@ -245,11 +245,11 @@ $res = $db->execute(
 # Employees with history: 1(Alice),2(Bob),3(Charlie),5(Eve) -> 4 rows
 
 # ok 20
-rows_ok($res->{data},, 4, "correlated EXISTS: 4 employees have salary history");
+rows_ok($res->{data}, 4, "correlated EXISTS: 4 employees have salary history");
 @names = sort map { $_->{name} } @{$res->{data}};
 
 # ok 21
-is(join(',',@names), 'Alice,Bob,Charlie,Eve', "correlated EXISTS: correct names");
+is(join(',', @names), 'Alice,Bob,Charlie,Eve', "correlated EXISTS: correct names");
 
 ###############################################################################
 # Correlated NOT EXISTS
@@ -260,11 +260,11 @@ $res = $db->execute(
 # Employees WITHOUT history: Diana(4),Frank(6),Grace(7),Hank(8) -> 4 rows
 
 # ok 22
-rows_ok($res->{data},, 4, "correlated NOT EXISTS: 4 employees have no salary history");
+rows_ok($res->{data}, 4, "correlated NOT EXISTS: 4 employees have no salary history");
 @names = sort map { $_->{name} } @{$res->{data}};
 
 # ok 23
-is(join(',',@names), 'Diana,Frank,Grace,Hank', "correlated NOT EXISTS: correct names");
+is(join(',', @names), 'Diana,Frank,Grace,Hank', "correlated NOT EXISTS: correct names");
 
 ###############################################################################
 # FROM (SELECT ...) AS t -- basic derived table
@@ -275,7 +275,7 @@ $res = $db->execute(
 # Engineering employees: Alice,Charlie,Eve,Hank
 
 # ok 24
-rows_ok($res->{data},, 4, "derived table: 4 Engineering employees");
+rows_ok($res->{data}, 4, "derived table: 4 Engineering employees");
 
 ###############################################################################
 # FROM (SELECT ...) AS t WHERE outer condition
@@ -286,11 +286,11 @@ $res = $db->execute(
 # Engineering with salary > 80000: Alice(90000), Eve(95000)
 
 # ok 25
-rows_ok($res->{data},, 2, "derived table + outer WHERE: Alice and Eve");
+rows_ok($res->{data}, 2, "derived table + outer WHERE: Alice and Eve");
 @names = sort map { $_->{name} } @{$res->{data}};
 
 # ok 26
-is(join(',',@names), 'Alice,Eve', "derived table + outer WHERE: correct names");
+is(join(',', @names), 'Alice,Eve', "derived table + outer WHERE: correct names");
 
 ###############################################################################
 # FROM (SELECT ...) AS t ORDER BY / LIMIT
@@ -300,7 +300,7 @@ $res = $db->execute(
 );
 
 # ok 27
-rows_ok($res->{data},, 3, "derived table + ORDER BY + LIMIT: 3 rows");
+rows_ok($res->{data}, 3, "derived table + ORDER BY + LIMIT: 3 rows");
 # Should be the 3 lowest salaries: Frank(48000),Bob(55000),Diana(62000)
 @names = map { $_->{name} } @{$res->{data}};
 
@@ -318,7 +318,7 @@ $res = $db->execute(
 # Well-paid Engineering: Alice(90k), Charlie(80k), Eve(95k), Hank(72k)
 
 # ok 30
-rows_ok($res->{data},, 4, "derived table pre-filter + outer WHERE: 4 well-paid Engineering");
+rows_ok($res->{data}, 4, "derived table pre-filter + outer WHERE: 4 well-paid Engineering");
 
 ###############################################################################
 # Scalar subquery in SELECT list
@@ -328,7 +328,7 @@ $res = $db->execute(
 );
 
 # ok 31
-rows_ok($res->{data},, 1, "scalar subquery in SELECT list: 1 row");
+rows_ok($res->{data}, 1, "scalar subquery in SELECT list: 1 row");
 
 # ok 32
 is($res->{data}[0]{eng_budget}, 500000, "scalar subquery in SELECT: correct budget value");
@@ -343,7 +343,7 @@ $res = $db->execute(
 );
 
 # ok 33
-rows_ok($res->{data},, 6, "two-level nesting: 6 employees in high-value departments");
+rows_ok($res->{data}, 6, "two-level nesting: 6 employees in high-value departments");
 
 ###############################################################################
 # Three-level nesting
@@ -361,7 +361,7 @@ $res = $db->execute(
 # Engineering employees: Alice,Charlie,Eve,Hank
 
 # ok 34
-rows_ok($res->{data},, 4, "three-level nesting: 4 Engineering employees");
+rows_ok($res->{data}, 4, "three-level nesting: 4 Engineering employees");
 
 ###############################################################################
 # Correlated IN (outer col in inner WHERE)
@@ -376,11 +376,11 @@ $res = $db->execute(
 # emp_ids: 1(Alice), 5(Eve)
 
 # ok 35
-rows_ok($res->{data},, 2, "correlated-style IN + salary_hist: Alice and Eve");
+rows_ok($res->{data}, 2, "correlated-style IN + salary_hist: Alice and Eve");
 @names = sort map { $_->{name} } @{$res->{data}};
 
 # ok 36
-is(join(',',@names), 'Alice,Eve', "IN salary_hist > 80000: correct names");
+is(join(',', @names), 'Alice,Eve', "IN salary_hist > 80000: correct names");
 
 ###############################################################################
 # Correlated scalar comparison (each row evaluates subquery)
@@ -397,11 +397,11 @@ $res = $db->execute(
 # Others (Diana,Frank,Grace,Hank) have no 2022 history -> subquery returns empty -> no match
 
 # ok 37
-rows_ok($res->{data},, 4, "correlated scalar: 4 employees got a raise from 2022");
+rows_ok($res->{data}, 4, "correlated scalar: 4 employees got a raise from 2022");
 @names = sort map { $_->{name} } @{$res->{data}};
 
 # ok 38
-is(join(',',@names), 'Alice,Bob,Charlie,Eve', "correlated scalar: correct names");
+is(join(',', @names), 'Alice,Bob,Charlie,Eve', "correlated scalar: correct names");
 
 ###############################################################################
 # Subquery inside JOIN query
@@ -415,7 +415,7 @@ $res = $db->execute(
 # Only Engineering(10) has budget > 200000 -> 4 rows
 
 # ok 39
-rows_ok($res->{data},, 4, "JOIN + IN subquery: 4 Engineering employees");
+rows_ok($res->{data}, 4, "JOIN + IN subquery: 4 Engineering employees");
 
 ###############################################################################
 # Regression tests
@@ -424,13 +424,13 @@ $res = $db->execute("SELECT name FROM employees WHERE salary > 70000");
 # Alice(90k), Charlie(80k), Eve(95k), Hank(72k) = 4 rows; Grace=70000 not included
 
 # ok 40
-rows_ok($res->{data},, 4, "Regression plain SELECT: salary > 70000 -> 4 rows");
+rows_ok($res->{data}, 4, "Regression plain SELECT: salary > 70000 -> 4 rows");
 
 $db->execute("CREATE UNIQUE INDEX idx_emp_id ON employees (id)");
 $res = $db->execute("SELECT name FROM employees WHERE id = 5");
 
 # ok 41
-rows_ok($res->{data},, 1, "Regression index SELECT: id=5 -> 1 row");
+rows_ok($res->{data}, 1, "Regression index SELECT: id=5 -> 1 row");
 
 # ok 42
 is($res->{data}[0]{name}, 'Eve', "Regression index SELECT: got Eve");
@@ -443,7 +443,7 @@ $res = $db->execute(
 );
 
 # ok 43
-rows_ok($res->{data},, 1, "Regression JOIN SELECT: id=1 -> 1 row");
+rows_ok($res->{data}, 1, "Regression JOIN SELECT: id=1 -> 1 row");
 
 ###############################################################################
 # Cleanup

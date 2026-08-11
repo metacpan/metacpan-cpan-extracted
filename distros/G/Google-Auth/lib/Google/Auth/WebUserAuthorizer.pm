@@ -14,348 +14,187 @@
 
 package Google::Auth::WebUserAuthorizer;
 
+use Moo;
+extends 'Google::Auth::UserAuthorizer';
+
 use JSON::MaybeXS;
-use strict;
+use Google::Auth::Exceptions;
+use URI;
 
 my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 
-# What follows is an in-progress translation to perl of googleapis/google-auth-library-ruby/lib/googleauth/web_user_authorizer.rb
+use constant {
+  STATE_PARAM        => 'state',
+  AUTH_CODE_KEY      => 'code',
+  ERROR_CODE_KEY     => 'error',
+  SESSION_ID_KEY     => 'session_id',
+  CALLBACK_STATE_KEY => 'g-auth-callback',
+  CURRENT_URI_KEY    => 'current_uri',
+  XSRF_KEY           => 'g-xsrf-token',
+  SCOPE_KEY          => 'scope',
+};
 
-#use Google::Auth::Signet::OAuth2;
-#use Google::Auth::Signet::UserAuthorizer;
-#use Google::Auth::Signet::UserRefreshCredentials;
+# Generic request handling: assumes $request is a hash reference with
+# 'session', 'url', and 'parameters' keys, or objects supporting those methods.
 
-=begin comment
+sub _get_session {
+  my ($request) = @_;
+  if (ref($request) eq 'HASH') {
+    return $request->{session};
+  } elsif ($request->can('session')) {
+    return $request->session;
+  }
+  return;
+}
 
-    # Varation on {Google::Auth::UserAuthorizer} adapted for Plack based
-    # web applications.
-    #
-    # Example usage:
-    #
-    #     get('/') do
-    #       user_id = request.session['user_email']
-    #       credentials = authorizer.get_credentials(user_id, request)
-    #       if credentials.nil?
-    #         redirect authorizer.get_authorization_url(user_id: user_id,
-    #                                                   request: request)
-    #       end
-    #       # Credentials are valid, can call APIs
-    #       ...
-    #    end
-    #
-    #    get('/oauth2callback') do
-    #      url = Google::Auth::WebUserAuthorizer.handle_auth_callback_deferred(
-    #        request)
-    #      redirect url
-    #    end
-    #
-    # Instead of implementing the callback directly, applications are
-    # encouraged to use {Google::Auth::WebUserAuthorizer::CallbackApp} instead.
-    #
-    # @see CallbackApp
-    # @note Requires sessions are enabled
-    class WebUserAuthorizer < Google::Auth::UserAuthorizer
-      STATE_PARAM = "state".freeze
-      AUTH_CODE_KEY = "code".freeze
-      ERROR_CODE_KEY = "error".freeze
-      SESSION_ID_KEY = "session_id".freeze
-      CALLBACK_STATE_KEY = "g-auth-callback".freeze
-      CURRENT_URI_KEY = "current_uri".freeze
-      XSRF_KEY = "g-xsrf-token".freeze
-      SCOPE_KEY = "scope".freeze
+sub _get_url {
+  my ($request) = @_;
+  if (ref($request) eq 'HASH') {
+    return $request->{url};
+  } elsif ($request->can('url')) {
+    return $request->url;
+  }
+  return;
+}
 
-      NIL_REQUEST_ERROR = "Request is required.".freeze
-      NIL_SESSION_ERROR = "Sessions must be enabled".freeze
-      MISSING_AUTH_CODE_ERROR = "Missing authorization code in request".freeze
-      AUTHORIZATION_ERROR = "Authorization error: %s".freeze
-      INVALID_STATE_TOKEN_ERROR =
-        "State token does not match expected value".freeze
-
-      class << self
-        attr_accessor :default
-      end
-
-=cut
-
-# Handle the result of the oauth callback. This version defers the
-# exchange of the code by temporarily stashing the results in the user's
-# session. This allows apps to use the generic
-# {Google::Auth::WebUserAuthorizer::CallbackApp} handler for the callback
-# without any additional customization.
-#
-# Apps that wish to handle the callback directly should use
-# {#handle_auth_callback} instead.
-#
-# @param [Rack::Request] request
-#  Current request
+sub _get_param {
+  my ($request, $key) = @_;
+  if (ref($request) eq 'HASH') {
+    return $request->{parameters}->{$key} // $request->{$key};
+  } elsif ($request->can('param')) {
+    return $request->param($key);
+  } elsif ($request->can('parameters')) {
+    return $request->parameters->{$key};
+  }
+  return;
+}
 
 sub handle_auth_callback_deferred {
-  my ($self,           $request)      = @_;
-  my ($callback_state, $redirect_uri) = extract_callback_state($request);
-  $request->{session}->{$self->{CALLBACK_STATE_KEY}} =
-    $coder->encode($callback_state);
-  $redirect_uri;
+  my ($class, $request) = @_;
+  my ($callback_state, $redirect_uri) =
+    $class->extract_callback_state($request);
 
-=begin comment
-      def self.handle_auth_callback_deferred request
-        callback_state, redirect_uri = extract_callback_state request
-        request.session[CALLBACK_STATE_KEY] = MultiJson.dump callback_state
-        redirect_uri
-      end
+  my $session = _get_session($request);
+  Google::Auth::Error->throw('Sessions must be enabled') unless $session;
 
-=cut
-
+  $session->{+CALLBACK_STATE_KEY} = $coder->encode($callback_state);
+  return $redirect_uri;
 }
-
-# Initialize the authorizer
-#
-# @param [Google::Auth::ClientID] client_id
-#  Configured ID & secret for this application
-# @param [String, Array<String>] scope
-#  Authorization scope to request
-# @param [Google::Auth::Stores::TokenStore] token_store
-#  Backing storage for persisting user credentials
-# @param [String] callback_uri
-#  URL (either absolute or relative) of the auth callback. Defaults
-#  to '/oauth2callback'
-
-sub initialize {
-
-=begin comment
-      def initialize client_id, scope, token_store, callback_uri = nil
-        super client_id, scope, token_store, callback_uri
-      end
-
-=cut
-
-}
-
-# Handle the result of the oauth callback. Exchanges the authorization
-# code from the request and persists to storage.
-#
-# @param [String] user_id
-#  Unique ID of the user for loading/storing credentials.
-# @param [Rack::Request] request
-#  Current request
-# @return (Google::Auth::UserRefreshCredentials, String)
-#  credentials & next URL to redirect to
 
 sub handle_auth_callback {
+  my ($self, $user_id, $request) = @_;
 
-=begin comment
-      def handle_auth_callback user_id, request
-        callback_state, redirect_uri = WebUserAuthorizer.extract_callback_state(
-          request
-        )
-        WebUserAuthorizer.validate_callback_state callback_state, request
-        credentials = get_and_store_credentials_from_code(
-          user_id:  user_id,
-          code:     callback_state[AUTH_CODE_KEY],
-          scope:    callback_state[SCOPE_KEY],
-          base_url: request.url
-        )
-        [credentials, redirect_uri]
-      end
+  my ($callback_state, $redirect_uri) = $self->extract_callback_state($request);
+  $self->validate_callback_state($callback_state, $request);
 
-=cut
+  my $creds = $self->get_and_store_credentials_from_code(
+    user_id  => $user_id,
+    code     => $callback_state->{+AUTH_CODE_KEY},
+    scope    => $callback_state->{+SCOPE_KEY},
+    base_url => _get_url($request),
+  );
 
+  return ($creds, $redirect_uri);
 }
-
-# Build the URL for requesting authorization.
-#
-# @param [String] login_hint
-#  Login hint if need to authorize a specific account. Should be a
-#  user's email address or unique profile ID.
-# @param [Rack::Request] request
-#  Current request
-# @param [String] redirect_to
-#  Optional URL to proceed to after authorization complete. Defaults to
-#  the current URL.
-# @param [String, Array<String>] scope
-#  Authorization scope to request. Overrides the instance scopes if
-#  not nil.
-# @param [Hash] state
-#  Optional key-values to be returned to the oauth callback.
-# @return [String]
-#  Authorization url
 
 sub get_authorization_url {
+  my ($self, %options) = @_;
 
-=begin comment
+  my $request = $options{request};
+  Google::Auth::Error->throw('Request is required') unless $request;
 
-      def get_authorization_url options = {}
-        options = options.dup
-        request = options[:request]
-        raise NIL_REQUEST_ERROR if request.nil?
-        raise NIL_SESSION_ERROR if request.session.nil?
+  my $session = _get_session($request);
+  Google::Auth::Error->throw('Sessions must be enabled') unless $session;
 
-        state = options[:state] || {}
+  my $state       = $options{state}       // {};
+  my $redirect_to = $options{redirect_to} // _get_url($request);
 
-        redirect_to = options[:redirect_to] || request.url
-        request.session[XSRF_KEY] = SecureRandom.base64
-        options[:state] = MultiJson.dump(state.merge(
-                                           SESSION_ID_KEY  => request.session[XSRF_KEY],
-                                           CURRENT_URI_KEY => redirect_to
-                                         ))
-        options[:base_url] = request.url
-        super options
-      end
+  # Generate XSRF token
+  require Google::Auth;
+  my $random_bytes = Google::Auth::get_secure_random_bytes(32);
+  my $xsrf_token   = unpack('H*', $random_bytes);
+  $session->{+XSRF_KEY} = $xsrf_token;
 
-=cut
+  my $state_data = {
+    %$state,
+    SESSION_ID_KEY()  => $xsrf_token,
+    CURRENT_URI_KEY() => $redirect_to,
+  };
 
+  $options{state}    = $coder->encode($state_data);
+  $options{base_url} = _get_url($request);
+
+  return $self->SUPER::get_authorization_url(%options);
 }
 
-# Fetch stored credentials for the user from the given request session.
-#
-# @param [String] user_id
-#  Unique ID of the user for loading/storing credentials.
-# @param [Rack::Request] request
-#  Current request. Optional. If omitted, this will attempt to fall back
-#  on the base class behavior of reading from the token store.
-# @param [Array<String>, String] scope
-#  If specified, only returns credentials that have all the \
-#  requested scopes
-# @return [Google::Auth::UserRefreshCredentials]
-#  Stored credentials, nil if none present
-# @raise [Signet::AuthorizationError]
-#  May raise an error if an authorization code is present in the session
-#  and exchange of the code fails
-
 sub get_credentials {
+  my ($self, $user_id, $request, $scope) = @_;
 
-=begin comment
+  my $session = $request ? _get_session($request) : undef;
 
-      def get_credentials user_id, request = nil, scope = nil
-        if request&.session&.key? CALLBACK_STATE_KEY
-          # Note - in theory, no need to check required scope as this is
-          # expected to be called immediately after a return from authorization
-          state_json = request.session.delete CALLBACK_STATE_KEY
-          callback_state = MultiJson.load state_json
-          WebUserAuthorizer.validate_callback_state callback_state, request
-          get_and_store_credentials_from_code(
-            user_id:  user_id,
-            code:     callback_state[AUTH_CODE_KEY],
-            scope:    callback_state[SCOPE_KEY],
-            base_url: request.url
-          )
-        else
-          super user_id, scope
-        end
-      end
+  if ($session && exists $session->{+CALLBACK_STATE_KEY}) {
+    my $state_json     = delete $session->{+CALLBACK_STATE_KEY};
+    my $callback_state = $coder->decode($state_json);
 
-=cut
+    $self->validate_callback_state($callback_state, $request);
 
+    return $self->get_and_store_credentials_from_code(
+      user_id  => $user_id,
+      code     => $callback_state->{+AUTH_CODE_KEY},
+      scope    => $callback_state->{+SCOPE_KEY},
+      base_url => _get_url($request),
+    );
+  }
+
+  return $self->SUPER::get_credentials($user_id, $scope);
 }
 
 sub extract_callback_state {
+  my ($class, $request) = @_;
 
-=begin comment
+  my $state_json = _get_param($request, STATE_PARAM) // '{}';
+  my $state      = $coder->decode($state_json);
 
-      def self.extract_callback_state request
-        state = MultiJson.load(request[STATE_PARAM] || "{}")
-        redirect_uri = state[CURRENT_URI_KEY]
-        callback_state = {
-          AUTH_CODE_KEY  => request[AUTH_CODE_KEY],
-          ERROR_CODE_KEY => request[ERROR_CODE_KEY],
-          SESSION_ID_KEY => state[SESSION_ID_KEY],
-          SCOPE_KEY      => request[SCOPE_KEY]
-        }
-        [callback_state, redirect_uri]
-      end
+  my $redirect_uri = $state->{+CURRENT_URI_KEY};
 
-=cut
+  my $callback_state = {
+    AUTH_CODE_KEY()  => _get_param($request, AUTH_CODE_KEY),
+    ERROR_CODE_KEY() => _get_param($request, ERROR_CODE_KEY),
+    SESSION_ID_KEY() => $state->{+SESSION_ID_KEY},
+    SCOPE_KEY()      => _get_param($request, SCOPE_KEY),
+  };
 
+  return ($callback_state, $redirect_uri);
 }
 
-# Verifies the results of an authorization callback
-#
-# @param [Hash] state
-#  Callback state
-# @option state [String] AUTH_CODE_KEY
-#  The authorization code
-# @option state [String] ERROR_CODE_KEY
-#  Error message if failed
-# @param [Rack::Request] request
-#  Current request
-
 sub validate_callback_state {
+  my ($self, $state, $request) = @_;
 
-=begin comment
+  Google::Auth::Error->throw('Missing authorization code in request')
+    unless defined $state->{+AUTH_CODE_KEY};
 
-      def self.validate_callback_state state, request
-        raise Signet::AuthorizationError, MISSING_AUTH_CODE_ERROR if state[AUTH_CODE_KEY].nil?
-        if state[ERROR_CODE_KEY]
-          raise Signet::AuthorizationError,
-                format(AUTHORIZATION_ERROR, state[ERROR_CODE_KEY])
-        elsif request.session[XSRF_KEY] != state[SESSION_ID_KEY]
-          raise Signet::AuthorizationError, INVALID_STATE_TOKEN_ERROR
-        end
-      end
+  if ($state->{+ERROR_CODE_KEY}) {
+    Google::Auth::Error->throw(
+      'Authorization error: ' . $state->{+ERROR_CODE_KEY});
+  }
 
-=cut
+  my $session = _get_session($request);
+  Google::Auth::Error->throw('Sessions must be enabled') unless $session;
 
+  my $stored_xsrf   = $session->{+XSRF_KEY};
+  my $received_xsrf = $state->{+SESSION_ID_KEY};
+
+  if ( !defined $stored_xsrf
+    || !defined $received_xsrf
+    || $stored_xsrf ne $received_xsrf)
+  {
+    Google::Auth::Error->throw('State token does not match expected value');
+  }
 }
 
 package Google::Auth::WebUserAuthorizer::CallbackApp;
 
-=begin comment
-
-      # Small Plack app which acts as the default callback handler for the app.
-      #
-      # To configure in Rails, add to routes.rb:
-      #
-      #     match '/oauth2callback',
-      #           to: Google::Auth::WebUserAuthorizer::CallbackApp,
-      #           via: :all
-      #
-      # With Rackup, add to config.ru:
-      #
-      #     map '/oauth2callback' do
-      #       run Google::Auth::WebUserAuthorizer::CallbackApp
-      #     end
-      #
-      # Or in a classic Sinatra app:
-      #
-      #     get('/oauth2callback') do
-      #       Google::Auth::WebUserAuthorizer::CallbackApp.call(env)
-      #     end
-      #
-      # @see Google::Auth::WebUserAuthorizer
-      class CallbackApp
-        LOCATION_HEADER = "Location".freeze
-        REDIR_STATUS = 302
-        ERROR_STATUS = 500
-
-        # Handle a rack request. Simply stores the results the authorization
-        # in the session temporarily and redirects back to to the previously
-        # saved redirect URL. Credentials can be later retrieved by calling.
-        # {Google::Auth::Web::WebUserAuthorizer#get_credentials}
-        #
-        # See {Google::Auth::Web::WebUserAuthorizer#get_authorization_uri}
-        # for how to initiate authorization requests.
-        #
-        # @param [Hash] env
-        #  Rack environment
-        # @return [Array]
-        #  HTTP response
-        def self.call env
-          request = Rack::Request.new env
-          return_url = WebUserAuthorizer.handle_auth_callback_deferred request
-          if return_url
-            [REDIR_STATUS, { LOCATION_HEADER => return_url }, []]
-          else
-            [ERROR_STATUS, {}, ["No return URL is present in the request."]]
-          end
-        end
-
-        def call env
-          self.class.call env
-        end
-      end
-    end
-  end
-end
-
-=cut
+# To be implemented if we want a turnkey Plack app similar to Ruby's rack app.
+# For now, WebUserAuthorizer provides the helpers to build one easily.
 
 1;

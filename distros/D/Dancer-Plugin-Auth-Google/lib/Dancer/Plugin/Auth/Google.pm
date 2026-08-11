@@ -2,7 +2,7 @@ package Dancer::Plugin::Auth::Google;
 use strict;
 use warnings;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 use Dancer ':syntax';
 use Dancer::Plugin;
@@ -18,18 +18,25 @@ my $client_id;
 my $client_secret;
 my $scope;
 my $access_type;
-my $callback_url;
 my $callback_success;
 my $callback_fail;
 my $legacy_gplus;
 my $furl;
 
+sub callback_url {
+    my $callback_url  = plugin_setting->{callback_url};
+    return if !defined $callback_url;
+    # Prepend the current request URL base if the callback_url is relative
+    $callback_url = request->base . $callback_url if $callback_url =~ s/^\///;
+    return $callback_url;
+}
+
 register 'auth_google_init' => sub {
     my $config     = plugin_setting;
     $client_id     = $config->{client_id};
     $client_secret = $config->{client_secret};
-    $callback_url  = $config->{callback_url};
 
+    my $insecure      = $config->{insecure}         || 'no';
     $scope            = $config->{scope}            || 'profile';
     $callback_success = $config->{callback_success} || '/';
     $callback_fail    = $config->{callback_fail}    || '/fail';
@@ -41,12 +48,12 @@ register 'auth_google_init' => sub {
             unless $config->{$param};
     }
 
-    debug "new google with $client_id, $client_secret, $callback_url";
+    debug "new google with $client_id, $client_secret, ".$config->{callback_url};
     $furl = Furl->new(
         agent    => "Dancer-Plugin-Auth-Google/$VERSION",
         timeout  => 5,
         ssl_opts => {
-            SSL_verify_mode => SSL_VERIFY_NONE(),
+            SSL_verify_mode => ($insecure eq 'yes' ? SSL_VERIFY_NONE() : SSL_VERIFY_PEER()),
         },
     );
 
@@ -55,15 +62,16 @@ register 'auth_google_init' => sub {
 
 register 'auth_google_authenticate_url' => sub {
     Carp::croak 'auth_google_init() must be called first'
-        unless defined $callback_url;
+        unless defined callback_url;
 
     my $uri = URI->new('https://accounts.google.com/o/oauth2/v2/auth');
     $uri->query_form(
         client_id     => $client_id,
-        redirect_uri  => $callback_url,
+        redirect_uri  => callback_url(),
         scope         => $scope,
         access_type   => $access_type,
         response_type => 'code',
+        @_
     );
 
     debug "google auth uri: $uri";
@@ -85,25 +93,19 @@ get '/auth/google/callback' => sub {
             code          => $code,
             client_id     => $client_id,
             client_secret => $client_secret,
-            redirect_uri  => $callback_url,
+            redirect_uri  => callback_url(),
             grant_type    => 'authorization_code',
         }
     );
 
     my ($data, $error) = _parse_response( $res->decoded_content );
-    if (ref $data && !$error) {
-        # Google tells us to ignore any unrecognized fields
-        # included in the response (like their "id_token").
-        $data = {
-            access_token  => $data->{access_token},
-            expires_in    => $data->{expires_in},
-            token_type    => $data->{token_type},
-            refresh_token => $data->{refresh_token},
-        };
-    }
-    else {
-        return send_error('google auth: ' . (defined $error ? $error : 'unknown error'));
-    }
+    return send_error($error) if $error;
+
+    return send_error( $data->{error} )
+        if $data->{error};
+
+    return send_error 'google auth: no access token present'
+        unless $data->{access_token};
 
     $res = $furl->get(
         'https://www.googleapis.com/oauth2/v2/userinfo',
@@ -223,16 +225,18 @@ for new ones.
 =head2 Google Application
 
 Anyone with a valid Google account can register an application. Go to
-L<http://console.developers.google.com>, then select a project or create
-a new one. After that, in the sidebar on the left, select "Credentials".
+L<https://console.cloud.google.com/apis/dashboard>, then select a project or create
+a new one.
 
-First, go to the I<OAuth consent screen> tab and set it up with you website's
+After that, in the sidebar on the left, select "OAuth Consent Screen".
+
+Inside, go to the I<Branding> tab and set it up with you website's
 logo, desired credentials (the "email" and "profile" ones are granted
 by default) and, specially, your B<authorized domains>. We'll need those for
 the next step!
 
-Now go to the I<Credentials> tab and click the B<Create credentials>
-button/dropdown and select B<OAuth client ID>.
+Now go to the I<Clients> tab and click the B<< + Create client >>
+button/dropdown to create an B<OAuth client ID>.
 
 =for HTML
 <p><img src="https://raw.githubusercontent.com/garu/Dancer-Plugin-Auth-Google/master/share/create-new-id.png"></p>
@@ -242,21 +246,17 @@ select I<"Web application">.
 
 Under the "Authorized JavaScript origins" field, put the domains of both
 your development server and your production one
-(e.g.: http://localhost:3000 and http://mywebsite.com). You will only be
+(e.g.: http://localhost:3000 and https://mywebsite.com). You will only be
 able to include domains listed under your I<authorized domain list>,
 which you set on the previous step (though localhost domains are ok).
 
-Same thing goes for the "Redirect URIs": those B<**MUST**> be the same
+Same thing goes for the "Authorized Redirect URIs": those B<**MUST**> be the same
 as you will set in your app and Google won't redirect to any page that
 is not listed (don't worry, you can edit this later too).
 
-=for HTML
-<p><img src="https://raw.githubusercontent.com/garu/Dancer-Plugin-Auth-Google/master/share/authorized-uris.png"></p>
-
 Again, make sure the "Redirect URIs" contains both your development
 url (e.g. C<http://localhost:3000/auth/google/callback>) and production
-(e.g. C<http://mywebsite.com/auth/google/callback>). It's usually a good
-practice to add I<both> HTTP and HTTPS callback urls.
+(e.g. C<https://mywebsite.com/auth/google/callback>).
 
 After you're finished, copy the "Client ID" and "Client Secret" data
 of your newly created app. It should be listed on that same panel
@@ -280,6 +280,7 @@ Plugins / Auth::Google, like so:
             callback_success: '/'
             callback_fail:    '/fail'
             legacy_gplus:     0
+	    insecure:         'no'
 
 Of those, only "client_id", "client_secret" and "callback_url" are mandatory.
 If you omit the other ones, they will assume their default values, as listed
@@ -302,6 +303,20 @@ And
     plugins:
         'Auth::Google':
             callback_url:   'http://myproductionserver.com/auth/google/callback'
+
+The C<callback_url> may be a relative path like I</auth/google/callback>. The
+domain part (base URL) of the current Dancer request will be used (prepended)
+to the given C<callback_url>.
+
+B<Caution>: All callback URLs being used must be configured in the Google API
+console! Using a relative path may pass invalid (unconfigured) callback URLs to
+the Google API which led to an error being shown to the user!
+
+B<NOTE>: version 0.08 onwards will verify the certificates before connecting
+to Google OAuth servers, protecting against MitM attacks (CWE-295). If you
+want to explicitly allow for insecure connections (the default behavior for
+versions 0.07 and below), you can set 'insecure' to 'true'. Any other value
+for 'insecure' will verify the certificates.
 
 
 =head3 Setting your permissions' scope
@@ -336,27 +351,11 @@ demo above.
 
 Google allows you to send additional C<key=value> data to preserve state
 in your application throughout the OAuth2 process, via the I<state> variable.
-To do so, simply tweak the URI object with that additional info:
+To do so, simply add an extra param to the auth_google_authenticate_url:
 
-    use URI::Escape;
+For example, to force the approval prompt to be displayed, you can do:
 
-    if (!session('google_user')) {
-        my $state = 'CSRF=my-special-token&other=whatever';
-
-        my $uri = auth_google_authenticate_url;
-        $uri->query_form(
-            $uri->query_form, # <-- required so we ADD instead of REPLACE
-            state => URI::Encode->new->encode($state),
-        );
-
-        return redirect $uri;
-    }
-
-If you do this, the "state" data will be sent back to you on the callback
-as a request parameter. You can then use it to direct your user to the
-proper resource or check it against forgery attacks - assuming you also
-stored it in a session variable of some sort.
-
+    redirect auth_google_authenticate_url( approval_prompt => 'force' );
 
 =head1 ROUTE HANDLERS
 
@@ -397,7 +396,8 @@ and picture. C<< session('google_user') >> looks like so (random hash order!):
         verified_email => 1,
     }
 
-=head4 NOTE: G+ is no more. Add 'legacy_gplus: 1' to keep old code running.
+=head4 NOTE: Once upon a time there was a thing called "G+".
+Add C<< legacy_gplus => 1 >> to keep old code that used it running.
 
 Up to version 0.06 of this module the C<< session('google_user') >>
 data structure was as returned by Google Plus' API. Google decided to
@@ -437,7 +437,7 @@ Dancer::Plugin::Auth::Twitter and Dancer::Plugin::Auth::Facebook.
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014-2019, Breno G. de Oliveira
+Copyright (C) 2014-2026, Breno G. de Oliveira
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

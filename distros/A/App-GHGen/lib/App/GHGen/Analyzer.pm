@@ -15,7 +15,7 @@ our @EXPORT_OK = qw(
 	get_cache_suggestion
 );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -519,21 +519,6 @@ sub find_outdated_actions($workflow) {
 	}
 
 	return @outdated;
-}
-
-sub has_deployment_steps($workflow) {
-	my $jobs = $workflow->{jobs} or return 0;
-
-    for my $job (values %$jobs) {
-        my $steps = $job->{steps} or next;
-        for my $step (@$steps) {
-            # Check for deployment-related actions
-            return 1 if $step->{uses} && $step->{uses} =~ /deploy|publish|release/i;
-            return 1 if $step->{run} && $step->{run} =~ /git push|npm publish/;
-        }
-    }
-
-	return 0;
 }
 
 =head1 AUTHOR

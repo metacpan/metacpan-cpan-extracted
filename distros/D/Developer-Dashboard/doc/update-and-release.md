@@ -50,6 +50,25 @@ checksum, generates a detached signature, and creates or updates the GitHub
 release for that tag. That workflow must also install `Devel::Cover` before
 it runs the numeric `cover` gate, or the release path will die before the
 tarball, checksum, and signature assets are published.
+
+A tag push runs that workflow **as frozen at the tag**, so a fix landed on
+`master` afterwards does nothing for a tag that already exists. Both `v4.23`
+and `v4.24` were lost that way: each tag carries the pre-DD-449 node20 pin for
+`shogo82148/actions-setup-perl`, the runner now forces node24, and re-running
+the failed run replays the same frozen file. For that case the workflow takes
+an optional `tag` input on `workflow_dispatch`: dispatch it from `master` with
+`tag=vX.XX` and it publishes that existing tag under the current definition,
+while still checking out the tag's own tree so the artifact comes from the
+tagged source rather than from `master`. The input is validated against the
+`vX.XX` shape before anything is created, so a dispatch cannot publish a
+branch as a release. Leave the input empty and an ordinary tag push behaves
+exactly as it always has.
+
+Recovering a tag this way still runs the full suite and the coverage gate
+against the tagged tree, so a tag whose code cannot pass those gates stays
+unpublishable by design — that is the second, separate reason `v4.24` cannot
+be recovered, and it is not something the dispatch path is meant to bypass.
+
 The GitHub-hosted CPAN upload workflow is deliberately manual-only. Do not
 wire tag pushes to automatic PAUSE uploads here; ordinary `vX.XX` tags are for
 the signed GitHub release path, while CPAN publication stays an explicit
@@ -177,11 +196,24 @@ sequence, the repository root must contain exactly one unpacked
 `Developer-Dashboard-X.XX/` build directory and exactly one matching
 `Developer-Dashboard-X.XX.tar.gz` tarball. If stale build directories remain,
 the tarball kwalitee gate must fail.
+Untracked runtime and operator state directories that live in the checkout
+root must be named explicitly in the `[GatherDir]` `exclude_match` list. `dzil`
+gathers from disk rather than from git, so `.gitignore` never protects the
+tarball, and a leading dot is not protection either — it only works because
+`GatherDir` defaults `include_dotfiles` to `0`, which is a default rather than
+a decision and disappears the moment a directory is renamed. `cover_db/`,
+`dogfood-output/`, `.worktrees/`, and `node_modules/` are excluded for exactly
+that reason: each holds build spew, browser QA evidence, or whole other
+checkouts, and none of it belongs in a release. `t/15-release-metadata.t` gates this in three independent
+ways: the exclusion lines must be present in `dist.ini`, the parsed
+`exclude_match` patterns must actually match the hazardous paths while leaving
+every shipped path alone, and any built tarball must carry no member under
+those prefixes.
 After the source-tree `prove -lr t` and explicit `Devel::Cover` gates pass,
 verify the built tarball still installs in a blank Perl container with:
 
 ```bash
-docker run --rm -v "$PWD:/work" -w /work perl:5.38-bookworm \
+docker run --rm -v "$PWD:/work" -w /work perl:5.44-bookworm \
   sh -lc 'cpanm --notest /work/Developer-Dashboard-X.XX.tar.gz -v'
 ```
 
@@ -428,7 +460,7 @@ and uploads the resulting tarball to PAUSE using:
 stored as GitHub Actions secrets.
 
 The release workflow bootstraps the C<App::Cmd> dependency chain explicitly before C<Dist::Zilla>, including modules such as C<Module::Pluggable::Object>, C<Getopt::Long::Descriptive>, C<Class::Load>, and C<IO::TieCombine>, so fresh GitHub runners do not fail during release dependency installation when C<Dist::Zilla> pulls in the C<App::Cmd::*> stack. It also installs C<Dist::Zilla::Plugin::MetaProvides::Package> so generated META files include an explicit C<provides> section.
-Both shipped GitHub workflows now pin C<actions/checkout@v5> and set C<FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true> so hosted runners do not rely on the deprecated Node 20 JavaScript-action runtime.
+Every shipped GitHub workflow pins its actions by full commit SHA on release lines that declare the C<node24> runtime natively, so hosted runners do not depend on GitHub rerouting the deprecated Node 20 JavaScript-action runtime. The claim that this had been achieved was previously recorded here while the pins were still C<node20>; C<script/audit-action-pins> now resolves each pin on every push, so the statement is checked rather than asserted.
 
 Generated release metadata should also include repository resources plus an
 explicit C<provides> section, and the repository root should ship
@@ -490,9 +522,15 @@ Before release, verify the library coverage target:
 
 ```bash
 eval "$(perl -I ~/perl5/lib/perl5 -Mlocal::lib=~/perl5)"
-cover -delete
-HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
-cover -report text -select_re '^lib/' -coverage statement -coverage subroutine
+perl script/coverage-gate
 ```
+
+`script/coverage-gate` is the canonical entrypoint: it drops the coverage
+database, runs the instrumented suite, collects the `lib/` report and enforces
+100.0 on statement, branch, condition and subroutine. It runs the whole chain
+inside one process, so no command of it can see a different library path from
+the others — the split that makes `Devel::Cover` unable to read the database it
+just wrote. Exit `3` means exactly that instrument failure and is never fixed by
+re-running.
 
 Release quality requires a reviewed coverage report for `lib/` alongside a green test suite.

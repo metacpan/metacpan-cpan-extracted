@@ -1,0 +1,21 @@
+# CPANSA-Plack-2026-7381 has no fixed Plack release. The project does not load
+# Plack::Middleware::XSendfile and script/cpan-audit-project rejects both direct
+# references and normal Plack builder activation before this advisory is excluded.
+CPANSA-Plack-2026-7381
+
+# CPANSA-File-Temp-2011-4116 has no fixed File::Temp release. The historical
+# finding concerns the _is_safe symlink check reached by public tempfile/tempdir
+# calls at MEDIUM safety level. The project uses those public constructors only
+# at the default STANDARD level, and the audit script rejects any production
+# call that changes File::Temp's safe_level before this advisory is excluded.
+CPANSA-File-Temp-2011-4116
+
+# CPANSA-Dancer2-2026-13577 (CVE-2026-13577) has no fixed Dancer2 release: the
+# advisory's affected range is ">0" and its fixed range is empty, so there is
+# nothing to floor to. The weakness is Dancer2::Core::Role::SessionFactory
+# falling back to a rand-derived session id when its CSPRNG modules are absent.
+# This project never uses Dancer2's session factory - it has its own file-backed
+# store - and script/cpan-audit-project rejects any production use of a Dancer2
+# session before this advisory is excluded. Reviewed 2026-08-08 under DD-451;
+# revisit if a fixed Dancer2 ships or the app ever adopts Dancer2 sessions.
+CPANSA-Dancer2-2026-13577

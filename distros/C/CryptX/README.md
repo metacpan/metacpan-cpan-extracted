@@ -126,6 +126,8 @@ Use these only when authentication is handled separately or not needed:
 
 - **CTR** ([Crypt::Mode::CTR](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACTR)) - Turns a block cipher into a stream cipher. Parallelizable.
 - **CBC** ([Crypt::Mode::CBC](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACBC)) - Classic mode, needs padding. Prefer CTR or an AEAD mode.
+- **XTS** ([Crypt::Mode::XTS](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AXTS)) - For encrypting storage in place (disk sectors); one tweaked
+data unit per call. Not for data that travels.
 - **ECB** ([Crypt::Mode::ECB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AECB)) - **Insecure for most uses.** Each block encrypted independently.
 
 The individual [Crypt::Cipher::AES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAES), [Crypt::Cipher::Twofish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ATwofish), etc. modules implement
@@ -227,7 +229,7 @@ module POD when you need exact failure semantics.
 
 - Block cipher modes
 
-    [Crypt::Mode::CBC](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACBC), [Crypt::Mode::CFB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACFB), [Crypt::Mode::CTR](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACTR), [Crypt::Mode::ECB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AECB), [Crypt::Mode::OFB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AOFB)
+    [Crypt::Mode::CBC](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACBC), [Crypt::Mode::CFB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACFB), [Crypt::Mode::CTR](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACTR), [Crypt::Mode::ECB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AECB), [Crypt::Mode::OFB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AOFB), [Crypt::Mode::XTS](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AXTS)
 
 - Stream ciphers
 
@@ -241,7 +243,7 @@ module POD when you need exact failure semantics.
 - Hash functions
 
     [Crypt::Digest::BLAKE2b\_160](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2b_160), [Crypt::Digest::BLAKE2b\_256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2b_256), [Crypt::Digest::BLAKE2b\_384](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2b_384), [Crypt::Digest::BLAKE2b\_512](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2b_512),
-    [Crypt::Digest::BLAKE2s\_128](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2s_128), [Crypt::Digest::BLAKE2s\_160](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2s_160), [Crypt::Digest::BLAKE2s\_224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2s_224), [Crypt::Digest::BLAKE2s\_256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2s_256),
+    [Crypt::Digest::BLAKE2s\_128](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2s_128), [Crypt::Digest::BLAKE2s\_160](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2s_160), [Crypt::Digest::BLAKE2s\_224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2s_224), [Crypt::Digest::BLAKE2s\_256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE2s_256), [Crypt::Digest::BLAKE3](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ABLAKE3),
     [Crypt::Digest::CHAES](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ACHAES), [Crypt::Digest::MD2](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AMD2), [Crypt::Digest::MD4](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AMD4), [Crypt::Digest::MD5](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AMD5), [Crypt::Digest::RIPEMD128](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ARIPEMD128), [Crypt::Digest::RIPEMD160](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ARIPEMD160),
     [Crypt::Digest::RIPEMD256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ARIPEMD256), [Crypt::Digest::RIPEMD320](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ARIPEMD320), [Crypt::Digest::SHA1](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA1), [Crypt::Digest::SHA224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA224), [Crypt::Digest::SHA256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA256), [Crypt::Digest::SHA384](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA384),
     [Crypt::Digest::SHA512](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512), [Crypt::Digest::SHA512\_224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512_224), [Crypt::Digest::SHA512\_256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512_256), [Crypt::Digest::Tiger192](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ATiger192), [Crypt::Digest::Whirlpool](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AWhirlpool),

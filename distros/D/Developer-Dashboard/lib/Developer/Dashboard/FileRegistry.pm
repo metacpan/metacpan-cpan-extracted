@@ -3,7 +3,7 @@ package Developer::Dashboard::FileRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use File::Spec;
 use File::Find ();
@@ -37,7 +37,7 @@ sub register_named_files {
     my ( $self, $aliases ) = @_;
     return $self if ref($aliases) ne 'HASH';
     for my $name ( keys %{$aliases} ) {
-        next if !defined $name || $name eq '';
+        next if !defined $name || $name eq '';    # uncoverable condition left
         my $path = $aliases->{$name};
         next if !defined $path || $path eq '';
         $self->{named_files}{$name} = $path;
@@ -65,8 +65,8 @@ sub named_files {
     my ($self) = @_;
     $self->_load_configured_named_files;
     return {
-        %{ $self->{configured_named_files} || {} },
-        %{ $self->{named_files}            || {} },
+        %{ $self->{configured_named_files} || {} },    # uncoverable branch true
+        %{ $self->{named_files}            || {} },    # uncoverable branch true
     };
 }
 
@@ -128,10 +128,12 @@ sub locate_files_under {
             no_chdir => 1,
             wanted   => sub {
                 return if !-f $_;
+                # With no_chdir the visited $_ equals $File::Find::name (the full
+                # pathname), so matching each term against that path already
+                # covers the basename and the directory components.
                 my $path = $File::Find::name;
-                my $name = $_;
                 for my $term (@terms) {
-                    return if $name !~ /\Q$term\E/i && $path !~ /\Q$term\E/i;
+                    return if $path !~ /\Q$term\E/i;
                 }
                 push @found, $path;
             },

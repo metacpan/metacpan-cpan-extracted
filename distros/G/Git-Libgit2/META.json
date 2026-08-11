@@ -45,15 +45,15 @@
    "provides" : {
       "Git::Libgit2" : {
          "file" : "lib/Git/Libgit2.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Git::Libgit2::Error" : {
          "file" : "lib/Git/Libgit2/Error.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Git::Libgit2::FFI" : {
          "file" : "lib/Git/Libgit2/FFI.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/Getty/p5-git-libgit2"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -424,7 +424,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.005",
+                  "tag" : "0.006",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

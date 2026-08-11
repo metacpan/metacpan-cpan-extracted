@@ -23,7 +23,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 # Other items we are prepared to export if requested
 @EXPORT_OK =	qw();
 
-$VERSION = '2.07';
+$VERSION = '2.09';
 bootstrap Crypt::DES;
 
 use strict;
@@ -263,12 +263,12 @@ my $i = 1;
 my $fail = 0;
 my $tt = (scalar(@{$testval}) *2);
 print "1..$tt\n";
-my $t0 = new Benchmark;
+my $t0 = Benchmark->new();
 foreach my $tst (@{$testval}) {
     my ($anot,$bnot) = (0,0);
     foreach(@{$tst}) { $_ = pack("H*",$_) }
 
-    my $cipher = new Crypt::DES($tst->[0]);
+    my $cipher = Crypt::DES->new($tst->[0]);
     $anot = 1 unless ($cipher->encrypt($tst->[1]) eq $tst->[2]);
     if($anot) {
 	#print "not ";
@@ -284,7 +284,7 @@ foreach my $tst (@{$testval}) {
 ;
     $i++;
 }
-my $t1 = new Benchmark;
+my $t1 = Benchmark->new();
 
 my $suc = $tt - $fail;
 my $fp = sprintf("%0.2f",(($tt / $suc) * 100)) unless $suc == 0;
@@ -298,35 +298,35 @@ if($fail > 0) {
 } else {
     print "\nRunning speed tests...\n";
     print "\nnon-cached cipher speed test.  5000 encrypt iterations\n";
-    my $t2 = new Benchmark;
+    my $t2 = Benchmark->new();
     for(1..5000) {
-	my $cipher = new Crypt::DES(pack("H*",'1c587f1c13924fef'));
+	my $cipher = Crypt::DES->new(pack("H*",'1c587f1c13924fef'));
 	$cipher->encrypt(pack("H*",'305532286d6f295a'));
     }
-    my $t3 = new Benchmark;
+    my $t3 = Benchmark->new();
     my $td1 = timediff($t3,$t2);
     my $ts1 = timestr($td1);
     print "$ts1\nok 343\n";
 
     print "\nnon-cached cipher speed test.  5000 decrypt iterations\n";
-    my $t4 = new Benchmark;
+    my $t4 = Benchmark->new();
     for(1..5000) {
-        my $cipher = new Crypt::DES(pack("H*",'1c587f1c13924fef'));
+        my $cipher = Crypt::DES->new(pack("H*",'1c587f1c13924fef'));
         $cipher->decrypt(pack("H*",'63fac0d034d9f793'));
     }
-    my $t5 = new Benchmark;
+    my $t5 = Benchmark->new();
     my $td2 = timediff($t5,$t4);
     my $ts2 = timestr($td2);
     print "$ts2\nok 344\n";
 
     print "\ncached cipher speed test.  10000 encrypt iterations\n";
     {
-    my $t6 = new Benchmark;
-    my $cipher = new Crypt::DES(pack("H*",'1c587f1c13924fef'));
+    my $t6 = Benchmark->new();
+    my $cipher = Crypt::DES->new(pack("H*",'1c587f1c13924fef'));
     for(1..10000) {
         $cipher->encrypt(pack("H*",'305532286d6f295a'));
     }
-    my $t7 = new Benchmark;
+    my $t7 = Benchmark->new();
     my $td3 = timediff($t7,$t6);
     my $ts3 = timestr($td3);
     print "$ts3\nok 345\n";
@@ -334,12 +334,12 @@ if($fail > 0) {
 
     print "\ncached cipher speed test.  10000 decrypt iterations\n";
     {
-    my $t8 = new Benchmark;
-    my $cipher = new Crypt::DES(pack("H*",'1c587f1c13924fef'));
+    my $t8 = Benchmark->new();
+    my $cipher = Crypt::DES->new(pack("H*",'1c587f1c13924fef'));
     for(1..10000) {
         $cipher->decrypt(pack("H*",'63fac0d034d9f793'));
     }
-    my $t9 = new Benchmark;
+    my $t9 = Benchmark->new();
     my $td4 = timediff($t9,$t8);
     my $ts4 = timestr($td4);
     print "$ts4\nok 346\n";
@@ -354,7 +354,7 @@ if(!$@) {
                 $@ = "CBC mode requires Crypt::CBC version 1.22 or higher.";
         } else {
 
-                my $cipher = new Crypt::CBC(pack("H*","0123456789ABCDEF"),"DES");
+                my $cipher = Crypt::CBC->new(pack("H*","0123456789ABCDEF"),"DES");
                 my $ciphertext = $cipher->encrypt(pack("H*","37363534333231204E6F77206973207468652074696D6520666F722000"));
                 my $plaintext  = $cipher->decrypt($ciphertext);
 

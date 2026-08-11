@@ -3,7 +3,7 @@ package Developer::Dashboard::Zipper;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Exporter 'import';
 use File::Basename qw(dirname);
@@ -61,7 +61,7 @@ sub acmdx {
         token   => $token,
         url     => { tokenised => $url, app => $args{app} || $url },
         forward => [ $path => { token => $token->{raw}, type => $type } ],
-        html    => sprintf( q{<a href="%s" target="%s">%s</a>}, $url, ( $args{target} || '_blank' ), ( $args{label} || 'Click Here' ) ),
+        html    => sprintf( q{<a href="%s" target="%s">%s</a>}, $url, ( $args{target} || '_blank' ), ( $args{label} || 'Click Here' ) ),    # uncoverable condition false
     };
 }
 
@@ -168,7 +168,7 @@ sub _saved_ajax_url {
         file       => $file,
     );
     my $path = $route
-      ? ( $route->{path} || '' )
+      ? $route->{path}
       : (
         ( $args{skill_name} || '' ) ne ''
         ? sprintf '/ajax/%s/%s', _url_path_escape( $args{skill_name} ), _url_path_escape($file)

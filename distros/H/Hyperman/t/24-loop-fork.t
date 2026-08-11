@@ -65,8 +65,10 @@ sub parent_survives_child_remove {
     my $pid = open my $rd, '-|';
     die "fork: $!" unless defined $pid;
     if (!$pid) {
-        # what a disown does: drop the inherited watcher by fd
-        eval { $loop->remove(fileno $r) };
+        # what a disown does: drop the inherited watcher by fd. No eval:
+        # if the API moves, this test must fail loudly, not pass by
+        # silently doing nothing.
+        $loop->unwatch_io($r, 'r');
         print "removed\n";
         exit 0;
     }

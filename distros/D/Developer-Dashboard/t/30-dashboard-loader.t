@@ -279,6 +279,7 @@ PERL
 
 my @perl_scripts = (
     File::Spec->catfile( $repo_root, 'bin', 'dashboard' ),
+    File::Spec->catfile( $repo_root, 'bin', 'd2' ),
     File::Spec->catfile( $repo_root, 'app.psgi' ),
     (
     map { File::Spec->catfile( $repo_root, 'share', 'private-cli', $_ ) } qw(

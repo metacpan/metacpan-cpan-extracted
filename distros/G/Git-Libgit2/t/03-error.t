@@ -6,6 +6,10 @@ use Git::Libgit2 qw(
 );
 use Git::Libgit2::FFI ();
 
+# Pin libgit2 away from the user's gitconfig — exact bug Git::Raw shipped.
+local $ENV{GIT_CONFIG_GLOBAL} = '/dev/null';
+local $ENV{GIT_CONFIG_SYSTEM} = '/dev/null';
+
 # git_error_code constants carry their canonical libgit2 values.
 is GIT_OK,              0,   'GIT_OK';
 is GIT_ERROR,          -1,  'GIT_ERROR';

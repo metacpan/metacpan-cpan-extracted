@@ -39,6 +39,7 @@
       },
       "test" : {
          "requires" : {
+            "Devel::Peek" : "0",
             "Test::More" : "0"
          }
       }
@@ -52,6 +53,6 @@
          "url" : "https://github.com/DCIT/perl-CryptX"
       }
    },
-   "version" : "0.090",
+   "version" : "0.091",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

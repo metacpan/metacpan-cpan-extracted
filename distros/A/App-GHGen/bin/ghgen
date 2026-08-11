@@ -84,7 +84,7 @@ sub cmd_generate() {
 
 	unless ($type) {
 		die colored(['red'], "Error: ") .
-			"Please specify --type, use --auto, or use --interactive\n";
+			'Please specify --type, use --auto, or use --interactive';
 	}
 
 	# Customization mode
@@ -115,7 +115,7 @@ sub cmd_generate() {
 	}
 
 	unless ($yaml) {
-		die colored(['red'], "Error: "),  "Unknown project type '$type'. Use --list to see options.\n";
+		die colored(['red'], 'Error: '), "Unknown project type '$type'. Use --list to see options.";
 	}
 
 	# Determine output file
@@ -145,12 +145,12 @@ sub cmd_analyze() {
 	unless (@workflow_files) {
 		die colored(['red'], 'Error: ') .
 			"No .github/workflows directory found\n" .
-			"Run this from the root of a repository with GitHub Actions.\n";
+			'Run this from the root of a repository with GitHub Actions.';
 	}
 
 	say colored(['bold cyan'], "GitHub Actions Workflow Analyzer");
 	if ($opts{fix}) {
-		say colored(['yellow'], "(Auto-fix mode enabled)");
+		say colored(['yellow'], '(Auto-fix mode enabled)');
 	}
 	if ($opts{estimate}) {
 		say colored(['cyan'], "(Cost estimation mode)");
@@ -349,7 +349,7 @@ sub interactive_select_type() {
 		return $types[$choice - 1];
 	}
 
-	die colored(['red'], "Invalid choice\n");
+	die colored(['red'], 'Invalid choice');
 }
 
 sub auto_detect_with_prompt() {

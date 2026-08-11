@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
 	%ACTION_UPDATES
 );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 PACKAGE DATA
 
@@ -40,6 +40,7 @@ our %ACTION_UPDATES = (
 	'actions/cache@v3'        => 'actions/cache@v5',
 	'actions/checkout@v5'     => 'actions/checkout@v6',
 	'actions/checkout@v4'     => 'actions/checkout@v6',
+	'actions/checkout@v2'     => 'actions/checkout@v6',
 	'actions/checkout@v3'     => 'actions/checkout@v6',
 	'actions/setup-node@v3'   => 'actions/setup-node@v4',
 	'actions/setup-python@v4' => 'actions/setup-python@v5',

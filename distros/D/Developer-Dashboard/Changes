@@ -1,3 +1,217 @@
+4.26  2026-08-10
+
+  - Packaging: stopped the release tarball carrying two things it never should
+    have. logs/ shipped the board sweep's own runtime output - findings about
+    this project's cards - to anyone who installed the product, because dzil
+    gathers from disk and cron recreates that directory hourly. SECURITY_CHECKS.md
+    shipped the internal security-audit protocol, which belongs with the operator
+    files that are deliberately never released. Both are excluded now and t/15
+    fails if either exclusion is removed.
+  - Board tooling: the FT99 sweep decides from the cards themselves instead of a
+    retired markdown page, so a card parked on the owner with nothing left to
+    answer is reported rather than silently accepted, and a card holding an
+    unanswered question anywhere else is reported too. It also reports a card
+    claimed in a working column that has stopped moving, and one left untouched in
+    the backlog.
+  - Coverage gate: refuses to grade a database written by a different
+    Devel::Cover install, and says which two disagree, instead of exiting with an
+    unexplained status.
+
+4.25  2026-08-09
+
+  - CI: restored a pipeline that had certified nothing for ten days. Three
+    GitHub Action pins sat on the node20 line while their version comments
+    claimed node24, so every run died at Setup Perl and the suite, the coverage
+    gate and both CVE audits never executed (DD-449). The pin comments are now
+    resolved against the upstream tag rather than trusted (DD-449), the
+    environment export no longer swallows its own failure inside a command
+    substitution (DD-483), and two suite files no longer assume tools and
+    libraries CI installs elsewhere (DD-485).
+  - Security: helper session ids are drawn from the operating system CSPRNG
+    instead of a SHA over the pid, the wall-clock second and built-in rand -
+    the construction CVE-2026-13577 describes in Dancer2, reimplemented here in
+    the code guarding the web interface. Crypt::URandom is now a declared
+    dependency floored at 0.55, because CVE-2026-2474 affects earlier releases
+    (DD-452).
+  - Security: dispositioned CVE-2026-13577 for Dancer2, which has no fixed
+    release, behind a guard that fails the audit if any production code ever
+    activates a Dancer2 session (DD-451).
+  - Security: closed a Zip Slip in dashboard open-file, where a sources jar
+    could write attacker-controlled paths anywhere the user can write (DD-498).
+  - Security: corrected the CVE gate's subject so it judges the product's
+    declared chain rather than the host interpreter (DD-499).
+  - Fix: a collector's loop state is written before its pidfile, so a
+    concurrent running_loops can no longer delete the pidfile of a healthy loop
+    and leave it unstoppable by name while the supervisor forks a duplicate
+    (DD-488).
+  - Fix: Housekeeper's temp-file cleanup lists its directory instead of
+    globbing a pattern built from the path, so a directory whose path contains
+    a space stops hiding every real temp file and unlinking unrelated ones
+    (DD-502).
+  - Test reliability: the coverage gate, the empty-environ probe and several
+    collector lifecycle fixtures no longer fail purely because the host is
+    CPU-starved, which is the shape of every CI runner (DD-482, DD-486,
+    DD-489). Every timeout changed here is backed by a measurement rather than
+    by the fact that a larger number passes.
+
+4.24  2026-08-08
+
+  - Security: closed the open-redirect class in the login redirect sanitizer
+    and on both HTTPS-enforcement Host-header redirect paths (DD-415, DD-419),
+    rather than only the single reported byte.
+  - Security: closed three path-traversal classes - saved-page writes outside
+    the dashboards root (DD-395), parent-directory traversal in every
+    skill-namespaced web route with static-file containment asserted (DD-416),
+    and skill installs whose repo name escapes the skills root (DD-426).
+  - Security: every page-derived value the web layer places inside an HTML
+    attribute is now escaped for attribute context (DD-421), and saved
+    bookmark link segments are percent-encoded for URL context (DD-423).
+  - Security: state-changing requests are rejected when Origin or Referer is
+    foreign, on every web tier (DD-422).
+  - Security: the transient-token denial now depends on the token alone, so a
+    file value riding along can no longer bypass the 403 (DD-425).
+  - Security: release tarballs no longer carry dogfood QA evidence, ticket
+    worktrees (DD-414), or the Hermes runtime state root and its credentials
+    (DD-432).
+  - Feature: first-class self-upgrade - dashboard upgrade and d2 upgrade run
+    the canonical platform installer (DD-386).
+  - Feature: a real /favicon.ico is served instead of a 404 on every page
+    load (DD-407).
+  - Collectors: a timed-out command's full process subtree is terminated
+    (DD-388); blocked Windows command collectors are interrupted at their
+    timeout (DD-389); the atomic writer uses a per-process pending name so
+    concurrent workers stop clobbering each other (DD-418); log append and
+    rotation share a per-log lock (DD-399) and rotation cuts on entry
+    boundaries so a combined lines+days rule cannot orphan an entry body
+    (DD-427); collectors keep running when the updates directory is absent
+    (DD-398).
+  - Runtime: saved-Ajax disconnect cleanup terminates descendant processes
+    (DD-396) and gives them a real elapsed SIGTERM grace window (DD-428);
+    runtime state readers survive a transient empty state file (DD-411) and
+    the web lifecycle no longer acts on incomplete runtime state (DD-412).
+  - Windows: the SSL certificate home resolves through PathRegistry so the
+    HTTPS server starts (DD-417); every passwd lookup is guarded so
+    non-interactive sessions resolve a user and a home (DD-413); PERL5LIB
+    generation is cross-platform (DD-397); PowerShell startup caches are
+    anchored to the home layer and no longer clobber live PATH state
+    (DD-390).
+  - Web UI: every generated HTML document carries a lang attribute (DD-405);
+    logout and an authorized /login route by trust tier (DD-408); page-editor
+    textareas carry programmatic accessible names (DD-409); rendered page
+    chrome no longer overflows 320px phone viewports (DD-410).
+  - Performance: PathRegistry working-directory lookups no longer fork
+    /bin/pwd repeatedly (DD-393).
+  - Gates: the POD syntax gate reads the source tree instead of a stale copy
+    and the three reds it was hiding are fixed (DD-429); the coverage gate
+    grades lib/ instead of the stale build tree (DD-431) and a failed exec in
+    the harness process can no longer blind it (DD-428); the Windows
+    collector-timeout E2E is proven on a real QEMU Windows guest and made
+    repeatable (DD-404).
+  - Metadata: MakeMaker license metadata aligned with MIT (DD-400).
+
+4.23  2026-07-29
+
+  - Coverage: every module under lib/ now reaches 100.0 on all four
+    Devel::Cover metrics - statement, subroutine, branch, AND condition -
+    driven by the new per-module hermetic coverage suites (t/59 through
+    t/106) with genuinely-unreachable outcomes annotated inline and dead
+    guard operands removed where redundancy caused unreachable branches.
+  - CI: all three workflows (test, release-github, release-cpan) enforce the
+    all-metric standard through script/check-all-metric-coverage, which
+    fails closed on any metric below 100.0 or any malformed report
+    (t/107-all-metric-coverage-gate.t).
+  - Security: helper host-trust no longer accepts arbitrary Host headers
+    that merely resolve to loopback, closing a DNS-rebinding vector; exact
+    loopback literals and configured alias hosts remain trusted.
+  - Test isolation: the fresh-runtime API assertions in
+    t/15-cli-module-coverage.t now chdir into their isolated HOME so a
+    dev-runtime layer in the working checkout cannot capture their writes.
+  - Installability: the dependency hardening initially raised the Perl floor
+    to 5.44, which cpanm rejects on every mainstream perl (perl:latest is
+    5.42); the floor is restored to 5.38 (the code's real requirement) while
+    CI continues to run on Perl 5.44 and the dependency version pins keep
+    the security gate.
+
+4.22  2026-07-15
+    - the housekeeper now sweeps expired helper-session files each run (wiring the
+      SessionStore expired-session sweep added in 4.21 into the periodic cleanup),
+      so stale session records no longer accumulate unbounded between logins
+
+4.21  2026-07-15
+    - batch of fixes from the automated bug-hunt (round 1), each test-covered:
+    - config: the merged config now always dedupes the `collectors` array by
+      name and `providers` by id, even when only one layer defines them (a
+      single layer repeating a collector name previously leaked duplicates);
+      config.json / api.json are now written atomically (temp file + checked
+      close + rename) instead of truncated in place
+    - security: the encoded-action transient path no longer trusts a
+      payload-supplied `source`/trusted flag, closing a forged-token arbitrary
+      command execution; the session id from the cookie is charset-sanitized
+      before path use, closing a session-file path traversal; the session cookie
+      gains `Secure` over HTTPS; helper passwords are now stretched with
+      PBKDF2-HMAC-SHA256 while still verifying existing hashes
+    - collectors: `timeout_ms` now round-trips correctly (no more x1000 blow-up
+      on Windows worker restart); a `* * * * *` cron collector no longer bypasses
+      per-minute dedup; signal-killed collector/action commands are recorded as
+      failures instead of exit 0; background actions guard setsid on Windows
+    - state writes: Collector and IndicatorStore atomic-write helpers now check
+      close() and no longer unlink before rename; a git error is no longer
+      reported as a dirty tree
+    - added SessionStore::sweep_expired for expired-session reclaim (wiring it
+      into the housekeeper, plus the DNS-rebinding host-trust tightening and the
+      timed-out-command subtree kill, are deferred as follow-ups)
+
+4.20  2026-07-15
+    - security: in `dashboard serve --ssl` the public front-proxy relays raw TLS
+      to the internal loopback backend, so every backend connection arrived from
+      127.0.0.1; combined with a `Host: 127.0.0.1` header a remote HTTPS client
+      was classified as trusted loopback admin and got unauthenticated admin.
+      The internal SSL backend now marks itself proxied and never grants the
+      loopback-admin shortcut, so remote HTTPS clients must authenticate.
+
+4.19  2026-07-15
+    - ship `d2` as a real, installed command instead of only a shell-bootstrap
+      alias: `bin/d2` is a first-class entrypoint that re-execs its sibling
+      `dashboard` with the same arguments, so `d2 <command>` behaves exactly like
+      `dashboard <command>` and now works in scripts, cron jobs, and fresh shells
+      that never sourced the dashboard shell integration
+    - the shell bootstrap keeps completion wiring for `d2`, and the generated
+      shell shortcut remains as a convenience where the bootstrap is loaded
+
+4.18  2026-07-15
+    - add `dashboard ask <question>`: a uniform AI-assistant command that answers
+      from the Anthropic API when an `ANTHROPIC_API_KEY` (or the `claude` config
+      domain) is set, and otherwise falls back to the local `claude` CLI
+    - support pluggable backends `--claude` (default), `--codex`, `--copilot`,
+      and `--gemini`; the chosen backend becomes sticky per workspace, and each
+      shells out non-interactively in a forced read-only mode
+    - remember the conversation per workspace (keyed by WORKSPACE_REF or the
+      active project root) so follow-up questions carry prior turns; `--new`
+      starts fresh and `--no-memory` skips the transcript for one turn
+    - inline `--file` text attachments into the prompt and pass image attachments
+      natively (Anthropic image blocks, codex `-i`, copilot `--attachment`); the
+      transcript is stored owner-only under the runtime state root
+
+4.17  2026-07-15
+    - make `dashboard collector stop <name>` actually stop the collector: it now
+      routes through the supervisor-aware stop path so the collector watchdog is
+      deregistered and cannot immediately respawn the loop (previously it called
+      the low-level loop stop directly, so the supervisor restarted the collector
+      and its status snapped back to running)
+    - stop the collector supervisor from creating a DUPLICATE loop when it races
+      a freshly started loop before that loop has set its process title, by
+      recognizing an already-running loop from its recorded state as well as by
+      process identity
+    - reset the consumer-facing collector `status.json` (running / active_runs)
+      when a loop is stopped, so prompt, web, and CLI status readers reflect the
+      stop immediately
+    - reliably terminate long-running collector command subtrees on stop: send
+      the worker process-group SIGKILL unconditionally so a SIGTERM-ignoring
+      child is still reaped, kill the loop first and scale the TERM grace to the
+      worker count so the loop is not KILLed mid-cleanup, persist active worker
+      pids on spawn, and sweep orphaned workers left behind by a crashed loop
+    - recognize managed collector loops from recorded state on hosts without
+      `/proc` or `ps` (Windows), so stop can still terminate them
 4.16  2026-06-11
     - teach the built-in `dashboard workspace` command a `-c` flag, accepted
       before or after the workspace name, that changes into the registered

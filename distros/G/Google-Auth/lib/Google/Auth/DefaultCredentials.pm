@@ -30,6 +30,7 @@ has environment => (
 
 sub make_creds {
   my ($self, %options) = @_;
+
   # Allow calling as class or instance method
   $self = ref $self ? $self : $self->new();
 
@@ -104,7 +105,7 @@ sub from_env {
   my $credentials_path =
     $ENV{GOOGLE_APPLICATION_CREDENTIALS} || $self->environment->CREDENTIALS;
 
-  if ($credentials_path && -f $credentials_path) {
+  if ($credentials_path) {
     return $self->make_creds(
       json_path => $credentials_path,
       scope     => $scopes,
@@ -203,7 +204,9 @@ sub _read_file {
     'Could not open file ' . $path . ': ' . $!);
   local $/;
   my $content = <$fh>;
-  close($fh);
+  close($fh)
+    or Google::Auth::DefaultCredentialsError->throw(
+    'Could not close file ' . $path . ': ' . $!);
   return $content;
 }
 

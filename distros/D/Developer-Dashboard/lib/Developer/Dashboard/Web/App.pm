@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Capture::Tiny qw(capture);
 use Digest::SHA qw(sha256_hex);
@@ -13,17 +13,18 @@ use POSIX qw(strftime);
 use File::Spec;
 use Scalar::Util qw(blessed);
 use URI;
-use URI::Escape qw(uri_unescape);
-use Cwd qw(cwd);
+use URI::Escape qw(uri_escape uri_unescape);
+use Cwd qw(abs_path cwd);
 
 use Developer::Dashboard::JSON qw(json_encode);
-use Developer::Dashboard::Platform qw(command_in_path);
+use Developer::Dashboard::Platform qw(command_in_path is_windows);
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::Codec qw(decode_payload);
 use Developer::Dashboard::Zipper ();
-
+use Developer::Dashboard::SkillDispatcher ();
 our $MODULE_SOURCE_PATH = File::Spec->rel2abs(__FILE__);
+our $ORIG_CWD = cwd();    # compile-time CWD so rel2abs resolves correctly even after chdir
 
 # new(%args)
 # Constructs the browser-facing dashboard web application.
@@ -50,6 +51,167 @@ sub new {
         resolver => $args{resolver},
         sessions => $sessions,
     }, $class;
+}
+
+# HTTP methods that can change server state. The Origin/Referer half of the
+# cross-site request forgery defense applies to exactly these, because a
+# browser only guarantees an Origin header on a cross-site state-changing
+# request. The fetch-metadata half below carries no such limit and covers GET
+# too, which is what the code-executing saved-Ajax route needs.
+my %STATE_CHANGING_METHODS = map { $_ => 1 } qw(POST PUT DELETE PATCH);
+
+# Fetch-metadata values that mean the request was not issued by this
+# dashboard's own pages. The browser sets Sec-Fetch-Site itself and it is a
+# forbidden header name, so page script can neither forge nor suppress it.
+# `same-origin` is the dashboard's own page and `none` is a user-initiated load
+# (typed URL, bookmark, browser start-up), so both stay outside the check.
+my %FOREIGN_FETCH_SITES = map { $_ => 1 } qw(cross-site same-site);
+
+# _csrf_rejection_response(%args)
+# Cross-site request forgery choke point for every request. Browsers
+# unconditionally attach an Origin header to cross-site state-changing
+# requests (and legacy flows carry a Referer), so a foreign Origin/Referer
+# identifies an attack regardless of trust tier: the loopback-admin shortcut,
+# an ambient helper session cookie, and even valid machine credentials must all
+# refuse to act on it. Requests carrying neither header are allowed because
+# non-browser machine clients (curl, registered x-dd-api-key consumers) send
+# neither, while a hostile page cannot suppress the Origin header on a
+# cross-site state-changing request. A GET needs the separate fetch-metadata
+# check, which runs first and on every method.
+# Input: normalized request method and headers (host, origin, referer,
+# sec-fetch-site).
+# Output: 403 empty-body response array reference when the browser context is
+# foreign, otherwise undef and the request proceeds to tier dispatch.
+sub _csrf_rejection_response {
+    my ( $self, %args ) = @_;
+
+    # Fetch metadata is checked on every method, not just the state-changing
+    # ones: a saved-Ajax handler is an operator-written script that the
+    # `/ajax/<file>` route runs from a plain GET, so GET is not a safe method
+    # here. Origin cannot defend that route — browsers omit Origin on
+    # same-origin GETs, and a hostile page can drop its Referer with a referrer
+    # policy — but it cannot touch Sec-Fetch-Site.
+    return $self->_csrf_forbidden_response if $self->_fetch_site_is_foreign(%args);
+
+    my $method = uc( $args{method} || 'GET' );
+    return undef if !$STATE_CHANGING_METHODS{$method};
+    my $headers = $args{headers} || {};
+    my $source = _browser_source_value($headers);
+    return undef if $source eq '';
+    return $self->_csrf_forbidden_response
+      if !$self->_request_source_is_same_site( source => $source, headers => $headers );
+    return undef;
+}
+
+# _fetch_site_is_foreign(%args)
+# Reports whether the browser itself labelled this request as coming from
+# another site. A request carrying no Sec-Fetch-Site is never foreign, which
+# keeps non-browser clients (curl, registered x-dd-api-key consumers) and
+# browsers too old to send fetch metadata working exactly as before; a hostile
+# page cannot reach that shape, because every browser that can be scripted into
+# making the request also sends the header. A cross-site or same-site label is
+# foreign unless the accompanying Origin/Referer names this dashboard or a
+# trusted local alias, which keeps the localhost/127.0.0.1 pair — one host to
+# the loopback trust model, two sites to the browser — serving normally.
+# Input: normalized request headers (sec-fetch-site, origin, referer, host).
+# Output: boolean true when the request comes from a foreign browser context.
+sub _fetch_site_is_foreign {
+    my ( $self, %args ) = @_;
+    my $headers = $args{headers} || {};
+    my $site =
+      defined $headers->{'sec-fetch-site'} && !ref( $headers->{'sec-fetch-site'} )
+      ? lc $headers->{'sec-fetch-site'}
+      : '';
+    $site =~ s/^\s+//;
+    $site =~ s/\s+$//;
+    return 0 if !$FOREIGN_FETCH_SITES{$site};
+    my $source = _browser_source_value($headers);
+    return 1 if $source eq '';
+    return $self->_request_source_is_same_site( source => $source, headers => $headers ) ? 0 : 1;
+}
+
+# _browser_source_value($headers)
+# Picks the header that names the browser context a request came from. Origin
+# wins when present and Referer is the legacy fallback; reference-valued header
+# values (a shape no HTTP stack produces) count as absent so the caller never
+# dereferences one.
+# Input: normalized request headers hash reference.
+# Output: raw source header string, empty when the request carries neither.
+sub _browser_source_value {
+    my ($headers) = @_;
+    my $origin = defined $headers->{origin} && !ref( $headers->{origin} ) ? $headers->{origin} : '';
+    return $origin if $origin ne '';
+    return defined $headers->{referer} && !ref( $headers->{referer} ) ? $headers->{referer} : '';
+}
+
+# _request_source_is_same_site(%args)
+# Decides whether one Origin or Referer value names this dashboard itself.
+# The serialized authority (host[:port]) must equal the request's own Host
+# header, or the source host must be a trusted local alias — a numeric
+# loopback literal, the localhost family, or a configured
+# web.ssl_subject_alt_names entry — mirroring the exact alias semantics the
+# loopback-admin trust check applies to Host. The Host comparison also stays
+# correct behind the SSL front-proxy, because that proxy forwards TLS bytes
+# unmodified and the backend therefore sees the browser's own Host header.
+# An opaque "null" origin (sandboxed frame, data: URL) never matches.
+# Input: source header value (Origin value or full Referer URL) plus the
+# normalized request headers.
+# Output: boolean true when the source is this dashboard's own origin.
+sub _request_source_is_same_site {
+    my ( $self, %args ) = @_;
+    my $authority = _source_authority( $args{source} );
+    return 0 if !defined $authority;
+    my $headers = $args{headers} || {};
+    my $request_host = defined $headers->{host} && !ref( $headers->{host} ) ? lc $headers->{host} : '';
+    $request_host =~ s/^\s+//;
+    $request_host =~ s/\s+$//;
+    return 1 if $request_host ne '' && lc($authority) eq $request_host;
+    my $config_has_web_settings = blessed( $self->{config} ) && $self->{config}->can('web_settings');
+    return 1 if $self->{auth}->host_is_local_alias(
+        host                 => $authority,
+        extra_loopback_hosts => (
+            $config_has_web_settings
+            ? ( $self->{config}->web_settings->{ssl_subject_alt_names} || [] )
+            : []
+        ),
+    );
+    return 0;
+}
+
+# _source_authority($value)
+# Extracts the host[:port] authority from one Origin or Referer header value.
+# Origin is a serialized origin (scheme://host[:port]); Referer is a full URL,
+# so everything from the first path/query/fragment delimiter is dropped. The
+# opaque "null" origin and values that do not parse as a single clean
+# authority (embedded userinfo or whitespace only appear in crafted headers —
+# browsers serialize neither) are reported as unparsable, which callers treat
+# as foreign.
+# Input: raw header string.
+# Output: authority string, or undef when the value is opaque or unparsable.
+sub _source_authority {
+    my ($value) = @_;
+    return undef if !defined $value;
+    $value =~ s/^\s+//;
+    $value =~ s/\s+$//;
+    return undef if $value eq '' || lc($value) eq 'null';
+    return undef if $value !~ m{\A[A-Za-z][A-Za-z0-9+.-]*://([^/?#]+)}s;
+    my $authority = $1;
+    return undef if $authority =~ /[\@\s]/;
+    return $authority;
+}
+
+# _csrf_forbidden_response()
+# Builds the denial for a state-changing request arriving from a foreign
+# browser context. The body stays empty so a cross-site attacker page learns
+# nothing about the dashboard from the refusal.
+# Input: none.
+# Output: response array reference with a 403 empty plain-text body.
+sub _csrf_forbidden_response {
+    return [
+        403,
+        'text/plain; charset=utf-8',
+        '',
+    ];
 }
 
 # _transient_url_tokens_allowed()
@@ -116,17 +278,50 @@ sub handle {
     my $path   = $args{path} || '/';
     my $method = uc( $args{method} || 'GET' );
 
+    # Cross-site defense first: even the pre-authorization special-case routes
+    # below (the login form POST in particular) must never act on a foreign
+    # browser context.
+    my $csrf_response = $self->_csrf_rejection_response(%args);
+    return $csrf_response if $csrf_response;
+
     if ( $path eq '/login' && $method eq 'POST' ) {
         return $self->login_response(%args);
     }
     if ( $path eq '/logout' ) {
         return $self->logout_response(%args);
     }
+    if ( $path eq '/favicon.ico' ) {
+        return $self->favicon_response(%args);
+    }
 
     my $auth_response = $self->authorize_request(%args);
     return $auth_response if $auth_response;
 
     return $self->dispatch_request(%args);
+}
+
+# _request_trust_tier(%args)
+# Classifies one normalized request into its browser trust tier.
+# Every caller must go through here so the loopback-admin shortcut, the
+# DEVELOPER_DASHBOARD_SSL_PROXIED lockout, and the configured local-only alias
+# hosts are applied identically to authorization and to route decisions that
+# depend on the tier.
+# Input: normalized request headers and remote address.
+# Output: trust tier string, currently 'admin' or 'helper'.
+sub _request_trust_tier {
+    my ( $self, %args ) = @_;
+    my $headers = $args{headers} || {};
+    my $config_has_web_settings = blessed( $self->{config} ) && $self->{config}->can('web_settings');
+    return $self->{auth}->trust_tier(
+        remote_addr          => $args{remote_addr},
+        host                 => $headers->{host},
+        ssl_proxied          => ( $ENV{DEVELOPER_DASHBOARD_SSL_PROXIED} ? 1 : 0 ),
+        extra_loopback_hosts => (
+            $config_has_web_settings
+            ? ( $self->{config}->web_settings->{ssl_subject_alt_names} || [] )
+            : []
+        ),
+    );
 }
 
 # authorize_request(%args)
@@ -136,16 +331,15 @@ sub handle {
 sub authorize_request {
     my ( $self, %args ) = @_;
     my $headers = $args{headers} || {};
-    my $config_has_web_settings = blessed( $self->{config} ) && $self->{config}->can('web_settings');
-    my $tier = $self->{auth}->trust_tier(
-        remote_addr          => $args{remote_addr},
-        host                 => $headers->{host},
-        extra_loopback_hosts => (
-            $config_has_web_settings
-            ? ( $self->{config}->web_settings->{ssl_subject_alt_names} || [] )
-            : []
-        ),
-    );
+
+    # The cross-site rejection sits before tier classification so one
+    # mechanism covers the loopback-admin shortcut, helper sessions, and the
+    # machine api tier alike; route adapters that call this method directly
+    # (bypassing handle) get the same defense.
+    my $csrf_response = $self->_csrf_rejection_response(%args);
+    return $csrf_response if $csrf_response;
+
+    my $tier = $self->_request_trust_tier(%args);
     my $session;
     my $api_context;
 
@@ -193,7 +387,13 @@ sub dispatch_request {
     my $path   = $args{path} || '/';
     my $method = uc( $args{method} || 'GET' );
 
+    if ( $path =~ m{^/app/(.+)$} ) {
+        my $invalid_id = $self->_invalid_saved_page_id_response( uri_unescape($1) );
+        return $invalid_id if $invalid_id;
+    }
+
     return $self->root_response(%args) if $path eq '/';
+    return $self->authorized_login_redirect_response(%args) if $path eq '/login';
     return $self->apps_redirect_response(%args) if $path eq '/apps';
     return $self->legacy_ajax_response(%args) if $path eq '/ajax';
     return $self->ajax_singleton_stop_response(%args) if $path eq '/ajax/singleton/stop';
@@ -232,6 +432,30 @@ sub dispatch_request {
     }
 
     return [ 404, 'text/plain; charset=utf-8', "Not found\n" ];
+}
+
+# _invalid_saved_page_id_response($id)
+# Converts PageStore's saved-id containment rejection into an authorized route response.
+# Input: saved page id captured from an /app route.
+# Output: undef for a valid id, otherwise a 400 plain-text response.
+sub _invalid_saved_page_id_response {
+    my ( $self, $id ) = @_;
+    return if !$self->{pages}->can('page_file');
+    my $ok = eval { $self->{pages}->page_file($id); 1 };
+    return if $ok;
+    die $@ if $@ !~ /Invalid page (?:id|path)/;
+    return [ 400, 'text/plain; charset=utf-8', "Invalid page id\n" ];
+}
+
+# _saved_page_error_response($error)
+# Converts PageStore containment failures at body-derived write boundaries into
+# a fixed client response without exposing filesystem details or source lines.
+# Input: caught exception string.
+# Output: 400 response for invalid page ids/paths, otherwise undef.
+sub _saved_page_error_response {
+    my ( $self, $error ) = @_;
+    return if !defined $error || $error !~ /Invalid page (?:id|path)/;
+    return [ 400, 'text/plain; charset=utf-8', "Invalid page id\n" ];
 }
 
 # _helper_access_disabled_response()
@@ -345,22 +569,41 @@ sub _handle_login {
         'text/plain; charset=utf-8',
         "Redirecting\n",
         {
-            'Location'   => $redirect_to || '/',
-            'Set-Cookie' => _session_cookie( $session->{session_id} ),
+            'Location'   => $redirect_to,    # _sanitize_redirect_target always yields a non-empty target
+            'Set-Cookie' => _session_cookie( $session->{session_id}, _request_is_secure() ),
         },
     ];
 }
 
 # login_response(%args)
-# Executes the helper login submission route.
-# Input: normalized request body and remote address.
+# Executes the helper login submission route. The route adapter calls this
+# without authorization (a login cannot require a session), so the cross-site
+# rejection runs here directly: a foreign page must not be able to log a
+# victim into an attacker-chosen helper account (login CSRF).
+# Input: normalized request method, headers, body, and remote address.
 # Output: response array reference.
 sub login_response {
     my ( $self, %args ) = @_;
+    my $csrf_response = $self->_csrf_rejection_response(%args);
+    return $csrf_response if $csrf_response;
     return $self->_handle_login(
         body        => defined $args{body} ? $args{body} : '',
         remote_addr => $args{remote_addr},
     );
+}
+
+# _post_logout_location(%args)
+# Chooses the route one logged-out client is sent to next.
+# The loopback-admin tier is authorized without a session and therefore never
+# receives the helper login challenge, so /login is not a page it can use; send
+# it to the dashboard home route instead. Every challenged tier still goes to
+# /login, where the auth layer renders the login form. The target is derived
+# only from the trust tier, never from request-supplied input.
+# Input: normalized request headers and remote address.
+# Output: local redirect target path string.
+sub _post_logout_location {
+    my ( $self, %args ) = @_;
+    return $self->_request_trust_tier(%args) eq 'admin' ? '/' : '/login';
 }
 
 # logout_response(%args)
@@ -382,9 +625,28 @@ sub logout_response {
         'text/plain; charset=utf-8',
         "Redirecting\n",
         {
-            'Location'   => '/login',
+            'Location'   => $self->_post_logout_location(%args),
             'Set-Cookie' => _expired_session_cookie(),
         },
+    ];
+}
+
+# authorized_login_redirect_response(%args)
+# Executes the login route for a request that is already authorized.
+# handle() intercepts POST /login before authorization, and an unauthorized
+# client is answered by authorize_request with the 401 login challenge, so a
+# request that reaches this route has nothing left to log in to. Send it to the
+# dashboard home route rather than leaving /login without a GET handler, which
+# dead-ended the loopback-admin tier on a bare 404.
+# Input: normalized request arguments (unused; the target is a fixed local path).
+# Output: response array reference with a 302 to the dashboard home route.
+sub authorized_login_redirect_response {
+    my ( $self, %args ) = @_;
+    return [
+        302,
+        'text/plain; charset=utf-8',
+        "Redirecting\n",
+        { Location => '/' },
     ];
 }
 
@@ -409,7 +671,12 @@ sub root_response {
         }
         my $source_kind = 'transient';
         if ( exists $body_params->{instruction} && $page_id ne '' ) {
-            $self->{pages}->save_page($page);
+            my $saved = eval { $self->{pages}->save_page($page); 1 };
+            if ( !$saved ) {
+                my $invalid = $self->_saved_page_error_response($@);
+                return $invalid if $invalid;
+                die $@;
+            }
             $source_kind = 'saved';
         }
         $page->{meta}{source_kind} = $source_kind;
@@ -549,7 +816,7 @@ sub skill_ajax_file_response {
 sub prefixed_ajax_file_response {
     my ( $self, %args ) = @_;
     my $ajax_path = $args{ajax_path} || '';
-    my @segments = grep { defined && $_ ne '' } split m{/+}, $ajax_path;
+    my @segments = grep { $_ ne '' } split m{/+}, $ajax_path;
     if ( my $spec = $self->_resolve_skill_route_spec(@segments) ) {
         my $ajax_file = join '/', @{ $spec->{route_segments} || [] };
         if ( $ajax_file ne '' ) {
@@ -586,7 +853,7 @@ sub jquery_js_response {
     open my $fh, '<:raw', $path or die "Unable to read $path: $!";
     local $/;
     my $content = <$fh>;
-    close $fh or die "Unable to close $path: $!";
+    close $fh or die "Unable to close $path: $!";    # uncoverable branch true
     return [ 200, 'application/javascript; charset=utf-8', $content ];
 }
 
@@ -600,7 +867,7 @@ sub _bundled_public_asset_path {
     die 'asset type is required' if !defined $type || $type eq '';
     die 'asset file is required' if !defined $file || $file eq '';
 
-    my $module_source = $MODULE_SOURCE_PATH || File::Spec->rel2abs(__FILE__);
+    my $module_source = $MODULE_SOURCE_PATH || File::Spec->rel2abs( __FILE__, $ORIG_CWD );    # uncoverable condition false
     my $module_dir    = dirname($module_source);
     my @candidates;
 
@@ -632,14 +899,15 @@ sub _bundled_public_asset_path {
             File::Spec->updir,
             File::Spec->updir,
             File::Spec->updir,
-        )
+        ),
+        $ORIG_CWD,
     );
     push @candidates, File::Spec->catfile( $module_root, 'auto', 'share', 'dist', 'Developer-Dashboard', 'public', $type, $file );
     push @candidates, File::Spec->catfile( $module_root, 'auto', 'Developer', 'Dashboard', 'public', $type, $file );
 
     my %seen;
     for my $candidate (@candidates) {
-        next if !defined $candidate || $candidate eq '' || $seen{$candidate}++;
+        next if $seen{$candidate}++;
         return $candidate if -f $candidate;
     }
 
@@ -662,6 +930,26 @@ sub marked_js_response {
 sub tiff_js_response {
     my ( $self, %args ) = @_;
     return [ 200, 'application/javascript; charset=utf-8', "window.Tiff=window.Tiff||function(){};\n" ];
+}
+
+# favicon_response(%args)
+# Serves the browser tab icon that every browser requests on its own for each
+# page load, preferring a layered `others/favicon.ico` override over the icon
+# bundled with the distribution.
+# Input: normalized request arguments.
+# Output: response array reference.
+sub favicon_response {
+    my ( $self, %args ) = @_;
+    my $override = $self->_serve_static_file( 'others', 'favicon.ico' );
+    return $override if $override->[0] == 200;
+    my $bundled = _bundled_public_asset_path( 'others', 'favicon.ico' );
+    return $self->_serve_static_file_at_path(
+        'others',
+        'favicon.ico',
+        $bundled,
+        '',
+        [ dirname($bundled) ],
+    );
 }
 
 # loading_image_response(%args)
@@ -696,7 +984,7 @@ sub prefixed_static_file_response {
     my ( $self, %args ) = @_;
     my $type = $args{type} || '';
     my $file = $args{file} || '';
-    my @segments = grep { defined && $_ ne '' } split m{/+}, $file;
+    my @segments = grep { $_ ne '' } split m{/+}, $file;
     if ( my $spec = $self->_resolve_skill_route_spec(@segments) ) {
         my $skill_file = join '/', @{ $spec->{route_segments} || [] };
         if ( $skill_file ne '' ) {
@@ -741,8 +1029,7 @@ sub skill_route_response {
     
     return [ 400, 'text/plain; charset=utf-8', "Invalid skill name\n" ] if !$skill_name;
     return [ 400, 'text/plain; charset=utf-8', "Invalid skill route\n" ] if !$route;
-    
-    require Developer::Dashboard::SkillDispatcher;
+
     my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $self->{pages} ? $self->{pages}{paths} : undef );
     my ( $query_params, $body_params ) = $self->_request_params(%args);
     return $dispatcher->route_response(
@@ -768,7 +1055,11 @@ sub skill_static_file_response {
     my $file       = $args{file}       || '';
     return [ 400, 'text/plain; charset=utf-8', "Invalid skill name\n" ] if $skill_name eq '';
     my $skill_file = $self->_skill_static_file_path( $skill_name, $type, $file );
-    return $self->_serve_static_file_at_path( $type, $file, $skill_file, $args{default_type} || '' ) if $skill_file ne '';
+    return $self->_serve_static_file_at_path(
+        $type, $file, $skill_file,
+        $args{default_type} || '',
+        [ $self->_skill_dispatcher->skill_static_roots( $skill_name, $type ) ],
+    ) if $skill_file ne '';
     return $self->_serve_static_file( $type, join( '/', $skill_name, $file ) );
 }
 
@@ -819,7 +1110,7 @@ sub page_source_response {
     my ( $params, $body_params ) = $self->_request_params(%args);
     my $page = $self->_load_editable_named_page( $args{id} );
     return [ 404, 'text/plain; charset=utf-8', "Not found\n" ] if !$page;
-    $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;
+    $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;    # uncoverable condition false
     $page = $self->_page_with_runtime_state(
         $page,
         query_params => $params,
@@ -827,13 +1118,14 @@ sub page_source_response {
         path         => $args{path} || '/app/' . $args{id} . '/source',
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
-    );
+    );    # uncoverable condition false
     $page = $self->{runtime}->prepare_page(
         page            => $page,
         source          => $page->{meta}{source_kind} || 'saved',
         runtime_context => { params => { %{$params}, %{$body_params} } },
     );
-    return [ 200, 'text/plain; charset=utf-8', $page->{meta}{raw_instruction} || $page->canonical_instruction ];
+    # raw_instruction was forced non-empty above and prepare_page preserves it.
+    return [ 200, 'text/plain; charset=utf-8', $page->{meta}{raw_instruction} ];
 }
 
 # page_edit_post_response(%args)
@@ -859,10 +1151,15 @@ sub page_edit_post_response {
         }
         else {
             $page->{meta}{source_kind} = 'saved';
-            $self->{pages}->save_page($page);
+            my $saved = eval { $self->{pages}->save_page($page); 1 };
+            if ( !$saved ) {
+                my $invalid = $self->_saved_page_error_response($@);
+                return $invalid if $invalid;
+                die $@;
+            }
         }
         my $mode = $params->{mode} || $body_params->{mode} || 'edit';
-        my $request_path = $args{path} || '/app/' . $args{id} . '/edit';
+        my $request_path = $args{path} || '/app/' . $args{id} . '/edit';    # uncoverable condition false
         $request_path = '/app/' . $args{id} if $mode eq 'render' && $source_kind eq 'skill';
         $page = $self->_page_with_runtime_state(
             $page,
@@ -892,7 +1189,7 @@ sub page_edit_response {
     my ( $params, $body_params ) = $self->_request_params(%args);
     my $page = $self->_load_editable_named_page( $args{id} );
     return $self->_missing_named_page_response( $args{id} ) if !$page;
-    $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;
+    $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;    # uncoverable condition false
     $page = $self->_page_with_runtime_state(
         $page,
         query_params => $params,
@@ -900,7 +1197,7 @@ sub page_edit_response {
         path         => $args{path} || '/app/' . $args{id} . '/edit',
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
-    );
+    );    # uncoverable condition false
     $page = $self->{runtime}->prepare_page(
         page            => $page,
         source          => $page->{meta}{source_kind} || 'saved',
@@ -924,7 +1221,7 @@ sub page_action_response {
         path         => $args{path} || '/app/' . $args{id} . '/action/' . $args{action_id},
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
-    );
+    );    # uncoverable condition false
     $page = $self->{runtime}->prepare_page(
         page            => $page,
         source          => $page->{meta}{source_kind} || 'saved',
@@ -990,7 +1287,7 @@ sub _load_editable_named_page {
 sub _load_skill_named_page {
     my ( $self, $id ) = @_;
     return if !defined $id || $id eq '';
-    my @segments = grep { defined && $_ ne '' } split m{/+}, $id;
+    my @segments = grep { $_ ne '' } split m{/+}, $id;
     return if !@segments;
 
     my $dispatcher = $self->_skill_dispatcher;
@@ -1005,7 +1302,7 @@ sub _load_skill_named_page {
             route_id   => $route_id,
         );
     };
-    return if !$page || $@;
+    return if !$page || $@;    # uncoverable condition right
     return $self->_decorate_skill_page_routes($page);
 }
 
@@ -1020,7 +1317,7 @@ sub _decorate_skill_page_routes {
     my $page_id = $page->as_hash->{id} || '';
     return $page if $page_id eq '';
 
-    my $page_url = $self->_saved_page_url($page_id);
+    my $page_url = $self->_saved_page_href($page_id);
     $page->{meta}{render_route} = $page_url;
     $page->{meta}{edit_route}   = $page_url . '/edit';
     $page->{meta}{source_route} = $page_url . '/edit';
@@ -1049,7 +1346,7 @@ sub _page_route_urls {
     my $source_kind = $meta->{source_kind} || '';
     my $is_saved = $source_kind eq 'saved' && $page_id ne '';
     my $is_transient = $source_kind eq 'transient';
-    my $page_url = $is_saved ? $self->_saved_page_url($page_id) : '';
+    my $page_url = $is_saved ? $self->_saved_page_href($page_id) : '';
     return {
         page_url    => $is_transient ? $self->{pages}->editable_url($page) : $page_url,
         form_action => $is_saved ? $page_url . '/edit' : '/',
@@ -1065,7 +1362,7 @@ sub _page_route_urls {
 # Output: response array reference.
 sub _page_response {
     my ( $self, $page, $mode ) = @_;
-    my $source = $page->{meta}{raw_instruction} || $page->canonical_instruction;
+    my $source = $page->{meta}{raw_instruction} || $page->canonical_instruction;    # uncoverable condition false
 
     if ( $mode eq 'source' ) {
         return _no_editor_response() if $self->_editor_disabled;
@@ -1085,14 +1382,14 @@ sub _page_response {
 # Output: HTML string.
 sub _edit_html {
     my ( $self, $page ) = @_;
-    my $raw_source = $page->{meta}{raw_instruction} || $page->canonical_instruction;
+    my $raw_source = $page->{meta}{raw_instruction} || $page->canonical_instruction;    # uncoverable condition false
     my $source = $raw_source;
     $source =~ s/&/&amp;/g;
     $source =~ s/</&lt;/g;
     $source =~ s/>/&gt;/g;
 
     my $urls = $self->_page_route_urls($page);
-    my $form_action = $urls->{form_action} || '/';
+    my $form_action = $urls->{form_action} || '/';    # uncoverable condition right
 
     my $title = $page->as_hash->{title};
     $title =~ s/&/&amp;/g;
@@ -1101,7 +1398,7 @@ sub _edit_html {
 
     my $html = <<'HTML';
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1228,7 +1525,7 @@ sub _edit_html {
   <form method="post" action="__FORM_ACTION__" id="instruction-form">
     <input type="hidden" name="mode" id="instruction-mode" value="edit">
     <div class="editor-hint">Each bookmark section is edited as its own block. Press Tab inside a block to start the next section.</div>
-    <textarea class="instruction-source" id="instruction-source" name="instruction" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off">__SOURCE__</textarea>
+    <textarea class="instruction-source" id="instruction-source" name="instruction" aria-label="Bookmark source" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off">__SOURCE__</textarea>
     <div class="editor-blocks" id="instruction-blocks"></div>
   </form>
 </main>
@@ -1239,6 +1536,7 @@ const ddMode = document.getElementById('instruction-mode');
 const ddBlocks = document.getElementById('instruction-blocks');
 const ddPlayButton = document.getElementById('play-button');
 const ddLegacySep = ':--------------------------------------------------------------------------------:';
+let ddBlockSeq = 0;
 function ddEscapeHtml(text) {
   return String(text)
     .replace(/&/g, '&amp;')
@@ -1539,8 +1837,10 @@ function ddCreateEditorBlock(text, index) {
   const wrapper = document.createElement('div');
   wrapper.className = 'editor-block';
 
+  const labelId = 'editor-block-label-' + (++ddBlockSeq);
   const label = document.createElement('div');
   label.className = 'editor-block-label';
+  label.id = labelId;
   label.textContent = ddBlockLabel(text, index);
   wrapper.appendChild(label);
 
@@ -1559,6 +1859,7 @@ function ddCreateEditorBlock(text, index) {
 
   const editor = document.createElement('textarea');
   editor.className = 'instruction-block-editor';
+  editor.setAttribute('aria-labelledby', labelId);
   editor.wrap = 'off';
   editor.spellcheck = false;
   editor.autocapitalize = 'off';
@@ -1666,7 +1967,7 @@ HTML
     $html =~ s/__TOP_CHROME__/$self->_top_chrome_html( $page, \%$urls )/ge;
     $html =~ s/__SOURCE__/$source/g;
     $html =~ s/__SOURCE_JSON__/_json_for_inline_script($raw_source)/ge;
-    $html =~ s/__FORM_ACTION__/$form_action/g;
+    $html =~ s/__FORM_ACTION__/_escape_html_attr($form_action)/ge;
     return $html;
 }
 
@@ -1784,7 +2085,7 @@ sub _highlight_html_text {
         if ( $line =~ m{<(script|style)\b}i ) {
             my ( $before, $tag, $mode_name, $after ) = $line =~ m{\A(.*?)(<(script|style)\b[\s\S]*?>)(.*)\z}is;
             if ( defined $tag ) {
-                my $mode = lc( $mode_name || '' ) eq 'script' ? 'script' : 'style';
+                my $mode = lc($mode_name) eq 'script' ? 'script' : 'style';
                 $out .= $self->_highlight_markup_text($before);
                 $out .= $self->_highlight_markup_text($tag);
                 $line = $after;
@@ -1911,6 +2212,23 @@ sub _escape_html {
     return $text;
 }
 
+# _escape_html_attr($value)
+# Escapes one value for safe output inside a quoted HTML attribute.
+# Quotes are what _escape_html deliberately leaves alone, and a quote is
+# exactly what closes an attribute early, so attribute context needs its own
+# escaper: saved bookmark ids reach the route builders with only traversal
+# components rejected, so a quote in an id would otherwise end the attribute
+# and let the rest of the id open a tag.
+# Input: raw value, possibly undefined.
+# Output: escaped value safe between either kind of attribute quote.
+sub _escape_html_attr {
+    my ($value) = @_;
+    $value = _escape_html($value);
+    $value =~ s/"/&quot;/g;
+    $value =~ s/'/&#39;/g;
+    return $value;
+}
+
 # _render_page_html($page, $mode)
 # Renders the browser page view and action URLs for a page.
 # Input: page document object and mode string.
@@ -1924,8 +2242,8 @@ sub _render_page_html {
     my %action_urls;
     for my $action ( @{ $page->as_hash->{actions} || [] } ) {
         next if ref($action) ne 'HASH' || !$action->{id};
-        my $saved_action_url = $self->_saved_page_url( $page->as_hash->{id} || '' );
-        $saved_action_url .= '/action/' . $action->{id} if $saved_action_url ne '';
+        my $saved_action_url = $self->_saved_page_href( $page->as_hash->{id} || '' );
+        $saved_action_url .= '/action/' . uri_escape( $action->{id} ) if $saved_action_url ne '';
         my $atoken = $self->{actions}
           ? $self->{actions}->encode_action_payload(
               action => $action,
@@ -2012,16 +2330,17 @@ sub _nav_items_html {
         }
         closedir $dh;
     }
+    my $runtime_context = $args{runtime_context} || {};
     my @items;
-    my $current_page = $args{runtime_context}{current_page} || '';
+    my $current_page = $runtime_context->{current_page} || '';
     for my $nav_id (@nav_ids) {
         my $nav_page = eval { $self->_load_named_page($nav_id) };
-        next if !$nav_page || $@;
+        next if !$nav_page || $@;    # uncoverable condition right
         $nav_page->{meta}{raw_instruction} = $nav_page->canonical_instruction;
         $nav_page = $self->{runtime}->prepare_page(
             page            => $self->_page_with_runtime_state(
                 $nav_page,
-                query_params => $args{runtime_context}{params} || {},
+                query_params => $runtime_context->{params} || {},
                 body_params  => {},
                 path         => $self->_saved_page_url($page_id),
                 remote_addr  => $self->{_current_request_context}{remote_addr},
@@ -2029,22 +2348,21 @@ sub _nav_items_html {
             ),
             source          => $nav_page->{meta}{source_kind} || 'saved',
             runtime_context => {
-                %{ $args{runtime_context} || { params => {} } },
+                %{ $runtime_context },
                 current_page => $current_page,
             },
         );
         my $fragment = $self->_page_fragment_html($nav_page);
         next if $fragment eq '';
-        push @items, qq{<li data-nav-id="} . _escape_html($nav_id) . qq{">$fragment</li>};
+        push @items, qq{<li data-nav-id="} . _escape_html_attr($nav_id) . qq{">$fragment</li>};
     }
 
-    require Developer::Dashboard::SkillDispatcher;
     my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $paths );
     for my $nav_page ( @{ $dispatcher->all_skill_nav_pages || [] } ) {
         $nav_page = $self->{runtime}->prepare_page(
             page            => $self->_page_with_runtime_state(
                 $nav_page,
-                query_params => $args{runtime_context}{params} || {},
+                query_params => $runtime_context->{params} || {},
                 body_params  => {},
                 path         => $self->_saved_page_url($page_id),
                 remote_addr  => $self->{_current_request_context}{remote_addr},
@@ -2052,14 +2370,14 @@ sub _nav_items_html {
             ),
             source          => 'skill',
             runtime_context => {
-                %{ $args{runtime_context} || { params => {} } },
+                %{ $runtime_context },
                 current_page => $current_page,
             },
         );
         my $nav_id = $nav_page->as_hash->{id} || '';
         my $fragment = $self->_page_fragment_html($nav_page);
         next if $fragment eq '';
-        push @items, qq{<li data-nav-id="} . _escape_html($nav_id) . qq{">$fragment</li>};
+        push @items, qq{<li data-nav-id="} . _escape_html_attr($nav_id) . qq{">$fragment</li>};
     }
 
     return '' if !@items;
@@ -2175,7 +2493,7 @@ sub _legacy_app_response {
     }
 
     my $raw = eval { $self->{pages}->read_saved_entry($id) };
-    if ( !defined $raw || $@ ) {
+    if ( !defined $raw || $@ ) {    # uncoverable condition right
         my $skill_response = $self->_skill_app_fallback_response( id => $id, %args );
         return $skill_response if $skill_response;
         return $self->_missing_named_page_response($id);
@@ -2207,7 +2525,7 @@ sub _legacy_app_response {
 sub _skill_app_fallback_response {
     my ( $self, %args ) = @_;
     my $id = $args{id} || return;
-    my @segments = grep { defined && $_ ne '' } split m{/+}, $id;
+    my @segments = grep { $_ ne '' } split m{/+}, $id;
     return if !@segments;
 
     require Developer::Dashboard::SkillDispatcher;
@@ -2429,7 +2747,7 @@ sub _legacy_ajax_response {
                     stderr_writer   => $writer,
                     return_writer   => $writer,
                 );
-                $writer->( $result->{error} ) if defined $result->{error} && $result->{error} ne '';
+                $writer->( $result->{error} ) if defined $result->{error} && $result->{error} ne '';    # uncoverable condition left
             },
         },
     ];
@@ -2460,12 +2778,14 @@ sub _ajax_content_type {
 
 # _legacy_ajax_allowed($params)
 # Checks whether an older /ajax request is allowed under the transient token policy.
+# A file value must not soften this: _legacy_ajax_response gives the token strict
+# precedence over file and saved_ajax_path, so a request carrying a token reaches
+# tokenized code execution no matter what file value travels beside it.
 # Input: flat request parameter hash reference.
 # Output: boolean true when no token is present or transient token URLs are enabled.
 sub _legacy_ajax_allowed {
     my ( $self, $params ) = @_;
     return 1 if ref($params) ne 'HASH';
-    return 1 if ( $params->{file} || '' ) ne '';
     return 1 if ( $params->{token} || '' ) eq '';
     return _transient_url_tokens_allowed();
 }
@@ -2566,6 +2886,13 @@ sub _login_redirect_target {
 
 # _sanitize_redirect_target($target)
 # Validates a post-login redirect target so helpers only return to local app routes.
+# A target is only safe when the browser's own URL parser cannot re-read it as an
+# authority. Two byte classes do exactly that after the value leaves this server:
+# a backslash, which URL parsers fold to a forward slash, and a raw tab, newline
+# or carriage return, which URL parsers strip before parsing - so "/\evil.com"
+# and "/<tab>/evil.com" both arrive as the protocol-relative "//evil.com". Any
+# legitimate local target percent-encodes those bytes, so rejecting the whole
+# ASCII control range costs nothing and closes the class rather than one byte.
 # Input: requested redirect target string.
 # Output: safe relative redirect target string, or '/' when invalid.
 sub _sanitize_redirect_target {
@@ -2574,7 +2901,8 @@ sub _sanitize_redirect_target {
     return '/' if $target eq '';
     return '/' if $target !~ m{\A/};
     return '/' if $target =~ m{\A//};
-    return '/' if $target =~ m{[\r\n]};
+    return '/' if $target =~ m{\\};
+    return '/' if $target =~ m{[\x00-\x1f\x7f]};
     return '/' if $target =~ m{\A/login(?:\z|[/?#])};
     return $target;
 }
@@ -2602,6 +2930,22 @@ sub _saved_page_url {
     return '/app/' . $normalized;
 }
 
+# _saved_page_href($id)
+# Builds the browser-facing /app/<id> hyperlink for one saved bookmark id.
+# Unlike _saved_page_url, which stays in decoded PATH_INFO space for
+# request-context paths and the BOOKMARK: document field, this form is for
+# HTML emission: each path segment is percent-encoded so ids carrying #, ?,
+# %, or spaces survive as valid URLs, while the / separators stay raw so the
+# route table still sees the nested segments.
+# Input: saved bookmark id string.
+# Output: percent-encoded /app/<id> href string, or empty string when id is empty.
+sub _saved_page_href {
+    my ( $self, $id ) = @_;
+    my $normalized = $self->_normalized_saved_page_id($id);
+    return '' if $normalized eq '';
+    return '/app/' . join '/', map { uri_escape($_) } split m{/+}, $normalized;
+}
+
 # _top_chrome_html($page, $urls)
 # Builds the shared top-of-page chrome for edit and render views.
 # Input: page document object and hash reference of edit/render/source URLs.
@@ -2616,8 +2960,8 @@ sub _top_chrome_html {
     my $mode  = $page->as_hash->{mode} || 'edit';
     my $ctx   = $page->{meta}{request_context} || {};
     my @links;
-    push @links, qq{<button type="button" class="chrome-button" id="play-button" data-play-url="$play">Play</button>} if $mode ne 'render' && $play ne '';
-    push @links, qq{<a href="$src" id="view-source-url">View Source</a>} if $mode ne 'edit' && $src ne '';
+    push @links, qq{<button type="button" class="chrome-button" id="play-button" data-play-url="} . _escape_html_attr($play) . qq{">Play</button>} if $mode ne 'render' && $play ne '';
+    push @links, qq{<a href="} . _escape_html_attr($src) . qq{" id="view-source-url">View Source</a>} if $mode ne 'edit' && $src ne '';
     push @links, q{<a href="/logout" id="logout-url">Logout</a>}
       if ( $ctx->{tier} || '' ) eq 'helper';
     my $nav = join ' ', @links;
@@ -2625,13 +2969,20 @@ sub _top_chrome_html {
     my $status = $hide_indicators ? q{} : $self->_prompt_summary;
     my $context = $hide_indicators ? q{} : $self->_top_context_html($page);
     my $share_html = $share ne ''
-      ? qq{<div><a href="$share" id="share-url">Right Click Copy &amp; Share or Bookmark This Page</a></div>}
+      ? qq{<div><a href="} . _escape_html_attr($share) . qq{" id="share-url">Right Click Copy &amp; Share or Bookmark This Page</a></div>}
       : q{};
     my $nav_html = $nav ne '' ? qq{<div style="margin-top:6px">$nav</div>} : q{};
+    # The colour-emoji families must trail the text families: they carry the
+    # keycap bases U+0030-U+0039 and U+002E, so leading with them paints plain
+    # ASCII host addresses and timestamps at emoji advance widths, producing an
+    # unbreakable token that overflowed 320px viewports. Trailing them still
+    # supplies the indicator icons, which no serif text font covers.
+    # min-width:0 plus overflow-wrap:anywhere keep this flex column shrinkable
+    # below its min-content width whatever the host name or status text says.
     my $right_html = $hide_indicators
       ? q{}
       : sprintf(
-        q{<div style="text-align:right;white-space:pre-wrap;font-family:'Segoe UI Emoji','Noto Color Emoji','Segoe UI Symbol',Georgia,'Times New Roman',serif">%s<span id="status-on-top">%s</span></div>},
+        q{<div style="text-align:right;white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;font-family:Georgia,'Times New Roman',serif,'Segoe UI Emoji','Noto Color Emoji','Segoe UI Symbol'">%s<span id="status-on-top">%s</span></div>},
         $context,
         $status,
       );
@@ -2673,9 +3024,12 @@ sub _top_chrome_html {
 })();
 </script>
 HTML
+    # flex-wrap:wrap lets the two columns stack instead of being squeezed onto
+    # one line, and min-width:0 lets each of them shrink below its min-content
+    # width, so a narrow phone viewport never gains a horizontal scrollbar.
     return sprintf <<'HTML', $share_html, $nav_html, $right_html, $script_html;
-<div class="dd-top-chrome" style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd3c2">
-  <div>
+<div class="dd-top-chrome" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd3c2">
+  <div style="min-width:0">
     %s
     %s
   </div>
@@ -2694,7 +3048,7 @@ sub _top_context_html {
     my $ctx = $page->{meta}{request_context} || {};
     my $user = (
         ( $ctx->{tier} || '' ) eq 'helper' && ( $ctx->{username} || '' ) ne ''
-    ) ? $ctx->{username} : ( $ENV{USER} || eval { getpwuid($<) } || 'user' );
+    ) ? $ctx->{username} : ( $ENV{USER} || eval { getpwuid($<) } || 'user' );    # uncoverable condition right count:2
     my $host = $ctx->{host} || '';
     $host =~ s/^https?:\/\///;
     $host =~ s/\/.*$//;
@@ -2704,7 +3058,7 @@ sub _top_context_html {
     my $now = strftime '%Y-%m-%d %H:%M:%S', localtime;
     return sprintf q{<span class="user-name-and-icon">&#128129;&#127996; %s</span> <span id="status-server">&#128187; <a href="%s">%s</a></span> &#128467; <span id="status-datetime">%s</span><br>},
       _escape_html($user),
-      _escape_html($host_href),
+      _escape_html_attr($host_href),
       _escape_html($machine_ip),
       _escape_html($now);
 }
@@ -2857,13 +3211,27 @@ sub _page_status_payload {
     return $indicators->page_header_payload;
 }
 
-# _session_cookie($session_id)
+# _session_cookie($session_id, $secure)
 # Builds the Set-Cookie header value for a dashboard session.
-# Input: session id string.
+# Input: session id string, and an optional boolean secure flag that appends the
+#        Secure attribute when the request arrived over HTTPS.
 # Output: cookie header string.
 sub _session_cookie {
-    my ($session_id) = @_;
-    return "dashboard_session=$session_id; Path=/; HttpOnly; SameSite=Strict";
+    my ( $session_id, $secure ) = @_;
+    my $cookie = "dashboard_session=$session_id; Path=/; HttpOnly; SameSite=Strict";
+    $cookie .= '; Secure' if $secure;
+    return $cookie;
+}
+
+# _request_is_secure()
+# Reports whether the current request is being served over HTTPS/TLS.
+# The dashboard only ever serves real HTTPS traffic through its SSL front-proxy,
+# which marks backend worker processes with DEVELOPER_DASHBOARD_SSL_PROXIED; plain
+# HTTP (loopback) serving never sets that flag.
+# Input: none.
+# Output: boolean true when the request arrived over HTTPS, false for plain HTTP.
+sub _request_is_secure {
+    return $ENV{DEVELOPER_DASHBOARD_SSL_PROXIED} ? 1 : 0;
 }
 
 # _expired_session_cookie()
@@ -2897,7 +3265,7 @@ sub _serve_static_file_from_roots {
     my $file_path = '';
     for my $public_dir (@public_roots) {
         my $candidate = File::Spec->catfile( $public_dir, $filename );
-        my $real_path = eval { File::Spec->rel2abs($candidate) } || '';
+        my $real_path = eval { File::Spec->rel2abs($candidate) } || '';    # uncoverable condition right
         my $quoted_public = quotemeta($public_dir);
         next if $real_path !~ /^$quoted_public(?:\/|\z)/;
         next if !-f $candidate || !-r $candidate;
@@ -2906,7 +3274,7 @@ sub _serve_static_file_from_roots {
     }
     return [ 404, 'text/plain; charset=utf-8', "Not Found\n" ] if $file_path eq '';
 
-    return $self->_serve_static_file_at_path( $type, $filename, $file_path );
+    return $self->_serve_static_file_at_path( $type, $filename, $file_path, '', \@public_roots );
 }
 
 # _skill_ajax_file_path($skill_name, $ajax_file)
@@ -2963,18 +3331,55 @@ sub _static_file_roots {
     return @roots;
 }
 
-# _serve_static_file_at_path($type, $filename, $file_path, $default_type)
-# Serves one already-resolved static file path after the caller has chosen the lookup source.
-# Input: asset type string, request filename string, resolved file path string, and optional explicit mime type override.
+# _static_path_contained($file_path, $allowed_roots)
+# Asserts that one resolved static asset path still lives beneath an allowed
+# public root after symlinks and parent-directory components are resolved,
+# denying by default when no allowed roots are supplied. Comparison folds case
+# on Windows runtimes and normalizes separators, mirroring the saved-page
+# containment assertion.
+# Input: resolved candidate file path string and array reference of allowed
+# root directory path strings.
+# Output: boolean true when the resolved path is inside one existing allowed
+# root, otherwise false.
+sub _static_path_contained {
+    my ( $file_path, $allowed_roots ) = @_;
+    return 0 if ref($allowed_roots) ne 'ARRAY';
+    my $path_real = -e $file_path ? abs_path($file_path) : undef;
+    return 0 if !defined $path_real;
+    for my $root ( @{$allowed_roots} ) {
+        next if !defined $root || $root eq '';
+        my $root_real = -d $root ? abs_path($root) : undef;
+        next if !defined $root_real;
+        my ( $path_cmp, $root_cmp ) = ( $path_real, $root_real );
+        if ( is_windows() ) {
+            $path_cmp = lc $path_cmp;
+            $root_cmp = lc $root_cmp;
+        }
+        $path_cmp =~ s{\\}{/}g;
+        $root_cmp =~ s{\\}{/}g;
+        return 1 if index( $path_cmp, $root_cmp . '/' ) == 0;
+    }
+    return 0;
+}
+
+# _serve_static_file_at_path($type, $filename, $file_path, $default_type, $allowed_roots)
+# Serves one already-resolved static file path after the caller has chosen the
+# lookup source, refusing any resolved path that escapes the caller's allowed
+# public roots.
+# Input: asset type string, request filename string, resolved file path string,
+# optional explicit mime type override, and array reference of allowed root
+# directories the resolved path must stay inside.
 # Output: array reference of status code, content type, and body.
 sub _serve_static_file_at_path {
-    my ( $self, $type, $filename, $file_path, $default_type ) = @_;
+    my ( $self, $type, $filename, $file_path, $default_type, $allowed_roots ) = @_;
     return [ 404, 'text/plain; charset=utf-8', "Not Found\n" ]
       if !defined $file_path || $file_path eq '' || !-f $file_path || !-r $file_path;
+    return [ 404, 'text/plain; charset=utf-8', "Not Found\n" ]
+      if !_static_path_contained( $file_path, $allowed_roots );
     my $content_type = defined $default_type && $default_type ne ''
       ? _ajax_content_type($default_type)
       : $self->_get_content_type( $type, $filename );
-    open my $fh, '<', $file_path or return [ 500, 'text/plain; charset=utf-8', "Internal Server Error\n" ];
+    open my $fh, '<', $file_path or return [ 500, 'text/plain; charset=utf-8', "Internal Server Error\n" ];    # uncoverable branch true
     my $content = do { local $/; <$fh> };
     close $fh;
     return [ 200, $content_type, $content ];
@@ -3032,6 +3437,8 @@ sub _get_content_type {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
 Developer::Dashboard::Web::App - local web application for Developer Dashboard
@@ -3050,6 +3457,38 @@ This module handles the browser-facing dashboard routes, helper login flow,
 page rendering modes, and page/action execution endpoints. It also provides
 static file serving for JavaScript, CSS, and other assets from the public
 directory structure (~/.developer-dashboard/dashboard/public/{js,css,others}).
+The browser tab icon at C</favicon.ico> is served from the same layered
+C<others> roots with a bundled fallback, and resolves before the authorization
+gate because browsers request it implicitly on every page load.
+
+Cross-site request forgery defense: every state-changing request (POST, PUT,
+DELETE, PATCH) passes one origin check before any trust-tier dispatch. When
+the request carries an C<Origin> header (or, absent that, a C<Referer>), its
+authority must equal the request's own C<Host> header or name a trusted local
+alias — a numeric loopback literal, the localhost hostname family, or a
+configured C<web.ssl_subject_alt_names> entry, the same alias semantics the
+loopback-admin trust check applies. Anything else, including the opaque
+C<Origin: null>, is refused with an empty 403 on every tier: the
+loopback-admin shortcut, helper sessions, and the machine API tier alike,
+because browsers attach ambient credentials and loopback reachability to
+cross-site requests automatically. Requests with neither header keep working,
+since non-browser machine clients send neither while browsers always attach
+C<Origin> to cross-site state-changing requests. The check also holds behind
+the SSL front-proxy, which forwards TLS bytes unmodified, so the backend
+compares against the browser's own C<Host> header.
+
+That origin check cannot defend a C<GET>, because browsers omit C<Origin> on
+same-origin GETs and a hostile page can drop its C<Referer> with a referrer
+policy — yet C</ajax/E<lt>fileE<gt>> runs an operator-written saved handler as
+a child process from a plain GET, on a tier that needs no cookie. So the same
+choke point additionally refuses, on B<every> method, any request the browser
+labelled C<Sec-Fetch-Site: cross-site> or C<same-site>, unless the
+accompanying C<Origin>/C<Referer> names this dashboard or a trusted local
+alias (the C<localhost>/C<127.0.0.1> pair is one host to the trust model and
+two sites to the browser). C<Sec-Fetch-Site> is set by the browser itself and
+is a forbidden header name, so page script can neither forge nor suppress it.
+Requests carrying no fetch metadata are unaffected, which keeps machine
+clients and browsers too old to send it working unchanged.
 
 =head1 METHODS
 
@@ -3066,6 +3505,21 @@ Output: array reference of [status_code, content_type, body].
 
 Security: Prevents directory traversal attacks and verifies files are within
 the public directory before serving.
+
+=head2 _static_path_contained($file_path, $allowed_roots)
+
+Package function asserting that one resolved static asset path still lives
+beneath an allowed public root after symlinks and parent-directory components
+are resolved with C<Cwd::abs_path>, denying by default when no allowed roots
+are supplied. Every static-serving entry point passes its lookup roots through
+this check before opening a resolved path, including skill-namespaced assets,
+whose allowed roots come from the skill dispatcher's layered
+C<dashboards/public> trees.
+
+Input: resolved candidate file path string and array reference of allowed root
+directory path strings.
+Output: boolean true when the resolved path is inside one existing allowed
+root, otherwise false.
 
 =head2 _get_content_type($type, $filename)
 

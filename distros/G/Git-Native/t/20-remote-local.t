@@ -59,14 +59,25 @@ ok 1, 'fetch completed without die';
 my $b_ref = $b->reference('refs/karr/test/data');
 is $b_ref->target->hex, $commit_oid->hex, 'repo B has the fetched ref';
 
-# Credentials callback exercises the closure path even when not strictly
-# needed (file:// requires no auth — libgit2 still asks if registered).
+# Registering a credentials callback must not disturb a transport that needs
+# no auth. libgit2 asks for credentials only when the transport reports an
+# auth challenge, so over file:// the callback is invoked ZERO times — the
+# count below is the assertion, not a formality. (An earlier version of this
+# test claimed libgit2 "still asks if registered" and asserted nothing; it
+# does not, and the PASSTHROUGH mapping itself is unit-tested without a
+# transport in t/52-credential-callback.t.)
+my $cred_calls = 0;
+$b->reference_delete('refs/karr/test/data');
+ok !$b->reference_exists('refs/karr/test/data'), 'ref removed from B before the re-fetch';
+
 my $remote_b2 = $b->remote_anonymous($url);
 $remote_b2->fetch(
   refspecs    => ['+refs/karr/*:refs/karr/*'],
-  credentials => sub { undef },   # PASSTHROUGH → falls through
+  credentials => sub { $cred_calls++; return undef },
 );
-ok 1, 'fetch with credentials callback (PASSTHROUGH path)';
+is $cred_calls, 0, 'file:// fetch never invokes the credentials callback';
+is $b->reference('refs/karr/test/data')->target->hex, $commit_oid->hex,
+  'the fetch still transferred the ref with a callback registered';
 
 # --- prune semantics ---
 # Add a second ref to A, push it; remote now has both.

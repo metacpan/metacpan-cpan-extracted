@@ -29,10 +29,10 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok  { my($c,$n)=@_; $T++;
+sub ok  { my($c, $n)=@_; $T++;
           $c ? ($PASS++, push @OUT, "ok $T - $n\n")
              : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is  { my($g,$e,$n)=@_; $T++;
+sub is  { my($g, $e, $n)=@_; $T++;
           defined($g) && ("$g" eq "$e")
             ? ($PASS++, push @OUT, "ok $T - $n\n")
             : ($FAIL++, push @OUT, "not ok $T - $n"
@@ -193,13 +193,13 @@ is($join_names[1], 'e.name',  "B: JOIN NAME[1]=e.name");
 # ok 29
 is($join_names[2], 'e.dept',  "B: JOIN NAME[2]=e.dept");
 # ok 30
-is($join_names[3], 'e.salary',"B: JOIN NAME[3]=e.salary");
+is($join_names[3], 'e.salary', "B: JOIN NAME[3]=e.salary");
 # ok 31
 is($join_names[4], 'd.did',   "B: JOIN NAME[4]=d.did");
 # ok 32
 is($join_names[5], 'd.dname', "B: JOIN NAME[5]=d.dname");
 # ok 33
-is($join_names[6], 'd.budget',"B: JOIN NAME[6]=d.budget");
+is($join_names[6], 'd.budget', "B: JOIN NAME[6]=d.budget");
 # ok 34
 is(scalar @join_names, 7, "B: JOIN 7 columns total");
 my $jr = $sth->fetchrow_arrayref;
@@ -260,7 +260,7 @@ $r = $db->execute("INSERT INTO emp VALUES (11,'Eve')");
 # ok 48
 ok($r->{type} eq 'error', "C: too few values -> error");
 # ok 49
-ok($r->{message} =~ /\d+.*column/i, "C: error message mentions column count");
+ok(($r->{message} =~ /\d+.*column/i) ? 1 : 0, "C: error message mentions column count");
 
 # C4: INSERT with too many values -> error
 $r = $db->execute("INSERT INTO emp VALUES (12,'Frank','Sales',55000,99)");

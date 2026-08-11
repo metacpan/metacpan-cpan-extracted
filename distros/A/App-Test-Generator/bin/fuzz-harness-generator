@@ -11,6 +11,11 @@ use Getopt::Long qw(GetOptions);
 use Pod::Usage;
 use YAML::XS qw(LoadFile);
 
+# Derive prove from $^X so we always use the same perl installation that
+# invoked this script, even when $PATH resolves to a different system perl.
+my ($prove_vol, $prove_dir) = (File::Spec->splitpath($^X))[0, 1];
+my $prove = File::Spec->catpath($prove_vol, $prove_dir, 'prove');
+
 =head1 NAME
 
 fuzz-harness-generator - Generate fuzzing + corpus-based test harnesses from test schemas
@@ -141,7 +146,7 @@ if($replay_corpus) {
 		chmod 0755, $outfile;
 		print "Replay test written to: $outfile\n";
 		if($run) {
-			exit system('prove', '-l', $outfile) >> 8;
+			exit system($prove, '-l', $outfile) >> 8;
 		}
 	} else {
 		print $tap;
@@ -186,7 +191,7 @@ if($run && !$outfile) {
 
 	App::Test::Generator->generate($infile, $tmp);
 
-	exit system('prove', '-l', $tmp) >> 8;
+	exit system($prove, '-l', $tmp) >> 8;
 }
 
 if($dry_run) {
@@ -213,7 +218,7 @@ if($outfile) {
 	chmod 0755, $outfile if($outfile =~ /\.(pl|cgi)$/);
 	if($run) {
 		# Use list form to avoid shell interpolation of $outfile
-		system('prove', '-l', $outfile);
+		system($prove, '-l', $outfile);
 	}
 }
 
@@ -239,8 +244,6 @@ exit 0;
 # Exit:       Returns a sorted list of file paths.
 #             Returns an empty list if the path does
 #             not exist or contains no .json files.
-#
-# Side effects: None.
 #
 # Notes:      Directory globbing matches only *.json
 #             files at the top level of the directory;

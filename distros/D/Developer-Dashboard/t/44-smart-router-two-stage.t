@@ -15,9 +15,11 @@ our $ROOT;
 BEGIN {
     $ROOT = Cwd::abs_path( Cwd::getcwd() );
     unshift @INC, File::Spec->catdir( $ROOT, 'lib' );
+    unshift @INC, File::Spec->catdir( $ROOT, 't', 'lib' );
 }
 
 use Developer::Dashboard::PathRegistry;
+use Local::DockerGuard;
 
 my $skill_name       = join q{}, 'sql', '-dashboard';
 my $ajax_route_name  = join q{}, $skill_name, '-profiles-bootstrap';
@@ -46,6 +48,17 @@ plan skip_all => 'docker daemon is not reachable for the post-build smart-router
 my $repos_root = tempdir( CLEANUP => 1 );
 my $skill_repo = _create_dashboard_skill_repo( $repos_root, $skill_name, $ajax_route_name );
 my $container = sprintf 'dd-smart-router-two-stage-%d-%d', $$, time;
+
+# Collect the containers earlier runs leaked before choosing a port or creating
+# our own. The END block below cannot cover a SIGKILLed run -- and every
+# automation round here runs under a timeout that kills its process tree -- so
+# the cleanup has to be generational: each run reclaims its predecessors'
+# leaks. Doing it first also releases the loopback ports those leaks were
+# holding, which is what keeps _find_free_port() from turning intermittent.
+my @reclaimed = Local::DockerGuard::reclaim_guard_containers( own => $container );
+diag( sprintf 'reclaimed %d leaked guard container(s): %s', scalar @reclaimed, join q{, }, @reclaimed )
+  if @reclaimed;
+
 my $host_port = _find_free_port();
 my $container_tarball = "/tmp/Developer-Dashboard-$version.tar.gz";
 

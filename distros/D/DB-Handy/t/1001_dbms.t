@@ -18,8 +18,8 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok      { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is      { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
+sub ok      { my($c, $n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is      { my($g, $e, $n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
 
 
 ###############################################################################
@@ -59,7 +59,7 @@ ok(!$db->use_database('nosuchdb'),      "use_database missing fails");
 my @dbs = $db->list_databases();
 
 # ok 6
-ok(scalar(grep { $_ eq 'testdb' } @dbs),"list_databases contains testdb");
+ok(scalar(grep { $_ eq 'testdb' } @dbs), "list_databases contains testdb");
 
 ###############################################################################
 # Table creation

@@ -3,9 +3,11 @@ abstract: 'GitHub Actions workflow generator, analyzer, and optimizer'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
   IPC::Run3: '0'
   IPC::System::Simple: '0'
+  Readonly: '0'
   Test::DescribeMe: '0'
   Test::Exception: '0'
   Test::Mockingbird: '0'
@@ -35,5 +37,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GHGen
   homepage: https://metacpan.org/pod/App::GHGen
   repository: git://github.com/nigelhorne/App-GHGen.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

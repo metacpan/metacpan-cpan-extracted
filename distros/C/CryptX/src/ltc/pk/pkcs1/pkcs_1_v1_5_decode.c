@@ -32,14 +32,15 @@ int ltc_pkcs_1_v1_5_decode(const unsigned char *msg,
   unsigned long modulus_len, ps_len, i;
   int result;
 
-  /* default to invalid packet */
+  /* is_valid is cleared before anything else can return, it stays 0 unless the padding is valid */
+  LTC_ARGCHK(is_valid != NULL);
   *is_valid = 0;
 
   modulus_len = (modulus_bitlen >> 3) + (modulus_bitlen & 7 ? 1 : 0);
 
-  /* test message size */
+  /* test message size - the encoded message is exactly as long as the modulus (RFC 8017 7.2.2, 8.2.2) and the code below reads modulus_len octets */
 
-  if ((msglen > modulus_len) || (modulus_len < 11)) {
+  if ((msglen != modulus_len) || (modulus_len < 11)) {
     return CRYPT_PK_INVALID_SIZE;
   }
 

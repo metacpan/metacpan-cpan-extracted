@@ -1,0 +1,377 @@
+#!/usr/bin/env perl
+
+# IMPORTANT: this checker has to tell three different failures apart, because
+# responding to one of them as if it were another is what costs whole rounds.
+# A coverage SHORTFALL is a fact about the code. An UNREADABLE report is a fact
+# about the report. An INSTRUMENT FAILURE is a fact about the environment: the
+# coverage database was written by one serializer and is being read by another,
+# and re-running produces the identical error. Each gets its own exit status so
+# a caller never has to parse prose to know which one it is.
+
+use strict;
+use warnings;
+
+use Config;
+use File::Spec;
+use Getopt::Long qw(GetOptions);
+
+use constant EXIT_CLEAN      => 0;
+use constant EXIT_SHORTFALL  => 1;
+use constant EXIT_UNREADABLE => 2;
+use constant EXIT_INSTRUMENT => 3;
+
+# The parse errors Devel::Cover surfaces when the reader's serializer is not the
+# one that wrote the database. Neither text names the real cause, which is why
+# they are matched here and translated into a verdict that does.
+my @INSTRUMENT_SIGNATURES = (
+    qr/File is not a perl storable/i,
+    qr/Bad Sereal header/i,
+    qr/Storable binary image v\d+\.\d+ more recent than I am/i,
+    qr/Can't load either JSON or Storable/i,
+);
+
+exit main(@ARGV);
+
+# Purpose: classify a Devel::Cover text report arriving on standard input.
+# Input: the raw @ARGV list; only --database is accepted, naming the coverage
+#        database to sniff when an instrument failure has to be explained.
+# Output: an exit code - 0 all four metrics at 100.0, 1 a genuine shortfall,
+#         2 the report could not be read, 3 the instrument could not read its
+#         own database.
+sub main {
+    my @argv = @_;
+
+    my $database = 'cover_db';
+    local @ARGV = @argv;
+    GetOptions( 'database=s' => \$database )
+        or return _unreadable('unrecognized option; only --database is accepted');
+    return _unreadable( 'unexpected argument: ' . join ' ', @ARGV ) if @ARGV;
+
+    my @lines = <STDIN>;
+
+    # Echo the report first and flush it, so the verdict written to standard
+    # error cannot appear above the table it is a verdict about. Standard output
+    # is block-buffered whenever this runs in a pipeline, which is always.
+    local $| = 1;
+    print @lines;
+
+    my $signature = _instrument_signature( \@lines );
+    return _instrument( $signature, $database ) if defined $signature;
+
+    return _unreadable('no coverage report arrived on standard input; the report was never produced')
+        if !grep { /\S/ } @lines;
+
+    return _check_report( \@lines );
+}
+
+# Purpose: find the first input line that is a serializer parse error rather
+#          than report content.
+# Input: an array reference of report lines.
+# Output: the offending line with trailing whitespace removed, or undef.
+sub _instrument_signature {
+    my ($lines) = @_;
+
+    for my $line ( @{$lines} ) {
+        for my $signature (@INSTRUMENT_SIGNATURES) {
+            next if $line !~ $signature;
+            my $trimmed = $line;
+            $trimmed =~ s/\s+\z//;
+            return $trimmed;
+        }
+    }
+
+    return undef;
+}
+
+# Purpose: report a serializer mismatch as an instrument failure, naming the
+#          format on disk, the format this reader would choose, and every
+#          Devel::Cover::DB::IO this process can see.
+# Input: the offending reader message and the coverage database directory.
+# Output: EXIT_INSTRUMENT, after writing the verdict to standard error.
+sub _instrument {
+    my ( $message, $database ) = @_;
+
+    my ( $written, $source ) = _database_format($database);
+    my $read  = _reader_format();
+    my @paths = _io_module_paths();
+
+    print {*STDERR} <<"VERDICT";
+coverage gate: INSTRUMENT FAILURE - the coverage database could not be read.
+coverage gate: the reader said: $message
+coverage gate: written as: $written ($source)
+coverage gate: read as:    $read (the serializer this process resolves)
+coverage gate: Devel/Cover/DB/IO.pm visible here: @{[ join '; ', @paths ]}
+coverage gate: Devel::Cover::DB::IO chooses Sereal, then JSON, then Storable at
+coverage gate: BEGIN from \@INC, and never records the choice beside the data, so
+coverage gate: two commands of one chain that see different library paths cannot
+coverage gate: read what the other just wrote.
+coverage gate: this is an instrument failure, not a corrupt database - deleting
+coverage gate: the database and running again produces the identical error. Run
+coverage gate: the whole chain through script/coverage-gate, which gives every
+coverage gate: command one environment.
+VERDICT
+
+    return EXIT_INSTRUMENT;
+}
+
+# Purpose: name the serialization format an on-disk coverage database was
+#          written with, from its leading bytes rather than from assumption.
+# Input: the coverage database directory.
+# Output: the format name and a short phrase saying where it came from.
+sub _database_format {
+    my ($database) = @_;
+
+    my $file = _database_sample($database);
+    return ( 'unknown', "no readable database file under $database" ) if !defined $file;
+
+    open my $handle, '<:raw', $file or return ( 'unknown', "$file could not be read: $!" );
+    read $handle, my $magic, 16;
+    close $handle or return ( 'unknown', "$file could not be closed: $!" );
+    $magic = '' if !defined $magic;
+
+    return ( 'Sereal',   "sniffed from $file" ) if $magic =~ /\A=(?:srl|\xF3rl)/;
+    return ( 'Storable', "sniffed from $file" ) if $magic =~ /\A(?:pst0|perl-store)/;
+    return ( 'JSON',     "sniffed from $file" ) if $magic =~ /\A\s*[\{\[]/;
+    return ( 'unknown',  "unrecognised leading bytes in $file" );
+}
+
+# Purpose: pick one representative file out of a coverage database.
+# Input: the coverage database directory.
+# Output: the path of a readable regular file inside it, or undef.
+sub _database_sample {
+    my ($database) = @_;
+
+    for my $candidate ( File::Spec->catfile( $database, 'digests' ), _database_members($database) ) {
+        return $candidate if -f $candidate && -r _;
+    }
+
+    return undef;
+}
+
+# Purpose: list the ordinary files a Devel::Cover database keeps under its own
+#          subdirectories, without letting a glob pattern build the paths.
+# Input: the coverage database directory.
+# Output: a list of candidate file paths, empty when nothing can be listed.
+sub _database_members {
+    my ($database) = @_;
+
+    my @members;
+    for my $subdirectory (qw(structure runs)) {
+        my $directory = File::Spec->catdir( $database, $subdirectory );
+        opendir my $handle, $directory or next;
+        my @entries = sort grep { $_ ne '.' && $_ ne '..' && $_ !~ /\.lock\z/ } readdir $handle;
+        closedir $handle or next;
+        push @members, map { File::Spec->catfile( $directory, $_ ) } @entries;
+    }
+
+    return @members;
+}
+
+# Purpose: reproduce the format choice Devel::Cover::DB::IO makes at BEGIN, for
+#          this process's @INC.
+# Input: none.
+# Output: the format name this reader would select.
+sub _reader_format {
+    return 'Sereal'   if eval { require Sereal::Decoder; require Sereal::Encoder; 1 };
+    return 'JSON'     if eval { require JSON::MaybeXS;   1 };
+    return 'Storable' if eval { require Storable;        1 };
+    return 'none';
+}
+
+# Purpose: list every Devel::Cover::DB::IO this process could load, so a host
+#          carrying more than one installation shows both.
+# Input: none.
+# Output: a list of descriptive strings, the first marked as the one in use.
+sub _io_module_paths {
+    my $relative = File::Spec->catfile(qw(Devel Cover DB IO.pm));
+
+    my @search = @INC;
+    push @search, split /\Q$Config{path_sep}\E/, $ENV{PERL5LIB} if defined $ENV{PERL5LIB};
+
+    my ( %seen, @found );
+    for my $directory (@search) {
+        next if ref $directory;
+        my $candidate = File::Spec->catfile( $directory, $relative );
+        next if !-f $candidate;
+        next if $seen{$candidate}++;
+        push @found, $candidate;
+    }
+
+    return ("none found on \@INC (Devel/Cover/DB/IO.pm is not installed here)") if !@found;
+
+    $found[0] .= ' [in use]';
+    return @found;
+}
+
+# Purpose: enforce 100.0 on every required metric of a parsed report.
+# Input: an array reference of report lines.
+# Output: EXIT_CLEAN, EXIT_SHORTFALL, or EXIT_UNREADABLE.
+sub _check_report {
+    my ($lines) = @_;
+
+    my @headers = grep { /^File\b/ } @{$lines};
+    my @totals  = grep { /^Total\b/ } @{$lines};
+    return _unreadable('missing Total row')                if !@totals;
+    return _unreadable('expected exactly one Total row')   if @totals != 1;
+    return _unreadable('missing coverage header')          if !@headers;
+    return _unreadable('expected exactly one coverage header') if @headers != 1;
+
+    my @metrics = map {
+        my $name = lc $_;
+              $name eq 'stmt' ? 'statement'
+            : $name eq 'bran' ? 'branch'
+            : $name eq 'cond' ? 'condition'
+            : $name eq 'sub'  ? 'subroutine'
+            :                   $name;
+    } split /\s+/, $headers[0];
+    shift @metrics if @metrics && $metrics[0] eq 'file';
+    my $has_aggregate = @metrics && $metrics[-1] eq 'total';
+    pop @metrics if $has_aggregate;
+
+    return _unreadable('duplicate or unknown metric columns')
+        if @metrics != 4 || join( ',', @metrics ) ne 'statement,branch,condition,subroutine';
+
+    my @fields = split /\s+/, $totals[0];
+    shift @fields if @fields && $fields[0] eq 'Total';
+    return _unreadable('expected statement, branch, condition, and subroutine totals')
+        if @fields != @metrics + ( $has_aggregate ? 1 : 0 );
+    return _unreadable('malformed numeric total')
+        if grep { !/\A(?:0|[1-9]\d*)(?:\.\d+)?\z/ } @fields;
+    pop @fields if $has_aggregate;
+
+    my %totals;
+    @totals{@metrics} = @fields;
+
+    my @required = qw(statement branch condition subroutine);
+    my @missing = grep { !exists $totals{$_} } @required;
+    return _unreadable( 'missing metrics: ' . join ', ', @missing ) if @missing;
+
+    my @failed;
+    for my $metric (@required) {
+        push @failed, "$metric $totals{$metric}" if $totals{$metric} != 100;
+    }
+
+    if (@failed) {
+        print {*STDERR} 'coverage gate: below 100.0: ' . join( ', ', @failed ) . "\n";
+        return EXIT_SHORTFALL;
+    }
+
+    print "coverage gate: statement, branch, condition, and subroutine totals are 100.0\n";
+    return EXIT_CLEAN;
+}
+
+# Purpose: report that the gate could not read what it was given, which must
+#          never be confused with having nothing to report.
+# Input: the reason, without a trailing newline.
+# Output: EXIT_UNREADABLE, after writing the reason to standard error.
+sub _unreadable {
+    my ($reason) = @_;
+    print {*STDERR} "coverage gate: $reason\n";
+    return EXIT_UNREADABLE;
+}
+
+__END__
+
+=head1 NAME
+
+check-all-metric-coverage - enforce 100.0 statement, branch, condition and
+subroutine coverage for C<lib/>, and tell an instrument failure apart from a
+coverage failure
+
+=head1 WHAT IT IS
+
+A fail-closed filter. It reads a C<Devel::Cover> text report on standard input,
+echoes it so the operator still sees the table, and turns it into one of four
+verdicts, each with its own exit status.
+
+=head1 WHAT IT IS FOR
+
+It is the enforcing half of the repository coverage gate. The collecting half is
+C<script/coverage-gate>, which runs the whole chain and pipes its report here.
+
+=head1 WHY IT EXISTS
+
+Three failures look alike at a glance and demand opposite responses:
+
+=over 4
+
+=item * A B<coverage shortfall> is a fact about the code. Write more tests.
+
+=item * An B<unreadable report> is a fact about the report. Something upstream
+did not produce what it claimed to produce, and the gate must never read that as
+a clean result.
+
+=item * An B<instrument failure> is a fact about the environment.
+C<Devel::Cover::DB::IO> picks its on-disk serialization format at C<BEGIN> from
+whatever C<@INC> makes visible - Sereal, then JSON, then Storable - and records
+that choice nowhere. On a host carrying two C<Devel::Cover> installations whose
+available serializers differ, a chain whose commands see different library paths
+cannot read the database it has just written. It surfaces as C<File is not a
+perl storable> or C<Bad Sereal header>, neither of which names the cause, and
+both of which read as a corrupt database. The natural response - delete the
+database and run again - fails identically, and each attempt spends another
+host-exclusive multi-minute suite slot.
+
+=back
+
+This filter names the third case explicitly, sniffs the format actually on disk,
+reports the format this reader would choose, and lists every
+C<Devel::Cover::DB::IO> visible to the process, so the mismatch is on the page
+rather than inferred.
+
+=head1 WHEN TO USE
+
+Whenever a C<Devel::Cover> report has to be judged: continuous integration,
+release workflows, and any local verification run.
+
+=head1 HOW TO USE
+
+Prefer C<script/coverage-gate>, which collects the report and calls this filter
+with the right database. Call it directly only when a report already exists.
+
+Exit statuses are the interface:
+
+=over 4
+
+=item * B<0> - statement, branch, condition and subroutine are all 100.0.
+
+=item * B<1> - a genuine shortfall; the failing metrics are named.
+
+=item * B<2> - the report could not be read, or never arrived.
+
+=item * B<3> - the instrument could not read its own database.
+
+=back
+
+=head1 WHAT USES IT
+
+C<script/coverage-gate>, the C<test>, C<release-cpan> and C<release-github>
+workflows, and C<t/107-all-metric-coverage-gate.t>, which is its acceptance
+contract.
+
+=head1 EXAMPLES
+
+Example 1:
+
+  perl script/coverage-gate
+
+Run the whole gate; this filter is the last step of it.
+
+Example 2:
+
+  cover cover_db -report text -select_re '^lib/' \
+    -coverage statement -coverage branch \
+    -coverage condition -coverage subroutine 2>&1 \
+    | perl script/check-all-metric-coverage
+
+Judge a report that has already been collected. Merging standard error into the
+pipe is what lets a serializer parse error be classified rather than lost.
+
+Example 3:
+
+  perl script/check-all-metric-coverage --database /tmp/scratch-db < report.txt
+
+Judge a report collected against a coverage database somewhere other than
+C<cover_db>, so an instrument failure can name that database's format.
+
+=cut

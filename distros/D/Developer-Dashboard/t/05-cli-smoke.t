@@ -951,6 +951,16 @@ if ( !$UNDER_COVER ) {
     my $collector_start_pid = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector start cli.collector" );
     like( $collector_start_pid, qr/\A\d+\n\z/, 'dashboard collector start still starts one named collector loop directly' );
 
+    # dashboard collector stop <name> (path 2) must go through the supervisor-aware
+    # stop so the watchdog cannot respawn the collector (regression: it used to
+    # call the low-level stop_loop directly and leave the supervisor running).
+    my $collector_subcmd_stop = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector stop cli.collector" );
+    like( $collector_subcmd_stop, qr/\A(?:\d+\n)?\z/, 'dashboard collector stop <name> prints the stopped loop pid (or nothing when already stopped)' );
+    my $collector_subcmd_stopped_status = json_decode( _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector status cli.collector" ) );
+    ok( !$collector_subcmd_stopped_status->{running}, 'dashboard collector stop <name> leaves the collector not running so the supervisor cannot respawn it' );
+    # re-start so the following top-level stop/restart assertions still control a live collector
+    _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector start cli.collector" );
+
     my $top_level_stop_named_collector = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' stop collector cli.collector" );
     like( $top_level_stop_named_collector, qr/Component\s+Target\s+Status/, 'dashboard stop collector <name> prints a table summary by default' );
     like( $top_level_stop_named_collector, qr/collector\s+cli\.collector\s+stopped/, 'dashboard stop collector <name> reports the named collector row' );
@@ -1232,11 +1242,9 @@ my $shell_bootstrap = _run("$perl -I'$lib' '$dashboard' shell bash");
 like( $shell_bootstrap, qr/path cdr/, 'dashboard shell bootstrap delegates cdr target selection through the Perl path helper' );
 unlike( $shell_bootstrap, qr/\bperl\s+-MJSON::XS\b/, 'dashboard shell bootstrap does not decode helper JSON through a bare perl command that can drift to an incompatible interpreter' );
 like( $shell_bootstrap, qr/\Q$perl\E.*-MJSON::XS/s, 'dashboard shell bootstrap decodes helper JSON through the same perl interpreter that generated the bootstrap' );
-like( $shell_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell bash bootstrap exposes the d2 shortcut helper' );
+unlike( $shell_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell bash bootstrap no longer defines a d2 shell function because d2 is now a real installed command' );
 like( $shell_bootstrap, qr/complete -F _dashboard_complete dashboard d2/, 'dashboard shell bash bootstrap wires tab completion for dashboard and d2' );
 like( $shell_bootstrap, qr/complete -F _dashboard_complete_cdr cdr dd_cdr which_dir/, 'dashboard shell bash bootstrap wires cdr-family tab completion' );
-like( $shell_bootstrap, qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s, 'dashboard shell bash bootstrap dispatches d2 through the dashboard entrypoint directly' );
-unlike( $shell_bootstrap, qr/d2\(\)\s*\{\s*'\Q$perl\E'\s+/s, 'dashboard shell bash bootstrap does not hardcode the current perl binary for d2' );
 unlike( $shell_bootstrap, qr/done\s+<\s+</, 'dashboard shell bash bootstrap avoids process substitution in completion helpers for macOS compatibility' );
 like( $shell_bootstrap, qr/completion_output="\$\('\Q$dashboard\E' complete /, 'dashboard shell bash bootstrap captures dashboard completions through command substitution' );
 like( $shell_bootstrap, qr/completion_output="\$\('\Q$dashboard\E' path complete-cdr /, 'dashboard shell bash bootstrap captures cdr completions through command substitution' );
@@ -1245,7 +1253,7 @@ like( $shell_bootstrap, qr/completion_output="\$\('\Q$dashboard\E' path complete
     my $stale_entrypoint_bootstrap = _run("$perl -I'$lib' '$dashboard' shell bash");
     like(
         $stale_entrypoint_bootstrap,
-        qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s,
+        qr/completion_output="\$\('\Q$dashboard\E' complete /,
         'dashboard shell bash bootstrap ignores a stale inherited dashboard entrypoint path',
     );
     unlike(
@@ -1258,8 +1266,11 @@ my $shell_bootstrap_file = File::Spec->catfile( $ENV{HOME}, 'dashboard-shell.sh'
 open my $shell_bootstrap_fh, '>', $shell_bootstrap_file or die "Unable to write $shell_bootstrap_file: $!";
 print {$shell_bootstrap_fh} $shell_bootstrap;
 close $shell_bootstrap_fh;
-my $bash_d2_version = _run("bash -lc '. \"$shell_bootstrap_file\"; d2 version'");
-is( $bash_d2_version, "$expected_version\n", 'd2 helper dispatches dashboard subcommands through the bash bootstrap' );
+# d2 is now a real installed command; make its bin dir discoverable on PATH and
+# confirm it dispatches dashboard subcommands identically.
+( my $d2_bindir = $dashboard ) =~ s{/[^/]+\z}{};
+my $bash_d2_version = _run("bash -lc 'PATH=\"$d2_bindir:\$PATH\"; . \"$shell_bootstrap_file\"; d2 version'");
+is( $bash_d2_version, "$expected_version\n", 'the real d2 command dispatches dashboard subcommands identically to dashboard' );
 my $bash_completion = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard do); COMP_CWORD=1; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
 like( $bash_completion, qr/^docker$/m, 'dashboard shell bash completion suggests docker through the generated completion helper' );
 like( $bash_completion, qr/^doctor$/m, 'dashboard shell bash completion suggests doctor through the generated completion helper' );
@@ -1319,14 +1330,13 @@ like( $zsh_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top 
 like( $zsh_bootstrap, qr/tmux set-option -q status-format\[1\] "\$default_status"/, 'dashboard shell zsh bootstrap restores the normal tmux status row beneath the indicators' );
 like( $zsh_bootstrap, qr/ps1 --jobs \$\{#jobstates\} --mode compact --no-indicators/, 'dashboard shell zsh bootstrap suppresses prompt indicators when tmux owns the status line' );
 like( $zsh_bootstrap, qr/path cdr/, 'dashboard shell zsh bootstrap keeps the cdr path helper functions' );
-like( $zsh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell zsh bootstrap exposes the d2 shortcut helper' );
+unlike( $zsh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell zsh bootstrap no longer defines a d2 shell function because d2 is now a real installed command' );
 like( $zsh_bootstrap, qr/autoload -Uz compinit/, 'dashboard shell zsh bootstrap loads compinit for fresh shells before completion setup' );
 like( $zsh_bootstrap, qr{whence compdef >/dev/null 2>&1}, 'dashboard shell zsh bootstrap checks whether compdef is already available' );
 like( $zsh_bootstrap, qr/\bcompinit\b/, 'dashboard shell zsh bootstrap initializes zsh completion when compdef is missing' );
 like( $zsh_bootstrap, qr/compdef _dashboard_complete_zsh dashboard d2/, 'dashboard shell zsh bootstrap wires tab completion for dashboard and d2' );
 like( $zsh_bootstrap, qr/compdef _dashboard_complete_cdr_zsh cdr dd_cdr which_dir/, 'dashboard shell zsh bootstrap wires cdr-family tab completion' );
-like( $zsh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s, 'dashboard shell zsh bootstrap dispatches d2 through the dashboard entrypoint directly' );
-unlike( $zsh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$perl\E'\s+/s, 'dashboard shell zsh bootstrap does not hardcode the current perl binary for d2' );
+unlike( $zsh_bootstrap, qr/\bd2\(\)/, 'dashboard shell zsh bootstrap defines no d2 function body at all' );
 
 my $sh_bootstrap = _run("$perl -I'$lib' '$dashboard' shell sh");
 like( $sh_bootstrap, qr/path cdr/, 'dashboard shell sh bootstrap keeps the cdr path helper functions' );
@@ -1342,14 +1352,12 @@ like( $sh_bootstrap, qr/ps1 --mode compact --no-indicators/, 'dashboard shell sh
 unlike( $sh_bootstrap, qr/\\j/, 'dashboard shell sh bootstrap does not rely on bash-specific job expansion' );
 unlike( $sh_bootstrap, qr/\bperl\s+-MJSON::XS\b/, 'dashboard shell sh bootstrap does not decode helper JSON through a bare perl command either' );
 like( $sh_bootstrap, qr/\Q$perl\E.*-MJSON::XS/s, 'dashboard shell sh bootstrap decodes helper JSON through the same perl interpreter that generated the bootstrap' );
-like( $sh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell sh bootstrap exposes the d2 shortcut helper' );
-like( $sh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s, 'dashboard shell sh bootstrap dispatches d2 through the dashboard entrypoint directly' );
-unlike( $sh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$perl\E'\s+/s, 'dashboard shell sh bootstrap does not hardcode the current perl binary for d2' );
+unlike( $sh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell sh bootstrap no longer defines a d2 shell function because d2 is now a real installed command' );
 my $sh_bootstrap_file = File::Spec->catfile( $ENV{HOME}, 'dashboard-shell-posix.sh' );
 open my $sh_bootstrap_fh, '>', $sh_bootstrap_file or die "Unable to write $sh_bootstrap_file: $!";
 print {$sh_bootstrap_fh} $sh_bootstrap;
 close $sh_bootstrap_fh;
-my $sh_d2_version = _run("sh -lc '. \"$sh_bootstrap_file\"; d2 version'");
+my $sh_d2_version = _run("sh -lc 'PATH=\"$d2_bindir:\$PATH\"; . \"$sh_bootstrap_file\"; d2 version'");
 is( $sh_d2_version, "$expected_version\n", 'd2 helper dispatches dashboard subcommands through the POSIX shell bootstrap' );
 my $sh_which_dir_bookmarks = _run("sh -lc '. \"$sh_bootstrap_file\"; which_dir bookmarks_root'");
 is_same_path_output( $sh_which_dir_bookmarks, $bookmarks_root, 'which_dir resolves bookmarks_root through the POSIX shell helper' );
@@ -1376,8 +1384,8 @@ like( $ps_bootstrap, qr/\$ddPrompt\s*=\s*& .*?\bps1 --mode compact/s, 'dashboard
 like( $ps_bootstrap, qr/Write-Host \$header/s, 'dashboard shell ps bootstrap writes the status header line separately before returning the cursor prompt' );
 like( $ps_bootstrap, qr/return '> '/s, 'dashboard shell ps bootstrap falls back to a bare next-line cursor prompt when the helper returns no content' );
 unlike( $ps_bootstrap, qr/\bPS1\b/, 'dashboard shell ps bootstrap does not mention the POSIX PS1 environment variable' );
-like( $ps_bootstrap, qr/function Invoke-DashboardShortcut \{/, 'dashboard shell ps bootstrap exposes the d2 shortcut runner' );
-like( $ps_bootstrap, qr/Set-Alias d2 Invoke-DashboardShortcut/, 'dashboard shell ps bootstrap exposes the d2 shortcut alias' );
+unlike( $ps_bootstrap, qr/function Invoke-DashboardShortcut \{/, 'dashboard shell ps bootstrap no longer defines a d2 shortcut runner because d2 is now a real installed command' );
+unlike( $ps_bootstrap, qr/Set-Alias d2 Invoke-DashboardShortcut/, 'dashboard shell ps bootstrap no longer aliases d2 because d2 is now a real installed command' );
 like( $ps_bootstrap, qr/Register-ArgumentCompleter/, 'dashboard shell ps bootstrap wires argument completion for dashboard and d2' );
 like( $ps_bootstrap, qr/CommandName 'dashboard', 'd2'/, 'dashboard shell ps bootstrap registers completion for both dashboard and d2' );
 like( $ps_bootstrap, qr/CommandName 'cdr', 'dd_cdr', 'which_dir'/, 'dashboard shell ps bootstrap also registers cdr-family completion' );
@@ -1947,7 +1955,10 @@ my $skill_dotted_dispatch = _run("$perl -I'$lib' '$dashboard' demo-skill.foo alp
 like( $skill_dotted_dispatch, qr/skill-hook/, 'dashboard <skill>.<command> runs skill-local hooks before the skill command body' );
 like( $skill_dotted_dispatch, qr/alpha\|beta/, 'dashboard <skill>.<command> forwards remaining args to the skill command body' );
 {
-    my $interactive_cli = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'ask' );
+    # 'ask' is now a reserved built-in command, so this stdin-passthrough check
+    # uses a non-reserved custom command name to keep exercising the user
+    # top-level command path (built-ins resolve before custom commands).
+    my $interactive_cli = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'interactive-demo' );
     open my $interactive_cli_fh, '>', $interactive_cli or die "Unable to write $interactive_cli: $!";
     print {$interactive_cli_fh} <<'PERL';
 #!/usr/bin/env perl
@@ -1962,7 +1973,7 @@ PERL
     chmod 0755, $interactive_cli or die "Unable to chmod $interactive_cli: $!";
 
     my $top_level_prompt = _run_interactive_command(
-        command => [ $perl, '-I', $lib, $dashboard, 'ask' ],
+        command => [ $perl, '-I', $lib, $dashboard, 'interactive-demo' ],
         input   => "bar\n",
     );
     is( $top_level_prompt->{exit_code}, 0, 'dashboard top-level CLI command keeps stdin prompting interactive' );

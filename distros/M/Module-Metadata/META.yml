@@ -11,6 +11,7 @@ build_requires:
   File::Spec: '0'
   File::Temp: '0'
   IO::File: '0'
+  Scalar::Util: '0'
   Test::More: '0.88'
   lib: '0'
   perl: '5.006'
@@ -32,7 +33,7 @@ no_index:
 provides:
   Module::Metadata:
     file: lib/Module/Metadata.pm
-    version: '1.000039'
+    version: '1.000040'
 requires:
   Carp: '0'
   Encode: '0'
@@ -49,10 +50,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Metadata
   homepage: https://github.com/Perl-Toolchain-Gang/Module-Metadata
   repository: https://github.com/Perl-Toolchain-Gang/Module-Metadata.git
-version: '1.000039'
+version: '1.000040'
 x_Dist_Zilla:
   perl:
-    version: '5.043009'
+    version: '5.045001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -132,12 +133,12 @@ x_Dist_Zilla:
           repo_root: .
           version: '0.009'
       name: '@Author::ETHER/generate CONTRIBUTING'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/InstallGuide'
       version: '1.200014'
@@ -405,7 +406,7 @@ x_Dist_Zilla:
           inherit_version: 0
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
@@ -479,7 +480,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
@@ -517,7 +518,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20260320'
+          Module::CoreList: '5.20260720'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -553,7 +554,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
@@ -561,7 +562,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
       name: '@Author::ETHER/Git::Remote::Check'
@@ -681,9 +682,9 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.000039
+          tag: v1.000040
           tag_format: v%V
-          tag_message: v%v%t
+          tag_message: v%v%t%n%n%c
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.52.0
           repo_root: .
@@ -825,7 +826,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: DynamicPrereqs
       version: '0.040'
@@ -903,9 +904,10 @@ x_contributors:
   - 'Josh Jore <jjore@cpan.org>'
   - 'Kent Fredric <kentnl@cpan.org>'
   - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>'
   - 'Peter Rabbitson <ribasushi@cpan.org>'
   - 'Steve Hay <steve.m.hay@googlemail.com>'
-x_generated_by_perl: v5.43.9
+x_generated_by_perl: v5.45.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

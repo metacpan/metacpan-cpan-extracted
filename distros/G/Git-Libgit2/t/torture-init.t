@@ -2,6 +2,10 @@ use Test2::V0;
 
 use Git::Libgit2 qw( init_lib shutdown_lib version );
 
+# Pin libgit2 away from the user's gitconfig — exact bug Git::Raw shipped.
+local $ENV{GIT_CONFIG_GLOBAL} = '/dev/null';
+local $ENV{GIT_CONFIG_SYSTEM} = '/dev/null';
+
 init_lib();
 
 my ( $maj, $min, $rev ) = version();

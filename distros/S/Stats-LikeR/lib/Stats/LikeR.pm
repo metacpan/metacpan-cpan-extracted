@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.296;
+our $VERSION = 0.297;
 require XSLoader;
 use autodie ':default';
 use warnings FATAL => 'all';
@@ -5008,7 +5008,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.296
+version 0.297
 
 =head1 Synopsis
 
@@ -13384,6 +13384,10 @@ C<f.sf> / C<norm.sf> and statsmodels' C<anova_oneway>; see
 C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
 
 =head1 Changes
+
+=head2 0.297 2026-08-10 CDT
+
+https://www.cpantesters.org/cpan/report/260534ea-9474-11f1-8ca2-bfb68deea6df bug fix
 
 =head2 0.296 2026-08-09 CDT
 

@@ -134,7 +134,7 @@ my @tests = (
     sub {
         $dbh->do('INSERT INTO t (id,n) VALUES (3,3000000000)');
         my $msg = $dbh->errstr;
-        ok((defined($msg) && ($msg =~ /out of range/i)),
+        ok(((defined($msg) && ($msg =~ /out of range/i))) ? 1 : 0,
            'T1 - the error message says the value is out of range');
     },
     sub {
@@ -213,7 +213,7 @@ my @tests = (
     sub {
         $dbh->do("INSERT INTO t (id,d) VALUES (13,'2020-13-99')");
         my $msg = $dbh->errstr;
-        ok((defined($msg) && ($msg =~ /DATE/i)),
+        ok(((defined($msg) && ($msg =~ /DATE/i))) ? 1 : 0,
            'T3 - the error message names the DATE column');
     },
 

@@ -90,7 +90,7 @@ Git::Native::Credential - A libgit2 credential (passed back from acquire callbac
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -121,6 +121,74 @@ is disowned automatically so it won't double-free.
 
 If you construct one without passing it to libgit2, DEMOLISH calls
 C<git_credential_free> for you.
+
+Every constructor is a class method, and every one of them croaks on a
+missing required argument before it reaches the FFI layer, so a typo in an
+argument name fails at the call site instead of somewhere inside libgit2.
+
+=head2 userpass
+
+  Git::Native::Credential->userpass(
+    username => 'git',
+    password => $ENV{GITHUB_TOKEN},
+  );
+
+Username and password (C<git_credential_userpass_plaintext_new>). Both
+arguments are required. This is also the constructor for HTTPS token auth:
+the token goes in C<password>, and which username the host expects varies
+(C<git> and C<oauth2> are the usual answers).
+
+=head2 ssh_key
+
+  Git::Native::Credential->ssh_key(
+    username    => 'git',
+    private_key => "$ENV{HOME}/.ssh/id_ed25519",
+    public_key  => "$ENV{HOME}/.ssh/id_ed25519.pub",   # optional
+    passphrase  => 'hunter2',                          # optional
+  );
+
+An on-disk key pair (C<git_credential_ssh_key_new>). C<username> and
+C<private_key> are required; C<public_key> may be left out, in which case
+libgit2 derives it from the private key, and C<passphrase> defaults to the
+empty string. The key files are not touched at construction time — libgit2
+reads them when the transport uses the credential, so a wrong path surfaces
+as an auth failure during C<fetch> / C<push>, not here.
+
+=head2 ssh_agent
+
+  Git::Native::Credential->ssh_agent( username => 'git' );
+
+Take a key from the running ssh-agent
+(C<git_credential_ssh_key_from_agent>). C<username> is required; for the
+common hosting providers it is C<git>, which is also what
+C<username_from_url> yields for a C<git@host:path> URL. This is the closest
+equivalent to what OpenSSH does for an ssh remote when an agent is running.
+
+Note that libgit2 can be built without SSH support; on such a build this
+constructor and C<ssh_key> already fail at allocation time with a
+L<Git::Native::Error>, long before any connection is attempted.
+
+=head2 default
+
+  Git::Native::Credential->default;
+
+The "use the ambient identity" credential (C<git_credential_default_new>),
+for Negotiate mechanisms such as NTLM or Kerberos. Takes no arguments, and
+only means anything on a transport that has such an identity to offer.
+
+=head2 username
+
+  Git::Native::Credential->username( username => 'git' );
+
+A username with no secret attached (C<git_credential_username_new>). SSH
+needs this when the URL carries no user part: libgit2 then runs a
+pre-authentication round asking only for a username (C<allowed_types> has
+C<GIT_CREDENTIAL_USERNAME>, 32, set), and calls the credentials callback a
+second time for the actual key once it has one.
+
+=head1 SEE ALSO
+
+L<Git::Native::Remote>
 
 =head1 SUPPORT
 

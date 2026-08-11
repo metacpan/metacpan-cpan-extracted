@@ -1,0 +1,99 @@
+Revision history for Crypt-DES
+
+2.09  2026-08-10
+    [Significant Changes since 2.08]
+    - Essentially 2.08-TRIAL with minor documentation and test updates
+    - Add a Security Considerations section to the pod
+    - Clarify module recommendations
+    - Move new Module::Whatever to Module::Whatever->new() in pod and tests
+
+    [Detailed Changes]
+    - 6d8a719 Increment the version for a release
+    - 8aa5583 Update .gitignore
+    - e4255e8 Update README
+    - bfc70b5 Add a Security Considerations section and clarifiy recommendations
+    - 6f3c622 Modernize module new() in tests
+    - 061b73a Fix over item back pod with blank lines
+    - cefb17d Modernize new() calling and fix missing SYNOPSIS
+    - 40eb31b Add a Changes file
+
+2.08  2026-08-08
+
+    [Significant Changes since 2.07]
+    - New Maintainer (TIMLEGGE)
+    - Fixes failure to build on newer GCC with implicit-function-declaration
+    - Add Security Policy (DES is insecure)
+    - Minor packaging updates
+
+    [Detailed Changes]
+    - 76a27cd Update/reformat MANIFEST Changes, META.json and SECURITY.md added
+    - 6cc5f6a Add .gitignore file
+    - 9578c62 Regenerate META.yml
+    - 35fb123 Add links for github code repo and issues
+    - 1b3a375 Increment version number
+    - c8d74aa Add a Security Policy
+    - 19dd1d0 Fix RT#133363 and RT#133412 fails to build with implicit-function-declaration
+    - 9cba1a9 Import Crypt-DES-2.07 from CPAN
+
+Note: The change details below were generated with the assistance of AI.
+In most cases the wording is direct from the updates in various parts
+of the code, README or pod.  While I have attempted to ensure its accuracy
+by reviewing the diffs between the versions myself, it should be considered
+informational only and may have inaccuracies.  Should you be concerned
+about the history of this module prior to 2.08 you will need to review
+the diffs between released versions manually.
+
+2.07  2013-07-23
+    - Fixed malformed META.yml.
+    - test.pl $VERSION resynced with DES.pm (was left at 2.05).
+
+2.06  2013-07-23
+    - Fixed use of SvUPGRADE as an rvalue, which broke the build under
+      Perl 5.18; now called as a statement.
+    - Regenerated META.yml;
+
+2.05  2005-12-08
+    - Renamed the XS entry points from des_* to _des_* (XS PREFIX and
+      _des.h prototypes), the 2.04 header rename having failed to fix
+      the Solaris symbol clash.
+
+2.04  2005-12-08
+    - Renamed des.h to _des.h to avoid clashing with the system DES
+      header on Solaris.
+    - Added META.yml.
+
+2.03  2000-12-05
+    - Restored "require DynaLoader", missing since 2.00 although
+      DynaLoader was still listed in @ISA.
+    - Dropped the stray "package DES;" so blocksize/keysize/new/
+      encrypt/decrypt are defined in Crypt::DES itself.
+    - bootstrap now version-checks against $VERSION.
+    - Declared globals with "use vars".
+    - Documentation: describe the interface as Crypt::CBC's rather
+      than Crypt::BlockCipher's.
+
+    (2.02 was never released to CPAN.)
+
+2.01  2000-09-11
+    - Removed a stray #include <stdio.h> from _des.c.
+    - Comment and dead-code cleanup in DES.pm and test.pl.
+
+2.00  2000-09-11
+    - Maintenance taken over by Dave Paris / W3Works, LLC.
+    - Portability rewrite: builds on big-endian machines and on many
+      more x86 platforms; local i8/i32 typedefs replace the u_int*_t
+      types, and PL_sv_undef is handled for newer perls.
+    - Renamed the internal DES routines to perl_des_* and des.c to
+      _des.c, resolving the des_SPtrans symbol clash with mod_ssl
+      (reported by Jan 'Kozo' Vajda).
+    - POD folded from DES.pod into DES.pm; README added.
+    - Makefile.PL requires Perl 5.004 and takes VERSION_FROM DES.pm.
+    - Expanded tests
+
+1.01  1999-06-07
+    - Include <sys/types.h> instead of <machine/types.h>.
+    - Adjusted library paths so installation via "perl -MCPAN" works.
+
+1.0  1996-05-22
+    - First release, by Gary Howland; DES implementation by Eric Young,
+      Perl extension by Systemics Ltd.

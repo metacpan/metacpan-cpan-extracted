@@ -1,5 +1,10 @@
 Revision history for Dancer-Plugin-Auth-Google
 
+0.08	2026-08-11
+    - Callback url may now adopt to URL used for the current request (SEWI)
+    - Auth URI accepts extra arguments (YANICK)
+    - Fix CVE-2026-13410 (SSL_verify_mode set to PEER() by default) (ROBRWO)
+
 0.07    2019-02-28
     - updated endpoints to OAuth via Google Identity Platform.
     - remove calls to deprecated G+ endpoints.

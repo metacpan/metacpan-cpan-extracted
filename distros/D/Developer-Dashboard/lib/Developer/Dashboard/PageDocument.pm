@@ -3,7 +3,7 @@ package Developer::Dashboard::PageDocument;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
@@ -87,7 +87,7 @@ sub from_instruction {
     my $state = _decode_stash_section( join( "\n", @{ $sections{STASH} || [] } ) );
 
     my %meta = ();
-    $meta{icon} = _trim( join( "\n", @{ $sections{ICON} || [] } ) ) if exists $sections{ICON};
+    $meta{icon} = _trim( join( "\n", @{ $sections{ICON} } ) ) if exists $sections{ICON};
 
     my @codes;
     for my $section ( sort grep { /^CODE\d+$/ } keys %sections ) {
@@ -206,7 +206,7 @@ sub legacy_instruction {
 
     my @chunks = map {
         my ( $name, $body ) = @$_;
-        $body = '' if !defined $body;
+        $body = '' if !defined $body;    # uncoverable branch true
         $body =~ s/\A\n+//;
         $body =~ s/\n+\z//;
         "$name: $body";
@@ -259,7 +259,7 @@ sub render_html {
 
     return <<"HTML";
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -417,7 +417,7 @@ sub _parse_legacy_sections {
         next if $part !~ /^([A-Za-z][A-Za-z0-9.]*)\s*:\s*(.*)$/s;
         my ( $name, $body ) = ( uc($1), $2 );
         $body =~ s/\A\s+//;
-        next if !$name || !grep { $_ eq $name || ( $name =~ /^CODE\d+$/ && /^CODE\d+$/ ) } @LEGACY_KEYS;
+        next if !grep { $_ eq $name || ( $name =~ /^CODE\d+$/ && /^CODE\d+$/ ) } @LEGACY_KEYS;
         $sections{$name} = [ split /\n/, $body, -1 ];
     }
     return %sections;
@@ -467,7 +467,7 @@ sub _legacy_quote {
 # Output: scalar string.
 sub _template_value {
     my ( $path, $context ) = @_;
-    my @parts = grep { defined && $_ ne '' } split /\./, _trim($path);
+    my @parts = grep { $_ ne '' } split /\./, _trim($path);
     my $value = $context;
     for my $part (@parts) {
         return '' if ref($value) ne 'HASH' || !exists $value->{$part};

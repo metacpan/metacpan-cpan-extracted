@@ -1,18 +1,25 @@
 {
     "name" : "DB-Handy",
-    "version" : "1.09",
+    "version" : "1.10",
     "abstract" : "Pure-Perl flat-file relational database with DBI-like interface",
     "author" : [
         "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat version 0.44",
+    "generated_by" : "pmake.bat version 0.50",
     "license" : [
         "perl_5"
     ],
     "meta-spec" : {
         "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
         "version" : 2
+    },
+    "no_index" : {
+        "directory" : [
+            "t",
+            "eg",
+            "doc"
+        ]
     },
     "release_status" : "stable",
     "resources" : {
@@ -48,9 +55,11 @@
         },
         "test" : {
             "requires" : {
+                "Exporter" : "0",
                 "Fcntl" : "1.03",
                 "File::Path" : "1.0401",
                 "File::Spec" : "0",
+                "FindBin" : "1.42",
                 "POSIX" : "0",
                 "constant" : "0",
                 "perl" : "5.00503"
@@ -60,15 +69,15 @@
     "provides" : {
         "DB::Handy" : {
             "file" : "lib/DB/Handy.pm",
-            "version" : "1.09"
+            "version" : "1.10"
         },
         "DB::Handy::Connection" : {
             "file" : "lib/DB/Handy.pm",
-            "version" : "1.09"
+            "version" : "1.10"
         },
         "DB::Handy::Statement" : {
             "file" : "lib/DB/Handy.pm",
-            "version" : "1.09"
+            "version" : "1.10"
         }
     }
 }

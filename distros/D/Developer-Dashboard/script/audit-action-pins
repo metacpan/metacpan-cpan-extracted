@@ -1,0 +1,385 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Spec;
+use JSON::XS       ();
+use LWP::UserAgent ();
+use MIME::Base64 qw(decode_base64);
+
+# Exit codes. Everything non-zero fails the CI step; the distinction exists so a
+# log reader can tell "a pin is wrong" from "this run could not find out", which
+# are very different things to act on. EXIT_UNUSABLE is deliberately NOT zero:
+# an audit that could not run must never read as an audit that passed.
+use constant {
+    EXIT_CLEAN    => 0,
+    EXIT_FINDINGS => 1,
+    EXIT_USAGE    => 2,
+    EXIT_UNUSABLE => 3,
+};
+
+# The runtime floor. GitHub force-runs node20 actions on node24, which some
+# actions survive and others do not, so a node20 pin is a latent failure rather
+# than a deprecation warning: shogo82148/actions-setup-perl v1.31.3 died with
+# "unable to get latest version" under exactly that forced upgrade and took ten
+# days of CI with it (DD-449).
+use constant MINIMUM_NODE_RUNTIME => 24;
+
+my $API_ROOT = 'https://api.github.com';
+
+exit main(@ARGV);
+
+# Purpose: entry point - audit every SHA-pinned action in a workflow directory.
+# Input:   @argv - optional single argument, the workflow directory to audit
+#          (defaults to .github/workflows relative to the current directory).
+# Output:  one of the EXIT_* codes; a human-readable report on STDOUT and any
+#          diagnostics on STDERR.
+sub main {
+    my (@argv) = @_;
+
+    if ( @argv > 1 || ( @argv && $argv[0] =~ m{\A-} ) ) {
+        print {*STDERR} "Usage: audit-action-pins [workflow-directory]\n";
+        return EXIT_USAGE;
+    }
+
+    my $dir = @argv ? $argv[0] : File::Spec->catdir( '.github', 'workflows' );
+    if ( !-d $dir ) {
+        print {*STDERR} "audit-action-pins: not a directory: $dir\n";
+        return EXIT_UNUSABLE;
+    }
+
+    my @pins = collect_pins($dir);
+    if ( !@pins ) {
+        print {*STDERR} "audit-action-pins: no SHA-pinned actions found under $dir\n";
+        return EXIT_UNUSABLE;
+    }
+
+    my $fixture = load_fixture();
+    if ($fixture) {
+        print "audit-action-pins: FIXTURE MODE - resolving from $ENV{DD_ACTION_PIN_FIXTURE}.\n";
+        print "audit-action-pins: this run is NOT network-verified and does not certify the pins.\n";
+    }
+
+    my @findings;
+    my @unusable;
+    for my $pin (@pins) {
+        my ( $problem, $blocked ) = audit_pin( $pin, $fixture );
+        push @findings, @{$problem};
+        push @unusable, @{$blocked};
+    }
+
+    return report( \@pins, \@findings, \@unusable );
+}
+
+# Purpose: print the audit outcome and pick the process exit code from it.
+# Input:   $pins - arrayref of every pin record examined; $findings - arrayref of
+#          human-readable defect strings; $unusable - arrayref of strings naming
+#          pins that could not be resolved at all.
+# Output:  the EXIT_* code matching the worst outcome.
+sub report {
+    my ( $pins, $findings, $unusable ) = @_;
+
+    printf "audit-action-pins: examined %d SHA-pinned action%s\n", scalar @{$pins},
+      ( @{$pins} == 1 ? '' : 's' );
+
+    for my $finding ( @{$findings} ) {
+        print {*STDERR} "audit-action-pins: FAIL $finding\n";
+    }
+    for my $blocked ( @{$unusable} ) {
+        print {*STDERR} "audit-action-pins: UNUSABLE $blocked\n";
+    }
+
+    return EXIT_FINDINGS if @{$findings};
+    return EXIT_UNUSABLE if @{$unusable};
+
+    print "audit-action-pins: every pin resolves to its stated release and runs on node"
+      . MINIMUM_NODE_RUNTIME . "+\n";
+    return EXIT_CLEAN;
+}
+
+# Purpose: audit one pin - that its declared runtime is current, and that the
+#          version comment beside it really names the tag the SHA belongs to.
+# Input:   $pin - a pin record from collect_pins(); $fixture - the offline
+#          resolver hashref, or undef to use the network.
+# Output:  two arrayrefs: (findings, unusable), each of message strings.
+sub audit_pin {
+    my ( $pin, $fixture ) = @_;
+
+    my ( @findings, @unusable );
+    my $where = sprintf '%s@%s (%s)', $pin->{action}, substr( $pin->{sha}, 0, 12 ), $pin->{workflows};
+
+    my $manifest = fetch_action_manifest( $pin, $fixture );
+    if ( !defined $manifest ) {
+        push @unusable, "$where: could not read action.yml at the pinned SHA";
+        return ( \@findings, \@unusable );
+    }
+
+    # Docker and composite actions declare no node runtime, so the floor simply
+    # does not apply to them; only JavaScript actions carry one.
+    my ($node) = $manifest =~ m{using:\s*['"]?node(\d+)['"]?}i;
+    if ( defined $node && $node < MINIMUM_NODE_RUNTIME ) {
+        push @findings,
+          "$where declares node$node, below the node" . MINIMUM_NODE_RUNTIME . ' floor';
+    }
+
+    # The comment is the only human-readable statement of what a 40-hex pin is,
+    # so an unverified one is worse than none: it is trusted and wrong.
+    if ( defined $pin->{version} ) {
+        my $tag_sha = resolve_tag( $pin, $fixture );
+        if ( !defined $tag_sha ) {
+            push @unusable, "$where: could not resolve upstream tag $pin->{version}";
+        }
+        elsif ( $tag_sha ne $pin->{sha} ) {
+            push @findings,
+                "$where is commented $pin->{version}, but that tag is $tag_sha"
+              . ' - the comment does not describe the pinned commit';
+        }
+    }
+
+    return ( \@findings, \@unusable );
+}
+
+# Purpose: read every `uses: <action>@<sha>` pin out of a workflow directory,
+#          merging repeated pins so one action pinned in five files is audited
+#          once and reported with all five filenames.
+# Input:   $dir - the workflow directory to scan.
+# Output:  a list of hashrefs { action, sha, version, workflows }, sorted for a
+#          stable report order.
+sub collect_pins {
+    my ($dir) = @_;
+
+    opendir my $dh, $dir or return ();
+    my @files = sort grep { m{\.ya?ml\z} } readdir $dh;
+    closedir $dh or die "Unable to close $dir: $!";
+
+    my %seen;
+    for my $file (@files) {
+        my $text = slurp( File::Spec->catfile( $dir, $file ) );
+        next if !defined $text;
+        while ( $text =~ m{uses:\s*(\S+?)\@([0-9a-f]{40})(?:[^\S\n]+\#[^\S\n]*(v\d+(?:\.\d+){2}))?}g ) {
+            my ( $action, $sha, $version ) = ( $1, $2, $3 );
+            my $key = "$action\@$sha";
+            $seen{$key} ||= { action => $action, sha => $sha, version => $version, files => [] };
+            push @{ $seen{$key}{files} }, $file;
+        }
+    }
+
+    my @pins;
+    for my $key ( sort keys %seen ) {
+        my $pin = $seen{$key};
+        $pin->{workflows} = join ', ', @{ $pin->{files} };
+        push @pins, $pin;
+    }
+    return @pins;
+}
+
+# Purpose: fetch the action.yml (or action.yaml) that a pinned SHA actually
+#          points at, which is what states the runtime the pin will run on.
+# Input:   $pin - a pin record; $fixture - offline resolver hashref or undef.
+# Output:  the manifest text, or undef when it cannot be retrieved.
+sub fetch_action_manifest {
+    my ( $pin, $fixture ) = @_;
+
+    # `owner/repo` for a top-level action, `owner/repo/sub/dir` for one of the
+    # several actions a monorepo publishes (github/codeql-action/init).
+    my ( $owner, $repo, @sub ) = split m{/}, $pin->{action};
+    return undef if !defined $repo;
+    my $prefix = @sub ? join( '/', @sub ) . '/' : '';
+
+    for my $name (qw(action.yml action.yaml)) {
+        my $path = $prefix . $name;
+        if ($fixture) {
+            my $hit = $fixture->{contents}{"$owner/$repo|$path|$pin->{sha}"};
+            return $hit if defined $hit;
+            next;
+        }
+        my $body = api_get("/repos/$owner/$repo/contents/$path?ref=$pin->{sha}");
+        next if !defined $body;
+        my $json = eval { JSON::XS->new->decode($body) };
+        next if !$json || !$json->{content};
+        return decode_base64( $json->{content} );
+    }
+    return undef;
+}
+
+# Purpose: resolve the upstream tag named in a pin's comment to the commit SHA it
+#          points at, dereferencing annotated tags to their target commit.
+# Input:   $pin - a pin record carrying {version}; $fixture - offline resolver or
+#          undef.
+# Output:  the 40-hex commit SHA, or undef when the tag cannot be resolved.
+sub resolve_tag {
+    my ( $pin, $fixture ) = @_;
+
+    my ( $owner, $repo ) = split m{/}, $pin->{action};
+    return undef if !defined $repo;
+
+    if ($fixture) {
+        return $fixture->{tags}{"$owner/$repo|$pin->{version}"};
+    }
+
+    my $body = api_get("/repos/$owner/$repo/git/ref/tags/$pin->{version}");
+    return undef if !defined $body;
+    my $ref = eval { JSON::XS->new->decode($body) };
+    return undef if !$ref || !$ref->{object};
+
+    # A lightweight tag points straight at the commit; an annotated tag points at
+    # a tag object that has to be dereferenced, and comparing the tag object's
+    # own SHA to a commit SHA would report every annotated tag as a mismatch.
+    return $ref->{object}{sha} if ( $ref->{object}{type} // '' ) ne 'tag';
+
+    my $tag_body = api_get("/repos/$owner/$repo/git/tags/$ref->{object}{sha}");
+    return undef if !defined $tag_body;
+    my $tag = eval { JSON::XS->new->decode($tag_body) };
+    return undef if !$tag || !$tag->{object};
+    return $tag->{object}{sha};
+}
+
+# Purpose: perform one authenticated GET against the GitHub REST API.
+# Input:   $path - an API path beginning with a slash.
+# Output:  the response body on success, undef on any non-success status.
+sub api_get {
+    my ($path) = @_;
+
+    my $agent = LWP::UserAgent->new( timeout => 30, agent => 'developer-dashboard-action-pin-audit/1' );
+    my @headers = ( 'Accept' => 'application/vnd.github+json' );
+    my $token = $ENV{GITHUB_TOKEN} || $ENV{GITHUB_AUTH_TOKEN};
+    push @headers, ( 'Authorization' => "Bearer $token" ) if $token;
+
+    my $response = $agent->get( $API_ROOT . $path, @headers );
+    return undef if !$response->is_success;
+    return $response->decoded_content;
+}
+
+# Purpose: load the offline resolver fixture when DD_ACTION_PIN_FIXTURE names one,
+#          so the audit logic is testable without reaching the network. The caller
+#          announces fixture mode loudly, because a fixture can say anything and a
+#          fixture-backed run therefore certifies nothing.
+# Input:   none; reads DD_ACTION_PIN_FIXTURE from the environment.
+# Output:  the decoded fixture hashref, or undef when the variable is unset.
+sub load_fixture {
+    my $path = $ENV{DD_ACTION_PIN_FIXTURE};
+    return undef if !defined $path || $path eq '';
+
+    my $text = slurp($path);
+    die "audit-action-pins: unable to read fixture $path\n" if !defined $text;
+    return JSON::XS->new->decode($text);
+}
+
+# Purpose: read a whole file.
+# Input:   $path - the file to read.
+# Output:  its contents, or undef when it cannot be opened.
+sub slurp {
+    my ($path) = @_;
+
+    open my $fh, '<:raw', $path or return undef;
+    local $/;
+    my $text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return $text;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+audit-action-pins - resolve every SHA-pinned GitHub Action against its upstream
+tag and its declared runtime
+
+=head1 PURPOSE
+
+Make a workflow's action pins mean what they say. Every C<uses:> line in this
+repository is pinned to an immutable 40-hex commit and annotated with a
+C<# vX.Y.Z> comment naming the release that commit belongs to. The SHA is the
+security control; the comment is the only part a human can read, and it is what
+the repository's own guardrail test reads its version floors from. This gate is
+what keeps the two in agreement.
+
+=head1 WHY IT EXISTS
+
+Because a comment nobody verifies is trusted and can still be false. Three pins
+in this repository carried comments written from intent rather than resolved
+from the tag: C<actions/checkout> was annotated C<# v5.2.2>, a tag that has
+never existed upstream, over a commit that is really v4.2.2;
+C<shogo82148/actions-setup-perl> was annotated C<# v1.32.0> over v1.31.3.
+
+All three were node20 actions. GitHub force-runs node20 actions on the node24
+runtime, which C<actions/checkout> survives and C<actions-setup-perl> v1.31.3
+does not - it fails with C<Error: unable to get latest version>. The C<Setup
+Perl> step therefore failed on every CI run for ten days, skipping the test
+suite, the coverage gate and both dependency audits, while the guardrail test
+certified the node24 migration as complete because the comments said so. A
+version floor read from a comment cannot catch a comment that lies, so the check
+that can - resolving the SHA - lives here.
+
+=head1 WHEN TO USE
+
+Run it whenever an action pin is added or changed, and on every CI push. It is
+wired into the test workflow after the dependency install, because it needs the
+project's own C<LWP::UserAgent> and C<JSON::XS>.
+
+=head1 HOW TO USE
+
+    script/audit-action-pins
+    script/audit-action-pins .github/workflows
+    GITHUB_TOKEN=... script/audit-action-pins
+
+The audit reports two distinct kinds of problem, and exits non-zero for both:
+
+=over 4
+
+=item *
+
+C<FAIL> - the pin was resolved and is wrong: it declares a runtime below node24,
+or its version comment names a tag that resolves to a different commit.
+
+=item *
+
+C<UNUSABLE> - the pin could not be resolved at all, so this run found nothing
+out. This is never reported as success. An unauthenticated run can hit the
+GitHub rate limit, and the C</repos/.../commits/{sha}> endpoint is unreliable
+for some large repositories, so the manifest is read through the contents API
+instead.
+
+=back
+
+Exit codes are C<0> clean, C<1> findings, C<2> usage error, C<3> could not
+audit.
+
+=head1 WHAT USES IT
+
+C<.github/workflows/test.yml> runs it on every push and pull request.
+C<t/34-scorecard-guardrails.t> asserts that wiring still exists, and
+C<t/142-action-pin-provenance.t> exercises this script's own logic.
+
+=head1 OFFLINE TESTING
+
+Setting C<DD_ACTION_PIN_FIXTURE> to a JSON file replaces the network with a
+canned resolver, so the audit logic can be tested hermetically:
+
+    {
+      "contents": { "actions/checkout|action.yml|<sha>": "runs:\n  using: node24\n" },
+      "tags":     { "actions/checkout|v7.0.1": "<sha>" }
+    }
+
+A fixture-backed run prints a banner saying so and does not certify anything - a
+fixture can assert whatever it likes, which is the point in a test and would be
+a hole anywhere else.
+
+=head1 EXAMPLES
+
+Audit the repository's workflows before pushing a pin change:
+
+    script/audit-action-pins; echo "exit=$?"
+
+Audit a single directory of workflows copied elsewhere:
+
+    script/audit-action-pins /tmp/candidate-workflows
+
+Confirm the gate fails closed when it cannot reach the API:
+
+    GITHUB_TOKEN= script/audit-action-pins /tmp/empty-dir; echo "exit=$?"   # 3
+
+=cut

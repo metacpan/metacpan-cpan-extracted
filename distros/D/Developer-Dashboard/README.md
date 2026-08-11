@@ -5,7 +5,7 @@
 Developer::Dashboard - a local home for development work
 
 # VERSION
-4.16
+4.26
 
 # INTRODUCTION
 
@@ -104,6 +104,10 @@ variables across `CODE*` blocks without leaking them into later page runs
 - a lightweight local web interface
 - action execution with trusted and safer page boundaries
 - config-backed providers, path aliases, and compose overlays
+- asking an AI backend from the shell with `dashboard ask`, over the Anthropic
+API, the local `claude` CLI, or the `codex`, `copilot`, and `gemini`
+command-line tools, keeping a per-workspace conversation so follow-up questions
+carry context and inlining `--file` attachments
 - update scripts and installable runtime packaging
 
 Managed runtime children are expected to clean up after themselves. Detached
@@ -265,6 +269,11 @@ require a password when the request still originates from loopback
 treated as local-admin when they still arrive from loopback
 - helper access is for everyone else, including non-loopback IPs and other
 machines on the network
+- the loopback-admin shortcut applies only to direct (plain HTTP) connections;
+under `dashboard serve --ssl` the public front-proxy relays TLS to an internal
+loopback backend, so every backend connection looks like loopback and cannot
+prove the real client is local -- in that mode the shortcut is disabled and
+even loopback HTTPS requests require a helper login
 - helper logins let you share the dashboard safely without turning every browser
 request into full local-admin access
 
@@ -678,7 +687,12 @@ runtime public tree first and then from the saved bookmark root. The web layer
 also provides a built-in bundled `/js/jquery.js` asset that serves the local
 copy of jQuery 4.0.0, with `/js/jquery-4.0.0.min.js` kept as a compatibility
 alias for the same shipped payload even when no runtime file has been copied
-into `dashboard/public/js` yet. Skills can ship the same classes of assets
+into `dashboard/public/js` yet. The bundled browser tab icon works the same
+way: browsers request `/favicon.ico` on their own for every page load, so that
+route is served outside the authorization gate, on every trust tier and before
+any helper login, from the bundled 16x16 icon. Dropping your own
+`dashboard/public/others/favicon.ico` into any runtime layer overrides it.
+Skills can ship the same classes of assets
 under their own dashboard tree: `dashboards/ajax/*` resolves at
 `/ajax/<repo-name>/...` or
 `/ajax/<repo-name>/<sub-skill>/...`, and
@@ -1039,13 +1053,13 @@ by bridging `~/.profile` to `~/.bashrc`, prefers
 Homebrew Perl on macOS when `brew --prefix perl` exposes a brewed
 interpreter, bootstraps a user-space `perlbrew` Perl on Debian-family,
 Alpine, or Fedora hosts when the system Perl is older than the required
-`5.38`, installs `App::perlbrew` into `~/perl5/bin` first if the package manager did not
+`5.44`, installs `App::perlbrew` into `~/perl5/bin` first if the package manager did not
 already put `perlbrew` on `PATH`, keeps that local `perlbrew` and
 `patchperl` toolchain pinned to the private `~/perl5/lib/perl5` include path
 while the rescue build runs, fetches the `App::perlbrew` tarball with
 `curl` before the local install so Alpine does not emit the noisy
 `IO::Socket::IP` warning during that bootstrap step, uses
-`perlbrew --notest install perl-5.38.5` so blank-machine bootstrap does not
+`perlbrew --notest install perl-5.44.0` so blank-machine bootstrap does not
 stall in upstream Perl core test failures, updates the selected shell rc file
 itself with the needed `PERLBREW_HOME` and rescue-Perl `PATH` lines instead
 of leaving a manual `~/.profile` editing step behind or sourcing perlbrew's
@@ -1078,16 +1092,21 @@ bootstrap, resets and refreshes the source catalog once before retrying when a
 `File::ShareDir::Install`, installs Developer Dashboard with `cpanm --notest`,
 sets the CurrentUser PowerShell execution policy to
 `RemoteSigned` when it is still too restrictive to load profile scripts,
-updates the current-user PowerShell profile with a self-contained
-private `~/perl5` PATH and Perl environment block plus
-`dashboard shell ps`, seeds `$env:HOME` from PowerShell's own `$HOME` inside
-that managed profile block when Windows did not export `HOME` itself, creates
-a stable user-space `make.cmd` shim that points at Strawberry Perl's GNU make
-provider so skill `Makefile` workflows keep working in later sessions, runs
-`dashboard init` first so the home helper runtime exists, and then activates
-that PowerShell bootstrap in the current shell when possible. Future
-PowerShell sessions do not rely on installer-only helper functions while
-loading that generated profile block. The generated bash, zsh,
+updates the current-user PowerShell profile with self-contained
+private `~/perl5` and runtime PATH setup, seeds `$env:HOME` from PowerShell's
+own `$HOME` when Windows did not export `HOME` itself, and dot-sources the
+generated `~/.developer-dashboard/cache/powershell-env.ps1` and
+`powershell-bootstrap.ps1` files instead of launching Perl at profile load.
+`dashboard shell ps` remains the explicit cache refresh command and writes
+both files atomically. The installer runs `dashboard init`, refreshes and
+syntax-checks both non-empty caches before writing the managed profile, and
+then activates the bootstrap in the current shell when possible. Missing,
+empty, or corrupt caches produce an actionable refresh warning rather than a
+silent Perl fallback. The installer also creates a stable user-space
+`make.cmd` shim that points at Strawberry Perl's GNU make provider so skill
+`Makefile` workflows keep working in later sessions. Future PowerShell
+sessions do not rely on installer-only helper functions while loading that
+generated profile block. The generated bash, zsh,
 POSIX sh, and PowerShell shell bootstraps all follow the same tmux-aware
 prompt rule: when the shell starts inside a `dashboard workspace` tmux session
 that carries `DEVELOPER_DASHBOARD_TMUX_STATUS=1`, indicator glyphs move to
@@ -1231,6 +1250,11 @@ files before control returns to the real update command. Perl code can read
 those payloads through `Runtime::Result`.
 
 Use `dashboard version` to print the installed Developer Dashboard version.
+
+Use `dashboard upgrade` or the identical `d2 upgrade` short entrypoint to
+download, validate, and run the canonical HTTPS installer for the active
+platform. Add `--dry-run` to print the selected installer URL and execution
+plan without making a network request or changing the host.
 
 The blank-container integration harness applies fake-project dashboard override
 environment variables only after `cpanm --notest` finishes installing the
@@ -1654,7 +1678,11 @@ also rotates collector log transcripts when a collector defines `rotation`
 or `rotations`. `lines` keeps the trailing line count, while `minute`,
 `minutes`, `hour`, `hours`, `day`, `days`, `week`, `weeks`,
 `month`, and `months` keep only log entries newer than the requested
-retention window. Run it on demand with:
+retention window. Both rules cut on entry boundaries, so a rotated
+transcript always starts at a complete entry header: a line budget drops
+whole entries rather than slicing one in half, and a budget smaller than
+the newest entry empties the transcript instead of leaving a headerless
+fragment behind. Run it on demand with:
 
     dashboard housekeeper
     dashboard collector run housekeeper
@@ -1880,9 +1908,11 @@ to a prompt command that does not depend on bash-only prompt escapes, and
 PowerShell installs a `prompt` function instead of using the POSIX `PS1`
 variable.
 
-`d2` is the short shell shortcut for `dashboard`, so after loading the
-bootstrap you can run `d2 version`, `d2 doctor`, or
-`d2 docker compose ps` without typing the full command name each time.
+`d2` is a real, installed short command for `dashboard`, shipped in the same
+`bin` directory and re-execing the `dashboard` entrypoint, so you can run
+`d2 version`, `d2 doctor`, or `d2 docker compose ps` without typing the full
+command name -- in scripts and fresh shells as well as interactively, without
+depending on the shell bootstrap.
 
 The same generated bootstrap also wires live tab completion for `dashboard`
 and `d2`. Bash registers `_dashboard_complete`, zsh registers
@@ -1942,8 +1972,29 @@ The browser security model follows the original local-first trust concept:
 - helper access requires a login backed by local file-based user and session records
 - helper sessions are file-backed, bound to the originating remote address, and expire automatically
 - helper passwords must be at least 8 characters long
+- state-changing requests are refused with an empty-bodied `403` when `Origin`
+or `Referer` names anything other than this dashboard or a trusted local
+alias, on every tier
+- requests the browser labelled `Sec-Fetch-Site: cross-site` or `same-site` are
+refused on **every** method, including `GET`, unless the accompanying
+`Origin`/`Referer` names this dashboard or a trusted local alias
 
 This keeps the fast path for loopback-local access while making non-loopback or shared access explicit.
+
+The two cross-site checks above sit at one choke point that runs before trust
+tier classification, because the loopback-admin tier authorizes on the remote
+address alone: there is no cookie in that decision, so `SameSite=Strict`
+protects nothing there and any page the operator visits would otherwise reach
+an already-authorized dashboard. The fetch-metadata half covers `GET` because
+`GET` is not a safe method on this product — `/ajax/<file>` runs an
+operator-written saved handler as a child process from a plain `GET` — while
+`Origin` is frequently absent on a `GET` and `Referer` can be suppressed by
+the attacking page. `Sec-Fetch-Site` is set by the browser and is a forbidden
+header name, so page script can neither forge nor suppress it. Opening the
+dashboard by typed URL or bookmark reports `Sec-Fetch-Site: none` and is
+unaffected, as are `curl` and registered `x-dd-api-key` machine consumers,
+which send no fetch metadata at all; following a link in from another site is
+refused, which is deliberate on a route that executes saved handlers.
 
 The editor and rendered pages also include a shared top chrome with share and
 source links on the left and the original status-plus-alias indicator strip on
@@ -2118,16 +2169,29 @@ Measure library coverage with Devel::Cover:
     cpanm --no-wget --notest --local-lib-contained ./.perl5 Devel::Cover
     export PERL5LIB="$PWD/.perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
     export PATH="$PWD/.perl5/bin:$PATH"
-    cover -delete
-    HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
-    PERL5OPT=-MDevel::Cover prove -lr t
-    cover -report text -select_re '^lib/' -coverage statement -coverage subroutine
+    perl script/coverage-gate
 
-The repository target is 100% statement and subroutine coverage for `lib/`.
+`script/coverage-gate` is the canonical entrypoint and the one every CI
+workflow runs. It drops the coverage database, runs the instrumented suite,
+collects the `lib/` report and enforces 100.0 on statement, branch, condition
+and subroutine. Its exit status is the interface: `0` all four metrics at
+100.0, `1` a genuine shortfall, `2` the gate could not run or could not read
+its report, `3` the coverage instrument could not read its own database.
+
+The chain is one command rather than three because
+`Devel::Cover::DB::IO` picks its on-disk serialization format at `BEGIN` from
+whatever `@INC` makes visible and records the choice nowhere. Typed as separate
+shell lines, a library path omitted from one of them leaves the reader unable to
+parse what the writer just produced; running them as children of one process
+removes that split by construction. An exit `3` is an environment fault and is
+never fixed by re-running.
+
+The repository target is 100.0 on all four metrics for `lib/`.
 This is a standing QA gate for every change, not only releases. After the
 normal `prove -lr t` test gate passes, run the numeric `Devel::Cover` gate
-and do not treat the work as done until the `cover` summary still reports
-100% statement and 100% subroutine coverage for `lib/`.
+and do not treat the work as done until it exits `0`. Only one coverage run may
+be in flight on a host at a time, because instrumented timing-sensitive tests
+misread under contention.
 GitHub workflow coverage gates must match the `Devel::Cover` `Total` summary
 line by regex rather than one fixed-width spacing layout, because runner or
 module upgrades can change column padding without changing the real
@@ -2724,6 +2788,20 @@ For repository delivery on this machine, follow the loop:
 Use `~/bin/git-push-mf` for the authenticated push step.
 Do not treat Scorecard as a pre-commit local gate; run it only after the local
 gates, commit, and push are complete.
+When Scorecard needs a signed GitHub release, push a `vX.XX` tag so the
+tag-triggered GitHub release workflow can publish the tarball, checksum, and
+detached signature assets that back the `Signed-Releases` check. A signature
+alone caps that check at eight of ten, because the remaining points are scored
+only for a release that also carries build provenance, and provenance is
+recognised solely by a release asset whose name ends in `.intoto.jsonl` -
+recording an attestation in the GitHub attestation store does not count. So a
+second job in the same workflow re-downloads the published tarball, verifies it
+against the published checksum, attests it, and attaches the SLSA build
+provenance as `<tarball>.intoto.jsonl` together with the full Sigstore
+bundle that carries the material needed to verify that provenance offline. That
+job is deliberately separate: minting an OIDC token is what lets the workflow
+speak as the repository, and it is never granted to the job that runs the test
+suite, the coverage pass, and the tarball build.
 
 Skill fleet integration:
 

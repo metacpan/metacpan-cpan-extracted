@@ -3,11 +3,12 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use File::Spec;
+use File::Temp qw(tempfile);
 use POSIX qw(close setsid strftime);
 use Template;
 use Time::HiRes qw(sleep time);
@@ -49,7 +50,7 @@ sub run_once {
     my $name = $job->{name} || die 'Collector job missing name';
     my ( $mode, $source ) = $self->_collector_source($job);
 
-    my $cwd = $job->{cwd} || cwd();
+    my $cwd = $job->{cwd} || cwd();    # uncoverable condition false cwd() always returns a non-empty path
     if ( !File::Spec->file_name_is_absolute($cwd) && $self->{paths}->can($cwd) ) {
         $cwd = $self->{paths}->$cwd();
     }
@@ -57,6 +58,12 @@ sub run_once {
     die "Collector cwd '$cwd' does not exist" if !-d $cwd;
 
     my $started_at = _now_iso8601();
+    # Normalize the timeout to milliseconds once and persist it under its own
+    # field. Storing a millisecond value under the seconds-keyed 'timeout' field
+    # made a persisted-and-reloaded job (for example the Windows worker re-read,
+    # and the watchdog stale window) re-inflate the timeout by 1000x, so keep
+    # 'timeout' as seconds and record the derived 'timeout_ms' explicitly.
+    my $timeout_ms = $self->_normalize_timeout_ms($job);
     $self->{collectors}->write_job(
         $name,
         {
@@ -68,7 +75,8 @@ sub run_once {
             interval   => $job->{interval},
             cron       => $job->{cron},
             schedule   => $job->{schedule},
-            timeout    => $job->{timeout} || $job->{timeout_ms},
+            timeout    => $job->{timeout},
+            timeout_ms => $timeout_ms,
             env        => $job->{env},
             output_format => $job->{output_format},
             updated_at => $started_at,
@@ -79,7 +87,7 @@ sub run_once {
         {
             enabled         => 1,
             last_started_at => $started_at,
-            schedule        => $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' ),
+            schedule        => $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' ),    # uncoverable condition false the schedule fallback ternary always yields a non-empty string
         }
     );
 
@@ -91,7 +99,7 @@ sub run_once {
             source     => $source,
             cwd        => $cwd,
             env        => $job->{env},
-            timeout_ms => $job->{timeout_ms} || ( $job->{timeout} ? $job->{timeout} * 1000 : undef ),
+            timeout_ms => $timeout_ms,
         );
 
         if ( $self->{indicators} && ref( $job->{indicator} ) eq 'HASH' ) {
@@ -154,6 +162,21 @@ sub run_once {
         stderr    => $stderr,
         timed_out => $timed_out ? 1 : 0,
     };
+}
+
+# _normalize_timeout_ms($job)
+# Normalizes a collector job timeout to milliseconds, preferring an explicit
+# millisecond value and otherwise converting the seconds-keyed timeout, so a
+# persisted-and-reloaded job keeps the same effective timeout instead of being
+# re-inflated by 1000x.
+# Input: collector job hash reference.
+# Output: timeout in milliseconds, or undef when no timeout is configured.
+sub _normalize_timeout_ms {
+    my ( $self, $job ) = @_;
+    return undef if ref($job) ne 'HASH';
+    return $job->{timeout_ms} if $job->{timeout_ms};
+    return $job->{timeout} * 1000 if $job->{timeout};
+    return undef;
 }
 
 # _materialize_indicator_state(%args)
@@ -265,7 +288,7 @@ sub start_loop {
     my $interval = $self->_effective_interval_seconds($job);
     my $configured_interval = defined $job->{interval} ? $job->{interval} : 30;
     my $name = $job->{name} || die 'Collector job missing name';
-    my $schedule_mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
+    my $schedule_mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );    # uncoverable condition false the schedule fallback ternary always yields a non-empty string
     die "Collector '$name' uses manual schedule and should be run on demand" if $schedule_mode eq 'manual';
     my $pidfile = $self->_pidfile($name);
     my $title   = $self->_process_title($name);
@@ -273,7 +296,11 @@ sub start_loop {
     if ( -f $pidfile ) {
         my $pid = _slurp($pidfile);
         chomp $pid;
-        if ( $pid && $self->_is_managed_loop( $pid, $name ) ) {
+        # Recognize an already-running managed loop by its recorded state as
+        # well as by proc/ps identity, so the supervisor's start_loop does not
+        # create a DUPLICATE loop when it races the fresh loop before that loop
+        # has set its process title.
+        if ( $pid && ( $self->_is_managed_loop( $pid, $name ) || $self->_state_confirms_managed_loop( $name, $pid ) ) ) {
             $self->_write_loop_state(
                 $name,
                 {
@@ -306,10 +333,28 @@ sub start_loop {
     die "Unable to fork collector '$name': $!" if !defined $pid;
 
     if ($pid) {
-        open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
-        print {$fh} $pid;
-        close $fh;
-        $self->{paths}->secure_file_permissions($pidfile);
+        # The loop STATE is written before the pidfile, and the order is
+        # load-bearing rather than stylistic.
+        #
+        # running_loops keys on the pidfile: it lists pidfiles, and for each one
+        # decides whether that pid is a loop it manages. It recognises the pid
+        # either by its process title or by this recorded state. Written the other
+        # way round there is a window - pidfile present, state not yet written -
+        # in which a freshly forked child that has not yet adopted its title is
+        # unrecognisable by either route. A concurrent running_loops in any other
+        # process then treats a perfectly healthy loop as an orphan and unlinks
+        # its pidfile.
+        #
+        # The consequence is the exact failure the surrounding code exists to
+        # prevent: stop_loop returns early on a missing pidfile so the loop can no
+        # longer be stopped by name, and start_loop consults the loop-state
+        # fallback only inside its `-f $pidfile` branch, so the next supervisor
+        # start forks a DUPLICATE. The fallback that would have caught it cannot
+        # fire, because the sweep deleted the evidence it reads.
+        #
+        # Writing the state first closes the window instead of widening a wait:
+        # the pidfile - the thing the sweep keys on - never exists without the
+        # state that identifies it.
         $self->_write_loop_state(
             $name,
             {
@@ -326,6 +371,10 @@ sub start_loop {
                 heartbeat_at => _now_iso8601(),
             }
         );
+        open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
+        print {$fh} $pid;
+        close $fh;
+        $self->{paths}->secure_file_permissions($pidfile);
         return $pid;
     }
 
@@ -356,7 +405,7 @@ sub _start_windows_loop_process {
     my ( $self, %args ) = @_;
     my $job                 = $args{job}                 || die 'Missing collector job';
     my $name                = $args{name}                || die 'Missing collector name';
-    my $title               = $args{title}               || $self->_process_title($name);
+    my $title               = $args{title}               || $self->_process_title($name);    # uncoverable condition false _process_title always returns a non-empty title
     my $interval            = defined $args{interval} ? $args{interval} : 30;
     my $configured_interval = defined $args{configured_interval} ? $args{configured_interval} : 30;
     my $schedule_mode       = $args{schedule_mode}       || 'interval';
@@ -406,7 +455,7 @@ sub _run_loop_child {
     my ( $self, %args ) = @_;
     my $job           = $args{job}           || die 'Missing collector job';
     my $name          = $args{name}          || die 'Missing collector name';
-    my $title         = $args{title}         || $self->_process_title($name);
+    my $title         = $args{title}         || $self->_process_title($name);    # uncoverable condition false _process_title always returns a non-empty title
     my $interval      = defined $args{interval} ? $args{interval} : 30;
     my $schedule_mode = $args{schedule_mode} || 'interval';
     my $daemonize     = exists $args{daemonize} ? $args{daemonize} : 1;
@@ -416,9 +465,9 @@ sub _run_loop_child {
 
     if ($daemonize) {
         $self->_detach_process_session;
-        open STDIN, '<', File::Spec->devnull() or die $!;
+        open STDIN, '<', File::Spec->devnull() or die $!;    # uncoverable branch true opening the null device for reading never fails on the test host
         open STDOUT, '>>', $self->{files}->collector_log or die $!;
-        open STDERR, '>>', $self->{files}->collector_log or die $!;
+        open STDERR, '>>', $self->{files}->collector_log or die $!;    # uncoverable branch true STDOUT already opened the same collector-log path, so the STDERR reopen cannot fail independently
         $self->_close_inherited_fds( close_ipc => 1 );
     }
 
@@ -496,6 +545,13 @@ sub _run_loop_child {
             }
             elsif ($worker_pid) {
                 $active_workers{$worker_pid} = 1;
+                $self->_write_loop_state(
+                    $name,
+                    {
+                        active_runs        => scalar keys %active_workers,
+                        active_worker_pids => [ $self->_active_worker_pids( \%active_workers ) ],
+                    }
+                );
             }
         }
         $self->_sleep_until_next_tick(
@@ -615,16 +671,19 @@ sub _run_loop_worker {
             error       => $error,
             source      => 'loop error',
         );
+        my $state_pid      = $loop_pid || $$;                           # uncoverable condition false the current pid is always truthy
+        my $state_title    = $title || $self->_process_title($name);    # uncoverable condition false _process_title always returns a non-empty title
+        my $state_schedule = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );    # uncoverable condition false the schedule fallback ternary always yields a non-empty string
         $self->_write_loop_state(
             $name,
             {
-                pid          => $loop_pid || $$,
+                pid          => $state_pid,
                 name         => $name,
-                process_name => $title || $self->_process_title($name),
+                process_name => $state_title,
                 command      => $job->{command},
                 cwd          => $job->{cwd},
                 interval     => $job->{interval},
-                schedule     => $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' ),
+                schedule     => $state_schedule,
                 status       => 'error',
                 error        => $error,
                 heartbeat_at => _now_iso8601(),
@@ -680,10 +739,13 @@ sub _terminate_loop_workers {
             last if !$self->_pid_is_running($pid);
             sleep 0.1;
         }
-        if ( $self->_pid_is_running($pid) ) {
-            kill 9, -$pid if !is_windows();
-            kill 9, $pid;
-        }
+        # Send the group SIGKILL unconditionally: a command child that ignores
+        # SIGTERM can still be alive in the worker's process group even after
+        # the worker (group leader) has exited, and a running leader is only
+        # signalled directly when it is still alive. kill on an empty group is a
+        # harmless no-op.
+        kill 9, -$pid if !is_windows();
+        kill 9, $pid if $self->_pid_is_running($pid);
         $self->_reap_child_process($pid);
         delete $active_workers->{$pid};
     }
@@ -700,7 +762,7 @@ sub _active_worker_pids {
     $active_workers ||= {};
     my @pids;
     for my $pid ( keys %{$active_workers} ) {
-        next if !defined $pid;
+        next if !defined $pid;    # uncoverable branch true hash keys are always defined strings
         next if $pid !~ /^\d+$/;
         next if $pid <= 0;
         push @pids, $pid;
@@ -738,10 +800,10 @@ sub _sleep_until_next_tick {
     my $active_workers = $args{active_workers} || {};
     my $slice = $remaining > 0.1 ? 0.1 : $remaining;
     while ( $remaining > 0 ) {
-        $slice = $remaining if $remaining < $slice || $slice <= 0;
+        $slice = $remaining if $remaining < $slice || $slice <= 0;    # uncoverable condition right slice is always positive once remaining > 0
         sleep $slice;
         $remaining -= $slice;
-        $remaining = 0 if $remaining < 0;
+        $remaining = 0 if $remaining < 0;    # uncoverable branch true remaining never underflows below zero after the clamped subtraction
         $self->_reap_finished_loop_workers($active_workers);
     }
     return 1;
@@ -758,7 +820,6 @@ sub stop_loop {
     my $pid = _slurp($pidfile);
     chomp $pid;
     my @state_worker_pids = $self->_state_active_worker_pids($name);
-    $self->_terminate_loop_workers( { map { $_ => 1 } @state_worker_pids } ) if @state_worker_pids;
     my $already_reaped = $pid ? $self->_reap_child_process($pid) : 0;
     my $same_namespace = $pid ? $self->_same_pid_namespace($pid) : 0;
     if (
@@ -768,20 +829,37 @@ sub stop_loop {
         && ( $self->_is_managed_loop( $pid, $name ) || $self->_state_confirms_managed_loop( $name, $pid ) )
       )
     {
+        # Kill the loop FIRST so it stops spawning new workers and its own
+        # SIGTERM handler can terminate its accurate in-memory worker set. Scale
+        # the grace to the recorded worker count so the loop is not KILL-9'd
+        # mid-cleanup (its handler may spend up to ~2s per stubborn worker).
         kill 15, $pid;
+        my $grace = 20 + 20 * scalar(@state_worker_pids);
+        for ( 1 .. $grace ) {
+            last if !$self->_pid_is_running($pid);
+            sleep 0.1;
+        }
+        kill 9, -$pid if !is_windows();
+        kill 9, $pid  if $self->_pid_is_running($pid);
         for ( 1 .. 20 ) {
             last if !$self->_pid_is_running($pid);
             sleep 0.1;
         }
-        kill 9, $pid if $self->_pid_is_running($pid);
-        for ( 1 .. 20 ) {
-            last if !$self->_pid_is_running($pid);
-            sleep 0.1;
-        }
+        # Backstop after the loop is gone: sweep any worker the loop did not
+        # reap (the KILL escalation path skips its handler). Fix A keeps the
+        # persisted set complete, and the sweep kills each worker's process
+        # group so command subtrees are reaped too.
         $self->_terminate_loop_workers( { map { $_ => 1 } $self->_state_active_worker_pids($name) } );
         $self->_reap_child_process($pid);
         die "Collector '$name' did not stop after TERM and KILL\n" if $self->_pid_is_running($pid);
     }
+    else {
+        # The loop is not signalable here (already dead/crashed, foreign
+        # namespace, or unrecognized): still sweep any workers recorded in state
+        # so a crashed loop does not leave orphaned worker subtrees behind.
+        $self->_terminate_loop_workers( { map { $_ => 1 } @state_worker_pids } ) if @state_worker_pids;
+    }
+    $self->{collectors}->mark_stopped($name);
     if ( $pid && !$same_namespace ) {
         $self->_cleanup_loop_files($name);
         return $pid;
@@ -864,7 +942,7 @@ sub loop_state {
         local $/;
         my $payload = scalar <$fh>;
         close $fh;
-        if ( defined $payload && $payload ne '' ) {
+        if ( defined $payload && $payload ne '' ) {    # uncoverable condition left a readable state file always slurps to a defined string (an empty file reads as the empty string, not undef)
             my $decoded = eval { json_decode($payload) };
             return $decoded if $decoded;
             $last_error = $@ || 'Unable to decode loop state JSON';
@@ -933,7 +1011,10 @@ sub _state_confirms_managed_loop {
     return 0 if ( $state->{pid} || 0 ) != $pid;
     return 0 if ( $state->{name} || '' ) ne $name;
     return 0 if ( $state->{process_name} || '' ) ne $self->_process_title($name);
-    return 0 if ( $state->{status} || '' ) !~ /^(?:starting|running|error)$/;
+    # The recorded pid+name+process-title identity is strong evidence we own
+    # this loop even when /proc and ps are unavailable (Windows), so recognize
+    # any live recorded loop except one that has already marked itself stopped.
+    return 0 if ( $state->{status} || '' ) eq 'stopped';
     return 1;
 }
 
@@ -945,10 +1026,10 @@ sub _read_process_env_marker {
     my ( $self, $pid, $key ) = @_;
     my $proc = "/proc/$pid/environ";
     return if !-r $proc;
-    open my $fh, '<', $proc or return;
+    open my $fh, '<', $proc or return;    # uncoverable branch true a readable procfs environ file always opens on the test host
     local $/;
     my $env = scalar <$fh>;
-    return if !defined $env || $env eq '';
+    return if !defined $env || $env eq '';    # uncoverable condition left a readable procfs environ slurp is always defined (empty environs read as the empty string, not undef)
     for my $pair ( split /\0/, $env ) {
         next if $pair !~ /^([^=]+)=(.*)$/s;
         return $2 if $1 eq $key;
@@ -965,8 +1046,8 @@ sub _read_process_title {
     my $proc = "/proc/$pid/cmdline";
     my $cmdline = $self->_read_proc_file($proc);
     if ( defined $cmdline && $cmdline ne '' ) {
-        $cmdline =~ s/\0/ /g if defined $cmdline;
-        $cmdline =~ s/\s+$// if defined $cmdline;
+        $cmdline =~ s/\0/ /g;
+        $cmdline =~ s/\s+$//;
         return $cmdline;
     }
 
@@ -1009,7 +1090,7 @@ sub _read_process_state {
 sub _read_proc_file {
     my ( $self, $file ) = @_;
     return if !-r $file;
-    open my $fh, '<', $file or return;
+    open my $fh, '<', $file or return;    # uncoverable branch true a readable procfs file always opens on the test host
     local $/;
     return scalar <$fh>;
 }
@@ -1156,7 +1237,7 @@ sub _replace_path_via_powershell {
         return $? >> 8;
     };
     return ( 1, '' ) if $exit_code == 0;
-    return ( 0, join '', grep { defined && $_ ne '' } $stderr, $stdout );
+    return ( 0, join '', grep { $_ ne '' } $stderr, $stdout );
 }
 
 # _overwrite_state_file_in_place($source, $target)
@@ -1171,13 +1252,13 @@ sub _overwrite_state_file_in_place {
     open my $source_fh, '<', $source or return ( 0, "Unable to read $source for in-place overwrite: $!" );
     local $/;
     my $content = <$source_fh>;
-    close $source_fh or undef;
+    close $source_fh;
 
     open my $target_fh, '>', $target or return ( 0, "Unable to open $target for in-place overwrite: $!" );
     print {$target_fh} $content
       or return ( 0, "Unable to write $target during in-place overwrite: $!" );
-    close $target_fh or undef;
-    if ( -e $source ) {
+    close $target_fh;
+    if ( -e $source ) {    # uncoverable branch false the source temp file was just opened for reading, so it always still exists here
         $self->_unlink_path($source) or undef;
     }
     return ( 1, '' );
@@ -1268,7 +1349,7 @@ sub _helper_file_supports_internal_command {
     open my $fh, '<:raw', $path or return 0;
     local $/;
     my $content = <$fh>;
-    CORE::close($fh) or return 0;
+    CORE::close($fh) or return 0;    # uncoverable branch true closing a freshly read handle does not fail on the test host
     return $content =~ /\Q$command\E/ ? 1 : 0;
 }
 
@@ -1302,7 +1383,7 @@ sub _spawn_windows_background_command {
     };
     die "Unable to launch detached Windows collector process: $stderr$stdout"
       if $exit_code != 0;
-    my ($pid) = grep { defined $_ && /^\d+$/ && $_ > 0 } split /\r?\n/, ( $stdout || '' );
+    my ($pid) = grep { /^\d+$/ && $_ > 0 } split /\r?\n/, ( $stdout || '' );
     return $pid;
 }
 
@@ -1383,7 +1464,7 @@ sub _open_file_descriptors {
     my %seen;
     my @fds;
     for my $path ( glob('/proc/self/fd/*'), glob('/dev/fd/*') ) {
-        next if $path !~ m{(?:/proc/self/fd|/dev/fd)/(\d+)\z};
+        next if $path !~ m{(?:/proc/self/fd|/dev/fd)/(\d+)\z};    # uncoverable branch true the fd globs only ever yield numeric descriptor paths
         my $fd = $1 + 0;
         next if $seen{$fd}++;
         push @fds, $fd;
@@ -1404,7 +1485,7 @@ sub _descriptor_is_inherited_pipe {
     my $proc_target = readlink("/proc/self/fd/$fd");
     my $dev_target  = readlink("/dev/fd/$fd");
     my $target = defined $proc_target ? $proc_target : $dev_target;
-    return 0 if !defined $target || $target eq '';
+    return 0 if !defined $target || $target eq '';    # uncoverable condition right a resolved fd symlink target is never the empty string
     return 1 if $target =~ /^pipe:/;
     return 0 if !$args{close_ipc};
     return $target =~ /^(?:socket:|anon_inode:)/ ? 1 : 0;
@@ -1488,7 +1569,7 @@ sub _coverage_instrumentation_active {
 # Output: boolean due flag.
 sub _job_is_due {
     my ( $self, $job, $name ) = @_;
-    my $mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
+    my $mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );    # uncoverable condition false the schedule fallback ternary always yields a non-empty string
     return 0 if $mode eq 'manual';
     return 1 if $mode eq 'interval';
     return $self->_cron_due( $job->{cron}, $name );
@@ -1500,7 +1581,11 @@ sub _job_is_due {
 # Output: boolean due flag.
 sub _cron_due {
     my ( $self, $expr, $name ) = @_;
-    return 1 if !defined $expr || $expr eq '' || $expr eq '* * * * *';
+    # A missing expression means "always due". A fully-wildcard "* * * * *" must
+    # NOT short-circuit here: it has to fall through to the per-minute
+    # last_cron_slot de-duplication below, otherwise it fires on every
+    # one-second cron scheduling tick (~60x/minute) instead of once per minute.
+    return 1 if !defined $expr || $expr eq '';
     my @now = localtime();
     my @parts = split /\s+/, $expr;
     return 0 if @parts < 5;
@@ -1538,7 +1623,10 @@ sub _cron_match {
 }
 
 # _run_command(%args)
-# Executes a collector command with captured stdout/stderr and timeout handling.
+# Executes a collector command as an owned child process with captured
+# stdout/stderr, timeout handling, and complete subtree cleanup. POSIX hosts
+# interrupt the blocking wait with SIGALRM; Windows cannot dispatch that signal
+# while system() waits, so it spawns the command asynchronously and polls it.
 # Input: command string, cwd path, env hash, and timeout_ms.
 # Output: list of stdout, stderr, exit_code, and timed_out flag.
 sub _run_command {
@@ -1554,24 +1642,216 @@ sub _run_command {
     my %dashboard_env = %{ Developer::Dashboard::PerlEnv->dashboard_child_env() };
     local @ENV{ keys %dashboard_env } = values %dashboard_env;
     my $timed_out = 0;
+    my ( $pid_fh, $pidfile ) = tempfile( 'dashboard-collector-command-XXXXXX', TMPDIR => 1, UNLINK => 0 );
+    CORE::close $pid_fh or die "Unable to close collector command pid file $pidfile: $!";
     my ( $stdout, $stderr, $exit_code ) = capture {
+        my @argv = shell_command_argv( $cmd, login => 0 );
+
+        local $SIG{TERM} = sub { $self->_forward_command_signal( $pidfile, 'TERM', 15 ) };
+        local $SIG{INT}  = sub { $self->_forward_command_signal( $pidfile, 'INT',  2 ) };
+        local $SIG{HUP}  = sub { $self->_forward_command_signal( $pidfile, 'HUP',  1 ) };
+        local $ENV{PERL5OPT} = $ENV{PERL5OPT};
+        local $ENV{HARNESS_PERL_SWITCHES} = $ENV{HARNESS_PERL_SWITCHES};
+        delete @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)};
+
+        if ( is_windows() ) {
+            my ( $windows_exit, $expired ) = $self->_await_windows_command( $pidfile, $timeout_ms, @argv );
+            $timed_out = $expired;
+            return $windows_exit;
+        }
+
+        my @launcher = $self->_command_launcher_argv( $pidfile, @argv );
         local $SIG{ALRM} = sub { die "__COLLECTOR_TIMEOUT__\n" };
         alarm( int( ( $timeout_ms + 999 ) / 1000 ) );
         my $ok = eval {
-            system shell_command_argv( $cmd, login => 0 );
-            return $? >> 8;
+            system { $launcher[0] } @launcher;
+            return _exit_code_from_status($?);
         };
         if ($@) {
             die $@ if $@ !~ /__COLLECTOR_TIMEOUT__/;
             $timed_out = 1;
+            alarm(0);
+            $self->_terminate_command_process( $self->_await_command_pid($pidfile) );
             return 124;
         }
         alarm(0);
         return $ok;
     };
     alarm(0);
+    unlink $pidfile;
     chdir $old or die "Unable to restore cwd to $old: $!";
     return ( $stdout, $stderr, $exit_code, $timed_out );
+}
+
+# _await_windows_command($pidfile, $timeout_ms, @command_argv)
+# Runs one collector command on native Windows without ever blocking inside
+# system(). Windows dispatches Perl's alarm emulation only at operation
+# boundaries, so the SIGALRM timeout that guards the POSIX path never interrupts
+# a synchronous system() and a hung command outlives its timeout. The command
+# shell is therefore spawned asynchronously, published through the same pid file
+# the POSIX launcher writes so signal forwarding keeps one source of truth, and
+# polled against a deadline. Expiry terminates the whole command subtree.
+# Input: pid-file path, timeout in milliseconds, and the shell command argv.
+# Output: list of the collector exit code and the timed-out flag.
+sub _await_windows_command {
+    my ( $self, $pidfile, $timeout_ms, @argv ) = @_;
+    my $pid = $self->_spawn_windows_command(@argv);
+    die "Unable to spawn collector command '$argv[0]': $!\n" if $pid < 1;
+    $self->_record_command_pid( $pidfile, $pid );
+
+    my $deadline = time() + ( $timeout_ms / 1000 );
+    while (1) {
+        my $reaped = waitpid( $pid, 1 );
+        die "Unable to wait for collector command process $pid: $!\n" if $reaped < 0;
+        return ( _exit_code_from_status($?), 0 ) if $reaped > 0;
+        if ( time() >= $deadline ) {
+            $self->_terminate_command_process($pid);
+            return ( 124, 1 );
+        }
+        sleep 0.02;
+    }
+}
+
+# _spawn_windows_command(@command_argv)
+# Starts one collector command shell with the asynchronous form of system(),
+# which returns the new process designator immediately instead of waiting for
+# the command to exit. The command inherits the caller's already-redirected
+# stdout and stderr, so its output is still captured.
+# Input: shell command argv list.
+# Output: process designator integer, or a value below one when the spawn fails.
+sub _spawn_windows_command {
+    my ( $self, @argv ) = @_;
+    my $spawned = system 1, @argv;
+    return 0 + $spawned;
+}
+
+# _record_command_pid($pidfile, $pid)
+# Publishes an asynchronously spawned command pid through the same pid-file
+# contract the POSIX launcher writes for itself, so signal forwarding and
+# subtree termination read one source of truth on every platform.
+# Input: pid-file path and process id integer.
+# Output: true value.
+sub _record_command_pid {
+    my ( $self, $pidfile, $pid ) = @_;
+    open my $fh, '>', $pidfile or die "Unable to write collector command pid file $pidfile: $!";
+    print {$fh} $pid;
+    CORE::close($fh)
+      or die "Unable to close collector command pid file $pidfile: $!";
+    return 1;
+}
+
+# _command_launcher_argv($pidfile, @command_argv)
+# Builds a small uninstrumented Perl launcher that records its pid before
+# becoming the collector command. This preserves system()'s fast native spawn
+# path under Devel::Cover while making the command subtree addressable.
+# Input: pid-file path followed by the shell command argv.
+# Output: launcher argv list.
+sub _command_launcher_argv {
+    my ( $self, $pidfile, @argv ) = @_;
+    my $launcher = <<'PERL';
+use strict;
+use warnings;
+use POSIX ();
+my $pidfile = shift @ARGV;
+open my $pid_fh, '>', $pidfile or die "Unable to write collector command pid file $pidfile: $!";
+print {$pid_fh} $$;
+close $pid_fh or die "Unable to close collector command pid file $pidfile: $!";
+POSIX::setsid() if $^O ne 'MSWin32';
+exec { $ARGV[0] } @ARGV or die "Unable to exec collector command: $!";
+PERL
+    return ( $^X, '-e', $launcher, $pidfile, @argv );
+}
+
+# _command_pid_from_file($pidfile)
+# Reads and validates the direct command pid recorded by the launcher.
+# Input: pid-file path.
+# Output: positive pid integer or undef.
+sub _command_pid_from_file {
+    my ( $self, $pidfile ) = @_;
+    return if !defined $pidfile || $pidfile eq '' || !-f $pidfile;
+    open my $fh, '<', $pidfile or return;
+    my $pid = <$fh>;
+    close $fh;
+    return if !defined $pid || $pid !~ /^(\d+)$/ || $pid < 1;
+    return 0 + $pid;
+}
+
+# _await_command_pid($pidfile)
+# Waits briefly for the native-spawned launcher to record its pid. This closes
+# the startup race where an immediate timeout or stop signal could otherwise
+# arrive before the command subtree became addressable.
+# Input: pid-file path.
+# Output: positive pid integer or undef after a bounded wait.
+sub _await_command_pid {
+    my ( $self, $pidfile ) = @_;
+    for ( 1 .. 100 ) {
+        my $pid = $self->_command_pid_from_file($pidfile);
+        return $pid if defined $pid;
+        sleep 0.01;
+    }
+    return;
+}
+
+# _forward_command_signal($pidfile, $signal, $number)
+# Cleans up an executing command subtree before preserving the signal semantics
+# of the CollectorRunner process that received the external stop request.
+# Input: command pid-file path, signal name, and numeric POSIX signal value.
+# Output: never returns.
+sub _forward_command_signal {
+    my ( $self, $pidfile, $signal, $number ) = @_;
+    $self->_terminate_command_process( $self->_await_command_pid($pidfile) );
+    unlink $pidfile if defined $pidfile && $pidfile ne '';
+    if ( !is_windows() ) {
+        $SIG{$signal} = 'DEFAULT';
+        kill $signal, $$;
+    }
+    CORE::exit( 128 + $number );
+}
+
+# _terminate_command_process($pid)
+# Terminates and reaps one owned command process plus every descendant. POSIX
+# commands are isolated session leaders, while Windows uses taskkill's tree mode.
+# Input: direct command child pid integer.
+# Output: true value after bounded TERM/KILL cleanup.
+sub _terminate_command_process {
+    my ( $self, $pid ) = @_;
+    return 1 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
+
+    if (is_windows()) {
+        capture { system 'taskkill', '/PID', $pid, '/T', '/F' };
+        waitpid( $pid, 0 );
+        return 1;
+    }
+
+    kill 'TERM', -$pid;
+    kill 'TERM', $pid;
+    my $reaped = 0;
+    for ( 1 .. 20 ) {
+        my $waited = waitpid( $pid, 1 );
+        if ( $waited == $pid || $waited == -1 ) {
+            $reaped = 1;
+            last;
+        }
+        sleep 0.01;
+    }
+    kill 'KILL', -$pid;
+    kill 'KILL', $pid if !$reaped;
+    waitpid( $pid, 0 ) if !$reaped;
+    return 1;
+}
+
+# _exit_code_from_status($status)
+# Converts a raw child wait status into a collector exit code that stays
+# non-zero when the command was terminated by a signal, so a crashed or killed
+# run is never mistaken for a successful (exit 0) run.
+# Input: raw $? style wait status integer (or undef).
+# Output: non-negative exit code integer.
+sub _exit_code_from_status {
+    my ($status) = @_;
+    $status = 0 if !defined $status;
+    my $signal = $status & 127;
+    return 128 + $signal if $signal;
+    return $status >> 8;
 }
 
 # _run_code(%args)

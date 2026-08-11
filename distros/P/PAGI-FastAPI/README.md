@@ -17,10 +17,10 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
         version => '1.0.0',
     );
 
-    # 1. Add CORS Support
+    # 1. Add CORS Support (delegates to PAGI::Middleware::CORS from PAGI::Tools)
     $app->add_cors(
-        allow_origins => ['https://example.com'],
-        allow_methods => ['GET', 'POST'],
+        origins => ['https://example.com'],
+        methods => ['GET', 'POST'],
     );
 
     # 2. Add Authentication Middleware Hook

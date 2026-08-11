@@ -2,7 +2,7 @@ package CryptX;
 
 use strict;
 use warnings ;
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
@@ -193,6 +193,9 @@ Use these only when authentication is handled separately or not needed:
 
 =item * B<CBC> (L<Crypt::Mode::CBC>) - Classic mode, needs padding. Prefer CTR or an AEAD mode.
 
+=item * B<XTS> (L<Crypt::Mode::XTS>) - For encrypting storage in place (disk sectors); one tweaked
+data unit per call. Not for data that travels.
+
 =item * B<ECB> (L<Crypt::Mode::ECB>) - B<Insecure for most uses.> Each block encrypted independently.
 
 =back
@@ -332,7 +335,7 @@ L<Crypt::Cipher::Twofish>, L<Crypt::Cipher::XTEA>
 
 =item * Block cipher modes
 
-L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::ECB>, L<Crypt::Mode::OFB>
+L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::ECB>, L<Crypt::Mode::OFB>, L<Crypt::Mode::XTS>
 
 =item * Stream ciphers
 
@@ -346,7 +349,7 @@ L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt:
 =item * Hash functions
 
 L<Crypt::Digest::BLAKE2b_160>, L<Crypt::Digest::BLAKE2b_256>, L<Crypt::Digest::BLAKE2b_384>, L<Crypt::Digest::BLAKE2b_512>,
-L<Crypt::Digest::BLAKE2s_128>, L<Crypt::Digest::BLAKE2s_160>, L<Crypt::Digest::BLAKE2s_224>, L<Crypt::Digest::BLAKE2s_256>,
+L<Crypt::Digest::BLAKE2s_128>, L<Crypt::Digest::BLAKE2s_160>, L<Crypt::Digest::BLAKE2s_224>, L<Crypt::Digest::BLAKE2s_256>, L<Crypt::Digest::BLAKE3>,
 L<Crypt::Digest::CHAES>, L<Crypt::Digest::MD2>, L<Crypt::Digest::MD4>, L<Crypt::Digest::MD5>, L<Crypt::Digest::RIPEMD128>, L<Crypt::Digest::RIPEMD160>,
 L<Crypt::Digest::RIPEMD256>, L<Crypt::Digest::RIPEMD320>, L<Crypt::Digest::SHA1>, L<Crypt::Digest::SHA224>, L<Crypt::Digest::SHA256>, L<Crypt::Digest::SHA384>,
 L<Crypt::Digest::SHA512>, L<Crypt::Digest::SHA512_224>, L<Crypt::Digest::SHA512_256>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool>,

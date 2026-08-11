@@ -65,11 +65,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.44
+Version 0.45
 
 =cut
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 =head1 SYNOPSIS
 
@@ -2322,12 +2322,22 @@ sub _detect_accessor_methods {
 				};
 			}
 		}
+		# Set position 0 on whichever single input parameter already exists.
+		# The parameter may be named differently from the stored property
+		# (e.g. $dir for the logdir property), so find the existing key
+		# rather than creating a new entry keyed by $property — doing the
+		# latter produces a duplicate-position collision between the real
+		# param and the spurious $property key.
 		if(ref($schema->{input}) eq 'HASH') {
-			if(scalar keys(%{$schema->{input}}) > 1) {
+			my @input_keys = keys %{$schema->{input}};
+			if(scalar @input_keys > 1) {
 				croak(__PACKAGE__, ': A getset accessor function can have at most one argument');
+			} elsif(@input_keys == 1) {
+				$schema->{input}{$input_keys[0]}{position} = 0;
+			} else {
+				$schema->{input}{$property}{position} = 0;
 			}
 		}
-		$schema->{input}->{$property}->{position} = 0;
 	} elsif ($code =~ /return\s+\$self\s*->\s*\{\s*['"]?([^}'"]+)['"]?\s*\}\s*;/) {
 		# -------------------------------
 		# Getter
@@ -3216,6 +3226,15 @@ use Type::Params -sigs;
 use Types::Common -types;
 use JSON::MaybeXS;
 
+# Apply address-space limit passed from parent via env.  Done here (in the
+# child) rather than in the parent so the parent's memory is never capped.
+if (my $limit = $ENV{_ATG_RLIMIT_AS}) {
+    eval {
+        require BSD::Resource;
+        BSD::Resource::setrlimit(BSD::Resource::RLIMIT_AS(), $limit, $limit);
+    };
+}
+
 # Stub sub so Perl can parse it
 sub FUNCTION_NAME {}
 
@@ -3241,8 +3260,11 @@ my @params;
 # }
 
 for my $p (@sig_params) {
+	my $name = ($p->can('name') && defined($p->name) && length($p->name))
+		? $p->name
+		: "arg$pos";
 	push @params, {
-		name => "arg$pos",
+		name => $name,
 		optional => $p->optional ? 1 : 0,
 		position => $pos,
 		type => $p->type->name
@@ -3278,18 +3300,13 @@ PERL
 	my ($wtr, $rdr, $err) = (undef, undef, gensym);
 	local %ENV;
 
-	# Apply memory limit if BSD::Resource is available.
-	# This module is Unix-only and not available on Windows,
-	# so we guard the call and skip silently if not present.
-	eval {
-		require BSD::Resource;
-		BSD::Resource::setrlimit(
-			BSD::Resource::RLIMIT_AS(),
-			$MEMORY_LIMIT_BYTES,
-			$MEMORY_LIMIT_BYTES
-		);
-	};
-	# Ignore failure — resource limiting is best-effort only
+	# Pass the memory limit to the child via env so the child can apply
+	# setrlimit on itself after exec.  Must NOT call setrlimit here in the
+	# parent: setrlimit(RLIMIT_AS) constrains the parent's own address
+	# space, and when the parent later tries to allocate memory for test
+	# framework teardown it would OOM and crash inside the Test::Builder
+	# subtest context, producing a "context destroyed" error.
+	$ENV{_ATG_RLIMIT_AS} = $MEMORY_LIMIT_BYTES;
 
 	my $pid = open3($wtr, $rdr, $err, $^X, '-T');
 
@@ -3311,7 +3328,20 @@ PERL
 		return;
 	}
 
-	return decode_json($stdout);
+	# Child may be killed by the kernel OOM killer (SIGKILL) before it can
+	# write anything to stdout or stderr.  Guard both cases so we degrade
+	# gracefully rather than croaking with "malformed JSON".
+	if (!defined($stdout) || !length($stdout)) {
+		carp 'Signature subprocess produced no output' if $self->{verbose};
+		return;
+	}
+
+	my $result = eval { decode_json($stdout) };
+	if ($@) {
+		carp "Error decoding signature output: $@" if $self->{verbose};
+		return;
+	}
+	return $result;
 }
 
 # --------------------------------------------------
@@ -7959,7 +7989,7 @@ sub _write_schema {
 		function => $method_name,
 		module => $package_name,
 		config => {
-			close_stdin => 0,
+			close_stdin => 1,
 			dedup => 1,
 			test_nuls => 0,
 			test_undef => 0,

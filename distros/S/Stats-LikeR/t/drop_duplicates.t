@@ -240,9 +240,15 @@ no_leaks_ok {
 
 	srand(20260808);
 	my @rand;
-	for (1 .. 40_000) {                       # arbitrary bit patterns
-		my $x = unpack 'd', pack 'Q', (int(rand 2**32) << 32) | int(rand 2**32);
-		push @rand, $x if $x == $x && abs($x) != 9**9**9;
+	# Arbitrary bit patterns, assembled from two 32-bit halves: 'Q' and a 32-bit
+	# shift both need a 64-bit-integer perl, 'L2' runs anywhere.
+	if (length(pack 'd', 0) == 8) {
+		for (1 .. 40_000) {
+			my $x = unpack 'd', pack 'L2', int(rand 2**32), int(rand 2**32);
+			push @rand, $x if $x == $x && abs($x) != 9**9**9;
+		}
+	} else {                                  # no 8-byte double: exponent sweep
+		push @rand, rand() * 10 ** (int(rand 600) - 300) for 1 .. 40_000;
 	}
 	is($mismatch->(@rand), '', 'random doubles group by stringification');
 

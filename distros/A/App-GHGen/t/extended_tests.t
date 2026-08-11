@@ -163,31 +163,6 @@ subtest 'Analyzer::get_cache_suggestion - unknown ecosystem returns guidance pro
 	unlike($suggestion, qr/actions\/cache/,    'generic guidance does not include a cache action snippet');
 };
 
-# DEAD CODE NOTICE:
-# Analyzer::has_deployment_steps() is defined in Analyzer.pm but is NOT
-# exported in @EXPORT_OK and is NOT called by analyze_workflow(). It is
-# unreachable through any public interface.  Flag for review:
-# sub has_deployment_steps { ... }  # lines 492-505
-# Recommend: either export it, call it from analyze_workflow, or remove it.
-
-subtest 'Analyzer::has_deployment_steps (internal) - deploy action detected' => sub {
-	# Call through fully-qualified name to verify the function exists and works,
-	# even though it is not reachable via any exported path.
-	my $wf_deploy = {
-		jobs => {
-			deploy => {
-				steps => [{ uses => 'my-org/deploy-action@v1' }],
-			},
-		},
-	};
-	my $wf_clean = { jobs => { build => { steps => [{ run => 'echo ok' }] } } };
-	ok(App::GHGen::Analyzer::has_deployment_steps($wf_deploy), 'deploy action detected');
-	ok(!App::GHGen::Analyzer::has_deployment_steps($wf_clean),  'no deploy steps → false');
-
-	diag('NOTE: has_deployment_steps is dead code — not called from analyze_workflow or exported')
-		if $ENV{TEST_VERBOSE};
-};
-
 # =============================================================================
 # 2.  App::GHGen::CostEstimator — uncovered branches
 # =============================================================================

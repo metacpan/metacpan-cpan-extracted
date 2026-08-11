@@ -61,10 +61,27 @@ else {
 my $missing_updates_root = tempdir( CLEANUP => 1 );
 my $missing_updates_path = $missing_updates_root . '/does-not-exist';
 {
+    package Local::TrackingUpdateRunner;
+
+    sub new { return bless { stopped => [], started => [] }, shift }
+    sub running_loops { return ({ name => 'alpha' }) }
+    sub stop_loop { push @{ $_[0]->{stopped} }, $_[1]; return }
+    sub start_loop { push @{ $_[0]->{started} }, $_[1]; return }
+}
+{
     no warnings 'redefine';
     local *Developer::Dashboard::UpdateManager::updates_dir = sub { $missing_updates_path };
-    my $missing_result = $updater->run;
+    my $tracking_runner = Local::TrackingUpdateRunner->new;
+    my $tracking_updater = Developer::Dashboard::UpdateManager->new(
+        config => $config,
+        files  => $files,
+        paths  => $paths,
+        runner => $tracking_runner,
+    );
+    my $missing_result = $tracking_updater->run;
     is_deeply( $missing_result, [], 'update returns an empty step list when the checkout-only updates directory is absent' );
+    is_deeply( $tracking_runner->{stopped}, [], 'missing updates directory leaves active collectors running' );
+    is_deeply( $tracking_runner->{started}, [], 'missing updates directory does not restart untouched collectors' );
 }
 
 done_testing;

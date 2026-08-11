@@ -20,9 +20,9 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok      { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is      { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
-sub isnt    { my($g,$e,$n)=@_; $T++; !defined($g)||("$g" ne "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (both='$g')\n") }
+sub ok      { my($c, $n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is      { my($g, $e, $n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
+sub isnt    { my($g, $e, $n)=@_; $T++; !defined($g)||("$g" ne "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (both='$g')\n") }
 
 use File::Path ();
 use File::Spec ();
@@ -432,7 +432,7 @@ ok(defined $dbh, "reconnect for tests");
     ok(scalar @$tables >= 1,      "at least 1 table");
 
     # ok 70
-    { my @tn=map{$_->{TABLE_NAME}}@$tables; ok(scalar(grep{$_ eq 'emp'}@tn),"emp in table_info"); }
+    { my @tn=map{$_->{TABLE_NAME}}@$tables; ok(scalar(grep{$_ eq 'emp'}@tn), "emp in table_info"); }
 
     my $cols = $dbh->column_info('emp');
 

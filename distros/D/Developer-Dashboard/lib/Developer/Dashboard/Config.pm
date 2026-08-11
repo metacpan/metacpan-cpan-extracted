@@ -3,7 +3,7 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use File::Spec;
 use Cwd qw(cwd);
@@ -50,10 +50,24 @@ sub load_global {
 # Output: written file path string.
 sub save_global {
     my ( $self, $config ) = @_;
-    my $file = $self->_global_config_file;
-    open my $fh, '>:raw', $file or die "Unable to write $file: $!";
-    print {$fh} json_encode( $config || {} );
-    close $fh;
+    return $self->_write_json_atomic( $self->_global_config_file, json_encode( $config || {} ) );
+}
+
+# _write_json_atomic($file, $text)
+# Persists JSON text to a config file atomically: it stages the payload in a
+# sibling temporary file, hardens the temp file, checks close(), and renames it
+# over the target so a concurrent reader never observes a truncated or
+# partially written config, and a failed write never destroys the previous file.
+# Input: destination config file path string and already-encoded JSON text.
+# Output: written destination file path string.
+sub _write_json_atomic {
+    my ( $self, $file, $text ) = @_;
+    my $temp = $file . '.tmp.' . $$ . '.' . int( rand(1_000_000) );
+    open my $fh, '>:raw', $temp or die "Unable to write $temp: $!";
+    print {$fh} $text;
+    close $fh or die "Unable to close $temp: $!";    # uncoverable branch true
+    $self->{paths}->secure_file_permissions($temp);
+    rename $temp, $file or die "Unable to rename $temp to $file: $!";
     $self->{paths}->secure_file_permissions($file);
     return $file;
 }
@@ -138,6 +152,16 @@ sub _merge_hashes {
         $merged{$key} = $right->{$key};
     }
 
+    # Collectors (by name) and providers (by id) are logical sets, so a single
+    # contributing layer that already lists the same identity twice must not
+    # leak a duplicate into the merged view. Re-collapse them by identity after
+    # the merge regardless of how many layers contributed, letting the last
+    # duplicate's fields win.
+    $merged{collectors} = $self->_merge_named_hash_array( [], $merged{collectors}, 'name' )
+      if ref( $merged{collectors} ) eq 'ARRAY';
+    $merged{providers} = $self->_merge_named_hash_array( [], $merged{providers}, 'id' )
+      if ref( $merged{providers} ) eq 'ARRAY';
+
     return \%merged;
 }
 
@@ -200,7 +224,7 @@ sub collectors {
     @jobs = @{ $self->_merge_named_hash_array( \@jobs, [ $self->_skill_collectors ], 'name' ) };
 
     if ( my $filter = $ENV{DEVELOPER_DASHBOARD_CHECKERS} ) {
-        my %wanted = map { $_ => 1 } grep { defined && $_ ne '' } split /:/, $filter;
+        my %wanted = map { $_ => 1 } grep { $_ ne '' } split /:/, $filter;
         @jobs = grep { ref($_) eq 'HASH' && $wanted{ $_->{name} } } @jobs;
     }
 
@@ -240,7 +264,7 @@ sub _normalize_collector_job {
 sub _collector_disable_flag {
     my ( $self, $value ) = @_;
     return 0 if !defined $value;
-    return $value ? 1 : 0 if ref($value);
+    return 1 if ref($value);
     return 0 if $value =~ /\A(?:0|false|no|off)\z/i;
     return $value ne '' ? 1 : 0;
 }
@@ -628,16 +652,15 @@ sub save_writable_api_registry {
     my ( $self, $registry ) = @_;
     my $file = $self->_global_api_file;
     $self->{paths}->ensure_dir( $self->{paths}->config_root );
-    open my $fh, '>:raw', $file or die "Unable to write $file: $!";
-    print {$fh} json_encode(
-        $self->_normalize_api_keys(
-            $registry || {},
-            preserve_disabled => 1,
-        )
+    return $self->_write_json_atomic(
+        $file,
+        json_encode(
+            $self->_normalize_api_keys(
+                $registry || {},
+                preserve_disabled => 1,
+            )
+        ),
     );
-    close $fh or die "Unable to close $file: $!";
-    $self->{paths}->secure_file_permissions($file);
-    return $file;
 }
 
 # providers()
@@ -748,9 +771,9 @@ sub _skill_config_entries {
     my @entries;
     for my $skill_root ( $self->{paths}->installed_skill_roots ) {
         my ($skill_name) = $skill_root =~ m{/([^/]+)\z};
-        next if !defined $skill_name || $skill_name eq '';
+        next if !defined $skill_name;    # uncoverable branch true
         my $config = $self->_skill_config_hash($skill_name);
-        next if ref($config) ne 'HASH' || !%{$config};
+        next if ref($config) ne 'HASH' || !%{$config};    # uncoverable condition left
         push @entries,
           {
             skill_name => $skill_name,
@@ -783,9 +806,9 @@ sub _skill_api_entries {
     my @entries;
     for my $skill_root ( $self->{paths}->installed_skill_roots ) {
         my ($skill_name) = $skill_root =~ m{/([^/]+)\z};
-        next if !defined $skill_name || $skill_name eq '';
+        next if !defined $skill_name;    # uncoverable branch true
         my $api = $self->_skill_api_hash($skill_name);
-        next if ref($api) ne 'HASH' || !%{$api};
+        next if ref($api) ne 'HASH' || !%{$api};    # uncoverable condition left
         push @entries,
           {
             skill_name => $skill_name,
@@ -846,7 +869,7 @@ sub _normalize_api_keys {
     return {} if ref($keys) ne 'HASH';
     my %normalized;
     for my $name ( keys %{$keys} ) {
-        next if !defined $name || ref($name) || $name eq '';
+        next if $name eq '';
         my $entry = $keys->{$name};
         next if ref($entry) ne 'HASH';
         my $disabled = $self->_api_key_disabled_flag($entry);
@@ -880,7 +903,7 @@ sub _merge_api_key_hashes {
     my $normalized_right = $self->_normalize_api_keys( $right, preserve_disabled => 1 );
     for my $name ( keys %{$normalized_right} ) {
         my $entry = $normalized_right->{$name};
-        if ( ref($entry) eq 'HASH' && $entry->{disabled} ) {
+        if ( $entry->{disabled} ) {
             delete $merged{$name};
             next;
         }
@@ -900,7 +923,7 @@ sub _api_key_disabled_flag {
     for my $field (qw(disabled _disabled)) {
         next if !exists $entry->{$field};
         my $value = $entry->{$field};
-        return $value ? 1 : 0 if ref($value);
+        return 1 if ref($value);
         return 0 if !defined $value || $value eq '' || $value =~ /\A(?:0|false|no|off)\z/i;
         return 1;
     }

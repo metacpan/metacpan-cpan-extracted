@@ -1223,4 +1223,90 @@ subtest 'Generator::generate(): statement-injection-shaped function name is reje
 	ok(!-e $outfile, 'no output file was written once the malicious identifier was rejected');
 };
 
+subtest '_compile_signature_isolated: pathological subprocess outputs are handled gracefully' => sub {
+	# Covers three hostile subprocess scenarios:
+	#   1. SIGKILL before any write  — stdout empty, stderr empty
+	#   2. Corrupt/truncated output  — stdout non-JSON, stderr empty
+	#   3. Only stderr output        — stdout empty, stderr has message
+	#
+	# In every case the parent must return undef rather than croaking with
+	# "malformed JSON string" (regression: the croak used to propagate through
+	# Test::Builder's subtest boundary and exit the process with code 255).
+	#
+	# Strategy: mock open3 in the consuming namespace so no real subprocess
+	# is spawned; waitpid($$, 0) on our own PID returns -1 harmlessly.
+
+	my $make_extractor = sub {
+		bless { allow_signature_exec => 1, verbose => 0 },
+			'App::Test::Generator::SchemaExtractor';
+	};
+
+	my $mock_open3 = sub {
+		my ($stdout_content, $stderr_content) = @_;
+		open my $fake_rdr, '<', \$stdout_content or die;
+		open my $fake_err, '<', \$stderr_content or die;
+		no warnings 'redefine';
+		local *App::Test::Generator::SchemaExtractor::open3 = sub {
+			$_[0] = do { open my $fh, '>', \my $buf; $fh };
+			$_[1] = $fake_rdr;
+			$_[2] = $fake_err;
+			return $$;
+		};
+		return;
+	};
+
+	{
+		my $empty = '';
+		open my $fake_rdr, '<', \$empty or die;
+		open my $fake_err, '<', \$empty or die;
+		no warnings 'redefine';
+		local *App::Test::Generator::SchemaExtractor::open3 = sub {
+			$_[0] = do { open my $fh, '>', \my $buf; $fh };
+			$_[1] = $fake_rdr;
+			$_[2] = $fake_err;
+			return $$;
+		};
+		my $result;
+		lives_ok { $result = $make_extractor->()->_compile_signature_isolated('f', '(positional => [])') }
+			'silent kill (empty stdout + stderr) → does not croak';
+		is($result, undef, 'silent kill → undef returned');
+	}
+
+	{
+		my $garbage = '}{not json[';
+		my $empty   = '';
+		open my $fake_rdr, '<', \$garbage or die;
+		open my $fake_err, '<', \$empty   or die;
+		no warnings 'redefine';
+		local *App::Test::Generator::SchemaExtractor::open3 = sub {
+			$_[0] = do { open my $fh, '>', \my $buf; $fh };
+			$_[1] = $fake_rdr;
+			$_[2] = $fake_err;
+			return $$;
+		};
+		my $result;
+		lives_ok { $result = $make_extractor->()->_compile_signature_isolated('f', '(positional => [])') }
+			'corrupt JSON stdout → does not croak';
+		is($result, undef, 'corrupt JSON stdout → undef returned');
+	}
+
+	{
+		my $empty  = '';
+		my $errmsg = "Compilation failed\n";
+		open my $fake_rdr, '<', \$empty  or die;
+		open my $fake_err, '<', \$errmsg or die;
+		no warnings 'redefine';
+		local *App::Test::Generator::SchemaExtractor::open3 = sub {
+			$_[0] = do { open my $fh, '>', \my $buf; $fh };
+			$_[1] = $fake_rdr;
+			$_[2] = $fake_err;
+			return $$;
+		};
+		my $result;
+		lives_ok { $result = $make_extractor->()->_compile_signature_isolated('f', '(positional => [])') }
+			'subprocess stderr output → does not croak';
+		is($result, undef, 'subprocess stderr output → undef returned');
+	}
+};
+
 done_testing();

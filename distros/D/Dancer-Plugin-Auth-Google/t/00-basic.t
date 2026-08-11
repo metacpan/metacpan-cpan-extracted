@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 use Test::More import => ['!pass'];
-plan tests => 6;
+plan tests => 8;
 
 {
     use Dancer;
+    use Dancer::Plugin::Auth::Google;
 
-    # settings must be loaded before we load the plugin
     setting( plugins => {
         'Auth::Google' => {
             client_id        => 1234,
@@ -18,10 +18,6 @@ plan tests => 6;
             scope            => 'profile email whatever',
         },
     });
-
-    eval 'use Dancer::Plugin::Auth::Google';
-    die $@ if $@;
-    ok 1, 'plugin loaded successfully';
 
     ok auth_google_init(), 'able to load auth_google_init()';
 
@@ -37,6 +33,11 @@ plan tests => 6;
         response_type => 'code',
     );
     ok $u->eq($expected), "$u looks like $expected";
+
+    ok my $u2 = auth_google_authenticate_url( extra => 'moar data', and => 42 ), 'augmented authenticate url';
+    isa_ok $u2, 'URI';
+    $expected->query_form( $expected->query_form(), extra => 'moar data', and => 42 );
+    ok $u2->eq($expected), "$u2 looks like $expected";
 }
 
 use Dancer::Test;

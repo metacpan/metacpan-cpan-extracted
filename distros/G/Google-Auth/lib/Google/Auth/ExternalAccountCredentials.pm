@@ -67,9 +67,7 @@ has ua => (
   },
 );
 
-has '+_is_universe_pinned' => (
-  default => sub { 0 },
-);
+has '+_is_universe_pinned' => (default => sub { 0 },);
 
 around BUILDARGS => sub {
   my ($orig, $class, @args) = @_;
@@ -108,7 +106,9 @@ sub BUILD {
 
   # Only skip environment_id validation if we are in the AWS subclass
   if (!$self->isa('Google::Auth::ExternalAccountCredentials::Aws')) {
-    if (exists $source->{environment_id} && defined $source->{environment_id}) {
+    if (exists $source->{environment_id}
+      && defined $source->{environment_id})
+    {
       Google::Auth::Error->throw(
         'Invalid Identity Pool credential_source field \'environment_id\'');
     }
@@ -140,7 +140,8 @@ sub BUILD {
         'Invalid credential_source format ' . $format_type);
     }
 
-    if ($format_type eq 'json' && !defined $format->{subject_token_field_name})
+    if ($format_type eq 'json'
+      && !defined $format->{subject_token_field_name})
     {
       Google::Auth::Error->throw(
         'Missing subject_token_field_name for JSON credential_source format');
@@ -186,7 +187,9 @@ sub retrieve_subject_token {
       'Could not open credential source file ' . $source_name . ': ' . $!);
     local $/;
     $content = <$fh>;
-    close($fh);
+    close($fh)
+      or Google::Auth::Error->throw(
+      'Could not close credential source file ' . $source_name . ': ' . $!);
   } else {
     $source_name = $source->{url};
     my $headers = $source->{headers} // {};
@@ -203,8 +206,10 @@ sub retrieve_subject_token {
     if (!$response->is_success) {
       $log->errorf('Failed to fetch subject token from URL %s: %s',
         $source_name, $response->status_line);
-      Google::Auth::Error->throw('Failed to retrieve subject token from URL ' .
-          $source_name . ': ' . $response->status_line);
+      Google::Auth::Error->throw(
+        'Failed to retrieve subject token from URL ' .
+          $source_name . ': ' .
+          $response->status_line);
     }
     $content = $response->decoded_content;
   }

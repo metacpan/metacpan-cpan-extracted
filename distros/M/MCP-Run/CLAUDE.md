@@ -25,7 +25,7 @@ p5-mcp-run/
 │           ├── Bash.pm    # bash -c Execution via IPC::Open3
 │           └── Compress.pm # Filter-Pipeline (30+ Filter)
 ├── t/                     # Tests
-├── dist.ini               # [@Author::GETTY] + run_after_release
+├── dist.ini               # [@Author::GETTY] + [@Author::GETTY::Docker]
 └── Dockerfile             # Multi-stage build
 ```
 
@@ -110,13 +110,10 @@ installierbar (`raudssus/mcp-run-compress`) — kein Perl auf dem Host nötig.
 - `t/10-bash.t` – Bash Execution, allowlist, validator, timeout, format_result
 - `t/20-integration.t` – MCP lifecycle (initialize, tools/list, tools/call)
 - `t/compress.t` – Compression Tests
+- `t/30-no-warnings.t` – Regression: Compress.pm warnings (transform returning undef, undef inputs)
+- `t/40-compress-bin.t` – `bin/mcp-run-compress`: `--hook` (native + docker rewrite, bypasses, malformed), `--install-claude` (settings patching, idempotent, docker mode), `--filter-files`, end-to-end MCP compression mit echtem command context (`--b64`, incl. ls-Filter)
 
-**Fehlende Tests:**
-- `bin/mcp-run-compress --hook` (PreToolUse JSON)
-- `bin/mcp-run-compress --install-claude` (settings.json patching)
-- Docker Rewrite
-- `--filter-files`
-- MCP-server Compression mit echter command context (Filter-Match end-to-end)
+Die früher hier gelisteten „Fehlenden Tests" (`--hook`, `--install-claude`, Docker Rewrite, `--filter-files`, end-to-end MCP Compression) werden allesamt von `t/40-compress-bin.t` abgedeckt.
 
 ## Troubleshooting
 
@@ -134,11 +131,14 @@ installierbar (`raudssus/mcp-run-compress`) — kein Perl auf dem Host nötig.
 
 ```bash
 dzil release
-# mit Docker multi-arch:
-MCP_RUN_DOCKER_BUILD_ARGS='--platform linux/amd64,linux/arm64' dzil release
 ```
 
-`run_after_release` macht: GitHub Release + Docker Hub push.
+`[@Author::GETTY]` macht das Release: `GitHub::CreateRelease` legt das GitHub-Release
+an (CPAN-Tarball als Asset, ChangeLog-Notes) und `[@Author::GETTY::Docker / compress]`
+baut+pusht das Docker-Image (`raudssus/mcp-run-compress`, `MCP_RUN_VERSION` build-arg,
+`compress` stage — nur der Compress-Hook, nicht die mcp-run-bash Runtime). Braucht
+`~/.github-identity` und `docker login`. `dzil build`/`dzil test` bauen das Image
+mit (Dev-Loop `prove -lr t/` unberührt).
 
 ## Links
 
@@ -186,9 +186,8 @@ principle and lane are in `.claude/rules/mcp-run-rules.md`.
 
 | Task | Agent |
 |---|---|
-| Implement / refactor / debug behavior-relevant code | `mcp-run-worker` (default) |
-| Pre-release audit | `mcp-run-release-checker` |
+| Implement / refactor / debug behavior-relevant code | `mcp-run-worker` |
 
-The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
+The agent carries its skills via `briefing.skills` (see `.claude/agents/`); the main
 agent delegates rather than loading them. Skill sources live under `.claude/skills/`.
 The karr board (`refs/karr/*`) is the internal coordination channel.

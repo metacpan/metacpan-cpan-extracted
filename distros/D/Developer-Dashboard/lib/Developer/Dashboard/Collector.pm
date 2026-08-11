@@ -3,7 +3,7 @@ package Developer::Dashboard::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Fcntl qw(:flock);
 use File::Spec;
@@ -11,7 +11,7 @@ use POSIX qw(strftime);
 use Time::HiRes qw(time);
 use Time::Local qw(timegm);
 
-use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::JSON qw(json_encode json_decode json_decode_state);
 
 # new(%args)
 # Constructs the collector storage manager.
@@ -74,7 +74,7 @@ sub read_job {
         next if !-f $file;
         open my $fh, '<:raw', $file or die "Unable to read $file: $!";
         local $/;
-        return json_decode(<$fh>);
+        return json_decode_state(<$fh>);
     }
     return;
 }
@@ -219,6 +219,33 @@ sub mark_run_finished {
     );
 }
 
+# mark_stopped($name)
+# Resets one collector's consumer-facing status so a stopped loop is no longer
+# reported as running. Clears the live-run counters while preserving the other
+# recorded status fields, and records when the collector was stopped so prompt,
+# web, and CLI status readers reflect the stop immediately.
+# Input: collector name string.
+# Output: written status file path, or undef when the collector has no status
+# file yet (nothing to reset).
+sub mark_stopped {
+    my ( $self, $name ) = @_;
+    die 'Missing collector name' if !defined $name || $name eq '';
+    my $paths = $self->collector_paths($name);
+    return if !-f $paths->{status};
+    return $self->update_status(
+        $name,
+        sub {
+            my ($existing) = @_;
+            return {
+                %{$existing},
+                running     => 0,
+                active_runs => 0,
+                stopped_at  => _now_iso8601(),
+            };
+        }
+    );
+}
+
 # read_status($name)
 # Loads stored status metadata for a collector.
 # Input: collector name string.
@@ -279,11 +306,16 @@ sub append_log_entry {
         error       => $entry{error},
         source      => $entry{source},
     );
-    open my $fh, '>>', $paths->{log} or die "Unable to append $paths->{log}: $!";
-    print {$fh} $text;
-    close $fh;
-    $self->{paths}->secure_file_permissions( $paths->{log} );
-    return $paths->{log};
+    return $self->_with_log_lock(
+        $paths,
+        sub {
+            open my $fh, '>>', $paths->{log} or die "Unable to append $paths->{log}: $!";
+            print {$fh} $text;
+            close $fh;
+            $self->{paths}->secure_file_permissions( $paths->{log} );
+            return $paths->{log};
+        }
+    );
 }
 
 # rotate_log($name, $rotation, %args)
@@ -299,24 +331,43 @@ sub rotate_log {
     my $paths = $self->collector_paths($name);
     return if !-f $paths->{log};
 
-    my $original = _slurp( $paths->{log} );
-    my $rotated = $self->_apply_log_rotation(
-        $name,
-        $original,
-        $normalized,
-        now_epoch => $args{now_epoch},
-    );
-    return if $rotated eq $original;
+    return $self->_with_log_lock(
+        $paths,
+        sub {
+            my $original = _slurp( $paths->{log} );
+            my $rotated = $self->_apply_log_rotation(
+                $name,
+                $original,
+                $normalized,
+                now_epoch => $args{now_epoch},
+            );
+            return if $rotated eq $original;
 
-    $self->_atomic_write_text( $paths->{log}, $rotated );
-    return {
-        kind         => 'collector-log-rotation',
-        name         => $name,
-        path         => $paths->{log},
-        strategy     => join( ',', map { $_ . '=' . $normalized->{$_} } sort keys %{$normalized} ),
-        before_bytes => length $original,
-        after_bytes  => length $rotated,
-    };
+            $self->_atomic_write_text( $paths->{log}, $rotated );
+            return {
+                kind         => 'collector-log-rotation',
+                name         => $name,
+                path         => $paths->{log},
+                strategy     => join( ',', map { $_ . '=' . $normalized->{$_} } sort keys %{$normalized} ),
+                before_bytes => length $original,
+                after_bytes  => length $rotated,
+            };
+        }
+    );
+}
+
+# _with_log_lock($paths, $callback)
+# Serializes collector log mutation so append and read-modify-replace rotation
+# cannot overwrite each other across processes.
+# Input: collector path hash reference and callback run inside the critical section.
+# Output: callback return value.
+sub _with_log_lock {
+    my ( $self, $paths, $callback ) = @_;
+    my $lock = File::Spec->catfile( $paths->{dir}, '.log.lock' );
+    open my $lock_fh, '>>', $lock or die "Unable to open $lock: $!";
+    $self->{paths}->secure_file_permissions($lock);
+    flock( $lock_fh, LOCK_EX ) or die "Unable to lock $lock: $!";
+    return $callback->();
 }
 
 # read_log($name)
@@ -397,7 +448,7 @@ sub _render_latest_log_entry {
     my ( $self, $name ) = @_;
     return '' if !$self->collector_exists($name);
     my $status = $self->read_status($name) || {};
-    my $output = $self->read_output($name) || {};
+    my $output = $self->read_output($name);
     return '' if !$self->_log_payload_present( $status, $output );
     return $self->_format_log_entry(
         name        => $name,
@@ -554,7 +605,7 @@ sub _trim_log_by_age {
 }
 
 # _trim_log_by_lines($text, $lines)
-# Keeps only the configured trailing number of lines from a collector log blob.
+# Keeps only the trailing whole log entries that fit the configured line count.
 # Input: log text string and non-negative line count.
 # Output: rotated log text string containing at most the requested number of lines.
 sub _trim_log_by_lines {
@@ -562,11 +613,32 @@ sub _trim_log_by_lines {
     return $text if $text eq '';
 
     my $has_trailing_newline = $text =~ /\n\z/ ? 1 : 0;
+    # Splitting non-empty text with a negative limit always yields at least one
+    # field, and a newline-terminated blob always yields an empty final field,
+    # so the trailing-newline flag alone decides whether to drop it.
     my @parts = split /\n/, $text, -1;
-    pop @parts if $has_trailing_newline && @parts && $parts[-1] eq '';
+    pop @parts if $has_trailing_newline;
     return $text if @parts <= $lines;
     @parts = @parts[ @parts - $lines .. $#parts ];
-    return join( "\n", @parts ) . ( $has_trailing_newline ? "\n" : '' );
+    my $trimmed = join( "\n", @parts ) . ( $has_trailing_newline ? "\n" : '' );
+    return $self->_realign_to_entry_boundary( $text, $trimmed );
+}
+
+# _realign_to_entry_boundary($original, $trimmed)
+# Drops the orphaned entry body a line count cut can leave in front of a
+# collector log so the rotated transcript still starts at an entry header.
+# Input: the log text before the line cut and the line-cut log text.
+# Output: log text starting at an entry header, or an empty string when no whole entry survived the cut.
+sub _realign_to_entry_boundary {
+    my ( $self, $original, $trimmed ) = @_;
+    return $trimmed if $trimmed =~ /\A=== collector /;
+    # A log that already lacked a leading entry header was corrupted outside
+    # rotation. Keep its trailing lines verbatim so rotation never quietly
+    # deletes unrecognized content and the age trim still fails loudly on it.
+    return $trimmed if $original !~ /\A=== collector /;
+    my @entries = $self->_split_log_entries($trimmed);
+    shift @entries;
+    return join '', @entries;
 }
 
 # _split_log_entries($text)
@@ -576,7 +648,10 @@ sub _trim_log_by_lines {
 sub _split_log_entries {
     my ( $self, $text ) = @_;
     return () if !defined $text || $text eq '';
-    return grep { defined && $_ ne '' } split /(?=^=== collector )/m, $text;
+    # The split pattern is a bare lookahead with no capture group, so split can
+    # never hand back an undefined field; only the leading empty field produced
+    # when the text starts at an entry header needs filtering out.
+    return grep { $_ ne '' } split /(?=^=== collector )/m, $text;
 }
 
 # _entry_timestamp_epoch($name, $entry)
@@ -630,18 +705,41 @@ sub _atomic_write_json {
     return $self->_atomic_write_text( $file, json_encode($data) );
 }
 
+# _pending_path($file)
+# Builds the per-writer temporary file name used to stage one atomic write.
+# The name has to be unique per writing process: collectors configured with
+# mode => 'multiple' run several worker processes against the same collector at
+# the same time, and every one of them writes the same stdout/stderr/combined/
+# last_run/job targets without holding a lock. A shared "<file>.pending" name let
+# one worker truncate and then rename away another worker's staged file, which
+# both lost that worker's output and made its rename fail, so the run died before
+# the active-run counter could be decremented and the collector stayed reported
+# as running forever. The process id plus the high-resolution timestamp is the
+# same uniquifier the other lock-free atomic writers in this distribution use.
+# Input: target file path string.
+# Output: pending temporary file path string.
+sub _pending_path {
+    my ( $self, $file ) = @_;
+    return sprintf '%s.%s.%s.pending', $file, $$, time;
+}
+
 # _atomic_write_text($file, $text)
-# Atomically writes raw text to a file using a pending temporary file.
+# Atomically writes raw text to a file by fully flushing a per-writer pending
+# temporary file and then renaming it over the target in a single step. The write
+# and the close are both checked so a short write or a failed flush is surfaced as
+# an error instead of being renamed into place, and the target is never removed
+# before the rename so consumers only ever observe the old or the new file, never
+# a missing one. The pending name is unique per writing process so concurrent
+# collector workers cannot clobber each other's staged file.
 # Input: target file path and text string.
 # Output: written file path string.
 sub _atomic_write_text {
     my ( $self, $file, $text ) = @_;
-    my $tmp = "$file.pending";
+    my $tmp = $self->_pending_path($file);
     open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";
-    print {$fh} $text;
-    close $fh;
+    print {$fh} $text or die "Unable to write $tmp: $!";
+    close $fh or die "Unable to close $tmp: $!";
     $self->{paths}->secure_file_permissions($tmp);
-    unlink $file if -f $file;
     rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
     $self->{paths}->secure_file_permissions($file);
     return $file;
@@ -702,7 +800,9 @@ Developer::Dashboard::Collector - file-backed collector storage
 This module owns the on-disk storage model for collector job definitions,
 status records, latest outputs, and persisted collector log transcripts. It
 also applies collector log retention rules when housekeeping asks it to rotate
-those transcripts.
+those transcripts. Both the age window and the line budget cut on entry
+boundaries, so a rotated transcript always starts at a complete entry header
+and stays parsable by the next rotation pass.
 
 =head1 METHODS
 

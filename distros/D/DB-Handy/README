@@ -143,6 +143,14 @@ LIMITATIONS
   - Database, table and index names must be word characters ([A-Za-z0-9_]);
     they become path components, so a name holding / \ : or .. is rejected
     with "Invalid <kind> name" rather than being turned into a path
+  - the Windows device names con, prn, aux, nul, com0-com9 and lpt0-lpt9
+    are rejected too, in any letter case and on every platform: "nul.sch"
+    names the bit bucket on Windows, so such a table would appear to be
+    created, discard every write and read back as empty
+  - a database, table or index carrying one of those device names, created
+    by 1.09 or earlier on a system that allowed it, cannot be reached from
+    1.10 at all: drop_database and drop_table refuse it as well, so remove
+    it with the tools of the operating system
   - $DB::Handy::errstr keeps the last error from any handle and is not
     cleared by a later success; test $dbh->errstr, or the return value of
     the method, instead

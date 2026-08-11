@@ -68,7 +68,7 @@ Git::Native::Tree - A libgit2 tree object
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -81,6 +81,51 @@ version 0.004
 
 A libgit2 tree object. Entries are returned as plain hashrefs with
 C<name>, C<oid>, C<mode>, C<type>.
+
+A Tree is a single directory level, not a recursive listing: an entry of
+type C<GIT_OBJECT_TREE> is a subdirectory you look up separately with
+L<Git::Native::Repository/tree>.
+
+A Tree taken from a L<Git::Native::Commit> holds its repository, so it
+outlives the Commit it came from — walking C<< $repo->object($oid)->tree >>
+in one expression is safe.
+
+=head2 oid
+
+  say $tree->oid;
+
+The tree's L<Git::Native::Oid>. Computed on first use.
+
+=head2 entrycount
+
+  say $tree->entrycount;
+
+Number of entries in this tree level.
+
+=head2 entries
+
+  for my $e ( @{ $tree->entries } ) {
+    printf "%06o %s %s\n", $e->{mode}, $e->{oid}, $e->{name};
+  }
+
+All entries, in libgit2's order, as an arrayref of plain hashrefs. Each
+carries C<name> (this level only, no path), C<oid> (a
+L<Git::Native::Oid>), C<mode> (the numeric git filemode — C<0100644> for a
+regular file, C<0100755> executable, C<0120000> symlink, C<040000> a
+subtree) and C<type> (the C<git_object_t> value: 1 commit, 2 tree, 3 blob,
+4 tag — the C<GIT_OBJECT_*> constants exported by L<Git::Libgit2>).
+
+=head2 entry_by_name
+
+  my $e = $tree->entry_by_name('hello.txt');
+
+The single entry hashref for C<$name>, in the same shape C<entries>
+returns, or C<undef> when this tree has no such entry. C<$name> is one
+path component, not a path: C<'lib/Foo.pm'> does not match.
+
+=head1 SEE ALSO
+
+L<Git::Native::TreeBuilder>, L<Git::Native::Commit>, L<Git::Native::Blob>
 
 =head1 SUPPORT
 

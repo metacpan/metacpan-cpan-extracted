@@ -83,7 +83,7 @@ Git::Native::Commit - A libgit2 commit object
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -98,6 +98,77 @@ version 0.004
 A libgit2 commit object exposing C<oid>, C<message>, C<summary>,
 C<time> (Unix epoch), C<time_offset> (minutes east of UTC), C<tree>,
 C<tree_oid>, C<parent_count>, C<parent_oids>.
+
+Obtained from L<Git::Native::Repository/commit> or
+L<Git::Native::Repository/object>; created with
+L<Git::Native::Repository/commit_create>, which returns the new OID rather
+than a Commit. A Commit keeps its repository alive, and so does the
+L<Git::Native::Tree> it hands out — the tree outlives the commit it came
+from.
+
+=head2 oid
+
+  say $commit->oid;
+
+The commit's own L<Git::Native::Oid>. Computed on first use.
+
+=head2 message
+
+  print $commit->message;
+
+The full commit message, as stored — including the trailing newline and
+any body paragraphs.
+
+=head2 summary
+
+  say $commit->summary;   # 'add greeting'
+
+The first paragraph of the message with whitespace collapsed, the same
+thing C<git log --oneline> shows. libgit2 does the extraction.
+
+=head2 time
+
+  say scalar gmtime $commit->time;
+
+The committer timestamp as Unix epoch seconds, in UTC. The author time is
+not exposed.
+
+=head2 time_offset
+
+  printf "%+03d%02d\n", $commit->time_offset / 60, $commit->time_offset % 60;
+
+The committer's timezone offset in B<minutes> east of UTC (C<120> for
+C<+0200>), which is what C<time> was recorded against. Git stores it for
+display only; C<time> is already UTC and needs no correction.
+
+=head2 tree
+
+  my $tree = $commit->tree;
+
+The commit's root L<Git::Native::Tree>, looked up in the repository.
+
+=head2 tree_oid
+
+  say $commit->tree_oid;
+
+The root tree's L<Git::Native::Oid> without loading the tree object.
+
+=head2 parent_count
+
+  say $commit->parent_count;   # 0 root, 1 normal, 2+ merge
+
+Number of parents.
+
+=head2 parent_oids
+
+  for my $p ( @{ $commit->parent_oids } ) { ... }
+
+Arrayref of the parents' L<Git::Native::Oid>s in commit order, so
+C<< ->[0] >> is the first parent. Empty for a root commit.
+
+=head1 SEE ALSO
+
+L<Git::Native::Repository>, L<Git::Native::Tree>, L<Git::Native::Revwalker>
 
 =head1 SUPPORT
 

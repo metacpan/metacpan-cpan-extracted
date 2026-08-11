@@ -4,7 +4,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 # VERSION
 
-Version 0.43
+Version 0.45
 
 # SYNOPSIS
 
@@ -24,7 +24,7 @@ From the command line:
     fuzz-harness-generator -r t/conf/abs.yml
 
     # Attempt to create a formal definition from a routine package, then run tests against that formal definition
-    # This is the holy grail of automatic test generation, just by looking at the source code
+    # This is the holy grail of test generation, a set of tests is automatically created directly from the source code,
     extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
 
     # Fuzz a module and keep the corpus bounded: trim to the minimum subset that still covers every branch
@@ -1260,11 +1260,9 @@ Takes a schema file and produces a test file (or STDOUT).
 #### Input
 
     {
-        schema_file => { type => 'string', optional => 1 },
+        schema_file => { type => 'string', optional => 0 },
         input_file  => { type => 'string', optional => 1 },
-        output_file => { type => 'string', optional => 1 },
-        schema      => { type => 'hashref', optional => 1 },
-        quiet       => { type => 'boolean', optional => 1 },    # accepted but not yet implemented; has no effect
+        output_file => { type => 'string', optional => 1, max => 255 },
     }
 
 #### Output
@@ -1339,10 +1337,6 @@ the form:
 
 Returns an empty string if `$href` is undef, empty, or not a hashref.
 
-### Side effects
-
-None. Does not modify `$href`.
-
 ### Notes
 
 The `matches` and `nomatch` sub-keys are treated specially — their
@@ -1357,7 +1351,7 @@ Other sub-keys are rendered via `perl_quote`.
 
 #### input
 
-    { href => { type => 'hashref', optional => 1 } }
+    { href => { type => 'any', optional => 1 } }
 
 #### output
 
@@ -1395,7 +1389,7 @@ the generated test.
 
 #### input
 
-    { href => { type => 'hashref', optional => 1 } }
+    { href => { type => 'any', optional => 1 } }
 
 #### output
 
@@ -1433,7 +1427,7 @@ mixed-value hashes and only want the arrayref entries rendered.
 
 #### input
 
-    { href => { type => 'hashref', optional => 1 } }
+    { href => { type => 'any', optional => 1 } }
 
 #### output
 

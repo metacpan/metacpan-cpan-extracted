@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Cwd qw(getcwd);
@@ -191,8 +191,8 @@ sub _build_paths {
     my $home = $ENV{HOME} || '';
     return Developer::Dashboard::PathRegistry->new(
         home            => $home,
-        workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
-        project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
+        workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],    # uncoverable branch false the mapped candidate is an interpolated string and is never undef
+        project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],    # uncoverable branch false the mapped candidate is an interpolated string and is never undef
     );
 }
 
@@ -261,7 +261,7 @@ sub _skills_install_summary_table {
         ]
     } _install_result_rows($result);
     my $error = ref($result) eq 'HASH' ? $result->{error} : undef;
-    my $changed = grep { ( $_->[4] || '' ) eq 'installed' || ( $_->[4] || '' ) eq 'updated' } @rows;
+    my $changed = grep { $_->[4] eq 'installed' || $_->[4] eq 'updated' } @rows;
     my $text = '';
     if ( defined $error && $error ne '' ) {
         $text .= "Error: $error";
@@ -281,8 +281,8 @@ sub _skills_install_summary_table {
 sub _install_result_rows {
     my ($result) = @_;
     return () if ref($result) ne 'HASH';
-    return @{ $result->{operations} || [] } if ref( $result->{operations} ) eq 'ARRAY';
-    return @{ $result->{results} || [] }    if ref( $result->{results} ) eq 'ARRAY';
+    return @{ $result->{operations} } if ref( $result->{operations} ) eq 'ARRAY';
+    return @{ $result->{results} }    if ref( $result->{results} ) eq 'ARRAY';
     return ($result) if $result->{repo_name};
     return ();
 }

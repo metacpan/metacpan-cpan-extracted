@@ -22,8 +22,8 @@ extends 'Google::Auth::ExternalAccountCredentials';
 
 use JSON::PP;
 use Google::Auth::Exceptions;
-use Capture::Tiny qw(capture);
-use Log::Any      qw($log);
+use Capture::Tiny    qw(capture);
+use Log::Any         qw($log);
 use Text::ParseWords qw(shellwords);
 use Config;
 
@@ -61,12 +61,14 @@ sub retrieve_subject_token {
   }
 
   # Parse command into words, respecting quotes and escapes
-  my @words = shellwords($command);
+  my @words      = shellwords($command);
   my $executable = $words[0];
 
   if (!defined $executable) {
-    $log->errorf('Invalid command format in Pluggable executable configuration');
-    Google::Auth::Error->throw('Invalid command format in executable configuration');
+    $log->errorf(
+      'Invalid command format in Pluggable executable configuration');
+    Google::Auth::Error->throw(
+      'Invalid command format in executable configuration');
   }
 
   my $resolved_executable;
@@ -77,7 +79,7 @@ sub retrieve_subject_token {
     my $path_sep = $Config{path_sep} // ':';
     for my $dir (split /\Q$path_sep\E/, ($ENV{PATH} // '')) {
       my $path = "$dir/$executable";
-      if (-f $path && -x _) {
+      if (-f $path && -x _ ) {
         $resolved_executable = $path;
         last;
       }
@@ -103,7 +105,7 @@ sub retrieve_subject_token {
     local $SIG{ALRM} = sub { die "Timeout\n" };
     alarm($timeout);
     ($stdout, $stderr, $exit) = capture {
-      system { $resolved_executable } @words;
+      system {$resolved_executable} @words;
     };
     alarm(0);
   };

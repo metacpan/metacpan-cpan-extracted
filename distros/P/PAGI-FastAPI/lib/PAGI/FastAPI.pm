@@ -4,7 +4,7 @@ use v5.36;
 use experimental qw/try for_list/;
 use version;
 
-our $VERSION   = qv('v0.0.9');
+our $VERSION   = qv('v0.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
@@ -12,6 +12,7 @@ use JSON::PP qw(encode_json decode_json);
 use Scalar::Util qw(blessed);
 use PAGI::App::URLMap;
 use PAGI::WebSocket;
+use PAGI::Middleware::CORS;
 use PAGI::FastAPI::Context;
 use PAGI::FastAPI::Depends qw(Depends);
 
@@ -23,7 +24,7 @@ PAGI::FastAPI - Asynchronous, Type-Safe Micro-Framework with Dependency Injectio
 
 =head1 VERSION
 
-Version v0.0.9
+Version v0.1.0
 
 =head1 SYNOPSIS
 
@@ -38,10 +39,10 @@ Version v0.0.9
         version => '1.0.0',
     );
 
-    # 1. Add CORS Support
+    # 1. Add CORS Support (delegates to PAGI::Middleware::CORS from PAGI::Tools)
     $app->add_cors(
-        allow_origins => ['https://example.com'],
-        allow_methods => ['GET', 'POST'],
+        origins => ['https://example.com'],
+        methods => ['GET', 'POST'],
     );
 
     # 2. Add Authentication Middleware Hook
@@ -187,6 +188,8 @@ documentation generation.
 
 =item * B<WebSocket Support:> Full non-blocking WebSocket handshake and frame streaming via L<PAGI::WebSocket>.
 
+=item * B<CORS:> C<add_cors> delegates to L<PAGI::Middleware::CORS> (from L<PAGI::Tools>) rather than a separate implementation.
+
 =item * B<Automatic Type Validation:> Request query parameters and JSON payloads are checked against L<Type::Tiny> constraints before reaching route handlers.
 
 =item * B<Automatic Interactive Docs:> Serves an interactive Swagger UI interface at C</docs> and machine-readable OpenAPI 3.1 JSON at C</openapi.json>.
@@ -249,6 +252,7 @@ sub new ($class, %args) {
         routes         => [],
         middlewares    => [],
         mounts         => [],
+        cors_options   => undef,
         event_handlers => {
             startup  => [],
             shutdown => [],
@@ -332,56 +336,41 @@ sub add_middleware ($self, $code_ref) {
 
 =head2 C<add_cors(%options)>
 
-Enables Cross-Origin Resource Sharing (CORS) with automatic handling of
-C<OPTIONS> preflight requests. Options include:
+Enables Cross-Origin Resource Sharing (CORS), including automatic handling
+of C<OPTIONS> preflight requests, by delegating to L<PAGI::Middleware::CORS>
+(from L<PAGI::Tools>) rather than a hand-rolled implementation, see that
+module's own documentation for the authoritative behaviour.
+Options (matching L<PAGI::Middleware::CORS>'s own names exactly, so they
+mean the same thing here as anywhere else in the PAGI ecosystem):
 
 =over 4
 
-=item * C<allow_origins> - ArrayRef or string of allowed origins (default: C<['*']>).
+=item * C<origins> - ArrayRef of allowed origins (default: C<['*']>).
 
-=item * C<allow_methods> - ArrayRef or string of allowed HTTP methods (default: C<['*']>).
+=item * C<methods> - ArrayRef of allowed HTTP methods
+(default: C<['GET','POST','PUT','DELETE','PATCH','OPTIONS']>).
 
-=item * C<allow_headers> - ArrayRef or string of allowed HTTP headers (default: C<['*']>).
+=item * C<headers> - ArrayRef of allowed request headers
+(default: C<['Content-Type','Authorization','X-Requested-With']>).
 
-=item * C<allow_credentials> - Boolean enabling credentials support (default: C<0>).
+=item * C<expose_headers> - ArrayRef of headers to expose to the client (default: C<[]>).
 
-=item * C<max_age> - Preflight cache max age in seconds (default: C<600>).
+=item * C<credentials> - Boolean enabling credentials support (default: C<0>).
+
+=item * C<max_age> - Preflight cache max age in seconds (default: C<86400>).
 
 =back
+
+B<Changed in v0.1.0>: previously this took C<allow_origins>/C<allow_methods>/
+C<allow_headers>/C<allow_credentials> and implemented CORS handling directly
+in C<PAGI::FastAPI>. It's now a thin wrapper that hands your options straight
+to L<PAGI::Middleware::CORS>, so the option names above match that module's
+exactly.
 
 =cut
 
 sub add_cors ($self, %opts) {
-    my $allow_origins     = $opts{allow_origins}     // ['*'];
-    my $allow_methods     = $opts{allow_methods}     // ['*'];
-    my $allow_headers     = $opts{allow_headers}     // ['*'];
-    my $allow_credentials = $opts{allow_credentials} // 0;
-    my $max_age           = $opts{max_age}           // 600;
-
-    my $origins_str = ref $allow_origins eq 'ARRAY' ? join(', ', @$allow_origins) : $allow_origins;
-    my $methods_str = ref $allow_methods eq 'ARRAY' ? join(', ', @$allow_methods) : $allow_methods;
-    my $headers_str = ref $allow_headers eq 'ARRAY' ? join(', ', @$allow_headers) : $allow_headers;
-
-    $self->add_middleware(async sub ($ctx, $next) {
-        my $origin = $ctx->header('origin');
-
-        if ($origin) {
-            $ctx->set_header('Access-Control-Allow-Origin'  => $origins_str eq '*' ? '*' : $origin);
-            $ctx->set_header('Access-Control-Allow-Methods' => $methods_str);
-            $ctx->set_header('Access-Control-Allow-Headers' => $headers_str);
-            if ($allow_credentials) {
-                $ctx->set_header('Access-Control-Allow-Credentials' => 'true');
-            }
-        }
-
-        if (uc($ctx->scope->{method} // '') eq 'OPTIONS') {
-            $ctx->set_header('Access-Control-Max-Age' => $max_age);
-            $ctx->status(204);
-            return '';
-        }
-
-        return await $next->($ctx);
-    });
+    $self->{cors_options} = \%opts;
 }
 
 =head2 C<websocket($path, %options)>
@@ -436,17 +425,29 @@ C<to_app()> automatically wraps the routes using L<PAGI::App::URLMap>.
 sub to_app ($self) {
     my $fastapi_app = $self->_build_pagi_app;
 
-    return $fastapi_app unless @{ $self->{mounts} };
+    my $final_app = $fastapi_app;
 
-    my $urlmap = PAGI::App::URLMap->new;
+    if (@{ $self->{mounts} }) {
+        my $urlmap = PAGI::App::URLMap->new;
 
-    for my $m (@{ $self->{mounts} }) {
-        $urlmap->mount($m->{prefix} => $m->{app});
+        for my $m (@{ $self->{mounts} }) {
+            $urlmap->mount($m->{prefix} => $m->{app});
+        }
+
+        $urlmap->mount('/' => $fastapi_app);
+
+        $final_app = $urlmap->to_app;
     }
 
-    $urlmap->mount('/' => $fastapi_app);
+    # Applied outermost, after mounts, so CORS headers/preflight handling
+    # cover every route, including mounted sub-apps and static files, not
+    # just routes registered directly on this app.
+    if ($self->{cors_options}) {
+        $final_app = PAGI::Middleware::CORS->new(%{ $self->{cors_options} })
+                                           ->wrap($final_app);
+    }
 
-    return $urlmap->to_app;
+    return $final_app;
 }
 
 sub _build_pagi_app ($self) {
@@ -798,7 +799,12 @@ sub _register_route ($self, $method, $path, $opts) {
     if ($method ne 'WEBSOCKET') {
         my @parameters;
         for my $param (@path_params) {
-            push @parameters, { name => $param, in => 'path', required => \1, schema => { type => 'string' } };
+            push @parameters, {
+                name     => $param,
+                in       => 'path',
+                required => \1,
+                schema   => { type => 'string' }
+            };
         }
         for my ($param, $type) (%$query_types) {
             my $t_name = eval { $type->name } // '';
@@ -898,32 +904,69 @@ with a JSON body:
 
 Unmatched routes return C<HTTP 404 Not Found> with C<{"detail": "Not Found"}>.
 
-=head1 MIXING WITH OTHER EVENT LOOPS
+=head1 EVENT LOOPS: FUTURE::IO IS THE GOAL, IO::ASYNC IS AN IMPLEMENTATION DETAIL
 
-C<PAGI::FastAPI> operates completely on L<IO::Async>. If your handlers are
-also dependent on a library built over a I<different> event loop, most
-commonly either L<Mojo::Pg> or other modules built on top of L<Mojo::IOLoop>,
-calling that library's non-blocking/callback API will do nothing:
-L<IO::Async::Loop> and L<Mojo::IOLoop> are separate reactors by default and
-running one does not provide service to the other one. The observation that
-would arise from that is a request or C<on_startup> / C<on_shutdown> handler
-that hangs (and, under L<PAGI::Server>, eventually fails with a
-lifespan-timeout error) even though the call you're C<await>ing seems to be
-correct.
+The PAGI protocol is deliberately silent on which event loop drives it,
+that's meant to be an implementation detail of whichever server runs your
+app, not part of the application-level contract. L<PAGI::Server>, the
+reference server, happens to use L<IO::Async> today, but don't write your
+own application code as if that's guaranteed or load-bearing. Prefer
+L<Future::IO> for anything loop-driven you write yourself (timers, delays,
+periodic tasks) and it keeps working regardless of which backend a given
+PAGI server chooses, now or in the future.
 
-On the other hand, utilising that library in blocking mode (such as plain
-C<< $pg->db->query(...) >> with no callback) results in it triggering
-immediately, whereas the entire operation of the process gets halted, all
-concurrent requests and WebSocket connections are paused for the time that
-the function call lasts, as it is a genuine blocking call without any
-cooperative aspect. At the same time, this is something that can easily
-happen by mistake; blocking mode is just the default and easiest way of
-calling most libraries, and it happens to work without any flaws when tried
-manually with one client prior to failing under concurrent load.
+For a periodic task (a heartbeat or a cache sweep, anything you'd otherwise
+reach for a timer object for), prefer a self-rescheduling coroutine over
+constructing an C<IO::Async::Timer::Periodic> (or any other loop-specific
+timer class) directly:
 
-The solution however stays the same in both situations. It is to make use of
-L<IO::Async> and also to arrange both loops to utilise the I<same> underlying
-reactor:
+    use Future::AsyncAwait;
+    use Future::IO;
+
+    async sub heartbeat {
+        while (1) {
+            await Future::IO->sleep(30);
+            ...
+        }
+    }
+    heartbeat()->retain;
+
+No loop object of your own to construct or own, C<< Future::IO->sleep >>
+delegates to whatever backend is already configured in the process, whatever
+that turns out to be.
+
+B<Why "prefer" and not "always," then?> Pragmatically, the L<Future::IO>
+ecosystem is still growing, and not every library has caught up to it yet.
+You'll sometimes still need a loop-specific integration for a particular
+dependency, most commonly L<Mojo::Pg> or anything else built directly on
+L<Mojo::IOLoop>, which predates L<Future::IO> and doesn't use it. Treat the
+rest of this section as a workaround for that specific, narrower situation,
+not as a description of how C<PAGI::FastAPI> itself works, which it doesn't
+depend on.
+
+=head2 Fallback: bridging a Mojo::IOLoop-based dependency
+
+If your handlers depend on a library on a I<different> event loop from
+whatever the PAGI server ends up using, concretely, L<Mojo::Pg> or anything
+else on L<Mojo::IOLoop>, calling that library's non-blocking/callback API
+will do nothing: separate reactors by default don't service each other. The
+symptom is a request or C<on_startup>/C<on_shutdown> handler that just hangs
+(and, under L<PAGI::Server>, eventually fails with a lifespan-timeout error)
+even though the call you're C<await>-ing looks correct.
+
+Conversely, calling that library in blocking mode instead (e.g. plain
+C<< $pg->db->query(...) >> with no callback) does fire promptly, but freezes
+the I<entire> process, every other in-flight request and WebSocket
+connection, for the duration of that call, since it's a real synchronous
+call with nothing cooperative about it. This is easy to end up with by
+accident: the blocking form is the default/simplest way to call most of
+these libraries, and it will work correctly in every manual test with one
+client before degrading badly under concurrent load.
+
+The fix, when C<PAGI::Server> happens to be running on L<IO::Async> (which,
+again, is an implementation detail you shouldn't assume, but is true of the
+reference server today): get L<IO::Async> and the other library's loop onto
+the I<same> underlying reactor, so a single running loop drives both.
 
 =over 4
 
@@ -1054,6 +1097,10 @@ the full documentation and an end-to-end JWT-verification example.
 =item * L<PAGI::App::URLMap> - Routing middleware for prefix-matching PAGI applications.
 
 =item * L<PAGI::WebSocket> - Asynchronous WebSocket connection object (from PAGI::Tools) used by C<websocket()> handlers.
+
+=item * L<PAGI::Middleware::CORS> - CORS middleware (from PAGI::Tools) used by C<add_cors>.
+
+=item * L<Future::IO> - Loop-agnostic async I/O primitives; see L</EVENT LOOPS: FUTURE::IO IS THE GOAL, IO::ASYNC IS AN IMPLEMENTATION DETAIL>.
 
 =item * L<PAGI::FastAPI::Context> - Context object passed to route handlers.
 

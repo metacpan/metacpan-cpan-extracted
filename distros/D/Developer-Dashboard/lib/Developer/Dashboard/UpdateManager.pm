@@ -3,7 +3,7 @@ package Developer::Dashboard::UpdateManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -47,13 +47,13 @@ sub updates_dir {
 sub run {
     my ($self) = @_;
 
-    my @running = $self->_running_collectors;
-    $self->_stop_collectors(@running);
-
     my @results;
     my $dir = $self->updates_dir;
 
     return \@results if !-d $dir;
+
+    my @running = $self->_running_collectors;
+    $self->_stop_collectors(@running);
 
     opendir my $dh, $dir or die "Unable to open updates directory $dir: $!";
     for my $file ( sort readdir $dh ) {
@@ -76,7 +76,7 @@ sub run {
         };
         my $output = $stdout . $stderr;
 
-        print $output if defined $output && $output ne '';
+        print $output if defined $output && $output ne ''; # uncoverable condition left
         print "\n>> Finished.\n\n";
 
         push @results, {

@@ -4,6 +4,10 @@ use Git::Libgit2 qw( init_lib shutdown_lib version );
 use Git::Libgit2::FFI ();
 use Git::Libgit2::Error ();
 
+# Pin libgit2 away from the user's gitconfig — exact bug Git::Raw shipped.
+local $ENV{GIT_CONFIG_GLOBAL} = '/dev/null';
+local $ENV{GIT_CONFIG_SYSTEM} = '/dev/null';
+
 ok( Git::Libgit2::FFI::ffi(), 'FFI singleton boots' );
 
 my $rc = init_lib();

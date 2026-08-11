@@ -297,7 +297,7 @@ my @tests = (
         $dbh->do('INSERT INTO ro (id) VALUES (3)');
         my $msg = $dbh->errstr;
         chmod 0644, $dat;
-        ok((defined($msg) && ($msg =~ /dat|record/i)),
+        ok(((defined($msg) && ($msg =~ /dat|record/i))) ? 1 : 0,
            'H6 - the error message names the failure');
     },
     sub {

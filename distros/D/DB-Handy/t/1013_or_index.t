@@ -27,10 +27,10 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok  { my($c,$n)=@_; $T++;
+sub ok  { my($c, $n)=@_; $T++;
           $c ? ($PASS++, push @OUT, "ok $T - $n\n")
              : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is  { my($g,$e,$n)=@_; $T++;
+sub is  { my($g, $e, $n)=@_; $T++;
           defined($g) && ("$g" eq "$e")
             ? ($PASS++, push @OUT, "ok $T - $n\n")
             : ($FAIL++, push @OUT, "not ok $T - $n"

@@ -3,18 +3,14 @@
 package Git::Native::Revwalker;
 use Moo;
 use Carp ();
+use Git::Libgit2 qw(
+  GIT_ITEROVER
+  GIT_SORT_NONE GIT_SORT_TOPOLOGICAL GIT_SORT_TIME GIT_SORT_REVERSE
+);
 use Git::Libgit2::FFI ();
 use Git::Native::Error qw( check_rc );
 use FFI::Platypus::Buffer qw( scalar_to_buffer );
 use Git::Native::Oid ();
-
-use constant {
-  GIT_SORT_NONE        => 0,
-  GIT_SORT_TOPOLOGICAL => 1,
-  GIT_SORT_TIME        => 2,
-  GIT_SORT_REVERSE     => 4,
-  GIT_ITEROVER         => -31,
-};
 
 has _handle => ( is => 'ro', required => 1 );
 has _owner  => ( is => 'ro', required => 1 );
@@ -90,7 +86,7 @@ Git::Native::Revwalker - Walk commits in topological / time order
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -106,31 +102,110 @@ version 0.004
 Wraps libgit2's C<git_revwalk*>. Push starting points (commits, refs,
 globs), optionally hide commits to exclude, then iterate with C<next>.
 
-=head2 push_oid($oid)
+B<Seeding is mandatory.> A walker that has had no C<push_*> call has no
+starting point and therefore yields nothing at all: C<next> returns
+C<undef> straight away and C<all> gives an empty arrayref. There is no
+implicit "walk HEAD" — say C<< $walker->push_head >> for that.
 
-Mark a commit as a starting point. C<$oid> may be a hex string or a
-L<Git::Native::Oid>.
+The walk goes from the pushed commits towards their ancestors, so a child
+always comes out before its parents. Every C<push_*> and C<hide_*> returns
+the walker, so seeding chains.
 
-=head2 push_head / push_ref($refname) / push_glob($pattern) / push_range("A..B")
+A walker keeps its repository alive for as long as it is in scope.
 
-Convenience pushers.
+=head2 push_oid
+
+  $walker->push_oid($oid);
+  $walker->push_oid('35104eb6815e52f24b06c95cbc53e95943cb532b');
+
+Add a commit as a starting point. C<$oid> is a L<Git::Native::Oid> or a
+40-character hex string, and must resolve to something committish — a blob
+OID throws a L<Git::Native::Error> ("object is not a committish").
+
+=head2 push_head
+
+  $walker->push_head;
+
+Start from whatever HEAD resolves to.
+
+=head2 push_ref
+
+  $walker->push_ref('refs/heads/topic');
+
+Start from the commit a reference points at. Throws if the ref does not
+exist.
+
+=head2 push_glob
+
+  $walker->push_glob('refs/heads/*');
+
+Start from every reference matching the pattern at once — the union of all
+those histories.
+
+=head2 push_range
+
+  $walker->push_range("$old..$new");
+
+Push C<B> and hide C<A> for a range written C<"A..B">, the same spelling
+C<git log> takes.
 
 =head2 hide_oid / hide_head / hide_ref / hide_glob
 
-Exclude commits and their ancestors from the walk.
+  $walker->push_head->hide_ref('refs/heads/main');
 
-=head2 sorting($mode)
+Exclude a commit B<and all of its ancestors> from the walk — what makes
+"on this branch but not on main" expressible. Same argument forms as the
+matching C<push_*>.
 
-Bitfield of C<GIT_SORT_NONE>, C<GIT_SORT_TOPOLOGICAL>, C<GIT_SORT_TIME>,
-C<GIT_SORT_REVERSE>.
+=head2 sorting
+
+  $walker->sorting(
+    Git::Native::Revwalker::GIT_SORT_TIME | Git::Native::Revwalker::GIT_SORT_REVERSE
+  );
+
+Set the ordering: a bitfield of C<GIT_SORT_NONE> (libgit2's default walk
+order), C<GIT_SORT_TOPOLOGICAL>, C<GIT_SORT_TIME> and C<GIT_SORT_REVERSE>,
+which are constants in this package and not exported.
+
+Set it B<before the first C<next>>: changing the sorting mode of a walk
+already in progress resets the walker, which drops the pushed starting
+points along with it and leaves you iterating nothing.
+
+=head2 reset
+
+  $walker->reset->push_ref('refs/heads/other');
+
+Return the walker to its just-created state so it can be used for a
+different walk. This clears the pushed and hidden commits as well as the
+sorting mode — re-seed before iterating again, or the walk is empty.
+
+=head2 simplify_first_parent
+
+  $walker->push_head->simplify_first_parent;
+
+Follow only the first parent of each commit, so a merge does not pull the
+merged-in side branch into the walk. Applies to the walking still to come.
 
 =head2 next
 
-Returns the next L<Git::Native::Oid>, or C<undef> when exhausted.
+  while ( defined( my $oid = $walker->next ) ) { ... }
+
+The next L<Git::Native::Oid>, or C<undef> once the walk is exhausted —
+libgit2's C<GIT_ITEROVER> is the normal end of iteration and is
+B<not> raised as an error. Real failures still throw a
+L<Git::Native::Error>.
 
 =head2 all
 
-Drains the walker into an arrayref of L<Git::Native::Oid>.
+  my $oids = $walker->all;
+
+Drain the walker from where it stands into an arrayref of
+L<Git::Native::Oid>. It consumes the same iterator C<next> does, so a
+second C<all> without a C<reset> and fresh C<push_*> comes back empty.
+
+=head1 SEE ALSO
+
+L<Git::Native::Repository>, L<Git::Native::Commit>, L<Git::Native::Oid>
 
 =head1 SUPPORT
 

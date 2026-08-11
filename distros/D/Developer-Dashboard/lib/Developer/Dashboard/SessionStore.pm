@@ -3,9 +3,9 @@ package Developer::Dashboard::SessionStore;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
-use Digest::SHA qw(sha256_hex);
+use Crypt::URandom qw(urandom);
 use File::Spec;
 use POSIX qw(strftime);
 
@@ -30,7 +30,14 @@ sub create {
     my $username = $args{username} || die 'Missing username';
     my $role     = $args{role}     || 'helper';
     my $ttl      = $args{ttl_seconds} || 43_200;
-    my $session_id = sha256_hex( join ':', $$, time, rand(), $username, $role );
+    # 256 bits straight from the operating system's CSPRNG. This used to hash the
+    # pid, the wall-clock second, rand(), the username and the role together,
+    # which is the construction CVE-2026-13577 describes: every term but rand()
+    # is attacker-observable, and rand() is drand48 seeded with thirty-two bits.
+    # Crypt::URandom is imported at compile time on purpose - there is
+    # deliberately no fallback, because a SILENT fallback to weak material is
+    # the vulnerability itself, not the remedy for it.
+    my $session_id = unpack 'H*', urandom(32);
     my $record = {
         session_id  => $session_id,
         username    => $username,
@@ -99,13 +106,32 @@ sub from_cookie {
     return $session;
 }
 
+# _safe_session_id($session_id)
+# Neutralizes a caller-supplied session id before it is interpolated into an
+# on-disk path, mirroring the charset sanitization Auth applies to usernames.
+# Session ids created here are always CSPRNG-derived hex, but get()/delete() accept the
+# raw value from the request cookie; without this a value such as
+# "../../etc/passwd" would let the store read or unlink files outside the
+# session directory (path traversal). Stripping everything outside the safe
+# charset removes the "/" and "\" separators (and NUL) that make traversal
+# possible while preserving legitimate ids, which only contain safe characters.
+# Input: raw session id string (may be undef).
+# Output: sanitized id containing only [A-Za-z0-9_.-]; '' when the id is undef.
+sub _safe_session_id {
+    my ($session_id) = @_;
+    return '' if !defined $session_id;
+    $session_id =~ s/[^A-Za-z0-9_.-]+/_/g;
+    return $session_id;
+}
+
 # _session_file($session_id)
 # Resolves the session storage file path.
 # Input: session id string.
 # Output: file path string.
 sub _session_file {
     my ( $self, $session_id ) = @_;
-    return File::Spec->catfile( $self->{paths}->sessions_root, "$session_id.json" );
+    my $safe = _safe_session_id($session_id);
+    return File::Spec->catfile( $self->{paths}->sessions_root, "$safe.json" );
 }
 
 # _session_file_candidates($session_id)
@@ -114,7 +140,44 @@ sub _session_file {
 # Output: ordered list of session file path strings.
 sub _session_file_candidates {
     my ( $self, $session_id ) = @_;
-    return map { File::Spec->catfile( $_, "$session_id.json" ) } $self->{paths}->sessions_roots;
+    my $safe = _safe_session_id($session_id);
+    return map { File::Spec->catfile( $_, "$safe.json" ) } $self->{paths}->sessions_roots;
+}
+
+# sweep_expired()
+# Garbage-collects expired session files from the write-target session root.
+# create() writes one file per login and from_cookie only deletes a record when
+# that exact cookie is presented again, so expired sessions otherwise pile up
+# forever; this is the reclaim pass a cleanup service (Housekeeper) can invoke.
+# It scans only the current write-target root (where create() writes) so it
+# never touches inherited or shared parent-layer session stores. Files it cannot
+# read or parse as a session record are left untouched on purpose: the sweep only
+# removes records it can positively confirm are expired.
+# Input: none.
+# Output: number of expired session files removed.
+sub sweep_expired {
+    my ($self) = @_;
+    my $root = $self->{paths}->sessions_root;
+    opendir my $dh, $root or die "Unable to read sessions root $root: $!";
+    my @entries = readdir $dh;
+    closedir $dh;
+    my $removed = 0;
+    my $now     = time;
+    for my $entry (@entries) {
+        next if $entry !~ /\A.+\.json\z/;
+        my $file = File::Spec->catfile( $root, $entry );
+        open my $fh, '<:raw', $file or next;
+        local $/;
+        my $json = <$fh>;
+        close $fh;
+        my $record = eval { json_decode($json) };
+        next if !$record || ref($record) ne 'HASH';
+        my $expires_at = $record->{expires_at};
+        next if !defined $expires_at || $expires_at eq '';
+        next if _iso8601_to_epoch($expires_at) > $now;
+        $removed++ if unlink $file;
+    }
+    return $removed;
 }
 
 # _now_iso8601()
@@ -168,9 +231,10 @@ persist authenticated helper access between requests.
 
 =head1 METHODS
 
-=head2 new, create, get, delete, from_cookie
+=head2 new, create, get, delete, from_cookie, sweep_expired
 
-Construct and manage session records.
+Construct and manage session records, and reclaim expired ones with
+C<sweep_expired>.
 
 =for comment FULL-POD-DOC START
 

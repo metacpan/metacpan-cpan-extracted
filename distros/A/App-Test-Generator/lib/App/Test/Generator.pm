@@ -22,7 +22,7 @@ use File::Basename qw(basename);
 use File::Spec;
 use Module::Load::Conditional qw(check_install can_load);
 use Params::Get;
-use Params::Validate::Strict 0.30;
+use Params::Validate::Strict 0.36;
 use Readonly;
 use Readonly::Values::Boolean;
 use Scalar::Util qw(looks_like_number);
@@ -34,7 +34,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use constant {
 	DEFAULT_ITERATIONS => 30,
@@ -153,7 +153,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.44
+Version 0.45
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ From the command line:
   fuzz-harness-generator -r t/conf/abs.yml
 
   # Attempt to create a formal definition from a routine package, then run tests against that formal definition
-  # This is the holy grail of automatic test generation, just by looking at the source code
+  # This is the holy grail of test generation, a set of tests is automatically created directly from the source code,
   extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
 
   # Fuzz a module and keep the corpus bounded: trim to the minimum subset that still covers every branch
@@ -1594,7 +1594,7 @@ Takes a schema file and produces a test file (or STDOUT).
 =head4 Input
 
     {
-        schema_file => { type => 'string', optional => 0, memberof => ['schemas/generate.yml'] },
+        schema_file => { type => 'string', optional => 0 },
         input_file  => { type => 'string', optional => 1 },
         output_file => { type => 'string', optional => 1, max => 255 },
     }
@@ -2984,10 +2984,6 @@ the form:
     'key' => { subkey => value, ... }
 
 Returns an empty string if C<$href> is undef, empty, or not a hashref.
-
-=head3 Side effects
-
-None. Does not modify C<$href>.
 
 =head3 Notes
 

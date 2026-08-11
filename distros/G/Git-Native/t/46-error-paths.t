@@ -2,7 +2,7 @@ use Test2::V0;
 use lib 't/lib';
 use TestRepo;
 use Git::Native;
-use Git::Libgit2 qw( GIT_EMODIFIED );
+use Git::Libgit2 qw( GIT_EMODIFIED GIT_ELOCKED GIT_EBAREREPO );
 use Git::Native::Error;
 
 # The contract from the docs: every libgit2 failure surfaces as a Throwable
@@ -61,6 +61,54 @@ my $modified = Git::Native::Error->new(
 );
 ok $modified->is_not_matched, 'is_not_matched recognizes GIT_EMODIFIED';
 ok !$nf->is_not_matched, 'is_not_matched rejects an unrelated error code';
+
+# A concurrent ref writer holding refs/<name>.lock reports GIT_ELOCKED, not
+# GIT_EMODIFIED - a CAS retry loop must recognize both.
+my $locked = Git::Native::Error->new(
+  code    => GIT_ELOCKED,
+  message => 'the reference is locked',
+);
+ok $locked->is_locked, 'is_locked recognizes GIT_ELOCKED';
+ok !$locked->is_not_matched, 'is_not_matched rejects GIT_ELOCKED';
+ok !$nf->is_locked, 'is_locked rejects an unrelated error code';
+
+# A bare repo has no worktree, so the worktree-only operations refuse to run
+# with GIT_EBAREREPO instead of returning an empty result. Without a predicate
+# a consumer walking mixed repos has to compare the bare -8.
+my $bare = Git::Native::Error->new(
+  code    => GIT_EBAREREPO,
+  message => 'cannot status. This operation is not allowed against bare repositories.',
+);
+ok $bare->is_bare_repo, 'is_bare_repo recognizes GIT_EBAREREPO';
+ok !$nf->is_bare_repo,  'is_bare_repo rejects an unrelated error code';
+
+# GIT_EBAREREPO must not be swept up by any of the other predicates - each one
+# is a distinct branch a caller may take.
+for my $other (
+  qw( is_not_found is_exists is_auth is_certificate is_conflict
+      is_not_fast_forward is_unborn_branch is_invalid_spec is_not_matched
+      is_locked )
+) {
+  ok !$bare->$other, "$other rejects GIT_EBAREREPO";
+}
+
+# ...and the same thing off a REAL libgit2 failure, which is the point of this
+# file: init a bare repo and ask it for status.
+my $bare_repo = Git::Native->init( "$tmp/bare.git", bare => 1 );
+ok $bare_repo->is_bare, 'init(bare=>1) gives a bare repository';
+
+my $status_err = dies { $bare_repo->status };
+isa_ok $status_err, ['Git::Native::Error'],
+  'status on a bare repo throws Git::Native::Error';
+is $status_err->code, GIT_EBAREREPO, 'the real failure carries GIT_EBAREREPO';
+ok $status_err->is_bare_repo, 'is_bare_repo true for the real status failure';
+ok !$status_err->is_not_found, 'the real failure is not misread as not-found';
+
+my $status_path_err = dies { $bare_repo->status_for_path('x') };
+isa_ok $status_path_err, ['Git::Native::Error'],
+  'status_for_path on a bare repo throws Git::Native::Error';
+ok $status_path_err->is_bare_repo,
+  'is_bare_repo true for the real status_for_path failure';
 
 # clone(bare=>1) is a deliberate, friendly croak BEFORE libgit2 is touched
 # (the offset of the `bare` field isn't stable) - a plain die, not a typed

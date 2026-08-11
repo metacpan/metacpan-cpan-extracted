@@ -9,7 +9,7 @@ use Readonly;
 Readonly my $HIGH_CONFIDENCE_THRESHOLD   => 40;
 Readonly my $MEDIUM_CONFIDENCE_THRESHOLD => 20;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ App::Test::Generator::Model::Method - Evidence-based model of a single method un
 
 =head1 VERSION
 
-Version 0.44
+Version 0.45
 
 =head1 DESCRIPTION
 
@@ -549,8 +549,7 @@ sub resolve_return_type {
 	# Tie-break alphabetically — deterministic but arbitrary
 	my ($winner) = sort { ($score{$b} || 0) <=> ($score{$a} || 0) || $a cmp $b } keys %score;
 
-	$self->{return_type} = $winner || 'unknown';
-	return $self->{return_type};
+	return $self->{return_type} = $winner;
 }
 
 =head2 resolve_confidence

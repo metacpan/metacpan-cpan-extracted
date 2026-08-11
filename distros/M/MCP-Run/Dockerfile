@@ -26,8 +26,8 @@ RUN cpm install -g \
     && make install \
     && rm -rf ~/.perl-cpm ~/.cpanm
 
-# ------------------------------------------------------------------ runtime
-FROM perl:5.40-slim AS runtime
+# ------------------------------------------------------------------ compress
+FROM perl:5.40-slim AS compress
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libssl3 zlib1g ca-certificates \

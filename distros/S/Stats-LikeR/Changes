@@ -1,6 +1,10 @@
 Revision history for Stats-LikeR
 
 
+0.297 2026-08-10 CDT
+
+ - https://www.cpantesters.org/cpan/report/260534ea-9474-11f1-8ca2-bfb68deea6df bug fix
+
 0.296 2026-08-09 CDT
 
  - fixed CPAN bug: https://www.cpantesters.org/cpan/report/fcf32c68-75a5-1014-bc87-8fe0d10910fe

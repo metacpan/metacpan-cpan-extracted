@@ -6,6 +6,7 @@ use Git::Native::Commit;
 use Git::Native::Config;
 use Git::Native::Credential;
 use Git::Native::Error;
+use Git::Native::Index;
 use Git::Native::Oid;
 use Git::Native::Reference;
 use Git::Native::Remote;

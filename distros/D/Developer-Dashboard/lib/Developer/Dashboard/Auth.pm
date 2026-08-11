@@ -3,15 +3,25 @@ package Developer::Dashboard::Auth;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Fcntl qw(:mode);
-use Digest::SHA qw(sha256_hex);
+use Digest::SHA qw(sha256_hex hmac_sha256);
 use File::Spec;
 use POSIX qw(strftime);
 use Socket qw(AF_INET AF_INET6 SOCK_STREAM getaddrinfo inet_ntoa inet_ntop unpack_sockaddr_in unpack_sockaddr_in6);
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+
+# Work factor for the PBKDF2-HMAC-SHA256 helper-password scheme. This is the
+# iteration count new helper passwords are stretched with; it is also recorded
+# per-record so each stored hash is always verified with its own work factor.
+my $PBKDF2_ITERATIONS = 210_000;
+
+# Scheme label stored in a helper-user record so verify_user knows which
+# derivation to reproduce. Records without this key are legacy single-round
+# SHA-256 hashes and are still accepted for backward compatibility.
+my $PBKDF2_SCHEME = 'pbkdf2-hmac-sha256';
 
 # new(%args)
 # Constructs an auth manager bound to file and path registries.
@@ -36,6 +46,11 @@ sub trust_tier {
     my ( $self, %args ) = @_;
     my $remote_addr = $self->_canonical_ip( $args{remote_addr} );
     my $host = $self->_canonical_host( $args{host} );
+    # Behind the SSL front-proxy every backend connection arrives from the
+    # proxy's loopback socket, so remote_addr is ALWAYS loopback and can no
+    # longer prove the real client is local. Never grant the loopback-admin
+    # shortcut in that mode -- require an explicit helper login instead.
+    return 'helper' if $args{ssl_proxied};
     return 'admin' if $self->_request_is_loopback_admin(
         remote_addr          => $remote_addr,
         host                 => $host,
@@ -47,7 +62,9 @@ sub trust_tier {
 # add_user(%args)
 # Creates or replaces a file-backed helper user record.
 # Input: username, password, and optional role.
-# Output: saved user hash reference.
+# Output: saved user hash reference; the stored password is stretched with
+# PBKDF2-HMAC-SHA256 and the scheme/iteration work factor is recorded alongside
+# it so verification can reproduce the exact derivation later.
 sub add_user {
     my ( $self, %args ) = @_;
     my $username = $args{username} || die 'Missing username';
@@ -57,13 +74,16 @@ sub add_user {
       if $username !~ /\A[A-Za-z0-9_.-]{1,64}\z/;
     die 'Password must be at least 8 characters long'
       if length($password) < 8;
-    my $salt     = sha256_hex( join ':', $$, time, rand(), $username );
-    my $record   = {
-        username      => $username,
-        role          => $role,
-        salt          => $salt,
-        password_hash => $self->_password_hash( $username, $password, $salt ),
-        updated_at    => _now_iso8601(),
+    my $salt       = sha256_hex( join ':', $$, time, rand(), $username );
+    my $iterations = $PBKDF2_ITERATIONS;
+    my $record     = {
+        username        => $username,
+        role            => $role,
+        salt            => $salt,
+        password_scheme => $PBKDF2_SCHEME,
+        iterations      => $iterations,
+        password_hash   => _pbkdf2_hmac_sha256_hex( $password, $salt, $iterations ),
+        updated_at      => _now_iso8601(),
     };
     my $file = $self->_user_file($username);
     open my $fh, '>:raw', $file or die "Unable to write $file: $!";
@@ -76,15 +96,32 @@ sub add_user {
 # verify_user(%args)
 # Verifies a username/password pair against stored auth data.
 # Input: username and password.
-# Output: user hash reference on success or undef on failure.
+# Output: user hash reference on success or undef on failure. New records are
+# verified with PBKDF2-HMAC-SHA256; pre-existing single-round SHA-256 records
+# stay verifiable so upgrading the scheme never locks out established users.
 sub verify_user {
     my ( $self, %args ) = @_;
     my $username = $args{username} || return;
     my $password = $args{password} || return;
     my $user = $self->get_user($username) or return;
-    my $expected = $self->_password_hash( $username, $password, $user->{salt} );
-    return if $expected ne $user->{password_hash};
+    my $expected = $self->_expected_password_hash( $user, $username, $password );
+    return if !_secure_compare( $expected, $user->{password_hash} );
     return $user;
+}
+
+# _expected_password_hash($user, $username, $password)
+# Recomputes the stored password hash for a record using that record's own
+# scheme so legacy and stretched records both verify against the right
+# derivation.
+# Input: stored user hash reference, username string, candidate password string.
+# Output: expected password-hash hex string for the record's declared scheme.
+sub _expected_password_hash {
+    my ( $self, $user, $username, $password ) = @_;
+    if ( ( $user->{password_scheme} || '' ) eq $PBKDF2_SCHEME ) {
+        my $iterations = $user->{iterations} || $PBKDF2_ITERATIONS;    # uncoverable condition false
+        return _pbkdf2_hmac_sha256_hex( $password, $user->{salt}, $iterations );
+    }
+    return $self->_password_hash( $username, $password, $user->{salt} );
 }
 
 # get_user($username)
@@ -149,7 +186,7 @@ sub login_page {
     $redirect_to =~ s/"/&quot;/g;
     return <<"HTML";
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -233,20 +270,55 @@ sub _canonical_host {
 
 # _request_is_loopback_admin(%args)
 # Reports whether one request should be treated as trusted local-admin traffic.
+# Hostnames that are well-known local-machine aliases ('localhost',
+# 'localhost.localdomain') are always accepted.  Hostnames that merely resolve
+# to loopback via DNS are NOT trusted — that prevents DNS-rebinding attacks
+# where an attacker hostname resolves to 127.0.0.1.
 # Input: canonical remote_addr IP string and canonical host string.
-# Output: boolean true when the request comes from loopback and the host is blank, loopback, or resolves only to loopback addresses.
+# Output: boolean true when the request comes from loopback and the host
+# belongs to an explicitly trusted local-only set.
 sub _request_is_loopback_admin {
     my ( $self, %args ) = @_;
     my $remote_addr = $args{remote_addr} || '';
     my $host = $args{host};
+    return 0 if !$self->_ip_is_loopback($remote_addr);
+    return 1 if !defined $host || $host eq '';
+    return $self->host_is_local_alias(
+        host                 => $host,
+        extra_loopback_hosts => $args{extra_loopback_hosts},
+    );
+}
+
+# host_is_local_alias(%args)
+# Reports whether one host value is an explicitly trusted name for this
+# machine: a numeric loopback literal, a configured local-only alias from
+# web.ssl_subject_alt_names, or a well-known localhost hostname. IPv6 brackets
+# and any :port suffix are stripped before comparison, so the loopback-admin
+# trust check and the web layer's cross-site Origin/Referer check apply one
+# shared alias semantics. Hostnames that merely resolve to loopback via DNS
+# are NOT accepted — that is the DNS-rebinding protection.
+# Input: host string (optionally host:port or [v6]:port) plus optional
+# extra_loopback_hosts array reference of configured local-only alias hosts.
+# Output: boolean true when the host names this machine itself.
+sub host_is_local_alias {
+    my ( $self, %args ) = @_;
+    my $host = $self->_canonical_host( $args{host} );
+    # _canonical_host returns undef or a non-empty lowercased host, never an
+    # empty string, so undef is the only not-a-host outcome to reject here.
+    return 0 if !defined $host;
     my @extra_loopback_hosts = map { $self->_canonical_host($_) }
       grep { defined $_ && $_ ne '' }
       @{ ref( $args{extra_loopback_hosts} ) eq 'ARRAY' ? $args{extra_loopback_hosts} : [] };
-    return 0 if !$self->_ip_is_loopback($remote_addr);
-    return 1 if !defined $host || $host eq '';
-    return 1 if $self->_ip_is_loopback($host);
-    return 1 if grep { defined $_ && $_ ne '' && $_ eq $host } @extra_loopback_hosts;
-    return $self->_host_resolves_only_to_loopback($host);
+    return 1 if $self->_ip_is_loopback( $self->_canonical_ip($host) );
+    return 1 if grep { $_ eq $host } @extra_loopback_hosts;
+    # Well-known system-local hostnames are implicitly trusted without
+    # DNS resolution.  This list is intentionally small — arbitrary
+    # hostnames that happen to resolve to loopback are NOT trusted,
+    # preventing DNS-rebinding admin elevation.
+    return 1 if $host eq 'localhost';
+    return 1 if $host eq 'localhost.localdomain';
+    return 1 if $host eq 'localhost6' || $host eq 'localhost6.localdomain6';
+    return 0;    # Any other hostname is not local even when it resolves to loopback
 }
 
 # _host_resolves_only_to_loopback($host)
@@ -286,7 +358,7 @@ sub _resolve_host_ips {
             $ip = inet_ntop( AF_INET6, $packed_addr );
         }
         $ip = $self->_canonical_ip($ip);
-        next if !defined $ip || $ip eq '';
+        next if $ip eq '';
         next if $seen{$ip}++;
         push @ips, $ip;
     }
@@ -327,12 +399,45 @@ sub _ip_is_loopback {
 }
 
 # _password_hash($username, $password, $salt)
-# Derives the stored password hash for a user.
+# Derives the legacy single-round SHA-256 password hash for a user. Retained
+# only so pre-existing helper records created before password stretching keep
+# verifying; new records use the PBKDF2 scheme instead.
 # Input: username string, password string, salt string.
 # Output: hash string.
 sub _password_hash {
     my ( $self, $username, $password, $salt ) = @_;
     return sha256_hex( join ':', $salt, $username, $password );
+}
+
+# _pbkdf2_hmac_sha256_hex($password, $salt, $iterations)
+# Stretches a password with PBKDF2-HMAC-SHA256 (RFC 2898). The 32-byte SHA-256
+# output equals the derived-key length, so exactly one output block is needed.
+# Input: password string, salt string, positive iteration count.
+# Output: 64-character lowercase hex string of the derived key.
+sub _pbkdf2_hmac_sha256_hex {
+    my ( $password, $salt, $iterations ) = @_;
+    my $u      = hmac_sha256( $salt . pack( 'N', 1 ), $password );
+    my $result = $u;
+    for ( 2 .. $iterations ) {
+        $u = hmac_sha256( $u, $password );
+        $result ^= $u;
+    }
+    return unpack( 'H*', $result );
+}
+
+# _secure_compare($left, $right)
+# Compares two strings in length-constant time so password-hash verification
+# does not leak how many leading characters matched through timing.
+# Input: two strings (either may be undef).
+# Output: boolean true only when both are defined, equal length, and identical.
+sub _secure_compare {
+    my ( $left, $right ) = @_;
+    return 0 if !defined $left || !defined $right;
+    return 0 if length($left) != length($right);
+    my $diff = 0;
+    $diff |= ord( substr( $left, $_, 1 ) ) ^ ord( substr( $right, $_, 1 ) )
+      for 0 .. length($left) - 1;
+    return $diff == 0 ? 1 : 0;
 }
 
 # _now_iso8601()
@@ -360,10 +465,23 @@ Developer::Dashboard::Auth - local auth and trust-tier handling
 =head1 DESCRIPTION
 
 This module implements the local-first trust model for Developer Dashboard.
-Loopback requests using loopback-local hosts such as C<127.0.0.1>,
-C<localhost>, or configured local alias names can be treated as trusted admin
-access, while other requests authenticate through file-backed helper user
-records.
+Loopback requests using loopback-local IPs such as C<127.0.0.1> or C<::1>,
+explicitly configured local alias names, or the well-known hostnames
+C<localhost>, C<localhost.localdomain>, C<localhost6>, and
+C<localhost6.localdomain6> can be treated as trusted admin access, while
+all other requests authenticate through file-backed helper user records.
+
+DNS-rebinding protection: hostnames that merely resolve to loopback addresses
+via DNS are NOT granted admin trust.  Only the well-known local-machine
+aliases listed above, configured C<extra_loopback_hosts>, and literal loopback
+IPs are accepted.  This prevents an attacker-controlled hostname that resolves
+to C<127.0.0.1> from gaining admin access over a loopback connection.
+
+Helper passwords are stored stretched with PBKDF2-HMAC-SHA256 and each record
+carries its own scheme label and iteration work factor. Helper records written
+before stretching was introduced used a single-round salted SHA-256 hash and
+are still accepted, so tightening the scheme never locks out an established
+helper user.
 
 =head1 METHODS
 
@@ -374,6 +492,14 @@ Construct an auth manager.
 =head2 trust_tier, add_user, verify_user, get_user, list_users, remove_user, login_page, helper_users_enabled
 
 Manage trust decisions, helper users, and login UI.
+
+=head2 host_is_local_alias
+
+Report whether one host value is an explicitly trusted local name for this
+machine: a numeric loopback literal, a configured local-only alias, or a
+well-known localhost hostname. The loopback-admin trust check and the web
+layer's cross-site Origin/Referer defense share this method so both apply
+identical alias semantics.
 
 =for comment FULL-POD-DOC START
 

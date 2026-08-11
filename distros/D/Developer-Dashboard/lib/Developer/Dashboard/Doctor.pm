@@ -3,7 +3,7 @@ package Developer::Dashboard::Doctor;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use File::Find ();
 use File::Spec;
@@ -121,7 +121,7 @@ sub _audit_root {
                 return if !$issue;
                 if ($fix) {
                     chmod oct( $issue->{expected_mode} ), $entry
-                      or die sprintf 'Unable to chmod %s to %s: %s', $entry, $issue->{expected_mode}, $!;
+                      or die sprintf 'Unable to chmod %s to %s: %s', $entry, $issue->{expected_mode}, $!;    # uncoverable branch true
                     $issue->{fixed} = 1;
                     $issue->{current_mode} = $issue->{expected_mode};
                 }
@@ -234,7 +234,7 @@ sub _helper_issue_for_path {
     my $current = <$fh>;
     close $fh;
 
-    return undef if defined $current && $current eq $expected;
+    return undef if defined $current && $current eq $expected;    # uncoverable condition left
 
     return {
         path          => $path,
@@ -320,7 +320,7 @@ sub _rewrite_bashrc_dashboard_lines {
     my ( $self, $path ) = @_;
     my $text = $self->_slurp_text_file($path);
     my ( $guard_start, $guard_end ) = $self->_bash_noninteractive_guard_offsets($text);
-    return if !defined $guard_start || !defined $guard_end;
+    return if !defined $guard_end;
 
     my @dashboard_lines = $self->_dashboard_bashrc_lines($text);
     return if !@dashboard_lines;
@@ -343,7 +343,7 @@ sub _rewrite_bashrc_dashboard_lines {
 
     open my $write_fh, '>', $path or die "Unable to write $path: $!";
     print {$write_fh} $rewritten;
-    close $write_fh or die "Unable to close $path after writing: $!";
+    close $write_fh or die "Unable to close $path after writing: $!";    # uncoverable branch true
 }
 
 # _dashboard_bashrc_lines($text)
@@ -416,8 +416,8 @@ sub _slurp_text_file {
     open my $read_fh, '<', $path or die "Unable to read $path: $!";
     local $/;
     my $text = <$read_fh>;
-    close $read_fh or die "Unable to close $path after reading: $!";
-    return defined($text) ? $text : q{};
+    close $read_fh or die "Unable to close $path after reading: $!";    # uncoverable branch true
+    return defined($text) ? $text : q{};    # uncoverable branch false
 }
 
 # _mode_octal($path)

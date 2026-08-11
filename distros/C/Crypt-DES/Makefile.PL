@@ -11,6 +11,19 @@ WriteMakefile(
 	'DISTNAME' => 'Crypt-DES',
 	'VERSION_FROM' => 'DES.pm',,
 	'OBJECT' => 'DES.o _des.o',
-	'dist'   => {COMPRESS=>'gzip', SUFFIX=>'gz'}
+	'dist'   => {COMPRESS=>'gzip', SUFFIX=>'gz'},
+        META_MERGE       => {
+        'meta-spec' => { version => 2 },
+        'resources' => {
+            'repository' => {
+                'type' => 'git',
+                'url'  => 'git://github.com/timlegge/perl-Crypt-DES.git',
+                'web'  => 'https://github.com/timlegge/perl-Crypt-DES',
+            },
+            'bugtracker' => {
+                'web' => 'https://github.com/timlegge/perl-Crypt-DES/issues',
+            },
+        },
+    },
 );
 

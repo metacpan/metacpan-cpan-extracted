@@ -225,6 +225,54 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
     return def;
 }
 
+/* How many SNI hosts a built context actually carries. -1 when it has no
+ * registry at all (a plain default with no SNI map).
+ *
+ * hm_tls_ctx_build SKIPS a host whose certificate will not load and
+ * still returns a usable default, which is right at boot - one bad PEM
+ * should not stop a server starting. It is wrong for a reload, where
+ * the same behaviour silently drops every domain that failed down to
+ * the fallback certificate. A reload compares this against what it
+ * asked for and refuses to install a context that carries fewer. */
+static int hm_tls_sni_count(void *ctxv) {
+    hm_sni_registry *reg;
+    if (!ctxv || hm_tls_sni_ex_idx < 0) return -1;
+    reg = (hm_sni_registry *)SSL_CTX_get_ex_data((SSL_CTX *)ctxv,
+                                                 hm_tls_sni_ex_idx);
+    return reg ? reg->n : -1;
+}
+
+/* Release a context built by hm_tls_ctx_build, and the SNI registry that
+ * hangs off it.
+ *
+ * The registry has to be freed by hand: hm_tls_sni_ex_idx is created with
+ * a NULL free function, so SSL_CTX_free walks past it. Nothing needed
+ * this until tls_reload, because a context used to live exactly as long
+ * as the process did.
+ *
+ * Safe on a context that was built before a fork. Copy-on-write means
+ * the caller is decrementing refcounts in its own copy of those pages;
+ * the parent's context and its siblings' are untouched. */
+static void hm_tls_ctx_free(void *ctxv) {
+    SSL_CTX *ctx = (SSL_CTX *)ctxv;
+    hm_sni_registry *reg;
+    if (!ctx) return;
+
+    reg = (hm_sni_registry *)(hm_tls_sni_ex_idx >= 0
+            ? SSL_CTX_get_ex_data(ctx, hm_tls_sni_ex_idx) : NULL);
+    if (reg) {
+        int i;
+        for (i = 0; i < reg->n; i++) {
+            free(reg->entries[i].host);
+            if (reg->entries[i].ctx) SSL_CTX_free(reg->entries[i].ctx);
+        }
+        free(reg->entries);
+        free(reg);
+        SSL_CTX_set_ex_data(ctx, hm_tls_sni_ex_idx, NULL);
+    }
+    SSL_CTX_free(ctx);
+}
+
 /* Wrap an accepted fd in a server-side SSL and put it in handshake state. */
 static int hm_tls_wrap(hm_conn *c, void *ctx) {
     SSL *ssl = SSL_new((SSL_CTX *)ctx);
@@ -331,6 +379,8 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
     (void)cert; (void)key; (void)ca; (void)verify; (void)sni; (void)alpn;
     return 0;
 }
+static int  hm_tls_sni_count(void *ctx) { (void)ctx; return -1; }
+static void hm_tls_ctx_free(void *ctx) { (void)ctx; }
 static int  hm_tls_wrap(hm_conn *c, void *ctx) { (void)c; (void)ctx; return -1; }
 static void hm_tls_capture_peer(hm_conn *c) { (void)c; }
 static void hm_tls_conn_free(hm_conn *c) { (void)c; }

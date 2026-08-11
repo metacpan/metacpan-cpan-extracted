@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Ticket;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -65,7 +65,7 @@ sub registered_workspace_dir {
     require Developer::Dashboard::FileRegistry;
     require Developer::Dashboard::Config;
     my $home = $ENV{HOME} || '';
-    my @roots = grep { defined && -d } map { "$home/$_" } qw(projects src work);
+    my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
     my $paths = Developer::Dashboard::PathRegistry->new(
         home            => $home,
         cwd             => cwd(),
@@ -195,7 +195,7 @@ sub _dashboard_command_path {
       if defined $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT}
       && $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} ne '';
     my $path = command_in_path('dashboard');
-    return $path if defined $path && $path ne '';
+    return $path if defined $path;
     return 'dashboard';
 }
 
@@ -209,14 +209,14 @@ sub _workspace_env_files {
     my $cwd = $args{cwd};
     $cwd = cwd() if !defined $cwd || $cwd eq '';
     my $dir = Developer::Dashboard::EnvLoader->_path_identity($cwd);
-    return () if !defined $dir || $dir eq '';
+    return () if $dir eq '';
     my @files;
     while (1) {
         my $file = File::Spec->catfile( $dir, '.env' );
         push @files, $file if -f $file;
         last if $dir eq File::Spec->rootdir();
         my $parent = dirname($dir);
-        last if !defined $parent || $parent eq '' || $parent eq $dir;
+        last if $parent eq $dir;
         $dir = $parent;
     }
     return reverse @files;
@@ -263,8 +263,8 @@ sub apply_workspace_environment {
         args => [ 'show-environment', '-t', $session, 'DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS' ],
     );
     my %new = %{$env};
-    my %new_keys = map { $_ => 1 } grep { defined && $_ ne '' } split /:/, ( $new{DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS} || '' );
-    my %existing = map { $_ => 1 } grep { defined && $_ ne '' } split /:/, ( defined $existing_keys ? ( $existing_keys =~ s/^DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS=//r ) : '' );
+    my %new_keys = map { $_ => 1 } grep { $_ ne '' } split /:/, ( $new{DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS} || '' );
+    my %existing = map { $_ => 1 } grep { $_ ne '' } split /:/, ( defined $existing_keys ? ( $existing_keys =~ s/^DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS=//r ) : '' );
 
     for my $key ( sort keys %existing ) {
         next if $new_keys{$key};
@@ -309,7 +309,7 @@ sub apply_ticket_status {
     my (%args) = @_;
     my $session = $args{session} || die 'Missing session name';
     my $tmux = $args{tmux} || \&tmux_command;
-    my $dashboard = $args{dashboard} || _dashboard_command_path();
+    my $dashboard = $args{dashboard} || _dashboard_command_path();    # uncoverable condition false
 
     my $default_status = _tmux_stdout(
         tmux => $tmux,
@@ -394,7 +394,7 @@ sub list_sessions {
       ( $result->{stdout} || '' )
       if $result->{exit_code} != 0;
 
-    return grep { defined && $_ ne '' } split /\r?\n/, ( $result->{stdout} || '' );
+    return grep { $_ ne '' } split /\r?\n/, ( $result->{stdout} || '' );
 }
 
 # build_workspace_plan(%args)

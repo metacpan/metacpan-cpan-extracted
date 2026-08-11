@@ -1,5 +1,19 @@
 Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
 
+0.0012 -- Mon Aug 10 21:49:40 ADT 2026
+
+    [Significant Changes from 0.0009]
+    - bin/createrelease.pl changes only
+    - Don't try to read 'dist.ini' if the name is in .githubcreaterelease
+    - Sort tags by version:refname as taggerdate requires annotated tags
+
+    [Detailed Change Log]
+    - 03f6c96 Update version for a release
+    - 6e9507f Don't read from dist.ini if name is provided in .githubcreaterelease
+    - 38527d4 Sort tags by version:refname as taggerdate requires annotated tags
+    - 6144fe7 v0.0011
+    - e3d95ef Update version for a release
+
 0.0011 -- Sun Aug 09 19:31:30 ADT 2026
 
     [Significant Changes from 0.0009]

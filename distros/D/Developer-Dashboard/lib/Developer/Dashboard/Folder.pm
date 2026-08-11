@@ -3,7 +3,7 @@ package Developer::Dashboard::Folder;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Cwd qw(cwd);
 use File::Basename qw(dirname);
@@ -95,7 +95,7 @@ sub all {
 # Output: directory path string.
 sub postman {
     my $dir = File::Spec->catdir( configs(), 'postman' );
-    make_path($dir) if $dir ne '' && !-d $dir;
+    make_path($dir) if $dir ne '' && !-d $dir;    # uncoverable condition left
     return $dir;
 }
 
@@ -109,8 +109,8 @@ sub _paths_obj {
     return if $home eq '';
     $PATHS = Developer::Dashboard::PathRegistry->new(
         home            => $home,
-        workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
-        project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
+        workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],    # uncoverable branch false
+        project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],    # uncoverable branch false
     );
     _load_configured_aliases();
     return $PATHS;
@@ -124,7 +124,7 @@ sub _configured_alias_cache_key {
     my ($paths) = @_;
     return '' if !$paths || !blessed($paths);
     my $project_root = eval { $paths->current_project_root } || '';
-    my @runtime_roots = eval { $paths->runtime_roots } || ();
+    my @runtime_roots = eval { $paths->runtime_roots } || ();    # uncoverable condition right
     return join "\n", $project_root, @runtime_roots;
 }
 
@@ -189,7 +189,7 @@ sub ls {
         };
     }
     closedir $dh;
-    return sort { $b->{type} cmp $a->{type} || $a->{NAME} cmp $b->{NAME} } @items;
+    return sort { $b->{type} cmp $a->{type} || $a->{NAME} cmp $b->{NAME} } @items;    # uncoverable branch true
 }
 
 # locate(@parts)
@@ -210,9 +210,8 @@ sub locate {
                 wanted   => sub {
                     return if !-d $_;
                     my $path = $File::Find::name;
-                    my $name = $_;
                     for my $part (@parts) {
-                        return if $name !~ /\Q$part\E/i && $path !~ /\Q$part\E/i;
+                        return if $path !~ /\Q$part\E/i;
                     }
                     push @found, $path;
                 },

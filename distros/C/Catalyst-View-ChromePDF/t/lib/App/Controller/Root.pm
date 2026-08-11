@@ -12,6 +12,7 @@ sub base : Chained('/') PathPart('') Args(0) {
     $c->stash->{pdf} = {
         template  => 'base.tt',
         page_size => 'a5',
+        wait      => 0,
     };
 
     $c->forward('View::ChromePDF');

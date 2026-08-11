@@ -62,7 +62,7 @@ subtest 'Custom Timing/Response Wrapper Middleware' => sub {
 
 subtest 'CORS Middleware & OPTIONS Preflight' => sub {
     my $app = PAGI::FastAPI->new();
-    $app->add_cors(allow_origins => ['https://frontend.com']);
+    $app->add_cors(origins => ['https://frontend.com']);
 
     $app->get('/api/data', handler => async sub ($c) { return { data => 123 }; });
 

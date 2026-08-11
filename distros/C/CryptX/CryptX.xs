@@ -131,13 +131,6 @@ typedef struct digest_struct {          /* used by Crypt::Digest */
   int finalized;
 } *Crypt__Digest;
 
-STATIC int cryptx_internal_noclone_hash(const char *name) {
-  if (name == NULL) return 0;
-  return strcmp(name, "sha1") == 0
-      || strcmp(name, "sha224") == 0
-      || strcmp(name, "sha256") == 0;
-}
-
 typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE, TurboSHAKE, KangarooTwelve */
   hash_state state;
   int num;
@@ -743,9 +736,7 @@ typedef struct ofb_struct {             /* used by Crypt::Mode::OFB */
 } *Crypt__Mode__OFB;
 
 typedef struct xts_struct {             /* used by Crypt::Mode::XTS */
-  int cipher_id, cipher_rounds;
-  symmetric_xts state;
-  int direction;
+  symmetric_xts state;                  /* the two key schedules; raw key is never kept */
 } *Crypt__Mode__XTS;
 
 typedef struct prng_struct {            /* used by Crypt::PRNG */
@@ -1167,6 +1158,7 @@ _radix_to_bin(SV *in, int radix)
             RETVAL = NEWSV(0, len); /* avoid zero! */
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, len);
+            *SvEND(RETVAL) = '\0';
             out_data = (unsigned char *)SvPVX(RETVAL);
             if (mp_to_ubin(&mpi, out_data, len, NULL) != MP_OKAY) {
               SvREFCNT_dec(RETVAL);
@@ -1303,6 +1295,7 @@ decode_b64(SV * in)
             XSRETURN_UNDEF;
           }
           SvCUR_set(RETVAL, out_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -1384,6 +1377,7 @@ decode_b32r(SV *in)
             XSRETURN_UNDEF;
           }
           SvCUR_set(RETVAL, out_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -1405,6 +1399,7 @@ increment_octets_le(SV * in)
           RETVAL = NEWSV(0, len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           Copy(in_data, out_data, len, unsigned char);
           while (i < len) {
@@ -1437,6 +1432,7 @@ increment_octets_be(SV * in)
           RETVAL = NEWSV(0, len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           Copy(in_data, out_data, len, unsigned char);
           while (i < len) {
@@ -1520,7 +1516,7 @@ INCLUDE: inc/CryptX_Mode_OFB.xs.inc
 INCLUDE: inc/CryptX_Mode_CTR.xs.inc
 #INCLUDE: inc/CryptX_Mode_F8.xs.inc
 #INCLUDE: inc/CryptX_Mode_LRW.xs.inc
-#INCLUDE: inc/CryptX_Mode_XTS.xs.inc
+INCLUDE: inc/CryptX_Mode_XTS.xs.inc
 
 INCLUDE: inc/CryptX_PRNG.xs.inc
 

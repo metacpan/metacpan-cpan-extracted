@@ -2,7 +2,6 @@ use Test2::V0;
 use Path::Tiny;
 use Git::Libgit2 qw( init_lib shutdown_lib check_rc );
 use Git::Libgit2::FFI ();
-use FFI::Platypus::Buffer qw( scalar_to_buffer );
 
 local $ENV{GIT_CONFIG_GLOBAL} = '/dev/null';
 local $ENV{GIT_CONFIG_SYSTEM} = '/dev/null';
@@ -22,15 +21,25 @@ ok( $config, 'git_repository_config returned a config handle' );
 check_rc Git::Libgit2::FFI::git_config_set_string( $config, 'user.name', 'Test User' );
 check_rc Git::Libgit2::FFI::git_config_set_string( $config, 'user.email', 'test@example.invalid' );
 
-# --- git_config_get_string (read directly, no snapshot) ---
-# NOTE: reading from the same config after set_string requires using
-# git_config_get_string; but since we cannot safely mix read+write on the
-# same handle in libgit2 1.5.x, we only confirm the call succeeds here.
-my $name_out_buf = "\0" x 256;
-my ($name_out) = scalar_to_buffer($name_out_buf);
-my $rc_get = Git::Libgit2::FFI::git_config_get_string( $name_out, $config, 'user.name' );
-# rc < 0 means error; a segfault here means the library is unstable for this pattern
-ok( $rc_get < 0 || $rc_get == 0, 'git_config_get_string returned (rc=' . $rc_get . ')' );
+# --- git_config_get_string ---
+# The out-param borrows storage owned by the config object, so libgit2
+# refuses the call on a live (writable) handle and says so:
+# "get_string called on a live config object" (GIT_ERROR_CONFIG).
+my $rc_live = Git::Libgit2::FFI::git_config_get_string( \my $live_name, $config, 'user.name' );
+isnt( $rc_live, 0, 'git_config_get_string is refused on a live config handle' );
+like(
+  Git::Libgit2::Error->last($rc_live)->message,
+  qr/live config object/,
+  'refusal comes from libgit2 as the live-config error'
+);
+
+# Reads therefore go through a snapshot, same as the get_bool block below.
+my $name_snap;
+check_rc Git::Libgit2::FFI::git_config_snapshot( \$name_snap, $config );
+my $rc_get = Git::Libgit2::FFI::git_config_get_string( \my $name, $name_snap, 'user.name' );
+is( $rc_get, 0, 'git_config_get_string succeeded on a snapshot (rc=' . $rc_get . ')' );
+is( $name, 'Test User', 'git_config_get_string read back the value set above' );
+Git::Libgit2::FFI::git_config_free($name_snap);
 
 # --- git_config_get_bool (read off a snapshot, the safe read path) ---
 check_rc Git::Libgit2::FFI::git_config_set_string( $config, 'core.flag', 'true' );

@@ -7,12 +7,12 @@ extends 'Catalyst::View';
 
 use File::Spec;
 use IO::File::WithPath;
-use Log::Log4perl ':easy';
 use MooseX::Aliases;
 use Path::Tiny qw( path );
 use Scalar::Util qw( blessed );
 use Try::Tiny;
-use Types::Common qw( Enum HashRef InstanceOf NonEmptySimpleStr StrMatch );
+use Types::Common qw( Enum HashRef NonEmptySimpleStr PositiveOrZeroInt StrMatch );
+use URI::Escape qw( uri_escape_utf8 );
 use WWW::Mechanize::Chrome;
 
 # RECOMMEND PREREQ: Catalyst::View::TT
@@ -22,22 +22,20 @@ use namespace::autoclean;
 
 use experimental qw( signatures );
 
-our $VERSION = 'v0.1.2';
-
-Log::Log4perl->easy_init($WARN);
+our $VERSION = 'v0.1.3';
 
 # ABSTRACT: convert HTML (or TT) content to PDF using Chrome
 
 
 has tmpdir => (
     is         => 'ro',
-    isa        => InstanceOf['Path::Tiny'],
+    isa        => NonEmptySimpleStr,
     lazy_build => 1,
     builder    => '_build_tmpdir',
 );
 
 sub _build_tmpdir($self) {
-    return path( File::Spec->tmpdir )->mkdir
+    return File::Spec->tmpdir;
 }
 
 
@@ -104,7 +102,7 @@ sub process( $self, $c ) {
     $c->res->body( $self->render( $c, $args // { } ) );
 
     my $disposition = $Dispositions->assert_return( $args->{disposition} // $self->disposition );
-    my $filename    = $args->{filename} // $self->filename;
+    my $filename    = uri_escape_utf8( $args->{filename} // $self->filename );
 
     $c->res->header(
         "Content-Disposition" => "${disposition}; filename*=UTF-8''${filename}",
@@ -131,13 +129,15 @@ sub render( $self, $c, $args ) {
     die 'Void-input' unless defined $html;
 
     my $file = Path::Tiny->tempfile(
-        DIR    => $self->tmpdir->stringify,
+        DIR    => $self->tmpdir,
         SUFFIX => ".html",
         UNLINK => 1,
     );
 
     $c->log->debug("Saving the HTML to ${file}");
     $file->spew_raw($html);
+
+    my $wait = PositiveOrZeroInt->assert_return( $args->{wait} // 0 );
 
     my $mech = $args->{mech} // WWW::Mechanize::Chrome->new(
         headless         => 1,
@@ -148,15 +148,17 @@ sub render( $self, $c, $args ) {
     return try {
         my $res = $mech->get_local( $file->stringify );
 
+        $mech->infinite_scroll($wait) if $wait;
+
         if ( $res->is_success ) {
 
             my $out = Path::Tiny->tempfile(
                 DIR    => $self->tmpdir,
                 SUFFIX => ".pdf",
-                UNLINK => 0,
+                UNLINK => 1,
             );
 
-            my $res;
+            my $ret;
 
             my %opts = $self->_build_pdf_options( $c, $args );
 
@@ -165,18 +167,24 @@ sub render( $self, $c, $args ) {
                 $c->log->debug("Saving the PDF to ${out}");
 
                 $mech->content_as_pdf( %opts, filename => $out->stringify );
-                $res = IO::File::WithPath->new( $out, '<:raw' );
+                $ret = IO::File::WithPath->new( $out, '<:raw' );
 
             }
             else {
 
-                $res = $mech->content_as_pdf(%opts);
+                $ret = $mech->content_as_pdf(%opts);
 
             }
 
-            return $res;
+            return $ret;
 
         }
+        else {
+
+            die "Unknown error: HTTP " . $res->code;
+
+        }
+
 
     }
     catch {
@@ -226,7 +234,7 @@ Catalyst::View::ChromePDF - convert HTML (or TT) content to PDF using Chrome
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.3
 
 =head1 SYNOPSIS
 
@@ -354,6 +362,16 @@ This is a L<WWW::Mechanize::Chrome> instance.
 If omitted, a new instance will be created and then closed, using the L</chrome_args>.
 
 =head2 send_filehandle
+
+When true, send the filehandle instead of the PDF content.
+
+Note that this may result in files left in L</tmpdir> that will need to be purged by a separate process.
+
+=head2 wait
+
+When this is non-zero, then it will scroll to the bottom and wait this number of seconds for the content to load.
+
+This was added in version v0.1.3.
 
 =head2 format
 

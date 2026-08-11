@@ -3,10 +3,6 @@ abstract: 'Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Dashboard for 
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
-  Data::Random: '0'
-  Data::Random::String: '0'
-  Data::Random::String::Matches: '0.02'
-  Data::Random::Structure: '0'
   Encode: '0'
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
@@ -22,7 +18,6 @@ build_requires:
   Test::Needs: '0'
   Test::Returns: '0.03'
   Test::Without::Module: '0'
-  Unicode::GCString: '0'
   Unicode::Normalize: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -47,6 +42,10 @@ requires:
   Config::Abstraction: '0.36'
   Cwd: '0'
   Data::Dumper: '0'
+  Data::Random: '0'
+  Data::Random::String: '0'
+  Data::Random::String::Matches: '0.02'
+  Data::Random::Structure: '0'
   Data::Section::Simple: '0'
   File::Copy: '0'
   File::Copy::Recursive: '0'
@@ -62,7 +61,7 @@ requires:
   Module::Load::Conditional: '0'
   PPI: '0'
   Params::Get: '0.15'
-  Params::Validate::Strict: '0.3'
+  Params::Validate::Strict: '0.36'
   Pod::Simple: '0'
   Pod::Usage: '0'
   Readonly: '0'
@@ -73,6 +72,7 @@ requires:
   Text::Balanced: '0'
   URI: '0'
   UUID::Tiny: '0'
+  Unicode::GCString: '0'
   WWW::RT::CPAN: '0'
   YAML::XS: '0'
   autodie: '0'
@@ -81,5 +81,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.44'
+version: '0.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

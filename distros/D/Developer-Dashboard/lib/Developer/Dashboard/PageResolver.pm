@@ -3,7 +3,7 @@ package Developer::Dashboard::PageResolver;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Developer::Dashboard::PageDocument;
 
@@ -134,7 +134,7 @@ sub load_provider_page {
             layout      => { body => $provider->{body} || '' },
             actions     => $provider->{actions} || [],
             state       => $provider->{state} || {},
-        );
+        );    # uncoverable condition false count:1
     }
 
     $page->{meta}{source_kind} = 'provider';

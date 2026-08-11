@@ -48,6 +48,10 @@
             "Config::Abstraction" : "0.36",
             "Cwd" : "0",
             "Data::Dumper" : "0",
+            "Data::Random" : "0",
+            "Data::Random::String" : "0",
+            "Data::Random::String::Matches" : "0.02",
+            "Data::Random::Structure" : "0",
             "Data::Section::Simple" : "0",
             "File::Copy" : "0",
             "File::Copy::Recursive" : "0",
@@ -63,7 +67,7 @@
             "Module::Load::Conditional" : "0",
             "PPI" : "0",
             "Params::Get" : "0.15",
-            "Params::Validate::Strict" : "0.3",
+            "Params::Validate::Strict" : "0.36",
             "Pod::Simple" : "0",
             "Pod::Usage" : "0",
             "Readonly" : "0",
@@ -74,6 +78,7 @@
             "Text::Balanced" : "0",
             "URI" : "0",
             "UUID::Tiny" : "0",
+            "Unicode::GCString" : "0",
             "WWW::RT::CPAN" : "0",
             "YAML::XS" : "0",
             "autodie" : "0",
@@ -82,10 +87,6 @@
       },
       "test" : {
          "requires" : {
-            "Data::Random" : "0",
-            "Data::Random::String" : "0",
-            "Data::Random::String::Matches" : "0.02",
-            "Data::Random::Structure" : "0",
             "Encode" : "0",
             "FindBin" : "0",
             "IPC::System::Simple" : "0",
@@ -100,7 +101,6 @@
             "Test::Needs" : "0",
             "Test::Returns" : "0.03",
             "Test::Without::Module" : "0",
-            "Unicode::GCString" : "0",
             "Unicode::Normalize" : "0"
          }
       }
@@ -120,6 +120,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.44",
+   "version" : "0.45",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -2,10 +2,14 @@ use strict;
 use warnings;
 
 use Cwd qw(abs_path);
+use File::Copy qw(copy);
 use File::Find qw(find);
+use File::Path qw(make_path);
 use File::Spec;
+use File::Temp qw(tempdir);
 use FindBin qw($RealBin);
 use Capture::Tiny qw(capture);
+use JSON::XS ();
 use Test::More;
 use Archive::Tar;
 
@@ -58,6 +62,7 @@ my @doc_paths = grep { -e $_ } (
     _repo_path( 'doc', 'static-file-serving.md' ),
     _repo_path( 'doc', 'testing.md' ),
     _repo_path( 'doc', 'update-and-release.md' ),
+    _repo_path( 'doc', 'upgrade.md' ),
     _repo_path( 'doc', 'web-readonly-mode.md' ),
 );
 my @pod_paths = (
@@ -76,7 +81,7 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '4.16', 'repo version bumped for the workspace -c change-directory flag' );
+is( $version, '4.26', 'repo version bumped for the packaging-hygiene epic DD-507..DD-533' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 {
     my @module_files;
@@ -128,6 +133,35 @@ is(
 );
 if ( $dist ne '' ) {
     like( $dist, qr/^version = \Q$version\E$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^license = MIT$/m, 'dist.ini declares the canonical MIT distribution license' );
+    {
+        my $fixture = tempdir( CLEANUP => 1 );
+        make_path( File::Spec->catdir( $fixture, 'lib', 'Developer' ) );
+        copy( _repo_path('Makefile.PL'), File::Spec->catfile( $fixture, 'Makefile.PL' ) )
+          or die "Unable to copy Makefile.PL into $fixture: $!";
+        copy(
+            _repo_path( 'lib', 'Developer', 'Dashboard.pm' ),
+            File::Spec->catfile( $fixture, 'lib', 'Developer', 'Dashboard.pm' ),
+          ) or die "Unable to copy Developer::Dashboard into $fixture: $!";
+        make_path( File::Spec->catdir( $fixture, 'share' ) );
+
+        my ( $configure_stdout, $configure_stderr, $configure_exit ) = capture {
+            my $original = Cwd::cwd();
+            chdir $fixture or die "Unable to chdir to $fixture: $!";
+            local $ENV{HOME} = $fixture;
+            system( $^X, 'Makefile.PL' );
+            my $exit = $? >> 8;
+            chdir $original or die "Unable to return to $original: $!";
+            return $exit;
+        };
+        is( $configure_exit, 0, 'Makefile.PL generates metadata in a temporary source fixture' )
+          or diag("stdout:\n$configure_stdout\nstderr:\n$configure_stderr");
+
+        my $mymeta_path = File::Spec->catfile( $fixture, 'MYMETA.json' );
+        ok( -f $mymeta_path, 'Makefile.PL writes MYMETA.json' );
+        my $generated_meta = JSON::XS->new->decode( _slurp($mymeta_path) );
+        is_deeply( $generated_meta->{license}, ['mit'], 'generated MakeMaker metadata declares only the canonical MIT license' );
+    }
     like( $dist, qr/^skip = \^Module::CPANTS::Analyse\$$/m, 'dist.ini skips release-only Module::CPANTS::Analyse from generated install-time prereqs' );
     like( $dist, qr/^skip = \^Module::CPANTS::Kwalitee\$$/m, 'dist.ini skips release-only Module::CPANTS::Kwalitee from generated install-time prereqs' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
@@ -135,6 +169,8 @@ if ( $dist ne '' ) {
     like( $dist, qr/^exclude_match = \^node_modules\/$/m, 'dist.ini excludes node_modules so JavaScript dependency trees do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^test_by_michael\/$/m, 'dist.ini excludes test_by_michael so private scratch fixtures do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^updates\/$/m, 'dist.ini excludes checkout-only update scripts so user-defined update remains the installed runtime contract' );
+    like( $dist, qr/^exclude_match = \^dogfood-output\/$/m, 'dist.ini excludes dogfood-output so browser QA evidence and screenshots do not leak into release tarballs' );
+    like( $dist, qr/^exclude_match = \^\\\.worktrees\/$/m, 'dist.ini excludes .worktrees so ticket worktrees do not leak into release tarballs' );
     unlike( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini keeps integration assets in the release tarball so install-time integration tests can read them' );
     unlike( $dist, qr/^exclude_match = \\.md\$$/m, 'dist.ini keeps Markdown documentation in the release tarball so release tests can read the shipped docs' );
     like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
@@ -171,6 +207,9 @@ for my $path (
     ok( !-e _repo_path($path), "$path is no longer shipped as a public executable" );
 }
 
+ok( -f _repo_path( 'bin', 'd2' ), 'bin/d2 is shipped as the real short dashboard entrypoint' );
+ok( -x _repo_path( 'bin', 'd2' ), 'bin/d2 is shipped as an executable' );
+
 for my $module (
     qw(
     Developer::Dashboard::Folder
@@ -189,45 +228,130 @@ unlike( $makefile, qr/["']Test::Pod["']\s*=>\s*0/, 'Makefile.PL does not ship Te
 unlike( $makefile, qr/["']HTTP::Daemon["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Daemon metadata' );
 unlike( $makefile, qr/["']HTTP::Status["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Status metadata' );
 unlike( $cpanfile, qr/requires ['"]Test::Pod['"];/, 'cpanfile does not ship Test::Pod as an install-time prerequisite' );
-for my $module (
-    qw(
-    JSON::XS
-    YAML::XS
-    TOML::Parser
-    Capture::Tiny
-    Getopt::Long
-    Digest::MD5
-    Digest::SHA
-    Archive::Zip
-    MIME::Base64
-    IO::Compress::Gzip
-    IO::Uncompress::Gunzip
-    Dancer2
-    Plack
-    Starman
-    HTTP::Request
-    LWP::Protocol::https
-    LWP::UserAgent
-    Template
-    URI
-    URI::Escape
-    XML::Parser
-    )
-  )
-{
-    like( $makefile, qr/["']\Q$module\E["']\s*=>\s*0/, "Makefile.PL declares runtime prerequisite $module" );
-    like( $cpanfile, qr/requires ['"]\Q$module\E['"];/, "cpanfile declares runtime prerequisite $module" );
-    like( $dist, qr/^\Q$module\E = 0$/m, "dist.ini declares runtime prerequisite $module" ) if $dist ne '';
+my %runtime_prereq_minimum = (
+    'JSON::XS'               => '4.04',
+    'YAML::XS'               => '0.903.0',
+    'TOML::Parser'           => '0',
+    'Capture::Tiny'          => '0.24',
+    'Getopt::Long'           => '0',
+    'Digest::MD5'            => '2.25',
+    'Digest::SHA'            => '5.96',
+    'Archive::Tar'           => '3.10',
+    'Archive::Zip'           => '1.61',
+    'MIME::Base64'           => '0',
+    'Compress::Raw::Zlib'    => '2.220',
+    'IO::Compress::Gzip'     => '2.220',
+    'IO::Uncompress::Gunzip' => '2.220',
+    'Cpanel::JSON::XS'       => '4.41',
+    'Dancer2'                => '0.206000',
+    'YAML'                   => '1.28',
+    'Plack'                  => '1.0054',
+    'Socket'                 => '2.041',
+    'Starman'                => '0.4018',
+    'Storable'               => '3.41',
+    'HTML::Parser'           => '3.84',
+    'HTTP::Date'             => '6.08',
+    'HTTP::Request'          => '0',
+    'HTTP::Tiny'             => '0.095',
+    'LWP::Protocol::https'   => '6.07',
+    'LWP::UserAgent'         => '6.83',
+    'Template'               => '3.103',
+    'URI'                    => '0',
+    'URI::Escape'            => '0',
+    'XML::Parser'            => '2.48',
+);
+for my $module ( sort keys %runtime_prereq_minimum ) {
+    my $minimum = $runtime_prereq_minimum{$module};
+    my $makefile_value = $minimum eq '0' ? '0' : "['\"]\Q$minimum\E['\"]";
+    my $cpanfile_re = $minimum eq '0'
+        ? qr/requires ['"]\Q$module\E['"];/
+        : qr/requires ['"]\Q$module\E['"]\s*,\s*['"]\Q$minimum\E['"];/;
+    like( $makefile, qr/["']\Q$module\E["']\s*=>\s*$makefile_value/, "Makefile.PL declares runtime prerequisite $module at $minimum" );
+    like( $cpanfile, $cpanfile_re, "cpanfile declares runtime prerequisite $module at $minimum" );
+    like( $dist, qr/^\Q$module\E = \Q$minimum\E$/m, "dist.ini declares runtime prerequisite $module at $minimum" ) if $dist ne '';
 }
-for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket workspace path paths ps1 encode decode indicator collector config auth api init cpan page action docker serve stop restart shell doctor housekeeper skills which)) {
+for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket workspace path paths ps1 encode decode indicator collector config auth api ask init cpan page action docker serve stop restart shell doctor housekeeper skills which upgrade)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
 }
 ok( -f _repo_path( 'share', 'public', 'js', 'jquery-4.0.0.min.js' ), 'share/public/js/jquery-4.0.0.min.js is shipped as a bundled public asset' );
+ok( -f _repo_path( 'share', 'public', 'others', 'favicon.ico' ), 'share/public/others/favicon.ico is shipped as a bundled public asset' );
 ok( -f _repo_path('install.sh'), 'repo-root install.sh is tracked for bootstrap installs' );
 ok( -f _repo_path('install.ps1'), 'repo-root install.ps1 is tracked for Windows bootstrap installs' );
 ok( -f _repo_path('aptfile'), 'repo-root aptfile is tracked for bootstrap installs' );
 ok( -f _repo_path('apkfile'), 'repo-root apkfile is tracked for bootstrap installs' );
 ok( -f _repo_path('brewfile'), 'repo-root brewfile is tracked for bootstrap installs' );
+
+# Operator-local rule/planning files must never ship. .gitignore does not
+# protect the tarball (Dist::Zilla's GatherDir gathers from disk, not git), so
+# every one of these must be individually excluded in dist.ini and absent from
+# any built release tarball.
+my @operator_local_files = qw(
+    agents.md
+    AGENTS.md
+    AGENTS.override.md
+    CLAUDE.md
+    DASHBOARD_IMPROVEMENT_PLAN.md
+    ELLEN.md
+    FIX.md
+    FIXED_BUGS.md
+    MISTAKE.md
+    SCORECARD_ACTIONS.md
+    SECURITY_CHECKS.md
+    SKILL.md
+    SKILLS.md
+    SOFTWARE_SPEC.md
+    TEST_PLAN.md
+    TEST_PLAN_RESULTS.md
+);
+{
+    my $dist = _slurp( _repo_path('dist.ini') );
+    for my $operator_file (@operator_local_files) {
+        like(
+            $dist,
+            qr/^exclude_filename = \Q$operator_file\E$/m,
+            "dist.ini excludes operator-local $operator_file from release tarballs",
+        );
+    }
+}
+
+
+# Text assertions alone only pin that the exclusion LINES exist; they cannot
+# catch a pattern that is present but does not actually match the paths it is
+# meant to stop. Compile every exclude_match out of dist.ini and apply it, so
+# the exclusions are gated by meaning and not by spelling.
+{
+    my $dist_ini = _slurp( _repo_path('dist.ini') );
+    my @exclude_match = map { qr/$_/ } ( $dist_ini =~ /^exclude_match = (.+)$/mg );
+    ok( scalar @exclude_match > 0, 'dist.ini declares gatherable exclude_match patterns to apply' );
+
+    my $excluded = sub {
+        my ($path) = @_;
+        return scalar grep { $path =~ $_ } @exclude_match;
+    };
+
+    my @must_be_excluded = qw(
+        cover_db/coverage.html
+        local/lib/perl5/Net/SSLeay.pod
+        audit-local/lib/perl5/CPANSA/DB.pm
+        logs/ft99.log
+        Developer-Dashboard-9.99/lib/Developer/Dashboard.pm
+        dogfood-output/screenshot.png
+        .worktrees/dd-432/lib/Developer/Dashboard.pm
+        node_modules/left-pad/index.js
+    );
+    ok( $excluded->($_), "dist.ini exclusions actually match $_ so it cannot be gathered" ) for @must_be_excluded;
+
+    my @must_be_shipped = qw(
+        lib/Developer/Dashboard.pm
+        bin/dashboard
+        t/15-release-metadata.t
+        share/public/js/jquery-4.0.0.min.js
+        integration/blank-env/run-integration.pl
+        doc/testing.md
+        install.sh
+    );
+    ok( !$excluded->($_), "dist.ini exclusions leave $_ in the release tarball" ) for @must_be_shipped;
+}
 
 my @required_tarball_paths = (
     "Developer-Dashboard-$version/install.sh",
@@ -236,6 +360,7 @@ my @required_tarball_paths = (
     "Developer-Dashboard-$version/apkfile",
     "Developer-Dashboard-$version/brewfile",
     "Developer-Dashboard-$version/share/public/js/jquery-4.0.0.min.js",
+    "Developer-Dashboard-$version/share/public/others/favicon.ico",
     "Developer-Dashboard-$version/doc/integration-test-plan.md",
     "Developer-Dashboard-$version/doc/install-bootstrap.md",
     "Developer-Dashboard-$version/doc/testing.md",
@@ -247,7 +372,8 @@ my @required_tarball_paths = (
 );
 my $matching_tarball = _repo_path("Developer-Dashboard-$version.tar.gz");
 SKIP: {
-    skip "matching release tarball $matching_tarball has not been built yet", 6 + scalar @required_tarball_paths
+    skip "matching release tarball $matching_tarball has not been built yet",
+      10 + scalar(@required_tarball_paths) + scalar(@operator_local_files)
       if !-f $matching_tarball;
 
     my $tar = Archive::Tar->new;
@@ -258,6 +384,56 @@ SKIP: {
     my %files = map { $_ => 1 } @files;
     for my $required (@required_tarball_paths) {
         ok( $files{$required}, "$required is packaged into the release tarball" );
+    }
+    for my $operator_file (@operator_local_files) {
+        ok(
+            !$files{"Developer-Dashboard-$version/$operator_file"},
+            "release tarball does not leak operator-local $operator_file",
+        );
+    }
+# Per-ticket worktree sandboxes must be git-ignored, not merely untracked.
+#
+# Every ticket is worked in its own worktree cut from origin/master, named for
+# the ticket reference, and merged back at the git gate. Each sandbox therefore
+# holds an ENTIRE second checkout of this repository. Untracked was never
+# protection: it relied on nobody ever running `git add -A` from the repo root,
+# which is a convention rather than a guarantee, and one stray add would commit
+# a whole checkout into master. dogfood-output/ is the same class - build spew
+# and browser QA screenshots of the operator's machine.
+{
+    my $gitignore = _slurp( _repo_path('.gitignore') );
+    for my $sandbox (qw(.worktrees dogfood-output)) {
+        like(
+            $gitignore,
+            qr{^\Q$sandbox\E/$}m,
+            "$sandbox/ is git-ignored so a stray add cannot commit a sandbox into master",
+        );
+    }
+
+    my @tracked = grep { m{^\.worktrees/} || m{^dogfood-output/} }
+      split /\n/, `git -C @{[ _repo_path() ]} ls-files 2>/dev/null`;
+    is_deeply( \@tracked, [], 'no sandbox file is tracked in this repository' );
+}
+
+    # Untracked-but-not-ignored working directories are the same leak class as
+    # the operator files above: GatherDir reads the disk, so .gitignore never
+    # protects the tarball. dogfood-output/ in particular holds browser QA
+    # evidence and screenshots of the operator's machine.
+    # local/ and audit-local/ are the CI's own dependency trees, created by
+    # `cpanm -L local` and `cpanm -L audit-local` in the workflow that then builds
+    # the tarball. dzil gathers from disk, so a build running after a dependency
+    # install ships the dependencies: the PUBLISHED v4.25 carried 1206 local/ and
+    # 47 audit-local/ members, including Net::SSLeay's compiled .so built for the
+    # runner, and weighed 5.7MB against v4.22's 1.0MB (DD-522). It had never
+    # shipped before only because no release since v4.22 ever reached the build
+    # step at all.
+    for my $leak_prefix (qw(dogfood-output .worktrees local audit-local)) {
+        my @leaked = grep { m{^Developer-Dashboard-\Q$version\E/\Q$leak_prefix\E/} } @files;
+        is(
+            scalar @leaked,
+            0,
+            "release tarball carries no $leak_prefix/ member",
+        );
     }
     my $meta_member = "Developer-Dashboard-$version/META.json";
     ok( $files{$meta_member}, 'matching release tarball ships META.json for packaged prerequisite assertions' );
@@ -331,6 +507,11 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/\.env.*before.*\.env\.pl|\.env\.pl.*after.*\.env/s, 'docs describe same-level .env before .env.pl ordering' );
     like( $doc, qr/\$NAME|\$\{NAME:-default\}|\$\{Namespace::function\(\):-default\}/, 'docs describe supported plain env expansion forms' );
     like( $doc, qr/whole-line `\/\/` comments|whole-line C<\/\/> comments|block comments.*multiple lines|block comments.*multi-line/i, 'docs describe supported .env comment syntax including // and block comments' );
+    like( $doc, qr/vX\.XX\S*\s+tag\s+so\s+the\s+tag-triggered\s+GitHub\s+release\s+workflow/s, 'docs describe pushing a vX.XX tag as the trigger for the tag-driven GitHub release workflow' );
+    like( $doc, qr/tarball,\s+checksum,\s+and\s+detached\s+signature\s+assets/s, 'docs name the tarball, checksum and detached signature assets that the release workflow publishes' );
+    like( $doc, qr/Signed-Releases/, 'docs name the Signed-Releases Scorecard check that the published release assets back' );
+    like( $doc, qr/\.intoto\.jsonl/, 'docs name the provenance asset, because signing alone leaves Signed-Releases capped below full marks' );
+    like( $doc, qr/build\s+provenance/i, 'docs describe the release as carrying build provenance and not merely a signature' );
 }
 
 for my $doc (
@@ -393,6 +574,26 @@ for my $path (@pod_paths) {
     unlike( $pod, qr/C<FORM\.TT:>|C<FORM:>|\bFORM\.TT\b/, "$path POD no longer documents removed FORM bookmark directives" );
 }
 
+# DD-434: the auth regression test's own POD is security documentation, so it
+# must describe the DNS-rebinding admin-trust invariant as enforced rather than
+# as an open gap, and must not advertise a TODO block the file does not carry.
+# DD-387 closed that gap; the POD went stale behind it and told readers a
+# loopback admin-elevation hole was merely "documented" and still open.
+{
+    my $auth_hunt      = _slurp( _repo_path( 't', '57-hunt-auth.t' ) );
+    my $auth_hunt_pod  = _extract_pod($auth_hunt);
+    my $auth_hunt_body = $auth_hunt;
+    $auth_hunt_body =~ s/\n__END__\n.*\z//s;
+
+    unlike( $auth_hunt_pod, qr/gap that remains/i, 'auth regression POD no longer calls the DNS-rebinding gap outstanding' );
+    unlike( $auth_hunt_pod, qr/\bresidual\b/i,     'auth regression POD no longer calls the DNS-rebinding trust decision residual' );
+    unlike( $auth_hunt_pod, qr/still[- ]open/i,    'auth regression POD no longer calls the DNS-rebinding tightening still open' );
+    unlike( $auth_hunt_pod, qr/\bTODO\b/,          'auth regression POD no longer cites a TODO block' );
+    unlike( $auth_hunt_body, qr/\bTODO\b/,         'auth regression test body carries no TODO block for its POD to cite' );
+    like( $auth_hunt_pod, qr/DNS-rebinding/,       'auth regression POD still names the DNS-rebinding invariant it guards' );
+    like( $auth_hunt_body, qr/DNS-rebinding admin-trust/, 'auth regression test body still pins the DNS-rebinding admin-trust invariant' );
+}
+
 for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/install\.sh/, 'README documents the repo bootstrap installer' );
     like( $doc, qr/cpanm --no-wget --notest Developer::Dashboard/, 'README documents the repo bootstrap installer cpanm contract' );
@@ -429,7 +630,7 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/Do not treat Scorecard as a pre-commit local gate/, 'README documents that live Scorecard runs happen after local gates and commit/push' );
     like( $doc, qr/after the\s+normal\s+`prove -lr t`\s+test gate|after the\s+normal\s+C<prove -lr t>\s+test gate/is, 'README documents the explicit post-test numeric coverage QA gate ordering' );
     like( $doc, qr/every change, not only releases|not only releases.*every change|every change.*not only releases/is, 'README documents the per-change numeric coverage QA gate scope' );
-    like( $doc, qr/do not treat the work as done until .*100%\s+statement\s+and\s+100%\s+subroutine|100%\s+statement\s+and\s+100%\s+subroutine.*do not treat the work as done/is, 'README documents numeric 100 percent library coverage as a completion gate' );
+    like( $doc, qr/target is 100\.0 on all four metrics/is, 'README documents numeric 100 percent library coverage as a completion gate on every metric' );
 }
 like( $release_doc, qr/dzil build/, 'release doc still documents the dzil build step' ) if $release_doc ne '';
 like( $release_doc, qr/OWASP ASVS 5\.0|ASVS 5\.0/, 'release doc references the current OWASP ASVS gate version' ) if $release_doc ne '';
@@ -451,7 +652,7 @@ like(
 like( $install_bootstrap_doc, qr/aptfile.*apkfile.*brewfile|aptfile.*brewfile.*apkfile|apkfile.*aptfile.*brewfile|apkfile.*brewfile.*aptfile|brewfile.*aptfile.*apkfile|brewfile.*apkfile.*aptfile/is, 'bootstrap install doc explains all bootstrap package manifests' ) if $install_bootstrap_doc ne '';
 like( $testing_doc, qr/after the\s+normal\s+`prove -lr t`\s+test gate/is, 'testing doc documents the explicit post-test numeric coverage QA gate ordering' ) if $testing_doc ne '';
 like( $testing_doc, qr/every change, not only releases|not only releases.*every change|every change.*not only releases/is, 'testing doc documents the per-change numeric coverage QA gate scope' ) if $testing_doc ne '';
-like( $testing_doc, qr/do not treat the work as done until .*100%\s+statement\s+and\s+100%\s+subroutine|100%\s+statement\s+and\s+100%\s+subroutine.*do not treat the work as done/is, 'testing doc documents numeric 100 percent library coverage as a completion gate' ) if $testing_doc ne '';
+like( $testing_doc, qr/target is 100\.0 on \*\*all four\*\* metrics/is, 'testing doc documents numeric 100 percent library coverage as a completion gate on every metric' ) if $testing_doc ne '';
 like( $security_checks_doc, qr/ASVS 5\.0|OWASP ASVS 5\.0/, 'security checks doc references the current OWASP ASVS gate version explicitly' ) if $security_checks_doc ne '';
 like( $security_checks_doc, qr/V1 .*Architecture|V14 .*Configuration/s, 'security checks doc covers the full OWASP ASVS chapter span instead of only a narrow baseline subset' ) if $security_checks_doc ne '';
 like( $security_checks_doc, qr/OWASP Top 10/i, 'security checks doc cross-maps the repo gate to the OWASP Top 10' ) if $security_checks_doc ne '';

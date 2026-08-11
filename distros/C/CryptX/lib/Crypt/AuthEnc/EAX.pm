@@ -2,7 +2,7 @@ package Crypt::AuthEnc::EAX;
 
 use strict;
 use warnings;
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( eax_encrypt_authenticate eax_decrypt_verify )] );
@@ -149,6 +149,9 @@ Returns the authentication tag as a binary string (raw bytes).
 This call finalizes the current message.
 
  my $tag = $ae->encrypt_done();                 # returns $tag value
+
+B<IMPORTANT:> The length of the tag is a security parameter and a zero-length
+tag is legal (it simply provides no authenticity), which is the caller's choice.
 
 =head2 decrypt_add
 

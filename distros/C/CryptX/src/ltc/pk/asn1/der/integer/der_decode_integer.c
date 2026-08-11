@@ -25,6 +25,11 @@ int der_decode_integer(const unsigned char *in, unsigned long inlen, void *num)
    LTC_ARGCHK(num    != NULL);
    LTC_ARGCHK(in     != NULL);
 
+   /* DER INTEGER decodes into an MPI, so fail cleanly when no math provider is active. */
+   if (ltc_mp.name == NULL) {
+      return CRYPT_INVALID_ARG;
+   }
+
    /* min DER INTEGER is 0x02 01 00 == 0 */
    if (inlen < (1 + 1 + 1)) {
       return CRYPT_INVALID_PACKET;
@@ -42,6 +47,11 @@ int der_decode_integer(const unsigned char *in, unsigned long inlen, void *num)
       return err;
    }
    x += inlen;
+
+   /* an INTEGER holds at least one content octet, so in[x] below stays inside the packet */
+   if (y == 0) {
+      return CRYPT_INVALID_PACKET;
+   }
 
    if ((err = ltc_mp_read_unsigned_bin(num, (unsigned char *)in + x, y)) != CRYPT_OK) {
       return err;

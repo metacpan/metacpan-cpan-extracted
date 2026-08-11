@@ -101,7 +101,7 @@ Git::Native::Reference - A Git reference (branch, tag, HEAD)
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -125,6 +125,100 @@ C<is_symbolic>, C<is_branch>, C<is_remote>, C<is_tag>.
 
 Mutators return a fresh Reference: C<set_target> (direct refs),
 C<symbolic_set_target> (symbolic refs), plus C<delete>.
+
+References are obtained from a L<Git::Native::Repository> and keep it
+alive: the repository handle is not freed while any reference taken from
+it is still in scope.
+
+=head2 name
+
+  say $ref->name;   # refs/heads/main
+
+The full reference name.
+
+=head2 shorthand
+
+  say $ref->shorthand;   # main
+
+The short form libgit2 derives from the name — C<refs/heads/main> becomes
+C<main>. C<HEAD> has no prefix to strip and stays C<HEAD>.
+
+=head2 target
+
+  my $oid = $ref->target;
+
+The L<Git::Native::Oid> a B<direct> reference points at, or C<undef> for a
+symbolic one (C<HEAD> normally is symbolic) — use C<symbolic_target> for
+those, or C<resolve> first and take the C<target> of the result. On an
+annotated tag ref this is the OID of the tag object, not of the commit it
+tags; C<< $repo->object >> on it returns a L<Git::Native::Tag>.
+
+=head2 symbolic_target
+
+  say $repo->reference('HEAD')->symbolic_target;   # refs/heads/main
+
+The refname a B<symbolic> reference points at, or C<undef> for a direct
+one. The mirror image of C<target>: exactly one of the two is defined.
+The named ref need not exist — that is precisely the unborn-HEAD state of
+a fresh repository.
+
+=head2 is_symbolic
+
+  if ( $ref->is_symbolic ) { ... }
+
+1 when the reference points at another refname, 0 when it points at an
+OID.
+
+=head2 is_branch / is_remote / is_tag
+
+  $repo->reference('refs/heads/main')->is_branch;   # 1
+
+Where the reference lives, decided by its name: C<refs/heads/*>,
+C<refs/remotes/*>, C<refs/tags/*>. Each returns 1 or 0, and C<HEAD> is
+none of the three.
+
+=head2 resolve
+
+  my $direct = $repo->reference('HEAD')->resolve;
+  say $direct->name;     # refs/heads/main
+  say $direct->target;   # the commit OID
+
+Follow symbolic references until a direct one is reached and return that as
+a fresh Reference. The invocant keeps its own handle and stays usable. A
+reference that is already direct resolves to an equivalent Reference.
+
+=head2 set_target
+
+  my $moved = $ref->set_target($oid, message => 'rewind one commit');
+
+Repoint a B<direct> reference at C<$oid> (a L<Git::Native::Oid> or a
+40-character hex string) and return the updated reference as a B<new>
+object — the invocant keeps reporting the old value, it is a snapshot of
+the handle it was created with. C<message> goes into the reflog. Throws a
+L<Git::Native::Error> on a symbolic reference ("cannot set OID on symbolic
+reference"); C<symbolic_set_target> is the one to use there.
+
+=head2 symbolic_set_target
+
+  $repo->reference('HEAD')->symbolic_set_target('refs/heads/topic');
+
+The counterpart for B<symbolic> references: repoint at another refname
+(which may be one that does not exist yet) and return the updated
+reference as a new object. C<message> goes into the reflog. Throws a
+L<Git::Native::Error> on a direct reference.
+
+=head2 delete
+
+  $repo->reference('refs/heads/stale')->delete;
+
+Delete the reference from the repository and return the invocant. The Perl
+object stays alive and its accessors keep answering out of the handle it
+already holds, so what you have afterwards is a snapshot of a ref that is
+no longer there.
+
+=head1 SEE ALSO
+
+L<Git::Native::Repository>, L<Git::Native::Branch>, L<Git::Native::Oid>
 
 =head1 SUPPORT
 

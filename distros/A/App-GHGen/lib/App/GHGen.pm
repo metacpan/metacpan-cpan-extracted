@@ -5,7 +5,7 @@ package App::GHGen;
 # git tag -a v2 -m 'Release v0.02'
 # git push origin v2
 # Go to https://github.com/nigelhorne/App-GHGen/releases
-# Click “Draft a new release”
+# Click 'Draft a new release'
 # Choose the new tag: v2
 # Commit release v2
 # Publish the release
@@ -20,11 +20,11 @@ App::GHGen - GitHub Actions workflow generator, analyzer, and optimizer
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -601,7 +601,7 @@ B<Generated workflow step order:>
 
 =item 1. C<actions/checkout@v6>
 
-=item 2. Setup Perl — C<shogo82148/actions-setup-perl@v1.42.0>
+=item 2. Setup Perl — C<shogo82148/actions-setup-perl@v1.43.1>
 
 =item 3. Cache CPAN modules — C<actions/cache@v5>
 

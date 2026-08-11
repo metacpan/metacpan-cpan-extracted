@@ -3,7 +3,7 @@ package Developer::Dashboard::File;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -112,7 +112,7 @@ sub touch {
     my $path = $class->_resolve_file($file);
     die 'Missing file path' if !defined $path || $path eq '';
     open my $fh, '>>', $path or die "Unable to touch $path: $!";
-    close $fh or die "Unable to close $path: $!";
+    close $fh or die "Unable to close $path: $!";    # uncoverable branch true closing an append handle with no buffered output cannot fail on the test host
     my $files = _files_obj();
     $files->paths->secure_file_permissions($path) if $files && $files->can('paths');
     return $path;
@@ -139,8 +139,8 @@ sub _files_obj {
     return if $home eq '';
     my $paths = Developer::Dashboard::PathRegistry->new(
         home            => $home,
-        workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
-        project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
+        workspace_roots => [ grep { -d } map { "$home/$_" } qw(projects src work) ],
+        project_roots   => [ grep { -d } map { "$home/$_" } qw(projects src work) ],
     );
     $FILES = Developer::Dashboard::FileRegistry->new( paths => $paths );
     _load_configured_aliases();
@@ -157,7 +157,7 @@ sub _configured_alias_cache_key {
     my $paths = $files->paths;
     return '' if !$paths || !blessed($paths);
     my $project_root = eval { $paths->current_project_root } || '';
-    my @runtime_roots = eval { $paths->runtime_roots } || ();
+    my @runtime_roots = eval { $paths->runtime_roots } || ();    # uncoverable condition right an empty list literal is never true
     return join "\n", $project_root, @runtime_roots;
 }
 

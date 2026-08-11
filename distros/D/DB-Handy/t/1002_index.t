@@ -18,8 +18,8 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok      { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is      { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
+sub ok      { my($c, $n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is      { my($g, $e, $n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
 
 use File::Path ();
 use File::Spec ();
@@ -187,7 +187,7 @@ $res = $db->execute("INSERT INTO emp (id,name,dept,salary) VALUES (1,'Dup','Test
 ok($res->{type} eq 'error', "Duplicate INSERT blocked by UNIQUE");
 
 # ok 27
-ok($res->{message} =~ /UNIQUE/, "Error message mentions UNIQUE");
+ok(($res->{message} =~ /UNIQUE/) ? 1 : 0, "Error message mentions UNIQUE");
 
 ###############################################################################
 # UNIQUE constraint: duplicate UPDATE blocked
@@ -315,7 +315,7 @@ $res = $db->execute("SELECT * FROM negtest WHERE n >= -1");
 my @vals = sort { $a <=> $b } map { $_->{n}+0 } @{$res->{data}};
 
 # ok 45
-ok(join(',',@vals) eq '-1,0,1,100,2147483647', "INT range search with negatives correct");
+ok(join(',', @vals) eq '-1,0,1,100,2147483647', "INT range search with negatives correct");
 
 $res = $db->execute("SELECT * FROM negtest WHERE n = -2147483648");
 

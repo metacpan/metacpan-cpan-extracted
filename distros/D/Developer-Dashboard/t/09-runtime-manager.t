@@ -57,6 +57,34 @@ sub dies_like {
     like( $error, $pattern, $label );
 }
 
+# settled_web_state($manager, $status)
+# Reads persisted web state, waiting out the write-and-replace window in which a
+# concurrent writer in this file leaves the shared state file transiently
+# unreadable.
+# Input: runtime manager object and the status the caller is waiting for.
+# Output: state hash reference, or the last unusable read for diagnostics.
+sub settled_web_state {
+    my ( $manager, $status ) = @_;
+    my $state;
+    for ( 1 .. 30 ) {
+        $state = $manager->web_state;
+        last if ref $state eq 'HASH' && ( $state->{status} || '' ) eq $status;
+        sleep 0.1;
+    }
+    return $state;
+}
+
+# state_field($state, $field)
+# Extracts one field from a possibly-unusable state read, so a lost race fails
+# the assertion with diagnostics instead of dying on an undefined hash reference.
+# Input: state read result and field name.
+# Output: field value, or the unusable read itself when it is not a hash.
+sub state_field {
+    my ( $state, $field ) = @_;
+    return $state if ref $state ne 'HASH';
+    return $state->{$field};
+}
+
 sub wait_for_child_exit {
     my ( $pid, $attempts, $interval ) = @_;
     $attempts = 20 if !defined $attempts;
@@ -731,7 +759,11 @@ my $serve_error_manager = Developer::Dashboard::RuntimeManager->new(
     my $serve_exit = $serve_error_manager->_run_web_child( $writer, '0.0.0.0', 7904, detach => 0, redirect => 0 );
     is( $serve_exit, 1, '_run_web_child returns a non-zero exit code for serve failures' );
     like( $buffer, qr/^ok\|/, '_run_web_child reports a successful bind before a serve-loop failure' );
-    is( $serve_error_manager->web_state->{status}, 'error', '_run_web_child records error status when the serve loop dies' );
+    is(
+        state_field( settled_web_state( $serve_error_manager, 'error' ), 'status' ),
+        'error',
+        '_run_web_child records error status when the serve loop dies',
+    );
 }
 
 my $clean_exit_manager = Developer::Dashboard::RuntimeManager->new(
@@ -752,7 +784,11 @@ my $clean_exit_manager = Developer::Dashboard::RuntimeManager->new(
     open my $writer, '>', \$buffer or die $!;
     my $clean_exit = $clean_exit_manager->_run_web_child( $writer, '0.0.0.0', 7905, detach => 0, redirect => 0 );
     is( $clean_exit, 0, '_run_web_child returns zero when the server loop ends cleanly' );
-    is( $clean_exit_manager->web_state->{status}, 'stopped', '_run_web_child records stopped status after a clean exit' );
+    is(
+        state_field( settled_web_state( $clean_exit_manager, 'stopped' ), 'status' ),
+        'stopped',
+        '_run_web_child records stopped status after a clean exit',
+    );
     $clean_exit_manager->_cleanup_web_files;
 }
 
@@ -793,7 +829,7 @@ my $clean_exit_manager = Developer::Dashboard::RuntimeManager->new(
         '_run_web_child exits after TERM triggers the shutdown handler'
     );
     waitpid( $signal_pid, 0 ) if $signal_reaped == 0;
-    is( $signal_state->{status}, 'stopped', '_run_web_child TERM shutdown records stopped status through the signal handler' );
+    is( state_field( $signal_state, 'status' ), 'stopped', '_run_web_child TERM shutdown records stopped status through the signal handler' );
     $signal_manager->_cleanup_web_files;
 }
 
@@ -821,7 +857,11 @@ my $clean_exit_manager = Developer::Dashboard::RuntimeManager->new(
     my $exit = $direct_signal_manager->_run_web_child( $writer, '0.0.0.0', 7907, detach => 0, redirect => 0 );
     like( $buffer, qr/^ok\|/, '_run_web_child still reports startup before the in-process TERM shutdown path fires' );
     is( $exit, 0, '_run_web_child in-process TERM path returns cleanly when POSIX::_exit is stubbed' );
-    is( $direct_signal_manager->web_state->{status}, 'stopped', '_run_web_child in-process TERM path records stopped status through the local shutdown closure' );
+    is(
+        state_field( settled_web_state( $direct_signal_manager, 'stopped' ), 'status' ),
+        'stopped',
+        '_run_web_child in-process TERM path records stopped status through the local shutdown closure',
+    );
     $direct_signal_manager->_cleanup_web_files;
 }
 
@@ -3276,8 +3316,11 @@ SKIP: {
         $manager->_shutdown_web();
     }
     waitpid( $child, 0 );
-    my $state = $manager->web_state;
-    is( $state->{status}, 'stopped', '_shutdown_web writes a default stopped status when no previous web state exists' );
+    is(
+        state_field( settled_web_state( $manager, 'stopped' ), 'status' ),
+        'stopped',
+        '_shutdown_web writes a default stopped status when no previous web state exists',
+    );
     $manager->_cleanup_web_files;
 }
 
@@ -3286,7 +3329,11 @@ SKIP: {
     local *POSIX::_exit = sub { return 0 };
     $manager->_cleanup_web_files;
     is( $manager->_shutdown_web(), 0, '_shutdown_web in-process path also writes a default empty state before exiting when no prior state exists' );
-    is( $manager->web_state->{status}, 'stopped', '_shutdown_web in-process default path records the stopped status with an empty starting state' );
+    is(
+        state_field( settled_web_state( $manager, 'stopped' ), 'status' ),
+        'stopped',
+        '_shutdown_web in-process default path records the stopped status with an empty starting state',
+    );
     $manager->_cleanup_web_files;
 }
 
@@ -3295,8 +3342,9 @@ SKIP: {
     local *POSIX::_exit = sub { return 0 };
     $manager->_write_web_state( { pid => 1234, status => 'running' } );
     is( $manager->_shutdown_web('stopped'), 0, '_shutdown_web returns the stubbed POSIX::_exit value when called in-process' );
-    is( $manager->web_state->{pid}, $$ + 0, '_shutdown_web rewrites the final web state pid to the current process in-process' );
-    is( $manager->web_state->{status}, 'stopped', '_shutdown_web keeps the requested stopped status when exiting in-process' );
+    my $shutdown_state = settled_web_state( $manager, 'stopped' );
+    is( state_field( $shutdown_state, 'pid' ), $$ + 0, '_shutdown_web rewrites the final web state pid to the current process in-process' );
+    is( state_field( $shutdown_state, 'status' ), 'stopped', '_shutdown_web keeps the requested stopped status when exiting in-process' );
     $manager->_cleanup_web_files;
 }
 

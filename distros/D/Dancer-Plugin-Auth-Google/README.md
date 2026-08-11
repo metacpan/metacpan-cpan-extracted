@@ -1,8 +1,6 @@
 Dancer-Plugin-Auth-Google
 =========================
 
-[![Build status](https://api.travis-ci.org/garu/Dancer-Plugin-Auth-Google.png)](https://api.travis-ci.org/garu/Dancer-Plugin-Auth-Google.png)
-[![Coverage Status](https://coveralls.io/repos/garu/Dancer-Plugin-Auth-Google/badge.png)](https://coveralls.io/r/garu/Dancer-Plugin-Auth-Google)
 [![CPAN version](https://badge.fury.io/pl/Dancer-Plugin-Auth-Google.png)](http://badge.fury.io/pl/Dancer-Plugin-Auth-Google)
 
 This plugin provides a simple way to authenticate your users through Google's
@@ -278,7 +276,7 @@ Dancer::Plugin::Auth::Twitter and Dancer::Plugin::Auth::Facebook.
 COPYRIGHT AND LICENCE
 ---------------------
 
-Copyright (C) 2014-2019, Breno G. de Oliveira
+Copyright (C) 2014-2026, Breno G. de Oliveira
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

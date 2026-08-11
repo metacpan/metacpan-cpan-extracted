@@ -11,6 +11,10 @@
 
 #if defined(LTC_ARCH_X86) && (defined(LTC_AES_NI) || !defined(ENCRYPT_ONLY))
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
 #if !defined (LTC_S_X86_CPUID)
 #define LTC_S_X86_CPUID
 static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
@@ -22,7 +26,7 @@ static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
 
    a = leaf;
    b = c = d = 0;
-   asm volatile ("cpuid"
+   __asm__ volatile ("cpuid"
        :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
        :"a"(a), "c"(c)
    );

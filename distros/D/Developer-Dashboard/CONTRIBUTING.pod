@@ -24,8 +24,8 @@ Run C<prove -lr t>.
 
 =item 3.
 
-Run Devel::Cover and keep C<lib/> at 100 percent statement and subroutine
-coverage.
+Run Devel::Cover and keep C<lib/> at 100 percent statement, subroutine, branch,
+and condition coverage.
 
 =item 4.
 

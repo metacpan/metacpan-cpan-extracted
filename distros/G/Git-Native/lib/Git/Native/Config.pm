@@ -69,7 +69,7 @@ Git::Native::Config - A libgit2 configuration handle
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -90,6 +90,52 @@ Reads go through C<get_string>, which libgit2 only supports reliably on a
 B<snapshot> config — get one via L<Git::Native::Repository/config_snapshot>
 or the L<Git::Native::Repository/config_string> convenience. Writes
 (C<set_string>) require a live config from L<Git::Native::Repository/config>.
+
+A repository config sees the merged view git itself would use: the
+repository's own C<config> file plus the global and system levels.
+
+=head2 get_string
+
+  my $name = $repo->config_snapshot->get_string('user.name');
+
+The value of C<$key>, or C<undef> when the key is not set anywhere in the
+config. Only "not found" becomes C<undef> — any other libgit2 failure
+throws a L<Git::Native::Error>, so an unreadable config is never silently
+reported as unset.
+
+Call it on a snapshot. On a live config libgit2 refuses the read and this
+throws; L<Git::Native::Repository/config_string> takes a snapshot for you.
+
+=head2 get_bool
+
+  if ( $repo->config_snapshot->get_bool('core.bare') ) { ... }
+
+1 or 0 for a git-style boolean, or C<undef> when the key is not set —
+which is why the test is C<defined>, not truth, when "unset" and "false"
+have to be told apart. libgit2 does the parsing (C<true>/C<yes>/C<on>/1,
+C<false>/C<no>/C<off>/0, integers by non-zero), so git's own rules apply.
+A key set to something that is not a boolean at all throws a
+L<Git::Native::Error> rather than coming back C<undef>.
+
+=head2 set_string
+
+  $repo->config->set_string('user.name', 'Ada');
+
+Write C<$value> under C<$key> and return the config. Needs a live config —
+a snapshot is read-only and throws. The write lands in the highest-priority
+writable level, i.e. the repository's own config file.
+
+=head2 snapshot
+
+  my $snap = $repo->config->snapshot;
+
+A frozen, read-only copy of the config as it stands right now, returned as
+a fresh Config. Later writes through the live config are not visible in it;
+take a new snapshot to see them.
+
+=head1 SEE ALSO
+
+L<Git::Native::Repository>
 
 =head1 SUPPORT
 

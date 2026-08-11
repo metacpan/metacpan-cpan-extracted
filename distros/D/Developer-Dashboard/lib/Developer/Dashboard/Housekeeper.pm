@@ -3,7 +3,7 @@ package Developer::Dashboard::Housekeeper;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use File::Path qw(remove_tree);
 use File::Spec;
@@ -14,6 +14,7 @@ use Developer::Dashboard::Collector;
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_decode);
+use Developer::Dashboard::SessionStore;
 
 # new(%args)
 # Constructs the temp-state cleanup service.
@@ -43,11 +44,13 @@ sub run {
         ajax_temp_files   => 0,
         result_temp_files => 0,
         collector_logs    => 0,
+        expired_sessions  => 0,
     };
 
     push @{$removed}, $self->_cleanup_state_roots( min_age_seconds => $min_age_seconds, scanned => $scanned );
     push @{$removed}, $self->_cleanup_temp_files( min_age_seconds => $min_age_seconds, scanned => $scanned );
     push @{$removed}, $self->_rotate_collector_logs( scanned => $scanned, now_epoch => $args{now_epoch} );
+    $scanned->{expired_sessions} = $self->_sweep_expired_sessions;
 
     return {
         ok               => 1,
@@ -57,6 +60,17 @@ sub run {
         removed          => $removed,
         removed_count    => scalar @{$removed},
     };
+}
+
+# _sweep_expired_sessions()
+# Removes expired helper-session records through the session store so stale
+# session files cannot accumulate unbounded between logins.
+# Input: none.
+# Output: count of expired session files removed.
+sub _sweep_expired_sessions {
+    my ($self) = @_;
+    my $sessions = Developer::Dashboard::SessionStore->new( paths => $self->{paths} );
+    return $sessions->sweep_expired;
 }
 
 # _rotate_collector_logs(%args)
@@ -95,7 +109,7 @@ sub _cleanup_state_roots {
         $self->{paths}->_state_root_for_layer($_) => 1
     } $self->{paths}->runtime_layers;
 
-    opendir my $dh, $base or die "Unable to read $base: $!";
+    opendir my $dh, $base or die "Unable to read $base: $!";    # uncoverable branch true
     my @removed;
     while ( my $entry = readdir $dh ) {
         next if $entry eq '.' || $entry eq '..';
@@ -121,11 +135,11 @@ sub _cleanup_temp_files {
         next if !-f $path;
         my ( undef, undef, $entry ) = File::Spec->splitpath($path);
         my ( $kind, $scan_key ) = $self->_temp_file_kind($entry);
-        next if !$kind;
+        next if !$kind;    # uncoverable branch true
         $args{scanned}{$scan_key}++;
         next if !$self->_path_is_old_enough( $path, $args{min_age_seconds} );
         if ( !unlink $path ) {
-            next if !-e $path;
+            next if !-e $path;    # uncoverable branch true
             my $label = $kind eq 'ajax-temp-file' ? 'Ajax temp file' : 'runtime result temp file';
             die "Unable to remove stale $label $path: $!";
         }
@@ -139,24 +153,29 @@ sub _cleanup_temp_files {
 
 # _temp_file_candidates()
 # Returns the dashboard-owned temp file paths that housekeeper may remove.
+# This lists the system temp directory itself and keeps the entries whose names
+# carry a dashboard-owned prefix. It deliberately does NOT expand a shell-glob
+# pattern built from the temp path: Perl's built-in glob() is csh_glob, which
+# splits its argument on whitespace and honours backslash escapes, so a temp
+# directory whose path contains either (the ordinary shape of a Windows temp
+# path) yielded fragments instead of the intended pattern -- the genuine temp
+# files were never matched, and the trailing fragment was relative, so it
+# resolved against this process's working directory and offered up unrelated
+# files for deletion. Listing the directory confines every candidate to it by
+# construction. A temp directory that is absent is an empty scan; one that
+# exists but cannot be read is an error, because "could not look" must never be
+# reported as "there was nothing there".
 # Input: none.
-# Output: ordered list of candidate temp file path strings.
+# Output: name-sorted list of candidate temp file path strings.
 sub _temp_file_candidates {
     my ($self) = @_;
     my $tmpdir = File::Spec->tmpdir;
-    my %seen;
-    my @paths;
-    for my $pattern (
-        File::Spec->catfile( $tmpdir, 'developer-dashboard-ajax-*' ),
-        File::Spec->catfile( $tmpdir, 'dashboard-result-*' ),
-      )
-    {
-        for my $path (glob $pattern) {
-            next if !defined $path || $path eq '' || $seen{$path}++;
-            push @paths, $path;
-        }
-    }
-    return @paths;
+    return () if !-d $tmpdir;
+    opendir my $dh, $tmpdir or die "Unable to read temp directory $tmpdir: $!";
+    my @entries = readdir $dh;
+    closedir $dh;
+    return map { File::Spec->catfile( $tmpdir, $_ ) }
+      sort grep { my ($kind) = $self->_temp_file_kind($_); defined $kind } @entries;
 }
 
 # _temp_file_kind($entry)
@@ -221,7 +240,7 @@ sub _state_root_has_live_collectors {
         next if !-f $pidfile;
         open my $fh, '<', $pidfile or die "Unable to read $pidfile: $!";
         my $pid = <$fh>;
-        close $fh or die "Unable to close $pidfile: $!";
+        close $fh or die "Unable to close $pidfile: $!";    # uncoverable branch true
         chomp $pid if defined $pid;
         next if !defined $pid || $pid !~ /\A\d+\z/;
         if ( kill 0, $pid ) {
@@ -244,7 +263,7 @@ sub _read_state_metadata {
     open my $fh, '<', $file or die "Unable to read $file: $!";
     local $/;
     my $raw = <$fh>;
-    close $fh or die "Unable to close $file: $!";
+    close $fh or die "Unable to close $file: $!";    # uncoverable branch true
     my $data = eval { json_decode($raw) };
     return if !$data || ref($data) ne 'HASH';
     return $data;
@@ -298,7 +317,7 @@ sub _only_missing_tree_errors {
 # Output: Developer::Dashboard::Collector object.
 sub _collector_store {
     my ($self) = @_;
-    return $self->{collector_store} ||= Developer::Dashboard::Collector->new( paths => $self->{paths} );
+    return $self->{collector_store} ||= Developer::Dashboard::Collector->new( paths => $self->{paths} );    # uncoverable condition false
 }
 
 # _config()
@@ -309,7 +328,7 @@ sub _config {
     my ($self) = @_;
     return $self->{config} ||= Developer::Dashboard::Config->new(
         paths => $self->{paths},
-        files => Developer::Dashboard::FileRegistry->new( paths => $self->{paths} ),
+        files => Developer::Dashboard::FileRegistry->new( paths => $self->{paths} ),    # uncoverable condition false
     );
 }
 
@@ -346,6 +365,17 @@ F</tmp/E<lt>userE<gt>/developer-dashboard/state/>, oversized Ajax payload temp
 files created under F</tmp/>, file-backed runtime result payloads created
 under F</tmp/dashboard-result-*>, and configured collector log transcripts
 that exceed their declared retention windows.
+
+Temp-file candidates are found by listing the system temp directory and keeping
+the entries whose names carry a dashboard-owned prefix. That listing is the
+containment boundary: no candidate can name a path outside the temp directory,
+whatever characters the temp path itself contains. A shell-glob pattern built
+from the temp path is deliberately not used, because the built-in C<glob> splits
+on whitespace and honours backslash escapes, so a temp path shaped like a
+typical Windows one both hid the real temp files and produced relative patterns
+that resolved against the process working directory. A temp directory that is
+absent yields an empty scan; one that exists and cannot be read raises an error
+rather than reporting an empty scan.
 
 =for comment FULL-POD-DOC START
 

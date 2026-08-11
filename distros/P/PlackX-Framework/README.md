@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/dstroma/PlackX-Framework/actions/workflows/test.yml/badge.svg)](https://github.com/dstroma/PlackX-Framework/actions)
+[![Actions Status](https://github.com/dstroma/PlackX-Framework/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/dstroma/PlackX-Framework/actions?workflow=test)
 # NAME
 
 PlackX::Framework - A thin framework for PSGI/Plack web apps.
@@ -65,7 +65,7 @@ PlackX::Framework::Handler, ::Request, ::Response, and so on.
 ## Optional Components
 
 The Config, Template, URIx modules are included in the distribution, but
-loading them is optional to save memory and compile time when not needed.
+loading them is optional to save memory and compilation time when not needed.
 Just as with the required modules, you can subclass them yourself, or you can
 have them automatically generated.
 
@@ -75,9 +75,9 @@ To set up all optional modules, import with the :all (or +all) tag.
     use PlackX::Framework qw(:all);
     use PlackX::Framework qw(+all);
 
-Note that 'use Module -option' syntax is not supported, because it can be mis-
-read by human readers as "minus option" which might give the impression that
-the named option is being turned off.
+Note that 'use Module -option' syntax is not supported, because it can be
+misread by humans as "minus option" which might give the false impression that
+the option is being turned off.
 
 If you want to pick certain optional modules, you can specify those
 individually with the name of the module, optionally preceded by a single
@@ -127,7 +127,10 @@ a stash, and if set up, templating.
 
 The PlackX::Framework::Request and PlackX::Framework::Response modules are
 subclasses of Plack::Request and Plack::Response sprinkled with additional
-features, described below.
+features. Both share stash and flash properties.
+
+For more information, see the documentation for [PlackX::Framework::Request](https://metacpan.org/pod/PlackX%3A%3AFramework%3A%3ARequest)
+and [PlackX::Framework::Response](https://metacpan.org/pod/PlackX%3A%3AFramework%3A%3AResponse).
 
 - stash()
 
@@ -189,6 +192,8 @@ your main app package, as shown in the introduction, or separate packages.
       };
     }
 
+For more information, see [Plack::Framework::Router](https://metacpan.org/pod/Plack%3A%3AFramework%3A%3ARouter).
+
 ### PlackX::Framework::Router::Engine
 
 The PlackX::Framework::Router::Engine is a subclass of Router::Boom with some
@@ -200,6 +205,8 @@ directly. It is used by PlackX::Framework::Router internally.
 This module is provided primarily for convenience. Currently not used by PXF
 directly except you may optionally store template system configuration there.
 
+For more information, see [Plack::Framework::Config](https://metacpan.org/pod/Plack%3A%3AFramework%3A%3AConfig).
+
 ### PlackX::Framework::Template
 
 The PlackX::Framework::Template module can automatically load and set up
@@ -207,6 +214,14 @@ Template Toolkit, offering several convenience methods. If you desire to use
 a different templating system from TT, you may override as many methods as
 necessary in your subclass. A new instance of this class is generated for
 each request by the app() method of PlackX::Framework::Handler.
+
+During request handling, PlackX::Framework will check if templating has been
+set up by checking if a ::Template module in your application's namespace has
+been loaded. If so, it will automatically create an instance of the respective
+::Template class and automatically add the template variables STASH, REQUEST,
+and RESPONSE to the object.
+
+For more information, see [Plack::Framework::Template](https://metacpan.org/pod/Plack%3A%3AFramework%3A%3ATemplate).
 
 ### PlackX::Framework::URIx
 
@@ -216,6 +231,8 @@ your request objects through $request->urix (the x is to not confuse it
 with the Plack::Request->uri() method). If you have not enabled the URIx
 feature in your application, with the :URIx or :all tag, the request->urix
 method will cause an error.
+
+For more information, see [PlackX::Framework::URIx](https://metacpan.org/pod/PlackX%3A%3AFramework%3A%3AURIx).
 
 ## Why Another Framework?
 
@@ -336,21 +353,21 @@ Therefore, the following will not load Template Toolkit:
     require MyApp::Template; # Template Toolkit is not loaded
 
 If you want to supply Template Toolkit with configuration options, you can
-add them like this
+add them by specifying a parameter hashref:
 
-    use MyApp::Template (INCLUDE_PATH => 'template');
+    use MyApp::Template { INCLUDE_PATH => 'template', ... };
 
 If you want to use your own templating system, you can create a MyApp::Template
 module that subclasses PlackX::Framework::Template, then override necessary
-methods; however, a simpler way is available if your templating system as a TT
-compatible process method, like this:
+methods; however, a simpler way is available if your templating system has a TT
+compatible process() method, like this:
 
     use MyApp::Template qw(:manual);
     MyApp::Template->set_engine(My::Template::System->new(%options));
 
 ## Model Layer
 
-This framework is databse/ORM agnostic, you are free to choose your own or use
+This framework is database/ORM agnostic, you are free to choose your own or use
 plain DBI/SQL.
 
 # EXPORT
@@ -366,12 +383,17 @@ to \[ProjectName\]::Handler->build\_app.)
 - perl 5.36 or greater
 - Plack
 - Router::Boom
-- URI::Fast
 
 ## Optional
 
 - Config::Any
+- Sub::Util
+
+    Due to extensive use of code references, installation of Sub::Util is
+    recommended to help debugging your application.
+
 - Template
+- URI::Fast
 
 # SEE ALSO
 
@@ -388,3 +410,6 @@ Dondi Michael Stroma, <dstroma@gmail.com>
 # COPYRIGHT AND LICENSE
 
 Copyright (C) 2016-2026 by Dondi Michael Stroma
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

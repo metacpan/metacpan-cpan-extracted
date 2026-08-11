@@ -577,11 +577,35 @@ Write-TraceLine "DASHBOARD_LOGS_END"
 
     $freshSessionScriptPath = Join-Path ([System.IO.Path]::GetTempPath()) "dd-fresh-session-bootstrap.ps1"
     $freshSessionLogPath = Join-Path ([System.IO.Path]::GetTempPath()) ("dd-fresh-session-bootstrap-" + [guid]::NewGuid().ToString("N") + ".log")
+    $processTraceSource = "dd-profile-load-" + [guid]::NewGuid().ToString("N")
     try {
         $env:DD_SMOKE_SKILL_SOURCE = $smokeSkillSource
         $env:DD_FRESH_SESSION_LOG = $freshSessionLogPath
         Set-Content -Path $freshSessionScriptPath -Value $freshSessionScript -Encoding UTF8
         Set-Content -Path $freshSessionLogPath -Value '' -Encoding UTF8
+
+        $null = Register-WmiEvent -Class Win32_ProcessStartTrace -SourceIdentifier $processTraceSource
+        $profileLoadStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $profileLoadProcess = Start-Process -FilePath powershell.exe -ArgumentList @('-NoLogo', '-Command', 'exit') -PassThru -Wait
+        $profileLoadStopwatch.Stop()
+        if ($profileLoadProcess.ExitCode -ne 0) {
+            throw "fresh profile-load timing check failed with exit code $($profileLoadProcess.ExitCode)"
+        }
+        $profileLoadMilliseconds = $profileLoadStopwatch.Elapsed.TotalMilliseconds
+        if ($profileLoadMilliseconds -gt 500) {
+            throw ("fresh PowerShell profile load took {0:N0} ms; expected at most 500 ms" -f $profileLoadMilliseconds)
+        }
+        $profilePerlStarts = @(
+            Get-Event -SourceIdentifier $processTraceSource -ErrorAction SilentlyContinue |
+                Where-Object {
+                    $_.SourceEventArgs.NewEvent.ParentProcessID -eq $profileLoadProcess.Id -and
+                    $_.SourceEventArgs.NewEvent.ProcessName -match '^perl(?:\.exe)?$'
+                }
+        )
+        if ($profilePerlStarts.Count -gt 0) {
+            throw "fresh PowerShell profile load launched Perl"
+        }
+
         & powershell.exe @(
             '-NoLogo',
             '-File',
@@ -593,6 +617,8 @@ Write-TraceLine "DASHBOARD_LOGS_END"
         }
     }
     finally {
+        Unregister-Event -SourceIdentifier $processTraceSource -ErrorAction SilentlyContinue
+        Remove-Event -SourceIdentifier $processTraceSource -ErrorAction SilentlyContinue
         Remove-Item Env:DD_SMOKE_SKILL_SOURCE -ErrorAction SilentlyContinue
         Remove-Item Env:DD_FRESH_SESSION_LOG -ErrorAction SilentlyContinue
         Remove-Item $freshSessionScriptPath -ErrorAction SilentlyContinue
@@ -806,6 +832,63 @@ try {
         throw "dashboard collector output windows.collector failed with exit code $LASTEXITCODE"
     }
     Invoke-AssertContains -Text $collectorOutput -Fragment "collector-ok" -Label "collector output"
+
+    Write-PhaseStatus -Phase "run-collector-timeout-check"
+    $timeoutMarker = "DD389_TIMEOUT_" + [guid]::NewGuid().ToString("N")
+    $timeoutProbe = Join-Path $tempRoot "collector-timeout-probe.pl"
+    $timeoutProbeSource = @'
+use strict;
+use warnings;
+use File::Spec;
+use Time::HiRes qw(time);
+use Developer::Dashboard::Collector;
+use Developer::Dashboard::CollectorRunner;
+use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::PathRegistry;
+
+my ( $home, $marker ) = @ARGV;
+my $paths = Developer::Dashboard::PathRegistry->new(
+    home => $home,
+    workspace_roots => [ File::Spec->catdir( $home, 'workspace' ) ],
+);
+my $runner = Developer::Dashboard::CollectorRunner->new(
+    collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+    files      => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+    paths      => $paths,
+);
+my $started = time();
+my $result = $runner->run_once(
+    {
+        name       => 'windows.timeout.collector',
+        command    => q{Write-Output timeout-start; Start-Process powershell.exe -ArgumentList '-NoLogo','-NoProfile','-Command','Start-Sleep -Seconds 60 # } . $marker . q{' -Wait},
+        cwd        => $home,
+        timeout_ms => 1000,
+    }
+);
+printf "elapsed_ms=%.0f exit_code=%d timed_out=%d stdout=%s\n",
+  ( time() - $started ) * 1000,
+  $result->{exit_code},
+  $result->{timed_out},
+  $result->{stdout};
+exit( $result->{exit_code} == 124 && $result->{timed_out} ? 0 : 1 );
+'@
+    Set-Content -Path $timeoutProbe -Value $timeoutProbeSource -Encoding UTF8
+    $timeoutProof = & $Perl $timeoutProbe $homeRoot $timeoutMarker | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        throw "Windows collector timeout probe failed with exit code $LASTEXITCODE`: $timeoutProof"
+    }
+    if ($timeoutProof -notmatch 'elapsed_ms=(\d+)\s+exit_code=124\s+timed_out=1') {
+        throw "Windows collector timeout proof was incomplete: $timeoutProof"
+    }
+    $timeoutElapsed = [int]$Matches[1]
+    if ($timeoutElapsed -gt 10000) {
+        throw "Windows collector timeout exceeded bounded cleanup grace: $timeoutElapsed ms"
+    }
+    $timeoutDescendants = @(Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*$timeoutMarker*" })
+    if ($timeoutDescendants.Count -ne 0) {
+        throw "Timed-out Windows collector left $($timeoutDescendants.Count) marked descendant process(es) alive"
+    }
+    Write-Host "Windows collector timeout $timeoutProof marker_processes=$($timeoutDescendants.Count)"
 
     Invoke-LoggedCommand -Label "dashboard auth add-user helper smoke-pass-123" -Command @($Dashboard, "auth", "add-user", "helper", "smoke-pass-123")
 

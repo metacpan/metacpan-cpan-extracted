@@ -40,6 +40,9 @@ t/20-index.t
 t/21-checkout.t
 t/22-revparse.t
 t/23-reset.t
+t/24-lookup-prefix.t
+t/25-opts.t
+t/26-constants.t
 t/30-merge.t
 t/31-stash.t
 t/32-reflog.t

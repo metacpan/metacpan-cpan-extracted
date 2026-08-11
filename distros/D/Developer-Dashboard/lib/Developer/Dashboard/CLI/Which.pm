@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Which;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Cwd qw(cwd);
 use File::Spec;
@@ -69,7 +69,7 @@ sub _usage {
 # Output: Developer::Dashboard::PathRegistry object scoped to the current cwd.
 sub _build_paths {
     my $home = $ENV{HOME} || '';
-    my @roots = grep { defined && -d } map { "$home/$_" } qw(projects src work);
+    my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
     return Developer::Dashboard::PathRegistry->new(
         home            => $home,
         cwd             => cwd(),
@@ -149,7 +149,7 @@ sub _locate_skill_target {
     my $target = $args{target} || '';
     return if $target !~ /\./;
     my ( $skill_name, $skill_command ) = split /\./, $target, 2;
-    return if !defined $skill_name || $skill_name eq '' || !defined $skill_command || $skill_command eq '';
+    return if $skill_name eq '' || $skill_command eq '';
 
     my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     return if !$manager->get_skill_path($skill_name);
@@ -221,10 +221,10 @@ sub _resolved_command_path {
     return '' if !defined $path || $path eq '';
     if ( -d $path ) {
         my $runner = _resolve_directory_runner($path);
-        return $runner if defined $runner && $runner ne '';
+        return $runner if defined $runner;
     }
     my $resolved = resolve_runnable_file($path);
-    return defined $resolved && $resolved ne '' ? $resolved : '';
+    return defined $resolved ? $resolved : '';
 }
 
 # _resolve_directory_runner($dir)
@@ -237,7 +237,7 @@ sub _resolve_directory_runner {
     for my $candidate ( qw(run run.pl run.sh run.bash run.ps1 run.cmd run.bat run.go run.java) ) {
         my $path = File::Spec->catfile( $dir, $candidate );
         my $resolved = resolve_runnable_file($path);
-        return $resolved if defined $resolved && $resolved ne '';
+        return $resolved if defined $resolved;
     }
     return;
 }

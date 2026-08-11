@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Cwd qw(cwd);
 use File::Basename qw(basename);
@@ -31,7 +31,7 @@ sub run_paths_command {
     my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
     my $aliases_loaded = 0;
     my $load_configured_path_aliases = sub {
-        return 1 if $aliases_loaded;
+        return 1 if $aliases_loaded;    # uncoverable branch true every dispatch arm below loads the aliases at most once before returning, so the memoized re-entry never happens
         $paths->register_named_paths( $config->path_aliases );
         $aliases_loaded = 1;
         return 1;
@@ -204,7 +204,7 @@ sub _normalize_delete_argument {
 # Output: Developer::Dashboard::PathRegistry object scoped to the current cwd.
 sub _build_paths {
     my $home = $ENV{HOME} || '';
-    my @roots = grep { defined && -d } map { "$home/$_" } qw(projects src work);
+    my @roots = grep { defined && -d } map { "$home/$_" } qw(projects src work);    # uncoverable branch false the interpolated map above always yields a defined string
     return Developer::Dashboard::PathRegistry->new(
         home            => $home,
         cwd             => cwd(),
@@ -310,7 +310,7 @@ sub _cdr_initial_candidates {
     ) for grep { defined && $_ ne '' && -d $_ } @{$roots};
 
     my %seen;
-    return sort grep { defined && $_ ne '' && !$seen{$_}++ } @candidates;
+    return sort grep { defined && $_ ne '' && !$seen{$_}++ } @candidates;    # uncoverable condition left candidates only ever come from hash keys and basenames, so an undefined entry cannot occur
 }
 
 # _cdr_directory_candidates(%args)
@@ -334,7 +334,7 @@ sub _cdr_directory_candidates {
     for my $path (@matches) {
         next if !defined $path || $path eq '' || $path eq $root;
         my $name = basename($path);
-        next if !defined $name || $name eq '';
+        next if $name eq '';    # uncoverable branch true basename never returns an empty string for the non-empty paths this loop reaches
         next if $prefix ne '' && index( $name, $prefix ) != 0;
         next if $seen{$name}++;
         push @candidates, $name;

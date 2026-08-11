@@ -38,7 +38,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.172",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.173",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -331,22 +331,21 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.173"
+         "version" : "0.174"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.173"
+         "version" : "0.174"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.173"
+         "version" : "0.174"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Dist-Zilla-PluginBundle-Author-ETHER@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER"
+         "web" : "https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER/issues"
       },
       "homepage" : "https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER",
       "repository" : {
@@ -357,10 +356,10 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.173",
+   "version" : "0.174",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.044000"
+         "version" : "5.045001"
       },
       "plugins" : [
          {
@@ -1168,7 +1167,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20260708"
+                  "Module::CoreList" : "5.20260720"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1217,7 +1216,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::CheckFor::MergeConflicts",
-            "version" : "0.014"
+            "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
@@ -1228,7 +1227,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::CheckFor::CorrectBranch",
-            "version" : "0.014"
+            "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Remote::Check",
@@ -1386,9 +1385,9 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.173",
+                  "tag" : "v0.174",
                   "tag_format" : "v%V",
-                  "tag_message" : "v%v%t"
+                  "tag_message" : "v%v%t%n%n%c"
                },
                "Dist::Zilla::Role::Git::Repo" : {
                   "git_version" : "2.52.0",
@@ -1643,8 +1642,8 @@
       "Roy Ivy III <rivy@cpan.org>",
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.44.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_generated_by_perl" : "v5.45.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0,
    "x_use_unsafe_inc" : 0

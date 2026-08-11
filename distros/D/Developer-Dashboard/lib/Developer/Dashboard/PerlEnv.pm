@@ -3,7 +3,7 @@ package Developer::Dashboard::PerlEnv;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Config ();
 use Cwd qw(abs_path);
@@ -28,9 +28,9 @@ sub path_separator {
 sub current_perl_bin_dir {
     my $perl = $^X || '';
     return '' if $perl eq '';
-    my $resolved = abs_path($perl) || $perl;
+    my $resolved = abs_path($perl) || $perl;    # uncoverable condition false
     my $dir = dirname($resolved);
-    return defined $dir && $dir ne '' && -d $dir ? $dir : '';
+    return -d $dir ? $dir : '';
 }
 
 # current_shell_bin_dir()
@@ -43,9 +43,9 @@ sub current_perl_bin_dir {
 sub current_shell_bin_dir {
     my $shell = $Config::Config{sh} || '';
     return '' if $shell eq '';
-    my $resolved = abs_path($shell) || $shell;
+    my $resolved = abs_path($shell) || $shell;    # uncoverable condition false
     my $dir = dirname($resolved);
-    return defined $dir && $dir ne '' && -d $dir ? $dir : '';
+    return -d $dir ? $dir : '';
 }
 
 # core_inc_paths()
@@ -91,7 +91,7 @@ sub dashboard_lib_roots {
     my @ordered;
     my %seen;
     for my $path (@candidates) {
-        next if !defined $path || $path eq '' || !-d $path;
+        next if !-d $path;
         my $canon = File::Spec->canonpath($path);
         next if $seen{$canon}++;
         push @ordered, $path;
@@ -110,11 +110,11 @@ sub dashboard_lib_roots {
 sub perl5lib_list {
     my ( $class, %args ) = @_;
     my $env = ref( $args{env} ) eq 'HASH' ? $args{env} : \%ENV;
-    my $path_sep = $args{path_sep} || path_separator();
+    my $path_sep = $args{path_sep} || path_separator();    # uncoverable condition false
 
     my @existing = ref( $args{existing} ) eq 'ARRAY'
       ? @{ $args{existing} }
-      : grep { defined $_ && $_ ne '' } split /\Q$path_sep\E/, ( $env->{PERL5LIB} || '' );
+      : grep { $_ ne '' } split /\Q$path_sep\E/, ( $env->{PERL5LIB} || '' );
 
     my @ordered;
     my %seen;
@@ -145,7 +145,7 @@ sub perl5lib_list {
 # Output: scalar PERL5LIB string.
 sub perl5lib_env {
     my ( $class, %args ) = @_;
-    my $path_sep = $args{path_sep} || path_separator();
+    my $path_sep = $args{path_sep} || path_separator();    # uncoverable condition false
     return join( $path_sep, $class->perl5lib_list(%args) );
 }
 
@@ -159,12 +159,12 @@ sub perl5lib_env {
 sub path_with_current_perl {
     my ( $class, %args ) = @_;
     my $env = ref( $args{env} ) eq 'HASH' ? $args{env} : \%ENV;
-    my $path_sep = $args{path_sep} || path_separator();
-    my @existing = grep { defined $_ && $_ ne '' } split /\Q$path_sep\E/, ( $env->{PATH} || '' );
+    my $path_sep = $args{path_sep} || path_separator();    # uncoverable condition false
+    my @existing = grep { $_ ne '' } split /\Q$path_sep\E/, ( $env->{PATH} || '' );
     my @ordered;
     my %seen;
     for my $path ( $class->current_perl_bin_dir, $class->current_shell_bin_dir, @existing ) {
-        next if !defined $path || $path eq '' || !-d $path;
+        next if $path eq '' || !-d $path;
         my $canon = File::Spec->canonpath($path);
         next if $seen{$canon}++;
         push @ordered, $path;

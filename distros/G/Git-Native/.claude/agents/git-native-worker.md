@@ -102,10 +102,19 @@ These apply to every file you touch, regardless of lane:
 ## Module hygiene
 
 - Moo, not Moose. `lazy_build => 1` + `sub _build_x` is the default for non-trivial attrs.
-- `namespace::clean` on every `.pm` (already in cpanfile).
+- **No `namespace::clean` on new modules.** It is in the cpanfile but used by exactly
+  one module (`Remote/Result.pm`); the other 16 do without. Adding it to a single file
+  forks the convention, and adding it wholesale would break the distribution: the
+  `GIT_BRANCH_*` / `GIT_SORT_*` constants are imported from `Git::Libgit2` and reached
+  package-qualified from outside (`Git::Native::Branch::GIT_BRANCH_LOCAL` in
+  `Repository.pm`, in its POD, and in `t/30` / `t/57` / `t/59`). `namespace::clean`
+  would sweep exactly those. Same for `check_rc`, which `Error.pm` re-exports to every
+  wrapper. See karr ticket 20.
 - `# ABSTRACT:` as the first comment line. Inline `=attr` / `=method` / `=seealso`
   PodWeaver directives under the `[@Author::GETTY]` bundle.
-- `no Moo; __PACKAGE__->meta->make_immutable;` at the bottom of every Moo class.
+- **No `make_immutable`.** That is Moose language and does not carry over: under plain
+  Moo `->meta` returns a `Moo::HandleMoose::FakeMetaClass` and `make_immutable` on it is
+  a silent no-op. `perl-core` mandates it for *Moose* classes; this distribution is Moo.
 - New modules go through the `pod-writer` agent for POD; do not hand-write the `=head1 NAME`
   / `=head1 SYNOPSIS` boilerplate.
 - **cpanfile versions**: never copy `$VERSION` from this repo — it's the next-unreleased

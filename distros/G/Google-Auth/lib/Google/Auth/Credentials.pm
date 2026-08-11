@@ -33,6 +33,16 @@ has universe_domain => (
   default => sub { 'googleapis.com' },
 );
 
+has quota_project_id => (
+  is       => 'ro',
+  required => 0,
+);
+
+has project_id => (
+  is       => 'ro',
+  required => 0,
+);
+
 has _is_universe_pinned => (
   is      => 'ro',
   default => sub { 0 },
@@ -50,19 +60,26 @@ has is_refreshing => (
 
 around BUILDARGS => sub {
   my ($orig, $class, @args) = @_;
-  
+
   # Standardize arguments to a hashref
   my $args;
   if (@args == 1 && ref $args[0] eq 'HASH') {
-    $args = { %{$args[0]} };
+    $args = {%{$args[0]}};
   } else {
-    $args = { @args };
+    $args = {@args};
   }
 
   # If universe_domain is explicitly passed in code/options, it is pinned (trusted).
   if (exists $args->{universe_domain}) {
     $args->{_is_universe_pinned} //= 1;
   }
+
+  if (my $json = $args->{json_key}) {
+    $args->{quota_project_id} //= $json->{quota_project_id};
+    $args->{project_id}       //= $json->{project_id};
+  }
+
+  $args->{project_id} //= $ENV{GOOGLE_CLOUD_PROJECT};
 
   return $class->$orig($args);
 };
@@ -86,7 +103,7 @@ sub is_expired {
   } else {
     my $tp = eval { Time::Piece->strptime($expires, '%Y-%m-%dT%H:%M:%SZ') };
     if ($@ || !$tp) {
-      $tp = eval { Time::Piece->strptime($expires, '%Y-%m-%dT%H:%M:%S.%fZ') };
+      $tp = eval { Time::Piece->strptime($expires, '%Y-%m-%dT%H:%M:%S.%fZ'); };
     }
     $expiry_epoch = $tp ? $tp->epoch : time();
   }
@@ -145,9 +162,13 @@ sub apply {
   my $token = $self->get_token(%options);
 
   if (ref $req_or_headers eq 'HASH') {
-    $req_or_headers->{Authorization} = 'Bearer ' . $token;
+    $req_or_headers->{Authorization}         = 'Bearer ' . $token;
+    $req_or_headers->{'X-Goog-User-Project'} = $self->quota_project_id
+      if $self->quota_project_id;
   } elsif (eval { $req_or_headers->isa('HTTP::Request') }) {
-    $req_or_headers->header(Authorization => 'Bearer ' . $token);
+    $req_or_headers->header(Authorization         => 'Bearer ' . $token);
+    $req_or_headers->header('X-Goog-User-Project' => $self->quota_project_id)
+      if $self->quota_project_id;
   } else {
     $log->errorf(
       'Invalid apply target type: %s',

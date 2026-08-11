@@ -33,11 +33,11 @@ use constant EXEC_PATTERN => qr/\b(?:system|exec)\b|qx\(|`/;
 # --------------------------------------------------
 use constant GLOBAL_PATTERN => qr/\$(?:GLOBAL|ENV|SIG|ARGV|_|!|0)\b|\$\/|%ENV\b|%SIG\b|\@ARGV\b/;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 =head1 VERSION
 
-Version 0.44
+Version 0.45
 
 =head1 DESCRIPTION
 

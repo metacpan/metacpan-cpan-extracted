@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::CLI::Upgrade ();
+
+# main(@ARGV)
+# Runs the safe Developer Dashboard self-upgrade flow.
+# Input: command-line arguments from @ARGV.
+# Output: exits with the installer status, or zero after a dry-run plan.
+exit Developer::Dashboard::CLI::Upgrade::run_upgrade( args => \@ARGV );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+upgrade - private self-upgrade helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard upgrade
+  dashboard upgrade --dry-run
+  d2 upgrade
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
+public C<dashboard> entrypoint remains a thin switchboard while the reusable
+upgrade module owns platform selection, download validation, and execution.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Expose the first-class C<dashboard upgrade> and C<d2 upgrade> command surface
+through the managed private-helper namespace.
+
+=head1 WHY IT EXISTS
+
+Self-upgrade crosses a remote-code execution boundary. A dedicated helper keeps
+that behavior out of the public switchboard and hands it to one tested module
+that validates the canonical installer before execution.
+
+=head1 WHEN TO USE
+
+Use this file when changing the staged handoff into the self-upgrade module.
+Change platform, transport, validation, and execution policy in
+C<Developer::Dashboard::CLI::Upgrade> instead.
+
+=head1 HOW TO USE
+
+Run C<dashboard upgrade> or C<d2 upgrade> to download the canonical installer,
+validate its Developer Dashboard markers, and execute it through the active
+platform interpreter while preserving its visible output and exit status. Add
+C<--dry-run> to print the platform, canonical HTTPS URL, and argv-style command
+plan without downloading or executing an installer. Unix-like hosts use C<sh>;
+Windows prefers C<pwsh> and otherwise uses C<powershell> with a process-scoped
+execution-policy bypass.
+
+=head1 WHAT USES IT
+
+The public dashboard switchboard, the C<d2> short entrypoint, installed home
+runtimes, and focused upgrade acceptance tests use this helper.
+
+=head1 EXAMPLES
+
+  dashboard upgrade --dry-run
+  d2 upgrade
+  prove -lv t/122-upgrade-cli.t
+
+=for comment FULL-POD-DOC END
+
+=cut

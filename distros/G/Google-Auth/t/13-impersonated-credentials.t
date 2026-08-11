@@ -106,6 +106,7 @@ subtest 'Load from JSON configuration' => sub {
 };
 
 subtest 'Validation and Configuration Errors' => sub {
+
   # 1. Missing base and source credentials
   eval {
     Google::Auth::ImpersonatedServiceAccountCredentials->new(
@@ -166,7 +167,7 @@ subtest 'Validation and Configuration Errors' => sub {
   eval { $creds_evil->fetch_access_token(); };
   like(
     $@,
-    qr/carries security violation|Service account impersonation failed with status 404/,
+qr/carries security violation|Service account impersonation failed with status 404/,
     'throws error on invalid domain in impersonation_url'
   );
 };

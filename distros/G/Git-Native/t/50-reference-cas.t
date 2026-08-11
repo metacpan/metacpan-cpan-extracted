@@ -1,7 +1,6 @@
 use Test2::V0;
 use lib 't/lib';
 use TestRepo;
-use Git::Libgit2::FFI ();
 use Git::Native;
 
 my ( $repo, $tmp ) = TestRepo::new_repo();
@@ -16,21 +15,8 @@ my $c3   = $repo->commit_create( tree => $tree, parents => [$c2], message => 'th
 
 my $create_ref = 'refs/cas/create';
 $repo->reference_create( $create_ref, $c1 );
-my $has_create_matching =
-  Git::Libgit2::FFI->can('git_reference_create_matching');
-
-unless ($has_create_matching) {
-  my $err = dies {
-    $repo->reference_create( $create_ref, $c2, expected_old => $c1 );
-  };
-  like "$err", qr/Git::Libgit2 function git_reference_create_matching is not bound/,
-    'missing create-matching binding has an actionable error';
-}
 
 subtest 'reference_create compare-and-swap' => sub {
-  plan skip_all => 'Git::Libgit2 does not bind git_reference_create_matching'
-    unless $has_create_matching;
-
   my $updated = $repo->reference_create(
     $create_ref, $c2,
     expected_old => $c1,

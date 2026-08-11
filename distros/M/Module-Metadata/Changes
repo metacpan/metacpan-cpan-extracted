@@ -1,5 +1,9 @@
 Revision history for Module-Metadata
 
+1.000040  2026-08-10 21:34:29Z
+  - update taint support detection in a test to handle an upcoming change in
+    perl 5.45.2 (Paul Evans, #41)
+
 1.000039  2026-04-03 20:54:53Z
   - adds recognition of attributes in "class" declarations (Erik Huelsmann,
     #39)

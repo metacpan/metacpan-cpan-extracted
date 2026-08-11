@@ -1135,6 +1135,59 @@ subtest 'SchemaExtractor::generate_pod_validation_report - exact Severity and in
 	done_testing();
 };
 
+subtest 'SchemaExtractor: _compile_signature_isolated subprocess failures degrade to undef without propagating exceptions' => sub {
+	# Public-API regression: when the isolated perl -T subprocess fails
+	# (OOM kill, compile error, or garbled JSON), _compile_signature_isolated
+	# must return undef so _extract_type_params_schema falls back to heuristics.
+	# Before the fix, decode_json('') croaked; the croak propagated through
+	# Test::Builder's subtest boundary and killed the test process (exit 255).
+	#
+	# Strategy: mock open3 in the consuming namespace to return controlled
+	# filehandles without spawning a real process.
+
+	my $make_e = sub {
+		bless { allow_signature_exec => 1, verbose => 0 },
+			'App::Test::Generator::SchemaExtractor';
+	};
+
+	# Scenario 1: silent SIGKILL — stdout and stderr both empty.
+	{
+		my $empty = '';
+		open my $rdr, '<', \$empty or die;
+		open my $err, '<', \$empty or die;
+		no warnings 'redefine';
+		local *App::Test::Generator::SchemaExtractor::open3 = sub {
+			$_[0] = do { open my $fh, '>', \my $b; $fh };
+			$_[1] = $rdr;
+			$_[2] = $err;
+			return $$;
+		};
+		my $res;
+		lives_ok { $res = $make_e->()->_compile_signature_isolated('f', '(positional => [])') }
+			'silent subprocess exit: no exception raised';
+		is($res, undef, 'silent subprocess exit: undef returned');
+	}
+
+	# Scenario 2: non-JSON stdout (e.g. truncated by OOM mid-write).
+	{
+		my $junk = 'partial{json';
+		my $empty = '';
+		open my $rdr, '<', \$junk  or die;
+		open my $err, '<', \$empty or die;
+		no warnings 'redefine';
+		local *App::Test::Generator::SchemaExtractor::open3 = sub {
+			$_[0] = do { open my $fh, '>', \my $b; $fh };
+			$_[1] = $rdr;
+			$_[2] = $err;
+			return $$;
+		};
+		my $res;
+		lives_ok { $res = $make_e->()->_compile_signature_isolated('f', '(positional => [])') }
+			'non-JSON stdout: no exception raised';
+		is($res, undef, 'non-JSON stdout: undef returned');
+	}
+};
+
 subtest 'SchemaExtractor::generate_pod_validation_report - multiple methods are sorted by name' => sub {
 	my $extractor = App::Test::Generator::SchemaExtractor->new(input_file => $0);
 

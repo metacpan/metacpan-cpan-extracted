@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFile;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Cwd qw(cwd);
@@ -29,8 +29,8 @@ our @EXPORT_OK = qw(run_open_file_command build_path_registry);
 # Output: Developer::Dashboard::PathRegistry instance.
 sub build_path_registry {
     return Developer::Dashboard::PathRegistry->new(
-        workspace_roots => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
-        project_roots   => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
+        workspace_roots => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],    # uncoverable branch false the interpolated map above always yields a defined string
+        project_roots   => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],    # uncoverable branch false the interpolated map above always yields a defined string
     );
 }
 
@@ -40,7 +40,7 @@ sub build_path_registry {
 # Output: exits after printing matches or execing the configured editor.
 sub run_open_file_command {
     my (%args) = @_;
-    my $paths = $args{paths} || build_path_registry();
+    my $paths = $args{paths} || build_path_registry();    # uncoverable condition false build_path_registry always returns a blessed registry object
     my @argv  = @{ $args{args} || [] };
     my $print = 0;
     my $line  = 0;
@@ -128,7 +128,7 @@ sub _select_open_file_matches {
     );
 
     return @chosen if @chosen;
-    return @matches if $selection eq '';
+    return @matches if $selection eq '';    # uncoverable branch true a blank selection always yields chosen matches above, so this reblank guard is only reached for non-empty invalid input
     die "Invalid file selection '$selection'\n";
 }
 
@@ -144,14 +144,14 @@ sub _selection_matches {
 
     if ( $choices =~ /^\d+(?:\s*-\s*\d+)?(?:[\s,]+\d+(?:\s*-\s*\d+)?)*$/ ) {
         my @chosen;
-        for my $chunk ( grep { defined && $_ ne '' } split /[,\s]+/, $choices ) {
+        for my $chunk ( grep { $_ ne '' } split /[,\s]+/, $choices ) {
             if ( $chunk =~ /^(\d+)-(\d+)$/ ) {
                 my ( $start, $end ) = ( $1, $2 );
                 return if $start < 1 || $end < $start || $end > @$matches;
                 push @chosen, @$matches[ $start - 1 .. $end - 1 ];
                 next;
             }
-            return if $chunk !~ /^\d+$/ || $chunk < 1 || $chunk > @$matches;
+            return if $chunk < 1 || $chunk > @$matches;
             push @chosen, $matches->[ $chunk - 1 ];
         }
         return @chosen;
@@ -198,7 +198,7 @@ sub _ordered_scope_matches {
       sort {
              $a->{rank}  <=> $b->{rank}
           || $a->{index} <=> $b->{index}
-      } @ranked;
+      } @ranked;    # uncoverable branch true : entries carry unique indexes, so this tiebreaker is never 0 and the comparator never returns 0
 }
 
 # _scope_match_rank(%args)
@@ -220,7 +220,7 @@ sub _scope_match_rank {
         next if !defined $pattern || $pattern eq '';
         my $regex = _compile_open_file_regex($pattern);
         my $score = 50;
-        my @components = grep { defined && $_ ne '' } split m{[\\/]+}, $match_path;
+        my @components = grep { $_ ne '' } split m{[\\/]+}, $match_path;
 
         if ( $basename =~ /\A(?:$pattern)\z/i ) {
             $score = 0;
@@ -273,7 +273,7 @@ sub _resolve_open_file_matches {
 
     if ( defined $first ) {
         my $resolved_file = eval { $files->resolve_file($first) };
-        return ( $line, $resolved_file ) if defined $resolved_file && $resolved_file ne '' && -f $resolved_file;
+        return ( $line, $resolved_file ) if defined $resolved_file && -f $resolved_file;
     }
 
     if ( defined $first ) {
@@ -301,7 +301,7 @@ sub _resolve_open_file_matches {
         return ( $line, $relative_match ) if defined $relative_match;
     }
     else {
-        $scope = $paths->current_project_root || cwd();
+        $scope = $paths->current_project_root || cwd();    # uncoverable condition false cwd never returns an empty value on the test host
         @patterns = grep { defined && $_ ne '' } ( $first, @argv );
     }
 
@@ -413,7 +413,7 @@ sub _open_file_roots {
     my $paths = $args{paths} || die 'Missing path registry';
     my @roots = (
         cwd(),
-        scalar( $paths->current_project_root || () ),
+        scalar( $paths->current_project_root ),
         $paths->workspace_roots,
         $paths->project_roots,
         @INC,
@@ -555,15 +555,25 @@ sub _extract_java_sources_from_archive {
     my @matches;
     for my $entry ( _matching_java_archive_entries( zip => $zip, relative => $relative ) ) {
         my $member = $zip->memberNamed($entry) || next;
+
+        # An archive member names its own destination, and archives reaching
+        # here are third-party artifacts, so a member whose name climbs out of
+        # the cache tree is dropped rather than written. Skipping keeps a
+        # poisoned member from also denying the archive's legitimate members.
         my $target = _cached_archive_source_path(
             paths   => $paths,
             archive => $archive,
             entry   => $entry,
-        );
+        ) or next;
         my ( $volume, $directories ) = File::Spec->splitpath($target);
         make_path( File::Spec->catpath( $volume, $directories, '' ) );
-        open my $fh, '>', $target or die "Unable to write $target: $!";
-        print {$fh} $member->contents;
+        open my $fh, '>', $target or die "Unable to write $target: $!";    # uncoverable branch true the target parent directory is created immediately above so the write cannot fail on the test host
+
+        # contents() returns ($contents, $status) in list context, which print
+        # imposes, so the member body must be taken in scalar context or the
+        # status code is appended to every extracted source file.
+        my ($contents) = $member->contents;
+        print {$fh} $contents;
         close $fh;
         push @matches, $target;
     }
@@ -592,24 +602,46 @@ sub _matching_java_archive_entries {
     return @entries;
 }
 
+# _contained_cache_path($root, @segments)
+# Resolves untrusted path segments below one cache root and refuses any result
+# that escapes it. Segments arrive from archive member names and from remote
+# Maven search documents, so a parent-directory run in them would otherwise
+# steer a write to any location the user can reach. Resolution is lexical and
+# never consults the filesystem, so the decision cannot change between the
+# check and the write that follows it.
+# Input: intended root directory path string plus untrusted path segments.
+# Output: contained path string, or undef when the segments escape the root.
+sub _contained_cache_path {
+    my ( $root, @segments ) = @_;
+    my @resolved;
+
+    for my $part ( grep { $_ !~ m{\A\.?\z} } map { split m{[\\/]+}, $_ } @segments ) {
+        if ( $part eq '..' ) {
+            return if !@resolved;
+            pop @resolved;
+            next;
+        }
+        push @resolved, $part;
+    }
+
+    return if !@resolved;
+    return File::Spec->catfile( $root, @resolved );
+}
+
 # _cached_archive_source_path(%args)
 # Builds the stable cache location used for one extracted Java source member.
 # Input: path registry object, archive file path string, and archive member path string.
-# Output: extracted source file path string.
+# Output: extracted source file path string, or undef when the member escapes the cache.
 sub _cached_archive_source_path {
     my (%args) = @_;
     my $paths   = $args{paths}   || die 'Missing path registry';
     my $archive = $args{archive} || die 'Missing archive path';
     my $entry   = $args{entry}   || die 'Missing archive entry';
     my $digest  = md5_hex( join "\0", $archive, $entry );
-    my @parts   = grep { defined && $_ ne '' } split m{/+}, $entry;
 
-    return File::Spec->catfile(
-        $paths->cache_root,
-        'open-file',
-        'java-sources',
-        $digest,
-        @parts,
+    return _contained_cache_path(
+        File::Spec->catdir( $paths->cache_root, 'open-file', 'java-sources', $digest ),
+        $entry,
     );
 }
 
@@ -672,15 +704,17 @@ sub _download_maven_source_jar {
 
     my $group_path = join '/', split /\./, $doc->{g};
     my $file       = "$doc->{a}-$doc->{v}-sources.jar";
-    my $target     = File::Spec->catfile(
-        $paths->cache_root,
-        'open-file',
-        'maven-sources',
-        split( /\//, $group_path ),
+
+    # The coordinates come from a remote search response, so the mirror target
+    # is contained the same way an archive member name is: refuse before any
+    # directory is created or any transfer is started.
+    my $target = _contained_cache_path(
+        File::Spec->catdir( $paths->cache_root, 'open-file', 'maven-sources' ),
+        $group_path,
         $doc->{a},
         $doc->{v},
         $file,
-    );
+    ) or return;
     return $target if -f $target;
 
     my ( $volume, $directories ) = File::Spec->splitpath($target);

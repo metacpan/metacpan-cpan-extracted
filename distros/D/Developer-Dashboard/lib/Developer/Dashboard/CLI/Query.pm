@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Query;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Exporter 'import';
 
@@ -45,7 +45,7 @@ sub _split_query_args {
     my @rest;
 
     for my $arg (@argv) {
-        if ( !$file && defined $arg && -f $arg ) {
+        if ( !$file && -f $arg ) {
             $file = $arg;
             next;
         }
@@ -116,7 +116,7 @@ sub _extract_query_path {
     return $data if !defined $path || $path eq '' || $path eq '$d' || $path eq '.';
     $path =~ s/^\$d\.?//;
 
-    my @parts = grep { defined && $_ ne '' } split /\./, $path;
+    my @parts = grep { $_ ne '' } split /\./, $path;
     my $value = $data;
 
     while (@parts) {
@@ -242,7 +242,7 @@ sub _parse_java_properties {
         next if $line =~ /^\s*$/;
 
         my ( $key, $value ) = split /\s*[:=]\s*|\s+/, $line, 2;
-        $key   = '' if !defined $key;
+        $key   = '' if !defined $key;    # uncoverable branch true
         $value = '' if !defined $value;
         $key   =~ s/^\s+|\s+$//g;
         $value =~ s/^\s+|\s+$//g;
@@ -358,8 +358,8 @@ sub _xml_element_payload {
     while (@items) {
         my $name = shift @items;
         my $value = shift @items;
-        if ( defined $name && $name eq '0' ) {
-            push @text, $value if defined $value && $value !~ /^\s*$/;
+        if ( $name eq '0' ) {
+            push @text, $value if $value !~ /^\s*$/;
             next;
         }
 

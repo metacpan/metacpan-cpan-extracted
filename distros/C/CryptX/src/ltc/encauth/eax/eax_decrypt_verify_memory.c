@@ -40,17 +40,22 @@ int eax_decrypt_verify_memory(int cipher,
    unsigned char *buf;
    unsigned long  buflen;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the tag is good */
    LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(key  != NULL);
    LTC_ARGCHK(pt   != NULL);
    LTC_ARGCHK(ct   != NULL);
    LTC_ARGCHK(tag  != NULL);
 
-   /* default to zero */
-   *stat = 0;
-
-   /* limit taglen */
-   taglen = MIN(taglen, MAXBLOCKSIZE);
+   if ((err = cipher_is_valid(cipher)) != CRYPT_OK) {
+      return err;
+   }
+   /* NOTE: zero-length tag is legal (it just provides no authenticity) */
+   if (taglen > (unsigned long)cipher_descriptor[cipher].block_length) {
+      return CRYPT_INVALID_ARG;
+   }
 
    /* allocate ram */
    buf = XMALLOC(taglen);

@@ -16,13 +16,13 @@ name: Git-Libgit2
 provides:
   Git::Libgit2:
     file: lib/Git/Libgit2.pm
-    version: '0.005'
+    version: '0.006'
   Git::Libgit2::Error:
     file: lib/Git/Libgit2/Error.pm
-    version: '0.005'
+    version: '0.006'
   Git::Libgit2::FFI:
     file: lib/Git/Libgit2/FFI.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Alien::Libgit2: '0.001'
   Carp: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-git-libgit2/issues
   homepage: https://github.com/Getty/p5-git-libgit2
   repository: https://github.com/Getty/p5-git-libgit2.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -308,7 +308,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.005'
+          tag: '0.006'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

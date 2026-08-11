@@ -28,10 +28,10 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok  { my($c,$n)=@_; $T++;
+sub ok  { my($c, $n)=@_; $T++;
           $c ? ($PASS++, push @OUT, "ok $T - $n\n")
              : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is  { my($g,$e,$n)=@_; $T++;
+sub is  { my($g, $e, $n)=@_; $T++;
           defined($g) && ("$g" eq "$e")
             ? ($PASS++, push @OUT, "ok $T - $n\n")
             : ($FAIL++, push @OUT, "not ok $T - $n"
@@ -66,7 +66,7 @@ my $r = $db->execute("SELECT id, ROW_NUMBER() OVER () AS rn FROM emp");
 # ok 1
 ok($r->{type} eq 'error', "WINDOW: ROW_NUMBER() OVER() -> error");
 # ok 2
-ok($r->{message} =~ /Window|OVER|not supported/i,
+ok(($r->{message} =~ /Window|OVER|not supported/i) ? 1 : 0,
     "WINDOW: error message mentions OVER/Window");
 
 # 1-2: RANK() OVER (ORDER BY id)
@@ -113,7 +113,7 @@ $r = $db->execute("CREATE TABLE child1 (id INT, dept_id INT REFERENCES dept(id))
 # ok 10
 ok($r->{type} eq 'ok', "FK: CREATE TABLE with REFERENCES -> ok");
 # ok 11
-ok($r->{message} =~ /FOREIGN KEY.*not enforced/i,
+ok(($r->{message} =~ /FOREIGN KEY.*not enforced/i) ? 1 : 0,
     "FK: message warns constraints not enforced");
 
 # 2-2: INSERT violating FK does NOT produce an error (not enforced)
@@ -143,7 +143,7 @@ my $rv = $dbh->begin_work;
 # ok 16
 ok(!defined $rv, "TX: begin_work returns undef");
 # ok 17
-ok($dbh->errstr =~ /Transactions.*not supported|AutoCommit/i,
+ok(($dbh->errstr =~ /Transactions.*not supported|AutoCommit/i) ? 1 : 0,
     "TX: begin_work sets errstr");
 
 # 3-2: commit returns undef
@@ -151,7 +151,7 @@ $rv = $dbh->commit;
 # ok 18
 ok(!defined $rv, "TX: commit returns undef");
 # ok 19
-ok($dbh->errstr =~ /Transactions.*not supported|AutoCommit/i,
+ok(($dbh->errstr =~ /Transactions.*not supported|AutoCommit/i) ? 1 : 0,
     "TX: commit sets errstr");
 
 # 3-3: rollback returns undef
@@ -159,7 +159,7 @@ $rv = $dbh->rollback;
 # ok 20
 ok(!defined $rv, "TX: rollback returns undef");
 # ok 21
-ok($dbh->errstr =~ /Transactions.*not supported|AutoCommit/i,
+ok(($dbh->errstr =~ /Transactions.*not supported|AutoCommit/i) ? 1 : 0,
     "TX: rollback sets errstr");
 
 # 3-4: Normal operations still work after failed begin_work
@@ -210,7 +210,7 @@ $r = $db->execute("INSERT INTO t_vc (id,s,c) VALUES (3,'toolong','XY')");
 # ok 28
 ok($r->{type} eq 'error', "VARCHAR: INSERT too long -> error");
 # ok 29
-ok($r->{message} =~ /too long.*'s'|'s'.*too long|declared VARCHAR\(5\)/i,
+ok(($r->{message} =~ /too long.*'s'|'s'.*too long|declared VARCHAR\(5\)/i) ? 1 : 0,
     "VARCHAR: error message mentions column and size");
 
 # 5-4: INSERT CHAR too long -> error
@@ -218,7 +218,7 @@ $r = $db->execute("INSERT INTO t_vc (id,s,c) VALUES (4,'ok','TOOLONG')");
 # ok 30
 ok($r->{type} eq 'error', "CHAR: INSERT too long -> error");
 # ok 31
-ok($r->{message} =~ /too long.*'c'|'c'.*too long|declared VARCHAR\(3\)/i,
+ok(($r->{message} =~ /too long.*'c'|'c'.*too long|declared VARCHAR\(3\)/i) ? 1 : 0,
     "CHAR: error message mentions column and size");
 
 # 5-5: UPDATE VARCHAR too long -> error
@@ -305,7 +305,7 @@ $r = $db->execute("CREATE TABLE t_blob (id INT, data BLOB)");
 # ok 45
 ok($r->{type} eq 'error', "BLOB: CREATE TABLE rejected");
 # ok 46
-ok($r->{message} =~ /Unknown type|not support|BLOB/i,
+ok(($r->{message} =~ /Unknown type|not support|BLOB/i) ? 1 : 0,
     "BLOB: error message mentions type");
 
 $r = $db->execute("CREATE TABLE t_clob (id INT, data CLOB)");
@@ -320,7 +320,7 @@ $r = $db->execute("CREATE VIEW v_emp AS SELECT id,name FROM emp");
 # ok 48
 ok($r->{type} eq 'error', "VIEW: CREATE VIEW -> error");
 # ok 49
-ok($r->{message} =~ /not support|Unsupported/i,
+ok(($r->{message} =~ /not support|Unsupported/i) ? 1 : 0,
     "VIEW: error message mentions not supported");
 
 ###############################################################################

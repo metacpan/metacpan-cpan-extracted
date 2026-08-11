@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Progress;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 # new(%args)
 # Constructs a terminal progress renderer for restart/stop lifecycle commands.
@@ -19,7 +19,7 @@ sub new {
         my $id   = $task->{id} || die 'Progress task missing id';
         $id => {
             id           => $id,
-            label        => $task->{label} || $id,
+            label        => $task->{label} || $id,    # uncoverable condition false
             status       => 'pending',
             detail_lines => [],
         }
@@ -67,7 +67,7 @@ sub add_tasks {
         push @{ $self->{order} }, $id;
         $self->{tasks}{$id} = {
             id           => $id,
-            label        => $task->{label} || $id,
+            label        => $task->{label} || $id,    # uncoverable condition false
             status       => 'pending',
             detail_lines => [],
         };
@@ -139,7 +139,13 @@ sub render {
     }
     print {$stream} $board;
     $self->{rendered} = 1;
-    $self->{last_rendered_line_count} = scalar grep { defined } split /\n/, $board;
+
+    # split never yields an undefined field for this pattern, so the rendered
+    # line count is simply the number of fields: interior blank lines count as
+    # rendered lines, and the single trailing newline render_text appends is
+    # dropped as a trailing empty field.
+    my @rendered_lines = split /\n/, $board;
+    $self->{last_rendered_line_count} = scalar @rendered_lines;
     return 1;
 }
 

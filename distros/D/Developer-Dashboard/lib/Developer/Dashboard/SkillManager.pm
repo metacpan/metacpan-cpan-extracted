@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -17,21 +17,28 @@ use IO::Select;
 use IPC::Open3;
 use JSON::XS qw(decode_json encode_json);
 use Symbol qw(gensym);
-use Developer::Dashboard::Platform qw(command_in_path);
+use Developer::Dashboard::Platform qw(command_in_path passwd_home_directory);
 use Developer::Dashboard::PathRegistry;
 
 # new()
 # Creates a SkillManager instance to handle skill installation, updates, uninstalls.
+# The home chain reads HOME, then the Windows USERPROFILE variable, and only
+# then the guarded passwd lookup, so a Windows session with no HOME resolves its
+# profile directory instead of aborting inside an unimplemented passwd function.
 # Input: none.
 # Output: SkillManager object.
 sub new {
     my ( $class, %args ) = @_;
-    my $paths = $args{paths}
-      || Developer::Dashboard::PathRegistry->new(
-        home            => ( $ENV{HOME} || (getpwuid($>))[7] || $ENV{USERPROFILE} || die 'Missing home directory' ),
-        workspace_roots => [],
-        project_roots   => [],
-      );
+    my $paths = $args{paths};
+    if ( !$paths ) {
+        my $home = $ENV{HOME} || $ENV{USERPROFILE} || passwd_home_directory($>);
+        die 'Missing home directory' if !$home;
+        $paths = Developer::Dashboard::PathRegistry->new(
+            home            => $home,
+            workspace_roots => [],
+            project_roots   => [],
+        );
+    }
 
     return bless {
         paths      => $paths,
@@ -72,7 +79,7 @@ sub install_progress_tasks {
 sub dependency_progress_tasks_for_skill_path {
     my ( $self, $skill_path ) = @_;
     my %wanted = map { $_ => 1 } $self->_dependency_progress_task_ids_for_skill_path($skill_path);
-    my @tasks = grep { $wanted{ $_->{id} || '' } } @{ install_progress_tasks() };
+    my @tasks = grep { $wanted{ $_->{id} || '' } } @{ install_progress_tasks() };    # uncoverable condition right
     return \@tasks;
 }
 
@@ -168,7 +175,7 @@ sub install_many {
 sub install_from_ddfiles {
     my ( $self, $base_dir ) = @_;
     $base_dir ||= '.';
-    my $root = realpath($base_dir) || $base_dir;
+    my $root = realpath($base_dir) || $base_dir;    # uncoverable condition false
     my $ddfile = File::Spec->catfile( $root, 'ddfile' );
     my $ddfile_local = File::Spec->catfile( $root, 'ddfile.local' );
     return { error => "No ddfile or ddfile.local found under $root" }
@@ -255,11 +262,11 @@ sub uninstall {
     return { error => 'Missing repo name' } if !$repo_name;
     
     my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 );
-    return { error => "Skill '$repo_name' not found" } if !defined $skill_path || !-d $skill_path;
-    my $real_path = realpath($skill_path) || $skill_path;
+    return { error => "Skill '$repo_name' not found" } if !defined $skill_path || !-d $skill_path;    # uncoverable condition right
+    my $real_path = realpath($skill_path);
     my $inside_layer = 0;
     for my $skills_root ( $self->{paths}->skills_roots ) {
-        my $real_root = realpath($skills_root) || $skills_root;
+        my $real_root = realpath($skills_root);
         if ( index( $real_path, $real_root . '/' ) == 0 ) {
             $inside_layer = 1;
             last;
@@ -295,7 +302,7 @@ sub update {
     return { error => 'Missing repo name' } if !$repo_name;
     
     my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 );
-    return { error => "Skill '$repo_name' not found" } if !defined $skill_path || !-d $skill_path;
+    return { error => "Skill '$repo_name' not found" } if !defined $skill_path || !-d $skill_path;    # uncoverable condition right
 
     my ( $stdout, $stderr, $exit ) = capture {
         system( 'git', '-C', $skill_path, 'pull', '--ff-only' );
@@ -422,7 +429,10 @@ sub usage {
 }
 
 # _extract_repo_name($source)
-# Extracts repository name from various Git URL formats.
+# Extracts repository name from various Git URL formats. This is a parser, not
+# a validator: sources such as owner/.., file:///x/.. or git@github.com:owner/..
+# legitimately yield a '..' segment, so every caller that joins the result onto
+# a directory must first clear it through _is_safe_skill_name.
 # Input: Git URL string or local directory path.
 # Output: repo name or undef.
 sub _extract_repo_name {
@@ -438,6 +448,40 @@ sub _extract_repo_name {
     }
     
     return;
+}
+
+# _is_safe_skill_name($name)
+# Reports whether one derived skill repository name is exactly one ordinary
+# relative path segment, so joining it onto a skills root can never address
+# anything but a direct child of that root. File::Spec->catdir never collapses
+# a parent-directory component, so this whitelist is what keeps '..' out.
+# Input: candidate skill repository name string.
+# Output: boolean true for a single validated segment, false otherwise.
+sub _is_safe_skill_name {
+    my ($name) = @_;
+    my @segments = Developer::Dashboard::PathRegistry::validated_path_segments($name);
+    return @segments == 1 ? 1 : 0;
+}
+
+# _install_path_contained($skill_path, $skills_root)
+# Reports whether one install destination resolves to somewhere strictly
+# beneath its skills root, following symlinks so a planted link cannot redirect
+# the pre-install removal or the checkout that follows it out of the tree. A
+# destination that does not exist yet is contained by construction, because the
+# name it was built from is already one validated segment; a destination whose
+# resolved target cannot be established is refused rather than assumed safe.
+# Input: candidate installed skill path and its skills root directory path.
+# Output: boolean true when the destination is safe to remove and write.
+sub _install_path_contained {
+    my ( $self, $skill_path, $skills_root ) = @_;
+    my $root_real = realpath($skills_root);
+    return 0 if !defined $root_real;
+    return 1 if !-e $skill_path && !-l $skill_path;
+    my $path_real = realpath($skill_path);
+    return 0 if !defined $path_real;
+    $root_real =~ s{\\}{/}g;
+    $path_real =~ s{\\}{/}g;
+    return index( $path_real, $root_real . '/' ) == 0 ? 1 : 0;
 }
 
 # _normalize_install_source($source)
@@ -483,7 +527,7 @@ sub _register_root_ddfile_source {
     if ( -f $ddfile ) {
         open my $read_fh, '<', $ddfile or return { error => "Unable to read root ddfile $ddfile: $!" };
         local $/;
-        $existing = <$read_fh> // '';
+        $existing = <$read_fh> // '';    # uncoverable condition right
         close $read_fh;
         for my $line ( split /\n/, $existing ) {
             $line =~ s/^\s+|\s+$//g;
@@ -528,7 +572,7 @@ sub _unregister_root_ddfile_source {
 
     open my $read_fh, '<', $ddfile or return { error => "Unable to read root ddfile $ddfile: $!" };
     local $/;
-    my $existing = <$read_fh> // '';
+    my $existing = <$read_fh> // '';    # uncoverable condition right
     close $read_fh;
 
     my @kept;
@@ -574,7 +618,7 @@ sub _ddfile_source_matches_repo_name {
     $source =~ s/^\s+|\s+$//g;
     return 0 if $source eq q{} || $source =~ /\A#/;
     my $resolved = _extract_repo_name($source);
-    return 0 if !defined $resolved || $resolved eq q{};
+    return 0 if !defined $resolved || $resolved eq q{};    # uncoverable condition right
     return $resolved eq $repo_name ? 1 : 0;
 }
 
@@ -601,9 +645,9 @@ sub _register_home_gitignore_skill {
     open my $read_fh, '<', $gitignore or return { error => "Unable to read home gitignore $gitignore: $!" };
     {
         local $/;
-        $existing = <$read_fh> // '';
+        $existing = <$read_fh> // '';    # uncoverable condition right
     }
-    close $read_fh or return { error => "Unable to close home gitignore $gitignore: $!" };
+    close $read_fh or return { error => "Unable to close home gitignore $gitignore: $!" };    # uncoverable branch true
     for my $line ( split /\n/, $existing ) {
         $line =~ s/^\s+|\s+$//g;
         next if $line eq '' || $line =~ /\A#/;
@@ -617,7 +661,7 @@ sub _register_home_gitignore_skill {
     open my $append_fh, '>>', $gitignore or return { error => "Unable to update home gitignore $gitignore: $!" };
     print {$append_fh} "\n" if length($existing) && $existing !~ /\n\z/;
     print {$append_fh} "$entry\n";
-    close $append_fh or return { error => "Unable to close home gitignore $gitignore: $!" };
+    close $append_fh or return { error => "Unable to close home gitignore $gitignore: $!" };    # uncoverable branch true
     $self->{paths}->secure_file_permissions($gitignore);
 
     return {
@@ -687,7 +731,7 @@ sub _copy_tree {
         );
         1;
     } or do {
-        my $error = $@ || 'Unknown local skill copy failure';
+        my $error = $@ || 'Unknown local skill copy failure';    # uncoverable condition right
         return { error => "Failed to sync local skill source $source_path without rsync: $error" };
     };
 
@@ -725,7 +769,7 @@ sub _local_checked_out_source {
     return if $source =~ m{\A[A-Za-z][A-Za-z0-9+.-]*://};
     return if !-d $source;
 
-    my $local_source = realpath($source) || $source;
+    my $local_source = realpath($source);
     return { error => "Local skill source '$source' is missing a .git directory" }
       if !-d File::Spec->catdir( $local_source, '.git' );
     return { error => "Local skill source '$source' is missing a .env file with VERSION" }
@@ -802,9 +846,15 @@ sub _install_to_skills_root {
     my $clone_source = $local_source ? $source : $self->_normalize_install_source($source);
     my $repo_name = $local_source ? basename($local_source) : _extract_repo_name($clone_source);
     return { error => "Unable to extract repo name from $source" } if !$repo_name;
+    return {
+        error => "Refusing to install skill outside skills root: '$source' resolves to the unsafe skill name '$repo_name'"
+    } if !_is_safe_skill_name($repo_name);
 
     $self->{paths}->ensure_dir($skills_root);
     my $skill_path = File::Spec->catdir( $skills_root, $repo_name );
+    return {
+        error => "Refusing to install skill outside skills root: '$skill_path' does not resolve inside '$skills_root'"
+    } if !$self->_install_path_contained( $skill_path, $skills_root );
     my $had_existing = -e $skill_path ? 1 : 0;
     my $version_before = $self->_skill_env_version($skill_path);
     my $remove = $self->_remove_existing_skill_path($skill_path);
@@ -917,7 +967,7 @@ sub _install_version_status {
     return 'installed' if !defined $before && defined $after;
     return 'installed' if !$had_existing;
     return 'updated'   if defined $before && defined $after && $before ne $after;
-    return 'no update' if defined $before && defined $after && $before eq $after;
+    return 'no update' if defined $before && defined $after;
     return 'unknown';
 }
 
@@ -1041,13 +1091,13 @@ sub _dependency_progress_task_ids_for_skill_path {
     my %allowed_system = map { $_ => 1 } $self->_host_progress_system_task_ids;
     my @task_ids;
     for my $task ( @{ install_progress_tasks() } ) {
-        my $task_id = $task->{id} || '';
+        my $task_id = $task->{id} || '';    # uncoverable condition right
         next if $task_id eq 'fetch_source' || $task_id eq 'prepare_layout';
         if ( my $file = $cross_platform_file_for{$task_id} ) {
             push @task_ids, $task_id if -f File::Spec->catfile( $skill_path, $file );
             next;
         }
-        if ( my $file = $system_file_for{$task_id} ) {
+        if ( my $file = $system_file_for{$task_id} ) {    # uncoverable branch false
             push @task_ids, $task_id if $allowed_system{$task_id} && -f File::Spec->catfile( $skill_path, $file );
             next;
         }
@@ -1062,11 +1112,11 @@ sub _dependency_progress_task_ids_for_skill_path {
 # Output: ordered task id list for host-relevant system package managers.
 sub _host_progress_system_task_ids {
     my ($self) = @_;
-    my $os = $ENV{DD_TEST_OS} || $^O;
-    my $is_alpine = $ENV{DD_TEST_ALPINE} ? 1 : ( $os eq 'linux' && -f '/etc/alpine-release' ? 1 : 0 );
-    my $is_fedora = $ENV{DD_TEST_FEDORA} ? 1 : ( $os eq 'linux' && -f '/etc/fedora-release' ? 1 : 0 );
+    my $os = $ENV{DD_TEST_OS} || $^O;    # uncoverable condition false
+    my $is_alpine = $self->_is_alpine;
+    my $is_fedora = $self->_is_fedora;
     my $is_debian_like = $ENV{DD_TEST_DEBIAN_LIKE}
-      ? 1
+      ? 1    # uncoverable condition right
       : ( $os eq 'linux' && !$is_alpine && !$is_fedora && -f '/etc/debian_version' ? 1 : 0 );
     return ('install_wingetfile') if $os eq 'MSWin32';
     return ('install_brewfile')   if $os eq 'darwin';
@@ -1114,7 +1164,7 @@ sub _dependency_progress_label {
         install_makefile       => 'Install Makefile dependencies',
         install_dockerfile     => 'Install dockerfile dependencies',
     );
-    my $label = $labels{$task_id} || $task_id;
+    my $label = $labels{$task_id} || $task_id;    # uncoverable condition false
     my $file  = $files{$task_id} || return $label;
     my $path  = File::Spec->catfile( $skill_path, $file );
     my $result = $args{result};
@@ -1220,33 +1270,33 @@ sub _run_streaming_command {
         chdir $cwd or die "Unable to chdir to $cwd for command launch: $!";
         my $ok = eval { $launcher->(); 1 };
         my $error = $@;
-        chdir $orig or die "Unable to chdir back to $orig after command launch: $!";
+        chdir $orig or die "Unable to chdir back to $orig after command launch: $!";    # uncoverable branch true
         die $error if !$ok;
     }
     else {
         $launcher->();
     }
 
-    close $stdin_handle if $stdin_handle;
+    close $stdin_handle if $stdin_handle;    # uncoverable branch false
     %target_for = (
         fileno($stdout_handle) => \$stdout,
         fileno($stderr_handle) => \$stderr,
     );
 
     my $selector = IO::Select->new();
-    $selector->add($stdout_handle) if $stdout_handle;
-    $selector->add($stderr_handle) if $stderr_handle;
+    $selector->add($stdout_handle) if $stdout_handle;    # uncoverable branch false
+    $selector->add($stderr_handle) if $stderr_handle;    # uncoverable branch false
     while ( my @ready = $selector->can_read ) {
         for my $handle (@ready) {
             my $chunk = '';
             my $read = sysread( $handle, $chunk, 8192 );
-            if ( !defined $read || $read == 0 ) {
+            if ( !defined $read || $read == 0 ) {    # uncoverable condition left
                 $selector->remove($handle);
                 close $handle;
                 next;
             }
             my $slot = $target_for{ fileno($handle) };
-            ${$slot} .= $chunk if $slot;
+            ${$slot} .= $chunk if $slot;    # uncoverable branch false
             for my $line ( split /\n/, $chunk ) {
                 $self->_progress_detail_line($line);
             }
@@ -1334,7 +1384,7 @@ sub _dependency_file_lines {
 # Input: none.
 # Output: short operating system string such as linux or darwin.
 sub _current_os {
-    return $ENV{DD_TEST_OS} || $^O;
+    my $os = $ENV{DD_TEST_OS} || $^O; return $os;    # uncoverable condition false
 }
 
 # _is_debian_like()
@@ -1346,7 +1396,7 @@ sub _is_debian_like {
     return 1 if $ENV{DD_TEST_DEBIAN_LIKE};
     return 0 if $self->_is_alpine;
     return 0 if $self->_current_os ne 'linux';
-    return -f '/etc/debian_version' ? 1 : 0;
+    return -f '/etc/debian_version' ? 1 : 0;    # uncoverable branch false
 }
 
 # _is_alpine()
@@ -1357,7 +1407,7 @@ sub _is_alpine {
     my ($self) = @_;
     return 1 if $ENV{DD_TEST_ALPINE};
     return 0 if $self->_current_os ne 'linux';
-    return -f '/etc/alpine-release' ? 1 : 0;
+    return -f '/etc/alpine-release' ? 1 : 0;    # uncoverable branch true
 }
 
 # _is_fedora()
@@ -1368,7 +1418,7 @@ sub _is_fedora {
     my ($self) = @_;
     return 1 if $ENV{DD_TEST_FEDORA};
     return 0 if $self->_current_os ne 'linux';
-    return -f '/etc/fedora-release' ? 1 : 0;
+    return -f '/etc/fedora-release' ? 1 : 0;    # uncoverable branch true
 }
 
 # _is_windows()
@@ -1478,16 +1528,16 @@ sub _install_skill_dependency_manifest {
     return { success => 1, skipped => 1 } if !@skills;
 
     my $skills_root = $self->_skill_install_root($skill_path);
-    my %seen = map { $_ => 1 } grep { defined && $_ ne '' } split /:/, ( $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} || '' );
+    my %seen = map { $_ => 1 } grep { $_ ne '' } split /:/, ( $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} || '' );
     my $repo_name = basename($skill_path);
-    $seen{$repo_name} = 1 if defined $repo_name && $repo_name ne '';
+    $seen{$repo_name} = 1;
 
     my @stdout;
     my @stderr;
     for my $dependency (@skills) {
         next if $seen{$dependency};
         next if $self->get_skill_path( $dependency, include_disabled => 1 );
-        my $install_stack = join ':', grep { defined && $_ ne '' } sort keys %{{ %seen, $dependency => 1 }};
+        my $install_stack = join ':', grep { defined && $_ ne '' } sort keys %{{ %seen, $dependency => 1 }};    # uncoverable branch false
         my ( $step_stdout, $step_stderr, $exit ) = do {
             local $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} = $install_stack;
             local $ENV{DEVELOPER_DASHBOARD_DEPENDENCY_MANIFEST} = $manifest_name;
@@ -1512,8 +1562,8 @@ sub _install_skill_dependency_manifest {
         return {
             error => "Failed to install dependent skills for $skill_path via $manifest_name: $step_stderr",
         } if $exit != 0;
-        push @stdout, $step_stdout if defined $step_stdout && $step_stdout ne '';
-        push @stderr, $step_stderr if defined $step_stderr && $step_stderr ne '';
+        push @stdout, $step_stdout if defined $step_stdout && $step_stdout ne '';    # uncoverable condition left
+        push @stderr, $step_stderr if defined $step_stderr && $step_stderr ne '';    # uncoverable condition left
     }
 
     return { success => 1, skipped => 1 } if !@stdout && !@stderr;
@@ -1545,7 +1595,7 @@ sub _install_skill_package_json {
     make_path($target_root) if !-d $target_root;
     my $workspace = tempdir( 'npm-install-XXXXXX', DIR => $workspace_parent, CLEANUP => 1 );
     my $workspace_package_json = File::Spec->catfile( $workspace, 'package.json' );
-    open my $workspace_fh, '>', $workspace_package_json or die "Unable to write $workspace_package_json: $!";
+    open my $workspace_fh, '>', $workspace_package_json or die "Unable to write $workspace_package_json: $!";    # uncoverable branch true
     print {$workspace_fh} encode_json(
         {
             name    => 'developer-dashboard-skill-runtime',
@@ -1572,7 +1622,7 @@ sub _install_skill_package_json {
             $self->_copy_tree_contents( $workspace_modules, $target_root );
             1;
         } ? '' : "$@";
-        $copy_error =~ s/\s+\z// if defined $copy_error;
+        $copy_error =~ s/\s+\z// if defined $copy_error;    # uncoverable branch false
         return {
             error => "Failed to merge skill Node dependencies into $target_root for $skill_path: $copy_error",
         } if $copy_error ne '';
@@ -1635,7 +1685,7 @@ sub _package_json_dependency_specs {
     close $fh;
 
     my $decoded = eval { decode_json($content) };
-    die "Unable to parse $package_json: $@" if !$decoded || $@;
+    die "Unable to parse $package_json: $@" if !$decoded || $@;    # uncoverable condition right
 
     my @specs;
     for my $section ( qw(dependencies devDependencies optionalDependencies peerDependencies) ) {
@@ -1679,10 +1729,10 @@ sub _copy_tree_contents {
                 }
 
                 my ( undef, $target_dir ) = File::Spec->splitpath($target);
-                make_path($target_dir) if defined $target_dir && $target_dir ne '' && !-d $target_dir;
+                make_path($target_dir) if !-d $target_dir;    # uncoverable branch true
                 copy( $source, $target ) or die "Unable to copy $source to $target: $!";
                 my $mode = ( stat $source )[2];
-                chmod( $mode & 07777, $target ) if defined $mode && -f $target;
+                chmod( $mode & 07777, $target );
             },
         },
         $source_root
@@ -1699,7 +1749,7 @@ sub _copy_tree_contents {
 sub _install_manifest_file {
     my ( $self, $manifest_path, %args ) = @_;
     return { success => 1, skipped => 1 } if !defined $manifest_path || !-f $manifest_path;
-    my $manifest_name = $args{manifest_name} || basename($manifest_path);
+    my $manifest_name = $args{manifest_name} || basename($manifest_path);    # uncoverable condition false
     my $skills_root = $args{skills_root} || return { error => "Missing skills root for $manifest_name" };
     my $operations = $args{operations};
     my @sources = $self->_dependency_file_lines($manifest_path);
@@ -1883,8 +1933,8 @@ sub _install_skill_wingetfile {
         return {
             error => "Failed to install skill winget dependencies for $skill_path: $run->{stderr}",
         } if $run->{exit} != 0;
-        push @stdout, $run->{stdout} if defined $run->{stdout} && $run->{stdout} ne '';
-        push @stderr, $run->{stderr} if defined $run->{stderr} && $run->{stderr} ne '';
+        push @stdout, $run->{stdout} if defined $run->{stdout} && $run->{stdout} ne '';    # uncoverable condition left
+        push @stderr, $run->{stderr} if defined $run->{stderr} && $run->{stderr} ne '';    # uncoverable condition left
     }
 
     return {
@@ -1900,7 +1950,7 @@ sub _install_skill_wingetfile {
 # Output: list containing 'sudo' for non-root users, or an empty list for root.
 sub _skill_package_runner_prefix {
     my ($self) = @_;
-    return () if ( $> || 0 ) == 0;
+    return () if $> == 0;    # uncoverable branch true
     return ('sudo');
 }
 
@@ -2004,7 +2054,7 @@ sub _install_skill_makefile {
     my ( $self, $skill_path ) = @_;
     my $makefile = File::Spec->catfile( $skill_path, 'Makefile' );
     return { success => 1, skipped => 1 } if !-f $makefile;
-    my $make = command_in_path('make') || 'make';
+    my $make = command_in_path('make') || 'make';    # uncoverable condition right
 
     my %targets = map { $_ => 1 } $self->_makefile_targets($makefile);
     my @commands = (
@@ -2030,8 +2080,8 @@ sub _install_skill_makefile {
                 banner  => "Running make $target_name for " . basename($skill_path) . " from $makefile",
             );
             my ( $stdout, $stderr, $exit ) = @{$run}{qw(stdout stderr exit)};
-            push @stdout, $stdout if defined $stdout && $stdout ne '';
-            push @stderr, $stderr if defined $stderr && $stderr ne '';
+            push @stdout, $stdout if defined $stdout && $stdout ne '';    # uncoverable condition left
+            push @stderr, $stderr if defined $stderr && $stderr ne '';    # uncoverable condition left
             if ( $exit != 0 ) {
                 my $target = 'default';
                 if (@{$args}) {
@@ -2094,12 +2144,12 @@ sub _makefile_targets {
         next if $line =~ /^\./;
         next if $line !~ /^([^:=]+)\s*:(?![=])/;
         for my $target ( split /\s+/, $1 ) {
-            next if !defined $target || $target eq '';
+            next if $target eq '';    # uncoverable branch true
             next if $seen{$target}++;
             push @targets, $target;
         }
     }
-    close $fh or die "Unable to close $makefile: $!";
+    close $fh or die "Unable to close $makefile: $!";    # uncoverable branch true
     return @targets;
 }
 
@@ -2429,6 +2479,15 @@ Skills are isolated under the active DD-OOP-LAYERS skills root such as
 register their original source lines in the home root F<ddfile>, and uninstall
 removes matching entries again by repo name while preserving comments and
 unrelated sources.
+
+The repository name an install source resolves to is untrusted input, whether it
+arrives from an operator argument or from a F<ddfile> manifest line. Sources such
+as C<owner/..> parse to a parent-directory segment, and C<File::Spec> never
+collapses one, so install applies two independent guards before it touches the
+filesystem: the resolved name must be exactly one ordinary relative path segment,
+and the destination built from it must resolve to somewhere strictly beneath the
+target skills root. Either guard failing aborts the install with an explicit
+refusal instead of removing or writing outside the skills tree.
 
 =for comment FULL-POD-DOC START
 

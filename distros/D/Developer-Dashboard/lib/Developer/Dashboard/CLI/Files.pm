@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Files;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Cwd qw(cwd);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -30,7 +30,7 @@ sub run_files_command {
     my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
     my $aliases_loaded = 0;
     my $load_configured_file_aliases = sub {
-        return 1 if $aliases_loaded;
+        return 1 if $aliases_loaded;    # uncoverable branch true
         $files->register_named_files( $config->file_aliases );
         $aliases_loaded = 1;
         return 1;
@@ -144,7 +144,7 @@ sub run_files_command {
 # Output: Developer::Dashboard::PathRegistry object scoped to the current cwd.
 sub _build_paths {
     my $home = $ENV{HOME} || '';
-    my @roots = grep { defined && -d } map { "$home/$_" } qw(projects src work);
+    my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
     return Developer::Dashboard::PathRegistry->new(
         home            => $home,
         cwd             => cwd(),

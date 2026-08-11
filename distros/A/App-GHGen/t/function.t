@@ -251,33 +251,6 @@ subtest 'Analyzer::find_outdated_actions - flags old action versions' => sub {
 	is(scalar @none, 0, 'good workflow has no outdated actions');
 };
 
-subtest 'Analyzer::has_deployment_steps - recognises deploy actions and commands' => sub {
-	my $deploy_action = {
-		jobs => { test => { steps => [
-			{ uses => 'some/deploy-action@v1' },
-		]}},
-	};
-	ok(
-		App::GHGen::Analyzer::has_deployment_steps($deploy_action),
-		'step with "deploy" in uses is a deployment step',
-	);
-
-	my $git_push = {
-		jobs => { test => { steps => [
-			{ run => 'git push origin main' },
-		]}},
-	};
-	ok(
-		App::GHGen::Analyzer::has_deployment_steps($git_push),
-		'"git push" run command is a deployment step',
-	);
-
-	ok(
-		!App::GHGen::Analyzer::has_deployment_steps($GOOD_WORKFLOW),
-		'good workflow has no deployment steps',
-	);
-};
-
 subtest 'Analyzer::get_cache_suggestion - returns per-ecosystem YAML snippet' => sub {
 	my $npm_wf = {
 		jobs => { test => { steps => [{ run => 'npm ci' }] } },

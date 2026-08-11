@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
 	customize_workflow
 );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 

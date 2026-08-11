@@ -24,9 +24,9 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok  { my($c,$n)=@_; $T++; $c ? ($PASS++,push @OUT, "ok $T - $n\n")
-                                  : ($FAIL++,push @OUT, "not ok $T - $n\n") }
-sub is  { my($g,$e,$n)=@_; $T++;
+sub ok  { my($c, $n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n")
+                                  : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is  { my($g, $e, $n)=@_; $T++;
           defined($g) && ("$g" eq "$e")
             ? ($PASS++, push @OUT, "ok $T - $n\n")
             : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\ (defined $g?$g:'undef')}', exp='$e')\n") }
@@ -66,7 +66,7 @@ $r = $db->execute("UPDATE ck SET salary=-1 WHERE id=1");
 # ok 3
 ok($r->{type} eq 'error', "Fix1: UPDATE salary=-1 blocked by CHECK");
 # ok 4
-ok($r->{message} =~ /CHECK/, "Fix1: UPDATE error mentions CHECK");
+ok(($r->{message} =~ /CHECK/) ? 1 : 0, "Fix1: UPDATE error mentions CHECK");
 
 # UPDATE violation: score exceeds limit
 $r = $db->execute("UPDATE ck SET score=101 WHERE id=1");

@@ -66,7 +66,7 @@ subtest 'Pluggable WIF Disabled without Env Var' => sub {
 
 subtest 'Pluggable WIF Success JSON Output' => sub {
   my $command = sprintf(
-    '"%s" -e print+qq({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"my_token_field\":\"mock_pluggable_token\"})',
+'"%s" -e print+qq({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"my_token_field\":\"mock_pluggable_token\"})',
     $^X);
   my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
     audience =>
@@ -112,10 +112,11 @@ subtest 'Pluggable WIF Success Text Output' => sub {
 };
 
 subtest 'Pluggable WIF Environment Variable Injection' => sub {
+
   # Command that prints a JSON containing the value of the environment variable MOCK_ENV_VAR
   # We use perl to print it portably
   my $command = sprintf(
-    '"%s" -e print+qq({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"id_token\":\"$ENV{MOCK_ENV_VAR}\"})',
+'"%s" -e print+qq({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"id_token\":\"$ENV{MOCK_ENV_VAR}\"})',
     $^X);
 
   my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
@@ -140,6 +141,7 @@ subtest 'Pluggable WIF Environment Variable Injection' => sub {
 };
 
 subtest 'Pluggable WIF Error Handling' => sub {
+
   # Command that produces invalid JSON
   my $bad_json_command =
     '"' . $^X . '" -e "print q({) . chr(34) . q(invalid_json:)"';

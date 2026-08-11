@@ -1387,11 +1387,20 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
 {
     my $fresh_home = tempdir( CLEANUP => 1 );
     local $ENV{HOME} = $fresh_home;
+    # Hermetic isolation: the API config root is resolved from the deepest
+    # .developer-dashboard layer at or above the CWD, so this fresh-runtime
+    # assertion must run from inside the fresh home. Otherwise a dev-runtime
+    # .developer-dashboard/ in the ambient CWD (present in a working checkout,
+    # absent in a clean release build) captures the write and the file check
+    # below fails spuriously.
+    my $original_cwd = cwd();
+    chdir $fresh_home or die "Unable to chdir to $fresh_home: $!";
     my $fresh_add = _run_api_command_capture( 'add', '--key', 'fresh-client', '--maybe-secret', 'fresh-secret' );
     is( $fresh_add->{exit_code}, 0, 'dashboard api add bootstraps config/api.json on a fresh runtime' );
     my $fresh_file = File::Spec->catfile( $fresh_home, '.developer-dashboard', 'config', 'api.json' );
     ok( -f $fresh_file, 'dashboard api add creates config/api.json when it was previously missing' );
     is( json_decode( _slurp_file($fresh_file) )->{'fresh-client'}{secret}, sha256_hex('fresh-secret'), 'fresh runtime API config stores the hashed maybe-secret' );
+    chdir $original_cwd or die "Unable to restore cwd to $original_cwd: $!";
 }
 
 done_testing;

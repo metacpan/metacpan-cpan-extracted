@@ -68,25 +68,70 @@ singleton workers during `dashboard stop`, `dashboard restart`, and browser
 or `stream_value()` against a finite saved Ajax handler and assert the final
 DOM after incremental chunks land.
 
+### Source-tree gates and git worktrees
+
+Some test files only make sense against a checkout rather than an installed
+distribution, and they gate themselves on the presence of `.git`. Detect that
+by existence, never by directory-ness: in the primary checkout `.git` is a
+directory, but in a linked git worktree it is a regular file holding a
+`gitdir:` pointer. A `-d` gate is therefore false in every worktree, and a file
+that opens with `plan skip_all` on it deletes itself there entirely.
+
+This matters because per-ticket work happens in worktrees, so a directory-only
+gate switches the affected guardrails off at exactly the moment a change is
+authored and first verified, and they only wake up later on a run from the
+primary checkout. `t/139-worktree-source-tree-detection.t` proves the guardrail
+file really executes inside a real linked worktree and sweeps `t/` so the
+directory-only form cannot come back.
+
 ## Coverage
 
-Install Devel::Cover in a local Perl library and generate the coverage report:
+Install Devel::Cover in a local Perl library, then run the gate as one command:
 
 ```bash
 cpanm --notest --local-lib-contained ./.perl5 Devel::Cover
 export PERL5LIB="$PWD/.perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
 export PATH="$PWD/.perl5/bin:$PATH"
-cover -delete
-HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
-PERL5OPT=-MDevel::Cover prove -lr t
-cover -report text -select_re '^lib/' -coverage statement -coverage subroutine
+perl script/coverage-gate
 ```
 
-Developer Dashboard expects a reviewed `lib/` coverage report before release, and the current repository target is 100% statement and subroutine coverage for `lib/`.
-This is a standing QA gate for every change, not only releases. After the
-normal `prove -lr t` test gate passes, run the numeric `Devel::Cover` gate and
-do not treat the work as done until the `cover` summary still reports 100%
-statement and 100% subroutine coverage for `lib/`.
+`script/coverage-gate` is the canonical entrypoint and the one every CI
+workflow runs, so the documented gate and the executed gate are the same thing.
+It drops the coverage database, runs the instrumented suite, collects the
+`lib/` report for statement, branch, condition and subroutine, and enforces
+100.0 on all four through `script/check-all-metric-coverage`. Use
+`perl script/coverage-gate --dry-run` to see the resolved interpreter, library
+path, serializer module and the exact commands before spending a slot, and
+`perl script/coverage-gate --database DIR t/some-file.t` to collect a focused
+run into a scratch database.
+
+Its exit status is the interface: `0` all four metrics at 100.0, `1` a genuine
+shortfall with the failing metrics named, `2` the gate could not run or could
+not read its report, `3` the coverage instrument could not read its own
+database.
+
+That last status is why the chain is one command rather than three.
+`Devel::Cover::DB::IO` picks its on-disk serialization format at `BEGIN` from
+whatever `@INC` makes visible — Sereal, then JSON, then Storable — and records
+the choice nowhere. Typed as three shell lines, the library path has to be
+repeated on every one of them; omit it from a single line on a host carrying
+two Devel::Cover installations with different serializers available, and the
+reader cannot parse what the writer produced moments earlier. It surfaces as
+`File is not a perl storable` or `Bad Sereal header`, both of which read as a
+corrupt database and invite a re-run that fails identically, spending another
+host-exclusive multi-minute slot. Running the three commands as children of one
+process removes the split: they inherit one environment because there is only
+one to inherit. If the gate does report exit `3`, the fix is the environment,
+never a re-run.
+
+Developer Dashboard expects a reviewed `lib/` coverage report before release,
+and the repository target is 100.0 on **all four** metrics — statement, branch,
+condition and subroutine.
+This is a standing QA gate for every change, not only releases.
+After the normal `prove -lr t` test gate passes, run the numeric gate
+and do not treat the work as done until it exits `0`. Only one coverage run may
+be in flight on a host at a time; instrumented timing-sensitive tests misread
+under contention, and a contended run is not valid gate evidence.
 
 The coverage-closure suite includes managed collector loop start/stop paths under `Devel::Cover`, including wrapped fork coverage in `t/14-coverage-closure-extra.t`, so the covered run stays green without breaking TAP from daemon-style child processes.
 Managed collector children now scrub inherited `PERL5OPT` and `HARNESS_PERL_SWITCHES` coverage settings before their long-lived loop work begins, and the runtime manager widens its startup stability polls when the parent harness is running under `Devel::Cover`, so the full covered suite does not misclassify a slow instrumented startup as a dead runtime.
@@ -170,6 +215,18 @@ The JavaScript fast-check wrapper is a source-tree fuzz gate. It runs when
 `node`, `npm`, `package.json`, and `package-lock.json` are all available, and
 it skips in packaged install-test trees that do not ship those checkout-only
 JavaScript manifests.
+That gate is only as good as the dependency behind it, so `fast-check` is held
+on its maintained major. Upstream ended the 3.x line at 3.23.2 in December 2024
+and now ships only 4.x, so a range floored on 3 pins the project's one
+property-based gate to a major that gets no new generators, no new shrinkers,
+and no upstream fixes while still reporting green.
+`t/34-scorecard-guardrails.t` enforces both halves of that: `package.json` must
+declare a major of 4 or higher, and the resolved `node_modules/fast-check`
+entry in `package-lock.json` must sit on the same major the manifest declares.
+The pair matters because `npm ci` — the command both the fuzz workflow and
+`t/35-js-fast-check.t` actually run — installs what the lock resolves, not what
+the manifest reads, so a manifest saying 4 over a lock resolving 3 would fuzz
+on the abandoned line while looking current.
 The contributor contract now lives here plus `AGENTS.override.md` and
 `agents.md`, not in the top-level product manual in `README.md` or
 `Developer::Dashboard.pm`. Those two files stay synced as user-facing product
@@ -364,7 +421,7 @@ The repository also now enforces:
 
 The web tests also cover the access model:
 
-- exact `127.0.0.1` admin bypass
+- loopback admin bypass across the full strict-octet `127.0.0.0/8` range and `::1`, not just exact `127.0.0.1`
 - `localhost` helper login requirement
 - helper login session creation and logout
 - helper session remote-address binding and expiry validation paths
@@ -414,6 +471,55 @@ The host-side launcher now also runs `prove -lv t/44-smart-router-two-stage.t`
 immediately after `dzil build` and before the broader blank-environment
 container flow. Treat that smart-router two-stage guard as a managed
 post-build gate, not as an optional memory step.
+
+### Post-Build Guard Container Reclaim
+
+`t/44-smart-router-two-stage.t` creates a long-lived container named
+`dd-smart-router-two-stage-<pid>-<epoch>` and removes it from an `END` block.
+That teardown covers a normal exit and a trapped signal, but not `SIGKILL`, and
+every automation round in this repository runs under a `timeout` that kills the
+whole process tree when its budget expires. Because the container name embeds a
+pid and an epoch that are dead by then, no later run recognised the container as
+something it could remove, so a hard-killed run leaked its container
+permanently. The guard is not skipped in ordinary runs — it skips only when the
+release tarball is absent — so every `prove -lr t` on a host that has built a
+tarball could add another leak, and each leak holds a bound loopback port plus a
+full dashboard process tree whose in-container processes are root-owned and
+therefore out of reach of the host-side stray-collector cleanup.
+
+Better teardown cannot close this. `SIGKILL` cannot be trapped, and the
+container is long-lived and exec'd into, so `docker run --rm` does not apply.
+The cleanup is therefore generational: before choosing a port or creating its
+own container, the guard calls
+`Local::DockerGuard::reclaim_guard_containers` (`t/lib/Local/DockerGuard.pm`)
+and removes every guard container its predecessors leaked. Reclaiming first also
+releases the loopback ports those leaks were holding, which is what keeps the
+guard's free-port search from turning intermittent.
+
+A container is judged a leak when the pid embedded in its name no longer
+resolves to a running process, or when it is older than one hour. The pid check
+collects a fresh leak on the very next run; the age window exists only to
+backstop pid recycling, where a dead run's pid has been reissued to an unrelated
+live process that would otherwise vouch for the leak forever. A pid that exists
+but cannot be signalled from this uid counts as alive, because the leaked
+processes run as root and treating "permission denied" as "gone" would be
+exactly backwards. Names that do not match the
+`dd-smart-router-two-stage-<pid>-<epoch>` shape are never touched, so a sweep
+can only ever remove a container this guard created, and the removal is verified
+by re-reading the container inventory rather than by trusting `docker rm`'s exit
+status — which is non-zero both when removal genuinely failed and when the
+container had already gone.
+
+`t/141-smart-router-guard-container-reclaim.t` pins those rules. It drives the
+whole decision through an injected command runner and an injected pid probe, so
+it needs no docker daemon and runs on any host.
+
+The other docker-driven gates do not have this defect and need no reclaim of
+their own: `integration/blank-env/run-host-integration.sh` uses
+`docker compose run --rm`, and `integration/windows/run-qemu-windows-smoke.sh`
+names its container from a fixed `WINDOWS_DOCKUR_NAME`, which the next run finds
+and reuses or replaces by name. Any new gate that creates a long-lived,
+uniquely named container must reclaim generationally in the same way.
 That blank-container tarball install now assumes the normal `prove -lr t`
 suite and explicit numeric `Devel::Cover` gate already passed in the source
 tree. Its purpose is packaged dependency resolution and installed-runtime

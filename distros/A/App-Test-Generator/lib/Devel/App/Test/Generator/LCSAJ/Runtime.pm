@@ -24,11 +24,11 @@ Devel::App::Test::Generator::LCSAJ::Runtime - Debugger backend for LCSAJ coverag
 
 =head1 VERSION
 
-Version 0.44
+Version 0.45
 
 =cut
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ END {
 # --------------------------------------------------
 # _normalize
 #
-# Purpose:    Convert an absolute or build-tree path
+# Convert an absolute or build-tree path
 #             to a canonical lib-relative form so that
 #             paths recorded at runtime match the
 #             targets derived from LCSAJ_TARGETS.
@@ -117,8 +117,6 @@ END {
 #
 # Exit:       Returns a lib-relative path string,
 #             e.g. lib/Foo/Bar.pm
-#
-# Side effects: None.
 #
 # Notes:      Must be defined before the BEGIN block
 #             that calls it, since BEGIN runs at compile
@@ -140,7 +138,7 @@ sub _normalize {
 # --------------------------------------------------
 # DB::DB
 #
-# Purpose:    Called by the Perl debugger before every
+# Called by the Perl debugger before every
 #             statement. Records (file, line) hits for
 #             later LCSAJ coverage analysis.
 #
@@ -244,7 +242,7 @@ sub DB::DB {
 # --------------------------------------------------
 # _write_results
 #
-# Purpose:    Serialise %HITS to a per-process JSON
+# Serialise %HITS to a per-process JSON
 #             file in the output directory.
 #
 # Entry:      None. Reads %HITS and $OUT_DIR.

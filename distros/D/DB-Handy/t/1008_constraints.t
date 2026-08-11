@@ -25,8 +25,8 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok  { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is  { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\ (defined $g?$g:'undef')}', exp='$e')\n") }
+sub ok  { my($c, $n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is  { my($g, $e, $n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\ (defined $g?$g:'undef')}', exp='$e')\n") }
 
 use File::Path ();
 use File::Spec ();
@@ -56,7 +56,7 @@ $res = $db->execute("INSERT INTO nn (name) VALUES ('Bob')");
 # ok 2
 ok($res->{type} eq 'error', "NOT NULL: INSERT omitting NOT NULL col fails");
 # ok 3
-ok($res->{message} =~ /NOT NULL/, "NOT NULL: error message mentions NOT NULL");
+ok(($res->{message} =~ /NOT NULL/) ? 1 : 0, "NOT NULL: error message mentions NOT NULL");
 
 # Explicit empty string also violates NOT NULL
 $res = $db->execute("INSERT INTO nn (id,name) VALUES ('','Carol')");
@@ -70,7 +70,7 @@ $res = $db->execute("UPDATE nn SET id='' WHERE id=1");
 # ok 5
 ok($res->{type} eq 'error', "NOT NULL: UPDATE to empty string fails");
 # ok 6
-ok($res->{message} =~ /NOT NULL/, "NOT NULL: UPDATE error message mentions NOT NULL");
+ok(($res->{message} =~ /NOT NULL/) ? 1 : 0, "NOT NULL: UPDATE error message mentions NOT NULL");
 
 # Valid UPDATE does not affect NOT NULL checking
 $res = $db->execute("UPDATE nn SET name='AliceNew' WHERE id=1");
@@ -124,7 +124,7 @@ $res = $db->execute("INSERT INTO ck (id,salary) VALUES (2,-100)");
 # ok 15
 ok($res->{type} eq 'error', "CHECK: INSERT with negative salary fails");
 # ok 16
-ok($res->{message} =~ /CHECK/, "CHECK: error message mentions CHECK");
+ok(($res->{message} =~ /CHECK/) ? 1 : 0, "CHECK: error message mentions CHECK");
 
 ###############################################################################
 # CHECK: evaluated on UPDATE (violation)
@@ -133,7 +133,7 @@ $res = $db->execute("UPDATE ck SET salary=-9999 WHERE id=1");
 # ok 17
 ok($res->{type} eq 'error', "CHECK: UPDATE with negative salary fails");
 # ok 18
-ok($res->{message} =~ /CHECK/, "CHECK: UPDATE error message mentions CHECK");
+ok(($res->{message} =~ /CHECK/) ? 1 : 0, "CHECK: UPDATE error message mentions CHECK");
 
 ###############################################################################
 # PRIMARY KEY: implies NOT NULL and an auto-created UNIQUE index <col>_pk
@@ -160,7 +160,7 @@ my $pk_idx = $db->list_indexes('pk');
 ok((grep { $_->{name} eq 'id_pk' && $_->{unique} && $_->{col} eq 'id' } @$pk_idx),
    "PRIMARY KEY: auto-created UNIQUE index is named id_pk");
 # ok 23
-ok($res->{message} =~ /UNIQUE/, "PRIMARY KEY: error mentions UNIQUE");
+ok(($res->{message} =~ /UNIQUE/) ? 1 : 0, "PRIMARY KEY: error mentions UNIQUE");
 
 ###############################################################################
 # PRIMARY KEY: schema records PK column name
@@ -183,7 +183,7 @@ $db->execute("CREATE UNIQUE INDEX uq_email ON uq (email)");
 # ok 25
 ok($res->{type} eq 'error', "UNIQUE INDEX: duplicate email INSERT rejected");
 # ok 26
-ok($res->{message} =~ /UNIQUE/, "UNIQUE INDEX: error message mentions UNIQUE");
+ok(($res->{message} =~ /UNIQUE/) ? 1 : 0, "UNIQUE INDEX: error message mentions UNIQUE");
 
 ###############################################################################
 # UNIQUE via CREATE UNIQUE INDEX: UPDATE enforcement

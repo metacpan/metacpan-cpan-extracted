@@ -1185,4 +1185,76 @@ END_MODULE
 	);
 };
 
+# ==================================================================
+# PIPELINE 15: Memory limit passed via env var, not parent setrlimit
+#
+# Regression: _compile_signature_isolated previously called
+# setrlimit(RLIMIT_AS) on the PARENT before open3().  That capped
+# the parent's own address space at 50 MB; the test framework OOMed
+# during subtest teardown, producing "A context appears to have been
+# destroyed without first calling release()" and exit 255.
+#
+# The fix: set $ENV{_ATG_RLIMIT_AS} in the local %ENV scope so only
+# the child sees the limit; the parent's address space is unrestricted.
+# ==================================================================
+
+subtest '_compile_signature_isolated: memory limit is passed via env var to child, not applied to parent' => sub {
+	my $captured_env;
+
+	no warnings 'redefine';
+	local *App::Test::Generator::SchemaExtractor::open3 = sub {
+		# Capture the environment visible to the would-be child at fork time.
+		$captured_env = {%ENV};
+		$_[0] = do { open my $fh, '>', \my $buf; $fh };
+		my $empty = '';
+		open $_[1], '<', \$empty;
+		open $_[2], '<', \$empty;
+		return $$;	# harmless: waitpid($$,0) returns -1 immediately
+	};
+
+	my $e = bless { allow_signature_exec => 1, verbose => 0 },
+		'App::Test::Generator::SchemaExtractor';
+	$e->_compile_signature_isolated('myfunc', '(positional => [])');
+
+	ok(defined($captured_env->{_ATG_RLIMIT_AS}),
+		'_ATG_RLIMIT_AS env var is set in the child-visible environment');
+	like($captured_env->{_ATG_RLIMIT_AS}, qr/^\d+$/,
+		'_ATG_RLIMIT_AS value is a positive integer (the byte limit)');
+	ok(!defined($ENV{_ATG_RLIMIT_AS}),
+		'_ATG_RLIMIT_AS is cleaned up in the parent after the call (local %ENV scope)');
+};
+
+# ==================================================================
+# PIPELINE 16: fuzz-harness-generator invoked under $^X
+#
+# Regression: t/fuzz.t called fuzz-harness-generator as a bare
+# executable, so the OS used #!/usr/bin/env perl (the first perl in
+# $PATH).  On CPAN smokers where $PATH resolves to the system perl,
+# @INC contained only system paths and PREREQ_PM modules installed
+# alongside the testing perl were invisible (Data::Section::Simple
+# etc).  The fix: always prepend $^X to the command list.
+#
+# This pipeline confirms that when fuzz-harness-generator is run via
+# $^X, the @INC it uses includes the same Perl installation's site_lib.
+# ==================================================================
+
+subtest 'fuzz-harness-generator: invoked via $^X shares @INC with the test process' => sub {
+	use FindBin qw($Bin);
+	use IPC::Run3;
+
+	my $script = File::Spec->catfile($Bin, '..', 'bin', 'fuzz-harness-generator');
+	plan skip_all => 'fuzz-harness-generator not found' unless -f $script;
+
+	my ($stdout, $stderr);
+	run3([$^X, $script, '--help'], \undef, \$stdout, \$stderr);
+	my $exit = $? >> 8;
+
+	# --help exits 0 (via Pod::Usage) and writes to stdout; any "Can't locate"
+	# compile error would cause a non-zero exit and write to stderr.
+	ok($exit == 0 || $exit == 1,
+		'fuzz-harness-generator compiles cleanly under $^X (no missing module errors)');
+	unlike($stderr // '', qr/Can't locate/,
+		'no "Can\'t locate" errors — @INC from $^X includes all required modules');
+};
+
 done_testing();

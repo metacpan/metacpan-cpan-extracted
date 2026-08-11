@@ -19,9 +19,9 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok      { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is      { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
-sub rows_ok { my($r,$c,$n)=@_; $T++; (ref($r) eq 'ARRAY')&&(@$r==$c) ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got=".(ref($r) eq 'ARRAY'?scalar@$r:'undef').", exp=$c)\n") }
+sub ok      { my($c, $n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is      { my($g, $e, $n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\(defined $g?$g:'undef')}', exp='$e')\n") }
+sub rows_ok { my($r, $c, $n)=@_; $T++; (ref($r) eq 'ARRAY')&&(@$r==$c) ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got=".(ref($r) eq 'ARRAY'?scalar@$r:'undef').", exp=$c)\n") }
 
 use File::Path ();
 use File::Spec ();
@@ -80,7 +80,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     my $r = $db->execute("SELECT id, method, path FROM http_log WHERE status >= 200 AND status < 300 ORDER BY id");
 
     # ok 4
-    rows_ok($r->{data},, 6, "2xx responses: 6 rows");
+    rows_ok($r->{data}, 6, "2xx responses: 6 rows");
 
     # ok 5
     is($r->{data}[0]{method}, 'GET',  "first 2xx is GET");
@@ -104,7 +104,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT host, COUNT(*) AS cnt FROM http_log GROUP BY host ORDER BY host");
 
     # ok 9
-    rows_ok($r->{data},, 3, "3 distinct hosts");
+    rows_ok($r->{data}, 3, "3 distinct hosts");
     my %hc = map { $_->{host} => $_->{cnt} } @{$r->{data}};
 
     # ok 10
@@ -130,7 +130,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT id, latency FROM http_log ORDER BY latency DESC LIMIT 3");
 
     # ok 15
-    rows_ok($r->{data},, 3, "LIMIT 3 slow requests");
+    rows_ok($r->{data}, 3, "LIMIT 3 slow requests");
 
     # ok 16
     is($r->{data}[0]{latency}, 120, "slowest latency=120");
@@ -200,7 +200,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     my $r = $db->execute("SELECT id, label FROM events WHERE category = 'click' ORDER BY id");
 
     # ok 24
-    rows_ok($r->{data},, 4, "click events: 4 rows");
+    rows_ok($r->{data}, 4, "click events: 4 rows");
 
     # ok 25
     ok(!exists $r->{data}[0]{score}, "projection: score not in result");
@@ -212,7 +212,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT id FROM events WHERE (category = 'click' OR category = 'view') AND flag = 'yes' ORDER BY id");
 
     # ok 27
-    rows_ok($r->{data},, 5, "click OR view, flag=yes: 5 rows");
+    rows_ok($r->{data}, 5, "click OR view, flag=yes: 5 rows");
 
     # ok 28
     is($r->{data}[0]{id}, 1, "first id=1");
@@ -221,7 +221,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT category, COUNT(*) AS cnt, SUM(score) AS total FROM events GROUP BY category ORDER BY category");
 
     # ok 29
-    rows_ok($r->{data},, 3, "3 categories");
+    rows_ok($r->{data}, 3, "3 categories");
     my %cat = map { $_->{category} => $_ } @{$r->{data}};
 
     # ok 30
@@ -240,13 +240,13 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT DISTINCT category FROM events ORDER BY category");
 
     # ok 34
-    rows_ok($r->{data},, 3, "DISTINCT categories: 3");
+    rows_ok($r->{data}, 3, "DISTINCT categories: 3");
 
     # LIMIT + OFFSET (pagination)
     $r = $db->execute("SELECT id FROM events ORDER BY id LIMIT 3 OFFSET 0");
 
     # ok 35
-    rows_ok($r->{data},, 3, "page 1: 3 rows");
+    rows_ok($r->{data}, 3, "page 1: 3 rows");
 
     # ok 36
     is($r->{data}[0]{id}, 1, "page1 first id=1");
@@ -257,7 +257,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT id FROM events ORDER BY id LIMIT 3 OFFSET 3");
 
     # ok 38
-    rows_ok($r->{data},, 3, "page 2: 3 rows");
+    rows_ok($r->{data}, 3, "page 2: 3 rows");
 
     # ok 39
     is($r->{data}[0]{id}, 4, "page2 first id=4");
@@ -266,19 +266,19 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT id FROM events WHERE score BETWEEN 5 AND 10 ORDER BY id");
 
     # ok 40
-    rows_ok($r->{data},, 6, "score BETWEEN 5 AND 10: 6 rows");
+    rows_ok($r->{data}, 6, "score BETWEEN 5 AND 10: 6 rows");
 
     # LIKE filter
     $r = $db->execute("SELECT id FROM events WHERE label LIKE 'btn%' ORDER BY id");
 
     # ok 41
-    rows_ok($r->{data},, 4, "label LIKE 'btn%': 4 rows");
+    rows_ok($r->{data}, 4, "label LIKE 'btn%': 4 rows");
 
     # ORDER BY multiple columns
     $r = $db->execute("SELECT category, score FROM events ORDER BY category ASC, score DESC LIMIT 4");
 
     # ok 42
-    rows_ok($r->{data},, 4, "ORDER BY 2 cols: 4 rows");
+    rows_ok($r->{data}, 4, "ORDER BY 2 cols: 4 rows");
 
     # ok 43
     is($r->{data}[0]{category}, 'click', "first category=click");
@@ -287,7 +287,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT id, score * 2 AS double_score FROM events WHERE id <= 3 ORDER BY id");
 
     # ok 44
-    rows_ok($r->{data},, 3, "expression alias: 3 rows");
+    rows_ok($r->{data}, 3, "expression alias: 3 rows");
 
     # ok 45
     is($r->{data}[0]{double_score}, 20, "id=1 double_score=20");
@@ -304,7 +304,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT id FROM nullable WHERE val IS NOT NULL AND val != '' ORDER BY id");
 
     # ok 47
-    rows_ok($r->{data},, 2, "IS NOT NULL and non-empty: 2 rows");
+    rows_ok($r->{data}, 2, "IS NOT NULL and non-empty: 2 rows");
 
     # ok 48
     is($r->{data}[0]{id}, 1, "first non-null id=1");
@@ -396,7 +396,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     my $r = $db->execute("SELECT u.uname, o.product FROM users u INNER JOIN orders o ON u.uid = o.uid ORDER BY o.oid");
 
     # ok 61
-    rows_ok($r->{data},, 6, "INNER JOIN: 6 order rows");
+    rows_ok($r->{data}, 6, "INNER JOIN: 6 order rows");
 
     # ok 62
     is($r->{data}[0]{'u.uname'}, 'alice', "first order: alice");
@@ -405,13 +405,13 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT u.uname, o.product FROM users u LEFT JOIN orders o ON u.uid = o.uid ORDER BY u.uid");
 
     # ok 63
-    rows_ok($r->{data},, 7, "LEFT JOIN: 7 rows (4 users, dave+null)");
+    rows_ok($r->{data}, 7, "LEFT JOIN: 7 rows (4 users, dave+null)");
 
     # JOIN + GROUP BY: total order amount per user
     $r = $db->execute("SELECT u.uname, COUNT(*) AS cnt, SUM(o.amount) AS total FROM users u INNER JOIN orders o ON u.uid = o.uid GROUP BY u.uname ORDER BY u.uname");
 
     # ok 64
-    rows_ok($r->{data},, 3, "JOIN+GROUP BY: 3 users with orders");
+    rows_ok($r->{data}, 3, "JOIN+GROUP BY: 3 users with orders");
     my %ut = map { defined($_->{'u.uname'}) ? $_->{'u.uname'} : $_->{'uname'} => $_ } @{$r->{data}};
 
     # ok 65
@@ -479,7 +479,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     is($cn{oid},    'INT',     "oid type=INT");
 
     # ok 81
-    is($cn{product},'VARCHAR', "product type=VARCHAR");
+    is($cn{product}, 'VARCHAR', "product type=VARCHAR");
 
     # DROP TABLE
 
@@ -526,7 +526,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     my $r = $db->execute("SELECT pname, CASE WHEN stock = 0 THEN 'soldout' WHEN stock < 10 THEN 'low' ELSE 'ok' END AS status FROM products ORDER BY pid");
 
     # ok 87
-    rows_ok($r->{data},, 5, "CASE WHEN: 5 rows");
+    rows_ok($r->{data}, 5, "CASE WHEN: 5 rows");
     my %ps = map { $_->{pname} => $_->{status} } @{$r->{data}};
 
     # ok 88
@@ -560,7 +560,7 @@ ok($db->execute("USE api")->{type} eq 'ok', "USE api");
     $r = $db->execute("SELECT pid FROM products WHERE pid NOT IN (2, 5) ORDER BY pid");
 
     # ok 95
-    rows_ok($r->{data},, 3, "NOT IN (2,5): 3 rows");
+    rows_ok($r->{data}, 3, "NOT IN (2,5): 3 rows");
 
     # ok 96
     is($r->{data}[0]{pid}, 1, "first pid=1");

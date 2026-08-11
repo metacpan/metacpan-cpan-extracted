@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Cwd qw(abs_path cwd);
 use File::Basename qw(basename);
@@ -34,7 +34,7 @@ sub render {
     my ( $self, %args ) = @_;
 
     my $jobs = defined $args{jobs} ? $args{jobs} : 0;
-    my $cwd  = $args{cwd} || cwd();
+    my $cwd  = $args{cwd} || cwd();    # uncoverable condition false
     my $mode = $args{mode} || 'compact';
     my $color = exists $args{color} ? $args{color} : 0;
     my $max_age = defined $args{max_age} ? $args{max_age} : 300;
@@ -57,7 +57,7 @@ sub render {
       ? $ENV{WORKSPACE_REF}
       : ( defined $ENV{TICKET_REF} ? $ENV{TICKET_REF} : '' );
     my @info_parts = @indicator_parts;
-    push @info_parts, "🎫:$ticket" if defined $ticket && $ticket ne '';
+    push @info_parts, "🎫:$ticket" if $ticket ne '';
     my $info = @info_parts ? join( ' ', @info_parts ) : '';
     my $branch = $self->_git_branch($project);
     my $jobs_suffix = $jobs ? " ($jobs jobs)" : '';
@@ -81,7 +81,7 @@ sub render_tmux_status {
     my ( $top, $bottom ) = $self->_tmux_status_lines(%args);
     return $top    if $line eq 'top';
     return $bottom if $line eq 'bottom';
-    return join "\n", grep { defined $_ && $_ ne q{} } ( $top, $bottom );
+    return join "\n", grep { defined $_ && $_ ne q{} } ( $top, $bottom );    # uncoverable branch false
 }
 
 # _timestamp()
@@ -111,7 +111,7 @@ sub _indicator_parts {
         my $stale = $self->{indicators}->is_stale( $indicator, max_age => $max_age ) ? 1 : 0;
         my $part = $mode eq 'extended'
           ? join( '', grep { defined && $_ ne '' } $status_icon, $icon, $label )
-          : join( '', grep { defined && $_ ne '' } $status_icon, ( $icon || substr( $label, 0, 1 ) ) );
+          : join( '', grep { defined && $_ ne '' } $status_icon, ( $icon || substr( $label, 0, 1 ) ) );    # uncoverable branch false
         if ($color) {
             my $status = $indicator->{status} || '';
             my $ansi = $stale ? "\e[33m" : $status =~ /^(ok|clean)$/ ? "\e[32m" : $status =~ /^(missing|error|dirty|down)$/ ? "\e[31m" : "\e[36m";

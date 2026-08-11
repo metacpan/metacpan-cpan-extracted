@@ -33,7 +33,7 @@ local $ENV{RELEASE_TESTING} = 1;
 local $ENV{TEST_PERLTIDY}   = 1;
 
 # Run prove on xt/ directory
-my $exit_code = system('prove', '-l', 'xt/');
+my $exit_code = system('prove', '-b', 'xt/');
 
 if ($exit_code != 0) {
   die "RELEASE LINT ERROR: Author tests (xt/) failed!\n";

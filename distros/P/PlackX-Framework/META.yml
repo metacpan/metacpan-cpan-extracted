@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150013'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -28,7 +28,7 @@ provides:
     file: lib/PXF/Util.pm
   PlackX::Framework:
     file: lib/PlackX/Framework.pm
-    version: '0.28'
+    version: '0.29'
   PlackX::Framework::Config:
     file: lib/PlackX/Framework/Config.pm
   PlackX::Framework::Handler:
@@ -69,6 +69,6 @@ resources:
   bugtracker: https://github.com/dstroma/PlackX-Framework/issues
   homepage: https://github.com/dstroma/PlackX-Framework
   repository: https://github.com/dstroma/PlackX-Framework.git
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

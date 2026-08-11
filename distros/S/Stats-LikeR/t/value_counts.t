@@ -221,6 +221,9 @@ if ($n == 0) {
 #--------
 {
 	srand(4321);
+	# Arbitrary bit patterns come from two 32-bit halves below: 'Q' and a 32-bit
+	# shift both need a 64-bit-integer perl, 'L2' runs anywhere.
+	my $bits = length(pack 'd', 0) == 8;
 	my $bad = 0;
 	for my $round (1 .. 20) {
 		my @v = grep { $_ == $_ && abs($_) != 9**9**9 }
@@ -229,7 +232,8 @@ if ($n == 0) {
 			  $k == 0 ? int rand 1e6
 			: $k == 1 ? rand() * 10 ** (int(rand 60) - 30)
 			: $k == 2 ? int(rand 1e6) / 1000
-			:           unpack 'd', pack 'Q', (int(rand 2**32) << 32) | int(rand 2**32)
+			: $bits   ? unpack 'd', pack 'L2', int(rand 2**32), int(rand 2**32)
+			:           rand() * 10 ** (int(rand 300) - 150)
 		} 1 .. 2000;
 		my %want;
 		$want{"$_"}++ for @v;

@@ -1,11 +1,14 @@
+_des.c
+_des.h
+Changes
 COPYRIGHT
 DES.pm
 DES.xs
-MANIFEST
-README
 Makefile.PL
-_des.c
-_des.h
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module meta-data (added by MakeMaker)
+README
+SECURITY.md
 test.pl
 typemap
-META.yml                                 Module meta-data (added by MakeMaker)

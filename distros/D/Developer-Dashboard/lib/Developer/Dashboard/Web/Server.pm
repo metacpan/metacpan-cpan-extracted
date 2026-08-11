@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::Server;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Capture::Tiny qw(capture);
 use Errno qw(EINTR);
@@ -37,7 +37,7 @@ sub new {
     my $ssl_subject_alt_names = ref( $args{ssl_subject_alt_names} ) eq 'ARRAY'
       ? [ @{ $args{ssl_subject_alt_names} } ]
       : [];
-    die 'Missing worker count' if !defined $workers || $workers eq '';
+    die 'Missing worker count' if !defined $workers || $workers eq '';    # uncoverable condition left
     die 'Worker count must be a positive integer' if $workers !~ /^\d+$/ || $workers < 1;
 
     if ($ssl) {
@@ -149,7 +149,7 @@ sub psgi_app {
     return $app if !$self->{ssl};
     return sub {
         my ($env) = @_;
-        return _ssl_redirect_response($env) if !_request_is_https($env);
+        return $self->_ssl_redirect_response($env) if !_request_is_https($env);
         return $app->($env);
     };
 }
@@ -267,6 +267,11 @@ sub _serve_ssl_frontend {
 # Output: numeric process exit code.
 sub _run_ssl_backend_process {
     my ( $self, $daemon ) = @_;
+    # Mark this process as the internal backend behind the SSL front-proxy so
+    # authorize_request never auto-grants loopback admin (every connection here
+    # arrives from the proxy's loopback socket). Starman workers fork from here
+    # and inherit the flag.
+    local $ENV{DEVELOPER_DASHBOARD_SSL_PROXIED} = 1;
     my $runner = $self->_build_runner($daemon);
     my $app = $self->psgi_app;
     $runner->run($app);
@@ -306,7 +311,7 @@ sub _handle_ssl_frontend_client {
     my $daemon = $args{daemon} || die 'Missing daemon descriptor';
     my $first = '';
     my $peeked = recv( $client, $first, 1, MSG_PEEK );
-    return 1 if !defined $peeked || !defined $first || $first eq '';
+    return 1 if !defined $peeked || $first eq '';
 
     if ( _socket_looks_like_tls($first) ) {
         my $backend = IO::Socket::INET->new(
@@ -322,7 +327,7 @@ sub _handle_ssl_frontend_client {
 
     my $request = _read_http_request_head($client);
     my $response = _http_redirect_response(
-        host   => _request_host_from_head( $request, $daemon ),
+        host   => $self->_request_host_from_head( $request, $daemon ),
         target => _request_target_from_head($request),
     );
     syswrite( $client, $response );
@@ -361,29 +366,36 @@ sub _read_http_request_head {
 }
 
 # _request_target_from_head($head)
-# Extracts the requested path and query from one plain HTTP request head.
+# Extracts the requested path and query from one plain HTTP request head and
+# reduces it to a target that is safe to append to the redirect authority.
 # Input: raw request-head string.
 # Output: path/query target string, defaulting to /.
 sub _request_target_from_head {
     my ($head) = @_;
     return '/' if !defined $head || $head eq '';
-    return $1 if $head =~ m{\A[A-Z]+\s+(\S+)\s+HTTP/}s;
+    return _safe_redirect_target($1) if $head =~ m{\A[A-Z]+\s+(\S+)\s+HTTP/}s;
     return '/';
 }
 
 # _request_host_from_head($head, $daemon)
 # Extracts or reconstructs the public host:port for one redirecting plain HTTP
-# request.
+# request. This is the authority a real plain-HTTP client sees in the Location
+# header of the public SSL port, so the client-supplied Host header is only
+# reused when it passes the same allowlist the PSGI redirect applies; otherwise
+# the bound listener address is used.
 # Input: raw request-head string and daemon descriptor.
 # Output: host[:port] string.
 sub _request_host_from_head {
-    my ( $head, $daemon ) = @_;
-    if ( defined $head && $head =~ /^Host:\s*([^\r\n]+)/im ) {
-        return $1;
+    my ( $self, $head, $daemon ) = @_;
+    if ( defined $head && $head =~ /^Host:[ \t]*([^\r\n]*)/im ) {
+        my $requested = $1;
+        $requested =~ s/[ \t]+\z//;
+        my $allowed = $self->_allowlisted_redirect_authority($requested);
+        return $allowed if $allowed ne '';
     }
     my $host = $daemon->sockhost || '127.0.0.1';
     my $port = $daemon->sockport || 443;
-    return $port == 443 ? $host : $host . ':' . $port;
+    return _redirect_authority( $host, $port == 443 ? undef : $port );
 }
 
 # _http_redirect_response(%args)
@@ -597,8 +609,8 @@ sub _request_is_https {
 # Input: PSGI environment hash reference.
 # Output: PSGI array response with redirect status, headers, and body.
 sub _ssl_redirect_response {
-    my ($env) = @_;
-    my $location = _https_redirect_location($env);
+    my ( $self, $env ) = @_;
+    my $location = $self->_https_redirect_location($env);
     return [
         307,
         [
@@ -611,28 +623,158 @@ sub _ssl_redirect_response {
 
 # _https_redirect_location($env)
 # Rebuilds the current request URL with an https:// scheme for SSL-enforcement
-# redirects.
+# redirects. The client-supplied Host header is only reused when it names an
+# authority this server can actually answer for; anything else falls back to
+# the server-derived SERVER_NAME/SERVER_PORT authority.
 # Input: PSGI environment hash reference.
 # Output: absolute HTTPS URL string.
 sub _https_redirect_location {
-    my ($env) = @_;
-    my $host = defined $env->{HTTP_HOST} ? $env->{HTTP_HOST} : '';
+    my ( $self, $env ) = @_;
+    my $host = $self->_allowlisted_redirect_authority( $env->{HTTP_HOST} );
     if ( $host eq '' ) {
         my $server_name = defined $env->{SERVER_NAME} ? $env->{SERVER_NAME} : '127.0.0.1';
         my $server_port = defined $env->{SERVER_PORT} ? $env->{SERVER_PORT} : 443;
-        $host = $server_name;
-        $host .= ':' . $server_port if defined $server_port && $server_port ne '' && $server_port !~ /^443$/;
+        my $fallback_port =
+          $server_port ne '' && $server_port !~ /^443$/ ? $server_port : undef;
+        $host = _redirect_authority( _split_request_authority( $server_name, $fallback_port ) );
+        $host = '127.0.0.1' if $host eq '';
     }
     my $path = defined $env->{SCRIPT_NAME} ? $env->{SCRIPT_NAME} : '';
     $path .= defined $env->{PATH_INFO} ? $env->{PATH_INFO} : '/';
-    $path = '/' if $path eq '';
     my $query = defined $env->{QUERY_STRING} ? $env->{QUERY_STRING} : '';
-    return 'https://' . $host . $path . ( $query ne '' ? '?' . $query : '' );
+    my $target = _safe_redirect_target( $path . ( $query ne '' ? '?' . $query : '' ) );
+    return 'https://' . $host . $target;
+}
+
+# _allowlisted_redirect_authority($authority)
+# Validates one client-supplied authority before it may appear in a Location
+# header. Echoing a raw Host header back turns the plain-HTTP listener into an
+# open redirect: the server binds 0.0.0.0 by default, so any remote client can
+# name its own authority and have the dashboard launder a redirect to it. The
+# allowlist is the same trust set the rest of the app already uses - loopback
+# literals plus the names this server's own certificate covers, which is every
+# authority it can legitimately serve HTTPS for.
+# Input: raw Host header string or undef.
+# Output: normalized authority string, or empty string when it is not allowed.
+sub _allowlisted_redirect_authority {
+    my ( $self, $authority ) = @_;
+    my ( $host, $port ) = _split_request_authority($authority);
+    return '' if !defined $host;
+    return '' if !$self->_redirect_host_is_allowed($host);
+    return _redirect_authority( $host, $port );
+}
+
+# _redirect_host_is_allowed($host)
+# Reports whether one already-parsed host may be named in a redirect Location.
+# Input: normalized lowercase host string without port.
+# Output: boolean true when the host is loopback or a covered certificate name.
+sub _redirect_host_is_allowed {
+    my ( $self, $host ) = @_;
+    return 1 if _host_is_loopback_literal($host);
+    my %allowed = map { $_ => 1 } _ssl_expected_subject_alt_names(
+        host  => $self->{host},
+        hosts => $self->{ssl_subject_alt_names},
+    );
+    return $allowed{$host} ? 1 : 0;
+}
+
+# _host_is_loopback_literal($host)
+# Reports whether one host is a loopback IP literal. A loopback authority can
+# never point at an attacker-controlled origin, so it stays acceptable in a
+# redirect even when the certificate only covers 127.0.0.1. This mirrors the
+# loopback rule in Developer::Dashboard::Auth on purpose - the whole 127.0.0.0/8
+# range with strict 0-255 octets, plus both spellings of the IPv6 loopback - and
+# the two must stay in step.
+# Input: normalized lowercase host string.
+# Output: boolean true for loopback literals only.
+sub _host_is_loopback_literal {
+    my ($host) = @_;
+    return 0 if !defined $host || $host eq '';
+    return 1 if $host =~ /\A127(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}\z/;
+    return 1 if $host eq '::1' || $host eq '0:0:0:0:0:0:0:1';
+    return 0;
+}
+
+# _split_request_authority($authority, $port)
+# Parses one authority into its host and port parts, rejecting anything that is
+# not a syntactically valid HTTP authority. Parsing rather than pattern-matching
+# is deliberate: the caller rebuilds the authority from these parts, so no byte
+# of the original string can survive into a header.
+# Input: raw authority string (host with optional port) and an optional port
+# override used when the caller already holds the port separately.
+# Output: (host, port) list with a lowercase host and an undefined port when
+# absent, or an empty list when the authority is not usable.
+sub _split_request_authority {
+    my ( $authority, $port_override ) = @_;
+    return () if !defined $authority || $authority eq '';
+    return () if length($authority) > 255;
+    my ( $host, $port );
+    if ( $authority =~ /\A\[([0-9A-Fa-f:.]{2,45})\](?::(\d{1,5}))?\z/ ) {
+        ( $host, $port ) = ( $1, $2 );
+    }
+    elsif ( $authority =~ /\A([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)(?::(\d{1,5}))?\z/ ) {
+        ( $host, $port ) = ( $1, $2 );
+    }
+    else {
+        return ();
+    }
+    $port = $port_override if defined $port_override;
+    if ( defined $port ) {
+        return () if $port !~ /\A\d{1,5}\z/;
+        return () if $port < 1 || $port > 65535;
+    }
+    return ( lc $host, $port );
+}
+
+# _redirect_authority($host, $port)
+# Rebuilds one authority string from validated parts, bracketing IPv6 literals
+# so the result is always a parseable URL authority.
+# Input: normalized host string (or empty list) and optional port.
+# Output: authority string, or empty string when no host was supplied.
+sub _redirect_authority {
+    my ( $host, $port ) = @_;
+    return '' if !defined $host || $host eq '';
+    my $literal = $host =~ /:/ ? '[' . $host . ']' : $host;
+    return defined $port ? $literal . ':' . $port : $literal;
+}
+
+# _safe_redirect_target($target)
+# Reduces one request target to a form that cannot move the authority of the
+# URL it is appended to. The target is concatenated straight after the
+# authority, so an authority-form target such as "@evil.com/" would demote the
+# real host to userinfo and hand the redirect to the attacker. Only an
+# origin-form path is safe, and - matching the login redirect sanitizer - a
+# backslash or raw ASCII control byte is rejected too, because URL parsers fold
+# or strip those before parsing. A legitimate target percent-encodes them.
+# Input: raw request target string (path plus optional query).
+# Output: the target when it is safe, otherwise '/'.
+sub _safe_redirect_target {
+    my ($target) = @_;
+    return '/' if !defined $target || $target eq '';
+    return '/' if $target !~ m{\A/};
+    return '/' if $target =~ m{\A//};
+    return '/' if $target =~ m{\\};
+    return '/' if $target =~ m{[\x00-\x1f\x7f]};
+    return $target;
+}
+
+# _ssl_certificate_directory()
+# Resolves the home-layer certificate directory for the current user. The home
+# directory itself is resolved by the path registry, which understands HOME,
+# then USERPROFILE, then HOMEDRIVE plus HOMEPATH. Reading $ENV{HOME} directly
+# here would refuse to serve HTTPS on Windows, which does not export HOME at
+# all, before the server ever reached a listening socket.
+# Input: none.
+# Output: list of (path registry object, certificate directory path string); dies
+# when no home directory is resolvable from the environment.
+sub _ssl_certificate_directory {
+    my $paths = Developer::Dashboard::PathRegistry->new;
+    return ( $paths, File::Spec->catdir( $paths->home_runtime_path, 'certs' ) );
 }
 
 # generate_self_signed_cert(%args)
 # Generates or reuses a self-signed certificate for HTTPS.
-# Creates ~/.developer-dashboard/certs/ if it does not exist.
+# Creates the certs/ directory in the home runtime layer if it does not exist.
 # Reuses existing certificates when they already match the expected browser-safe
 # localhost/loopback profile plus any requested extra SAN names/IPs, and
 # regenerates older legacy certificates when they do not.
@@ -640,9 +782,7 @@ sub _https_redirect_location {
 # Output: path to certificate file, or dies on error.
 sub generate_self_signed_cert {
     my (%args) = @_;
-    my $home = $ENV{HOME} || die 'Missing HOME environment variable';
-    my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
-    my $cert_dir = File::Spec->catdir( $paths->home_runtime_path, 'certs' );
+    my ( $paths, $cert_dir ) = _ssl_certificate_directory();
     my $cert_file = File::Spec->catfile($cert_dir, 'server.crt');
     my $key_file  = File::Spec->catfile($cert_dir, 'server.key');
     my @expected_subject_alt_names = _ssl_expected_subject_alt_names(
@@ -744,13 +884,13 @@ sub _ssl_expected_subject_alt_names {
     my (%args) = @_;
     my @requested = ( 'localhost', '127.0.0.1', '::1' );
     push @requested, $args{host} if defined $args{host};
-    push @requested, @{ $args{hosts} || [] } if ref( $args{hosts} ) eq 'ARRAY';
+    push @requested, @{ $args{hosts} } if ref( $args{hosts} ) eq 'ARRAY';
 
     my @normalized;
     my %seen;
     for my $name (@requested) {
         my $normalized = _normalize_ssl_subject_alt_name($name);
-        next if !defined $normalized || $normalized eq '';
+        next if !defined $normalized || $normalized eq '';    # uncoverable condition left
         next if _ssl_subject_alt_name_is_wildcard($normalized);
         my $seen_key = lc $normalized;
         next if $seen{$seen_key}++;
@@ -844,8 +984,7 @@ sub _ssl_cert_has_expected_profile {
 # most recently prepared for the active dashboard runtime.
 # Output: list of (cert_path, key_path) or dies if files do not exist.
 sub get_ssl_cert_paths {
-    my $home = $ENV{HOME} || die 'Missing HOME environment variable';
-    my $cert_dir = File::Spec->catdir($home, '.developer-dashboard', 'certs');
+    my ( undef, $cert_dir ) = _ssl_certificate_directory();
     my $cert_file = File::Spec->catfile($cert_dir, 'server.crt');
     my $key_file  = File::Spec->catfile($cert_dir, 'server.key');
 
@@ -875,7 +1014,7 @@ and runs it under Starman through Plack::Runner.
 
 =head1 METHODS
 
-=head2 new, run, start_daemon, listening_url, serve_daemon, psgi_app, _build_runner, _default_headers, generate_self_signed_cert, get_ssl_cert_paths
+=head2 new, run, start_daemon, listening_url, serve_daemon, psgi_app, _build_runner, _default_headers, _ssl_certificate_directory, generate_self_signed_cert, get_ssl_cert_paths
 
 Construct and run the local PSGI web server with optional SSL/HTTPS support.
 
@@ -892,6 +1031,43 @@ Pass C<ssl => 1> to the new() constructor to enable HTTPS:
   $server->run;
 
 Self-signed certificates are generated automatically in C<~/.developer-dashboard/certs/> and reused on subsequent runs when they already match the expected browser-safe localhost/loopback profile plus any configured SAN aliases or IP literals. Older legacy dashboard certs without the required SAN and server-auth extensions are regenerated automatically.
+
+Both C<generate_self_signed_cert> and C<get_ssl_cert_paths> locate that directory through C<_ssl_certificate_directory>, which asks C<Developer::Dashboard::PathRegistry> for the home runtime layer. The registry resolves the home directory from C<HOME>, then C<USERPROFILE>, then C<HOMEDRIVE> plus C<HOMEPATH>, so HTTPS also starts on a Windows session, which does not export C<HOME> at all. Only an environment that names no home directory by any of those variables is an error, and it is reported as a missing home directory rather than as a missing single variable.
+
+=head1 HTTPS REDIRECT TRUST BOUNDARY
+
+The public listener binds C<0.0.0.0> by default, so the plain-HTTP redirect it
+serves on the SSL port is reachable from the network and its C<Location> header
+must never be built from client-controlled input. Two values reach that header
+and both are validated:
+
+=over 4
+
+=item *
+
+The B<authority> comes from the request C<Host> header only when that header
+parses as a valid host with an optional in-range port B<and> names an authority
+this server can legitimately answer for: a loopback IP literal, or one of the
+names its own certificate covers (C<localhost>, C<127.0.0.1>, C<::1>, the
+concrete non-wildcard bind host, and every entry in
+C<web.ssl_subject_alt_names>). Anything else is discarded and the redirect uses
+the server-derived listen authority instead. The accepted authority is rebuilt
+from the parsed parts, so no byte of the original header survives into the
+header value.
+
+=item *
+
+The B<target> is only reused when it is an origin-form path. A target is
+concatenated directly after the authority, so an authority-form target such as
+C<@evil.com/> would demote the real host to userinfo and hand the redirect to
+the attacker; a backslash or raw ASCII control byte is rejected for the same
+reason the login redirect sanitizer rejects them, because URL parsers fold or
+strip those bytes before parsing. Anything unsafe collapses to C</>.
+
+=back
+
+Both the PSGI-level redirect used by C<psgi_app> and the socket-level redirect
+served by the SSL front-proxy apply the same rules.
 
 =for comment FULL-POD-DOC START
 

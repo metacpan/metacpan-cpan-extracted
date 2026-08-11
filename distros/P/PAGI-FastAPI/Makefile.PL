@@ -16,11 +16,12 @@ WriteMakefile(
     },
 
     PREREQ_PM => {
-        'PAGI'               => '0.002001',
-        'PAGI::WebSocket'    => '0.002002',
-        'Future::AsyncAwait' => '0.60',
-        'Type::Tiny'         => '2.000000',
-        'JSON::PP'           => '4.00',
+        'PAGI'                    => '0.002001',
+        'PAGI::WebSocket'         => '0.002002',
+        'PAGI::Middleware::CORS'  => '0.002002',
+        'Future::AsyncAwait'      => '0.60',
+        'Type::Tiny'              => '2.000000',
+        'JSON::PP'                => '4.00',
     },
 
     TEST_REQUIRES => {

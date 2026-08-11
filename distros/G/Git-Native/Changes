@@ -1,5 +1,149 @@
 Revision history for Git-Native
 
+0.005     2026-08-11 03:39:12Z
+  - Repository: new index accessor returning a Git::Native::Index, the
+    first native access to the staging area in this distribution. It
+    answers "is anything tracked at or below this path?" - the question
+    status_for_path cannot: being a working-tree comparison it misses a
+    path git tracks but that is gone from disk, and on a directory it
+    fails GIT_EAMBIGUOUS. Consumers had to shell out to `git ls-files`
+    for this.
+  - Index: new read-only wrapper - entrycount, find, find_prefix,
+    has_path, has_prefix, is_tracked_under, reload. No add / remove /
+    write; nothing here can stage or unstage anything. find_prefix and
+    has_prefix match a raw STRING prefix ('tasks' also matches
+    'tasksfoo.txt'); is_tracked_under is the path-aware question and
+    answers exactly what `git ls-files -- $path` does.
+  - Index: Repository->index re-reads the index file on every call.
+    libgit2 caches the git_index* inside the repository and hands the
+    same object to every git_repository_index call, so without the read
+    a fresh accessor would still report a stale index - a file another
+    process staged would be invisible. A held Index is consequently not
+    a snapshot either; reload is the explicit refresh.
+  - Error: new is_locked predicate (GIT_ELOCKED). libgit2 takes a
+    refs/<name>.lock for every reference write, so a concurrent writer
+    fails with GIT_ELOCKED (-14), not GIT_EMODIFIED. A compare-and-swap
+    retry loop that only retries on is_not_matched drops updates under
+    contention; reference_create / reference_set_target now document that
+    both codes are normal and retryable.
+  - Error: new is_bare_repo predicate (GIT_EBAREREPO). A bare repository
+    has no worktree, so status / status_for_path fail with GIT_EBAREREPO
+    (-8) rather than returning an empty result. Code walking a mixed set
+    of repositories had to compare the raw -8 to tell "not applicable
+    here" from a real error.
+  - Repository: replace the remaining hardcoded libgit2 return codes with
+    the GIT_E* / GIT_ITEROVER / GIT_OBJECT_ANY constants from
+    Git::Libgit2. No behaviour change - head() already treated -9 / -3 as
+    unborn / missing HEAD, and the iterators already stopped on -31.
+  - Tests: new edge-case layer t/51 - t/66, lifting branch coverage from
+    59% to 81% and condition coverage from 48% to 76%. Covers the failure
+    and boundary paths: every Error predicate against every other
+    predicate's code, the credential-callback contract network-free
+    (t/52), binary blob content with embedded NULs, open_ext and the init
+    argument guards, _known_hosts_match including @revoked and
+    @cert-authority, and _build_strarray's NULL-on-empty semantics.
+  - Repository: signature_default returned a Signature whose name and
+    email were the literal string '<from-config>'. The real values sat in
+    the C handle and were never read, so anything asking who would commit
+    got a placeholder. New Signature->from_handle reads name / email /
+    when / offset out of the git_signature struct and copies them into
+    Perl, so they survive the handle being freed.
+  - Remote: nothing can die out of an FFI closure any more. The credential
+    callback's type check sat outside its eval, so a callback returning
+    something that is not a Git::Native::Credential died across libgit2's
+    C frames; the check also used `ref` before calling ->isa, which died
+    one line earlier on an unblessed reference. The update_tips callback
+    had a bare die with no eval at all. All three now warn and return a
+    negative rc, which libgit2 propagates for check_rc to throw.
+  - Remote, Revwalker: use the GIT_PASSTHROUGH / GIT_ITEROVER constants
+    from Git::Libgit2 instead of re-declaring them locally.
+  - Tests: t/lib/TestRepo.pm now really isolates the developer's git
+    config. GIT_CONFIG_GLOBAL / GIT_CONFIG_SYSTEM only reach the git CLI -
+    libgit2 does not know them and guesses its config search path from
+    HOME once, during git_libgit2_init. A BEGIN block redirects HOME and
+    XDG_CONFIG_HOME before Git::Native is loaded, and TestRepo refuses to
+    load after it. Until now every test commit was signed with the
+    developer's identity and results depended on their ~/.gitconfig.
+    Regression test in t/69-config-isolation.t. The system level is
+    covered too, see the set_config_search_path entry below.
+  - Tests: t/20-remote-local.t no longer claims to cover the PASSTHROUGH
+    credential path. libgit2 invokes the credential callback only when
+    the transport raises an auth challenge, which file:// never does, so
+    the old assertion could not fail. The callback is now pinned in
+    t/52-credential-callback.t instead.
+  - Requires Git::Libgit2 0.006, up from 0.005. The new bindings it
+    carries - git_object_lookup_prefix, git_libgit2_opts - and its
+    constant-group exports are what the next few entries are built on.
+  - Git::Native: new set_config_search_path(system|global|xdg|programdata
+    => $dir) class method, wrapping git_libgit2_opts with
+    GIT_OPT_SET_SEARCH_PATH. This is the only supported way to move
+    libgit2's config search: /etc/gitconfig is compiled in and no
+    environment variable reaches it - not GIT_CONFIG_SYSTEM, not
+    GIT_CONFIG_NOSYSTEM. Deliberately a class method and not a repository
+    method: the option mutates a process-global table in libgit2, and a
+    repository that is already open keeps the config it resolved when it
+    was opened, so a per-repository method would provably do nothing to
+    its own object. Passing undef restores libgit2's default, "" blanks
+    the level.
+  - Repository: new object_by_prefix($short_hex), the equivalent of
+    git rev-parse abc1234. Until now Oid->from_hex demanded all 40
+    characters, so there was no way to resolve an abbreviated OID. Note
+    that git_object_lookup_prefix counts the prefix in hex characters,
+    not bytes. A prefix shorter than 4 croaks rather than reaching
+    libgit2, which answers it with GIT_EAMBIGUOUS - the same code a
+    genuine collision returns - so is_ambiguous keeps exactly one
+    meaning.
+  - Error: new is_ambiguous (GIT_EAMBIGUOUS) and is_owner_mismatch
+    (GIT_EOWNER) predicates. On the second one, worth knowing before you
+    reach for it: libgit2 1.5.1 only reports GIT_EOWNER when a
+    safe.directory entry exists and does not match. With no entry at all
+    - the normal state - it asks the config for the multivar, gets
+    GIT_ENOTFOUND and returns that instead, so a foreign-owned repository
+    reports a not-found naming a config key nobody set, and is_not_found
+    is what answers. safe.directory = * is not honoured on 1.5.1 either.
+    Both quirks are pinned in t/72-owner-mismatch.t.
+  - Remote::Result: updated entries now always carry the same four keys,
+    { ref, from, to, reason }. They used to differ by operation - fetch
+    produced { ref, from, to } from update_tips, push produced
+    { ref, reason } from push_update_reference - so caller code that
+    handled both got undef on push without a warning, and the old POD
+    claimed push returned from/to, which it never did. An all-zero OID in
+    either tip now maps to undef, meaning "did not exist" resp. "ref
+    deleted", instead of 40 zeroes.
+  - Repository: commit_create validates its required arguments in Perl.
+    Omitting message used to die inside libgit2 with "invalid argument:
+    'string'", naming neither the method nor the argument. message => ''
+    stays valid, parents => undef stays equivalent to omitting it.
+  - Oid: from_hex and from_raw croak with their own message naming
+    Git::Native::Oid, instead of passing through a croak from
+    Git::Libgit2's helper that named a function the caller never called.
+    @CARP_NOT makes the blame land on the calling line rather than inside
+    the distribution. These stay croaks rather than becoming
+    Git::Native::Error on purpose: the input never reaches libgit2, so
+    there is no return code to report, and borrowing GIT_EINVALIDSPEC
+    would make is_invalid_spec ambiguous between a bad refname and a bad
+    OID inside a single reference_create call.
+  - Branch, Revwalker, Remote: take GIT_BRANCH_*, GIT_SORT_* and
+    GIT_DIRECTION_* from Git::Libgit2 0.006 instead of re-declaring them
+    locally. Values verified identical against the installed module, not
+    just the header. The struct-version constants stay local - Git::Libgit2
+    does not export those.
+  - POD for the whole public surface. Until now only reference_create and
+    reference_set_target had one, and the class list in CLAUDE.md was the
+    de-facto documentation - which no CPAN user sees. Every public method
+    and attribute across all 17 modules is documented, with emphasis on
+    the semantics you cannot guess: head() returning undef on an unborn
+    or missing HEAD, tag() returning undef for lightweight tags, status
+    on a bare repository failing GIT_EBAREREPO, Revwalker::next returning
+    undef at ITEROVER.
+  - Tests: t/70 - t/73 pin the argument guards on commit_create, the
+    abbreviated-OID lookup including a real SHA1 prefix collision, the
+    ownership check, and the croak-not-throw contract across all 14
+    entry points that accept an OID or hex string. The predicate matrix
+    in t/51 now covers all 13 curated predicates and has a symbol-table
+    check that fails if a new predicate is added to Error.pm and not
+    listed there.
+
 0.004     2026-08-09 20:34:42Z
   - Repository: add compare-and-swap direct reference updates.
     reference_create(..., expected_old => $oid) uses

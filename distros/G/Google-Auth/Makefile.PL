@@ -33,13 +33,16 @@ for my $dir (@ssl_search_dirs) {
   }
 }
 
+my $is_win32     = $^O eq 'MSWin32';
+my $proxy_target = $is_win32 ? 'bin/gcloud-auth.ps1' : 'bin/gcloud-auth';
+
 WriteMakefile(
   NAME               => 'Google::Auth',
   AUTHOR             => q{C.J. Collier <cjac@google.com>},
   VERSION_FROM       => 'lib/Google/Auth.pm',
   ABSTRACT_FROM      => 'lib/Google/Auth.pm',
   LICENSE            => 'apache_2_0',
-  PL_FILES           => {},
+  PL_FILES           => {'bin/gcloud-auth.PL' => $proxy_target},
   LIBS               => [$libs_flags],
   INC                => $inc_flags,
   OBJECT             => '$(O_FILES)',
@@ -60,8 +63,11 @@ WriteMakefile(
     'Moo'           => '0',
     'URI'           => '0',
   },
-  dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
-  clean => {FILES    => 'Google-Auth-Library-Perl-*'},
+  EXE_FILES => ['bin/gcloud-auth.pl', $proxy_target],
+  dist      => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
+  clean     => {
+    FILES => 'Google-Auth-Library-Perl-* bin/gcloud-auth bin/gcloud-auth.ps1'
+  },
 );
 
 package MY;
@@ -73,6 +79,13 @@ sub dist_basics {
   $inherited =~
     s/(distcheck\s*:)/$1 release_lint\n\nrelease_lint :\n$check_code\n/;
   return $inherited;
+}
+
+sub postamble {
+  return <<'MAKE_EXTRAS';
+author-tests :
+	AUTHOR_TESTING=1 prove -Ilib -bv xt/
+MAKE_EXTRAS
 }
 
 package main;

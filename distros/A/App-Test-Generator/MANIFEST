@@ -119,6 +119,7 @@ t/Mutator_unit.t
 t/object_detection.t
 t/params_validate.t
 t/params_validate_strict.t
+t/path.t
 t/Planner-Fixture.t
 t/Planner-Grouping.t
 t/Planner-Isolation.t

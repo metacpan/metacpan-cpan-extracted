@@ -218,8 +218,8 @@ are remembered in order from oldest to newest.
 
 =item urix()
 
-Returns a new instance of a URI::Fast object, if you have the URI::Fast module
-installed and your app turned on this feature.
+Returns a new instance of your app's subclass of PlackX::Framework::URIx if
+you have turned on the URIx feature.
 
     package MyApp {
       use PlackX::Framework qw(:URIx); # or :all

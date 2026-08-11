@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Capture::Tiny qw(capture);
+use Cwd ();
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -34,7 +35,7 @@ ok( -f $brewfile, 'brewfile exists at the repo root' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/VERSION_FROM\s*=>\s*'lib\/Developer\/Dashboard\.pm'/, 'Makefile.PL uses a filesystem path for VERSION_FROM so checkout installs work on Windows' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/use\s+File::ShareDir::Install\s+qw\(install_share\);/, 'Makefile.PL loads File::ShareDir::Install so packaged installs can refresh shipped helper assets under auto/share/dist' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/install_share\s+dist\s*=>\s*'share';/, 'Makefile.PL explicitly installs the repo share tree so packaged helper assets stay in sync with the tarball' );
-like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/package\s+MY;\s*use\s+File::ShareDir::Install\s+qw\(postamble\);/s, 'Makefile.PL exports the File::ShareDir::Install postamble into package MY so share assets actually install' );
+unlike( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/package\s+MY;\s*use\s+File::ShareDir::Install\s+qw\(postamble\);/s, 'Makefile.PL does not import and redefine the File::ShareDir::Install postamble in package MY' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/File::ShareDir::Install::postamble\(\s*\$self\s*\)/, 'Makefile.PL chains the share-dir installer postamble before its checkout bootstrap hook' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/install\s+::\s*\n\t\$\(NOECHO\)\s+\$\(PERL\)\s+-e\s+"1;"/, 'Makefile.PL gives the Windows gmake install target an explicit no-op recipe so it does not synthesize install from install.sh' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/pure_install\s+::\s+install-private-cli-tools/, 'Makefile.PL runs the private helper staging hook from pure_install instead of a recipe-less install target' );
@@ -68,6 +69,66 @@ like(
         \@expected_helpers,
         'Makefile.PL checkout bootstrap seeds the full current private helper set into the home runtime',
     );
+}
+
+{
+    # Windows gmake runs the staging one-liner with no HOME in the process
+    # environment and a perl whose getpwuid dies as unimplemented, so the
+    # recipe must fall back to USERPROFILE exactly like bin/dashboard does.
+    my $makefile_text = _slurp( File::Spec->catfile( $root, 'Makefile.PL' ) );
+    my ($staging_code) = $makefile_text =~ /install-private-cli-tools :\n\t\$\(NOECHO\) \$\(PERL\) -e '([^']+)'/;
+    ok( defined $staging_code, 'Makefile.PL carries the single-quoted install-private-cli-tools staging one-liner' );
+    $staging_code =~ s/\$\$/\$/g;
+    my $windows_like_prelude = 'BEGIN { *CORE::GLOBAL::getpwuid = sub ($) { die "The getpwuid function is unimplemented" }; } ';
+    my $profile_home = tempdir( CLEANUP => 1 );
+    my ( $stdout, $stderr, $exit ) = capture {
+        local %ENV = %ENV;
+        delete $ENV{HOME};
+        $ENV{USERPROFILE} = $profile_home;
+        my $previous_dir = Cwd::getcwd();
+        chdir $root or die "Unable to chdir to $root: $!";
+        system( $^X, '-e', $windows_like_prelude . $staging_code );
+        my $status = $?;
+        chdir $previous_dir or die "Unable to chdir back to $previous_dir: $!";
+        $status;
+    };
+    is( $exit >> 8, 0, 'the helper staging one-liner succeeds on a Windows-like host with no HOME and an unimplemented getpwuid' )
+      or diag $stderr;
+    is( $stderr, '', 'the helper staging one-liner stays warning-clean without HOME' );
+    my $staged_core = File::Spec->catfile( $profile_home, '.developer-dashboard', 'cli', '_dashboard-core' );
+    my $staged_upgrade = File::Spec->catfile( $profile_home, '.developer-dashboard', 'cli', 'upgrade' );
+    ok( -f $staged_core, 'the staging one-liner resolves USERPROFILE as home and seeds _dashboard-core under it' );
+    ok( -f $staged_upgrade, 'the staging one-liner seeds the new upgrade helper under the USERPROFILE home' );
+}
+
+{
+    # With neither home variable set and a getpwuid that dies as unimplemented,
+    # the staging recipe must report its own explicit error instead of letting
+    # the passwd lookup abort the install or silently staging helpers into a
+    # relative directory inside the build tree.
+    my $makefile_text = _slurp( File::Spec->catfile( $root, 'Makefile.PL' ) );
+    my ($staging_code) = $makefile_text =~ /install-private-cli-tools :\n\t\$\(NOECHO\) \$\(PERL\) -e '([^']+)'/;
+    $staging_code =~ s/\$\$/\$/g;
+    my $windows_like_prelude = 'BEGIN { *CORE::GLOBAL::getpwuid = sub ($) { die "The getpwuid function is unimplemented" }; } ';
+    my $sandbox = tempdir( CLEANUP => 1 );
+    my ( $stdout, $stderr, $exit ) = capture {
+        local %ENV = %ENV;
+        delete $ENV{HOME};
+        delete $ENV{USERPROFILE};
+        my $previous_dir = Cwd::getcwd();
+        chdir $sandbox or die "Unable to chdir to $sandbox: $!";
+        system( $^X, '-e', $windows_like_prelude . $staging_code );
+        my $status = $?;
+        chdir $previous_dir or die "Unable to chdir back to $previous_dir: $!";
+        $status;
+    };
+    isnt( $exit >> 8, 0, 'the helper staging one-liner fails when no home directory is resolvable' );
+    like( $stderr, qr/Unable to resolve a home directory/,
+        'the staging one-liner reports its own missing-home error' );
+    unlike( $stderr, qr/unimplemented/,
+        'the staging one-liner never lets the unimplemented passwd lookup surface' );
+    ok( !-d File::Spec->catdir( $sandbox, '.developer-dashboard' ),
+        'the staging one-liner stages nothing into the build directory when home is unresolvable' );
 }
 
 {
@@ -175,7 +236,16 @@ like(
     like( $install_ps_text, qr/\[Regex\]::Escape\(\$endMarker\)/, 'install.ps1 escapes the managed end marker with the .NET regex API before replacing older profile blocks' );
     unlike( $install_ps_text, qr/\\Q\$beginMarker\\E|\\Q\$endMarker\\E/, 'install.ps1 avoids Perl-style \\Q...\\E regex quoting that PowerShell does not support in [Regex]::Replace' );
     like( $install_ps_text, qr/legacyManagedPattern/, 'install.ps1 strips legacy unmarked Developer Dashboard profile blocks from earlier Windows bootstrap failures' );
-    like( $install_ps_text, qr/Join-Path\s+\`\$HOME\s+'.developer-dashboard\\cli\\dd\\_dashboard-core'/s, 'install.ps1 only asks dashboard shell ps for profile bootstrap when the staged home helper runtime is present' );
+    like( $install_ps_text, qr/\`\$ddCacheRoot = Join-Path\s+\`\$env:HOME\s+'\.developer-dashboard\\cache'/s, 'install.ps1 resolves the managed PowerShell cache root from env:HOME, matching the Perl-side home resolution, without invoking Perl during profile startup' );
+    unlike( $install_ps_text, qr/\`\$ddCacheRoot = Join-Path\s+\`\$HOME\s/s, 'install.ps1 does not resolve the managed PowerShell cache root from the PowerShell-only HOME variable, which can diverge from the HOME that Perl writes the cache under' );
+    like( $install_ps_text, qr/function Resolve-DashboardRuntimeHome/s, 'install.ps1 has a dedicated resolver for the HOME that the Perl runtime uses for its cache root' );
+    like( $install_ps_text, qr/\$env:HOME = Resolve-DashboardRuntimeHome/s, 'install.ps1 seeds env:HOME for its own session so the Perl runtime and the generated profile agree on the cache root' );
+    like( $install_ps_text, qr/\$powershellCacheRoot = Join-Path\s+\$env:HOME\s+'\.developer-dashboard\\cache'/s, 'install.ps1 validates the same env:HOME-derived cache root that the generated profile will read' );
+    like( $install_ps_text, qr/if\s+\(\[string\]::IsNullOrWhiteSpace\(\`\$env:HOME\)\)\s*\{\s*\`\$env:HOME = '\$profileRuntimeHome'/s, 'install.ps1 bakes the install-time runtime home into the managed profile block as a last-resort seed so the cache root is never joined against an empty HOME' );
+    like( $install_ps_text, qr/Join-Path\s+\`\$ddCacheRoot\s+'powershell-env\.ps1'/s, 'install.ps1 points the managed profile at the cached local-lib environment script' );
+    like( $install_ps_text, qr/Join-Path\s+\`\$ddCacheRoot\s+'powershell-bootstrap\.ps1'/s, 'install.ps1 points the managed profile at the cached dashboard shell bootstrap script' );
+    like( $install_ps_text, qr/\.\s+\`\$ddEnvironmentCache.*?\.\s+\`\$ddBootstrapCache/s, 'install.ps1 dot-sources the cached environment before the cached shell bootstrap' );
+    like( $install_ps_text, qr/Run 'dashboard shell ps' to refresh them/, 'install.ps1 gives an actionable warning when either PowerShell startup cache file is unavailable' );
     like( $install_ps_text, qr/if\s+\(\[string\]::IsNullOrWhiteSpace\(\`\$env:HOME\)\s+-and\s+-not\s+\[string\]::IsNullOrWhiteSpace\(\`\$HOME\)\)\s*\{\s*\`\$env:HOME = \`\$HOME/s, 'install.ps1 seeds env:HOME from PowerShell HOME inside the managed profile block for future sessions' );
     like( $install_ps_text, qr/\$profilePerlRuntimePaths\s*=\s*\@/s, 'install.ps1 captures the resolved Strawberry Perl runtime directories before writing the managed PowerShell profile block' );
     like( $install_ps_text, qr/\$profileExtraRuntimePaths\s*=\s*\@/s, 'install.ps1 captures extra Windows runtime directories such as portable Node.js before writing the managed PowerShell profile block' );
@@ -183,13 +253,19 @@ like(
     like( $install_ps_text, qr/\`\$ddExtraRuntimePaths\s*=\s*\@/s, 'install.ps1 writes any extra portable Windows runtime directories into the managed PowerShell profile block for future sessions' );
     like( $install_ps_text, qr/foreach\s+\(\`\$ddPerlRuntimePath in \`\$ddPerlRuntimePaths\)/s, 'install.ps1 prepends the persisted Strawberry Perl runtime directories in future PowerShell sessions before resolving dashboard' );
     like( $install_ps_text, qr/foreach\s+\(\`\$ddExtraRuntimePath in \`\$ddExtraRuntimePaths\)/s, 'install.ps1 also prepends any persisted portable Windows runtime directories in future PowerShell sessions' );
-    like( $install_ps_text, qr/\$ddDashboardCandidate in \@\(\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard\.bat'\),\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard\.cmd'\),\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard'\),\s*\(\(Get-Command dashboard -ErrorAction SilentlyContinue\)\.Source\)\s*\)/s, 'install.ps1 resolves the managed dashboard command from the local-lib bin directory before falling back to command discovery in the PowerShell profile block' );
-    like( $install_ps_text, qr/\$ddShellBootstrap\s*=\s*&\s+\`\$ddPerlCommand\.Source\s+\`\$ddDashboardCommand\s+shell\s+ps/s, 'install.ps1 captures dashboard shell ps output through perl plus the resolved managed dashboard command before invoking it in the profile so Windows batch shims do not return blank output' );
+    unlike( $install_ps_text, qr/\$ddDashboardCandidate in \@\(\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard\.bat'\),\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard\.cmd'\),\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard'\),\s*\(\(Get-Command dashboard -ErrorAction SilentlyContinue\)\.Source\)\s*\)/s, 'install.ps1 does not resolve dashboard commands inside the generated PowerShell profile block' );
+    unlike( $install_ps_text, qr/\$ddShellBootstrap\s*=\s*&\s+\`\$ddPerlCommand\.Source\s+\`\$ddDashboardCommand\s+shell\s+ps/s, 'install.ps1 does not launch Perl plus dashboard shell ps from the generated PowerShell profile' );
     unlike( $install_ps_text, qr/\$ddShellBootstrapText\s*=\s*Join-ScriptText\s+-Value\s+\`\$ddShellBootstrap/s, 'install.ps1 does not leak installer-only Join-ScriptText helper calls into the generated PowerShell profile block' );
-    like( $install_ps_text, qr/\$ddShellBootstrapText\s*=\s*\(\(@\(\`\$ddShellBootstrap \| Where-Object \{ .*? \} \| ForEach-Object \{ .*? \}\)\) -join \[Environment\]::NewLine\)/s, 'install.ps1 normalizes dashboard shell ps output arrays inline inside the generated PowerShell profile block' );
-    like( $install_ps_text, qr/if\s+\(-not\s+\[string\]::IsNullOrWhiteSpace\(\`\$ddShellBootstrapText\)\)\s*\{\s*Invoke-Expression\s+\`\$ddShellBootstrapText/s, 'install.ps1 skips Invoke-Expression when the normalized profile bootstrap is empty' );
+    unlike( $install_ps_text, qr/\$ddShellBootstrapText\s*=\s*\(\(@\(\`\$ddShellBootstrap \| Where-Object \{ .*? \} \| ForEach-Object \{ .*? \}\)\) -join \[Environment\]::NewLine\)/s, 'install.ps1 no longer normalizes live dashboard shell output inside the generated PowerShell profile block' );
+    unlike( $install_ps_text, qr/Invoke-Expression\s+\`\$ddShellBootstrapText/s, 'install.ps1 does not evaluate live dashboard shell output during PowerShell profile startup' );
     like( $install_ps_text, qr/Invoke-NativeCommand\s+-Label\s+'dashboard init'\s+-FilePath\s+\$dashboardCommand\s+-Arguments\s+\@\(\'init\'\).*?&\s+\$perlPath\s+\$dashboardCommand\s+shell\s+ps/s, 'install.ps1 initializes the dashboard runtime before asking perl plus the installed dashboard command for its PowerShell bootstrap on Windows' );
     like( $install_ps_text, qr/\$dashboardShellBootstrapText\s*=\s*Join-ScriptText\s+-Value\s+\$dashboardShellBootstrap/s, 'install.ps1 normalizes the current-session dashboard shell ps output into one script string' );
+    like( $install_ps_text, qr/\$powershellEnvironmentCache\s*=\s*Join-Path\s+\$powershellCacheRoot\s+'powershell-env\.ps1'/s, 'install.ps1 resolves the generated PowerShell environment cache before installing the managed profile block' );
+    like( $install_ps_text, qr/\$powershellBootstrapCache\s*=\s*Join-Path\s+\$powershellCacheRoot\s+'powershell-bootstrap\.ps1'/s, 'install.ps1 resolves the generated PowerShell bootstrap cache before installing the managed profile block' );
+    like( $install_ps_text, qr/&\s+\$perlPath\s+\$dashboardCommand\s+shell\s+ps.*?Test-Path\s+-LiteralPath\s+\$powershellEnvironmentCache\s+-PathType\s+Leaf.*?Test-Path\s+-LiteralPath\s+\$powershellBootstrapCache\s+-PathType\s+Leaf.*?Ensure-ProfileContains/s, 'install.ps1 generates and validates both non-empty PowerShell caches before writing the managed profile block' );
+    like( $install_ps_text, qr/PowerShell startup cache generation failed.*?dashboard shell ps/s, 'install.ps1 stops with a cache-refresh diagnostic instead of installing a profile backed by missing cache files' );
+    like( $install_ps_text, qr/Language\.Parser\]::ParseFile.*?powershellEnvironmentCache.*?powershellBootstrapCache/s, 'install.ps1 parses both generated PowerShell caches before installing the managed profile block' );
+    like( $install_ps_text, qr/catch\s*\{.*?PowerShell startup cache files could not be loaded.*?dashboard shell ps/s, 'install.ps1 generated profile reports an actionable refresh instruction when a non-empty cache file is corrupt' );
     unlike( $install_ps_text, qr/Invoke-Expression\s+\(&\s+\$dashboardCommand\s+shell\s+ps\)/, 'install.ps1 no longer invokes dashboard shell ps directly without checking for empty output' );
     unlike( $install_ps_text, qr/\$CpanTarget\s*=\s*if\s*\(\[string\]::IsNullOrWhiteSpace\(\$env:DD_INSTALL_CPAN_TARGET\)\)\s*\{\s*'Developer::Dashboard'\s*\}/, 'install.ps1 no longer defaults streamed Windows installs to the stale CPAN module name' );
     like( $install_ps_text, qr/cpanm.*--notest/s, 'install.ps1 installs Developer Dashboard with cpanm --notest on Windows' );
@@ -200,7 +276,7 @@ like(
     like( $install_ps_text, qr/kept the saved CurrentUser policy and continued/s, 'install.ps1 explains when a more specific PowerShell execution-policy scope keeps the current session in Bypass while the saved CurrentUser policy still succeeds' );
     like( $install_ps_text, qr/Get-ExecutionPolicy\s+-Scope\s+CurrentUser/s, 'install.ps1 inspects the current-user execution policy before changing it' );
     like( $install_ps_text, qr/-Mlocal::lib=\$normalizedInstallRoot/s, 'install.ps1 asks perl local::lib for canonical Windows environment values instead of composing INSTALL_BASE manually' );
-    like( $install_ps_text, qr/-Mlocal::lib=\`\$ddInstallRootForward/s, 'install.ps1 writes a profile block that refreshes local::lib from perl in future PowerShell sessions' );
+    unlike( $install_ps_text, qr/-Mlocal::lib=\`\$ddInstallRootForward/s, 'install.ps1 does not refresh local::lib from perl in future PowerShell sessions' );
 }
 
 my @apt_packages  = _manifest_lines($aptfile);
@@ -946,7 +1022,7 @@ SH
     );
     like(
         $stdout,
-        qr/Updated \Q$home\/.bashrc\E so perlbrew metadata and perl-5\.38\.5 load automatically in new shells\./,
+        qr/Updated \Q$home\/.bashrc\E so perlbrew metadata and perl-5\.44\.0 load automatically in new shells\./,
         'install.sh reports which rc file it updated for perlbrew bootstrap',
     );
 
@@ -959,7 +1035,7 @@ SH
             'perl -MConfig -e print $Config{archname}',
             'perlbrew init',
             'perlbrew list',
-            'perlbrew --notest install perl-5.38.5',
+            'perlbrew --notest install perl-5.44.0',
             'perlbrew install-cpanm',
             "cpanm --no-wget --notest --local-lib-contained $home/perl5 local::lib App::cpanminus File::ShareDir::Install",
             "perl -I $home/perl5/lib/perl5 -Mlocal::lib",
@@ -980,7 +1056,7 @@ SH
     );
     like(
         $bashrc_text,
-        qr/export PATH="\Q$home\E\/perl5\/perlbrew\/perls\/perl-5\.38\.5\/bin:\$PATH"/,
+        qr/export PATH="\Q$home\E\/perl5\/perlbrew\/perls\/perl-5\.44\.0\/bin:\$PATH"/,
         'install.sh records the perlbrew Perl path in the active shell rc file',
     );
     like(
@@ -1049,8 +1125,8 @@ SH
             "cpanm --no-wget --notest --local-lib-contained $home/perl5 $home/perl5/bootstrap-cache/$perlbrew_app_dist_basename",
             'perlbrew init',
             'perlbrew list',
-            'perlbrew --notest install perl-5.38.5',
-            'patchperl apply perl-5.38.5',
+            'perlbrew --notest install perl-5.44.0',
+            'patchperl apply perl-5.44.0',
             'perlbrew install-cpanm',
             "cpanm --no-wget --notest --local-lib-contained $home/perl5 local::lib App::cpanminus File::ShareDir::Install",
             "perl -I $home/perl5/lib/perl5 -Mlocal::lib",

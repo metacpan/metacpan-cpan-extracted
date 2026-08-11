@@ -12,11 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Google::Auth::IAMCredentials;
+use Moo;
 
-use JSON::MaybeXS;
-use strict;
+has selector => (
+  is       => 'ro',
+  required => 0,
+);
 
-my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
+has token => (
+  is       => 'ro',
+  required => 0,
+);
+
+sub apply {
+  my ($self, $req_or_headers) = @_;
+
+  if (ref $req_or_headers eq 'HASH') {
+    $req_or_headers->{'x-goog-iam-authority-selector'} = $self->selector
+      if defined $self->selector;
+    $req_or_headers->{'x-goog-iam-authorization-token'} = $self->token
+      if defined $self->token;
+  } elsif (eval { $req_or_headers->isa('HTTP::Request') }) {
+    $req_or_headers->header('x-goog-iam-authority-selector' => $self->selector)
+      if defined $self->selector;
+    $req_or_headers->header('x-goog-iam-authorization-token' => $self->token)
+      if defined $self->token;
+  }
+}
 
 1;

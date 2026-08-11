@@ -14,9 +14,52 @@
 
 package Google::Auth::ClientId;
 
-#use JSON::MaybeXS;
-use strict;
+use Moo;
+use JSON::MaybeXS;
+use Google::Auth::Exceptions;
 
-#my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
+has id => (
+  is       => 'ro',
+  required => 1,
+);
+
+has secret => (
+  is       => 'ro',
+  required => 1,
+);
+
+sub from_hash {
+  my ($class, $hash) = @_;
+
+  my $config = $hash->{installed} // $hash->{web};
+
+  if ($config) {
+    return $class->new(
+      id     => $config->{client_id},
+      secret => $config->{client_secret},
+    );
+  }
+
+  if ($hash->{client_id} && $hash->{client_secret}) {
+    return $class->new(
+      id     => $hash->{client_id},
+      secret => $hash->{client_secret},
+    );
+  }
+
+  Google::Auth::Error->throw("Invalid format for client ID configuration");
+}
+
+sub from_file {
+  my ($class, $file) = @_;
+
+  open my $fh, '<', $file or die "Cannot open $file: $!";
+  local $/;
+  my $json = <$fh>;
+  close $fh or die "Cannot close $file: $!";
+
+  my $hash = decode_json($json);
+  return $class->from_hash($hash);
+}
 
 1;

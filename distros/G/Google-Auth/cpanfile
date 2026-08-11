@@ -11,4 +11,7 @@ requires 'Test::Perl::Critic';
 requires 'Perl::Critic::Policy::Modules::RequireEndWithOne';
 requires 'Perl::Critic::Policy::Modules::ProhibitMultiplePackages';
 requires 'Perl::Critic::Policy::Subroutines::ProhibitBuiltinHomonyms';
+requires 'Perl::Critic::Community';
+requires 'Perl::Critic::Policy::RegularExpressions::RequireDefault';
+requires 'Perl::Critic::Policy::Security::RandBytesFromHash';
 requires 'Clone';

@@ -1,3 +1,0 @@
-<observers>
-  <observer type="AutorunInitial" sub="AutorunInitialObserver::callback" />
-</observers>

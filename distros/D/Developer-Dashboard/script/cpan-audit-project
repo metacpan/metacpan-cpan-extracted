@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+# IMPORTANT: do not invoke this via `sh`/`dash`. The shebang pins bash so that
+# `set -euo pipefail` and `set -o pipefail` are recognized and command errors
+# fail the gate. Running it under a different shell silently drops the
+# pipefail guarantee, masking advisory exits.
+#
+# Probe the real interpreter early and refuse to run if the caller used a
+# different shell (e.g. `sh script/cpan-audit-project` from CI).
+if [ -z "${BASH_VERSION:-}" ]; then
+    printf '%s\n' 'cpan-audit-project must be invoked through bash; current shell is not bash' >&2
+    exit 2
+fi
+set -euo pipefail
+
+if [ "$#" -ne 1 ] || [ ! -d "$1" ]; then
+  printf 'Usage: %s <isolated-perl5-library-root>\n' "$0" >&2
+  exit 2
+fi
+
+repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+perl5_root="$(CDPATH= cd -- "$1" && pwd)"
+exclusions="$repo_root/cpan-audit-exclusions.txt"
+
+# ISOLATION PRECONDITION (DD-499).
+#
+# This gate asks "is the set of distributions installed in this root
+# vulnerable?" - a question that is only ABOUT THE PRODUCT when the root holds
+# the product's dependencies and nothing else. Pointed at a shared CPAN tree it
+# answers faithfully about the tree and misleadingly about the product: on
+# 2026-08-09 `$HOME/perl5/lib/perl5` produced exit 88 and twenty-four advisories
+# across seven distributions, not one of which was a declared runtime
+# dependency. Three rounds read that as a release blocker before anyone checked
+# what it had measured, and one filed a ticket against it.
+#
+# So the subject is stated out loud, and a root that is not an isolated product
+# root is REFUSED rather than audited. The refusal is deliberately a distinct
+# exit status: 0 clean, 1 a disposition guard fired, 2 the caller made a usage
+# error, 3 the gate was pointed at the wrong subject, 4 the gate could not run at
+# all, 5 advisories were found. Collapsing "wrong subject" into "finding" is what
+# made the original misreading so easy.
+#
+# Status 4 exists because the opposite collapse was also live (DD-517). When
+# cpan-audit cannot start - a mixed-version library tree, a missing dependency -
+# perl dies with status 1 or 2, and 1 is this gate's OWN code for a disposition
+# guard. A tool that never ran was therefore indistinguishable from a real
+# finding and from a fired guard, and the suite's "gate is non-zero for a
+# vulnerable fixture" test passed on the strength of a crash. A gate that cannot
+# look must never be mistaken for a gate that looked and found something.
+#
+# "Inside the checkout" is the test because that is what an isolated root IS
+# here - CI builds one at local/lib/perl5 and audits it in place. It is a crisp
+# check with no false positive against that path, which matters: a guard that
+# red-lines CI would be worse than the misreading it prevents. A genuinely
+# isolated root built elsewhere stays auditable through the opt-in below, which
+# is explicit on purpose - the default has to be refusal, or the habit that
+# caused DD-499 simply continues.
+printf 'auditing library root: %s\n' "$perl5_root"
+if [ "${DD_CPAN_AUDIT_ALLOW_EXTERNAL_ROOT:-}" != '1' ] \
+  && [ "$perl5_root" != "$repo_root" ] \
+  && case "$perl5_root" in "$repo_root"/*) false ;; *) true ;; esac; then
+  cat >&2 <<EOF
+$perl5_root is not an isolated product library root: it lies outside the
+repository working tree $repo_root, so it is a shared CPAN tree carrying
+whatever else has been installed on this machine. Advisories found there are
+not this product's exposure, and reporting them as such is how DD-499 was
+filed against a product whose real CVE position was clean.
+
+To audit the product against a shared tree, use the gate built for that
+question, which walks the transitive runtime closure of the declared chain and
+ignores everything outside it:
+
+    script/cpan-audit-declared-chain "$perl5_root"
+
+To audit an isolated root, build one and point this gate at it, as CI does:
+
+    cpanm --installdeps --local-lib-contained local .
+    script/cpan-audit-project local/lib/perl5
+
+If this root really is isolated and merely lives outside the checkout, say so
+explicitly:
+
+    DD_CPAN_AUDIT_ALLOW_EXTERNAL_ROOT=1 script/cpan-audit-project "$perl5_root"
+EOF
+  exit 3
+fi
+
+if grep -R -n -E "Plack::Middleware::XSendfile|(enable|enable_if)[[:space:]\(]+(['\"](Plack::Middleware::)?XSendfile['\"]|XSendfile([[:space:];,)]+|$))|X-Sendfile-Type|X-Accel-Mapping" \
+  "$repo_root/app.psgi" "$repo_root/bin" "$repo_root/lib" "$repo_root/share"; then
+  printf '%s\n' 'CPANSA-Plack-2026-7381 exclusion invalid: XSendfile middleware is activated by production code' >&2
+  exit 1
+fi
+
+if grep -R -n -E 'File::Temp[[:space:]]*(->|::)[[:space:]]*safe_level[[:space:]]*\(' \
+  "$repo_root/app.psgi" "$repo_root/bin" "$repo_root/lib" "$repo_root/share"; then
+  printf '%s\n' 'CPANSA-File-Temp-2011-4116 exclusion invalid: File::Temp vulnerable safety checks are activated by production code' >&2
+  exit 1
+fi
+
+# Dancer2 sessions are reached through the DSL keyword, not a method call, so an
+# arrow-anchored pattern would have missed every real use of them. The keyword
+# forms are anchored to statement position instead: unanchored `session '` also
+# matched POD prose and tmux session strings, which would have made this guard
+# fire on a tree that never touches Dancer2 sessions at all.
+if grep -R -n -E "Dancer2::Session|^[[:space:]]*session[[:space:]]*[('\"]|=[[:space:]]*session[[:space:]]*\(|^[[:space:]]*set[[:space:]]+'?session'?[[:space:]]" \
+  "$repo_root/app.psgi" "$repo_root/bin" "$repo_root/lib" "$repo_root/share"; then
+  printf '%s\n' 'CPANSA-Dancer2-2026-13577 exclusion invalid: Dancer2 session handling is activated by production code' >&2
+  exit 1
+fi
+
+if ! command -v cpan-audit >/dev/null 2>&1; then
+  printf '%s\n' 'cpan-audit is not on PATH, so this gate audited nothing. That is not a clean result.' >&2
+  exit 4
+fi
+
+# Captured rather than streamed, because the status alone cannot tell "found
+# advisories" from "died before it could look": cpan-audit exits non-zero for
+# both, and a Perl startup failure exits 1 or 2, which this gate already spends
+# on its own guards. The OUTPUT does distinguish them - a run that audited
+# anything names advisories, and a run that died prints a Perl diagnostic and no
+# advisory at all - so the decision is made on that and the output is passed
+# through unchanged either way.
+set +e
+audit_output="$(cpan-audit installed "$perl5_root" --perl --exclude-file "$exclusions" 2>&1)"
+audit_status=$?
+set -e
+
+printf '%s\n' "$audit_output"
+
+if [ "$audit_status" -eq 0 ]; then
+  exit 0
+fi
+
+if printf '%s' "$audit_output" | grep -q -E 'CPANSA-|[0-9]+ advisor'; then
+  # A real finding. Remapped to a single status of its own rather than passed
+  # through, because cpan-audit's own non-zero statuses vary with what it found
+  # (65 and 66 have both been seen) and could collide with the gate's 1, 2, 3
+  # and 4. A finding must not be able to impersonate a usage error.
+  exit 5
+fi
+
+cat >&2 <<EOF
+cpan-audit exited $audit_status without reporting a single advisory, which means
+it did not audit $perl5_root - it failed before it could. The output above is its
+diagnostic, not a security result.
+
+This gate is reporting UNUSABLE (4) rather than a finding on purpose. Treating
+the failure as a finding would be no safer: it would put a false advisory in
+front of whoever reads it, and the next person to see the gate go green after
+"fixing" it would have fixed nothing.
+
+The usual cause is a library tree built for a different Perl than the one running
+cpan-audit. Check that the interpreter and the tool come from the same install:
+
+    command -v perl cpan-audit
+    perl -e 'print "\$]\n"'
+EOF
+exit 4

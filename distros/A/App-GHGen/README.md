@@ -4,7 +4,7 @@ App::GHGen - GitHub Actions workflow generator, analyzer, and optimizer
 
 # VERSION
 
-Version 0.06
+Version 0.09
 
 # SYNOPSIS
 
@@ -474,14 +474,14 @@ Comprehensive Perl testing with modern best practices.
 **Generated workflow step order:**
 
 - 1. `actions/checkout@v6`
-- 2. Setup Perl — `shogo82148/actions-setup-perl@v1`
-- 3. Cache CPAN modules — `actions/cache@v6`
+- 2. Setup Perl — `shogo82148/actions-setup-perl@v1.43.1`
+- 3. Cache CPAN modules — `actions/cache@v5`
 - 4. Install cpanm and `local::lib`
 - 5. Install project dependencies
-- 6. **Lint and syntax check** — all matrix cells (enabled by default); unused-variable check via `PERL5OPT=-Mwarnings::unused` is embedded at the end of this step when `enable_linter_unused` is true (Linux only, non-blocking)
+- 6. **Lint and syntax check** — all matrix cells (enabled by default)
 - 7. Run tests
-- 8. Run Perl::Critic — latest Perl + Ubuntu only (enabled by default)
-- 9. **Check imports with perlimports** — latest Perl + Ubuntu only (enabled by default)
+- 8. **Check for unused variables** — latest Perl + Ubuntu only (opt-in)
+- 9. Run Perl::Critic — latest Perl + Ubuntu only (enabled by default)
 - 10. Test coverage — latest Perl + Ubuntu only (enabled by default)
 - 11. Show cpanm build log on failure
 

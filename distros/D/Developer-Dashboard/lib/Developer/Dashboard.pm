@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 1;
 
@@ -18,7 +18,7 @@ __END__
 Developer::Dashboard - a local home for development work
 
 =head1 VERSION
-4.16
+4.26
 
 =head1 INTRODUCTION
 
@@ -154,6 +154,13 @@ action execution with trusted and safer page boundaries
 =item *
 
 config-backed providers, path aliases, and compose overlays
+
+=item *
+
+asking an AI backend from the shell with C<dashboard ask>, over the Anthropic
+API, the local C<claude> CLI, or the C<codex>, C<copilot>, and C<gemini>
+command-line tools, keeping a per-workspace conversation so follow-up questions
+carry context and inlining C<--file> attachments
 
 =item *
 
@@ -384,6 +391,14 @@ treated as local-admin when they still arrive from loopback
 
 helper access is for everyone else, including non-loopback IPs and other
 machines on the network
+
+=item *
+
+the loopback-admin shortcut applies only to direct (plain HTTP) connections;
+under C<dashboard serve --ssl> the public front-proxy relays TLS to an internal
+loopback backend, so every backend connection looks like loopback and cannot
+prove the real client is local -- in that mode the shortcut is disabled and
+even loopback HTTPS requests require a helper login
 
 =item *
 
@@ -868,7 +883,12 @@ runtime public tree first and then from the saved bookmark root. The web layer
 also provides a built-in bundled C</js/jquery.js> asset that serves the local
 copy of jQuery 4.0.0, with C</js/jquery-4.0.0.min.js> kept as a compatibility
 alias for the same shipped payload even when no runtime file has been copied
-into C<dashboard/public/js> yet. Skills can ship the same classes of assets
+into C<dashboard/public/js> yet. The bundled browser tab icon works the same
+way: browsers request C</favicon.ico> on their own for every page load, so that
+route is served outside the authorization gate, on every trust tier and before
+any helper login, from the bundled 16x16 icon. Dropping your own
+C<dashboard/public/others/favicon.ico> into any runtime layer overrides it.
+Skills can ship the same classes of assets
 under their own dashboard tree: C<dashboards/ajax/*> resolves at
 C</ajax/E<lt>repo-nameE<gt>/...> or
 C</ajax/E<lt>repo-nameE<gt>/E<lt>sub-skillE<gt>/...>, and
@@ -1319,13 +1339,13 @@ by bridging F<~/.profile> to F<~/.bashrc>, prefers
 Homebrew Perl on macOS when C<brew --prefix perl> exposes a brewed
 interpreter, bootstraps a user-space C<perlbrew> Perl on Debian-family,
 Alpine, or Fedora hosts when the system Perl is older than the required
-C<5.38>, installs C<App::perlbrew> into F<~/perl5/bin> first if the package manager did not
+C<5.44>, installs C<App::perlbrew> into F<~/perl5/bin> first if the package manager did not
 already put C<perlbrew> on C<PATH>, keeps that local C<perlbrew> and
 C<patchperl> toolchain pinned to the private F<~/perl5/lib/perl5> include path
 while the rescue build runs, fetches the C<App::perlbrew> tarball with
 C<curl> before the local install so Alpine does not emit the noisy
 C<IO::Socket::IP> warning during that bootstrap step, uses
-C<perlbrew --notest install perl-5.38.5> so blank-machine bootstrap does not
+C<perlbrew --notest install perl-5.44.0> so blank-machine bootstrap does not
 stall in upstream Perl core test failures, updates the selected shell rc file
 itself with the needed C<PERLBREW_HOME> and rescue-Perl C<PATH> lines instead
 of leaving a manual F<~/.profile> editing step behind or sourcing perlbrew's
@@ -1358,16 +1378,21 @@ F<~/perl5> tree with that standalone script together with
 C<File::ShareDir::Install>, installs Developer Dashboard with C<cpanm --notest>,
 sets the CurrentUser PowerShell execution policy to
 C<RemoteSigned> when it is still too restrictive to load profile scripts,
-updates the current-user PowerShell profile with a self-contained
-private F<~/perl5> PATH and Perl environment block plus
-C<dashboard shell ps>, seeds C<$env:HOME> from PowerShell's own C<$HOME> inside
-that managed profile block when Windows did not export C<HOME> itself, creates
-a stable user-space C<make.cmd> shim that points at Strawberry Perl's GNU make
-provider so skill C<Makefile> workflows keep working in later sessions, runs
-C<dashboard init> first so the home helper runtime exists, and then activates
-that PowerShell bootstrap in the current shell when possible. Future
-PowerShell sessions do not rely on installer-only helper functions while
-loading that generated profile block. The generated bash, zsh,
+updates the current-user PowerShell profile with self-contained
+private F<~/perl5> and runtime PATH setup, seeds C<$env:HOME> from PowerShell's
+own C<$HOME> when Windows did not export C<HOME> itself, and dot-sources the
+generated F<~/.developer-dashboard/cache/powershell-env.ps1> and
+F<powershell-bootstrap.ps1> files instead of launching Perl at profile load.
+C<dashboard shell ps> remains the explicit cache refresh command and writes
+both files atomically. The installer runs C<dashboard init>, refreshes and
+syntax-checks both non-empty caches before writing the managed profile, and
+then activates the bootstrap in the current shell when possible. Missing,
+empty, or corrupt caches produce an actionable refresh warning rather than a
+silent Perl fallback. The installer also creates a stable user-space
+C<make.cmd> shim that points at Strawberry Perl's GNU make provider so skill
+C<Makefile> workflows keep working in later sessions. Future PowerShell
+sessions do not rely on installer-only helper functions while loading that
+generated profile block. The generated bash, zsh,
 POSIX sh, and PowerShell shell bootstraps all follow the same tmux-aware
 prompt rule: when the shell starts inside a C<dashboard workspace> tmux session
 that carries C<DEVELOPER_DASHBOARD_TMUX_STATUS=1>, indicator glyphs move to
@@ -1511,6 +1536,11 @@ files before control returns to the real update command. Perl code can read
 those payloads through C<Runtime::Result>.
 
 Use C<dashboard version> to print the installed Developer Dashboard version.
+
+Use C<dashboard upgrade> or the identical C<d2 upgrade> short entrypoint to
+download, validate, and run the canonical HTTPS installer for the active
+platform. Add C<--dry-run> to print the selected installer URL and execution
+plan without making a network request or changing the host.
 
 The blank-container integration harness applies fake-project dashboard override
 environment variables only after C<cpanm --notest> finishes installing the
@@ -1943,7 +1973,11 @@ also rotates collector log transcripts when a collector defines C<rotation>
 or C<rotations>. C<lines> keeps the trailing line count, while C<minute>,
 C<minutes>, C<hour>, C<hours>, C<day>, C<days>, C<week>, C<weeks>,
 C<month>, and C<months> keep only log entries newer than the requested
-retention window. Run it on demand with:
+retention window. Both rules cut on entry boundaries, so a rotated
+transcript always starts at a complete entry header: a line budget drops
+whole entries rather than slicing one in half, and a budget smaller than
+the newest entry empties the transcript instead of leaving a headerless
+fragment behind. Run it on demand with:
 
   dashboard housekeeper
   dashboard collector run housekeeper
@@ -2193,9 +2227,11 @@ to a prompt command that does not depend on bash-only prompt escapes, and
 PowerShell installs a C<prompt> function instead of using the POSIX C<PS1>
 variable.
 
-C<d2> is the short shell shortcut for C<dashboard>, so after loading the
-bootstrap you can run C<d2 version>, C<d2 doctor>, or
-C<d2 docker compose ps> without typing the full command name each time.
+C<d2> is a real, installed short command for C<dashboard>, shipped in the same
+C<bin> directory and re-execing the C<dashboard> entrypoint, so you can run
+C<d2 version>, C<d2 doctor>, or C<d2 docker compose ps> without typing the full
+command name -- in scripts and fresh shells as well as interactively, without
+depending on the shell bootstrap.
 
 The same generated bootstrap also wires live tab completion for C<dashboard>
 and C<d2>. Bash registers C<_dashboard_complete>, zsh registers
@@ -2281,9 +2317,36 @@ helper sessions are file-backed, bound to the originating remote address, and ex
 
 helper passwords must be at least 8 characters long
 
+=item *
+
+state-changing requests are refused with an empty-bodied C<403> when C<Origin>
+or C<Referer> names anything other than this dashboard or a trusted local
+alias, on every tier
+
+=item *
+
+requests the browser labelled C<Sec-Fetch-Site: cross-site> or C<same-site> are
+refused on B<every> method, including C<GET>, unless the accompanying
+C<Origin>/C<Referer> names this dashboard or a trusted local alias
+
 =back
 
 This keeps the fast path for loopback-local access while making non-loopback or shared access explicit.
+
+The two cross-site checks above sit at one choke point that runs before trust
+tier classification, because the loopback-admin tier authorizes on the remote
+address alone: there is no cookie in that decision, so C<SameSite=Strict>
+protects nothing there and any page the operator visits would otherwise reach
+an already-authorized dashboard. The fetch-metadata half covers C<GET> because
+C<GET> is not a safe method on this product — C</ajax/E<lt>fileE<gt>> runs an
+operator-written saved handler as a child process from a plain C<GET> — while
+C<Origin> is frequently absent on a C<GET> and C<Referer> can be suppressed by
+the attacking page. C<Sec-Fetch-Site> is set by the browser and is a forbidden
+header name, so page script can neither forge nor suppress it. Opening the
+dashboard by typed URL or bookmark reports C<Sec-Fetch-Site: none> and is
+unaffected, as are C<curl> and registered C<x-dd-api-key> machine consumers,
+which send no fetch metadata at all; following a link in from another site is
+refused, which is deliberate on a route that executes saved handlers.
 
 The editor and rendered pages also include a shared top chrome with share and
 source links on the left and the original status-plus-alias indicator strip on
@@ -2534,16 +2597,29 @@ Measure library coverage with Devel::Cover:
   cpanm --no-wget --notest --local-lib-contained ./.perl5 Devel::Cover
   export PERL5LIB="$PWD/.perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
   export PATH="$PWD/.perl5/bin:$PATH"
-  cover -delete
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
-  PERL5OPT=-MDevel::Cover prove -lr t
-  cover -report text -select_re '^lib/' -coverage statement -coverage subroutine
+  perl script/coverage-gate
 
-The repository target is 100% statement and subroutine coverage for C<lib/>.
+C<script/coverage-gate> is the canonical entrypoint and the one every CI
+workflow runs. It drops the coverage database, runs the instrumented suite,
+collects the C<lib/> report and enforces 100.0 on statement, branch, condition
+and subroutine. Its exit status is the interface: C<0> all four metrics at
+100.0, C<1> a genuine shortfall, C<2> the gate could not run or could not read
+its report, C<3> the coverage instrument could not read its own database.
+
+The chain is one command rather than three because
+C<Devel::Cover::DB::IO> picks its on-disk serialization format at C<BEGIN> from
+whatever C<@INC> makes visible and records the choice nowhere. Typed as separate
+shell lines, a library path omitted from one of them leaves the reader unable to
+parse what the writer just produced; running them as children of one process
+removes that split by construction. An exit C<3> is an environment fault and is
+never fixed by re-running.
+
+The repository target is 100.0 on all four metrics for C<lib/>.
 This is a standing QA gate for every change, not only releases. After the
 normal C<prove -lr t> test gate passes, run the numeric C<Devel::Cover> gate
-and do not treat the work as done until the C<cover> summary still reports
-100% statement and 100% subroutine coverage for C<lib/>.
+and do not treat the work as done until it exits C<0>. Only one coverage run may
+be in flight on a host at a time, because instrumented timing-sensitive tests
+misread under contention.
 GitHub workflow coverage gates must match the C<Devel::Cover> C<Total> summary
 line by regex rather than one fixed-width spacing layout, because runner or
 module upgrades can change column padding without changing the real
@@ -3228,6 +3304,20 @@ For repository delivery on this machine, follow the loop:
 Use C<~/bin/git-push-mf> for the authenticated push step.
 Do not treat Scorecard as a pre-commit local gate; run it only after the local
 gates, commit, and push are complete.
+When Scorecard needs a signed GitHub release, push a C<vX.XX> tag so the
+tag-triggered GitHub release workflow can publish the tarball, checksum, and
+detached signature assets that back the C<Signed-Releases> check. A signature
+alone caps that check at eight of ten, because the remaining points are scored
+only for a release that also carries build provenance, and provenance is
+recognised solely by a release asset whose name ends in C<.intoto.jsonl> -
+recording an attestation in the GitHub attestation store does not count. So a
+second job in the same workflow re-downloads the published tarball, verifies it
+against the published checksum, attests it, and attaches the SLSA build
+provenance as C<< <tarball>.intoto.jsonl >> together with the full Sigstore
+bundle that carries the material needed to verify that provenance offline. That
+job is deliberately separate: minting an OIDC token is what lets the workflow
+speak as the repository, and it is never granted to the job that runs the test
+suite, the coverage pass, and the tarball build.
 
 Skill fleet integration:
 

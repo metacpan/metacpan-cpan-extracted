@@ -32,6 +32,7 @@ inc/CryptX_Mode_CFB.xs.inc
 inc/CryptX_Mode_CTR.xs.inc
 inc/CryptX_Mode_ECB.xs.inc
 inc/CryptX_Mode_OFB.xs.inc
+inc/CryptX_Mode_XTS.xs.inc
 inc/CryptX_PK_DH.xs.inc
 inc/CryptX_PK_DSA.xs.inc
 inc/CryptX_PK_ECC.xs.inc
@@ -99,6 +100,7 @@ lib/Crypt/Digest/BLAKE2s_128.pm
 lib/Crypt/Digest/BLAKE2s_160.pm
 lib/Crypt/Digest/BLAKE2s_224.pm
 lib/Crypt/Digest/BLAKE2s_256.pm
+lib/Crypt/Digest/BLAKE3.pm
 lib/Crypt/Digest/CHAES.pm
 lib/Crypt/Digest/KangarooTwelve.pm
 lib/Crypt/Digest/Keccak224.pm
@@ -147,6 +149,7 @@ lib/Crypt/Mode/CFB.pm
 lib/Crypt/Mode/CTR.pm
 lib/Crypt/Mode/ECB.pm
 lib/Crypt/Mode/OFB.pm
+lib/Crypt/Mode/XTS.pm
 lib/Crypt/PK.pm
 lib/Crypt/PK/DH.pm
 lib/Crypt/PK/DSA.pm
@@ -253,6 +256,7 @@ src/ltc/encauth/ocb3/ocb3_int_xor_blocks.c
 src/ltc/encauth/siv/siv.c
 src/ltc/hashes/blake2b.c
 src/ltc/hashes/blake2s.c
+src/ltc/hashes/blake3.c
 src/ltc/hashes/chc/chc.c
 src/ltc/hashes/helper/hash_file.c
 src/ltc/hashes/helper/hash_filehandle.c
@@ -275,9 +279,17 @@ src/ltc/hashes/sha2/sha256.c
 src/ltc/hashes/sha2/sha256_desc.c
 src/ltc/hashes/sha2/sha256_x86.c
 src/ltc/hashes/sha2/sha384.c
+src/ltc/hashes/sha2/sha384_desc.c
+src/ltc/hashes/sha2/sha384_x86.c
 src/ltc/hashes/sha2/sha512.c
 src/ltc/hashes/sha2/sha512_224.c
+src/ltc/hashes/sha2/sha512_224_desc.c
+src/ltc/hashes/sha2/sha512_224_x86.c
 src/ltc/hashes/sha2/sha512_256.c
+src/ltc/hashes/sha2/sha512_256_desc.c
+src/ltc/hashes/sha2/sha512_256_x86.c
+src/ltc/hashes/sha2/sha512_desc.c
+src/ltc/hashes/sha2/sha512_x86.c
 src/ltc/hashes/sha3.c
 src/ltc/hashes/sha3_test.c
 src/ltc/hashes/sm3.c
@@ -357,6 +369,7 @@ src/ltc/math/rand_bn.c
 src/ltc/math/rand_prime.c
 src/ltc/math/tfm_desc.c
 src/ltc/misc/adler32.c
+src/ltc/misc/algname_match.c
 src/ltc/misc/argon2/argon2.c
 src/ltc/misc/base16/base16_decode.c
 src/ltc/misc/base16/base16_encode.c
@@ -450,6 +463,11 @@ src/ltc/modes/ofb/ofb_encrypt.c
 src/ltc/modes/ofb/ofb_getiv.c
 src/ltc/modes/ofb/ofb_setiv.c
 src/ltc/modes/ofb/ofb_start.c
+src/ltc/modes/xts/xts_decrypt.c
+src/ltc/modes/xts/xts_done.c
+src/ltc/modes/xts/xts_encrypt.c
+src/ltc/modes/xts/xts_init.c
+src/ltc/modes/xts/xts_mult_x.c
 src/ltc/pk/asn1/der/bit/der_decode_bit_string.c
 src/ltc/pk/asn1/der/bit/der_decode_raw_bit_string.c
 src/ltc/pk/asn1/der/bit/der_encode_bit_string.c
@@ -1202,6 +1220,7 @@ t/digest_blake2s_128.t
 t/digest_blake2s_160.t
 t/digest_blake2s_224.t
 t/digest_blake2s_256.t
+t/digest_blake3.t
 t/digest_chaes.t
 t/digest_kangarootwelve.t
 t/digest_keccak224.t
@@ -1269,6 +1288,7 @@ t/mode_cfb.t
 t/mode_ctr.t
 t/mode_ecb.t
 t/mode_ofb.t
+t/mode_xts.t
 t/pk_dh.t
 t/pk_dsa.t
 t/pk_dsa_test_vectors_openssl.t
@@ -1292,6 +1312,7 @@ t/prng_rc4.t
 t/prng_sober128.t
 t/prng_yarrow.t
 t/sshkey.t
+t/sv_nul_terminated.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

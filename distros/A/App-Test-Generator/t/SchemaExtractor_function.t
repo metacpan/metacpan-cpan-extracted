@@ -2343,6 +2343,121 @@ subtest '_detect_accessor_methods() skips methods accessing multiple fields' => 
 	ok(!exists $schema->{accessor}, 'multi-field method not marked as accessor');
 };
 
+# Regression: when the parameter name differs from the stored property name
+# (e.g. sub logdir { my $dir = shift; ... $self->{logdir} = $dir }), the
+# position-0 assignment must target the existing 'dir' key, not create a
+# spurious 'logdir' key — previously caused a "Duplicate position 0" schema.
+subtest '_detect_accessor_methods() does not create spurious property-named input key' => sub {
+	my $e = _extractor();
+	$e->{_package_name} = 'TestModule';
+	# Pre-populate input as _merge_parameter_analyses would: param is 'dir',
+	# but the stored property is 'logdir'.
+	my $schema = {
+		output      => {},
+		_confidence => { input => {}, output => {} },
+		input       => { dir => { type => 'string', _source => 'code' } },
+	};
+	my $method = {
+		name => 'logdir',
+		body => "sub logdir {\n"
+		      . "    my \$self = shift;\n"
+		      . "    my \$dir  = shift;\n"
+		      . "    if(\$dir) {\n"
+		      . "        if(length(\$dir) && (-d \$dir) && (-w \$dir)) {\n"
+		      . "            return \$self->{'logdir'} = \$dir;\n"
+		      . "        }\n"
+		      . "    }\n"
+		      . "    return \$self->{'logdir'};\n"
+		      . "}",
+		pod  => '',
+	};
+	$e->_detect_accessor_methods($method, $schema);
+
+	my @keys = sort keys %{ $schema->{input} };
+	is_deeply(\@keys, ['dir'], 'only the real parameter key "dir" present — no spurious "logdir" key');
+	ok(!exists $schema->{input}{logdir}, 'spurious "logdir" input key absent');
+	is($schema->{input}{dir}{position}, 0, '"dir" has position 0');
+};
+
+subtest '_detect_accessor_methods() sets position on existing key when name matches property' => sub {
+	# Standard case: parameter name and property name are the same.
+	my $e = _extractor();
+	$e->{_package_name} = 'TestModule';
+	my $schema = {
+		output      => {},
+		_confidence => { input => {}, output => {} },
+		input       => { name => { type => 'string', _source => 'code' } },
+	};
+	my $method = {
+		name => 'name',
+		body => "sub name {\n"
+		      . "    my \$self = shift;\n"
+		      . "    my \$name = shift;\n"
+		      . "    if(\$name) { return \$self->{'name'} = \$name; }\n"
+		      . "    return \$self->{'name'};\n"
+		      . "}",
+		pod  => '',
+	};
+	$e->_detect_accessor_methods($method, $schema);
+
+	my @keys = sort keys %{ $schema->{input} };
+	is_deeply(\@keys, ['name'], 'exactly one input key when param and property share a name');
+	is($schema->{input}{name}{position}, 0, 'position 0 set on the single param');
+};
+
+subtest '_detect_accessor_methods() via extract_all: no duplicate position-0 params' => sub {
+	# Integration-level regression for the logdir bug: run the full extraction
+	# pipeline on a module that has a validated getter/setter whose argument
+	# name differs from the stored property.
+	my $content = <<'END_PM';
+package My::Config;
+
+=head2 logdir($dir)
+
+Gets and sets the log directory.
+
+=over 4
+
+=item $dir
+
+Path to a writable directory.
+
+=back
+
+=cut
+
+sub logdir {
+    my $self = shift;
+    my $dir  = shift;
+    if($dir) {
+        if(length($dir) && (-d $dir) && (-w $dir)) {
+            return $self->{'logdir'} = $dir;
+        }
+        die "Invalid logdir: $dir";
+    }
+    return $self->{'logdir'};
+}
+
+1;
+END_PM
+
+	my $path   = _make_module($content);
+	my $outdir = tempdir(CLEANUP => 1);
+	my $e      = App::Test::Generator::SchemaExtractor->new(
+		input_file => $path,
+		output_dir => $outdir,
+		verbose    => 0,
+	);
+	my $schemas = $e->extract_all();
+
+	ok(exists $schemas->{logdir}, 'logdir schema extracted');
+	my $input = $schemas->{logdir}{input};
+	my @keys  = sort keys %$input;
+	is_deeply(\@keys, ['dir'], 'exactly one input parameter: "dir"');
+	ok(!exists $input->{logdir}, 'no spurious "logdir" input entry');
+	is($input->{dir}{position}, 0, '"dir" has position 0');
+};
+
 # ==================================================================
 # _extract_defaults_from_code
 # ==================================================================

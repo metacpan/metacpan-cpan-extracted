@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.172-4-g2d3a2be
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.173-3-g78e71a7
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.173';
+our $VERSION = '0.174';
 
 use Moose;
 with
@@ -681,7 +681,10 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.173
+version 0.174
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 
@@ -1337,8 +1340,7 @@ and a star in L<GitHub|https://github.com/karenetheridge/Dist-Zilla-PluginBundle
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER>
-(or L<bug-Dist-Zilla-PluginBundle-Author-ETHER@rt.cpan.org|mailto:bug-Dist-Zilla-PluginBundle-Author-ETHER@rt.cpan.org>).
+Bugs may be submitted through L<https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER/issues>.
 
 There is also a mailing list available for users of this distribution, at
 L<http://dzil.org/#mailing-list>.

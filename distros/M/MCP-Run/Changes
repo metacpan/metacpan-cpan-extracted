@@ -1,5 +1,23 @@
 Revision history for MCP-Run
 
+0.105     2026-08-10 16:59:50Z
+  - Migrate the release process fully into the [@Author::GETTY] bundle
+    and drop the hand-rolled maint/release-after.pl. Its
+    run_after_release hook created the GitHub release first, so the
+    bundle's GitHub::CreateRelease plugin always hit 422
+    already_exists and died with a generic "Unable to create GitHub
+    release". GitHub::CreateRelease now owns the GitHub release (with
+    ChangeLog notes), and a new [@Author::GETTY::Docker / compress]
+    dist.ini section builds and pushes the raudssus/mcp-run-compress
+    image (:latest, :0, :<VERSION>) as part of `dzil release`.
+  - Dockerfile: rename the runtime stage to `compress`, matching the
+    bundle's docker target and what the image actually ships (the
+    mcp-run-compress hook only, not the mcp-run-bash runtime).
+  - Make the ls-filter subtest in t/40-compress-bin.t deterministic:
+    list a process-private tempdir instead of the shared /tmp, where a
+    readdir race could make ls transiently exit 1 and fail the test
+    intermittently.
+
 0.104     2026-08-09 18:57:54Z
   - Fix "Use of uninitialized value in join or string" warning from
     MCP::Run::Compress::compress/process when a transform coderef

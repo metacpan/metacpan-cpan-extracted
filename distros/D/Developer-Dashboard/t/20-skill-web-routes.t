@@ -502,6 +502,135 @@ my $missing_bookmark = $app->handle(
 );
 is( $missing_bookmark->[0], 404, 'missing skill bookmark routes return 404' );
 
+# ---------------------------------------------------------------------------
+# DD-416: skill-namespaced browser routes must never resolve a file outside the
+# skill tree they are anchored to. Every one of these paths served the target
+# file with a 200 before the containment fix landed.
+#
+# A dedicated flat skill (no nested skills/<repo> tree) is used so the resolved
+# traversal depth is deterministic:
+#   <skills_root>/dd416-trav/dashboards/public/<type>/  -> five parents reach
+#   <runtime_root>, and <skills_root>/dd416-trav/dashboards/ -> three parents
+#   reach <runtime_root>.
+# ---------------------------------------------------------------------------
+my $traversal_skill = File::Spec->catdir( $paths->skills_root, 'dd416-trav' );
+make_path( File::Spec->catdir( $traversal_skill, 'dashboards', 'public', $_ ) ) for qw(js css others);
+_write_file(
+    File::Spec->catfile( $traversal_skill, 'dashboards', 'index' ),
+    <<'BOOKMARK',
+TITLE: Traversal Skill Index
+:--------------------------------------------------------------------------------:
+BOOKMARK: index
+:--------------------------------------------------------------------------------:
+HTML:
+Traversal Skill Index
+BOOKMARK
+    0644,
+);
+_write_file( File::Spec->catfile( $traversal_skill, 'dashboards', 'public', 'others', 'info.txt' ), "trav skill info\n", 0644 );
+_write_file( File::Spec->catfile( $traversal_skill, 'dashboards', 'public', 'js',     'skill.js' ), qq{console.log("trav js");\n}, 0644 );
+_write_file( File::Spec->catfile( $traversal_skill, 'dashboards', 'public', 'css',    'skill.css' ), qq{body { color: #654321; }\n}, 0644 );
+
+my $secret_file = File::Spec->catfile( $paths->runtime_root, 'dd416-runtime-secret.txt' );
+_write_file( $secret_file, "DD416-RUNTIME-SECRET\n", 0600 );
+my $secret_bookmark = File::Spec->catfile( $paths->runtime_root, 'dd416-runtime-secret-bookmark' );
+_write_file(
+    $secret_bookmark,
+    <<'BOOKMARK',
+TITLE: DD416 Secret Bookmark
+:--------------------------------------------------------------------------------:
+BOOKMARK: dd416-secret
+:--------------------------------------------------------------------------------:
+HTML:
+DD416-RUNTIME-SECRET-BOOKMARK
+BOOKMARK
+    0600,
+);
+
+for my $type (qw(js css others)) {
+    my $escaped = $app->handle(
+        path        => "/$type/dd416-trav/../../../../../dd416-runtime-secret.txt",
+        method      => 'GET',
+        headers     => { host => '127.0.0.1' },
+        remote_addr => '127.0.0.1',
+    );
+    is( $escaped->[0], 400, "/$type skill-prefixed parent traversal is rejected" );
+    unlike( $escaped->[2], qr/DD416-RUNTIME-SECRET/, "/$type skill-prefixed parent traversal leaks no file content" );
+}
+
+my $passwd_escape = $app->handle(
+    path        => '/others/dd416-trav/' . ( '../' x 12 ) . 'etc/passwd',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $passwd_escape->[0], 400, '/others skill-prefixed traversal to an absolute system path is rejected' );
+unlike( $passwd_escape->[2], qr/root:/, '/others skill-prefixed traversal leaks no system account file' );
+
+my $skill_route_escape = $app->handle(
+    path        => '/skill/dd416-trav/../../../dd416-runtime-secret-bookmark',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $skill_route_escape->[0], 404, '/skill route id parent traversal is rejected' );
+unlike( $skill_route_escape->[2], qr/DD416-RUNTIME-SECRET-BOOKMARK/, '/skill route id parent traversal renders no out-of-tree bookmark' );
+
+my $skill_name_escape = $app->handle(
+    path        => '/skill/../../dd416-runtime-secret-bookmark',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $skill_name_escape->[0], 404, '/skill parent-directory skill name is rejected' );
+unlike( $skill_name_escape->[2], qr/DD416-RUNTIME-SECRET-BOOKMARK/, '/skill parent-directory skill name renders no out-of-tree bookmark' );
+
+my $ajax_escape = $app->handle(
+    path        => '/ajax/dd416-trav/../../../dd416-runtime-secret.txt',
+    query       => 'type=text',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $ajax_escape->[0], 400, '/ajax skill-prefixed parent traversal is rejected' );
+unlike( _drain_stream_body( $ajax_escape->[2] ), qr/DD416-RUNTIME-SECRET/, '/ajax skill-prefixed parent traversal leaks no file content' );
+
+my $legit_other = $app->handle(
+    path        => '/others/dd416-trav/info.txt',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $legit_other->[0], 200, 'containment keeps serving a legitimate skill others asset' );
+is( $legit_other->[2], "trav skill info\n", 'legitimate skill others asset still returns its own content' );
+
+my $legit_js = $app->handle(
+    path        => '/js/dd416-trav/skill.js',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $legit_js->[0], 200, 'containment keeps serving a legitimate skill js asset' );
+is( $legit_js->[2], qq{console.log("trav js");\n}, 'legitimate skill js asset still returns its own content' );
+
+my $legit_css = $app->handle(
+    path        => '/css/dd416-trav/skill.css',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $legit_css->[0], 200, 'containment keeps serving a legitimate skill css asset' );
+is( $legit_css->[2], qq{body { color: #654321; }\n}, 'legitimate skill css asset still returns its own content' );
+
+my $legit_skill_route = $app->handle(
+    path        => '/skill/dd416-trav/index',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $legit_skill_route->[0], 200, 'containment keeps serving a legitimate skill bookmark route' );
+like( $legit_skill_route->[2], qr/Traversal Skill Index/, 'legitimate skill bookmark route still renders its own bookmark' );
+
 sub _uri_escape {
     my ($text) = @_;
     return uri_escape($text);

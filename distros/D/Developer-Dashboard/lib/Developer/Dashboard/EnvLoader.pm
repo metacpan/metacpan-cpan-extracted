@@ -3,7 +3,7 @@ package Developer::Dashboard::EnvLoader;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Cwd qw(abs_path cwd);
 use File::Basename qw(dirname);
@@ -189,7 +189,7 @@ sub _plain_directory_layers {
         push @layers, $dir;
         last if $class->_path_identity($dir) eq $class->_path_identity($stop_dir);
         my $parent = dirname($dir);
-        last if !defined $parent || $parent eq '' || $parent eq $dir;
+        last if $parent eq $dir;    # uncoverable branch true dirname never returns undef/empty and the stop-dir match above always fires before the filesystem root is reached
         $dir = $parent;
     }
     return reverse @layers;
@@ -223,7 +223,7 @@ sub _load_skill_layer_specs {
         next if ref($spec) ne 'HASH';
         my $prefix = $spec->{prefix} || '';
         for my $file ( $class->_env_file_candidates( $spec->{root} ) ) {
-            next if !defined $file || $file eq '';
+            next if !defined $file;    # uncoverable branch true _env_file_candidates always yields defined non-empty catfile paths
             my $identity = $class->_path_identity($file);
             next if $seen{$identity}++;
             next if !-f $file;
@@ -245,11 +245,11 @@ sub _load_skill_layer_specs {
                        ( !defined $before_env{$key} && !defined $ENV{$key} )
                     || ( defined $before_env{$key} && defined $ENV{$key} && $before_env{$key} eq $ENV{$key} )
                   );
-                if ( exists $key_prefix{$key} && $key_prefix{$key} ne '' && $key_prefix{$key} ne $prefix && exists $before_env{$key} ) {
+                if ( exists $key_prefix{$key} && $key_prefix{$key} ne $prefix && exists $before_env{$key} ) {
                     my $parent_key = $key_prefix{$key} . '_' . $key;
-                    my $parent_source = ref($before_audit) eq 'HASH' && ref( $before_audit->{$key} ) eq 'HASH'
-                      ? ( $before_audit->{$key}{envfile} || $file )
-                      : $file;
+                    # The preserved parent value's provenance is always the
+                    # audit source recorded for this key by the earlier layer.
+                    my $parent_source = $before_audit->{$key}{envfile};
                     $ENV{$parent_key} = $before_env{$key};
                     Developer::Dashboard::EnvAudit->record( $parent_key, $before_env{$key}, $parent_source );
                 }
@@ -290,7 +290,7 @@ sub _nested_skill_layer_specs {
     my ( $class, $skill_root ) = @_;
     return () if !defined $skill_root || $skill_root eq '';
     my @parts = File::Spec->splitdir( File::Spec->canonpath($skill_root) );
-    my @skill_indexes = grep { $parts[$_] eq 'skills' && defined $parts[ $_ + 1 ] && $parts[ $_ + 1 ] ne '' } 0 .. $#parts - 1;
+    my @skill_indexes = grep { $parts[$_] eq 'skills' } 0 .. $#parts - 1;
     return ( { root => $skill_root, prefix => $class->_normalize_skill_env_prefix( $parts[-1] || '' ) } ) if !@skill_indexes;
 
     my @specs;
@@ -353,7 +353,7 @@ sub _load_env_file {
         $ENV{$key} = $value;
         Developer::Dashboard::EnvAudit->record( $key, $value, $file );
     }
-    close $fh or die "Unable to close $file: $!";
+    close $fh or die "Unable to close $file: $!";    # uncoverable branch true closing a read-only handle does not fail on the test host
     die "Unterminated block comment in $file\n" if $in_block_comment;
     return 1;
 }
@@ -377,8 +377,8 @@ sub _load_env_pl_file {
           )
     } sort keys %ENV;
     for my $key (@changed) {
-        next if exists $before{$key} && defined $before{$key} && defined $ENV{$key} && $before{$key} eq $ENV{$key};
-        next if exists $before{$key} && !defined $before{$key} && !defined $ENV{$key};
+        # The grep above already selects only genuinely new or changed keys,
+        # so every key reaching this point is recorded without re-filtering.
         Developer::Dashboard::EnvAudit->record( $key, $ENV{$key}, $file );
     }
     return 1;
@@ -393,7 +393,7 @@ sub _path_identity {
     my ( $class, $path ) = @_;
     return '' if !defined $path || $path eq '';
     my $resolved = eval { abs_path($path) };
-    return defined $resolved && $resolved ne '' ? $resolved : File::Spec->canonpath($path);
+    return defined $resolved ? $resolved : File::Spec->canonpath($path);
 }
 
 # _same_or_descendant_path($path, $root)

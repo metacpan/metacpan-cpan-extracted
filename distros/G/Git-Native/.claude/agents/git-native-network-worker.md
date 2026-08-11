@@ -118,9 +118,14 @@ These are the load-bearing invariants specific to the network + FFI work. Read C
 ## Module hygiene
 
 - Moo, not Moose. `lazy_build => 1` + `sub _build_x` for non-trivial attrs.
-- `namespace::clean` on every `.pm`. `# ABSTRACT:` as the first comment line. Inline
-  `=attr` / `=method` / `=seealso` PodWeaver directives under the `[@Author::GETTY]`
-  bundle. `no Moo; __PACKAGE__->meta->make_immutable;` at the bottom.
+- **No `namespace::clean`**, and **no `make_immutable`**. Both are in the briefing's
+  history rather than the code: `namespace::clean` is used by exactly one module
+  (`Remote/Result.pm`) and adding it wholesale would sweep the `Git::Libgit2` constants
+  that are reached package-qualified from outside (`GIT_DIRECTION_*` in `Remote.pm`,
+  `GIT_BRANCH_*` / `GIT_SORT_*` elsewhere) plus the re-exported `check_rc`; see karr
+  ticket 20. `make_immutable` is Moose language and a silent no-op under plain Moo.
+- `# ABSTRACT:` as the first comment line. Inline `=attr` / `=method` / `=seealso`
+  PodWeaver directives under the `[@Author::GETTY]` bundle.
 - **`_disown`** is the contract for handing a `Git::Native::Credential` to libgit2. The
   caller must hold a separate reference if it wants to use the credential later. Don't
   "fix" this by adding a duplicate return path.

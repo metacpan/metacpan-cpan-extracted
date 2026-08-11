@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::SeededPages;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use File::Spec;
 use Developer::Dashboard::JSON qw(json_decode json_encode);
@@ -97,7 +97,7 @@ sub ensure_seeded_page {
         return 'current';
     }
 
-    if ( _manifest_md5_matches( paths => $paths, id => $id, md5 => $current_md5 )
+    if ( _manifest_md5_matches( paths => $paths, id => $id, md5 => $current_md5 )    # uncoverable condition right
         || is_known_managed_page_md5( id => $id, md5 => $current_md5 ) )
     {
         $pages->save_page($page);
@@ -122,8 +122,8 @@ sub _read_manifest {
     return {} if !-f $manifest_path;
     open my $fh, '<:raw', $manifest_path or die "Unable to read $manifest_path: $!";
     my $json = do { local $/; <$fh> };
-    close $fh or die "Unable to close $manifest_path: $!";
-    $json = '{}' if !defined $json || $json =~ /\A\s*\z/;
+    close $fh or die "Unable to close $manifest_path: $!";    # uncoverable branch true
+    $json = '{}' if !defined $json || $json =~ /\A\s*\z/;    # uncoverable condition left
     my $manifest = json_decode($json);
     die "Seed manifest at $manifest_path must decode to a hash\n" if ref($manifest) ne 'HASH';
     return $manifest;

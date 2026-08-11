@@ -607,11 +607,15 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 		my $json = $historical_cache{$hist_file};
 		next unless $json;	# Skip if not cached (shouldn't happen, but be safe)
 
-		# Try both with and without blib/ prefix since older history
-		# files store paths under blib/lib/... while the dashboard
-		# displays them as lib/...
-		my $hist_key = $json->{summary}{"blib/$file"} ? "blib/$file"
-			     : $json->{summary}{$file}         ? $file
+		# Resolve the key used in this historical snapshot.  Try the raw
+		# Devel::Cover key ($file, which may be blib/lib/...) first, then
+		# the normalised lib/ form ($display_file), then the blib/ form of
+		# the normalised path for snapshots that stored blib/ keys.
+		# NOTE: prepending "blib/" to $file directly is wrong when $file
+		# already starts with "blib/" — it would produce "blib/blib/...".
+		my $hist_key = $json->{summary}{$file}                 ? $file
+			     : $json->{summary}{$display_file}          ? $display_file
+			     : $json->{summary}{"blib/$display_file"}   ? "blib/$display_file"
 			     : undef;
 
 		if($hist_key) {
@@ -623,11 +627,17 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 	my $points_attr = join(',', @file_history);
 
 	my $delta_html;
-	if(exists $deltas{$file}) {
-		my $delta = $deltas{$file};
+	# %deltas is indexed by the normalised lib/ key ($display_file), not the
+	# raw Devel::Cover blib/ key ($file).  Using $file here caused a miss for
+	# every blib-path entry, silently falling through to the (often wrong)
+	# sparkline-based fallback.
+	if(exists $deltas{$display_file}) {
+		my $delta = $deltas{$display_file};
 		my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
 		my $delta_icon  = $delta > 0 ? '&#9650;'  : $delta < 0 ? '&#9660;' : '&#9679;';
-		my $prev_pct = $prev_data->{summary}{$file}{total}{percentage} // 0;
+		my $prev_pct = $prev_data->{summary}{$display_file}{total}{percentage}
+			// $prev_data->{summary}{$file}{total}{percentage}
+			// 0;
 
 		$delta_html = sprintf(
 			'<td class="%s" title="Previous: %.1f%%">%s %.1f%%</td>',
@@ -840,6 +850,35 @@ foreach my $file (reverse sort @history_files) {
 	};
 
 	$processed_count++;
+}
+
+# Append the current run as the final trend point if it is not already
+# present in the archive.  The snapshot is written AFTER the HTML is
+# generated, so the current commit's entry will normally be absent —
+# the last visible trend point would otherwise be the previous commit's,
+# which may have anomalously low coverage (e.g. a partial Devel::Cover
+# run) and makes the trend appear to crash just before the current date.
+unless(grep { index($_->{url}, $commit_sha) >= 0 } @data_points_with_time) {
+	my ($cur_sum, $cur_count) = (0, 0);
+	for my $f (keys %{$cover_db->{summary}}) {
+		next if $f eq 'Total';
+		next if $f =~ /^\//;
+		next unless $f =~ /^(?:lib|blib|bin)\//;
+		$cur_sum += $cover_db->{summary}{$f}{total}{percentage} // 0;
+		$cur_count++;
+	}
+	if($cur_count) {
+		my $cur_ts = strftime('%Y-%m-%dT%H:%M:%S', localtime);
+		my $tz = strftime('%z', localtime);
+		$tz =~ s/([+-])(\d{2})(\d{2})/$1$2:$3/;
+		$cur_ts .= $tz;
+		push @data_points_with_time, {
+			timestamp => $cur_ts,
+			pct       => $cur_sum / $cur_count,
+			url       => "https://github.com/$config{github_user}/$config{github_repo}/commit/$commit_sha",
+			comment   => $commit_messages{$commit_sha} // 'Current run',
+		};
+	}
 }
 
 # Sort by timestamp to ensure chronological order

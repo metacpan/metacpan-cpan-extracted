@@ -2,7 +2,7 @@ package Crypt::AuthEnc::OCB;
 
 use strict;
 use warnings;
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( ocb_encrypt_authenticate ocb_decrypt_verify )] );
@@ -134,6 +134,9 @@ C<new>, for example:
  # $key ..... [binary string] AES key of proper length (128/192/256 bits)
  # $nonce ... [binary string] unique nonce/salt (no need to keep it secret)
  # $tag_len . [integer] required length of output tag
+
+B<IMPORTANT:> The length of the tag is a security parameter and a zero-length
+tag is legal (it simply provides no authenticity), which is the caller's choice.
 
 =head2 adata_add
 

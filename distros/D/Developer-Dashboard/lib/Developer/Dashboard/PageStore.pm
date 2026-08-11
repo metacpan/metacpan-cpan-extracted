@@ -3,18 +3,24 @@ package Developer::Dashboard::PageStore;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 use utf8;
 
 use Encode qw(decode FB_CROAK FB_DEFAULT);
+use Cwd qw(abs_path);
+use Fcntl qw(:DEFAULT O_NOFOLLOW);
 use File::Find ();
 use File::Spec;
 use File::Basename qw(basename dirname);
-use File::Path qw(make_path);
 use URI::Escape qw(uri_escape);
 
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::PageDocument;
+use Developer::Dashboard::Platform qw(is_windows);
+
+# Fallback no-follow flag: O_NOFOLLOW where the platform provides the macro,
+# otherwise 0 so path-based fallback opens still work on such runtimes.
+my $NOFOLLOW = eval { O_NOFOLLOW } || 0;    # uncoverable condition false O_NOFOLLOW is defined on every POSIX test host
 
 # new(%args)
 # Constructs the page persistence and token transport store.
@@ -33,7 +39,7 @@ sub new {
 sub page_file {
     my ( $self, $id ) = @_;
     die 'Missing page id' if !defined $id || $id eq '';
-    return File::Spec->catfile( $self->{paths}->dashboards_root, $self->_normalized_page_id($id) );
+    return File::Spec->catfile( $self->{paths}->dashboards_root, $self->_validated_page_id($id) );
 }
 
 # save_page($page)
@@ -48,9 +54,11 @@ sub save_page {
 
     my $id = $page->as_hash->{id} || die 'Saved pages require an id';
     my $file = $self->page_file($id);
-    my $dir = dirname($file);
-    $self->{paths}->ensure_dir($dir);
-    open my $fh, '>', $file or die "Unable to save $file: $!";
+    my $fh = $self->_open_saved_page_for_write(
+        $self->{paths}->dashboards_root,
+        $self->_validated_page_id($id),
+        create_dirs => 1,
+    );
     print {$fh} $page->canonical_instruction;
     close $fh;
     $self->{paths}->secure_file_permissions($file);
@@ -63,12 +71,13 @@ sub save_page {
 # Output: Developer::Dashboard::PageDocument object.
 sub load_saved_page {
     my ( $self, $id ) = @_;
-    my $file = $self->_existing_page_file($id);
+    my ( $file, $root ) = $self->_existing_page_file($id);
     die "Page '$id' not found" if !$file;
-    my $page = $self->_load_page_file( $file, id => $id );
+    my $instruction = $self->_read_saved_instruction( $file, root => $root, id => $id );
+    my $page = $self->_load_page_instruction( $instruction, id => $id );
     $page->{id} ||= $id;
     $page->{meta}{source_kind} = 'saved';
-    $page->{meta}{raw_instruction} = $self->_read_saved_instruction($file);
+    $page->{meta}{raw_instruction} = $instruction;
     return $page;
 }
 
@@ -78,9 +87,9 @@ sub load_saved_page {
 # Output: raw file content string.
 sub read_saved_entry {
     my ( $self, $id ) = @_;
-    my $file = $self->_existing_page_file($id);
+    my ( $file, $root ) = $self->_existing_page_file($id);
     die "Page '$id' not found" if !$file;
-    return $self->_read_saved_instruction($file);
+    return $self->_read_saved_instruction( $file, root => $root, id => $id );
 }
 
 # load_transient_page($token)
@@ -148,7 +157,11 @@ sub list_saved_pages {
         for my $entry ( $self->_saved_page_entries_for_root($root) ) {
             my $id = $entry->{id};
             next if !defined $id || $id eq '';
-            my $ok = eval { $self->_load_page_file( $entry->{file}, id => $id ); 1 };
+            my $ok = eval {
+                my $instruction = $self->_read_saved_instruction( $entry->{file}, root => $root, id => $id );
+                $self->_load_page_instruction( $instruction, id => $id );
+                1;
+            };
             next if !$ok;
             $ids{$id} = 1;
         }
@@ -172,16 +185,19 @@ sub migrate_legacy_json_pages {
         next if $entry !~ /\.json\z/;
         my $file = File::Spec->catfile( $root, $entry );
         next if -d $file;
-        open my $fh, '<', $file or next;
+        next if -l $file;
+        next if !eval { $self->_assert_page_path_contained( $file, root => $root ); 1 };
+        my $fh = eval { $self->_open_saved_page_for_read( $root, $entry ) } or next;
         local $/;
         my $raw = <$fh>;
         close $fh;
         my $page = eval { Developer::Dashboard::PageDocument->from_json($raw) } or next;
         my $id = $page->as_hash->{id} || basename( $entry, '.json' );
         $page->{id} = $id;
-        my $target = $self->page_file($id);
-        $self->{paths}->ensure_dir( dirname($target) );
-        open my $out, '>', $target or die "Unable to save $target: $!";
+        my $normalized_id = eval { $self->_validated_page_id($id) };
+        next if !defined $normalized_id;
+        my $target = File::Spec->catfile( $root, $normalized_id );
+        my $out = $self->_open_saved_page_for_write( $root, $normalized_id, create_dirs => 1 );
         print {$out} $page->canonical_instruction;
         close $out;
         $self->{paths}->secure_file_permissions($target);
@@ -193,13 +209,122 @@ sub migrate_legacy_json_pages {
 }
 
 # _page_file_candidates($id)
-# Returns candidate bookmark file paths for a page id in lookup order.
+# Returns candidate bookmark files for a page id in lookup order.
 # Input: page id string.
-# Output: ordered list of bookmark file path strings.
+# Output: ordered list of hash references with root and file keys.
 sub _page_file_candidates {
     my ( $self, $id ) = @_;
+    my $normalized = $self->_validated_page_id($id);
+    return map {
+        my $root = $_;
+        { root => $root, file => File::Spec->catfile( $root, $normalized ) }
+    } $self->{paths}->dashboards_roots;
+}
+
+# _validated_page_id($id)
+# Validates one normalized bookmark id before it is joined to a dashboards root.
+# Input: page id string, optionally already prefixed with /app/.
+# Output: relative bookmark id with no current/parent-directory components.
+sub _validated_page_id {
+    my ( $self, $id ) = @_;
     my $normalized = $self->_normalized_page_id($id);
-    return map { File::Spec->catfile( $_, $normalized ) } $self->{paths}->dashboards_roots;
+    die 'Invalid page id' if $normalized eq '';
+    # uncoverable branch true leading separators are stripped by normalization and drive-qualified absolutes only exist on Windows
+    die 'Invalid page id' if File::Spec->file_name_is_absolute($normalized);
+    die 'Invalid page id' if $normalized =~ /\A[A-Za-z]:/;
+    die 'Invalid page id' if grep { $_ eq '' || $_ eq '.' || $_ eq '..' } split m{[\\/]}, $normalized, -1;
+    return $normalized;
+}
+
+# _assert_page_path_contained($file, %args)
+# Ensures a page path's resolved target or nearest existing ancestor remains
+# beneath one configured dashboards root before a read or write follows it.
+# Input: candidate file path plus optional for_write boolean.
+# Output: true, or dies with Invalid page path when containment is violated.
+sub _assert_page_path_contained {
+    my ( $self, $file, %args ) = @_;
+    die 'Invalid page path' if !defined $file || $file eq '';
+
+    my @roots = exists $args{root} ? ( $args{root} ) : $self->{paths}->dashboards_roots;
+    for my $root (@roots) {
+        next if !defined $root || $root eq '';
+        my $root_real = abs_path($root);
+        next if !defined $root_real;
+
+        my $probe = $file;
+        if ( $args{for_write} && !-e $probe && !-l $probe ) {
+            while ( !-e $probe && !-l $probe ) {
+                my $parent = dirname($probe);
+                last if $parent eq $probe;    # uncoverable branch true the filesystem root always exists so the walk stops on an existing ancestor first
+                $probe = $parent;
+            }
+        }
+        my $probe_real = abs_path($probe);
+        next if !defined $probe_real;
+        my ( $probe_cmp, $root_cmp ) = ( $probe_real, $root_real );
+        if ( is_windows() ) {
+            $probe_cmp = lc $probe_cmp;
+            $root_cmp  = lc $root_cmp;
+        }
+        $probe_cmp =~ s{\\}{/}g;
+        $root_cmp  =~ s{\\}{/}g;
+        return 1 if $probe_cmp eq $root_cmp;
+        return 1 if index( $probe_cmp, $root_cmp . '/' ) == 0;
+    }
+
+    die 'Invalid page path';
+}
+
+# _open_saved_page_for_read($root, $id)
+# Opens one saved page through no-follow directory descriptors where openat is
+# available, preventing a validated pathname from being swapped to a symlink.
+# Input: dashboards root and validated relative page id.
+# Output: readable filehandle.
+sub _open_saved_page_for_read {
+    my ( $self, $root, $id ) = @_;
+    return $self->_open_saved_page_at( root => $root, id => $id, flags => O_RDONLY );
+}
+
+# _open_saved_page_for_write($root, $id)
+# Opens one saved page for replacement without following symlinks in any path
+# component when openat is available.
+# Input: dashboards root and validated relative page id.
+# Output: writable filehandle.
+sub _open_saved_page_for_write {
+    my ( $self, $root, $id, %args ) = @_;
+    return $self->_open_saved_page_at(
+        root  => $root,
+        id    => $id,
+        flags => O_WRONLY | O_CREAT | O_TRUNC,
+        mode  => 0600,
+        create_dirs => $args{create_dirs} ? 1 : 0,
+    );
+}
+
+# _open_saved_page_at(%args)
+# Opens a validated page id beneath a dashboards root, asserting the resolved
+# path stays contained in that root and refusing to follow a symlinked leaf.
+# One path on every platform: a capability-dependent variant would mean two
+# installs of the same release protecting their users differently.
+# Input: root, id, open flags, and optional creation mode.
+# Output: Perl filehandle bound to the opened file.
+sub _open_saved_page_at {
+    my ( $self, %args ) = @_;
+    my $root = $args{root} || die 'Invalid page path';
+    my $id = $self->_validated_page_id( $args{id} );
+
+    my $file = File::Spec->catfile( $root, $id );
+    $self->_assert_page_path_contained( $file, root => $root, for_write => ( $args{flags} & O_WRONLY ? 1 : 0 ) );
+    $self->{paths}->ensure_dir( dirname($file) ) if $args{create_dirs} && !-d dirname($file);
+    my $fh;
+    if ( $args{flags} & O_WRONLY ) {
+        sysopen $fh, $file, $args{flags} | $NOFOLLOW, $args{mode} || 0600 or die 'Invalid page path';
+    }
+    else {
+        sysopen $fh, $file, $args{flags} | $NOFOLLOW or die 'Invalid page path';
+        binmode $fh, ':raw';
+    }
+    return $fh;
 }
 
 # _normalized_page_id($id)
@@ -219,11 +344,15 @@ sub _normalized_page_id {
 # _existing_page_file($id)
 # Resolves the first existing bookmark file path for a page id.
 # Input: page id string.
-# Output: bookmark file path string or undef when missing.
+# Output: file path plus its owning root in list context, the file path alone
+# in scalar context, or nothing when the page is missing.
 sub _existing_page_file {
     my ( $self, $id ) = @_;
-    for my $file ( $self->_page_file_candidates($id) ) {
-        return $file if -f $file;
+    for my $candidate ( $self->_page_file_candidates($id) ) {
+        my $file = $candidate->{file};
+        next if !-f $file;
+        $self->_assert_page_path_contained( $file, root => $candidate->{root} );
+        return wantarray ? ( $file, $candidate->{root} ) : $file;
     }
     return;
 }
@@ -235,6 +364,15 @@ sub _existing_page_file {
 sub _load_page_file {
     my ( $self, $file, %args ) = @_;
     my $instruction = $self->_read_saved_instruction($file);
+    return $self->_load_page_instruction( $instruction, %args );
+}
+
+# _load_page_instruction($instruction, %args)
+# Parses saved instruction text into a page document, with raw nav/*.tt fragment fallback.
+# Input: decoded instruction text string plus optional saved-page id.
+# Output: Developer::Dashboard::PageDocument object.
+sub _load_page_instruction {
+    my ( $self, $instruction, %args ) = @_;
     my $page = eval { Developer::Dashboard::PageDocument->from_instruction($instruction) };
     return $page if $page;
 
@@ -246,7 +384,7 @@ sub _load_page_file {
         );
     }
 
-    die( $@ || "Unable to load bookmark file $file" );
+    die $@;
 }
 
 # _raw_nav_fragment_page(%args)
@@ -277,17 +415,23 @@ sub _looks_like_raw_nav_fragment {
     return 0;
 }
 
-# _read_saved_instruction($file)
-# Reads one saved bookmark file and normalizes older-invalid UTF-8 bytes.
-# Input: bookmark file path string.
+# _read_saved_instruction($file, %args)
+# Reads one saved bookmark file and normalizes older-invalid UTF-8 bytes; with
+# a root and id it opens through the symlink-refusing descriptor path.
+# Input: bookmark file path string plus optional owning root and page id.
 # Output: decoded instruction text string that is safe to emit as UTF-8 HTML/text.
 sub _read_saved_instruction {
-    my ( $self, $file ) = @_;
-    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    my ( $self, $file, %args ) = @_;
+    my $fh = exists $args{root}
+      ? $self->_open_saved_page_for_read( $args{root}, $args{id} )
+      : do {
+          open my $direct_fh, '<:raw', $file or die "Unable to read $file: $!";
+          $direct_fh;
+      };
     local $/;
     my $raw = <$fh>;
-    close $fh or die "Unable to close $file: $!";
-    return '' if !defined $raw;
+    close $fh or die "Unable to close $file: $!";    # uncoverable branch true
+    return '' if !defined $raw;    # uncoverable branch true
     my $text = eval { decode( 'UTF-8', $raw, FB_CROAK ) } || decode( 'UTF-8', $raw, FB_DEFAULT );
     return $self->_normalize_legacy_icon_markup($text);
 }
@@ -319,6 +463,8 @@ sub _saved_page_entries_for_root {
             no_chdir => 1,
             wanted   => sub {
                 return if !-f $_;
+                return if -l $File::Find::name;
+                return if !eval { $self->_assert_page_path_contained( $File::Find::name, root => $root ); 1 };
                 my $rel = File::Spec->abs2rel( $File::Find::name, $root );
                 $rel =~ s{\\}{/}g;
                 push @entries, {

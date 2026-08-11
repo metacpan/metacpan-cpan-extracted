@@ -22,14 +22,19 @@ use Git::Native::Remote::Result;
 #   * fetch update_tips fires for every accepted local ref update, even on
 #     a local file:// transport. Easy to exercise.
 #
-#   * push push_update_reference only fires when the server sends a
-#     report-status "ng" for a ref. libgit2 1.5's local transport
-#     (src/libgit2/transports/local.c) does NOT do report-status and does
-#     NOT run receive hooks — it just writes the ref directly. So we can
-#     only test the SUCCESS path against a local bare. Testing the
-#     REJECTED path needs an ssh/https remote with a pre-receive hook;
-#     t/40-remote-ssh.t and t/41-remote-https.t are the place for that
-#     when TEST_GIT_NATIVE_SSH_URL / TEST_GIT_NATIVE_HTTPS_URL is set.
+#   * push push_update_reference reports a per-ref verdict, but libgit2
+#     1.5's local transport (src/libgit2/transports/local.c) does NOT do
+#     report-status and does NOT run receive hooks — it just writes the ref
+#     directly. So only the SUCCESS path is reachable through a file://
+#     remote; a real rejection needs an ssh/https remote with a pre-receive
+#     hook (t/40-remote-ssh.t / t/41-remote-https.t, when
+#     TEST_GIT_NATIVE_SSH_URL / TEST_GIT_NATIVE_HTTPS_URL is set). The
+#     rejection BRANCH is covered here anyway by driving the thunk closure
+#     from Perl with the arguments libgit2 would pass, the same trick
+#     t/52-credential-callback.t uses.
+#
+# The other contract this file pins is that both callbacks produce the SAME
+# entry shape — { ref, from, to, reason } — see section 3b (karr #16).
 
 # ---- 1. fetch update_tips: a brand-new ref appears in ->updated ----
 
@@ -66,6 +71,9 @@ my $u = $fetch_result->updated->[0];
 is $u->{ref},  'refs/karr/test/data', 'updated refname';
 is $u->{from}, undef,                  'from oid is undef for a brand-new ref';
 is $u->{to},   $commit_a->hex,         'to oid matches the upstream tip';
+is $u->{reason}, '',
+  'reason is "" on a fetch update — there is no server verdict on a fetch, '
+  . 'the key exists so fetch and push entries have the same shape';
 
 # ---- 2. fetch update_tips: a re-fetch (no-op) records nothing -----
 
@@ -91,22 +99,212 @@ my $push_result = $pp_rmt->push(
 );
 is scalar @{ $push_result->rejected }, 0, 'fast-forward push: nothing rejected';
 is scalar @{ $push_result->updated }, 1, 'fast-forward push: one ref updated';
-is $push_result->updated->[0]{ref}, 'refs/karr/test/data',
-  'updated refname';
-is $push_result->updated->[0]{reason}, '',
-  'reason is "" on a successful push_update_reference';
 
-# ---- 4. push push_update_reference: rejection path (live network) ---
+my $pu = $push_result->updated->[0];
+is $pu->{ref}, 'refs/karr/test/data',
+  'updated refname — the name on the REMOTE side, which is what the '
+  . 'server reports back through push_update_reference';
+is $pu->{reason}, '',
+  'reason is "" on a successful push_update_reference';
+is $pu->{to}, $commit_a->hex,
+  'to oid is filled from the local source ref of the refspec — the server '
+  . 'only sends a verdict, but we know what we asked it to write';
+is $pu->{from}, undef,
+  'from oid is undef on a push: the previous remote-side oid would cost an '
+  . 'extra git_remote_ls round trip, so push reports an honest undef';
+
+# ---- 3b. the unification: push and fetch entries have ONE shape ----
 #
-# The REJECTED branch of push_update_reference is unreachable against a
-# file:// remote in libgit2 1.5: the local transport does not do
-# report-status and does not run receive hooks. Reproducing it requires
-# an ssh/https remote with a pre-receive hook. We pin that gap with a
-# TODO marker so it's clear what the live-network tests should cover.
-TODO_LOCAL: {
-  ok 1, 'TODO: rejection path needs ssh/https + pre-receive hook '
-     . '(file:// transport bypasses hooks in libgit2 1.5)';
+# The regression this pins (karr #16): updated entries used to be
+# { ref, from, to } on fetch and { ref, reason } on push, so
+# $result->updated->[0]{to} silently returned undef on a push — a key that
+# was not there at all rather than a value that was unknown. Anything
+# reading a Result generically broke on whichever operation it was not
+# written against. The key set is now the contract; if a callback ever
+# grows or drops a field again, this is the assertion that fails.
+my @fetch_keys = sort keys %{ $fetch_result->updated->[0] };
+my @push_keys  = sort keys %{ $push_result->updated->[0] };
+is \@fetch_keys, [qw( from reason ref to )],
+  'a fetch update entry has exactly ref/from/to/reason';
+is \@push_keys, \@fetch_keys,
+  'a push update entry has exactly the same keys as a fetch update entry';
+
+# ---- 4. push push_update_reference: the rejection path --------------
+#
+# The REJECTED branch is unreachable through a file:// remote in libgit2
+# 1.5: the local transport does not do report-status and does not run
+# receive hooks, so the server side never sends an "ng" for a ref. Rather
+# than leave the branch untested until someone sets
+# TEST_GIT_NATIVE_SSH_URL, drive the thunk straight from Perl the way
+# t/52-credential-callback.t drives the credential thunk — the closure is
+# a pure function of ( refname, status, payload ) and an
+# FFI::Platypus::Closure is a blessed CODE ref.
+#
+#   int cb(const char *refname, const char *status, void *data)
+subtest 'push_update_reference sorts the server verdict into updated/rejected' => sub {
+  my ( @rejected, @updated );
+  my ( $closure, $keep ) = Git::Native::Remote::_make_push_update_thunk(
+    \@rejected, \@updated,
+    { 'refs/heads/ok'    => 'a' x 40,
+      'refs/heads/empty' => 'b' x 40,
+      'refs/heads/gone'  => undef },
+  );
+
+  # status == NULL: libgit2's "the server raised no objection".
+  is $closure->( 'refs/heads/ok', undef, 0 ), 0,
+    'a NULL status returns 0 so the push continues';
+  # status == "": a server that reported success with no message.
+  is $closure->( 'refs/heads/empty', '', 0 ), 0,
+    'an empty status returns 0 too';
+  # status != "": the server refused this ref, and said why.
+  is $closure->( 'refs/heads/nope', 'pre-receive hook declined', 0 ), 0,
+    'a rejection still returns 0 — one refused ref must not abort the '
+    . 'reporting of the others';
+  # A delete refspec: accepted, but there is no oid on the far side now.
+  is $closure->( 'refs/heads/gone', undef, 0 ), 0,
+    'a deleted ref is reported through the same callback';
+
+  is \@updated, [
+    { ref => 'refs/heads/ok',    from => undef, to => 'a' x 40, reason => '' },
+    { ref => 'refs/heads/empty', from => undef, to => 'b' x 40, reason => '' },
+    { ref => 'refs/heads/gone',  from => undef, to => undef,    reason => '' },
+  ], 'NULL and "" are both "accepted", and each entry carries the four-key '
+   . 'shape with `to` taken from the refspec target map';
+
+  is \@rejected, [
+    { ref => 'refs/heads/nope', reason => 'pre-receive hook declined' },
+  ], 'a non-empty status is a rejection carrying the server message verbatim';
+
+  ok $keep, 'the thunk returns a keepalive alongside the closure';
+};
+
+# A ref the server names but the refspec map does not know (a push through
+# a refspec whose source is not a resolvable local reference) must still
+# produce the full key set — an unknown oid is undef, never a missing key.
+subtest 'an unmapped refname still yields the full four-key shape' => sub {
+  my ( @rejected, @updated );
+  my ( $closure, $keep ) = Git::Native::Remote::_make_push_update_thunk(
+    \@rejected, \@updated,
+  );
+  $closure->( 'refs/heads/surprise', undef, 0 );
+  is \@updated, [
+    { ref => 'refs/heads/surprise', from => undef, to => undef, reason => '' },
+  ], 'no target known for the ref: to is an explicit undef';
+};
+
+sub commit_in {
+  my ( $repo, $text ) = @_;
+  my $blob = $repo->blob_create_frombuffer($text);
+  my $tb   = $repo->tree_builder;
+  $tb->insert( name => 'data', oid => $blob, mode => 0100644 );
+  return $repo->commit_create(
+    tree => $tb->write, parents => [], message => $text,
+  );
 }
+
+# The `to` a push reports comes from pairing the expanded refspecs with the
+# local refs they name — the one piece of pure Perl between the refspec list
+# and the callback. Unit-test it directly, no remote involved: a wrong map
+# here means a push silently reports the wrong oid, which is worse than the
+# missing key it replaced.
+subtest '_push_update_targets maps destination refnames to local oids' => sub {
+  my $tmp_t = Path::Tiny->tempdir;
+  my $t     = Git::Native->init("$tmp_t");
+  my $c     = commit_in( $t, "target\n" );
+  $t->reference_create( 'refs/karr/a', $c, force => 1 );
+  $t->reference_create( 'refs/heads/main', $c, force => 1 );
+  $t->set_head('refs/heads/main');
+  my $rmt = $t->remote_anonymous('file:///nonexistent');
+
+  my $map = Git::Native::Remote::_push_update_targets( $rmt, [
+    '+refs/karr/a:refs/karr/a',      # forced, same name
+    'refs/karr/a:refs/backup/a',     # remapped destination
+    ':refs/karr/gone',               # delete refspec (what prune emits)
+    'refs/karr/missing:refs/karr/m', # source that is not a local ref
+    'HEAD:refs/heads/from-head',     # symbolic source
+    'refs/karr/a',                   # no colon: source is also destination
+  ] );
+
+  is $map->{'refs/karr/a'}, $c->hex,
+    'a same-name refspec maps the destination to the local oid';
+  is $map->{'refs/backup/a'}, $c->hex,
+    'a remapped destination is keyed by the REMOTE name, which is what '
+    . 'push_update_reference reports back';
+  ok exists $map->{'refs/karr/gone'},
+    'a delete refspec is in the map...';
+  is $map->{'refs/karr/gone'}, undef,
+    '...with an undef target, which is how a delete becomes to => undef';
+  is $map->{'refs/karr/m'}, undef,
+    'an unresolvable source yields undef rather than dying the push';
+  is $map->{'refs/heads/from-head'}, $c->hex,
+    'a symbolic source is resolved, so HEAD:refs/heads/x reports an oid';
+  is $map->{'refs/karr/a'}, $c->hex,
+    'a colonless refspec pushes the source to its own name';
+};
+
+# ---- 4b. deletions are distinguishable from updates ----------------
+#
+# Both operations can report a ref that DISAPPEARED, not one that moved:
+# `push prune => 1` sends `:refs/...` delete refspecs, and `fetch prune => 1`
+# drops stale mirror refs. libgit2 signals the fetch case by passing the
+# all-zero oid as the new tip of update_tips (probed against file://), which
+# we normalise to undef so both operations agree: no `to` means the ref is
+# gone. Without that, a caller cannot tell "now points at X" from "no longer
+# exists" except by a magic 40-zero string on one operation only.
+subtest 'a deleted ref is reported with to => undef on push and on fetch' => sub {
+  my $tmp_db  = Path::Tiny->tempdir;
+  my $db_bare = Git::Native->init( "$tmp_db", bare => 1 );
+  my $url     = 'file://' . $tmp_db;
+
+  my $tmp_src = Path::Tiny->tempdir;
+  my $src     = Git::Native->init("$tmp_src");
+  my $c_keep  = commit_in( $src, "keep\n" );
+  my $c_drop  = commit_in( $src, "drop\n" );
+  $src->reference_create( 'refs/karr/keep', $c_keep, force => 1 );
+  $src->reference_create( 'refs/karr/drop', $c_drop, force => 1 );
+  my $src_rmt = $src->remote_create( 'origin', $url );
+  $src_rmt->push( refspecs => ['+refs/karr/*:refs/karr/*'] );
+
+  # A mirror that has both refs, so its fetch --prune has something to drop.
+  my $tmp_mir = Path::Tiny->tempdir;
+  my $mirror  = Git::Native->init("$tmp_mir");
+  my $mir_rmt = $mirror->remote_create( 'origin', $url );
+  $mir_rmt->fetch( refspecs => ['+refs/karr/*:refs/karr/*'] );
+
+  # Drop it locally and push --prune: the delete refspec we synthesise
+  # comes back through push_update_reference like any accepted ref.
+  $src->reference_delete('refs/karr/drop');
+  my $pr = $src_rmt->push(
+    refspecs => ['+refs/karr/*:refs/karr/*'], prune => 1,
+  );
+  is scalar @{ $pr->rejected }, 0, 'prune push rejected nothing';
+  my %by_ref = map { $_->{ref} => $_ } @{ $pr->updated };
+  is [ sort keys %by_ref ], [ 'refs/karr/drop', 'refs/karr/keep' ],
+    'prune push reports both the written ref and the deleted one';
+  is $by_ref{'refs/karr/keep'}{to}, $c_keep->hex,
+    'the ref that was written carries its new oid';
+  is $by_ref{'refs/karr/drop'}{to}, undef,
+    'the ref that was DELETED carries to => undef, so a caller can tell the '
+    . 'two apart without re-listing the remote';
+  is [ sort keys %{ $by_ref{'refs/karr/drop'} } ], [qw( from reason ref to )],
+    'a delete entry is not a special shape, just to => undef';
+  ok !$db_bare->reference_exists('refs/karr/drop'),
+    'the remote really lost the ref (the report is not lying)';
+
+  # Same story on the fetch side.
+  my $fr = $mir_rmt->fetch(
+    refspecs => ['+refs/karr/*:refs/karr/*'], prune => 1,
+  );
+  my %f_by_ref = map { $_->{ref} => $_ } @{ $fr->updated };
+  ok exists $f_by_ref{'refs/karr/drop'},
+    'fetch --prune reports the stale ref it dropped';
+  is $f_by_ref{'refs/karr/drop'}{to}, undef,
+    'a pruned mirror ref is to => undef, not the 40-zero oid libgit2 passes';
+  is $f_by_ref{'refs/karr/drop'}{from}, $c_drop->hex,
+    'from still says where the ref used to point';
+  ok !$mirror->reference_exists('refs/karr/drop'),
+    'the mirror really lost the ref';
+};
 
 # ---- 5. Result->ok: semantics -------------------------------------
 

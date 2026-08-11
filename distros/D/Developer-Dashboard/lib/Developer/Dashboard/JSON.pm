@@ -3,12 +3,12 @@ package Developer::Dashboard::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.26';
 
 use Exporter 'import';
 use JSON::XS ();
 
-our @EXPORT_OK = qw(json_encode json_decode);
+our @EXPORT_OK = qw(json_encode json_decode json_decode_state);
 
 # json_encode($value)
 # Serializes a Perl value into canonical pretty JSON.
@@ -24,6 +24,23 @@ sub json_encode {
 # Output: decoded Perl value.
 sub json_decode {
     return JSON::XS->new->utf8->decode( $_[0] );
+}
+
+# json_decode_state($json)
+# Parses cached runtime state that a concurrent writer may be replacing.
+# Runtime state files are written to a temporary path and renamed into place, so
+# a reader can legitimately observe the destination while it is still empty or
+# only partially written. Such an observation means "no usable state right now",
+# not "corrupt data", so it must not be fatal to the caller.
+# Input: JSON text string, possibly undef, empty, or truncated.
+# Output: decoded Perl value, or undef when no complete payload is available.
+sub json_decode_state {
+    my ($json) = @_;
+    return undef if !defined $json;
+    return undef if $json !~ /\S/;
+    my $decoded = eval { JSON::XS->new->utf8->decode($json) };
+    return $decoded if !$@;
+    return undef;
 }
 
 1;

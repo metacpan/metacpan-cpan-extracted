@@ -3722,6 +3722,65 @@ subtest 'SchemaExtractor::_extract_default_value - returns undef for missing par
 	is($e->_extract_default_value('x', ''), undef, 'empty code returns undef');
 };
 
+subtest 'SchemaExtractor::_compile_signature_isolated: empty stdout and empty stderr -> return undef without croaking' => sub {
+	# Regression: when the child subprocess is killed by SIGKILL (e.g. the
+	# kernel OOM killer) before it writes anything, $stdout and $stderr are
+	# both empty strings.  Before the fix, decode_json('') croaked with
+	# "malformed JSON string" and the exception propagated through the
+	# Test::Builder subtest boundary, killing the test process with exit 255.
+	#
+	# Strategy: mock open3 in the consuming namespace so the "child" returns
+	# empty filehandles without spawning a real process.  waitpid($$, 0) on
+	# our own PID returns -1 immediately (not our child), which is harmless.
+
+	my $e = bless { allow_signature_exec => 1, verbose => 0 }, 'App::Test::Generator::SchemaExtractor';
+
+	my $empty = '';
+	open my $fake_rdr, '<', \$empty or die;
+	open my $fake_err, '<', \$empty or die;
+
+	no warnings 'redefine';
+	local *App::Test::Generator::SchemaExtractor::open3 = sub {
+		$_[0] = do { open my $fh, '>', \my $buf; $fh };	# writable stdin for child
+		$_[1] = $fake_rdr;					# stdout: empty
+		$_[2] = $fake_err;					# stderr: empty
+		return $$;						# our own PID → waitpid returns -1 quickly
+	};
+
+	my $result;
+	lives_ok { $result = $e->_compile_signature_isolated('myfunc', '(positional => [])') }
+		'does not croak when child produces nothing on stdout or stderr';
+	is($result, undef, 'returns undef for silent subprocess exit');
+};
+
+subtest 'SchemaExtractor::_compile_signature_isolated: non-JSON stdout -> return undef without croaking' => sub {
+	# Regression: decode_json() was called unconditionally on $stdout; when
+	# the child wrote a Perl warning or truncated output instead of valid JSON,
+	# the croak escaped Test::Builder's subtest eval and killed the process.
+	#
+	# Strategy: mock open3 so the "child" stdout returns garbage text.
+
+	my $e = bless { allow_signature_exec => 1, verbose => 0 }, 'App::Test::Generator::SchemaExtractor';
+
+	my $garbage = 'NOT VALID JSON AT ALL }{[]';
+	open my $fake_rdr, '<', \$garbage or die;
+	my $empty = '';
+	open my $fake_err, '<', \$empty or die;
+
+	no warnings 'redefine';
+	local *App::Test::Generator::SchemaExtractor::open3 = sub {
+		$_[0] = do { open my $fh, '>', \my $buf; $fh };
+		$_[1] = $fake_rdr;
+		$_[2] = $fake_err;
+		return $$;
+	};
+
+	my $result;
+	lives_ok { $result = $e->_compile_signature_isolated('myfunc', '(positional => [])') }
+		'does not croak when child stdout is non-JSON';
+	is($result, undef, 'returns undef for non-JSON subprocess output');
+};
+
 subtest 'SchemaExtractor::_log - prints to stdout only when verbose is true' => sub {
 	my $e = bless { verbose => 1 }, 'App::Test::Generator::SchemaExtractor';
 

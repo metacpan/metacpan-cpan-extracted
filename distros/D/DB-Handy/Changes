@@ -1,5 +1,59 @@
 Revision history for DB::Handy
 
+1.10  2026-08-11 JST (Japan Standard Time)
+
+  Portability -- Windows reserved device names.  CPAN Testers reported
+  t/1021_integrity.t failing its three K3 subtests on MSWin32, on both
+  perl 5.8.9 and perl 5.42.2, while every other platform passed.  The
+  cause was not the NULL handling those subtests exercise: the fixture
+  table was called "nul", and Windows resolves con, prn, aux, nul,
+  com0-com9 and lpt0-lpt9 to a character device whatever extension
+  follows them.  "nul.sch" was therefore the bit bucket.  create_table
+  saw no file, wrote a schema that went nowhere, and the first INSERT
+  reported that the table did not exist.
+  - Fixed: t/1021_integrity.t names its NULL fixture nl1.  This alone
+    is what the FAIL reports were about.
+  - Fixed: create_database, create_table and create_index now reject
+    the device names above, in any letter case.  Before this a user who
+    named a table "nul" on Windows got a table that appeared to be
+    created, swallowed every write and read back as empty.  The names
+    are rejected on every platform, not only on MSWin32, so that a data
+    directory built on one system stays usable on another.  A name that
+    merely begins with one, such as "nul1", is unaffected.
+  - Incompatible: a database, table or index already carrying one of
+    those names is unreachable from 1.10.  Windows could never hold one,
+    but a system that could -- a Unix host, say -- may have one built by
+    1.09 or earlier, and every method that takes a name now refuses it,
+    drop_database and drop_table included.  There is no way to reach or
+    remove it through the API; use the tools of the operating system.
+    Noted in BUGS AND LIMITATIONS and in README.
+  - Added: t/1022_names.t gains the N9 group (10 assertions) covering
+    the rejection through both the low-level API and the SQL layer.
+  - Documented: the rule in the identifier restriction section, in
+    DIAGNOSTICS under "Invalid database name", and in README.
+
+  Test suite -- assertions that could never fail.  ok() and is() take a
+  plain list, so their arguments are evaluated in list context, and a
+  match in list context returns the empty list when it fails rather than
+  a false scalar.  ok($str =~ /wanted/, 'name') therefore handed 'name'
+  to ok() as the condition and nothing as the description whenever the
+  match failed: the assertion printed itself as a nameless "ok" and could
+  not fail.  With a capture group the error ran the other way, a match
+  capturing '0' reporting a failure.  The module's own ok() carries an
+  ($;$) prototype and was never affected; the harnesses the t/1NNN files
+  define for themselves were.
+  - Fixed: 30 such assertions across twelve test files now force scalar
+    context.  All of them pass once made real, so nothing was hiding
+    behind them.
+  - Added: t/lib/INA_CPAN_Check.pm 0.44 adds K4, which reports a bare
+    match handed to an ok()/is()/isnt() declared without a prototype in
+    the file under test.  pmake.bat 0.50 spells the same rule in its own
+    selfcheck, so the two implementations agree.
+  - Changed: K1 (a comma is followed by whitespace) now runs over t/ as
+    well as lib/, which it has since INA_CPAN_Check 0.43; the test files
+    were brought into line with it, and 48 stray double commas in
+    t/1004_subquery.t and t/1006_cpan_api.t were removed.
+
 1.09  2026-07-31 JST (Japan Standard Time)
 
   SQL engine -- JOIN.  Every item below returned a wrong answer in

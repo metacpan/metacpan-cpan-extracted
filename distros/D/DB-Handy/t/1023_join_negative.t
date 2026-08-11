@@ -71,11 +71,11 @@ $dbh->do("CREATE TABLE b (k INT, q VARCHAR(10))") or die "create b\n";
 # a has three rows; b matches a.x = 1 twice and a.x = 2 once, so an
 # honest inner join is three rows and a Cartesian product is nine.  x = 3
 # has no match, which is what the LEFT JOIN tests hang on.
-for my $r ([1,'p'], [2,'p'], [3,'z']) {
+for my $r ([1, 'p'], [2, 'p'], [3, 'z']) {
     $dbh->do("INSERT INTO a (x,y) VALUES (?,?)", $r->[0], $r->[1])
         or die "insert a\n";
 }
-for my $r ([1,'b1'], [1,'b1b'], [2,'b2']) {
+for my $r ([1, 'b1'], [1, 'b1b'], [2, 'b2']) {
     $dbh->do("INSERT INTO b (k,q) VALUES (?,?)", $r->[0], $r->[1])
         or die "insert b\n";
 }
@@ -143,7 +143,7 @@ my @tests = (
         my $e = '';
         $dbh->selectall_arrayref("SELECT a.y FROM a JOIN b ON a.x < b.k");
         $e = $dbh->errstr;
-        ok((defined($e) && ($e =~ /\QON a.x < b.k\E/)),
+        ok(((defined($e) && ($e =~ /\QON a.x < b.k\E/))) ? 1 : 0,
            'J2 the message quotes the offending ON text');
     },
 
@@ -428,7 +428,7 @@ my @tests = (
     sub {
         $dbh->selectall_arrayref("SELECT * FROM a NATURAL JOIN b");
         my $e = $dbh->errstr;
-        ok((defined($e) && ($e =~ /NATURAL JOIN/)),
+        ok(((defined($e) && ($e =~ /NATURAL JOIN/))) ? 1 : 0,
            'J13 errstr explains which construct was rejected');
     },
     sub {
@@ -459,7 +459,7 @@ my @tests = (
         DB::Handy->connect($ROOT, 'jn',
                            { AutoCommit => 0, RaiseError => 0,
                              PrintError => 0 });
-        ok(($DB::Handy::Connection::errstr =~ /AutoCommit cannot be turned off/),
+        ok((($DB::Handy::Connection::errstr =~ /AutoCommit cannot be turned off/)) ? 1 : 0,
            'J13 the refusal says why');
     },
     sub {

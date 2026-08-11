@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::GitHub::CreateRelease;
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0012'; # VERSION
 
 # ABSTRACT: Create a GitHub Release
 
@@ -404,7 +404,7 @@ Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 =head1 VERSION
 
-version 0.0011
+version 0.0012
 
 =head1 SYNOPSIS
 

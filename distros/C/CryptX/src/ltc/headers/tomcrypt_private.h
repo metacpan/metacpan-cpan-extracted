@@ -47,6 +47,90 @@ LTC_STATIC_ASSERT(correct_ltc_uintptr_size, sizeof(ltc_uintptr) == sizeof(void*)
 
 #define LTC_ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
 
+#if defined(LTC_FAST)
+#if !defined(LTC_NO_INLINE)
+/* The LTC_FAST helpers operate on byte buffers that are not guaranteed to be aligned for LTC_FAST_TYPE.
+   Use memcpy for loads/stores to avoid undefined behavior from unaligned or aliasing-unsafe typed-pointer dereferences.
+   On GCC/Clang prefer __builtin_memcpy: it is guaranteed to be inlined for constant sizes regardless of any
+   user override of XMEMCPY (e.g. embedded builds). Other compilers fall back to XMEMCPY.
+*/
+static LTC_INLINE LTC_FAST_TYPE LTC_FAST_LOAD(const void *p)
+{
+   LTC_FAST_TYPE v;
+#if defined(__GNUC__)
+   __builtin_memcpy(&v, p, sizeof(v));
+#else
+   XMEMCPY(&v, p, sizeof(v));
+#endif
+   return v;
+}
+
+static LTC_INLINE void LTC_FAST_STORE(void *p, LTC_FAST_TYPE v)
+{
+#if defined(__GNUC__)
+   __builtin_memcpy(p, &v, sizeof(v));
+#else
+   XMEMCPY(p, &v, sizeof(v));
+#endif
+}
+
+static LTC_INLINE void LTC_FAST_STOREP(void *dst, void *src)
+{
+#if defined(__GNUC__)
+   __builtin_memcpy(dst, src, sizeof(LTC_FAST_TYPE));
+#else
+   XMEMCPY(dst, src, sizeof(LTC_FAST_TYPE));
+#endif
+}
+
+static LTC_INLINE void LTC_FAST_XOR2(void *dst, const void *src)
+{
+   LTC_FAST_STORE(dst, LTC_FAST_LOAD(dst) ^ LTC_FAST_LOAD(src));
+}
+
+static LTC_INLINE void LTC_FAST_XOR3(void *dst, const void *src1, const void *src2)
+{
+   LTC_FAST_STORE(dst, LTC_FAST_LOAD(src1) ^ LTC_FAST_LOAD(src2));
+}
+
+static LTC_INLINE void LTC_FAST_MASK(void *dst, const void *src, LTC_FAST_TYPE mask)
+{
+   LTC_FAST_STORE(dst, LTC_FAST_LOAD(src) & mask);
+}
+#else
+#define LTC_FAST_LOAD(src) \
+   ({ \
+      LTC_FAST_TYPE LTC_TMPVAR(fast_tmp); \
+      XMEMCPY(&LTC_TMPVAR(fast_tmp), (src), sizeof(LTC_FAST_TYPE)); \
+      LTC_TMPVAR(fast_tmp); \
+   })
+#define LTC_FAST_STORE(dst, v) \
+   do { \
+      XMEMCPY((dst), &(v), sizeof(v)); \
+   } while (0)
+#define LTC_FAST_STOREP(dst, src) \
+   do { \
+      XMEMCPY((dst), (src), sizeof(LTC_FAST_TYPE)); \
+   } while (0)
+#define LTC_FAST_XOR3(dst, src1, src2) \
+   do { \
+      LTC_FAST_TYPE LTC_TMPVAR(fast_src1), LTC_TMPVAR(fast_src2), LTC_TMPVAR(fast_dst); \
+      XMEMCPY(&LTC_TMPVAR(fast_src1), (src1), sizeof(LTC_FAST_TYPE)); \
+      XMEMCPY(&LTC_TMPVAR(fast_src2), (src2), sizeof(LTC_FAST_TYPE)); \
+      LTC_TMPVAR(fast_dst) = LTC_TMPVAR(fast_src1) ^ LTC_TMPVAR(fast_src2); \
+      XMEMCPY((dst), &LTC_TMPVAR(fast_dst), sizeof(LTC_FAST_TYPE)); \
+   } while (0)
+#define LTC_FAST_XOR2(dst, src) LTC_FAST_XOR3((dst), (dst), (src))
+#define LTC_FAST_MASK(dst, src, mask) \
+   do { \
+      LTC_FAST_TYPE LTC_TMPVAR(fast_src), LTC_TMPVAR(fast_dst); \
+      XMEMCPY(&LTC_TMPVAR(fast_src), (src), sizeof(LTC_FAST_TYPE)); \
+      LTC_TMPVAR(fast_dst) = LTC_TMPVAR(fast_src) & (mask); \
+      XMEMCPY((dst), &LTC_TMPVAR(fast_dst), sizeof(LTC_FAST_TYPE)); \
+   } while (0)
+#endif /* if !defined(LTC_NO_INLINE) */
+#endif /* #if defined(LTC_FAST) */
+
 /*
  * Internal Enums
  */
@@ -186,6 +270,7 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
 
 
 #define LTC_SHA_TARGET LTC_ATTRIBUTE((__target__("sse2,ssse3,sse4.1,sha")))
+#define LTC_SHA512_TARGET LTC_ATTRIBUTE((__target__("avx2,sha512")))
 
 #ifdef LTC_SHA1
 int sha1_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
@@ -195,6 +280,18 @@ int sha224_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
 #endif
 #ifdef LTC_SHA256
 int sha256_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
+#endif
+#ifdef LTC_SHA384
+int sha384_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
+#endif
+#ifdef LTC_SHA512
+int sha512_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
+#endif
+#ifdef LTC_SHA512_224
+int sha512_224_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
+#endif
+#ifdef LTC_SHA512_256
+int sha512_256_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
 #endif
 
 #ifdef LTC_KMAC
@@ -372,8 +469,8 @@ struct bufp {
    char *start, *work, *end;
 };
 
-#define SET_BUFP(n, d, l) n.start = (char*)d, n.work = (char*)d, n.end = (char*)d + l + 1
-#define UPDATE_BUFP(n, d, w, l) n.start = (char*)d, n.work = (char*)d + w, n.end = (char*)d + l + 1
+#define SET_BUFP(n, d, l) n.start = (char*)d, n.work = (char*)d, n.end = (char*)d + l
+#define UPDATE_BUFP(n, d, w, l) n.start = (char*)d, n.work = (char*)d + w, n.end = (char*)d + l
 
 struct get_char;
 struct get_char_api {
@@ -414,6 +511,9 @@ struct get_char {
 void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned long len, int coz);
 void password_free(struct password *pw, const struct password_ctx *ctx);
 
+/* Case-insensitive ASCII compare that ignores ' ', '-' and '_'. Returns 1 on match, 0 otherwise. */
+int ltc_algname_match(const char *left, const char *right);
+
 int ltc_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
 int ltc_do_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
 
@@ -433,6 +533,20 @@ int pbes2_extract(const ltc_asn1_list *s, pbes_arg *res);
 #endif
 
 #ifdef LTC_PEM
+extern const struct pem_header_id pem_std_headers[];
+extern const unsigned long pem_std_headers_num;
+extern const struct str pem_proc_type_encrypted;
+#ifdef LTC_SSH
+extern const struct str pem_ssh_comment;
+#endif
+extern const struct str pem_dek_info_start;
+extern const struct blockcipher_info pem_dek_infos[];
+extern const unsigned long pem_dek_infos_num;
+#ifdef LTC_PEM_SSH
+extern const struct blockcipher_info ssh_ciphers[];
+extern const unsigned long ssh_ciphers_num;
+#endif
+
 int pem_decrypt(unsigned char *data, unsigned long *datalen,
                 unsigned char *key,  unsigned long keylen,
                 unsigned char *iv,   unsigned long ivlen,

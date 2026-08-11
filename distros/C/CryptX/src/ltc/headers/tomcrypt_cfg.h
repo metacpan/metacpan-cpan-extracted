@@ -44,13 +44,19 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 #endif
 
 /* some compilers do not like "inline" (or maybe "static inline"), namely: HP cc, IBM xlc */
+#if !defined(LTC_NO_INLINE)
 #if defined(__GNUC__) || defined(__xlc__)
    #define LTC_INLINE __inline__
 #elif defined(_MSC_VER) || defined(__HP_cc)
    #define LTC_INLINE __inline
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
    #define LTC_INLINE inline
-#else
+#endif
+#endif
+#if !defined(LTC_INLINE)
+   #if !defined(LTC_NO_INLINE)
+      #define LTC_NO_INLINE
+   #endif
    #define LTC_INLINE
 #endif
 
@@ -261,17 +267,16 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_NO_SHA256_X86
 #endif
 
-/* No LTC_FAST if: explicitly disabled OR non-gcc/non-clang compiler OR old gcc OR using -ansi -std=c99 */
-#if defined(LTC_NO_FAST) || (__GNUC__ < 4) || defined(__STRICT_ANSI__)
+/* No LTC_FAST if explicitly disabled */
+#if defined(LTC_NO_FAST)
    #undef LTC_FAST
 #endif
 
 #ifdef LTC_FAST
-   #define LTC_FAST_TYPE_PTR_CAST(x) ((LTC_FAST_TYPE*)(void*)(x))
    #ifdef ENDIAN_64BITWORD
-   typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+   typedef ulong64 LTC_FAST_TYPE;
    #else
-   typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+   typedef ulong32 LTC_FAST_TYPE;
    #endif
 #endif
 
@@ -335,6 +340,23 @@ typedef unsigned long ltc_mp_digit;
       #endif
       #if !defined(LTC_NO_SHA256_X86)
          #define LTC_SHA256_X86
+      #endif
+   #endif
+   /* the SHA512 extension intrinsics require GCC 14 resp. clang 17 */
+   #if (defined __GNUC__ && !defined __clang__ && (__GNUC__ >= 14)) || \
+       (defined __clang__ && (__clang_major__ >= 17)) || \
+       (defined _MSC_FULL_VER && (_MSC_FULL_VER) >=  194033813l) /* MSVC 2022 17.10 */
+      #if !defined(LTC_NO_SHA384_X86)
+         #define LTC_SHA384_X86
+      #endif
+      #if !defined(LTC_NO_SHA512_X86)
+         #define LTC_SHA512_X86
+      #endif
+      #if !defined(LTC_NO_SHA512_224_X86)
+         #define LTC_SHA512_224_X86
+      #endif
+      #if !defined(LTC_NO_SHA512_256_X86)
+         #define LTC_SHA512_256_X86
       #endif
    #endif
 #endif
@@ -412,6 +434,12 @@ typedef unsigned long ltc_mp_digit;
 #  define LTC_ATTRIBUTE(x)
 #endif
 
+#if __has_attribute(fallthrough)
+#  define LTC_FALLTHROUGH LTC_ATTRIBUTE((fallthrough))
+#endif
+#ifndef LTC_FALLTHROUGH
+#  define LTC_FALLTHROUGH
+#endif
 #if __has_attribute(target)
 #  define LTC_TARGET(x) LTC_ATTRIBUTE((target(x)))
 #endif

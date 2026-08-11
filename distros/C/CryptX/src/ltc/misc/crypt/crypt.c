@@ -229,6 +229,9 @@ const char *crypt_build_settings =
 #if defined(LTC_SM3)
    "   SM3\n"
 #endif
+#if defined(LTC_BLAKE3)
+   "   BLAKE3\n"
+#endif
 #if defined(LTC_CHC_HASH)
    "   CHC_HASH\n"
 #endif
@@ -536,6 +539,18 @@ const char *crypt_build_settings =
 #if defined(LTC_SHA256) && defined(LTC_SHA256_X86)
    " SHA256-NI "
 #endif
+#if defined(LTC_SHA384) && defined(LTC_SHA384_X86)
+   " SHA384-NI "
+#endif
+#if defined(LTC_SHA512) && defined(LTC_SHA512_X86)
+   " SHA512-NI "
+#endif
+#if defined(LTC_SHA512_224) && defined(LTC_SHA512_224_X86)
+   " SHA512-224-NI "
+#endif
+#if defined(LTC_SHA512_256) && defined(LTC_SHA512_256_X86)
+   " SHA512-256-NI "
+#endif
 #if defined(LTC_DEVRANDOM)
     " LTC_DEVRANDOM "
 #endif
@@ -583,6 +598,11 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_NO_FAST)
     " LTC_NO_FAST "
+#endif
+#if defined(LTC_NO_INLINE)
+    " LTC_NO_INLINE "
+#else
+    " " NAME_VALUE(LTC_INLINE) " "
 #endif
 #if defined(LTC_NO_BSWAP)
     " LTC_NO_BSWAP "

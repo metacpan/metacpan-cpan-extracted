@@ -2,6 +2,7 @@
 
 package Git::Native::Signature;
 use Moo;
+use Carp ();
 use Git::Libgit2::FFI ();
 use Git::Native::Error qw( check_rc );
 
@@ -9,6 +10,13 @@ has name  => ( is => 'ro', required => 1 );
 has email => ( is => 'ro', required => 1 );
 has when  => ( is => 'ro' );                # epoch seconds; default = now
 has offset => ( is => 'ro', default => 0 ); # minutes
+
+# git_signature layout on a 64-bit host:
+#   typedef struct { char *name; char *email; git_time when; } git_signature;
+#   typedef struct { git_time_t time; int offset; char sign; } git_time;
+# giving  0 = char *name, 8 = char *email, 16 = int64 time, 24 = int offset.
+# Stable since libgit2 1.0; re-verified empirically against 1.5.1.
+use constant SIG_HEADER_SIZE => 28;   # through git_time.offset; .sign unused
 
 # Underlying git_signature*; allocated lazily, freed in DESTROY.
 has _handle => (
@@ -33,6 +41,25 @@ sub _build_handle {
   return $sig;
 }
 
+# Wrap a git_signature* libgit2 allocated for us (e.g. git_signature_default).
+# Takes ownership of the handle - DEMOLISH frees it. name/email are COPIED out
+# of the struct into Perl scalars, so they don't dangle once the C handle is
+# freed (same contract as Git::Native::Oid::from_ptr).
+sub from_handle {
+  my ( $class, $ptr ) = @_;
+  Carp::croak 'from_handle: null pointer' unless $ptr;
+  my $ffi = Git::Libgit2::FFI::ffi();
+  my ( $name_ptr, $email_ptr, $when, $offset )
+    = unpack 'Q Q q l', $ffi->cast( 'opaque', 'string(' . SIG_HEADER_SIZE . ')', $ptr );
+  return $class->new(
+    name    => $ffi->cast( 'opaque', 'string', $name_ptr ),
+    email   => $ffi->cast( 'opaque', 'string', $email_ptr ),
+    when    => $when,
+    offset  => $offset,
+    _handle => $ptr,
+  );
+}
+
 sub DEMOLISH {
   my $self = shift;
   Git::Libgit2::FFI::git_signature_free( $self->{_handle} )
@@ -53,7 +80,7 @@ Git::Native::Signature - A Git author/committer signature
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -68,6 +95,42 @@ version 0.004
 
 A Git signature (name + email + timestamp). Wraps C<git_signature*>;
 freed automatically when the object goes out of scope.
+
+Pass one as C<author> or C<committer> to
+L<Git::Native::Repository/commit_create>, or let that method fall back to
+L<Git::Native::Repository/signature_default>, which reads C<user.name> and
+C<user.email> from the repository config.
+
+=head2 name
+
+The human name, e.g. C<'Ada Lovelace'>. Required.
+
+=head2 email
+
+The email address, without angle brackets. Required.
+
+=head2 when
+
+Timestamp in Unix epoch seconds. Leave it unset and the signature is
+stamped with the current time when its libgit2 handle is first built.
+
+=head2 offset
+
+Timezone offset in B<minutes> east of UTC (C<120> for C<+0200>), default
+C<0>. Recorded for display only — C<when> is an absolute epoch either way.
+
+=head2 from_handle
+
+  my $sig = Git::Native::Signature->from_handle($ptr);
+
+Wraps a C<git_signature*> that libgit2 allocated (as
+L<Git::Native::Repository/signature_default> does) and takes ownership of
+it. C<name>, C<email>, C<when> and C<offset> are read out of the C struct
+and copied into Perl, so they stay valid after the handle is freed.
+
+=head1 SEE ALSO
+
+L<Git::Native::Repository>, L<Git::Native::Commit>
 
 =head1 SUPPORT
 

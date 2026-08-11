@@ -9,9 +9,6 @@
 
 #ifdef LTC_PEM
 
-extern const struct pem_header_id pem_std_headers[];
-extern const unsigned long pem_std_headers_num;
-
 static int s_decrypt_pem(unsigned char *asn1_cert, unsigned long *asn1_len, const struct pem_headers *hdr)
 {
    unsigned char iv[MAXBLOCKSIZE], key[MAXBLOCKSIZE];
@@ -73,7 +70,7 @@ static int s_import_pkcs8(unsigned char *asn1_cert, unsigned long asn1_len, ltc_
 {
    int err;
    enum ltc_oid_id oid_id;
-   ltc_asn1_list *alg_id, *priv_key;
+   ltc_asn1_list *alg_id = NULL, *priv_key = NULL;
    ltc_asn1_list *p8_asn1 = NULL;
    if ((err = pkcs8_decode_flexi(asn1_cert, asn1_len, pw_ctx, &p8_asn1)) != CRYPT_OK) {
       goto cleanup;
@@ -216,9 +213,10 @@ int pem_decode_pkcs_filehandle(FILE *f, ltc_pka_key *k, const password_ctx *pw_c
 
 int pem_decode_pkcs(const void *buf, unsigned long len, ltc_pka_key *k, const password_ctx *pw_ctx)
 {
-   LTC_ARGCHK(buf != NULL);
-   LTC_ARGCHK(len != 0);
+   LTC_ARGCHK(buf != NULL || len == 0);
    LTC_ARGCHK(k != NULL);
+   if (len == 0)
+      return CRYPT_OK;
    {
       struct get_char g = pem_get_char_init(buf, len);
       return s_decode(&g, k, pw_ctx);

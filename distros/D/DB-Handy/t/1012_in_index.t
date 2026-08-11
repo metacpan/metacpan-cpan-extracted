@@ -26,10 +26,10 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok  { my($c,$n)=@_; $T++;
+sub ok  { my($c, $n)=@_; $T++;
           $c ? ($PASS++, push @OUT, "ok $T - $n\n")
              : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is  { my($g,$e,$n)=@_; $T++;
+sub is  { my($g, $e, $n)=@_; $T++;
           defined($g) && ("$g" eq "$e")
             ? ($PASS++, push @OUT, "ok $T - $n\n")
             : ($FAIL++, push @OUT, "not ok $T - $n"
@@ -163,7 +163,7 @@ $sth->execute;
 is(join(',', @{$sth->{NAME}}), 'salary,id', "IN: NAME order follows SELECT list");
 my $aref = $sth->fetchrow_arrayref;
 # ok 16
-ok(defined $aref && $aref->[1] =~ /^[17]$/, "IN: fetchrow_arrayref[1] is id");
+ok((defined $aref && $aref->[1] =~ /^[17]$/) ? 1 : 0, "IN: fetchrow_arrayref[1] is id");
 $sth->finish;
 
 ###############################################################################

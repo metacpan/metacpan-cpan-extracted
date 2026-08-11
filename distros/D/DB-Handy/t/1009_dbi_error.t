@@ -20,9 +20,9 @@ use DB::Handy;
 my ($PASS, $FAIL, $T) = (0, 0, 0);
 my @OUT;          # buffered ok() lines
 my $DONE = 0;     # set once the plan has been emitted
-sub ok   { my($c,$n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
-sub is   { my($g,$e,$n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\ (defined $g?$g:'undef')}', exp='$e')\n") }
-sub isnt { my($g,$e,$n)=@_; $T++; !defined($g)||("$g" ne "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (both='$g')\n") }
+sub ok   { my($c, $n)=@_; $T++; $c ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n\n") }
+sub is   { my($g, $e, $n)=@_; $T++; defined($g)&&("$g" eq "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (got='${\ (defined $g?$g:'undef')}', exp='$e')\n") }
+sub isnt { my($g, $e, $n)=@_; $T++; !defined($g)||("$g" ne "$e") ? ($PASS++, push @OUT, "ok $T - $n\n") : ($FAIL++, push @OUT, "not ok $T - $n  (both='$g')\n") }
 
 use File::Path ();
 use File::Spec ();
@@ -85,7 +85,7 @@ END { File::Path::rmtree($BASE) if defined($BASE) && -d $BASE }
     # ok 7
     ok(scalar @warnings > 0, "PrintError: warning was emitted");
     # ok 8
-    ok($warnings[0] =~ /DB::Handy/, "PrintError: warning mentions DB::Handy");
+    ok(($warnings[0] =~ /DB::Handy/) ? 1 : 0, "PrintError: warning mentions DB::Handy");
 
     $dbh->disconnect;
 }
@@ -286,7 +286,7 @@ END { File::Path::rmtree($BASE) if defined($BASE) && -d $BASE }
     # ok 32
     is($rows->[0]{no_space}, 'JohnDoe',  "|| concat no space: JohnDoe");
     # ok 33
-    is($rows->[1]{no_space}, 'JaneSmith',"|| concat no space: JaneSmith");
+    is($rows->[1]{no_space}, 'JaneSmith', "|| concat no space: JaneSmith");
 
     # Concatenation in WHERE via alias (or direct expression filter)
     $rows = $dbh->selectall_arrayref(
@@ -350,7 +350,7 @@ END { File::Path::rmtree($BASE) if defined($BASE) && -d $BASE }
 {
     my $dbh = DB::Handy->connect($BASE, 'etest');
     $dbh->do("CREATE TABLE dist (id INT, cat VARCHAR(5))");
-    for my $row ([1,'A'],[2,'B'],[3,'A'],[4,'C'],[5,'B'],[6,'A']) {
+    for my $row ([1, 'A'], [2, 'B'], [3, 'A'], [4, 'C'], [5, 'B'], [6, 'A']) {
         $dbh->do("INSERT INTO dist (id,cat) VALUES ($row->[0],'$row->[1]')");
     }
 

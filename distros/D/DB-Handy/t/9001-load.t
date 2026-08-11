@@ -93,7 +93,7 @@ diag("load error: $@") if $@;
 
 # ok 2-3: VERSION
 ok(defined $DB::Handy::VERSION,           'DB::Handy: $VERSION defined');
-ok($DB::Handy::VERSION =~ /^\d+\.\d+/,   'DB::Handy: $VERSION looks like a version number');
+ok(($DB::Handy::VERSION =~ /^\d+\.\d+/) ? 1 : 0,   'DB::Handy: $VERSION looks like a version number');
 
 # ok 4-5: sub-packages present
 ok(defined $DB::Handy::Connection::{new}, 'DB::Handy::Connection package present');

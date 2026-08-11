@@ -11,6 +11,9 @@ use Test::More;
 use URI::Escape qw(uri_escape);
 
 use lib 'lib';
+use lib 't/lib';
+
+use Local::CollectorFixture qw(wait_for_managed_loop);
 
 use Developer::Dashboard::ActionRunner;
 use Developer::Dashboard::Auth;
@@ -147,20 +150,277 @@ PAGE
     open my $fh, '>', $pidfile or die $!;
     print {$fh} $managed_child;
     close $fh;
-    my @loops;
-    for ( 1 .. 20 ) {
-        @loops = $runner->running_loops;
-        last if @loops == 1;
-        select undef, undef, undef, 0.1;
-    }
+    # Wait BEFORE the first running_loops call, not around it. This pidfile has
+    # no loop state, so the child's process title is the only evidence of its
+    # identity, and running_loops deletes the pidfile of any same-namespace pid it
+    # cannot recognize. A poll loop therefore destroys its own fixture on the
+    # first iteration and can never recover, however many iterations it is given.
+    ok(
+        wait_for_managed_loop( $runner, $managed_child, $loop_name ),
+        'managed loop child becomes identifiable before running_loops reads the collectors root',
+    );
+    my @loops = $runner->running_loops;
     is( scalar @loops, 1, 'running_loops lists active managed loop pids' );
     is( $loops[0]{name}, $loop_name, 'running_loops returns the managed loop name' );
+
+    $collector_store->mark_run_started( $loop_name, {} );
+    ok( $collector_store->read_status($loop_name)->{running}, 'collector status reports running before the loop is stopped' );
 
     my $stopped_pid = $runner->stop_loop($loop_name);
     is( $stopped_pid, $managed_child, 'stop_loop returns managed loop pid' );
     waitpid( $managed_child, 0 );
     ok( !-e $pidfile, 'stop_loop removes loop pid files after forced kill' );
     ok( !-e $statefile, 'stop_loop removes loop state files after forced kill' );
+
+    my $status_after_stop = $collector_store->read_status($loop_name) || {};
+    ok( !$status_after_stop->{running}, 'stop_loop resets the consumer-facing running flag so a stopped collector is no longer reported as running' );
+    is( $status_after_stop->{active_runs}, 0, 'stop_loop clears active_runs when the loop is stopped so in-flight counters do not linger' );
+}
+
+{
+    is( $collector_store->mark_stopped('never.seeded.collector'), undef, 'mark_stopped is a no-op when the collector has no status file yet' );
+
+    $collector_store->mark_run_started( 'reset.direct.collector', {} );
+    ok( $collector_store->read_status('reset.direct.collector')->{running}, 'seeded collector status reports running' );
+    is( $collector_store->read_status('reset.direct.collector')->{active_runs}, 1, 'seeded collector status reports one active run' );
+
+    $collector_store->mark_stopped('reset.direct.collector');
+    my $reset = $collector_store->read_status('reset.direct.collector');
+    ok( !$reset->{running}, 'mark_stopped clears the running flag directly' );
+    is( $reset->{active_runs}, 0, 'mark_stopped clears active_runs directly' );
+    ok( defined $reset->{stopped_at} && $reset->{stopped_at} ne '', 'mark_stopped records when the collector was stopped' );
+}
+
+{
+    # Fix A: a just-spawned worker must be persisted to active_worker_pids
+    # immediately, not only at the top of the next iteration, so a crash cannot
+    # orphan a worker that is invisible to the persisted state.
+    my $persist_name = 'coverage.persist.on.spawn';
+    my $child = fork();
+    die "fork failed: $!" if !defined $child;
+    if ( !$child ) {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_job_is_due = sub { return 1 };
+        my $ok = $runner->_run_loop_child(
+            daemonize     => 0,
+            interval      => 1,
+            job           => { command => 'sleep 30', cwd => $home },
+            name          => $persist_name,
+            schedule_mode => 'interval',
+            single_tick   => 1,
+            title         => $runner->_process_title($persist_name),
+        );
+        exit( $ok ? 0 : 1 );
+    }
+    waitpid( $child, 0 );
+    my @persisted = $runner->_state_active_worker_pids($persist_name);
+    ok( scalar(@persisted) >= 1, 'loop persists active_worker_pids immediately on spawn so a just-started worker survives a crash-and-stop' );
+    for my $wpid (@persisted) { kill 9, -$wpid; kill 9, $wpid; }
+}
+
+{
+    # Fix D (Facet 1c): a command child that ignores SIGTERM stays alive in the
+    # worker's process group after the worker (group leader) exits; pass 2 must
+    # send the group SIGKILL unconditionally to reap it.
+    my $gc_file = File::Spec->catfile( $home, "trapgc.$$" );
+    unlink $gc_file;
+    my $worker = fork();
+    die "fork failed: $!" if !defined $worker;
+    if ( !$worker ) {
+        setsid();
+        my $gc = fork();
+        if ( !defined $gc ) { exit 1 }
+        if ( !$gc ) {
+            $SIG{TERM} = 'IGNORE';
+            select undef, undef, undef, 60;
+            exit 0;
+        }
+        open my $gf, '>', $gc_file or exit 1;
+        print {$gf} $gc;
+        close $gf;
+        $SIG{TERM} = 'DEFAULT';
+        select undef, undef, undef, 60;
+        exit 0;
+    }
+    my $gc_pid = '';
+    for ( 1 .. 60 ) { last if -s $gc_file; select undef, undef, undef, 0.05; }
+    if ( open my $gf, '<', $gc_file ) { local $/; $gc_pid = <$gf>; close $gf; }
+    $gc_pid =~ s/\s+//g;
+    ok( $gc_pid && kill( 0, $gc_pid ), 'SIGTERM-ignoring command child is running before termination' );
+    $runner->_terminate_loop_workers( { $worker => 1 } );
+    select undef, undef, undef, 0.3;
+    ok( !kill( 0, $gc_pid ), '_terminate_loop_workers group-SIGKILLs a SIGTERM-ignoring child left in a dead worker process group' );
+    kill 9, -$worker; kill 9, $worker; waitpid( $worker, 0 ) if kill 0, $worker;
+    unlink $gc_file;
+}
+
+{
+    # Fix E (Facet 5): on a proc-blind host (no /proc, no ps: Windows) a live
+    # loop recorded in loop.json must still be recognized from its pid/name/title
+    # even when its status is outside the old whitelist, so stop can kill it.
+    my $ename  = 'coverage.confirm.broadened';
+    my $echild = fork();
+    die "fork failed: $!" if !defined $echild;
+    if ( !$echild ) { $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 60; exit 0; }
+    my $epidfile = $runner->_pidfile($ename);
+    open my $ef, '>', $epidfile or die $!;
+    print {$ef} $echild;
+    close $ef;
+    $runner->_write_loop_state(
+        $ename,
+        {
+            pid          => $echild,
+            name         => $ename,
+            process_name => $runner->_process_title($ename),
+            status       => 'attention',
+        }
+    );
+    my $ret;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_read_process_title      = sub { return undef };
+        local *Developer::Dashboard::CollectorRunner::_read_process_env_marker = sub { return undef };
+        $ret = $runner->stop_loop($ename);
+    }
+    is( $ret, $echild, 'stop_loop returns a state-confirmed loop pid when proc/ps identity is unavailable' );
+    select undef, undef, undef, 0.3;
+    ok( !kill( 0, $echild ), 'stop_loop kills a state-confirmed loop with a non-whitelisted status on proc-blind (Windows) hosts' );
+    kill 9, $echild; waitpid( $echild, 0 ) if kill 0, $echild;
+}
+
+{
+    # Fix B+C (Facet 2): the loop TERM grace scales with the recorded worker
+    # count so the loop's own shutdown handler can finish cleaning workers
+    # instead of being KILL-9'd at a fixed 2s.
+    my $bname = 'coverage.grace.scaled';
+    my $flag  = File::Spec->catfile( $home, "graceflag.$$" );
+    unlink $flag;
+    $runner->_write_loop_state(
+        $bname,
+        {
+            pid                => 0,
+            name               => $bname,
+            process_name       => $runner->_process_title($bname),
+            status             => 'running',
+            active_worker_pids => [ 2000000001, 2000000002 ],
+        }
+    );
+    # The child announces that its TERM handler is installed, and the parent waits
+    # for that announcement before stopping it (DD-489).
+    #
+    # This assertion is about the GRACE the parent gives a handler that takes
+    # three seconds. It can only measure that if the handler exists when the
+    # signal arrives. Nothing used to guarantee it did: the parent wrote the
+    # pidfile and called stop_loop straight after forking, so on a starved host
+    # TERM could reach the child before $SIG{TERM} was set, the default action
+    # killed it instantly, and the flag file was never written - reported as the
+    # parent failing to scale its grace, which is the opposite of what happened.
+    #
+    # Recognition helpers cannot cover this one. wait_for_managed_loop waits for
+    # the RUNNER to recognise the loop, and this fixture writes the loop state by
+    # hand, so recognition is already true while the handler still is not. Only
+    # the child knows when it is ready, so only the child can say so.
+    my $ready = "$flag.ready";
+    unlink $ready;
+    my $bchild = fork();
+    die "fork failed: $!" if !defined $bchild;
+    if ( !$bchild ) {
+        my $flagfile = $flag;
+        $SIG{TERM} = sub {
+            select undef, undef, undef, 3;
+            if ( open my $f, '>', $flagfile ) { print {$f} 'done'; close $f; }
+            exit 0;
+        };
+        $0 = $runner->_process_title($bname);
+        $ENV{DEVELOPER_DASHBOARD_LOOP_NAME} = $bname;
+        if ( open my $r, '>', $ready ) { print {$r} 'ready'; close $r; }
+        select undef, undef, undef, 60;
+        exit 0;
+    }
+
+    # Bounded, and loud when it expires: a fixture that silently gave up waiting
+    # would turn this into the very flake it is meant to remove.
+    my $ready_deadline = time + 30;
+    until ( -f $ready || time > $ready_deadline ) { select undef, undef, undef, 0.02 }
+    ok( -f $ready, 'the grace fixture child installed its TERM handler before it was stopped' );
+    my $bpidfile = $runner->_pidfile($bname);
+    open my $bf, '>', $bpidfile or die $!;
+    print {$bf} $bchild;
+    close $bf;
+    $runner->_write_loop_state( $bname, { pid => $bchild } );
+    $runner->stop_loop($bname);
+    ok( -f $flag, 'stop_loop scales the loop TERM grace by worker count so the loop finishes its own worker cleanup before any KILL-9' );
+    kill 9, $bchild; waitpid( $bchild, 0 ) if kill 0, $bchild;
+    unlink $flag;
+    unlink "$flag.ready";
+}
+
+{
+    # Fix B+C else-branch (Facet 4): a crashed loop (dead pidfile) that left
+    # orphaned workers recorded in state must still have those workers swept.
+    my $cname  = 'coverage.crashed.loop.orphans';
+    my $orphan = fork();
+    die "fork failed: $!" if !defined $orphan;
+    if ( !$orphan ) { setsid(); $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 60; exit 0; }
+    my $deadpid = fork();
+    die "fork failed: $!" if !defined $deadpid;
+    if ( !$deadpid ) { exit 0; }
+    waitpid( $deadpid, 0 );
+    my $cpidfile = $runner->_pidfile($cname);
+    open my $cf, '>', $cpidfile or die $!;
+    print {$cf} $deadpid;
+    close $cf;
+    $runner->_write_loop_state(
+        $cname,
+        {
+            pid                => $deadpid,
+            name               => $cname,
+            process_name       => $runner->_process_title($cname),
+            status             => 'running',
+            active_worker_pids => [$orphan],
+        }
+    );
+    $runner->stop_loop($cname);
+    select undef, undef, undef, 0.3;
+    ok( !kill( 0, $orphan ), 'stop_loop sweeps orphaned worker subtrees left behind by a crashed loop with a stale pidfile' );
+    kill 9, -$orphan; kill 9, $orphan; waitpid( $orphan, 0 ) if kill 0, $orphan;
+}
+
+{
+    # Fix A (dedup): start_loop must recognize an already-running managed loop
+    # from its recorded state even when proc/ps identity is unavailable, so the
+    # supervisor cannot create a DUPLICATE loop by racing a fresh loop before it
+    # has set its process title.
+    my $dname = 'coverage.startloop.dedup';
+    my $dchild = fork();
+    die "fork failed: $!" if !defined $dchild;
+    if ( !$dchild ) { $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 60; exit 0; }
+    my $dpidfile = $runner->_pidfile($dname);
+    open my $dpf, '>', $dpidfile or die $!;
+    print {$dpf} $dchild;
+    close $dpf;
+    $runner->_write_loop_state(
+        $dname,
+        {
+            pid          => $dchild,
+            name         => $dname,
+            process_name => $runner->_process_title($dname),
+            status       => 'running',
+        }
+    );
+    my $forked = 0;
+    my $ret;
+    {
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::CollectorRunner::_read_process_title      = sub { return undef };
+        local *Developer::Dashboard::CollectorRunner::_read_process_env_marker = sub { return undef };
+        local *Developer::Dashboard::CollectorRunner::_fork_process            = sub { $forked++; return 4000000001; };
+        $ret = $runner->start_loop( { name => $dname, command => 'true', cwd => $home, interval => 1 } );
+    }
+    is( $ret,    $dchild, 'start_loop returns the existing loop pid when it is state-confirmed on a proc-blind host' );
+    is( $forked, 0,       'start_loop does not fork a duplicate loop when the existing loop is recognized from state' );
+    kill 9, $dchild; waitpid( $dchild, 0 ) if kill 0, $dchild;
+    $runner->_cleanup_loop_files($dname);
 }
 
 {
@@ -238,12 +498,17 @@ PAGE
         print {$fh} $pid;
         close $fh;
     }
-    my @loops;
-    for ( 1 .. 10 ) {
-        @loops = $runner->running_loops;
-        last if @loops == @names;
-        select undef, undef, undef, 0.2;
+    # Same ordering rule as the listing fixture above: every child has to be
+    # recognizable before running_loops is called at all, because the first call
+    # sweeps away the pidfile of any child it does not recognize and the sort then
+    # has nothing left to order.
+    for my $index ( 0 .. $#names ) {
+        ok(
+            wait_for_managed_loop( $runner, $children[$index], $names[$index] ),
+            "managed loop child $names[$index] becomes identifiable before the sorted listing is read",
+        );
     }
+    my @loops = $runner->running_loops;
     is_deeply(
         [ map { $_->{name} } @loops ],
         [ sort @names ],

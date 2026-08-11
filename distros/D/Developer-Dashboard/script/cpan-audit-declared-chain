@@ -1,0 +1,562 @@
+#!/usr/bin/env perl
+
+# IMPORTANT: this gate answers a different question from script/cpan-audit-project.
+# That gate asks "is the set of distributions installed in this root vulnerable?".
+# This gate asks "does the declared dependency chain PERMIT a vulnerable
+# resolution?" - which is what an installer actually decides. A resolver always
+# takes the newest release, so an installed-only audit stays green even while
+# the declared floors allow a vulnerable version, and a floor list derived from
+# the modules cpanfile names never sees the transitive requirements that
+# libwww-perl, Dancer2 and JSON::MaybeXS pull in on their own.
+
+use strict;
+use warnings;
+
+use File::Basename qw(basename dirname);
+use File::Spec;
+use Getopt::Long qw(GetOptions);
+use JSON::XS ();
+
+use constant EXIT_CLEAN   => 0;
+use constant EXIT_FINDING => 1;
+use constant EXIT_UNUSABLE => 2;
+
+exit main(@ARGV);
+
+# Purpose: run the declared-chain advisory gate end to end.
+# Input: the raw @ARGV list (one positional Perl library root, plus the
+#        optional --cpanfile and --exclude-file overrides).
+# Output: an exit code - 0 clean, 1 at least one permitted vulnerable
+#         resolution, 2 the gate could not audit anything and refuses to
+#         report a clean result it did not establish.
+sub main {
+    my @argv = @_;
+
+    my $repo_root = File::Spec->rel2abs( File::Spec->catdir( dirname(__FILE__), File::Spec->updir ) );
+    my $cpanfile  = File::Spec->catfile( $repo_root, 'cpanfile' );
+    my $exclusions = File::Spec->catfile( $repo_root, 'cpan-audit-exclusions.txt' );
+
+    local @ARGV = @argv;
+    GetOptions(
+        'cpanfile=s'     => \$cpanfile,
+        'exclude-file=s' => \$exclusions,
+    ) or return _usage('unrecognized option');
+    my @positional = @ARGV;
+
+    return _usage('exactly one Perl library root is required')
+        if @positional != 1;
+    my $perl5_root = $positional[0];
+    return _usage("not a directory: $perl5_root") if !-d $perl5_root;
+    return _usage("cpanfile not readable: $cpanfile") if !-f $cpanfile;
+
+    my $version_class = _load_audit_modules();
+    return _unusable('CPAN::Audit::DB and CPAN::Audit::Version must be loadable; install CPAN::Audit and put it on PERL5LIB')
+        if !$version_class;
+
+    my $declared = _parse_cpanfile($cpanfile);
+    return _unusable("no runtime requirements declared in $cpanfile")
+        if !%{$declared};
+
+    my $metadata = _index_metadata($perl5_root);
+    return _unusable(
+        sprintf 'the closure would be incomplete - %d distribution metadata file(s) could not be read: %s',
+        scalar @{ $metadata->{unusable} },
+        join( '; ', @{ $metadata->{unusable} } )
+    ) if @{ $metadata->{unusable} };
+    return _unusable("no distribution metadata (.meta) found under $perl5_root; the declared chain cannot be walked")
+        if !%{ $metadata->{module_to_dist} };
+
+    my $demand = _closure( $declared, $metadata );
+    my $floors = _distribution_floors( $demand, $metadata );
+    my $excluded = _read_exclusions($exclusions);
+
+    my @findings = _findings( $floors, $excluded, $version_class );
+
+    printf "declared-chain closure: %d modules across %d distributions under %s\n",
+        scalar( keys %{$demand} ), scalar( keys %{$floors} ), $perl5_root;
+
+    if ( !@findings ) {
+        print "No distribution in the declared runtime closure permits a version inside an advisory range.\n";
+        return EXIT_CLEAN;
+    }
+
+    for my $finding ( @findings ) {
+        printf "%s permits %s which has advisory %s\n",
+            $finding->{distribution}, $finding->{permitted}, $finding->{advisory};
+        printf "    affected range: %s\n", $finding->{affected};
+        printf "    fixed range:    %s\n", ( $finding->{fixed} eq '' ? '(no fixed release)' : $finding->{fixed} );
+        printf "    floor demanded: %s (%s)\n", $finding->{floor}, $finding->{because};
+        printf "    remedy:         declare a floor for %s at or above the fixed range in cpanfile, Makefile.PL and dist.ini, or record a reviewed disposition for %s\n",
+            $finding->{main_module}, $finding->{advisory};
+    }
+    printf "%d permitted vulnerable resolution(s) in the declared chain\n", scalar(@findings);
+
+    return EXIT_FINDING;
+}
+
+# Purpose: print the usage diagnostic for a caller error.
+# Input: a one-line reason string.
+# Output: the EXIT_UNUSABLE exit code (the message goes to STDERR).
+sub _usage {
+    my ($reason) = @_;
+    my $name = basename(__FILE__);
+    printf {*STDERR} "%s\n", $reason;
+    printf {*STDERR} "Usage: %s [--cpanfile PATH] [--exclude-file PATH] <perl5-library-root>\n", $name;
+    return EXIT_UNUSABLE;
+}
+
+# Purpose: refuse to report a clean chain the gate could not actually audit.
+# Input: a one-line reason string.
+# Output: the EXIT_UNUSABLE exit code (the message goes to STDERR).
+sub _unusable {
+    my ($reason) = @_;
+    printf {*STDERR} "cannot audit the declared chain: %s\n", $reason;
+    return EXIT_UNUSABLE;
+}
+
+# Purpose: load the CPAN::Audit advisory database and version-range comparator
+#          without dying when the audit tool is absent from this runtime.
+# Input: none.
+# Output: a CPAN::Audit::Version instance, or undef when either module is
+#         unavailable.
+sub _load_audit_modules {
+    my $loaded = eval {
+        require CPAN::Audit::DB;
+        require CPAN::Audit::Version;
+        1;
+    };
+    return undef if !$loaded;    ## no critic
+    return CPAN::Audit::Version->new;
+}
+
+# Purpose: read the top-level runtime requirements the distribution declares.
+# Input: the path to a cpanfile.
+# Output: a hash reference of module name => declared minimum version string.
+#         Phase blocks (on 'configure' => sub { ... }) and the perl floor are
+#         skipped, because neither is part of the runtime closure.
+sub _parse_cpanfile {
+    my ($path) = @_;
+
+    my %declared;
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    my $depth = 0;
+    while ( my $line = <$fh> ) {
+        $depth++ if $line =~ /=>\s*sub\s*\{/;
+        $depth-- if $line =~ /^\s*\}\s*;/;
+        next if $depth > 0;
+        next if $line !~ /^\s*requires\s+['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)?;/;
+        my ( $module, $minimum ) = ( $1, $2 );
+        next if $module eq 'perl';
+        $declared{$module} = defined $minimum ? $minimum : '0';
+    }
+    close $fh or die "Unable to close $path: $!";
+
+    return \%declared;
+}
+
+# Purpose: index every installed distribution's metadata under a Perl library
+#          root so the declared chain can be walked without network access.
+# Input: a Perl library root (the directory handed to cpanm's -L, plus its
+#        architecture subdirectories).
+# Output: a hash reference with four sub-indexes:
+#           module_to_dist   module name        => distribution name
+#           runtime_requires distribution name  => { module => minimum }
+#           releases         distribution name  => installed version string
+#           unusable         list of "path (reason)" for every metadata file
+#                            that could not be read, which the caller must
+#                            treat as fatal rather than walking a partial chain
+sub _index_metadata {
+    my ($root) = @_;
+
+    my %module_to_dist;
+    my %runtime_requires;
+    my %releases;
+    my @unusable;
+
+    for my $meta_root ( _meta_roots($root) ) {
+        opendir my $dh, $meta_root or next;
+        my @dists = sort grep { !/^\./ } readdir $dh;
+        closedir $dh or die "Unable to close $meta_root: $!";
+
+        for my $dist_dir (@dists) {
+            my $install = File::Spec->catfile( $meta_root, $dist_dir, 'install.json' );
+            my $mymeta  = File::Spec->catfile( $meta_root, $dist_dir, 'MYMETA.json' );
+            next if !-f $install;
+
+            my ( $installed, $install_error ) = _decode_json_file($install);
+            if ( defined $install_error ) {
+                push @unusable, "$install ($install_error)";
+                next;
+            }
+            my $name = $installed->{dist};
+            next if !defined $name;
+            $name =~ s/-v?[0-9][0-9._]*\z//;
+            next if $name eq '';
+
+            $releases{$name} = $installed->{version} if defined $installed->{version};
+            for my $module ( keys %{ $installed->{provides} || {} } ) {
+                $module_to_dist{$module} = $name if !exists $module_to_dist{$module};
+            }
+
+            next if !-f $mymeta;
+            my ( $declared, $mymeta_error ) = _decode_json_file($mymeta);
+            if ( defined $mymeta_error ) {
+                push @unusable, "$mymeta ($mymeta_error)";
+                next;
+            }
+            my $requires = $declared->{prereqs}{runtime}{requires} || {};
+            $runtime_requires{$name} = $requires;
+        }
+    }
+
+    return {
+        module_to_dist   => \%module_to_dist,
+        runtime_requires => \%runtime_requires,
+        releases         => \%releases,
+        unusable         => \@unusable,
+    };
+}
+
+# Purpose: list every directory that can hold cpanm distribution metadata for a
+#          library root, covering both the plain and architecture layouts.
+# Input: a Perl library root.
+# Output: a list of existing .meta directory paths.
+sub _meta_roots {
+    my ($root) = @_;
+
+    my @candidates = ( File::Spec->catdir( $root, '.meta' ) );
+    if ( opendir my $dh, $root ) {
+        for my $entry ( sort grep { !/^\./ } readdir $dh ) {
+            push @candidates, File::Spec->catdir( $root, $entry, '.meta' );
+        }
+        closedir $dh or die "Unable to close $root: $!";
+    }
+
+    return grep { -d $_ } @candidates;
+}
+
+# Purpose: decode a JSON metadata file, reporting why it was unusable instead of
+#          swallowing the failure. A dropped metadata file shrinks the closure,
+#          and a shrunken closure can hide exactly the finding this gate exists
+#          to make, so the caller is given the reason to fail closed on rather
+#          than an undef it could quietly skip.
+# Input: a file path.
+# Output: a two element list of the decoded hash reference and a failure reason.
+#         Exactly one of the two is defined.
+sub _decode_json_file {
+    my ($path) = @_;
+
+    my $handle;
+    if ( !open $handle, '<', $path ) {
+        return ( undef, "unreadable: $!" );    ## no critic
+    }
+
+    my $content = do { local $/; <$handle> };
+    close $handle or die "Unable to close $path: $!";
+
+    my $decoded = eval { JSON::XS->new->decode( defined $content ? $content : '' ) };
+    if ( !defined $decoded || ref $decoded ne 'HASH' ) {
+        my $reason = $@ || 'metadata is not a JSON object';
+        chomp $reason;
+        return ( undef, "unparseable: $reason" );    ## no critic
+    }
+
+    return ( $decoded, undef );    ## no critic
+}
+
+# Purpose: expand the declared requirements into the full transitive runtime
+#          closure, keeping the highest floor demanded for each module.
+# Input: the declared module => minimum map, and the metadata index.
+# Output: a hash reference of module name => { floor, because } where "because"
+#         names the requirement that produced the winning floor.
+sub _closure {
+    my ( $declared, $metadata ) = @_;
+
+    my %demand;
+    my @queue;
+    for my $module ( sort keys %{$declared} ) {
+        $demand{$module} = { floor => $declared->{$module}, because => 'declared in cpanfile' };
+        push @queue, $module;
+    }
+
+    my %visited;
+    while (@queue) {
+        my $module = shift @queue;
+        next if $visited{$module}++;
+
+        my $dist = $metadata->{module_to_dist}{$module};
+        next if !defined $dist;
+
+        my $requires = $metadata->{runtime_requires}{$dist} || {};
+        for my $required ( sort keys %{$requires} ) {
+            next if $required eq 'perl';
+            my $floor = defined $requires->{$required} ? $requires->{$required} : '0';
+            my $because = "runtime/requires of $dist";
+            if ( !exists $demand{$required} ) {
+                $demand{$required} = { floor => $floor, because => $because };
+            }
+            elsif ( _version_cmp( $floor, $demand{$required}{floor} ) > 0 ) {
+                $demand{$required} = { floor => $floor, because => $because };
+            }
+            push @queue, $required;
+        }
+    }
+
+    return \%demand;
+}
+
+# Purpose: collapse per-module floors onto the distributions that ship them, so
+#          the gate can reason about the release an installer would pick.
+# Input: the closure demand map and the metadata index.
+# Output: a hash reference of distribution name => { floor, because }.
+sub _distribution_floors {
+    my ( $demand, $metadata ) = @_;
+
+    my %floors;
+    for my $module ( sort keys %{$demand} ) {
+        my $dist = $metadata->{module_to_dist}{$module};
+        next if !defined $dist;
+
+        my $floor   = $demand->{$module}{floor};
+        my $because = "$module >= $floor, " . $demand->{$module}{because};
+        if ( !exists $floors{$dist} || _version_cmp( $floor, $floors{$dist}{floor} ) > 0 ) {
+            $floors{$dist} = { floor => $floor, because => $because };
+        }
+    }
+
+    return \%floors;
+}
+
+# Purpose: read the reviewed advisory disposition list shared with the
+#          installed-distribution gate.
+# Input: the path to the exclusions file (missing file means no exclusions).
+# Output: a hash reference of advisory id => 1.
+sub _read_exclusions {
+    my ($path) = @_;
+
+    my %excluded;
+    return \%excluded if !-f $path;
+
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    while ( my $line = <$fh> ) {
+        chomp $line;
+        $line =~ s/\s+\z//;
+        next if $line =~ /\A\s*\z/ || $line =~ /\A\s*#/;
+        $excluded{$line} = 1;
+    }
+    close $fh or die "Unable to close $path: $!";
+
+    return \%excluded;
+}
+
+# Purpose: report every distribution whose lowest permitted release still sits
+#          inside a published advisory range.
+# Input: the distribution floor map, the exclusion set, and the version
+#        comparator.
+# Output: a list of finding hash references, sorted by distribution name.
+sub _findings {
+    my ( $floors, $excluded, $version_class ) = @_;
+
+    my $db = CPAN::Audit::DB->db;
+    my @findings;
+
+    for my $dist ( sort keys %{$floors} ) {
+        my $entry = $db->{dists}{$dist};
+        next if !$entry;
+
+        my $floor     = $floors->{$dist}{floor};
+        my $permitted = _lowest_permitted( $entry, $floor, $version_class );
+
+        for my $advisory ( @{ $entry->{advisories} || [] } ) {
+            my $id = $advisory->{id};
+            next if !defined $id || $excluded->{$id};
+
+            my @affected = @{ $advisory->{affected_versions} || [] };
+            my $hit = 0;
+            for my $range (@affected) {
+                $hit = 1 if _in_range( $version_class, $permitted, $range );
+            }
+            next if !$hit;
+
+            push @findings, {
+                distribution => $dist,
+                permitted    => $permitted,
+                advisory     => $id,
+                affected     => join( ', ', @affected ),
+                fixed        => join( ', ', @{ $advisory->{fixed_versions} || [] } ),
+                floor        => $floor,
+                because      => $floors->{$dist}{because},
+                main_module  => $entry->{main_module} || $dist,
+            };
+        }
+    }
+
+    return @findings;
+}
+
+# Purpose: find the lowest released version of a distribution that the declared
+#          floor still allows an installer to choose.
+# Input: the advisory database entry for the distribution, the declared floor,
+#        and the version comparator.
+# Output: a version string - the lowest known release at or above the floor,
+#         falling back to the floor itself when no release list matches.
+sub _lowest_permitted {
+    my ( $entry, $floor, $version_class ) = @_;
+
+    my @permitted =
+        grep { _in_range( $version_class, $_, ">=$floor" ) }
+        map  { $_->{version} }
+        grep { defined $_->{version} } @{ $entry->{versions} || [] };
+    return $floor if !@permitted;
+
+    my $lowest = $permitted[0];
+    for my $candidate (@permitted) {
+        $lowest = $candidate if _version_cmp( $candidate, $lowest ) < 0;
+    }
+    return $lowest;
+}
+
+# Purpose: compare a version against a CPAN::Audit range without letting an
+#          unparseable version string abort the audit.
+# Input: the version comparator, a version string, and a range expression.
+# Output: 1 when the version falls inside the range, 0 otherwise.
+sub _in_range {
+    my ( $version_class, $candidate, $range ) = @_;
+
+    my $inside = eval { $version_class->in_range( $candidate, $range ) };
+    return $inside ? 1 : 0;
+}
+
+# Purpose: order two CPAN version strings without numifying them, because
+#          numifying an alpha release such as 1.28_001 is lossy and emits a
+#          warning, and warnings are failures in this project.
+# Input: two version strings, either of which may be undef, empty, dotted
+#        decimal, v-prefixed or an underscored alpha release.
+# Output: -1, 0 or 1 in the usual comparison sense. Unparseable strings sort as
+#         the lowest possible version rather than aborting the audit.
+sub _version_cmp {
+    my ( $left, $right ) = @_;
+
+    my $left_version  = _parse_version($left);
+    my $right_version = _parse_version($right);
+
+    return $left_version <=> $right_version;
+}
+
+# Purpose: turn a CPAN version string into a comparable version object.
+# Input: a version string, possibly undef, empty or unparseable.
+# Output: a version object, defaulting to version 0 when parsing fails.
+sub _parse_version {
+    my ($raw) = @_;
+
+    require version;
+    return version->parse(0) if !defined $raw || $raw eq '';
+    my $parsed = eval { version->parse($raw) };
+    return defined $parsed ? $parsed : version->parse(0);
+}
+
+__END__
+
+=head1 NAME
+
+cpan-audit-declared-chain - audit the transitive runtime closure of the declared
+dependency chain for permitted vulnerable resolutions
+
+=head1 WHAT IT IS
+
+A fail-closed advisory gate that reads the distribution's own declared runtime
+requirements, walks every runtime requirement reachable from them using the
+metadata cpanm writes next to each installed distribution, and reports any
+distribution whose lowest still-permitted release falls inside a published CPAN
+security advisory range.
+
+=head1 WHAT IT IS FOR
+
+It answers the question an installer answers, which is not the question an
+installed-distribution scan answers. A scan of what happens to be installed
+reports the versions a resolver already picked, and a resolver always picks the
+newest release, so that scan stays green while the declared floors still permit
+a vulnerable version. This gate reports the floor itself.
+
+=head1 WHY IT EXISTS
+
+The advisory floor list was originally derived from the modules the C<cpanfile>
+names, while the real exposure comes from the transitive closure. Two modules
+reached the product that way and were only caught by manual audit:
+
+=over 4
+
+=item * C<HTTP::Date>, required by C<libwww-perl>, where a vulnerable 6.06
+satisfied every declared requirement.
+
+=item * C<HTML::Parser>, required by C<libwww-perl> under the names
+C<HTML::Entities> and C<HTML::HeadParser>, where the only floor anywhere in the
+chain was 3.71 and a vulnerable 3.83 satisfied it.
+
+=back
+
+Neither module is named in the C<cpanfile> and neither is called by the product,
+so no source-level check could ever have found them. The declared floor is the
+whole mitigation, and this gate is what verifies the floor is actually there.
+
+=head1 WHEN TO USE
+
+Run it whenever dependency metadata changes, whenever an advisory floor is
+raised, and as a continuous-integration step against the isolated dependency
+root the build resolves. It is deliberately a live gate: the advisory database
+moves, so a chain that was clean yesterday can legitimately fail today.
+
+=head1 HOW TO USE
+
+Give it the Perl library root whose distribution metadata should be walked. The
+C<cpanfile> and the reviewed advisory disposition file default to the ones next
+to the script, and both can be overridden.
+
+Exit codes are fail-closed:
+
+=over 4
+
+=item * C<0> - no distribution in the closure permits a version inside an
+advisory range.
+
+=item * C<1> - at least one permitted vulnerable resolution was found.
+
+=item * C<2> - the gate could not audit the whole chain (bad usage, missing
+C<CPAN::Audit>, a library root with no distribution metadata, or a distribution
+metadata file it could not read or parse). It never reports a clean chain it did
+not establish, and an unreadable metadata file is not established: dropping one
+shrinks the closure, and a smaller closure is exactly what hides a finding.
+
+=back
+
+=head1 WHAT USES IT
+
+The continuous-integration dependency audit job runs it against the isolated
+C<local/lib/perl5> root the build resolves, and
+F<t/109-declared-chain-advisory-closure.t> exercises both its contracts and its
+detection behaviour against synthetic metadata fixtures.
+
+=head1 EXAMPLES
+
+Example 1 - audit the isolated dependency root a build resolved:
+
+  script/cpan-audit-declared-chain local/lib/perl5
+
+Example 2 - audit the operator's own library root:
+
+  script/cpan-audit-declared-chain "$HOME/perl5/lib/perl5"
+
+Example 3 - audit a candidate cpanfile before committing it:
+
+  script/cpan-audit-declared-chain --cpanfile /tmp/candidate-cpanfile local/lib/perl5
+
+Example 4 - audit with an alternative reviewed disposition list:
+
+  script/cpan-audit-declared-chain \
+    --exclude-file /tmp/reviewed-advisories.txt local/lib/perl5
+
+=head1 AUTHOR
+
+Developer Dashboard Contributors
+
+=cut

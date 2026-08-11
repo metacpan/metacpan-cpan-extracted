@@ -15,14 +15,32 @@ my $script = File::Spec->catfile($FindBin::Bin, '..', 'bin', 'test-generator-mut
 ok(-x $script, "$script is executable") if ($^O ne 'MSWin32');
 
 my $tmpdir = tempdir(CLEANUP => 1);
+my $orig_cwd = File::Spec->rel2abs('.');
+
+# git -C <dir> was introduced in git 1.8.5; use chdir for portability.
+sub git_in {
+	my ($dir, @args) = @_;
+	chdir $dir or die "chdir $dir: $!";
+	my $rc = system('git', @args);
+	chdir $orig_cwd or die "chdir $orig_cwd: $!";
+	return $rc;
+}
+
+sub git_in_capture {
+	my ($dir, @args) = @_;
+	chdir $dir or die "chdir $dir: $!";
+	my $out;
+	run3(['git', @args], \undef, \$out, \undef);
+	chdir $orig_cwd or die "chdir $orig_cwd: $!";
+	return $out // '';
+}
 
 {
 	# Set up a minimal git repo with one committed lib/*.pm file, so
 	# --changed_only --base_sha has something real to diff against.
-	my @git = (qw(git -C), $tmpdir);
-	system(@git, 'init', '-q')                          and die 'git init failed';
-	system(@git, 'config', 'user.email', 'a@b.com')     and die 'git config failed';
-	system(@git, 'config', 'user.name', 'test')         and die 'git config failed';
+	git_in($tmpdir, 'init', '-q')                          and die 'git init failed';
+	git_in($tmpdir, 'config', 'user.email', 'a@b.com')     and die 'git config failed';
+	git_in($tmpdir, 'config', 'user.name', 'test')         and die 'git config failed';
 
 	mkdir File::Spec->catdir($tmpdir, 'lib') or die $!;
 	my $pm = File::Spec->catfile($tmpdir, 'lib', 'Foo.pm');
@@ -30,11 +48,9 @@ my $tmpdir = tempdir(CLEANUP => 1);
 	print $fh "package Foo;\n1;\n";
 	close $fh;
 
-	system(@git, 'add', 'lib/Foo.pm')                   and die 'git add failed';
-	system(@git, 'commit', '-q', '-m', 'init')          and die 'git commit failed';
+	git_in($tmpdir, 'add', 'lib/Foo.pm')                   and die 'git add failed';
+	git_in($tmpdir, 'commit', '-q', '-m', 'init')          and die 'git commit failed';
 }
-
-my $orig_cwd = File::Spec->rel2abs('.');
 
 # Runs the script with $tmpdir as the cwd, since --changed_only relies
 # on relative git commands. Always restores the original cwd, even on
@@ -74,8 +90,7 @@ sub run_cmd {
 # --------------------------------------------------------------------
 
 {
-	my ($head_exit, $head_out, $head_err);
-	run3([qw(git -C), $tmpdir, qw(rev-parse HEAD)], \undef, \$head_out, \$head_err);
+	my $head_out = git_in_capture($tmpdir, qw(rev-parse HEAD));
 	chomp $head_out;
 
 	my ($exit, $out, $err) = run_cmd(

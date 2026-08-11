@@ -1,5 +1,54 @@
 Revision history for Git-Libgit2
 
+0.006     2026-08-11 03:38:31Z
+  - Bind git_object_lookup_prefix for abbreviated-OID lookups. Export
+    GIT_OID_MINPREFIXLEN (4). The len argument counts hex characters
+    (nibbles), not raw bytes.
+  - Bind git_libgit2_opts (variadic) for the (int, string) form used by
+    GIT_OPT_SET_SEARCH_PATH, enabling programmatic config-search-path
+    isolation. Export GIT_OPT_SET_SEARCH_PATH and the full
+    GIT_CONFIG_LEVEL_* enum.
+  - Export git_sort_t, git_direction, git_branch_t, git_filemode_t, and
+    git_status_t constant groups so consumers stop redeclaring them
+    locally (drift risk for GIT_ITEROVER / GIT_PASSTHROUGH and friends).
+  - Add gitconfig isolation (GIT_CONFIG_GLOBAL / GIT_CONFIG_SYSTEM) to
+    t/00-load.t, t/03-error.t, and t/torture-init.t to match the rest of
+    the suite.
+  - Bind git_index_find_prefix, so "is anything under this path tracked?"
+    can be answered natively instead of by shelling out to git ls-files.
+    The match is a string prefix, not a path prefix: a caller asking about
+    a directory must supply the trailing slash itself.
+  - Export GIT_OID_RAWSZ (20) and GIT_OID_HEXSZ (40), so consumers sizing
+    their own git_oid buffers stop redeclaring the widths locally.
+  - Correct the git_index_find documentation: it returns an error code
+    (GIT_ENOTFOUND on a miss), not UINT_MAX, and the position lands in the
+    out-param, which libgit2 leaves untouched on a miss — so the position
+    is only meaningful when the return code is 0.
+  - Fix three vacuous tests that passed a raw buffer address for a typed
+    pointer out-param (size_t*, git_reference**). FFI::Platypus passes
+    NULL rather than the address in that case, so the buffer kept its
+    zeroed initialisation and the assertions could not fail. Pointer
+    out-params need a scalar ref; only git_oid out-params typed as plain
+    opaque take an address.
+  - Give t/16-config.t and t/34-cherrypick-revert.t assertions that can
+    fail. The config test checked `rc < 0 || rc == 0`, true for every
+    value libgit2 can return; it now pins the documented refusal of
+    git_config_get_string on a live handle and reads the value back over
+    a snapshot. The cherrypick/revert test asserted in both branches of
+    an if/else and never reached the success path — its scenario was
+    unpickable (no parent to diff against, plus mainline=1 on a
+    non-merge commit). It now builds a real two-branch history and
+    asserts the merged index, the mainline misuse, and the working-tree
+    effect of git_cherrypick.
+  - Correct the cherrypick/revert documentation. The out-param of
+    git_cherrypick_commit / git_revert_commit is a git_index handle the
+    caller must free, not an OID, and neither function creates a commit
+    despite the name — they compute the resulting index. The fifth
+    argument is mainline (the parent to diff a merge against, 0 for an
+    ordinary commit), not a parent count. git_cherrypick / git_revert
+    do write to the index and working directory, so they need a
+    checked-out working directory.
+
 0.005     2026-08-09 20:03:21Z
   - Bind git_reference_create_matching for compare-and-swap direct reference
     updates that reject stale expected OIDs with GIT_EMODIFIED.

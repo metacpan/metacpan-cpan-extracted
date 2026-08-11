@@ -65,7 +65,10 @@ my $dbh = DB::Handy->connect($BASE, 'integrity')
 $dbh->do('CREATE TABLE pk1 (id INT PRIMARY KEY, name VARCHAR(20))');
 $dbh->do('CREATE TABLE uq1 (id INT PRIMARY KEY, code VARCHAR(20) UNIQUE)');
 $dbh->do('CREATE TABLE uq2 (id INT, code VARCHAR(20), UNIQUE (code))');
-$dbh->do('CREATE TABLE nul (id INT PRIMARY KEY, code VARCHAR(20) UNIQUE)');
+# The NULL fixture is called nl1, not nul: on Windows "nul.sch" names the
+# NUL character device, so a table called nul writes to the bit bucket and
+# is never created.  create_table now rejects such names on every platform.
+$dbh->do('CREATE TABLE nl1 (id INT PRIMARY KEY, code VARCHAR(20) UNIQUE)');
 
 $dbh->do('CREATE TABLE emp (id INT PRIMARY KEY, name VARCHAR(10), dept INT, sal INT)');
 $dbh->do('CREATE TABLE dpt (did INT PRIMARY KEY, dname VARCHAR(10))');
@@ -110,7 +113,7 @@ my @tests = (
         ok(!defined($r), 'K1 duplicate PRIMARY KEY is rejected');
     },
     sub {
-        ok($dbh->errstr =~ /UNIQUE/, 'K1 rejection names the UNIQUE constraint');
+        ok(($dbh->errstr =~ /UNIQUE/) ? 1 : 0, 'K1 rejection names the UNIQUE constraint');
     },
     sub {
         is(idxnames('pk1'), 'id_pk', 'K1 PRIMARY KEY creates the index id_pk');
@@ -172,15 +175,15 @@ my @tests = (
     # K3 -- NULL is exempt from UNIQUE, as SQL-92 requires
     # -------------------------------------------------------------------
     sub {
-        ok($dbh->do('INSERT INTO nul (id) VALUES (1)'),
+        ok($dbh->do('INSERT INTO nl1 (id) VALUES (1)'),
            'K3 first row omitting the UNIQUE column is accepted');
     },
     sub {
-        ok($dbh->do('INSERT INTO nul (id) VALUES (2)'),
+        ok($dbh->do('INSERT INTO nl1 (id) VALUES (2)'),
            'K3 a second NULL in a UNIQUE column is also accepted');
     },
     sub {
-        is(flat('SELECT id FROM nul ORDER BY id'), '1|2',
+        is(flat('SELECT id FROM nl1 ORDER BY id'), '1|2',
            'K3 both NULL rows were stored');
     },
 
@@ -236,7 +239,7 @@ my @tests = (
     sub {
         my $sth = $dbh->prepare('SELECT name FROM emp WHERE id = ?');
         $sth->execute(1, 2);
-        ok($sth->errstr =~ /bind variable/,
+        ok(($sth->errstr =~ /bind variable/) ? 1 : 0,
            'B1 the message explains the bind count mismatch');
     },
     sub {
@@ -333,7 +336,7 @@ my @tests = (
     },
     sub {
         $dbh->selectall_arrayref('SELECT name, sal FROM emp ORDER BY 99');
-        ok($dbh->errstr =~ /ORDER BY position/,
+        ok(($dbh->errstr =~ /ORDER BY position/) ? 1 : 0,
            'O1 the message names the offending position');
     },
     sub {

@@ -4,7 +4,7 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.173';
+our $VERSION = '0.174';
 
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -43,14 +43,18 @@ sub configure {
         [ 'Region' => 'header' ],
         'Name',
 
-        [ 'Version' => { format => [ split /\n/, <<'VERSION' ] } ],
-version %v
-
-I use a linearly-increasing version numbering scheme. No meaning should be
-presumed or inferred from the version being less than 1.0.
-%T
-%T This is a trial release!
+        [ 'GenerateSection' => 'generate VERSION' => {
+                title => 'VERSION',
+                main_module_only => 0,
+                text => [ <<'VERSION',
+version {{ join "\n\n",
+  $version,
+  $dist->is_trial ? 'This is a trial release!' : (),
+  $version < '1.0' && $version !~ /\..+\./ ? "I use a linearly-increasing version numbering scheme. No meaning should be\npresumed or inferred from the version being less than 1.0." : (),
+}}
 VERSION
+                        ] },
+        ],
 
         [ 'Region' => 'prelude' ],
         [ 'Generic' => 'SYNOPSIS' ],
@@ -195,7 +199,10 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.173
+version 0.174
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 
@@ -385,8 +392,7 @@ and a star in L<GitHub|https://github.com/karenetheridge/Dist-Zilla-PluginBundle
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER>
-(or L<bug-Dist-Zilla-PluginBundle-Author-ETHER@rt.cpan.org|mailto:bug-Dist-Zilla-PluginBundle-Author-ETHER@rt.cpan.org>).
+Bugs may be submitted through L<https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER/issues>.
 
 There is also a mailing list available for users of this distribution, at
 L<http://dzil.org/#mailing-list>.

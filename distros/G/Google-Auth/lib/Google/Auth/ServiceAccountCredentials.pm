@@ -33,11 +33,6 @@ has json_key => (
   required => 0,
 );
 
-has project_id => (
-  is       => 'ro',
-  required => 0,
-);
-
 has private_key_id => (
   is       => 'ro',
   required => 0,
@@ -66,6 +61,9 @@ has auth_uri => (
 has token_uri => (
   is       => 'ro',
   required => 0,
+  default  => sub {
+    $ENV{GOOGLE_AUTH_TOKEN_URI} // 'https://oauth2.googleapis.com/token';
+  },
 );
 
 has auth_provider_x509_cert_url => (
@@ -124,7 +122,7 @@ sub fetch_access_token {
 
   my $private_key  = $self->private_key;
   my $client_email = $self->client_email;
-  my $token_uri    = $self->token_uri // 'https://oauth2.googleapis.com/token';
+  my $token_uri    = $self->token_uri;
 
   $self->_validate_url($token_uri, 'token_uri');
 

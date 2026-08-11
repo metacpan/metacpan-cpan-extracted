@@ -78,6 +78,25 @@ like( $web_server, qr/'Referrer-Policy'\s*=>\s*'no-referrer'/, 'web server keeps
 like( $web_server, qr/'Content-Security-Policy'\s*=>/, 'web server still sets a CSP header' );
 like( $auth_module, qr/sub verify_user\b/, 'auth module still owns helper credential verification' );
 
+# The security baseline doc and Auth.pm must describe the SAME loopback
+# trust surface: the full strict-octet 127.0.0.0/8 plus both IPv6 loopback
+# literal forms, alias hosts only via web.ssl_subject_alt_names, and no trust
+# for hostnames that merely resolve to loopback. Pinning both sides here means
+# narrowing or widening either one forces the other to move with it.
+my $auth_v4_loopback_source = quotemeta('127(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}');
+my $auth_v6_loopback_source = quotemeta(q{$ip eq '::1' || $ip eq '0:0:0:0:0:0:0:1'});
+like( $security_doc, qr{127\.0\.0\.0/8}, 'security baseline doc states the full IPv4 loopback /8 trust surface' );
+like( $security_doc, qr/0:0:0:0:0:0:0:1/, 'security baseline doc names both accepted IPv6 loopback literal forms' );
+like( $security_doc, qr/ssl_subject_alt_names/, 'security baseline doc names the configured loopback alias allowlist' );
+like( $security_doc, qr/DNS[- ]rebinding/i, 'security baseline doc records that resolve-to-loopback hostnames are never trusted' );
+unlike(
+    $security_doc,
+    qr/exact\s+`?127\.0\.0\.1`?\s+with\s+numeric\s+host/,
+    'security baseline doc no longer understates the trust surface as exact 127.0.0.1 only'
+);
+like( $auth_module, qr/$auth_v4_loopback_source/, 'auth module still implements the documented strict-octet 127.0.0.0\/8 loopback check' );
+like( $auth_module, qr/$auth_v6_loopback_source/, 'auth module still implements the documented IPv6 loopback literal forms' );
+
 like( $web_security_t, qr/redirect_to/, 'focused web regression test still covers post-login redirect behavior' );
 like( $web_security_t, qr/Content-Security-Policy/, 'focused web regression test still covers security headers' );
 like( $static_files_t, qr/\.\.\/\.\.\/\.\.\/etc\/passwd/, 'static-file regression test still covers traversal blocking' );

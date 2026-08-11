@@ -49,6 +49,12 @@ if ( !defined $ENV{HOME} || $ENV{HOME} eq '' ) {
 }
 $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} ||= File::Spec->catfile( $Bin, '_dashboard-core' );
 
+# The local::lib environment keys the PowerShell startup cache reproduces, in
+# emission order, and which of them hold separator-joined lists rather than
+# scalar option strings.
+my @POWERSHELL_ENV_KEYS = qw(PATH PERL5LIB PERL_LOCAL_LIB_ROOT PERL_MB_OPT PERL_MM_OPT);
+my %POWERSHELL_ENV_LIST_KEYS = map { $_ => 1 } qw(PATH PERL5LIB PERL_LOCAL_LIB_ROOT);
+
 my $cmd = shift @ARGV || die "Missing built-in dashboard command\n";
 $0 = join q{ }, 'developer-dashboard', $cmd, @ARGV;
 
@@ -588,7 +594,9 @@ elsif ( $cmd eq 'collector' ) {
     }
     elsif ( $action eq 'stop' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector stop <name>\n";
-        my $pid = $runner->stop_loop($name);
+        my @stopped = $runtime->stop_collectors( names => [$name], structured => 1 );
+        my ($entry) = grep { ( $_->{name} || '' ) eq $name } @stopped;
+        my $pid = $entry ? $entry->{pid} : undef;
         print defined $pid ? "$pid\n" : '';
         exit 0;
     }
@@ -646,6 +654,17 @@ elsif ( $cmd eq 'api' ) {
     my $exit_code = Developer::Dashboard::CLI::API::run_api_command(
         args => \@ARGV,
     );
+    exit $exit_code;
+}
+elsif ( $cmd eq 'ask' ) {
+    require Developer::Dashboard::CLI::Ask;
+    my %ask_opts = ( args => \@ARGV );
+    if ( !-t STDIN ) {
+        local $/;
+        my $piped = <STDIN>;
+        $ask_opts{stdin} = $piped if defined $piped && $piped ne '';
+    }
+    my $exit_code = Developer::Dashboard::CLI::Ask::run_ask(%ask_opts);
     exit $exit_code;
 }
 elsif ( $cmd eq 'init' ) {
@@ -1116,7 +1135,11 @@ elsif ( $cmd eq 'log' || $cmd eq 'logs' ) {
 }
 elsif ( $cmd eq 'shell' ) {
     my $shell = normalize_shell_name( shift @ARGV || native_shell_name() );
-    print _shell_bootstrap($shell);
+    my $bootstrap = _shell_bootstrap($shell);
+    if ( $shell eq 'powershell' || $shell eq 'pwsh' ) {
+        _cache_powershell_bootstrap($bootstrap);
+    }
+    print $bootstrap;
     exit 0;
 }
 elsif ( $cmd eq 'doctor' ) {
@@ -1269,13 +1292,7 @@ function cdr {
   }
 }
 
-function Invoke-DashboardShortcut {
-  param([Parameter(ValueFromRemainingArguments = $true)][string[]]$DashboardArgs)
-  & __DASHBOARD_CMD__ @DashboardArgs
-}
-
 Set-Alias dd_cdr cdr
-Set-Alias d2 Invoke-DashboardShortcut
 
 Register-ArgumentCompleter -CommandName 'dashboard', 'd2' -ScriptBlock {
   param($wordToComplete, $commandAst, $cursorPosition)
@@ -1376,10 +1393,6 @@ dd_cdr() {
   cdr "$@"
 }
 
-d2() {
-  __DASHBOARD_CMD__ "$@"
-}
-
 which_dir() {
   payload="$(__DASHBOARD_CMD__ path cdr "$@")"
   matches="$(printf '%s' "$payload" | __DASHBOARD_JSON_MATCHES__)"
@@ -1432,10 +1445,6 @@ cdr() {
 
 dd_cdr() {
   cdr "$@"
-}
-
-d2() {
-  __DASHBOARD_CMD__ "$@"
 }
 
 which_dir() {
@@ -1497,10 +1506,6 @@ cdr() {
 
 dd_cdr() {
   cdr "$@"
-}
-
-d2() {
-  __DASHBOARD_CMD__ "$@"
 }
 
 which_dir() {
@@ -1716,6 +1721,80 @@ POWERSHELL
     die "Unsupported shell '$shell'\n";
 }
 
+# _powershell_single_quoted($value)
+# Renders one value as a PowerShell single-quoted string literal.
+# Input: raw string value.
+# Output: quoted literal with embedded single quotes doubled.
+sub _powershell_single_quoted {
+    my ($value) = @_;
+    $value =~ s/'/''/g;
+    return "'$value'";
+}
+
+# _powershell_env_assignment($key, $value)
+# Renders one PowerShell assignment for a cached local::lib environment value.
+# List-valued keys are rebuilt by prepending the cached entries to whatever the
+# live session already carries, because the pre-cache profile derived them from
+# a perl subprocess that inherited the session environment - assigning a frozen
+# install-time snapshot would drop every entry added since the cache was
+# written, including the runtime directories the profile prepends just above.
+# Input: environment variable name and its cached value.
+# Output: one PowerShell statement string terminated by a newline.
+sub _powershell_env_assignment {
+    my ( $key, $value ) = @_;
+    return "\$env:$key=" . _powershell_single_quoted($value) . "\n"
+      unless $POWERSHELL_ENV_LIST_KEYS{$key};
+
+    my $separator = $Config::Config{path_sep};
+    my @entries   = grep { length } split /\Q$separator\E/, $value;
+    my $cached    = join ',', map { _powershell_single_quoted($_) } @entries;
+    return sprintf
+      "\$env:%s = ((@(%s) + @(\$env:%s -split %s)) | Where-Object { -not [string]::IsNullOrWhiteSpace(\$_) } | Select-Object -Unique) -join %s\n",
+      $key, $cached, $key,
+      _powershell_single_quoted($separator),
+      _powershell_single_quoted($separator);
+}
+
+# _cache_powershell_bootstrap($bootstrap)
+# Caches the PowerShell shell bootstrap and local::lib environment to the
+# home-layer cache directory so PowerShell startup does not need to launch Perl
+# on every session. The home layer is deliberate: the managed profile reads one
+# fixed path, so a refresh run from a deeper DD-OOP-LAYER must still land where
+# that profile looks.
+# Input: assembled PowerShell bootstrap script string.
+# Output: true after the cache files are written.
+sub _cache_powershell_bootstrap {
+    my ($bootstrap) = @_;
+    my $cache_dir = $paths->home_cache_root;
+
+    # Write the bootstrap script atomically (write .tmp, rename into place)
+    my $bootstrap_file = File::Spec->catfile( $cache_dir, 'powershell-bootstrap.ps1' );
+    my $bootstrap_tmp   = sprintf '%s.%s.%s.pending', $bootstrap_file, $$, time;
+    open my $bfh, '>:raw', $bootstrap_tmp
+      or die "Unable to write $bootstrap_tmp: $!";    # uncoverable branch true the cache root exists and is writable, so the pending-file write cannot fail on the test host
+    print {$bfh} $bootstrap;
+    close $bfh;
+    rename( $bootstrap_tmp, $bootstrap_file )
+      or die "Unable to rename $bootstrap_tmp to $bootstrap_file: $!";
+
+    # Write the local::lib environment dump atomically using the
+    # Sync-LocalLibEnvironmentFromPerl env-var-key pattern, emitting
+    # PowerShell commands that cache consumers can dot-source directly.
+    my $env_file   = File::Spec->catfile( $cache_dir, 'powershell-env.ps1' );
+    my $env_tmp    = sprintf '%s.%s.%s.pending', $env_file, $$, time;
+    open my $efh, '>:raw', $env_tmp
+      or die "Unable to write $env_tmp: $!";    # uncoverable branch true same guarantee as the bootstrap file above
+    for my $key (@POWERSHELL_ENV_KEYS) {
+        next unless exists $ENV{$key};
+        print {$efh} _powershell_env_assignment( $key, $ENV{$key} );
+    }
+    close $efh;
+    rename( $env_tmp, $env_file )
+      or die "Unable to rename $env_tmp to $env_file: $!";
+
+    return 1;
+}
+
 __END__
 
 =head1 NAME
@@ -1733,8 +1812,9 @@ after the public C<dashboard> entrypoint has already handled hook execution and
 switchboard dispatch. It is staged under F<~/.developer-dashboard/cli/dd/> as
 F<_dashboard-core> and is not meant to be called by users directly. It also
 generates the shared shell bootstrap snippets that expose C<cdr>,
-C<dd_cdr>, C<d2>, C<which_dir>, prompt wiring, and tab-completion handlers
-across bash, zsh, POSIX sh, and PowerShell. While it is running, it rewrites
+C<dd_cdr>, C<which_dir>, prompt wiring, and tab-completion handlers (including
+completion for the real C<d2> command) across bash, zsh, POSIX sh, and
+PowerShell. While it is running, it rewrites
 its process title to the public-facing C<developer-dashboard ...> form so
 process listings do not leak the staged helper path.
 

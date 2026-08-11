@@ -386,9 +386,11 @@ sub new {
 sub interpret_json {
   my ($self, $data) = @_;
   return map {
+    my $pubkey = Google::Auth::load_pubkey_from_x509_cert($data->{$_});
+    die "Failed to load X509 certificate for key $_" unless defined $pubkey;
     Google::Auth::IDTokens::KeyInfo->new({
         id        => $_,
-        key       => Google::Auth::load_pubkey_from_x509_cert($data->{$_}),
+        key       => $pubkey,
         algorithm => $self->{algorithm}});
   } sort keys %$data;
 }

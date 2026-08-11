@@ -1,7 +1,7 @@
 # ABSTRACT: Low-level FFI bindings to libgit2
 
 package Git::Libgit2;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use strict;
 use warnings;
 use Carp ();
@@ -26,6 +26,49 @@ our @EXPORT_OK = qw(
   GIT_OBJECT_TAG
 
   GIT_REPOSITORY_INIT_BARE
+
+  GIT_OID_RAWSZ
+  GIT_OID_HEXSZ
+  GIT_OID_MINPREFIXLEN
+
+  GIT_OPT_SET_SEARCH_PATH
+  GIT_CONFIG_LEVEL_PROGRAMDATA
+  GIT_CONFIG_LEVEL_SYSTEM
+  GIT_CONFIG_LEVEL_XDG
+  GIT_CONFIG_LEVEL_GLOBAL
+  GIT_CONFIG_LEVEL_LOCAL
+  GIT_CONFIG_LEVEL_APP
+  GIT_CONFIG_HIGHEST_LEVEL
+
+  GIT_SORT_NONE
+  GIT_SORT_TOPOLOGICAL
+  GIT_SORT_TIME
+  GIT_SORT_REVERSE
+  GIT_DIRECTION_FETCH
+  GIT_DIRECTION_PUSH
+  GIT_BRANCH_LOCAL
+  GIT_BRANCH_REMOTE
+  GIT_BRANCH_ALL
+  GIT_FILEMODE_UNREADABLE
+  GIT_FILEMODE_TREE
+  GIT_FILEMODE_BLOB
+  GIT_FILEMODE_BLOB_EXECUTABLE
+  GIT_FILEMODE_LINK
+  GIT_FILEMODE_COMMIT
+  GIT_STATUS_CURRENT
+  GIT_STATUS_INDEX_NEW
+  GIT_STATUS_INDEX_MODIFIED
+  GIT_STATUS_INDEX_DELETED
+  GIT_STATUS_INDEX_RENAMED
+  GIT_STATUS_INDEX_TYPECHANGE
+  GIT_STATUS_WT_NEW
+  GIT_STATUS_WT_MODIFIED
+  GIT_STATUS_WT_DELETED
+  GIT_STATUS_WT_TYPECHANGE
+  GIT_STATUS_WT_RENAMED
+  GIT_STATUS_WT_UNREADABLE
+  GIT_STATUS_IGNORED
+  GIT_STATUS_CONFLICTED
 
   GIT_OK
   GIT_ERROR
@@ -72,8 +115,63 @@ use constant {
 
   GIT_REPOSITORY_INIT_BARE => 1 << 0,
 
-  GIT_OID_RAWSZ   => 20,
-  GIT_OID_HEXSZ   => 40,
+  GIT_OID_RAWSZ        => 20,
+  GIT_OID_HEXSZ        => 40,
+  GIT_OID_MINPREFIXLEN => 4,
+
+  # git_libgit2_opt_t (include/git2/common.h). Only SET_SEARCH_PATH is
+  # exported for now — the variadic git_libgit2_opts binding covers just the
+  # (int, string) form. Add siblings on demand.
+  GIT_OPT_SET_SEARCH_PATH => 5,
+
+  # git_config_level_t (include/git2/config.h).
+  GIT_CONFIG_LEVEL_PROGRAMDATA => 1,
+  GIT_CONFIG_LEVEL_SYSTEM      => 2,
+  GIT_CONFIG_LEVEL_XDG         => 3,
+  GIT_CONFIG_LEVEL_GLOBAL      => 4,
+  GIT_CONFIG_LEVEL_LOCAL       => 5,
+  GIT_CONFIG_LEVEL_APP         => 6,
+  GIT_CONFIG_HIGHEST_LEVEL     => -1,
+
+  # git_sort_t (include/git2/revwalk.h).
+  GIT_SORT_NONE        => 0,
+  GIT_SORT_TOPOLOGICAL => 1 << 0,
+  GIT_SORT_TIME        => 1 << 1,
+  GIT_SORT_REVERSE     => 1 << 2,
+
+  # git_direction (include/git2/net.h).
+  GIT_DIRECTION_FETCH => 0,
+  GIT_DIRECTION_PUSH  => 1,
+
+  # git_branch_t (include/git2/types.h). ALL = LOCAL | REMOTE.
+  GIT_BRANCH_LOCAL  => 1,
+  GIT_BRANCH_REMOTE => 2,
+  GIT_BRANCH_ALL    => 3,
+
+  # git_filemode_t (include/git2/types.h). Octal literals — Perl octal
+  # matches the C enum values (e.g. 0100644 == 33188 decimal).
+  GIT_FILEMODE_UNREADABLE      => 0,
+  GIT_FILEMODE_TREE            => 0040000,
+  GIT_FILEMODE_BLOB            => 0100644,
+  GIT_FILEMODE_BLOB_EXECUTABLE => 0100755,
+  GIT_FILEMODE_LINK            => 0120000,
+  GIT_FILEMODE_COMMIT          => 0160000,
+
+  # git_status_t (include/git2/status.h).
+  GIT_STATUS_CURRENT          => 0,
+  GIT_STATUS_INDEX_NEW        => 1 << 0,
+  GIT_STATUS_INDEX_MODIFIED   => 1 << 1,
+  GIT_STATUS_INDEX_DELETED    => 1 << 2,
+  GIT_STATUS_INDEX_RENAMED    => 1 << 3,
+  GIT_STATUS_INDEX_TYPECHANGE => 1 << 4,
+  GIT_STATUS_WT_NEW           => 1 << 7,
+  GIT_STATUS_WT_MODIFIED      => 1 << 8,
+  GIT_STATUS_WT_DELETED       => 1 << 9,
+  GIT_STATUS_WT_TYPECHANGE    => 1 << 10,
+  GIT_STATUS_WT_RENAMED       => 1 << 11,
+  GIT_STATUS_WT_UNREADABLE    => 1 << 12,
+  GIT_STATUS_IGNORED          => 1 << 14,
+  GIT_STATUS_CONFLICTED       => 1 << 15,
 
   # git_error_code enum (include/git2/errors.h). Stable values across
   # libgit2 1.x. GIT_PASSTHROUGH / GIT_ITEROVER are control codes, not
@@ -187,7 +285,7 @@ Git::Libgit2 - Low-level FFI bindings to libgit2
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -262,8 +360,22 @@ C<git_oid_tostr>).
 
 =head1 EXPORTS
 
+Nothing is exported by default. Functions available on request:
 C<init_lib>, C<shutdown_lib>, C<version>, C<check_rc>, C<oid_from_hex>,
-C<oid_to_hex>, plus object-type and repository-init constants.
+C<oid_to_hex>.
+
+Constants, by group: object type (C<GIT_OBJECT_*>), repository init
+(C<GIT_REPOSITORY_INIT_BARE>), OID sizes and the abbreviated-OID minimum
+(C<GIT_OID_RAWSZ>, C<GIT_OID_HEXSZ>, C<GIT_OID_MINPREFIXLEN>), error codes
+(C<GIT_OK>, C<GIT_ERROR>, the
+C<GIT_E*> family plus C<GIT_PASSTHROUGH>, C<GIT_ITEROVER>, C<GIT_RETRY>,
+C<GIT_TIMEOUT>), the C<git_libgit2_opts> option and config levels
+(C<GIT_OPT_SET_SEARCH_PATH>, C<GIT_CONFIG_LEVEL_*>,
+C<GIT_CONFIG_HIGHEST_LEVEL>), revwalk sort (C<GIT_SORT_*>), remote
+direction (C<GIT_DIRECTION_*>), branch type (C<GIT_BRANCH_*>), tree entry
+filemode (C<GIT_FILEMODE_*>) and status flags (C<GIT_STATUS_*>).
+
+The C<:all> tag imports every name listed above.
 
 =head1 SEE ALSO
 
