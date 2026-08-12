@@ -8,6 +8,7 @@
 #     REVISION: ---
 #===============================================================================
 
+## no critic (Modules::RequireExplicitPackage)
 use strict;
 use warnings;
 use Sys::OsRelease::Lite;
@@ -94,6 +95,7 @@ is($osrelease4->platform(), $Config{osname}, "empty: ref->platform() returns Per
 is(Sys::OsRelease::Lite->platform(), $Config{osname}, "empty: class->platform() returns Perl's osname ($Config{osname})");
 is(scalar ($osrelease4->found_attrs()), 0, "empty: ref->found_attrs() returns empty list");
 is(scalar (Sys::OsRelease::Lite->found_attrs()), 0, "empty: class->found_attrs() returns empty list");
+1;
 
 =head1 AUTHOR
 

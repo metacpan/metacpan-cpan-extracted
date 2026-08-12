@@ -2,8 +2,9 @@
 use strict;
 use warnings;
 use Test::More;
-use lib 'blib/lib', 'blib/arch';
+use lib 'blib/lib', 'blib/arch', 't/lib';
 use ClickHouse::Encoder;
+use TestCH qw(f64);
 
 # JSON::PP is core - use it to get booleans
 use JSON::PP ();
@@ -42,7 +43,7 @@ sub roundtrip {
     ]);
     is($out->[0]{x}, 1,       'int kind');
     is($out->[1]{x}, "hello", 'string kind');
-    is($out->[2]{x}+0, 3.14,  'float kind');
+    is($out->[2]{x}+0, f64(3.14),  'float kind');
     is($out->[3]{x}, 1,       'bool true');
 }
 

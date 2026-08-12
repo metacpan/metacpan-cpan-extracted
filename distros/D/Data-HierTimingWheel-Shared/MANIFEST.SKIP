@@ -18,3 +18,5 @@
 # local tool artifacts / built dists (not shipped)
 (^|/)\.pcg($|/)
 (^|/)\.claude($|/)
+^Data-HierTimingWheel-Shared-[0-9][0-9.]*/
+^Data-HierTimingWheel-Shared-[0-9][0-9.]*\.tar\.gz$

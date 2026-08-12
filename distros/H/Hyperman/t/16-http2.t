@@ -92,14 +92,25 @@ is(h2('/async'), 'async-h2', 'Future-returning handler over h2');
 is(h2('/stream'), 'chunk1;chunk2', 'psgi.streaming (buffered) over h2');
 
 # multiplexing: many streams on one connection (curl reuses the h2 conn),
-# with --parallel to issue them concurrently
+# with --parallel to issue them concurrently.
+#
+# --parallel arrived in curl 7.66. An older curl rejects the option and
+# writes nothing at all to stdout, which counted as 0 of 20 answered - a
+# FAIL that said "the server dropped 20 streams" when the server was never
+# asked. Without it the same URL list still goes down a single connection
+# as consecutive streams, so what is lost is the concurrency, not the
+# multiplexing.
 {
+    my $parallel = system('curl --parallel --version >/dev/null 2>&1') == 0
+        ? '--parallel' : '';
     my @urls = map { "http://127.0.0.1:$port/query?n=$_" } 1 .. 20;
-    my $cmd  = "curl -s --http2-prior-knowledge --parallel "
+    my $cmd  = "curl -s --http2-prior-knowledge $parallel "
              . join(' ', map { "'$_'" } @urls);
     my $out  = `$cmd 2>/dev/null`;
     my $count = () = $out =~ /path=\/query/g;
-    is($count, 20, 'multiplexed concurrent streams all answered');
+    is($count, 20, $parallel
+        ? 'multiplexed concurrent streams all answered'
+        : 'multiplexed streams all answered (serial; curl has no --parallel)');
 }
 
 kill 'TERM', $pid;

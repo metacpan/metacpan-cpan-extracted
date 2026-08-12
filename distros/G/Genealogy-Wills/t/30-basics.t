@@ -3,7 +3,7 @@ use warnings;
 
 use File::Temp qw(tempdir);
 use Genealogy::Wills;
-use Test::Most tests => 13;	# Define the number of tests
+use Test::Most tests => 19;	# Define the number of tests
 use Test::Returns;
 
 # Mock database
@@ -78,4 +78,50 @@ is($custom_obj->{'cache_duration'}, '2 days', 'Custom cache_duration property is
 	my @results = $obj->search(last => 'Smith');
 	returns_is(\@results, { 'type' => 'arrayref', 'min' => 1, 'max' => 1 }, 'Search returns correct number of results');
 	like($results[0]->{'url'}, qr/^https:\/\//, 'URL formatting correctly prepends https://');
+}
+
+# ------------------------------------------------------------------
+# Equivalence-partition boundary tests for 'year'
+# Major Premise:  PVS enforces year in range [1 .. MAX_WILL_YEAR].
+# Partition A: below min (year=0)   => validation FAILS  (invalid partition)
+# Partition B: min boundary (year=1) => validation PASSES (valid partition)
+# Partition C: max boundary (year=MAX_WILL_YEAR) => validation PASSES
+# Partition D: above max (year=MAX_WILL_YEAR+1) => validation FAILS
+# ------------------------------------------------------------------
+
+my $max_year = (localtime)[5] + 1900;
+
+# Partition A: below minimum -- PVS must reject
+dies_ok(
+	sub { $obj->search(last => 'Smith', year => 0) },
+	'year=0 (below min boundary) is rejected by PVS'
+);
+
+# Partition B: minimum boundary -- PVS must accept
+lives_ok(
+	sub { my @r = $obj->search(last => 'Smith', year => 1) },
+	'year=1 (min boundary) is accepted by PVS'
+);
+
+# Partition C: maximum boundary -- PVS must accept
+lives_ok(
+	sub { my @r = $obj->search(last => 'Smith', year => $max_year) },
+	'year=MAX_WILL_YEAR (max boundary) is accepted by PVS'
+);
+
+# Partition D: above maximum -- PVS must reject
+dies_ok(
+	sub { $obj->search(last => 'Smith', year => $max_year + 1) },
+	'year=MAX_WILL_YEAR+1 (above max boundary) is rejected by PVS'
+);
+
+# Scalar context: search() must return a single hashref (or undef), not a list
+{
+	no warnings 'redefine';
+	*Genealogy::Wills::wills::fetchrow_hashref = sub {
+		return { first => 'John', last => 'Smith', url => 'example.com/js' };
+	};
+	my $one = $obj->search(last => 'Smith');
+	ok(ref($one) eq 'HASH', 'scalar context returns a single hashref');
+	like($one->{'url'}, qr/^https:\/\//, 'scalar-context url has https:// prefix');
 }

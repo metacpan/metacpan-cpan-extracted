@@ -446,7 +446,7 @@ sub new
 	my $YTDLcnt = 0;
 	my $embedPage = 0;
 	unless ($self->{'youtube'} =~ /only/i) {
-		#TRY TO FETCH ANY STREAM IN THE ODYSEE VIDEO PAGE ITSELF:
+		#TRY TO FETCH ANY STREAM IN THE SUBSPLASH PAGE ITSELF:
 		foreach my $tag ('video', 'audio') {
 			if ($html =~ s#\<$tag\s+preload(.+?)\<\/$tag\>##si) {
 				my $stuff = $1;

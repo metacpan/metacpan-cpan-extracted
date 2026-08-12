@@ -24,6 +24,7 @@ my ($host, $port, $user, $password, $database) =
     ('127.0.0.1', 9000, 'default', '', 'default');
 my $table = 'tcp_compressed_demo';
 my $n_rows = 1000;
+my $timeout = 10;
 GetOptions(
     'host=s'     => \$host,
     'port=i'     => \$port,
@@ -32,6 +33,7 @@ GetOptions(
     'database=s' => \$database,
     'table=s'    => \$table,
     'rows=i'     => \$n_rows,
+    'timeout=i'  => \$timeout,
 ) or die "bad options\n";
 
 my $sock = IO::Socket::INET->new(PeerAddr => "$host:$port", Timeout => 5)
@@ -43,7 +45,24 @@ binmode $sock;
 # over-read bytes forward so none are lost between calls.
 my $rbuf = '';
 sub read_or_die {
-    my $pkt = ClickHouse::Encoder::TCP->read_packet($sock, buffer => \$rbuf);
+    # Against a server newer than the revision this module speaks, the
+    # Hello succeeds and the next read blocks forever. Without the timeout
+    # this example just hangs; with it you get the diagnostic below.
+    my $pkt = eval {
+        ClickHouse::Encoder::TCP->read_packet(
+            $sock, buffer => \$rbuf, timeout => $timeout)
+    };
+    if (!$pkt) {
+        my $err = $@ || "read failed\n";
+        die $err . "\nThis example needs a server at protocol revision "
+                 . "<= 54474.\nModern servers (24.10+) negotiate chunking "
+                 . "after Hello, which this\nsubset does not implement - "
+                 . "use the HTTP transport instead, e.g.\n"
+                 . "eg/insert_compressed.pl. The compressed-block framing "
+                 . "is identical;\nonly the handshake differs.\n"
+            if $err =~ /timed out/;
+        die $err;
+    }
     die "server exception ($pkt->{name}): $pkt->{message}\n"
         if $pkt->{type} == ClickHouse::Encoder::TCP::SERVER_EXCEPTION;
     return $pkt;

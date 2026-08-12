@@ -29,8 +29,10 @@ void decode_block_prologue(pTHX_ SV *bytes, UV start_offset,
                            const unsigned char **out_end,
                            UV *out_ncols, UV *out_nrows);
 
-/* Decode a single column of `nrows` values of type `t`. Returns a
- * mortal RV pointing to an AV; the caller owns the returned SV. */
+/* Decode a single column of `nrows` values of type `t`. Returns an owned
+ * (refcount 1, non-mortal) RV pointing to an AV; the caller must
+ * SvREFCNT_dec it or pass it to something that takes ownership. A croak
+ * frees the partially-built column, so callers need not guard for it. */
 SV *decode_column(pTHX_ const unsigned char **p,
                   const unsigned char *end,
                   TypeInfo *t, SSize_t nrows);

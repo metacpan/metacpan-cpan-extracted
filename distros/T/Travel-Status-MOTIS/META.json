@@ -1,7 +1,7 @@
 {
    "abstract" : "An interface to the MOTIS routing service",
    "author" : [
-      "Copyright (C) 2025 networkException E<lt>git@nwex.deE<gt>",
+      "Copyright (C) 2025-2026 networkException E<lt>git@nwex.deE<gt>",
       "Copyright (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
@@ -50,31 +50,31 @@
    "provides" : {
       "Travel::Status::MOTIS" : {
          "file" : "lib/Travel/Status/MOTIS.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Travel::Status::MOTIS::Polyline" : {
          "file" : "lib/Travel/Status/MOTIS/Polyline.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Travel::Status::MOTIS::Services" : {
          "file" : "lib/Travel/Status/MOTIS/Services.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Travel::Status::MOTIS::Stop" : {
          "file" : "lib/Travel/Status/MOTIS/Stop.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Travel::Status::MOTIS::Stopover" : {
          "file" : "lib/Travel/Status/MOTIS/Stopover.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Travel::Status::MOTIS::Trip" : {
          "file" : "lib/Travel/Status/MOTIS/Trip.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Travel::Status::MOTIS::TripAtStopover" : {
          "file" : "lib/Travel/Status/MOTIS/TripAtStopover.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -86,6 +86,6 @@
          "url" : "https://github.com/derf/Travel-Status-MOTIS"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

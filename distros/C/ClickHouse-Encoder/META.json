@@ -37,11 +37,16 @@
             "IO::Compress::Gzip" : "0"
          },
          "requires" : {
+            "Encode" : "0",
             "HTTP::Tiny" : "0",
             "Math::BigInt" : "0",
+            "POSIX" : "0",
             "Time::HiRes" : "0",
             "XSLoader" : "0",
             "perl" : "5.010"
+         },
+         "suggests" : {
+            "Time::Moment" : "0"
          }
       },
       "test" : {
@@ -64,6 +69,6 @@
          "web" : "https://github.com/vividsnow/perl5-clickhouse-encoder"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

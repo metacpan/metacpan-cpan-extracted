@@ -99,7 +99,8 @@ struct BfHeader {
     uint32_t drain_seq;               /* 80  futex bumped by a reader releasing under a draining writer (wakes it) */
     uint32_t slotless_rdepth;         /* readers holding with no reader-slot (documented residual) */
     uint64_t stat_ops;                /* 88 */
-    uint8_t  _pad[160];               /* 96..255 */
+    uint8_t  sealed;                  /* 96  0 = mutable, 1 = frozen (read-only; lock-free reads) */
+    uint8_t  _pad[159];               /* 97..255 */
 };
 typedef struct BfHeader BfHeader;
 
@@ -120,6 +121,7 @@ typedef struct BfHandle {
     uint32_t      cached_pid;    /* getpid() cached at last slot claim */
     uint32_t      cached_fork_gen; /* bf_fork_gen value at last slot claim */
     uint32_t slotless_held; /* read-locks this process holds with no reader-slot */
+    int      readonly;      /* 1 = frozen O_RDONLY/PROT_READ view: lock-free reads, mutation croaks */
 } BfHandle;
 
 /* ================================================================
@@ -161,13 +163,6 @@ static inline void bf_rwlock_spin_pause(void) {
 #define BF_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define BF_RWLOCK_WR(pid)    (BF_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & BF_RWLOCK_PID_MASK))
 
-/* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
-/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse -- if a dead
- * lock-holder's PID is recycled to an unrelated live process before recovery
- * runs, this reports "alive" and that slot's rdepth is not reclaimed until the
- * recycled process exits. Robust detection would require a per-slot
- * process-start-time epoch (a header-layout/version change).
- * Documented under "Crash Safety" in the POD. */
 /* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
  * process that crashed while holding the lock and lingers unreaped would never
  * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
@@ -187,6 +182,9 @@ static inline int bf_pid_is_zombie(uint32_t pid) {
     if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
     return rp[1] == ' ' && rp[2] == 'Z';
 }
+/* 1 if alive or unknown, 0 if definitely dead.  Cannot detect PID reuse: a
+ * recycled PID reports "alive" and the slot is not reclaimed until that
+ * process exits.  See "Crash Safety" in the POD. */
 static inline int bf_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
@@ -271,8 +269,7 @@ static inline void bf_claim_reader_slot(BfHandle *h) {
     /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
      * if its rdepth>0: clearing pid drops the dead reader's entire contribution
      * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
-     * old design) we need not skip dead slots that still show a read count. */
+     * claim it. */
     for (uint32_t i = 0; i < BF_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || bf_pid_alive(dpid)) continue;
@@ -280,7 +277,7 @@ static inline void bf_claim_reader_slot(BfHandle *h) {
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            bf_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            bf_occ_set(h, i);
             h->my_slot_idx = i;
             return;
         }
@@ -526,7 +523,6 @@ static inline void bf_init_header(void *base, uint32_t k, uint64_t m_bits,
     /* Explicitly zero the header + reader-slot region (lock-recovery state, like
        hll.h); the bit array relies on the fresh mapping being OS zero-filled. */
     memset(base, 0, (size_t)L.bits);
-    hdr->magic            = BF_MAGIC;
     hdr->version          = BF_VERSION;
     hdr->k                = k;
     hdr->m_bits           = m_bits;
@@ -536,6 +532,11 @@ static inline void bf_init_header(void *base, uint32_t k, uint64_t m_bits,
     hdr->total_size       = total;
     hdr->reader_slots_off = L.reader_slots;
     hdr->bits_off         = L.bits;
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, BF_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -643,6 +644,16 @@ static int bf_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int bf_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static BfHandle *bf_create(const char *path, uint64_t capacity, double fp_rate, mode_t mode, char *errbuf) {
     uint32_t k;
     uint64_t m_bits;
@@ -681,7 +692,32 @@ static BfHandle *bf_create(const char *path, uint64_t capacity, double fp_rate, 
         if (base == MAP_FAILED) { BF_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!bf_validate_header((BfHeader *)base, (uint64_t)st.st_size)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((BfHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && bf_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        BF_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    bf_init_header(base, k, m_bits, capacity, fp_rate, total);
+                    flock(fd, LOCK_UN); close(fd);
+                    return bf_setup(base, map_size, path, -1);
+                }
+                if (((BfHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    BF_ERR("%s: incomplete Bloom filter file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 BF_ERR("invalid Bloom filter file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            if (((BfHeader *)base)->sealed) {
+                BF_ERR("%s is frozen (read-only); open it with new_readonly", path);
+                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
             return bf_setup(base, map_size, path, -1);
@@ -721,9 +757,42 @@ static BfHandle *bf_open_fd(int fd, char *errbuf) {
     if (!bf_validate_header((BfHeader *)base, (uint64_t)st.st_size)) {
         BF_ERR("invalid Bloom filter table"); munmap(base, ms); return NULL;
     }
+    if (((BfHeader *)base)->sealed) {
+        BF_ERR("this Bloom filter is frozen (read-only); open it with new_readonly");
+        munmap(base, ms); return NULL;
+    }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { BF_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
     return bf_setup(base, ms, NULL, myfd);
+}
+
+/* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock ever.
+ * A sealed file is immutable and no read path writes the mapping, so queries
+ * take no reader-slot / rwlock traffic and any number of processes can share
+ * one PROT_READ mapping (same architecture; the magic rejects a wrong-endian
+ * file). */
+static BfHandle *bf_open_readonly(const char *path, char *errbuf) {
+    if (errbuf) errbuf[0] = '\0';
+    int fd = open(path, O_RDONLY|O_NOFOLLOW|O_CLOEXEC);
+    if (fd < 0) { BF_ERR("open %s: %s", path, strerror(errno)); return NULL; }
+    struct stat st;
+    if (fstat(fd, &st) < 0) { BF_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
+    if ((uint64_t)st.st_size < sizeof(BfHeader)) { BF_ERR("%s: file too small", path); close(fd); return NULL; }
+    size_t ms = (size_t)st.st_size;
+    void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
+    if (base == MAP_FAILED) { BF_ERR("mmap %s: %s", path, strerror(errno)); return NULL; }
+    if (!bf_validate_header((BfHeader *)base, (uint64_t)st.st_size)) {
+        BF_ERR("%s: invalid Bloom filter file", path); munmap(base, ms); return NULL;
+    }
+    if (!((BfHeader *)base)->sealed) {
+        BF_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
+        munmap(base, ms); return NULL;
+    }
+    BfHandle *h = bf_setup(base, ms, path, -1);   /* munmaps on OOM */
+    if (!h) { BF_ERR("out of memory"); return NULL; }
+    h->readonly = 1;
+    return h;
 }
 
 static void bf_destroy(BfHandle *h) {
@@ -751,6 +820,18 @@ static void bf_destroy(BfHandle *h) {
 static inline int bf_msync(BfHandle *h) {
     if (!h || !h->base) return 0;
     return msync(h->base, h->mmap_size, MS_SYNC);
+}
+
+/* Seal a filter: make it permanently immutable so it can be shipped and opened
+ * read-only.  Takes the write lock so no add is in flight, publishes the seal,
+ * then flushes it (file/memfd-backed).  Afterwards every mutator croaks and a
+ * read-write reopen is refused. */
+static int bf_freeze(BfHandle *h) {
+    bf_rwlock_wrlock(h);
+    h->hdr->sealed = 1;
+    bf_rwlock_wrunlock(h);
+    if (h->path || h->backing_fd >= 0) return bf_msync(h);  /* durability for file/memfd-backed */
+    return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
 }
 
 /* ================================================================

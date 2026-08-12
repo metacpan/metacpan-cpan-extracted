@@ -11,6 +11,7 @@ new(char* class, SV* path, UV capacity, UV str_len, UV file_mode = 0600)
         if (str_len > 0xFFFFFFFFU) croak("Data::Buffer::Shared::Str->new: max length exceeds 2^32");
         BufHandle* buf = buf_str_create(p, (uint64_t)capacity, (uint32_t)str_len, (mode_t)file_mode, errbuf);
         if (!buf) croak("Data::Buffer::Shared::Str: %s", errbuf[0] ? errbuf : "unknown error");
+        REREAD_CLASS();
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
         RETVAL
@@ -18,7 +19,7 @@ new(char* class, SV* path, UV capacity, UV str_len, UV file_mode = 0600)
 void
 DESTROY(SV* self_sv)
     CODE:
-        if (!SvROK(self_sv)) return;
+        if (!sv_isobject(self_sv) || !sv_derived_from(self_sv, "Data::Buffer::Shared::Str")) return;
         BufHandle* h = INT2PTR(BufHandle*, SvIV(SvRV(self_sv)));
         if (!h) return;
         sv_setiv(SvRV(self_sv), 0);
@@ -30,7 +31,7 @@ get(SV* self_sv, UV idx)
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         uint32_t esz = h->elem_size;
         char *tmp;
-        Newx(tmp, esz + 1, char);
+        Newx(tmp, (size_t)esz + 1, char);
         SAVEFREEPV(tmp);
         uint32_t out_len;
         if (!buf_str_get(h, (uint64_t)idx, tmp, &out_len)) XSRETURN_UNDEF;
@@ -45,7 +46,7 @@ set(SV* self_sv, UV idx, SV* val_sv)
         STRLEN vlen;
         const char *vstr = SvPV(val_sv, vlen);
         REEXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
-        RETVAL = buf_str_set(h, (uint64_t)idx, vstr, (uint32_t)vlen);
+        RETVAL = buf_str_set(h, (uint64_t)idx, vstr, (uint32_t)(vlen < h->elem_size ? vlen : h->elem_size));
     OUTPUT:
         RETVAL
 
@@ -54,6 +55,8 @@ slice(SV* self_sv, UV from, UV count)
     PPCODE:
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         if (count == 0) XSRETURN_EMPTY;
+        if (count > h->capacity || from > h->capacity - count)
+            croak("Data::Buffer::Shared::Str: slice out of bounds");
         uint32_t esz = h->elem_size;
         char *tmp;
         Newx(tmp, count * esz, char);
@@ -96,7 +99,7 @@ fill(SV* self_sv, SV* val_sv)
         STRLEN vlen;
         const char *vstr = SvPV(val_sv, vlen);
         REEXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
-        buf_str_fill(h, vstr, (uint32_t)vlen);
+        buf_str_fill(h, vstr, (uint32_t)(vlen < h->elem_size ? vlen : h->elem_size));
 
 UV
 capacity(SV* self_sv)
@@ -158,7 +161,7 @@ void
 unlink(SV* self_or_class, ...)
     CODE:
         const char *p;
-        if (SvROK(self_or_class)) {
+        if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Buffer::Shared::Str")) {
             BufHandle* h = INT2PTR(BufHandle*, SvIV(SvRV(self_or_class)));
             if (h) { if (!h->path) croak("cannot unlink anonymous buffer"); p = h->path; }
             else croak("Data::Buffer::Shared::Str: destroyed object");
@@ -166,7 +169,8 @@ unlink(SV* self_or_class, ...)
             if (items < 2) croak("Usage: Data::Buffer::Shared::Str->unlink($path)");
             p = SvPV_nolen(ST(1));
         }
-        if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
+        if (unlink(p) != 0 && errno != ENOENT)
+            croak("unlink(%s): %s", p, strerror(errno));
 
 UV
 ptr(SV* self_sv)
@@ -193,6 +197,7 @@ new_anon(char* class, UV capacity, UV str_len)
         if (str_len > 0xFFFFFFFFU) croak("Data::Buffer::Shared::Str->new_anon: max length exceeds 2^32");
         BufHandle* buf = buf_str_create_anon((uint64_t)capacity, (uint32_t)str_len, errbuf);
         if (!buf) croak("Data::Buffer::Shared::Str: %s", errbuf[0] ? errbuf : "unknown error");
+        REREAD_CLASS();
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
         RETVAL
@@ -241,6 +246,7 @@ new_memfd(char* class, SV* name, UV capacity, UV str_len)
         if (str_len > 0xFFFFFFFFU) croak("Data::Buffer::Shared::Str->new_memfd: max length exceeds 2^32");
         BufHandle* buf = buf_str_create_memfd(nm, (uint64_t)capacity, (uint32_t)str_len, errbuf);
         if (!buf) croak("Data::Buffer::Shared::Str: %s", errbuf[0] ? errbuf : "unknown error");
+        REREAD_CLASS();
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
         RETVAL
@@ -252,6 +258,7 @@ new_from_fd(char* class, int fd, UV str_len)
         if (str_len > 0xFFFFFFFFU) croak("Data::Buffer::Shared::Str->new_from_fd: max length exceeds 2^32");
         BufHandle* buf = buf_str_open_fd(fd, (uint32_t)str_len, errbuf);
         if (!buf) croak("Data::Buffer::Shared::Str: %s", errbuf[0] ? errbuf : "unknown error");
+        REREAD_CLASS();
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
         RETVAL

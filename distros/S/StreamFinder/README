@@ -134,23 +134,27 @@ DESCRIPTION
     (aka iheartradio.com) radio stations and podcasts
     (StreamFinder::IHeartRadio), www.internet-radio.com radio stations
     (StreamFinder::InternetRadio), onlineradiobox.com radio stations
-    (StreamFinder::OnlineRadiobox), odysee.com videos
-    (StreamFinder::Odysee), podbean.com podcasts (StreamFinder::Podbean),
-    podcastaddict.com podcasts (StreamFinder::PodcastAddict), podchaser.com
-    podcasts (StreamFinder::Podchaser), prageru.com videos
-    (StreamFinder::PragerU), radio.net radio stations
-    (StreamFinder::RadioNet), rcast.net radio stations
-    (StreamFinder::Rcast), rumble.com videos (StreamFinder::Rumble),
-    sermonaudio.com sermons: audio and video (StreamFinder::SermonAudio),
-    soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud)
-    (DEPRECIATED), spreaker.com podcasts (StreamFinder::Spreaker),
-    subsplash.com podcasts (StreamFinder::Subsplash) (EXPERIMENTAL),
-    tunein.com (non-paywalled) radio stations and podcasts
-    (StreamFinder::Tunein), vimeo.com videos (StreamFinder::Vimeo),
-    youtube.com, et. al and other sites that yt-dlp support
-    (StreamFinder::Youtube), zeno.fm radio stations and podcasts
+    (StreamFinder::OnlineRadiobox), podbean.com podcasts
+    (StreamFinder::Podbean), podcastaddict.com podcasts
+    (StreamFinder::PodcastAddict), podchaser.com podcasts
+    (StreamFinder::Podchaser), prageru.com videos (StreamFinder::PragerU),
+    radio.net radio stations (StreamFinder::RadioNet), rcast.net radio
+    stations (StreamFinder::Rcast), rumble.com videos
+    (StreamFinder::Rumble), sermonaudio.com sermons: audio and video
+    (StreamFinder::SermonAudio), soundcloud.com (non-paywalled) songs
+    (StreamFinder::SoundCloud) (DEPRECIATED), spreaker.com podcasts
+    (StreamFinder::Spreaker), subsplash.com podcasts
+    (StreamFinder::Subsplash) (EXPERIMENTAL), tunein.com (non-paywalled)
+    radio stations and podcasts (StreamFinder::Tunein), vimeo.com videos
+    (StreamFinder::Vimeo), youtube.com, et. al and other sites that yt-dlp
+    support (StreamFinder::Youtube), zeno.fm radio stations and podcasts
     (StreamFinder::Zeno), and StreamFinder::Anystream - search any (other)
     webpage URL (not supported by any of the other submodules) for streams.
+
+    NOTE: StreamFinder::Odysee has been removed as it is now no longer
+    possible to play stream URLs on their site because they now require
+    their javascript- based browser-player to access (and they don't seem to
+    provide a Youtube stream anymore).
 
     NOTE: StreamFinder::Podcastaddict is now fully-functional again
     including being able to return playlists from podcast pages!
@@ -431,8 +435,8 @@ DEPENDENCIES
     URI::Escape, HTML::Entities, LWP::UserAgent
 
 RECCOMENDS
-    yt-dlp (for Youtube, Bitchute, Blogger, Brighteon, Odysee, Vimeo) NOTE:
-    Required for Youtube, Bitchute, and SoundCloud to work.
+    yt-dlp (for Youtube, Bitchute, Blogger, Brighteon, Vimeo) NOTE: Required
+    for Youtube, Bitchute, and SoundCloud to work.
 
     wget
 

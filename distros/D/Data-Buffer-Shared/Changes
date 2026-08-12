@@ -1,5 +1,23 @@
 Revision history for Data-Buffer-Shared
 
+0.07      2026-08-11
+          - Fix a reader-lock leak and an unbalanced unlock_rd that underflowed
+            a reader slot; either could block every writer indefinitely.
+          - Refuse a non-empty file too small to hold a header, including one
+            this process created.
+          - Recover a file left behind by an interrupted create.
+          - Create leaves the backing file sparse.
+          - Str set()/fill(): clamp the value length to the element size.
+          - Str get(): size the scratch buffer as size_t.
+          - slice(): validate count against capacity before allocating.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+          - Makefile.PL: Shared.c depends on xs/*.xs and buf_*.h; declare the
+            repository and bugtracker in META.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+
 0.06      2026-07-22
           - On-disk format change (v2 -> v3): an existing 0.05 file is
             refused; recreate it.
@@ -20,7 +38,7 @@ Revision history for Data-Buffer-Shared
 0.04  2026-05-26
     - Dead-reader rwlock recovery: SIGKILL'd reader no longer pins the counter;
       1024-slot per-process mirror drains dead contributions on wrlock timeout
-    - BUF_VERSION 1 → 2 (header adds reader_slots_off); existing 0.03 maps
+    - BUF_VERSION 1 -> 2 (header adds reader_slots_off); existing 0.03 maps
       must be recreated
 
 0.03  2026-04-26

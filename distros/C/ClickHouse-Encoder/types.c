@@ -5,9 +5,42 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <stdint.h>
 
 #include "types.h"
+
+/* Cap on type-expression nesting. parse_type recurses once per level, as
+ * do free_typeinfo / encode_column / decode_column over the tree it
+ * builds, so an unbounded depth overflows the C stack - and type strings
+ * are not always trusted: decode_block parses whatever a Native block
+ * carries. Real schemas nest a handful of levels (MultiPolygon, the
+ * deepest built-in alias, is 4). Capping the parse bounds every other
+ * recursive walk, since they all follow this tree. */
+#define CHE_MAX_TYPE_DEPTH 100
+
+static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth);
+
+/* Bounded stand-in for atoi() on a slice that is not NUL-terminated at
+ * `maxlen`, whose behaviour on an over-long digit run is undefined.
+ * Returns -1 when no digit is present or the value would not fit an int,
+ * leaving each caller's range check to report it. The ceiling is INT_MAX
+ * rather than anything tighter: FixedString(N) is legal up to CH's
+ * MAX_FIXED_STRING_SIZE and this parser also runs on wire type strings.
+ * Overflow is checked before the multiply, so `long`'s width is moot. */
+static int parse_int_param(const char *s, STRLEN maxlen) {
+    STRLEN i = 0;
+    long v = 0;
+    while (i < maxlen && (s[i] == ' ' || s[i] == '\t'
+                       || s[i] == '\n' || s[i] == '\r')) i++;
+    if (i >= maxlen || s[i] < '0' || s[i] > '9') return -1;
+    for (; i < maxlen && s[i] >= '0' && s[i] <= '9'; i++) {
+        int digit = s[i] - '0';
+        if (v > (INT_MAX - digit) / 10) return -1;
+        v = v * 10 + digit;
+    }
+    return (int)v;
+}
 
 void free_typeinfo(pTHX_ TypeInfo *t) {
     if (!t) return;
@@ -89,9 +122,19 @@ static void parse_enum_entries(pTHX_ TypeInfo *t, const char *s, STRLEN len, int
             croak("Invalid enum format: expected digit at position %d", (int)i);
         }
         long val = 0;
+        int overflow = 0;
         while (i < len && s[i] >= '0' && s[i] <= '9') {
-            val = val * 10 + (s[i] - '0');
+            /* Stop well before `long` wraps: signed overflow is undefined
+             * and a wrapped value could land back inside the range check
+             * below. 100000 is past every Enum16 bound. */
+            if (val > 100000) overflow = 1;
+            else val = val * 10 + (s[i] - '0');
             i++;
+        }
+        if (overflow) {
+            Safefree(name_buf);
+            croak("Enum value out of range for %s (must be %ld..%ld)",
+                  code == T_ENUM8 ? "Enum8" : "Enum16", min_val, max_val);
         }
         if (neg) val = -val;
         if (val < min_val || val > max_val) {
@@ -118,6 +161,17 @@ static void cleanup_typeinfo_slot(pTHX_ void *p) {
     TypeInfo **slot = (TypeInfo **)p;
     if (*slot) free_typeinfo(aTHX_ *slot);
     Safefree(slot);
+}
+
+/* Cleanup for a caller-owned TypeInfo*. parse_type disarms its own slot on
+ * return, so a later croak would otherwise leak the tree. Frees the type,
+ * not the slot, so the slot can be a local. Disarm by setting it NULL. */
+void cleanup_typeinfo_ptr(pTHX_ void *p) {
+    TypeInfo **slot = (TypeInfo **)p;
+    if (*slot) {
+        free_typeinfo(aTHX_ *slot);
+        *slot = NULL;
+    }
 }
 
 /* Cleanup for a partially-built Tuple types array. The struct owns the array
@@ -208,7 +262,7 @@ static int split_type_list(const char *s, STRLEN len, TypeBound *bounds) {
  * parse_tuple_types is a thin wrapper that splits internally. */
 static TypeInfo** parse_tuple_types_with_bounds(pTHX_ const char *s,
                                                 TypeBound *bounds,
-                                                int n) {
+                                                int n, int depth) {
     TupleSlot *slot;
     Newxz(slot, 1, TupleSlot);
     SAVEDESTRUCTOR_X(cleanup_tuple_slot, slot);
@@ -216,7 +270,8 @@ static TypeInfo** parse_tuple_types_with_bounds(pTHX_ const char *s,
 
     int i;
     for (i = 0; i < n; i++) {
-        slot->types[i] = parse_type(aTHX_ s + bounds[i].start, bounds[i].len);
+        slot->types[i] = parse_type_at(aTHX_ s + bounds[i].start,
+                                       bounds[i].len, depth);
         slot->count = i + 1;
     }
     {
@@ -226,12 +281,13 @@ static TypeInfo** parse_tuple_types_with_bounds(pTHX_ const char *s,
     }
 }
 
-static TypeInfo** parse_tuple_types(pTHX_ const char *s, STRLEN len, int *count) {
+static TypeInfo** parse_tuple_types(pTHX_ const char *s, STRLEN len, int *count,
+                                    int depth) {
     TypeBound *bounds;
     Newx(bounds, len + 1, TypeBound);
     SAVEFREEPV(bounds);
     *count = split_type_list(s, len, bounds);
-    return parse_tuple_types_with_bounds(aTHX_ s, bounds, *count);
+    return parse_tuple_types_with_bounds(aTHX_ s, bounds, *count, depth);
 }
 
 /* Return 1 if this type can be used as a JSON typed path. CH writes
@@ -268,19 +324,20 @@ static int type_can_be_typed_path(TypeInfo *t) {
  * a full type expression. Stores parsed entries on t in name-sorted
  * order via tuple_names + tuple. Empty body (JSON()) is a no-op. */
 static void parse_json_typed_paths(pTHX_ TypeInfo *t,
-                                   const char *body, STRLEN body_len) {
+                                   const char *body, STRLEN body_len,
+                                   int depth) {
     TypeBound *bounds;
     Newxz(bounds, body_len + 1, TypeBound);
     SAVEFREEPV(bounds);
 
     int idx = 0;
-    int depth = 0;
+    int paren_depth = 0;   /* not `depth`, which is the type-nesting level */
     STRLEN start = 0, i;
     for (i = 0; i <= body_len; i++) {
         char c = (i < body_len) ? body[i] : ',';
-        if      (c == '(') depth++;
-        else if (c == ')') depth--;
-        else if ((c == ',' && depth == 0) || i == body_len) {
+        if      (c == '(') paren_depth++;
+        else if (c == ')') paren_depth--;
+        else if ((c == ',' && paren_depth == 0) || i == body_len) {
             STRLEN ts = start, te = i;
             #define J_WS(c2) ((c2)==' '||(c2)=='\t'||(c2)=='\n'||(c2)=='\r')
             while (ts < te && J_WS(body[ts])) ts++;
@@ -369,7 +426,7 @@ static void parse_json_typed_paths(pTHX_ TypeInfo *t,
                bounds[ii].name_len);
         t->tuple_names[ii][bounds[ii].name_len] = '\0';
     }
-    t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds, n);
+    t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds, n, depth);
 
     for (ii = 0; ii < n; ii++) {
         if (!type_can_be_typed_path(t->tuple[ii]))
@@ -381,9 +438,18 @@ static void parse_json_typed_paths(pTHX_ TypeInfo *t,
 }
 
 TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
+    return parse_type_at(aTHX_ type, len, 0);
+}
+
+static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
     TypeInfo *t;
     /* Slot lives on the heap so its address is stable across the XSUB lifetime. */
     TypeInfo **slot;
+
+    if (++depth > CHE_MAX_TYPE_DEPTH)
+        croak("Type nesting too deep (limit %d): %.*s",
+              CHE_MAX_TYPE_DEPTH, (int)(len > 60 ? 60 : len), type);
+
     Newx(slot, 1, TypeInfo*);
     *slot = NULL;
     SAVEDESTRUCTOR_X(cleanup_typeinfo_slot, slot);
@@ -416,11 +482,16 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
         t->code = T_STRING;
     } else if (len > 12 && strncmp(type, "FixedString(", 12) == 0) {
         t->code = T_FIXEDSTRING;
-        t->param = atoi(type + 12);
+        t->param = parse_int_param(type + 12, len - 12);
         if (t->param <= 0) croak("FixedString needs positive length");
+        /* ClickHouse's MAX_FIXED_STRING_SIZE; beyond it the server itself
+         * refuses the type, so no real schema reaches here. */
+        if (t->param > 0xFFFFFF)
+            croak("FixedString length %d exceeds the maximum of %d",
+                  t->param, 0xFFFFFF);
     } else if (len > 6 && strncmp(type, "Array(", 6) == 0) {
         t->code = T_ARRAY;
-        t->inner = parse_type(aTHX_ type + 6, len - 7);
+        t->inner = parse_type_at(aTHX_ type + 6, len - 7, depth);
     } else if (len > 6 && strncmp(type, "Tuple(", 6) == 0) {
         t->code = T_TUPLE;
         const char *body = type + 6;
@@ -429,7 +500,8 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
         Newx(bounds, body_len + 1, TypeBound);
         SAVEFREEPV(bounds);
         t->tuple_len = split_type_list(body, body_len, bounds);
-        t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds, t->tuple_len);
+        t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds,
+                                                 t->tuple_len, depth);
         /* If at least one element carries a field-name, capture all of
          * them so encode_column can accept hashrefs for this tuple. A
          * mix of named and unnamed elements isn't legal in ClickHouse;
@@ -456,7 +528,7 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
         if (len > 18 && strncmp(type + 9, "Nullable(", 9) == 0)
             croak("Nullable(Nullable(...)) is not allowed");
         t->code = T_NULLABLE;
-        t->inner = parse_type(aTHX_ type + 9, len - 10);
+        t->inner = parse_type_at(aTHX_ type + 9, len - 10, depth);
     } else if (len > 6 && strncmp(type, "Enum8(", 6) == 0) {
         t->code = T_ENUM8;
         parse_enum_entries(aTHX_ t, type + 6, len - 7, T_ENUM8);
@@ -465,29 +537,29 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
         parse_enum_entries(aTHX_ t, type + 7, len - 8, T_ENUM16);
     } else if (len > 10 && strncmp(type, "Decimal32(", 10) == 0) {
         t->code = T_DECIMAL32;
-        t->param = atoi(type + 10);
+        t->param = parse_int_param(type + 10, len - 10);
         if (t->param < 0 || t->param > 9)
             croak("Decimal32 scale must be 0..9, got %d", t->param);
     } else if (len > 10 && strncmp(type, "Decimal64(", 10) == 0) {
         t->code = T_DECIMAL64;
-        t->param = atoi(type + 10);
+        t->param = parse_int_param(type + 10, len - 10);
         if (t->param < 0 || t->param > 18)
             croak("Decimal64 scale must be 0..18, got %d", t->param);
     } else if (len > 11 && strncmp(type, "Decimal128(", 11) == 0) {
         t->code = T_DECIMAL128;
-        t->param = atoi(type + 11);
+        t->param = parse_int_param(type + 11, len - 11);
         if (t->param < 0 || t->param > 38)
             croak("Decimal128 scale must be 0..38, got %d", t->param);
     } else if (len > 11 && strncmp(type, "Decimal256(", 11) == 0) {
         t->code = T_DECIMAL256;
-        t->param = atoi(type + 11);
+        t->param = parse_int_param(type + 11, len - 11);
         if (t->param < 0 || t->param > 76)
             croak("Decimal256 scale must be 0..76, got %d", t->param);
     } else if (len > 8 && strncmp(type, "Decimal(", 8) == 0) {
-        int precision = atoi(type + 8);
+        int precision = parse_int_param(type + 8, len - 8);
         const char *comma = memchr(type + 8, ',', len - 8);
         if (!comma) croak("Decimal(P, S) requires precision and scale");
-        int scale = atoi(comma + 1);
+        int scale = parse_int_param(comma + 1, len - (STRLEN)(comma + 1 - type));
         if (precision < 1 || precision > 38)
             croak("Decimal(P, S) precision must be 1..38, got %d (use Decimal256(S) explicitly for P > 38)", precision);
         if (scale < 0 || scale > precision)
@@ -506,7 +578,7 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
         t->code = T_DATETIME;
     } else if (len > 11 && strncmp(type, "DateTime64(", 11) == 0) {
         t->code = T_DATETIME64;
-        t->param = atoi(type + 11);
+        t->param = parse_int_param(type + 11, len - 11);
         if (t->param < 0 || t->param > 9)
             croak("DateTime64 precision must be 0..9, got %d", t->param);
     } else if (len == 4 && strncmp(type, "Bool", 4) == 0) {
@@ -529,7 +601,8 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
         if (!comma) croak("SimpleAggregateFunction requires (func, T)");
         STRLEN inner_off = (comma - body) + 1;
         while (inner_off < body_len && body[inner_off] == ' ') inner_off++;
-        TypeInfo *inner = parse_type(aTHX_ body + inner_off, body_len - inner_off);
+        TypeInfo *inner = parse_type_at(aTHX_ body + inner_off,
+                                          body_len - inner_off, depth);
         /* Steal inner's contents in one shot. The outer slot still owns t; the
          * inner's slot was already disarmed before parse_type returned, so we
          * can free the now-redundant inner struct directly. */
@@ -557,7 +630,8 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
             croak("Variant requires at least one type argument");
         if (t->tuple_len > 254)
             croak("Variant supports at most 254 types (got %d)", t->tuple_len);
-        t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds, t->tuple_len);
+        t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds,
+                                                 t->tuple_len, depth);
 
         /* Sort declaration indices alphabetically by their type bytes.
          * Selection sort -- nvar is at most 254. */
@@ -588,7 +662,7 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
         /* Map(K, V) is wire-equivalent to Array(Tuple(K, V)). Build the
          * synthetic structure so encode_column can reuse Array+Tuple paths. */
         t->code = T_MAP;
-        t->tuple = parse_tuple_types(aTHX_ type + 4, len - 5, &t->tuple_len);
+        t->tuple = parse_tuple_types(aTHX_ type + 4, len - 5, &t->tuple_len, depth);
         if (t->tuple_len != 2)
             croak("Map type requires exactly 2 type arguments, got %d", t->tuple_len);
     } else if (len > 7 && strncmp(type, "Nested(", 7) == 0) {
@@ -621,35 +695,36 @@ TypeInfo* parse_type(pTHX_ const char *type, STRLEN len) {
          * paths skip the Dynamic+Variant wrapping. */
         t->code = T_JSON;
         if (len > 5 && type[4] == '(') {
-            parse_json_typed_paths(aTHX_ t, type + 5, len - 6);
+            parse_json_typed_paths(aTHX_ t, type + 5, len - 6, depth);
         }
     } else if (len == 5 && strncmp(type, "Point", 5) == 0) {
         /* Point = Tuple(Float64, Float64) */
         t->code = T_TUPLE;
-        t->tuple = parse_tuple_types(aTHX_ "Float64, Float64", 16, &t->tuple_len);
+        t->tuple = parse_tuple_types(aTHX_ "Float64, Float64", 16,
+                                    &t->tuple_len, depth);
     } else if (len == 4 && strncmp(type, "Ring", 4) == 0) {
         /* Ring = Array(Point) */
         t->code = T_ARRAY;
-        t->inner = parse_type(aTHX_ "Point", 5);
+        t->inner = parse_type_at(aTHX_ "Point", 5, depth);
     } else if (len == 10 && strncmp(type, "LineString", 10) == 0) {
         /* LineString = Array(Point) */
         t->code = T_ARRAY;
-        t->inner = parse_type(aTHX_ "Point", 5);
+        t->inner = parse_type_at(aTHX_ "Point", 5, depth);
     } else if (len == 15 && strncmp(type, "MultiLineString", 15) == 0) {
         /* MultiLineString = Array(Array(Point)) */
         t->code = T_ARRAY;
-        t->inner = parse_type(aTHX_ "Array(Point)", 12);
+        t->inner = parse_type_at(aTHX_ "Array(Point)", 12, depth);
     } else if (len == 7 && strncmp(type, "Polygon", 7) == 0) {
         /* Polygon = Array(Ring) */
         t->code = T_ARRAY;
-        t->inner = parse_type(aTHX_ "Ring", 4);
+        t->inner = parse_type_at(aTHX_ "Ring", 4, depth);
     } else if (len == 12 && strncmp(type, "MultiPolygon", 12) == 0) {
         /* MultiPolygon = Array(Polygon) */
         t->code = T_ARRAY;
-        t->inner = parse_type(aTHX_ "Polygon", 7);
+        t->inner = parse_type_at(aTHX_ "Polygon", 7, depth);
     } else if (len > 15 && strncmp(type, "LowCardinality(", 15) == 0) {
         t->code = T_LOWCARDINALITY;
-        t->inner = parse_type(aTHX_ type + 15, len - 16);
+        t->inner = parse_type_at(aTHX_ type + 15, len - 16, depth);
         if (t->inner->code != T_STRING && t->inner->code != T_FIXEDSTRING
                 && (t->inner->code != T_NULLABLE
                     || (t->inner->inner->code != T_STRING

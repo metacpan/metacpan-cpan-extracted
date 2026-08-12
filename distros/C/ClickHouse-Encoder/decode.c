@@ -12,6 +12,11 @@
 #include "json_kind.h"
 #include "decode.h"
 
+/* Not defined by every perl we claim to build against. */
+#ifndef SSize_t_MAX
+#  define SSize_t_MAX ((SSize_t)(~(Size_t)0 >> 1))
+#endif
+
 
 /* ===== DECODER ============================================================
  * Symmetric counterpart to encode_column. Reads raw Native bytes through
@@ -120,6 +125,9 @@ void decode_block_prologue(pTHX_ SV *bytes, UV start_offset,
         croak("%s: ncols=%lu exceeds remaining buffer (%lu bytes)",
               fname, (unsigned long)ncols, (unsigned long)(end - p));
     UV remaining_after_headers = (UV)(end - p);
+    /* No ncols==0 check: this encoder's own zero-column output is a bare
+     * "ncols=0 nrows=N" header and must keep decoding. The amplification
+     * that would justify one is handled in decode_block_rows instead. */
     if (nrows > remaining_after_headers && nrows > 0)
         croak("%s: nrows=%lu exceeds remaining buffer (%lu bytes)",
               fname, (unsigned long)nrows,
@@ -305,12 +313,51 @@ static void decode_dynamic_variant_slot(pTHX_ const unsigned char **p,
     for (r = 0; r < (nrows); r++) av_store(av, r, (sv_expr));                \
 } while (0)
 
+/* What decode_column owns while a column is under construction, freed by
+ * SAVEDESTRUCTOR_X if a nested read croaks. Callers drive those croaks as
+ * ordinary control flow while awaiting more bytes, so the error path is a
+ * hot one. Fields are cleared as ownership moves on, leaving the
+ * destructor a no-op on success.
+ *
+ * `vec` is owned outright rather than SAVEFREEPV'd: the savestack unwinds
+ * LIFO, so a later SAVEFREEPV would free the array before this runs. */
+typedef struct {
+    AV  *av;        /* the column AV being built */
+    SV  *inner;     /* one nested column RV (Array / Nullable / LC / JSON) */
+    SV **vec;       /* nested column RVs (Tuple / Variant), owned */
+    int  vec_n;     /* how many vec[] slots are populated */
+} DecGuard;
+
+static void cleanup_dec_guard(pTHX_ void *pv) {
+    DecGuard *g = (DecGuard *)pv;
+    if (g->vec) {
+        int i;
+        for (i = 0; i < g->vec_n; i++)
+            if (g->vec[i]) SvREFCNT_dec(g->vec[i]);
+        Safefree(g->vec);
+        g->vec   = NULL;
+        g->vec_n = 0;
+    }
+    if (g->inner) { SvREFCNT_dec(g->inner);       g->inner = NULL; }
+    if (g->av)    { SvREFCNT_dec((SV *)g->av);    g->av    = NULL; }
+}
+
 SV *decode_column(pTHX_ const unsigned char **p,
                          const unsigned char *end,
                          TypeInfo *t, SSize_t nrows) {
-    AV *av = newAV();
-    if (nrows > 0) av_extend(av, nrows - 1);
+    SV *result = NULL;
+    DecGuard g;
+    AV *av;
     SSize_t r;
+
+    /* Own scope: XSUBs get no implicit one, so the guard needs it. */
+    ENTER;
+    Zero(&g, 1, DecGuard);
+    SAVEDESTRUCTOR_X(cleanup_dec_guard, &g);
+
+    av = newAV();
+    g.av = av;
+    if (nrows > 0) av_extend(av, nrows - 1);
 
     switch (t->code) {
         case T_INT8: {
@@ -564,6 +611,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
                       "(%lu bytes)",
                       (long)total, (unsigned long)(end - *p));
             SV *flat_rv = decode_column(aTHX_ p, end, t->inner, total);
+            g.inner     = flat_rv;
             AV *flat    = (AV *)SvRV(flat_rv);
             for (r = 0; r < nrows; r++) {
                 AV *slice = newAV();
@@ -577,6 +625,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
                 }
                 av_store(av, r, newRV_noinc((SV*)slice));
             }
+            g.inner = NULL;
             SvREFCNT_dec(flat_rv);
             break;
         }
@@ -585,10 +634,15 @@ SV *decode_column(pTHX_ const unsigned char **p,
              * transpose into per-row tuples. */
             int i;
             SV **cols;
-            Newx(cols, t->tuple_len, SV*);
-            SAVEFREEPV(cols);
-            for (i = 0; i < t->tuple_len; i++)
+            /* Guard-owned; grown one slot at a time so a croak frees only
+             * what was decoded. +1 covers the degenerate Tuple() case. */
+            Newxz(cols, t->tuple_len + 1, SV*);
+            g.vec   = cols;
+            g.vec_n = 0;
+            for (i = 0; i < t->tuple_len; i++) {
                 cols[i] = decode_column(aTHX_ p, end, t->tuple[i], nrows);
+                g.vec_n = i + 1;
+            }
             for (r = 0; r < nrows; r++) {
                 AV *row = newAV();
                 if (t->tuple_len > 0) av_extend(row, t->tuple_len - 1);
@@ -598,7 +652,10 @@ SV *decode_column(pTHX_ const unsigned char **p,
                 }
                 av_store(av, r, newRV_noinc((SV*)row));
             }
+            g.vec   = NULL;
+            g.vec_n = 0;
             for (i = 0; i < t->tuple_len; i++) SvREFCNT_dec(cols[i]);
+            Safefree(cols);
             break;
         }
         case T_NULLABLE: {
@@ -608,6 +665,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             SAVEFREEPV(nulls);
             for (r = 0; r < nrows; r++) nulls[r] = *(*p)++;
             SV *inner_rv = decode_column(aTHX_ p, end, t->inner, nrows);
+            g.inner      = inner_rv;
             AV *inner    = (AV *)SvRV(inner_rv);
             for (r = 0; r < nrows; r++) {
                 if (nulls[r]) {
@@ -617,6 +675,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
                     av_store(av, r, elem ? SvREFCNT_inc(*elem) : newSV(0));
                 }
             }
+            g.inner = NULL;
             SvREFCNT_dec(inner_rv);
             break;
         }
@@ -632,8 +691,10 @@ SV *decode_column(pTHX_ const unsigned char **p,
             array_t.code      = T_ARRAY;
             array_t.inner     = &tuple_t;
             SV *rv = decode_column(aTHX_ p, end, &array_t, nrows);
+            g.av = NULL;
             SvREFCNT_dec((SV *)av);
-            return rv;
+            result = rv;
+            break;
         }
         case T_LOWCARDINALITY: {
             DEC_NEED(24);
@@ -657,6 +718,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             int is_null    = (inner->code == T_NULLABLE);
             TypeInfo *leaf = is_null ? inner->inner : inner;
             SV *dict_rv    = decode_column(aTHX_ p, end, leaf, (SSize_t)dict_n);
+            g.inner        = dict_rv;
             AV *dict       = (AV *)SvRV(dict_rv);
             DEC_NEED(8);
             uint64_t idx_n = dec_le64(*p);
@@ -690,6 +752,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
                     av_store(av, r, elem ? SvREFCNT_inc(*elem) : newSV(0));
                 }
             }
+            g.inner = NULL;
             SvREFCNT_dec(dict_rv);
             break;
         }
@@ -716,13 +779,15 @@ SV *decode_column(pTHX_ const unsigned char **p,
             }
             /* Decode each sub-column in wire (alphabetical) order; the
              * decl index of wire position w is t->variant_wire_to_decl[w]. */
-            SV **subcols;
-            Newx(subcols, nvar, SV*);
-            SAVEFREEPV(subcols);
+            SV **subcols;   /* guard-owned, as in T_TUPLE */
+            Newxz(subcols, nvar + 1, SV*);
+            g.vec   = subcols;
+            g.vec_n = 0;
             int w;
             for (w = 0; w < nvar; w++) {
                 int decl = t->variant_wire_to_decl[w];
                 subcols[w] = decode_column(aTHX_ p, end, t->tuple[decl], counts[w]);
+                g.vec_n = w + 1;
             }
             SSize_t *cursors;
             Newxz(cursors, nvar, SSize_t);
@@ -741,7 +806,10 @@ SV *decode_column(pTHX_ const unsigned char **p,
                     av_store(av, r, newRV_noinc((SV*)pair));
                 }
             }
+            g.vec   = NULL;
+            g.vec_n = 0;
             for (w = 0; w < nvar; w++) SvREFCNT_dec(subcols[w]);
+            Safefree(subcols);
             break;
         }
 
@@ -861,6 +929,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
                 for (tp = 0; tp < t->tuple_len; tp++) {
                     SV *col_rv = decode_column(aTHX_ p, end, t->tuple[tp],
                                                nrows);
+                    g.inner    = col_rv;
                     AV *col_av = (AV*)SvRV(col_rv);
                     STRLEN nlen = strlen(t->tuple_names[tp]);
                     for (r = 0; r < nrows; r++) {
@@ -871,6 +940,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
                         hv_store(row_hv, t->tuple_names[tp], (I32)nlen,
                                  SvREFCNT_inc(*e), 0);
                     }
+                    g.inner = NULL;
                     SvREFCNT_dec(col_rv);
                 }
             }
@@ -888,21 +958,32 @@ SV *decode_column(pTHX_ const unsigned char **p,
                  * The wire variant list has (kind_count + 1) entries (the
                  * +1 is SharedVariant inserted at its lex position 7).
                  * Rebuild the kind mask from the type-name list we just
-                 * parsed and reuse the same lex-table helper as encode. */
+                 * parsed and reuse the same lex-table helper as encode.
+                 *
+                 * wire_slots must come from json_build_lex_table, not the
+                 * wire's count: the table holds at most JSON_LEX_SLOTS, so
+                 * a larger count indexes off the end. A mismatch means the
+                 * prefix listed a type twice. */
                 int nv = path_kind_count[pi];
-                int wire_slots = nv + 1;
-                SSize_t *var_counts;
-                Newxz(var_counts, wire_slots, SSize_t);
-                SAVEFREEPV(var_counts);
-
                 int slot_to_kind_or_shared[JSON_LEX_SLOTS];
+                int wire_slots;
                 {
                     unsigned mask = 0;
                     int i;
                     for (i = 0; i < nv; i++)
                         mask |= 1u << path_kind_list[pi][i];
-                    (void)json_build_lex_table(mask, slot_to_kind_or_shared);
+                    wire_slots = json_build_lex_table(mask,
+                                                      slot_to_kind_or_shared);
                 }
+                if (wire_slots != nv + 1)
+                    croak("decode JSON: path '%.*s' declares %d variant "
+                          "types but only %d are distinct (duplicate type "
+                          "names in Dynamic prefix)",
+                          (int)path_lens[pi], paths[pi], nv, wire_slots - 1);
+
+                SSize_t *var_counts;
+                Newxz(var_counts, wire_slots, SSize_t);
+                SAVEFREEPV(var_counts);
 
                 for (r = 0; r < nrows; r++) {
                     unsigned char d = discs[r];
@@ -1091,13 +1172,17 @@ SV *decode_column(pTHX_ const unsigned char **p,
                       "(got %lu)", (unsigned long)var_mode);
 
             int nv = (int)ntypes;
-            int wire_slots = nv + 1;
             unsigned mask = 0;
             int i;
             for (i = 0; i < nv; i++) mask |= 1u << kinds_in_order[i];
 
+            /* From the lex table, not the wire's ntypes - see T_JSON. */
             int slot_to_kind[JSON_LEX_SLOTS];
-            (void)json_build_lex_table(mask, slot_to_kind);
+            int wire_slots = json_build_lex_table(mask, slot_to_kind);
+            if (wire_slots != nv + 1)
+                croak("decode Dynamic: %d variant types declared but only "
+                      "%d are distinct (duplicate type names in prefix)",
+                      nv, wire_slots - 1);
 
             DEC_NEED((STRLEN)nrows);
             unsigned char *discs;
@@ -1145,7 +1230,14 @@ SV *decode_column(pTHX_ const unsigned char **p,
         default:
             croak("decode: unhandled type code %d", t->code);
     }
-    return newRV_noinc((SV *)av);
+
+    /* T_MAP already produced `result`; disarm so the guard is a no-op. */
+    if (!result) {
+        g.av   = NULL;
+        result = newRV_noinc((SV *)av);
+    }
+    LEAVE;
+    return result;
 }
 
 #undef DEC_NEED

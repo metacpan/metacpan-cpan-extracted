@@ -10,6 +10,7 @@
         croak("Expected a Data::CountingBloomFilter::Shared object"); \
     CbfHandle *h = INT2PTR(CbfHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::CountingBloomFilter::Shared object"); \
+    CbfHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -22,13 +23,21 @@
     if (!SvROK(sv)) \
         croak("Data::CountingBloomFilter::Shared object was replaced during the call"); \
     h = INT2PTR(CbfHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::CountingBloomFilter::Shared object destroyed during the call")
+    if (h != h0) croak("Data::CountingBloomFilter::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
     SV *ref = newRV_noinc(obj); \
     sv_bless(ref, gv_stashpv(class, GV_ADD)); \
     RETVAL = ref
+
+/* Re-read the class-name PV immediately before blessing the new object.
+ * `class` is captured by the typemap in the INPUT section; a tied/overloaded
+ * later constructor argument can run get-magic that reallocs or frees ST(0)'s
+ * PV, dangling that pointer before it is used to bless.  Same fix as
+ * Data::CuckooFilter::Shared already carries. */
+#define REREAD_CLASS() \
+    class = SvPV_nolen(ST(0))
 
 MODULE = Data::CountingBloomFilter::Shared  PACKAGE = Data::CountingBloomFilter::Shared
 
@@ -56,7 +65,8 @@ new(class, path = &PL_sv_undef, capacity = 0, fp_rate = 0.01, ...)
      * cbf_create() uses it. */
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     CbfHandle *h = cbf_create(p, (uint64_t)capacity, fp_rate, mode, errbuf);
-    if (!h) croak("Data::CountingBloomFilter::Shared->new: %s", errbuf);
+    if (!h) croak("Data::CountingBloomFilter::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -76,7 +86,8 @@ new_memfd(class, name = &PL_sv_undef, capacity = 0, fp_rate = 0.01)
     if (!(fp_rate > 0.0 && fp_rate < 1.0))
         croak("Data::CountingBloomFilter::Shared->new_memfd: fp_rate must be between 0 and 1 (exclusive)");
     CbfHandle *h = cbf_create_memfd(nm, (uint64_t)capacity, fp_rate, errbuf);
-    if (!h) croak("Data::CountingBloomFilter::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::CountingBloomFilter::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -89,7 +100,29 @@ new_from_fd(class, fd)
     char errbuf[CBF_ERR_BUFLEN];
   CODE:
     CbfHandle *h = cbf_open_fd(fd, errbuf);
-    if (!h) croak("Data::CountingBloomFilter::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::CountingBloomFilter::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_readonly(class, path)
+    const char *class
+    SV *path
+  PREINIT:
+    char errbuf[CBF_ERR_BUFLEN];
+  CODE:
+    /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
+       ever.  A sealed file is immutable and no read path writes the mapping,
+       so queries take no reader-slot / rwlock traffic and any number of
+       processes can share one PROT_READ mapping (same architecture; the
+       magic rejects a wrong-endian file). */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (!p) croak("Data::CountingBloomFilter::Shared->new_readonly: path is required");
+    CbfHandle *h = cbf_open_readonly(p, errbuf);
+    if (!h) croak("Data::CountingBloomFilter::Shared->new_readonly: %s", errbuf);
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -112,9 +145,11 @@ add(self, item)
     STRLEN n;
     const char *s;
   CODE:
+    if (h->readonly) croak("Data::CountingBloomFilter::Shared->add: filter is frozen (read-only)");
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
     cbf_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->add: filter is frozen (read-only)"); }
     RETVAL = cbf_add_locked(h, s, n);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     cbf_rwlock_wrunlock(h);
@@ -131,10 +166,12 @@ add_many(self, items)
     IV  top;
     UV  added = 0;
   CODE:
+    if (h->readonly) croak("Data::CountingBloomFilter::Shared->add_many: filter is frozen (read-only)");
     SvGETMAGIC(items);
     if (!SvROK(items) || SvTYPE(SvRV(items)) != SVt_PVAV)
         croak("Data::CountingBloomFilter::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(items);
+    sv_2mortal(SvREFCNT_inc((SV *)av));   /* pin the arrayref: element magic below cannot free it mid-loop */
     top = av_len(av);                     /* last index, -1 if empty */
     {
         STRLEN cnt = (top >= 0) ? (STRLEN)(top + 1) : 0, i;
@@ -160,6 +197,7 @@ add_many(self, items)
         }
         REEXTRACT(self);
         cbf_rwlock_wrlock(h);                             /* locked region: NO croak-capable calls */
+        if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->add_many: filter is frozen (read-only)"); }
         for (i = 0; i < cnt; i++) added += (UV)cbf_add_locked(h, ps[i], ls[i]);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
         cbf_rwlock_wrunlock(h);
@@ -179,9 +217,13 @@ contains(self, item)
   CODE:
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
-    cbf_rwlock_rdlock(h);
-    RETVAL = cbf_contains_locked(h, s, n);
-    cbf_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable counters, no lock needed */
+        RETVAL = cbf_contains_locked(h, s, n);
+    } else {
+        cbf_rwlock_rdlock(h);
+        RETVAL = cbf_contains_locked(h, s, n);
+        cbf_rwlock_rdunlock(h);
+    }
   OUTPUT:
     RETVAL
 
@@ -196,9 +238,13 @@ count_of(self, item)
   CODE:
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
-    cbf_rwlock_rdlock(h);
-    RETVAL = cbf_count_of_locked(h, s, n);
-    cbf_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable counters, no lock needed */
+        RETVAL = cbf_count_of_locked(h, s, n);
+    } else {
+        cbf_rwlock_rdlock(h);
+        RETVAL = cbf_count_of_locked(h, s, n);
+        cbf_rwlock_rdunlock(h);
+    }
   OUTPUT:
     RETVAL
 
@@ -211,9 +257,11 @@ remove(self, item)
     STRLEN n;
     const char *s;
   CODE:
+    if (h->readonly) croak("Data::CountingBloomFilter::Shared->remove: filter is frozen (read-only)");
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
     cbf_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->remove: filter is frozen (read-only)"); }
     RETVAL = cbf_remove_locked(h, s, n);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     cbf_rwlock_wrunlock(h);
@@ -227,6 +275,7 @@ merge(self, other)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::CountingBloomFilter::Shared->merge: filter is frozen (read-only)");
     if (!sv_isobject(other) || !sv_derived_from(other, "Data::CountingBloomFilter::Shared"))
         croak("Data::CountingBloomFilter::Shared->merge: expected a Data::CountingBloomFilter::Shared object");
     CbfHandle *o = INT2PTR(CbfHandle*, SvIV(SvRV(other)));
@@ -258,11 +307,16 @@ merge(self, other)
     uint8_t *tmp;
     Newx(tmp, (size_t)bytes, uint8_t);
     SAVEFREEPV(tmp);                 /* freed on normal return OR croak unwind */
-    cbf_rwlock_rdlock(o);
-    memcpy(tmp, cbf_counters(o), (size_t)bytes);
-    cbf_rwlock_rdunlock(o);
+    if (o->readonly) {                     /* frozen other: immutable counters, no lock */
+        memcpy(tmp, cbf_counters(o), (size_t)bytes);
+    } else {
+        cbf_rwlock_rdlock(o);
+        memcpy(tmp, cbf_counters(o), (size_t)bytes);
+        cbf_rwlock_rdunlock(o);
+    }
 
     cbf_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->merge: filter is frozen (read-only)"); }
     cbf_merge_counters(h, tmp, bytes);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     cbf_rwlock_wrunlock(h);
@@ -273,10 +327,42 @@ clear(self)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::CountingBloomFilter::Shared->clear: filter is frozen (read-only)");
     cbf_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->clear: filter is frozen (read-only)"); }
     cbf_clear_locked(h);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     cbf_rwlock_wrunlock(h);
+
+void
+freeze(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    if (h->readonly) croak("Data::CountingBloomFilter::Shared->freeze: cannot freeze a read-only handle");
+    if (cbf_freeze(h) != 0) croak("Data::CountingBloomFilter::Shared->freeze: msync: %s", strerror(errno));
+    h->readonly = 1;   /* this handle now rejects mutation too (the file is sealed) */
+
+UV
+frozen(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->hdr->sealed ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
+UV
+readonly(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->readonly ? 1 : 0;
+  OUTPUT:
+    RETVAL
 
 UV
 capacity(self)
@@ -325,9 +411,13 @@ count(self)
     EXTRACT(self);
     UV n;
   CODE:
-    cbf_rwlock_rdlock(h);
-    n = (UV)cbf_count_locked(h);
-    cbf_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable counters, no lock needed */
+        n = (UV)cbf_count_locked(h);
+    } else {
+        cbf_rwlock_rdlock(h);
+        n = (UV)cbf_count_locked(h);
+        cbf_rwlock_rdunlock(h);
+    }
     RETVAL = n;
   OUTPUT:
     RETVAL
@@ -344,7 +434,7 @@ stats(self)
         double   fp_rate;
         /* Snapshot under the lock; do all (croak-capable) Perl allocation after
            releasing it -- so an OOM in newHV/newSVuv can never strand the lock. */
-        cbf_rwlock_rdlock(h);
+        if (!h->readonly) cbf_rwlock_rdlock(h);   /* frozen: immutable, no lock */
         X        = cbf_nonzero_count_locked(h);
         n_est    = cbf_count_from_nonzero(h, X);   /* reuse X -- no second scan */
         m_ctr   = h->hdr->m_ctr;
@@ -352,7 +442,7 @@ stats(self)
         capacity = h->hdr->capacity;
         fp_rate  = h->hdr->fp_rate;
         ops      = h->hdr->stat_ops;
-        cbf_rwlock_rdunlock(h);
+        if (!h->readonly) cbf_rwlock_rdunlock(h);
 
         HV *hv = newHV();
         hv_stores(hv, "capacity",   newSVuv((UV)capacity));
@@ -364,6 +454,8 @@ stats(self)
         hv_stores(hv, "fill_ratio", newSVnv((double)X / (double)m_ctr));
         hv_stores(hv, "ops",        newSVuv((UV)ops));
         hv_stores(hv, "mmap_size",  newSVuv((UV)h->mmap_size));
+        hv_stores(hv, "frozen",     newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "readonly",   newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }
   OUTPUT:
@@ -395,7 +487,7 @@ sync(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (cbf_msync(h) != 0) croak("sync: %s", strerror(errno));
+    if (!h->readonly && cbf_msync(h) != 0) croak("sync: %s", strerror(errno));
 
 void
 unlink(self, ...)
@@ -403,7 +495,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::CountingBloomFilter::Shared")) {
         CbfHandle *h = INT2PTR(CbfHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::CountingBloomFilter::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::CountingBloomFilter::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

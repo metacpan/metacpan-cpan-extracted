@@ -6,11 +6,12 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 Travel::Status::MOTIS::Stop->mk_ro_accessors(
 	qw(
 	  id
+	  parent_id
 	  name
 	  type
 	  lat
@@ -41,10 +42,11 @@ sub from_stopover {
 	my $json = $opt{json};
 
 	my $ref = {
-		id   => $json->{stopId},
-		name => $json->{name},
-		lat  => $json->{lat},
-		lon  => $json->{lon},
+		id        => $json->{stopId},
+		parent_id => $json->{parentId},
+		name      => $json->{name},
+		lat       => $json->{lat},
+		lon       => $json->{lon},
 	};
 
 	bless( $ref, $obj );

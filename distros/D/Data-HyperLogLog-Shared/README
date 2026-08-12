@@ -26,31 +26,35 @@ SYNOPSIS
         # share across processes via a backing file
         my $shared = Data::HyperLogLog::Shared->new("/tmp/visitors.hll", 14);
 
-DESCRIPTION
-    A HyperLogLog estimator in shared memory: it counts the number of
-    distinct items it has seen (a probabilistic distinct-count) in a fixed,
-    tiny amount of memory, regardless of how many items pass through it. It
-    never stores the items; it keeps only an array of "m = 2**precision"
-    single-byte registers (16 KB at the default precision 14) plus a fixed
-    ~16 KB region for the cross-process reader table, so the whole mapping
-    is about 32 KB at precision 14 (see "mmap_size" in "STATS"). It yields a
-    relative standard error of roughly 0.8%.
+        # freeze and ship: query it read-only (lock-free) on other machines
+        $shared->freeze;
+        my $ro = Data::HyperLogLog::Shared->new_readonly("/tmp/visitors.hll");
+        $ro->count;
 
-    Each item is hashed with XXH3; the top "precision" bits of the hash
-    select a register, and the position of the first set bit in the
-    remaining bits is folded into that register as a running maximum. The
-    harmonic mean of the registers, with a small-range linear-counting
-    correction, gives the estimate.
+DESCRIPTION
+    A HyperLogLog estimator in shared memory: it counts the number of distinct
+    items it has seen (a probabilistic distinct-count) in a fixed, tiny amount
+    of memory, regardless of how many items pass through it. It never stores
+    the items; it keeps only an array of "m = 2**precision" single-byte
+    registers (16 KB at the default precision 14) plus a fixed ~16 KB region
+    for the cross-process reader table, so the whole mapping is about 32 KB at
+    precision 14 (see "mmap_size" in "STATS"). It yields a relative standard
+    error of roughly 0.8%.
+
+    Each item is hashed with XXH3; the top "precision" bits of the hash select
+    a register, and the position of the first set bit in the remaining bits is
+    folded into that register as a running maximum. The harmonic mean of the
+    registers, with a small-range linear-counting correction, gives the
+    estimate.
 
     Because the register array lives in a shared mapping, several processes
     share one estimator: any process that opens the same backing file,
     inherits the anonymous mapping across "fork", or reopens a passed memfd,
     sees the others' additions and contributes its own. A write-preferring
-    futex rwlock with dead-process recovery guards mutation, so many
-    processes may "add" and "count" concurrently. Two estimators of equal
-    precision can be combined with "merge" (register-wise max), which gives
-    the cardinality of the union of their item sets without double-counting
-    overlaps.
+    futex rwlock with dead-process recovery guards mutation, so many processes
+    may "add" and "count" concurrently. Two estimators of equal precision can
+    be combined with "merge" (register-wise max), which gives the cardinality
+    of the union of their item sets without double-counting overlaps.
 
     Items are added by their byte content (encode wide/utf8 strings first).
     Linux-only. Requires 64-bit Perl.
@@ -62,16 +66,21 @@ METHODS
         my $hll = Data::HyperLogLog::Shared->new(undef, 16);            # anonymous, precision 16
         my $hll = Data::HyperLogLog::Shared->new_memfd($name, $precision);
         my $hll = Data::HyperLogLog::Shared->new_from_fd($fd);
+        my $ro  = Data::HyperLogLog::Shared->new_readonly($path);       # frozen file, read-only
 
     $path is the backing file ("undef" or omitted for an anonymous mapping).
     $precision is optional and defaults to 14; it must be between 4 and 18
     ("new" croaks otherwise). The register count is "m = 2**precision"
     (precision 4 -> 16 registers, 18 -> 262144), and the relative standard
-    error is about "1.04 / sqrt(m)" (precision 14 -> ~0.81%, 16 -> ~0.41%,
-    12 -> ~1.63%). When reopening an existing file or memfd, the stored
-    precision wins and the caller's argument is ignored. "new_memfd" creates
-    a Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
-    reopens one in another process.
+    error is about "1.04 / sqrt(m)" (precision 14 -> ~0.81%, 16 -> ~0.41%, 12
+    -> ~1.63%). When reopening an existing file or memfd, the stored precision
+    wins and the caller's argument does not change it -- but it is still
+    range-checked, so an out-of-range value croaks. "new_memfd" creates a
+    Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
+    reopens one in another process. The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle. "new_readonly" opens a frozen file read-only for
+    lock-free querying (see "FROZEN (READ-ONLY) MODE").
 
   Adding and counting
         my $bumped = $hll->add($item);          # 1 if a register increased, else 0
@@ -82,17 +91,17 @@ METHODS
     "add" hashes $item (taken by its bytes; wide characters croak, encode
     first) and updates the relevant register, returning 1 if that register
     increased and 0 otherwise. A return of 0 does not mean the item was seen
-    before -- it means its hash did not beat the current register value;
-    treat the return only as "did this change the sketch". "add_many" takes
-    an array reference and does the whole batch under a single write lock,
-    returning how many of its elements increased a register. "count" returns
-    the current estimate rounded to the nearest integer.
+    before -- it means its hash did not beat the current register value; treat
+    the return only as "did this change the sketch". "add_many" takes an array
+    reference and does the whole batch under a single write lock, returning
+    how many of its elements increased a register. "count" returns the current
+    estimate rounded to the nearest integer.
 
   Merging
         $hll->merge($other);
 
-    Folds $other's registers into $hll by register-wise maximum, so $hll
-    then estimates the cardinality of the union of the two item sets. Both
+    Folds $other's registers into $hll by register-wise maximum, so $hll then
+    estimates the cardinality of the union of the two item sets. Both
     estimators must have the same precision ("merge" croaks on a mismatch).
     $other is read under its own lock into a private snapshot first, so
     merging is deadlock-free even if two processes merge each other
@@ -102,41 +111,43 @@ METHODS
         $hll->precision; $hll->registers; $hll->count; $hll->stats;
         $hll->path; $hll->memfd; $hll->sync; $hll->unlink;   # or Class->unlink($path)
 
-    "precision" is the configured precision; "registers" is the register
-    count "m" ("2**precision"). "sync" flushes the mapping to its backing
-    store (a no-op for anonymous and memfd estimators, which have none);
-    "unlink" removes the backing file (also callable as
-    "Class->unlink($path)"); "path" returns the backing path ("undef" for
-    anonymous, memfd, or fd-reopened estimators) and "memfd" the backing
-    descriptor -- the memfd of a "new_memfd" estimator or the dup'd fd of a
-    "new_from_fd" estimator, and -1 for file-backed or anonymous estimators.
+    "precision" is the configured precision; "registers" is the register count
+    "m" ("2**precision"). "sync" flushes the mapping to its backing store (a
+    no-op for anonymous and memfd estimators, which have none); "unlink"
+    removes the backing file (also callable as "Class->unlink($path)"); "path"
+    returns the backing path ("undef" for anonymous, memfd, or fd-reopened
+    estimators) and "memfd" the backing descriptor -- the memfd of a
+    "new_memfd" estimator or the dup'd fd of a "new_from_fd" estimator, and -1
+    for file-backed or anonymous estimators.
 
 STATS
     stats() returns a hashref: "precision", "registers" (the register count
     "m"), "count" (the current rounded estimate), "ops" (running count of
-    mutating operations -- "add", "add_many", "merge", "clear"), and
-    "mmap_size" (bytes of the shared mapping).
+    mutating operations -- "add", "add_many", "merge", "clear"), "mmap_size"
+    (bytes of the shared mapping), "frozen" (1 if the estimator has been
+    sealed by "freeze", else 0), and "readonly" (1 if this handle is a
+    read-only view, from "new_readonly" or the handle that called "freeze",
+    else 0).
 
 ACCURACY
     The relative standard error is approximately "1.04 / sqrt(m)" where "m =
-    2**precision". At the default precision 14 that is about 0.8%; roughly
-    two thirds of estimates fall within one standard error of the truth and
-    almost all within three. For very small cardinalities (when the estimate
-    is at or below "2.5 * m" and some registers are still zero) the
-    estimator switches to linear counting, which is accurate in that range.
-    There is no large-range (2^32) correction: with 64-bit hashes the hash
-    space is effectively collision-free for any cardinality this is used
-    for.
+    2**precision". At the default precision 14 that is about 0.8%; roughly two
+    thirds of estimates fall within one standard error of the truth and almost
+    all within three. For very small cardinalities (when the estimate is at or
+    below "2.5 * m" and some registers are still zero) the estimator switches
+    to linear counting, which is accurate in that range. There is no
+    large-range (2^32) correction: with 64-bit hashes the hash space is
+    effectively collision-free for any cardinality this is used for.
 
 SHARING ACROSS PROCESSES
-    The estimator lives in a shared mapping, shared the same three ways as
-    the rest of the family: a backing file (every process calls "new($path,
-    ...)" on the same path), an anonymous mapping inherited across "fork",
-    or a memfd whose descriptor is passed to an unrelated process (over a
-    UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened
-    with new_from_fd($fd). Because the mapping is shared, every process adds
-    into and reads from the same set of registers, so the cardinality
-    reflects the union of what all of them have seen.
+    The estimator lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path, ...)"
+    on the same path), an anonymous mapping inherited across "fork", or a
+    memfd whose descriptor is passed to an unrelated process (over a UNIX
+    socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened with
+    new_from_fd($fd). Because the mapping is shared, every process adds into
+    and reads from the same set of registers, so the cardinality reflects the
+    union of what all of them have seen.
 
         # producer and consumer share one estimator with no coordination
         my $hll = Data::HyperLogLog::Shared->new;            # before fork
@@ -144,46 +155,96 @@ SHARING ACROSS PROCESSES
         wait;
         print $hll->count, "\n";   # ~1000, counting the child's additions
 
+FROZEN (READ-ONLY) MODE
+    A file-backed estimator can be frozen and then shipped to other machines,
+    where consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $hll = Data::HyperLogLog::Shared->new("/tmp/visitors.hll", 14);
+        $hll->add_many(\@known);
+        $hll->freeze;                 # seal: now immutable, and $hll itself is read-only
+        # ... copy /tmp/visitors.hll to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::HyperLogLog::Shared->new_readonly("/tmp/visitors.hll");
+        $ro->count;
+
+    "freeze" takes the write lock, marks the estimator permanently immutable
+    (there is no unfreeze -- rebuild the file to change it), and flushes the
+    seal to disk. A frozen estimator rejects every mutator ("add", "add_many",
+    "merge", "clear") with a croak, and a read-write reopen ("new($path,
+    ...)") of a sealed file is refused -- so a shipped artifact can never be
+    silently mutated out from under its readers.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed estimator's registers and geometry are immutable, "count" and
+    "stats" read them directly, taking no reader lock -- the mapping is never
+    written, so a read-only view works from a read-only file descriptor or a
+    read-only filesystem, and any number of processes can share one
+    "PROT_READ" mapping. "frozen" and "readonly" report the two states.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
+
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership; if a holder dies, the next contender detects the
-    dead owner and recovers. Each register update is a single byte store, so
-    a crash leaves the estimator consistent up to the last completed "add".
+    dead owner and recovers. Each register update is a single byte store, so a
+    crash leaves the estimator consistent up to the last completed "add".
     Limitation: PID reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete HyperLogLog file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
-    Data::Intern::Shared, Data::SortedSet::Shared,
-    Data::SpatialHash::Shared, and the rest of the "Data::*::Shared" family.
+    Data::Intern::Shared, Data::SortedSet::Shared, Data::SpatialHash::Shared,
+    and the rest of the "Data::*::Shared" family.
 
 AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

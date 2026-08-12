@@ -28,4 +28,26 @@ use Test::More;
     is_deeply $data, {b => 2}, 'plain export decode_json works';
 }
 
+# A qw() import sets the keyword hint, which the compiler prefers over the
+# closure the flag form installs -- so the flags were silently dropped.
+{
+    package TestPkg3;
+    use JSON::YY qw(encode_json);
+    use JSON::YY -pretty;
+    use Test::More;
+
+    like encode_json({a => 1}), qr/\n/,
+        'a -flag import after a qw() import still takes effect';
+}
+
+# flags-only in a nested scope
+{
+    package TestPkg4;
+    use Test::More;
+    {
+        use JSON::YY -pretty;
+        like encode_json({a => 1}), qr/\n/, '-flag import inside a block works';
+    }
+}
+
 done_testing;

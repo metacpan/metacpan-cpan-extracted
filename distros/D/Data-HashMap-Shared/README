@@ -85,14 +85,14 @@ DESCRIPTION
 
   Integer Range and Wrapping
     Integer keys and values are stored as fixed-width two's-complement
-    integers: "I16"/"SI16"/"I16S" use a signed 16-bit range (-32768 ..
-    32767), "I32"/"SI32"/"I32S" a signed 32-bit range, and "II"/"IS"/"SI" a
-    signed 64-bit range. A key or value outside the variant's range is
-    silently truncated to the low bits (two's complement), with no warning:
-    on an "I16" map, "$map->put(70000, ...)" stores under key 4464 ("70000 &
-    0xFFFF"), so get(70000) and get(4464) address the same entry.
-    "incr"/"decr" wrap the same way ("32767 + 1" becomes -32768). Pick a
-    variant wide enough for your data.
+    integers: "I16"/"SI16"/"I16S" use a signed 16-bit range (-32768 .. 32767),
+    "I32"/"SI32"/"I32S" a signed 32-bit range, and "II"/"IS"/"SI" a signed
+    64-bit range. A key or value outside the variant's range is silently
+    truncated to the low bits (two's complement), with no warning: on an "I16"
+    map, "$map->put(70000, ...)" stores under key 4464 ("70000 & 0xFFFF"), so
+    get(70000) and get(4464) address the same entry. "incr"/"decr" wrap the
+    same way ("32767 + 1" becomes -32768). Pick a variant wide enough for your
+    data.
 
   Constructor
         my $map = Data::HashMap::Shared::II->new($path, $max_entries);
@@ -111,10 +111,12 @@ DESCRIPTION
     as the path creates an anonymous "MAP_SHARED|MAP_ANONYMOUS" mapping that
     is inherited across "fork" but has no filesystem presence.
 
-    "new_memfd" creates an unlinked memfd-backed map whose file descriptor
-    can be passed to another process (via "SCM_RIGHTS", "fork"+"exec", or
-    duped+open). "new_from_fd" reopens such a descriptor. Both require a
-    64-bit Perl on Linux (memfd_create(2)).
+    "new_memfd" creates an unlinked memfd-backed map whose file descriptor can
+    be passed to another process (via "SCM_RIGHTS", "fork"+"exec", or
+    duped+open). "new_from_fd" reopens such a descriptor. The descriptor you
+    pass is duplicated ("F_DUPFD_CLOEXEC"), so it stays yours to close and
+    closing it does not disturb the handle. Both require a 64-bit Perl on
+    Linux (memfd_create(2)).
 
     $max_entries, $max_size, $ttl, $lru_skip, $arena_cap, and $file_mode are
     used only when creating a new file; when opening an existing one, all
@@ -125,42 +127,53 @@ DESCRIPTION
 
     Optional $max_size enables LRU eviction: when the map reaches $max_size
     entries, the least-recently-used entry is evicted on insert. Set to 0
-    (default) to disable. LRU uses a clock/second-chance algorithm: "get"
-    sets an accessed bit (lock-free, no write lock), and eviction gives a
-    second chance to recently accessed entries before evicting.
+    (default) to disable. LRU uses a clock/second-chance algorithm: "get" sets
+    an accessed bit (lock-free, no write lock), and eviction gives a second
+    chance to recently accessed entries before evicting.
 
     Optional $ttl sets a default time-to-live in seconds for all entries.
     Expired entries are lazily removed on access. Set to 0 (default) to
     disable. When TTL is active, "get" and "exists" check expiry. Expiry is
-    measured against a monotonic clock ("CLOCK_MONOTONIC_COARSE"): TTLs
-    track elapsed running time and do not advance while the system is
-    suspended or hibernating.
+    measured against a monotonic clock ("CLOCK_MONOTONIC_COARSE"): TTLs track
+    elapsed running time and do not advance while the system is suspended or
+    hibernating.
+
+    That clock is also local to the current boot: it restarts at zero on
+    reboot and is unrelated between machines, while the expiry timestamps live
+    in the backing file. A file that outlives the boot which wrote it -- or is
+    copied to another host, including a frozen map shipped elsewhere (see
+    "Frozen (Read-Only) Mode") -- therefore carries expiries on a timeline
+    that no longer exists. The error is always in the safe direction: "now"
+    has not yet reached the stored values, so entries live longer than their
+    TTL, never shorter, and it corrects itself once uptime passes them.
+    Nothing expires early and nothing crashes, but do not rely on TTL across a
+    reboot or a host move -- call "flush_expired" or rebuild the map.
 
     Optional $lru_skip (0-99, default 0) reduces how often LRU promotion
     reorders the recency list: higher values skip more promotions. Promotion
-    runs only when an operation updates an existing entry under the write
-    lock ("put"/"incr"/"get_or_set" on a hit, the update family); plain
-    "get" and "get_with_ttl" never promote -- they set a lock-free accessed
-    bit that the clock eviction consumes. Skipping promotions cuts
-    write-lock churn for Zipfian (power-law) patterns where a few hot keys
-    dominate. The LRU tail (eviction victim) is never skipped, preserving
-    eviction correctness. Set to 0 for strict LRU ordering.
+    runs only when an operation updates an existing entry under the write lock
+    ("put"/"incr"/"get_or_set" on a hit, the update family); plain "get" and
+    "get_with_ttl" never promote -- they set a lock-free accessed bit that the
+    clock eviction consumes. Skipping promotions cuts write-lock churn for
+    Zipfian (power-law) patterns where a few hot keys dominate. The LRU tail
+    (eviction victim) is never skipped, preserving eviction correctness. Set
+    to 0 for strict LRU ordering.
 
     Optional $arena_cap (bytes) sizes the string-storage arena explicitly,
     decoupling it from $max_entries. By default the arena holds roughly 128
-    bytes per entry (4096 minimum), so a map with a few large strings --
-    keys or values -- can exhaust it while the table is nearly empty; pass
-    an $arena_cap sized for your strings instead. Clamped to "[4096,
-    0xFFFFFFFF]" (arena offsets are 32-bit). Integer-only variants
-    ("II"/"I16"/"I32") have no arena and ignore it. For sharded maps it is
-    the per-shard cap, like $max_entries.
+    bytes per entry (4096 minimum), so a map with a few large strings -- keys
+    or values -- can exhaust it while the table is nearly empty; pass an
+    $arena_cap sized for your strings instead. Clamped to "[4096, 0xFFFFFFFF]"
+    (arena offsets are 32-bit). Integer-only variants ("II"/"I16"/"I32") have
+    no arena and ignore it. For sharded maps it is the per-shard cap, like
+    $max_entries.
 
     Optional $file_mode (octal, default 0600) sets the permission bits used
-    when the backing file is created; the exact mode is applied via
-    "fchmod", so the process umask does not narrow it. It is ignored when
-    attaching an existing file and for anonymous or memfd-backed maps. The
-    default is owner-only; pass a wider mode such as 0666 to opt in to
-    cross-user sharing. Before version 0.14 the default was 0666.
+    when the backing file is created; the exact mode is applied via "fchmod",
+    so the process umask does not narrow it. It is ignored when attaching an
+    existing file and for anonymous or memfd-backed maps. The default is
+    owner-only; pass a wider mode such as 0666 to opt in to cross-user
+    sharing. Before version 0.14 the default was 0666.
 
     Zero-cost when disabled: with both "$max_size=0" and "$ttl=0", the fast
     lock-free read path is used. The only overhead is a branch (predicted
@@ -169,9 +182,9 @@ DESCRIPTION
   String Keys/Values and UTF-8
     String-key variants ("SS", "SI", "SI16", "SI32") compare keys as raw
     bytes: two keys are the same entry if and only if they contain the same
-    byte sequence. The SV UTF-8 flag is stored alongside the key so
-    retrieval round-trips it to the returned SV, but it is not part of key
-    identity. Consequences:
+    byte sequence. The SV UTF-8 flag is stored alongside the key so retrieval
+    round-trips it to the returned SV, but it is not part of key identity.
+    Consequences:
 
     *   ASCII keys with a toggled UTF-8 flag hash and match the same entry
         ("use utf8", "utf8::upgrade", and "utf8::downgrade" on ASCII are all
@@ -180,47 +193,45 @@ DESCRIPTION
     *   Non-ASCII keys with different byte encodings are distinct. "caf\xe9"
         (latin-1, 4 bytes) and the same character sequence under "use utf8"
         ("caf\xc3\xa9", 5 UTF-8 bytes) are two different keys. If your input
-        comes in mixed encodings, normalize with "Encode::encode_utf8"
-        before use.
+        comes in mixed encodings, normalize with "Encode::encode_utf8" before
+        use.
 
-    String-value variants ("SS", "IS", "I16S", "I32S") store the SV UTF-8
-    flag alongside each value and round-trip it on retrieval. The "cas"
-    comparison of $expected against the stored value is byte-only -- the
-    UTF-8 flag on $expected is ignored (same rationale as string-key
-    equality).
+    String-value variants ("SS", "IS", "I16S", "I32S") store the SV UTF-8 flag
+    alongside each value and round-trip it on retrieval. The "cas" comparison
+    of $expected against the stored value is byte-only -- the UTF-8 flag on
+    $expected is ignored (same rationale as string-key equality).
 
   Sharding
         my $map = Data::HashMap::Shared::II->new_sharded($path_prefix, $shards, $max_entries, ...);
 
     Creates $shards independent maps (files "$path_prefix.0",
     "$path_prefix.1", ...) behind a single handle, each with up to
-    $max_entries entries (total capacity is "$shards * $max_entries").
-    Per-key operations automatically route to the correct shard via hash
-    dispatch. Writes to different shards proceed in parallel with
-    independent locks. "new_sharded" requires a filesystem $path_prefix;
-    anonymous ("undef"-path) sharded maps are not supported.
+    $max_entries entries (total capacity is "$shards * $max_entries"). Per-key
+    operations automatically route to the correct shard via hash dispatch.
+    Writes to different shards proceed in parallel with independent locks.
+    "new_sharded" requires a filesystem $path_prefix; anonymous ("undef"-path)
+    sharded maps are not supported.
 
-    The batch ops ("set_multi", "get_multi", "remove_multi") dispatch each
-    key to its shard independently rather than holding one lock for the
-    whole call, so on a sharded map a batch is not atomic across shards (the
-    "single lock" note in the API below applies to non-sharded maps).
+    The batch ops ("set_multi", "get_multi", "remove_multi") dispatch each key
+    to its shard independently rather than holding one lock for the whole
+    call, so on a sharded map a batch is not atomic across shards (the "single
+    lock" note in the API below applies to non-sharded maps).
 
-    All operations work transparently on sharded maps: "put", "get",
-    "remove", "exists", "add", "update", "swap", "take", "incr", "max",
-    "min", "cas", "cas_take", "get_or_set", "put_ttl", "add_ttl",
-    "update_ttl", "touch", "persist", "set_ttl", "keys", "values", "items",
-    "to_hash", "set_multi" (method only), "remove_multi" (method only),
-    "get_multi" (method only), "get_with_ttl" (method only), "each", "pop",
-    "shift", "drain", "clear", "flush_expired", "flush_expired_partial",
-    "size", "stats" (method only), "reserve", and all diagnostic keywords.
+    All operations work transparently on sharded maps: "put", "get", "remove",
+    "exists", "add", "update", "swap", "take", "incr", "max", "min", "cas",
+    "cas_take", "get_or_set", "put_ttl", "add_ttl", "update_ttl", "touch",
+    "persist", "set_ttl", "keys", "values", "items", "to_hash", "set_multi"
+    (method only), "remove_multi" (method only), "get_multi" (method only),
+    "get_with_ttl" (method only), "each", "pop", "shift", "drain", "clear",
+    "flush_expired", "flush_expired_partial", "size", "stats" (method only),
+    "reserve", and all diagnostic keywords.
 
     Diagnostic counters and capacities reported for a sharded handle are
     aggregate totals across all shards: "size", "capacity", "max_entries",
-    "max_size", "tombstones", "mmap_size", "arena_used", "arena_cap", and
-    the "stats" eviction/expiry/recovery counts all sum over the shards.
-    ("ttl" is the shared per-entry default, so it reports a single shard's
-    value.) "reserve $n" pre-grows each shard to $n entries (not $n in
-    total).
+    "max_size", "tombstones", "mmap_size", "arena_used", "arena_cap", and the
+    "stats" eviction/expiry/recovery counts all sum over the shards. ("ttl" is
+    the shared per-entry default, so it reports a single shard's value.)
+    "reserve $n" pre-grows each shard to $n entries (not $n in total).
 
     Cursors chain across shards automatically. "cursor_seek" routes to the
     correct shard based on key hash. $shards is rounded up to the next power
@@ -260,20 +271,19 @@ DESCRIPTION
     (string-value variants) the arena is full.
 
     "cas" is available for all variants. Returns true when the stored value
-    matched $expected and was atomically replaced with $desired; false if
-    the key is missing or expired, the value did not match, or (string-value
+    matched $expected and was atomically replaced with $desired; false if the
+    key is missing or expired, the value did not match, or (string-value
     variants) the arena is full. See "String Keys/Values and UTF-8" for the
     byte-only comparison rule.
 
     "swap" returns the previous value, or "undef" when the key did not exist
     (a fresh insert). "undef" is also returned when the new value cannot be
     stored -- the map is already at "max_entries" capacity, or (string-value
-    variants) the arena is full -- in which case an existing key keeps its
-    old value. "swap" by itself therefore cannot distinguish a fresh insert
-    from a full-map failure; check "exists" or "size" first if that matters.
-    On TTL maps, "swap" refreshes an existing entry's TTL to the default and
-    assigns the default TTL on insert, but leaves a permanent entry (TTL 0)
-    permanent.
+    variants) the arena is full -- in which case an existing key keeps its old
+    value. "swap" by itself therefore cannot distinguish a fresh insert from a
+    full-map failure; check "exists" or "size" first if that matters. On TTL
+    maps, "swap" refreshes an existing entry's TTL to the default and assigns
+    the default TTL on insert, but leaves a permanent entry (TTL 0) permanent.
 
     Integer-value variants also have:
 
@@ -295,10 +305,10 @@ DESCRIPTION
     there is no read-modify-write gap for a concurrent
     "incr_by"/"cas"/"max"/"min" on the same key: the result is monotonic
     ("max" never lowers, "min" never raises) and never clobbers a concurrent
-    increment. The common "value already past the bound" case completes
-    under a shared read lock, writing nothing. Like "incr_by", they die only
-    when the key is new and the map is at "max_entries", and the result
-    wraps at the variant's integer width.
+    increment. The common "value already past the bound" case completes under
+    a shared read lock, writing nothing. Like "incr_by", they die only when
+    the key is new and the map is at "max_entries", and the result wraps at
+    the variant's integer width.
 
     LRU/TTL operations ("put_ttl", "add_ttl", and "update_ttl" require a
     TTL-enabled map):
@@ -323,8 +333,8 @@ DESCRIPTION
         my @kv = shm_xx_drain $map, $n;           # remove+return up to N entries as flat (k,v,...) list
 
     "pop" and "shift" remove from opposite ends: "pop" takes the LRU tail
-    (oldest / least recently used) while "shift" takes the LRU head (newest
-    / most recently used). On non-LRU maps, "pop" scans forward and "shift"
+    (oldest / least recently used) while "shift" takes the LRU head (newest /
+    most recently used). On non-LRU maps, "pop" scans forward and "shift"
     scans backward. "drain" removes in "pop" order (tail-first). Useful for
     work-queue patterns and batch processing.
 
@@ -354,10 +364,11 @@ DESCRIPTION
         my $p   = $map->path;                    # backing file path (method only)
         my $s   = $map->stats;                   # hashref with all diagnostics in one call
         # stats keys: size, capacity, max_entries, tombstones, mmap_size,
-        #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl
+        #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl,
+        #   frozen, readonly
 
-    "set_multi", "get_multi", "remove_multi", "get_with_ttl", "stats",
-    "path", "sync", and "unlink" are method-only (no keyword form).
+    "set_multi", "get_multi", "remove_multi", "get_with_ttl", "stats", "path",
+    "sync", and "unlink" are method-only (no keyword form).
 
     File management:
 
@@ -365,34 +376,84 @@ DESCRIPTION
         $map->unlink;                             # remove backing file (mmap stays valid)
         Data::HashMap::Shared::II->unlink($path); # class method form
 
-    "sync" issues a synchronous msync(2) over the whole mapping (every
-    shard, for sharded maps) and dies on error. Use it to force durability
-    of a file-backed map; it is a no-op for anonymous mappings, which have
-    no backing file. Changes are visible to other processes sharing the
-    mapping without "sync" -- it only affects on-disk persistence.
+    "sync" issues a synchronous msync(2) over the whole mapping (every shard,
+    for sharded maps) and dies on error. Use it to force durability of a
+    file-backed map; it is a no-op for anonymous mappings, which have no
+    backing file. Changes are visible to other processes sharing the mapping
+    without "sync" -- it only affects on-disk persistence.
+
+    "unlink" reports through its return value rather than by dying: it returns
+    true when the file (every shard, for sharded maps) was removed and false
+    otherwise, including when the file was already gone and when removal was
+    refused -- a read-only directory, for instance. Check it if the removal
+    mattered; an ignored false is how a file survives a cleanup unnoticed.
+
+  Frozen (Read-Only) Mode
+        $map->freeze;                                       # seal the file immutable (durable)
+        my $ro = Data::HashMap::Shared::II->new_readonly($path);
+        my $v  = $ro->get($key);                            # lock-free query; writes nothing
+        my $is_frozen   = $map->frozen;                     # true once sealed
+        my $is_readonly = $ro->readonly;                    # true for a read-only handle
+
+    "freeze" seals a file-backed map permanently immutable so it can be
+    shipped and served read-only. It takes the write lock (so no mutation is
+    in flight), sets a seal flag in the header, and flushes it to disk
+    ("msync"). Afterwards every mutator on that handle croaks and the handle
+    itself becomes read-only. A sharded map seals every shard file. Freezing
+    is one-way; there is no unfreeze.
+
+    "new_readonly" opens an already-frozen file with "O_RDONLY" and maps it
+    "PROT_READ". Because a sealed map is immutable and can have no writers,
+    queries take no lock at all -- no reader-slot bookkeeping, no LRU clock
+    bit, no lazy TTL cleanup -- and never write the mapping. A read-only view
+    therefore works from a read-only file or filesystem, and any number of
+    processes can share one frozen file at once. All queries and full
+    iteration are supported: "get", "exists", "get_with_ttl", "get_multi",
+    "keys", "values", "items", "to_hash", "each", and cursors ("cursor" and
+    "cursor_next"). Every mutator croaks (including the integer counters
+    "incr"/"decr"/"max"/"min", which on a writable map update in place under
+    the read lock). "sync" is a silent no-op. "frozen" and "readonly" report
+    the state, and "stats" gains matching "frozen" and "readonly" keys.
+
+    The seal reuses a previously reserved header byte, so the on-disk format
+    and version are unchanged: a file written by an older release is simply
+    not frozen (the byte reads 0) and opens read-write exactly as before.
+
+    The two modes never mix: opening a frozen file read-write ("new",
+    "new_from_fd") is refused -- open it with "new_readonly" instead -- and
+    "new_readonly" refuses a file that has not been frozen (its lock-free
+    readers must never race a live writer). "new_readonly" is for a single
+    backing file, not a sharded set.
+
+    Portability: a frozen file is a raw memory image. Read it back on the same
+    architecture that wrote it (same word size and endianness; the native
+    magic and variant id reject a mismatched or wrong-variant file at attach
+    time). Ship it by copying the file; do not serve it over NFS or another
+    network filesystem while another host has it mapped.
 
   Crash Safety
-    If a process dies (e.g., SIGKILL, OOM kill) while holding the write
-    lock, other processes detect the stale lock within 2 seconds and
-    automatically recover. The writer's PID is encoded in the rwlock word
-    itself (single atomic CAS, no crash window). On "FUTEX_WAIT" timeout,
-    waiters "kill($pid, 0)" the holder and CAS-release the lock if it's
-    dead.
+    If a process dies (e.g., SIGKILL, OOM kill) while holding the write lock,
+    other processes detect the stale lock within 2 seconds and automatically
+    recover. The writer's PID is encoded in the rwlock word itself (single
+    atomic CAS, no crash window). On "FUTEX_WAIT" timeout, waiters "kill($pid,
+    0)" the holder and CAS-release the lock if it's dead.
 
     Reader-side recovery uses a 1024-slot table in the shared mmap (one slot
-    per process, claimed lazily on first lock; fork()'d children claim a
-    fresh slot via "pthread_atfork"). On a writer-lock timeout the recovery
-    scan CAS-claims each dead PID's slot, drains the waiter counts, and
-    force-resets the reader counter once no live reader holds it -- so a
-    worker killed mid-"incr_by" no longer pins the rwlock indefinitely. If a
-    live reader is concurrently present, the dead slot is left intact for
-    the next recovery cycle (preserves the only record of the stuck
-    counter). Beyond 1024 simultaneous handles per map, new handles skip
-    slot tracking and fall back to the slow per-timeout drain.
+    per process, claimed lazily on first lock; fork()'d children claim a fresh
+    slot via "pthread_atfork"). A reader's entire contribution to the lock is
+    the "rdepth" word in its own slot -- there is no shared reader counter --
+    so a dead reader is neutralised by clearing that one slot's PID, and a
+    draining writer does so unconditionally as it scans. Because no orphaned
+    count can exist, there is no quiescent force-reset: a worker killed
+    mid-"incr_by" cannot pin the lock at all. An occupancy bitmap (one bit per
+    slot, published before the slot can hold a lock) lets the writer visit
+    only occupied slots rather than all 1024. Beyond 1024 simultaneous handles
+    per map, a handle that cannot claim a slot proceeds "slotless"; see
+    "Reader-slot exhaustion" for the one case that recovery cannot cover.
 
-    The same path validates and rebuilds the LRU doubly-linked list if a
-    dead writer left it inconsistent. "stat_recoveries" in "stats" counts
-    every recovery event.
+    The same path validates and rebuilds the LRU doubly-linked list if a dead
+    writer left it inconsistent. "stat_recoveries" in "stats" counts every
+    recovery event.
 
     Recovery uses "kill($pid, 0)" for liveness, which cannot distinguish a
     reused PID from the original. Hitting a false "alive" requires a process
@@ -400,34 +461,34 @@ DESCRIPTION
     through the entire PID space back to that exact number within the
     ~2-second recovery window and hand it to a long-lived process -- i.e. a
     runaway fork storm. Even then the effect is bounded: writers stall until
-    the recycled process exits; reads are unaffected and no data is
-    corrupted. Writer-crash recovery is immune (the writer PID lives in the
-    lock word and is reclaimed independently of the slot table).
+    the recycled process exits; reads are unaffected and no data is corrupted.
+    Writer-crash recovery is immune (the writer PID lives in the lock word and
+    is reclaimed independently of the slot table).
 
     Limitation: PID-based recovery assumes all processes share the same PID
     namespace. Cross-container sharing (different PID namespaces) is not
     supported.
 
     After recovery from a mid-mutation crash, the map data may be partially
-    inconsistent (e.g., one entry was being updated when the writer died).
-    Map structure (locks, LRU, free lists, counters) is restored, but the
-    specific entry being mutated may have stale or partial bytes. Calling
-    "clear" after detecting a stale lock recovery is recommended for
-    safety-critical applications.
+    inconsistent (e.g., one entry was being updated when the writer died). Map
+    structure (locks, LRU, free lists, counters) is restored, but the specific
+    entry being mutated may have stale or partial bytes. Calling "clear" after
+    detecting a stale lock recovery is recommended for safety-critical
+    applications.
 
-    Reader-slot exhaustion (slotless readers): dead-process recovery
-    attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+  Reader-slot exhaustion
+    Dead-process recovery attributes a crashed lock holder's contribution
+    through its reader-slot. The slot table holds 1024 entries (one per
+    concurrent reader process). If more than that many reader processes share
+    one mapping at once, a reader that cannot claim a slot proceeds "slotless"
+    -- it still takes the read lock but leaves no per-process record. If such
+    a slotless reader is then killed while holding the read lock, its share of
+    the lock cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated. Reaching
+    this needs more than 1024 concurrent reader processes on one mapping plus
+    a crash in the brief read-lock window; the dead-process slot reclaim keeps
+    the table from filling with stale entries, so in practice it is very
+    unlikely.
 
 BENCHMARKS
     Throughput versus other shared-memory / on-disk solutions, 25K entries,
@@ -473,8 +534,7 @@ BENCHMARKS
 
     Key takeaways:
 
-    *   10x faster lookups than LMDB for integer keys (lock-free seqlock
-        path)
+    *   10x faster lookups than LMDB for integer keys (lock-free seqlock path)
 
     *   1.5x faster than Hash::SharedMem for short string lookups (inline
         strings, no arena overhead)
@@ -484,12 +544,25 @@ BENCHMARKS
     *   4.5x faster cross-process reads than LMDB; 3.4x faster writes than
         SharedMem
 
-    *   LRU reads are lock-free (clock eviction) -- no overhead vs plain
-        maps
+    *   LRU reads are lock-free (clock eviction) -- no overhead vs plain maps
 
     *   Atomic "incr" is 9x faster than get+put on competitors
 
     *   Strings <= 7 bytes stored inline in node (zero arena overhead)
+
+CRASH SAFETY
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete map file left by an interrupted create; remove it and retry".
+    A file left behind by an interrupted create never held data, so removing
+    it is safe -- but a file whose header was corrupted after the fact reaches
+    the same croak, so confirm it is an abandoned create before deleting
+    anything you care about.
 
 SEE ALSO
     Data::Buffer::Shared - typed shared array
@@ -519,22 +592,22 @@ SEE ALSO
     Data::RingBuffer::Shared - fixed-size overwriting ring buffer
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
 UPGRADING
     The on-disk format changed in this release (v9 to v10; a reader-slot
-    occupancy bitmap was added). A file-backed map written by an older
-    release is rejected with a version-mismatch error when attached. Migrate
-    existing files in place -- with no process attached -- using the bundled
-    tool:
+    occupancy bitmap was added). A file-backed map written by an older release
+    is rejected with a version-mismatch error when attached. Migrate existing
+    files in place -- with no process attached -- using the bundled tool:
 
         hashmap-shared-upgrade FILE...
 
@@ -558,6 +631,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

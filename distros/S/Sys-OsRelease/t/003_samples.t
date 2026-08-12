@@ -6,19 +6,19 @@
 #      CREATED: 04/25/2022 09:14:30 PM
 #===============================================================================
 
+## no critic (Modules::RequireExplicitPackage)
 use strict;
 use warnings;
 use Carp qw(croak);
-use File::Basename;
+use File::Basename qw(basename);
 use File::Find;
-use Cwd;
+use Cwd qw(getcwd);
 use YAML;
 use Sys::OsRelease;
 
 use Test::More; # planned test total will be counted from YAML data
 
 # globals 
-my %config;
 my $input_dir = getcwd()."/t/test-inputs/".basename($0, ".t");
 my $yaml_config = "test-config.yaml";
 
@@ -27,7 +27,7 @@ if (! -d $input_dir) {
     BAIL_OUT("can't find test inputs directory: expected $input_dir");
 }
 
-if ( not -e $input_dir."/".$yaml_config) {
+if ( not -e ( $input_dir."/".$yaml_config )) {
     BAIL_OUT("can't find test config file $input_dir/$yaml_config");
 }
 my $test_config = YAML::LoadFile($input_dir."/".$yaml_config);
@@ -64,3 +64,4 @@ foreach my $file (sort keys %{$test_config->{files}}) {
     # clean up the test instance
     Sys::OsRelease->clear_instance();
 }
+1;

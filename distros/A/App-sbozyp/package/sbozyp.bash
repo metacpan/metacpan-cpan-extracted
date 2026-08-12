@@ -1,30 +1,70 @@
+declare -a _sbozyp_command_prefix_args
+
 _sbozyp_command_prefix() {
-    local config_file_opt=
-    local repo_opt=
+    local config_file=
+    local working_tree=
+    local repo=
     local i=1
 
     while [[ $i -lt ${#COMP_WORDS[@]} ]]; do
         local word=${COMP_WORDS[i]}
         local next=${COMP_WORDS[i+1]}
-        if [[ $word == -F && -z $config_file_opt ]]; then
-            config_file_opt="-F $next"
+        if [[ $word == -F && -z $config_file ]]; then
+            config_file=$next
             ((i++))
-        elif [[ $word == -R && -z $repo_opt ]]; then
-            repo_opt="-R $next"
+        elif [[ $word == -R && -z $repo ]]; then
+            repo=$next
             ((i++))
+        elif [[ $word == -W ]]; then
+            working_tree=1
         fi
         ((i++))
     done
 
-    printf "%s %s %s" "-T" "$repo_opt" "$config_file_opt";
+    _sbozyp_command_prefix_args=(-T)
+    [[ -n $repo ]] && _sbozyp_command_prefix_args+=(-R "$repo")
+    [[ -n $working_tree ]] && _sbozyp_command_prefix_args+=(-W)
+    [[ -n $config_file ]] && _sbozyp_command_prefix_args+=(-F "$config_file")
 }
 
 _sbozyp_config_file() {
     local config_file=/etc/sbozyp/sbozyp.conf
-    if [[ $(_sbozyp_command_prefix) =~ -F[[:space:]](.+) ]]; then
-        config_file=$(eval printf '%s' "${BASH_REMATCH[1]}")
-    fi
+    local i=1
+    while [[ $i -lt ${#COMP_WORDS[@]} ]]; do
+        if [[ ${COMP_WORDS[i]} == -F ]]; then
+            config_file=${COMP_WORDS[i+1]}
+            break
+        fi
+        ((i++))
+    done
     printf '%s' "$config_file"
+}
+
+_sbozyp_complete_packages() {
+    if [[ $cur == .* || $cur == /* ]]; then
+        _filedir -d
+        return
+    fi
+    _sbozyp_command_prefix
+    local repo_dir=$(sbozyp "${_sbozyp_command_prefix_args[@]}" query -c 2>/dev/null)
+    [[ -d $repo_dir ]] || return
+
+    cur=$repo_dir$cur
+    _filedir -d
+    cur=${cur#"$repo_dir"}
+    COMPREPLY=( "${COMPREPLY[@]#"$repo_dir"}" )
+    compopt +o filenames 2>/dev/null
+
+    if [[ ${#COMPREPLY[@]} -eq 0 && $cur != */* ]]; then
+        COMPREPLY=( "$repo_dir"*/"$cur"*/ )
+        [[ -d ${COMPREPLY[0]} ]] || { COMPREPLY=(); return; }
+        COMPREPLY=( "${COMPREPLY[@]%/}" )
+        COMPREPLY=( "${COMPREPLY[@]##*/}" )
+    elif [[ $cur != */* ]]; then
+        COMPREPLY=( $(compgen -W "${COMPREPLY[*]}" -X '.*') )
+        COMPREPLY=( "${COMPREPLY[@]/%//}" )
+        compopt -o nospace 2>/dev/null
+    fi
 }
 
 _sbozyp_determine_command() {
@@ -53,7 +93,7 @@ _sbozyp_complete() {
     local cur prev words cword
     _init_completion || return
 
-    local global_opts="--help --version -C -F -R -S -T"
+    local global_opts="--help --version -C -F -R -S -T -W"
 
     local commands="install build remove query search null"
 
@@ -78,8 +118,7 @@ _sbozyp_complete() {
             elif [[ $prev == -b ]]; then
                 _filedir
             else
-                local all_prgnams=$(sbozyp $(_sbozyp_command_prefix) search -p '' 2>/dev/null)
-                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur") )
+                _sbozyp_complete_packages
             fi
             ;;
         build|bu)
@@ -89,8 +128,7 @@ _sbozyp_complete() {
             elif [[ $cur == -* ]]; then
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
             else
-                local all_prgnams=$(sbozyp $(_sbozyp_command_prefix) search -p '' 2>/dev/null)
-                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur") )
+                _sbozyp_complete_packages
             fi
             ;;
         null|nu)
@@ -108,8 +146,7 @@ _sbozyp_complete() {
             elif [[ $cur == -* ]]; then
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
             else
-                local all_prgnams=$(sbozyp $(_sbozyp_command_prefix) search -p '' 2>/dev/null)
-                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur") )
+                _sbozyp_complete_packages
             fi
             ;;
         remove|rm)
@@ -118,8 +155,14 @@ _sbozyp_complete() {
                 COMPREPLY=( "remove" )
             elif [[ $cur == -* ]]; then
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
+            elif [[ $cur == .* || $cur == /* ]]; then
+                _filedir -d
             else
-                local installed_packages=$(sbozyp $(_sbozyp_command_prefix) query -a 2>/dev/null | cut -d'/' -f2 | sort)
+                _sbozyp_command_prefix
+                local installed_packages=$(sbozyp "${_sbozyp_command_prefix_args[@]}" query -a 2>/dev/null)
+                if [[ $cur != */* ]]; then
+                    installed_packages=$(printf '%s\n' "$installed_packages" | cut -d'/' -f2 | sort)
+                fi
                 COMPREPLY=( $(compgen -W "$installed_packages" -- "$cur") )
             fi
             ;;

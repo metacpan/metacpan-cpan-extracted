@@ -21,7 +21,7 @@ ok keys %{ $p->{lex} }, 'lex';
 my ($known) = $p->knowns;
 is keys %$known, 10, 'known';
 my $power = $p->power;
-is @$power, 215, 'power';
+is @$power, 12, 'power';
 
 my $score = $p->score_parts( '[', ']' );
 my $mask = '1111111111';

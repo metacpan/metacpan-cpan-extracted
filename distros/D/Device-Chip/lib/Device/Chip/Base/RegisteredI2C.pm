@@ -1,18 +1,21 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2026 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::Base::RegisteredI2C 0.26;
+package Device::Chip::Base::RegisteredI2C 0.27;
 class Device::Chip::Base::RegisteredI2C :isa(Device::Chip);
 
 use utf8;
 
+use meta;
 use Future::AsyncAwait 0.38; # async method
+
+no warnings 'meta::experimental';
 
 use Carp;
 
@@ -28,6 +31,8 @@ use constant REG_DATA_SIZE => 8;
 C<Device::Chip::Base::RegisteredI2C> - base class for drivers of register-oriented I²C chips
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This subclass of L<Device::Chip> provides some handy utility methods to
 implement a chip driver that supports a chip which (largely) operates on the
@@ -58,7 +63,8 @@ method REG_DATA_BYTES ()
 
    # cache it for next time
    my $pkg = ref $self || $self;
-   { no strict 'refs'; *{"${pkg}::REG_DATA_BYTES"} = method () { $bytes }; }
+   my $metapkg = meta::package->get( $pkg );
+   $metapkg->add_named_sub( REG_DATA_BYTES => method () { $bytes } );
 
    return $bytes;
 }

@@ -1,5 +1,11 @@
 Revision history for JSON-YY
 
+0.07  2026-08-11
+    - security: fix encoder heap overflow; tied-hash and deep-nesting crashes
+    - fix thread-clone double free; latin-1 now encodes as utf-8
+    - fix scalar typing, TO_JSON, jnum, jfind, jpaths, jpatch, Doc compare
+    - Doc keywords no longer rewrite the scalars passed to them
+
 0.06  2026-06-05
     - Fix build on Windows/Strawberry Perl (yyjson allocator macro clash)
     - encode: fix reals on quadmath; emit C-locale radix

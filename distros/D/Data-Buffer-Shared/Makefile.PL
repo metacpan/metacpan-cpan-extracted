@@ -37,6 +37,16 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Data/Buffer/Shared.pm',
     AUTHOR            => 'vividsnow',
     LICENSE           => 'perl_5',
+    META_MERGE        => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+            repository => { type => 'git',
+                url => 'https://github.com/vividsnow/perl5-data-buffer-shared.git',
+                web => 'https://github.com/vividsnow/perl5-data-buffer-shared' },
+            bugtracker => { web => 'https://github.com/vividsnow/perl5-data-buffer-shared/issues' },
+        },
+    },
     MIN_PERL_VERSION  => '5.022',
     LIBS              => [''],
     DEFINE            => '-D_GNU_SOURCE',
@@ -44,4 +54,11 @@ WriteMakefile(
     XS                => { 'Shared.xs' => 'Shared.c' },
     OBJECT            => 'Shared$(OBJ_EXT)',
     clean            => { FILES => "*.bs *.o ppport.h Shared.c" },
+    # Shared.xs pulls the per-variant XSUBs in with INCLUDE:, which xsubpp
+    # resolves but make does not see. Without this, editing xs/*.xs or a
+    # buf_*.h leaves Shared.c stale and the rebuild silently keeps the old
+    # code.
+    depend            => {
+        'Shared.c' => join ' ', sort( glob('xs/*.xs'), glob('buf_*.h') ),
+    },
 );

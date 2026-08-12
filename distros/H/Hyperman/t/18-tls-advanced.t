@@ -17,7 +17,15 @@ my $curl = `which curl`; chomp $curl;
 plan skip_all => 'curl not found' unless $curl;
 
 my $dir = File::Temp::tempdir(CLEANUP => 1);
-sub sh { system("$_[0] >/dev/null 2>&1") == 0 or die "cmd failed: $_[0]\n" }
+
+# A host that cannot mint a certificate is missing a prerequisite, the same
+# one t/17 skips on - no usable openssl.cnf, an openssl too old for these
+# arguments, no entropy. That has to skip here too. Dying instead exited
+# before any plan was printed, which the harness can only read as a failed
+# test file ("No plan found in TAP output"), so every such smoker reported
+# FAIL for a certificate it was never able to create.
+my $made = 1;
+sub sh { $made &&= system("$_[0] >/dev/null 2>&1") == 0 }
 
 # --- a tiny CA, a server cert signed by it, and a client cert signed by it ---
 sh(qq{openssl req -x509 -newkey rsa:2048 -nodes -keyout $dir/ca.key -out $dir/ca.pem -days 1 -subj "/CN=Test CA"});
@@ -32,6 +40,12 @@ sh(qq{openssl req -x509 -newkey rsa:2048 -nodes -keyout $dir/ex.key -out $dir/ex
 # a third, for a host that is NOT in the map at boot - the certificate
 # that arrives while the process is already serving
 sh(qq{openssl req -x509 -newkey rsa:2048 -nodes -keyout $dir/late.key -out $dir/late.pem -days 1 -subj "/CN=late.test"});
+
+plan skip_all => 'could not create the test certificates'
+    unless $made
+        && !grep { !-s "$dir/$_" } qw(ca.pem ca.key srv.pem srv.key
+                                      cli.pem cli.key ex.pem ex.key
+                                      late.pem late.key);
 
 my $mtls_port = 24000 + ($$ % 500);
 my $sni_port  = 24500 + ($$ % 500);

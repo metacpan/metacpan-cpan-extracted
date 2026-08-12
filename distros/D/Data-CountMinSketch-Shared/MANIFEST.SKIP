@@ -18,3 +18,5 @@
 # local tool artifacts / built dists (not shipped)
 (^|/)\.pcg($|/)
 (^|/)\.claude($|/)
+^Data-CountMinSketch-Shared-[0-9][0-9.]*/
+^Data-CountMinSketch-Shared-[0-9][0-9.]*\.tar\.gz$

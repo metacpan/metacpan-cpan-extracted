@@ -44,6 +44,7 @@ static const MGVTBL buf_scalar_magic_vtbl = {
         croak("Expected a %s object", classname); \
     BufHandle* h = INT2PTR(BufHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    BufHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -54,8 +55,18 @@ static const MGVTBL buf_scalar_magic_vtbl = {
  * would dangle.  Used only where magic can actually intervene between
  * EXTRACT_BUF and the next use of h. */
 #define REEXTRACT_BUF(classname, sv) \
+    if (!SvROK(sv)) \
+        croak("%s object was replaced during the call", classname); \
     h = INT2PTR(BufHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("%s object destroyed during the call", classname)
+    if (h != h0) croak("%s object replaced or destroyed during the call", classname)
+
+/* Re-read the class-name PV immediately before blessing the new object.
+ * `class` is captured by the typemap in the INPUT section; a tied/overloaded
+ * later constructor argument can run get-magic that reallocs or frees ST(0)'s
+ * PV, dangling that pointer before it is used to bless.  Same fix as
+ * Data::CuckooFilter::Shared already carries. */
+#define REREAD_CLASS() \
+    class = SvPV_nolen(ST(0))
 
 /* ---- Generic keyword build functions ---- */
 

@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::Adapter 0.26;
+package Device::Chip::Adapter 0.27;
 role Device::Chip::Adapter :repr(HASH) :compat(invokable);
 
 use experimental 'signatures';
@@ -25,6 +25,8 @@ require Device::Chip;
 C<Device::Chip::Adapter> - an abstraction of a hardware communication device
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This package describes an interfaces tha classes can use to implement a driver
 to provide access to some means of connecting an electronic chip or hardware

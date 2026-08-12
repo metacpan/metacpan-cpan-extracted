@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 # ABSTRACT: Encode / decode IPv6 addresses
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 sub new { bless \my $x, shift }
 
@@ -87,6 +87,7 @@ sub _encode {
   my ( $self, $ip ) = @_;
   if ( $ip =~ m{\A([0-9A-Fa-f:]+)/(0|[1-9][0-9]*)\z} ) {
     my $mask = $2;
+    return if $mask > 128;
     return unless my $addr = _pack( $1 );
     return unless my $bits = _width2bits( $mask, 128 );
     return ( $addr & $bits, Net::CIDR::Set::_inc( $addr | ~$bits ) );
@@ -147,7 +148,7 @@ Net::CIDR::Set::IPv6 - Encode / decode IPv6 addresses
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =for Pod::Coverage new
 

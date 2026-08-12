@@ -487,7 +487,6 @@ static inline void deq_init_header(void *base, uint64_t total,
                                     uint64_t capacity) {
     DeqHeader *hdr = (DeqHeader *)base;
     memset(base, 0, (size_t)total);  /* zeroes data + ctl -> all slots EMPTY, gen=0 */
-    hdr->magic      = DEQ_MAGIC;
     hdr->version    = DEQ_VERSION;
     hdr->elem_size  = elem_size;
     hdr->variant_id = variant_id;
@@ -496,6 +495,12 @@ static inline void deq_init_header(void *base, uint64_t total,
     hdr->data_off   = sizeof(DeqHeader);
     hdr->ctl_off    = deq_ctl_offset(elem_size, capacity);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, DEQ_MAGIC, __ATOMIC_RELEASE);
+
 }
 
 /* Layout fields are passed in by the caller -- either from a validated
@@ -574,6 +579,16 @@ static int deq_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int deq_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static DeqHandle *deq_create(const char *path, uint64_t capacity,
                               uint32_t elem_size, uint32_t variant_id,
                               mode_t mode, char *errbuf) {
@@ -622,6 +637,31 @@ static DeqHandle *deq_create(const char *path, uint64_t capacity,
             DeqHeader snap;  /* single fetch: validate + setup use one copy */
             memcpy(&snap, base, sizeof snap);
             if (!deq_validate_header(&snap, (uint64_t)st.st_size, variant_id)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors.  Reads snap.magic, the snapshot
+                 * already fetched, rather than `base` again -- the same
+                 * single-fetch TOCTOU avoidance used above. */
+                if (snap.magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && deq_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        DEQ_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    deq_init_header(base, total, elem_size, variant_id, capacity);
+                    flock(fd, LOCK_UN); close(fd);
+                    return deq_setup(base, map_size, path, -1,
+                                     sizeof(DeqHeader), deq_ctl_offset(elem_size, capacity),
+                                     elem_size, capacity);
+                }
+                if (snap.magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    DEQ_ERR("%s: incomplete deque file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 DEQ_ERR("invalid deque file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);

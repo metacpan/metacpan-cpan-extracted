@@ -31,7 +31,8 @@ sub behaves_like_proclaim {
 		;
 
 	$params{throws} = qr/Key already resolved/
-		if exists $params{throws};
+		if exists $params{throws}
+		;
 
 	my ($lives, $error, $returns) = evaluate {
 		$params{object}->proclaim ($params{with_key}, $params{with_value});
@@ -39,13 +40,16 @@ sub behaves_like_proclaim {
 
 	context $title => as {
 		if ($params{throws}) {
-			it "should throw exception" => as { throws_ok { die $error unless $lives } $params{throws} };
-			it "should deduce value" => as { is $params{object}->deduce ($params{with_key}), $params{expect_value} }
-				if exists $params{expect_value};
+			it q (should throw exception) => as { throws_ok { die $error
+				unless $lives } $params{throws} };
+			it q (should deduce value) => as { is $params{object}->deduce ($params{with_key}), $params{expect_value} }
+				if exists $params{expect_value}
+				;
 		} else {
-			it "should not throw exception" => as { lives_ok { die $error unless $lives } };
-			it "should return 'self'" => as { is $returns, $params{object} };
-			it "should deduce value" => as { is $params{object}->deduce ($params{with_key}), $params{with_value} };
+			it q (should not throw exception) => as { lives_ok { die $error
+				unless $lives } };
+			it q (should return 'self') => as { is $returns, $params{object} };
+			it q (should deduce value) => as { is $params{object}->deduce ($params{with_key}), $params{with_value} };
 		}
 	};
 }
@@ -73,47 +77,54 @@ sub behaves_like_deduce {
 	};
 
 	my $code;
-	$code = as { throws_ok { die $error unless $lives_ok } $params{throws} }
-		if $params{throws};
+	$code = as { throws_ok { die $error
+		unless $lives_ok } $params{throws} }
+		if $params{throws}
+		;
 	$code //= as { lives_ok { die $error } }
-		unless $lives_ok;
+		unless $lives_ok
+		;
 	$code //= as { cmp_deeply $got, $params{expect_value} };
 
 	it $title => $code;
 }
 
 export build_frame => as {
-	my $parent = shared->frame_class // 'Context::Singleton::Frame';
-	$parent = shift if @_ % 2;
-	return $parent->new (@_);
+	my $parent = shared->frame_class // q (Context::Singleton::Frame);
+	$parent = shift
+		if @_ % 2
+		;
+	return $parent->build_frame (@_);
 };
 
 export build_sample_dependencies => as {
-	build_frame ('Sample::Context::Singleton::Frame::002::Resolve::Dependencies', @_);
+	build_frame (q (Sample::Context::Singleton::Frame::002::Resolve::Dependencies), @_);
 };
 
 export build_sample_unique => as {
-	build_frame ('Sample::Context::Singleton::Frame::001::Unique::DB', @_);
+	build_frame (q (Sample::Context::Singleton::Frame::001::Unique::DB), @_);
 };
 
 example expect_depth => as {
-	my $title = shift if @_ % 2;
+	my $title = shift
+		if @_ % 2
+		;
 	my (%params) = @_;
 	Hash::Util::lock_keys %params, qw[ object expect ];
 
-	it $title // "expect depth $params{expect}" => as { cmp_deeply $params{object}{depth}, $params{expect} };
+	it $title // qq (expect depth $params{expect}) => as { cmp_deeply $params{object}->depth, $params{expect} };
 };
 
 example it_should_have_parent => as {
 	my (%params) = @_;
 
-	it "should have parent" => as { ok $params{object}->{parent} };
+	it q (should have parent) => as { ok $params{object}->parent };
 };
 
 example it_should_not_have_parent => as {
 	my (%params) = @_;
 
-	it "should not have parent" => as { ok ! $params{object}->{parent} };
+	it q (should not have parent) => as { ok ! $params{object}->parent };
 };
 
 example should_proclaim => as {
@@ -161,15 +172,16 @@ example should_deduce => as {
 example should_not_deduce => as {
 	my ($title, %params) = @_;
 
-	test_method $title, %params, throws => 'Context::Singleton::Exception::Nondeducible';
+	test_method $title, %params, throws => q (Context::Singleton::Exception::Nondeducible);
 };
 
 example it_should_have_db => as {
 	my (%params) = @_;
 
-	it "should have db" => as { ok $params{object}->db };
-	it "should share db with its ancestor" => as { is $params{object}->db, $params{ancestor}->db }
-		if $params{ancestor};
+	it q (should have db) => as { ok $params{object}->db };
+	it q (should share db with its ancestor) => as { is $params{object}->db, $params{ancestor}->db }
+		if $params{ancestor}
+		;
 };
 
 example frame_constructor => as {
@@ -183,25 +195,34 @@ example frame_constructor => as {
 	$params{expect_resolved} //= [];
 
 	context $title => as {
-		Test::More::plan tests => $params{plan} if $params{plan};
+		Test::More::plan tests => $params{plan}
+			if $params{plan}
+			;
 		is_instance_of (
 			object => $params{object},
 			class  => $params{expect_class},
-		) if exists $params{expect_class};
+		)
+			if exists $params{expect_class}
+			;
 
-		expect_depth ("expect depth $params{expect_depth}" => do {
+		expect_depth (qq (expect depth $params{expect_depth}) => do {
 			object => $params{object},
 				expect => $params{expect_depth},
-			}) if exists $params{expect_depth};
+			})
+			if exists $params{expect_depth}
+			;
 
 		it_should_have_parent (object => $params{object})
-			if exists $params{expect_parent} and $params{expect_parent};
+			if exists $params{expect_parent} and $params{expect_parent}
+			;
 
 		it_should_not_have_parent (object => $params{object})
-			if exists $params{expect_parent} and not $params{expect_parent};
+			if exists $params{expect_parent} and not $params{expect_parent}
+			;
 
 		is ($params{object}->root_resolver, $params{expect_root})
-			if exists $params{expect_root};
+			if exists $params{expect_root}
+			;
 
 		#it_should_have_db (
 		#    object => $params{object},
@@ -210,7 +231,7 @@ example frame_constructor => as {
 
 		for my $key (@{ $params{expect_resolved} }) {
 			should_be_deduced (
-				"'$key' should be deduced",
+				qq ('$key' should be deduced),
 				object => $params{object},
 				with_key => $key,
 			)
@@ -223,7 +244,8 @@ example test_method_proclaim => as {
 	Hash::Util::lock_keys %params, qw[ object with_rule with_value throws expect ];
 
 	$params{expect} = $params{with_value}
-		unless exists $params{expect} or $params{throws};
+		unless exists $params{expect} or $params{throws}
+		;
 
 	test_method $title => %params;
 };

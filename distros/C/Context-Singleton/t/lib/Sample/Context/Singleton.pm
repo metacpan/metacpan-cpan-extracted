@@ -7,7 +7,7 @@ package Sample::Context::Singleton;
 
 our $VERSION = v1.0.0;
 
-use parent 'Context::Singleton';
+use parent q (Context::Singleton);
 
 use Ref::Util;
 
@@ -23,7 +23,7 @@ sub import {
 
 	$globals->{into} //= scalar caller;
 	$globals->{load_path} //= [];
-    push @{ $globals->{load_path} }, 'Sample::Context::Singleton::001';
+	push @{ $globals->{load_path} }, q (Sample::Context::Singleton::001);
 
 	$class->SUPER::import ($globals, @params);
 }

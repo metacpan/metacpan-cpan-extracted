@@ -5,7 +5,13 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our @EXPORT_OK = qw(read_varint read_varint_ref skip_header split_paren_list);
+our @EXPORT_OK = qw(read_varint read_varint_ref skip_header split_paren_list
+                    f64);
+
+# Round a literal through an IEEE double: a Float64 decodes bit-exactly
+# from the wire, but on a -Duselongdouble perl a literal like 3.14 is a
+# more precise number than the double the wire carries.
+sub f64 { return unpack('d', pack('d', $_[0])) }
 
 # Value form: read a LEB128 varint from $buf at $off, return ($value, $new_off).
 sub read_varint {

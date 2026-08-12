@@ -37,15 +37,10 @@ the first data that is added to it.
 
 # RECENT CHANGES
 
-Changes for version 0.22 (2026-06-13)
+Changes for version 0.23 (2026-08-11)
 
-- Toolchain
-    - Set the static install flag
-    - Adjusted build prerequisites to be recommended instead of required.
-    - Sign distribution with SigStore.
-- Tests
-    - Added author tests.
-    - Update minimum prereqs for some tests.
+- Security
+    - Fix an unbounded IPv6 netmask prefix length (CVE-2026-19566)
 
 See the `Changes` file for more details.
 

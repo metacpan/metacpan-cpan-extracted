@@ -144,6 +144,18 @@ int64_t parse_datetime64_string(pTHX_ const char *s, STRLEN len, int precision) 
 
     if (tz_pos < len) base -= parse_tz_offset(aTHX_ s, len, tz_pos);
 
-    uint64_t scale = (precision >= 0 && precision <= 19) ? pow10_u64[precision] : 1;
-    return base * (int64_t)scale + frac;
+    /* precision is capped at 0..9, so scale fits int64 comfortably - but
+     * base * scale does not, and would wrap to a negative tick count
+     * (signed overflow being undefined besides). Check before the
+     * multiply, not after. */
+    int64_t scale = (precision >= 0 && precision <= 18)
+                  ? (int64_t)pow10_u64[precision] : 1;
+    if (scale > 1 && (base > INT64_MAX / scale || base < INT64_MIN / scale))
+        croak("DateTime64(%d) out of range (value overflows 64-bit ticks): "
+              "%.*s", precision, (int)(len > 30 ? 30 : len), s);
+    int64_t ticks = base * scale;
+    if (frac > 0 && ticks > INT64_MAX - frac)
+        croak("DateTime64(%d) out of range (value overflows 64-bit ticks): "
+              "%.*s", precision, (int)(len > 30 ? 30 : len), s);
+    return ticks + frac;
 }

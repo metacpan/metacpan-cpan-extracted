@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -37,7 +37,6 @@
             "Exporter" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "List::Util" : "1.33",
-            "Params::Get" : "0.13",
             "Readonly::Values::Boolean" : "0",
             "Scalar::Util" : "0",
             "Unicode::GCString" : "0",
@@ -58,7 +57,7 @@
             "Readonly" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
-            "Test::Mockingbird" : "0.1",
+            "Test::Mockingbird" : "0.13",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::Warnings" : "0"
@@ -80,6 +79,6 @@
          "x_repository" : "https://github.com/nigelhorne/Params-Validate-Strict"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

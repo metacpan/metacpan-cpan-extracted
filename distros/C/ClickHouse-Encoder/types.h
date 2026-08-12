@@ -54,6 +54,16 @@ struct TypeInfo {
  * enum lookup HV, etc.). NULL-safe. */
 void free_typeinfo(pTHX_ TypeInfo *t);
 
+/* SAVEDESTRUCTOR_X cleanup for a caller-owned `TypeInfo *` variable:
+ *     ENTER;
+ *     TypeInfo *t = parse_type(...);
+ *     SAVEDESTRUCTOR_X(cleanup_typeinfo_ptr, &t);
+ *     ... work that may croak ...
+ *     LEAVE;                      // frees t
+ * parse_type disarms its own cleanup on success, so without this a croak
+ * between the parse and free_typeinfo leaks the type tree. */
+void cleanup_typeinfo_ptr(pTHX_ void *p);
+
 /* Parse a ClickHouse type expression ("Array(Tuple(Int32, String))",
  * "JSON(a Int32, b String)", etc.) into a freshly allocated TypeInfo.
  * Croaks on malformed input. Caller owns the result and must call

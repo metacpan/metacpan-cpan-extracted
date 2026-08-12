@@ -1,5 +1,12 @@
 Revision history for Data-HierTimingWheel-Shared
 
+0.02      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.01      2026-07-22
           - Fix a use-after-free in advance(): an overloaded or tied tick
             count runs Perl that can destroy the wheel, after which the

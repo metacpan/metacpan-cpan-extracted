@@ -1,7 +1,7 @@
 package Data::CountingBloomFilter::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::CountingBloomFilter::Shared', $VERSION);
 
@@ -41,6 +41,11 @@ Data::CountingBloomFilter::Shared - shared-memory counting Bloom filter for Linu
 
     # share across processes via a backing file
     my $shared = Data::CountingBloomFilter::Shared->new("/tmp/seen.cbf", 1_000_000);
+
+    # freeze and ship: query it read-only (lock-free) on other machines
+    $shared->freeze;
+    my $ro = Data::CountingBloomFilter::Shared->new_readonly("/tmp/seen.cbf");
+    $ro->contains("alice");
 
 =head1 DESCRIPTION
 
@@ -99,6 +104,7 @@ Requires 64-bit Perl.
     my $cbf = Data::CountingBloomFilter::Shared->new(undef, 1_000_000);        # anonymous, 1% default
     my $cbf = Data::CountingBloomFilter::Shared->new_memfd($name, $capacity, $fp_rate);
     my $cbf = Data::CountingBloomFilter::Shared->new_from_fd($fd);
+    my $ro  = Data::CountingBloomFilter::Shared->new_readonly($path);   # frozen file, read-only
 
 C<$path> is the backing file (C<undef> or omitted for an anonymous mapping).
 C<$capacity> is the number of items you expect to add (at least 1). C<$fp_rate>
@@ -106,16 +112,22 @@ is the target false-positive rate at that capacity, strictly between 0 and 1
 (default C<0.01>). C<new> and C<new_memfd> croak on a capacity below 1 or an
 out-of-range C<$fp_rate>.
 
-From C<$capacity> and C<$fp_rate> the filter derives C<k = round(-log2 fp_rate)>
-(clamped to 1..32) probes and C<m = next_pow2(capacity * k / ln2)> 4-bit counters
-(floor 64), for a C<m/2>-byte counter array. When reopening an existing file or
-memfd the stored geometry wins and the caller's C<$capacity>/C<$fp_rate>
-arguments are ignored. C<new_memfd> creates a Linux memfd (transferable via its
-C<memfd> descriptor); C<new_from_fd> reopens one in another process.
+From C<$capacity> and C<$fp_rate> the filter derives C<k = round(-log2
+fp_rate)> (clamped to 1..32) probes and C<m = next_pow2(capacity * k / ln2)>
+4-bit counters (floor 64), for a C<m/2>-byte counter array. When reopening an
+existing file or memfd the stored geometry wins, so the caller's
+C<$capacity>/C<$fp_rate> do not resize it -- but they are still range-checked
+first, so an out-of-range value croaks even though it would have been ignored.
+C<new_memfd> creates a Linux memfd (transferable via its C<memfd> descriptor);
+C<new_from_fd> reopens one in another process. The descriptor you pass is
+duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it
+does not disturb the handle.
 
 An optional file B<mode> may be passed as the last argument to C<new> (e.g.
 C<0660>) to opt a newly-created backing file into cross-user sharing; it defaults
 to C<0600> (owner-only) and is ignored for anonymous mappings and existing files.
+C<new_readonly> opens a B<frozen> file read-only for lock-free querying (see
+L</"FROZEN (READ-ONLY) MODE">).
 
 =head2 Adding, testing, counting, removing
 
@@ -168,14 +180,17 @@ present in either filter and C<count_of> reflects the summed (saturated) counts.
     $cbf->count; $cbf->capacity; $cbf->counters; $cbf->hashes; $cbf->fp_rate;
     $cbf->stats; $cbf->path; $cbf->memfd; $cbf->sync; $cbf->unlink;
 
-C<count> estimates the number of B<distinct items currently present> (added minus
-removed, from the fraction of nonzero counters, C<-(m/k) * ln(1 - X/m)> where
-C<X> is the nonzero-counter count); it is an estimate, not an exact tally. C<capacity> is the configured item
-capacity; C<counters> is the counter count C<m> (a power of two); C<hashes> is
-C<k>; C<fp_rate> is the configured target false-positive rate. C<sync> flushes
-the mapping to its backing store (a no-op for anonymous and memfd filters);
-C<unlink> removes the backing file (also callable as C<< Class->unlink($path) >>);
-C<path> returns the backing path (C<undef> for anonymous, memfd, or fd-reopened
+C<count> estimates the number of B<distinct items currently present> (added
+minus removed, from the fraction of nonzero counters, C<-(m/k) * ln(1 - X/m)>
+where C<X> is the nonzero-counter count); it is an estimate, not an exact
+tally. C<capacity> is the configured item capacity; C<counters> is the counter
+count C<m> (a power of two); C<hashes> is C<k>; C<fp_rate> is the configured
+target false-positive rate. C<sync> flushes the mapping to its backing store
+(a no-op for anonymous and memfd filters); C<unlink> removes the backing file
+(also callable as C<< Class->unlink($path) >>) and croaks if the removal fails
+-- except when the file is already gone, which is what you asked for; it is
+likewise a no-op when there is no backing file (anonymous or memfd); C<path>
+returns the backing path (C<undef> for anonymous, memfd, or fd-reopened
 filters) and C<memfd> the backing descriptor -- the memfd of a C<new_memfd>
 filter or the dup'd fd of a C<new_from_fd> filter, and -1 for file-backed or
 anonymous filters.
@@ -206,6 +221,11 @@ C<remove>, C<merge>, C<clear>), whether or not any counter actually changed.
 
 =item * C<mmap_size> -- bytes of the shared mapping.
 
+=item * C<frozen> -- 1 if the filter has been sealed by C<freeze> (immutable), else 0.
+
+=item * C<readonly> -- 1 if this handle is a read-only view (from C<new_readonly>,
+or the handle that called C<freeze>), else 0.
+
 =back
 
 =head1 SHARING ACROSS PROCESSES
@@ -224,17 +244,65 @@ into, tests against, and removes from the same table>.
     wait;
     print $cbf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
 
+=head1 FROZEN (READ-ONLY) MODE
+
+A file-backed filter can be B<frozen> and then shipped to other machines, where
+consumers open it B<read-only> and query it with B<no locking at all>.
+
+    # producer: build, freeze, ship the file
+    my $cbf = Data::CountingBloomFilter::Shared->new("/tmp/seen.cbf", 1_000_000, 0.01);
+    $cbf->add_many(\@known);
+    $cbf->freeze;                 # seal: now immutable, and $cbf itself is read-only
+    # ... copy /tmp/seen.cbf to another host ...
+
+    # consumer (any process, same architecture): read-only, lock-free
+    my $ro = Data::CountingBloomFilter::Shared->new_readonly("/tmp/seen.cbf");
+    $ro->contains($item) for @queries;
+    $ro->count_of($item);
+
+C<freeze> takes the write lock, marks the filter B<permanently immutable>
+(there is no unfreeze -- rebuild the file to change it), and flushes the seal
+to disk. A frozen filter rejects every mutator (C<add>, C<add_many>,
+C<remove>, C<merge>, C<clear>) with a croak, and a read-write reopen (C<<
+new($path, ...) >>) of a sealed file is B<refused> -- so a shipped artifact
+can never be silently mutated out from under its readers. That protection is
+enforced by the reader: the seal is a header flag that C<0.01> and earlier do
+not know about, and the on-disk format version is deliberately unchanged so
+those releases can still open files written here. A pre-C<0.02> build
+therefore opens a sealed file read-write and can modify it, so keep producers
+and consumers on C<0.02> or later if you rely on the seal. C<freeze> itself is
+not idempotent: the handle that seals the file becomes a read-only view of it,
+so calling C<freeze> on that handle again croaks.
+
+C<new_readonly($path)> maps the file C<O_RDONLY> / C<PROT_READ> and B<requires it
+to be frozen> (it croaks on a file that was never C<freeze>d). Because a sealed
+filter's counters and geometry are immutable, C<contains>, C<count_of>, C<count>,
+and C<stats> read them B<directly, taking no reader lock> -- the mapping is never
+written, so a read-only view works from a read-only file descriptor or a
+read-only filesystem, and any number of processes can share one C<PROT_READ>
+mapping. C<frozen> and C<readonly> report the two states.
+
+B<Portability.> The on-disk format is native binary (native-endian 64-bit
+words), so a frozen file may be copied only between machines of the B<same
+architecture>; a wrong-endian file is rejected at open by the magic check.
+B<Copy the file to each consumer> -- do not share one file over a network
+filesystem: the lock is a Linux futex (process-local to one kernel), and the
+"no live writer" contract assumes a static copy. Linux-only; 64-bit Perl.
+
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>;
-the mode is applied when the file is created; a pre-existing B<empty> file owned
-by the caller is adopted as new and likewise gets the requested mode, while a
-B<non-empty> existing file keeps its own permissions. The file is opened with
-C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with C<O_EXCL>; the on-disk header is validated when
-the file is attached. Any process you grant write access to a shared mapping is
-trusted not to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created; a pre-existing file
+owned by the caller is adopted as new -- and likewise gets the requested mode
+-- when it is B<empty>, or when it is the full-size all-zero file an
+interrupted create leaves behind (see L</CRASH SAFETY>). Any other existing
+file keeps its own permissions. The file is opened with C<O_NOFOLLOW>, so a
+symlink planted at the path is refused, and created with C<O_EXCL>; the
+on-disk header is validated when the file is attached. Any process you grant
+write access to a shared mapping is trusted not to corrupt its contents while
+other processes are using it.
 
 =head1 CRASH SAFETY
 
@@ -245,16 +313,46 @@ crash leaves the filter consistent up to the last completed operation.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
-crashed lock holder's contribution through its reader-slot. The slot table holds
-1024 entries (one per concurrent reader process). If more than that many reader
-processes share one mapping at once, a reader that cannot claim a slot proceeds
-"slotless" -- it still takes the read lock but leaves no per-process record. If
-such a slotless reader is then killed while holding the read lock, its share of
-the lock cannot be attributed to a dead process, so writer recovery cannot
-reclaim it and writers may block until the mapping is recreated. Reaching this
-needs more than 1024 concurrent reader processes on one mapping plus a crash in
-the brief read-lock window; the dead-process slot reclaim keeps the table from
-filling with stale entries, so in practice it is very unlikely.
+crashed lock holder's contribution through its reader-slot. The slot table
+holds 1024 entries (one per concurrent reader process). If more than that many
+reader processes share one mapping at once, a reader that cannot claim a slot
+proceeds "slotless" -- it still takes the read lock but leaves no per-process
+record. If such a slotless reader is then killed while holding the read lock,
+its share of the lock cannot be attributed to a dead process, so writer
+recovery cannot reclaim it and writers may block until the mapping is
+recreated. Reaching this needs more than 1024 concurrent reader processes on
+one mapping plus a crash in the brief read-lock window; the dead-process slot
+reclaim keeps the table from filling with stale entries, so in practice it is
+very unlikely. Those preconditions cover the live-process route only. The
+count lives in the mapping and C<new> validates the geometry, not this
+transient value, so a backing file damaged at rest -- bit rot, a partial copy,
+or a process that scribbled on the mapping -- can present a non-zero slotless
+count and block every writer the same way, with none of the above. If writers
+hang on a file no live reader is using, recreate it.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete counting Bloom
+filter file left by an interrupted create; remove it and retry>. A file left
+behind by an interrupted create never held data, so removing it is safe -- but
+a file whose header was corrupted after the fact reaches the same croak, so
+confirm it is an abandoned create before deleting anything you care about.
+
+B<Disk space.> The backing file is created B<sparse>: C<new> sizes it, but
+blocks are allocated only as you write, so a large filter costs almost
+nothing on disk until it is used. The cost of that is a late failure, and how
+it reaches you depends on the filesystem. Where blocks are allocated at fault
+time -- tmpfs, so C</dev/shm> and many C</tmp> mounts -- a write to a page that
+cannot be backed raises C<SIGBUS> and kills the process, because an C<mmap>
+store has no way to report C<ENOSPC>. Where allocation is delayed to writeback
+(ext4, xfs), the store lands in page cache and the failure appears later: the
+write is lost, and C<sync> is what reports it, croaking with the underlying
+error. Keep the filesystem sized for the filter you asked for, and call
+C<sync> when you need to know your writes reached disk.
 
 =head1 SEE ALSO
 

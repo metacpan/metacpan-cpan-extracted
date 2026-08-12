@@ -35,6 +35,32 @@ plan skip_all => 'Compress::LZ4 not installed' unless $have_lz4;
          'cityhash128 distinguishes different inputs');
 }
 
+# Golden vectors. Every other check here compares the hash against itself
+# and so cannot notice a WRONG hash - a blind spot that hid a real bug in
+# the >=128-byte path. Each expectation below is the checksum of a frame
+# a real ClickHouse 26.7 accepted, so it comes from the server, not us.
+# Lengths straddle the 128-byte path split.
+{
+    my $enc = ClickHouse::Encoder->new(columns => [['id', 'UInt64']]);
+    my @vectors = (
+        [   1, 'a2757fbbcf9c44f7f93179b68ad09e65' ],  # 29 B  - short path
+        [  12, '6e6e4d9f48921ee6269873eb40702f6e' ],  # 117 B - short path
+        [  16, 'ee974a0ef8e26a913eecfdbb18c475ef' ],  # 149 B - long loop
+        [  40, 'e9eb845623ef3ab1e9c158a982c40ccc' ],  # 341 B - long loop
+        [ 200, '707a74b6c5737b0fa593fbd6a3bc51fb' ],  # 1622 B - long loop
+    );
+    for my $v (@vectors) {
+        my ($rows, $want) = @$v;
+        my $block  = $enc->encode([ map { [$_] } 1 .. $rows ]);
+        my $framed = ClickHouse::Encoder->compress_native_block(
+            $block, mode => 'none');
+        my $hashed = substr($framed, 16);   # header + payload, as CH hashes
+        is(unpack('H*', ClickHouse::Encoder::_cityhash128($hashed)), $want,
+           "cityhash128 matches ClickHouse for a "
+         . length($hashed) . "-byte input ($rows rows)");
+    }
+}
+
 # unknown mode rejected
 {
     my $err = eval {

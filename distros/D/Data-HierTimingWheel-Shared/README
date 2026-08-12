@@ -26,31 +26,30 @@ DESCRIPTION
     behind Linux kernel and Kafka/Netty timers): a timer scheduler where
     scheduling and cancelling are O(1) at any delay, from one tick to
     billions, in a fixed amount of memory. It is the multi-level
-    generalisation of Data::TimingWheel::Shared: where the single-level
-    wheel revisits a far-future timer once per rotation, this one parks it
-    in a coarse level and only touches it as its time approaches.
+    generalisation of Data::TimingWheel::Shared: where the single-level wheel
+    revisits a far-future timer once per rotation, this one parks it in a
+    coarse level and only touches it as its time approaches.
 
-    Time advances in integer ticks. There are "num_levels" cascading wheels
-    of "num_slots" (= S) buckets each; a level-"k" slot spans "S**k" ticks,
-    so the whole structure schedules any delay in "[1, S**num_levels)". A
-    timer is placed in the lowest level whose range covers its delay. On
-    each tick, level 0 fires the timers in its current slot; when level 0
-    completes a rotation, the next level's current slot cascades down -- its
-    timers are redistributed into finer levels by their remaining delay --
-    recursively up the levels. A timer with delay "D" fires at exactly tick
-    "D", just like the single-level wheel, but a far-future timer costs O(1)
-    instead of one visit per rotation.
+    Time advances in integer ticks. There are "num_levels" cascading wheels of
+    "num_slots" (= S) buckets each; a level-"k" slot spans "S**k" ticks, so
+    the whole structure schedules any delay in "[1, S**num_levels)". A timer
+    is placed in the lowest level whose range covers its delay. On each tick,
+    level 0 fires the timers in its current slot; when level 0 completes a
+    rotation, the next level's current slot cascades down -- its timers are
+    redistributed into finer levels by their remaining delay -- recursively up
+    the levels. A timer with delay "D" fires at exactly tick "D", just like
+    the single-level wheel, but a far-future timer costs O(1) instead of one
+    visit per rotation.
 
     Each timer carries an arbitrary 64-bit payload (e.g. a job id) returned
-    when it fires. Timers live in a fixed pool of "capacity" slots;
-    scheduling beyond it, or with a delay at or beyond "S**num_levels",
-    croaks.
+    when it fires. Timers live in a fixed pool of "capacity" slots; scheduling
+    beyond it, or with a delay at or beyond "S**num_levels", croaks.
 
     Because the wheels live in a shared mapping, several processes schedule
-    into and advance one clock: any process that opens the same backing
-    file, inherits the anonymous mapping across "fork", or reopens a passed
-    memfd shares the same timers. A write-preferring futex rwlock with
-    dead-process recovery guards mutation. Linux-only. Requires 64-bit Perl.
+    into and advance one clock: any process that opens the same backing file,
+    inherits the anonymous mapping across "fork", or reopens a passed memfd
+    shares the same timers. A write-preferring futex rwlock with dead-process
+    recovery guards mutation. Linux-only. Requires 64-bit Perl.
 
 METHODS
   Constructors
@@ -64,35 +63,35 @@ METHODS
     together they set the maximum schedulable delay to "S**L - 1" ticks
     ("num_slots ** num_levels" must fit in 64 bits, else the constructor
     croaks). $capacity is the maximum number of concurrent timers (1..2^24).
-    Memory is "num_levels * num_slots * 4 + capacity * 32" bytes plus a
-    fixed header. Choose S and L so that "S**L" exceeds your longest delay
-    -- e.g. "256, 4" covers ~4.3 billion ticks, "64, 8" covers ~281
-    trillion. When reopening an existing file or memfd the stored geometry
-    wins and the caller's arguments are ignored. An optional file mode may
-    be passed as the last argument to "new" (e.g. 0660) for cross-user
-    sharing; it defaults to 0600 (owner-only).
+    Memory is "num_levels * num_slots * 4 + capacity * 32" bytes plus a fixed
+    header. Choose S and L so that "S**L" exceeds your longest delay -- e.g.
+    "256, 4" covers ~4.3 billion ticks, "64, 8" covers ~281 trillion. When
+    reopening an existing file or memfd the stored geometry wins and the
+    caller's arguments do not resize it -- but they are still range-checked,
+    so an out-of-range value croaks. An optional file mode may be passed as
+    the last argument to "new" (e.g. 0660) for cross-user sharing; it defaults
+    to 0600 (owner-only).
 
   Scheduling
         my $id = $tw->add($delay, $payload);   # returns a timer id
         my $id = $tw->schedule($delay, $payload); # alias for add
         my $ok = $tw->cancel($id);             # 1 if cancelled, 0 if already fired/invalid
 
-    "add" schedules a timer to fire $delay ticks from now (a delay below 1
-    is treated as 1) carrying the integer $payload, and returns a timer id;
-    it croaks if the timer pool is full or $delay is at or beyond the
-    wheel's range ("max_delay + 1"). "cancel" removes a still-pending timer
-    by its id, returning 1 if it was cancelled or 0 if it had already fired
-    or the id is not active.
+    "add" schedules a timer to fire $delay ticks from now (a delay below 1 is
+    treated as 1) carrying the integer $payload, and returns a timer id; it
+    croaks if the timer pool is full or $delay is at or beyond the wheel's
+    range ("max_delay + 1"). "cancel" removes a still-pending timer by its id,
+    returning 1 if it was cancelled or 0 if it had already fired or the id is
+    not active.
 
   Advancing the clock
         my @due = $tw->advance($ticks);   # advance by $ticks (default 1)
         my @due = $tw->advance;           # advance by one tick
 
-    "advance" moves the wheel forward by $ticks ticks (default 1) and
-    returns the list of payloads of every timer that came due during those
-    ticks, in fire order. Timers that fire are removed automatically. Cost
-    is O(ticks + fired) amortised; cascades happen only when a level rolls
-    over.
+    "advance" moves the wheel forward by $ticks ticks (default 1) and returns
+    the list of payloads of every timer that came due during those ticks, in
+    fire order. Timers that fire are removed automatically. Cost is O(ticks +
+    fired) amortised; cascades happen only when a level rolls over.
 
   Introspection and lifecycle
         $tw->now;           # absolute tick count since creation (or last clear)
@@ -106,48 +105,62 @@ METHODS
         $tw->path; $tw->memfd; $tw->sync; $tw->unlink;
 
     "clear" cancels every timer and resets the tick counter. "sync" flushes
-    the mapping to its backing store (a no-op for anonymous and memfd
-    wheels); "unlink" removes the backing file (also callable as
+    the mapping to its backing store (a no-op for anonymous and memfd wheels);
+    "unlink" removes the backing file (also callable as
     "Class->unlink($path)"); "path" returns the backing path ("undef" for
     anonymous, memfd, or fd-reopened wheels) and "memfd" the backing
     descriptor.
 
 SHARING ACROSS PROCESSES
     The wheels live in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file, an anonymous mapping inherited
-    across "fork", or a memfd passed to an unrelated process and reopened
-    with new_from_fd($fd). Any process can schedule timers; typically one
-    process owns advancing the clock and dispatches the fired payloads,
-    while others schedule and cancel. The tick counter is shared, so all
-    processes agree on "now".
+    rest of the family: a backing file, an anonymous mapping inherited across
+    "fork", or a memfd passed to an unrelated process and reopened with
+    new_from_fd($fd). The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle. Any process can schedule timers; typically one process
+    owns advancing the clock and dispatches the fired payloads, while others
+    schedule and cancel. The tick counter is shared, so all processes agree on
+    "now".
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default; pass
-    an explicit octal mode (e.g. 0660) as the last argument to "new" for
-    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
-    and the header is validated on attach. Any process granted write access
-    is trusted not to corrupt the mapping.
+    Backing files are created with mode 0600 (owner-only) by default; pass an
+    explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL", and
+    the header is validated on attach. Any process granted write access is
+    trusted not to corrupt the mapping.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
-    PID-encoded ownership and dead-owner recovery. Scheduling, cancelling,
-    and each tick of an advance are short bounded list operations, so a
-    crash leaves the wheel consistent up to the last completed operation.
+    PID-encoded ownership and dead-owner recovery. Scheduling, cancelling, and
+    each tick of an advance are short bounded list operations, so a crash
+    leaves the wheel consistent up to the last completed operation.
     Limitation: PID reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete hierarchical timing-wheel file left by an interrupted create;
+    remove it and retry". A file left behind by an interrupted create never
+    held data, so removing it is safe -- but a file whose header was corrupted
+    after the fact reaches the same croak, so confirm it is an abandoned
+    create before deleting anything you care about.
 
 SEE ALSO
     Data::TimingWheel::Shared (single-level wheel; simpler, for bounded
@@ -158,6 +171,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

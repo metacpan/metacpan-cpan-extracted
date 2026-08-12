@@ -2,7 +2,7 @@ use v5.36;
 
 package RT::Extension::AwayMode;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # Transaction types that hand a ticket off when its owner is away. Must stay a
 # subset of the ApplicableTransTypes the scrip condition is registered with in
@@ -85,7 +85,8 @@ scrip condition installed by C<make initdb> was registered for C<Correspond>
 transactions only, and RT filters on that column before the condition code
 ever runs, so a code-only upgrade would never see comments. Re-running
 C<make initdb> is B<not> the way to fix this: it would install a second copy
-of the scrip. Instead, widen the existing condition once:
+of the scrip. Instead, widen the existing condition once (and bring its
+description in line with what it now does):
 
     perl -I /opt/rt6/local/lib -I /opt/rt6/lib -e '
         use RT; RT::LoadConfig(); RT::Init();
@@ -94,7 +95,14 @@ of the scrip. Instead, widen the existing condition once:
         die "no such scrip condition\n" unless $cond->Id;
         my ($ok, $msg) = $cond->SetApplicableTransTypes("Correspond,Comment");
         die "$msg\n" unless $ok;
+        ($ok, $msg) = $cond->SetDescription(
+            "Whenever a reply or comment arrives on a ticket whose owner has Away Mode active");
+        die "$msg\n" unless $ok;
     '
+
+The description is cosmetic -- it is what the admin UI shows for the
+condition -- so only the C<SetApplicableTransTypes> call actually changes
+behaviour.
 
 Fresh installs need nothing extra; C<make initdb> already registers both
 transaction types.

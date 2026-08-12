@@ -29,7 +29,8 @@ add_stopwords(qw(
     SQL TabSeparated tsv csv NDJSON JSONL
     HTTP Tiny PerlIO POSIX
     zstd gzip lz4
-    backpressure cardinality compressor compressors
+    backpressure cardinality compressor compressors decompressor
+    GiB unbracketed
     croaks croaking croak's
     iter iterator iterators
     perlio Perl5 perl5

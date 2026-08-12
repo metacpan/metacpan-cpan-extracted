@@ -1,7 +1,7 @@
 package Data::Graph::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::Graph::Shared', $VERSION);
 
@@ -73,11 +73,15 @@ B<Linux-only>. Requires 64-bit Perl.
     my $g = Data::Graph::Shared->new(undef, $max_nodes, $max_edges);  # anonymous
     my $g = Data::Graph::Shared->new_memfd($name, $max_nodes, $max_edges);
     my $g = Data::Graph::Shared->new_from_fd($fd);                    # reopen memfd
+    my $ro = Data::Graph::Shared->new_readonly($path);   # frozen file, read-only
 
-C<$max_nodes> is rounded up to the next even number for alignment, so
-C<< $g->max_nodes >> may report one more than requested; C<$max_edges> is the
-edge-slot capacity. An optional trailing octal C<$mode> (see L</SECURITY>) sets
-the backing-file permissions.
+C<$max_nodes> is rounded up to the next even number for alignment, so C<<
+$g->max_nodes >> may report one more than requested; C<$max_edges> is the
+edge-slot capacity. An optional trailing octal C<$mode> (see L</SECURITY>)
+sets the backing-file permissions. C<new_readonly> opens a B<frozen> file
+read-only for lock-free queries (see L</"FROZEN (READ-ONLY) MODE">). The
+descriptor you pass is duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to
+close and closing it does not disturb the handle.
 
 =head2 Operations
 
@@ -95,6 +99,14 @@ the backing-file permissions.
     my @ids = $g->nodes;                     # all node indices
     $g->node_count;  $g->edge_count;
     $g->max_nodes;   $g->max_edges;
+
+An id becomes stale once its node is removed, and the two kinds of method
+treat that differently. C<add_edge>, C<remove_node> and C<remove_node_full>
+return true when they did something and false when the node is not there --
+so an C<add_edge> naming a removed node adds no edge and reports it only
+through that return value. C<node_data>, C<set_node_data>, C<degree>,
+C<neighbors> and C<each_neighbor> instead croak on an id that does not
+exist. C<has_node> is the cheap way to tell beforehand.
 
 =head2 Lifecycle
 
@@ -132,6 +144,18 @@ crashing mid-write may leave the structure in an inconsistent state.
 Any process you grant write access to the mapping is trusted not to corrupt
 it. This is B<Linux-only> (it relies on futex and F</proc>).
 
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete graph file left
+by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
+
 =head1 BENCHMARKS
 
 Single-process (10K ops, x86_64 Linux, Perl 5.40):
@@ -146,18 +170,61 @@ Single-process (10K ops, x86_64 Linux, Perl 5.40):
 =head1 STATS
 
 C<stats()> returns: C<node_count>, C<edge_count>, C<max_nodes>,
-C<max_edges>, C<ops>, C<mmap_size>.
+C<max_edges>, C<ops>, C<mmap_size>, C<frozen>, C<readonly>.
+
+=head1 FROZEN (READ-ONLY) MODE
+
+A file-backed graph can be B<frozen> and then shipped to other machines, where
+consumers open it B<read-only> and query it with B<no locking at all>.
+
+    # producer: build, freeze, ship the file
+    my $g = Data::Graph::Shared->new("/tmp/graph.shm", 100, 500);
+    my $a = $g->add_node(1);
+    my $b = $g->add_node(2);
+    $g->add_edge($a, $b, 5);
+    $g->freeze;                  # seal: now immutable, and $g itself is read-only
+    # ... copy /tmp/graph.shm to another host ...
+
+    # consumer (any process, same architecture): read-only, lock-free
+    my $ro = Data::Graph::Shared->new_readonly("/tmp/graph.shm");
+    $ro->neighbors($a);
+
+C<freeze> takes the mutex, marks the graph B<permanently immutable> (there is
+no unfreeze -- rebuild the file to change it), and flushes the seal to disk. A
+frozen graph rejects every mutator (C<add_node>, C<add_edge>, C<remove_node>,
+C<remove_node_full>, C<set_node_data>) with a croak, and a read-write reopen
+(C<< new($path, ...) >> or C<new_from_fd>) of a sealed file is B<refused> -- so
+a shipped artifact can never be silently mutated out from under its readers.
+
+C<new_readonly($path)> maps the file C<O_RDONLY> / C<PROT_READ> and B<requires
+it to be frozen> (it croaks on a file that was never C<freeze>d). Because a
+sealed graph's nodes and edges are immutable, C<has_node>, C<node_data>,
+C<neighbors>, C<degree>, C<nodes>, C<each_neighbor>, C<node_count>,
+C<edge_count> and C<stats> read them B<directly, taking no lock> -- the
+mapping is never written, so a read-only view works from a read-only file
+descriptor or a read-only filesystem, and any number of processes can share
+one C<PROT_READ> mapping. C<frozen> and C<readonly> report the two states.
+
+B<Portability.> The on-disk format is native binary (native-endian 64-bit
+words), so a frozen file may be copied only between machines of the B<same
+architecture>; a corrupt or foreign-endian file is rejected at open (the magic
+check fails). B<Copy the file to each consumer> -- do not share one file over
+a network filesystem: the mutex is a Linux futex (process-local to one
+kernel), and the "no live writer" contract assumes a static copy. Linux-only;
+64-bit Perl.
 
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created, and when a file left
+behind by an interrupted create is re-initialized (see L</CONCURRENCY AND
+CRASH SAFETY>); a file already in use keeps its own permissions. The file is
+opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused, and
+created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted
+not to corrupt its contents while other processes are using it.
 
 =head1 SEE ALSO
 

@@ -34,5 +34,8 @@ throws_ok {
     Net::CIDR::Set->new->add("::1/02");
 } qr{^Can't decode ::1/02 as an IPv4 or IPv6 address};
 
+throws_ok {
+    Net::CIDR::Set->new->add("2001:db8::/129");
+} qr{^Can't decode 2001:db8::/129 as an IPv4 or IPv6 addres};
 
 done_testing;

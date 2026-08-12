@@ -1,5 +1,14 @@
 Revision history for Data::Deque::Shared
 
+0.08      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.07      2026-07-21
           - Fix push/pop hanging on a slot abandoned by a killed peer.
           - Resolve argument magic before capturing the path string.
@@ -16,11 +25,11 @@ Revision history for Data::Deque::Shared
 0.04  2026-05-26
     - drain: bounded recovery (~2s) for slots stuck after a crashed pusher
       (covers both WRITING and pre-claim_write EMPTY@gen windows)
-    - slot publish is now CAS-only — prevents a stalled pusher from
+    - slot publish is now CAS-only -- prevents a stalled pusher from
       clobbering a slot drain force-recovered to EMPTY
     - new stats->{recoveries} counter for drain-time force-skips
     - header validation rejects files with elem_size invalid for the
-      variant (Int = 8, Str ≥ 5)
+      variant (Int = 8, Str >= 5)
 
 0.03  2026-04-26
     - MPMC per-slot state machine + file format v2
@@ -31,7 +40,7 @@ Revision history for Data::Deque::Shared
 
 
 0.02  2026-04-12
-    - Add drain() — concurrency-safe alternative to clear()
+    - Add drain() -- concurrency-safe alternative to clear()
 
 0.01  2026-04-11
     - Initial release

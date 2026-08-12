@@ -41,6 +41,7 @@ examples/lzw_string_fibonacci.pl
 examples/mrl.pl
 examples/mrl_string.pl
 lib/Compression/Util.pm
+lib/Compression/Util.pod
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

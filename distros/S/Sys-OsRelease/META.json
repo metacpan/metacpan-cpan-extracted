@@ -65,8 +65,8 @@
          "web" : "https://github.com/ikluft/Sys-OsRelease"
       }
    },
-   "version" : "0.4.5",
-   "x_generated_by_perl" : "v5.42.2",
+   "version" : "0.4.6",
+   "x_generated_by_perl" : "v5.42.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.41",
    "x_spdx_expression" : "Artistic-2.0"
 }

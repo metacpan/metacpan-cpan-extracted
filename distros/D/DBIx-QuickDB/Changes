@@ -1,3 +1,14 @@
+0.000065  2026-08-11 10:03:34-07:00 America/Los_Angeles
+
+    - Release tarballs no longer carry the internal agent and developer
+      Markdown files, the AI_DOCS directory, or perltidyrc. README.md still
+      ships.
+
+    - Test machinery only, no runtime change: t/watcher_fast_kill.t and
+      t/server_exit_status.t no longer fail on a heavily loaded host, whose
+      scheduling delays outran timing windows those tests did not need to
+      keep tight.
+
 0.000064  2026-08-08 17:32:34-07:00 America/Los_Angeles
 
     - Test machinery only, no runtime change: a host that runs out of System V

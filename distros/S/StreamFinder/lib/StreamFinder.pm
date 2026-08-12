@@ -139,7 +139,6 @@ iheart.com (aka iheartradio.com) radio stations and podcasts
 (L<StreamFinder::IHeartRadio>), 
 www.internet-radio.com radio stations (L<StreamFinder::InternetRadio>), 
 onlineradiobox.com radio stations (L<StreamFinder::OnlineRadiobox>), 
-odysee.com videos (L<StreamFinder::Odysee>), 
 podbean.com podcasts (L<StreamFinder::Podbean>), 
 podcastaddict.com podcasts (L<StreamFinder::PodcastAddict>), 
 podchaser.com podcasts (L<StreamFinder::Podchaser>), 
@@ -158,6 +157,11 @@ youtube.com, et. al and other sites that yt-dlp support
 zeno.fm radio stations and podcasts (L<StreamFinder::Zeno>), 
 and L<StreamFinder::Anystream> - search any (other) webpage URL (not supported 
 by any of the other submodules) for streams.  
+
+NOTE:  StreamFinder::Odysee has been removed as it is now no longer possible 
+to play stream URLs on their site because they now require their javascript- 
+based browser-player to access (and they don't seem to provide a Youtube 
+stream anymore).
 
 NOTE:  StreamFinder::Podcastaddict is now fully-functional again including 
 being able to return playlists from podcast pages!
@@ -449,7 +453,7 @@ L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
 
-yt-dlp (for Youtube, Bitchute, Blogger, Brighteon, Odysee, Vimeo)
+yt-dlp (for Youtube, Bitchute, Blogger, Brighteon, Vimeo)
 NOTE:  Required for Youtube, Bitchute, and SoundCloud to work.
 
 wget
@@ -535,7 +539,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.64';
+our $VERSION = '2.70';
 our $DEBUG = 0;
 
 require Exporter;
@@ -543,7 +547,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox EpochTV 
-		Google IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict Podchaser 
+		Google IHeartRadio InternetRadio OnlineRadiobox Podbean PodcastAddict Podchaser 
 		PragerU RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube Zeno 
 		Subsplash));
 
@@ -624,9 +628,6 @@ sub new
 	} elsif ($url =~ m#\bsermonaudio\.com\/# && $useit{'SermonAudio'}) {
 		eval { require 'StreamFinder/SermonAudio.pm'; $haveit = 1; };
 		return new StreamFinder::SermonAudio($url, @args)  if ($haveit);
-	} elsif ($url =~ m#\bodysee\.com\/# && $useit{'Odysee'}) {
-		eval { require 'StreamFinder/Odysee.pm'; $haveit = 1; };
-		return new StreamFinder::Odysee($url, @args)  if ($haveit);
 	} elsif ($url =~ m#\bpodbean\.com\b# && $useit{'Podbean'}) {
 		eval { require 'StreamFinder/Podbean.pm'; $haveit = 1; };
 		return new StreamFinder::Podbean($url, @args)  if ($haveit);

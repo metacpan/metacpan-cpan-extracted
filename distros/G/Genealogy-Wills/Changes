@@ -1,5 +1,196 @@
 Revision history for Genealogy::Wills
 
+0.11	Tue Aug 11 07:40:15 PM EDT 2026
+	[ Enhancements ]
+	- Add t/path.t: 35-subtest exhaustive CFG path-coverage suite (LCSAJ/TER3).
+	  Maps all unique execution paths through new() (18 paths: PN-1 to PN-18),
+	  search() (12+ paths: PS-1 to PS-12), and _decorate_will() (1 sequential
+	  path: PD-1). Covers: ::new() function form with undef class (//= fires),
+	  clone paths (single-string, no-args // {} guard, flat-list override),
+	  config_file readable vs unreadable (D=TRUE/FALSE), all three logger-croak
+	  branches (not blessed, missing info(), missing error()), logger=undef
+	  defined() skip, directory //= MODULE_DATA_DIR branch, -d+r check both
+	  directions, unreadable directory (chmod 0, SKIP for root/Win32), A-branch
+	  (single-string arg) vs get_params branch for class->new(), PVS throws on
+	  bad last/optional-field/year (5 variants), D=TRUE carp in list+scalar
+	  context, wills->new()=undef croak, list context 0-iter and N-iter loops
+	  (fixate count proxy), scalar fetchrow=undef bare return, scalar
+	  fetchrow=defined Return::Set path, ||= short-circuit on pre-set slot,
+	  bare-string and hashref arg normalization.  Uses inline _PT_MockDB_Rows/
+	  _PT_MockDB_Empty packages (real named methods) to avoid Test::Mockingbird
+	  AUTOLOAD-cache decay that causes fetchrow_hashref to return 1 after
+	  multiple restore_all() cycles.  Dead-code summary: none.  Loop analysis:
+	  for-loop in search() executes 0 or N>=2 times (no annotation required).
+	- Add t/extended_tests.t: 14-subtest coverage-gap suite targeting untested
+	  LCSAJ/TER3 paths. Covers: scalar context + undef last (carps and returns
+	  undef, not empty list); new() logger => undef skips the defined() guard
+	  branch; wills->new() arg capture (no_entry, no_fixate, directory all
+	  forwarded); void context search() (wantarray false, scalar branch taken);
+	  hashref argument form happy path; Data::Reuse::fixate call count equals
+	  row count in list context and is zero for empty list; Return::Set::set_return
+	  invoked exactly once in scalar non-null path; alternating list/scalar calls
+	  on same object (no cross-contamination); clone inheriting pre-set wills slot
+	  (wills::new() not called again on clone); first/middle/town/year optional
+	  fields forwarded verbatim to DB layer (apostrophe, period, hyphen, comma
+	  preserved); bare-string form maps to { last => string } verified at DB
+	  boundary; clone with no-arg new() inherits all original attribute values.
+	- Regex audit: lib/Genealogy/Wills.pm: $MODULE_DATA_DIR s/\.pm$// → s/\.pm\z// (strict
+	  end-of-string; $ matches before trailing \n, \z does not)
+	- Regex audit: lib/Genealogy/Wills.pm: $SEARCH_SCHEMA matches qr/^[\w\-]+$/ → qr/^[\w-]+\z/a:
+	  \z for strict eos; idiomatic unescaped [-] at end of character class; /a restricts \w
+	  to ASCII [0-9A-Za-z_] blocking Unicode homograph queries (Finding 2 applied)
+	- Regex audit: bin/create_db.PL: replace $line =~ /Created by/ with index() for O(1)
+	  literal substring check (avoids regex engine startup cost per line)
+	- Regex audit: bin/create_db.PL: rewrite main HTML parsing regex with /x modifier and
+	  negated character classes: [^"]+ for href (URL cannot contain "), [^,<>]+ for last
+	  name (bounded by comma delimiter), [^<]+? non-greedy for first name (terminates at
+	  </a>), .+? non-greedy for town (year anchor stops correctly) — eliminates ReDoS
+	  from greedy (.+) groups that could backtrack catastrophically on malformed input
+	- Regex audit: bin/create_db.PL: Alias regex /(.+)\sAlias\s(.+)/ → /\A(.+?)\s+Alias\s+(.+)\z/x:
+	  anchored; non-greedy first group splits on FIRST Alias; \s+ tolerates multi-space
+	- Regex audit: bin/create_db.PL: slash alias regex /(.+)\/(.+)/ → /\A([^\/]+)\/(.+)\z/x:
+	  [^/]+ for first part (no backtracking possible; alias cannot contain /); anchored
+	- Regex audit: bin/create_db.PL: town "next" regex /(.*) next (.*?)/i → /x multiline
+	  with .+ (not .*) requiring non-empty place names; \s+ around "next" for robustness
+	- Regex audit: bin/create_db.PL: first/middle split /^(.+?)\s(.+)$/ → /^(\S+)\s+(.+)\z/:
+	  \S+ (non-whitespace) for first-name token avoids backtracking; \s+ handles double-
+	  spaced input; \z is strictly end-of-string
+	- Bump minimum versions
+	- Added the test dashboard
+	- Modernize Genealogy::Wills.pm: use autodie, explicit Scalar::Util import, simplified
+	  directory fallback, optimised list-context return in search()
+	- Modernize bin/create_db.PL: remove old-style sub prototypes, replace SQL
+	  string-interpolation inserts with DBI prepared statements, state cache in normalise_name
+	- Add =head1 LIMITATIONS POD section documenting ::new() behaviour, Sub::Private gap,
+	  load-time year cap, and single-source data limitation
+	- Add =head1 SECURITY POD section documenting attack surface, mitigations, and
+	  known findings for first/middle/town (no matches constraint), Unicode \w without /a,
+	  and Object::Configure logger replacement behaviour
+	- Enhance POD for new() and search() with EXAMPLE, API SPECIFICATION, MESSAGES,
+	  FORMAL SPECIFICATION, and PSEUDOCODE sub-sections
+	- Makefile.PL: remove unused File::Slurp, File::Basename, File::pfopen prerequisites;
+	  raise MIN_PERL_VERSION from 5.6.2 to 5.010 (required by use feature 'state');
+	  add Readonly to PREREQ_PM
+	- bin/create_db.PL: use Carp::croak instead of die; localize $| with local $| = 1
+	  to prevent output-buffering state leaking across calls; fix misleading memory comment
+	- Add t/locales.t: POSIX locale robustness tests verifying hardcoded error messages
+	  are locale-independent; uses $! directly (not POSIX::strerror) to avoid C-library
+	  divergence
+	- Add t/cgi_security.t: 20-subtest penetration test suite covering SQL injection,
+	  XSS, shell injection, CRLF, null bytes, path traversal, type confusion, DoS/ReDoS,
+	  hostile logger injection, CGI QUERY_STRING and POST body simulation; no real DB needed
+	- Performance: replace Module::Info->new_from_loaded(__PACKAGE__)->file() in new()
+	  with a compile-time __FILE__ constant ($MODULE_DATA_DIR) computed once at module
+	  load; eliminates a per-call %INC scan and Module::Info object allocation; removes
+	  Module::Info dependency entirely from module and Makefile.PL
+	- Performance: hoist the Params::Validate::Strict schema out of search() into a
+	  module-level constant ($SEARCH_SCHEMA); eliminates 6 transient hashref allocations
+	  per search() call -- meaningful at high call rates (e.g. 1000 searches/sec)
+	- Performance: bin/create_db.PL: use $dbh->prepare_cached() in flush() instead of
+	  prepare() so the INSERT statement plan is reused across batch flushes
+	- Performance: bin/create_db.PL: replace shift(@lines)-while with for-loop over
+	  split(/\n/,$data); simpler and avoids the slower /$/ms multi-line anchor split
+	- Performance: bin/create_db.PL: remove unused 'use HTML::Entities' (never called;
+	  LWP's decoded_content() handles entity decoding; saves ~3ms at startup)
+	- Logic-reducer: replace use constant with Readonly my $... for all four module
+	  constants (DEFAULT_CACHE_DURATION, MIN/MAX_LAST_NAME_LENGTH, MAX_WILL_YEAR);
+	  remove dead branches in new() (unreachable ::new()-with-args carp, dead clone guard);
+	  remove redundant s/[^\w\-]//g sanitization in search() (transitive reduction -- PVS
+	  already enforces the character set); normalize selectall_hashref return to // []
+	  eliminating one conditional branch; use cached stat (-r _) after -d in new()
+	- t/30-basics.t: add six equivalence-partition boundary tests for year field
+	  (year=0 dies, year=1 lives, year=MAX lives, year=MAX+1 dies) and scalar-context
+	  hashref return
+	- lib/Genealogy/Wills.pm: extract %_FIELD_BASE (shared optional-string schema base)
+	  and $_OPT_NAME_RE/$_OPT_TOWN_RE (shared matches regexes) to eliminate three copies
+	  of { type => 'string', optional => 1, min => 1, max => 100 } and two copies of
+	  qr/^[\w '.-]+\z/ in $SEARCH_SCHEMA
+	- lib/Genealogy/Wills.pm: extract _decorate_will() private helper to eliminate
+	  duplicated URL-prefix injection + Data::Reuse::fixate logic in search() list and
+	  scalar branches; update LIMITATIONS POD to document the helper and why Sub::Private
+	  is not used (CHECK block timing conflict with test harness)
+	- bin/create_db.PL: refactor queue() alias/slash if/elsif: both branches had an
+	  identical two-line body (push @queue + $last=$2); now captures ($alt, $primary)
+	  in the pattern-match phase and executes the shared action once
+	- Add t/edge_cases.t: 35-assertion destructive/boundary/security test suite.
+	  Covers: last field \z-anchor regression (trailing \n proof), null byte
+	  injection, Unicode Cyrillic homograph attack (proves /a modifier), 1/100/101
+	  char boundaries, type confusion (arrayref/hashref/coderef for last), empty-
+	  string and above-max for first/middle/town, XSS payloads (< > blocked),
+	  CRLF and null-byte injection in optional fields, shell metacharacters, year
+	  boundary (0/1/-1/float/non-numeric), DB upstream failures (undef/0/die on
+	  selectall_hashref, die on fetchrow_hashref, new() returns undef), row
+	  corruption (missing url key produces bare 'https://', pre-schemed url gets
+	  doubled), $@ preservation regression (PVS clobber fix), $_ preservation
+	  during list-context and croak-path search(), wrong-class blessed invocant,
+	  unblessed-hashref invocant, /dev/null and file-as-directory in new(),
+	  unreadable config file (non-root SKIP), config file is a directory, alarm()
+	  not consumed by search(), 1000-row stress test (all rows decorated), duplicate
+	  keys last-wins, first=>undef optional field. Documents fragility: // [] guard
+	  only replaces undef; selectall_hashref returning 0 exposes this assumption.
+	- Add t/integration.t: 23-subtest end-to-end integration suite. Covers: complete
+	  new()->search() workflows in list and scalar context; bare-string, hashref, and
+	  named-arg argument forms; config-file-driven construction (YAML); ENV override
+	  (Genealogy__Wills__directory) taking precedence over config; clone (instance->new())
+	  lifecycle; two independent objects not sharing wills DB slots; cross-module
+	  interaction verification via spy on Data::Reuse::fixate and call-counting mock on
+	  Genealogy::Wills::wills::new() (confirms lazy-init fires exactly once per object);
+	  capturing mock on selectall_hashref confirming all five search fields forwarded
+	  verbatim; url-decoration invariant (https:// prepended exactly once in both list
+	  and scalar contexts); all documented error paths (bad directory, bad config_file,
+	  bad logger, DB-init failure, class-method call, no-argument call); note documenting
+	  absence of optional runtime dependencies
+	[ Bug Fixes ]
+	- lib/Genealogy/Wills.pm: fix $@ clobber bug: Params::Validate::Strict uses
+	  eval internally and resets $@ to '' on successful validation. Added
+	  local $@ in a do-block around the validate_strict() call in search() so
+	  the caller's $@ is preserved. Revealed by t/unit.t global-state integrity test.
+	- lib/Genealogy/Wills.pm: fix dead-code bug where the logger validation check
+	  (blessed && can 'info' && can 'error') ran AFTER Object::Configure::configure(),
+	  which always replaces the caller's logger before the check ran. Moved validation
+	  BEFORE configure() so bad-interface loggers cause an immediate croak. Revealed
+	  by t/function.t which tests intended rather than actual behaviour. Updated
+	  t/cgi_security.t section 15 to assert the corrected behaviour: bad loggers
+	  croak early; valid-interface trojans still get replaced by Object::Configure.
+	- Work around MakeMaker copying to blib *before* running the script to build the files to go there
+	- search() now croaks with "Usage: ..." when called with no arguments
+	- new() now croaks with "Can't load configuration from ..." when the specified
+	  config_file does not exist or is not readable
+	- t/wills.t: HTTP URL checks now skip gracefully when the upstream site returns non-200
+	- use Carp () — prevent default Carp exports so all carp/croak calls stay
+	  fully-qualified and remain interceptable by Test::Carp at runtime; bare imported
+	  aliases (compile-time copies) bypassed the runtime override
+	- new() directory-not-found carp was a bare carp() call; changed to Carp::carp()
+	- search() sanitization regex s/[^\w\-']//g allowed apostrophes that the validation
+	  pattern qr/^[\w\-]+$/ rejects; fixed to s/[^\w\-]//g; subsequently removed
+	  entirely as a transitive reduction (PVS enforces the constraint upstream)
+	- bin/create_db.PL: removed dead die check after DBI->connect with RaiseError=>1
+	  (DBI throws before returning undef); removed duplicate mkdir block
+	- t/carp.t: added test for new() directory-not-found carp path; restructured to
+	  avoid done_testing() inside SKIP conflicting with the outer test plan
+	- Security audit S1 (MEDIUM, Finding 1 applied): add matches constraints to
+	  first/middle/town in $SEARCH_SCHEMA. first/middle: qr/^[\w '.-]+\z/ allows
+	  Unicode word chars, space, apostrophe, period, hyphen; blocks ;=|&<>\r\n\0.
+	  town: qr/^[\w ',.-]+\z/ additionally allows comma for "Town, County, Country"
+	  format. Primary defence remains parameterised queries (Database::Abstraction);
+	  matches constraints add defence-in-depth. Residual: Smith'-- passes (valid
+	  name chars) but is neutralised by parameterised queries.
+	- Security audit S1: update t/cgi_security.t section 10 from lives_ok
+	  (documenting pass-through) to dies_ok (asserting rejection at PVS level);
+	  remove is($captured{...}) assertions; add three positive tests confirming
+	  O'Brien, Canterbury, St. John still pass the new constraints.
+	- Security audit S2 (MEDIUM): sanitize $ENV{CACHE_DIR}/$ENV{CACHEDIR} in
+	  bin/create_db.PL before use in mkdir and File::Spec::catfile; validate with
+	  qr/\A[\w.\-\/~]+\z/ and index(..) < 0 (no .. traversal sequences); croak on
+	  invalid value.
+	- Security audit S3 (LOW): bin/create_db.PL: replace die on HTTP error with
+	  Carp::croak() for consistency with the documented croak/carp convention.
+	- Security audit S4 (MEDIUM/INFO): document Finding 4 in SECURITY POD:
+	  Object::Configure reads Genealogy__Wills__directory from %ENV before new()
+	  applies defaults, allowing a compromised process environment to redirect
+	  search() to an attacker-controlled SQLite file; note conditions and
+	  mitigations. No code change possible (design decision in Object::Configure).
+
 0.10	Sat Aug 23 20:34:26 EDT 2025
 	Fix return in scalar context
 	Validate last name

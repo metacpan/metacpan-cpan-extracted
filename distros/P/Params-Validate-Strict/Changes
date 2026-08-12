@@ -1,5 +1,48 @@
 Revision history for Params-Validate-Strict
 
+0.38	Tue Aug 11 09:36:18 PM EDT 2026
+	[Enhancements]
+	- Reduce dependancies
+	- Rule dispatch now processes the 'type' rule before all other rules,
+	  guaranteeing that min/max handlers can rely on the type having been
+	  validated.  Redundant arrayref re-validation in min/max handlers removed
+	  as dead code (type fires first; non-array values are caught before min/max
+	  can execute).
+	- Optional-parameter detection now uses a ternary expression in place of
+	  an intermediate $look_for_default boolean.
+	- Private helpers extracted to eliminate duplicated code:
+	    _rule_error($logger, $rules, @parts) — emits error_msg or default
+	    _value_in_list($val, $list, $type, $cs) — O(1) cached memberof lookup
+	    _param_defined($args, $param) — exists+defined check
+	- _value_in_list cache uses Scalar::Util::weaken to detect address reuse
+	  (ABA problem) after list GC; cache entries with a dead weak ref are
+	  discarded before use.
+	- nomatch handler now wraps plain-string patterns in qr/\Q...\E/ and guards
+	  the arrayref arm with any{} (was using the raw pattern variable).
+	- float/number regex in element_type changed from capturing to non-capturing
+	  groups and restructured to avoid O(n^2) alternation.
+	- Typo fix: custom-type minimum-key fallback used 'minumum' instead of
+	  'minimum'; the constraint was silently ignored for custom types that
+	  specified 'minimum' (not 'min').
+	- Dead code annotated with TODO comments: unreachable die after croak in
+	  _error; unreachable next/last after _error calls; unreachable position < 0
+	  guard (any negative number stringifies with '-' which already matches /\D/).
+	[Tests]
+	- t/logic_reducer.t (23 subtests): equivalence-partition tests for the
+	  type-first dispatch ordering, min/max arrayref and hashref exact boundaries,
+	  void type boundaries, unix_timestamp four-point boundary, custom-type
+	  minimum key (typo fix), and optional-arrayref skips min when absent.
+	- t/path.t (20 subtests): path-coverage tests for CFG branches not exercised
+	  by the existing suite: _schema_from_arrayref guards (non-hashref element,
+	  missing name, duplicate name); validate/validator non-CODE rule; unknown
+	  relationship type; position rule \D guard; duplicate position collision in
+	  return loop; cross_validation non-CODE; nested arrayref field-schema form
+	  (is_field_schema path); element_type unsupported-type BUG path; required_group
+	  < 2 params guard; value_constraint unrecognised operator; conditional_requirement
+	  and dependency missing-key guards; value_conditional condition-false path;
+	  positional return-arrayref path; args=>undef with args key present.
+	- Bump minimum Test::Mockingbird
+
 0.37	Tue Jul 28 09:29:48 EDT 2026
   [Enhancements]
   - New type 'void': asserts that the parameter value is undef, representing

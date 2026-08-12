@@ -29,31 +29,36 @@ SYNOPSIS
         $rng->range_add(10, 20, 5);   # add 5 to every position in [10, 20]
         $rng->range(10, 20);          # 55  (sum over the range)
 
+        # freeze and ship: query it read-only (lock-free) on other machines
+        $shared->freeze;
+        my $ro = Data::Fenwick::Shared->new_readonly("/tmp/counts.fen");
+        $ro->prefix(500_000);
+
 DESCRIPTION
-    A Fenwick tree (binary indexed tree) in shared memory: a fixed-size
-    array of "n" signed 64-bit integer positions that supports point update
-    and prefix-sum query in "O(log n)" each, plus an "O(log n)" binary
-    search for the position at which a running total is reached. It is the
-    compact, update-friendly structure behind cumulative-frequency tables,
-    running rank/order statistics, and weighted random sampling.
+    A Fenwick tree (binary indexed tree) in shared memory: a fixed-size array
+    of "n" signed 64-bit integer positions that supports point update and
+    prefix-sum query in "O(log n)" each, plus an "O(log n)" binary search for
+    the position at which a running total is reached. It is the compact,
+    update-friendly structure behind cumulative-frequency tables, running
+    rank/order statistics, and weighted random sampling.
 
     Positions are numbered 1 to n (1-indexed). "update($i, $delta)" adds a
     (possibly negative) delta at position $i; prefix($i) returns the sum of
     positions "1..$i"; "range($l, $r)" the sum of "$l..$r"; point($i) the
     current value at a single position; and "total" the sum of everything.
-    "set" overwrites a position with an absolute value. find($target)
-    returns the smallest position whose prefix sum is at least $target
-    (meaningful when all stored values are non-negative) -- the operation
-    that turns a Fenwick tree into a weighted sampler or a rank index.
+    "set" overwrites a position with an absolute value. find($target) returns
+    the smallest position whose prefix sum is at least $target (meaningful
+    when all stored values are non-negative) -- the operation that turns a
+    Fenwick tree into a weighted sampler or a rank index.
 
-    The tree lives in a shared mapping, so several processes update and
-    query one structure: any process that opens the same backing file,
-    inherits the anonymous mapping across "fork", or reopens a passed memfd
-    sees the others' updates and contributes its own. A write-preferring
-    futex rwlock with dead-process recovery guards mutation, so many
-    processes may "update" and query concurrently. Two trees of equal size
-    "n" can be "merge"d by element-wise addition (a Fenwick tree is linear,
-    so the merge of tree(A) and tree(B) is tree(A+B)).
+    The tree lives in a shared mapping, so several processes update and query
+    one structure: any process that opens the same backing file, inherits the
+    anonymous mapping across "fork", or reopens a passed memfd sees the
+    others' updates and contributes its own. A write-preferring futex rwlock
+    with dead-process recovery guards mutation, so many processes may "update"
+    and query concurrently. Two trees of equal size "n" can be "merge"d by
+    element-wise addition (a Fenwick tree is linear, so the merge of tree(A)
+    and tree(B) is tree(A+B)).
 
     Values are signed 64-bit integers; sums that overflow 64 bits wrap, as
     with any native integer arithmetic. Memory is "(n+1) * 8" bytes for the
@@ -61,18 +66,18 @@ DESCRIPTION
 
   Range-update mode
     A tree created with "new_range" supports range update as well as range
-    query: "range_add($l, $r, $delta)" adds a delta to every position in
-    "[$l, $r]" in "O(log n)", and "prefix"/"range"/"point"/"total" report
-    the resulting sums. It uses the classic two-BIT technique (a second
-    binary indexed tree tracking the weighted difference), so a range-mode
-    tree costs twice the memory ("2 * (n+1) * 8" bytes) but adds O(log n)
-    range updates a plain Fenwick tree cannot do. "update($i, $delta)" and
-    "set" still work (a point update is just "range_add($i, $i, $delta)").
-    "find" and "merge" are not available in range mode (the two-BIT layout
-    has no single-BIT binary lift); use a point tree for those. The mode is
-    recorded in the header, so a reopened segment stays range mode. Note
-    that the 0.02 on-disk format is incompatible with 0.01: a file created
-    by 0.01 cannot be opened and must be recreated.
+    query: "range_add($l, $r, $delta)" adds a delta to every position in "[$l,
+    $r]" in "O(log n)", and "prefix"/"range"/"point"/"total" report the
+    resulting sums. It uses the classic two-BIT technique (a second binary
+    indexed tree tracking the weighted difference), so a range-mode tree costs
+    twice the memory ("2 * (n+1) * 8" bytes) but adds O(log n) range updates a
+    plain Fenwick tree cannot do. "update($i, $delta)" and "set" still work (a
+    point update is just "range_add($i, $i, $delta)"). "find" and "merge" are
+    not available in range mode (the two-BIT layout has no single-BIT binary
+    lift); use a point tree for those. The mode is recorded in the header, so
+    a reopened segment stays range mode. Note that the 0.02 on-disk format is
+    incompatible with 0.01: a file created by 0.01 cannot be opened and must
+    be recreated.
 
 METHODS
   Constructors
@@ -80,6 +85,7 @@ METHODS
         my $fen = Data::Fenwick::Shared->new(undef, $n);            # anonymous
         my $fen = Data::Fenwick::Shared->new_memfd($name, $n);
         my $fen = Data::Fenwick::Shared->new_from_fd($fd);
+        my $ro  = Data::Fenwick::Shared->new_readonly($path);       # frozen file, read-only
 
         # range-update mode (two BITs) -- same arguments
         my $fen = Data::Fenwick::Shared->new_range($path, $n);
@@ -91,11 +97,14 @@ METHODS
     the tree cap. When reopening an existing file or memfd, the stored "n"
     wins and the caller's $n argument is ignored -- but a positive $n
     placeholder is still required, since the constructor validates $n before
-    the stored value wins. "new_memfd" creates a Linux memfd (transferable
-    via its "memfd" descriptor); "new_from_fd" reopens one in another
-    process. An optional file mode may be passed as the last argument to
-    "new" (e.g. 0660) to opt a newly-created backing file into cross-user
-    sharing; it defaults to 0600 (owner-only).
+    the stored value wins. "new_memfd" creates a Linux memfd (transferable via
+    its "memfd" descriptor); "new_from_fd" reopens one in another process. The
+    descriptor you pass is duplicated ("F_DUPFD_CLOEXEC"), so it stays yours
+    to close and closing it does not disturb the handle. "new_readonly" opens
+    a frozen file read-only for lock-free querying (see "FROZEN (READ-ONLY)
+    MODE"). An optional file mode may be passed as the last argument to "new"
+    (e.g. 0660) to opt a newly-created backing file into cross-user sharing;
+    it defaults to 0600 (owner-only).
 
   Updating
         $fen->update($i, $delta);        # add $delta at position $i (1 <= $i <= n)
@@ -104,12 +113,12 @@ METHODS
         $fen->clear;                      # reset every position to 0
 
     "range_add" adds a delta to a whole inclusive range in "O(log n)" and
-    requires a range-mode tree ("new_range"); it croaks on a point-mode
-    tree. "update" adds a signed delta at a single position and returns
-    nothing. "set" overwrites a position with an absolute value and returns
-    its previous value (it is "update($i, $value - point($i))" done
-    atomically under one lock). Both croak if $i is outside "1..n". "clear"
-    zeroes the whole tree.
+    requires a range-mode tree ("new_range"); it croaks on a point-mode tree.
+    "update" adds a signed delta at a single position and returns nothing.
+    "set" overwrites a position with an absolute value and returns its
+    previous value (it is "update($i, $value - point($i))" done atomically
+    under one lock). Both croak if $i is outside "1..n". "clear" zeroes the
+    whole tree.
 
   Querying
         my $s = $fen->prefix($i);       # sum of positions 1..$i (0 <= $i <= n; prefix(0) == 0)
@@ -119,14 +128,13 @@ METHODS
         my $i = $fen->find($target);    # smallest position with prefix >= $target
 
     "prefix", "range", "point", and "total" are "O(log n)" reads returning
-    signed integers. "find" binary-searches the tree for the smallest
-    position whose prefix sum is at least $target, returning that position
-    or "n+1" if no prefix reaches it. "find" is only meaningful when every
-    stored value is non-negative (a cumulative distribution): it is the core
-    of weighted sampling (draw $target uniformly in "[1, total]" and "find"
-    the bucket) and of order-statistic / rank queries. Out-of-range
-    positions croak. "find" requires a point-mode tree (it croaks in range
-    mode).
+    signed integers. "find" binary-searches the tree for the smallest position
+    whose prefix sum is at least $target, returning that position or "n+1" if
+    no prefix reaches it. "find" is only meaningful when every stored value is
+    non-negative (a cumulative distribution): it is the core of weighted
+    sampling (draw $target uniformly in "[1, total]" and "find" the bucket)
+    and of order-statistic / rank queries. Out-of-range positions croak.
+    "find" requires a point-mode tree (it croaks in range mode).
 
   Merging, introspection, lifecycle
         $fen->merge($other);            # element-wise add (point mode; both must have equal n)
@@ -139,29 +147,31 @@ METHODS
     both trees must have the same "n" or it croaks, and both must be
     point-mode ("merge" croaks in range mode). The other tree is snapshotted
     under its own read lock, so two processes may merge concurrently without
-    deadlock. "is_range" reports whether the tree is range mode. "size"
-    (also "capacity") is "n". "sync" flushes the mapping to its backing
-    store (a no-op for anonymous and memfd trees); "unlink" removes the
-    backing file (also callable as "Class->unlink($path)"); "path" returns
-    the backing path ("undef" for anonymous, memfd, or fd-reopened trees)
-    and "memfd" the backing descriptor -- the memfd of a "new_memfd" tree or
-    the dup'd fd of a "new_from_fd" tree, and -1 for file-backed or
-    anonymous trees.
+    deadlock. "is_range" reports whether the tree is range mode. "size" (also
+    "capacity") is "n". "sync" flushes the mapping to its backing store (a
+    no-op for anonymous and memfd trees); "unlink" removes the backing file
+    (also callable as "Class->unlink($path)"); "path" returns the backing path
+    ("undef" for anonymous, memfd, or fd-reopened trees) and "memfd" the
+    backing descriptor -- the memfd of a "new_memfd" tree or the dup'd fd of a
+    "new_from_fd" tree, and -1 for file-backed or anonymous trees.
 
 STATS
     stats() returns a hashref: "size" (the number of positions "n"), "total"
     (the current sum of all positions), "ops" (running count of write-path
     calls -- "update", "range_add", "set", "merge", "clear"), "mmap_size"
-    (bytes of the shared mapping), and "range" (1 for a range-mode tree, 0
-    for a point-mode tree).
+    (bytes of the shared mapping), "range" (1 for a range-mode tree, 0 for a
+    point-mode tree), "frozen" (1 if the tree has been sealed by "freeze" and
+    is immutable, else 0), and "readonly" (1 if this handle is a read-only
+    view -- from "new_readonly", or the handle that called "freeze" -- else
+    0).
 
 SHARING ACROSS PROCESSES
-    The tree lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file (every process calls "new($path, $n)"
-    on the same path with a matching $n), an anonymous mapping inherited
-    across "fork", or a memfd whose descriptor is passed to an unrelated
-    process (over a UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n")
-    and reopened with new_from_fd($fd). Because the mapping is shared, every
+    The tree lives in a shared mapping, shared the same three ways as the rest
+    of the family: a backing file (every process calls "new($path, $n)" on the
+    same path with a matching $n), an anonymous mapping inherited across
+    "fork", or a memfd whose descriptor is passed to an unrelated process
+    (over a UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and
+    reopened with new_from_fd($fd). Because the mapping is shared, every
     process updates and queries the same tree.
 
         # producer and consumer share one running-sum tree with no coordination
@@ -170,36 +180,90 @@ SHARING ACROSS PROCESSES
         wait;
         print $fen->total, "\n";   # 500 -- the child's updates
 
+FROZEN (READ-ONLY) MODE
+    A file-backed tree can be frozen and then shipped to other machines, where
+    consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $fen = Data::Fenwick::Shared->new("/tmp/counts.fen", 1_000_000);
+        $fen->update($_, $counts{$_}) for keys %counts;
+        $fen->freeze;                 # seal: now immutable, and $fen itself is read-only
+        # ... copy /tmp/counts.fen to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::Fenwick::Shared->new_readonly("/tmp/counts.fen");
+        $ro->prefix($_) for @queries;
+
+    "freeze" takes the write lock, marks the tree permanently immutable (there
+    is no unfreeze -- rebuild the file to change it), and flushes the seal to
+    disk. A frozen tree rejects every mutator ("update", "range_add", "set",
+    "clear", "merge") with a croak, and a read-write reopen ("new($path, ...)"
+    or "new_from_fd") of a sealed file is refused -- so a shipped artifact can
+    never be silently mutated out from under its readers.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed tree's values and geometry are immutable, "prefix", "range",
+    "point", "total", "find", and "stats" read them directly, taking no reader
+    lock -- the mapping is never written, so a read-only view works from a
+    read-only file descriptor or a read-only filesystem, and any number of
+    processes can share one "PROT_READ" mapping. "frozen" and "readonly"
+    report the two states. A range-mode tree ("new_range") can be frozen and
+    reopened read-only the same way as a point-mode one; "find" and "merge"
+    stay unavailable in range mode regardless of the frozen state.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
+
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default. To
-    share a backing file across users, pass an explicit octal file mode such
-    as 0660 as the last argument to "new"; the mode is applied only when the
-    file is created. The file is opened with "O_NOFOLLOW" (a symlink at the
-    path is refused) and "O_EXCL"; the on-disk header is validated when the
-    file is attached. Any process you grant write access to a shared mapping
-    is trusted not to corrupt it while others are using it.
+    Backing files are created with mode 0600 (owner-only) by default. To share
+    a backing file across users, pass an explicit octal file mode such as 0660
+    as the last argument to "new"; the mode is applied when the file is
+    created, and when a file left behind by an interrupted create is
+    re-initialized (see "CRASH SAFETY"); a file already in use keeps its own
+    permissions. The file is opened with "O_NOFOLLOW" (a symlink at the path
+    is refused) and "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt it while others are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership; if a holder dies, the next contender detects the
     dead owner and recovers. Each "update" is a short O(log n) sequence of
     int64 stores, so a crash leaves the tree consistent up to the last
-    completed operation. Limitation: PID reuse is not detected (very
-    unlikely in practice).
+    completed operation. Limitation: PID reuse is not detected (very unlikely
+    in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete Fenwick tree file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
     Data::SortedSet::Shared (order-statistics ZSET), Data::NDArray::Shared
@@ -210,6 +274,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

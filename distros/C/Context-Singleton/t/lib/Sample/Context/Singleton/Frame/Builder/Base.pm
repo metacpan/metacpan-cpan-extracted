@@ -7,12 +7,13 @@ package Sample::Context::Singleton::Frame::Builder::Base;
 our $VERSION = v1.0.0;
 
 package Sample::Context::Singleton::Frame::Builder::Base::__::Builtin::Deps;
-use parent 'Context::Singleton::Frame::Builder::Base';
+use Moo;
+BEGIN { extends q (Context::Singleton::Frame::Builder::Base) }
 
 sub _build_required {
 	my ($self) = @_;
 
-	$self->SUPER::_build_required, 'foo', 'bar';
+	$self->SUPER::_build_required, q (foo), q (bar);
 }
 
 sub build_callback_args {

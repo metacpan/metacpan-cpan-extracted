@@ -106,4 +106,38 @@ use JSON::YY qw(encode_json decode_json);
     ok $a ne $c, 'ne overload';
 }
 
+# RFC 6902 4.1: add onto an existing object member replaces it. yyjson's
+# pointer-put inserts unconditionally when its insert_new flag is set, which
+# duplicated the key (and left the document disagreeing with its own JSON);
+# yyjson.c carries a marked local patch for this.
+{
+    my @cases = (
+        ['add onto existing',   '{"x":1}',       '[{"op":"add","path":"/x","value":2}]',    '{"x":2}'],
+        ['copy onto existing',  '{"a":1,"b":2}', '[{"op":"copy","from":"/a","path":"/b"}]', '{"a":1,"b":1}'],
+        ['move onto existing',  '{"a":1,"b":2}', '[{"op":"move","from":"/a","path":"/b"}]', '{"b":1}'],
+        ['replace existing',    '{"x":1}',       '[{"op":"replace","path":"/x","value":2}]','{"x":2}'],
+        ['add a new key',       '{"a":1}',       '[{"op":"add","path":"/b","value":2}]',    '{"a":1,"b":2}'],
+        ['add nested existing', '{"a":{"b":1}}', '[{"op":"add","path":"/a/b","value":9}]',  '{"a":{"b":9}}'],
+        ['array insert',        '{"a":[1,3]}',   '[{"op":"add","path":"/a/1","value":2}]',  '{"a":[1,2,3]}'],
+        ['array append',        '{"a":[1]}',     '[{"op":"add","path":"/a/-","value":2}]',  '{"a":[1,2]}'],
+    );
+    for my $c (@cases) {
+        my ($name, $doc, $patch, $want) = @$c;
+        my $d = jdoc $doc;
+        jpatch $d, jdoc $patch;
+        is "$d", $want, "jpatch: $name";
+    }
+
+    # the document must agree with its own serialisation afterwards
+    my $d = jdoc '{"x":1}';
+    jpatch $d, jdoc '[{"op":"add","path":"/x","value":2}]';
+    is +(jgetp $d, "/x"), decode_json(jencode $d, "")->{x},
+        'jpatch: document agrees with its own JSON';
+
+    # applying the same add twice is idempotent (the upsert pattern)
+    my $u = jdoc '{}';
+    jpatch $u, jdoc '[{"op":"add","path":"/k","value":1}]' for 1 .. 3;
+    is "$u", '{"k":1}', 'jpatch: repeated add is idempotent';
+}
+
 done_testing;

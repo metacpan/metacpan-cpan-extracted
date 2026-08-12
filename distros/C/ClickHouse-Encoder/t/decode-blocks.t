@@ -123,6 +123,38 @@ is_deeply($blocks->[1]{columns}[1]{values}, ["three", "four"], 'block 1 col 1');
               'decode_stream yields blocks across small reads');
 }
 
+# A partial buffer trips the prologue's "nrows exceeds remaining buffer"
+# guard, which is meant for corrupt headers - so decode_stream must read
+# more rather than die. Reachable on ordinary data: CH's default
+# max_block_size (~65k rows) is close to the default 64 KiB chunk_size.
+{
+    require File::Temp;
+    my $enc = ClickHouse::Encoder->new(columns => [['s', 'String']]);
+    # Rows wide enough that a block spans many chunks, so the residual
+    # left at a boundary is routinely smaller than the 500-row count.
+    # Enough blocks that a chunk boundary eventually leaves a residual
+    # under the row count - which one it is depends on the arithmetic.
+    my $nblocks = 20;
+    my $body = join '',
+        map { $enc->encode([ map { ["r$_-" . ('x' x 30)] } 1 .. 500 ]) }
+        1 .. $nblocks;
+    my ($fh, $path) = File::Temp::tempfile(UNLINK => 1);
+    binmode $fh; print $fh $body; close $fh;
+    open my $in, '<', $path or die "open $path: $!";
+    binmode $in;
+    my @got;
+    my $ok = eval {
+        ClickHouse::Encoder->decode_stream($in,
+            sub { push @got, $_[0]{nrows} }, chunk_size => 4096);
+        1;
+    };
+    close $in;
+    ok($ok, 'decode_stream survives a residual smaller than the row count')
+        or diag($@);
+    is_deeply(\@got, [(500) x $nblocks],
+              'decode_stream yields every block across small chunks');
+}
+
 # Truncated tail -> croak with clear message.
 {
     require File::Temp;

@@ -10,6 +10,7 @@
         croak("Expected a Data::Heap::Shared object"); \
     HeapHandle *h = INT2PTR(HeapHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::Heap::Shared object"); \
+    HeapHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -23,7 +24,7 @@
     if (!SvROK(sv)) \
         croak("Data::Heap::Shared object was replaced during the call"); \
     h = INT2PTR(HeapHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::Heap::Shared object destroyed during the call")
+    if (h != h0) croak("Data::Heap::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -46,7 +47,7 @@ new(class, path, capacity, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     HeapHandle *h = heap_create(p, capacity, mode, errbuf);
-    if (!h) croak("Data::Heap::Shared->new: %s", errbuf);
+    if (!h) croak("Data::Heap::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -60,7 +61,7 @@ new_memfd(class, name, capacity)
     char errbuf[HEAP_ERR_BUFLEN];
   CODE:
     HeapHandle *h = heap_create_memfd(name, capacity, errbuf);
-    if (!h) croak("Data::Heap::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Heap::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -73,7 +74,7 @@ new_from_fd(class, fd)
     char errbuf[HEAP_ERR_BUFLEN];
   CODE:
     HeapHandle *h = heap_open_fd(fd, errbuf);
-    if (!h) croak("Data::Heap::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Heap::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -82,7 +83,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Heap::Shared")) return;
     HeapHandle *h = INT2PTR(HeapHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -284,7 +285,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
+    if (unlink(p) != 0 && errno != ENOENT) croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
 stats(self)

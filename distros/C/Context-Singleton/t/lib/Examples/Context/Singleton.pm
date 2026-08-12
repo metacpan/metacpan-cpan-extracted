@@ -15,28 +15,32 @@ example it_should_know_about_rule => as {
 	my ($title, %params) = @_;
 
 	my $db = $params{db} // Context::Singleton::Frame::DB->instance;
-	my $status = $db->find_builder_for ($params{rule});
+	my $status = $db->search_builder_for ($params{rule});
 
-	it "should know about rule $params{rule}" => as { ok $status };
+	it qq (should know about rule $params{rule}) => as { ok $status };
 };
 
 example it_should_not_know_about_rule => as {
 	my ($title, %params) = @_;
 
 	my $db = $params{db} // Context::Singleton::Frame::DB->instance;
-	my $status = $db->find_builder_for ($params{rule});
+	my $status = $db->search_builder_for ($params{rule});
 
-	it "should not know about rule $params{rule}" => as { ok !$status };
+	it qq (should not know about rule $params{rule}) => as { ok !$status };
 };
 
 example it_should_load_rules => as {
 	my ($title, %params) = @_;
 
-	it_should_not_know_about_rule (rule => $_) for @{ $params{rules} };
+	it_should_not_know_about_rule (rule => $_)
+		for @{ $params{rules} }
+		;
 
 	$params{loader}->();
 
-	it_should_know_about_rule (rule => $_) for @{ $params{rules} };
+	it_should_know_about_rule (rule => $_)
+		for @{ $params{rules} }
+		;
 };
 
 example it_should_resolve_rule => as {
@@ -47,9 +51,9 @@ example it_should_resolve_rule => as {
 	my $err = $@;
 
 	if ($lives_ok) {
-		it "should deduce $params{rule}" => as { is_deeply $value, $params{expected} };
+		it qq (should deduce $params{rule}) => as { is_deeply $value, $params{expected} };
 	} else {
-		it "should not die while resolving $params{rule}" => as { diag "Sudden death: $err"; fail };
+		it qq (should not die while resolving $params{rule}) => as { diag qq (Sudden death: $err); fail };
 	}
 };
 
@@ -58,7 +62,7 @@ example it_should_be_resolved => as {
 
 	my $status = is_deduced $params{rule};
 
-	it "should deduce $params{rule}" => as { ok $status };
+	it qq (should deduce $params{rule}) => as { ok $status };
 };
 
 example it_should_not_be_resolved => as {
@@ -66,7 +70,7 @@ example it_should_not_be_resolved => as {
 
 	my $status = is_deduced $params{rule};
 
-	it "should not deduce $params{rule}" => as { ok ! $status };
+	it qq (should not deduce $params{rule}) => as { ok ! $status };
 };
 
 1;

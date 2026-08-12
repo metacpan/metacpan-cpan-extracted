@@ -2,8 +2,9 @@
 use strict;
 use warnings;
 use Test::More;
-use lib 'blib/lib', 'blib/arch';
+use lib 'blib/lib', 'blib/arch', 't/lib';
 use ClickHouse::Encoder;
+use TestCH qw(f64);
 use JSON::PP ();
 
 # Round-trip helper for a Dynamic column.
@@ -56,7 +57,7 @@ sub rt {
         [["a","b"], 42],
     ]);
     my $block = ClickHouse::Encoder->decode_block($bytes);
-    is_deeply($block->{columns}[0]{values}, [1, 3.14, ["a","b"]],
+    is_deeply($block->{columns}[0]{values}, [1, f64(3.14), ["a","b"]],
               'first Dynamic column');
     is_deeply($block->{columns}[1]{values}, ["x", undef, 42],
               'second Dynamic column');

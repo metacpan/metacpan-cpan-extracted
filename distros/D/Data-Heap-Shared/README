@@ -17,17 +17,16 @@ SYNOPSIS
         my ($pri, $val) = $heap->pop_wait(5.0);
 
 DESCRIPTION
-    Binary min-heap in shared memory. Elements are "(priority, value)"
-    integer pairs. Lowest priority pops first.
+    Binary min-heap in shared memory. Elements are "(priority, value)" integer
+    pairs. Lowest priority pops first.
 
     Mutex-protected push/pop with sift-up/sift-down. PID-based stale mutex
     recovery. Futex blocking when empty.
 
-    Crash safety: if a process dies while holding the heap mutex (mid-push
-    or mid-pop), the mutex is recovered via PID detection, but the heap data
-    may be in an inconsistent state (partially sifted). Callers should
-    "clear" and rebuild if crash recovery is triggered in a critical
-    application.
+    Crash safety: if a process dies while holding the heap mutex (mid-push or
+    mid-pop), the mutex is recovered via PID detection, but the heap data may
+    be in an inconsistent state (partially sifted). Callers should "clear" and
+    rebuild if crash recovery is triggered in a critical application.
 
     Linux-only. Requires 64-bit Perl.
 
@@ -39,17 +38,15 @@ CONSTRUCTORS
 
     Create or attach a heap. $capacity is the maximum number of elements. If
     $path is a defined filename, the heap is backed by that file (created if
-    absent, attached if present). If $path is "undef", an anonymous mapping
-    is used -- it has no backing file but is "MAP_SHARED", so it is
-    inherited across "fork" and shared with child processes (an unrelated
-    process simply cannot attach it).
+    absent, attached if present). If $path is "undef", an anonymous mapping is
+    used -- it has no backing file but is "MAP_SHARED", so it is inherited
+    across "fork" and shared with child processes (an unrelated process simply
+    cannot attach it).
 
     The optional $mode is an octal permission mask applied only when the
-    backing file is created; it defaults to 0600 (owner-only). See
-    "SECURITY".
+    backing file is created; it defaults to 0600 (owner-only). See "SECURITY".
 
-    Croaks on error (bad capacity, permission denied, header mismatch,
-    etc.).
+    Croaks on error (bad capacity, permission denied, header mismatch, etc.).
 
   new_memfd
         my $heap = Data::Heap::Shared->new_memfd($name, $capacity);
@@ -64,8 +61,10 @@ CONSTRUCTORS
         my $heap = Data::Heap::Shared->new_from_fd($fd);
 
     Attach to an existing heap given an open file descriptor for its backing
-    store (typically obtained from "memfd" in another process). The header
-    is validated on attach. Croaks on error.
+    store (typically obtained from "memfd" in another process). The header is
+    validated on attach. Croaks on error. The descriptor you pass is
+    duplicated ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it
+    does not disturb the handle.
 
 METHODS
   push
@@ -86,16 +85,16 @@ METHODS
         my ($pri, $val) = $heap->pop_wait($secs);  # block up to $secs
         my ($pri, $val) = $heap->pop_wait(0);      # non-blocking
 
-    Like "pop", but blocks (via futex) until an element is available. With
-    no argument (or a negative timeout) it blocks indefinitely. A timeout of
-    0 polls without blocking. A positive fractional $secs bounds the wait;
-    on timeout the empty list is returned.
+    Like "pop", but blocks (via futex) until an element is available. With no
+    argument (or a negative timeout) it blocks indefinitely. A timeout of 0
+    polls without blocking. A positive fractional $secs bounds the wait; on
+    timeout the empty list is returned.
 
   peek
         my ($pri, $val) = $heap->peek;
 
-    Return the lowest-priority element without removing it. Returns the
-    empty list if the heap is empty.
+    Return the lowest-priority element without removing it. Returns the empty
+    list if the heap is empty.
 
   size
         my $n = $heap->size;
@@ -145,11 +144,10 @@ METHODS
         $heap->unlink;
         Data::Heap::Shared->unlink($path);
 
-    Remove the backing file from the filesystem. Called as an instance
-    method it unlinks the heap's own path; called as a class method it
-    unlinks the given $path. Croaks for anonymous / memfd heaps (no path) or
-    on unlink failure. The mapping stays valid until all handles are
-    destroyed.
+    Remove the backing file from the filesystem. Called as an instance method
+    it unlinks the heap's own path; called as a class method it unlinks the
+    given $path. Croaks for anonymous / memfd heaps (no path) or on unlink
+    failure. The mapping stays valid until all handles are destroyed.
 
   stats
         my $stats = $heap->stats;
@@ -208,15 +206,30 @@ BENCHMARKS
         push+pop                3.1M/s aggregate
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
+
+CRASH SAFETY
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete heap file left by an interrupted create; remove it and retry".
+    A file left behind by an interrupted create never held data, so removing
+    it is safe -- but a file whose header was corrupted after the fact reaches
+    the same croak, so confirm it is an abandoned create before deleting
+    anything you care about.
 
 SEE ALSO
     Data::Stack::Shared - LIFO stack
@@ -249,6 +262,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

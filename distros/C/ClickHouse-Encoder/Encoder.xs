@@ -487,11 +487,13 @@ CODE:
         const char *tstr; STRLEN tlen;
         dec_lenpfx_string(aTHX_ &p, end, &name, &name_len);
         dec_lenpfx_string(aTHX_ &p, end, &tstr, &tlen);
-        /* parse_type uses heap-slot SAVEDESTRUCTOR_X for cleanup on
-         * croak; on success the slot is disarmed. We're in the XSUB's
-         * implicit save scope, so a croak from any nested decode
-         * unwinds the type back through this cleanup. */
+        /* Own scope per column: parse_type disarms its own cleanup on
+         * return, so the type needs re-guarding here or a croak from the
+         * decode below leaks the whole tree. LEAVE frees it at the end of
+         * the body, keeping the eager free for wide blocks. */
+        ENTER;
         TypeInfo *t = parse_type(aTHX_ tstr, tlen);
+        SAVEDESTRUCTOR_X(cleanup_typeinfo_ptr, &t);
 
         int keep = 1;
         if (keep_set && !hv_exists(keep_set, name, name_len))
@@ -516,9 +518,6 @@ CODE:
             }
             values = newRV_noinc((SV *)placeholder);
         }
-        /* Free this column's TypeInfo eagerly to avoid piling them up
-         * on the save stack for wide blocks. */
-        free_typeinfo(aTHX_ t);
 
         HV *col_hv = newHV();
         (void)hv_stores(col_hv, "name",   newSVpvn(name, name_len));
@@ -526,6 +525,7 @@ CODE:
         (void)hv_stores(col_hv, "values", values);
         if (!keep) (void)hv_stores(col_hv, "skipped", newSViv(1));
         av_store(cols, c, newRV_noinc((SV *)col_hv));
+        LEAVE;   /* frees this column's TypeInfo */
     }
 
     HV *result = newHV();
@@ -574,21 +574,20 @@ CODE:
     AV *types = (AV *)sv_2mortal((SV *)newAV());
     AV *rows  = (AV *)sv_2mortal((SV *)newAV());
     if (ncols > 0) { av_extend(names, ncols - 1); av_extend(types, ncols - 1); }
-    if (nrows > 0) av_extend(rows, nrows - 1);
+    /* `rows` is deliberately NOT pre-extended from nrows: that count is
+     * unvalidated wire data, and sizing an AV from it hands a crafted
+     * header a per-byte allocation multiplier before any column has been
+     * read. The fill loop below extends it once column 0 has proved the
+     * row count real. */
 
-    /* Pre-create row AVs - we'll fill column c into row_av[c] as we
-     * decode each column. Stash AV pointers for fast access. */
+    /* Row AVs are built after the first column decodes, not up front:
+     * nrows is wire data bounded only by the byte length, so one AV per
+     * row would allocate ~80 bytes per input byte before any column data
+     * was validated. Only the cheap pointer array is allocated here. */
     AV **row_avs = NULL;
     if (nrows > 0) {
-        Newx(row_avs, nrows, AV *);
+        Newxz(row_avs, nrows, AV *);
         SAVEFREEPV(row_avs);
-        UV r;
-        for (r = 0; r < nrows; r++) {
-            AV *row_av = newAV();
-            if (ncols > 0) av_extend(row_av, ncols - 1);
-            row_avs[r] = row_av;
-            av_store(rows, r, newRV_noinc((SV *)row_av));
-        }
     }
 
     UV c;
@@ -597,12 +596,23 @@ CODE:
         const char *tstr; STRLEN tlen;
         dec_lenpfx_string(aTHX_ &p, end, &name, &name_len);
         dec_lenpfx_string(aTHX_ &p, end, &tstr, &tlen);
+        /* Per-column scope, as in decode_block. */
+        ENTER;
         TypeInfo *t = parse_type(aTHX_ tstr, tlen);
+        SAVEDESTRUCTOR_X(cleanup_typeinfo_ptr, &t);
         SV *col_rv = decode_column(aTHX_ &p, end, t, (SSize_t)nrows);
-        free_typeinfo(aTHX_ t);
 
         AV *col_av = (AV *)SvRV(col_rv);
         UV r;
+        if (c == 0) {
+            if (nrows > 0) av_extend(rows, nrows - 1);
+            for (r = 0; r < nrows; r++) {
+                AV *row_av = newAV();
+                av_extend(row_av, ncols - 1);
+                row_avs[r] = row_av;
+                av_store(rows, r, newRV_noinc((SV *)row_av));
+            }
+        }
         for (r = 0; r < nrows; r++) {
             SV **e = av_fetch(col_av, r, 0);
             av_store(row_avs[r], c, e ? SvREFCNT_inc(*e) : newSV(0));
@@ -612,6 +622,7 @@ CODE:
 
         av_store(names, c, newSVpvn(name, name_len));
         av_store(types, c, newSVpvn(tstr, tlen));
+        LEAVE;   /* frees this column's TypeInfo */
     }
 
     HV *result = newHV();

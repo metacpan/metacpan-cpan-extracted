@@ -181,7 +181,7 @@ static void CityHash128WithSeed(const char *s, size_t len,
     w[1] = Rotate(x + Fetch64(s + 88), 53) * k1;
 
     do {
-        x = Rotate(x + y + v[0] + Fetch64(s + 8), 37) * k1;
+        x = Rotate(x + y + v[0] + Fetch64(s + 16), 37) * k1;
         y = Rotate(y + v[1] + Fetch64(s + 48), 42) * k1;
         x ^= w[1];
         y ^= v[0];
@@ -190,7 +190,7 @@ static void CityHash128WithSeed(const char *s, size_t len,
         WeakHashLen32WithSeeds(s + 32, z + w[1], y,         w);
         { uint64_t t = z; z = x; x = t; }
         s += 64;
-        x = Rotate(x + y + v[0] + Fetch64(s + 8), 37) * k1;
+        x = Rotate(x + y + v[0] + Fetch64(s + 16), 37) * k1;
         y = Rotate(y + v[1] + Fetch64(s + 48), 42) * k1;
         x ^= w[1];
         y ^= v[0];
@@ -215,7 +215,7 @@ static void CityHash128WithSeed(const char *s, size_t len,
             x = Rotate(x, 49) * k0 + w[0];
             w[0] += v[0];
             WeakHashLen32WithSeeds(s + len - tail_done,
-                                   v[0] + z, v[1], v);
+                                   v[0], v[1], v);
         }
     }
     /* Final mix. */

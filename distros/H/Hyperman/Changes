@@ -1,5 +1,10 @@
 Revision history for Hyperman
 
+0.16    2026-08-12
+        - t/18-tls-advanced.t skips, rather than dies, when the host
+          cannot mint a certificate. 
+        - t/16-http2.t no longer requires curl's --parallel.
+
 0.15    2026-08-10
         - Hyperman->tls_reload(\%sni): replace a worker's TLS
           certificates without replacing the process. 

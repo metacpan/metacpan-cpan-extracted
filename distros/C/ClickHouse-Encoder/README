@@ -31,7 +31,10 @@ SUPPORTED TYPES
     JSON / Object('json') (CH 24.8+): hashref input with nested hashref
     auto-flattening to dotted paths; per-path types inferred from
     Perl SV flags (Int64, Float64, Bool, String) and arrayref leaves
-    encoded as Array(T) variants. Symmetric on decode (unflattens).
+    encoded as Array(T) variants. Decode unflattens symmetrically for
+    JSON this module wrote; a JSON column holding arrays written by
+    another client decodes as Array(Nullable(T)), which is not yet
+    supported -- see the TYPES section of the POD.
     Dynamic: standalone Dynamic column, same wire format as one JSON
     path's Dynamic sub-column without the Object wrapper.
     DateTime / DateTime64 strings accept ISO 8601 with timezone offsets

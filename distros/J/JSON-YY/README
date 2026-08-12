@@ -63,11 +63,21 @@ OO API
 
     new(%options)
         Create a new encoder/decoder. Options: "utf8", "pretty",
-        "allow_nonref", "allow_unknown", "allow_blessed", "convert_blessed",
-        "max_depth".
+        "canonical", "allow_nonref", "allow_unknown", "allow_blessed",
+        "convert_blessed", "max_depth". ("canonical" is accepted for
+        JSON::XS compatibility but is currently a no-op; see "LIMITATIONS".)
+
+        By default "allow_nonref" is on and every other flag is off, so a
+        fresh coder produces character-mode output; pass "utf8 => 1" for
+        UTF-8 byte strings (as the "encode_json" function always does).
 
     encode($perl_value)
-        Encode to JSON string.
+        Encode to JSON string. With "utf8" enabled the result is a UTF-8
+        byte string; otherwise it is a character string.
+
+        Strings without Perl's UTF8 flag are treated as Latin-1 and
+        re-encoded to UTF-8 on output, as JSON::XS does, so "caf\xE9" and
+        "caf\x{E9}" produce the same JSON.
 
     decode($json_string)
         Decode from JSON string.
@@ -76,12 +86,24 @@ OO API
         Decode to a "JSON::YY::Doc" handle (mutable document, no Perl
         materialization). Can then use Doc API keywords on the result.
 
-    utf8, pretty, allow_nonref, allow_unknown, allow_blessed,
+    utf8, pretty, canonical, allow_nonref, allow_unknown, allow_blessed,
     convert_blessed
         Boolean setters, return $self for chaining.
 
+        "convert_blessed" calls a blessed object's "TO_JSON" method when the
+        class has one; when it does not, encoding falls back to the
+        "allow_blessed" behaviour ("null", or a croak if that flag is off).
+
     max_depth($n)
-        Set maximum nesting depth (default 512).
+        Set maximum nesting depth (default 512), applied when encoding and
+        when decoding. JSON nested deeper than this is rejected rather than
+        materialised.
+
+        The default is what keeps untrusted input from exhausting the C
+        stack; raising it raises that ceiling too. A few thousand is safe,
+        but values in the tens of thousands let input through that recurses
+        deeply enough to crash rather than croak, so only raise it as far as
+        your data actually needs.
 
 DOC API
         use JSON::YY ':doc';
@@ -89,6 +111,23 @@ DOC API
     The Doc API operates on yyjson's internal mutable document tree, using
     JSON Pointer (RFC 6901) paths for addressing. All keywords compile to
     custom ops for maximum performance.
+
+    Character strings, not bytes. "jdoc" and "jraw" read their JSON as
+    *characters*, like "JSON::YY->new->decode" does with "utf8" off. If you
+    hand them UTF-8 bytes straight off a socket or file, non-ASCII text is
+    double-encoded. Decode first, or use the OO entry point for bytes:
+
+        my $doc = jdoc $body;                          # WRONG for raw bytes
+        my $doc = jdoc Encode::decode_utf8($body);     # right
+        my $doc = JSON::YY->new(utf8=>1)->decode_doc($body);  # right, no copy
+
+    "jread" reads a file as bytes and needs no such care. The keywords never
+    modify the scalars passed to them.
+
+    Unless documented otherwise, path keywords croak when the path is
+    missing or the value has the wrong type for the operation. The
+    exceptions return a soft value instead: "jgetp", "jtype", "jdel", and
+    "jfind" return "undef"; "jhas" and the "jis_*" predicates return false.
 
   Document creation
     jdoc $json_string
@@ -101,7 +140,7 @@ DOC API
     Create typed JSON values for use with "jset":
 
     jstr $value - JSON string (ensures string type, e.g. "jstr "007"")
-    jnum $value - JSON number
+    jnum $value - JSON number (croaks if $value is not numeric)
     jbool $value - JSON true/false
     jnull - JSON null
     jarr - empty JSON array
@@ -124,9 +163,22 @@ DOC API
         Set value at path. $value can be a scalar (auto-typed), Perl ref
         (recursively converted), or another Doc (deep-copied). Returns $doc.
 
+        Missing intermediate levels are created as objects, even when the
+        path component is a number, so "jset $doc, "/users/0/name", "Bob""
+        on an empty document yields "{"users":{"0":{"name":"Bob"}}}", not an
+        array. Create the array first ("jset $doc, "/users", []") when you
+        want one; appending to an existing array with "/-" works as
+        expected.
+
+        A blessed object is converted with its "TO_JSON" method if it has
+        one, and otherwise becomes "null" (the Doc API always behaves as if
+        "convert_blessed" and "allow_blessed" were enabled). The same
+        applies to "jfrom".
+
     jdel $doc, $path
         Delete value at path. Returns the removed subtree as an independent
-        Doc, or "undef" if path not found.
+        Doc, or "undef" if path not found. Croaks on an empty path (the root
+        cannot be deleted).
 
     jhas $doc, $path
         Check if path exists. Returns boolean.
@@ -184,23 +236,32 @@ DOC API
     jpaths $doc, $path
         Enumerate all leaf paths under the given path. Returns a list of
         JSON Pointer strings. Keys containing "~" or "/" are escaped per RFC
-        6901.
+        6901. Empty objects and arrays contain no leaves and so contribute
+        no paths.
 
   Search
     jfind $doc, $array_path, $key_path, $match_value
         Find the first element in an array where the value at $key_path
         equals $match_value. Returns the matching element as a Doc, or
-        "undef" if not found.
+        "undef" if no element matches (also if $array_path is missing or
+        does not point to an array).
 
             my $bob = jfind $doc, "/users", "/name", "Bob";
+
+        Integer fields are compared as 64-bit integers and real fields as
+        doubles (so values above 2^53 do not collide). To match a JSON
+        "true", "false", or "null" field, pass the corresponding string
+        "true", "false", or "null" as $match_value.
 
   Patching
     jpatch $doc, $patch_doc
         Apply RFC 6902 JSON Patch. $patch_doc must be a Doc containing a
-        patch array. Modifies $doc in-place.
+        patch array. Modifies $doc in-place. $doc must be an owned document;
+        croaks on a borrowed subtree (from "jget") -- "jclone" it first.
 
     jmerge $doc, $patch_doc
-        Apply RFC 7386 JSON Merge Patch. Modifies $doc in-place.
+        Apply RFC 7386 JSON Merge Patch. Modifies $doc in-place. As with
+        "jpatch", $doc must be an owned document, not a borrowed subtree.
 
   Comparison
     jeq $doc_a, $doc_b
@@ -223,14 +284,20 @@ DOC API
 
         "$doc"          # stringify to JSON
         if ($doc)       # always true
-        $a eq $b        # deep equality
+        $a eq $b        # deep equality; vs a plain string, compares the JSON
         $a ne $b        # deep inequality
+        $a == $b        # identity -- true only for the same handle
 
 IMPORT FLAGS
         use JSON::YY -utf8, -pretty;
 
     Imports "encode_json"/"decode_json" with the specified flags
-    pre-configured.
+    pre-configured. ("decode_json_ro" is only available via the qw() import,
+    not the flag form.)
+
+    The two import styles do not combine: the flag form installs closures,
+    so it turns off the keyword compilation for those two names in that
+    scope. Import one way or the other.
 
 JSON POINTER (RFC 6901)
     Paths use JSON Pointer syntax:
@@ -284,6 +351,11 @@ EXAMPLES
         say "equal" if $doc_a eq $doc_b;   # overloaded
 
 PERFORMANCE
+    Indicative figures from the bundled bench/bench.pl. Throughput depends
+    heavily on payload shape, perl build and hardware, and the two libraries
+    trade places across those axes -- run the benchmark on your own data
+    rather than relying on the numbers below.
+
   Encode (ops/sec, higher is better)
                         JSON::XS    JSON::YY     delta
         small  (38B)    6.4M        6.7M         +4%
@@ -312,11 +384,61 @@ PERFORMANCE
     The Doc API avoids full Perl materialization, providing 4-5x speedup for
     surgical operations on medium/large documents.
 
+THREADS
+    Encoding and decoding are stateless, so "encode_json", "decode_json" and
+    "decode_json_ro" can be used freely from any thread.
+
+    Coder objects ("JSON::YY->new") are copied into a new thread with their
+    settings intact and remain usable on both sides.
+
+    "JSON::YY::Doc" handles and iterators are tied to the interpreter that
+    created them: they may be alive when a thread starts, but the copy the
+    child receives is inert and using it croaks with "cannot be shared
+    between threads". The original stays fully usable. Pass JSON text (or
+    the result of "jencode") between threads instead of a Doc.
+
+    Structures from "decode_json_ro" may be shared with a thread and read
+    from either side; the underlying parse buffer is kept alive until the
+    last thread holding part of it goes away.
+
 LIMITATIONS
     *   "canonical" mode is accepted but not yet implemented (yyjson has no
         sorted-key writer).
 
+    *   Duplicate keys in one object are resolved differently by the two
+        decoders: "decode_json"/"decode_json_ro" keep the last occurrence
+        (as JSON::XS does), while the Doc API resolves a pointer to the
+        first. "jdel" on such a key removes every occurrence but returns
+        only the first. JSON does not define duplicate-key semantics; avoid
+        relying on either.
+
     *   NaN and Infinity values cannot be encoded (croaks).
+
+    *   Nesting is bounded in both directions by "max_depth" (default 512):
+        input nested deeper than that is rejected with "maximum nesting
+        depth exceeded" rather than being materialised, and encoding croaks
+        the same way. A JSON Pointer passed to "jset"/"jraw" is bounded too,
+        since each component creates a nested parent. The functional and Doc
+        APIs use the default; only the OO coder can change it -- see
+        "max_depth($n)" before raising it far.
+
+        A document can still be driven past the limit by repeated mutation,
+        since each individual path is short ("jset $cur, "/k", {}; $cur =
+        jget $cur, "/k"" in a loop). Serialising such a document is safe
+        ("jencode", "jpp" and stringification are iterative), and
+        "jgetp"/"jpaths" croak rather than recurse. "jclone", "jeq", "jdel",
+        "jwrite" and "jpatch" however recurse inside yyjson and will exhaust
+        the C stack somewhere around 100_000 levels. Reaching that takes a
+        deliberate loop -- neither parsed JSON nor a JSON Pointer can build
+        a document that deep -- but if you construct documents by unbounded
+        repeated nesting, serialise rather than clone or compare them.
+
+    *   JSON "true"/"false" decode to the Perl scalars 1/0 (correct in
+        boolean context), not to overloaded boolean objects. To encode a
+        JSON boolean, pass a scalar ref ("\1" for true, "\0" for false) or
+        use "jbool" in the Doc API. Consequently
+        "encode_json(decode_json('[true,false]'))" yields "[1,0]", not
+        "[true,false]".
 
 COOKBOOK
   Read config, modify, write back
@@ -386,6 +508,7 @@ CHEATSHEET
         # --- Read ---
         jget $doc, $path           # -> Doc subtree ref (shared)
         jgetp $doc, $path          # -> Perl value (materialized)
+        jdecode $doc, $path        # alias for jgetp
         jhas $doc, $path           # -> bool
         jfind $doc, $arr, $k, $v   # -> Doc (first match) or undef
 

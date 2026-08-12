@@ -1,5 +1,17 @@
 Revision history for Data-DDSketch-Shared
 
+0.02      2026-08-11
+          - Frozen read-only mode: freeze() seals a file-backed structure;
+            new_readonly() maps it O_RDONLY and queries it lock-free.
+          - Create leaves the backing file sparse.
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+
 0.01      2026-07-22
           - Initial release.
 

@@ -28,13 +28,18 @@ for my $path (@fixtures) {
     my $original = <$fh>;
     close $fh;
 
-    # Decode the fixture; not every fixture is a self-contained block
-    # (some are partial wire snippets used in doc/wire-format research).
-    # Skip cleanly if decode itself fails - the round-trip claim only
-    # makes sense for fixtures the decoder can read.
+    # A skip here is not "the fixture is malformed" - every .bin came from
+    # a real server. It means the decoder cannot read something the server
+    # emits, so name the cause. 09-array is the known case: it carries
+    # Array(Nullable(Int64)) (see the JSON notes in the main POD).
     my $blk = eval { ClickHouse::Encoder->decode_block($original) };
     if ($@ || !defined $blk) {
-      SKIP: { skip "fixture $name not a complete block: $@", 1; }
+        my $why = $@ || 'decode returned undef';
+        $why =~ s/\s+at .*\z//s;
+      SKIP: {
+            skip "fixture $name (captured from a real server) cannot be "
+               . "decoded - known limitation: $why", 1;
+        }
         next;
     }
 

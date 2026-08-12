@@ -1,5 +1,12 @@
 Revision history for Data-DisjointSet-Shared
 
+0.04      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.03      2026-07-22
           - Fix a use-after-free in union_many(): a tied array, or overloaded
             or tied elements, run Perl that can destroy the set, after which

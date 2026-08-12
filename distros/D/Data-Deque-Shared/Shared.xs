@@ -10,6 +10,7 @@
         croak("Expected a Data::Deque::Shared object"); \
     DeqHandle *h = INT2PTR(DeqHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::Deque::Shared object"); \
+    DeqHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -19,8 +20,10 @@
  * `h` would dangle.  Used only where magic can actually intervene between
  * EXTRACT_DEQ and the first use of h. */
 #define REEXTRACT_DEQ(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::Deque::Shared object was replaced during the call"); \
     h = INT2PTR(DeqHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::Deque::Shared object destroyed during the call")
+    if (h != h0) croak("Data::Deque::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -36,7 +39,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Deque::Shared")) return;
     DeqHandle *h = INT2PTR(DeqHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -194,7 +197,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
+    if (unlink(p) != 0 && errno != ENOENT) croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
 stats(self)
@@ -232,7 +235,7 @@ new(class, path, capacity, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     DeqHandle *h = deq_create(p, capacity, sizeof(int64_t), DEQ_VAR_INT, mode, errbuf);
-    if (!h) croak("Data::Deque::Shared::Int->new: %s", errbuf);
+    if (!h) croak("Data::Deque::Shared::Int->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -246,7 +249,7 @@ new_memfd(class, name, capacity)
     char errbuf[DEQ_ERR_BUFLEN];
   CODE:
     DeqHandle *h = deq_create_memfd(name, capacity, sizeof(int64_t), DEQ_VAR_INT, errbuf);
-    if (!h) croak("Data::Deque::Shared::Int->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Deque::Shared::Int->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -259,7 +262,7 @@ new_from_fd(class, fd)
     char errbuf[DEQ_ERR_BUFLEN];
   CODE:
     DeqHandle *h = deq_open_fd(fd, DEQ_VAR_INT, errbuf);
-    if (!h) croak("Data::Deque::Shared::Int->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Deque::Shared::Int->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -388,7 +391,7 @@ new(class, path, capacity, max_len, ...)
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     DeqHandle *h = deq_create(p, capacity, elem_size, DEQ_VAR_STR, mode, errbuf);
-    if (!h) croak("Data::Deque::Shared::Str->new: %s", errbuf);
+    if (!h) croak("Data::Deque::Shared::Str->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -407,7 +410,7 @@ new_memfd(class, name, capacity, max_len)
         croak("max_len too large (>= 2 GiB)");
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
     DeqHandle *h = deq_create_memfd(name, capacity, elem_size, DEQ_VAR_STR, errbuf);
-    if (!h) croak("Data::Deque::Shared::Str->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Deque::Shared::Str->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -420,7 +423,7 @@ new_from_fd(class, fd)
     char errbuf[DEQ_ERR_BUFLEN];
   CODE:
     DeqHandle *h = deq_open_fd(fd, DEQ_VAR_STR, errbuf);
-    if (!h) croak("Data::Deque::Shared::Str->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Deque::Shared::Str->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL

@@ -3,41 +3,60 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::Promise::Rule;
+$Context::Singleton::Frame::Promise::Rule::VERSION = '1.0.7';
+use Moo;
 
-our $VERSION = v1.0.5;
+use namespace::clean;
 
-use parent qw[ Context::Singleton::Frame::Promise ];
+BEGIN { extends q (Context::Singleton::Frame::Promise) }
 
-sub new {
-	my ($class, %params) = @_;
+use namespace::clean;
 
-	my $self = $class->SUPER::new (%params);
-
-	$self->{rule} = $params{rule};
-
-	$self;
-}
-
-sub rule {
-	$_[0]->{rule};
-}
+has q (rule)
+	=> is       => q (ro)
+	;
 
 sub notify_deducible {
 	my ($self, $in_depth) = @_;
 
 	$self->set_deducible ($in_depth)
-		if $self->deducible_dependencies;
+		if $self->deducible_dependencies
+		;
 }
 
 sub deducible_builder {
 	my ($self) = @_;
 
 	for my $dependency ($self->deducible_dependencies) {
-		next unless $dependency->deduced_in_depth == $self->deduced_in_depth;
+		next
+			unless $dependency->deduced_in_depth == $self->deduced_in_depth
+			;
 
 		return $dependency;
 	}
 }
 
 1;
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Context::Singleton::Frame::Promise::Rule - Represents all rules of one singleton
+
+=head1 DESCRIPTION
+
+This is internal package.
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney.cpan@gmail.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+This module is part of L<Context::Singleton> distribution.
+
+=cut
 

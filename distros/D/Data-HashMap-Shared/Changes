@@ -1,5 +1,31 @@
 Revision history for Data-HashMap-Shared
 
+0.17      2026-08-12
+          - Enforce the freeze in every mutator, not only at open.
+          - Bound the arena offset when reading a string, so a corrupt record
+            cannot hand an out-of-range pointer to newSVpvn.
+          - Retire a tombstone before counting the new entry, so a concurrent
+            open no longer reports a corrupt header on a saturated map.
+          - new_sharded croaks above 4096 shards instead of looping forever, and
+            constructor sizes above 2**32 croak instead of truncating.
+          - get() no longer spins forever on a stably-corrupt record.
+          - drain() reserves only what the map can yield, not the requested
+            limit.
+          - Sharded capacity(), tombstones() and stat_recoveries() accumulate in
+            64 bits and saturate, matching size().
+          - The v9->v10 upgrader loops on short writes, preserves group
+            ownership across the rename, and no longer reports a dead pid as
+            a live writer.
+          - Every access to the shared value word is now atomic (relaxed).
+          - Recover a file left behind by an interrupted create.
+          - Frozen read-only mode: freeze() seals a file-backed map;
+            new_readonly() maps it O_RDONLY and queries it lock-free.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+          - Document that unlink() reports through its return value rather than
+            by dying.
+
 0.16      2026-07-21
           - On-disk format change (v9 -> v10): migrate existing files with
             bin/hashmap-shared-upgrade or Data::HashMap::Shared->upgrade_file.

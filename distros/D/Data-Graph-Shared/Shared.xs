@@ -10,6 +10,7 @@
         croak("Expected a Data::Graph::Shared object"); \
     GraphHandle *h = INT2PTR(GraphHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::Graph::Shared object"); \
+    GraphHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -23,7 +24,7 @@
     if (!SvROK(sv)) \
         croak("Data::Graph::Shared object was replaced during the call"); \
     h = INT2PTR(GraphHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::Graph::Shared object destroyed during the call")
+    if (h != h0) croak("Data::Graph::Shared object replaced or destroyed during the call")
 
 /* Node ids are UV in the XS signature but uint32_t in the core. Reject an
  * out-of-range id instead of silently truncating it into a different, valid
@@ -44,6 +45,14 @@
         graph_mutex_unlock((h)->hdr); \
         croak("node %u does not exist", (unsigned)(node)); \
     } \
+} while (0)
+
+/* Lock-free node-existence check for a frozen (readonly PROT_READ) handle --
+ * same check and message as REQUIRE_NODE, but no lock to release since none
+ * was ever taken (a mutex CAS on a PROT_READ mapping would SIGSEGV). */
+#define REQUIRE_NODE_RO(h, node) do { \
+    if ((uint32_t)(node) >= (h)->max_nodes || !graph_bit_set((h)->node_bitmap, (uint32_t)(node))) \
+        croak("node %u does not exist", (unsigned)(node)); \
 } while (0)
 
 MODULE = Data::Graph::Shared  PACKAGE = Data::Graph::Shared
@@ -69,7 +78,7 @@ new(class, path, max_nodes, max_edges, ...)
     if (p && strlen(p) != (size_t)SvCUR(path))
         croak("Data::Graph::Shared->new: path contains an embedded NUL");
     GraphHandle *h = graph_create(p, (uint32_t)max_nodes, (uint32_t)max_edges, mode, errbuf);
-    if (!h) croak("Data::Graph::Shared->new: %s", errbuf);
+    if (!h) croak("Data::Graph::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -86,7 +95,7 @@ new_memfd(class, name, max_nodes, max_edges)
     if (max_nodes > UINT32_MAX || max_edges > UINT32_MAX)
         croak("Data::Graph::Shared->new_memfd: max_nodes/max_edges exceed 2^32");
     GraphHandle *h = graph_create_memfd(name, (uint32_t)max_nodes, (uint32_t)max_edges, errbuf);
-    if (!h) croak("Data::Graph::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Graph::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -99,7 +108,28 @@ new_from_fd(class, fd)
     char errbuf[GRAPH_ERR_BUFLEN];
   CODE:
     GraphHandle *h = graph_open_fd(fd, errbuf);
-    if (!h) croak("Data::Graph::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Graph::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_readonly(class, path)
+    const char *class
+    SV *path
+  PREINIT:
+    char errbuf[GRAPH_ERR_BUFLEN];
+  CODE:
+    /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
+       ever.  A sealed file is immutable and no read path writes the mapping,
+       so queries take no reader-slot / rwlock traffic and any number of
+       processes can share one PROT_READ mapping (same architecture; the
+       magic rejects a wrong-endian file). */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (!p) croak("Data::Graph::Shared->new_readonly: path is required");
+    GraphHandle *h = graph_open_readonly(p, errbuf);
+    if (!h) croak("Data::Graph::Shared->new_readonly: %s", errbuf);
+    class = SvPV_nolen(ST(0));   /* re-read: SvGETMAGIC above may have run Perl that reallocs/frees ST(0)'s PV */
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -108,7 +138,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Graph::Shared")) return;
     GraphHandle *h = INT2PTR(GraphHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -120,7 +150,7 @@ sync(self)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
-    if (graph_msync(h) != 0) croak("msync: %s", strerror(errno));
+    if (!h->readonly && graph_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -136,7 +166,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
+    if (unlink(p) != 0 && errno != ENOENT) croak("unlink(%s): %s", p, strerror(errno));
 
 IV
 memfd(self)
@@ -207,7 +237,12 @@ add_node(self, data)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
-    int64_t idx = graph_add_node(h, (int64_t)data);
+    if (h->readonly) croak("Data::Graph::Shared->add_node: graph is frozen (read-only)");
+    graph_mutex_lock(h->hdr);
+    if (h->hdr->sealed) { graph_mutex_unlock(h->hdr); croak("Data::Graph::Shared->add_node: graph is frozen (read-only)"); }
+    int64_t idx = graph_add_node_locked(h, (int64_t)data);
+    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    graph_mutex_unlock(h->hdr);
     RETVAL = (idx >= 0) ? newSViv((IV)idx) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -220,11 +255,16 @@ add_edge(self, src, dst, ...)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    if (h->readonly) croak("Data::Graph::Shared->add_edge: graph is frozen (read-only)");
     GRAPH_CHECK_NODE(src, "add_edge");
     GRAPH_CHECK_NODE(dst, "add_edge");
     int64_t weight = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (int64_t)SvIV(ST(3)) : 1;
     REEXTRACT_GRAPH(self);   /* the weight's get-magic may have destroyed self */
-    RETVAL = graph_add_edge(h, (uint32_t)src, (uint32_t)dst, weight);
+    graph_mutex_lock(h->hdr);
+    if (h->hdr->sealed) { graph_mutex_unlock(h->hdr); croak("Data::Graph::Shared->add_edge: graph is frozen (read-only)"); }
+    RETVAL = graph_add_edge_locked(h, (uint32_t)src, (uint32_t)dst, weight);
+    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    graph_mutex_unlock(h->hdr);
   OUTPUT:
     RETVAL
 
@@ -235,8 +275,13 @@ remove_node(self, node)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    if (h->readonly) croak("Data::Graph::Shared->remove_node: graph is frozen (read-only)");
     GRAPH_CHECK_NODE(node, "remove_node");
-    RETVAL = graph_remove_node(h, (uint32_t)node);
+    graph_mutex_lock(h->hdr);
+    if (h->hdr->sealed) { graph_mutex_unlock(h->hdr); croak("Data::Graph::Shared->remove_node: graph is frozen (read-only)"); }
+    RETVAL = graph_remove_node_locked(h, (uint32_t)node);
+    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    graph_mutex_unlock(h->hdr);
   OUTPUT:
     RETVAL
 
@@ -247,8 +292,13 @@ remove_node_full(self, node)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    if (h->readonly) croak("Data::Graph::Shared->remove_node_full: graph is frozen (read-only)");
     GRAPH_CHECK_NODE(node, "remove_node_full");
-    RETVAL = graph_remove_node_full(h, (uint32_t)node);
+    graph_mutex_lock(h->hdr);
+    if (h->hdr->sealed) { graph_mutex_unlock(h->hdr); croak("Data::Graph::Shared->remove_node_full: graph is frozen (read-only)"); }
+    RETVAL = graph_remove_node_full_locked(h, (uint32_t)node);
+    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    graph_mutex_unlock(h->hdr);
   OUTPUT:
     RETVAL
 
@@ -272,10 +322,15 @@ node_data(self, node)
     EXTRACT_GRAPH(self);
   CODE:
     GRAPH_CHECK_NODE(node, "node_data");
-    graph_mutex_lock(h->hdr);
-    REQUIRE_NODE(h, node);
-    RETVAL = (IV)h->node_data[(uint32_t)node];
-    graph_mutex_unlock(h->hdr);
+    if (h->readonly) {
+        REQUIRE_NODE_RO(h, node);
+        RETVAL = (IV)h->node_data[(uint32_t)node];
+    } else {
+        graph_mutex_lock(h->hdr);
+        REQUIRE_NODE(h, node);
+        RETVAL = (IV)h->node_data[(uint32_t)node];
+        graph_mutex_unlock(h->hdr);
+    }
   OUTPUT:
     RETVAL
 
@@ -287,8 +342,10 @@ set_node_data(self, node, data)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    if (h->readonly) croak("Data::Graph::Shared->set_node_data: graph is frozen (read-only)");
     GRAPH_CHECK_NODE(node, "set_node_data");
     graph_mutex_lock(h->hdr);
+    if (h->hdr->sealed) { graph_mutex_unlock(h->hdr); croak("Data::Graph::Shared->set_node_data: graph is frozen (read-only)"); }
     REQUIRE_NODE(h, node);
     h->node_data[(uint32_t)node] = (int64_t)data;
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -304,16 +361,23 @@ neighbors(self, node)
     GRAPH_CHECK_NODE(node, "neighbors");
     /* Collect edges under lock, then build Perl SVs outside it:
      * newAV/newSVuv/newSViv can longjmp on OOM, which would leak the
-     * process-shared mutex to peers (no automatic cleanup for futex). */
-    graph_mutex_lock(h->hdr);
-    REQUIRE_NODE(h, node);
+     * process-shared mutex to peers (no automatic cleanup for futex).
+     * A frozen (readonly) handle is an immutable PROT_READ mapping: the
+     * mutex is never touched (a CAS on it would SIGSEGV) and every result
+     * below lands only in this process-local malloc'd buffer. */
+    if (h->readonly) {
+        REQUIRE_NODE_RO(h, node);
+    } else {
+        graph_mutex_lock(h->hdr);
+        REQUIRE_NODE(h, node);
+    }
     uint32_t deg = graph_degree(h, (uint32_t)node);
     uint32_t eidx = h->node_heads[(uint32_t)node];
     uint32_t *dsts = deg ? (uint32_t *)malloc(deg * sizeof(uint32_t)) : NULL;
     int64_t  *wts  = deg ? (int64_t *)malloc(deg * sizeof(int64_t))  : NULL;
     if (deg && (!dsts || !wts)) {
         free(dsts); free(wts);
-        graph_mutex_unlock(h->hdr);
+        if (!h->readonly) graph_mutex_unlock(h->hdr);
         croak("neighbors: out of memory");
     }
     uint32_t i = 0;
@@ -324,7 +388,7 @@ neighbors(self, node)
         eidx = h->edges[eidx].next;
         i++;
     }
-    graph_mutex_unlock(h->hdr);
+    if (!h->readonly) graph_mutex_unlock(h->hdr);
     EXTEND(SP, (SSize_t)i);
     for (uint32_t j = 0; j < i; j++) {
         AV *pair = newAV();
@@ -342,10 +406,15 @@ degree(self, node)
     EXTRACT_GRAPH(self);
   CODE:
     GRAPH_CHECK_NODE(node, "degree");
-    graph_mutex_lock(h->hdr);
-    REQUIRE_NODE(h, node);
-    RETVAL = graph_degree(h, (uint32_t)node);
-    graph_mutex_unlock(h->hdr);
+    if (h->readonly) {
+        REQUIRE_NODE_RO(h, node);
+        RETVAL = graph_degree(h, (uint32_t)node);
+    } else {
+        graph_mutex_lock(h->hdr);
+        REQUIRE_NODE(h, node);
+        RETVAL = graph_degree(h, (uint32_t)node);
+        graph_mutex_unlock(h->hdr);
+    }
   OUTPUT:
     RETVAL
 
@@ -389,6 +458,36 @@ max_edges(self)
   OUTPUT:
     RETVAL
 
+void
+freeze(self)
+    SV *self
+  PREINIT:
+    EXTRACT_GRAPH(self);
+  CODE:
+    if (h->readonly) croak("Data::Graph::Shared->freeze: cannot freeze a read-only handle");
+    if (graph_freeze(h) != 0) croak("Data::Graph::Shared->freeze: msync: %s", strerror(errno));
+    h->readonly = 1;   /* this handle now rejects mutation too (the file is sealed) */
+
+UV
+frozen(self)
+    SV *self
+  PREINIT:
+    EXTRACT_GRAPH(self);
+  CODE:
+    RETVAL = h->hdr->sealed ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
+UV
+readonly(self)
+    SV *self
+  PREINIT:
+    EXTRACT_GRAPH(self);
+  CODE:
+    RETVAL = h->readonly ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
 SV *
 stats(self)
     SV *self
@@ -402,6 +501,8 @@ stats(self)
     hv_store(hv, "max_edges", 9, newSVuv(h->hdr->max_edges), 0);
     hv_store(hv, "ops", 3, newSVuv((UV)__atomic_load_n(&h->hdr->stat_ops, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
+    hv_store(hv, "frozen", 6, newSVuv(h->hdr->sealed ? 1 : 0), 0);
+    hv_store(hv, "readonly", 8, newSVuv(h->readonly ? 1 : 0), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL

@@ -30,10 +30,10 @@ naming scheme should be sufficient to distinguish driver module names from
 other parts of infrastructure, which are all named in title case and lack
 digits.
 
-The L<Device::Class> package provides a base class that such a specific
+The L<Device::Chip> package provides a base class that such a specific
 implementation class could use as a superclass, but it is not required to.
 The important detail is that it provides the interface described by the main
-L<Device::Class> documentation. The documentation in this file mostly concerns
+L<Device::Chip> documentation. The documentation in this file mostly concerns
 itself with the abilities and utilities provided by the base class 
 implementation.
 

@@ -1,9 +1,11 @@
 ---
 abstract: unknown
 author:
-  - unknown
+  - 'Ian Kluft <https://github.com/ikluft>'
 build_requires:
+  Carp: '0'
   Config::Tiny: '0'
+  Cwd: '0'
   Data::Dumper: '0'
   File::Basename: '0'
   File::Find: '0'
@@ -15,11 +17,13 @@ build_requires:
   YAML: '0'
 configure_requires:
   CPAN::Changes: '0'
-  ExtUtils::MakeMaker: '0'
+  CPAN::Meta: '0'
+  Carp: '0'
+  ExtUtils::MakeMaker: '7.36'
   Versioning::Scheme::Semantic: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -33,5 +37,8 @@ provides:
     file: lib/Sys/OsRelease/Lite.pm
 requires:
   perl: '5.010001'
-version: v0.4.5+lite
+resources:
+  bugtracker: https://github.com/ikluft/Sys-OsRelease/issues
+version: v0.4.6+lite
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_spdx_expression: Artistic-2.0

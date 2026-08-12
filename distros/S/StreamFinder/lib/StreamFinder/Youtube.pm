@@ -532,6 +532,9 @@ sub new
 		} elsif ($_[0] =~ /^\-?format$/o) {
 			shift;
 			$self->{'format'} = shift  if (defined $_[0]);
+		} elsif ($_[0] =~ /^\-?formatv$/o) {
+			shift;
+			$self->{'formatv'} = shift  if (defined $_[0]);
 		} elsif ($_[0] =~ /^\-?format\-fallback$/o) {
 			shift;
 			$self->{'format-fallback'} = shift  if (defined $_[0]);
@@ -709,10 +712,16 @@ DO_YTDL:
 	$ytdlArgs .= ' -f "' . $ytformat . '" '  unless ($ytformat =~ /^a(?:ny|ll)$/i);
 	my $try = 0;
 	my (@ytdldata, @ytStreams);
+	my $wasdashfmt = 0;
 
 RETRYIT:
 	$_ = '';
 	my $cmd = '';
+	print STDERR "====== (RE)TRYIT: TRY=$try= getdash=$wasdashfmt=\n"  if ($DEBUG);
+	unless ($wasdashfmt == 1) {   #RESET STREAMS UNLESS LOOKING FOR 2ND PART OF DASH STREAM:
+		$self->{'streams'} = [];
+		$self->{'cnt'} = 0;
+	}
 	if (defined($self->{'userid'}) && defined($self->{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
 		my $uid = $self->{'userid'};
 		my $upw = $self->{'userpw'};
@@ -725,14 +734,18 @@ RETRYIT:
 	$_ = `$cmd`;
 	print STDERR "--YT RETURNED DATA===>$_<===\n"  if ($DEBUG);
 	@ytdldata = split /\r?\n/s;
-	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
+	unless ($try || scalar(@ytdldata) > 1) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		$try++;
 		if (defined $self->{'format-fallback'} && $self->{'format-fallback'}) {
-			print STDERR "..1:No ($ytformat) streams found, try again with ($$self{'formatonly'})...\n"  if ($DEBUG);
+			print STDERR "..1a:No ($ytformat) streams found, try again with ($$self{'format-fallback'})...\n"  if ($DEBUG);
+			$wasdashfmt = shift (@ytStreams)  if ($wasdashfmt == 1 && scalar(@ytStreams) > 0);
+			@ytStreams = ();  #RESET HERE CASE WE HAVE AUDIO STREAM FROM DASH FORMAT!
 			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"/\-f \"$$self{'format-fallback'}\"/);
 		}
 		unless ($self->{'formatonly'}) {
-			print STDERR "..1:No ($ytformat) streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
+			print STDERR "..1b:No ($ytformat) streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
+			$wasdashfmt = shift (@ytStreams)  if ($wasdashfmt == 1 && scalar(@ytStreams) > 0);
+			@ytStreams = ();  #RESET HERE CASE WE HAVE AUDIO STREAM FROM DASH FORMAT!
 			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"//);
 		}
 	}
@@ -753,7 +766,7 @@ RETRYIT:
 		}
 	}
 		
-	return undef unless (scalar(@ytdldata) > 0);
+	return undef unless ($self->{'cnt'} > 0 || scalar(@ytdldata) > 0);
 
 	#NOTE:  ytdldata is ORDERED:  TITLE?, ID, STREAM-URLS, THEN THE ICON URL, THEN DESCRIPTION, LASTLY FORMATS!:
 	unless ($ytdldata[0] =~ m#^https?\:\/\/#) {
@@ -788,14 +801,26 @@ RETRYIT:
 	push @{$self->{'streams'}}, @ytStreams;
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
 	print STDERR "-STREAM COUNT=".$self->{'cnt'}."= FMTS=".join('|',@fmtsfound)."= ICON=".$self->{'iconurl'}."=\n"  if ($DEBUG);
+	if ($try == 0 && $wasdashfmt == 0 && $self->{'cnt'} > 0 && defined($self->{'formatv'})) {
+		#NOW LOOK FOR A CORRESPONDING DASH VIDEO STREAM:
+		print STDERR "..1:Now try for dash video stream ($$self{'formatv'})...\n"  if ($DEBUG);
+		$wasdashfmt = 1;
+		$ytformat = $self->{'formatv'};
+		goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"/\-f \"$ytformat\"/);
+	}
 	unless ($try || $self->{'cnt'} > 0) {  #IF NO STREAMS FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		$try++;
+		$self->{'formatv'} = undef;  #DON'T LOOK FOR DASH VIDEO IN FALLBACK TRIES!
 		if (defined $self->{'format-fallback'}) {
-			print STDERR "..1:No ($ytformat) streams found, try again with ($$self{'formatonly'})...\n"  if ($DEBUG);
+			print STDERR "..2a:No ($ytformat) streams found, try again with ($$self{'format-fallback'})...\n"  if ($DEBUG);
+			$wasdashfmt = shift (@ytStreams)  if ($wasdashfmt == 1 && scalar(@ytStreams) > 0);
+			@ytStreams = ();  #RESET HERE CASE WE HAVE AUDIO STREAM FROM DASH FORMAT!
 			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"/\-f \"$$self{'format-fallback'}\"/);
 		}
 		unless (defined($self->{'formatonly'}) && $self->{'formatonly'}) {
-			print STDERR "..2:No ($ytformat) streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
+			print STDERR "..2b:No ($ytformat) streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
+			$wasdashfmt = shift (@ytStreams)  if ($wasdashfmt == 1 && scalar(@ytStreams) > 0);
+			@ytStreams = ();  #RESET HERE CASE WE HAVE AUDIO STREAM FROM DASH FORMAT!
 			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"//);
 		}
 	}
@@ -871,9 +896,19 @@ RETRYPAGE:
 			goto RETRYPAGE;
 		}
 	}
+	if ($self->{'cnt'} <= 0 && $wasdashfmt && $wasdashfmt != 1) {
+		@{$self->{'streams'}} = ($wasdashfmt);  #FALLBACK TO ANY RESIDUAL DASH AUDIO-STREAM (from formatv).
+		$self->{'cnt'} = 1;
+	}
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
+	if (defined($self->{'formatv'}) && $self->{'cnt'} > 1) {
+		my $video_stream = $self->{'streams'}->[$self->{'cnt'}-1];
+		$self->{'streams'}->[$self->{'cnt'}-1] = $self->{'Url'};
+		$self->{'Url'} .= "|" . $video_stream;
+		$self->{'streams'}->[0] = $self->{'Url'};
+	}
 	print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
 			if ($DEBUG && $self->{'cnt'} > 0);
@@ -889,6 +924,10 @@ RETRYPAGE:
 	}
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."= artist=".$self->{'artist'}."= year(Published)=".$self->{'year'}."=\n"  if ($DEBUG);
 	if ($DEBUG) {
+		foreach (my $i=0;$i<$self->{'cnt'};$i++) {
+			print STDERR "===== Stream.YT($i)=".$self->{'streams'}->[$i]."=\n";
+		}
+		print STDERR "\n";
 		foreach my $i (sort keys %{$self}) {
 			print STDERR "--KEY.YT=$i= VAL=".$self->{$i}."=\n";
 		}

@@ -23,7 +23,7 @@ my @dirs = (
 	'lib/Genealogy/Wills/data'
 );
 
-# FIXME: AUTOMATED_TESTING - create the empty directory in blib
+# create_db.PL calls _sync_to_blib() on all exit paths to keep blib in sync
 foreach my $dir(@dirs) {
 	if(! -d $dir) {
 		print "Creating the download directory $dir\n";
@@ -37,31 +37,24 @@ foreach my $dir(@dirs) {
 
 my $prereqs = {
 	'autodie' => 0,
-	'constant' => 0,
 	'Carp' => 0,
 	'Data::Reuse' => 0,
-	'Database::Abstraction' => 0.04,
+	'Database::Abstraction' => 0.37,
 	'DBD::SQLite' => 0,
-	'DBD::SQLite::Constants' => 0,
-	'Error::Simple' => 0,
 	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-	'File::Basename' => 0,
-	'File::pfopen' => 0,
-	'File::Slurp' => 0,
 	'File::Spec' => 0,
-	'File::Temp' => 0,
-	'Module::Info' => 0,
-	'Object::Configure' => 0.12,
-	'Params::Get' => 0.13,
-	'Params::Validate::Strict' => 0.09,
-	'Return::Set' => 0,
-	'Scalar::Util' => 0
+	'Object::Configure' => 0.23,
+	'Params::Get' => 0.16,
+	'Params::Validate::Strict' => 0.37,
+	'Readonly' => 0,
+	'Return::Set' => 0.05,
+	'Scalar::Util' => 0,
+	'Sub::Protected' => 0
 };
 
 unless(defined($ENV{'AUTOMATED_TESTING'})) {
 	$prereqs->{'DBI'} = 0;
 	$prereqs->{'File::HomeDir'} = 0;
-	$prereqs->{'HTML::Entities'} = 0;
 	$prereqs->{'HTTP::Cache::Transparent'} = 0;
 	$prereqs->{'LWP::ConnCache'} = 0;
 	$prereqs->{'LWP::Protocol::https'} = 0;
@@ -87,7 +80,7 @@ WriteMakefile(
 	ABSTRACT_FROM	=> 'lib/Genealogy/Wills.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-	  ? ('LICENSE'=> 'GPL')
+	  ? ('LICENSE'=> 'gpl_2')
 	  : ()),
 	'LIBS' => [''],   # e.g., '-lm'
 	'DEFINE' => '',     # e.g., '-DHAVE_SOMETHING'
@@ -95,10 +88,13 @@ WriteMakefile(
 	PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-	}, TEST_REQUIRES => {
+	}, PREREQ_PM => $prereqs,
+	TEST_REQUIRES => {
 		'File::Temp' => 0,
 		'Test::Carp' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Memory::Cycle' => 0,
+		'Test::Mockingbird' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::Returns' => 0,
@@ -106,8 +102,7 @@ WriteMakefile(
 		# 'Test::Kwalitee' => 0,
 		'IPC::System::Simple' => 0,
 		'YAML::Any' => 0
-	}, PREREQ_PM => $prereqs,
-	dist => $dist,
+	}, dist => $dist,
 	clean => { FILES => 'Genealogy-Wills-*' },
 	realclean => {
 		# This would seem logical, but it will break "make && make test" even though you don't call "make realclean"
@@ -122,19 +117,19 @@ WriteMakefile(
 		resources => {
 			repository => {
 				type => 'git',
-				url => 'git://github.com/nigelhorne/Genealogy-Wills.git',
+				url => 'https://github.com/nigelhorne/Genealogy-Wills.git',
 				web => 'https://github.com/nigelhorne/Genealogy-Wills',
 				repository => 'https://github.com/nigelhorne/Genealogy-Wills',
-			},
-			bugtracker => {
+			}, bugtracker => {
 				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Wills',
 				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Wills',
 				# web => 'https://github.com/nigelhorne/Genealogy-Wills/issues',
 				mailto => 'bug-Genealogy-Wills@rt.cpan.org'
-			}, homepage => 'https://sites.rootsweb.com/~obituary',
+			},
+			homepage => 'https://sites.rootsweb.com/~obituary',
 		},
 	},
 	# PPM_INSTALL_EXEC	=> 'perl',
 	# PPM_INSTALL_SCRIPT	=> 'bin/create_db.PL',
-	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.010001'	# autodie qw(:all) requires 5.10.1; use feature 'state' requires 5.10
 );

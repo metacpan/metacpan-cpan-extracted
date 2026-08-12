@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib map "${FindBin::Bin}/$_", qw[ ../lib lib sample ];
+use lib map qq (${FindBin::Bin}/$_), qw[ ../lib lib sample ];
 
 use Test::Spec::Util;
 
@@ -12,28 +12,28 @@ use Sample::Context::Singleton::Frame::Builder::Base;
 
 use Context::Singleton::Frame::Builder::Array;
 
-class_under_test 'Context::Singleton::Frame::Builder::Array';
+class_under_test q (Context::Singleton::Frame::Builder::Array);
 
-my $SAMPLE_BUILDER = 'Sample::Context::Singleton::Frame::Builder::Base::__::Builder';
-my $EXAMPLE_CLASS = 'Example::Test::Builder::Base';
-my $EXAMPLE_DEDUCE = 'example-deduce';
+my $SAMPLE_BUILDER = q (Sample::Context::Singleton::Frame::Builder::Base::__::Builder);
+my $EXAMPLE_CLASS = q (Example::Test::Builder::Base);
+my $EXAMPLE_DEDUCE = q (example-deduce);
 
 sub with_dependencies {
-	+( 'foo', 'bar' )
+	+( q (foo), q (bar) )
 }
 
 sub with_deduced {
 	+(
-		foo => 'Foo',
-		bar => 'Bar',
+		foo => q (Foo),
+		bar => q (Bar),
 		$EXAMPLE_CLASS => $SAMPLE_BUILDER,
 		$EXAMPLE_DEDUCE => bless {}, $SAMPLE_BUILDER,
 	);
 }
 
-describe 'Builder::Array' => as {
-	context 'with empty dependencies' => as {
-		context "without 'this'" => sub {
+describe q (Builder::Array) => as {
+	context q (with empty dependencies) => as {
+		context q (without 'this') => sub {
 			build_instance [
 				dep => [ ],
 			];
@@ -48,7 +48,7 @@ describe 'Builder::Array' => as {
 			return;
 		};
 
-		context "with this" => sub {
+		context q (with this) => sub {
 			build_instance [
 				this => $EXAMPLE_CLASS,
 				dep => [ ],
@@ -69,36 +69,36 @@ describe 'Builder::Array' => as {
 		return;
 	};
 
-	context 'with some dependencies' => as {
-		context "without 'this'" => sub {
+	context q (with some dependencies) => as {
+		context q (without 'this') => sub {
 			build_instance [
-				dep => [ 'foo', 'bar' ],
+				dep => [ q (foo), q (bar) ],
 			];
 
 			plan tests => 4;
 
-			expect_required   expect => [ 'foo', 'bar' ];
-			expect_unresolved expect => [ 'foo', 'bar' ];
-			expect_dep        expect => [ 'foo', 'bar' ];
-			expect_build_args expect => [ 'Foo', 'Bar' ],
+			expect_required   expect => [ q (foo), q (bar) ];
+			expect_unresolved expect => [ q (foo), q (bar) ];
+			expect_dep        expect => [ q (foo), q (bar) ];
+			expect_build_args expect => [ q (Foo), q (Bar) ],
 				with_deduced => { with_deduced },
 				;
 
 			return;
 		};
 
-		context "with this" => sub {
+		context q (with this) => sub {
 			build_instance [
 				this => $EXAMPLE_CLASS,
-				dep => [ 'foo', 'bar' ],
+				dep => [ q (foo), q (bar) ],
 			];
 
 			plan tests => 4;
 
-			expect_required   expect => [ $EXAMPLE_CLASS, 'foo', 'bar' ];
-			expect_unresolved expect => [ $EXAMPLE_CLASS, 'foo', 'bar' ];
-			expect_dep        expect => [ 'foo', 'bar' ];
-			expect_build_args expect => [ $SAMPLE_BUILDER, 'Foo', 'Bar' ],
+			expect_required   expect => [ $EXAMPLE_CLASS, q (foo), q (bar) ];
+			expect_unresolved expect => [ $EXAMPLE_CLASS, q (foo), q (bar) ];
+			expect_dep        expect => [ q (foo), q (bar) ];
+			expect_build_args expect => [ $SAMPLE_BUILDER, q (Foo), q (Bar) ],
 				with_deduced => { with_deduced },
 				;
 

@@ -62,9 +62,7 @@ fudge it in. C<NORAD_CAT_ID> has the same value.
 =item Favorites do not work
 
 In the previous release C<spacetrack()> would fetch canned favorites
-curated by Space Track. As of January 21 2026 these are 404. If I find
-these data sets I will restore them. Favorites can still be retrieved
-via the C<favorite()> method.
+curated by Space Track. As of January 21 2026 these are 404.
 
 =back
 
@@ -151,7 +149,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.182';
+our $VERSION = '0.183';
 our @EXPORT_OK = qw{
     shell
 
@@ -4422,8 +4420,8 @@ The following catalogs are available:
                     Well-Tracked Objects not associated
 		    with a specific launch
 
-The starred items are 404 as of 2026-01-19. They are deprecated and will
-be removed.
+The starred items are 404 as of 2026-01-19. Attempts to retrieve them
+produce an exception as of version 1.083.
 
 The following option is supported:
 
@@ -5246,7 +5244,7 @@ sub _check_cookie_generic {
 {
 
     use constant _MASTER_IRIDIUM_DEPRECATION_LEVEL	=> 3;
-    use constant _MASTER_FAVORITE_DEPRECATION_LEVEL	=> 2;
+    use constant _MASTER_FAVORITE_DEPRECATION_LEVEL	=> 3;
 
     my %deprecate = (
 	celestrak => {

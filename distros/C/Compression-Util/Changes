@@ -1,5 +1,20 @@
 Revision history for Compression-Util
 
+0.17    2026-08-11
+
+        [ADDITIONS]
+
+        - Added the `lzss_encode_hash4()` function.
+        - Added the `$LZ_MAX_CHAIN_WIDTH` package variable, for better controlling of LZ encoding inside `lzss_encode()` and `lzss_encode_symbolic()`.
+
+        [IMPROVEMENTS]
+
+        - Improved LZ encoding for certain inputs, by preferring earlier matches.
+
+        [FIXES]
+
+        - Fixed `bwt_sort_symbolic()`: it could hang indefinitely on cyclic patterns, such as "ABCABC".
+
 0.16    2026-03-31
 
         [IMPROVEMENTS]

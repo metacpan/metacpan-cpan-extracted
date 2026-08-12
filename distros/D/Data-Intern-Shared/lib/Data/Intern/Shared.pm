@@ -1,7 +1,7 @@
 package Data::Intern::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::Intern::Shared', $VERSION);
 
@@ -65,17 +65,22 @@ per-string removal (see L</LIMITS>). B<Linux-only>. Requires 64-bit Perl.
     my $in = Data::Intern::Shared->new(undef, $max_strings);          # anonymous
     my $in = Data::Intern::Shared->new_memfd($name, $max_strings, $arena_bytes);
     my $in = Data::Intern::Shared->new_from_fd($fd);
+    my $ro = Data::Intern::Shared->new_readonly($path);   # frozen file, read-only
 
-C<$path> is the backing file (C<undef> for an anonymous mapping); C<$max_strings>
-is the id/string capacity; C<$arena_bytes> is the total string-bytes capacity and
-is optional (defaults to C<$max_strings * 32>, with a 64-byte floor, capped at 4 GB). When reopening an
-existing file or memfd, the stored header wins and the caller's sizes are ignored.
-Backing files are created with mode 0600 (owner-only) by default; pass an octal
-C<$mode> (e.g. C<0666>, applied exactly via C<fchmod> -- not narrowed by umask) to allow cross-user sharing. C<$mode>
-applies only when the file is created -- it is ignored when attaching to an
-existing file, and for anonymous and memfd tables.
-C<new_memfd> creates a Linux memfd (transferable via its C<memfd> descriptor);
-C<new_from_fd> reopens one in another process.
+C<$path> is the backing file (C<undef> for an anonymous mapping);
+C<$max_strings> is the id/string capacity; C<$arena_bytes> is the total
+string-bytes capacity and is optional (defaults to C<$max_strings * 32>, with
+a 64-byte floor, capped at 4 GB). When reopening an existing file or memfd,
+the stored header wins and the caller's sizes are ignored. Backing files are
+created with mode 0600 (owner-only) by default; pass an octal C<$mode> (e.g.
+C<0666>, applied exactly via C<fchmod> -- not narrowed by umask) to allow
+cross-user sharing. C<$mode> applies only when the file is created -- it is
+ignored when attaching to an existing file, and for anonymous and memfd
+tables. C<new_memfd> creates a Linux memfd (transferable via its C<memfd>
+descriptor); C<new_from_fd> reopens one in another process. The descriptor you
+pass is duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and
+closing it does not disturb the handle. C<new_readonly> opens a B<frozen> file
+read-only for lock-free querying (see L</"FROZEN (READ-ONLY) MODE">).
 
 =head2 Interning
 
@@ -124,7 +129,8 @@ turn any id back into the string -- which is the whole point.
 C<stats()> returns a hashref: C<count>, C<max_strings>, C<hash_slots>,
 C<hash_load> (occupied fraction of the forward hash), C<arena_used>,
 C<arena_bytes>, C<arena_load>, C<ops> (running count of C<intern> calls),
-and C<mmap_size> (bytes).
+C<mmap_size> (bytes), C<frozen> (1 if sealed by C<freeze>, else 0), and
+C<readonly> (1 if this handle is a read-only view, else 0).
 
 =head1 LIMITS
 
@@ -148,16 +154,57 @@ construction and cannot grow.
 
 =back
 
+=head1 FROZEN (READ-ONLY) MODE
+
+A file-backed table can be B<frozen> and then shipped to other machines, where
+consumers open it B<read-only> and query it with B<no locking at all>.
+
+    # producer: build, freeze, ship the file
+    my $in = Data::Intern::Shared->new("/tmp/dict.intern", 1_000_000, 32 << 20);
+    $in->intern($_) for @known_strings;
+    $in->freeze;                 # seal: now immutable, and $in itself is read-only
+    # ... copy /tmp/dict.intern to another host ...
+
+    # consumer (any process, same architecture): read-only, lock-free
+    my $ro = Data::Intern::Shared->new_readonly("/tmp/dict.intern");
+    my $id  = $ro->id_of("alice");
+    my $str = $ro->string($id);
+
+C<freeze> takes the write lock, marks the table B<permanently immutable> (there
+is no unfreeze -- rebuild the file to change it), and flushes the seal to disk.
+A frozen table rejects every mutator (C<intern>, C<clear>) with a croak, and a
+read-write reopen (C<< new($path, ...) >> or C<new_from_fd>) of a sealed file is
+B<refused> -- so a shipped artifact can never be silently mutated out from under
+its readers.
+
+C<new_readonly($path)> maps the file C<O_RDONLY> / C<PROT_READ> and B<requires it
+to be frozen> (it croaks on a file that was never C<freeze>d). Because a sealed
+table's forward hash, reverse array and arena are immutable, C<id_of>,
+C<string>, C<exists>, C<count>, C<arena_used> and C<stats> read them B<directly,
+taking no reader lock> -- the mapping is never written, so a read-only view
+works from a read-only file descriptor or a read-only filesystem, and any number
+of processes can share one C<PROT_READ> mapping. C<frozen> and C<readonly>
+report the two states.
+
+B<Portability.> The on-disk format is native binary (native-endian 64-bit
+words), so a frozen file may be copied only between machines of the B<same
+architecture>; a wrong-endian file is rejected at open by the magic check.
+B<Copy the file to each consumer> -- do not share one file over a network
+filesystem: the lock is a Linux futex (process-local to one kernel), and the
+"no live writer" contract assumes a static copy. Linux-only; 64-bit Perl.
+
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created, and when a file left
+behind by an interrupted create is re-initialized (see L</CRASH SAFETY>); a
+file already in use keeps its own permissions. The file is opened with
+C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with
+C<O_EXCL>; the on-disk header is validated when the file is attached. Any
+process you grant write access to a shared mapping is trusted not to corrupt
+its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 
@@ -178,6 +225,18 @@ reclaim it and writers may block until the mapping is recreated. Reaching this
 needs more than 1024 concurrent reader processes on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete intern file left
+by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

@@ -160,4 +160,111 @@ sub _try_decode {
 
 is($crashed, 0, "$iters fuzz iterations: 0 crashes ($survived survived)");
 
+# ---- structured adversarial blocks ------------------------------------
+# Byte-mutating a valid seed cannot reach these shapes: a mutated wire
+# count only matters if the bytes after it still parse, so a bumped
+# "ntypes" lands on a garbage type name and is rejected before the count
+# is used, and no mutation of a shallow seed yields a deeply nested type
+# expression. Both hid real bugs from this file's mutation loop, so
+# construct them deliberately.
+{
+    my $vi = sub { my $v = shift; my $o=''; while ($v >= 0x80) { $o .= chr(($v & 0x7f)|0x80); $v >>= 7 } $o . chr($v) };
+    my $ls = sub { $vi->(length $_[0]) . $_[0] };
+    my $u64 = sub { pack 'V2', $_[0] & 0xFFFFFFFF, ($_[0] >> 32) & 0xFFFFFFFF };
+
+    my @adversarial;
+
+    # Dynamic / JSON prefixes claiming far more variant types than there
+    # are distinct kinds (the wire count indexed a 9-entry stack array).
+    for my $n (2, 9, 10, 64, 300) {
+        for my $name (qw(Bool Int64 String Array(Int64))) {
+            push @adversarial, [
+                "Dynamic prefix, $n x $name",
+                $vi->(1) . $vi->(1) . $ls->('d') . $ls->('Dynamic')
+                . $u64->(1) . $vi->(0) . $vi->($n)
+                . ($ls->($name) x $n) . $u64->(0)
+                . chr(int rand 256) . ("\0" x 64) ];
+        }
+        push @adversarial, [
+            "JSON path prefix, $n x Bool",
+            $vi->(1) . $vi->(1) . $ls->('j') . $ls->('JSON')
+            . $u64->(0) . $vi->(0) . $vi->(1) . $ls->('a')
+            . $u64->(1) . $vi->(0) . $vi->($n)
+            . ($ls->('Bool') x $n) . $u64->(0)
+            . chr(int rand 256) . ("\0" x 64) ];
+    }
+
+    # Deeply nested type expressions read off the wire.
+    for my $depth (10, 100, 101, 5_000, 50_000) {
+        for my $shape (['Array(', ')', 'Int32'],
+                       ['Nullable(', ')', 'Int32'],
+                       ['Tuple(', ')', 'Int32'],
+                       ['Map(String, ', ')', 'Int32'],
+                       ['LowCardinality(', ')', 'String']) {
+            my ($open, $close, $leaf) = @$shape;
+            push @adversarial, [
+                "nested $open x $depth",
+                $vi->(1) . $vi->(0) . $ls->('c')
+                . $ls->(($open x $depth) . $leaf . ($close x $depth)) ];
+        }
+    }
+
+    # Degenerate / contradictory block headers.
+    push @adversarial,
+        ['ncols=0 nrows=huge',   $vi->(0) . $vi->(1_000_000)],
+        ['ncols=huge nrows=0',   $vi->(1_000_000) . $vi->(0)],
+        ['ncols=1 nrows=huge',   $vi->(1) . $vi->(2**40) . $ls->('c') . $ls->('Int32')],
+        ['LowCardinality dict_n huge',
+            $vi->(1) . $vi->(1) . $ls->('c') . $ls->('LowCardinality(String)')
+            . $u64->(1) . $u64->(1 << 9) . $u64->(2**40)],
+        ['Variant disc out of range',
+            $vi->(1) . $vi->(1) . $ls->('c') . $ls->('Variant(Int32, String)')
+            . $u64->(0) . chr(200) . ("\0" x 32)],
+        ['Array offset with bit 63 set',
+            $vi->(1) . $vi->(1) . $ls->('c') . $ls->('Array(Int32)')
+            . pack('V2', 0, 0x80000000) . ("\0" x 32)];
+
+    my $adv_crashed = 0;
+    for my $case (@adversarial) {
+        my ($label, $bytes) = @$case;
+        # Only a clean decode or a croak is acceptable; a segfault takes
+        # the process down and never reaches the check below.
+        eval { _try_decode($bytes); 1 };
+        if ($@ && $@ =~ /Segmentation|stack overflow|Out of memory|Killed/i) {
+            $adv_crashed++;
+            diag "CRASH on adversarial case '$label': $@";
+        }
+    }
+    is($adv_crashed, 0,
+       scalar(@adversarial) . ' structured adversarial blocks: 0 crashes');
+}
+
+# ---- decode failures must not leak ------------------------------------
+# decode_column holds the column AV, its SVs and a TypeInfo before it can
+# know the buffer is short, and the streaming decoders drive that croak on
+# every chunk boundary - so a leak here hits ordinary use, not just
+# hostile input.
+SKIP: {
+    skip 'RSS check needs Linux /proc', 1 unless -r '/proc/self/status';
+    # See t/hardening.t: under ASAN this measures the quarantine, not us.
+    skip 'RSS growth measures the ASAN quarantine, not a leak', 1
+        if ($ENV{LD_PRELOAD} // '') =~ /libasan|libclang_rt\.asan/
+        || ($ENV{ASAN_OPTIONS} // '') ne '';
+    my $rss = sub {
+        open my $fh, '<', '/proc/self/status' or return 0;
+        while (<$fh>) { return $1 if /^VmRSS:\s+(\d+)/ }
+        return 0;
+    };
+    # Truncate each seed just short of complete, so the decoder gets deep
+    # into the column before running out of bytes.
+    my @truncated = map { substr($_, 0, length($_) - 1) } @seeds;
+    for my $b (@truncated) { eval { _try_decode($b) } for 1 .. 200 }  # warm up
+    my $before = $rss->();
+    for my $b (@truncated) { eval { _try_decode($b) } for 1 .. 2_000 }
+    my $growth = $rss->() - $before;
+    cmp_ok($growth, '<', 8 * 1024,
+           'no leak across ' . (2_000 * @truncated)
+         . " caught decode failures (RSS grew ${growth} kB)");
+}
+
 done_testing();

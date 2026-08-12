@@ -254,29 +254,52 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             break;
         }
         case T_DATE: {
-            uint16_t v;
-            if (!SvOK(val)) v = 0;
-            else if (SvIOK(val) || SvNOK(val)) v = (uint16_t)SvUV(val);
-            else {
-                STRLEN slen;
-                const char *s = SvPV(val, slen);
-                if (looks_like_int_str(s, slen)) v = (uint16_t)SvUV(val);
-                else v = (uint16_t)parse_date_string(aTHX_ s, slen);
+            /* UInt16 days since the epoch: 1970-01-01 .. 2149-06-06.
+             * Out-of-range values would wrap to a different but
+             * valid-looking date, so reject them as T_DATETIME does. */
+            IV days = 0;
+            if (SvOK(val)) {
+                if (SvIOK(val) || SvNOK(val)) days = SvIV(val);
+                else {
+                    STRLEN slen;
+                    const char *s = SvPV(val, slen);
+                    days = looks_like_int_str(s, slen)
+                         ? SvIV(val)
+                         : (IV)parse_date_string(aTHX_ s, slen);
+                }
+                if (days < 0 || days > 65535) {
+                    STRLEN mlen;
+                    const char *ms = SvPV(val, mlen);
+                    croak("Date out of range "
+                          "(1970-01-01 .. 2149-06-06): %.*s",
+                          (int)(mlen > 30 ? 30 : mlen), ms);
+                }
             }
-            buf_le16(aTHX_ b,v);
+            buf_le16(aTHX_ b, (uint16_t)days);
             break;
         }
         case T_DATE32: {
-            int32_t v;
-            if (!SvOK(val)) v = 0;
-            else if (SvIOK(val) || SvNOK(val)) v = (int32_t)SvIV(val);
-            else {
-                STRLEN slen;
-                const char *s = SvPV(val, slen);
-                if (looks_like_int_str(s, slen)) v = (int32_t)SvIV(val);
-                else v = parse_date_string(aTHX_ s, slen);
+            /* Int32 days since the epoch. Date strings can't reach the
+             * limit (the year caps at 9999), but a raw number can. */
+            IV days = 0;
+            if (SvOK(val)) {
+                if (SvIOK(val) || SvNOK(val)) days = SvIV(val);
+                else {
+                    STRLEN slen;
+                    const char *s = SvPV(val, slen);
+                    days = looks_like_int_str(s, slen)
+                         ? SvIV(val)
+                         : (IV)parse_date_string(aTHX_ s, slen);
+                }
+                if (days < INT32_MIN || days > INT32_MAX) {
+                    STRLEN mlen;
+                    const char *ms = SvPV(val, mlen);
+                    croak("Date32 out of range "
+                          "(CH accepts 1900-01-01 .. 2299-12-31): %.*s",
+                          (int)(mlen > 30 ? 30 : mlen), ms);
+                }
             }
-            buf_le32(aTHX_ b,(uint32_t)v);
+            buf_le32(aTHX_ b, (uint32_t)(int32_t)days);
             break;
         }
         case T_DATETIME: {
@@ -622,6 +645,13 @@ static void json_emit_scalar(pTHX_ Buffer *b, SV *val, int k_match) {
     }
 }
 
+/* Cap on JSON object nesting: flatten_json_hash recurses once per level,
+ * so an unbounded structure overflows the C stack. Wire data reaches it
+ * too - a path name with N dotted segments decodes to an N-deep hash, so
+ * re-encoding a hostile block recurses just as far. 512 matches the
+ * default max_depth of the common JSON parsers. */
+#define CHE_MAX_JSON_DEPTH 512
+
 /* Recursively flatten a JSON value hash into a flat HV of dotted-path
  * names. Allocated SVs are mortalized so the caller never has to free
  * them; the only references stored in `out_flat` are to leaf SVs from
@@ -633,7 +663,10 @@ static void json_emit_scalar(pTHX_ Buffer *b, SV *val, int k_match) {
  * paths whose declared inner type is a hash-shape (Map / Tuple). */
 static void flatten_json_hash(pTHX_ HV *src,
                               const char *prefix, STRLEN prefix_len,
-                              HV *out_flat, HV *stop_paths) {
+                              HV *out_flat, HV *stop_paths, int depth) {
+    if (++depth > CHE_MAX_JSON_DEPTH)
+        croak("JSON column: object nesting deeper than %d levels",
+              CHE_MAX_JSON_DEPTH);
     hv_iterinit(src);
     HE *he;
     while ((he = hv_iternext(src))) {
@@ -670,7 +703,7 @@ static void flatten_json_hash(pTHX_ HV *src,
                       HvNAME(SvSTASH(SvRV(vsv))));
             flatten_json_hash(aTHX_ (HV*)SvRV(vsv),
                               SvPVX(path_sv), new_len, out_flat,
-                              stop_paths);
+                              stop_paths, depth);
         } else {
             hv_store(out_flat, SvPVX(path_sv), new_len,
                      SvREFCNT_inc_simple_NN(vsv), 0);
@@ -1111,7 +1144,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                           ": must be hashref or undef", (IV)r);
                 HV *flat = (HV*)sv_2mortal((SV*)newHV());
                 flatten_json_hash(aTHX_ (HV*)SvRV(val), NULL, 0, flat,
-                                  stop_paths);
+                                  stop_paths, 0);
                 row_hvs[r] = flat;
             }
 

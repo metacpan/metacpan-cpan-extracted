@@ -37,6 +37,34 @@ typedef struct {
     U32 max_depth;
 } json_yy_t;
 
+/* ---- ithreads ----
+   perl_clone() copies mg_ptr verbatim, so without an svt_dup a live handle is
+   owned by two interpreters and freed twice. Coders are copied; docs and
+   iterators cannot be, so their clones are emptied and using one croaks. */
+static int
+json_yy_dup_disown(pTHX_ MAGIC *mg, CLONE_PARAMS *param) {
+    PERL_UNUSED_ARG(param);
+    mg->mg_ptr = NULL;
+    return 0;
+}
+
+/* handle that came out of a thread clone */
+#define CHECK_CLONED(mg, what)                                  \
+    STMT_START {                                                \
+        if (!(mg)->mg_ptr)                                      \
+            croak(what " cannot be shared between threads");    \
+    } STMT_END
+
+/* sv_magicext() does not derive MGf_DUP from the vtable, and perl_clone()
+   only calls svt_dup when it is set. */
+static inline MAGIC *
+attach_ext_magic(pTHX_ SV *sv, const MGVTBL *vtbl, void *ptr) {
+    MAGIC *mg = sv_magicext(sv, NULL, PERL_MAGIC_ext, vtbl,
+                            (const char *)ptr, 0);
+    mg->mg_flags |= MGf_DUP;
+    return mg;
+}
+
 /* magic vtable for json_yy_t stored on HV */
 static int
 json_yy_magic_free(pTHX_ SV *sv, MAGIC *mg) {
@@ -46,10 +74,22 @@ json_yy_magic_free(pTHX_ SV *sv, MAGIC *mg) {
     return 0;
 }
 
+static int
+json_yy_magic_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param) {
+    PERL_UNUSED_ARG(param);
+    if (mg->mg_ptr) {
+        json_yy_t *copy;
+        Newx(copy, 1, json_yy_t);
+        *copy = *(json_yy_t *)mg->mg_ptr;
+        mg->mg_ptr = (char *)copy;
+    }
+    return 0;
+}
+
 static MGVTBL json_yy_vtbl = {
     NULL, NULL, NULL, NULL,
     json_yy_magic_free,
-    NULL, NULL, NULL
+    NULL, json_yy_magic_dup, NULL
 };
 
 static inline json_yy_t *
@@ -58,7 +98,8 @@ get_self(pTHX_ SV *self_sv) {
         croak("not a JSON::YY object");
     MAGIC *mg = mg_findext(SvRV(self_sv), PERL_MAGIC_ext, &json_yy_vtbl);
     if (!mg)
-        croak("corrupted JSON::YY object");
+        croak("not a JSON::YY object");
+    CHECK_CLONED(mg, "JSON::YY object");
     return (json_yy_t *)mg->mg_ptr;
 }
 
@@ -66,13 +107,69 @@ static MGVTBL empty_vtbl = {0};
 
 /* forward declarations */
 static inline int is_ascii(const char *s, size_t len);
-/* doc holder magic: frees yyjson_doc when SV is destroyed */
+
+/* Characters of `sv` as UTF-8 without touching the caller's scalar: SvPVutf8()
+   upgrades in place, so `jdoc $body` would leave $body a character string and
+   break a later decode_json($body). Only latin-1 high bytes need the copy. */
+static const char *
+sv_pv_utf8_nomod(pTHX_ SV *sv, STRLEN *lenp) {
+    SvGETMAGIC(sv);
+    const char *s = SvPV_nomg(sv, *lenp);
+    if (SvUTF8(sv) || is_ascii(s, *lenp))
+        return s;
+    SV *tmp = sv_2mortal(newSVpvn(s, *lenp));
+    sv_utf8_upgrade(tmp);
+    return SvPV_const(tmp, *lenp);
+}
+
+/* Immutable parse buffer behind decode_json_ro, refcounted: its SVs are
+   zero-copy (SvLEN 0) and perl_clone() shares those PV pointers rather than
+   copying, so an emptied clone would read freed memory. Deliberately shared
+   between interpreters, so it uses libc malloc/free rather than perl's
+   per-interpreter pool -- Newx/Safefree here is "Free to wrong pool" under
+   PERL_IMPLICIT_SYS. */
+typedef struct {
+    yyjson_doc *doc;
+    U32 refcnt;
+} json_yy_ro_t;
+
+#ifdef USE_ITHREADS
+static perl_mutex json_yy_ro_mutex;
+static int json_yy_ro_mutex_ready = 0;
+#  define RO_LOCK()   MUTEX_LOCK(&json_yy_ro_mutex)
+#  define RO_UNLOCK() MUTEX_UNLOCK(&json_yy_ro_mutex)
+#else
+#  define RO_LOCK()   NOOP
+#  define RO_UNLOCK() NOOP
+#endif
+
+/* doc holder magic: frees yyjson_doc when the last reference goes */
 static int
 docholder_magic_free(pTHX_ SV *sv, MAGIC *mg) {
     PERL_UNUSED_ARG(sv);
-    yyjson_doc *doc = (yyjson_doc *)mg->mg_ptr;
-    if (doc)
-        yyjson_doc_free(doc);
+    json_yy_ro_t *h = (json_yy_ro_t *)mg->mg_ptr;
+    if (h) {
+        int last;
+        RO_LOCK();
+        last = (--h->refcnt == 0);
+        RO_UNLOCK();
+        if (last) {
+            yyjson_doc_free(h->doc);
+            free(h);
+        }
+    }
+    return 0;
+}
+
+static int
+docholder_magic_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param) {
+    PERL_UNUSED_ARG(param);
+    json_yy_ro_t *h = (json_yy_ro_t *)mg->mg_ptr;
+    if (h) {
+        RO_LOCK();
+        h->refcnt++;
+        RO_UNLOCK();
+    }
     return 0;
 }
 
@@ -89,13 +186,13 @@ mut_docholder_magic_free(pTHX_ SV *sv, MAGIC *mg) {
 static MGVTBL docholder_magic_vtbl = {
     NULL, NULL, NULL, NULL,
     docholder_magic_free,
-    NULL, NULL, NULL
+    NULL, docholder_magic_dup, NULL
 };
 
 static MGVTBL mut_docholder_vtbl = {
     NULL, NULL, NULL, NULL,
     mut_docholder_magic_free,
-    NULL, NULL, NULL
+    NULL, json_yy_dup_disown, NULL
 };
 
 /* free() a yyjson-allocated (libc malloc) buffer at scope exit, so the buffer
@@ -134,8 +231,55 @@ static inline SV * yyjson_mut_num_to_sv(pTHX_ yyjson_mut_val *val) {
     return newSVnv(yyjson_mut_get_real(val));
 }
 
-static SV * yyjson_val_to_sv(pTHX_ yyjson_val *val);
-static SV * yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv);
+/* Reject a parsed document nested deeper than `limit`: our materialisers
+   recurse, as do the copy/equals routines behind jclone/jwrite/jeq. Immutable
+   values sit flat in document order (uni.ofs skips a subtree), so one linear
+   pass with a stack of end pointers measures depth without recursing. */
+static int
+doc_too_deep(pTHX_ yyjson_doc *doc, U32 limit) {
+    yyjson_val *val = doc->root;
+    if (!val || !unsafe_yyjson_is_ctn(val))
+        return 0;
+
+    yyjson_val *end = unsafe_yyjson_get_next(val);
+    yyjson_val **stack;
+    U32 cap = 64, depth = 0;
+    int too_deep = 0;
+
+    Newx(stack, cap, yyjson_val *);
+    for (; val < end; val++) {
+        while (depth && val >= stack[depth - 1]) depth--;
+        if (unsafe_yyjson_is_ctn(val)) {
+            if (depth >= limit) { too_deep = 1; break; }
+            yyjson_val *sub_end = unsafe_yyjson_get_next(val);
+            /* an n-slot subtree cannot nest deeper than n levels, so small
+               ones are provably fine and get skipped whole */
+            if ((size_t)(sub_end - val) <= (size_t)(limit - depth)) {
+                val = sub_end - 1;   /* the loop's ++ lands on sub_end */
+                continue;
+            }
+            if (depth == cap) { cap *= 2; Renew(stack, cap, yyjson_val *); }
+            stack[depth++] = sub_end;
+        }
+    }
+    Safefree(stack);
+    return too_deep;
+}
+
+/* frees the document before croaking */
+#define CHECK_DOC_DEPTH(doc, limit, what)          \
+    STMT_START {                                   \
+        if (doc_too_deep(aTHX_ (doc), (limit))) {  \
+            yyjson_doc_free(doc);                  \
+            croak(what ": maximum nesting depth exceeded"); \
+        }                                          \
+    } STMT_END
+
+/* The materialisers return NULL when the depth budget runs out rather than
+   croaking mid-build, so the caller drops the partial structure with one
+   SvREFCNT_dec. */
+static SV * yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget);
+static SV * yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv, U32 budget);
 static yyjson_mut_val * sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv,
                                           json_yy_t *self, U32 depth);
 
@@ -166,7 +310,7 @@ json_yy_doc_magic_free(pTHX_ SV *sv, MAGIC *mg) {
 static MGVTBL json_yy_doc_vtbl = {
     NULL, NULL, NULL, NULL,
     json_yy_doc_magic_free,
-    NULL, NULL, NULL
+    NULL, json_yy_dup_disown, NULL
 };
 
 static inline json_yy_doc_t *
@@ -175,7 +319,8 @@ get_doc(pTHX_ SV *sv) {
         croak("not a JSON::YY::Doc object");
     MAGIC *mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &json_yy_doc_vtbl);
     if (!mg)
-        croak("corrupted JSON::YY::Doc object");
+        croak("not a JSON::YY::Doc object");
+    CHECK_CLONED(mg, "JSON::YY::Doc");
     return (json_yy_doc_t *)mg->mg_ptr;
 }
 
@@ -191,14 +336,13 @@ new_doc_sv(pTHX_ yyjson_mut_doc *doc, yyjson_mut_val *root, SV *owner) {
         d->owner = owner;
         SvREFCNT_inc_simple_void_NN(owner);
     }
-    sv_magicext((SV *)hv, NULL, PERL_MAGIC_ext, &json_yy_doc_vtbl,
-                (const char *)d, 0);
+    attach_ext_magic(aTHX_ (SV *)hv, &json_yy_doc_vtbl, d);
     return sv_bless(newRV_noinc((SV *)hv),
                     gv_stashpvs("JSON::YY::Doc", GV_ADD));
 }
 
 /* resolve a path on a Doc, returning the yyjson_mut_val* or NULL.
-   path must be UTF-8 encoded (use SvPVutf8 on caller side). */
+   path must be UTF-8 encoded (use sv_pv_utf8_nomod on caller side). */
 static inline yyjson_mut_val *
 doc_resolve_path(pTHX_ json_yy_doc_t *d, const char *path, STRLEN path_len) {
     if (path_len == 0)
@@ -208,7 +352,7 @@ doc_resolve_path(pTHX_ json_yy_doc_t *d, const char *path, STRLEN path_len) {
 
 
 /* forward decl */
-static SV * yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val);
+static SV * yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val, U32 budget);
 
 /* ---- keyword plugin: Doc keyword ops ---- */
 
@@ -217,12 +361,13 @@ static OP * pp_jdoc_impl(pTHX) {
     dSP;
     SV *json_sv = POPs;
     STRLEN len;
-    const char *json = SvPVutf8(json_sv, len);
+    const char *json = sv_pv_utf8_nomod(aTHX_ json_sv, &len);
 
     yyjson_read_err err;
     yyjson_doc *idoc = yyjson_read_opts((char *)json, len, YYJSON_READ_NOFLAG, NULL, &err);
     if (!idoc)
         croak("jdoc: JSON parse error: %s at byte offset %zu", err.msg, err.pos);
+    CHECK_DOC_DEPTH(idoc, MAX_DEPTH_DEFAULT, "jdoc");
 
     yyjson_mut_doc *mdoc = yyjson_doc_mut_copy(idoc, NULL);
     yyjson_doc_free(idoc);
@@ -242,7 +387,7 @@ static OP * pp_jget_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val)
@@ -260,7 +405,7 @@ static OP * pp_jgetp_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val) {
@@ -268,7 +413,9 @@ static OP * pp_jgetp_impl(pTHX) {
         RETURN;
     }
 
-    SV *result = yyjson_mut_val_to_sv(aTHX_ val);
+    SV *result = yyjson_mut_val_to_sv(aTHX_ val, MAX_DEPTH_DEFAULT);
+    if (!result)
+        croak("jgetp: maximum nesting depth exceeded");
     XPUSHs(sv_2mortal(result));
     RETURN;
 }
@@ -281,6 +428,17 @@ static OP * pp_jgetp_impl(pTHX) {
 static void
 doc_set_at_path(pTHX_ json_yy_doc_t *d, const char *path, STRLEN path_len,
                 yyjson_mut_val *new_val, const char *op) {
+    /* Each component becomes a nested parent, so a long path would build a
+       document deeper than jclone/jeq/jwrite can walk. ('/' is always a
+       separator; a slash inside a key is spelled ~1.) */
+    {
+        STRLEN i, comps = 0;
+        for (i = 0; i < path_len; i++)
+            if (path[i] == '/') comps++;
+        if (comps > MAX_DEPTH_DEFAULT)
+            croak("%s: path nests deeper than the maximum depth", op);
+    }
+
     if (path_len == 0) {
         if (d->owner)
             croak("%s: cannot replace root of a borrowed Doc; jclone it first", op);
@@ -309,7 +467,7 @@ static OP * pp_jset_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *new_val;
 
@@ -322,7 +480,8 @@ static OP * pp_jset_impl(pTHX) {
     } else {
         /* convert Perl value to yyjson_mut_val */
         json_yy_t self_stack;
-        self_stack.flags = F_UTF8 | F_ALLOW_NONREF | F_ALLOW_BLESSED;
+        self_stack.flags = F_UTF8 | F_ALLOW_NONREF | F_ALLOW_BLESSED
+                         | F_CONVERT_BLESSED;
         self_stack.max_depth = MAX_DEPTH_DEFAULT;
         new_val = sv_to_yyjson_val(aTHX_ d->doc, value_sv, &self_stack, 0);
     }
@@ -340,7 +499,7 @@ static OP * pp_jdel_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     if (path_len == 0)
         croak("jdel: cannot delete root");
@@ -367,8 +526,14 @@ static OP * pp_jdel_impl(pTHX) {
 
     /* copy secured; now remove from the parent */
     yyjson_ptr_ctx ctx = {0};
-    yyjson_ptr_err perr;
-    yyjson_mut_ptr_removex(d->root, path, path_len, &ctx, &perr);
+    yyjson_ptr_err perr = {0};
+    if (!yyjson_mut_ptr_removex(d->root, path, path_len, &ctx, &perr)) {
+        /* the path resolved a moment ago; returning the subtree while the
+           parent still holds it would be a lie */
+        yyjson_mut_doc_free(new_doc);
+        croak("jdel: failed to remove path %.*s: %s", (int)path_len, path,
+              perr.msg ? perr.msg : "unknown error");
+    }
     SV *result = new_doc_sv(aTHX_ new_doc, copy, NULL);
     XPUSHs(sv_2mortal(result));
     RETURN;
@@ -381,7 +546,7 @@ static OP * pp_jhas_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     XPUSHs(val ? &PL_sv_yes : &PL_sv_no);
@@ -395,7 +560,7 @@ static OP * pp_jclone_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *src = doc_resolve_path(aTHX_ d, path, path_len);
     if (!src)
@@ -424,7 +589,7 @@ static OP * pp_jencode_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val)
@@ -457,7 +622,7 @@ static OP * pp_jstr_impl(pTHX) {
     dSP;
     SV *val_sv = POPs;
     STRLEN len;
-    const char *str = SvPVutf8(val_sv, len);
+    const char *str = sv_pv_utf8_nomod(aTHX_ val_sv, &len);
     yyjson_mut_doc *doc = yyjson_mut_doc_new(NULL);
     yyjson_mut_val *root = yyjson_mut_strncpy(doc, str, len);
     yyjson_mut_doc_set_root(doc, root);
@@ -465,20 +630,59 @@ static OP * pp_jstr_impl(pTHX) {
     RETURN;
 }
 
-/* pp_jnum: create JSON number value */
+/* pp_jnum: a string argument is grokked rather than run through SvNV, so
+   jnum "42" is an integer and jnum "abc" croaks. */
 static OP * pp_jnum_impl(pTHX) {
     dSP;
     SV *val_sv = POPs;
-    yyjson_mut_doc *doc = yyjson_mut_doc_new(NULL);
-    yyjson_mut_val *root;
+    SvGETMAGIC(val_sv);
+
+    /* settle the value first: a document allocated before the croaks below
+       would leak on the unwind */
+    enum { NUM_UINT, NUM_SINT, NUM_REAL } kind = NUM_REAL;
+    uint64_t uval = 0;
+    int64_t  ival = 0;
+    NV       nval = 0;
+
     if (SvIOK(val_sv)) {
-        if (SvIsUV(val_sv))
-            root = yyjson_mut_uint(doc, (uint64_t)SvUVX(val_sv));
-        else
-            root = yyjson_mut_sint(doc, (int64_t)SvIVX(val_sv));
+        if (SvIsUV(val_sv)) { kind = NUM_UINT; uval = (uint64_t)SvUVX(val_sv); }
+        else                { kind = NUM_SINT; ival = (int64_t)SvIVX(val_sv); }
+    } else if (SvNOK(val_sv)) {
+        nval = SvNVX(val_sv);
+        /* narrowed: a JSON real is a C double, so a value that is finite only
+           as a long double still cannot be represented */
+        if (Perl_isnan((double)nval) || Perl_isinf((double)nval))
+            croak("jnum: cannot use NaN or Infinity as a JSON number");
+    } else if (SvPOKp(val_sv)) {
+        STRLEN nlen;
+        const char *nstr = SvPV_const(val_sv, nlen);
+        UV uv;
+        int m_int_ok = 0;
+        int t = grok_number(nstr, nlen, &uv);
+        if (!t || (t & (IS_NUMBER_NAN | IS_NUMBER_INFINITY)))
+            croak("jnum: not a number: \"%.*s\"", (int)nlen, nstr);
+        if (!(t & IS_NUMBER_NOT_INT) && (t & IS_NUMBER_IN_UV)) {
+            /* widened to uint64_t: (UV)INT64_MAX truncates on a 32-bit UV */
+            uint64_t u = (uint64_t)uv;
+            if (!(t & IS_NUMBER_NEG))                       { kind = NUM_UINT; uval = u; m_int_ok = 1; }
+            else if (u <= (uint64_t)INT64_MAX)              { kind = NUM_SINT; ival = -(int64_t)u; m_int_ok = 1; }
+            else if (u == (uint64_t)INT64_MAX + 1)          { kind = NUM_SINT; ival = INT64_MIN; m_int_ok = 1; }
+            else                                              nval = SvNV(val_sv);
+        } else {
+            nval = SvNV(val_sv);
+        }
+        /* "1e999" groks fine but overflows to Inf as a double; reject it here
+           rather than building a document that only fails later on write */
+        if (!m_int_ok && (Perl_isnan((double)nval) || Perl_isinf((double)nval)))
+            croak("jnum: not a number: \"%.*s\"", (int)nlen, nstr);
     } else {
-        root = yyjson_mut_real(doc, SvNV(val_sv));
+        croak("jnum: not a number: %s", SvOK(val_sv) ? "reference" : "undef");
     }
+
+    yyjson_mut_doc *doc = yyjson_mut_doc_new(NULL);
+    yyjson_mut_val *root = kind == NUM_UINT ? yyjson_mut_uint(doc, uval)
+                         : kind == NUM_SINT ? yyjson_mut_sint(doc, ival)
+                                            : yyjson_mut_real(doc, nval);
     yyjson_mut_doc_set_root(doc, root);
     XPUSHs(sv_2mortal(new_doc_sv(aTHX_ doc, root, NULL)));
     RETURN;
@@ -532,7 +736,7 @@ static OP * pp_jtype_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val) {
@@ -561,7 +765,7 @@ static OP * pp_jlen_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val)
@@ -588,7 +792,7 @@ static OP * pp_jkeys_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val || !yyjson_mut_is_obj(val))
@@ -636,7 +840,7 @@ json_yy_iter_magic_free(pTHX_ SV *sv, MAGIC *mg) {
 static MGVTBL json_yy_iter_vtbl = {
     NULL, NULL, NULL, NULL,
     json_yy_iter_magic_free,
-    NULL, NULL, NULL
+    NULL, json_yy_dup_disown, NULL
 };
 
 static inline json_yy_iter_t *
@@ -645,7 +849,8 @@ get_iter(pTHX_ SV *sv) {
         croak("not a JSON::YY::Iter object");
     MAGIC *mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &json_yy_iter_vtbl);
     if (!mg)
-        croak("corrupted JSON::YY::Iter object");
+        croak("not a JSON::YY::Iter object");
+    CHECK_CLONED(mg, "JSON::YY::Iter");
     return (json_yy_iter_t *)mg->mg_ptr;
 }
 
@@ -656,7 +861,7 @@ static OP * pp_jiter_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val)
@@ -680,8 +885,7 @@ static OP * pp_jiter_impl(pTHX) {
     }
 
     HV *hv = newHV();
-    sv_magicext((SV *)hv, NULL, PERL_MAGIC_ext, &json_yy_iter_vtbl,
-                (const char *)it, 0);
+    attach_ext_magic(aTHX_ (SV *)hv, &json_yy_iter_vtbl, it);
     SV *result = sv_bless(newRV_noinc((SV *)hv),
                           gv_stashpvs("JSON::YY::Iter", GV_ADD));
     XPUSHs(sv_2mortal(result));
@@ -790,13 +994,13 @@ static OP * pp_jfrom_impl(pTHX) {
     if (!doc) croak("jfrom: failed to create document");
 
     json_yy_t self_stack;
-    self_stack.flags = F_UTF8 | F_ALLOW_NONREF | F_ALLOW_BLESSED;
+    self_stack.flags = F_UTF8 | F_ALLOW_NONREF | F_ALLOW_BLESSED
+                     | F_CONVERT_BLESSED;
     self_stack.max_depth = MAX_DEPTH_DEFAULT;
 
     /* wrap doc in a holder SV so it's freed on croak */
     SV *guard = newSV(0);
-    sv_magicext(guard, NULL, PERL_MAGIC_ext, &mut_docholder_vtbl,
-                (const char *)doc, 0);
+    attach_ext_magic(aTHX_ guard, &mut_docholder_vtbl, doc);
     sv_2mortal(guard);
 
     yyjson_mut_val *root = sv_to_yyjson_val(aTHX_ doc, data, &self_stack, 0);
@@ -816,7 +1020,7 @@ static OP * pp_jvals_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val || !yyjson_mut_is_obj(val))
@@ -851,7 +1055,7 @@ static OP * pp_jpp_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val)
@@ -879,14 +1083,15 @@ static OP * pp_jraw_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
     STRLEN json_len;
-    const char *json = SvPVutf8(json_sv, json_len);
+    const char *json = sv_pv_utf8_nomod(aTHX_ json_sv, &json_len);
 
     /* parse the raw JSON fragment */
     yyjson_doc *idoc = yyjson_read(json, json_len, YYJSON_READ_NOFLAG);
     if (!idoc)
         croak("jraw: invalid JSON fragment");
+    CHECK_DOC_DEPTH(idoc, MAX_DEPTH_DEFAULT, "jraw");
 
     /* copy into mutable doc */
     yyjson_val *iroot = yyjson_doc_get_root(idoc);
@@ -910,7 +1115,7 @@ static OP * pp_##name##_impl(pTHX) { \
     SV *doc_sv = POPs; \
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv); \
     STRLEN path_len; \
-    const char *path = SvPVutf8(path_sv, path_len); \
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len); \
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len); \
     XPUSHs(val && check_fn(val) ? &PL_sv_yes : &PL_sv_no); \
     RETURN; \
@@ -942,6 +1147,7 @@ static OP * pp_jread_impl(pTHX) {
     yyjson_doc *idoc = yyjson_read_file(path, YYJSON_READ_NOFLAG, NULL, &err);
     if (!idoc)
         croak("jread: %s: %s", path, err.msg ? err.msg : "read failed");
+    CHECK_DOC_DEPTH(idoc, MAX_DEPTH_DEFAULT, "jread");
 
     yyjson_mut_doc *mdoc = yyjson_doc_mut_copy(idoc, NULL);
     yyjson_doc_free(idoc);
@@ -987,9 +1193,11 @@ static OP * pp_jwrite_impl(pTHX) {
 
 /* pp_jpaths: enumerate all leaf paths */
 
-static void
-collect_paths(pTHX_ yyjson_mut_val *val, SV *prefix, AV *result) {
+/* returns 0, or 1 if the value nests deeper than the budget allows */
+static int
+collect_paths(pTHX_ yyjson_mut_val *val, SV *prefix, AV *result, U32 budget) {
     if (yyjson_mut_is_obj(val)) {
+        if (!budget) return 1;
         size_t idx, max;
         yyjson_mut_val *key, *v;
         yyjson_mut_obj_foreach(val, idx, max, key, v) {
@@ -1014,13 +1222,15 @@ collect_paths(pTHX_ yyjson_mut_val *val, SV *prefix, AV *result) {
                 p = special;
             }
             if (yyjson_mut_is_obj(v) || yyjson_mut_is_arr(v)) {
-                collect_paths(aTHX_ v, path, result);
+                int deep = collect_paths(aTHX_ v, path, result, budget - 1);
                 SvREFCNT_dec(path);  /* path was used as prefix, not pushed */
+                if (deep) return 1;
             } else {
                 av_push(result, path);  /* transfers ownership */
             }
         }
     } else if (yyjson_mut_is_arr(val)) {
+        if (!budget) return 1;
         size_t idx, max;
         yyjson_mut_val *item;
         yyjson_mut_arr_foreach(val, idx, max, item) {
@@ -1030,8 +1240,9 @@ collect_paths(pTHX_ yyjson_mut_val *val, SV *prefix, AV *result) {
             int idxlen = snprintf(idxbuf, sizeof(idxbuf), "%zu", idx);
             sv_catpvn(path, idxbuf, idxlen);
             if (yyjson_mut_is_obj(item) || yyjson_mut_is_arr(item)) {
-                collect_paths(aTHX_ item, path, result);
+                int deep = collect_paths(aTHX_ item, path, result, budget - 1);
                 SvREFCNT_dec(path);
+                if (deep) return 1;
             } else {
                 av_push(result, path);
             }
@@ -1040,6 +1251,7 @@ collect_paths(pTHX_ yyjson_mut_val *val, SV *prefix, AV *result) {
         /* leaf -- the prefix itself is the path */
         av_push(result, newSVsv(prefix));
     }
+    return 0;
 }
 
 static OP * pp_jpaths_impl(pTHX) {
@@ -1048,7 +1260,7 @@ static OP * pp_jpaths_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = SvPVutf8(path_sv, path_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
 
     yyjson_mut_val *val = doc_resolve_path(aTHX_ d, path, path_len);
     if (!val)
@@ -1056,14 +1268,23 @@ static OP * pp_jpaths_impl(pTHX) {
 
     AV *paths = newAV();
     SV *prefix = newSVpvn(path, path_len);
-    collect_paths(aTHX_ val, prefix, paths);
+    int deep = collect_paths(aTHX_ val, prefix, paths, MAX_DEPTH_DEFAULT);
     SvREFCNT_dec(prefix);
+    if (deep) {
+        SvREFCNT_dec((SV *)paths);
+        croak("jpaths: maximum nesting depth exceeded");
+    }
 
     SSize_t count = av_len(paths) + 1;
     EXTEND(SP, count);
     for (SSize_t i = 0; i < count; i++) {
         SV **svp = av_fetch(paths, i, 0);
-        PUSHs(sv_2mortal(SvREFCNT_inc(*svp)));
+        SV *pv = *svp;
+        /* a path with a non-ASCII key must come back flagged, or feeding it to
+           jget/jencode re-reads those bytes as latin-1 (jkeys does the same) */
+        if (!SvUTF8(pv) && !is_ascii(SvPVX(pv), SvCUR(pv)))
+            SvUTF8_on(pv);
+        PUSHs(sv_2mortal(SvREFCNT_inc(pv)));
     }
     SvREFCNT_dec((SV *)paths);
     RETURN;
@@ -1078,14 +1299,39 @@ static OP * pp_jfind_impl(pTHX) {
     SV *doc_sv = POPs;
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len, key_len, match_len;
-    const char *path = SvPVutf8(path_sv, path_len);
-    const char *key = SvPVutf8(key_sv, key_len);
-    const char *match = SvPVutf8(match_sv, match_len);
+    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
+    const char *key = sv_pv_utf8_nomod(aTHX_ key_sv, &key_len);
+    const char *match = sv_pv_utf8_nomod(aTHX_ match_sv, &match_len);
 
     yyjson_mut_val *arr = doc_resolve_path(aTHX_ d, path, path_len);
     if (!arr || !yyjson_mut_is_arr(arr)) {
         XPUSHs(&PL_sv_undef);
         RETURN;
+    }
+
+    /* Classify the match once: a non-numeric string must not compare equal to
+       a numeric field (SvNV("abc") is 0.0), and an integer must compare as
+       64-bit so large ids do not collide through double rounding. */
+    int m_num = 0, m_int = 0, m_neg = 0;
+    UV m_uv = 0;
+    NV m_nv = 0;
+    if (SvIOK(match_sv)) {
+        m_num = m_int = 1;
+        if (SvIsUV(match_sv)) m_uv = SvUVX(match_sv);
+        else {
+            IV iv = SvIVX(match_sv);
+            if (iv < 0) { m_neg = 1; m_uv = (UV)(-(iv + 1)) + 1; } else m_uv = (UV)iv;
+        }
+    } else if (SvNOK(match_sv)) {
+        m_num = 1; m_nv = SvNVX(match_sv);
+    } else {
+        int t = grok_number(match, match_len, &m_uv);
+        if (t && !(t & (IS_NUMBER_NAN | IS_NUMBER_INFINITY))) {
+            m_num = 1;
+            m_neg = (t & IS_NUMBER_NEG) ? 1 : 0;
+            if (!(t & IS_NUMBER_NOT_INT) && (t & IS_NUMBER_IN_UV)) m_int = 1;
+            else m_nv = SvNV(match_sv);
+        }
     }
 
     size_t idx, max;
@@ -1108,30 +1354,29 @@ static OP * pp_jfind_impl(pTHX) {
                 RETURN;
             }
         }
-        /* compare: number. For integer fields compare as 64-bit integers so
-           values above 2^53 (e.g. Snowflake IDs) don't collide through double
-           rounding; fall back to double for real fields or non-integer matches. */
-        else if (yyjson_mut_is_num(field)) {
+        /* compare: number. Integer matches use 64-bit compares so values above
+           2^53 (e.g. Snowflake IDs) don't collide through double rounding. */
+        else if (yyjson_mut_is_num(field) && m_num) {
             yyjson_subtype st = yyjson_mut_get_subtype(field);
             int eq;
-            if (st == YYJSON_SUBTYPE_REAL || !SvIOK(match_sv)) {
-                /* yyjson stores reals as C double; narrow the match to double
-                   so the compare works on long double / quadmath perls, where
-                   SvNV(2.71) carries extra precision the JSON value never had
-                   and a bare == would never be equal. */
-                eq = ((double)SvNV(match_sv) == yyjson_mut_get_num(field));
-            } else if (SvIsUV(match_sv)) {
-                UV mv = SvUV(match_sv);
-                eq = (st == YYJSON_SUBTYPE_UINT)
-                     ? (yyjson_mut_get_uint(field) == (uint64_t)mv)
-                     : (yyjson_mut_get_sint(field) >= 0 &&
-                        (uint64_t)yyjson_mut_get_sint(field) == (uint64_t)mv);
+            if (m_int && st != YYJSON_SUBTYPE_REAL) {
+                if (!m_neg || m_uv == 0)   /* -0 is 0 */
+                    eq = (st == YYJSON_SUBTYPE_UINT)
+                         ? (yyjson_mut_get_uint(field) == (uint64_t)m_uv)
+                         : (yyjson_mut_get_sint(field) >= 0 &&
+                            (uint64_t)yyjson_mut_get_sint(field) == (uint64_t)m_uv);
+                else if ((uint64_t)m_uv <= (uint64_t)INT64_MAX)
+                    eq = (st == YYJSON_SUBTYPE_SINT) &&
+                         (yyjson_mut_get_sint(field) == -(int64_t)m_uv);
+                else   /* INT64_MIN is representable, -(int64_t)m_uv is not */
+                    eq = (st == YYJSON_SUBTYPE_SINT) &&
+                         ((uint64_t)m_uv == (uint64_t)INT64_MAX + 1) &&
+                         (yyjson_mut_get_sint(field) == INT64_MIN);
             } else {
-                IV mv = SvIV(match_sv);
-                eq = (st == YYJSON_SUBTYPE_SINT)
-                     ? (yyjson_mut_get_sint(field) == (int64_t)mv)
-                     : (mv >= 0 &&
-                        yyjson_mut_get_uint(field) == (uint64_t)mv);
+                /* narrowed to double: yyjson stores reals as C double, and on a
+                   long-double perl a bare == would never be equal */
+                NV nv = m_int ? (m_neg ? -(NV)m_uv : (NV)m_uv) : m_nv;
+                eq = ((double)nv == yyjson_mut_get_num(field));
             }
             if (eq) {
                 SV *result = new_doc_sv(aTHX_ d->doc, item, doc_sv);
@@ -1207,7 +1452,7 @@ new_sv_zerocopy(pTHX_ const char *str, size_t len, SV *doc_sv) {
 /* ---- DECODE: yyjson value -> Perl SV ---- */
 
 static SV *
-yyjson_val_to_sv(pTHX_ yyjson_val *val) {
+yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget) {
     switch (yyjson_get_type(val)) {
         case YYJSON_TYPE_NULL:
             return SvREFCNT_inc_simple_NN(&PL_sv_undef);
@@ -1231,6 +1476,7 @@ yyjson_val_to_sv(pTHX_ yyjson_val *val) {
         }
 
         case YYJSON_TYPE_ARR: {
+            if (!budget) return NULL;
             size_t count = yyjson_arr_size(val);
             AV *av = newAV();
             if (count > 0)
@@ -1239,12 +1485,15 @@ yyjson_val_to_sv(pTHX_ yyjson_val *val) {
             size_t idx, max;
             yyjson_val *item;
             yyjson_arr_foreach(val, idx, max, item) {
-                av_push(av, yyjson_val_to_sv(aTHX_ item));
+                SV *item_sv = yyjson_val_to_sv(aTHX_ item, budget - 1);
+                if (!item_sv) { SvREFCNT_dec(rv); return NULL; }
+                av_push(av, item_sv);
             }
             return rv;
         }
 
         case YYJSON_TYPE_OBJ: {
+            if (!budget) return NULL;
             size_t count = yyjson_obj_size(val);
             HV *hv = newHV();
             if (count > 0)
@@ -1255,7 +1504,8 @@ yyjson_val_to_sv(pTHX_ yyjson_val *val) {
             yyjson_obj_foreach(val, idx, max, key, value) {
                 const char *kstr = yyjson_get_str(key);
                 STRLEN klen = (STRLEN)yyjson_get_len(key);
-                SV *val_sv = yyjson_val_to_sv(aTHX_ value);
+                SV *val_sv = yyjson_val_to_sv(aTHX_ value, budget - 1);
+                if (!val_sv) { SvREFCNT_dec(rv); return NULL; }
                 if (!is_ascii(kstr, klen))
                     hv_store(hv, kstr, -(I32)klen, val_sv, 0);
                 else
@@ -1272,7 +1522,7 @@ yyjson_val_to_sv(pTHX_ yyjson_val *val) {
 /* ---- DECODE: yyjson mutable value -> Perl SV ---- */
 
 static SV *
-yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val) {
+yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val, U32 budget) {
     switch (yyjson_mut_get_type(val)) {
         case YYJSON_TYPE_NULL:
             return SvREFCNT_inc_simple_NN(&PL_sv_undef);
@@ -1295,6 +1545,7 @@ yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val) {
         }
 
         case YYJSON_TYPE_ARR: {
+            if (!budget) return NULL;
             size_t count = yyjson_mut_arr_size(val);
             AV *av = newAV();
             if (count > 0)
@@ -1303,12 +1554,15 @@ yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val) {
             size_t idx, max;
             yyjson_mut_val *item;
             yyjson_mut_arr_foreach(val, idx, max, item) {
-                av_push(av, yyjson_mut_val_to_sv(aTHX_ item));
+                SV *item_sv = yyjson_mut_val_to_sv(aTHX_ item, budget - 1);
+                if (!item_sv) { SvREFCNT_dec(rv); return NULL; }
+                av_push(av, item_sv);
             }
             return rv;
         }
 
         case YYJSON_TYPE_OBJ: {
+            if (!budget) return NULL;
             size_t count = yyjson_mut_obj_size(val);
             HV *hv = newHV();
             if (count > 0)
@@ -1319,7 +1573,8 @@ yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val) {
             yyjson_mut_obj_foreach(val, idx, max, key, value) {
                 const char *kstr = yyjson_mut_get_str(key);
                 STRLEN klen = (STRLEN)yyjson_mut_get_len(key);
-                SV *val_sv = yyjson_mut_val_to_sv(aTHX_ value);
+                SV *val_sv = yyjson_mut_val_to_sv(aTHX_ value, budget - 1);
+                if (!val_sv) { SvREFCNT_dec(rv); return NULL; }
                 if (!is_ascii(kstr, klen))
                     hv_store(hv, kstr, -(I32)klen, val_sv, 0);
                 else
@@ -1337,7 +1592,7 @@ yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val) {
 /* doc_sv: an SV holding the yyjson_doc* (refcounted, freed on DESTROY) */
 
 static SV *
-yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv) {
+yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv, U32 budget) {
     switch (yyjson_get_type(val)) {
         case YYJSON_TYPE_NULL:
             return SvREFCNT_inc_simple_NN(&PL_sv_undef);
@@ -1359,6 +1614,7 @@ yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv) {
                 yyjson_get_str(val), yyjson_get_len(val), doc_sv);
 
         case YYJSON_TYPE_ARR: {
+            if (!budget) return NULL;
             size_t count = yyjson_arr_size(val);
             AV *av = newAV();
             if (count > 0)
@@ -1367,13 +1623,16 @@ yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv) {
             size_t idx, max;
             yyjson_val *item;
             yyjson_arr_foreach(val, idx, max, item) {
-                av_push(av, yyjson_val_to_sv_ro(aTHX_ item, doc_sv));
+                SV *item_sv = yyjson_val_to_sv_ro(aTHX_ item, doc_sv, budget - 1);
+                if (!item_sv) { SvREFCNT_dec(rv); return NULL; }
+                av_push(av, item_sv);
             }
             SvREADONLY_on((SV *)av);
             return rv;
         }
 
         case YYJSON_TYPE_OBJ: {
+            if (!budget) return NULL;
             size_t count = yyjson_obj_size(val);
             HV *hv = newHV();
             if (count > 0)
@@ -1384,7 +1643,8 @@ yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv) {
             yyjson_obj_foreach(val, idx, max, key, value) {
                 const char *kstr = yyjson_get_str(key);
                 STRLEN klen = (STRLEN)yyjson_get_len(key);
-                SV *val_sv = yyjson_val_to_sv_ro(aTHX_ value, doc_sv);
+                SV *val_sv = yyjson_val_to_sv_ro(aTHX_ value, doc_sv, budget - 1);
+                if (!val_sv) { SvREFCNT_dec(rv); return NULL; }
                 if (!is_ascii(kstr, klen))
                     hv_store(hv, kstr, -(I32)klen, val_sv, 0);
                 else
@@ -1399,50 +1659,69 @@ yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv) {
     }
 }
 
-/* create a doc-holder SV: an opaque SV that frees yyjson_doc when destroyed */
+/* opaque SV releasing the yyjson_doc when the last reference across all
+   interpreters goes */
 static SV *
 new_doc_holder(pTHX_ yyjson_doc *doc) {
+    json_yy_ro_t *h;
     SV *sv = newSV(0);
-    sv_magicext(sv, NULL, PERL_MAGIC_ext, &docholder_magic_vtbl,
-                (const char *)doc, 0);
+    h = (json_yy_ro_t *)malloc(sizeof(json_yy_ro_t));
+    if (!h) croak("out of memory");
+    h->doc = doc;
+    h->refcnt = 1;
+    attach_ext_magic(aTHX_ sv, &docholder_magic_vtbl, h);
     return sv;
 }
 
 /* ---- DIRECT ENCODE: single-pass SV -> JSON bytes ---- */
 /* Bypasses yyjson_mut_doc entirely for maximum throughput */
 
-/* escape table: 0 = passthrough, 1+ = needs escaping */
+/* 0 = passthrough, 1 = \uXXXX, other = the char after a backslash,
+   ESC_WIDEN = latin-1 byte to widen. The ASCII half is shared. */
+#define ESC_WIDEN 0xff
+
+#define ESCAPE_TABLE_ASCII_HALF                                     \
+    /* 0x00-0x1f: control characters need \uXXXX */                 \
+    1,1,1,1,1,1,1,1, 'b','t','n',1,'f','r',1,1,                     \
+    1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,                               \
+    /* 0x20-0x7f */                                                 \
+    0,0,'"',0,0,0,0,0, 0,0,0,0,0,0,0,0,  /* " at 0x22 */            \
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,  /* 0x30-0x3f */              \
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,  /* 0x40-0x4f */              \
+    0,0,0,0,0,0,0,0, 0,0,0,0,'\\',0,0,0, /* \\ at 0x5c */           \
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,                               \
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+
+#define ESCAPE_TABLE_HIGH_HALF(v)                                   \
+    v,v,v,v,v,v,v,v, v,v,v,v,v,v,v,v,                               \
+    v,v,v,v,v,v,v,v, v,v,v,v,v,v,v,v,                               \
+    v,v,v,v,v,v,v,v, v,v,v,v,v,v,v,v,                               \
+    v,v,v,v,v,v,v,v, v,v,v,v,v,v,v,v,                               \
+    v,v,v,v,v,v,v,v, v,v,v,v,v,v,v,v,                               \
+    v,v,v,v,v,v,v,v, v,v,v,v,v,v,v,v,                               \
+    v,v,v,v,v,v,v,v, v,v,v,v,v,v,v,v,                               \
+    v,v,v,v,v,v,v,v, v,v,v,v,v,v,v,v
+
+/* source is UTF-8: high bytes pass through untouched */
 static const uint8_t escape_table[256] = {
-    /* 0x00-0x1f: control characters need \uXXXX */
-    1,1,1,1,1,1,1,1, 'b','t','n',1,'f','r',1,1,
-    1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
-    /* 0x20-0x7f */
-    0,0,'"',0,0,0,0,0, 0,0,0,0,0,0,0,0,  /* " at 0x22 */
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,  /* 0x30-0x3f */
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,  /* 0x40-0x4f */
-    0,0,0,0,0,0,0,0, 0,0,0,0,'\\',0,0,0, /* \\ at 0x5c */
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    /* 0x80-0xff: high bytes, pass through (valid UTF-8) */
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+    ESCAPE_TABLE_ASCII_HALF,
+    ESCAPE_TABLE_HIGH_HALF(0)
 };
 
-/* ensure buf SV has room for `need` more bytes */
+/* no UTF8 flag: high bytes are latin-1 and must be widened. A table rather
+   than an extra test keeps the run scan at one lookup per byte. */
+static const uint8_t escape_table_latin1[256] = {
+    ESCAPE_TABLE_ASCII_HALF,
+    ESCAPE_TABLE_HIGH_HALF(ESC_WIDEN)
+};
+
+/* Room for `need` more bytes plus the NUL. Compared additively: the
+   subtractive form underflows once cur reaches SvLEN, disabling all growth. */
 static inline void
 buf_ensure(pTHX_ SV *buf, size_t need) {
     STRLEN cur = SvCUR(buf);
-    STRLEN avail = SvLEN(buf) - cur - 1;
-    if (avail < need) {
-        STRLEN newlen = (cur + need + 1) * 2;
-        SvGROW(buf, newlen);
-    }
+    if (SvLEN(buf) < cur + need + 1)
+        SvGROW(buf, (cur + need + 1) * 2);
 }
 
 static inline void
@@ -1461,16 +1740,22 @@ buf_cat_mem(pTHX_ SV *buf, const char *s, size_t n) {
     SvCUR_set(buf, SvCUR(buf) + n);
 }
 
-/* check if string needs any escaping */
+/* Does the string need escaping? high_too also reports bytes >= 0x80 (latin-1
+   needing widening), riding along in the same scan. */
 static inline int
-needs_escape(const char *s, size_t len) {
+needs_escape(const char *s, size_t len, int high_too) {
     /* check 8 bytes at a time for common case (no control chars, no " or \) */
     /* bytes needing escape: 0x00-0x1f, 0x22 ("), 0x5c (\) */
     const unsigned char *p = (const unsigned char *)s;
+    /* masks rather than branches, so the ASCII case is unchanged */
+    const uint64_t hi_mask = high_too ? UINT64_C(0x8080808080808080) : 0;
+    const unsigned char hi_byte = high_too ? 0x80 : 0;
     size_t i = 0;
     for (; i + 7 < len; i += 8) {
         uint64_t chunk;
         memcpy(&chunk, p + i, 8);
+        if (chunk & hi_mask)
+            return 1;
         /* any byte < 0x20? subtract 0x20 from each byte; underflow sets high bit */
         if ((chunk - UINT64_C(0x2020202020202020)) & ~chunk & UINT64_C(0x8080808080808080))
             return 1;
@@ -1484,16 +1769,30 @@ needs_escape(const char *s, size_t len) {
         #undef HAS_ZERO
     }
     for (; i < len; i++) {
-        if (escape_table[p[i]])
+        if (escape_table[p[i]] | (p[i] & hi_byte))
             return 1;
     }
     return 0;
 }
 
-static void
-buf_cat_escaped_str(pTHX_ SV *buf, const char *s, size_t len) {
-    /* fast path: no escaping needed (very common for JSON keys/values) */
-    if (!needs_escape(s, len)) {
+/* latin1: the source had no UTF8 flag, so bytes >= 0x80 are latin-1 characters
+   needing widening to UTF-8. Callers pass 0 for UTF-8 or ASCII input. */
+/* the body is big enough that a plain `inline` hint is ignored, and the two
+   instantiations below are only worth anything if `latin1` folds away */
+#if defined(__GNUC__) || defined(__clang__)
+#  define JSON_YY_FORCE_INLINE inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define JSON_YY_FORCE_INLINE __forceinline
+#else
+#  define JSON_YY_FORCE_INLINE inline
+#endif
+
+static JSON_YY_FORCE_INLINE void
+buf_cat_escaped_impl(pTHX_ SV *buf, const char *s, size_t len, const int latin1) {
+    /* fast path: no escaping needed (very common for JSON keys/values).
+       With latin1 set the scan also rejects high bytes, so reaching here
+       means the memcpy below is byte-identical UTF-8. */
+    if (!needs_escape(s, len, latin1)) {
         buf_ensure(aTHX_ buf, len + 2);
         char *out = SvPVX(buf) + SvCUR(buf);
         *out++ = '"';
@@ -1504,11 +1803,14 @@ buf_cat_escaped_str(pTHX_ SV *buf, const char *s, size_t len) {
         return;
     }
 
-    /* slow path: need escaping */
+    /* slow path: need escaping (and/or widening) */
     static const char hex_digits[] = "0123456789abcdef";
+    const uint8_t *tbl = latin1 ? escape_table_latin1 : escape_table;
     buf_ensure(aTHX_ buf, len + 2 + 16); /* some headroom */
     char *out = SvPVX(buf) + SvCUR(buf);
-    char *out_end = SvPVX(buf) + SvLEN(buf) - 1;
+    /* SvLEN-1 is reserved for the NUL the callers write at SvPVX[SvCUR];
+       reaching it would push SvCUR to SvLEN and defeat buf_ensure */
+    char *out_end = SvPVX(buf) + SvLEN(buf) - 2;
     *out++ = '"';
 
     const char *end = s + len;
@@ -1518,26 +1820,31 @@ buf_cat_escaped_str(pTHX_ SV *buf, const char *s, size_t len) {
             SvCUR_set(buf, out - SvPVX(buf));
             buf_ensure(aTHX_ buf, (end - s) * 2 + 8);
             out = SvPVX(buf) + SvCUR(buf);
-            out_end = SvPVX(buf) + SvLEN(buf) - 1;
+            out_end = SvPVX(buf) + SvLEN(buf) - 2;
         }
 
         unsigned char c = *s;
-        uint8_t esc = escape_table[c];
+        uint8_t esc = tbl[c];
         if (!esc) {
             /* scan for run of safe chars */
             const char *safe = s + 1;
-            while (safe < end && !escape_table[(unsigned char)*safe])
+            while (safe < end && !tbl[(unsigned char)*safe])
                 safe++;
             size_t n = safe - s;
             if (out + n > out_end) {
                 SvCUR_set(buf, out - SvPVX(buf));
                 buf_ensure(aTHX_ buf, n + (end - safe) * 2 + 8);
                 out = SvPVX(buf) + SvCUR(buf);
-                out_end = SvPVX(buf) + SvLEN(buf) - 1;
+                out_end = SvPVX(buf) + SvLEN(buf) - 2;
             }
             memcpy(out, s, n);
             out += n;
             s = safe;
+        } else if (esc == ESC_WIDEN) {
+            /* latin-1 character: re-encode as two UTF-8 bytes */
+            *out++ = (char)(0xc0 | (c >> 6));
+            *out++ = (char)(0x80 | (c & 0x3f));
+            s++;
         } else if (esc > 1) {
             *out++ = '\\';
             *out++ = (char)esc;
@@ -1551,6 +1858,22 @@ buf_cat_escaped_str(pTHX_ SV *buf, const char *s, size_t len) {
     }
     *out++ = '"';
     SvCUR_set(buf, out - SvPVX(buf));
+}
+
+/* Instantiated twice so `latin1` folds to a constant in each: the UTF-8
+   variant loses the widening branch, the mask and the table indirection. */
+static void
+buf_cat_escaped_utf8(pTHX_ SV *buf, const char *s, size_t len) {
+    buf_cat_escaped_impl(aTHX_ buf, s, len, 0);
+}
+static void
+buf_cat_escaped_latin1(pTHX_ SV *buf, const char *s, size_t len) {
+    buf_cat_escaped_impl(aTHX_ buf, s, len, 1);
+}
+static inline void
+buf_cat_escaped_str(pTHX_ SV *buf, const char *s, size_t len, int latin1) {
+    if (latin1) buf_cat_escaped_latin1(aTHX_ buf, s, len);
+    else        buf_cat_escaped_utf8(aTHX_ buf, s, len);
 }
 
 /* fast unsigned integer to buffer */
@@ -1590,15 +1913,75 @@ buf_cat_nv(pTHX_ SV *buf, NV val) {
     STRLEN len;
     SV *tmp = sv_2mortal(newSVnv(val));
     const char *s = SvPV_const(tmp, len);
+    /* NV_DIG digits can round a finite value past the largest double, giving
+       a number our own decoder rejects as infinity. Only huge values can. */
+    if (UNLIKELY(val > (NV)1.0e308 || val < (NV)-1.0e308)) {
+        SV *back = sv_2mortal(newSVpvn(s, len));
+        if (Perl_isinf(SvNV(back))) {
+            sv_setpvs(tmp, "");
+            Perl_sv_catpvf(aTHX_ tmp, "%.*" NVgf, (int)NV_DIG + 3, val);
+            s = SvPV_const(tmp, len);
+        }
+    }
     buf_cat_mem(aTHX_ buf, s, len);
 }
 
 static json_yy_t default_self = { F_UTF8 | F_ALLOW_NONREF, MAX_DEPTH_DEFAULT };
 
+/* A scalar can hold a string and a number at once. Encode as a number only
+   when the number's own text is exactly the string: "42" stays 42, while
+   "007", "42\n" and $! stay strings. Matches Cpanel::JSON::XS. */
+static int
+sv_num_is_faithful(pTHX_ SV *sv, const char *str, STRLEN len) {
+    if (SvIOK(sv)) {
+        char buf[32];
+        char *end = buf + sizeof(buf);
+        char *p = end;
+        UV uv;
+        int neg = 0;
+        if (SvIsUV(sv))
+            uv = SvUVX(sv);
+        else {
+            IV iv = SvIVX(sv);
+            if (iv < 0) { neg = 1; uv = (UV)(-(iv + 1)) + 1; }
+            else          uv = (UV)iv;
+        }
+        if (!uv) *--p = '0';
+        else while (uv) { *--p = (char)('0' + (uv % 10)); uv /= 10; }
+        if (neg) *--p = '-';
+        return (STRLEN)(end - p) == len && memcmp(p, str, len) == 0;
+    }
+    if (SvNOK(sv)) {
+        /* same stringification the encoder would emit (see buf_cat_nv) */
+        STRLEN nlen;
+        SV *tmp = sv_2mortal(newSVnv(SvNVX(sv)));
+        const char *n = SvPV_const(tmp, nlen);
+        return nlen == len && memcmp(n, str, len) == 0;
+    }
+    return 0;
+}
+
+/* true/false decode to PL_sv_yes/PL_sv_no and re-encode as 1/0; PL_sv_no's PV
+   is "", which would otherwise fail the test above and emit an empty string. */
+#ifdef SvIsBOOL
+#  define SV_IS_BOOL(sv) (SvIsBOOL(sv) || (sv) == &PL_sv_yes || (sv) == &PL_sv_no)
+#else
+/* no bool flag before 5.36: match the shape perl gives a copy of !!1 / !!0 --
+   all three slots set, with PV "1"/IV 1 or PV ""/IV 0. An ordinary string that
+   was merely used numerically does not get all three. */
+#  define SV_IS_BOOL(sv)                                                   \
+     ((sv) == &PL_sv_yes || (sv) == &PL_sv_no ||                           \
+      (SvIOK(sv) && SvNOK(sv) && SvPOK(sv) &&                              \
+       ((SvCUR(sv) == 0 && SvIVX(sv) == 0) ||                              \
+        (SvCUR(sv) == 1 && SvPVX(sv)[0] == '1' && SvIVX(sv) == 1))))
+#endif
+
 static void
 direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
     if (depth > self->max_depth)
         croak("maximum nesting depth exceeded");
+
+    SvGETMAGIC(sv);   /* tied values arrive unresolved and would encode as null */
 
     if (!SvOK(sv)) {
         buf_cat_mem(aTHX_ buf, "null", 4);
@@ -1609,7 +1992,10 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
         SV *deref = SvRV(sv);
 
         if (SvOBJECT(deref)) {
-            if (self->flags & F_CONVERT_BLESSED) {
+            /* convert_blessed applies only if the class has a TO_JSON;
+               otherwise fall through to allow_blessed, as JSON::XS does */
+            if ((self->flags & F_CONVERT_BLESSED) &&
+                gv_fetchmethod_autoload(SvSTASH(deref), "TO_JSON", 0)) {
                 dSP;
                 ENTER; SAVETMPS;
                 PUSHMARK(SP);
@@ -1629,14 +2015,17 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
                    encode croaks on an unencodable TO_JSON result, the mortal
                    is still freed on unwind (an explicit dec would be skipped). */
                 sv_2mortal(result);
-                direct_encode_sv(aTHX_ buf, result, depth, self);
+                /* depth+1: a TO_JSON returning its own object would otherwise
+                   recurse forever past max_depth */
+                direct_encode_sv(aTHX_ buf, result, depth + 1, self);
                 return;
             }
             if (self->flags & F_ALLOW_BLESSED) {
                 buf_cat_mem(aTHX_ buf, "null", 4);
                 return;
             }
-            croak("encountered object '%s', but allow_blessed/convert_blessed is not enabled",
+            croak("encountered object '%s', but neither allow_blessed nor "
+                  "convert_blessed is enabled (or the TO_JSON method is missing)",
                   sv_reftype(deref, 1));
         }
 
@@ -1652,6 +2041,8 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
         if (SvTYPE(deref) == SVt_PVAV) {
             AV *av = (AV *)deref;
             SSize_t len = av_len(av) + 1;
+            if (depth >= self->max_depth)   /* count containers, as decode does */
+                croak("maximum nesting depth exceeded");
             buf_cat_c(aTHX_ buf, '[');
             for (SSize_t i = 0; i < len; i++) {
                 if (i) buf_cat_c(aTHX_ buf, ',');
@@ -1665,18 +2056,25 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
 
         if (SvTYPE(deref) == SVt_PVHV) {
             HV *hv = (HV *)deref;
+            if (depth >= self->max_depth)   /* count containers, as decode does */
+                croak("maximum nesting depth exceeded");
             buf_cat_c(aTHX_ buf, '{');
             hv_iterinit(hv);
             HE *he;
             int first = 1;
+            /* HeVAL() is NULL on a tied hash; hv_iterval() runs FETCH.
+               Guarded so plain hashes keep the inline fast path. */
+            const bool magical = cBOOL(SvRMAGICAL(hv));
             while ((he = hv_iternext(hv))) {
                 if (!first) buf_cat_c(aTHX_ buf, ',');
                 first = 0;
                 STRLEN klen;
                 const char *kstr = HePV(he, klen);
-                buf_cat_escaped_str(aTHX_ buf, kstr, klen);
+                buf_cat_escaped_str(aTHX_ buf, kstr, klen, !HeUTF8(he));
                 buf_cat_c(aTHX_ buf, ':');
-                direct_encode_sv(aTHX_ buf, HeVAL(he), depth + 1, self);
+                direct_encode_sv(aTHX_ buf,
+                                 magical ? hv_iterval(hv, he) : HeVAL(he),
+                                 depth + 1, self);
             }
             buf_cat_c(aTHX_ buf, '}');
             return;
@@ -1689,6 +2087,28 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
         croak("cannot encode reference to %s", sv_reftype(deref, 0));
     }
 
+    if (SvNOK(sv) && (Perl_isnan(SvNVX(sv)) || Perl_isinf(SvNVX(sv))))
+        croak("cannot encode NaN or Infinity as JSON");
+
+    if (SV_IS_BOOL(sv)) {
+        buf_cat_c(aTHX_ buf, SvTRUE(sv) ? '1' : '0');
+        return;
+    }
+
+    /* SvPOKp, not SvPOK: stringifying a number leaves only the private flag */
+    if (SvPOKp(sv)) {
+        STRLEN len;
+        const char *str = SvPV_nomg(sv, len);   /* get magic ran on entry */
+        if ((SvIOK(sv) || SvNOK(sv)) && sv_num_is_faithful(aTHX_ sv, str, len)) {
+            /* NVs go through buf_cat_nv even so, for the near-DBL_MAX fixup */
+            if (SvIOK(sv)) buf_cat_mem(aTHX_ buf, str, len);
+            else           buf_cat_nv(aTHX_ buf, SvNVX(sv));
+            return;
+        }
+        buf_cat_escaped_str(aTHX_ buf, str, len, !SvUTF8(sv));
+        return;
+    }
+
     if (SvIOK(sv)) {
         if (SvIsUV(sv))
             buf_cat_uv(aTHX_ buf, SvUVX(sv));
@@ -1698,17 +2118,7 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
     }
 
     if (SvNOK(sv)) {
-        NV nv = SvNVX(sv);
-        if (Perl_isnan(nv) || Perl_isinf(nv))
-            croak("cannot encode NaN or Infinity as JSON");
-        buf_cat_nv(aTHX_ buf, nv);
-        return;
-    }
-
-    if (SvPOK(sv)) {
-        STRLEN len;
-        const char *str = SvPV(sv, len);
-        buf_cat_escaped_str(aTHX_ buf, str, len);
+        buf_cat_nv(aTHX_ buf, SvNVX(sv));
         return;
     }
 
@@ -1722,6 +2132,8 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
     if (depth > self->max_depth)
         croak("maximum nesting depth exceeded");
 
+    SvGETMAGIC(sv);   /* see direct_encode_sv() */
+
     if (!SvOK(sv))
         return yyjson_mut_null(doc);
 
@@ -1730,8 +2142,10 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
 
         /* check for blessed objects */
         if (SvOBJECT(deref)) {
-            /* convert_blessed: call TO_JSON */
-            if (self->flags & F_CONVERT_BLESSED) {
+            /* convert_blessed: call TO_JSON, if the class has one (see
+               direct_encode_sv) */
+            if ((self->flags & F_CONVERT_BLESSED) &&
+                gv_fetchmethod_autoload(SvSTASH(deref), "TO_JSON", 0)) {
                 dSP;
                 ENTER; SAVETMPS;
                 PUSHMARK(SP);
@@ -1751,12 +2165,14 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
                    encode croaks on an unencodable TO_JSON result, the mortal
                    is still freed on unwind (an explicit dec would be skipped). */
                 sv_2mortal(result);
-                return sv_to_yyjson_val(aTHX_ doc, result, self, depth);
+                /* depth+1: see direct_encode_sv() */
+                return sv_to_yyjson_val(aTHX_ doc, result, self, depth + 1);
             }
             /* allow_blessed: encode as null */
             if (self->flags & F_ALLOW_BLESSED)
                 return yyjson_mut_null(doc);
-            croak("encountered object '%s', but allow_blessed/convert_blessed is not enabled",
+            croak("encountered object '%s', but neither allow_blessed nor "
+                  "convert_blessed is enabled (or the TO_JSON method is missing)",
                   sv_reftype(deref, 1));
         }
 
@@ -1770,6 +2186,8 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
         switch (SvTYPE(deref)) {
             case SVt_PVAV: {
                 AV *av = (AV *)deref;
+                if (depth >= self->max_depth)   /* see direct_encode_sv() */
+                    croak("maximum nesting depth exceeded");
                 yyjson_mut_val *arr = yyjson_mut_arr(doc);
                 SSize_t len = av_len(av) + 1;
                 for (SSize_t i = 0; i < len; i++) {
@@ -1782,14 +2200,25 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
 
             case SVt_PVHV: {
                 HV *hv = (HV *)deref;
+                if (depth >= self->max_depth)   /* see direct_encode_sv() */
+                    croak("maximum nesting depth exceeded");
                 yyjson_mut_val *obj = yyjson_mut_obj(doc);
                 hv_iterinit(hv);
                 HE *he;
+                const bool magical = cBOOL(SvRMAGICAL(hv));  /* see direct_encode_sv() */
                 while ((he = hv_iternext(hv))) {
                     STRLEN klen;
                     const char *kstr = HePV(he, klen);
-                    SV *val = HeVAL(he);
+                    if (!HeUTF8(he) && !is_ascii(kstr, klen)) {
+                        /* latin-1 key: widen, or yyjson rejects it on write */
+                        SV *ktmp = sv_2mortal(newSVpvn(kstr, klen));
+                        sv_utf8_upgrade(ktmp);
+                        kstr = SvPV_const(ktmp, klen);
+                    }
+                    /* copy the key before hv_iterval() runs FETCH, which
+                       could invalidate the entry kstr points into */
                     yyjson_mut_val *k = yyjson_mut_strncpy(doc, kstr, klen);
+                    SV *val = magical ? hv_iterval(hv, he) : HeVAL(he);
                     yyjson_mut_val *v = sv_to_yyjson_val(aTHX_ doc, val, self, depth + 1);
                     yyjson_mut_obj_add(obj, k, v);
                 }
@@ -1803,25 +2232,40 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
         }
     }
 
-    /* SvIOK first for speed */
+    if (SvNOK(sv) && (Perl_isnan(SvNVX(sv)) || Perl_isinf(SvNVX(sv))))
+        croak("cannot encode NaN or Infinity as JSON");
+
+    if (SV_IS_BOOL(sv))
+        return yyjson_mut_sint(doc, SvTRUE(sv) ? 1 : 0);
+
+    /* see sv_num_is_faithful(). One SvPV for the whole branch: fetching twice
+       could emit a different string than the one just tested. */
+    if (SvPOKp(sv)) {
+        STRLEN len;
+        const char *str = SvPV_nomg(sv, len);   /* get magic ran on entry */
+        if ((SvIOK(sv) || SvNOK(sv)) && sv_num_is_faithful(aTHX_ sv, str, len)) {
+            if (SvIOK(sv))
+                return SvIsUV(sv) ? yyjson_mut_uint(doc, (uint64_t)SvUVX(sv))
+                                  : yyjson_mut_sint(doc, (int64_t)SvIVX(sv));
+            return yyjson_mut_real(doc, SvNVX(sv));
+        }
+        if (!SvUTF8(sv) && !is_ascii(str, len)) {
+            /* latin-1: widen on a copy, never in the caller's SV */
+            SV *tmp = sv_2mortal(newSVpvn(str, len));
+            sv_utf8_upgrade(tmp);
+            str = SvPV_const(tmp, len);
+        }
+        return yyjson_mut_strncpy(doc, str, len);
+    }
+
     if (SvIOK(sv)) {
         if (SvIsUV(sv))
             return yyjson_mut_uint(doc, (uint64_t)SvUVX(sv));
         return yyjson_mut_sint(doc, (int64_t)SvIVX(sv));
     }
 
-    if (SvNOK(sv)) {
-        NV nv = SvNVX(sv);
-        if (Perl_isnan(nv) || Perl_isinf(nv))
-            croak("cannot encode NaN or Infinity as JSON");
-        return yyjson_mut_real(doc, nv);
-    }
-
-    if (SvPOK(sv)) {
-        STRLEN len;
-        const char *str = SvPV(sv, len);
-        return yyjson_mut_strncpy(doc, str, len);
-    }
+    if (SvNOK(sv))
+        return yyjson_mut_real(doc, SvNVX(sv));
 
     return yyjson_mut_null(doc);
 }
@@ -1840,6 +2284,7 @@ pp_decode_json_impl(pTHX) {
     yyjson_doc *doc = yyjson_read_opts((char *)json, len, YYJSON_READ_NOFLAG, NULL, &err);
     if (!doc)
         croak("JSON decode error: %s at byte offset %zu", err.msg, err.pos);
+    CHECK_DOC_DEPTH(doc, MAX_DEPTH_DEFAULT, "JSON decode error");
 
     yyjson_val *root = yyjson_doc_get_root(doc);
     if (!root) {
@@ -1847,8 +2292,10 @@ pp_decode_json_impl(pTHX) {
         croak("JSON decode error: empty document");
     }
 
-    SV *result = yyjson_val_to_sv(aTHX_ root);
+    SV *result = yyjson_val_to_sv(aTHX_ root, MAX_DEPTH_DEFAULT);
     yyjson_doc_free(doc);
+    if (!result)
+        croak("JSON decode error: maximum nesting depth exceeded");
 
     XPUSHs(sv_2mortal(result));
     RETURN;
@@ -1886,6 +2333,7 @@ pp_decode_json_ro_impl(pTHX) {
     yyjson_doc *doc = yyjson_read_opts((char *)json, len, YYJSON_READ_NOFLAG, NULL, &err);
     if (!doc)
         croak("JSON decode error: %s at byte offset %zu", err.msg, err.pos);
+    CHECK_DOC_DEPTH(doc, MAX_DEPTH_DEFAULT, "JSON decode error");
 
     yyjson_val *root = yyjson_doc_get_root(doc);
     if (!root) {
@@ -1894,7 +2342,11 @@ pp_decode_json_ro_impl(pTHX) {
     }
 
     SV *doc_sv = new_doc_holder(aTHX_ doc);
-    SV *result = yyjson_val_to_sv_ro(aTHX_ root, doc_sv);
+    SV *result = yyjson_val_to_sv_ro(aTHX_ root, doc_sv, MAX_DEPTH_DEFAULT);
+    if (!result) {
+        SvREFCNT_dec(doc_sv);
+        croak("JSON decode error: maximum nesting depth exceeded");
+    }
 
     /* attach doc_sv to keep yyjson_doc alive while zero-copy SVs exist.
        skip for null/bool roots -- they return immortal globals that must
@@ -2091,6 +2543,15 @@ MODULE = JSON::YY    PACKAGE = JSON::YY
 
 BOOT:
 {
+#ifdef USE_ITHREADS
+    /* guards the decode_json_ro buffer refcount; the flag keeps a second
+       interpreter loading the module from re-initialising a live mutex */
+    if (!json_yy_ro_mutex_ready) {
+        MUTEX_INIT(&json_yy_ro_mutex);
+        json_yy_ro_mutex_ready = 1;
+    }
+#endif
+
     boot_xs_parse_keyword(0.40);
 
     /* functional API keywords */
@@ -2166,8 +2627,7 @@ CODE:
     Newxz(self, 1, json_yy_t);
     self->flags = F_ALLOW_NONREF;
     self->max_depth = MAX_DEPTH_DEFAULT;
-    sv_magicext((SV *)hv, NULL, PERL_MAGIC_ext, &json_yy_vtbl,
-                (const char *)self, 0);
+    attach_ext_magic(aTHX_ (SV *)hv, &json_yy_vtbl, self);
     RETVAL = sv_bless(newRV_noinc((SV *)hv), gv_stashpv(klass, GV_ADD));
 }
 OUTPUT:
@@ -2234,13 +2694,14 @@ CODE:
     if (self->flags & F_UTF8) {
         json = SvPV(json_sv, len);       /* utf8 mode: input is raw bytes */
     } else {
-        json = SvPVutf8(json_sv, len);   /* character mode: encode to UTF-8 */
+        json = sv_pv_utf8_nomod(aTHX_ json_sv, &len);   /* character mode: encode to UTF-8 */
     }
 
     yyjson_read_err err;
     yyjson_doc *doc = yyjson_read_opts((char *)json, len, YYJSON_READ_NOFLAG, NULL, &err);
     if (!doc)
         croak("JSON decode error: %s at byte offset %zu", err.msg, err.pos);
+    CHECK_DOC_DEPTH(doc, self->max_depth, "JSON decode error");
 
     yyjson_val *root = yyjson_doc_get_root(doc);
     if (!root) {
@@ -2257,8 +2718,10 @@ CODE:
         }
     }
 
-    RETVAL = yyjson_val_to_sv(aTHX_ root);
+    RETVAL = yyjson_val_to_sv(aTHX_ root, self->max_depth);
     yyjson_doc_free(doc);
+    if (!RETVAL)
+        croak("JSON decode error: maximum nesting depth exceeded");
 }
 OUTPUT:
     RETVAL
@@ -2274,13 +2737,14 @@ CODE:
     if (self->flags & F_UTF8) {
         json = SvPV(json_sv, len);
     } else {
-        json = SvPVutf8(json_sv, len);
+        json = sv_pv_utf8_nomod(aTHX_ json_sv, &len);
     }
 
     yyjson_read_err err;
     yyjson_doc *idoc = yyjson_read_opts((char *)json, len, YYJSON_READ_NOFLAG, NULL, &err);
     if (!idoc)
         croak("JSON decode error: %s at byte offset %zu", err.msg, err.pos);
+    CHECK_DOC_DEPTH(idoc, self->max_depth, "decode_doc");
 
     yyjson_mut_doc *mdoc = yyjson_doc_mut_copy(idoc, NULL);
     yyjson_doc_free(idoc);
@@ -2329,8 +2793,7 @@ CODE:
         /* yyjson path for pretty */
         yyjson_mut_doc *doc = yyjson_mut_doc_new(NULL);
         SV *doc_guard = sv_2mortal(newSV(0));
-        sv_magicext(doc_guard, NULL, PERL_MAGIC_ext, &mut_docholder_vtbl,
-                    (const char *)doc, 0);
+        attach_ext_magic(aTHX_ doc_guard, &mut_docholder_vtbl, doc);
         yyjson_mut_val *root = sv_to_yyjson_val(aTHX_ doc, data, self, 0);
         yyjson_mut_doc_set_root(doc, root);
 
@@ -2383,6 +2846,7 @@ CODE:
     yyjson_doc *doc = yyjson_read_opts((char *)json, len, YYJSON_READ_NOFLAG, NULL, &err);
     if (!doc)
         croak("JSON decode error: %s at byte offset %zu", err.msg, err.pos);
+    CHECK_DOC_DEPTH(doc, MAX_DEPTH_DEFAULT, "JSON decode error");
 
     yyjson_val *root = yyjson_doc_get_root(doc);
     if (!root) {
@@ -2390,8 +2854,10 @@ CODE:
         croak("JSON decode error: empty document");
     }
 
-    RETVAL = yyjson_val_to_sv(aTHX_ root);
+    RETVAL = yyjson_val_to_sv(aTHX_ root, MAX_DEPTH_DEFAULT);
     yyjson_doc_free(doc);
+    if (!RETVAL)
+        croak("JSON decode error: maximum nesting depth exceeded");
 }
 OUTPUT:
     RETVAL
@@ -2407,6 +2873,7 @@ CODE:
     yyjson_doc *doc = yyjson_read_opts((char *)json, len, YYJSON_READ_NOFLAG, NULL, &err);
     if (!doc)
         croak("JSON decode error: %s at byte offset %zu", err.msg, err.pos);
+    CHECK_DOC_DEPTH(doc, MAX_DEPTH_DEFAULT, "JSON decode error");
 
     yyjson_val *root = yyjson_doc_get_root(doc);
     if (!root) {
@@ -2417,7 +2884,11 @@ CODE:
     /* doc ownership transfers to the holder SV */
     SV *doc_sv = new_doc_holder(aTHX_ doc);
 
-    RETVAL = yyjson_val_to_sv_ro(aTHX_ root, doc_sv);
+    RETVAL = yyjson_val_to_sv_ro(aTHX_ root, doc_sv, MAX_DEPTH_DEFAULT);
+    if (!RETVAL) {
+        SvREFCNT_dec(doc_sv);
+        croak("JSON decode error: maximum nesting depth exceeded");
+    }
 
     /* attach doc_sv to keep yyjson_doc alive while zero-copy SVs exist.
        skip for null/bool -- they return immortal globals. */

@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use lib 'blib/lib', 'blib/arch', 't/lib';
 use ClickHouse::Encoder;
-use TestCH qw(read_varint_ref split_paren_list);
+use TestCH qw(read_varint_ref split_paren_list f64);
 *_read_varint       = \&read_varint_ref;
 *_split_paren_list  = \&split_paren_list;
 
@@ -275,7 +275,7 @@ sub _values { return [map { $_->{values} } @{$_[0]->{columns}}] }
 # Floats
 {
     my $b = roundtrip([['f','Float64']], [[3.14], [-2.5e10], [0]]);
-    is($b->{columns}[0]{values}[0], 3.14, 'Float64 3.14');
+    is($b->{columns}[0]{values}[0], f64(3.14), 'Float64 3.14');
     is($b->{columns}[0]{values}[1], -2.5e10, 'Float64 -2.5e10');
     is($b->{columns}[0]{values}[2], 0,   'Float64 0');
 }

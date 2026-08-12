@@ -180,3 +180,11 @@ docker run --rm derfnull/motis-m:latest --version
 
 Documentation is not available in this image. Please refer to the
 [online motis-m manual](https://man.finalrewind.org/1/motis-m/) instead.
+
+## References
+
+Mirrors of this repository are available at
+
+* [Codeberg](https://codeberg.org/derf/Travel-Status-MOTIS/)
+* [Finalrewind](https://git.finalrewind.org/derf/Travel-Status-MOTIS/)
+* [GitHub](https://github.com/derf/Travel-Status-MOTIS)

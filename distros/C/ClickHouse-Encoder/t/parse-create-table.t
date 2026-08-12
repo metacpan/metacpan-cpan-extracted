@@ -141,4 +141,49 @@ DDL
          'column block with no closing paren croaks');
 }
 
+# TabSeparated-escaped DDL, as `show create table` arrives over HTTP: the
+# newlines come through as the two characters \ and n, which used to leave
+# the column block one unsplittable run and fail with "no columns parsed".
+{
+    # Captured verbatim from ClickHouse 26.7.1 via POST to /.
+    my $escaped = 'CREATE TABLE default.http_live\n(\n    `id` UInt32,'
+                . '\n    `name` String,\n    `ts` DateTime,'
+                . '\n    `val` Nullable(Float64)\n)\nENGINE = Memory' . "\n";
+    my $info = ClickHouse::Encoder->parse_create_table($escaped);
+    is($info->{table}, 'http_live', 'escaped DDL: table name');
+    is($info->{database}, 'default', 'escaped DDL: database');
+    is_deeply($info->{columns},
+              [['id','UInt32'], ['name','String'], ['ts','DateTime'],
+               ['val','Nullable(Float64)']],
+              'escaped DDL: all columns recovered');
+    is($info->{engine}, 'Memory', 'escaped DDL: engine');
+
+    # The same DDL unescaped must parse identically.
+    (my $plain = $escaped) =~ s/\\n/\n/g;
+    is_deeply(ClickHouse::Encoder->parse_create_table($plain)->{columns},
+              $info->{columns}, 'escaped and plain forms agree');
+}
+
+# The unescape must not fire on DDL that genuinely contains backslashes.
+# It keys off the escaped column-block opener the server always emits, not
+# merely on a backslash being present, so a caller's own SQL is never
+# rewritten - clause text included, which is returned verbatim.
+{
+    my $ddl = "CREATE TABLE t\n(\n  `a` String DEFAULT 'x\\ny',\n"
+            . "  `b` UInt32\n)\nENGINE = Memory";
+    my $info = ClickHouse::Encoder->parse_create_table($ddl);
+    is_deeply([map { $_->[0] } @{ $info->{columns} }], ['a','b'],
+              'real-newline DDL containing a backslash escape is left alone');
+
+    my $one_line = q{CREATE TABLE t (`a` String) ENGINE = MergeTree }
+                 . q{ORDER BY a SETTINGS x = 'a\nb'};
+    my $flat = ClickHouse::Encoder->parse_create_table($one_line);
+    is_deeply([map { $_->[0] } @{ $flat->{columns} }], ['a'],
+              'single-line DDL with a backslash literal still parses');
+    like($flat->{settings}, qr/\Qa\nb\E/,
+         'single-line DDL: backslash in a clause is not rewritten');
+    unlike($flat->{settings}, qr/\n/,
+           'single-line DDL: no spurious newline injected into a clause');
+}
+
 done_testing();

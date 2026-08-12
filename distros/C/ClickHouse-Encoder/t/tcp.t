@@ -580,6 +580,61 @@ SKIP: {
     close $sock;
 }
 
+# read_packet's timeout. Without one the call blocks in sysread forever,
+# which is what a handshake against a too-new server does: both sides
+# wait and neither gives up. Verified against ClickHouse 26.7 (rev 54488),
+# where the Hello succeeds and the very next read hangs.
+SKIP: {
+    my $ok = eval { require IO::Socket::INET; 1 };
+    skip 'IO::Socket::INET not available', 3 unless $ok;
+
+    # A listening socket that accepts but never speaks, standing in for
+    # the deadlocked server.
+    my $srv = IO::Socket::INET->new(
+        LocalAddr => '127.0.0.1', LocalPort => 0,
+        Listen => 1, ReuseAddr => 1);
+    skip 'could not open a loopback listener', 3 unless $srv;
+
+    my $cli = IO::Socket::INET->new(
+        PeerAddr => '127.0.0.1', PeerPort => $srv->sockport, Timeout => 5);
+    skip 'could not connect to the loopback listener', 3 unless $cli;
+    my $acc = $srv->accept;   # accepted, then deliberately ignored
+    binmode $cli;
+
+    my $t0 = time;
+    my $pkt = eval {
+        ClickHouse::Encoder::TCP->read_packet($cli, timeout => 1)
+    };
+    my $err     = $@;
+    my $elapsed = time - $t0;
+
+    ok(!$pkt, 'read_packet with a timeout does not return a packet');
+    like($err, qr/timed out after 1s/, 'read_packet croaks on timeout');
+    cmp_ok($elapsed, '<', 15,
+           "read_packet gave up promptly (${elapsed}s), rather than hanging");
+
+    # A signal landing mid-wait must not defeat the deadline: perl's 4-arg
+    # select returns -1 on EINTR, which is true, so a bare `or die` would
+    # read it as "socket ready" and fall into an unbounded sysread.
+    my $hits = 0;
+    local $SIG{ALRM} = sub { $hits++; alarm 1 };
+    alarm 1;
+    my $t1 = time;
+    my $p2 = eval {
+        ClickHouse::Encoder::TCP->read_packet($cli, timeout => 3)
+    };
+    my $err2 = $@;
+    my $el2  = time - $t1;
+    alarm 0;
+    ok($hits > 0, "a signal arrived during the wait ($hits)");
+    like($err2, qr/timed out after 3s/,
+         'the deadline still fires when select is interrupted');
+    cmp_ok($el2, '<', 15,
+           "interrupted wait still gave up promptly (${el2}s)");
+
+    close $cli; close $acc if $acc; close $srv;
+}
+
 done_testing();
 
 # helpers ----------------------------------------------------------

@@ -2,13 +2,13 @@
 use v5.10;
 use strict;
 use warnings;
-use feature 'state';
+use feature q (state);
 
 package Test::Spec::Util;
 
 our $VERSION = v1.0.0;
 
-use parent 'Exporter';
+use parent q (Exporter);
 
 use Hash::Util qw[ ];
 use Ref::Util qw[ is_coderef ];
@@ -23,13 +23,13 @@ use Test::Deep;
 use Test::Exception;
 
 our %context;
-our $context_accessor = 'Test::Spec::Util::Shared';
+our $context_accessor = q (Test::Spec::Util::Shared);
 
 our @EXPORT = (
-	'export',
-	'example',
-	'as',
-	'shared',
+	q (export),
+	q (example),
+	q (as),
+	q (shared),
 	@Test::More::EXPORT,
 	@Test::Exception::EXPORT,
 	@Test::Deep::EXPORT,
@@ -45,12 +45,12 @@ sub export {
 		into => $caller,
 	});
 
-	Sub::Name::subname "${caller}::${name}", $coderef;
+	Sub::Name::subname qq (${caller}::${name}), $coderef;
 
 	{
-		no strict 'refs';
-		(state $caller_cache)->{$caller} //= push @{ "${caller}::ISA" }, 'Exporter';
-		push @{ "${caller}::EXPORT" }, $name;
+		no strict q (refs);
+		(state $caller_cache)->{$caller} //= push @{ qq (${caller}::ISA) }, q (Exporter);
+		push @{ qq (${caller}::EXPORT) }, $name;
 	}
 
 	1;
@@ -67,12 +67,15 @@ sub example {
 	my $default_title = $name;
 	$default_title =~ s/_/ /g;
 
-	@_ = ($name, sub { unshift @_, $default_title unless @_ % 2; goto $coderef });
+	@_ = ($name, sub { unshift @_, $default_title
+		unless @_ % 2; goto $coderef });
 	goto &export;
 }
 
 sub shared (;$) : lvalue {
-	return $context_accessor unless @_;
+	return $context_accessor
+		unless @_
+		;
 
 	$context{$_[0]};
 }
@@ -80,14 +83,14 @@ sub shared (;$) : lvalue {
 export describe => sub {
 	my ($name, $code) = @_;
 	local %context = %context;
-	Test::More::note("describe $name");
+	Test::More::note(qq (describe $name));
 	Test::More::subtest ($name, sub { $code->(); done_testing });
 };
 
 export context => sub {
 	my ($name, $code) = @_;
 	local %context = %context;
-	Test::More::note("context $name");
+	Test::More::note(qq (context $name));
 	Test::More::subtest ($name, sub { $code->(); done_testing });
 };
 
@@ -97,12 +100,12 @@ export it => sub {
 
 	my $test_builder_ok = \&Test::Builder::ok;
 	my $only_one_assert = 0;
-	my $guard = Sub::Override->new ('Test::Builder::ok' => as {
+	my $guard = Sub::Override->new (q (Test::Builder::ok) => as {
 		my @args = @_;
 
 		if ($only_one_assert++) {
 			$args[1] = 0;
-			$args[2] = 'Only one assert allowed in one it';
+			$args[2] = q (Only one assert allowed in one it);
 		}
 
 		$args[2] = $description;
@@ -123,7 +126,7 @@ export is_instance_of => as {
 export is_test_deep_comparision => as {
 	my ($object) = @_;
 
-	eq_deeply ($object, obj_isa ('Test::Deep::Cmp'));
+	eq_deeply ($object, obj_isa (q (Test::Deep::Cmp)));
 };
 
 export is_empty => as {
@@ -143,9 +146,9 @@ export expect_true => as {
 export describe_method => as {
 	my ($method, $args, $code) = @_;
 
-	describe ("$method()" => as {
+	describe (qq ($method()) => as {
 		shared->method = $method;
-		shared->method_args = [ map "with_$_", @{$args} ];
+		shared->method_args = [ map qq (with_$_), @{$args} ];
 
 		$code->();
 	});
@@ -160,7 +163,8 @@ export test_method => as {
 
 	Hash::Util::lock_keys %params,
 		qw[ method method_args method_wantarray method_wanthash ],
-		qw[ object throws expect ], @args;
+		qw[ object throws expect ], @args
+		;
 
 	$params{object} //= shared->object;
 
@@ -170,19 +174,25 @@ export test_method => as {
 			? [ $params{object}->$method (@params{@args}) ]
 			: $params{object}->$method (@params{@args})
 			;
-		$value = { @$value } if $wanthash;
+		$value = { @$value }
+			if $wanthash
+			;
 		1
 	};
 	$error = $@;
 
-	return it ($title => as { throws_ok { die $error unless $lives_ok } $params{throws}})
-		if $params{throws};
+	return it ($title => as { throws_ok { die $error
+		unless $lives_ok } $params{throws}})
+		if $params{throws}
+		;
 
-	return it ("should not throw - $title" => as { lives_ok { die $error } })
-		unless $lives_ok;
+	return it (qq (should not throw - $title) => as { lives_ok { die $error } })
+		unless $lives_ok
+		;
 
 	return it ($title => as { pass })
-		unless exists $params{expect};
+		unless exists $params{expect}
+		;
 
 	return it ($title => as { cmp_deeply $value, $params{expect} });
 };
@@ -209,12 +219,14 @@ example expect_instance_of => as {
 	$params{object} //= shared->object;
 	$params{class} //= shared->class;
 
-	it ("is instance of $params{class}" => as {
-		return fail ("instance is not an object")
-			unless Scalar::Util::blessed ($params{object});
+	it (qq (is instance of $params{class}) => as {
+		return fail (q (instance is not an object))
+			unless Scalar::Util::blessed ($params{object})
+			;
 
-		return fail ("instance is not of $params{class}")
-			unless $params{object}->isa ($params{class});
+		return fail (qq (instance is not of $params{class}))
+			unless $params{object}->isa ($params{class})
+			;
 
 		return pass;
 	});
@@ -231,16 +243,20 @@ example it_should_build_instance => as {
 	$lives_ok = eval { $value = $params{class}->new (@{ $params{args} }); 1 };
 	$error = $@;
 
-	return it ($title => as { throws_ok { die $error unless $lives_ok } $params{throws}})
-		if $params{throws};
+	return it ($title => as { throws_ok { die $error
+		unless $lives_ok } $params{throws}})
+		if $params{throws}
+		;
 
-	return it ("should not throw - $title" => as { lives_ok { die $error } })
-		unless $lives_ok;
+	return it (qq (should not throw - $title) => as { lives_ok { die $error } })
+		unless $lives_ok
+		;
 
 	shared->object = $value;
 
 	return it ($title => as { expect_instance_of (class => $params{class}) })
-		unless exists $params{expect};
+		unless exists $params{expect}
+		;
 
 	return it ($title => as { cmp_deeply $value, $params{expect} });
 };
@@ -249,7 +265,7 @@ export use_sample_class => as {
 	my $name = pop;
 	my $base = shift // shared->class_under_test // shared->class;
 
-	shared->class = "Sample::${base}::__::$name";
+	shared->class = qq (Sample::${base}::__::$name);
 };
 
 export class_under_test => as {

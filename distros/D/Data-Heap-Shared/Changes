@@ -1,5 +1,14 @@
 Revision history for Data::Heap::Shared
 
+0.08      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.07      2026-07-22
           - Fix a use-after-free in pop_wait(): an overloaded or tied timeout
             argument runs Perl that can destroy the heap, after which the

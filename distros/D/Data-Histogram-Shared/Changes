@@ -1,5 +1,14 @@
 Revision history for Data-Histogram-Shared
 
+0.04      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Frozen read-only mode: freeze() seals a file-backed structure;
+            new_readonly() maps it O_RDONLY and queries it lock-free.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.03      2026-07-22
           - Fix use-after-free in merge() and record_many(): a tied argument,
             a tied array, or overloaded elements run Perl that can destroy

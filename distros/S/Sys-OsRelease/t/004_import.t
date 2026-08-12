@@ -5,6 +5,7 @@
 #      CREATED: 04/30/2022 06:17:49 PM
 #===============================================================================
 
+## no critic (Modules::RequireExplicitPackage)
 use strict;
 use warnings;
 use Sys::OsRelease;
@@ -33,4 +34,4 @@ Sys::OsRelease->import_singleton();
         isa_ok($result, "CODE", "pre-import: $method");
     }
 }
-
+1;

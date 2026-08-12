@@ -27,47 +27,46 @@ SYNOPSIS
 
 DESCRIPTION
     A Count-Min sketch in shared memory: a compact, fixed-size structure for
-    approximate frequency estimation over a stream. You add items
-    (optionally with a count), then ask for the estimated number of times
-    any item has been added. Memory is proportional to the configured error
-    parameters, not to the number of distinct items or the size of the
-    items; the sketch never stores the items themselves, only a small matrix
-    of counters.
+    approximate frequency estimation over a stream. You add items (optionally
+    with a count), then ask for the estimated number of times any item has
+    been added. Memory is proportional to the configured error parameters, not
+    to the number of distinct items or the size of the items; the sketch never
+    stores the items themselves, only a small matrix of counters.
 
     The estimate has a one-sided guarantee: it never underestimates the true
-    count, and overestimates by at most "epsilon * total" with probability
-    at least "1 - delta", where "total" is the sum of all increments. (An
-    item never added estimates as 0 unless hash collisions with other items
-    inflate every one of its cells.) This makes the sketch ideal for finding
-    heavy hitters and approximate counts in a stream that is too large to
-    count exactly. One caveat: "add" does not saturate, so a single key's
-    counter and the grand total wrap at 2^64 if a true count ever reaches
-    that ("merge" saturates instead); the never-underestimate guarantee
-    holds for all realistic counts.
+    count, and overestimates by at most "epsilon * total" with probability at
+    least "1 - delta", where "total" is the sum of all increments. (An item
+    never added estimates as 0 unless hash collisions with other items inflate
+    every one of its cells.) This makes the sketch ideal for finding heavy
+    hitters and approximate counts in a stream that is too large to count
+    exactly. One caveat: "add" does not saturate, so a single key's counter
+    and the grand total wrap at 2^64 if a true count ever reaches that
+    ("merge" saturates instead); the never-underestimate guarantee holds for
+    all realistic counts.
 
-    Each item is hashed once with XXH3 (128-bit); the two 64-bit halves
-    drive one column per row ("d"-row double hashing) into a "d" x "w"
-    matrix of 64-bit counters, with "w" a power of two. "add" increments the
-    "d" cells of the item (one per row); "estimate" returns the minimum of
-    those "d" cells -- since every collision only ever adds to a cell, the
-    smallest cell is the tightest upper bound, and is exact when at least
-    one of the item's cells suffered no collision. The matrix width "w" and
-    depth "d" are derived from the "epsilon" and "delta" you request.
+    Each item is hashed once with XXH3 (128-bit); the two 64-bit halves drive
+    one column per row ("d"-row double hashing) into a "d" x "w" matrix of
+    64-bit counters, with "w" a power of two. "add" increments the "d" cells
+    of the item (one per row); "estimate" returns the minimum of those "d"
+    cells -- since every collision only ever adds to a cell, the smallest cell
+    is the tightest upper bound, and is exact when at least one of the item's
+    cells suffered no collision. The matrix width "w" and depth "d" are
+    derived from the "epsilon" and "delta" you request.
 
-    Because the matrix lives in a shared mapping, several processes share
-    one sketch: any process that opens the same backing file, inherits the
+    Because the matrix lives in a shared mapping, several processes share one
+    sketch: any process that opens the same backing file, inherits the
     anonymous mapping across "fork", or reopens a passed memfd, sees the
-    others' additions and contributes its own. A write-preferring futex
-    rwlock with dead-process recovery guards mutation, so many processes may
-    "add" and "estimate" concurrently. Two sketches of identical geometry
-    can be combined with "merge" (cellwise add), which yields a sketch whose
-    counts are the sum of the two input streams -- the merged estimate of
-    any item equals the sum of its estimates in the two inputs.
+    others' additions and contributes its own. A write-preferring futex rwlock
+    with dead-process recovery guards mutation, so many processes may "add"
+    and "estimate" concurrently. Two sketches of identical geometry can be
+    combined with "merge" (cellwise add), which yields a sketch whose counts
+    are the sum of the two input streams -- the merged estimate of any item
+    equals the sum of its estimates in the two inputs.
 
-    Items are added and queried by their byte content; wide-character
-    strings (any codepoint above 255) cause a "Wide character" croak --
-    encode such strings to bytes first (for example with
-    "Encode::encode_utf8"). Linux-only. Requires 64-bit Perl.
+    Items are added and queried by their byte content; wide-character strings
+    (any codepoint above 255) cause a "Wide character" croak -- encode such
+    strings to bytes first (for example with "Encode::encode_utf8").
+    Linux-only. Requires 64-bit Perl.
 
 METHODS
   Constructors
@@ -76,36 +75,42 @@ METHODS
         my $cms = Data::CountMinSketch::Shared->new($path, 0.001, 0.001, 0660); # opt-in group share
         my $cms = Data::CountMinSketch::Shared->new_memfd($name, $epsilon, $delta);
         my $cms = Data::CountMinSketch::Shared->new_from_fd($fd);
+        my $ro  = Data::CountMinSketch::Shared->new_readonly($path);   # frozen file, read-only
 
     $path is the backing file ("undef" or omitted for an anonymous mapping).
     $epsilon is the target error factor and $delta the target failure
     probability; both are optional, default to 0.001, and must be strictly
-    between 0 and 1. "new" and "new_memfd" croak if $epsilon or $delta is
-    out of range.
+    between 0 and 1. "new" and "new_memfd" croak if $epsilon or $delta is out
+    of range.
 
     For a file-backed sketch, "new" accepts an optional fourth argument: the
-    octal permission mode used when it creates the backing file (default
-    0600, owner-only). Pass a wider mode such as 0660 to opt in to sharing
-    the sketch with another user, typically via a common group. The backing
-    file is always opened with "O_NOFOLLOW", so a pre-existing symlink at
-    $path is refused rather than followed. The mode is ignored when
-    attaching an already-existing file, for anonymous mappings, and for
-    "new_memfd"/"new_from_fd".
+    octal permission mode used when it creates the backing file (default 0600,
+    owner-only). Pass a wider mode such as 0660 to opt in to sharing the
+    sketch with another user, typically via a common group. The backing file
+    is always opened with "O_NOFOLLOW", so a pre-existing symlink at $path is
+    refused rather than followed. The mode is ignored when attaching an
+    already-initialized file, for anonymous mappings, and for
+    "new_memfd"/"new_from_fd"; a file left behind by an interrupted create is
+    re-initialized and does receive the requested mode (see "CRASH SAFETY").
 
-    From $epsilon and $delta the sketch derives its geometry: a width of "w
-    = next_power_of_two(ceil(e / epsilon))" columns (with a floor of 2
-    columns) and a depth of "d = ceil(ln(1 / delta))" rows (clamped to the
-    range 1..32). Rounding the width up to a power of two means the realised
-    error factor at any given total is typically at or below the configured
-    target. When reopening an existing file or memfd, the stored geometry
-    wins and the caller's $epsilon/$delta arguments are ignored. "new_memfd"
-    creates a Linux memfd (transferable via its "memfd" descriptor);
-    "new_from_fd" reopens one in another process.
+    From $epsilon and $delta the sketch derives its geometry: a width of "w =
+    next_power_of_two(ceil(e / epsilon))" columns (with a floor of 2 columns)
+    and a depth of "d = ceil(ln(1 / delta))" rows (clamped to the range
+    1..32). Rounding the width up to a power of two means the realised error
+    factor at any given total is typically at or below the configured target.
+    When reopening an existing file or memfd, the stored geometry wins and the
+    caller's $epsilon/$delta do not resize it -- but they are still
+    range-checked, so an out-of-range value croaks. "new_memfd" creates a
+    Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
+    reopens one in another process. The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle. "new_readonly" opens a frozen file read-only for
+    lock-free querying (see "FROZEN (READ-ONLY) MODE").
 
-    This is the standard Count-Min sketch (plain cell increments); it does
-    not use the conservative-update variant, which would make "merge"
-    unsound. The plain construction is what guarantees that merging two
-    sketches is exactly equivalent to having counted both streams into one.
+    This is the standard Count-Min sketch (plain cell increments); it does not
+    use the conservative-update variant, which would make "merge" unsound. The
+    plain construction is what guarantees that merging two sketches is exactly
+    equivalent to having counted both streams into one.
 
   Adding and estimating
         my $total = $cms->add($item);           # add 1; returns the new grand total
@@ -121,38 +126,41 @@ METHODS
     element once under a single write lock, returning the number of elements
     added (the array's length).
 
-    "estimate" returns the estimated number of times $item has been added:
-    the minimum of its "d" cells. This value never underestimates the true
-    count, and exceeds it by at most "epsilon * total" with probability at
-    least "1 - delta". An item that was never added estimates as 0 unless
-    every one of its cells happens to collide with other items.
+    "estimate" returns the estimated number of times $item has been added: the
+    minimum of its "d" cells. This value never underestimates the true count,
+    and exceeds it by at most "epsilon * total" with probability at least "1 -
+    delta". An item that was never added estimates as 0 unless every one of
+    its cells happens to collide with other items.
 
   Merging
         $cms->merge($other);
 
-    Folds $other's counter matrix into $cms by cellwise addition, so $cms
-    then estimates, for every item, the sum of that item's counts in the two
-    sketches; $cms's "total" likewise becomes the sum of the two totals.
-    Both sketches must have identical geometry -- the same width and depth,
-    which follows from constructing both with the same $epsilon and $delta
-    ("merge" croaks on a mismatch). $other is read under its own lock into a
-    private snapshot first, so merging is deadlock-free even if two
-    processes merge each other concurrently; $other is not modified. Cells
-    that would overflow a 64-bit counter saturate at the maximum value.
+    Folds $other's counter matrix into $cms by cellwise addition, so $cms then
+    estimates, for every item, the sum of that item's counts in the two
+    sketches; $cms's "total" likewise becomes the sum of the two totals. Both
+    sketches must have identical geometry -- the same width and depth, which
+    follows from constructing both with the same $epsilon and $delta ("merge"
+    croaks on a mismatch). $other is read under its own lock into a private
+    snapshot first, so merging is deadlock-free even if two processes merge
+    each other concurrently; $other is not modified. Cells that would overflow
+    a 64-bit counter saturate at the maximum value.
 
   Introspection and lifecycle
         $cms->total; $cms->width; $cms->depth; $cms->cells; $cms->stats;
         $cms->path; $cms->memfd; $cms->sync; $cms->unlink;   # or Class->unlink($path)
 
-    "total" is the running sum of all increments; "width" is the column
-    count "w" (a power of two); "depth" is the row count "d"; "cells" is
-    "width * depth", the number of counters. "sync" flushes the mapping to
-    its backing store (a no-op for anonymous and memfd sketches, which have
-    none); "unlink" removes the backing file (also callable as
-    "Class->unlink($path)"); "path" returns the backing path ("undef" for
-    anonymous, memfd, or fd-reopened sketches) and "memfd" the backing
-    descriptor -- the memfd of a "new_memfd" sketch or the dup'd fd of a
-    "new_from_fd" sketch, and -1 for file-backed or anonymous sketches.
+    "total" is the running sum of all increments; "width" is the column count
+    "w" (a power of two); "depth" is the row count "d"; "cells" is "width *
+    depth", the number of counters. "sync" flushes the mapping to its backing
+    store (a no-op for anonymous and memfd sketches, which have none);
+    "unlink" removes the backing file (also callable as
+    "Class->unlink($path)") and croaks if the removal fails -- except when the
+    file is already gone, which is what you asked for; it is likewise a no-op
+    when there is no backing file (anonymous or memfd); "path" returns the
+    backing path ("undef" for anonymous, memfd, or fd-reopened sketches) and
+    "memfd" the backing descriptor -- the memfd of a "new_memfd" sketch or the
+    dup'd fd of a "new_from_fd" sketch, and -1 for file-backed or anonymous
+    sketches.
 
 STATS
     stats() returns a hashref describing the sketch:
@@ -169,25 +177,37 @@ STATS
         overestimate is bounded by "epsilon * total" (with probability "1 -
         delta"); a smaller value is a tighter bound.
 
-    *   "delta" -- the achieved failure probability, exp(-depth). This is
-        the chance that the overestimate exceeds the "epsilon * total" bound
-        for a given item; a smaller value is a stronger guarantee.
+    *   "delta" -- the achieved failure probability, "exp(-min(depth,
+        width))". This is the chance that the overestimate exceeds the
+        "epsilon * total" bound for a given item; a smaller value is a
+        stronger guarantee. Row *r* and row *r+width* always probe the same
+        column, so rows past "width" repeat an earlier row and add no
+        independent estimate -- the effective depth is "min(depth, width)". A
+        very loose "epsilon" combined with a very tight "delta" therefore
+        cannot reach the requested "delta"; tighten "epsilon" (a smaller
+        epsilon raises "width") to get there.
 
     *   "ops" -- running count of mutating operations ("add", "add_many",
         "merge", "clear").
 
     *   "mmap_size" -- bytes of the shared mapping.
 
+    *   "frozen" -- 1 if the sketch has been sealed by "freeze" (immutable),
+        else 0.
+
+    *   "readonly" -- 1 if this handle is a read-only view (from
+        "new_readonly", or the handle that called "freeze"), else 0.
+
 SHARING ACROSS PROCESSES
     The sketch lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file (every process calls "new($path,
-    ...)" on the same path with matching epsilon and delta), an anonymous
-    mapping inherited across "fork", or a memfd whose descriptor is passed
-    to an unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
+    rest of the family: a backing file (every process calls "new($path, ...)"
+    on the same path with matching epsilon and delta), an anonymous mapping
+    inherited across "fork", or a memfd whose descriptor is passed to an
+    unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
     "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Because the
-    mapping is shared, every process adds into and estimates against the
-    same counter matrix, so the counts reflect the combined stream all of
-    them have added.
+    mapping is shared, every process adds into and estimates against the same
+    counter matrix, so the counts reflect the combined stream all of them have
+    added.
 
         # producer and consumer share one sketch with no coordination
         my $cms = Data::CountMinSketch::Shared->new(undef, 0.001, 0.001);   # before fork
@@ -195,47 +215,119 @@ SHARING ACROSS PROCESSES
         wait;
         print $cms->estimate("ev-500"), "\n";   # >= 10 -- the child's adds
 
+FROZEN (READ-ONLY) MODE
+    A file-backed sketch can be frozen and then shipped to other machines,
+    where consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $cms = Data::CountMinSketch::Shared->new("/tmp/freq.cms", 0.001, 0.001);
+        $cms->add_many(\@known);
+        $cms->freeze;                 # seal: now immutable, and $cms itself is read-only
+        # ... copy /tmp/freq.cms to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::CountMinSketch::Shared->new_readonly("/tmp/freq.cms");
+        $ro->estimate($item) for @queries;
+
+    "freeze" takes the write lock, marks the sketch permanently immutable
+    (there is no unfreeze -- rebuild the file to change it), and flushes the
+    seal to disk. A frozen sketch rejects every mutator ("add", "add_many",
+    "merge", "clear") with a croak, and a read-write reopen ("new($path,
+    ...)") of a sealed file is refused -- so a shipped artifact can never be
+    silently mutated out from under its readers. That protection is enforced
+    by the reader: the seal is a header flag that 0.03 and earlier do not know
+    about, and the on-disk format version is deliberately unchanged so those
+    releases can still open files written here. A pre-0.04 build therefore
+    opens a sealed file read-write and can modify it, so keep producers and
+    consumers on 0.04 or later if you rely on the seal. "freeze" itself is not
+    idempotent: the handle that seals the file becomes a read-only view of it,
+    so calling "freeze" on that handle again croaks.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed sketch's cells and geometry are immutable, "estimate", "total" and
+    "stats" read them directly, taking no reader lock -- the mapping is never
+    written, so a read-only view works from a read-only file descriptor or a
+    read-only filesystem, and any number of processes can share one
+    "PROT_READ" mapping. "frozen" and "readonly" report the two states.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
+
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership; if a holder dies, the next contender detects the
-    dead owner and recovers. Each cell increment is a single word store, so
-    a crash leaves the sketch consistent up to the last completed "add".
+    dead owner and recovers. Each cell increment is a single word store, so a
+    crash leaves the sketch consistent up to the last completed "add".
     Limitation: PID reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely. Those
+    preconditions cover the live-process route only. The count lives in the
+    mapping and "new" validates the geometry, not this transient value, so a
+    backing file damaged at rest -- bit rot, a partial copy, or a process that
+    scribbled on the mapping -- can present a non-zero slotless count and
+    block every writer the same way, with none of the above. If writers hang
+    on a file no live reader is using, recreate it.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete Count-Min sketch file left by an interrupted create; remove it
+    and retry". Such a file never held any data, so removing it is safe.
+
+    Disk space. The backing file is created sparse: "new" sizes it, but blocks
+    are allocated only as you write, so a large sketch costs almost nothing on
+    disk until it is used. The cost of that is a late failure, and how it
+    reaches you depends on the filesystem. Where blocks are allocated at fault
+    time -- tmpfs, so "/dev/shm" and many "/tmp" mounts -- a write to a page
+    that cannot be backed raises "SIGBUS" and kills the process, because an
+    "mmap" store has no way to report "ENOSPC". Where allocation is delayed to
+    writeback (ext4, xfs), the store lands in page cache and the failure
+    appears later: the write is lost, and "sync" is what reports it, croaking
+    with the underlying error. Keep the filesystem sized for the sketch you
+    asked for, and call "sync" when you need to know your writes reached disk.
 
 SEE ALSO
     Data::BloomFilter::Shared, Data::HyperLogLog::Shared,
-    Data::Intern::Shared, Data::SortedSet::Shared,
-    Data::SpatialHash::Shared, and the rest of the "Data::*::Shared" family.
+    Data::Intern::Shared, Data::SortedSet::Shared, Data::SpatialHash::Shared,
+    and the rest of the "Data::*::Shared" family.
 
 AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

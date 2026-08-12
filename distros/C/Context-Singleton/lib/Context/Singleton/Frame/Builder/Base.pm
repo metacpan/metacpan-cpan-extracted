@@ -4,43 +4,63 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::Builder::Base;
+$Context::Singleton::Frame::Builder::Base::VERSION = '1.0.7';
+use List::Util v1.450;
+use Moo;
 
-our $VERSION = v1.0.5;
+use namespace::clean;
 
-use List::MoreUtils;
+has q (_default)
+	=> is       => q (ro)
+	=> init_arg => q (default)
+	=> default  => sub { +{} }
+	;
 
-sub new {
-	my ($class, %params) = @_;
+has q (this)
+	=> is       => q (ro)
+	;
 
-	$params{default} //= {};
+has q (dep)
+	=> is       => q (ro)
+	;
 
-	my $self = bless \%params, $class;
+has q (as)
+	=> is       => q (ro)
+	=> predicate => q (has_as)
+	;
 
-	$self->{required} = [ List::MoreUtils::uniq $self->_build_required ];
+has q (call)
+	=> is       => q (ro)
+	=> predicate => q (has_call)
+	;
 
-	return $self;
-}
+has q (builder)
+	=> is       => q (ro)
+	=> predicate => q (has_builder)
+	;
+
+has q (_required)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> lazy     => 1
+	=> default  => sub { [ List::Util::uniq $_[0]->_build_required ] }
+	;
 
 sub _build_required {
 	my ($self) = @_;
 
-	return grep defined, $self->{this};
-}
-
-sub dep {
-	my ($self) = @_;
-	return $self->{dep};
+	return grep defined, $self->this;
 }
 
 sub required {
 	my ($self) = @_;
 
-	return @{ $self->{required} };
+	return @{ $self->_required };
 }
 
 sub unresolved {
 	my ($self, $resolved) = @_;
-	my $default = $self->{default};
+	my $default = $self->_default;
 	$resolved //= {};
 
 	return
@@ -53,31 +73,57 @@ sub unresolved {
 sub default {
 	my ($self) = @_;
 
-	return %{ $self->{default} };
+	return %{ $self->_default };
 }
 
 sub build {
 	my ($self, $resolved) = @_;
 
-	$resolved = { %{ $self->{default} }, %{ $resolved // {} } };
+	$resolved = { %{ $self->_default }, %{ $resolved // {} } };
 	my @args = $self->build_callback_args ($resolved);
 
-	return $self->{as}->(@args)
-		if $self->{as};
+	return $self->as->(@args)
+		if $self->has_as
+		;
 
 	my $this = shift @args;
 
-	return $this->can ($self->{call})->(@args)
-		if exists $self->{call};
+	return $this->can ($self->call)->(@args)
+		if $self->has_call
+		;
 
-	return $this->${\ $self->{builder} } (@args);
+	return $this->${\ $self->builder } (@args);
 }
 
 sub build_callback_args {
 	my ($self, $resolved) = @_;
 
-	return map $resolved->{$_}, grep $_, $self->{this};
+	return map $resolved->{$_}, grep $_, $self->this;
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Context::Singleton::Frame::Builder::Base - Base class for argument builders
+
+=head1 DESCRIPTION
+
+This is internal package.
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney.cpan@gmail.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+This module is part of L<Context::Singleton> distribution.
+
+=cut
 

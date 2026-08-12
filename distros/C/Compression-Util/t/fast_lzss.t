@@ -4,7 +4,7 @@ use 5.036;
 use Test::More;
 use Compression::Util qw(:all);
 
-plan tests => 2;
+plan tests => 4;
 
 foreach my $file (__FILE__) {
 
@@ -19,4 +19,10 @@ foreach my $file (__FILE__) {
 
     ok(length($enc) < length($str));
     is($str, $dec);
+
+    my $enc2 = lzss_compress($str, \&create_huffman_entry, \&lzss_encode_hash4);
+    my $dec2 = lzss_decompress($enc2);
+
+    ok(length($enc2) < length($str));
+    is($str, $dec2);
 }

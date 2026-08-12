@@ -21,7 +21,7 @@ SYNOPSIS
         $cf->add("x"); $cf->add("x");
         $cf->count_of("x");                 # 2
 
-        # add returns 0 when the table is full (a true no-op)
+        # add returns 0 when the table is full (the table is left unchanged)
         my $ok = $cf->add("item");          # 1 if stored, 0 if full
 
         # bulk add in a single lock acquisition
@@ -30,59 +30,64 @@ SYNOPSIS
         # share across processes via a backing file
         my $shared = Data::CuckooFilter::Shared->new("/tmp/seen.cuckoo", 1_000_000);
 
+        # freeze and ship: query it read-only (lock-free) on other machines
+        $shared->freeze;
+        my $ro = Data::CuckooFilter::Shared->new_readonly("/tmp/seen.cuckoo");
+        $ro->contains("alice");
+
 DESCRIPTION
     A Cuckoo filter in shared memory: a compact, fixed-size structure for
     approximate set membership that, unlike a Bloom filter, supports delete.
     You add items, ask whether an item is present, and remove items you
-    previously added. The membership answer is either "definitely not
-    present" or "probably present": for items you have added (and not
-    removed) "contains" always returns true -- there are no false negatives
-    -- but there is a tiny rate of false positives (it may occasionally
-    report an item as present that was never added). It never stores the
-    items themselves, only a small fingerprint of each, so memory is
-    proportional to the configured capacity, not to the size of the items.
+    previously added. The membership answer is either "definitely not present"
+    or "probably present": for items you have added (and not removed)
+    "contains" always returns true -- there are no false negatives -- but
+    there is a tiny rate of false positives (it may occasionally report an
+    item as present that was never added). It never stores the items
+    themselves, only a small fingerprint of each, so memory is proportional to
+    the configured capacity, not to the size of the items.
 
     Each item is hashed once with XXH3 (128-bit). The high half yields a
     16-bit fingerprint; the low half yields one candidate bucket, and
     partial-key cuckoo hashing derives a second candidate bucket from the
-    first and the fingerprint. Each bucket holds four fingerprint slots.
-    "add" stores the fingerprint in either candidate bucket, evicting and
-    rehoming existing fingerprints (the "cuckoo" kick) when both are full.
-    The false-positive rate is governed by the fingerprint width and bucket
-    size and is approximately "2 * slots_per_bucket / 2**16" -- about 0.012%
-    with the fixed 16-bit fingerprint and 4-slot buckets.
+    first and the fingerprint. Each bucket holds four fingerprint slots. "add"
+    stores the fingerprint in either candidate bucket, evicting and rehoming
+    existing fingerprints (the "cuckoo" kick) when both are full. The
+    false-positive rate is governed by the fingerprint width and bucket size
+    and is approximately "2 * slots_per_bucket / 2**16" -- about 0.012% with
+    the fixed 16-bit fingerprint and 4-slot buckets.
 
     The filter has a bounded capacity. When both candidate buckets are full
     and a bounded sequence of cuckoo evictions cannot rehome a fingerprint,
-    "add" returns false and leaves the filter byte-for-byte unchanged -- a
-    failed insert is a true no-op, so it never drops a previously stored
-    fingerprint and never creates a false negative, even at the full
-    boundary. A real-world filter accepts roughly its configured capacity
-    (typically 95% or more) before reporting full.
+    "add" returns false and rolls every eviction back, leaving the fingerprint
+    table byte-for-byte unchanged -- a failed insert never drops a previously
+    stored fingerprint, so it cannot create a false negative even at the full
+    boundary. (The operation counter and the eviction RNG state still advance,
+    so the backing file as a whole is not bit-identical.) A real-world filter
+    accepts roughly its configured capacity (typically 95% or more) before
+    reporting full.
 
     Because the table lives in a shared mapping, several processes share one
     filter: any process that opens the same backing file, inherits the
     anonymous mapping across "fork", or reopens a passed memfd, sees the
-    others' additions and removals and contributes its own. A
-    write-preferring futex rwlock with dead-process recovery guards
-    mutation, so many processes may "add", "remove", and "contains"
-    concurrently.
+    others' additions and removals and contributes its own. A write-preferring
+    futex rwlock with dead-process recovery guards mutation, so many processes
+    may "add", "remove", and "contains" concurrently.
 
     Removal caveat. "remove" deletes one fingerprint matching the item.
-    Because the filter stores only a 16-bit fingerprint, removing an item
-    that was never added -- or one whose fingerprint happens to collide with
-    a different present item -- may delete the wrong fingerprint and corrupt
-    the filter (causing a false negative for some other item). Only remove
-    items you actually added. There is no de-duplication: re-adding an item
-    stores a second copy of its fingerprint (and "count" rises by one each
-    time), so to fully forget an item you must "remove" it as many times as
-    you added it. Cuckoo filters do not union cleanly, so there is no merge
-    operation.
+    Because the filter stores only a 16-bit fingerprint, removing an item that
+    was never added -- or one whose fingerprint happens to collide with a
+    different present item -- may delete the wrong fingerprint and corrupt the
+    filter (causing a false negative for some other item). Only remove items
+    you actually added. There is no de-duplication: re-adding an item stores a
+    second copy of its fingerprint (and "count" rises by one each time), so to
+    fully forget an item you must "remove" it as many times as you added it.
+    Cuckoo filters do not union cleanly, so there is no merge operation.
 
-    Items are added, tested, and removed by their byte content;
-    wide-character strings (any codepoint above 255) cause a "Wide
-    character" croak -- encode such strings to bytes first (for example with
-    "Encode::encode_utf8"). Linux-only. Requires 64-bit Perl.
+    Items are added, tested, and removed by their byte content; wide-character
+    strings (any codepoint above 255) cause a "Wide character" croak -- encode
+    such strings to bytes first (for example with "Encode::encode_utf8").
+    Linux-only. Requires 64-bit Perl.
 
 METHODS
   Constructors
@@ -90,21 +95,25 @@ METHODS
         my $cf = Data::CuckooFilter::Shared->new(undef, 1_000_000);   # anonymous
         my $cf = Data::CuckooFilter::Shared->new_memfd($name, $capacity);
         my $cf = Data::CuckooFilter::Shared->new_from_fd($fd);
+        my $ro = Data::CuckooFilter::Shared->new_readonly($path);   # frozen file, read-only
 
     $path is the backing file ("undef" or omitted for an anonymous mapping).
-    $capacity is the number of items you expect to add; it must be at least
-    1. "new" and "new_memfd" croak if $capacity is less than 1.
+    $capacity is the number of items you expect to add; it must be at least 1.
+    "new" and "new_memfd" croak if $capacity is less than 1.
 
     From $capacity the filter derives its geometry: a bucket array of
     "num_buckets = next_power_of_two(ceil(capacity / 4 / 0.95))" buckets
-    (floor 2), each with four 16-bit fingerprint slots, for "4 *
-    num_buckets" slots total. The 0.95 target load factor and the rounding
-    up to a power of two mean the realised capacity at the full boundary is
-    typically at or above the requested $capacity. When reopening an
-    existing file or memfd, the stored geometry wins and the caller's
-    $capacity argument is ignored. "new_memfd" creates a Linux memfd
-    (transferable via its "memfd" descriptor); "new_from_fd" reopens one in
-    another process.
+    (floor 2), each with four 16-bit fingerprint slots, for "4 * num_buckets"
+    slots total. The 0.95 target load factor and the rounding up to a power of
+    two mean the realised capacity at the full boundary is typically at or
+    above the requested $capacity. When reopening an existing file or memfd,
+    the stored geometry wins and the caller's $capacity does not resize it --
+    but they are still range-checked, so an out-of-range value croaks.
+    "new_memfd" creates a Linux memfd (transferable via its "memfd"
+    descriptor); "new_from_fd" reopens one in another process. The descriptor
+    you pass is duplicated ("F_DUPFD_CLOEXEC"), so it stays yours to close and
+    closing it does not disturb the handle. "new_readonly" opens a frozen file
+    read-only for lock-free querying (see "FROZEN (READ-ONLY) MODE").
 
   Adding, testing, removing
         my $ok    = $cf->add($item);            # 1 if stored, 0 if the table is full
@@ -117,21 +126,21 @@ METHODS
     "add" hashes $item (taken by its bytes; wide characters croak, encode
     first) and stores its fingerprint in one of its two candidate buckets,
     returning 1 on success. It returns 0 only when the table is full -- both
-    candidate buckets are occupied and a bounded run of cuckoo evictions
-    could not make room. A return of 0 is a true no-op: the filter is
-    unchanged, so nothing you previously added is lost (no false negatives
-    for added items, even when full). "add" does not de-duplicate: adding
-    the same item twice stores its fingerprint twice and increments "count"
-    by two. "add_many" takes an array reference and does the whole batch
-    under a single write lock, returning how many elements were stored (the
-    count of "add" calls that returned 1).
+    candidate buckets are occupied and a bounded run of cuckoo evictions could
+    not make room. A return of 0 leaves the fingerprint table unchanged, so
+    nothing you previously added is lost (no false negatives for added items,
+    even when full). "add" does not de-duplicate: adding the same item twice
+    stores its fingerprint twice and increments "count" by two. "add_many"
+    takes an array reference and does the whole batch under a single write
+    lock, returning how many elements were stored (the count of "add" calls
+    that returned 1).
 
     "contains" returns 1 if the item is probably present and 0 if it is
-    definitely absent. A 0 means definitely absent: an item you added and
-    have not removed will never return 0 (there are no false negatives). A 1
-    may be a false positive (a different item happens to share a fingerprint
-    and bucket). There are never false negatives for items that are
-    currently stored.
+    definitely absent. A 0 means definitely absent: an item you added and have
+    not removed will never return 0 (there are no false negatives). A 1 may be
+    a false positive (a different item happens to share a fingerprint and
+    bucket). There are never false negatives for items that are currently
+    stored.
 
     "count_of" returns how many copies of $item are stored -- the number of
     times it was added minus the number of times it was removed -- as an
@@ -139,11 +148,11 @@ METHODS
     candidate buckets (four slots each), the count saturates at 8 ("2 *
     slots_per_bucket"): once an item fills those slots a further "add" of it
     returns 0 (full). Like "contains" it is probabilistic -- 0 means
-    definitely absent, while a positive count is an estimate that a
-    colliding fingerprint can inflate (the same caveat as "remove": trust it
-    only for items you added). It takes a read lock and is safe to call
-    concurrently. This makes the filter usable as a small counting set
-    (counts below 8) without the extra memory of a counting Bloom filter.
+    definitely absent, while a positive count is an estimate that a colliding
+    fingerprint can inflate (the same caveat as "remove": trust it only for
+    items you added). It takes a read lock and is safe to call concurrently.
+    This makes the filter usable as a small counting set (counts below 8)
+    without the extra memory of a counting Bloom filter.
 
     "remove" deletes one stored fingerprint of $item, returning 1 if one was
     found and cleared or 0 if none matched. See the Removal caveat in
@@ -155,21 +164,23 @@ METHODS
         $cf->count; $cf->capacity; $cf->buckets; $cf->slots; $cf->stats;
         $cf->path; $cf->memfd; $cf->sync; $cf->unlink;   # or Class->unlink($path)
 
-    "count" is the number of fingerprints currently stored (maintained
-    exactly on every "add", "remove", and "clear"); since "add" stores
-    duplicates, this is the number of live fingerprints, not the number of
-    distinct items. "capacity" is the configured item capacity; "buckets" is
-    the bucket count (a power of two); "slots" is the total fingerprint-slot
-    count ("4 * buckets"). "sync" flushes the mapping to its backing store
-    (a no-op for anonymous and memfd filters); "unlink" removes the backing
-    file (also callable as "Class->unlink($path)"); "path" returns the
-    backing path ("undef" for anonymous, memfd, or fd-reopened filters) and
-    "memfd" the backing descriptor -- the memfd of a "new_memfd" filter or
-    the dup'd fd of a "new_from_fd" filter, and -1 for file-backed or
-    anonymous filters.
+    "count" is the number of fingerprints currently stored (maintained exactly
+    on every "add", "remove", and "clear"); since "add" stores duplicates,
+    this is the number of live fingerprints, not the number of distinct items.
+    "capacity" is the configured item capacity; "buckets" is the bucket count
+    (a power of two); "slots" is the total fingerprint-slot count ("4 *
+    buckets"). "sync" flushes the mapping to its backing store (a no-op for
+    anonymous and memfd filters); "unlink" removes the backing file (also
+    callable as "Class->unlink($path)") and croaks if the removal fails --
+    except when the file is already gone, which is what you asked for; it is
+    likewise a no-op when there is no backing file (anonymous or memfd);
+    "path" returns the backing path ("undef" for anonymous, memfd, or
+    fd-reopened filters) and "memfd" the backing descriptor -- the memfd of a
+    "new_memfd" filter or the dup'd fd of a "new_from_fd" filter, and -1 for
+    file-backed or anonymous filters.
 
-    There is deliberately no merge method: cuckoo filters cannot be unioned
-    by a simple element-wise operation the way Bloom filters can.
+    There is deliberately no merge method: cuckoo filters cannot be unioned by
+    a simple element-wise operation the way Bloom filters can.
 
 STATS
     stats() returns a hashref describing the filter:
@@ -182,26 +193,31 @@ STATS
 
     *   "count" -- the number of fingerprints currently stored.
 
-    *   "fill_ratio" -- "count / slots", between 0 and 1. As this approaches
-        1 the table is near full and "add" begins to fail; in practice
-        inserts start to fail somewhat below a full table.
+    *   "fill_ratio" -- "count / slots", between 0 and 1. As this approaches 1
+        the table is near full and "add" begins to fail; in practice inserts
+        start to fail somewhat below a full table.
 
     *   "ops" -- running count of write-path calls ("add", "add_many",
-        "remove", "clear"), whether or not any fingerprint was actually
-        stored or removed.
+        "remove", "clear"), whether or not any fingerprint was actually stored
+        or removed.
 
     *   "mmap_size" -- bytes of the shared mapping.
 
+    *   "frozen" -- 1 if the filter has been sealed by "freeze" (immutable),
+        else 0.
+
+    *   "readonly" -- 1 if this handle is a read-only view (from
+        "new_readonly", or the handle that called "freeze"), else 0.
+
 SHARING ACROSS PROCESSES
     The filter lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file (every process calls "new($path,
-    ...)" on the same path with a matching capacity), an anonymous mapping
-    inherited across "fork", or a memfd whose descriptor is passed to an
-    unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
-    "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Because the
-    mapping is shared, every process adds into, tests against, and removes
-    from the same table, so membership reflects the combined effect of what
-    all of them have done.
+    rest of the family: a backing file (every process calls "new($path, ...)"
+    on the same path with a matching capacity), an anonymous mapping inherited
+    across "fork", or a memfd whose descriptor is passed to an unrelated
+    process (over a UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n")
+    and reopened with new_from_fd($fd). Because the mapping is shared, every
+    process adds into, tests against, and removes from the same table, so
+    membership reflects the combined effect of what all of them have done.
 
         # producer and consumer share one filter with no coordination
         my $cf = Data::CuckooFilter::Shared->new(undef, 100_000);   # before fork
@@ -209,18 +225,64 @@ SHARING ACROSS PROCESSES
         wait;
         print $cf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
 
+FROZEN (READ-ONLY) MODE
+    A file-backed filter can be frozen and then shipped to other machines,
+    where consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $cf = Data::CuckooFilter::Shared->new("/tmp/seen.cuckoo", 1_000_000);
+        $cf->add_many(\@known);
+        $cf->freeze;                 # seal: now immutable, and $cf itself is read-only
+        # ... copy /tmp/seen.cuckoo to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::CuckooFilter::Shared->new_readonly("/tmp/seen.cuckoo");
+        $ro->contains($item) for @queries;
+        $ro->count_of($item);
+
+    "freeze" takes the write lock, marks the filter permanently immutable
+    (there is no unfreeze -- rebuild the file to change it), and flushes the
+    seal to disk. A frozen filter rejects every mutator ("add", "add_many",
+    "remove", "clear") with a croak, and a read-write reopen ("new($path,
+    ...)") of a sealed file is refused -- so a shipped artifact can never be
+    silently mutated out from under its readers. That protection is enforced
+    by the reader: the seal is a header flag that 0.03 and earlier do not know
+    about, and the on-disk format version is deliberately unchanged so those
+    releases can still open files written here. A pre-0.04 build therefore
+    opens a sealed file read-write and can modify it, so keep producers and
+    consumers on 0.04 or later if you rely on the seal. "freeze" itself is not
+    idempotent: the handle that seals the file becomes a read-only view of it,
+    so calling "freeze" on that handle again croaks.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed filter's bucket table and geometry are immutable, "contains",
+    "count_of", "count", and "stats" read them directly, taking no reader lock
+    -- the mapping is never written, so a read-only view works from a
+    read-only file descriptor or a read-only filesystem, and any number of
+    processes can share one "PROT_READ" mapping. "frozen" and "readonly"
+    report the two states.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
+
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created,
-    with one exception: a pre-existing empty file owned by you is
-    initialized as new and set to that mode. Any other existing file keeps
-    its own permissions. The file is opened with "O_NOFOLLOW", so a symlink
-    planted at the path is refused, and created with "O_EXCL"; the on-disk
-    header is validated when the file is attached. Any process you grant
-    write access to a shared mapping is trusted not to corrupt its contents
-    while other processes are using it.
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. Any other
+    existing file keeps its own permissions. The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is attached.
+    Any process you grant write access to a shared mapping is trusted not to
+    corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
@@ -229,37 +291,66 @@ CRASH SAFETY
     store (or, on the eviction path, an all-or-nothing sequence that rolls
     back on failure), so a crash leaves the filter consistent up to the last
     completed operation. Crash caveat: dead-writer recovery repairs only the
-    lock word, not the table. A writer killed in the middle of an eviction
-    run never gets to roll it back and strands the fingerprint it was
-    carrying, so a previously added item can afterward read as absent -- the
-    "no false negatives" guarantee holds only when no writer has died
-    mid-operation. Recreate the filter if that matters. Limitation: PID
-    reuse is not detected (very unlikely in practice).
+    lock word, not the table. A writer killed in the middle of an eviction run
+    never gets to roll it back and strands the fingerprint it was carrying, so
+    a previously added item can afterward read as absent -- the "no false
+    negatives" guarantee holds only when no writer has died mid-operation.
+    Recreate the filter if that matters. Limitation: PID reuse is not detected
+    (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely. Those
+    preconditions cover the live-process route only. The count lives in the
+    mapping and "new" validates the geometry, not this transient value, so a
+    backing file damaged at rest -- bit rot, a partial copy, or a process that
+    scribbled on the mapping -- can present a non-zero slotless count and
+    block every writer the same way, with none of the above. If writers hang
+    on a file no live reader is using, recreate it.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete Cuckoo filter file left by an interrupted create; remove it
+    and retry". A file left behind by an interrupted create never held data,
+    so removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
+
+    Disk space. The backing file is created sparse: "new" sizes it, but blocks
+    are allocated only as you write, so a large filter costs almost nothing on
+    disk until it is used. The cost of that is a late failure, and how it
+    reaches you depends on the filesystem. Where blocks are allocated at fault
+    time -- tmpfs, so "/dev/shm" and many "/tmp" mounts -- a write to a page
+    that cannot be backed raises "SIGBUS" and kills the process, because an
+    "mmap" store has no way to report "ENOSPC". Where allocation is delayed to
+    writeback (ext4, xfs), the store lands in page cache and the failure
+    appears later: the write is lost, and "sync" is what reports it, croaking
+    with the underlying error. Keep the filesystem sized for the filter you
+    asked for, and call "sync" when you need to know your writes reached disk.
 
 SEE ALSO
     Data::BloomFilter::Shared (membership without delete),
-    Data::HyperLogLog::Shared, Data::Intern::Shared,
-    Data::SortedSet::Shared, Data::SpatialHash::Shared, and the rest of the
-    "Data::*::Shared" family.
+    Data::HyperLogLog::Shared, Data::Intern::Shared, Data::SortedSet::Shared,
+    Data::SpatialHash::Shared, and the rest of the "Data::*::Shared" family.
 
 AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

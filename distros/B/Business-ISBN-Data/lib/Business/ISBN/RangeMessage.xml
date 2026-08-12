@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>eaf68fd9-3d73-4f99-a65e-ff6db7b6cc5c</MessageSerialNumber>
-  <MessageDate>Fri, 7 Aug 2026 06:19:46 BST</MessageDate>
+  <MessageSerialNumber>89f6ae1c-c713-4369-b302-4931f3d13fa4</MessageSerialNumber>
+  <MessageDate>Tue, 11 Aug 2026 05:51:54 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -7095,7 +7095,15 @@
       <Agency>Lesotho</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-5999999</Range>
+          <Range>0000000-4699999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>4700000-4799999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>4800000-5999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>

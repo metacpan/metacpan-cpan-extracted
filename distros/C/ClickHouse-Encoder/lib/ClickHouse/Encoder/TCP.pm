@@ -2,7 +2,7 @@ package ClickHouse::Encoder::TCP;  ## no critic (Capitalization)
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Encoders/decoders for a useful subset of ClickHouse's native TCP
 # protocol packets. Built for insert pipelines: pack a Hello + Query,
@@ -24,6 +24,7 @@ our $VERSION = '0.01';
 # XS loader handled by the parent module; ensure it's loaded so the
 # XSUBs under PACKAGE = ClickHouse::Encoder::TCP are available.
 use ClickHouse::Encoder ();
+use Errno ();
 
 ## no critic (ProhibitConstantPragma)
 # Readability beats Readonly here - these are protocol-defined
@@ -343,7 +344,39 @@ sub read_packet {
     # over-read bytes are lost - unsafe to call in a loop.
     my $bufref = $opts{buffer};
     my $buf = $bufref ? $$bufref : '';
+    # Optional read deadline; without one a desynchronised handshake wedges
+    # the caller forever (see CAVEATS). Undef keeps the old behaviour.
+    my $timeout = $opts{timeout};
     my $read_some = sub {
+        my $fd = defined $timeout ? fileno($fh) : undef;
+        if (defined $timeout && defined $fd && $fd >= 0) {
+            require Time::HiRes;
+            my $deadline = Time::HiRes::time() + $timeout;
+            while (1) {
+                my $left = $deadline - Time::HiRes::time();
+                my $expired = "read_packet: timed out after ${timeout}s "
+                            . "waiting for the server (protocol desync, or "
+                            . "a server expecting a newer client "
+                            . "revision)\n";
+                die $expired if $left <= 0;
+                my $vec = '';
+                vec($vec, $fd, 1) = 1;
+                # select() rewrites its bit-vector argument, so hand it a
+                # copy. (Kept as a plain statement rather than an inline
+                # `my` inside the call, which CPANTS' quick prereq scanner
+                # cannot parse - it then reports the file as using nothing
+                # at all, including strict.)
+                my $ready = $vec;
+                my $n = select($ready, undef, undef, $left);
+                last if $n > 0;                 # readable
+                die $expired if $n == 0;        # deadline reached
+                # select returns -1 on EINTR, which is TRUE in Perl, so a
+                # bare `or die` would read a signal as readiness and fall
+                # into a blocking sysread. Retry against the deadline.
+                next if $! == Errno::EINTR();
+                die "read_packet: select failed: $!\n";
+            }
+        }
         my $got = sysread $fh, my $chunk, 4096;
         die "read_packet: read error: $!\n" if !defined $got;
         die "read_packet: connection closed mid-packet\n" if $got == 0;
@@ -598,6 +631,7 @@ C<<< ClickHouse::Encoder->decode_block >>> to extract rows.
     my $rbuf = '';
     my $pkt = ClickHouse::Encoder::TCP->read_packet($fh, buffer => \$rbuf);
     my $pkt = ClickHouse::Encoder::TCP->read_packet($fh, compressed => 1);
+    my $pkt = ClickHouse::Encoder::TCP->read_packet($fh, timeout => 30);
 
 Blocking read from a filehandle. C<sysread>s in chunks until it has
 one whole packet, parses it, and returns the hashref. For Data-shaped
@@ -613,6 +647,10 @@ for the next call. B<This is required to read more than one packet>
 - without a caller buffer, over-read bytes are dropped and a second
 C<read_packet> call may block or misparse. The compression and
 buffer options are independent and may be combined.
+
+C<<< timeout =E<gt> $seconds >>> bounds how long a single read may wait;
+on expiry C<read_packet> croaks instead of blocking forever, which is
+what a handshake against a too-new server does (see L</CAVEATS>).
 
 When the caller has negotiated compression (via C<pack_query(...
 compression =E<gt> COMPRESSION_ENABLE)>), pass C<compressed =E<gt>
@@ -677,11 +715,12 @@ reference them as C<ClickHouse::Encoder::TCP::SERVER_DATA> etc.
 =over 4
 
 =item * B<Modern server cutoff.> The default revision (54429) predates
-the chunking-negotiation extension introduced in ClickHouse 24.10
-(protocol revision E<gt>= 54475). Newer servers send a chunking offer
-right after C<SERVER_HELLO> that this subset does not respond to;
-the connection then fails with a fast protocol-mismatch error.
-For integration with recent servers, prefer HTTP transport.
+the client addendum (54458) and the chunked-packet negotiation (54470)
+that current servers expect after C<SERVER_HELLO>. B<The failure mode is
+a hang, not an error>: C<Hello> succeeds, then each side waits for the
+other and L</read_packet> blocks in C<sysread>. Verified against
+ClickHouse 26.7 (revision 54488). Pass C<<< timeout => $seconds >>> to
+turn that into a clean error, and prefer HTTP for recent servers.
 
 =item * B<String encoding.> Inputs to C<pack_string> (any string
 field: query, names, settings) are encoded as UTF-8 bytes; passing a

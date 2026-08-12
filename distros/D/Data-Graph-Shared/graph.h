@@ -70,7 +70,8 @@ typedef struct {
     uint32_t mutex;            /* 72 */
     uint32_t mutex_waiters;    /* 76 */
     uint64_t stat_ops;         /* 80 */
-    uint8_t  _pad1[40];        /* 88-127 */
+    uint8_t  sealed;           /* 88  0 = mutable, 1 = frozen (read-only; lock-free reads) */
+    uint8_t  _pad1[39];        /* 89-127 */
 } GraphHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -92,6 +93,7 @@ typedef struct {
     char        *path;
     int          notify_fd;
     int          backing_fd;
+    int          readonly;     /* 1 = frozen O_RDONLY/PROT_READ view: lock-free reads, mutation croaks */
 } GraphHandle;
 
 /* ================================================================
@@ -305,7 +307,10 @@ static inline int graph_has_node(GraphHandle *h, uint32_t node) {
     return graph_bit_set(h->node_bitmap, node);
 }
 
-/* Caller must hold graph_mutex and have verified node is live via bitmap. */
+/* Caller must hold graph_mutex and have verified node is live via bitmap --
+ * UNLESS the handle is frozen (readonly): once sealed, no process can mutate
+ * the adjacency lists again, so a lock-free walk of a frozen graph is
+ * race-free by construction and the mutex is skipped by every caller. */
 static inline uint32_t graph_degree(GraphHandle *h, uint32_t node) {
     if (node >= h->max_nodes) return 0;
     uint32_t count = 0;
@@ -346,7 +351,6 @@ static inline void graph_init_header(void *base, uint32_t max_nodes, uint32_t ma
 
     GraphHeader *hdr = (GraphHeader *)base;
     memset(base, 0, (size_t)total);
-    hdr->magic           = GRAPH_MAGIC;
     hdr->version         = GRAPH_VERSION;
     hdr->max_nodes       = max_nodes;
     hdr->max_edges       = max_edges;
@@ -358,6 +362,11 @@ static inline void graph_init_header(void *base, uint32_t max_nodes, uint32_t ma
     hdr->edge_bitmap_off = edge_bitmap_off;
     uint32_t *heads = (uint32_t *)((uint8_t *)base + node_heads_off);
     for (uint32_t i = 0; i < max_nodes; i++) heads[i] = GRAPH_NONE;
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, GRAPH_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -450,6 +459,16 @@ static int graph_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int graph_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t max_edges,
                                   mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
@@ -498,7 +517,32 @@ static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t 
         if (base == MAP_FAILED) { GRAPH_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!graph_validate_header((GraphHeader *)base, (uint64_t)st.st_size)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((GraphHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && graph_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        GRAPH_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    graph_init_header(base, max_nodes, max_edges, total);
+                    flock(fd, LOCK_UN); close(fd);
+                    return graph_setup(base, map_size, path, -1);
+                }
+                if (((GraphHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    GRAPH_ERR("%s: incomplete graph file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 GRAPH_ERR("invalid graph file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            if (((GraphHeader *)base)->sealed) {
+                GRAPH_ERR("%s is frozen (read-only); open it with new_readonly", path);
+                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
             return graph_setup(base, map_size, path, -1);
@@ -542,6 +586,10 @@ static GraphHandle *graph_open_fd(int fd, char *errbuf) {
     if (!graph_validate_header((GraphHeader *)base, (uint64_t)st.st_size)) {
         GRAPH_ERR("invalid graph"); munmap(base, ms); return NULL;
     }
+    if (((GraphHeader *)base)->sealed) {
+        GRAPH_ERR("this graph is frozen (read-only); open it with new_readonly");
+        munmap(base, ms); return NULL;
+    }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { GRAPH_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
     return graph_setup(base, ms, NULL, myfd);
@@ -559,6 +607,47 @@ static void graph_destroy(GraphHandle *h) {
 static inline int graph_msync(GraphHandle *h) {
     if (!h || !h->hdr) return 0;
     return msync(h->hdr, h->mmap_size, MS_SYNC);
+}
+
+/* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock ever.
+ * A sealed file is immutable and no read path writes the mapping, so queries
+ * take no reader-slot / rwlock traffic and any number of processes can share
+ * one PROT_READ mapping (same architecture; the magic rejects a wrong-endian
+ * file). */
+static GraphHandle *graph_open_readonly(const char *path, char *errbuf) {
+    if (errbuf) errbuf[0] = '\0';
+    int fd = open(path, O_RDONLY|O_NOFOLLOW|O_CLOEXEC);
+    if (fd < 0) { GRAPH_ERR("open %s: %s", path, strerror(errno)); return NULL; }
+    struct stat st;
+    if (fstat(fd, &st) < 0) { GRAPH_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
+    if ((uint64_t)st.st_size < sizeof(GraphHeader)) { GRAPH_ERR("%s: file too small", path); close(fd); return NULL; }
+    size_t ms = (size_t)st.st_size;
+    void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
+    if (base == MAP_FAILED) { GRAPH_ERR("mmap %s: %s", path, strerror(errno)); return NULL; }
+    if (!graph_validate_header((GraphHeader *)base, (uint64_t)st.st_size)) {
+        GRAPH_ERR("%s: invalid graph file", path); munmap(base, ms); return NULL;
+    }
+    if (!((GraphHeader *)base)->sealed) {
+        GRAPH_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
+        munmap(base, ms); return NULL;
+    }
+    GraphHandle *h = graph_setup(base, ms, path, -1);   /* munmaps on OOM/geometry mismatch */
+    if (!h) { GRAPH_ERR("out of memory or corrupt geometry"); return NULL; }
+    h->readonly = 1;
+    return h;
+}
+
+/* Seal a graph: make it permanently immutable so it can be shipped and opened
+ * read-only. Takes the mutex so no mutation is in flight, publishes the seal,
+ * then flushes it (file/memfd-backed). Afterwards every mutator croaks and a
+ * read-write reopen is refused. */
+static int graph_freeze(GraphHandle *h) {
+    graph_mutex_lock(h->hdr);
+    h->hdr->sealed = 1;
+    graph_mutex_unlock(h->hdr);
+    if (h->path || h->backing_fd >= 0) return graph_msync(h);  /* durability for file/memfd-backed */
+    return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
 }
 
 static int graph_create_eventfd(GraphHandle *h) {

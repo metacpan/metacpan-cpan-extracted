@@ -1,3 +1,6 @@
+0.183		2026-08-11	T. R. Wyant
+    Attempt to retrieve 'canned favorite' catalog is now an exception.
+
 0.182		2026-06-10	T. R. Wyant
     Add Celestrak primary catalog 'sar', Synthetic Aperture Radar.
 

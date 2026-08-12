@@ -1,7 +1,7 @@
 package Data::Buffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Data::Buffer::Shared', $VERSION);
@@ -118,6 +118,14 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =back
 
+The C<Str> variant stores each value in a fixed C<$max_len>-byte slot,
+B<NUL-padded>, and trims trailing NULs on the way out. Values longer than
+C<$max_len> are truncated to it. Embedded and leading NULs are preserved, so
+C<"a\0b"> round-trips exactly -- but B<trailing> NULs do not: C<"abc\0"> reads
+back as C<"abc">, and a value that is all NULs reads back as the empty string.
+For binary payloads that may end in NUL, store an explicit length alongside the
+value or use a numeric variant.
+
 =head2 Constructors
 
     my $buf = Data::Buffer::Shared::I64->new($path, $capacity);         # file-backed
@@ -134,10 +142,12 @@ per-element fixed byte width:
     my $buf = Data::Buffer::Shared::Str->new_from_fd($fd, $max_len);
 
 C<new_from_fd> duplicates the caller's fd internally; the caller keeps
-ownership of the passed fd. The C<Str> variant requires the same
-C<$max_len> the original was created with: it is recorded in the header as
-the element size and checked on attach, so passing a different C<$max_len>
-dies with an "elem_size mismatch" error.
+ownership of the passed fd. The C<Str> variant requires the same C<$max_len>
+the original was created with: it is recorded in the header as the element
+size and checked on attach, so passing a different C<$max_len> dies with an
+"elem_size mismatch" error. The descriptor you pass is duplicated
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the handle.
 
 =head2 Lifecycle
 
@@ -150,6 +160,8 @@ dies with an "elem_size mismatch" error.
     my $h = $buf->stats;    # diagnostic hashref
 
 C<unlink> also works as a class method: C<< Data::Buffer::Shared::I64->unlink($path) >>.
+It croaks if the removal fails -- except when the file is already gone, which is
+what you asked for, so a cleanup path may safely run twice.
 
 C<memfd> is an alias of C<fd> (present on every variant): both return the backing
 file descriptor for a memfd-backed buffer (created with C<new_memfd>), or C<undef>
@@ -184,11 +196,18 @@ Integer variants also have:
 
 Raw / bulk:
 
-    my $raw = buf_xx_get_raw $buf, $from, $count;        # bulk bytes, seqlock-guarded
-    buf_xx_set_raw $buf, $from, $raw;                    # bulk bytes, write-locked
+    my $raw = buf_xx_get_raw $buf, $byte_off, $nbytes;   # raw bytes, seqlock-guarded
+    buf_xx_set_raw $buf, $byte_off, $raw;                # raw bytes, write-locked
     $buf->add_slice($from, @deltas);                     # batch atomic add (integer variants; flat list)
     my $ptr = buf_xx_ptr $buf;           # raw pointer to data, for FFI use
     my $ptr = buf_xx_ptr_at $buf, $idx;  # pointer to element at index
+
+C<get_raw> and C<set_raw> address the data area in B<bytes>, not element
+indices -- unlike every other accessor here. On an C<I64> buffer
+C<< $buf->get_raw(4, 4) >> returns bytes 4..7, which is the upper half of
+element 0 and the lower half of element 1, not elements 4..7. Multiply by the
+element size to address elements. Both are bounds-checked against the data area
+and croak rather than run past it.
 
 Zero-copy:
 
@@ -252,6 +271,33 @@ process detects the dead holder and reclaims its contribution so the mapping
 does not deadlock. See L</Reader-slot exhaustion> for the one narrow case this
 recovery cannot cover.
 
+An interrupted create is also recovered. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file; C<new> re-initializes such a file automatically, but only when it is
+owned by your effective uid and is still entirely zero, so a file holding data
+is never re-initialized. If the creator got as far as writing part of the
+header, the file cannot be told apart from a corrupt one and C<new> refuses it
+with C<uninitialized file is not empty>. If that path has only ever been used
+for this buffer, the file never held data and removing it is safe -- but the
+same refusal is given for any file of the right size whose first bytes are
+zero, so check before deleting. An initialized buffer is never re-initialized,
+resized, or truncated by a later C<new>. On attach the stored geometry wins:
+the capacity you pass is ignored and the existing capacity is used, so check
+C<< $buf->capacity >> if it matters. A variant, element-size or version
+mismatch is reported as an error.
+
+B<Disk space.> The backing file is created B<sparse>: C<new> sizes it, but
+blocks are allocated only as you write, so a large buffer costs almost
+nothing on disk until it is used. The cost of that is a late failure, and how
+it reaches you depends on the filesystem. Where blocks are allocated at fault
+time -- tmpfs, so C</dev/shm> and many C</tmp> mounts -- a write to a page that
+cannot be backed raises C<SIGBUS> and kills the process, because an C<mmap>
+store has no way to report C<ENOSPC>. Where allocation is delayed to writeback
+(ext4, xfs), the store lands in page cache and the failure appears later: the
+write is lost, and C<sync> is what reports it, croaking with the underlying
+error. Keep the filesystem sized for the buffer you asked for, and call
+C<sync> when you need to know your writes reached disk.
+
 =head1 SEE ALSO
 
 L<Data::HashMap::Shared> - concurrent hash table
@@ -282,30 +328,39 @@ L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
 
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created or initialized (an existing non-empty file keeps its own
-permissions; a pre-existing empty file owned by your effective uid is initialized as a
-fresh backing file and the mode is applied to it via C<fchmod>). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied only when the file is created or initialized,
+never to a buffer that is already in use. A pre-existing file is initialized
+-- and so has the mode applied to it via C<fchmod> -- only when it is owned by
+your effective uid and is either empty or entirely zero (what an interrupted
+create leaves behind, see L</CONCURRENCY AND CRASH SAFETY>); in every other
+case the file keeps its own permissions and its contents. The file is opened
+with C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created
+with C<O_EXCL>; the on-disk header is validated when the file is attached. Any
+process you grant write access to a shared mapping is trusted not to corrupt
+its contents while other processes are using it.
 
 =head2 Reader-slot exhaustion
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
-crashed lock holder's contribution through its reader-slot. The slot table holds
-1024 entries (one per concurrent reader process). If more than that many reader
-processes share one mapping at once, a reader that cannot claim a slot proceeds
-"slotless" -- it still takes the read lock but leaves no per-process record. If
-such a slotless reader is then killed while holding the read lock, its share of
-the lock cannot be attributed to a dead process, so writer recovery cannot
-reclaim it and writers may block until the mapping is recreated. Reaching this
-needs more than 1024 concurrent reader processes on one mapping plus a crash in
-the brief read-lock window; the dead-process slot reclaim keeps the table from
-filling with stale entries, so in practice it is very unlikely.
+crashed lock holder's contribution through its reader-slot. The slot table
+holds 1024 entries (one per concurrent reader process). If more than that many
+reader processes share one mapping at once, a reader that cannot claim a slot
+proceeds "slotless" -- it still takes the read lock but leaves no per-process
+record. If such a slotless reader is then killed while holding the read lock,
+its share of the lock cannot be attributed to a dead process, so writer
+recovery cannot reclaim it and writers may block until the mapping is
+recreated. Reaching this needs more than 1024 concurrent reader processes on
+one mapping plus a crash in the brief read-lock window; the dead-process slot
+reclaim keeps the table from filling with stale entries, so in practice it is
+very unlikely. Those preconditions cover the live-process route only. The
+count lives in the mapping and C<new> validates the geometry, not this
+transient value, so a backing file damaged at rest -- bit rot, a partial copy,
+or a process that scribbled on the mapping -- can present a non-zero slotless
+count and block every writer the same way, with none of the above. If writers
+hang on a file no live reader is using, recreate it.
 
 =head1 AUTHOR
 

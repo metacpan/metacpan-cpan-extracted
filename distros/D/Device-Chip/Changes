@@ -1,5 +1,12 @@
 Revision history for Device-Chip
 
+0.27    2026-08-11
+        [CHANGES]
+         * Merge sensor declarations from superclasses in
+           `Device::Chip::Sensor`
+         * Various Pod style fixes and updates
+         * Use `meta` instead of `no strict 'refs'` blocks
+
 0.26    2023-10-18
         [CHANGES]
          * Optional read buffer in `Test::Device::Chip::Adapter` to assist

@@ -9,7 +9,9 @@ use utf8;
 use Object::Pad 0.66;
 
 use Future::AsyncAwait;
-use Future::IO::Impl::IOAsync;
+use Future::IO;
+
+Future::IO->load_best_impl;
 
 use Net::Prometheus;
 use Metrics::Any::Adapter "Prometheus";
@@ -189,6 +191,10 @@ my $client = Net::Prometheus->new;
 
 my $app = MyApp->new->parse_argv;
 
-$client->export_to_IO_Async( undef, port => $PORT );
+my $exporter_f;
+$exporter_f = $client->export_to_Future_IO( port => $PORT ) if $PORT;
 
-await $app->run;
+await Future->wait_any(
+   $app->run,
+   $exporter_f ? ( $exporter_f ) : (),
+);

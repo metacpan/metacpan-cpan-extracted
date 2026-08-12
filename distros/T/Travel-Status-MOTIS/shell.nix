@@ -12,6 +12,7 @@
       TestPod
       URI
       FileSlurp
+      PerlTidy
     ]))
   ];
 }

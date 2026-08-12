@@ -10,6 +10,7 @@
         croak("Expected a Data::DisjointSet::Shared object"); \
     DsuHandle *h = INT2PTR(DsuHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::DisjointSet::Shared object"); \
+    DsuHandle *h0 = h; PERL_UNUSED_VAR(h0); /* identity anchor for REEXTRACT */ \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code: overloaded/tied
@@ -17,14 +18,19 @@
  * and element fetches.  EXTRACT's sv_2mortal(SvREFCNT_inc(...)) pin only
  * blocks REFCOUNT-driven destruction; an explicit $obj->DESTROY frees the
  * handle regardless and zeroes the IV, so the local `h` would dangle.
- * That same Perl can also REPLACE the invocant ($obj = 42 mutates ST(0),
- * because Perl passes aliases), which is why SvROK is re-checked before
- * SvRV -- otherwise SvRV would run on a non-reference. */
+ * That same Perl can also REPLACE the invocant ($obj = 42, or $obj = another
+ * object) by mutating the ST(0) alias.  So we re-check SvROK (else SvRV would
+ * run on a non-reference), then compare the re-read handle against the one
+ * captured at EXTRACT (h0): a legitimate invocant's handle is immutable across
+ * a call, so `h != h0` rejects EVERY replacement (non-ref, foreign ref, or a
+ * DIFFERENT same-class object -- which sv_derived_from could not tell apart)
+ * and destruction (a freed/DESTROYed handle reads back 0 != h0) in one branch,
+ * at the same cost as the old `!h` null check. */
 #define REEXTRACT(sv) \
     if (!SvROK(sv)) \
         croak("Data::DisjointSet::Shared object was replaced during the call"); \
     h = INT2PTR(DsuHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::DisjointSet::Shared object destroyed during the call")
+    if (h != h0) croak("Data::DisjointSet::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -49,7 +55,7 @@ new(class, path = &PL_sv_undef, n = 0, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     DsuHandle *h = dsu_create(p, (uint64_t)n, mode, errbuf);   /* validates args into errbuf */
-    if (!h) croak("Data::DisjointSet::Shared->new: %s", errbuf);
+    if (!h) croak("Data::DisjointSet::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -64,7 +70,7 @@ new_memfd(class, name = &PL_sv_undef, n = 0)
   CODE:
     const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     DsuHandle *h = dsu_create_memfd(nm, (uint64_t)n, errbuf);   /* validates args into errbuf */
-    if (!h) croak("Data::DisjointSet::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::DisjointSet::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -77,7 +83,7 @@ new_from_fd(class, fd)
     char errbuf[DSU_ERR_BUFLEN];
   CODE:
     DsuHandle *h = dsu_open_fd(fd, errbuf);
-    if (!h) croak("Data::DisjointSet::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::DisjointSet::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -166,6 +172,7 @@ union_many(self, pairs)
     if (!SvROK(pairs) || SvTYPE(SvRV(pairs)) != SVt_PVAV)
         croak("Data::DisjointSet::Shared->union_many: expected an array reference");
     av = (AV *)SvRV(pairs);
+    sv_2mortal(SvREFCNT_inc((SV *)av));   /* pin the arrayref: a tied element's FETCH below cannot free it mid-loop */
     top = av_len(av);                     /* last index, -1 if empty */
     /* SvGETMAGIC(pairs) above, and av_len on a tied array, both run Perl that
      * can have destroyed self -- re-check before the first use of h below. */
@@ -317,7 +324,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::DisjointSet::Shared")) {
         DsuHandle *h = INT2PTR(DsuHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::DisjointSet::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::DisjointSet::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

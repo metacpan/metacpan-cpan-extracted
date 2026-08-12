@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -39,7 +39,8 @@ __END__
 
 =head1 NAME
 
-Data::HashMap::Shared - Multiprocess shared-memory hash maps with LRU eviction and per-key TTL
+Data::HashMap::Shared - Multiprocess shared-memory hash maps with LRU eviction
+and per-key TTL
 
 =head1 SYNOPSIS
 
@@ -171,10 +172,12 @@ Creates or opens a shared hash map backed by file C<$path>. Passing C<undef>
 as the path creates an anonymous C<MAP_SHARED|MAP_ANONYMOUS> mapping that is
 inherited across C<fork> but has no filesystem presence.
 
-C<new_memfd> creates an unlinked memfd-backed map whose file descriptor
-can be passed to another process (via C<SCM_RIGHTS>, C<fork>+C<exec>, or
-duped+open). C<new_from_fd> reopens such a descriptor. Both require a
-64-bit Perl on Linux (C<memfd_create(2)>).
+C<new_memfd> creates an unlinked memfd-backed map whose file descriptor can be
+passed to another process (via C<SCM_RIGHTS>, C<fork>+C<exec>, or duped+open).
+C<new_from_fd> reopens such a descriptor. The descriptor you pass is
+duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it
+does not disturb the handle. Both require a 64-bit Perl on Linux
+(C<memfd_create(2)>).
 
 C<$max_entries>, C<$max_size>, C<$ttl>, C<$lru_skip>, C<$arena_cap>, and
 C<$file_mode> are used only when creating a new file; when opening an
@@ -195,6 +198,17 @@ When TTL is active, C<get> and C<exists> check expiry. Expiry is measured
 against a monotonic clock (C<CLOCK_MONOTONIC_COARSE>): TTLs track elapsed
 running time and do not advance while the system is suspended or hibernating.
 
+That clock is also B<local to the current boot>: it restarts at zero on reboot
+and is unrelated between machines, while the expiry timestamps live in the
+backing file. A file that outlives the boot which wrote it -- or is copied to
+another host, including a frozen map shipped elsewhere (see
+L</"Frozen (Read-Only) Mode">) -- therefore carries expiries on a timeline that
+no longer exists. The error is always in the safe direction: C<now> has not yet
+reached the stored values, so entries live B<longer> than their TTL, never
+shorter, and it corrects itself once uptime passes them. Nothing expires early
+and nothing crashes, but do not rely on TTL across a reboot or a host move --
+call C<flush_expired> or rebuild the map.
+
 Optional C<$lru_skip> (0-99, default 0) reduces how often LRU promotion
 reorders the recency list: higher values skip more promotions. Promotion runs
 only when an operation updates an existing entry under the write lock
@@ -213,12 +227,12 @@ sized for your strings instead. Clamped to C<[4096, 0xFFFFFFFF]> (arena offsets 
 32-bit). Integer-only variants (C<II>/C<I16>/C<I32>) have no arena and ignore
 it. For sharded maps it is the per-shard cap, like C<$max_entries>.
 
-Optional C<$file_mode> (octal, default C<0600>) sets the permission bits
-used when the backing file is created; the exact mode is applied via
-C<fchmod>, so the process umask does not narrow it. It is ignored when attaching an existing file and
-for anonymous or memfd-backed maps. The default is owner-only; pass a
-wider mode such as C<0666> to opt in to cross-user sharing. Before
-version 0.14 the default was C<0666>.
+Optional C<$file_mode> (octal, default C<0600>) sets the permission bits used
+when the backing file is created; the exact mode is applied via C<fchmod>, so
+the process umask does not narrow it. It is ignored when attaching an existing
+file and for anonymous or memfd-backed maps. The default is owner-only; pass a
+wider mode such as C<0666> to opt in to cross-user sharing. Before version
+0.14 the default was C<0666>.
 
 B<Zero-cost when disabled>: with both C<$max_size=0> and C<$ttl=0>, the fast
 lock-free read path is used. The only overhead is a branch (predicted away).
@@ -273,12 +287,12 @@ on a sharded map a batch is B<not> atomic across shards (the "single lock"
 note in the API below applies to non-sharded maps).
 
 All operations work transparently on sharded maps: C<put>, C<get>, C<remove>,
-C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<max>, C<min>, C<cas>, C<cas_take>,
-C<get_or_set>, C<put_ttl>, C<add_ttl>, C<update_ttl>, C<touch>, C<persist>,
-C<set_ttl>, C<keys>, C<values>, C<items>, C<to_hash>, C<set_multi> (method only),
-C<remove_multi> (method only), C<get_multi> (method only),
-C<get_with_ttl> (method only), C<each>, C<pop>, C<shift>, C<drain>,
-C<clear>, C<flush_expired>, C<flush_expired_partial>, C<size>,
+C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<max>, C<min>,
+C<cas>, C<cas_take>, C<get_or_set>, C<put_ttl>, C<add_ttl>, C<update_ttl>,
+C<touch>, C<persist>, C<set_ttl>, C<keys>, C<values>, C<items>, C<to_hash>,
+C<set_multi> (method only), C<remove_multi> (method only), C<get_multi>
+(method only), C<get_with_ttl> (method only), C<each>, C<pop>, C<shift>,
+C<drain>, C<clear>, C<flush_expired>, C<flush_expired_partial>, C<size>,
 C<stats> (method only), C<reserve>, and all diagnostic keywords.
 
 Diagnostic counters and capacities reported for a sharded handle are
@@ -418,7 +432,8 @@ Diagnostics:
     my $p   = $map->path;                    # backing file path (method only)
     my $s   = $map->stats;                   # hashref with all diagnostics in one call
     # stats keys: size, capacity, max_entries, tombstones, mmap_size,
-    #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl
+    #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl,
+    #   frozen, readonly
 
 C<set_multi>, C<get_multi>, C<remove_multi>, C<get_with_ttl>, C<stats>,
 C<path>, C<sync>, and C<unlink> are method-only (no keyword form).
@@ -435,6 +450,55 @@ a file-backed map; it is a no-op for anonymous mappings, which have no
 backing file. Changes are visible to other processes sharing the mapping
 without C<sync> -- it only affects on-disk persistence.
 
+C<unlink> reports through its return value rather than by dying: it returns
+true when the file (every shard, for sharded maps) was removed and false
+otherwise, including when the file was already gone and when removal was
+refused -- a read-only directory, for instance. Check it if the removal
+mattered; an ignored false is how a file survives a cleanup unnoticed.
+
+=head2 Frozen (Read-Only) Mode
+
+    $map->freeze;                                       # seal the file immutable (durable)
+    my $ro = Data::HashMap::Shared::II->new_readonly($path);
+    my $v  = $ro->get($key);                            # lock-free query; writes nothing
+    my $is_frozen   = $map->frozen;                     # true once sealed
+    my $is_readonly = $ro->readonly;                    # true for a read-only handle
+
+C<freeze> seals a file-backed map permanently immutable so it can be shipped and
+served read-only. It takes the write lock (so no mutation is in flight), sets a
+seal flag in the header, and flushes it to disk (C<msync>). Afterwards every
+mutator on that handle croaks and the handle itself becomes read-only. A sharded
+map seals every shard file. Freezing is one-way; there is no unfreeze.
+
+C<new_readonly> opens an already-frozen file with C<O_RDONLY> and maps it
+C<PROT_READ>. Because a sealed map is immutable and can have no writers, queries
+take B<no lock at all> -- no reader-slot bookkeeping, no LRU clock bit, no lazy
+TTL cleanup -- and never write the mapping. A read-only view therefore works
+from a read-only file or filesystem, and any number of processes can share one
+frozen file at once. All queries and full iteration are supported: C<get>,
+C<exists>, C<get_with_ttl>, C<get_multi>, C<keys>, C<values>, C<items>,
+C<to_hash>, C<each>, and cursors (C<cursor> and C<cursor_next>). Every mutator
+croaks (including the integer counters C<incr>/C<decr>/C<max>/C<min>, which on a
+writable map update in place under the read lock). C<sync> is a silent no-op.
+C<frozen> and C<readonly> report the state, and C<stats> gains matching
+C<frozen> and C<readonly> keys.
+
+The seal reuses a previously reserved header byte, so the on-disk format and
+version are unchanged: a file written by an older release is simply not frozen
+(the byte reads 0) and opens read-write exactly as before.
+
+The two modes never mix: opening a frozen file read-write (C<new>,
+C<new_from_fd>) is refused -- open it with C<new_readonly> instead -- and
+C<new_readonly> refuses a file that has not been frozen (its lock-free readers
+must never race a live writer). C<new_readonly> is for a single backing file,
+not a sharded set.
+
+B<Portability>: a frozen file is a raw memory image. Read it back on the B<same
+architecture> that wrote it (same word size and endianness; the native magic and
+variant id reject a mismatched or wrong-variant file at attach time). Ship it by
+B<copying> the file; do not serve it over NFS or another network filesystem
+while another host has it mapped.
+
 =head2 Crash Safety
 
 If a process dies (e.g., SIGKILL, OOM kill) while holding the write lock,
@@ -445,14 +509,17 @@ C<kill($pid, 0)> the holder and CAS-release the lock if it's dead.
 
 Reader-side recovery uses a 1024-slot table in the shared mmap (one slot
 per process, claimed lazily on first lock; fork()'d children claim a
-fresh slot via C<pthread_atfork>).  On a writer-lock timeout the recovery
-scan CAS-claims each dead PID's slot, drains the waiter counts, and
-force-resets the reader counter once no live reader holds it -- so a
-worker killed mid-C<incr_by> no longer pins the rwlock indefinitely.
-If a live reader is concurrently present, the dead slot is left intact
-for the next recovery cycle (preserves the only record of the stuck
-counter).  Beyond 1024 simultaneous handles per map, new handles skip
-slot tracking and fall back to the slow per-timeout drain.
+fresh slot via C<pthread_atfork>).  A reader's B<entire> contribution to
+the lock is the C<rdepth> word in its own slot -- there is no shared
+reader counter -- so a dead reader is neutralised by clearing that one
+slot's PID, and a draining writer does so unconditionally as it scans.
+Because no orphaned count can exist, there is no quiescent force-reset:
+a worker killed mid-C<incr_by> cannot pin the lock at all.  An occupancy
+bitmap (one bit per slot, published before the slot can hold a lock) lets
+the writer visit only occupied slots rather than all 1024.  Beyond 1024
+simultaneous handles per map, a handle that cannot claim a slot proceeds
+"slotless"; see L</"Reader-slot exhaustion"> for the one case that
+recovery cannot cover.
 
 The same path validates and rebuilds the LRU doubly-linked list if a
 dead writer left it inconsistent.  C<stat_recoveries> in C<stats> counts
@@ -479,7 +546,9 @@ specific entry being mutated may have stale or partial bytes. Calling
 C<clear> after detecting a stale lock recovery is recommended for
 safety-critical applications.
 
-Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+=head2 Reader-slot exhaustion
+
+Dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds
 1024 entries (one per concurrent reader process). If more than that many reader
 processes share one mapping at once, a reader that cannot claim a slot proceeds
@@ -553,6 +622,20 @@ Key takeaways:
 
 =back
 
+=head1 CRASH SAFETY
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete map file left by
+an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
+
 =head1 SEE ALSO
 
 L<Data::Buffer::Shared> - typed shared array
@@ -583,14 +666,16 @@ L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created, and when a file left
+behind by an interrupted create is re-initialized (see L</CRASH SAFETY>); a
+file already in use keeps its own permissions. The file is opened with
+C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with
+C<O_EXCL>; the on-disk header is validated when the file is attached. Any
+process you grant write access to a shared mapping is trusted not to corrupt
+its contents while other processes are using it.
 
 =head1 UPGRADING
 

@@ -17,7 +17,7 @@ WriteMakefile(
 	NAME => 'Params::Validate::Strict',
 	VERSION_FROM => 'lib/Params/Validate/Strict.pm', # finds $VERSION in the module
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
@@ -27,7 +27,6 @@ WriteMakefile(
 		'Exporter' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'List::Util' => 1.33,	# Minimum version for any()
-		'Params::Get' => 0.13,
 		'Readonly::Values::Boolean' => 0,
 		'Scalar::Util' => 0,
 		'Unicode::GCString' => 0,
@@ -44,7 +43,7 @@ WriteMakefile(
 		'Readonly' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
-		'Test::Mockingbird' => 0.10,
+		'Test::Mockingbird' => 0.13,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::Warnings' => 0,

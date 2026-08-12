@@ -12,3 +12,5 @@
 ^\.gitignore$
 ^\.github/
 ^\.claude/
+^\.pcg/
+^ClickHouse-Encoder-\d

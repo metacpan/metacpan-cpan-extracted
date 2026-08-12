@@ -11,6 +11,8 @@ Shared.xs
 t/01-basic.t
 t/02-intern.t
 t/03-edge.t
+t/04-frozen.t
+t/05-recover.t
 xt/asan.t
 xt/concurrent_open.t
 xt/crash_recovery.t

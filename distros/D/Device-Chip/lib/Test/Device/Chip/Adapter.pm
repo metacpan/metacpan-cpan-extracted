@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Test::Device::Chip::Adapter 0.26;
+package Test::Device::Chip::Adapter 0.27;
 class Test::Device::Chip::Adapter
    :does(Device::Chip::Adapter);
 
@@ -28,6 +28,8 @@ use Test::ExpectAndCheck::Future;
 C<Test::Device::Chip::Adapter> - unit testing on C<Device::Chip>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Test::More;
    use Test::Device::Chip::Adapter;

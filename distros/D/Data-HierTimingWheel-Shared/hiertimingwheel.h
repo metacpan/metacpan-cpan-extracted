@@ -183,13 +183,6 @@ static inline void hw_rwlock_spin_pause(void) {
 #define HW_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define HW_RWLOCK_WR(pid)    (HW_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & HW_RWLOCK_PID_MASK))
 
-/* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
-/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse -- if a dead
- * lock-holder's PID is recycled to an unrelated live process before recovery
- * runs, this reports "alive" and that slot's rdepth is not reclaimed until the
- * recycled process exits. Robust detection would require a per-slot
- * process-start-time epoch (a header-layout/version change).
- * Documented under "Crash Safety" in the POD. */
 /* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
  * process that crashed while holding the lock and lingers unreaped would never
  * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
@@ -209,6 +202,9 @@ static inline int hw_pid_is_zombie(uint32_t pid) {
     if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
     return rp[1] == ' ' && rp[2] == 'Z';
 }
+/* 1 if alive or unknown, 0 if definitely dead.  Cannot detect PID reuse: a
+ * recycled PID reports "alive" and the slot is not reclaimed until that
+ * process exits.  See "Crash Safety" in the POD. */
 static inline int hw_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
@@ -293,8 +289,7 @@ static inline void hw_claim_reader_slot(HwHandle *h) {
     /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
      * if its rdepth>0: clearing pid drops the dead reader's entire contribution
      * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
-     * old design) we need not skip dead slots that still show a read count. */
+     * claim it. */
     for (uint32_t i = 0; i < HW_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || hw_pid_alive(dpid)) continue;
@@ -302,7 +297,7 @@ static inline void hw_claim_reader_slot(HwHandle *h) {
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            hw_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            hw_occ_set(h, i);
             h->my_slot_idx = i;
             return;
         }
@@ -567,7 +562,6 @@ static inline void hw_init_header(void *base, uint32_t num_slots, uint32_t num_l
         timers[i].bucket = HW_NIL;
         timers[i].state  = 0;
     }
-    hdr->magic            = HW_MAGIC;
     hdr->version          = HW_VERSION;
     hdr->num_slots        = num_slots;
     hdr->num_levels       = num_levels;
@@ -579,6 +573,11 @@ static inline void hw_init_header(void *base, uint32_t num_slots, uint32_t num_l
     hdr->timers_off       = L.timers;
     hdr->total_size       = total;
     hdr->reader_slots_off = L.reader_slots;
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, HW_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -676,6 +675,16 @@ static int hw_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int hw_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static HwHandle *hw_create(const char *path, uint64_t num_slots, uint64_t num_levels, uint64_t capacity, mode_t mode, char *errbuf) {
     if (!hw_validate_args(num_slots, num_levels, capacity, errbuf)) return NULL;
 
@@ -712,6 +721,27 @@ static HwHandle *hw_create(const char *path, uint64_t num_slots, uint64_t num_le
         if (base == MAP_FAILED) { HW_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!hw_validate_header((HwHeader *)base, (uint64_t)st.st_size)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((HwHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && hw_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        HW_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    hw_init_header(base, (uint32_t)num_slots, (uint32_t)num_levels, (uint32_t)capacity, total);
+                    flock(fd, LOCK_UN); close(fd);
+                    return hw_setup(base, map_size, path, -1);
+                }
+                if (((HwHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    HW_ERR("%s: incomplete hierarchical timing-wheel file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 HW_ERR("invalid hierarchical timing-wheel file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);

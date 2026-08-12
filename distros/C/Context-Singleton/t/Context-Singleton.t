@@ -3,80 +3,80 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib map "${FindBin::Bin}/$_", qw[ ../lib lib sample ];
+use lib map qq (${FindBin::Bin}/$_), qw[ ../lib lib sample ];
 
 use Test::Spec::Util;
 
 use Examples::Context::Singleton;
 use Sample::Context::Singleton;
 
-describe 'import()' => as {
-	it_should_know_about_rule (rule => '001-foo');
+describe q (import()) => as {
+	it_should_know_about_rule (rule => q (001-foo));
 };
 
-describe 'load_rules()' => as {
+describe q (load_rules()) => as {
 	it_should_load_rules (
-		rules => [ '002-foo' ],
+		rules => [ q (002-foo) ],
 		loader => as {
-			load_rules 'Sample::Context::Singleton::002';
+			load_rules q (Sample::Context::Singleton::002);
 		},
 	);
 };
 
-describe 'contrive()' => as {
+describe q (contrive()) => as {
 	it_should_load_rules (
-		rules => [ 'provides-foo', 'Provides::Foo' ],
-		loader => as { contrive 'provides-foo' => class => 'Provides::Foo' },
+		rules => [ q (provides-foo), q (Provides::Foo) ],
+		loader => as { contrive q (provides-foo) => class => q (Provides::Foo) },
 	);
 };
 
-describe 'deduce()' => as {
-	context 'value rule' => as {
+describe q (deduce()) => as {
+	context q (value rule) => as {
 		frame {
-			it_should_resolve_rule (rule => 'constant', expected => '42');
+			it_should_resolve_rule (rule => q (constant), expected => q (42));
 			frame {
 				proclaim constant => 24;
-				it_should_resolve_rule (rule => 'constant', expected => '24');
+				it_should_resolve_rule (rule => q (constant), expected => q (24));
 			};
-			it_should_resolve_rule (rule => 'constant', expected => '42');
+			it_should_resolve_rule (rule => q (constant), expected => q (42));
 		};
 	};
 
-	context 'computed rule' => as {
+	context q (computed rule) => as {
 		frame {
 			proclaim a => 10;
 			proclaim b => 5;
 
-			it_should_resolve_rule (rule => 'sum', expected => '15');
+			it_should_resolve_rule (rule => q (sum), expected => q (15));
 		};
 	};
 
-	context 'unresolvable rule' => as {
-		it "should die" => as { throws_ok { deduce 'un-resolvable' } 'Context::Singleton::Exception::Nondeducible', '' };
+	context q (unresolvable rule) => as {
+		it q (should die) => as { throws_ok { deduce q (un-resolvable) } q (Context::Singleton::Exception::Nondeducible), q () };
 	};
 };
 
-describe 'try_deduce()' => as {
-	context 'unresolvable rule' => as {
-		it "should not die" => as { lives_ok { try_deduce 'un-resolvable' } };
-		it "should return undef" => as { is try_deduce( 'un-resolvable' ), undef };
+describe q (try_deduce()) => as {
+	context q (unresolvable rule) => as {
+		it q (should not die) => as { lives_ok { try_deduce q (un-resolvable) } };
+		it q (should return undef) => as { is try_deduce( q (un-resolvable) ), undef };
 	};
 };
 
-describe 'is_deduced()' => as {
+describe q (is_deduced()) => as {
 	plan tests => 1;
 
-	context 'known resource' => as {
+	context q (known resource) => as {
 		frame {
 			proclaim a => 10;
 			proclaim b => 5;
 
-			it_should_be_resolved (rule => 'a');
-			it_should_not_be_resolved (rule => 'sum');
+			it_should_be_resolved (rule => q (a));
+			it_should_not_be_resolved (rule => q (sum));
 
-			try_deduce 'sum';
+			try_deduce q (sum);
 
-			it_should_be_resolved (rule => 'sum');
+			it_should_be_resolved (rule => q (sum));
 		};
 	};
 };

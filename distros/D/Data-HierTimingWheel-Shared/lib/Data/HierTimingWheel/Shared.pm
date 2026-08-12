@@ -1,7 +1,7 @@
 package Data::HierTimingWheel::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::HierTimingWheel::Shared', $VERSION);
 
@@ -15,7 +15,8 @@ __END__
 
 =head1 NAME
 
-Data::HierTimingWheel::Shared - shared-memory hierarchical timing wheel (O(1) timers at any delay)
+Data::HierTimingWheel::Shared - shared-memory hierarchical timing wheel (O(1)
+timers at any delay)
 
 =head1 SYNOPSIS
 
@@ -75,17 +76,18 @@ mutation. B<Linux-only>. Requires 64-bit Perl.
     my $tw = Data::HierTimingWheel::Shared->new_memfd($name, $num_slots, $num_levels, $capacity);
     my $tw = Data::HierTimingWheel::Shared->new_from_fd($fd);
 
-C<$num_slots> (S, 2..2^16, default 256) is the number of buckets per level, and
-C<$num_levels> (L, 1..16, default 4) the number of cascading wheels; together
-they set the maximum schedulable delay to C<S**L - 1> ticks (C<num_slots ** num_levels>
-must fit in 64 bits, else the constructor croaks). C<$capacity> is the maximum
-number of concurrent timers (1..2^24). Memory is C<num_levels * num_slots * 4 +
-capacity * 32> bytes plus a fixed header. Choose S and L so that C<S**L> exceeds
-your longest delay -- e.g. C<256, 4> covers ~4.3 billion ticks, C<64, 8> covers
-~281 trillion. When reopening an existing file or memfd the stored geometry wins
-and the caller's arguments are ignored. An optional file B<mode> may be passed as
-the last argument to C<new> (e.g. C<0660>) for cross-user sharing; it defaults to
-C<0600> (owner-only).
+C<$num_slots> (S, 2..2^16, default 256) is the number of buckets per level,
+and C<$num_levels> (L, 1..16, default 4) the number of cascading wheels;
+together they set the maximum schedulable delay to C<S**L - 1> ticks
+(C<num_slots ** num_levels> must fit in 64 bits, else the constructor croaks).
+C<$capacity> is the maximum number of concurrent timers (1..2^24). Memory is
+C<num_levels * num_slots * 4 + capacity * 32> bytes plus a fixed header.
+Choose S and L so that C<S**L> exceeds your longest delay -- e.g. C<256, 4>
+covers ~4.3 billion ticks, C<64, 8> covers ~281 trillion. When reopening an
+existing file or memfd the stored geometry wins and the caller's arguments do
+not resize it -- but they are still range-checked, so an out-of-range value
+croaks. An optional file B<mode> may be passed as the last argument to C<new>
+(e.g. C<0660>) for cross-user sharing; it defaults to C<0600> (owner-only).
 
 =head2 Scheduling
 
@@ -130,11 +132,14 @@ and C<memfd> the backing descriptor.
 =head1 SHARING ACROSS PROCESSES
 
 The wheels live in a shared mapping, shared the same three ways as the rest of
-the family: a B<backing file>, an B<anonymous mapping inherited across C<fork>>,
-or a B<memfd> passed to an unrelated process and reopened with
-C<< new_from_fd($fd) >>. Any process can schedule timers; typically one process
-owns advancing the clock and dispatches the fired payloads, while others schedule
-and cancel. The tick counter is shared, so all processes agree on "now".
+the family: a B<backing file>, an B<anonymous mapping inherited across
+C<fork>>, or a B<memfd> passed to an unrelated process and reopened with C<<
+new_from_fd($fd) >>. The descriptor you pass is duplicated
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the handle. Any process can schedule timers; typically one process
+owns advancing the clock and dispatches the fired payloads, while others
+schedule and cancel. The tick counter is shared, so all processes agree on
+"now".
 
 =head1 SECURITY
 
@@ -163,6 +168,19 @@ reclaim it and writers may block until the mapping is recreated. Reaching this
 needs more than 1024 concurrent reader processes on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete hierarchical
+timing-wheel file left by an interrupted create; remove it and retry>. A file
+left behind by an interrupted create never held data, so removing it is safe
+-- but a file whose header was corrupted after the fact reaches the same
+croak, so confirm it is an abandoned create before deleting anything you care
+about.
 
 =head1 SEE ALSO
 

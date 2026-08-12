@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -1456,6 +1456,7 @@ FF9E\tFF9F
 FF70
 -utf8::IsCn
 -30FB
+-3000\t3040
 END
     # Explanation of the above gibberish: The funny hex is for dakuten
     # and handakuten half width. The "Katakana" catches halfwidth
@@ -1464,6 +1465,9 @@ END
     # matching non-kana characters floating around near to real
     # ones. 30FB is "Katakana middle dot", which is not kana as far as
     # I know, so that's also removed.
+
+    # There is a bug in InHiragana and Katakana where they match CJK
+    # Symbols and Punctuation characters from 3000-3040.
 }
 
 # お

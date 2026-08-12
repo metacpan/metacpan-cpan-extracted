@@ -68,6 +68,10 @@ t/09-review-fixes.t
 t/10-coverage-gaps.t
 t/11-sync-stats.t
 t/12-dead-reader-recovery.t
+t/13-recover.t
+t/14-unbalanced-unlock.t
+t/15-slotless-peel.t
+t/16-unlink-enoent.t
 t/pod_synopsis.t
 t/version_check.t
 xs/f32.xs

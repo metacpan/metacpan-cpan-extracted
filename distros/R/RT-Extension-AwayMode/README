@@ -61,7 +61,8 @@ UPGRADING
     condition code ever runs, so a code-only upgrade would never see
     comments. Re-running "make initdb" is not the way to fix this: it would
     install a second copy of the scrip. Instead, widen the existing
-    condition once:
+    condition once (and bring its description in line with what it now
+    does):
 
         perl -I /opt/rt6/local/lib -I /opt/rt6/lib -e '
             use RT; RT::LoadConfig(); RT::Init();
@@ -70,7 +71,14 @@ UPGRADING
             die "no such scrip condition\n" unless $cond->Id;
             my ($ok, $msg) = $cond->SetApplicableTransTypes("Correspond,Comment");
             die "$msg\n" unless $ok;
+            ($ok, $msg) = $cond->SetDescription(
+                "Whenever a reply or comment arrives on a ticket whose owner has Away Mode active");
+            die "$msg\n" unless $ok;
         '
+
+    The description is cosmetic -- it is what the admin UI shows for the
+    condition -- so only the "SetApplicableTransTypes" call actually changes
+    behaviour.
 
     Fresh installs need nothing extra; "make initdb" already registers both
     transaction types.

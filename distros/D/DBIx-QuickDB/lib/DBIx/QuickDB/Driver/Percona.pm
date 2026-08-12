@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::Percona;
 use strict;
 use warnings;
 
-our $VERSION = '0.000064';
+our $VERSION = '0.000065';
 
 use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;

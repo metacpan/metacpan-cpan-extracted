@@ -69,11 +69,21 @@ static void shm_free_cleanup(pTHX_ void *ptr) {
 
 /* ---- Helper macros ---- */
 
+/* Constructor sizes arrive as UV and are handed to the C layer as uint32_t.
+ * Without this, new($path, 2**32+100) silently truncates to a 100-entry map --
+ * the caller asks for four billion entries and gets a hundred, with no error.
+ * Croak instead, matching how the 1GB string limits are enforced. */
+#define CK_U32(val, what, classname) \
+    do { if ((UV)(val) > (UV)0xFFFFFFFF) \
+            croak("%s: %s %" UVuf " exceeds the maximum of %u", \
+                  classname, what, (UV)(val), 0xFFFFFFFFU); } while (0)
+
 #define EXTRACT_MAP(classname, sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
     ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    ShmHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -83,8 +93,10 @@ static void shm_free_cleanup(pTHX_ void *ptr) {
  * h would dangle.  Used only where magic can actually intervene between
  * EXTRACT_MAP and the first use of h. */
 #define REEXTRACT_MAP(classname, sv) \
+    if (!SvROK(sv)) \
+        croak("%s object was replaced during the call", classname); \
     h = INT2PTR(ShmHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("%s object destroyed during the call", classname)
+    if (h != h0) croak("%s object replaced or destroyed during the call", classname)
 
 #define EXTRACT_STR_KEY(sv) \
     STRLEN _klen; \
@@ -119,14 +131,17 @@ static void shm_free_cleanup(pTHX_ void *ptr) {
         croak("Expected a %s object", classname); \
     ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(sv))); \
     if (!c) croak("Attempted to use a destroyed %s cursor", classname); \
+    ShmCursor *c0 = c; PERL_UNUSED_VAR(c0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))   /* pin the invocant across the method (reentrant-DESTROY UAF guard) */
 
 /* Cursor counterpart of REEXTRACT_MAP: same explicit-DESTROY hazard, applied
  * to the cursor pointer where argument magic runs between EXTRACT_CURSOR and
  * the first use of c. */
 #define REEXTRACT_CURSOR(classname, sv) \
+    if (!SvROK(sv)) \
+        croak("%s cursor was replaced during the call", classname); \
     c = INT2PTR(ShmCursor*, SvIV(SvRV(sv))); \
-    if (!c) croak("%s cursor destroyed during the call", classname)
+    if (c != c0) croak("%s cursor replaced or destroyed during the call", classname)
 
 /* ---- Generic keyword build functions ---- */
 

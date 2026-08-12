@@ -8,8 +8,8 @@ our $VERSION = v1.0.0;
 
 use Sample::Context::Singleton;
 
-contrive 'sum' => (
-	dep => [ 'a', 'b' ],
+contrive q (sum) => (
+	dep => [ q (a), q (b) ],
 	as => sub { $_[0] + $_[1] },
 );
 

@@ -17,36 +17,40 @@ SYNOPSIS
         # share the sketch across processes via a backing file
         my $shared = Data::DDSketch::Shared->new("/tmp/latency.dd", 0.01);
 
+        # freeze and ship: query it read-only (lock-free) on other machines
+        $shared->freeze;
+        my $ro = Data::DDSketch::Shared->new_readonly("/tmp/latency.dd");
+        $ro->quantile(0.99);
+
 DESCRIPTION
     A DDSketch in shared memory: it estimates any quantile of a stream of
-    numbers to within a configured relative accuracy "alpha" (default 1%),
-    in a fixed amount of memory, no matter how many values are added. Unlike
-    a fixed histogram, the guarantee is relative: the returned value for any
+    numbers to within a configured relative accuracy "alpha" (default 1%), in
+    a fixed amount of memory, no matter how many values are added. Unlike a
+    fixed histogram, the guarantee is relative: the returned value for any
     quantile is within a factor "alpha" of the true value, whether that
     quantile is a microsecond or an hour -- which is what you want for
     latencies and other long-tailed, wide-dynamic-range data.
 
     Each value "v" falls into a logarithmic bucket keyed by
     "ceil(log_gamma(|v|))", with "gamma = (1 + alpha) / (1 - alpha)"; every
-    value in a bucket is within "alpha" of the bucket's representative
-    value. Positive and negative magnitudes use separate bucket stores and
-    exact zeros a dedicated counter, so the full real line is covered. The
-    sketch also tracks the exact count, minimum, and maximum, plus a running
-    sum, giving mean and true extremes for free.
+    value in a bucket is within "alpha" of the bucket's representative value.
+    Positive and negative magnitudes use separate bucket stores and exact
+    zeros a dedicated counter, so the full real line is covered. The sketch
+    also tracks the exact count, minimum, and maximum, plus a running sum,
+    giving mean and true extremes for free.
 
     Because the buckets live in a shared mapping, several processes feed one
     sketch: any process that opens the same backing file, inherits the
-    anonymous mapping across "fork", or reopens a passed memfd contributes
-    to and reads the same distribution. A write-preferring futex rwlock with
+    anonymous mapping across "fork", or reopens a passed memfd contributes to
+    and reads the same distribution. A write-preferring futex rwlock with
     dead-process recovery guards mutation. Linux-only. Requires 64-bit Perl.
 
     Memory is bounded at "num_buckets" counters per sign (default 2048): the
-    buckets form a fixed window centred on value 1, and values whose
-    magnitude falls outside the window collapse into the nearest extreme
-    bucket. With the defaults the window spans roughly 1.5e-9 to 6.6e8, so
-    ordinary data never reaches the edges; raise "num_buckets" for a wider
-    exact range. Two sketches created with the same "alpha" and
-    "num_buckets" can be merged.
+    buckets form a fixed window centred on value 1, and values whose magnitude
+    falls outside the window collapse into the nearest extreme bucket. With
+    the defaults the window spans roughly 1.3e-9 to 7.6e8, so ordinary data
+    never reaches the edges; raise "num_buckets" for a wider exact range. Two
+    sketches created with the same "alpha" and "num_buckets" can be merged.
 
 METHODS
   Constructors
@@ -54,16 +58,19 @@ METHODS
         my $dd = Data::DDSketch::Shared->new(undef, 0.01);            # anonymous, 2048 buckets
         my $dd = Data::DDSketch::Shared->new_memfd($name, $alpha, $num_buckets);
         my $dd = Data::DDSketch::Shared->new_from_fd($fd);
+        my $ro = Data::DDSketch::Shared->new_readonly($path);         # frozen file, read-only
 
-    $alpha is the relative accuracy (default 0.01 = 1%; between 1e-6 and
-    0.5). $num_buckets is the number of counters per sign (default 2048;
-    between 8 and 2^24) and sets both the memory use ("2 * num_buckets * 8"
-    bytes plus a fixed header) and the exact value range. "new" and
-    "new_memfd" croak on an out-of-range $alpha or $num_buckets. When
-    reopening an existing file or memfd the stored geometry wins and the
-    caller's arguments are ignored. An optional file mode may be passed as
-    the last argument to "new" (e.g. 0660) for cross-user sharing; it
-    defaults to 0600 (owner-only).
+    $alpha is the relative accuracy (default 0.01 = 1%; between 1e-6 and 0.5).
+    $num_buckets is the number of counters per sign (default 2048; between 8
+    and 2^24) and sets both the memory use ("2 * num_buckets * 8" bytes plus a
+    fixed header) and the exact value range. "new" and "new_memfd" croak on an
+    out-of-range $alpha or $num_buckets. When reopening an existing file or
+    memfd the stored geometry wins and the caller's arguments do not resize it
+    -- but they are still range-checked, so an out-of-range value croaks. An
+    optional file mode may be passed as the last argument to "new" (e.g. 0660)
+    for cross-user sharing; it defaults to 0600 (owner-only). "new_readonly"
+    opens a frozen file read-only for lock-free querying (see "FROZEN
+    (READ-ONLY) MODE").
 
   Feeding values
         my $n = $dd->add($value);        # add one value; returns the new total count
@@ -71,10 +78,10 @@ METHODS
         $dd->add_many(\@values);         # add a batch under a single write lock
         $dd->clear;                      # empty the sketch
 
-    "add" adds one finite number (croaks on "NaN" or infinity) and returns
-    the running total count. "add_many" adds an array reference of numbers
-    under one write lock, validating them all first. Negative values and
-    zero are supported.
+    "add" adds one finite number (croaks on "NaN" or infinity) and returns the
+    running total count. "add_many" adds an array reference of numbers under
+    one write lock, validating them all first. Negative values and zero are
+    supported.
 
   Querying
         my $v   = $dd->quantile($q);     # value at quantile $q in 0 .. 1 (undef if empty)
@@ -86,15 +93,15 @@ METHODS
 
     "quantile" returns the estimated value at quantile $q (e.g. 0.99 for the
     99th percentile), guaranteed within relative error "alpha" of the true
-    value; it returns "undef" for an empty sketch and croaks if $q is
-    outside "[0, 1]". "min", "max", and "count" are exact (tracked
-    separately from the buckets); "sum" and "mean" are double-precision
-    running values subject to floating-point rounding.
+    value; it returns "undef" for an empty sketch and croaks if $q is outside
+    "[0, 1]". "min", "max", and "count" are exact (tracked separately from the
+    buckets); "sum" and "mean" are double-precision running values subject to
+    floating-point rounding.
 
   Merging and introspection
         $dd->merge($other);              # fold another sketch's values in (same alpha + num_buckets)
         $dd->alpha; $dd->gamma; $dd->num_buckets;
-        $dd->stats;   # { alpha, gamma, num_buckets, count, zero_count, sum, min, max, mean, ops, mmap_size }
+        $dd->stats;   # { alpha, gamma, num_buckets, count, zero_count, sum, min, max, mean, ops, mmap_size, frozen, readonly }
 
     "merge" requires $other to have the same "alpha" and "num_buckets" and
     croaks otherwise; afterwards this sketch represents the combined
@@ -103,11 +110,13 @@ METHODS
   Lifecycle
         $dd->path; $dd->memfd; $dd->sync; $dd->unlink;
 
-    "sync" flushes the mapping to its backing store (a no-op for anonymous
-    and memfd sketches); "unlink" removes the backing file (also callable as
-    "Class->unlink($path)"); "path" returns the backing path ("undef" for
-    anonymous, memfd, or fd-reopened sketches) and "memfd" the backing
-    descriptor.
+    "sync" flushes the mapping to its backing store (a no-op for anonymous and
+    memfd sketches); "unlink" removes the backing file (also callable as
+    "Class->unlink($path)") and croaks if the removal fails -- except when the
+    file is already gone, which is what you asked for; it is likewise a no-op
+    when there is no backing file (anonymous or memfd); "path" returns the
+    backing path ("undef" for anonymous, memfd, or fd-reopened sketches) and
+    "memfd" the backing descriptor.
 
 ACCURACY
     For any quantile, the returned value "e" and the true value "v" satisfy
@@ -117,47 +126,125 @@ ACCURACY
     histogram lacks. The count, minimum, and maximum are exact; the sum and
     mean are double-precision running values subject to floating-point
     rounding. The only approximation is the per-quantile value, and only for
-    magnitudes inside the representable window; magnitudes outside it
-    collapse into the extreme bucket and lose accuracy.
+    magnitudes inside the representable window; magnitudes outside it collapse
+    into the extreme bucket and lose accuracy.
 
 SHARING ACROSS PROCESSES
     The sketch lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file, an anonymous mapping inherited
-    across "fork", or a memfd passed to an unrelated process and reopened
-    with new_from_fd($fd). Every process's "add" feeds the one shared
-    sketch, so a fleet of workers can each measure part of a workload into a
-    single distribution.
+    rest of the family: a backing file, an anonymous mapping inherited across
+    "fork", or a memfd passed to an unrelated process and reopened with
+    new_from_fd($fd). The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle. Every process's "add" feeds the one shared sketch, so
+    a fleet of workers can each measure part of a workload into a single
+    distribution.
+
+FROZEN (READ-ONLY) MODE
+    A file-backed sketch can be frozen and then shipped to other machines,
+    where consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $dd = Data::DDSketch::Shared->new("/tmp/latency.dd", 0.01);
+        $dd->add($_) for @known_latencies;
+        $dd->freeze;                  # seal: now immutable, and $dd itself is read-only
+        # ... copy /tmp/latency.dd to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::DDSketch::Shared->new_readonly("/tmp/latency.dd");
+        $ro->quantile(0.99);
+        $ro->count;
+
+    "freeze" takes the write lock, marks the sketch permanently immutable
+    (there is no unfreeze -- rebuild the file to change it), and flushes the
+    seal to disk. A frozen sketch rejects every mutator ("add", "add_many",
+    "merge", "clear") with a croak, and a read-write reopen ("new($path,
+    ...)") of a sealed file is refused -- so a shipped artifact can never be
+    silently mutated out from under its readers. That protection is enforced
+    by the reader: the seal is a header flag that 0.01 and earlier do not know
+    about, and the on-disk format version is deliberately unchanged so those
+    releases can still open files written here. A pre-0.02 build therefore
+    opens a sealed file read-write and can modify it, so keep producers and
+    consumers on 0.02 or later if you rely on the seal. "freeze" itself is not
+    idempotent: the handle that seals the file becomes a read-only view of it,
+    so calling "freeze" on that handle again croaks.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed sketch's buckets and geometry are immutable, "quantile", "min",
+    "max", "mean", "sum", "count", "zero_count", and "stats" read them
+    directly, taking no reader lock -- the mapping is never written, so a
+    read-only view works from a read-only file descriptor or a read-only
+    filesystem, and any number of processes can share one "PROT_READ" mapping.
+    "frozen" and "readonly" report the two states.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default; pass
-    an explicit octal mode (e.g. 0660) as the last argument to "new" for
-    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
-    and the header is validated on attach. Any process granted write access
-    is trusted not to corrupt the mapping.
+    Backing files are created with mode 0600 (owner-only) by default; pass an
+    explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL", and
+    the header is validated on attach. Any process granted write access is
+    trusted not to corrupt the mapping.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership and dead-owner recovery. Each "add" is a short
-    bounded update, but recovery restores locking only -- it performs no
-    state repair. "add" commits the scalar aggregates (count, sum, min, max)
-    before the bucket counter, so a crash in that window leaves "count"
-    ahead of the buckets and quantile(1.0) can return "undef" on a non-empty
-    sketch until the next "add" completes. Limitation: PID reuse is not
-    detected (very unlikely in practice).
+    bounded update, but recovery restores locking only -- it performs no state
+    repair. "add" commits the scalar aggregates (count, sum, min, max) before
+    the bucket counter, so a crash in that window leaves "count" ahead of the
+    buckets and quantile(1.0) can return "undef" on a non-empty sketch until
+    the next "add" completes. Limitation: PID reuse is not detected (very
+    unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely. Those
+    preconditions cover the live-process route only. The count lives in the
+    mapping and "new" validates the geometry, not this transient value, so a
+    backing file damaged at rest -- bit rot, a partial copy, or a process that
+    scribbled on the mapping -- can present a non-zero slotless count and
+    block every writer the same way, with none of the above. If writers hang
+    on a file no live reader is using, recreate it.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete DDSketch file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
+
+    Disk space. The backing file is created sparse: "new" sizes it, but blocks
+    are allocated only as you write, so a large sketch costs almost nothing on
+    disk until it is used. The cost of that is a late failure, and how it
+    reaches you depends on the filesystem. Where blocks are allocated at fault
+    time -- tmpfs, so "/dev/shm" and many "/tmp" mounts -- a write to a page
+    that cannot be backed raises "SIGBUS" and kills the process, because an
+    "mmap" store has no way to report "ENOSPC". Where allocation is delayed to
+    writeback (ext4, xfs), the store lands in page cache and the failure
+    appears later: the write is lost, and "sync" is what reports it, croaking
+    with the underlying error. Keep the filesystem sized for the sketch you
+    asked for, and call "sync" when you need to know your writes reached disk.
 
 SEE ALSO
     Data::Histogram::Shared (fixed-bucket histogram), the DDSketch paper
@@ -167,6 +254,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

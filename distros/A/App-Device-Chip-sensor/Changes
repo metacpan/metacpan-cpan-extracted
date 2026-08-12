@@ -1,5 +1,10 @@
 Revision history for App-Device-Chip-sensor
 
+0.08    2026-08-11
+        [CHANGES]
+         * Use Future::IO v0.18 and its ->load_best_impl method
+         * Remember to apply chip power before attempting to ->change_config
+
 0.07    2024-08-14
         [CHANGES]
          * Updated for Object::Pad v0.805

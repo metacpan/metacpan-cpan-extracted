@@ -12,6 +12,7 @@ eg/merge_patch.pl
 eg/ndjson.pl
 eg/value_constructors.pl
 lib/JSON/YY.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -37,6 +38,14 @@ t/18_borrowed_write.t
 t/19_jfind_bigint.t
 t/20_int_width.t
 t/21_consistency.t
+t/22_encode_buffer.t
+t/23_magic_sv.t
+t/24_encode_utf8.t
+t/25_threads.t
+t/26_scalar_typing.t
+t/27_blessed.t
+t/28_depth.t
+t/29_api_polish.t
 xt/leak.t
 YY.xs
 yyjson.c

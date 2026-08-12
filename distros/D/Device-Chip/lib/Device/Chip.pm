@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip 0.26;
+package Device::Chip 0.27;
 class Device::Chip :repr(HASH);
 
 use Carp;
@@ -19,6 +19,8 @@ use Future::AsyncAwait 0.38; # async method
 C<Device::Chip> - an abstraction of a hardware chip IO driver
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 =over 2
 

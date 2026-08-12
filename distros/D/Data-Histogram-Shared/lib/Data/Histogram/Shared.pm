@@ -1,7 +1,7 @@
 package Data::Histogram::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::Histogram::Shared', $VERSION);
 
@@ -44,6 +44,11 @@ Data::Histogram::Shared - shared-memory HdrHistogram for Linux
 
     # share across processes via a backing file
     my $shared = Data::Histogram::Shared->new("/tmp/latency.hdr", 1, 3_600_000_000, 3);
+
+    # freeze and ship: query it read-only (lock-free) on other machines
+    $shared->freeze;
+    my $ro = Data::Histogram::Shared->new_readonly("/tmp/latency.hdr");
+    $ro->value_at_percentile(99);
 
 =head1 DESCRIPTION
 
@@ -89,6 +94,7 @@ the two input streams. B<Linux-only>. Requires 64-bit Perl.
     my $h = Data::Histogram::Shared->new(undef, 1, 3_600_000_000, 3);   # defaults
     my $h = Data::Histogram::Shared->new_memfd($name, $lowest, $highest, $sig_figs);
     my $h = Data::Histogram::Shared->new_from_fd($fd);
+    my $ro = Data::Histogram::Shared->new_readonly($path);   # frozen file, read-only
 
 C<$path> is the backing file (C<undef> or omitted for an anonymous mapping).
 C<$lowest> is the lowest value that can be distinguished from 0 and must be
@@ -99,11 +105,12 @@ and must be in the range 1..5 (default 3). C<new> and C<new_memfd> croak if any
 argument is out of range.
 
 C<$mode> sets the permission bits used when C<new> B<creates> the backing file
-(applied exactly via C<fchmod>, so umask does not narrow it); the default is C<0600>, owner-only. Pass
-e.g. C<0660> to opt in to sharing the file with other users in the group. It
-applies only at creation: reopening an existing file does not change its
-permissions, and the argument is ignored for anonymous histograms (C<$path>
-undef or omitted). C<new_memfd> and C<new_from_fd> do not take a mode.
+(applied exactly via C<fchmod>, so umask does not narrow it); the default is
+C<0600>, owner-only. Pass e.g. C<0660> to opt in to sharing the file with
+other users in the group. It applies only at creation: reopening an existing
+file does not change its permissions, and the argument is ignored for
+anonymous histograms (C<$path> undef or omitted). C<new_memfd> and
+C<new_from_fd> do not take a mode.
 
 C<$lowest> additionally must satisfy
 C<floor(log2($lowest)) + ceil(log2(2 * 10**$sig_figs)) - 1 E<lt>= 61> (a
@@ -116,8 +123,11 @@ C<floor(log2($lowest))>, C<2 * 10**sig_figs> sub-buckets per power of two
 (rounded up to a power of two), and as many buckets as are needed to cover
 C<$highest>. When reopening an existing file or memfd, the B<stored geometry
 wins> and the caller's C<$lowest>/C<$highest>/C<$sig_figs> arguments are
-ignored. C<new_memfd> creates a Linux memfd (transferable via its
-C<memfd> descriptor); C<new_from_fd> reopens one in another process.
+ignored. C<new_memfd> creates a Linux memfd (transferable via its C<memfd>
+descriptor); C<new_from_fd> reopens one in another process. The descriptor you
+pass is duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and
+closing it does not disturb the handle. C<new_readonly> opens a B<frozen> file
+read-only for lock-free querying (see L</"FROZEN (READ-ONLY) MODE">).
 
 =head2 Recording values
 
@@ -229,6 +239,11 @@ C<record_many>, C<merge>, C<reset>).
 
 =item * C<mmap_size> -- bytes of the shared mapping.
 
+=item * C<frozen> -- 1 if the histogram has been sealed by C<freeze> (immutable), else 0.
+
+=item * C<readonly> -- 1 if this handle is a read-only view (from C<new_readonly>,
+or the handle that called C<freeze>), else 0.
+
 =back
 
 =head1 SHARING ACROSS PROCESSES
@@ -248,16 +263,56 @@ combined stream all of them have recorded.
     wait;
     print $h->value_at_percentile(50), "\n";   # the child's recordings
 
+=head1 FROZEN (READ-ONLY) MODE
+
+A file-backed histogram can be B<frozen> and then shipped to other machines,
+where consumers open it B<read-only> and query it with B<no locking at all>.
+
+    # producer: build, freeze, ship the file
+    my $h = Data::Histogram::Shared->new("/tmp/latency.hdr", 1, 3_600_000_000, 3);
+    $h->record_many(\@samples);
+    $h->freeze;                  # seal: now immutable, and $h itself is read-only
+    # ... copy /tmp/latency.hdr to another host ...
+
+    # consumer (any process, same architecture): read-only, lock-free
+    my $ro = Data::Histogram::Shared->new_readonly("/tmp/latency.hdr");
+    $ro->value_at_percentile(99) for @queries;
+
+C<freeze> takes the write lock, marks the histogram B<permanently immutable>
+(there is no unfreeze -- rebuild the file to change it), and flushes the seal to
+disk. A frozen histogram rejects every mutator (C<record>, C<record_many>,
+C<merge>, C<reset>) with a croak, and a read-write reopen (C<< new($path, ...) >>)
+of a sealed file is B<refused> -- so a shipped artifact can never be silently
+mutated out from under its readers.
+
+C<new_readonly($path)> maps the file C<O_RDONLY> / C<PROT_READ> and B<requires it
+to be frozen> (it croaks on a file that was never C<freeze>d). Because a sealed
+histogram's counts and geometry are immutable, C<value_at_percentile>,
+C<percentile>, C<count_at_value>, C<min>, C<max>, C<mean>, C<total_count>,
+C<count> and C<stats> read them B<directly, taking no reader lock> -- the mapping
+is never written, so a read-only view works from a read-only file descriptor or a
+read-only filesystem, and any number of processes can share one C<PROT_READ>
+mapping. C<frozen> and C<readonly> report the two states.
+
+B<Portability.> The on-disk format is native binary (native-endian 64-bit
+words), so a frozen file may be copied only between machines of the B<same
+architecture>; a wrong-endian file is rejected at open by the magic check.
+B<Copy the file to each consumer> -- do not share one file over a network
+filesystem: the lock is a Linux futex (process-local to one kernel), and the
+"no live writer" contract assumes a static copy. Linux-only; 64-bit Perl.
+
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created, and when a file left
+behind by an interrupted create is re-initialized (see L</CRASH SAFETY>); a
+file already in use keeps its own permissions. The file is opened with
+C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with
+C<O_EXCL>; the on-disk header is validated when the file is attached. Any
+process you grant write access to a shared mapping is trusted not to corrupt
+its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 
@@ -278,6 +333,18 @@ reclaim it and writers may block until the mapping is recreated. Reaching this
 needs more than 1024 concurrent reader processes on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete histogram file
+left by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

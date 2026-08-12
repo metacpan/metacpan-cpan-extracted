@@ -1,5 +1,11 @@
 # Revision history for the Perl extension Win32
 
+## 0.64 [2026-08-11]
+
+- ship the CPAN tarball with LF line endings again; releases 0.60
+  through 0.63 were packaged with CRLF because the release workflow's
+  Windows runner converted the checkout [#65](https://github.com/perl-libwin32/win32/pull/65)
+
 ## 0.63 [2026-08-09]
 
 - fix Win32::GetLastError() returning 0 after list-context Win32::HttpGetFile()

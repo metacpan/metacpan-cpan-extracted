@@ -10,6 +10,7 @@
         croak("Expected a Data::HierTimingWheel::Shared object"); \
     HwHandle *h = INT2PTR(HwHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::HierTimingWheel::Shared object"); \
+    HwHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code. EXTRACT's
@@ -24,7 +25,7 @@
     if (!SvROK(sv)) \
         croak("Data::HierTimingWheel::Shared object was replaced during the call"); \
     h = INT2PTR(HwHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::HierTimingWheel::Shared object destroyed during the call")
+    if (h != h0) croak("Data::HierTimingWheel::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -53,7 +54,7 @@ new(class, path = &PL_sv_undef, num_slots = 256, num_levels = 4, capacity = 0, .
      * (default 0600, owner-only). Pass e.g. 0660 for cross-user sharing. */
     mode_t mode = (items > 5 && (SvGETMAGIC(ST(5)), SvOK(ST(5)))) ? (mode_t)SvUV(ST(5)) : 0600;
     HwHandle *h = hw_create(p, (uint64_t)num_slots, (uint64_t)num_levels, (uint64_t)capacity, mode, errbuf);
-    if (!h) croak("Data::HierTimingWheel::Shared->new: %s", errbuf);
+    if (!h) croak("Data::HierTimingWheel::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -72,7 +73,7 @@ new_memfd(class, name = &PL_sv_undef, num_slots = 256, num_levels = 4, capacity 
     if (capacity < 1)
         croak("Data::HierTimingWheel::Shared->new_memfd: capacity must be >= 1");
     HwHandle *h = hw_create_memfd(nm, (uint64_t)num_slots, (uint64_t)num_levels, (uint64_t)capacity, errbuf);
-    if (!h) croak("Data::HierTimingWheel::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::HierTimingWheel::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -85,7 +86,7 @@ new_from_fd(class, fd)
     char errbuf[HW_ERR_BUFLEN];
   CODE:
     HwHandle *h = hw_open_fd(fd, errbuf);
-    if (!h) croak("Data::HierTimingWheel::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::HierTimingWheel::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -293,7 +294,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::HierTimingWheel::Shared")) {
         HwHandle *h = INT2PTR(HwHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::HierTimingWheel::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::HierTimingWheel::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

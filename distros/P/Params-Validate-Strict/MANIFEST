@@ -30,10 +30,12 @@ t/get.t
 t/integration.t
 t/lib/Test/Logger.pm
 t/lib/TestLogger.pm
+t/logic_reducer.t
 t/memberof.t
 t/mutant_killers.t
 t/nested.t
 t/notmemberof.t
+t/path.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-spelling.t

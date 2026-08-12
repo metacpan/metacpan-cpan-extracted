@@ -10,6 +10,7 @@
         croak("Expected a Data::IntervalTree::Shared object"); \
     ItHandle *h = INT2PTR(ItHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::IntervalTree::Shared object"); \
+    ItHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -19,8 +20,10 @@
  * explicit DESTROY, so the local `h` would dangle.  Used only where magic
  * can actually intervene between EXTRACT and the first use of h. */
 #define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::IntervalTree::Shared object was replaced during the call"); \
     h = INT2PTR(ItHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::IntervalTree::Shared object destroyed during the call")
+    if (h != h0) croak("Data::IntervalTree::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -87,7 +90,7 @@ new(class, path = &PL_sv_undef, capacity = 0, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     ItHandle *h = it_create(p, (uint64_t)capacity, mode, errbuf);
-    if (!h) croak("Data::IntervalTree::Shared->new: %s", errbuf);
+    if (!h) croak("Data::IntervalTree::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     /* Re-read the class PV from ST(0) now that all argument magic (capacity,
      * mode, path) has run: xsubpp captured `class` in the INPUT section,
      * before that magic, and the magic can realloc or free the PV it points
@@ -110,7 +113,7 @@ new_memfd(class, name = &PL_sv_undef, capacity = 0)
     if (capacity < 1)
         croak("Data::IntervalTree::Shared->new_memfd: capacity must be >= 1");
     ItHandle *h = it_create_memfd(nm, (uint64_t)capacity, errbuf);
-    if (!h) croak("Data::IntervalTree::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::IntervalTree::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     class = SvPV_nolen(ST(0));   /* re-read after argument magic; see new() */
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -124,7 +127,28 @@ new_from_fd(class, fd)
     char errbuf[IT_ERR_BUFLEN];
   CODE:
     ItHandle *h = it_open_fd(fd, errbuf);
-    if (!h) croak("Data::IntervalTree::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::IntervalTree::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
+    class = SvPV_nolen(ST(0));   /* re-read after argument magic; see new() */
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_readonly(class, path)
+    const char *class
+    SV *path
+  PREINIT:
+    char errbuf[IT_ERR_BUFLEN];
+  CODE:
+    /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
+       ever.  A sealed file is immutable and no read path writes the mapping,
+       so queries take no reader-slot / rwlock traffic and any number of
+       processes can share one PROT_READ mapping (same architecture; the
+       magic rejects a wrong-endian file). */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (!p) croak("Data::IntervalTree::Shared->new_readonly: path is required");
+    ItHandle *h = it_open_readonly(p, errbuf);
+    if (!h) croak("Data::IntervalTree::Shared->new_readonly: %s", errbuf);
     class = SvPV_nolen(ST(0));   /* re-read after argument magic; see new() */
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -150,6 +174,7 @@ add(self, lo, hi, id = &PL_sv_undef)
     int64_t slot;
     uint64_t payload;
   CODE:
+    if (h->readonly) croak("Data::IntervalTree::Shared->add: tree is frozen (read-only)");
     if (lo > hi) croak("Data::IntervalTree::Shared->add: lo (%" IVdf ") > hi (%" IVdf ")", (IV)lo, (IV)hi);
     /* resolve the id BEFORE locking: SvUV on a tied/overloaded SV can run Perl
      * code that dies, and a longjmp past the wrlock would strand it on a live PID. */
@@ -157,6 +182,7 @@ add(self, lo, hi, id = &PL_sv_undef)
     uint64_t id_val = have_id ? (uint64_t)SvUV(id) : 0;
     REEXTRACT(self);
     it_rwlock_wrlock(h);
+    if (h->hdr->sealed) { it_rwlock_wrunlock(h); croak("Data::IntervalTree::Shared->add: tree is frozen (read-only)"); }
     payload = have_id ? id_val : h->hdr->count;   /* default id = insertion index */
     slot = it_add_locked(h, (int64_t)lo, (int64_t)hi, payload);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -172,7 +198,9 @@ build(self)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::IntervalTree::Shared->build: tree is frozen (read-only)");
     it_rwlock_wrlock(h);
+    if (h->hdr->sealed) { it_rwlock_wrunlock(h); croak("Data::IntervalTree::Shared->build: tree is frozen (read-only)"); }
     if (h->hdr->dirty) it_build_locked(h);
     it_rwlock_wrunlock(h);
 
@@ -187,7 +215,9 @@ stab(self, point)
         ItRes *res = NULL;
         uint64_t got = 0, cap = h->capacity;
         if (cap) { Newx(res, (size_t)cap, ItRes); SAVEFREEPV(res); }   /* alloc BEFORE the lock */
-        {
+        if (h->readonly) {   /* frozen: freeze() force-built the tree, so it is never dirty here -- lock-free, no build */
+            got = cap ? it_overlaps_locked(h, (int64_t)point, (int64_t)point, res, cap) : 0;
+        } else {
             int wr = it_query_lock(h);
             got = cap ? it_overlaps_locked(h, (int64_t)point, (int64_t)point, res, cap) : 0;
             it_query_unlock(h, wr);
@@ -208,7 +238,9 @@ overlaps(self, lo, hi)
         uint64_t got = 0, cap = h->capacity;
         if (lo > hi) croak("Data::IntervalTree::Shared->overlaps: lo (%" IVdf ") > hi (%" IVdf ")", (IV)lo, (IV)hi);
         if (cap) { Newx(res, (size_t)cap, ItRes); SAVEFREEPV(res); }   /* alloc BEFORE the lock */
-        {
+        if (h->readonly) {   /* frozen: freeze() force-built the tree, so it is never dirty here -- lock-free, no build */
+            got = cap ? it_overlaps_locked(h, (int64_t)lo, (int64_t)hi, res, cap) : 0;
+        } else {
             int wr = it_query_lock(h);
             got = cap ? it_overlaps_locked(h, (int64_t)lo, (int64_t)hi, res, cap) : 0;
             it_query_unlock(h, wr);
@@ -222,10 +254,42 @@ clear(self)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::IntervalTree::Shared->clear: tree is frozen (read-only)");
     it_rwlock_wrlock(h);
+    if (h->hdr->sealed) { it_rwlock_wrunlock(h); croak("Data::IntervalTree::Shared->clear: tree is frozen (read-only)"); }
     it_clear_locked(h);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     it_rwlock_wrunlock(h);
+
+void
+freeze(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    if (h->readonly) croak("Data::IntervalTree::Shared->freeze: cannot freeze a read-only handle");
+    if (it_freeze(h) != 0) croak("Data::IntervalTree::Shared->freeze: msync: %s", strerror(errno));
+    h->readonly = 1;   /* this handle now rejects mutation too (the file is sealed) */
+
+UV
+frozen(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->hdr->sealed ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
+UV
+readonly(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->readonly ? 1 : 0;
+  OUTPUT:
+    RETVAL
 
 UV
 count(self)
@@ -234,9 +298,13 @@ count(self)
     EXTRACT(self);
     UV n;
   CODE:
-    it_rwlock_rdlock(h);
-    n = (UV)h->hdr->count;
-    it_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        n = (UV)h->hdr->count;
+    } else {
+        it_rwlock_rdlock(h);
+        n = (UV)h->hdr->count;
+        it_rwlock_rdunlock(h);
+    }
     RETVAL = n;
   OUTPUT:
     RETVAL
@@ -260,18 +328,22 @@ stats(self)
     {
         uint64_t count, ops;
         uint32_t cap, dirty;
-        it_rwlock_rdlock(h);
+        /* Snapshot under the lock; do all (croak-capable) Perl allocation after
+           releasing it -- so an OOM in newHV/newSVuv can never strand the lock. */
+        if (!h->readonly) it_rwlock_rdlock(h);   /* frozen: immutable, no lock */
         count = h->hdr->count;
         cap   = h->hdr->capacity;
         dirty = h->hdr->dirty;
         ops   = h->hdr->stat_ops;
-        it_rwlock_rdunlock(h);
+        if (!h->readonly) it_rwlock_rdunlock(h);
         HV *hv = newHV();
         hv_stores(hv, "count",     newSVuv((UV)count));
         hv_stores(hv, "capacity",  newSVuv((UV)cap));
         hv_stores(hv, "dirty",     newSVuv((UV)dirty));
         hv_stores(hv, "ops",       newSVuv((UV)ops));
         hv_stores(hv, "mmap_size", newSVuv((UV)h->mmap_size));
+        hv_stores(hv, "frozen",    newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "readonly",  newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }
   OUTPUT:
@@ -303,7 +375,7 @@ sync(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (it_msync(h) != 0) croak("sync: %s", strerror(errno));
+    if (!h->readonly && it_msync(h) != 0) croak("sync: %s", strerror(errno));
 
 void
 unlink(self, ...)
@@ -311,7 +383,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::IntervalTree::Shared")) {
         ItHandle *h = INT2PTR(ItHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::IntervalTree::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::IntervalTree::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

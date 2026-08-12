@@ -20,7 +20,17 @@
 
 
 #define EXCEPTION "Math::NLopt::Exception"
-#define ECLASS(x) EXCEPTION "::" x
+#define EXC_EXCEPTION           EXCEPTION
+#define EXC_FAILURE             EXCEPTION "::Failure"
+#define EXC_FORCED_STOP         EXCEPTION "::ForcedStop"
+#define EXC_IMPROPER_ARGS       EXCEPTION "::InvalidArgs"
+#define EXC_IMPROPER_TYPE       EXCEPTION "::ImproperType"
+#define EXC_INTERNAL_ERROR      EXCEPTION "::InternalError"
+#define EXC_INVALID_DIMENSIONS  EXCEPTION "::InvalidDimensions"
+#define EXC_INVALID_RETURN      EXCEPTION "::InvalidReturn"
+#define EXC_INVALID_USE         EXCEPTION "::InvalidUse"
+#define EXC_OUT_OF_MEMORY       EXCEPTION "::OutOfMemory"
+#define EXC_ROUNDOFF_LIMITED    EXCEPTION "::RoundoffLimited"
 
 /**********************************************************
   Exception handling
@@ -107,37 +117,37 @@ new_nlopt_exception_v( pTHX_ int iclass, const char *format, va_list args ) {
 
     switch( iclass ) {
     case NLOPT_FAILURE:
-        pclass = "Math::NLopt::Exception::Failure";
+        pclass = EXC_FAILURE;
         if ( NULL == format )
             format = "failure";
         break;
 
     case NLOPT_OUT_OF_MEMORY:
-        pclass = "Math::NLopt::Exception::OutOfMemory";
+        pclass = EXC_OUT_OF_MEMORY;
         if ( NULL == format )
             format = "out of memory";
         break;
 
     case NLOPT_INVALID_ARGS:
-        pclass = "Math::NLopt::Exception::InvalidArgs";
+        pclass = EXC_IMPROPER_ARGS;
         if ( NULL == format )
             format = "invalid argument";
         break;
 
     case NLOPT_ROUNDOFF_LIMITED:
-        pclass = "Math::NLopt::Exception::RoundoffLimited";
+        pclass = EXC_ROUNDOFF_LIMITED;
         if ( NULL == format )
             format = "roundoff limited";
         break;
 
     case NLOPT_FORCED_STOP:
-        pclass = "Math::NLopt::Exception::ForcedStop";
+        pclass = EXC_FORCED_STOP;
         if ( NULL == format )
             format = "forced stop";
         break;
 
     default:
-        pclass = "Math::NLopt::Exception";
+        pclass = EXC_EXCEPTION;
         break;
     }
 
@@ -193,7 +203,7 @@ sv2av( pTHX_ SV* sv ) {
     if ( SvTYPE(sv) == SVt_PVAV )
         return (AV*) sv;
 
-    throw_class( aTHX_ ECLASS("Internal::Error"), "internal error: unknown SV passed to sv2av" );
+    throw_class( aTHX_ EXC_INTERNAL_ERROR, "internal error: unknown SV passed to sv2av" );
     /* NOT REACHED */
 
     return NULL;
@@ -207,7 +217,7 @@ new_mortal_double( pTHX_ SSize_t len ) {
 static SV*
 dup_subref( pTHX_ SV* sub ) {
     if ( ! ( SvTYPE(sub) == SVt_PV || (SvROK(sub) && SvTYPE(SvRV(sub)) == SVt_PVCV ) ) )
-        throw_class( aTHX_ ECLASS("InvalidArgs"), "subroutine must either be a codref or string" );
+        throw_class( aTHX_ EXC_IMPROPER_ARGS, "subroutine must either be a codref or string" );
 
     return newSVsv(sub);
 }
@@ -285,7 +295,7 @@ cp_AV1D_to_double( pTHX_ AV* src, double *dst ) {
     for ( SSize_t i = 0; i < len ; i++ ) {
         SV** svp = av_fetch( src, i, 1 );
         if ( svp == NULL )
-            throw_class( aTHX_ ECLASS(  "InternalError" ), "internal error: NULL svp" );
+            throw_class( aTHX_ EXC_INTERNAL_ERROR, "internal error: NULL svp" );
         dst[i] = SvNVx( *svp );
     }
 
@@ -319,7 +329,7 @@ validate_length_AV1D( pTHX_ SSize_t len, AV* arr, const char* var ) {
     if ( len == av_count(arr) )
         return NULL;
 
-    return new_exception_object( aTHX_ "Math::NLopt::Exception::InvalidDimensions",
+    return new_exception_object( aTHX_ EXC_INVALID_DIMENSIONS,
                                  "%s has length %" UVuf "; expected %" UVuf,
                                  var, (UV) av_count(arr), (UV) len );
 }
@@ -374,19 +384,19 @@ cp_AV2D_to_double ( pTHX_ unsigned m, unsigned n, AV* src, double *dst ) {
 static SV*
 validate_length_AV2D ( pTHX_ unsigned m, unsigned n, AV* matrix, const char* var ) {
     if ( av_count( matrix ) != m )
-        return new_exception_object( aTHX_ "Math::NLopt::Exception::InvalidDimensions",
+        return new_exception_object( aTHX_ EXC_INVALID_DIMENSIONS,
                                      "%s has length %" UVuf "; expected %" UVuf,
                                      var, (UV) av_count( matrix ), (UV) m );
 
     for ( unsigned i = 0; i < m; i++ ) {
         SV** svp = av_fetch( matrix, i, 1 );
         if ( svp == NULL || !SvROK( *svp ) || SvTYPE( SvRV( *svp ) ) != SVt_PVAV )
-            return new_exception_object( aTHX_ "Math::NLopt::Exception::InvalidType",
+            return new_exception_object( aTHX_ EXC_IMPROPER_TYPE,
                                          "%s[%u] is not an ARRAY reference", var, i );
 
         AV* row = (AV*) SvRV( *svp );
         if ( av_count( row ) != n )
-            return new_exception_object( aTHX_ "Math::NLopt::Exception::InvalidDimensions",
+            return new_exception_object( aTHX_ EXC_INVALID_DIMENSIONS,
                                          "%s[%u] has length %" UVuf "; expected %" UVuf,
                                          var, i, (UV) av_count( row ), (UV) n );
     }
@@ -582,7 +592,7 @@ proxy_func ( unsigned n, const double *x, double *gradient, void *data ) {
         if (count != 1) {
             if ( ! opt->exception ) {
                 opt->exception = new_exception_object(
-                    aTHX_ "Math::NLopt::Exception::InvalidReturn",
+                    aTHX_ EXC_INVALID_RETURN,
                     "proxy_func: func returned %d values, expected 1\n", count );
             }
             nlopt_force_stop( opt->self );
@@ -893,12 +903,12 @@ T_nlopt_opt
     if (sv_isa($arg, \"$Package\")) {
         ProxyNLopt* proxy = (ProxyNLopt*) SvPVX( SvRV($arg) );
         if ( ! proxy->self )
-            throw_class( aTHX_ ECLASS( \"InvalidUse\" ), \"attempt to use object after destruction\" );
+            throw_class( aTHX_ EXC_INVALID_USE, \"attempt to use object after destruction\" );
         $var = proxy->self;
     }
     else {
         const char* refstr = SvROK($arg) ? \"\" : SvOK($arg) ? \"scalar \" : \"undef\";
-        throw_class( aTHX_ ECLASS( \"ImproperType\"), \"%s: Expected %s to be of type %s; got %s%\" SVf \" instead\",
+        throw_class( aTHX_ EXC_IMPROPER_TYPE, \"%s: Expected %s to be of type %s; got %s%\" SVf \" instead\",
                 ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                 \"$var\", \"Math::NLopt\",
                 refstr, $arg
@@ -912,13 +922,13 @@ T_NLopt
         ProxyNLopt* proxy = (ProxyNLopt*) SvPVX( SvRV($arg) );
         ${ $pname =~ /DESTROY$/ ? \q[] : \qq[
         if ( ! proxy->self )
-            throw_class( aTHX_ ECLASS( \"InvalidUse\" ), \"attempt to use object after destruction\" );
+            throw_class( aTHX_ EXC_INVALID_USE, \"attempt to use object after destruction\" );
         ]}
         $var = proxy;
     }
     else {
         const char* refstr = SvROK($arg) ? \"\" : SvOK($arg) ? \"scalar \" : \"undef\";
-        throw_class( aTHX_ ECLASS( \"ImproperType\"), \"%s: Expected %s to be of type %s; got %s%\" SVf \" instead\",
+        throw_class( aTHX_ EXC_IMPROPER_TYPE, \"%s: Expected %s to be of type %s; got %s%\" SVf \" instead\",
                 ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                 \"$var\", \"$Package\",
                 refstr, $arg
@@ -950,7 +960,7 @@ T_MY_AVREF_REFCOUNT_FIXED
                     $var = (AV*)SvRV(xsub_tmp_sv);
                 }
                 else{
-                    throw_class( aTHX_ ECLASS(\"InvalidType\"), \"%s: %s is not an ARRAY reference\",
+                    throw_class( aTHX_ EXC_IMPROPER_TYPE, \"%s: %s is not an ARRAY reference\",
                                 ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                                 \"$var\");
                 }

@@ -29,12 +29,15 @@ use Math::NLopt qw( NLOPT_LD_MMA NLOPT_LD_LBFGS );
         my $opt = Math::NLopt->new( NLOPT_LD_MMA, 1 );
         $opt->DESTROY;
 
-        ok( dies { $opt->get_algorithm }, 'NLopt-backed method dies after explicit destruction' );
-        ok(
-            dies {
-                $opt->set_min_objective( sub { 0 } )
-            },
-            'operational method dies after explicit destruction',
+        isa_ok(
+            dies { $opt->get_algorithm },
+            ['Math::NLopt::Exception::InvalidUse'],
+            'NLopt-backed method rejects an explicitly destroyed object',
+        );
+        isa_ok(
+            dies { $opt->set_min_objective( sub { 0 } ) },
+            ['Math::NLopt::Exception::InvalidUse'],
+            'operational method rejects an explicitly destroyed object',
         );
         undef $opt;
     };
@@ -50,11 +53,12 @@ for my $method ( qw( set_precond_min_objective set_precond_max_objective ) ) {
         weaken( $weak_data );
         weaken( $weak_pre );
 
-        my $error = eval {
-            $opt->$method( 1, $pre, $data );
-            1;
-        } // $@;
-        ok( $error, 'invalid preconditioned objective registration is rejected' );
+        my $exception = dies { $opt->$method( 1, $pre, $data ) };
+        isa_ok(
+            $exception,
+            ['Math::NLopt::Exception::InvalidArgs'],
+            'invalid preconditioned objective callback throws InvalidArgs',
+        );
 
         undef $data;
         ok( !defined( $weak_data ), 'failed registration does not retain callback data' );
@@ -77,7 +81,11 @@ for my $method ( qw( set_precond_min_objective set_precond_max_objective ) ) {
                 return $x->[0]**2;
             } );
 
-        ok( dies { $opt->set_min_objective( 1 ) }, 'invalid replacement is rejected' );
+        isa_ok(
+            dies { $opt->set_min_objective( 1 ) },
+            ['Math::NLopt::Exception::InvalidArgs'],
+            'invalid replacement throws InvalidArgs',
+        );
 
         $opt->set_lower_bounds( [-1] );
         $opt->set_upper_bounds( [1] );
@@ -98,11 +106,12 @@ subtest 'scalar constraint' => sub {
             weaken( $weak_data );
             weaken( $weak_func );
 
-            my $error = eval {
-                $opt->$method( $func, data => $data, );
-                1;
-            } // $@;
-            ok( $error, 'unsupported registration is rejected' );
+            my $exception = dies { $opt->$method( $func, data => $data ) };
+            isa_ok(
+                $exception,
+                ['Math::NLopt::Exception::InvalidArgs'],
+                'unsupported registration throws InvalidArgs',
+            );
 
             undef $data;
             ok( !defined( $weak_data ), 'failed registration does not retain callback data' );
@@ -124,16 +133,19 @@ subtest 'vector constraint' => sub {
             weaken( $weak_data );
             weaken( $weak_func );
 
-            my $error = eval {
+            my $exception = dies {
                 $opt->$method(
                     $func,
                     m    => 1,
                     tol  => [1],
                     data => $data,
-                );
-                1;
-            } // $@;
-            ok( $error, 'unsupported registration is rejected' );
+                )
+            };
+            isa_ok(
+                $exception,
+                ['Math::NLopt::Exception::InvalidArgs'],
+                'unsupported registration throws InvalidArgs',
+            );
 
             undef $data;
             ok( !defined( $weak_data ), 'failed registration does not retain callback data' );

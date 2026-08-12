@@ -432,6 +432,21 @@ subtest 'validate length of Perl arrays passed to NLopt' => sub {
 
 };
 
+subtest 'validate XS argument types' => sub {
+    my $opt = Math::NLopt->new( NLOPT_GN_ISRES, 2 );
+
+    isa_ok(
+        dies { Math::NLopt::get_algorithm( 1 ) },
+        ['Math::NLopt::Exception::ImproperType'],
+        'optimizer arguments must be Math::NLopt objects',
+    );
+    isa_ok(
+        dies { $opt->set_lower_bounds( undef ) },
+        ['Math::NLopt::Exception::ImproperType'],
+        'array arguments must be array references',
+    );
+};
+
 subtest 'callback output lengths' => sub {
     for my $case (
         [ 'no objective return value',        sub { return; } ],
@@ -585,6 +600,30 @@ subtest 'vector constraint gradient is an m by n array' => sub {
     ok( lives { $opt->optimize( [ 1, 1 ] ) }, 'optimization completes' );
     is( $gradient_m, 2,        'gradient outer dimension is m' );
     is( $gradient_n, [ 2, 2 ], 'gradient inner dimension is n' );
+};
+
+subtest 'vector constraint gradient rows must be array references' => sub {
+    my $opt = Math::NLopt->new( NLOPT_LD_MMA, 2 );
+
+    $opt->set_min_objective( sub { 0 } );
+    $opt->add_inequality_mconstraint(
+        sub {
+            my ( $result, $x, $gradient ) = @_;
+            @{$result}   = ( 0, 0 );
+            @{$gradient} = ( [ 1, 0 ], 1 );
+        },
+        m   => 2,
+        tol => [ 1e-8, 1e-8 ],
+    );
+    $opt->set_maxeval( 1 );
+
+    my $exception = dies { $opt->optimize( [ 1, 1 ] ) };
+    isa_ok(
+        $exception,
+        ['Math::NLopt::Exception::ImproperType'],
+        'non-array gradient rows throw ImproperType',
+    );
+    is( $opt->last_optimize_result, NLOPT_FORCED_STOP, 'improper gradient type forces stop' );
 };
 
 subtest 'vector constraint tolerance lengths' => sub {

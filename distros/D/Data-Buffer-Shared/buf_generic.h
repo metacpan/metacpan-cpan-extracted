@@ -115,6 +115,10 @@ typedef struct {
     uint32_t   cached_pid;   /* getpid() at claim time */
     uint32_t   cached_fork_gen; /* fork-generation at claim time */
     uint8_t    wr_locked;    /* process-local: 1 if lock_wr is held */
+    uint32_t   slotless_held; /* read locks this handle published to slotless_rdepth
+                               * because no reader slot was free. Decrements peel these
+                               * off FIRST: a slot claimed mid-hold must not receive a
+                               * decrement that was published to the slotless counter. */
     uint32_t   rd_held;      /* read locks THIS handle holds (rdepth is per-process,
                               * shared by every handle, so it cannot be used to tell
                               * how much of it belongs to this handle at close time) */
@@ -208,6 +212,7 @@ static inline void buf_claim_reader_slot(BufHandle *h) {
     if (h->cached_fork_gen != cur_gen) {
         h->cached_fork_gen = cur_gen;
         h->my_slot_idx = UINT32_MAX;
+        h->slotless_held = 0;   /* a forked child holds none of the parent's slotless reads */
     }
     if (h->my_slot_idx != UINT32_MAX) return;
     uint32_t now_pid = (uint32_t)getpid();
@@ -231,8 +236,7 @@ static inline void buf_claim_reader_slot(BufHandle *h) {
     /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
      * if its rdepth>0: clearing pid drops the dead reader's entire contribution
      * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
-     * old design) we need not skip dead slots that still show a read count. */
+     * claim it. */
     for (uint32_t i = 0; i < BUF_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || buf_pid_alive(dpid)) continue;
@@ -240,7 +244,7 @@ static inline void buf_claim_reader_slot(BufHandle *h) {
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            buf_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            buf_occ_set(h, i);
             h->my_slot_idx = i;
             return;
         }
@@ -270,17 +274,31 @@ static inline void buf_unpark(BufHandle *h) {
  * so a slot claimed mid-hold cannot misattribute the decrement. */
 static inline void buf_rdepth_inc(BufHandle *h) {
     h->rd_held++;                      /* process-local: what THIS handle owes */
-    if (h->my_slot_idx != UINT32_MAX)
+    if (h->my_slot_idx != UINT32_MAX) {
         __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
-    else
+    } else {
         __atomic_add_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
+        h->slotless_held++;
+    }
 }
 static inline void buf_rdepth_dec(BufHandle *h) {
-    if (h->rd_held) h->rd_held--;
-    if (h->my_slot_idx == UINT32_MAX)
+    /* Drop ONLY what this handle actually published.  An unbalanced unlock_rd
+     * (more unlocks than locks) would otherwise decrement a slot rdepth of 0,
+     * wrapping it to UINT32_MAX: the owning pid is alive, so dead-reader
+     * recovery never fires and every writer on the buffer -- in every process --
+     * blocks forever inside the drain futex, uninterruptible by Perl signals. */
+    if (h->rd_held == 0) return;
+    h->rd_held--;
+    /* Peel slotless holds first. A reader that published to slotless_rdepth and
+     * then claimed a freed slot mid-hold would otherwise decrement the SLOT,
+     * underflowing its rdepth and stranding slotless_rdepth at a nonzero value --
+     * which nothing ever recovers, so every future writer would block forever. */
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
         __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
-    else
+    } else if (h->my_slot_idx != UINT32_MAX) {
         __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+    }
 }
 
 /* Wake a writer that may be draining readers (it waits on drain_seq).  Called
@@ -534,6 +552,16 @@ static int buf_secure_open(const char *path, mode_t file_mode, int *created, cha
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int buf_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static BufHandle *buf_create_map(const char *path, uint64_t capacity,
                                   uint32_t elem_size, uint32_t variant_id,
                                   mode_t file_mode, char *errbuf) {
@@ -571,7 +599,11 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
         return NULL;
     }
 
-    if (!created && st.st_size > 0 && (uint64_t)st.st_size < sizeof(BufHeader)) {
+    /* Not gated on `created`: winning O_EXCL does not mean the inode is still
+     * empty (see the resize comment below), so a non-empty file too small to hold
+     * a header must be refused here whether we created it or not -- otherwise the
+     * init memset below runs past the end of the mapping. */
+    if (st.st_size > 0 && (uint64_t)st.st_size < sizeof(BufHeader)) {
         snprintf(errbuf, BUF_ERR_BUFLEN, "%s: file too small (%lld)", path, (long long)st.st_size);
         flock(fd, LOCK_UN); close(fd); return NULL;
     }
@@ -579,7 +611,23 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
         snprintf(errbuf, BUF_ERR_BUFLEN, "%s: refusing to initialize file not owned by us", path);
         flock(fd, LOCK_UN); close(fd); return NULL;
     }
-    if (created || st.st_size == 0) {
+    /* Never SHRINK: winning O_EXCL does not mean the inode is still empty. If we
+     * lose the race to flock, a peer publishes its buffer into this inode while we
+     * wait -- truncating it to our (smaller) total_size would discard the peer's
+     * data and SIGBUS it on its next access. Nor may we GROW one: extending a
+     * peer's published file past its recorded total_size makes buf_open_fd (which
+     * requires total_size == st_size) reject it forever. So resize only a file that
+     * is still uninitialized -- zero-length, or full-size with no magic committed. */
+    int may_resize = (st.st_size == 0);
+    if (!may_resize && created && (uint64_t)st.st_size >= sizeof(BufHeader)) {
+        /* We won O_EXCL but the inode is not empty, so we lost the race to flock.
+         * Resize only if the peer has not committed yet; growing a published file
+         * past its recorded total_size makes buf_open_fd reject it forever. */
+        uint32_t probe = 0;
+        may_resize = (pread(fd, &probe, sizeof probe, 0) == (ssize_t)sizeof probe
+                      && probe == 0);
+    }
+    if (may_resize && (uint64_t)st.st_size < total_size) {
         if (ftruncate(fd, (off_t)total_size) < 0) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "ftruncate(%s): %s", path, strerror(errno));
             flock(fd, LOCK_UN);
@@ -607,17 +655,55 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
 
     BufHeader *hdr = (BufHeader *)base;
 
-    if (created || hdr->magic == 0) {
+    /* Gate on the header, not on `created`. A file we created is normally still
+     * zero here and initializes as usual -- but winning O_EXCL is not a guarantee:
+     * if we lose the race to flock, a peer publishes its buffer into this inode
+     * while we wait, and `created` is then true over an initialized header. Gating
+     * on `created` would memset that peer's buffer (and its lock state) out from
+     * under it; gating on the header attaches to it instead, which is correct. */
+    if (hdr->magic == 0) {
         /* A pre-existing but uninitialized file (magic==0, not created by us) may
          * be smaller than the region we are about to zero; a hostile peer could
          * pre-create an undersized file to drive the init memset out of bounds. */
-        if (!created && (uint64_t)st.st_size < total_size) {
+        /* Also not gated on `created`: the resize above deliberately declines to
+         * grow a file it cannot prove is uninitialized, so a created file can
+         * still reach here undersized. Refuse rather than zero past the mapping. */
+        if ((uint64_t)st.st_size < total_size) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "%s: file too small to initialize", path);
             goto fail;
         }
+        /* An abandoned mid-init file (magic==0, already ftruncate'd so st_size>0)
+         * skips the size==0 ownership check above; verify ownership here too so we
+         * never (re)initialize a file we do not own. */
+        if (!created && st.st_uid != geteuid()) {
+            snprintf(errbuf, BUF_ERR_BUFLEN, "%s: refusing to initialize file not owned by us", path);
+            goto fail;
+        }
+        /* Re-initialize a pre-existing file ONLY when it is provably all-zero (a
+         * fresh ftruncate, which is all an abandoned mid-init creator leaves), so
+         * a same-owner file that merely starts with a zero word is never clobbered. */
+        if (!created && !buf_region_is_zero(base, (size_t)st.st_size)) {
+            snprintf(errbuf, BUF_ERR_BUFLEN, "%s: uninitialized file is not empty; refusing to initialize", path);
+            goto fail;
+        }
+        /* Apply the requested mode only now that we have decided to adopt the file:
+         * doing it with the ownership test would rewrite the permissions of a file
+         * we then turn around and refuse. */
+        if (!created && fchmod(fd, file_mode) < 0) {
+            snprintf(errbuf, BUF_ERR_BUFLEN, "%s: fchmod: %s", path, strerror(errno));
+            goto fail;
+        }
+        /* Zero reader_slots + occ bitmap, before any header field is written, so a
+         * creator killed here stays in the all-zero state the recovery below can
+         * re-initialize.  The DATA area is deliberately not zeroed: every path that
+         * reaches here already has it zero (a fresh ftruncate extension, or a file
+         * the scan above proved all-zero), and writing it would fault in and
+         * allocate every page of an otherwise sparse file -- which on a filesystem
+         * with less free space than the buffer turns create into a SIGBUS. */
+        memset((char *)base + reader_slots_off, 0,
+               (size_t)(reader_slots_size + BUF_OCC_BYTES));
         /* Initialize header */
         memset(hdr, 0, sizeof(BufHeader));
-        hdr->magic = BUF_MAGIC;
         hdr->version = BUF_VERSION;
         hdr->variant_id = variant_id;
         hdr->elem_size = elem_size;
@@ -625,9 +711,11 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
         hdr->total_size = (uint64_t)st.st_size;
         hdr->data_off = data_off;
         hdr->reader_slots_off = reader_slots_off;
-        /* Zero reader_slots + occ bitmap + data area */
-        memset((char *)base + reader_slots_off, 0,
-               (size_t)(reader_slots_size + BUF_OCC_BYTES + capacity * elem_size));
+        /* Publish magic LAST, as a release store: it is the commit point, so
+         * a creator killed before it leaves magic==0 and never a file
+         * mistaken for a valid one.  A kill during the field stores leaves
+         * one to remove by hand. */
+        __atomic_store_n(&hdr->magic, BUF_MAGIC, __ATOMIC_RELEASE);
         __atomic_thread_fence(__ATOMIC_RELEASE);
     } else {
         /* Validate existing header */
@@ -715,7 +803,6 @@ static BufHandle *buf_create_anon(uint64_t capacity, uint32_t elem_size,
 
     BufHeader *hdr = (BufHeader *)base;
     memset(hdr, 0, sizeof(BufHeader));
-    hdr->magic = BUF_MAGIC;
     hdr->version = BUF_VERSION;
     hdr->variant_id = variant_id;
     hdr->elem_size = elem_size;
@@ -724,6 +811,11 @@ static BufHandle *buf_create_anon(uint64_t capacity, uint32_t elem_size,
     hdr->data_off = data_off;
     hdr->reader_slots_off = reader_slots_off;
     /* MAP_ANONYMOUS already zero-fills reader_slots, occ bitmap and data. */
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, BUF_MAGIC, __ATOMIC_RELEASE);
 
     BufHandle *h = (BufHandle *)calloc(1, sizeof(BufHandle));
     if (!h) {
@@ -783,7 +875,6 @@ static BufHandle *buf_create_memfd(const char *name, uint64_t capacity,
 
     BufHeader *hdr = (BufHeader *)base;
     memset(hdr, 0, sizeof(BufHeader));
-    hdr->magic = BUF_MAGIC;
     hdr->version = BUF_VERSION;
     hdr->variant_id = variant_id;
     hdr->elem_size = elem_size;
@@ -791,6 +882,11 @@ static BufHandle *buf_create_memfd(const char *name, uint64_t capacity,
     hdr->total_size = total_size;
     hdr->data_off = data_off;
     hdr->reader_slots_off = reader_slots_off;
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, BUF_MAGIC, __ATOMIC_RELEASE);
 
     BufHandle *h = (BufHandle *)calloc(1, sizeof(BufHandle));
     if (!h) {

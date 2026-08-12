@@ -1,7 +1,7 @@
 package Data::CountMinSketch::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::CountMinSketch::Shared', $VERSION);
 
@@ -92,6 +92,7 @@ Requires 64-bit Perl.
     my $cms = Data::CountMinSketch::Shared->new($path, 0.001, 0.001, 0660); # opt-in group share
     my $cms = Data::CountMinSketch::Shared->new_memfd($name, $epsilon, $delta);
     my $cms = Data::CountMinSketch::Shared->new_from_fd($fd);
+    my $ro  = Data::CountMinSketch::Shared->new_readonly($path);   # frozen file, read-only
 
 C<$path> is the backing file (C<undef> or omitted for an anonymous mapping).
 C<$epsilon> is the target error factor and C<$delta> the target failure
@@ -104,18 +105,24 @@ permission mode used when it B<creates> the backing file (default C<0600>,
 owner-only). Pass a wider mode such as C<0660> to opt in to sharing the sketch
 with another user, typically via a common group. The backing file is always
 opened with C<O_NOFOLLOW>, so a pre-existing symlink at C<$path> is refused
-rather than followed. The mode is ignored when attaching an already-existing
-file, for anonymous mappings, and for C<new_memfd>/C<new_from_fd>.
+rather than followed. The mode is ignored when attaching an already-initialized
+file, for anonymous mappings, and for C<new_memfd>/C<new_from_fd>; a file left
+behind by an interrupted create is re-initialized and does receive the requested
+mode (see L</CRASH SAFETY>).
 
-From C<$epsilon> and C<$delta> the sketch derives its geometry: a width of
-C<w = next_power_of_two(ceil(e / epsilon))> columns (with a floor of 2 columns)
+From C<$epsilon> and C<$delta> the sketch derives its geometry: a width of C<w
+= next_power_of_two(ceil(e / epsilon))> columns (with a floor of 2 columns)
 and a depth of C<d = ceil(ln(1 / delta))> rows (clamped to the range 1..32).
 Rounding the width up to a power of two means the realised error factor at any
-given total is typically B<at or below> the configured target. When reopening an
-existing file or memfd, the stored geometry wins and the caller's
-C<$epsilon>/C<$delta> arguments are ignored. C<new_memfd> creates a Linux memfd
-(transferable via its C<memfd> descriptor); C<new_from_fd> reopens one in
-another process.
+given total is typically B<at or below> the configured target. When reopening
+an existing file or memfd, the stored geometry wins and the caller's
+C<$epsilon>/C<$delta> do not resize it -- but they are still range-checked, so
+an out-of-range value croaks. C<new_memfd> creates a Linux memfd (transferable
+via its C<memfd> descriptor); C<new_from_fd> reopens one in another process.
+The descriptor you pass is duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours
+to close and closing it does not disturb the handle. C<new_readonly> opens a
+B<frozen> file read-only for lock-free querying (see L</"FROZEN (READ-ONLY)
+MODE">).
 
 This is the standard Count-Min sketch (plain cell increments); it does B<not>
 use the conservative-update variant, which would make C<merge> unsound. The
@@ -162,15 +169,17 @@ counter saturate at the maximum value.
     $cms->total; $cms->width; $cms->depth; $cms->cells; $cms->stats;
     $cms->path; $cms->memfd; $cms->sync; $cms->unlink;   # or Class->unlink($path)
 
-C<total> is the running sum of all increments; C<width> is the column count C<w>
-(a power of two); C<depth> is the row count C<d>; C<cells> is C<width * depth>,
-the number of counters. C<sync> flushes the mapping to its backing store (a
-no-op for anonymous and memfd sketches, which have none); C<unlink> removes the
-backing file (also callable as C<< Class->unlink($path) >>); C<path> returns the
-backing path (C<undef> for anonymous, memfd, or fd-reopened sketches) and
-C<memfd> the backing descriptor -- the memfd of a C<new_memfd> sketch or the
-dup'd fd of a C<new_from_fd> sketch, and -1 for file-backed or anonymous
-sketches.
+C<total> is the running sum of all increments; C<width> is the column count
+C<w> (a power of two); C<depth> is the row count C<d>; C<cells> is C<width *
+depth>, the number of counters. C<sync> flushes the mapping to its backing
+store (a no-op for anonymous and memfd sketches, which have none); C<unlink>
+removes the backing file (also callable as C<< Class->unlink($path) >>) and
+croaks if the removal fails -- except when the file is already gone, which is
+what you asked for; it is likewise a no-op when there is no backing file
+(anonymous or memfd); C<path> returns the backing path (C<undef> for
+anonymous, memfd, or fd-reopened sketches) and C<memfd> the backing descriptor
+-- the memfd of a C<new_memfd> sketch or the dup'd fd of a C<new_from_fd>
+sketch, and -1 for file-backed or anonymous sketches.
 
 =head1 STATS
 
@@ -190,14 +199,25 @@ C<stats()> returns a hashref describing the sketch:
 per-item overestimate is bounded by C<epsilon * total> (with probability
 C<1 - delta>); a smaller value is a tighter bound.
 
-=item * C<delta> -- the achieved failure probability, C<exp(-depth)>. This is
-the chance that the overestimate exceeds the C<epsilon * total> bound for a
-given item; a smaller value is a stronger guarantee.
+=item * C<delta> -- the achieved failure probability,
+C<< exp(-min(depth, width)) >>. This is the chance that the overestimate
+exceeds the C<epsilon * total> bound for a given item; a smaller value is a
+stronger guarantee. Row I<r> and row I<r+width> always probe the same column,
+so rows past C<width> repeat an earlier row and add no independent estimate --
+the effective depth is C<< min(depth, width) >>. A very loose C<epsilon>
+combined with a very tight C<delta> therefore cannot reach the requested
+C<delta>; tighten C<epsilon> (a smaller epsilon raises C<width>) to get
+there.
 
 =item * C<ops> -- running count of mutating operations (C<add>, C<add_many>,
 C<merge>, C<clear>).
 
 =item * C<mmap_size> -- bytes of the shared mapping.
+
+=item * C<frozen> -- 1 if the sketch has been sealed by C<freeze> (immutable), else 0.
+
+=item * C<readonly> -- 1 if this handle is a read-only view (from C<new_readonly>,
+or the handle that called C<freeze>), else 0.
 
 =back
 
@@ -218,16 +238,62 @@ reflect the combined stream all of them have added.
     wait;
     print $cms->estimate("ev-500"), "\n";   # >= 10 -- the child's adds
 
+=head1 FROZEN (READ-ONLY) MODE
+
+A file-backed sketch can be B<frozen> and then shipped to other machines, where
+consumers open it B<read-only> and query it with B<no locking at all>.
+
+    # producer: build, freeze, ship the file
+    my $cms = Data::CountMinSketch::Shared->new("/tmp/freq.cms", 0.001, 0.001);
+    $cms->add_many(\@known);
+    $cms->freeze;                 # seal: now immutable, and $cms itself is read-only
+    # ... copy /tmp/freq.cms to another host ...
+
+    # consumer (any process, same architecture): read-only, lock-free
+    my $ro = Data::CountMinSketch::Shared->new_readonly("/tmp/freq.cms");
+    $ro->estimate($item) for @queries;
+
+C<freeze> takes the write lock, marks the sketch B<permanently immutable>
+(there is no unfreeze -- rebuild the file to change it), and flushes the seal
+to disk. A frozen sketch rejects every mutator (C<add>, C<add_many>, C<merge>,
+C<clear>) with a croak, and a read-write reopen (C<< new($path, ...) >>) of a
+sealed file is B<refused> -- so a shipped artifact can never be silently
+mutated out from under its readers. That protection is enforced by the reader:
+the seal is a header flag that C<0.03> and earlier do not know about, and the
+on-disk format version is deliberately unchanged so those releases can still
+open files written here. A pre-C<0.04> build therefore opens a sealed file
+read-write and can modify it, so keep producers and consumers on C<0.04> or
+later if you rely on the seal. C<freeze> itself is not idempotent: the handle
+that seals the file becomes a read-only view of it, so calling C<freeze> on
+that handle again croaks.
+
+C<new_readonly($path)> maps the file C<O_RDONLY> / C<PROT_READ> and B<requires it
+to be frozen> (it croaks on a file that was never C<freeze>d). Because a sealed
+sketch's cells and geometry are immutable, C<estimate>, C<total> and C<stats>
+read them B<directly, taking no reader lock> -- the mapping is never written, so
+a read-only view works from a read-only file descriptor or a read-only
+filesystem, and any number of processes can share one C<PROT_READ> mapping.
+C<frozen> and C<readonly> report the two states.
+
+B<Portability.> The on-disk format is native binary (native-endian 64-bit
+words), so a frozen file may be copied only between machines of the B<same
+architecture>; a wrong-endian file is rejected at open by the magic check.
+B<Copy the file to each consumer> -- do not share one file over a network
+filesystem: the lock is a Linux futex (process-local to one kernel), and the
+"no live writer" contract assumes a static copy. Linux-only; 64-bit Perl.
+
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created, and when a file left
+behind by an interrupted create is re-initialized (see L</CRASH SAFETY>); a
+file already in use keeps its own permissions. The file is opened with
+C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with
+C<O_EXCL>; the on-disk header is validated when the file is attached. Any
+process you grant write access to a shared mapping is trusted not to corrupt
+its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 
@@ -238,16 +304,44 @@ sketch consistent up to the last completed C<add>.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
-crashed lock holder's contribution through its reader-slot. The slot table holds
-1024 entries (one per concurrent reader process). If more than that many reader
-processes share one mapping at once, a reader that cannot claim a slot proceeds
-"slotless" -- it still takes the read lock but leaves no per-process record. If
-such a slotless reader is then killed while holding the read lock, its share of
-the lock cannot be attributed to a dead process, so writer recovery cannot
-reclaim it and writers may block until the mapping is recreated. Reaching this
-needs more than 1024 concurrent reader processes on one mapping plus a crash in
-the brief read-lock window; the dead-process slot reclaim keeps the table from
-filling with stale entries, so in practice it is very unlikely.
+crashed lock holder's contribution through its reader-slot. The slot table
+holds 1024 entries (one per concurrent reader process). If more than that many
+reader processes share one mapping at once, a reader that cannot claim a slot
+proceeds "slotless" -- it still takes the read lock but leaves no per-process
+record. If such a slotless reader is then killed while holding the read lock,
+its share of the lock cannot be attributed to a dead process, so writer
+recovery cannot reclaim it and writers may block until the mapping is
+recreated. Reaching this needs more than 1024 concurrent reader processes on
+one mapping plus a crash in the brief read-lock window; the dead-process slot
+reclaim keeps the table from filling with stale entries, so in practice it is
+very unlikely. Those preconditions cover the live-process route only. The
+count lives in the mapping and C<new> validates the geometry, not this
+transient value, so a backing file damaged at rest -- bit rot, a partial copy,
+or a process that scribbled on the mapping -- can present a non-zero slotless
+count and block every writer the same way, with none of the above. If writers
+hang on a file no live reader is using, recreate it.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete Count-Min sketch
+file left by an interrupted create; remove it and retry>. Such a file never
+held any data, so removing it is safe.
+
+B<Disk space.> The backing file is created B<sparse>: C<new> sizes it, but
+blocks are allocated only as you write, so a large sketch costs almost
+nothing on disk until it is used. The cost of that is a late failure, and how
+it reaches you depends on the filesystem. Where blocks are allocated at fault
+time -- tmpfs, so C</dev/shm> and many C</tmp> mounts -- a write to a page that
+cannot be backed raises C<SIGBUS> and kills the process, because an C<mmap>
+store has no way to report C<ENOSPC>. Where allocation is delayed to writeback
+(ext4, xfs), the store lands in page cache and the failure appears later: the
+write is lost, and C<sync> is what reports it, croaking with the underlying
+error. Keep the filesystem sized for the sketch you asked for, and call
+C<sync> when you need to know your writes reached disk.
 
 =head1 SEE ALSO
 

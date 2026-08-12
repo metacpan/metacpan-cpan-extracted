@@ -1,5 +1,13 @@
 Revision history for RT-Extension-AwayMode
 
+0.04  2026-08-11
+      - Add Catalan (ca) and Spanish (es) translations.
+      - UPGRADING: the one-time SetApplicableTransTypes tweak for existing
+        installs also updates the scrip condition's description to match
+        its widened behavior. Cosmetic only (it's what the admin UI shows
+        for the condition) -- SetApplicableTransTypes is still the part
+        that actually changes behavior.
+
 0.03  2026-08-07
       - Hand tickets off on comments as well as replies. An rt-mailgate run
         with --action comment records incoming mail as a Comment rather than

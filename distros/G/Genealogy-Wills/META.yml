@@ -1,5 +1,5 @@
 ---
-abstract: 'Lookup in a database of wills'
+abstract: 'Search a local database of historical wills'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
@@ -8,6 +8,8 @@ build_requires:
   IPC::System::Simple: '0'
   Test::Carp: '0'
   Test::DescribeMe: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::Returns: '0'
@@ -16,8 +18,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -29,38 +31,31 @@ no_index:
 requires:
   Carp: '0'
   DBD::SQLite: '0'
-  DBD::SQLite::Constants: '0'
   DBI: '0'
   Data::Reuse: '0'
-  Database::Abstraction: '0.04'
-  Error::Simple: '0'
+  Database::Abstraction: '0.37'
   ExtUtils::MakeMaker: '6.64'
-  File::Basename: '0'
   File::HomeDir: '0'
-  File::Slurp: '0'
   File::Spec: '0'
-  File::Temp: '0'
-  File::pfopen: '0'
-  HTML::Entities: '0'
   HTTP::Cache::Transparent: '0'
   LWP::ConnCache: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent::WithCache: '0'
   Lingua::EN::NameCase: '0'
-  Module::Info: '0'
-  Object::Configure: '0.12'
-  Params::Get: '0.13'
-  Params::Validate::Strict: '0.09'
-  Return::Set: '0'
+  Object::Configure: '0.23'
+  Params::Get: '0.16'
+  Params::Validate::Strict: '0.37'
+  Readonly: '0'
+  Return::Set: '0.05'
   Scalar::Util: '0'
+  Sub::Protected: '0'
   Test::HTTPStatus: '0'
   Try::Tiny: '0'
   autodie: '0'
-  constant: '0'
-  perl: '5.006002'
+  perl: '5.010001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Wills
   homepage: https://sites.rootsweb.com/~obituary
-  repository: git://github.com/nigelhorne/Genealogy-Wills.git
-version: '0.10'
+  repository: https://github.com/nigelhorne/Genealogy-Wills.git
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

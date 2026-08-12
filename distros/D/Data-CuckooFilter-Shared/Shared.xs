@@ -10,6 +10,7 @@
         croak("Expected a Data::CuckooFilter::Shared object"); \
     CfHandle *h = INT2PTR(CfHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::CuckooFilter::Shared object"); \
+    CfHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -19,8 +20,10 @@
  * explicit DESTROY, so the local `h` would dangle.  Used only where magic
  * can actually intervene between EXTRACT and the first use of h. */
 #define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::CuckooFilter::Shared object was replaced during the call"); \
     h = INT2PTR(CfHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::CuckooFilter::Shared object destroyed during the call")
+    if (h != h0) croak("Data::CuckooFilter::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -54,7 +57,8 @@ new(class, path = &PL_sv_undef, capacity = 0, ...)
     /* Optional 4th arg: file mode for the exclusive create of a NEW backing
        file (default 0600, owner-only). Pass e.g. 0660 to opt into group
        sharing. Ignored for anonymous mappings and when attaching an existing
-       file. Subject to the process umask, like any open(). */
+       file. Applied exactly: cf_secure_open fchmods after the O_EXCL create,
+       so the process umask does not narrow it. */
     /* Resolve the trailing optional args BEFORE capturing path's PV: get-magic
        on ST(3) can realloc/free path's PV, dangling p before cf_create() uses it. */
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
@@ -62,7 +66,7 @@ new(class, path = &PL_sv_undef, capacity = 0, ...)
     if (capacity < 1)
         croak("Data::CuckooFilter::Shared->new: capacity must be >= 1");
     CfHandle *h = cf_create(p, (uint64_t)capacity, mode, errbuf);
-    if (!h) croak("Data::CuckooFilter::Shared->new: %s", errbuf);
+    if (!h) croak("Data::CuckooFilter::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     REREAD_CLASS();   /* after all argument magic: capacity SvUV, mode/path SvGETMAGIC */
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -80,7 +84,7 @@ new_memfd(class, name = &PL_sv_undef, capacity = 0)
     if (capacity < 1)
         croak("Data::CuckooFilter::Shared->new_memfd: capacity must be >= 1");
     CfHandle *h = cf_create_memfd(nm, (uint64_t)capacity, errbuf);
-    if (!h) croak("Data::CuckooFilter::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::CuckooFilter::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     REREAD_CLASS();   /* after all argument magic: capacity SvUV, name SvGETMAGIC */
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -94,8 +98,29 @@ new_from_fd(class, fd)
     char errbuf[CF_ERR_BUFLEN];
   CODE:
     CfHandle *h = cf_open_fd(fd, errbuf);
-    if (!h) croak("Data::CuckooFilter::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::CuckooFilter::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     REREAD_CLASS();   /* after all argument magic: fd SvIV conversion */
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_readonly(class, path)
+    const char *class
+    SV *path
+  PREINIT:
+    char errbuf[CF_ERR_BUFLEN];
+  CODE:
+    /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
+       ever.  A sealed file is immutable and no read path writes the mapping,
+       so queries take no reader-slot / rwlock traffic and any number of
+       processes can share one PROT_READ mapping (same architecture; the
+       magic rejects a wrong-endian file). */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (!p) croak("Data::CuckooFilter::Shared->new_readonly: path is required");
+    CfHandle *h = cf_open_readonly(p, errbuf);
+    if (!h) croak("Data::CuckooFilter::Shared->new_readonly: %s", errbuf);
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -118,9 +143,11 @@ add(self, item)
     STRLEN n;
     const char *s;
   CODE:
+    if (h->readonly) croak("Data::CuckooFilter::Shared->add: filter is frozen (read-only)");
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
     cf_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cf_rwlock_wrunlock(h); croak("Data::CuckooFilter::Shared->add: filter is frozen (read-only)"); }
     RETVAL = cf_add_locked(h, s, n);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     cf_rwlock_wrunlock(h);
@@ -137,10 +164,12 @@ add_many(self, items)
     IV  top;
     UV  added = 0;
   CODE:
+    if (h->readonly) croak("Data::CuckooFilter::Shared->add_many: filter is frozen (read-only)");
     SvGETMAGIC(items);
     if (!SvROK(items) || SvTYPE(SvRV(items)) != SVt_PVAV)
         croak("Data::CuckooFilter::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(items);
+    sv_2mortal(SvREFCNT_inc((SV *)av));   /* pin the arrayref: element magic below cannot free it mid-loop */
     top = av_len(av);                     /* last index, -1 if empty */
     {
         STRLEN cnt = (top >= 0) ? (STRLEN)(top + 1) : 0, i;
@@ -163,6 +192,7 @@ add_many(self, items)
         }
         REEXTRACT(self);
         cf_rwlock_wrlock(h);                             /* locked region: NO croak-capable calls */
+        if (h->hdr->sealed) { cf_rwlock_wrunlock(h); croak("Data::CuckooFilter::Shared->add_many: filter is frozen (read-only)"); }
         for (i = 0; i < cnt; i++) added += (UV)cf_add_locked(h, ps[i], ls[i]);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
         cf_rwlock_wrunlock(h);
@@ -182,9 +212,13 @@ contains(self, item)
   CODE:
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
-    cf_rwlock_rdlock(h);
-    RETVAL = cf_contains_locked(h, s, n);
-    cf_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable table, no lock needed */
+        RETVAL = cf_contains_locked(h, s, n);
+    } else {
+        cf_rwlock_rdlock(h);
+        RETVAL = cf_contains_locked(h, s, n);
+        cf_rwlock_rdunlock(h);
+    }
   OUTPUT:
     RETVAL
 
@@ -199,9 +233,13 @@ count_of(self, item)
   CODE:
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
-    cf_rwlock_rdlock(h);
-    RETVAL = cf_count_of_locked(h, s, n);
-    cf_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable table, no lock needed */
+        RETVAL = cf_count_of_locked(h, s, n);
+    } else {
+        cf_rwlock_rdlock(h);
+        RETVAL = cf_count_of_locked(h, s, n);
+        cf_rwlock_rdunlock(h);
+    }
   OUTPUT:
     RETVAL
 
@@ -214,9 +252,11 @@ remove(self, item)
     STRLEN n;
     const char *s;
   CODE:
+    if (h->readonly) croak("Data::CuckooFilter::Shared->remove: filter is frozen (read-only)");
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
     cf_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cf_rwlock_wrunlock(h); croak("Data::CuckooFilter::Shared->remove: filter is frozen (read-only)"); }
     RETVAL = cf_remove_locked(h, s, n);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     cf_rwlock_wrunlock(h);
@@ -229,10 +269,42 @@ clear(self)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::CuckooFilter::Shared->clear: filter is frozen (read-only)");
     cf_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cf_rwlock_wrunlock(h); croak("Data::CuckooFilter::Shared->clear: filter is frozen (read-only)"); }
     cf_clear_locked(h);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     cf_rwlock_wrunlock(h);
+
+void
+freeze(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    if (h->readonly) croak("Data::CuckooFilter::Shared->freeze: cannot freeze a read-only handle");
+    if (cf_freeze(h) != 0) croak("Data::CuckooFilter::Shared->freeze: msync: %s", strerror(errno));
+    h->readonly = 1;   /* this handle now rejects mutation too (the file is sealed) */
+
+UV
+frozen(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->hdr->sealed ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
+UV
+readonly(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->readonly ? 1 : 0;
+  OUTPUT:
+    RETVAL
 
 UV
 count(self)
@@ -241,9 +313,13 @@ count(self)
     EXTRACT(self);
     UV n;
   CODE:
-    cf_rwlock_rdlock(h);
-    n = (UV)h->hdr->count;
-    cf_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        n = (UV)h->hdr->count;
+    } else {
+        cf_rwlock_rdlock(h);
+        n = (UV)h->hdr->count;
+        cf_rwlock_rdunlock(h);
+    }
     RETVAL = n;
   OUTPUT:
     RETVAL
@@ -288,12 +364,12 @@ stats(self)
         uint64_t count, capacity, num_buckets, slots_total, ops, mmap_size;
         /* Snapshot under the lock; do all (croak-capable) Perl allocation after
            releasing it -- so an OOM in newHV/newSVuv can never strand the lock. */
-        cf_rwlock_rdlock(h);
+        if (!h->readonly) cf_rwlock_rdlock(h);   /* frozen: immutable, no lock */
         count       = h->hdr->count;
         capacity    = h->hdr->capacity;
         num_buckets = h->hdr->num_buckets;
         ops         = h->hdr->stat_ops;
-        cf_rwlock_rdunlock(h);
+        if (!h->readonly) cf_rwlock_rdunlock(h);
         slots_total = num_buckets * (uint64_t)CF_SLOTS;
         mmap_size   = (uint64_t)h->mmap_size;
 
@@ -305,6 +381,8 @@ stats(self)
         hv_stores(hv, "fill_ratio", newSVnv((double)count / (double)slots_total));   /* slots_total >= CF_MIN_BUCKETS*CF_SLOTS, never 0 */
         hv_stores(hv, "ops",        newSVuv((UV)ops));
         hv_stores(hv, "mmap_size",  newSVuv((UV)mmap_size));
+        hv_stores(hv, "frozen",     newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "readonly",   newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }
   OUTPUT:
@@ -336,7 +414,7 @@ sync(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (cf_msync(h) != 0) croak("sync: %s", strerror(errno));
+    if (!h->readonly && cf_msync(h) != 0) croak("sync: %s", strerror(errno));
 
 void
 unlink(self, ...)
@@ -344,7 +422,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::CuckooFilter::Shared")) {
         CfHandle *h = INT2PTR(CfHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::CuckooFilter::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::CuckooFilter::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

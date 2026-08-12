@@ -31,10 +31,10 @@ no_index:
 provides:
   Math::NLopt:
     file: lib/Math/NLopt.pm
-    version: '0.13'
+    version: '0.14'
   Math::NLopt::Exception:
     file: lib/Math/NLopt/Exception.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Alien::NLopt: '0'
   Ref::Util: '0'
@@ -42,7 +42,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Math-NLopt
   repository: https://codeberg.org/djerius/p5-Math-NLopt.git
-version: '0.13'
+version: '0.14'
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: GPL-3.0-only

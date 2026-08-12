@@ -10,6 +10,7 @@ new(char* class, SV* path, UV capacity, UV file_mode = 0600)
         const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
         BufHandle* buf = buf_u32_create(p, (uint64_t)capacity, (mode_t)file_mode, errbuf);
         if (!buf) croak("Data::Buffer::Shared::U32: %s", errbuf[0] ? errbuf : "unknown error");
+        REREAD_CLASS();
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
         RETVAL
@@ -17,7 +18,7 @@ new(char* class, SV* path, UV capacity, UV file_mode = 0600)
 void
 DESTROY(SV* self_sv)
     CODE:
-        if (!SvROK(self_sv)) return;
+        if (!sv_isobject(self_sv) || !sv_derived_from(self_sv, "Data::Buffer::Shared::U32")) return;
         BufHandle* h = INT2PTR(BufHandle*, SvIV(SvRV(self_sv)));
         if (!h) return;
         sv_setiv(SvRV(self_sv), 0);
@@ -46,6 +47,8 @@ slice(SV* self_sv, UV from, UV count)
     PPCODE:
         EXTRACT_BUF("Data::Buffer::Shared::U32", self_sv);
         if (count == 0) XSRETURN_EMPTY;
+        if (count > h->capacity || from > h->capacity - count)
+            croak("Data::Buffer::Shared::U32: slice out of bounds");
         uint32_t *tmp;
         Newx(tmp, count, uint32_t);
         SAVEFREEPV(tmp);
@@ -172,7 +175,7 @@ void
 unlink(SV* self_or_class, ...)
     CODE:
         const char *p;
-        if (SvROK(self_or_class)) {
+        if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Buffer::Shared::U32")) {
             BufHandle* h = INT2PTR(BufHandle*, SvIV(SvRV(self_or_class)));
             if (h) { if (!h->path) croak("cannot unlink anonymous buffer"); p = h->path; }
             else croak("Data::Buffer::Shared::U32: destroyed object");
@@ -180,7 +183,8 @@ unlink(SV* self_or_class, ...)
             if (items < 2) croak("Usage: Data::Buffer::Shared::U32->unlink($path)");
             p = SvPV_nolen(ST(1));
         }
-        if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
+        if (unlink(p) != 0 && errno != ENOENT)
+            croak("unlink(%s): %s", p, strerror(errno));
 
 UV
 ptr(SV* self_sv)
@@ -206,6 +210,7 @@ new_anon(char* class, UV capacity)
         char errbuf[BUF_ERR_BUFLEN];
         BufHandle* buf = buf_u32_create_anon((uint64_t)capacity, errbuf);
         if (!buf) croak("Data::Buffer::Shared::U32: %s", errbuf[0] ? errbuf : "unknown error");
+        REREAD_CLASS();
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
         RETVAL
@@ -289,6 +294,7 @@ new_memfd(char* class, SV* name, UV capacity)
         const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
         BufHandle* buf = buf_u32_create_memfd(nm, (uint64_t)capacity, errbuf);
         if (!buf) croak("Data::Buffer::Shared::U32: %s", errbuf[0] ? errbuf : "unknown error");
+        REREAD_CLASS();
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
         RETVAL
@@ -299,6 +305,7 @@ new_from_fd(char* class, int fd)
         char errbuf[BUF_ERR_BUFLEN];
         BufHandle* buf = buf_u32_open_fd(fd, errbuf);
         if (!buf) croak("Data::Buffer::Shared::U32: %s", errbuf[0] ? errbuf : "unknown error");
+        REREAD_CLASS();
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
         RETVAL

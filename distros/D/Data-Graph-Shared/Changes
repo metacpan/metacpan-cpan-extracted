@@ -1,5 +1,19 @@
 Revision history for Data::Graph::Shared
 
+0.06      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Frozen read-only mode: freeze() seals a file-backed structure;
+            new_readonly() maps it O_RDONLY and queries it lock-free.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+          - Document which methods return false for an id whose node is gone and
+            which croak; add_edge naming a removed node adds nothing and reports
+            it only through its return value.
+
 0.05      2026-07-22
           - Fix a use-after-free in add_edge(): an overloaded or tied weight
             argument runs Perl that can destroy the graph, after which the

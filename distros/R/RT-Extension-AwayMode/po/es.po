@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2026-08-11 22:15:30+0200\n"
+"Last-Translator: Eduardo Domínguez Vázquez <eduardo.dominguez@uib.es>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: html/Elements/AwayModeEditor:38
+msgid "End date can't be before start date."
+msgstr "La fecha final no puede ser anterior a la inicial."
+
+#: html/Elements/AwayModeEditor:55
+msgid "Away Mode preferences updated."
+msgstr "Se han actualizado las preferencias del Modo de Ausencia."
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:58
+msgid "Away Mode preferences updated for %1."
+msgstr "Se han actualizado las preferencias del Modo de Ausencia para %1."
+
+#: html/Elements/AwayModeEditor:72 html/Callbacks/RT-Extension-AwayMode/Elements/Tabs/Privileged:22 html/Callbacks/RT-Extension-AwayMode/Elements/Header/PrivilegedMainNav:6 html/Prefs/AwayMode.html:11
+msgid "Away Mode"
+msgstr "Modo de Ausencia"
+
+#: html/Elements/AwayModeEditor:89
+msgid "Start date (optional)"
+msgstr "Fecha inicial (opcional)"
+
+#: html/Elements/AwayModeEditor:94
+msgid "End date (optional)"
+msgstr "Fecha final (opcional)"
+
+#: html/Elements/AwayModeEditor:100
+msgid "Dates are inclusive and are compared against RT's own local date."
+msgstr "Las fechas están incluidas en el intervalo, las cuales serán referenciadas con la hora local propia del servidor de RT."
+
+#: html/Elements/AwayModeEditor:115
+msgid "Away Mode is currently ACTIVE."
+msgstr "El Modo de Ausencia está actualmente ACTIVO."
+
+#: html/Elements/AwayModeEditor:116
+msgid "Away Mode is currently not active."
+msgstr "El Modo de Ausencia no está actualmente activo."
+
+#: html/Elements/AwayModeEditor:118
+msgid "New replies to tickets you own will be reassigned to Nobody, with a comment noting you're away."
+msgstr "Las nuevas respuestas a alguno de sus tiques harán que éstos se reasignen al usuario Nobody, con un comentario indicando que está ausente."
+
+#: html/Elements/AwayModeEditor:120
+msgid "I am away/on holiday"
+msgstr "Estoy ausente/de vacaciones"
+
+#: html/Elements/AwayModeEditor:121
+msgid "Leave both dates blank to stay away for as long as the checkbox above is on, or set one or both to bound the away window."
+msgstr "Deje ambas fechas en blanco para indicar su ausencia mientras la casilla anterior esté marcada, o fije una o ambas fechas para delimitar el intervalo de su ausencia."
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:125
+msgid "Away Mode is currently ACTIVE for %1."
+msgstr "El Modo de Ausencia está actualmente ACTIVO para %1."
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:126
+msgid "Away Mode is currently not active for %1."
+msgstr "El Modo de Ausencia está actualmente inactivo para %1."
+
+#: html/Elements/AwayModeEditor:128
+msgid "New replies to tickets %1 owns will be reassigned to Nobody, with a comment noting they are away."
+msgstr "Los tiques que pertenezcan a $1 y que reciban alguna respuesta se reasignarán al usuario Nobody, con un comentario indicando que está ausente."
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:130
+msgid "%1 is away/on holiday"
+msgstr "%1 está ausente/de vacaciones"
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:131
+msgid "Leave both dates blank to keep this user away for as long as the checkbox above is on, or set one or both to bound the away window."
+msgstr "Deje ambas fechas en blanco para mantener a este usuario ausente mientras esta casilla esté activada, o puede fijar una o las dos fechas para delimitar el intervalo de ausencia."
+
+#: html/Callbacks/RT-Extension-AwayMode/autohandler/Default:9
+msgid "Away Mode is active for your account. New replies on tickets you own will be reassigned to Nobody."
+msgstr "El Modo de Ausencia está activado para su cuenta. Si alguno de sus tiques recibe alguna respuesta se reasignará al usuario Nobody."
+
+#. $prefs->{'EndDate'}
+#: html/Callbacks/RT-Extension-AwayMode/autohandler/Default:10
+msgid "You're expected back %1."
+msgstr "Se espera su regreso el día %1."
+
+#: html/Admin/Users/AwayMode.html:16
+msgid "You do not have permission to modify other users."
+msgstr "No tiene permiso para modificar la configuración de otros usuarios."
+
+#. $id
+#: html/Admin/Users/AwayMode.html:22
+msgid "Couldn't load user '%1'"
+msgstr "No se puede cargar el usuario '%1'"
+
+#. $UserObj->Name
+#: html/Admin/Users/AwayMode.html:24
+msgid "Away Mode for the user %1"
+msgstr "Modo de Ausencia para el usuario %1"

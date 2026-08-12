@@ -4,301 +4,279 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame;
-
-our $VERSION = v1.0.5;
-
-use List::Util;
-use Scalar::Util;
+$Context::Singleton::Frame::VERSION = '1.0.7';
+use Moo;
 
 use Context::Singleton::Frame::DB;
 use Context::Singleton::Exception::Invalid;
 use Context::Singleton::Exception::Deduced;
 use Context::Singleton::Exception::Nondeducible;
-use Context::Singleton::Frame::Promise;
-use Context::Singleton::Frame::Promise::Builder;
-use Context::Singleton::Frame::Promise::Rule;
+use Context::Singleton::Frame::Deducer::Notifying;
+
+use namespace::clean;
 
 use overload (
-	'""' => sub { ref ($_[0]) . '[' . $_[0]->{depth} . ']' },
+	q ("") => sub { ref ($_[0]) . q ([) . $_[0]->depth . q (]) },
 	fallback => 1,
 );
 
-sub new {
-	my ($class, %proclaim) = @_;
-	my $self = {
-		promises    => {},
-		depth       => 0,
-		db          => $class->default_db_instance,
-	};
+__PACKAGE__->_generate_frame_class_internals;
 
-	if (ref $class) {
-		$self->{root}   = $class->{root};
-		$self->{parent} = $class;
-		$self->{db}     = $class->{db};
-		$self->{depth}  = $class->{depth} + 1;
+has q (_deducer_class)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> lazy     => 1
+	=> default  => sub { Context::Singleton::Frame::Deducer::Notifying:: }
+	;
 
-		$class = ref $class;
-	}
+has q (_deducer)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> lazy     => 1
+	=> default  => sub { $_[0]->root_frame->_deducer_class->new (frame => $_[0]) }
+	=> handles  => [
+		q (is_deducible),
+	];
 
-	unless ($self->{root}) {
-		$self->{root} = $self;
-		Scalar::Util::weaken $self->{root};
-	}
+has q (db)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> lazy     => 1
+	=> default  => sub { $_[0]->parent ? $_[0]->parent->db : $_[0]->db_class->instance }
+	;
 
-	$self = bless $self, $class;
+has q (db_class)
+	=> is       => q (ro)
+	=> lazy     => 1
+	=> default  => sub { Context::Singleton::Frame::DB:: }
+	;
 
-	$self->proclaim (%proclaim);
+has q (depth)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> lazy     => 1
+	=> default  => sub { $_[0]->parent ? $_[0]->parent->depth + 1 : 0 }
+	;
 
-	return $self;
-}
+has q (parent)
+	=> is       => q (ro)
+	;
 
-sub depth {
-	$_[0]->{depth};
-}
+has q (root_frame)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> lazy     => 1
+	=> default  => sub { $_[0]->parent ? $_[0]->parent->root_frame : $_[0] }
+	;
 
-sub parent {
-	$_[0]->{parent};
-}
+sub _effective_frame {
+	my $frame = shift;
 
-sub default_db_class {
-	'Context::Singleton::Frame::DB';
-}
-
-sub default_db_instance {
-	$_[0]->default_db_class->instance;
-}
-
-sub db {
-	$_[0]->{db};
-}
-
-sub debug {
-	my ($self, @message) = @_;
-
-	my $sub = (caller(1))[3];
-	$sub =~ s/^.*://;
-
-	use feature 'say';
-	say "# [${\ $self->depth}] $sub ${\ join ' ', @message }";
-}
-
-sub _build_builder_promise_for {
-	my ($self, $builder) = @_;
-
-	my $promise = $self->_class_builder_promise->new (
-		depth   => $self->depth,
-		builder => $builder,
-	);
-
-	my %optional = $builder->default;
-	my %required = map +($_ => 1), $builder->required;
-	delete @required{ keys %optional };
-
-	$promise->add_dependencies (
-		map $self->_search_promise_for ($_), keys %required
-	);
-
-	$promise->set_deducible (0) unless keys %required;
-
-	$promise->listen ($self->_search_promise_for ($_))
-		for keys %optional;
-
-	$promise;
-}
-
-sub _build_rule_promise_for {
-	my ($self, $rule) = @_;
-
-	$self->{promises}{$rule} // do {
-		my $promise = $self->{promises}{$rule} = $self->_class_rule_promise->new (
-			depth => $self->depth,
-			rule => $rule,
-		);
-
-		$promise->add_dependencies ($self->parent->_search_promise_for ($rule))
-			if $self->parent;
-
-		for my $builder ($self->db->find_builder_for ($rule)) {
-			$promise->add_dependencies (
-				$self->_build_builder_promise_for ($builder)
-			);
-		}
-
-		$promise;
-	};
-}
-
-sub _class_builder_promise {
-	'Context::Singleton::Frame::Promise::Builder';
-}
-
-sub _class_rule_promise {
-	'Context::Singleton::Frame::Promise::Rule';
-}
-
-sub _deduce_rule {
-	my ($self, $rule) = @_;
-
-	my $promise = $self->_search_promise_for( $rule );
-	return $promise->value if $promise->is_deduced;
-
-	my $builder_promise = $promise->deducible_builder;
-	return $builder_promise->value if $builder_promise->is_deduced;
-
-	my $builder = $builder_promise->builder;
-	my %deduced = $builder->default;
-
-	for my $dependency ($builder->required) {
-		# dependencies with default values may not be deducible
-		# relying on promises to detect deducible values
-		next unless $self->is_deducible( $dependency );
-
-		$deduced{$dependency} = $self->deduce ($dependency);
-	}
-
-	$builder->build (\%deduced);
-}
-
-sub _execute_triggers {
-	my ($self, $rule, $value) = @_;
-
-	$_->($value) for $self->db->find_trigger_for ($rule);
-}
-
-sub _find_promise_for {
-	my ($self, $rule) = @_;
-
-	$self->{promises}{$rule};
+	ref ($frame) ? $frame : $frame->current_frame;
 }
 
 sub _frame_by_depth {
-	my ($self, $depth) = @_;
+	my ($frame, $depth) = @_;
 
-	return if $depth < 0;
+	return
+		if $depth < 0
+		;
 
-	my $distance = $self->depth - $depth;
-	return if $distance < 0;
+	my $distance = $frame->depth - $depth;
+	return
+		if $distance < 0
+		;
 
-	my $found = $self;
+	my $found = $frame;
 
 	$found = $found->parent
-		while $distance-- > 0;
+		while $distance-- > 0
+		;
 
 	$found;
 }
 
-sub _root_frame {
-	$_[0]->{root};
-}
+sub _generate_frame_class_internals {
+	my ($class) = @_;
 
-sub _search_promise_for {
-	my ($self, $rule) = @_;
+	my $current_frame = [ $class->build_frame ];
 
-	$self->_find_promise_for ($rule)
-		// $self->_build_rule_promise_for ($rule)
-		;
-}
-
-sub _set_promise_value {
-	my ($self, $promise, $value) = @_;
-
-	$promise->set_value ($value, $self->depth);
-	$self->_execute_triggers ($promise->rule, $value);
-
-	$value;
+	no strict q (refs);
+	*{"${class}::_localisable_current_frame"} = sub { $current_frame };
 }
 
 sub _throw_deduced {
-	my ($self, $rule) = @_;
+	my ($frame, $singleton) = @_;
 
-	throw Context::Singleton::Exception::Deduced ($rule);
+	throw Context::Singleton::Exception::Deduced ($singleton);
 }
 
 sub _throw_nondeducible {
-	my ($self, $rule) = @_;
+	my ($frame, $singleton) = @_;
 
-	throw Context::Singleton::Exception::Nondeducible ($rule);
+	throw Context::Singleton::Exception::Nondeducible ($singleton);
+}
+
+sub build_frame {
+	my ($class, %proclaim) = @_;
+
+	my $frame = ref ($class)
+		? $class->new (parent => $class)
+		: $class->new
+		;
+
+	$frame->proclaim (%proclaim);
+
+	return $frame;
 }
 
 sub contrive {
-	my ($self, $rule, @how) = @_;
-
-	$self->db->contrive ($rule, @how);
+	(&_effective_frame)->db->contrive (@_);
 }
 
-sub load_rules {
-	shift->db->load_rules (@_);
+sub contrive_class {
+	(&_effective_frame)->db->contrive_class (@_);
 }
 
-sub trigger {
-	shift->db->trigger (@_);
+sub current_frame {
+	shift->_localisable_current_frame->[0];
+}
+
+sub debug {
+	my ($frame, @message) = @_;
+
+	my $sub = (caller(1))[3];
+	$sub =~ s/^.*://;
+
+	use feature q (say);
+	say qq (# [${\ $frame->depth}] $sub ${\ join ' ', @message });
 }
 
 sub deduce {
-	my ($self, $rule, @proclaim) = @_;
+	my ($frame, $singleton, @proclaim) = (&_effective_frame, @_);
 
-	$self = $self->new (@proclaim) if @proclaim;
+	$frame = $frame->new (@proclaim)
+		if @proclaim
+		;
 
-	$self->_throw_nondeducible ($rule)
-		unless $self->try_deduce ($rule);
+	$frame->_throw_nondeducible ($singleton)
+		unless $frame->try_deduce ($singleton)
+		;
 
-	$self->_find_promise_for ($rule)->value;
+	$frame->_deducer->deduce ($singleton);
+}
+
+sub frame {
+	my ($frame, $code) = (&_effective_frame, @_);
+
+	local $frame->_localisable_current_frame->[0] = $frame->build_frame;
+
+	$code->();
 }
 
 sub is_deduced {
-	my ($self, $rule) = @_;
-
-	return unless my $promise = $self->_find_promise_for ($rule);
-	return $promise->is_deduced;
+	(&_effective_frame)->_deducer->is_deduced (@_);
 }
 
-sub is_deducible {
-	my ($self, $rule) = @_;
-
-	return unless my $promise = $self->_search_promise_for ($rule);
-	return $promise->is_deducible;
+sub load_rules {
+	(&_effective_frame)->db->load_rules (@_);
 }
 
 sub proclaim {
-	my ($self, @proclaim) = @_;
+	my ($frame, @proclaim) = (&_effective_frame, @_);
 
-	return unless @proclaim;
+	return
+		unless @proclaim
+		;
 
 	my $retval;
 	while (@proclaim) {
-		my $key = shift @proclaim;
+		my $singleton = shift @proclaim;
 		my $value = shift @proclaim;
 
-		my $promise = $self->_find_promise_for ($key)
-			// $self->_build_rule_promise_for ($key)
+		$frame->_throw_deduced ($singleton)
+			if $frame->is_deduced ($singleton)
 			;
 
-		$self->_throw_deduced ($key)
-			if $promise->is_deduced;
-
-		$retval = $self->_set_promise_value ($promise, $value);
+		$retval = $frame->_deducer->proclaim ($singleton, $value);
 	}
 
 	$retval;
 }
 
+sub trigger {
+	(&_effective_frame)->db->trigger (@_);
+}
+
 sub try_deduce {
-	my ($self, $rule) = @_;
-
-	my $promise = $self->_search_promise_for ($rule);
-	return unless $promise->is_deducible;
-
-	my $value = $self
-		->_frame_by_depth ($promise->deduced_in_depth)
-		->_deduce_rule ($promise->rule)
-		;
-
-	$promise->set_value ($value, $promise->deduced_in_depth);
-
-	1;
+	(&_effective_frame)->_deducer->try_deduce (@_);
 }
 
 1;
 
 __END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Context::Singleton::Frame - Internal representation of Context::Singleton's frame
+
+=head1 DESCRIPTION
+
+This is internal package.
+
+=head1 EXTENDING FRAME
+
+Each L<Context::Singleton::Frame> (sub)class tracks its own current I<frame>,
+so alternate implementations - e.g. selected via
+C<< use Context::Singleton { frame_class => q (My::Frame) } >> - don't
+interfere with L<Context::Singleton::Frame>'s (or each other's) state.
+
+=head2 _generate_frame_class_internals ()
+
+	package My::Frame;
+	use Moo;
+	BEGIN { extends q (Context::Singleton::Frame) }
+	BEGIN { __PACKAGE__->_generate_frame_class_internals }
+
+Installs a C<_localisable_current_frame> method into the calling class,
+backed by its own arrayref slot holding the current I<frame> instance.
+
+C<current_frame ()> and C<frame {}> both resolve C<_localisable_current_frame>
+through regular method dispatch, so:
+
+=over
+
+=item *
+
+A class calling C<_generate_frame_class_internals> gets its own current
+I<frame>, independent of its parent class.
+
+=item *
+
+A subclass which doesn't call it inherits its parent's
+C<_localisable_current_frame> and therefore shares its parent's current
+I<frame>.
+
+=back
+
+L<Context::Singleton::Frame> calls C<_generate_frame_class_internals> on
+itself when the module is loaded, so it always has its own state, even
+before any subclass exists.
+
+An optional frame (or class) to seed the slot with may be passed; it defaults
+to the invocant.
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney.cpan@gmail.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+This module is part of L<Context::Singleton> distribution.
+
+=cut
 

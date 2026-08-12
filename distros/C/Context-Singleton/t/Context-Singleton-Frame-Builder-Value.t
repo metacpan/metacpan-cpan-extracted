@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib map "${FindBin::Bin}/$_", qw[ ../lib lib sample ];
+use lib map qq (${FindBin::Bin}/$_), qw[ ../lib lib sample ];
 
 use Test::Spec::Util;
 
@@ -11,20 +11,20 @@ use Examples::Context::Singleton::Frame::Builder;
 
 use Context::Singleton::Frame::Builder::Value;
 
-class_under_test 'Context::Singleton::Frame::Builder::Value';
+class_under_test q (Context::Singleton::Frame::Builder::Value);
 
-describe "build" => as {
-	context "with defined value" => as {
+describe q (build) => as {
+	context q (with defined value) => as {
 		build_instance [
-			value => 'xyz',
+			value => q (xyz),
 		];
 
 		expect_required   expect => [ ];
 		expect_unresolved expect => [ ];
-		expect_build      expect => 'xyz';
+		expect_build      expect => q (xyz);
 	};
 
-	context "with undefined value" => as {
+	context q (with undefined value) => as {
 		build_instance [
 			value => undef,
 		];

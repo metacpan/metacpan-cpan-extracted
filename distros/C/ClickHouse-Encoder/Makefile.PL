@@ -18,11 +18,13 @@ WriteMakefile(
     LICENSE      => 'perl_5',
     PREREQ_PM    => {
         XSLoader => 0,
-        # All four below are core in any supported Perl; listed for
+        # All of these are core in any supported Perl; listed for
         # honesty about what the lazy-require sites pull in.
         'HTTP::Tiny'   => 0,  # for_table(via=>'http'), insert_http, etc.
         'Time::HiRes'  => 0,  # bulk_inserter retry backoff
         'Math::BigInt' => 0,  # decimal128_str / decimal256_str
+        'Encode'       => 0,  # URL escaping in _http_url_headers
+        'POSIX'        => 0,  # coerce_datetimes, encode_to_command
     },
     TEST_REQUIRES => {
         'Test::More'      => 0,
@@ -64,6 +66,10 @@ WriteMakefile(
                     # bulk_inserter(compress=>'gzip'). Core since 5.10
                     # but listed for explicitness.
                     'IO::Compress::Gzip' => 0,
+                },
+                suggests => {
+                    # coerce_datetimes(as => 'datetime') only.
+                    'Time::Moment' => 0,
                 },
             },
         },

@@ -1,5 +1,9 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.63 2026-08-12
+
+* Remove CJK Symbols and Punctuation 3000-3040 from InKana regexp
+
 0.62 2026-07-16
 
 * is_romaji_semistrict returns a canonical form rather than 1 if valid

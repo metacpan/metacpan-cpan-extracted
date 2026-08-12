@@ -4,6 +4,7 @@ PROTOTYPES: DISABLE
 SV*
 new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0, UV file_mode = 0600)
     CODE:
+        CK_U32(max_entries, "max_entries", "Data::HashMap::Shared::I16"); CK_U32(lru_max, "lru_max", "Data::HashMap::Shared::I16"); CK_U32(ttl_default, "ttl_default", "Data::HashMap::Shared::I16"); CK_U32(lru_skip, "lru_skip", "Data::HashMap::Shared::I16");
         char errbuf[SHM_ERR_BUFLEN]; const char* path = (SvGETMAGIC(path_sv), SvOK(path_sv)) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_i16_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, (mode_t)file_mode, errbuf);
         if (!map) croak("Data::HashMap::Shared::I16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
@@ -14,6 +15,8 @@ SV*
 new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0, UV file_mode = 0600)
     CODE:
         const char* path_prefix = (SvGETMAGIC(path_prefix_sv), SvOK(path_prefix_sv)) ? SvPV_nolen(path_prefix_sv) : NULL;
+        CK_U32(max_entries, "max_entries", "Data::HashMap::Shared::I16"); CK_U32(lru_max, "lru_max", "Data::HashMap::Shared::I16"); CK_U32(ttl_default, "ttl_default", "Data::HashMap::Shared::I16"); CK_U32(lru_skip, "lru_skip", "Data::HashMap::Shared::I16");
+        CK_U32(num_shards, "num_shards", "Data::HashMap::Shared::I16");
         char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_i16_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, (mode_t)file_mode, errbuf);
         if (!map) croak("Data::HashMap::Shared::I16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
@@ -26,6 +29,7 @@ new_memfd(char* class, SV* name_sv, UV max_entries, UV lru_max = 0, UV ttl_defau
     CODE:
         char errbuf[SHM_ERR_BUFLEN];
         const char* name = (SvGETMAGIC(name_sv), SvOK(name_sv)) ? SvPV_nolen(name_sv) : NULL;
+        CK_U32(max_entries, "max_entries", "Data::HashMap::Shared::I16"); CK_U32(lru_max, "lru_max", "Data::HashMap::Shared::I16"); CK_U32(ttl_default, "ttl_default", "Data::HashMap::Shared::I16"); CK_U32(lru_skip, "lru_skip", "Data::HashMap::Shared::I16");
         ShmHandle* map = shm_i16_create_memfd(name, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, errbuf);
         if (!map) croak("Data::HashMap::Shared::I16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
@@ -39,6 +43,42 @@ new_from_fd(char* class, int fd)
         ShmHandle* map = shm_i16_open_fd(fd, errbuf);
         if (!map) croak("Data::HashMap::Shared::I16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+    OUTPUT:
+        RETVAL
+
+SV*
+new_readonly(char* class, SV* path_sv)
+    CODE:
+        char errbuf[SHM_ERR_BUFLEN];
+        const char* path = (SvGETMAGIC(path_sv), SvOK(path_sv)) ? SvPV_nolen(path_sv) : NULL;
+        if (!path) croak("Data::HashMap::Shared::I16->new_readonly: path is required");
+        ShmHandle* map = shm_i16_open_readonly(path, errbuf);
+        if (!map) croak("Data::HashMap::Shared::I16: %s", errbuf[0] ? errbuf : "unknown error");
+        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+    OUTPUT:
+        RETVAL
+
+void
+freeze(SV* self_sv)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16->freeze: cannot freeze a read-only handle");
+        if (shm_freeze(h) != 0) croak("Data::HashMap::Shared::I16->freeze: msync: %s", strerror(errno));
+        shm_mark_readonly(h);
+
+UV
+frozen(SV* self_sv)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        RETVAL = (UV)((h->shard_handles ? h->shard_handles[0]->hdr->sealed : h->hdr->sealed) ? 1 : 0);
+    OUTPUT:
+        RETVAL
+
+UV
+readonly(SV* self_sv)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        RETVAL = (UV)(h->readonly ? 1 : 0);
     OUTPUT:
         RETVAL
 
@@ -60,7 +100,7 @@ sync(SV* self_sv)
 void
 DESTROY(SV* self_sv)
     CODE:
-        if (!SvROK(self_sv)) return;
+        if (!sv_isobject(self_sv) || !sv_derived_from(self_sv, "Data::HashMap::Shared::I16")) return;
         ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
         if (!h) return;
         sv_setiv(SvRV(self_sv), 0);
@@ -70,6 +110,7 @@ bool
 put(SV* self_sv, int16_t key, int16_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_put(h, key, value);
     OUTPUT:
         RETVAL
@@ -88,6 +129,7 @@ bool
 remove(SV* self_sv, int16_t key)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_remove(h, key);
     OUTPUT:
         RETVAL
@@ -104,6 +146,7 @@ SV*
 incr(SV* self_sv, int16_t key)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int ok;
         int16_t val = shm_i16_incr_by(h, key, 1, &ok);
         if (!ok) croak("Data::HashMap::Shared::I16: increment failed");
@@ -115,6 +158,7 @@ SV*
 decr(SV* self_sv, int16_t key)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int ok;
         int16_t val = shm_i16_incr_by(h, key, -1, &ok);
         if (!ok) croak("Data::HashMap::Shared::I16: decrement failed");
@@ -126,6 +170,7 @@ SV*
 incr_by(SV* self_sv, int16_t key, int16_t delta)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int ok;
         int16_t val = shm_i16_incr_by(h, key, delta, &ok);
         if (!ok) croak("Data::HashMap::Shared::I16: incr_by failed");
@@ -137,6 +182,7 @@ SV*
 max(SV* self_sv, int16_t key, int16_t desired)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int ok;
         int16_t val = shm_i16_set_minmax(h, key, desired, 1, &ok);
         if (!ok) croak("Data::HashMap::Shared::I16: max failed");
@@ -148,6 +194,7 @@ SV*
 min(SV* self_sv, int16_t key, int16_t desired)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int ok;
         int16_t val = shm_i16_set_minmax(h, key, desired, 0, &ok);
         if (!ok) croak("Data::HashMap::Shared::I16: min failed");
@@ -203,7 +250,7 @@ values(SV* self_sv)
             EXTEND(SP, hdr->size);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now))
-                    mXPUSHi(nodes[i].value);
+                    mXPUSHi(__atomic_load_n(&nodes[i].value, __ATOMIC_RELAXED));
             }
         }
 
@@ -223,7 +270,7 @@ items(SV* self_sv)
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now)) {
                     mXPUSHi(nodes[i].key);
-                    mXPUSHi(nodes[i].value);
+                    mXPUSHi(__atomic_load_n(&nodes[i].value, __ATOMIC_RELAXED));
                 }
             }
         }
@@ -254,6 +301,7 @@ void
 clear(SV* self_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         shm_i16_clear(h);
 
 SV*
@@ -270,7 +318,7 @@ to_hash(SV* self_sv)
             RDLOCK_GUARD(sh);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now)) {
-                    SV* val = newSViv(nodes[i].value);
+                    SV* val = newSViv(__atomic_load_n(&nodes[i].value, __ATOMIC_RELAXED));
                     char kbuf[24];
                     int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)nodes[i].key);
                     if (!hv_store(hv, kbuf, klen, val, 0)) SvREFCNT_dec(val);
@@ -286,6 +334,7 @@ SV*
 get_or_set(SV* self_sv, int16_t key, int16_t default_value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int16_t out;
         int rc = shm_i16_get_or_set(h, key, default_value, &out);
         if (!rc) XSRETURN_UNDEF;
@@ -297,6 +346,7 @@ bool
 put_ttl(SV* self_sv, int16_t key, int16_t value, UV ttl_sec)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         REQUIRE_TTL(h);
         RETVAL = shm_i16_put_ttl(h, key, value, (uint32_t)ttl_sec);
     OUTPUT:
@@ -322,6 +372,7 @@ SV*
 take(SV* self_sv, int16_t key)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int16_t out_value;
         if (!shm_i16_take(h, key, &out_value)) XSRETURN_UNDEF;
         RETVAL = newSViv(out_value);
@@ -332,6 +383,7 @@ void
 pop(SV* self_sv)
     PPCODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int16_t out_key;
         int16_t out_val;
         if (!shm_i16_pop(h, &out_key, &out_val)) XSRETURN_EMPTY;
@@ -343,6 +395,7 @@ void
 shift(SV* self_sv)
     PPCODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int16_t out_key;
         int16_t out_val;
         if (!shm_i16_shift(h, &out_key, &out_val)) XSRETURN_EMPTY;
@@ -354,6 +407,13 @@ void
 drain(SV* self_sv, UV limit)
     PPCODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
+        /* Only as many as the map can actually yield: drain(1e9) on a
+         * ten-entry map otherwise reserved a billion entries up front. */
+        {
+            UV avail = (UV)shm_i16_size(h);
+            if (limit > avail) limit = avail;
+        }
         if (limit == 0) XSRETURN_EMPTY;
         shm_i16_drain_entry *entries;
         Newxz(entries, limit, shm_i16_drain_entry);
@@ -374,6 +434,7 @@ UV
 flush_expired(SV* self_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = (UV)shm_i16_flush_expired(h);
     OUTPUT:
         RETVAL
@@ -382,6 +443,7 @@ void
 flush_expired_partial(SV* self_sv, UV limit)
     PPCODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int done = 0;
         uint32_t flushed = shm_i16_flush_expired_partial(h, (uint32_t)limit, &done);
         EXTEND(SP, 2);
@@ -400,6 +462,7 @@ bool
 touch(SV* self_sv, int16_t key)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_touch(h, key);
     OUTPUT:
         RETVAL
@@ -408,6 +471,7 @@ bool
 reserve(SV* self_sv, UV target)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_reserve(h, (uint32_t)target);
     OUTPUT:
         RETVAL
@@ -456,6 +520,7 @@ bool
 add(SV* self_sv, int16_t key, int16_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_add(h, key, value);
     OUTPUT:
         RETVAL
@@ -464,6 +529,7 @@ bool
 add_ttl(SV* self_sv, int16_t key, int16_t value, UV ttl_sec)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         REQUIRE_TTL(h);
         RETVAL = shm_i16_add_ttl(h, key, value, (uint32_t)ttl_sec);
     OUTPUT:
@@ -473,6 +539,7 @@ bool
 update(SV* self_sv, int16_t key, int16_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_update(h, key, value);
     OUTPUT:
         RETVAL
@@ -481,6 +548,7 @@ bool
 update_ttl(SV* self_sv, int16_t key, int16_t value, UV ttl_sec)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         REQUIRE_TTL(h);
         RETVAL = shm_i16_update_ttl(h, key, value, (uint32_t)ttl_sec);
     OUTPUT:
@@ -490,6 +558,7 @@ SV*
 swap(SV* self_sv, int16_t key, int16_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int16_t out_value;
         int rc = shm_i16_swap(h, key, value, &out_value);
         if (rc != 1) XSRETURN_UNDEF;
@@ -501,6 +570,7 @@ bool
 cas(SV* self_sv, int16_t key, int16_t expected, int16_t desired)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_cas(h, key, expected, desired);
     OUTPUT:
         RETVAL
@@ -509,6 +579,7 @@ SV*
 cas_take(SV* self_sv, int16_t key, int16_t expected)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         int16_t out_value;
         if (!shm_i16_cas_take(h, key, expected, &out_value)) XSRETURN_UNDEF;
         RETVAL = newSViv(out_value);
@@ -519,6 +590,7 @@ bool
 persist(SV* self_sv, int16_t key)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_persist(h, key);
     OUTPUT:
         RETVAL
@@ -527,6 +599,7 @@ bool
 set_ttl(SV* self_sv, int16_t key, UV ttl_sec)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         RETVAL = shm_i16_set_ttl(h, key, (uint32_t)ttl_sec);
     OUTPUT:
         RETVAL
@@ -580,7 +653,7 @@ get_multi(SV* self_sv, ...)
                     if (st != tag) continue;
                     if (nodes[idx].key == key) {
                         if (h->expires_at && h->expires_at[idx] && now >= h->expires_at[idx]) break;
-                        val = nodes[idx].value;
+                        val = __atomic_load_n(&nodes[idx].value, __ATOMIC_RELAXED);
                         found = 1;
                         break;
                     }
@@ -625,6 +698,8 @@ stats(SV* self_sv)
         hv_store(hv, "recoveries", 10, newSVuv(shm_i16_stat_recoveries(h)), 0);
         hv_store(hv, "max_size", 8, newSVuv(shm_i16_max_size(h)), 0);
         hv_store(hv, "ttl", 3, newSVuv(shm_i16_ttl(h)), 0);
+        hv_store(hv, "frozen", 6, newSVuv((UV)((h->shard_handles ? h->shard_handles[0]->hdr->sealed : h->hdr->sealed) ? 1 : 0)), 0);
+        hv_store(hv, "readonly", 8, newSVuv((UV)(h->readonly ? 1 : 0)), 0);
         RETVAL = newRV_noinc((SV*)hv);
     OUTPUT:
         RETVAL
@@ -633,6 +708,7 @@ UV
 set_multi(SV* self_sv, ...)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         if ((items - 1) % 2 != 0) croak("set_multi requires even number of arguments (key, value pairs)");
         uint32_t count = 0;
         if (h->shard_handles) {
@@ -659,6 +735,7 @@ UV
 remove_multi(SV* self_sv, ...)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
         uint32_t count = 0;
         if (h->shard_handles) {
             for (int i = 1; i < items; i++) {
@@ -690,7 +767,7 @@ path(SV* self_sv)
 bool
 unlink(SV* self_or_class, ...)
     CODE:
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
+        if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::HashMap::Shared::I16")) {
             ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
             if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::I16 object");
             RETVAL = shm_unlink_sharded(h);
@@ -744,7 +821,7 @@ PROTOTYPES: DISABLE
 void
 DESTROY(SV* self_sv)
     CODE:
-        if (!SvROK(self_sv)) return;
+        if (!sv_isobject(self_sv) || !sv_derived_from(self_sv, "Data::HashMap::Shared::I16::Cursor")) return;
         ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
         if (!c) return;
         ShmHandle* h = c->current;

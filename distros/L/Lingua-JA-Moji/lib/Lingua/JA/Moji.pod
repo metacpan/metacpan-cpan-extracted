@@ -25,7 +25,7 @@ produces output
     アイウエオ
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.62/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.63/examples/synopsis.pl> in the distribution.)
 
 
 Convert between different forms of kana:
@@ -51,13 +51,13 @@ produces output
     ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
 
 
-(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.62/examples/syn-kana.pl> in the distribution.)
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.63/examples/syn-kana.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.62
-corresponding to git commit L<397c762aa8e05043d9d5c068665085db33f8cab1|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/397c762aa8e05043d9d5c068665085db33f8cab1> made on Thu Jul 16 15:27:09 2026 +0900.
+This document describes Lingua::JA::Moji version 0.63
+corresponding to git commit L<8cd0fa037206a9fa1a2cd6e648ccb36d0ec6eefc|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/8cd0fa037206a9fa1a2cd6e648ccb36d0ec6eefc> made on Wed Aug 12 09:31:10 2026 +0900.
 
 =head1 DESCRIPTION
 
@@ -138,7 +138,6 @@ converted into wapuro format.
     # The following line returns a canonical version of the romaji
     is_romaji_semistrict ("atarimae");
     # The following line returns a canonical version of the romaji
-    a defined value
     is_romaji_semistrict ("pinku no dorufin");
 
 
@@ -163,7 +162,7 @@ of the romaji.
     is_romaji_strict ("abcdefg");
     # The following line returns "undef"
     is_romaji_strict ('loyehye');
-    # The following line returns a defined value
+    # The following line returns a canonical version of the romaji
     is_romaji_strict ("atarimae");
 
 
@@ -1671,7 +1670,7 @@ produces output
     アッタカ〜イ -> アッタカアイ
 
 
-(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.62/examples/onbiki.pl> in the distribution.)
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.63/examples/onbiki.pl> in the distribution.)
 
 
 =item L<Lingua::JA::Regular::Unicode>
@@ -1937,6 +1936,29 @@ This added L</kana_consonant>.
 =item 0.59
 
 This added L</strip_sound_marks>.
+
+=item 0.60
+
+Added L</is_small> and L</is_katakana> functions.
+
+=item 0.61
+
+L</kana2romaji> now supports "Wikipedia romanisation", the false
+format used by the English-language Wikipedia to romanise Japanese.
+
+A bug was fixed in L</kana2romaji>'s kunrei romanisation.
+
+=item 0.62
+
+L</is_romaji_semistrict> now returns a canonical form as a positive
+result rather than just "1".
+
+=item 0.63
+
+A bug in the Perl regexp classes C<InHiragana> and C<Katakana> was
+found where they would match the punctuation characters C<U+3000> to
+C<U+3040>, so the regexp class L</InKana> from this module was not
+working correctly. This block of false matches was removed.
 
 =back
 

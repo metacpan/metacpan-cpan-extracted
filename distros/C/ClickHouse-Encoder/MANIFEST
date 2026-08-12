@@ -107,6 +107,7 @@ t/empty-string-vs-undef.t
 t/error_messages.t
 t/estimate-size-accuracy.t
 t/extended_types.t
+t/hardening.t
 t/helpers.t
 t/http-retry-backoff.t
 t/insert-deduplication.t
@@ -132,6 +133,7 @@ t/streamer-edge.t
 t/streamer-error-recovery.t
 t/stress.t
 t/tcp.t
+t/threads.t
 t/tied-rows.t
 t/types.t
 t/url-helpers.t

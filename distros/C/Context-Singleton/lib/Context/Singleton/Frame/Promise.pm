@@ -4,31 +4,47 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::Promise;
-
-our $VERSION = v1.0.5;
+$Context::Singleton::Frame::Promise::VERSION = '1.0.7';
+use Moo;
 
 use Scalar::Util qw[ weaken ];
 
 use namespace::clean;
 
-sub new {
-	my ($class, %params) = @_;
+has q (depth)
+	=> is       => q (ro)
+	;
 
-	bless {
-		depth           => $params{depth},
-		is_resolvable   => 0,
-		dependencies    => [],
-		listeners       => {},
-	}, $class;
-}
+has q (value)
+	=> is       => q (rw)
+	=> writer   => q (_value)
+	=> predicate => q (is_deduced)
+	;
 
-sub depth {
-	$_[0]->{depth};
-}
+has q (is_deducible)
+	=> is       => q (rw)
+	=> init_arg => +undef
+	=> writer   => q (_is_deducible)
+	=> default  => sub { 0 }
+	;
 
-sub value {
-	$_[0]->{value};
-}
+has q (deduced_in_depth)
+	=> is       => q (rw)
+	=> init_arg => +undef
+	=> writer   => q (_deduced_in_depth)
+	;
+
+has q (_dependencies)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> default  => sub { +[] }
+	;
+
+has q (_listeners)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> default  => sub { +{} }
+	;
 
 sub set_value {
 	my ($self, $value, $in_depth) = @_;
@@ -36,43 +52,23 @@ sub set_value {
 	$in_depth //= $self->depth;
 
 	unless ($self->is_deduced) {
-		$self->{value} = $value;
+		$self->_value ($value);
 		$self->set_deducible ($in_depth);
 	}
 
 	$self;
 }
 
-sub is_deduced {
-	exists $_[0]->{value};
-}
-
-sub is_deducible {
-	$_[0]->{is_deducible};
-}
-
 sub set_deducible {
 	my ($self, $in_depth) = @_;
 
 	unless ($self->is_deducible and $self->deduced_in_depth >= $in_depth) {
-		$self->{is_deducible} = 1;
-		$self->_set_deduced_in_depth ($in_depth);
+		$self->_is_deducible (1);
+		$self->_deduced_in_depth ($in_depth);
 		$self->_broadcast_deducible;
 	}
 
 	$self;
-}
-
-sub deduced_in_depth {
-	$_[0]->{in_depth};
-}
-
-sub _set_deduced_in_depth {
-	$_[0]->{in_depth} = $_[1];
-}
-
-sub _listeners {
-	$_[0]->{listeners};
 }
 
 sub add_listeners {
@@ -92,12 +88,14 @@ sub add_listeners {
 		};
 
 		$entry->{next}{prev} = $head->{next}
-			if $entry->{next};
+			if $entry->{next}
+			;
 
 		Scalar::Util::weaken $entry->{listener};
 
 		$self->_notify_listener ($entry->{listener})
-			if $self->is_deducible;
+			if $self->is_deducible
+			;
 	}
 
 	$self;
@@ -113,10 +111,6 @@ sub listen {
 	$self;
 }
 
-sub _dependencies {
-	$_[0]->{dependencies};
-}
-
 sub add_dependencies {
 	my ($self, @new_dependencies) = @_;
 
@@ -127,7 +121,9 @@ sub add_dependencies {
 		#Scalar::Util::weaken ($self->_dependencies->[-1]);
 	}
 
-	$_->add_listeners ($self) for @new_dependencies;
+	$_->add_listeners ($self)
+		for @new_dependencies
+		;
 
 	$self;
 }
@@ -145,7 +141,9 @@ sub deducible_dependencies {
 sub _broadcast_deducible {
 	my ($self) = @_;
 
-	return unless $self->is_deducible;
+	return
+		unless $self->is_deducible
+		;
 
 	my $head = $self->_listeners;
 	while ($head = $head->{next}) {
@@ -153,7 +151,8 @@ sub _broadcast_deducible {
 			# obsoleted weak listener
 			$head->{prev}{next} = $head->{next};
 			$head->{next}{prev} = $head->{prev}
-				if $head->{next};
+				if $head->{next}
+				;
 			next;
 		}
 
@@ -176,6 +175,8 @@ sub _notify_listener {
 
 __END__
 
+=pod
+
 =encoding utf-8
 
 =head1 NAME
@@ -185,4 +186,14 @@ Context::Singleton::Frame::Promise - basic promise logic
 =head1 DESCRIPTION
 
 Basic promise logic as required for L<Context::Singleton::Frame>
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney.cpan@gmail.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+This module is part of L<Context::Singleton> distribution.
+
+=cut
 

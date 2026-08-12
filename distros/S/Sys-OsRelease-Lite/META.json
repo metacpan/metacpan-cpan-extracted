@@ -1,12 +1,12 @@
 {
    "abstract" : "unknown",
    "author" : [
-      "unknown"
+      "Ian Kluft <https://github.com/ikluft>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Carp" : "0",
             "Config::Tiny" : "0",
             "Data::Dumper" : "0",
             "File::Basename" : "0",
@@ -35,7 +36,9 @@
       "configure" : {
          "requires" : {
             "CPAN::Changes" : "0",
-            "ExtUtils::MakeMaker" : "0",
+            "CPAN::Meta" : "0",
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "7.36",
             "Versioning::Scheme::Semantic" : "0"
          }
       },
@@ -46,6 +49,8 @@
       },
       "test" : {
          "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
             "File::Basename" : "0",
             "File::Find" : "0",
             "Test::More" : "0",
@@ -59,6 +64,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.5+lite",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ikluft/Sys-OsRelease/issues"
+      }
+   },
+   "version" : "v0.4.6+lite",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-2.0"
 }

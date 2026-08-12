@@ -77,7 +77,12 @@ subtest escalates_to_sigkill => sub {
     my $elapsed = time - $start;
 
     ok(!pid_alive($pid), "child gone after escalation to SIGKILL");
-    ok($elapsed < 5, "escalation happened within the grace window (${elapsed}s)");
+
+    # _watcher_kill_fast escalates after 2s, so anything near that bound is a
+    # real regression while anything under it is scheduler noise. Kept far above
+    # the 2s window: a loaded CPAN smoker reported 8s for a run that escalated
+    # and reaped correctly, purely because its poll loop was not scheduled.
+    ok($elapsed < 60, "escalation happened rather than waiting forever (${elapsed}s)");
 };
 
 subtest default_is_sigkill => sub {
@@ -100,12 +105,13 @@ subtest driver_fast_stop_sig => sub {
 # signal (which releases SysV semaphores) instead of being SIGKILLed outright
 # and leaking them.
 subtest graceful_kill_escalates_via_fast_sig => sub {
-    # Grace 4 -> fast_at=4s, kill_at=6s. The 2s gap between SIGQUIT and
-    # SIGKILL matters: with grace 1 the gap was only 1s, and on a slow loaded
-    # smoker the child was not scheduled in time to run its QUIT handler
-    # (which writes the marker file asserted below) before SIGKILL landed --
-    # observed as a spurious CPAN Testers failure of the marker assertion.
-    local $ENV{QDB_STOP_GRACE} = 4;
+    # Grace 10 -> fast_at=10s, kill_at=15s. What matters is the gap between
+    # SIGQUIT and SIGKILL (int(grace/2)), not the grace itself: the child has
+    # only that long to be scheduled and run its QUIT handler, which writes the
+    # marker file asserted below. A 1s gap (grace 1) and then a 2s gap (grace 4)
+    # each produced spurious CPAN Testers failures of that assertion on a loaded
+    # smoker, so this buys 5s.
+    local $ENV{QDB_STOP_GRACE} = 10;
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings => @_ };
 
@@ -124,7 +130,7 @@ subtest graceful_kill_escalates_via_fast_sig => sub {
 
     ok(-e "$tmp/grace-quit", "graceful escalation sent the fast_stop_sig (SIGQUIT), not a bare SIGKILL");
     ok(!pid_alive($pid),     "child reaped");
-    ok($elapsed < 10,        "escalation happened within the grace window (${elapsed}s)");
+    ok($elapsed < 30,        "escalation happened rather than waiting forever (${elapsed}s)");
     like(join('', @warnings),
         qr/Server taking too long to shut down, sending SIGQUIT/,
         'captured the expected fast-signal escalation warning');

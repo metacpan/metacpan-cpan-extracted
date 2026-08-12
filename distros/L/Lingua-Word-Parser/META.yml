@@ -29,7 +29,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Lingua-Word-Parser
   repository: https://github.com/ology/Lingua-Word-Parser.git
-version: '0.0900'
+version: '0.0901'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

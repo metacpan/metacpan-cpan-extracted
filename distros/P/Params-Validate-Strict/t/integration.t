@@ -20,7 +20,6 @@ BEGIN { use_ok('Params::Validate::Strict', 'validate_strict') }
 # ── Confirm the full dependency stack is available ────────────────────────────
 # These use_ok calls are availability assertions; the compile-time 'use'
 # statements above are what actually put the symbols into scope.
-use_ok('Params::Get');
 use_ok('Scalar::Util',       qw(blessed looks_like_number));
 # List::Util already loaded with correct version above; just assert it here.
 cmp_ok(List::Util->VERSION, '>=', '1.33', 'List::Util 1.33+ available (any() present)');
@@ -58,18 +57,18 @@ my $admin  = new_ok('Int::AdminUser', ['Bob',   'admin' ], 'Int::AdminUser objec
 my $gedcom = new_ok('Int::GedcomFile', [],                 'Int::GedcomFile object');
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Params::Get integration — calling conventions
+# Calling conventions
 # ══════════════════════════════════════════════════════════════════════════════
 
-subtest 'Params::Get: named args style' => sub {
+subtest 'named args style' => sub {
 	my $r = validate_strict(
 		schema => { x => { type => 'string' } },
 		input  => { x => 'hello' },
 	);
-	is($r->{x}, 'hello', 'named args passed through Params::Get correctly');
+	is($r->{x}, 'hello', 'named args passed through correctly');
 };
 
-subtest 'Params::Get: single-hashref calling style' => sub {
+subtest 'single-hashref calling style' => sub {
 	my $r = validate_strict({
 		schema => { x => { type => 'string' } },
 		input  => { x => 'hello' },
@@ -77,15 +76,15 @@ subtest 'Params::Get: single-hashref calling style' => sub {
 	is($r->{x}, 'hello', 'single hashref calling style works');
 };
 
-subtest 'Params::Get: args/members aliases' => sub {
+subtest 'args/members aliases' => sub {
 	my $r = validate_strict(
 		members => { x => { type => 'string' } },
 		args    => { x => 'hello' },
 	);
-	is($r->{x}, 'hello', 'members/args aliases handled by Params::Get');
+	is($r->{x}, 'hello', 'members/args aliases handled');
 };
 
-subtest 'Params::Get: named style and hashref style produce identical results' => sub {
+subtest 'named style and hashref style produce identical results' => sub {
 	my $schema = { n => { type => 'integer', min => 1 } };
 	my $input  = { n => '7' };
 	my $r1 = validate_strict(schema => $schema, input => $input);

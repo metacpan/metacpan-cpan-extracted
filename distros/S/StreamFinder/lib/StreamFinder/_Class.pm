@@ -4,7 +4,7 @@ StreamFinder::_Class - Base module containing default methods common to all Stre
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2025 by
+This module is Copyright (C) 2017-2026 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -137,7 +137,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 			|| ($self->{'hls_bandwidth'} > 0 && $firstStream =~ /\.(m3u8)$/i)
 			|| ($arglist =~ /\b\-?noplaylists\b/ && $firstStream =~ /\.(pls|m3u8?)$/i)) {
 		my $plType = $1;
-		print STDERR "-getURL($idx): -NOPLAYLISTS|BANDWIDTH SET: 1st=$firstStream= EXT=$plType=\n"  if ($DEBUG);
+		print STDERR "-getURL($idx): -NOPLAYLISTS and (".$firstStream.") TP=$plType=\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 		$ua->timeout($self->{'timeout'});
 		$ua->cookie_jar({});

@@ -6,7 +6,9 @@ use warnings;
 use Object::Pad 0.66;
 
 use Future::AsyncAwait;
-use Future::IO::Impl::IOAsync;
+use Future::IO;
+
+Future::IO->load_best_impl;
 
 STDOUT->autoflush(1);
 STDOUT->binmode( ":encoding(UTF-8)" );

@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsRelease;
-$Sys::OsRelease::VERSION = '0.4.5';
+$Sys::OsRelease::VERSION = '0.4.6';
 use if $] >= 5.016, "feature", "fc";  # retain even though 5.22 is minimum Perl, same code in ...::Lite
 use feature qw(say);
 use Config;
@@ -418,7 +418,7 @@ Sys::OsRelease - read operating system details from standard /etc/os-release fil
 
 =head1 VERSION
 
-version 0.4.5
+version 0.4.6
 
 =head1 SYNOPSIS
 
@@ -474,12 +474,6 @@ This module maintains minimal prerequisites, and only those which are usually in
 That is intended to be acceptable for establishing system or container environments which contain Perl programs.
 It can also be used for installing or configuring software that needs to know about the system environment.
 
-Note: due to restrictions of the Dist::Zilla build environment and its dependencies,
-L<Sys::OsRelease> 0.4.0 had to follow an increase in the minimum Perl version from 5.10 to 5.22.
-For systems with Perl older than 5.22, see below about L<Sys::OsRelease::Lite>
-which repackages Sys::OsRelease without the Dist::Zilla version limitation
-in order to retain support for legacy Perl installations.
-
 =head2 The os-release Standard
 
 FreeDesktop.Org's os-release standard is at L<https://www.freedesktop.org/software/systemd/man/os-release.html>.
@@ -493,6 +487,16 @@ Current attributes recognized by Sys::OsRelease are:
 
 If other attributes are found in the os-release file, they will be accepted.
 Folded to lower case, the attribute names are used as keys in an internal hash structure.
+
+=head2 Sys::OsRelease or Sys::OsRelease::Lite?
+
+Due to restrictions of the Dist::Zilla build environment and its dependencies,
+L<Sys::OsRelease> 0.4.0 had to follow an increase in the minimum Perl version from 5.10 to 5.22.
+For systems with Perl older than 5.22, see below about L<Sys::OsRelease::Lite>
+which repackages Sys::OsRelease without the Dist::Zilla version limitation
+in order to retain support for legacy Perl installations.
+
+Sys::OsRelease::Lite is the same module in all but name. A release script filters the source code of Sys::OsRelease to change its name. Then Sys::OsRelease::Lite is built with ExtUtils::MakeMaker to maintain compatibility back to Perl 5.10. The two are released in parallel with the same version number.
 
 =head1 METHODS
 

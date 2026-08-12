@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = 'v1.7.2';
+our $VERSION = 'v1.8.0';
 
 use Cwd qw();
 use Digest::MD5 qw();
@@ -36,6 +36,7 @@ sub main {
         \@argv,
         'C'   => \my $opt_clone,
         'F=s' => \(my $opt_configfile = '/etc/sbozyp/sbozyp.conf'),
+        'W'   => \my $opt_workingtree,
         'R=s' => \my $opt_reponame,
         'S'   => \my $opt_syncrepo,
         'T'   => \my $opt_noinitrepo
@@ -55,19 +56,15 @@ sub main {
     else                                 { sbozyp_die("invalid command: $cmd")     }
     # set the configuration
     parse_config_file($opt_configfile); # mutates the global %CONFIG
-    set_repo_name_or_die($opt_reponame // $CONFIG{REPO_PRIMARY});
-    # initialize the environment
-    return if $opt_noinitrepo and !repo_is_cloned();
-    if ($opt_clone or !repo_is_cloned()) {
-        i_am_root_or_die('need root to clone repo');
-        clone_repo();
-    }
-    if ($opt_syncrepo) {
-        i_am_root_or_die('need root to sync repo');
-        sync_repo();
-    }
+    local $CONFIG{_REPO_DIR_OVERRIDE} = $opt_workingtree ? Cwd::abs_path('.') : undef;
     # run the command
-    $cmd_main->(@argv);
+    my $repo_opts = {
+        clone    => $opt_clone,
+        noinit   => $opt_noinitrepo,
+        reponame => $opt_reponame,
+        sync     => $opt_syncrepo,
+    };
+    $cmd_main->($repo_opts, @argv);
 }
 
             ####################################################
@@ -75,8 +72,9 @@ sub main {
             ####################################################
 
 sub main_install {
+    my ($repo_opts, @argv) = @_;
     sbozyp_getopts(
-        \@_,
+        \@argv,
         'h|help' => \my $opt_help,
         'b=s'    => \(my $opt_blacklistfile = '/etc/sbozyp/sbozyp.blacklist'),
         'f'      => \my $opt_force,
@@ -87,9 +85,10 @@ sub main_install {
         'z'      => \my $opt_keepsrc
     );
     if ($opt_help) { print command_help_msg('install'); return }
-    @_ >= 1 or die command_usage('install');
+    @argv >= 1 or die command_usage('install');
+    init_repo($repo_opts, @argv) or return;
     i_am_root_or_die('the install command requires root');
-    my @pkgs = pkgs_uniq(map { $_ = pkg($_) } @_);
+    my @pkgs = pkgs_uniq(map { $_ = pkg($_) } @argv);
     my @queue; for my $pkg (@pkgs) {
         my @pkg_queue = $opt_installdeps ? pkg_queue($pkg) : ($pkg);
         unless ($opt_force) {
@@ -124,8 +123,9 @@ sub main_install {
 }
 
 sub main_build {
+    my ($repo_opts, @argv) = @_;
     sbozyp_getopts(
-        \@_,
+        \@argv,
         'h|help' => \my $opt_help,
         'f'      => \my $opt_force,
         'n'      => \my $opt_skipmd5,
@@ -133,9 +133,10 @@ sub main_build {
         'z'      => \my $opt_keepsrc
     );
     if ($opt_help) { print command_help_msg('build'); return }
-    @_ >= 1 or die command_usage('build');
+    @argv >= 1 or die command_usage('build');
+    init_repo($repo_opts, @argv) or return;
     i_am_root_or_die('the build command requires root');
-    my @pkgs = pkgs_uniq(map { $_ = pkg($_) } @_);
+    my @pkgs = pkgs_uniq(map { $_ = pkg($_) } @argv);
     if (not $opt_noninteractive) {
         sbozyp_print('are you sure you want to build these packages:', "\n");
         return unless pkgs_confirm_with_user(@pkgs);
@@ -152,17 +153,19 @@ sub main_build {
 }
 
 sub main_remove {
+    my ($repo_opts, @argv) = @_;
     sbozyp_getopts(
-        \@_,
+        \@argv,
         'h|help' => \my $opt_help,
         'f'      => \my $opt_nodepsafetycheck,
         'r'      => \my $opt_removedeps,
         'y'      => \my $opt_noninteractive
     );
     if ($opt_help) { print command_help_msg('remove'); return }
-    @_ >= 1 or die command_usage('remove');
+    @argv >= 1 or die command_usage('remove');
+    init_repo($repo_opts, @argv) or return;
     i_am_root_or_die('the remove command requires root');
-    my @pkgs = pkgs_uniq(map { $_ = pkg($_) } @_);
+    my @pkgs = pkgs_uniq(map { $_ = pkg($_) } @argv);
     unless ($opt_nodepsafetycheck) {
         my @errors; for my $pkg (@pkgs) {
             my @dependents = pkg_array_minus([pkg_dependents_direct($pkg)], [@pkgs]);
@@ -184,12 +187,16 @@ sub main_remove {
         sbozyp_print('are you sure you want to remove these packages:', "\n");
         return unless pkgs_confirm_with_user(@pkgs);
     }
-    remove_slackware_pkg($_->{PRGNAM}) for @pkgs;
+    for my $pkg (@pkgs) {
+        my ($prgnam) = parse_slackware_pkgname(pkg_package_name($pkg));
+        remove_slackware_pkg($prgnam);
+    }
 }
 
 sub main_query {
+    my ($repo_opts, @argv) = @_;
     sbozyp_getopts(
-        \@_,
+        \@argv,
         'h|help' => \my $opt_help,
         'a'      => \my $opt_listinstalled,
         'b'      => \my $opt_printpackagedir,
@@ -208,16 +215,18 @@ sub main_query {
         'x'      => \my $opt_listpkgsnotinrepo
     );
     if ($opt_help) { print command_help_msg('query'); return }
-    if (@_ > 1) { die command_usage('query') }
+    if (@argv > 1) { die command_usage('query') }
     my $num_opts_set = 0; for ($opt_listinstalled,$opt_printpackagedir,$opt_printrepodir,$opt_slackdesc,$opt_info,$opt_pkgsnodependents,$opt_recdependents,$opt_directdependents,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupdate,$opt_listneedupdateversion,$opt_listpkgsnotinrepo) { $num_opts_set++ if defined }
     if ($num_opts_set != 1) { sbozyp_die("must set exactly 1 query option but $num_opts_set were set") }
     my $opt = $opt_listinstalled ? '-a' : $opt_printpackagedir ? '-b' : $opt_printrepodir ? '-c' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkgsnodependents ? '-m' : $opt_recdependents ? '-n' : $opt_directdependents ? '-o' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupdate ? '-u' : $opt_listneedupdateversion ? '-v' : $opt_listpkgsnotinrepo ? '-x' : die;
-    my $pkg; if ($opt_printpackagedir || $opt_slackdesc || $opt_info || $opt_recdependents || $opt_directdependents || $opt_pkginstalled || $opt_printqueue || $opt_readme || $opt_slackbuild) {
-        @_ == 1 or sbozyp_die("query option '$opt' requires single PKGNAME argument");
-        $pkg = pkg($_[0]);
+    my $has_pkg_arg = $opt_printpackagedir || $opt_slackdesc || $opt_info || $opt_recdependents || $opt_directdependents || $opt_pkginstalled || $opt_printqueue || $opt_readme || $opt_slackbuild;
+    if ($has_pkg_arg) {
+        @argv == 1 or sbozyp_die("query option '$opt' requires single PKGNAME argument");
     } else {
-        @_ == 0 or sbozyp_die("query option '$opt' does not take PKGNAME argument");
+        @argv == 0 or sbozyp_die("query option '$opt' does not take PKGNAME argument");
     }
+    init_repo($repo_opts, @argv) or return;
+    my $pkg = $has_pkg_arg ? pkg($argv[0]) : undef;
     # option implementations
     if ($opt_listinstalled) {
         my %installed_sbo_pkgs = installed_sbo_pkgs();
@@ -270,8 +279,9 @@ sub main_query {
 }
 
 sub main_search {
+    my ($repo_opts, @argv) = @_;
     sbozyp_getopts(
-        \@_,
+        \@argv,
         'h|help' => \my $opt_help,
         'c'      => \my $opt_casesensitive,
         'n'      => \my $opt_matchcategory,
@@ -279,8 +289,9 @@ sub main_search {
         'q'      => \my $opt_quiet
     );
     if ($opt_help) { print command_help_msg('search'); return }
-    @_ == 1 or die command_usage('search');
-    my $regex_arg = $_[0];
+    @argv == 1 or die command_usage('search');
+    init_repo($repo_opts) or return;
+    my $regex_arg = $argv[0];
     my $regex = eval { $opt_casesensitive ? qr/$regex_arg/ : qr/$regex_arg/i };
     sbozyp_die("invalid Perl regex: $regex_arg") if $@;
     my @matches = grep {
@@ -297,12 +308,14 @@ sub main_search {
 }
 
 sub main_null {
+    my ($repo_opts, @argv) = @_;
     sbozyp_getopts(
-        \@_,
+        \@argv,
         'h|help' => \my $opt_help,
     );
     if ($opt_help) { print command_help_msg('null'); return }
-    @_ == 0 or die command_usage('null');
+    @argv == 0 or die command_usage('null');
+    init_repo($repo_opts);
 }
 
             ####################################################
@@ -311,6 +324,7 @@ sub main_null {
 
 sub pkg {
     my ($prgnam) = @_;
+    $prgnam = path_to_pkgname(Cwd::abs_path($prgnam)) if is_slackbuild_dir($prgnam);
     my $pkgname = prgnam_to_pkgname($prgnam) // sbozyp_die("could not find a package named $prgnam");
     state %pkg_cache; if (my $pkg = $pkg_cache{$pkgname}) { return $pkg }
     my $info_file = repo_dir()."$pkgname/@{[basename($pkgname)]}.info";
@@ -342,6 +356,12 @@ sub pkg {
     };
     $pkg_cache{$pkgname} = $pkg;
     return $pkg
+}
+
+sub pkg_package_name {
+    my ($pkg) = @_;
+    local $ENV{PRINT_PACKAGE_NAME} = 1;
+    return scalar sbozyp_qx('bash', $pkg->{SLACKBUILD_FILE});
 }
 
 sub pkgs_uniq {
@@ -386,15 +406,23 @@ sub pkgs_confirm_with_user {
 
 sub pkg_installed {
     my ($pkg) = @_;
-    my %installed_sbo_pkgs = installed_sbo_pkgs();
-    my $version = $installed_sbo_pkgs{$pkg->{PKGNAME}};
-    return $version;
+    my ($pkg_prgnam) = parse_slackware_pkgname(pkg_package_name($pkg));
+    defined $pkg_prgnam or return;
+    my $root = $ENV{ROOT} // '/';
+    if (-d "$root/var/lib/pkgtools/packages") {
+        for my $slackware_pkg (grep /_SBo$/, sbozyp_readdir("$root/var/lib/pkgtools/packages")) {
+            my ($prgnam, $version) = parse_slackware_pkgname(basename($slackware_pkg));
+            return $version if $prgnam eq $pkg_prgnam;
+        }
+    }
+    return;
 }
 
 sub pkg_installed_and_up_to_date {
     my ($pkg) = @_;
     my $installed_version = pkg_installed($pkg);
-    if (!defined $installed_version or version_gt($pkg->{VERSION}, $installed_version)) {
+    my (undef, $version) = parse_slackware_pkgname(pkg_package_name($pkg));
+    if (!defined $installed_version or !defined $version or version_gt($version, $installed_version)) {
         return 0;
     } else {
         return 1;
@@ -428,7 +456,7 @@ sub pkg_matches_blacklist {
 
 sub parse_slackware_pkgname {
     my ($slackware_pkgname) = @_;
-    my ($prgnam, $version) = $slackware_pkgname =~ /^([\w.+-]+)-([^-]*)-[^-]*-\d+_SBo$/;
+    my ($prgnam, $version) = $slackware_pkgname =~ /^([\w.+-]+)-([^-]*)-[^-]*-\d+_SBo(?:\.t[blxg]z)?$/;
     return ($prgnam => $version);
 }
 
@@ -495,6 +523,14 @@ sub prgnam_to_pkgname { # if $prgnam is already a pkgname its just returned back
     }
     $pkgname_cache{$prgnam} = $pkgname;
     return $pkgname;
+}
+
+sub is_slackbuild_dir {
+    my ($dir) = @_;
+    defined $dir && -d $dir or return 0;
+    my $pkg_dir = Cwd::abs_path($dir) // return 0;
+    my $prgnam = basename($pkg_dir);
+    return -f "$pkg_dir/$prgnam.info" && -f "$pkg_dir/$prgnam.SlackBuild";
 }
 
 sub path_to_pkgname {
@@ -668,24 +704,20 @@ sub build_slackware_pkg {
     sbozyp_mkdir($CONFIG{TMPDIR});
     my $staging_dir = pkg_prepare_for_build($pkg, $keep_src, $skip_md5);
     my $slackbuild = $pkg->{PRGNAM} . '.SlackBuild';
-    my $cmd = with_cwd($staging_dir, sub {
+    my $result = with_cwd($staging_dir, sub {
         sbozyp_chmod(0755, "./$slackbuild");
-        return sbozyp_open('-|', "./$slackbuild");
+        return system("./$slackbuild");
     });
-    my $slackware_pkg; while (my $line = <$cmd>) {
-        $slackware_pkg = $1 if $line =~ /^Slackware package (.+) created\.$/;
-        print $line;
-    }
-    close $cmd;
-    sbozyp_die("failed to build $pkg->{PKGNAME}") if $? != 0;
-    sbozyp_die("successfully built $pkg->{PKGNAME} but couldn't determine the path of the created Slackware package") if !defined $slackware_pkg;
+    sbozyp_die("failed to build $pkg->{PKGNAME}") if $result != 0;
+    my $slackware_pkg = "$CONFIG{TMPDIR}/" . pkg_package_name($pkg);
+    sbozyp_die("successfully built $pkg->{PKGNAME} but couldn't determine the path of the created Slackware package") unless -f $slackware_pkg;
     return $slackware_pkg;
 }
 
 sub built_slackware_pkg {
     my ($pkg) = @_;
-    my $output = $CONFIG{TMPDIR};
-    return [ glob "$output/$pkg->{PRGNAM}*$pkg->{VERSION}*_SBo*" ]->[0];
+    my $slackware_pkg = "$CONFIG{TMPDIR}/" . pkg_package_name($pkg);
+    return -f $slackware_pkg ? $slackware_pkg : undef;
 }
 
 sub install_slackware_pkg {
@@ -701,6 +733,32 @@ sub remove_slackware_pkg {
             ####################################################
             #               REPOSITORY MANAGEMENT              #
             ####################################################
+
+sub init_repo {
+    my $repo_opts = shift;
+    for my $pkg (@_) {
+        next unless is_slackbuild_dir($pkg);
+        my $repo_dir = dirname(dirname(Cwd::abs_path($pkg)));
+        sbozyp_die("package directory arguments must come from the same working tree")
+            if defined $CONFIG{_REPO_DIR_OVERRIDE} && $CONFIG{_REPO_DIR_OVERRIDE} ne $repo_dir;
+        $CONFIG{_REPO_DIR_OVERRIDE} = $repo_dir;
+    }
+    sbozyp_die("-C, -R, and -S cannot be used with a working tree")
+        if defined $CONFIG{_REPO_DIR_OVERRIDE}
+        && ($repo_opts->{clone} || defined $repo_opts->{reponame} || $repo_opts->{sync});
+    return 1 if defined $CONFIG{_REPO_DIR_OVERRIDE};
+    set_repo_name_or_die($repo_opts->{reponame} // $CONFIG{REPO_PRIMARY});
+    return 0 if $repo_opts->{noinit} && !repo_is_cloned();
+    if ($repo_opts->{clone} || !repo_is_cloned()) {
+        i_am_root_or_die('need root to clone repo');
+        clone_repo();
+    }
+    if ($repo_opts->{sync}) {
+        i_am_root_or_die('need root to sync repo');
+        sync_repo();
+    }
+    return 1;
+}
 
 sub set_repo_name_or_die {
     my ($repo_name) = @_;
@@ -751,6 +809,10 @@ sub repo_git_url {
 }
 
 sub repo_dir {
+    if (defined(my $repo_dir_override = $CONFIG{_REPO_DIR_OVERRIDE})) {
+        $repo_dir_override =~ s,/+,/,g; $repo_dir_override =~ s,/+$,,;
+        return "$repo_dir_override/";
+    }
     state $repo_dir = do {
         my $repo_root = $CONFIG{REPO_ROOT};
         $repo_root =~ s,/+,/,g; $repo_root =~ s,/+$,,;
@@ -861,6 +923,27 @@ sub sbozyp_system {
         sbozyp_die("the following system command was killed by signal $signal: @cmd");
     }
     return $status;
+}
+
+sub sbozyp_qx {
+    my @cmd = @_;
+    open(my $fh, '-|', @cmd) or sbozyp_die("could not run command '@cmd': $!");
+    my @output = <$fh>;
+    close $fh;
+    my $result = $?; my $status = $result >> 8; my $signal = $result & 127;
+    if (0 != $status) {
+        sbozyp_die("the following system command exited with status $status: @cmd");
+    } elsif (0 != $signal) {
+        sbozyp_die("the following system command was killed by signal $signal: @cmd");
+    }
+    if (wantarray) {
+        chomp @output;
+        return @output;
+    } else {
+        my $output = join('', @output);
+        chomp $output;
+        return $output;
+    }
 }
 
 sub with_stdout_to_stderr {
@@ -1075,6 +1158,7 @@ Every command has its own options, these are just the global ones:
  -R REPO_NAME  Use SBo repository REPO_NAME instead of REPO_PRIMARY
  -S            Sync SBo repository before running the command
  -T            Exit if the SBo repository hasn't been cloned yet
+ -W            Use the current directory as the working SBo tree
 
 Commands:
 
@@ -1154,6 +1238,27 @@ install and build commands -z flag.
  
 Defaults to C<SRCDIR=/var/lib/sbozyp/source-cache>.
 
+=head1 WORKING TREES
+
+A package argument may be a package name or a SlackBuild package directory:
+
+ sbozyp in -r ./office/mu
+ sbozyp in system/foo ./office/mu
+ cd office/mu
+ sbozyp in -r .
+
+The directory must be C<CATEGORY/PRGNAM> and contain matching C<PRGNAM.info>
+and C<PRGNAM.SlackBuild> files. The tree need not be a Git or configured
+repository. If any package argument is a SlackBuild directory, its tree is used
+for the entire command, regardless of argument order. All other packages and
+dependencies come from that tree.
+
+Use C<-W> from the tree root when giving package names:
+
+ sbozyp -W in -r office/mu
+
+C<-W> cannot be combined with C<-C>, C<-R>, or C<-S>.
+
 =head1 COMMANDS
 
 =head2 INSTALL
@@ -1181,6 +1286,7 @@ Examples:
  sbozyp in -k -r system/password-store
  sbozyp in -f -y -r password-store
  sbozyp -S -R $REPO in -f -r password-store
+ sbozyp in -r ./office/mu
  sbozyp in -r $(sbozyp -S qr -u) ### update all packages
 
 =head2 BUILD
@@ -1205,6 +1311,7 @@ Examples:
  sbozyp bu -f -y system/password-store
  sbozyp -S -R $REPO bu password-store
  sbozyp bu -y system/password-store xclip mu
+ sbozyp bu ./office/mu
 
 =head2 REMOVE
 
@@ -1225,6 +1332,7 @@ Examples:
  sbozyp rm xclip mu system/password-store
  sbozyp rm -y -r password-store
  sbozyp -S -R $REPO rm password-store
+ sbozyp rm ./office/mu
 
 =head2 QUERY
 
@@ -1262,6 +1370,7 @@ Examples:
  cd $(sbozyp qr -b password-store)
  removepkg $(sbozyp qr -x) # remove packages not in current repo
  sbozyp -S -R $REPO qr -r password-store
+ sbozyp qr -q ./office/mu
 
 =head2 SEARCH
 
@@ -1284,6 +1393,7 @@ Examples:
  sbozyp se -p -q password.+
  sbozyp se -c -n system/.+
  sbozyp -S -R $REPO se password-store
+ sbozyp -W se mu
 
 =head2 NULL
 

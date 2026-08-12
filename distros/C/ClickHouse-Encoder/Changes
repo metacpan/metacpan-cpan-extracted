@@ -1,4 +1,24 @@
 Revision history for ClickHouse-Encoder
 
+0.02    2026-07-31
+        - Fix the bundled CityHash128 for inputs of 128 bytes or more, so
+          compressed blocks of a realistic size checksum correctly. All
+          compression paths were affected.
+        - Fix RowBinary NULL framing: a Nullable value is written only
+          when the flag says not-null.
+        - Harden the decoder against malformed blocks: bound the variant
+          slot table, cap type and JSON nesting depth, bound allocations
+          driven by wire counts, and free partially-built columns on croak.
+        - Reject out-of-range Date, Date32, DateTime64, Enum and
+          FixedString values instead of wrapping or truncating them.
+        - Set CLONE_SKIP on the encoder, streamer and bulk inserter.
+        - decode_stream / select_blocks: stop re-parsing a partial block on
+          every chunk, and stop mistaking one for a corrupt header.
+        - parse_create_table accepts `show create table` as it arrives over
+          HTTP; add a read timeout to TCP read_packet; reject '@' in HTTP
+          hosts and accept bracketed IPv6 literals.
+        - Declare Encode and POSIX; suggest Time::Moment.
+        - Extend fuzz, leak, thread and hardening test coverage.
+
 0.01    2026-05-26
         - Initial release.

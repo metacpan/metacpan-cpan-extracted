@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 # ABSTRACT: Encode / decode IPv4 addresses
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 sub new { bless \my $x, shift }
 
@@ -116,7 +116,7 @@ Net::CIDR::Set::IPv4 - Encode / decode IPv4 addresses
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =for Pod::Coverage new
 

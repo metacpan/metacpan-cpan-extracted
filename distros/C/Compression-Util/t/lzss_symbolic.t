@@ -18,6 +18,9 @@ foreach my $file (__FILE__) {
     my $enc = lzss_compress_symbolic([map { ord($_) } $str =~ /(\X)/g]);
     my $dec = lzss_decompress_symbolic($enc);
 
+    say length $enc;
+    say length join('', map { chr($_) } @$dec);
+
     ok(length($enc) < length($str));
     is($str, join('', map { chr($_) } @$dec));
 }

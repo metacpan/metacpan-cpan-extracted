@@ -565,6 +565,9 @@ SKIP: {
     ch_query("drop table if exists test_compressed");
     ch_query("create table test_compressed
                   (id Int32, msg String, ts DateTime) engine = Memory");
+    ch_query("drop table if exists test_compressed_big");
+    ch_query("create table test_compressed_big
+                  (id UInt64, msg String) engine = Memory");
 
     my $enc = ClickHouse::Encoder->new(columns =>
         [['id','Int32'], ['msg','String'], ['ts','DateTime']]);
@@ -596,6 +599,31 @@ SKIP: {
     my $sum = ch_query_result(
         "select sum(id) from test_compressed");
     is($sum, '6', 'compressed INSERT row values intact (sum=6)');
+
+    # The 3-row block above stays on CityHash128's short path. Only a
+    # realistically-sized block reaches the >=128-byte loop, which is what
+    # actually pins the bundled hash against the server.
+    {
+        my $big_enc = ClickHouse::Encoder->new(
+            columns => [['id', 'UInt64'], ['msg', 'String']]);
+        my $big = $big_enc->encode([ map { [$_, 'x' x 40] } 1 .. 500 ]);
+        cmp_ok(length($big), '>', 1024,
+               'large block is past CityHash128 short-input path');
+        my $bframed = ClickHouse::Encoder->compress_native_block(
+            $big, mode => 'lz4');
+        my $bresp = $http->post(
+            "http://127.0.0.1:$port/"
+                . "?query=insert+into+test_compressed_big+format+native"
+                . "&decompress=1",
+            { content => $bframed,
+              headers => { 'Content-Type' => 'application/octet-stream' } });
+        ok($bresp->{success},
+           'compressed INSERT of a realistically-sized block accepted')
+            or diag("status=$bresp->{status} body="
+                  . substr($bresp->{content} // '', 0, 120));
+        is(ch_query_result("select count() from test_compressed_big"),
+           '500', 'large compressed INSERT delivered all 500 rows');
+    }
 
     # Round-trip the other way: SELECT the data back uncompressed and
     # confirm the values match (additional pin on the whole pipeline).

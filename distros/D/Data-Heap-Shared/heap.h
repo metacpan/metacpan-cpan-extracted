@@ -330,11 +330,15 @@ static inline uint32_t heap_size(HeapHandle *h) {
 static inline void heap_init_header(void *base, uint64_t total, uint64_t capacity) {
     HeapHeader *hdr = (HeapHeader *)base;
     memset(base, 0, (size_t)total);
-    hdr->magic     = HEAP_MAGIC;
     hdr->version   = HEAP_VERSION;
     hdr->capacity  = capacity;
     hdr->total_size = total;
     hdr->data_off  = sizeof(HeapHeader);
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, HEAP_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -387,6 +391,16 @@ static int heap_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int heap_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static HeapHandle *heap_create(const char *path, uint64_t capacity, mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { HEAP_ERR("capacity must be > 0"); return NULL; }
@@ -428,6 +442,27 @@ static HeapHandle *heap_create(const char *path, uint64_t capacity, mode_t mode,
         if (base == MAP_FAILED) { HEAP_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!heap_validate_header((HeapHeader *)base, (uint64_t)st.st_size)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((HeapHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && heap_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        HEAP_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    heap_init_header(base, total, capacity);
+                    flock(fd, LOCK_UN); close(fd);
+                    return heap_setup(base, map_size, path, -1);
+                }
+                if (((HeapHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    HEAP_ERR("%s: incomplete heap file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 HEAP_ERR("invalid heap file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);

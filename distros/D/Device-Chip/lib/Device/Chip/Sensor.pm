@@ -1,18 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 use Object::Pad 0.800 ':experimental(mop adjust_params)';
 
-package Device::Chip::Sensor 0.26;
+package Device::Chip::Sensor 0.27;
 
 use strict;
 use warnings;
+use meta;
 
 use experimental 'signatures';
+no warnings 'meta::experimental';
 
 use Carp;
 
@@ -22,8 +24,10 @@ C<Device::Chip::Sensor> - declarations of sensor readings for C<Device::Chip>
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
    class Device::Chip::MySensorChip
-      extends Device::Chip;
+      :isa(Device::Chip);
 
    use Device::Chip::Sensor -declare;
 
@@ -61,6 +65,9 @@ the following methods are added to it.
 
 Returns a list of individual sensor objects. Each object represents a single
 sensor reading that can be measured.
+
+I<Since version 0.27> sensors are inherited from superclasses, with sensors
+declared by base classes listed first, before sensors added in subclasses.
 
 =head1 OPTIONAL CHIP METHODS
 
@@ -159,9 +166,16 @@ sub declare_into ( $caller )
 
    my $sensors = $SENSORS_FOR_CLASS{$classmeta->name} //= [];
 
+   my $superclass = ( map { $_->name } $classmeta->superclasses )[0];
+   undef $superclass unless exists $SENSORS_FOR_CLASS{$superclass};
+
+   $classmeta->add_method( _list_metasensors => sub ( $self ) {
+      return ( $superclass ? $superclass->_list_metasensors : () ),
+         $sensors->@*;
+   } );
+
    $classmeta->add_method( list_sensors => sub ( $self ) {
-      # TODO: some sort of superclass merge?
-      return map { $_->bind( $self ) } $sensors->@*;
+      return map { $_->bind( $self ) } $self->_list_metasensors;
    } );
 
    my $declare = sub ( $name, %params ) {
@@ -171,11 +185,12 @@ sub declare_into ( $caller )
       );
    };
 
-   no strict 'refs';
-   *{"${caller}::declare_sensor"} = $declare;
-   *{"${caller}::declare_sensor_counter"} = sub {
+   my $metapkg = meta::package->get( $caller );
+
+   $metapkg->add_named_sub( declare_sensor => $declare );
+   $metapkg->add_named_sub( declare_sensor_counter => sub {
       $declare->( @_, type => "counter", units => undef, precision => 0 );
-   };
+   } );
 }
 
 class Device::Chip::Sensor;

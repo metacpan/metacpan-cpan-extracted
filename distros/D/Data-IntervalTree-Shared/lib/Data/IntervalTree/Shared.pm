@@ -1,7 +1,7 @@
 package Data::IntervalTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::IntervalTree::Shared', $VERSION);
 
@@ -74,11 +74,15 @@ bytes and a fixed header.
     my $it = Data::IntervalTree::Shared->new(undef, $capacity);
     my $it = Data::IntervalTree::Shared->new_memfd($name, $capacity);
     my $it = Data::IntervalTree::Shared->new_from_fd($fd);
+    my $ro = Data::IntervalTree::Shared->new_readonly($path);   # frozen file, read-only
 
 C<$capacity> is the maximum number of intervals (1..2^24). C<new> and
 C<new_memfd> croak on an out-of-range C<$capacity>. When reopening an existing
-file or memfd the stored geometry wins and the caller's argument is ignored. An
-optional file B<mode> may be passed as the last argument to C<new> (e.g. C<0660>)
+file or memfd the stored geometry wins and the caller's argument does not
+resize it, though it is still range-checked and an out-of-range value croaks;
+reopening a B<sealed> (frozen) file read-write is refused -- use
+C<new_readonly> instead (see L</"FROZEN (READ-ONLY) MODE">). An optional file
+B<mode> may be passed as the last argument to C<new> (e.g. C<0660>)
 for cross-user sharing; it defaults to C<0600> (owner-only).
 
 =head2 Adding intervals
@@ -110,23 +114,68 @@ stab is exactly C<overlaps($p, $p)>.
     $it->count;         # number of intervals added
     $it->capacity;      # maximum number of intervals
     $it->clear;         # remove all intervals
-    $it->stats;         # { count, capacity, dirty, ops, mmap_size }
+    $it->stats;         # { count, capacity, dirty, ops, mmap_size, frozen, readonly }
+    $it->frozen;        # 1 if sealed by freeze, else 0
+    $it->readonly;      # 1 if this handle is a read-only view, else 0
     $it->path; $it->memfd; $it->sync; $it->unlink;
 
 C<clear> empties the index. C<sync> flushes the mapping to its backing store (a
-no-op for anonymous and memfd trees); C<unlink> removes the backing file (also
-callable as C<< Class->unlink($path) >>); C<path> returns the backing path
-(C<undef> for anonymous, memfd, or fd-reopened trees) and C<memfd> the backing
-descriptor.
+no-op for anonymous and memfd trees, and for any read-only view); C<unlink>
+removes the backing file (also callable as C<< Class->unlink($path) >>);
+C<path> returns the backing path (C<undef> for anonymous, memfd, or
+fd-reopened trees) and C<memfd> the backing descriptor. C<frozen> and
+C<readonly> report whether the tree has been sealed and whether this handle is
+a read-only view, respectively (see L</"FROZEN (READ-ONLY) MODE">).
 
 =head1 SHARING ACROSS PROCESSES
 
 The index lives in a shared mapping, shared the same three ways as the rest of
-the family: a B<backing file>, an B<anonymous mapping inherited across C<fork>>,
-or a B<memfd> passed to an unrelated process and reopened with
-C<< new_from_fd($fd) >>. Any process can add intervals; the first query after an
-add rebuilds the shared tree once (under the write lock), and subsequent queries
-run concurrently under the read lock.
+the family: a B<backing file>, an B<anonymous mapping inherited across
+C<fork>>, or a B<memfd> passed to an unrelated process and reopened with C<<
+new_from_fd($fd) >>. The descriptor you pass is duplicated
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the handle. Any process can add intervals; the first query after an
+add rebuilds the shared tree once (under the write lock), and subsequent
+queries run concurrently under the read lock.
+
+=head1 FROZEN (READ-ONLY) MODE
+
+A file-backed tree can be B<frozen> and then shipped to other machines, where
+consumers open it B<read-only> and query it with B<no locking at all>.
+
+    # producer: build, freeze, ship the file
+    my $it = Data::IntervalTree::Shared->new("/tmp/bookings.it", 100_000);
+    $it->add($_->[0], $_->[1], $_->[2]) for @known;
+    $it->freeze;                 # seal: now immutable, and $it itself is read-only
+    # ... copy /tmp/bookings.it to another host ...
+
+    # consumer (any process, same architecture): read-only, lock-free
+    my $ro = Data::IntervalTree::Shared->new_readonly("/tmp/bookings.it");
+    $ro->stab($t);                # or $ro->overlaps($lo, $hi)
+
+C<freeze> takes the write lock, force-completes any balanced-tree build still
+pending (so a frozen tree is never left C<dirty>), marks the tree B<permanently
+immutable> (there is no unfreeze -- rebuild the file to change it), and flushes
+the seal to disk. A frozen tree rejects every mutator (C<add>, C<build>,
+C<clear>) with a croak, and a read-write reopen (C<< new($path, ...) >>) of a
+sealed file is B<refused> -- so a shipped artifact can never be silently mutated
+out from under its readers.
+
+C<new_readonly($path)> maps the file C<O_RDONLY> / C<PROT_READ> and B<requires it
+to be frozen> (it croaks on a file that was never C<freeze>d). Because
+C<freeze> guarantees the balanced tree is already built, and a sealed tree's
+intervals and links are immutable, C<stab>, C<overlaps>, C<count> and C<stats>
+read them B<directly, taking no reader lock and never rebuilding> -- the
+mapping is never written, so a read-only view works from a read-only file
+descriptor or a read-only filesystem, and any number of processes can share one
+C<PROT_READ> mapping. C<frozen> and C<readonly> report the two states.
+
+B<Portability.> The on-disk format is native binary (native-endian 64-bit
+words), so a frozen file may be copied only between machines of the B<same
+architecture>; a wrong-endian file is rejected at open by the magic check.
+B<Copy the file to each consumer> -- do not share one file over a network
+filesystem: the lock is a Linux futex (process-local to one kernel), and the
+"no live writer" contract assumes a static copy. Linux-only; 64-bit Perl.
 
 =head1 SECURITY
 
@@ -155,6 +204,18 @@ reclaim it and writers may block until the mapping is recreated. Reaching this
 needs more than 1024 concurrent reader processes on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete interval tree
+file left by an interrupted create; remove it and retry>. A file left behind
+by an interrupted create never held data, so removing it is safe -- but a file
+whose header was corrupted after the fact reaches the same croak, so confirm
+it is an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

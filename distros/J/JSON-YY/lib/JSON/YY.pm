@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('JSON::YY', $VERSION);
@@ -22,6 +22,16 @@ my @DOC_KEYWORDS = qw(jdoc jget jgetp jset jdel jhas jclone jencode
 *decode_json    = \&_xs_decode_json;
 *decode_json_ro = \&_xs_decode_json_ro;
 
+# max_depth reaches XS as a U32: -1 would wrap to 4294967295, which is not
+# "unlimited" but "deep enough to blow the C stack".
+sub _checked_max_depth {
+    my ($self, $val) = @_;
+    $val = 512 unless defined $val;
+    Carp::croak("max_depth must be a non-negative integer (got '$val')")
+        unless $val =~ /\A[0-9]+\z/ && $val <= 0xFFFFFFFF;
+    $self->_set_max_depth($val);
+}
+
 my %SETTERS = (
     utf8            => \&_set_utf8,
     pretty          => \&_set_pretty,
@@ -30,7 +40,7 @@ my %SETTERS = (
     allow_unknown   => \&_set_allow_unknown,
     allow_blessed   => \&_set_allow_blessed,
     convert_blessed => \&_set_convert_blessed,
-    max_depth       => \&_set_max_depth,
+    max_depth       => \&_checked_max_depth,
 );
 
 sub import {
@@ -61,6 +71,11 @@ sub import {
             $coder->$setter(1);
         }
         no strict 'refs';
+        no warnings 'redefine';
+        # a qw() import in the same scope leaves the keyword hint set, and the
+        # compiler would then bypass these closures entirely -- silently
+        # dropping the flags the caller just asked for
+        delete $^H{"JSON::YY/$_"} for qw(encode_json decode_json);
         *{"${caller}::encode_json"} = sub { $coder->encode($_[0]) };
         *{"${caller}::decode_json"} = sub { $coder->decode($_[0]) };
     }
@@ -84,7 +99,7 @@ sub allow_nonref    { $_[0]->_set_allow_nonref($_[1] // 1);    $_[0] }
 sub allow_unknown   { $_[0]->_set_allow_unknown($_[1] // 1);   $_[0] }
 sub allow_blessed   { $_[0]->_set_allow_blessed($_[1] // 1);   $_[0] }
 sub convert_blessed { $_[0]->_set_convert_blessed($_[1] // 1); $_[0] }
-sub max_depth       { $_[0]->_set_max_depth($_[1] // 512);     $_[0] }
+sub max_depth       { $_[0]->_checked_max_depth($_[1]);        $_[0] }
 
 # wrap XS new to accept keyword args
 {
@@ -104,11 +119,33 @@ sub max_depth       { $_[0]->_set_max_depth($_[1] // 512);     $_[0] }
 
 # Doc overloading: stringify to JSON, boolean always true, eq/ne deep compare
 package JSON::YY::Doc;
+use Scalar::Util ();
+
+# _doc_eq only understands Docs, so compare the JSON text when the other side
+# is not one -- otherwise $doc eq '{"a":1}' is false while "$doc" eq it is true.
+sub _eq {
+    my ($self, $other) = @_;
+    return JSON::YY::_doc_eq($self, $other)
+        if Scalar::Util::blessed($other) && $other->isa('JSON::YY::Doc');
+    # _doc_stringify returns UTF-8 bytes. The UTF8 flag cannot tell a character
+    # string from a byte string (chars < 256 may be stored either way), so
+    # accept the operand under either reading.
+    my $str = defined $other ? "$other" : '';
+    my $json = JSON::YY::_doc_stringify($self);
+    return 1 if $json eq $str;
+    my $enc = $str;
+    utf8::encode($enc);
+    return $json eq $enc;
+}
+
 use overload
     '""'     => sub { JSON::YY::_doc_stringify($_[0]) },
     'bool'   => sub { 1 },
-    'eq'     => sub { JSON::YY::_doc_eq($_[0], $_[1]) },
-    'ne'     => sub { !JSON::YY::_doc_eq($_[0], $_[1]) },
+    # without this `fallback` numifies via the string and every pair of Docs
+    # compares equal; identity is the only sensible number for a handle
+    '0+'     => sub { Scalar::Util::refaddr($_[0]) },
+    'eq'     => \&_eq,
+    'ne'     => sub { !_eq(@_) },
     fallback => 1;
 
 package JSON::YY;
@@ -208,7 +245,12 @@ strings (as the C<encode_json> function always does).
 
 =item encode($perl_value)
 
-Encode to JSON string.
+Encode to JSON string. With C<utf8> enabled the result is a UTF-8 byte
+string; otherwise it is a character string.
+
+Strings without Perl's UTF8 flag are treated as Latin-1 and re-encoded to
+UTF-8 on output, as L<JSON::XS> does, so C<"caf\xE9"> and C<"caf\x{E9}">
+produce the same JSON.
 
 =item decode($json_string)
 
@@ -223,9 +265,19 @@ materialization). Can then use Doc API keywords on the result.
 
 Boolean setters, return C<$self> for chaining.
 
+C<convert_blessed> calls a blessed object's C<TO_JSON> method when the class
+has one; when it does not, encoding falls back to the C<allow_blessed>
+behaviour (C<null>, or a croak if that flag is off).
+
 =item max_depth($n)
 
-Set maximum nesting depth (default 512).
+Set maximum nesting depth (default 512), applied when encoding and when
+decoding. JSON nested deeper than this is rejected rather than materialised.
+
+The default is what keeps untrusted input from exhausting the C stack; raising
+it raises that ceiling too. A few thousand is safe, but values in the tens of
+thousands let input through that recurses deeply enough to crash rather than
+croak, so only raise it as far as your data actually needs.
 
 =back
 
@@ -236,6 +288,18 @@ Set maximum nesting depth (default 512).
 The Doc API operates on yyjson's internal mutable document tree, using
 JSON Pointer (RFC 6901) paths for addressing. All keywords compile to
 custom ops for maximum performance.
+
+B<Character strings, not bytes.> C<jdoc> and C<jraw> read their JSON as
+I<characters>, like C<< JSON::YY->new->decode >> does with C<utf8> off. If you
+hand them UTF-8 bytes straight off a socket or file, non-ASCII text is
+double-encoded. Decode first, or use the OO entry point for bytes:
+
+    my $doc = jdoc $body;                          # WRONG for raw bytes
+    my $doc = jdoc Encode::decode_utf8($body);     # right
+    my $doc = JSON::YY->new(utf8=>1)->decode_doc($body);  # right, no copy
+
+C<jread> reads a file as bytes and needs no such care. The keywords never
+modify the scalars passed to them.
 
 Unless documented otherwise, path keywords B<croak> when the path is missing
 or the value has the wrong type for the operation. The exceptions return a
@@ -264,7 +328,7 @@ Create typed JSON values for use with C<jset>:
 
 =item jstr $value - JSON string (ensures string type, e.g. C<jstr "007">)
 
-=item jnum $value - JSON number
+=item jnum $value - JSON number (croaks if C<$value> is not numeric)
 
 =item jbool $value - JSON true/false
 
@@ -298,6 +362,16 @@ Alias: C<jdecode>.
 
 Set value at path. C<$value> can be a scalar (auto-typed), Perl ref
 (recursively converted), or another Doc (deep-copied). Returns C<$doc>.
+
+Missing intermediate levels are created as B<objects>, even when the path
+component is a number, so C<< jset $doc, "/users/0/name", "Bob" >> on an empty
+document yields C<< {"users":{"0":{"name":"Bob"}}} >>, not an array. Create the
+array first (C<< jset $doc, "/users", [] >>) when you want one; appending to an
+existing array with C</-> works as expected.
+
+A blessed object is converted with its C<TO_JSON> method if it has one, and
+otherwise becomes C<null> (the Doc API always behaves as if C<convert_blessed>
+and C<allow_blessed> were enabled). The same applies to C<jfrom>.
 
 =item jdel $doc, $path
 
@@ -399,7 +473,8 @@ Write a Doc to a file (pretty-printed).
 
 Enumerate all leaf paths under the given path. Returns a list of
 JSON Pointer strings. Keys containing C<~> or C</> are escaped
-per RFC 6901.
+per RFC 6901. Empty objects and arrays contain no leaves and so
+contribute no paths.
 
 =back
 
@@ -480,8 +555,9 @@ C<JSON::YY::Doc> objects support:
 
     "$doc"          # stringify to JSON
     if ($doc)       # always true
-    $a eq $b        # deep equality
+    $a eq $b        # deep equality; vs a plain string, compares the JSON
     $a ne $b        # deep inequality
+    $a == $b        # identity -- true only for the same handle
 
 =head1 IMPORT FLAGS
 
@@ -490,6 +566,10 @@ C<JSON::YY::Doc> objects support:
 Imports C<encode_json>/C<decode_json> with the specified flags
 pre-configured. (C<decode_json_ro> is only available via the C<qw()>
 import, not the flag form.)
+
+The two import styles do not combine: the flag form installs closures, so it
+turns off the keyword compilation for those two names in that scope. Import
+one way or the other.
 
 =head1 JSON POINTER (RFC 6901)
 
@@ -546,6 +626,11 @@ Paths use JSON Pointer syntax:
 
 =head1 PERFORMANCE
 
+Indicative figures from the bundled F<bench/bench.pl>. Throughput depends
+heavily on payload shape, perl build and hardware, and the two libraries trade
+places across those axes -- run the benchmark on your own data rather than
+relying on the numbers below.
+
 =head2 Encode (ops/sec, higher is better)
 
                     JSON::XS    JSON::YY     delta
@@ -577,6 +662,24 @@ on small/medium payloads due to Perl SV allocation overhead.
 The Doc API avoids full Perl materialization, providing 4-5x speedup
 for surgical operations on medium/large documents.
 
+=head1 THREADS
+
+Encoding and decoding are stateless, so C<encode_json>, C<decode_json> and
+C<decode_json_ro> can be used freely from any thread.
+
+Coder objects (C<< JSON::YY->new >>) are copied into a new thread with their
+settings intact and remain usable on both sides.
+
+C<JSON::YY::Doc> handles and iterators are tied to the interpreter that
+created them: they may be alive when a thread starts, but the copy the child
+receives is inert and using it croaks with C<cannot be shared between
+threads>. The original stays fully usable. Pass JSON text (or the result of
+C<jencode>) between threads instead of a Doc.
+
+Structures from C<decode_json_ro> may be shared with a thread and read from
+either side; the underlying parse buffer is kept alive until the last thread
+holding part of it goes away.
+
 =head1 LIMITATIONS
 
 =over 4
@@ -584,11 +687,30 @@ for surgical operations on medium/large documents.
 =item * C<canonical> mode is accepted but not yet implemented (yyjson
 has no sorted-key writer).
 
+=item * Duplicate keys in one object are resolved differently by the two
+decoders: C<decode_json>/C<decode_json_ro> keep the last occurrence (as
+L<JSON::XS> does), while the Doc API resolves a pointer to the first. C<jdel>
+on such a key removes every occurrence but returns only the first. JSON does
+not define duplicate-key semantics; avoid relying on either.
+
 =item * NaN and Infinity values cannot be encoded (croaks).
 
-=item * Decoding or enumerating extremely deeply nested JSON (thousands of
-levels) recurses on the C stack and can crash on pathological input; bound the
-size of untrusted JSON before decoding. Encoding is bounded by C<max_depth>.
+=item * Nesting is bounded in both directions by C<max_depth> (default 512):
+input nested deeper than that is rejected with C<maximum nesting depth
+exceeded> rather than being materialised, and encoding croaks the same way. A
+JSON Pointer passed to C<jset>/C<jraw> is bounded too, since each component
+creates a nested parent. The functional and Doc APIs use the default; only the
+OO coder can change it -- see L</"max_depth($n)"> before raising it far.
+
+A document can still be driven past the limit by repeated mutation, since each
+individual path is short (C<< jset $cur, "/k", {}; $cur = jget $cur, "/k" >> in
+a loop). Serialising such a document is safe (C<jencode>, C<jpp> and
+stringification are iterative), and C<jgetp>/C<jpaths> croak rather than
+recurse. C<jclone>, C<jeq>, C<jdel>, C<jwrite> and C<jpatch> however recurse
+inside yyjson and will exhaust the C stack somewhere around 100_000 levels.
+Reaching that takes a deliberate loop -- neither parsed JSON nor a JSON Pointer
+can build a document that deep -- but if you construct documents by unbounded
+repeated nesting, serialise rather than clone or compare them.
 
 =item * JSON C<true>/C<false> decode to the Perl scalars C<1>/C<0> (correct in
 boolean context), not to overloaded boolean objects. To B<encode> a JSON

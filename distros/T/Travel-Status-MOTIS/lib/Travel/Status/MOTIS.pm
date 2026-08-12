@@ -23,7 +23,7 @@ use Travel::Status::MOTIS::Trip;
 use Travel::Status::MOTIS::Stopover;
 use Travel::Status::MOTIS::Stop;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # {{{ Endpoint Definition
 
@@ -75,7 +75,7 @@ sub new {
 			@modes_of_transit = @{ $conf{modes_of_transit} // [] };
 		}
 
-		$request_url->path('api/v1/stoptimes');
+		$request_url->path('api/v6/stoptimes');
 		$request_url->query_form(
 			time   => DateTime::Format::ISO8601->format_datetime($timestamp),
 			stopId => $stop_id,
@@ -84,7 +84,7 @@ sub new {
 		);
 	}
 	elsif ( my $trip_id = $conf{trip_id} ) {
-		$request_url->path('api/v2/trip');
+		$request_url->path('api/v6/trip');
 		$request_url->query_form(
 			tripId => $trip_id,
 		);
@@ -145,6 +145,7 @@ sub new {
 
 	if ( $conf{stop_id} ) {
 		$self->parse_trips_at_stopover;
+		$self->parse_stop;
 	}
 	elsif ( $conf{trip_id} ) {
 		$self->parse_trip;
@@ -184,6 +185,7 @@ sub new_p {
 
 			if ( $conf{stop_id} ) {
 				$self->parse_trips_at_stopover;
+				$self->parse_stop;
 			}
 			elsif ( $conf{trip_id} ) {
 				$self->parse_trip;
@@ -343,6 +345,16 @@ sub parse_trips_at_stopover {
 	return $self;
 }
 
+sub parse_stop {
+	my ($self) = @_;
+
+	$self->{result} = Travel::Status::MOTIS::Stop->from_stopover(
+		json => $self->{raw_json}{place},
+	);
+
+	return $self;
+}
+
 # }}}
 # {{{ Public Functions
 
@@ -409,7 +421,7 @@ Blocking variant:
 			"%s +%-3d %10s -> %s\n",
 			$result->stopover->departure->strftime('%H:%M'),
 			$result->stopover->delay,
-			$result->route_name,
+			$result->display_name,
 			$result->headsign,
 		);
 	}
@@ -432,7 +444,7 @@ Non-blocking variant;
 				"%s +%-3d %10s -> %s\n",
 				$result->stopover->departure->strftime('%H:%M'),
 				$result->stopover->delay,
-				$result->route_name,
+				$result->display_name,
 				$result->headsign,
 			);
 		}
@@ -440,7 +452,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -505,20 +517,24 @@ you can use an empty hashref to unset the default.
 
 Only consider the modes of transit given in I<arrayref> when listing
 departures. Accepted modes of transit are:
-TRANSIT (same as RAIL, SUBWAY, TRAM, BUS, FERRY, AIRPLANE, COACH),
+TRANSIT (same as TRAM, FERRY, AIRPLANE, BUS, COACH, RAIL, ODM, RIDE_SHARING, FUNICULAR, AERIAL_LIFT, OTHER),
 TRAM,
 SUBWAY,
 FERRY,
 AIRPLANE,
 BUS,
 COACH,
-RAIL (same as HIGHSPEED_RAIL, LONG_DISTANCE_RAIL, NIGHT_RAIL, REGIONAL_RAIL, REGIONAL_FAST_RAIL),
-METRO,
+RAIL (same as HIGHSPEED_RAIL, LONG_DISTANCE, NIGHT_RAIL, REGIONAL_RAIL, SUBURBAN, SUBWAY),
 HIGHSPEED_RAIL,
 LONG_DISTANCE,
 NIGHT_RAIL,
 REGIONAL_FAST_RAIL,
-REGIONAL_RAIL.
+REGIONAL_RAIL,
+SUBURBAN,
+ODM,
+RIDE_SHARING,
+FUNICULAR,
+AERIAL_LIFT.
 
 By default, Travel::Status::MOTIS uses TRANSIT.
 
@@ -603,7 +619,7 @@ L<TBD>
 
 =head1 AUTHOR
 
-Copyright (C) 2025 networkException E<lt>git@nwex.deE<gt>
+Copyright (C) 2025-2026 networkException E<lt>git@nwex.deE<gt>
 
 Based on Travel::Status::DE::DBRIS
 

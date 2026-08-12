@@ -8,6 +8,7 @@ my $build = Module::Build->new(
    module_name => 'Device::Chip',
    requires => {
       'perl' => '5.026', # signatures in Object::Pad
+      'meta' => 0,
       'Future::AsyncAwait' => '0.47', # toplevel await
       'Object::Pad' => '0.800',
       'Object::Pad::ClassAttr::Struct' => '0.05',

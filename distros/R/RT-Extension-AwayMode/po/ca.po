@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2026-08-11 22:30+0200\n"
+"Last-Translator: Eduardo Domínguez Vázquez <eduardo.dominguez@uib.es>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: html/Elements/AwayModeEditor:38
+msgid "End date can't be before start date."
+msgstr "La data final no pot ser anterior a la inicial."
+
+#: html/Elements/AwayModeEditor:55
+msgid "Away Mode preferences updated."
+msgstr "S'han actualitzat les preferències del Mode d'Absència."
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:58
+msgid "Away Mode preferences updated for %1."
+msgstr "Les preferències del Mode d'Absència s'han actualitzat per %1."
+
+#: html/Elements/AwayModeEditor:72 html/Callbacks/RT-Extension-AwayMode/Elements/Tabs/Privileged:22 html/Callbacks/RT-Extension-AwayMode/Elements/Header/PrivilegedMainNav:6 html/Prefs/AwayMode.html:11
+msgid "Away Mode"
+msgstr "Mode d'Absència"
+
+#: html/Elements/AwayModeEditor:89
+msgid "Start date (optional)"
+msgstr "Data inicial (opcional)"
+
+#: html/Elements/AwayModeEditor:94
+msgid "End date (optional)"
+msgstr "Data final (opcional)"
+
+#: html/Elements/AwayModeEditor:100
+msgid "Dates are inclusive and are compared against RT's own local date."
+msgstr "Les dates estan incloses a l'interval, les quals són referenciades amb l'hora local pròpia del servidor d'RT."
+
+#: html/Elements/AwayModeEditor:115
+msgid "Away Mode is currently ACTIVE."
+msgstr "El Mode d'Absència està actualment ACTIU."
+
+#: html/Elements/AwayModeEditor:116
+msgid "Away Mode is currently not active."
+msgstr "El Mode d'Absència actualment no està actiu."
+
+#: html/Elements/AwayModeEditor:118
+msgid "New replies to tickets you own will be reassigned to Nobody, with a comment noting you're away."
+msgstr "Les noves respostes dels tiquets que li pertanyin faran que aquests siguin reassignats a Nobody, amb un comentari indicant la seva absència."
+
+#: html/Elements/AwayModeEditor:120
+msgid "I am away/on holiday"
+msgstr "Estic absent/de vacances"
+
+#: html/Elements/AwayModeEditor:121
+msgid "Leave both dates blank to stay away for as long as the checkbox above is on, or set one or both to bound the away window."
+msgstr "Deixi ambdues dates en blanc per indicar la seva absència mentre la casella anterior estigui marcada, o fixi una o ambdues dates per delimitar l'interval de la seva absència."
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:125
+msgid "Away Mode is currently ACTIVE for %1."
+msgstr "El Mode d'Absència està actualment ACTIU per %1."
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:126
+msgid "Away Mode is currently not active for %1."
+msgstr "El Mode d'Absència està actualment inactiu per %1."
+
+#: html/Elements/AwayModeEditor:128
+msgid "New replies to tickets %1 owns will be reassigned to Nobody, with a comment noting they are away."
+msgstr "Les noves respostes dels tiquets que pertanyin a %1 faran que aquests siguin reassignats a Nobody, amb un comentari indicant la seva absència."
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:130
+msgid "%1 is away/on holiday"
+msgstr "%1 està absent/de vacances"
+
+#. $UserObj->Name
+#: html/Elements/AwayModeEditor:131
+msgid "Leave both dates blank to keep this user away for as long as the checkbox above is on, or set one or both to bound the away window."
+msgstr "Deixi ambdues dates en blanc per mantenir aquest usuari absent tot el temps que aquesta casella estigui activada, o pot fixar un o ambdues per delimitar l'interval d'absència."
+
+#: html/Callbacks/RT-Extension-AwayMode/autohandler/Default:9
+msgid "Away Mode is active for your account. New replies on tickets you own will be reassigned to Nobody."
+msgstr "El Mode d'Absència s'ha activat al seu compte. Si qualque tiquet seu reb una resposta, es reassignarà a l'usuari Nobody."
+
+#. $prefs->{'EndDate'}
+#: html/Callbacks/RT-Extension-AwayMode/autohandler/Default:10
+msgid "You're expected back %1."
+msgstr "S'espera el vostre retorn el dia %1."
+
+#: html/Admin/Users/AwayMode.html:16
+msgid "You do not have permission to modify other users."
+msgstr "No té permís per modificar la configuració d'altres usuaris."
+
+#. $id
+#: html/Admin/Users/AwayMode.html:22
+msgid "Couldn't load user '%1'"
+msgstr "No es pot carregar l'usuari '%1'"
+
+#. $UserObj->Name
+#: html/Admin/Users/AwayMode.html:24
+msgid "Away Mode for the user %1"
+msgstr "Mode d'Absència per l'usuari %1"

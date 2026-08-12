@@ -28,59 +28,60 @@ SYNOPSIS
         # share across processes via a backing file
         my $shared = Data::CountingBloomFilter::Shared->new("/tmp/seen.cbf", 1_000_000);
 
-DESCRIPTION
-    A counting Bloom filter in shared memory: like
-    Data::BloomFilter::Shared, a compact fixed-size structure for
-    approximate set membership, but each position is a small 4-bit counter
-    instead of a single bit. That one change buys two things a plain Bloom
-    filter cannot do: you can remove items, and you can ask how many times
-    an item was added ("count_of"). The cost is memory -- four bits per slot
-    instead of one, so about four times the size of the equivalent Bloom
-    filter.
+        # freeze and ship: query it read-only (lock-free) on other machines
+        $shared->freeze;
+        my $ro = Data::CountingBloomFilter::Shared->new_readonly("/tmp/seen.cbf");
+        $ro->contains("alice");
 
-    Membership is still one-sided: "contains" returns "definitely not
-    present" or "probably present". For items you have added (and not
-    removed) it always returns true -- there are no false negatives -- with
-    a small tunable rate of false positives. It never stores the items
-    themselves, only which counters they touch.
+DESCRIPTION
+    A counting Bloom filter in shared memory: like Data::BloomFilter::Shared,
+    a compact fixed-size structure for approximate set membership, but each
+    position is a small 4-bit counter instead of a single bit. That one change
+    buys two things a plain Bloom filter cannot do: you can remove items, and
+    you can ask how many times an item was added ("count_of"). The cost is
+    memory -- four bits per slot instead of one, so about four times the size
+    of the equivalent Bloom filter.
+
+    Membership is still one-sided: "contains" returns "definitely not present"
+    or "probably present". For items you have added (and not removed) it
+    always returns true -- there are no false negatives -- with a small
+    tunable rate of false positives. It never stores the items themselves,
+    only which counters they touch.
 
     Each item is hashed once with XXH3 (128-bit) and, by double hashing
     (Kirsch-Mitzenmacher), drives "k" probes into an array of "m" counters.
     "add" increments each of the item's "k" counters (saturating at 15);
     "contains" is true when all k are greater than zero; "remove" decrements
-    them (only if the item is present); and "count_of" returns the minimum
-    of the "k" counters -- an estimate of the item's stored occurrence
-    count. From the requested capacity "n" and false-positive rate "p" the
-    filter derives "k = round(-log2 p)" and "m = next_pow2(n * k / ln2)",
-    the same geometry as a Bloom filter.
+    them (only if the item is present); and "count_of" returns the minimum of
+    the "k" counters -- an estimate of the item's stored occurrence count.
+    From the requested capacity "n" and false-positive rate "p" the filter
+    derives "k = round(-log2 p)" and "m = next_pow2(n * k / ln2)", the same
+    geometry as a Bloom filter.
 
     The counters saturate at 15: an item added more than 15 times (or
     colliding with others up to that ceiling) sticks at 15 and is never
     decremented again, which keeps membership sound (no false negatives) but
-    caps "count_of" and means a saturated item cannot be fully removed.
-    Sizing the filter for its intended load keeps saturation vanishingly
-    rare.
+    caps "count_of" and means a saturated item cannot be fully removed. Sizing
+    the filter for its intended load keeps saturation vanishingly rare.
 
     Because the table lives in a shared mapping, several processes share one
     filter: any process that opens the same backing file, inherits the
     anonymous mapping across "fork", or reopens a passed memfd sees the
-    others' additions and removals and contributes its own. A
-    write-preferring futex rwlock with dead-process recovery guards
-    mutation, so many processes may "add", "remove", and "contains"
-    concurrently.
+    others' additions and removals and contributes its own. A write-preferring
+    futex rwlock with dead-process recovery guards mutation, so many processes
+    may "add", "remove", and "contains" concurrently.
 
     Removal caveat. "remove" decrements the counters of an item that is
     present. Because counters are shared between items, decrementing the
     counters of an item that was never added -- or one whose probes collide
-    with present items -- can push a shared counter to zero and cause a
-    false negative for some other item. Only remove items you actually
-    added, and remove an item as many times as you added it to forget it
-    completely.
+    with present items -- can push a shared counter to zero and cause a false
+    negative for some other item. Only remove items you actually added, and
+    remove an item as many times as you added it to forget it completely.
 
-    Items are added, tested, and removed by their byte content;
-    wide-character strings (any codepoint above 255) cause a "Wide
-    character" croak -- encode such strings to bytes first (for example with
-    "Encode::encode_utf8"). Linux-only. Requires 64-bit Perl.
+    Items are added, tested, and removed by their byte content; wide-character
+    strings (any codepoint above 255) cause a "Wide character" croak -- encode
+    such strings to bytes first (for example with "Encode::encode_utf8").
+    Linux-only. Requires 64-bit Perl.
 
 METHODS
   Constructors
@@ -88,25 +89,30 @@ METHODS
         my $cbf = Data::CountingBloomFilter::Shared->new(undef, 1_000_000);        # anonymous, 1% default
         my $cbf = Data::CountingBloomFilter::Shared->new_memfd($name, $capacity, $fp_rate);
         my $cbf = Data::CountingBloomFilter::Shared->new_from_fd($fd);
+        my $ro  = Data::CountingBloomFilter::Shared->new_readonly($path);   # frozen file, read-only
 
     $path is the backing file ("undef" or omitted for an anonymous mapping).
-    $capacity is the number of items you expect to add (at least 1).
-    $fp_rate is the target false-positive rate at that capacity, strictly
-    between 0 and 1 (default 0.01). "new" and "new_memfd" croak on a
-    capacity below 1 or an out-of-range $fp_rate.
+    $capacity is the number of items you expect to add (at least 1). $fp_rate
+    is the target false-positive rate at that capacity, strictly between 0 and
+    1 (default 0.01). "new" and "new_memfd" croak on a capacity below 1 or an
+    out-of-range $fp_rate.
 
-    From $capacity and $fp_rate the filter derives "k = round(-log2
-    fp_rate)" (clamped to 1..32) probes and "m = next_pow2(capacity * k /
-    ln2)" 4-bit counters (floor 64), for a "m/2"-byte counter array. When
-    reopening an existing file or memfd the stored geometry wins and the
-    caller's $capacity/$fp_rate arguments are ignored. "new_memfd" creates a
-    Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
-    reopens one in another process.
+    From $capacity and $fp_rate the filter derives "k = round(-log2 fp_rate)"
+    (clamped to 1..32) probes and "m = next_pow2(capacity * k / ln2)" 4-bit
+    counters (floor 64), for a "m/2"-byte counter array. When reopening an
+    existing file or memfd the stored geometry wins, so the caller's
+    $capacity/$fp_rate do not resize it -- but they are still range-checked
+    first, so an out-of-range value croaks even though it would have been
+    ignored. "new_memfd" creates a Linux memfd (transferable via its "memfd"
+    descriptor); "new_from_fd" reopens one in another process. The descriptor
+    you pass is duplicated ("F_DUPFD_CLOEXEC"), so it stays yours to close and
+    closing it does not disturb the handle.
 
     An optional file mode may be passed as the last argument to "new" (e.g.
     0660) to opt a newly-created backing file into cross-user sharing; it
     defaults to 0600 (owner-only) and is ignored for anonymous mappings and
-    existing files.
+    existing files. "new_readonly" opens a frozen file read-only for lock-free
+    querying (see "FROZEN (READ-ONLY) MODE").
 
   Adding, testing, counting, removing
         my $new   = $cbf->add($item);           # 1 if the item was probably new, else 0
@@ -116,43 +122,43 @@ METHODS
         my $gone  = $cbf->remove($item);         # 1 if present and decremented, else 0
         $cbf->clear;                             # reset to empty
 
-    "add" hashes $item (by its bytes; wide characters croak, encode first)
-    and increments its "k" counters, each saturating at 15. It returns 1 if
-    the item was probably new (at least one of its counters was 0
-    beforehand) or 0 if it was already present. "add_many" takes an array
-    reference and does the whole batch under a single write lock, returning
-    how many of the adds were probably new.
+    "add" hashes $item (by its bytes; wide characters croak, encode first) and
+    increments its "k" counters, each saturating at 15. It returns 1 if the
+    item was probably new (at least one of its counters was 0 beforehand) or 0
+    if it was already present. "add_many" takes an array reference and does
+    the whole batch under a single write lock, returning how many of the adds
+    were probably new.
 
-    "contains" returns 1 if the item is probably present (all "k" counters
-    are nonzero) and 0 if it is definitely absent. A 0 means definitely
-    absent: an item you added and have not removed never returns 0 (no false
-    negatives). A 1 may be a false positive.
+    "contains" returns 1 if the item is probably present (all "k" counters are
+    nonzero) and 0 if it is definitely absent. A 0 means definitely absent: an
+    item you added and have not removed never returns 0 (no false negatives).
+    A 1 may be a false positive.
 
-    "count_of" returns the minimum of the item's "k" counters, an integer
-    from 0 to 15 estimating how many times the item is stored (times added
-    minus removed). Collisions can only raise a counter, so below saturation
-    "count_of" never under-counts -- it is an upper estimate. It saturates
-    at 15: a returned 15 means 15 or more, so an item added more than 15
-    times is under-reported. A 0 means definitely absent.
+    "count_of" returns the minimum of the item's "k" counters, an integer from
+    0 to 15 estimating how many times the item is stored (times added minus
+    removed). Collisions can only raise a counter, so below saturation
+    "count_of" never under-counts -- it is an upper estimate. It saturates at
+    15: a returned 15 means 15 or more, so an item added more than 15 times is
+    under-reported. A 0 means definitely absent.
 
     "remove", only if the item is present (all "k" counters are nonzero),
     decrements each of them and returns 1; otherwise it changes nothing and
     returns 0. Saturated (15) counters are left stuck, so "remove" of a
     saturated item still returns 1 but cannot lower it -- a saturated item
     cannot be fully removed. See the Removal caveat in "DESCRIPTION": only
-    remove items you added, and remove an item as many times as it was
-    added. "clear" empties the whole filter (all counters zeroed).
+    remove items you added, and remove an item as many times as it was added.
+    "clear" empties the whole filter (all counters zeroed).
 
   Merging
         $cbf->merge($other);                     # counter-wise saturating add
 
-    "merge" adds another filter's counters into this one, counter by
-    counter, saturating each at 15. Both filters must have the same geometry
-    (same "m" and "k", i.e. created with the same capacity and
-    false-positive rate) or "merge" croaks. The other filter is snapshotted
-    under its own read lock, so two processes may safely merge concurrently.
-    After merging, "contains" is true for every item present in either
-    filter and "count_of" reflects the summed (saturated) counts.
+    "merge" adds another filter's counters into this one, counter by counter,
+    saturating each at 15. Both filters must have the same geometry (same "m"
+    and "k", i.e. created with the same capacity and false-positive rate) or
+    "merge" croaks. The other filter is snapshotted under its own read lock,
+    so two processes may safely merge concurrently. After merging, "contains"
+    is true for every item present in either filter and "count_of" reflects
+    the summed (saturated) counts.
 
   Introspection and lifecycle
         $cbf->count; $cbf->capacity; $cbf->counters; $cbf->hashes; $cbf->fp_rate;
@@ -161,15 +167,17 @@ METHODS
     "count" estimates the number of distinct items currently present (added
     minus removed, from the fraction of nonzero counters, "-(m/k) * ln(1 -
     X/m)" where "X" is the nonzero-counter count); it is an estimate, not an
-    exact tally. "capacity" is the configured item capacity; "counters" is
-    the counter count "m" (a power of two); "hashes" is "k"; "fp_rate" is
-    the configured target false-positive rate. "sync" flushes the mapping to
-    its backing store (a no-op for anonymous and memfd filters); "unlink"
-    removes the backing file (also callable as "Class->unlink($path)");
-    "path" returns the backing path ("undef" for anonymous, memfd, or
-    fd-reopened filters) and "memfd" the backing descriptor -- the memfd of
-    a "new_memfd" filter or the dup'd fd of a "new_from_fd" filter, and -1
-    for file-backed or anonymous filters.
+    exact tally. "capacity" is the configured item capacity; "counters" is the
+    counter count "m" (a power of two); "hashes" is "k"; "fp_rate" is the
+    configured target false-positive rate. "sync" flushes the mapping to its
+    backing store (a no-op for anonymous and memfd filters); "unlink" removes
+    the backing file (also callable as "Class->unlink($path)") and croaks if
+    the removal fails -- except when the file is already gone, which is what
+    you asked for; it is likewise a no-op when there is no backing file
+    (anonymous or memfd); "path" returns the backing path ("undef" for
+    anonymous, memfd, or fd-reopened filters) and "memfd" the backing
+    descriptor -- the memfd of a "new_memfd" filter or the dup'd fd of a
+    "new_from_fd" filter, and -1 for file-backed or anonymous filters.
 
 STATS
     stats() returns a hashref describing the filter:
@@ -196,15 +204,20 @@ STATS
 
     *   "mmap_size" -- bytes of the shared mapping.
 
+    *   "frozen" -- 1 if the filter has been sealed by "freeze" (immutable),
+        else 0.
+
+    *   "readonly" -- 1 if this handle is a read-only view (from
+        "new_readonly", or the handle that called "freeze"), else 0.
+
 SHARING ACROSS PROCESSES
     The filter lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file (every process calls "new($path,
-    ...)" on the same path with a matching capacity), an anonymous mapping
-    inherited across "fork", or a memfd whose descriptor is passed to an
-    unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
-    "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Because the
-    mapping is shared, every process adds into, tests against, and removes
-    from the same table.
+    rest of the family: a backing file (every process calls "new($path, ...)"
+    on the same path with a matching capacity), an anonymous mapping inherited
+    across "fork", or a memfd whose descriptor is passed to an unrelated
+    process (over a UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n")
+    and reopened with new_from_fd($fd). Because the mapping is shared, every
+    process adds into, tests against, and removes from the same table.
 
         # producer and consumer share one filter with no coordination
         my $cbf = Data::CountingBloomFilter::Shared->new(undef, 100_000);   # before fork
@@ -212,40 +225,117 @@ SHARING ACROSS PROCESSES
         wait;
         print $cbf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
 
+FROZEN (READ-ONLY) MODE
+    A file-backed filter can be frozen and then shipped to other machines,
+    where consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $cbf = Data::CountingBloomFilter::Shared->new("/tmp/seen.cbf", 1_000_000, 0.01);
+        $cbf->add_many(\@known);
+        $cbf->freeze;                 # seal: now immutable, and $cbf itself is read-only
+        # ... copy /tmp/seen.cbf to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::CountingBloomFilter::Shared->new_readonly("/tmp/seen.cbf");
+        $ro->contains($item) for @queries;
+        $ro->count_of($item);
+
+    "freeze" takes the write lock, marks the filter permanently immutable
+    (there is no unfreeze -- rebuild the file to change it), and flushes the
+    seal to disk. A frozen filter rejects every mutator ("add", "add_many",
+    "remove", "merge", "clear") with a croak, and a read-write reopen
+    ("new($path, ...)") of a sealed file is refused -- so a shipped artifact
+    can never be silently mutated out from under its readers. That protection
+    is enforced by the reader: the seal is a header flag that 0.01 and earlier
+    do not know about, and the on-disk format version is deliberately
+    unchanged so those releases can still open files written here. A pre-0.02
+    build therefore opens a sealed file read-write and can modify it, so keep
+    producers and consumers on 0.02 or later if you rely on the seal. "freeze"
+    itself is not idempotent: the handle that seals the file becomes a
+    read-only view of it, so calling "freeze" on that handle again croaks.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed filter's counters and geometry are immutable, "contains",
+    "count_of", "count", and "stats" read them directly, taking no reader lock
+    -- the mapping is never written, so a read-only view works from a
+    read-only file descriptor or a read-only filesystem, and any number of
+    processes can share one "PROT_READ" mapping. "frozen" and "readonly"
+    report the two states.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
+
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied when the file is created; a
-    pre-existing empty file owned by the caller is adopted as new and
-    likewise gets the requested mode, while a non-empty existing file keeps
-    its own permissions. The file is opened with "O_NOFOLLOW", so a symlink
-    planted at the path is refused, and created with "O_EXCL"; the on-disk
-    header is validated when the file is attached. Any process you grant
-    write access to a shared mapping is trusted not to corrupt its contents
-    while other processes are using it.
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created; a pre-existing
+    file owned by the caller is adopted as new -- and likewise gets the
+    requested mode -- when it is empty, or when it is the full-size all-zero
+    file an interrupted create leaves behind (see "CRASH SAFETY"). Any other
+    existing file keeps its own permissions. The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is attached.
+    Any process you grant write access to a shared mapping is trusted not to
+    corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership; if a holder dies, the next contender detects the
     dead owner and recovers. Each "add" and "remove" is a short sequence of
     counter updates, so a crash leaves the filter consistent up to the last
-    completed operation. Limitation: PID reuse is not detected (very
-    unlikely in practice).
+    completed operation. Limitation: PID reuse is not detected (very unlikely
+    in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely. Those
+    preconditions cover the live-process route only. The count lives in the
+    mapping and "new" validates the geometry, not this transient value, so a
+    backing file damaged at rest -- bit rot, a partial copy, or a process that
+    scribbled on the mapping -- can present a non-zero slotless count and
+    block every writer the same way, with none of the above. If writers hang
+    on a file no live reader is using, recreate it.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete counting Bloom filter file left by an interrupted create;
+    remove it and retry". A file left behind by an interrupted create never
+    held data, so removing it is safe -- but a file whose header was corrupted
+    after the fact reaches the same croak, so confirm it is an abandoned
+    create before deleting anything you care about.
+
+    Disk space. The backing file is created sparse: "new" sizes it, but blocks
+    are allocated only as you write, so a large filter costs almost nothing on
+    disk until it is used. The cost of that is a late failure, and how it
+    reaches you depends on the filesystem. Where blocks are allocated at fault
+    time -- tmpfs, so "/dev/shm" and many "/tmp" mounts -- a write to a page
+    that cannot be backed raises "SIGBUS" and kills the process, because an
+    "mmap" store has no way to report "ENOSPC". Where allocation is delayed to
+    writeback (ext4, xfs), the store lands in page cache and the failure
+    appears later: the write is lost, and "sync" is what reports it, croaking
+    with the underlying error. Keep the filesystem sized for the filter you
+    asked for, and call "sync" when you need to know your writes reached disk.
 
 SEE ALSO
     Data::BloomFilter::Shared (membership without delete, one bit per slot),
@@ -257,6 +347,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

@@ -8,8 +8,8 @@ our $VERSION = v1.0.0;
 
 use Sample::Context::Singleton qw[ contrive ];
 
-contrive 'constant' => (
-	value => '42',
+contrive q (constant) => (
+	value => q (42),
 );
 
 1;

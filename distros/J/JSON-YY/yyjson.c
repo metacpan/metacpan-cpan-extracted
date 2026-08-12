@@ -10527,7 +10527,12 @@ bool unsafe_yyjson_mut_ptr_putx(
     ctn_len = unsafe_yyjson_get_len(ctn);
     if (ctn_type == YYJSON_TYPE_OBJ) {
         if (ctx) ctx->ctn = ctn;
-        if (!val || insert_new) {
+        /* LOCAL PATCH (JSON::YY): upstream also inserts when insert_new is set,
+           which makes RFC 6902 add/copy/move duplicate an existing object key
+           instead of replacing it (RFC 6902 4.1). insert_new governs array
+           append/insert only; for an object, an existing key must be replaced.
+           Re-apply this when upgrading yyjson. */
+        if (!val) {
             /* insert new key-value pair */
             key = ptr_new_key(token, token_len, esc, doc);
             if (unlikely(!key)) return_err_alloc(false);

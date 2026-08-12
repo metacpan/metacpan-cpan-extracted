@@ -852,3 +852,29 @@ Revision history for StreamFinder
 2.64    2026/08/04
         - StreamFinder::Rumble - Fix uninitialized variable issue & improve 
         debug output.
+2.70    2026/08/11
+        - StreamFinder::Youtube - Add ability to return Youtube "DASH" streams 
+        in pairs separated by a bar ("|"):  (an audio-only stream URL plus a 
+        video-only stream URL) by specifying a yt-dlp audio format specifier in 
+        the "-format" option plus a separate video format specifier in the new 
+        "-formatv" option.  Youtube now only returns up to a single stream URL 
+        that combines audio and video (ancient format "18" which is a very low 
+        resolution format (360p)).  All their other available formats are now 
+        either video-only or audio-only ("DASH" format).  This new option will 
+        now allow Fauxdacious Media Player to play higher-resolution and 
+        higher-fidelity Youtube videos by streaming both URLs simultaineously 
+        and combining their content during demuxing, while still allowing 
+        dynamic seeking within the stream without having to download! 
+        Example:  -format => "bestaudio", -formatv => 
+        "bv[height<=720][vbr<=3500]", format-fallback => "b[tbr<=3500]".
+        This example tries to download up to 720p with average bandwidth of 
+        no more than 3500 kbps along with best audio format.  If yt-dlp fails 
+        to obtain both a valid and compliant audio and video URL, the old 
+        (fallback) 360p combined format (18) stream will be returned.
+        The first stream returned will be "audio-url|video-url" and the 2nd 
+        will be the "audio-url".  If the fallback is returned it will be 
+        the "avcombo-url".
+        - StreamFinder::Odysee - Removed due to restrictions preventing playing 
+        their streams outside of their javascript-based web-browser player and 
+        no longer providing a backup Youtube URL (in other words, more 
+        internet encrapification).

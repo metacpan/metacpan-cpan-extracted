@@ -7,7 +7,7 @@ use warnings;
 use lib 'blib/lib', 'blib/arch', 't/lib';
 use Test::More;
 use ClickHouse::Encoder;
-use TestCH qw(skip_header);
+use TestCH qw(skip_header f64);
 
 sub round {
     my ($cols, $rows) = @_;
@@ -41,7 +41,7 @@ sub round {
               'Int64 round-trip (string-safe boundaries)');
     is_deeply($block->{columns}[2]{values}, [4_294_967_295, 0], 'UInt32 round-trip');
     is($block->{columns}[3]{values}[0], 1.5,  'Float32 round-trip +1.5');
-    is($block->{columns}[4]{values}[1], -2.71828, 'Float64 round-trip');
+    is($block->{columns}[4]{values}[1], f64(-2.71828), 'Float64 round-trip');
     is($block->{columns}[5]{values}[0], 1.0,  'BFloat16 round-trip 1.0');
     is_deeply($block->{columns}[6]{values}, ['hello', ''], 'String round-trip');
     is_deeply($block->{columns}[7]{values}, ['abcd', "xy\x00\x00"],

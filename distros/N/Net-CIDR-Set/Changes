@@ -1,5 +1,9 @@
 Revision history for Net-CIDR-Set
 
+0.23      2026-08-11 20:08:42+01:00 Europe/London
+  [Security]
+  - Fix an unbounded IPv6 netmask prefix length (CVE-2026-19566)
+
 0.22      2026-06-13 14:44:25+01:00 Europe/London
   [Toolchain]
   - Set the static install flag

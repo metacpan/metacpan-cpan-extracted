@@ -2,10 +2,16 @@ package ClickHouse::Encoder;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('ClickHouse::Encoder', $VERSION);
+
+# An encoder is a blessed IV holding a raw Encoder* (likewise Streamer).
+# ithreads clone SVs verbatim, so without this both interpreters own the
+# same pointer and each frees it - a double free on any thread spawn.
+# The child's copies become plain undef instead. See THREADS in the docs.
+sub CLONE_SKIP { return 1 }
 
 # Validate a [db.]table identifier as ASCII word characters only.
 # Rejects anything that could inject SQL via the --query argument.
@@ -52,8 +58,12 @@ sub _http_url_headers {
 # Validate the host/port/scheme triple shared by every HTTP entry point.
 # Rejects anything other than http/https, ensures the port is a positive
 # integer, and refuses host strings that contain URL-structural characters
-# (':/?#&'). Centralised here so insert_http, bulk_inserter, ping, and
+# (':/?#&@'). Centralised here so insert_http, bulk_inserter, ping, and
 # select_blocks share a single allow-list and identical error messages.
+# '@' counts: it opens the userinfo section, so 'evil.com@internal.db'
+# would send the request to internal.db. IPv6 literals are the one host
+# form that legitimately holds colons; accept them bracketed ('[::1]'),
+# which is also the form the URL needs to keep the port unambiguous.
 sub _check_endpoint {
     my ($opts) = @_;
     my $scheme = $opts->{scheme} // 'http';
@@ -61,9 +71,12 @@ sub _check_endpoint {
     my $port   = $opts->{port}   // 8123;
     die "endpoint: scheme must be 'http' or 'https' (got '$scheme')\n"
         unless $scheme eq 'http' || $scheme eq 'https';
+    my $is_ipv6 = $host =~ /\A\[[0-9A-Fa-f:.]+\]\z/;
     die "endpoint: host must not contain URL-structural characters "
       . "(got '$host')\n"
-        if $host =~ m{[:/?#&\s]} || !length $host;
+        if !length $host
+        || $host =~ m{[/?#&\@\s]}
+        || ($host =~ m{:} && !$is_ipv6);
     die "endpoint: port must be a positive integer (got '$port')\n"
         unless $port =~ /\A[1-9]\d{0,4}\z/ && $port < 65536;
     return ($scheme, $host, $port);
@@ -335,6 +348,9 @@ sub decompress_native_block {
     # Same default as compress_native_block. Callers can pass
     # hasher => undef explicitly to skip checksum verification.
     my $hasher = exists $opts{hasher} ? $opts{hasher} : \&_cityhash128;
+    # Wire data the decompressor allocates up front, so a tiny block
+    # claiming 4 GiB asks for 4 GiB. Callers can raise the bound.
+    my $max_size = $opts{max_size} // 1024 * 1024 * 1024;
     my $total  = length $bytes;
     die "decompress_native_block: truncated header at offset $off "
       . "(need >= 25 bytes, have " . ($total - $off) . ")\n"
@@ -347,6 +363,9 @@ sub decompress_native_block {
 
     die "decompress_native_block: compressed_size=$csize < 9 (corrupt)\n"
         if $csize < 9;
+    die "decompress_native_block: uncompressed_size=$usize exceeds "
+      . "max_size=$max_size (pass max_size => N to raise)\n"
+        if $usize > $max_size;
     my $payload_len = $csize - 9;
     my $end = $off + 16 + $csize;
     die "decompress_native_block: block extends past buffer end\n"
@@ -503,6 +522,13 @@ sub decode_stream {
     my $buf = '';        # raw bytes from the filehandle
     my $inner = '';      # decompressed Native bytes (== $buf when !decompress)
     my $done = 0;
+    # A truncated decode re-parses the partial block from byte 0, so
+    # retrying on every chunk is quadratic in block size. The decoder
+    # says how many bytes it came up short, so wait for exactly that
+    # much before trying again: no wasted re-parse, and - unlike a blind
+    # doubling - never a complete block held back or an unbounded read.
+    my $need_at = 0;
+    my $at_eof  = 0;
     until ($done) {
         # Phase 1: peel compressed-block frames out of $buf into $inner.
         if ($decompress) {
@@ -519,20 +545,28 @@ sub decode_stream {
         } else {
             $inner = $buf;
         }
-        # Phase 2: decode complete Native blocks out of $inner.
-        while (length($inner) > 0) {
+        # Phase 2: decode complete Native blocks out of $inner. At EOF the
+        # threshold is ignored - the buffer gets a last chance before it
+        # is called trailing junk.
+        while (length($inner) > 0 && ($at_eof || length($inner) >= $need_at)) {
             my $block = eval { $class->decode_block($inner, 0, $keep) };
             if ($@) {
-                # Truncation or malformed mid-block; need more bytes.
-                # Only "buffer truncated" means "data ran short, read
-                # more"; "exceeds remaining" indicates a malformed wire
-                # value (e.g. a corrupted varint count) and should die
-                # rather than spin reading more bytes.
-                last if $@ =~ /buffer truncated/i;
+                # Both shapes mean "not enough bytes yet". The prologue's
+                # "exceeds remaining buffer" guard compares a header count
+                # against what has arrived, so a block of N rows trips it
+                # whenever a chunk boundary leaves fewer than N bytes
+                # buffered - ordinary on real data. Reading more cannot
+                # loop: EOF ends the outer scan.
+                if ($@ =~ /buffer truncated \(need (\d+) more/i) {
+                    $need_at = length($inner) + $1;
+                    last;
+                }
+                last if $@ =~ /buffer truncated|exceeds remaining buffer/i;
                 die $@;  # real error
             }
             $cb->($block);
             substr($inner, 0, $block->{consumed}, '');
+            $need_at = 0;
         }
         # When not decompressing, $inner aliases $buf - carry the residual
         # back so the next read sees the unconsumed tail.
@@ -542,8 +576,10 @@ sub decode_stream {
         my $n = read $fh, $more, $chunk_size;
         die "decode_stream: read error: $!" if !defined $n;
         if ($n == 0) {
-            # EOF. If anything is left in either buffer it's a truncated
-            # final block; raise rather than swallow.
+            # EOF. Re-run the scan ungated once, then anything still left
+            # in either buffer is a truncated final block; raise rather
+            # than swallow.
+            if (!$at_eof && length $inner) { $at_eof = 1; next }
             die "decode_stream: " . length($buf) . " trailing bytes "
               . "after last complete compressed block"
                 if $decompress && length $buf;
@@ -901,9 +937,44 @@ sub _split_column_defs {
 # DEFAULT/CODEC/TTL modifiers are dropped from the type (they are not
 # part of the type proper); the bare type is what CH's own `describe`
 # would report. Croaks if no create table header or column block is found.
+# Undo TabSeparated escaping outside single-quoted SQL literals. Escapes
+# inside a literal are left alone: the caller's own DDL may carry a regex
+# or a Windows path, and clause values are returned verbatim, so rewriting
+# them is worse than leaving one escaped newline the parser ignores.
+sub _tsv_unescape_ddl {
+    my ($s) = @_;
+    my %map = ('n' => "\n", 't' => "\t", 'r' => "\r", '0' => "\0",
+               '\\' => "\\");
+    my ($out, $in_lit, $len) = ('', 0, length $s);
+    for (my $i = 0; $i < $len; $i++) {
+        my $c = substr $s, $i, 1;
+        if ($c eq "'") { $in_lit = !$in_lit; $out .= $c; next }
+        if ($c eq "\\" && $i + 1 < $len) {
+            my $n = substr $s, $i + 1, 1;
+            # Inside a literal, copy the pair through untouched so an
+            # embedded \' still shields its quote from the toggle above.
+            if ($in_lit)          { $out .= $c . $n; $i++; next }
+            if (exists $map{$n})  { $out .= $map{$n}; $i++; next }
+        }
+        $out .= $c;
+    }
+    return $out;
+}
+
 sub parse_create_table {
     my ($class, $ddl) = @_;
     die "parse_create_table: input required\n" unless defined $ddl;
+
+    # `show create table` over HTTP comes back TabSeparated, which escapes
+    # the DDL's newlines into the two characters \ and n; left alone, the
+    # column block is one unsplittable run. Key off the escaped column-block
+    # opener the server always emits ("...name\n(\n") rather than on a bare
+    # backslash. The trailing real newline is TSV's row terminator, hence
+    # the trim. (_for_describe does the same for `describe table`.)
+    (my $probe = $ddl) =~ s/\s+\z//;
+    if ($probe !~ /\n/ && $probe =~ /\\n\s*\(/) {
+        $ddl = _tsv_unescape_ddl($ddl);
+    }
 
     # A name part is a backtick-quoted identifier or a bare run with no
     # space / dot / paren; the table name is one part, optionally
@@ -1105,6 +1176,12 @@ sub _rb_encode_value {
     if ($type =~ /\ALowCardinality\((.+)\)\z/s) {
         return _rb_encode_value($1, $val, $cache);
     }
+    # The one shape the Native-slice trick cannot express: RowBinary omits
+    # the value when the flag says null, Native always emits a placeholder.
+    if ($type =~ /\ANullable\((.+)\)\z/s) {
+        return "\x01" if !defined $val;
+        return "\x00" . _rb_encode_value($1, $val, $cache);
+    }
     _rb_assert_scalar($type);
     my $slot = $cache->{$type} ||= do {
         my $enc = ClickHouse::Encoder->new(columns => [['c', $type]]);
@@ -1147,6 +1224,8 @@ sub encode_row_binary {
 sub _rb_value_len {
     my ($type, $bufref, $pos) = @_;
     if ($type =~ /\ANullable\((.+)\)\z/s) {
+        # A set null flag is the whole value; nothing follows it.
+        return 1 if ord substr($$bufref, $pos, 1);
         return 1 + _rb_value_len($1, $bufref, $pos + 1);
     }
     if ($type =~ /\ALowCardinality\((.+)\)\z/s) {
@@ -1184,6 +1263,19 @@ sub _rb_decode_value {
     }
     if ($type =~ /\ALowCardinality\((.+)\)\z/s) {
         return _rb_decode_value($1, $bufref, $posref, $cache);
+    }
+    # A set null flag is the entire value; see _rb_encode_value.
+    if ($type =~ /\ANullable\((.+)\)\z/s) {
+        my $inner = $1;
+        die "decode_row_binary: truncated null flag for '$type' "
+          . "at offset $$posref\n"
+            if $$posref >= length $$bufref;
+        my $is_null = ord substr($$bufref, $$posref, 1);
+        $$posref += 1;
+        # Explicit undef: the caller does `push @row, ...`, where a bare
+        # return yields an empty list and would shift every later column.
+        return undef if $is_null;  ## no critic (ProhibitExplicitReturnUndef)
+        return _rb_decode_value($inner, $bufref, $posref, $cache);
     }
     _rb_assert_scalar($type);
     my $vlen   = _rb_value_len($type, $bufref, $$posref);
@@ -1468,7 +1560,7 @@ sub insert_http {
     my $table    = $args{table} or die "insert_http needs table";
     my $timeout  = $args{timeout}  // 60;
     my $compress = $args{compress} // 'raw';
-    my $origin   = ref $class_or_self || $class_or_self;
+    my $origin   = ref($class_or_self) ? ref($class_or_self) : $class_or_self;
 
     my ($url, $hdr) = _build_insert_endpoint($table, $compress, %args);
     my $body = _apply_compression($origin, $compress, $enc->encode($rows));
@@ -1515,7 +1607,12 @@ sub select_blocks {
     # framing entries and feed the decompressed bytes into a second
     # accumulator that decode_block reads. Otherwise feed buf directly.
     my $inner_buf = '';
+    # As in decode_stream: after a truncation, wait for exactly the byte
+    # count the decoder said it was short before re-parsing. The forced
+    # final drain below still attempts the last partial block.
+    my $need_at = 0;
     my $drain = sub {
+        my ($force) = @_;
         # Phase 1: pull compressed-block frames out of $buf into $inner_buf
         if ($decompress) {
             while (length($buf) >= 25) {     # 16 hash + 9 header minimum
@@ -1531,13 +1628,21 @@ sub select_blocks {
         }
         # Phase 2: decode whole Native blocks out of $inner_buf
         while (length($inner_buf) > 0) {
+            last if !$force && length($inner_buf) < $need_at;
             my $block = eval { $class->decode_block($inner_buf, 0, $keep) };
             if ($@) {
-                last if $@ =~ /buffer truncated/i;
+                if ($@ =~ /buffer truncated \(need (\d+) more/i) {
+                    $need_at = length($inner_buf) + $1;
+                    last;
+                }
+                # See decode_stream: a partial buffer trips the prologue's
+                # header-count guard too, and it means the same thing here.
+                last if $@ =~ /buffer truncated|exceeds remaining buffer/i;
                 die $@;
             }
             $cb->($block);
             substr($inner_buf, 0, $block->{consumed}, '');
+            $need_at = 0;
         }
         # When not decompressing, inner_buf IS buf; carry the residual
         # back so the next data_callback append sees the unconsumed tail.
@@ -1556,7 +1661,7 @@ sub select_blocks {
     die "select_blocks: HTTP $resp->{status}: $resp->{content}\n"
         unless $resp->{success};
 
-    $drain->();
+    $drain->(1);   # forced: the response is complete, ignore $retry_at
     die "select_blocks: " . length($buf) . " trailing bytes "
       . "after last complete compressed block\n"
         if $decompress && length $buf;
@@ -1578,12 +1683,23 @@ sub bulk_inserter {
         _origin => $class_or_self);
 }
 
+package ClickHouse::Encoder::Streamer;  ## no critic (ProhibitMultiplePackages)
+
+# Body is XS; declared here only to carry CLONE_SKIP (see main package).
+sub CLONE_SKIP { return 1 }
+
 package ClickHouse::Encoder::BulkInserter;  ## no critic (ProhibitMultiplePackages)
+
+# Holds an encoder, which does not survive a thread spawn (see the main
+# package). Skip cloning the whole inserter rather than handing the child
+# one whose {enc} has silently become undef.
+sub CLONE_SKIP { return 1 }
 
 sub new {
     my ($class, %args) = @_;
     my $origin_raw = delete $args{_origin};
-    my $origin     = (ref $origin_raw || $origin_raw) || 'ClickHouse::Encoder';
+    my $origin     = (ref($origin_raw) ? ref($origin_raw) : $origin_raw)
+                     || 'ClickHouse::Encoder';
     my $enc        = $args{encoder} // do {
         my $cols = $args{columns} or die "bulk_inserter needs columns or encoder";
         $origin->new(columns => $cols);
@@ -1990,6 +2106,13 @@ dependency. Recommended on environments without C<clickhouse-client>.
 Connection parameters. Defaults: C<localhost>; C<9000> for
 C<<< via => 'client' >>> or C<8123> for C<<< via => 'http' >>>;
 C<default>, C<default>.
+
+For the HTTP entry points C<host> must be a plain hostname or IPv4
+address, or an IPv6 literal in RFC 3986 bracket form (C<'[::1]'>).
+Characters that would restructure the URL (C</?#&@>, whitespace, and
+unbracketed colons) are rejected: C<@> in particular opens the userinfo
+section, so a host of C<'evil.com@internal.db'> would quietly send the
+request to C<internal.db>.
 
 =item C<password>
 
@@ -2807,6 +2930,15 @@ number of bytes consumed from C<$bytes> (16 + 9 + payload length),
 so the caller can advance an offset cursor through a stream of
 back-to-back compressed blocks.
 
+The uncompressed size in the block header is wire data and the LZ4
+decompressor allocates it up front, so a corrupt or hostile block could
+otherwise demand a multi-gigabyte buffer from a few bytes of input.
+Blocks declaring more than C<max_size> bytes (default 1 GiB) are
+rejected; raise it explicitly if you genuinely move blocks that large:
+
+    ClickHouse::Encoder->decompress_native_block(
+        $framed, max_size => 4 * 1024 ** 3);
+
 =head1 TYPES
 
 =head2 Supported
@@ -2955,6 +3087,35 @@ is one of: C<Bool>, C<Float64>, C<Int64>, C<String>, or an
 C<Array(...)> of those (homogeneous element type per array). Mixed
 or nested arrays are rejected with a clear message.
 
+B<Arrays inside a C<JSON> column are a known interoperability gap.>
+ClickHouse's own type inference makes JSON array elements nullable: an
+insert of C<<< {"a":[1,2]} >>> through C<JSONEachRow> - or any other
+client - stores the path as C<Array(Nullable(Int64))>, B<even though no
+null is present>. That type is outside the set above, so:
+
+=over 4
+
+=item *
+
+Decoding croaks with C<unsupported variant type>. In practice a
+C<select> over any C<JSON> column that contains arrays and was written
+by something other than this module cannot be decoded. Scalar-only JSON
+is unaffected, as is a standalone C<Dynamic> column (C<Dynamic> infers
+C<Array(Int64)>, which decodes fine).
+
+=item *
+
+Encoding never produces the nullable form: this module writes
+C<Array(Int64)>, so JSON it wrote itself round-trips. A C<undef> element
+is written as the element type's zero value, so
+C<<< { a => [1, undef, 3] } >>> comes back as C<[1, 0, 3]> and the null
+is B<silently lost>.
+
+=back
+
+Pin the path with a typed declaration - C<< JSON(a Array(Nullable(Int64))) >>
+- or use a dedicated column, when either matters.
+
 The C<JSON(name Type, name Type, ...)> form pins specific paths to
 concrete inner types ("typed paths"). Those paths skip the
 Dynamic+Variant wrapping and emit as regular columns, which is
@@ -3018,6 +3179,23 @@ days since the epoch; a C<YYYY-MM-DD> string is parsed. Pass DateTime /
 Time::Piece / Time::Moment objects as C<< $dt->epoch / 86400 >> -- the
 encoder doesn't dispatch through C<< ->epoch >> itself.
 
+C<Date> stores a C<UInt16> day count, so its range is
+C<1970-01-01 .. 2149-06-06> (0 .. 65535). Values outside it croak rather
+than wrapping -- a wrapped day count would land on a different but
+entirely valid-looking date and write silently wrong data. C<Date32> is
+an C<Int32> day count (ClickHouse accepts
+C<1900-01-01 .. 2299-12-31>); values that would not fit the 32-bit
+storage croak for the same reason.
+
+Note that the server itself I<saturates> rather than rejecting: inserting
+C<'2200-01-01'> into a C<Date> column through C<clickhouse-client> stores
+C<2149-06-06>. This encoder deliberately croaks instead, matching how it
+has always treated out-of-range C<DateTime>: a date that silently becomes
+a different date is a data-quality bug you want to hear about at the
+insert site. Clamp explicitly in your own code if you want the server's
+behaviour. (C<DateTime64> is not affected by this distinction -- the
+range it rejects is the range ClickHouse rejects too.)
+
 =item *
 
 C<DateTime>: integer is Unix seconds; a C<YYYY-MM-DD HH:MM:SS> string is
@@ -3032,7 +3210,10 @@ C<DateTime64(P)>: integer is in scaled units (i.e. ticks of
 C<10^-P> seconds); a float is in seconds and scaled to ticks; a
 C<YYYY-MM-DD HH:MM:SS.fff> string is parsed. For sub-second-aware
 objects pass C<< $dt->hires_epoch >> (or C<< ->epoch >> if the object
-is integer-only).
+is integer-only). Ticks are a signed 64-bit count, so the representable
+span narrows as C<P> grows (at C<P=9> it ends at
+C<2262-04-11 23:47:16>); a date past the limit croaks instead of
+wrapping to a negative tick count.
 
 =item *
 
@@ -3279,6 +3460,23 @@ C<Array(String)>, in-process via C<clickhouse-local>):
 For wide tables with many string columns the gap widens (the XS encoder
 pulls further ahead of plain-Perl TSV serialization). See F<bench/> for
 reproducible scripts and additional scenarios.
+
+=head1 THREADS
+
+Encoders and streamers are per-thread objects: construct them inside the
+thread that uses them.
+
+Both hold a C-level structure behind a blessed scalar, so they set
+C<CLONE_SKIP>. When a thread is spawned they are B<not> cloned into it -
+the child interpreter sees a plain unblessed value, and calling a method
+on it raises C<Can't call method ... on unblessed reference> rather than
+sharing (and eventually double-freeing) the parent's structure. The
+parent's own encoder is unaffected and stays usable across the spawn.
+
+Nothing else in the distribution keeps mutable global state, so any
+number of threads may each build and use their own encoder concurrently.
+Processes forked with C<fork> are unaffected by any of this and inherit a
+working encoder as usual.
 
 =head1 CAVEATS
 

@@ -26,13 +26,15 @@ recommends:
   Compress::Zstd: '0'
   IO::Compress::Gzip: '0'
 requires:
+  Encode: '0'
   HTTP::Tiny: '0'
   Math::BigInt: '0'
+  POSIX: '0'
   Time::HiRes: '0'
   XSLoader: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-clickhouse-encoder/issues
   repository: https://github.com/vividsnow/perl5-clickhouse-encoder.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

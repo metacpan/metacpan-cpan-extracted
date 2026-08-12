@@ -11,6 +11,7 @@ use utf8;
 use Carp qw(croak);
 use ExtUtils::MakeMaker;
 
+# compute semantic version
 my $perl = $^X;
 my $semver;
 open( my $fh, "-|", $perl, "build_tools/get_semver.pl" )
@@ -22,6 +23,11 @@ close $fh
     or croak "failed to close pipe from build/get_semver.pl: $!";
 chomp $semver;
 
+# preop is used by dist to build README files from source code POD docs
+my $preop = 'perldoc -uT build_tools/input/OsRelease.pm | tee $(DISTVNAME)/README.pod > README.pod;'
+    . 'pod2text README.pod | tee $(DISTVNAME)/README > README';
+
+# ExtUtils::MakeMaker configuration - builds Makefile
 WriteMakefile(
     NAME             => "Sys::OsRelease::Lite",
     VERSION          => $semver,
@@ -37,11 +43,14 @@ WriteMakefile(
     },
     PM => { 'lib/Sys/OsRelease/Lite.pm' => '$(INST_LIB)/Sys/OsRelease/Lite.pm' },
     CONFIGURE_REQUIRES => {
-        "ExtUtils::MakeMaker" => 0,
+        "Carp" => 0,
+        "ExtUtils::MakeMaker" => "7.36",
         "CPAN::Changes" => 0,
+        "CPAN::Meta" => 0,
         "Versioning::Scheme::Semantic" => 0,
     },
     BUILD_REQUIRES => {
+        "Carp" => 0,
         "Readonly" => 0,
         "FindBin" => 0,
         "File::Path" => 0,
@@ -52,6 +61,8 @@ WriteMakefile(
         "YAML" => 0,
     },
     TEST_REQUIRES => {
+        "Carp" => 0,
+        "Cwd" => 0,
         "Test::More" => 0,
         "File::Basename" => 0,
         "File::Find" => 0,
@@ -63,10 +74,26 @@ WriteMakefile(
                 file => "lib/Sys/OsRelease/Lite.pm",
             },
         },
+        "resources" => {
+            "repository" => {
+                type => 'git',
+                url => 'git://github.com/ikluft/Sys-OsRelease.git',
+                web => 'https://github.com/ikluft/Sys-OsRelease',
+            },
+            "bugtracker" => "https://github.com/ikluft/Sys-OsRelease/issues",
+        },
+        "x_spdx_expression" => "Artistic-2.0",
     },
+    AUTHOR => [
+        "Ian Kluft <https://github.com/ikluft>",
+    ],
+    LICENSE => "artistic_2",
     depend => {
         Makefile                    => 'build_tools/get_semver.pl',
     },
+    dist => {
+        PREOP => $preop,
+    },
     clean => { FILES => "lib/Sys/OsRelease/Lite.pm t/001_module_load.t t/002_basic.t t/003_samples.t t/004_import.t "
-        . "MANIFEST" },
+        . "MANIFEST README README.pod" },
 );

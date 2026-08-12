@@ -11,6 +11,7 @@
         croak("Expected a Data::DDSketch::Shared object"); \
     DdHandle *h = INT2PTR(DdHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::DDSketch::Shared object"); \
+    DdHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))   /* pin the referent so a reentrant DESTROY (from overload/tie on an arg) can't free the handle mid-method */
 
 /* The pin above only blocks REFCOUNT-driven destruction. Perl run from argument
@@ -25,13 +26,21 @@
     if (!SvROK(sv)) \
         croak("Data::DDSketch::Shared object was replaced during the call"); \
     h = INT2PTR(DdHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::DDSketch::Shared object destroyed during the call")
+    if (h != h0) croak("Data::DDSketch::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
     SV *ref = newRV_noinc(obj); \
     sv_bless(ref, gv_stashpv(class, GV_ADD)); \
     RETVAL = ref
+
+/* Re-read the class-name PV immediately before blessing the new object.
+ * `class` is captured by the typemap in the INPUT section; a tied/overloaded
+ * later constructor argument can run get-magic that reallocs or frees ST(0)'s
+ * PV, dangling that pointer before it is used to bless.  Same fix as
+ * Data::CuckooFilter::Shared already carries. */
+#define REREAD_CLASS() \
+    class = SvPV_nolen(ST(0))
 
 MODULE = Data::DDSketch::Shared  PACKAGE = Data::DDSketch::Shared
 
@@ -53,7 +62,8 @@ new(class, path = &PL_sv_undef, alpha = 0.01, num_buckets = 2048, ...)
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     DdHandle *h = dd_create(p, alpha, (uint64_t)num_buckets, mode, errbuf);
-    if (!h) croak("Data::DDSketch::Shared->new: %s", errbuf);
+    if (!h) croak("Data::DDSketch::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -69,7 +79,8 @@ new_memfd(class, name = &PL_sv_undef, alpha = 0.01, num_buckets = 2048)
   CODE:
     const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     DdHandle *h = dd_create_memfd(nm, alpha, (uint64_t)num_buckets, errbuf);
-    if (!h) croak("Data::DDSketch::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::DDSketch::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -82,7 +93,29 @@ new_from_fd(class, fd)
     char errbuf[DD_ERR_BUFLEN];
   CODE:
     DdHandle *h = dd_open_fd(fd, errbuf);
-    if (!h) croak("Data::DDSketch::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::DDSketch::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_readonly(class, path)
+    const char *class
+    SV *path
+  PREINIT:
+    char errbuf[DD_ERR_BUFLEN];
+  CODE:
+    /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
+       ever.  A sealed file is immutable and no read path writes the mapping,
+       so queries take no reader-slot / rwlock traffic and any number of
+       processes can share one PROT_READ mapping (same architecture; the
+       magic rejects a wrong-endian file). */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (!p) croak("Data::DDSketch::Shared->new_readonly: path is required");
+    DdHandle *h = dd_open_readonly(p, errbuf);
+    if (!h) croak("Data::DDSketch::Shared->new_readonly: %s", errbuf);
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -103,9 +136,11 @@ add(self, value)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::DDSketch::Shared->add: sketch is frozen (read-only)");
     if (!isfinite(value))                  /* reject NaN/Inf BEFORE the lock */
         croak("Data::DDSketch::Shared->add: value must be finite");
     dd_rwlock_wrlock(h);
+    if (h->hdr->sealed) { dd_rwlock_wrunlock(h); croak("Data::DDSketch::Shared->add: sketch is frozen (read-only)"); }
     dd_insert_locked(h, value, 1);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     RETVAL = (UV)h->hdr->total_count;
@@ -123,10 +158,12 @@ add_many(self, values)
     IV  top;
     UV  added = 0;
   CODE:
+    if (h->readonly) croak("Data::DDSketch::Shared->add_many: sketch is frozen (read-only)");
     SvGETMAGIC(values);
     if (!SvROK(values) || SvTYPE(SvRV(values)) != SVt_PVAV)
         croak("Data::DDSketch::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(values);
+    sv_2mortal(SvREFCNT_inc((SV *)av));   /* pin the arrayref: element magic below cannot free it mid-loop */
     top = av_len(av);                     /* last index, -1 if empty */
     {
         STRLEN cnt = (top >= 0) ? (STRLEN)(top + 1) : 0, i;
@@ -147,6 +184,7 @@ add_many(self, values)
          * skips the loop but still reaches the lock below. */
         REEXTRACT(self);
         dd_rwlock_wrlock(h);                             /* locked region: NO croak-capable calls */
+        if (h->hdr->sealed) { dd_rwlock_wrunlock(h); croak("Data::DDSketch::Shared->add_many: sketch is frozen (read-only)"); }
         for (i = 0; i < cnt; i++) { dd_insert_locked(h, vs[i], 1); added++; }
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
         dd_rwlock_wrunlock(h);
@@ -167,11 +205,17 @@ quantile(self, q)
   CODE:
     if (!(q >= 0.0 && q <= 1.0))
         croak("Data::DDSketch::Shared->quantile: q must be between 0 and 1");
-    dd_rwlock_rdlock(h);
-    total = h->hdr->total_count;
-    if (total == 0) { found = 0; val = 0.0; }
-    else val = dd_value_at_rank(h, q * (double)(total - 1), &found);
-    dd_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable stores, no lock needed */
+        total = h->hdr->total_count;
+        if (total == 0) { found = 0; val = 0.0; }
+        else val = dd_value_at_rank(h, q * (double)(total - 1), &found);
+    } else {
+        dd_rwlock_rdlock(h);
+        total = h->hdr->total_count;
+        if (total == 0) { found = 0; val = 0.0; }
+        else val = dd_value_at_rank(h, q * (double)(total - 1), &found);
+        dd_rwlock_rdunlock(h);
+    }
     RETVAL = found ? newSVnv(val) : &PL_sv_undef;   /* undef on an empty sketch */
   OUTPUT:
     RETVAL
@@ -184,10 +228,15 @@ min(self)
     double v;
     uint64_t total;
   CODE:
-    dd_rwlock_rdlock(h);
-    total = h->hdr->total_count;
-    v = h->hdr->min_value;
-    dd_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        total = h->hdr->total_count;
+        v = h->hdr->min_value;
+    } else {
+        dd_rwlock_rdlock(h);
+        total = h->hdr->total_count;
+        v = h->hdr->min_value;
+        dd_rwlock_rdunlock(h);
+    }
     RETVAL = total ? newSVnv(v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -200,10 +249,15 @@ max(self)
     double v;
     uint64_t total;
   CODE:
-    dd_rwlock_rdlock(h);
-    total = h->hdr->total_count;
-    v = h->hdr->max_value;
-    dd_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        total = h->hdr->total_count;
+        v = h->hdr->max_value;
+    } else {
+        dd_rwlock_rdlock(h);
+        total = h->hdr->total_count;
+        v = h->hdr->max_value;
+        dd_rwlock_rdunlock(h);
+    }
     RETVAL = total ? newSVnv(v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -216,10 +270,15 @@ mean(self)
     double sum;
     uint64_t total;
   CODE:
-    dd_rwlock_rdlock(h);
-    total = h->hdr->total_count;
-    sum = h->hdr->sum;
-    dd_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        total = h->hdr->total_count;
+        sum = h->hdr->sum;
+    } else {
+        dd_rwlock_rdlock(h);
+        total = h->hdr->total_count;
+        sum = h->hdr->sum;
+        dd_rwlock_rdunlock(h);
+    }
     RETVAL = total ? newSVnv(sum / (double)total) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -231,9 +290,13 @@ sum(self)
     EXTRACT(self);
     double v;
   CODE:
-    dd_rwlock_rdlock(h);
-    v = h->hdr->sum;
-    dd_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        v = h->hdr->sum;
+    } else {
+        dd_rwlock_rdlock(h);
+        v = h->hdr->sum;
+        dd_rwlock_rdunlock(h);
+    }
     RETVAL = v;
   OUTPUT:
     RETVAL
@@ -245,9 +308,13 @@ count(self)
     EXTRACT(self);
     UV n;
   CODE:
-    dd_rwlock_rdlock(h);
-    n = (UV)h->hdr->total_count;
-    dd_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        n = (UV)h->hdr->total_count;
+    } else {
+        dd_rwlock_rdlock(h);
+        n = (UV)h->hdr->total_count;
+        dd_rwlock_rdunlock(h);
+    }
     RETVAL = n;
   OUTPUT:
     RETVAL
@@ -259,9 +326,13 @@ zero_count(self)
     EXTRACT(self);
     UV n;
   CODE:
-    dd_rwlock_rdlock(h);
-    n = (UV)h->hdr->zero_count;
-    dd_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        n = (UV)h->hdr->zero_count;
+    } else {
+        dd_rwlock_rdlock(h);
+        n = (UV)h->hdr->zero_count;
+        dd_rwlock_rdunlock(h);
+    }
     RETVAL = n;
   OUTPUT:
     RETVAL
@@ -273,6 +344,7 @@ merge(self, other)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::DDSketch::Shared->merge: sketch is frozen (read-only)");
     if (!sv_isobject(other) || !sv_derived_from(other, "Data::DDSketch::Shared"))
         croak("Data::DDSketch::Shared->merge: expected a Data::DDSketch::Shared object");
     DdHandle *o = INT2PTR(DdHandle*, SvIV(SvRV(other)));
@@ -300,14 +372,22 @@ merge(self, other)
     double o_sum, o_min, o_max;
     Newx(tneg, (size_t)(nb ? nb : 1), uint64_t); SAVEFREEPV(tneg);
     Newx(tpos, (size_t)(nb ? nb : 1), uint64_t); SAVEFREEPV(tpos);
-    dd_rwlock_rdlock(o);
-    memcpy(tneg, dd_neg(o), (size_t)nb * sizeof(uint64_t));
-    memcpy(tpos, dd_pos(o), (size_t)nb * sizeof(uint64_t));
-    o_total = o->hdr->total_count; o_zero = o->hdr->zero_count;
-    o_sum = o->hdr->sum; o_min = o->hdr->min_value; o_max = o->hdr->max_value;
-    dd_rwlock_rdunlock(o);
+    if (o->readonly) {                     /* frozen other: immutable stores, no lock */
+        memcpy(tneg, dd_neg(o), (size_t)nb * sizeof(uint64_t));
+        memcpy(tpos, dd_pos(o), (size_t)nb * sizeof(uint64_t));
+        o_total = o->hdr->total_count; o_zero = o->hdr->zero_count;
+        o_sum = o->hdr->sum; o_min = o->hdr->min_value; o_max = o->hdr->max_value;
+    } else {
+        dd_rwlock_rdlock(o);
+        memcpy(tneg, dd_neg(o), (size_t)nb * sizeof(uint64_t));
+        memcpy(tpos, dd_pos(o), (size_t)nb * sizeof(uint64_t));
+        o_total = o->hdr->total_count; o_zero = o->hdr->zero_count;
+        o_sum = o->hdr->sum; o_min = o->hdr->min_value; o_max = o->hdr->max_value;
+        dd_rwlock_rdunlock(o);
+    }
 
     dd_rwlock_wrlock(h);
+    if (h->hdr->sealed) { dd_rwlock_wrunlock(h); croak("Data::DDSketch::Shared->merge: sketch is frozen (read-only)"); }
     dd_merge_locked(h, tneg, tpos, nb, o_total, o_zero, o_sum, o_min, o_max);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     dd_rwlock_wrunlock(h);
@@ -318,10 +398,42 @@ clear(self)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::DDSketch::Shared->clear: sketch is frozen (read-only)");
     dd_rwlock_wrlock(h);
+    if (h->hdr->sealed) { dd_rwlock_wrunlock(h); croak("Data::DDSketch::Shared->clear: sketch is frozen (read-only)"); }
     dd_clear_locked(h);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     dd_rwlock_wrunlock(h);
+
+void
+freeze(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    if (h->readonly) croak("Data::DDSketch::Shared->freeze: cannot freeze a read-only handle");
+    if (dd_freeze(h) != 0) croak("Data::DDSketch::Shared->freeze: msync: %s", strerror(errno));
+    h->readonly = 1;   /* this handle now rejects mutation too (the file is sealed) */
+
+UV
+frozen(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->hdr->sealed ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
+UV
+readonly(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->readonly ? 1 : 0;
+  OUTPUT:
+    RETVAL
 
 NV
 alpha(self)
@@ -363,7 +475,7 @@ stats(self)
         uint64_t total, zero, ops;
         uint32_t nb;
         double alpha, gamma, sum, mn, mx;
-        dd_rwlock_rdlock(h);
+        if (!h->readonly) dd_rwlock_rdlock(h);   /* frozen: immutable, no lock */
         total = h->hdr->total_count;
         zero  = h->hdr->zero_count;
         ops   = h->hdr->stat_ops;
@@ -373,7 +485,7 @@ stats(self)
         sum   = h->hdr->sum;
         mn    = h->hdr->min_value;
         mx    = h->hdr->max_value;
-        dd_rwlock_rdunlock(h);
+        if (!h->readonly) dd_rwlock_rdunlock(h);
 
         HV *hv = newHV();
         hv_stores(hv, "alpha",       newSVnv(alpha));
@@ -387,6 +499,8 @@ stats(self)
         hv_stores(hv, "mean",        total ? newSVnv(sum / (double)total) : newSV(0));
         hv_stores(hv, "ops",         newSVuv((UV)ops));
         hv_stores(hv, "mmap_size",   newSVuv((UV)h->mmap_size));
+        hv_stores(hv, "frozen",      newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "readonly",    newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }
   OUTPUT:
@@ -418,7 +532,7 @@ sync(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (dd_msync(h) != 0) croak("sync: %s", strerror(errno));
+    if (!h->readonly && dd_msync(h) != 0) croak("sync: %s", strerror(errno));
 
 void
 unlink(self, ...)
@@ -426,7 +540,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::DDSketch::Shared")) {
         DdHandle *h = INT2PTR(DdHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::DDSketch::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::DDSketch::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

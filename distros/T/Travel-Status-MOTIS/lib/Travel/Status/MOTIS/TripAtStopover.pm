@@ -8,14 +8,14 @@ use DateTime::Format::ISO8601;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 Travel::Status::MOTIS::TripAtStopover->mk_ro_accessors(
 	qw(
 	  id
 	  mode
 	  agency
-	  route_name
+	  display_name
 	  route_color
 	  route_text_color
 	  headsign
@@ -37,7 +37,7 @@ sub new {
 		id               => $json->{tripId},
 		mode             => $json->{mode},
 		agency           => $json->{agencyName},
-		route_name       => $json->{routeShortName},
+		display_name     => $json->{displayName},
 		route_color      => $json->{routeColor},
 		route_text_color => $json->{routeTextColor},
 		headsign         => $json->{headsign},

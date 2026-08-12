@@ -99,15 +99,15 @@
    "provides" : {
       "Net::CIDR::Set" : {
          "file" : "lib/Net/CIDR/Set.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "Net::CIDR::Set::IPv4" : {
          "file" : "lib/Net/CIDR/Set/IPv4.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "Net::CIDR::Set::IPv6" : {
          "file" : "lib/Net/CIDR/Set/IPv6.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -122,7 +122,7 @@
       },
       "x_authority" : "cpan:RRWO"
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_contributors" : [
       "Thomas Eckardt <Thomas.Eckardt@thockar.com>",
       "Brian Gottreu <gottreu@cpan.org>",

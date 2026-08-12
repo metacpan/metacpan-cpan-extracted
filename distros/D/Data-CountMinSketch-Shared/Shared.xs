@@ -10,6 +10,7 @@
         croak("Expected a Data::CountMinSketch::Shared object"); \
     CmsHandle *h = INT2PTR(CmsHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::CountMinSketch::Shared object"); \
+    CmsHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -23,13 +24,21 @@
     if (!SvROK(sv)) \
         croak("Data::CountMinSketch::Shared object was replaced during the call"); \
     h = INT2PTR(CmsHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::CountMinSketch::Shared object destroyed during the call")
+    if (h != h0) croak("Data::CountMinSketch::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
     SV *ref = newRV_noinc(obj); \
     sv_bless(ref, gv_stashpv(class, GV_ADD)); \
     RETVAL = ref
+
+/* Re-read the class-name PV immediately before blessing the new object.
+ * `class` is captured by the typemap in the INPUT section; a tied/overloaded
+ * later constructor argument can run get-magic that reallocs or frees ST(0)'s
+ * PV, dangling that pointer before it is used to bless.  Same fix as
+ * Data::CuckooFilter::Shared already carries. */
+#define REREAD_CLASS() \
+    class = SvPV_nolen(ST(0))
 
 MODULE = Data::CountMinSketch::Shared  PACKAGE = Data::CountMinSketch::Shared
 
@@ -51,7 +60,8 @@ new(class, path = &PL_sv_undef, epsilon = 0.001, delta = 0.001, ...)
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     CmsHandle *h = cms_create(p, epsilon, delta, mode, errbuf);   /* validates epsilon/delta into errbuf */
-    if (!h) croak("Data::CountMinSketch::Shared->new: %s", errbuf);
+    if (!h) croak("Data::CountMinSketch::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -67,7 +77,8 @@ new_memfd(class, name = &PL_sv_undef, epsilon = 0.001, delta = 0.001)
   CODE:
     const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     CmsHandle *h = cms_create_memfd(nm, epsilon, delta, errbuf);   /* validates epsilon/delta into errbuf */
-    if (!h) croak("Data::CountMinSketch::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::CountMinSketch::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -80,7 +91,29 @@ new_from_fd(class, fd)
     char errbuf[CMS_ERR_BUFLEN];
   CODE:
     CmsHandle *h = cms_open_fd(fd, errbuf);
-    if (!h) croak("Data::CountMinSketch::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::CountMinSketch::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
+    REREAD_CLASS();
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_readonly(class, path)
+    const char *class
+    SV *path
+  PREINIT:
+    char errbuf[CMS_ERR_BUFLEN];
+  CODE:
+    /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
+       ever.  A sealed file is immutable and no read path writes the mapping,
+       so queries take no reader-slot / rwlock traffic and any number of
+       processes can share one PROT_READ mapping (same architecture; the
+       magic rejects a wrong-endian file). */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (!p) croak("Data::CountMinSketch::Shared->new_readonly: path is required");
+    CmsHandle *h = cms_open_readonly(p, errbuf);
+    if (!h) croak("Data::CountMinSketch::Shared->new_readonly: %s", errbuf);
+    REREAD_CLASS();
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -105,9 +138,11 @@ add(self, item, n = 1)
     const char *s;
     UV total;
   CODE:
+    if (h->readonly) croak("Data::CountMinSketch::Shared->add: sketch is frozen (read-only)");
     s = SvPVbyte(item, len);               /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
     cms_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cms_rwlock_wrunlock(h); croak("Data::CountMinSketch::Shared->add: sketch is frozen (read-only)"); }
     cms_add_locked(h, s, len, (uint64_t)n);
     total = (UV)h->hdr->total;
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -125,10 +160,12 @@ add_many(self, items)
     AV *av;
     IV  top;
   CODE:
+    if (h->readonly) croak("Data::CountMinSketch::Shared->add_many: sketch is frozen (read-only)");
     SvGETMAGIC(items);
     if (!SvROK(items) || SvTYPE(SvRV(items)) != SVt_PVAV)
         croak("Data::CountMinSketch::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(items);
+    sv_2mortal(SvREFCNT_inc((SV *)av));   /* pin the arrayref: element magic below cannot free it mid-loop */
     top = av_len(av);                     /* last index, -1 if empty */
     {
         STRLEN cnt = (top >= 0) ? (STRLEN)(top + 1) : 0, i;
@@ -151,6 +188,7 @@ add_many(self, items)
         }
         REEXTRACT(self);
         cms_rwlock_wrlock(h);                            /* locked region: NO croak-capable calls */
+        if (h->hdr->sealed) { cms_rwlock_wrunlock(h); croak("Data::CountMinSketch::Shared->add_many: sketch is frozen (read-only)"); }
         for (i = 0; i < cnt; i++) cms_add_locked(h, ps[i], ls[i], 1);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
         cms_rwlock_wrunlock(h);
@@ -171,9 +209,13 @@ estimate(self, item)
   CODE:
     s = SvPVbyte(item, len);               /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
-    cms_rwlock_rdlock(h);
-    est = (UV)cms_estimate_locked(h, s, len);
-    cms_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable cells, no lock needed */
+        est = (UV)cms_estimate_locked(h, s, len);
+    } else {
+        cms_rwlock_rdlock(h);
+        est = (UV)cms_estimate_locked(h, s, len);
+        cms_rwlock_rdunlock(h);
+    }
     RETVAL = est;
   OUTPUT:
     RETVAL
@@ -185,6 +227,7 @@ merge(self, other)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::CountMinSketch::Shared->merge: sketch is frozen (read-only)");
     if (!sv_isobject(other) || !sv_derived_from(other, "Data::CountMinSketch::Shared"))
         croak("Data::CountMinSketch::Shared->merge: expected a Data::CountMinSketch::Shared object");
     CmsHandle *o = INT2PTR(CmsHandle*, SvIV(SvRV(other)));
@@ -224,12 +267,18 @@ merge(self, other)
     uint64_t *tmp;
     Newx(tmp, (size_t)cells, uint64_t);
     SAVEFREEPV(tmp);                 /* freed on normal return OR croak unwind */
-    cms_rwlock_rdlock(o);
-    memcpy(tmp, (char *)o->base + ooff, (size_t)cells * sizeof(uint64_t));
-    other_total = o->hdr->total;
-    cms_rwlock_rdunlock(o);
+    if (o->readonly) {                     /* frozen other: immutable cells, no lock */
+        memcpy(tmp, (char *)o->base + ooff, (size_t)cells * sizeof(uint64_t));
+        other_total = o->hdr->total;
+    } else {
+        cms_rwlock_rdlock(o);
+        memcpy(tmp, (char *)o->base + ooff, (size_t)cells * sizeof(uint64_t));
+        other_total = o->hdr->total;
+        cms_rwlock_rdunlock(o);
+    }
 
     cms_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cms_rwlock_wrunlock(h); croak("Data::CountMinSketch::Shared->merge: sketch is frozen (read-only)"); }
     cms_merge_counters((uint64_t *)((char *)h->base + hoff), tmp, cells);
     if (h->hdr->total > UINT64_MAX - other_total) h->hdr->total = UINT64_MAX;
     else h->hdr->total += other_total;
@@ -242,10 +291,42 @@ clear(self)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::CountMinSketch::Shared->clear: sketch is frozen (read-only)");
     cms_rwlock_wrlock(h);
+    if (h->hdr->sealed) { cms_rwlock_wrunlock(h); croak("Data::CountMinSketch::Shared->clear: sketch is frozen (read-only)"); }
     cms_clear_locked(h);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     cms_rwlock_wrunlock(h);
+
+void
+freeze(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    if (h->readonly) croak("Data::CountMinSketch::Shared->freeze: cannot freeze a read-only handle");
+    if (cms_freeze(h) != 0) croak("Data::CountMinSketch::Shared->freeze: msync: %s", strerror(errno));
+    h->readonly = 1;   /* this handle now rejects mutation too (the file is sealed) */
+
+UV
+frozen(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->hdr->sealed ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
+UV
+readonly(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->readonly ? 1 : 0;
+  OUTPUT:
+    RETVAL
 
 UV
 total(self)
@@ -254,9 +335,13 @@ total(self)
     EXTRACT(self);
     UV t;
   CODE:
-    cms_rwlock_rdlock(h);
-    t = (UV)h->hdr->total;
-    cms_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable, no lock needed */
+        t = (UV)h->hdr->total;
+    } else {
+        cms_rwlock_rdlock(h);
+        t = (UV)h->hdr->total;
+        cms_rwlock_rdunlock(h);
+    }
     RETVAL = t;
   OUTPUT:
     RETVAL
@@ -302,12 +387,12 @@ stats(self)
         uint32_t d;
         /* Snapshot under the lock; do all (croak-capable) Perl allocation after
            releasing it -- so an OOM in newHV/newSVuv can never strand the lock. */
-        cms_rwlock_rdlock(h);
+        if (!h->readonly) cms_rwlock_rdlock(h);   /* frozen: immutable, no lock */
         w     = h->hdr->w;
         d     = h->hdr->d;
         total = h->hdr->total;
         ops   = h->hdr->stat_ops;
-        cms_rwlock_rdunlock(h);
+        if (!h->readonly) cms_rwlock_rdunlock(h);
         cells = (uint64_t)d * w;
 
         HV *hv = newHV();
@@ -316,9 +401,15 @@ stats(self)
         hv_stores(hv, "total",     newSVuv((UV)total));
         hv_stores(hv, "cells",     newSVuv((UV)cells));
         hv_stores(hv, "epsilon",   newSVnv(M_E / (double)w));   /* achieved error factor */
-        hv_stores(hv, "delta",     newSVnv(exp(-(double)d)));   /* achieved failure prob  */
+        /* Achieved failure probability.  A row's column is (h1 + r*h2) & (w-1),
+         * and w*h2 is a multiple of w, so rows r and r+w always probe the same
+         * column -- they are duplicates that add no independent estimate.  The
+         * effective depth is therefore min(d, w), which is what the bound uses. */
+        hv_stores(hv, "delta",     newSVnv(exp(-(double)((uint64_t)d < w ? (uint64_t)d : w))));
         hv_stores(hv, "ops",       newSVuv((UV)ops));
         hv_stores(hv, "mmap_size", newSVuv((UV)h->mmap_size));
+        hv_stores(hv, "frozen",    newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "readonly",  newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }
   OUTPUT:
@@ -350,7 +441,7 @@ sync(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (cms_msync(h) != 0) croak("sync: %s", strerror(errno));
+    if (!h->readonly && cms_msync(h) != 0) croak("sync: %s", strerror(errno));
 
 void
 unlink(self, ...)
@@ -358,7 +449,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::CountMinSketch::Shared")) {
         CmsHandle *h = INT2PTR(CmsHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::CountMinSketch::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::CountMinSketch::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

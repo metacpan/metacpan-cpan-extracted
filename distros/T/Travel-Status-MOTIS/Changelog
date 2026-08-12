@@ -1,3 +1,9 @@
+Travel::Status::MOTIS 0.04 - Wed Aug 12 2026
+
+    * MOTIS: Use v6 API
+    * MOTIS::Stop: Add ->parent_id accessor
+    * MOTIS::Trip: Rename ->route_name to ->display_name (breaking change)
+
 Travel::Status::MOTIS 0.03 - Fri Jun 20 2025
 
     * MOTIS->new: Fix time_zone parameter not being respected

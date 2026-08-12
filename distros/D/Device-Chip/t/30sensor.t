@@ -92,4 +92,28 @@ is( scalar @sensors, 4, '$chip->list_sensors yields 3 sensors' );
       '$sensor->read fails when above ubounds' );
 }
 
+# subclass merge
+{
+   use Object::Pad 0.800;
+
+   class XYChip :isa(Device::Chip) {
+      use Device::Chip::Sensor -declare;
+
+      declare_sensor x => ;
+      declare_sensor y => ;
+   }
+
+   class XYZChip :isa(XYChip) {
+      use Device::Chip::Sensor -declare;
+
+      declare_sensor z => ;
+   }
+
+   my @sensors = XYZChip->new->list_sensors;
+   is( scalar @sensors, 3, 'XYZChip list_sensors inherits from XYChip' );
+
+   is( [ map { $_->name } @sensors ], [qw( x y z )],
+      'sensors arrive in subclass order' );
+}
+
 done_testing;

@@ -143,4 +143,58 @@ for my $bad (
     like($@, qr/no columns but/, 'zero columns + non-empty buffer croaks');
 }
 
+# --- golden bytes, captured from a real ClickHouse server --------------
+#
+# Everything above round-trips through this module's own codec in both
+# directions, so a systematic error cancels out and still passes - which
+# is how a Nullable bug survived: our NULL was "\x01\x00" where the server
+# writes "\x01", and the stray byte misaligned every following row.
+# These come from `clickhouse-client ... format RowBinary` (v26.7.1).
+{
+    my %golden = (
+        'Nullable(String)' => [ [undef, "\x01"],
+                                ['hi',  "\x00\x02hi"] ],
+        'Nullable(Int32)'  => [ [undef, "\x01"],
+                                [42,    "\x00\x2a\x00\x00\x00"] ],
+        'Nullable(UInt8)'  => [ [undef, "\x01"],
+                                [7,     "\x00\x07"] ],
+        'String'           => [ ['hi',  "\x02hi"] ],
+        'UInt8'            => [ [7,     "\x07"] ],
+    );
+    for my $type (sort keys %golden) {
+        my $enc = ClickHouse::Encoder->new(columns => [['v', $type]]);
+        for my $case (@{ $golden{$type} }) {
+            my ($val, $want) = @$case;
+            my $label = defined $val ? "'$val'" : 'NULL';
+            is(unpack('H*', $enc->encode_row_binary([[$val]])),
+               unpack('H*', $want),
+               "$type $label encodes to the server's bytes");
+            my $got = $enc->decode_row_binary($want);
+            is_deeply($got, [[$val]],
+                      "$type $label decodes from the server's bytes");
+        }
+    }
+
+    # Multi-row and multi-column layouts: a wrong NULL width misaligns
+    # everything after it rather than failing at the offending value.
+    my $enc = ClickHouse::Encoder->new(
+        columns => [['a', 'Nullable(Int32)'], ['b', 'String']]);
+    my $rows = [ [undef, 'x'], [5, 'y'], [undef, 'z'] ];
+    is(unpack('H*', $enc->encode_row_binary($rows)),
+       unpack('H*', "\x01\x01x" . "\x00\x05\x00\x00\x00\x01y" . "\x01\x01z"),
+       'NULLs interleaved with a following column stay aligned');
+    is_deeply($enc->decode_row_binary($enc->encode_row_binary($rows)), $rows,
+              'multi-column rows with NULLs round-trip');
+
+    # Array(Nullable(T)): the flag-only form applies per element too.
+    my $ae = ClickHouse::Encoder->new(
+        columns => [['v', 'Array(Nullable(Int32))']]);
+    is(unpack('H*', $ae->encode_row_binary([[[1, undef, 3]]])),
+       unpack('H*', "\x03" . "\x00\x01\x00\x00\x00" . "\x01"
+                           . "\x00\x03\x00\x00\x00"),
+       'Array(Nullable(Int32)) with a NULL element matches the wire form');
+    is_deeply($ae->decode_row_binary($ae->encode_row_binary([[[1, undef, 3]]])),
+              [[[1, undef, 3]]], 'Array(Nullable) round-trips');
+}
+
 done_testing();

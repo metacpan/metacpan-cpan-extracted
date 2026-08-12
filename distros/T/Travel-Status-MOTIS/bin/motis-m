@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use utf8;
 use DateTime;
@@ -28,7 +28,7 @@ my ( $json_output, $raw_json_output, $with_polyline );
 my %known_mode_of_transit
   = map { $_ => 1 }
   (
-	qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL)
+	qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL SUBURBAN ODM RIDE_SHARING FUNICULAR AERIAL_LIFT)
   );
 
 binmode( STDOUT, ':encoding(utf-8)' );
@@ -126,6 +126,12 @@ elsif ( $input =~ m{_} ) {
 	$opt{stop_id} = $input;
 }
 else {
+
+	my $list_stops;
+	if ( $input =~ s{ ^ [?] }{}x ) {
+		$list_stops = 1;
+	}
+
 	$opt{stops_by_query} = $input;
 
 	my $status = Travel::Status::MOTIS->new(%opt);
@@ -138,14 +144,23 @@ else {
 	my $found;
 	for my $result ( $status->results ) {
 		if ( defined $result->id ) {
-			if ( lc( $result->name ) ne lc( $opt{stops_by_query} ) ) {
-				say $result->name;
+			if ($list_stops) {
+				printf( "%40s %s\n", $result->name, $result->id );
 			}
+			else {
+				if ( lc( $result->name ) ne lc( $opt{stops_by_query} ) ) {
+					say $result->name;
+				}
 
-			$opt{stop_id} = $result->id;
-			$found = 1;
-			last;
+				$opt{stop_id} = $result->id;
+				$found = 1;
+				last;
+			}
 		}
+	}
+
+	if ($list_stops) {
+		exit 0;
 	}
 
 	if ( not $found ) {
@@ -196,7 +211,7 @@ if ( $date or $time ) {
 if ( $modes_of_transit and $modes_of_transit eq 'help' ) {
 	say "Supported modes of transmit (-m / --modes-of-transit):";
 	for my $mot (
-		qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL)
+		qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL SUBURBAN ODM RIDE_SHARING FUNICULAR AERIAL_LIFT)
 	  )
 	{
 		say $mot;
@@ -273,6 +288,14 @@ if ($json_output) {
 	if ( $opt{trip_id} ) {
 		say JSON->new->convert_blessed->encode( $status->result );
 	}
+	elsif ( $opt{stop_id} ) {
+		say JSON->new->convert_blessed->encode(
+			{
+				result  => $status->result,
+				results => [ $status->results ]
+			}
+		);
+	}
 	else {
 		say JSON->new->convert_blessed->encode( [ $status->results ] );
 	}
@@ -281,7 +304,8 @@ if ($json_output) {
 }
 
 if ( $opt{stop_id} ) {
-	my $max_route_name = max map { length( $_->route_name ) } $status->results;
+	my $max_display_name
+	  = max map { length( $_->display_name ) } $status->results;
 	my $max_headsign
 	  = max map { length( $_->headsign // q{} ) } $status->results;
 	my $max_delay = max map { length( $_->stopover->departure_delay // q{} ) }
@@ -302,14 +326,14 @@ if ( $opt{stop_id} ) {
 
 	for my $result (@results) {
 		printf(
-			"%s  %s  %${max_route_name}s  %${max_headsign}s  %${max_track}s\n",
+"%s  %s  %${max_display_name}s  %${max_headsign}s  %${max_track}s\n",
 			$result->is_cancelled ? '--:--'
 			: $result->stopover->departure->strftime('%H:%M'),
 			$result->stopover->departure_delay ? sprintf(
 				"(%+${max_delay}d)", $result->stopover->departure_delay
 			  )
 			: q{ } x ( $max_delay + 2 ),
-			$result->route_name,
+			$result->display_name,
 			$result->headsign // q{???},
 			$result->stopover->track // q{}
 		);
@@ -344,7 +368,7 @@ elsif ( $opt{trip_id} ) {
 	}
 
 	printf( "%s am %s\n\n",
-		$trip->route_name, $trip->scheduled_arrival->strftime('%d.%m.%Y') );
+		$trip->display_name, $trip->scheduled_arrival->strftime('%d.%m.%Y') );
 
 	for my $stop ( $trip->stopovers ) {
 		if ( $stop == $mark_stop ) {
@@ -413,7 +437,7 @@ B<motis-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -543,11 +567,9 @@ provide functionality needed for use as a proper CLI public transit client.
 
 =head1 AUTHOR
 
-Copyright (C) 2025 networkException E<lt>git@nwex.deE<gt>
+Copyright (C) 2025-2026 networkException E<lt>git@nwex.deE<gt>
 
-Copyright (C) 2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
-
-Based on Travel::Status::DE::DBRIS, which is (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2025-2026 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

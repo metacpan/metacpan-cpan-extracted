@@ -32,6 +32,16 @@ my $protocol = await $adapter->make_protocol( "SPI" );
       '->readwrite value' );
 
    $adapter->check_and_clear( '->readwrite' );
+
+   $adapter->expect_assert_ss;
+   $adapter->expect_readwrite_no_ss( "AB" )
+      ->will_fail( "Protocol Error\n" );
+   $adapter->expect_release_ss;
+
+   is( dies { $protocol->readwrite( "AB" )->get }, "Protocol Error\n",
+      '->readwrite failure' );
+
+   $adapter->check_and_clear( '->readwrite still releases SS on failure' );
 }
 
 # write
@@ -73,6 +83,18 @@ my $protocol = await $adapter->make_protocol( "SPI" );
       '->write_then_read value' );
 
    $adapter->check_and_clear( '->write_then_read' );
+
+   $adapter->expect_assert_ss;
+   $adapter->expect_readwrite_no_ss( "GH" )
+      ->will_done( "XX" );
+   $adapter->expect_readwrite_no_ss( "\0\0" )
+      ->will_fail( "Protocol Error\n" );
+   $adapter->expect_release_ss;
+
+   is( dies { $protocol->write_then_read( "GH", 2 )->get }, "Protocol Error\n",
+      '->write_then_read failure' );
+
+   $adapter->check_and_clear( '->write_then_read still releases SS on failure' );
 }
 
 done_testing;

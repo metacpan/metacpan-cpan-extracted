@@ -1,12 +1,13 @@
 
 use v5.10;
+use feature q (state);
+
 use strict;
 use warnings;
-use feature 'state';
 
 package Context::Singleton::Frame::DB;
-
-our $VERSION = v1.0.5;
+$Context::Singleton::Frame::DB::VERSION = '1.0.7';
+use Moo;
 
 use Class::Load;
 use Module::Pluggable::Object;
@@ -16,24 +17,37 @@ use Context::Singleton::Frame::Builder::Value;
 use Context::Singleton::Frame::Builder::Hash;
 use Context::Singleton::Frame::Builder::Array;
 
-sub new {
-	my ($class) = @_;
+use namespace::clean;
 
-	my $self = bless {
-		cache => {},
-		plugin => {},
-	}, $class;
+has q (cache)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> default  => sub { +{} }
+	;
 
-	$self->contrive ('Class::Load', (
-		value => 'Class::Load',
+has q (triggers)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> default  => sub { +{} }
+	;
+
+has q (plugins)
+	=> is       => q (ro)
+	=> init_arg => +undef
+	=> default  => sub { +{} }
+	;
+
+sub BUILD {
+	my ($db) = @_;
+
+	$db->contrive (q (Class::Load), (
+		value => q (Class::Load),
 	));
 
-	$self->contrive ('class_loader', (
-		dep => [ 'Class::Load' ],
-		as  => sub { $_[0]->can ('load_class') },
+	$db->contrive (q (class_loader), (
+		dep => [ q (Class::Load) ],
+		as  => sub { $_[0]->can (q (load_class)) },
 	));
-
-	return $self;
 }
 
 sub instance {
@@ -41,33 +55,39 @@ sub instance {
 	return $instance;
 }
 
-sub _contrive_class_loader {
-	my ($self, $name) = @_;
+sub contrive_class {
+	my ($db, $name) = @_;
 
-	return if exists $self->{cache}{$name};
+	return
+		if exists $db->cache->{$name}
+		;
 
-	$self->contrive ($name, (
-		dep => [ 'class_loader' ],
-		as => eval "sub { \$_[0]->(q[$name]) && q[$name] }",
+	$db->contrive ($name, (
+		dep => [ q (class_loader) ],
+		as => eval qq (sub { \$_[0]->(q[$name]) && q[$name] }),
 	));
 
 	return;
 }
 
 sub _guess_builder_class {
-	my ($self, $def) = @_;
+	my ($db, $def) = @_;
 
-	return 'Context::Singleton::Frame::Builder::Value' if exists $def->{value};
-	return 'Context::Singleton::Frame::Builder::Hash'  if Ref::Util::is_hashref ($def->{dep});
-	return 'Context::Singleton::Frame::Builder::Array'
+	return q (Context::Singleton::Frame::Builder::Value)
+		if exists $def->{value}
+		;
+	return q (Context::Singleton::Frame::Builder::Hash)
+		if Ref::Util::is_hashref ($def->{dep})
+		;
+	return q (Context::Singleton::Frame::Builder::Array)
 }
 
 sub contrive {
-	my ($self, $name, %def) = @_;
+	my ($db, $name, %def) = @_;
 
 	if ($def{class}) {
-		$self->_contrive_class_loader ($def{class});
-		$def{builder} //= 'new';
+		$db->contrive_class ($def{class});
+		$def{builder} //= q (new);
 	}
 
 	if ($def{class} // $def{deduce}) {
@@ -76,39 +96,39 @@ sub contrive {
 		delete $def{deduce};
 	}
 
-	my $builder_class = $self->_guess_builder_class (\%def);
+	my $builder_class = $db->_guess_builder_class (\%def);
 	my $builder = $builder_class->new (%def);
 
-	push @{ $self->{cache}{ $name } }, $builder;
+	push @{ $db->cache->{ $name } }, $builder;
 
 	return;
 }
 
 sub trigger {
-	my ($self, $name, $code) = @_;
+	my ($db, $name, $code) = @_;
 
-	push @{ $self->{trigger}{ $name } }, $code;
+	push @{ $db->triggers->{ $name } }, $code;
 
 	return;
 }
 
-sub find_builder_for {
-	my ($self, $name) = @_;
+sub search_builder_for {
+	my ($db, $name) = @_;
 
-	return @{ $self->{cache}{ $name } // [] };
+	return @{ $db->cache->{ $name } // [] };
 }
 
-sub find_trigger_for {
-	my ($self, $name) = @_;
+sub search_trigger_for {
+	my ($db, $name) = @_;
 
-	return @{ $self->{trigger}{ $name } // [] };
+	return @{ $db->triggers->{ $name } // [] };
 }
 
 sub load_rules {
-	my ($self, @packages) = @_;
+	my ($db, @packages) = @_;
 
 	for my $package (@packages) {
-		$self->{plugins}{ $package } //= do {
+		$db->plugins->{ $package } //= do {
 			Module::Pluggable::Object->new (
 				require => 1,
 				search_path => [ $package ],
@@ -121,3 +141,26 @@ sub load_rules {
 }
 
 1;
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Context::Singleton::DB - Internal class storing singleton rules.
+
+=head1 DESCRIPTION
+
+This is internal package.
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney.cpan@gmail.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+This module is part of L<Context::Singleton> distribution.
+
+=cut
+

@@ -19,6 +19,7 @@ no_index:
     - etc
     - html
     - inc
+    - po
     - t
 requires:
   perl: 5.36.0
@@ -26,6 +27,6 @@ resources:
   bugtracker: https://github.com/firefart/RT-Extension-AwayMode/issues
   license: https://opensource.org/licenses/gpl-3.0.html
   repository: https://github.com/firefart/RT-Extension-AwayMode.git
-version: '0.03'
+version: '0.04'
 x_module_install_rtx_version: '0.45'
 x_requires_rt: 6.0.0

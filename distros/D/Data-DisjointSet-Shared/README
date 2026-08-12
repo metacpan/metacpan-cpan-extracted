@@ -30,47 +30,45 @@ SYNOPSIS
 
 DESCRIPTION
     A union-find (disjoint-set) structure in shared memory. It maintains a
-    partition of a fixed universe of N integer elements (numbered "0 ..
-    N-1") into disjoint sets. The three core operations are:
+    partition of a fixed universe of N integer elements (numbered "0 .. N-1")
+    into disjoint sets. The three core operations are:
 
     *   union(a, b) -- merge the set containing "a" with the set containing
         "b" into a single set.
 
-    *   find(x) -- return the *canonical representative* (the root) of the
-        set containing "x". Two elements are in the same set if and only if
-        they have the same root.
+    *   find(x) -- return the *canonical representative* (the root) of the set
+        containing "x". Two elements are in the same set if and only if they
+        have the same root.
 
-    *   connected(a, b) -- test whether "a" and "b" are currently in the
-        same set.
+    *   connected(a, b) -- test whether "a" and "b" are currently in the same
+        set.
 
-    The structure uses path compression (path halving on "find") together
-    with union by size (the larger-sized root always becomes the parent),
-    which gives near-constant amortized time per operation (the
-    inverse-Ackermann bound). Each element is one "parent" slot and one
-    "size" slot, both 32-bit, so the payload is "8 * N" bytes regardless of
-    how many unions are performed; the mapping also carries a fixed ~16 KB
-    cross-process reader table, so the "mmap_size" stat reports the true
-    total.
+    The structure uses path compression (path halving on "find") together with
+    union by size (the larger-sized root always becomes the parent), which
+    gives near-constant amortized time per operation (the inverse-Ackermann
+    bound). Each element is one "parent" slot and one "size" slot, both
+    32-bit, so the payload is "8 * N" bytes regardless of how many unions are
+    performed; the mapping also carries a fixed ~16 KB cross-process reader
+    table, so the "mmap_size" stat reports the true total.
 
     Because the "parent"/"size" arrays live in a shared mapping, several
     processes share one structure: any process that opens the same backing
     file, inherits the anonymous mapping across "fork", or reopens a passed
-    memfd, sees the others' unions and contributes its own. A
-    write-preferring futex rwlock with dead-process recovery guards every
-    mutation, so unions from many processes serialize cleanly and the final
-    partition is well defined.
+    memfd, sees the others' unions and contributes its own. A write-preferring
+    futex rwlock with dead-process recovery guards every mutation, so unions
+    from many processes serialize cleanly and the final partition is well
+    defined.
 
-    IMPORTANT: "find", "connected" and "set_size" perform path compression
-    -- they mutate the structure to keep future queries fast -- and
-    therefore acquire the write lock. They are *not* read-only operations.
-    Only "num_sets" and "capacity" are cheap reads ("capacity" is lock-free;
-    it is immutable after construction).
+    IMPORTANT: "find", "connected" and "set_size" perform path compression --
+    they mutate the structure to keep future queries fast -- and therefore
+    acquire the write lock. They are *not* read-only operations. Only
+    "num_sets" and "capacity" are cheap reads ("capacity" is lock-free; it is
+    immutable after construction).
 
     There is no operation that unions one whole structure into another. A
     disjoint-set is a partition of one fixed universe; combining it with a
-    separate structure is not meaningful. To combine elements, use "union"
-    or "union_many" within a single structure. Linux-only. Requires 64-bit
-    Perl.
+    separate structure is not meaningful. To combine elements, use "union" or
+    "union_many" within a single structure. Linux-only. Requires 64-bit Perl.
 
 METHODS
   Constructors
@@ -81,23 +79,25 @@ METHODS
         my $d = Data::DisjointSet::Shared->new_from_fd($fd);
 
     $path is the backing file ("undef" or omitted for an anonymous mapping).
-    $n is the number of elements: the universe is "0 .. $n-1". It must be
-    ">= 1" and "<= 2**31"; "new" and "new_memfd" croak if $n is out of
-    range. A freshly created structure starts with every element in its own
-    singleton set, so "num_sets == $n" and "set_size($i) == 1" for every $i.
+    $n is the number of elements: the universe is "0 .. $n-1". It must be ">=
+    1" and "<= 2**31"; "new" and "new_memfd" croak if $n is out of range. A
+    freshly created structure starts with every element in its own singleton
+    set, so "num_sets == $n" and "set_size($i) == 1" for every $i.
 
     When reopening an existing file or memfd, the stored "n" wins and the
     existing partition is preserved; the $n you pass to "new" on a reopen is
     only used when the file is brand new. "new_memfd" creates a Linux memfd
     (transferable via its "memfd" descriptor); "new_from_fd" reopens one in
-    another process.
+    another process. The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle.
 
     Backing files are created exclusively ("O_EXCL", symlinks rejected) with
-    mode 0600 by default, so only the creating user can attach. Pass an
-    octal $mode (e.g. 0664 or 0666, applied exactly via "fchmod" -- not
-    narrowed by umask) as the optional third argument to permit group/other
-    access for cross-user sharing. $mode applies only when the file is newly
-    created; reopening an existing file never changes its permissions.
+    mode 0600 by default, so only the creating user can attach. Pass an octal
+    $mode (e.g. 0664 or 0666, applied exactly via "fchmod" -- not narrowed by
+    umask) as the optional third argument to permit group/other access for
+    cross-user sharing. $mode applies only when the file is newly created;
+    reopening an existing file never changes its permissions.
 
   Union and query
         my $merged = $d->union($a, $b);      # merge; 1 if newly merged, 0 if already together
@@ -108,20 +108,20 @@ METHODS
         my $size   = $d->set_size($x);       # number of elements in $x's set
 
     "union" merges the set containing $a with the set containing $b and
-    returns 1 if they were in different sets (a merge happened, and
-    "num_sets" decreased by one) or 0 if they were already in the same set
-    (nothing changed). "merge" is a short alias.
+    returns 1 if they were in different sets (a merge happened, and "num_sets"
+    decreased by one) or 0 if they were already in the same set (nothing
+    changed). "merge" is a short alias.
 
     "find" returns the root of $x's set -- a stable representative that is
     equal for all members of the same set. "connected" (aliased "same")
-    returns true when $a and $b share a root. "set_size" returns the number
-    of elements in $x's set.
+    returns true when $a and $b share a root. "set_size" returns the number of
+    elements in $x's set.
 
     All four of "find", "connected", "set_size" and "union" take the write
-    lock: "union" obviously mutates, and "find"/"connected"/"set_size"
-    mutate via path compression. Every index argument must be in "0 ..
-    capacity-1"; an out-of-range index croaks before any lock is taken (so a
-    caught croak never leaks a lock).
+    lock: "union" obviously mutates, and "find"/"connected"/"set_size" mutate
+    via path compression. Every index argument must be in "0 .. capacity-1";
+    an out-of-range index croaks before any lock is taken (so a caught croak
+    never leaks a lock).
 
   Bulk union
         my $merged = $d->union_many(\@pairs);
@@ -133,10 +133,10 @@ METHODS
     returned 1).
 
     The batch is atomic with respect to validation: every index is resolved
-    and range-checked before the lock is taken, so an odd-length array or
-    any out-of-range index croaks without performing "any" union and without
-    holding the lock. An empty array reference is a valid no-op that
-    performs zero unions.
+    and range-checked before the lock is taken, so an odd-length array or any
+    out-of-range index croaks without performing "any" union and without
+    holding the lock. An empty array reference is a valid no-op that performs
+    zero unions.
 
   Partition size
         my $sets = $d->num_sets;             # current number of disjoint sets
@@ -153,10 +153,10 @@ METHODS
         $d->clear;                           # alias for reset
         $d->path; $d->memfd; $d->sync; $d->unlink;   # or Class->unlink($path)
 
-    "reset" (aliased "clear") returns every element to its own singleton
-    set, so "num_sets" becomes "capacity" again. "sync" flushes the mapping
-    to its backing store (a no-op for anonymous and memfd structures, which
-    have none); "unlink" removes the backing file (also callable as
+    "reset" (aliased "clear") returns every element to its own singleton set,
+    so "num_sets" becomes "capacity" again. "sync" flushes the mapping to its
+    backing store (a no-op for anonymous and memfd structures, which have
+    none); "unlink" removes the backing file (also callable as
     "Class->unlink($path)"); "path" returns the backing path ("undef" for
     anonymous, memfd, or fd-reopened structures) and "memfd" the backing
     descriptor -- the memfd of a "new_memfd" structure or the dup'd fd of a
@@ -175,16 +175,16 @@ STATS
     *   "mmap_size" -- bytes of the shared mapping.
 
 SHARING ACROSS PROCESSES
-    The structure lives in a shared mapping, shared the same three ways as
-    the rest of the family: a backing file (every process calls "new($path,
-    $n)" on the same path; pass a $mode to "new" if the attaching processes
-    run as different users), an anonymous mapping inherited across "fork",
-    or a memfd whose descriptor is passed to an unrelated process (over a
-    UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened
-    with new_from_fd($fd). Because the mapping is shared, every process
-    unions into and queries the same partition. All mutation is serialized
-    by the write lock, so the final partition is independent of how the
-    processes interleave.
+    The structure lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path, $n)"
+    on the same path; pass a $mode to "new" if the attaching processes run as
+    different users), an anonymous mapping inherited across "fork", or a memfd
+    whose descriptor is passed to an unrelated process (over a UNIX socket via
+    "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened with
+    new_from_fd($fd). Because the mapping is shared, every process unions into
+    and queries the same partition. All mutation is serialized by the write
+    lock, so the final partition is independent of how the processes
+    interleave.
 
         # parent and children share one disjoint-set with no coordination
         my $d = Data::DisjointSet::Shared->new(undef, 100);   # before fork
@@ -193,13 +193,14 @@ SHARING ACROSS PROCESSES
         print $d->num_sets, "\n";   # reflects the child's unions
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
@@ -208,33 +209,45 @@ CRASH SAFETY
     PID-encoded ownership; if a holder dies, the next contender detects the
     dead owner and recovers. Because "union" updates a couple of words while
     holding the lock, a crash leaves the partition consistent up to the last
-    completed "union". Limitation: PID reuse is not detected (very unlikely
-    in practice).
+    completed "union". Limitation: PID reuse is not detected (very unlikely in
+    practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete disjoint-set file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
     Data::Histogram::Shared, Data::CountMinSketch::Shared,
     Data::HyperLogLog::Shared, Data::BloomFilter::Shared,
-    Data::Intern::Shared, Data::SortedSet::Shared,
-    Data::SpatialHash::Shared, and the rest of the "Data::*::Shared" family.
+    Data::Intern::Shared, Data::SortedSet::Shared, Data::SpatialHash::Shared,
+    and the rest of the "Data::*::Shared" family.
 
 AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

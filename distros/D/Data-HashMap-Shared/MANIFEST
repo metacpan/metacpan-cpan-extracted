@@ -1,4 +1,3 @@
-.gitignore
 bench/rdlock_bench.pl
 bench/stress.pl
 bench/vs.pl
@@ -114,5 +113,8 @@ xt/writer_crash_recovery.t
 xxhash.h
 bin/hashmap-shared-upgrade
 t/24-upgrade.t
+t/25-frozen.t
+t/26-recover.t
+t/27-review-fixes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

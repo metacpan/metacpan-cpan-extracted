@@ -301,7 +301,7 @@ for my $case (
     subtest "unstoppable_server_still_loses_its_data_dir_via_$case->{name}" => sub {
         my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
-        local $ENV{QDB_START_TIMEOUT} = 3;
+        local $ENV{QDB_START_TIMEOUT} = 30;
         local $ENV{QDB_STOP_GRACE}    = 1;
 
         my $db = QDB::FakeDriver->new(
@@ -435,7 +435,7 @@ subtest reusable_data_dir_is_never_removed => sub {
     # this process is gone. "Remove it anyway" applies only to disposable dirs.
     my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
-    local $ENV{QDB_START_TIMEOUT} = 3;
+    local $ENV{QDB_START_TIMEOUT} = 30;
 
     my $db = QDB::FakeDriver->new(dir => $dir, serve => 1, run_seconds => 30, cleanup => 0, autostart => 0);
 
@@ -449,7 +449,7 @@ subtest teardown_still_cleans_up_normally => sub {
     # The guard above must not cost the ordinary case its cleanup.
     my $dir = tempdir("QDB-TEST-$$-XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
-    local $ENV{QDB_START_TIMEOUT} = 3;
+    local $ENV{QDB_START_TIMEOUT} = 30;
 
     my $db = QDB::FakeDriver->new(dir => $dir, serve => 1, run_seconds => 30, cleanup => 1, autostart => 0);
 

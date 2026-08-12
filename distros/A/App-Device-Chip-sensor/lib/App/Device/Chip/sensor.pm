@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-class App::Device::Chip::sensor 0.07;
+class App::Device::Chip::sensor 0.08;
 
 use Carp;
 
@@ -28,6 +28,8 @@ use Scalar::Util qw( refaddr );
 C<App::Device::Chip::sensor> - Base class to build C<Device::Chip::Sensor>-based applications on
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    #!/usr/bin/perl
    use v5.26;
@@ -259,11 +261,11 @@ async method chips
 
       await $chip->mount( $adapter, %mountopts );
 
+      await $chip->protocol->power(1);
+
       if( $chipconfig->{config} ) {
          await $chip->change_config( $chipconfig->{config}->%* );
       }
-
-      await $chip->protocol->power(1);
 
       if( $chip->can( "initialize_sensors" ) ) {
          await $chip->initialize_sensors;
