@@ -509,3 +509,78 @@ _headers(self)
     }
     OUTPUT:
         RETVAL
+
+# ---- abuse controls: Hyperman's v3 arena via the ABI (punk_hm) --------------
+#
+# These reach the shared denylist / rate counters Hyperman maps before it forks
+# its workers. They FAIL OPEN: with no Hyperman >= ABI v3 under us (plackup, an
+# older server) punk_hm() is NULL, block_ip is a no-op returning 0 and rate_hit
+# reports "allowed", so rate limiting is never the reason a request is refused.
+
+# $c->block_ip([$ip [, $ttl]]) / $c->unblock_ip([$ip])
+# Denylist (or lift) an IP at the edge; $ip defaults to this request's
+# REMOTE_ADDR, $ttl seconds (0 = permanent). Returns 1 if the edge arena is
+# present (the change took), else 0.
+IV
+block_ip(self, ...)
+        SV *self
+    ALIAS:
+        unblock_ip = 1
+    CODE:
+    {
+        const hm_abi *A = punk_hm(aTHX);
+        const char *ip = NULL;
+        if (items > 1 && SvOK(ST(1))) {
+            ip = SvPV_nolen(ST(1));
+        } else {
+            AV  *av = pcx_av(aTHX_ self);
+            SV **e  = av_fetch(av, PCX_ENV, 0);
+            if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV) {
+                SV **r = hv_fetchs((HV *)SvRV(*e), "REMOTE_ADDR", 0);
+                if (r && *r && SvOK(*r)) ip = SvPV_nolen(*r);
+            }
+        }
+        if (!A || !A->deny_add || !ip || !*ip) {
+            RETVAL = 0;
+        } else if (ix == 1) {
+            A->deny_remove(ip);
+            RETVAL = 1;
+        } else {
+            long ttl = (items > 2 && SvOK(ST(2))) ? (long)SvIV(ST(2)) : 0;
+            A->deny_add(ip, ttl);
+            RETVAL = 1;
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+# $c->rate_hit($key, $limit, $window) -> ($ok, $remaining, $reset)
+# Count one hit against the opaque $key under $limit per $window seconds.
+# $limit <= 0 is unlimited. Fail-open with no arena: (1, $limit-1, next-window).
+void
+rate_hit(self, key, limit, window)
+        SV *self
+        SV *key
+        IV  limit
+        IV  window
+    PPCODE:
+    {
+        const hm_abi *A = punk_hm(aTHX);
+        STRLEN klen;
+        const char *k = SvPV(key, klen);
+        IV rem = 0, reset = 0;
+        int ok;
+        PERL_UNUSED_VAR(self);
+        if (A && A->ratelimit_hit) {
+            ok = A->ratelimit_hit(k, klen, limit, window, &rem, &reset);
+        } else {
+            long now = (long)time(NULL);
+            long w   = window > 0 ? window : 60;
+            ok    = 1;
+            rem   = limit > 0 ? limit - 1 : -1;
+            reset = now - (now % w) + w;
+        }
+        XPUSHs(sv_2mortal(newSViv(ok)));
+        XPUSHs(sv_2mortal(newSViv(rem)));
+        XPUSHs(sv_2mortal(newSViv(reset)));
+    }

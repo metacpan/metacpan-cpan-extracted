@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib "t/lib";
 use Test::More;
+use HMTest qw(free_ports);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -12,7 +14,8 @@ use File::Temp ();
 
 my $dir     = File::Temp::tempdir(CLEANUP => 1);
 my $logfile = "$dir/access.log";
-my $port    = 20000 + ($$ % 1000) + 1;
+my ($port) = free_ports(1);
+plan skip_all => "no free loopback port" unless $port;
 
 my $sup = fork;
 die "fork: $!" unless defined $sup;
@@ -48,8 +51,17 @@ sub get {
         $req .= "Referer: $opt{ref}\r\n"   if defined $opt{ref};
         $req .= "\r\n";
         $s->print($req);
-        local $/;
-        my $r = <$s>;
+        # bounded read: a peer that accepts and then says nothing must not
+        # wedge the test file for the harness's whole timeout.
+        my $r = eval {
+            local $SIG{ALRM} = sub { die "timeout\n" };
+            alarm 5;
+            local $/;
+            my $body = <$s>;
+            alarm 0;
+            $body;
+        };
+        alarm 0;
         return $1 if defined $r && $r =~ /\r\n\r\n(.*)\z/s;
         Time::HiRes::sleep(0.1);
     }

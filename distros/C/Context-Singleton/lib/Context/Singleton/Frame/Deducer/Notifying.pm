@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::Deducer::Notifying;
-$Context::Singleton::Frame::Deducer::Notifying::VERSION = '1.0.7';
+$Context::Singleton::Frame::Deducer::Notifying::VERSION = '1.0.8';
 use Moo;
 
 use Context::Singleton::Frame::Promise;

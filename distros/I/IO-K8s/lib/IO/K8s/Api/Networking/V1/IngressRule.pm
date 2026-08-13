@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::IngressRule;
 # ABSTRACT: IngressRule represents the rules mapping the paths under a specified host to the related backend services. Incoming requests are first evaluated for a host match, then routed to the backend associated with the matching IngressRuleValue.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s host => Str;
@@ -22,7 +22,7 @@ IO::K8s::Api::Networking::V1::IngressRule - IngressRule represents the rules map
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 host
 
@@ -35,10 +35,6 @@ host is the fully qualified domain name of a network host, as defined by RFC 398
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -49,7 +45,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

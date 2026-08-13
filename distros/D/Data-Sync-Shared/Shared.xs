@@ -11,6 +11,7 @@
         croak("Expected a %s object", classname); \
     SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    SyncHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -27,7 +28,7 @@
     if (!SvROK(sv)) \
         croak("Data::Sync::Shared object was replaced during the call"); \
     h = INT2PTR(SyncHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::Sync::Shared object destroyed during the call")
+    if (h != h0) croak("Data::Sync::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -51,7 +52,7 @@ new(class, path, max, ...)
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     SyncHandle *h = sync_create(p, SYNC_TYPE_SEMAPHORE, (uint32_t)max, initial, mode, errbuf);
-    if (!h) croak("Data::Sync::Shared::Semaphore->new: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Semaphore->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -66,7 +67,7 @@ new_memfd(class, name, max, ...)
   CODE:
     uint32_t initial = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (uint32_t)SvUV(ST(3)) : (uint32_t)max;
     SyncHandle *h = sync_create_memfd(name, SYNC_TYPE_SEMAPHORE, (uint32_t)max, initial, errbuf);
-    if (!h) croak("Data::Sync::Shared::Semaphore->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Semaphore->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -79,7 +80,7 @@ new_from_fd(class, fd)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_open_fd(fd, SYNC_TYPE_SEMAPHORE, errbuf);
-    if (!h) croak("Data::Sync::Shared::Semaphore->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Semaphore->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -88,7 +89,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Sync::Shared::Semaphore")) return;
     SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -286,7 +287,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0)
+    if (unlink(p) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
@@ -325,7 +326,7 @@ new(class, path, parties, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     SyncHandle *h = sync_create(p, SYNC_TYPE_BARRIER, (uint32_t)parties, 0, mode, errbuf);
-    if (!h) croak("Data::Sync::Shared::Barrier->new: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Barrier->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -339,7 +340,7 @@ new_memfd(class, name, parties)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_create_memfd(name, SYNC_TYPE_BARRIER, (uint32_t)parties, 0, errbuf);
-    if (!h) croak("Data::Sync::Shared::Barrier->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Barrier->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -352,7 +353,7 @@ new_from_fd(class, fd)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_open_fd(fd, SYNC_TYPE_BARRIER, errbuf);
-    if (!h) croak("Data::Sync::Shared::Barrier->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Barrier->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -361,7 +362,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Sync::Shared::Barrier")) return;
     SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -522,7 +523,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0)
+    if (unlink(p) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
@@ -559,7 +560,7 @@ new(class, path, ...)
     mode_t mode = (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) ? (mode_t)SvUV(ST(2)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     SyncHandle *h = sync_create(p, SYNC_TYPE_RWLOCK, 0, 0, mode, errbuf);
-    if (!h) croak("Data::Sync::Shared::RWLock->new: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::RWLock->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -572,7 +573,7 @@ new_memfd(class, name)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_create_memfd(name, SYNC_TYPE_RWLOCK, 0, 0, errbuf);
-    if (!h) croak("Data::Sync::Shared::RWLock->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::RWLock->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -585,7 +586,7 @@ new_from_fd(class, fd)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_open_fd(fd, SYNC_TYPE_RWLOCK, errbuf);
-    if (!h) croak("Data::Sync::Shared::RWLock->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::RWLock->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -594,7 +595,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Sync::Shared::RWLock")) return;
     SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -804,7 +805,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0)
+    if (unlink(p) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
@@ -861,7 +862,7 @@ new(class, path, ...)
     mode_t mode = (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) ? (mode_t)SvUV(ST(2)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     SyncHandle *h = sync_create(p, SYNC_TYPE_CONDVAR, 0, 0, mode, errbuf);
-    if (!h) croak("Data::Sync::Shared::Condvar->new: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Condvar->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -874,7 +875,7 @@ new_memfd(class, name)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_create_memfd(name, SYNC_TYPE_CONDVAR, 0, 0, errbuf);
-    if (!h) croak("Data::Sync::Shared::Condvar->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Condvar->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -887,7 +888,7 @@ new_from_fd(class, fd)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_open_fd(fd, SYNC_TYPE_CONDVAR, errbuf);
-    if (!h) croak("Data::Sync::Shared::Condvar->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Condvar->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -896,7 +897,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Sync::Shared::Condvar")) return;
     SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -1051,7 +1052,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0)
+    if (unlink(p) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
@@ -1088,7 +1089,7 @@ new(class, path, ...)
     mode_t mode = (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) ? (mode_t)SvUV(ST(2)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     SyncHandle *h = sync_create(p, SYNC_TYPE_ONCE, 0, 0, mode, errbuf);
-    if (!h) croak("Data::Sync::Shared::Once->new: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Once->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1101,7 +1102,7 @@ new_memfd(class, name)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_create_memfd(name, SYNC_TYPE_ONCE, 0, 0, errbuf);
-    if (!h) croak("Data::Sync::Shared::Once->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Once->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1114,7 +1115,7 @@ new_from_fd(class, fd)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     SyncHandle *h = sync_open_fd(fd, SYNC_TYPE_ONCE, errbuf);
-    if (!h) croak("Data::Sync::Shared::Once->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Sync::Shared::Once->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1123,7 +1124,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Sync::Shared::Once")) return;
     SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -1262,7 +1263,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0)
+    if (unlink(p) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", p, strerror(errno));
 
 SV *

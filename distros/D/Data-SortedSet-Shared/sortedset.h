@@ -124,7 +124,8 @@ struct SsHeader {
     uint32_t drain_seq;               /* 84  futex bumped by a reader releasing under a draining writer (wakes it) */
     uint64_t stat_ops;                /* 88 */
     uint32_t slotless_rdepth;         /* 96: readers holding with no reader-slot (documented residual) */
-    uint8_t  _pad[156];               /* 100..255 */
+    uint8_t  sealed;                  /* 100  0 = mutable, 1 = frozen (read-only; lock-free reads) */
+    uint8_t  _pad[155];               /* 101..255 */
 };
 typedef struct SsHeader SsHeader;
 
@@ -148,6 +149,7 @@ typedef struct SsHandle {
     uint32_t      cached_pid;    /* getpid() cached at last slot claim */
     uint32_t      cached_fork_gen; /* ss_fork_gen value at last slot claim */
     uint32_t slotless_held; /* rwlock read-locks held with no reader-slot */
+    int      readonly;      /* 1 = frozen O_RDONLY/PROT_READ view: lock-free reads, mutation croaks */
 } SsHandle;
 
 /* ================================================================
@@ -213,13 +215,6 @@ static inline void ss_rwlock_spin_pause(void) {
 #define SS_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define SS_RWLOCK_WR(pid)    (SS_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & SS_RWLOCK_PID_MASK))
 
-/* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
-/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse -- if a dead
- * lock-holder's PID is recycled to an unrelated live process before recovery
- * runs, this reports "alive" and that slot's orphaned contribution is not
- * reclaimed until the recycled process exits. Robust detection would require
- * a per-slot process-start-time epoch (a header-layout/version change).
- * Documented under "Crash Safety" in the POD. */
 /* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
  * process that crashed while holding the lock and lingers unreaped would never
  * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
@@ -239,6 +234,9 @@ static inline int ss_pid_is_zombie(uint32_t pid) {
     if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
     return rp[1] == ' ' && rp[2] == 'Z';
 }
+/* 1 if alive or unknown, 0 if definitely dead.  Cannot detect PID reuse: a
+ * recycled PID reports "alive" and the slot is not reclaimed until that
+ * process exits.  See "Crash Safety" in the POD. */
 static inline int ss_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
@@ -323,8 +321,7 @@ static inline void ss_claim_reader_slot(SsHandle *h) {
     /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
      * if its rdepth>0: clearing pid drops the dead reader's entire contribution
      * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
-     * old design) we need not skip dead slots that still show a read count. */
+     * claim it. */
     for (uint32_t i = 0; i < SS_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || ss_pid_alive(dpid)) continue;
@@ -332,7 +329,7 @@ static inline void ss_claim_reader_slot(SsHandle *h) {
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            ss_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            ss_occ_set(h, i);
             h->my_slot_idx = i;
             return;
         }
@@ -576,7 +573,6 @@ static inline void ss_init_header(void *base, uint32_t max_entries, uint32_t ind
     SsLayout L = ss_layout(index_slots);
     SsHeader *hdr = (SsHeader *)base;
     memset(base, 0, (size_t)total);
-    hdr->magic            = SS_MAGIC;
     hdr->version          = SS_VERSION;
     hdr->max_entries      = max_entries;
     hdr->node_capacity    = node_capacity;
@@ -597,6 +593,11 @@ static inline void ss_init_header(void *base, uint32_t max_entries, uint32_t ind
         nodes[i].parent = (i + 1 < node_capacity) ? (i + 1) : SS_NONE;
     hdr->node_free_head = 0;
     /* index region left zeroed: every slot empty (state == 0). */
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, SS_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -643,6 +644,14 @@ static inline int ss_validate_header(const SsHeader *hdr, uint64_t file_size) {
     if (hdr->count > hdr->max_entries) return 0;
     if (hdr->root != SS_NONE && hdr->root >= hdr->node_capacity) return 0;
     if (hdr->root == SS_NONE && hdr->count != 0) return 0;
+    /* ...and the converse: a root that is a VALID index while the tree claims
+     * to be empty. The checks above accept that pair (the index is in range,
+     * and the "no root" rule only fires when root IS SS_NONE), but the node it
+     * names is still on the free list with uninitialised links -- the first
+     * insert descends from it and dereferences garbage. Height is the same
+     * story: a non-empty tree always has a height. */
+    if (hdr->root != SS_NONE && (hdr->count == 0 || hdr->height == 0)) return 0;
+    if (hdr->height != 0 && hdr->root == SS_NONE) return 0;
     return 1;
 }
 
@@ -679,6 +688,16 @@ static int ss_secure_open(const char *path, mode_t mode, char *errbuf) {
     }
     SS_ERR("open %s: create/attach kept racing", path);
     return -1;
+}
+
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int ss_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
 }
 
 static SsHandle *ss_create(const char *path, uint32_t max_entries, mode_t mode, char *errbuf) {
@@ -718,7 +737,32 @@ static SsHandle *ss_create(const char *path, uint32_t max_entries, mode_t mode, 
         if (base == MAP_FAILED) { SS_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!ss_validate_header((SsHeader *)base, (uint64_t)st.st_size)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((SsHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && ss_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        SS_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    ss_init_header(base, max_entries, index_slots, node_capacity, total);
+                    flock(fd, LOCK_UN); close(fd);
+                    return ss_setup(base, map_size, path, -1);
+                }
+                if (((SsHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    SS_ERR("%s: incomplete sorted-set file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 SS_ERR("invalid sorted-set file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            if (((SsHeader *)base)->sealed) {   /* a frozen file must never be reopened read-write */
+                SS_ERR("%s is frozen (read-only); open it with new_readonly", path);
+                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
             return ss_setup(base, map_size, path, -1);
@@ -757,6 +801,10 @@ static SsHandle *ss_open_fd(int fd, char *errbuf) {
     if (!ss_validate_header((SsHeader *)base, (uint64_t)st.st_size)) {
         SS_ERR("invalid sorted-set"); munmap(base, ms); return NULL;
     }
+    if (((SsHeader *)base)->sealed) {   /* a frozen file must never be reopened read-write */
+        SS_ERR("this sorted set is frozen (read-only); open it with new_readonly");
+        munmap(base, ms); return NULL;
+    }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { SS_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
     return ss_setup(base, ms, NULL, myfd);
@@ -788,6 +836,50 @@ static void ss_destroy(SsHandle *h) {
 static inline int ss_msync(SsHandle *h) {
     if (!h || !h->hdr) return 0;
     return msync(h->hdr, h->mmap_size, MS_SYNC);
+}
+
+/* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock ever.
+ * A sealed file is immutable and no read path writes the mapping, so queries
+ * take no reader-slot / rwlock traffic and any number of processes can share
+ * one PROT_READ mapping (same architecture; the magic rejects a wrong-endian
+ * file). */
+static SsHandle *ss_open_readonly(const char *path, char *errbuf) {
+    if (errbuf) errbuf[0] = '\0';
+    int fd = open(path, O_RDONLY|O_NOFOLLOW|O_CLOEXEC);
+    if (fd < 0) { SS_ERR("open %s: %s", path, strerror(errno)); return NULL; }
+    struct stat st;
+    if (fstat(fd, &st) < 0) { SS_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
+    if ((uint64_t)st.st_size < sizeof(SsHeader)) { SS_ERR("%s: file too small", path); close(fd); return NULL; }
+    size_t ms = (size_t)st.st_size;
+    void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
+    if (base == MAP_FAILED) { SS_ERR("mmap %s: %s", path, strerror(errno)); return NULL; }
+    if (!ss_validate_header((SsHeader *)base, (uint64_t)st.st_size)) {
+        SS_ERR("%s: invalid sorted-set file", path); munmap(base, ms); return NULL;
+    }
+    if (!((SsHeader *)base)->sealed) {
+        SS_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
+        munmap(base, ms); return NULL;
+    }
+    SsHandle *h = ss_setup(base, ms, path, -1);   /* munmaps on OOM */
+    if (!h) { SS_ERR("out of memory"); return NULL; }
+    h->readonly = 1;
+    return h;
+}
+
+/* Seal a sorted set: make it permanently immutable so it can be shipped and
+ * opened read-only.  Takes the write lock so no mutation is in flight, publishes
+ * the seal, then flushes it (file/memfd-backed).  The order-statistics B+tree is
+ * maintained EAGERLY on every write (subtree counts, leaf links and separators
+ * are all kept up to date in add/remove/incr) -- there is no deferred/lazy build
+ * to force-complete, so the sealed tree is already query-ready for the lock-free
+ * read path.  Afterwards every mutator croaks and a read-write reopen is refused. */
+static int ss_freeze(SsHandle *h) {
+    ss_rwlock_wrlock(h);
+    h->hdr->sealed = 1;
+    ss_rwlock_wrunlock(h);
+    if (h->path || h->backing_fd >= 0) return ss_msync(h);  /* durability for file/memfd-backed */
+    return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
 }
 
 static int ss_create_eventfd(SsHandle *h) {

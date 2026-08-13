@@ -77,6 +77,35 @@ static int oa_check(pTHX_ SV *handle, SV *value, AV *errs,
     }
 }
 
+static SV *oa_body_decode(pTHX_ SV *text);   /* defined below */
+
+/* One declared parameter against its value.
+ *
+ * The ordinary case is a straight schema check. A parameter declared with
+ * `content` rather than `schema` carries a document of that media type in a
+ * single value - `?filter={"a":1}` - so the value is decoded first and the
+ * schema then sees the structure it was written about. An undecodable value is
+ * a 400 rather than a silent pass, exactly as a request body is; a media type
+ * with no decoder is left alone, as an undeclared body type is. */
+static int oa_check_param(pTHX_ oa_param *pp, SV *value, AV *errs,
+                          const char *in) {
+    SV *data = value;
+    if (!pp->handle) return 1;
+    if (pp->ctype) {
+        STRLEN cl; const char *cp = SvPV_const(pp->ctype, cl);
+        if (!oa_ctype_is_json(cp, cl)) return 1;
+        if (!SvROK(value)) {
+            data = oa_body_decode(aTHX_ value);
+            if (!data) {
+                if (errs) oa_err_push(aTHX_ errs, in, pp->name, "content",
+                                      "parameter is not valid JSON");
+                return 0;
+            }
+        }
+    }
+    return oa_check(aTHX_ pp->handle, data, errs, in, pp->name);
+}
+
 /* ---- query / cookie parsing ------------------------------------------------ */
 
 /* Parse a query string into a fresh HV: every key decoded; a key is an
@@ -209,7 +238,7 @@ static int oa_validate_op(pTHX_ oa_api *a, oa_op *o,
         if (raw && *raw && SvOK(*raw)) {
             STRLEN vl; const char *vp = SvPV_const(*raw, vl);
             SV *dec = sv_2mortal(oa_pct_decode(aTHX_ vp, vl, 0));
-            if (!oa_check(aTHX_ pp->handle, dec, errs, "path", pp->name)) ok = 0;
+            if (!oa_check_param(aTHX_ pp, dec, errs, "path")) ok = 0;
             else (void)hv_store(op_, np, (I32)nl, SvREFCNT_inc(dec), 0);
         } else {
             ok = 0;
@@ -240,7 +269,7 @@ static int oa_validate_op(pTHX_ oa_api *a, oa_op *o,
         STRLEN nl; const char *np = SvPV_const(pp->name, nl);
         SV **v = hv_fetch(oq, np, (I32)nl, 0);
         if (v && *v && SvOK(*v)) {
-            if (!oa_check(aTHX_ pp->handle, *v, errs, "query", pp->name)) ok = 0;
+            if (!oa_check_param(aTHX_ pp, *v, errs, "query")) ok = 0;
         } else if (pp->required) {
             ok = 0;
             if (errs) oa_err_push(aTHX_ errs, "query", pp->name,
@@ -261,7 +290,7 @@ static int oa_validate_op(pTHX_ oa_api *a, oa_op *o,
             v = headers ? hv_fetch(headers, lc, (I32)nl, 0) : NULL;
         }
         if (v && *v && SvOK(*v)) {
-            if (!oa_check(aTHX_ pp->handle, *v, errs, "header", pp->name)) ok = 0;
+            if (!oa_check_param(aTHX_ pp, *v, errs, "header")) ok = 0;
             else (void)hv_store(oh, np, (I32)nl, newSVsv(*v), 0);
         } else if (pp->required) {
             ok = 0;
@@ -284,7 +313,7 @@ static int oa_validate_op(pTHX_ oa_api *a, oa_op *o,
             STRLEN nl; const char *np = SvPV_const(pp->name, nl);
             SV **v = jar ? hv_fetch(jar, np, (I32)nl, 0) : NULL;
             if (v && *v && SvOK(*v)) {
-                if (!oa_check(aTHX_ pp->handle, *v, errs, "cookie", pp->name)) ok = 0;
+                if (!oa_check_param(aTHX_ pp, *v, errs, "cookie")) ok = 0;
                 else (void)hv_store(oc, np, (I32)nl, newSVsv(*v), 0);
             } else if (pp->required) {
                 ok = 0;

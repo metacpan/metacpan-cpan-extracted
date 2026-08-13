@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::TokenRequestSpec;
 # ABSTRACT: TokenRequestSpec contains client provided parameters of a token request.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s audiences => [Str], 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Authentication::V1::TokenRequestSpec - TokenRequestSpec contains c
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 audiences
 
@@ -47,10 +47,6 @@ ExpirationSeconds is the requested duration of validity of the request. The toke
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -61,7 +57,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

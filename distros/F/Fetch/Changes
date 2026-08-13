@@ -1,5 +1,9 @@
 Revision history for Fetch
 
+0.12    2026-08-12
+        - A keep-alive connection the server closes at the moment it is reused
+          no longer fails the request. 
+
 0.11    Date/time
         - $ua->clone(%overrides): another agent over this one's connection
           pool and loop, with the named options replaced. The case it exists

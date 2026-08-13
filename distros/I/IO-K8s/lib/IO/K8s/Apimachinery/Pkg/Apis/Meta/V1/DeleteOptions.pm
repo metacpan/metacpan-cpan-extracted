@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::DeleteOptions;
 # ABSTRACT: DeleteOptions may be provided when deleting an API object.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -10,6 +10,9 @@ k8s dryRun => [Str];
 
 
 k8s gracePeriodSeconds => Int;
+
+
+k8s ignoreStoreReadErrorWithClusterBreakingPotential => Bool;
 
 
 k8s kind => Str;
@@ -38,7 +41,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::DeleteOptions - DeleteOptions may be
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 apiVersion
 
@@ -51,6 +54,10 @@ When present, indicates that modifications should not be persisted. An invalid o
 =head2 gracePeriodSeconds
 
 The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.
+
+=head2 ignoreStoreReadErrorWithClusterBreakingPotential
+
+if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it
 
 =head2 kind
 
@@ -75,10 +82,6 @@ Whether and how garbage collection will be performed. Either this field or Orpha
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -89,7 +92,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

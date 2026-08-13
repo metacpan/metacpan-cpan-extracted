@@ -6,10 +6,11 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef', 'lexical_subs';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use CXC::Astro::Regions::CFITSIO::Types qw(
   Angle
+  ColumnName
   Tuple
   Length
   NonEmptyStr
@@ -32,7 +33,7 @@ use namespace::clean;
 use parent 'Exporter::Tiny';
 
 my sub pkgpath ( @paths ) {
-    join q{::}, __PACKAGE__, map { ucfirst( $_ ) } @paths;
+    join q{::}, __PACKAGE__, map { ucfirst } @paths;
 }
 
 my sub args ( @args ) {
@@ -48,6 +49,9 @@ my sub VERTEX     { { name => undef,      isa => Vertex,      args( @_ ) } }
 my sub VERTICES   { { name => 'vertices', isa => ArrayRef [Vertex], args( @_ ) } }
 my sub XPOS       { { name => undef,      isa => XPosition, args( @_ ) } }
 my sub YPOS       { { name => undef,      isa => YPosition, args( @_ ) } }
+my sub COLUMNPAIR {
+    { name => 'columns', isa => Tuple [ ColumnName, ColumnName ], required => 0, args( @_ ) };
+}
 
 use Package::Stash;
 our @EXPORT_OK = ( 'mkregion' );
@@ -99,10 +103,21 @@ REGION annulus => (
 
 
 
-# Box           ( Xc, Yc, Wdth, Hght, A )   V within the region
+
+
+
+
+
+
+
+
+
+# Box           ( Xc, Yc, Wdth, Hght, A )
+# Box           ( Xc, Yc, Wdth, Hght, A, Xcolumn, Ycolumn )
 REGION box => (
     name   => 'box',
-    params => [ VERTEX( 'center' ), LENGTH( 'width' ), LENGTH( 'height' ), ANGLE( default => 0 ) ],
+    params =>
+      [ VERTEX( 'center' ), LENGTH( 'width' ), LENGTH( 'height' ), ANGLE( default => 0 ), COLUMNPAIR, ],
 );
 
 
@@ -111,8 +126,15 @@ REGION box => (
 
 
 
+
+
+
+
+
+
 # Circle        ( Xc, Yc, R )
-REGION circle => ( params => [ VERTEX( 'center' ), LENGTH( 'radius' ) ], );
+# Circle        ( Xc, Yc, R, Xcolumn, Ycolumn )
+REGION circle => ( params => [ VERTEX( 'center' ), LENGTH( 'radius' ), COLUMNPAIR ], );
 
 
 
@@ -136,9 +158,19 @@ REGION diamond =>
 
 
 
+
+
+
+
+
+
+
+
+
 # Ellipse       ( Xc, Yc, Rx, Ry, A )
+# Ellipse       ( Xc, Yc, Rx, Ry, A, Xcolumn, Ycolumn )
 REGION ellipse =>
-  ( params => [ VERTEX( 'center' ), LENGTHPAIR( 'radii' ), ANGLE( default => 0 ) ], );
+  ( params => [ VERTEX( 'center' ), LENGTHPAIR( 'radii' ), ANGLE( default => 0 ), COLUMNPAIR, ], );
 
 
 
@@ -249,6 +281,7 @@ __END__
 =pod
 
 =for :stopwords Diab Jerius Smithsonian Astrophysical Observatory mkregion elliptannulus
+regfilter
 
 =head1 NAME
 
@@ -256,7 +289,7 @@ CXC::Astro::Regions::CFITSIO - CFITSIO Compatible Regions
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -339,15 +372,30 @@ represents a single annulus.
 
 =head2 box
 
+For use in a file loaded by the B<regfilter> row filter function:
+
   $region = box( center => [ <x>, <y> ],
                  width  => <length>, height => <length>,
+                 ?angle => <angle> );
+
+For use directly as a row filter function:
+
+  $region = box( center => [ <x>, <y> ],
+                 width  => <length>, height => <length>,
+                 columns => [ <xcol>, <ycol> ],
                  ?angle => <angle> );
 
 This returns an instance of B<CXC::Astro::Regions::CFITSIO::Box>.
 
 =head2 circle
 
+For use in a file loaded by the B<regfilter> row filter function:
+
   $region = circle( center => [ <x>, <y> ], radius => <length> );
+
+For use directly as a row filter function:
+
+  $region = circle( center => [ <x>, <y> ], radius => <length>, columns => [ <xcol>, <ycol> ] );
 
 =head2 diamond
 
@@ -357,8 +405,17 @@ This returns an instance of B<CXC::Astro::Regions::CFITSIO::Box>.
 
 =head2 ellipse
 
+For use in a file loaded by the B<regfilter> row filter function:
+
   $region = ellipse( center => [ <x>, <y> ],
                      radii  => [ <xradius>, <yradius>],
+                     ?angle => <angle> );
+
+For use directly as a row filter function:
+
+  $region = ellipse( center => [ <x>, <y> ],
+                     radii  => [ <xradius>, <yradius>],
+                     columns => [ <xcol>, <ycol> ],
                      ?angle => <angle> );
 
 This returns an instance of B<CXC::Astro::Regions::CFITSIO::Ellipse>.
@@ -432,11 +489,11 @@ Please report any bugs or feature requests to bug-cxc-astro-regions@rt.cpan.org 
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-astro-regions
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-astro-regions.git
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions.git
 
 =head1 SEE ALSO
 

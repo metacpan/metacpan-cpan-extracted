@@ -1,5 +1,9 @@
 Revision history for Context::Singleton
 
+v1.0.8     2026-08-12 19:07 UTC
+
+    Fix issue when frame calling depth was change
+
 v1.0.7     2026-08-12 07:08 UTC
 
     Move Context::Singleton's implementation into Context::Singleton::Frame

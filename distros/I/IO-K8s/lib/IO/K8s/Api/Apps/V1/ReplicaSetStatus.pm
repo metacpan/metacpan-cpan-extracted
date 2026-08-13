@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::ReplicaSetStatus;
 # ABSTRACT: ReplicaSetStatus represents the current status of a ReplicaSet.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s availableReplicas => Int;
@@ -38,7 +38,7 @@ IO::K8s::Api::Apps::V1::ReplicaSetStatus - ReplicaSetStatus represents the curre
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 availableReplicas
 
@@ -77,10 +77,6 @@ This is a beta field. It is only populated by servers that enable the Deployment
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -91,7 +87,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

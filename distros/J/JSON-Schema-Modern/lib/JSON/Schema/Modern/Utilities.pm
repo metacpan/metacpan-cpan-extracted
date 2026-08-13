@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.642';
+our $VERSION = '0.644';
 
 use 5.020;
 use strictures 2;
@@ -29,6 +29,7 @@ use Clone 'clone';
 use Feature::Compat::Try;
 use Mojo::JSON ();
 use Mojo::JSON::Pointer ();
+use Mojo::Util 'url_escape';
 use JSON::PP ();
 use Types::Standard qw(Str InstanceOf Enum);
 use Mojo::File 'path';
@@ -44,6 +45,7 @@ our @EXPORT_OK = qw(
   is_bignum
   is_equal
   is_elements_unique
+  canonicalize_uri
   jsonp
   unjsonp
   jsonp_get
@@ -316,6 +318,12 @@ sub is_elements_unique ($array, $state = {}) {
     }
   }
   return 1;
+}
+
+# given a URI to a schema resource, return the canonical form of this URI
+sub canonicalize_uri ($evaluator, $uri) {
+  my $schema_resource = $evaluator->_fetch_from_uri($uri);
+  return $schema_resource ? $schema_resource->{canonical_uri} : undef;
 }
 
 # shorthand for creating and appending json pointers
@@ -591,13 +599,25 @@ sub core_formats_type () {
         }
       },
       encode => sub ($content_ref, @) {
-        if (ref $content_ref->$* eq 'ARRAY') {
-          \ Mojo::Parameters->new->charset('UTF-8')
-            ->parse(map %$_, $content_ref->$*->@*)->to_string;
+        # WHATWG §1.3: "The application/x-www-form-urlencoded percent-encode set contains all code
+        # points, except the ASCII alphanumeric, U+002A (*), U+002D (-), U+002E (.), and U+005F
+        # (_)."
+        state sub escape ($str) {
+          url_escape(Encode::encode('UTF-8', $str, Encode::DIE_ON_ERR), '^A-Za-z0-9*\-._');
         }
-        elsif (ref $content_ref->$* eq 'HASH') {
-          \ Mojo::Parameters->new->charset('UTF-8')
-            ->parse(map +($_ => $content_ref->$*->{$_}), sort keys $content_ref->$*->%*)->to_string;
+
+        if (ref $content_ref->$* eq 'ARRAY') {    # arrayref of hashref tuples
+          \ join '&', map +(join '=', (map +(escape $_), %$_)), $content_ref->$*->@*;
+        }
+        elsif (ref $content_ref->$* eq 'HASH') {  # hashref of strings or arrayref of strings
+          \ join '&',
+            map do {
+              my ($k, $ek) = ($_, escape($_));
+              ref $content_ref->$*->{$k} eq 'ARRAY'
+                ? (map +($ek.'='.escape($_)), $content_ref->$*->{$k}->@*)
+                : $ek.'='.escape($content_ref->$*->{$k})
+            },
+            sort keys $content_ref->$*->%*;
         }
         else {
           die 'unrecognized data type: ', ref $content_ref->$*;
@@ -613,12 +633,10 @@ sub core_formats_type () {
       decode => sub ($content_ref, @) {
         my $decoder = _JSON_BACKEND->new->allow_nonref(1)->utf8(1);
         my $line = 0; # line numbers start at 1
-        \[ map {
-            do {
-              try { ++$line; $decoder->decode($_) }
-              catch ($e) { croak 'parse error at line '.$line.': '.$e }
-            }
-          }
+        \[ map do {
+            try { ++$line; $decoder->decode($_) }
+            catch ($e) { croak 'parse error at line '.$line.': '.$e }
+          },
           split(/\r?\n/, $content_ref->$*)
         ];
       },
@@ -991,7 +1009,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.642
+version 0.644
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -1092,6 +1110,13 @@ The optional second argument hashref supports the same options as L</is_equal>, 
 C<equal_indices> (populated by function): if result is false, the list of indices of the (first set of) equal items found.
 
 =back
+
+=head2 canonicalize_uri
+
+  # "https://example.com/schema#/$defs/thing"
+  my $uri = canonicalize_uri($evaluator, "https://example.com/schema#my_anchor_to_thing");
+
+Given a URI to a schema resource, returns the canonical form of this URI.
 
 =head2 jsonp
 

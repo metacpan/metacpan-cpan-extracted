@@ -6,7 +6,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef', 'lexical_subs';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 package CXC::Astro::Regions::DS9::Role::Region {
     use Moo::Role;
@@ -45,7 +45,7 @@ my sub croak {
 }
 
 my sub pkgpath ( @paths ) {
-    join q{::}, __PACKAGE__, map { ucfirst( $_ ) } @paths;
+    join q{::}, __PACKAGE__, map { ucfirst } @paths;
 }
 
 my sub args ( @args ) {
@@ -662,7 +662,7 @@ CXC::Astro::Regions::DS9 - DS9 Compatible Regions
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -1096,11 +1096,11 @@ Please report any bugs or feature requests to bug-cxc-astro-regions@rt.cpan.org 
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-astro-regions
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-astro-regions.git
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions.git
 
 =head1 SEE ALSO
 

@@ -1,7 +1,7 @@
 package Data::Reservoir::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::Reservoir::Shared', $VERSION);
 
@@ -93,10 +93,11 @@ mode in the header, so a reopened segment stays weighted.
 C<$k> is the reservoir size (the number of items to retain, at least 1).
 C<$item_size> is the maximum bytes stored per item (default 256; items are
 truncated to it). C<new> and C<new_memfd> croak on a size below 1 or an
-out-of-range C<$item_size>. When reopening an existing file or memfd the stored
-geometry wins and the caller's arguments are ignored. An optional file B<mode>
-may be passed as the last argument to C<new> (e.g. C<0660>) for cross-user
-sharing; it defaults to C<0600> (owner-only).
+out-of-range C<$item_size>. When reopening an existing file or memfd the
+stored geometry wins and the caller's arguments do not resize it -- but they
+are still range-checked, so an out-of-range value croaks. An optional file
+B<mode> may be passed as the last argument to C<new> (e.g. C<0660>) for
+cross-user sharing; it defaults to C<0600> (owner-only).
 
 =head2 Sampling
 
@@ -113,11 +114,11 @@ B<0 if it was discarded>. On a B<weighted> reservoir C<add> takes a second
 argument, the item's weight (a finite number greater than zero -- a missing,
 zero, negative, infinite, or NaN weight croaks). C<add_many> feeds an array
 reference under a single write lock, returning how many of the batch were
-stored (an item that replaces an earlier sample counts as stored; use
-C<count> for the number currently retained); for a weighted reservoir each
-element must be an C<< [$item, $weight] >> pair. C<sample> returns the retained items as a list
-(order is not meaningful); C<get> returns a single retained item by index.
-C<clear> empties the reservoir and resets the seen counter.
+stored (an item that replaces an earlier sample counts as stored; use C<count>
+for the number currently retained); for a weighted reservoir each element must
+be an C<< [$item, $weight] >> pair. C<sample> returns the retained items as a
+list (order is not meaningful); C<get> returns a single retained item by
+index. C<clear> empties the reservoir and resets the seen counter.
 
 =head2 Introspection and RNG
 
@@ -144,11 +145,13 @@ anonymous, memfd, or fd-reopened reservoirs) and C<memfd> the backing descriptor
 
 =head1 SHARING ACROSS PROCESSES
 
-The reservoir lives in a shared mapping, shared the same three ways as the rest
-of the family: a B<backing file>, an B<anonymous mapping inherited across
-C<fork>>, or a B<memfd> passed to an unrelated process and reopened with
-C<< new_from_fd($fd) >>. Every process's C<add> feeds the one shared reservoir,
-and the shared RNG keeps the sampling probabilities consistent across producers.
+The reservoir lives in a shared mapping, shared the same three ways as the
+rest of the family: a B<backing file>, an B<anonymous mapping inherited across
+C<fork>>, or a B<memfd> passed to an unrelated process and reopened with C<<
+new_from_fd($fd) >>. The descriptor you pass is duplicated
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the handle. Every process's C<add> feeds the one shared reservoir, and
+the shared RNG keeps the sampling probabilities consistent across producers.
 
 =head1 SECURITY
 
@@ -176,6 +179,18 @@ reclaim it and writers may block until the mapping is recreated. Reaching this
 needs more than 1024 concurrent reader processes on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete reservoir file
+left by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

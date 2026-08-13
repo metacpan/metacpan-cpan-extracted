@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib "t/lib";
 use Test::More;
+use HMTest qw(free_ports);
 use IO::Socket::INET;
 use Time::HiRes ();
 use Hyperman;
@@ -11,7 +13,8 @@ use Hyperman;
 # does not close it - and then drives it itself through the worker loop,
 # while the worker keeps serving ordinary HTTP on other connections.
 
-my $port = 24900 + ($$ % 400);
+my ($port) = free_ports(1);
+plan skip_all => "no free loopback port" unless $port;
 
 my $pid = fork // die "fork: $!";
 if (!$pid) {

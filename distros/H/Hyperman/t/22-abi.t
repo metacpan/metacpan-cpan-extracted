@@ -27,8 +27,11 @@ is(Hyperman::_abi_selftest(), 1,
 # The table only ever grows at the tail, so a consumer compiled against an
 # older header keeps working: existing entries never move. The selftest
 # above also exercises the v2 conn_detach entry's rejection path (a ticket
-# naming no connection); t/23-detach.t covers the success path live.
-is(Hyperman::_abi_version(), 2, 'ABI version 2 (v2 added conn_detach)');
+# naming no connection); t/23-detach.t covers the success path live. It also
+# drives the v3 abuse controls (deny_check/add/remove and a fixed-window
+# ratelimit_hit) against the shared arena.
+is(Hyperman::_abi_version(), 3,
+   'ABI version 3 (v2 conn_detach, v3 denylist + rate limit)');
 
 # Provider config: ExtUtils::Depends wrote Hyperman::Install::Files with an
 # include path, so a dependent's ExtUtils::Depends->new(..., 'Hyperman')

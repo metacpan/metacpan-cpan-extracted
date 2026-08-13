@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::ValidationRule;
 # ABSTRACT: ValidationRule describes a validation rule written in the CEL expression language.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s fieldPath => Str;
@@ -35,7 +35,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::ValidationRule - 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 fieldPath
 
@@ -68,10 +68,6 @@ Rule represents the expression which will be evaluated by CEL. ref: https://gith
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -82,7 +78,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

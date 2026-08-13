@@ -5,7 +5,7 @@ package CXC::Astro::Regions::DS9::Types;
 use v5.20;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use CXC::Types::Astro::Coords 'Sexagesimal';
 
@@ -99,7 +99,7 @@ CXC::Astro::Regions::DS9::Types - Types for DS9 Regions
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SUPPORT
 
@@ -111,11 +111,11 @@ Please report any bugs or feature requests to bug-cxc-astro-regions@rt.cpan.org 
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-astro-regions
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-astro-regions.git
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions.git
 
 =head1 SEE ALSO
 

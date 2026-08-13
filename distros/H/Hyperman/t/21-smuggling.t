@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib "t/lib";
 use Test::More;
+use HMTest qw(free_ports);
 use IO::Socket::INET;
 use Time::HiRes ();
 use Hyperman;
@@ -13,7 +15,8 @@ use Hyperman;
 # A well-formed request with one valid Content-Length is served normally, and
 # no smuggled second request leaks through on the same connection.
 
-my $port = 24500 + ($$ % 400);
+my ($port) = free_ports(1);
+plan skip_all => "no free loopback port" unless $port;
 
 my $pid = fork // die "fork: $!";
 if (!$pid) {

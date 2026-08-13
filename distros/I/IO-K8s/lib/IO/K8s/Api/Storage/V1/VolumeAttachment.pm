@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::VolumeAttachment;
 # ABSTRACT: VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node. VolumeAttachment objects are non-namespaced.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Storage::V1::VolumeAttachment - VolumeAttachment captures the inte
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ status represents status of the VolumeAttachment request. Populated by the entit
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumeattachment-v1-storage.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#volumeattachment-v1-storage.k8s.io>
 
 =head1 SUPPORT
 
@@ -52,10 +52,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumeatt
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -67,7 +63,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

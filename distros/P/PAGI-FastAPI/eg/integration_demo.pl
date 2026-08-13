@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.36;
+use v5.38;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Future::AsyncAwait;

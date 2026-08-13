@@ -175,11 +175,6 @@ static inline void st_rwlock_spin_pause(void) {
 #define ST_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define ST_RWLOCK_WR(pid)    (ST_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & ST_RWLOCK_PID_MASK))
 
-/* Liveness via kill(pid,0).  Cannot detect PID reuse: if a dead lock-holder's
- * PID is recycled to a live process before recovery runs, this reports
- * "alive" and that slot's rdepth is not reclaimed until the recycled process
- * exits (robust detection needs a per-slot start-time epoch, a header-layout
- * change).  Documented under "Crash Safety" in the POD. */
 /* A zombie (dead, unreaped) still answers kill(pid,0) as alive, so a crashed
  * lock-holder that lingers unreaped would never be recovered.  Treat
  * /proc/<pid>/stat state 'Z' as dead.  Linux-only; if /proc is unreadable,
@@ -198,6 +193,9 @@ static inline int st_pid_is_zombie(uint32_t pid) {
     if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
     return rp[1] == ' ' && rp[2] == 'Z';
 }
+/* 1 if alive or unknown, 0 if definitely dead.  Cannot detect PID reuse: a
+ * recycled PID reports "alive" and the slot is not reclaimed until that
+ * process exits.  See "Crash Safety" in the POD. */
 static inline int st_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
@@ -291,7 +289,7 @@ static inline void st_claim_reader_slot(StHandle *h) {
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            st_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            st_occ_set(h, i);
             h->my_slot_idx = i;
             return;
         }
@@ -535,13 +533,17 @@ static inline void st_init_header(void *base, uint64_t n, uint64_t size, uint64_
        positions read as 0.  Padding leaves (n..size-1) stay 0 too and are
        never queried (queries clamp to [0, n-1]), so they never surface. */
     memset(base, 0, (size_t)L.total);
-    hdr->magic            = ST_MAGIC;
     hdr->version          = ST_VERSION;
     hdr->n                = n;
     hdr->size             = size;
     hdr->nodes_off        = L.nodes;
     hdr->total_size       = total;
     hdr->reader_slots_off = L.reader_slots;
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, ST_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -645,6 +647,16 @@ static int st_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int st_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static StHandle *st_create(const char *path, uint64_t n, mode_t mode, char *errbuf) {
     if (!st_validate_args(n, errbuf)) return NULL;
 
@@ -682,6 +694,27 @@ static StHandle *st_create(const char *path, uint64_t n, mode_t mode, char *errb
         if (base == MAP_FAILED) { ST_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!st_validate_header((StHeader *)base, (uint64_t)st.st_size)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((StHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && st_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        ST_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    st_init_header(base, n, size, total);
+                    flock(fd, LOCK_UN); close(fd);
+                    return st_setup(base, map_size, path, -1, errbuf);
+                }
+                if (((StHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    ST_ERR("%s: incomplete segment-tree file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 ST_ERR("invalid segment-tree file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);

@@ -10,6 +10,7 @@
         croak("Expected a Data::Reservoir::Shared object"); \
     RsvHandle *h = INT2PTR(RsvHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::Reservoir::Shared object"); \
+    RsvHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* The pin above only blocks REFCOUNT-driven destruction. Perl run from argument
@@ -23,7 +24,7 @@
     if (!SvROK(sv)) \
         croak("Data::Reservoir::Shared object was replaced during the call"); \
     h = INT2PTR(RsvHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::Reservoir::Shared object destroyed during the call")
+    if (h != h0) croak("Data::Reservoir::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -53,7 +54,7 @@ new(class, path = &PL_sv_undef, ...)
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     RsvHandle *hh = rsv_create(p, (uint64_t)k, (uint64_t)item_size, RSV_MODE_UNIFORM, mode, errbuf);
-    if (!hh) croak("Data::Reservoir::Shared->new: %s", errbuf);
+    if (!hh) croak("Data::Reservoir::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, hh);
   OUTPUT:
     RETVAL
@@ -72,7 +73,7 @@ new_memfd(class, name = &PL_sv_undef, ...)
     const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
     if (k < 1) croak("Data::Reservoir::Shared->new_memfd: reservoir size (k) must be >= 1");
     RsvHandle *hh = rsv_create_memfd(nm, (uint64_t)k, (uint64_t)item_size, RSV_MODE_UNIFORM, errbuf);
-    if (!hh) croak("Data::Reservoir::Shared->new_memfd: %s", errbuf);
+    if (!hh) croak("Data::Reservoir::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, hh);
   OUTPUT:
     RETVAL
@@ -127,7 +128,7 @@ new_from_fd(class, fd)
     char errbuf[RSV_ERR_BUFLEN];
   CODE:
     RsvHandle *hh = rsv_open_fd(fd, errbuf);
-    if (!hh) croak("Data::Reservoir::Shared->new_from_fd: %s", errbuf);
+    if (!hh) croak("Data::Reservoir::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, hh);
   OUTPUT:
     RETVAL
@@ -465,7 +466,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::Reservoir::Shared")) {
         RsvHandle *h = INT2PTR(RsvHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::Reservoir::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::Reservoir::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

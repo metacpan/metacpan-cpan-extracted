@@ -1,5 +1,9 @@
 Revision history for Perl extension EV::Redis
 
+0.14 2026-08-12
+     - Update bundled hiredis to v1.4.1 (security release: stack
+       overflow on deeply nested replies, map element count overflow)
+
 0.13 2026-07-22
      - Fix multiple use-after-free/double-free windows around deferred
        disconnects, failed connects, and destruction (drain-context

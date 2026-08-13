@@ -1,5 +1,15 @@
 Revision history for Open-API
 
+0.09    2026-08-12
+        - OpenAPI 3.0 documents are now accepted. A 3.1 Schema Object is
+          JSON Schema 2020-12, which is what JSON::Schema::Fast validates;
+          a 3.0 one is a different dialect, so a 3.0 document is rewritten
+          into 3.1 shape once at load (include/oa_upconvert.h) before
+          anything else sees it.
+        - Because the conversion happens at document level rather than at
+          schema-compile time, ->spec, the mock generator and the docs UI
+          all see one dialect 
+
 0.08    2026-08-09
         - Response synthesis: $api->synthesize
           builds a PSGI triplet for an operation from the document alone,

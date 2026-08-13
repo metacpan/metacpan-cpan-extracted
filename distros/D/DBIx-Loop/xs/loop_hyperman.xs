@@ -19,8 +19,9 @@ new(class, ...)
         const char *cls = (SvROK(class) && SvOBJECT(SvRV(class)))
                         ? HvNAME(SvSTASH(SvRV(class))) : SvPV_nolen(class);
         if (!A)
-            croak("DBIx::Loop::Loop::Hyperman: Hyperman is not loaded (or "
-                  "its C ABI is older than %d) - use Hyperman first",
+            croak("DBIx::Loop::Loop::Hyperman: no Hyperman C ABI version %d - "
+                  "either Hyperman is not loaded (use Hyperman first) or it "
+                  "predates the ABI (needs Hyperman 0.10 or newer)",
                   HM_ABI_VERSION);
         for (i = 1; i + 1 < items; i += 2) {
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);

@@ -1,5 +1,9 @@
 Revision history for Template-Stencil
 
+0.05    2026-08-12
+        - Require perl 5.10.1.
+        - _abi_ptr returns a UV rather than an IV.
+
 0.04    2026-08-08
         - cpuid.h is now included only on gcc 4.3+ or clang; FreeBSD 9's
           base gcc 4.2.1 defines __GNUC__ without shipping the header, so

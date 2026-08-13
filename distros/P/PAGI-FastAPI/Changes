@@ -1,5 +1,83 @@
 Revision history for PAGI::FastAPI
 
+1.0.0  2026-08-12
+       [FEATURE]
+       - Refactored core framework to modern Perl syntax: use experimental 'class'.
+       - Added PAGI::FastAPI::RateLimit::Driver abstract async base class
+         for pluggable rate-limiting storage drivers.
+       - Added PAGI::FastAPI::RateLimit::Driver::Memory as the built-in,
+          default in-memory storage driver.
+       - Added PAGI::FastAPI::Middleware::RateLimit to support app-level
+         and route-level rate limiting using a fixed time-window counter.
+       - Added PAGI::FastAPI::BotProtection::ProofOfWork for stateless
+         cryptographic bot mitigation.
+       - Added PAGI::FastAPI::Middleware::BotProtection middleware to
+         automatically enforce challenge/response flow on unauthenticated
+         requests.
+       - Added $app->add_bot_protection() helper method to PAGI::FastAPI.
+       - Added PAGI::FastAPI::Response::SSE to support production-grade
+         Server-Sent Events (SSE) streaming via PAGI::SSE.
+       - Added $c->sse() context helper method for simplified SSE stream
+         creation with support for keepalives, custom headers, and auto-JSON
+         serialisation.
+       - Added $c->sse() helper method to PAGI::FastAPI::Context for
+         Server-Sent Events support.
+       - Added $c->sleep() non-blocking sleep utility method using Future::IO.
+       - Added PAGI::FastAPI::Response base class to standardise HTTP
+         response handling across HTML, SSE, and JSON handlers.
+       - Improved route response dispatcher in PAGI::FastAPI to correctly
+         route streaming responses (can('dispatch')) and response objects
+         without triggering JSON serialization errors.
+       - Added stringification overload fallback for response classes.
+       - Added enable_csrf(), to_pagi() to PAGI::FastAPI.
+       - Added csrf_token(), csrf_verify(), pagi_context() to PAGI::FastAPI::Context.
+
+       [DOCUMENTATION]
+       - Updated POD for core classes and added comprehensive POD for:
+         PAGI::FastAPI::RateLimit::Driver,
+         PAGI::FastAPI::RateLimit::Driver::Memory,
+         PAGI::FastAPI::Middleware::RateLimit,
+         PAGI::FastAPI::BotProtection,
+         PAGI::FastAPI::BotProtection::ProofOfWork,
+         PAGI::FastAPI::Middleware::BotProtection,
+         PAGI::FastAPI::Response,
+         PAGI::FastAPI::Response::HTML and
+         PAGI::FastAPI::Response::SSE.
+
+       [TESTS]
+       - Added integration tests for rate limiting: t/12-rate_limit.t.
+       - Added comprehensive unit test suite: t/13-bot_protection.t.
+       - Added test suite for PAGI::SSE: t/14-sse_streaming.t
+       - Added test for HTML response: t/15-html_response.t
+       - Added test for CSRF: t/16-middleware_csrf.
+       - Added t/17-enable_csrf_app_secret.t covering the app-level secret
+         fallback fix, the call-level override, and the "no secret
+         anywhere" error path.
+       - Added t/18-context_extras.t covering PAGI::FastAPI::Context's
+         param(), csrf_token(), csrf_verify(), html(), sse(), and sleep(),
+         none of which had any prior test coverage.
+       - Added t/19-ratelimit_driver_memory.t: direct unit tests for
+         PAGI::FastAPI::RateLimit::Driver::Memory, including a regression
+         test for the increment_async() two-value contract.
+       - Added t/20-bot_protection_ipv6.t: regression tests for the IPv6
+         delimiter fix and the difficulty=0 edge case.
+       - Added t/21-depends.t covering PAGI::FastAPI::Depends, including
+         the previously-untested ADJUST non-CODE-reference guard.
+
+       [EXAMPLES]
+       - Added working example of SSE: eg/sse_demo.pl
+       - Added working example of CSRF: eg/csrf_demo.pl
+
+       [PACKAGING]
+       - Corrected MIN_PERL_VERSION in Makefile.PL from 5.036 to 5.038000.
+         The `class`/`field`/`method`/`ADJUST` keywords used throughout lib/
+         (via `use experimental 'class'`) were only added to the Perl
+         interpreter in 5.38.0; they do not exist in 5.36, regardless of
+         the `use experimental` pragma. Every lib/*.pm now consistently
+         declares `use v5.38;` to match.
+       - Added TEST_REQUIRES entries: Test::Fatal and PAGI::Test::Client,
+         both of which the test suite already depended on without declaring.
+
 0.1.0  2026-08-10
        [BREAKING]
        - The add_cors function now utilizes PAGI::Middleware::CORS instead
@@ -16,7 +94,6 @@ Revision history for PAGI::FastAPI
          applied after mount()-ed sub-applications and static files are
          created. Thus, CORS will be applied throughout the application and
          not only to get/post/other functions like before.
-
        - New requirement: PAGI::Middleware::CORS >= 0.002002 (comes with the
          same PAGI::Tools package as PAGI::WebSocket, already in the list of
          prerequisites. Also, presented here explicitly as being directly

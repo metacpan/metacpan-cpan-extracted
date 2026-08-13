@@ -5,10 +5,11 @@ package CXC::Astro::Regions::CFITSIO::Types;
 use v5.20;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Types::Standard        qw( Enum Bool Num Str StrMatch );
 use Types::Common::Numeric qw( PositiveNum );
+use Types::Common::String  qw( NonEmptyStr );
 
 use Type::Utils -all;
 use Regexp::Common qw( number );
@@ -22,6 +23,7 @@ use Type::Library
   Vertex
   XPosition
   YPosition
+  ColumnName
   );
 
 use CXC::Types::Astro::Coords 'Sexagesimal';
@@ -37,6 +39,8 @@ declare Vertex,    as Tuple [ XPosition, YPosition ];
 declare Length, as StrMatch [qr/\A$RE{num}{real} (['"dp])?\z/x];
 
 declare Angle, as Num;
+
+declare ColumnName, as StrMatch [qr/^[[:alpha:]]\w*$/a];   # does FITS support unicode column names?
 
 1;
 
@@ -62,7 +66,7 @@ CXC::Astro::Regions::CFITSIO::Types - Types for CFITSIO Regions
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SUPPORT
 
@@ -74,11 +78,11 @@ Please report any bugs or feature requests to bug-cxc-astro-regions@rt.cpan.org 
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-astro-regions
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-astro-regions.git
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions.git
 
 =head1 SEE ALSO
 

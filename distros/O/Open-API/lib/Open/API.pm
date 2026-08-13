@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Open::API', $VERSION);
@@ -21,11 +21,11 @@ __END__
 
 =head1 NAME
 
-Open::API - OpenAPI 3.1 server and client
+Open::API - OpenAPI 3.0 and 3.1 server and client
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -52,8 +52,8 @@ Version 0.08
 
 =head1 DESCRIPTION
 
-C<Open::API> loads an OpenAPI 3.1 document once and compiles every parameter,
-header, cookie and body schema through L<JSON::Schema::Fast> at
+C<Open::API> loads an OpenAPI 3.0 or 3.1 document once and compiles every
+parameter, header, cookie and body schema through L<JSON::Schema::Fast> at
 startup. Each request is then routed and validated on a C hot path.
 
 The compiled object is the shared core of two consumers: L<Open::API::Plack>
@@ -63,9 +63,109 @@ client on L<Fetch>'s C ABI, so one document defines both sides of the wire.
 The L</match> and L</validate_request> methods below expose the router and
 validator directly for any other framework adapter.
 
-OpenAPI B<3.1 only>: 3.1 schemas are native JSON Schema 2020-12, which is what
-JSON::Schema::Fast validates. A document with any other C<openapi> version
-croaks at load.
+=head1 OPENAPI VERSIONS
+
+A 3.1 Schema Object B<is> JSON Schema 2020-12, which is what
+JSON::Schema::Fast validates, so a 3.1 document reaches the validator
+unchanged.
+
+A 3.0 Schema Object is a different dialect - an extended subset of JSON Schema
+Wright draft-00 - so a 3.0 document is rewritten into 3.1 shape once, at load,
+before anything else sees it. L</spec> then returns the normalised document,
+which means the validator, the mock generator, the docs UI and any consumer
+walking C<< $api->spec >> all deal in one schema dialect. Any other C<openapi>
+version, including Swagger 2.0, croaks at load.
+
+What the up-conversion does, per Schema Object:
+
+=over 4
+
+=item * C<nullable: true> widens C<type> into a union with C<"null">
+(C<< {type => 'string'} >> becomes C<< {type => ['string','null']} >>). With no
+C<type>, a C<nullable> C<enum> gains a null member; beside a C<$ref> the pair
+becomes C<< anyOf => [ {$ref}, {type => 'null'} ] >>, the idiom 3.1 uses.
+C<nullable: false> is simply dropped.
+
+=item * The boolean C<exclusiveMinimum> / C<exclusiveMaximum> fold into the
+numeric 2020-12 form: C<< {minimum => 5, exclusiveMinimum => true} >> becomes
+C<< {exclusiveMinimum => 5} >>. C<false>, or a C<true> with no bound to attach
+to, is dropped.
+
+=item * Tuple C<items> becomes C<prefixItems>, and C<additionalItems> becomes
+C<items>. (An array C<items> is not legal 3.0, but specs carry the draft-04
+habit and the intent is unambiguous.)
+
+=item * Schema-level C<example> becomes C<< examples => [ $value ] >>. A
+B<media type> C<example> is an Example Object, not a schema keyword, and is
+left alone.
+
+=item * C<format: byte> gains C<contentEncoding: base64> and C<format: binary>
+gains C<contentMediaType: application/octet-stream>. The C<format> stays too:
+it is inert to the validator, and the docs UI recognises either spelling.
+
+=item * Keywords beside a C<$ref> are ignored, as 3.0 requires. Annotations
+(C<description>, C<title>, C<default>, ...) ride along because they cannot
+change a verdict; assertions are dropped. Without this a request that a
+3.0-conformant gateway accepts could be rejected here.
+
+=back
+
+Values are never rewritten. C<example>, C<default> and C<enum> hold arbitrary
+user JSON that may itself contain a key called C<nullable> or C<items>, so the
+walk descends only through positions where a Schema Object can actually appear.
+
+The normalised document keeps its original C<openapi> string - a document
+should not lie about what it was - so the conversion is idempotent:
+C<< Open::API->new(spec => $api->spec) >> is a no-op. Use L</openapi_version>
+to tell the dialects apart.
+
+=head1 DISCRIMINATOR
+
+A C<discriminator> names the property whose value says which schema a payload
+really is. Both the forms OpenAPI defines are supported, in 3.0 and 3.1 alike:
+
+    # a discriminated union
+    PetUnion:
+      oneOf: [ {$ref: '#/components/schemas/Dog'},
+               {$ref: '#/components/schemas/Cat'} ]
+      discriminator:
+        propertyName: petType
+        mapping: { dog: Dog, cat: Cat }     # optional
+
+    # inheritance: the children are found by their allOf reference to the base
+    Pet:
+      type: object
+      required: [petType]
+      discriminator: { propertyName: petType }
+    Dog:
+      allOf: [ {$ref: '#/components/schemas/Pet'}, {...} ]
+
+Once a schema is compiled, L<JSON::Schema::Fast> owns the traversal, so the
+discriminator is expanded at load into the 2020-12 constructs that express it:
+a guard that the property is present and names a known branch, then one
+C<if>/C<then> per branch. The validator therefore needs to know nothing about
+OpenAPI, and the payload is weighed against the branch it named rather than
+against every branch at once - which is the point, because two branches a
+payload both satisfies make a bare C<oneOf> fail however clear the document
+was about which one was meant. It also means a failure reports the branch's own
+error (C<bark> is missing) instead of C<< failed 'oneOf' >>.
+
+A value with no mapping entry is rejected, as the specification requires: it
+fails the guard's C<enum> with the discriminator property as its
+C<instanceLocation>.
+
+Where a mapping is not given it is derived - from the branch C<$ref>s, or from
+the schemas that inherit from the base - and written back into the document, so
+C<< $api->spec >> always shows an explicit mapping. The generated subschemas
+carry an C<x-oa-discriminator> key: it marks them as derived rather than
+declared, and it is what lets a second pass rebuild them instead of appending
+to them.
+
+A discriminator with nothing to dispatch on - no mapping, no union, no
+children - stays an inert annotation.
+
+The mock generator honours the discriminator too, so a mocked union is a
+coherent member of it rather than a fold of all of them.
 
 =head1 CONSTRUCTOR
 
@@ -98,11 +198,40 @@ and C<default>-filling on. C<$ref>s to C<#/components/schemas/...> are
 resolved at compile time. A malformed document, a missing or duplicate
 operationId, or an unresolvable reference croaks here, at startup.
 
+A parameter may be declared with C<content> instead of C<schema>, which means
+it carries a whole document in one value:
+
+    - name: filter
+      in: query
+      content:
+        application/json:
+          schema: { type: object, properties: { field: {type: string} } }
+
+The value is decoded to its media type before its schema sees it, so
+C<?filter=%7B%22field%22%3A%22name%22%7D> is validated as the object it
+represents; a value that will not decode is a 400 rather than a silent pass.
+Such a parameter is compiled B<without> coercion - a decoded document already
+has the types the schema is talking about - and, being one document rather than
+a repeated key, an arrayref value is its content and not a list of values. A
+media type with no decoder is passed through unvalidated, exactly as an
+undeclared request body type is. L<Open::API::Client> encodes these the same
+way round: pass a structure and it travels as JSON.
+
 =head1 METHODS
 
 =head2 spec
 
-The decoded OpenAPI document.
+The decoded OpenAPI document, normalised: 3.1-shaped whatever version it
+declared, with any C<discriminator> expanded. See L</OPENAPI VERSIONS> and
+L</DISCRIMINATOR>.
+
+=head2 openapi_version
+
+    my $v = $api->openapi_version;   # '3.0.3' or '3.1.0'
+
+The C<openapi> version the document declares. A 3.0 document keeps its own
+version string after up-conversion, so this reports the dialect it was written
+in even though L</spec> is 3.1-shaped throughout.
 
 =head2 operations
 

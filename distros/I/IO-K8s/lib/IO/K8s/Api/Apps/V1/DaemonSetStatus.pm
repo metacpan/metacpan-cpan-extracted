@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::DaemonSetStatus;
 # ABSTRACT: DaemonSetStatus represents the current status of a daemon set.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s collisionCount => Int;
@@ -47,7 +47,7 @@ IO::K8s::Api::Apps::V1::DaemonSetStatus - DaemonSetStatus represents the current
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 collisionCount
 
@@ -96,10 +96,6 @@ The total number of nodes that are running updated daemon pod
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -110,7 +106,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

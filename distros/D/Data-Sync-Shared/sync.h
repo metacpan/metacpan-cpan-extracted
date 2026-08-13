@@ -385,8 +385,7 @@ static inline void sync_claim_reader_slot(SyncHandle *h) {
     /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
      * if its rdepth>0: clearing pid drops the dead reader's entire contribution
      * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
-     * old design) we need not skip dead slots that still show a read count. */
+     * claim it. */
     for (uint32_t i = 0; i < SYNC_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || sync_pid_alive(dpid)) continue;
@@ -394,7 +393,7 @@ static inline void sync_claim_reader_slot(SyncHandle *h) {
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            sync_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            sync_occ_set(h, i);
             h->my_slot_idx = i;
             return;
         }
@@ -1410,6 +1409,16 @@ static int sync_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int sync_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
                                 uint32_t initial, mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
@@ -1435,7 +1444,6 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
         }
         SyncHeader *hdr = (SyncHeader *)base;
         memset(hdr, 0, sizeof(SyncHeader));
-        hdr->magic            = SYNC_MAGIC;
         hdr->version          = SYNC_VERSION;
         hdr->type             = type;
         hdr->param            = param;
@@ -1444,6 +1452,11 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
         if (type == SYNC_TYPE_SEMAPHORE)
             hdr->value = initial;
         /* MAP_ANONYMOUS already zero-fills the reader_slots + occ region. */
+        /* Publish magic LAST, as a release store: it is the commit point, so
+           a creator killed before it leaves magic==0 and never a file
+           mistaken for a valid one.  A kill during the field stores leaves
+           one to remove by hand. */
+        __atomic_store_n(&hdr->magic, SYNC_MAGIC, __ATOMIC_RELEASE);
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
         goto setup_handle;
     } else {
@@ -1503,8 +1516,39 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
                     (uint64_t)st.st_size < need)
                     valid = 0;
             }
+            /* Recover an abandoned mid-init file: a creator killed between
+             * the ftruncate and the header init leaves a full-size, all-zero
+             * (magic==0) file that would brick every future open of this
+             * path.  Re-initialize ONLY when it is exactly our size, still
+             * uninitialized, and owned by us; anything else still errors. */
+            if (hdr->magic == 0 && (uint64_t)st.st_size == total_size
+                && st.st_uid == geteuid() && sync_region_is_zero(base, map_size)) {
+                if (fchmod(fd, mode) < 0) {
+                    SYNC_ERR("%s: fchmod: %s", path, strerror(errno));
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
+                hdr->version          = SYNC_VERSION;
+                hdr->type             = type;
+                hdr->param            = param;
+                hdr->total_size       = total_size;
+                hdr->reader_slots_off = slots_off;
+                if (type == SYNC_TYPE_SEMAPHORE)
+                    hdr->value = initial;
+                /* Publish magic LAST, as a release store: it is the commit
+                   point, so a creator killed before it leaves magic==0 and
+                   never a file mistaken for a valid one.  A kill during the
+                   field stores leaves one to remove by hand. */
+                __atomic_store_n(&hdr->magic, SYNC_MAGIC, __ATOMIC_RELEASE);
+                __atomic_thread_fence(__ATOMIC_SEQ_CST);
+                flock(fd, LOCK_UN); close(fd);
+                goto setup_handle;
+            }
             if (!valid) {
-                SYNC_ERR("%s: invalid or incompatible sync file", path);
+                if (hdr->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid())
+                    SYNC_ERR("%s: incomplete sync file left by an interrupted create; remove it and retry", path);
+                else
+                    SYNC_ERR("%s: invalid or incompatible sync file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN);
@@ -1514,7 +1558,6 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
 
         /* Initialize while holding the flock */
         memset(base, 0, (size_t)total_size);  /* zero header + reader_slots + occ region */
-        hdr->magic            = SYNC_MAGIC;
         hdr->version          = SYNC_VERSION;
         hdr->type             = type;
         hdr->param            = param;
@@ -1522,6 +1565,11 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
         hdr->reader_slots_off = slots_off;
         if (type == SYNC_TYPE_SEMAPHORE)
             hdr->value = initial;
+        /* Publish magic LAST, as a release store: it is the commit point, so
+           a creator killed before it leaves magic==0 and never a file
+           mistaken for a valid one.  A kill during the field stores leaves
+           one to remove by hand. */
+        __atomic_store_n(&hdr->magic, SYNC_MAGIC, __ATOMIC_RELEASE);
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
 
         flock(fd, LOCK_UN);
@@ -1602,7 +1650,6 @@ static SyncHandle *sync_create_memfd(const char *name, uint32_t type,
 
     SyncHeader *hdr = (SyncHeader *)base;
     memset(hdr, 0, (size_t)total_size);  /* zero header + reader_slots + occ region */
-    hdr->magic            = SYNC_MAGIC;
     hdr->version          = SYNC_VERSION;
     hdr->type             = type;
     hdr->param            = param;
@@ -1612,6 +1659,11 @@ static SyncHandle *sync_create_memfd(const char *name, uint32_t type,
     if (type == SYNC_TYPE_SEMAPHORE)
         hdr->value = initial;
 
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, SYNC_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 
     SyncHandle *h = (SyncHandle *)calloc(1, sizeof(SyncHandle));

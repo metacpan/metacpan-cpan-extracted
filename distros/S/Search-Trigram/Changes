@@ -1,5 +1,12 @@
 Revision history for Search-Trigram
 
+0.03  2026-08-12
+  - _abi_ptr returns a UV rather than an IV
+  - Build against perl 5.10.0 again: newSVpvn_flags only arrived in
+    5.10.1, so the extension linked and then died with "undefined
+    symbol: newSVpvn_flags" on the first search that returned a hit.
+    strigram_compat.h falls back to newSVpvn + SvUTF8_on below 5.10.1.
+
 0.02  2026-08-07
   - Add a shared C ABI, include/sg_abi.h
   - search writes into a caller-provided array rather than handing back

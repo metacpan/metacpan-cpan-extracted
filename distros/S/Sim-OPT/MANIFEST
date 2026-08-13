@@ -14,6 +14,7 @@ lib/Sim/OPT/Parcoord3d.pm
 lib/Sim/OPT/Modish.pm
 lib/Sim/OPT/Interlinear.pm
 lib/Sim/OPT/CalcMarginals.pm
+lib/Sim::OPT::ClusterMedoid.pm
 examples/optw.zip
 examples/useterm.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

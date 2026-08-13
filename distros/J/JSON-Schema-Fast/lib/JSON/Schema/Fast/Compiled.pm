@@ -3,7 +3,7 @@ package JSON::Schema::Fast::Compiled;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # A compiled schema: a blessed scalar holding the C arena IR pointer (the
 # ecosystem convention for C-backed objects). Its methods are defined in XS

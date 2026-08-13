@@ -49,7 +49,7 @@ default(self)
     CODE:
     {
         pv_views *v = pv_of(aTHX_ self);
-        RETVAL = v->deflt ? newSVsv(v->deflt) : &PL_sv_undef;
+        RETVAL = v->deflt ? newSVsv(v->deflt) : newSV(0);
     }
     OUTPUT:
         RETVAL
@@ -108,7 +108,7 @@ render(self, c, template, data = &PL_sv_undef, ...)
             PUTBACK;
             count = call_method("render", G_SCALAR);
             SPAGAIN;
-            bytes = count > 0 ? SvREFCNT_inc(POPs) : &PL_sv_undef;
+            bytes = count > 0 ? SvREFCNT_inc(POPs) : newSV(0);
             PUTBACK;
             FREETMPS; LEAVE;
         }

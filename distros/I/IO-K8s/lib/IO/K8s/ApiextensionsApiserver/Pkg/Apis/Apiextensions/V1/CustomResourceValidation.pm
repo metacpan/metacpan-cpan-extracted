@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceValidation;
 # ABSTRACT: CustomResourceValidation is a list of validation methods for CustomResources.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s openAPIV3Schema => 'Apiextensions::V1::JSONSchemaProps';
@@ -20,7 +20,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceVal
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 openAPIV3Schema
 
@@ -33,10 +33,6 @@ openAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -47,7 +43,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

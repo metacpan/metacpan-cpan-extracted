@@ -1,6 +1,6 @@
 package IO::K8s::Role::Resource;
 # ABSTRACT: Role providing Kubernetes resource instance behavior
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use v5.10;
 use Moo::Role;
 use JSON::MaybeXS ();
@@ -16,19 +16,81 @@ sub _build_json {
     return JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 }
 
-# Get attribute info from the global registry in IO::K8s::Resource
+# The registry lookup is the hot path (every inflate / TO_JSON), so the
+# merged views are cached per class. IO::K8s::Resource::_k8s() invalidates
+# the affected entries whenever it registers a new attribute.
+my %_attr_info_cache;
+my %_attributes_cache;
+
+# Get merged attribute info from the global registry in IO::K8s::Resource,
+# walking @ISA so a consumer subclass registered via class_namespaces sees
+# its parents' attributes. Nearest wins: a class's own entry for a name
+# beats any inherited one; @ISA order (depth-first, left to right) is
+# deterministic, so diamond shapes resolve to the first declarer.
 sub _k8s_attr_info {
     my ($class) = @_;
     $class = ref($class) if ref($class);
-    return $IO::K8s::Resource::_attr_registry{$class} // {};
+    return $_attr_info_cache{$class} //= _merged_attr_info($class);
 }
 
-# Get attribute list (stored as per-class package variable)
+sub _merged_attr_info {
+    my ($class) = @_;
+    my %info = %{ $IO::K8s::Resource::_attr_registry{$class} // {} };
+    no strict 'refs';
+    for my $parent (@{"${class}::ISA"}) {
+        my $parent_info = _merged_attr_info($parent);
+        for my $attr (keys %$parent_info) {
+            $info{$attr} //= $parent_info->{$attr};
+        }
+    }
+    return \%info;
+}
+
+# Get attribute list (stored as per-class package variables), merged with
+# ancestors as a UNION: a class's own declarations first, then each parent's
+# in @ISA order, deduplicated so an overridden name appears once.
 sub _k8s_attributes {
     my ($self) = @_;
     my $class = ref($self) || $self;
+    return $_attributes_cache{$class} //= _collect_attributes($class);
+}
+
+sub _collect_attributes {
+    my ($class) = @_;
+    my (@attrs, %seen);
+    _append_attributes($class, \@attrs, \%seen);
+    return \@attrs;
+}
+
+sub _append_attributes {
+    my ($class, $attrs, $seen) = @_;
     no strict 'refs';
-    return \@{"${class}::_k8s_attributes"};
+    for my $attr (@{"${class}::_k8s_attributes"}) {
+        next if $seen->{$attr}++;
+        push @$attrs, $attr;
+    }
+    for my $parent (@{"${class}::ISA"}) {
+        _append_attributes($parent, $attrs, $seen);
+    }
+}
+
+# Invalidate the merged-view caches for a class and every cached descendant
+# after IO::K8s::Resource::_k8s() registers a new attribute. The direct hit
+# covers the registering class; the descendant sweep covers a class whose
+# merged view was already computed before its parent gained the attribute
+# (the same subclass drift this module exists to fix).
+sub _invalidate_k8s_attr_cache {
+    my ($class) = @_;
+    delete $_attr_info_cache{$class};
+    delete $_attributes_cache{$class};
+    my %sweep;
+    @sweep{keys %_attr_info_cache, keys %_attributes_cache} = ();
+    for my $cached_class (keys %sweep) {
+        next if $cached_class eq $class;
+        next unless $cached_class->isa($class);
+        delete $_attr_info_cache{$cached_class};
+        delete $_attributes_cache{$cached_class};
+    }
 }
 
 sub TO_JSON {
@@ -69,6 +131,8 @@ sub TO_JSON {
             $data{$key} = { map { $_ => $value->{$_}->TO_JSON } keys %$value };
         } elsif ($attr_info->{is_array_of_int}) {
             $data{$key} = [ map { int($_) } @$value ];
+        } elsif ($attr_info->{is_array_of_bool}) {
+            $data{$key} = [ map { $_ ? JSON::MaybeXS::true : JSON::MaybeXS::false } @$value ];
         } elsif (ref $value eq 'ARRAY') {
             $data{$key} = $value;
         } elsif (ref $value eq 'HASH') {
@@ -117,7 +181,10 @@ sub compare_to_schema {
     my ($class, $schema) = @_;
     $class = ref($class) if ref($class);
 
-    my $local_attrs = $IO::K8s::Resource::_attr_registry{$class} // {};
+    # Use the merged @ISA view (same structure as the raw registry entry:
+    # json_key plus type flags) so a class_namespaces-style subclass sees its
+    # inherited attributes instead of an empty or partial registry entry.
+    my $local_attrs = _k8s_attr_info($class);
     my $schema_props = $schema->{properties} // {};
 
     # Build json_key -> attr_name mapping for lookup
@@ -177,6 +244,7 @@ sub _describe_local_type {
     return 'boolean'        if $info->{is_bool};
     return 'array<string>'  if $info->{is_array_of_str};
     return 'array<integer>' if $info->{is_array_of_int};
+    return 'array<boolean>' if $info->{is_array_of_bool};
     return 'array<object>'  if $info->{is_array_of_objects};
     return 'hash<string>'   if $info->{is_hash_of_str};
     return 'hash<object>'   if $info->{is_hash_of_objects};
@@ -229,7 +297,7 @@ IO::K8s::Role::Resource - Role providing Kubernetes resource instance behavior
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SUPPORT
 
@@ -237,10 +305,6 @@ version 1.105
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -252,7 +316,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

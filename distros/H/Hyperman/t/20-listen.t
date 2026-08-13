@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib "t/lib";
 use Test::More;
+use HMTest qw(free_ports);
 
 unless ( $ENV{HM_LISTEN_TESTS} ) {
     plan( skip_all => "multi-listener tests skipped; set HM_LISTEN_TESTS to run" );
@@ -15,8 +17,8 @@ use Hyperman;
 # https-redirect port, and (when OpenSSL is built) a TLS port beside a plain
 # one in the same server.
 
-my $base = 24000 + ($$ % 1000);
-my ($p1, $p2, $p3) = ($base, $base + 1, $base + 2);
+my ($p1, $p2, $p3) = free_ports(3);
+plan skip_all => "no free loopback ports" unless $p3;
 
 sub wait_up {
     my $port = shift;
@@ -102,7 +104,8 @@ SKIP: {
          . qq{-days 1 -subj "/CN=localhost" >/dev/null 2>&1});
     skip 'could not create self-signed cert', 3 unless -s $cert && -s $key;
 
-    my ($hp, $sp) = ($base + 10, $base + 11);
+    my ($hp, $sp) = free_ports(2);
+    skip 'no free loopback ports', 3 unless $sp;
     my $pid2 = fork // die "fork: $!";
     if (!$pid2) {
         open STDERR, '>', '/dev/null';

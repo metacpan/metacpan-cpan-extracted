@@ -1,6 +1,6 @@
 package IO::K8s::Api::Policy::V1::Eviction;
 # ABSTRACT: Eviction evicts a pod from its node subject to certain policies and safety constraints. This is a subresource of Pod.  A request to cause such an eviction is created by POSTing to .../pods/<pod name>/evictions.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Policy::V1::Eviction - Eviction evicts a pod from its node subject
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ DeleteOptions may be provided
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#eviction-v1-policy.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#eviction-v1-policy.k8s.io>
 
 =head1 SUPPORT
 
@@ -44,10 +44,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#eviction-
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -59,7 +55,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -114,4 +114,65 @@ subtest 'instantiation + add attributes' => sub {
     };
 };
 
+subtest 'floating point' => sub {
+
+    isa_ok(
+        my $Payments = $class->new,
+        $class,
+    );
+
+    $Payments->add_header_record( {
+        bpay_batch_user_id  => '123456',
+        customer_short_name => 'TEST CUSTOMER',
+        processing_date     => DateTime->new(
+            year  => 2007,
+            month => 4,
+            day   => 30,
+        ),
+    } );
+
+    my $i = 0;
+
+    # force some floating point issues with arithmetic
+    my $amount = 281.71;
+    $amount *= 100;
+
+    foreach my $payment (
+        [ qw/ 7773 083-004 035261665 13863530005 /,$amount ],
+    ) {
+        $i++;
+
+        $Payments->add_detail_record( {
+            biller_code               => $payment->[ 0 ],
+            payment_account_bsb       => $payment->[ 1 ],
+            payment_account_number    => $payment->[ 2 ],
+            customer_reference_number => $payment->[ 3 ],
+            amount                    => $payment->[ 4 ],
+            lodgement_reference_1     => "TransNo00$i",
+        } );
+    }
+
+    is( scalar( $Payments->detail_record->@* ), 1, '1 detail records added' );
+
+    # BPAY records are fixed 144-char lines terminated with CRLF; pad the
+    # meaningful prefix out to the record width rather than spelling out the
+    # trailing blanks.
+    my $line = sub { $_[0] . ( ' ' x ( 144 - length $_[0] ) ) . "\r\n" };
+    my $expected =
+        $line->( "1123456          TEST CUSTOMER       20070430" )
+        . $line->( "2000000777308300403526166513863530005         0000000028171TransNo001" )
+        . $line->( "900000000010000000028171" )
+    ;
+
+    subtest '->to_file (lacking trailer record)' => sub {
+        my $fh       = File::Temp->new;
+        my $tmp_file = $fh->filename;
+        $Payments->to_file( $tmp_file );
+
+        file_contents_eq_or_diff(
+            $tmp_file, $expected, "batch file content"
+        );
+    };
+};
+
 done_testing();

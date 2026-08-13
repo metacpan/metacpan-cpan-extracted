@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::IngressRoute;
 # ABSTRACT: Traefik HTTP routing via IngressRoute
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'ingressroutes';
@@ -25,7 +25,7 @@ IO::K8s::Traefik::V1alpha1::IngressRoute - Traefik HTTP routing via IngressRoute
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -48,10 +48,6 @@ IngressRoute defines HTTP routing rules for Traefik. It configures routes, match
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -62,7 +58,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

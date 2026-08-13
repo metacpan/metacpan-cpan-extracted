@@ -1,7 +1,7 @@
 package Data::Queue::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Data::Queue::Shared', $VERSION);
@@ -188,7 +188,9 @@ retrieve the fd and pass it to other processes via C<SCM_RIGHTS>
     my $q2 = Data::Queue::Shared::Int->new_from_fd($fd);
     my $q2 = Data::Queue::Shared::Str->new_from_fd($fd);
 
-Opens a queue from a received memfd. The fd is dup'd internally.
+Opens a queue from a received memfd. The fd is dup'd internally
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the queue.
 
     my $fd = $q->memfd;    # backing fd (-1 if file-backed/anonymous)
 
@@ -370,6 +372,20 @@ Key takeaways:
 
 =back
 
+=head1 CRASH SAFETY
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete queue file left
+by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
+
 =head1 SEE ALSO
 
 L<Data::Buffer::Shared> - typed shared array
@@ -400,14 +416,16 @@ L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created, and when a file left
+behind by an interrupted create is re-initialized (see L</CRASH SAFETY>); a
+file already in use keeps its own permissions. The file is opened with
+C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with
+C<O_EXCL>; the on-disk header is validated when the file is attached. Any
+process you grant write access to a shared mapping is trusted not to corrupt
+its contents while other processes are using it.
 
 =head1 AUTHOR
 

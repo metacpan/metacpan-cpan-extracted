@@ -66,8 +66,8 @@ SYNOPSIS
 
 DESCRIPTION
     Data::Pool::Shared provides a fixed-size object pool in shared memory.
-    Slots are allocated and freed explicitly, like a memory allocator but
-    for cross-process shared objects.
+    Slots are allocated and freed explicitly, like a memory allocator but for
+    cross-process shared objects.
 
     Unlike Data::Buffer::Shared (index-based array access), Pool provides
     allocate/free semantics: you request a slot, use it, and return it. The
@@ -83,8 +83,8 @@ DESCRIPTION
     Data::Pool::Shared::Str - fixed-length strings
 
   Allocation
-    Allocation uses a CAS-based bitmap scan (lock-free). Each 64-slot group
-    is managed by one atomic uint64_t word. On contention, CAS retries
+    Allocation uses a CAS-based bitmap scan (lock-free). Each 64-slot group is
+    managed by one atomic uint64_t word. On contention, CAS retries
     automatically. When the pool is full, "alloc" blocks on a futex until a
     slot is freed.
 
@@ -114,6 +114,10 @@ CONSTRUCTORS
         my $p = Data::Pool::Shared::Str->new_memfd($name, $capacity, $max_len);
         my $p = Data::Pool::Shared::Str->new_from_fd($fd);
 
+    The descriptor you pass to "new_from_fd" is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the pool.
+
 METHODS
   Allocation
         my $idx = $pool->alloc;             # block until available
@@ -135,8 +139,8 @@ METHODS
     scan_from($slot) pins the scan start to $slot's 64-slot word (pass 0 for
     low-to-high order). It is per-handle (does not affect other processes),
     takes effect on the next "alloc", and an out-of-range $slot wraps. The
-    bitmap is still the source of truth, so this only changes *where* the
-    scan starts, never correctness. All typed variants inherit it.
+    bitmap is still the source of truth, so this only changes *where* the scan
+    starts, never correctness. All typed variants inherit it.
 
   Batch Operations
         my $slots = $pool->alloc_n($n);            # allocate N slots (blocking)
@@ -170,12 +174,12 @@ METHODS
         my $ptr = $pool->ptr($idx);     # raw C pointer to slot data (UV)
         my $ptr = $pool->data_ptr;      # pointer to start of data section
 
-    "ptr" returns the memory address of a slot's data as an unsigned
-    integer. Use with FFI::Platypus, OpenGL "_c" functions, or XS code that
-    needs a "void*".
+    "ptr" returns the memory address of a slot's data as an unsigned integer.
+    Use with FFI::Platypus, OpenGL "_c" functions, or XS code that needs a
+    "void*".
 
-    "data_ptr" returns the base of the contiguous data region. Slots are
-    laid out as "data_ptr + idx * elem_size".
+    "data_ptr" returns the base of the contiguous data region. Slots are laid
+    out as "data_ptr + idx * elem_size".
 
     Warning: The returned pointer becomes dangling if the pool object is
     destroyed. Do not use after the pool goes out of scope.
@@ -183,20 +187,19 @@ METHODS
   Zero-Copy Access
         my $sv = $pool->slot_sv($idx);  # SV backed by slot memory
 
-    Returns a read-only scalar whose PV points directly into the shared
-    memory slot. Reading the returned scalar reads the slot with no
-    "memcpy", which matters for large slots. It keeps the pool object alive
-    for as long as that scalar (or a reference to it) is live.
+    Returns a read-only scalar whose PV points directly into the shared memory
+    slot. Reading the returned scalar reads the slot with no "memcpy", which
+    matters for large slots. It keeps the pool object alive for as long as
+    that scalar (or a reference to it) is live.
 
     Note that binding it with plain assignment makes an ordinary private
     *copy* -- Perl copies the string on assignment, so
 
         my $snap = $pool->slot_sv($idx);   # a SNAPSHOT of the slot right now
 
-    is frozen and does not track later writes. To keep the live zero-copy
-    view that continues to reflect the slot's current contents (including
-    after a free()/re-allocation), use the return value directly or hold a
-    reference:
+    is frozen and does not track later writes. To keep the live zero-copy view
+    that continues to reflect the slot's current contents (including after a
+    free()/re-allocation), use the return value directly or hold a reference:
 
         my $ref = \$pool->slot_sv($idx);   # live view; $$ref reads current slot
 
@@ -257,13 +260,14 @@ STATS
     "recoveries" -- slots freed by "recover_stale"
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
@@ -271,8 +275,8 @@ PERFORMANCE
     *   Allocation scans a bitmap of ceil(capacity/64) words. O(capacity/64)
         worst case, O(1) amortized with scan_hint.
 
-    *   Each allocation is a single CAS on one bitmap word. Under
-        contention, CAS retries on the same word are ~10ns each.
+    *   Each allocation is a single CAS on one bitmap word. Under contention,
+        CAS retries on the same word are ~10ns each.
 
     *   When pool is full, "alloc" blocks on a futex (zero CPU). Woken by a
         single "FUTEX_WAKE" syscall on "free".
@@ -311,6 +315,20 @@ BENCHMARKS
 
     Bottleneck is Perl XS call overhead, not the CAS or futex.
 
+CRASH SAFETY
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete pool file left by an interrupted create; remove it and retry".
+    A file left behind by an interrupted create never held data, so removing
+    it is safe -- but a file whose header was corrupted after the fact reaches
+    the same croak, so confirm it is an abandoned create before deleting
+    anything you care about.
+
 SEE ALSO
     Data::Buffer::Shared - typed shared array (index-based, no alloc/free)
 
@@ -342,6 +360,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

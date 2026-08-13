@@ -1,0 +1,128 @@
+# Maintained allowlist for maint/spec-drift-check.pl.
+#
+# Every entry here is a deliberate, already-made decision, not a TODO or a
+# thing waiting to be fixed. New entries should say *why* (a Changes bullet
+# or karr ticket) so a future maintainer can tell a settled call apart from
+# noise before touching it. This file is read as-is on every run -- there
+# is no merge with built-in defaults, so removing an entry immediately
+# surfaces whatever it was hiding.
+#
+# Matching: every string below is matched as a literal PREFIX against the
+# fully-qualified Perl class name (a full class name is trivially a prefix
+# of itself, so exact matches work the same way). No globs, no regex.
+
+# Kubernetes' generic list wrapper (a Kind with just `items` + `metadata`,
+# e.g. PodList, DeviceClassList) was dropped for every resource in 1.105
+# (see Changes) -- by design, not a gap. This suppresses every such upstream
+# Kind whose class was never shipped, current and future, without having to
+# enumerate one entry per Kind per Kubernetes release. Flip to false only if
+# list support is reinstated project-wide.
+list_kinds_dropped: true
+
+# Upstream apimachinery scalar types this dist deliberately models as a
+# Type::Tiny bareword (Resource.pm %TYPE_FLAGS) instead of shipping a class.
+# The definition key is the io.k8s.* upstream identity; the value is the
+# k8s() DSL bareword it resolves to. Keep this in sync with Resource.pm --
+# it is the same convention, duplicated here so the checker doesn't need to
+# `require` internals to know about it.
+scalar_types:
+  io.k8s.apimachinery.pkg.api.resource.Quantity: Quantity
+  io.k8s.apimachinery.pkg.apis.meta.v1.Time: Time
+  io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime: Time
+  io.k8s.apimachinery.pkg.util.intstr.IntOrString: IntOrStr
+
+# Upstream types this dist deliberately models as an unconstrained
+# hash-of-string ({ Str => 1 } in the k8s() DSL) rather than a class, because
+# they serialize as an arbitrary JSON blob. See AutoGen.pm %OPAQUE_TYPES.
+opaque_types:
+  - io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1
+  - io.k8s.apimachinery.pkg.runtime.RawExtension
+  # karr #12: a marker type with zero properties, used only to give the
+  # PATCH request body a name in the spec/docs. Never referenced by any
+  # other definition's properties (checked against spec/v1.36.3.json) -
+  # real PATCH bodies are raw JSON Patch / Merge Patch / Strategic Merge
+  # Patch payloads, not a "Patch" struct, so there is nothing to model.
+  - io.k8s.apimachinery.pkg.apis.meta.v1.Patch
+
+# Definitions upstream tags with x-kubernetes-group-version-kind (so they
+# have a real Kind identity in swagger.json) but that IO::K8s deliberately
+# never registers in %DEFAULT_RESOURCE_MAP for kind+apiVersion dispatch,
+# because they are not actually addressable per-group resources -- there is
+# nothing a caller would ever legitimately inflate() by this kind+apiVersion
+# pair. Matched by definition key, exact match (not prefix): every GVK
+# entry that definition contributes is skipped, not just one. Consumed by
+# t/43_spec_kind_dispatch.t, which walks every upstream GVK entry and checks
+# IO::K8s->expand_class($kind, $apiVersion) resolves + loads; without this
+# list it would report ~125 false gaps every run (matches
+# maint/spec-drift-check.pl's coarser per-definition-key coverage check,
+# which never notices this because it only asks "does a class exist for
+# this key", not "is this exact apiVersion+kind pair dispatchable").
+non_dispatchable_kinds:
+  - key: io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions
+    reason: "shared per-group delete-request-body type -- the SAME definition lists one GVK entry per API group (60 in v1.36.3) purely as a client-codegen convenience; there is one Perl class (Apimachinery::Pkg::Apis::Meta::V1::DeleteOptions) and it is constructed directly, never looked up by kind+apiVersion. Confirmed in karr #10."
+  - key: io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent
+    reason: "shared per-group watch-response-wrapper type, same multi-group codegen pattern as DeleteOptions above (60 GVK entries in v1.36.3, one Perl class)"
+  - key: io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup
+    reason: "API discovery type (served by /apis, /apis/<group>), no addressable REST path of its own -- verified against spec/v1.36.3.json's paths. Confirmed in karr #10."
+  - key: io.k8s.apimachinery.pkg.apis.meta.v1.APIGroupList
+    reason: "API discovery type, same as APIGroup above. Not the 1.105-dropped generic list wrapper (list_kinds_dropped above) -- it has its own `groups` field, not `items`. Confirmed in karr #10."
+  - key: io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions
+    reason: "API discovery type (served by /api), no addressable REST path of its own -- verified against spec/v1.36.3.json's paths. Confirmed in karr #10."
+  - key: io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList
+    reason: "API discovery type, same as APIVersions above. Not the 1.105-dropped generic list wrapper -- it has its own `resources` field, not `items`. Confirmed in karr #10."
+  - key: io.k8s.apimachinery.pkg.apis.meta.v1.Status
+    reason: "generic response-status wrapper (returned inline by many operations on error, or on a successful DELETE), not itself a kind-dispatched resource -- no operation in spec/v1.36.3.json's paths names Status as its x-kubernetes-group-version-kind. Confirmed in karr #10 (\"Confirmed neither sibling type (APIGroup/APIVersions/Status/DeleteOptions) is registered in %DEFAULT_RESOURCE_MAP\")."
+
+# Perl classes that intentionally have no matching definition key in the
+# *current* spec: old API tracks kept on purpose for clusters still running
+# an older Kubernetes/CRD release. Without these, every run re-reports the
+# same ~100 settled decisions. Reported at INFO severity even when absent
+# from this list; add an entry to silence one for good once the call is
+# made, with a `reason` so it survives the next contributor.
+# Note on granularity: these are whole-namespace prefixes, not per-class.
+# That's deliberate and safe, not laziness -- a class only ever lands in the
+# perl_only bucket when NO upstream definition matches it at all. Anything
+# in one of these namespaces that upstream still defines today (e.g.
+# admissionregistration v1alpha1's MutatingAdmissionPolicy* and its shared
+# helper types ApplyConfiguration/JSONPatch/MatchCondition/...) resolves to
+# a real definition key and is checked normally regardless of this list; a
+# whole-namespace entry can only suppress classes that already have no
+# upstream match, never hide a newly-missing one.
+perl_only:
+  - prefix: "IO::K8s::Api::Admissionregistration::V1alpha1::"
+    reason: "pre-graduation alpha track of admissionregistration.k8s.io; ValidatingAdmissionPolicy* and its old helper types (AuditAnnotation, ExpressionWarning, TypeChecking, Validation) graduated to v1 and dropped from v1alpha1 upstream, kept here for older clusters"
+  - prefix: "IO::K8s::Api::Admissionregistration::V1beta1::"
+    reason: "pre-graduation beta track of admissionregistration.k8s.io; same ValidatingAdmissionPolicy* graduation as v1alpha1 above"
+  - prefix: "IO::K8s::Api::Authentication::V1alpha1::"
+    reason: "pre-graduation alpha track of authentication.k8s.io, kept for older clusters"
+  - prefix: "IO::K8s::Api::Authentication::V1beta1::"
+    reason: "pre-graduation beta track of authentication.k8s.io, kept for older clusters"
+  - prefix: "IO::K8s::Api::Coordination::V1alpha1::"
+    reason: "pre-graduation alpha track of coordination.k8s.io (superseded by v1alpha2/v1beta1), kept for older clusters"
+  - prefix: "IO::K8s::Api::Flowcontrol::V1beta3::"
+    reason: "flowcontrol.k8s.io/v1beta3 superseded by v1, kept for older clusters"
+  - prefix: "IO::K8s::Api::Resource::V1alpha3::"
+    reason: "classic DRA core (resource.k8s.io/v1alpha3), superseded by v1beta1/v1beta2/v1; kept for older clusters. The v1.36 delta types (DeviceTaint, DeviceTaintRule*, DeviceTaintSelector, PoolStatus, ResourcePoolStatusRequest*) have real upstream matches in v1alpha3 and are checked normally"
+  - prefix: "IO::K8s::Api::Storagemigration::V1alpha1::"
+    reason: "storagemigration.k8s.io/v1alpha1 superseded by v1beta1, kept for older clusters"
+  - prefix: "IO::K8s::Api::Storage::V1alpha1::"
+    reason: "pre-graduation alpha track of storage.k8s.io (VolumeAttributesClass), kept for older clusters"
+
+# One-off suppressions that don't fit a whole-namespace prefix rule above.
+# Empty by design -- add sparingly, each with a reason, each pointing at the
+# Changes bullet or karr ticket that made the call.
+#
+#   ignore_missing_classes:
+#     - prefix: "IO::K8s::Api::Foo::V1::Bar"
+#       reason: "..."
+#   ignore_missing_fields:
+#     - class: "IO::K8s::Api::Foo::V1::Bar"
+#       field: "someField"
+#       reason: "..."
+#   ignore_extra_fields:
+#     - class: "IO::K8s::Api::Foo::V1::Bar"
+#       field: "someField"
+#       reason: "..."
+ignore_missing_classes: []
+ignore_missing_fields: []
+ignore_extra_fields: []

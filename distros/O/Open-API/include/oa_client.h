@@ -74,6 +74,41 @@ static void oa_cli_bad(pTHX_ oa_op *o, const char *in, SV *name, SV *value,
           SvPV_nolen(o->op_id), in, name ? SvPV_nolen(name) : "body", msg);
 }
 
+/* The wire form of a parameter value.
+ *
+ * A `content` parameter carries a whole document in one value, so a structure
+ * is encoded to its media type before it goes into the URL or a header -
+ * without this it would stringify as HASH(0x...). A caller who has already
+ * encoded it passes a string, which travels as it is. Mortal, or the original
+ * SV when nothing needs doing. */
+static SV *oa_cli_wire(pTHX_ oa_param *pp, SV *v) {
+    if (pp->ctype && SvROK(v)
+        && (SvTYPE(SvRV(v)) == SVt_PVHV || SvTYPE(SvRV(v)) == SVt_PVAV)) {
+        STRLEN cl; const char *cp = SvPV_const(pp->ctype, cl);
+        if (oa_ctype_is_json(cp, cl)) {
+            SV *j = oa_json_encode(aTHX_ v);
+            if (j) return j;
+        }
+    }
+    return v;
+}
+
+/* The value a `content` parameter's schema should see: the decoded document.
+ * Croaks on undecodable input, so the client fails before any I/O. */
+static SV *oa_cli_decoded(pTHX_ oa_op *o, oa_param *pp, const char *in, SV *v) {
+    if (pp->ctype && !SvROK(v)) {
+        STRLEN cl; const char *cp = SvPV_const(pp->ctype, cl);
+        if (oa_ctype_is_json(cp, cl)) {
+            SV *d = oa_body_decode(aTHX_ v);
+            if (!d) croak("Open::API::Client: %s: %s parameter '%s' is not "
+                          "valid JSON", SvPV_nolen(o->op_id), in,
+                          SvPV_nolen(pp->name));
+            return d;
+        }
+    }
+    return v;
+}
+
 /* ---- the response map callback ------------------------------------------------ */
 
 typedef struct oa_cli_ctx {
@@ -331,8 +366,9 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
             STRLEN nl; const char *np = SvPV_const(pp->name, nl);
             SV **v = hv_fetch(params, np, (I32)nl, 0);
             if (v && *v && SvOK(*v)) {
-                if (pp->handle && !JSF->is_valid(aTHX_ pp->handle, *v))
-                    oa_cli_bad(aTHX_ o, oa_loc_name(loc), pp->name, *v,
+                SV *chk = oa_cli_decoded(aTHX_ o, pp, oa_loc_name(loc), *v);
+                if (pp->handle && !JSF->is_valid(aTHX_ pp->handle, chk))
+                    oa_cli_bad(aTHX_ o, oa_loc_name(loc), pp->name, chk,
                                pp->handle);
             } else if (pp->required) {
                 croak("Open::API::Client: %s: missing required %s parameter '%.*s'",
@@ -381,12 +417,20 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
             STRLEN nl; const char *np = SvPV_const(o->segs[i].pname, nl);
             SV **v = hv_fetch(params, np, (I32)nl, 0);
             STRLEN vl; const char *vp;
+            SV *w;
+            int k;
             /* declared path params were checked above, but a template var the
              * spec never declared as a parameter reaches here unchecked */
             if (!v || !*v || !SvOK(*v))
                 croak("Open::API::Client: %s: missing required path parameter "
                       "'%.*s'", SvPV_nolen(o->op_id), (int)nl, np);
-            vp = SvPV_const(*v, vl);
+            w = *v;
+            for (k = 0; k < o->nparams[OA_IN_PATH]; k++)
+                if (sv_eq(o->params[OA_IN_PATH][k].name, o->segs[i].pname)) {
+                    w = oa_cli_wire(aTHX_ &o->params[OA_IN_PATH][k], *v);
+                    break;
+                }
+            vp = SvPV_const(w, vl);
             oa_pct_encode_into(aTHX_ url, vp, vl);
         }
     }
@@ -399,7 +443,8 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
             SV **v = hv_fetch(params, np, (I32)nl, 0);
             AV *multi;
             if (!v || !*v || !SvOK(*v)) continue;
-            multi = oa_av_of(*v);
+            /* a content parameter's arrayref is its document, not repeat keys */
+            multi = pp->ctype ? NULL : oa_av_of(*v);
             if (multi) {
                 SSize_t j, n = av_len(multi) + 1;
                 for (j = 0; j < n; j++) {
@@ -413,7 +458,8 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
                     oa_pct_encode_into(aTHX_ url, vp, vl);
                 }
             } else {
-                STRLEN vl; const char *vp = SvPV_const(*v, vl);
+                SV *w = oa_cli_wire(aTHX_ pp, *v);
+                STRLEN vl; const char *vp = SvPV_const(w, vl);
                 sv_catpvn(url, first ? "?" : "&", 1); first = 0;
                 oa_pct_encode_into(aTHX_ url, np, nl);
                 sv_catpvs(url, "=");
@@ -437,7 +483,8 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
         STRLEN nl; const char *np = SvPV_const(pp->name, nl);
         SV **v = hv_fetch(params, np, (I32)nl, 0);
         if (v && *v && SvOK(*v)) {
-            STRLEN vl; const char *vp = SvPV_const(*v, vl);
+            SV *w = oa_cli_wire(aTHX_ pp, *v);
+            STRLEN vl; const char *vp = SvPV_const(w, vl);
             hdrs[nh].name = np; hdrs[nh].nlen = nl;
             hdrs[nh].val  = vp; hdrs[nh].vlen = vl;
             nh++;
@@ -452,7 +499,7 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
             else sv_catpvs(cookie, "; ");
             sv_catpvn(cookie, np, nl);
             sv_catpvs(cookie, "=");
-            sv_catsv(cookie, *v);
+            sv_catsv(cookie, oa_cli_wire(aTHX_ pp, *v));
         }
     }
     for (i = 0; i < nsec_c; i++) {              /* apiKey-in-cookie schemes */

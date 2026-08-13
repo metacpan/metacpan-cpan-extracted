@@ -11,4 +11,3 @@ ok(is_scale('maj'));
 ok(is_scale('minor'));
 ok(is_scale('min'));
 ok(is_scale('m'));
-

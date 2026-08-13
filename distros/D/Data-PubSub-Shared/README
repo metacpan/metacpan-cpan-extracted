@@ -43,11 +43,11 @@ SYNOPSIS
         wait;
 
 DESCRIPTION
-    Broadcast pub/sub over shared memory (mmap(MAP_SHARED)). Publishers
-    write to a ring buffer; each subscriber independently reads with its own
-    cursor. Messages are never consumed -- the ring overwrites old data when
-    it wraps. Slow subscribers auto-recover by resetting to the oldest
-    available position.
+    Broadcast pub/sub over shared memory (mmap(MAP_SHARED)). Publishers write
+    to a ring buffer; each subscriber independently reads with its own cursor.
+    Messages are never consumed -- the ring overwrites old data when it wraps.
+    Slow subscribers auto-recover by resetting to the oldest available
+    position.
 
     Linux-only. Requires 64-bit Perl.
 
@@ -77,9 +77,9 @@ DESCRIPTION
 
     Data::PubSub::Shared::Int32 -- int32, 8 bytes/slot
     Data::PubSub::Shared::Int16 -- int16, 8 bytes/slot
-        Compact variants -- half the memory, 2x cache density. Same
-        lock-free algorithm. Values silently truncated to type range (C cast
-        semantics). Best for status codes, small enums, sensor readings.
+        Compact variants -- half the memory, 2x cache density. Same lock-free
+        algorithm. Values silently truncated to type range (C cast semantics).
+        Best for status codes, small enums, sensor readings.
 
     Data::PubSub::Shared::Str -- variable-length strings
         Mutex-protected publish, lock-free subscribers. Messages stored in a
@@ -90,8 +90,8 @@ DESCRIPTION
     Int (including Int32/Int16): lock-free, zero contention between
     publishers. Use when the payload fits in an integer.
 
-    Str: mutex serializes publishers, but subscribers are still lock-free.
-    Use for arbitrary byte strings.
+    Str: mutex serializes publishers, but subscribers are still lock-free. Use
+    for arbitrary byte strings.
 
 API
   Constructor
@@ -112,16 +112,21 @@ API
 
     No filesystem path -- backed by memfd_create(2). Share via fork()
     inheritance or "SCM_RIGHTS" fd passing. The fd is dup'd internally by
-    "new_from_fd".
+    "new_from_fd" ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing
+    it does not disturb the channel.
 
   Publishing
-        $ps->publish($value);                # always succeeds
+        $ps->publish($value);                # numeric: always succeeds
         my $n = $ps->publish_multi(@values); # batch (max 8192 values)
         $ps->publish_notify($value);         # publish + eventfd notify
 
-    Int: "publish_multi" claims all slots in one atomic fetch-add, then
-    writes values and wakes subscribers once. Str: holds mutex for the
-    entire batch.
+    For the numeric variants ("Int", "Int32", "Int16") "publish" always
+    succeeds. The "Str" variant croaks if the message is longer than the
+    "msg_size" the pub/sub was created with. "publish_multi" croaks if passed
+    more than 8192 values.
+
+    Int: "publish_multi" claims all slots in one atomic fetch-add, then writes
+    values and wakes subscribers once. Str: holds mutex for the entire batch.
 
   Subscribing
         my $sub = $ps->subscribe;       # future messages only
@@ -160,7 +165,10 @@ API
         };
 
     Subscribers inherit the handle's eventfd at creation time. Use
-    "$sub->eventfd_set($fd)" to set manually after creation.
+    "$sub->eventfd_set($fd)" to set manually after creation (both handles and
+    subscribers support "eventfd_set"). "$ps->fileno" and "$sub->fileno"
+    return the current notification fd (the handle's or the subscriber's), or
+    -1 if none is set -- useful for registering with an event loop.
 
   Status
         my $n = $sub->lag;             # messages behind
@@ -175,8 +183,8 @@ API
         $sub->reset_oldest;  # jump to oldest available
 
     If a subscriber falls behind by more than "capacity" messages, "poll"
-    auto-recovers by resetting to the oldest available position. Lost
-    messages are counted in "overflow_count".
+    auto-recovers by resetting to the oldest available position. Lost messages
+    are counted in "overflow_count".
 
   Handle Management
         $ps->clear;              # reset ring to initial state
@@ -185,13 +193,15 @@ API
         Class->unlink($path);    # class method form
         my $p = $ps->path;       # undef for anonymous/memfd
         my $s = $ps->stats;      # diagnostic hashref
+        my $c = $ps->capacity;   # ring capacity (rounded-up power of 2)
+        my $m = $sps->msg_size;  # Str only: max message size in bytes
 
-    Call "clear" only when publishers are quiescent. The
-    "int"/"int32"/"int16" publish path is lock-free, so "clear" cannot
-    exclude an in-flight publish; racing the two can leave a stale sequence
-    in the freshly-zeroed ring, which a subscriber may see as duplicate
-    re-delivery or a brief stall. ("str" publish takes the ring mutex, so
-    "str" "clear" is not exposed to this.)
+    Call "clear" only when publishers are quiescent. The "int"/"int32"/"int16"
+    publish path is lock-free, so "clear" cannot exclude an in-flight publish;
+    racing the two can leave a stale sequence in the freshly-zeroed ring,
+    which a subscriber may see as duplicate re-delivery or a brief stall.
+    ("str" publish takes the ring mutex, so "str" "clear" is not exposed to
+    this.)
 
   Keyword API
         use Data::PubSub::Shared::Int;
@@ -205,8 +215,8 @@ API
 
   Crash Safety
     Str mode: futex mutex with PID tracking. If a publisher dies holding the
-    mutex, other publishers recover within 2 seconds. Int modes are
-    lock-free and need no recovery.
+    mutex, other publishers recover within 2 seconds. Int modes are lock-free
+    and need no recovery.
 
 BENCHMARKS
     Single-process, 1M items, Linux x86_64. Run "perl -Mblib
@@ -223,6 +233,20 @@ BENCHMARKS
         Str publish_multi:     42M/s
 
     Fan-out: publish throughput is independent of subscriber count.
+
+CRASH SAFETY
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete pubsub file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
     Data::Buffer::Shared - typed shared array
@@ -252,13 +276,14 @@ SEE ALSO
     Data::RingBuffer::Shared - fixed-size overwriting ring buffer
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
@@ -266,6 +291,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

@@ -1,7 +1,7 @@
 package Data::BitSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::BitSet::Shared', $VERSION);
 
@@ -48,6 +48,13 @@ Data::BitSet::Shared - Shared-memory fixed-size bitset for Linux
     say "$bs";                # "10101000..." (stringification)
     my @bits = $bs->set_bits; # (0, 2, 4)
 
+    # freeze and ship: query it read-only (lock-free) on other machines
+    my $shared = Data::BitSet::Shared->new("/tmp/seen.bitset", 256);
+    $shared->set(10);
+    $shared->freeze;
+    my $ro = Data::BitSet::Shared->new_readonly("/tmp/seen.bitset");
+    $ro->test(10);
+
 =head1 DESCRIPTION
 
 Fixed-size bitset in shared memory. CAS-based atomic per-bit
@@ -67,6 +74,12 @@ B<Linux-only>. Requires 64-bit Perl.
     my $bs = Data::BitSet::Shared->new(undef, $capacity);    # anonymous (fork-inherited)
     my $bs = Data::BitSet::Shared->new_memfd($name, $cap);   # memfd (fd-passable)
     my $bs = Data::BitSet::Shared->new_from_fd($fd);         # attach to existing fd
+    my $ro = Data::BitSet::Shared->new_readonly($path);      # frozen file, read-only
+
+C<new_readonly> opens a B<frozen> file read-only for lock-free querying (see
+L</"FROZEN (READ-ONLY) MODE">). The descriptor you pass is duplicated
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the handle.
 
 =head2 Bit Operations
 
@@ -123,20 +136,79 @@ Single-process (1M ops, x86_64 Linux, Perl 5.40, 64K-bit set):
 =head1 STATS
 
 C<stats()> returns a hashref with keys: C<capacity>, C<count>,
-C<sets>, C<clears>, C<toggles>, C<mmap_size>.
+C<sets>, C<clears>, C<toggles>, C<mmap_size>, C<frozen> (1 if the bitset has
+been sealed by C<freeze>, else 0), and C<readonly> (1 if this handle is a
+read-only view -- from C<new_readonly>, or the handle that called C<freeze> --
+else 0).
+
+=head1 FROZEN (READ-ONLY) MODE
+
+A file-backed bitset can be B<frozen> and then shipped to other machines,
+where consumers open it B<read-only> and query it with B<no locking at all>
+(bit operations are already lock-free CAS/atomics, frozen or not; freezing
+only guarantees the mapping is never mutated again).
+
+    # producer: build, freeze, ship the file
+    my $bs = Data::BitSet::Shared->new("/tmp/seen.bitset", 1_000_000);
+    $bs->set($_) for @known_ids;
+    $bs->freeze;                 # seal: now immutable, and $bs itself is read-only
+    # ... copy /tmp/seen.bitset to another host ...
+
+    # consumer (any process, same architecture): read-only, lock-free
+    my $ro = Data::BitSet::Shared->new_readonly("/tmp/seen.bitset");
+    $ro->test($_) for @queries;
+
+C<freeze> marks the bitset B<permanently immutable> (there is no unfreeze --
+rebuild the file to change it) and flushes the seal to disk. A frozen bitset
+rejects every mutator (C<set>, C<clear>, C<toggle>, C<fill>, C<zero>) with a
+croak, and a read-write reopen (C<< new($path, ...) >> or C<new_from_fd>) of a
+sealed file is B<refused> -- so a shipped artifact can never be silently
+mutated out from under its readers.
+
+C<new_readonly($path)> maps the file C<O_RDONLY> / C<PROT_READ> and B<requires
+it to be frozen> (it croaks on a file that was never C<freeze>d). Every query
+method (C<test>, C<count>, C<capacity>, C<any>, C<none>, C<first_set>,
+C<first_clear>, C<to_string>, C<stats>, stringification) reads the mapping
+directly with no lock, so a read-only view works from a read-only file
+descriptor or a read-only filesystem, and any number of processes can share
+one C<PROT_READ> mapping. C<frozen> and C<readonly> report the two states;
+C<sync> is a silent no-op on a read-only handle.
+
+B<Portability.> The on-disk format is native binary (native-endian 64-bit
+words), so a frozen file may be copied only between machines of the B<same
+architecture>; a wrong-endian file is rejected at open by the magic check.
+B<Copy the file to each consumer> -- do not share one file over a network
+filesystem: C<MAP_SHARED> coherency across NFS clients is not guaranteed, and
+the "no live writer" contract assumes a static copy. Linux-only; 64-bit Perl.
 
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-when the file is created; a pre-existing empty file owned by the caller is
-adopted and also gets the requested mode, while a non-empty existing file
-keeps its own permissions. The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created; a pre-existing file
+owned by the caller is adopted -- and also gets the requested mode -- when it
+is empty, or when it is the full-size all-zero file an interrupted create
+leaves behind (see L</CRASH SAFETY>). Any other existing file keeps its own
+permissions. The file is opened with C<O_NOFOLLOW>, so a symlink planted at
+the path is refused, and created with C<O_EXCL>; the on-disk header is
+validated when the file is attached. Any process you grant write access to a
+shared mapping is trusted not to corrupt its contents while other processes
+are using it.
+
+=head1 CRASH SAFETY
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete bitset file left
+by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

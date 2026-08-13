@@ -1,6 +1,15 @@
 #ifndef HM_TLS_H
 #define HM_TLS_H
 
+/* Upper bound on a session-ticket key, which is a 16-byte key name plus an
+ * HMAC key plus an AES key. The last two widened from 16 to 32 bytes in
+ * OpenSSL 3.0, so the total is 48 through 1.1.1 and 80 on 3.x - and passing
+ * the wrong length makes the ctrl a no-op that merely returns 0, with nothing
+ * logged. The real length is therefore asked of the library at runtime and
+ * this only has to bound it. Defined outside the HM_HAVE_OPENSSL fence
+ * because hm_core.h sizes a buffer with it either way. */
+#define HM_TLS_TKEY_MAX 128
+
 /* TLS/HTTPS via OpenSSL. Enabled by Makefile.PL when OpenSSL is found
  * (-DHM_HAVE_OPENSSL, -lssl -lcrypto); otherwise the entry points compile to
  * stubs and tls_cert/tls_key error at runtime.
@@ -17,7 +26,12 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/x509.h>
+/* The session-ticket-key macros live here, not in ssl.h, and 3.x stopped
+ * pulling this in transitively - without it the HM_HAVE_TICKET_KEYS probe
+ * below silently fails and every reload rotates to an unshared key. */
+#include <openssl/tls1.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 
@@ -60,25 +74,60 @@ static int OPENSSL_init_ssl(unsigned long opts, const void *settings) {
 #define HM_HAVE_ALPN 1
 #endif
 
+/* SSL_CTX_set_num_tickets is 1.1.1+ (it only means anything under TLS 1.3).
+ * LibreSSL reports a >= 1.1.1 version number but has not always shipped it,
+ * so it is excluded rather than probed. */
+#if OPENSSL_VERSION_NUMBER >= 0x10101000L && !defined(LIBRESSL_VERSION_NUMBER)
+#define HM_HAVE_NUM_TICKETS 1
+#endif
+
+/* The ticket-key get/set pair are macros over SSL_CTX_ctrl, absent when the
+ * library was built with OPENSSL_NO_TLSEXT. */
+#ifdef SSL_CTX_set_tlsext_ticket_keys
+#define HM_HAVE_TICKET_KEYS 1
+#endif
+
 /* client-cert verification modes */
 #define HM_TLS_VERIFY_NONE     0
 #define HM_TLS_VERIFY_OPTIONAL 1
 #define HM_TLS_VERIFY_REQUIRE  2
 
 /* one SNI host -> its own SSL_CTX; the default ctx carries the registry in
- * ex_data so its servername callback can switch. */
-typedef struct { char *host; SSL_CTX *ctx; } hm_sni_entry;
+ * ex_data so its servername callback can switch. Hosts are stored lowercased
+ * and the array kept sorted, so the callback binary-searches with memcmp
+ * rather than walking every entry through strcasecmp - the map is one entry
+ * per certificate, and a multi-tenant gateway runs to hundreds. */
+typedef struct { char *host; size_t hlen; SSL_CTX *ctx; } hm_sni_entry;
 typedef struct { hm_sni_entry *entries; int n; } hm_sni_registry;
 
-/* captured at handshake, surfaced into $env */
+/* Only allocated when the client actually presented a certificate; the
+ * protocol/cipher strings are OpenSSL-owned and live directly on hm_conn. */
 typedef struct {
-    int         has_cert;
-    int         verified;
-    char       *subject;
-    char       *issuer;
-    const char *proto;   /* OpenSSL-owned, valid for the connection */
-    const char *cipher;
+    int   verified;
+    char *subject;
+    char *issuer;
 } hm_tls_peer;
+
+/* ASCII lowercase, in place or into dst (which may equal src). DNS names are
+ * ASCII, and tolower() would fold per the locale - in tr_TR 'I' does not go
+ * to 'i', which would make a hostname match depend on the server's LANG. */
+static void hm_tls_lc(char *dst, const char *src, size_t n) {
+    size_t i;
+    for (i = 0; i < n; i++) {
+        unsigned char ch = (unsigned char)src[i];
+        dst[i] = (char)(ch >= 'A' && ch <= 'Z' ? ch + ('a' - 'A') : ch);
+    }
+}
+
+/* Order by length first, then bytes: any total order works as long as the
+ * sort and the search agree, and comparing lengths up front skips most
+ * memcmps outright. */
+static int hm_sni_cmp(const void *a, const void *b) {
+    const hm_sni_entry *x = (const hm_sni_entry *)a;
+    const hm_sni_entry *y = (const hm_sni_entry *)b;
+    if (x->hlen != y->hlen) return x->hlen < y->hlen ? -1 : 1;
+    return memcmp(x->host, y->host, x->hlen);
+}
 
 static int hm_tls_sni_ex_idx = -1;
 
@@ -113,13 +162,21 @@ static int hm_tls_sni_cb(SSL *ssl, int *ad, void *arg) {
         (hm_tls_sni_ex_idx >= 0 ? SSL_CTX_get_ex_data(ctx, hm_tls_sni_ex_idx) : NULL);
     const char *host = SSL_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
     (void)ad; (void)arg;
-    if (host && reg) {
-        int i;
-        for (i = 0; i < reg->n; i++)
-            if (strcasecmp(host, reg->entries[i].host) == 0) {
-                SSL_set_SSL_CTX(ssl, reg->entries[i].ctx);
-                break;
+    if (host && reg && reg->n > 0) {
+        char lc[256];                     /* a DNS name is at most 253 bytes */
+        size_t hl = strlen(host);
+        if (hl > 0 && hl < sizeof(lc)) {
+            int lo = 0, hi = reg->n - 1;
+            hm_tls_lc(lc, host, hl);
+            while (lo <= hi) {
+                int mid = lo + (hi - lo) / 2;
+                hm_sni_entry *e = &reg->entries[mid];
+                int cmp = hl != e->hlen ? (hl < e->hlen ? -1 : 1)
+                                        : memcmp(lc, e->host, hl);
+                if (cmp == 0) { SSL_set_SSL_CTX(ssl, e->ctx); break; }
+                if (cmp < 0) hi = mid - 1; else lo = mid + 1;
             }
+        }
     }
     return SSL_TLSEXT_ERR_OK;
 }
@@ -135,15 +192,62 @@ static void hm_tls_init(void) {
 }
 
 /* Build and configure one server SSL_CTX from a cert/key pair, with optional
- * ALPN and client-cert verification. Returns NULL (reason on stderr) on error. */
+ * ALPN and client-cert verification. tkey, when given, is a 48-byte
+ * session-ticket key to install instead of the random one SSL_CTX_new mints
+ * (see hm_tls_ctx_build). Returns NULL (reason on stderr) on error. */
 static SSL_CTX *hm_tls_ctx_one(const char *cert, const char *key,
-                               const char *ca, int verify, int alpn_h2) {
+                               const char *ca, int verify, int alpn_h2,
+                               const unsigned char *tkey, size_t tkeylen) {
+    /* Any fixed non-empty string will do: it only has to be stable across the
+     * contexts a client might resume against, which one constant guarantees. */
+    static const unsigned char sid[] = "hyperman";
     SSL_CTX *ctx = SSL_CTX_new(TLS_server_method());
     if (!ctx) return NULL;
     SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION);
-    SSL_CTX_set_options(ctx, SSL_OP_NO_COMPRESSION | SSL_OP_CIPHER_SERVER_PREFERENCE);
+    SSL_CTX_set_options(ctx, SSL_OP_NO_COMPRESSION | SSL_OP_CIPHER_SERVER_PREFERENCE
+#ifdef SSL_OP_NO_RENEGOTIATION
+                             /* client-initiated TLS 1.2 renegotiation is an
+                              * asymmetric-CPU DoS and nothing here wants it;
+                              * refusing it also retires the only case that
+                              * makes SSL_write block wanting a read */
+                             | SSL_OP_NO_RENEGOTIATION
+#endif
+                             );
     SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE
-                          | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
+                          | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER
+#ifdef SSL_MODE_RELEASE_BUFFERS
+                          /* hand OpenSSL's record buffers back whenever they
+                           * drain, rather than pinning them for a
+                           * connection's whole life. A keep-alive server is
+                           * mostly idle connections, which is exactly the
+                           * case this covers. How much it saves depends on
+                           * the OpenSSL version's buffer sizing and on the
+                           * allocator actually returning the pages - worth
+                           * measuring on the deployment platform (Linux
+                           * /proc/PID/status VmRSS; macOS RSS is far too
+                           * noisy to read anything off). */
+                          | SSL_MODE_RELEASE_BUFFERS
+#endif
+                          );
+    /* Without a session id context OpenSSL declines to resume a session on a
+     * context that verifies peers, so every mTLS connection would pay a full
+     * handshake plus a full chain verification. */
+    SSL_CTX_set_session_id_context(ctx, sid, sizeof(sid) - 1);
+#ifdef HM_HAVE_NUM_TICKETS
+    /* TLS 1.3 issues two NewSessionTickets per handshake by default; one is
+     * enough to resume with, and the second is pure post-handshake write. */
+    SSL_CTX_set_num_tickets(ctx, 1);
+#endif
+#ifdef HM_HAVE_TICKET_KEYS
+    /* copied rather than cast: the setter takes a non-const void * */
+    if (tkey && tkeylen && tkeylen <= HM_TLS_TKEY_MAX) {
+        unsigned char tk[HM_TLS_TKEY_MAX];
+        memcpy(tk, tkey, tkeylen);
+        SSL_CTX_set_tlsext_ticket_keys(ctx, tk, (long)tkeylen);
+    }
+#else
+    (void)tkey; (void)tkeylen;
+#endif
     if (SSL_CTX_use_certificate_chain_file(ctx, cert) <= 0) {
         fprintf(stderr, "Hyperman TLS: cannot load certificate '%s'\n", cert);
         ERR_print_errors_fp(stderr); SSL_CTX_free(ctx); return NULL;
@@ -178,17 +282,53 @@ static SSL_CTX *hm_tls_ctx_one(const char *cert, const char *key,
     return ctx;
 }
 
+/* Copy a context's session-ticket key into buf (at most HM_TLS_TKEY_MAX
+ * bytes) and report its length. The size is asked of the library rather than
+ * assumed - it differs between 1.1.1 and 3.x, and the getter answers a
+ * mismatched length with a plain 0. Returns 1 on success, 0 if the library
+ * cannot report one (built without TLSEXT, or TLS not compiled in here). */
+static int hm_tls_get_ticket_key(void *ctxv, unsigned char *buf, size_t *len) {
+#ifdef HM_HAVE_TICKET_KEYS
+    long need;
+    if (!ctxv) return 0;
+    need = SSL_CTX_ctrl((SSL_CTX *)ctxv, SSL_CTRL_GET_TLSEXT_TICKET_KEYS,
+                        0, NULL);                    /* 0/NULL asks the size */
+    if (need <= 0 || (size_t)need > HM_TLS_TKEY_MAX) return 0;
+    if (SSL_CTX_get_tlsext_ticket_keys((SSL_CTX *)ctxv, buf, need) != 1)
+        return 0;
+    *len = (size_t)need;
+    return 1;
+#else
+    (void)ctxv; (void)buf; (void)len;
+    return 0;
+#endif
+}
+
 /* Build the default SSL_CTX plus any SNI per-host contexts (sni_hv:
  * { host => { cert => ..., key => ... }, ... }). The registry is attached to
  * the default ctx via ex_data and the servername callback installed. Returns
- * the default ctx or NULL. */
+ * the default ctx or NULL.
+ *
+ * tkey, when given, is the session-ticket key to install across every context
+ * built here; otherwise the default context's own random key is read back and
+ * shared with the per-host ones. Either way all of them end up with the SAME
+ * key, which is what makes a ticket usable: SSL_CTX_new mints an independent
+ * random key per context, so left alone a ticket issued while one certificate
+ * was in effect would not decrypt on the context that a later handshake
+ * selects, and the client would silently fall back to a full handshake.
+ * hm_tls_reload passes the running context's key in for the same reason
+ * across processes - it runs per worker, so each would otherwise rotate to a
+ * key its siblings cannot read. */
 static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
                               const char *ca, int verify,
-                              SV *sni_hv, int alpn_h2) {
+                              SV *sni_hv, int alpn_h2,
+                              const unsigned char *tkey, size_t tkeylen) {
     SSL_CTX *def;
+    unsigned char kbuf[HM_TLS_TKEY_MAX];
     hm_tls_init();
-    def = hm_tls_ctx_one(cert, key, ca, verify, alpn_h2);
+    def = hm_tls_ctx_one(cert, key, ca, verify, alpn_h2, tkey, tkeylen);
     if (!def) return NULL;
+    if (!tkey && hm_tls_get_ticket_key(def, kbuf, &tkeylen)) tkey = kbuf;
 
     if (sni_hv && SvROK(sni_hv) && SvTYPE(SvRV(sni_hv)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(sni_hv);
@@ -201,6 +341,8 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
             SV *val = hv_iterval(hv, he);
             const char *hc = NULL, *hk = NULL;
             SSL_CTX *hctx;
+            char *lchost;
+            if (klen <= 0) continue;          /* a key we cannot match on */
             if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
                 HV *e = (HV *)SvRV(val);
                 SV **c = hv_fetchs(e, "cert", 0);
@@ -212,13 +354,18 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
                 fprintf(stderr, "Hyperman TLS: SNI host '%s' needs cert and key\n", host);
                 continue;
             }
-            hctx = hm_tls_ctx_one(hc, hk, ca, verify, alpn_h2);
+            hctx = hm_tls_ctx_one(hc, hk, ca, verify, alpn_h2, tkey, tkeylen);
             if (!hctx) continue;
-            reg->entries[i].host = strdup(host);
+            lchost = strdup(host);
+            if (!lchost) { SSL_CTX_free(hctx); continue; }
+            hm_tls_lc(lchost, lchost, (size_t)klen);
+            reg->entries[i].host = lchost;
+            reg->entries[i].hlen = (size_t)klen;
             reg->entries[i].ctx  = hctx;
             i++;
         }
         reg->n = i;
+        if (i > 1) qsort(reg->entries, (size_t)i, sizeof(hm_sni_entry), hm_sni_cmp);
         SSL_CTX_set_ex_data(def, hm_tls_sni_ex_idx, reg);
         SSL_CTX_set_tlsext_servername_callback(def, hm_tls_sni_cb);
     }
@@ -284,25 +431,28 @@ static int hm_tls_wrap(hm_conn *c, void *ctx) {
     return 0;
 }
 
-/* After a successful handshake, record protocol/cipher and any client cert. */
+/* After a successful handshake, record protocol/cipher and any client cert.
+ * The protocol and cipher names are OpenSSL-owned and valid for the life of
+ * the connection, so they sit on hm_conn directly; the heap struct is only
+ * paid for when a client certificate was actually presented, which on a
+ * public listener is never. */
 static void hm_tls_capture_peer(hm_conn *c) {
     SSL *ssl = (SSL *)c->ssl;
-    hm_tls_peer *p = (hm_tls_peer *)hm_xcalloc(1, sizeof(hm_tls_peer));
     X509 *cert;
-    p->proto  = SSL_get_version(ssl);
-    p->cipher = SSL_get_cipher(ssl);
+    c->tls_proto  = SSL_get_version(ssl);
+    c->tls_cipher = SSL_get_cipher(ssl);
     cert = SSL_get1_peer_certificate(ssl);
     if (cert) {
+        hm_tls_peer *p = (hm_tls_peer *)hm_xcalloc(1, sizeof(hm_tls_peer));
         char buf[512];
-        p->has_cert = 1;
         p->verified = (SSL_get_verify_result(ssl) == X509_V_OK);
         if (X509_NAME_oneline(X509_get_subject_name(cert), buf, sizeof(buf)))
             p->subject = strdup(buf);
         if (X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof(buf)))
             p->issuer = strdup(buf);
         X509_free(cert);
+        c->tls_peer = p;
     }
-    c->tls_peer = p;
 }
 
 static void hm_tls_conn_free(hm_conn *c) {
@@ -313,29 +463,72 @@ static void hm_tls_conn_free(hm_conn *c) {
         free(p);
         c->tls_peer = NULL;
     }
+    c->tls_proto = c->tls_cipher = NULL;
     if (c->ssl) {
-        SSL_shutdown((SSL *)c->ssl);
+        /* close_notify costs a write syscall and only means anything once a
+         * session exists - a connection dropped mid-handshake has nothing to
+         * shut down, so tell OpenSSL not to emit the alert for it. */
+        if (c->tls_hs) SSL_set_quiet_shutdown((SSL *)c->ssl, 1);
+        else           SSL_shutdown((SSL *)c->ssl);
         SSL_free((SSL *)c->ssl);
         c->ssl = NULL;
     }
+}
+
+/* The TLS $env keys as shared key SVs, made once. hv_stores against a literal
+ * hashes the string and cuts a fresh HEK out of the shared string table on
+ * every request, then releases it again at env teardown; storing through a
+ * shared SV reuses the precomputed hash and the one HEK for the life of the
+ * process. Same trick, and the same reasoning, as the HTTP_* table in
+ * hm_core.h - it just pays per TLS request rather than per header.
+ *
+ * The values stay freshly allocated per request even though they are constant
+ * for the connection: an env value is what a PSGI app assigns THROUGH when it
+ * writes $env->{HTTPS}, and perl assigns into the SV already in the hash slot
+ * rather than replacing it, so a shared value SV would let one request's
+ * rewrite bleed into the next on the same keep-alive connection. */
+enum {
+    HM_TLSK_HTTPS, HM_TLSK_PROTOCOL, HM_TLSK_CIPHER,
+    HM_TLSK_VERIFY, HM_TLSK_S_DN, HM_TLSK_I_DN, HM_TLSK_COUNT
+};
+static const char *const hm_tlsk_name[HM_TLSK_COUNT] = {
+    "HTTPS", "SSL_PROTOCOL", "SSL_CIPHER",
+    "SSL_CLIENT_VERIFY", "SSL_CLIENT_S_DN", "SSL_CLIENT_I_DN"
+};
+static SV *hm_tlsk[HM_TLSK_COUNT];
+
+static void hm_tls_env_init(pTHX) {
+    int i;
+    if (hm_tlsk[0]) return;
+    for (i = 0; i < HM_TLSK_COUNT; i++)
+        hm_tlsk[i] = newSVpvn_share(hm_tlsk_name[i],
+                                    (I32)strlen(hm_tlsk_name[i]), 0);
 }
 
 /* Add the TLS $env keys (mod_ssl-style) for a TLS connection. */
 static void hm_tls_env(pTHX_ hm_conn *c, HV *env) {
     hm_tls_peer *p;
     if (!c->ssl) return;
-    hv_stores(env, "HTTPS", newSVpvs("on"));
+    hm_tls_env_init(aTHX);
+    (void)hv_store_ent(env, hm_tlsk[HM_TLSK_HTTPS], newSVpvs("on"), 0);
+    if (c->tls_proto)
+        (void)hv_store_ent(env, hm_tlsk[HM_TLSK_PROTOCOL],
+                           newSVpv(c->tls_proto, 0), 0);
+    if (c->tls_cipher)
+        (void)hv_store_ent(env, hm_tlsk[HM_TLSK_CIPHER],
+                           newSVpv(c->tls_cipher, 0), 0);
     p = (hm_tls_peer *)c->tls_peer;
-    if (!p) return;
-    if (p->proto)  hv_stores(env, "SSL_PROTOCOL", newSVpv(p->proto, 0));
-    if (p->cipher) hv_stores(env, "SSL_CIPHER",   newSVpv(p->cipher, 0));
-    if (p->has_cert) {
-        hv_stores(env, "SSL_CLIENT_VERIFY",
-                  newSVpv(p->verified ? "SUCCESS" : "FAILED", 0));
-        if (p->subject) hv_stores(env, "SSL_CLIENT_S_DN", newSVpv(p->subject, 0));
-        if (p->issuer)  hv_stores(env, "SSL_CLIENT_I_DN", newSVpv(p->issuer, 0));
+    if (p) {
+        (void)hv_store_ent(env, hm_tlsk[HM_TLSK_VERIFY],
+                           newSVpv(p->verified ? "SUCCESS" : "FAILED", 0), 0);
+        if (p->subject)
+            (void)hv_store_ent(env, hm_tlsk[HM_TLSK_S_DN],
+                               newSVpv(p->subject, 0), 0);
+        if (p->issuer)
+            (void)hv_store_ent(env, hm_tlsk[HM_TLSK_I_DN],
+                               newSVpv(p->issuer, 0), 0);
     } else {
-        hv_stores(env, "SSL_CLIENT_VERIFY", newSVpvs("NONE"));
+        (void)hv_store_ent(env, hm_tlsk[HM_TLSK_VERIFY], newSVpvs("NONE"), 0);
     }
 }
 
@@ -375,10 +568,14 @@ static int hm_tls_available(void) { return 1; }
 
 #include <unistd.h>
 static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
-                              const char *ca, int verify, SV *sni, int alpn) {
+                              const char *ca, int verify, SV *sni, int alpn,
+                              const unsigned char *tkey, size_t tkeylen) {
     (void)cert; (void)key; (void)ca; (void)verify; (void)sni; (void)alpn;
+    (void)tkey; (void)tkeylen;
     return 0;
 }
+static int  hm_tls_get_ticket_key(void *ctx, unsigned char *buf, size_t *len)
+    { (void)ctx; (void)buf; (void)len; return 0; }
 static int  hm_tls_sni_count(void *ctx) { (void)ctx; return -1; }
 static void hm_tls_ctx_free(void *ctx) { (void)ctx; }
 static int  hm_tls_wrap(hm_conn *c, void *ctx) { (void)c; (void)ctx; return -1; }

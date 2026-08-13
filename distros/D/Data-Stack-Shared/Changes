@@ -1,5 +1,13 @@
 Revision history for Data::Stack::Shared
 
+0.08  2026-08-12
+    - Recover a file left behind by an interrupted create instead of leaving the
+      path unopenable.
+    - Hardening: re-entrancy with tied and overloaded arguments, and DESTROY on
+      an invocant that is not one of ours.
+    - Documentation and test-harness corrections.
+    - unlink() reports a removal that failed; one already gone is not an error.
+
 0.07  2026-07-22
     - Fix push/pop hanging on a slot abandoned by a killed peer.
     - Fix the reclaim path in pop() skipping the push_wait wake: a pusher
@@ -19,7 +27,7 @@ Revision history for Data::Stack::Shared
 
 0.04  2026-05-26
     - drain: bounded recovery (~2s) for slots stuck WRITING after a crashed pusher
-    - slot publish is now CAS-only — prevents a stalled-but-live pusher from
+    - slot publish is now CAS-only -- prevents a stalled-but-live pusher from
       clobbering a slot drain force-recovered to EMPTY
 
 0.03  2026-04-26
@@ -30,7 +38,7 @@ Revision history for Data::Stack::Shared
 
 
 0.02  2026-04-12
-    - Add drain() — concurrency-safe alternative to clear()
+    - Add drain() -- concurrency-safe alternative to clear()
 
 0.01  2026-04-11
     - Initial release

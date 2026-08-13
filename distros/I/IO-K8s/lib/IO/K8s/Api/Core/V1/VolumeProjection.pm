@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::VolumeProjection;
 # ABSTRACT: Projection that may be projected along with other supported volume types. Exactly one of these fields must be set.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s clusterTrustBundle => 'Core::V1::ClusterTrustBundleProjection';
@@ -10,6 +10,9 @@ k8s configMap => 'Core::V1::ConfigMapProjection';
 
 
 k8s downwardAPI => 'Core::V1::DownwardAPIProjection';
+
+
+k8s podCertificate => 'Core::V1::PodCertificateProjection';
 
 
 k8s secret => 'Core::V1::SecretProjection';
@@ -32,7 +35,7 @@ IO::K8s::Api::Core::V1::VolumeProjection - Projection that may be projected alon
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 clusterTrustBundle
 
@@ -52,6 +55,22 @@ configMap information about the configMap data to project
 
 downwardAPI information about the downwardAPI data to project
 
+=head2 podCertificate
+
+Projects an auto-rotating credential bundle (private key and certificate chain) that the pod can use either as a TLS client or server.
+
+Kubelet generates a private key and uses it to send a PodCertificateRequest to the named signer.  Once the signer approves the request and issues a certificate chain, Kubelet writes the key and certificate chain to the pod filesystem.  The pod does not start until certificates have been issued for each podCertificate projected volume source in its spec.
+
+Kubelet will begin trying to rotate the certificate at the time indicated by the signer using the PodCertificateRequest.Status.BeginRefreshAt timestamp.
+
+Kubelet can write a single file, indicated by the credentialBundlePath field, or separate files, indicated by the keyPath and certificateChainPath fields.
+
+The credential bundle is a single file in PEM format.  The first PEM entry is the private key (in PKCS#8 format), and the remaining PEM entries are the certificate chain issued by the signer (typically, signers will return their certificate chain in leaf-to-root order).
+
+Prefer using the credential bundle format, since your application code can read it atomically.  If you use keyPath and certificateChainPath, your application must make two separate file reads. If these coincide with a certificate rotation, it is possible that the private key and leaf certificate you read may not correspond to each other.  Your application will need to check for this condition, and re-read until they are consistent.
+
+The named signer controls chooses the format of the certificate it issues; consult the signer implementation's documentation to learn how to use the certificates it issues.
+
 =head2 secret
 
 secret information about the secret data to project
@@ -67,10 +86,6 @@ serviceAccountToken is information about the serviceAccountToken data to project
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -81,7 +96,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

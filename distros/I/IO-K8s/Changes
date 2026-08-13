@@ -1,5 +1,276 @@
 Revision history for IO-K8s
 
+1.106     2026-08-13 02:59:43Z
+
+  - Derive api_version through @ISA for class_namespaces subclasses.
+    IO::K8s::Role::APIObject::api_version now falls back to walking the
+    inheritance chain when the class name itself is not in a known
+    namespace, so a consumer subclass (e.g. `use parent
+    'IO::K8s::Api::Core::V1::Pod'`) serializes apiVersion instead of
+    silently omitting it.
+
+  - Make compare_to_schema inheritance-aware. The schema comparison in
+    IO::K8s::Role::Resource now reads the merged @ISA attribute view
+    (_k8s_attr_info) instead of the raw registry entry, so a
+    class_namespaces-style subclass compares its inherited attributes
+    instead of an empty or partial set.
+
+  - Make the k8s attribute lookups class_namespaces-aware via @ISA.
+    _k8s_attr_info and _k8s_attributes in IO::K8s::Role::Resource now walk
+    the inheritance chain, so a consumer subclass registered through
+    class_namespaces (e.g. `use parent 'IO::K8s::Api::Core::V1::Pod'`)
+    inflates with typed fields and serializes its parents' attributes
+    instead of seeing an empty registry. Attribute info merges nearest-wins
+    (a class's own declaration overrides an inherited one, in deterministic
+    @ISA order); the attribute list is a deduplicated union of own and
+    inherited declarations. Both merged views are cached per class and
+    invalidated when a new k8s attribute is registered.
+
+  - Made AutoGen dispatch apiVersion-aware and deterministic.
+    expand_class()/inflate() with an explicit apiVersion now fall through to
+    the openapi_spec AutoGen lookup when the resource map has no qualified
+    key, but only for an exact group/version match in the spec's
+    x-kubernetes-group-version-kind metadata; unknown or non-matching
+    apiVersions fail closed (expand_class returns undef, inflate dies)
+    instead of silently selecting a different version. Definition lookup no
+    longer depends on hash order: versionless lookups sort candidate
+    definitions lexicographically, exact lookups filter by group/version
+    and croak on ambiguity. AutoGen picks a multi-GVK definition's entry by
+    exact api_version (croak on ambiguity or no match) and deterministically
+    sorted first otherwise, and a definition serving several versions now
+    gets a GVK-specific package identity so two apiVersions of one
+    definition yield distinct classes with the correct api_version method
+    and wire serialization.
+
+  - Fix IO::K8s::List::api_version for empty lists with an item_class.
+    The local class-name regex derived shortened, invalid wire versions
+    for groups with a ".k8s.io" suffix (rbac/v1, storage/v1, events/v1)
+    and serialised them into manifests. The wire version is now derived
+    from the item_class's own api_version class method, which knows the
+    full group (rbac.authorization.k8s.io/v1, storage.k8s.io/v1,
+    events.k8s.io/v1); unloadable or non-API item_classes yield undef and
+    serialised empty lists omit apiVersion again.
+
+  - Document that .pk8s manifests are Perl code executed in-process via
+    eval and therefore must only be loaded from trusted sources, with
+    load_yaml documented as the data-only path without code execution.
+
+  - Declared Module::Runtime as a direct runtime prerequisite. IO::K8s has
+    always loaded it in IO::K8s (for require_module) but cpanfile and the
+    built META omitted it, so dependency installers that resolve strictly
+    from the declared prereqs could miss it. The built META.json now lists
+    Module::Runtime under runtime requires.
+
+  - Made built-in Kubernetes resource dispatch exact for every addressable
+    apiVersion/kind pair in the pinned v1.36.3 OpenAPI spec. This adds the
+    missing events.k8s.io/v1 Event and autoscaling/v1
+    HorizontalPodAutoscaler routes while preserving the historical bare-name
+    defaults (Core v1 Event and Autoscaling v2 HPA). Explicit unknown,
+    malformed, empty, or mismatched apiVersions now fail closed:
+    expand_class() returns undef and inflate()/new_object() report the
+    requested Kind and apiVersion instead of silently selecting a different
+    bare-name schema. Newly exposed compatibility aliases are
+    ClusterTrustBundle, DeviceTaintRule, LeaseCandidate, PodGroup,
+    ResourcePoolStatusRequest, StorageVersion, StorageVersionMigration and
+    Workload; all existing aliases and targets remain pinned. An offline,
+    SHA-256-pinned v1.36.3 fixture now exhaustively checks 98 addressable GVKs,
+    all 14 multi-version Kind collisions, namespace scope, maintained
+    non-dispatchable exceptions, real inflation and provider first-wins
+    behavior.
+
+  - Fixed inflate()/expand_class() to dispatch by apiVersion to the correct
+    multi-version Kind. Pre-fix, %DEFAULT_RESOURCE_MAP mapped each short
+    Kind name (DeviceClass, ResourceClaim, ResourceClaimTemplate,
+    ResourceSlice, ...) to exactly one class path (always the GA v1), and
+    only entries added externally via add() ever got domain-qualified
+    ('$apiVersion/$Kind') entries. Two visible consequences:
+    inflate({apiVersion=>'resource.k8s.io/v1beta1', kind=>'DeviceClass',
+    ...}) silently returned IO::K8s::Api::Resource::V1::DeviceClass (the
+    GA class, wrong schema), and inflate of a short-name-less Kind
+    (DeviceTaintRule, ResourcePoolStatusRequest) died with 'Cant locate
+    IO/K8s/DeviceTaintRule.pm in @INC' because the bare IO::K8s::$Kind
+    fallback does not exist. %DEFAULT_RESOURCE_MAP now carries literal
+    qualified entries for every shipped version of every addressable Kind,
+    including the short-name-less ones. Class-method and instance dispatch
+    therefore share the same complete static map without BUILD eagerly
+    loading every target class; add() still derives qualified keys for
+    externally merged providers. See karr #11.
+  - Fixed api_version() in IO::K8s::Role::APIObject for the
+    Storagemigration and Apiserverinternal groups. The fallback
+    `lc($group) . '/' . $version` only produces the correct wire
+    apiVersion for groups whose CamelCase lc-form equals the upstream
+    group name (apps, batch, autoscaling, policy) -- for groups whose
+    upstream name has a `.k8s.io` suffix, it produced a syntactically
+    plausible but rejected-by-the-API-server string. In particular,
+    every serialised StorageVersionMigration manifested as
+    `apiVersion: storagemigration/v1beta1` (upstream:
+    `storagemigration.k8s.io/v1beta1`) and every StorageVersion as
+    `apiVersion: apiserverinternal/v1alpha1` (upstream:
+    `internal.apiserver.k8s.io/v1alpha1`). Both groups are now in
+    %API_GROUP_MAP, alongside the 13 already-mapped groups. The other
+    18 groups covered by %_class_prefix were audited and verified to
+    either already map correctly or to fall through to the lc-fallback
+    correctly (the upstream group name equals the lc form).
+  - Fixed _expand_class in IO::K8s::Resource to handle CamelCase prefixes
+    (KubeAggregator, AdmissionRegistration, ...). The single-word
+    `[A-Z][a-z]+` regex could not match a prefix that has an internal
+    capital, so any declared class name whose first segment was CamelCase
+    silently fell through to the IO::K8s::Api default. In practice this
+    meant KubeAggregator's APIService, APIServiceSpec, APIServiceStatus,
+    APIServiceCondition and ServiceReference could not be inflated --
+    spec/status resolved to nonexistent IO::K8s::Api::KubeAggregator::V1
+    classes instead of the shipped IO::K8s::KubeAggregator::Pkg::Apis::
+    Apiregistration::V1 ones. The lookup now walks %_class_prefix in
+    longest-key-first order so CamelCase wins over a hypothetical shorter
+    substring, and uses \Q ... \E so the prefix is matched as a literal
+    rather than as a regex. Backwards-compatible: unknown short names still
+    fall through to the IO::K8s::Api default.
+  - Shipped IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionSpec.
+    Upstream declares it as an empty struct ("StorageVersionSpec is an
+    empty spec"), but the class was never authored, so every StorageVersion
+    inflate died with "Can't locate .../StorageVersionSpec.pm in @INC".
+    There was no working path through the class. This is the empty class
+    upstream asked for; the failure mode that mattered was on the
+    serialisation side, where an empty class round-tripped through TO_JSON
+    could collapse to an empty hash or disappear altogether.
+  - Added t/34_registry_guard.t: after every shipped class is loaded,
+    walks the global attribute registry and asserts every referenced
+    target class is loadable. This is the regression net that would have
+    caught the apiextensions.k8s.io/v1 union types, the KubeAggregator
+    prefix mismatch and the missing StorageVersionSpec together, rather
+    than one at a time on the consumer side. Inline-generated structs
+    (packages with no .pm file) are recognised via the `k8s` symbol in
+    the target's stash.
+  - Added t/32_kubeaggregator_apiservice.t and t/33_apiserverinternal_
+    storage_version.t covering the two regression cases above: that
+    APIService and StorageVersion inflate, that every spec/status/
+    condition class resolves to the namespace shipped (not the wrong
+    IO::K8s::Api fallback), and that the full object round-trips
+    byte-for-byte through inflate -> TO_JSON -> inflate -> TO_JSON.
+  - Added t/35_expand_class.t and t/36_storage_version_spec_unit.t for
+    direct unit coverage of the bugfix targets: every branch of
+    Resource::_expand_class (+FullClassName, already-qualified,
+    longest-key-first prefix walk, default fallback) and the full
+    prefix map; and StorageVersionSpec on its own (DOES Resource,
+    ->new, TO_JSON as an empty hash, no api_version/kind since the
+    class intentionally does not consume IO::K8s::APIObject).
+
+  - Added the four apiextensions.k8s.io/v1 types the distribution declared
+    but never shipped: JSON, JSONSchemaPropsOrArray, JSONSchemaPropsOrBool
+    and JSONSchemaPropsOrStringArray. Without them, inflating any
+    CustomResourceDefinition whose schema used `items`, `additionalItems`,
+    `additionalProperties`, `dependencies`, `default`, `example` or `enum`
+    died with "Can't locate IO/K8s/.../JSONSchemaPropsOrArray.pm in @INC" --
+    in practice nearly every real CRD, since a single array field is enough
+    to hit it. All four are Kubernetes union types that serialize as the
+    bare alternative rather than as a tagged wrapper, so which arm was used
+    now survives a round trip: `additionalProperties: false` stays false
+    instead of collapsing into an empty schema object, and a single `items`
+    schema does not turn into a one-element array.
+  - Added a FROM_STRUCT inflation hook to struct_to_object. A class that
+    provides this class method takes over its own inflation completely and
+    owns its TO_JSON in return, instead of being built field by field from
+    a hashref. This is what makes the union types above representable; it
+    is the general mechanism for any type that serializes as a bare value.
+
+  - Shipped resource.k8s.io/v1beta1 (39 classes, entirely missing --
+    lib/IO/K8s/Api/Resource/ had no V1beta1/ directory at all) and filled
+    in resource.k8s.io/v1beta2 (39 more classes; only the DeviceTaintRule/
+    DeviceTaintRuleSpec/DeviceTaintRuleStatus/DeviceTaintSelector quartet
+    from an earlier fix was shipped there). Both versions now carry the
+    full DRA surface: DeviceClass, ResourceClaim, ResourceClaimTemplate and
+    ResourceSlice (DeviceClass/ResourceSlice cluster scoped, ResourceClaim/
+    ResourceClaimTemplate namespaced -- verified against the real swagger
+    paths, not just pattern-matched from V1) plus the whole Device/
+    AllocationResult/DeviceRequest/Counter/CapacityRequestPolicy family.
+    v1beta1 is the most widely deployed DRA server version; any consumer
+    talking to a cluster that had not migrated to v1 got "Can't locate
+    .../DeviceClass.pm in @INC" for every one of these Kinds.
+  - Added the 9 v1.36 DRA additions to resource.k8s.io/v1alpha3 that had
+    not been backported to the legacy "classic DRA" version also serving
+    them: DeviceTaint, DeviceTaintRule (+ Spec/Status), DeviceTaintSelector,
+    PoolStatus, and ResourcePoolStatusRequest (+ Spec/Status) -- the latter
+    three were already present from a previous pass; only the
+    DeviceTaint(Rule) family was actually missing. The 24 already-shipped
+    "classic DRA" structural types (DeviceClass, ResourceClaim, Device,
+    AllocationResult, etc.) are untouched, per the 1.100/1.105 decision to
+    keep them as legacy backward compatibility.
+  - Fixed ArrayRef[Bool] fields (DeviceAttribute.bools, present in the V1,
+    V1beta1 and V1beta2 DRA APIs) to serialize as JSON booleans instead of
+    plain 0/1, and to accept real decoded JSON booleans on the way back in.
+    Previously TO_JSON emitted [1,0,1] instead of [true,false,true], and
+    FROM_HASH on a real cluster response died with a Moo type constraint
+    violation because JSON::PP::Boolean objects don't satisfy Types::
+    Standard's Bool -- this affected the already-shipped
+    IO::K8s::Api::Resource::V1::DeviceAttribute too, not just the new
+    v1beta1/v1beta2 copies. IO::K8s::Resource now tracks an
+    is_array_of_bool flag with element-wise coercion, mirroring the
+    existing scalar Bool handling.
+  - Fixed ResourceClaimTemplateSpec (v1beta1 and v1beta2) to be built on
+    IO::K8s::APIObject instead of IO::K8s::Resource, matching the already-
+    shipped V1 sibling. Despite not being a Kind, it carries a real
+    upstream `metadata: ObjectMeta` field; without APIObject the metadata
+    attribute was never registered and silently dropped on serialization.
+  - Added maint/spec-drift-check.pl, a repeatable coverage checker that
+    diffs a real upstream swagger.json against what lib/IO/K8s/ actually
+    ships and reports missing Kinds/types/fields (the tool behind karr
+    #4-#8's discovery), plus a --from/--to mode that diffs two upstream
+    releases directly to gauge whether a version bump is worth doing.
+    Settled non-gaps (dropped *List kinds, old back-compat API tracks,
+    apimachinery scalar/opaque types) are filtered via the maintained
+    maint/spec-drift-exceptions.yaml. Report-only: never edits lib/ or
+    the karr board.
+  - Shipped storagemigration.k8s.io/v1beta1 (IO::K8s::Api::Storagemigration::
+    V1beta1::StorageVersionMigration, ::StorageVersionMigrationSpec and
+    ::StorageVersionMigrationStatus), the version v1.36 clusters actually
+    serve now that v1alpha1 has been dropped from the upstream spec. The
+    existing V1alpha1 classes are untouched and stay shipped for old-cluster
+    back-compat. Also added IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::
+    GroupResource, which StorageVersionMigrationSpec.resource needs and
+    which did not exist under any group.
+  - Added five Core::V1 classes that existing structs gained a new $ref
+    field for in v1.36, but whose target type was never shipped, silently
+    swallowing the field on inflate: FileKeySelector (EnvVarSource.
+    fileKeyRef -- read an env var's value from a file in the container),
+    NodeSwapStatus (NodeSystemInfo.swap), PodCertificateProjection
+    (VolumeProjection.podCertificate), and VolumeStatus + ImageVolumeStatus
+    (VolumeMountStatus.volumeStatus).
+  - Added t/38_storagemigration_v1beta1_and_core_v136_fields.t covering the
+    two fixes above: a full StorageVersionMigration inflate -> TO_JSON ->
+    inflate round-trip through GroupResource, plus round-trips for
+    EnvVarSource.fileKeyRef, VolumeMountStatus.volumeStatus, NodeSystemInfo.
+    swap and VolumeProjection.podCertificate.
+  - Added 14 fields the v1.36 sync had missed on otherwise-shipped classes:
+    Core::V1::ContainerStatus.stopSignal, Core::V1::Lifecycle.stopSignal,
+    Core::V1::PodCondition.observedGeneration, Core::V1::
+    PodSecurityContext.seLinuxChangePolicy, Core::V1::ResourceHealth.message,
+    Storage::V1::VolumeError.errorCode, ApiextensionsApiserver::...::V1::
+    CustomResourceDefinitionCondition.observedGeneration and ::
+    CustomResourceDefinitionStatus.observedGeneration, Apimachinery::...::
+    Meta::V1::DeleteOptions.ignoreStoreReadErrorWithClusterBreakingPotential,
+    and Apimachinery::Pkg::Version::Info.emulationMajor/emulationMinor/
+    minCompatibilityMajor/minCompatibilityMinor. Also shipped the new
+    IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ShardInfo struct and wired it
+    up as ListMeta.shardInfo, which previously had no target type at all.
+  - Shipped coordination.k8s.io/v1alpha2 (IO::K8s::Api::Coordination::
+    V1alpha2::LeaseCandidate and ::LeaseCandidateSpec), which had no
+    directory at all despite V1, V1alpha1 and V1beta1 all being shipped.
+    Also added IO::K8s::Api::Scheduling::V1alpha2::TypedLocalObjectReference,
+    a distinct upstream schema that WorkloadSpec.controllerRef previously
+    pointed at Core::V1::TypedLocalObjectReference for instead -- the two
+    happen to share the same three fields today, but they are different
+    schemas and were drifting apart silently.
+  - Added the meta.v1 discovery Kinds APIGroupList and APIResourceList
+    (IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::), used by the /apis and
+    /apis/<group> discovery endpoints. Modelled like their already-shipped
+    siblings APIGroup/APIVersions/Status/DeleteOptions: explicit apiVersion/
+    kind Str fields, not IO::K8s::APIObject.
+  - Added t/39_v1_36_field_and_kind_gaps.t covering all of the above: field
+    round-trips for a representative sample of the 14 additions, a full
+    LeaseCandidate inflate -> TO_JSON -> inflate round-trip, the corrected
+    WorkloadSpec.controllerRef target class, and APIGroupList/
+    APIResourceList loading with their required fields passed through.
+
 1.105     2026-08-08 18:51:44Z
 
   - Removed the 76 individual *List classes (PodList, ServiceList,

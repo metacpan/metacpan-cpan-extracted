@@ -10,6 +10,8 @@ README
 Shared.xs
 t/01-basic.t
 t/02-bbit.t
+t/03-frozen.t
+t/04-recover.t
 xt/asan.t
 xt/class_pv_during_new.t
 xt/crash_recovery.t

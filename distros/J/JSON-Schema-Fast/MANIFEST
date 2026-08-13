@@ -41,6 +41,7 @@ t/51-errors.t
 t/52-coerce.t
 t/53-apply-defaults.t
 t/54-fast-path.t
+t/55-no-mutation.t
 t/70-conformance.t
 t/71-error-shape.t
 t/72-oracle.t

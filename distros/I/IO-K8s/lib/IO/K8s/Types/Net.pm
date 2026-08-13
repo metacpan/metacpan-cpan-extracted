@@ -1,6 +1,6 @@
 package IO::K8s::Types::Net;
 # ABSTRACT: Type::Tiny constraints for IP addresses and CIDR notation
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use v5.10;
 use Type::Library -base, -declare => qw( IPv4 IPv6 IPAddress CIDR NetIP );
 use Type::Utils -all;
@@ -63,7 +63,7 @@ IO::K8s::Types::Net - Type::Tiny constraints for IP addresses and CIDR notation
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SUPPORT
 
@@ -71,10 +71,6 @@ version 1.105
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -86,7 +82,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

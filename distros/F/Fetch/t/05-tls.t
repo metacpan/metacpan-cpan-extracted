@@ -5,6 +5,7 @@ use warnings;
 no warnings 'once';   # $IO::Socket::SSL::SSL_ERROR is referenced once
 use File::Temp ();
 use Test::More;
+use File::Spec ();
 use Fetch;
 
 # Requires OpenSSL in the Fetch build and IO::Socket::SSL + openssl(1) for the
@@ -30,6 +31,11 @@ my $port = $srv->sockport;
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    # Never hold the harness TAP pipe open, and never outlive the run:
+    # a leaked server child hangs the whole suite after this test is done.
+    open STDOUT, ">", File::Spec->devnull();
+    open STDERR, ">", File::Spec->devnull();
+    alarm 120;
     $SIG{TERM} = sub { exit 0 };
     while (my $c = $srv->accept) {
         my $l = <$c>; my ($path) = $l =~ m{^\S+\s+(\S+)};
@@ -71,4 +77,4 @@ my $base = "https://127.0.0.1:$port";
     ok($f->is_failed, 'tls_verify=1 rejects a self-signed cert');
 }
 
-END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

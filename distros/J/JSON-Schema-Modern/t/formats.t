@@ -18,8 +18,6 @@ use Test2::Warnings qw(warnings :no_end_test had_no_warnings allow_warnings);
 use JSON::Schema::Modern::Utilities qw(get_type);
 
 use Test::Without::Module 0.19 qw(
-  Time::Moment
-  DateTime::Format::RFC3339
   Data::Validate::Domain
   Email::Address::XS
   Net::IDN::Encode
@@ -994,17 +992,18 @@ subtest 'assertion formats using implementations that rely on optional dependenc
       $doc = $js->add_schema({
         '$schema' => 'https://my_metaschema',
         allOf => [
-          { format => 'date-time' },
+          { format => 'hostname' },
           true,
         ],
       });
     };
-    is($doc->errors, 0, $spec_version . ': for format validation with the Format-Assertion vocabulary, no errors during traversal when using an unknown custom format');
+
+    is($doc->errors, 0, $spec_version . ': for format validation with the Format-Assertion vocabulary, no errors during traversal when using a format with missing prerequisites');
 
     cmp_result(
       \@warnings,
-      [ re(qr{Can't locate Time/Moment\.pm}) ],
-      '...but we do warn for the missing module',
+      [ re(qr{Can't locate Data/Validate/Domain\.pm}) ],
+      'we warn for a missing module',
     );
 
     cmp_result(
@@ -1013,13 +1012,13 @@ subtest 'assertion formats using implementations that rely on optional dependenc
         valid => false,
         errors => [
           {
-            error => re(qr{^EXCEPTION: Can't locate Time/Moment\.pm}),
+            error => re(qr{^EXCEPTION: Can't locate Data/Validate/Domain\.pm}),
             instanceLocation => '',
             keywordLocation => '/allOf/0/format',
           },
         ],
       },
-      $spec_version . ': for Format-Asertion vocabulary, we immediately abort when encountering a format that throws an exception',
+      $spec_version . ': for Format-Assertion vocabulary, we immediately abort when encountering a format that throws an exception',
     );
   }
 };

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::CSINode;
 # ABSTRACT: CSINode holds information about all CSI drivers installed on a node. CSI drivers do not need to create the CSINode object directly. As long as they use the node-driver-registrar sidecar container, the kubelet will automatically populate the CSINode object for the CSI driver as part of kubelet plugin registration. CSINode has the same name as a node. If the object is missing, it means either there are no CSI Drivers available on the node, or the Kubelet version is low enough that it doesn't create this object. CSINode has an OwnerReference that points to the corresponding node object.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Storage::V1::CSINode - CSINode holds information about all CSI dri
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ spec is the specification of CSINode
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#csinode-v1-storage.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#csinode-v1-storage.k8s.io>
 
 =head1 SUPPORT
 
@@ -43,10 +43,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#csinode-v
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -58,7 +54,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

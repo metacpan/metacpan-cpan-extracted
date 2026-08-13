@@ -20,6 +20,20 @@ BEGIN {
 # DBIx::Loop 0.02's own disown logic each enforce this; here it is asserted
 # through the model tier, the way an application actually hits it.
 
+# Everything here talks to pool workers over sockets, so the failure mode is
+# a wait rather than a wrong answer: on Hyperman before 0.14 a child cleaning
+# up its inherited loop deregistered the PARENT's fds from the epoll they
+# shared, leaving the parent's workers alive but never readable again. Bound
+# it, so that arrives as a failed test rather than as a smoker killing a test
+# that has been sitting on a socket for half an hour.
+alarm 120;
+$SIG{ALRM} = sub {
+    print "Bail out! stuck waiting on a pool worker"
+        . " (Hyperman @{[ eval { require Hyperman; Hyperman->VERSION } || '?' ]};"
+        . " needs 0.14+ for the shared-epoll-across-fork fix)\n";
+    exit 1;
+};
+
 {
     package T::Model::Row;
     use Punk::Model;

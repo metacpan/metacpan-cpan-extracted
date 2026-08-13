@@ -1,7 +1,10 @@
 package IO::K8s::Api::Storage::V1::VolumeError;
 # ABSTRACT: VolumeError captures an error encountered during a volume operation.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
+
+k8s errorCode => Int;
+
 
 k8s message => Str;
 
@@ -23,7 +26,13 @@ IO::K8s::Api::Storage::V1::VolumeError - VolumeError captures an error encounter
 
 =head1 VERSION
 
-version 1.105
+version 1.106
+
+=head2 errorCode
+
+errorCode is a numeric gRPC code representing the error encountered during Attach or Detach operations.
+
+This field requires the MutableCSINodeAllocatableCount feature gate being enabled to be set.
 
 =head2 message
 
@@ -40,10 +49,6 @@ time represents the time the error was encountered.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -54,7 +59,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

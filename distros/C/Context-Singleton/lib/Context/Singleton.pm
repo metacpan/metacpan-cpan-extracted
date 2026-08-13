@@ -5,12 +5,13 @@ use warnings;
 use feature q (state);
 
 package Context::Singleton;
-$Context::Singleton::VERSION = '1.0.7';
+$Context::Singleton::VERSION = '1.0.8';
 use parent q (Exporter::Tiny);
 
 use Context::Singleton::Frame;
 
 use constant DEFAULT_FRAME_CLASS => Context::Singleton::Frame::;
+use constant FRAME_DEPTH         => 2;
 
 our @EXPORT = (
 	qw[ contrive        ],
@@ -36,7 +37,7 @@ sub _exported_accessors {
 		contrive_class  => eval qq (sub { $frame_class->contrive_class (\@_) }),
 		current_frame   => eval qq (sub { $frame_class->current_frame }),
 		deduce          => eval qq (sub { $frame_class->deduce (\@_) }),
-		frame           => eval qq (sub (&) { $frame_class->frame (\$_[0]); };),
+		frame           => eval qq (sub (&) { my \$frame = $frame_class->current_frame; local \$frame->_localisable_current_frame->[0] = \$frame->build_frame; \$_[0]->() }),
 		is_deduced      => eval qq (sub { $frame_class->is_deduced (\@_) }),
 		load_rules      => eval qq (sub { $frame_class->load_rules (\@_) }),
 		proclaim        => eval qq (sub { $frame_class->proclaim (\@_) }),

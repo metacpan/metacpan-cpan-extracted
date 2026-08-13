@@ -16,6 +16,7 @@ include/oa_mock.h
 include/oa_plack.h
 include/oa_route.h
 include/oa_types.h
+include/oa_normalize.h
 include/oa_validate.h
 lib/Open/API.pm
 lib/Open/API/Client.pm
@@ -55,12 +56,18 @@ t/24-plack-ui.t
 t/25-abi.t
 t/26-response-report.t
 t/27-synthesize.t
+t/28-openapi30.t
+t/29-spec-twin-30.t
+t/30-discriminator.t
+t/31-param-content.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/spec/mini.json
 t/spec/mini.yaml
 t/spec/mock.json
+t/spec/petstore-3.0.json
+t/spec/petstore-3.1-twin.json
 t/spec/petstore.json
 t/spec/petstore.yaml
 xt/boilerplate.t

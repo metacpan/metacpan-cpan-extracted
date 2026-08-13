@@ -518,7 +518,6 @@ static inline void pool_init_header(void *base, uint64_t total,
                                      uint64_t own_off, uint64_t dat_off) {
     PoolHeader *hdr = (PoolHeader *)base;
     memset(base, 0, (size_t)total);
-    hdr->magic      = POOL_MAGIC;
     hdr->version    = POOL_VERSION;
     hdr->elem_size  = elem_size;
     hdr->variant_id = variant_id;
@@ -528,6 +527,12 @@ static inline void pool_init_header(void *base, uint64_t total,
     hdr->bitmap_off = bm_off;
     hdr->owners_off = own_off;
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, POOL_MAGIC, __ATOMIC_RELEASE);
+
 }
 
 /* ================================================================
@@ -623,6 +628,16 @@ static int pool_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int pool_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static PoolHandle *pool_create(const char *path, uint64_t capacity,
                                 uint32_t elem_size, uint32_t variant_id,
                                 mode_t mode, char *errbuf) {
@@ -697,7 +712,28 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
 
         if (!is_new) {
             if (!pool_validate_header((PoolHeader *)base, (uint64_t)st.st_size, variant_id)) {
-                POOL_ERR("%s: invalid or incompatible pool file", path);
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((PoolHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && pool_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        POOL_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    pool_init_header(base, total, elem_size, variant_id, capacity,
+                                     bm_off, own_off, dat_off);
+                    flock(fd, LOCK_UN); close(fd);
+                    return pool_setup_handle(base, map_size, path, -1);
+                }
+                if (((PoolHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid())
+                    POOL_ERR("%s: incomplete pool file left by an interrupted create; remove it and retry", path);
+                else
+                    POOL_ERR("%s: invalid or incompatible pool file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             /* Attaching an existing file must match the requested geometry, else

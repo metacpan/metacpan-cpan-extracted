@@ -1,5 +1,8 @@
 Revision history for Business-NAB
 
+0.09
+        - Protect against even more rounding errors.
+
 0.08
         - Bump version having failed to bump version last time
 

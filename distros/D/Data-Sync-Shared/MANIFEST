@@ -43,8 +43,10 @@ t/05-once.t
 t/06-eventfd.t
 t/07-new-features.t
 t/08-errors.t
+t/09-recover.t
 t/pod_synopsis.t
 t/version_check.t
+t/10-foreign-invocant.t
 xt/acquire_n_stress.t
 xt/asan.t
 xt/cloexec_exec.t

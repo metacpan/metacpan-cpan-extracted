@@ -84,6 +84,7 @@ DEFINE_PS_KW(str, "Str", lag,     1, build_kw_1arg)
         croak("Expected a %s object", classname); \
     PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    PubSubHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -98,7 +99,7 @@ DEFINE_PS_KW(str, "Str", lag,     1, build_kw_1arg)
     if (!SvROK(sv)) \
         croak("%s object was replaced during the call", classname); \
     h = INT2PTR(PubSubHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("%s object destroyed during the call", classname)
+    if (h != h0) croak("%s object replaced or destroyed during the call", classname)
 
 #define MAKE_OBJ(class, ptr) \
     SV *ref = newRV_noinc(newSViv(PTR2IV(ptr))); \
@@ -110,6 +111,7 @@ DEFINE_PS_KW(str, "Str", lag,     1, build_kw_1arg)
         croak("Expected a %s object", classname); \
     PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(sv))); \
     if (!sub) croak("Attempted to use a destroyed %s object", classname); \
+    PubSubSub *sub0 = sub; PERL_UNUSED_VAR(sub0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))   /* pin the invocant across the method (reentrant-DESTROY UAF guard) */
 
 /* Re-read the subscriber after a call that can run Perl code (tied/overloaded
@@ -124,7 +126,7 @@ DEFINE_PS_KW(str, "Str", lag,     1, build_kw_1arg)
     if (!SvROK(sv)) \
         croak("%s object was replaced during the call", classname); \
     sub = INT2PTR(PubSubSub*, SvIV(SvRV(sv))); \
-    if (!sub) croak("%s object destroyed during the call", classname)
+    if (sub != sub0) croak("%s object replaced or destroyed during the call", classname)
 
 MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Int
 
@@ -157,7 +159,7 @@ new(class, path, capacity, ...)
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     if (capacity > 0xFFFFFFFFU) croak("Data::PubSub::Shared->new: capacity exceeds 2^32");
     PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT, 0, fmode, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int->new: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -172,7 +174,7 @@ new_memfd(class, name, capacity)
   CODE:
     if (capacity > 0xFFFFFFFFU) croak("Data::PubSub::Shared->new: capacity exceeds 2^32");
     PubSubHandle *h = pubsub_create_memfd(name, (uint32_t)capacity, PUBSUB_MODE_INT, 0, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int->new_memfd: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -185,7 +187,7 @@ new_from_fd(class, fd)
     char errbuf[PUBSUB_ERR_BUFLEN];
   CODE:
     PubSubHandle *h = pubsub_open_fd(fd, PUBSUB_MODE_INT, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -204,7 +206,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::PubSub::Shared::Int")) return;
     PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -388,7 +390,7 @@ unlink(self_or_class, ...)
         path = SvPV_nolen(ST(1));
     }
     if (!path) croak("cannot unlink anonymous or memfd pubsub");
-    if (unlink(path) != 0)
+    if (unlink(path) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", path, strerror(errno));
 
 IV
@@ -446,7 +448,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::PubSub::Shared::Int::Sub")) return;
     PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(self)));
     if (!sub) return;
     sv_setiv(SvRV(self), 0);
@@ -686,7 +688,7 @@ new(class, path, capacity, ...)
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     if (capacity > 0xFFFFFFFFU) croak("Data::PubSub::Shared->new: capacity exceeds 2^32");
     PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_STR, msg_size, fmode, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Str->new: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Str->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -703,7 +705,7 @@ new_memfd(class, name, capacity, ...)
     msg_size = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (uint32_t)SvUV(ST(3)) : 0;
     if (capacity > 0xFFFFFFFFU) croak("Data::PubSub::Shared->new: capacity exceeds 2^32");
     PubSubHandle *h = pubsub_create_memfd(name, (uint32_t)capacity, PUBSUB_MODE_STR, msg_size, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Str->new_memfd: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Str->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -716,7 +718,7 @@ new_from_fd(class, fd)
     char errbuf[PUBSUB_ERR_BUFLEN];
   CODE:
     PubSubHandle *h = pubsub_open_fd(fd, PUBSUB_MODE_STR, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Str->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Str->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -735,7 +737,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::PubSub::Shared::Str")) return;
     PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -944,7 +946,7 @@ unlink(self_or_class, ...)
         path = SvPV_nolen(ST(1));
     }
     if (!path) croak("cannot unlink anonymous or memfd pubsub");
-    if (unlink(path) != 0)
+    if (unlink(path) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", path, strerror(errno));
 
 IV
@@ -1002,7 +1004,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::PubSub::Shared::Str::Sub")) return;
     PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(self)));
     if (!sub) return;
     sv_setiv(SvRV(self), 0);
@@ -1274,7 +1276,7 @@ new(class, path, capacity, ...)
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     if (capacity > 0xFFFFFFFFU) croak("Data::PubSub::Shared->new: capacity exceeds 2^32");
     PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT32, 0, fmode, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int32->new: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int32->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1289,7 +1291,7 @@ new_memfd(class, name, capacity)
   CODE:
     if (capacity > 0xFFFFFFFFU) croak("Data::PubSub::Shared->new: capacity exceeds 2^32");
     PubSubHandle *h = pubsub_create_memfd(name, (uint32_t)capacity, PUBSUB_MODE_INT32, 0, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int32->new_memfd: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int32->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1302,7 +1304,7 @@ new_from_fd(class, fd)
     char errbuf[PUBSUB_ERR_BUFLEN];
   CODE:
     PubSubHandle *h = pubsub_open_fd(fd, PUBSUB_MODE_INT32, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int32->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int32->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1321,7 +1323,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::PubSub::Shared::Int32")) return;
     PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -1501,7 +1503,7 @@ unlink(self_or_class, ...)
         path = SvPV_nolen(ST(1));
     }
     if (!path) croak("cannot unlink anonymous or memfd pubsub");
-    if (unlink(path) != 0)
+    if (unlink(path) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", path, strerror(errno));
 
 IV
@@ -1559,7 +1561,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::PubSub::Shared::Int32::Sub")) return;
     PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(self)));
     if (!sub) return;
     sv_setiv(SvRV(self), 0);
@@ -1797,7 +1799,7 @@ new(class, path, capacity, ...)
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     if (capacity > 0xFFFFFFFFU) croak("Data::PubSub::Shared->new: capacity exceeds 2^32");
     PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT16, 0, fmode, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int16->new: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int16->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1812,7 +1814,7 @@ new_memfd(class, name, capacity)
   CODE:
     if (capacity > 0xFFFFFFFFU) croak("Data::PubSub::Shared->new: capacity exceeds 2^32");
     PubSubHandle *h = pubsub_create_memfd(name, (uint32_t)capacity, PUBSUB_MODE_INT16, 0, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int16->new_memfd: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int16->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1825,7 +1827,7 @@ new_from_fd(class, fd)
     char errbuf[PUBSUB_ERR_BUFLEN];
   CODE:
     PubSubHandle *h = pubsub_open_fd(fd, PUBSUB_MODE_INT16, errbuf);
-    if (!h) croak("Data::PubSub::Shared::Int16->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::PubSub::Shared::Int16->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1844,7 +1846,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::PubSub::Shared::Int16")) return;
     PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -2024,7 +2026,7 @@ unlink(self_or_class, ...)
         path = SvPV_nolen(ST(1));
     }
     if (!path) croak("cannot unlink anonymous or memfd pubsub");
-    if (unlink(path) != 0)
+    if (unlink(path) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", path, strerror(errno));
 
 IV
@@ -2082,7 +2084,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::PubSub::Shared::Int16::Sub")) return;
     PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(self)));
     if (!sub) return;
     sv_setiv(SvRV(self), 0);

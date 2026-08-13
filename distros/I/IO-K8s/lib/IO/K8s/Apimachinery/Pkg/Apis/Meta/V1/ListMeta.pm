@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ListMeta;
 # ABSTRACT: ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s continue => Str;
@@ -13,6 +13,9 @@ k8s resourceVersion => Str;
 
 
 k8s selfLink => Str;
+
+
+k8s shardInfo => 'Meta::V1::ShardInfo';
 
 
 1;
@@ -29,7 +32,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ListMeta - ListMeta describes metada
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 continue
 
@@ -47,16 +50,18 @@ String that identifies the server's internal version of this object that can be 
 
 Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
 
+=head2 shardInfo
+
+shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
+
+This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
+
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -68,7 +73,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

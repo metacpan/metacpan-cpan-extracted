@@ -80,6 +80,7 @@ static const frj_abi *punk_frj(pTHX) {
 #include "punk/punk_wsconn.h"     /* the live WebSocket connection         */
 #include "punk/punk_wshandshake.h" /* the upgrade handshake (SHA-1 + base64) */
 #include "punk/punk_sse.h"         /* Server-Sent Events streams            */
+#include "punk/punk_ratelimit.h"  /* rate_limit: a C before_dispatch closure */
 #include "punk/punk_wsroom.h"      /* per-worker pub/sub rooms              */
 #include "punk/punk_future.h"      /* async result: loop when live, else block */
 #include "punk/punk_dbil.h"        /* the async model backend, on DBIx::Loop's
@@ -111,6 +112,7 @@ INCLUDE: xs/session.xs
 INCLUDE: xs/log.xs
 INCLUDE: xs/scope.xs
 INCLUDE: xs/app.xs
+INCLUDE: xs/ratelimit.xs
 INCLUDE: xs/serve.xs
 INCLUDE: xs/views.xs
 INCLUDE: xs/stencil.xs

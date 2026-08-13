@@ -22,10 +22,16 @@ SYNOPSIS
         say "$bs";                # "10101000..." (stringification)
         my @bits = $bs->set_bits; # (0, 2, 4)
 
+        # freeze and ship: query it read-only (lock-free) on other machines
+        my $shared = Data::BitSet::Shared->new("/tmp/seen.bitset", 256);
+        $shared->set(10);
+        $shared->freeze;
+        my $ro = Data::BitSet::Shared->new_readonly("/tmp/seen.bitset");
+        $ro->test(10);
+
 DESCRIPTION
-    Fixed-size bitset in shared memory. CAS-based atomic per-bit operations
-    on uint64_t words. Lock-free set/clear/test/toggle with hardware
-    popcount.
+    Fixed-size bitset in shared memory. CAS-based atomic per-bit operations on
+    uint64_t words. Lock-free set/clear/test/toggle with hardware popcount.
 
     Useful for shared flags, membership tracking, bloom filter backing,
     resource allocation bitmaps.
@@ -38,6 +44,12 @@ METHODS
         my $bs = Data::BitSet::Shared->new(undef, $capacity);    # anonymous (fork-inherited)
         my $bs = Data::BitSet::Shared->new_memfd($name, $cap);   # memfd (fd-passable)
         my $bs = Data::BitSet::Shared->new_from_fd($fd);         # attach to existing fd
+        my $ro = Data::BitSet::Shared->new_readonly($path);      # frozen file, read-only
+
+    "new_readonly" opens a frozen file read-only for lock-free querying (see
+    "FROZEN (READ-ONLY) MODE"). The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle.
 
   Bit Operations
         my $old = $bs->set($bit);     # set to 1, returns old value
@@ -60,9 +72,9 @@ METHODS
         $bs->fill;           # set all bits to 1
         $bs->zero;           # set all bits to 0
 
-    Not safe to call concurrently with per-bit operations -- these store
-    full 64-bit words, which can race with CAS-based set/clear/toggle on any
-    bit in the same word.
+    Not safe to call concurrently with per-bit operations -- these store full
+    64-bit words, which can race with CAS-based set/clear/toggle on any bit in
+    the same word.
 
   Stringification
         say "$bs";           # "01001..." (overloaded)
@@ -87,20 +99,78 @@ BENCHMARKS
 
 STATS
     stats() returns a hashref with keys: "capacity", "count", "sets",
-    "clears", "toggles", "mmap_size".
+    "clears", "toggles", "mmap_size", "frozen" (1 if the bitset has been
+    sealed by "freeze", else 0), and "readonly" (1 if this handle is a
+    read-only view -- from "new_readonly", or the handle that called "freeze"
+    -- else 0).
+
+FROZEN (READ-ONLY) MODE
+    A file-backed bitset can be frozen and then shipped to other machines,
+    where consumers open it read-only and query it with no locking at all (bit
+    operations are already lock-free CAS/atomics, frozen or not; freezing only
+    guarantees the mapping is never mutated again).
+
+        # producer: build, freeze, ship the file
+        my $bs = Data::BitSet::Shared->new("/tmp/seen.bitset", 1_000_000);
+        $bs->set($_) for @known_ids;
+        $bs->freeze;                 # seal: now immutable, and $bs itself is read-only
+        # ... copy /tmp/seen.bitset to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::BitSet::Shared->new_readonly("/tmp/seen.bitset");
+        $ro->test($_) for @queries;
+
+    "freeze" marks the bitset permanently immutable (there is no unfreeze --
+    rebuild the file to change it) and flushes the seal to disk. A frozen
+    bitset rejects every mutator ("set", "clear", "toggle", "fill", "zero")
+    with a croak, and a read-write reopen ("new($path, ...)" or "new_from_fd")
+    of a sealed file is refused -- so a shipped artifact can never be silently
+    mutated out from under its readers.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Every query
+    method ("test", "count", "capacity", "any", "none", "first_set",
+    "first_clear", "to_string", "stats", stringification) reads the mapping
+    directly with no lock, so a read-only view works from a read-only file
+    descriptor or a read-only filesystem, and any number of processes can
+    share one "PROT_READ" mapping. "frozen" and "readonly" report the two
+    states; "sync" is a silent no-op on a read-only handle.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: "MAP_SHARED" coherency across NFS clients is not guaranteed,
+    and the "no live writer" contract assumes a static copy. Linux-only;
+    64-bit Perl.
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied when the file is created; a
-    pre-existing empty file owned by the caller is adopted and also gets the
-    requested mode, while a non-empty existing file keeps its own
-    permissions. The file is opened with "O_NOFOLLOW", so a symlink planted
-    at the path is refused, and created with "O_EXCL"; the on-disk header is
-    validated when the file is attached. Any process you grant write access
-    to a shared mapping is trusted not to corrupt its contents while other
-    processes are using it.
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created; a pre-existing
+    file owned by the caller is adopted -- and also gets the requested mode --
+    when it is empty, or when it is the full-size all-zero file an interrupted
+    create leaves behind (see "CRASH SAFETY"). Any other existing file keeps
+    its own permissions. The file is opened with "O_NOFOLLOW", so a symlink
+    planted at the path is refused, and created with "O_EXCL"; the on-disk
+    header is validated when the file is attached. Any process you grant write
+    access to a shared mapping is trusted not to corrupt its contents while
+    other processes are using it.
+
+CRASH SAFETY
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete bitset file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
     Data::Buffer::Shared - typed shared array
@@ -133,6 +203,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

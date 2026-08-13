@@ -8,6 +8,3 @@ BEGIN { plan tests => 1 }
 END { ok($loaded) }
 use Music::Scales;
 $loaded++;
-
-
-

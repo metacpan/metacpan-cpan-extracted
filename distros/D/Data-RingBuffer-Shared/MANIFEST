@@ -1,4 +1,3 @@
-.github/workflows/ci.yml
 bench/baseline.pl
 bench/single.pl
 Changes
@@ -25,9 +24,11 @@ t/01-basic.t
 t/02-multi-process.t
 t/03-edge-cases.t
 t/04-edges.t
+t/05-recover.t
 t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t
+t/06-foreign-invocant.t
 xt/abi_skew.t
 xt/asan.t
 xt/cloexec.t

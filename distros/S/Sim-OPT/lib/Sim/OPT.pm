@@ -79,7 +79,7 @@ eval { use Sim::OPTcue::Exogen::GBDT; 1 };
 eval { use Sim::OPTcue::Endogen::DWGN2; 1 };
 eval { use Sim::OPTcue::Endogen::NeuralBoltzmann; 1 };
 
-$VERSION = '0.921';
+$VERSION = '0.925';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################

@@ -70,7 +70,7 @@ new(class, path = &PL_sv_undef, capacity = 0, key_size = 256, ...)
      * may run between the capture and its use, or p could dangle. */
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     TkHandle *h = tk_create(p, (uint64_t)capacity, (uint64_t)key_size, TK_MODE_PLAIN, 0.0, mode, errbuf);
-    if (!h) croak("Data::TopK::Shared->new: %s", errbuf);
+    if (!h) croak("Data::TopK::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -88,7 +88,7 @@ new_memfd(class, name = &PL_sv_undef, capacity = 0, key_size = 256)
     if (capacity < 1)
         croak("Data::TopK::Shared->new_memfd: capacity must be >= 1");
     TkHandle *h = tk_create_memfd(nm, (uint64_t)capacity, (uint64_t)key_size, TK_MODE_PLAIN, 0.0, errbuf);
-    if (!h) croak("Data::TopK::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::TopK::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -148,7 +148,7 @@ new_from_fd(class, fd)
     char errbuf[TK_ERR_BUFLEN];
   CODE:
     TkHandle *h = tk_open_fd(fd, errbuf);
-    if (!h) croak("Data::TopK::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::TopK::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -475,7 +475,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::TopK::Shared")) {
         TkHandle *h = INT2PTR(TkHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::TopK::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::TopK::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

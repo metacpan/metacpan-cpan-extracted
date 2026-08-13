@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::AllocatedDeviceStatus;
 # ABSTRACT: AllocatedDeviceStatus contains the status of an allocated device, if the driver chooses to report it. This may include driver-specific information. The combination of Driver, Pool, Device, and ShareID must match the corresponding key in Status.Allocation.Devices.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
@@ -38,7 +38,7 @@ IO::K8s::Api::Resource::V1::AllocatedDeviceStatus - AllocatedDeviceStatus contai
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 conditions
 
@@ -81,10 +81,6 @@ ShareID uniquely identifies an individual allocation share of the device.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -95,7 +91,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

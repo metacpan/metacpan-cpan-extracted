@@ -9,14 +9,13 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.173',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.174',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
                                       'Cpanel::JSON::XS' => '4.38',
                                       'Data::Validate::Domain' => '0.13',
                                       'Data::Validate::URI' => '0',
-                                      'DateTime::Format::RFC3339' => '0',
                                       'Devel::Hide' => '0',
                                       'Email::Address::XS' => '1.04',
                                       'Encode' => '0',
@@ -42,8 +41,7 @@ do { my $x = {
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage::TrustMe' => '0.002001',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.17',
-                                      'Time::Moment' => '0'
+                                      'Test::Spelling' => '0.17'
                                     }
                     },
        'runtime' => {
@@ -73,12 +71,10 @@ do { my $x = {
                                       'Cpanel::JSON::XS' => '4.38',
                                       'Data::Validate::Domain' => '0.13',
                                       'Data::Validate::URI' => '0',
-                                      'DateTime::Format::RFC3339' => '0',
                                       'Email::Address::XS' => '1.04',
                                       'Getopt::Long::Descriptive' => '0',
                                       'Net::IDN::Encode' => '0',
                                       'Sereal' => '0',
-                                      'Time::Moment' => '0',
                                       'Type::Tiny::XS' => '0'
                                     }
                     },

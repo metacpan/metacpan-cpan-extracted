@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use IO::Socket::INET;
 use Test::More;
+use File::Spec ();
 use Fetch;
 
 # RFC 7230 3.3.3: a response carrying both Content-Length and Transfer-Encoding:
@@ -20,6 +21,11 @@ my $base = "http://127.0.0.1:$port";
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    # Never hold the harness TAP pipe open, and never outlive the run:
+    # a leaked server child hangs the whole suite after this test is done.
+    open STDOUT, ">", File::Spec->devnull();
+    open STDERR, ">", File::Spec->devnull();
+    alarm 120;
     $SIG{TERM} = sub { exit 0 };
     # Serve two requests on ONE keep-alive connection. The first response has a
     # deliberately-wrong Content-Length: 3 alongside a 12-byte chunked body.
@@ -58,6 +64,8 @@ is($r1->content, 'HELLOWORLD!!',
 my $r2 = $ua->get("$base/two")->get;
 is($r2->content, 'second', 'keep-alive after CL+TE response is not desynced');
 
-kill 'TERM', $pid;
-waitpid $pid, 0;
 done_testing;
+
+# In an END block, and SIGKILL: a die anywhere above must not leave a server
+# child holding the harness's TAP pipe open.
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

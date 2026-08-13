@@ -1,5 +1,38 @@
 Revision history for Perl-Critic-Policy-PreferredModules
 
+0.005     2026-08-12 15:14:44-06:00 America/Denver
+
+- add a 'severity' key to override the policy severity for a single module
+  (GH #6)
+- add a 'message' key to replace the violation description for a single
+  module, the 'reason' and 'severity' keys keep working alongside it (GH #9)
+- report the modules passed to 'use parent' and 'use base', including quoted
+  strings, qw() lists and the -norequire flag (GH #16)
+- report the module named by a 'use if' conditional import, which used to be
+  missed as the pragma name was taken for the module being loaded (GH #21)
+- add a 'for' key to restrict a preference to a list of functions (GH #23)
+- add '[perl/<function>]' sections to prefer a module's implementation of a
+  builtin function (GH #23)
+- check a bare 'use' against the preferred module's exports, so a module that
+  does not export the function by default is reported rather than assumed to
+  have taken effect (GH #23)
+- such a configuration now requires -allow-unsafe, since resolving the exports
+  loads the module (GH #23)
+- no longer report 'no Module' statements, which are the opposite of a 'use'
+  (GH #13)
+- throw an error when the config file exists but cannot be read, instead of
+  silently disabling the policy (GH #10)
+- ignore anything set before the first [Section] of the config file rather
+  than using it as a module name (GH #10)
+- report every config validation error at once instead of stopping at the
+  first one (GH #18)
+- fix the duplicated word in the violation description, 'Prefer using module
+  module X over Y' (GH #2)
+- update the distribution metadata URLs after the move to the cpan-authors
+  organization (GH #11)
+- declare the test dependency on Test2::V0 under its current name and drop
+  the unused Test::MockFile one (GH #7, GH #11)
+
 0.004     2022-01-24 15:09:18-07:00 America/Denver
 
 - fix pod and avoid duplicate name entry

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.36;
+use v5.38;
 use Test::More;
 
 plan skip_all => 'these tests are for authors only!'

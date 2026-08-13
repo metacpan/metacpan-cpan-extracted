@@ -11,6 +11,7 @@ include/hyperman/hm_core.h
 include/hyperman/hm_future.h
 include/hyperman/hm_http2.h
 include/hyperman/hm_parse.h
+include/hyperman/hm_ratelimit.h
 include/hyperman/hm_tls.h
 include/hyperman/hyperman.h
 lib/Hyperman.pm
@@ -40,7 +41,11 @@ t/19-access-log.t
 t/20-listen.t
 t/21-smuggling.t
 t/22-abi.t
+t/23-detach.t
 t/24-loop-fork.t
+t/25-tls-session.t
+t/26-ratelimit.t
+t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -50,6 +55,5 @@ xs/future.xs
 xs/hyperman.xs
 xs/loop.xs
 xs/writer.xs
-t/23-detach.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

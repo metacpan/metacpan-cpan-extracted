@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.641-14-g088d22be
+package JSON::Schema::Modern; # git description: v0.643-2-gbe691772
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.642';
+our $VERSION = '0.644';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -425,11 +425,11 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       seen => {},
       callbacks => $config_override->{callbacks} // {},
       evaluator => $self,
-      (map {
+      (map do {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ($_ => $val) : ()
         # note: this is a subset of the allowed overrides defined above
-      } qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict)),
+      }, qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict)),
       $config_override->{with_defaults} // $self->with_defaults ? (defaults => {}) : (),
     };
 
@@ -495,7 +495,11 @@ sub validate_schema ($self, $schema, $config_override = {}) {
     : $self->METASCHEMA_URIS->{$self->specification_version // $self->SPECIFICATION_VERSION_DEFAULT};
 
   my $result = $self->evaluate($schema, $metaschema_uri,
-    { %$config_override, $self->strict || $config_override->{strict} ? (_strict_schema_data => 1) : () });
+    {
+      %$config_override,
+      $self->strict || $config_override->{strict} ? (_strict_schema_data => 1) : (),
+      validate_formats => 1,
+    });
 
   return $result if not $result->valid;
 
@@ -826,11 +830,11 @@ sub _evaluate_subschema ($self, $data, $schema, $state) {
     $state->{seen_data_properties}{jsonp($state->{data_path}, $_)} |= 0
       foreach grep !/^x-/, keys %$data;
 
-    my @evaluated_properties = map {
+    my @evaluated_properties = map do {
       my $keyword = $_->{keyword};
       (grep $keyword eq $_, qw(properties additionalProperties patternProperties unevaluatedProperties))
         ? $_->{annotation}->@* : ();
-    } local_annotations($state);
+    }, local_annotations($state);
 
     # tick off properties that were recognized by this subschema
     $state->{seen_data_properties}{jsonp($state->{data_path}, $_)} |= 1 foreach @evaluated_properties;
@@ -928,7 +932,7 @@ has _vocabulary_classes => (
   lazy => 1,
   default => sub {
     +{
-      map { my $class = $_; pairmap { $a => [ $b, $class ] } $class->vocabulary }
+      map do { my $class = $_; pairmap { $a => [ $b, $class ] } $class->vocabulary },
         map load_module('JSON::Schema::Modern::Vocabulary::'.$_),
           qw(Core Applicator Validation FormatAssertion FormatAnnotation Content MetaData Unevaluated)
     }
@@ -1132,10 +1136,10 @@ sub _fetch_from_uri ($self, $uri_reference) {
       my $doc_addr = refaddr($resource->{document});
       my @closest_resources =
         sort { length($b->[1]{path}) <=> length($a->[1]{path}) }  # sort by length, descending
-        grep { !length($_->[1]{path})       # document root
+        grep !length($_->[1]{path})       # document root
           || length($document_path)
-            && $document_path =~ m{^\Q$_->[1]{path}\E(?:/|\z)} }  # path is above desired location
-        grep { refaddr($_->[1]{document}) == $doc_addr }          # in same document
+            && $document_path =~ m{^\Q$_->[1]{path}\E(?:/|\z)},   # path is above desired location
+        grep refaddr($_->[1]{document}) == $doc_addr,             # in same document
         $self->_resource_pairs;
 
       # now whittle down to all the resources with the same document path as the first candidate
@@ -1303,7 +1307,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.642
+version 0.644
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -2078,14 +2082,6 @@ validation will always succeed, unless draft2020-12 is in use with the Format-As
 declared in the metaschema, in which case use of the format will produce an error).
 
 =over 4
-
-=item *
-
-C<date-time> and C<date> require L<Time::Moment>
-
-=item *
-
-C<date-time> also requires L<DateTime::Format::RFC3339>
 
 =item *
 

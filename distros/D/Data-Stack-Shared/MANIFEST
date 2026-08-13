@@ -1,4 +1,3 @@
-.github/workflows/ci.yml
 bench/multiprocess.pl
 bench/single.pl
 Changes
@@ -21,10 +20,12 @@ stack.h
 t/01-basic.t
 t/02-mpmc-state-machine.t
 t/03-file-format.t
+t/04-recover.t
 t/10-edges.t
 t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t
+t/11-foreign-invocant.t
 xt/asan.t
 xt/capacity_boundary.t
 xt/cloexec_exec.t

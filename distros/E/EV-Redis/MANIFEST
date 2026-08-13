@@ -21,9 +21,9 @@ deps/hiredis/CHANGELOG.md
 deps/hiredis/COPYING
 deps/hiredis/dict.c
 deps/hiredis/dict.h
+deps/hiredis/ffc.h
 deps/hiredis/fmacros.h
 deps/hiredis/hiredis.c
-deps/hiredis/ffc.h
 deps/hiredis/hiredis.h
 deps/hiredis/hiredis_ssl.h
 deps/hiredis/Makefile

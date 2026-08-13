@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeSystemInfo;
 # ABSTRACT: NodeSystemInfo is a set of ids/uuids to uniquely identify the node.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s architecture => Str, 'required';
@@ -30,6 +30,9 @@ k8s operatingSystem => Str, 'required';
 k8s osImage => Str, 'required';
 
 
+k8s swap => 'Core::V1::NodeSwapStatus';
+
+
 k8s systemUUID => Str, 'required';
 
 
@@ -47,7 +50,7 @@ IO::K8s::Api::Core::V1::NodeSystemInfo - NodeSystemInfo is a set of ids/uuids to
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 architecture
 
@@ -85,6 +88,10 @@ The Operating System reported by the node
 
 OS Image reported by the node from /etc/os-release (e.g. Debian GNU/Linux 7 (wheezy)).
 
+=head2 swap
+
+Swap Info reported by the node.
+
 =head2 systemUUID
 
 SystemUUID reported by the node. For unique machine identification MachineID is preferred. This field is specific to Red Hat hosts https://access.redhat.com/documentation/en-us/red_hat_subscription_management/1/html/rhsm/uuid
@@ -96,10 +103,6 @@ SystemUUID reported by the node. For unique machine identification MachineID is 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -110,7 +113,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

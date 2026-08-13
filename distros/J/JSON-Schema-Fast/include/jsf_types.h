@@ -32,6 +32,27 @@ static int jsf__is_bool_class(pTHX_ SV *sv) {
     return 0;
 }
 
+/* The numeric value of an already-classified JSON number, without disturbing
+ * the SV.
+ *
+ * SvNV on an integer caches the NV and turns NOK on. That is invisible to the
+ * validator and changes nothing about the verdict - but it changes the value
+ * afterwards: an encoder that tests NOK before IOK then writes 1 as 1.0, so a
+ * caller who validates a document and then serialises it puts different bytes
+ * on the wire than the ones it was handed. Validation is a question asked of a
+ * value, not something done to it, so the flags a decoder set are read rather
+ * than forced.
+ *
+ * The order matches sv_2nv's own preference (NV before IV) so a value carrying
+ * both still answers exactly what SvNV would have answered. Anything else -
+ * a string coerced into a number, an SV with magic - falls through to SvNV,
+ * which by then has nothing left to spoil. */
+static NV jsf__nv_of(pTHX_ SV *sv) {
+    if (SvNOK(sv)) return SvNVX(sv);
+    if (SvIOK(sv)) return SvIOK_UV(sv) ? (NV)SvUVX(sv) : (NV)SvIVX(sv);
+    return SvNV(sv);
+}
+
 /* Classify a live SV into one JSON type bit (integer also sets number). Called
  * once per value; the result is reused by the interpreter. JSON Schema types
  * follow the JSON value's type, not Perl's DWIM - a numeric-looking string is

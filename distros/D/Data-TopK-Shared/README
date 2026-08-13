@@ -34,18 +34,18 @@ DESCRIPTION
     seen.
 
     Feed keys with "add". While a counter is free a new key claims it; once
-    all "capacity" counters are in use, a new key evicts the smallest
-    counter and takes over its count as an over-estimate bound. Consequently
-    each monitored key carries a "count" (an upper bound) and an "error"
-    (the maximum over-estimate), so its true frequency lies in "[count -
-    error, count]". Any key whose true frequency exceeds "total_observations
-    / capacity" is guaranteed to be retained -- the genuine heavy hitters
-    never fall out.
+    all "capacity" counters are in use, a new key evicts the smallest counter
+    and takes over its count as an over-estimate bound. Consequently each
+    monitored key carries a "count" (an upper bound) and an "error" (the
+    maximum over-estimate), so its true frequency lies in "[count - error,
+    count]". Any key whose true frequency exceeds "total_observations /
+    capacity" is guaranteed to be retained -- the genuine heavy hitters never
+    fall out.
 
-    Because the summary lives in a shared mapping, several processes feed
-    one top-k: any process that opens the same backing file, inherits the
-    anonymous mapping across "fork", or reopens a passed memfd contributes
-    to and reads the same counters. A write-preferring futex rwlock with
+    Because the summary lives in a shared mapping, several processes feed one
+    top-k: any process that opens the same backing file, inherits the
+    anonymous mapping across "fork", or reopens a passed memfd contributes to
+    and reads the same counters. A write-preferring futex rwlock with
     dead-process recovery guards mutation.
 
     Keys are handled by their byte content, truncated to "key_size" bytes
@@ -57,18 +57,18 @@ DESCRIPTION
   Time decay (recent hitters)
     A summary created with "new_decayed($path, $capacity, $key_size,
     $half_life)" keeps a time-decayed top-k: an observation's contribution
-    halves every $half_life time units, so recent activity dominates and
-    stale heavy hitters fade out. It uses forward decay (Efraimidis /
-    Cormode): counts are stored as decayed weights so the Space-Saving
-    min-heap stays consistent, with an occasional internal landmark rescale
-    to keep the weights bounded (no unbounded growth). Feed it with
-    "$tk->add($key, $timestamp)" -- $timestamp is any non-decreasing number
-    in your own units (epoch seconds, milliseconds, an event index); if you
-    omit it, time advances one tick per "add". A past (smaller) timestamp
-    does not rewind the clock. "estimate", "error", and "top" then report
-    decayed counts (floating point) as of the latest time seen; everything
-    else -- eviction bounds, cross-process sharing, "clear" -- works the
-    same. A plain (non-decayed) summary is unchanged and on-disk compatible.
+    halves every $half_life time units, so recent activity dominates and stale
+    heavy hitters fade out. It uses forward decay (Efraimidis / Cormode):
+    counts are stored as decayed weights so the Space-Saving min-heap stays
+    consistent, with an occasional internal landmark rescale to keep the
+    weights bounded (no unbounded growth). Feed it with "$tk->add($key,
+    $timestamp)" -- $timestamp is any non-decreasing number in your own units
+    (epoch seconds, milliseconds, an event index); if you omit it, time
+    advances one tick per "add". A past (smaller) timestamp does not rewind
+    the clock. "estimate", "error", and "top" then report decayed counts
+    (floating point) as of the latest time seen; everything else -- eviction
+    bounds, cross-process sharing, "clear" -- works the same. A plain
+    (non-decayed) summary is unchanged and on-disk compatible.
 
 METHODS
   Constructors
@@ -84,17 +84,18 @@ METHODS
     "new_decayed" / "new_decayed_memfd" take a final $half_life (a finite
     number greater than 0, in whatever time units you feed to "add"): a
     contribution's weight halves every $half_life units. They croak on a
-    non-positive or non-finite half-life. $capacity is the number of
-    counters (the maximum number of keys tracked at once, at least 1, up to
-    2^24) -- pick it a few times larger than the number of heavy hitters you
-    want to reliably capture. $key_size is the maximum bytes stored per key
-    (default 256; longer keys are truncated). Memory is roughly "capacity *
-    (40 + key_size)" bytes plus a fixed header. "new" and "new_memfd" croak
-    on a capacity below 1 or above 2^24, or a $key_size outside 1..4096.
-    When reopening an existing file or memfd the stored geometry wins and
-    the caller's arguments are ignored. An optional file mode may be passed
-    as the last argument to "new" (e.g. 0660) for cross-user sharing; it
-    defaults to 0600 (owner-only).
+    non-positive or non-finite half-life. $capacity is the number of counters
+    (the maximum number of keys tracked at once, at least 1, up to 2^24) --
+    pick it a few times larger than the number of heavy hitters you want to
+    reliably capture. $key_size is the maximum bytes stored per key (default
+    256; longer keys are truncated). Memory is roughly "capacity * (40 +
+    key_size)" bytes plus a fixed header. "new" and "new_memfd" croak on a
+    capacity below 1 or above 2^24, or a $key_size outside 1..4096. When
+    reopening an existing file or memfd the stored geometry wins and the
+    caller's arguments do not resize it -- but they are still range-checked,
+    so an out-of-range value croaks. An optional file mode may be passed as
+    the last argument to "new" (e.g. 0660) for cross-user sharing; it defaults
+    to 0600 (owner-only).
 
   Feeding and querying
         my $count = $tk->add($key);           # observe one key; returns its new estimated count
@@ -112,11 +113,11 @@ METHODS
     lock. "top" returns a list of hash references "{ key => $bytes, count =>
     $n, error => $e }" sorted by "count" descending (ties broken by tighter
     "error" first); with no argument, or an argument larger than the number
-    tracked, it returns every tracked key. "estimate" returns the
-    upper-bound count for a single key (0 if it is not currently tracked);
-    "error" returns that key's over-estimate bound, so its true count lies
-    in "[estimate - error, estimate]". To read a key's count and error as a
-    consistent pair under one lock, use the hashref "top" returns for it.
+    tracked, it returns every tracked key. "estimate" returns the upper-bound
+    count for a single key (0 if it is not currently tracked); "error" returns
+    that key's over-estimate bound, so its true count lies in "[estimate -
+    error, estimate]". To read a key's count and error as a consistent pair
+    under one lock, use the hashref "top" returns for it.
 
   Introspection
         $tk->capacity;      # number of counters
@@ -128,17 +129,17 @@ METHODS
         $tk->stats;         # { capacity, key_size, tracked, seen, ops, mmap_size, decayed[, half_life] }
 
     "is_decayed" reports whether the summary is time-decayed; "half_life"
-    returns its half-life (0 for a plain summary). In decayed mode
-    "estimate", "error", and the "count"/"error" fields of "top" are decayed
-    counts (floating point) as of the latest observed time; "stats" gains
-    "decayed" (and "half_life" when decayed).
+    returns its half-life (0 for a plain summary). In decayed mode "estimate",
+    "error", and the "count"/"error" fields of "top" are decayed counts
+    (floating point) as of the latest observed time; "stats" gains "decayed"
+    (and "half_life" when decayed).
 
   Lifecycle
         $tk->path; $tk->memfd; $tk->sync; $tk->unlink;
 
-    "sync" flushes the mapping to its backing store (a no-op for anonymous
-    and memfd summaries); "unlink" removes the backing file (also callable
-    as "Class->unlink($path)"); "path" returns the backing path ("undef" for
+    "sync" flushes the mapping to its backing store (a no-op for anonymous and
+    memfd summaries); "unlink" removes the backing file (also callable as
+    "Class->unlink($path)"); "path" returns the backing path ("undef" for
     anonymous, memfd, or fd-reopened summaries) and "memfd" the backing
     descriptor.
 
@@ -153,39 +154,52 @@ ACCURACY
 
 SHARING ACROSS PROCESSES
     The summary lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file, an anonymous mapping inherited
-    across "fork", or a memfd passed to an unrelated process and reopened
-    with new_from_fd($fd). Every process's "add" feeds the one shared
-    summary, so a fleet of workers can each process part of a stream into a
-    single top-k.
+    rest of the family: a backing file, an anonymous mapping inherited across
+    "fork", or a memfd passed to an unrelated process and reopened with
+    new_from_fd($fd). The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle. Every process's "add" feeds the one shared summary, so
+    a fleet of workers can each process part of a stream into a single top-k.
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default; pass
-    an explicit octal mode (e.g. 0660) as the last argument to "new" for
-    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
-    and the header is validated on attach. Any process granted write access
-    is trusted not to corrupt the mapping.
+    Backing files are created with mode 0600 (owner-only) by default; pass an
+    explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL", and
+    the header is validated on attach. Any process granted write access is
+    trusted not to corrupt the mapping.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership and dead-owner recovery. Each "add" is a short
     bounded update, so a crash leaves the summary consistent up to the last
-    completed operation. Limitation: PID reuse is not detected (very
-    unlikely in practice).
+    completed operation. Limitation: PID reuse is not detected (very unlikely
+    in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete top-k table file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
     Data::CountMinSketch::Shared (per-key frequency estimation),
@@ -196,6 +210,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

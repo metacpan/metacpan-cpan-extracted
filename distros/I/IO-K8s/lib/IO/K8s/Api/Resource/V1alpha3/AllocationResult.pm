@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::AllocationResult;
 # ABSTRACT: AllocationResult contains attributes of an allocated resource.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s controller => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1alpha3::AllocationResult - AllocationResult contains a
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 controller
 
@@ -51,10 +51,6 @@ NodeSelector defines where the allocated resources are available. If unset, they
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -65,7 +61,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

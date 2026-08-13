@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::SuccessPolicy;
 # ABSTRACT: SuccessPolicy describes when a Job can be declared as succeeded based on the success of some indexes.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s rules => ['Batch::V1::SuccessPolicyRule'], 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Batch::V1::SuccessPolicy - SuccessPolicy describes when a Job can 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 rules
 
@@ -33,10 +33,6 @@ rules represents the list of alternative rules for the declaring the Jobs as suc
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -47,7 +43,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

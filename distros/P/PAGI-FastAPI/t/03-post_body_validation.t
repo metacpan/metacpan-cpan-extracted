@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.36;
+use v5.38;
 use Test::More;
 use Future::AsyncAwait;
 use JSON::PP qw(encode_json decode_json);

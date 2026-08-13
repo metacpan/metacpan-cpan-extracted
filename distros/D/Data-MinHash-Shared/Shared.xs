@@ -10,6 +10,7 @@
         croak("Expected a Data::MinHash::Shared object"); \
     MnhHandle *h = INT2PTR(MnhHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::MinHash::Shared object"); \
+    MnhHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -26,7 +27,7 @@
     if (!SvROK(sv)) \
         croak("Data::MinHash::Shared object was replaced during the call"); \
     h = INT2PTR(MnhHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::MinHash::Shared object destroyed during the call")
+    if (h != h0) croak("Data::MinHash::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -56,7 +57,7 @@ new(class, path = &PL_sv_undef, k = 0, ...)
      * that magic can realloc/free path's PV and dangle p before use. */
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     MnhHandle *h = mnh_create(p, (uint64_t)k, mode, errbuf);
-    if (!h) croak("Data::MinHash::Shared->new: %s", errbuf);
+    if (!h) croak("Data::MinHash::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     /* Re-read the class PV at the point of use: xsubpp captured it in INPUT,
      * before the k/mode/path magic above, which can realloc/free that PV and
      * dangle `class` before MAKE_OBJ passes it to gv_stashpv. */
@@ -77,7 +78,7 @@ new_memfd(class, name = &PL_sv_undef, k = 0)
     if (k < 1)
         croak("Data::MinHash::Shared->new_memfd: number of registers must be >= 1");
     MnhHandle *h = mnh_create_memfd(nm, (uint64_t)k, errbuf);
-    if (!h) croak("Data::MinHash::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::MinHash::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     /* Re-read the class PV at the point of use (see new above): the k/name
      * magic ran after xsubpp captured `class` in INPUT. */
     class = SvPV_nolen(ST(0));
@@ -93,9 +94,32 @@ new_from_fd(class, fd)
     char errbuf[MNH_ERR_BUFLEN];
   CODE:
     MnhHandle *h = mnh_open_fd(fd, errbuf);
-    if (!h) croak("Data::MinHash::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::MinHash::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     /* Re-read the class PV at the point of use (see new above): the fd
      * conversion in INPUT ran its magic after `class` was captured. */
+    class = SvPV_nolen(ST(0));
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_readonly(class, path)
+    const char *class
+    SV *path
+  PREINIT:
+    char errbuf[MNH_ERR_BUFLEN];
+  CODE:
+    /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
+       ever.  A sealed file is immutable and no read path writes the mapping,
+       so queries take no reader-slot / rwlock traffic and any number of
+       processes can share one PROT_READ mapping (same architecture; the
+       magic rejects a wrong-endian file). */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (!p) croak("Data::MinHash::Shared->new_readonly: path is required");
+    MnhHandle *h = mnh_open_readonly(p, errbuf);
+    if (!h) croak("Data::MinHash::Shared->new_readonly: %s", errbuf);
+    /* Re-read the class PV at the point of use (see new above): the path
+     * magic above can realloc/free the INPUT-captured PV. */
     class = SvPV_nolen(ST(0));
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -119,9 +143,11 @@ add(self, item)
     STRLEN n;
     const char *s;
   CODE:
+    if (h->readonly) croak("Data::MinHash::Shared->add: sketch is frozen (read-only)");
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     REEXTRACT(self);
     mnh_rwlock_wrlock(h);
+    if (h->hdr->sealed) { mnh_rwlock_wrunlock(h); croak("Data::MinHash::Shared->add: sketch is frozen (read-only)"); }
     RETVAL = mnh_add_locked(h, s, n);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     mnh_rwlock_wrunlock(h);
@@ -138,10 +164,12 @@ add_many(self, items)
     IV  top;
     UV  changed = 0;
   CODE:
+    if (h->readonly) croak("Data::MinHash::Shared->add_many: sketch is frozen (read-only)");
     SvGETMAGIC(items);
     if (!SvROK(items) || SvTYPE(SvRV(items)) != SVt_PVAV)
         croak("Data::MinHash::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(items);
+    sv_2mortal(SvREFCNT_inc((SV *)av));   /* pin the arrayref: element magic below cannot free it mid-loop */
     top = av_len(av);                     /* last index, -1 if empty */
     {
         STRLEN cnt = (top >= 0) ? (STRLEN)(top + 1) : 0, i;
@@ -164,6 +192,7 @@ add_many(self, items)
         }
         REEXTRACT(self);
         mnh_rwlock_wrlock(h);                             /* locked region: NO croak-capable calls */
+        if (h->hdr->sealed) { mnh_rwlock_wrunlock(h); croak("Data::MinHash::Shared->add_many: sketch is frozen (read-only)"); }
         for (i = 0; i < cnt; i++) changed += (UV)mnh_add_locked(h, ps[i], ls[i]);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
         mnh_rwlock_wrunlock(h);
@@ -201,14 +230,22 @@ similarity(self, other)
     uint64_t *tmp;
     Newx(tmp, (size_t)(k ? k : 1), uint64_t);
     SAVEFREEPV(tmp);                      /* freed on normal return OR croak unwind */
-    mnh_rwlock_rdlock(o);
-    memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
-    mnh_rwlock_rdunlock(o);
+    if (o->readonly) {                     /* frozen other: immutable registers, no lock */
+        memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
+    } else {
+        mnh_rwlock_rdlock(o);
+        memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
+        mnh_rwlock_rdunlock(o);
+    }
 
     uint64_t agree, kk = h->hdr->k;
-    mnh_rwlock_rdlock(h);
-    agree = mnh_agree_locked(h, tmp, k);
-    mnh_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen self: immutable registers, no lock */
+        agree = mnh_agree_locked(h, tmp, k);
+    } else {
+        mnh_rwlock_rdlock(h);
+        agree = mnh_agree_locked(h, tmp, k);
+        mnh_rwlock_rdunlock(h);
+    }
     RETVAL = kk ? (double)agree / (double)kk : 0.0;
   OUTPUT:
     RETVAL
@@ -240,14 +277,22 @@ bbit_similarity(self, other, b)
         uint64_t *tmp;
         Newx(tmp, (size_t)(k ? k : 1), uint64_t);
         SAVEFREEPV(tmp);
-        mnh_rwlock_rdlock(o);
-        memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
-        mnh_rwlock_rdunlock(o);
+        if (o->readonly) {                     /* frozen other: immutable registers, no lock */
+            memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
+        } else {
+            mnh_rwlock_rdlock(o);
+            memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
+            mnh_rwlock_rdunlock(o);
+        }
 
         uint64_t mask = mnh_bbit_mask((uint32_t)b), agree, kk = h->hdr->k;
-        mnh_rwlock_rdlock(h);
-        agree = mnh_bbit_agree_locked(h, tmp, k, mask);
-        mnh_rwlock_rdunlock(h);
+        if (h->readonly) {                     /* frozen self: immutable registers, no lock */
+            agree = mnh_bbit_agree_locked(h, tmp, k, mask);
+        } else {
+            mnh_rwlock_rdlock(h);
+            agree = mnh_bbit_agree_locked(h, tmp, k, mask);
+            mnh_rwlock_rdunlock(h);
+        }
         double f = kk ? (double)agree / (double)kk : 0.0;
         RETVAL = mnh_bbit_correct(f, (uint32_t)b);
     }
@@ -270,9 +315,13 @@ bbit_signature(self, b)
         uint64_t *regs; uint8_t *out;
         Newx(regs, (size_t)(k ? k : 1), uint64_t);        SAVEFREEPV(regs);
         Newx(out,  (size_t)(nbytes ? nbytes : 1), uint8_t); SAVEFREEPV(out);
-        mnh_rwlock_rdlock(h);
-        memcpy(regs, mnh_registers(h), (size_t)k * sizeof(uint64_t));
-        mnh_rwlock_rdunlock(h);
+        if (h->readonly) {                     /* frozen: immutable registers, no lock */
+            memcpy(regs, mnh_registers(h), (size_t)k * sizeof(uint64_t));
+        } else {
+            mnh_rwlock_rdlock(h);
+            memcpy(regs, mnh_registers(h), (size_t)k * sizeof(uint64_t));
+            mnh_rwlock_rdunlock(h);
+        }
         mnh_bbit_pack(regs, k, (uint32_t)b, out);          /* pack the low b bits, after unlock */
         RETVAL = newSVpvn((char *)out, (STRLEN)nbytes);
     }
@@ -320,6 +369,7 @@ merge(self, other)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::MinHash::Shared->merge: sketch is frozen (read-only)");
     if (!sv_isobject(other) || !sv_derived_from(other, "Data::MinHash::Shared"))
         croak("Data::MinHash::Shared->merge: expected a Data::MinHash::Shared object");
     MnhHandle *o = INT2PTR(MnhHandle*, SvIV(SvRV(other)));
@@ -343,11 +393,16 @@ merge(self, other)
     uint64_t *tmp;
     Newx(tmp, (size_t)(k ? k : 1), uint64_t);
     SAVEFREEPV(tmp);                      /* freed on normal return OR croak unwind */
-    mnh_rwlock_rdlock(o);
-    memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
-    mnh_rwlock_rdunlock(o);
+    if (o->readonly) {                     /* frozen other: immutable registers, no lock */
+        memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
+    } else {
+        mnh_rwlock_rdlock(o);
+        memcpy(tmp, mnh_registers(o), (size_t)k * sizeof(uint64_t));
+        mnh_rwlock_rdunlock(o);
+    }
 
     mnh_rwlock_wrlock(h);
+    if (h->hdr->sealed) { mnh_rwlock_wrunlock(h); croak("Data::MinHash::Shared->merge: sketch is frozen (read-only)"); }
     mnh_merge_locked(h, tmp, k);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     mnh_rwlock_wrunlock(h);
@@ -364,9 +419,13 @@ registers(self)
         if (k > kmax) k = kmax;
         uint64_t *snap = NULL;
         if (k) { Newx(snap, (size_t)k, uint64_t); SAVEFREEPV(snap); }  /* alloc BEFORE the lock */
-        mnh_rwlock_rdlock(h);
-        if (k) memcpy(snap, mnh_registers(h), (size_t)k * sizeof(uint64_t));
-        mnh_rwlock_rdunlock(h);
+        if (h->readonly) {                     /* frozen: immutable registers, no lock */
+            if (k) memcpy(snap, mnh_registers(h), (size_t)k * sizeof(uint64_t));
+        } else {
+            mnh_rwlock_rdlock(h);
+            if (k) memcpy(snap, mnh_registers(h), (size_t)k * sizeof(uint64_t));
+            mnh_rwlock_rdunlock(h);
+        }
         EXTEND(SP, (SSize_t)k);
         for (uint64_t j = 0; j < k; j++)
             PUSHs(sv_2mortal(newSVuv((UV)snap[j])));    /* Perl alloc AFTER unlock */
@@ -379,9 +438,13 @@ filled(self)
     EXTRACT(self);
     UV n;
   CODE:
-    mnh_rwlock_rdlock(h);
-    n = (UV)mnh_filled_locked(h);
-    mnh_rwlock_rdunlock(h);
+    if (h->readonly) {                     /* frozen: immutable registers, no lock */
+        n = (UV)mnh_filled_locked(h);
+    } else {
+        mnh_rwlock_rdlock(h);
+        n = (UV)mnh_filled_locked(h);
+        mnh_rwlock_rdunlock(h);
+    }
     RETVAL = n;
   OUTPUT:
     RETVAL
@@ -392,10 +455,42 @@ clear(self)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::MinHash::Shared->clear: sketch is frozen (read-only)");
     mnh_rwlock_wrlock(h);
+    if (h->hdr->sealed) { mnh_rwlock_wrunlock(h); croak("Data::MinHash::Shared->clear: sketch is frozen (read-only)"); }
     mnh_clear_locked(h);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     mnh_rwlock_wrunlock(h);
+
+void
+freeze(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    if (h->readonly) croak("Data::MinHash::Shared->freeze: cannot freeze a read-only handle");
+    if (mnh_freeze(h) != 0) croak("Data::MinHash::Shared->freeze: msync: %s", strerror(errno));
+    h->readonly = 1;   /* this handle now rejects mutation too (the file is sealed) */
+
+UV
+frozen(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->hdr->sealed ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
+UV
+readonly(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->readonly ? 1 : 0;
+  OUTPUT:
+    RETVAL
 
 UV
 size(self)
@@ -417,17 +512,19 @@ stats(self)
         uint64_t k, filled, ops;
         /* Snapshot under the lock; do all (croak-capable) Perl allocation after
            releasing it -- so an OOM in newHV/newSVuv can never strand the lock. */
-        mnh_rwlock_rdlock(h);
+        if (!h->readonly) mnh_rwlock_rdlock(h);   /* frozen: immutable, no lock */
         filled = mnh_filled_locked(h);
         k      = h->hdr->k;
         ops    = h->hdr->stat_ops;
-        mnh_rwlock_rdunlock(h);
+        if (!h->readonly) mnh_rwlock_rdunlock(h);
 
         HV *hv = newHV();
         hv_stores(hv, "size",        newSVuv((UV)k));
         hv_stores(hv, "filled",      newSVuv((UV)filled));
         hv_stores(hv, "ops",         newSVuv((UV)ops));
         hv_stores(hv, "mmap_size",   newSVuv((UV)h->mmap_size));
+        hv_stores(hv, "frozen",      newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "readonly",    newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }
   OUTPUT:
@@ -459,7 +556,7 @@ sync(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (mnh_msync(h) != 0) croak("sync: %s", strerror(errno));
+    if (!h->readonly && mnh_msync(h) != 0) croak("sync: %s", strerror(errno));
 
 void
 unlink(self, ...)
@@ -467,7 +564,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::MinHash::Shared")) {
         MnhHandle *h = INT2PTR(MnhHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::MinHash::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::MinHash::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

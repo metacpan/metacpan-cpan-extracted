@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::ResourceMetricSource;
 # ABSTRACT: ResourceMetricSource indicates how to scale on a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  The values will be averaged together before being compared to the target.  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the "pods" source.  Only one "target" type should be set.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Autoscaling::V2::ResourceMetricSource - ResourceMetricSource indic
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 name
 
@@ -40,10 +40,6 @@ target specifies the target value for the given metric
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -54,7 +50,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

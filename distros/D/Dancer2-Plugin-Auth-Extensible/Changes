@@ -1,5 +1,14 @@
 Revision history for Dancer2-Plugin-Auth-Extensible
 
+0.712 Wed 12 Aug 12:00:00 BST 2026
+
+    [SECURITY FIXES]
+
+    * Add uri_base parameter (addresses CVE-2026-15689). If this is not set and
+      if the application does not otherwise enforce a particular hostname, then
+      an attacker can generate password reset emails and welcome emails for
+      genuine users that contain links to a malicious host.
+
 0.711 Thu 29 Aug 10:28:00 BST 2024
 
     [BUG FIXES]

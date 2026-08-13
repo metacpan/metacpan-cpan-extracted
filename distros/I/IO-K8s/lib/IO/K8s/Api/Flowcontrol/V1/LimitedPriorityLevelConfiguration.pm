@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1::LimitedPriorityLevelConfiguration;
 # ABSTRACT: LimitedPriorityLevelConfiguration specifies how to handle requests that are subject to limits. It addresses two issues: How are requests for this priority level limited? What should be done with requests that exceed the limit?
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s borrowingLimitPercent => Int;
@@ -29,7 +29,7 @@ IO::K8s::Api::Flowcontrol::V1::LimitedPriorityLevelConfiguration - LimitedPriori
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 borrowingLimitPercent
 
@@ -68,10 +68,6 @@ Setting this field to zero supports the construction of a "jail" for this priori
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -82,7 +78,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

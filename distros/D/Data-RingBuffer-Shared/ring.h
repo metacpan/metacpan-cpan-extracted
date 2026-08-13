@@ -338,7 +338,6 @@ static inline void ring_init_header(void *base, uint64_t total,
                                      uint64_t capacity) {
     RingHeader *hdr = (RingHeader *)base;
     memset(base, 0, (size_t)total);
-    hdr->magic      = RING_MAGIC;
     hdr->version    = RING_VERSION;
     hdr->elem_size  = elem_size;
     hdr->variant_id = variant_id;
@@ -347,6 +346,12 @@ static inline void ring_init_header(void *base, uint64_t total,
     hdr->seq_off    = ring_seq_off();
     hdr->data_off   = ring_data_off(capacity);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, RING_MAGIC, __ATOMIC_RELEASE);
+
 }
 
 /* Fixed element size implied by a variant. Reads copy a slot into a
@@ -419,6 +424,16 @@ static int ring_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int ring_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static RingHandle *ring_create(const char *path, uint64_t capacity,
                                 uint32_t elem_size, uint32_t variant_id,
                                 mode_t mode, char *errbuf) {
@@ -462,6 +477,27 @@ static RingHandle *ring_create(const char *path, uint64_t capacity,
         if (base == MAP_FAILED) { RING_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!ring_validate_header((RingHeader *)base, (uint64_t)st.st_size, variant_id)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((RingHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && ring_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        RING_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    ring_init_header(base, total, elem_size, variant_id, capacity);
+                    flock(fd, LOCK_UN); close(fd);
+                    return ring_setup(base, map_size, path, -1);
+                }
+                if (((RingHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    RING_ERR("%s: incomplete ring file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 RING_ERR("invalid ring file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);

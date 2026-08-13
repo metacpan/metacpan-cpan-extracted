@@ -1,5 +1,20 @@
 Revision history for Data-ReqRep-Shared
 
+0.07      2026-08-12
+          - Fix a client receiving another client's reply. A reply copied its
+            payload into the response slot before claiming it, so a cancel and
+            re-acquire completing in that window let the copy overwrite the new
+            owner's already-published reply; the new owner then read it as its
+            own, with no error reported anywhere. A reply now takes the slot
+            before writing to it.
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.06      2026-07-21
           - Bound a shared slot's response length before copying it.
           - Fetch get-magic on optional arguments before testing them.
@@ -14,10 +29,10 @@ Revision history for Data-ReqRep-Shared
     - reply: re-check generation before publishing CAS and recover post-CAS
       via gen bump (fixes TOCTOU where cancel+re-acquire could let a reply
       land on the wrong owner's slot)
-    - slot_release: two-step CAS (owner_pid mypid→0, then state from→FREE)
+    - slot_release: two-step CAS (owner_pid mypid->0, then state from->FREE)
       prevents blind state-store from clobbering a freshly-acquired slot
     - compute_layout: resp_stride in uint64 (was wrapping for resp_data_max
-      near UINT32_MAX → replies overflowing into next slot)
+      near UINT32_MAX -> replies overflowing into next slot)
     - validate_header: reject files with resp_stride too small for slot data
     - size(): read head before tail and clamp tail<head to 0
     - plug mmap/fd leak in create_int / create_int_memfd on calloc OOM

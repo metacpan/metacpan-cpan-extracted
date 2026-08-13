@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib "t/lib";
 use Test::More;
+use HMTest qw(free_ports);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -11,7 +13,8 @@ use File::Temp ();
 # of the response Future when the client disconnects.
 
 my $marker = File::Temp::tempdir(CLEANUP => 1) . '/cancelled';
-my $port   = 19000 + ($$ % 1000);
+my ($port) = free_ports(1);
+plan skip_all => "no free loopback port" unless $port;
 
 my $app = sub {
     my $env = shift;

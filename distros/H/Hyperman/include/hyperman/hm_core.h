@@ -62,7 +62,9 @@ struct hm_conn {
     SV      *env_sv;        /* held while parked, for access_log    */
     void    *h2;            /* hm_h2_sess* when in HTTP/2 mode       */
     void    *ssl;           /* SSL* when this is a TLS connection    */
-    void    *tls_peer;      /* hm_tls_peer* (cert/cipher for $env)   */
+    const char *tls_proto;  /* SSL_PROTOCOL / SSL_CIPHER for $env.   */
+    const char *tls_cipher; /* OpenSSL-owned, valid for the conn     */
+    void    *tls_peer;      /* hm_tls_peer*, only if a client cert   */
     unsigned char tls_hs;         /* TLS handshake in progress       */
     unsigned char tls_r_wants_w;  /* SSL_read blocked wanting write  */
     unsigned char tls_w_wants_r;  /* SSL_write blocked wanting read  */
@@ -140,6 +142,7 @@ struct hm_loop {
     char        log_ts[32];         /* "dd/Mon/YYYY:HH:MM:SS +ZZZZ", 1Hz     */
     UV          requests;           /* requests dispatched (stats)  */
     UV          accepts;            /* connections accepted (stats) */
+    UV          denied;             /* connections dropped at accept, denylist */
     UV          bytes_out;          /* response bytes queued (stats) */
     UV          max_requests;       /* recycle worker after N (0=off) */
     int         recycle_pending;    /* max_requests hit; drain at loop top */
@@ -1827,10 +1830,19 @@ static void hm_readable(pTHX_ hm_conn *c) {
             return;
         } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
             /* TLS read blocked wanting writable: arm a write watcher so a
-             * write-readiness event re-drives us */
-            if (c->tls_r_wants_w && !c->writing) {
-                loop->be->add_io(loop->be, c->fd, HM_EV_WRITE, 0);
-                c->writing = 1;
+             * write-readiness event re-drives us. Once it unblocks, drop that
+             * watcher again unless there is queued output still waiting on
+             * it. The backends are level-triggered, so a watcher left armed
+             * over an empty write buffer is not merely untidy - it re-fires
+             * every turn of the loop and spins the worker at 100% CPU. */
+            if (c->tls_r_wants_w) {
+                if (!c->writing) {
+                    loop->be->add_io(loop->be, c->fd, HM_EV_WRITE, 0);
+                    c->writing = 1;
+                }
+            } else if (c->writing && c->woff == c->wlen) {
+                loop->be->remove_io(loop->be, c->fd, HM_EV_WRITE);
+                c->writing = 0;
             }
             break;
         } else {
@@ -1850,11 +1862,19 @@ static void hm_accept(pTHX_ hm_loop *loop, hm_listener *lst) {
         struct sockaddr_storage ss;
         socklen_t slen = sizeof(ss);
         hm_conn *c;
+        char peer[INET6_ADDRSTRLEN];
+        int  peer_port;
         int fd = accept(lst->fd, (struct sockaddr *)&ss, &slen);
         if (fd < 0) break;                     /* EAGAIN: drained */
         if (fd >= HM_MAXFD) { close(fd); continue; }
+        /* Denylist: format the peer and drop a blocked IP HERE, before a
+         * connection object is allocated or a byte is read - the cheapest
+         * possible rejection. Fails open (no arena -> deny_check is 0). */
+        hm_fmt_peer(peer, sizeof(peer), &peer_port, (struct sockaddr *)&ss);
+        if (hm_rl_deny_check(peer)) { close(fd); loop->denied++; continue; }
         c = hm_new_conn(loop, fd, lst);
-        hm_fmt_peer(c->peer, sizeof(c->peer), &c->peer_port, (struct sockaddr *)&ss);
+        memcpy(c->peer, peer, sizeof(c->peer));
+        c->peer_port = peer_port;
         loop->accepts++;
         /* fairness: don't grab the whole queue in one wakeup; the listener
          * stays level-readable, so the next iteration resumes */
@@ -2074,12 +2094,16 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
         int fd = ev->fd;
         hm_conn *c;
         if ((c = loop->conns[fd])) {
-            /* TLS post-handshake: route writes through hm_readable so a
-             * blocked SSL op in either direction is re-driven (it flushes
-             * pending output at the end); plain conns just flush. */
-            if (c->tls_hs)              hm_tls_handshake(aTHX_ c);
-            else if (c->ssl)            hm_readable(aTHX_ c);
-            else                        hm_flush(aTHX_ c);
+            /* TLS post-handshake: when the write watcher is armed because
+             * SSL_read wanted a writable socket, route through hm_readable so
+             * the blocked read is re-driven (it flushes pending output at the
+             * end). Otherwise this is ordinary write backpressure and the
+             * read side is not blocked at all - going through hm_readable
+             * then costs an SSL_read that can only return EAGAIN, once per
+             * writable wakeup for the whole of a large response. */
+            if (c->tls_hs)                       hm_tls_handshake(aTHX_ c);
+            else if (c->ssl && c->tls_r_wants_w) hm_readable(aTHX_ c);
+            else                                 hm_flush(aTHX_ c);
         }
         else if (loop->io_w[fd].sv || loop->io_w[fd].c_cb)
             hm_io_event(aTHX_ loop, fd, HM_EV_WRITE, &loop->io_w[fd]);
@@ -2443,6 +2467,8 @@ typedef struct {
     SV         *log_cb;              /* access_log coderef, or NULL          */
     int         log_fd;             /* fast access-log fd, or -1            */
     const char *log_path;           /* access_log file to open (parent), or NULL */
+    SV         *deny;               /* arrayref of IPs to denylist, or NULL */
+    unsigned    deny_cap, rate_cap; /* arena table sizes, 0 = default        */
 } hm_worker_cfg;
 
 /* Populate the loop's listener array from the (already bound) specs. Under
@@ -2510,10 +2536,24 @@ static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
     for (i = 0; i < loop->nlisteners; i++) {
         hm_listener *l = &loop->listeners[i];
         void *fresh;
+        unsigned char tkey[HM_TLS_TKEY_MAX];
+        const unsigned char *tk = NULL;
+        size_t tklen = 0;
         if (!l->tls_ctx || !l->tls_cert || !l->tls_key) continue;  /* plain */
 
+        /* Carry the running context's session-ticket key into the new one.
+         * The boot-time contexts are built before the fork, so every worker
+         * starts out able to decrypt every other worker's tickets - but this
+         * reload runs independently in each of them, and SSL_CTX_new mints a
+         * fresh random key. Left alone, the first rotation would leave a
+         * ticket issued by one worker undecryptable by its siblings, and
+         * every resumption a client attempted would quietly become a full
+         * handshake: the signature and key exchange that tickets exist to
+         * avoid, on a fleet that rotates certificates continuously. */
+        if (hm_tls_get_ticket_key(l->tls_ctx, tkey, &tklen)) tk = tkey;
+
         fresh = hm_tls_ctx_build(aTHX_ l->tls_cert, l->tls_key, l->tls_ca,
-                                 l->tls_verify, sni, l->http2);
+                                 l->tls_verify, sni, l->http2, tk, tklen);
         if (!fresh) continue;                   /* keep what we are serving */
 
         if (want > 0 && hm_tls_sni_count(fresh) < want) {
@@ -2619,6 +2659,22 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         workers = n > 0 ? (int)n : 1;
     }
     cfg->nworkers = workers;
+
+    /* The abuse-control arena, mapped HERE - before any worker forks - so
+     * every worker inherits the one shared denylist and counter table. Static
+     * `deny` entries are loaded now, in the parent, so they are live from the
+     * first accepted connection. Single-worker (dev) mode maps it too, so the
+     * ABI behaves the same whether or not a supervisor forks. */
+    hm_rl_arena_init(cfg->deny_cap, cfg->rate_cap);
+    if (cfg->deny && SvROK(cfg->deny) && SvTYPE(SvRV(cfg->deny)) == SVt_PVAV) {
+        AV *av = (AV *)SvRV(cfg->deny);
+        SSize_t i, n = av_len(av) + 1;
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(av, i, 0);
+            if (e && *e && SvOK(*e)) hm_rl_deny_add(SvPV_nolen(*e), 0);
+        }
+    }
+
 #ifndef SO_REUSEPORT
     if (cfg->reuseport) croak("Hyperman: SO_REUSEPORT not supported on this platform");
 #endif
@@ -2638,7 +2694,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             if (s->tls_cert && s->tls_key) {
                 s->tls_ctx = hm_tls_ctx_build(aTHX_ s->tls_cert, s->tls_key,
                                               s->tls_ca, s->tls_verify,
-                                              s->tls_sni, s->http2);
+                                              s->tls_sni, s->http2, NULL, 0);
                 if (!s->tls_ctx)
                     croak("Hyperman: TLS: could not initialise from cert '%s' "
                           "/ key '%s'", s->tls_cert, s->tls_key);
@@ -2691,7 +2747,14 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
 
         for (i = 0; i < workers; i++) {
             pid_t pid = hm_spawn(aTHX_ cfg, i);
-            if (pid < 0) croak("Hyperman: fork: %s", strerror(errno));
+            if (pid < 0) {
+                /* take the pool down with us: croaking out of run() leaves
+                 * nobody supervising the workers already forked, and they
+                 * would keep the listening socket alive forever. */
+                int j;
+                for (j = 0; j < hm_nchildren; j++) kill(hm_children[j], SIGTERM);
+                croak("Hyperman: fork: %s", strerror(errno));
+            }
             hm_child_start[hm_nchildren] = time(NULL);
             hm_children[hm_nchildren++] = pid;
         }
@@ -2741,17 +2804,34 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                 }
 
                 if (hm_sup_hup) {
-                    pid_t old[1024];
-                    int nold = hm_nchildren;
+                    pid_t  old[1024];
+                    time_t old_start[1024];
+                    int nold = hm_nchildren, nfresh = 0;
                     memcpy(old, hm_children, nold * sizeof(pid_t));
+                    memcpy(old_start, hm_child_start, nold * sizeof(time_t));
                     hm_sup_hup = 0;
                     hm_nchildren = 0;
                     for (i = 0; i < workers; i++) {
+                        /* a failed fork must never reach hm_children: -1 there
+                         * turns the TERM sweep below into kill(-1, SIGTERM),
+                         * which signals every process this uid owns. */
+                        pid_t pid = hm_spawn(aTHX_ cfg, i);
+                        if (pid < 0) continue;
                         hm_child_start[hm_nchildren] = time(NULL);
-                        hm_children[hm_nchildren++] = hm_spawn(aTHX_ cfg, i);
+                        hm_children[hm_nchildren++]  = pid;
+                        nfresh++;
                     }
-                    for (i = 0; i < nold; i++)
-                        kill(old[i], SIGTERM);       /* drain gracefully */
+                    /* retire one old worker per fresh one. Short of processes
+                     * the survivors stay in the live set, so a HUP under fork
+                     * pressure shrinks the pool instead of emptying it. */
+                    for (i = 0; i < nold; i++) {
+                        if (i < nfresh) {
+                            kill(old[i], SIGTERM);   /* drain gracefully */
+                        } else {
+                            hm_child_start[hm_nchildren] = old_start[i];
+                            hm_children[hm_nchildren++]  = old[i];
+                        }
+                    }
                 }
 
                 /* reap every exited child without blocking, respawning the
@@ -2789,9 +2869,12 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                     }
                     {
                         int slot = hm_nchildren;
-                        hm_child_start[slot] = time(NULL);
-                        hm_children[slot] = hm_spawn(aTHX_ cfg, slot);
-                        hm_nchildren = slot + 1;
+                        pid_t fresh = hm_spawn(aTHX_ cfg, slot);
+                        if (fresh > 0) {            /* never record a -1 */
+                            hm_child_start[slot] = time(NULL);
+                            hm_children[slot]    = fresh;
+                            hm_nchildren = slot + 1;
+                        }
                     }
                     if (hm_sup_term) break;   /* TERM arrived during backoff */
                 }

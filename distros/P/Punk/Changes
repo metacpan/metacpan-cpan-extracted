@@ -1,15 +1,38 @@
 Revision history for Punk
 
+0.06    2026-08-13
+        - Rate limiting and IP blocking over Hyperman's shared arena
+          (requires Hyperman 0.18, ABI v3; fails open without it).
+        - New `rate_limit` keyword: installs a before_dispatch that answers
+          429 (with Retry-After and the X-RateLimit-* headers) when a
+          caller is over the limit. Key by client IP (default), a request
+          header (by => 'header:X-Api-Key'), or a coderef; scope to a path
+          prefix with `for`. Chainable for layered limits. The counters
+          live in the shared arena, so a limit is exact across the worker
+          pool rather than per worker.
+        - New context methods: $c->block_ip([$ip [, $ttl]]) and
+          $c->unblock_ip([$ip]) add or lift an IP on the edge denylist
+          ($ip defaults to the request's REMOTE_ADDR), and $c->rate_hit
+          for a raw counter check.
+
+0.05    2026-08-12
+        - Fixed a segfault on perl before 5.20. Six places handed one of
+          perl's immortal SVs to something that would release it.
+        - t/42-immortal-refcount.t asserts the invariant rather than the
+          symptom: an immortal's refcount may not move across these
+          calls. That fails on any perl, including the ones where the bug
+          is invisible.
+	- Update min version of deps
+
 0.04    2026-08-08
-        - Fixed the configure-time dependency declaration, which is why
+        - Fixed the configure-time dependency declaration, which is why 
           0.03 could not be installed from CPAN at all.
-        - $app->install_kw($name => $code, $owner?): a plugin can install a
-          declaration keyword of its own into the application class instead
-          of assigning to a glob there. 
-        - params now takes names: `$c->params(@names)` and
-          `$req->params(@names)` return just those, as a list of values in
-          the order asked for, or - in scalar context - a hashref of only
-          the names that were passed.
+        - $app->install_kw($name => $code, $owner?): a plugin can install
+          a declaration keyword of its own into the application class 
+          instead of assigning to a glob there.
+         - params now takes names: `$c->params(@names)` and `$req->params(@names)`
+           return just those, as a list of values in the order asked for, or - 
+           in scalar context - a hashref of only the names that were passed.
 
 0.03    2026-08-07
         - Punk::Model::DBIx::Loop, a non-blocking model backend. The same

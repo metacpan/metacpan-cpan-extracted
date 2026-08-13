@@ -33,39 +33,80 @@ subtest annulus => sub {
 
 subtest box => sub {
 
-    is(
-        box(
-            center => [ 10, 20 ],
-            width  => q{2'},
-            height => '3d',
-        )->render,
-        q{box(10,20,2',3d,0)},
-        'no angle',
-    );
+    subtest 'region file' => sub {
+        is(
+            box(
+                center => [ 10, 20 ],
+                width  => q{2'},
+                height => '3d',
+            )->render,
+            q{box(10,20,2',3d,0)},
+            'no angle',
+        );
 
-    is(
-        box(
-            center => [ 10, 20 ],
-            width  => q{2'},
-            height => '3d',
-            angle  => 33,
-        )->render,
-        q{box(10,20,2',3d,33)},
-        'angle',
-    );
+        is(
+            box(
+                center => [ 10, 20 ],
+                width  => q{2'},
+                height => '3d',
+                angle  => 33,
+            )->render,
+            q{box(10,20,2',3d,33)},
+            'angle',
+        );
+    };
+
+    subtest 'filter function' => sub {
+
+        is(
+            box(
+                center  => [ 10, 20 ],
+                width   => q{2'},
+                height  => '3d',
+                columns => [ 'x', 'y' ],
+            )->render,
+            q{box(10,20,2',3d,0,x,y)},
+            'no angle',
+        );
+
+        is(
+            box(
+                center  => [ 10, 20 ],
+                width   => q{2'},
+                height  => '3d',
+                angle   => 33,
+                columns => [ 'x', 'y' ],
+            )->render,
+            q{box(10,20,2',3d,33,x,y)},
+            'angle',
+        );
+
+    };
 
 };
 
 subtest circle => sub {
 
-    is(
-        circle(
-            center => [ 10, 20 ],
-            radius => 2,
-        )->render,
-        'circle(10,20,2)',
-    );
+    subtest 'region file' => sub {
+        is(
+            circle(
+                center => [ 10, 20 ],
+                radius => 2,
+            )->render,
+            'circle(10,20,2)',
+        );
+    };
 
+    subtest 'filter function' => sub {
+        is(
+            circle(
+                center  => [ 10, 20 ],
+                radius  => 2,
+                columns => [ 'x', 'y' ],
+            )->render,
+            'circle(10,20,2,x,y)',
+        );
+    };
 };
 
 subtest diamond => sub {
@@ -95,24 +136,50 @@ subtest diamond => sub {
 
 subtest ellipse => sub {
 
-    is(
-        ellipse(
-            center => [ 10,    20 ],
-            radii  => [ q{2'}, '3d' ],
-        )->render,
-        q{ellipse(10,20,2',3d,0)},
-        'no angle',
-    );
+    subtest 'filter file' => sub {
+        is(
+            ellipse(
+                center  => [ 10,    20 ],
+                radii   => [ q{2'}, '3d' ],
+                columns => [ 'x',   'y' ],
+            )->render,
+            q{ellipse(10,20,2',3d,0,x,y)},
+            'no angle',
+        );
 
-    is(
-        ellipse(
-            center => [ 10,    20 ],
-            radii  => [ q{2'}, '3d' ],
-            angle  => 33,
-        )->render,
-        q{ellipse(10,20,2',3d,33)},
-        'angle',
-    );
+        is(
+            ellipse(
+                center  => [ 10,    20 ],
+                radii   => [ q{2'}, '3d' ],
+                columns => [ 'x',   'y' ],
+                angle   => 33,
+            )->render,
+            q{ellipse(10,20,2',3d,33,x,y)},
+            'angle',
+        );
+    };
+
+    subtest 'filter functoin' => sub {
+        is(
+            ellipse(
+                center => [ 10,    20 ],
+                radii  => [ q{2'}, '3d' ],
+            )->render,
+            q{ellipse(10,20,2',3d,0)},
+            'no angle',
+        );
+
+        is(
+            ellipse(
+                center => [ 10,    20 ],
+                radii  => [ q{2'}, '3d' ],
+                angle  => 33,
+            )->render,
+            q{ellipse(10,20,2',3d,33)},
+            'angle',
+        );
+    };
+
 };
 
 subtest elliptannulus => sub {

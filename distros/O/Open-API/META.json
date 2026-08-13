@@ -1,5 +1,5 @@
 {
-   "abstract" : "OpenAPI 3.1 server and client",
+   "abstract" : "OpenAPI 3.0 and 3.1 server and client",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -52,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

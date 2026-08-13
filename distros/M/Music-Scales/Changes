@@ -1,5 +1,18 @@
 Revision history for Perl module Music::Scales
 
+0.11 2026-08-12 12:19:46
+	- Update the SYNOPSIS again.
+
+0.1 2026-08-12 12:08:32
+	- Use spaces instead of sporadic tabs.
+
+0.09 2026-08-12 11:58:06
+	- Cleaned up POD again.
+
+0.08 2026-08-12 10:22:15
+	- Cleaned up POD.
+	- Exported scale lists.
+
 0.07	Bugfixes :(
 
 0.06	Added get_scale_MIDI
@@ -20,8 +33,4 @@ Revision history for Perl module Music::Scales
 
 0.01	Sat Apr 12 22:09:25 2003
 	- original version; created by ExtUtils::ModuleMaker 0.31229
-
-
-
-
 

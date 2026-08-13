@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::NetworkPolicySpec;
 # ABSTRACT: NetworkPolicySpec provides the specification of a NetworkPolicy
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s egress => ['Networking::V1::NetworkPolicyEgressRule'];
@@ -29,7 +29,7 @@ IO::K8s::Api::Networking::V1::NetworkPolicySpec - NetworkPolicySpec provides the
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 egress
 
@@ -54,10 +54,6 @@ policyTypes is a list of rule types that the NetworkPolicy relates to. Valid opt
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -68,7 +64,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

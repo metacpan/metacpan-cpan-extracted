@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use IO::Socket::INET;
 use Test::More;
+use File::Spec ();
 use Fetch;
 
 # WebSocket (RFC 6455) client: the handshake, then masked text/binary frames
@@ -28,6 +29,11 @@ my $port = $srv->sockport;
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    # Never hold the harness TAP pipe open, and never outlive the run:
+    # a leaked server child hangs the whole suite after this test is done.
+    open STDOUT, ">", File::Spec->devnull();
+    open STDERR, ">", File::Spec->devnull();
+    alarm 120;
     $SIG{TERM} = sub { exit 0 };
     my $c = $srv->accept or exit 0;
     $c->blocking(1);
@@ -129,4 +135,4 @@ is($ws->next_message->get, "\x00\x01\x02\xfe\xff", 'binary message echoed');
 $ws->close;
 ok($ws->is_closed, 'close shuts the socket down');
 
-END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

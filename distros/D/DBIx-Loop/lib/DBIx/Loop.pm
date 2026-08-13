@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('DBIx::Loop', $VERSION);
@@ -19,7 +19,7 @@ DBIx::Loop - non-blocking DBI on your event loop
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

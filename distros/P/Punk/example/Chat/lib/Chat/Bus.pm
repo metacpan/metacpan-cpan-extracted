@@ -49,7 +49,10 @@ sub publish {
     return room($name)->broadcast(encode($event), $except);
 }
 
-sub connected { scalar room($_[0])->clients }
+# count, not `scalar ...->clients`: clients is a list-returning XSUB,
+# and an XSUB that pushes N items yields the LAST one in scalar context
+# - a WebSocket object where the member count belongs
+sub connected { room($_[0])->count }
 
 # The wire shape of one message, shared by the history replay, the live
 # broadcast and the API's JSON responses.

@@ -1,7 +1,7 @@
 package Data::SortedSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::SortedSet::Shared', $VERSION);
 
@@ -73,15 +73,20 @@ B<Linux-only>.  Requires 64-bit Perl.
     my $z = Data::SortedSet::Shared->new(undef, $max);        # anonymous
     my $z = Data::SortedSet::Shared->new_memfd($name, $max);
     my $z = Data::SortedSet::Shared->new_from_fd($fd);
+    my $z = Data::SortedSet::Shared->new_readonly($path);     # frozen file, lock-free
 
-C<$path> is the backing file (C<undef> for an anonymous mapping); C<$max> is the
-maximum number of members.  When reopening an existing file or memfd, the stored
-header wins and the caller's C<$max> is ignored.  Backing files are created with
-mode 0600 by default; pass an octal C<$mode> (e.g. C<0660>) to opt into cross-user
-sharing.  The mode applies only when the file is created (it is ignored when
-attaching an existing file); the exact mode is applied via C<fchmod>, so umask does not narrow it.  C<new_memfd> creates a Linux
-memfd (transferable via its C<memfd> descriptor); C<new_from_fd> reopens one in
-another process.
+C<$path> is the backing file (C<undef> for an anonymous mapping); C<$max> is
+the maximum number of members. C<new_readonly> attaches a B<frozen> file
+read-only and lock-free (see L</"FROZEN (READ-ONLY) MODE">). When reopening an
+existing file or memfd, the stored header wins and the caller's C<$max> is
+ignored. Backing files are created with mode 0600 by default; pass an octal
+C<$mode> (e.g. C<0660>) to opt into cross-user sharing. The mode applies only
+when the file is created (it is ignored when attaching an existing file); the
+exact mode is applied via C<fchmod>, so umask does not narrow it. C<new_memfd>
+creates a Linux memfd (transferable via its C<memfd> descriptor);
+C<new_from_fd> reopens one in another process. The descriptor you pass is
+duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it
+does not disturb the handle.
 
 =head2 String-keyed sets
 
@@ -160,6 +165,7 @@ call back into the set.
     $z->count; $z->max_entries; $z->stats;     # see STATS
     $z->path; $z->memfd; $z->sync; $z->unlink;     # or Class->unlink($path)
     $z->eventfd; $z->fileno; $z->notify; $z->eventfd_consume;
+    $z->freeze; $z->frozen; $z->readonly;      # see FROZEN (READ-ONLY) MODE
 
 C<sync> flushes the mapping to its backing store and C<unlink> removes the
 backing file (also callable as C<< Class->unlink($path) >>).  C<path> returns the
@@ -171,6 +177,53 @@ C<fileno> returns the current eventfd descriptor or -1, C<notify> writes a wakeu
 (returning false if no eventfd is attached), and C<eventfd_consume> reads and
 resets the counter, returning it as an integer or C<undef> when nothing is
 pending.
+
+=head1 FROZEN (READ-ONLY) MODE
+
+A file-backed sorted set can be B<frozen> and then shipped to other machines,
+where consumers open it B<read-only> and query it with B<no locking at all>.
+
+    # producer: build, freeze, ship the file
+    my $z = Data::SortedSet::Shared->new("/tmp/leaderboard.sset", 1_000_000);
+    $z->add_many(\@rows);
+    $z->freeze;                  # seal: now immutable, and $z itself is read-only
+    # ... copy /tmp/leaderboard.sset to another host ...
+
+    # consumer (any process, same architecture): read-only, lock-free
+    my $ro  = Data::SortedSet::Shared->new_readonly("/tmp/leaderboard.sset");
+    my @top = $ro->rev_range_by_rank(0, 9);
+    my $r   = $ro->rank($member);
+
+C<freeze> takes the write lock, marks the set B<permanently immutable> (there is
+no unfreeze -- rebuild the file to change it), and flushes the seal to disk. A
+frozen set rejects every mutator (C<add>, C<incr>, C<remove>, C<add_many>,
+C<pop_min>, C<pop_max>, C<clear>) with a croak, and a read-write reopen
+(C<< new($path, ...) >> or C<< new_from_fd($fd) >>) of a sealed file is
+B<refused> -- so a shipped artifact can never be silently mutated out from under
+its readers. The order-statistics B+tree (subtree counts, leaf links, and
+separators) is maintained on every write, so nothing has to be built or
+completed at freeze time.
+
+C<new_readonly($path)> maps the file C<O_RDONLY> / C<PROT_READ> and B<requires it
+to be frozen> (it croaks on a file that was never C<freeze>d). Because a sealed
+set's tree, leaf links, subtree counts and member index are all immutable, every
+read -- C<score>, C<exists>, C<rank>, C<rev_rank>, C<at_rank>, C<count>,
+C<count_in_score>, C<range_by_rank>, C<range_by_score>, C<peek_*>, C<each>,
+C<stats> -- reads them B<directly, taking no reader lock>. The mapping is never
+written (a range or iteration walks with a process-local cursor and returns its
+results in a private buffer), so a read-only view works from a read-only file
+descriptor or a read-only filesystem, and any number of processes can share one
+C<PROT_READ> mapping. C<frozen> reports whether the file is sealed and
+C<readonly> whether this handle is a read-only view; C<stats> gains matching
+C<frozen> and C<readonly> flags. C<sync> is a no-op on a read-only view.
+
+B<Portability.> The on-disk format is native binary (native-endian 64-bit
+words), so a frozen file may be copied only between machines of the B<same
+architecture>; a wrong-endian file is rejected at open by the magic check.
+B<Copy the file to each consumer> -- do not share one file over a network
+filesystem: the lock is a Linux futex (process-local to one kernel), and the
+"no live writer" contract that makes the lock-free reads safe assumes a static
+copy. Linux-only; 64-bit Perl.
 
 =head1 SHARING ACROSS PROCESSES
 
@@ -227,18 +280,22 @@ of C<k> members is O(log n + k), scanning sequentially through the linked leaves
 C<stats()> returns a hashref with keys: C<count>, C<max_entries>, C<height>
 (B+tree height), C<node_capacity>, C<nodes_used>, C<index_slots>, C<index_load>
 (occupied fraction of the member index), C<ops> (running count of write-path
-calls, whether or not they changed the set), and C<mmap_size> (bytes).
+calls, whether or not they changed the set), C<mmap_size> (bytes), C<frozen> (1
+if the set has been sealed by C<freeze>), and C<readonly> (1 if this handle is a
+read-only view -- see L</"FROZEN (READ-ONLY) MODE">).
 
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created, and when a file left
+behind by an interrupted create is re-initialized (see L</CRASH SAFETY>); a
+file already in use keeps its own permissions. The file is opened with
+C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with
+C<O_EXCL>; the on-disk header is validated when the file is attached. Any
+process you grant write access to a shared mapping is trusted not to corrupt
+its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 
@@ -260,6 +317,18 @@ reclaim it and writers may block until the mapping is recreated. Reaching this
 needs more than 1024 concurrent reader processes on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete sorted-set file
+left by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

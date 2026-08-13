@@ -33,26 +33,26 @@ SYNOPSIS
 
 DESCRIPTION
     Sparse spatial hash in shared memory: an unbounded Euclidean grid by
-    default, or a bounded seamless torus (see "Toroidal space"). Positions
-    and values are stored in a flat array of entries; a hash table of
-    buckets maps cell coordinates to entry chains. Coordinates are arbitrary
-    floats in 2D or 3D; for 2D use, simply omit the "z" argument (it
-    defaults to 0). For planets and other spherical worlds, geo helpers map
+    default, or a bounded seamless torus (see "Toroidal space"). Positions and
+    values are stored in a flat array of entries; a hash table of buckets maps
+    cell coordinates to entry chains. Coordinates are arbitrary floats in 2D
+    or 3D; for 2D use, simply omit the "z" argument (it defaults to 0). For
+    planets and other spherical worlds, geo helpers map
     latitude/longitude/altitude to 3D and a cube-sphere cell scheme provides
     chunk and level-of-detail ids (see "Spherical worlds").
 
     Multiple processes can map the same hash and read and write it
-    concurrently; access is serialized by a write-preferring futex rwlock
-    that recovers automatically if a lock holder dies (see "CRASH SAFETY").
+    concurrently; access is serialized by a write-preferring futex rwlock that
+    recovers automatically if a lock holder dies (see "CRASH SAFETY").
 
     Linux-only. Requires 64-bit Perl.
 
   Coordinate model
     Space is divided into axis-aligned cells of size "cell_size". A point at
     (x, y, z) lands in cell (floor(x/cell_size), floor(y/cell_size),
-    floor(z/cell_size)). Spatial queries walk all cells that overlap the
-    query region; smaller cells reduce false positives at the cost of more
-    bucket lookups.
+    floor(z/cell_size)). Spatial queries walk all cells that overlap the query
+    region; smaller cells reduce false positives at the cost of more bucket
+    lookups.
 
   2D vs 3D
     All methods that accept coordinates accept either (x, y) or (x, y, z).
@@ -63,21 +63,21 @@ DESCRIPTION
 
   Toroidal space
     By default the grid is unbounded and Euclidean. Construct with "wrap =>
-    [$Wx, $Wy]" (2D) or "[$Wx, $Wy, $Wz]" (3D) to make space a seamless
-    torus: neighbour-cell expansion wraps around the grid edges and
-    "query_radius", "query_knn", "each_in_radius", "query_radius_many", and
-    the pair emitters all use the minimum-image (shortest wrapping) distance
+    [$Wx, $Wy]" (2D) or "[$Wx, $Wy, $Wz]" (3D) to make space a seamless torus:
+    neighbour-cell expansion wraps around the grid edges and "query_radius",
+    "query_knn", "each_in_radius", "query_radius_many", and the pair emitters
+    all use the minimum-image (shortest wrapping) distance
 
         dx = abs(ax - bx);  dx = $Wx - dx if dx > $Wx / 2;   # per axis
 
-    so an entry near 0 and one near $Wx are neighbours. Keep positions
-    within "[0, $W)" per axis for the metric to be meaningful. Each wrapped
-    extent must be a positive multiple of "cell_size" so the cells tile the
-    world exactly, otherwise the constructor croaks. "query_cell" resolves
-    its coordinate to a wrapped cell, but "query_aabb" uses the literal
+    so an entry near 0 and one near $Wx are neighbours. Keep positions within
+    "[0, $W)" per axis for the metric to be meaningful. Each wrapped extent
+    must be a positive multiple of "cell_size" so the cells tile the world
+    exactly, otherwise the constructor croaks. "query_cell" resolves its
+    coordinate to a wrapped cell, but "query_aabb" uses the literal
     (non-wrapping) box even in a wrapping world. The wrap configuration is
-    part of the mapped format and is restored on reopen; the "world"
-    accessor returns the extents.
+    part of the mapped format and is restored on reopen; the "world" accessor
+    returns the extents.
 
 METHODS
   Constructors
@@ -86,25 +86,29 @@ METHODS
         my $s = Data::SpatialHash::Shared->new_memfd($name, $max, $buckets, $cell);
         my $s = Data::SpatialHash::Shared->new_from_fd($fd);
         my $s = Data::SpatialHash::Shared->new($path, $max, $buckets, $cell, wrap => [$Wx, $Wy]);
+        my $ro = Data::SpatialHash::Shared->new_readonly($path);   # frozen file, read-only
 
-    $path is the backing file path; "undef" creates an anonymous mapping.
-    $max is the maximum number of entries. $buckets is the bucket count (0 =
-    auto). $cell is the cell size (float).
+    $path is the backing file path; "undef" creates an anonymous mapping. $max
+    is the maximum number of entries. $buckets is the bucket count (0 = auto).
+    $cell is the cell size (float).
 
     Pass "wrap => [$Wx, $Wy]" (or "[$Wx, $Wy, $Wz]") to make the world a
     seamless torus of those extents (see "Toroidal space"); omit it for an
     unbounded Euclidean space.
 
-    When reopening an existing backing file or memfd, the stored header
-    wins: the caller's $max, $buckets, $cell, "wrap", and "sphere" arguments
-    are ignored and the file's original values are used. They are still
-    validated for well-formedness first (for example a non-positive $cell
-    croaks), so pass plausible values even on a reopen; only the stored
-    geometry is authoritative.
+    When reopening an existing backing file or memfd, the stored header wins:
+    the caller's $max, $buckets, $cell, "wrap", and "sphere" arguments are
+    ignored and the file's original values are used. They are still validated
+    for well-formedness first (for example a non-positive $cell croaks), so
+    pass plausible values even on a reopen; only the stored geometry is
+    authoritative.
 
-    "new_memfd" creates a Linux memfd (anonymous but transferable via
-    "memfd" file descriptor). "new_from_fd" reopens an existing memfd in
-    another process.
+    "new_memfd" creates a Linux memfd (anonymous but transferable via "memfd"
+    file descriptor). "new_from_fd" reopens an existing memfd in another
+    process. The descriptor you pass is duplicated ("F_DUPFD_CLOEXEC"), so it
+    stays yours to close and closing it does not disturb the handle.
+    "new_readonly" opens a frozen file read-only for lock-free querying (see
+    "FROZEN (READ-ONLY) MODE").
 
   Mutators
         my $h = $s->insert(x, y, value);        # 2D insert -- returns handle or undef
@@ -120,28 +124,26 @@ METHODS
         my $n   = $s->move_many([ [handle,x,y], [handle,x,y,z], ... ]);  # bulk move
 
     "insert" returns a handle (opaque integer) on success, or "undef" if
-    "max_entries" is exhausted. "move" and "remove" return true on success,
-    or false if the handle is invalid or already removed. "set_value"
-    instead croaks on an invalid or freed handle; it and "clear" return
-    nothing.
+    "max_entries" is exhausted. "move" and "remove" return true on success, or
+    false if the handle is invalid or already removed. "set_value" instead
+    croaks on an invalid or freed handle; it and "clear" return nothing.
 
-    Each entry may carry an interaction radius (default 0; must be finite
-    and non-negative), used by "each_colliding_pair". Set it with the
-    5-argument "insert" or with "set_radius" (which croaks on an invalid or
-    freed handle); for a 2D entry with a radius, insert then call
-    "set_radius". "insert_many" and "move_many" apply a whole batch under a
-    single lock acquisition -- each row is an arrayref. "insert_many"
-    inserts 2D entries (rows "[x,y,value]" or "[x,y,value,radius]"; use
-    "insert" in a loop for 3D) and returns the list of handles, with "undef"
-    for any row that overflowed the pool, was malformed (not an arrayref of
-    length 3 or 4), or carried a negative or non-finite radius. "move_many"
-    takes "[handle,x,y]" or "[handle,x,y,z]" rows and returns the count
-    successfully moved; freed/invalid handles and malformed rows are
-    skipped.
+    Each entry may carry an interaction radius (default 0; must be finite and
+    non-negative), used by "each_colliding_pair". Set it with the 5-argument
+    "insert" or with "set_radius" (which croaks on an invalid or freed
+    handle); for a 2D entry with a radius, insert then call "set_radius".
+    "insert_many" and "move_many" apply a whole batch under a single lock
+    acquisition -- each row is an arrayref. "insert_many" inserts 2D entries
+    (rows "[x,y,value]" or "[x,y,value,radius]"; use "insert" in a loop for
+    3D) and returns the list of handles, with "undef" for any row that
+    overflowed the pool, was malformed (not an arrayref of length 3 or 4), or
+    carried a negative or non-finite radius. "move_many" takes "[handle,x,y]"
+    or "[handle,x,y,z]" rows and returns the count successfully moved;
+    freed/invalid handles and malformed rows are skipped.
 
-    Handles are entry slot indices starting at 0, and 0 is false in Perl.
-    The very first insert into a fresh hash returns handle 0. Always test
-    the result with "defined $h", never for truthiness:
+    Handles are entry slot indices starting at 0, and 0 is false in Perl. The
+    very first insert into a fresh hash returns handle 0. Always test the
+    result with "defined $h", never for truthiness:
 
         my $h = $s->insert($x, $y, $v);
         die "full" unless defined $h;   # correct: handle 0 is valid
@@ -159,8 +161,8 @@ METHODS
   Queries
     Most query methods return a list of stored values (not handles) for
     matching entries; "query_radius_many" instead returns an arrayref of
-    id-list arrayrefs (see "Batched radius queries"). For "query_knn",
-    results are in nearest-first order.
+    id-list arrayrefs (see "Batched radius queries"). For "query_knn", results
+    are in nearest-first order.
 
         my @ids = $s->query_radius(x, y, r);         # 2D radius search
         my @ids = $s->query_radius(x, y, z, r);      # 3D radius search
@@ -174,17 +176,16 @@ METHODS
         $s->each_in_radius(x, y, z, r, sub { my ($v) = @_; ... }); # 3D cb
         my $lists = $s->query_radius_many([ [x,y,r], [x,y,z,r] ]); # N radius queries, one lock
 
-    "query_radius" and "each_in_radius" require a finite, non-negative
-    radius, and "query_knn" requires "k" to be at least 1; out-of-range
-    values croak. The radius is inclusive (a point at exactly the radius
-    matches), unlike the strict "each_pair_within"; "query_geo_radius" is
-    inclusive too, as are "query_aabb"'s box edges.
+    "query_radius" and "each_in_radius" require a finite, non-negative radius,
+    and "query_knn" requires "k" to be at least 1; out-of-range values croak.
+    The radius is inclusive (a point at exactly the radius matches), unlike
+    the strict "each_pair_within"; "query_geo_radius" is inclusive too, as are
+    "query_aabb"'s box edges.
 
     "each_in_radius" snapshots the matching values under the read lock, then
     invokes the callback once per value after the lock is released. Because
-    the lock is dropped before any callback runs, the callback may safely
-    call back into the same map (for example "has" or "move") without
-    deadlock.
+    the lock is dropped before any callback runs, the callback may safely call
+    back into the same map (for example "has" or "move") without deadlock.
 
    Batched radius queries
         my $lists = $s->query_radius_many([ [x, y, r], [x, y, z, r], ... ]);
@@ -193,15 +194,14 @@ METHODS
     "query_radius_many" runs a whole batch of radius queries under a single
     read lock and returns an arrayref of id-list arrayrefs, one per query in
     input order. Each row is "[x, y, r]" (2D) or "[x, y, z, r]" (3D); a
-    malformed row (not a 3- or 4-element arrayref, or a negative or
-    non-finite "r") yields an empty list for that slot, siblings unaffected
-    -- it cannot croak mid-batch while holding the lock, mirroring
-    "insert_many". A region-too-large or out-of-memory condition from any
-    query still croaks (after freeing the partial result). This is purely a
-    lock-amortization win for callers issuing many queries per critical
-    section (for example a per-tick collision broad-phase across many
-    actors): one "rdlock"/"rdunlock" pair for the batch instead of one per
-    query.
+    malformed row (not a 3- or 4-element arrayref, or a negative or non-finite
+    "r") yields an empty list for that slot, siblings unaffected -- it cannot
+    croak mid-batch while holding the lock, mirroring "insert_many". A
+    region-too-large or out-of-memory condition from any query still croaks
+    (after freeing the partial result). This is purely a lock-amortization win
+    for callers issuing many queries per critical section (for example a
+    per-tick collision broad-phase across many actors): one
+    "rdlock"/"rdunlock" pair for the batch instead of one per query.
 
    Collision pairs
         $s->each_pair_within($max_r, sub { my ($va, $vb) = @_; ... });
@@ -209,47 +209,46 @@ METHODS
 
     "each_pair_within" invokes the callback once for every unordered pair of
     entries whose centre distance is less than $max_r. "each_colliding_pair"
-    instead pairs entries whose centre distance is less than the sum of
-    their two radii (see "set_radius") -- a heterogeneous-radius collision
-    test computed in a single grid walk, so a small "cell_size" stays
-    correct even for large-radius entries. Both emit each pair exactly once,
-    are seam-aware in a toroidal world, and -- like "each_in_radius" --
-    snapshot under the read lock then run the callback with the lock
-    released (so it may mutate the map). The callback arguments are the
-    stored values of the pair. Distances are 3D when any entry has a
-    non-zero "z" (or the world wraps in "z"), otherwise 2D.
-    "each_pair_within" croaks on a negative or non-finite $max_r.
+    instead pairs entries whose centre distance is less than the sum of their
+    two radii (see "set_radius") -- a heterogeneous-radius collision test
+    computed in a single grid walk, so a small "cell_size" stays correct even
+    for large-radius entries. Both emit each pair exactly once, are seam-aware
+    in a toroidal world, and -- like "each_in_radius" -- snapshot under the
+    read lock then run the callback with the lock released (so it may mutate
+    the map). The callback arguments are the stored values of the pair.
+    Distances are 3D when any entry has a non-zero "z" (or the world wraps in
+    "z"), otherwise 2D. "each_pair_within" croaks on a negative or non-finite
+    $max_r.
 
    Region query cost
     The cost of a region query scales with the number of grid cells covering
     the query region, not with the number of matching points. For
     "query_radius", "each_in_radius", and each "query_radius_many" sub-query
     that is roughly (2 * radius / cell_size) ** dims cells (similarly for
-    "query_aabb", which scans the cells spanning the box). The scan runs
-    while holding a read lock. An over-large radius relative to "cell_size"
+    "query_aabb", which scans the cells spanning the box). The scan runs while
+    holding a read lock. An over-large radius relative to "cell_size"
     therefore scans many empty cells, wasting time and stalling concurrent
     writers that are waiting for the lock. Size "cell_size" on the order of
     your typical query radius so each query touches only a handful of cells.
 
-    As a safety net, any region query that would scan more than
-    approximately 67 million cells (2**26) -- a "query_radius",
-    "query_aabb", "each_in_radius", or a "query_radius_many" sub-query whose
-    region spans that many cells, a "query_knn" that must walk that many
-    cells across its expanding shells, or a "each_pair_within" /
-    "each_colliding_pair" whose per-entry neighbourhood spans that many
-    cells -- croaks with a message containing the word "cells" rather than
-    scanning unbounded. If your use case genuinely requires regions that
-    large, increase "cell_size" so the same physical region maps to fewer
-    cells.
+    As a safety net, any region query that would scan more than approximately
+    67 million cells (2**26) -- a "query_radius", "query_aabb",
+    "each_in_radius", or a "query_radius_many" sub-query whose region spans
+    that many cells, a "query_knn" that must walk that many cells across its
+    expanding shells, or a "each_pair_within" / "each_colliding_pair" whose
+    per-entry neighbourhood spans that many cells -- croaks with a message
+    containing the word "cells" rather than scanning unbounded. If your use
+    case genuinely requires regions that large, increase "cell_size" so the
+    same physical region maps to fewer cells.
 
   Spherical worlds
     For points on or above a sphere (planets, globes), construct with a body
-    radius and use the geo helpers; a separate cube-sphere scheme gives
-    stable hierarchical cell ids for chunking and level-of-detail. Curvature
-    needs no special handling: with "sphere" set, geo coordinates are
-    converted to and from Cartesian in C, so proximity is exact
-    straight-line distance -- correct for surface and air entities alike --
-    not a great-circle approximation.
+    radius and use the geo helpers; a separate cube-sphere scheme gives stable
+    hierarchical cell ids for chunking and level-of-detail. Curvature needs no
+    special handling: with "sphere" set, geo coordinates are converted to and
+    from Cartesian in C, so proximity is exact straight-line distance --
+    correct for surface and air entities alike -- not a great-circle
+    approximation.
 
    Geo proximity
         my $s = Data::SpatialHash::Shared->new(undef, $max, 0, $cell, sphere => $R);
@@ -261,27 +260,25 @@ METHODS
 
     "sphere" is the body radius -- distinct from a per-entry interaction
     radius -- and must be finite and greater than zero; it is stored in the
-    map and restored on reopen. "sphere" and "wrap" are mutually exclusive
-    (a sphere is not a flat torus); passing both croaks. Latitude and
-    longitude are in radians ("lat" in -pi/2 .. pi/2, "lon" in -pi .. pi);
-    "alt" is height above the sphere of radius $R, so an entity lies at
-    distance "$R + $alt" from the centre. Each geo method converts to
-    Cartesian and delegates to the ordinary 3D engine, so $dist in
-    "query_geo_radius" is a true straight-line distance and must be finite
-    and non-negative. At a pole, longitude is undefined and "position_geo"
-    reports it as 0. Calling a geo method on a map created without "sphere"
-    croaks. "insert_geo" returns a handle or "undef" if the pool is
-    exhausted (test with "defined" -- handle 0 is valid but false);
-    "move_geo" returns true, or false for a freed/invalid handle;
-    "position_geo" croaks on a freed or invalid handle.
+    map and restored on reopen. "sphere" and "wrap" are mutually exclusive (a
+    sphere is not a flat torus); passing both croaks. Latitude and longitude
+    are in radians ("lat" in -pi/2 .. pi/2, "lon" in -pi .. pi); "alt" is
+    height above the sphere of radius $R, so an entity lies at distance "$R +
+    $alt" from the centre. Each geo method converts to Cartesian and delegates
+    to the ordinary 3D engine, so $dist in "query_geo_radius" is a true
+    straight-line distance and must be finite and non-negative. At a pole,
+    longitude is undefined and "position_geo" reports it as 0. Calling a geo
+    method on a map created without "sphere" croaks. "insert_geo" returns a
+    handle or "undef" if the pool is exhausted (test with "defined" -- handle
+    0 is valid but false); "move_geo" returns true, or false for a
+    freed/invalid handle; "position_geo" croaks on a freed or invalid handle.
 
    Cube-sphere cells
-    A direction (or lat/lon) maps to a hierarchical cell id on a
-    cube-sphere: six cube faces, each an equal-angle grid subdivided to a
-    chosen level (level 0 = the whole face, level "L" = "2**L" cells per
-    face edge, up to level 24). The ids are stateless integers independent
-    of any stored data -- useful as chunk keys for streaming and
-    level-of-detail.
+    A direction (or lat/lon) maps to a hierarchical cell id on a cube-sphere:
+    six cube faces, each an equal-angle grid subdivided to a chosen level
+    (level 0 = the whole face, level "L" = "2**L" cells per face edge, up to
+    level 24). The ids are stateless integers independent of any stored data
+    -- useful as chunk keys for streaming and level-of-detail.
 
         my $cell = $s->cube_cell($x, $y, $z, $level);     # direction (need not be unit length)
         my $cell = $s->cube_cell_geo($lat, $lon, $level);
@@ -294,10 +291,10 @@ METHODS
 
     A cell id packs "(level, face, i, j)" into an unsigned integer, so cells
     at different levels are different ids. "cube_neighbors" returns the four
-    edge-adjacent cells, correct across face seams; diagonal/corner
-    neighbours are not included. These methods read no map state (any handle
-    provides them), and a malformed cell id croaks; a zero or non-finite
-    direction yields an arbitrary but valid cell. The grid is near-uniform
+    edge-adjacent cells, correct across face seams; diagonal/corner neighbours
+    are not included. These methods read no map state (any handle provides
+    them), and a malformed cell id croaks; a zero or non-finite direction
+    yields an arbitrary but valid cell. The grid is near-uniform
     (equal-angle), not equal-area.
 
   Introspection
@@ -326,29 +323,29 @@ METHODS
         my $n = $s->eventfd_consume;  # read+reset eventfd counter
 
     "eventfd_set" attaches an external eventfd, closing the
-    previously-attached fd (such as one created by "eventfd") unless it is
-    the same descriptor. "notify" returns false if no eventfd is attached,
-    true after writing the signal. "eventfd_consume" returns the counter as
-    an integer, or "undef" if no eventfd is attached or nothing is pending
-    (a spurious wakeup).
+    previously-attached fd (such as one created by "eventfd") unless it is the
+    same descriptor. "notify" returns false if no eventfd is attached, true
+    after writing the signal. "eventfd_consume" returns the counter as an
+    integer, or "undef" if no eventfd is attached or nothing is pending (a
+    spurious wakeup).
 
 TUNING
     Choose "cell_size" close to your typical query radius. A value too small
     means many cells are scanned per radius query; a value too large packs
     many entries into each cell and increases false-positive tests.
 
-    Choose "num_buckets" to be a power of two slightly above the expected
-    peak live count; any value you pass is rounded up to the next power of
-    two. The default (0 = auto) picks a power of two near "max_entries",
-    which is a safe starting point. After loading real data, inspect
-    "stats->{load_factor}" (target below 0.7) and "stats->{max_chain}"
-    (target below 5).
+    Choose "num_buckets" to be a power of two slightly above the expected peak
+    live count; any value you pass is rounded up to the next power of two. The
+    default (0 = auto) picks a power of two near "max_entries", which is a
+    safe starting point. After loading real data, inspect
+    "stats->{load_factor}" (target below 0.7) and "stats->{max_chain}" (target
+    below 5).
 
 BENCHMARKS
     Measured on Linux x86_64, Perl 5.40.2 (bench/single.pl). The first four
     use 100k entries at "cell_size" 1.0; "each_colliding_pair" uses 4000
-    radius-bearing actors on a 2000x2000 torus; the geo/cube rows use a
-    planet ("sphere" set):
+    radius-bearing actors on a 2000x2000 torus; the geo/cube rows use a planet
+    ("sphere" set):
 
         insert:                4.6M/s
         query_radius:           61k/s
@@ -374,43 +371,101 @@ STATS
     "ops" -- total mutation operation counter
     "mmap_size" -- size of the shared mapping in bytes
 
+FROZEN (READ-ONLY) MODE
+    A file-backed spatial hash can be frozen and then shipped to other
+    machines, where consumers open it read-only and query it with no locking
+    at all.
+
+        # producer: build, freeze, ship the file
+        my $s = Data::SpatialHash::Shared->new("/tmp/world.sph", 100_000, 0, 1.0);
+        $s->insert($_, $_, $_) for 1 .. 1000;
+        $s->freeze;                 # seal: now immutable, and $s itself is read-only
+        # ... copy /tmp/world.sph to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::SpatialHash::Shared->new_readonly("/tmp/world.sph");
+        my @near = $ro->query_radius(5, 5, 10);
+
+    "freeze" takes the write lock, marks the spatial hash permanently
+    immutable (there is no unfreeze -- rebuild the file to change it), and
+    flushes the seal to disk. A frozen spatial hash rejects every mutator
+    ("insert", "insert_many", "insert_geo", "move", "move_many", "move_geo",
+    "remove", "set_value", "set_radius", "clear") with a croak, and a
+    read-write reopen ("new($path, ...)" or "new_from_fd") of a sealed file is
+    refused -- so a shipped artifact can never be silently mutated out from
+    under its readers.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed spatial hash's entries and geometry are immutable, every accessor
+    and query method -- "has", "value", "get_radius", "position",
+    "position_geo", "count", "query_cell", "query_aabb", "query_radius",
+    "query_radius_many", "query_knn", "query_geo_radius", "each_in_radius",
+    "each_pair_within", "each_colliding_pair", and "stats" -- reads it
+    directly, taking no reader lock. The mapping is never written, so a
+    read-only view works from a read-only file descriptor or a read-only
+    filesystem, and any number of processes can share one "PROT_READ" mapping.
+    "sync" is a silent no-op on a read-only view. "frozen" and "readonly"
+    report the two states.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
+
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 via a "mode
-    => 0660" option to "new"; the mode is applied only when the file is
-    created (an existing file keeps its own permissions). The file is opened
-    with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 via a "mode => 0660"
+    option to "new"; the mode is applied when the file is created, and when a
+    file left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
     created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
 CRASH SAFETY
-    The write lock is a futex-based rwlock with PID-encoded ownership. If
-    the writer process dies while holding the lock, the next writer that
-    cannot acquire the lock checks whether the owner PID is still alive and,
-    if not, recovers the lock. Reader slots are similarly reclaimed when a
-    dead reader's slot is detected.
+    The write lock is a futex-based rwlock with PID-encoded ownership. If the
+    writer process dies while holding the lock, the next writer that cannot
+    acquire the lock checks whether the owner PID is still alive and, if not,
+    recovers the lock. Reader slots are similarly reclaimed when a dead
+    reader's slot is detected.
 
-    Limitation: PID reuse is not detected. If a new process acquires the
-    same PID as a dead lock holder before recovery runs, the stale lock may
-    not be released automatically. This edge case requires the kernel to
-    reassign PIDs faster than lock-recovery attempts, which is very unlikely
-    in practice but cannot be ruled out.
+    Limitation: PID reuse is not detected. If a new process acquires the same
+    PID as a dead lock holder before recovery runs, the stale lock may not be
+    released automatically. This edge case requires the kernel to reassign
+    PIDs faster than lock-recovery attempts, which is very unlikely in
+    practice but cannot be ruled out.
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete spatial hash file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
     Data::Graph::Shared - directed weighted graph
@@ -445,6 +500,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

@@ -6,7 +6,7 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
 
 ## SYNOPSIS
 
-    use v5.36;
+    use v5.38;
     use PAGI::FastAPI;
     use PAGI::FastAPI::Depends qw(Depends);
     use Types::Standard qw(Int Str);

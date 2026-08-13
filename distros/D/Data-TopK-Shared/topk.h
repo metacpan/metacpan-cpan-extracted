@@ -196,13 +196,6 @@ static inline void tk_rwlock_spin_pause(void) {
 #define TK_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define TK_RWLOCK_WR(pid)    (TK_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & TK_RWLOCK_PID_MASK))
 
-/* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
-/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse -- if a dead
- * lock-holder's PID is recycled to an unrelated live process before recovery
- * runs, this reports "alive" and that slot's rdepth is not reclaimed until the
- * recycled process exits. Robust detection would require a per-slot
- * process-start-time epoch (a header-layout/version change).
- * Documented under "Crash Safety" in the POD. */
 /* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
  * process that crashed while holding the lock and lingers unreaped would never
  * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
@@ -222,6 +215,9 @@ static inline int tk_pid_is_zombie(uint32_t pid) {
     if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
     return rp[1] == ' ' && rp[2] == 'Z';
 }
+/* 1 if alive or unknown, 0 if definitely dead.  Cannot detect PID reuse: a
+ * recycled PID reports "alive" and the slot is not reclaimed until that
+ * process exits.  See "Crash Safety" in the POD. */
 static inline int tk_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
@@ -306,8 +302,7 @@ static inline void tk_claim_reader_slot(TkHandle *h) {
     /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
      * if its rdepth>0: clearing pid drops the dead reader's entire contribution
      * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
-     * old design) we need not skip dead slots that still show a read count. */
+     * claim it. */
     for (uint32_t i = 0; i < TK_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || tk_pid_alive(dpid)) continue;
@@ -315,7 +310,7 @@ static inline void tk_claim_reader_slot(TkHandle *h) {
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            tk_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            tk_occ_set(h, i);
             h->my_slot_idx = i;
             return;
         }
@@ -578,7 +573,6 @@ static inline void tk_init_header(void *base, uint32_t m, uint32_t key_size, uin
        TK_NIL (0xFF bytes) so the table starts empty. */
     memset(base, 0, (size_t)L.buckets);
     memset((char *)base + L.buckets, 0xFF, (size_t)(L.total - L.buckets));   /* buckets = TK_NIL */
-    hdr->magic            = TK_MAGIC;
     hdr->version          = TK_VERSION;
     hdr->capacity         = m;
     hdr->key_size         = key_size;
@@ -594,6 +588,11 @@ static inline void tk_init_header(void *base, uint32_t m, uint32_t key_size, uin
     hdr->alpha            = alpha;
     hdr->now              = 0.0;
     hdr->landmark         = 0.0;
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, TK_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -711,6 +710,16 @@ static int tk_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int tk_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static TkHandle *tk_create(const char *path, uint64_t capacity, uint64_t key_size, uint32_t tkmode, double alpha, mode_t mode, char *errbuf) {
     if (!tk_validate_args(capacity, key_size, errbuf)) return NULL;
 
@@ -747,6 +756,27 @@ static TkHandle *tk_create(const char *path, uint64_t capacity, uint64_t key_siz
         if (base == MAP_FAILED) { TK_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!tk_validate_header((TkHeader *)base, (uint64_t)st.st_size)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((TkHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && tk_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        TK_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    tk_init_header(base, (uint32_t)capacity, (uint32_t)key_size, tkmode, alpha, total);
+                    flock(fd, LOCK_UN); close(fd);
+                    return tk_setup(base, map_size, path, -1);
+                }
+                if (((TkHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    TK_ERR("%s: incomplete top-k table file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 TK_ERR("invalid top-k table file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);

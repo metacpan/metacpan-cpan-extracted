@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::Device;
 # ABSTRACT: Device represents one individual hardware instance that can be selected based on its attributes. Besides the name, exactly one field must be set.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s basic => 'Resource::V1alpha3::BasicDevice';
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1alpha3::Device - Device represents one individual hard
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 basic
 
@@ -40,10 +40,6 @@ Name is unique identifier among all devices managed by the driver in the pool. I
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -54,7 +50,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

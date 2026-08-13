@@ -21,20 +21,20 @@ SYNOPSIS
         $z->each(sub { my ($member, $score) = @_; ... });   # in score order
 
 DESCRIPTION
-    An ordered set in shared memory, in the spirit of a Redis sorted set:
-    each member is a 64-bit integer carrying a double score, and members are
-    kept in score order. It is backed by an order-statistics B+tree -- so
-    "rank", range, and "pop" are O(log n) and ranges scan sequentially
-    through doubly-linked leaves -- paired with a member-to-score hash
-    index, so "score" and "exists" are O(1).
+    An ordered set in shared memory, in the spirit of a Redis sorted set: each
+    member is a 64-bit integer carrying a double score, and members are kept
+    in score order. It is backed by an order-statistics B+tree -- so "rank",
+    range, and "pop" are O(log n) and ranges scan sequentially through
+    doubly-linked leaves -- paired with a member-to-score hash index, so
+    "score" and "exists" are O(1).
 
-    The total order is (score, member): members with equal scores are
-    ordered by member id, which gives a well-defined rank and a
-    deterministic "pop_min"/"pop_max".
+    The total order is (score, member): members with equal scores are ordered
+    by member id, which gives a well-defined rank and a deterministic
+    "pop_min"/"pop_max".
 
     Multiple processes can map the same set and read and write it
-    concurrently; access is serialized by a write-preferring futex rwlock
-    that recovers automatically if a lock holder dies (see "CRASH SAFETY").
+    concurrently; access is serialized by a write-preferring futex rwlock that
+    recovers automatically if a lock holder dies (see "CRASH SAFETY").
 
     Members are 64-bit integers. For string-keyed sets, see "String-keyed
     sets" and Data::SortedSet::Shared::Strings (bundled). Scores must not be
@@ -46,16 +46,20 @@ METHODS
         my $z = Data::SortedSet::Shared->new(undef, $max);        # anonymous
         my $z = Data::SortedSet::Shared->new_memfd($name, $max);
         my $z = Data::SortedSet::Shared->new_from_fd($fd);
+        my $z = Data::SortedSet::Shared->new_readonly($path);     # frozen file, lock-free
 
-    $path is the backing file ("undef" for an anonymous mapping); $max is
-    the maximum number of members. When reopening an existing file or memfd,
-    the stored header wins and the caller's $max is ignored. Backing files
-    are created with mode 0600 by default; pass an octal $mode (e.g. 0660)
-    to opt into cross-user sharing. The mode applies only when the file is
-    created (it is ignored when attaching an existing file); the exact mode
-    is applied via "fchmod", so umask does not narrow it. "new_memfd"
+    $path is the backing file ("undef" for an anonymous mapping); $max is the
+    maximum number of members. "new_readonly" attaches a frozen file read-only
+    and lock-free (see "FROZEN (READ-ONLY) MODE"). When reopening an existing
+    file or memfd, the stored header wins and the caller's $max is ignored.
+    Backing files are created with mode 0600 by default; pass an octal $mode
+    (e.g. 0660) to opt into cross-user sharing. The mode applies only when the
+    file is created (it is ignored when attaching an existing file); the exact
+    mode is applied via "fchmod", so umask does not narrow it. "new_memfd"
     creates a Linux memfd (transferable via its "memfd" descriptor);
-    "new_from_fd" reopens one in another process.
+    "new_from_fd" reopens one in another process. The descriptor you pass is
+    duplicated ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it
+    does not disturb the handle.
 
   String-keyed sets
         my $z = Data::SortedSet::Shared->new_strings(max => 1_000_000);
@@ -63,13 +67,13 @@ METHODS
         my @top = $z->rev_range_by_rank(0, 9);    # ("alice", ...)
 
     "new_strings" returns a Data::SortedSet::Shared::Strings -- the same API
-    as this class but with string members. Keys are interned to dense ids
-    via Data::Intern::Shared (a prerequisite of this distribution), so the
-    set is still shared across processes by id. Ties among equal scores
-    break by interning id, not lexicographically. See
-    Data::SortedSet::Shared::Strings for the full options ("set"/"keys"
-    backing paths, "max_keys", "arena", "mode"), and the separate "wrap"
-    constructor that adopts two existing objects.
+    as this class but with string members. Keys are interned to dense ids via
+    Data::Intern::Shared (a prerequisite of this distribution), so the set is
+    still shared across processes by id. Ties among equal scores break by
+    interning id, not lexicographically. See Data::SortedSet::Shared::Strings
+    for the full options ("set"/"keys" backing paths, "max_keys", "arena",
+    "mode"), and the separate "wrap" constructor that adopts two existing
+    objects.
 
   Mutators
         $z->add($member, $score);     # 1 new, 0 existing (score updated), undef if full
@@ -86,10 +90,9 @@ METHODS
     member is new.
 
     "add_many" applies a whole batch under a single lock; each row is an
-    "[member, score]" arrayref, malformed or NaN-scored rows are skipped,
-    and it stops at $max. It returns the number of members newly inserted,
-    which can be fewer than the number of new rows if the pool fills
-    mid-batch.
+    "[member, score]" arrayref, malformed or NaN-scored rows are skipped, and
+    it stops at $max. It returns the number of members newly inserted, which
+    can be fewer than the number of new rows if the pool fills mid-batch.
 
   Lookup and count
         $z->score($member);           # the score, or undef if absent
@@ -106,11 +109,11 @@ METHODS
         my @m = $z->range_by_score($min, $max, %opts);  # members scored in [min, max], ascending
         my @m = $z->rev_range_by_score($max, $min, %opts);
 
-    Rank indices are 0-based and may be negative (counting from the end,
-    like Perl slices); "range_by_*" bounds are inclusive. "range_by_score" /
+    Rank indices are 0-based and may be negative (counting from the end, like
+    Perl slices); "range_by_*" bounds are inclusive. "range_by_score" /
     "rev_range_by_score" accept "limit => $n" and "offset => $k" (a negative
-    "offset" is treated as 0). All range and rank methods return members;
-    pass "withscores => 1" for a flat "(member, score, ...)" list instead.
+    "offset" is treated as 0). All range and rank methods return members; pass
+    "withscores => 1" for a flat "(member, score, ...)" list instead.
 
   Pop and peek
         my ($member, $score) = $z->pop_min;    # remove + return the lowest, or () if empty
@@ -122,33 +125,81 @@ METHODS
         $z->each(sub { my ($member, $score) = @_; ... });
 
     "each" snapshots all members under the read lock, then invokes the
-    callback once per member in score order after the lock is released, so
-    the callback may safely call back into the set.
+    callback once per member in score order after the lock is released, so the
+    callback may safely call back into the set.
 
   Introspection and lifecycle
         $z->count; $z->max_entries; $z->stats;     # see STATS
         $z->path; $z->memfd; $z->sync; $z->unlink;     # or Class->unlink($path)
         $z->eventfd; $z->fileno; $z->notify; $z->eventfd_consume;
+        $z->freeze; $z->frozen; $z->readonly;      # see FROZEN (READ-ONLY) MODE
 
     "sync" flushes the mapping to its backing store and "unlink" removes the
-    backing file (also callable as "Class->unlink($path)"). "path" returns
-    the backing file path ("undef" for an anonymous or memfd-backed set) and
+    backing file (also callable as "Class->unlink($path)"). "path" returns the
+    backing file path ("undef" for an anonymous or memfd-backed set) and
     "memfd" returns the descriptor of a "new_memfd" set (-1 otherwise). The
     eventfd methods let another process wait for updates: "eventfd" lazily
-    creates an eventfd and returns its descriptor (croaks on failure;
-    calling it again returns the same fd), "fileno" returns the current
-    eventfd descriptor or -1, "notify" writes a wakeup (returning false if
-    no eventfd is attached), and "eventfd_consume" reads and resets the
-    counter, returning it as an integer or "undef" when nothing is pending.
+    creates an eventfd and returns its descriptor (croaks on failure; calling
+    it again returns the same fd), "fileno" returns the current eventfd
+    descriptor or -1, "notify" writes a wakeup (returning false if no eventfd
+    is attached), and "eventfd_consume" reads and resets the counter,
+    returning it as an integer or "undef" when nothing is pending.
+
+FROZEN (READ-ONLY) MODE
+    A file-backed sorted set can be frozen and then shipped to other machines,
+    where consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $z = Data::SortedSet::Shared->new("/tmp/leaderboard.sset", 1_000_000);
+        $z->add_many(\@rows);
+        $z->freeze;                  # seal: now immutable, and $z itself is read-only
+        # ... copy /tmp/leaderboard.sset to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro  = Data::SortedSet::Shared->new_readonly("/tmp/leaderboard.sset");
+        my @top = $ro->rev_range_by_rank(0, 9);
+        my $r   = $ro->rank($member);
+
+    "freeze" takes the write lock, marks the set permanently immutable (there
+    is no unfreeze -- rebuild the file to change it), and flushes the seal to
+    disk. A frozen set rejects every mutator ("add", "incr", "remove",
+    "add_many", "pop_min", "pop_max", "clear") with a croak, and a read-write
+    reopen ("new($path, ...)" or new_from_fd($fd)) of a sealed file is refused
+    -- so a shipped artifact can never be silently mutated out from under its
+    readers. The order-statistics B+tree (subtree counts, leaf links, and
+    separators) is maintained on every write, so nothing has to be built or
+    completed at freeze time.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed set's tree, leaf links, subtree counts and member index are all
+    immutable, every read -- "score", "exists", "rank", "rev_rank", "at_rank",
+    "count", "count_in_score", "range_by_rank", "range_by_score", "peek_*",
+    "each", "stats" -- reads them directly, taking no reader lock. The mapping
+    is never written (a range or iteration walks with a process-local cursor
+    and returns its results in a private buffer), so a read-only view works
+    from a read-only file descriptor or a read-only filesystem, and any number
+    of processes can share one "PROT_READ" mapping. "frozen" reports whether
+    the file is sealed and "readonly" whether this handle is a read-only view;
+    "stats" gains matching "frozen" and "readonly" flags. "sync" is a no-op on
+    a read-only view.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract that makes the lock-free reads safe assumes
+    a static copy. Linux-only; 64-bit Perl.
 
 SHARING ACROSS PROCESSES
     The set lives in a shared mapping, so several processes operate on the
-    same data with no serialization layer in between. There are three ways
-    to share it:
+    same data with no serialization layer in between. There are three ways to
+    share it:
 
     *   A backing file -- every process calls "new($path, $max)" on the same
-        path. The first to arrive creates and sizes the file (serialized by
-        an exclusive lock); the rest map it.
+        path. The first to arrive creates and sizes the file (serialized by an
+        exclusive lock); the rest map it.
 
     *   An anonymous mapping inherited across "fork" -- create with
         "new(undef, $max)" before forking; the parent and its children then
@@ -170,11 +221,10 @@ SHARING ACROSS PROCESSES
         1 while wait != -1;                                  # reap children
         print $z->count, "\n";                               # 4000
 
-    Every operation is serialized by the rwlock, so concurrent writers do
-    not corrupt the tree. A writer can wake readers blocked in other
-    processes through the eventfd interface: it calls "notify" after a
-    batch, and a reader selects on "fileno" then drains the count with
-    "eventfd_consume".
+    Every operation is serialized by the rwlock, so concurrent writers do not
+    corrupt the tree. A writer can wake readers blocked in other processes
+    through the eventfd interface: it calls "notify" after a batch, and a
+    reader selects on "fileno" then drains the count with "eventfd_consume".
 
 COMPLEXITY
     "score"/"exists"/"peek_*" are O(1); "add"/"remove"/"incr"/"rank"/
@@ -185,47 +235,62 @@ COMPLEXITY
 STATS
     stats() returns a hashref with keys: "count", "max_entries", "height"
     (B+tree height), "node_capacity", "nodes_used", "index_slots",
-    "index_load" (occupied fraction of the member index), "ops" (running
-    count of write-path calls, whether or not they changed the set), and
-    "mmap_size" (bytes).
+    "index_load" (occupied fraction of the member index), "ops" (running count
+    of write-path calls, whether or not they changed the set), "mmap_size"
+    (bytes), "frozen" (1 if the set has been sealed by "freeze"), and
+    "readonly" (1 if this handle is a read-only view -- see "FROZEN
+    (READ-ONLY) MODE").
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     The write lock is a futex-based rwlock with PID-encoded ownership; if a
     writer dies while holding it, the next writer detects the dead owner and
-    recovers. Reader slots are reclaimed similarly. Recovery restores
-    locking only, never tree consistency: a writer killed mid-mutation (a
-    node split, underflow, or insert) can leave the B+tree structurally
-    corrupt. Limitation: PID reuse is not detected, which is very unlikely
-    in practice but cannot be ruled out.
+    recovers. Reader slots are reclaimed similarly. Recovery restores locking
+    only, never tree consistency: a writer killed mid-mutation (a node split,
+    underflow, or insert) can leave the B+tree structurally corrupt.
+    Limitation: PID reuse is not detected, which is very unlikely in practice
+    but cannot be ruled out.
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete sorted-set file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
-    Data::SortedSet::Shared::Strings (string-keyed variant, bundled with
-    this distribution), Data::Intern::Shared, Data::SpatialHash::Shared,
+    Data::SortedSet::Shared::Strings (string-keyed variant, bundled with this
+    distribution), Data::Intern::Shared, Data::SpatialHash::Shared,
     Data::HashMap::Shared, Data::Heap::Shared, Data::Graph::Shared, and the
     rest of the "Data::*::Shared" family.
 
@@ -233,6 +298,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

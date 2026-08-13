@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::CapacityRequestPolicy;
 # ABSTRACT: CapacityRequestPolicy defines how requests consume device capacity. Must not set more than one ValidRequestValues.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s default => Quantity;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::CapacityRequestPolicy - CapacityRequestPolicy define
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 default
 
@@ -47,10 +47,6 @@ ValidValues defines a set of acceptable quantity values in consuming requests. M
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -61,7 +57,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -421,7 +421,6 @@ static inline void stk_init_header(void *base, uint64_t total,
                                     uint64_t capacity) {
     StkHeader *hdr = (StkHeader *)base;
     memset(base, 0, (size_t)total);  /* zeroes ctl array -> all slots EMPTY, gen=0 */
-    hdr->magic      = STK_MAGIC;
     hdr->version    = STK_VERSION;
     hdr->elem_size  = elem_size;
     hdr->variant_id = variant_id;
@@ -430,6 +429,12 @@ static inline void stk_init_header(void *base, uint64_t total,
     hdr->data_off   = sizeof(StkHeader);
     hdr->ctl_off    = stk_ctl_offset(elem_size, capacity);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, STK_MAGIC, __ATOMIC_RELEASE);
+
 }
 
 /* Layout fields are passed in by the caller -- either from a validated
@@ -492,6 +497,16 @@ static int stk_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int stk_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static StkHandle *stk_create(const char *path, uint64_t capacity,
                               uint32_t elem_size, uint32_t variant_id,
                               mode_t mode, char *errbuf) {
@@ -547,7 +562,29 @@ static StkHandle *stk_create(const char *path, uint64_t capacity,
             StkHeader snap;  /* single fetch: validate + setup use one copy */
             memcpy(&snap, base, sizeof snap);
             if (!stk_validate_header(&snap, (uint64_t)st.st_size, variant_id)) {
-                STK_ERR("invalid or incompatible stack file");
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (snap.magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && stk_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        STK_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    stk_init_header(base, total, elem_size, variant_id, capacity);
+                    flock(fd, LOCK_UN); close(fd);
+                    return stk_setup(base, map_size, path, -1,
+                                     sizeof(StkHeader), stk_ctl_offset(elem_size, capacity),
+                                     elem_size, capacity);
+                }
+                if (snap.magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid())
+                    STK_ERR("incomplete stack file left by an interrupted create; remove it and retry");
+                else
+                    STK_ERR("invalid or incompatible stack file");
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);

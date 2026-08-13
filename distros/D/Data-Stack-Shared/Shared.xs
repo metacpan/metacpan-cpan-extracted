@@ -10,6 +10,7 @@
         croak("Expected a Data::Stack::Shared object"); \
     StkHandle *h = INT2PTR(StkHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::Stack::Shared object"); \
+    StkHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -19,8 +20,10 @@
  * `h` would dangle.  Used only where magic can actually intervene between
  * EXTRACT_STK and the first use of h. */
 #define REEXTRACT_STK(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::Stack::Shared object was replaced during the call"); \
     h = INT2PTR(StkHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::Stack::Shared object destroyed during the call")
+    if (h != h0) croak("Data::Stack::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -38,7 +41,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Stack::Shared")) return;
     StkHandle *h = INT2PTR(StkHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -196,7 +199,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
+    if (unlink(p) != 0 && errno != ENOENT) croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
 stats(self)
@@ -234,7 +237,7 @@ new(class, path, capacity, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     StkHandle *h = stk_create(p, capacity, sizeof(int64_t), STK_VAR_INT, mode, errbuf);
-    if (!h) croak("Data::Stack::Shared::Int->new: %s", errbuf);
+    if (!h) croak("Data::Stack::Shared::Int->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -248,7 +251,7 @@ new_memfd(class, name, capacity)
     char errbuf[STK_ERR_BUFLEN];
   CODE:
     StkHandle *h = stk_create_memfd(name, capacity, sizeof(int64_t), STK_VAR_INT, errbuf);
-    if (!h) croak("Data::Stack::Shared::Int->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Stack::Shared::Int->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -261,7 +264,7 @@ new_from_fd(class, fd)
     char errbuf[STK_ERR_BUFLEN];
   CODE:
     StkHandle *h = stk_open_fd(fd, STK_VAR_INT, errbuf);
-    if (!h) croak("Data::Stack::Shared::Int->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Stack::Shared::Int->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -351,7 +354,7 @@ new(class, path, capacity, max_len, ...)
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     StkHandle *h = stk_create(p, capacity, elem_size, STK_VAR_STR, mode, errbuf);
-    if (!h) croak("Data::Stack::Shared::Str->new: %s", errbuf);
+    if (!h) croak("Data::Stack::Shared::Str->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -370,7 +373,7 @@ new_memfd(class, name, capacity, max_len)
         croak("max_len too large");
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
     StkHandle *h = stk_create_memfd(name, capacity, elem_size, STK_VAR_STR, errbuf);
-    if (!h) croak("Data::Stack::Shared::Str->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Stack::Shared::Str->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -383,7 +386,7 @@ new_from_fd(class, fd)
     char errbuf[STK_ERR_BUFLEN];
   CODE:
     StkHandle *h = stk_open_fd(fd, STK_VAR_STR, errbuf);
-    if (!h) croak("Data::Stack::Shared::Str->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Stack::Shared::Str->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL

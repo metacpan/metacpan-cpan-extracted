@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::SuccessPolicyRule;
 # ABSTRACT: SuccessPolicyRule describes rule for declaring a Job as succeeded. Each rule must have at least one of the "succeededIndexes" or "succeededCount" specified.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s succeededCount => Int;
@@ -23,7 +23,7 @@ IO::K8s::Api::Batch::V1::SuccessPolicyRule - SuccessPolicyRule describes rule fo
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 succeededCount
 
@@ -40,10 +40,6 @@ succeededIndexes specifies the set of indexes which need to be contained in the 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -54,7 +50,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

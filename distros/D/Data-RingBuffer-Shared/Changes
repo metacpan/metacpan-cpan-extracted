@@ -1,5 +1,14 @@
 Revision history for Data::RingBuffer::Shared
 
+0.06      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.05      2026-07-21
           - A displaced writer no longer overwrites a recovered slot.
           - Resolve argument magic before capturing the path string.

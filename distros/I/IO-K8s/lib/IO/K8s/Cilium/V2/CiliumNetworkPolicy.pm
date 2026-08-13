@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumNetworkPolicy;
 # ABSTRACT: Cilium network policy for namespace-scoped network security
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumnetworkpolicies';
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::CiliumNetworkPolicy - Cilium network policy for namespace-s
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -49,10 +49,6 @@ This resource represents a namespace-scoped network policy enforced by Cilium's 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -63,7 +59,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

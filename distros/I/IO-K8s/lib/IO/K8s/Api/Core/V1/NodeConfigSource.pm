@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeConfigSource;
 # ABSTRACT: NodeConfigSource specifies a source of node configuration. Exactly one subfield (excluding metadata) must be non-nil. This API is deprecated since 1.22
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s configMap => 'Core::V1::ConfigMapNodeConfigSource';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::NodeConfigSource - NodeConfigSource specifies a source o
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 configMap
 
@@ -33,10 +33,6 @@ ConfigMap is a reference to a Node's ConfigMap
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -47,7 +43,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

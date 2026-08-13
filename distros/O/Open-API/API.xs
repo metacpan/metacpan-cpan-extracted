@@ -22,6 +22,7 @@ static int OA_FRJ_TRIED = 0;
 static const frj_abi *oa_frj(pTHX);   /* defined below; used by the headers */
 
 #include "oa_compile.h"   /* needs the JSF table above */
+#include "oa_normalize.h" /* 3.0 -> 3.1 + discriminator (needs oa_get/oa_methods) */
 #include "oa_route.h"
 #include "oa_validate.h"
 #include "oa_plack.h"
@@ -237,8 +238,12 @@ static SV *oa_load_spec(pTHX_ SV *spec) {
     return doc;
 }
 
-/* Enforce OpenAPI 3.1: doc must be a hashref whose `openapi` is 3.1[.x]. */
-static void oa_check_version(pTHX_ SV *doc) {
+/* Classify the document's OpenAPI version: doc must be a hashref whose
+ * `openapi` is 3.0[.x] or 3.1[.x]. Croaks on anything else. */
+#define OA_V30 30
+#define OA_V31 31
+
+static int oa_check_version(pTHX_ SV *doc) {
     HV *h; SV **v;
     STRLEN l; const char *p;
     if (!doc || !SvROK(doc) || SvTYPE(SvRV(doc)) != SVt_PVHV)
@@ -248,16 +253,27 @@ static void oa_check_version(pTHX_ SV *doc) {
     if (!v || !*v || !SvOK(*v))
         croak("Open::API: spec has no 'openapi' version field");
     p = SvPV_const(*v, l);
-    if (!(l >= 3 && memEQ(p, "3.1", 3) && (l == 3 || p[3] == '.')))
-        croak("Open::API supports OpenAPI 3.1 only (got %.*s)", (int)l, p);
+    if (l >= 3 && memEQ(p, "3.", 2) && (l == 3 || p[3] == '.')) {
+        if (p[2] == '1') return OA_V31;
+        if (p[2] == '0') return OA_V30;
+    }
+    croak("Open::API supports OpenAPI 3.0 and 3.1 (got %.*s)", (int)l, p);
+    return OA_V31;   /* not reached */
 }
 
 /* Construct a compiled Open::API from a spec argument (shared by
- * Open::API->new and Open::API::Client->new(spec => ...)). */
+ * Open::API->new and Open::API::Client->new(spec => ...)).
+ *
+ * The document is normalised here, before anything else sees it, so `a->spec` -
+ * and therefore the validator, the mock generator and the docs UI - only ever
+ * deals in one schema dialect: a 3.0 document is up-converted to 3.1 shape, and
+ * in either version a `discriminator` is expanded into the 2020-12 constructs
+ * that express it. See oa_normalize.h. */
 static SV *oa_new_from_spec(pTHX_ const char *cls, SV *spec) {
     SV *doc = oa_load_spec(aTHX_ spec);
     oa_api *a;
-    oa_check_version(aTHX_ doc);
+    doc = sv_2mortal(oa_normalize(aTHX_ doc,
+                                  oa_check_version(aTHX_ doc) == OA_V30));
     a = oa_api_new(aTHX);
     if (!a) croak("Open::API: out of memory");
     a->spec = newSVsv(doc);
@@ -475,6 +491,22 @@ spec(self)
     {
         oa_api *a = oa_api_of(aTHX_ self);
         RETVAL = a->spec ? newSVsv(a->spec) : &PL_sv_undef;
+    }
+    OUTPUT:
+        RETVAL
+
+# The document's declared `openapi` version. A 3.0 document keeps its own
+# version string after up-conversion, so this tells a caller which dialect the
+# spec was written in even though ->spec is 3.1-shaped throughout.
+SV *
+openapi_version(self)
+        SV *self
+    CODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        HV *h = a->spec ? oa_hv_of(a->spec) : NULL;
+        SV *v = h ? oa_get(aTHX_ h, "openapi") : NULL;
+        RETVAL = v ? newSVsv(v) : &PL_sv_undef;
     }
     OUTPUT:
         RETVAL

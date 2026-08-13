@@ -56,4 +56,25 @@ for my $c (@cases) {
     ok !($st & 127), "no crash: $name" or diag "died from signal " . ($st & 127);
     is $st >> 8, 0, "clean croak with the expected message: $name";
 }
+
+# A FOREIGN object is the case the type_tag dispatch cannot handle at all: the
+# IV behind the ref belongs to somebody else, so INT2PTR yields a wild pointer
+# and reading type_tag off it segfaults before any dispatch happens. Both
+# DESTROYs must reject anything that is not one of our two classes. Unlike the
+# cases above this is a silent return, not a croak -- a destructor must not
+# throw -- so the child only has to survive.
+for my $victim (qw(Data::PerfectHash::Shared Data::PerfectHash::Shared::Builder)) {
+    my $pid = fork;
+    unless (defined $pid) { plan skip_all => "fork: $!" }
+    unless ($pid) {
+        my $foreign = bless \( my $x = 0x5 ), 'Some::Foreign::Class';
+        eval { no strict 'refs'; &{"${victim}::DESTROY"}($foreign) };
+        POSIX::_exit(0);
+    }
+    waitpid $pid, 0;
+    my $st = $?;
+    ok !( $st & 127 ), "no crash: foreign blessed ref into ${victim}::DESTROY"
+        or diag "died from signal " . ( $st & 127 );
+    is $st >> 8, 0, "... and the child exits cleanly";
+}
 done_testing;

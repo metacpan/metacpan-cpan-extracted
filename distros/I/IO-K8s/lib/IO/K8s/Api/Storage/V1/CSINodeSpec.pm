@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::CSINodeSpec;
 # ABSTRACT: CSINodeSpec holds information about the specification of all CSI drivers installed on a node
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s drivers => ['Storage::V1::CSINodeDriver'], 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Storage::V1::CSINodeSpec - CSINodeSpec holds information about the
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 drivers
 
@@ -33,10 +33,6 @@ drivers is a list of information of all CSI Drivers existing on a node. If all d
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -47,7 +43,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

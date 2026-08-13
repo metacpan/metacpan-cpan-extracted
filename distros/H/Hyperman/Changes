@@ -1,5 +1,46 @@
 Revision history for Hyperman
 
+0.18    2026-08-13
+        - Abuse controls on a fork-shared arena: an IP denylist enforced
+          at accept and fixed-window rate counters, both in one anonymous
+          shared-memory region mapped before the workers fork, so a limit
+          is exact across the pool rather than per worker. Everything
+          fails open.
+        - run() gains deny => [ips], deny_capacity and rate_capacity. A
+          denylisted peer is dropped at accept, before a connection object
+          is built or a byte is read; a new `denied` worker stat counts it.
+        - hm_abi.h grows to ABI version 3 (append-only): deny_check,
+          deny_add, deny_remove and ratelimit_hit, for consumers such as
+          Punk's rate_limit. Older consumers are unaffected.
+        - Rate-counter slots are reclaimed on demand: a slot whose window
+          has rolled is reused by a new key before a live counter would be
+          evicted, so the table drains when the keys that filled it go
+          quiet rather than thrashing at capacity.
+
+0.17    2026-08-12
+        - TLS session resumption now survives tls_reload. 
+        - HTTPS connections no longer pay a wasted SSL_read on every
+          writable event. 
+        - A TLS connection whose SSL_read blocked wanting a writable
+          socket no longer risks spinning the worker at 100% CPU.
+        - SSL_MODE_RELEASE_BUFFERS, so OpenSSL's record buffers are handed
+          back when they drain instead of being pinned for a connection's
+          whole life - a keep-alive server is mostly idle connections.
+        - A session id context is now set, without which OpenSSL declines
+          to resume any session on a context that verifies peers: every
+          mTLS connection paid a full handshake and a full chain
+          verification.
+        - SNI hostname lookup is a binary search over a sorted, lowercased
+          table rather than a strcasecmp walk of every entry, which is a
+          per-handshake cost that grew with the number of certificates
+          served.
+        - close_notify is no longer written for a connection dropped
+          mid-handshake, where there is no session to shut down.
+        - Tests no longer derive their listening port from $$.
+        - A failed fork during a SIGHUP recycle no longer stores -1 in the
+          child table, where the shutdown sweep would have turned it into
+          kill(-1, SIGTERM) and signalled every process owned by the uid.
+
 0.16    2026-08-12
         - t/18-tls-advanced.t skips, rather than dies, when the host
           cannot mint a certificate. 

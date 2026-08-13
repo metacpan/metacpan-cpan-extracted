@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::DB;
-$Context::Singleton::Frame::DB::VERSION = '1.0.7';
+$Context::Singleton::Frame::DB::VERSION = '1.0.8';
 use Moo;
 
 use Class::Load;

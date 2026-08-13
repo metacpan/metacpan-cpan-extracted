@@ -10,6 +10,7 @@
         croak("Expected a Data::Log::Shared object"); \
     LogHandle *h = INT2PTR(LogHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::Log::Shared object"); \
+    LogHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -19,8 +20,10 @@
  * explicit DESTROY, so the local `h` would dangle.  Used only where magic
  * can actually intervene between EXTRACT_LOG and the first use of h. */
 #define REEXTRACT_LOG(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::Log::Shared object was replaced during the call"); \
     h = INT2PTR(LogHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::Log::Shared object destroyed during the call")
+    if (h != h0) croak("Data::Log::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -48,7 +51,7 @@ new(class, path, data_size, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     LogHandle *h = log_create(p, data_size, mode, errbuf);
-    if (!h) croak("Data::Log::Shared->new: %s", errbuf);
+    if (!h) croak("Data::Log::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -66,7 +69,7 @@ new_memfd(class, name, data_size)
      * or free name's PV if it were captured by the typemap first. */
     const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
     LogHandle *h = log_create_memfd(nm, data_size, errbuf);
-    if (!h) croak("Data::Log::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Log::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -79,7 +82,7 @@ new_from_fd(class, fd)
     char errbuf[LOG_ERR_BUFLEN];
   CODE:
     LogHandle *h = log_open_fd(fd, errbuf);
-    if (!h) croak("Data::Log::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Log::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -88,7 +91,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Log::Shared")) return;
     LogHandle *h = INT2PTR(LogHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -319,7 +322,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
+    if (unlink(p) != 0 && errno != ENOENT) croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
 stats(self)

@@ -1,5 +1,11 @@
 Revision history for Google-Auth
 
+0.12    Wed Aug 12 2026
+    - Expanded Workload Identity Federation (WIF) support with AWS ECS Container Task Roles and EC2 IMDSv2.
+    - Security hardening for AWS Container Credentials Full URI (Protocol Scheme enforcement).
+    - Fixed IPv6 loopback validation bug in AWS credentials.
+    - Improved stability with case-insensitivity and strict boolean evaluation in token retrieval.
+
 0.11    Thu Aug 6 2026
     - Implemented UserAuthorizer, WebUserAuthorizer, and FileTokenStore for full parity with standard OAuth2 flows.
     - Added the `gcloud-auth` CLI dispatcher (mirroring standard `gcloud auth` hierarchy).

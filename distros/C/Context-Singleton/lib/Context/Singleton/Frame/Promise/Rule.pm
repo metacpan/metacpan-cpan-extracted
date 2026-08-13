@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::Promise::Rule;
-$Context::Singleton::Frame::Promise::Rule::VERSION = '1.0.7';
+$Context::Singleton::Frame::Promise::Rule::VERSION = '1.0.8';
 use Moo;
 
 use namespace::clean;

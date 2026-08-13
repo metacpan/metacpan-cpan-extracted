@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2025-07-24 00:00:00 +0000 to present.
+Changes from 2025-08-13 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.08 at 2026-07-24 07:32:36 +0000
+version 0.09 at 2026-08-13 08:07:35 +0000
 -----------------------------------------
+
+  Change: eae882169c69b5172b8afc95bbfbe917b68ea6ef
+  Author: Lee J <lee@payprop.com>
+  Date : 2026-08-13 10:06:54 +0000
+
+    Merge pull request #5 from payprop/lee/more_floating_point_fixes
+
+    use integers in call to TrailerRecord->new 
+
+  Change: 80f2247e5ced645a243cef200c8f3518d0a621e6
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-08-13 09:32:53 +0000
+
+    use integers in call to TrailerRecord->new
+
+    w/r/t 0b287b4638877c588aa66825689d5c6bf308710a - we've already
+    established that the total_value_of_payments might have floating
+    point issues, so we need to truncate it when we pass to the
+    TrailerRecord->new constructor to avoid these
+
+    exercise in testing by doing some floating point arithmetic that
+    shows the issue prior to the fix
+
+    bump VERSION and Changes for CPAN release 
 
   Change: 7cba50fc080918e98068676e8277b921e1b61c9e
   Author: Lee Johnson <lee@payprop.com>

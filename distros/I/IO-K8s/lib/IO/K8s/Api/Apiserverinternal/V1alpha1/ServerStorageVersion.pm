@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apiserverinternal::V1alpha1::ServerStorageVersion;
 # ABSTRACT: An API server instance reports the version it can decode and the version it encodes objects to when persisting objects in the backend.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s apiServerID => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Apiserverinternal::V1alpha1::ServerStorageVersion - An API server 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 apiServerID
 
@@ -54,10 +54,6 @@ The API server can serve these versions. DecodableVersions must include all Serv
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -68,7 +64,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -54,7 +54,9 @@ The worker's room of that name, created on first use.
 
 =head2 clients
 
-The live members.
+The live members, as a list. List context only: like any
+list-returning XS call, C<scalar $room-E<gt>clients> yields the last
+member, not a count - that is what C<count> is for.
 
 =head2 count
 

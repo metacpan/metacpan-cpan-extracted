@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::StatefulSet;
 # ABSTRACT: StatefulSet represents a set of pods with consistent identities.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Apps::V1::StatefulSet - StatefulSet represents a set of pods with 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Status is the current status of Pods in this StatefulSet. This data may be out o
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#statefulset-v1-apps>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#statefulset-v1-apps>
 
 =head1 SUPPORT
 
@@ -51,10 +51,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#statefuls
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -66,7 +62,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -23,27 +23,27 @@ DESCRIPTION
     dimensions that answers nearest-neighbour, k-nearest, bounding-box, and
     radius queries far faster than scanning every point. It complements
     Data::SpatialHash::Shared (a uniform grid, ideal for fixed-radius
-    proximity): a k-d tree adapts to the point density and answers exact
-    k-NN and arbitrary-box queries.
+    proximity): a k-d tree adapts to the point density and answers exact k-NN
+    and arbitrary-box queries.
 
     Points are appended in O(1) and each carries a user-supplied 64-bit id
     (defaulting to its insertion index). To keep queries fast regardless of
     insertion order, the tree is bulk-built balanced (median split on a
     cycling axis) the first time it is queried after any insert, so query
-    recursion is O(log n) deep -- there is no risk of a degenerate, deep
-    tree from sorted inserts.
+    recursion is O(log n) deep -- there is no risk of a degenerate, deep tree
+    from sorted inserts.
 
     Because the points live in a shared mapping, several processes build and
     query one index: any process that opens the same backing file, inherits
     the anonymous mapping across "fork", or reopens a passed memfd sees the
     same points. A write-preferring futex rwlock with dead-process recovery
-    guards mutation; once the tree is built, queries take only the read
-    lock, so many run concurrently. Coordinates are "double"; a non-finite
+    guards mutation; once the tree is built, queries take only the read lock,
+    so many run concurrently. Coordinates are "double"; a non-finite
     coordinate croaks. Linux-only. Requires 64-bit Perl.
 
     The index has a fixed capacity; adding beyond it croaks. Memory is
-    "capacity * (dims * 8 + 16)" bytes for the points plus a build scratch
-    of "capacity * 4" bytes and a fixed header.
+    "capacity * (dims * 8 + 16)" bytes for the points plus a build scratch of
+    "capacity * 4" bytes and a fixed header.
 
 METHODS
   Constructors
@@ -51,13 +51,17 @@ METHODS
         my $kd = Data::KDTree::Shared->new(undef, $dims, $capacity);
         my $kd = Data::KDTree::Shared->new_memfd($name, $dims, $capacity);
         my $kd = Data::KDTree::Shared->new_from_fd($fd);
+        my $kd = Data::KDTree::Shared->new_readonly($path);   # frozen file, lock-free
 
-    $dims is the number of dimensions (1..16) and $capacity the maximum
-    number of points (1..2^24). "new" and "new_memfd" croak on an
-    out-of-range $dims or $capacity. When reopening an existing file or
-    memfd the stored geometry wins and the caller's arguments are ignored.
-    An optional file mode may be passed as the last argument to "new" (e.g.
-    0660) for cross-user sharing; it defaults to 0600 (owner-only).
+    $dims is the number of dimensions (1..16) and $capacity the maximum number
+    of points (1..2^24). "new" and "new_memfd" croak on an out-of-range $dims
+    or $capacity. When reopening an existing file or memfd the stored geometry
+    wins and the caller's arguments do not resize it -- but they are still
+    range-checked, so an out-of-range value croaks. An optional file mode may
+    be passed as the last argument to "new" (e.g. 0660) for cross-user
+    sharing; it defaults to 0600 (owner-only). A read-write reopen of a frozen
+    file is refused; use "new_readonly" instead (see "FROZEN (READ-ONLY)
+    MODE").
 
   Adding points
         my $i = $kd->add(\@coords);          # id defaults to the insertion index
@@ -65,11 +69,10 @@ METHODS
         $kd->build;                          # (optional) force a rebuild now
 
     "add" appends one point (an array reference of exactly $dims finite
-    coordinates) with an optional integer $id and returns its insertion
-    index; it croaks if the tree is full or a coordinate is missing or
-    non-finite. "build" forces the balanced tree to be (re)built
-    immediately; you rarely need it, since queries build automatically after
-    inserts.
+    coordinates) with an optional integer $id and returns its insertion index;
+    it croaks if the tree is full or a coordinate is missing or non-finite.
+    "build" forces the balanced tree to be (re)built immediately; you rarely
+    need it, since queries build automatically after inserts.
 
   Queries
         my $near  = $kd->nearest(\@point);       # { id, dist } or undef if empty
@@ -77,65 +80,124 @@ METHODS
         my @ids   = $kd->range(\@lo, \@hi);      # ids whose coords lie in [lo, hi] per axis
         my @ball  = $kd->radius(\@point, $r);    # { id, dist } within Euclidean distance $r
 
-    "nearest" returns the single closest point as "{ id => ..., dist => ...
-    }" (Euclidean distance), or "undef" if the index is empty. "knn" returns
-    up to $m such hash references sorted by increasing distance. "range"
-    returns a plain list of the ids of every point inside the axis-aligned
-    box with corners "\@lo" and "\@hi" (order unspecified). "radius" returns
-    "{ id, dist }" hash references for every point within Euclidean distance
-    $r, closest first. All query points and box corners are array references
-    of exactly $dims finite coordinates.
+    "nearest" returns the single closest point as "{ id => ..., dist => ... }"
+    (Euclidean distance), or "undef" if the index is empty. "knn" returns up
+    to $m such hash references sorted by increasing distance. "range" returns
+    a plain list of the ids of every point inside the axis-aligned box with
+    corners "\@lo" and "\@hi" (order unspecified). "radius" returns "{ id,
+    dist }" hash references for every point within Euclidean distance $r,
+    closest first. All query points and box corners are array references of
+    exactly $dims finite coordinates.
 
   Introspection and lifecycle
         $kd->count;         # number of points added
         $kd->capacity;      # maximum number of points
         $kd->dims;          # number of dimensions
         $kd->clear;         # remove all points
-        $kd->stats;         # { count, dims, capacity, dirty, ops, mmap_size }
+        $kd->stats;         # { count, dims, capacity, dirty, ops, mmap_size, frozen, readonly }
+        $kd->frozen;        # 1 if sealed by freeze, else 0
+        $kd->readonly;      # 1 if this handle is a read-only view, else 0
         $kd->path; $kd->memfd; $kd->sync; $kd->unlink;
 
-    "clear" empties the index. "sync" flushes the mapping to its backing
-    store (a no-op for anonymous and memfd trees); "unlink" removes the
-    backing file (also callable as "Class->unlink($path)"); "path" returns
-    the backing path ("undef" for anonymous, memfd, or fd-reopened trees)
-    and "memfd" the backing descriptor.
+    "clear" empties the index. "sync" flushes the mapping to its backing store
+    (a no-op for anonymous and memfd trees, and for any read-only view);
+    "unlink" removes the backing file (also callable as
+    "Class->unlink($path)"); "path" returns the backing path ("undef" for
+    anonymous, memfd, or fd-reopened trees) and "memfd" the backing
+    descriptor. "frozen" and "readonly" report whether the tree has been
+    sealed and whether this handle is a read-only view, respectively (see
+    "FROZEN (READ-ONLY) MODE").
+
+FROZEN (READ-ONLY) MODE
+    A file-backed tree can be frozen and then shipped to other machines, where
+    consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $kd = Data::KDTree::Shared->new("/tmp/points.kd", 2, 100_000);
+        $kd->add([$_->[0], $_->[1]], $_->[2]) for @known;
+        $kd->freeze;                 # seal: now immutable, and $kd itself is read-only
+        # ... copy /tmp/points.kd to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::KDTree::Shared->new_readonly("/tmp/points.kd");
+        my $n  = $ro->nearest([$x, $y]);   # or knn / range / radius
+
+    "freeze" takes the write lock, force-completes any balanced-tree build
+    still pending (so a frozen tree is never left "dirty"), marks the tree
+    permanently immutable (there is no unfreeze -- rebuild the file to change
+    it), and flushes the seal to disk. A frozen tree rejects every mutator
+    ("add", "build", "clear") with a croak, and a read-write reopen
+    ("new($path, ...)") of a sealed file is refused -- so a shipped artifact
+    can never be silently mutated out from under its readers.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because
+    "freeze" guarantees the balanced tree is already built, and a sealed
+    tree's points and links are immutable, "nearest", "knn", "range",
+    "radius", "count" and "stats" read them directly, taking no reader lock
+    and never rebuilding -- the mapping is never written, so a read-only view
+    works from a read-only file descriptor or a read-only filesystem, and any
+    number of processes can share one "PROT_READ" mapping. "frozen" and
+    "readonly" report the two states.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
 
 SHARING ACROSS PROCESSES
     The index lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file, an anonymous mapping inherited
-    across "fork", or a memfd passed to an unrelated process and reopened
-    with new_from_fd($fd). Any process can add points; the first query after
-    an add rebuilds the shared tree once (under the write lock), and
-    subsequent queries run concurrently under the read lock.
+    rest of the family: a backing file, an anonymous mapping inherited across
+    "fork", or a memfd passed to an unrelated process and reopened with
+    new_from_fd($fd). The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle. Any process can add points; the first query after an
+    add rebuilds the shared tree once (under the write lock), and subsequent
+    queries run concurrently under the read lock.
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default; pass
-    an explicit octal mode (e.g. 0660) as the last argument to "new" for
-    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
-    and the header is validated on attach. Any process granted write access
-    is trusted not to corrupt the mapping.
+    Backing files are created with mode 0600 (owner-only) by default; pass an
+    explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL", and
+    the header is validated on attach. Any process granted write access is
+    trusted not to corrupt the mapping.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership and dead-owner recovery. Adds are short bounded
-    appends and the bulk build runs entirely under the write lock, so a
-    crash leaves the index consistent up to the last completed operation (a
-    crash mid-build simply leaves it marked for rebuild). Limitation: PID
-    reuse is not detected (very unlikely in practice).
+    appends and the bulk build runs entirely under the write lock, so a crash
+    leaves the index consistent up to the last completed operation (a crash
+    mid-build simply leaves it marked for rebuild). Limitation: PID reuse is
+    not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete k-d tree file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
     Data::SpatialHash::Shared (uniform-grid proximity), and the rest of the
@@ -145,6 +207,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

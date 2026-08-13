@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.642';
+our $VERSION = '0.644';
 
 use 5.020;
 use Moo;
@@ -108,11 +108,11 @@ sub _eval_keyword_unevaluatedProperties ($class, $data, $schema, $state) {
   die '"unevaluatedProperties" keyword present, but annotation collection is disabled'
     if not $state->{collect_annotations};
 
-  my @evaluated_properties = map {
+  my @evaluated_properties = map do {
     my $keyword = $_->{keyword};
     (grep $keyword eq $_, qw(properties additionalProperties patternProperties unevaluatedProperties))
       ? $_->{annotation}->@* : ();
-  } local_annotations($state);
+  }, local_annotations($state);
 
   my $valid = 1;
   my @properties;
@@ -157,7 +157,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.642
+version 0.644
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

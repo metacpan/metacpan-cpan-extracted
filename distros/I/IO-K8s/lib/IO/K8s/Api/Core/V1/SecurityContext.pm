@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::SecurityContext;
 # ABSTRACT: SecurityContext holds security configuration that will be applied to a container. Some fields are present in both SecurityContext and PodSecurityContext.  When both are set, the values in SecurityContext take precedence.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s allowPrivilegeEscalation => Bool;
@@ -53,7 +53,7 @@ IO::K8s::Api::Core::V1::SecurityContext - SecurityContext holds security configu
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 allowPrivilegeEscalation
 
@@ -110,10 +110,6 @@ The Windows specific settings applied to all containers. If unspecified, the opt
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -124,7 +120,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -2,6 +2,14 @@
 #include "perl.h"
 #include "XSUB.h"
 
+/* mPUSHs landed after 5.10.0 (the mortal-push macros arrived piecemeal),
+ * so on 5.10.0 the .so fails to load with "undefined symbol: mPUSHs" - the
+ * compiler took the undefined macro for an implicit external call. Every use
+ * here is already guarded by an EXTEND, so this literal expansion is exact. */
+#ifndef mPUSHs
+#  define mPUSHs(s) PUSHs(sv_2mortal(s))
+#endif
+
 /* ------------------------------------------------------------------ */
 /* Unity build: the parser sources live in src/ and are pulled in below
  * so the per-xs Makefile doesn't need extra OBJECT entries. Order
@@ -474,10 +482,15 @@ OUTPUT:
 # module (Punk's markdown mount) fetches this once at boot, INT2PTRs it to a
 # `const mds_abi *`, and checks ->abi_version before using it. Not part of the
 # public Perl API.
-IV
+# An address is unsigned: PTR2IV would hand back a NEGATIVE integer wherever
+# the shared object maps with the top bit set (Solaris/illumos amd64 loads
+# libraries high, a 32-bit address in the upper half does the same), and the
+# `> 0` sanity check downstream would fail on a pointer that is otherwise
+# perfectly usable. PTR2UV keeps it a large positive integer everywhere.
+UV
 _abi_ptr()
     CODE:
-        RETVAL = PTR2IV(&MDS_ABI);
+        RETVAL = PTR2UV(&MDS_ABI);
     OUTPUT:
         RETVAL
 
@@ -506,7 +519,7 @@ _abi_selftest(self, input, opts = &PL_sv_undef)
         const char* in;
         {
             dSP;
-            IV  ptr = 0;
+            UV  ptr = 0;
             int count;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
@@ -514,11 +527,11 @@ _abi_selftest(self, input, opts = &PL_sv_undef)
             count = call_pv("Markdown::Simple::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;
             if (count > 0) {
-                /* Pop into a local first: before 5.30 SvIV was a macro that
-                 * evaluated its argument twice, so SvIV(POPs) popped twice
-                 * and read the IV off whatever sat one slot lower. */
+                /* Pop into a local first: before 5.30 SvUV was a macro that
+                 * evaluated its argument twice, so SvUV(POPs) popped twice
+                 * and read the UV off whatever sat one slot lower. */
                 SV* rv = POPs;
-                if (!SvTRUE(ERRSV)) ptr = SvIV(rv);
+                if (!SvTRUE(ERRSV)) ptr = SvUV(rv);
             }
             PUTBACK; FREETMPS; LEAVE;
             if (ptr) abi = INT2PTR(const mds_abi*, ptr);
@@ -581,7 +594,7 @@ _abi_selftest_render(input, opts = &PL_sv_undef)
         const char* in;
         {
             dSP;
-            IV  ptr = 0;
+            UV  ptr = 0;
             int count;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
@@ -590,7 +603,7 @@ _abi_selftest_render(input, opts = &PL_sv_undef)
             SPAGAIN;
             if (count > 0) {
                 SV* rv = POPs;
-                if (!SvTRUE(ERRSV)) ptr = SvIV(rv);
+                if (!SvTRUE(ERRSV)) ptr = SvUV(rv);
             }
             PUTBACK; FREETMPS; LEAVE;
             if (ptr) abi = INT2PTR(const mds_abi*, ptr);

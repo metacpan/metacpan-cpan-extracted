@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::NodeAllocatableResourceMapping;
 # ABSTRACT: NodeAllocatableResourceMapping defines the translation between the DRA device/capacity units requested to the corresponding quantity of the node allocatable resource.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s allocationMultiplier => Quantity;
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1::NodeAllocatableResourceMapping - NodeAllocatableReso
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 allocationMultiplier
 
@@ -46,10 +46,6 @@ CapacityKey references a capacity name defined as a key in the C<spec.devices[*]
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -60,7 +56,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

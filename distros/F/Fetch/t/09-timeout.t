@@ -5,6 +5,7 @@ use warnings;
 use IO::Socket::INET;
 use Time::HiRes ();
 use Test::More;
+use File::Spec ();
 use Fetch;
 
 # Per-request deadline: a request to a server that accepts but never replies
@@ -21,6 +22,11 @@ my $base = "http://127.0.0.1:$port";
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    # Never hold the harness TAP pipe open, and never outlive the run:
+    # a leaked server child hangs the whole suite after this test is done.
+    open STDOUT, ">", File::Spec->devnull();
+    open STDERR, ">", File::Spec->devnull();
+    alarm 120;
     $SIG{TERM} = sub { exit 0 };
     my @hold;                       # keep slow sockets open, unanswered
     while (my $c = $srv->accept) {
@@ -62,4 +68,4 @@ my $ua = Fetch->new;
     is($res->content, 'quick', 'fast request succeeds with a timeout set');
 }
 
-END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

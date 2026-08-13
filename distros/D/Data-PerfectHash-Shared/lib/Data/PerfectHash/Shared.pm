@@ -1,11 +1,11 @@
 package Data::PerfectHash::Shared;
 use strict; use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use XSLoader;
 XSLoader::load('Data::PerfectHash::Shared', $VERSION);
 
 package Data::PerfectHash::Shared::Builder;   # blessed builder handle
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 __END__
@@ -14,7 +14,8 @@ __END__
 
 =head1 NAME
 
-Data::PerfectHash::Shared - immutable shared-memory exact set via CHD minimal perfect hashing
+Data::PerfectHash::Shared - immutable shared-memory exact set via CHD minimal
+perfect hashing
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EndpointSubset;
 # ABSTRACT: EndpointSubset is a group of addresses with a common set of ports. The expanded set of endpoints is the Cartesian product of Addresses x Ports.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s addresses => ['Core::V1::EndpointAddress'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::EndpointSubset - EndpointSubset is a group of addresses 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 addresses
 
@@ -47,10 +47,6 @@ Port numbers available on the related IP addresses.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -61,7 +57,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

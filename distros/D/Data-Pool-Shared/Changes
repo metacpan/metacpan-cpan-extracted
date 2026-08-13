@@ -1,5 +1,14 @@
 Revision history for Data::Pool::Shared
 
+0.09      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.08      2026-07-22
           - Fix a use-after-free in set() for the Raw and Str pools: the value
             argument is a bare SV, so its overload or tie magic runs Perl that

@@ -26,6 +26,7 @@ close $probe;
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    open STDOUT, '>', '/dev/null';   # never hold the harness TAP pipe open
     open STDERR, '>', '/dev/null';
     Hyperman->run(
         host => '127.0.0.1', port => $port, workers => 1,
@@ -120,4 +121,4 @@ is($ws->next_message->get, "\x00\xff\x10", 'binary echoed');
 
 $ws->close;
 
-END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

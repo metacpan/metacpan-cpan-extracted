@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use IO::Socket::INET;
 use Test::More;
+use File::Spec ();
 use Fetch;
 
 # ---- a small forking-free test server ------------------------------------
@@ -17,6 +18,11 @@ my $port = $srv->sockport;
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    # Never hold the harness TAP pipe open, and never outlive the run:
+    # a leaked server child hangs the whole suite after this test is done.
+    open STDOUT, ">", File::Spec->devnull();
+    open STDERR, ">", File::Spec->devnull();
+    alarm 120;
     $SIG{TERM} = sub { exit 0 };
     while (my $cli = $srv->accept) {
         my ($line, %h);
@@ -81,4 +87,4 @@ plan tests => 11;
     like(($f[3]->get)->content, qr{path=/c4}, 'concurrent responses not crossed');
 }
 
-END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

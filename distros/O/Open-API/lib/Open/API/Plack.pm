@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Open::API;   # loads the shared XS
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 1;
 
@@ -13,7 +13,7 @@ __END__
 
 =head1 NAME
 
-Open::API::Plack - the PSGI app for a compiled OpenAPI 3.1 spec
+Open::API::Plack - the PSGI app for a compiled OpenAPI spec
 
 =head1 SYNOPSIS
 

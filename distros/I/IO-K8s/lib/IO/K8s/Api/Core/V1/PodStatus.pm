@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodStatus;
 # ABSTRACT: PodStatus represents information about the status of a pod. Status may trail the actual state of a system, especially if the node that hosts the pod cannot contact the control plane.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s allocatedResources => { Str => 1 };
@@ -80,7 +80,7 @@ IO::K8s::Api::Core::V1::PodStatus - PodStatus represents information about the s
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 allocatedResources
 
@@ -179,10 +179,6 @@ RFC 3339 date and time at which the object was acknowledged by the Kubelet. This
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -193,7 +189,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

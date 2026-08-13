@@ -111,11 +111,18 @@ void
 DESTROY(self)
     SV *self
   CODE:
+    /* Cross-bless dispatch below is only safe once we know the SV really is
+     * one of OUR two handles: a foreign blessed ref carries an unrelated IV
+     * that INT2PTR turns into a wild pointer, and reading type_tag segfaults.
+     * Accept either class -- that is exactly the case the dispatch exists for. */
+    if (!sv_isobject(self)
+        || (!sv_derived_from(self, "Data::PerfectHash::Shared")
+            && !sv_derived_from(self, "Data::PerfectHash::Shared::Builder"))) return;
     { PhBuilder *b = INT2PTR(PhBuilder*, SvIV(SvRV(self)));
-      /* Cross-bless safety: a reblessed handle points at a real allocation of
-       * the OTHER struct. type_tag is the first member of both, so read it
-       * first and dispatch to the CORRECT free -- never reinterpret (crash) or
-       * skip it (leak). A 0 tag means already-destroyed: no-op. */
+      /* A reblessed handle points at a real allocation of the OTHER struct.
+       * type_tag is the first member of both, so read it first and dispatch to
+       * the CORRECT free -- never reinterpret (crash) or skip it (leak).
+       * A 0 tag means already-destroyed: no-op. */
       if (b) { uint32_t tag = b->type_tag; sv_setiv(SvRV(self), 0);
         if (tag == PH_BUILDER_TAG) ph_builder_free(b);
         else if (tag == PH_SET_TAG) ph_close((PhSet*)b); } }
@@ -277,6 +284,11 @@ void
 DESTROY(self)
     SV *self
   CODE:
+    /* Reject foreign objects before the cross-bless dispatch: see the matching
+     * comment on Builder's DESTROY. */
+    if (!sv_isobject(self)
+        || (!sv_derived_from(self, "Data::PerfectHash::Shared")
+            && !sv_derived_from(self, "Data::PerfectHash::Shared::Builder"))) return;
     { PhSet *s = INT2PTR(PhSet*, SvIV(SvRV(self)));
       /* Cross-bless safety: see the matching comment on Builder's DESTROY. */
       if (s) { uint32_t tag = s->type_tag; sv_setiv(SvRV(self),0);

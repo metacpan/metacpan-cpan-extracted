@@ -1,5 +1,15 @@
 Revision history for Data-SortedSet-Shared
 
+0.05      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Frozen read-only mode: freeze() seals a file-backed structure;
+            new_readonly() maps it O_RDONLY and queries it lock-free.
+          - Documentation and test-harness corrections.
+          - Refuse a header whose root names a real node while the tree
+            claims to be empty.  The node is still on the free list, so the
+            next insert descended from it and read uninitialised links.
+
 0.04      2026-07-23
           - Refuse an insert when the node pool cannot satisfy the worst-case
             split, instead of writing through an out-of-range node index if

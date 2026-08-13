@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::SubjectAccessReviewSpec;
 # ABSTRACT: SubjectAccessReviewSpec is a description of the access request.  Exactly one of ResourceAuthorizationAttributes and NonResourceAuthorizationAttributes must be set
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s extra => { Str => 1 };
@@ -35,7 +35,7 @@ IO::K8s::Api::Authorization::V1::SubjectAccessReviewSpec - SubjectAccessReviewSp
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 extra
 
@@ -68,10 +68,6 @@ User is the user you're testing for. If you specify "User" but not "Groups", the
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -82,7 +78,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

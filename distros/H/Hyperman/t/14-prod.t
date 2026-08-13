@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
+use HMTest qw(free_ports server_status server_reap slurp);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -11,16 +13,26 @@ use File::Temp ();
 
 my $dir    = File::Temp::tempdir(CLEANUP => 1);
 my $logfile = "$dir/access.log";
-my $port   = 20000 + ($$ % 1000);
+my $errfile = "$dir/stderr.log";
+my ($port) = free_ports(1);
+plan skip_all => 'no free loopback port' unless $port;
+
+# Everything below reads worker pids out of response bodies. Against someone
+# else's server those pids are real and meaningless, so stamp the responses
+# with a token only this run knows and refuse to test a stranger.
+my $token = "hm$$-" . time;
 
 my $sup = fork;
 die "fork: $!" unless defined $sup;
 if ($sup == 0) {
-    open STDERR, '>', '/dev/null';
+    open STDERR, '>', $errfile;
     require Hyperman;
     Hyperman->run(
         app => sub {
             my $env = shift;
+            if ($env->{PATH_INFO} eq '/whoami') {
+                return [ 200, [], [ $token ] ];
+            }
             if ($env->{PATH_INFO} eq '/stats') {
                 my $s = Hyperman->stats;
                 return [ 200, [], [ "req=$s->{requests} conn=$s->{connections} pid=$s->{pid}" ] ];
@@ -38,15 +50,31 @@ if ($sup == 0) {
     exit 0;
 }
 
+# One request, or undef within GET_BUDGET seconds. Both bounds matter: a
+# refused connect retries (the server may still be forking), and a peer that
+# accepts and then says nothing - which is what someone else holding the port
+# looks like - must not wedge the file. The budget is wall clock rather than
+# a retry count so the two failure modes cannot multiply into minutes.
+use constant GET_BUDGET => 10;
+
 sub get {
     my $path = shift;
-    for (1 .. 50) {
+    my $deadline = Time::HiRes::time() + GET_BUDGET;
+    while (Time::HiRes::time() < $deadline) {
         my $s = IO::Socket::INET->new(
-            PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp')
+            PeerAddr => '127.0.0.1', PeerPort => $port,
+            Proto => 'tcp', Timeout => 2)
             or (Time::HiRes::sleep(0.1), next);
         $s->print("GET $path HTTP/1.0\r\n\r\n");
-        local $/;
-        my $r = <$s>;
+        my $r = eval {
+            local $SIG{ALRM} = sub { die "timeout\n" };
+            alarm 3;
+            local $/;
+            my $body = <$s>;
+            alarm 0;
+            $body;
+        };
+        alarm 0;
         return $1 if defined $r && $r =~ /\r\n\r\n(.*)\z/s;
         Time::HiRes::sleep(0.1);
     }
@@ -76,6 +104,30 @@ sub worker_pids {
         $p{$1} = 1 if defined $b && $b =~ /^w(\d+)/;
     }
     return sort keys %p;
+}
+
+# ---- the server under test is ours ----------------------------------------
+# Before reading any pid off the wire, establish that the supervisor is alive
+# and that the thing answering on $port is the server this file started. A
+# bind clash used to leave every assertion below measuring a stranger.
+{
+    my $who;
+    wait_until(15, sub {
+        return 1 if defined server_status($sup);
+        $who = get('/whoami');
+        defined $who;
+    });
+
+    my $dead = server_status($sup);
+    if (defined $dead) {
+        plan skip_all => "server did not stay up ($dead): " . slurp($errfile);
+    }
+    unless (defined $who && $who eq $token) {
+        kill 'TERM', $sup;
+        server_reap($sup);
+        plan skip_all => "port $port answered by another process (got "
+            . (defined $who ? "'$who'" : 'no response') . ")";
+    }
 }
 
 my @orig = worker_pids();
@@ -109,7 +161,8 @@ cmp_ok(scalar @orig, '>=', 1, "serving from workers: @orig");
         }
         Time::HiRes::sleep(0.1);
     }
-    ok($found, 'access_log wrote method/path/status/bytes');
+    ok($found, 'access_log wrote method/path/status/bytes')
+        or diag "supervisor stderr: " . slurp($errfile);
 }
 
 # ---- respawn: kill -9 a worker, service continues, pool refills ----------
@@ -125,7 +178,10 @@ cmp_ok(scalar @orig, '>=', 1, "serving from workers: @orig");
         my $b = get('/');
         defined $b && $b =~ /^w(\d+)/ && !$orig{$1};
     });
-    ok($newcomer, 'supervisor respawned a replacement worker');
+    ok($newcomer, 'supervisor respawned a replacement worker')
+        or diag "killed $victim, still only @orig; supervisor "
+            . (server_status($sup) || 'alive')
+            . "; stderr: " . slurp($errfile);
 }
 
 # ---- SIGHUP: zero-downtime recycle ---------------------------------------
@@ -145,11 +201,17 @@ cmp_ok(scalar @orig, '>=', 1, "serving from workers: @orig");
         my $b = get('/');
         defined $b && $b =~ /^w(\d+)/ && !$before{$1};
     });
-    ok($fresh, 'HUP produced fresh workers');
+    ok($fresh, 'HUP produced fresh workers')
+        or diag "pre-HUP workers " . join(' ', sort keys %before)
+            . "; supervisor " . (server_status($sup) || 'alive')
+            . "; stderr: " . slurp($errfile);
 }
 
-kill 'TERM', $sup;
-waitpid $sup, 0;
-is($? >> 8, 0, 'supervisor exited cleanly on TERM');
+# only signal a pid we know we still own: a diag above may already have
+# reaped the supervisor, and a reaped pid can be recycled by the kernel.
+kill 'TERM', $sup unless defined server_status($sup);
+my $st = server_reap($sup);
+is($st >> 8, 0, 'supervisor exited cleanly on TERM')
+    or diag "wait status $st, supervisor stderr: " . slurp($errfile);
 
 done_testing;

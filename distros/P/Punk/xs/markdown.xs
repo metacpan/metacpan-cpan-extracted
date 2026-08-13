@@ -23,7 +23,12 @@ app(class, dir, opts = NULL, prefix = NULL)
         AV *rels, *order;
         HV *pages, *docmap;
         Stat_t st;
-        SV *root, *tmpl_dir = NULL, *idx_sv = &PL_sv_undef;
+        /* idx_sv stays NULL without an index so the av_store below makes a
+         * fresh undef to own. &PL_sv_undef must never go in: av_store takes
+         * over a reference, and the matching decrement when the capture is
+         * freed lands on the immortal - fatal before perl 5.20, where
+         * immortals are not yet immune to refcount juggling. */
+        SV *root, *tmpl_dir = NULL, *idx_sv = NULL;
         SSize_t i, n;
         const char *index_name;
         int want_search;

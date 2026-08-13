@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::CounterSet;
 # ABSTRACT: CounterSet defines a named set of counters that are available to be used by devices defined in the ResourcePool.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s counters => { 'Resource::V1::Counter' => 1 }, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1::CounterSet - CounterSet defines a named set of count
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 counters
 
@@ -42,10 +42,6 @@ Name defines the name of the counter set. It must be a DNS label.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -56,7 +52,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

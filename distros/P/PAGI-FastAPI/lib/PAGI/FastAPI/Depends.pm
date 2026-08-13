@@ -1,14 +1,32 @@
 package PAGI::FastAPI::Depends;
 
-use v5.36;
+use v5.38;
+use experimental 'class';
 use version;
 
-our $VERSION   = qv('v0.1.0');
+our $VERSION   = qv('v1.0.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw(Depends);
+
+class PAGI::FastAPI::Depends {
+    field $code :param;
+    field $key  :param = undef;
+
+    ADJUST {
+        die "Depends requires a CODE reference"
+            unless defined $code && ref $code eq 'CODE';
+    }
+
+    method code { $code }
+    method key  { $key  }
+}
+
+sub Depends ($code, %opts) {
+    return PAGI::FastAPI::Depends->new(code => $code, %opts);
+}
 
 =encoding utf-8
 
@@ -18,7 +36,7 @@ PAGI::FastAPI::Depends - Dependency Injection Wrapper for PAGI::FastAPI
 
 =head1 VERSION
 
-Version v0.1.0
+Version v1.0.0
 
 =head1 SYNOPSIS
 
@@ -70,48 +88,21 @@ Options:
 C<key> - Optional scalar string key under which the dependency's return
 value will be stored in C<< $c->stash >>.
 
-=cut
-
-sub Depends ($code, %opts) {
-    return __PACKAGE__->new($code, %opts);
-}
-
 =head1 METHODS
 
-=head2 C<new($code_ref, [%options])>
+=head2 C<new(code => $code_ref, [key => $key])>
 
 Constructs a new C<PAGI::FastAPI::Depends> object instance. Dies if
-C<$code_ref> is not a C<CODE> reference.
-
-=cut
-
-sub new ($class, $code, %opts) {
-    die "Depends requires a CODE reference"
-        unless ref $code eq 'CODE';
-
-    return bless {
-        code        => $code,
-        key         => $opts{key},
-        _is_depends => 1,
-    }, $class;
-}
+C<$code_ref> is missing or not a C<CODE> reference.
 
 =head2 C<code()>
 
 Returns the underlying code reference for the dependency subroutine.
 
-=cut
-
-sub code ($self) { $self->{code} }
-
 =head2 C<key()>
 
 Returns the stash key string associated with the dependency, or C<undef>
 if none was defined.
-
-=cut
-
-sub key  ($self) { $self->{key} }
 
 =head1 AUTHOR
 
@@ -156,10 +147,7 @@ L<https://metacpan.org/dist/PAGI-FastAPI/>
 Copyright (C) 2026 Mohammad Sajid Anwar.
 
 This program is free software; you can redistribute it and/or modify it under
-the terms of the Artistic License (2.0). You may obtain a copy of the full
-license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
+the terms of the Artistic License (2.0).
 
 =cut
 

@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use File::Raw::JSON ();   # JSON encode/decode via its C ABI (ft_json.h / _abi_ptr)
 
@@ -29,7 +29,7 @@ Fetch - HTTP/2 Future-based user agent
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 

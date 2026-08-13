@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::ResourceRule;
 # ABSTRACT: ResourceRule is the list of actions the subject is allowed to perform on resources. The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s apiGroups => [Str];
@@ -29,7 +29,7 @@ IO::K8s::Api::Authorization::V1::ResourceRule - ResourceRule is the list of acti
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 apiGroups
 
@@ -55,10 +55,6 @@ Verb is a list of kubernetes resource API verbs, like: get, list, watch, create,
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -69,7 +65,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

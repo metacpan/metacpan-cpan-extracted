@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodSecurityContext;
 # ABSTRACT: PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s appArmorProfile => 'Core::V1::AppArmorProfile';
@@ -19,6 +19,9 @@ k8s runAsNonRoot => Bool;
 
 
 k8s runAsUser => Int;
+
+
+k8s seLinuxChangePolicy => Str;
 
 
 k8s seLinuxOptions => 'Core::V1::SELinuxOptions';
@@ -53,7 +56,7 @@ IO::K8s::Api::Core::V1::PodSecurityContext - PodSecurityContext holds pod-level 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 appArmorProfile
 
@@ -82,6 +85,20 @@ Indicates that the container must run as a non-root user. If true, the Kubelet w
 =head2 runAsUser
 
 The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
+
+=head2 seLinuxChangePolicy
+
+seLinuxChangePolicy defines how the container's SELinux label is applied to all volumes used by the Pod. It has no effect on nodes that do not support SELinux or to volumes does not support SELinux. Valid values are "MountOption" and "Recursive".
+
+"Recursive" means relabeling of all files on all Pod volumes by the container runtime. This may be slow for large volumes, but allows mixing privileged and unprivileged Pods sharing the same volume on the same node.
+
+"MountOption" mounts all eligible Pod volumes with `-o context` mount option. This requires all Pods that share the same volume to use the same SELinux label. It is not possible to share the same volume among privileged and unprivileged Pods. Eligible volumes are in-tree FibreChannel and iSCSI volumes, and all CSI volumes whose CSI driver announces SELinux support by setting spec.seLinuxMount: true in their CSIDriver instance. Other volumes are always re-labelled recursively. "MountOption" value is allowed only when SELinuxMount feature gate is enabled.
+
+If not specified and SELinuxMount feature gate is enabled, "MountOption" is used. If not specified and SELinuxMount feature gate is disabled, "MountOption" is used for ReadWriteOncePod volumes and "Recursive" for all other volumes.
+
+This field affects only Pods that have SELinux label set, either in PodSecurityContext or in SecurityContext of all containers.
+
+All Pods that use the same volume should use the same seLinuxChangePolicy, otherwise some pods can get stuck in ContainerCreating state. Note that this field cannot be set when spec.os.name is windows.
 
 =head2 seLinuxOptions
 
@@ -114,10 +131,6 @@ The Windows specific settings applied to all containers. If unspecified, the opt
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -128,7 +141,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

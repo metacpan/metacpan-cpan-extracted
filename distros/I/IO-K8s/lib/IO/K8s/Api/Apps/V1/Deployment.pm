@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::Deployment;
 # ABSTRACT: Deployment enables declarative updates for Pods and ReplicaSets.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -26,7 +26,7 @@ IO::K8s::Api::Apps::V1::Deployment - Deployment enables declarative updates for 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ Most recently observed status of the Deployment.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#deployment-v1-apps>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#deployment-v1-apps>
 
 =head1 SUPPORT
 
@@ -53,10 +53,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#deploymen
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -68,7 +64,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::WebhookConversion;
 # ABSTRACT: WebhookConversion describes how to call a conversion webhook
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s clientConfig => 'Apiextensions::V1::WebhookClientConfig';
@@ -23,7 +23,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::WebhookConversion
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 clientConfig
 
@@ -40,10 +40,6 @@ conversionReviewVersions is an ordered list of preferred `ConversionReview` vers
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -54,7 +50,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

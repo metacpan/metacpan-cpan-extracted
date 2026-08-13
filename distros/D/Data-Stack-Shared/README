@@ -36,30 +36,30 @@ DESCRIPTION
 
   Concurrency
     Push and pop are safe under multi-producer / multi-consumer workloads.
-    Each slot carries a 64-bit control word (state + generation) that acts
-    as a publication gate: a pusher atomically transitions the slot through
-    "empty -" writing -> filled>, and a popper transitions it through
-    "filled -" reading -> empty> with the generation bumped on completion. A
-    consumer that claims position "t-1" via the "top" CAS therefore always
-    observes the matching pusher's transition to "filled" before reading the
-    value. "peek" is a seqlock-style read: it retries if the slot
-    transitions during the read and returns false if the top changes
-    concurrently beyond the retry budget.
+    Each slot carries a 64-bit control word (state + generation) that acts as
+    a publication gate: a pusher atomically transitions the slot through
+    "empty -" writing -> filled>, and a popper transitions it through "filled
+    -" reading -> empty> with the generation bumped on completion. A consumer
+    that claims position "t-1" via the "top" CAS therefore always observes the
+    matching pusher's transition to "filled" before reading the value. "peek"
+    is a seqlock-style read: it retries if the slot transitions during the
+    read and returns false if the top changes concurrently beyond the retry
+    budget.
 
-    "drain" is safe under concurrent "push"/"pop". It bounds the per-slot
-    wait to ~2s and, on timeout, force-resets a slot still in the "writing"
-    state to "empty" (with generation bumped) so a pusher that crashed
-    between its position CAS and publish cannot wedge drain forever. Because
-    the slot control word does not encode owner PID, this recovery cannot
-    distinguish a crashed pusher from one stalled longer than 2s; if a live
-    pusher is falsely reclaimed, its later publish observes the bumped
-    generation and is silently dropped (the value is lost -- equivalent to a
-    crash). A legitimate publish-in-flight delay is many orders of magnitude
-    shorter than the threshold under normal load.
+    "drain" is safe under concurrent "push"/"pop". It bounds the per-slot wait
+    to ~2s and, on timeout, force-resets a slot still in the "writing" state
+    to "empty" (with generation bumped) so a pusher that crashed between its
+    position CAS and publish cannot wedge drain forever. Because the slot
+    control word does not encode owner PID, this recovery cannot distinguish a
+    crashed pusher from one stalled longer than 2s; if a live pusher is
+    falsely reclaimed, its later publish observes the bumped generation and is
+    silently dropped (the value is lost -- equivalent to a crash). A
+    legitimate publish-in-flight delay is many orders of magnitude shorter
+    than the threshold under normal load.
 
   Compatibility
-    File format bumped to v2 in this release (per-slot control array added
-    for MPMC safety). Opening a v1 file (magic "STK1") created by
+    File format bumped to v2 in this release (per-slot control array added for
+    MPMC safety). Opening a v1 file (magic "STK1") created by
     Data::Stack::Shared "<= 0.02" will croak on header validation. Re-create
     the stack with the new version; anonymous and memfd-backed usage is
     unaffected.
@@ -107,13 +107,14 @@ STATS
     "timeouts", "mmap_size".
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
@@ -128,6 +129,20 @@ BENCHMARKS
     Multi-process (8 workers, 200K ops each, cap=64):
 
         Int push + pop          5.0M/s aggregate
+
+CRASH SAFETY
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete stack file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
 
 SEE ALSO
     Data::Deque::Shared - double-ended queue (deque)
@@ -160,6 +175,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

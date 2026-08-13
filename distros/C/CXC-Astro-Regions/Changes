@@ -1,5 +1,13 @@
 Revision history for CXC-Astro-Regions
 
+0.04      2026-08-12 18:34:14 EDT
+
+  [ENHANCEMENTS]
+
+    * CFITSIO: CFITSIO allows the circle, box, and ellipse regions to
+      be used as filter functions in extend file name row filter
+      specifications, with extra parameters for column names.
+
 0.03      2024-10-05 13:29:42-04:00 America/New_York
 
   [API BREAKAGE]

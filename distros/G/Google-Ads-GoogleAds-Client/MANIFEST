@@ -1,3 +1,7 @@
+.github/ISSUE_TEMPLATE/bug_report.md
+.github/ISSUE_TEMPLATE/config.yml
+.github/ISSUE_TEMPLATE/feature_request.md
+.github/ISSUE_TEMPLATE/usage_question.md
 .perltidyrc
 Build.PL
 CHANGELOG.md
@@ -119,6 +123,7 @@ lib/Google/Ads/GoogleAds/Common/OAuth2BaseHandler.pm
 lib/Google/Ads/GoogleAds/Common/OAuthApplicationsHandlerInterface.pm
 lib/Google/Ads/GoogleAds/Constants.pm
 lib/Google/Ads/GoogleAds/GoogleAdsException.pm
+lib/Google/Ads/GoogleAds/GoogleAuthHandler.pm
 lib/Google/Ads/GoogleAds/Logging/DetailStats.pm
 lib/Google/Ads/GoogleAds/Logging/GoogleAdsLogger.pm
 lib/Google/Ads/GoogleAds/Logging/SummaryStats.pm
@@ -10035,6 +10040,7 @@ t/020_ResourcesNames.t
 t/021_OperationService.t
 t/022_SearchStreamHandler.t
 t/023_OAuth2ServiceAccountsHandler.t
+t/024_GoogleAuthHandler.t
 t/testdata/exception_bad_request.json
 t/testdata/exception_google_ads_failure.json
 t/testdata/exception_stream_search.json

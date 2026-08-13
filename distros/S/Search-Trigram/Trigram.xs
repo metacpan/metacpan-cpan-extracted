@@ -372,10 +372,14 @@ DESTROY(self)
 # Address of Search::Trigram's own C ABI table (sg_abi.h). A consumer XS
 # module fetches this once at boot, INT2PTRs it to a `const sg_abi *`, and
 # checks ->abi_version before using it. Not part of the public Perl API.
-IV
+#
+# Unsigned, not IV: where the loader maps this object decides the sign bit.
+# A 32-bit perl above 0x7fffffff, or illumos putting shared objects up at
+# 0xfffffd7f..., would hand back a negative number from PTR2IV.
+UV
 _abi_ptr()
     CODE:
-        RETVAL = PTR2IV(&SG_ABI);
+        RETVAL = PTR2UV(&SG_ABI);
     OUTPUT:
         RETVAL
 
@@ -388,7 +392,7 @@ _abi_version()
         RETVAL
 
 # Exercise the whole sg_abi table the way a C consumer would: resolve it from
-# the IV _abi_ptr hands back, gate on abi_version, then drive index_of ->
+# the UV _abi_ptr hands back, gate on abi_version, then drive index_of ->
 # search through the function pointers rather than calling the C directly.
 # This is how the ABI gets tested without a second distribution.
 #
@@ -410,7 +414,7 @@ _abi_selftest(self, query, limit = 10)
         const char   *q;
         {
             dSP;
-            IV  ptr = 0;
+            UV  ptr = 0;
             int count;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
@@ -418,11 +422,15 @@ _abi_selftest(self, query, limit = 10)
             count = call_pv("Search::Trigram::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;
             if (count > 0) {
-                /* Pop into a local first: before 5.30 SvIV was a macro that
-                 * evaluated its argument twice, so SvIV(POPs) popped twice
-                 * and read the IV off whatever sat one slot lower. */
+                /* Pop into a local first: before 5.30 SvUV was a macro that
+                 * evaluated its argument twice, so SvUV(POPs) popped twice
+                 * and read the value off whatever sat one slot lower.
+                 *
+                 * SvUV, not SvIV, to match the UV _abi_ptr returns: an
+                 * address with the top bit set is above IV_MAX, and SvIV
+                 * would clamp it rather than hand back the address. */
                 SV *rv = POPs;
-                if (!SvTRUE(ERRSV)) ptr = SvIV(rv);
+                if (!SvTRUE(ERRSV)) ptr = SvUV(rv);
             }
             PUTBACK; FREETMPS; LEAVE;
             if (ptr) abi = INT2PTR(const sg_abi *, ptr);

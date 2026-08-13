@@ -1,5 +1,14 @@
 Revision history for Data-PubSub-Shared
 
+0.09      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Hardening: re-entrancy with tied and overloaded arguments, and
+            DESTROY on an invocant that is not one of ours.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.08      2026-07-23
           - Int/Int32/Int16 publish now commits (value, sequence) atomically
             and drops an already-superseded store, so a publisher preempted a

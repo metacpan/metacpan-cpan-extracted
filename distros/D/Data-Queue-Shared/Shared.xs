@@ -92,6 +92,7 @@ DEFINE_Q_KW(str, "Str", size, 1, build_kw_1arg)
         croak("Expected a %s object", classname); \
     QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    QueueHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -101,8 +102,10 @@ DEFINE_Q_KW(str, "Str", size, 1, build_kw_1arg)
  * explicit DESTROY, so the local h would dangle.  Used only where magic
  * can actually intervene between EXTRACT_HANDLE and the first use of h. */
 #define REEXTRACT_HANDLE(classname, sv) \
+    if (!SvROK(sv)) \
+        croak("%s object was replaced during the call", classname); \
     h = INT2PTR(QueueHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("%s object destroyed during the call", classname)
+    if (h != h0) croak("%s object replaced or destroyed during the call", classname)
 
 #define MAKE_OBJ(class, ptr) \
     SV *ref = newRV_noinc(newSViv(PTR2IV(ptr))); \
@@ -149,7 +152,7 @@ new(class, path, capacity, ...)
      * owner-only); pass e.g. 0660 to opt into cross-user sharing. */
     mode_t fmode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_INT, 0, fmode, errbuf);
-    if (!h) croak("Data::Queue::Shared::Int->new: %s", errbuf);
+    if (!h) croak("Data::Queue::Shared::Int->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -163,7 +166,7 @@ new_memfd(class, name, capacity)
     char errbuf[QUEUE_ERR_BUFLEN];
   CODE:
     QueueHandle *h = queue_create_memfd(name, (uint32_t)capacity, QUEUE_MODE_INT, 0, errbuf);
-    if (!h) croak("Data::Queue::Shared::Int->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Queue::Shared::Int->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -176,7 +179,7 @@ new_from_fd(class, fd)
     char errbuf[QUEUE_ERR_BUFLEN];
   CODE:
     QueueHandle *h = queue_open_fd(fd, QUEUE_MODE_INT, errbuf);
-    if (!h) croak("Data::Queue::Shared::Int->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Queue::Shared::Int->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -195,7 +198,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Queue::Shared::Int")) return;
     QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -351,7 +354,7 @@ unlink(self_or_class, ...)
         path = SvPV_nolen(ST(1));
     }
     if (!path) croak("cannot unlink anonymous or memfd queue");
-    if (unlink(path) != 0)
+    if (unlink(path) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", path, strerror(errno));
 
 SV *
@@ -528,7 +531,7 @@ new(class, path, capacity, ...)
     /* Optional 5th arg: file mode (default 0600); arena_cap is the optional 4th. */
     mode_t fmode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_STR, arena_cap, fmode, errbuf);
-    if (!h) croak("Data::Queue::Shared::Str->new: %s", errbuf);
+    if (!h) croak("Data::Queue::Shared::Str->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -547,7 +550,7 @@ new_memfd(class, name, capacity, ...)
     else
         arena_cap = (uint64_t)capacity * 256;
     QueueHandle *h = queue_create_memfd(name, (uint32_t)capacity, QUEUE_MODE_STR, arena_cap, errbuf);
-    if (!h) croak("Data::Queue::Shared::Str->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Queue::Shared::Str->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -560,7 +563,7 @@ new_from_fd(class, fd)
     char errbuf[QUEUE_ERR_BUFLEN];
   CODE:
     QueueHandle *h = queue_open_fd(fd, QUEUE_MODE_STR, errbuf);
-    if (!h) croak("Data::Queue::Shared::Str->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Queue::Shared::Str->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -579,7 +582,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Queue::Shared::Str")) return;
     QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -821,7 +824,7 @@ unlink(self_or_class, ...)
         path = SvPV_nolen(ST(1));
     }
     if (!path) croak("cannot unlink anonymous or memfd queue");
-    if (unlink(path) != 0)
+    if (unlink(path) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", path, strerror(errno));
 
 SV *

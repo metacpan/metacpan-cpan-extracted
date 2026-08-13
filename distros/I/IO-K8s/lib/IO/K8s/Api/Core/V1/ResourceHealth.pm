@@ -1,9 +1,12 @@
 package IO::K8s::Api::Core::V1::ResourceHealth;
 # ABSTRACT: ResourceHealth represents the health of a resource. It has the latest device health information. This is a part of KEP https://kep.k8s.io/4680 and historical health changes are planned to be added in future iterations of a KEP.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s health => Str;
+
+
+k8s message => Str;
 
 
 k8s resourceID => Str, 'required';
@@ -23,11 +26,15 @@ IO::K8s::Api::Core::V1::ResourceHealth - ResourceHealth represents the health of
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 health
 
 Health of the resource. can be one of:  - Healthy: operates as normal 
+
+=head2 message
+
+Message provides human-readable context for Health (e.g. "ECC error count exceeded threshold"). This field is populated by the kubelet when ResourceHealthStatusMessage is enabled if the DRA plugin returns a message, and is null otherwise.
 
 =head2 resourceID
 
@@ -40,10 +47,6 @@ ResourceID is the unique identifier of the resource. See the ResourceID type for
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -54,7 +57,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

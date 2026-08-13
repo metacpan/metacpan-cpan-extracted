@@ -45,7 +45,8 @@ typedef struct ft_conn {
     void         *ssl;         /* SSL* when https, else NULL */
     int           tls;         /* request wants TLS */
     int           verify;      /* verify peer + hostname */
-    char         *host;        /* SNI / verify host */
+    char         *host;        /* SNI / verify host, and the redial target */
+    char         *port;        /* service, kept for the keep-alive redial */
     /* HTTP/2 (nghttp2) - populated after ALPN negotiates h2 */
     void         *h2;          /* nghttp2_session* */
     int           is_h2;
@@ -204,6 +205,7 @@ static void ft_conn_free(pTHX_ ft_conn *c) {
     if (c->rq_headers)   SvREFCNT_dec(c->rq_headers);
     if (c->rq_body)      SvREFCNT_dec(c->rq_body);
     Safefree(c->host);
+    Safefree(c->port);
     Safefree(c->poolkey);
     Safefree(c->ws_key);
     Safefree(c->ws_wbuf);
@@ -636,6 +638,72 @@ static int ft_ws_upgrade(pTHX_ ft_conn *c) {
     return 1;
 }
 
+/* RFC 7231 4.2.2: methods a client may replay without changing what the
+ * request means. Read off the request line rather than c->rq_method, which
+ * belongs to the request that first opened the connection, not this one. */
+static int ft_req_idempotent(const char *req, size_t len) {
+    static const char *const ok[] = { "GET", "HEAD", "PUT", "DELETE",
+                                      "OPTIONS", "TRACE", NULL };
+    size_t i = 0, n;
+    const char *const *m;
+    while (i < len && req[i] != ' ') i++;
+    for (m = ok; *m; m++) {
+        n = strlen(*m);
+        if (n == i && strncmp(req, *m, n) == 0) return 1;
+    }
+    return 0;
+}
+
+/* A keep-alive connection revived from the pool can die under the very
+ * request that revived it: the server had already decided to close it and the
+ * FIN was still in flight when ft_conn_alive() peeked. That is not a request
+ * failure, it is a lost race, and every request over a pool has to survive it
+ * - so redial and send the same bytes again on a fresh socket.
+ *
+ * Only ever on a revived connection (c->reused, cleared here so one request
+ * cannot loop), only while nothing of a response has arrived, and only for an
+ * idempotent method - if any byte came back the server did answer, and a
+ * replay would be a second POST rather than a retry.
+ *
+ * Returns 1 when the request is back in flight on a new socket. */
+static int ft_conn_retry(pTHX_ ft_conn *c) {
+    struct addrinfo hints, *ai = NULL, *rp;
+    int fd = -1;
+
+    if (!c->reused || c->have_headers || c->rlen || c->body_recv) return 0;
+    if (c->is_h2 || c->is_ws || c->want_ws)                       return 0;
+    if (!c->host || !c->port || !c->req)                          return 0;
+    if (!ft_req_idempotent(c->req, c->req_len))                   return 0;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family   = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    if (getaddrinfo(c->host, c->port, &hints, &ai) != 0) return 0;
+    for (rp = ai; rp; rp = rp->ai_next) {
+        fd = ft_os_socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (fd < 0) continue;
+        ft_os_set_nonblock(fd);
+        if (ft_os_connect(fd, rp->ai_addr, (int)rp->ai_addrlen) == 0
+            || errno == EINPROGRESS)
+            break;
+        ft_os_close(fd); fd = -1;
+    }
+    freeaddrinfo(ai);
+    if (fd < 0) return 0;               /* cannot redial: let the caller fail */
+
+    ft_arm(aTHX_ c, 0);                 /* stop watching the dead fd first */
+    ft_tls_free(c);
+    if (c->fd >= 0) ft_os_close(c->fd);
+    c->fd      = fd;
+    c->state   = FT_CONNECTING;
+    c->req_off = 0;
+    c->reused  = 0;                     /* one redial per request */
+    /* the deadline armed for this request keeps running: a redial buys
+     * another socket, not more time. */
+    ft_arm(aTHX_ c, HM_EV_WRITE);
+    return 1;
+}
+
 /* One pass of the connection state machine. TLS handshake, request send, and
  * response recv+parse all re-arm the loop for whichever direction OpenSSL (or
  * the socket) next needs. */
@@ -688,6 +756,7 @@ static void ft_conn_step(pTHX_ ft_conn *c) {
             if (n > 0) { c->req_off += (size_t)n; continue; }
             if (n < 0 && want)          { ft_arm(aTHX_ c, want); return; }
             if (n < 0 && errno == EINTR) continue;
+            if (ft_conn_retry(aTHX_ c)) return;   /* pooled socket died mid-send */
             ft_conn_fail(aTHX_ c, strerror(errno)); return;
         }
         c->state = FT_READING;
@@ -747,12 +816,15 @@ static void ft_conn_step(pTHX_ ft_conn *c) {
             if (n == 0) {
                 if (c->have_headers && !c->chunked && c->content_len < 0)
                     ft_conn_finish(aTHX_ c);
+                else if (ft_conn_retry(aTHX_ c))  /* server hung up on reuse */
+                    ;
                 else
                     ft_conn_fail(aTHX_ c, "connection closed before response was complete");
                 return;
             }
             if (want)                    { ft_arm(aTHX_ c, want); return; }
             if (errno == EINTR) continue;
+            if (ft_conn_retry(aTHX_ c)) return;   /* reset before any response */
             ft_conn_fail(aTHX_ c, strerror(errno)); return;
         }
     }
@@ -932,7 +1004,10 @@ static SV *ft_h1_start(pTHX_ ft_loop *loop, SV *loop_sv, ft_pool *pool,
         Newx(c->ws_key, kl + 1, char);
         memcpy(c->ws_key, ws_key, kl + 1);
     }
-    if (tls) { size_t hl = strlen(host); Newx(c->host, hl + 1, char); memcpy(c->host, host, hl + 1); }
+    /* host/port outlive the connect: SNI and verification need the host, and
+     * ft_conn_retry needs both to redial a pooled socket the server closed. */
+    { size_t hl = strlen(host); Newx(c->host, hl + 1, char); memcpy(c->host, host, hl + 1); }
+    { size_t pl = strlen(port); Newx(c->port, pl + 1, char); memcpy(c->port, port, pl + 1); }
     /* structured pieces for a possible h2 upgrade - consumed only by the
      * nghttp2 path after ALPN, which happens on TLS. On a cleartext
      * connection h2 can never be negotiated, so skip storing them (the body

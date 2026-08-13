@@ -1,5 +1,17 @@
 Revision history for JSON-Schema-Modern
 
+0.644     2026-08-12 22:40:50Z
+          - fix experimental warning on earlier perls
+
+0.643     2026-08-12 17:01:19Z
+          - fix the set of characters that are encoded for the
+            application/x-www-form-urlencoded media-type to be spec-compliant
+            (Mojolicious isn't)
+          - drop optional prereqs on DateTime::Format::RFC3339 and
+            Time::Moment
+          - new utility function: canonicalize_uri()
+          - respect format constraints in validate_schema()
+
 0.642     2026-07-19 23:29:16Z
           - "application/x-www-form-urlencoded" media encoder and decoders now
             support working with an arrayref of hashref tuples

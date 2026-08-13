@@ -23,6 +23,7 @@ static const MGVTBL pool_scalar_magic_vtbl = {
         croak("Expected a Data::Pool::Shared object"); \
     PoolHandle *h = INT2PTR(PoolHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::Pool::Shared object"); \
+    PoolHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -38,7 +39,7 @@ static const MGVTBL pool_scalar_magic_vtbl = {
     if (!SvROK(sv)) \
         croak("Data::Pool::Shared object was replaced during the call"); \
     h = INT2PTR(PoolHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::Pool::Shared object destroyed during the call")
+    if (h != h0) croak("Data::Pool::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -72,7 +73,7 @@ new(class, path, capacity, elem_size, ...)
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     PoolHandle *h = pool_create(p, capacity, (uint32_t)elem_size, POOL_VAR_RAW, mode, errbuf);
-    if (!h) croak("Data::Pool::Shared->new: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -87,7 +88,7 @@ new_memfd(class, name, capacity, elem_size)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_create_memfd(name, capacity, (uint32_t)elem_size, POOL_VAR_RAW, errbuf);
-    if (!h) croak("Data::Pool::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -100,7 +101,7 @@ new_from_fd(class, fd)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_open_fd(fd, POOL_VAR_RAW, errbuf);
-    if (!h) croak("Data::Pool::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -109,7 +110,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::Pool::Shared")) return;
     PoolHandle *h = INT2PTR(PoolHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -374,7 +375,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0)
+    if (unlink(p) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
@@ -444,6 +445,7 @@ free_n(self, slots_av)
     if (!SvROK(slots_av) || SvTYPE(SvRV(slots_av)) != SVt_PVAV)
         croak("free_n: expected arrayref");
     AV *av = (AV *)SvRV(slots_av);
+    sv_2mortal(SvREFCNT_inc((SV *)av));   /* pin the arrayref: element magic below cannot free it mid-loop */
     SSize_t len = av_top_index(av) + 1;
     if (len <= 0) {
         RETVAL = 0;
@@ -551,7 +553,7 @@ new(class, path, capacity, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     PoolHandle *h = pool_create(p, capacity, sizeof(int64_t), POOL_VAR_I64, mode, errbuf);
-    if (!h) croak("Data::Pool::Shared::I64->new: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::I64->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -565,7 +567,7 @@ new_memfd(class, name, capacity)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_create_memfd(name, capacity, sizeof(int64_t), POOL_VAR_I64, errbuf);
-    if (!h) croak("Data::Pool::Shared::I64->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::I64->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -578,7 +580,7 @@ new_from_fd(class, fd)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_open_fd(fd, POOL_VAR_I64, errbuf);
-    if (!h) croak("Data::Pool::Shared::I64->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::I64->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -708,7 +710,7 @@ new(class, path, capacity, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     PoolHandle *h = pool_create(p, capacity, sizeof(double), POOL_VAR_F64, mode, errbuf);
-    if (!h) croak("Data::Pool::Shared::F64->new: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::F64->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -722,7 +724,7 @@ new_memfd(class, name, capacity)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_create_memfd(name, capacity, sizeof(double), POOL_VAR_F64, errbuf);
-    if (!h) croak("Data::Pool::Shared::F64->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::F64->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -735,7 +737,7 @@ new_from_fd(class, fd)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_open_fd(fd, POOL_VAR_F64, errbuf);
-    if (!h) croak("Data::Pool::Shared::F64->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::F64->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -781,7 +783,7 @@ new(class, path, capacity, ...)
     mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     PoolHandle *h = pool_create(p, capacity, sizeof(int32_t), POOL_VAR_I32, mode, errbuf);
-    if (!h) croak("Data::Pool::Shared::I32->new: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::I32->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -795,7 +797,7 @@ new_memfd(class, name, capacity)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_create_memfd(name, capacity, sizeof(int32_t), POOL_VAR_I32, errbuf);
-    if (!h) croak("Data::Pool::Shared::I32->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::I32->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -808,7 +810,7 @@ new_from_fd(class, fd)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_open_fd(fd, POOL_VAR_I32, errbuf);
-    if (!h) croak("Data::Pool::Shared::I32->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::I32->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -943,7 +945,7 @@ new(class, path, capacity, max_len, ...)
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     PoolHandle *h = pool_create(p, capacity, elem_size, POOL_VAR_STR, mode, errbuf);
-    if (!h) croak("Data::Pool::Shared::Str->new: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::Str->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -962,7 +964,7 @@ new_memfd(class, name, capacity, max_len)
         croak("Data::Pool::Shared::Str->new_memfd: max_len too large");
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
     PoolHandle *h = pool_create_memfd(name, capacity, elem_size, POOL_VAR_STR, errbuf);
-    if (!h) croak("Data::Pool::Shared::Str->new_memfd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::Str->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -975,7 +977,7 @@ new_from_fd(class, fd)
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
     PoolHandle *h = pool_open_fd(fd, POOL_VAR_STR, errbuf);
-    if (!h) croak("Data::Pool::Shared::Str->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::Pool::Shared::Str->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL

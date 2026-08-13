@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::HelmChart;
 # ABSTRACT: K3s Helm chart deployment
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject
     api_version     => 'helm.cattle.io/v1',
     resource_plural => 'helmcharts';
@@ -23,7 +23,7 @@ IO::K8s::K3s::V1::HelmChart - K3s Helm chart deployment
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -48,10 +48,6 @@ As of the C<helm-controller> version shipped with K3s v1.36.3+k3s1, C<spec> acce
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -62,7 +58,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

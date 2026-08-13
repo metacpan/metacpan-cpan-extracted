@@ -127,8 +127,11 @@ function refName(ref) {
 
 function typeOf(schema) {
     if (schema.type) {
-        return Array.isArray(schema.type) ? schema.type.join(' | ')
-                                          : schema.type;
+        if (!Array.isArray(schema.type)) return schema.type;
+        /* a `null` member is the 3.1 spelling of nullable, and reads better as
+         * the badge constraintsOf adds than as part of the type */
+        var t = schema.type.filter(function (x) { return x !== 'null'; });
+        return (t.length ? t : schema.type).join(' | ');
     }
     if (schema.properties || schema.additionalProperties) return 'object';
     if (schema.items) return 'array';
@@ -149,7 +152,11 @@ function constraintsOf(s) {
     if (s.maxItems !== undefined) c.push('maxItems ' + s.maxItems);
     if (s.pattern) c.push('pattern ' + s.pattern);
     if (s.default !== undefined) c.push('default ' + JSON.stringify(s.default));
-    if (s.nullable) c.push('nullable');
+    /* `nullable` is 3.0's spelling; a `null` member of a type union is 3.1's.
+     * A 3.0 document arrives here already converted, so the union is the usual
+     * case - but a hand-written 3.0 schema can still reach the UI. */
+    if (s.nullable || (Array.isArray(s.type) && s.type.indexOf('null') !== -1))
+        c.push('nullable');
     if (s.enum) c.push('one of ' + s.enum.map(function (v) {
         return JSON.stringify(v);
     }).join(', '));

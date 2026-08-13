@@ -9,6 +9,8 @@ MANIFEST.SKIP
 README
 Shared.xs
 t/01-basic.t
+t/02-frozen.t
+t/03-recover.t
 xt/asan.t
 xt/crash_recovery.t
 xt/destroy_during_call.t

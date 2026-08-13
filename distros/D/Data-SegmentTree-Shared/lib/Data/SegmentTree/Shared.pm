@@ -1,7 +1,7 @@
 package Data::SegmentTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::SegmentTree::Shared', $VERSION);
 
@@ -13,7 +13,8 @@ __END__
 
 =head1 NAME
 
-Data::SegmentTree::Shared - shared-memory segment tree (range add/assign, range sum/min/max/gcd/product)
+Data::SegmentTree::Shared - shared-memory segment tree (range add/assign,
+range sum/min/max/gcd/product)
 
 =head1 SYNOPSIS
 
@@ -93,12 +94,13 @@ structures, so this only matters if you persisted one.
     my $st = Data::SegmentTree::Shared->new_memfd($name, $n);
     my $st = Data::SegmentTree::Shared->new_from_fd($fd);
 
-C<$n> is the number of positions (at least 1, up to 2^24); every position starts
-at 0. Memory is C<2 * next_pow2(n) * 64> bytes plus a fixed header. C<new> and
-C<new_memfd> croak on a C<$n> below 1 or above 2^24. When reopening an existing
-file or memfd the stored C<$n> wins and the caller's argument is ignored. An
-optional file B<mode> may be passed as the last argument to C<new> (e.g. C<0660>)
-for cross-user sharing; it defaults to C<0600> (owner-only).
+C<$n> is the number of positions (at least 1, up to 2^24); every position
+starts at 0. Memory is C<2 * next_pow2(n) * 64> bytes plus a fixed header.
+C<new> and C<new_memfd> croak on a C<$n> below 1 or above 2^24. When reopening
+an existing file or memfd the stored C<$n> wins and the caller's arguments do
+not resize it -- but they are still range-checked, so an out-of-range value
+croaks. An optional file B<mode> may be passed as the last argument to C<new>
+(e.g. C<0660>) for cross-user sharing; it defaults to C<0600> (owner-only).
 
 =head2 Updates
 
@@ -155,11 +157,13 @@ when the object is destroyed; do not close it yourself. Pass it to another proce
 
 =head1 SHARING ACROSS PROCESSES
 
-The tree lives in a shared mapping, exposed the same three ways as the rest of the
-family: a B<backing file>, an B<anonymous mapping inherited across C<fork>>, or a
-B<memfd> passed to an unrelated process and reopened with C<< new_from_fd($fd) >>.
-Every process's updates land in the one shared array, and queries take only the
-read lock so many readers proceed concurrently.
+The tree lives in a shared mapping, exposed the same three ways as the rest of
+the family: a B<backing file>, an B<anonymous mapping inherited across
+C<fork>>, or a B<memfd> passed to an unrelated process and reopened with C<<
+new_from_fd($fd) >>. The descriptor you pass is duplicated
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the handle. Every process's updates land in the one shared array, and
+queries take only the read lock so many readers proceed concurrently.
 
 =head1 SECURITY
 
@@ -200,6 +204,18 @@ reclaim it and writers may block until the mapping is recreated. Reaching this
 needs more than 1024 concurrent reader processes on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete segment-tree file
+left by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

@@ -328,7 +328,6 @@ static inline void queue_init_new_header(void *base, uint32_t cap, uint64_t aren
                                           uint32_t mode, uint64_t total_size) {
     QueueHeader *hdr = (QueueHeader *)base;
     memset(hdr, 0, sizeof(QueueHeader));
-    hdr->magic      = QUEUE_MAGIC;
     hdr->version    = QUEUE_VERSION;
     hdr->mode       = mode;
     hdr->capacity   = cap;
@@ -344,6 +343,11 @@ static inline void queue_init_new_header(void *base, uint32_t cap, uint64_t aren
     else if (mode == QUEUE_MODE_INT32) INIT_SEQ(QueueInt32Slot, cap);
     else if (mode == QUEUE_MODE_INT16) INIT_SEQ(QueueInt16Slot, cap);
     #undef INIT_SEQ
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, QUEUE_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -364,6 +368,16 @@ static int queue_secure_open(const char *path, mode_t file_mode, char *errbuf) {
     }
     QUEUE_ERR("open(%s): create/attach kept racing", path);
     return -1;
+}
+
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int queue_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
 }
 
 static QueueHandle *queue_create(const char *path, uint32_t capacity,
@@ -467,7 +481,27 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
                          hdr->arena_off + hdr->arena_cap <= hdr->total_size);
             }
             if (!valid) {
-                QUEUE_ERR("%s: invalid or incompatible queue file", path);
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (hdr->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid() && queue_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, file_mode) < 0) {
+                        QUEUE_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
+                    flock(fd, LOCK_UN); close(fd);
+                    goto setup_handle;
+                }
+                if (hdr->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid())
+                    QUEUE_ERR("%s: incomplete queue file left by an interrupted create; remove it and retry", path);
+                else
+                    QUEUE_ERR("%s: invalid or incompatible queue file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             cap = hdr->capacity;

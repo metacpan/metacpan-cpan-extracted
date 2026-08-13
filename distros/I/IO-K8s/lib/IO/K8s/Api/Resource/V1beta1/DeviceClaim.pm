@@ -1,0 +1,76 @@
+package IO::K8s::Api::Resource::V1beta1::DeviceClaim;
+# ABSTRACT: DeviceClaim defines how to request devices with a ResourceClaim.
+our $VERSION = '1.106';
+use IO::K8s::Resource;
+
+k8s config => ['Resource::V1beta1::DeviceClaimConfiguration'];
+
+
+k8s constraints => ['Resource::V1beta1::DeviceConstraint'];
+
+
+k8s requests => ['Resource::V1beta1::DeviceRequest'];
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+IO::K8s::Api::Resource::V1beta1::DeviceClaim - DeviceClaim defines how to request devices with a ResourceClaim.
+
+=head1 VERSION
+
+version 1.106
+
+=head2 config
+
+This field holds configuration for multiple potential drivers which could satisfy requests in this claim. It is ignored while allocating the claim.
+
+=head2 constraints
+
+These constraints must be satisfied by the set of devices that get allocated for the claim.
+
+=head2 requests
+
+Requests represent individual requests for distinct devices which must all be satisfied. If empty, nothing needs to be allocated.
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/pplu/io-k8s-p5/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Torsten Raudssus <getty@cpan.org>
+
+=item *
+
+Jose Luis Martinez Torres <jlmartin@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

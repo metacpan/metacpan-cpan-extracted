@@ -1,10 +1,10 @@
 package Template::Stencil;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Template::Stencil', $VERSION);

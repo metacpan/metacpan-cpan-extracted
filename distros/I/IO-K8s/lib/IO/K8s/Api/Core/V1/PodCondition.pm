@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodCondition;
 # ABSTRACT: PodCondition contains details for the current condition of this pod.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s lastProbeTime => Time;
@@ -10,6 +10,9 @@ k8s lastTransitionTime => Time;
 
 
 k8s message => Str;
+
+
+k8s observedGeneration => Int;
 
 
 k8s reason => Str;
@@ -35,7 +38,7 @@ IO::K8s::Api::Core::V1::PodCondition - PodCondition contains details for the cur
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 lastProbeTime
 
@@ -48,6 +51,10 @@ Last time the condition transitioned from one status to another.
 =head2 message
 
 Human-readable message indicating details about last transition.
+
+=head2 observedGeneration
+
+If set, this represents the .metadata.generation that the pod condition was set based upon.
 
 =head2 reason
 
@@ -68,10 +75,6 @@ Type is the type of the condition. More info: https://kubernetes.io/docs/concept
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -82,7 +85,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

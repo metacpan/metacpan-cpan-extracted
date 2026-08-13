@@ -1,6 +1,5 @@
 NAME
-    Data::Queue::Shared - High-performance shared-memory MPMC queues for
-    Linux
+    Data::Queue::Shared - High-performance shared-memory MPMC queues for Linux
 
 SYNOPSIS
         use Data::Queue::Shared;
@@ -45,10 +44,9 @@ SYNOPSIS
         print $q->pop;                   # 99
 
 DESCRIPTION
-    Data::Queue::Shared provides bounded MPMC (multi-producer,
-    multi-consumer) queues stored in file-backed shared memory
-    (mmap(MAP_SHARED)), enabling efficient multiprocess data sharing on
-    Linux.
+    Data::Queue::Shared provides bounded MPMC (multi-producer, multi-consumer)
+    queues stored in file-backed shared memory (mmap(MAP_SHARED)), enabling
+    efficient multiprocess data sharing on Linux.
 
     Linux-only. Requires 64-bit Perl.
 
@@ -59,10 +57,10 @@ DESCRIPTION
 
     Data::Queue::Shared::Int32 - int32 values, lock-free (8 bytes/slot)
     Data::Queue::Shared::Int16 - int16 values, lock-free (8 bytes/slot)
-        Compact variants with 32-bit Vyukov sequence numbers. Half the
-        memory footprint per slot = double the cache density. Same lock-free
-        algorithm. Same API as Int. Values outside the type range are
-        silently truncated (standard C cast semantics).
+        Compact variants with 32-bit Vyukov sequence numbers. Half the memory
+        footprint per slot = double the cache density. Same lock-free
+        algorithm. Same API as Int. Values outside the type range are silently
+        truncated (standard C cast semantics).
 
     Data::Queue::Shared::Str - byte string values, mutex-protected
         Uses a futex-based mutex with a circular arena for variable-length
@@ -78,8 +76,8 @@ DESCRIPTION
         fixed-slot-per-entry (memory use = capacity x max_len), uses a
         per-slot publication state machine instead of a shared mutex, and
         measures 1.3x-4.7x faster than Queue::Str depending on contention (1
-        vs 8 writers, 32-byte payloads, single box). Use that if your
-        messages share an upper bound and you want lock-free-style scaling.
+        vs 8 writers, 32-byte payloads, single box). Use that if your messages
+        share an upper bound and you want lock-free-style scaling.
 
   Features
     *   File-backed mmap for cross-process sharing
@@ -105,10 +103,10 @@ DESCRIPTION
         my $q = Data::Queue::Shared::Str->new($path, $capacity);
         my $q = Data::Queue::Shared::Str->new($path, $capacity, $arena_bytes);
 
-    Creates or opens a shared queue backed by file $path. $capacity is
-    rounded up to the next power of 2. When opening an existing file,
-    parameters are read from the stored header. Multiple processes can open
-    the same file simultaneously.
+    Creates or opens a shared queue backed by file $path. $capacity is rounded
+    up to the next power of 2. When opening an existing file, parameters are
+    read from the stored header. Multiple processes can open the same file
+    simultaneously.
 
     Pass "undef" for $path to create an anonymous queue using
     "MAP_SHARED|MAP_ANONYMOUS". Anonymous queues are shared with child
@@ -120,23 +118,24 @@ DESCRIPTION
         my $q = Data::Queue::Shared::Str->new_memfd($name, $cap, $arena);
 
     Creates a queue backed by memfd_create(2). No filesystem path -- the
-    backing memory is identified by a file descriptor. Use memfd() to
-    retrieve the fd and pass it to other processes via "SCM_RIGHTS" (Unix
-    domain socket fd passing) or fork() inheritance.
+    backing memory is identified by a file descriptor. Use memfd() to retrieve
+    the fd and pass it to other processes via "SCM_RIGHTS" (Unix domain socket
+    fd passing) or fork() inheritance.
 
         my $q2 = Data::Queue::Shared::Int->new_from_fd($fd);
         my $q2 = Data::Queue::Shared::Str->new_from_fd($fd);
 
-    Opens a queue from a received memfd. The fd is dup'd internally.
+    Opens a queue from a received memfd. The fd is dup'd internally
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the queue.
 
         my $fd = $q->memfd;    # backing fd (-1 if file-backed/anonymous)
 
-    For Str queues, $arena_bytes sets the string storage arena size
-    (default: "$capacity * 256", minimum 4096, maximum 4GB). Strings are
-    stored in a circular arena; total stored string bytes cannot exceed the
-    arena capacity. Any single string is likewise bounded by the arena
-    capacity (and by a ~2GB hard limit); pushing one that does not fit
-    croaks.
+    For Str queues, $arena_bytes sets the string storage arena size (default:
+    "$capacity * 256", minimum 4096, maximum 4GB). Strings are stored in a
+    circular arena; total stored string bytes cannot exceed the arena
+    capacity. Any single string is likewise bounded by the arena capacity (and
+    by a ~2GB hard limit); pushing one that does not fit croaks.
 
   API
    Core operations
@@ -161,8 +160,8 @@ DESCRIPTION
         my $val = $q->pop_back_wait($timeout);  # with timeout
 
     "push_front" inserts at the head -- useful for requeueing failed jobs.
-    "pop_back" removes from the tail -- useful for work-stealing or undo.
-    Not available for Int (Vyukov algorithm is strictly FIFO).
+    "pop_back" removes from the tail -- useful for work-stealing or undo. Not
+    available for Int (Vyukov algorithm is strictly FIFO).
 
    Batch operations
         my $n  = $q->push_multi(@values);          # non-blocking, returns pushed count
@@ -173,8 +172,8 @@ DESCRIPTION
         my @v  = $q->drain($max);                  # pop up to $max elements
 
     "pop_wait_multi" blocks until at least one element is available (or
-    timeout), then grabs up to $n elements non-blocking. Returns empty list
-    on timeout.
+    timeout), then grabs up to $n elements non-blocking. Returns empty list on
+    timeout.
 
     "push_wait_multi" pushes all values, blocking if the queue is full.
     $timeout is seconds (-1 = infinite, 0 = try once).
@@ -194,9 +193,9 @@ DESCRIPTION
         my $s = $q->stats;          # diagnostic hashref
 
     Stats keys: "size", "capacity", "mmap_size", "push_ok", "pop_ok",
-    "push_full", "pop_empty", "recoveries", "push_waiters", "pop_waiters".
-    Str queues additionally include "arena_cap" and "arena_used". All
-    counters are approximate under concurrent access (diagnostic only).
+    "push_full", "pop_empty", "recoveries", "push_waiters", "pop_waiters". Str
+    queues additionally include "arena_cap" and "arena_used". All counters are
+    approximate under concurrent access (diagnostic only).
     "push_waiters"/"pop_waiters" show currently blocked producers/consumers.
 
   Event Loop Integration (eventfd)
@@ -208,8 +207,8 @@ DESCRIPTION
 
     Notification is opt-in: "push" does not write to the eventfd
     automatically. Call "notify" explicitly after pushing. This gives full
-    control over batching (push N items, notify once) and avoids any
-    overhead when eventfd is not used.
+    control over batching (push N items, notify once) and avoids any overhead
+    when eventfd is not used.
 
         use EV;
         my $q = Data::Queue::Shared::Str->new($path, 1024);
@@ -232,9 +231,9 @@ DESCRIPTION
 
   Crash Safety
     If a process dies while holding the Str queue mutex, other processes
-    detect the stale lock within 2 seconds via PID tracking and
-    automatically recover. The Int queue is lock-free and requires no crash
-    recovery for normal push/pop operations.
+    detect the stale lock within 2 seconds via PID tracking and automatically
+    recover. The Int queue is lock-free and requires no crash recovery for
+    normal push/pop operations.
 
   Keyword API
     When XS::Parse::Keyword is installed at build time, keyword forms are
@@ -247,13 +246,13 @@ DESCRIPTION
         my $val = q_int_peek $q;
         my $n   = q_int_size $q;
 
-    Replace "int" with "int32", "int16", or "str" for other variants.
-    Keywords are lexically scoped and require "use" (not "require").
+    Replace "int" with "int32", "int16", or "str" for other variants. Keywords
+    are lexically scoped and require "use" (not "require").
 
 BENCHMARKS
-    Throughput versus other Perl queue/IPC modules, 200K items, single
-    process and cross-process, Linux x86_64. Run "perl -Mblib bench/vs.pl
-    200000" to reproduce.
+    Throughput versus other Perl queue/IPC modules, 200K items, single process
+    and cross-process, Linux x86_64. Run "perl -Mblib bench/vs.pl 200000" to
+    reproduce.
 
         SINGLE-PROCESS INTEGER PUSH+POP (interleaved)
                                    Rate
@@ -297,6 +296,20 @@ BENCHMARKS
 
     *   True concurrent MPMC (MCE::Queue is workers-to-manager only)
 
+CRASH SAFETY
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete queue file left by an interrupted create; remove it and
+    retry". A file left behind by an interrupted create never held data, so
+    removing it is safe -- but a file whose header was corrupted after the
+    fact reaches the same croak, so confirm it is an abandoned create before
+    deleting anything you care about.
+
 SEE ALSO
     Data::Buffer::Shared - typed shared array
 
@@ -325,13 +338,14 @@ SEE ALSO
     Data::RingBuffer::Shared - fixed-size overwriting ring buffer
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
@@ -339,6 +353,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

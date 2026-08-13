@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib "t/lib";
 use Test::More;
+use HMTest qw(free_ports);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -47,9 +49,8 @@ plan skip_all => 'could not create the test certificates'
                                       cli.pem cli.key ex.pem ex.key
                                       late.pem late.key);
 
-my $mtls_port = 24000 + ($$ % 500);
-my $sni_port  = 24500 + ($$ % 500);
-my $rel_port  = 25000 + ($$ % 500);
+my ($mtls_port, $sni_port, $rel_port) = free_ports(3);
+plan skip_all => "no free loopback ports" unless $rel_port;
 
 # ---- server 1: require client certs ----
 my $mpid = fork // die;

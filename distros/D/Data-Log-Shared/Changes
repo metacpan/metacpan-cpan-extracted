@@ -1,5 +1,13 @@
 Revision history for Data::Log::Shared
 
+0.07  2026-08-12
+    - Recover a file left behind by an interrupted create instead of leaving the
+      path unopenable.
+    - Hardening: re-entrancy with tied and overloaded arguments, and DESTROY on
+      an invocant that is not one of ours.
+    - Documentation and test-harness corrections.
+    - unlink() reports a removal that failed; one already gone is not an error.
+
 0.06  2026-07-21
     - Clamp the truncate offset to the data region.
     - Resolve argument magic before capturing the path string.
@@ -15,7 +23,7 @@ Revision history for Data::Log::Shared
     - read_entry/each_entry take optional abandon_wait_us (default 2s,
       0 = immediate); read_entry returns (undef, $next_off) on abandoned
     - log_reset now zeros the data region (prevents stale-data on reset)
-    - Magic LOG1 → LOG2; existing v1 logs must be recreated
+    - Magic LOG1 -> LOG2; existing v1 logs must be recreated
 
 0.03  2026-04-26
     - memfd sealing + factored validate header

@@ -21,6 +21,8 @@ t/05-bulk.t
 t/06-strings.t
 t/07-strings-oracle.t
 t/08-strings-errors.t
+t/09-frozen.t
+t/10-recover.t
 xt/asan.t
 xt/concurrent_open.t
 xt/corrupt_shm.t

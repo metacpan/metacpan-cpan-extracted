@@ -101,7 +101,7 @@
           message(m);
           break;
         case 'presence':
-          count.textContent = m.connected + (m.connected === 1 ? ' here' : ' here');
+          count.textContent = m.connected + ' here';
           notice(m.event, {
             created: m.created,
             text: m.nick + (m.event === 'join' ? ' joined' : ' left')

@@ -18,7 +18,19 @@ BEGIN {
 use DBIx::Loop;
 use DBIx::Loop::Loop::Hyperman;
 
-my $ad = DBIx::Loop::Loop::Hyperman->new;
+# Hyperman loading is not the same thing as an adapter this dist can build.
+# The adapter binds to Hyperman's public C ABI, which arrived in Hyperman
+# 0.10; against an older one it croaks, correctly. DBIx::Loop declares no
+# Hyperman prerequisite - the coupling is runtime-only, by design - so
+# whichever Hyperman happens to be installed is not ours to demand: skip on
+# one that predates the ABI rather than failing the distribution over it.
+my $ad = eval { DBIx::Loop::Loop::Hyperman->new };
+unless ($ad) {
+    my $have = eval { Hyperman->VERSION };
+    plan skip_all => 'Hyperman ' . (defined $have ? $have : '(unknown version)')
+                   . ' has no C ABI for this adapter (needs Hyperman 0.10+)';
+}
+
 isa_ok($ad, 'DBIx::Loop::Loop::Hyperman', 'adapter');
 isa_ok($ad->loop, 'Hyperman::Loop', 'underlying loop');
 

@@ -34,6 +34,7 @@ static void nda_boot_pdl(pTHX) {
         croak("Expected a Data::NDArray::Shared object"); \
     NdaHandle *h = INT2PTR(NdaHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::NDArray::Shared object"); \
+    NdaHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -48,7 +49,7 @@ static void nda_boot_pdl(pTHX) {
     if (!SvROK(sv)) \
         croak("Data::NDArray::Shared object was replaced during the call"); \
     h = INT2PTR(NdaHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::NDArray::Shared object destroyed during the call")
+    if (h != h0) croak("Data::NDArray::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -238,8 +239,20 @@ static void nda_elementwise_op_locked(NdaHandle *a, NdaHandle *b, int op) {
  * globally-consistent order keyed on each array's shared identity (array_id),
  * NOT the process-local handle pointer, so two unrelated processes mapping the
  * same pair agree on order and cannot deadlock.  a and b must be DISTINCT
- * underlying arrays (the caller has already handled the same-array case). */
+ * underlying arrays (the caller has already handled the same-array case).
+ *
+ * `b` may be a frozen/readonly (PROT_READ) handle: its reader-slot/wlock
+ * bookkeeping lives in the header region, which such a handle cannot WRITE to,
+ * so rdlock/rdunlock on it would SIGSEGV.  Once sealed, b's data can never
+ * change (every mutator on it is refused), so skipping its lock entirely is
+ * safe -- only `a` (never readonly; the caller already refused that) takes a
+ * lock.  `a` is always the caller's own (mutable) handle, so array_id ordering
+ * is only needed -- and only meaningful -- when both sides actually lock. */
 static void nda_lock_pair(NdaHandle *a, NdaHandle *b) {
+    if (b->readonly) {
+        nda_rwlock_wrlock(a);
+        return;
+    }
     if (a->hdr->array_id < b->hdr->array_id) {
         nda_rwlock_wrlock(a);
         nda_rwlock_rdlock(b);
@@ -249,6 +262,10 @@ static void nda_lock_pair(NdaHandle *a, NdaHandle *b) {
     }
 }
 static void nda_unlock_pair(NdaHandle *a, NdaHandle *b) {
+    if (b->readonly) {
+        nda_rwlock_wrunlock(a);
+        return;
+    }
     if (a->hdr->array_id < b->hdr->array_id) {
         nda_rwlock_rdunlock(b);
         nda_rwlock_wrunlock(a);
@@ -263,6 +280,8 @@ static void nda_unlock_pair(NdaHandle *a, NdaHandle *b) {
  * element-wise op, bump stat_ops, and unlock.  `op` is '+', '-' or '*'; `who`
  * is the fully-qualified method name used in croak messages. */
 static void nda_do_elementwise(pTHX_ SV *self_sv, NdaHandle *h, SV *other, int op, const char *who) {
+    NdaHandle *h0 = h; PERL_UNUSED_VAR(h0);   /* identity anchor for the REEXTRACT below */
+    if (h->readonly) croak("%s: array is frozen (read-only)", who);
     if (!sv_isobject(other) || !sv_derived_from(other, "Data::NDArray::Shared"))
         croak("%s: expected a Data::NDArray::Shared object", who);
     NdaHandle *o = INT2PTR(NdaHandle*, SvIV(SvRV(other)));
@@ -279,11 +298,16 @@ static void nda_do_elementwise(pTHX_ SV *self_sv, NdaHandle *h, SV *other, int o
               who, (UV)h->size, (UV)o->size);
     if (o == h || o->hdr->array_id == h->hdr->array_id) {
         nda_rwlock_wrlock(h);
+        if (h->hdr->sealed) { nda_rwlock_wrunlock(h); croak("%s: array is frozen (read-only)", who); }
         nda_elementwise_op_locked(h, h, op);   /* self: +=->double, -=->zero, *=->square */
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
         nda_rwlock_wrunlock(h);
     } else {
+        /* o may be a frozen/readonly (PROT_READ) other -- nda_lock_pair/
+         * nda_unlock_pair skip its lock in that case (see their comment);
+         * its data is immutable so reading it lock-free is safe. */
         nda_lock_pair(h, o);
+        if (h->hdr->sealed) { nda_unlock_pair(h, o); croak("%s: array is frozen (read-only)", who); }
         nda_elementwise_op_locked(h, o, op);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
         nda_unlock_pair(h, o);
@@ -353,7 +377,7 @@ new(class, ...)
             "Data::NDArray::Shared->new", &label, &dt, dims);   /* croaks before any alloc */
         const char *p = (SvGETMAGIC(label), SvOK(label)) ? SvPV_nolen(label) : NULL;
         NdaHandle *h = nda_create(p, dt, dims, ndim, mode, errbuf);
-        if (!h) croak("Data::NDArray::Shared->new: %s", errbuf);
+        if (!h) croak("Data::NDArray::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
         MAKE_OBJ(class, h);
     }
   OUTPUT:
@@ -372,7 +396,7 @@ new_memfd(class, ...)
             "Data::NDArray::Shared->new_memfd", &label, &dt, dims);
         const char *nm = (SvGETMAGIC(label), SvOK(label)) ? SvPV_nolen(label) : NULL;
         NdaHandle *h = nda_create_memfd(nm, dt, dims, ndim, errbuf);
-        if (!h) croak("Data::NDArray::Shared->new_memfd: %s", errbuf);
+        if (!h) croak("Data::NDArray::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
         MAKE_OBJ(class, h);
     }
   OUTPUT:
@@ -386,7 +410,27 @@ new_from_fd(class, fd)
     char errbuf[NDA_ERR_BUFLEN];
   CODE:
     NdaHandle *h = nda_open_fd(fd, errbuf);
-    if (!h) croak("Data::NDArray::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::NDArray::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_readonly(class, path)
+    const char *class
+    SV *path
+  PREINIT:
+    char errbuf[NDA_ERR_BUFLEN];
+  CODE:
+    /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
+       ever.  A sealed file is immutable and no read path writes the mapping,
+       so queries take no reader-slot / rwlock traffic and any number of
+       processes can share one PROT_READ mapping (same architecture; the
+       magic rejects a wrong-endian file). */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (!p) croak("Data::NDArray::Shared->new_readonly: path is required");
+    NdaHandle *h = nda_open_readonly(p, errbuf);
+    if (!h) croak("Data::NDArray::Shared->new_readonly: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -413,31 +457,48 @@ get(self, ...)
             croak("Data::NDArray::Shared->get: too many indices (%u)", nix);
         for (uint32_t d = 0; d < nix; d++)          /* read the args before locking */
             idx[d] = (uint64_t)SvUV(ST(1 + d));
-        /* Validate shape + compute the flat offset UNDER the read lock: a concurrent
-           reshape() mutates ndim/shape/strides under the write lock, so doing this
-           lock-free could bound-check one shape yet offset with another -> OOB. */
         REEXTRACT(self);
-        nda_rwlock_rdlock(h);
-        uint32_t ndim = h->hdr->ndim;
-        if (nix != ndim) { nda_rwlock_rdunlock(h);
-            croak("Data::NDArray::Shared->get: expected %u indices, got %u", ndim, nix); }
-        for (uint32_t d = 0; d < ndim; d++)
-            if (idx[d] >= h->hdr->shape[d]) { uint64_t sz = h->hdr->shape[d]; nda_rwlock_rdunlock(h);
-                croak("Data::NDArray::Shared->get: index %u = %" UVuf " out of range (dim size %" UVuf ")",
-                      d, (UV)idx[d], (UV)sz); }
-        uint64_t off = nda_flat_offset(h, idx, ndim);
-        /* Layer B: strides[] are read from the shared segment; a local peer with
-           write access to the backing file could corrupt them so an in-range
-           multi-index still yields a flat offset past the element count -> OOB
-           read.  Canonical row-major strides always keep off < size, so this
-           never fires for good data. */
-        if (off >= h->size) { nda_rwlock_rdunlock(h);   /* cached immutable count, not peer hdr->size */
-            croak("Data::NDArray::Shared->get: computed offset out of range"); }
-        {
-            char _raw[8]; nda_read_raw(h, off, _raw);   /* copy element under the lock */
+        char _raw[8]; uint32_t ndim;
+        if (h->readonly) {
+            /* Frozen: reshape (the only thing that can change ndim/shape/strides)
+               is refused, so they can never change -- safe to read lock-free.
+               Taking the rwlock here would WRITE into the PROT_READ-mapped header
+               (reader-slot claim) and SIGSEGV. */
+            ndim = h->hdr->ndim;
+            if (nix != ndim)
+                croak("Data::NDArray::Shared->get: expected %u indices, got %u", ndim, nix);
+            for (uint32_t d = 0; d < ndim; d++)
+                if (idx[d] >= h->hdr->shape[d])
+                    croak("Data::NDArray::Shared->get: index %u = %" UVuf " out of range (dim size %" UVuf ")",
+                          d, (UV)idx[d], (UV)h->hdr->shape[d]);
+            uint64_t off = nda_flat_offset(h, idx, ndim);
+            if (off >= h->size)   /* cached immutable count, not peer hdr->size */
+                croak("Data::NDArray::Shared->get: computed offset out of range");
+            nda_read_raw(h, off, _raw);
+        } else {
+            /* Validate shape + compute the flat offset UNDER the read lock: a concurrent
+               reshape() mutates ndim/shape/strides under the write lock, so doing this
+               lock-free could bound-check one shape yet offset with another -> OOB. */
+            nda_rwlock_rdlock(h);
+            ndim = h->hdr->ndim;
+            if (nix != ndim) { nda_rwlock_rdunlock(h);
+                croak("Data::NDArray::Shared->get: expected %u indices, got %u", ndim, nix); }
+            for (uint32_t d = 0; d < ndim; d++)
+                if (idx[d] >= h->hdr->shape[d]) { uint64_t sz = h->hdr->shape[d]; nda_rwlock_rdunlock(h);
+                    croak("Data::NDArray::Shared->get: index %u = %" UVuf " out of range (dim size %" UVuf ")",
+                          d, (UV)idx[d], (UV)sz); }
+            uint64_t off = nda_flat_offset(h, idx, ndim);
+            /* Layer B: strides[] are read from the shared segment; a local peer with
+               write access to the backing file could corrupt them so an in-range
+               multi-index still yields a flat offset past the element count -> OOB
+               read.  Canonical row-major strides always keep off < size, so this
+               never fires for good data. */
+            if (off >= h->size) { nda_rwlock_rdunlock(h);   /* cached immutable count, not peer hdr->size */
+                croak("Data::NDArray::Shared->get: computed offset out of range"); }
+            nda_read_raw(h, off, _raw);   /* copy element under the lock */
             nda_rwlock_rdunlock(h);
-            RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);   /* build SV after unlock */
         }
+        RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);   /* build SV after unlock */
     }
   OUTPUT:
     RETVAL
@@ -450,6 +511,7 @@ set(self, ...)
     uint64_t idx[NDA_MAX_DIMS];
   CODE:
     {
+        if (h->readonly) croak("Data::NDArray::Shared->set: array is frozen (read-only)");
         if (items < 2) croak("Data::NDArray::Shared->set: expected indices + value");
         uint32_t nix = (uint32_t)(items - 2);       /* self + ndim indices + value */
         if (nix > NDA_MAX_DIMS)
@@ -463,6 +525,8 @@ set(self, ...)
            shape read + offset against a concurrent reshape to prevent an OOB index). */
         REEXTRACT(self);
         nda_rwlock_wrlock(h);
+        if (h->hdr->sealed) { nda_rwlock_wrunlock(h);
+            croak("Data::NDArray::Shared->set: array is frozen (read-only)"); }
         uint32_t ndim = h->hdr->ndim;
         if (nix != ndim) { nda_rwlock_wrunlock(h);
             croak("Data::NDArray::Shared->set: expected %u indices + value, got %u args", ndim, nix); }
@@ -493,9 +557,13 @@ get_flat(self, e)
               e, (UV)h->size);
     {
         char _raw[8];
-        nda_rwlock_rdlock(h);
-        nda_read_raw(h, (uint64_t)e, _raw);
-        nda_rwlock_rdunlock(h);
+        if (h->readonly) {
+            nda_read_raw(h, (uint64_t)e, _raw);
+        } else {
+            nda_rwlock_rdlock(h);
+            nda_read_raw(h, (uint64_t)e, _raw);
+            nda_rwlock_rdunlock(h);
+        }
         RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);
     }
   OUTPUT:
@@ -509,12 +577,15 @@ set_flat(self, e, val)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::NDArray::Shared->set_flat: array is frozen (read-only)");
     if (e >= h->size)   /* cached immutable count, not peer hdr->size */
         croak("Data::NDArray::Shared->set_flat: index %" UVuf " out of range (size %" UVuf ")",
               e, (UV)h->size);
     char enc[8]; uint32_t nb = nda_encode(aTHX_ h->dtype, val, enc);  /* encode before locking */
     REEXTRACT(self);
     nda_rwlock_wrlock(h);
+    if (h->hdr->sealed) { nda_rwlock_wrunlock(h);
+        croak("Data::NDArray::Shared->set_flat: array is frozen (read-only)"); }
     nda_store_bytes(h, (uint64_t)e, enc, nb);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
@@ -526,9 +597,12 @@ fill(self, val)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::NDArray::Shared->fill: array is frozen (read-only)");
     char enc[8]; uint32_t nb = nda_encode(aTHX_ h->dtype, val, enc);  /* encode before locking */
     REEXTRACT(self);
     nda_rwlock_wrlock(h);
+    if (h->hdr->sealed) { nda_rwlock_wrunlock(h);
+        croak("Data::NDArray::Shared->fill: array is frozen (read-only)"); }
     nda_fill_bytes(h, enc, nb);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
@@ -543,7 +617,10 @@ zero(self)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::NDArray::Shared->zero: array is frozen (read-only)");
     nda_rwlock_wrlock(h);
+    if (h->hdr->sealed) { nda_rwlock_wrunlock(h);
+        croak("Data::NDArray::Shared->zero: array is frozen (read-only)"); }
     memset(nda_data(h), 0, (size_t)(h->size * h->itemsize));   /* cached immutable geometry, not peer hdr fields */
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
@@ -561,6 +638,7 @@ reshape(self, ...)
     uint64_t strides[NDA_MAX_DIMS];
   CODE:
     {
+        if (h->readonly) croak("Data::NDArray::Shared->reshape: array is frozen (read-only)");
         I32 nd = items - 1;
         if (nd < 1) croak("Data::NDArray::Shared->reshape: at least one dimension required");
         if (nd > NDA_MAX_DIMS) croak("Data::NDArray::Shared->reshape: too many dimensions (max %d)", NDA_MAX_DIMS);
@@ -580,6 +658,8 @@ reshape(self, ...)
         strides[nd - 1] = 1;
         for (int d = nd - 2; d >= 0; d--) strides[d] = strides[d + 1] * dims[d + 1];
         nda_rwlock_wrlock(h);
+        if (h->hdr->sealed) { nda_rwlock_wrunlock(h);
+            croak("Data::NDArray::Shared->reshape: array is frozen (read-only)"); }
         h->hdr->ndim = (uint32_t)nd;
         for (I32 i = 0; i < nd; i++) { h->hdr->shape[i] = dims[i]; h->hdr->strides[i] = strides[i]; }
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -596,9 +676,13 @@ sum(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    nda_rwlock_rdlock(h);
-    RETVAL = nda_sum_locked(h);
-    nda_rwlock_rdunlock(h);
+    if (h->readonly) {
+        RETVAL = nda_sum_locked(h);   /* frozen: immutable, no lock needed */
+    } else {
+        nda_rwlock_rdlock(h);
+        RETVAL = nda_sum_locked(h);
+        nda_rwlock_rdunlock(h);
+    }
   OUTPUT:
     RETVAL
 
@@ -610,9 +694,13 @@ mean(self)
   CODE:
     {
         double acc;
-        nda_rwlock_rdlock(h);
-        acc = nda_sum_locked(h);
-        nda_rwlock_rdunlock(h);
+        if (h->readonly) {
+            acc = nda_sum_locked(h);   /* frozen: immutable, no lock needed */
+        } else {
+            nda_rwlock_rdlock(h);
+            acc = nda_sum_locked(h);
+            nda_rwlock_rdunlock(h);
+        }
         RETVAL = acc / (double)h->size;   /* cached immutable count (>= 1); matches the summed span */
     }
   OUTPUT:
@@ -626,10 +714,15 @@ min(self)
   CODE:
     {
         uint64_t best; char _raw[8];
-        nda_rwlock_rdlock(h);
-        best = nda_argextreme_locked(h, 0);   /* compare in native dtype */
-        nda_read_raw(h, best, _raw);          /* copy the min element under the lock */
-        nda_rwlock_rdunlock(h);
+        if (h->readonly) {
+            best = nda_argextreme_locked(h, 0);   /* frozen: immutable, no lock needed */
+            nda_read_raw(h, best, _raw);
+        } else {
+            nda_rwlock_rdlock(h);
+            best = nda_argextreme_locked(h, 0);   /* compare in native dtype */
+            nda_read_raw(h, best, _raw);          /* copy the min element under the lock */
+            nda_rwlock_rdunlock(h);
+        }
         RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);   /* build SV after unlock */
     }
   OUTPUT:
@@ -643,10 +736,15 @@ max(self)
   CODE:
     {
         uint64_t best; char _raw[8];
-        nda_rwlock_rdlock(h);
-        best = nda_argextreme_locked(h, 1);   /* compare in native dtype */
-        nda_read_raw(h, best, _raw);          /* copy the max element under the lock */
-        nda_rwlock_rdunlock(h);
+        if (h->readonly) {
+            best = nda_argextreme_locked(h, 1);   /* frozen: immutable, no lock needed */
+            nda_read_raw(h, best, _raw);
+        } else {
+            nda_rwlock_rdlock(h);
+            best = nda_argextreme_locked(h, 1);   /* compare in native dtype */
+            nda_read_raw(h, best, _raw);          /* copy the max element under the lock */
+            nda_rwlock_rdunlock(h);
+        }
         RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);   /* build SV after unlock */
     }
   OUTPUT:
@@ -659,10 +757,13 @@ add_scalar(self, s)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::NDArray::Shared->add_scalar: array is frozen (read-only)");
     double sd=0; int64_t si=0; uint64_t su=0;
     nda_read_scalar(aTHX_ h->dtype, s, &sd, &si, &su);  /* pre-read lock-free */
     REEXTRACT(self);
     nda_rwlock_wrlock(h);
+    if (h->hdr->sealed) { nda_rwlock_wrunlock(h);
+        croak("Data::NDArray::Shared->add_scalar: array is frozen (read-only)"); }
     nda_scalar_op_locked(h, sd, si, su, '+');
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
@@ -678,10 +779,13 @@ mul_scalar(self, s)
   PREINIT:
     EXTRACT(self);
   CODE:
+    if (h->readonly) croak("Data::NDArray::Shared->mul_scalar: array is frozen (read-only)");
     double sd=0; int64_t si=0; uint64_t su=0;
     nda_read_scalar(aTHX_ h->dtype, s, &sd, &si, &su);  /* pre-read lock-free */
     REEXTRACT(self);
     nda_rwlock_wrlock(h);
+    if (h->hdr->sealed) { nda_rwlock_wrunlock(h);
+        croak("Data::NDArray::Shared->mul_scalar: array is frozen (read-only)"); }
     nda_scalar_op_locked(h, sd, si, su, '*');
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
@@ -746,9 +850,13 @@ to_list(self)
             Newx(snap, size * (STRLEN)nb, char);
             SAVEFREEPV(snap);                     /* freed on scope exit / croak */
         }
-        nda_rwlock_rdlock(h);
-        if (size) memcpy(snap, nda_data(h), (size_t)(size * nb));   /* snapshot raw bytes under the lock */
-        nda_rwlock_rdunlock(h);
+        if (h->readonly) {
+            if (size) memcpy(snap, nda_data(h), (size_t)(size * nb));   /* frozen: immutable, no lock needed */
+        } else {
+            nda_rwlock_rdlock(h);
+            if (size) memcpy(snap, nda_data(h), (size_t)(size * nb));   /* snapshot raw bytes under the lock */
+            nda_rwlock_rdunlock(h);
+        }
         for (e = 0; e < size; e++)                /* build the SVs AFTER unlocking */
             av_store(av, (SSize_t)e, nda_sv_from_raw(aTHX_ dt, snap + e * nb));
         RETVAL = newRV_noinc((SV *)av);
@@ -766,12 +874,20 @@ shape(self)
         uint64_t snap[NDA_MAX_DIMS]; uint32_t ndim, d;
         /* Snapshot ndim+shape under the read lock: reshape mutates them under
          * the write lock, so an unlocked read could tear (a new ndim with a
-         * stale shape[]).  Copy out, unlock, then build the SVs. */
-        nda_rwlock_rdlock(h);
-        ndim = h->hdr->ndim;
-        if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
-        for (d = 0; d < ndim; d++) snap[d] = (uint64_t)h->hdr->shape[d];
-        nda_rwlock_rdunlock(h);
+         * stale shape[]).  Copy out, unlock, then build the SVs.  Frozen: reshape
+         * is refused, so ndim/shape can never change -- read lock-free (the
+         * rwlock would WRITE into the PROT_READ header and SIGSEGV). */
+        if (h->readonly) {
+            ndim = h->hdr->ndim;
+            if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
+            for (d = 0; d < ndim; d++) snap[d] = (uint64_t)h->hdr->shape[d];
+        } else {
+            nda_rwlock_rdlock(h);
+            ndim = h->hdr->ndim;
+            if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
+            for (d = 0; d < ndim; d++) snap[d] = (uint64_t)h->hdr->shape[d];
+            nda_rwlock_rdunlock(h);
+        }
         EXTEND(SP, (SSize_t)ndim);
         for (d = 0; d < ndim; d++)
             PUSHs(sv_2mortal(newSVuv((UV)snap[d])));
@@ -786,12 +902,19 @@ strides(self)
     {
         uint64_t snap[NDA_MAX_DIMS]; uint32_t ndim, d;
         /* Snapshot ndim+strides under the read lock (see shape): reshape mutates
-         * them under the write lock; an unlocked read could tear. */
-        nda_rwlock_rdlock(h);
-        ndim = h->hdr->ndim;
-        if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
-        for (d = 0; d < ndim; d++) snap[d] = (uint64_t)h->hdr->strides[d];
-        nda_rwlock_rdunlock(h);
+         * them under the write lock; an unlocked read could tear.  Frozen: lock-free
+         * (see shape). */
+        if (h->readonly) {
+            ndim = h->hdr->ndim;
+            if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
+            for (d = 0; d < ndim; d++) snap[d] = (uint64_t)h->hdr->strides[d];
+        } else {
+            nda_rwlock_rdlock(h);
+            ndim = h->hdr->ndim;
+            if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
+            for (d = 0; d < ndim; d++) snap[d] = (uint64_t)h->hdr->strides[d];
+            nda_rwlock_rdunlock(h);
+        }
         EXTEND(SP, (SSize_t)ndim);
         for (d = 0; d < ndim; d++)
             PUSHs(sv_2mortal(newSVuv((UV)snap[d])));
@@ -840,9 +963,13 @@ buffer(self)
         char *base = nda_data(h);
         RETVAL = newSVpvn("", 0);
         (void)SvGROW(RETVAL, (STRLEN)(bytes + 1));   /* size the buffer BEFORE the lock */
-        nda_rwlock_rdlock(h);
-        Copy(base, SvPVX(RETVAL), bytes, char);
-        nda_rwlock_rdunlock(h);
+        if (h->readonly) {
+            Copy(base, SvPVX(RETVAL), bytes, char);   /* frozen: immutable, no lock needed */
+        } else {
+            nda_rwlock_rdlock(h);
+            Copy(base, SvPVX(RETVAL), bytes, char);
+            nda_rwlock_rdunlock(h);
+        }
         SvCUR_set(RETVAL, (STRLEN)bytes);
         *SvEND(RETVAL) = '\0';
     }
@@ -859,6 +986,7 @@ update_from_bytes(self, src)
     EXTRACT(self);
   CODE:
     {
+        if (h->readonly) croak("Data::NDArray::Shared->update_from_bytes: array is frozen (read-only)");
         STRLEN slen;
         const char *sbytes = SvPVbyte(src, slen);   /* resolve + any croak BEFORE the lock */
         REEXTRACT(self);
@@ -869,6 +997,8 @@ update_from_bytes(self, src)
                   " bytes, expected %" UVuf, (UV)slen, (UV)bytes);
         base = nda_data(h);
         nda_rwlock_wrlock(h);
+        if (h->hdr->sealed) { nda_rwlock_wrunlock(h);
+            croak("Data::NDArray::Shared->update_from_bytes: array is frozen (read-only)"); }
         Copy(sbytes, base, bytes, char);
         nda_rwlock_wrunlock(h);
     }
@@ -889,6 +1019,20 @@ _alias_pdl_create(self, datatype, dims_av)
   CODE:
 #ifdef HAVE_PDL
     {
+        /* Frozen: the mapping is PROT_READ.  PDL_READONLY (PDL's own "throw
+         * error if given as output to xform" flag) blocks ordinary in-place
+         * writes (.=, +=, ->inplace->...) with a clean croak, but NOT every PDL
+         * write path -- $piddle->set(...) pokes the buffer directly and does
+         * NOT check it, so a PDL_READONLY-flagged alias can still SIGSEGV
+         * (confirmed empirically).  There is no PDL mechanism that reliably
+         * blocks every write path, so refuse the zero-copy alias outright on a
+         * frozen handle rather than hand out a piddle with a real, if narrower,
+         * crash hazard; to_pdl gives a safe (copied) piddle instead. */
+        if (h->readonly)
+            croak("Data::NDArray::Shared->as_pdl_alias: array is frozen (read-only); "
+                  "a zero-copy alias would risk writing into the read-only mapping "
+                  "(not all PDL write paths are read-only-safe) -- use to_pdl for a "
+                  "safe copy instead");
         IV nd = av_len(dims_av) + 1, i;
         PDL_Indx dims[NDA_MAX_DIMS];
         pdl_error err;
@@ -906,6 +1050,9 @@ _alias_pdl_create(self, datatype, dims_av)
         err = PDL->setdims(p, dims, (PDL_Indx)nd);
         if (err.error) { PDL->destroy(p); croak("Data::NDArray::Shared: PDL->setdims failed"); }
         REEXTRACT(self);
+        if (h->readonly)   /* REEXTRACT re-reads h; re-check in case magic mid-call froze it */
+            croak("Data::NDArray::Shared->as_pdl_alias: array is frozen (read-only); "
+                  "use to_pdl for a safe copy instead");
         p->data = nda_data(h);                    /* alias the shared mmap */
         p->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
         PDL->add_deletedata_magic(p, nda_pdl_nofree, 0);
@@ -932,6 +1079,36 @@ dtype(self)
   OUTPUT:
     RETVAL
 
+void
+freeze(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    if (h->readonly) croak("Data::NDArray::Shared->freeze: cannot freeze a read-only handle");
+    if (nda_freeze(h) != 0) croak("Data::NDArray::Shared->freeze: msync: %s", strerror(errno));
+    h->readonly = 1;   /* this handle now rejects mutation too (the file is sealed) */
+
+UV
+frozen(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->hdr->sealed ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
+UV
+readonly(self)
+    SV *self
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    RETVAL = h->readonly ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
 SV *
 stats(self)
     SV *self
@@ -941,17 +1118,31 @@ stats(self)
     {
         uint32_t dtype, ndim, itemsize, d;
         uint64_t size, ops, shp[NDA_MAX_DIMS];
+        uint8_t sealed;
         /* Snapshot under the lock; build the HV after releasing it so an OOM
-           in newHV/newSV* can never strand the lock. */
-        nda_rwlock_rdlock(h);
-        dtype    = h->dtype;   /* cached + in-range: safe to index nda_name_tab */
-        ndim     = h->hdr->ndim;
-        if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
-        itemsize = h->hdr->itemsize;
-        size     = h->hdr->size;
-        ops      = h->hdr->stat_ops;
-        for (d = 0; d < ndim; d++) shp[d] = h->hdr->shape[d];
-        nda_rwlock_rdunlock(h);
+           in newHV/newSV* can never strand the lock.  Frozen: immutable, no
+           lock needed (the rwlock would WRITE into the PROT_READ header). */
+        if (h->readonly) {
+            dtype    = h->dtype;   /* cached + in-range: safe to index nda_name_tab */
+            ndim     = h->hdr->ndim;
+            if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
+            itemsize = h->hdr->itemsize;
+            size     = h->hdr->size;
+            ops      = h->hdr->stat_ops;
+            sealed   = h->hdr->sealed;
+            for (d = 0; d < ndim; d++) shp[d] = h->hdr->shape[d];
+        } else {
+            nda_rwlock_rdlock(h);
+            dtype    = h->dtype;   /* cached + in-range: safe to index nda_name_tab */
+            ndim     = h->hdr->ndim;
+            if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
+            itemsize = h->hdr->itemsize;
+            size     = h->hdr->size;
+            ops      = h->hdr->stat_ops;
+            sealed   = h->hdr->sealed;
+            for (d = 0; d < ndim; d++) shp[d] = h->hdr->shape[d];
+            nda_rwlock_rdunlock(h);
+        }
 
         AV *shape_av = newAV();
         /* Guard the low side: a peer-corrupted ndim==0 would wrap ndim-1 to
@@ -968,6 +1159,8 @@ stats(self)
         hv_stores(hv, "shape",     newRV_noinc((SV *)shape_av));
         hv_stores(hv, "ops",       newSVuv((UV)ops));
         hv_stores(hv, "mmap_size", newSVuv((UV)h->mmap_size));
+        hv_stores(hv, "frozen",    newSVuv(sealed ? 1 : 0));
+        hv_stores(hv, "readonly",  newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }
   OUTPUT:
@@ -999,7 +1192,7 @@ sync(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (nda_msync(h) != 0) croak("sync: %s", strerror(errno));
+    if (!h->readonly && nda_msync(h) != 0) croak("sync: %s", strerror(errno));
 
 void
 unlink(self, ...)
@@ -1007,7 +1200,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::NDArray::Shared")) {
         NdaHandle *h = INT2PTR(NdaHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::NDArray::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::NDArray::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

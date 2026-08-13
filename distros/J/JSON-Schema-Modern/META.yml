@@ -53,52 +53,52 @@ no_index:
 provides:
   JSON::Schema::Modern:
     file: lib/JSON/Schema/Modern.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Annotation:
     file: lib/JSON/Schema/Modern/Annotation.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Document:
     file: lib/JSON/Schema/Modern/Document.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Error:
     file: lib/JSON/Schema/Modern/Error.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Result:
     file: lib/JSON/Schema/Modern/Result.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::ResultNode:
     file: lib/JSON/Schema/Modern/ResultNode.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Utilities:
     file: lib/JSON/Schema/Modern/Utilities.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary:
     file: lib/JSON/Schema/Modern/Vocabulary.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary::Applicator:
     file: lib/JSON/Schema/Modern/Vocabulary/Applicator.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary::Content:
     file: lib/JSON/Schema/Modern/Vocabulary/Content.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary::Core:
     file: lib/JSON/Schema/Modern/Vocabulary/Core.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary::FormatAnnotation:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary::FormatAssertion:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary::MetaData:
     file: lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary::Unevaluated:
     file: lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
-    version: '0.642'
+    version: '0.644'
   JSON::Schema::Modern::Vocabulary::Validation:
     file: lib/JSON/Schema/Modern/Vocabulary/Validation.pm
-    version: '0.642'
+    version: '0.644'
 requires:
   Clone: '0'
   Digest::MD5: '0'
@@ -123,10 +123,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Modern/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Modern
   repository: https://github.com/karenetheridge/JSON-Schema-Modern.git
-version: '0.642'
+version: '0.644'
 x_Dist_Zilla:
   perl:
-    version: '5.044000'
+    version: '5.045001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -409,8 +409,8 @@ x_Dist_Zilla:
               name: '@Author::ETHER/Name'
               version: '4.020'
             -
-              class: Pod::Weaver::Section::Version
-              name: '@Author::ETHER/Version'
+              class: Pod::Weaver::Section::GenerateSection
+              name: '@Author::ETHER/generate VERSION'
               version: '4.020'
             -
               class: Pod::Weaver::Section::Region
@@ -643,7 +643,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20260708'
+          Module::CoreList: '5.20260720'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -679,7 +679,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
@@ -687,7 +687,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
       name: '@Author::ETHER/Git::Remote::Check'
@@ -807,7 +807,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.642
+          tag: v0.644
           tag_format: v%V
           tag_message: v%v%t%n%n%c
         Dist::Zilla::Role::Git::Repo:
@@ -954,8 +954,6 @@ x_Dist_Zilla:
           copy_to:
             - develop.requires
           modules:
-            - Time::Moment
-            - DateTime::Format::RFC3339
             - Data::Validate::Domain
             - Data::Validate::URI
             - Email::Address::XS
@@ -983,6 +981,7 @@ x_Dist_Zilla:
             - Mojo::JSON::Pointer
             - Mojo::Message::Response
             - Mojo::URL
+            - Mojo::Util
             - Moo::Role
             - Scalar::Util
             - Types::Common::Numeric
@@ -1080,7 +1079,7 @@ x_breaks:
   Mojolicious::Plugin::OpenAPI::Modern: '< 0.014'
   OpenAPI::Modern: '< 0.077'
   Test::Mojo::Role::OpenAPI::Modern: '< 0.007'
-x_generated_by_perl: v5.44.0
+x_generated_by_perl: v5.45.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

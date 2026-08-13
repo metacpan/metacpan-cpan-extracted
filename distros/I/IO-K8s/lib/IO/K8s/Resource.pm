@@ -1,6 +1,6 @@
 package IO::K8s::Resource;
 # ABSTRACT: Base class for all Kubernetes resources
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use v5.10;
 use Moo ();
 use Moo::Role ();
@@ -8,6 +8,7 @@ use Import::Into;
 use Package::Stash;
 use Types::Standard qw( ArrayRef Bool HashRef InstanceOf Int Maybe Str );
 use IO::K8s::Types qw( IntOrStr Quantity Time );
+use IO::K8s::Role::Resource ();
 use Scalar::Util qw(blessed);
 
 # Registry: class -> attr -> { type, class, is_array, is_hash, is_bool, is_int }
@@ -84,12 +85,16 @@ sub _expand_class {
     # Already fully qualified?
     return $short if $short =~ /^IO::K8s::/;
 
-    # Check for prefix match (e.g., Core::V1::Pod)
-    if ($short =~ /^([A-Z][a-z]+)::/) {
-        my $prefix = $1;
-        if (my $expansion = $_class_prefix{$prefix}) {
-            $short =~ s/^$prefix/$expansion/;
-            return $short;
+    # Prefix match against %_class_prefix: try the longest key first so that
+    # CamelCase prefixes like KubeAggregator win over a hypothetical shorter
+    # substring. Anything in the map is canonical — the lookup IS the source
+    # of truth, the regex is not. Unknown short names still fall through to
+    # the IO::K8s::Api default so this stays backwards compatible.
+    if ($short =~ /^([A-Z]\w*)::/) {
+        for my $prefix (sort { length($b) <=> length($a) } keys %_class_prefix) {
+            next unless $short =~ /^\Q$prefix\E::/;
+            $short =~ s/^\Q$prefix\E:://;
+            return $_class_prefix{$prefix} . '::' . $short;
         }
     }
 
@@ -167,6 +172,8 @@ sub _k8s {
                 $info{is_array_of_str} = 1;
             } elsif ($type_name eq 'Int') {
                 $info{is_array_of_int} = 1;
+            } elsif ($type_name eq 'Bool') {
+                $info{is_array_of_bool} = 1;
             }
             $isa = $required ? ArrayRef[$inner] : Maybe[ArrayRef[$inner]];
         } elsif ($inner eq 'Str') {
@@ -217,6 +224,10 @@ sub _k8s {
     no strict 'refs';
     push @{"${caller}::_k8s_attributes"}, $attr_name;
 
+    # The merged @ISA views in IO::K8s::Role::Resource are cached; a new
+    # registration must not leave a stale merged view behind.
+    IO::K8s::Role::Resource::_invalidate_k8s_attr_cache($caller);
+
     # Only create the attribute if it doesn't already exist (e.g., from a role)
     return if $caller->can($attr_name);
 
@@ -226,6 +237,13 @@ sub _k8s {
     # Bool attributes: coerce \0/\1 refs and JSON booleans to plain 0/1
     if ($info{is_bool}) {
         @coerce = (coerce => sub { ref $_[0] ? (${$_[0]} ? 1 : 0) : ($_[0] ? 1 : 0) });
+    }
+    # Array of bool: same \0/\1 and JSON::PP::Boolean normalization, per element
+    elsif ($info{is_array_of_bool}) {
+        @coerce = (coerce => sub {
+            return $_[0] unless ref $_[0] eq 'ARRAY';
+            return [ map { ref $_ ? ($$_ ? 1 : 0) : ($_ ? 1 : 0) } @{$_[0]} ];
+        });
     }
     # Inline struct: coerce plain hashref to inner class instance
     elsif ($info{is_inline_struct}) {
@@ -256,7 +274,7 @@ IO::K8s::Resource - Base class for all Kubernetes resources
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 
@@ -321,10 +339,6 @@ original keys.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -335,7 +349,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

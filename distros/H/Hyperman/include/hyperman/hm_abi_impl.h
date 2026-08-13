@@ -92,6 +92,21 @@ static int hm_abi_conn_detach(pTHX_ void *vl, int fd, UV id) {
     return hm_detach(aTHX_ (hm_loop *)vl, fd, id);
 }
 
+/* v3: abuse controls. Plain forwards onto the shared arena (hm_ratelimit.h);
+ * no pTHX, no SV - the arena is process-global. */
+static int  hm_abi_deny_check(const char *ip)            { return hm_rl_deny_check(ip); }
+static void hm_abi_deny_add(const char *ip, long ttl)    { hm_rl_deny_add(ip, ttl); }
+static void hm_abi_deny_remove(const char *ip)           { hm_rl_deny_remove(ip); }
+static int  hm_abi_ratelimit_hit(const void *key, STRLEN klen,
+                                 IV limit, IV window, IV *remaining, IV *reset) {
+    long rem = 0, rst = 0;
+    int ok = hm_rl_ratelimit_hit(key, (size_t)klen, (long)limit, (long)window,
+                                 &rem, &rst);
+    if (remaining) *remaining = (IV)rem;
+    if (reset)     *reset     = (IV)rst;
+    return ok;
+}
+
 static const hm_abi hm_abi_table = {
     HM_ABI_VERSION,
     hm_abi_cur_loop,
@@ -109,6 +124,10 @@ static const hm_abi hm_abi_table = {
     hm_abi_future_on_ready,
     hm_abi_run_until,
     hm_abi_conn_detach,          /* v2 */
+    hm_abi_deny_check,           /* v3 */
+    hm_abi_deny_add,
+    hm_abi_deny_remove,
+    hm_abi_ratelimit_hit,
 };
 
 /* ---- _abi_selftest: drive the whole table from C (t/22-abi.t) ----------- */
@@ -198,6 +217,32 @@ static int hm_abi_selftest(pTHX) {
         else if (A->conn_detach(aTHX_ (void *)loop, 4094, 1) != -1) ok = 0;
 
         hm_loop_free(aTHX_ loop);
+    }
+
+    /* v3 abuse controls, driven through the table. Init the arena here so the
+     * selftest exercises them even with no server running (idempotent). */
+    {
+        IV rem = 0, rst = 0;
+        hm_rl_arena_init(0, 0);
+        if (!A->deny_check || !A->deny_add || !A->deny_remove
+            || !A->ratelimit_hit)                                 ok = 0;
+        else {
+            if (A->deny_check("203.0.113.7") != 0)                ok = 0;
+            A->deny_add("203.0.113.7", 0);
+            if (A->deny_check("203.0.113.7") != 1)                ok = 0;
+            if (A->deny_check("203.0.113.8") != 0)                ok = 0;
+            A->deny_remove("203.0.113.7");
+            if (A->deny_check("203.0.113.7") != 0)                ok = 0;
+
+            /* 2 per window: two allowed, the third over */
+            if (A->ratelimit_hit("st", 2, 2, 60, &rem, &rst) != 1) ok = 0;
+            if (A->ratelimit_hit("st", 2, 2, 60, &rem, &rst) != 1) ok = 0;
+            if (A->ratelimit_hit("st", 2, 2, 60, &rem, &rst) != 0) ok = 0;
+            if (rem != 0)                                          ok = 0;
+            if (rst <= 0)                                          ok = 0;
+            /* unlimited is always allowed */
+            if (A->ratelimit_hit("st2", 3, 0, 60, &rem, &rst) != 1) ok = 0;
+        }
     }
 
     return ok;

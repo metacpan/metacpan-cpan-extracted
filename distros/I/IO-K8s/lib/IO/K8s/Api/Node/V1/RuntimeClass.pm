@@ -1,6 +1,6 @@
 package IO::K8s::Api::Node::V1::RuntimeClass;
 # ABSTRACT: RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://kubernetes.io/docs/concepts/containers/runtime-class/
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 
 
@@ -26,7 +26,7 @@ IO::K8s::Api::Node::V1::RuntimeClass - RuntimeClass defines a class of container
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ scheduling holds the scheduling constraints to ensure that pods running with thi
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#runtimeclass-v1-node.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#runtimeclass-v1-node.k8s.io>
 
 =head1 SUPPORT
 
@@ -58,10 +58,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#runtimecl
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -73,7 +69,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

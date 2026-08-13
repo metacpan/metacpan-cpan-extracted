@@ -57,7 +57,8 @@ static int jsf_annot_has_idx(pTHX_ jsf_annot *a, IV i) {
 static int jsf_json_equal(pTHX_ SV *a, SV *b) {
     unsigned ta = jsf_classify_type(aTHX_ a);
     unsigned tb = jsf_classify_type(aTHX_ b);
-    if ((ta & JSF_T_NUMBER) && (tb & JSF_T_NUMBER)) return SvNV(a) == SvNV(b);
+    if ((ta & JSF_T_NUMBER) && (tb & JSF_T_NUMBER))
+        return jsf__nv_of(aTHX_ a) == jsf__nv_of(aTHX_ b);
     if ((ta & JSF_T_STRING) && (tb & JSF_T_STRING)) {
         STRLEN la, lb; const char *sa = SvPV_const(a, la); const char *sb = SvPV_const(b, lb);
         return la == lb && memcmp(sa, sb, la) == 0;
@@ -292,8 +293,13 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
         if (!found) JSF_FAIL("enum");
     }
 
-    if (t & JSF_T_NUMBER) {
-        NV x = SvNV(data);
+    /* Gated on the keywords actually present: a number the schema only gives a
+     * `type` is never read numerically at all, which is both one branch cheaper
+     * and one fewer chance to touch the value. */
+    if ((t & JSF_T_NUMBER)
+        && (n->present & (JSF_HAS_MIN | JSF_HAS_MAX | JSF_HAS_EXMIN
+                          | JSF_HAS_EXMAX | JSF_HAS_MULOF))) {
+        NV x = jsf__nv_of(aTHX_ data);
         if ((n->present & JSF_HAS_MIN)   && x <  n->minimum) JSF_FAIL("minimum");
         if ((n->present & JSF_HAS_MAX)   && x >  n->maximum) JSF_FAIL("maximum");
         if ((n->present & JSF_HAS_EXMIN) && x <= n->exmin)   JSF_FAIL("exclusiveMinimum");

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.36;
+use v5.38;
 use Test::More;
 
 eval 'use Test::CPAN::Changes';

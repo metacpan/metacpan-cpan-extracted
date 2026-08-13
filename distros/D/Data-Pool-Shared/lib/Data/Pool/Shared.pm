@@ -1,7 +1,7 @@
 package Data::Pool::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Data::Pool::Shared', $VERSION);
@@ -18,7 +18,7 @@ sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (dou
 # Guard -- auto-free on scope exit
 
 package Data::Pool::Shared::Guard {
-    our $VERSION = '0.08';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.09';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         my $self = shift;
         # only the creating process frees the slot: after fork the child inherits
@@ -205,6 +205,10 @@ startup for crash recovery.
     my $p = Data::Pool::Shared::Str->new_memfd($name, $capacity, $max_len);
     my $p = Data::Pool::Shared::Str->new_from_fd($fd);
 
+The descriptor you pass to C<new_from_fd> is duplicated
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the pool.
+
 =head1 METHODS
 
 =head2 Allocation
@@ -376,14 +380,16 @@ approximate under concurrency.
 
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new>; the mode is applied when the file is created, and when a file left
+behind by an interrupted create is re-initialized (see L</CRASH SAFETY>); a
+file already in use keeps its own permissions. The file is opened with
+C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with
+C<O_EXCL>; the on-disk header is validated when the file is attached. Any
+process you grant write access to a shared mapping is trusted not to corrupt
+its contents while other processes are using it.
 
 =head1 PERFORMANCE
 
@@ -434,6 +440,20 @@ Measured on a single-socket x86_64 Linux system, Perl 5.40.
       batch=64                  ~110K/s  (vs ~50K individual, 2x gain)
 
 Bottleneck is Perl XS call overhead, not the CAS or futex.
+
+=head1 CRASH SAFETY
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete pool file left by
+an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

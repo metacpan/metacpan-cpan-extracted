@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::Ingress;
 # ABSTRACT: Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::Routable';
 sub _route_format { 'ingress' }
@@ -25,7 +25,7 @@ IO::K8s::Api::Networking::V1::Ingress - Ingress is a collection of rules that al
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ status is the current state of the Ingress. More info: https://git.k8s.io/commun
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#ingress-v1-networking.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#ingress-v1-networking.k8s.io>
 
 =head1 SUPPORT
 
@@ -52,10 +52,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#ingress-v
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -67,7 +63,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

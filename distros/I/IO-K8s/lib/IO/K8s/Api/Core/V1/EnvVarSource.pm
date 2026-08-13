@@ -1,12 +1,15 @@
 package IO::K8s::Api::Core::V1::EnvVarSource;
 # ABSTRACT: EnvVarSource represents a source for the value of an EnvVar.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s configMapKeyRef => 'Core::V1::ConfigMapKeySelector';
 
 
 k8s fieldRef => 'Core::V1::ObjectFieldSelector';
+
+
+k8s fileKeyRef => 'Core::V1::FileKeySelector';
 
 
 k8s resourceFieldRef => 'Core::V1::ResourceFieldSelector';
@@ -29,7 +32,7 @@ IO::K8s::Api::Core::V1::EnvVarSource - EnvVarSource represents a source for the 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 configMapKeyRef
 
@@ -38,6 +41,10 @@ Selects a key of a ConfigMap.
 =head2 fieldRef
 
 Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
+
+=head2 fileKeyRef
+
+FileKeyRef selects a key of the env file. Requires the EnvFiles feature gate to be enabled.
 
 =head2 resourceFieldRef
 
@@ -54,10 +61,6 @@ Selects a key of a secret in the pod's namespace
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -68,7 +71,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

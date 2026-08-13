@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceRequest;
 # ABSTRACT: DeviceRequest is a request for devices required for a claim. This is typically a request for a single resource like a device, but can also ask for several identical devices. With FirstAvailable it is also possible to provide a prioritized list of requests.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s exactly => 'Resource::V1::ExactDeviceRequest';
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::DeviceRequest - DeviceRequest is a request for devic
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 exactly
 
@@ -55,10 +55,6 @@ Must be a DNS label.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -69,7 +65,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

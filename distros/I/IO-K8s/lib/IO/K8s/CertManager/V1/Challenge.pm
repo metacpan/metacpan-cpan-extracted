@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::Challenge;
 # ABSTRACT: cert-manager ACME challenge
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject
     api_version     => 'acme.cert-manager.io/v1',
     resource_plural => 'challenges';
@@ -23,7 +23,7 @@ IO::K8s::CertManager::V1::Challenge - cert-manager ACME challenge
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -46,10 +46,6 @@ Challenge represents a single ACME challenge (HTTP-01 or DNS-01) that must be co
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -60,7 +56,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -1,4 +1,3 @@
-.github/workflows/ci.yml
 bench/single.pl
 Changes
 eg/basic.pl
@@ -44,8 +43,11 @@ t/17-bulk.t
 t/18-geo.t
 t/19-cubesphere.t
 t/20-query-many.t
+t/21-frozen.t
+t/22-recover.t
 t/pod_synopsis.t
 t/version_check.t
+t/23-foreign-invocant.t
 xt/asan.t
 xt/cloexec_exec.t
 xt/concurrent_open.t

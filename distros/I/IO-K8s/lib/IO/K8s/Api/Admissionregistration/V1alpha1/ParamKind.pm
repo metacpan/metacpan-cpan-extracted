@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1alpha1::ParamKind;
 # ABSTRACT: ParamKind is a tuple of Group Kind and Version.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Admissionregistration::V1alpha1::ParamKind - ParamKind is a tuple 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 apiVersion
 
@@ -40,10 +40,6 @@ Kind is the API kind the resources belong to. Required.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -54,7 +50,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

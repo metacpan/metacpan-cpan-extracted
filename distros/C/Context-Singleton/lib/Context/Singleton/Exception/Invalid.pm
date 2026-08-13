@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Exception::Invalid;
-$Context::Singleton::Exception::Invalid::VERSION = '1.0.7';
+$Context::Singleton::Exception::Invalid::VERSION = '1.0.8';
 use Exception::Class ( __PACKAGE__ );
 
 sub new {

@@ -9,7 +9,15 @@ use Data::TimingWheel::Shared;
 # take the write lock and schedule -- the futex rwlock's dead-owner recovery.
 # The anonymous MAP_SHARED mapping is inherited across fork, so parent and child
 # contend on the one wheel.
-my $h = Data::TimingWheel::Shared->new(undef, 256, 100_000);
+#
+# The pool has to outlast the kill window on ANY runner, not just a slow one:
+# only the odd ids are cancelled, so the child nets one timer every two
+# iterations and a 100_000 pool was 61% consumed in 50ms here -- a 1.7x margin
+# that a faster machine closes, and then the child dies of "timer pool is full"
+# rather than of our SIGKILL, testing nothing. Size it past the 1M net adds the
+# loop can possibly reach. Only touched pages are resident, so the larger
+# mapping costs about what the old one did.
+my $h = Data::TimingWheel::Shared->new(undef, 256, 1_100_000);
 my $pid = fork // die $!;
 if (!$pid) {
     my $s = 1;

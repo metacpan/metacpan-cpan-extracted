@@ -22,8 +22,11 @@ close $fh;
 
 # ---- the table itself --------------------------------------------------------
 
+# Unsigned: the address is whatever the loader picked, and on a 32-bit perl
+# or on illumos (shared objects up at 0xfffffd7f...) the top bit is set.
 my $ptr = Template::Stencil::_abi_ptr();
 ok($ptr, '_abi_ptr returns an address');
+ok($ptr !~ /^-/, 'handed back unsigned, whatever the sign bit says');
 is(Template::Stencil::_abi_ptr(), $ptr, 'the table is static - same address');
 
 # ---- engine_of ---------------------------------------------------------------

@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/lib";
 
 BEGIN {
     # Running from a Punk checkout that is built but not installed.
-    my $punk = "$FindBin::Bin/..";
+    my $punk = "$FindBin::Bin/../..";
     unshift @INC, "$punk/blib/lib", "$punk/blib/arch"
         if -d "$punk/blib/arch" && !$ENV{PUNK_CHAT_NO_BLIB};
 }

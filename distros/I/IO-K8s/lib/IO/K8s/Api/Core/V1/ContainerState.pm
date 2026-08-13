@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ContainerState;
 # ABSTRACT: ContainerState holds a possible state of container. Only one of its members may be specified. If none of them is specified, the default one is ContainerStateWaiting.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s running => 'Core::V1::ContainerStateRunning';
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ContainerState - ContainerState holds a possible state o
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 running
 
@@ -47,10 +47,6 @@ Details about a waiting container
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -61,7 +57,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

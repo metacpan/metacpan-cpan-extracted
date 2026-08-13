@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::DaemonEndpoint;
 # ABSTRACT: DaemonEndpoint contains information about a single Daemon endpoint.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s Port => Int, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::DaemonEndpoint - DaemonEndpoint contains information abo
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 Port
 
@@ -33,10 +33,6 @@ Port number of the given endpoint.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -47,7 +43,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

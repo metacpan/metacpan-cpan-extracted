@@ -1,5 +1,13 @@
 Revision history for Punk-Queue
 
+0.03    2026-08-12
+        - t/21-supervisor.t read the worker registry the moment the queue
+          drained and expected a supervisor plus both children in it. A
+          drained queue does not mean both children registered: one child
+          can take all 50 jobs while the other is still coming up, which
+          is what a loaded smoker sees. It now waits for the registry to
+          settle, bounded, the way the drain itself is waited for.
+
 0.02    2026-08-10
 	- pq_cron.h used perl's U64, which handy.h only typedefs under
 	  QUADKIND and which perls around 5.20/5.22 do not expose to an

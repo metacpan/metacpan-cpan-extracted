@@ -3,108 +3,285 @@ package IO::K8s;
 
 use v5.10;
 use Moo;
+use Carp qw(croak);
 use Module::Runtime qw(require_module);
 use JSON::MaybeXS;
 use Scalar::Util ();
+use IO::K8s::AutoGen;
 use namespace::clean;
 
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
 
-# Default resource map - maps short names to class paths relative to IO::K8s
+# Default resource map. Two kinds of key live here:
+#
+#   'Pod'          short name: what new_object('Pod') and any lookup
+#                  without an apiVersion resolve to. One per Kind, pointing
+#                  at the newest stable shipped version.
+#   'v1/Pod'       domain-qualified '$api_version/$Kind': what inflate()
+#                  dispatches on (it always passes the payload's apiVersion)
+#                  and what expand_class($kind, $api_version) consults first.
+#                  One per SHIPPED version of the Kind.
+#
+# Values are class paths relative to IO::K8s, or a full class name with a
+# '+' prefix.
+#
+# Both key kinds are plain literals on purpose. The qualified ones used to
+# be derived in BUILD by loading every target class to ask for its
+# api_version(), which made IO::K8s->new pull in ~110 modules and cost
+# ~0.4s even for a caller that only wanted a ConfigMap. The set is
+# statically known, so it is written out. Writing it out also keeps the
+# class-method path (IO::K8s->expand_class(...), which reads
+# %DEFAULT_RESOURCE_MAP directly and never runs BUILD) in sync with what
+# an instance sees. add() still introspects, because external providers
+# are not known at compile time.
+#
+# Adding a Kind: one short name pointing at the newest stable shipped
+# version, plus one qualified key per shipped version. Omitting the
+# qualified key means an explicit GVK request fails closed, even when a
+# bare compatibility alias exists for the Kind -- see karr #11 and #17.
+#
+# Deliberately absent: Kinds served only by CRD providers (those live in
+# the provider's own resource_map, opt in via
+# IO::K8s->new(with => [...])), and the upstream *TemplateSpec types
+# (PodTemplateSpec, JobTemplateSpec, PersistentVolumeClaimTemplate,
+# ResourceClaimTemplateSpec) -- they carry metadata but have no
+# x-kubernetes-group-version-kind and never appear as a 'kind:' on the wire.
 my %DEFAULT_RESOURCE_MAP = (
-    # Core API resources
-    Binding => 'Api::Core::V1::Binding',
-    ComponentStatus => 'Api::Core::V1::ComponentStatus',
-    ConfigMap => 'Api::Core::V1::ConfigMap',
-    Endpoints => 'Api::Core::V1::Endpoints',
-    Event => 'Api::Core::V1::Event',
-    LimitRange => 'Api::Core::V1::LimitRange',
-    Namespace => 'Api::Core::V1::Namespace',
-    Node => 'Api::Core::V1::Node',
-    PersistentVolume => 'Api::Core::V1::PersistentVolume',
-    PersistentVolumeClaim => 'Api::Core::V1::PersistentVolumeClaim',
-    Pod => 'Api::Core::V1::Pod',
-    PodTemplate => 'Api::Core::V1::PodTemplate',
-    ReplicationController => 'Api::Core::V1::ReplicationController',
-    ResourceQuota => 'Api::Core::V1::ResourceQuota',
-    Secret => 'Api::Core::V1::Secret',
-    Service => 'Api::Core::V1::Service',
-    ServiceAccount => 'Api::Core::V1::ServiceAccount',
-    # Apps
-    ControllerRevision => 'Api::Apps::V1::ControllerRevision',
-    DaemonSet => 'Api::Apps::V1::DaemonSet',
-    Deployment => 'Api::Apps::V1::Deployment',
-    ReplicaSet => 'Api::Apps::V1::ReplicaSet',
-    StatefulSet => 'Api::Apps::V1::StatefulSet',
-    # Batch
-    CronJob => 'Api::Batch::V1::CronJob',
-    Job => 'Api::Batch::V1::Job',
-    # Networking
-    Ingress => 'Api::Networking::V1::Ingress',
-    IngressClass => 'Api::Networking::V1::IngressClass',
-    NetworkPolicy => 'Api::Networking::V1::NetworkPolicy',
-    ServiceCIDR => 'Api::Networking::V1::ServiceCIDR',
-    IPAddress => 'Api::Networking::V1::IPAddress',
-    # Storage
-    CSIDriver => 'Api::Storage::V1::CSIDriver',
-    CSINode => 'Api::Storage::V1::CSINode',
-    CSIStorageCapacity => 'Api::Storage::V1::CSIStorageCapacity',
-    StorageClass => 'Api::Storage::V1::StorageClass',
-    VolumeAttachment => 'Api::Storage::V1::VolumeAttachment',
-    VolumeAttributesClass => 'Api::Storage::V1::VolumeAttributesClass',
-    # Resource (Dynamic Resource Allocation, GA in v1.34)
-    DeviceClass => 'Api::Resource::V1::DeviceClass',
-    ResourceClaim => 'Api::Resource::V1::ResourceClaim',
-    ResourceClaimTemplate => 'Api::Resource::V1::ResourceClaimTemplate',
-    ResourceSlice => 'Api::Resource::V1::ResourceSlice',
-    # Authorization
-    LocalSubjectAccessReview => 'Api::Authorization::V1::LocalSubjectAccessReview',
-    SelfSubjectAccessReview => 'Api::Authorization::V1::SelfSubjectAccessReview',
-    SelfSubjectRulesReview => 'Api::Authorization::V1::SelfSubjectRulesReview',
-    SubjectAccessReview => 'Api::Authorization::V1::SubjectAccessReview',
-    # Authentication
-    SelfSubjectReview => 'Api::Authentication::V1::SelfSubjectReview',
-    TokenRequest => 'Api::Authentication::V1::TokenRequest',
-    TokenReview => 'Api::Authentication::V1::TokenReview',
-    # RBAC
-    ClusterRole => 'Api::Rbac::V1::ClusterRole',
-    ClusterRoleBinding => 'Api::Rbac::V1::ClusterRoleBinding',
-    Role => 'Api::Rbac::V1::Role',
-    RoleBinding => 'Api::Rbac::V1::RoleBinding',
-    # Policy
-    Eviction => 'Api::Policy::V1::Eviction',
-    PodDisruptionBudget => 'Api::Policy::V1::PodDisruptionBudget',
-    # Autoscaling
-    HorizontalPodAutoscaler => 'Api::Autoscaling::V2::HorizontalPodAutoscaler',
-    Scale => 'Api::Autoscaling::V1::Scale',
-    # Certificates
-    CertificateSigningRequest => 'Api::Certificates::V1::CertificateSigningRequest',
-    # Coordination
-    Lease => 'Api::Coordination::V1::Lease',
-    # Discovery
-    EndpointSlice => 'Api::Discovery::V1::EndpointSlice',
-    # Scheduling
-    PriorityClass => 'Api::Scheduling::V1::PriorityClass',
-    # Node
-    RuntimeClass => 'Api::Node::V1::RuntimeClass',
-    # Flowcontrol
-    FlowSchema => 'Api::Flowcontrol::V1::FlowSchema',
-    PriorityLevelConfiguration => 'Api::Flowcontrol::V1::PriorityLevelConfiguration',
-    # Admissionregistration
-    MutatingWebhookConfiguration => 'Api::Admissionregistration::V1::MutatingWebhookConfiguration',
-    MutatingAdmissionPolicy => 'Api::Admissionregistration::V1::MutatingAdmissionPolicy',
-    MutatingAdmissionPolicyBinding => 'Api::Admissionregistration::V1::MutatingAdmissionPolicyBinding',
-    ValidatingAdmissionPolicy => 'Api::Admissionregistration::V1::ValidatingAdmissionPolicy',
-    ValidatingAdmissionPolicyBinding => 'Api::Admissionregistration::V1::ValidatingAdmissionPolicyBinding',
-    ValidatingWebhookConfiguration => 'Api::Admissionregistration::V1::ValidatingWebhookConfiguration',
-    # Certificates (beta)
-    PodCertificateRequest => 'Api::Certificates::V1beta1::PodCertificateRequest',
-    # Extension APIs (different base paths)
-    CustomResourceDefinition => 'ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinition',
-    APIService => 'KubeAggregator::Pkg::Apis::Apiregistration::V1::APIService',
+    # -- Core (v1) ---------------------------------------------------------
+    Binding                    => 'Api::Core::V1::Binding',
+    ComponentStatus            => 'Api::Core::V1::ComponentStatus',
+    ConfigMap                  => 'Api::Core::V1::ConfigMap',
+    Endpoints                  => 'Api::Core::V1::Endpoints',
+    Event                      => 'Api::Core::V1::Event',
+    LimitRange                 => 'Api::Core::V1::LimitRange',
+    Namespace                  => 'Api::Core::V1::Namespace',
+    Node                       => 'Api::Core::V1::Node',
+    PersistentVolume           => 'Api::Core::V1::PersistentVolume',
+    PersistentVolumeClaim      => 'Api::Core::V1::PersistentVolumeClaim',
+    Pod                        => 'Api::Core::V1::Pod',
+    PodTemplate                => 'Api::Core::V1::PodTemplate',
+    ReplicationController      => 'Api::Core::V1::ReplicationController',
+    ResourceQuota              => 'Api::Core::V1::ResourceQuota',
+    Secret                     => 'Api::Core::V1::Secret',
+    Service                    => 'Api::Core::V1::Service',
+    ServiceAccount             => 'Api::Core::V1::ServiceAccount',
+    'v1/Binding'               => 'Api::Core::V1::Binding',
+    'v1/ComponentStatus'       => 'Api::Core::V1::ComponentStatus',
+    'v1/ConfigMap'             => 'Api::Core::V1::ConfigMap',
+    'v1/Endpoints'             => 'Api::Core::V1::Endpoints',
+    'v1/Event'                 => 'Api::Core::V1::Event',
+    'v1/LimitRange'            => 'Api::Core::V1::LimitRange',
+    'v1/Namespace'             => 'Api::Core::V1::Namespace',
+    'v1/Node'                  => 'Api::Core::V1::Node',
+    'v1/PersistentVolume'      => 'Api::Core::V1::PersistentVolume',
+    'v1/PersistentVolumeClaim' => 'Api::Core::V1::PersistentVolumeClaim',
+    'v1/Pod'                   => 'Api::Core::V1::Pod',
+    'v1/PodTemplate'           => 'Api::Core::V1::PodTemplate',
+    'v1/ReplicationController' => 'Api::Core::V1::ReplicationController',
+    'v1/ResourceQuota'         => 'Api::Core::V1::ResourceQuota',
+    'v1/Secret'                => 'Api::Core::V1::Secret',
+    'v1/Service'               => 'Api::Core::V1::Service',
+    'v1/ServiceAccount'        => 'Api::Core::V1::ServiceAccount',
+    'events.k8s.io/v1/Event'   => 'Api::Events::V1::Event',
+
+    # -- Apps --------------------------------------------------------------
+    ControllerRevision           => 'Api::Apps::V1::ControllerRevision',
+    DaemonSet                    => 'Api::Apps::V1::DaemonSet',
+    Deployment                   => 'Api::Apps::V1::Deployment',
+    ReplicaSet                   => 'Api::Apps::V1::ReplicaSet',
+    StatefulSet                  => 'Api::Apps::V1::StatefulSet',
+    'apps/v1/ControllerRevision' => 'Api::Apps::V1::ControllerRevision',
+    'apps/v1/DaemonSet'          => 'Api::Apps::V1::DaemonSet',
+    'apps/v1/Deployment'         => 'Api::Apps::V1::Deployment',
+    'apps/v1/ReplicaSet'         => 'Api::Apps::V1::ReplicaSet',
+    'apps/v1/StatefulSet'        => 'Api::Apps::V1::StatefulSet',
+
+    # -- Batch -------------------------------------------------------------
+    CronJob            => 'Api::Batch::V1::CronJob',
+    Job                => 'Api::Batch::V1::Job',
+    'batch/v1/CronJob' => 'Api::Batch::V1::CronJob',
+    'batch/v1/Job'     => 'Api::Batch::V1::Job',
+
+    # -- Networking --------------------------------------------------------
+    IPAddress                               => 'Api::Networking::V1::IPAddress',
+    Ingress                                 => 'Api::Networking::V1::Ingress',
+    IngressClass                            => 'Api::Networking::V1::IngressClass',
+    NetworkPolicy                           => 'Api::Networking::V1::NetworkPolicy',
+    ServiceCIDR                             => 'Api::Networking::V1::ServiceCIDR',
+    'networking.k8s.io/v1/IPAddress'        => 'Api::Networking::V1::IPAddress',
+    'networking.k8s.io/v1/Ingress'          => 'Api::Networking::V1::Ingress',
+    'networking.k8s.io/v1/IngressClass'     => 'Api::Networking::V1::IngressClass',
+    'networking.k8s.io/v1/NetworkPolicy'    => 'Api::Networking::V1::NetworkPolicy',
+    'networking.k8s.io/v1/ServiceCIDR'      => 'Api::Networking::V1::ServiceCIDR',
+    'networking.k8s.io/v1beta1/IPAddress'   => 'Api::Networking::V1beta1::IPAddress',
+    'networking.k8s.io/v1beta1/ServiceCIDR' => 'Api::Networking::V1beta1::ServiceCIDR',
+
+    # -- Storage -----------------------------------------------------------
+    CSIDriver                                       => 'Api::Storage::V1::CSIDriver',
+    CSINode                                         => 'Api::Storage::V1::CSINode',
+    CSIStorageCapacity                              => 'Api::Storage::V1::CSIStorageCapacity',
+    StorageClass                                    => 'Api::Storage::V1::StorageClass',
+    VolumeAttachment                                => 'Api::Storage::V1::VolumeAttachment',
+    VolumeAttributesClass                           => 'Api::Storage::V1::VolumeAttributesClass',
+    'storage.k8s.io/v1/CSIDriver'                   => 'Api::Storage::V1::CSIDriver',
+    'storage.k8s.io/v1/CSINode'                     => 'Api::Storage::V1::CSINode',
+    'storage.k8s.io/v1/CSIStorageCapacity'          => 'Api::Storage::V1::CSIStorageCapacity',
+    'storage.k8s.io/v1/StorageClass'                => 'Api::Storage::V1::StorageClass',
+    'storage.k8s.io/v1/VolumeAttachment'            => 'Api::Storage::V1::VolumeAttachment',
+    'storage.k8s.io/v1/VolumeAttributesClass'       => 'Api::Storage::V1::VolumeAttributesClass',
+    'storage.k8s.io/v1alpha1/VolumeAttributesClass' => 'Api::Storage::V1alpha1::VolumeAttributesClass',
+    'storage.k8s.io/v1beta1/VolumeAttributesClass'  => 'Api::Storage::V1beta1::VolumeAttributesClass',
+
+    # -- Resource (Dynamic Resource Allocation) ----------------------------
+    DeviceClass                                          => 'Api::Resource::V1::DeviceClass',
+    DeviceTaintRule                                      => 'Api::Resource::V1beta2::DeviceTaintRule',
+    ResourceClaim                                        => 'Api::Resource::V1::ResourceClaim',
+    ResourceClaimTemplate                                => 'Api::Resource::V1::ResourceClaimTemplate',
+    ResourcePoolStatusRequest                            => 'Api::Resource::V1alpha3::ResourcePoolStatusRequest',
+    ResourceSlice                                        => 'Api::Resource::V1::ResourceSlice',
+    'resource.k8s.io/v1/DeviceClass'                     => 'Api::Resource::V1::DeviceClass',
+    'resource.k8s.io/v1/ResourceClaim'                   => 'Api::Resource::V1::ResourceClaim',
+    'resource.k8s.io/v1/ResourceClaimTemplate'           => 'Api::Resource::V1::ResourceClaimTemplate',
+    'resource.k8s.io/v1/ResourceSlice'                   => 'Api::Resource::V1::ResourceSlice',
+    'resource.k8s.io/v1alpha3/DeviceClass'               => 'Api::Resource::V1alpha3::DeviceClass',
+    'resource.k8s.io/v1alpha3/DeviceTaintRule'           => 'Api::Resource::V1alpha3::DeviceTaintRule',
+    'resource.k8s.io/v1alpha3/ResourceClaim'             => 'Api::Resource::V1alpha3::ResourceClaim',
+    'resource.k8s.io/v1alpha3/ResourceClaimTemplate'     => 'Api::Resource::V1alpha3::ResourceClaimTemplate',
+    'resource.k8s.io/v1alpha3/ResourcePoolStatusRequest' => 'Api::Resource::V1alpha3::ResourcePoolStatusRequest',
+    'resource.k8s.io/v1alpha3/ResourceSlice'             => 'Api::Resource::V1alpha3::ResourceSlice',
+    'resource.k8s.io/v1beta1/DeviceClass'                => 'Api::Resource::V1beta1::DeviceClass',
+    'resource.k8s.io/v1beta1/ResourceClaim'              => 'Api::Resource::V1beta1::ResourceClaim',
+    'resource.k8s.io/v1beta1/ResourceClaimTemplate'      => 'Api::Resource::V1beta1::ResourceClaimTemplate',
+    'resource.k8s.io/v1beta1/ResourceSlice'              => 'Api::Resource::V1beta1::ResourceSlice',
+    'resource.k8s.io/v1beta2/DeviceClass'                => 'Api::Resource::V1beta2::DeviceClass',
+    'resource.k8s.io/v1beta2/DeviceTaintRule'            => 'Api::Resource::V1beta2::DeviceTaintRule',
+    'resource.k8s.io/v1beta2/ResourceClaim'              => 'Api::Resource::V1beta2::ResourceClaim',
+    'resource.k8s.io/v1beta2/ResourceClaimTemplate'      => 'Api::Resource::V1beta2::ResourceClaimTemplate',
+    'resource.k8s.io/v1beta2/ResourceSlice'              => 'Api::Resource::V1beta2::ResourceSlice',
+
+    # -- Authorization -----------------------------------------------------
+    LocalSubjectAccessReview                           => 'Api::Authorization::V1::LocalSubjectAccessReview',
+    SelfSubjectAccessReview                            => 'Api::Authorization::V1::SelfSubjectAccessReview',
+    SelfSubjectRulesReview                             => 'Api::Authorization::V1::SelfSubjectRulesReview',
+    SubjectAccessReview                                => 'Api::Authorization::V1::SubjectAccessReview',
+    'authorization.k8s.io/v1/LocalSubjectAccessReview' => 'Api::Authorization::V1::LocalSubjectAccessReview',
+    'authorization.k8s.io/v1/SelfSubjectAccessReview'  => 'Api::Authorization::V1::SelfSubjectAccessReview',
+    'authorization.k8s.io/v1/SelfSubjectRulesReview'   => 'Api::Authorization::V1::SelfSubjectRulesReview',
+    'authorization.k8s.io/v1/SubjectAccessReview'      => 'Api::Authorization::V1::SubjectAccessReview',
+
+    # -- Authentication ----------------------------------------------------
+    SelfSubjectReview                                  => 'Api::Authentication::V1::SelfSubjectReview',
+    TokenRequest                                       => 'Api::Authentication::V1::TokenRequest',
+    TokenReview                                        => 'Api::Authentication::V1::TokenReview',
+    'authentication.k8s.io/v1/SelfSubjectReview'       => 'Api::Authentication::V1::SelfSubjectReview',
+    'authentication.k8s.io/v1/TokenRequest'            => 'Api::Authentication::V1::TokenRequest',
+    'authentication.k8s.io/v1/TokenReview'             => 'Api::Authentication::V1::TokenReview',
+    'authentication.k8s.io/v1alpha1/SelfSubjectReview' => 'Api::Authentication::V1alpha1::SelfSubjectReview',
+    'authentication.k8s.io/v1beta1/SelfSubjectReview'  => 'Api::Authentication::V1beta1::SelfSubjectReview',
+
+    # -- RBAC --------------------------------------------------------------
+    ClusterRole                                       => 'Api::Rbac::V1::ClusterRole',
+    ClusterRoleBinding                                => 'Api::Rbac::V1::ClusterRoleBinding',
+    Role                                              => 'Api::Rbac::V1::Role',
+    RoleBinding                                       => 'Api::Rbac::V1::RoleBinding',
+    'rbac.authorization.k8s.io/v1/ClusterRole'        => 'Api::Rbac::V1::ClusterRole',
+    'rbac.authorization.k8s.io/v1/ClusterRoleBinding' => 'Api::Rbac::V1::ClusterRoleBinding',
+    'rbac.authorization.k8s.io/v1/Role'               => 'Api::Rbac::V1::Role',
+    'rbac.authorization.k8s.io/v1/RoleBinding'        => 'Api::Rbac::V1::RoleBinding',
+
+    # -- Policy ------------------------------------------------------------
+    Eviction                        => 'Api::Policy::V1::Eviction',
+    PodDisruptionBudget             => 'Api::Policy::V1::PodDisruptionBudget',
+    'policy/v1/Eviction'            => 'Api::Policy::V1::Eviction',
+    'policy/v1/PodDisruptionBudget' => 'Api::Policy::V1::PodDisruptionBudget',
+
+    # -- Autoscaling -------------------------------------------------------
+    HorizontalPodAutoscaler                  => 'Api::Autoscaling::V2::HorizontalPodAutoscaler',
+    Scale                                    => 'Api::Autoscaling::V1::Scale',
+    'autoscaling/v1/HorizontalPodAutoscaler' => 'Api::Autoscaling::V1::HorizontalPodAutoscaler',
+    'autoscaling/v1/Scale'                   => 'Api::Autoscaling::V1::Scale',
+    'autoscaling/v2/HorizontalPodAutoscaler' => 'Api::Autoscaling::V2::HorizontalPodAutoscaler',
+
+    # -- Certificates ------------------------------------------------------
+    CertificateSigningRequest                           => 'Api::Certificates::V1::CertificateSigningRequest',
+    ClusterTrustBundle                                  => 'Api::Certificates::V1beta1::ClusterTrustBundle',
+    PodCertificateRequest                               => 'Api::Certificates::V1beta1::PodCertificateRequest',
+    'certificates.k8s.io/v1/CertificateSigningRequest'  => 'Api::Certificates::V1::CertificateSigningRequest',
+    'certificates.k8s.io/v1alpha1/ClusterTrustBundle'   => 'Api::Certificates::V1alpha1::ClusterTrustBundle',
+    'certificates.k8s.io/v1beta1/ClusterTrustBundle'    => 'Api::Certificates::V1beta1::ClusterTrustBundle',
+    'certificates.k8s.io/v1beta1/PodCertificateRequest' => 'Api::Certificates::V1beta1::PodCertificateRequest',
+
+    # -- Coordination ------------------------------------------------------
+    Lease                                         => 'Api::Coordination::V1::Lease',
+    LeaseCandidate                                => 'Api::Coordination::V1beta1::LeaseCandidate',
+    'coordination.k8s.io/v1/Lease'                => 'Api::Coordination::V1::Lease',
+    'coordination.k8s.io/v1alpha1/LeaseCandidate' => 'Api::Coordination::V1alpha1::LeaseCandidate',
+    'coordination.k8s.io/v1alpha2/LeaseCandidate' => 'Api::Coordination::V1alpha2::LeaseCandidate',
+    'coordination.k8s.io/v1beta1/LeaseCandidate'  => 'Api::Coordination::V1beta1::LeaseCandidate',
+
+    # -- Discovery ---------------------------------------------------------
+    EndpointSlice                       => 'Api::Discovery::V1::EndpointSlice',
+    'discovery.k8s.io/v1/EndpointSlice' => 'Api::Discovery::V1::EndpointSlice',
+
+    # -- Scheduling --------------------------------------------------------
+    PodGroup                              => 'Api::Scheduling::V1alpha2::PodGroup',
+    PriorityClass                         => 'Api::Scheduling::V1::PriorityClass',
+    Workload                              => 'Api::Scheduling::V1alpha2::Workload',
+    'scheduling.k8s.io/v1/PriorityClass'  => 'Api::Scheduling::V1::PriorityClass',
+    'scheduling.k8s.io/v1alpha2/PodGroup' => 'Api::Scheduling::V1alpha2::PodGroup',
+    'scheduling.k8s.io/v1alpha2/Workload' => 'Api::Scheduling::V1alpha2::Workload',
+
+    # -- Node --------------------------------------------------------------
+    RuntimeClass                  => 'Api::Node::V1::RuntimeClass',
+    'node.k8s.io/v1/RuntimeClass' => 'Api::Node::V1::RuntimeClass',
+
+    # -- Flowcontrol -------------------------------------------------------
+    FlowSchema                                                        => 'Api::Flowcontrol::V1::FlowSchema',
+    PriorityLevelConfiguration                                        => 'Api::Flowcontrol::V1::PriorityLevelConfiguration',
+    'flowcontrol.apiserver.k8s.io/v1/FlowSchema'                      => 'Api::Flowcontrol::V1::FlowSchema',
+    'flowcontrol.apiserver.k8s.io/v1/PriorityLevelConfiguration'      => 'Api::Flowcontrol::V1::PriorityLevelConfiguration',
+    'flowcontrol.apiserver.k8s.io/v1beta3/FlowSchema'                 => 'Api::Flowcontrol::V1beta3::FlowSchema',
+    'flowcontrol.apiserver.k8s.io/v1beta3/PriorityLevelConfiguration' => 'Api::Flowcontrol::V1beta3::PriorityLevelConfiguration',
+
+    # -- Admissionregistration ---------------------------------------------
+    MutatingAdmissionPolicy                                                  => 'Api::Admissionregistration::V1::MutatingAdmissionPolicy',
+    MutatingAdmissionPolicyBinding                                           => 'Api::Admissionregistration::V1::MutatingAdmissionPolicyBinding',
+    MutatingWebhookConfiguration                                             => 'Api::Admissionregistration::V1::MutatingWebhookConfiguration',
+    ValidatingAdmissionPolicy                                                => 'Api::Admissionregistration::V1::ValidatingAdmissionPolicy',
+    ValidatingAdmissionPolicyBinding                                         => 'Api::Admissionregistration::V1::ValidatingAdmissionPolicyBinding',
+    ValidatingWebhookConfiguration                                           => 'Api::Admissionregistration::V1::ValidatingWebhookConfiguration',
+    'admissionregistration.k8s.io/v1/MutatingAdmissionPolicy'                => 'Api::Admissionregistration::V1::MutatingAdmissionPolicy',
+    'admissionregistration.k8s.io/v1/MutatingAdmissionPolicyBinding'         => 'Api::Admissionregistration::V1::MutatingAdmissionPolicyBinding',
+    'admissionregistration.k8s.io/v1/MutatingWebhookConfiguration'           => 'Api::Admissionregistration::V1::MutatingWebhookConfiguration',
+    'admissionregistration.k8s.io/v1/ValidatingAdmissionPolicy'              => 'Api::Admissionregistration::V1::ValidatingAdmissionPolicy',
+    'admissionregistration.k8s.io/v1/ValidatingAdmissionPolicyBinding'       => 'Api::Admissionregistration::V1::ValidatingAdmissionPolicyBinding',
+    'admissionregistration.k8s.io/v1/ValidatingWebhookConfiguration'         => 'Api::Admissionregistration::V1::ValidatingWebhookConfiguration',
+    'admissionregistration.k8s.io/v1alpha1/MutatingAdmissionPolicy'          => 'Api::Admissionregistration::V1alpha1::MutatingAdmissionPolicy',
+    'admissionregistration.k8s.io/v1alpha1/MutatingAdmissionPolicyBinding'   => 'Api::Admissionregistration::V1alpha1::MutatingAdmissionPolicyBinding',
+    'admissionregistration.k8s.io/v1alpha1/ValidatingAdmissionPolicy'        => 'Api::Admissionregistration::V1alpha1::ValidatingAdmissionPolicy',
+    'admissionregistration.k8s.io/v1alpha1/ValidatingAdmissionPolicyBinding' => 'Api::Admissionregistration::V1alpha1::ValidatingAdmissionPolicyBinding',
+    'admissionregistration.k8s.io/v1beta1/MutatingAdmissionPolicy'           => 'Api::Admissionregistration::V1beta1::MutatingAdmissionPolicy',
+    'admissionregistration.k8s.io/v1beta1/MutatingAdmissionPolicyBinding'    => 'Api::Admissionregistration::V1beta1::MutatingAdmissionPolicyBinding',
+    'admissionregistration.k8s.io/v1beta1/ValidatingAdmissionPolicy'         => 'Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicy',
+    'admissionregistration.k8s.io/v1beta1/ValidatingAdmissionPolicyBinding'  => 'Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicyBinding',
+
+    # -- Storage version migration -----------------------------------------
+    StorageVersionMigration                                    => 'Api::Storagemigration::V1beta1::StorageVersionMigration',
+    'storagemigration.k8s.io/v1alpha1/StorageVersionMigration' => 'Api::Storagemigration::V1alpha1::StorageVersionMigration',
+    'storagemigration.k8s.io/v1beta1/StorageVersionMigration'  => 'Api::Storagemigration::V1beta1::StorageVersionMigration',
+
+    # -- Internal apiserver ------------------------------------------------
+    StorageVersion                                      => 'Api::Apiserverinternal::V1alpha1::StorageVersion',
+    'internal.apiserver.k8s.io/v1alpha1/StorageVersion' => 'Api::Apiserverinternal::V1alpha1::StorageVersion',
+
+    # -- Extension APIs (different base paths) -----------------------------
+    APIService                                         => 'KubeAggregator::Pkg::Apis::Apiregistration::V1::APIService',
+    CustomResourceDefinition                           => 'ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinition',
+    'apiextensions.k8s.io/v1/CustomResourceDefinition' => 'ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinition',
+    'apiregistration.k8s.io/v1/APIService'             => 'KubeAggregator::Pkg::Apis::Apiregistration::V1::APIService',
 );
 
 has json => (is => 'ro', default => sub {
@@ -156,7 +333,32 @@ sub default_resource_map { \%DEFAULT_RESOURCE_MAP }
 
 sub BUILD {
     my ($self) = @_;
+
+    # The built-in map already carries its domain-qualified keys as
+    # literals (see %DEFAULT_RESOURCE_MAP above), so there is nothing to
+    # derive here. Only external providers need introspecting, and add()
+    # does that itself.
     $self->add(@{$self->with}) if @{$self->with};
+}
+
+# Add a '$api_version/$kind' qualified entry to $map if the target class
+# can be loaded and reports an api_version. No-op if the qualified key
+# already exists. Only used by add(): the built-in map spells its
+# qualified keys out as literals, but an external provider's classes are
+# not known until it is merged, so those have to be introspected.
+sub _qualify_class_path {
+    my ($map, $kind, $class_path) = @_;
+
+    my $full_class = $class_path =~ /^\+/
+        ? substr($class_path, 1) : "IO::K8s::$class_path";
+
+    return unless _class_exists($full_class) && $full_class->can('api_version');
+    my $api_version = $full_class->api_version;
+    return unless $api_version;
+
+    my $qkey = "$api_version/$kind";
+    return if exists $map->{$qkey};
+    $map->{$qkey} = $class_path;
 }
 
 # Merge external resource maps into this instance
@@ -179,39 +381,16 @@ sub add {
         for my $kind (keys %$ext_map) {
             my $class_path = $ext_map->{$kind};
 
-            # Resolve full class name for api_version lookup
-            my $full_class = $class_path =~ /^\+/
-                ? substr($class_path, 1) : "IO::K8s::$class_path";
-
-            # Try to load the class and get its api_version
-            my $api_version;
-            if (_class_exists($full_class) && $full_class->can('api_version')) {
-                $api_version = $full_class->api_version;
-            }
-
             if (exists $map->{$kind}) {
                 # COLLISION: short name already taken
                 # Ensure the original entry also has a domain-qualified key
-                my $orig_path = $map->{$kind};
-                my $orig_class = $orig_path =~ /^\+/
-                    ? substr($orig_path, 1) : "IO::K8s::$orig_path";
-                if (_class_exists($orig_class) && $orig_class->can('api_version')) {
-                    my $orig_av = $orig_class->api_version;
-                    if ($orig_av && !exists $map->{"$orig_av/$kind"}) {
-                        $map->{"$orig_av/$kind"} = $orig_path;
-                    }
-                }
+                _qualify_class_path($map, $kind, $map->{$kind});
                 # New entry: domain-qualified only (no short name)
-                if ($api_version) {
-                    $map->{"$api_version/$kind"} = $class_path;
-                }
+                _qualify_class_path($map, $kind, $class_path);
             } else {
-                # No collision: register short name
+                # No collision: register short name + domain-qualified
                 $map->{$kind} = $class_path;
-                # Also register domain-qualified
-                if ($api_version) {
-                    $map->{"$api_version/$kind"} = $class_path;
-                }
+                _qualify_class_path($map, $kind, $class_path);
             }
         }
     }
@@ -230,10 +409,31 @@ sub add {
 #   2. IO::K8s built-in (resource_map or relative path)
 #   3. Auto-generate from openapi_spec (if available)
 sub expand_class {
+    my $api_version_supplied = @_ >= 3;
     my ($self, $class, $api_version) = @_;
 
     # +FullClassName - strip + and use as-is
     return substr($class, 1) if $class =~ /^\+/;
+
+    my $map = ref($self) ? $self->resource_map : \%DEFAULT_RESOURCE_MAP;
+
+    # An explicitly supplied apiVersion is an exact GVK request, including
+    # undef or an empty string. It must never fall through to a bare Kind or
+    # class-name fallback. AutoGen joins in only for an exact group/version
+    # match in the openapi_spec's x-kubernetes-group-version-kind metadata
+    # and fails closed otherwise (no silent fallback to another version).
+    if ($api_version_supplied) {
+        return undef unless defined $api_version;
+        my $qualified = "$api_version/$class";
+        if (exists $map->{$qualified}) {
+            return $self->_resolve_mapped($map->{$qualified}, $class);
+        }
+        if (ref($self) && $self->has_openapi_spec) {
+            my $autogen = $self->_autogen_class_for($class, $api_version);
+            return $autogen if $autogen;
+        }
+        return undef;
+    }
 
     # Already a full IO::K8s class name - return as-is
     return $class if $class =~ /^IO::K8s::/;
@@ -241,51 +441,17 @@ sub expand_class {
     # Already a loaded class (e.g. CRD class passed by ref) - return as-is
     return $class if _class_exists($class);
 
-    my $map = ref($self) ? $self->resource_map : \%DEFAULT_RESOURCE_MAP;
-
     # Domain-qualified string: 'cilium.io/v2/NetworkPolicy'
     if ($class =~ m{/}) {
-        if (my $mapped = $map->{$class}) {
-            return $mapped =~ /^\+/ ? substr($mapped, 1) : "IO::K8s::$mapped";
+        if (exists $map->{$class}) {
+            return $self->_resolve_mapped($map->{$class}, (split m{/}, $class)[-1]);
         }
         return undef;
     }
 
-    # Short name + api_version disambiguation: 'NetworkPolicy' + 'cilium.io/v2'
-    if ($api_version) {
-        my $qualified = "$api_version/$class";
-        if (my $mapped = $map->{$qualified}) {
-            return $mapped =~ /^\+/ ? substr($mapped, 1) : "IO::K8s::$mapped";
-        }
-    }
-
     # Short name like "Pod" - look up in resource_map
     if (my $mapped = $map->{$class}) {
-        # Mapped value with + prefix = full class name
-        return substr($mapped, 1) if $mapped =~ /^\+/;
-
-        my $rel_path = $mapped;
-
-        # 1. Check user's class_namespaces first
-        if (ref($self)) {
-            for my $ns (@{$self->class_namespaces}) {
-                my $user_class = "${ns}::${rel_path}";
-                return $user_class if _class_exists($user_class);
-            }
-        }
-
-        # 2. Check IO::K8s built-in
-        my $builtin_class = 'IO::K8s::' . $rel_path;
-        return $builtin_class if _class_exists($builtin_class);
-
-        # 3. Try auto-generation if we have openapi_spec
-        if (ref($self) && $self->has_openapi_spec) {
-            my $autogen = $self->_autogen_class_for($class);
-            return $autogen if $autogen;
-        }
-
-        # Fall back to IO::K8s:: path (might not exist, but let load_class handle error)
-        return $builtin_class;
+        return $self->_resolve_mapped($mapped, $class);
     }
 
     # Not in resource_map - might be a CRD or relative path
@@ -311,6 +477,48 @@ sub expand_class {
     return $builtin_class;
 }
 
+# Turn a resource_map VALUE into an actual class name.
+#
+# Shared by all three lookup branches of expand_class() so that a hit on a
+# domain-qualified key ('$api_version/$Kind') resolves exactly like a hit on
+# the bare short name. It did not use to: the qualified branches built
+# "IO::K8s::$mapped" directly and skipped the class_namespaces search, so a
+# consumer with class_namespaces => ['My::K8s'] got their own subclass from
+# expand_class('Pod') but the IO::K8s class from expand_class('Pod', 'v1') --
+# and inflate() always passes the apiVersion. That branch was effectively
+# dead while the built-in map had no qualified keys; adding them made it the
+# normal path.
+#
+# $kind is only used for the openapi_spec autogen fallback.
+sub _resolve_mapped {
+    my ($self, $mapped, $kind) = @_;
+
+    # Mapped value with + prefix = full class name, used as-is (no
+    # class_namespaces lookup - the provider named an exact class).
+    return substr($mapped, 1) if $mapped =~ /^\+/;
+
+    # 1. Check user's class_namespaces first
+    if (ref($self)) {
+        for my $ns (@{$self->class_namespaces}) {
+            my $user_class = "${ns}::${mapped}";
+            return $user_class if _class_exists($user_class);
+        }
+    }
+
+    # 2. Check IO::K8s built-in
+    my $builtin_class = 'IO::K8s::' . $mapped;
+    return $builtin_class if _class_exists($builtin_class);
+
+    # 3. Try auto-generation if we have openapi_spec
+    if (ref($self) && $self->has_openapi_spec) {
+        my $autogen = $self->_autogen_class_for($kind);
+        return $autogen if $autogen;
+    }
+
+    # Fall back to IO::K8s:: path (might not exist, but let load_class handle error)
+    return $builtin_class;
+}
+
 # Check if a class exists (is loaded or can be loaded)
 sub _class_exists {
     my ($class) = @_;
@@ -322,8 +530,17 @@ sub _class_exists {
 }
 
 # Auto-generate a class from OpenAPI spec for unknown type
+#
+# $api_version is optional. When given, this is an exact GVK request: the
+# definition must carry a matching x-kubernetes-group-version-kind entry
+# (handled by _find_definition_for_kind) and the generated class gets that
+# apiVersion. When omitted, the versionless compatibility fallback picks a
+# deterministic default definition and version.
+#
+# The cache key is GVK-specific so the same definition requested under two
+# apiVersions (a definition with several GVK entries) yields two classes.
 sub _autogen_class_for {
-    my ($self, $kind) = @_;
+    my ($self, $kind, $api_version) = @_;
 
     return unless $self->has_openapi_spec;
 
@@ -331,48 +548,89 @@ sub _autogen_class_for {
     my $defs = $spec->{definitions} // {};
 
     # Find the definition for this kind
-    my $def_name = $self->_find_definition_for_kind($kind, $defs);
+    my $def_name = $self->_find_definition_for_kind($kind, $api_version, $defs);
     return unless $def_name;
 
-    # Check cache first
+    # Cache key is GVK-specific
     my $cache_key = $self->_autogen_namespace . '::' . $def_name;
+    $cache_key .= "::$api_version" if defined $api_version;
     return $_autogen_cache{$cache_key} if $_autogen_cache{$cache_key};
 
     # Generate the class
-    require IO::K8s::AutoGen;
+    my %autogen_opts;
+    $autogen_opts{api_version} = $api_version if defined $api_version;
     my $class = IO::K8s::AutoGen::get_or_generate(
         $def_name,
         $defs->{$def_name},
         $defs,
         $self->_autogen_namespace,
+        %autogen_opts,
     );
 
     $_autogen_cache{$cache_key} = $class;
     return $class;
 }
 
-# Find OpenAPI definition name for a given kind
+# Find OpenAPI definition name for a given kind.
+#
+# With an $api_version this is an EXACT GVK request: only definitions whose
+# x-kubernetes-group-version-kind metadata carries that exact group/version
+# count as candidates (a def_name suffix match cannot verify the version and
+# is ignored). Exactly one candidate is returned; several are an ambiguity
+# error (the defs are listed sorted, so the error is deterministic); none is
+# undef (fail closed).
+#
+# Without an $api_version this is the deterministic versionless
+# compatibility fallback: every def that matches the kind -- by GVK metadata
+# or by def_name suffix -- is a candidate, and the lexicographically first
+# def_name wins. Hash iteration order never influences the pick.
 sub _find_definition_for_kind {
-    my ($self, $kind, $defs) = @_;
+    my ($self, $kind, $api_version, $defs) = @_;
 
-    # Direct match by kind name at end of definition
+    my %candidates;
     for my $def_name (keys %$defs) {
         my $def = $defs->{$def_name};
-        # Check x-kubernetes-group-version-kind
-        if (my $gvk_list = $def->{'x-kubernetes-group-version-kind'}) {
+        my $gvk_list = $def->{'x-kubernetes-group-version-kind'};
+
+        if ($gvk_list) {
             for my $gvk (@$gvk_list) {
-                if ($gvk->{kind} eq $kind) {
-                    return $def_name;
+                next unless $gvk->{kind} eq $kind;
+                if (defined $api_version) {
+                    my $av = _gvk_api_version($gvk);
+                    $candidates{$def_name} = 1 if $av eq $api_version;
+                } else {
+                    $candidates{$def_name} = 1;
                 }
             }
         }
-        # Also check if definition name ends with the kind
-        if ($def_name =~ /\.\Q$kind\E$/) {
-            return $def_name;
+
+        # Versionless only: a def_name ending in the kind is a candidate too
+        if (!defined $api_version && $def_name =~ /\.\Q$kind\E$/) {
+            $candidates{$def_name} = 1;
         }
     }
 
-    return undef;
+    my @candidates = sort keys %candidates;
+
+    if (defined $api_version) {
+        if (@candidates > 1) {
+            croak "GVK ambiguity for kind '$kind', apiVersion '$api_version': "
+                . 'multiple definitions match ('
+                . join(', ', @candidates) . ')';
+        }
+        return $candidates[0];
+    }
+
+    return $candidates[0];
+}
+
+# Wire apiVersion a GVK entry represents: group/version, or bare version
+# when the group is empty (core group).
+sub _gvk_api_version {
+    my ($entry) = @_;
+    my $group = $entry->{group} // '';
+    my $version = $entry->{version} // '';
+    return $group ? "$group/$version" : $version;
 }
 
 sub load_class {
@@ -409,6 +667,12 @@ sub struct_to_object {
     return $params if Scalar::Util::blessed($params) && $params->isa($class);
 
     $self->load_class($class);
+
+    # Self-inflating classes (union types like the apiextensions JSONSchemaProps*
+    # alternatives) take over completely: they serialize as a bare value, not as
+    # a hashref of attributes, so the generic path below would lose the data.
+    return $class->FROM_STRUCT($params, $self) if $class->can('FROM_STRUCT');
+
     my $inflated = $self->_inflate_struct($class, $params);
     return $class->new(%$inflated);
 }
@@ -421,9 +685,14 @@ sub inflate {
 
     my $kind = $struct->{kind}
         or die "Cannot inflate: missing 'kind' field in data";
+    my $api_version_supplied = exists $struct->{apiVersion};
     my $api_version = $struct->{apiVersion};
 
-    my $class = $self->expand_class($kind, $api_version);
+    my $class = $api_version_supplied
+        ? $self->expand_class($kind, $api_version)
+        : $self->expand_class($kind);
+    _die_resolution_error($kind, $api_version)
+        if $api_version_supplied && !defined $class;
     $self->load_class($class);
     my $inflated = $self->_inflate_struct($class, $struct);
     return $class->new(%$inflated);
@@ -437,16 +706,33 @@ sub new_object {
     #   ->new_object('Pod', foo => 'bar')
     #   ->new_object('Pod', { ... }, 'cilium.io/v2')  # with api_version
     my ($params, $api_version);
+    my $api_version_supplied = 0;
     if (@args >= 2 && ref($args[0]) eq 'HASH' && !ref($args[1])) {
         ($params, $api_version) = @args;
+        $api_version_supplied = 1;
     } elsif (@args == 1 && ref($args[0]) eq 'HASH') {
         $params = $args[0];
     } else {
         $params = { @args };
     }
 
-    my $class = $self->expand_class($short_class, $api_version);
+    my $class = $api_version_supplied
+        ? $self->expand_class($short_class, $api_version)
+        : $self->expand_class($short_class);
+    _die_resolution_error($short_class, $api_version)
+        if $api_version_supplied && !defined $class;
+    if (!defined($class) && $short_class =~ m{\A(.*)/([^/]*)\z}) {
+        _die_resolution_error($2, $1);
+    }
     return $self->struct_to_object($class, $params);
+}
+
+sub _die_resolution_error {
+    my ($kind, $api_version) = @_;
+    my $display = !defined($api_version) ? '<undef>'
+        : length($api_version) ? $api_version
+        : '<empty>';
+    die "Cannot resolve Kubernetes GVK: kind '$kind', apiVersion '$display'\n";
 }
 
 sub _inflate_struct {
@@ -592,7 +878,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 
@@ -931,6 +1217,12 @@ Returns C<$self> for chaining.
 
 Load a C<.pk8s> manifest file and return an ArrayRef of IO::K8s objects.
 
+B<Trust boundary:> A C<.pk8s> manifest is Perl code, not data. The loader
+C<eval>s the file content in-process, so a C<.pk8s> file can execute
+arbitrary code with the full privileges of the running program. Only load
+C<.pk8s> files from sources you trust. For data-only manifests (YAML or
+JSON), use C<load_yaml>, which parses without executing any code.
+
 The C<.pk8s> file format is Perl code with a DSL for defining Kubernetes
 resources:
 
@@ -1045,6 +1337,17 @@ from C<kind>. With two arguments, uses the specified class.
 
 Convert a Perl hashref to an IO::K8s object. With one argument, auto-detects
 the class from C<kind>. With two arguments, uses the specified class.
+
+If the target class provides a C<FROM_STRUCT> class method, it is called as
+C<< $class->FROM_STRUCT($struct, $k8s) >> and its return value is used as-is,
+bypassing the generic field-by-field inflation. This is the hook for union
+types that serialize as a bare alternative rather than as a hashref of
+attributes -- see
+L<IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrBool>
+and its siblings, where C<additionalProperties: false> has to stay a boolean
+instead of collapsing into an empty object. A class implementing
+C<FROM_STRUCT> is responsible for its own C<TO_JSON> as well, so that the two
+directions stay symmetric.
 
 =head2 object_to_json
 
@@ -1209,10 +1512,6 @@ Jose Luis Martinez <jlmartin@cpan.org> (original author)
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -1223,7 +1522,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

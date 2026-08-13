@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::DeviceClassSpec;
 # ABSTRACT: DeviceClassSpec is used in a [DeviceClass] to define what can be allocated and how to configure it.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s config => ['Resource::V1alpha3::DeviceClassConfiguration'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1alpha3::DeviceClassSpec - DeviceClassSpec is used in a
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 config
 
@@ -53,10 +53,6 @@ This is an alpha field and requires enabling the DRAControlPlaneController featu
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -67,7 +63,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

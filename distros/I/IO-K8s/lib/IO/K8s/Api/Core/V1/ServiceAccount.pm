@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ServiceAccount;
 # ABSTRACT: ServiceAccount binds together: * a name, understood by users, and perhaps by peripheral systems, for an identity * a principal that can be authenticated and authorized * a set of secrets
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -27,7 +27,7 @@ IO::K8s::Api::Core::V1::ServiceAccount - ServiceAccount binds together: * a name
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ Secrets is a list of the secrets in the same namespace that pods running using t
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#serviceaccount-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#serviceaccount-v1-core>
 
 =head1 SUPPORT
 
@@ -58,10 +58,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#serviceac
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -73,7 +69,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

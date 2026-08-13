@@ -1,9 +1,9 @@
 package IO::K8s::Api::Scheduling::V1alpha2::WorkloadSpec;
 # ABSTRACT: WorkloadSpec defines the desired state of a Workload.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
-k8s controllerRef => 'Core::V1::TypedLocalObjectReference';
+k8s controllerRef => 'Scheduling::V1alpha2::TypedLocalObjectReference';
 
 
 k8s podGroupTemplates => ['Scheduling::V1alpha2::PodGroupTemplate'], 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Scheduling::V1alpha2::WorkloadSpec - WorkloadSpec defines the desi
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 controllerRef
 
@@ -42,10 +42,6 @@ PodGroupTemplates is the list of templates that make up the Workload. The maximu
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -56,7 +52,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

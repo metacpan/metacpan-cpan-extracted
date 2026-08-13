@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -80,6 +80,9 @@ interfaces (F<xs/>).
         tls_sni        => {            # per-hostname certificates (SNI)
             'other.example' => { cert => $c2, key => $k2 },
         },
+        deny           => ['1.2.3.4'], # IPs dropped at accept (see below)
+        deny_capacity  => 1024,        # denylist table size (0 = default)
+        rate_capacity  => 4096,        # rate-counter table size (0 = default)
     );
 
 The event backend is chosen automatically (kqueue, io_uring, epoll, then poll) and can
@@ -220,10 +223,11 @@ drives the reload should drive it per worker rather than once.
 =head2 stats
 
     my $s = Hyperman->stats;   # in-app, inside a worker
-    # { requests => N, accepts => N, bytes_out => N, connections => N,
-    #   backend => 'kqueue', pid => $$ }
+    # { requests => N, accepts => N, denied => N, bytes_out => N,
+    #   connections => N, backend => 'kqueue', pid => $$ }
 
-Per-worker counters; returns undef outside a running loop.
+Per-worker counters; returns undef outside a running loop. C<denied> counts
+connections dropped at accept by the denylist (see below).
 
 =head2 detach
 
@@ -253,6 +257,38 @@ before an upgrade - but not from a C<psgi.streaming> responder, which has
 already forced C<Connection: close>, nor once response bytes are queued.
 
 The equivalent for a C consumer is the table's C<conn_detach>.
+
+=head2 Denylist and rate limiting
+
+Hyperman maps a small anonymous shared-memory arena B<before it forks its
+workers>, holding an IP denylist and a set of fixed-window rate counters. It
+is shared, not per-worker, on purpose: a counter kept per worker would let a
+C<100/min> limit through at C<workers x 100/min>, and a denylist kept per
+worker would be a different list on each. Because the mapping is inherited
+across the fork, every worker reads and writes the one copy.
+
+The B<denylist> is enforced at C<accept>: a blocked peer's connection is
+closed before a connection object is built or a byte is read - the cheapest
+possible rejection - and the worker's C<denied> stat counts it. Seed it
+statically with C<< run(deny => ['1.2.3.4', ...]) >>; C<deny_capacity> and
+C<rate_capacity> size the two tables (both default, and both round-trip a few
+thousand entries).
+
+The B<rate counters> are a fixed window: at most C<limit> hits against a key
+in each C<window>-second wall-clock slot, the first hit of a new slot finding
+a stale record and zeroing it - no timer, no sweep. A slot whose window has
+rolled is reclaimable, so when the keys that filled the table go quiet their
+slots are reused on demand by new keys rather than lingering; sizing
+C<rate_capacity> above the peak of distinct keys in a window keeps live
+counters from evicting each other (an over-capacity eviction resets a
+counter, so it would leak looser, never tighter). N gateways behind a load
+balancer admit up to N times the limit, which is honest rather than a
+distributed count this does not implement.
+
+Applications reach all of this through the C ABI below - C<deny_check> /
+C<deny_add> / C<deny_remove> and C<ratelimit_hit> - which is how L<Punk>'s
+C<rate_limit> keyword and C<< $c->block_ip >> are built. Nothing here is a
+Perl-level method: the arena is C, on the hot path.
 
 =head1 C ABI
 
@@ -288,7 +324,7 @@ F<hm_abi.h>.
 
 =head2 The table
 
-    #define HM_ABI_VERSION 2
+    #define HM_ABI_VERSION 3
 
     #define HM_ABI_READ  0x1        /* io_watch masks     */
     #define HM_ABI_WRITE 0x2
@@ -337,6 +373,17 @@ F<hm_abi.h>.
          * 0 ok; -1 no such connection or a stale id; -2 HTTP/2; -3 TLS;
          * -4 output still queued; -5 already detached. */
         int (*conn_detach)(pTHX_ void *loop, int fd, UV id);
+
+        /* v3: abuse controls on the fork-shared arena (no pTHX, no SV;
+         * process-global; fail open with no arena). deny_check is the
+         * lock-free accept-path check; ratelimit_hit is a fixed window,
+         * returns 1 within the limit and 0 over, filling *remaining and
+         * *reset (the epoch the window rolls) when non-NULL. */
+        int  (*deny_check)(const char *ip);
+        void (*deny_add)(const char *ip, long ttl_secs);
+        void (*deny_remove)(const char *ip);
+        int  (*ratelimit_hit)(const void *key, STRLEN klen,
+                              IV limit, IV window, IV *remaining, IV *reset);
     } hm_abi;
 
 =head2 Hyperman::_abi_ptr
@@ -391,6 +438,28 @@ C<run_until> pumps the loop until the given future settles. It is
 re-entrant - calling it from inside a callback nests, exactly like
 C<< ->get >> inside a Hyperman worker - so a blocking-style C<await> can be
 built on it directly.
+
+=head2 Abuse controls (v3)
+
+The v3 entries reach the fork-shared arena described under L</Denylist and
+rate limiting>. They take no C<pTHX> and touch no SV - they operate only on
+that process-global arena - so a consumer may call them from any worker, and
+they B<fail open> when no arena is mapped.
+
+C<deny_check($ip)> returns 1 if C<$ip> (an C<INET6_ADDRSTRLEN> string) is
+denylisted and unexpired, else 0; it is lock-free, being the check Hyperman
+itself runs on every accept. C<deny_add($ip, $ttl_secs)> adds or refreshes an
+entry (C<$ttl_secs> 0 = permanent); C<deny_remove($ip)> lifts one.
+
+C<ratelimit_hit(key, klen, limit, window, &remaining, &reset)> counts one hit
+against the opaque C<key> (C<klen> bytes) under C<limit> per C<window>
+seconds, returning 1 within the limit and 0 over, and filling C<*remaining>
+(never below zero) and C<*reset> (the epoch the window rolls) when they are
+non-NULL. A C<limit> of 0 or less is unlimited. The window is fixed and a
+function of the clock, exactly as the arena describes.
+
+L<Punk> builds its C<rate_limit> keyword, C<< $c->block_ip >> and
+C<< $c->rate_hit >> on these four.
 
 =head2 Contracts
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::NetworkPolicy;
 # ABSTRACT: NetworkPolicy describes what network traffic is allowed for a set of Pods
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::NetworkPolicy';
 sub _netpol_format { 'core' }
@@ -22,7 +22,7 @@ IO::K8s::Api::Networking::V1::NetworkPolicy - NetworkPolicy describes what netwo
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ spec represents the specification of the desired behavior for this NetworkPolicy
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#networkpolicy-v1-networking.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#networkpolicy-v1-networking.k8s.io>
 
 =head1 SUPPORT
 
@@ -45,10 +45,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#networkpo
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -60,7 +56,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

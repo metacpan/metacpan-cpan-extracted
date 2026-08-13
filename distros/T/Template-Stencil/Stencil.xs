@@ -579,15 +579,19 @@ _buf_selftest()
 # module (Punk's view tier) fetches this once at boot, INT2PTRs it to a
 # `const st_abi *`, and checks ->abi_version before using it. Not part of the
 # public Perl API.
-IV
+#
+# Unsigned, not IV: where the loader maps this object decides the sign bit.
+# A 32-bit perl above 0x7fffffff, or illumos putting shared objects up at
+# 0xfffffd7f..., would hand back a negative number from PTR2IV.
+UV
 _abi_ptr()
     CODE:
-        RETVAL = PTR2IV(&ST_ABI);
+        RETVAL = PTR2UV(&ST_ABI);
     OUTPUT:
         RETVAL
 
 # Exercise the whole st_abi table the way a C consumer would: resolve it from
-# the IV _abi_ptr hands back, gate on abi_version, then drive engine_of ->
+# the UV _abi_ptr hands back, gate on abi_version, then drive engine_of ->
 # render through the function pointers rather than calling the C directly.
 # Returns the rendered bytes; (undef, $error) when the template fails; and an
 # empty list when the gate rejects the table or the invocant is not a Stencil
@@ -606,7 +610,7 @@ _abi_selftest(self, tmpl, data = &PL_sv_undef, opts = &PL_sv_undef)
         HV           *dhv;
         {
             dSP;
-            IV  ptr   = 0;
+            UV  ptr   = 0;
             int count;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
@@ -614,14 +618,18 @@ _abi_selftest(self, tmpl, data = &PL_sv_undef, opts = &PL_sv_undef)
             count = call_pv("Template::Stencil::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;
             if (count > 0) {
-                /* Pop into a local first: before 5.30 SvIV was a macro that
-                 * evaluated its argument twice (SvIOK(sv) ? SvIVX(sv) :
-                 * sv_2iv(sv)), so SvIV(POPs) popped twice and read the IV
+                /* Pop into a local first: before 5.30 SvUV was a macro that
+                 * evaluated its argument twice (SvIOK(sv) ? SvUVX(sv) :
+                 * sv_2uv(sv)), so SvUV(POPs) popped twice and read the value
                  * off whatever sat one slot lower. Modern perls make it an
                  * inline function, which is why this only ever bit on old
-                 * ones. */
+                 * ones.
+                 *
+                 * SvUV, not SvIV, to match the UV _abi_ptr returns: an
+                 * address with the top bit set is above IV_MAX, and SvIV
+                 * would clamp it rather than hand back the address. */
                 SV *rv = POPs;
-                if (!SvTRUE(ERRSV)) ptr = SvIV(rv);
+                if (!SvTRUE(ERRSV)) ptr = SvUV(rv);
             }
             PUTBACK; FREETMPS; LEAVE;
             if (ptr) abi = INT2PTR(const st_abi *, ptr);

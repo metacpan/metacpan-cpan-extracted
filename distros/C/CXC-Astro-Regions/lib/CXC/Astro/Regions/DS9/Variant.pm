@@ -6,7 +6,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Module::Runtime 'module_notional_filename';
 use Ref::Util qw( is_arrayref );
@@ -190,7 +190,7 @@ CXC::Astro::Regions::DS9::Variant - Generate DS9 Region classes
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =for Pod::Coverage make_variant
 make_variant_package_name
@@ -207,11 +207,11 @@ Please report any bugs or feature requests to bug-cxc-astro-regions@rt.cpan.org 
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-astro-regions
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-astro-regions.git
+  https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions.git
 
 =head1 SEE ALSO
 

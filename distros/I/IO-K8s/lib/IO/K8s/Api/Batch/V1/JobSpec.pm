@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::JobSpec;
 # ABSTRACT: JobSpec describes how the job execution will look like.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s activeDeadlineSeconds => Int;
@@ -65,7 +65,7 @@ IO::K8s::Api::Batch::V1::JobSpec - JobSpec describes how the job execution will 
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 activeDeadlineSeconds
 
@@ -150,10 +150,6 @@ ttlSecondsAfterFinished limits the lifetime of a Job that has finished execution
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -164,7 +160,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

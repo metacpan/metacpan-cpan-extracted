@@ -18,7 +18,7 @@ my %module_build_args = (
     "Branislav Zahradn\x{ed}k <barney.cpan\@gmail.com>"
   ],
   "dist_name" => "Context-Singleton",
-  "dist_version" => "1.0.7",
+  "dist_version" => "1.0.8",
   "license" => "artistic_2",
   "module_name" => "Context::Singleton",
   "recursive_test_files" => 1,

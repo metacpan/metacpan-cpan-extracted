@@ -28,8 +28,9 @@
  * built against an older header keeps working against a newer provider -
  * check `abi_version >= the version you need`):
  *   1 - loop handles, io watchers, timers, futures, run_until
- *   2 - conn_detach */
-#define HM_ABI_VERSION 2
+ *   2 - conn_detach
+ *   3 - deny_check/deny_add/deny_remove/ratelimit_hit (abuse controls) */
+#define HM_ABI_VERSION 3
 
 /* io_watch masks (match Hyperman's internal HM_EV_READ/HM_EV_WRITE) */
 #define HM_ABI_READ  0x1
@@ -114,6 +115,30 @@ typedef struct hm_abi {
      *   -4 output still draining for an earlier response
      *   -5 already detached */
     int (*conn_detach)(pTHX_ void *loop, int fd, UV id);
+
+    /* ---- v3: abuse controls on a fork-shared arena --------------------- *
+     * An IP denylist and fixed-window rate counters live in one anonymous
+     * shared-memory arena the server mmaps BEFORE forking its workers, so
+     * every worker shares one denylist and one set of counts (a per-worker
+     * copy would multiply a limit by the worker count). These take no pTHX
+     * and touch no SV - they operate only on that process-global arena and
+     * are safe to call from any worker. They FAIL OPEN: with no arena
+     * (server not running one, or the build has no atomics) deny_check
+     * returns 0 and ratelimit_hit returns 1.
+     *
+     * deny_check(ip):   1 if ip is denylisted and unexpired, else 0. This is
+     *                   the accept-path check, and it is lock-free.
+     * deny_add(ip,ttl): add/refresh ip for ttl_secs (0 = permanent).
+     * deny_remove(ip):  drop ip.
+     * ratelimit_hit(key,klen,limit,window,rem,reset): count one hit against
+     *   the opaque key under `limit` per `window` seconds; returns 1 within
+     *   the limit, 0 over. *rem (requests left, >=0) and *reset (epoch the
+     *   window rolls) are filled when non-NULL. limit <= 0 is unlimited. */
+    int  (*deny_check)(const char *ip);
+    void (*deny_add)(const char *ip, long ttl_secs);
+    void (*deny_remove)(const char *ip);
+    int  (*ratelimit_hit)(const void *key, STRLEN klen,
+                          IV limit, IV window, IV *remaining, IV *reset);
 } hm_abi;
 
 #endif /* HM_ABI_H */

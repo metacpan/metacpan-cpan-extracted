@@ -1,6 +1,6 @@
 package IO::K8s::Role::APIObject;
 # ABSTRACT: Role for top-level Kubernetes API objects
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use Moo::Role;
 use Types::Standard qw( InstanceOf Maybe );
 use Scalar::Util qw(blessed);
@@ -27,17 +27,18 @@ my %API_GROUP_MAP = (
     discovery             => 'discovery.k8s.io',
     flowcontrol           => 'flowcontrol.apiserver.k8s.io',
     resource              => 'resource.k8s.io',
+    apiserverinternal     => 'internal.apiserver.k8s.io',
+    storagemigration      => 'storagemigration.k8s.io',
 );
 
-# Derive apiVersion from class name
+# Derive apiVersion from a class-name string in a known namespace:
 # IO::K8s::Api::Core::V1::Pod -> v1
 # IO::K8s::Api::Apps::V1::Deployment -> apps/v1
 # IO::K8s::Api::Rbac::V1::Role -> rbac.authorization.k8s.io/v1
 # IO::K8s::ApiextensionsApiserver::...::V1::CustomResourceDefinition -> apiextensions.k8s.io/v1
 # IO::K8s::KubeAggregator::...::V1::APIService -> apiregistration.k8s.io/v1
-sub api_version {
-    my ($self) = @_;
-    my $class = ref($self) || $self;
+sub _api_version_from_class {
+    my ($class) = @_;
 
     # Standard API: IO::K8s::Api::Group::Version::Kind
     if ($class =~ /^IO::K8s::Api::(\w+)::(\w+)::/) {
@@ -59,6 +60,32 @@ sub api_version {
     }
 
     return undef;
+}
+
+# Walk @ISA depth-first, left to right (same shape as
+# IO::K8s::Role::Resource::_merged_attr_info) so a consumer subclass
+# registered via class_namespaces derives the apiVersion from the first
+# ancestor that is a known namespace.
+sub _api_version_from_isa {
+    my ($class) = @_;
+    no strict 'refs';
+    for my $parent (@{"${class}::ISA"}) {
+        my $version = _api_version_from_class($parent);
+        return $version if defined $version;
+        $version = _api_version_from_isa($parent);
+        return $version if defined $version;
+    }
+    return undef;
+}
+
+sub api_version {
+    my ($self) = @_;
+    my $class = ref($self) || $self;
+
+    my $version = _api_version_from_class($class);
+    return $version if defined $version;
+
+    return _api_version_from_isa($class);
 }
 
 
@@ -345,7 +372,7 @@ IO::K8s::Role::APIObject - Role for top-level Kubernetes API objects
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 metadata
 
@@ -353,7 +380,9 @@ Standard object's metadata. See L<IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Ob
 
 =head2 api_version
 
-Returns the Kubernetes API version derived from the class name.
+Returns the Kubernetes API version derived from the class name. For a
+consumer subclass registered via L<IO::K8s/class_namespaces>, the version is
+derived from the first ancestor in a known namespace.
 
     $pod->api_version;  # "v1"
     $deployment->api_version;  # "apps/v1"
@@ -501,10 +530,6 @@ Returns the ownerReferences array, or an empty arrayref.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -515,7 +540,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

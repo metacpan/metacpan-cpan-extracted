@@ -4,6 +4,8 @@ author:
   - 'Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  PAGI::Test::Client: '0.002002'
+  Test::Fatal: '0.017'
   Test::More: '1.302'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -21,23 +23,52 @@ no_index:
 provides:
   PAGI::FastAPI:
     file: lib/PAGI/FastAPI.pm
-    version: v0.1.0
+    version: v1.0.0
+  PAGI::FastAPI::BotProtection:
+    file: lib/PAGI/FastAPI/BotProtection.pm
+    version: v1.0.0
+  PAGI::FastAPI::BotProtection::ProofOfWork:
+    file: lib/PAGI/FastAPI/BotProtection/ProofOfWork.pm
+    version: v1.0.0
   PAGI::FastAPI::Context:
     file: lib/PAGI/FastAPI/Context.pm
-    version: v0.1.0
+    version: v1.0.0
   PAGI::FastAPI::Depends:
     file: lib/PAGI/FastAPI/Depends.pm
-    version: v0.1.0
+    version: v1.0.0
+  PAGI::FastAPI::Middleware::BotProtection:
+    file: lib/PAGI/FastAPI/Middleware/BotProtection.pm
+    version: v1.0.0
+  PAGI::FastAPI::Middleware::RateLimit:
+    file: lib/PAGI/FastAPI/Middleware/RateLimit.pm
+    version: v1.0.0
+  PAGI::FastAPI::RateLimit::Driver:
+    file: lib/PAGI/FastAPI/RateLimit/Driver.pm
+    version: v1.0.0
+  PAGI::FastAPI::RateLimit::Driver::Memory:
+    file: lib/PAGI/FastAPI/RateLimit/Driver/Memory.pm
+    version: v1.0.0
+  PAGI::FastAPI::Response:
+    file: lib/PAGI/FastAPI/Response.pm
+    version: v1.0.0
+  PAGI::FastAPI::Response::HTML:
+    file: lib/PAGI/FastAPI/Response/HTML.pm
+    version: v1.0.0
+  PAGI::FastAPI::Response::SSE:
+    file: lib/PAGI/FastAPI/Response/SSE.pm
+    version: v1.0.0
 requires:
   Future::AsyncAwait: '0.60'
   JSON::PP: '4.00'
   PAGI: '0.002001'
   PAGI::Middleware::CORS: '0.002002'
+  PAGI::Middleware::RateLimit: '0.002002'
+  PAGI::SSE: '0.002002'
   PAGI::WebSocket: '0.002002'
   Type::Tiny: '2.000000'
-  perl: '5.036'
+  perl: '5.038000'
 resources:
   bugtracker: https://github.com/manwar/PAGI-FastAPI/issues
   repository: https://github.com/manwar/PAGI-FastAPI.git
-version: v0.1.0
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

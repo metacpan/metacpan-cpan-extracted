@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.642';
+our $VERSION = '0.644';
 
 use 5.020;
 use Moo;
@@ -177,7 +177,7 @@ sub format ($self, $style, $formatted_annotations = undef) {
   elsif ($style eq 'terse') {
     my (%instance_locations, %keyword_locations);
 
-    my @errors = grep {
+    my @errors = grep do {
       my ($keyword, $error) = ($_->keyword, $_->error);
 
       my $keep = 0+!!(
@@ -198,7 +198,7 @@ sub format ($self, $style, $formatted_annotations = undef) {
       ++$keyword_locations{$_->keyword_location} if $keep;
 
       $keep;
-    }
+    },
     $self->errors;
 
     die 'uh oh, have no errors left to report' if not $self->valid and not @errors;
@@ -291,7 +291,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.642
+version 0.644
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::SelfSubjectReview;
 # ABSTRACT: SelfSubjectReview contains the user information that the kube-apiserver has about the user making this request. When using impersonation, users will receive the user info of the user being impersonated.  If impersonation or request header authentication is used, any extra keys will have their case ignored and returned as lowercase.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Authentication::V1::SelfSubjectReview - SelfSubjectReview contains
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ Status is filled in by the server with the user attributes.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#selfsubjectreview-v1-authentication.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#selfsubjectreview-v1-authentication.k8s.io>
 
 =head1 SUPPORT
 
@@ -43,10 +43,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#selfsubje
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -58,7 +54,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

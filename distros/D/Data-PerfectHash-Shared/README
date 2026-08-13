@@ -67,12 +67,13 @@ DESCRIPTION
     checked, along with the bounds of every region (the displacement array,
     the slot array, and, for string sets, the byte arena). A file that fails
     any check -- including one built on a different byte order -- is refused
-    with a descriptive error instead of being misread. Every persisted field
-    is a fixed-width little-endian integer ("uint32_t"/"uint64_t" in the
-    header, and a 1- to 4-byte packed integer per displacement entry), so an
-    image builds and loads consistently across hosts of differing word size,
-    as long as they share the same byte order (see "SECURITY" for what is, and
-    is not, re-validated on every lookup).
+    with a descriptive error instead of being misread. The image is written in
+    the host's native byte order -- the header struct and its 64-bit fields
+    as-is, with only the packed displacement entries explicitly little-endian
+    -- and is tagged with an explicit endianness marker that "load" checks, so
+    an image is portable only to hosts of the same byte order (and C integer
+    sizes) and is refused rather than misread on any other (see "SECURITY" for
+    what is, and is not, re-validated on every lookup).
 
 METHODS
   Builder
@@ -173,6 +174,15 @@ SECURITY
     slot immediately before reading through it. A slot that fails the check is
     reported as not present (or skipped, for "each_key") rather than read out
     of bounds.
+
+    A built ".phs" file must be treated as immutable once written: replace it
+    only by building a fresh file -- which "build" now does atomically,
+    writing a temporary file in the same directory and "rename"-ing it over
+    the target -- never by modifying a mapped file in place. A concurrent
+    writer that truncates or rewrites a file another process has "load"-ed
+    (mmap-ed) can crash those readers with SIGBUS; the atomic
+    temp-file-plus-rename build avoids this by leaving the old inode intact
+    for existing readers until they release it.
 
 LIMITS
     *   Immutable. A built image cannot be added to, removed from, or updated

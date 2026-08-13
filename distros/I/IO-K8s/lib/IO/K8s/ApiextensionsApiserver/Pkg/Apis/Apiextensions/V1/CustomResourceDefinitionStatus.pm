@@ -1,12 +1,15 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionStatus;
 # ABSTRACT: CustomResourceDefinitionStatus indicates the state of the CustomResourceDefinition
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s acceptedNames => 'Apiextensions::V1::CustomResourceDefinitionNames';
 
 
 k8s conditions => ['Apiextensions::V1::CustomResourceDefinitionCondition'];
+
+
+k8s observedGeneration => Int;
 
 
 k8s storedVersions => [Str];
@@ -26,7 +29,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDef
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 acceptedNames
 
@@ -35,6 +38,10 @@ acceptedNames are the names that are actually being used to serve discovery. The
 =head2 conditions
 
 conditions indicate state for particular aspects of a CustomResourceDefinition
+
+=head2 observedGeneration
+
+The generation observed by the CRD controller.
 
 =head2 storedVersions
 
@@ -47,10 +54,6 @@ storedVersions lists all versions of CustomResources that were ever persisted. T
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -61,7 +64,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

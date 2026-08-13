@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeAddress;
 # ABSTRACT: NodeAddress contains information for the node's address.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s address => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::NodeAddress - NodeAddress contains information for the n
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 address
 
@@ -40,10 +40,6 @@ Node address type, one of Hostname, ExternalIP or InternalIP.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -54,7 +50,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -16,6 +16,7 @@
         croak("Expected a %s object", classname); \
     ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    ReqRepHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -25,8 +26,10 @@
  * local `h` would dangle.  Used only where magic can actually intervene
  * between EXTRACT_HANDLE and the first use of h. */
 #define REEXTRACT_HANDLE(classname, sv) \
+    if (!SvROK(sv)) \
+        croak("%s object was replaced during the call", classname); \
     h = INT2PTR(ReqRepHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("%s object destroyed during the call", classname)
+    if (h != h0) croak("%s object replaced or destroyed during the call", classname)
 
 #define MAKE_OBJ(class, ptr) \
     SV *ref = newRV_noinc(newSViv(PTR2IV(ptr))); \
@@ -57,7 +60,7 @@ new(class, path, req_cap, resp_slots, resp_size, ...)
     if (req_cap > 0xFFFFFFFFU || resp_slots > 0xFFFFFFFFU || resp_size > 0xFFFFFFFFU) croak("Data::ReqRep::Shared->new: a capacity/size argument exceeds 2^32");
     ReqRepHandle *h = reqrep_create(p, (uint32_t)req_cap, (uint32_t)resp_slots,
                                      (uint32_t)resp_size, arena_cap, mode, errbuf);
-    if (!h) croak("Data::ReqRep::Shared->new: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -77,7 +80,7 @@ new_memfd(class, name, req_cap, resp_slots, resp_size, ...)
     if (req_cap > 0xFFFFFFFFU || resp_slots > 0xFFFFFFFFU || resp_size > 0xFFFFFFFFU) croak("Data::ReqRep::Shared->new: a capacity/size argument exceeds 2^32");
     ReqRepHandle *h = reqrep_create_memfd(name, (uint32_t)req_cap, (uint32_t)resp_slots,
                                            (uint32_t)resp_size, arena_cap, errbuf);
-    if (!h) croak("Data::ReqRep::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -90,7 +93,7 @@ new_from_fd(class, fd)
     char errbuf[REQREP_ERR_BUFLEN];
   CODE:
     ReqRepHandle *h = reqrep_open_fd(fd, REQREP_MODE_STR, errbuf);
-    if (!h) croak("Data::ReqRep::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -109,7 +112,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::ReqRep::Shared")) return;
     ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -409,7 +412,7 @@ unlink(self_or_class, ...)
         path = SvPV_nolen(ST(1));
     }
     if (!path) croak("cannot unlink anonymous or memfd channel");
-    if (unlink(path) != 0)
+    if (unlink(path) != 0 && errno != ENOENT)
         croak("unlink(%s): %s", path, strerror(errno));
 
 SV *
@@ -568,7 +571,7 @@ new(class, path)
   CODE:
     const char *p = SvPV_nolen(path);
     ReqRepHandle *h = reqrep_open(p, REQREP_MODE_STR, errbuf);
-    if (!h) croak("Data::ReqRep::Shared::Client->new: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared::Client->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -581,7 +584,7 @@ new_from_fd(class, fd)
     char errbuf[REQREP_ERR_BUFLEN];
   CODE:
     ReqRepHandle *h = reqrep_open_fd(fd, REQREP_MODE_STR, errbuf);
-    if (!h) croak("Data::ReqRep::Shared::Client->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared::Client->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -600,7 +603,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::ReqRep::Shared::Client")) return;
     ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -983,7 +986,7 @@ new(class, path, req_cap, resp_slots, ...)
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     if (req_cap > 0xFFFFFFFFU || resp_slots > 0xFFFFFFFFU) croak("Data::ReqRep::Shared::Int->new: req_cap/resp_slots exceeds 2^32");
     ReqRepHandle *h = reqrep_create_int(p, (uint32_t)req_cap, (uint32_t)resp_slots, mode, errbuf);
-    if (!h) croak("Data::ReqRep::Shared::Int->new: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared::Int->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -999,7 +1002,7 @@ new_memfd(class, name, req_cap, resp_slots)
   CODE:
     if (req_cap > 0xFFFFFFFFU || resp_slots > 0xFFFFFFFFU) croak("Data::ReqRep::Shared::Int->new_memfd: req_cap/resp_slots exceeds 2^32");
     ReqRepHandle *h = reqrep_create_int_memfd(name, (uint32_t)req_cap, (uint32_t)resp_slots, errbuf);
-    if (!h) croak("Data::ReqRep::Shared::Int->new_memfd: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared::Int->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1012,7 +1015,7 @@ new_from_fd(class, fd)
     char errbuf[REQREP_ERR_BUFLEN];
   CODE:
     ReqRepHandle *h = reqrep_open_fd(fd, REQREP_MODE_INT, errbuf);
-    if (!h) croak("Data::ReqRep::Shared::Int->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared::Int->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1031,7 +1034,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::ReqRep::Shared::Int")) return;
     ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -1292,7 +1295,7 @@ unlink(self_or_class, ...)
         path = SvPV_nolen(ST(1));
     }
     if (!path) croak("cannot unlink anonymous or memfd channel");
-    if (unlink(path) != 0) croak("unlink(%s): %s", path, strerror(errno));
+    if (unlink(path) != 0 && errno != ENOENT) croak("unlink(%s): %s", path, strerror(errno));
 
 
 MODULE = Data::ReqRep::Shared  PACKAGE = Data::ReqRep::Shared::Int::Client
@@ -1306,7 +1309,7 @@ new(class, path)
   CODE:
     const char *p = SvPV_nolen(path);
     ReqRepHandle *h = reqrep_open(p, REQREP_MODE_INT, errbuf);
-    if (!h) croak("Data::ReqRep::Shared::Int::Client->new: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared::Int::Client->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1319,7 +1322,7 @@ new_from_fd(class, fd)
     char errbuf[REQREP_ERR_BUFLEN];
   CODE:
     ReqRepHandle *h = reqrep_open_fd(fd, REQREP_MODE_INT, errbuf);
-    if (!h) croak("Data::ReqRep::Shared::Int::Client->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::ReqRep::Shared::Int::Client->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -1338,7 +1341,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::ReqRep::Shared::Int::Client")) return;
     ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);

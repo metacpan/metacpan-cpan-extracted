@@ -1,4 +1,3 @@
-.github/workflows/ci.yml
 bench/contention.pl
 bench/multiprocess.pl
 bench/single.pl
@@ -29,9 +28,11 @@ t/02-multiprocess.t
 t/03-memfd-eventfd.t
 t/04-edge-cases.t
 t/05-scan-from.t
+t/06-recover.t
 t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t
+t/07-foreign-invocant.t
 xt/abi_skew.t
 xt/asan.t
 xt/atomic_alignment.t

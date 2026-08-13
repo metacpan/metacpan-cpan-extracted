@@ -2,8 +2,11 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Spec ();
 use Socket ();
 use Fetch;
+
+my $pid;   # file scope so the END block below can always reap the server
 
 # $ua->clone(%overrides): a second agent over the same pool and loop. The
 # reason it exists is per-request cookie isolation, so that is what most of
@@ -52,9 +55,14 @@ SKIP: {
     listen($srv, 20) or skip 'no listen', 4;
     my $port = (Socket::unpack_sockaddr_in(getsockname $srv))[0];
 
-    my $pid = fork;
+    $pid = fork;
     skip 'no fork', 4 unless defined $pid;
     if (!$pid) {
+        # Never hold the harness TAP pipe open, and never outlive the run:
+        # a leaked server child hangs the whole suite after this test is done.
+        open STDOUT, '>', File::Spec->devnull();
+        open STDERR, '>', File::Spec->devnull();
+        alarm 120;
         # sets a cookie every time, and reports whichever one it was sent
         for (1 .. 8) {
             accept(my $cl, $srv) or last;
@@ -62,7 +70,12 @@ SKIP: {
             while (sysread($cl, my $b, 4096)) { $req .= $b; last if $req =~ /\r\n\r\n/ }
             my ($seen) = $req =~ /^Cookie:[ \t]*(.*?)\r\n/mi;
             my $body = defined $seen ? "saw:$seen" : "saw:none";
+            # This server closes after every response, so say so: without it
+            # the client is entitled to pool the connection and the next
+            # request races the close. Keep-alive reuse is t/20's subject,
+            # cookie isolation is this one's.
             syswrite($cl, "HTTP/1.1 200 OK\r\nSet-Cookie: sid=secret; Path=/\r\n"
+                        . "Connection: close\r\n"
                         . "Content-Length: " . length($body) . "\r\n\r\n$body");
             close $cl;
         }
@@ -84,8 +97,10 @@ SKIP: {
     is($shared->get($url)->get->content, 'saw:none',
        'and the jarless parent never collected one');
 
-    kill 'TERM', $pid;
-    waitpid $pid, 0;
 }
 
 done_testing;
+
+# In an END block, and SIGKILL: a die anywhere above must not leave a server
+# child holding the harness's TAP pipe open.
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

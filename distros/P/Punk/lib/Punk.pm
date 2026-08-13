@@ -7,12 +7,13 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.04';
+    $VERSION = '0.06';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
 
 use Punk::App;
+use Punk::RateLimit;   # adds Punk::App::rate_limit + the key strategies
 
 # The application registrars, one per class that says `use Punk`. The C
 # import (punk_import.h) keeps them here rather than anywhere private, so a

@@ -133,7 +133,10 @@ sub data_of { file_json_decode(body_of($_[0])) }
 # ---- the property test: the mock cannot generate what its own validator
 # ---- rejects, over every operation of whole specs ---------------------------
 
-for my $spec (qw(mock.json petstore.json)) {
+# petstore-3.0.json is here on purpose: the generator walks the document, not
+# the compiled handles, so it only agrees with the validator if the 3.0
+# up-conversion happened at document level (include/oa_upconvert.h).
+for my $spec (qw(mock.json petstore.json petstore-3.0.json)) {
     my $checker = Open::API->new(spec => "$FindBin::Bin/spec/$spec");
     my $checked = 0;
     for my $op (@{ $checker->operations }) {

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Open::API;   # loads the shared XS
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 1;
 
@@ -30,7 +30,7 @@ Open::API::Client - a spec-driven HTTP client on Fetch's C ABI
 
 =head1 DESCRIPTION
 
-Builds requests from the same compiled OpenAPI 3.1 document the server side
+Builds requests from the same compiled OpenAPI document the server side
 uses: parameters are validated client-side through the compiled
 L<JSON::Schema::Fast> handles BEFORE any I/O (bad input croaks), the URL,
 query, headers, cookies and JSON body are assembled in C, and the request is

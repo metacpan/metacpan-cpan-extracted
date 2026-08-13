@@ -1,6 +1,6 @@
 package IO::K8s::AutoGen;
 # ABSTRACT: Dynamically generate IO::K8s classes from OpenAPI schema
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use v5.10;
 use strict;
 use warnings;
@@ -49,16 +49,101 @@ sub is_autogen {
 sub get_or_generate {
     my ($def_name, $schema, $all_defs, $namespace, %opts) = @_;
 
-    my $class = def_to_class($def_name, $namespace);
+    my $class = _class_name_for($def_name, $schema, $namespace, $opts{api_version});
     return $class if $_generated{$class};
 
     _generate_class($class, $def_name, $schema, $all_defs, $namespace, %opts);
     return $class;
 }
 
+# Class identity for a definition. A definition whose
+# x-kubernetes-group-version-kind lists several entries serves more than
+# one apiVersion from one schema; requesting one of them must produce a
+# package specific to that GVK, otherwise the second version would silently
+# reuse the first version's class (and its api_version method). The
+# versionless generation keeps the plain def_to_class name as the
+# deterministic compatibility default.
+sub _class_name_for {
+    my ($def_name, $schema, $namespace, $api_version) = @_;
+    my $class = def_to_class($def_name, $namespace);
+    return $class unless defined $api_version;
+
+    my $gvk = $schema->{'x-kubernetes-group-version-kind'};
+    return $class unless ref($gvk) eq 'ARRAY' && @$gvk > 1;
+
+    # / and . are not valid in a package name, and a trailing segment must
+    # be a bare identifier; map group/version to ::-separated segments the
+    # same way def_to_class maps def_names.
+    my $suffix = $api_version;
+    $suffix =~ s{/}{::}g;
+    $suffix =~ s{\.}{::}g;
+    return "${class}::${suffix}";
+}
+
+# Wire apiVersion a GVK entry represents: group/version, or bare version
+# when the group is empty (core group).
+sub _gvk_api_version {
+    my ($entry) = @_;
+    my $group = $entry->{group} // '';
+    my $version = $entry->{version} // '';
+    return $group ? "$group/$version" : $version;
+}
+
+# Deterministic ordering key for a GVK entry.
+sub _gvk_sort_key {
+    my ($entry) = @_;
+    return join '/',
+        ($entry->{group} // ''),
+        ($entry->{version} // ''),
+        ($entry->{kind} // '');
+}
+
+# Pick the GVK entry a class should be built from.
+#
+# With an $api_version the request is exact: the entry whose group/version
+# matches is returned; several matches are an ambiguity error, none is a
+# fail-closed error. It never silently takes the first entry.
+#
+# Without an $api_version the entries are sorted and the first is returned
+# -- deterministic regardless of array order.
+sub _select_gvk_entry {
+    my ($gvk, $api_version, $def_name) = @_;
+
+    return $gvk unless ref($gvk) eq 'ARRAY';
+
+    if (defined $api_version) {
+        my @matches = grep { _gvk_api_version($_) eq $api_version } @$gvk;
+        if (@matches > 1) {
+            croak "GVK ambiguity in definition '$def_name': "
+                . scalar(@matches)
+                . " x-kubernetes-group-version-kind entries match api_version '$api_version'";
+        }
+        if (@matches == 1) {
+            return $matches[0];
+        }
+        croak "No x-kubernetes-group-version-kind entry in definition '$def_name' "
+            . "matches api_version '$api_version'";
+    }
+
+    return (sort { _gvk_sort_key($a) cmp _gvk_sort_key($b) } @$gvk)[0];
+}
+
 # Generate a class from OpenAPI schema using IO::K8s::Resource
 sub _generate_class {
     my ($class, $def_name, $schema, $all_defs, $namespace, %opts) = @_;
+
+    # Determine api_version/kind from schema or explicit options. This has
+    # to happen before the class is marked generated: a fail-closed error
+    # here (ambiguous or non-matching api_version) must not leave a
+    # half-generated stub in the cache that a later retry would return.
+    my ($api_ver, $kind_val, $res_plural, $is_namespaced);
+    if (my $gvk = $schema->{'x-kubernetes-group-version-kind'}) {
+        my $entry = _select_gvk_entry($gvk, $opts{api_version}, $def_name);
+        my $group = $entry->{group} // '';
+        my $version = $entry->{version} // '';
+        $kind_val = $entry->{kind} // '';
+        $api_ver = $group ? "$group/$version" : $version;
+    }
 
     return if $_generated{$class};
     $_generated{$class} = 1;  # Mark early to prevent recursion
@@ -91,17 +176,6 @@ sub _generate_class {
         next unless defined $type_spec;  # Skip unsupported types
 
         $k8s->($prop, $type_spec);
-    }
-
-    # Determine api_version/kind from schema or explicit options
-    my ($api_ver, $kind_val, $res_plural, $is_namespaced);
-
-    if (my $gvk = $schema->{'x-kubernetes-group-version-kind'}) {
-        my $entry = ref($gvk) eq 'ARRAY' ? $gvk->[0] : $gvk;
-        my $group = $entry->{group} // '';
-        my $version = $entry->{version} // '';
-        $kind_val = $entry->{kind} // '';
-        $api_ver = $group ? "$group/$version" : $version;
     }
 
     # Explicit options override schema-derived values
@@ -268,7 +342,7 @@ IO::K8s::AutoGen - Dynamically generate IO::K8s classes from OpenAPI schema
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 SYNOPSIS
 
@@ -347,10 +421,6 @@ List all generated class names.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -361,7 +431,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

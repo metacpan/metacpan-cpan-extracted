@@ -3,7 +3,7 @@ package Search::Trigram;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Search::Trigram', $VERSION);
@@ -18,7 +18,7 @@ Search::Trigram - Trigram inverted index search with Dice coefficient scoring
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -119,6 +119,10 @@ stack array is the expected use.
 The table is resolved at runtime through C<Search::Trigram::_abi_ptr> and
 gated on its C<abi_version>, so there is no link-time coupling and the two
 distributions upgrade independently; entries are only ever appended.
+C<_abi_ptr> hands the address back as an unsigned integer, so read it with
+C<SvUV> and not C<SvIV>: where the loader maps this object decides whether
+the top bit is set, and it is on a 32-bit perl above C<0x7fffffff> or on
+illumos, which puts shared objects up at C<0xfffffd7f...>.
 Reach the header with L<ExtUtils::Depends>:
 
     my $pkg = ExtUtils::Depends->new('My::Module', 'Search::Trigram');

@@ -144,6 +144,7 @@ static const pki_kw PKI_KEYWORDS[] = {
     { "database",   "database",    PKW_FWD    },
     { "model",      "model_class", PKW_FWD    },
     { "hook",       "hook",        PKW_FWD    },
+    { "rate_limit", "rate_limit",  PKW_FWD    },
     { "middleware", "middleware",  PKW_FWD    },
     { "on_error",   "on_error",    PKW_FWD    },
     { "plugin",     "plugin",      PKW_FWD    },

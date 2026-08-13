@@ -1,7 +1,7 @@
 package Data::TopK::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::TopK::Shared', $VERSION);
 
@@ -97,19 +97,20 @@ is unchanged and on-disk compatible.
     my $tk = Data::TopK::Shared->new_decayed($path, $capacity, $key_size, $half_life);
     my $tk = Data::TopK::Shared->new_decayed_memfd($name, $capacity, $key_size, $half_life);
 
-C<new_decayed> / C<new_decayed_memfd> take a final C<$half_life> (a finite number
-greater than 0, in whatever time units you feed to C<add>): a contribution's
-weight halves every C<$half_life> units. They croak on a non-positive or
-non-finite half-life. C<$capacity> is the number of counters (the maximum number of keys tracked at
-once, at least 1, up to 2^24) -- pick it a few times larger than the number of
-heavy hitters you want to reliably capture. C<$key_size> is the maximum bytes
-stored per key (default 256; longer keys are truncated). Memory is roughly
-C<capacity * (40 + key_size)> bytes plus a fixed header. C<new> and C<new_memfd>
-croak on a capacity below 1 or above 2^24, or a C<$key_size> outside 1..4096.
-When reopening an existing file or memfd the stored geometry wins and the
-caller's arguments are ignored. An optional file B<mode> may be passed as the
-last argument to C<new> (e.g. C<0660>) for cross-user sharing; it defaults to
-C<0600> (owner-only).
+C<new_decayed> / C<new_decayed_memfd> take a final C<$half_life> (a finite
+number greater than 0, in whatever time units you feed to C<add>): a
+contribution's weight halves every C<$half_life> units. They croak on a
+non-positive or non-finite half-life. C<$capacity> is the number of counters
+(the maximum number of keys tracked at once, at least 1, up to 2^24) -- pick
+it a few times larger than the number of heavy hitters you want to reliably
+capture. C<$key_size> is the maximum bytes stored per key (default 256; longer
+keys are truncated). Memory is roughly C<capacity * (40 + key_size)> bytes
+plus a fixed header. C<new> and C<new_memfd> croak on a capacity below 1 or
+above 2^24, or a C<$key_size> outside 1..4096. When reopening an existing file
+or memfd the stored geometry wins and the caller's arguments do not resize it
+-- but they are still range-checked, so an out-of-range value croaks. An
+optional file B<mode> may be passed as the last argument to C<new> (e.g.
+C<0660>) for cross-user sharing; it defaults to C<0600> (owner-only).
 
 =head2 Feeding and querying
 
@@ -168,11 +169,13 @@ approximate. Increasing C<capacity> tightens the error on the marginal keys.
 
 =head1 SHARING ACROSS PROCESSES
 
-The summary lives in a shared mapping, shared the same three ways as the rest of
-the family: a B<backing file>, an B<anonymous mapping inherited across C<fork>>,
-or a B<memfd> passed to an unrelated process and reopened with
-C<< new_from_fd($fd) >>. Every process's C<add> feeds the one shared summary, so
-a fleet of workers can each process part of a stream into a single top-k.
+The summary lives in a shared mapping, shared the same three ways as the rest
+of the family: a B<backing file>, an B<anonymous mapping inherited across
+C<fork>>, or a B<memfd> passed to an unrelated process and reopened with C<<
+new_from_fd($fd) >>. The descriptor you pass is duplicated
+(C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
+disturb the handle. Every process's C<add> feeds the one shared summary, so a
+fleet of workers can each process part of a stream into a single top-k.
 
 =head1 SECURITY
 
@@ -200,6 +203,18 @@ reclaim it and writers may block until the mapping is recreated. Reaching this
 needs more than 1024 concurrent reader processes on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete top-k table file
+left by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
 
 =head1 SEE ALSO
 

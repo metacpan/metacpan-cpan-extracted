@@ -1,5 +1,9 @@
 Revision history for DBIx-Loop
 
+0.03    2026-08-12
+        - t/06-hyperman.t failed the distribution on a box carrying a
+          Hyperman older than 0.10.
+
 0.02    2026-08-07
         - Fix a pool worker dying while idle taking the whole pool down
           with it. Worker death was only ever noticed as EOF on the read

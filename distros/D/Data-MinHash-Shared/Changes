@@ -1,5 +1,14 @@
 Revision history for Data-MinHash-Shared
 
+0.03      2026-08-12
+          - Recover a file left behind by an interrupted create instead of
+            leaving the path unopenable.
+          - Frozen read-only mode: freeze() seals a file-backed structure;
+            new_readonly() maps it O_RDONLY and queries it lock-free.
+          - Documentation and test-harness corrections.
+          - unlink() reports a removal that failed; one already gone is not an
+            error.
+
 0.02      2026-07-23
           - Add b-bit MinHash (bbit_similarity / bbit_signature / bbit_similarity_of).
           - Copy the first signature before reading the second in bbit.

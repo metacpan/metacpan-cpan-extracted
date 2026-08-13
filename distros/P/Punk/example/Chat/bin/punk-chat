@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../lib";
 # It is also how this is really deployed, with nginx where tls-proxy sits.
 
 BEGIN {
-    my $punk = "$FindBin::Bin/../..";
+    my $punk = "$FindBin::Bin/../../..";
     unshift @INC, "$punk/blib/lib", "$punk/blib/arch"
         if -d "$punk/blib/arch" && !$ENV{PUNK_CHAT_NO_BLIB};
 }

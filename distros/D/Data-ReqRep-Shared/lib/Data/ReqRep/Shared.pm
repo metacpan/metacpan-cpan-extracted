@@ -1,7 +1,7 @@
 package Data::ReqRep::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Data::ReqRep::Shared', $VERSION);
@@ -126,10 +126,11 @@ B<Client> (opens existing channel):
     ->new($path)
     ->new_from_fd($fd)
 
-Constructor arguments for Str: C<$path, $req_cap, $resp_slots,
-$resp_size [, $arena [, $mode]]>. For Int: C<$path, $req_cap,
-$resp_slots [, $mode]>. C<$mode> is the octal backing-file permission
-(default C<0600>); see L</SECURITY>.
+Constructor arguments for Str: C<$path, $req_cap, $resp_slots, $resp_size [,
+$arena [, $mode]]>. For Int: C<$path, $req_cap, $resp_slots [, $mode]>.
+C<$mode> is the octal backing-file permission (default C<0600>); see
+L</SECURITY>. The descriptor you pass is duplicated (C<F_DUPFD_CLOEXEC>), so
+it stays yours to close and closing it does not disturb the handle.
 
 =head2 Server API
 
@@ -315,6 +316,20 @@ client-worker connection and cannot do MPMC without a broker (which
 halves throughput).
 
 
+=head1 CRASH SAFETY
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete reqrep file left
+by an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
+
 =head1 SEE ALSO
 
 L<Data::Buffer::Shared> - typed shared array
@@ -345,17 +360,19 @@ L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 =head1 SECURITY
 
-Backing files are created with mode C<0600> (owner-only) by default, so only the
-creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the final C<$mode> argument
-to C<new> -- for Str after the optional C<$arena>
-(C<< new($path, $req_cap, $resp_slots, $resp_size, $arena, 0660) >>), for Int as
-the fourth argument (C<< new($path, $req_cap, $resp_slots, 0660) >>); the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
-file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
-and created with C<O_EXCL>; the on-disk header is validated when the file is
-attached. Any process you grant write access to a shared mapping is trusted not
-to corrupt its contents while other processes are using it.
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the final C<$mode>
+argument to C<new> -- for Str after the optional C<$arena> (C<< new($path,
+$req_cap, $resp_slots, $resp_size, $arena, 0660) >>), for Int as the fourth
+argument (C<< new($path, $req_cap, $resp_slots, 0660) >>); the mode is applied
+when the file is created, and when a file left behind by an interrupted create
+is re-initialized (see L</CRASH SAFETY>); a file already in use keeps its own
+permissions. The file is opened with C<O_NOFOLLOW>, so a symlink planted at
+the path is refused, and created with C<O_EXCL>; the on-disk header is
+validated when the file is attached. Any process you grant write access to a
+shared mapping is trusted not to corrupt its contents while other processes
+are using it.
 
 =head1 AUTHOR
 

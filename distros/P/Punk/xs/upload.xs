@@ -21,7 +21,7 @@ filename(self)
             croak("Punk::Upload: not an upload");
         h = (HV *)SvRV(self);
         v = hv_fetch(h, f[ix], (I32)strlen(f[ix]), 0);
-        RETVAL = (v && *v) ? newSVsv(*v) : &PL_sv_undef;
+        RETVAL = (v && *v) ? newSVsv(*v) : newSV(0);
     }
     OUTPUT:
         RETVAL

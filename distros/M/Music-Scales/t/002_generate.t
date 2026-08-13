@@ -12,6 +12,3 @@ ok(join(" ",get_scale_nums(1)) eq "0 2 4 5 7 9 11");
 ok(join(" ",get_scale_nums(30)) eq "0 3 5 7 10");
 ok(join(" ",get_scale_notes('C',"chromatic")) eq "C C# D D# E F F# G G# A A# B");
 ok(join(" ",get_scale_notes('C',"chromatic",1)) eq "C B Bb A Ab G Gb F E Eb D Db");
-
-
-

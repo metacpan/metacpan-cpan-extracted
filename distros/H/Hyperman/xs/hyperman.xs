@@ -42,6 +42,9 @@ run(class, ...)
             else if (strEQ(key, "header_timeout")) cfg.header_t = SvNV(val);
             else if (strEQ(key, "max_pipeline"))   cfg.max_pipe = (int)SvIV(val);
             else if (strEQ(key, "reuseport"))      cfg.reuseport = SvTRUE(val) ? 1 : 0;
+            else if (strEQ(key, "deny"))           { if (SvOK(val) && SvROK(val)) cfg.deny = val; }
+            else if (strEQ(key, "deny_capacity"))  cfg.deny_cap = (unsigned)SvUV(val);
+            else if (strEQ(key, "rate_capacity"))  cfg.rate_cap = (unsigned)SvUV(val);
             else if (strEQ(key, "access_log")) {
                 /* coderef -> per-request Perl callback (as before);
                  * a filehandle or a path -> fast C-side Combined-log writer. */
@@ -181,6 +184,7 @@ stats(...)
             HV *h = newHV();
             hv_stores(h, "requests",    newSVuv(hm_cur_loop->requests));
             hv_stores(h, "accepts",     newSVuv(hm_cur_loop->accepts));
+            hv_stores(h, "denied",      newSVuv(hm_cur_loop->denied));
             hv_stores(h, "bytes_out",   newSVuv(hm_cur_loop->bytes_out));
             hv_stores(h, "connections", newSViv(hm_cur_loop->nconns));
             hv_stores(h, "backend",     newSVpv(hm_cur_loop->be->name, 0));

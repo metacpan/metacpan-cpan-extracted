@@ -32,9 +32,9 @@ SYNOPSIS
         $log = Data::Log::Shared->new_from_fd($fd);
 
 DESCRIPTION
-    Append-only log in shared memory. Multiple writers append
-    variable-length entries via CAS on a tail offset. Readers replay from
-    any position. Entries persist until explicit "reset".
+    Append-only log in shared memory. Multiple writers append variable-length
+    entries via CAS on a tail offset. Readers replay from any position.
+    Entries persist until explicit "reset".
 
     Unlike Data::Queue::Shared (consumed on read) and Data::PubSub::Shared
     (ring overwrites), the log retains all entries until truncation. Useful
@@ -57,8 +57,7 @@ METHODS
 
     "read_entry" distinguishes three cases:
 
-    *   Entry available: returns "($data, $next_off)" where $data is
-        defined.
+    *   Entry available: returns "($data, $next_off)" where $data is defined.
 
     *   End / in-flight: returns the empty list. The caller should stop
         iterating (or wait via "wait_for") and retry.
@@ -78,9 +77,8 @@ METHODS
         my $final_pos = $log->each_entry(\&cb, $start_offset);
         my $final_pos = $log->each_entry(\&cb, $start_offset, $abandon_wait_us);
 
-    $abandon_wait_us is forwarded to "read_entry"; pass 0 to skip
-    uncommitted slots immediately rather than waiting up to 2s for an
-    in-flight writer.
+    $abandon_wait_us is forwarded to "read_entry"; pass 0 to skip uncommitted
+    slots immediately rather than waiting up to 2s for an in-flight writer.
 
   Status
         my $off  = $log->tail_offset;   # byte offset past last entry
@@ -103,19 +101,19 @@ METHODS
         $log->unlink;                # remove backing file
 
   Truncation vs Reset
-    The log has a fixed size ("data_size", set at creation). It is
-    append-only -- space is never reclaimed automatically.
+    The log has a fixed size ("data_size", set at creation). It is append-only
+    -- space is never reclaimed automatically.
 
     truncate($offset) is concurrency-safe (lock-free CAS). It marks all
     entries before $offset as logically invalid -- readers calling
-    "read_entry" or "each_entry" will skip them. However, truncation does
-    not free physical space: the tail offset keeps advancing, and the log
-    will eventually fill regardless of truncation.
+    "read_entry" or "each_entry" will skip them. However, truncation does not
+    free physical space: the tail offset keeps advancing, and the log will
+    eventually fill regardless of truncation.
 
-    "reset" reclaims all space by zeroing the tail and the data region. It
-    is not concurrency-safe -- it must only be called when no other process
-    is reading or writing. Cost is O(data_size) because the slot region is
-    zeroed to prevent stale-data hazards for subsequent readers.
+    "reset" reclaims all space by zeroing the tail and the data region. It is
+    not concurrency-safe -- it must only be called when no other process is
+    reading or writing. Cost is O(data_size) because the slot region is zeroed
+    to prevent stale-data hazards for subsequent readers.
 
     Typical pattern for long-running logs: size the log generously, truncate
     periodically to discard old entries from readers, and reset during
@@ -140,13 +138,14 @@ STATS
     "appends", "waits", "timeouts", "mmap_size".
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default, so
-    only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
+    Backing files are created with mode 0600 (owner-only) by default, so only
+    the creating user can open and attach them. To share a backing file across
+    users, pass an explicit octal file mode such as 0660 as the last argument
+    to "new"; the mode is applied when the file is created, and when a file
+    left behind by an interrupted create is re-initialized (see "CRASH
+    SAFETY"); a file already in use keeps its own permissions. The file is
+    opened with "O_NOFOLLOW", so a symlink planted at the path is refused, and
+    created with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
 
@@ -160,6 +159,20 @@ BENCHMARKS
     Multi-process (8 workers, 200K appends each):
 
         concurrent append       6.2M/s aggregate
+
+CRASH SAFETY
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete log file left by an interrupted create; remove it and retry".
+    A file left behind by an interrupted create never held data, so removing
+    it is safe -- but a file whose header was corrupted after the fact reaches
+    the same croak, so confirm it is an abandoned create before deleting
+    anything you care about.
 
 SEE ALSO
     Data::Queue::Shared - FIFO queue (consumed on read)
@@ -192,6 +205,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

@@ -48,6 +48,13 @@ the currently running Hyperman loop (inside a worker) or creates a fresh
 C<Hyperman::Loop>. Loading L<Hyperman> before constructing the adapter is
 required; without it C<new> croaks.
 
+The ABI this binds to arrived in Hyperman 0.10, so that is the oldest
+Hyperman the adapter works against - on an earlier one C<new> croaks the same
+way it does when Hyperman was never loaded, because from C there is nothing
+to bind to in either case. Nothing else in DBIx::Loop is affected: the version
+floor belongs to this adapter alone, which is why it is not a distribution
+prerequisite.
+
 C<timer($after, $cb)> returns a handle; C<cancel_timer($handle)> cancels a
 timer that has not fired yet. Never cancel a timer after its callback ran -
 the handle dies with the fire.

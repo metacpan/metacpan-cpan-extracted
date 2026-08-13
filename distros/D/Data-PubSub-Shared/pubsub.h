@@ -380,7 +380,6 @@ static void pubsub_init_header(void *base, uint32_t mode, uint32_t cap,
                                 uint64_t arena_cap) {
     PubSubHeader *hdr = (PubSubHeader *)base;
     memset(hdr, 0, sizeof(PubSubHeader));
-    hdr->magic     = PUBSUB_MAGIC;
     hdr->version   = PUBSUB_VERSION;
     hdr->mode      = mode;
     hdr->capacity  = cap;
@@ -389,6 +388,12 @@ static void pubsub_init_header(void *base, uint32_t mode, uint32_t cap,
     hdr->data_off  = data_off;
     hdr->msg_size  = msg_size;
     hdr->arena_cap = arena_cap;
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, PUBSUB_MAGIC, __ATOMIC_RELEASE);
+
 }
 
 /* Returns 1 on success, 0 if the requested capacity * msg_size would
@@ -445,6 +450,16 @@ static int pubsub_secure_open(const char *path, mode_t mode, char *errbuf) {
     }
     PUBSUB_ERR("open %s: create/attach kept racing", path);
     return -1;
+}
+
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int pubsub_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
 }
 
 static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
@@ -521,7 +536,30 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
 
         if (!is_new) {
             if (!pubsub_validate_header((PubSubHeader *)base, mode, (uint64_t)st.st_size)) {
-                PUBSUB_ERR("%s: invalid or incompatible pubsub file", path);
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((PubSubHeader *)base)->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid() && pubsub_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, fmode) < 0) {
+                        PUBSUB_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    pubsub_init_header(base, mode, cap, total_size, slots_off, data_off,
+                                        msg_size, arena_cap);
+                    flock(fd, LOCK_UN); close(fd);
+                    PubSubHandle *h = pubsub_init_handle(base, map_size, mode, path);
+                    if (!h) { munmap(base, map_size); return NULL; }
+                    return h;
+                }
+                if (((PubSubHeader *)base)->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid())
+                    PUBSUB_ERR("%s: incomplete pubsub file left by an interrupted create; remove it and retry", path);
+                else
+                    PUBSUB_ERR("%s: invalid or incompatible pubsub file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN);

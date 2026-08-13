@@ -249,9 +249,9 @@ upload(self, name)
         got = (u && *u && SvROK(*u)) ? hv_fetch((HV *)SvRV(*u), n, (I32)nl, 0) : NULL;
         if (got && *got && SvROK(*got) && SvTYPE(SvRV(*got)) == SVt_PVAV) {
             SV **first = av_fetch((AV *)SvRV(*got), 0, 0);   /* first of several */
-            RETVAL = (first && *first) ? newSVsv(*first) : &PL_sv_undef;
+            RETVAL = (first && *first) ? newSVsv(*first) : newSV(0);
         }
-        else RETVAL = (got && *got) ? newSVsv(*got) : &PL_sv_undef;
+        else RETVAL = (got && *got) ? newSVsv(*got) : newSV(0);
     }
     OUTPUT:
         RETVAL

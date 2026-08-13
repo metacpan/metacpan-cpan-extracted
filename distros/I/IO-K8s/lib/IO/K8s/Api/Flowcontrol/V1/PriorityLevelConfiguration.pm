@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfiguration;
 # ABSTRACT: PriorityLevelConfiguration represents the configuration of a priority level.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfiguration - PriorityLevelConfigu
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ C<metadata>, C<api_version()>, and C<kind()>.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#prioritylevelconfiguration-v1-flowcontrol.apiserver.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#prioritylevelconfiguration-v1-flowcontrol.apiserver.k8s.io>
 
 =head1 SUPPORT
 
@@ -50,10 +50,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#priorityl
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -65,7 +61,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

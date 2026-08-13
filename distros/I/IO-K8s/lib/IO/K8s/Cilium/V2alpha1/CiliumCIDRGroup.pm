@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumCIDRGroup;
 # ABSTRACT: Cilium CIDR group for IP address management
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumcidrgroups';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2alpha1::CiliumCIDRGroup - Cilium CIDR group for IP address ma
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -45,10 +45,6 @@ This cluster-scoped resource defines reusable sets of CIDRs that can be referenc
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -59,7 +55,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

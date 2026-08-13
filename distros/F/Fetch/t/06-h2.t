@@ -35,6 +35,7 @@ close $probe;
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    open STDOUT, '>', '/dev/null';   # never hold the harness TAP pipe open
     open STDERR, '>', '/dev/null';
     Hyperman->run(
         app => sub {
@@ -100,4 +101,4 @@ my $base = "https://127.0.0.1:$port";
     is($seen, 'body-of/stream', 'h2 body delivered through on_body, not buffered');
 }
 
-END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

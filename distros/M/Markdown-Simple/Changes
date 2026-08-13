@@ -1,5 +1,13 @@
 Revision history for Markdown-Simple
 
+0.21    2026-08-12
+        - Fix _abi_ptr on platforms that map the shared object at a high
+          address.
+        - Fix loading on perl 5.10.0: the ABI selftest used mPUSHs, which
+          only arrived after 5.10.0, so the .so failed to load there with
+          "undefined symbol: mPUSHs". Add an #ifndef shim; every use was
+          already EXTEND-guarded, so the expansion is exact.
+
 0.20    2026-08-07
         - Add heading_ids => 1: headings get a GitHub-style anchor, as
           <h2 id="the-slug">. 

@@ -2,6 +2,7 @@ requires 'Moo', '2.000000';
 requires 'Type::Tiny', '2.000000';
 requires 'Types::Standard';
 requires 'JSON::MaybeXS';
+requires 'Module::Runtime';
 requires 'YAML::PP';
 requires 'Scalar::Util';
 requires 'Import::Into';

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use IO::Socket::INET;
 use Test::More;
+use File::Spec ();
 use Fetch;
 
 # Redirect following: a chain of 301/302 (relative and absolute Location),
@@ -19,6 +20,11 @@ my $base = "http://127.0.0.1:$port";
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    # Never hold the harness TAP pipe open, and never outlive the run:
+    # a leaked server child hangs the whole suite after this test is done.
+    open STDOUT, ">", File::Spec->devnull();
+    open STDERR, ">", File::Spec->devnull();
+    alarm 120;
     $SIG{TERM} = sub { exit 0 };
     while (my $c = $srv->accept) {
         my $l = <$c>;
@@ -86,4 +92,4 @@ my $ua = Fetch->new;
     is($res->status, 301, 'max_redirects => 0 returns the redirect itself');
 }
 
-END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

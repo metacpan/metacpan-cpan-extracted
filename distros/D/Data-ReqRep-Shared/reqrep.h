@@ -44,6 +44,14 @@
 #define RESP_FREE              0
 #define RESP_ACQUIRED          1
 #define RESP_READY             2
+/* A responder holds the slot while it copies the payload in. Acquire needs
+ * FREE and cancel needs ACQUIRED, so neither can take a slot parked here --
+ * which is what makes the copy itself safe. Checking state and generation
+ * around the copy is not enough: a cancel + re-acquire + reply completing
+ * between the check and the copy let a stale responder overwrite the new
+ * owner's already-published payload, and the later checks rejected the state
+ * transition without ever undoing the data. */
+#define RESP_WRITING           3
 
 #define REQREP_MODE_STR        0
 #define REQREP_MODE_INT        1
@@ -129,7 +137,7 @@ typedef struct {
 } ReqIntSlot;  /* 24 bytes (Int mode, lock-free) */
 
 typedef struct {
-    uint32_t state;        /* futex: RESP_FREE=0, RESP_ACQUIRED=1, RESP_READY=2 */
+    uint32_t state;        /* futex: RESP_FREE=0, RESP_ACQUIRED=1, RESP_READY=2, RESP_WRITING=3 */
     uint32_t waiters;      /* futex waiters on this slot */
     uint32_t owner_pid;    /* PID of client that acquired (for stale recovery) */
     uint32_t resp_len;     /* response data length */
@@ -383,7 +391,11 @@ static int32_t reqrep_slot_acquire(ReqRepHandle *h) {
     for (uint32_t i = 0; i < n; i++) {
         RespSlotHeader *slot = reqrep_resp_slot(h, i);
         uint32_t state = __atomic_load_n(&slot->state, __ATOMIC_ACQUIRE);
-        if (state != RESP_ACQUIRED && state != RESP_READY) continue;
+        /* WRITING too: owner_pid is the CLIENT, so a slot parked mid-reply
+         * still belongs to a client that may have died, and skipping it here
+         * would leak the slot for the life of the segment. */
+        if (state != RESP_ACQUIRED && state != RESP_READY && state != RESP_WRITING)
+            continue;
         uint32_t pid = __atomic_load_n(&slot->owner_pid, __ATOMIC_ACQUIRE);
         if (!pid || reqrep_pid_alive(pid)) continue;
 
@@ -396,9 +408,11 @@ static int32_t reqrep_slot_acquire(ReqRepHandle *h) {
             continue;
 
         /* We own the recovery now. Drive state to FREE; retry on transient
-         * ACQUIRED->READY (reply arrived after death) until state is FREE.
-         * If clear() or another path beat us, state==FREE already.
-         * State can only be 0/1/2; CAS-on-fail sets cur_state to current. */
+         * ACQUIRED->WRITING->READY (a reply arriving after death) until state
+         * is FREE. If clear() or another path beat us, state==FREE already.
+         * CAS-on-fail sets cur_state to the current value, so the loop follows
+         * whatever the responder does; the responder's publishing CAS then
+         * fails against FREE and it drops the reply. */
         uint32_t cur_state = state;
         while (cur_state != RESP_FREE) {
             if (__atomic_compare_exchange_n(&slot->state, &cur_state, RESP_FREE,
@@ -524,7 +538,6 @@ static void reqrep_init_header(void *base, uint32_t req_cap, uint32_t resp_slots
                                 uint32_t resp_stride) {
     ReqRepHeader *hdr = (ReqRepHeader *)base;
     memset(hdr, 0, sizeof(ReqRepHeader));
-    hdr->magic         = REQREP_MAGIC;
     hdr->version       = REQREP_VERSION;
     hdr->mode          = REQREP_MODE_STR;
     hdr->req_cap       = req_cap;
@@ -542,6 +555,11 @@ static void reqrep_init_header(void *base, uint32_t req_cap, uint32_t resp_slots
         memset(rs, 0, sizeof(RespSlotHeader));
     }
 
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, REQREP_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -602,6 +620,16 @@ static int reqrep_secure_open(const char *path, mode_t mode, char *errbuf) {
     }
     REQREP_ERR("open %s: create/attach kept racing", path);
     return -1;
+}
+
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int reqrep_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
 }
 
 static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
@@ -681,7 +709,31 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
 
         if (!is_new) {
             if (!reqrep_validate_header((ReqRepHeader *)base, (size_t)st.st_size, REQREP_MODE_STR)) {
-                REQREP_ERR("%s: invalid or incompatible reqrep file", path);
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((ReqRepHeader *)base)->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid() && reqrep_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        REQREP_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    reqrep_init_header(base, req_cap, resp_slots_n, resp_data_max, total_size,
+                                        req_slots_off, req_arena_off, req_arena_cap,
+                                        resp_off, resp_stride);
+                    flock(fd, LOCK_UN); close(fd);
+                    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+                    if (!h) { munmap(base, map_size); return NULL; }
+                    return h;
+                }
+                if (((ReqRepHeader *)base)->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid())
+                    REQREP_ERR("%s: incomplete reqrep file left by an interrupted create; remove it and retry", path);
+                else
+                    REQREP_ERR("%s: invalid or incompatible reqrep file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN);
@@ -1101,39 +1153,42 @@ static int reqrep_reply(ReqRepHandle *h, uint64_t id,
     if (len > h->resp_data_max) return -3;
 
     RespSlotHeader *slot = reqrep_resp_slot(h, slot_idx);
-    uint32_t state = __atomic_load_n(&slot->state, __ATOMIC_ACQUIRE);
-    if (state != RESP_ACQUIRED) return -2;
-    if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen) return -2;
+
+    /* Take the slot OUT of ACQUIRED before touching the payload. Until we put
+     * it back, no acquire (needs FREE) and no cancel (needs ACQUIRED) can move
+     * it, so nothing can become the new owner underneath our copy. */
+    uint32_t expected_state = RESP_ACQUIRED;
+    if (!__atomic_compare_exchange_n(&slot->state, &expected_state, RESP_WRITING,
+            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+        return -2;
+
+    /* Only now is the generation stable enough to trust: a cancel and
+     * re-acquire could have completed before our CAS, leaving the slot legally
+     * ACQUIRED by somebody else. Hand it back exactly as we found it, having
+     * written nothing. */
+    if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen) {
+        __atomic_store_n(&slot->state, RESP_ACQUIRED, __ATOMIC_RELEASE);
+        return -2;
+    }
 
     uint8_t *data = (uint8_t *)slot + sizeof(RespSlotHeader);
     if (len > 0) memcpy(data, str, len);
     slot->resp_len = len;
     slot->resp_flags = utf8 ? 1 : 0;
 
-    /* Tighten the race window: re-check gen just before CAS. A cancel +
-     * re-acquire cycle would have bumped gen; reject if so. */
-    if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen)
-        return -2;
-
-    /* CAS ACQUIRED->READY (with RELEASE to publish data writes). */
-    uint32_t expected_state = RESP_ACQUIRED;
+    /* Publish (RELEASE orders the payload before the state a reader sees).
+     * CAS rather than a plain store: the owner's death can still hand this
+     * slot to recovery, which drives any state to FREE, and we must not stamp
+     * READY over a slot that has since been handed to someone else. */
+    expected_state = RESP_WRITING;
     if (!__atomic_compare_exchange_n(&slot->state, &expected_state, RESP_READY,
-            0, __ATOMIC_RELEASE, __ATOMIC_RELAXED))
-        return -2;
-
-    /* Post-CAS gen verification: cancel+re-acquire could still have raced
-     * between the gen recheck and the CAS. If so, we've stamped READY onto
-     * the wrong owner's slot. Invalidate them rather than let them read
-     * our stale data: bump gen + reset state to FREE. */
-    if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen) {
-        __atomic_add_fetch(&slot->generation, 1, __ATOMIC_RELEASE);
-        __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
-        __atomic_store_n(&slot->state, RESP_FREE, __ATOMIC_RELEASE);
-        /* StoreLoad barrier: publish the slot state/generation change before reading waiters (else a registered waiter's wakeup is lost). */
+            0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
+        /* Recovery or clear took the slot from under us. Wake whoever is
+         * parked on it so they observe the new generation now rather than
+         * sleeping out their timeout. */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
             syscall(SYS_futex, &slot->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-        reqrep_wake_slot_waiters(h->hdr);
         return -2;
     }
 
@@ -1297,7 +1352,7 @@ static uint32_t reqrep_pending(ReqRepHandle *h) {
     for (uint32_t i = 0; i < h->resp_slots; i++) {
         RespSlotHeader *slot = reqrep_resp_slot(h, i);
         uint32_t state = __atomic_load_n(&slot->state, __ATOMIC_ACQUIRE);
-        if ((state == RESP_ACQUIRED || state == RESP_READY) &&
+        if ((state == RESP_ACQUIRED || state == RESP_READY || state == RESP_WRITING) &&
             __atomic_load_n(&slot->owner_pid, __ATOMIC_ACQUIRE) == mypid)
             count++;
     }
@@ -1332,7 +1387,7 @@ static void reqrep_clear(ReqRepHandle *h) {
     for (uint32_t i = 0; i < h->resp_slots; i++) {
         RespSlotHeader *slot = reqrep_resp_slot(h, i);
         uint32_t state = __atomic_load_n(&slot->state, __ATOMIC_ACQUIRE);
-        while (state == RESP_ACQUIRED || state == RESP_READY) {
+        while (state == RESP_ACQUIRED || state == RESP_READY || state == RESP_WRITING) {
             if (__atomic_compare_exchange_n(&slot->state, &state, RESP_FREE,
                     0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
                 __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
@@ -1440,7 +1495,6 @@ static void reqrep_int_init_header(void *base, uint32_t req_cap, uint32_t resp_s
                                     uint32_t resp_off, uint32_t resp_stride) {
     ReqRepHeader *hdr = (ReqRepHeader *)base;
     memset(hdr, 0, sizeof(ReqRepHeader));
-    hdr->magic         = REQREP_MAGIC;
     hdr->version       = REQREP_VERSION;
     hdr->mode          = REQREP_MODE_INT;
     hdr->req_cap       = req_cap;
@@ -1462,6 +1516,11 @@ static void reqrep_int_init_header(void *base, uint32_t req_cap, uint32_t resp_s
         memset(rs, 0, sizeof(RespSlotHeader));
     }
 
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, REQREP_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -1511,7 +1570,31 @@ static ReqRepHandle *reqrep_create_int(const char *path, uint32_t req_cap,
         if (base == MAP_FAILED) { REQREP_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!reqrep_validate_header((ReqRepHeader *)base, map_size, REQREP_MODE_INT)) {
-                REQREP_ERR("%s: invalid or incompatible", path); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((ReqRepHeader *)base)->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid() && reqrep_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        REQREP_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    reqrep_int_init_header(base, req_cap, resp_slots_n, total_size,
+                                            req_slots_off, resp_off, resp_stride);
+                    flock(fd, LOCK_UN); close(fd);
+                    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+                    if (!h) { munmap(base, map_size); return NULL; }
+                    return h;
+                }
+                if (((ReqRepHeader *)base)->magic == 0 && (uint64_t)st.st_size == total_size
+                    && st.st_uid == geteuid())
+                    REQREP_ERR("%s: incomplete reqrep file left by an interrupted create; remove it and retry", path);
+                else
+                    REQREP_ERR("%s: invalid or incompatible", path);
+                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
             ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
@@ -1721,30 +1804,29 @@ static int reqrep_int_reply(ReqRepHandle *h, uint64_t id, int64_t value) {
     if (slot_idx >= h->resp_slots) return -1;
 
     RespSlotHeader *slot = reqrep_resp_slot(h, slot_idx);
-    uint32_t state = __atomic_load_n(&slot->state, __ATOMIC_ACQUIRE);
-    if (state != RESP_ACQUIRED) return -2;
-    if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen) return -2;
+
+    /* Pin the slot for the store, exactly as reqrep_reply does -- an 8-byte
+     * value is no more protected than a memcpy: the old owner's store and the
+     * new owner's read are still two separate operations. */
+    uint32_t expected_state = RESP_ACQUIRED;
+    if (!__atomic_compare_exchange_n(&slot->state, &expected_state, RESP_WRITING,
+            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+        return -2;
+
+    if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen) {
+        __atomic_store_n(&slot->state, RESP_ACQUIRED, __ATOMIC_RELEASE);
+        return -2;
+    }
 
     *(int64_t *)((uint8_t *)slot + sizeof(RespSlotHeader)) = value;
 
-    /* Tightened gen recheck before the publishing CAS. */
-    if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen)
-        return -2;
-
-    uint32_t expected_state = RESP_ACQUIRED;
+    expected_state = RESP_WRITING;
     if (!__atomic_compare_exchange_n(&slot->state, &expected_state, RESP_READY,
-            0, __ATOMIC_RELEASE, __ATOMIC_RELAXED))
-        return -2;
-
-    /* Post-CAS verification -- invalidate the wrong owner if we raced. */
-    if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen) {
-        __atomic_add_fetch(&slot->generation, 1, __ATOMIC_RELEASE);
-        __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
-        __atomic_store_n(&slot->state, RESP_FREE, __ATOMIC_RELEASE);
+            0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
+        /* See reqrep_reply: wake anyone parked on a slot recovery took. */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
             syscall(SYS_futex, &slot->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-        reqrep_wake_slot_waiters(h->hdr);
         return -2;
     }
 
@@ -1863,7 +1945,7 @@ static void reqrep_int_clear(ReqRepHandle *h) {
     for (uint32_t i = 0; i < h->resp_slots; i++) {
         RespSlotHeader *slot = reqrep_resp_slot(h, i);
         uint32_t state = __atomic_load_n(&slot->state, __ATOMIC_ACQUIRE);
-        while (state == RESP_ACQUIRED || state == RESP_READY) {
+        while (state == RESP_ACQUIRED || state == RESP_READY || state == RESP_WRITING) {
             if (__atomic_compare_exchange_n(&slot->state, &state, RESP_FREE,
                     0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
                 __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);

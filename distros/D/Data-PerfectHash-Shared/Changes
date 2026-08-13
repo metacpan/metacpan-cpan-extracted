@@ -1,5 +1,12 @@
 Revision history for Data::PerfectHash::Shared
 
+0.02  2026-08-12
+    - Regenerate README from the POD: it still described the image as portable
+      across differing word sizes, whereas load() requires the same byte order.
+    - Hardening: re-entrancy with tied and overloaded arguments, and DESTROY on
+      an invocant that is not one of ours.
+    - Documentation and test-harness corrections.
+
 0.01  2026-07-28
     - Initial release.
     - Compact CHD index: the per-bucket displacement array is stored

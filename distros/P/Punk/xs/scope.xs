@@ -119,7 +119,7 @@ api(self, spec, opts = &PL_sv_undef)
         argv[1] = opts;
         argv[2] = self;
         mount = pcx_call_meth(aTHX_ app ? app : &PL_sv_undef, "api", argv, 3, 1);
-        RETVAL = mount ? mount : &PL_sv_undef;
+        RETVAL = mount ? mount : newSV(0);
     }
     OUTPUT:
         RETVAL

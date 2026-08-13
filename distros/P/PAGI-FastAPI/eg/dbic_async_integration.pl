@@ -22,8 +22,8 @@
 #       curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:5000/users/1
 #       curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:5000/dashboard
 #       curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:5000/users/999
-#
-use v5.36;
+
+use v5.38;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 

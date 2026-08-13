@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::SelfSubjectRulesReview;
 # ABSTRACT: SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Authorization::V1::SelfSubjectRulesReview - SelfSubjectRulesReview
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Status is filled in by the server and indicates the set of actions a user can pe
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#selfsubjectrulesreview-v1-authorization.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#selfsubjectrulesreview-v1-authorization.k8s.io>
 
 =head1 SUPPORT
 
@@ -50,10 +50,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#selfsubje
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -65,7 +61,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -33,6 +33,7 @@ my @files = (
     't/builder-array.t',
     't/contrive-class.t',
     't/exporting.t',
+    't/frame-call-depth.t',
     't/frame-hierarchy-depth.t',
     't/frame-hierarchy-parent.t',
     't/frame-hierarchy-root.t',

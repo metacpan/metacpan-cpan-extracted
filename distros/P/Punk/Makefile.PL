@@ -77,33 +77,34 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
-        'File::Raw::JSON'     => '0.05',   # provides frj_abi.h
-        'Open::API'           => '0.04',   # provides oa_abi.h
-        'Template::Stencil'   => '0.02',   # provides st_abi.h
-        'Hyperman'            => '0.13',   # provides hm_abi.h
-        'Markdown::Simple'    => '0.20',   # provides mds_abi.h
-        'Search::Trigram'     => '0.02',   # provides sg_abi.h
-        'DBIx::Loop'          => '0.02',   # provides dbil_abi.h
+        'File::Raw::JSON'     => '0.06',   # provides frj_abi.h
+        'Open::API'           => '0.09',   # provides oa_abi.h
+        'Template::Stencil'   => '0.05',   # provides st_abi.h
+        'Hyperman'            => '0.18',   # provides hm_abi.h (v3: rate limit)
+        'Markdown::Simple'    => '0.21',   # provides mds_abi.h
+        'Search::Trigram'     => '0.03',   # provides sg_abi.h
+        'DBIx::Loop'          => '0.03',   # provides dbil_abi.h
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Open::API'            => '0.04',   # spec-first routing + validation; oa_abi.h
-        'Template::Stencil'    => '0.02',   # Punk::View::Stencil; st_abi.h
-        'File::Raw::JSON'      => '0.05',   # body decode / auto-JSON encode
-        'Fetch'                => '0.11',   # $c->ua, on the worker's own loop
+        'Open::API'            => '0.09',   # spec-first routing + validation; oa_abi.h
+        'Template::Stencil'    => '0.05',   # Punk::View::Stencil; st_abi.h
+        'File::Raw::JSON'      => '0.06',   # body decode / auto-JSON encode
+        'Fetch'                => '0.12',   # $c->ua, on the worker's own loop
         'JSON::Schema::Fast'   => '0.05',   # schema field validation
         'YAML::XS'             => '0',      # Punk::Config; every scaffolded
                                             # app carries a config/punk.yml
-        'Hyperman'             => '0.13',   # the native server; hm_abi.h's
+        'Hyperman'             => '0.18',   # the native server; hm_abi.h's
                                             # detach ABI is what websocket
-                                            # routes attach through
-        'Markdown::Simple'     => '0.20',   # the markdown mount; mds_abi.h,
+                                            # routes attach through, and v3
+                                            # is the rate-limit / denylist arena
+        'Markdown::Simple'     => '0.21',   # the markdown mount; mds_abi.h,
                                             # whose heading anchors and TOC
                                             # the docs shell is built on
-        'Search::Trigram'      => '0.02',   # markdown search; sg_abi.h
-        'DBIx::Loop'           => '0.02',   # Punk::Model::DBIx::Loop, the
+        'Search::Trigram'      => '0.03',   # markdown search; sg_abi.h
+        'DBIx::Loop'           => '0.03',   # Punk::Model::DBIx::Loop, the
                                             # async model backend; dbil_abi.h
     },
     META_MERGE => {
@@ -120,6 +121,7 @@ my %WriteMakefileArgs = (
     EXE_FILES => ['bin/punk'],   # the `punk new` scaffolder
     INC    => $INC,
     DEFINE => join(' ', @DEFINE),
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Punk-*' },
     # MakeMaker maps Punk.xs -> Punk.c and does not rescan the INCLUDE:

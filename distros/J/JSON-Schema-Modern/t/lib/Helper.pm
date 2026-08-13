@@ -14,8 +14,6 @@ no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use if $ENV{NO_OPTIONAL_MODULES}, 'Devel::Hide', qw(
-  Time::Moment
-  DateTime::Format::RFC3339
   Data::Validate::Domain
   Email::Address::XS
   Net::IDN::Encode

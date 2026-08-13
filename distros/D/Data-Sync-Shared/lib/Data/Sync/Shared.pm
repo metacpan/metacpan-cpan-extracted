@@ -1,7 +1,7 @@
 package Data::Sync::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Data::Sync::Shared', $VERSION);
@@ -22,7 +22,7 @@ XSLoader::load('Data::Sync::Shared', $VERSION);
 # Guard objects -- auto-release on scope exit
 
 package Data::Sync::Shared::RWLock::Guard {
-    our $VERSION = '0.07';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.08';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the lock may release it: after fork the
         # child inherits the guard object, and its global destruction would
@@ -46,7 +46,7 @@ sub Data::Sync::Shared::RWLock::wrlock_guard {
 }
 
 package Data::Sync::Shared::Condvar::Guard {
-    our $VERSION = '0.07';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.08';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the mutex may release it -- see the note
         # on RWLock::Guard::DESTROY.
@@ -100,7 +100,7 @@ sub Data::Sync::Shared::Semaphore::acquire_guard {
 }
 
 package Data::Sync::Shared::Semaphore::Guard {
-    our $VERSION = '0.07';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.08';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the permits may release them: a forked
         # child's global destruction would otherwise release permits it never
@@ -490,6 +490,38 @@ C<timeouts>, C<recoveries>.
     my $n  = $obj->eventfd_consume;  # drain notification counter
 
 Notification is opt-in. Use with L<EV> or other event loops.
+
+=head1 CRASH SAFETY
+
+An interrupted create is recovered too. A creator killed after the backing
+file is sized but before its header is committed leaves a full-size, all-zero
+file. C<new> re-initializes such a file automatically, but only when it is
+exactly the size the requested geometry needs, is owned by your effective uid,
+and is still entirely zero -- a file holding data is never re-initialized. If
+the creator got as far as writing part of the header, the file cannot be told
+apart from a corrupt one and C<new> croaks with C<incomplete sync file left by
+an interrupted create; remove it and retry>. A file left behind by an
+interrupted create never held data, so removing it is safe -- but a file whose
+header was corrupted after the fact reaches the same croak, so confirm it is
+an abandoned create before deleting anything you care about.
+
+=head1 SECURITY
+
+Backing files are created with mode C<0600> (owner-only) by default, so only
+the creating user can open and attach them. To share a backing file across
+users, pass an explicit octal file mode such as C<0660> as the last argument
+to C<new> -- C<< Semaphore->new($path, $max, $initial, $mode) >>,
+C<< Barrier->new($path, $parties, $mode) >>, C<< RWLock->new($path, $mode) >>,
+C<< Condvar->new($path, $mode) >> and C<< Once->new($path, $mode) >>. The mode
+is applied when the file is created, and when a file left behind by an
+interrupted create is re-initialized (see L</CRASH SAFETY>); a file already in
+use keeps its own permissions. The file is opened with C<O_NOFOLLOW>, so a
+symlink planted at the path is refused, and created with C<O_EXCL>; the on-disk
+header is validated when the file is attached. Any process you grant write
+access to a shared mapping is trusted not to corrupt its contents while other
+processes are using it -- a primitive whose header is rewritten underneath it
+can leave waiters parked, which no amount of validation at attach time can
+undo.
 
 =head1 SEE ALSO
 

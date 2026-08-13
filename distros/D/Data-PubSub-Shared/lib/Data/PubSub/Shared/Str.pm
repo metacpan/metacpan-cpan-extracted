@@ -1,7 +1,7 @@
 package Data::PubSub::Shared::Str;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use Data::PubSub::Shared ();
 1;
 

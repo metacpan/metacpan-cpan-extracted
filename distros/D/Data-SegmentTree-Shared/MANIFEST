@@ -10,6 +10,7 @@ README
 Shared.xs
 t/01-basic.t
 t/02-assign-monoids.t
+t/03-recover.t
 xt/asan.t
 xt/clamp_oob.t
 xt/crash_recovery.t

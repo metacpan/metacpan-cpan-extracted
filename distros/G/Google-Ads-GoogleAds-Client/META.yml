@@ -42,6 +42,8 @@ no_index:
     - Google::Ads::GoogleAds::V25::Common
     - Google::Ads::GoogleAds::V25::Resources
     - Google::Ads::GoogleAds::V25::Services
+recommends:
+  Google::Auth: '0.10'
 requires:
   Class::Load: '0'
   Class::Std::Fast: '0'
@@ -84,5 +86,5 @@ resources:
   bugtracker: https://github.com/googleads/google-ads-perl/issues
   license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/googleads/google-ads-perl
-version: v33.0.0
+version: v33.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

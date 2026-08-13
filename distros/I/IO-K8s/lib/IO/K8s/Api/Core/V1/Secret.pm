@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Secret;
 # ABSTRACT: Secret holds secret data of a certain type. The total bytes of the values in the Data field must be less than MaxSecretSize bytes.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -30,7 +30,7 @@ IO::K8s::Api::Core::V1::Secret - Secret holds secret data of a certain type. The
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -57,7 +57,7 @@ Used to facilitate programmatic handling of secret data. More info: https://kube
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#secret-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#secret-v1-core>
 
 =head1 SUPPORT
 
@@ -65,10 +65,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#secret-v1
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -80,7 +76,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::HTTPIngressRuleValue;
 # ABSTRACT: HTTPIngressRuleValue is a list of http selectors pointing to backends. In the example: http://<host>/<path>?<searchpart> -> backend where where parts of the url correspond to RFC 3986, this resource will be used to match against everything after the last '/' and before the first '?' or '#'.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s paths => ['Networking::V1::HTTPIngressPath'], 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Networking::V1::HTTPIngressRuleValue - HTTPIngressRuleValue is a l
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 paths
 
@@ -33,10 +33,6 @@ paths is a collection of paths that map requests to backends.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -47,7 +43,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

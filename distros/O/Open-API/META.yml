@@ -1,5 +1,5 @@
 ---
-abstract: 'OpenAPI 3.1 server and client'
+abstract: 'OpenAPI 3.0 and 3.1 server and client'
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -29,5 +29,5 @@ requires:
   File::Raw::JSON: '0.05'
   JSON::Schema::Fast: '0.05'
   perl: '5.008003'
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

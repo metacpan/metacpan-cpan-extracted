@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use IO::Socket::INET;
 use Test::More;
+use File::Spec ();
 use Fetch;
 
 # Keep-alive pooling: a persistent server tags every TCP connection with an
@@ -20,6 +21,11 @@ my $base = "http://127.0.0.1:$port";
 my $pid = fork;
 plan skip_all => "cannot fork: $!" unless defined $pid;
 if (!$pid) {
+    # Never hold the harness TAP pipe open, and never outlive the run:
+    # a leaked server child hangs the whole suite after this test is done.
+    open STDOUT, ">", File::Spec->devnull();
+    open STDERR, ">", File::Spec->devnull();
+    alarm 120;
     $SIG{TERM} = sub { exit 0 };
     $SIG{CHLD} = 'IGNORE';
     my $connid = 0;
@@ -77,4 +83,4 @@ plan tests => 5;
     like($res[-1]->content, qr/^conn\d+$/, 'reused connection still returns a body');
 }
 
-END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
+END { local $?; if ($pid) { kill 'KILL', $pid; waitpid $pid, 0 } }

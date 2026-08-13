@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib "t/lib";
 use Test::More;
+use HMTest qw(free_ports);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -24,7 +26,8 @@ system(qq{openssl req -x509 -newkey rsa:2048 -nodes -keyout "$key" -out "$cert" 
 plan skip_all => 'could not create self-signed cert'
     unless -s $cert && -s $key;
 
-my $port = 23000 + ($$ % 1000);
+my ($port) = free_ports(1);
+plan skip_all => "no free loopback port" unless $port;
 
 my $pid = fork;
 die "fork: $!" unless defined $pid;

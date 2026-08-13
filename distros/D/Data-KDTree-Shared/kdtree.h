@@ -102,7 +102,8 @@ struct KdHeader {
     uint32_t drain_seq;               /* 80  futex bumped by a reader releasing under a draining writer (wakes it) */
     uint32_t slotless_rdepth;         /* readers holding with no reader-slot (documented residual) */
     uint64_t stat_ops;                /* 88 */
-    uint8_t  _pad[160];               /* 96..255 */
+    uint8_t  sealed;                  /* 96  0 = mutable, 1 = frozen (read-only; lock-free reads) */
+    uint8_t  _pad[159];               /* 97..255 */
 };
 typedef struct KdHeader KdHeader;
 
@@ -130,6 +131,7 @@ typedef struct KdHandle {
     uint32_t      cached_pid;    /* getpid() cached at last slot claim */
     uint32_t      cached_fork_gen; /* kd_fork_gen value at last slot claim */
     uint32_t slotless_held; /* rwlock read-locks held with no reader-slot */
+    int      readonly;      /* 1 = frozen O_RDONLY/PROT_READ view: lock-free reads, mutation croaks */
 } KdHandle;
 
 /* ================================================================
@@ -171,13 +173,6 @@ static inline void kd_rwlock_spin_pause(void) {
 #define KD_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define KD_RWLOCK_WR(pid)    (KD_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & KD_RWLOCK_PID_MASK))
 
-/* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
-/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse -- if a dead
- * lock-holder's PID is recycled to an unrelated live process before recovery
- * runs, this reports "alive" and that slot's rdepth is not reclaimed until the
- * recycled process exits. Robust detection would require a per-slot
- * process-start-time epoch (a header-layout/version change).
- * Documented under "Crash Safety" in the POD. */
 /* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
  * process that crashed while holding the lock and lingers unreaped would never
  * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
@@ -197,6 +192,9 @@ static inline int kd_pid_is_zombie(uint32_t pid) {
     if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
     return rp[1] == ' ' && rp[2] == 'Z';
 }
+/* 1 if alive or unknown, 0 if definitely dead.  Cannot detect PID reuse: a
+ * recycled PID reports "alive" and the slot is not reclaimed until that
+ * process exits.  See "Crash Safety" in the POD. */
 static inline int kd_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
@@ -281,8 +279,7 @@ static inline void kd_claim_reader_slot(KdHandle *h) {
     /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
      * if its rdepth>0: clearing pid drops the dead reader's entire contribution
      * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
-     * old design) we need not skip dead slots that still show a read count. */
+     * claim it. */
     for (uint32_t i = 0; i < KD_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || kd_pid_alive(dpid)) continue;
@@ -290,7 +287,7 @@ static inline void kd_claim_reader_slot(KdHandle *h) {
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            kd_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            kd_occ_set(h, i);
             h->my_slot_idx = i;
             return;
         }
@@ -534,7 +531,6 @@ static inline void kd_init_header(void *base, uint32_t dims, uint32_t capacity, 
     KdLayout L = kd_layout_for(dims, capacity);
     KdHeader *hdr = (KdHeader *)base;
     memset(base, 0, (size_t)L.nodes);   /* header + reader slots; node data is written on add */
-    hdr->magic            = KD_MAGIC;
     hdr->version          = KD_VERSION;
     hdr->dims             = dims;
     hdr->capacity         = capacity;
@@ -546,6 +542,11 @@ static inline void kd_init_header(void *base, uint32_t dims, uint32_t capacity, 
     hdr->idx_off          = L.idx;
     hdr->total_size       = total;
     hdr->reader_slots_off = L.reader_slots;
+    /* Publish magic LAST, as a release store: it is the commit point, so a
+       creator killed before it leaves magic==0 and never a file mistaken for
+       a valid one.  A kill during the field stores leaves one to remove by
+       hand. */
+    __atomic_store_n(&hdr->magic, KD_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -647,6 +648,16 @@ static int kd_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
+/* True iff the whole mapped region is zero -- what an abandoned mid-init
+   creator leaves.  Lets recovery re-init only a provably-empty file, never
+   one that merely starts with a zero word.  Cold path, so a byte scan is
+   fine. */
+static inline int kd_region_is_zero(const void *p, size_t n) {
+    const unsigned char *b = (const unsigned char *)p;
+    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+    return 1;
+}
+
 static KdHandle *kd_create(const char *path, uint64_t dims, uint64_t capacity, mode_t mode, char *errbuf) {
     if (!kd_validate_args(dims, capacity, errbuf)) return NULL;
 
@@ -683,7 +694,32 @@ static KdHandle *kd_create(const char *path, uint64_t dims, uint64_t capacity, m
         if (base == MAP_FAILED) { KD_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
             if (!kd_validate_header((KdHeader *)base, (uint64_t)st.st_size)) {
+                /* Recover an abandoned mid-init file: a creator killed
+                 * between the ftruncate and the header init leaves a
+                 * full-size, all-zero (magic==0) file that would brick every
+                 * future open of this path.  Re-initialize ONLY when it is
+                 * exactly our size, still uninitialized, and owned by us;
+                 * anything else still errors. */
+                if (((KdHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid() && kd_region_is_zero(base, map_size)) {
+                    if (fchmod(fd, mode) < 0) {
+                        KD_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    kd_init_header(base, (uint32_t)dims, (uint32_t)capacity, total);
+                    flock(fd, LOCK_UN); close(fd);
+                    return kd_setup(base, map_size, path, -1);
+                }
+                if (((KdHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    KD_ERR("%s: incomplete k-d tree file left by an interrupted create; remove it and retry", path);
+                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                }
                 KD_ERR("invalid k-d tree file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            if (((KdHeader *)base)->sealed) {
+                KD_ERR("%s is frozen (read-only); open it with new_readonly", path);
+                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
             return kd_setup(base, map_size, path, -1);
@@ -721,9 +757,42 @@ static KdHandle *kd_open_fd(int fd, char *errbuf) {
     if (!kd_validate_header((KdHeader *)base, (uint64_t)st.st_size)) {
         KD_ERR("invalid k-d tree table"); munmap(base, ms); return NULL;
     }
+    if (((KdHeader *)base)->sealed) {
+        KD_ERR("this k-d tree is frozen (read-only); open it with new_readonly");
+        munmap(base, ms); return NULL;
+    }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { KD_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
     return kd_setup(base, ms, NULL, myfd);
+}
+
+/* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock ever.
+ * A sealed file is immutable and no read path writes the mapping, so queries
+ * take no reader-slot / rwlock traffic and any number of processes can share
+ * one PROT_READ mapping (same architecture; the magic rejects a wrong-endian
+ * file). */
+static KdHandle *kd_open_readonly(const char *path, char *errbuf) {
+    if (errbuf) errbuf[0] = '\0';
+    int fd = open(path, O_RDONLY|O_NOFOLLOW|O_CLOEXEC);
+    if (fd < 0) { KD_ERR("open %s: %s", path, strerror(errno)); return NULL; }
+    struct stat st;
+    if (fstat(fd, &st) < 0) { KD_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
+    if ((uint64_t)st.st_size < sizeof(KdHeader)) { KD_ERR("%s: file too small", path); close(fd); return NULL; }
+    size_t ms = (size_t)st.st_size;
+    void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
+    if (base == MAP_FAILED) { KD_ERR("mmap %s: %s", path, strerror(errno)); return NULL; }
+    if (!kd_validate_header((KdHeader *)base, (uint64_t)st.st_size)) {
+        KD_ERR("%s: invalid k-d tree file", path); munmap(base, ms); return NULL;
+    }
+    if (!((KdHeader *)base)->sealed) {
+        KD_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
+        munmap(base, ms); return NULL;
+    }
+    KdHandle *h = kd_setup(base, ms, path, -1);   /* munmaps on OOM */
+    if (!h) { KD_ERR("out of memory"); return NULL; }
+    h->readonly = 1;
+    return h;
 }
 
 static void kd_destroy(KdHandle *h) {
@@ -751,6 +820,27 @@ static void kd_destroy(KdHandle *h) {
 static inline int kd_msync(KdHandle *h) {
     if (!h || !h->base) return 0;
     return msync(h->base, h->mmap_size, MS_SYNC);
+}
+
+/* forward decl: kd_freeze (below) must force a pending build to completion
+ * before sealing; kd_build_locked itself is defined further down, alongside
+ * the rest of the tree operations. */
+static void kd_build_locked(KdHandle *h);
+
+/* Seal a tree: make it permanently immutable so it can be shipped and opened
+ * read-only.  Takes the write lock and, if a build is pending (dirty), force-
+ * completes it right there -- a sealed tree must NEVER be left dirty, because
+ * the read-only query path (kd_open_readonly handles) takes no lock and never
+ * builds; publishing the seal is what makes that lock-free path safe.  Then
+ * flushes it (file/memfd-backed).  Afterwards every mutator croaks and a
+ * read-write reopen is refused. */
+static int kd_freeze(KdHandle *h) {
+    kd_rwlock_wrlock(h);
+    if (h->hdr->dirty) kd_build_locked(h);
+    h->hdr->sealed = 1;
+    kd_rwlock_wrunlock(h);
+    if (h->path || h->backing_fd >= 0) return kd_msync(h);
+    return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
 }
 
 /* ================================================================

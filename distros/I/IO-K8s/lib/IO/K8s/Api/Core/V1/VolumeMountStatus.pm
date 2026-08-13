@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::VolumeMountStatus;
 # ABSTRACT: VolumeMountStatus shows status of volume mounts.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s mountPath => Str, 'required';
@@ -13,6 +13,9 @@ k8s readOnly => Bool;
 
 
 k8s recursiveReadOnly => Str;
+
+
+k8s volumeStatus => 'Core::V1::VolumeStatus';
 
 
 1;
@@ -29,7 +32,7 @@ IO::K8s::Api::Core::V1::VolumeMountStatus - VolumeMountStatus shows status of vo
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 mountPath
 
@@ -47,16 +50,16 @@ ReadOnly corresponds to the original VolumeMount.
 
 RecursiveReadOnly must be set to Disabled, Enabled, or unspecified (for non-readonly mounts). An IfPossible value in the original VolumeMount must be translated to Disabled or Enabled, depending on the mount result.
 
+=head2 volumeStatus
+
+volumeStatus represents volume-type-specific status about the mounted volume.
+
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -68,7 +71,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -1,7 +1,9 @@
 #!perl
 use strict;
 use warnings;
+use lib "t/lib";
 use Test::More;
+use HMTest qw(free_ports);
 use IO::Socket::INET;
 use Time::HiRes ();
 use Hyperman;
@@ -17,7 +19,8 @@ plan skip_all => 'curl not found' unless $curl;
 plan skip_all => 'curl lacks HTTP/2'
     unless `curl --version 2>/dev/null` =~ /\bHTTP2\b/;
 
-my $port = 22000 + ($$ % 1000);
+my ($port) = free_ports(1);
+plan skip_all => "no free loopback port" unless $port;
 
 my $pid = fork;
 die "fork: $!" unless defined $pid;

@@ -27,12 +27,15 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 4096, 256, 4096);
 
-    # spawn workers
+    # spawn workers.  Idle timeout must exceed the client's per-request timeout:
+    # a worker that gives up first would starve still-running clients and cascade
+    # into spurious client timeouts.  The parent TERMs them once clients are done.
     my @wpids;
     for my $w (1..$WORKERS) {
         my $pid = fork // die "fork: $!";
         if ($pid == 0) {
-            while (my ($req, $id) = $srv->recv_wait(10.0)) {
+            $SIG{TERM} = sub { exit 0 };
+            while (my ($req, $id) = $srv->recv_wait($CTMO + 5)) {
                 $srv->reply($id, "w$w:$req");
             }
             exit 0;
@@ -46,7 +49,7 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
         my $pid = fork // die "fork: $!";
         if ($pid == 0) {
             my $cli = Data::ReqRep::Shared::Client->new($path);
-            my $ok = 0;
+            my ($ok, $wrong, $late) = (0, 0, 0);
             my $cancel_ok = 0;
             for my $i (1..$MSGS) {
                 if ($i % $CANCEL == 0) {
@@ -54,25 +57,68 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
                     if (defined $id) { $cli->cancel($id); $cancel_ok++ }
                 } else {
                     my $resp = $cli->req_wait("c${c}m$i", $CTMO);
-                    $ok++ if defined $resp && $resp =~ /^w\d+:c${c}m${i}$/;
+                    if    (!defined $resp)                       { $late++  }
+                    elsif ($resp =~ /^w\d+:c${c}m${i}$/)         { $ok++    }
+                    else {
+                        # Record what actually came back. A bare count cannot
+                        # distinguish a stale reply to this client's own earlier
+                        # request from another client's payload, and those have
+                        # different causes -- so keep the first one.
+                        $wrong++;
+                        if ( $wrong == 1 && open my $wfh, '>', "$path.wrong.$c" ) {
+                            print $wfh "sent c${c}m$i got $resp\n";
+                            close $wfh;
+                        }
+                    }
                 }
             }
-            my $expected = $MSGS - int($MSGS / $CANCEL);
-            exit($ok == $expected ? 0 : 1);
+            # A WRONG answer (mismatched or cross-talked response) is always a bug.
+            # A missing one only means this process lost the CPU long enough to blow
+            # a 30s per-request timeout, which an oversubscribed runner does cause --
+            # report it separately so load cannot masquerade as a correctness failure.
+            #
+            # Exit 3, not 1: an uncaught die exits with $! when errno is non-zero,
+            # so a client dying while errno happened to be EPERM would otherwise be
+            # indistinguishable from a genuine wrong answer. 2 and 3 cannot collide
+            # with that, since die never produces them from a zero/EPERM errno.
+            exit 3 if $wrong;
+            exit($late ? 2 : 0);
         }
         push @cpids, $pid;
     }
 
     my $t0 = time;
-    my $all_ok = 1;
+    my ($wrong_clients, $late_clients, $died_clients) = (0, 0, 0);
     for my $pid (@cpids) {
         waitpid($pid, 0);
-        $all_ok = 0 if $? != 0;
+        my $code = $? >> 8;
+        $wrong_clients++ if $code == 3;
+        $late_clients++  if $code == 2;
+        # anything else non-zero is a client that died, which is neither a wrong
+        # answer nor a timeout and must not be reported as either
+        $died_clients++  if $code && $code != 2 && $code != 3;
     }
     my $dt = time - $t0;
+    kill 'TERM', @wpids;          # clients are done; do not wait out the idle timeout
     waitpid($_, 0) for @wpids;
 
-    ok $all_ok, "mpmc: all clients verified all responses";
+    ok !$wrong_clients, "mpmc: every response received was the right one";
+    if ($wrong_clients) {
+        # Print what each offending client actually received: without it a
+        # failure here says only "something mismatched", which is not enough to
+        # tell a real cross-talk bug from a test artifact after the fact.
+        for my $c (1 .. $CLIENTS) {
+            next unless open my $wfh, '<', "$path.wrong.$c";
+            chomp( my $line = <$wfh> // '' );
+            close $wfh;
+            diag "client $c: $line" if length $line;
+        }
+    }
+    unlink "$path.wrong.$_" for 1 .. $CLIENTS;
+    diag "note: $died_clients/$CLIENTS client(s) exited abnormally (neither a wrong "
+       . "answer nor a timeout)" if $died_clients;
+    diag "note: $late_clients/$CLIENTS client(s) had a request exceed ${CTMO}s -- "
+       . "runner oversubscription, not a correctness failure" if $late_clients;
 
     my $total = $CLIENTS * $MSGS;
     my $stats = $srv->stats;

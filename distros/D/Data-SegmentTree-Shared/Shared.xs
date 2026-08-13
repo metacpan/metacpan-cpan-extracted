@@ -65,7 +65,7 @@ new(class, path = &PL_sv_undef, n = 0, ...)
     /* capture the path PV last, after all get-magic on other args has run */
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     StHandle *h = st_create(p, (uint64_t)n, mode, errbuf);
-    if (!h) croak("Data::SegmentTree::Shared->new: %s", errbuf);
+    if (!h) croak("Data::SegmentTree::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -82,7 +82,7 @@ new_memfd(class, name = &PL_sv_undef, n = 0)
     if (n < 1)
         croak("Data::SegmentTree::Shared->new_memfd: number of positions must be >= 1");
     StHandle *h = st_create_memfd(nm, (uint64_t)n, errbuf);
-    if (!h) croak("Data::SegmentTree::Shared->new_memfd: %s", errbuf);
+    if (!h) croak("Data::SegmentTree::Shared->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -95,7 +95,7 @@ new_from_fd(class, fd)
     char errbuf[ST_ERR_BUFLEN];
   CODE:
     StHandle *h = st_open_fd(fd, errbuf);
-    if (!h) croak("Data::SegmentTree::Shared->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::SegmentTree::Shared->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -411,7 +411,12 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::SegmentTree::Shared")) {
         StHandle *h = INT2PTR(StHandle*, SvIV(SvRV(self)));
-        if (h && h->path) unlink(h->path);
+        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
+            croak("Data::SegmentTree::Shared->unlink(%s): %s", h->path, strerror(errno));
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
-        unlink(SvPV_nolen(ST(1)));
+        {
+            const char *up = SvPV_nolen(ST(1));
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::SegmentTree::Shared->unlink(%s): %s", up, strerror(errno));
+        }
     }

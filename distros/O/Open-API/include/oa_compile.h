@@ -20,7 +20,12 @@ enum { OA_IN_PATH = 0, OA_IN_QUERY, OA_IN_HEADER, OA_IN_COOKIE, OA_IN_N };
 enum { OA_SEC_APIKEY = 0, OA_SEC_BEARER, OA_SEC_BASIC };
 
 typedef struct oa_seg   { SV *lit; SV *pname; } oa_seg;   /* lit XOR pname */
-typedef struct oa_param { SV *name; SV *handle; int required; int is_array; } oa_param;
+/* `ctype` is set only for a parameter declared with `content` instead of
+ * `schema`: the value on the wire is then a document of that media type, and
+ * has to be decoded before the schema sees it. NULL is the ordinary case. */
+typedef struct oa_param {
+    SV *name; SV *handle; SV *ctype; int required; int is_array;
+} oa_param;
 typedef struct oa_body  { SV *ctype; SV *handle; } oa_body;  /* handle NULL = pass-through */
 typedef struct oa_resp  { SV *status; SV *ctype; SV *handle; } oa_resp;
 
@@ -187,6 +192,12 @@ static int oa_schema_is_array(pTHX_ SV *schema) {
         }
     }
     return 0;
+}
+
+/* A media type we have a decoder for. A prefix test, so `application/json`
+ * and its `+json`-suffixed relatives both match. */
+static int oa_ctype_is_json(const char *p, STRLEN l) {
+    return l >= 16 && memEQ(p, "application/json", 16);
 }
 
 /* JSF resolves same-document $refs against schema locations it knows -
@@ -391,17 +402,35 @@ static void oa_compile_params(pTHX_ oa_api *a, oa_op *o, AV *item_params,
         pp = &o->params[l][fill[l]++];
         pp->name     = oa_keep(aTHX_ a, newSVsv(name));
         pp->required = (l == OA_IN_PATH) ? 1 : (req && SvTRUE(req)) ? 1 : 0;
+        pp->ctype    = NULL;
         pp->is_array = schema ? oa_schema_is_array(aTHX_ schema) : 0;
         pp->handle   = schema
             ? oa_compile_schema(aTHX_ a, schema, 1) : NULL;
+
+        /* `content` instead of `schema`: the value is a document, not a
+         * string standing in for one. The spec allows exactly one entry, so
+         * the first is the one - and it is compiled WITHOUT coercion, unlike
+         * an ordinary parameter, because a decoded JSON document already has
+         * the types the schema is talking about. */
+        if (!schema) {
+            HV *content = oa_hv_of(oa_get(aTHX_ ph, "content"));
+            HE *he;
+            if (content && HvUSEDKEYS(content)) {
+                hv_iterinit(content);
+                if ((he = hv_iternext(content))) {
+                    I32 ckl; const char *ck = hv_iterkey(he, &ckl);
+                    HV *media = oa_hv_of(hv_iterval(content, he));
+                    SV *cs = media ? oa_get(aTHX_ media, "schema") : NULL;
+                    pp->ctype = oa_keep(aTHX_ a, newSVpvn(ck, (STRLEN)ckl));
+                    if (cs && oa_ctype_is_json(ck, (STRLEN)ckl))
+                        pp->handle = oa_compile_schema(aTHX_ a, cs, 0);
+                }
+            }
+        }
     }
 }
 
 /* ---- requestBody / responses ----------------------------------------------- */
-
-static int oa_ctype_is_json(const char *p, STRLEN l) {
-    return l >= 16 && memEQ(p, "application/json", 16);
-}
 
 static void oa_compile_body(pTHX_ oa_api *a, oa_op *o, SV *rb) {
     HV *rbh = oa_hv_of(rb);

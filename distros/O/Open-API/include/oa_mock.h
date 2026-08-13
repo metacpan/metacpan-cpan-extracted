@@ -421,6 +421,29 @@ static SV *oa_gen_allof(pTHX_ HV *doc, AV *all, HV *caps, int depth) {
         while ((he = hv_iternext(sh))) {
             I32 kl; const char *k = hv_iterkey(he, &kl);
             SV *v = hv_iterval(sh, he);
+            /* A folded base carries its discriminator dispatch with it. None of
+             * that describes the shape of a value, and folding it back in would
+             * send oa_gen round the same branch for ever - base to child to
+             * base - so the annotation and the generated members are dropped
+             * and only the constraints are merged. */
+            if (kl == 13 && memEQ(k, "discriminator", 13)) continue;
+            if (kl == 5 && memEQ(k, "allOf", 5)) {
+                AV *src = oa_av_of(v), *keep;
+                SSize_t x, xn = src ? av_len(src) + 1 : 0;
+                if (!src) continue;
+                keep = newAV();
+                for (x = 0; x < xn; x++) {
+                    SV **me = av_fetch(src, x, 0);
+                    HV *mhv = (me && *me) ? oa_hv_of(*me) : NULL;
+                    if (mhv && hv_exists(mhv, OA_DISC_MARK, OA_DISC_MARK_LEN))
+                        continue;
+                    if (me && *me) av_push(keep, SvREFCNT_inc(*me));
+                }
+                if (av_len(keep) >= 0)
+                    (void)hv_store(m, k, kl, newRV_noinc((SV *)keep), 0);
+                else SvREFCNT_dec((SV *)keep);
+                continue;
+            }
             if (kl == 10 && memEQ(k, "properties", 10)) {
                 HV *ph = oa_hv_of(v);
                 HE *pe;
@@ -472,6 +495,46 @@ static SV *oa_gen(pTHX_ HV *doc, SV *schema, HV *caps, int depth) {
         if (e && *e) return newSVsv(*e);
     }
     if ((v = oa_get(aTHX_ h, "default"))) return newSVsv(v);
+
+    /* A discriminated schema: generate the branch the document names first and
+     * stamp the discriminator property with its key, so the mock is a coherent
+     * member of the union rather than a fold of all of them. The mapping is
+     * always explicit and its keys are taken in order, so the same document
+     * always mocks the same branch. */
+    if ((v = oa_get(aTHX_ h, "discriminator"))) {
+        HV *dh  = oa_hv_of(v);
+        SV *pn  = dh ? oa_get(aTHX_ dh, "propertyName") : NULL;
+        HV *map = dh ? oa_hv_of(oa_get(aTHX_ dh, "mapping")) : NULL;
+        if (pn && !SvROK(pn) && map && HvUSEDKEYS(map)) {
+            AV *ks = (AV *)sv_2mortal((SV *)newAV());
+            HE *he;
+            STRLEN pl;
+            (void)SvPV_const(pn, pl);
+            hv_iterinit(map);
+            while ((he = hv_iternext(map))) {
+                I32 kl; const char *k = hv_iterkey(he, &kl);
+                av_push(ks, newSVpvn(k, (STRLEN)kl));
+            }
+            oa_sort_av(aTHX_ ks);
+            if (pl && av_len(ks) >= 0) {
+                SV *key = *av_fetch(ks, 0, 0);
+                STRLEN kl; const char *kp = SvPV_const(key, kl);
+                SV **tv = hv_fetch(map, kp, (I32)kl, 0);
+                SV *out = NULL;
+                if (tv && *tv && !SvROK(*tv)) {
+                    STRLEN rl; const char *rp = SvPV_const(*tv, rl);
+                    SV *target = oa_doc_at(aTHX_ doc, rp, rl);
+                    if (target) out = oa_gen(aTHX_ doc, target, caps, depth + 1);
+                }
+                if (out && SvROK(out) && SvTYPE(SvRV(out)) == SVt_PVHV) {
+                    (void)hv_store((HV *)SvRV(out), SvPVX_const(pn), (I32)pl,
+                                   newSVsv(key), 0);
+                    return out;
+                }
+                if (out) SvREFCNT_dec(out);
+            }
+        }
+    }
 
     if ((v = oa_get(aTHX_ h, "allOf")) && oa_av_of(v))
         return oa_gen_allof(aTHX_ doc, oa_av_of(v), caps, depth);

@@ -1,5 +1,24 @@
 Revision history for JSON-Schema-Fast
 
+0.07    2026-08-12
+        - Build : 0.06 does not build at all where the toolchain compiles 
+          -flto to bitcode but does not link it 
+        - Validation no longer mutates the value it is judging. SvNV on an
+          integer caches the NV and turns NOK on, and although that changes
+          no verdict it changes the value afterwards: an encoder that tests
+          NOK before IOK then writes 1 as 1.0, so a caller who validates a
+          document and then serialises it puts different bytes on the wire
+          than the ones it was handed.
+        - The interpreter now reads the flags a decoder set rather than
+          forcing them (jsf__nv_of in include/jsf_types.h), at both sites
+          that read a number: the numeric keyword block, and jsf_json_equal
+          for const / enum / uniqueItems. The read order matches sv_2nv's
+          own preference, so a value carrying both an IV and an NV still
+          answers exactly what SvNV answered.
+        - t/55-no-mutation.t covers every keyword that reads a number,
+          values nested in objects and arrays, the failing path, floats and
+          large integers.
+
 0.06    Date/time
         - Build fix for perl 5.14 through 5.20: U64 is behind #ifdef PERL_CORE
           until 5.22

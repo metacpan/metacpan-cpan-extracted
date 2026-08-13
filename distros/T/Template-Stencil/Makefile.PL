@@ -1,4 +1,4 @@
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -125,7 +125,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Template/Stencil.pm',
     ABSTRACT_FROM    => 'lib/Template/Stencil.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010000',
+    MIN_PERL_VERSION => '5.010001',
     OBJECT           => join(' ', 'Stencil$(OBJ_EXT)',
                              map { (my $o = $_) =~ s/\.c$/\$(OBJ_EXT)/; $o }
                                  sort glob 'src/*.c'),

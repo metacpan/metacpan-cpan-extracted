@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::Builder::Base;
-$Context::Singleton::Frame::Builder::Base::VERSION = '1.0.7';
+$Context::Singleton::Frame::Builder::Base::VERSION = '1.0.8';
 use List::Util v1.450;
 use Moo;
 

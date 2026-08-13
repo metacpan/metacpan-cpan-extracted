@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ConfigMapProjection;
 # ABSTRACT: Adapts a ConfigMap into a projected volume. The contents of the target ConfigMap's Data field will be presented in a projected volume as files using the keys in the Data field as the file names, unless the items element is populated with specific mappings of keys to paths. Note that this is identical to a configmap volume source without the default mode.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s items => ['Core::V1::KeyToPath'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ConfigMapProjection - Adapts a ConfigMap into a projecte
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 items
 
@@ -47,10 +47,6 @@ optional specify whether the ConfigMap or its keys must be defined
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -61,7 +57,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

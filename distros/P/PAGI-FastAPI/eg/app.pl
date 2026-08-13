@@ -26,7 +26,7 @@
 #   curl http://localhost:5000/openapi.json
 #
 
-use v5.36;
+use v5.38;
 use Future::AsyncAwait;
 use Types::Standard qw(Int Str);
 use PAGI::FastAPI;

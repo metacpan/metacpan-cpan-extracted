@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::PodFailurePolicyOnExitCodesRequirement;
 # ABSTRACT: PodFailurePolicyOnExitCodesRequirement describes the requirement for handling a failed pod based on its container exit codes. In particular, it lookups the .state.terminated.exitCode for each app container and init container status, represented by the .status.containerStatuses and .status.initContainerStatuses fields in the Pod status, respectively. Containers completed with success (exit code 0) are excluded from the requirement check.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s containerName => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Batch::V1::PodFailurePolicyOnExitCodesRequirement - PodFailurePoli
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 containerName
 
@@ -52,10 +52,6 @@ Specifies the set of values. Each returned container exit code (might be multipl
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -66,7 +62,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

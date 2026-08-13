@@ -1,12 +1,15 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionCondition;
 # ABSTRACT: CustomResourceDefinitionCondition contains details for the current condition of this pod.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
 
 
 k8s message => Str;
+
+
+k8s observedGeneration => Int;
 
 
 k8s reason => Str;
@@ -32,7 +35,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDef
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head2 lastTransitionTime
 
@@ -41,6 +44,10 @@ lastTransitionTime last time the condition transitioned from one status to anoth
 =head2 message
 
 message is a human-readable message indicating details about last transition.
+
+=head2 observedGeneration
+
+observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
 
 =head2 reason
 
@@ -61,10 +68,6 @@ type is the type of the condition. Types include Established, NamesAccepted and 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -75,7 +78,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

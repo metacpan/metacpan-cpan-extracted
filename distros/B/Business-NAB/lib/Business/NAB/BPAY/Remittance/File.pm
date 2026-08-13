@@ -1,5 +1,5 @@
 package Business::NAB::BPAY::Remittance::File;
-$Business::NAB::BPAY::Remittance::File::VERSION = '0.08';
+$Business::NAB::BPAY::Remittance::File::VERSION = '0.09';
 =head1 NAME
 
 Business::NAB::BPAY::Remittance::File

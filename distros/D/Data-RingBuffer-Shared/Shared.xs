@@ -10,6 +10,7 @@
         croak("Expected a Data::RingBuffer::Shared object"); \
     RingHandle *h = INT2PTR(RingHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::RingBuffer::Shared object"); \
+    RingHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code (tied/overloaded
@@ -19,8 +20,10 @@
  * explicit DESTROY, so the local `h` would dangle.  Used only where magic
  * can actually intervene between EXTRACT_RING and the first use of h. */
 #define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::RingBuffer::Shared object was replaced during the call"); \
     h = INT2PTR(RingHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Data::RingBuffer::Shared object destroyed during the call")
+    if (h != h0) croak("Data::RingBuffer::Shared object replaced or destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -36,7 +39,7 @@ void
 DESTROY(self)
     SV *self
   CODE:
-    if (!SvROK(self)) return;
+    if (!sv_isobject(self) || !sv_derived_from(self, "Data::RingBuffer::Shared")) return;
     RingHandle *h = INT2PTR(RingHandle*, SvIV(SvRV(self)));
     if (!h) return;
     sv_setiv(SvRV(self), 0);
@@ -198,7 +201,7 @@ unlink(self_or_class, ...)
         p = SvPV_nolen(ST(1));
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
-    if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
+    if (unlink(p) != 0 && errno != ENOENT) croak("unlink(%s): %s", p, strerror(errno));
 
 SV *
 stats(self)
@@ -242,7 +245,7 @@ new(class, path, capacity, ...)
      * run: magic on ST(3) could realloc or free the PV, so grab it last. */
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     RingHandle *h = ring_create(p, capacity, sizeof(int64_t), RING_VAR_INT, mode, errbuf);
-    if (!h) croak("Data::RingBuffer::Shared::Int->new: %s", errbuf);
+    if (!h) croak("Data::RingBuffer::Shared::Int->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -259,7 +262,7 @@ new_memfd(class, name, capacity)
      * capacity get-magic) have run; INPUT order would capture it too early. */
     const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
     RingHandle *h = ring_create_memfd(nm, capacity, sizeof(int64_t), RING_VAR_INT, errbuf);
-    if (!h) croak("Data::RingBuffer::Shared::Int->new_memfd: %s", errbuf);
+    if (!h) croak("Data::RingBuffer::Shared::Int->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -272,7 +275,7 @@ new_from_fd(class, fd)
     char errbuf[RING_ERR_BUFLEN];
   CODE:
     RingHandle *h = ring_open_fd(fd, RING_VAR_INT, errbuf);
-    if (!h) croak("Data::RingBuffer::Shared::Int->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::RingBuffer::Shared::Int->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -337,7 +340,7 @@ new(class, path, capacity, ...)
      * run: magic on ST(3) could realloc or free the PV, so grab it last. */
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     RingHandle *h = ring_create(p, capacity, sizeof(double), RING_VAR_F64, mode, errbuf);
-    if (!h) croak("Data::RingBuffer::Shared::F64->new: %s", errbuf);
+    if (!h) croak("Data::RingBuffer::Shared::F64->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -354,7 +357,7 @@ new_memfd(class, name, capacity)
      * capacity get-magic) have run; INPUT order would capture it too early. */
     const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
     RingHandle *h = ring_create_memfd(nm, capacity, sizeof(double), RING_VAR_F64, errbuf);
-    if (!h) croak("Data::RingBuffer::Shared::F64->new_memfd: %s", errbuf);
+    if (!h) croak("Data::RingBuffer::Shared::F64->new_memfd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
@@ -367,7 +370,7 @@ new_from_fd(class, fd)
     char errbuf[RING_ERR_BUFLEN];
   CODE:
     RingHandle *h = ring_open_fd(fd, RING_VAR_F64, errbuf);
-    if (!h) croak("Data::RingBuffer::Shared::F64->new_from_fd: %s", errbuf);
+    if (!h) croak("Data::RingBuffer::Shared::F64->new_from_fd: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL

@@ -36,8 +36,19 @@ for my $p (@paths) {
         }
         is($q->stats->{finished_jobs}, 50, 'all 50 jobs finished');
 
-        # while alive: one supervisor row, two child rows
-        my $ws = $q->list_workers;
+        # While alive: one supervisor row, two child rows. A drained queue
+        # does not imply both children have registered - one child can take
+        # every job while the other is still coming up, which is exactly what
+        # a loaded smoker sees - so wait for the registry to settle first,
+        # bounded like the drain above. A count that never arrives still
+        # fails, just after the wait rather than before it.
+        my $ws;
+        $deadline = time + 15;
+        while (time < $deadline) {
+            $ws = $q->list_workers;
+            last if $ws->{total} == 3;
+            select undef, undef, undef, 0.2;
+        }
         is($ws->{total}, 3, 'supervisor + 2 children registered');
         is(scalar(grep { $_->{role} eq 'supervisor' } @{ $ws->{workers} }),
            1, 'one supervisor row');

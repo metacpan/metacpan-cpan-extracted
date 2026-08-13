@@ -19,6 +19,11 @@ SYNOPSIS
         # share a sketch across processes via a backing file
         my $shared = Data::MinHash::Shared->new("/tmp/set.mh", 256);
 
+        # freeze and ship: query it read-only (lock-free) on other machines
+        $shared->freeze;
+        my $ro = Data::MinHash::Shared->new_readonly("/tmp/set.mh");
+        $ro->similarity($a);
+
         # b-bit MinHash: estimate from only the low b bits, and export a compact signature
         my $j     = $a->bbit_similarity($b, 1);    # corrected estimate from 1 bit per register
         my $sig_a = $a->bbit_signature(1);         # 256 bits = 32 bytes (vs 2 KiB full sketch)
@@ -27,28 +32,28 @@ SYNOPSIS
 
 DESCRIPTION
     A MinHash sketch in shared memory: it summarises a set as "k" "minimum
-    hash" registers so that the Jaccard similarity of two sets -- the size
-    of their intersection over the size of their union -- can be estimated
-    from the fraction of registers that agree between their two sketches, in
-    a fixed amount of memory independent of how many elements were added.
+    hash" registers so that the Jaccard similarity of two sets -- the size of
+    their intersection over the size of their union -- can be estimated from
+    the fraction of registers that agree between their two sketches, in a
+    fixed amount of memory independent of how many elements were added.
 
     Each element is hashed once (XXH3-64) and mixed with each register's
-    index, so the "k" registers behave like "k" independent min-hashes;
-    every register keeps the smallest value it has ever seen. Two sets that
-    share many elements keep the same minima in many registers, so
+    index, so the "k" registers behave like "k" independent min-hashes; every
+    register keeps the smallest value it has ever seen. Two sets that share
+    many elements keep the same minima in many registers, so
     "agreeing_registers / k" is an unbiased estimate of their Jaccard
-    similarity. Accuracy improves with "k": the standard error of the
-    estimate is about "1/sqrt(k)" (e.g. "k = 256" gives roughly a 6%
-    standard error, "k = 1024" about 3%).
+    similarity. Accuracy improves with "k": the standard error of the estimate
+    is about "1/sqrt(k)" (e.g. "k = 256" gives roughly a 6% standard error, "k
+    = 1024" about 3%).
 
-    Because the sketch lives in a shared mapping, several processes update
-    and read one sketch: any process that opens the same backing file,
-    inherits the anonymous mapping across "fork", or reopens a passed memfd
-    folds into and reads the same registers. A write-preferring futex rwlock
-    with dead-process recovery guards mutation. Elements are handled by
-    their byte content; wide-character strings (any codepoint above 255)
-    cause a "Wide character" croak -- encode to bytes first. Linux-only.
-    Requires 64-bit Perl.
+    Because the sketch lives in a shared mapping, several processes update and
+    read one sketch: any process that opens the same backing file, inherits
+    the anonymous mapping across "fork", or reopens a passed memfd folds into
+    and reads the same registers. A write-preferring futex rwlock with
+    dead-process recovery guards mutation. Elements are handled by their byte
+    content; wide-character strings (any codepoint above 255) cause a "Wide
+    character" croak -- encode to bytes first. Linux-only. Requires 64-bit
+    Perl.
 
     Two sketches must have the same number of registers to be compared or
     merged; "similarity" and "merge" croak on a register-count mismatch.
@@ -56,20 +61,19 @@ DESCRIPTION
   b-bit MinHash
     b-bit MinHash (Li and Koenig) compares only the low "b" bits of each
     register instead of the full 64. Two registers whose true minima differ
-    still collide in "b" bits with probability "2**-b", so the observed
-    match fraction "f" is corrected to a Jaccard estimate as "(f - 2**-b) /
-    (1 - 2**-b)". Small "b" (even "b == 1") gives a good estimate for all
-    but very high similarities, at a fraction of the storage: a "b"-bit
-    signature is "ceil(k * b / 8)" bytes -- e.g. "64x" smaller than the full
-    sketch at "b == 1" -- which makes it cheap to store or ship many
-    finalized sketches.
+    still collide in "b" bits with probability "2**-b", so the observed match
+    fraction "f" is corrected to a Jaccard estimate as "(f - 2**-b) / (1 -
+    2**-b)". Small "b" (even "b == 1") gives a good estimate for all but very
+    high similarities, at a fraction of the storage: a "b"-bit signature is
+    "ceil(k * b / 8)" bytes -- e.g. "64x" smaller than the full sketch at "b
+    == 1" -- which makes it cheap to store or ship many finalized sketches.
 
     Because this sketch is incremental (each register keeps a running 64-bit
-    minimum, which the low bits alone cannot maintain), b-bit is offered as
-    a finalization: the live sketch stays full, and you either compare two
-    live sketches with "bbit_similarity", or "bbit_signature" a snapshot for
-    compact storage and later compare snapshots with "bbit_similarity_of".
-    "b" ranges from 1 to 64 ("b == 64" is exactly the full "similarity").
+    minimum, which the low bits alone cannot maintain), b-bit is offered as a
+    finalization: the live sketch stays full, and you either compare two live
+    sketches with "bbit_similarity", or "bbit_signature" a snapshot for
+    compact storage and later compare snapshots with "bbit_similarity_of". "b"
+    ranges from 1 to 64 ("b == 64" is exactly the full "similarity").
 
 METHODS
   Constructors
@@ -77,14 +81,17 @@ METHODS
         my $mh = Data::MinHash::Shared->new(undef, $k);              # anonymous
         my $mh = Data::MinHash::Shared->new_memfd($name, $k);
         my $mh = Data::MinHash::Shared->new_from_fd($fd);
+        my $ro = Data::MinHash::Shared->new_readonly($path);         # frozen file, read-only
 
     $k is the number of registers (at least 1, up to 2^24) and sets the
-    accuracy/memory trade-off; memory is "k * 8" bytes for the registers
-    plus a fixed header. "new" and "new_memfd" croak on a $k below 1 or
-    above 2^24. When reopening an existing file or memfd the stored $k wins
-    and the caller's argument is ignored. An optional file mode may be
-    passed as the last argument to "new" (e.g. 0660) for cross-user sharing;
-    it defaults to 0600 (owner-only).
+    accuracy/memory trade-off; memory is "k * 8" bytes for the registers plus
+    a fixed header. "new" and "new_memfd" croak on a $k below 1 or above 2^24.
+    When reopening an existing file or memfd the stored $k wins and the
+    caller's argument does not change it -- but it is still range-checked, so
+    an out-of-range value croaks. An optional file mode may be passed as the
+    last argument to "new" (e.g. 0660) for cross-user sharing; it defaults to
+    0600 (owner-only). "new_readonly" opens a frozen file read-only for
+    lock-free querying (see "FROZEN (READ-ONLY) MODE").
 
   Building and comparing
         my $changed = $mh->add($element);       # 1 if a register was lowered, else 0
@@ -113,60 +120,112 @@ METHODS
         $mh->capacity;      # alias for size
         $mh->filled;        # registers that hold a value: 0 if empty, else k
         my @regs = $mh->registers;   # snapshot of the k register values
-        $mh->stats;         # { size, filled, ops, mmap_size }
+        $mh->stats;         # { size, filled, ops, mmap_size, frozen, readonly }
 
     "filled" counts registers that hold a value (differ from the empty
-    sentinel). Every "add" updates all "k" registers at once, so "filled" is
-    0 for a fresh or cleared sketch and "k" once any element has been added
-    -- it is really an emptiness check rather than a fill gauge. "registers"
+    sentinel). Every "add" updates all "k" registers at once, so "filled" is 0
+    for a fresh or cleared sketch and "k" once any element has been added --
+    it is really an emptiness check rather than a fill gauge. "registers"
     returns a snapshot of the raw register values (unsigned integers) taken
     under the read lock -- useful for serialising or comparing sketches
-    yourself.
+    yourself. "stats" also reports "frozen" and "readonly" (see "FROZEN
+    (READ-ONLY) MODE").
 
   Lifecycle
         $mh->path; $mh->memfd; $mh->sync; $mh->unlink;
 
-    "sync" flushes the mapping to its backing store (a no-op for anonymous
-    and memfd sketches); "unlink" removes the backing file (also callable as
+    "sync" flushes the mapping to its backing store (a no-op for anonymous and
+    memfd sketches); "unlink" removes the backing file (also callable as
     "Class->unlink($path)"); "path" returns the backing path ("undef" for
     anonymous, memfd, or fd-reopened sketches) and "memfd" the backing
     descriptor.
 
 SHARING ACROSS PROCESSES
     The sketch lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file, an anonymous mapping inherited
-    across "fork", or a memfd passed to an unrelated process and reopened
-    with new_from_fd($fd). Every process's "add" folds into the one shared
-    sketch, so a fleet of workers can each stream part of a set and the
-    merged sketch reflects them all.
+    rest of the family: a backing file, an anonymous mapping inherited across
+    "fork", or a memfd passed to an unrelated process and reopened with
+    new_from_fd($fd). The descriptor you pass is duplicated
+    ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
+    disturb the handle. Every process's "add" folds into the one shared
+    sketch, so a fleet of workers can each stream part of a set and the merged
+    sketch reflects them all.
+
+FROZEN (READ-ONLY) MODE
+    A file-backed sketch can be frozen and then shipped to other machines,
+    where consumers open it read-only and query it with no locking at all.
+
+        # producer: build, freeze, ship the file
+        my $mh = Data::MinHash::Shared->new("/tmp/set.mh", 256);
+        $mh->add_many(\@known);
+        $mh->freeze;                 # seal: now immutable, and $mh itself is read-only
+        # ... copy /tmp/set.mh to another host ...
+
+        # consumer (any process, same architecture): read-only, lock-free
+        my $ro = Data::MinHash::Shared->new_readonly("/tmp/set.mh");
+        $ro->similarity($other);
+
+    "freeze" takes the write lock, marks the sketch permanently immutable
+    (there is no unfreeze -- rebuild the file to change it), and flushes the
+    seal to disk. A frozen sketch rejects every mutator ("add", "add_many",
+    "merge", "clear") with a croak, and a read-write reopen ("new($path,
+    ...)") of a sealed file is refused -- so a shipped artifact can never be
+    silently mutated out from under its readers.
+
+    new_readonly($path) maps the file "O_RDONLY" / "PROT_READ" and requires it
+    to be frozen (it croaks on a file that was never "freeze"d). Because a
+    sealed sketch's registers and geometry are immutable, "similarity",
+    "bbit_similarity", "bbit_signature", "registers", "filled" and "stats"
+    read them directly, taking no reader lock -- the mapping is never written,
+    so a read-only view works from a read-only file descriptor or a read-only
+    filesystem, and any number of processes can share one "PROT_READ" mapping.
+    "similarity" and "bbit_similarity" also accept a frozen $other: its
+    registers are read lock-free the same way. "frozen" and "readonly" report
+    the two states.
+
+    Portability. The on-disk format is native binary (native-endian 64-bit
+    words), so a frozen file may be copied only between machines of the same
+    architecture; a wrong-endian file is rejected at open by the magic check.
+    Copy the file to each consumer -- do not share one file over a network
+    filesystem: the lock is a Linux futex (process-local to one kernel), and
+    the "no live writer" contract assumes a static copy. Linux-only; 64-bit
+    Perl.
 
 SECURITY
-    Backing files are created with mode 0600 (owner-only) by default; pass
-    an explicit octal mode (e.g. 0660) as the last argument to "new" for
-    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
-    and the header is validated on attach. Any process granted write access
-    is trusted not to corrupt the mapping.
+    Backing files are created with mode 0600 (owner-only) by default; pass an
+    explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL", and
+    the header is validated on attach. Any process granted write access is
+    trusted not to corrupt the mapping.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership and dead-owner recovery. Each "add" is a short
     bounded update, so a crash leaves the sketch consistent up to the last
-    completed operation. Limitation: PID reuse is not detected (very
-    unlikely in practice).
+    completed operation. Limitation: PID reuse is not detected (very unlikely
+    in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process).
-    If more than that many reader processes share one mapping at once, a
-    reader that cannot claim a slot proceeds "slotless" -- it still takes
-    the read lock but leaves no per-process record. If such a slotless
-    reader is then killed while holding the read lock, its share of the lock
-    cannot be attributed to a dead process, so writer recovery cannot
-    reclaim it and writers may block until the mapping is recreated.
-    Reaching this needs more than 1024 concurrent reader processes on one
-    mapping plus a crash in the brief read-lock window; the dead-process
-    slot reclaim keeps the table from filling with stale entries, so in
-    practice it is very unlikely.
+    The slot table holds 1024 entries (one per concurrent reader process). If
+    more than that many reader processes share one mapping at once, a reader
+    that cannot claim a slot proceeds "slotless" -- it still takes the read
+    lock but leaves no per-process record. If such a slotless reader is then
+    killed while holding the read lock, its share of the lock cannot be
+    attributed to a dead process, so writer recovery cannot reclaim it and
+    writers may block until the mapping is recreated. Reaching this needs more
+    than 1024 concurrent reader processes on one mapping plus a crash in the
+    brief read-lock window; the dead-process slot reclaim keeps the table from
+    filling with stale entries, so in practice it is very unlikely.
+
+    An interrupted create is recovered too. A creator killed after the backing
+    file is sized but before its header is committed leaves a full-size,
+    all-zero file. "new" re-initializes such a file automatically, but only
+    when it is exactly the size the requested geometry needs, is owned by your
+    effective uid, and is still entirely zero -- a file holding data is never
+    re-initialized. If the creator got as far as writing part of the header,
+    the file cannot be told apart from a corrupt one and "new" croaks with
+    "incomplete MinHash sketch file left by an interrupted create; remove it
+    and retry". Such a file never held any data, so removing it is safe.
 
 SEE ALSO
     Data::HyperLogLog::Shared (cardinality estimation),
@@ -177,6 +236,6 @@ AUTHOR
     vividsnow
 
 LICENSE
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 

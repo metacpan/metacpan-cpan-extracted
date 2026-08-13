@@ -1,6 +1,6 @@
 package IO::K8s::Api::Events::V1::Event;
 # ABSTRACT: Event is a report of an event somewhere in the cluster. It generally denotes some state change in the system. Events have a limited retention time and triggers and messages may evolve with time.  Event consumers should not rely on the timing of an event with a given Reason reflecting a consistent underlying trigger, or the continued existence of events with that Reason.  Events should be treated as informative, best-effort, supplemental data.
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -60,7 +60,7 @@ IO::K8s::Api::Events::V1::Event - Event is a report of an event somewhere in the
 
 =head1 VERSION
 
-version 1.105
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -127,7 +127,7 @@ type is the type of this event (Normal, Warning), new types could be added in th
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#event-v1-events.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#event-v1-events.k8s.io>
 
 =head1 SUPPORT
 
@@ -135,10 +135,6 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#event-v1-
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/pplu/io-k8s-p5/issues>.
-
-=head2 IRC
-
-Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -150,7 +146,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

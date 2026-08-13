@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use IO::Socket::INET;
 use Test::More;
+use File::Spec ();
 use Fetch;
 
 # Security: credential headers (Authorization, Cookie) must NOT survive a
@@ -19,6 +20,11 @@ sub spawn {
     my $pid  = fork;
     return unless defined $pid;
     if (!$pid) {
+        # Never hold the harness TAP pipe open, and never outlive the run:
+        # a leaked server child hangs the whole suite after this test is done.
+        open STDOUT, ">", File::Spec->devnull();
+        open STDERR, ">", File::Spec->devnull();
+        alarm 120;
         $SIG{TERM} = sub { exit 0 };
         while (my $c = $srv->accept) {
             my $l = <$c> // next;
@@ -74,7 +80,15 @@ my $cross = $ua->get("$baseA/xorigin",
 like($cross->content, qr/auth=-/,   'cross-origin redirect strips Authorization');
 like($cross->content, qr/cookie=-/, 'cross-origin redirect strips Cookie');
 
-kill 'TERM', $pidA, $pidB;
-waitpid $pidA, 0;
-waitpid $pidB, 0;
 done_testing;
+
+# In an END block, and SIGKILL: a die anywhere above must not leave a server
+# child holding the harness's TAP pipe open.
+END {
+    local $?;
+    for my $p ($pidA, $pidB) {
+        next unless $p;
+        kill 'KILL', $p;
+        waitpid $p, 0;
+    }
+}

@@ -59,6 +59,7 @@ t/17-redirect-auth.t
 t/18-cl-te.t
 t/16-timeout-hyperman.t
 t/19-clone.t
+t/20-stale-keepalive.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

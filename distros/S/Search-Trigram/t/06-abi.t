@@ -19,9 +19,13 @@ use Search::Trigram;
 
 # ---- the pointer and the gate -----------------------------------------------
 
+# Unsigned: the address is whatever the loader picked, and on a 32-bit perl
+# or on illumos (shared objects up at 0xfffffd7f...) the top bit is set. The
+# only thing that makes an address unusable here is being zero.
 my $ptr = Search::Trigram::_abi_ptr();
 ok defined $ptr, '_abi_ptr returns something';
-ok $ptr > 0, 'and it is a usable address';
+ok $ptr != 0, 'and it is a usable address';
+ok $ptr !~ /^-/, 'handed back unsigned, whatever the sign bit says';
 is Search::Trigram::_abi_version(), 1, 'compiled against ABI version 1';
 is Search::Trigram::_abi_ptr(), $ptr,
     'the table is a fixed address, not rebuilt per call';

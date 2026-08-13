@@ -32,31 +32,21 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
-            "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
             "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
             "Dist::Zilla::Plugin::EnsurePrereqsInstalled" : "0",
             "Dist::Zilla::Plugin::GatherDir" : "0",
             "Dist::Zilla::Plugin::GatherDir::Template" : "0",
             "Dist::Zilla::Plugin::InsertCopyright" : "0",
             "Dist::Zilla::Plugin::InsertExample" : "0",
-            "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
-            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
             "Dist::Zilla::Plugin::MetaResources" : "0",
-            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0",
-            "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::PodCoverageTests" : "0",
-            "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
-            "Dist::Zilla::Plugin::Readme::Brief" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
             "Dist::Zilla::Plugin::Regenerate" : "0",
-            "Dist::Zilla::Plugin::RewriteVersion" : "0",
-            "Dist::Zilla::Plugin::RunExtraTests" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
             "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
@@ -67,11 +57,12 @@
             "Dist::Zilla::Plugin::Test::NoTabs" : "0",
             "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
-            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
-            "Dist::Zilla::PluginBundle::Basic" : "0",
-            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Dist::Zilla::PluginBundle::Starter" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver::Plugin::StopWords" : "0",
             "Pod::Weaver::Section::Contributors" : "0",
@@ -133,55 +124,55 @@
    "provides" : {
       "CXC::Astro::Regions" : {
          "file" : "lib/CXC/Astro/Regions.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::CFITSIO" : {
          "file" : "lib/CXC/Astro/Regions/CFITSIO.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::CFITSIO::Role::Region" : {
          "file" : "lib/CXC/Astro/Regions/CFITSIO.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::CFITSIO::Types" : {
          "file" : "lib/CXC/Astro/Regions/CFITSIO/Types.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::CFITSIO::Variant" : {
          "file" : "lib/CXC/Astro/Regions/CFITSIO/Variant.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::CIAO" : {
          "file" : "lib/CXC/Astro/Regions/CIAO.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::CIAO::Role::Region" : {
          "file" : "lib/CXC/Astro/Regions/CIAO.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::CIAO::Types" : {
          "file" : "lib/CXC/Astro/Regions/CIAO/Types.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::CIAO::Variant" : {
          "file" : "lib/CXC/Astro/Regions/CIAO/Variant.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::DS9" : {
          "file" : "lib/CXC/Astro/Regions/DS9.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::DS9::Role::Region" : {
          "file" : "lib/CXC/Astro/Regions/DS9.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::DS9::Types" : {
          "file" : "lib/CXC/Astro/Regions/DS9/Types.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "CXC::Astro::Regions::DS9::Variant" : {
          "file" : "lib/CXC/Astro/Regions/DS9/Variant.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -192,11 +183,11 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://gitlab.com/djerius/cxc-astro-regions.git",
-         "web" : "https://gitlab.com/djerius/cxc-astro-regions"
+         "url" : "https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions.git",
+         "web" : "https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"

@@ -44,6 +44,7 @@
 #include "backend_poll.c"
 
 #include "hm_future.h"
+#include "hm_ratelimit.h"   /* fork-shared denylist + rate counters (arena) */
 #include "hm_core.h"
 #include "hm_abi_impl.h"
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.36;
+use v5.38;
 use experimental qw(try);
 use Future::AsyncAwait;
 use PAGI::FastAPI;

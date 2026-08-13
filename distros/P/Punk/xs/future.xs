@@ -102,7 +102,7 @@ failure(self)
         punk_future *pf = pf_of(aTHX_ self);
         SV **f = (pf->state == PF_FAILED && pf->vals)
                  ? av_fetch(pf->vals, 0, 0) : NULL;
-        RETVAL = (f && *f) ? newSVsv(*f) : &PL_sv_undef;
+        RETVAL = (f && *f) ? newSVsv(*f) : newSV(0);
     }
     OUTPUT:
         RETVAL
