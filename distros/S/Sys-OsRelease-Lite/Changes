@@ -10,6 +10,11 @@ Change log for Sys::OsRelease
  - BUG FIXES
  - DOCS
 
+0.4.7 2026-08-13T23:29:56-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - fix Lite build breakage: remove MANIFEST.SKIP, build_tools still needed
+   after dist generation
+
 0.4.6 2026-08-11T14:57:01-07:00 America/Los_Angeles
  [REVISION]
  - export module metadata for Sys::OsRelease::Lite to fill gaps which

@@ -27,15 +27,25 @@ FROM perl:5.40-slim AS runtime-base
 # git + runtime shared libs: the vendored libgit2.so links against OpenSSL
 # (HTTPS), libssh2 (SSH) and zlib (compression); FFI::Platypus now links the
 # system libffi (see builder stage), so libffi8 must be present at runtime too.
+#
+# openssh-client is what the git-CLI fallback forks for an ssh:// remote.
+# libssh2 covers the libgit2 path, but the fallback exists precisely for the
+# cases libgit2 cannot do -- ssh-config, ProxyCommand -- and without an ssh
+# binary it could never take any of them: git answered `cannot run ssh: No such
+# file or directory` and the board was simply unreachable.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git gosu passwd \
+    git gosu passwd openssh-client \
     libssl3 libssh2-1 zlib1g libffi8 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/lib/perl5/site_perl/ /usr/local/lib/perl5/site_perl/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
-RUN mkdir -p /home/karr /work
+# /work only. The home directory is created by whoever ends up owning it:
+# runtime-user's `useradd -m`, and for runtime-root the entrypoint, which has to
+# mkdir it anyway for the uid it is about to drop to. Creating it here just made
+# useradd warn about a home it had been told to create.
+RUN mkdir -p /work
 
 ENV HOME=/home/karr
 ENV GIT_AUTHOR_NAME="karr"
@@ -60,7 +70,7 @@ ARG KARR_GID=1000
 
 RUN groupadd -g ${KARR_GID} karr \
     && useradd -m -d /home/karr -u ${KARR_UID} -g ${KARR_GID} -s /bin/sh karr \
-    && chown -R ${KARR_UID}:${KARR_GID} /home/karr /work
+    && chown -R ${KARR_UID}:${KARR_GID} /work
 
 USER karr
 

@@ -1,3 +1,1764 @@
+0.500     2026-08-13 23:57:25Z
+
+    - Three karr-foundation fixes (#165, #166, #168). `max_runtime: 0`
+      no longer silently turns `drain: true` into a single run: the
+      drain's wall-clock guard now reads `&& $max_runtime > 0`, so 0
+      means "no per-run timeout and no drain budget" matching the
+      documented intent, and a positive value bounds the drain as
+      before (#165). `_discover_repos` deduplicates by canonical path,
+      so a repo reachable through both `dirs:` and `scan:` is processed
+      exactly once per tick: realpath (with absolute as fallback) keyed
+      by path, first-seen order preserved so an explicit `dirs:` entry
+      wins over a `scan:` hit (#166). A pull that refuses no longer
+      aborts the whole foundation run: `_process_repo`'s pull is now
+      wrapped in the same try/catch that already protects the other
+      per-repo steps (`_drain_repo` below it, `_process_repo` itself
+      from #162), so a refusal from the wholesale-wipe guard, the
+      board-identity guard, or the unapplied-refs guard warns and lets
+      the run continue — and the board whose pull refused is not then
+      processed as if it were up to date (#168).
+
+    - Four fixes in karr's character/octet boundary and refs-backed
+      storage guarantees (tickets #155, #156, #157, #167). `karr restore`
+      is now atomic across its write phase: `replace_board_refs` snapshots
+      every `refs/karr/*` OID and every ref the snapshot is about to
+      introduce before the first `_write_ref_oid` call, and any die out
+      of the write loop unwinds every ref that landed — restoring the
+      original OID for refs that existed, deleting refs the snapshot
+      managed to create — so the board reads back exactly as it did
+      before the failed restore. `Cmd::Restore`'s POD promise ('a snapshot
+      karr cannot apply ... is refused with the board exactly as it was')
+      is now true for the directory/file name conflict that previously
+      half-applied, and for the CAS-exhaustion path that previously
+      half-applied without any manual editing at all (#155). The
+      activity log no longer loses entries under concurrency: log_entry
+      wraps its read-and-write in `write_ref_cas` + `retry_contended`,
+      matching `save_task_cas` and `allocate_next_id_ref`, so the
+      existing CAS plumbing handles contention transparently and a
+      board running N parallel `karr create` writes N log entries
+      (#156). `git_user_name` and friends no longer leak libgit2's
+      octets into karr's character strings: `Git.pm:_config_string`
+      and `_run_git`'s captured stderr decode through `from_octets`,
+      so a non-ASCII `user.name` is no longer written double-encoded
+      into the log ref and `karr repair` does not need to undo it on
+      read (#157). `%ENV` is now an octet crossing `App::karr::Encoding`
+      owns: two new helpers, `to_octets_for_env` and
+      `from_octets_from_env`, match the POD style of the existing
+      helpers and delegate to the canonical codec, and the three
+      `Foundation/Runner.pm` writes go through `to_octets_for_env` —
+      so the 'Wide character in setenv' warning on a non-ASCII prompt
+      is gone, and the house rule that Encoding owns every crossing
+      is complete (#167).
+
+    - Three board commands no longer treat a value the user did pass as
+      if it had not been given (tickets #151, #152, #153). `Cmd/Log.pm`
+      refused `--last < 1` only via truth, so `karr log --last 0` dumped
+      the full log (the bound silently removed) and `karr log --last -3`
+      reported an empty log and exited 0 — indistinguishable from a board
+      with no activity. `Cmd/Archive.pm:55` read `$pos[0] under `or die`,
+      so the truthy comma in `karr archive ,` passed the guard, parse_ids
+      split to nothing, and run_batch iterated zero items with no output
+      and exit 0. `Cmd/{Edit,Create,Handoff}.pm` carried 17 sibling
+      options whose presence was tested with `if ($self->foo)` rather
+      than `defined && length`, so the literal value `0` was
+      indistinguishable from "not given" — the write still ran, `updated`
+      was bumped, an activity-log entry was appended, the command printed
+      success, and `--block 0` left the card unblocked (the sharp edge:
+      `karr pick` would have handed it out). The fix is the rule already
+      written down for `--body` in ticket #78 (`defined && length`)
+      applied to the siblings; `--last < 1` raises a usage error matching
+      `Show.pm:161-162` and `Context.pm:97-99` exactly (same exit 2,
+      same error format); `karr archive ,` raises the same usage error
+      as `move ,` / `edit ,` / `delete ,` already do. The audit trail no
+      longer records edits that did not happen.
+
+    - `karr-foundation` now keeps an agent it started alive in three
+      situations where it used to silently lose it: a pipeline/`&`/shell-
+      builtin command where the real agent was the shell's child, not the
+      shell (#148); an agent that closed its stdout before max_runtime
+      elapsed, where the runner fell through to a bare blocking waitpid
+      that held `.karr.lock` forever (#161); and a SIGTERM/INT/HUP to
+      foundation mid-drain, where the agent was reparented to init and
+      `.karr.lock` named a dead pid the next tick read as free (#163).
+      The runner wraps every agent in its own process group with
+      `setpgid(0,0)` in the child and `setpgid($pid,$pid)` in the parent
+      (the second call wins the fork race idempotently); the timeout,
+      SIGTERM and SIGKILL all signal the group with a negative pid, so
+      the shell, the agent and any grandchildren the agent forked all
+      receive the kill. `max_runtime` is now enforced independently of
+      IO activity by a SIGALRM handler that closes the read end of the
+      pipe, and the post-EOF wait is a deadline-aware WNOHANG poll that
+      falls through to the SIGTERM/SIGKILL/reap path when the wall clock
+      beats the child. Foundation installs a SIGTERM/INT/HUP handler for
+      the lifetime of `run()` that kills the agent's group, force-releases
+      the lock, and `POSIX::_exit(128 + signum)` — the conventional shell
+      exit shape, so systemd/cron see a signal-death exit and an operator
+      reading the log does not need a special case for "killed cleanly
+      mid-drain".
+
+    - `.karr.lock` is now a `flock(2)` on an open file descriptor the
+      foundation keeps for the lifetime of the lock, not an advisory pid
+      that two ticks could each write their own value into (#162). Two
+      ticks that overlap — the normal case, since a drain may run for
+      `max_runtime` (default 1800s) while cron fires every few minutes —
+      race on the file: the second tick gets `EWOULDBLOCK` from
+      `LOCK_EX|LOCK_NB` and returns immediately, without overwriting the
+      existing pid. `_release_lock` closes the open fd (closing drops the
+      flock) and only unlinks the file if the recorded pid still matches
+      `$$`, so a pid-recycled foundation cannot unlock its successor's
+      lock. `_lock_held` is the flock check, not a `kill(0,$pid)` against
+      a recorded pid the foundation wrote itself — a stale lock whose
+      holder died is held=false and a fresh tick takes over without
+      manual cleanup. Path::Tiny's `slurp_utf8` does an internal blocking
+      flock that hangs forever when the same process already holds one,
+      so the metadata read is a raw `sysread` loop.
+
+    - An agent killed by a signal is now booked as `128 + signum`, not as
+      a clean exit 0 (#164). The runner used to compute `$exit_code =
+      $? >> 8` — the high 8 bits, which are 0 for any child that died
+      from a signal. The OOM-killer, an external SIGTERM, a SIGSEGV, and
+      any other signal-death shape were all booked as a clean run:
+      `last_error` stayed unset, the cooldown that exists to back off
+      after a machine-killing agent never engaged, and the next cron
+      tick re-launched at full rate. The fix reads both halves of `$?`:
+      signal death becomes `128 + signum` (the shell convention, so
+      SIGTERM=143, SIGKILL=137, SIGSEGV=139, SIGINT=130); a normal exit
+      falls through to `( $? >> 8 ) & 255`. The timeout path's exit code
+      already used this convention; the classifier now matches it for
+      every signal, including the ones we don't fire ourselves.
+
+    - `karr pick` ranks candidates and `karr context --sections in-progress`
+      lists in-progress tasks by the board's own `priorities` and `classes`
+      lists, not by a hardcoded table (ticket #149). `Cmd/Pick.pm` used to
+      sort through `App::karr::Config->priority_order` and `->class_order` —
+      class methods that only knew the four default priorities and four
+      default classes. On a board imported from kanban-md with a longer
+      priorities list (or any class name the table did not recognise),
+      every unknown priority collapsed into the `// 2` fallback, the sort
+      became a no-op on that axis, and the wrong card went out — silently
+      and consistently, while `karr list --sort priority` showed the right
+      order right next to it. The reproduction in the ticket was a board
+      with priorities `[low, medium, high, critical, blocker]`: `karr pick`
+      handed out the merely-critical card because `blocker` was unknown to
+      the table, and `karr context --sections in-progress` listed
+      `critical` above `blocker` for the same reason. The fix reads
+      `$self->config->priorities` and `$self->config->classes` and sorts
+      by class index (lower = more urgent) then by priority index (higher
+      = most urgent), matching kanban-md's `internal/board/pick.go:74-90`.
+      `App::karr::Config->priority_order` and `->class_order` are removed
+      rather than left in place: their only callers were the two bug sites,
+      and leaving them around invites a future caller to use the wrong one
+      again. The `=attr priority` / `=attr class` POD in `Task.pm` now
+      references the `Config/priorities` and `Config/classes` instance
+      methods.
+
+    - `karr edit --status X --release` no longer walks straight through the
+      `require_claim` guard and lands a card in a require_claim column with
+      no claim on it (ticket #150). `Cmd/Edit.pm` cleared the claim forty
+      lines after `apply_status_change` had already satisfied the guard with
+      that same claim, so `karr edit 1 --claim agent-a` followed by
+      `karr edit 1 --status in-progress --release` produced an unowned
+      in-progress card — a state `karr move` and `karr edit --status` both
+      refuse to create by any other route. `karr edit 2 --status in-progress
+      --claim agent-b --release` did it in one command. The fix has two
+      pieces: `--claim` and `--release` are rejected together at the flag
+      layer as a usage error (exit 2), matching kanban-md
+      (`cmd/edit.go:128-130`); and the `--release` block now runs before
+      `apply_status_change`, so the guard in
+      `Role::TaskMutation::apply_status_change` sees the post-release state
+      and refuses the status change, matching kanban-md's `validateEditPost`
+      firing after `applyFn` regardless of release
+      (`internal/board/mutate.go:442`). `--release` alone on a card already
+      in a require_claim column is intentionally left unchanged: it is the
+      same shape but outside the ticket's scope (kanban-md has the same
+      hole).
+
+    - karr-foundation no longer throws away a successful agent run because of
+      something it printed (ticket #160). The common-error scan ran on every
+      run before anything asked whether the run had worked, over the whole
+      transcript, against bare substrings — network, quota, credentials, 401,
+      403, 429, 503. An agent working a karr board prints the board, so a
+      backlog line reading "retry the network fetch on 503" matched, and so
+      did a diffstat of 403 changed lines. The drain aborted, the cards the
+      agent had just moved were credited to nobody, and the cooldown climbed
+      1m, 2m, 4m … 64m without ever resetting, because the next run printed
+      the same words: a healthy board throttled to one discarded run per hour.
+      What a run did is now asked before what it printed. A run that exited 0
+      and moved the board is progress whatever scrolled past, and is never
+      reclassified by its own output; the scan is evidence only where there is
+      none other, a run that moved nothing — which is what a rate-limited or
+      unauthenticated agent looks like. A pattern seen in a run that did move
+      the board is noted in `.karr.log` and otherwise ignored. The default
+      patterns are narrow to match: a symptom word counts next to a failure
+      word on the same line ("network error", "invalid credentials", "quota
+      exceeded"), never on its own, and an HTTP status only where something
+      adjacent marks it as one ("API error: 429", "429 Too Many Requests") —
+      not in a diffstat, a byte count, a line number or a commit hash. Genuine
+      failures reported by an agent that still exits 0 keep triggering the
+      backoff, which is what the scan is for. A board's own `error_patterns`
+      are unchanged: plain case-insensitive substrings.
+
+    - `.karr.state` no longer keeps a `last_error` from a run three cooldowns
+      ago sitting next to `last_exit: 0` with nothing to explain the pair
+      (ticket #160). `last_error` describes the last run and is dropped by the
+      next run that is not a common error. Where the pair is real — an agent
+      that reports a rate limit and still exits 0 — it is now said out loud:
+      `.karr.log` records "COMMON-ERROR rate limit — agent exited 0, run
+      discarded", and `karr-foundation --status` names the reason beside the
+      wait ("cooldown 240s (rate limit)").
+
+    - Fixed data loss when a pull could not write a ref (ticket #154). The
+      apply step of the reconciliation used an unretried ref write whose
+      failure nobody checked, so a ref whose `.lock` file was held — by
+      another karr mid-write, or left behind by one that was killed — was not
+      applied, while the `refs/karr-remote/` mirror was advanced as if it had
+      been. The next reconciliation then read the stale local ref as unpushed
+      work and the forced, pruning push wrote it over the remote's newer card,
+      in every clone, at exit 0. Those writes now retry on the same terms as
+      every other ref write in `App::karr::Git`, a ref that still cannot be
+      applied leaves the mirror at its pre-fetch value so the next sync
+      decides it again, and the pull fails with a non-zero exit naming the ref
+      instead of proceeding to the push. The same fix covers a remote deletion
+      that could not be applied (which used to be pushed back as a
+      resurrection), a conflict whose local version could not be parked (the
+      local version is now kept rather than replaced), a mirror rollback
+      behind a refusal that only half succeeded (now reported), and the
+      board-identity stamp the mirror could not record.
+
+    - karr-foundation no longer auto-blocks tasks its agent never touched
+      (ticket #158). `_stuck_tasks` claimed to return "tasks the agent engaged
+      (claimed / in-progress) but did not move" and tested only whether the
+      card carried *any* claim or sat in `in-progress` — who held it was never
+      compared against anything. Every drain iteration in which the agent moved
+      some other card therefore charged an attempt against every card somebody
+      else was holding, and since `max_attempts` (default 2) can be spent
+      inside a single drain, a human's in-progress card was blocked with
+      `auto-block: no progress after N attempts (foundation)` and pushed to the
+      remote within seconds — a destructive write to shared board state about
+      work foundation never attempted, dropping that card out of `karr pick`'s
+      actionable set behind its owner's back and giving a reason that is
+      factually wrong. Engagement is now proven rather than assumed: foundation
+      runs the agent with `KARR_ROLE=agent`, so the agent's `karr` writes are
+      recorded in the board's own activity log under the `agent` identity, and
+      only cards named there during that drain — held by nobody, or under a
+      claim name the agent itself wrote with — can be penalized. A card the
+      agent merely left claimed in an earlier run no longer counts either; a
+      stale claim is what `claim_timeout` and `karr unlock` are for. Where that
+      evidence is missing altogether — an agent command that never calls
+      `karr`, an unreadable log — foundation now auto-blocks nothing rather
+      than guess: a drain that ends on its iteration cap costs an iteration,
+      blocking the wrong card costs somebody their work. The ownership test is
+      repeated at the write itself, which is the only place foundation mutates
+      a board, so a future caller inherits the guarantee instead of having to
+      remember it.
+
+    - karr-foundation no longer splices environment values into the agent
+      command string before `/bin/sh` parses it (ticket #159). `PROMPT`,
+      `KARR_REPO` and `KARR_ROLE` are exported into the child's environment
+      and the shell expands them, as it already could. Previously a prompt's
+      backtick spans and `$(...)` — board content, written in Markdown — were
+      executed as shell commands in the board's own directory, and the agent
+      then received an instruction nobody wrote; and the substitution reached
+      inside single quotes, where sh guarantees a literal, so the documented
+      output-shaping technique broke silently (`awk '{print $2}'` arrived at
+      awk as `'{print }'`). Every variable a command template could reference
+      before still expands, the `${VAR}` form included. The START line in
+      `.karr.log` now records the command template — the exact string handed
+      to `/bin/sh` — instead of the substituted result, and so no longer
+      copies environment values, a wrapper's API key included, into a
+      plaintext log.
+
+    - karr-foundation can no longer start an agent and then walk away from it
+      (ticket #147). `App::karr::Foundation::Runner` opened `.karr.log` after
+      the fork, so a log it could not open was reported with the agent already
+      exec'd, and that `user_error` came before the parent's own `waitpid`.
+      Not fatal to the run, which is what made it expensive: `_run_command` is
+      called from the drain loop, which `_process_repo` catches per repo and
+      then releases the board's lock anyway, so every affected board was left
+      with a live, unwatched agent and a lock file saying nobody was running —
+      and the next tick would start a second one on top of it. The log is now
+      opened before the fork, which turns an unwritable log into a refusal with
+      nothing started: the same answer the foundation's own `_append_log` for
+      the START line already gives one call earlier, and the reason that window
+      needed a race to reach at all, since a log that is a directory or
+      unwritable fails there first. The one that needed no race is the
+      `TIMEOUT` line, appended between the read loop and the
+      SIGTERM/SIGKILL/`waitpid` that are the only things that stop a hung
+      agent: an agent that removed or replaced `.karr.log` during its own
+      half-hour run took that append down with it and outlived the timeout it
+      had earned. That append is now best-effort, and its failure is warned
+      once the child is safely reaped instead of thrown in front of the kill;
+      the END line still raises it for real if the log is unwritable by then.
+      Nothing between the fork and the `waitpid` can throw any more.
+      t/148-foundation-runner-child-leak.t pins both halves, and t/122's #143
+      assertion that the child gets reaped became the assertion that there is
+      no child to reap.
+
+    - The lookup for the bundled skill file has one implementation instead of
+      two (ticket #146). `App::karr::Cmd::Init::_find_skill_source` and
+      `App::karr::Cmd::Skill::_skill_content` were the same sub twice over —
+      byte-identical apart from the `$INC` key each read to find its own source
+      tree for the development fallback — which is the shape that made ticket
+      #142 fix the skill *write* in one command and left #145 to fix it again
+      in the other three commits later. Both are now `_skill_content` on
+      `App::karr::Role::SkillFile`, next to the `_write_skill` #145 collapsed
+      the same way, and the role still requires nothing of its consumer, which
+      is what lets it serve board-less `karr skill` and board-composing
+      `karr init` alike. The fallback anchors on the role's own loaded path
+      rather than on a command's: naming either command's file would answer for
+      one caller and send the other silently on to "Could not find
+      claude-skill.md", and since MooX::Cmd decides which command classes get
+      loaded, whether that happened would depend on how karr was invoked. No
+      change in behaviour: both lookups, both fallback triggers and both
+      commands are exercised end to end in t/26-skill-share-dir.t, including
+      through the CLI with File::ShareDir made to fail the way an uninstalled
+      dist makes it fail.
+
+    - `karr metrics` no longer averages impossible cycle times (ticket #140).
+      A completed card whose `completed` precedes its `started` measures a
+      negative duration, which is not a cycle time; it is now left out of that
+      average and counted in `unusable_timestamps`, the same way a `started`
+      that precedes its own card's `created` already was. The start check had
+      quietly stopped catching these: #138's `karr repair` clamp raises
+      `started` to `created`, so the old condition holds by construction on
+      every card it touched, and the pre-#68 bare-date `completed` — midnight
+      of its day — then falls below the new start. On karr's own board that
+      was 42 of 117 cycle samples negative, an average cycle time of 16
+      minutes, and `unusable_timestamps` reporting 0 — the figure whose whole
+      job is to say what is missing from the averages, saying nothing.
+      `unusable_timestamps` is now documented as what it has always counted:
+      cards, not stamps, each one missing from at least one of the two
+      averages. Lead time is deliberately untouched here and can still be
+      negative where `completed` precedes `created` — that was ticket #139's
+      decision to take, and it is the entry below. `completed` equal to
+      `started` stays measurable — a
+      card moved straight into a terminal status has a cycle time of zero, and
+      zero is a measurement.
+
+    - `karr metrics` now says how much of its lead average cannot be believed
+      (ticket #139). A card whose `completed` precedes its own `created`
+      contributes a negative lead time, and it still does: unlike `started`,
+      which karr manufactured and `karr repair` rewrites, `created` and
+      `completed` are original data, so a negative lead time is evidence of a
+      bad completion rather than something to normalise away — and every value
+      a clamp could pick would be an invention (`created` is too early,
+      `started` asserts a zero cycle time, and the end of the day a bare date
+      bounds was never written down). So the sample stays in the average and
+      is qualified instead of cleaned: `negative_lead_samples` under `--json`,
+      always present including as 0, and a closing note in the default and
+      compact renderings stating the same figure. Deliberately *not* folded
+      into `unusable_timestamps`, which counts cards missing from at least one
+      average — these are missing from nothing; both definitions are now
+      spelled out in the POD, along with the fact that one card can be in
+      both. The command also stops implying an hour precision its data does
+      not have: boards written before ticket #68 (karr 0.403) carry
+      day-granular `started`/`completed` stamps, bare `YYYY-MM-DD` read as
+      midnight, which is where every negative duration comes from, and on such
+      a board an average printed to the hour is finer than what it rests on.
+      On karr's own board 51 of 138 lead samples are negative, averaging
+      -10.1 hours; discarding them would raise the printed average from 6h 39m
+      to 16h 28m, which is why the figure is reported with the 51 beside it
+      rather than tidied up with the evidence removed. No data migration:
+      `karr repair` is untouched and the stored stamps stay exactly as they
+      are.
+
+    - `karr skill install` and `karr skill update` write the target SKILL.md in
+      place instead of replacing it (ticket #142). Path::Tiny's `spew_utf8`
+      writes a temp file and renames it over the destination, so the path it
+      wrote came back on a new inode -- right for an ordinary file, wrong for a
+      skill file: skills are shared between projects as a hardlink chain, one
+      inode behind the same relative path in dozens of checkouts, and the
+      rename broke the updated path out of its chain. That one project got the
+      new skill, all the others kept the old inode with the old text, and the
+      link count dropped with nothing said. Found during agent setup in an
+      unrelated repository, where the workaround was piping `karr skill show`
+      into a shell redirect. The write now truncates the existing file and
+      writes through it, so every link sees the update; it is still
+      Path::Tiny's character-level UTF-8, so the encoding boundary is unmoved.
+      A target that does not exist yet is still created and a symlinked target
+      is still written through. A target that cannot be opened for writing at
+      all -- a read-only SKILL.md, which the rename handled because it only
+      needed a writable directory -- is still updated by replacement rather
+      than turned into a failure, but that is the one case left where a chain
+      cannot survive, so it is now reported instead of done silently.
+
+    - `karr init --claude-skill` writes .claude/skills/karr/SKILL.md in place
+      too (ticket #145). It installs the very file `karr skill install --agent
+      claude-code` installs, and it still did so with the `spew_utf8` that
+      ticket #142 had just removed one command over: a temp file renamed over
+      the target, so the path came back on a new inode. Where a skill file is
+      one link of a hardlink chain shared between projects, that broke this
+      project out of the chain and left every other one on the old inode with
+      the old text. Both commands now go through one shared implementation —
+      App::karr::Role::SkillFile — rather than a copy each, because the copy
+      is how the rule came to be right in one place and wrong in the other; it
+      carries the in-place write, the fallback for a target that cannot be
+      opened for writing at all, and the warning that says so when a chain was
+      there. `karr init` still reports a directory it cannot create as "Could
+      not create .claude/...", which is what actually failed, and `karr skill`
+      behaves exactly as before.
+
+    - `App::karr::Role::TaskMutation` now declares the five methods it calls
+      on its consumer (ticket #141): `git` and `store` from
+      `Role::BoardDiscovery`, `save_task` and `log_task_write` from
+      `Role::BoardAccess`, `json` from `Role::Output`. It declared nothing at
+      all, and composed cleanly into anything, which is the state #128 found
+      `Role::DependencyCheck` in — so a future command reaching for
+      `update_task_guarded` would have inherited a compare-and-swap loop whose
+      collaborators nobody had checked for, and learned about it from inside
+      the callback as a "Can't locate object method". No command changes: all
+      five on the mutation path already compose both supplying roles, which is
+      what hid the gap. The ticket proposed six names; `check_claim` is not
+      one, because it comes from `Role::ClaimTimeout`, which this role
+      composes, exactly as `check_dependencies` comes from
+      `Role::DependencyCheck`. Requiring either would never fail — Role::Tiny
+      installs a role's methods into the consumer before checking its
+      requires, so the check finds what the composition just put there. `json`
+      is now declared twice, here and on `Role::DependencyCheck`; that is
+      deliberate, since a role that lets one it happens to compose declare a
+      collaborator on its behalf is how this gap opened.
+
+    - `App::karr::Role::ClaimTimeout` now declares the one method it calls on
+      its consumer (ticket #144): `store`, from `Role::BoardDiscovery`. It
+      declared nothing at all and composed cleanly into anything, which is the
+      state #128 found `Role::DependencyCheck` in and #141 fixed for
+      `Role::TaskMutation` — so a consumer without `store` was still handed
+      `check_claim`, karr's one claim-ownership rule, and would have found out
+      from inside a mutation as a "Can't locate object method", on the one run
+      where a task was actually claimed by somebody else. No command changes:
+      all seven that compose the role, directly or through
+      `Role::TaskMutation`, already bring `store` along via
+      `Role::BoardAccess`, which is what hid the gap. One name is the whole
+      list — the role's four other calls reach subs defined in the role itself,
+      and unlike `Role::TaskMutation` this one composes no role at all, so
+      nothing arrives by composition either. Requiring any of them could never
+      fail: Role::Tiny installs a role's methods into the consumer before
+      checking its requires, so the check finds what the composition just put
+      there. With this, the three roles on the mutation path all say what they
+      call.
+
+    - `karr repair` gained a second migration (ticket #138): it raises a
+      `started` stamp that precedes its own card's `created` up to that
+      `created`. karr wrote `started` as a bare date until #68, which reads as
+      midnight and therefore lands before any card filed and begun on the same
+      day — 75 of 138 cards on karr's own board. Both migrations are reported
+      and applied together but kept apart in the output, since a board can
+      need either without the other, and neither bumps `updated`: a migration
+      is not an edit, and stamping every card it rewrites would destroy the
+      history it is repairing. Only the pre-#68 bare-date shape is clamped; a
+      `started` that precedes `created` while carrying a time of day is a
+      different and unknown fault, so it is reported and left alone rather
+      than having its evidence erased. What the clamp costs is stated by the
+      command rather than left to be discovered: a clamped card asserts zero
+      queue time, which is false for one filed in the morning and picked up at
+      night, and nothing on it marks the stamp as having been day-granular any
+      more — the rewrite cannot be undone from the data. The dry run says how
+      many cards that is before `--yes` applies it. `repair` also no longer
+      returns early when the encoding is already current, since otherwise the
+      clamp could never run on a board written by a current karr; `up_to_date`
+      in the JSON keeps answering for the encoding migration alone, and says
+      so.
+
+    - `App::karr::Role::DependencyCheck` is split in two (ticket #137). It
+      carried both halves of dependency handling under one name, with two
+      different contracts: parsing and validating `--depends-on` arguments at
+      set time, and warning at move time that a card's dependencies are
+      unfinished. `Cmd::Create` composed the whole thing for the first half
+      alone, which is why #128 could not put `json` in the role's `requires` —
+      `create` has no `--json`, and requiring it would have refused a consumer
+      that never reaches the reporting half. The set-time half is now
+      `App::karr::Role::DependencyArgs`, named beside the existing
+      `Role::CliArgs` for the same reason: it turns command-line values into
+      validated ids. Both halves now declare every method they call on their
+      consumer, `json` included. Only `Cmd::Create` and `Cmd::Edit` change
+      what they compose; `Cmd::Pick` and `Role::TaskMutation` keep the
+      reporting half under its old name, so external `L<...DependencyCheck>`
+      references stay correct. `Cmd::Edit` turned out to be getting
+      `parse_dependency_ids` by accident of the two halves sharing a role, and
+      now names `DependencyArgs` itself.
+
+    - New command `karr metrics` (ticket #126), the last kanban-md feature
+      karr did not have: throughput over fixed 7- and 30-day windows, average
+      lead time (created to completed) and cycle time (started to completed),
+      flow efficiency, and aging work items — started, not terminal, no
+      completion — oldest first. `--since`, `--json` and `--compact` as
+      elsewhere; archived tasks are excluded the way `list` and `board`
+      exclude them, and like the other read commands it does not sync first
+      and refuses a repository holding no board rather than reporting zeroes.
+      Every figure comes from the lifecycle stamps on the cards and from
+      nothing else. The activity log was considered and rejected as a source:
+      its entries record the status a write left a task in, not the
+      transition, it only exists since #64, and `import`/`restore`/`repair`
+      write refs without logging — so a log-derived cycle time would come out
+      silently short on exactly the oldest boards and disagree with the cards.
+      Two departures from kanban-md, both deliberate: flow efficiency is the
+      summed cycle time over the summed lead time of the same cards, not one
+      average divided by another over different populations, which is how
+      kanban-md can report over 100%; and the JSON carries `lead_samples`,
+      `cycle_samples` and `unusable_timestamps` (the text render carries the
+      counts too), so a figure resting on two cards cannot pass for one
+      resting on two hundred. Cards whose stamps cannot carry a measurement —
+      an unreadable date, or a `started` that precedes the card's own
+      `created` — are left out of the averages that need them and named in a
+      note.
+
+    - `karr unlock` no longer announces a lock it did not break (ticket #119).
+      `Git::delete_ref` returned `0` both for "the ref was never there" and
+      for "libgit2 refused the delete", so a caller could not tell them apart
+      — and `Lock::break_lock` read the second as the first: with the delete
+      refused, `karr unlock` printed "Broke lock on task N" and exited 0 while
+      the lock ref was still on disk and the card still held, with nobody left
+      to look at it. `delete_ref` now raises on a refusal, the way its
+      compare-and-swap twin and every other ref mutation in the class already
+      did: `1` means this call removed it, `0` means there was nothing to
+      remove, and a refusal is an exception carrying libgit2's reason. Lock
+      contention is unchanged — still the retry path, not a failure — and so
+      is the `0` for a repository that cannot be opened at all, since that is
+      the global-destruction teardown from #63 rather than a refusal. The
+      delete itself stays unguarded: `karr destroy`, `delete_refs` and
+      `break_lock` still remove whatever is there. `karr destroy` now reports
+      *why* it is stuck rather than just which refs are left, and attempts
+      every ref before raising instead of stopping at the first refusal;
+      `restore`'s best-effort cleanup catches the refusal, and no longer
+      mislabels a ref that vanished underneath it as stuck.
+
+    - `karr config get KEY --json` now always wraps the answer in the key that
+      was asked for (ticket #131). It wrapped scalars and printed lists and
+      mappings bare, so `karr config get board --json` answered
+      `{"name":"..."}` — byte-identical to the wrapped form of a scalar key
+      called `name`, with nothing in the payload to tell the two apart, and a
+      consumer reading it as `{"board": ...}` silently got the wrong shape.
+      Mappings and lists now carry their key too, as `board` and `statuses`;
+      scalars are unchanged. That also makes `get KEY --json` a one-key subset
+      of the `config show --json` object rather than a second schema. This is
+      a deliberate break of a machine-readable interface, not a bug fix:
+      consumers that read the bare list or mapping have to index the requested
+      key first. Nothing in the distribution, the shipped skill or
+      karr-foundation read the old form. Two asymmetries are left alone as
+      separate decisions: `config set --json` answers with its own
+      `{"key":...,"value":...}` shape, and a dotted key still wraps flat
+      (`get board.name --json` → `{"board.name":"..."}`, not a nested object),
+      so a dotted `get` is still not a subset of `show`.
+
+    - Deleting a task id that was never there no longer writes an activity-log
+      entry claiming it was deleted (ticket #120). `Role::BoardAccess`'s two
+      write doors disagreed by accident: `save_task` guarded its
+      `log_task_write` on the store write having succeeded, `delete_task`
+      called it unconditionally. Since #64 that log feeds `karr log` and `karr
+      show --me`, so `karr delete 999` on a board with no task 999 reported a
+      delete that never happened — and an entry has no room to say
+      "attempted", since it carries only agent, action, task id and detail.
+      The third write path, `Role::TaskMutation::delete_task_guarded`, already
+      dies on a missing id before it logs, so the unguarded door was the lone
+      outlier of three.
+
+    - `Role::BoardAccess::save_config` is gone (ticket #120). Nothing in the
+      distribution called it — every config write goes to
+      `$self->store->save_config($hash)` directly — and its no-argument form
+      would have corrupted the board: it defaulted to `$self->config`, an
+      `App::karr::Config` object, where `BoardStore::save_config` expects the
+      plain effective-config hash. Handed the object it diffed the blessed
+      hash's own `data` and `file` keys against the defaults, and because that
+      merges into something schema-valid, `Config->validate` — the single
+      validation gate — waved it through: the result was a `refs/karr/config`
+      with the board's entire real config nested under a `data:` key and
+      `board.name` gone. It has been there since the initial release, so this
+      is an API removal against 0.402 for anyone who composed the role outside
+      this distribution; the role's POD now records
+      why the door is deliberately absent, since `save_task` and `delete_task`
+      earn theirs by writing the activity log and a bare pass-through does not.
+
+    - The COMMANDS block of `karr --help` lines its descriptions up in one
+      column again. It never did: the row was rendered with `sprintf "  %-*s
+      %s\n", $max, colored($name, 'cyan'), $desc`, and `%-*s` pads to the
+      length of the string it is handed — which for a coloured name includes
+      the ANSI escapes `colored()` wrapped around it. Those are about nine
+      characters on their own, so every argument was already wider than `$max`
+      and the field never padded at all, leaving each description one space
+      behind its command name. The padding is now computed from the bare name
+      and applied before the colour, so `materialize` and `init` put their
+      descriptions on the same column. The width still derives from the
+      longest name in the table rather than a fixed number, so adding a longer
+      command does not silently break it again. What kept this from being
+      caught: `colored()` returns its text untouched under `NO_COLOR` /
+      `ANSI_COLORS_DISABLED`, so the existing help tests — which strip escapes
+      or run plain — saw perfectly aligned output. The regression test renders
+      the help twice, once forced plain and once with colour forced on, and
+      asserts the coloured rendering really does carry escapes before
+      measuring it.
+
+    - `karr config get` / `karr config show` answer for this board, or refuse
+      (ticket #136). They were the sibling of #135 that fix deliberately left
+      out: `Cmd::Config` called `sync_before` and `require_board` only in its
+      `set` branch, so the read path did neither and fell back to the code
+      defaults — documented as a choice, on the grounds that those values really
+      are the ones that would apply. For `board.name` there is no such reading.
+      In a fresh clone of a board named "Echtes Board", `karr config get
+      board.name` printed `Kanban Board`, karr's placeholder, at exit 0, and
+      left the clone holding zero karr refs; `karr sync` then fetched six and
+      the same command answered correctly. Both `show` and `get` now go through
+      `require_local_board` like every other read: still offline, refusing with
+      exit 1 where nothing is stored under `refs/karr/`, reading a half-board
+      with the note on STDERR. The defaults keep their honest use — "what would
+      a board created here start with?" is a real question — but have to be
+      asked for: `karr config show --defaults` (and `get KEY --defaults`) reads
+      no board, needs no repository, and answers the same everywhere, so the
+      difference between the board's value and karr's is carried by the exit
+      code rather than by an unmarked payload. Which key it is does not decide
+      anything: in a fresh clone every key can be overridden on the remote, and
+      `board.name` is only the one that almost always is. `--defaults` renders
+      identically to a board read, so `diff <(karr config show) <(karr config
+      show --defaults)` is exactly the set of keys a board overrides. It is
+      rejected on `set`, with exit 2.
+
+    - The read-only commands no longer render an empty board where there is no
+      board (ticket #135). `board`, `list`, `show`, `log`, `context` and the
+      bare `karr` summary never asked whether a board was there; they rendered
+      the code defaults over an empty task list, so a repository holding no
+      board printed exactly what a board holding no cards prints — down to the
+      byte, once the board is called "Kanban Board". `git clone` does not fetch
+      `refs/karr/*`, which makes that the normal state of every fresh clone,
+      where the tickets are all still on the remote: a user who trusts `0 tasks`
+      there concludes they are gone. The reads stay offline — a pull in front of
+      every `karr show` is not worth it, and a stale read is recoverable where a
+      stale write is not — but they now report what they actually read. Nothing
+      under `refs/karr/` is refused with exit 1 and a message that names the
+      namespace, denies the empty-board reading, and, where the repository has a
+      remote, leads with `karr sync` rather than `karr init`: the board is
+      unfetched rather than absent, and `init` would answer that by starting a
+      second, empty one. A half-board (#133) is read rather than refused — its
+      tasks are demonstrably there — with the note that `refs/karr/config` is
+      missing on STDERR, so `--json` stays parsable. An initialized board with
+      no tasks answers exactly as before, which is the distinction that was
+      missing. `--json` consumers tell the two apart the way they tell every
+      other karr failure apart: exit 1 and an empty stdout, rather than a
+      payload full of zeros. The agent skill says so too, in its Sync section:
+      a fresh clone has no `refs/karr/*`, the read commands refuse until
+      `karr sync` has run, and `karr init` is the wrong answer there. That is
+      the loop this came out of — an agent read an empty board, believed it,
+      and reached for `init`.
+
+    - The runtime images can reach an `ssh://` remote (ticket #134). They
+      shipped without an ssh binary — `runtime-base` installed `git gosu passwd`
+      and the shared libraries, and nothing else — so git's CLI fallback died
+      with `error: cannot run ssh: No such file or directory` and a board on an
+      ssh remote was unreachable from the published images. That fallback is not
+      decoration: it is there for the ssh-config and `ProxyCommand` setups
+      libgit2 cannot do, and it could never take a single one of them.
+      `openssh-client` is now installed with the rest. The other half was the
+      README's recommended alias, which mounted `.gitconfig`, `.claude`,
+      `.codex` and `.cursor` but not `.ssh`, while setting `HOME=/home/karr` —
+      so libgit2 looked for `known_hosts` in a directory that did not exist and
+      reported every host as unknown, and the fix it printed
+      (`ssh-keyscan … >> ~/.ssh/known_hosts`) was carried out on the host, where
+      the container never saw it. The alias now mounts `~/.ssh` read-only, and
+      an agent-forwarding variant is documented as a shell function, since
+      `docker run` rejects the socket mount outright when no agent is running.
+      Neither half helps alone: an ssh binary with no keys cannot authenticate,
+      and mounted keys with no ssh binary cannot fall back. A third piece only
+      turned up when the finished image was pointed at a real ssh remote: the
+      root image drops to whoever owns F</work>, and that host uid has no
+      C</etc/passwd> entry, so C<ssh> — which looks itself up with
+      C<getpwuid()> — refused to start with `No user exists for uid 1000`. The
+      entrypoint now writes an entry for the uid before dropping to it. The
+      fixed-user image never had this problem, since C<useradd> wrote one at
+      build time; the default image, the one the README recommends, had it for
+      every ssh remote.
+
+    - `karr init` no longer stamps the encoding marker on a board it is
+      completing rather than creating (ticket #132). `init` accepts a
+      half-board — task refs present, `refs/karr/config` missing — and finishes
+      it (#62), but it used to write `refs/karr/meta/encoding` on the way out
+      either way. On a board from 0.402 or earlier that marker asserts the
+      opposite of what the adopted task refs carry: the read path stopped
+      undoing their double-encoded UTF-8, every old card turned to mojibake
+      (`… Transport prüfen —` became `… Transport prÃ¼fen â`), and `karr
+      repair` then reported the board as already up to date and declined to
+      migrate it, leaving hand-deleting a ref as the only way back. Not one
+      byte in the refs changes in that failure, which is why it was invisible.
+      The marker is now written only by an `init` that found nothing at all
+      under `refs/karr/`, so a completed half-board keeps both the repair on
+      read and `karr repair --yes`. `karr import --yes` had the same defect and
+      the same fix: it rewrites the task refs from the file view but never the
+      activity log under `refs/karr/log/` (nor the config, when the view
+      carries no `config.yml`), so on a pre-0.403 board it stamped a claim it
+      could not make and turned every old log entry into mojibake. It now
+      stamps only a board that import itself created. `karr repair --yes` is
+      unchanged and remains the one command that may stamp an existing board,
+      because it is the one that rewrites every ref.
+    - "No karr board found. Run 'karr init' to create one." no longer speaks
+      for two different repositories (ticket #133). Write commands raised it
+      whenever `refs/karr/config` was absent, including on a repository whose
+      tasks, counter and log were all there — so a board missing exactly one
+      ref reported itself as never having existed. An agent hit that on a
+      repository holding 21 tickets, believed them gone, and ran `karr init`,
+      which at the time also broke how they were read (#132 above). A
+      repository with nothing under `refs/karr/` still gets the old sentence,
+      the one `backup`, `destroy`, `materialize` and `repair` raise for the
+      same state. A half-board now gets its own: it is named as one, the number
+      of task refs at stake is stated, and `karr init` is described as
+      completing the board while keeping what is already there. `karr init`
+      likewise reports which of the two things it did.
+    - `karr config get statuses` and `karr config get classes` are readable
+      again (ticket #130). Both lists allow an entry to be either a bare name or
+      a mapping — `{ name: in-progress, require_claim: true }`,
+      `{ name: expedite, wip_limit: 1 }` — and the renderer joined the raw list,
+      so every mapping printed as `HASH(0x558580cd1688)`. The default board hits
+      it twice in `statuses` and, because all four of its classes are mappings,
+      four times out of four in `classes`, where the answer carried no name at
+      all. An entry now renders as its name followed by its per-entry settings
+      in parentheses — `in-progress (require_claim: 1)`, `expedite
+      (bypass_column_wip: 1, wip_limit: 1)` — and `karr config show` renders the
+      two lists the same way instead of dropping the settings, so the overview
+      and the single-key lookup cannot disagree about what the board's columns
+      are. `--json` is unchanged: it already carried the entries as configured,
+      and still does. This was not cosmetic — that output is what a reader
+      consults to learn which columns a board has, and the unreadable entries
+      led an agent to describe an "extended status set" with a `closed` status
+      that no board in the tree configures.
+    - The `runtime-user` image build no longer warns about `/home/karr`. The
+      shared `runtime-base` stage used to create that directory, so
+      `runtime-user`'s `useradd -m` was asking for a home that already existed
+      and printed `useradd: warning: the home directory /home/karr already
+      exists.` plus `Not copying any file from skel directory into it.` on every
+      build. `runtime-base` now creates only `/work` and leaves the home to
+      whoever owns it — `useradd -m` in `runtime-user`, and in `runtime-root` the
+      entrypoint, which has to `mkdir` it anyway for the uid it drops to, so
+      nothing there depended on the base stage doing it. Two visible
+      consequences for the `-user` image: the home is now `0700` rather than
+      `0755`, because `useradd` applies Debian's `HOME_MODE` instead of
+      inheriting a `mkdir` default, and it carries the `/etc/skel` files
+      (`.bashrc`, `.profile`, `.bash_logout`) that the warning had been skipping.
+      Neither affects the image as documented — it runs fixed as `USER karr`,
+      which owns that directory, and the README's `-v …:/home/karr/…` mounts are
+      unaffected. Overriding the uid at `docker run --user` time is the one thing
+      that gets stricter; that case is what the root image and its entrypoint are
+      for.
+    - The README's recipe for a custom fixed-user image passed `.` from a git
+      checkout as the Docker build context, which cannot work: the `builder`
+      stage installs the tree with `cpanm`, and a Dist::Zilla distribution has no
+      `Makefile.PL` until it has been built. It now points at a built
+      distribution — an unpacked CPAN tarball, or `dzil build --no-tgz` output —
+      and mentions that `dzil build` already produces both published images
+      itself through the `[@Author::GETTY::Docker]` sections.
+    - `karr list --json` now carries the task body (ticket #129). It built its
+      payload from `Task->to_frontmatter`, the YAML frontmatter view — and the
+      body lives *below* the frontmatter in the file format, never inside it,
+      so every card came out of `list --json` without its text while `show`,
+      `pick` and `handoff`, which go through `Task->to_json_hash`, shipped the
+      same card whole. Nothing documented the difference: `--json` was
+      described as "machine-readable" without a caveat, and `to_json_hash`
+      listed its users without noticing `list` was missing from them. kanban-md
+      marshals the full task structs in `cmd/list.go`, with
+      `json:"body,omitempty"` on `Body`, so this was also a parity gap. In
+      practice it forced anyone reading ticket text by machine into one `show`
+      per id — N+1 calls for what one call can answer. An absent body stays an
+      absent key rather than an empty string, as kanban-md's `omitempty`
+      spells it, and a body of `"0"` counts as text (the #78 rule: emptiness is
+      length, not truth). Boards with long bodies will see the payload grow;
+      that is what `--compact` is for. `karr board --json` is deliberately
+      unchanged: its columns stay a card index, not a text dump — kanban-md's
+      own `board --json` carries counts and no task payloads at all, so karr
+      already gives more there than parity asks for.
+    - `depends_on` can now be set from the CLI (ticket #124): `karr create
+      --depends-on 2,3` takes comma-separated ids the way `--tags` does, and
+      `karr edit --add-depends-on` / `--remove-depends-on` follow the
+      `--add-tag`/`--remove-tag` rule — add appends without duplicating,
+      remove is a no-op for ids the card does not carry. Until now the field
+      was reachable only through `karr import` of a file view, so after #123
+      karr warned about a relationship it could not itself express. The ids
+      are stored and emitted as numbers, matching kanban-md's IntSlice, so
+      they round-trip the frontmatter and `--json` numerically. Setting also
+      validates, as kanban-md does (ValidateDependencyIDs): a non-numeric id
+      or one the board does not have condemns the whole invocation as a usage
+      error (exit 2) before anything is written — on create, before an id is
+      allocated, so a rejected create burns none (the #54 rule) — while a
+      self-reference is per-id (`karr edit 4,5 --add-depends-on 5` is valid
+      for 4 and wrong for 5), failing that id and letting the rest of the
+      batch proceed (the #61 rule, exit 1). Removing an id the board no
+      longer has stays legal: it is how a dependency on a deleted task is
+      cleaned up. The #123 move-time warning is unchanged and complementary —
+      set-time catches a typo while the author still remembers what they
+      meant, move-time catches state that changed afterwards.
+    - A scalar where a list field belongs — `tags: urgent`, `depends_on: 1`,
+      writable only by hand or by a third tool in a materialized view — is now
+      refused at the parse gate as a usage error naming the field, and through
+      `karr import` also the file (ticket #125). It used to pass parsing and
+      die mid-write at the dereference in to_frontmatter, as a raw Perl error
+      with a source location (the #77 class); on the import path that fired
+      after refs had already started moving, so the import stopped half done —
+      config saved, earlier cards rewritten, the bad card and the prune never
+      reached — despite serialize_from's all-or-nothing promise (#70). Refusing
+      at parse time puts it behind that gate, and no ref moves. An empty or
+      null value is not refused: per the #98 interop rule "present but empty"
+      is the same state as "absent" and now loads as the empty list, where it
+      previously died at the same dereference.
+    - karr now reads `depends_on` (ticket #123). The field had been stored,
+      round-tripped and written into the frontmatter since the beginning and
+      evaluated by nothing, which is worse than a missing feature: a card
+      recording `depends_on: [5]` looked as though karr would hold it back
+      until 5 was finished, because the field was accepted, kept and
+      materialized — and `karr pick` handed it out regardless. Taking a card
+      up now warns when a dependency is unfinished, and warns in different
+      words when one names an id the board does not have. That covers a move
+      into a non-terminal status (`move`, `edit --status`, `handoff`) and
+      every `pick`, with or without `--move`: on a pick the claim itself is
+      the taking-up, so a bare `karr pick --claim X` — the commonest call
+      there is — warns too. It does not block: the command proceeds and
+      still exits 0. "Finished" is decided by the board's own terminal
+      statuses, so a board ending in `shipped` is judged by that column and
+      not by the literal `done`. The warning goes to STDERR, so STDOUT stays
+      parseable; under `--json` it rides in the result object instead, where
+      a JSON consumer can actually see it; `--quiet` silences the STDERR
+      copy. kanban-md skips such a card in `pick` entirely
+      (internal/board/pick.go) and counts an unknown id as satisfied
+      (internal/board/filter.go) — karr deliberately does neither, and says
+      so at both sites.
+    - `karr show` now displays `depends_on`, with the current status of each
+      dependency and `(unknown)` for an id the board does not have (also
+      ticket #123). The field was previously invisible in every command, which
+      was half of what made it a trap.
+    - Every public method in the distribution now carries POD (ticket #118).
+      The gap was not evenly spread and not a policy: App::karr::ActivityLog,
+      Error, SyncGuard and four roles documented every method, while
+      App::karr::Git documented four of fifty-two and App::karr::Lock none of
+      twelve — although all of them are set up identically, with an ABSTRACT,
+      a DESCRIPTION and a SYNOPSIS each, so a reader had no way to tell which
+      modules were meant to be used. Ticket #115, the dead L</last_error>
+      link, was one symptom of it. The new blocks state contracts rather than
+      restating method names: what a lookup answers when the thing is missing,
+      which arguments are required, and which failures are returned versus
+      thrown. Writing them down surfaced four defects that reading the code
+      had not (tickets #119 to #122), the sharpest being that
+      App::karr::Git::delete_ref returns the same 0 for "the ref never
+      existed" and "libgit2 refused the delete". Documentation only; no
+      behaviour changed anywhere.
+    - The Docker images no longer fight over their tags (ticket #116).
+      F<dist.ini> set C<docker_image> without C<docker_default = 0>, so the
+      C<[@Author::GETTY]> bundle added a third, unnamed C<Docker::API> plugin
+      on top of the two the distribution configures by name. That one has no
+      C<target>, so it built the last stage in the F<Dockerfile> — which is
+      C<runtime-user>, not C<runtime-root> — and no C<tags>, so it inherited
+      the plugin default C<latest %V %v>: exactly the tags C<runtime-root>
+      publishes. Which image C<raudssus/karr:latest> ended up carrying
+      therefore depended on the order the plugins happened to run in. Only
+      the two named builds run now.
+    - The bundled agent skill documents C<karr materialize>, C<karr import>
+      and C<karr repair>, which it had never mentioned, spells
+      C<karr agent-name> the way the command table does, and no longer
+      describes C<karr handoff> as moving to a literal C<review> — since
+      ticket #102 the target is the board's review column, or its last
+      non-terminal column on a board that has none. This applies to
+      F<share/claude-skill.md>, the copy C<karr skill install> writes into
+      other projects, so an agent set up by karr gets the corrected text
+      (ticket #117 tracks that this copy and the one in this repository are
+      kept in step by hand).
+    - App::karr::Git now resolves every path it hands git from the work tree
+      root, on both routes into is_tracked_under (tickets #113 and #114). The
+      string comes out of _relative_to_root, which measures from the root, and
+      libgit2 resolves it that way by itself — but the `git ls-files` fallback
+      ran as `git -C ->dir`, and a pathspec is resolved against the process
+      cwd. Build the class on a subdirectory, as its own SYNOPSIS shows with
+      `dir => '.'`, and it asked about `subdir/tasks` while the caller asked
+      about `tasks`; a pathspec that matches nothing exits 0 with no output,
+      which reads back as "not tracked", so a project that owns `tasks/` would
+      be told it does not — the symptom ticket #89 removed, through a different
+      door. The CLI is now pinned to the root, which the transport verbs cannot
+      tell apart. The root itself is `.`, a pathspec git understands but not a
+      path the index can hold — entries are stored as `tasks/a.md`, never
+      `./tasks/a.md` — so the native route answered 0 for a repository full of
+      tracked files; at the root the question is now whether the index holds
+      anything at all, which is what `ls-files -- .` answers there too. No
+      karr command changes behaviour: every is_tracked_under call goes through
+      the store's Git, which App::karr::Role::BoardDiscovery builds at the
+      repository root, and none of them passes the root as the path. Both were
+      latent, and each was a wrong answer rather than a failure — the kind that
+      would have surfaced as the answer depending on whether libgit2 was
+      available to ask.
+    - App::karr::Git::is_tracked_under now reads the index natively, through
+      Git::Native::Index, and only falls back to `git ls-files` when libgit2
+      declines to answer (ticket #107). That question decides whether `karr
+      init` and `karr materialize` may claim `tasks/` and `config.yml` in
+      .gitignore, and it used to be asked through the git CLI unconditionally
+      — not as a fallback, but because the Git::Native of the day exposed no
+      index at all. With no `git` on PATH the run simply failed, the answer
+      came back "not tracked", and both commands wrote the entries over paths
+      the project already tracks, undoing ticket #89 in that configuration.
+      The native route needs no `git` binary, so that configuration now
+      answers correctly; the CLI remains for an index libgit2 cannot read,
+      with the reason in last_error. Requires Git::Native 0.005 and
+      Git::Libgit2 0.006.
+    - Fixed the em dash literals that reached users double-encoded (ticket
+      #108). No file under lib/ or bin/ says `use utf8`, deliberately: non-ASCII
+      belongs in data, and App::karr::Encoding owns every character/octet
+      crossing. Eleven string literals in executable code carried a pasted em
+      dash anyway, so Perl read its three bytes as three Latin-1 characters and
+      the `:encoding(UTF-8)` layer encoded each of them again — the user saw a
+      stray a-circumflex and two control characters where a dash belonged. The
+      worst was `karr context`, which renders one on every noted item in the
+      blocked, overdue and recently-completed sections, both on stdout and into
+      the file `--write-to` names; `karr-foundation` accounted for the other
+      ten, including the TIMEOUT notice App::karr::Foundation::Runner appends to
+      `.karr.log`, which corrupted a file on disk and not merely a terminal. All
+      eleven now spell the character `"\x{2014}"`, which also restores byte
+      compatibility with kanban-md's own context block. t/124-source-ascii-only.t
+      polices the class from here on, using PPI so that the em dashes in POD and
+      comments — harmless, and plentiful — raise nothing.
+    - Closed the last of the role import leaks: App::karr::Role::ClaimTimeout
+      and App::karr::Role::TaskMutation no longer compose Time::Piece's
+      `localtime` and `gmtime` into the commands that consume them — `move`,
+      `edit`, `delete`, `archive`, `handoff`, `pick` and `unlock` (ticket #105,
+      finishing #38). These were the worse half of that family, because the two
+      shadow builtins: a later `sub localtime` or an attribute of that name on a
+      command class would have fought an inherited Time::Piece export, and the
+      failure would have read as a core function misbehaving. Time::Piece is not
+      a drop-in for the usual cure — replacing the builtins is its whole point —
+      so the call sites were decided one at a time instead of swept.
+      ClaimTimeout keeps the module and spells its one live call
+      `Time::Piece::gmtime()`, because `_claim_expired` needs the overloaded
+      object and the builtin would hand that subtraction a string; TaskMutation
+      never asked for the time at all and drops the module, since the lifecycle
+      stamps are written by App::karr::Task. Nothing called either as a method,
+      so no behaviour changes, and t/121-role-import-leakage.t now runs with an
+      empty allow-list.
+    - Finished the sweep that stopped karr's own source locations reaching the
+      user (ticket #77). `croak` appends " at Some/Module.pm line 42." even to a
+      message that already ends in a newline, so anyone who ran `karr list`
+      outside a repository was told "Not a git repository. karr requires Git."
+      and then handed the file and line of the builder that said so; every
+      remote failure ended with a line number in whichever `Cmd/*` had called
+      the sync; and `karr-foundation` reported a broken config the same way.
+      Those, plus the pipe/fork/log-open failures in the foundation runner, now
+      go through `App::karr::Error::user_error` and print the message alone. The
+      four commands that let a Path::Tiny error out raw — `karr restore
+      --input` on an unreadable file, `karr backup --output` and `karr context
+      --write` into a directory karr may not write, `karr init --claude-skill`
+      into an unwritable `.claude` — now name the path the user typed and the
+      reason the OS gave, and nothing else. Two errors deliberately keep their
+      call site, because there it is the useful part: saving an unpersisted
+      ref-backed task, which is a programming error, and `croak` in
+      App::karr::Foundation's YAML report, whose parser message names its own
+      document, line and column and is passed through whole rather than reduced
+      to one line.
+    - A failed sync now shows git's error once instead of twice. The message
+      that ended the command embedded another copy of the multi-line error that
+      had already been printed the moment it happened — so one failed pull put
+      the same "does not appear to be a git repository" block on the screen
+      twice, and `--quiet`, which suppresses the retry banners and never the
+      errors (that is deliberate, ticket #27), made no difference to the
+      duplicate. `sync_before` now ends on the verdict alone, the way
+      `sync_after` always has: "Pull failed after 3 attempts. Nothing was
+      changed. / Run 'karr sync' to retry." A cause that *changes* between
+      attempts is still reported each time.
+    - App::karr::Role::BoardDiscovery and App::karr::Role::SyncLifecycle no
+      longer compose their imports into the ~20 command classes that consume
+      them (ticket #38). A Moo::Role copies every sub in its package into its
+      consumers, imported ones included, so `use Path::Tiny;` and
+      `use Carp qw( croak );` in a role made `$cmd->path(...)` and
+      `$cmd->croak(...)` callable on every command. Nothing called them, so
+      nothing was broken — but the first command class to want an attribute
+      named `path` would have fought an inherited Path::Tiny constructor for it,
+      silently. Both roles now load what they need with an empty import list and
+      qualify the call, which is what App::karr::Role::Output and
+      App::karr::Role::TaskMutation already did. The `use Time::Piece;` that was
+      out of scope here went with ticket #105 above. Still leaking, and not
+      karr's to fix: MooX::Cmd::Role composes `croak` into every command class
+      from upstream.
+    - Fixed an ordinary kanban-md round trip silently switching a disabled
+      board back on. kanban-md rewrites `config.yml` the moment it loads one —
+      it migrates the schema version and re-serialises the file from its own
+      structs — so afterwards every key that schema does not know is gone from
+      the view, karr's `foundation` among them. `karr import --yes` then
+      replaced `refs/karr/config` with what was left, and a board switched off
+      with `karr disable` came back enabled, with karr-foundation resuming
+      agent runs on it; nothing warned at any step. Import now reconciles the
+      view against the board config instead of replacing it — the view speaks
+      for the keys it carries and karr models, and every other key keeps what
+      the board already said. `lock_timeout`, karr's other own key, was being
+      reset to the default by the same route and is preserved likewise.
+    - Fixed that same round trip recording kanban-md's migrated defaults as
+      deliberate per-board overrides. Its rewritten `config.yml` carries
+      `version: 10`, a fully expanded `statuses` list decorated with the
+      `show_duration` flag karr does not model, and a whole `tui` block —
+      diffed against karr's defaults, all of it looked changed, so the board
+      froze a copy of another tool's defaults and stopped following karr's own.
+      The view's keys are now pruned to what karr models and normalised to the
+      shape karr writes them in, so a migrated config compares equal to the
+      defaults and is not stored as an override. Two consequences worth
+      knowing: a kanban-md `tui` or `wip_limits` block is no longer carried
+      across the bridge, since it is not karr board config and `karr config`
+      can neither show nor set it; and a board already polluted by an earlier
+      import keeps its stale `version` until something rewrites the config.
+    - Fixed `karr import` walking the task id counter backwards. `karr
+      materialize` writes `next_id` into the file view because kanban-md
+      requires it, but import threw that copy away and re-seeded purely from
+      the highest card it could see. A kanban-md board that has ever lost a
+      card carries a counter ahead of its highest id and holds it there on
+      purpose — max(stored, highest id + 1) is kanban-md's own rule for the
+      same value — so importing one retired ids it had already handed out, and
+      the next `karr create` produced an id kanban-md considers used. The
+      counter now takes the higher of the two and still never moves backwards,
+      so a healthy board's counter stays untouched.
+    - `karr import` now names a `config.yml` that is not a mapping, instead of
+      dying with a bare `Not a HASH reference` and a line number in
+      BoardStore.pm — the same promise it already made for a malformed card.
+    - Fixed the remaining readers that took an empty frontmatter value for a
+      real one, and stopped writing such values out. `claimed_by: ""` made
+      `karr show` print "Claimed:" with nothing after it and `karr board` draw
+      a bare "@" and count the card as claimed; it satisfied the `require_claim`
+      rule, so `karr move 1 in-progress` went through with no claimant at all;
+      and karr-foundation counted the card as one its agent had engaged, which
+      is what feeds the auto-block. Rather than a fifth per-reader test, an
+      optional field whose value has no length now loads as unset, once, in the
+      task model — which is what `omitempty` on kanban-md's Go struct means and
+      where the asymmetry came from. `0` and `"0"` are one character long and
+      stay values. This changes what karr writes: a card imported carrying
+      those empty keys loses them on its next write, which is exactly the shape
+      kanban-md's own writer produces, verified by a round trip through both
+      tools.
+    - Fixed `completed` never being recorded on a board whose final column is
+      not named `done`. Which move counts as finishing was decided against a
+      hardcoded pair rather than against the board, so on a board ending in
+      `shipped` `karr move 1 shipped` recorded the start of the work and never
+      its finish — and everything built on that stamp, `karr context`'s
+      recently-completed section and the cycle times `karr metrics` is meant to
+      report, was empty for ever. `karr move`, `karr edit --status`,
+      `karr archive` and `karr handoff` now hand the board's own configuration
+      to the lifecycle rules.
+    - Fixed `karr context`'s recently-completed section, which had never
+      produced a single entry on any board: it was selected out of the
+      non-terminal tasks, so the terminal statuses it looked for could not be
+      among them. It now scans the whole board, bounded by the completion stamp
+      within `--days` (default 7), the way kanban-md bounds it. Cards in
+      `archived` stay out — those are filed away, not recent.
+    - Fixed `karr init` adding `tasks/` and `config.yml` to .gitignore even
+      when the project already tracks content at those paths. Git applies no
+      ignore rule to a file it tracks, so the entries changed nothing at all
+      while telling every later reader that karr owned paths the project owns —
+      and they said so right where `karr materialize` refuses to write, for
+      that very reason. init now leaves .gitignore alone in that case and
+      reports what it did not do.
+    - Changed `karr list --sort priority` to open with the most urgent task —
+      critical down to low on a default board — instead of following the
+      config's priority order ascending (ticket #91). Ascending order opened
+      the list with the least urgent task, the exact opposite of what `karr
+      pick` would hand out from the same board, and the two commands
+      disagreeing about which end is urgent was a trap: the list now reads
+      urgency the way pick and `karr context` already did. `--reverse` gives
+      the least-urgent-first view, and every other sort key keeps its
+      direction. This deviated from kanban-md when it landed; kanban-md has
+      since made the same change (upstream `c783157`, "sort priority lists
+      highest first"), so the two agree again. It gets there differently —
+      kanban-md flips the reverse flag in `cmd/list.go` and leaves its
+      comparator ascending, karr reads the config list backwards — but the
+      resulting order is the same.
+    - Fixed the wipe guard's blind spot: it caught a remote that had lost
+      every board ref, but not one swapped for a DIFFERENT non-empty board —
+      a stale clone, a re-initialised origin, a typo'd remote URL — which a
+      pull then faithfully converged the local board onto, silently and
+      totally, because the ref count was not zero. Boards now carry an
+      identity in `refs/karr/meta/board-id` (#95). `karr init` and `karr
+      import` stamp it for boards they create (and never re-key an existing
+      one); a board from before this change is stamped by the first pull that
+      finds no id on either side, with the ordinary push path carrying the
+      stamp to the remote; a clone meeting a stamped remote for the first
+      time adopts that id. A pull where both sides have an id and they differ
+      is refused before any reconciliation, naming what happened and the two
+      ways through: `karr sync --push` to republish this board over the wrong
+      remote, or the new `karr sync --accept-foreign-board` to adopt the
+      remote's board. `karr restore` keeps the board's standing identity when
+      the snapshot predates the stamp, so restoring a backup onto its own
+      board never looks like a foreign takeover.
+    - Fixed `karr pick` being blind to a board imported from kanban-md. An
+      optional frontmatter field set to the empty string counted as set,
+      because a Moo predicate only knows whether the attribute was passed —
+      and `claimed_by: ""` is exactly what a kanban-md card carries once it has
+      been read and rewritten, or written by hand. `karr import` stored it
+      verbatim, `karr pick` read it as a claim by somebody, and so on a freshly
+      imported board pick answered "No available tasks to pick." while
+      `karr list` showed the very same work sitting in backlog. An empty
+      `claimed_by` is now no claim, the same test `karr move`/`edit`/`delete`
+      already applied. Three more of the same: `karr list` printed a bare "@"
+      for `assignee: ""`, `karr context` counted `due: ""` as overdue for ever
+      (the empty string sorting before every real date), and `karr context
+      --json` emitted an `assignee` key with nothing in it. The same assumption
+      in `karr show`, `karr board` and the no-claim test the mutating commands
+      share is fixed too — see the entry above, which moves the rule into the
+      task model instead of into a fifth reader.
+    - Fixed `karr pick --json` printing an English sentence when there is
+      nothing to pick, on both of its empty paths, so the one karr command
+      certain to be machine-parsed handed its consumer a JSON decode error
+      instead of an empty result. It now prints `{"picked":null}`. A successful
+      pick still prints the task object itself, and the exit status stays 0 on
+      both paths — "nothing for you right now" is the normal answer to a poll,
+      not a failure, so a drain loop must not stop on it.
+    - Fixed "finished" being hardcoded to the `done` and `archived` columns. A
+      board imported from kanban-md may end anywhere, and on one whose columns
+      ran backlog / doing / shipped / archived, `karr pick` handed shipped
+      cards straight back out as available work and `karr list` did not hide
+      them. Terminal statuses are now read from the board's own `statuses`,
+      by kanban-md's rule: the last configured status, or the one before it
+      when the last is `archived`, with `archived` terminal either way. Nothing
+      changes on a default board, and `statuses` remains read-only from the
+      CLI, so a custom list still only arrives through `karr import` of a
+      kanban-md config.yml. `karr board`'s claim counting and the `completed`
+      stamp followed — see the entries above.
+    - New `karr list --archived`, which shows the archive and only the
+      archive, matching kanban-md's flag of the same name. It replaces the
+      other status filtering rather than narrowing it, so it wins over
+      `--status`. Note that `karr list` still excludes the whole terminal
+      group by default where kanban-md excludes only `archived`: it is the
+      agent's "what is open" view, and that difference is now documented
+      rather than merely undocumented.
+    - Fixed `karr move`, `karr edit` and `karr delete` abandoning the rest of a
+      batch after one bad id. A missing id died from inside the loop, so every
+      id after it was skipped and the outcome depended on where the bad id sat
+      in the list: `karr move 1,999,2 todo` moved 1 and never looked at 2,
+      while `karr move 999,1,2 todo` moved nothing. All four id-list commands —
+      `archive` included, which already behaved this way — now share one batch
+      loop: every id is attempted, each failure is reported on STDERR with a
+      `N of M ids failed` summary, and the command exits 1 while keeping the
+      work that did succeed, which is the contract ADR 0002 already documented.
+      A usage error is deliberately not a per-id failure: `karr move 1,2,3
+      no-such-status` is wrong for every id at once, so it still rejects the
+      whole invocation with exit 2 and writes nothing. With `--json` the
+      results array is now printed even when part of the batch failed (`move`,
+      `edit` and `delete` previously printed no JSON at all in that case), and
+      a failed id appears in it as `{"id":999,"error":"Task 999 not found"}` —
+      `archive`, which already reported failures there, used to give the
+      shorter `"not found"` for the same field.
+    - Fixed `karr archive` ignoring claims. It set the status to `archived` and
+      saved with no claim check at all, so it could archive a card another
+      agent was holding — the one door into a status change that `karr move`
+      and `karr edit --status` did not cover. Archiving now applies the same
+      claim rule as `move`, `edit` and `delete`, with the same message, and is
+      refused while a live claim is on the card; release it with
+      `karr edit ID --release` or let `claim_timeout` expire it. Re-archiving
+      an already-archived task changes nothing and stays a success whatever its
+      claim says. Because archiving is now an ordinary status change, a board
+      whose configured `statuses` do not include `archived` will have
+      `karr archive` refuse rather than write a status the board does not have.
+    - Fixed `karr handoff` overwriting concurrent changes. It read the task,
+      changed it and saved it back without checking the card had not moved in
+      between, so a claim landing in that window was silently replaced instead
+      of obeyed. The handoff now goes through the same compare-and-swap and the
+      same status-change path as `karr move`, so the claim rule is applied to
+      the revision that actually gets written.
+    - Fixed `karr pick` locks being published to the remote. Lock refs lived at
+      `refs/karr/tasks/N/lock`, inside the namespace karr pushes, so any sync
+      that fired while a lock was held put it on the remote; other clones then
+      pulled a lock whose holder they could not see, could not outlive and
+      could only clear with `karr unlock`. Board backups snapshotted it too.
+      Locks are process-local state, so they now live under `refs/karr-local/`,
+      which nothing pushes, fetches, prunes or snapshots — and which
+      `karr set-refs` refuses, so no refspec can reach them at all. Board
+      state, including the `refs/karr/log/*` activity log, is unaffected and
+      still syncs. Locks left at the old address by an older karr, or pulled
+      from a remote that still has them, are not acted on — a lock from another
+      clone says nothing about this process — but `karr unlock` lists them,
+      marked as strays, and clears them.
+    - Fixed the last race in `karr delete`'s claim guard. `App::karr::Git`
+      could only delete a ref by name, through a libgit2 call that takes no
+      expected-old OID, so no delete could be guarded: re-reading the task and
+      re-applying the claim rule closed the minutes-long window behind the
+      confirmation prompt but left the microseconds after it, in which a claim
+      landing on the card was deleted along with it. There is now a
+      compare-and-swap delete (`delete_ref_cas`) reporting the same retryable
+      outcomes the existing retry loop understands, and the guarded delete
+      paths — `karr delete` and giving back a `karr pick` lock — go through it.
+      The unguarded `delete_ref` is unchanged, because `karr destroy` and
+      breaking a lock deliberately remove whatever is there.
+    - Fixed the push insurance retrying a push the remote had already refused.
+      When a command dies after writing refs, karr pushes from an END block so
+      the writes are not stranded; that path still made three attempts a second
+      apart at a refusal the far side had already given its answer to, and then
+      told the user to run `karr sync` — a command that would be refused
+      identically. It now stops at the refusal and reports what the remote
+      refused, ref by ref, on both the native and the git-CLI transport. An
+      ordinary transport failure is still retried three times and still advises
+      a sync, because there retrying can work.
+    - Fixed `karr materialize` silently deleting and overwriting tracked
+      project files. It wrote its file view straight into the working tree —
+      replacing `config.yml` and removing every `tasks/*.md` — so a repository
+      that already kept its own `tasks/` directory or `config.yml` lost them,
+      from a command that only reads the board. Materialize now refuses to run
+      when it would overwrite or delete anything Git tracks, names each such
+      path, and writes nothing on that path; `--force` overrides it. The sweep
+      of stale cards is also limited to files named the way karr and kanban-md
+      name them (`NNN-slug.md`), so unrelated files in `tasks/` are left alone.
+    - Fixed `karr import --yes` wiping the board when `tasks/` exists but holds
+      no cards. The guard only checked that the directory was there, so an
+      empty view imported zero tasks, deleted every task ref and exited 0
+      reporting success. An empty view is now refused.
+    - Fixed `karr import` leaving the board half-written when one file is
+      malformed. Refs were written as files were parsed, so a bad card aborted
+      the run mid-way with some tasks updated, the prune never reached, and a
+      bare "Invalid task format" that named no file. The whole view is now
+      parsed before any ref is touched: the import either applies completely or
+      changes nothing, and every rejected file is listed with its reason.
+      `App::karr::Task::from_file` names the file in all its errors.
+    - Fixed `karr materialize` writing a `config.yml` that kanban-md refuses to
+      load, which defeated the purpose of the file view. Perl's `1`/`0` were
+      dumped as YAML integers where kanban-md's schema wants booleans
+      (`require_claim`, `bypass_column_wip`), and `next_id`, which it validates
+      as `>= 1`, was never written at all. The view now carries real YAML
+      booleans and `next_id`; the counter itself stays in
+      `refs/karr/meta/next-id` and import continues to ignore the file's copy.
+    - Fixed `karr edit --status` bypassing every rule `karr move` applies.
+      `karr move 1 in-progress` refused without `--claim`, while `karr edit 1
+      --status in-progress` set the field and exited 0 — so `require_claim`,
+      the guarantee karr's multi-agent coordination rests on, was one flag
+      away from optional, by accident as easily as on purpose. `edit --status`
+      also skipped the `started`/`completed` lifecycle stamps that `move`
+      writes. Both commands now change a status through one shared path and
+      behave identically, including the status-name check described below.
+    - Fixed `karr move`, `karr edit` and `karr delete` taking over another
+      agent's live claim without a word. None of the three asked who held the
+      claim, so `karr move 1 review --claim mallory` on a task alice was
+      working on simply reassigned it, and `karr delete 1 --yes` removed it.
+      All three now apply the same claim rule `karr handoff` and `karr pick`
+      already applied: an unclaimed task is free, the holder may proceed, an
+      expired claim blocks nobody, and anything else is refused with "Task N
+      is claimed by X". `karr edit --release` stays exempt, because it is the
+      only way to break a claim a crashed agent left behind. `karr delete`
+      refuses on any live claim whoever holds it, matching kanban-md, which
+      gives delete no `--claim` either. For move and edit the check and the
+      write are now one compare-and-swap against the task ref, so a claim
+      taken between the two no longer loses; delete re-checks immediately
+      before removing the ref, which is as close as libgit2's unguarded ref
+      delete allows.
+    - Fixed claim expiry misreading every timestamp that carries a UTC offset.
+      kanban-md stamps claims as RFC3339 with the agent's local offset and
+      nanoseconds (`2026-08-09T17:28:46.449764553+02:00`) and karr discarded
+      both, reading the stamp as if it were UTC. A claim stamped `+02:00`
+      never expired, so `karr pick` would not take over stale work; one
+      stamped `-05:00` expired five hours early, so pick stole claims whose
+      owners were still working. Every call also printed "Garbage at end of
+      string in strptime" to stderr, on every single `karr pick`. Offsets and
+      fractional seconds are now parsed and normalised to UTC, and the
+      warnings are gone with them.
+    - Fixed `karr delete` without `--yes` printing "Use of uninitialized value
+      $answer" twice when stdin reaches EOF without an answer — which is every
+      agent and CI invocation that forgets the flag — and then silently
+      skipping the task with exit 0. When there is no answer and stdin is not
+      a terminal it now refuses with "No answer on stdin and stdin is not a
+      terminal. Re-run with --yes." and exits 1, the way karr's other
+      destructive commands already refuse without `--yes`. Ctrl-D at a real
+      terminal still means "no", and piping `y` or `n` into the prompt still
+      works.
+    - Fixed `karr move , todo`, `karr edit ,` and `karr delete ,` — an id list
+      that contains no ids — doing nothing at all and exiting 0. The comma got
+      past the "an id is required" check because it is a non-empty string, and
+      then split to an empty list, so the per-id loop never ran and no error
+      was raised for the exit-code contract to classify. All three now report
+      a usage error and exit 2.
+    - Fixed a push the remote rejected being reported as a completed sync.
+      libgit2 returns success from `git_remote_push` even when the server
+      refused every ref — a pre-receive hook, a protected ref, a
+      non-fast-forward on a non-forced refspec — so the refusal exists only in
+      the per-ref result Git::Native 0.004 hands back, which karr discarded.
+      The board then diverged from the remote with no signal at all. A push
+      with rejected refs now fails, naming every refused ref with the reason
+      the server gave, on both transports: the git-CLI fallback pushes with
+      `--porcelain` and reports the same refs and reasons. Such a push is no
+      longer retried — the remote was reached and gave its answer — except
+      from the insurance push that fires when a command dies mid-body, which
+      still makes its three attempts and still ends with the generic "run
+      karr sync to retry" advice.
+    - Sync failures are no longer repeated once per retry attempt. Both retry
+      loops printed the error on every attempt, so one failed sync produced
+      three copies of it — and with the per-ref rejection message above, three
+      copies of a block several lines long. An error identical to the one just
+      shown is now dropped; an error that differs still gets its own line.
+      `--quiet` is unchanged: it silences the retry announcements, never the
+      errors.
+    - Fixed a remote that is empty for the wrong reason reconciling the whole
+      board away. Pulls are reconciled against a tracking mirror, so "the
+      remote had these refs at the last sync and does not have them now" is
+      acted on — which is what makes a delete propagate between clones, and
+      also exactly what a re-created origin, a remote URL edited to point
+      somewhere else, or a rolled-back hosting-side restore look like. In
+      those, a routine writing command deleted the entire board in one step,
+      silently. A reconciliation that would remove every remaining board ref
+      is now refused: the command stops, the mirror is left as it was so the
+      next command refuses again rather than quietly republishing, and the
+      message points at `karr sync --push` to republish this board or at the
+      new `karr sync --prune` to accept the deletion (which is how a
+      `karr destroy` on another clone now reaches this one). This guard
+      catches the total wipe only; the remote swapped for a different,
+      non-empty board — which leaves refs standing and so slips past it — is
+      caught by the board identity described above (ticket #95).
+    - Fixed a failed `karr restore` destroying the board instead of restoring
+      it. Restore deleted `refs/karr/*` first and wrote the snapshot back
+      afterwards, so a snapshot karr could not write took the board with it: a
+      single unusable ref name left the board empty locally, and then on the
+      remote too, because the push insurance faithfully mirrored the
+      half-executed destruction. Every ref name is now validated and every
+      commit object built before the first ref moves, so a snapshot karr cannot
+      apply is refused with the board untouched, and the refs it can apply are
+      overwritten in place instead of starting from an empty namespace. The ref
+      updates themselves are still a loop rather than one transaction — an I/O
+      failure part-way through can still leave a board holding a mix of old and
+      new refs — but the board is no longer emptied before the first write, so
+      no failure can leave it with nothing in it. A snapshot may also no longer
+      address refs outside `refs/karr/`, which previously let a hand-edited
+      backup overwrite a branch.
+    - Fixed any write command silently seeding a partial board in whichever
+      repository it was run in, and that partial board then locking `karr init`
+      out of it for good — `karr create` typed in the wrong directory was
+      enough, and `karr destroy --yes` was the only way back. A board now
+      counts as existing only when `refs/karr/config` is present; the commands
+      that write to the board refuse with "No karr board found" when it is
+      absent, and `karr init` completes a half-board (keeping its ID counter,
+      so existing tasks are not overwritten) instead of refusing. `backup`,
+      `destroy`, `materialize` and `repair` still work on whatever is under
+      `refs/karr/`, so a half-board an older karr left behind can still be
+      inspected and removed. `karr import --yes` is still allowed to bootstrap
+      a board from a bare kanban-md `tasks/` view, and now writes the default
+      config ref when the view has no `config.yml`, so the board it leaves
+      behind is one the writing commands accept. The read-only commands
+      (`list`, `board`, `show`, `context`, `log`, `config get`) are unchanged:
+      they still report an empty board with the default config rather than
+      refusing.
+    - Fixed a ref deletion that did not happen reporting success. `delete_ref`
+      discarded the libgit2 error and always incremented the write counter
+      SyncGuard reads to decide whether local refs still need pushing, so a
+      failed or no-op delete both claimed success and left the push insurance
+      believing there was unpushed work. It now returns false when nothing was
+      removed, counts only deletes that landed, and retries lock contention
+      like every other ref write; clearing a whole namespace re-reads it
+      afterwards, so `karr destroy` can no longer report success over refs that
+      are still there.
+    - Fixed every task write path accepting a status, priority, class or due
+      date that does not exist. `karr move 1 totally-invalid`, `karr create x
+      --priority bogus`, `karr edit 1 --status bogus` and `karr pick --move
+      bogus` all exited 0 and wrote the value to the board, which then sat in
+      no column — invisible on `karr board`, still counted in the total, and
+      `karr move --next` died on it. Those values are now checked against the
+      board config before anything is written and rejected with exit 2, the
+      usage-error code from ADR 0002. Status names are checked in the one
+      shared status-change path, so `move` and `edit --status` cannot drift
+      apart. A due date must be a real calendar date in `YYYY-MM-DD`, so
+      `2026-02-30` is refused as well. A batch `edit` or `move` writes nothing
+      at all rather than updating half the ids, and a rejected `create` no
+      longer consumes a task id. Validation is on the write path only: a board
+      that already carries a bad value stays readable so `karr move` can put it
+      back.
+    - Fixed `blocked` being incompatible with kanban-md. karr stored the
+      blocking reason as free text in `blocked`; kanban-md has a boolean
+      `blocked` plus a `block_reason` string, and its parser refuses a string
+      there outright — a karr-blocked task was skipped as malformed and
+      vanished from its board. karr now writes the kanban-md shape, and
+      `--json` reports `blocked` as a JSON boolean instead of sometimes a
+      string and sometimes `true`. `karr edit --block "reason"` and `karr
+      handoff --block` are unchanged and still set both fields. Existing boards
+      need no migration: a legacy free-text `blocked` is recognised on read and
+      converted on the next write of that task.
+    - Fixed unknown frontmatter fields being deleted on the first write. Any
+      key karr did not model — a newer kanban-md field, a note added by hand in
+      an editor — was dropped when the task was next saved. Unknown keys are
+      now carried through untouched. They are not order-preserved: karr's YAML
+      output is key-sorted, so a passthrough field lands in alphabetical
+      position.
+    - Fixed the lifecycle timestamps. `completed` was never cleared when a task
+      was reopened, so every reopened task still looked finished; `started` was
+      only set for the literal status `in-progress` and `completed` only for
+      the literal `done`, so a move straight to `done` or `archived` recorded
+      neither; and `started` was written as a bare date while every other
+      timestamp carried a time. All four are fixed, and `karr archive` and
+      `karr handoff` now maintain the stamps as well. Unlike kanban-md, karr
+      does not re-stamp `completed` when a finished task is archived — the date
+      it was actually finished is kept.
+    - Fixed `karr create --body 0` silently dropping the body, and `karr show`
+      not printing a body of `0`.
+    - Fixed a body losing one trailing newline on every save. The two storage
+      paths disagreed about it, so a body ending in blank lines shrank each
+      time the task was written. Both paths now agree: a stored body never ends
+      in a newline.
+    - Fixed `claim_timeout` silently meaning one hour for any compound
+      duration. Only `1h` and `30m` shapes were understood, so a config
+      imported from kanban-md with `claim_timeout: 1h30m` meant 90 minutes
+      there and 60 here. The full Go duration grammar is now parsed (`1h30m`,
+      `90s`, `2h45m30s`, `0.5h`); `7d` is still rejected, as it is by Go.
+    - Fixed task filenames being cut mid-word at 50 characters while kanban-md
+      trims to the last word boundary, which gave the same task two different
+      filenames in a shared `tasks/` directory.
+    - Fixed `karr import` accepting a `config.yml` that does not validate — a
+      `defaults.status` naming a status that does not exist was written to the
+      board and then applied to every new task. The board config is now
+      validated wherever karr writes it (`import`, `config set`, `disable`).
+      `karr restore` is deliberately not covered: it replaces refs verbatim
+      from a snapshot. `karr config show` also no longer dies with a raw Perl
+      error on a board whose config is already broken.
+    - Fixed parallel `karr create` silently losing tasks. Task IDs were handed
+      out by reading a counter ref and writing it back, so two agents that read
+      it at the same time were given the same ID and the second task ref
+      overwrote the first — 40 successful creates produced 32 tasks, with no
+      warning on either side. Allocation is now a compare-and-swap against the
+      counter ref, retried on contention, so concurrent agents always get
+      distinct IDs.
+    - Fixed task locking granting the same lock to every agent at once. Lock
+      acquisition checked the lock ref and then wrote it, so all 16 contenders
+      in a race passed the check and all 16 were told they had acquired it,
+      while the ref could only hold one. Acquisition is now an atomic
+      create-if-absent: exactly one agent wins and the rest get the usual
+      "locked by ..." answer. On its own that does not make `karr pick` safe —
+      see the entry below, which is what actually fixes concurrent picking.
+    - Fixed `karr pick` handing the same task to several agents. Pick ranked
+      candidates from a snapshot of the board read before any lock existed and
+      never looked at the card again, so it claimed tasks that had been taken
+      in the meantime: 12 parallel picks on a fresh 12-task board told nine
+      agents they owned task 1, while the card named only the last of them. The
+      lock was not the hole — its holder identity is the clone's `user.email`,
+      which every agent on one machine shares, so all 12 acquired it quite
+      legitimately. Each candidate is now re-read from its ref under its lock,
+      re-tested with the same predicate, and written back under a
+      compare-and-swap on the OID it was read from; an agent that loses that
+      swap picks nothing and moves on. Verified with 12 forked contenders
+      behind a barrier: 12 picks, 12 different tasks, and every agent named on
+      the card it was told it got.
+    - Fixed one orphaned lock ref bricking every command on the board.
+      `list_task_refs` matched `refs/karr/tasks/N/lock` as well as `.../data`,
+      so a lock left behind by an agent that died mid-pick made its task id
+      exist after the card was deleted; `load_tasks` mapped that id to undef
+      and `list`, `board`, `materialize` and `pick` all died on it, with no way
+      out short of `git update-ref -d`. Only the data ref makes a task exist
+      now, and the board list never contains undef.
+    - `karr pick` no longer publishes its lock to the remote or strands its log
+      entry. The lock was released, and the pick logged, after the push, so the
+      remote kept the lock ref forever and the activity-log entry never left
+      the clone. Both now happen before the push.
+    - Locks expire. An agent that died between acquiring and releasing left a
+      lock nothing could ever clear, and its task stayed unpickable forever. A
+      lock older than the new `lock_timeout` board setting (default `5m`) may
+      be taken over, itself by compare-and-swap against the revision whose age
+      was judged, so a holder that refreshes in between is never silently
+      evicted. This is deliberately not `claim_timeout` (default `1h`): a claim
+      covers a work session, a lock covers one pick.
+    - New command `karr unlock`: with no arguments it lists the pick locks
+      currently held, with their holder, age, and whether they have expired;
+      given task ids or `--all` it breaks them. The manual escape hatch for a
+      stuck board, and the only one on a board that sets `lock_timeout` to
+      `0s`. Breaking a lock cannot corrupt a concurrent pick — the claim is
+      bound by the compare-and-swap on the card, not by the lock.
+    - Board ref commits carry the time they were written. The git signature was
+      built once and cached for the life of the process, so every ref a
+      long-running driver (`karr-foundation`) wrote was stamped with the time
+      of its first write.
+    - Fixed ordinary ref contention aborting commands with a raw libgit2 error
+      ("failed to lock file '.../lock.lock' for writing") followed by a stack
+      trace of module paths and line numbers. Losing the race for a ref's lock
+      file is now retried with a randomised backoff, and a ref write that
+      genuinely fails reports a single karr-level line.
+    - Raised the minimum Git::Native to 0.004 and Git::Libgit2 to 0.005. Those
+      releases add compare-and-swap reference updates (`expected_old`) and
+      per-ref outcomes from fetch/push, which karr needs to make ID allocation
+      and lock acquisition atomic and to notice a server-rejected push. They
+      also fix git+ssh remotes under libgit2 < 1.7 by verifying the hostkey
+      against `~/.ssh/known_hosts`.
+    - Fixed a frontmatter value ending in `---` corrupting the task and
+      bricking the board. The closing delimiter was not anchored to the start
+      of a line, so a value that merely ended in `---` — `karr edit 1 --block
+      "waiting ---"` was enough, and YAML dumps such a value unquoted — cut the
+      frontmatter mid-line. Every command that loads the board then died with
+      "Missing required arguments: id, title", `delete` included, so the board
+      could not be repaired with karr at all. The parser now scans for `---` at
+      a line start, matching kanban-md.
+    - Fixed UTF-8 being encoded twice everywhere. karr passed YAML::XS::Dump
+      output (octets) around as characters, mixed that with character-level
+      file I/O, and never decoded `@ARGV`. Non-ASCII text was therefore stored
+      mojibaked in the refs, handed to agents mojibaked through `--json`,
+      written three encodes deep by `materialize`, and destroyed by
+      `backup`/`restore`; a correctly encoded kanban-md task file could not be
+      imported at all ("invalid trailing UTF-8 octet"). `karr show` looked
+      right only because two errors cancelled out. karr now keeps character
+      strings internally and encodes only at its edges — argv, stdout/stderr,
+      Git ref blobs, YAML and JSON — so non-ASCII titles, bodies, tags, and
+      board names round-trip and kanban-md interop works outside ASCII.
+    - Boards written by earlier versions keep working and are read correctly:
+      the double encoding is undone on load for any board without the new
+      `refs/karr/meta/encoding` marker. New command `karr repair` makes that
+      permanent — it reports by default, rewrites the affected refs with
+      `--yes`, and stamps the marker so nothing guesses at the board's bytes
+      again. It is idempotent, never rewrites a ref whose payload is ASCII, and
+      preserves task timestamps. `karr init` and `karr import --yes` stamp the
+      marker themselves.
+    - Fixed a runaway that could take the whole machine down: after a command
+      died (a plain usage error was enough), the sync guard was only reaped in
+      Perl's global destruction and pushed from there. libgit2 is reached
+      through FFI::Platypus, whose type parser and library-search tables are
+      already being freed in that phase, so the push re-entered them and
+      recursed without bound — observed at 53 GB RSS on a 62 GB box, killable
+      only from outside. It needed a board with a remote to trigger, which is
+      why boards without one never showed it. App::karr::Git now refuses every
+      native operation while `${^GLOBAL_PHASE}` is `DESTRUCT`, so the whole
+      class of teardown re-entry degrades into an ordinary error.
+    - Behaviour change on the die path: a sync guard reaped in global
+      destruction reports instead of pushing. When refs were written but never
+      pushed it now prints "Local refs are intact. Run 'karr sync' to push
+      them."; when the command died before writing anything it stays silent.
+      The automatic insurance push promised for this window never actually
+      worked (it either recursed as above or was lost as an "(in cleanup)"
+      warning) — making it deterministic is what exposed that. Restoring a real
+      push is tracked separately.
+    - And now restored: a command that dies after writing refs pushes them
+      before the process exits again, instead of only advising `karr sync`.
+      Armed sync guards register in a process-wide registry that `karr` drains
+      from an `END` block — the last point at which pushing is still safe, and
+      one that also covers the `exit` calls inside command bodies. A command
+      that died before writing anything still pushes nothing and says nothing,
+      and a push that fails there warns without touching the exit code. The
+      global-destruction report above stays as the last resort for embedders
+      that never drain the registry.
+    - A writing command whose push fails no longer retries six times. Its
+      `sync_after` disarms the guard after spending its own three attempts, so
+      the new `END` flush does not repeat the identical failing push on a
+      command that is already reporting the failure.
+    - `karr skill show` no longer warns "Wide character in print". The bundled
+      skill file is read decoded, so it is now encoded back to UTF-8 bytes at
+      the one print site. The output bytes were always correct, but the warning
+      was noise on stderr — and it ended up inside the written file whenever
+      someone refreshed an installed SKILL.md with `karr skill show >file 2>&1`.
+    - The installed executables `karr` and `karr-foundation` now carry a
+      `$VERSION`. Both shipped versionless through 0.400, 0.401 and 0.402: the
+      woven POD had a VERSION section (generated from the dist version), but the
+      code itself declared none. Dist::Zilla only inserts a `$VERSION` into a
+      file that has a `package` statement, which a script does not — so the
+      line has to exist once, after which every release keeps it in step.
+    - Fixed silent loss of another agent's work on every shared board. `push`
+      sent `refs/karr/*` with a forced refspec but `pull` fetched with a
+      non-forced one, and since karr writes every board ref as a parentless
+      commit, no update is ever a fast-forward. libgit2 declined the update
+      without reporting an error, so `karr sync` said "Done." and exited 0 while
+      the local ref stayed stale — and the next write force-pushed that stale
+      ref over the other agent's version. A pull now really applies what the
+      remote has, so the board settles on last-writer-wins with no stale read in
+      between. The first sync of a task always worked, which is why this hid.
+    - A task deleted in one clone stays deleted instead of being resurrected by
+      the next clone that writes. Push already pruned, so `karr delete` was not
+      durable in any multi-clone setup.
+    - `pull` no longer fetches straight into the board. The remote state lands
+      in a per-remote tracking mirror under `refs/karr-remote/`, and the board is
+      reconciled against it. That mirror is what tells a ref the remote deleted
+      apart from one that only exists locally because its push failed — the
+      first is pruned, the second is kept, which is what karr promises with
+      "Local refs are intact. Run 'karr sync' to retry.". It also means a board
+      that `karr init` created and never pushed, and a clone that has never
+      fetched, both survive their first sync untouched.
+    - A ref that changed on both sides since the last sync is no longer resolved
+      in silence. The remote version takes the slot, the local one is kept under
+      `refs/karr-conflict/` and a warning names both, so the overwrite is
+      reported and recoverable rather than invisible. Neither `refs/karr-remote/`
+      nor `refs/karr-conflict/` is ever pushed or shown on the board.
+    - Helper refs (`karr set-refs` / `get-refs`) are fetched forced for the same
+      reason, so `karr get-refs` no longer serves a stale local copy after the
+      ref changed on the remote.
+    - The git-CLI transport fallback and libgit2 no longer disagree on a
+      diverged board. The fallback used to fail with "non-fast-forward" on every
+      ref, which made every writing command fail permanently — including `karr
+      sync`, so the clone could only be recovered with raw git. Both transports
+      now take the same refspec, and the reconciliation that follows the fetch
+      is the same code either way, so they reach the same board state.
+    - The git-CLI transport no longer reports success when `git` dies from a
+      signal. It checked `$? >> 8`, which is 0 for a signal death as well as for
+      a clean exit, so a `git` stopped by the OOM killer, a Ctrl-C on the process
+      group or a SIGPIPE was announced as a completed transport while the remote
+      received nothing. The signal is now reported as a failure, with its number.
+    - The git-CLI transport no longer deadlocks past 64 KiB of stderr. It read
+      stdout to EOF before touching stderr, so once the child filled the stderr
+      pipe buffer neither side moved again — reachable with roughly 700 rejected
+      refs, and possible after the command had already printed its result. Both
+      streams are drained together now, and a run is bounded by a wall-clock
+      timeout (120s by default, `KARR_TRANSPORT_TIMEOUT` overrides, `0` disables)
+      after which the child is killed and the transport reported as failed.
+    - `set-refs`, `get-refs` and `agent-name` are reachable again with `--dir`.
+      The dashed spellings were rewritten to their internal command names only
+      at `$ARGV[0]`, so `karr --dir PATH get-refs REF` — the shape an
+      orchestrator driving karr from outside the target repository uses — died
+      with "Unknown command: get-refs". They are now registered as command names
+      in their own right, which also means a payload or title that merely spells
+      one (`karr set-refs REF set-refs`) is stored verbatim. `get-refs` and
+      `set-refs` additionally accept `--dir` after the command, matching every
+      other command and the documented "either position" rule; `agent-name`
+      still does not, since it touches no repository.
+    - `--` now works as the end-of-options separator, so an option-shaped
+      positional can be passed without a named option: `karr create -- --json`
+      creates a task titled "--json" instead of reporting "Title is required".
+      Getopt::Long always honoured the separator, but karr's own positional
+      extraction re-read the escaped tokens as options and dropped them. Applies
+      to every command that takes a positional argument.
+    - `karr get-refs` no longer reports success for a ref that does not exist.
+      It printed an empty line, said "Fetched ..." and exited 0, so the
+      documented `karr get-refs spec.md > spec.md` shape silently truncated the
+      file it was meant to fill. A missing ref is now a runtime failure: "Ref
+      refs/... not found" on stderr, nothing on stdout, exit 1. A ref that
+      exists with an empty payload is still a success.
+    - `karr show --last 0` (and any negative count) is a usage error, exit 2,
+      instead of being clamped to 1 and answering with a task at exit 0.
+      Commands can now raise that class of error through `usage_error` in
+      App::karr::Role::ExitCodes. The other rows from the same report — `karr
+      list --sort <bogus>`, `karr skill <bogus>`, `karr skill check --agent
+      <bogus>` and `karr move , todo` — are covered by the entries below.
+    - `karr list --sort FIELD` no longer turns the field name from the command
+      line into a method call. `$a->$field` meant any method on
+      App::karr::Task was reachable from argv — `--sort slug` and `--sort
+      to_markdown` both ran — and anything else died with "Can't locate object
+      method ... at List.pm line 204", but only on a board with two or more
+      tasks, since a shorter list never reaches the comparator. The field is
+      now looked up in an explicit table of the six documented keys, and
+      anything outside it is a usage error (exit 2, ADR 0002) on every board
+      size.
+    - Three `karr list --sort` orders now match kanban-md
+      (internal/board/sort.go) instead of deviating from it. **This changes
+      existing output.** `--sort status` follows the board config's status
+      order rather than the alphabet (backlog, todo, review — not backlog,
+      review, todo). `--sort priority` follows the config's `priorities` list,
+      which it previously ignored in favour of a hardcoded critical-first
+      table, so the default order is now low, medium, high, critical —
+      **exactly reversed** from before; use `--reverse` for the old reading.
+      `--sort due` puts tasks without a due date last instead of first. Ties
+      are broken by id so the order no longer depends on Perl's sort being
+      stable.
+    - `karr skill show --json` emits JSON. It used to print the raw skill
+      Markdown, byte for byte identical to `karr skill show`, so the flag was
+      silently ignored and the output was not parseable — while its siblings
+      `skill check --json` and `skill install --json` were correct. The content
+      now comes back as a JSON object under `content`, handed to Role::Output
+      as characters like every other payload, so the CLI's output layer encodes
+      it exactly once.
+    - `karr skill <unknown-action>` and `karr skill --agent <unknown-name>`
+      exit 2 instead of 1, joining the rest of the exit-code contract. Neither
+      is reachable by MooX::Options — the action is a positional and `--agent`
+      takes free-form text — so both were plain runtime dies. A scripting agent
+      can now tell "I called this wrong" from "the operation failed" on the
+      skill command too.
+    - New App::karr::Error: one place that turns an internal error into a
+      single user-facing line, with `user_error` (a plain `die`, which honours
+      the trailing-newline convention that Carp's `croak` ignores) and
+      `clean_error` (strips the "at FILE line N." suffix and any trailing
+      backend chatter). Applied to the file I/O in `karr skill install`,
+      `skill check` and `skill update`, whose Path::Tiny failures used to
+      report a karr source location at the user: an unwritable target now says
+      "Could not write PATH: Permission denied" and nothing else. This was the
+      mechanism plus one command; the entry above finishes the sweep across the
+      rest of the CLI, and App::karr::Git's inline copy of the same reduction
+      has collapsed onto `clean_error`.
+    - Fix the activity log dying on ordinary mail addresses. The Git email was
+      folded into a ref name with `s/[^a-zA-Z0-9._-]/_/g`, which is not the
+      grammar git actually enforces: `a..b@example.com` produced
+      `refs/karr/log/user/a..b_example.com`, libgit2 refused it, and the
+      command died *after* it had already written — the task stayed claimed and
+      its lock ref stayed behind. An address ending in `.lock` or starting with
+      a dot hit the same wall, KARR_ROLE went through the same mapping, and
+      `a b@x`, `a-b@x`, `a+b@x` and `a/b@x` all collapsed onto one shared log
+      while every non-ASCII byte became `_`. Each identity component is now
+      percent-encoded (`user/getty%40conflict.industries`): legal by
+      construction, injective, reversible through
+      `App::karr::ActivityLog->decode_identity`, and UTF-8 safe. Logs written
+      under either older naming scheme are read alongside the new ref, so no
+      history is orphaned and no entry is counted twice. A log that still
+      cannot be written warns and is dropped instead of taking its command down
+      mid-write.
+    - The activity log is now written by every mutating command, not only by
+      `pick`. `karr create`, `move`, `edit`, `handoff`, `archive` and `delete`
+      wrote nothing, so `karr log` stayed empty and `karr show --me/--agent`
+      resolved against an almost empty history. Logging hangs off
+      `App::karr::Role::BoardAccess`'s save_task/delete_task — the two doors a
+      command changes a task through — so a command is recorded because it
+      wrote, not because it remembered to log: the action comes from the
+      command name and the actor from its `--claim`, the task's holder, or the
+      Git identity. Guarded writes go through the same door: `save_task` takes
+      the OID the card was read from and becomes a compare-and-swap, so the
+      one-writer-wins paths in `move`, `edit` and `pick` are logged by the same
+      line of code as the unguarded ones, and a write that loses its race is
+      not logged at all. Bulk paths that reinstate state verbatim (`import`,
+      `restore`, `repair`) sit below that door and stay unlogged, and `pick`,
+      which also logs explicitly, still produces exactly one entry.
+    - Fixed `karr pick --move` never recording a completion on a board whose
+      final column is not named `done` — the last leftover of the
+      terminal-status sweep (ticket #101; sweep: tickets #67, #98). Pick has
+      its own compare-and-swap loop and does not go through the shared
+      status-change path, so its direct call to the lifecycle rules kept the
+      three-argument form when move, edit, archive and handoff started handing
+      the board's own configuration along, and "is this the final column" kept
+      being answered for the default board. A card picked straight into
+      `shipped` got its `started` stamp and no `completed` for ever. Pick now
+      hands the board config over like everywhere else.
+    - Fixed `karr handoff` being unusable on any board without a `review`
+      column: it moved the card to the literal status `review`, which the
+      status validation rejects as not configured, so the command died as a
+      usage error no matter what the agent typed (ticket #102). kanban-md's
+      handoff targets `review` too and merely refuses such a board
+      (`cmd/handoff.go:105-110`); karr derives the target instead. A board
+      that configures `review` keeps exactly that target, so every board
+      kanban-md itself can hand off on behaves the same here; any other board
+      hands off to the column a card sits in right before it is finished — the
+      last non-terminal status, by the same rule the terminal statuses already
+      follow. A board with no working column at all still cannot hand off, and
+      now says so by name.
+    - Fixed `karr materialize` claiming `tasks/` and `config.yml` in .gitignore
+      even when the project already tracks content at those paths — the other
+      half of the hole `karr init` had just closed (ticket #100). init declines
+      to write those entries for a path the project owns; materialize appended
+      them anyway, so the very next command put the untrue claim straight back.
+      Git applies no ignore rule to a file it already tracks, so the entry could
+      do nothing except tell a later reader that karr owns a path the project
+      owns — and it said so right where `karr materialize` refuses to write, for
+      that very reason. Both commands now ask the same question, and materialize
+      reports what it left alone the way init does. The question is asked before
+      the view is written, so a tracked card that `--force` sweeps away does not
+      make the path look unowned on the way out.
+    - `karr context` gained a fifth, optional section: `activity`, the
+      board's recent activity log (ticket #92). #64 put every mutating
+      command through the log but left `context` reading none of it, still
+      summarising task state only — the claim in #64 that `context` already
+      read the log was wrong, which is what #92 was filed to correct.
+      Selectable and omittable through the existing `--sections` filter like
+      the other four. It is bounded, and the bound is not "last N entries of
+      the log": it is the last C<--activity-limit> entries (default 5)
+      written by identities *other* than the one invoking C<context>. An
+      agent about to pick up work already knows what it itself just did —
+      `karr show --me` is the tool for that — so the entries that actually
+      change what it decides are what everybody else has been doing; the
+      whole log, unbounded, is what `karr log` is for. Entries render newest
+      first, like `recently-completed`. In `--json`, the section is wrapped
+      the same way the other four are (`{"name":"activity","items":[...]}`
+      inside `sections`), but its items are shaped like `karr log --json`'s
+      own entries (`ts`/`agent`/`action`/`task_id`, `detail` when present)
+      rather than the task-shaped `id`/`title`/`priority`/`assignee` the
+      other four use — an activity entry is a historical event, not a task,
+      and forcing it into the task shape would have meant inventing a
+      priority and an assignee for something that has neither.
+      `--activity-limit` below 1 is a usage error rather than a silent
+      surprise, by the rule `show --last` already follows (ticket #76,
+      ADR 0002): the two out-of-range values failed in opposite directions
+      and neither was visible, `0` reading as "no bound at all" and so
+      pouring the whole log into the very section the option exists to keep
+      short, and a negative rendering an empty section with exit 0 —
+      indistinguishable from "nobody else has acted on this board".
+    - Replaced the linear, per-file walk behind `project_owned_view_paths`
+      with a single index read (ticket #104, follow-up to #100). The old
+      check walked the file-view directory and asked git one `is_tracked`
+      per file found on disk, so a repeat `karr materialize` on a 300-card
+      board spent roughly 180ms of its ~1.4s confirming the project owned
+      nothing under `tasks/` before writing — O(card count), and the cheap
+      "only ask when an entry would actually be added" guard cannot help,
+      because in the case this check exists for the entry never gets added
+      regardless. It also had a gap the old POD documented as known: a path
+      git tracks but that is currently missing from the working tree — rm'd,
+      not yet committed — has no file on disk for a directory walk to find,
+      so it read as unowned and karr claimed a path the project still
+      tracked. `App::karr::Git` gained `is_tracked_under`, which asks the
+      index directly instead of the working tree (via `git ls-files`, since
+      Git::Native's libgit2 binding exposes no index API of its own to ask
+      natively) and matches a directory as a prefix over everything under
+      it, so one call answers for a file or a directory alike and closes the
+      gap in the same step that drops the per-file loop. Both `karr init`
+      and `karr materialize` share the helper, so both pick up the fix
+      without their own code changing. Isolated, the check itself dropped
+      from roughly 135ms to 10ms per call on a 300-card board; the whole
+      `karr materialize` command roughly 150ms.
+
 0.402     2026-08-04 04:46:25Z
 
     - New board-level opt-out from automated agent runs: `karr disable

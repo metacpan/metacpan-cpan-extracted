@@ -1,5 +1,5 @@
 package MCP::Run::Compress;
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 use Mojo::Base -base;
 
 # ABSTRACT: Output compression for LLMs
@@ -811,12 +811,39 @@ sub _build_default_filters {
       my $model = $ENV{CO_AUTHORED_BY} || $ENV{ANTHROPIC_MODEL};
       return $cmd unless $model;
       if ($cmd =~ /Co-Authored-By:/i) {
-        $cmd =~ s/Co-Authored-By: [^\n]+/Co-Authored-By: $model/g;
-      } else {
-        # Inject inside the closing quote, otherwise the Co-Authored-By
-        # line ends up as a separate shell command and `<model@host>`
-        # parses as a redirection, breaking the whole call.
-        $cmd =~ s/(")\s*$/\n\nCo-Authored-By: $model$1/m;
+        # [^\n"]+ instead of [^\n]+: when the trailer sits at the end of a
+        # -m "..." message, the greedy class used to swallow the closing
+        # quote too, leaving the shell with an unterminated string.
+        $cmd =~ s/Co-Authored-By: [^\n"]+/Co-Authored-By: $model/g;
+        return $cmd;
+      }
+      # Injection. The trailer is spliced after the closing quote of the
+      # last -m/--message argument inside the git commit invocation (the
+      # invocation runs from `commit` up to the next shell separator).
+      # The old code targeted the last quote of the whole command line, so
+      # a compound command like `git commit -m "x" && git config user.name
+      # "y"` had the trailer injected into user.name, corrupting the config
+      # value. Injecting inside the quote (rather than appending `-m
+      # "..."`) keeps the trailer part of the commit message: appended, the
+      # `<model@host>` would parse as a shell redirection and break the
+      # call. No -m argument (e.g. `git commit --amend` opening the editor)
+      # means no safe injection point, so nothing is rewritten.
+      my $tail = $cmd;
+      if ( $tail =~ /\bgit\b[^&|;]*?(?<![=])\bcommit\b/ ) {
+        $tail =~ s/^.*\bgit\b[^&|;]*?(?<![=])\bcommit\b//;
+        my $origin = length($cmd) - length($tail);
+        $tail =~ s/[&|;].*$//;
+        # -[a-zA-Z]*m covers bundled short flags whose last letter is the
+        # message flag (-am, -sm, -anm), not just a bare -m. The lookbehind
+        # requires the dash to start an argument -- \b can't do that, since
+        # `-` is not a word character, so \b- never matches after a space.
+        # Without it, a path like /tmp/msg-m "x" would look like a flag.
+        if ( $tail
+          =~ /^(.*(?<![^\s])(?:--message|-[a-zA-Z]*m)\s+")((?:[^"\\]|\\.)*)(")/ )
+        {
+          substr( $cmd, $origin + length($1) + length($2), 0 )
+            = "\n\nCo-Authored-By: $model";
+        }
       }
       return $cmd;
     },
@@ -1177,7 +1204,7 @@ MCP::Run::Compress - Output compression for LLMs
 
 =head1 VERSION
 
-version 0.105
+version 0.106
 
 =head1 SYNOPSIS
 

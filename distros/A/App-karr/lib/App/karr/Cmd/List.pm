@@ -1,16 +1,17 @@
 # ABSTRACT: List tasks with filtering and sorting
 
 package App::karr::Cmd::List;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-  usage_string => 'USAGE: karr list [--status LIST] [--priority LIST] [--sort FIELD] [options]',
+  usage_string => 'USAGE: karr list [--status LIST] [--priority LIST] [--archived] [--sort FIELD] [options]',
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
 use App::karr::Task;
 use App::karr::Config;
+use App::karr::Error qw( user_error );
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
@@ -52,11 +53,15 @@ option claimed_by => (
   doc => 'Filter by claim owner',
 );
 
+# The complete set of --sort keys, in the order the usage message lists them.
+# Single source for the option doc, the usage message, and _comparators.
+my @SORT_FIELDS = qw( id status priority created updated due );
+
 option sort => (
   is => 'ro',
   format => 's',
   default => sub { 'id' },
-  doc => 'Sort by: id, status, priority, created, updated, due',
+  doc => 'Sort by: ' . join(', ', @SORT_FIELDS),
 );
 
 option reverse => (
@@ -65,14 +70,27 @@ option reverse => (
   doc => 'Reverse sort order',
 );
 
+option archived => (
+  is => 'ro',
+  doc => 'Show only archived tasks',
+);
+
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
+  # "0 task(s)" and `[]` are answers about a board; a repository with no board
+  # has to say that instead of borrowing them (#135).
+  $self->require_local_board;
   my @tasks = $self->_load_tasks;
   @tasks = $self->_filter(\@tasks);
   @tasks = $self->_sort(\@tasks);
 
   if ($self->json) {
-    $self->print_json([map { $_->to_frontmatter } @tasks]);
+    # to_json_hash, not to_frontmatter: the body lives below the frontmatter in
+    # the file format, so the frontmatter view has no body to give and list
+    # --json shipped bodiless cards while show/pick/handoff shipped whole ones
+    # (ticket #129). kanban-md marshals the full task here too, with
+    # `json:"body,omitempty"` on Body (cmd/list.go, internal/task/task.go).
+    $self->print_json([map { $_->to_json_hash } @tasks]);
     return;
   }
 
@@ -88,7 +106,10 @@ sub execute {
   for my $t (@tasks) {
     my @meta;
     push @meta, $t->priority if defined $t->priority && length $t->priority;
-    push @meta, '@' . $t->assignee if $t->has_assignee;
+    # An `assignee: ""` from kanban-md satisfies the predicate but names
+    # nobody, and printing it gave every imported card a bare "@" in its meta
+    # list. Empty means absent here as it does in pick (ticket #59).
+    push @meta, '@' . $t->assignee if $t->has_assignee && length $t->assignee;
     push @meta, 'blocked' if $t->has_blocked;
     my $title = $t->title;
     $title .= ' [' . join(', ', @meta) . ']' if @meta;
@@ -110,15 +131,25 @@ sub _filter {
   my ($self, $tasks) = @_;
   my @filtered = @$tasks;
 
-  # Exclude terminal statuses (done/archived) by default, but let an explicit
-  # --status request surface them.
-  unless ($self->status) {
-    @filtered = grep { !App::karr::Config->is_terminal_status($_->status) } @filtered;
+  # Which statuses were asked for, if any. --archived is a status filter and
+  # nothing more, exactly as in kanban-md (cmd/list.go): it replaces --status
+  # rather than intersecting with it, and every other filter below still
+  # applies on top, so `--archived --tag legacy` means what it reads like.
+  my $wanted;
+  if ($self->archived) {
+    $wanted = { App::karr::Config->ARCHIVED_STATUS => 1 };
+  } elsif ($self->status) {
+    $wanted = { map { $_ => 1 } split /,/, $self->status };
   }
 
-  if ($self->status) {
-    my %statuses = map { $_ => 1 } split /,/, $self->status;
-    @filtered = grep { $statuses{$_->status} } @filtered;
+  # Nothing asked for: hide the board's terminal statuses, so the default view
+  # is open work. Asked of the store, so a board whose final column is
+  # `shipped` hides shipped work instead of the `done` it does not have
+  # (ticket #67).
+  if ($wanted) {
+    @filtered = grep { $wanted->{$_->status} } @filtered;
+  } else {
+    @filtered = grep { !$self->store->is_terminal_status($_->status) } @filtered;
   }
   if ($self->priority) {
     my %priorities = map { $_ => 1 } split /,/, $self->priority;
@@ -150,17 +181,78 @@ sub _filter {
 sub _sort {
   my ($self, $tasks) = @_;
   my $field = $self->sort;
-  my @sorted;
-  if ($field eq 'id') {
-    @sorted = sort { $a->id <=> $b->id } @$tasks;
-  } elsif ($field eq 'priority') {
-    my %pri = App::karr::Config->priority_order;
-    @sorted = sort { ($pri{$a->priority} // 2) <=> ($pri{$b->priority} // 2) } @$tasks;
-  } else {
-    @sorted = sort { ($a->$field // '') cmp ($b->$field // '') } @$tasks;
-  }
+
+  # Look the key up in an explicit table; never call it as a method. The old
+  # `$a->$field` turned a value straight from argv into a method call on
+  # App::karr::Task, so `--sort slug` and `--sort to_markdown` both ran, and an
+  # unknown key died with "Can't locate object method ... at List.pm line NNN".
+  my $comparators = $self->_comparators;
+  my $cmp = $comparators->{$field}
+    or user_error( "Usage: karr list --sort ", join('|', @SORT_FIELDS),
+                   " (got '$field')" );
+
+  # Tie-break on id so the order is fully determined: Perl's sort is stable in
+  # practice but not by contract, and load_tasks already hands tasks over in
+  # ascending id order, so this pins what stability was silently providing.
+  my @sorted = sort { $cmp->($a, $b) || $a->id <=> $b->id } @$tasks;
   @sorted = reverse @sorted if $self->reverse;
   return @sorted;
+}
+
+# One comparator per allowed --sort key. Status follows the board config's own
+# order rather than the alphabet or a hardcoded table, matching kanban-md's
+# Sort/compareTasks (internal/board/sort.go) which indexes both through
+# cfg.StatusIndex / cfg.PriorityIndex. Priority deliberately breaks that
+# symmetry (ticket #91): it walks the config list backwards, so the most
+# urgent task -- the last name in priorities, critical on a default board --
+# sorts first and the top of the list agrees with what pick would take.
+# kanban-md's ascending order (sort.go:29) put the least urgent task on top,
+# the exact opposite of pick; it has since taken the same direction (upstream
+# c783157), one layer up -- cmd/list.go flips the reverse flag for this one key
+# and sort.go:29 stays ascending -- so the comparators differ but the order a
+# user sees does not. A value that is not in the config still gets
+# index -1, as kanban-md's IndexOf does; descending, that keeps it at the
+# least-urgent end, the same end the ascending order gave it.
+sub _comparators {
+  my ($self) = @_;
+  my %status   = $self->_index_of( $self->config->statuses );
+  my %priority = $self->_index_of( $self->config->priorities );
+  return {
+    id       => sub { $_[0]->id <=> $_[1]->id },
+    status   => sub { ($status{$_[0]->status}     // -1) <=> ($status{$_[1]->status}     // -1) },
+    priority => sub { ($priority{$_[1]->priority} // -1) <=> ($priority{$_[0]->priority} // -1) },
+    # created/updated are ISO-8601 UTC stamps, so a string compare is
+    # chronological.
+    created  => sub { $_[0]->created cmp $_[1]->created },
+    updated  => sub { $_[0]->updated cmp $_[1]->updated },
+    due      => sub { $self->_cmp_due(@_) },
+  };
+}
+
+sub _index_of {
+  my ($self, @values) = @_;
+  my %index;
+  $index{$values[$_]} //= $_ for 0 .. $#values;
+  return %index;
+}
+
+# `due` is optional. kanban-md's compareDue sorts a task without a due date
+# last; the previous `('' cmp '')` fallback sorted it first.
+sub _cmp_due {
+  my ($self, $left, $right) = @_;
+  my $l = $self->_due_of($left);
+  my $r = $self->_due_of($right);
+  return 0 unless defined $l || defined $r;
+  return 1 unless defined $l;
+  return -1 unless defined $r;
+  return $l cmp $r;
+}
+
+sub _due_of {
+  my ($self, $task) = @_;
+  return undef unless $task->has_due;
+  my $due = $task->due;
+  return ( defined $due && length $due ) ? $due : undef;
 }
 
 1;
@@ -177,7 +269,7 @@ App::karr::Cmd::List - List tasks with filtering and sorting
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -189,9 +281,24 @@ version 0.402
 =head1 DESCRIPTION
 
 Lists tasks from the current board with optional filtering and sorting.
-Archived tasks are excluded by default so the output focuses on active work.
-Use C<--compact> for terse one-line output and C<--json> for machine-readable
+Finished tasks are excluded by default so the output focuses on active work:
+that means the board's terminal statuses -- its final configured status plus
+C<archived>, so C<done> and C<archived> on a default board, but C<shipped> and
+C<archived> on a board whose columns end in C<shipped>. Ask for them by name
+with C<--status>, or for the archive alone with C<--archived>. Use
+C<--compact> for terse one-line output and C<--json> for machine-readable
 automation.
+
+C<--json> emits each task as the full payload L<App::karr::Task/to_json_hash>
+builds -- the frontmatter fields plus the C<body> when the task has one, the
+same shape C<karr show --json> returns. Reading a set of tickets is therefore
+one call rather than one C<show> per id; C<--compact> is the flag for when the
+bodies are not wanted.
+
+Note that karr excludes the whole terminal group here where kanban-md's
+C<list> excludes only C<archived> and still shows finished work. That is a
+deliberate difference, not an oversight: C<karr list> is the agent's "what is
+open" view.
 
 =head1 FILTERS AND SORTING
 
@@ -201,6 +308,12 @@ automation.
 
 Accept comma-separated lists and only return tasks matching one of the
 requested values.
+
+=item * C<--archived>
+
+Shows the archive and nothing else. It is a status filter, so it replaces
+C<--status> rather than intersecting with it -- matching kanban-md's flag of
+the same name -- while the remaining filters still narrow the result.
 
 =item * C<--assignee>, C<--tag>, C<--claimed-by>
 
@@ -213,7 +326,17 @@ Performs a case-insensitive substring search across title, body, and tags.
 =item * C<--sort>, C<--reverse>
 
 Sort by C<id>, C<status>, C<priority>, C<created>, C<updated>, or C<due>, and
-optionally reverse the result order.
+optionally reverse the result order. Any other field is a usage error (exit
+C<2>).
+
+C<status> follows the board config's own order. C<priority> deliberately
+reads the config list the other way, most urgent first: C<--sort priority>
+lists C<critical> before C<low> with the default C<priorities> setting, so
+the top of a priority-sorted list is the task L<App::karr::Cmd::Pick> would
+hand out, and C<--reverse> gives the least-urgent-first view. kanban-md's
+ascending config order opened the list with the least urgent task when karr
+took this direction; it has since made the same change, so the two agree.
+Tasks without a C<due> date sort last. Ties are broken by C<id>.
 
 =back
 

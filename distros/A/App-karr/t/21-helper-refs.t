@@ -94,11 +94,41 @@ subtest 'git helper API normalizes refs and blocks protected namespaces' => sub 
         'non-reserved helper ref is accepted'
     ) or diag $@;
 
+    # Ticket #63: only refs/heads/ was covered here, so deleting any other
+    # entry from validate_helper_ref's blocklist -- refs/karr/ included, which
+    # would let `karr set-refs` overwrite board state -- left the suite green.
+    # Every entry gets its own case.
+    for my $blocked (
+        'refs/heads/main',
+        'refs/tags/v1.0',
+        'refs/remotes/origin/main',
+        'refs/bisect/bad',
+        'refs/replace/abc123',
+        'refs/karr/tasks/1/data',
+        'refs/karr/config',
+        'refs/stash',
+        'refs/stash/mine',
+      )
+    {
+        ok(
+            !eval { $git->validate_helper_ref($blocked); 1 },
+            "$blocked is rejected"
+        );
+        like( $@, qr/protected|blocked/i, "$blocked error is descriptive" );
+    }
+
+    # The bare form normalizes to the same protected namespace, so it must be
+    # rejected too -- the blocklist is checked after normalize_ref_name.
     ok(
-        !eval { $git->validate_helper_ref('refs/heads/main'); 1 },
-        'heads namespace is rejected'
+        !eval { $git->validate_helper_ref('karr/tasks/1/data'); 1 },
+        'the bare form of a protected ref is rejected as well'
     );
-    like( $@, qr/protected|blocked/i, 'blocked namespace error is descriptive' );
+
+    # Not blocked: a name that merely starts with the same letters.
+    ok(
+        eval { $git->validate_helper_ref('refs/karrots/notes'); 1 },
+        'a namespace that only shares a prefix is still allowed'
+    ) or diag $@;
 };
 
 subtest 'set-refs and get-refs roundtrip over a remote' => sub {

@@ -1,0 +1,15 @@
+logger: capture
+plugins:
+    Auth::Extensible:
+        uri_base: "https://genuine.example.com"
+        realms:
+            default:
+                provider: Provider::ConfigExtended
+                users:
+                    - user: dave
+                      pass: beer
+                      name: David
+        mailer:
+            module: Mail::Message
+            options:
+                via: sendmail

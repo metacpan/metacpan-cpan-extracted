@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Exception::Nondeducible;
-$Context::Singleton::Exception::Nondeducible::VERSION = '1.0.8';
+$Context::Singleton::Exception::Nondeducible::VERSION = '1.0.9';
 use Exception::Class ( __PACKAGE__ );
 
 sub new {

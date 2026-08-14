@@ -1,7 +1,7 @@
 # ABSTRACT: Import a tasks/ file view back into the ref-backed board
 
 package App::karr::Cmd::Import;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -30,9 +30,20 @@ sub execute {
   # missing tasks/ directory would make serialize_from delete all task refs.
   my $store     = $self->store;
   my $board_dir = $self->git_root;
+  my $tasks_dir = $board_dir->child('tasks');
   die "No materialized task view found at $board_dir (no tasks/ directory).\n"
     . "Run 'karr materialize' first, or place a tasks/ directory there before importing.\n"
-    unless $board_dir->child('tasks')->exists;
+    unless $tasks_dir->exists;
+
+  # Ticket #50: the directory existing is not the same as there being a view.
+  # serialize_from prunes every ref the view does not mention, so an empty
+  # tasks/ imported zero tasks, deleted the whole board and reported success.
+  # Empty input means "nothing to import", never "delete everything".
+  my @cards = $tasks_dir->children(qr/\.md$/);
+  die "No task cards found in $tasks_dir -- the file view is empty.\n"
+    . "Importing it would delete every task on the board. Run 'karr materialize' to\n"
+    . "refresh the view, or remove tasks deliberately with 'karr delete ID'.\n"
+    unless @cards;
 
   # Writing command: pull before, push after, with SyncGuard insurance.
   $self->sync_before;
@@ -62,7 +73,7 @@ App::karr::Cmd::Import - Import a tasks/ file view back into the ref-backed boar
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -82,6 +93,25 @@ This is the destructive inverse of C<karr materialize>: task refs are replaced
 by the file view, and task refs with no matching file are deleted. It therefore
 requires an explicit C<--yes> acknowledgement, and, because it mutates refs, it
 pulls before and pushes after like the other writing commands.
+
+The config is the one thing it does not replace. A F<config.yml> that has been
+through another tool is not the whole board config any more -- kanban-md
+rewrites the file as soon as it loads it and keeps only what its own schema
+knows -- so the view is read as a set of changes rather than as the truth.
+Keys it carries and karr models are adopted; keys it cannot express, C<foundation>
+and C<lock_timeout> among them, keep what C<refs/karr/config> already said.
+Without that, C<karr disable> was undone by a tool that never heard of it
+(ticket #87). See L<App::karr::Config/reconcile_view_config>.
+
+The task id counter moves forward across the bridge and never backwards: it
+ends up at whichever is higher, one past the highest imported card or the
+view's own C<next_id> (ticket #90).
+
+Two things it will not do. An empty F<tasks/> is refused rather than read as
+"delete every task" -- deleting the whole board is what C<karr delete> is for.
+And the import is all-or-nothing: every card is parsed before any ref is
+written, so a malformed file aborts the run with each offending file named and
+the board left exactly as it was.
 
 =head1 OPTIONS
 

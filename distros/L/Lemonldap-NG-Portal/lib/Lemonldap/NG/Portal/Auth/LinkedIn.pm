@@ -8,7 +8,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_REDIRECT);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.3';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -24,6 +24,23 @@ has ua => (
         my $ua = Lemonldap::NG::Common::UserAgent->new( $_[0]->{conf} );
         $ua->env_proxy();
         return $ua;
+    }
+);
+
+# Used to protect the authorization request against CSRF and to restore the
+# initial request across the LinkedIn round trip
+has state_ott => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        my $ott = $_[0]->{p}->loadModule('::Lib::OneTimeToken');
+        $ott->timeout( $_[0]->conf->{timeout} );
+
+        # LinkedIn sends the user back to any portal of the farm, so the state
+        # must not be stored in the local cache, whatever tokenUseGlobalStorage
+        # says
+        $ott->cache(undef);
+        return $ott;
     }
 );
 
@@ -100,6 +117,24 @@ sub extractFormInfo {
 
     # Code
     if ($code) {
+
+        # Restore initial request. This also protects against login CSRF: the
+        # state token can only have been created by this portal
+        unless ($state) {
+            $self->userLogger->error(
+                'LinkedIn response without state parameter');
+            return PE_ERROR;
+        }
+        my $stateData = $self->state_ott->getToken($state);
+        unless ( $stateData
+            and ( $stateData->{_type} // '' ) eq 'linkedInState' )
+        {
+            $self->userLogger->error('Invalid or expired LinkedIn state');
+            return PE_ERROR;
+        }
+        $req->urldc( $stateData->{urldc} ) if $stateData->{urldc};
+        $req->{checkLogins} = $stateData->{checkLogins};
+
         my %form;
         $form{"code"}          = $code;
         $form{"client_id"}     = $self->conf->{linkedInClientID};
@@ -202,16 +237,6 @@ sub extractFormInfo {
         $self->logger->debug(
             "Good LinkedIn authentication for " . $req->user );
 
-        # Extract state
-        if ($state) {
-            my $stateSession = $self->p->getApacheSession( $state, 1 );
-
-            $req->urldc( $stateSession->data->{urldc} );
-            $req->{checkLogins} = $stateSession->data->{checkLogins};
-
-            $stateSession->remove;
-        }
-
         return PE_OK;
     }
 
@@ -220,15 +245,17 @@ sub extractFormInfo {
         $self->logger->debug('Redirection to LinkedIn');
 
         # Store state
-        my $stateSession =
-          $self->p->getApacheSession( undef, 1, 0, 'LinkedInState' );
-
-        my $stateInfos = {};
-        $stateInfos->{_utime}      = time() + $self->conf->{timeout};
-        $stateInfos->{urldc}       = $req->urldc;
-        $stateInfos->{checkLogins} = $req->{checkLogins};
-
-        $stateSession->update($stateInfos);
+        my $stateToken = $self->state_ott->createToken(
+            {
+                _type       => 'linkedInState',
+                urldc       => $req->urldc,
+                checkLogins => $req->{checkLogins},
+            }
+        );
+        unless ($stateToken) {
+            $self->logger->error('Unable to create LinkedIn state token');
+            return PE_ERROR;
+        }
 
         my $authn_uri = $self->linkedInAuthorizationEndpoint;
         my $client_id = $self->conf->{linkedInClientID};
@@ -239,7 +266,7 @@ sub extractFormInfo {
             client_id     => $client_id,
             redirect_uri  => $callback_url,
             scope         => $scope,
-            state         => $stateSession->id,
+            state         => $stateToken,
           );
 
         $req->urldc($authn_uri);

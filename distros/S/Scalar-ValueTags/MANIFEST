@@ -1,11 +1,12 @@
 .gitignore
 Build.PL
 Changes
-DMD_helper.h
 lib/Scalar/ValueTags.pm
 lib/Scalar/ValueTags.xs
+LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP
+README
 t/01valuetags.t
 t/40behavior-uniq-ref-array.t
 t/41behavior-append-array.t
@@ -17,7 +18,5 @@ xt/01changes.t
 xt/02checkmanifest.t
 xt/03pod.t
 xt/99kwalitee.t
-README
-LICENSE
 META.yml
 META.json

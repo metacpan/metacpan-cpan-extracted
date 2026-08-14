@@ -262,9 +262,9 @@
           if (n[2] != null) {
             return init();
           } else {
-            if ($scope.cfg[0].prev) {
+            if ($scope.cfg[0].prev && $scope.cfg[0].prev.cfgNum) {
               $scope.cfg[1] = $scope.cfg[0];
-              return getCfg(0, $scope.cfg[1].prev).then(function () {
+              return getCfg(0, $scope.cfg[1].prev.cfgNum).then(function () {
                 return init();
               });
             } else {

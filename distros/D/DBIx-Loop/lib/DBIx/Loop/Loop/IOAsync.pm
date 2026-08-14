@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # A loop adapter over IO::Async::Loop, implementing the DBIx::Loop seam:
 # add_reader / add_writer / remove / timer / new_future / await. The backends
@@ -59,14 +59,31 @@ sub timer {
     return $self->{loop}->watch_time(after => $after, code => $cb);
 }
 
+# A pending future of this ecosystem's native class.
+#
+# IO::Async before 0.805 stores the loop by poking $future->{loop}, and Future
+# 0.50+ no longer implements a Future as a hashref - so on that pairing (which
+# a smoker will happily assemble: IO::Async 0.801 with a current Future)
+# $loop->new_future dies "Not a HASH reference" before it returns anything.
+# That is IO::Async's business, not ours, but it is not worth dying over: fall
+# back to a plain Future, which is the same class from the caller's side and
+# differs only in not carrying its own ->await (we await on the loop anyway).
+sub _native_future {
+    my ($self) = @_;
+    my $f = eval { $self->{loop}->new_future };
+    return $f if $f;
+    require Future;
+    return Future->new;
+}
+
 # native future for this ecosystem (IO::Async's own); the phase-2 pool uses the
 # canonical DBIx::Loop::Future directly and does not call this yet.
-sub new_future { $_[0]{loop}->new_future }
+sub new_future { $_[0]->_native_future }
 
 # bridge a DBIx::Loop::Future to an IO::Async Future
 sub to_native {
     my ($self, $future) = @_;
-    my $nf = $self->{loop}->new_future;
+    my $nf = $self->_native_future;
     $future->on_ready(sub {
         my ($f) = @_;
         $f->is_done ? $nf->done($f->get) : $nf->fail($f->failure);
@@ -107,6 +124,14 @@ DBIx::Loop::Loop::IOAsync - drive DBIx::Loop on an IO::Async event loop
 The loop adapter for L<IO::Async>. It implements the DBIx::Loop loop seam
 (C<add_reader>, C<add_writer>, C<remove>, C<timer>, C<new_future>) plus
 C<await> for synchronous use. See L<DBIx::Loop>.
+
+C<new_future> and C<to_native> hand back an L<IO::Async::Future>, except on
+IO::Async before 0.805 running against L<Future> 0.50 or newer: those
+IO::Async versions construct theirs by poking C<< $f->{loop} >>, which a
+Future of that vintage is not, and C<< $loop->new_future >> dies. There the
+adapter returns a plain L<Future> instead - the same class to the caller,
+without its own C<await>, which costs nothing here because awaiting is the
+adapter's job.
 
 =head1 AUTHOR
 

@@ -30,16 +30,21 @@
       },
       "runtime" : {
          "requires" : {
+            "Encode" : "0",
+            "Errno" : "0",
             "File::ShareDir" : "0",
-            "Git::Libgit2" : "0.004",
-            "Git::Native" : "0.003",
+            "Git::Libgit2" : "0.006",
+            "Git::Native" : "0.005",
+            "IO::Select" : "0",
             "JSON::MaybeXS" : "0",
             "Moo" : "0",
             "MooX::Cmd" : "0",
             "MooX::Options" : "0",
+            "POSIX" : "0",
             "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
             "Term::ANSIColor" : "0",
-            "Text::Table::Tiny" : "0",
+            "Time::HiRes" : "0",
             "Time::Piece" : "0",
             "Try::Tiny" : "0",
             "YAML::XS" : "0"
@@ -48,7 +53,7 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "Test::Exception" : "0",
+            "PPI" : "0",
             "Test::More" : "0"
          }
       }
@@ -56,183 +61,219 @@
    "provides" : {
       "App::karr" : {
          "file" : "lib/App/karr.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::ActivityLog" : {
          "file" : "lib/App/karr/ActivityLog.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::BoardStore" : {
          "file" : "lib/App/karr/BoardStore.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::AgentName" : {
          "file" : "lib/App/karr/Cmd/AgentName.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Archive" : {
          "file" : "lib/App/karr/Cmd/Archive.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Backup" : {
          "file" : "lib/App/karr/Cmd/Backup.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Board" : {
          "file" : "lib/App/karr/Cmd/Board.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Config" : {
          "file" : "lib/App/karr/Cmd/Config.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Context" : {
          "file" : "lib/App/karr/Cmd/Context.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Create" : {
          "file" : "lib/App/karr/Cmd/Create.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Delete" : {
          "file" : "lib/App/karr/Cmd/Delete.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Destroy" : {
          "file" : "lib/App/karr/Cmd/Destroy.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Disable" : {
          "file" : "lib/App/karr/Cmd/Disable.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Edit" : {
          "file" : "lib/App/karr/Cmd/Edit.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Enable" : {
          "file" : "lib/App/karr/Cmd/Enable.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::GetRefs" : {
          "file" : "lib/App/karr/Cmd/GetRefs.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Handoff" : {
          "file" : "lib/App/karr/Cmd/Handoff.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Import" : {
          "file" : "lib/App/karr/Cmd/Import.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Init" : {
          "file" : "lib/App/karr/Cmd/Init.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::List" : {
          "file" : "lib/App/karr/Cmd/List.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Log" : {
          "file" : "lib/App/karr/Cmd/Log.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Materialize" : {
          "file" : "lib/App/karr/Cmd/Materialize.pm",
-         "version" : "0.402"
+         "version" : "0.500"
+      },
+      "App::karr::Cmd::Metrics" : {
+         "file" : "lib/App/karr/Cmd/Metrics.pm",
+         "version" : "0.500"
       },
       "App::karr::Cmd::Move" : {
          "file" : "lib/App/karr/Cmd/Move.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Pick" : {
          "file" : "lib/App/karr/Cmd/Pick.pm",
-         "version" : "0.402"
+         "version" : "0.500"
+      },
+      "App::karr::Cmd::Repair" : {
+         "file" : "lib/App/karr/Cmd/Repair.pm",
+         "version" : "0.500"
       },
       "App::karr::Cmd::Restore" : {
          "file" : "lib/App/karr/Cmd/Restore.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::SetRefs" : {
          "file" : "lib/App/karr/Cmd/SetRefs.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Show" : {
          "file" : "lib/App/karr/Cmd/Show.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Skill" : {
          "file" : "lib/App/karr/Cmd/Skill.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Cmd::Sync" : {
          "file" : "lib/App/karr/Cmd/Sync.pm",
-         "version" : "0.402"
+         "version" : "0.500"
+      },
+      "App::karr::Cmd::Unlock" : {
+         "file" : "lib/App/karr/Cmd/Unlock.pm",
+         "version" : "0.500"
       },
       "App::karr::Config" : {
          "file" : "lib/App/karr/Config.pm",
-         "version" : "0.402"
+         "version" : "0.500"
+      },
+      "App::karr::Encoding" : {
+         "file" : "lib/App/karr/Encoding.pm",
+         "version" : "0.500"
+      },
+      "App::karr::Error" : {
+         "file" : "lib/App/karr/Error.pm",
+         "version" : "0.500"
       },
       "App::karr::Foundation" : {
          "file" : "lib/App/karr/Foundation.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Foundation::Overview" : {
          "file" : "lib/App/karr/Foundation/Overview.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Foundation::Runner" : {
          "file" : "lib/App/karr/Foundation/Runner.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Foundation::State" : {
          "file" : "lib/App/karr/Foundation/State.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Git" : {
          "file" : "lib/App/karr/Git.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Lock" : {
          "file" : "lib/App/karr/Lock.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Role::BoardAccess" : {
          "file" : "lib/App/karr/Role/BoardAccess.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Role::BoardDiscovery" : {
          "file" : "lib/App/karr/Role/BoardDiscovery.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Role::ClaimTimeout" : {
          "file" : "lib/App/karr/Role/ClaimTimeout.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Role::CliArgs" : {
          "file" : "lib/App/karr/Role/CliArgs.pm",
-         "version" : "0.402"
+         "version" : "0.500"
+      },
+      "App::karr::Role::DependencyArgs" : {
+         "file" : "lib/App/karr/Role/DependencyArgs.pm",
+         "version" : "0.500"
+      },
+      "App::karr::Role::DependencyCheck" : {
+         "file" : "lib/App/karr/Role/DependencyCheck.pm",
+         "version" : "0.500"
       },
       "App::karr::Role::ExitCodes" : {
          "file" : "lib/App/karr/Role/ExitCodes.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Role::Output" : {
          "file" : "lib/App/karr/Role/Output.pm",
-         "version" : "0.402"
+         "version" : "0.500"
+      },
+      "App::karr::Role::SkillFile" : {
+         "file" : "lib/App/karr/Role/SkillFile.pm",
+         "version" : "0.500"
       },
       "App::karr::Role::SyncLifecycle" : {
          "file" : "lib/App/karr/Role/SyncLifecycle.pm",
-         "version" : "0.402"
+         "version" : "0.500"
+      },
+      "App::karr::Role::TaskMutation" : {
+         "file" : "lib/App/karr/Role/TaskMutation.pm",
+         "version" : "0.500"
       },
       "App::karr::SyncGuard" : {
          "file" : "lib/App/karr/SyncGuard.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       },
       "App::karr::Task" : {
          "file" : "lib/App/karr/Task.pm",
-         "version" : "0.402"
+         "version" : "0.500"
       }
    },
    "release_status" : "stable",
@@ -249,7 +290,7 @@
       "x_IRC" : "irc://irc.perl.org/#langertha",
       "x_IRC_user" : "Getty"
    },
-   "version" : "0.402",
+   "version" : "0.500",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -610,7 +651,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.402",
+                  "tag" : "0.500",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -697,11 +738,6 @@
             "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
             "name" : "@Author::GETTY/GitHub::CreateRelease",
             "version" : "0.0009"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Docker::API",
-            "name" : "@Author::GETTY/@Author::GETTY::Docker/Docker::API",
-            "version" : "0.103"
          },
          {
             "class" : "Dist::Zilla::Plugin::Docker::API",

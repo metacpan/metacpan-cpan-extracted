@@ -20,10 +20,16 @@ the rules file). Agents in this repo (skills force-loaded via `briefing.skills`)
 
 | Task | Agent |
 |---|---|
-| Implement / refactor / debug behavior-relevant code | `karr-worker` (default) |
+| Task/config semantics, lifecycle, activity log, ordinary board commands, filtering, rendering | `karr-board-worker` |
+| Git transport, refs-backed storage, CAS, locks, sync, encoding, materialize/import/backup/restore | `karr-ref-worker` |
+| karr-foundation: discovery, drain loops, per-repo lock/state, cooldown, auto-blocking, `disable`/`enable` | `karr-foundation-worker` |
+| Behavior-relevant code spanning those domains, or none of them cleanly | `karr-worker` (generalist fallback) |
 | Write/extend tests under `t/` | `karr-test-writer` |
 | Pre-release audit (Changes, cpanfile, dist.ini, version) | `karr-release-checker` |
 | POD (`=attr`/`=method`, `# ABSTRACT`) | `karr-pod-writer` |
+
+Take the narrowest domain worker that fits; each names the other two in its boundaries section
+and hands a misrouted task back rather than solving it from the wrong context.
 
 **Dogfood:** karr tracks its own work on its own board (`refs/karr/*`). Use `karr list --compact`
 / `karr board` for open work and file bugs found here as tickets. Full surface: skill
@@ -46,6 +52,7 @@ The Go implementation at `../kanban-md/` is the feature reference. Key docs:
 - `lib/App/karr.pm` — Main app, MooX::Cmd root
 - `lib/App/karr/Cmd/*.pm` — Subcommands (MooX::Cmd default namespace)
 - `lib/App/karr/Role/Output.pm` — Role for --json and --compact output options
+- `lib/App/karr/Encoding.pm` — The character/octet boundary: argv, std handles, ref blobs, YAML, JSON
 - `lib/App/karr/Role/BoardDiscovery.pm` — Role providing git/store/config discovery
 - `lib/App/karr/Role/SyncLifecycle.pm` — Role providing sync_before/sync_after with retry
 - `lib/App/karr/Role/BoardAccess.pm` — Composes BoardDiscovery + SyncLifecycle + task access
@@ -78,9 +85,10 @@ storage backend.
 | `delete` | implemented | `delete` / `rm` |
 | `board` | implemented | `board` / `summary` |
 | `pick` | implemented | `pick` |
+| `unlock` | implemented | — (show and break pick locks) |
 | `archive` | implemented | `archive` |
 | `handoff` | implemented | `handoff` |
-| `metrics` | TODO | `metrics` |
+| `metrics` | implemented | `metrics` |
 | `log` | implemented | `log` |
 | `config` | implemented | `config` |
 | `context` | implemented | `context` |
@@ -88,6 +96,7 @@ storage backend.
 | `skill` | implemented | `skill` |
 | `materialize` | implemented | — (refs→files bridge) |
 | `import` | implemented | — (files→refs bridge) |
+| `repair` | implemented | — (migrates a 0.402-or-earlier board off double-encoded UTF-8) |
 | `sync` | implemented | — (explicit refs pull/push) |
 | `backup` | implemented | — (board snapshot to YAML) |
 | `restore` | implemented | — (snapshot→refs, destructive) |
@@ -103,6 +112,14 @@ storage backend.
 - **Path::Tiny** for all file operations
 - **No namespace::clean** in command classes (incompatible with MooX::Options)
 - Task file format 100% compatible with kanban-md (interop goal)
+- **Characters inside, octets only at the edges.** Everything between the CLI
+  entry point and the Git ref blob is a Perl character string. `App::karr::Encoding`
+  owns every crossing — `@ARGV`, STDOUT/STDERR, ref read/write, YAML, JSON — and
+  nothing else may `Encode::encode`/`decode`, call `YAML::XS::Dump`/`Load`, or
+  `encode_json`/`decode_json` directly. `Path::Tiny`'s `slurp_utf8`/`spew_utf8`
+  are already character-level: putting an encode in front of one is a double
+  encode. Boards written before this rule are detected via
+  `refs/karr/meta/encoding` and repaired on read; `karr repair` migrates them.
 
 ## Building and testing
 
@@ -113,15 +130,13 @@ dzil test                      # Full Dist::Zilla test
 dzil build                     # Build distribution
 ```
 
-## What still needs building (v1 roadmap)
+## What still needs building
 
-Live status is on the karr board (`refs/karr/*`); this is the at-a-glance summary.
-
-1. **metrics command** — throughput, lead/cycle time, flow efficiency
-2. **dependency checking** — block tasks with unsatisfied deps from being picked
-3. **Self-healing IDs** — detect and repair duplicate IDs, filename/ID mismatches
-4. **WIP limit enforcement** — reject moves that would exceed WIP limits
-5. **TUI** — interactive terminal board (stretch goal, possibly with Tickit)
+Open work lives on the karr board (`refs/karr/*`) — `karr list --compact` or
+`karr board`. This file deliberately keeps no second copy of it: the summary that
+used to stand here dated from the initial commit, was never reconciled with the
+board, and by the time anyone noticed, none of its five items existed as a
+ticket while it claimed the board held the live status.
 
 ## Documentation and release notes
 

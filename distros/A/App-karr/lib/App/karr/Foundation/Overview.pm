@@ -1,7 +1,7 @@
 # ABSTRACT: karr-foundation read-only overview — multi-board status dashboard
 
 package App::karr::Foundation::Overview;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 
 
@@ -40,7 +40,13 @@ sub _print_overview {
     push @flags, 'agent-running' if $self->foundation->_lock_held($repo);
     if ( $self->foundation->_cooldown_active($repo) ) {
       my $until = $self->foundation->_state_get( $repo, 'cooldown_until' ) // 0;
-      push @flags, 'cooldown ' . ( $until - time ) . 's';
+      # Why, not just how long: a board sitting in cooldown is a board doing
+      # nothing, and the only other record of the reason is a COMMON-ERROR
+      # line somewhere in .karr.log (#160). last_error belongs to the run that
+      # set this deadline — the next run that is not a common error drops it.
+      my $why = $self->foundation->_state_get( $repo, 'last_error' );
+      push @flags, 'cooldown ' . ( $until - time ) . 's'
+                 . ( defined $why ? " ($why)" : '' );
     }
     push @flags, 'agent'
       if !$disabled && defined $self->foundation->_agent_command( $repo, $karr );
@@ -76,7 +82,7 @@ App::karr::Foundation::Overview - karr-foundation read-only overview — multi-b
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 DESCRIPTION
 
@@ -86,8 +92,10 @@ configured: per repo it prints the task-status counts, the in-progress and
 blocked task ids, and disabled / lock / cooldown / agent flags. A board that
 opted out of automated agent runs (C<karr disable>) is shown with a C<disabled>
 flag and a C<disabled:> line carrying its reason; its C<agent> flag is
-suppressed, because no agent runs there. A weak back-reference to the owning
-foundation supplies the board data and state helpers.
+suppressed, because no agent runs there. A board in cooldown carries the
+remaining wait and the error that caused it (C<cooldown 240s (rate limit)>),
+since a parked board is a board doing nothing. A weak back-reference to the
+owning foundation supplies the board data and state helpers.
 
 =head1 SUPPORT
 

@@ -6,6 +6,7 @@
 .claude/skills/mcp-run-core/SKILL.md
 .claude/skills/perl-core/SKILL.md
 .claude/skills/perl-mcp/SKILL.md
+.claude/skills/perl-mojo/SKILL.md
 .claude/skills/perl-release-author-getty/SKILL.md
 .claude/skills/perl-release-dist-ini/SKILL.md
 .gitignore
@@ -32,6 +33,7 @@ t/10-bash.t
 t/20-integration.t
 t/30-no-warnings.t
 t/40-compress-bin.t
+t/50-bash-bin.t
 t/author-pod-syntax.t
 t/compress.t
 t/release-changes_has_content.t

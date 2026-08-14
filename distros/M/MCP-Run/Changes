@@ -1,5 +1,89 @@
 Revision history for MCP-Run
 
+0.106     2026-08-13 18:19:29Z
+  - Fix mcp-run-bash dying on every tools/call in its default
+    configuration. MCP::Run::format_result calls
+    MCP::Run::Compress->new, but nothing under lib/ ever loaded that
+    class, and bin/mcp-run-bash enables compression unconditionally.
+    Every tools/call therefore hit "Can't locate object method new via
+    package MCP::Run::Compress": under MCP 0.13 the server process
+    died outright without answering, under 0.15 the client got
+    -32603 Internal error. MCP::Run now loads MCP::Run::Compress at
+    compile time, so a broken or missing compressor fails at server
+    startup instead of mid-session. MCP_RUN_COMPRESS=0 was the only
+    working configuration and is why the bug survived this long.
+  - Add t/50-bash-bin.t, driving bin/mcp-run-bash as a subprocess over
+    real stdio. None of the seven existing test files could have
+    caught the above: the compress attribute defaults to off in the
+    module, and every test instantiated the classes in-process, which
+    loads MCP::Run::Compress and papers over the missing load. Only a
+    fresh interpreter running the shipped script sees it. The test
+    also asserts that the ls filter visibly rewrites the listing, so
+    the crash cannot be "fixed" by quietly disabling compression.
+  - Report mcp-run-bash and the distribution version in serverInfo
+    instead of MCP::Server's PerlServer / 1.0.0 defaults. The defaults
+    live on MCP::Run::Bash rather than in bin/mcp-run-bash, so library
+    users are identified correctly too; passing name/version to the
+    constructor still overrides them.
+  - Require MCP 0.15 and rework t/20-integration.t for its protocol
+    handling, fixing the smoker failures reported in GH #2. MCP 0.15
+    made the protocol revision part of every request: params._meta
+    must carry io.modelcontextprotocol/protocolVersion (checked
+    against MCP::Constants::SUPPORTED_VERSIONS) and
+    io.modelcontextprotocol/clientCapabilities, or MCP::Server
+    rejects the request with "Missing protocol version" before
+    dispatch. The test built a bare MCP::Server::Context and sent no
+    _meta, so all four subtests failed. Only the test was wrong —
+    MCP::Run does no protocol handling, and real clients are
+    unaffected because the stdio transport serves the classic
+    initialize handshake through MCP::Server::Legacy, which skips
+    _check_meta entirely.
+  - Follow the two 0.15 renames in the same test: the 'initialize'
+    handshake became 'server/discover', and serverInfo moved out of
+    the result body into result._meta, where it now accompanies every
+    response. Assertions on server name, version, tool surface and
+    execution are unchanged.
+  - Add a 'protocol contract' subtest pinning both rejection paths
+    (missing _meta, unsupported protocol revision) so a future
+    protocol change fails with a legible message instead of
+    scattering failures across every other subtest. The protocol
+    revision is taken from MCP::Constants rather than hardcoded.
+  - Pin the MCP prereq in cpanfile (was unversioned, which is why the
+    smokers kept pulling the latest release). The suite targets the
+    0.15 API only; there is no compatibility path back to 0.13.
+  - Enforce that pin at runtime with a plain `use MCP 0.15` in
+    t/20-integration.t. A cpanfile prereq is install-time metadata:
+    prove never reads it and Makefile.PL only warns, so a stale MCP
+    in @INC reached the suite untouched and aborted with three "not
+    exported by the MCP::Constants module" import errors that named
+    neither MCP nor a version. It now dies with "MCP version 0.15
+    required--this is only version 0.13". No other test file needs
+    the guard — they either avoid the protocol layer or, in the case
+    of t/50-bash-bin.t, deliberately straddle both revisions.
+  - GH #1 ("Can't call method has_scope on unblessed reference") was
+    already fixed in 0.104 by passing MCP::Server::Context instances
+    instead of raw hashrefs, and is not reproducible since. The
+    smoker report predates that release.
+  - Fix mcp-run-compress injecting the Co-Authored-By trailer into the
+    wrong quote. The git-commit transform targeted the last double quote
+    of the whole command line, so a compound command like
+    `git commit -m "x" && git config user.name "y"` had the trailer
+    written into the git config value (corrupting it) instead of the
+    commit message. The injection now lands after the closing quote of
+    the commit's own -m/--message argument; commands without one (e.g.
+    `git commit --amend` opening the editor) are left alone. The flag
+    match also covers bundled short options ending in the message flag
+    (`git commit -am "..."`, -sm, -anm), which contain no literal `-m`
+    and had lost the trailer entirely; the flag must now start an
+    argument, so a `-m` inside a value like /tmp/msg-m is no longer
+    mistaken for it.
+  - Fix the same transform's replacement path swallowing the closing
+    quote: s/Co-Authored-By: [^\n]+/.../g matched the quote too when
+    the trailer ended a -m "..." message, leaving the shell with an
+    unterminated string. The character class now stops at the quote
+    ([^\n"]+), so replacing an existing Co-Authored-By line keeps the
+    message intact.
+
 0.105     2026-08-10 16:59:50Z
   - Migrate the release process fully into the [@Author::GETTY] bundle
     and drop the hand-rolled maint/release-after.pl. Its

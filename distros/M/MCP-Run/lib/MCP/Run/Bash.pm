@@ -1,5 +1,5 @@
 package MCP::Run::Bash;
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 use Mojo::Base 'MCP::Run', -signatures;
 
 # ABSTRACT: MCP server that executes commands via bash
@@ -9,6 +9,12 @@ use IPC::Open3;
 use IO::Select;
 use Symbol 'gensym';
 use POSIX   ':sys_wait_h';
+
+has name => 'mcp-run-bash';
+
+
+has version => $VERSION;
+
 
 sub execute ($self, $command, $working_directory, $timeout) {
   my $full_command = $command;
@@ -92,7 +98,7 @@ MCP::Run::Bash - MCP server that executes commands via bash
 
 =head1 VERSION
 
-version 0.105
+version 0.106
 
 =head1 SYNOPSIS
 
@@ -117,6 +123,18 @@ C<cd '$dir' && $command> before being handed to bash.
 
 On timeout the child process is sent C<SIGTERM> and the exit code is set to
 C<124> (matching the convention used by GNU C<timeout(1)>).
+
+=head2 name
+
+Server name reported to the MCP client in C<serverInfo>. Defaults to
+C<mcp-run-bash>, overriding the C<PerlServer> default inherited from
+L<MCP::Server>. Pass C<name> to the constructor to identify as something else.
+
+=head2 version
+
+Server version reported to the MCP client in C<serverInfo>. Defaults to this
+distribution's version, overriding the C<1.0.0> default inherited from
+L<MCP::Server>.
 
 =head2 execute
 

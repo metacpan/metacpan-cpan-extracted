@@ -21,14 +21,14 @@ my %WriteMakefileArgs = (
   "NAME" => "MCP::Run",
   "PREREQ_PM" => {
     "JSON::MaybeXS" => 0,
-    "MCP" => 0,
+    "MCP" => "0.15",
     "Path::Tiny" => 0,
     "Text::Trim" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.105",
+  "VERSION" => "0.106",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
-  "MCP" => 0,
+  "MCP" => "0.15",
   "Path::Tiny" => 0,
   "Test::More" => 0,
   "Text::Trim" => 0

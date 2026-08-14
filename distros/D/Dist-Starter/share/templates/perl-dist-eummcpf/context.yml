@@ -1,8 +1,1 @@
 ---
-git_base_url: ''
-distname: Foo-Bar-Baz
-initial_version: v0.1.0
-abstract: ~
-author: ~
-license: perl_5
-min_perl_version: 5.010000

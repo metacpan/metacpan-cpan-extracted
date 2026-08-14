@@ -69,7 +69,7 @@
          "web" : "https://github.com/ikluft/Sys-OsRelease/issues"
       }
    },
-   "version" : "v0.4.6+lite",
+   "version" : "v0.4.7+lite",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-2.0"
 }

@@ -1,5 +1,13 @@
 Release history for Dist-Starter
 
+v0.2.0    2026-08-13T10:03:22Z
+          - Provide options for "license" and "initial version"
+          - Refactor "author" info processing
+          - Skip lines that contain any number (even 0) of blank characters
+            after placeholder substitution
+          - If provided normalize module name to distname
+          - Introduce "share" place holders
+
 v0.1.1    2026-08-06T14:40:21Z    Alpha release
           - Set XDG_CONFIG_HOME environment variable to fallback in api test
             script

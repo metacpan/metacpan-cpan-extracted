@@ -65,6 +65,18 @@ elsif ( $mode eq 'claim-stall' ) {
       $t->status('in-progress');
       $t->claimed_by('fake-agent');
       $store->save_task($t);
+      # The other half of what `karr move --claim` writes: the activity-log
+      # entry under the agent identity. That log is foundation's only evidence
+      # of which cards its agent engaged (#158), so a fake agent that skips it
+      # is not a stand-in for a karr client at all.
+      require App::karr::ActivityLog;
+      App::karr::ActivityLog->new( git => $store->git, role => 'agent' )
+        ->log_entry(
+          agent   => 'fake-agent',
+          action  => 'move',
+          task_id => $t->id + 0,
+          detail  => 'in-progress',
+        );
     }
     # already claimed/in-progress -> do nothing -> no board change -> stall
   }
@@ -122,6 +134,8 @@ subtest 'error patterns' => sub {
 
 subtest '_stuck_tasks' => sub {
   my $f = App::karr::Foundation->new;
+  # The agent engaged 1, 2 and 3 this run, all under the claim name 'a'.
+  my $eng = { seen => 0, ids => { 1 => 1, 2 => 1, 3 => 1 }, claims => { a => 1 } };
   my $before = {
     1 => { status => 'in-progress', claimed_by => 'a', updated => 'T1' },
     2 => { status => 'todo',        claimed_by => undef, updated => 'T1' },
@@ -132,12 +146,26 @@ subtest '_stuck_tasks' => sub {
     2 => { status => 'todo',        claimed_by => undef, updated => 'T1' }, # not claimed -> ignore
     3 => { status => 'done',        claimed_by => 'a', updated => 'T2' },  # advanced -> not stuck
   };
-  is_deeply [ $f->_stuck_tasks( $before, $after ) ], [1], 'only the unchanged claimed task is stuck';
+  is_deeply [ $f->_stuck_tasks( $before, $after, $eng ) ], [1],
+    'only the unchanged claimed task is stuck';
 
   # blocked task is never stuck
   my $b2 = { 1 => { status => 'in-progress', claimed_by => 'a', updated => 'T1' } };
   my $a2 = { 1 => { status => 'in-progress', claimed_by => 'a', updated => 'T1', blocked => 1 } };
-  is_deeply [ $f->_stuck_tasks( $b2, $a2 ) ], [], 'blocked task drops out';
+  is_deeply [ $f->_stuck_tasks( $b2, $a2, $eng ) ], [], 'blocked task drops out';
+
+  # Engagement is the gate: same unchanged card, no evidence the agent ever
+  # wrote to it, and no engagement record at all (#158).
+  is_deeply [ $f->_stuck_tasks( $before, $after,
+      { seen => 0, ids => {}, claims => {} } ) ], [],
+    'a card the agent never touched is not stuck';
+  is_deeply [ $f->_stuck_tasks( $before, $after ) ], [],
+    'no engagement record => nothing is stuck';
+
+  # Touched by the agent, but held by somebody else.
+  is_deeply [ $f->_stuck_tasks( $before, $after,
+      { seen => 0, ids => { 1 => 1 }, claims => { 'someone-else' => 1 } } ) ], [],
+    "a stranger's card is not stuck even when the agent touched it";
 };
 
 # ---------------------------------------------------------------------------
@@ -181,10 +209,24 @@ subtest '_autoblock_task' => sub {
   my $repo = make_git_repo();
   seed_board( $repo, { status => 'in-progress', claimed_by => 'a' } );
   my $f = App::karr::Foundation->new;
-  ok $f->_autoblock_task( $repo, 1, 'auto: nope' ), 'autoblock returns true';
+  ok $f->_autoblock_task( $repo, 1, 'auto: nope', { a => 1 } ),
+    'autoblock returns true';
   my $t = task_by_id( $repo, 1 );
   ok $t->has_blocked, 'task is blocked';
-  is $t->blocked, 'auto: nope', 'block reason stored';
+  is $t->block_reason, 'auto: nope', 'block reason stored';
+};
+
+subtest '_autoblock_task refuses somebody else\'s card' => sub {
+  my $repo = make_git_repo();
+  seed_board( $repo, { status => 'in-progress', claimed_by => 'human-alice' } );
+  my $f = App::karr::Foundation->new;
+  # The ownership test lives at the write too, not only in _stuck_tasks (#158).
+  ok ! $f->_autoblock_task( $repo, 1, 'auto: nope', { 'fake-agent' => 1 } ),
+    'autoblock declines a card the agent does not hold';
+  ok ! task_by_id( $repo, 1 )->has_blocked, 'and the card is untouched';
+  ok ! $f->_autoblock_task( $repo, 1, 'auto: nope' ),
+    'no claim set at all declines as well';
+  ok ! task_by_id( $repo, 1 )->has_blocked, 'still untouched';
 };
 
 # ---------------------------------------------------------------------------
@@ -222,7 +264,7 @@ subtest 'stalled task is auto-blocked' => sub {
 
   my $t = task_by_id( $repo, 1 );
   ok $t->has_blocked, 'stuck task ends up blocked';
-  like $t->blocked, qr/auto-block: no progress/, 'auto-block reason set';
+  like $t->block_reason, qr/auto-block: no progress/, 'auto-block reason set';
   ok ! $f->_has_actionable_tasks( $repo ), 'no actionable tasks left -> drain done';
 };
 

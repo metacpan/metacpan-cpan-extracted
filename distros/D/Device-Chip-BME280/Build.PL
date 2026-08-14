@@ -13,7 +13,7 @@ my $build = Module::Build->new(
 
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.03',
-      'Device::Chip::Sensor' => '0.23',
+      'Device::Chip::Sensor' => '0.27',
       'Future::Mutex' => '0.47', # weaken() bugfix
    },
    test_requires => {

@@ -48,6 +48,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'DBI' => '1.600',
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'DBIx-Loop-* Install/Files.pm' },
     # MakeMaker maps Loop.xs -> Loop.c and does not rescan the INCLUDE:

@@ -826,6 +826,8 @@ t/32-OIDC-Token-Introspection.t
 t/32-OIDC-Token-Security.t
 t/32-RemoveOIDCToken.t
 t/33-Auth-and-issuer-OpenID2.t
+t/33-Auth-GitHub.t
+t/33-Auth-LinkedIn.t
 t/34-Auth-Proxy-and-REST-Server.t
 t/34-Auth-Proxy-and-REST-sessions.t
 t/34-Auth-Proxy-and-SOAP-Server.t
@@ -875,6 +877,8 @@ t/40-Notifications-JSON-File-with-token.t
 t/40-Notifications-JSON-File.t
 t/40-Notifications-JSON-LDAP.t
 t/40-Notifications-JSON-Server.t
+t/40-Notifications-PublicNotif-DBI.t
+t/40-Notifications-PublicNotif-LDAP.t
 t/40-Notifications-PublicNotif.t
 t/40-Notifications-XML-DBI.t
 t/40-Notifications-XML-File.t
@@ -945,6 +949,7 @@ t/62-SingleSession-with-Rules.t
 t/62-SingleSession.t
 t/62-UpgradeSession-disabled.t
 t/62-UpgradeSession.t
+t/63-History-password-events-not-failed.t
 t/63-History.t
 t/64-StayConnected-single-connection.t
 t/64-StayConnected-singleSession.t

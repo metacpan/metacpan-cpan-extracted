@@ -39,6 +39,6 @@ requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/ikluft/Sys-OsRelease/issues
-version: v0.4.6+lite
+version: v0.4.7+lite
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_spdx_expression: Artistic-2.0

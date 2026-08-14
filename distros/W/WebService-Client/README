@@ -1,11 +1,10 @@
 NAME
 
-    WebService::Client - A base role for quickly and easily creating web
-    service clients
+    WebService::Client - A base role for creating web service clients
 
 VERSION
 
-    version 1.0001
+    version 1.0100
 
 SYNOPSIS
 
@@ -78,26 +77,25 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This module is a base role for quickly and easily creating web service
-    clients. Every time I created a web service client, I noticed that I
-    kept rewriting the same boilerplate code independent of the web
-    service. This module does the boring boilerplate for you so you can
-    just focus on the fun part - writing the web service specific code.
+    This module is a base role for creating web service clients. Every time
+    I created one, I rewrote the same boilerplate code. This module
+    provides that boilerplate so you can write the web service specific
+    code.
 
 METHODS
 
     These are the methods this role composes into your class. The HTTP
-    methods (get, post, put, and delete) will return the deserialized
-    response data, if the response body contained any data. This will
-    usually be a hashref. If the web service responds with a failure, then
+    methods (get, post, put, patch, delete, head, options) return the
+    deserialized response data if the response body contains any data. This
+    will usually be a hashref. If the web service responds with a failure,
     the corresponding HTTP response object is thrown as an exception. This
     exception is a HTTP::Response object that has the
-    HTTP::Response::Stringable role so it can be easily logged. GET
-    requests that respond with a status code of 404 or 410 will not throw
-    an exception. Instead, they will simply return undef.
+    HTTP::Response::Stringable role so it can be logged. GET requests that
+    respond with a status code of 404 or 410 will not throw an exception.
+    Instead, they will simply return undef.
 
-    The http methods get/post/put/delete can all take the following
-    optional named arguments:
+    The http methods get/post/put/patch/delete/head/options can all take
+    the following optional named arguments:
 
     headers
 
@@ -120,11 +118,11 @@ METHODS
     Example:
 
         $client->post(
-            /widgets,
+            '/widgets',
             { color => 'blue' },
             headers      => { x_custom_header => 'blah' },
             serializer   => sub { ... },
-            deserialized => sub { ... },
+            deserializer => sub { ... },
         }
 
  get
@@ -151,6 +149,7 @@ METHODS
  patch
 
         $client->patch('/foo', { some => 'data' });
+        $client->patch('/foo', { some => 'data' }, headers => { foo => 'bar' });
 
     Makes an HTTP PATCH request.
 
@@ -159,6 +158,22 @@ METHODS
         $client->delete('/foo');
 
     Makes an HTTP DELETE request.
+
+ head
+
+        $client->head('/foo');
+        $client->head('/foo', { query => 'params' });
+        $client->head('/foo', { query => 'params' }, headers => { foo => 'bar' });
+
+    Makes an HTTP HEAD request. Supports query parameters like get.
+
+ options
+
+        $client->options('/foo');
+        $client->options('/foo', { some => 'data' });
+        $client->options('/foo', { some => 'data' }, headers => { foo => 'bar' });
+
+    Makes an HTTP OPTIONS request.
 
  req
 
@@ -171,7 +186,7 @@ METHODS
     a contrived example:
 
         around req => sub {
-            my ($orig, $self, $req) = @_;
+            my ($orig, $self, $req, @rest) = @_;
             $req->authorization_basic($self->login, $self->password);
             return $self->$orig($req, @rest);
         };
@@ -219,6 +234,25 @@ ATTRIBUTES
 
     Optional. Default is 'application/json'.
 
+ array_query_style
+
+    Optional. Controls how array-valued query parameters are encoded in GET
+    requests.
+
+        # php style (default) - ids[]=1&ids[]=2
+        array_query_style => 'php',
+    
+        # rfc style - ids=1&ids=2
+        array_query_style => 'rfc',
+
+    The 'php' style appends [] to the key for each array value. This
+    matches how query parameters are parsed in many web frameworks. It is
+    the default for backward compatibility with earlier versions of this
+    module.
+
+    The 'rfc' style repeats the key for each value. This is specified by
+    RFC 3986 and is the standard behavior for most modern REST APIs.
+
  serializer
 
     Optional. A coderef that serializes the request content. Set this to
@@ -231,8 +265,7 @@ ATTRIBUTES
 
 EXAMPLES
 
-    Here are some examples of web service clients built with this role. You
-    can view their source to help you get started.
+    Web service clients built with this role:
 
       * Business::BalancedPayments
 

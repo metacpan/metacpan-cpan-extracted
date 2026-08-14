@@ -1,5 +1,17 @@
 Revision history for Punk
 
+0.08    2026-08-14
+        - t/42-immortal-refcount.t failed the distribution on perl 5.18,
+          where perl itself moves the refcount it measures. Before 5.20
+          av_extend filled the slots it allocated with &PL_sv_undef and
+          av_undef released every slot up to the fill.
+
+0.07    2026-08-13
+        - The router stored &PL_sv_yes bare in three set-membership hashes
+        - New PUNK_SET_TRUE (include/punk/punk_compat.h) is the sanctioned
+          way to put a true value in a set slot - it takes the reference
+          first, so the container has one to spend, with no allocation.
+
 0.06    2026-08-13
         - Rate limiting and IP blocking over Hyperman's shared arena
           (requires Hyperman 0.18, ABI v3; fails open without it).

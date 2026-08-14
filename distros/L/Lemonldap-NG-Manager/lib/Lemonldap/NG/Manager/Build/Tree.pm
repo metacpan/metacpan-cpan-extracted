@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.23.1';
+our $VERSION = '2.23.3';
 
 sub tree {
     return [ {
@@ -1216,6 +1216,7 @@ sub tree {
                                 'SMTPPort',
                                 'SMTPAuthUser',
                                 'SMTPAuthPass',
+                                'SMTPAuthMech',
                                 'SMTPTLS',
                                 'SMTPTLSOpts',
                                 {

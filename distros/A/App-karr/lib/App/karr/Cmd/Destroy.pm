@@ -1,7 +1,7 @@
 # ABSTRACT: Destroy the ref-backed karr board
 
 package App::karr::Cmd::Destroy;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -36,7 +36,7 @@ sub execute {
   $self->sync_before;
 
   die "No karr board found. Run 'karr init' to create one.\n"
-    unless $store->board_exists;
+    unless $store->has_board_refs;
 
   $store->delete_all_karr_refs;
 
@@ -59,7 +59,7 @@ App::karr::Cmd::Destroy - Destroy the ref-backed karr board
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

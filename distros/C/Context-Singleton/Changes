@@ -1,5 +1,7 @@
 Revision history for Context::Singleton
 
+v1.0.9     2026-08-13 15:13 UTC
+
 v1.0.8     2026-08-12 19:07 UTC
 
     Fix issue when frame calling depth was change

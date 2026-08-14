@@ -11,6 +11,7 @@ use App::karr::Git;
 use App::karr::BoardStore;
 use App::karr::Task;
 use App::karr::ActivityLog;
+use App::karr::Lock;
 use App::karr::Cmd::Pick;
 
 # Regression for karr board ticket #20:
@@ -77,7 +78,7 @@ subtest 'pick claims a task, releases its lock, and logs the pick' => sub {
 
   # The locking path ran end-to-end: the lock ref for the picked task must have
   # been acquired and then released, so it should no longer exist.
-  my $lock_ref = 'refs/karr/tasks/' . $claimed[0]->id . '/lock';
+  my $lock_ref = App::karr::Lock->LOCK_ROOT . $claimed[0]->id . '/lock';
   ok( !$git->ref_exists($lock_ref), 'lock ref released after pick' );
 
   # ...and the pick was written to the activity log.

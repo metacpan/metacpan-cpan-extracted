@@ -128,6 +128,7 @@ t/37-Common-TOTP.t
 t/38-SAML-Metadata.t
 t/40-Common-Session.t
 t/41-Common-EmailAddress.t
+t/42-Common-EmailTransport.t
 t/45-importMetadata-config.t
 t/45-importMetadata.t
 t/50-Combination-Parser.t

@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.23.1';
+our $VERSION = '2.23.3';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -2193,6 +2193,12 @@ sub attributes {
         SMTPAuthPass => {
             type          => 'password',
             documentation => 'Password to use to send mails',
+        },
+        SMTPAuthMech => {
+            type          => 'text',
+            default       => '',
+            test          => qr/^[\w\s-]*$/,
+            documentation => 'SASL mechanism(s) to use to send mails',
         },
 
         # Mails

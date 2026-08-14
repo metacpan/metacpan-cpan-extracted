@@ -10,7 +10,7 @@ use Test::More;
 use DBIx::Loop;
 
 SKIP: {
-    skip 'IO::Async required', 4 unless eval { require IO::Async::Loop; 1 };
+    skip 'IO::Async required', 6 unless eval { require IO::Async::Loop; 1 };
     require DBIx::Loop::Loop::IOAsync;
     my $ad = DBIx::Loop::Loop::IOAsync->new;
 
@@ -25,6 +25,23 @@ SKIP: {
     $g->fail("io boom\n");
     ok($ng->is_failed, 'failure crosses to Future');
     like(($ng->failure)[0], qr/io boom/, 'failure text preserved');
+
+    # IO::Async before 0.805 builds its Future by poking $f->{loop}, which a
+    # Future 0.50+ is not, so $loop->new_future dies "Not a HASH reference" on
+    # that pairing. The adapter falls back to a plain Future rather than take
+    # the caller down with it.
+    {
+        # 'once': IO::Async is required at runtime, so this glob is unknown
+        # to the compiler and naming it here is its only mention.
+        no warnings 'redefine', 'once';
+        local *IO::Async::Loop::new_future =
+            sub { die "Not a HASH reference at IO/Async/Future.pm line 74.\n" };
+        my $h  = DBIx::Loop::Future->new;
+        my $nh = $ad->to_native($h);
+        isa_ok($nh, 'Future', 'to_native past a broken $loop->new_future');
+        $h->done('fallback');
+        is(($nh->get)[0], 'fallback', 'values cross on the fallback future');
+    }
 }
 
 SKIP: {

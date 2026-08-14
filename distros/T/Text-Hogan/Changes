@@ -1,5 +1,9 @@
 Revision history for perl module Text::Hogan
 
+2.06 2026-08-13
+    * Github Actions
+    * add prereq of Text::Pod and Scalar::List::Utils to get Actions passing
+
 2.05 2026-07-19
     * update dependencies for Clone (0.50), Scalar::Util (1.70), Text::Trim (1.04) previous requirements were ancient
     * various speed ups

@@ -3,23 +3,30 @@
 use v5.26;
 use warnings;
 
+use Device::Chip::BMP280;
 use Device::Chip::BME280;
 use Device::Chip::Adapter;
 
 use Future::AsyncAwait;
 use Future::IO;
 
-use Getopt::Long;
+use Getopt::Long qw( :config no_ignore_case );
+
+my $MODEL;
 
 GetOptions(
    'i|interval=i'   => \(my $INTERVAL = 10),
    'p|print-config' => \my $PRINT_CONFIG,
    'addr|a=s'       => \my $ADDR,
+   'bmp'            => sub { $MODEL = "BMP280" },
+   'bme'            => sub { $MODEL = "BME280" },
 
    'adapter|A=s' => \my $ADAPTER,
 ) or exit 1;
 
-my $chip = Device::Chip::BME280->new;
+$MODEL //= "BME280";
+
+my $chip = "Device::Chip::$MODEL"->new;
 await $chip->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    addr => $ADDR,
@@ -34,6 +41,7 @@ END {
 }
 
 printf "Chip ID: %02X\n", await $chip->read_id;
+await $chip->check_id;
 
 await $chip->change_config(
    # Turn on all three sensors
@@ -57,7 +65,9 @@ while(1) {
 
    printf "Pressure=%.3fkPa  ", $press / 1000;
 
-   printf "Humidity=%.2f%%\n", $hum;
+   printf "Humidity=%.2f%%", $hum if $MODEL eq "BME280";
+
+   print "\n";
 
    await Future::IO->sleep( $INTERVAL );
 }

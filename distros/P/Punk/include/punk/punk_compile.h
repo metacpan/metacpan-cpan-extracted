@@ -244,7 +244,7 @@ static void pc_discover_namespace(pTHX_ SV *ns_sv, AV *out) {
             name  = sv_2mortal(newSVpvn(es, el - 3));
             class = sv_2mortal(newSVsv(ns_sv)); sv_catsv(class, name);
             if (hv_exists_ent(seen, class, 0)) continue;
-            (void)hv_store_ent(seen, class, &PL_sv_yes, 0);
+            (void)hv_store_ent(seen, class, PUNK_SET_TRUE, 0);
             if (!pc_class_can(aTHX_ SvPVX(class), SvCUR(class),
                               "_punk_model_meta")) {
                 SV *file = sv_2mortal(newSVsv(dir));

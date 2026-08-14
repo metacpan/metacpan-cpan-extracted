@@ -10,6 +10,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "punk/punk_immortal_probe.h"  /* TEMP author probe (-DPUNK_IMMORTAL_PROBE) */
 
 #include "punk/punk_compat.h"     /* pre-5.16 perl shims; must precede punk/ */
 

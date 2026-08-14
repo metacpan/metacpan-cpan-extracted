@@ -307,29 +307,6 @@ Default: /var/www/<MONIKER>
 
 This class implements the following methods
 
-=head2 startup
-
-This is your main hook into the application, it will be called at application startup.
-Meant to be overloaded in a subclass.
-
-This method is called immediately after creating the instance and returns it
-
-B<NOTE:> Please use only in your subclasses!
-
-    sub startup {
-        my $self = shift;
-
-        . . .
-
-        return $self; # REQUIRED!
-    }
-
-=head2 debugmode
-
-    $app->debugmode;
-
-Returns debug flag. 1 - on, 0 - off
-
 =head2 begin
 
     my $timing_begin = $app->begin;
@@ -339,6 +316,13 @@ This method sets timestamp for L</elapsed>
     my $timing_begin = $app->begin;
     # ... long operations ...
     my $elapsed = $app->elapsed( $timing_begin );
+
+=head2 debugmode
+
+    $app->debugmode;
+
+Returns debug flag. 1 - on, 0 - off
+
 
 =head2 elapsed
 
@@ -382,6 +366,13 @@ Returns list of names of registered handlers
     my @names_and_aliases = $app->handlers(1);
 
 Returns list of aliases and names of registered handlers
+
+=head2 has_handler
+
+    $app->has_handler($command)
+        or die "The command not found";
+
+This method returns true if the specified command name is exists
 
 =head2 lookup_handler
 
@@ -551,6 +542,23 @@ Runs handler by name and returns result of it handler running
 Returns the verbose flag in the opposite value. 0 - verbose, 1 - silent.
 
 See L</verbosemode>
+
+=head2 startup
+
+This is your main hook into the application, it will be called at application startup.
+Meant to be overloaded in a subclass.
+
+This method is called immediately after creating the instance and returns it
+
+B<NOTE:> Please use only in your subclasses!
+
+    sub startup {
+        my $self = shift;
+
+        . . .
+
+        return $self; # REQUIRED!
+    }
 
 =head2 testmode
 
@@ -1165,6 +1173,12 @@ sub handlers {
         }
     }
     return [(sort {$a cmp $b} keys %seen)];
+}
+sub has_handler {
+    my $self = shift;
+    my $name = trim(shift // '');
+    return undef unless length $name;
+    return !!grep { $_ eq $name } @{ $self->handlers(1) };
 }
 sub run_handler {
     my $self = shift;

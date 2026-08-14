@@ -55,14 +55,35 @@ sub run {
         is(scalar @{ $wide->{rows}[0] }, 10, 'ten columns cross intact');
 
         # -- a larger result set --------------------------------------------------
+        #
+        # The seed writes go one at a time, on purpose. Two pool workers are
+        # two processes writing one SQLite file and SQLite serialises writers,
+        # so fired off as a 500-deep burst they fight for the write lock; on a
+        # loaded machine a starved writer sits out its whole busy timeout and
+        # comes back "database is locked". Nothing here ever looked at the
+        # write futures, so that arrived as a silent short row count (a CPAN
+        # smoker reported 497). Nothing about crossing 500 rows needs
+        # concurrent writers - the concurrent-work path is what the read burst
+        # below, AdapterConformance and t/02-pool.t are for - and a failed
+        # write is now a named failure rather than a missing row.
         {
-            my @f;
+            my ($written, $err) = (0, undef);
             for my $i (100 .. 599) {
-                push @f, $db->do("INSERT INTO p (id, name, n) VALUES (?,?,?)",
-                                 $i, "row$i", $i);
+                my $f = $db->do("INSERT INTO p (id, name, n) VALUES (?,?,?)",
+                                $i, "row$i", $i);
+                $ad->await($f);
+                if ($f->is_failed) { $err ||= "row $i: " . $f->failure; next }
+                $written++;
             }
-            $ad->await($_) for @f;
-            my $big = $await->($db->query("SELECT id, name, n FROM p WHERE id >= 100 ORDER BY id"));
+            is($written, 500, '500 rows written') or diag($err);
+
+            my @q = map { $db->query(
+                "SELECT id, name, n FROM p WHERE id >= 100 ORDER BY id") } 1 .. 3;
+            $ad->await($_) for @q;
+            is(scalar(grep { $_->is_done } @q), 3,
+                'three concurrent 500-row reads all resolve')
+                or diag(join '', map { $_->is_failed ? $_->failure : () } @q);
+            my $big = $q[0]->is_done ? ($q[0]->get)[0] : { rows => [] };
             is(scalar @{ $big->{rows} }, 500, '500-row result set crosses');
             is($big->{rows}[499][1], 'row599', 'last row intact');
         }

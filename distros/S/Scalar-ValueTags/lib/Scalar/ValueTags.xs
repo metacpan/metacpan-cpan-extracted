@@ -554,6 +554,19 @@ static MAGIC *S_remove_value_tags_magic(pTHX_ SV *vt_type, SV *sv)
     return mg;
 }
 
+#ifdef HAVE_DMD_HELPER
+static int dumpmagic(pTHX_ DMDContext *ctx, const SV *sv, MAGIC *mg)
+{
+    DMD_DUMP_MGv2_USERSTRUCT(ctx, "Scalar::ValueTags/VALUETAGS", mg,
+      1, ((const DMDNamedField []){
+        {"the tags", DMD_FIELD_PTR, .ptr = VALUETAGS(mg) },
+      })
+    );
+
+    return 0;
+}
+#endif
+
 #endif /* HAVE_VALUE_MAGIC */
 
 /*** API ***/
@@ -731,5 +744,9 @@ BOOT:
     MY_CXT_INIT;
     MY_CXT.vt_specs = NULL;
     MY_CXT.final_vt_spec = NULL;
+#    ifdef HAVE_DMD_HELPER
+    DMD_ADD_ROOT((SV *)&magic_funcs, "the Scalar::ValueTags magic funcs");
+    DMD_SET_MGv2_HELPER(&magic_funcs, dumpmagic);
+#    endif
 }
 # endif

@@ -11,7 +11,20 @@
 # that way on 5.14 and 5.18 while passing everywhere newer.
 #
 # So assert the invariant rather than the symptom. The refcount of the
-# immortal must not move across any number of these calls, on every perl.
+# immortal must not move across any number of these calls.
+#
+# On perl before 5.20 it moves whatever we do, which is why this file checks
+# before it measures. Those perls filled the array slots av_extend allocated
+# with &PL_sv_undef (perl5200delta: "Arrays now use NULL internally to
+# represent unused slots, instead of &PL_sv_undef") and released every slot
+# up to the fill on free, fillers included. So an ordinary hole in an array -
+# `my @a; $a[3] = 1` will do it, no XS required - spends immortal references
+# by itself, and this measurement can no longer tell a leak from perl's own
+# bookkeeping. Where the control below finds that, the file skips: the tool
+# for the invisible class on those perls is the probe header, not this test.
+# See include/punk/punk_immortal_probe.h, whose -DPUNK_OLD_AV_HOLES puts the
+# pre-5.20 array behaviour back on a current perl so the arithmetic can be
+# checked without an old perl to hand.
 
 use 5.010;
 use strict;
@@ -41,6 +54,19 @@ sub immortal_refcount {
 
 plan skip_all => 'cannot read the immortal refcount on this perl'
     unless defined immortal_refcount() && immortal_refcount() =~ /^\d+$/;
+
+# The control: plain Perl, one array, one hole, no XS anywhere near it. If the
+# immortal moves for that, it moves for everything, and nothing measured here
+# would mean what it says.
+{
+    my $before = immortal_refcount();
+    for (1 .. 20) { my @a; $a[3] = 1; }
+    plan skip_all => 'this perl spends immortal references on ordinary array '
+        . 'holes (before 5.20 av_extend filled unused slots with '
+        . '&PL_sv_undef and av_undef released them), so perl\'s own '
+        . 'bookkeeping cannot be told from a leak here'
+        if $before != immortal_refcount();
+}
 
 # $n runs of $code must leave the immortal exactly where it started.
 sub holds_steady {

@@ -4,6 +4,7 @@ cpanfile
 {{main_module_podfile}}
 Makefile.PL
 MANIFEST			This list of files
+MY.pm
 README
 t/basic.t
 t/critic.t

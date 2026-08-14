@@ -1,7 +1,7 @@
 # ABSTRACT: Hand off a task for review
 
 package App::karr::Cmd::Handoff;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -9,11 +9,16 @@ use MooX::Options (
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
+use App::karr::Role::TaskMutation;
 use App::karr::Task;
 use App::karr::Config;
 use Time::Piece;
 
-with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output', 'App::karr::Role::ClaimTimeout';
+# TaskMutation composes Role::ClaimTimeout, which is where check_claim comes
+# from; handoff no longer names it separately because it no longer applies the
+# claim rule on its own terms.
+with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output',
+     'App::karr::Role::TaskMutation';
 
 
 option claim => (
@@ -52,63 +57,77 @@ sub execute {
   $self->check_positional_args($args_ref, 1);
 
   $self->sync_before;
+  $self->require_board;
 
   my @pos = $self->positional_args($args_ref);
   my $id = $pos[0] or die "Usage: karr handoff ID --claim NAME [--note TEXT] [--block REASON] [--release]\n";
 
-  my $ec = $self->store->effective_config;
+  # The status a handoff lands in: the board's review column when it has one,
+  # the derived last non-terminal column when it does not -- a literal
+  # C<review> here made handoff unusable on any board without that column
+  # (ticket #102). The derivation lives on the config, next to the
+  # terminal-status rule it builds on.
+  my $target = App::karr::Config->from_merged( $self->store->effective_config )
+    ->handoff_status;
 
-  my $task = $self->find_task($id);
-  die "Task $id not found\n" unless $task;
+  # Handoff used to read the task, mutate it and save it back unguarded, so a
+  # claim landing in that window was overwritten rather than obeyed -- the same
+  # read-then-write #44/#46/#56 closed everywhere else. update_task_guarded is
+  # that closure: the claim rule below is applied to the revision this writes,
+  # and re-applied if another agent gets in first (ticket #97).
+  my $task = $self->update_task_guarded($id, sub {
+    my ($task) = @_;
 
-  # Validate claim ownership
-  if ($task->has_claimed_by && $task->claimed_by ne $self->claim) {
-    my $timeout = $self->_parse_timeout($ec->{claim_timeout} // '1h');
-    unless ($self->_claim_expired($task, $timeout)) {
-      die sprintf "Task %d is claimed by %s\n", $task->id, $task->claimed_by;
+    # The one claim-ownership rule, shared with move/edit/delete/archive rather
+    # than reimplemented here.
+    $self->check_claim($task, $self->claim);
+
+    # And the one status-change path, so the handoff obeys the same
+    # require_claim, status validation and lifecycle stamps as `karr move`
+    # (tickets #54, #55, #68). --claim is required on this command, so a target
+    # status flagged require_claim is always satisfied.
+    $self->apply_status_change($task, $target, $self->claim);
+
+    # Refresh claim
+    $task->claimed_by($self->claim);
+    $task->claimed_at(gmtime->datetime . 'Z');
+
+    # Block if requested. length, not truth: --block 0 is a reason (ticket #153,
+    # extending ticket #78's rule to the handoff path).
+    if (defined $self->block && length $self->block) {
+      $task->block($self->block);
     }
-  }
 
-  # Move to review
-  my $old_status = $task->status;
-  if ($task->status ne 'review') {
-    $task->status('review');
-  }
-
-  # Refresh claim
-  $task->claimed_by($self->claim);
-  $task->claimed_at(gmtime->datetime . 'Z');
-
-  # Block if requested
-  if ($self->block) {
-    $task->blocked($self->block);
-  }
-
-  # Append note
-  if ($self->note) {
-    my $note_text = $self->note;
-    if ($self->timestamp) {
-      $note_text = gmtime->strftime('%Y-%m-%d %H:%M') . ' ' . $note_text;
+    # Append note. length, not truth: --note 0 is a note (ticket #153, the
+    # same fix as --append_body in edit).
+    if (defined $self->note && length $self->note) {
+      my $note_text = $self->note;
+      if ($self->timestamp) {
+        $note_text = gmtime->strftime('%Y-%m-%d %H:%M') . ' ' . $note_text;
+      }
+      my $have = defined $task->body && length $task->body;
+      $task->body(($have ? $task->body . "\n" : '') . $note_text);
     }
-    $task->body(($task->body ? $task->body . "\n" : '') . $note_text);
-  }
 
-  # Release claim if requested
-  if ($self->release) {
-    $task->clear_claimed_by;
-    $task->clear_claimed_at;
-  }
-
-  $self->save_task($task);
+    # Release claim if requested
+    if ($self->release) {
+      $task->clear_claimed_by;
+      $task->clear_claimed_at;
+    }
+  });
 
   $self->sync_after;
 
+  # The handoff target is a working column, so apply_status_change above will
+  # have recorded any unsatisfied dependencies; this emits them (ticket #123).
+  my %dependency = $self->dependency_report( $task->id );
+
   if ($self->json) {
-    $self->print_json($task->to_json_hash);
+    $self->print_json({ %{ $task->to_json_hash }, %dependency });
     return;
   }
 
-  my $msg = sprintf "Handed off task %d -> review", $task->id;
+  my $msg = sprintf "Handed off task %d -> %s", $task->id, $target;
   $msg .= sprintf " (blocked: %s)", $self->block if $self->block;
   $msg .= " (claim released)" if $self->release;
   print "$msg\n";
@@ -128,7 +147,7 @@ App::karr::Cmd::Handoff - Hand off a task for review
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -138,9 +157,11 @@ version 0.402
 
 =head1 DESCRIPTION
 
-Moves a task into C<review> and refreshes its claim so the next stage of work
-can see who handed it off. The command can append a note, add a blocker, and
-optionally release the claim after the handoff.
+Moves a task into the board's review column -- C<review> where the board
+configures one, the last non-terminal column where it does not
+(L<App::karr::Config/handoff_status>) -- and refreshes its claim so the next
+stage of work can see who handed it off. The command can append a note, add a
+blocker, and optionally release the claim after the handoff.
 
 =head1 OPTIONS
 

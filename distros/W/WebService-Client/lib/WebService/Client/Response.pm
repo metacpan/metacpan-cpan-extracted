@@ -1,15 +1,16 @@
 package WebService::Client::Response;
 use Moo;
 
-our $VERSION = '1.0001'; # VERSION
+our $VERSION = '1.0100'; # VERSION
 
 use JSON::MaybeXS ();
+use Scalar::Util qw(blessed);
 
 has res => (
     is => 'ro',
     isa => sub {
         die 'res must be a HTTP::Response object'
-            unless shift->isa('HTTP::Response');
+            unless blessed($_[0]) && $_[0]->isa('HTTP::Response');
     },
     required => 1,
     handles => [qw(
@@ -52,7 +53,7 @@ WebService::Client::Response
 
 =head1 VERSION
 
-version 1.0001
+version 1.0100
 
 =head1 AUTHOR
 

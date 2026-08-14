@@ -1,7 +1,7 @@
 # ABSTRACT: Show board summary
 
 package App::karr::Cmd::Board;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -44,6 +44,12 @@ my %PRIORITY_COLOR = (
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
+
+  # Before anything is rendered: a repository with no board here would
+  # otherwise print the default config over an empty task list, which is
+  # byte-identical to a board that simply has no cards (#135). No sync -- see
+  # App::karr::Role::BoardDiscovery/require_local_board.
+  $self->require_local_board;
 
   my $ec = $self->store->effective_config;
   my @statuses = $self->store->all_status_names;
@@ -118,11 +124,15 @@ sub execute {
       if ($t->priority && $t->priority ne 'medium') {
         push @meta, $c->('priority:' . $t->priority, $PRIORITY_COLOR{$t->priority} // 'white');
       }
-      if ($t->has_claimed_by && $t->status ne 'done' && $t->status ne 'archived') {
+      # A claim is only worth showing while the work is still live, and which
+      # columns count as finished is the board's decision -- a board imported
+      # from kanban-md can end in `shipped`, and every finished card there
+      # still carried its claimant into the board (ticket #98, following #67).
+      if ($t->has_claimed_by && !$self->store->is_terminal_status($t->status)) {
         push @meta, $c->('@' . $t->claimed_by, 'cyan');
       }
       if ($t->has_blocked) {
-        my $reason = $t->blocked;
+        my $reason = $t->has_block_reason ? $t->block_reason : undef;
         $reason = substr($reason, 0, 40) . '...' if defined $reason && length $reason > 43;
         push @meta, $c->(
           defined $reason && length $reason ? "blocked:$reason" : 'blocked', 'bold red');
@@ -143,7 +153,9 @@ sub execute {
 
   # Summary footer
   my $blocked = grep { $_->has_blocked } @tasks;
-  my $claimed = grep { $_->has_claimed_by && $_->status ne 'done' && $_->status ne 'archived' } @tasks;
+  # Same test as the per-card `@claimant` token above, so the footer can never
+  # count a claim the board itself does not show.
+  my $claimed = grep { $_->has_claimed_by && !$self->store->is_terminal_status($_->status) } @tasks;
   my $done_hidden = $self->done ? 0 : scalar @{ $by_status{done} // [] };
   my $total_label = scalar(@tasks) . ' tasks';
   $total_label .= " ($done_hidden done hidden)" if $done_hidden;
@@ -167,7 +179,7 @@ App::karr::Cmd::Board - Show board summary
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

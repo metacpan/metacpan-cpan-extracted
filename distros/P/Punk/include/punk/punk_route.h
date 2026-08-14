@@ -176,7 +176,7 @@ static void pr_add_static(pTHX_ pr_router *rt, HV *seen,
     if (hv_exists_ent(seen, key, 0))
         croak("Punk::Router: duplicate route %.*s %.*s",
               (int)ml, m, (int)pl, p);
-    (void)hv_store_ent(seen, key, &PL_sv_yes, 0);
+    (void)hv_store_ent(seen, key, PUNK_SET_TRUE, 0);
     (void)hv_store_ent(rt->statics, key, newSViv(idx), 0);
     slot = hv_fetch(rt->static_paths, p, (I32)pl, 1);
     if (!(*slot && SvROK(*slot) && SvTYPE(SvRV(*slot)) == SVt_PVAV))
@@ -392,14 +392,14 @@ static int pr_allow(pTHX_ pr_router *rt,
         SSize_t j, n = av_len(ms) + 1;
         for (j = 0; j < n; j++) {
             SV **mv = av_fetch(ms, j, 0);
-            if (mv && *mv) (void)hv_store_ent(seen, *mv, &PL_sv_yes, 0);
+            if (mv && *mv) (void)hv_store_ent(seen, *mv, PUNK_SET_TRUE, 0);
         }
     }
     if (nsegs >= 0) {
         for (i = 0; i < rt->n; i++) {
             pr_rec *r = &rt->recs[i];
             if (!pr_segs_match(r, path, plen, seg_p, seg_l, nsegs)) continue;
-            (void)hv_store(seen, r->method, (I32)r->mlen, &PL_sv_yes, 0);
+            (void)hv_store(seen, r->method, (I32)r->mlen, PUNK_SET_TRUE, 0);
         }
     }
     /* the request method is not "other" */

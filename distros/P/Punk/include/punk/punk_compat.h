@@ -65,4 +65,15 @@ static MAGIC *Punk_mg_findext(SV *sv, int type, const MGVTBL *vtbl) {
 #  define mXPUSHs(s) XPUSHs(sv_2mortal(s))
 #endif
 
+/* A true value for a set-membership slot, that the container may own.
+ *
+ * &PL_sv_yes must never be stored bare: hv_store and friends take over a
+ * reference, and the matching decrement when the hash is freed lands on an
+ * immortal that nobody incremented. From perl 5.20 the immortals shrug that
+ * off; before it the refcount really does walk down to zero and the next
+ * thing to touch yes/no/undef segfaults. Taking the reference first costs
+ * nothing - it is still the same singleton, with no allocation - and keeps
+ * the books straight on every perl. See t/42-immortal-refcount.t. */
+#define PUNK_SET_TRUE SvREFCNT_inc_simple_NN(&PL_sv_yes)
+
 #endif /* PUNK_COMPAT_H */

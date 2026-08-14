@@ -97,7 +97,11 @@ subtest 'context command runs without strftime crash' => sub {
     local $@;
     eval {
       local *STDOUT;
-      open STDOUT, '>', \$md or die $!;
+      # Same layer bin/karr installs via enable_std_utf8: reopening STDOUT
+      # drops it, and App::karr::Encoding's POD makes putting it back the
+      # in-process capturer's job. Without it the em dash in a noted item
+      # (ticket #108) prints wide and warns.
+      open STDOUT, '>:encoding(UTF-8)', \$md or die $!;
       $cmd->execute( [], [] );
     };
     $@;
@@ -123,7 +127,7 @@ subtest 'context --json runs without strftime crash' => sub {
     local $@;
     eval {
       local *STDOUT;
-      open STDOUT, '>', \$out or die $!;
+      open STDOUT, '>:encoding(UTF-8)', \$out or die $!;
       $cmd->execute( [], [] );
     };
     $@;
@@ -145,7 +149,7 @@ subtest 'context recently-completed section exercises cutoff strftime' => sub {
     local $@;
     eval {
       local *STDOUT;
-      open STDOUT, '>', \$out or die $!;
+      open STDOUT, '>:encoding(UTF-8)', \$out or die $!;
       $cmd->execute( [], [] );
     };
     $@;

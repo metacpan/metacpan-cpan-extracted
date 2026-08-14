@@ -38,7 +38,7 @@ no_index:
 provides:
   Dist::Starter:
     file: lib/Dist/Starter.pm
-    version: v0.1.1
+    version: v0.2.0
 requires:
   Carp: '1.32'
   Fcntl: '0'
@@ -47,7 +47,7 @@ requires:
   File::ShareDir::Tiny: '0'
   File::Spec::Functions: '0'
   File::Temp: '0'
-  Getopt::Guided: v3.2.2
+  Getopt::Guided: v3.2.3
   PerlX::Maybe: '0'
   Safe::Isa: '0'
   Try::Tiny: '0'
@@ -58,5 +58,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/XSven/Dist-Starter/issues
   repository: https://codeberg.org/XSven/Dist-Starter.git
-version: v0.1.1
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -7,7 +7,7 @@ use feature qw( say );
 #<<<
 package Dist::Starter;
 BEGIN {
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.0';
 }
 #>>>
 
@@ -39,7 +39,7 @@ sub croakf ( $@ ) {
 sub print_usage_info () {
   my $script_name = basename( $0 );
   print STDOUT "Usage: $script_name [ -V | -h  ]\n",
-"       $script_name [ -T <template> ] [ -o <output directory> ] [ -n ] [ -A <abstract> ] [ -G <git base url> ] [ -M <min perl version> ] [ -a <author> ] <distname>\n";
+"       $script_name [ -T <template> ] [ -o <output directory> ] [ -n ] [ -A <abstract> ] [ -G <git base url> ] [ -I <initial version> ] [ -L <license> ] [ -M <min perl version> ] [ -S <share property>=<share value> ] [ -a <author from> ] <distname>\n";
   EOOD
 }
 
@@ -85,7 +85,8 @@ sub scaffold ( $$$ ) {
       local $^I   = '';
       local @ARGV = ( $file );
       while ( <ARGV> ) {
-        s/\{\{ ( [^}]+ ) \}\}/$context->lookup( $1 )/xeg;
+        # Skip lines that contain any number (even 0) of blank characters after placeholder substitution
+        next if s/\{\{ ( [^}]+ ) \}\}/$context->lookup( $1 )/xeg and m/\A[ \t]*\R\z/;
         print;
       }
     }
@@ -97,7 +98,7 @@ sub scaffold ( $$$ ) {
   my $distname = $context->lookup( 'distname' );
   defined(
     $project = try {
-      # Now its time to look for place holders in the file names
+      # Now its time to look for placeholders in the file names
       # On purpose declare $after_file before the foreach loop
       my $after_file;
       foreach my $before_file ( @files ) {
@@ -152,10 +153,11 @@ sub run {
     'o:' => \my $output_directory,
     'A:' => \my $abstract,
     'G:' => \my $git_base_url,
+    'I:' => \my $initial_version,
+    'L:' => \my $license,
     'M:' => \my $min_perl_version,
-    'a:' => \my $author
-    # https://metacpan.org/pod/CPAN::Meta::Spec#license
-    #'L:' => \my $license
+    'S=' => \my %share,
+    'a:' => \my $author_from
     or return EXIT_USAGE;
   ( $rv eq '-V' or $rv eq '-h' ) and return EXIT_SUCCESS;
 
@@ -163,6 +165,7 @@ sub run {
     or ( printf STDERR "Number of required arguments has to be %d but it is %d\n", 1, scalar @argv ),
     return EXIT_USAGE;
   my ( $distname ) = @argv;
+  $distname =~ s/::/-/g;
 
   my $entry_point = catdir( $template, DISTNAME_PLACEHOLDER );
   -d $entry_point
@@ -172,18 +175,23 @@ sub run {
     my $context = try {
       Dist::Starter::Context->load_from_file(
         catfile( $template, 'context.yml' ),
+        distname => $distname,
         # TODO:
         # Check if PerlX::Maybe::provided_deref_with_maybe $condition, $r, @rest
         # can be used
         maybe
           abstract => $abstract,
         maybe
-          author => $author,
-        maybe
-          distname => $distname,
+          author_from => $author_from,
         maybe
           git_base_url => $git_base_url,
-        maybe min_perl_version => $min_perl_version
+        maybe
+          initial_version => $initial_version,
+        maybe
+          license => $license,
+        maybe
+          min_perl_version => $min_perl_version,
+        !%share ? () : ( share => \%share )
       )
     } catch {
       $_->$_isa( 'Dist::Starter::Exception' ) ? say STDERR $_->message : die $_;

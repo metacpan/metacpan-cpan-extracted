@@ -1,10 +1,10 @@
 {
    "abstract" : "like require for relative paths",
    "author" : [
-      "Branislav Zahradn\u00edk <barney@cpan.org>"
+      "Branislav Zahradn\u00edk <barney.cpan@gmail.org>>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -48,13 +48,13 @@
    "provides" : {
       "require::relative" : {
          "file" : "lib/require/relative.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
-   "version" : "1.0.0",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "1.0.1",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

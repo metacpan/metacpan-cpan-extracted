@@ -1,11 +1,11 @@
 package Dancer2::Plugin::Auth::Extensible;
 
-our $VERSION = '0.712';
+our $VERSION = '0.713';
 
 use strict;
 use warnings;
 use Carp;
-use Dancer2::Core::Types qw(ArrayRef Bool HashRef InstanceOf Int Str);
+use Dancer2::Core::Types qw(ArrayRef Bool HashRef Maybe Int Str);
 use Dancer2::FileUtils qw(path);
 use Dancer2::Template::Tiny;
 use File::Share qw(dist_dir);
@@ -176,22 +176,24 @@ has reset_password_handler => (
 );
 
 has uri_base => (
-    is             => 'ro',
-    isa            => InstanceOf["URI"],
-    lazy           => 1,
-    coerce         => sub {
-        my $value = shift;
-        $value = URI->new($value) if ! blessed $value;
-        # Make sure that URI always ends in separator, so that the path can be
-        # appended
-        $value->path($value->path =~ s!/*$!/!r);
-        $value;
-    },
-    builder        => sub {
-        my $plugin = shift;
-        $plugin->config->{uri_base} || $plugin->app->request->uri_base;
-    },
+    is          => 'ro',
+    isa         => Maybe[Str],
+    from_config => 1,
 );
+
+# Use the uri_base from the configuration if set, otherwise the one from this
+# particular request. This can potentially generate security vulnerabilities if
+# the calling application allows unsanitised host headers (see pod for
+# uri_base).
+sub uri_base_request
+{   my $plugin = shift;
+    my $base = $plugin->uri_base || $plugin->app->request->uri_base;
+    my $uri = URI->new($base);
+    # Make sure that URI always ends in separator, so that the path can be
+    # appended
+    $uri->path($uri->path =~ s!/*$!/!r);
+    $uri;
+}
 
 has user_home_page => (
     is          => 'ro',
@@ -1055,7 +1057,7 @@ sub _default_email_password_reset {
         %message = &{$password_reset_text}( $plugin, %options );
     }
     else {
-        my $link = URI->new_abs("login/$options{code}", $plugin->uri_base);
+        my $link = URI->new_abs("login/$options{code}", $plugin->uri_base_request);
         my $appname = $plugin->app->config->{appname} || '[unknown]';
         $message{subject} = "Password reset request";
         $message{from}    = $plugin->mail_from;
@@ -1122,7 +1124,7 @@ sub _default_welcome_send {
     }
     else {
         my $appname    = $plugin->app->config->{appname} || '[unknown]';
-        my $reset_link = URI->new_abs("login/$options{code}", $plugin->uri_base);
+        my $reset_link = URI->new_abs("login/$options{code}", $plugin->uri_base_request);
         $message{subject} = "Welcome to $appname";
         $message{from}    = $plugin->mail_from;
         $message{plain}   = <<__EMAIL;
@@ -2223,6 +2225,12 @@ Called after successful login just before redirect is called.
 =head2 before_logout
 
 Called just before the session gets destroyed on logout.
+
+=head1 SECURITY CONSIDERATIONS
+
+If not used correctly, this module can potentially be abused to insert
+malicious URIs in the emails that it generates. See the documentation for
+uri_base, create_user and password_reset_send.
 
 =head1 AUTHOR
 

@@ -25,18 +25,20 @@ my $build = Module::Build->new(
     create_license  => 1,
     create_manifest => 1,
     create_readme   => 1,
-    add_to_cleanup  => [
-        'LICENSE',
-        'MANIFEST',
-        'META.*',
-        'README',
-    ],
+    add_to_cleanup  => [ 'MANIFEST', 'META.*', 'DMD_helper.h' ],
+    meta_merge      => {
+        resources => {
+            license    => 'https://dev.perl.org/licences/',
+            bugtracker => 'https://github.com/Zhtwn/Scalar-ValueTags/issues',
+            repository => 'git://github.com/Zhtwn/Scalar-ValueTags.git',
+        },
+    },
 );
 
 if (
     eval {
         require Devel::MAT::Dumper::Helper
-          and Devel::MAT::Dumper::Helper->VERSION('0.45');
+          and Devel::MAT::Dumper::Helper->VERSION('0.52');
     }
   )
 {

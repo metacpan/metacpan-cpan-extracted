@@ -4,12 +4,41 @@
 
 use strict;
 use warnings;
+our $VERSION = '0.500';
 use App::karr;
+use App::karr::SyncGuard;
+use App::karr::Encoding qw( decode_argv enable_std_utf8 );
+use App::karr::Error qw( is_usage_error );
 
-if (@ARGV) {
-    $ARGV[0] = 'setrefs' if $ARGV[0] eq 'set-refs';
-    $ARGV[0] = 'getrefs' if $ARGV[0] eq 'get-refs';
-    $ARGV[0] = 'agentname' if $ARGV[0] eq 'agent-name';
+# The character/octet boundary (ticket #53). Everything above this line is
+# bytes, everything below is Perl characters: @ARGV comes in decoded, STDOUT and
+# STDERR encode on the way out, and no command body encodes anything itself.
+# STDIN stays raw on purpose -- karr restore decodes its own payload.
+enable_std_utf8();
+decode_argv();
+
+# Push insurance, flushed at the last safe moment (ticket #37).
+#
+# App::karr::Role::SyncLifecycle arms an App::karr::SyncGuard for every writing
+# command and stashes it on the command object, so that a body dying before
+# sync_after still pushes what it wrote. On this CLI that never fired: the run
+# below is wrapped in an eval, the handler exits, and MooX::Cmd's command chain
+# holds the command object -- so the guard was first reaped in global
+# destruction, where App::karr::Git refuses to work at all (#34) and the guard
+# can do nothing but print "run karr sync".
+#
+# END is the fix: it runs before global destruction with the interpreter still
+# whole, and unlike the error handler it also covers the exit() calls inside
+# command bodies and the option-parse exits from App::karr::Role::ExitCodes.
+#
+# $? is localized because the exit code is a documented contract (see EXIT CODES
+# below) and the push may shell out to `git` on App::karr::Git's CLI-fallback
+# path, whose open3/waitpid would otherwise overwrite it. flush_armed is
+# documented never to die, which is the other half of protecting that contract:
+# an exception here would abort perl's END queue and set its own exit status.
+END {
+    local $?;
+    App::karr::SyncGuard->flush_armed;
 }
 
 my $ran = eval { App::karr->new_with_cmd; 1 };
@@ -25,15 +54,25 @@ if ( !$ran ) {
     #   "Unknown command:"          the dispatch guard in App::karr
     #   "unexpected extra argument"  surplus positionals (Role::CliArgs)
     #   "Usage:"                     a missing required positional
-    # Any new usage-error die must start with one of these. Everything else --
-    # task not found, board missing, a Git/sync failure, a refused destructive
-    # operation -- is a runtime failure (1).
+    #   "Usage error:"               anything a command rejects as misuse that
+    #                                is not one of the shapes above -- raised
+    #                                via App::karr::Role::ExitCodes'
+    #                                usage_error(), which is the generic entry
+    #                                point for e.g. an out-of-range option value
+    # Any new usage-error die must start with one of these; prefer usage_error()
+    # over inventing a fifth marker. Everything else -- task not found, board
+    # missing, a Git/sync failure, a refused destructive operation -- is a
+    # runtime failure (1).
     #
-    # Option-parse errors (unknown option, invalid option value) never reach
+    # The markers themselves live in App::karr::Error::is_usage_error, because
+    # this handler is no longer their only reader: the batch runner in
+    # App::karr::Role::TaskMutation asks the same question to decide whether a
+    # failure belongs to one id or to the whole invocation (ticket #61).
+    #
+    # Option-parse errors (unknown option, unparseable option value) never reach
     # here: MooX::Options exits 2 directly via App::karr::Role::ExitCodes (and
     # the root's _print_help), so those exits bypass this eval.
-    my $is_usage = defined $err
-        && $err =~ /\A(?:Unknown command:|unexpected extra argument|Usage:)/;
+    my $is_usage = is_usage_error($err);
 
     print STDERR $err if defined $err && length $err;
     exit( $is_usage ? 2 : 1 );
@@ -51,7 +90,7 @@ karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -189,6 +228,11 @@ Shows the grouped board view.
 
 Finds the next suitable task and claims it for an agent.
 
+=item * L<App::karr::Cmd::Unlock>
+
+Shows the pick locks currently held on the board, and breaks them. The escape
+hatch for a lock left behind by an agent that died mid-pick.
+
 =item * L<App::karr::Cmd::Handoff>
 
 Moves work into review and optionally appends a timestamped note.
@@ -224,6 +268,12 @@ destructive and requires explicit confirmation flags.
 =item * L<App::karr::Cmd::Destroy>
 
 Deletes the whole board namespace from the repository.
+
+=item * L<App::karr::Cmd::Repair>
+
+Migrates a board written by karr 0.402 or earlier off double-encoded UTF-8.
+Reports by default; C<--yes> rewrites the affected refs. Idempotent, and a
+no-op on a board that is already current.
 
 =back
 

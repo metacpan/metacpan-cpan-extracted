@@ -3,7 +3,16 @@
 # ABSTRACT: Single-shot foundation daemon for periodic karr agent execution
 use strict;
 use warnings;
+our $VERSION = '0.500';
 use App::karr::Foundation;
+use App::karr::Encoding qw( decode_argv enable_std_utf8 );
+
+# Same character/octet boundary as F<karr> (ticket #53). The agent output this
+# tees to the terminal is raw bytes and is decoded incrementally in
+# App::karr::Foundation::Runner, not here.
+enable_std_utf8();
+decode_argv();
+
 exit App::karr::Foundation->new_with_options->run;
 
 __END__
@@ -18,7 +27,7 @@ karr-foundation - Single-shot foundation daemon for periodic karr agent executio
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

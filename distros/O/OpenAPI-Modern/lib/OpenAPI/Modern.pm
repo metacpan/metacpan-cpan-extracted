@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.145-7-gb9a19e75
+package OpenAPI::Modern; # git description: v0.146-3-g4b9c5a2c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.146';
+our $VERSION = '0.147';
 
 use 5.020;
 use utf8;
@@ -21,7 +21,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use Carp qw(carp croak);
-use List::Util qw(first pairs uniq);
+use List::Util qw(first pairs uniq pairkeys pairgrep max);
 use if "$]" < 5.041010, 'List::Util' => qw(all any);
 use if "$]" >= 5.041010, experimental => qw(keyword_all keyword_any);
 use builtin::compat qw(indexed blessed);
@@ -1567,10 +1567,9 @@ sub _deserialize_content ($self, $content_ref, $state, $content_obj, $media_type
 
   my ($deserialized_content_ref, $headers_ref);
   try {
-    if (match_media_type($content_type, ['multipart/form-data'])) {
+    if (match_media_type($content_type, ['multipart/*'])) {
       ($deserialized_content_ref, $headers_ref) = \ deserialize_multipart($content_ref);
     }
-    elsif (match_media_type($content_type, ['multipart/*'])) { }  # TODO (soon!)
     else {
       # TODO: handle Content-Encoding header(s)
 
@@ -1589,18 +1588,13 @@ sub _deserialize_content ($self, $content_ref, $state, $content_obj, $media_type
     $media_type_obj = $self->_resolve_ref('media-type', $ref, $state);
   }
 
-  if (not $deserialized_content_ref and not match_media_type($content_type, ['multipart/form-data'])) {
+  if (not $deserialized_content_ref and not match_media_type($content_type, ['multipart/*'])) {
     # don't fail, and return the original data, if the best-matching media-type object is under */*
     # or the schema would pass on any input
-    return (ref $content_ref eq 'SCALAR' && !match_media_type($content_type, ['multipart/*'])
-        ? $content_ref : \'TODO')
+    return $content_ref
       if $media_type eq '*/*'
         or all { ref $_ eq 'HASH' ? !keys %$_ : $_ }
           ($media_type_obj->{schema}//(), $media_type_obj->{itemSchema}//());
-
-    # coming soon!
-    abort($saved_state, 'EXCEPTION: unimplemented media type "%s"', $content_type =~ s/;.*\z//r)
-      if match_media_type($content_type, ['multipart/*']);
 
     abort($saved_state, 'EXCEPTION: unsupported media type "%s": add support with JSON::Schema::Modern::Utilities::add_media_type(...)', $content_type =~ s/;.*\z//r);
   }
@@ -1787,7 +1781,10 @@ sub _decode_content ($self, $content_ref, $headers_ref, $schema_state, $schema, 
 
       # v3.2.0 §4.15.5 1: "Array properties MUST be handled by applying the given Encoding Object to
       # produce one encoded value per array item, each with the same name..."
-      if ($encoding_state->{is_form} and ref $content_ref->$*->{$property} eq 'ARRAY') {
+      if ($encoding_state->{is_form}
+          and ref((match_media_type($content_type, ['multipart/form-data'])
+            ? $header_map : $content_ref->$*)->{$property}) eq 'ARRAY') {
+
         foreach my $idx (0 .. $content_ref->$*->{$property}->$#*) {
           my ($schema_state, $schema) = _adjust_state_for_array($self, $idx, $schema_state, $schema);
 
@@ -1808,9 +1805,8 @@ sub _decode_content ($self, $content_ref, $headers_ref, $schema_state, $schema, 
         # v3.2.0 §4.15.5 1: "... For all other value types for both top-level non-array properties
         # and for values, including array values, within a top-level array, the Encoding Object
         # MUST be applied to the entire value."
-
         my $encoding_state = { %$encoding_state,
-          match_media_type($content_type, ['multipart/form-data'])
+          match_media_type($content_type, ['multipart/*'])
             ? (header_path => $encoding_state->{header_path}.'/'.$header_map->{$property}) : () };
 
         ()= $self->_decode_content_element(\ $content_ref->$*->{$property},
@@ -1855,11 +1851,11 @@ sub _decode_content ($self, $content_ref, $headers_ref, $schema_state, $schema, 
           $headers->[$idx], $property, $schema_state, $schema, $encoding_state, $encoding_obj);
       }
       else {
-        # we are parsing array-based data from some other decoding
-
-        # no headers once we're recursing into a part's data (TODO: need headers for multipart/mixed)
+        # we are parsing array-based multipart data (other than multipart/form-data), or data from
+        # some other decoding
         ()= $self->_decode_content_element(\ $content_ref->$*->[$idx],
-          undef, $idx, $schema_state, $schema, $encoding_state, $encoding_obj);
+          $headers && match_media_type($content_type, ['multipart/*']) ? $headers->[$idx] : undef,
+          $idx, $schema_state, $schema, $encoding_state, $encoding_obj);
       }
     } # end foreach array item
   } # end ARRAY
@@ -1995,14 +1991,32 @@ sub _decode_content_element ($self, $element_ref, $headers, $name, $schema_state
   $element_ref->$* = $element_decoded_ref->$* if $element_decoded_ref;
 
   RECURSE:
-  if (defined $schema or defined $encoding_obj) {
+  if (defined $schema or defined $encoding_obj
+      or $headers and match_media_type($headers->{'Content-Type'}, ['multipart/*'])) {
+
     # do not apply _charset_ to nested strings
     delete $encoding_state->{charset};
 
+    my @charset_indices = pairkeys
+      pairgrep { $a =~ /^[0-9]+\z/ && ($b->{'Content-Disposition'}//'') eq 'form-data; name="_charset_"' }
+      ($headers//{})->%*;
+
     ()= $self->_decode_content(
       $element_ref,   # this may be the original data, if nothing was decoded
-      undef,          # no headers once we recurse into the multipart parts
-      $schema_state, $schema, $encoding_state, $encoding_obj, $content_type);
+      $headers && match_media_type($headers->{'Content-Type'}, ['multipart/*'])
+       ? \[ map +(/^[0-9]+\z/ ? $headers->{$_} : ()), sort keys $headers->%* ]  # nested headers
+       : undef,
+      $schema_state, $schema, $encoding_state, $encoding_obj,
+      $content_type // ($headers//{})->{'Content-Type'});
+
+    # find all _charset_ headers from the original headers hash and splice them out
+    foreach my $idx (sort { $b <=> $a } @charset_indices) {
+      my $max_idx = max(grep /^[0-9]+\z/, keys $headers->%*);
+      delete $headers->{$idx};  # remove header for _charset_ part
+      foreach my $idx ($idx+1 .. $max_idx) {
+        $headers->{$idx-1} = delete $headers->{$idx}; # renumber all subsequent part headers
+      }
+    }
   }
 }
 
@@ -2401,7 +2415,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.146
+version 0.147
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -2672,7 +2686,7 @@ C<instanceLocation>s in errors in the Result object):
       },
       body => {
         header => [
-          <for multipart media-types, an arrayref of headers, one element per part,
+          <for multipart media-types, an arrayref of headers, one element per part, possibly nested,
           in the same order as the body parts from the original message>
         ],
         content => <deserialized data from body; can be any type>,
@@ -2733,7 +2747,7 @@ C<instanceLocation>s in errors in the Result object):
       },
       body => {
         header => [
-          <for multipart media-types, an arrayref of headers, one element per part,
+          <for multipart media-types, an arrayref of headers, one element per part, possibly nested,
           in the same order as the body parts from the original message>
         ],
         content => <deserialized data from body; can be any type>,
@@ -2980,7 +2994,79 @@ L<OpenAPI Media Type Registry: Forms: Ordered name-value pairs|https://spec.open
 
 =back
 
+Other multipart media-types are deserialized to an array, one item per part. See:
+
+=over 4
+
+=item *
+
+L<v3.2.0 §4.14.5.2: Encoding By Position|https://spec.openapis.org/oas/latest#encoding-by-position>
+
+=item *
+
+L<OpenAPI Media Type Registry: Sequential Multipart: Multipart subtypes with unnamed parts|https://spec.openapis.org/registry/media-type/sequential_multipart>
+
+=back
+
 Multipart headers are always deserialized as an array of hashrefs, one hashref per part.
+
+Nested multipart messages are also supported. Deserialized body content is presented as nested
+arrays or objects of the multipart parts; deserialized headers are presented as nested hashrefs,
+where the hashref keys correspond to the indices of the nested parts. This looks a bit weird when
+exploded out into perl-style data structures, but the JSON pointers are intuitive, as it allows one
+to pretend that the data structure is both a hashref and an arrayref at the same time. For example:
+
+This deserialized body content, consisting of two multipart/form-data parts inside a
+multipart/form-data message which itself has two parts:
+
+  {
+    alpha => {
+      a => '1',
+      b => '2',
+    },
+    beta => {
+      x => '7',
+      y => '8',
+    },
+  }
+
+..will have its body headers deserialized as:
+
+  [
+    {
+      'Content-Type' => 'multipart/form-data; boundary=XXXXX',
+      'Content-Disposition' => 'form-data; name="alpha"',
+      0 => { 'Content-Disposition' => 'form-data; name="a"' },
+      1 => { 'Content-Disposition' => 'form-data; name="b"' },
+    },
+    {
+      'Content-Type' => 'multipart/form-data; boundary=XXXXX',
+      'Content-Disposition' => 'form-data; name="beta"',
+      0 => { 'Content-Disposition' => 'form-data; name="x"' },
+      1 => { 'Content-Disposition' => 'form-data; name="y"' },
+    },
+  ]
+
+When flattened to a hashref of JSON pointers => values via
+L<JSON::Schema::Modern::Utilities/jsonp_elements>, all the locations and values returned in
+L<JSON::Schema::Modern::Result/data> are:
+
+  {
+    '/request/body/content/alpha/a'                 => '1',
+    '/request/body/content/alpha/b'                 => '2',
+    '/request/body/content/beta/x'                  => '7',
+    '/request/body/content/beta/y'                  => '8',
+    '/request/body/header/0/Content-Type'           => 'multipart/form-data; boundary=XXXXX',
+    '/request/body/header/0/Content-Disposition'    => 'form-data; name="alpha"',
+    '/request/body/header/0/0/Content-Disposition'  => 'form-data; name="a"',
+    '/request/body/header/0/1/Content-Disposition'  => 'form-data; name="b"',
+    '/request/body/header/1/Content-Type'           => 'multipart/form-data; boundary=XXXXX',
+    '/request/body/header/1/Content-Disposition'    => 'form-data; name="beta"',
+    '/request/body/header/1/0/Content-Disposition'  => 'form-data; name="x"',
+    '/request/body/header/1/1/Content-Disposition'  => 'form-data; name="y"',
+  }
+
+You can access the result data via JSON pointers with L<JSON::Schema::Modern::Utilities/jsonp_get>.
 
 =head1 LIMITATIONS
 
@@ -3036,10 +3122,6 @@ C<param>, C<every_param>, C<params> on C<$c>
 =head2 Unimplemented sections of the specification
 
 =over 4
-
-=item *
-
-C<multipart/*> messages (except for C<multipart/form-data>)
 
 =item *
 
@@ -3164,6 +3246,10 @@ L<Web Hypertext Application Technology Working Group (WHATWG): application/x-www
 =item *
 
 L<RFC7578: Returning Values from Forms: multipart/form-data|https://datatracker.ietf.org/doc/html/rfc7578>
+
+=item *
+
+L<RFC2046 §5.1: Multipart Media Type|https://www.rfc-editor.org/info/rfc2046/#section-5.1>
 
 =back
 

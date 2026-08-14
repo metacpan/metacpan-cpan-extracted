@@ -1,14 +1,15 @@
 # ABSTRACT: Restore the ref-backed karr board from YAML
 
 package App::karr::Cmd::Restore;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
   usage_string => 'USAGE: karr restore --yes [--input PATH]',
 );
 use Path::Tiny;
-use YAML::XS qw( Load );
+use App::karr::Encoding qw( yaml_load from_octets );
+use App::karr::Error qw( user_error clean_error );
 use App::karr::Role::BoardDiscovery;
 use App::karr::Role::SyncLifecycle;
 
@@ -42,7 +43,7 @@ sub execute {
   $self->sync_before;
 
   my $payload = $self->_load_payload;
-  my $snapshot = eval { Load($payload) };
+  my $snapshot = eval { yaml_load($payload) };
   die "Backup payload is not valid YAML\n" if $@;
   die "Backup payload must be a hash document\n" unless ref $snapshot eq 'HASH';
   die "Backup payload version 1 is required\n"
@@ -61,13 +62,21 @@ sub _load_payload {
   my ($self) = @_;
 
   if ( $self->input ) {
-    return path( $self->input )->slurp_utf8;
+    # An unreadable --input is the user's path, not karr's: Path::Tiny's own
+    # error would hand them this file and line instead (#77).
+    my $content = eval { path( $self->input )->slurp_utf8 };
+    defined $content
+      or user_error( "Could not read ", $self->input, ": ", clean_error($@) );
+    return $content;
   }
 
+  # STDIN is the one input edge App::karr::Encoding leaves without a PerlIO
+  # layer, precisely so this decode is explicit and happens exactly once.
+  binmode STDIN, ':raw';
   my $content = do { local $/; <STDIN> };
   die "No backup payload received on stdin\n"
     unless defined $content && length $content;
-  return $content;
+  return from_octets($content);
 }
 
 1;
@@ -84,7 +93,7 @@ App::karr::Cmd::Restore - Restore the ref-backed karr board from YAML
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -96,6 +105,12 @@ version 0.402
 Replaces the complete C<refs/karr/*> namespace with a previously exported YAML
 snapshot. This is intentionally destructive: refs currently present but absent
 from the snapshot are deleted as part of the restore.
+
+It is not destructive on the way in, though. Every ref name in the snapshot is
+checked and every commit object written before the first ref moves, so a
+snapshot karr cannot apply -- an unusable ref name, or one outside
+C<refs/karr/> -- is refused with the board exactly as it was. Nothing is
+deleted up front, so a restore that fails can no longer leave the board empty.
 
 =head1 OPTIONS
 

@@ -8,7 +8,7 @@ use Lemonldap::NG::Handler::Main;
 use Lemonldap::NG::Common::Util qw(getSameSite);
 use URI;
 
-our $VERSION = '2.23.1';
+our $VERSION = '2.23.3';
 
 use constant validPartnerName => qr/^[\w-]+$/;
 
@@ -205,6 +205,24 @@ sub tests {
                     and $conf->{authentication} !~ /$type/ );
             }
             return 1;
+        },
+
+        checkSelfReferentialMacros => sub {
+            my @tmp;
+            foreach my $macro ( keys %{$conf->{macros}} ) {
+                my $code = $conf->{macros}->{$macro};
+                push @tmp, $macro if $code =~ /\$\Q$macro\E\b/;
+            }
+            return (
+                1,
+                (
+                    @tmp
+                    ? 'Macro definitions for "'
+                      . join( ', ', @tmp )
+                      . '" refer to themselves'
+                    : ''
+                )
+            );
         },
 
         # Check that OpenID macros exists
@@ -1263,12 +1281,11 @@ sub tests {
                       unless $param;
                 }
             }
-            foreach ( my ( $k, $v ) =
-                sort keys %{ $conf->{authChoiceModules} } )
-            {
+            foreach my $k ( sort keys %{ $conf->{authChoiceModules} } ) {
+                my $v = $conf->{authChoiceModules}->{$k};
                 my ( $a, $u, $p, $url ) = split ';', $v;
                 return ( 0, "Choice $k has an invalid URL" )
-                  unless $url =~ m#^https?://#;
+                  if $url and $url !~ m#^https?://#;
             }
             return 1;
         },

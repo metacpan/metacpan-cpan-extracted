@@ -233,6 +233,34 @@ sub do_tests {
   }
 
   #
+  # App with Middleware (Auth Basic and Access Log)
+  #
+  {
+    my $app = do './examples/single-file-apps/with-middleware.psgi';
+    my ($test_env, $response, $body);
+
+    $test_env = test_env();
+    $response = $app->($test_env);
+
+    is(
+      $response->[0] => 401,
+      'App with middleware (Auth::Basic) returns 401 response'
+    );
+
+    my $logged_lines = eval { scalar $test_env->{'psgi.errors'}->@* };
+    ok(
+      ($logged_lines and $logged_lines > 0),
+      'App with middleware (AccessLog) has lines logged'
+    );
+
+    my $line = eval { $test_env->{'psgi.errors'}->[0] };
+    ok(
+      ($line and $line =~ m/127\.0\.0\.1/ and $line =~ m/GET/),
+      'Log line looks reasonably like an HTTP access log line'
+    );
+  }
+
+  #
   # Streaming app
   #
   {
@@ -296,10 +324,12 @@ sub do_tests {
 }
 
 ###############################################################################
+package printable_object { sub print { push shift->@*, shift } }
+
 sub test_env {
   return {
     'psgi.version'     => [1, 1],
-    'psgi.errors'      => '',
+    'psgi.errors'      => bless([], 'printable_object'),
     'psgi.nonblocking' => '',
     'psgi.run_once'    => '',
     'psgi.streaming'   => 0,

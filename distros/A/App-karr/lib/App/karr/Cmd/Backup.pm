@@ -1,14 +1,15 @@
 # ABSTRACT: Export the ref-backed karr board as YAML
 
 package App::karr::Cmd::Backup;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
   usage_string => 'USAGE: karr backup [--output PATH]',
 );
 use Path::Tiny;
-use YAML::XS qw( Dump );
+use App::karr::Encoding qw( yaml_dump );
+use App::karr::Error qw( user_error clean_error );
 use App::karr::Role::BoardDiscovery;
 use App::karr::Role::SyncLifecycle;
 
@@ -35,14 +36,19 @@ sub execute {
   $guard->done;
 
   die "No karr board found. Run 'karr init' to create one.\n"
-    unless $store->board_exists;
+    unless $store->has_board_refs;
 
-  my $yaml = Dump( $store->snapshot );
+  # Characters all the way: spew_utf8 encodes for the --output file, and the
+  # CLI's :encoding(UTF-8) layer encodes for stdout. A Dump() here would emit
+  # octets and both paths would encode them a second time (ticket #53).
+  my $yaml = yaml_dump( $store->snapshot );
 
   if ( $self->output ) {
     my $file = path( $self->output );
-    $file->parent->mkpath;
-    $file->spew_utf8($yaml);
+    # An --output karr cannot write is the user's path, not karr's: Path::Tiny
+    # would otherwise report this file and line at them (#77).
+    eval { $file->parent->mkpath; $file->spew_utf8($yaml); 1 }
+      or user_error( "Could not write $file: ", clean_error($@) );
     print STDERR "Wrote backup to $file\n";
     return;
   }
@@ -64,7 +70,7 @@ App::karr::Cmd::Backup - Export the ref-backed karr board as YAML
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

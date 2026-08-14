@@ -1,7 +1,7 @@
 # ABSTRACT: Re-enable automated agent runs on this board
 
 package App::karr::Cmd::Enable;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -19,6 +19,7 @@ sub execute {
   $self->check_positional_args($args_ref, 0);
 
   $self->sync_before;
+  $self->require_board;
   $self->store->set_foundation_enabled(1);
   $self->sync_after;
 
@@ -44,7 +45,7 @@ App::karr::Cmd::Enable - Re-enable automated agent runs on this board
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

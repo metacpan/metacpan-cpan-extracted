@@ -1,12 +1,13 @@
 # ABSTRACT: Kanban Assignment & Responsibility Registry
 
 package App::karr;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options;
 use Term::ANSIColor qw( colored );
 use App::karr::Role::BoardAccess;
+use App::karr::Cmd::Board;
 
 with 'App::karr::Role::BoardAccess';
 
@@ -22,6 +23,34 @@ option done => (
   doc => 'Include the Done section in the default board view',
 );
 
+# MooX::Cmd derives a command name from the class basename, so
+# App::karr::Cmd::SetRefs is only ever spelled "setrefs" -- the documented
+# dashed forms need registering as extra keys in the command table.
+#
+# Registering them here rather than rewriting $ARGV[0] in bin/karr is what makes
+# them reachable with a root option in front (ticket #71): MooX::Cmd looks the
+# command up with a first_index over this very table across the WHOLE argv, so
+# `karr --dir PATH get-refs REF` leaves the alias at index 2, where the old
+# position-0-only rewrite never saw it. Leaving argv untouched also keeps a
+# payload that merely spells an alias intact -- `karr set-refs REF set-refs`
+# stores "set-refs", it does not store "setrefs" -- because only the token
+# MooX::Cmd itself dispatches on is ever consulted.
+my %COMMAND_ALIASES = (
+  'set-refs'   => 'setrefs',
+  'get-refs'   => 'getrefs',
+  'agent-name' => 'agentname',
+);
+
+around _build_command_commands => sub {
+  my ($orig, $self, @args) = @_;
+  my $commands = $orig->($self, @args);
+  for my $alias (keys %COMMAND_ALIASES) {
+    my $name = $COMMAND_ALIASES{$alias};
+    $commands->{$alias} = $commands->{$name} if $commands->{$name};
+  }
+  return $commands;
+};
+
 my @COMMANDS = (
   [ init      => 'Initialize a new karr board' ],
   [ create    => 'Create a new task' ],
@@ -32,6 +61,7 @@ my @COMMANDS = (
   [ edit      => 'Modify task fields' ],
   [ delete    => 'Delete a task' ],
   [ pick      => 'Claim the next available task' ],
+  [ unlock    => 'Show or break pick locks' ],
   [ archive   => 'Archive a task (soft-delete)' ],
   [ handoff   => 'Hand off a task for review' ],
   [ destroy   => 'Delete the entire refs/karr/* board' ],
@@ -40,10 +70,12 @@ my @COMMANDS = (
   [ enable    => 'Re-enable automated agent runs on this board' ],
   [ context   => 'Generate board context summary' ],
   [ log       => 'Show activity log' ],
+  [ metrics   => 'Show flow metrics' ],
   [ backup    => 'Export refs/karr/* as YAML' ],
   [ restore   => 'Replace refs/karr/* from YAML' ],
   [ materialize => 'Write refs/karr/* out as a tasks/ file view' ],
   [ import    => 'Import a tasks/ file view into refs/karr/*' ],
+  [ repair    => 'Migrate a 0.402-or-earlier board off double-encoded UTF-8' ],
   [ sync      => 'Sync board with remote' ],
   [ 'agent-name' => 'Generate a random agent name' ],
   [ skill     => 'Install/update agent skills' ],
@@ -63,8 +95,17 @@ sub _print_help {
   my $max = 0;
   for (@COMMANDS) { $max = length($_->[0]) if length($_->[0]) > $max }
 
+  # Pad on the VISIBLE width, then colour. sprintf's %-*s counts the ANSI
+  # escapes colored() wraps around the name, and those alone already exceed
+  # $max, so a "%-*s" over the coloured string never pads at all and the
+  # descriptions come out ragged. Padding by hand off the bare command name
+  # is correct whether or not colored() actually emits escapes (it returns
+  # the text untouched under NO_COLOR/ANSI_COLORS_DISABLED).
   for my $cmd (@COMMANDS) {
-    $out .= sprintf "  %-*s  %s\n", $max, colored($cmd->[0], 'cyan'), $cmd->[1];
+    $out .= sprintf "  %s%s  %s\n",
+      colored($cmd->[0], 'cyan'),
+      ' ' x ($max - length $cmd->[0]),
+      $cmd->[1];
   }
 
   $out .= "\n" . colored("OPTIONS:", 'bold') . "\n";
@@ -117,20 +158,18 @@ sub execute {
   # directly (not dispatched by MooX::Cmd), so it has no command_chain to adopt
   # --dir from; forward the root's own --dir explicitly so bare
   # `karr --dir PATH` targets PATH rather than silently falling back to cwd.
-  eval {
-    require App::karr::Cmd::Board;
-    my %board_args = (
-      done      => $self->done,
-    );
-    $board_args{dir} = $self->dir if $self->has_dir;
-    App::karr::Cmd::Board->new(%board_args)->execute($args_ref, $chain_ref);
-  };
-  if ($@) {
-    if ($@ =~ /No karr board found/) {
-      die "No karr board found. Run 'karr init' to create one.\n";
-    }
-    die $@;
-  }
+  #
+  # Board's own errors reach the CLI unchanged. This used to run in an eval that
+  # rewrote anything matching /No karr board found/ into that same sentence --
+  # a no-op while the sentence was all there was to say, and a downgrade the
+  # moment it was not: bare `karr` in a fresh clone must say that refs/karr/*
+  # are merely unfetched and name 'karr sync', which is precisely the wording
+  # that rewrite would have thrown away (#135).
+  my %board_args = (
+    done      => $self->done,
+  );
+  $board_args{dir} = $self->dir if $self->has_dir;
+  App::karr::Cmd::Board->new(%board_args)->execute($args_ref, $chain_ref);
 }
 
 1;
@@ -147,7 +186,7 @@ App::karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

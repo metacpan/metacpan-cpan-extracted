@@ -30,4 +30,13 @@ fi
 chown "$target_uid:$target_gid" /home/karr
 export HOME=/home/karr
 
+# ssh looks itself up with getpwuid() and refuses to start at all when the uid
+# it runs as has no passwd entry -- "No user exists for uid 1000". We drop to
+# whoever owns /work, a host uid this image knows nothing about, so an ssh://
+# remote failed here even once openssh-client was installed. The fixed-user
+# image does not need this: useradd wrote its entry at build time.
+if ! getent passwd "$target_uid" >/dev/null 2>&1; then
+    echo "karr:x:${target_uid}:${target_gid}:karr:/home/karr:/bin/sh" >> /etc/passwd
+fi
+
 exec gosu "$target_uid:$target_gid" karr "$@"

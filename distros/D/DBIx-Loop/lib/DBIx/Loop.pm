@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('DBIx::Loop', $VERSION);
@@ -19,7 +19,7 @@ DBIx::Loop - non-blocking DBI on your event loop
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -138,6 +138,16 @@ C<< { rows => [ [...], ... ], columns => [ ... ] } >> (arrayref rows - they
 benchmarked ~4x faster to build than hashrefs) and C<do> to
 C<< { rows_affected => $n, insert_id => $id } >> (insert_id best-effort via
 C<last_insert_id>).
+
+A note on B<SQLite and more than one worker>: each worker is another process
+with its own connection, and SQLite takes one writer at a time for the whole
+file. Reads run concurrently; writes serialise, and a writer that keeps losing
+the race gets C<database is locked> back once DBD::SQLite's busy timeout (30
+seconds by default) is spent - which on a loaded machine a deep burst of
+concurrent writes can genuinely do. For write-heavy SQLite either use
+C<workers =E<gt> 1>, which costs no responsiveness (the queue still keeps the
+loop free) and removes the contention outright, or raise
+C<sqlite_busy_timeout>. Client/server engines have no such limit.
 
 =head1 CONSTRUCTORS
 

@@ -28,17 +28,25 @@ force-loaded via `briefing.skills` — this file is for the orchestrating agent.
 Depends on whether the Agent/Task tool is available to you.
 
 - **You can spawn subagents** (orchestrating main agent): Do NOT touch behavior-relevant karr
-  code yourself — delegate to `karr-worker`. Your lane: coordinate, inspect, plan, review diffs,
+  code yourself — delegate to the domain worker below. Your lane: coordinate, inspect, plan, review diffs,
   run tests, manage git, edit non-behavioral docs. Why: only the `karr-*` agents get their skills
   force-loaded via `briefing.skills`; you get no briefing and would touch internals with too
   little context. Specialist lanes:
 
   | Task | Agent |
   |---|---|
-  | Implement / refactor / debug behavior-relevant code | `karr-worker` (default) |
+  | Task/config semantics, lifecycle, claims, dependencies, activity log, ordinary board commands, filtering, rendering, `context`, `metrics` | `karr-board-worker` |
+  | Git transport, refs-backed persistence, CAS, locks, sync, encoding, `init`/`sync`/`materialize`/`import`/`repair`/`backup`/`restore`/`destroy`/`unlock`, share-file plumbing | `karr-ref-worker` |
+  | karr-foundation: multi-board discovery, overview, agent command resolution, drain loops, `.karr.lock`/`.karr.state`, cooldown, stall detection, auto-blocking, `disable`/`enable` | `karr-foundation-worker` |
+  | Behavior-relevant code that spans those domains, or none of them cleanly | `karr-worker` (generalist fallback) |
   | Write/extend tests under `t/` | `karr-test-writer` |
   | Pre-release audit (Changes, cpanfile, dist.ini, version) | `karr-release-checker` |
   | POD (`=attr`/`=method`, ABSTRACT) | `karr-pod-writer` |
+
+  Pick the narrowest domain worker that covers the task — they brief on one domain instead of
+  the whole distribution, and each one names the other two in its own boundaries section, so a
+  task that turns out to belong elsewhere gets handed back rather than solved from the wrong
+  context. `karr-worker` stays for work that genuinely crosses the seams.
 
 - **You cannot spawn subagents** (you ARE a `karr-*` agent): The delegation lock does not apply —
   implement, refactor, debug, and test per these rules.

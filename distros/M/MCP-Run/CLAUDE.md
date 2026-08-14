@@ -108,10 +108,11 @@ installierbar (`raudssus/mcp-run-compress`) — kein Perl auf dem Host nötig.
 - `t/00-load.t` – Load Tests
 - `t/05-base.t` – Basis-Klasse
 - `t/10-bash.t` – Bash Execution, allowlist, validator, timeout, format_result
-- `t/20-integration.t` – MCP lifecycle (initialize, tools/list, tools/call)
+- `t/20-integration.t` – MCP lifecycle (server/discover, tools/list, tools/call) plus protocol contract: Requests ohne `params._meta` bzw. mit nicht unterstützter Protocol-Revision werden abgewiesen
 - `t/compress.t` – Compression Tests
 - `t/30-no-warnings.t` – Regression: Compress.pm warnings (transform returning undef, undef inputs)
 - `t/40-compress-bin.t` – `bin/mcp-run-compress`: `--hook` (native + docker rewrite, bypasses, malformed), `--install-claude` (settings patching, idempotent, docker mode), `--filter-files`, end-to-end MCP compression mit echtem command context (`--b64`, incl. ls-Filter)
+- `t/50-bash-bin.t` – `bin/mcp-run-bash` als Subprozess über echtes stdio (Legacy-Handshake): Compression an/aus, `serverInfo`-Identität. Deckt den Pfad ab, den echte Clients nehmen — genau dort, wo der Compress-Ladefehler durchrutschte
 
 Die früher hier gelisteten „Fehlenden Tests" (`--hook`, `--install-claude`, Docker Rewrite, `--filter-files`, end-to-end MCP Compression) werden allesamt von `t/40-compress-bin.t` abgedeckt.
 
@@ -155,6 +156,10 @@ mit (Dev-Loop `prove -lr t/` unberührt).
 - `transform_command` (Co-Authored-By) und `compress()` (Output-Filtering) sind verwandt aber unterschiedlich
 - `mcp-run-bash` compression default ist AN (bin/mcp-run-bash), Modul-Attribut ist AUS (lib/MCP/Run.pm)
 - `format_result($tool, $result, $compress, $command)` — bei Override in Subclasses muss der `$command` für command-spezifische Filter durchgereicht werden
+- **MCP >= 0.15 erforderlich** (cpanfile-Pin). Ab 0.15 ist die Protocol-Revision Teil *jedes* Requests: `params._meta` muss `protocolVersion` und `clientCapabilities` tragen, sonst weist `MCP::Server::_check_meta` vor dem Dispatch mit `Missing protocol version` ab. Wer im Test einen nackten `MCP::Server::Context` baut, umgeht den Transport und landet im modernen Pfad — dann fallen scheinbar unabhängige Subtests gleichzeitig um. `initialize` heisst dort `server/discover`, `serverInfo` liegt in `result._meta`
+- Echte stdio-Clients laufen weiter über `MCP::Server::Legacy` (klassischer `initialize`-Handshake, `_check_meta` übersprungen) — MCP dokumentiert diesen Pfad aber als temporär, siehe karr #7
+- `MCP::Run::Compress` wird in lib/MCP/Run.pm **zur Compile-Zeit** geladen, obwohl `_get_compressor` den Compressor lazy konstruiert. Absicht: ein fehlendes/kaputtes Compress-Modul soll den Server beim Start umbringen, nicht beim ersten `tools/call` des Nutzers. Das `use` nicht in ein `require` im Lazy-Loader zurückbauen
+- `serverInfo`-Identität (`mcp-run-bash`/`$VERSION`) liegt als Klassen-Default in lib/MCP/Run/Bash.pm, nicht in `bin/` — damit Library-Nutzer sie mitbekommen. Mojo::Base-Mechanik: skill `perl-mojo`
 
 ## Weitere Runner-Ideen
 

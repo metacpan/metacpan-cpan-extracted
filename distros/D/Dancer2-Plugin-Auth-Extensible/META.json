@@ -66,6 +66,12 @@
             "namespace::clean" : "0",
             "perl" : "5.006000"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Mail::Message" : "0",
+            "Mail::Transport" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -79,6 +85,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dancer"
    },
-   "version" : "0.712",
+   "version" : "0.713",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

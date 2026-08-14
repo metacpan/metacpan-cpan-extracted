@@ -61,11 +61,13 @@ subtest 'handoff with block' => sub {
 
   my $loaded = App::karr::Task->from_file($tasks->child('003-block-test.md'));
   $loaded->status('review');
-  $loaded->blocked('waiting for feedback');
+  # Ticket #58: the flag and the reason are two fields, as in kanban-md.
+  $loaded->block('waiting for feedback');
   $loaded->save;
 
   my $after = App::karr::Task->from_file($tasks->child('003-block-test.md'));
-  is $after->blocked, 'waiting for feedback', 'blocked with reason';
+  ok $after->blocked, 'blocked flag set';
+  is $after->block_reason, 'waiting for feedback', 'blocked with reason';
 };
 
 done_testing;

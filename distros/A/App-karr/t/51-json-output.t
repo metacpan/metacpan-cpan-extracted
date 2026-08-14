@@ -7,6 +7,7 @@ require_git_c();
 use File::Temp qw( tempdir );
 use YAML::XS qw( Dump );
 use JSON::MaybeXS qw( decode_json );
+use Encode qw( encode_utf8 decode FB_CROAK LEAVE_SRC );
 
 use App::karr::Git;
 use App::karr::BoardStore;
@@ -25,6 +26,14 @@ use App::karr::Cmd::Handoff;
 # but move/edit/show/pick/handoff had no --json coverage at all. This pins the
 # behaviour those helpers now carry so the refactor -- and any future edit to it
 # -- can't silently change the JSON contract.
+#
+# Ticket #63: every fixture here used to be ASCII and every assertion went
+# through decode_json against the same literal the fixture was built from, which
+# is an identity round trip -- the file stayed green while --json was handing
+# agents double-encoded text (#53). The fixtures below carry non-ASCII, and the
+# last subtest asserts on the raw bytes that reach stdout instead.
+my $TITLE = "Fix \x{dc}nicode \x{2014} \x{e4}rger";
+my $BODY  = "Caf\x{e9} \x{2014} na\x{ef}ve";
 
 sub _fresh_store {
   my $repo = tempdir( CLEANUP => 1 );
@@ -52,7 +61,10 @@ sub _save {
 }
 
 # Capture STDOUT of a command's execute() (sync chatter goes to STDERR, so the
-# capture stays clean JSON in --json mode).
+# capture stays clean JSON in --json mode). The :encoding(UTF-8) layer is the
+# one F<bin/karr> installs (App::karr::Encoding::enable_std_utf8); reopening
+# STDOUT drops it, so without restoring it here the capture would not be the
+# bytes a caller of the CLI actually sees. $out therefore holds octets.
 sub _run_execute {
   my ( $cmd, @args ) = @_;
   my $out;
@@ -60,7 +72,7 @@ sub _run_execute {
     local $@;
     eval {
       local *STDOUT;
-      open STDOUT, '>', \$out or die $!;
+      open STDOUT, '>:encoding(UTF-8)', \$out or die $!;
       $cmd->execute( \@args, [] );
     };
     $@;
@@ -134,31 +146,31 @@ subtest 'edit --json: single id is a bare object with id and title' => sub {
   my $cmd = App::karr::Cmd::Edit->new(
     store => $store,
     json  => 1,
-    title => 'New title',
+    title => $TITLE,
   );
   my ( $err, $out ) = _run_execute( $cmd, '1' );
   is( $err, '', 'edit 1 --json does not die' ) or diag $err;
 
   my $data = eval { decode_json($out) };
-  is( ref $data,     'HASH',      'single edit --json emits a bare JSON object' ) or diag $out;
-  is( $data->{id},    1,          'object carries the edited id' );
-  is( $data->{title}, 'New title', 'edited title reflected in the payload' );
+  is( ref $data,     'HASH', 'single edit --json emits a bare JSON object' ) or diag $out;
+  is( $data->{id},    1,     'object carries the edited id' );
+  is( $data->{title}, $TITLE, 'edited title reflected in the payload' );
 };
 
 subtest 'show --json: explicit id renders frontmatter + body via to_json_hash' => sub {
   my $store = _fresh_store();
-  _save( $store, id => 1, title => 'Alpha', status => 'todo', body => 'Alpha body' );
+  _save( $store, id => 1, title => $TITLE, status => 'todo', body => $BODY );
 
   my $cmd = App::karr::Cmd::Show->new( store => $store, json => 1 );
   my ( $err, $out ) = _run_execute( $cmd, '1' );
   is( $err, '', 'show 1 --json does not die' ) or diag $err;
 
   my $data = eval { decode_json($out) };
-  is( ref $data,      'HASH',       'explicit id --json stays a bare object' ) or diag $out;
-  is( $data->{id},     1,           'id present' );
-  is( $data->{title},  'Alpha',     'title present' );
-  is( $data->{status}, 'todo',      'status present' );
-  is( $data->{body},   'Alpha body', 'body included when present' );
+  is( ref $data,      'HASH',  'explicit id --json stays a bare object' ) or diag $out;
+  is( $data->{id},     1,      'id present' );
+  is( $data->{title},  $TITLE, 'title present' );
+  is( $data->{status}, 'todo', 'status present' );
+  is( $data->{body},   $BODY,  'body included when present' );
 };
 
 subtest 'pick --json: picked task payload built via to_json_hash' => sub {
@@ -198,6 +210,32 @@ subtest 'handoff --json: review payload built via to_json_hash' => sub {
   is( $data->{status},     'review',    'status moved to review' );
   is( $data->{claimed_by}, 'agent-test', 'claim reflected in payload' );
   is( $data->{body},       'Alpha body', 'body included' );
+};
+
+subtest 'print_json writes UTF-8 to stdout encoded exactly once' => sub {
+  my $store = _fresh_store();
+  _save( $store, id => 1, title => $TITLE, status => 'todo', body => $BODY );
+
+  my $cmd = App::karr::Cmd::Show->new( store => $store, json => 1 );
+  my ( $err, $out ) = _run_execute( $cmd, '1' );
+  is( $err, '', 'show 1 --json does not die' ) or diag $err;
+
+  # decode_json($out) eq $TITLE cannot distinguish a correct encoder from a
+  # consistently wrong one, so assert on the octets themselves. Under #53's
+  # double encode the first index is -1 and the second is 0.
+  ok( index( $out, encode_utf8($TITLE) ) >= 0,
+    'the title reaches stdout as singly-encoded UTF-8' )
+    or diag unpack( 'H*', $out );
+  is( index( $out, encode_utf8( encode_utf8($TITLE) ) ), -1,
+    'and never as the double-encoded form' );
+  ok( index( $out, encode_utf8($BODY) ) >= 0, 'same for the body' );
+
+  my $decoded = eval { decode( 'UTF-8', $out, FB_CROAK | LEAVE_SRC ) };
+  ok( defined $decoded, 'the whole payload is valid UTF-8' );
+
+  my $data = eval { decode_json($out) };
+  is( $data->{title}, $TITLE, 'and it still parses back to the characters that went in' );
+  is( $data->{body},  $BODY,  'body round-trips too' );
 };
 
 done_testing;

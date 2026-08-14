@@ -37,4 +37,16 @@ ok( defined $root_block && $root_block !~ /^\s*tags\s*=/m,
 ok( index( $config, "tags = user" ) >= 0,
     'runtime-user has user tag' );
 
+# If docker_image is set on the [@Author::GETTY] bundle without
+# docker_default = 0, the bundle auto-adds a third, unnamed
+# [@Author::GETTY::Docker] plugin
+# (GETTY.pm:1281-1289) on top of the two named runtime-root/runtime-user
+# subsections above. That third plugin has no target, so it builds the LAST
+# Dockerfile stage (runtime-user, not runtime-root), and no tags, so it
+# inherits the plugin default `latest %V %v` -- the exact tags runtime-root
+# publishes. raudssus/karr:latest would then carry the root or the user image
+# depending on plugin run order (ticket #116).
+ok( $config =~ /^docker_default\s*=\s*0\s*$/m,
+    'docker_default = 0 suppresses the auto-added third Docker plugin' );
+
 done_testing;

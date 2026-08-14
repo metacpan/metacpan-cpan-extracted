@@ -10,6 +10,7 @@ use IPC::Open3 qw( open3 );
 use Symbol qw( gensym );
 use Path::Tiny qw( path );
 use JSON::MaybeXS qw( decode_json );
+use Encode qw( encode_utf8 decode FB_CROAK LEAVE_SRC );
 
 use App::karr::Git;
 use App::karr::Task;
@@ -19,6 +20,14 @@ use App::karr::Task;
 # reads such a view back into refs. materialize reads only (no sync); import
 # mutates refs, so it needs a --yes guard and preserves task timestamps
 # verbatim (the serialize_from path pinned by t/39).
+#
+# Ticket #63: the assertions here were right all along -- only the fixtures were
+# ASCII, which is why the round trip stayed green while materialize was writing
+# triple-encoded files (#53). The fixtures below carry non-ASCII, handed to the
+# child as the UTF-8 octets a shell would deliver.
+my $TITLE = "Only t\x{e5}sk \x{2014} \x{fc}";
+my $BODY  = "Caf\x{e9} \x{2014} na\x{ef}ve";
+my $TAG   = "gr\x{fc}n";
 
 my $ROOT = abs_path('.');
 my $BIN  = "$ROOT/bin/karr";
@@ -67,7 +76,7 @@ sub _init_board {
 
 subtest 'materialize writes a kanban-md file view that round-trips the refs' => sub {
   my $repo = _init_board( 'View Board',
-    [ 'First task', '--priority', 'high' ],
+    [ 'First task', '--priority', 'high', '--body', encode_utf8($BODY), '--tags', encode_utf8($TAG) ],
     [ 'Second task' ],
   );
 
@@ -82,14 +91,23 @@ subtest 'materialize writes a kanban-md file view that round-trips the refs' => 
   my @files = sort map { $_->basename } $root->child('tasks')->children(qr/\.md$/);
   is_deeply( \@files, [ '001-first-task.md', '002-second-task.md' ], 'both cards materialized as files' );
 
-  my $t1 = App::karr::Task->from_file( $root->child('tasks')->child('001-first-task.md') );
+  my $card = $root->child('tasks')->child('001-first-task.md');
+  my $t1 = App::karr::Task->from_file($card);
   is( $t1->id,       1,            'materialized file has the ref id' );
   is( $t1->title,    'First task', 'materialized file round-trips the title from refs' );
   is( $t1->priority, 'high',       'materialized file round-trips the priority from refs' );
+  is( $t1->body,     $BODY,        'materialized file round-trips a non-ASCII body' );
+  is_deeply( $t1->tags, [$TAG],    'materialized file round-trips a non-ASCII tag' );
+
+  # from_file decodes, so it cannot tell singly- from multiply-encoded content
+  # on its own. Look at the bytes on disk: kanban-md has to be able to read them.
+  my $raw = do { open my $fh, '<:raw', "$card" or die $!; local $/; <$fh> };
+  ok( index( $raw, encode_utf8($BODY) ) >= 0, 'the file holds singly-encoded UTF-8' );
+  ok( defined eval { decode( 'UTF-8', $raw, FB_CROAK | LEAVE_SRC ) }, 'the file is valid UTF-8' );
 };
 
 subtest 'materialize --json always emits a task array' => sub {
-  my $repo = _init_board( 'Json Board', [ 'Only task' ] );
+  my $repo = _init_board( 'Json Board', [ encode_utf8($TITLE) ] );
 
   my $rv = _run_karr( $repo, undef, 'materialize', '--json' );
   is( $rv->{exit}, 0, 'materialize --json exits 0' );
@@ -97,8 +115,10 @@ subtest 'materialize --json always emits a task array' => sub {
   my $data = decode_json( $rv->{stdout} );
   is( ref $data, 'ARRAY', 'a one-task board still yields an array, not a bare object' );
   is( scalar @$data, 1, 'one task in the payload' );
-  is( $data->[0]{id},    1,           'task id present in json' );
-  is( $data->[0]{title}, 'Only task', 'task title present in json' );
+  is( $data->[0]{id},    1,      'task id present in json' );
+  is( $data->[0]{title}, $TITLE, 'task title present in json' );
+  ok( index( $rv->{stdout}, encode_utf8($TITLE) ) >= 0,
+    'stdout carries the title as singly-encoded UTF-8' );
 };
 
 subtest 'materialize refuses on a repo without a board' => sub {
@@ -133,7 +153,7 @@ subtest 'import --yes reads the edited file view back into refs' => sub {
 
   my $file = ( path($repo)->child('tasks')->children(qr/\.md$/) )[0];
   my $edited = $file->slurp_utf8;
-  $edited =~ s/Before/After/;
+  $edited =~ s/Before/$TITLE/;
   $file->spew_utf8($edited);
 
   my $rv = _run_karr( $repo, undef, 'import', '--yes' );
@@ -142,7 +162,12 @@ subtest 'import --yes reads the edited file view back into refs' => sub {
 
   my $show = _run_karr( $repo, undef, 'show', '1', '--json' );
   my $task = decode_json( $show->{stdout} );
-  is( $task->{title}, 'After', 'the edit in the file view landed in refs' );
+  is( $task->{title}, $TITLE, 'the non-ASCII edit in the file view landed in refs' );
+
+  # The ref is the canonical state; assert its bytes rather than only what show
+  # renders, so a compensating pair of encode/decode errors cannot hide here.
+  my $git = App::karr::Git->new( dir => $repo );
+  is( $git->load_task_ref(1)->title, $TITLE, 'and the ref itself holds the characters' );
 };
 
 subtest 'import preserves task timestamps verbatim' => sub {

@@ -4,6 +4,22 @@ use Test::More;
 
 use MCP::Run::Bash;
 
+# The identity defaults live on the class, not in bin/mcp-run-bash, so that
+# library users of MCP::Run::Bash are not announced as MCP::Server's
+# 'PerlServer' / '1.0.0' either. Asserting it here is what pins that
+# placement — a version of the fix that only patched the bin script would
+# still satisfy the stdio test in t/50-bash-bin.t, but not this one.
+subtest 'default name and version identify the distribution' => sub {
+  my $server = MCP::Run::Bash->new;
+  is $server->name, 'mcp-run-bash', 'default name';
+  is $server->version, $MCP::Run::Bash::VERSION, 'default version is the distribution version';
+  isnt $server->version, '1.0.0', 'not the MCP::Server default';
+
+  my $custom = MCP::Run::Bash->new(name => 'RunServer', version => '0.001');
+  is $custom->name, 'RunServer', 'constructor still overrides name';
+  is $custom->version, '0.001', 'constructor still overrides version';
+};
+
 subtest 'constructor registers run tool' => sub {
   my $server = MCP::Run::Bash->new(name => 'TestServer');
   my $tools  = $server->tools;

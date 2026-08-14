@@ -26,58 +26,40 @@ SYNOPSIS
 DESCRIPTION
 
     This Device::Chip subclass provides specific communication to a Bosch
-    BME280 attached to a computer via an I²C adapter.
+    BME280 attached to a computer via an I²C adapter. As this chip is a
+    variation of the BMP280 which adds a humidity sensor, this module is a
+    subclass of Device::Chip::BMP280. See that module for documentation on
+    overall configuration, and access to the temperature and pressure
+    sensors common to both chips.
 
     The reader is presumed to be familiar with the general operation of
     this chip; the documentation here will not attempt to explain or define
     chip-specific concepts or features, only the use of this module to
     access them.
 
-MOUNT PARAMETERS
-
- addr
-
-    The I²C address of the device. Can be specified in decimal, octal or
-    hex with leading 0 or 0x prefixes.
-
 METHODS
 
     The following methods documented in an await expression return Future
     instances.
 
- read_id
-
-       $id = await $chip->read_id;
-
-    Returns the chip ID.
+    In addition this module inherits all the methods provided by
+    Device::Chip::BMP280.
 
  read_config
 
        $config = await $chip->read_config;
 
-    Returns a HASH reference containing the chip config, using fields named
-    from the data sheet.
+    Returns a HASH reference containing the chip config, which includes all
+    the registers provided by Device::Chip::BMP280, and additionally:
 
-       FILTER   => OFF | 2 | 4 | 8 | 16
-       MODE     => SLEEP | FORCED | NORMAL
        OSRS_H   => SKIP | 1 | 2 | 4 | 8 | 16
-       OSRS_P   => SKIP | 1 | 2 | 4 | 8 | 16
-       OSRS_T   => SKIP | 1 | 2 | 4 | 8 | 16
-       SPI3W_EN => 0 | 1
-       T_SB     => 0.5 | 10 | 20 | 62.5 | 125 | 250 | 500 | 1000
 
  change_config
 
        await $chip->change_config( %changes );
 
-    Writes updates to the configuration registers.
-
-    Note that these two methods use a cache of configuration bytes to make
-    subsequent modifications more efficient.
-
- read_status
-
-       $status = await $chip->read_status;
+    Writes updates to the configuration registers. Accepts OSRS_H as
+    defined above.
 
  read_raw
 

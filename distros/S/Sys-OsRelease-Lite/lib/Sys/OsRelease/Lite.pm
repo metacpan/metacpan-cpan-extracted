@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsRelease::Lite;
-$Sys::OsRelease::Lite::VERSION = '0.4.6+lite';
+$Sys::OsRelease::Lite::VERSION = '0.4.7+lite';
 use if $] >= 5.016, "feature", "fc";  # retain even though 5.22 is minimum Perl, same code in ...::Lite
 use feature qw(say);
 use Config;
@@ -417,7 +417,7 @@ Sys::OsRelease::Lite - read operating system details from standard /etc/os-relea
 
 =head1 VERSION
 
-version 0.4.6+lite
+version 0.4.7+lite
 
 
 =head1 SYNOPSIS

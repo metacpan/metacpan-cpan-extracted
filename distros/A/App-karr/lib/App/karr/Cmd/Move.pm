@@ -1,7 +1,7 @@
 # ABSTRACT: Change a task's status
 
 package App::karr::Cmd::Move;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -9,11 +9,13 @@ use MooX::Options (
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
+use App::karr::Role::TaskMutation;
 use App::karr::Task;
 use App::karr::Config;
 use Time::Piece;
 
-with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output',
+     'App::karr::Role::TaskMutation';
 
 
 option next => (
@@ -38,64 +40,72 @@ sub execute {
   $self->check_positional_args($args_ref, 2);
 
   $self->sync_before;
+  $self->require_board;
 
   my @pos = $self->positional_args($args_ref);
   my $id_str = $pos[0] or die "Usage: karr move ID[,ID,...] [STATUS]\n";
+  # `karr move , todo` passes the truthy "," above and then splits to an empty
+  # list, so the loop below never ran: no ids, no output, no die, exit 0. A
+  # command that silently did nothing is the one answer the exit-code contract
+  # (ADR 0002) cannot express. The "Usage:" prefix is what bin/karr keys on to
+  # make it a usage error (2) rather than a runtime failure (1).
   my @ids = $self->parse_ids($id_str);
+  die "Usage: karr move ID[,ID,...] [STATUS]\n" unless @ids;
   my $new_status = $pos[1];
 
-  my $ec = $self->store->effective_config;
   my @statuses = $self->store->all_status_names;
 
-  my @results;
-  for my $id (@ids) {
-    my $task = $self->find_task($id);
-    die "Task $id not found\n" unless $task;
+  # Every id is attempted, whatever the ones before it did: a missing id used to
+  # die from inside this loop and take the rest of the batch with it, so the
+  # result depended on where the bad id sat in the list (ticket #61).
+  my ($results, $failed) = $self->run_batch(\@ids, sub {
+    my ($id) = @_;
 
-    my $task_new_status = $new_status;
+    # Everything that reads the task happens inside the guard, --next/--prev
+    # included: the target status is derived from the task's current status, so
+    # deciding it outside the loop would decide it against a revision another
+    # agent may already have replaced.
+    my $old_status;
+    my $task = $self->update_task_guarded($id, sub {
+      my ($task) = @_;
 
-    if ($self->next) {
-      my $idx = $self->_status_index(\@statuses, $task->status);
-      die "Already at last status\n" if $idx >= $#statuses;
-      $task_new_status = $statuses[$idx + 1];
-    } elsif ($self->prev) {
-      my $idx = $self->_status_index(\@statuses, $task->status);
-      die "Already at first status\n" if $idx <= 0;
-      $task_new_status = $statuses[$idx - 1];
-    }
+      $self->check_claim($task, $self->claim);
 
-    die "New status required\n" unless $task_new_status;
+      my $task_new_status = $new_status;
 
-    # Check require_claim
-    if ($self->store->status_requires_claim($task_new_status) && !$self->claim && !$task->has_claimed_by) {
-      die "Status '$task_new_status' requires --claim\n";
-    }
+      if ($self->next) {
+        my $idx = $self->_status_index(\@statuses, $task->status);
+        die "Already at last status\n" if $idx >= $#statuses;
+        $task_new_status = $statuses[$idx + 1];
+      } elsif ($self->prev) {
+        my $idx = $self->_status_index(\@statuses, $task->status);
+        die "Already at first status\n" if $idx <= 0;
+        $task_new_status = $statuses[$idx - 1];
+      }
 
-    if ($self->claim) {
-      $task->claimed_by($self->claim);
-      $task->claimed_at(gmtime->datetime . 'Z');
-    }
+      die "New status required\n" unless $task_new_status;
 
-    my $old_status = $task->status;
-    $task->status($task_new_status);
+      if ($self->claim) {
+        $task->claimed_by($self->claim);
+        $task->claimed_at(gmtime->datetime . 'Z');
+      }
 
-    # Set started/completed timestamps
-    if ($task_new_status eq 'in-progress' && !$task->has_started) {
-      $task->started(gmtime->strftime('%Y-%m-%d'));
-    }
-    if ($task_new_status eq 'done' && !$task->has_completed) {
-      $task->completed(gmtime->strftime('%Y-%m-%d'));
-    }
+      $old_status = $self->apply_status_change($task, $task_new_status, $self->claim);
+    });
 
-    $self->save_task($task);
-
-    push @results, { id => $task->id, title => $task->title, old_status => $old_status, new_status => $task_new_status };
-    printf "Moved task %d: %s -> %s\n", $task->id, $old_status, $task_new_status unless $self->json;
-  }
+    printf "Moved task %d: %s -> %s\n", $task->id, $old_status, $task->status unless $self->json;
+    # After the write, not inside the guarded callback that decided it: see
+    # App::karr::Role::DependencyCheck/dependency_report. Under --json the pair
+    # it returns lands in this hash instead of on STDERR.
+    return { id => $task->id, title => $task->title, old_status => $old_status,
+             new_status => $task->status, $self->dependency_report( $task->id ) };
+  });
 
   $self->sync_after;
 
-  $self->print_json_results(@results);
+  $self->print_json_results(@$results);
+
+  $self->report_batch_failure($failed, scalar @ids);
 }
 
 sub _status_index {
@@ -120,7 +130,7 @@ App::karr::Cmd::Move - Change a task's status
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

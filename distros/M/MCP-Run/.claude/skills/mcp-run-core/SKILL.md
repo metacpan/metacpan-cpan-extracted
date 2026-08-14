@@ -60,6 +60,30 @@ command-spezifischen Filter nicht.
   Permission ist Claude Code's Job.
 - **`mcp-run-compress --b64` hat hardcoded 1800s Timeout** — beim Touchen prüfen,
   ob das noch zeitgemäß ist (kommt aus dem Bonus-Hook, nicht aus dem MCP-Server).
+- **MCP >= 0.15 ist Pflicht** (cpanfile-Pin, bewusst ohne Kompatibilitätsweichen).
+  Ab 0.15 ist die Protocol-Revision Teil *jedes* Requests: `params._meta` braucht
+  `protocolVersion` (gegen `MCP::Constants::SUPPORTED_VERSIONS`) und
+  `clientCapabilities`, sonst weist `MCP::Server::_check_meta` **vor** dem Dispatch
+  mit `Missing protocol version` ab. Wer im Test einen nackten
+  `MCP::Server::Context` baut, umgeht den Transport und landet im modernen Pfad —
+  dann fallen scheinbar unabhängige Subtests gleichzeitig um, und die eine echte
+  Ursache versteckt sich hinter vier Symptomen. `initialize` heißt dort
+  `server/discover`, `serverInfo` liegt in `result._meta`. Revision nie hardcoden,
+  immer aus `MCP::Constants` ziehen.
+- **Echte stdio-Clients laufen über `MCP::Server::Legacy`** (klassischer
+  `initialize`-Handshake, `_check_meta` übersprungen) — deshalb war der
+  Protokollbruch ein reines Testproblem. MCP dokumentiert diesen Pfad aber als
+  temporär; wenn er fällt, verlieren Clients mit klassischem Handshake den Zugang
+  zu `mcp-run-bash` (karr #7, offene Produktfrage).
+- **`MCP::Run::Compress` wird compile-time geladen** (`use` in lib/MCP/Run.pm),
+  obwohl `_get_compressor` lazy konstruiert. Absicht: ein fehlendes Compress-Modul
+  soll den Server beim **Start** umbringen, nicht beim ersten `tools/call`. Genau
+  das fehlte bis 0.105 und machte jeden `tools/call` in der Default-Konfiguration
+  unbrauchbar. Nicht in ein `require` im Lazy-Loader zurückbauen.
+- **`serverInfo` kommt aus Klassen-Defaults, nicht aus dem bin-Skript.**
+  `MCP::Run::Bash` setzt `name`/`version` und überschreibt damit die
+  `MCP::Server`-Defaults (`PerlServer`/`1.0.0`). Identität gehört in die Klasse,
+  damit Library-Nutzer sie mitbekommen — nicht in `bin/mcp-run-bash`.
 
 ## Pipeline (Compression)
 
@@ -101,12 +125,23 @@ command-spezifischen Filter nicht.
 t/00-load.t          # Load Tests
 t/05-base.t          # Basis-Klasse
 t/10-bash.t          # bash -c, allowlist, validator, timeout, format_result
-t/20-integration.t   # MCP lifecycle (initialize, tools/list, tools/call)
+t/20-integration.t   # MCP lifecycle (server/discover, tools/list, tools/call)
+                     # + protocol contract: fehlendes _meta / alte Revision
 t/compress.t         # Compression
 t/30-no-warnings.t   # Regression: Compress.pm warnings (transform undef, undef inputs)
 t/40-compress-bin.t  # bin/mcp-run-compress: --hook, --install-claude, --filter-files,
                      # end-to-end MCP compression mit echtem command context
+t/50-bash-bin.t      # bin/mcp-run-bash als Subprozess über echtes stdio
+                     # (Legacy-Handshake): Compression an/aus, serverInfo-Identität
 ```
+
+**Negative Assertions allein fangen einen toten Server nicht.** In `t/50-bash-bin.t`
+gingen `unlike $text, qr/drwxr-xr-x/` und `unlike $text, qr/total \d+/` auf dem
+kaputten Build *leer* durch — ein leeres Ergebnis enthält auch keine Rechte-Spalte.
+Was den Test trägt, ist die positive Assertion (`like ... qr/^- README\.md$/m`)
+gepaart mit einem `MCP_RUN_COMPRESS=0`-Lauf, der das rohe Listing behalten muss.
+Erst diese Paarung verhindert, dass sich ein Crash durch stilles Abschalten der
+Compression "beheben" lässt. Beim Schreiben von Filter-Tests immer so paaren.
 
 **`prove -l t/` ist non-recursive** und überspringt nichts in Subdirs — alle
 Tests liegen direkt unter `t/`, aber gewöhne dir trotzdem `prove -lr t/` an,
@@ -132,6 +167,8 @@ baut single-arch).
 ## Conventions
 
 - Style, Moose patterns, Module-Loading, cpanfile-Pinning: skill `perl-core`
+- Mojo::Base (Attribute, Defaults, lazy `sub {}`, Rollen) — die ganze Distribution
+  baut darauf auf: skill `perl-mojo`
 - Bundle/POD/Changes/{{$NEXT}} Konventionen: skill `perl-release-author-getty`
 - dist.ini Plugins: skill `perl-release-dist-ini`
 - MCP-Server Setup (`MCP::Server`, `$server->tool()`): skill `perl-mcp`

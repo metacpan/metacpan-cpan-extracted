@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame;
-$Context::Singleton::Frame::VERSION = '1.0.8';
+$Context::Singleton::Frame::VERSION = '1.0.9';
 use Moo;
 
 use Context::Singleton::Frame::DB;

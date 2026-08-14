@@ -1,5 +1,15 @@
 Revision history for Dancer2-Plugin-Auth-Extensible
 
+0.713 Thu 13 Aug 12:00:00 BST 2026
+
+    [BUG FIXES]
+
+    * Fix the ability to generate links in emails that have dynamic hosts. The
+      security fix in the previous release cached the first base URI, which
+      meant that if an application intentionally supports different hosts for
+      its generated emails (based on the reqest host) then these were always
+      fixed at the first request.
+
 0.712 Wed 12 Aug 12:00:00 BST 2026
 
     [SECURITY FIXES]

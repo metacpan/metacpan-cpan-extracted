@@ -1,22 +1,24 @@
 ---
-abstract: 'A base role for quickly and easily creating web service clients'
+abstract: 'A base role for creating web service clients'
 author:
   - 'Naveed Massjouni <naveed@vt.edu>'
 build_requires:
+  Clone: '0'
+  Compress::Zlib: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::LWP::UserAgent: '0'
   Test::More: '0'
-  perl: '5.006'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,13 +27,13 @@ name: WebService-Client
 provides:
   WebService::Client:
     file: lib/WebService/Client.pm
-    version: '1.0001'
+    version: '1.0100'
   WebService::Client::Response:
     file: lib/WebService/Client/Response.pm
-    version: '1.0001'
+    version: '1.0100'
 requires:
   Carp: '0'
-  HTTP::Message: '6.06'
+  HTTP::Message: '6.21'
   HTTP::Request: '0'
   HTTP::Request::Common: '0'
   HTTP::Response::Stringable: '0.0002'
@@ -39,10 +41,14 @@ requires:
   LWP::UserAgent: '0'
   Moo: '1.005000'
   Moo::Role: '0'
-  perl: '5.006'
+  Ref::Util: '0'
+  Scalar::Util: '0'
+  URI: '5.35'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/ironcamel/WebService-Client/issues
   repository: git://github.com/ironcamel/WebService-Client.git
-version: '1.0001'
-x_generated_by_perl: v5.30.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '1.0100'
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.69'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

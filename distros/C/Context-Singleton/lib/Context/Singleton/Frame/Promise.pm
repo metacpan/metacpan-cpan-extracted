@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::Promise;
-$Context::Singleton::Frame::Promise::VERSION = '1.0.8';
+$Context::Singleton::Frame::Promise::VERSION = '1.0.9';
 use Moo;
 
 use Scalar::Util qw[ weaken ];

@@ -5,6 +5,7 @@ use warnings;
 
 use Test2::V0;
 
+require Device::Chip::BMP280;
 require Device::Chip::BME280;
 
 pass( 'Modules loaded' );

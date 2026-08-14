@@ -1,0 +1,14 @@
+logger: capture
+plugins:
+    Auth::Extensible:
+        realms:
+            default:
+                provider: Provider::ConfigExtended
+                users:
+                    - user: dave
+                      pass: beer
+                      name: David
+        mailer:
+            module: Mail::Message
+            options:
+                via: sendmail

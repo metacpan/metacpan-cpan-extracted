@@ -1,7 +1,7 @@
 # ABSTRACT: Show full details of a task
 
 package App::karr::Cmd::Show;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -48,13 +48,30 @@ sub _show_task {
   printf "Tags:     %s\n", join(', ', @{$task->tags}) if @{$task->tags};
   printf "Due:      %s\n", $task->due if $task->has_due;
   printf "Estimate: %s\n", $task->estimate if $task->has_estimate;
+  printf "Depends:  %s\n",
+    join( ', ', map { $self->_dependency_label($_) } @{$task->depends_on} )
+    if @{$task->depends_on};
   printf "Claimed:  %s\n", $task->claimed_by if $task->has_claimed_by;
-  printf "Blocked:  %s\n", $task->blocked if $task->has_blocked;
+  printf "Blocked:  %s\n", $task->has_block_reason ? $task->block_reason : 'yes'
+    if $task->has_blocked;
   printf "Created:  %s\n", $task->created;
   printf "Updated:  %s\n", $task->updated;
-  if ($task->body) {
+  if (defined $task->body && length $task->body) {
     print "\n" . $task->body . "\n";
   }
+}
+
+# A bare id list answers the wrong question: `depends_on: [5]` tells the reader
+# nothing about whether 5 is finished, which is the only thing they wanted to
+# know. Half of what made ticket #123 a trap was that `show` did not print the
+# field at all, so a dependency recorded on a card was invisible to the one
+# reader who could have acted on it. An id the board does not have is called
+# unknown rather than left to look like a status.
+sub _dependency_label {
+  my ($self, $dep_id) = @_;
+  my $dep = $self->find_task($dep_id);
+  return sprintf '%s (unknown)', $dep_id unless $dep;
+  return sprintf '%s (%s)', $dep_id, $dep->status;
 }
 
 # Tasks sorted most-recently-updated first.
@@ -88,7 +105,7 @@ sub _select_tasks {
     return ($task);
   }
 
-  my $limit = $self->last > 0 ? $self->last : 1;
+  my $limit = $self->last;
 
   if ($self->me) {
     my @tasks = grep { defined } map { $self->find_task($_) } $self->_my_recent_ids($limit);
@@ -109,6 +126,18 @@ sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
   $self->check_positional_args($args_ref, 1);
+
+  # --last is a count, so 0 and negatives are invalid values, not requests for
+  # a smaller board. They used to be clamped silently to 1, so `--last 0`
+  # answered with one task and exit 0 -- indistinguishable from a correct call
+  # (ticket #76). ADR 0002 classifies an invalid option value as a usage error.
+  $self->usage_error( sprintf '--last must be 1 or greater (got %d)', $self->last )
+    if $self->last < 1;
+
+  # After the usage checks, before any lookup: "No tasks found." / `[]` for an
+  # id that was never loaded is the wrong answer, and "Task N not found" is a
+  # worse one -- neither says the board itself is not here (#135).
+  $self->require_local_board;
 
   my @pos = $self->positional_args($args_ref);
   my @tasks = $self->_select_tasks($pos[0]);
@@ -146,7 +175,7 @@ App::karr::Cmd::Show - Show full details of a task
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

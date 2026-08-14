@@ -5,7 +5,7 @@ use warnings;
 use feature q (state);
 
 package Context::Singleton;
-$Context::Singleton::VERSION = '1.0.8';
+$Context::Singleton::VERSION = '1.0.9';
 use parent q (Exporter::Tiny);
 
 use Context::Singleton::Frame;

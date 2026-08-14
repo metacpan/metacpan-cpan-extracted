@@ -1,12 +1,16 @@
 # ABSTRACT: Generate board context summary for embedding
 
 package App::karr::Cmd::Context;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-  usage_string => 'USAGE: karr context [--write-to FILE] [--sections LIST] [--days N] [--json]',
+  usage_string => 'USAGE: karr context [--write-to FILE] [--sections LIST] [--days N] '
+    . '[--activity-limit N] [--json]',
 );
+use Path::Tiny ();
+use App::karr::Error qw( user_error clean_error );
+use App::karr::Encoding qw( json_decode );
 use Time::Piece;
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
@@ -25,7 +29,7 @@ option write_to => (
 option sections => (
   is => 'ro',
   format => 's',
-  doc => 'Comma-separated section filter (in-progress,blocked,overdue,recently-completed)',
+  doc => 'Comma-separated section filter (in-progress,blocked,overdue,recently-completed,activity)',
 );
 
 option days => (
@@ -35,8 +39,31 @@ option days => (
   doc => 'Lookback days for recently-completed (default: 7)',
 );
 
+option activity_limit => (
+  is => 'ro',
+  format => 'i',
+  default => sub { 5 },
+  doc => "Other agents' recent log entries to include in activity (default: 5)",
+);
+
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
+
+  # --activity-limit is a count, so 0 and negatives are invalid values rather
+  # than requests for a differently sized section -- and here the wrong answer
+  # is worse than usual: the falsy guard in _recent_activity reads 0 as "no
+  # bound at all", so the one option whose whole job is to keep the briefing
+  # short would silently pour the entire log into it, and a negative produced
+  # an empty section and exit 0, indistinguishable from "nobody else acted".
+  # Same rule and same reason as `show --last` (ticket #76, ADR 0002).
+  $self->usage_error(
+    sprintf '--activity-limit must be 1 or greater (got %d)', $self->activity_limit )
+    if $self->activity_limit < 1;
+
+  # A briefing built from a board that was never read says "0 tasks, nothing
+  # blocked, nothing overdue" -- the most confident possible way to be wrong,
+  # and --write-to would then paste it into AGENTS.md (#135).
+  $self->require_local_board;
 
   my $ec = $self->store->effective_config;
   my @tasks = $self->load_tasks;
@@ -62,7 +89,7 @@ sub execute {
   }
 
   my @section_data;
-  my @all_sections = qw(in-progress blocked overdue recently-completed);
+  my @all_sections = qw(in-progress blocked overdue recently-completed activity);
 
   for my $sec (@all_sections) {
     next if $self->sections && !$wanted_sections{$sec};
@@ -74,20 +101,33 @@ sub execute {
         grep { $_->status ne $first_status && !$self->store->is_terminal_status($_->status) && !$_->has_blocked }
         @active_tasks;
     } elsif ($sec eq 'blocked') {
-      @items = map { $self->_task_item($_, 'blocked: ' . ($_->blocked // '')) }
+      @items = map { $self->_task_item($_, 'blocked: ' . ($_->has_block_reason ? $_->block_reason : '')) }
         grep { $_->has_blocked }
         @active_tasks;
     } elsif ($sec eq 'overdue') {
       my $now = gmtime->strftime('%Y-%m-%d');
       @items = map { $self->_task_item($_, 'due ' . $_->due) }
-        grep { $_->has_due && $_->due lt $now && !$self->store->is_terminal_status($_->status) }
+        grep { $self->_is_overdue($_, $now) }
         @active_tasks;
     } elsif ($sec eq 'recently-completed') {
+      # Over every task, not @active_tasks: that list is by definition the
+      # non-terminal ones, so intersecting it with the terminal statuses was
+      # empty by construction and this section had never once had an entry on
+      # any board (ticket #99). kanban-md's buildRecentlyCompletedSection scans
+      # the whole task list too.
+      #
+      # "Recently" is bounded by the completion stamp, as it is there, but to
+      # the day rather than to the second: `completed` is a string here and an
+      # interop card can carry it as a bare `YYYY-MM-DD`, as an RFC3339 stamp
+      # in UTC, or as one with a local offset, and a day-granular cutoff is the
+      # coarsest bound all three compare correctly against.
       my $cutoff = (gmtime() - ($self->days * 86400))->strftime('%Y-%m-%d');
       @items = map { $self->_task_item($_, 'completed ' . ($_->completed // '')) }
         sort { ($b->completed // '') cmp ($a->completed // '') }
         grep { $self->store->is_terminal_status($_->status) && $_->status ne 'archived' && $_->has_completed && $_->completed ge $cutoff }
-        @active_tasks;
+        @tasks;
+    } elsif ($sec eq 'activity') {
+      @items = $self->_recent_activity;
     }
 
     push @section_data, { name => $sec, items => \@items } if @items;
@@ -135,16 +175,29 @@ sub _render_markdown {
     'blocked'            => 'Blocked',
     'overdue'            => 'Overdue',
     'recently-completed' => 'Recently Completed',
+    'activity'           => 'Recent Activity',
   );
 
   for my $sec (@$sections) {
     $md .= "### " . ($section_title{$sec->{name}} // $sec->{name}) . "\n\n";
-    for my $item (@{$sec->{items}}) {
-      $md .= sprintf "- **#%d** %s (%s", $item->{id}, $item->{title}, $item->{priority};
-      $md .= ", \@$item->{assignee}" if $item->{assignee};
-      $md .= ")";
-      $md .= " — $item->{note}" if $item->{note};
-      $md .= "\n";
+    if ($sec->{name} eq 'activity') {
+      # An activity item is a log event, not a task -- it has no priority or
+      # assignee to report, so it gets its own line shape instead of being
+      # forced into _task_item's.
+      for my $item (@{$sec->{items}}) {
+        $md .= sprintf "- %s **%s** %s task#%s", $item->{ts} // '?',
+          $item->{agent} // '?', $item->{action} // '?', $item->{task_id} // '?';
+        $md .= " ($item->{detail})" if defined $item->{detail} && length $item->{detail};
+        $md .= "\n";
+      }
+    } else {
+      for my $item (@{$sec->{items}}) {
+        $md .= sprintf "- **#%d** %s (%s", $item->{id}, $item->{title}, $item->{priority};
+        $md .= ", \@$item->{assignee}" if $item->{assignee};
+        $md .= ")";
+        $md .= " \x{2014} $item->{note}" if $item->{note};
+        $md .= "\n";
+      }
     }
     $md .= "\n";
   }
@@ -155,21 +208,28 @@ sub _render_markdown {
 
 sub _write_to_file {
   my ($self, $md) = @_;
-  require Path::Tiny;
   my $file = Path::Tiny::path($self->write_to);
 
+  # Decide the whole file first, then write it once. --write into a directory
+  # karr may not write is the user's path, not karr's, and Path::Tiny's error
+  # would otherwise report this file and line at them (#77). A merely
+  # read-only target file still goes through: spew renames into place.
+  my $out = $md;
   if ($file->exists) {
-    my $content = $file->slurp_utf8;
+    my $content = eval { $file->slurp_utf8 };
+    defined $content
+      or user_error( "Could not read $file: ", clean_error($@) );
     if ($content =~ /<!-- BEGIN kanban-md context -->.*<!-- END kanban-md context -->/s) {
       $content =~ s/<!-- BEGIN kanban-md context -->.*<!-- END kanban-md context -->\n?/$md/s;
-      $file->spew_utf8($content);
+      $out = $content;
     } else {
       my $sep = $content =~ /\n$/ ? "\n" : "\n\n";
-      $file->spew_utf8($content . $sep . $md);
+      $out = $content . $sep . $md;
     }
-  } else {
-    $file->spew_utf8($md);
   }
+
+  eval { $file->spew_utf8($out); 1 }
+    or user_error( "Could not write $file: ", clean_error($@) );
 
   printf "Context written to %s\n", $self->write_to;
 }
@@ -181,21 +241,97 @@ sub _task_item {
     title    => $task->title,
     status   => $task->status,
     priority => $task->priority,
-    ($task->has_assignee ? (assignee => $task->assignee) : ()),
+    # Empty means absent, as in pick and list (ticket #59): an `assignee: ""`
+    # from kanban-md must not become an "assignee":"" key in the --json
+    # payload. The Markdown renderer already tested truth rather than the
+    # predicate, so only --json ever saw it.
+    ( $task->has_assignee && length $task->assignee
+      ? ( assignee => $task->assignee )
+      : () ),
     ($note ? (note => $note) : ()),
   };
 }
 
+# Cross-agent recent activity (ticket #92). #64 put every mutating command
+# through the log, but context read none of it -- the log was still summarised
+# purely from task state. Read via the same merged-refs walk `karr log` does,
+# but bounded, because this is a briefing meant to stay short, not the log
+# viewer: the whole log is what `karr log` is for.
+#
+# The bound excludes the invoking identity's own entries rather than
+# truncating a merged view blindly. An agent about to pick up work already
+# knows what it itself just did -- `karr show --me` is the tool for that --
+# so what changes its decision is what *other* identities have been doing.
+# Only the current-scheme ref is excluded; entries left on a pre-#75 legacy
+# ref (see App::karr::ActivityLog) are rare enough, and old enough, that
+# counting them as "someone else" costs nothing in practice.
+sub _recent_activity {
+  my ($self) = @_;
+  my $git = $self->git;
+  my $self_ref = 'refs/karr/log/' . $self->activity_log->identity;
+
+  my @entries;
+  for my $ref ($git->list_refs('refs/karr/log/')) {
+    next if $ref eq $self_ref;
+    my $content = $git->read_ref($ref);
+    next unless defined $content && length $content;
+    for my $line (split /\n/, $content) {
+      next unless length $line;
+      my $decoded = eval { json_decode($line) };
+      push @entries, $git->maybe_repair_legacy($decoded) if $decoded;
+    }
+  }
+
+  @entries = sort { ($a->{ts} // '') cmp ($b->{ts} // '') } @entries;
+  my $limit = $self->activity_limit;
+  @entries = @entries[-$limit .. -1] if $limit && @entries > $limit;
+
+  # Newest first, like recently-completed -- the point of a briefing is that
+  # the most relevant items are the ones on top.
+  return map {
+    my $e = $_;
+    {
+      ts      => $e->{ts},
+      agent   => $e->{agent},
+      action  => $e->{action},
+      task_id => $e->{task_id},
+      ( defined $e->{detail} && length $e->{detail} ? ( detail => $e->{detail} ) : () ),
+    }
+  } reverse @entries;
+}
+
+# The in-progress section is the briefing's "what is being worked on right
+# now", sorted most-urgent-first. The order comes from the board's own
+# priorities list -- a hardcoded table used to give the wrong answer for any
+# priority the default set did not know (ticket #149). Convention matches
+# pick / kanban-md: higher index in the list = more urgent.
 sub _pri_order {
   my ($self, $task) = @_;
-  my %order = App::karr::Config->priority_order;
-  return $order{$task->priority} // 2;
+  my @priorities = $self->config->priorities;
+  my %index;
+  $index{$priorities[$_]} //= $_ for 0 .. $#priorities;
+  my $max = $#priorities;
+  return $max - ( $index{ $task->priority } // -1 );
 }
 
 sub _count_overdue {
   my ($self, $tasks) = @_;
   my $now = gmtime->strftime('%Y-%m-%d');
-  return scalar grep { $_->has_due && $_->due lt $now && !$self->store->is_terminal_status($_->status) } @$tasks;
+  return scalar grep { $self->_is_overdue($_, $now) } @$tasks;
+}
+
+# One overdue test for the count and the section, so the header can never
+# disagree with the list under it.
+#
+# `due: ""` satisfies the predicate but is not a date, and the empty string
+# sorts before every real one -- so a kanban-md card carrying it was reported
+# overdue for ever, with "due " and nothing after it. Empty means absent, as it
+# does in pick (ticket #59).
+sub _is_overdue {
+  my ($self, $task, $now) = @_;
+  return 0 unless $task->has_due && length $task->due;
+  return 0 unless $task->due lt $now;
+  return !$self->store->is_terminal_status($task->status);
 }
 
 sub _load_tasks {
@@ -217,13 +353,14 @@ App::karr::Cmd::Context - Generate board context summary for embedding
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
     karr context
     karr context --sections blocked,overdue
     karr context --write-to AGENTS.md --days 14
+    karr context --activity-limit 10
     karr context --json
 
 =head1 DESCRIPTION
@@ -234,9 +371,15 @@ JSON, or update an existing file between sentinel comments.
 
 =head1 SECTIONS
 
-The generated context can include C<in-progress>, C<blocked>, C<overdue>, and
-C<recently-completed>. Use C<--sections> with a comma-separated list to limit
-the output to a subset.
+The generated context can include C<in-progress>, C<blocked>, C<overdue>,
+C<recently-completed>, and C<activity>. Use C<--sections> with a
+comma-separated list to limit the output to a subset.
+
+C<activity> is the board's activity log (see L<App::karr::Cmd::Log>), filtered
+to entries written by identities other than the one invoking C<context> and
+bounded by C<--activity-limit> (default 5). An agent reading its own briefing
+already knows what it just did -- C<karr show --me> is the tool for that --
+so what belongs in a briefing is what everyone *else* has been doing.
 
 =head1 FILE UPDATE MODE
 
@@ -247,7 +390,7 @@ already present; otherwise it appends the generated block to the file.
 =head1 SEE ALSO
 
 L<karr>, L<App::karr>, L<App::karr::Cmd::Board>, L<App::karr::Cmd::List>,
-L<App::karr::Cmd::Config>, L<App::karr::Cmd::Skill>
+L<App::karr::Cmd::Config>, L<App::karr::Cmd::Skill>, L<App::karr::Cmd::Log>
 
 =head1 SUPPORT
 

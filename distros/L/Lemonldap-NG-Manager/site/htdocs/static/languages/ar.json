@@ -16,6 +16,7 @@
 "OpenIDConnect":"أوبين أيدي كونيكت",
 "OptionalTitle":"عنوان الخيارات",
 "SMTP":"بروتوكول إرسال البريد SMTP",
+"SMTPAuthMech":"SASL mechanism",
 "SMTPAuthPass":"كلمة المرور",
 "SMTPAuthUser":"المستخدم",
 "SMTPPort":"المنفذ",

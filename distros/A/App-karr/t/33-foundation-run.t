@@ -35,11 +35,17 @@ subtest 'max_runtime: 0 disables the timeout' => sub {
   like $out, qr/nolimit/, 'output captured under undef-timeout path';
 };
 
-subtest 'timeout sends SIGKILL and reports exit -1' => sub {
+subtest 'timeout sends SIGTERM then SIGKILL and reports 143' => sub {
+  # Ticket #164: timeout kills the agent's process group with SIGTERM,
+  # escalates to SIGKILL, and reports the agent's exit status as the
+  # conventional 128 + signum. Old behaviour reported -1 (a magic number
+  # indistinguishable from "agent ran with exit -1") and killed only the
+  # agent process — children inherited init and survived, so the next
+  # tick saw a still-running karr-foundation and skipped the board (#148).
   my $repo = path( tempdir( CLEANUP => 1 ) );
   my $start = time;
   my ( $code, $out ) = $f->_run_command( $repo, { max_runtime => 1 }, 'sleep 30' );
-  is $code, -1, 'timed-out run reports exit -1';
+  is $code, 143, 'timed-out run reports 128+SIGTERM';
   ok time - $start < 10, 'killed promptly, not after the full sleep';
 };
 

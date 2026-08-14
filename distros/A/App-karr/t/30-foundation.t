@@ -70,9 +70,20 @@ subtest 'missing config warns and returns empty' => sub {
   # cannot resolve to a real file on the machine running the tests.
   local $ENV{HOME} = tempdir( CLEANUP => 1 );
   my $f = new_foundation();
-  my $cfg = $f->_config_data;
+  # The warning is the subject of this subtest, so catch it rather than let it
+  # through to the harness's STDERR. That handle has no :encoding(UTF-8) layer
+  # here -- bin/karr-foundation installs it via enable_std_utf8, an in-process
+  # caller does not -- so the em dash in the message (ticket #108) would print
+  # wide and warn about it on the way out.
+  my @warnings;
+  my $cfg = do {
+    local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+    $f->_config_data;
+  };
   is ref $cfg, 'HASH', 'returns hashref';
   is scalar keys %$cfg, 0, 'empty when no config';
+  is scalar @warnings, 1, 'and says so exactly once';
+  like $warnings[0], qr/config not found/, '...naming the missing config';
 };
 
 subtest 'config file loaded' => sub {
@@ -242,22 +253,74 @@ subtest 'stale lock (dead PID) → not held' => sub {
   ok ! $f->_lock_held( $dir ), 'stale lock treated as not held';
 };
 
-subtest 'live lock (our own PID) → held' => sub {
+# Ticket #162: the lock's source of truth is flock(2) on an open fd, not the
+# pid written in the file. A file that names our pid but has no flock is
+# stale and not held — the previous foundation died without releasing, and
+# the next probe should be able to take over. Conversely, the live lock is
+# the one whose fd we hold; an outside observer sees it via _lock_held.
+subtest 'live lock held via flock, not via pid text' => sub {
   my $dir = tempdir( CLEANUP => 1 );
-  $dir->child('.karr.lock')->spew_utf8("$$\n");  # our PID
-  my $f   = new_foundation();
-  ok $f->_lock_held( $dir ), 'own PID treated as held';
+  # File exists and names our pid, but is not flock'd — not held.
+  $dir->child('.karr.lock')->spew_utf8("$$\n");
+  my $f = new_foundation();
+  ok ! $f->_lock_held( $dir ), 'pid alone is no longer proof of life';
+
+  # Now acquire — flock is what counts.
+  ok $f->_acquire_lock( $dir ), 'acquire returns true';
+  ok  $f->_lock_held( $dir ),  'live flock => held';
+  # The file's content is JSON, not bare pid.
+  my $content = $f->_read_lock_metadata( $dir );
+  is $content->{pid}, $$ // 0, 'recorded pid matches ours'
+    or diag 'lock file does not record our foundation pid';
+  # _take_lock_fh drops the fd; the lock file may still exist briefly on
+  # disk but is no longer held by anyone.
+  $f->_take_lock_fh( $dir );
+  ok ! $f->_lock_held( $dir ), 'fd closed => not held';
 };
 
-subtest 'acquire and release' => sub {
+subtest 'acquire and release round-trip' => sub {
   my $dir = tempdir( CLEANUP => 1 );
   my $f   = new_foundation();
-  $f->_acquire_lock( $dir );
-  my $pid = $dir->child('.karr.lock')->slurp_utf8;
-  chomp $pid;
-  is $pid, $$, 'lock file contains our PID';
+  ok $f->_acquire_lock( $dir ), 'acquire returns true';
+  ok  $f->_lock_held( $dir ), 'held after acquire';
   $f->_release_lock( $dir );
-  ok ! $dir->child('.karr.lock')->exists, 'lock file removed';
+  ok ! $f->_lock_held( $dir ), 'not held after release';
+  ok ! $dir->child('.karr.lock')->exists, 'lock file removed on release';
+};
+
+# Two ticks cannot both hold the lock: the second one's LOCK_EX|LOCK_NB
+# probe fails with EWOULDBLOCK. The previous design let the second tick
+# spew over the first one's pid text and then unlock the file on its way
+# out, leaving a third tick to think the board was free while the first
+# one was still running (#162).
+subtest 'two acquires in sequence: only the second waits' => sub {
+  my $dir = tempdir( CLEANUP => 1 );
+  my $f1 = new_foundation();
+  my $f2 = new_foundation();
+  ok $f1->_acquire_lock( $dir ), 'first acquires';
+  ok ! $f2->_acquire_lock( $dir ), 'second refuses (EWOULDBLOCK)';
+  ok $f1->_lock_held( $dir ),  'first still holds it';
+  $f1->_release_lock( $dir );
+  ok $f2->_acquire_lock( $dir ), 'second succeeds once first released';
+  $f2->_release_lock( $dir );
+};
+
+# _release_lock does not touch a lock that a different foundation instance
+# holds. Without this, a foundation whose process restart re-acquired
+# cleanly would, on its way out, unlock the file its successor already
+# owns — the successor's drain would then race the next tick (#162 again,
+# different shape: pid-recycled via systemd's restart loop).
+subtest 'release refuses to unlock somebody else\'s lock' => sub {
+  my $dir = tempdir( CLEANUP => 1 );
+  my $f1 = new_foundation();
+  my $f2 = new_foundation();
+  $f1->_acquire_lock( $dir );
+  # Force f2's release attempt on f1's lock. f2 has no fd, so the call is
+  # a no-op — the lock stays held by f1.
+  $f2->_release_lock( $dir );
+  ok $f1->_lock_held( $dir ), 'f1 still holds it after f2\'s release';
+  ok -e $dir->child('.karr.lock'), 'lock file still present';
+  $f1->_release_lock( $dir );
 };
 
 # ---------------------------------------------------------------------------

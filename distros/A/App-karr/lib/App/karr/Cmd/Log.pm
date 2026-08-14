@@ -1,7 +1,7 @@
 # ABSTRACT: Show activity log
 
 package App::karr::Cmd::Log;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -9,7 +9,7 @@ use MooX::Options (
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
-use JSON::MaybeXS qw( decode_json );
+use App::karr::Encoding qw( json_decode );
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
@@ -36,6 +36,20 @@ option last => (
 sub execute {
     my ($self, $args_ref, $chain_ref) = @_;
 
+    # --last is a count, so 0 and negatives are invalid values, not requests
+    # for a smaller log. The pre-fix truthiness guard read 0 as "no bound
+    # at all" and dumped the full log, while a negative passed the guard and
+    # sliced an empty range, so the command reported an empty log and exited
+    # 0 -- indistinguishable from "the board has no activity" (ticket #151).
+    # Same rule and same reason as `show --last` (ticket #76, ADR 0002).
+    $self->usage_error(
+        sprintf '--last must be 1 or greater (got %d)', $self->last )
+      if $self->last < 1;
+
+    # "No log entries." is what a board with no activity says; a repository
+    # with no board has to say something else (#135).
+    $self->require_local_board;
+
     my $git = $self->git;
 
     unless ($git->is_repo) {
@@ -49,8 +63,8 @@ sub execute {
         my $content = $git->read_ref($ref);
         next unless $content;
         for my $line (split /\n/, $content) {
-            my $entry = eval { decode_json($line) };
-            push @entries, $entry if $entry;
+            my $entry = eval { json_decode($line) };
+            push @entries, $git->maybe_repair_legacy($entry) if $entry;
         }
     }
 
@@ -66,7 +80,7 @@ sub execute {
     }
 
     # Limit
-    if ($self->last && @entries > $self->last) {
+    if (@entries > $self->last) {
         @entries = @entries[-$self->last .. -1];
     }
 
@@ -104,7 +118,7 @@ App::karr::Cmd::Log - Show activity log
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 

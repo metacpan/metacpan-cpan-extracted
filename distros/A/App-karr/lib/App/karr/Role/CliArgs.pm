@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing option-aware CLI positional-argument parsing
 
 package App::karr::Role::CliArgs;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo::Role;
 
 
@@ -26,6 +26,14 @@ use Moo::Role;
 # typo would already have been rejected upstream by MooX::Options, so the only
 # accepted-but-unmatched shape here is a Getopt::Long abbreviation, and karr's
 # abbreviatable flags (e.g. --jso for --json) consume nothing anyway.
+#
+# A bare "--" is the POSIX end-of-options separator: everything after it is a
+# positional, however option-shaped it looks. Getopt::Long already honours it
+# when parsing (so `karr create -- --json` never tries to parse --json as a
+# flag), but protect_argv hands the ORIGINAL argv -- separator included -- back
+# to execute(), so without this branch the walk below re-read the escaped tokens
+# as options and dropped them, leaving no positional at all. That was ticket
+# #72: an option-shaped title could only be passed via --title.
 sub positional_args {
     my ($self, $args_ref) = @_;
 
@@ -42,6 +50,10 @@ sub positional_args {
     my @args = @$args_ref;
     while (@args) {
         my $arg = shift @args;
+        if ($arg eq '--') {
+            push @positional, @args;
+            last;
+        }
         if ($arg =~ /^-/) {
             (my $name = $arg) =~ s/^-+//;        # drop leading dashes
             my $has_inline = $name =~ s/=.*//s;  # --opt=value carries its value
@@ -54,6 +66,7 @@ sub positional_args {
     }
     return @positional;
 }
+
 
 # Reject surplus positional arguments before a command does any work, matching
 # kanban-md's cobra Args validators (ExactArgs/RangeArgs/MaximumNArgs) which
@@ -78,6 +91,7 @@ sub check_positional_args {
         ($usage ? "$usage\n" : '');
 }
 
+
 1;
 
 __END__
@@ -92,7 +106,7 @@ App::karr::Role::CliArgs - Role providing option-aware CLI positional-argument p
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 DESCRIPTION
 
@@ -102,9 +116,45 @@ that argv still holds every original token -- option flags, the values they
 consumed, and the positionals -- in their original order. C<positional_args>
 subtracts the option tokens back out (using the consuming command's own
 C<_options_data>) to yield the positionals, and C<check_positional_args> rejects
-surplus positionals before a command does any work.
+surplus positionals before a command does any work. A bare C<--> ends option
+processing, so everything after it is a positional however option-shaped it
+looks.
 
 Command classes provide C<_options_data> and C<_options_config> via MooX::Options.
+
+=head2 positional_args
+
+    my @positional = $self->positional_args($args_ref);
+
+In a command class that composes this role, recovers the real positional
+arguments from C<$args_ref> -- the argv MooX::Cmd echoes back into
+C<execute()>, which under C<protect_argv> still holds every original token:
+recognised option flags, the values they consumed, and the positionals, in
+their original order. Returns the positionals only, in order, as plain
+strings; unrecognised dash-prefixed tokens are treated defensively as
+non-consuming (a genuine typo is already rejected upstream by
+MooX::Options). A bare C<--> ends option processing, so every token after it
+is returned as a positional however option-shaped it looks. Never dies --
+an argument list with no positionals returns an empty list.
+
+=head2 check_positional_args
+
+    $self->check_positional_args($args_ref, $max);
+
+In a command class that composes this role, dies with a usage message
+(C<"unexpected extra argument(s): '...'\n">, followed by the command's usage
+string if it has one) when C<$args_ref> resolves to more than C<$max>
+positionals via L</positional_args>; otherwise returns nothing. The message
+starts with the C<unexpected extra argument> marker
+L<App::karr::Error/is_usage_error> recognises, so F<bin/karr>'s central
+handler exits C<2> (ADR 0002), not C<1>. There is no
+minimum-arity check here -- a missing required positional is each command's
+own concern -- this only rejects surplus. Call it before a command does any
+work: kanban-md's cobra C<Args> validators run before C<RunE> the same way,
+and karr's batch commands rely on the comma list (parsed by
+L<App::karr::Role::BoardAccess/parse_ids>) as the one and only way to pass
+more than one id, so a second bare positional is always a mistake rather than
+an alternate batch syntax.
 
 =head1 SUPPORT
 

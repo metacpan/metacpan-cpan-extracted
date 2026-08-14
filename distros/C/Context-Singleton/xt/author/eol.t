@@ -22,6 +22,7 @@ my @files = (
     'lib/Context/Singleton/Frame/Promise.pm',
     'lib/Context/Singleton/Frame/Promise/Builder.pm',
     'lib/Context/Singleton/Frame/Promise/Rule.pm',
+    'lib/Context/Singleton/Singleton.pm',
     'lib/Context/Singleton/Tutorial.pod',
     't/Context-Singleton-Frame-Builder-Array.t',
     't/Context-Singleton-Frame-Builder-Base.t',

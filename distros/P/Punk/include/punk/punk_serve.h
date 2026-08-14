@@ -280,7 +280,7 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
             if (!l) continue;
             n = av_len(l) + 1;
             for (j = 0; j < n; j++) { SV **a = av_fetch(l, j, 0);
-                if (a && *a) (void)hv_store_ent(seen, *a, &PL_sv_yes, 0); }
+                if (a && *a) (void)hv_store_ent(seen, *a, PUNK_SET_TRUE, 0); }
         }
         (void)hv_delete(seen, method, (I32)mlen, 0);
         if (HvUSEDKEYS(seen)) {

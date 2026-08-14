@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::Builder::Value;
-$Context::Singleton::Frame::Builder::Value::VERSION = '1.0.8';
+$Context::Singleton::Frame::Builder::Value::VERSION = '1.0.9';
 use Moo;
 
 use namespace::clean;

@@ -56,6 +56,10 @@ WriteMakefile(
         'Plack'             => '1.0029', # OO-style Plack::Test
         'URI::Escape'       => 0,
     },
+    TEST_REQUIRES => {
+        'Mail::Message' => 0,
+        'Mail::Transport' => 0,
+    },
     EXE_FILES => [ 'bin/dancer2-generate-crypted-password' ],
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Dancer2-Plugin-Auth-Extensible-*' },

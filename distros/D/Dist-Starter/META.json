@@ -51,7 +51,7 @@
             "File::ShareDir::Tiny" : "0",
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
-            "Getopt::Guided" : "v3.2.2",
+            "Getopt::Guided" : "v3.2.3",
             "PerlX::Maybe" : "0",
             "Safe::Isa" : "0",
             "Try::Tiny" : "0",
@@ -76,7 +76,7 @@
    "provides" : {
       "Dist::Starter" : {
          "file" : "lib/Dist/Starter.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -90,6 +90,6 @@
          "web" : "https://codeberg.org/XSven/Dist-Starter"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

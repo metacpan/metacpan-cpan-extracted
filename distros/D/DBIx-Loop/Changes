@@ -1,5 +1,9 @@
 Revision history for DBIx-Loop
 
+0.04    2026-08-13
+        - The IO::Async adapter no longer dies in to_native / new_future on
+          IO::Async before 0.805 paired with Future 0.50 or newer.
+
 0.03    2026-08-12
         - t/06-hyperman.t failed the distribution on a box carrying a
           Hyperman older than 0.10.

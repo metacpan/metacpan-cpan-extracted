@@ -1,0 +1,11 @@
+Changes
+cpanfile
+lib/Baz/Bar/Foo.pm
+lib/Baz/Bar/Foo.pod
+Makefile.PL
+MANIFEST			This list of files
+MY.pm
+README
+t/basic.t
+t/critic.t
+t/load.t

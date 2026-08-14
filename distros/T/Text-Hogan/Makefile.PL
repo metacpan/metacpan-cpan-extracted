@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Clone" => "0.50",
     "HTML::Escape" => "1.11",
     "Ref::Util" => "0.204",
+    "Scalar::List::Utils" => "1.70",
     "Scalar::Util" => "1.70",
     "Text::Trim" => "1.04"
   },
@@ -27,10 +28,11 @@ my %WriteMakefileArgs = (
     "Data::Visitor::Callback" => "0.30",
     "Path::Tiny" => "0.059",
     "Test::More" => "1.001008",
+    "Test::Pod" => "1.52",
     "Try::Tiny" => "0.22",
     "YAML::XS" => "0.67"
   },
-  "VERSION" => "2.05",
+  "VERSION" => "2.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,8 +45,10 @@ my %FallbackPrereqs = (
   "HTML::Escape" => "1.11",
   "Path::Tiny" => "0.059",
   "Ref::Util" => "0.204",
+  "Scalar::List::Utils" => "1.70",
   "Scalar::Util" => "1.70",
   "Test::More" => "1.001008",
+  "Test::Pod" => "1.52",
   "Text::Trim" => "1.04",
   "Try::Tiny" => "0.22",
   "YAML::XS" => "0.67"

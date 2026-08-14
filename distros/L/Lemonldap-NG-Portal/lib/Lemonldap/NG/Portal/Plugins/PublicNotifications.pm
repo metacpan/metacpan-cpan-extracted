@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.3';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -52,9 +52,12 @@ sub getPublicNotifs {
     my $infos =
       $self->notifObject->module->notifObject->getNotifications("public-info");
 
-    my $public_errors = [ map { from_json( $errors->{$_} ) } keys %$errors ];
-    my $public_warns  = [ map { from_json( $warns->{$_} ) } keys %$warns ];
-    my $public_infos  = [ map { from_json( $infos->{$_} ) } keys %$infos ];
+    my $public_errors =
+      [ map { $self->_extractNotification( $errors->{$_} ) } keys %$errors ];
+    my $public_warns =
+      [ map { $self->_extractNotification( $warns->{$_} ) } keys %$warns ];
+    my $public_infos =
+      [ map { $self->_extractNotification( $infos->{$_} ) } keys %$infos ];
 
     if ( @$public_errors || @$public_warns || @$public_infos ) {
         my $res = to_json( {
@@ -63,17 +66,31 @@ sub getPublicNotifs {
                 public_infos  => $public_infos,
             }
         );
+        my $cacheTag = $self->p->cacheTag;
         $req->env->{DISPLAY_PUBLIC_NOTIFICATIONS} = 1 if $res;
-        $req->data->{customScript} .= <<EOF           if $res;
+        $req->data->{customScript} .= <<EOF if $res;
 <script type="application/init">
 {
   "publicNotifications": $res
 }
 </script>
-<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/carousel.js?v=$self->{p}->cacheTag"></script>
+<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/carousel.min.js?v=$cacheTag"></script>
 EOF
     }
     return PE_OK;
+}
+
+sub _extractNotification {
+    my ( $self, $notif ) = @_;
+    $notif = from_json($notif);
+    $notif = $notif->[0] if ( ref($notif) eq 'ARRAY' );
+    if ( my $content = $notif->{xml} ) {
+        $self->logger->debug("Notification content: $content");
+        $content = from_json($content);
+        delete $notif->{xml};
+        return { %$notif, %$content };
+    }
+    else { return $notif; }
 }
 
 1;

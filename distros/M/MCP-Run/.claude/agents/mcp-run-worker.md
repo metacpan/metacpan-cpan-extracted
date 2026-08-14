@@ -7,6 +7,7 @@ briefing:
   skills:
     - mcp-run-core
     - perl-core
+    - perl-mojo
     - perl-mcp
     - perl-release-author-getty
     - perl-release-dist-ini

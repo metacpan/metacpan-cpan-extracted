@@ -10,3 +10,4 @@ lib/.*\.o
 ^MYMETA\.yml$
 ^MYMETA\.json$
 Scalar-ValueTags.*\.tar\.gz
+DMD_helper.h

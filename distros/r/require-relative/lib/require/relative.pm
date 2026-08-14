@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package require::relative;
-$require::relative::VERSION = '1.0.0';
+$require::relative::VERSION = '1.0.1';
 use Path::Tiny ();
 
 sub import {
@@ -50,7 +50,7 @@ share configuration or setup.
 
 =head1 AUTHOR
 
-Branislav Zahradník <barney@cpan.org>
+Branislav Zahradník <barney.cpan@gmail.org>
 
 =head1 COPYRIGHT AND LICENSE
 

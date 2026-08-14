@@ -1,7 +1,7 @@
 # ABSTRACT: Install, check, and update bundled agent skills
 
 package App::karr::Cmd::Skill;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -10,11 +10,17 @@ use MooX::Options (
 use App::karr::Role::Output;
 use App::karr::Role::CliArgs;
 use App::karr::Role::ExitCodes;
+use App::karr::Role::SkillFile;
+use App::karr::Error qw( user_error clean_error );
 use Path::Tiny;
 
 # ExitCodes: unknown option / bad option value exits 2, not 1 (ADR 0002). Skill
 # is board-less, so it does not inherit ExitCodes via BoardDiscovery.
-with 'App::karr::Role::Output', 'App::karr::Role::CliArgs', 'App::karr::Role::ExitCodes';
+# SkillFile: _skill_content and _write_skill, shared with `karr init
+# --claude-skill`, which writes the same file this command writes for the
+# claude-code agent (tickets #145, #146).
+with 'App::karr::Role::Output', 'App::karr::Role::CliArgs',
+     'App::karr::Role::ExitCodes', 'App::karr::Role::SkillFile';
 
 
 option agent => (
@@ -52,10 +58,36 @@ sub execute {
   } elsif ($action eq 'update') {
     $self->_update;
   } elsif ($action eq 'show') {
-    print $self->_skill_content;
+    $self->_show;
   } else {
-    die "Unknown action: $action (use install, check, update, or show)\n";
+    # Leading "Usage:" is what bin/karr's handler keys on to exit 2 rather than
+    # 1 (ADR 0002: an invalid value is a usage error). Becomes a one-line swap
+    # to Role::ExitCodes' usage_error once that lands (ticket #76).
+    user_error( "Usage: karr skill [install|check|update|show]\n",
+                "Unknown action: $action (use install, check, update, or show)" );
   }
+}
+
+sub _show {
+  my ($self) = @_;
+  my $content = $self->_skill_content;
+
+  if ($self->json) {
+    # Characters in, characters out, exactly like the plain branch below:
+    # print_json goes through App::karr::Encoding::json_encode, which is the
+    # character-level codec, and STDOUT's :encoding(UTF-8) layer does the one
+    # and only encode. _skill_content is already decoded (slurp_utf8), so it
+    # goes in untouched.
+    return $self->print_json({ content => $content });
+  }
+
+  # Ticket #33 encoded here, because back then the rest of the CLI handed raw
+  # octets to print and a layer on STDOUT would have double-encoded them.
+  # Ticket #53 removed that premise: STDOUT now carries :encoding(UTF-8) and
+  # every command prints characters, so _skill_content goes out as-is.
+  # Encoding it again here would be the very double encode #33 was avoiding.
+  print $content;
+  return;
 }
 
 sub _install {
@@ -74,8 +106,7 @@ sub _install {
       next;
     }
 
-    $dir->mkpath;
-    $file->spew_utf8($content);
+    $self->_write_skill($file, $content);
     push @results, { agent => $agent, status => 'installed', path => "$file" };
     printf "%-12s installed to %s\n", $agent, $file unless $self->json;
   }
@@ -101,7 +132,7 @@ sub _check {
       next;
     }
 
-    my $installed = $file->slurp_utf8;
+    my $installed = $self->_read_skill($file);
     if ($installed eq $current) {
       push @results, { agent => $agent, status => 'current' };
       printf "%-12s current\n", $agent unless $self->json;
@@ -134,12 +165,12 @@ sub _update {
       next;
     }
 
-    my $installed = $file->slurp_utf8;
+    my $installed = $self->_read_skill($file);
     if ($installed eq $content) {
       push @results, { agent => $agent, status => 'current' };
       printf "%-12s already current\n", $agent unless $self->json;
     } else {
-      $file->spew_utf8($content);
+      $self->_write_skill($file, $content);
       push @results, { agent => $agent, status => 'updated' };
       printf "%-12s updated\n", $agent unless $self->json;
     }
@@ -150,12 +181,35 @@ sub _update {
   }
 }
 
+# Path::Tiny raises Path::Tiny::Error objects that stringify with the call site
+# appended ("mkpath failed for ...: Permission denied at .../Cmd/Skill.pm line
+# NNN."), so an unwritable skill directory used to report a karr source
+# location at the user. App::karr::Error reduces it to the one line that is
+# actually about them (ticket #77).
+sub _read_skill {
+  my ($self, $file) = @_;
+  my $content = eval { $file->slurp_utf8 };
+  defined $content
+    or user_error( "Could not read $file: ", clean_error($@) );
+  return $content;
+}
+
+# _write_skill -- the in-place write, and why it has to be one -- lives in
+# App::karr::Role::SkillFile, composed above: `karr init --claude-skill` writes
+# the very same .claude/skills/karr/SKILL.md, and kept its own spew_utf8 copy of
+# this rule until ticket #145 because the rule lived here (#142). _skill_content,
+# which finds the bundled file in the first place, followed it there in #146 --
+# it was duplicated in Cmd::Init down to the last line but one.
+
 sub _target_agents {
   my ($self) = @_;
   if ($self->agent) {
     my @names = split /,/, $self->agent;
     for my $name (@names) {
-      die "Unknown agent: $name (known: " . join(', ', sort keys %AGENTS) . ")\n"
+      # --agent is a value MooX::Options cannot validate, so the usage error is
+      # raised here; see the note on the unknown-action branch in execute.
+      user_error( "Usage: karr skill --agent NAME[,NAME,...]\n",
+                  "Unknown agent: $name (known: ", join( ', ', sort keys %AGENTS ), ")" )
         unless $AGENTS{$name};
     }
     return @names;
@@ -178,28 +232,6 @@ sub _skill_dir {
   return $base->child('karr');
 }
 
-sub _skill_content {
-  my ($self) = @_;
-
-  # Try File::ShareDir (installed dist)
-  my $installed = eval {
-    require File::ShareDir;
-    my $dir = File::ShareDir::dist_dir('App-karr');
-    my $file = path($dir)->child('claude-skill.md');
-    $file->slurp_utf8 if $file->exists;
-  };
-  return $installed if defined $installed && length $installed;
-
-  # Fallback: relative to module location (development)
-  my $module_path = $INC{'App/karr/Cmd/Skill.pm'};
-  if ($module_path) {
-    my $share = path($module_path)->parent(5)->child('share/claude-skill.md');
-    return $share->slurp_utf8 if $share->exists;
-  }
-
-  die "Could not find claude-skill.md. Is App::karr properly installed?\n";
-}
-
 1;
 
 __END__
@@ -214,7 +246,7 @@ App::karr::Cmd::Skill - Install, check, and update bundled agent skills
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -230,6 +262,10 @@ Installs and maintains the bundled C<karr> skill file for supported agent
 clients. The command can target project-local directories or global skill
 locations in the current user's home directory, which makes it useful both for
 direct Perl installs and Docker-wrapped vendor usage.
+
+Writes go into the target file B<in place>, keeping its inode, so a
+F<SKILL.md> that is one link of a hardlink chain shared across projects stays
+part of that chain instead of being silently broken out of it.
 
 =head1 SUPPORTED AGENTS
 
@@ -256,7 +292,9 @@ Refreshes existing installed copies in place.
 
 =item * C<show>
 
-Prints the bundled skill content to standard output.
+Prints the bundled skill content to standard output. With C<--json> the same
+content is emitted as a JSON object under the C<content> key instead of raw
+Markdown.
 
 =back
 

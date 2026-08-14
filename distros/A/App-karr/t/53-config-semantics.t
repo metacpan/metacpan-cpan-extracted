@@ -56,6 +56,95 @@ subtest 'status_requires_claim honours require_claim flag on custom statuses' =>
   is $config->status_requires_claim('explicit-off'), 0, 'require_claim => 0 does not require claim';
 };
 
+# status_requires_claim used to walk `statuses` itself, next to status_config
+# doing the same walk for no caller at all (ticket #121). It now reads
+# status_config's entry, so both are pinned here: the entry each status shape
+# resolves to, and the boolean derived from it. The pair matters more than
+# either half -- the fold is only safe because a bare status synthesizes an
+# entry with no require_claim key, which is exactly the bare-string rule this
+# file records above.
+subtest 'status_config resolves one status to what the board says about it' => sub {
+  my $config = App::karr::Config->from_merged( App::karr::Config->default_config );
+
+  is_deeply $config->status_config('in-progress'),
+    { name => 'in-progress', require_claim => 1 },
+    'mapping status comes back as configured, require_claim included';
+  is_deeply $config->status_config('backlog'), { name => 'backlog' },
+    'bare status is synthesized into an entry carrying only its name';
+  ok !exists $config->status_config('backlog')->{require_claim},
+    '...and no require_claim key, which is what makes it need no claim';
+  is $config->status_config('missing'), undef, 'unknown status has no entry';
+
+  my $custom = App::karr::Config->from_merged({
+    statuses => [
+      'open',
+      { name => 'gated',        require_claim => 1 },
+      { name => 'ungated' },
+      { name => 'explicit-off', require_claim => 0 },
+    ],
+  });
+  is_deeply $custom->status_config('open'), { name => 'open' },
+    'bare custom status synthesizes an entry';
+  is_deeply $custom->status_config('ungated'), { name => 'ungated' },
+    'mapping without require_claim keeps its shape';
+  is_deeply $custom->status_config('explicit-off'),
+    { name => 'explicit-off', require_claim => 0 },
+    'an explicit false is preserved in the entry, not dropped';
+  is $custom->status_config('gated')->{require_claim}, 1,
+    'the flag status_requires_claim reads is on the entry';
+};
+
+subtest 'status_requires_claim is status_config require_claim as a boolean' => sub {
+  my $config = App::karr::Config->from_merged({
+    statuses => [
+      'open',
+      { name => 'gated',        require_claim => 1 },
+      { name => 'ungated' },
+      { name => 'explicit-off', require_claim => 0 },
+    ],
+  });
+
+  # Re-inlining the lookup, or reintroducing the old "a bare string requires a
+  # claim" answer status_config never gave, breaks this loop.
+  for my $status (qw( open gated ungated explicit-off backlog missing )) {
+    my $entry = $config->status_config($status);
+    is $config->status_requires_claim($status),
+      ( $entry && $entry->{require_claim} ) ? 1 : 0,
+      "status_requires_claim('$status') agrees with its status_config entry";
+  }
+
+  my $default = App::karr::Config->from_merged( App::karr::Config->default_config );
+  for my $status ( $default->statuses, 'nonexistent' ) {
+    my $entry = $default->status_config($status);
+    is $default->status_requires_claim($status),
+      ( $entry && $entry->{require_claim} ) ? 1 : 0,
+      "default board: '$status' agrees with its status_config entry";
+  }
+};
+
+subtest 'the MockStore double answers status_requires_claim like Config' => sub {
+  require MockStore;
+
+  my $ec = App::karr::Config->effective_config({
+    statuses => [
+      'inbox',
+      { name => 'doing',   require_claim => 1 },
+      { name => 'waiting' },
+      'shipped',
+    ],
+  });
+  my $mock      = MockStore->new( ec => $ec );
+  my $canonical = App::karr::Config->from_merged($ec);
+
+  for my $status (qw( inbox doing waiting shipped in-progress unknown )) {
+    is $mock->status_requires_claim($status),
+       $canonical->status_requires_claim($status),
+       "mock: status_requires_claim('$status') matches Config";
+  }
+  is $mock->status_requires_claim('doing'), 1, 'mock: require_claim status needs a claim';
+  is $mock->status_requires_claim('inbox'), 0, 'mock: bare status does not';
+};
+
 subtest 'BoardStore wrappers match canonical Config on the production path' => sub {
   my $repo = tempdir( CLEANUP => 1 );
   system( 'git', 'init', '-q', $repo ) == 0

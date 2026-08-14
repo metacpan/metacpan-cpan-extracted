@@ -1,4 +1,4 @@
-requires 'MCP';
+requires 'MCP' => '0.15';
 requires 'Text::Trim';
 requires 'JSON::MaybeXS';
 requires 'Path::Tiny';

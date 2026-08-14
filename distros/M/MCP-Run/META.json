@@ -30,7 +30,7 @@
       "runtime" : {
          "requires" : {
             "JSON::MaybeXS" : "0",
-            "MCP" : "0",
+            "MCP" : "0.15",
             "Path::Tiny" : "0",
             "Text::Trim" : "0"
          }
@@ -44,19 +44,19 @@
    "provides" : {
       "MCP::Run" : {
          "file" : "lib/MCP/Run.pm",
-         "version" : "0.105"
+         "version" : "0.106"
       },
       "MCP::Run::Bash" : {
          "file" : "lib/MCP/Run/Bash.pm",
-         "version" : "0.105"
+         "version" : "0.106"
       },
       "MCP::Run::Compress" : {
          "file" : "lib/MCP/Run/Compress.pm",
-         "version" : "0.105"
+         "version" : "0.106"
       },
       "MCP::Run::Compress::Filters" : {
          "file" : "lib/MCP/Run/Compress/Filters.pm",
-         "version" : "0.105"
+         "version" : "0.106"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/Getty/p5-mcp-run"
       }
    },
-   "version" : "0.105",
+   "version" : "0.106",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -427,7 +427,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.105",
+                  "tag" : "0.106",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

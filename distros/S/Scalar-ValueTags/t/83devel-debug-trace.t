@@ -16,6 +16,10 @@ BEGIN {
 }
 
 use Scalar::ValueTags;
+
+( my $file = __FILE__ ) =~ s/\.t$/.pmat/;
+END { unlink $file if -f $file }
+
 skip_all "Scalar::ValueTags is not available" unless value_tags_enabled;
 skip_all "Scalar::ValueTags debug tracing is not enabled"
   unless value_tags_tracing_enabled;
@@ -26,9 +30,7 @@ my $orig_var = 123;
 add_value_tags( $vt_type, \$orig_var, my $datum = { data => "here" } );
 my $derived_var = $orig_var;
 
-( my $file = __FILE__ ) =~ s/\.t$/.pmat/;
 Devel::MAT::Dumper::dump($file);
-END { unlink $file if -f $file }
 
 my $pmat = Devel::MAT->load($file);
 my $df   = $pmat->dumpfile;

@@ -16,6 +16,7 @@
 "OpenIDConnect":"OpenID Connect",
 "OptionalTitle":"Titolo facoltativo",
 "SMTP":"SMTP",
+"SMTPAuthMech":"SASL mechanism",
 "SMTPAuthPass":"Password",
 "SMTPAuthUser":"Utente",
 "SMTPPort":"Porta",

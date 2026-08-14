@@ -216,6 +216,66 @@ subtest 'transform_command Co-Authored-By override' => sub {
   my $across_separator = q{git status; git log --grep=commit -m "fix"};
   is $c->transform_command($across_separator), $across_separator, 'pattern does not cross command separators';
 
+  # Regression: the injected trailer must land in the commit MESSAGE, never
+  # in a trailing quoted argument of a compound command. The old injection
+  # targeted the last quote of the whole command line, so `... && git config
+  # user.name "y"` had the trailer written into the config value.
+  my $config_after = q{git commit -m "init" && git config user.name "Test User"};
+  my $config_signed = $c->transform_command($config_after);
+  like $config_signed, qr/init\n\nCo-Authored-By: MiniMax-M2\.7"/, 'compound: trailer inside commit message';
+  like $config_signed, qr/config user\.name "Test User"$/, 'compound: trailing config value untouched';
+
+  my $echo_after = q{git commit -m "init" && echo "done"};
+  my $echo_signed = $c->transform_command($echo_after);
+  like $echo_signed, qr/echo "done"$/, 'compound: trailing echo argument untouched';
+
+  my $author_arg = q{git commit -m "done" --author "Foo Bar <f@b.c>"};
+  my $author_signed = $c->transform_command($author_arg);
+  like $author_signed, qr/--author "Foo Bar <f\@b\.c>"$/, 'trailing --author untouched';
+
+  my $no_message = q{git commit --amend};
+  is $c->transform_command($no_message), $no_message, 'no -m argument: no injection';
+
+  # Regression: bundled short flags. `git commit -am "..."` contains no
+  # literal `-m`, so a regex looking for one skipped the injection and the
+  # trailer was silently dropped.
+  my $bundled = q{git commit -am "init"};
+  like $c->transform_command($bundled),
+    qr/-am "init\n\nCo-Authored-By: MiniMax-M2\.7"\z/,
+    'bundled -am: trailer inside the commit message';
+
+  my $bundled_many = q{git commit -anm "init"};
+  like $c->transform_command($bundled_many),
+    qr/-anm "init\n\nCo-Authored-By: MiniMax-M2\.7"\z/,
+    'bundled -anm: trailer inside the commit message';
+
+  my $bundled_compound = q{git commit -am "init" && git config user.name "Test User"};
+  my $bundled_compound_signed = $c->transform_command($bundled_compound);
+  like $bundled_compound_signed, qr/-am "init\n\nCo-Authored-By: MiniMax-M2\.7"/,
+    'bundled -am compound: trailer inside commit message';
+  like $bundled_compound_signed, qr/config user\.name "Test User"$/,
+    'bundled -am compound: trailing config value untouched';
+
+  # The widened flag pattern must stay a flag pattern: bundles not ending
+  # in `m` carry no message, and a `-m` inside an argument value is not an
+  # argument boundary.
+  my $bundle_no_m = q{git commit -av "init"};
+  is $c->transform_command($bundle_no_m), $bundle_no_m,
+    'bundled flags not ending in m: no injection';
+
+  my $dash_m_in_path = q{git commit -F /tmp/msg-m "unrelated"};
+  is $c->transform_command($dash_m_in_path), $dash_m_in_path,
+    '-m inside an argument value is not the message flag';
+
+  # Regression: replacing an existing Co-Authored-By line must not swallow
+  # the closing quote when the trailer ends the -m "..." message. The old
+  # s/Co-Authored-By: [^\n]+/.../g matched the quote too, leaving the shell
+  # with an unterminated string.
+  my $trailer_in_msg = qq{git commit -m "Fix bug\n\nCo-Authored-By: Claude <noreply\@anthropic.com>"};
+  my $replaced = $c->transform_command($trailer_in_msg);
+  like $replaced, qr/Co-Authored-By: MiniMax-M2\.7"/, 'replacement keeps the closing quote';
+  unlike $replaced, qr/Co-Authored-By: Claude/, 'old trailer replaced';
+
   done_testing;
 };
 

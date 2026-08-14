@@ -17,10 +17,12 @@ name: Scalar-ValueTags
 provides:
   Scalar::ValueTags:
     file: lib/Scalar/ValueTags.pm
-    version: '0.004'
+    version: '0.006'
 requires:
   perl: '5.044'
 resources:
+  bugtracker: https://github.com/Zhtwn/Scalar-ValueTags/issues
   license: http://dev.perl.org/licenses/
-version: '0.004'
+  repository: git://github.com/Zhtwn/Scalar-ValueTags.git
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -14,7 +14,15 @@ package PlackX::Framework::Handler {
   #
   # App assembly section
   #
-  sub build_app ($class, %options)  {
+  sub build_app ($class, %options) {
+    my $app = _build_app($class, %options);
+    if (my $wrapper = $class->app_namespace->can('apply_middleware')) {
+      $app = $wrapper->($app);
+    }
+    return $app;
+  }
+
+  sub _build_app ($class, %options)  {
     # Freeze the router
     my $rt_engine = ($class->app_namespace . '::Router::Engine')->instance;
     $rt_engine->freeze;
@@ -50,7 +58,7 @@ package PlackX::Framework::Handler {
     # error codes at the last possible moment and render a user-defined page.
     return sub ($env) {
       my $main_resp = $main_app->($env);
-      return $main_resp if ref $main_resp and $main_resp->[0] != 404;
+      return $main_resp if ref $main_resp and (ref $main_resp eq 'CODE' or $main_resp->[0] != 404);
       my $file_resp = $file_app->($env);
       return $file_resp if ref $file_resp and $file_resp->[0] != 404;
       return $main_resp;

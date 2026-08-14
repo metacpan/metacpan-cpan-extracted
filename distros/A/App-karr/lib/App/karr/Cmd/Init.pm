@@ -1,17 +1,20 @@
 # ABSTRACT: Initialize a new karr board
 
 package App::karr::Cmd::Init;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
   usage_string => 'USAGE: karr init [--name TEXT] [--statuses LIST] [--claude-skill]',
 );
-use Path::Tiny;
+use App::karr::Error qw( user_error clean_error );
 use App::karr::Config;
 use App::karr::Role::BoardDiscovery;
+use App::karr::Role::SkillFile;
 
-with 'App::karr::Role::BoardDiscovery';
+# SkillFile: _skill_content and _write_skill, shared with `karr skill`, which
+# installs the same file --claude-skill installs (tickets #145, #146).
+with 'App::karr::Role::BoardDiscovery', 'App::karr::Role::SkillFile';
 
 
 option name => (
@@ -40,6 +43,12 @@ sub execute {
   my $store = $self->store;
   die "Board already exists in refs/karr/\n" if $store->board_exists;
 
+  # Asked before the first ref write below, which would make any repository
+  # look like it already held something. This is what tells a board born here
+  # apart from a half-board this run is completing (#62), and the encoding
+  # marker further down hangs on the difference (#132).
+  my $born_here = !$store->has_board_refs;
+
   my $overrides = { version => 1 };
   $overrides->{board} = { name => $self->name } if defined $self->name;
 
@@ -50,16 +59,67 @@ sub execute {
 
   my $effective = App::karr::Config->effective_config($overrides);
   $store->save_config($effective);
-  $store->set_next_id(1);
+  # Not set_next_id(1): init now also completes a board that a stray write
+  # command left half-built (#62), and resetting the counter under tasks that
+  # are already there would hand the next `karr create` an id it would then
+  # overwrite.
+  $store->ensure_next_id;
+  # A board born here is written under the current encoding contract, so mark
+  # it and spare it the legacy-mojibake repair (ticket #53) -- but only one
+  # actually born here. The task refs of a half-board this run is completing
+  # were written by some earlier karr, quite possibly 0.402 or older, and
+  # stamping asserts the opposite of what they carry: the read-path repair
+  # stops running, every old card turns to mojibake, and `karr repair` then
+  # reports the board as up to date and declines to fix it (#132). Say nothing
+  # instead, which leaves both the repair on read and `karr repair --yes`
+  # available.
+  $store->stamp_encoding_version if $born_here;
+  # And stamp its identity, the thing a pull compares against the remote's to
+  # recognise a swapped board (#95). ensure_, not set_: init also completes
+  # half-boards (#62), and re-keying one that already carries an id would
+  # make every other clone read this board as a foreign one.
+  $store->ensure_board_id;
 
   print "Initialized karr board in refs/karr/\n";
+
+  # Completing a half-board is a different event from creating one, and the
+  # user has to be told which one just happened: the tasks that were already
+  # there are still there, and the board is still on the old encoding contract
+  # because this run had no business claiming otherwise (#132).
+  if ( !$born_here ) {
+    my @ids   = $store->git->list_task_refs;   # returns through sort: no scalar context
+    my $tasks = scalar @ids;
+    print $tasks == 1
+      ? "Completed a half-board: the 1 task ref already here was kept.\n"
+      : "Completed a half-board: the $tasks task refs already here were kept.\n";
+    print "Left refs/karr/meta/encoding unstamped, so those refs keep being read the way\n"
+      . "they were written; 'karr repair' says whether they need migrating.\n"
+      if $store->git->board_is_legacy_encoded;
+  }
 
   # The materialized file view (config.yml + tasks/) is a disposable view of the
   # canonical refs and must never be committed. Ensure the board-root .gitignore
   # covers it, appending idempotently -- kanban-md does the same at init time.
-  my @ignored = $store->ensure_gitignore( $root->stringify );
-  print "Added .gitignore entries for the file view: " . join( ', ', @ignored ) . "\n"
-    if @ignored;
+  #
+  # Unless the project got there first: `tasks/` and `config.yml` at a
+  # repository root are perfectly ordinary names for a project to already use,
+  # and git applies no ignore rule to a file it already tracks. The entry would
+  # therefore change nothing at all while telling every later reader that karr
+  # owns a path the project owns -- and it would say so right where `karr
+  # materialize` refuses to write, for that very reason (tickets #48, #89). Say
+  # nothing rather than something untrue.
+  my @owned = $store->project_owned_view_paths($root);
+  if (@owned) {
+    print "Left .gitignore alone: git already tracks content at "
+      . join( ', ', @owned ) . ".\n"
+      . "Those paths belong to the project, not to karr's file view, so karr is "
+      . "not\nclaiming them here.\n";
+  }
+  else {
+    my @ignored = $store->ensure_gitignore( $root->stringify );
+    print "Added .gitignore entries for the file view: " . join( ', ', @ignored ) . "\n"
+      if @ignored;
+  }
 
   if ($self->claude_skill) {
     $self->_install_claude_skill($root);
@@ -69,33 +129,30 @@ sub execute {
 sub _install_claude_skill {
   my ($self, $root) = @_;
   my $skill_dir = $root->child('.claude/skills/karr');
-  $skill_dir->mkpath;
+  # An unwritable .claude is the project's layout, not a karr bug: Path::Tiny
+  # would otherwise report this file and line at the user (#77). Kept here
+  # rather than left to the mkpath inside _write_skill, which would report the
+  # same failure as "Could not write .../SKILL.md": at that point nothing has
+  # been written and nothing could be, because the directory is what karr could
+  # not create. Saying so is this command's own contract (t/120).
+  eval { $skill_dir->mkpath; 1 }
+    or user_error( "Could not create $skill_dir: ", clean_error($@) );
 
-  my $skill_content = $self->_find_skill_source;
-  $skill_dir->child('SKILL.md')->spew_utf8($skill_content);
+  # Also App::karr::Role::SkillFile's, since ticket #146: finding the bundled
+  # file was a second copy of `karr skill`'s _skill_content, identical to it
+  # except for the one $INC key that told the development fallback which
+  # command's source tree to look next to.
+  my $skill_content = $self->_skill_content;
+  # Through App::karr::Role::SkillFile, not spew_utf8: this is the same file
+  # `karr skill install --agent claude-code` writes, and in a checkout wired up
+  # by manage-skills it is one link of a hardlink chain. spew_utf8 renames a
+  # temp file over the target, which breaks this project out of that chain and
+  # leaves every other one on the old inode with the old text -- the bug fixed
+  # in `karr skill` as ticket #142 and left standing here until #145. The role
+  # is also where the read-only fallback and its warning live, so there is one
+  # description of how a skill file gets written rather than two that drift.
+  $self->_write_skill( $skill_dir->child('SKILL.md'), $skill_content );
   print "Installed Claude Code skill to .claude/skills/karr/SKILL.md\n";
-}
-
-sub _find_skill_source {
-  my ($self) = @_;
-
-  # Try File::ShareDir (installed dist)
-  my $installed = eval {
-    require File::ShareDir;
-    my $dir = File::ShareDir::dist_dir('App-karr');
-    my $file = path($dir)->child('claude-skill.md');
-    $file->slurp_utf8 if $file->exists;
-  };
-  return $installed if defined $installed && length $installed;
-
-  # Fallback: relative to module location (development)
-  my $module_path = $INC{'App/karr/Cmd/Init.pm'};
-  if ($module_path) {
-    my $share = path($module_path)->parent(5)->child('share/claude-skill.md');
-    return $share->slurp_utf8 if $share->exists;
-  }
-
-  die "Could not find claude-skill.md. Is App::karr properly installed?\n";
 }
 
 1;
@@ -112,7 +169,7 @@ App::karr::Cmd::Init - Initialize a new karr board
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -140,7 +197,11 @@ Replaces the default status list with the comma-separated statuses you supply.
 
 =item * C<--claude-skill>
 
-Copies the bundled skill file to F<.claude/skills/karr/SKILL.md>.
+Copies the bundled skill file to F<.claude/skills/karr/SKILL.md> -- the same
+file L<App::karr::Cmd::Skill> installs for the C<claude-code> agent, and written
+the same way: B<in place>, keeping the inode of a F<SKILL.md> that is already
+there, so one that is a link of a hardlink chain shared across projects stays
+part of that chain.
 
 =back
 

@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.146';
+our $VERSION = '0.147';
 
 use 5.020;
 use strictures 2;
@@ -23,7 +23,7 @@ use Mojo::Util qw(url_unescape url_escape);
 use Carp 'croak';
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
-use builtin::compat 'blessed';
+use builtin::compat qw(blessed indexed);
 use JSON::Schema::Modern::Utilities qw(register_schema load_cached_document true false match_media_type);
 use namespace::clean;
 
@@ -211,7 +211,7 @@ sub convert_request ($request) {
     $req->version($request->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}r) if $request->protocol;
     my $body = $request->content;
 
-    if (match_media_type(scalar $request->content_type, ['multipart/form-data'])) {
+    if (match_media_type(scalar $request->content_type, ['multipart/*'])) {
       $req->content(Mojo::Content::MultiPart->new);
       $req->headers->add(@$_) foreach pairs $request->headers->flatten;
       $req->content->emit(read => $body);
@@ -227,7 +227,7 @@ sub convert_request ($request) {
     $request = do { +require Plack::Request; Plack::Request->new($request->env) }
       if not $request->isa('Plack::Request');
 
-    if (match_media_type($request->content_type, ['multipart/form-data'])) {
+    if (match_media_type($request->content_type, ['multipart/*'])) {
       $req->content(Mojo::Content::MultiPart->new);
       $req->parse($request->env);
       $req->content->emit(read => $request->content);
@@ -286,7 +286,7 @@ sub convert_response ($response) {
     return $res->error({ message => 'unknown type '.ref($response) });
   }
 
-  if (match_media_type(scalar $response->content_type, ['multipart/form-data'])) {
+  if (match_media_type(scalar $response->content_type, ['multipart/*'])) {
     $res->content(Mojo::Content::MultiPart->new);
     $res->headers->add(@$_) foreach @headers;
     $res->content->emit(read => $body);
@@ -383,7 +383,8 @@ sub elem ($items, $set) {
 
 # Operates on a Mojo::Content object; returns two values:
 # - all parts as an arrayref of objects:
-#   [ { $name => $value }, { ... }, ... ]
+#   for multipart/form-data: [ { $name => $value }, { ... }, ]
+#   for other multipart/*:   [ $value1, $value2, ... ]
 # - headers for each part as an arrayref of objects:
 #   [ { $header1 => $value, $header2 => $value, ... }, { ... }, ... ]
 # Only the top level is operated on; if there are parts nested inside of parts, those parts will be
@@ -395,18 +396,40 @@ sub deserialize_multipart ($content) {
   die 'body is not multipart' if not blessed $content or not $content->is_multipart;
 
   my (@content, @headers);
+  my $is_form = match_media_type($content->headers->content_type, ['multipart/form-data']);
 
   foreach my $part ($content->parts->@*) {
     my $headers = $part->headers->to_hash('multi');
-    push @headers, +{ map +($_ => ($headers->{$_}->@* == 1 ? $headers->{$_}[0] : $headers->{$_} )),
+    $headers = +{ map +($_ => ($headers->{$_}->@* == 1 ? $headers->{$_}[0] : $headers->{$_} )),
       keys $headers->%* };
 
-    my $disposition = $part->headers->content_disposition;
-    die 'missing Content-Disposition' if not defined $disposition;
+    my $value;
+    if ($part->is_multipart) {
+      ($value, my $new_headers) = deserialize_multipart($part);
+      # new_headers is an arrayref... copy into the $headers hash with array indices as hash keys
+      $headers = { %$headers, indexed $new_headers->@* };
+    }
+    else {
+      $value = $part->asset->slurp;
+    }
 
-    my ($name) = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
-    my $value = $part->is_multipart ? $part : $part->asset->slurp;
-    push @content, { $name => $value };
+    if ($is_form) {
+      my $disposition = $part->headers->content_disposition;
+      die 'missing Content-Disposition' if not defined $disposition;
+
+      my ($name) = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
+      $value = { $name => $value };
+    }
+
+    push @content, $value;
+    push @headers, $headers;
+  }
+
+  # remove empty header entries
+  my $seen_header;
+  foreach my $idx (reverse 0..$#headers) {
+    $seen_header++, last if keys $headers[$idx]->%*;
+    delete $headers[$idx];
   }
 
   return (\@content, \@headers);
@@ -434,7 +457,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.146
+version 0.147
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

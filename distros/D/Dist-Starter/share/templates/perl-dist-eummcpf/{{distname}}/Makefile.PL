@@ -18,12 +18,10 @@ my $main_module_podfile   = catfile( 'lib', @main_module_namespace ) . '.pod';
 my $main_module_version = MM->parse_version( $main_module_file );
 
 my %att = (
-  NAME          => $main_module,
-  AUTHOR        => '{{author.full_name}} <{{author.email}}>',
-  VERSION       => $main_module_version,
-  ABSTRACT_FROM => $main_module_podfile,
-  # Another valid license string is "restricted"
-  # https://metacpan.org/pod/CPAN::Meta::Spec#license
+  NAME             => $main_module,
+  AUTHOR           => '{{author.full_name}} <{{author.email}}>',
+  VERSION          => $main_module_version,
+  ABSTRACT_FROM    => $main_module_podfile,
   LICENSE          => '{{license}}',
   MIN_PERL_VERSION => '{{min_perl_version}}',
   DISTNAME         => $distname,
@@ -70,6 +68,7 @@ if ( caller() ) {
   require ExtUtils::MakeMaker::CPANfile;
   ExtUtils::MakeMaker::CPANfile->import;
 
+  {{share.Makefile}}
   local @INC = ( @INC, '.' ) if $] >= 5.026;
   can_load( modules => { MY => 0 } )
 }

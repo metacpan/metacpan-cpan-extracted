@@ -16,6 +16,7 @@
 "OpenIDConnect":"OpenID Connect",
 "OptionalTitle":"İsteğe bağlı başlık",
 "SMTP":"SMTP",
+"SMTPAuthMech":"SASL mechanism",
 "SMTPAuthPass":"Parola",
 "SMTPAuthUser":"Kullanıcı",
 "SMTPPort":"Port",

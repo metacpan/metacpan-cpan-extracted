@@ -1,14 +1,16 @@
 package WebService::Client;
 use Moo::Role;
 
-our $VERSION = '1.0001'; # VERSION
+our $VERSION = '1.0100'; # VERSION
 
 use Carp qw(croak);
-use HTTP::Request;
-use HTTP::Request::Common qw(DELETE GET POST PUT);
+use Ref::Util qw(is_hashref is_plain_arrayref is_plain_coderef);
+use URI ();
+use HTTP::Request ();
+use HTTP::Request::Common qw(DELETE GET HEAD OPTIONS PATCH POST PUT);
 use JSON::MaybeXS ();
-use LWP::UserAgent;
-use WebService::Client::Response;
+use LWP::UserAgent ();
+use WebService::Client::Response ();
 
 has base_url => (
     is      => 'rw',
@@ -56,7 +58,7 @@ has deserializer => (
         my $json = $self->json;
         sub {
             my ($res, %args) = @_;
-            return $json->decode($res->content);
+            return $json->decode($res->decoded_content);
         }
     },
 );
@@ -88,33 +90,30 @@ has mode => (
     default => sub { '' },
 );
 
-sub get {
-    my ($self, $path, $params, %args) = @_;
-    $params ||= {};
+has array_query_style => (
+    is      => 'ro',
+    default => sub { 'php' },
+    isa     => sub {
+        my $s = shift;
+        die q{array_query_style must be "php" or "rfc"}
+            unless $s eq 'php' or $s eq 'rfc';
+    },
+);
+
+sub get  { shift->_request_with_params(\&GET,  @_) }
+sub head { shift->_request_with_params(\&HEAD, @_) }
+
+sub _request_with_params {
+    my ($self, $method, $path, $params, %args) = @_;
+    $params //= {};
     my $headers = $self->_headers(\%args);
-    my $url = $self->_url($path);
-    my $q = '';
-    if (%$params) {
-        my @items;
-        while (my ($key, $value) = each %$params) {
-            if ('ARRAY' eq ref $value) {
-                push @items, map "$key\[]=$_", @$value;
-            }
-            else {
-                push @items, "$key=$value";
-            }
-        }
-        if (@items) {
-            $q = '?' . join '&', @items;
-        }
-    }
-    my $req = GET "$url$q", %$headers;
+    my $req = $method->($self->_build_url($path, $params), %$headers);
     return $self->req($req, %args);
 }
 
 sub post {
     my ($self, $path, $data, %args) = @_;
-    my $headers = $self->_headers(\%args);
+    my $headers = $self->_headers_content_type(\%args);
     my $url = $self->_url($path);
     my $req = POST $url, %$headers, $self->_content($data, %args);
     return $self->req($req, %args);
@@ -122,7 +121,7 @@ sub post {
 
 sub put {
     my ($self, $path, $data, %args) = @_;
-    my $headers = $self->_headers(\%args);
+    my $headers = $self->_headers_content_type(\%args);
     my $url = $self->_url($path);
     my $req = PUT $url, %$headers, $self->_content($data, %args);
     return $self->req($req, %args);
@@ -130,12 +129,9 @@ sub put {
 
 sub patch {
     my ($self, $path, $data, %args) = @_;
-    my $headers = $self->_headers(\%args);
+    my $headers = $self->_headers_content_type(\%args);
     my $url = $self->_url($path);
-    my %content = $self->_content($data, %args);
-    my $req = HTTP::Request->new(
-        'PATCH', $url, [%$headers], $content{content}
-    );
+    my $req = PATCH $url, %$headers, $self->_content($data, %args);
     return $self->req($req, %args);
 }
 
@@ -144,6 +140,16 @@ sub delete {
     my $headers = $self->_headers(\%args);
     my $url = $self->_url($path);
     my $req = DELETE $url, %$headers;
+    return $self->req($req, %args);
+}
+
+sub options {
+    my ($self, $path, $data, %args) = @_;
+    my $headers = defined $data
+        ? $self->_headers_content_type(\%args)
+        : $self->_headers(\%args);
+    my $url = $self->_url($path);
+    my $req = OPTIONS $url, %$headers, $self->_content($data, %args);
     return $self->req($req, %args);
 }
 
@@ -176,7 +182,7 @@ sub req {
     $des = $args{deserializer} if exists $args{deserializer};
     if ($des) {
         die 'deserializer must be a coderef or undef'
-            unless 'CODE' eq ref $des;
+            unless is_plain_coderef($des);
         return $des->($res, %args);
     }
     else {
@@ -200,15 +206,24 @@ sub prepare_response {
 sub _url {
     my ($self, $path) = @_;
     croak 'The path is missing' unless defined $path;
-    return $path =~ /^http/ ? $path : $self->base_url . $path;
+    return $path =~ m{^https?://} ? $path : $self->base_url . $path;
 }
 
 sub _headers {
     my ($self, $args) = @_;
-    my $headers = $args->{headers} ||= {};
-    croak 'The headers param must be a hashref' unless 'HASH' eq ref $headers;
-    $headers->{content_type} = $self->content_type
-        unless _content_type($headers);
+    my $headers = $args->{headers} // {};
+    croak 'The headers param must be a hashref'
+        unless is_hashref($headers);
+    return $headers;
+}
+
+sub _headers_content_type {
+    my ($self, $args) = @_;
+    my $headers = $self->_headers($args);
+    unless (_content_type($headers)) {
+        $headers = { %$headers, content_type => $self->content_type };
+        $args->{headers} = $headers;
+    }
     return $headers;
 }
 
@@ -237,7 +252,7 @@ sub _content {
         $ser = $args{serializer} if exists $args{serializer};
         if ($ser) {
             die 'serializer must be a coderef or undef'
-                unless 'CODE' eq ref $ser;
+                unless is_plain_coderef($ser);
             $data = $ser->($data, %args);
         }
         @content = ( content => $data );
@@ -245,7 +260,32 @@ sub _content {
     return @content;
 }
 
-# ABSTRACT: A base role for quickly and easily creating web service clients
+sub _encode_params {
+    my ($self, $params) = @_;
+    return $params unless $self->array_query_style eq 'php';
+    my %php;
+    for my $key (keys %$params) {
+        my $value = $params->{$key};
+        if (is_plain_arrayref($value)) {
+            $php{"$key\[]"} = $value;
+        }
+        else {
+            $php{$key} = $value;
+        }
+    }
+    return \%php;
+}
+
+sub _build_url {
+    my ($self, $path, $params) = @_;
+    my $uri = URI->new($self->_url($path));
+    if (keys %$params) {
+        $uri->query_form_hash($self->_encode_params($params));
+    }
+    return $uri->as_string;
+}
+
+# ABSTRACT: A base role for creating web service clients
 
 
 1;
@@ -258,11 +298,11 @@ __END__
 
 =head1 NAME
 
-WebService::Client - A base role for quickly and easily creating web service clients
+WebService::Client - A base role for creating web service clients
 
 =head1 VERSION
 
-version 1.0001
+version 1.0100
 
 =head1 SYNOPSIS
 
@@ -336,28 +376,27 @@ L<WebService::Client::Response> response object.
 
 =head1 DESCRIPTION
 
-This module is a base role for quickly and easily creating web service clients.
-Every time I created a web service client, I noticed that I kept rewriting the
-same boilerplate code independent of the web service.
-This module does the boring boilerplate for you so you can just focus on
-the fun part - writing the web service specific code.
+This module is a base role for creating web service clients.
+Every time I created one, I rewrote the same boilerplate code.
+This module provides that boilerplate so you can write the
+web service specific code.
 
 =head1 METHODS
 
 These are the methods this role composes into your class.
-The HTTP methods (get, post, put, and delete) will return the deserialized
-response data, if the response body contained any data.
+The HTTP methods (get, post, put, patch, delete, head, options) return the
+deserialized response data if the response body contains any data.
 This will usually be a hashref.
-If the web service responds with a failure, then the corresponding HTTP
-response object is thrown as an exception.
+If the web service responds with a failure, the corresponding HTTP response
+object is thrown as an exception.
 This exception is a L<HTTP::Response> object that has the
-L<HTTP::Response::Stringable> role so it can be easily logged.
+L<HTTP::Response::Stringable> role so it can be logged.
 GET requests that respond with a status code of C<404> or C<410> will not
 throw an exception.
 Instead, they will simply return C<undef>.
 
-The http methods C<get/post/put/delete> can all take the following optional
-named arguments:
+The http methods C<get/post/put/patch/delete/head/options> can all take the
+following optional named arguments:
 
 =over
 
@@ -384,11 +423,11 @@ Set this to C<undef> if you want the raw http response body to be returned.
 Example:
 
     $client->post(
-        /widgets,
+        '/widgets',
         { color => 'blue' },
         headers      => { x_custom_header => 'blah' },
         serializer   => sub { ... },
-        deserialized => sub { ... },
+        deserializer => sub { ... },
     }
 
 =head2 get
@@ -415,6 +454,7 @@ Makes an HTTP PUT request.
 =head2 patch
 
     $client->patch('/foo', { some => 'data' });
+    $client->patch('/foo', { some => 'data' }, headers => { foo => 'bar' });
 
 Makes an HTTP PATCH request.
 
@@ -423,6 +463,22 @@ Makes an HTTP PATCH request.
     $client->delete('/foo');
 
 Makes an HTTP DELETE request.
+
+=head2 head
+
+    $client->head('/foo');
+    $client->head('/foo', { query => 'params' });
+    $client->head('/foo', { query => 'params' }, headers => { foo => 'bar' });
+
+Makes an HTTP HEAD request. Supports query parameters like C<get>.
+
+=head2 options
+
+    $client->options('/foo');
+    $client->options('/foo', { some => 'data' });
+    $client->options('/foo', { some => 'data' }, headers => { foo => 'bar' });
+
+Makes an HTTP OPTIONS request.
 
 =head2 req
 
@@ -436,7 +492,7 @@ a method modifier to it.
 Here is a contrived example:
 
     around req => sub {
-        my ($orig, $self, $req) = @_;
+        my ($orig, $self, $req, @rest) = @_;
         $req->authorization_basic($self->login, $self->password);
         return $self->$orig($req, @rest);
     };
@@ -486,6 +542,24 @@ Optional.
 Optional.
 Default is C<'application/json'>.
 
+=head2 array_query_style
+
+Optional.
+Controls how array-valued query parameters are encoded in GET requests.
+
+    # php style (default) - ids[]=1&ids[]=2
+    array_query_style => 'php',
+
+    # rfc style - ids=1&ids=2
+    array_query_style => 'rfc',
+
+The C<'php'> style appends C<[]> to the key for each array value. This
+matches how query parameters are parsed in many web frameworks. It is the
+default for backward compatibility with earlier versions of this module.
+
+The C<'rfc'> style repeats the key for each value. This is specified by
+RFC 3986 and is the standard behavior for most modern REST APIs.
+
 =head2 serializer
 
 Optional.
@@ -500,8 +574,7 @@ Set this to C<undef> if you want the raw http response body to be returned.
 
 =head1 EXAMPLES
 
-Here are some examples of web service clients built with this role.
-You can view their source to help you get started.
+Web service clients built with this role:
 
 =over
 

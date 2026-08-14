@@ -6,35 +6,27 @@ use strict;
 use warnings;
 
 package Context::Singleton::Frame::DB;
-$Context::Singleton::Frame::DB::VERSION = '1.0.8';
+$Context::Singleton::Frame::DB::VERSION = '1.0.9';
 use Moo;
 
 use Class::Load;
 use Module::Pluggable::Object;
 use Ref::Util;
 
-use Context::Singleton::Frame::Builder::Value;
-use Context::Singleton::Frame::Builder::Hash;
-use Context::Singleton::Frame::Builder::Array;
+use Context::Singleton::Singleton;
 
 use namespace::clean;
 
-has q (cache)
-	=> is       => q (ro)
-	=> init_arg => +undef
+has cache
+	=> is       => ro
 	=> default  => sub { +{} }
+	=> init_arg => undef
 	;
 
-has q (triggers)
-	=> is       => q (ro)
-	=> init_arg => +undef
+has plugins
+	=> is       => ro
 	=> default  => sub { +{} }
-	;
-
-has q (plugins)
-	=> is       => q (ro)
-	=> init_arg => +undef
-	=> default  => sub { +{} }
+	=> init_arg => undef
 	;
 
 sub BUILD {
@@ -50,36 +42,23 @@ sub BUILD {
 	));
 }
 
-sub instance {
-	state $instance = __PACKAGE__->new;
-	return $instance;
+sub _ensure_singleton {
+	my ($db, $name) = @_;
+	my $lookup_key = $db->_lookup_key ($name);
+
+	return $db->cache->{$lookup_key} //= Context::Singleton::Singleton::->new (singleton => $name);
 }
 
-sub contrive_class {
+sub _lookup_key {
 	my ($db, $name) = @_;
 
-	return
-		if exists $db->cache->{$name}
-		;
-
-	$db->contrive ($name, (
-		dep => [ q (class_loader) ],
-		as => eval qq (sub { \$_[0]->(q[$name]) && q[$name] }),
-	));
-
-	return;
+	return $name;
 }
 
-sub _guess_builder_class {
-	my ($db, $def) = @_;
+sub _search_singleton {
+	my ($db, $name) = @_;
 
-	return q (Context::Singleton::Frame::Builder::Value)
-		if exists $def->{value}
-		;
-	return q (Context::Singleton::Frame::Builder::Hash)
-		if Ref::Util::is_hashref ($def->{dep})
-		;
-	return q (Context::Singleton::Frame::Builder::Array)
+	return $db->cache->{ $db->_lookup_key ($name) };
 }
 
 sub contrive {
@@ -96,32 +75,29 @@ sub contrive {
 		delete $def{deduce};
 	}
 
-	my $builder_class = $db->_guess_builder_class (\%def);
-	my $builder = $builder_class->new (%def);
-
-	push @{ $db->cache->{ $name } }, $builder;
+	$db->_ensure_singleton ($name)->add_builder (\ %def);
 
 	return;
 }
 
-sub trigger {
-	my ($db, $name, $code) = @_;
+sub contrive_class {
+	my ($db, $name) = @_;
 
-	push @{ $db->triggers->{ $name } }, $code;
+	return
+		if $db->_search_singleton ($name)
+		;
+
+	$db->contrive ($name, (
+		dep => [ q (class_loader) ],
+		as => eval qq (sub { \$_[0]->(q[$name]) && q[$name] }),
+	));
 
 	return;
 }
 
-sub search_builder_for {
-	my ($db, $name) = @_;
-
-	return @{ $db->cache->{ $name } // [] };
-}
-
-sub search_trigger_for {
-	my ($db, $name) = @_;
-
-	return @{ $db->triggers->{ $name } // [] };
+sub instance {
+	state $instance = __PACKAGE__->new;
+	return $instance;
 }
 
 sub load_rules {
@@ -136,6 +112,34 @@ sub load_rules {
 			1;
 		};
 	}
+
+	return;
+}
+
+sub search_builder_for {
+	my ($db, $name) = @_;
+
+	return
+		unless my $singleton = $db->_search_singleton ($name)
+		;
+
+	return $singleton->builders;
+}
+
+sub search_trigger_for {
+	my ($db, $name) = @_;
+
+	return
+		unless my $singleton = $db->_search_singleton ($name)
+		;
+
+	return $singleton->on_destroy;
+}
+
+sub trigger {
+	my ($db, $name, $code) = @_;
+
+	$db->_ensure_singleton ($name)->add_on_destroy ($code);
 
 	return;
 }

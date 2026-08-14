@@ -173,7 +173,7 @@ static void pco_methods_for(pTHX_ HV *state, const char *path, STRLEN plen,
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(web, i, 0);
             if (e && *e && !hv_exists_ent(seen, *e, 0)) {
-                (void)hv_store_ent(seen, *e, &PL_sv_yes, 0);
+                (void)hv_store_ent(seen, *e, PUNK_SET_TRUE, 0);
                 av_push(out, newSVsv(*e));
             }
         }
@@ -213,7 +213,7 @@ static void pco_methods_for(pTHX_ HV *state, const char *path, STRLEN plen,
             for (j = 0; j < an; j++) {
                 SV **e = av_fetch(allowv, j, 0);
                 if (e && *e && !hv_exists_ent(seen, *e, 0)) {
-                    (void)hv_store_ent(seen, *e, &PL_sv_yes, 0);
+                    (void)hv_store_ent(seen, *e, PUNK_SET_TRUE, 0);
                     av_push(out, newSVsv(*e));
                 }
             }

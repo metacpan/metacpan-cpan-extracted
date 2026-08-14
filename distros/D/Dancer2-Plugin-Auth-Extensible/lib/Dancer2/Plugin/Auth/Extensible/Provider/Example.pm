@@ -11,6 +11,6 @@ See also L<Dancer2::Plugin::Auth::Extensible::Role::Provider>.
 
 =cut
 
-our $VERSION = '0.712';
+our $VERSION = '0.713';
 
 1;

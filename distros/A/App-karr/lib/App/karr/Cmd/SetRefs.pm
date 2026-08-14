@@ -1,27 +1,45 @@
 # ABSTRACT: Store helper payloads in a Git ref
 
 package App::karr::Cmd::SetRefs;
-our $VERSION = '0.402';
+our $VERSION = '0.500';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
   usage_string => 'USAGE: karr set-refs REF CONTENT...',
 );
 use App::karr::Git;
+use App::karr::Role::CliArgs;
 use App::karr::Role::ExitCodes;
 
 # Unknown option / bad option value exits 2, not 1 (ADR 0002 exit-code
 # contract). This board-less command has no BoardDiscovery to inherit it from.
-with 'App::karr::Role::ExitCodes';
+with 'App::karr::Role::CliArgs', 'App::karr::Role::ExitCodes';
+
+# Declared locally rather than inherited from App::karr::Role::BoardDiscovery:
+# this command deliberately has no board, it only needs the discovery seed to
+# find the repository the helper ref is written into. Both documented
+# placements now work (ticket #71): `karr set-refs REF TEXT --dir PATH` binds
+# this option, while `karr --dir PATH set-refs REF TEXT` leaves --dir on the
+# root and is adopted from the MooX::Cmd command_chain in execute(). Declaring
+# it with format=s is also what keeps `--dir PATH` out of the joined payload.
+option dir => (
+  is        => 'ro',
+  format    => 's',
+  doc       => 'Path used as the starting point for Git repository discovery',
+  predicate => 1,
+);
 
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
-  my ($ref_input, @content_parts) = @$args_ref;
+  my ($ref_input, @content_parts) = $self->positional_args($args_ref);
   die "Usage: karr set-refs REF CONTENT...\n" unless defined $ref_input && @content_parts;
 
   my $repo_dir = '.';
-  if ($chain_ref && @$chain_ref) {
+  if ($self->has_dir) {
+    $repo_dir = $self->dir;
+  }
+  elsif ($chain_ref && @$chain_ref) {
     my $root = $chain_ref->[0];
     if ($root && $root->can('has_dir') && $root->has_dir) {
       $repo_dir = $root->dir;
@@ -54,12 +72,13 @@ App::karr::Cmd::SetRefs - Store helper payloads in a Git ref
 
 =head1 VERSION
 
-version 0.402
+version 0.500
 
 =head1 SYNOPSIS
 
     karr set-refs superpowers/spec/1234.md draft ready
     karr set-refs refs/superpowers/spec/1234.md "full payload"
+    karr set-refs superpowers/spec/1234.md "payload" --dir /path/to/repo
 
 =head1 DESCRIPTION
 
@@ -71,6 +90,9 @@ task card.
 Like the rest of the Perl CLI, this works fine from a local install, and the
 same command can be run from the Docker wrapper if you prefer the vendored
 runtime style described in the README.
+
+C<--dir> names the starting point for Git repository discovery and works both
+before the command (C<karr --dir PATH set-refs REF TEXT>) and after it.
 
 =head1 SEE ALSO
 

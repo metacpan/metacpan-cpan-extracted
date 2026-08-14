@@ -1,7 +1,7 @@
 # strict (5.12), warnings (5.35), signatures (5.36)
 use v5.36;
 
-package PlackX::Framework 0.29 {
+package PlackX::Framework 0.30 {
   use PXF::Util ();
   use List::Util qw(any);
 
@@ -327,6 +327,22 @@ feature in your application, with the :URIx or :all tag, the request->urix
 method will cause an error.
 
 For more information, see L<PlackX::Framework::URIx>.
+
+
+=head2 Middleware
+
+You can trigger PlackX::Framework to build middleware into your app by defining
+an apply_middleware sub in your root application. The sub will be passed a PSGI
+code reference and should return a PSGI code reference. (This sub will be called
+as a plain sub, not as a class or object method).
+
+    package MyApp {
+      use PlackX::Framework;
+      sub apply_middleware ($app) {
+        $app = Plack::Middleware::Alice->wrap($app, %options);
+        $app = Plack::Middleware::Bob->wrap($app, %options);
+      }
+    }
 
 =head2 Why Another Framework?
 

@@ -16,6 +16,7 @@
 "OpenIDConnect":"OpenID 連線",
 "OptionalTitle":"可選的標題",
 "SMTP":"SMTP",
+"SMTPAuthMech":"SASL mechanism",
 "SMTPAuthPass":"密碼",
 "SMTPAuthUser":"使用者",
 "SMTPPort":"連接埠",

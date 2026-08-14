@@ -6,7 +6,7 @@ use Moo;
 with "Dancer2::Plugin::Auth::Extensible::Role::Provider";
 use namespace::clean;
 
-our $VERSION = '0.712';
+our $VERSION = '0.713';
 
 =head1 NAME
 
